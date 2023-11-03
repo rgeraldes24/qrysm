@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
 	blockfeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/block"
 	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

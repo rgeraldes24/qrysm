@@ -33,7 +33,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -236,7 +236,7 @@ func TestServer_ListValidatorBalances_ExceedsMaxPageSize(t *testing.T) {
 }
 
 func pubKey(i uint64) []byte {
-	pubKey := make([]byte, params.BeaconConfig().BLSPubkeyLength)
+	pubKey := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
 	binary.LittleEndian.PutUint64(pubKey, i)
 	return pubKey
 }

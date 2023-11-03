@@ -20,9 +20,9 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	v1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	v2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assertions"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )

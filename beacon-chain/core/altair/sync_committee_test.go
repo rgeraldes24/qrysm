@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/bls"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	prysmTime "github.com/theQRL/qrysm/v4/time"
@@ -186,7 +186,7 @@ func TestSyncCommittee_CanGet(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 				require.Equal(t, int(params.BeaconConfig().SyncCommitteeSize), len(got.Pubkeys))
-				require.Equal(t, params.BeaconConfig().BLSPubkeyLength, len(got.AggregatePubkey))
+				require.Equal(t, params.BeaconConfig().DilithiumPubkeyLength, len(got.AggregatePubkey))
 			}
 		})
 	}

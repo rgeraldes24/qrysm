@@ -4,7 +4,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // HydrateSyncCommittee hydrates the provided sync committee message.
@@ -24,14 +24,14 @@ func ConvertToCommittee(inputKeys [][]byte) *zondpb.SyncCommittee {
 	var pubKeys [][]byte
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
 		if i < uint64(len(inputKeys)) {
-			pubKeys = append(pubKeys, bytesutil.PadTo(inputKeys[i], params.BeaconConfig().BLSPubkeyLength))
+			pubKeys = append(pubKeys, bytesutil.PadTo(inputKeys[i], params.BeaconConfig().DilithiumPubkeyLength))
 		} else {
-			pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength))
+			pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength))
 		}
 	}
 
 	return &zondpb.SyncCommittee{
 		Pubkeys:         pubKeys,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 }

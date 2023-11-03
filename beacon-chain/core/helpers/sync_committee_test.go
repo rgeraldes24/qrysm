@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -21,7 +21,7 @@ func TestIsCurrentEpochSyncCommittee_UsingCache(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -52,7 +52,7 @@ func TestIsCurrentEpochSyncCommittee_UsingCommittee(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -80,7 +80,7 @@ func TestIsCurrentEpochSyncCommittee_DoesNotExist(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -108,7 +108,7 @@ func TestIsNextEpochSyncCommittee_UsingCache(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -137,7 +137,7 @@ func TestIsNextEpochSyncCommittee_UsingCache(t *testing.T) {
 func TestIsNextEpochSyncCommittee_UsingCommittee(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -163,7 +163,7 @@ func TestIsNextEpochSyncCommittee_UsingCommittee(t *testing.T) {
 func TestIsNextEpochSyncCommittee_DoesNotExist(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -191,7 +191,7 @@ func TestCurrentEpochSyncSubcommitteeIndices_UsingCache(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -222,7 +222,7 @@ func TestCurrentEpochSyncSubcommitteeIndices_UsingCommittee(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -263,7 +263,7 @@ func TestCurrentEpochSyncSubcommitteeIndices_DoesNotExist(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -291,7 +291,7 @@ func TestNextEpochSyncSubcommitteeIndices_UsingCache(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -320,7 +320,7 @@ func TestNextEpochSyncSubcommitteeIndices_UsingCache(t *testing.T) {
 func TestNextEpochSyncSubcommitteeIndices_UsingCommittee(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -348,7 +348,7 @@ func TestNextEpochSyncSubcommitteeIndices_DoesNotExist(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)
@@ -402,7 +402,7 @@ func TestIsCurrentEpochSyncCommittee_SameBlockRoot(t *testing.T) {
 	defer ClearCache()
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	for i := 0; i < len(validators); i++ {
 		k := make([]byte, 48)

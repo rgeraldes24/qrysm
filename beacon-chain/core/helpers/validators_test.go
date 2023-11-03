@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -736,7 +736,7 @@ func TestLastActivatedValidatorIndex_OK(t *testing.T) {
 	balances := make([]uint64, len(validators))
 	for i := uint64(0); i < 4; i++ {
 		validators[i] = &zondpb.Validator{
-			PublicKey:             make([]byte, params.BeaconConfig().BLSPubkeyLength),
+			PublicKey:             make([]byte, params.BeaconConfig().DilithiumPubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			EffectiveBalance:      32 * 1e9,
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,

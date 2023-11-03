@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
-	v2 "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	v2 "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 )
 

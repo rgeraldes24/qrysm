@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/peers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/peers/peerdata"
 	http2 "github.com/theQRL/qrysm/v4/network/http"
-	zond "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // ListTrustedPeer retrieves data about the node's trusted peers.

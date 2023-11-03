@@ -3,7 +3,7 @@ package testing
 import (
 	"context"
 
-	zond "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // MockProtector mocks the protector.

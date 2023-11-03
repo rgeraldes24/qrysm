@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/crypto/bls"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
@@ -119,7 +119,7 @@ func NewBeaconState(options ...NewBeaconStateOption) (state.BeaconState, error) 
 func NewBeaconStateAltair(options ...func(state *zondpb.BeaconStateAltair) error) (state.BeaconState, error) {
 	pubkeys := make([][]byte, 512)
 	for i := range pubkeys {
-		pubkeys[i] = make([]byte, 48)
+		pubkeys[i] = make([]byte, 2592)
 	}
 
 	seed := &zondpb.BeaconStateAltair{
@@ -147,11 +147,11 @@ func NewBeaconStateAltair(options ...func(state *zondpb.BeaconStateAltair) error
 		CurrentEpochParticipation:   make([]byte, 0),
 		CurrentSyncCommittee: &zondpb.SyncCommittee{
 			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 48),
+			AggregatePubkey: make([]byte, 1327104),
 		},
 		NextSyncCommittee: &zondpb.SyncCommittee{
 			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 48),
+			AggregatePubkey: make([]byte, 1327104),
 		},
 	}
 
@@ -174,7 +174,7 @@ func NewBeaconStateAltair(options ...func(state *zondpb.BeaconStateAltair) error
 func NewBeaconStateBellatrix(options ...func(state *zondpb.BeaconStateBellatrix) error) (state.BeaconState, error) {
 	pubkeys := make([][]byte, 512)
 	for i := range pubkeys {
-		pubkeys[i] = make([]byte, 48)
+		pubkeys[i] = make([]byte, 2592)
 	}
 
 	seed := &zondpb.BeaconStateBellatrix{
@@ -202,11 +202,11 @@ func NewBeaconStateBellatrix(options ...func(state *zondpb.BeaconStateBellatrix)
 		CurrentEpochParticipation:   make([]byte, 0),
 		CurrentSyncCommittee: &zondpb.SyncCommittee{
 			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 48),
+			AggregatePubkey: make([]byte, 1327104),
 		},
 		NextSyncCommittee: &zondpb.SyncCommittee{
 			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 48),
+			AggregatePubkey: make([]byte, 1327104),
 		},
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeader{
 			ParentHash:       make([]byte, 32),
@@ -241,7 +241,7 @@ func NewBeaconStateBellatrix(options ...func(state *zondpb.BeaconStateBellatrix)
 func NewBeaconStateCapella(options ...func(state *zondpb.BeaconStateCapella) error) (state.BeaconState, error) {
 	pubkeys := make([][]byte, 512)
 	for i := range pubkeys {
-		pubkeys[i] = make([]byte, 48)
+		pubkeys[i] = make([]byte, 2592)
 	}
 
 	seed := &zondpb.BeaconStateCapella{
@@ -269,11 +269,11 @@ func NewBeaconStateCapella(options ...func(state *zondpb.BeaconStateCapella) err
 		CurrentEpochParticipation:   make([]byte, 0),
 		CurrentSyncCommittee: &zondpb.SyncCommittee{
 			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 48),
+			AggregatePubkey: make([]byte, 1327104),
 		},
 		NextSyncCommittee: &zondpb.SyncCommittee{
 			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 48),
+			AggregatePubkey: make([]byte, 1327104),
 		},
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
 			ParentHash:       make([]byte, 32),

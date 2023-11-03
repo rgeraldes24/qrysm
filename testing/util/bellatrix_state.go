@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // DeterministicGenesisStateBellatrix returns a genesis state in Bellatrix format made using the deterministic deposits.
@@ -224,15 +224,15 @@ func buildGenesisBeaconStateBellatrix(genesisTime uint64, preState state.BeaconS
 
 	var pubKeys [][]byte
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
-		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength))
+		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength))
 	}
 	st.CurrentSyncCommittee = &zondpb.SyncCommittee{
 		Pubkeys:         pubKeys,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 	st.NextSyncCommittee = &zondpb.SyncCommittee{
 		Pubkeys:         bytesutil.SafeCopy2dBytes(pubKeys),
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}
 
 	st.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeader{

@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/cmd"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -90,7 +90,7 @@ func TestServer_ListAssignments_Pagination_InputOutOfRange(t *testing.T) {
 	count := 100
 	validators := make([]*zondpb.Validator, 0, count)
 	for i := 0; i < count; i++ {
-		pubKey := make([]byte, params.BeaconConfig().BLSPubkeyLength)
+		pubKey := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
 		withdrawalCred := make([]byte, 32)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		validators = append(validators, &zondpb.Validator{
@@ -155,7 +155,7 @@ func TestServer_ListAssignments_Pagination_DefaultPageSize_NoArchive(t *testing.
 	count := 500
 	validators := make([]*zondpb.Validator, 0, count)
 	for i := 0; i < count; i++ {
-		pubKey := make([]byte, params.BeaconConfig().BLSPubkeyLength)
+		pubKey := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
 		withdrawalCred := make([]byte, 32)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		// Mark the validators with index divisible by 3 inactive.
@@ -239,7 +239,7 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 	validators := make([]*zondpb.Validator, 0, count)
 	withdrawCreds := make([]byte, 32)
 	for i := 0; i < count; i++ {
-		pubKey := make([]byte, params.BeaconConfig().BLSPubkeyLength)
+		pubKey := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		val := &zondpb.Validator{
 			PublicKey:             pubKey,
@@ -270,9 +270,9 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 		ReplayerBuilder:    mockstategen.NewMockReplayerBuilder(mockstategen.WithMockState(s)),
 	}
 
-	pubKey1 := make([]byte, params.BeaconConfig().BLSPubkeyLength)
+	pubKey1 := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
 	binary.LittleEndian.PutUint64(pubKey1, 1)
-	pubKey2 := make([]byte, params.BeaconConfig().BLSPubkeyLength)
+	pubKey2 := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
 	binary.LittleEndian.PutUint64(pubKey2, 2)
 	req := &zondpb.ListValidatorAssignmentsRequest{PublicKeys: [][]byte{pubKey1, pubKey2}, Indices: []primitives.ValidatorIndex{2, 3}}
 	res, err := bs.ListValidatorAssignments(context.Background(), req)
@@ -309,7 +309,7 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 	validators := make([]*zondpb.Validator, 0, count)
 	withdrawCred := make([]byte, 32)
 	for i := 0; i < count; i++ {
-		pubKey := make([]byte, params.BeaconConfig().BLSPubkeyLength)
+		pubKey := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		val := &zondpb.Validator{
 			PublicKey:             pubKey,

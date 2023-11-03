@@ -2,8 +2,9 @@ package beacon
 
 import (
 	"context"
-	"google.golang.org/grpc"
 	"strings"
+
+	"google.golang.org/grpc"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/api"
@@ -16,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/ssz/detect"
 	"github.com/theQRL/qrysm/v4/network/forks"
 	"github.com/theQRL/qrysm/v4/proto/migration"
-	zond "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 	"github.com/theQRL/qrysm/v4/runtime/version"

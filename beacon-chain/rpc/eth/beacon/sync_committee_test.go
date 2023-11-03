@@ -20,8 +20,8 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
-	zondpbalpha "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -42,7 +42,7 @@ func Test_currentCommitteeIndicesFromState(t *testing.T) {
 	}
 	require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
 		Pubkeys:         wantedCommittee,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}))
 
 	t.Run("OK", func(t *testing.T) {
@@ -55,7 +55,7 @@ func Test_currentCommitteeIndicesFromState(t *testing.T) {
 		wantedCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 48)
 		require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
 			Pubkeys:         wantedCommittee,
-			AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+			AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 		}))
 		_, _, err := currentCommitteeIndicesFromState(st)
 		require.ErrorContains(t, "index not found for pubkey", err)
@@ -73,7 +73,7 @@ func Test_nextCommitteeIndicesFromState(t *testing.T) {
 	}
 	require.NoError(t, st.SetNextSyncCommittee(&zondpbalpha.SyncCommittee{
 		Pubkeys:         wantedCommittee,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}))
 
 	t.Run("OK", func(t *testing.T) {
@@ -86,7 +86,7 @@ func Test_nextCommitteeIndicesFromState(t *testing.T) {
 		wantedCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 48)
 		require.NoError(t, st.SetNextSyncCommittee(&zondpbalpha.SyncCommittee{
 			Pubkeys:         wantedCommittee,
-			AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+			AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 		}))
 		_, _, err := nextCommitteeIndicesFromState(st)
 		require.ErrorContains(t, "index not found for pubkey", err)
@@ -102,7 +102,7 @@ func Test_extractSyncSubcommittees(t *testing.T) {
 	}
 	require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
 		Pubkeys:         syncCommittee,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}))
 
 	commSize := params.BeaconConfig().SyncCommitteeSize
@@ -136,7 +136,7 @@ func Test_extractSyncSubcommittees(t *testing.T) {
 		syncCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 48)
 		require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
 			Pubkeys:         syncCommittee,
-			AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+			AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 		}))
 		committee, err := st.CurrentSyncCommittee()
 		require.NoError(t, err)
@@ -155,7 +155,7 @@ func TestListSyncCommittees(t *testing.T) {
 	}
 	require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
 		Pubkeys:         syncCommittee,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}))
 	stRoot, err := st.HashTreeRoot(ctx)
 	require.NoError(t, err)
@@ -300,7 +300,7 @@ func TestListSyncCommitteesFuture(t *testing.T) {
 	}
 	require.NoError(t, st.SetNextSyncCommittee(&zondpbalpha.SyncCommittee{
 		Pubkeys:         syncCommittee,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().BLSPubkeyLength),
+		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
 	}))
 	db := dbTest.SetupDB(t)
 

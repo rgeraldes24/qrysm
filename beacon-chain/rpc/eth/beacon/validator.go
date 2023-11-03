@@ -12,8 +12,8 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/proto/migration"
+	zondpb "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
@@ -263,7 +263,7 @@ func valContainersByRequestIds(state state.BeaconState, validatorIds [][]byte) (
 		valContainers = make([]*zondpb.ValidatorContainer, 0, len(validatorIds))
 		for _, validatorId := range validatorIds {
 			var valIndex primitives.ValidatorIndex
-			if len(validatorId) == params.BeaconConfig().BLSPubkeyLength {
+			if len(validatorId) == params.BeaconConfig().DilithiumPubkeyLength {
 				var ok bool
 				valIndex, ok = state.ValidatorIndexByPubkey(bytesutil.ToBytes2592(validatorId))
 				if !ok {

@@ -9,7 +9,7 @@ import (
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	validatorpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	mock "github.com/theQRL/qrysm/v4/validator/accounts/testing"
@@ -66,7 +66,7 @@ func TestLocalKeymanager_FetchValidatingSeeds(t *testing.T) {
 		privKey, err := dilithium.RandKey()
 		require.NoError(t, err)
 		privKeyData := privKey.Marshal()
-		pubKey := bytesutil.ToBytes48(privKey.PublicKey().Marshal())
+		pubKey := bytesutil.ToBytes2592(privKey.PublicKey().Marshal())
 		wantedPrivateKeys[i] = bytesutil.ToBytes32(privKeyData)
 		dr.accountsStore.PublicKeys = append(dr.accountsStore.PublicKeys, pubKey[:])
 		dr.accountsStore.Seeds = append(dr.accountsStore.Seeds, privKeyData)

@@ -74,7 +74,7 @@ func TestLocalKeymanager_reloadAccountsFromKeystore(t *testing.T) {
 
 	// Check that the public keys were added to the public keys cache.
 	for i, keyBytes := range pubKeys {
-		require.Equal(t, bytesutil.ToBytes48(keyBytes), orderedPublicKeys[i])
+		require.Equal(t, bytesutil.ToBytes2592(keyBytes), orderedPublicKeys[i])
 	}
 
 	// Check that the secret keys were added to the secret keys cache.
@@ -83,7 +83,7 @@ func TestLocalKeymanager_reloadAccountsFromKeystore(t *testing.T) {
 	for i, keyBytes := range privKeys {
 		privKey, ok := dilithiumKeysCache[bytesutil.ToBytes2592(pubKeys[i])]
 		require.Equal(t, true, ok)
-		require.Equal(t, bytesutil.ToBytes48(keyBytes), bytesutil.ToBytes48(privKey.Marshal()))
+		require.Equal(t, bytesutil.ToBytes2592(keyBytes), bytesutil.ToBytes2592(privKey.Marshal()))
 	}
 
 	// Check the key was added to the global accounts store.

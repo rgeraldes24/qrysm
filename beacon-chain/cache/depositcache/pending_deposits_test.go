@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"google.golang.org/protobuf/proto"
 )
@@ -34,7 +34,7 @@ func TestRemovePendingDeposit_OK(t *testing.T) {
 	proof2 := makeDepositProof()
 	proof2[0] = bytesutil.PadTo([]byte{'A'}, 32)
 	data := &zondpb.Deposit_Data{
-		PublicKey:             make([]byte, 48),
+		PublicKey:             make([]byte, 2592),
 		WithdrawalCredentials: make([]byte, 32),
 		Amount:                0,
 		Signature:             make([]byte, 96),
@@ -64,7 +64,7 @@ func TestPendingDeposit_RoundTrip(t *testing.T) {
 	proof := makeDepositProof()
 	proof[0] = bytesutil.PadTo([]byte{'A'}, 32)
 	data := &zondpb.Deposit_Data{
-		PublicKey:             make([]byte, 48),
+		PublicKey:             make([]byte, 2592),
 		WithdrawalCredentials: make([]byte, 32),
 		Amount:                0,
 		Signature:             make([]byte, 96),

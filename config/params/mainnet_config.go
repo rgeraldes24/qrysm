@@ -113,7 +113,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	MinValidatorWithdrawabilityDelay: 256,
 	ShardCommitteePeriod:             256,
 	MinEpochsToInactivityPenalty:     4,
-	Eth1FollowDistance:               0,
+	Eth1FollowDistance:               2048,
 
 	// Fork choice algorithm constants.
 	ProposerScoreBoost:              40,
@@ -181,7 +181,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Prysm constants.
 	GweiPerEth:                     1000000000,
 	BLSSecretKeyLength:             32,
-	BLSPubkeyLength:                48,
+	DilithiumPubkeyLength:          2592,
 	DefaultBufferSize:              10000,
 	WithdrawalPrivkeyFileName:      "/shardwithdrawalkey",
 	ValidatorPrivkeyFileName:       "/validatorprivatekey",

@@ -8,17 +8,17 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // MockClient is a mock implementation of BuilderClient.
 type MockClient struct {
-	RegisteredVals map[[48]byte]bool
+	RegisteredVals map[[2592]byte]bool
 }
 
 // NewClient creates a new, correctly initialized mock.
 func NewClient() MockClient {
-	return MockClient{RegisteredVals: map[[48]byte]bool{}}
+	return MockClient{RegisteredVals: map[[2592]byte]bool{}}
 }
 
 // NodeURL --
@@ -34,7 +34,7 @@ func (MockClient) GetHeader(_ context.Context, _ primitives.Slot, _ [32]byte, _ 
 // RegisterValidator --
 func (m MockClient) RegisterValidator(_ context.Context, svr []*zondpb.SignedValidatorRegistrationV1) error {
 	for _, r := range svr {
-		b := bytesutil.ToBytes48(r.Message.Pubkey)
+		b := bytesutil.ToBytes2592(r.Message.Pubkey)
 		m.RegisteredVals[b] = true
 	}
 	return nil

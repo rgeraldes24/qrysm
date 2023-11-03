@@ -597,7 +597,7 @@ func requestedValIndices(w http.ResponseWriter, r *http.Request, st state.Beacon
 		index, err := strconv.ParseUint(v, 10, 64)
 		if err != nil {
 			pubkey, err := bytesutil.FromHexString(v)
-			if err != nil || len(pubkey) != fieldparams.BLSPubkeyLength {
+			if err != nil || len(pubkey) != fieldparams.DilithiumPubkeyLength {
 				errJson := &http2.DefaultErrorJson{
 					Message: fmt.Sprintf("%s is not a validator index or pubkey", v),
 					Code:    http.StatusBadRequest,

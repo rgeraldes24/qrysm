@@ -1,8 +1,8 @@
 package util
 
 import (
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	v2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
 )
 
 // NewBeaconBlockBellatrix creates a beacon block with minimum marshalable fields.

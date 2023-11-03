@@ -10,8 +10,8 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	synccontribution "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/attestation/aggregation/sync_contribution"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	synccontribution "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/sync_contribution"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"go.opencensus.io/trace"
 )

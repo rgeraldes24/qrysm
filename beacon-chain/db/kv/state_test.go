@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -709,7 +709,7 @@ func TestAltairState_CanDelete(t *testing.T) {
 func validators(limit int) []*zondpb.Validator {
 	var vals []*zondpb.Validator
 	for i := 0; i < limit; i++ {
-		pubKey := make([]byte, params.BeaconConfig().BLSPubkeyLength)
+		pubKey := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, rand.Uint64())
 		val := &zondpb.Validator{
 			PublicKey:                  pubKey,

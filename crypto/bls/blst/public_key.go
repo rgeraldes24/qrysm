@@ -22,10 +22,10 @@ type PublicKey struct {
 
 // PublicKeyFromBytes creates a BLS public key from a  BigEndian byte slice.
 func PublicKeyFromBytes(pubKey []byte) (common.PublicKey, error) {
-	if len(pubKey) != params.BeaconConfig().BLSPubkeyLength {
-		return nil, fmt.Errorf("public key must be %d bytes", params.BeaconConfig().BLSPubkeyLength)
+	if len(pubKey) != params.BeaconConfig().DilithiumPubkeyLength {
+		return nil, fmt.Errorf("public key must be %d bytes", params.BeaconConfig().DilithiumPubkeyLength)
 	}
-	newKey := (*[fieldparams.BLSPubkeyLength]byte)(pubKey)
+	newKey := (*[fieldparams.DilithiumPubkeyLength]byte)(pubKey)
 	if cv, ok := pubkeyCache.Get(*newKey); ok {
 		return cv.Copy(), nil
 	}

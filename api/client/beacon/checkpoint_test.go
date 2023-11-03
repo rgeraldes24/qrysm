@@ -9,22 +9,20 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/api/client"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
+	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	blocktest "github.com/theQRL/qrysm/v4/consensus-types/blocks/testing"
-	"github.com/theQRL/qrysm/v4/network/forks"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/testing/util"
-	"github.com/theQRL/qrysm/v4/time/slots"
-
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/ssz/detect"
+	"github.com/theQRL/qrysm/v4/network/forks"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
-
-	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/testing/require"
+	"github.com/theQRL/qrysm/v4/testing/util"
+	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 type testRT struct {
@@ -375,7 +373,7 @@ func populateValidators(cfg *params.BeaconChainConfig, st state.BeaconState, val
 	balances := make([]uint64, len(validators))
 	for i := uint64(0); i < valCount; i++ {
 		validators[i] = &zondpb.Validator{
-			PublicKey:             make([]byte, cfg.BLSPubkeyLength),
+			PublicKey:             make([]byte, cfg.DilithiumPubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			EffectiveBalance:      avgBalance * 1e9,
 			ExitEpoch:             cfg.FarFutureEpoch,

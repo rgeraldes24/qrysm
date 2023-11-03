@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/shared"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	http2 "github.com/theQRL/qrysm/v4/network/http"
-	zondpbalpha "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // GetAggregateAttestation aggregates all attestations matching the given attestation data root and slot, returning the aggregated result.
