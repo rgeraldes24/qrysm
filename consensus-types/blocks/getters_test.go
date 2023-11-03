@@ -46,7 +46,7 @@ func Test_BeaconBlockIsNil(t *testing.T) {
 func Test_SignedBeaconBlock_Signature(t *testing.T) {
 	sb := &SignedBeaconBlock{}
 	sb.SetSignature([]byte("signature"))
-	assert.DeepEqual(t, bytesutil.ToBytes96([]byte("signature")), sb.Signature())
+	assert.DeepEqual(t, bytesutil.ToBytes4595([]byte("signature")), sb.Signature())
 }
 
 func Test_SignedBeaconBlock_Block(t *testing.T) {

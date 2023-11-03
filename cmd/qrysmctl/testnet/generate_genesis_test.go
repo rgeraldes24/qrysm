@@ -1,11 +1,13 @@
 package testnet
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"testing"
 
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/go-qrllib/common"
+	cryptodilithium "github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/runtime/interop"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -13,7 +15,8 @@ import (
 
 func Test_genesisStateFromJSONValidators(t *testing.T) {
 	numKeys := 5
-	jsonData := createGenesisDepositData(t, numKeys)
+	jsonData, err := createGenesisDepositData(t, numKeys)
+	require.NoError(t, err)
 	jsonInput, err := json.Marshal(jsonData)
 	require.NoError(t, err)
 	_, dds, err := depositEntriesFromJSON(jsonInput)
@@ -23,14 +26,28 @@ func Test_genesisStateFromJSONValidators(t *testing.T) {
 	}
 }
 
-func createGenesisDepositData(t *testing.T, numKeys int) []*depositDataJSON {
-	pubKeys := make([]bls.PublicKey, numKeys)
-	privKeys := make([]bls.SecretKey, numKeys)
+/*
+var seed [common.SeedSize]uint8
+
+_, err := rand.Read(seed[:])
+if err != nil {
+	return nil, fmt.Errorf("failed to generate random seed for Dilithium address: %v", err)
+}
+*/
+
+func createGenesisDepositData(t *testing.T, numKeys int) ([]*depositDataJSON, error) {
+	pubKeys := make([]cryptodilithium.PublicKey, numKeys)
+	privKeys := make([]cryptodilithium.DilithiumKey, numKeys)
 	for i := 0; i < numKeys; i++ {
-		randKey, err := bls.RandKey()
+		var seed [common.SeedSize]uint8
+		_, err := rand.Read(seed[:])
 		require.NoError(t, err)
-		privKeys[i] = randKey
-		pubKeys[i] = randKey.PublicKey()
+
+		d, err := cryptodilithium.SecretKeyFromBytes(seed[:])
+		require.NoError(t, err)
+
+		privKeys[i] = d
+		pubKeys[i] = d.PublicKey()
 	}
 	dataList, _, err := interop.DepositDataFromKeys(privKeys, pubKeys)
 	require.NoError(t, err)
@@ -46,5 +63,5 @@ func createGenesisDepositData(t *testing.T, numKeys int) []*depositDataJSON {
 			Signature:             fmt.Sprintf("%#x", dataList[i].Signature),
 		}
 	}
-	return jsonData
+	return jsonData, nil
 }
