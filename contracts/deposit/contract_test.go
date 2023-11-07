@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"testing"
 
-	"github.com/theQRL/go-zond"
+	ethereum "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	depositcontract "github.com/theQRL/qrysm/v4/contracts/deposit"
 	"github.com/theQRL/qrysm/v4/contracts/deposit/mock"
@@ -51,6 +51,7 @@ func TestValidatorRegister_OK(t *testing.T) {
 
 	var depositDataRoot [32]byte
 	copy(depositDataRoot[:], depositDataRoots[0])
+
 	_, err = testAccount.Contract.Deposit(testAccount.TxOpts, pubKeys[0].Marshal(), depositDataItems[0].WithdrawalCredentials, depositDataItems[0].Signature, depositDataRoot)
 	testAccount.Backend.Commit()
 	require.NoError(t, err, "Validator registration failed")

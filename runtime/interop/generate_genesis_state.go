@@ -165,7 +165,7 @@ func depositDataFromKeys(privKeys []dilithium.DilithiumKey, pubKeys []dilithium.
 func createDepositData(privKey dilithium.DilithiumKey, pubKey dilithium.PublicKey, withExecCreds bool) (*zondpb.Deposit_Data, error) {
 	depositMessage := &zondpb.DepositMessage{
 		PublicKey:             pubKey.Marshal(),
-		WithdrawalCredentials: withdrawalCredentialsHash(pubKey.Marshal()),
+		WithdrawalCredentials: withdrawalCredentialsHash(privKey),
 		Amount:                params.BeaconConfig().MaxEffectiveBalance,
 	}
 	if withExecCreds {
@@ -204,7 +204,14 @@ func createDepositData(privKey dilithium.DilithiumKey, pubKey dilithium.PublicKe
 //	withdrawal_credentials[1:] == hash(withdrawal_pubkey)[1:]
 //
 // where withdrawal_credentials is of type bytes32.
-func withdrawalCredentialsHash(pubKey []byte) []byte {
-	h := hash.Hash(pubKey)
-	return append([]byte{blsWithdrawalPrefixByte}, h[1:]...)[:32]
+
+// TODO(rgeraldes24)
+// func withdrawalCredentialsHash(pubKey []byte) []byte {
+// 	h := hash.Hash(pubKey)
+// 	return append([]byte{blsWithdrawalPrefixByte}, h[1:]...)[:32]
+// }
+
+func withdrawalCredentialsHash(withdrawalKey dilithium.DilithiumKey) []byte {
+	h := hash.Hash(withdrawalKey.PublicKey().Marshal())
+	return append([]byte{params.BeaconConfig().DilithiumWithdrawalPrefixByte}, h[1:]...)[:32]
 }

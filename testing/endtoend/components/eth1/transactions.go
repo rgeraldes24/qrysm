@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/MariusVanDerWijden/FuzzyVM/filler"
-	txfuzz "github.com/MariusVanDerWijden/tx-fuzz"
+	txfuzz "github.com/rgeraldes24/tx-fuzz"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/accounts/keystore"
