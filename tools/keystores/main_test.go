@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -11,13 +12,15 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/theQRL/go-qrllib/common"
+	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 	"github.com/urfave/cli/v2"
-	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 )
 
 const password = "secretPassw0rd$1999"
@@ -25,7 +28,7 @@ const password = "secretPassw0rd$1999"
 type cliConfig struct {
 	keystoresPath string
 	password      string
-	privateKey    string
+	seed          string
 	outputPath    string
 }
 
@@ -37,20 +40,23 @@ func setupCliContext(
 	set := flag.NewFlagSet("test", 0)
 	set.String(keystoresFlag.Name, conf.keystoresPath, "")
 	set.String(passwordFlag.Name, conf.password, "")
-	set.String(privateKeyFlag.Name, conf.privateKey, "")
+	set.String(seedFlag.Name, conf.seed, "")
 	set.String(outputPathFlag.Name, conf.outputPath, "")
 	assert.NoError(tb, set.Set(keystoresFlag.Name, conf.keystoresPath))
 	assert.NoError(tb, set.Set(passwordFlag.Name, conf.password))
-	assert.NoError(tb, set.Set(privateKeyFlag.Name, conf.privateKey))
+	assert.NoError(tb, set.Set(seedFlag.Name, conf.seed))
 	assert.NoError(tb, set.Set(outputPathFlag.Name, conf.outputPath))
 	return cli.NewContext(&app, set, nil)
 }
 
 func createRandomKeystore(t testing.TB, password string) (*keymanager.Keystore, bls.SecretKey) {
-	encryptor := keystorev4.New()
-	id, err := uuid.NewRandom()
+	var seed [common.SeedSize]uint8
+	_, err := rand.Read(seed[:])
 	require.NoError(t, err)
-	validatingKey, err := bls.RandKey()
+	encryptor := keystorev4.New()
+	validatingKey, err := dilithium.SecretKeyFromBytes(seed[:])
+	require.NoError(t, err)
+	id, err := uuid.NewRandom()
 	require.NoError(t, err)
 	pubKey := validatingKey.PublicKey().Marshal()
 	cryptoFields, err := encryptor.Encrypt(validatingKey.Marshal(), password)
@@ -109,15 +115,20 @@ func TestDecrypt(t *testing.T) {
 }
 
 func TestEncrypt(t *testing.T) {
+	var seed [common.SeedSize]uint8
+	_, err := rand.Read(seed[:])
+	require.NoError(t, err)
+	privKey, err := dilithium.SecretKeyFromBytes(seed[:])
+	require.NoError(t, err)
+
 	keystoresDir := setupRandomDir(t)
 	keystoreFilePath := filepath.Join(keystoresDir, "keystore.json")
-	privKey, err := bls.RandKey()
 	require.NoError(t, err)
 
 	cliCtx := setupCliContext(t, &cliConfig{
 		outputPath: keystoreFilePath,
 		password:   password,
-		privateKey: fmt.Sprintf("%#x", privKey.Marshal()),
+		seed:       fmt.Sprintf("%#x", seed),
 	})
 
 	rescueStdout := os.Stdout

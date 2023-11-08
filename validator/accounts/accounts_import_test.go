@@ -2,14 +2,16 @@ package accounts
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/theQRL/go-qrllib/common"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -126,14 +128,17 @@ func Test_importPrivateKeyAsAccount(t *testing.T) {
 	require.NoError(t, os.MkdirAll(privKeyDir, os.ModePerm))
 	privKeyFileName := filepath.Join(privKeyDir, "privatekey.txt")
 
-	// We create a new private key and save it to a file on disk.
-	privKey, err := bls.RandKey()
+	// We create a new seed and save it to a file on disk.
+	var seed [common.SeedSize]uint8
+	_, err := rand.Read(seed[:])
 	require.NoError(t, err)
-	privKeyHex := fmt.Sprintf("%x", privKey.Marshal())
+	seedHex := fmt.Sprintf("%x", seed)
 	require.NoError(
 		t,
-		os.WriteFile(privKeyFileName, []byte(privKeyHex), params.BeaconIoConfig().ReadWritePermissions),
+		os.WriteFile(privKeyFileName, []byte(seedHex), params.BeaconIoConfig().ReadWritePermissions),
 	)
+	privKey, err := dilithium.SecretKeyFromBytes(seed[:])
+	require.NoError(t, err)
 
 	// We instantiate a new wallet from a cli context.
 	cliCtx := setupWalletCtx(t, &testWalletConfig{
@@ -174,7 +179,7 @@ func Test_importPrivateKeyAsAccount(t *testing.T) {
 	pubKeys, err := km.FetchValidatingPublicKeys(cliCtx.Context)
 	require.NoError(t, err)
 	require.Equal(t, 1, len(pubKeys))
-	assert.DeepEqual(t, pubKeys[0], bytesutil.ToBytes48(privKey.PublicKey().Marshal()))
+	assert.DeepEqual(t, pubKeys[0], bytesutil.ToBytes2592(privKey.PublicKey().Marshal()))
 }
 
 func Test_NameToDescriptionChangeIsOK(t *testing.T) {

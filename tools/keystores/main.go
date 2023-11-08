@@ -16,12 +16,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
+	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/io/file"
 	"github.com/theQRL/qrysm/v4/io/prompt"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 	"github.com/urfave/cli/v2"
-	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 )
 
 var (
@@ -36,10 +36,10 @@ var (
 		Value: "",
 		Usage: "Password for the keystore(s)",
 	}
-	privateKeyFlag = &cli.StringFlag{
-		Name:     "private-key",
+	seedFlag = &cli.StringFlag{
+		Name:     "seed",
 		Value:    "",
-		Usage:    "Hex string for the BLS12-381 private key you wish encrypt into a keystore file",
+		Usage:    "Hex string for the seed you wish encrypt into a keystore file",
 		Required: true,
 	}
 	outputPathFlag = &cli.StringFlag{
@@ -54,7 +54,7 @@ var (
 func main() {
 	app := &cli.App{
 		Name:        "Keystore utility",
-		Description: "Utility to encrypt and decrypt EIP-2335 compliant keystore.json files for BLS12-381 private keys",
+		Description: "Utility to encrypt and decrypt EIP-2335 compliant keystore.json files for Dilithium seeds",
 		Usage:       "",
 		Commands: []*cli.Command{
 			{
@@ -68,10 +68,10 @@ func main() {
 			},
 			{
 				Name:  "encrypt",
-				Usage: "encrypt a specified hex value of a BLS12-381 private key into a keystore file",
+				Usage: "encrypt a specified hex value of a seed into a keystore file",
 				Flags: []cli.Flag{
 					passwordFlag,
-					privateKeyFlag,
+					seedFlag,
 					outputPathFlag,
 				},
 				Action: encrypt,
@@ -144,9 +144,9 @@ func encrypt(cliCtx *cli.Context) error {
 			return err
 		}
 	}
-	privateKeyString := cliCtx.String(privateKeyFlag.Name)
-	if privateKeyString == "" {
-		return errors.New("--private-key must not be empty")
+	seedString := cliCtx.String(seedFlag.Name)
+	if seedString == "" {
+		return errors.New("--seed must not be empty")
 	}
 	outputPath := cliCtx.String(outputPathFlag.Name)
 	if outputPath == "" {
@@ -175,16 +175,16 @@ func encrypt(cliCtx *cli.Context) error {
 			return nil
 		}
 	}
-	if len(privateKeyString) > 2 && strings.Contains(privateKeyString, "0x") {
-		privateKeyString = privateKeyString[2:] // Strip the 0x prefix, if any.
+	if len(seedString) > 2 && strings.Contains(seedString, "0x") {
+		seedString = seedString[2:] // Strip the 0x prefix, if any.
 	}
-	bytesValue, err := hex.DecodeString(privateKeyString)
+	bytesValue, err := hex.DecodeString(seedString)
 	if err != nil {
-		return errors.Wrapf(err, "could not decode as hex string: %s", privateKeyString)
+		return errors.Wrapf(err, "could not decode as hex string: %s", seedString)
 	}
 	privKey, err := dilithium.SecretKeyFromBytes(bytesValue)
 	if err != nil {
-		return errors.Wrap(err, "not a valid BLS12-381 private key")
+		return errors.Wrap(err, "not a valid seed")
 	}
 	pubKey := fmt.Sprintf("%x", privKey.PublicKey().Marshal())
 	encryptor := keystorev4.New()

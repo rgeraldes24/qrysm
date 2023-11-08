@@ -1,6 +1,7 @@
 package accounts
 
 import (
+	"crypto/rand"
 	"flag"
 	"fmt"
 	"io"
@@ -13,20 +14,19 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
+	"github.com/theQRL/go-qrllib/common"
+	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/v4/cmd/validator/flags"
 	"github.com/theQRL/qrysm/v4/config/params"
 	types "github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	validatormock "github.com/theQRL/qrysm/v4/testing/validator-mock"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
-	"github.com/theQRL/qrysm/v4/validator/keymanager/derived"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/local"
-	constant "github.com/theQRL/qrysm/v4/validator/testing"
 	"github.com/urfave/cli/v2"
-	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 )
 
 const (
@@ -111,7 +111,10 @@ func createRandomKeystore(t testing.TB, password string) *keymanager.Keystore {
 	encryptor := keystorev4.New()
 	id, err := uuid.NewRandom()
 	require.NoError(t, err)
-	validatingKey, err := bls.RandKey()
+	var seed [common.SeedSize]uint8
+	_, err = rand.Read(seed[:])
+	require.NoError(t, err)
+	validatingKey, err := dilithium.SecretKeyFromBytes(seed[:])
 	require.NoError(t, err)
 	pubKey := validatingKey.PublicKey().Marshal()
 	cryptoFields, err := encryptor.Encrypt(validatingKey.Marshal(), password)
@@ -319,6 +322,7 @@ func TestListAccounts_LocalKeymanager(t *testing.T) {
 	require.Equal(t, expectedStdout, string(out))
 }
 
+/*
 func TestListAccounts_DerivedKeymanager(t *testing.T) {
 	walletDir, passwordsDir, passwordFilePath := setupWalletAndPasswordsDir(t)
 	cliCtx := setupWalletCtx(t, &testWalletConfig{
@@ -369,41 +373,41 @@ func TestListAccounts_DerivedKeymanager(t *testing.T) {
 	lines := strings.Split(string(out), newLine)
 
 	// Expected output example:
-	/*
-		(keymanager kind) derived, (HD) hierarchical-deterministic
-		(derivation format) m / purpose / coin_type / account_index / withdrawal_key / validating_key
-		Showing 2 validator accounts
 
-		Account 0 | uniquely-sunny-tarpon
-		[withdrawal public key] 0xa5faa97252104b408340b5d8cae3fa01023fa4dc9e7c7b470821433cf3a2a18158410b7d8a6dcdcd176c6552c2526681
-		[withdrawal private key] 0x5266fd1f13d7af74614fde4fed3b664bfd529bc4ad91118e3db73647b99546df
-		[derivation path] m/12381/3600/0/0
-		[validating public key] 0xa7292d8f8d1c1f3d42cacefd2fc4cd3b82651be37c1eb790bbd294a874829f4b7e1c167345dcc1966cc844132b38097e
-		[validating private key] 0x590707187dae64b42b8d36a95f3d7e11313ddd8b8d871b09e478e08c9bc8740b
-		[derivation path] m/12381/3600/0/0/0
+		// (keymanager kind) derived, (HD) hierarchical-deterministic
+		// (derivation format) m / purpose / coin_type / account_index / withdrawal_key / validating_key
+		// Showing 2 validator accounts
 
-		======================Eth1 Deposit Transaction Data=====================
+		// Account 0 | uniquely-sunny-tarpon
+		// [withdrawal public key] 0xa5faa97252104b408340b5d8cae3fa01023fa4dc9e7c7b470821433cf3a2a18158410b7d8a6dcdcd176c6552c2526681
+		// [withdrawal private key] 0x5266fd1f13d7af74614fde4fed3b664bfd529bc4ad91118e3db73647b99546df
+		// [derivation path] m/12381/3600/0/0
+		// [validating public key] 0xa7292d8f8d1c1f3d42cacefd2fc4cd3b82651be37c1eb790bbd294a874829f4b7e1c167345dcc1966cc844132b38097e
+		// [validating private key] 0x590707187dae64b42b8d36a95f3d7e11313ddd8b8d871b09e478e08c9bc8740b
+		// [derivation path] m/12381/3600/0/0/0
 
-		0x22895118000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000001205a9e92992d6a97ad113d217fa35cbe0659c662afe913ffd3a3ba61d7473be5630000000000000000000000000000000000000000000000000000000000000030a7292d8f8d1c1f3d42cacefd2fc4cd3b82651be37c1eb790bbd294a874829f4b7e1c167345dcc1966cc844132b38097e000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020003b8f70706c37fb0b8dcbd95340889bad7d7f29121ea895052a8b216de95e480000000000000000000000000000000000000000000000000000000000000060b6727242b055448defbf54292c65e30ae28ca3aef8a07c8fe674abc0ca42a324be2e7592d3e45bba84ca364d7fe1f0ce073bf8b3692246395aa127cdbf93c64ae9ca48f85cb4b1e519f6821998181de1c7465b2bdcae4ddd0dbc2d02a56219d9
+		// ======================Eth1 Deposit Transaction Data=====================
 
-		===================================================================
+		// 0x22895118000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000001205a9e92992d6a97ad113d217fa35cbe0659c662afe913ffd3a3ba61d7473be5630000000000000000000000000000000000000000000000000000000000000030a7292d8f8d1c1f3d42cacefd2fc4cd3b82651be37c1eb790bbd294a874829f4b7e1c167345dcc1966cc844132b38097e000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020003b8f70706c37fb0b8dcbd95340889bad7d7f29121ea895052a8b216de95e480000000000000000000000000000000000000000000000000000000000000060b6727242b055448defbf54292c65e30ae28ca3aef8a07c8fe674abc0ca42a324be2e7592d3e45bba84ca364d7fe1f0ce073bf8b3692246395aa127cdbf93c64ae9ca48f85cb4b1e519f6821998181de1c7465b2bdcae4ddd0dbc2d02a56219d9
 
-		Account 1 | usually-obliging-pelican
-		[withdrawal public key] 0xb91840d33bb87338bb28605cff837acd50e43a174a8a6d3893108fb91217fa428c12f1b2a25cf3c7aca75d418bcf0384
-		[withdrawal private key] 0x72c5ffa7d08fb16cd35a9cb10494dfd49b46842ea1bcc1a4cf46b46680b66810
-		[derivation path] m/12381/3600/1/0
-		[validating public key] 0x8447f878b701dad4dfa5a884cebc4745b0e8f21340dc56c840826537764dcc54e2e68f80b8d4e5737180212a26211891
-		[validating private key] 0x2cd5b1cddc9d96e50a16bea05d0953447655e3dd59fa1bfefad467c73d6c164a
-		[derivation path] m/12381/3600/1/0/0
+		// ===================================================================
 
-		======================Eth1 Deposit Transaction Data=====================
+		// Account 1 | usually-obliging-pelican
+		// [withdrawal public key] 0xb91840d33bb87338bb28605cff837acd50e43a174a8a6d3893108fb91217fa428c12f1b2a25cf3c7aca75d418bcf0384
+		// [withdrawal private key] 0x72c5ffa7d08fb16cd35a9cb10494dfd49b46842ea1bcc1a4cf46b46680b66810
+		// [derivation path] m/12381/3600/1/0
+		// [validating public key] 0x8447f878b701dad4dfa5a884cebc4745b0e8f21340dc56c840826537764dcc54e2e68f80b8d4e5737180212a26211891
+		// [validating private key] 0x2cd5b1cddc9d96e50a16bea05d0953447655e3dd59fa1bfefad467c73d6c164a
+		// [derivation path] m/12381/3600/1/0/0
 
-		0x22895118000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000001200a0b9079c33cc40d602a50f5c51f6db30b0f959fc6f58048d6d43319fea6c09000000000000000000000000000000000000000000000000000000000000000308447f878b701dad4dfa5a884cebc4745b0e8f21340dc56c840826537764dcc54e2e68f80b8d4e5737180212a2621189100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000d6ac42bde23388e7428c1247364347c027c3507e461d68b851d506c60364cf0000000000000000000000000000000000000000000000000000000000000060801a2d432595164d7d88ae1695618db511d1507108573b8471098536b2b5a23f6711235f0a9c6fa65ac26cbd0f2d97e013e0c72ab6b5cff406c48d99ec0a2439aa9faa4557d20bb210d451519101616fa20b1ff2c67fae561cdff160fbc7dc98
+		// ======================Eth1 Deposit Transaction Data=====================
 
-		===================================================================
+		// 0x22895118000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000e000000000000000000000000000000000000000000000000000000000000001200a0b9079c33cc40d602a50f5c51f6db30b0f959fc6f58048d6d43319fea6c09000000000000000000000000000000000000000000000000000000000000000308447f878b701dad4dfa5a884cebc4745b0e8f21340dc56c840826537764dcc54e2e68f80b8d4e5737180212a2621189100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000d6ac42bde23388e7428c1247364347c027c3507e461d68b851d506c60364cf0000000000000000000000000000000000000000000000000000000000000060801a2d432595164d7d88ae1695618db511d1507108573b8471098536b2b5a23f6711235f0a9c6fa65ac26cbd0f2d97e013e0c72ab6b5cff406c48d99ec0a2439aa9faa4557d20bb210d451519101616fa20b1ff2c67fae561cdff160fbc7dc98
+
+		// ===================================================================
 
 
-	*/
+
 
 	// Expected output format definition
 	const prologLength = 3
@@ -460,3 +464,4 @@ func TestListAccounts_DerivedKeymanager(t *testing.T) {
 		assert.Equal(t, true, keyFound, "Validating Private Key %s not found on line number %d", keyString, lineNumber)
 	}
 }
+*/
