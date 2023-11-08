@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"testing"
 
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -57,6 +56,7 @@ func TestImportAccounts_NoPassword(t *testing.T) {
 	require.Equal(t, resp[0].Status, zondpbservice.ImportedKeystoreStatus_ERROR)
 }
 
+/*
 func TestImport_SortByDerivationPath(t *testing.T) {
 	local.ResetCaches()
 	type test struct {
@@ -118,6 +118,7 @@ func TestImport_SortByDerivationPath(t *testing.T) {
 		})
 	}
 }
+*/
 
 func Test_importPrivateKeyAsAccount(t *testing.T) {
 	walletDir, _, passwordFilePath := setupWalletAndPasswordsDir(t)

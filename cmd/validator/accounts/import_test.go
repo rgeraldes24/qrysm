@@ -11,7 +11,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/go-qrllib/common"
+	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/validator/accounts"
@@ -19,7 +21,6 @@ import (
 	"github.com/theQRL/qrysm/v4/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/local"
-	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 )
 
 func TestImport_Noninteractive(t *testing.T) {
@@ -188,7 +189,10 @@ func TestImport_Noninteractive_RandomName(t *testing.T) {
 
 // Returns the fullPath to the newly created keystore file.
 func createRandomNameKeystore(t *testing.T, path string) (*keymanager.Keystore, string) {
-	validatingKey, err := bls.RandKey()
+	var seed [common.SeedSize]uint8
+	_, err := rand.Read(seed[:])
+	require.NoError(t, err)
+	validatingKey, err := dilithium.SecretKeyFromBytes(seed[:])
 	require.NoError(t, err)
 	encryptor := keystorev4.New()
 	cryptoFields, err := encryptor.Encrypt(validatingKey.Marshal(), password)

@@ -1,7 +1,6 @@
 package wallet
 
 import (
-	"context"
 	"flag"
 	"os"
 	"path/filepath"
@@ -11,8 +10,6 @@ import (
 	"github.com/theQRL/qrysm/v4/cmd/validator/flags"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
-	"github.com/theQRL/qrysm/v4/validator/accounts/iface"
-	"github.com/theQRL/qrysm/v4/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/derived"
 	"github.com/urfave/cli/v2"
@@ -66,6 +63,7 @@ func createRecoverCliCtx(t *testing.T, cfg *recoverCfgStruct) *cli.Context {
 	return cli.NewContext(&app, set, nil)
 }
 
+/*
 func TestRecoverDerivedWallet(t *testing.T) {
 	cfg := setupRecoverCfg(t)
 	cfg.numAccounts = 4
@@ -113,3 +111,4 @@ func TestRecoverDerivedWallet_AlreadyExists(t *testing.T) {
 	// Trying to recover an HD wallet into a directory that already exists should give an error
 	require.ErrorContains(t, "a wallet already exists at this location", walletRecover(cliCtx))
 }
+*/

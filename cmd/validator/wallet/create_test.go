@@ -167,6 +167,7 @@ func TestCreateWallet_Local(t *testing.T) {
 	require.NoError(t, err)
 }
 
+/*
 func TestCreateWallet_Derived(t *testing.T) {
 	walletDir, passwordsDir, passwordFile := setupWalletAndPasswordsDir(t)
 	cliCtx := setupWalletCtx(t, &testWalletConfig{
@@ -187,6 +188,7 @@ func TestCreateWallet_Derived(t *testing.T) {
 	})
 	assert.NoError(t, err)
 }
+*/
 
 // TestCreateWallet_WalletAlreadyExists checks for expected error if trying to create a wallet when there is one already.
 func TestCreateWallet_WalletAlreadyExists(t *testing.T) {
@@ -195,7 +197,7 @@ func TestCreateWallet_WalletAlreadyExists(t *testing.T) {
 		walletDir:          walletDir,
 		passwordsDir:       passwordsDir,
 		walletPasswordFile: passwordFile,
-		keymanagerKind:     keymanager.Derived,
+		keymanagerKind:     keymanager.Local,
 		numAccounts:        1,
 	})
 
@@ -207,16 +209,19 @@ func TestCreateWallet_WalletAlreadyExists(t *testing.T) {
 	_, err = CreateAndSaveWalletCli(cliCtx)
 	require.ErrorContains(t, "already exists", err)
 
-	cliCtx = setupWalletCtx(t, &testWalletConfig{
-		walletDir:          walletDir,
-		passwordsDir:       passwordsDir,
-		walletPasswordFile: passwordFile,
-		keymanagerKind:     keymanager.Local,
-	})
+	// TODO(rgeraldes24) - we don't support another type atm
+	/*
+		cliCtx = setupWalletCtx(t, &testWalletConfig{
+			walletDir:          walletDir,
+			passwordsDir:       passwordsDir,
+			walletPasswordFile: passwordFile,
+			keymanagerKind:     keymanager.Local,
+		})
 
-	// We attempt to create another wallet of different type at the same location. We expect an error.
-	_, err = CreateAndSaveWalletCli(cliCtx)
-	require.ErrorContains(t, "already exists", err)
+		// We attempt to create another wallet of different type at the same location. We expect an error.
+		_, err = CreateAndSaveWalletCli(cliCtx)
+		require.ErrorContains(t, "already exists", err)
+	*/
 }
 
 func TestInputKeymanagerKind(t *testing.T) {
@@ -244,12 +249,14 @@ func TestInputKeymanagerKind(t *testing.T) {
 			want:    keymanager.Local,
 			wantErr: false,
 		},
-		{
-			name:    "derived returns derived kind",
-			args:    "derived",
-			want:    keymanager.Derived,
-			wantErr: false,
-		},
+		/*
+			{
+				name:    "derived returns derived kind",
+				args:    "derived",
+				want:    keymanager.Derived,
+				wantErr: false,
+			},
+		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

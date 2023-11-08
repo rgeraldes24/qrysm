@@ -131,12 +131,12 @@ func (k Kind) String() string {
 // ParseKind from a raw string, returning a keymanager kind.
 func ParseKind(k string) (Kind, error) {
 	switch strings.ToLower(k) {
-	case "derived":
-		return Derived, nil
+	//case "derived":
+	//	return Derived, nil
 	case "direct", "imported", "local":
 		return Local, nil
-	case "web3signer":
-		return Web3Signer, nil
+	//case "web3signer":
+	//	return Web3Signer, nil
 	default:
 		return 0, fmt.Errorf("%s is not an allowed keymanager", k)
 	}

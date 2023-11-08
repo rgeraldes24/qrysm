@@ -1,6 +1,7 @@
 package accounts
 
 import (
+	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"flag"
@@ -13,9 +14,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/theQRL/go-qrllib/common"
+	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/v4/cmd/validator/flags"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -24,7 +27,6 @@ import (
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/local"
 	"github.com/urfave/cli/v2"
-	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 )
 
 const (
@@ -44,9 +46,12 @@ func setupWalletAndPasswordsDir(t testing.TB) (string, string, string) {
 
 // Returns the fullPath to the newly created keystore file.
 func createKeystore(t *testing.T, path string) (*keymanager.Keystore, string) {
-	validatingKey, err := bls.RandKey()
+	var seed [common.SeedSize]uint8
+	_, err := rand.Read(seed[:])
 	require.NoError(t, err)
 	encryptor := keystorev4.New()
+	validatingKey, err := dilithium.SecretKeyFromBytes(seed[:])
+	require.NoError(t, err)
 	cryptoFields, err := encryptor.Encrypt(validatingKey.Marshal(), password)
 	require.NoError(t, err)
 	id, err := uuid.NewRandom()
@@ -188,5 +193,5 @@ func TestDeleteAccounts_Noninteractive(t *testing.T) {
 	require.Equal(t, len(remainingAccounts), 1)
 	remainingPublicKey, err := hex.DecodeString(k3.Pubkey)
 	require.NoError(t, err)
-	assert.DeepEqual(t, remainingAccounts[0], bytesutil.ToBytes48(remainingPublicKey))
+	assert.DeepEqual(t, remainingAccounts[0], bytesutil.ToBytes2592(remainingPublicKey))
 }

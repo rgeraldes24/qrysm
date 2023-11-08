@@ -131,8 +131,8 @@ func inputKeymanagerKind(cliCtx *cli.Context) (keymanager.Kind, error) {
 		Label: "Select a type of wallet",
 		Items: []string{
 			wallet.KeymanagerKindSelections[keymanager.Local],
-			wallet.KeymanagerKindSelections[keymanager.Derived],
-			wallet.KeymanagerKindSelections[keymanager.Web3Signer],
+			//wallet.KeymanagerKindSelections[keymanager.Derived],
+			//wallet.KeymanagerKindSelections[keymanager.Web3Signer],
 		},
 	}
 	selection, _, err := promptSelect.Run()
