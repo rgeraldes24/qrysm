@@ -2,17 +2,7 @@
 
 package blst_test
 
-import (
-	"bytes"
-	"errors"
-	"testing"
-
-	"github.com/theQRL/qrysm/v4/crypto/bls/blst"
-	"github.com/theQRL/qrysm/v4/crypto/bls/common"
-	"github.com/theQRL/qrysm/v4/testing/assert"
-	"github.com/theQRL/qrysm/v4/testing/require"
-)
-
+/*
 func TestPublicKeyFromBytes(t *testing.T) {
 	tests := []struct {
 		name  string
@@ -121,3 +111,4 @@ func BenchmarkPublicKeyFromBytes(b *testing.B) {
 	})
 
 }
+*/

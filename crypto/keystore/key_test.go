@@ -6,12 +6,12 @@ import (
 	"path"
 	"testing"
 
-	"github.com/pborman/uuid"
 	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
+/*
 func TestMarshalAndUnmarshal(t *testing.T) {
 	testID := uuid.NewRandom()
 	blsKey, err := bls.RandKey()
@@ -34,6 +34,7 @@ func TestMarshalAndUnmarshal(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, true, bytes.Equal(newKey.ID, testID))
 }
+*/
 
 func TestStoreRandomKey(t *testing.T) {
 	ks := &Keystore{

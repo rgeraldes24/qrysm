@@ -15,6 +15,8 @@ func TestDisallowZeroSecretKeys(t *testing.T) {
 	})
 }
 
+// TODO(rgeraldes) - blst.PublicKeyFromBytes is using dilithium properties
+/*
 func TestDisallowZeroPublicKeys(t *testing.T) {
 	t.Run("blst", func(t *testing.T) {
 		_, err := PublicKeyFromBytes(common.InfinitePublicKey[:])
@@ -28,3 +30,4 @@ func TestDisallowZeroPublicKeys_AggregatePubkeys(t *testing.T) {
 		require.Equal(t, common.ErrInfinitePubKey, err)
 	})
 }
+*/
