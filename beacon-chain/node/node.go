@@ -142,7 +142,7 @@ func New(cliCtx *cli.Context, opts ...Option) (*BeaconNode, error) {
 	if err := configureSlotsPerArchivedPoint(cliCtx); err != nil {
 		return nil, err
 	}
-	if err := configureEth1Config(cliCtx); err != nil {
+	if err := configureZond1Config(cliCtx); err != nil {
 		return nil, err
 	}
 	configureNetwork(cliCtx)
@@ -796,7 +796,7 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 	beaconMonitoringPort := b.cliCtx.Int(flags.MonitoringPortFlag.Name)
 	cert := b.cliCtx.String(flags.CertFlag.Name)
 	key := b.cliCtx.String(flags.KeyFlag.Name)
-	mockEth1DataVotes := b.cliCtx.Bool(flags.InteropMockEth1DataVotesFlag.Name)
+	mockZond1DataVotes := b.cliCtx.Bool(flags.InteropMockZond1DataVotesFlag.Name)
 
 	maxMsgSize := b.cliCtx.Int(cmd.GrpcMaxCallRecvMsgSizeFlag.Name)
 	enableDebugRPCEndpoints := b.cliCtx.Bool(flags.EnableDebugRPCEndpoints.Name)
@@ -836,7 +836,7 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 		ExecutionChainService:         web3Service,
 		ExecutionChainInfoFetcher:     web3Service,
 		ChainStartFetcher:             chainStartFetcher,
-		MockEth1Votes:                 mockEth1DataVotes,
+		MockZond1Votes:                mockZond1DataVotes,
 		SyncService:                   syncService,
 		DepositFetcher:                depositFetcher,
 		PendingDepositFetcher:         b.depositCache,

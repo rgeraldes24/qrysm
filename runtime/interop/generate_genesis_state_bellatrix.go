@@ -17,7 +17,7 @@ import (
 
 // GenerateGenesisStateBellatrix deterministically given a genesis time and number of validators.
 // If a genesis time of 0 is supplied it is set to the current time.
-func GenerateGenesisStateBellatrix(ctx context.Context, genesisTime, numValidators uint64, ep *enginev1.ExecutionPayload, ed *zondpb.Eth1Data) (*zondpb.BeaconStateBellatrix, []*zondpb.Deposit, error) {
+func GenerateGenesisStateBellatrix(ctx context.Context, genesisTime, numValidators uint64, ep *enginev1.ExecutionPayload, ed *zondpb.Zond1Data) (*zondpb.BeaconStateBellatrix, []*zondpb.Deposit, error) {
 	privKeys, pubKeys, err := DeterministicallyGenerateKeys(0 /*startIndex*/, numValidators)
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "could not deterministically generate keys for %d validators", numValidators)
@@ -32,7 +32,7 @@ func GenerateGenesisStateBellatrix(ctx context.Context, genesisTime, numValidato
 // GenerateGenesisStateBellatrixFromDepositData creates a genesis state given a list of
 // deposit data items and their corresponding roots.
 func GenerateGenesisStateBellatrixFromDepositData(
-	ctx context.Context, genesisTime uint64, depositData []*zondpb.Deposit_Data, depositDataRoots [][]byte, ep *enginev1.ExecutionPayload, e1d *zondpb.Eth1Data,
+	ctx context.Context, genesisTime uint64, depositData []*zondpb.Deposit_Data, depositDataRoots [][]byte, ep *enginev1.ExecutionPayload, e1d *zondpb.Zond1Data,
 ) (*zondpb.BeaconStateBellatrix, []*zondpb.Deposit, error) {
 	t, err := trie.GenerateTrieFromItems(depositDataRoots, params.BeaconConfig().DepositContractTreeDepth)
 	if err != nil {

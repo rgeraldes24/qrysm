@@ -1,4 +1,4 @@
-package eth1
+package zond1
 
 import (
 	"context"
@@ -171,7 +171,7 @@ func (d *Depositor) SendAndMine(ctx context.Context, offset, nvals int, batch ty
 
 	// This is the "AndMine" part of the function. WaitForBlocks will spam transactions to/from the given key
 	// to advance the EL chain and until the chain has advanced the requested amount.
-	if err = WaitForBlocks(d.Client, d.Key, params.BeaconConfig().Eth1FollowDistance); err != nil {
+	if err = WaitForBlocks(d.Client, d.Key, params.BeaconConfig().Zond1FollowDistance); err != nil {
 		return fmt.Errorf("failed to mine blocks %w", err)
 	}
 	return nil

@@ -33,11 +33,11 @@ func TestGetBeaconBlockConverter_Phase0Error(t *testing.T) {
 			},
 		},
 		{
-			name:                 "nil eth1 data",
-			expectedErrorMessage: "eth1 data is nil",
+			name:                 "nil zond1 data",
+			expectedErrorMessage: "zond1 data is nil",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonPhase0BeaconBlock()
-				beaconBlock.Body.Eth1Data = nil
+				beaconBlock.Body.Zond1Data = nil
 				return beaconBlock
 			},
 		},
@@ -91,7 +91,7 @@ func TestGetBeaconBlockConverter_Phase0Error(t *testing.T) {
 			expectedErrorMessage: "failed to decode deposit root `bar`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonPhase0BeaconBlock()
-				beaconBlock.Body.Eth1Data.DepositRoot = "bar"
+				beaconBlock.Body.Zond1Data.DepositRoot = "bar"
 				return beaconBlock
 			},
 		},
@@ -100,7 +100,7 @@ func TestGetBeaconBlockConverter_Phase0Error(t *testing.T) {
 			expectedErrorMessage: "failed to parse deposit count `foo`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonPhase0BeaconBlock()
-				beaconBlock.Body.Eth1Data.DepositCount = "foo"
+				beaconBlock.Body.Zond1Data.DepositCount = "foo"
 				return beaconBlock
 			},
 		},
@@ -109,7 +109,7 @@ func TestGetBeaconBlockConverter_Phase0Error(t *testing.T) {
 			expectedErrorMessage: "failed to decode block hash `bar`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonPhase0BeaconBlock()
-				beaconBlock.Body.Eth1Data.BlockHash = "bar"
+				beaconBlock.Body.Zond1Data.BlockHash = "bar"
 				return beaconBlock
 			},
 		},
@@ -217,7 +217,7 @@ func TestGetBeaconBlockConverter_AltairError(t *testing.T) {
 			expectedErrorMessage: "failed to get the phase0 fields of the altair block",
 			generateData: func() *apimiddleware.BeaconBlockAltairJson {
 				beaconBlock := test_helpers.GenerateJsonAltairBeaconBlock()
-				beaconBlock.Body.Eth1Data = nil
+				beaconBlock.Body.Zond1Data = nil
 				return beaconBlock
 			},
 		},
@@ -289,7 +289,7 @@ func TestGetBeaconBlockConverter_BellatrixError(t *testing.T) {
 			expectedErrorMessage: "failed to get the altair fields of the bellatrix block",
 			generateData: func() *apimiddleware.BeaconBlockBellatrixJson {
 				beaconBlock := test_helpers.GenerateJsonBellatrixBeaconBlock()
-				beaconBlock.Body.Eth1Data = nil
+				beaconBlock.Body.Zond1Data = nil
 				return beaconBlock
 			},
 		},
@@ -469,7 +469,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			expectedErrorMessage: "failed to get the bellatrix fields of the capella block",
 			generateData: func() *apimiddleware.BeaconBlockCapellaJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.Eth1Data = nil
+				beaconBlock.Body.Zond1Data = nil
 				return beaconBlock
 			},
 		},

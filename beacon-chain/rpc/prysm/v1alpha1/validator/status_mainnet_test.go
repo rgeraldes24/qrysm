@@ -66,16 +66,16 @@ func TestValidatorStatus_Active(t *testing.T) {
 	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(st)
 	require.NoError(t, err)
 
-	timestamp := time.Unix(int64(params.BeaconConfig().Eth1FollowDistance), 0).Unix()
+	timestamp := time.Unix(int64(params.BeaconConfig().Zond1FollowDistance), 0).Unix()
 	p := &mockExecution.Chain{
 		TimesByHeight: map[int]uint64{
-			int(params.BeaconConfig().Eth1FollowDistance): uint64(timestamp),
+			int(params.BeaconConfig().Zond1FollowDistance): uint64(timestamp),
 		},
 	}
 	vs := &Server{
 		ChainStartFetcher: p,
 		BlockFetcher:      p,
-		Eth1InfoFetcher:   p,
+		Zond1InfoFetcher:  p,
 		DepositFetcher:    depositCache,
 		HeadFetcher:       &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
 	}

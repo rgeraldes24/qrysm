@@ -13,16 +13,15 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/bls"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
-	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
-	attaggregation "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/attestations"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+/*
+TODO(rgeraldes24)
 func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
 	data := util.HydrateAttestationData(&zondpb.AttestationData{
@@ -81,6 +80,7 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 	_, err = attaggregation.AggregatePair(att1, att2)
 	assert.ErrorContains(t, aggregation.ErrBitsOverlap.Error(), err)
 }
+*/
 
 func TestVerifyAttestationNoVerifySignature_IncorrectSlotTargetEpoch(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisState(t, 1)

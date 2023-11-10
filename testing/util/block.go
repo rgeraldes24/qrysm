@@ -62,7 +62,7 @@ func NewBeaconBlock() *zondpb.SignedBeaconBlock {
 			StateRoot:  make([]byte, fieldparams.RootLength),
 			Body: &zondpb.BeaconBlockBody{
 				RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-				Eth1Data: &zondpb.Eth1Data{
+				Zond1Data: &zondpb.Zond1Data{
 					DepositRoot: make([]byte, fieldparams.RootLength),
 					BlockHash:   make([]byte, fieldparams.RootLength),
 				},
@@ -127,9 +127,9 @@ func GenerateFullBlock(
 
 	numToGen = conf.NumDeposits
 	var newDeposits []*zondpb.Deposit
-	eth1Data := bState.Eth1Data()
+	zond1Data := bState.Zond1Data()
 	if numToGen > 0 {
-		newDeposits, eth1Data, err = generateDepositsAndEth1Data(bState, numToGen)
+		newDeposits, zond1Data, err = generateDepositsAndZond1Data(bState, numToGen)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed generating %d deposits:", numToGen)
 		}
@@ -179,7 +179,7 @@ func GenerateFullBlock(
 		ParentRoot:    parentRoot[:],
 		ProposerIndex: idx,
 		Body: &zondpb.BeaconBlockBody{
-			Eth1Data:          eth1Data,
+			Zond1Data:         zond1Data,
 			RandaoReveal:      reveal,
 			ProposerSlashings: pSlashings,
 			AttesterSlashings: aSlashings,
@@ -286,7 +286,7 @@ func GenerateAttesterSlashingForValidator(
 		AttestingIndices: []uint64{uint64(idx)},
 	}
 	var err error
-	att1.Signature, err = signing.ComputeDomainAndSign(bState, currentEpoch, att1.Data, params.BeaconConfig().DomainBeaconAttester, priv)
+	att1.Signatures, err = signing.ComputeDomainAndSign(bState, currentEpoch, att1.Data, params.BeaconConfig().DomainBeaconAttester, priv)
 	if err != nil {
 		return nil, err
 	}
@@ -307,7 +307,7 @@ func GenerateAttesterSlashingForValidator(
 		},
 		AttestingIndices: []uint64{uint64(idx)},
 	}
-	att2.Signature, err = signing.ComputeDomainAndSign(bState, currentEpoch, att2.Data, params.BeaconConfig().DomainBeaconAttester, priv)
+	att2.Signatures, err = signing.ComputeDomainAndSign(bState, currentEpoch, att2.Data, params.BeaconConfig().DomainBeaconAttester, priv)
 	if err != nil {
 		return nil, err
 	}
@@ -342,24 +342,24 @@ func generateAttesterSlashings(
 	return attesterSlashings, nil
 }
 
-func generateDepositsAndEth1Data(
+func generateDepositsAndZond1Data(
 	bState state.BeaconState,
 	numDeposits uint64,
 ) (
 	[]*zondpb.Deposit,
-	*zondpb.Eth1Data,
+	*zondpb.Zond1Data,
 	error,
 ) {
-	previousDepsLen := bState.Eth1DepositIndex()
+	previousDepsLen := bState.Zond1DepositIndex()
 	currentDeposits, _, err := DeterministicDepositsAndKeys(previousDepsLen + numDeposits)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not get deposits")
 	}
-	eth1Data, err := DeterministicEth1Data(len(currentDeposits))
+	zond1Data, err := DeterministicZond1Data(len(currentDeposits))
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not get eth1data")
+		return nil, nil, errors.Wrap(err, "could not get zond1data")
 	}
-	return currentDeposits[previousDepsLen:], eth1Data, nil
+	return currentDeposits[previousDepsLen:], zond1Data, nil
 }
 
 func GenerateVoluntaryExits(bState state.BeaconState, k bls.SecretKey, idx primitives.ValidatorIndex) (*zondpb.SignedVoluntaryExit, error) {
@@ -480,8 +480,8 @@ func HydrateBeaconBlockBody(b *zondpb.BeaconBlockBody) *zondpb.BeaconBlockBody {
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &zondpb.Eth1Data{
+	if b.Zond1Data == nil {
+		b.Zond1Data = &zondpb.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}
@@ -527,8 +527,8 @@ func HydrateV1BeaconBlockBody(b *v1.BeaconBlockBody) *v1.BeaconBlockBody {
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &v1.Eth1Data{
+	if b.Zond1Data == nil {
+		b.Zond1Data = &v1.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}
@@ -574,8 +574,8 @@ func HydrateV2AltairBeaconBlockBody(b *v2.BeaconBlockBodyAltair) *v2.BeaconBlock
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &v1.Eth1Data{
+	if b.Zond1Data == nil {
+		b.Zond1Data = &v1.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}
@@ -627,8 +627,8 @@ func HydrateV2BellatrixBeaconBlockBody(b *v2.BeaconBlockBodyBellatrix) *v2.Beaco
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &v1.Eth1Data{
+	if b.Zond1Data == nil {
+		b.Zond1Data = &v1.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}
@@ -693,8 +693,8 @@ func HydrateBeaconBlockBodyAltair(b *zondpb.BeaconBlockBodyAltair) *zondpb.Beaco
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &zondpb.Eth1Data{
+	if b.Zond1Data == nil {
+		b.Zond1Data = &zondpb.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}
@@ -746,8 +746,8 @@ func HydrateBeaconBlockBodyBellatrix(b *zondpb.BeaconBlockBodyBellatrix) *zondpb
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &zondpb.Eth1Data{
+	if b.Zond1Data == nil {
+		b.Zond1Data = &zondpb.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}
@@ -813,8 +813,8 @@ func HydrateBlindedBeaconBlockBodyBellatrix(b *zondpb.BlindedBeaconBlockBodyBell
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &zondpb.Eth1Data{
+	if b.Zond1Data == nil {
+		b.Zond1Data = &zondpb.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		}
@@ -880,8 +880,8 @@ func HydrateV2BlindedBeaconBlockBodyBellatrix(b *v2.BlindedBeaconBlockBodyBellat
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &v1.Eth1Data{
+	if b.Zond1Data == nil {
+		b.Zond1Data = &v1.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		}
@@ -946,8 +946,8 @@ func HydrateBeaconBlockBodyCapella(b *zondpb.BeaconBlockBodyCapella) *zondpb.Bea
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &zondpb.Eth1Data{
+	if b.Zond1Data == nil {
+		b.Zond1Data = &zondpb.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}
@@ -1013,8 +1013,8 @@ func HydrateBlindedBeaconBlockBodyCapella(b *zondpb.BlindedBeaconBlockBodyCapell
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &zondpb.Eth1Data{
+	if b.Zond1Data == nil {
+		b.Zond1Data = &zondpb.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		}
@@ -1081,8 +1081,8 @@ func HydrateV2BlindedBeaconBlockBodyCapella(b *v2.BlindedBeaconBlockBodyCapella)
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &v1.Eth1Data{
+	if b.Zond1Data == nil {
+		b.Zond1Data = &v1.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		}

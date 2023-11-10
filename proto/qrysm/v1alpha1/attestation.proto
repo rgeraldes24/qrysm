@@ -32,9 +32,7 @@ message Attestation {
     AttestationData data = 2;
 
     // 4595 (signature size per signer) * 2048 (number of signers) bytes of unaggregated signatures
-    bytes signature = 3 [(theqrl.zond.ext.ssz_max) = "9410560"];
-    // 96 byte BLS aggregate signature.
-//    bytes signature = 3 [(theqrl.zond.ext.ssz_size) = "4595"];
+    repeated bytes signatures = 3 [(theqrl.zond.ext.ssz_size) = "?,4595", (theqrl.zond.ext.ssz_max) = "2048"];
 
     // 2048 (number of signers)
     repeated uint64 signatureValidatorIndex = 4 [(theqrl.zond.ext.ssz_max) = "2048"];
@@ -47,7 +45,7 @@ message AggregateAttestationAndProof {
     // The aggregated attestation that was submitted.
     Attestation aggregate = 3;
 
-    // 96 byte selection proof signed by the aggregator, which is the signature of the slot to aggregate.
+    // 4595 byte selection proof signed by the aggregator, which is the signature of the slot to aggregate.
     bytes selection_proof = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
@@ -55,7 +53,7 @@ message SignedAggregateAttestationAndProof {
     // The aggregated attestation and selection proof itself.
     AggregateAttestationAndProof message = 1;
 
-    // 96 byte BLS aggregate signature signed by the aggregator over the message.
+    // 4595 byte Dilithium aggregate signature signed by the aggregator over the message.
     bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 

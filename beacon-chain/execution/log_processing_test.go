@@ -8,7 +8,7 @@ import (
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/theQRL/go-zond"
+	ethereum "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
@@ -404,9 +404,9 @@ func TestProcessETH2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 	require.NoError(t, err)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
 	web3Service.httpLogger = testAcc.Backend
-	web3Service.latestEth1Data.LastRequestedBlock = 0
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestZond1Data.LastRequestedBlock = 0
+	web3Service.latestZond1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestZond1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 	bConfig := params.MinimalSpecConfig().Copy()
 	bConfig.MinGenesisTime = 0
 	bConfig.SecondsPerETH1Block = 10
@@ -441,11 +441,11 @@ func TestProcessETH2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 		}
 	}
 	// Forward the chain to account for the follow distance
-	for i := uint64(0); i < params.BeaconConfig().Eth1FollowDistance; i++ {
+	for i := uint64(0); i < params.BeaconConfig().Zond1FollowDistance; i++ {
 		testAcc.Backend.Commit()
 	}
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestZond1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestZond1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 
 	// Set up our subscriber now to listen for the chain started event.
 	stateChannel := make(chan *feed.Event, 1)
@@ -501,9 +501,9 @@ func TestProcessETH2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 	require.NoError(t, err)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
 	web3Service.httpLogger = testAcc.Backend
-	web3Service.latestEth1Data.LastRequestedBlock = 0
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestZond1Data.LastRequestedBlock = 0
+	web3Service.latestZond1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestZond1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 	bConfig := params.MinimalSpecConfig().Copy()
 	bConfig.SecondsPerETH1Block = 10
 	params.OverrideBeaconConfig(bConfig)
@@ -543,11 +543,11 @@ func TestProcessETH2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 	wantedGenesisTime := testAcc.Backend.Blockchain().CurrentBlock().Time
 
 	// Forward the chain to account for the follow distance
-	for i := uint64(0); i < params.BeaconConfig().Eth1FollowDistance; i++ {
+	for i := uint64(0); i < params.BeaconConfig().Zond1FollowDistance; i++ {
 		testAcc.Backend.Commit()
 	}
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestZond1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestZond1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 
 	// Set the genesis time 500 blocks ahead of the last
 	// deposit log.
@@ -592,7 +592,7 @@ func TestCheckForChainstart_NoValidator(t *testing.T) {
 	require.LogsDoNotContain(t, hook, "Could not determine active validator count from pre genesis state")
 }
 
-func newPowchainService(t *testing.T, eth1Backend *mock.TestAccount, beaconDB db.Database) *Service {
+func newPowchainService(t *testing.T, zond1Backend *mock.TestAccount, beaconDB db.Database) *Service {
 	depositCache, err := depositcache.New()
 	require.NoError(t, err)
 	server, endpoint, err := mockExecution.SetupRPCServer()
@@ -602,17 +602,17 @@ func newPowchainService(t *testing.T, eth1Backend *mock.TestAccount, beaconDB db
 	})
 	web3Service, err := NewService(context.Background(),
 		WithHttpEndpoint(endpoint),
-		WithDepositContractAddress(eth1Backend.ContractAddr),
+		WithDepositContractAddress(zond1Backend.ContractAddr),
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
 	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
-	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(eth1Backend.ContractAddr, eth1Backend.Backend)
+	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(zond1Backend.ContractAddr, zond1Backend.Backend)
 	require.NoError(t, err)
 
-	web3Service.rpcClient = &mockExecution.RPCClient{Backend: eth1Backend.Backend}
-	web3Service.httpLogger = &goodLogger{backend: eth1Backend.Backend}
+	web3Service.rpcClient = &mockExecution.RPCClient{Backend: zond1Backend.Backend}
+	web3Service.httpLogger = &goodLogger{backend: zond1Backend.Backend}
 	params.SetupTestConfigCleanup(t)
 	bConfig := params.MinimalSpecConfig().Copy()
 	bConfig.MinGenesisTime = 0

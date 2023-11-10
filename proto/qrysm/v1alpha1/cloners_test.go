@@ -11,13 +11,13 @@ import (
 )
 
 func TestCopyETH1Data(t *testing.T) {
-	data := genEth1Data()
+	data := genZond1Data()
 
 	got := v1alpha1.CopyETH1Data(data)
 	if !reflect.DeepEqual(got, data) {
 		t.Errorf("CopyETH1Data() = %v, want %v", got, data)
 	}
-	assert.NotEmpty(t, got, "Copied eth1data has empty fields")
+	assert.NotEmpty(t, got, "Copied zond1data has empty fields")
 }
 
 func TestCopyPendingAttestation(t *testing.T) {
@@ -87,36 +87,6 @@ func TestCopyBeaconBlockBody(t *testing.T) {
 		t.Errorf("CopyBeaconBlockBody() = %v, want %v", got, body)
 	}
 	assert.NotEmpty(t, got, "Copied beacon block body has empty fields")
-}
-
-func TestCopySignedBeaconBlockAltair(t *testing.T) {
-	sbb := genSignedBeaconBlockAltair()
-
-	got := v1alpha1.CopySignedBeaconBlockAltair(sbb)
-	if !reflect.DeepEqual(got, sbb) {
-		t.Errorf("CopySignedBeaconBlockAltair() = %v, want %v", got, sbb)
-	}
-	assert.NotEmpty(t, sbb, "Copied signed beacon block altair has empty fields")
-}
-
-func TestCopyBeaconBlockAltair(t *testing.T) {
-	b := genBeaconBlockAltair()
-
-	got := v1alpha1.CopyBeaconBlockAltair(b)
-	if !reflect.DeepEqual(got, b) {
-		t.Errorf("CopyBeaconBlockAltair() = %v, want %v", got, b)
-	}
-	assert.NotEmpty(t, b, "Copied beacon block altair has empty fields")
-}
-
-func TestCopyBeaconBlockBodyAltair(t *testing.T) {
-	bb := genBeaconBlockBodyAltair()
-
-	got := v1alpha1.CopyBeaconBlockBodyAltair(bb)
-	if !reflect.DeepEqual(got, bb) {
-		t.Errorf("CopyBeaconBlockBodyAltair() = %v, want %v", got, bb)
-	}
-	assert.NotEmpty(t, bb, "Copied beacon block body altair has empty fields")
 }
 
 func TestCopyProposerSlashings(t *testing.T) {
@@ -320,73 +290,13 @@ func TestCopyPayloadHeader(t *testing.T) {
 }
 
 func TestCopyPayloadHeaderCapella(t *testing.T) {
-	p := genPayloadHeaderCapella()
+	p := genPayloadHeader()
 
-	got := v1alpha1.CopyExecutionPayloadHeaderCapella(p)
+	got := v1alpha1.CopyExecutionPayloadHeader(p)
 	if !reflect.DeepEqual(got, p) {
 		t.Errorf("TestCopyPayloadHeaderCapella() = %v, want %v", got, p)
 	}
 	assert.NotEmpty(t, got, "Copied execution payload header has empty fields")
-}
-
-func TestCopySignedBeaconBlockBellatrix(t *testing.T) {
-	sbb := genSignedBeaconBlockBellatrix()
-
-	got := v1alpha1.CopySignedBeaconBlockBellatrix(sbb)
-	if !reflect.DeepEqual(got, sbb) {
-		t.Errorf("CopySignedBeaconBlockBellatrix() = %v, want %v", got, sbb)
-	}
-	assert.NotEmpty(t, sbb, "Copied signed beacon block Bellatrix has empty fields")
-}
-
-func TestCopyBeaconBlockBellatrix(t *testing.T) {
-	b := genBeaconBlockBellatrix()
-
-	got := v1alpha1.CopyBeaconBlockBellatrix(b)
-	if !reflect.DeepEqual(got, b) {
-		t.Errorf("CopyBeaconBlockBellatrix() = %v, want %v", got, b)
-	}
-	assert.NotEmpty(t, b, "Copied beacon block Bellatrix has empty fields")
-}
-
-func TestCopyBeaconBlockBodyBellatrix(t *testing.T) {
-	bb := genBeaconBlockBodyBellatrix()
-
-	got := v1alpha1.CopyBeaconBlockBodyBellatrix(bb)
-	if !reflect.DeepEqual(got, bb) {
-		t.Errorf("CopyBeaconBlockBodyBellatrix() = %v, want %v", got, bb)
-	}
-	assert.NotEmpty(t, bb, "Copied beacon block body Bellatrix has empty fields")
-}
-
-func TestCopySignedBlindedBeaconBlockBellatrix(t *testing.T) {
-	sbb := genSignedBeaconBlockBellatrix()
-
-	got := v1alpha1.CopySignedBeaconBlockBellatrix(sbb)
-	if !reflect.DeepEqual(got, sbb) {
-		t.Errorf("CopySignedBeaconBlockBellatrix() = %v, want %v", got, sbb)
-	}
-	assert.NotEmpty(t, sbb, "Copied signed blinded beacon block Bellatrix has empty fields")
-}
-
-func TestCopyBlindedBeaconBlockBellatrix(t *testing.T) {
-	b := genBeaconBlockBellatrix()
-
-	got := v1alpha1.CopyBeaconBlockBellatrix(b)
-	if !reflect.DeepEqual(got, b) {
-		t.Errorf("CopyBeaconBlockBellatrix() = %v, want %v", got, b)
-	}
-	assert.NotEmpty(t, b, "Copied blinded beacon block Bellatrix has empty fields")
-}
-
-func TestCopyBlindedBeaconBlockBodyBellatrix(t *testing.T) {
-	bb := genBeaconBlockBodyBellatrix()
-
-	got := v1alpha1.CopyBeaconBlockBodyBellatrix(bb)
-	if !reflect.DeepEqual(got, bb) {
-		t.Errorf("CopyBeaconBlockBodyBellatrix() = %v, want %v", got, bb)
-	}
-	assert.NotEmpty(t, bb, "Copied blinded beacon block body Bellatrix has empty fields")
 }
 
 func TestCopySignedBeaconBlockCapella(t *testing.T) {
@@ -502,7 +412,7 @@ func genAttestation() *v1alpha1.Attestation {
 	return &v1alpha1.Attestation{
 		AggregationBits: bytes(32),
 		Data:            genAttData(),
-		Signature:       bytes(32),
+		Signatures:      [][]byte{bytes(32)},
 	}
 }
 
@@ -531,8 +441,8 @@ func genCheckpoint() *v1alpha1.Checkpoint {
 	}
 }
 
-func genEth1Data() *v1alpha1.Eth1Data {
-	return &v1alpha1.Eth1Data{
+func genZond1Data() *v1alpha1.Zond1Data {
+	return &v1alpha1.Zond1Data{
 		DepositRoot:  bytes(32),
 		DepositCount: 4,
 		BlockHash:    bytes(32),
@@ -568,7 +478,7 @@ func genBeaconBlock() *v1alpha1.BeaconBlock {
 func genBeaconBlockBody() *v1alpha1.BeaconBlockBody {
 	return &v1alpha1.BeaconBlockBody{
 		RandaoReveal:      bytes(32),
-		Eth1Data:          genEth1Data(),
+		Zond1Data:         genZond1Data(),
 		Graffiti:          bytes(32),
 		ProposerSlashings: genProposerSlashings(5),
 		AttesterSlashings: genAttesterSlashings(5),
@@ -604,7 +514,7 @@ func genIndexedAttestation() *v1alpha1.IndexedAttestation {
 	return &v1alpha1.IndexedAttestation{
 		AttestingIndices: []uint64{1, 2, 3},
 		Data:             genAttData(),
-		Signature:        bytes(32),
+		Signatures:       [][]byte{bytes(32)},
 	}
 }
 
@@ -704,78 +614,15 @@ func genSyncCommitteeContribution() *v1alpha1.SyncCommitteeContribution {
 
 func genSyncAggregate() *v1alpha1.SyncAggregate {
 	return &v1alpha1.SyncAggregate{
-		SyncCommitteeBits:      bytes(32),
-		SyncCommitteeSignature: bytes(32),
-	}
-}
-
-func genBeaconBlockBodyAltair() *v1alpha1.BeaconBlockBodyAltair {
-	return &v1alpha1.BeaconBlockBodyAltair{
-		RandaoReveal:      bytes(32),
-		Eth1Data:          genEth1Data(),
-		Graffiti:          bytes(32),
-		ProposerSlashings: genProposerSlashings(5),
-		AttesterSlashings: genAttesterSlashings(5),
-		Attestations:      genAttestations(10),
-		Deposits:          genDeposits(5),
-		VoluntaryExits:    genSignedVoluntaryExits(12),
-		SyncAggregate:     genSyncAggregate(),
-	}
-}
-
-func genBeaconBlockAltair() *v1alpha1.BeaconBlockAltair {
-	return &v1alpha1.BeaconBlockAltair{
-		Slot:          123455,
-		ProposerIndex: 55433,
-		ParentRoot:    bytes(32),
-		StateRoot:     bytes(32),
-		Body:          genBeaconBlockBodyAltair(),
-	}
-}
-
-func genSignedBeaconBlockAltair() *v1alpha1.SignedBeaconBlockAltair {
-	return &v1alpha1.SignedBeaconBlockAltair{
-		Block:     genBeaconBlockAltair(),
-		Signature: bytes(32),
-	}
-}
-
-func genBeaconBlockBodyBellatrix() *v1alpha1.BeaconBlockBodyBellatrix {
-	return &v1alpha1.BeaconBlockBodyBellatrix{
-		RandaoReveal:      bytes(32),
-		Eth1Data:          genEth1Data(),
-		Graffiti:          bytes(32),
-		ProposerSlashings: genProposerSlashings(5),
-		AttesterSlashings: genAttesterSlashings(5),
-		Attestations:      genAttestations(10),
-		Deposits:          genDeposits(5),
-		VoluntaryExits:    genSignedVoluntaryExits(12),
-		SyncAggregate:     genSyncAggregate(),
-		ExecutionPayload:  genPayload(),
-	}
-}
-
-func genBeaconBlockBellatrix() *v1alpha1.BeaconBlockBellatrix {
-	return &v1alpha1.BeaconBlockBellatrix{
-		Slot:          123455,
-		ProposerIndex: 55433,
-		ParentRoot:    bytes(32),
-		StateRoot:     bytes(32),
-		Body:          genBeaconBlockBodyBellatrix(),
-	}
-}
-
-func genSignedBeaconBlockBellatrix() *v1alpha1.SignedBeaconBlockBellatrix {
-	return &v1alpha1.SignedBeaconBlockBellatrix{
-		Block:     genBeaconBlockBellatrix(),
-		Signature: bytes(32),
+		SyncCommitteeBits:       bytes(32),
+		SyncCommitteeSignatures: [][]byte{bytes(32)},
 	}
 }
 
 func genBeaconBlockBodyCapella() *v1alpha1.BeaconBlockBodyCapella {
 	return &v1alpha1.BeaconBlockBodyCapella{
-		RandaoReveal:                bytes(96),
-		Eth1Data:                    genEth1Data(),
+		RandaoReveal:                bytes(4595),
+		Zond1Data:                   genZond1Data(),
 		Graffiti:                    bytes(32),
 		ProposerSlashings:           genProposerSlashings(5),
 		AttesterSlashings:           genAttesterSlashings(5),
@@ -783,7 +630,7 @@ func genBeaconBlockBodyCapella() *v1alpha1.BeaconBlockBodyCapella {
 		Deposits:                    genDeposits(5),
 		VoluntaryExits:              genSignedVoluntaryExits(12),
 		SyncAggregate:               genSyncAggregate(),
-		ExecutionPayload:            genPayloadCapella(),
+		ExecutionPayload:            genPayload(),
 		DilithiumToExecutionChanges: genDilithiumToExecutionChanges(10),
 	}
 }
@@ -801,14 +648,14 @@ func genBeaconBlockCapella() *v1alpha1.BeaconBlockCapella {
 func genSignedBeaconBlockCapella() *v1alpha1.SignedBeaconBlockCapella {
 	return &v1alpha1.SignedBeaconBlockCapella{
 		Block:     genBeaconBlockCapella(),
-		Signature: bytes(96),
+		Signature: bytes(4595),
 	}
 }
 
 func genBlindedBeaconBlockBodyCapella() *v1alpha1.BlindedBeaconBlockBodyCapella {
 	return &v1alpha1.BlindedBeaconBlockBodyCapella{
-		RandaoReveal:                bytes(96),
-		Eth1Data:                    genEth1Data(),
+		RandaoReveal:                bytes(4595),
+		Zond1Data:                   genZond1Data(),
 		Graffiti:                    bytes(32),
 		ProposerSlashings:           genProposerSlashings(5),
 		AttesterSlashings:           genAttesterSlashings(5),
@@ -816,7 +663,7 @@ func genBlindedBeaconBlockBodyCapella() *v1alpha1.BlindedBeaconBlockBodyCapella 
 		Deposits:                    genDeposits(5),
 		VoluntaryExits:              genSignedVoluntaryExits(12),
 		SyncAggregate:               genSyncAggregate(),
-		ExecutionPayloadHeader:      genPayloadHeaderCapella(),
+		ExecutionPayloadHeader:      genPayloadHeader(),
 		DilithiumToExecutionChanges: genDilithiumToExecutionChanges(10),
 	}
 }
@@ -850,25 +697,6 @@ func genSyncCommitteeMessage() *v1alpha1.SyncCommitteeMessage {
 func genPayload() *enginev1.ExecutionPayload {
 	return &enginev1.ExecutionPayload{
 		ParentHash:    bytes(32),
-		FeeRecipient:  bytes(32),
-		StateRoot:     bytes(32),
-		ReceiptsRoot:  bytes(32),
-		LogsBloom:     bytes(32),
-		PrevRandao:    bytes(32),
-		BlockNumber:   1,
-		GasLimit:      2,
-		GasUsed:       3,
-		Timestamp:     4,
-		ExtraData:     bytes(32),
-		BaseFeePerGas: bytes(32),
-		BlockHash:     bytes(32),
-		Transactions:  [][]byte{{'a'}, {'b'}, {'c'}},
-	}
-}
-
-func genPayloadCapella() *enginev1.ExecutionPayloadCapella {
-	return &enginev1.ExecutionPayloadCapella{
-		ParentHash:    bytes(32),
 		FeeRecipient:  bytes(20),
 		StateRoot:     bytes(32),
 		ReceiptsRoot:  bytes(32),
@@ -901,25 +729,6 @@ func genPayloadCapella() *enginev1.ExecutionPayloadCapella {
 
 func genPayloadHeader() *enginev1.ExecutionPayloadHeader {
 	return &enginev1.ExecutionPayloadHeader{
-		ParentHash:       bytes(32),
-		FeeRecipient:     bytes(32),
-		StateRoot:        bytes(32),
-		ReceiptsRoot:     bytes(32),
-		LogsBloom:        bytes(32),
-		PrevRandao:       bytes(32),
-		BlockNumber:      1,
-		GasLimit:         2,
-		GasUsed:          3,
-		Timestamp:        4,
-		ExtraData:        bytes(32),
-		BaseFeePerGas:    bytes(32),
-		BlockHash:        bytes(32),
-		TransactionsRoot: bytes(32),
-	}
-}
-
-func genPayloadHeaderCapella() *enginev1.ExecutionPayloadHeaderCapella {
-	return &enginev1.ExecutionPayloadHeaderCapella{
 		ParentHash:       bytes(32),
 		FeeRecipient:     bytes(20),
 		StateRoot:        bytes(32),
@@ -970,6 +779,6 @@ func genDilithiumToExecutionChange() *v1alpha1.SignedDilithiumToExecutionChange 
 			FromDilithiumPubkey: bytes(48),
 			ToExecutionAddress:  bytes(20),
 		},
-		Signature: bytes(96),
+		Signature: bytes(4595),
 	}
 }

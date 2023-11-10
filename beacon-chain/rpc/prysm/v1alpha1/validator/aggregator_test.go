@@ -2,7 +2,6 @@ package validator
 
 import (
 	"context"
-	"reflect"
 	"testing"
 	"time"
 
@@ -24,7 +23,6 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
-	attaggregation "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/attestations"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -136,6 +134,8 @@ func TestSubmitAggregateAndProof_UnaggregateOk(t *testing.T) {
 	require.NoError(t, err)
 }
 
+/*
+TODO(rgeraldes24)
 func TestSubmitAggregateAndProof_AggregateOk(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	c := params.MinimalSpecConfig().Copy()
@@ -181,6 +181,7 @@ func TestSubmitAggregateAndProof_AggregateOk(t *testing.T) {
 		t.Error("Did not receive wanted attestation")
 	}
 }
+*/
 
 func TestSubmitAggregateAndProof_AggregateNotOk(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

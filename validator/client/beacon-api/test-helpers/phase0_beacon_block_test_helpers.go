@@ -12,8 +12,8 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 		ParentRoot:    FillByteSlice(32, 3),
 		StateRoot:     FillByteSlice(32, 4),
 		Body: &zondpb.BeaconBlockBody{
-			RandaoReveal: FillByteSlice(96, 5),
-			Eth1Data: &zondpb.Eth1Data{
+			RandaoReveal: FillByteSlice(4595, 5),
+			Zond1Data: &zondpb.Zond1Data{
 				DepositRoot:  FillByteSlice(32, 6),
 				DepositCount: 7,
 				BlockHash:    FillByteSlice(32, 8),
@@ -29,7 +29,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 							StateRoot:     FillByteSlice(32, 13),
 							BodyRoot:      FillByteSlice(32, 14),
 						},
-						Signature: FillByteSlice(96, 15),
+						Signature: FillByteSlice(4595, 15),
 					},
 					Header_2: &zondpb.SignedBeaconBlockHeader{
 						Header: &zondpb.BeaconBlockHeader{
@@ -39,7 +39,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 							StateRoot:     FillByteSlice(32, 19),
 							BodyRoot:      FillByteSlice(32, 20),
 						},
-						Signature: FillByteSlice(96, 21),
+						Signature: FillByteSlice(4595, 21),
 					},
 				},
 				{
@@ -51,7 +51,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 							StateRoot:     FillByteSlice(32, 25),
 							BodyRoot:      FillByteSlice(32, 26),
 						},
-						Signature: FillByteSlice(96, 27),
+						Signature: FillByteSlice(4595, 27),
 					},
 					Header_2: &zondpb.SignedBeaconBlockHeader{
 						Header: &zondpb.BeaconBlockHeader{
@@ -61,7 +61,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 							StateRoot:     FillByteSlice(32, 31),
 							BodyRoot:      FillByteSlice(32, 32),
 						},
-						Signature: FillByteSlice(96, 33),
+						Signature: FillByteSlice(4595, 33),
 					},
 				},
 			},
@@ -82,7 +82,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 								Root:  FillByteSlice(32, 42),
 							},
 						},
-						Signature: FillByteSlice(96, 43),
+						Signatures: FillByteSlice(4595, 43),
 					},
 					Attestation_2: &zondpb.IndexedAttestation{
 						AttestingIndices: []uint64{44, 45},
@@ -99,7 +99,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 								Root:  FillByteSlice(32, 52),
 							},
 						},
-						Signature: FillByteSlice(96, 53),
+						Signatures: FillByteSlice(4595, 53),
 					},
 				},
 				{
@@ -118,7 +118,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 								Root:  FillByteSlice(32, 62),
 							},
 						},
-						Signature: FillByteSlice(96, 63),
+						Signatures: FillByteSlice(4595, 63),
 					},
 					Attestation_2: &zondpb.IndexedAttestation{
 						AttestingIndices: []uint64{64, 65},
@@ -135,7 +135,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 								Root:  FillByteSlice(32, 72),
 							},
 						},
-						Signature: FillByteSlice(96, 73),
+						Signatures: FillByteSlice(4595, 73),
 					},
 				},
 			},
@@ -155,7 +155,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 							Root:  FillByteSlice(32, 81),
 						},
 					},
-					Signature: FillByteSlice(96, 82),
+					Signatures: FillByteSlice(4595, 82),
 				},
 				{
 					AggregationBits: FillByteSlice(4, 83),
@@ -172,7 +172,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 							Root:  FillByteSlice(32, 90),
 						},
 					},
-					Signature: FillByteSlice(96, 91),
+					Signatures: FillByteSlice(4595, 91),
 				},
 			},
 			Deposits: []*zondpb.Deposit{
@@ -182,7 +182,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 						PublicKey:             FillByteSlice(48, 94),
 						WithdrawalCredentials: FillByteSlice(32, 95),
 						Amount:                96,
-						Signature:             FillByteSlice(96, 97),
+						Signature:             FillByteSlice(4595, 97),
 					},
 				},
 				{
@@ -191,7 +191,7 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 						PublicKey:             FillByteSlice(48, 100),
 						WithdrawalCredentials: FillByteSlice(32, 101),
 						Amount:                102,
-						Signature:             FillByteSlice(96, 103),
+						Signature:             FillByteSlice(4595, 103),
 					},
 				},
 			},
@@ -201,14 +201,14 @@ func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {
 						Epoch:          104,
 						ValidatorIndex: 105,
 					},
-					Signature: FillByteSlice(96, 106),
+					Signature: FillByteSlice(4595, 106),
 				},
 				{
 					Exit: &zondpb.VoluntaryExit{
 						Epoch:          107,
 						ValidatorIndex: 108,
 					},
-					Signature: FillByteSlice(96, 109),
+					Signature: FillByteSlice(4595, 109),
 				},
 			},
 		},
@@ -222,8 +222,8 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 		ParentRoot:    FillEncodedByteSlice(32, 3),
 		StateRoot:     FillEncodedByteSlice(32, 4),
 		Body: &apimiddleware.BeaconBlockBodyJson{
-			RandaoReveal: FillEncodedByteSlice(96, 5),
-			Eth1Data: &apimiddleware.Eth1DataJson{
+			RandaoReveal: FillEncodedByteSlice(4595, 5),
+			Zond1Data: &apimiddleware.Zond1DataJson{
 				DepositRoot:  FillEncodedByteSlice(32, 6),
 				DepositCount: "7",
 				BlockHash:    FillEncodedByteSlice(32, 8),
@@ -239,7 +239,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 							StateRoot:     FillEncodedByteSlice(32, 13),
 							BodyRoot:      FillEncodedByteSlice(32, 14),
 						},
-						Signature: FillEncodedByteSlice(96, 15),
+						Signature: FillEncodedByteSlice(4595, 15),
 					},
 					Header_2: &apimiddleware.SignedBeaconBlockHeaderJson{
 						Header: &apimiddleware.BeaconBlockHeaderJson{
@@ -249,7 +249,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 							StateRoot:     FillEncodedByteSlice(32, 19),
 							BodyRoot:      FillEncodedByteSlice(32, 20),
 						},
-						Signature: FillEncodedByteSlice(96, 21),
+						Signature: FillEncodedByteSlice(4595, 21),
 					},
 				},
 				{
@@ -261,7 +261,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 							StateRoot:     FillEncodedByteSlice(32, 25),
 							BodyRoot:      FillEncodedByteSlice(32, 26),
 						},
-						Signature: FillEncodedByteSlice(96, 27),
+						Signature: FillEncodedByteSlice(4595, 27),
 					},
 					Header_2: &apimiddleware.SignedBeaconBlockHeaderJson{
 						Header: &apimiddleware.BeaconBlockHeaderJson{
@@ -271,7 +271,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 							StateRoot:     FillEncodedByteSlice(32, 31),
 							BodyRoot:      FillEncodedByteSlice(32, 32),
 						},
-						Signature: FillEncodedByteSlice(96, 33),
+						Signature: FillEncodedByteSlice(4595, 33),
 					},
 				},
 			},
@@ -292,7 +292,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 								Root:  FillEncodedByteSlice(32, 42),
 							},
 						},
-						Signature: FillEncodedByteSlice(96, 43),
+						Signature: FillEncodedByteSlice(4595, 43),
 					},
 					Attestation_2: &apimiddleware.IndexedAttestationJson{
 						AttestingIndices: []string{"44", "45"},
@@ -309,7 +309,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 								Root:  FillEncodedByteSlice(32, 52),
 							},
 						},
-						Signature: FillEncodedByteSlice(96, 53),
+						Signature: FillEncodedByteSlice(4595, 53),
 					},
 				},
 				{
@@ -328,7 +328,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 								Root:  FillEncodedByteSlice(32, 62),
 							},
 						},
-						Signature: FillEncodedByteSlice(96, 63),
+						Signature: FillEncodedByteSlice(4595, 63),
 					},
 					Attestation_2: &apimiddleware.IndexedAttestationJson{
 						AttestingIndices: []string{"64", "65"},
@@ -345,7 +345,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 								Root:  FillEncodedByteSlice(32, 72),
 							},
 						},
-						Signature: FillEncodedByteSlice(96, 73),
+						Signature: FillEncodedByteSlice(4595, 73),
 					},
 				},
 			},
@@ -365,7 +365,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 							Root:  FillEncodedByteSlice(32, 81),
 						},
 					},
-					Signature: FillEncodedByteSlice(96, 82),
+					Signature: FillEncodedByteSlice(4595, 82),
 				},
 				{
 					AggregationBits: FillEncodedByteSlice(4, 83),
@@ -382,7 +382,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 							Root:  FillEncodedByteSlice(32, 90),
 						},
 					},
-					Signature: FillEncodedByteSlice(96, 91),
+					Signature: FillEncodedByteSlice(4595, 91),
 				},
 			},
 			Deposits: []*apimiddleware.DepositJson{
@@ -392,7 +392,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 						PublicKey:             FillEncodedByteSlice(48, 94),
 						WithdrawalCredentials: FillEncodedByteSlice(32, 95),
 						Amount:                "96",
-						Signature:             FillEncodedByteSlice(96, 97),
+						Signature:             FillEncodedByteSlice(4595, 97),
 					},
 				},
 				{
@@ -401,7 +401,7 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 						PublicKey:             FillEncodedByteSlice(48, 100),
 						WithdrawalCredentials: FillEncodedByteSlice(32, 101),
 						Amount:                "102",
-						Signature:             FillEncodedByteSlice(96, 103),
+						Signature:             FillEncodedByteSlice(4595, 103),
 					},
 				},
 			},
@@ -411,14 +411,14 @@ func GenerateJsonPhase0BeaconBlock() *apimiddleware.BeaconBlockJson {
 						Epoch:          "104",
 						ValidatorIndex: "105",
 					},
-					Signature: FillEncodedByteSlice(96, 106),
+					Signature: FillEncodedByteSlice(4595, 106),
 				},
 				{
 					Exit: &apimiddleware.VoluntaryExitJson{
 						Epoch:          "107",
 						ValidatorIndex: "108",
 					},
-					Signature: FillEncodedByteSlice(96, 109),
+					Signature: FillEncodedByteSlice(4595, 109),
 				},
 			},
 		},

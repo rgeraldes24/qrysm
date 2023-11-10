@@ -148,7 +148,7 @@ func TestAttestToBlockHead_AttestsCorrectly(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Root: sourceRoot[:], Epoch: 3},
 		},
 		AggregationBits: aggregationBitfield,
-		Signature:       make([]byte, 96),
+		Signatures:      make([]byte, 96),
 	}
 
 	root, err := signing.ComputeSigningRoot(expectedAttestation.Data, make([]byte, 32))
@@ -159,7 +159,7 @@ func TestAttestToBlockHead_AttestsCorrectly(t *testing.T) {
 		SigningRoot: root[:],
 	})
 	require.NoError(t, err)
-	expectedAttestation.Signature = sig.Marshal()
+	expectedAttestation.Signatures = sig.Marshal()
 	if !reflect.DeepEqual(generatedAttestation, expectedAttestation) {
 		t.Errorf("Incorrectly attested head, wanted %v, received %v", expectedAttestation, generatedAttestation)
 		diff, _ := messagediff.PrettyDiff(expectedAttestation, generatedAttestation)

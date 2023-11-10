@@ -75,7 +75,7 @@ func TestWaitForActivation_ContextClosed(t *testing.T) {
 		Ctx:               ctx,
 		ChainStartFetcher: &mockExecution.Chain{},
 		BlockFetcher:      &mockExecution.Chain{},
-		Eth1InfoFetcher:   &mockExecution.Chain{},
+		Zond1InfoFetcher:  &mockExecution.Chain{},
 		DepositFetcher:    depositCache,
 		HeadFetcher:       &mockChain.ChainService{State: beaconState, Root: genesisRoot[:]},
 	}

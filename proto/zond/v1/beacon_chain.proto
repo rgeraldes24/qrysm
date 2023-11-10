@@ -23,6 +23,7 @@ import "proto/zond/v1/attestation.proto";
 import "proto/zond/v1/beacon_block.proto";
 import "proto/zond/v1/beacon_state.proto";
 import "proto/zond/v1/validator.proto";
+import "proto/zond/v1/withdrawals.proto";
 
 option csharp_namespace = "TheQRL.Zond.V1";
 option go_package = "github.com/theQRL/qrysm/v4/proto/zond/v1";
@@ -220,8 +221,8 @@ message BeaconBlockHeaderContainer {
     // The unsigned beacon block header.
     BeaconBlockHeader message = 1;
 
-    // 96 byte BLS signature from the validator that produced this block header.
-    bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "96"];
+    // 4595 byte Dilithium signature from the validator that produced this block header.
+    bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
 message BlockResponse {
@@ -235,8 +236,8 @@ message BlockSSZResponse {
 message BeaconBlockContainer {
     BeaconBlock message = 1;
 
-    // 96 byte BLS signature from the validator that produced this block.
-    bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "96"];
+    // 4595 byte Dilithium signature from the validator that produced this block.
+    bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
 // Beacon Pool related API service.
@@ -360,4 +361,8 @@ enum ForkChoiceNodeValidity {
     VALID = 0;
     INVALID = 1;
     OPTIMISTIC = 2;
+}
+
+message DilithiumToExecutionChangesPoolResponse {
+  repeated SignedDilithiumToExecutionChange data = 1;
 }

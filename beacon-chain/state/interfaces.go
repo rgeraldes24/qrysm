@@ -44,7 +44,7 @@ type ReadOnlyBeaconState interface {
 	ReadOnlyBlockRoots
 	ReadOnlyStateRoots
 	ReadOnlyRandaoMixes
-	ReadOnlyEth1Data
+	ReadOnlyZond1Data
 	ReadOnlyValidators
 	ReadOnlyBalances
 	ReadOnlyCheckpoint
@@ -75,7 +75,7 @@ type WriteOnlyBeaconState interface {
 	WriteOnlyBlockRoots
 	WriteOnlyStateRoots
 	WriteOnlyRandaoMixes
-	WriteOnlyEth1Data
+	WriteOnlyZond1Data
 	WriteOnlyValidators
 	WriteOnlyBalances
 	WriteOnlyCheckpoint
@@ -160,11 +160,11 @@ type ReadOnlyRandaoMixes interface {
 	RandaoMixesLength() int
 }
 
-// ReadOnlyEth1Data defines a struct which only has read access to eth1 data methods.
-type ReadOnlyEth1Data interface {
-	Eth1Data() *zondpb.Eth1Data
-	Eth1DataVotes() []*zondpb.Eth1Data
-	Eth1DepositIndex() uint64
+// ReadOnlyZond1Data defines a struct which only has read access to zond1 data methods.
+type ReadOnlyZond1Data interface {
+	Zond1Data() *zondpb.Zond1Data
+	Zond1DataVotes() []*zondpb.Zond1Data
+	Zond1DepositIndex() uint64
 }
 
 // ReadOnlyAttestations defines a struct which only has read access to attestations methods.
@@ -209,12 +209,12 @@ type WriteOnlyStateRoots interface {
 	UpdateStateRootAtIndex(idx uint64, stateRoot [32]byte) error
 }
 
-// WriteOnlyEth1Data defines a struct which only has write access to eth1 data methods.
-type WriteOnlyEth1Data interface {
-	SetEth1Data(val *zondpb.Eth1Data) error
-	SetEth1DataVotes(val []*zondpb.Eth1Data) error
-	AppendEth1DataVotes(val *zondpb.Eth1Data) error
-	SetEth1DepositIndex(val uint64) error
+// WriteOnlyZond1Data defines a struct which only has write access to zond1 data methods.
+type WriteOnlyZond1Data interface {
+	SetZond1Data(val *zondpb.Zond1Data) error
+	SetZond1DataVotes(val []*zondpb.Zond1Data) error
+	AppendZond1DataVotes(val *zondpb.Zond1Data) error
+	SetZond1DepositIndex(val uint64) error
 }
 
 // WriteOnlyValidators defines a struct which only has write access to validators methods.

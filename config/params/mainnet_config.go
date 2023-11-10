@@ -108,12 +108,12 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	SqrRootSlotsPerEpoch:             5,
 	MinSeedLookahead:                 1,
 	MaxSeedLookahead:                 4,
-	EpochsPerEth1VotingPeriod:        64,
+	EpochsPerZond1VotingPeriod:       64,
 	SlotsPerHistoricalRoot:           8192,
 	MinValidatorWithdrawabilityDelay: 256,
 	ShardCommitteePeriod:             256,
 	MinEpochsToInactivityPenalty:     4,
-	Eth1FollowDistance:               2048,
+	Zond1FollowDistance:              2048,
 
 	// Fork choice algorithm constants.
 	ProposerScoreBoost:              40,
@@ -123,16 +123,16 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	IntervalsPerSlot:                3,
 
 	// Ethereum PoW parameters.
-	DepositChainID:         1, // Chain ID of eth1 mainnet.
-	DepositNetworkID:       1, // Network ID of eth1 mainnet.
+	DepositChainID:         1, // Chain ID of zond1 mainnet.
+	DepositNetworkID:       1, // Network ID of zond1 mainnet.
 	DepositContractAddress: "0x00000000219ab540356cBB839Cbe05303d7705Fa",
 
 	// Validator params.
 	RandomSubnetsPerValidator:         1 << 0,
 	EpochsPerRandomSubnetSubscription: 1 << 8,
 
-	// While eth1 mainnet block times are closer to 13s, we must conform with other clients in
-	// order to vote on the correct eth1 blocks.
+	// While zond1 mainnet block times are closer to 13s, we must conform with other clients in
+	// order to vote on the correct zond1 blocks.
 	//
 	// Additional context: https://github.com/ethereum/consensus-specs/issues/2132
 	// Bug prompting this change: https://github.com/theQRL/qrysm/issues/7856

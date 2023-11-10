@@ -94,32 +94,32 @@ func TestAllDeposits_ReturnsAllDeposits(t *testing.T) {
 
 	deposits := []*zondpb.DepositContainer{
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 10,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 10,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 10,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 11,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 11,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 11,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 11,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 12,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 12,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 12,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 12,
+			Deposit:          &zondpb.Deposit{},
 		},
 	}
 	dc.deposits = deposits
@@ -134,32 +134,32 @@ func TestAllDeposits_FiltersDepositUpToAndIncludingBlockNumber(t *testing.T) {
 
 	deposits := []*zondpb.DepositContainer{
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 10,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 10,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 10,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 11,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 11,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 11,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 11,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 12,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 12,
+			Deposit:          &zondpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 12,
-			Deposit:         &zondpb.Deposit{},
+			Zond1BlockHeight: 12,
+			Deposit:          &zondpb.Deposit{},
 		},
 	}
 	dc.deposits = deposits
@@ -175,25 +175,25 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 		require.NoError(t, err)
 		dc.deposits = []*zondpb.DepositContainer{
 			{
-				Eth1BlockHeight: 10,
-				Index:           0,
-				Deposit:         &zondpb.Deposit{},
+				Zond1BlockHeight: 10,
+				Index:            0,
+				Deposit:          &zondpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 10,
-				Index:           1,
-				Deposit:         &zondpb.Deposit{},
+				Zond1BlockHeight: 10,
+				Index:            1,
+				Deposit:          &zondpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 11,
-				Index:           2,
-				Deposit:         &zondpb.Deposit{},
+				Zond1BlockHeight: 11,
+				Index:            2,
+				Deposit:          &zondpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 13,
-				Index:           3,
-				Deposit:         &zondpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				Zond1BlockHeight: 13,
+				Index:            3,
+				Deposit:          &zondpb.Deposit{},
+				DepositRoot:      wantedRoot,
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(13))
@@ -206,10 +206,10 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 
 		dc.deposits = []*zondpb.DepositContainer{
 			{
-				Eth1BlockHeight: 10,
-				Index:           0,
-				Deposit:         &zondpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				Zond1BlockHeight: 10,
+				Index:            0,
+				Deposit:          &zondpb.Deposit{},
+				DepositRoot:      wantedRoot,
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(10))
@@ -222,20 +222,20 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 
 		dc.deposits = []*zondpb.DepositContainer{
 			{
-				Eth1BlockHeight: 8,
-				Index:           0,
-				Deposit:         &zondpb.Deposit{},
+				Zond1BlockHeight: 8,
+				Index:            0,
+				Deposit:          &zondpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 9,
-				Index:           1,
-				Deposit:         &zondpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				Zond1BlockHeight: 9,
+				Index:            1,
+				Deposit:          &zondpb.Deposit{},
+				DepositRoot:      wantedRoot,
 			},
 			{
-				Eth1BlockHeight: 11,
-				Index:           2,
-				Deposit:         &zondpb.Deposit{},
+				Zond1BlockHeight: 11,
+				Index:            2,
+				Deposit:          &zondpb.Deposit{},
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(10))
@@ -248,10 +248,10 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 
 		dc.deposits = []*zondpb.DepositContainer{
 			{
-				Eth1BlockHeight: 8,
-				Index:           0,
-				Deposit:         &zondpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				Zond1BlockHeight: 8,
+				Index:            0,
+				Deposit:          &zondpb.Deposit{},
+				DepositRoot:      wantedRoot,
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(7))
@@ -264,10 +264,10 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 
 		dc.deposits = []*zondpb.DepositContainer{
 			{
-				Eth1BlockHeight: 8,
-				Index:           0,
-				Deposit:         &zondpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				Zond1BlockHeight: 8,
+				Index:            0,
+				Deposit:          &zondpb.Deposit{},
+				DepositRoot:      wantedRoot,
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(10))
@@ -280,30 +280,30 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 
 		dc.deposits = []*zondpb.DepositContainer{
 			{
-				Eth1BlockHeight: 8,
-				Index:           0,
-				Deposit:         &zondpb.Deposit{},
+				Zond1BlockHeight: 8,
+				Index:            0,
+				Deposit:          &zondpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 8,
-				Index:           1,
-				Deposit:         &zondpb.Deposit{},
+				Zond1BlockHeight: 8,
+				Index:            1,
+				Deposit:          &zondpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 9,
-				Index:           2,
-				Deposit:         &zondpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				Zond1BlockHeight: 9,
+				Index:            2,
+				Deposit:          &zondpb.Deposit{},
+				DepositRoot:      wantedRoot,
 			},
 			{
-				Eth1BlockHeight: 10,
-				Index:           3,
-				Deposit:         &zondpb.Deposit{},
+				Zond1BlockHeight: 10,
+				Index:            3,
+				Deposit:          &zondpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 10,
-				Index:           4,
-				Deposit:         &zondpb.Deposit{},
+				Zond1BlockHeight: 10,
+				Index:            4,
+				Deposit:          &zondpb.Deposit{},
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(9))
@@ -317,7 +317,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 	require.NoError(t, err)
 	ctrs := []*zondpb.DepositContainer{
 		{
-			Eth1BlockHeight: 9,
+			Zond1BlockHeight: 9,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk0"), 2592),
@@ -327,7 +327,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 			},
 		},
 		{
-			Eth1BlockHeight: 10,
+			Zond1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk1"), 2592),
@@ -337,7 +337,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 			},
 		},
 		{
-			Eth1BlockHeight: 11,
+			Zond1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk1"), 2592),
@@ -347,7 +347,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 			},
 		},
 		{
-			Eth1BlockHeight: 12,
+			Zond1BlockHeight: 12,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk2"), 2592),
@@ -555,7 +555,7 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 	assert.Equal(t, int64(2), cachedDeposits.MerkleTrieIndex)
 }
 
-func TestFinalizedDeposits_HandleLowerEth1DepositIndex(t *testing.T) {
+func TestFinalizedDeposits_HandleLowerZond1DepositIndex(t *testing.T) {
 	dc, err := New()
 	require.NoError(t, err)
 
@@ -649,7 +649,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 
 	finalizedDeposits := []*zondpb.DepositContainer{
 		{
-			Eth1BlockHeight: 10,
+			Zond1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
@@ -660,7 +660,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Index: 0,
 		},
 		{
-			Eth1BlockHeight: 10,
+			Zond1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
@@ -673,7 +673,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 	}
 	dc.deposits = append(finalizedDeposits,
 		&zondpb.DepositContainer{
-			Eth1BlockHeight: 10,
+			Zond1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
@@ -684,7 +684,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Index: 2,
 		},
 		&zondpb.DepositContainer{
-			Eth1BlockHeight: 11,
+			Zond1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{3}, 2592),
@@ -706,7 +706,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 
 	finalizedDeposits := []*zondpb.DepositContainer{
 		{
-			Eth1BlockHeight: 10,
+			Zond1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
@@ -717,7 +717,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Index: 0,
 		},
 		{
-			Eth1BlockHeight: 10,
+			Zond1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
@@ -730,7 +730,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 	}
 	dc.deposits = append(finalizedDeposits,
 		&zondpb.DepositContainer{
-			Eth1BlockHeight: 10,
+			Zond1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
@@ -741,7 +741,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Index: 2,
 		},
 		&zondpb.DepositContainer{
-			Eth1BlockHeight: 11,
+			Zond1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{3}, 2592),
@@ -763,7 +763,7 @@ func TestFinalizedDeposits_ReturnsTrieCorrectly(t *testing.T) {
 
 	generateCtr := func(height uint64, index int64) *zondpb.DepositContainer {
 		return &zondpb.DepositContainer{
-			Eth1BlockHeight: height,
+			Zond1BlockHeight: height,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{uint8(index)}, 2592),

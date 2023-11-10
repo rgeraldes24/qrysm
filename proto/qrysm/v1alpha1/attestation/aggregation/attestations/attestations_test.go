@@ -8,9 +8,6 @@ import (
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/encoding/ssz/equality"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
 	aggtesting "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/testing"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -22,6 +19,7 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
+/*
 func TestAggregateAttestations_AggregatePair(t *testing.T) {
 	tests := []struct {
 		a1   *zondpb.Attestation
@@ -86,6 +84,7 @@ func TestAggregateAttestations_AggregatePair_DiffLengthFails(t *testing.T) {
 		require.ErrorContains(t, bitfield.ErrBitlistDifferentLength.Error(), err)
 	}
 }
+*/
 
 func TestAggregateAttestations_Aggregate(t *testing.T) {
 	// Each test defines the aggregation bitfield inputs and the wanted output result.

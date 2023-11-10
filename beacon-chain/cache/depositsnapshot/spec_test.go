@@ -18,7 +18,7 @@ import (
 type testCase struct {
 	DepositData     depositData `yaml:"deposit_data"`
 	DepositDataRoot [32]byte    `yaml:"deposit_data_root"`
-	Eth1Data        *eth1Data   `yaml:"eth1_data"`
+	Zond1Data       *zond1Data  `yaml:"zond1_data"`
 	BlockHeight     uint64      `yaml:"block_height"`
 	Snapshot        snapshot    `yaml:"snapshot"`
 }
@@ -27,7 +27,7 @@ func (tc *testCase) UnmarshalYAML(value *yaml.Node) error {
 	raw := struct {
 		DepositData     depositData `yaml:"deposit_data"`
 		DepositDataRoot string      `yaml:"deposit_data_root"`
-		Eth1Data        *eth1Data   `yaml:"eth1_data"`
+		Zond1Data       *zond1Data  `yaml:"zond1_data"`
 		BlockHeight     string      `yaml:"block_height"`
 		Snapshot        snapshot    `yaml:"snapshot"`
 	}{}
@@ -40,7 +40,7 @@ func (tc *testCase) UnmarshalYAML(value *yaml.Node) error {
 		return err
 	}
 	tc.DepositData = raw.DepositData
-	tc.Eth1Data = raw.Eth1Data
+	tc.Zond1Data = raw.Zond1Data
 	tc.BlockHeight, err = stringToUint64(raw.BlockHeight)
 	if err != nil {
 		return err
@@ -86,13 +86,13 @@ func (dd *depositData) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-type eth1Data struct {
+type zond1Data struct {
 	DepositRoot  [32]byte `yaml:"deposit_root"`
 	DepositCount uint64   `yaml:"deposit_count"`
 	BlockHash    [32]byte `yaml:"block_hash"`
 }
 
-func (ed *eth1Data) UnmarshalYAML(value *yaml.Node) error {
+func (ed *zond1Data) UnmarshalYAML(value *yaml.Node) error {
 	raw := struct {
 		DepositRoot  string `yaml:"deposit_root"`
 		DepositCount string `yaml:"deposit_count"`
@@ -272,11 +272,11 @@ func TestFinalization(t *testing.T) {
 		require.NoError(t, err)
 	}
 	originalRoot := tree.getRoot()
-	require.DeepEqual(t, testCases[127].Eth1Data.DepositRoot, originalRoot)
-	err = tree.finalize(&zond.Eth1Data{
-		DepositRoot:  testCases[100].Eth1Data.DepositRoot[:],
-		DepositCount: testCases[100].Eth1Data.DepositCount,
-		BlockHash:    testCases[100].Eth1Data.BlockHash[:],
+	require.DeepEqual(t, testCases[127].Zond1Data.DepositRoot, originalRoot)
+	err = tree.finalize(&zond.Zond1Data{
+		DepositRoot:  testCases[100].Zond1Data.DepositRoot[:],
+		DepositCount: testCases[100].Zond1Data.DepositCount,
+		BlockHash:    testCases[100].Zond1Data.BlockHash[:],
 	}, testCases[100].BlockHeight)
 	require.NoError(t, err)
 	// ensure finalization doesn't change root
@@ -290,10 +290,10 @@ func TestFinalization(t *testing.T) {
 	// ensure original and copy have the same root
 	require.Equal(t, tree.getRoot(), cp.getRoot())
 	//	finalize original again to check double finalization
-	err = tree.finalize(&zond.Eth1Data{
-		DepositRoot:  testCases[105].Eth1Data.DepositRoot[:],
-		DepositCount: testCases[105].Eth1Data.DepositCount,
-		BlockHash:    testCases[105].Eth1Data.BlockHash[:],
+	err = tree.finalize(&zond.Zond1Data{
+		DepositRoot:  testCases[105].Zond1Data.DepositRoot[:],
+		DepositCount: testCases[105].Zond1Data.DepositCount,
+		BlockHash:    testCases[105].Zond1Data.BlockHash[:],
 	}, testCases[105].BlockHeight)
 	require.NoError(t, err)
 	//	root should still be the same
@@ -323,10 +323,10 @@ func TestSnapshotCases(t *testing.T) {
 		require.NoError(t, err)
 	}
 	for _, c := range testCases {
-		err = tree.finalize(&zond.Eth1Data{
-			DepositRoot:  c.Eth1Data.DepositRoot[:],
-			DepositCount: c.Eth1Data.DepositCount,
-			BlockHash:    c.Eth1Data.BlockHash[:],
+		err = tree.finalize(&zond.Zond1Data{
+			DepositRoot:  c.Zond1Data.DepositRoot[:],
+			DepositCount: c.Zond1Data.DepositCount,
+			BlockHash:    c.Zond1Data.BlockHash[:],
 		}, c.BlockHeight)
 		require.NoError(t, err)
 		s, err := tree.getSnapshot()

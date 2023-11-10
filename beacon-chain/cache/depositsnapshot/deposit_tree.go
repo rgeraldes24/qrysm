@@ -95,14 +95,14 @@ func fromSnapshot(snapshot DepositTreeSnapshot) (DepositTree, error) {
 // finalize marks a deposit as finalized.
 //
 //nolint:unused
-func (d *DepositTree) finalize(eth1data *zond.Eth1Data, executionBlockHeight uint64) error {
+func (d *DepositTree) finalize(zond1data *zond.Zond1Data, executionBlockHeight uint64) error {
 	var blockHash [32]byte
-	copy(blockHash[:], eth1data.BlockHash)
+	copy(blockHash[:], zond1data.BlockHash)
 	d.finalizedExecutionBlock = executionBlock{
 		Hash:  blockHash,
 		Depth: executionBlockHeight,
 	}
-	_, err := d.tree.Finalize(eth1data.DepositCount, DepositContractDepth)
+	_, err := d.tree.Finalize(zond1data.DepositCount, DepositContractDepth)
 	if err != nil {
 		return err
 	}

@@ -5,7 +5,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
@@ -121,13 +120,14 @@ func NewMaxCover(atts []*zondpb.Attestation) *aggregation.MaxCoverProblem {
 }
 
 // aggregate returns list as an aggregated attestation.
+/*
 func (al attList) aggregate(coverage bitfield.Bitlist) (*zondpb.Attestation, error) {
 	if len(al) < 2 {
 		return nil, errors.Wrap(ErrInvalidAttestationCount, "cannot aggregate")
 	}
 	signs := make([]dilithium.Signature, len(al))
 	for i := 0; i < len(al); i++ {
-		sig, err := signatureFromBytes(al[i].Signature)
+		sig, err := signatureFromBytes(al[i].Signatures)
 		if err != nil {
 			return nil, err
 		}
@@ -136,9 +136,10 @@ func (al attList) aggregate(coverage bitfield.Bitlist) (*zondpb.Attestation, err
 	return &zondpb.Attestation{
 		AggregationBits: coverage,
 		Data:            zondpb.CopyAttestationData(al[0].Data),
-		Signature:       aggregateSignatures(signs).Marshal(),
+		Signatures:      aggregateSignatures(signs).Marshal(),
 	}, nil
 }
+*/
 
 // padSelectedKeys adds additional value to every key.
 func padSelectedKeys(keys []int, pad int) []int {
@@ -171,12 +172,11 @@ func aggregateAttestations(atts []*zondpb.Attestation, keys []int, coverage *bit
 	for _, att := range atts {
 		for i, index := range att.AggregationBits.BitIndices() {
 			attsKeys = append(attsKeys, index)
-			offset := i * dilithium2.CryptoBytes
 			// Ignore if the validator index in committee already exists
 			if _, found := attsMap[index]; found {
 				continue
 			}
-			attsMap[index] = append(attsMap[index], att.Signature[offset:offset+dilithium2.CryptoBytes]...)
+			attsMap[index] = append(attsMap[index], att.Signatures[i]...)
 			sigValidatorIndexMap[index] = append(sigValidatorIndexMap[index], att.SignatureValidatorIndex[i])
 		}
 	}
@@ -200,7 +200,7 @@ func aggregateAttestations(atts []*zondpb.Attestation, keys []int, coverage *bit
 		AggregationBits: coverage.ToBitlist(),
 		Data:            data,
 		//Signature:              aggregateSignatures(signs).Marshal(),
-		Signature:               unaggregatedSignatures(signs),
+		Signatures:              unaggregatedSignatures(signs),
 		SignatureValidatorIndex: signatureValidatorIndex,
 	}
 	return

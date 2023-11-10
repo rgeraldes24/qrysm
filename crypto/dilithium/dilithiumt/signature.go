@@ -73,17 +73,16 @@ func AggregateSignatures(sigs []common.Signature) common.Signature {
 	panic("AggregateSignatures not supported for dilithium")
 }
 
-func UnaggregatedSignatures(sigs []common.Signature) []byte {
+func UnaggregatedSignatures(sigs []common.Signature) [][]byte {
 	if len(sigs) == 0 {
 		return nil
 	}
 
-	unaggregatedSigns := make([]byte, dilithium2.CryptoBytes*len(sigs))
-	offset := 0
-	for i := 0; i < len(sigs); i++ {
-		copy(unaggregatedSigns[offset:offset+dilithium2.CryptoBytes], sigs[i].Marshal())
-		offset += dilithium2.CryptoBytes
+	unaggregatedSigns := make([][]byte, len(sigs))
+	for i, sig := range sigs {
+		copy(unaggregatedSigns[i], sig.Marshal())
 	}
+
 	return unaggregatedSigns
 }
 

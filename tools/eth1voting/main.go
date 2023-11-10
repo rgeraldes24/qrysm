@@ -35,8 +35,8 @@ func main() {
 	v := newVotes()
 
 	current := slots.ToEpoch(slots.CurrentSlot(*genesis))
-	start := current.Div(uint64(params.BeaconConfig().EpochsPerEth1VotingPeriod)).Mul(uint64(params.BeaconConfig().EpochsPerEth1VotingPeriod))
-	nextStart := start.AddEpoch(params.BeaconConfig().EpochsPerEth1VotingPeriod)
+	start := current.Div(uint64(params.BeaconConfig().EpochsPerZond1VotingPeriod)).Mul(uint64(params.BeaconConfig().EpochsPerZond1VotingPeriod))
+	nextStart := start.AddEpoch(params.BeaconConfig().EpochsPerZond1VotingPeriod)
 
 	fmt.Printf("Looking back from current epoch %d back to %d\n", current, start)
 	nextStartSlot, err := slots.EpochStart(nextStart)

@@ -60,7 +60,7 @@ func (d *AuthorizationData) ToHeaderValue() (string, error) {
 }
 
 // HttpEndpoint extracts an httputils.Endpoint from the provider parameter.
-func HttpEndpoint(eth1Provider string) Endpoint {
+func HttpEndpoint(zond1Provider string) Endpoint {
 	endpoint := Endpoint{
 		Url: "",
 		Auth: AuthorizationData{
@@ -68,7 +68,7 @@ func HttpEndpoint(eth1Provider string) Endpoint {
 			Value:  "",
 		}}
 
-	authValues := strings.Split(eth1Provider, ",")
+	authValues := strings.Split(zond1Provider, ",")
 	endpoint.Url = strings.TrimSpace(authValues[0])
 	if len(authValues) > 2 {
 		log.Errorf(

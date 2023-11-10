@@ -54,7 +54,7 @@ func TestBeaconNodeScraper(t *testing.T) {
 	require.Equal(t, true, bs.SyncEth2Synced)
 	require.Equal(t, int64(7365341184), bs.DiskBeaconchainBytesTotal)
 	require.Equal(t, int64(37), bs.NetworkPeersConnected)
-	require.Equal(t, true, bs.SyncEth1Connected)
+	require.Equal(t, true, bs.SyncZond1Connected)
 }
 
 // helper function to wrap up all the scrape logic so tests can focus on data cases and assertions
@@ -73,17 +73,17 @@ func scrapeBeaconNodeStats(body string) (*BeaconNodeStats, error) {
 	return bs, err
 }
 
-func TestInvertEth1Metrics(t *testing.T) {
+func TestInvertZond1Metrics(t *testing.T) {
 	cases := []struct {
 		key  string
 		body string
 		test func(*BeaconNodeStats) bool
 	}{
 		{
-			key:  "SyncEth1Connected",
-			body: strings.Replace(prometheusTestBody, "powchain_sync_eth1_connected 1", "powchain_sync_eth1_connected 0", 1),
+			key:  "SyncZond1Connected",
+			body: strings.Replace(prometheusTestBody, "powchain_sync_zond1_connected 1", "powchain_sync_zond1_connected 0", 1),
 			test: func(bs *BeaconNodeStats) bool {
-				return bs.SyncEth1Connected == false
+				return bs.SyncZond1Connected == false
 			},
 		},
 	}
@@ -239,15 +239,15 @@ p2p_peer_count{state="Connected"} 37
 p2p_peer_count{state="Connecting"} 0
 p2p_peer_count{state="Disconnected"} 62
 p2p_peer_count{state="Disconnecting"} 0
-# HELP powchain_sync_eth1_connected Boolean indicating whether a fallback eth1 endpoint is currently connected: 0=false, 1=true.
-# TYPE powchain_sync_eth1_connected gauge
-powchain_sync_eth1_connected 1
-# HELP powchain_sync_eth1_fallback_configured Boolean recording whether a fallback eth1 endpoint was configured: 0=false, 1=true.
-# TYPE powchain_sync_eth1_fallback_configured gauge
-powchain_sync_eth1_fallback_configured 1
-# HELP powchain_sync_eth1_fallback_connected Boolean indicating whether a fallback eth1 endpoint is currently connected: 0=false, 1=true.
-# TYPE powchain_sync_eth1_fallback_connected gauge
-powchain_sync_eth1_fallback_connected 1
+# HELP powchain_sync_zond1_connected Boolean indicating whether a fallback zond1 endpoint is currently connected: 0=false, 1=true.
+# TYPE powchain_sync_zond1_connected gauge
+powchain_sync_zond1_connected 1
+# HELP powchain_sync_zond1_fallback_configured Boolean recording whether a fallback zond1 endpoint was configured: 0=false, 1=true.
+# TYPE powchain_sync_zond1_fallback_configured gauge
+powchain_sync_zond1_fallback_configured 1
+# HELP powchain_sync_zond1_fallback_connected Boolean indicating whether a fallback zond1 endpoint is currently connected: 0=false, 1=true.
+# TYPE powchain_sync_zond1_fallback_connected gauge
+powchain_sync_zond1_fallback_connected 1
 `
 
 var statusFixtureOneOfEach = `# HELP validator_statuses validator statuses: 0 UNKNOWN, 1 DEPOSITED, 2 PENDING, 3 ACTIVE, 4 EXITING, 5 SLASHING, 6 EXITED

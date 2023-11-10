@@ -70,8 +70,8 @@ func fieldConverters(field types.FieldIndex, indices []uint64, elements interfac
 		return convertStateRoots(indices, elements, convertAll)
 	case types.RandaoMixes:
 		return convertRandaoMixes(indices, elements, convertAll)
-	case types.Eth1DataVotes:
-		return convertEth1DataVotes(indices, elements, convertAll)
+	case types.Zond1DataVotes:
+		return convertZond1DataVotes(indices, elements, convertAll)
 	case types.Validators:
 		return convertValidators(indices, elements, convertAll)
 	case types.PreviousEpochAttestations, types.CurrentEpochAttestations:
@@ -116,12 +116,12 @@ func convertRandaoMixes(indices []uint64, elements interface{}, convertAll bool)
 	}
 }
 
-func convertEth1DataVotes(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
-	val, ok := elements.([]*zondpb.Eth1Data)
+func convertZond1DataVotes(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
+	val, ok := elements.([]*zondpb.Zond1Data)
 	if !ok {
-		return nil, errors.Errorf("Wanted type of %T but got %T", []*zondpb.Eth1Data{}, elements)
+		return nil, errors.Errorf("Wanted type of %T but got %T", []*zondpb.Zond1Data{}, elements)
 	}
-	return handleEth1DataSlice(val, indices, convertAll)
+	return handleZond1DataSlice(val, indices, convertAll)
 }
 
 func convertValidators(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
@@ -232,15 +232,15 @@ func handleValidatorSlice(val []*zondpb.Validator, indices []uint64, convertAll 
 	return roots, nil
 }
 
-// handleEth1DataSlice processes a list of eth1data and indices into the appropriate roots.
-func handleEth1DataSlice(val []*zondpb.Eth1Data, indices []uint64, convertAll bool) ([][32]byte, error) {
+// handleZond1DataSlice processes a list of zond1data and indices into the appropriate roots.
+func handleZond1DataSlice(val []*zondpb.Zond1Data, indices []uint64, convertAll bool) ([][32]byte, error) {
 	length := len(indices)
 	if convertAll {
 		length = len(val)
 	}
 	roots := make([][32]byte, 0, length)
-	rootCreator := func(input *zondpb.Eth1Data) error {
-		newRoot, err := stateutil.Eth1DataRootWithHasher(input)
+	rootCreator := func(input *zondpb.Zond1Data) error {
+		newRoot, err := stateutil.Zond1DataRootWithHasher(input)
 		if err != nil {
 			return err
 		}
@@ -259,7 +259,7 @@ func handleEth1DataSlice(val []*zondpb.Eth1Data, indices []uint64, convertAll bo
 	if len(val) > 0 {
 		for _, idx := range indices {
 			if idx > uint64(len(val))-1 {
-				return nil, fmt.Errorf("index %d greater than number of items in eth1 data slice %d", idx, len(val))
+				return nil, fmt.Errorf("index %d greater than number of items in zond1 data slice %d", idx, len(val))
 			}
 			err := rootCreator(val[idx])
 			if err != nil {

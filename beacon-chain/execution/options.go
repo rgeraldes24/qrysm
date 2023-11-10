@@ -85,10 +85,10 @@ func WithStateGen(gen *stategen.State) Option {
 	}
 }
 
-// WithEth1HeaderRequestLimit to set the upper limit of eth1 header requests.
-func WithEth1HeaderRequestLimit(limit uint64) Option {
+// WithZond1HeaderRequestLimit to set the upper limit of zond1 header requests.
+func WithZond1HeaderRequestLimit(limit uint64) Option {
 	return func(s *Service) error {
-		s.cfg.eth1HeaderReqLimit = limit
+		s.cfg.zond1HeaderReqLimit = limit
 		return nil
 	}
 }

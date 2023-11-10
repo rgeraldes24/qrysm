@@ -37,7 +37,7 @@ func NewAttestation() *zondpb.Attestation {
 				Root: make([]byte, fieldparams.RootLength),
 			},
 		},
-		Signature: make([]byte, 96),
+		Signatures: make([]byte, 96),
 	}
 }
 
@@ -214,7 +214,7 @@ func GenerateAttestations(
 			att := &zondpb.Attestation{
 				Data:            attData,
 				AggregationBits: aggregationBits,
-				Signature:       bls.AggregateSignatures(sigs).Marshal(),
+				Signatures:      bls.AggregateSignatures(sigs).Marshal(),
 			}
 			attestations = append(attestations, att)
 		}
@@ -225,8 +225,8 @@ func GenerateAttestations(
 // HydrateAttestation hydrates an attestation object with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateAttestation(a *zondpb.Attestation) *zondpb.Attestation {
-	if a.Signature == nil {
-		a.Signature = make([]byte, 96)
+	if a.Signatures == nil {
+		a.Signatures = make([]byte, 96)
 	}
 	if a.AggregationBits == nil {
 		a.AggregationBits = make([]byte, 1)
@@ -241,8 +241,8 @@ func HydrateAttestation(a *zondpb.Attestation) *zondpb.Attestation {
 // HydrateV1Attestation hydrates a v1 attestation object with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateV1Attestation(a *attv1.Attestation) *attv1.Attestation {
-	if a.Signature == nil {
-		a.Signature = make([]byte, 96)
+	if a.Signatures == nil {
+		a.Signatures = make([]byte, 96)
 	}
 	if a.AggregationBits == nil {
 		a.AggregationBits = make([]byte, 1)
@@ -299,8 +299,8 @@ func HydrateV1AttestationData(d *attv1.AttestationData) *attv1.AttestationData {
 // HydrateIndexedAttestation hydrates an indexed attestation with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateIndexedAttestation(a *zondpb.IndexedAttestation) *zondpb.IndexedAttestation {
-	if a.Signature == nil {
-		a.Signature = make([]byte, 96)
+	if a.Signatures == nil {
+		a.Signatures = make([]byte, 96)
 	}
 	if a.Data == nil {
 		a.Data = &zondpb.AttestationData{}

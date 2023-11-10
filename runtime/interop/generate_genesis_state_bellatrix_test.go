@@ -29,7 +29,7 @@ func TestGenerateGenesisStateBellatrix(t *testing.T) {
 		BlockHash:     make([]byte, 32),
 		Transactions:  make([][]byte, 0),
 	}
-	e1d := &zondpb.Eth1Data{
+	e1d := &zondpb.Zond1Data{
 		DepositRoot:  make([]byte, 32),
 		DepositCount: 0,
 		BlockHash:    make([]byte, 32),
@@ -41,8 +41,8 @@ func TestGenerateGenesisStateBellatrix(t *testing.T) {
 	require.NoError(t, err)
 	dr, err := tr.HashTreeRoot()
 	require.NoError(t, err)
-	g.Eth1Data.DepositRoot = dr[:]
-	g.Eth1Data.BlockHash = make([]byte, 32)
+	g.Zond1Data.DepositRoot = dr[:]
+	g.Zond1Data.BlockHash = make([]byte, 32)
 	st, err := state_native.InitializeFromProtoUnsafeBellatrix(g)
 	require.NoError(t, err)
 	_, err = st.MarshalSSZ()

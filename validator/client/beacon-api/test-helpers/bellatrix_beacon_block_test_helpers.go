@@ -15,7 +15,7 @@ func GenerateProtoBellatrixBeaconBlock() *zondpb.BeaconBlockBellatrix {
 		StateRoot:     FillByteSlice(32, 4),
 		Body: &zondpb.BeaconBlockBodyBellatrix{
 			RandaoReveal: FillByteSlice(96, 5),
-			Eth1Data: &zondpb.Eth1Data{
+			Zond1Data: &zondpb.Zond1Data{
 				DepositRoot:  FillByteSlice(32, 6),
 				DepositCount: 7,
 				BlockHash:    FillByteSlice(32, 8),
@@ -84,7 +84,7 @@ func GenerateProtoBellatrixBeaconBlock() *zondpb.BeaconBlockBellatrix {
 								Root:  FillByteSlice(32, 42),
 							},
 						},
-						Signature: FillByteSlice(96, 43),
+						Signatures: FillByteSlice(96, 43),
 					},
 					Attestation_2: &zondpb.IndexedAttestation{
 						AttestingIndices: []uint64{44, 45},
@@ -101,7 +101,7 @@ func GenerateProtoBellatrixBeaconBlock() *zondpb.BeaconBlockBellatrix {
 								Root:  FillByteSlice(32, 52),
 							},
 						},
-						Signature: FillByteSlice(96, 53),
+						Signatures: FillByteSlice(96, 53),
 					},
 				},
 				{
@@ -120,7 +120,7 @@ func GenerateProtoBellatrixBeaconBlock() *zondpb.BeaconBlockBellatrix {
 								Root:  FillByteSlice(32, 62),
 							},
 						},
-						Signature: FillByteSlice(96, 63),
+						Signatures: FillByteSlice(96, 63),
 					},
 					Attestation_2: &zondpb.IndexedAttestation{
 						AttestingIndices: []uint64{64, 65},
@@ -137,7 +137,7 @@ func GenerateProtoBellatrixBeaconBlock() *zondpb.BeaconBlockBellatrix {
 								Root:  FillByteSlice(32, 72),
 							},
 						},
-						Signature: FillByteSlice(96, 73),
+						Signatures: FillByteSlice(96, 73),
 					},
 				},
 			},
@@ -157,7 +157,7 @@ func GenerateProtoBellatrixBeaconBlock() *zondpb.BeaconBlockBellatrix {
 							Root:  FillByteSlice(32, 81),
 						},
 					},
-					Signature: FillByteSlice(96, 82),
+					Signatures: FillByteSlice(96, 82),
 				},
 				{
 					AggregationBits: FillByteSlice(4, 83),
@@ -174,7 +174,7 @@ func GenerateProtoBellatrixBeaconBlock() *zondpb.BeaconBlockBellatrix {
 							Root:  FillByteSlice(32, 90),
 						},
 					},
-					Signature: FillByteSlice(96, 91),
+					Signatures: FillByteSlice(96, 91),
 				},
 			},
 			Deposits: []*zondpb.Deposit{
@@ -248,7 +248,7 @@ func GenerateJsonBellatrixBeaconBlock() *apimiddleware.BeaconBlockBellatrixJson 
 		StateRoot:     FillEncodedByteSlice(32, 4),
 		Body: &apimiddleware.BeaconBlockBodyBellatrixJson{
 			RandaoReveal: FillEncodedByteSlice(96, 5),
-			Eth1Data: &apimiddleware.Eth1DataJson{
+			Zond1Data: &apimiddleware.Zond1DataJson{
 				DepositRoot:  FillEncodedByteSlice(32, 6),
 				DepositCount: "7",
 				BlockHash:    FillEncodedByteSlice(32, 8),

@@ -1,6 +1,6 @@
-# eth1voting
+# zond1voting
 
-This tool can be used to query a Prysm node to print eth1voting information.
+This tool can be used to query a Prysm node to print zond1voting information.
 
 Flags:
 ```
@@ -12,14 +12,14 @@ Flags:
 
 Usage:
 ```
-bazel run //tools/eth1voting -- -beacon=127.0.0.1:4000 -genesis=1606824023
+bazel run //tools/zond1voting -- -beacon=127.0.0.1:4000 -genesis=1606824023
 ```
 
 Example response
 ```
 Looking back from current epoch 71132 back to 71104                                                                                                           
 Next period starts at epoch 71168 (3h50m1.542950367s)                                                                                                         
-====Eth1Data Voting Report====                                                                                                                                
+====Zond1Data Voting Report====                                                                                                                                
                                                                                                                                                               
 Total votes: 732                                                                                                                                              
                                                                                                                                                               

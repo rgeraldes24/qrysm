@@ -218,7 +218,7 @@ func (b *SignedBeaconBlock) ToBlinded() (interfaces.ReadOnlySignedBeaconBlock, e
 					StateRoot:     b.block.stateRoot[:],
 					Body: &zond.BlindedBeaconBlockBodyBellatrix{
 						RandaoReveal:           b.block.body.randaoReveal[:],
-						Eth1Data:               b.block.body.eth1Data,
+						Zond1Data:              b.block.body.zond1Data,
 						Graffiti:               b.block.body.graffiti[:],
 						ProposerSlashings:      b.block.body.proposerSlashings,
 						AttesterSlashings:      b.block.body.attesterSlashings,
@@ -245,7 +245,7 @@ func (b *SignedBeaconBlock) ToBlinded() (interfaces.ReadOnlySignedBeaconBlock, e
 					StateRoot:     b.block.stateRoot[:],
 					Body: &zond.BlindedBeaconBlockBodyCapella{
 						RandaoReveal:                b.block.body.randaoReveal[:],
-						Eth1Data:                    b.block.body.eth1Data,
+						Zond1Data:                   b.block.body.zond1Data,
 						Graffiti:                    b.block.body.graffiti[:],
 						ProposerSlashings:           b.block.body.proposerSlashings,
 						AttesterSlashings:           b.block.body.attesterSlashings,
@@ -777,9 +777,9 @@ func (b *BeaconBlockBody) RandaoReveal() [dilithium2.CryptoBytes]byte {
 	return b.randaoReveal
 }
 
-// Eth1Data returns the eth1 data in the block.
-func (b *BeaconBlockBody) Eth1Data() *zond.Eth1Data {
-	return b.eth1Data
+// Zond1Data returns the zond1 data in the block.
+func (b *BeaconBlockBody) Zond1Data() *zond.Zond1Data {
+	return b.zond1Data
 }
 
 // Graffiti returns the graffiti in the block.

@@ -92,7 +92,7 @@ func GethShanghaiTime(genesisTime uint64, cfg *clparams.BeaconChainConfig) *uint
 	return shanghaiTime
 }
 
-// GethTestnetGenesis creates a genesis.json for eth1 clients with a set of defaults suitable for ephemeral testnets,
+// GethTestnetGenesis creates a genesis.json for zond1 clients with a set of defaults suitable for ephemeral testnets,
 // like in an e2e test. The parameters are minimal but the full value is returned unmarshaled so that it can be
 // customized as desired.
 func GethTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *core.Genesis {

@@ -127,12 +127,12 @@ func BatchVerifyDepositsSignatures(ctx context.Context, deposits []*zondpb.Depos
 //	    leaf=hash_tree_root(deposit.data),
 //	    branch=deposit.proof,
 //	    depth=DEPOSIT_CONTRACT_TREE_DEPTH + 1,  # Add 1 for the List length mix-in
-//	    index=state.eth1_deposit_index,
-//	    root=state.eth1_data.deposit_root,
+//	    index=state.zond1_deposit_index,
+//	    root=state.zond1_data.deposit_root,
 //	)
 //
 //	# Deposits must be processed in order
-//	state.eth1_deposit_index += 1
+//	state.zond1_deposit_index += 1
 //
 //	pubkey = deposit.data.pubkey
 //	amount = deposit.data.amount
@@ -164,7 +164,7 @@ func ProcessDeposit(beaconState state.BeaconState, deposit *zondpb.Deposit, veri
 		}
 		return nil, newValidator, errors.Wrapf(err, "could not verify deposit from %#x", bytesutil.Trunc(deposit.Data.PublicKey))
 	}
-	if err := beaconState.SetEth1DepositIndex(beaconState.Eth1DepositIndex() + 1); err != nil {
+	if err := beaconState.SetZond1DepositIndex(beaconState.Zond1DepositIndex() + 1); err != nil {
 		return nil, newValidator, err
 	}
 	pubKey := deposit.Data.PublicKey
@@ -214,12 +214,12 @@ func verifyDeposit(beaconState state.ReadOnlyBeaconState, deposit *zondpb.Deposi
 	if deposit == nil || deposit.Data == nil {
 		return errors.New("received nil deposit or nil deposit data")
 	}
-	eth1Data := beaconState.Eth1Data()
-	if eth1Data == nil {
-		return errors.New("received nil eth1data in the beacon state")
+	zond1Data := beaconState.Zond1Data()
+	if zond1Data == nil {
+		return errors.New("received nil zond1data in the beacon state")
 	}
 
-	receiptRoot := eth1Data.DepositRoot
+	receiptRoot := zond1Data.DepositRoot
 	leaf, err := deposit.Data.HashTreeRoot()
 	if err != nil {
 		return errors.Wrap(err, "could not tree hash deposit data")
@@ -227,7 +227,7 @@ func verifyDeposit(beaconState state.ReadOnlyBeaconState, deposit *zondpb.Deposi
 	if ok := trie.VerifyMerkleProofWithDepth(
 		receiptRoot,
 		leaf[:],
-		beaconState.Eth1DepositIndex(),
+		beaconState.Zond1DepositIndex(),
 		deposit.Proof,
 		params.BeaconConfig().DepositContractTreeDepth,
 	); !ok {

@@ -21,9 +21,9 @@ import (
 )
 
 var (
-	// This is the recommended mock eth1 block hash according to the Ethereum consensus interop guidelines.
+	// This is the recommended mock zond1 block hash according to the Ethereum consensus interop guidelines.
 	// https://github.com/ethereum/eth2.0-pm/blob/a085c9870f3956d6228ed2a40cd37f0c6580ecd7/interop/mocked_start/README.md
-	mockEth1BlockHash = []byte{66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66}
+	mockZond1BlockHash = []byte{66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66}
 )
 
 // GenerateGenesisState deterministically given a genesis time and number of validators.
@@ -60,10 +60,10 @@ func GenerateGenesisStateFromDepositData(
 	if genesisTime == 0 {
 		genesisTime = uint64(time.Now().Unix())
 	}
-	beaconState, err := coreState.GenesisBeaconState(ctx, deposits, genesisTime, &zondpb.Eth1Data{
+	beaconState, err := coreState.GenesisBeaconState(ctx, deposits, genesisTime, &zondpb.Zond1Data{
 		DepositRoot:  root[:],
 		DepositCount: uint64(len(deposits)),
-		BlockHash:    mockEth1BlockHash,
+		BlockHash:    mockZond1BlockHash,
 	})
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not generate genesis state")

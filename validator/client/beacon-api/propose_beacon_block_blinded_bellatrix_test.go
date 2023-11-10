@@ -39,7 +39,7 @@ func TestProposeBeaconBlock_BlindedBellatrix(t *testing.T) {
 				Attestations:      jsonifyAttestations(blindedBellatrixBlock.BlindedBellatrix.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(blindedBellatrixBlock.BlindedBellatrix.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(blindedBellatrixBlock.BlindedBellatrix.Block.Body.Deposits),
-				Eth1Data:          jsonifyEth1Data(blindedBellatrixBlock.BlindedBellatrix.Block.Body.Eth1Data),
+				Zond1Data:         jsonifyZond1Data(blindedBellatrixBlock.BlindedBellatrix.Block.Body.Zond1Data),
 				Graffiti:          hexutil.Encode(blindedBellatrixBlock.BlindedBellatrix.Block.Body.Graffiti),
 				ProposerSlashings: jsonifyProposerSlashings(blindedBellatrixBlock.BlindedBellatrix.Block.Body.ProposerSlashings),
 				RandaoReveal:      hexutil.Encode(blindedBellatrixBlock.BlindedBellatrix.Block.Body.RandaoReveal),
@@ -105,7 +105,7 @@ func generateSignedBlindedBellatrixBlock() *zondpb.GenericSignedBeaconBlock_Blin
 				StateRoot:     test_helpers.FillByteSlice(32, 4),
 				Body: &zondpb.BlindedBeaconBlockBodyBellatrix{
 					RandaoReveal: test_helpers.FillByteSlice(96, 5),
-					Eth1Data: &zondpb.Eth1Data{
+					Zond1Data: &zondpb.Zond1Data{
 						DepositRoot:  test_helpers.FillByteSlice(32, 6),
 						DepositCount: 7,
 						BlockHash:    test_helpers.FillByteSlice(32, 8),
@@ -174,7 +174,7 @@ func generateSignedBlindedBellatrixBlock() *zondpb.GenericSignedBeaconBlock_Blin
 										Root:  test_helpers.FillByteSlice(32, 42),
 									},
 								},
-								Signature: test_helpers.FillByteSlice(96, 43),
+								Signatures: test_helpers.FillByteSlice(96, 43),
 							},
 							Attestation_2: &zondpb.IndexedAttestation{
 								AttestingIndices: []uint64{44, 45},
@@ -191,7 +191,7 @@ func generateSignedBlindedBellatrixBlock() *zondpb.GenericSignedBeaconBlock_Blin
 										Root:  test_helpers.FillByteSlice(32, 52),
 									},
 								},
-								Signature: test_helpers.FillByteSlice(96, 53),
+								Signatures: test_helpers.FillByteSlice(96, 53),
 							},
 						},
 						{
@@ -210,7 +210,7 @@ func generateSignedBlindedBellatrixBlock() *zondpb.GenericSignedBeaconBlock_Blin
 										Root:  test_helpers.FillByteSlice(32, 62),
 									},
 								},
-								Signature: test_helpers.FillByteSlice(96, 63),
+								Signatures: test_helpers.FillByteSlice(96, 63),
 							},
 							Attestation_2: &zondpb.IndexedAttestation{
 								AttestingIndices: []uint64{64, 65},
@@ -227,7 +227,7 @@ func generateSignedBlindedBellatrixBlock() *zondpb.GenericSignedBeaconBlock_Blin
 										Root:  test_helpers.FillByteSlice(32, 72),
 									},
 								},
-								Signature: test_helpers.FillByteSlice(96, 73),
+								Signatures: test_helpers.FillByteSlice(96, 73),
 							},
 						},
 					},
@@ -247,7 +247,7 @@ func generateSignedBlindedBellatrixBlock() *zondpb.GenericSignedBeaconBlock_Blin
 									Root:  test_helpers.FillByteSlice(32, 81),
 								},
 							},
-							Signature: test_helpers.FillByteSlice(96, 82),
+							Signatures: test_helpers.FillByteSlice(96, 82),
 						},
 						{
 							AggregationBits: test_helpers.FillByteSlice(4, 83),
@@ -264,7 +264,7 @@ func generateSignedBlindedBellatrixBlock() *zondpb.GenericSignedBeaconBlock_Blin
 									Root:  test_helpers.FillByteSlice(32, 90),
 								},
 							},
-							Signature: test_helpers.FillByteSlice(96, 91),
+							Signatures: test_helpers.FillByteSlice(96, 91),
 						},
 					},
 					Deposits: []*zondpb.Deposit{

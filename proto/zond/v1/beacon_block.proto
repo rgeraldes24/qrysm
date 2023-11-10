@@ -16,8 +16,11 @@ syntax = "proto3";
 package theqrl.zond.v1;
 
 import "google/protobuf/descriptor.proto";
+import "proto/engine/v1/execution_engine.proto";
 import "proto/zond/ext/options.proto";
 import "proto/zond/v1/attestation.proto";
+import "proto/zond/v1/version.proto";
+import "proto/zond/v1/withdrawals.proto";
 
 option csharp_namespace = "TheQRL.Zond.V1";
 option go_package = "github.com/theQRL/qrysm/v4/proto/zond/v1";
@@ -28,60 +31,161 @@ option php_namespace = "TheQRL\\Zond\\v1";
 
 // The Ethereum consensus beacon block. The message does not contain a validator signature.
 message BeaconBlock {
-    // Beacon chain slot that this block represents.
-    uint64 slot = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
+  // Beacon chain slot that this block represents.
+  uint64 slot = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
 
-    // Validator index of the validator that proposed the block header.
-    uint64 proposer_index = 2 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
+  // Validator index of the validator that proposed the block header.
+  uint64 proposer_index = 2 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
 
-    // 32 byte root of the parent block.
-    bytes parent_root = 3 [(theqrl.zond.ext.ssz_size) = "32"];
+  // 32 byte root of the parent block.
+  bytes parent_root = 3 [(theqrl.zond.ext.ssz_size) = "32"];
 
-    // 32 byte root of the resulting state after processing this block.
-    bytes state_root = 4 [(theqrl.zond.ext.ssz_size) = "32"];
+  // 32 byte root of the resulting state after processing this block.
+  bytes state_root = 4 [(theqrl.zond.ext.ssz_size) = "32"];
 
-    // The block body itself.
-    BeaconBlockBody body = 5;
+  // The block body itself.
+  BeaconBlockBody body = 5;
+}
+
+// The Ethereum consensus beacon block. The message does not contain a validator signature.
+message BlindedBeaconBlock {
+  // Beacon chain slot that this block represents.
+  uint64 slot = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
+
+  // Validator index of the validator that proposed the block header.
+  uint64 proposer_index = 2 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
+
+  // 32 byte root of the parent block.
+  bytes parent_root = 3 [(theqrl.zond.ext.ssz_size) = "32"];
+
+  // 32 byte root of the resulting state after processing this block.
+  bytes state_root = 4 [(theqrl.zond.ext.ssz_size) = "32"];
+
+  // The block body itself.
+  BlindedBeaconBlockBody body = 5;
+}
+
+message BeaconBlockContainer {
+  oneof block {
+    BeaconBlock capella_block = 1;
+  }
+}
+
+message SignedBeaconBlockContainer {
+  oneof message {
+    BeaconBlock capella_block = 1;
+  }
+
+  // 4595 byte Dilithium signature from the validator that produced this block.
+  bytes signature = 5 [(theqrl.zond.ext.ssz_size) = "4595"];
+}
+
+message BlindedBeaconBlockContainer {
+  oneof block {
+    BlindedBeaconBlock capella_block = 1;
+  }
+}
+
+message SignedBlindedBeaconBlockContainer {
+  oneof message {
+    BlindedBeaconBlock capella_block = 1;
+  }
+
+  // 4595 byte Dilithium signature from the validator that produced this block.
+  bytes signature = 5 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
 // The signed version of beacon block.
 message SignedBeaconBlock {
-    // The unsigned beacon block itself.
-    BeaconBlock block = 1;
+  BeaconBlock message = 1;
 
-    // 96 byte BLS signature from the validator that produced this block.
-    bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "96"];
+  // 4595 byte Dilithium signature from the validator that produced this block.
+  bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
-// The block body of an Ethereum consensus beacon block.
+message SignedBlindedBeaconBlock {
+  BlindedBeaconBlock message = 1;
+
+  // 4595 byte Dilithium signature from the validator that produced this block.
+  bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
+}
+
 message BeaconBlockBody {
-    // The validators RANDAO reveal 96 byte value.
-    bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
+  // The validators RANDAO reveal 4595 byte value.
+  bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-    // A reference to the Ethereum 1.x chain.
-    Eth1Data eth1_data = 2;
+  // A reference to the Ethereum 1.x chain.
+  v1.Zond1Data zond1_data = 2;
 
-    // 32 byte field of arbitrary data. This field may contain any data and
-    // is not used for anything other than a fun message.
-    bytes graffiti = 3 [(theqrl.zond.ext.ssz_size) = "32"];
+  // 32 byte field of arbitrary data. This field may contain any data and
+  // is not used for anything other than a fun message.
+  bytes graffiti = 3 [(theqrl.zond.ext.ssz_size) = "32"];
 
-    // Block operations
-    // Refer to spec constants at https://github.com/ethereum/consensus-specs/blob/dev/specs/core/0_beacon-chain.md#max-operations-per-block
+  // Block operations
+  // Refer to spec constants at https://github.com/ethereum/consensus-specs/blob/dev/specs/core/0_beacon-chain.md#max-operations-per-block
 
-    // At most MAX_PROPOSER_SLASHINGS.
-    repeated ProposerSlashing proposer_slashings = 4 [(theqrl.zond.ext.ssz_max) = "16"];
+  // At most MAX_PROPOSER_SLASHINGS.
+  repeated v1.ProposerSlashing proposer_slashings = 4 [(theqrl.zond.ext.ssz_max) = "16"];
 
-    // At most MAX_ATTESTER_SLASHINGS.
-    repeated AttesterSlashing attester_slashings = 5 [(theqrl.zond.ext.ssz_max) = "2"];
+  // At most MAX_ATTESTER_SLASHINGS.
+  repeated v1.AttesterSlashing attester_slashings = 5 [(theqrl.zond.ext.ssz_max) = "2"];
 
-    // At most MAX_ATTESTATIONS.
-    repeated Attestation attestations = 6 [(theqrl.zond.ext.ssz_max) = "128"];
+  // At most MAX_ATTESTATIONS.
+  repeated v1.Attestation attestations = 6 [(theqrl.zond.ext.ssz_max) = "128"];
 
-    // At most MAX_DEPOSITS.
-    repeated Deposit deposits = 7 [(theqrl.zond.ext.ssz_max) = "16"];
+  // At most MAX_DEPOSITS.
+  repeated v1.Deposit deposits = 7 [(theqrl.zond.ext.ssz_max) = "16"];
 
-    // At most MAX_VOLUNTARY_EXITS.
-    repeated SignedVoluntaryExit voluntary_exits = 8 [(theqrl.zond.ext.ssz_max) = "16"];
+  // At most MAX_VOLUNTARY_EXITS.
+  repeated v1.SignedVoluntaryExit voluntary_exits = 8 [(theqrl.zond.ext.ssz_max) = "16"];
+
+  // Sync aggregate object to track sync committee votes for light client support.
+  v1.SyncAggregate sync_aggregate = 9;
+
+  // Execution payload: the embedded execution payload of the block
+  theqrl.engine.v1.ExecutionPayload execution_payload = 10;
+
+  // Dilithium To Execution Changes: signed messages to change withdrawal credentials
+  repeated SignedDilithiumToExecutionChange dilithium_to_execution_changes = 11 [(theqrl.zond.ext.ssz_max) = "16"];
+}
+
+message BlindedBeaconBlockBody {
+  // The validators RANDAO reveal 4595 byte value.
+  bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
+
+  // A reference to the Ethereum 1.x chain.
+  v1.Zond1Data zond1_data = 2;
+
+  // 32 byte field of arbitrary data. This field may contain any data and
+  // is not used for anything other than a fun message.
+  bytes graffiti = 3 [(theqrl.zond.ext.ssz_size) = "32"];
+
+  // Block operations
+  // Refer to spec constants at https://github.com/ethereum/consensus-specs/blob/dev/specs/core/0_beacon-chain.md#max-operations-per-block
+
+  // At most MAX_PROPOSER_SLASHINGS.
+  repeated v1.ProposerSlashing proposer_slashings = 4 [(theqrl.zond.ext.ssz_max) = "16"];
+
+  // At most MAX_ATTESTER_SLASHINGS.
+  repeated v1.AttesterSlashing attester_slashings = 5 [(theqrl.zond.ext.ssz_max) = "2"];
+
+  // At most MAX_ATTESTATIONS.
+  repeated v1.Attestation attestations = 6 [(theqrl.zond.ext.ssz_max) = "128"];
+
+  // At most MAX_DEPOSITS.
+  repeated v1.Deposit deposits = 7 [(theqrl.zond.ext.ssz_max) = "16"];
+
+  // At most MAX_VOLUNTARY_EXITS.
+  repeated v1.SignedVoluntaryExit voluntary_exits = 8 [(theqrl.zond.ext.ssz_max) = "16"];
+
+  // Sync aggregate object to track sync committee votes for light client support.
+  v1.SyncAggregate sync_aggregate = 9;
+
+  // Execution payload header: the embedded execution payload of the block 
+  theqrl.engine.v1.ExecutionPayloadHeader execution_payload_header = 10;
+
+  // Dilithium To Execution Changes: signed messages to change withdrawal credentials
+  repeated SignedDilithiumToExecutionChange dilithium_to_execution_changes = 11 [(theqrl.zond.ext.ssz_max) = "16"];
 }
 
 // Proposer slashings are proofs that a slashable offense has been committed by
@@ -107,8 +211,8 @@ message AttesterSlashing {
 // Deposit into the Ethereum consensus from the Ethereum 1.x deposit contract.
 message Deposit {
     message Data {
-        // 48 byte BLS public key of the validator.
-        bytes pubkey = 1 [(theqrl.zond.ext.ssz_size) = "48", (theqrl.zond.ext.spec_name) = "pubkey"];
+        // 2592 byte Dilithium public key of the validator.
+        bytes pubkey = 1 [(theqrl.zond.ext.ssz_size) = "2592", (theqrl.zond.ext.spec_name) = "pubkey"];
 
         // A 32 byte hash of the withdrawal address public key.
         bytes withdrawal_credentials = 2 [(theqrl.zond.ext.ssz_size) = "32"];
@@ -116,8 +220,8 @@ message Deposit {
         // Deposit amount in gwei.
         uint64 amount = 3;
 
-        // 96 byte signature from the validators public key.
-        bytes signature = 4 [(theqrl.zond.ext.ssz_size) = "96"];
+        // 4595 byte signature from the validators public key.
+        bytes signature = 4 [(theqrl.zond.ext.ssz_size) = "4595"];
     }
 
     // 32 byte roots in the deposit tree branch.
@@ -143,12 +247,12 @@ message SignedVoluntaryExit {
     // The unsigned voluntary exit itself.
     VoluntaryExit message = 1;
 
-    // Validator's 96 byte signature
-    bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "96"];
+    // Validator's 4595 byte signature
+    bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
-// Eth1Data represents references to the Ethereum 1.x deposit contract.
-message Eth1Data {
+// Zond1Data represents references to the Ethereum 1.x deposit contract.
+message Zond1Data {
     // The 32 byte deposit tree root for the last deposit included in this
     // block.
     bytes deposit_root = 1 [(theqrl.zond.ext.ssz_size) = "32"];
@@ -187,8 +291,8 @@ message SignedBeaconBlockHeader {
     // The unsigned beacon block header itself.
     BeaconBlockHeader message = 1;
 
-    // 96 byte BLS signature from the validator that produced this block header.
-    bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "96"];
+    // 4595 byte Dilithium signature from the validator that produced this block header.
+    bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
 message IndexedAttestation {
@@ -196,8 +300,8 @@ message IndexedAttestation {
 
     AttestationData data = 2;
 
-    // 96 bytes aggregate signature.
-    bytes signature = 3 [(theqrl.zond.ext.ssz_size) = "96"];
+    // 4595 (signature size per signer) * 2048 (number of signers) bytes of unaggregated signatures
+    repeated bytes signatures = 3 [(theqrl.zond.ext.ssz_size) = "?,4595", (theqrl.zond.ext.ssz_max) = "2048"];
 }
 
 // The sync aggregate object for the beacon chain to track sync committee votes and to
@@ -206,6 +310,26 @@ message SyncAggregate {
     // Sync committee bits as Bitvector to track votes.
     bytes sync_committee_bits = 1 [(theqrl.zond.ext.ssz_size) = "sync_committee_bytes.size", (theqrl.zond.ext.cast_type) = "sync_committee_bits.type"];
 
-    // BLS aggregated signature of the sync committee for the ones that voted.
-    bytes sync_committee_signature = 2 [(theqrl.zond.ext.ssz_size) = "96"];
+    // Dilithium signatures of the sync committee for the ones that voted.
+    repeated bytes sync_committee_signatures = 2 [(theqrl.zond.ext.ssz_size) = "?,4595", (theqrl.zond.ext.ssz_max) = "sync_committee_bits.size"];
+}
+
+message BlockRequest {
+  // The block identifier. Can be one of: "head" (canonical head in node's view), "genesis",
+  // "finalized", <slot>, <hex encoded blockRoot with 0x prefix>.
+  bytes block_id = 1;
+}
+
+message BlockResponse {
+  v1.Version version = 1;
+  SignedBeaconBlockContainer data = 2;
+  bool execution_optimistic = 3;
+  bool finalized = 4;
+}
+
+message BlindedBlockResponse {
+  v1.Version version = 1;
+  SignedBlindedBeaconBlockContainer data = 2;
+  bool execution_optimistic = 3;
+  bool finalized = 4;
 }

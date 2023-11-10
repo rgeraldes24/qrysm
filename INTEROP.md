@@ -54,7 +54,7 @@ bazel run //beacon-chain -- \
 --force-clear-db \
 --min-sync-peers=0 \
 --interop-num-validators 64 \
---interop-eth1data-votes
+--interop-zond1data-votes
 ```
 
 This will deterministically generate a beacon genesis state and start
@@ -79,7 +79,7 @@ Assuming you generated a `genesis.ssz` file with 64 validators, open up two term
 --force-clear-db \
 --min-sync-peers=0 \
 --interop-genesis-state /path/to/genesis.ssz \
---interop-eth1data-votes
+--interop-zond1data-votes
 ```
 
 Wait a bit until your beacon chain starts, and in the other window:

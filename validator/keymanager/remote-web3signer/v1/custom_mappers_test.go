@@ -235,7 +235,7 @@ func TestMapBeaconBlockAltair(t *testing.T) {
 					StateRoot:     make([]byte, fieldparams.RootLength),
 					Body: &zondpb.BeaconBlockBodyAltair{
 						RandaoReveal: make([]byte, 32),
-						Eth1Data: &zondpb.Eth1Data{
+						Zond1Data: &zondpb.Zond1Data{
 							DepositRoot:  make([]byte, fieldparams.RootLength),
 							DepositCount: 0,
 							BlockHash:    make([]byte, 32),
@@ -370,7 +370,7 @@ func TestMapBeaconBlockBody(t *testing.T) {
 			args: args{
 				body: &zondpb.BeaconBlockBody{
 					RandaoReveal: make([]byte, 32),
-					Eth1Data: &zondpb.Eth1Data{
+					Zond1Data: &zondpb.Zond1Data{
 						DepositRoot:  make([]byte, fieldparams.RootLength),
 						DepositCount: 0,
 						BlockHash:    make([]byte, 32),

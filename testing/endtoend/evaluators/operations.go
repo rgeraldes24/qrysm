@@ -35,8 +35,8 @@ var churnLimit = 4
 var depositValCount = e2e.DepositCount
 var numOfExits = 2
 
-// Deposits should be processed in twice the length of the epochs per eth1 voting period.
-var depositsInBlockStart = params.E2ETestConfig().EpochsPerEth1VotingPeriod * 2
+// Deposits should be processed in twice the length of the epochs per zond1 voting period.
+var depositsInBlockStart = params.E2ETestConfig().EpochsPerZond1VotingPeriod * 2
 
 // deposits included + finalization + MaxSeedLookahead for activation.
 var depositActivationStartEpoch = depositsInBlockStart + 2 + params.E2ETestConfig().MaxSeedLookahead
@@ -110,7 +110,7 @@ var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 	Evaluation: validatorsAreWithdrawn,
 }
 
-// ValidatorsVoteWithTheMajority verifies whether validator vote for eth1data using the majority algorithm.
+// ValidatorsVoteWithTheMajority verifies whether validator vote for zond1data using the majority algorithm.
 var ValidatorsVoteWithTheMajority = e2etypes.Evaluator{
 	Name:       "validators_vote_with_the_majority_%d",
 	Policy:     policies.AfterNthEpoch(0),
@@ -474,7 +474,7 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 		return errors.Wrap(err, "failed to get blocks from beacon-chain")
 	}
 
-	slotsPerVotingPeriod := params.E2ETestConfig().SlotsPerEpoch.Mul(uint64(params.E2ETestConfig().EpochsPerEth1VotingPeriod))
+	slotsPerVotingPeriod := params.E2ETestConfig().SlotsPerEpoch.Mul(uint64(params.E2ETestConfig().EpochsPerZond1VotingPeriod))
 	for _, blk := range blks.BlockContainers {
 		var slot primitives.Slot
 		var vote []byte
@@ -482,27 +482,27 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 		case *zondpb.BeaconBlockContainer_Phase0Block:
 			b := blk.GetPhase0Block().Block
 			slot = b.Slot
-			vote = b.Body.Eth1Data.BlockHash
+			vote = b.Body.Zond1Data.BlockHash
 		case *zondpb.BeaconBlockContainer_AltairBlock:
 			b := blk.GetAltairBlock().Block
 			slot = b.Slot
-			vote = b.Body.Eth1Data.BlockHash
+			vote = b.Body.Zond1Data.BlockHash
 		case *zondpb.BeaconBlockContainer_BellatrixBlock:
 			b := blk.GetBellatrixBlock().Block
 			slot = b.Slot
-			vote = b.Body.Eth1Data.BlockHash
+			vote = b.Body.Zond1Data.BlockHash
 		case *zondpb.BeaconBlockContainer_BlindedBellatrixBlock:
 			b := blk.GetBlindedBellatrixBlock().Block
 			slot = b.Slot
-			vote = b.Body.Eth1Data.BlockHash
+			vote = b.Body.Zond1Data.BlockHash
 		case *zondpb.BeaconBlockContainer_CapellaBlock:
 			b := blk.GetCapellaBlock().Block
 			slot = b.Slot
-			vote = b.Body.Eth1Data.BlockHash
+			vote = b.Body.Zond1Data.BlockHash
 		case *zondpb.BeaconBlockContainer_BlindedCapellaBlock:
 			b := blk.GetBlindedCapellaBlock().Block
 			slot = b.Slot
-			vote = b.Body.Eth1Data.BlockHash
+			vote = b.Body.Zond1Data.BlockHash
 		default:
 			return errors.New("block neither phase0,altair or bellatrix")
 		}
@@ -522,11 +522,11 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 			isFirstSlotInVotingPeriod = slot%slotsPerVotingPeriod == 0
 		}
 		if isFirstSlotInVotingPeriod {
-			ec.ExpectedEth1DataVote = vote
+			ec.ExpectedZond1DataVote = vote
 			return nil
 		}
 
-		if !bytes.Equal(vote, ec.ExpectedEth1DataVote) {
+		if !bytes.Equal(vote, ec.ExpectedZond1DataVote) {
 			for i := primitives.Slot(0); i < slot; i++ {
 				v, ok := ec.SeenVotes[i]
 				if ok {
@@ -535,8 +535,8 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 					fmt.Printf("did not see slot=%d\n", i)
 				}
 			}
-			return fmt.Errorf("incorrect eth1data vote for slot %d; expected: %#x vs voted: %#x",
-				slot, ec.ExpectedEth1DataVote, vote)
+			return fmt.Errorf("incorrect zond1data vote for slot %d; expected: %#x vs voted: %#x",
+				slot, ec.ExpectedZond1DataVote, vote)
 		}
 	}
 	return nil

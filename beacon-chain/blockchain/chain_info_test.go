@@ -242,17 +242,17 @@ func TestGenesisValidatorsRoot_CanRetrieve(t *testing.T) {
 func TestHeadETH1Data_Nil(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	c := setupBeaconChain(t, beaconDB)
-	assert.DeepEqual(t, &zondpb.Eth1Data{}, c.HeadETH1Data(), "Incorrect pre chain start value")
+	assert.DeepEqual(t, &zondpb.Zond1Data{}, c.HeadETH1Data(), "Incorrect pre chain start value")
 }
 
 func TestHeadETH1Data_CanRetrieve(t *testing.T) {
-	d := &zondpb.Eth1Data{DepositCount: 999}
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{Eth1Data: d})
+	d := &zondpb.Zond1Data{DepositCount: 999}
+	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{Zond1Data: d})
 	require.NoError(t, err)
 	c := &Service{}
 	c.head = &head{state: s}
 	if !proto.Equal(c.HeadETH1Data(), d) {
-		t.Error("Received incorrect eth1 data")
+		t.Error("Received incorrect zond1 data")
 	}
 }
 

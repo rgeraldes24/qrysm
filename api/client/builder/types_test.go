@@ -796,17 +796,17 @@ func TestExecutionPayloadResponseCapellaToProto(t *testing.T) {
 
 }
 
-func pbEth1Data() *zond.Eth1Data {
-	return &zond.Eth1Data{
+func pbZond1Data() *zond.Zond1Data {
+	return &zond.Zond1Data{
 		DepositRoot:  make([]byte, 32),
 		DepositCount: 23,
 		BlockHash:    make([]byte, 32),
 	}
 }
 
-func TestEth1DataMarshal(t *testing.T) {
-	ed := &Eth1Data{
-		Eth1Data: pbEth1Data(),
+func TestZond1DataMarshal(t *testing.T) {
+	ed := &Zond1Data{
+		Zond1Data: pbZond1Data(),
 	}
 	b, err := json.Marshal(ed)
 	require.NoError(t, err)
@@ -816,8 +816,8 @@ func TestEth1DataMarshal(t *testing.T) {
 
 func pbSyncAggregate() *zond.SyncAggregate {
 	return &zond.SyncAggregate{
-		SyncCommitteeSignature: make([]byte, 48),
-		SyncCommitteeBits:      bitfield.Bitvector512{0x01},
+		SyncCommitteeSignatures: make([][]byte, 512),
+		SyncCommitteeBits:       bitfield.Bitvector512{0x01},
 	}
 }
 
@@ -887,7 +887,7 @@ func pbAttestation(t *testing.T) *zond.Attestation {
 				Root:  ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
 			},
 		},
-		Signature: ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"),
+		Signatures: [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
 	}
 }
 
@@ -905,7 +905,7 @@ func pbAttesterSlashing(t *testing.T) *zond.AttesterSlashing {
 	return &zond.AttesterSlashing{
 		Attestation_1: &zond.IndexedAttestation{
 			AttestingIndices: []uint64{1},
-			Signature:        ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"),
+			Signatures:       [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
 			Data: &zond.AttestationData{
 				Slot:            1,
 				CommitteeIndex:  1,
@@ -922,7 +922,7 @@ func pbAttesterSlashing(t *testing.T) *zond.AttesterSlashing {
 		},
 		Attestation_2: &zond.IndexedAttestation{
 			AttestingIndices: []uint64{1},
-			Signature:        ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"),
+			Signatures:       [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
 			Data: &zond.AttestationData{
 				Slot:            1,
 				CommitteeIndex:  1,
@@ -1204,7 +1204,7 @@ func TestMarshalBlindedBeaconBlockBodyBellatrix(t *testing.T) {
 		StateRoot:     ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
 		Body: &zond.BlindedBeaconBlockBodyBellatrix{
 			RandaoReveal:           ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"),
-			Eth1Data:               pbEth1Data(),
+			Zond1Data:              pbZond1Data(),
 			Graffiti:               ezDecode(t, "0xdeadbeefc0ffee"),
 			ProposerSlashings:      []*zond.ProposerSlashing{pbProposerSlashing(t)},
 			AttesterSlashings:      []*zond.AttesterSlashing{pbAttesterSlashing(t)},
@@ -1233,7 +1233,7 @@ func TestMarshalBlindedBeaconBlockBodyCapella(t *testing.T) {
 		StateRoot:     ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
 		Body: &zond.BlindedBeaconBlockBodyCapella{
 			RandaoReveal:           ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"),
-			Eth1Data:               pbEth1Data(),
+			Zond1Data:              pbZond1Data(),
 			Graffiti:               ezDecode(t, "0xdeadbeefc0ffee"),
 			ProposerSlashings:      []*zond.ProposerSlashing{pbProposerSlashing(t)},
 			AttesterSlashings:      []*zond.AttesterSlashing{pbAttesterSlashing(t)},

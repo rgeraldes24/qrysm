@@ -18,10 +18,10 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func FakeDeposits(n uint64) []*zondpb.Eth1Data {
-	deposits := make([]*zondpb.Eth1Data, n)
+func FakeDeposits(n uint64) []*zondpb.Zond1Data {
+	deposits := make([]*zondpb.Zond1Data, n)
 	for i := uint64(0); i < n; i++ {
-		deposits[i] = &zondpb.Eth1Data{
+		deposits[i] = &zondpb.Zond1Data{
 			DepositCount: 1,
 			DepositRoot:  bytesutil.PadTo([]byte("root"), 32),
 		}
@@ -29,16 +29,16 @@ func FakeDeposits(n uint64) []*zondpb.Eth1Data {
 	return deposits
 }
 
-func TestEth1DataHasEnoughSupport(t *testing.T) {
+func TestZond1DataHasEnoughSupport(t *testing.T) {
 	tests := []struct {
-		stateVotes         []*zondpb.Eth1Data
-		data               *zondpb.Eth1Data
+		stateVotes         []*zondpb.Zond1Data
+		data               *zondpb.Zond1Data
 		hasSupport         bool
 		votingPeriodLength primitives.Epoch
 	}{
 		{
 			stateVotes: FakeDeposits(uint64(params.BeaconConfig().SlotsPerEpoch.Mul(4))),
-			data: &zondpb.Eth1Data{
+			data: &zondpb.Zond1Data{
 				DepositCount: 1,
 				DepositRoot:  bytesutil.PadTo([]byte("root"), 32),
 			},
@@ -46,7 +46,7 @@ func TestEth1DataHasEnoughSupport(t *testing.T) {
 			votingPeriodLength: 7,
 		}, {
 			stateVotes: FakeDeposits(uint64(params.BeaconConfig().SlotsPerEpoch.Mul(4))),
-			data: &zondpb.Eth1Data{
+			data: &zondpb.Zond1Data{
 				DepositCount: 1,
 				DepositRoot:  bytesutil.PadTo([]byte("root"), 32),
 			},
@@ -54,7 +54,7 @@ func TestEth1DataHasEnoughSupport(t *testing.T) {
 			votingPeriodLength: 8,
 		}, {
 			stateVotes: FakeDeposits(uint64(params.BeaconConfig().SlotsPerEpoch.Mul(4))),
-			data: &zondpb.Eth1Data{
+			data: &zondpb.Zond1Data{
 				DepositCount: 1,
 				DepositRoot:  bytesutil.PadTo([]byte("root"), 32),
 			},
@@ -67,19 +67,19 @@ func TestEth1DataHasEnoughSupport(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			c := params.BeaconConfig()
-			c.EpochsPerEth1VotingPeriod = tt.votingPeriodLength
+			c.EpochsPerZond1VotingPeriod = tt.votingPeriodLength
 			params.OverrideBeaconConfig(c)
 
 			s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
-				Eth1DataVotes: tt.stateVotes,
+				Zond1DataVotes: tt.stateVotes,
 			})
 			require.NoError(t, err)
-			result, err := blocks.Eth1DataHasEnoughSupport(s, tt.data)
+			result, err := blocks.Zond1DataHasEnoughSupport(s, tt.data)
 			require.NoError(t, err)
 
 			if result != tt.hasSupport {
 				t.Errorf(
-					"blocks.Eth1DataHasEnoughSupport(%+v) = %t, wanted %t",
+					"blocks.Zond1DataHasEnoughSupport(%+v) = %t, wanted %t",
 					tt.data,
 					result,
 					tt.hasSupport,
@@ -89,10 +89,10 @@ func TestEth1DataHasEnoughSupport(t *testing.T) {
 	}
 }
 
-func TestAreEth1DataEqual(t *testing.T) {
+func TestAreZond1DataEqual(t *testing.T) {
 	type args struct {
-		a *zondpb.Eth1Data
-		b *zondpb.Eth1Data
+		a *zondpb.Zond1Data
+		b *zondpb.Zond1Data
 	}
 	tests := []struct {
 		name string
@@ -111,7 +111,7 @@ func TestAreEth1DataEqual(t *testing.T) {
 			name: "false when only one is nil",
 			args: args{
 				a: nil,
-				b: &zondpb.Eth1Data{
+				b: &zondpb.Zond1Data{
 					DepositRoot:  make([]byte, 32),
 					DepositCount: 0,
 					BlockHash:    make([]byte, 32),
@@ -122,12 +122,12 @@ func TestAreEth1DataEqual(t *testing.T) {
 		{
 			name: "true when real equality",
 			args: args{
-				a: &zondpb.Eth1Data{
+				a: &zondpb.Zond1Data{
 					DepositRoot:  make([]byte, 32),
 					DepositCount: 0,
 					BlockHash:    make([]byte, 32),
 				},
-				b: &zondpb.Eth1Data{
+				b: &zondpb.Zond1Data{
 					DepositRoot:  make([]byte, 32),
 					DepositCount: 0,
 					BlockHash:    make([]byte, 32),
@@ -138,12 +138,12 @@ func TestAreEth1DataEqual(t *testing.T) {
 		{
 			name: "false is field value differs",
 			args: args{
-				a: &zondpb.Eth1Data{
+				a: &zondpb.Zond1Data{
 					DepositRoot:  make([]byte, 32),
 					DepositCount: 0,
 					BlockHash:    make([]byte, 32),
 				},
-				b: &zondpb.Eth1Data{
+				b: &zondpb.Zond1Data{
 					DepositRoot:  make([]byte, 32),
 					DepositCount: 64,
 					BlockHash:    make([]byte, 32),
@@ -154,43 +154,43 @@ func TestAreEth1DataEqual(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, blocks.AreEth1DataEqual(tt.args.a, tt.args.b))
+			assert.Equal(t, tt.want, blocks.AreZond1DataEqual(tt.args.a, tt.args.b))
 		})
 	}
 }
 
-func TestProcessEth1Data_SetsCorrectly(t *testing.T) {
+func TestProcessZond1Data_SetsCorrectly(t *testing.T) {
 	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
-		Eth1DataVotes: []*zondpb.Eth1Data{},
+		Zond1DataVotes: []*zondpb.Zond1Data{},
 	})
 	require.NoError(t, err)
 
 	b := util.NewBeaconBlock()
 	b.Block = &zondpb.BeaconBlock{
 		Body: &zondpb.BeaconBlockBody{
-			Eth1Data: &zondpb.Eth1Data{
+			Zond1Data: &zondpb.Zond1Data{
 				DepositRoot: []byte{2},
 				BlockHash:   []byte{3},
 			},
 		},
 	}
 
-	period := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerEth1VotingPeriod)))
+	period := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerZond1VotingPeriod)))
 	for i := uint64(0); i < period; i++ {
-		processedState, err := blocks.ProcessEth1DataInBlock(context.Background(), beaconState, b.Block.Body.Eth1Data)
+		processedState, err := blocks.ProcessZond1DataInBlock(context.Background(), beaconState, b.Block.Body.Zond1Data)
 		require.NoError(t, err)
 		require.Equal(t, true, processedState.Version() == version.Phase0)
 	}
 
-	newETH1DataVotes := beaconState.Eth1DataVotes()
+	newETH1DataVotes := beaconState.Zond1DataVotes()
 	if len(newETH1DataVotes) <= 1 {
 		t.Error("Expected new ETH1 data votes to have length > 1")
 	}
-	if !proto.Equal(beaconState.Eth1Data(), zondpb.CopyETH1Data(b.Block.Body.Eth1Data)) {
+	if !proto.Equal(beaconState.Zond1Data(), zondpb.CopyETH1Data(b.Block.Body.Zond1Data)) {
 		t.Errorf(
-			"Expected latest eth1 data to have been set to %v, received %v",
-			b.Block.Body.Eth1Data,
-			beaconState.Eth1Data(),
+			"Expected latest zond1 data to have been set to %v, received %v",
+			b.Block.Body.Zond1Data,
+			beaconState.Zond1Data(),
 		)
 	}
 }

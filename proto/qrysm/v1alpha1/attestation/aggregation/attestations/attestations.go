@@ -5,7 +5,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
 )
 
 // attList represents list of attestations, defined for easier en masse operations (filtering, sorting).
@@ -74,6 +73,7 @@ func AggregateDisjointOneBitAtts(atts []*zondpb.Attestation) (*zondpb.Attestatio
 	return atts[0], nil
 }
 
+/*
 // AggregatePair aggregates pair of attestations a1 and a2 together.
 func AggregatePair(a1, a2 *zondpb.Attestation) (*zondpb.Attestation, error) {
 	o, err := a1.AggregationBits.Overlaps(a2.AggregationBits)
@@ -102,18 +102,19 @@ func AggregatePair(a1, a2 *zondpb.Attestation) (*zondpb.Attestation, error) {
 	if err != nil {
 		return nil, err
 	}
-	newSig, err := signatureFromBytes(newAtt.Signature)
+	newSig, err := signatureFromBytes(newAtt.Signatures)
 	if err != nil {
 		return nil, err
 	}
-	baseSig, err := signatureFromBytes(baseAtt.Signature)
+	baseSig, err := signatureFromBytes(baseAtt.Signatures)
 	if err != nil {
 		return nil, err
 	}
 
 	aggregatedSig := aggregateSignatures([]dilithium.Signature{baseSig, newSig})
-	baseAtt.Signature = aggregatedSig.Marshal()
+	baseAtt.Signatures = aggregatedSig.Marshal()
 	baseAtt.AggregationBits = newBits
 
 	return baseAtt, nil
 }
+*/

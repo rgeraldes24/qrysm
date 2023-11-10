@@ -25,7 +25,7 @@ func TestGenerateGenesisState(t *testing.T) {
 	require.NoError(t, err)
 	root, err := tr.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zond.Eth1Data{
+	genesisState, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zond.Zond1Data{
 		DepositRoot:  root[:],
 		DepositCount: uint64(len(deposits)),
 	})

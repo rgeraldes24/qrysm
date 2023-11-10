@@ -59,7 +59,7 @@ func MapAttestation(attestation *zondpb.Attestation) (*Attestation, error) {
 	return &Attestation{
 		AggregationBits: []byte(attestation.AggregationBits),
 		Data:            data,
-		Signature:       attestation.Signature,
+		Signature:       attestation.Signatures,
 	}, nil
 }
 
@@ -101,15 +101,15 @@ func MapBeaconBlockBody(body *zondpb.BeaconBlockBody) (*BeaconBlockBody, error) 
 	if body == nil {
 		return nil, fmt.Errorf("beacon block body is nil")
 	}
-	if body.Eth1Data == nil {
-		return nil, fmt.Errorf("eth1 data in Beacon Block Body is nil")
+	if body.Zond1Data == nil {
+		return nil, fmt.Errorf("zond1 data in Beacon Block Body is nil")
 	}
 	block := &BeaconBlockBody{
 		RandaoReveal: body.RandaoReveal,
-		Eth1Data: &Eth1Data{
-			DepositRoot:  body.Eth1Data.DepositRoot,
-			DepositCount: fmt.Sprint(body.Eth1Data.DepositCount),
-			BlockHash:    body.Eth1Data.BlockHash,
+		Zond1Data: &Zond1Data{
+			DepositRoot:  body.Zond1Data.DepositRoot,
+			DepositCount: fmt.Sprint(body.Zond1Data.DepositCount),
+			BlockHash:    body.Zond1Data.BlockHash,
 		},
 		Graffiti:          body.Graffiti,
 		ProposerSlashings: make([]*ProposerSlashing, len(body.ProposerSlashings)),
@@ -230,7 +230,7 @@ func MapIndexedAttestation(attestation *zondpb.IndexedAttestation) (*IndexedAtte
 	return &IndexedAttestation{
 		AttestingIndices: attestingIndices,
 		Data:             attestationData,
-		Signature:        attestation.Signature,
+		Signature:        attestation.Signatures,
 	}, nil
 }
 
@@ -303,10 +303,10 @@ func MapBeaconBlockBodyAltair(body *zondpb.BeaconBlockBodyAltair) (*BeaconBlockB
 
 	block := &BeaconBlockBodyAltair{
 		RandaoReveal: body.RandaoReveal,
-		Eth1Data: &Eth1Data{
-			DepositRoot:  body.Eth1Data.DepositRoot,
-			DepositCount: fmt.Sprint(body.Eth1Data.DepositCount),
-			BlockHash:    body.Eth1Data.BlockHash,
+		Zond1Data: &Zond1Data{
+			DepositRoot:  body.Zond1Data.DepositRoot,
+			DepositCount: fmt.Sprint(body.Zond1Data.DepositCount),
+			BlockHash:    body.Zond1Data.BlockHash,
 		},
 		Graffiti:          body.Graffiti,
 		ProposerSlashings: make([]*ProposerSlashing, len(body.ProposerSlashings)),

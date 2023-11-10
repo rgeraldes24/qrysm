@@ -5,10 +5,10 @@ import (
 )
 
 var (
-	// InteropMockEth1DataVotesFlag enables mocking the eth1 proof-of-work chain data put into blocks by proposers.
-	InteropMockEth1DataVotesFlag = &cli.BoolFlag{
-		Name:  "interop-eth1data-votes",
-		Usage: "Enable mocking of eth1 data votes for proposers to package into blocks",
+	// InteropMockZond1DataVotesFlag enables mocking the zond1 proof-of-work chain data put into blocks by proposers.
+	InteropMockZond1DataVotesFlag = &cli.BoolFlag{
+		Name:  "interop-zond1data-votes",
+		Usage: "Enable mocking of zond1 data votes for proposers to package into blocks",
 	}
 
 	// InteropGenesisTimeFlag specifies genesis time for state generation.

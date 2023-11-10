@@ -225,14 +225,14 @@ func populateBeaconNodeStats(pf metricMap) BeaconNodeStats {
 		}
 	}
 
-	f, err = pf.getFamily("powchain_sync_eth1_connected")
+	f, err = pf.getFamily("powchain_sync_zond1_connected")
 	if err != nil {
-		log.WithError(err).Debug("Failed to get powchain_sync_eth1_connected")
+		log.WithError(err).Debug("Failed to get powchain_sync_zond1_connected")
 	} else {
 		m = f.Metric[0]
-		bs.SyncEth1Connected = false
+		bs.SyncZond1Connected = false
 		if int64(m.Gauge.GetValue()) == 1 {
-			bs.SyncEth1Connected = true
+			bs.SyncZond1Connected = true
 		}
 	}
 

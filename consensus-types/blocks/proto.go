@@ -232,7 +232,7 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 	case version.Phase0:
 		return &zond.BeaconBlockBody{
 			RandaoReveal:      b.randaoReveal[:],
-			Eth1Data:          b.eth1Data,
+			Zond1Data:         b.zond1Data,
 			Graffiti:          b.graffiti[:],
 			ProposerSlashings: b.proposerSlashings,
 			AttesterSlashings: b.attesterSlashings,
@@ -243,7 +243,7 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 	case version.Altair:
 		return &zond.BeaconBlockBodyAltair{
 			RandaoReveal:      b.randaoReveal[:],
-			Eth1Data:          b.eth1Data,
+			Zond1Data:         b.zond1Data,
 			Graffiti:          b.graffiti[:],
 			ProposerSlashings: b.proposerSlashings,
 			AttesterSlashings: b.attesterSlashings,
@@ -264,7 +264,7 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 			}
 			return &zond.BlindedBeaconBlockBodyBellatrix{
 				RandaoReveal:           b.randaoReveal[:],
-				Eth1Data:               b.eth1Data,
+				Zond1Data:              b.zond1Data,
 				Graffiti:               b.graffiti[:],
 				ProposerSlashings:      b.proposerSlashings,
 				AttesterSlashings:      b.attesterSlashings,
@@ -285,7 +285,7 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 		}
 		return &zond.BeaconBlockBodyBellatrix{
 			RandaoReveal:      b.randaoReveal[:],
-			Eth1Data:          b.eth1Data,
+			Zond1Data:         b.zond1Data,
 			Graffiti:          b.graffiti[:],
 			ProposerSlashings: b.proposerSlashings,
 			AttesterSlashings: b.attesterSlashings,
@@ -307,7 +307,7 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 			}
 			return &zond.BlindedBeaconBlockBodyCapella{
 				RandaoReveal:                b.randaoReveal[:],
-				Eth1Data:                    b.eth1Data,
+				Zond1Data:                   b.zond1Data,
 				Graffiti:                    b.graffiti[:],
 				ProposerSlashings:           b.proposerSlashings,
 				AttesterSlashings:           b.attesterSlashings,
@@ -329,7 +329,7 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 		}
 		return &zond.BeaconBlockBodyCapella{
 			RandaoReveal:                b.randaoReveal[:],
-			Eth1Data:                    b.eth1Data,
+			Zond1Data:                   b.zond1Data,
 			Graffiti:                    b.graffiti[:],
 			ProposerSlashings:           b.proposerSlashings,
 			AttesterSlashings:           b.attesterSlashings,
@@ -576,7 +576,7 @@ func initBlockBodyFromProtoPhase0(pb *zond.BeaconBlockBody) (*BeaconBlockBody, e
 		version:           version.Phase0,
 		isBlinded:         false,
 		randaoReveal:      bytesutil.ToBytes4595(pb.RandaoReveal),
-		eth1Data:          pb.Eth1Data,
+		zond1Data:         pb.Zond1Data,
 		graffiti:          bytesutil.ToBytes32(pb.Graffiti),
 		proposerSlashings: pb.ProposerSlashings,
 		attesterSlashings: pb.AttesterSlashings,
@@ -596,7 +596,7 @@ func initBlockBodyFromProtoAltair(pb *zond.BeaconBlockBodyAltair) (*BeaconBlockB
 		version:           version.Altair,
 		isBlinded:         false,
 		randaoReveal:      bytesutil.ToBytes4595(pb.RandaoReveal),
-		eth1Data:          pb.Eth1Data,
+		zond1Data:         pb.Zond1Data,
 		graffiti:          bytesutil.ToBytes32(pb.Graffiti),
 		proposerSlashings: pb.ProposerSlashings,
 		attesterSlashings: pb.AttesterSlashings,
@@ -622,7 +622,7 @@ func initBlockBodyFromProtoBellatrix(pb *zond.BeaconBlockBodyBellatrix) (*Beacon
 		version:           version.Bellatrix,
 		isBlinded:         false,
 		randaoReveal:      bytesutil.ToBytes4595(pb.RandaoReveal),
-		eth1Data:          pb.Eth1Data,
+		zond1Data:         pb.Zond1Data,
 		graffiti:          bytesutil.ToBytes32(pb.Graffiti),
 		proposerSlashings: pb.ProposerSlashings,
 		attesterSlashings: pb.AttesterSlashings,
@@ -649,7 +649,7 @@ func initBlindedBlockBodyFromProtoBellatrix(pb *zond.BlindedBeaconBlockBodyBella
 		version:                version.Bellatrix,
 		isBlinded:              true,
 		randaoReveal:           bytesutil.ToBytes4595(pb.RandaoReveal),
-		eth1Data:               pb.Eth1Data,
+		zond1Data:              pb.Zond1Data,
 		graffiti:               bytesutil.ToBytes32(pb.Graffiti),
 		proposerSlashings:      pb.ProposerSlashings,
 		attesterSlashings:      pb.AttesterSlashings,
@@ -676,7 +676,7 @@ func initBlockBodyFromProtoCapella(pb *zond.BeaconBlockBodyCapella) (*BeaconBloc
 		version:                     version.Capella,
 		isBlinded:                   false,
 		randaoReveal:                bytesutil.ToBytes4595(pb.RandaoReveal),
-		eth1Data:                    pb.Eth1Data,
+		zond1Data:                   pb.Zond1Data,
 		graffiti:                    bytesutil.ToBytes32(pb.Graffiti),
 		proposerSlashings:           pb.ProposerSlashings,
 		attesterSlashings:           pb.AttesterSlashings,
@@ -704,7 +704,7 @@ func initBlindedBlockBodyFromProtoCapella(pb *zond.BlindedBeaconBlockBodyCapella
 		version:                     version.Capella,
 		isBlinded:                   true,
 		randaoReveal:                bytesutil.ToBytes4595(pb.RandaoReveal),
-		eth1Data:                    pb.Eth1Data,
+		zond1Data:                   pb.Zond1Data,
 		graffiti:                    bytesutil.ToBytes32(pb.Graffiti),
 		proposerSlashings:           pb.ProposerSlashings,
 		attesterSlashings:           pb.AttesterSlashings,

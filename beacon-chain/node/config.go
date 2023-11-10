@@ -88,7 +88,7 @@ func configureSlotsPerArchivedPoint(cliCtx *cli.Context) error {
 	return nil
 }
 
-func configureEth1Config(cliCtx *cli.Context) error {
+func configureZond1Config(cliCtx *cli.Context) error {
 	c := params.BeaconConfig().Copy()
 	if cliCtx.IsSet(flags.ChainID.Name) {
 		c.DepositChainID = cliCtx.Uint64(flags.ChainID.Name)
@@ -137,7 +137,7 @@ func configureInteropConfig(cliCtx *cli.Context) error {
 	}
 	genTimeIsSet := cliCtx.IsSet(flags.InteropGenesisTimeFlag.Name)
 	numValsIsSet := cliCtx.IsSet(flags.InteropNumValidatorsFlag.Name)
-	votesIsSet := cliCtx.IsSet(flags.InteropMockEth1DataVotesFlag.Name)
+	votesIsSet := cliCtx.IsSet(flags.InteropMockZond1DataVotesFlag.Name)
 
 	if genTimeIsSet || numValsIsSet || votesIsSet {
 		if err := params.SetActive(params.InteropConfig().Copy()); err != nil {

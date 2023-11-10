@@ -39,7 +39,7 @@ func TestProposeBeaconBlock_BlindedCapella(t *testing.T) {
 				Attestations:      jsonifyAttestations(blindedCapellaBlock.BlindedCapella.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(blindedCapellaBlock.BlindedCapella.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(blindedCapellaBlock.BlindedCapella.Block.Body.Deposits),
-				Eth1Data:          jsonifyEth1Data(blindedCapellaBlock.BlindedCapella.Block.Body.Eth1Data),
+				Zond1Data:         jsonifyZond1Data(blindedCapellaBlock.BlindedCapella.Block.Body.Zond1Data),
 				Graffiti:          hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.Graffiti),
 				ProposerSlashings: jsonifyProposerSlashings(blindedCapellaBlock.BlindedCapella.Block.Body.ProposerSlashings),
 				RandaoReveal:      hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.RandaoReveal),
@@ -107,7 +107,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 				StateRoot:     test_helpers.FillByteSlice(32, 4),
 				Body: &zondpb.BlindedBeaconBlockBodyCapella{
 					RandaoReveal: test_helpers.FillByteSlice(96, 5),
-					Eth1Data: &zondpb.Eth1Data{
+					Zond1Data: &zondpb.Zond1Data{
 						DepositRoot:  test_helpers.FillByteSlice(32, 6),
 						DepositCount: 7,
 						BlockHash:    test_helpers.FillByteSlice(32, 8),
@@ -176,7 +176,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 										Root:  test_helpers.FillByteSlice(32, 42),
 									},
 								},
-								Signature: test_helpers.FillByteSlice(96, 43),
+								Signatures: test_helpers.FillByteSlice(96, 43),
 							},
 							Attestation_2: &zondpb.IndexedAttestation{
 								AttestingIndices: []uint64{44, 45},
@@ -193,7 +193,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 										Root:  test_helpers.FillByteSlice(32, 52),
 									},
 								},
-								Signature: test_helpers.FillByteSlice(96, 53),
+								Signatures: test_helpers.FillByteSlice(96, 53),
 							},
 						},
 						{
@@ -212,7 +212,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 										Root:  test_helpers.FillByteSlice(32, 62),
 									},
 								},
-								Signature: test_helpers.FillByteSlice(96, 63),
+								Signatures: test_helpers.FillByteSlice(96, 63),
 							},
 							Attestation_2: &zondpb.IndexedAttestation{
 								AttestingIndices: []uint64{64, 65},
@@ -229,7 +229,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 										Root:  test_helpers.FillByteSlice(32, 72),
 									},
 								},
-								Signature: test_helpers.FillByteSlice(96, 73),
+								Signatures: test_helpers.FillByteSlice(96, 73),
 							},
 						},
 					},
@@ -249,7 +249,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 									Root:  test_helpers.FillByteSlice(32, 81),
 								},
 							},
-							Signature: test_helpers.FillByteSlice(96, 82),
+							Signatures: test_helpers.FillByteSlice(96, 82),
 						},
 						{
 							AggregationBits: test_helpers.FillByteSlice(4, 83),
@@ -266,7 +266,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 									Root:  test_helpers.FillByteSlice(32, 90),
 								},
 							},
-							Signature: test_helpers.FillByteSlice(96, 91),
+							Signatures: test_helpers.FillByteSlice(96, 91),
 						},
 					},
 					Deposits: []*zondpb.Deposit{

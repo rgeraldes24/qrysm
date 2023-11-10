@@ -94,7 +94,7 @@ func Test_SignedBeaconBlock_Header(t *testing.T) {
 	bb := &BeaconBlockBody{
 		version:      version.Phase0,
 		randaoReveal: [dilithium2.CryptoBytes]byte{},
-		eth1Data: &zond.Eth1Data{
+		zond1Data: &zond.Zond1Data{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},
@@ -316,11 +316,11 @@ func Test_BeaconBlockBody_RandaoReveal(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.ToBytes96([]byte("randaoreveal")), bb.Block().Body().RandaoReveal())
 }
 
-func Test_BeaconBlockBody_Eth1Data(t *testing.T) {
-	e := &zond.Eth1Data{DepositRoot: []byte("depositroot")}
+func Test_BeaconBlockBody_Zond1Data(t *testing.T) {
+	e := &zond.Zond1Data{DepositRoot: []byte("depositroot")}
 	bb := &SignedBeaconBlock{block: &BeaconBlock{body: &BeaconBlockBody{}}}
-	bb.SetEth1Data(e)
-	assert.DeepEqual(t, e, bb.Block().Body().Eth1Data())
+	bb.SetZond1Data(e)
+	assert.DeepEqual(t, e, bb.Block().Body().Zond1Data())
 }
 
 func Test_BeaconBlockBody_Graffiti(t *testing.T) {
@@ -441,7 +441,7 @@ func hydrateBeaconBlockBody() *zond.BeaconBlockBody {
 	return &zond.BeaconBlockBody{
 		RandaoReveal: make([]byte, dilithium2.CryptoBytes),
 		Graffiti:     make([]byte, fieldparams.RootLength),
-		Eth1Data: &zond.Eth1Data{
+		Zond1Data: &zond.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		},

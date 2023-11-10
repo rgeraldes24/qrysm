@@ -748,7 +748,7 @@ func (a *IndexedAttestation) MarshalJSON() ([]byte, error) {
 	}{
 		AttestingIndices: indices,
 		Data:             &AttestationData{a.IndexedAttestation.Data},
-		Signature:        a.IndexedAttestation.Signature,
+		Signature:        a.IndexedAttestation.Signatures,
 	})
 }
 
@@ -820,7 +820,7 @@ func (a *Attestation) MarshalJSON() ([]byte, error) {
 	}{
 		AggregationBits: hexutil.Bytes(a.Attestation.AggregationBits),
 		Data:            &AttestationData{a.Attestation.Data},
-		Signature:       a.Attestation.Signature,
+		Signature:       a.Attestation.Signatures,
 	})
 }
 
@@ -904,21 +904,21 @@ type SyncAggregate struct {
 // MarshalJSON returns a JSON byte array representation of SyncAggregate.
 func (s *SyncAggregate) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		SyncCommitteeBits      hexutil.Bytes `json:"sync_committee_bits"`
-		SyncCommitteeSignature hexutil.Bytes `json:"sync_committee_signature"`
+		SyncCommitteeBits       hexutil.Bytes   `json:"sync_committee_bits"`
+		SyncCommitteeSignatures []hexutil.Bytes `json:"sync_committee_signatures"`
 	}{
-		SyncCommitteeBits:      hexutil.Bytes(s.SyncAggregate.SyncCommitteeBits),
-		SyncCommitteeSignature: s.SyncAggregate.SyncCommitteeSignature,
+		SyncCommitteeBits:       hexutil.Bytes(s.SyncAggregate.SyncCommitteeBits),
+		SyncCommitteeSignatures: s.SyncAggregate.SyncCommitteeSignatures,
 	})
 }
 
-// Eth1Data is a field of Beacon Block Body.
-type Eth1Data struct {
-	*zond.Eth1Data
+// Zond1Data is a field of Beacon Block Body.
+type Zond1Data struct {
+	*zond.Zond1Data
 }
 
-// MarshalJSON returns a JSON byte array representation of Eth1Data.
-func (e *Eth1Data) MarshalJSON() ([]byte, error) {
+// MarshalJSON returns a JSON byte array representation of Zond1Data.
+func (e *Zond1Data) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		DepositRoot  hexutil.Bytes `json:"deposit_root"`
 		DepositCount string        `json:"deposit_count"`
@@ -954,7 +954,7 @@ func (b *BlindedBeaconBlockBodyBellatrix) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(struct {
 		RandaoReveal           hexutil.Bytes           `json:"randao_reveal"`
-		Eth1Data               *Eth1Data               `json:"eth1_data"`
+		Zond1Data              *Zond1Data              `json:"zond1_data"`
 		Graffiti               hexutil.Bytes           `json:"graffiti"`
 		ProposerSlashings      []*ProposerSlashing     `json:"proposer_slashings"`
 		AttesterSlashings      []*AttesterSlashing     `json:"attester_slashings"`
@@ -965,7 +965,7 @@ func (b *BlindedBeaconBlockBodyBellatrix) MarshalJSON() ([]byte, error) {
 		ExecutionPayloadHeader *ExecutionPayloadHeader `json:"execution_payload_header"`
 	}{
 		RandaoReveal:           b.RandaoReveal,
-		Eth1Data:               &Eth1Data{b.BlindedBeaconBlockBodyBellatrix.Eth1Data},
+		Zond1Data:              &Zond1Data{b.BlindedBeaconBlockBodyBellatrix.Zond1Data},
 		Graffiti:               b.BlindedBeaconBlockBodyBellatrix.Graffiti,
 		ProposerSlashings:      pros,
 		AttesterSlashings:      atsl,
@@ -1082,7 +1082,7 @@ func (b *BlindedBeaconBlockBodyCapella) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(struct {
 		RandaoReveal                hexutil.Bytes                       `json:"randao_reveal"`
-		Eth1Data                    *Eth1Data                           `json:"eth1_data"`
+		Zond1Data                   *Zond1Data                          `json:"zond1_data"`
 		Graffiti                    hexutil.Bytes                       `json:"graffiti"`
 		ProposerSlashings           []*ProposerSlashing                 `json:"proposer_slashings"`
 		AttesterSlashings           []*AttesterSlashing                 `json:"attester_slashings"`
@@ -1094,7 +1094,7 @@ func (b *BlindedBeaconBlockBodyCapella) MarshalJSON() ([]byte, error) {
 		ExecutionPayloadHeader      *ExecutionPayloadHeaderCapella      `json:"execution_payload_header"`
 	}{
 		RandaoReveal:                b.RandaoReveal,
-		Eth1Data:                    &Eth1Data{b.Eth1Data},
+		Zond1Data:                   &Zond1Data{b.Zond1Data},
 		Graffiti:                    b.Graffiti,
 		ProposerSlashings:           pros,
 		AttesterSlashings:           atsl,

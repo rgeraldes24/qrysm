@@ -53,7 +53,7 @@ type Server struct {
 	BlockFetcher           execution.POWBlockFetcher
 	DepositFetcher         depositcache.DepositFetcher
 	ChainStartFetcher      execution.ChainStartFetcher
-	Eth1InfoFetcher        execution.ChainInfoFetcher
+	Zond1InfoFetcher       execution.ChainInfoFetcher
 	OptimisticModeFetcher  blockchain.OptimisticModeFetcher
 	SyncChecker            sync.Checker
 	StateNotifier          statefeed.Notifier
@@ -64,8 +64,8 @@ type Server struct {
 	ExitPool               voluntaryexits.PoolManager
 	SyncCommitteePool      synccommittee.Pool
 	BlockReceiver          blockchain.BlockReceiver
-	MockEth1Votes          bool
-	Eth1BlockFetcher       execution.POWBlockFetcher
+	MockZond1Votes         bool
+	Zond1BlockFetcher      execution.POWBlockFetcher
 	PendingDepositsFetcher depositcache.PendingDepositsFetcher
 	OperationNotifier      opfeed.Notifier
 	StateGen               stategen.StateManager

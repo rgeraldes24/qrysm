@@ -355,11 +355,11 @@ func (s *Service) startFromExecutionChain() error {
 	return nil
 }
 
-// onExecutionChainStart initializes a series of deposits from the ChainStart deposits in the eth1
+// onExecutionChainStart initializes a series of deposits from the ChainStart deposits in the zond1
 // deposit contract, initializes the beacon chain's state, and kicks off the beacon chain.
 func (s *Service) onExecutionChainStart(ctx context.Context, genesisTime time.Time) {
 	preGenesisState := s.cfg.ChainStartFetcher.PreGenesisState()
-	initializedState, err := s.initializeBeaconChain(ctx, genesisTime, preGenesisState, s.cfg.ChainStartFetcher.ChainStartEth1Data())
+	initializedState, err := s.initializeBeaconChain(ctx, genesisTime, preGenesisState, s.cfg.ChainStartFetcher.ChainStartZond1Data())
 	if err != nil {
 		log.WithError(err).Fatal("Could not initialize beacon chain")
 	}
@@ -383,13 +383,13 @@ func (s *Service) initializeBeaconChain(
 	ctx context.Context,
 	genesisTime time.Time,
 	preGenesisState state.BeaconState,
-	eth1data *zondpb.Eth1Data) (state.BeaconState, error) {
+	zond1data *zondpb.Zond1Data) (state.BeaconState, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon-chain.Service.initializeBeaconChain")
 	defer span.End()
 	s.genesisTime = genesisTime
 	unixTime := uint64(genesisTime.Unix())
 
-	genesisState, err := transition.OptimizedGenesisBeaconState(unixTime, preGenesisState, eth1data)
+	genesisState, err := transition.OptimizedGenesisBeaconState(unixTime, preGenesisState, zond1data)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize genesis state")
 	}

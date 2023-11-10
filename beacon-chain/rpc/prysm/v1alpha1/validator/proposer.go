@@ -33,13 +33,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// eth1DataNotification is a latch to stop flooding logs with the same warning.
-var eth1DataNotification bool
+// zond1DataNotification is a latch to stop flooding logs with the same warning.
+var zond1DataNotification bool
 
 const (
 	// CouldNotDecodeBlock means that a signed beacon block couldn't be created from the block present in the request.
 	CouldNotDecodeBlock = "Could not decode block"
-	eth1dataTimeout     = 2 * time.Second
+	zond1dataTimeout    = 2 * time.Second
 )
 
 // GetBeaconBlock is called by a proposer during its assigned slot to request a block to sign
@@ -109,16 +109,16 @@ func (vs *Server) GetBeaconBlock(ctx context.Context, req *zondpb.BlockRequest) 
 			return nil, errors.Wrap(err, "could not build block in parallel")
 		}
 	} else {
-		// Set eth1 data.
-		eth1Data, err := vs.eth1DataMajorityVote(ctx, head)
+		// Set zond1 data.
+		zond1Data, err := vs.zond1DataMajorityVote(ctx, head)
 		if err != nil {
-			eth1Data = &zondpb.Eth1Data{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
-			log.WithError(err).Error("Could not get eth1data")
+			zond1Data = &zondpb.Zond1Data{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
+			log.WithError(err).Error("Could not get zond1data")
 		}
-		sBlk.SetEth1Data(eth1Data)
+		sBlk.SetZond1Data(zond1Data)
 
 		// Set deposit and attestation.
-		deposits, atts, err := vs.packDepositsAndAttestations(ctx, head, eth1Data) // TODO: split attestations and deposits
+		deposits, atts, err := vs.packDepositsAndAttestations(ctx, head, zond1Data) // TODO: split attestations and deposits
 		if err != nil {
 			sBlk.SetDeposits([]*zondpb.Deposit{})
 			sBlk.SetAttestations([]*zondpb.Attestation{})
@@ -198,16 +198,16 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 	go func() {
 		defer wg.Done()
 
-		// Set eth1 data.
-		eth1Data, err := vs.eth1DataMajorityVote(ctx, head)
+		// Set zond1 data.
+		zond1Data, err := vs.zond1DataMajorityVote(ctx, head)
 		if err != nil {
-			eth1Data = &zondpb.Eth1Data{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
-			log.WithError(err).Error("Could not get eth1data")
+			zond1Data = &zondpb.Zond1Data{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
+			log.WithError(err).Error("Could not get zond1data")
 		}
-		sBlk.SetEth1Data(eth1Data)
+		sBlk.SetZond1Data(zond1Data)
 
 		// Set deposit and attestation.
-		deposits, atts, err := vs.packDepositsAndAttestations(ctx, head, eth1Data) // TODO: split attestations and deposits
+		deposits, atts, err := vs.packDepositsAndAttestations(ctx, head, zond1Data) // TODO: split attestations and deposits
 		if err != nil {
 			sBlk.SetDeposits([]*zondpb.Deposit{})
 			sBlk.SetAttestations([]*zondpb.Attestation{})

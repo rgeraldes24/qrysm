@@ -1,5 +1,5 @@
 // Package interopcoldstart allows for spinning up a deterministic-genesis
-// local chain without the need for eth1 deposits useful for
+// local chain without the need for zond1 deposits useful for
 // local client development and interoperability testing.
 package interopcoldstart
 
@@ -118,9 +118,9 @@ func (_ *Service) AllDeposits(_ context.Context, _ *big.Int) []*zondpb.Deposit {
 	return []*zondpb.Deposit{}
 }
 
-// ChainStartEth1Data mocks out the powchain functionality for interop.
-func (_ *Service) ChainStartEth1Data() *zondpb.Eth1Data {
-	return &zondpb.Eth1Data{}
+// ChainStartZond1Data mocks out the powchain functionality for interop.
+func (_ *Service) ChainStartZond1Data() *zondpb.Zond1Data {
+	return &zondpb.Zond1Data{}
 }
 
 // PreGenesisState returns an empty beacon state.

@@ -1,4 +1,4 @@
-package eth1
+package zond1
 
 import (
 	"context"
@@ -135,11 +135,11 @@ func NewProxy(index int) *Proxy {
 
 // Start runs a proxy.
 func (node *Proxy) Start(ctx context.Context) error {
-	f, err := os.Create(path.Join(e2e.TestParams.LogPath, "eth1_proxy_"+strconv.Itoa(node.index)+".log"))
+	f, err := os.Create(path.Join(e2e.TestParams.LogPath, "zond1_proxy_"+strconv.Itoa(node.index)+".log"))
 	if err != nil {
 		return err
 	}
-	jwtPath := path.Join(e2e.TestParams.TestPath, "eth1data/"+strconv.Itoa(node.index)+"/")
+	jwtPath := path.Join(e2e.TestParams.TestPath, "zond1data/"+strconv.Itoa(node.index)+"/")
 	if node.index == 0 {
 		jwtPath = path.Join(e2e.TestParams.TestPath, "zond1data/miner/")
 	}
@@ -149,8 +149,8 @@ func (node *Proxy) Start(ctx context.Context) error {
 		return err
 	}
 	opts := []proxy.Option{
-		proxy.WithDestinationAddress(fmt.Sprintf("http://127.0.0.1:%d", e2e.TestParams.Ports.Eth1AuthRPCPort+node.index)),
-		proxy.WithPort(e2e.TestParams.Ports.Eth1ProxyPort + node.index),
+		proxy.WithDestinationAddress(fmt.Sprintf("http://127.0.0.1:%d", e2e.TestParams.Ports.Zond1AuthRPCPort+node.index)),
+		proxy.WithPort(e2e.TestParams.Ports.Zond1ProxyPort + node.index),
 		proxy.WithLogger(log.New()),
 		proxy.WithLogFile(f),
 		proxy.WithJwtSecret(string(secret)),
@@ -159,7 +159,7 @@ func (node *Proxy) Start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	log.Infof("Starting eth1 proxy %d with port: %d and file %s", node.index, e2e.TestParams.Ports.Eth1ProxyPort+node.index, f.Name())
+	log.Infof("Starting zond1 proxy %d with port: %d and file %s", node.index, e2e.TestParams.Ports.Zond1ProxyPort+node.index, f.Name())
 
 	// Set cancel into context.
 	ctx, cancel := context.WithCancel(ctx)
@@ -170,7 +170,7 @@ func (node *Proxy) Start(ctx context.Context) error {
 	return nProxy.Start(ctx)
 }
 
-// Started checks whether the eth1 proxy is started and ready to be queried.
+// Started checks whether the zond1 proxy is started and ready to be queried.
 func (node *Proxy) Started() <-chan struct{} {
 	return node.started
 }

@@ -66,7 +66,7 @@ func TestConfigureProofOfWork(t *testing.T) {
 	require.NoError(t, set.Set(flags.DepositContractFlag.Name, "deposit-contract"))
 	cliCtx := cli.NewContext(&app, set, nil)
 
-	require.NoError(t, configureEth1Config(cliCtx))
+	require.NoError(t, configureZond1Config(cliCtx))
 
 	assert.Equal(t, uint64(100), params.BeaconConfig().DepositChainID)
 	assert.Equal(t, uint64(200), params.BeaconConfig().DepositNetworkID)
@@ -192,8 +192,8 @@ func TestConfigureInterop(t *testing.T) {
 			func() *cli.Context {
 				app := cli.App{}
 				set := flag.NewFlagSet("test", 0)
-				set.Bool(flags.InteropMockEth1DataVotesFlag.Name, false, "")
-				assert.NoError(t, set.Set(flags.InteropMockEth1DataVotesFlag.Name, "true"))
+				set.Bool(flags.InteropMockZond1DataVotesFlag.Name, false, "")
+				assert.NoError(t, set.Set(flags.InteropMockZond1DataVotesFlag.Name, "true"))
 				return cli.NewContext(&app, set, nil)
 			},
 			"interop",

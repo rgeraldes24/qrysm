@@ -43,9 +43,9 @@ func TestGetAttesterDuties(t *testing.T) {
 	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(deposits))
+	zond1Data, err := util.DeterministicZond1Data(len(deposits))
 	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
 	require.NoError(t, err, "Could not set up genesis state")
 	// Set state to non-epoch start slot.
 	require.NoError(t, bs.SetSlot(5))
@@ -216,7 +216,7 @@ func TestGetProposerDuties(t *testing.T) {
 	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(deposits))
+	zond1Data, err := util.DeterministicZond1Data(len(deposits))
 	require.NoError(t, err)
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
@@ -232,7 +232,7 @@ func TestGetProposerDuties(t *testing.T) {
 	}
 
 	t.Run("Ok", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
 		require.NoError(t, err, "Could not set up genesis state")
 		require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 		require.NoError(t, bs.SetBlockRoots(roots))
@@ -272,7 +272,7 @@ func TestGetProposerDuties(t *testing.T) {
 	})
 
 	t.Run("Next epoch", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
 		require.NoError(t, err, "Could not set up genesis state")
 		require.NoError(t, bs.SetBlockRoots(roots))
 		chainSlot := primitives.Slot(0)
@@ -311,7 +311,7 @@ func TestGetProposerDuties(t *testing.T) {
 	})
 
 	t.Run("Prune payload ID cache ok", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
 		require.NoError(t, err, "Could not set up genesis state")
 		require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 		require.NoError(t, bs.SetBlockRoots(roots))
@@ -350,7 +350,7 @@ func TestGetProposerDuties(t *testing.T) {
 	})
 
 	t.Run("Epoch out of bound", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
 		require.NoError(t, err, "Could not set up genesis state")
 		// Set state to non-epoch start slot.
 		require.NoError(t, bs.SetSlot(5))
@@ -378,7 +378,7 @@ func TestGetProposerDuties(t *testing.T) {
 	})
 
 	t.Run("execution optimistic", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
 		require.NoError(t, err, "Could not set up genesis state")
 		// Set state to non-epoch start slot.
 		require.NoError(t, bs.SetSlot(5))
@@ -1310,9 +1310,9 @@ func TestSubmitBeaconCommitteeSubscription(t *testing.T) {
 	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(deposits))
+	zond1Data, err := util.DeterministicZond1Data(len(deposits))
 	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
 	require.NoError(t, err, "Could not set up genesis state")
 	// Set state to non-epoch start slot.
 	require.NoError(t, bs.SetSlot(5))
@@ -1456,9 +1456,9 @@ func TestSubmitSyncCommitteeSubscription(t *testing.T) {
 	genesis := util.NewBeaconBlock()
 	deposits, _, err := util.DeterministicDepositsAndKeys(64)
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(deposits))
+	zond1Data, err := util.DeterministicZond1Data(len(deposits))
 	require.NoError(t, err)
-	bs, err := util.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+	bs, err := util.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
 	require.NoError(t, err, "Could not set up genesis state")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")

@@ -97,7 +97,7 @@ func generateSignedAggregateAndProofJson() *zondpb.SignedAggregateAttestationAnd
 						Root:  test_helpers.FillByteSlice(32, 81),
 					},
 				},
-				Signature: test_helpers.FillByteSlice(96, 82),
+				Signatures: test_helpers.FillByteSlice(96, 82),
 			},
 			SelectionProof: test_helpers.FillByteSlice(96, 82),
 		},

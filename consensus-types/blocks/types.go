@@ -39,7 +39,7 @@ type BeaconBlockBody struct {
 	version                     int
 	isBlinded                   bool
 	randaoReveal                [dilithium2.CryptoBytes]byte
-	eth1Data                    *zond.Eth1Data
+	zond1Data                   *zond.Zond1Data
 	graffiti                    [field_params.RootLength]byte
 	proposerSlashings           []*zond.ProposerSlashing
 	attesterSlashings           []*zond.AttesterSlashing

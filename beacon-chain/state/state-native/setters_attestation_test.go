@@ -47,7 +47,7 @@ func TestAppendBeyondIndicesLimit(t *testing.T) {
 		CurrentEpochAttestations:  []*zondpb.PendingAttestation{{Data: &zondpb.AttestationData{Slot: 456}}},
 		PreviousEpochAttestations: []*zondpb.PendingAttestation{{Data: &zondpb.AttestationData{Slot: 123}}},
 		Validators:                []*zondpb.Validator{},
-		Eth1Data:                  &zondpb.Eth1Data{},
+		Zond1Data:                 &zondpb.Zond1Data{},
 		BlockRoots:                mockblockRoots,
 		StateRoots:                mockstateRoots,
 		RandaoMixes:               mockrandaoMixes,

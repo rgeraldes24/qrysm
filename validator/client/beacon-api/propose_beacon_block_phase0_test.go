@@ -37,7 +37,7 @@ func TestProposeBeaconBlock_Phase0(t *testing.T) {
 				Attestations:      jsonifyAttestations(phase0Block.Phase0.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(phase0Block.Phase0.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(phase0Block.Phase0.Block.Body.Deposits),
-				Eth1Data:          jsonifyEth1Data(phase0Block.Phase0.Block.Body.Eth1Data),
+				Zond1Data:         jsonifyZond1Data(phase0Block.Phase0.Block.Body.Zond1Data),
 				Graffiti:          hexutil.Encode(phase0Block.Phase0.Block.Body.Graffiti),
 				ProposerSlashings: jsonifyProposerSlashings(phase0Block.Phase0.Block.Body.ProposerSlashings),
 				RandaoReveal:      hexutil.Encode(phase0Block.Phase0.Block.Body.RandaoReveal),
@@ -77,7 +77,7 @@ func generateSignedPhase0Block() *zondpb.GenericSignedBeaconBlock_Phase0 {
 	return &zondpb.GenericSignedBeaconBlock_Phase0{
 		Phase0: &zondpb.SignedBeaconBlock{
 			Block:     test_helpers.GenerateProtoPhase0BeaconBlock(),
-			Signature: test_helpers.FillByteSlice(96, 110),
+			Signature: test_helpers.FillByteSlice(4595, 110),
 		},
 	}
 }

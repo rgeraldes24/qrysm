@@ -105,7 +105,7 @@ func V1Alpha1IndexedAttToV1(v1alpha1Att *zondpbalpha.IndexedAttestation) *zondpb
 	return &zondpbv1.IndexedAttestation{
 		AttestingIndices: v1alpha1Att.AttestingIndices,
 		Data:             V1Alpha1AttDataToV1(v1alpha1Att.Data),
-		Signature:        v1alpha1Att.Signature,
+		Signatures:       v1alpha1Att.Signatures,
 	}
 }
 
@@ -117,7 +117,7 @@ func V1Alpha1AttestationToV1(v1alpha1Att *zondpbalpha.Attestation) *zondpbv1.Att
 	return &zondpbv1.Attestation{
 		AggregationBits: v1alpha1Att.AggregationBits,
 		Data:            V1Alpha1AttDataToV1(v1alpha1Att.Data),
-		Signature:       v1alpha1Att.Signature,
+		Signatures:      v1alpha1Att.Signatures,
 	}
 }
 
@@ -129,7 +129,7 @@ func V1AttestationToV1Alpha1(v1Att *zondpbv1.Attestation) *zondpbalpha.Attestati
 	return &zondpbalpha.Attestation{
 		AggregationBits: v1Att.AggregationBits,
 		Data:            V1AttDataToV1Alpha1(v1Att.Data),
-		Signature:       v1Att.Signature,
+		Signatures:      v1Att.Signatures,
 	}
 }
 
@@ -245,7 +245,7 @@ func V1AttToV1Alpha1(v1Att *zondpbv1.Attestation) *zondpbalpha.Attestation {
 	return &zondpbalpha.Attestation{
 		AggregationBits: v1Att.AggregationBits,
 		Data:            V1AttDataToV1Alpha1(v1Att.Data),
-		Signature:       v1Att.Signature,
+		Signatures:      v1Att.Signatures,
 	}
 }
 
@@ -257,7 +257,7 @@ func V1IndexedAttToV1Alpha1(v1Att *zondpbv1.IndexedAttestation) *zondpbalpha.Ind
 	return &zondpbalpha.IndexedAttestation{
 		AttestingIndices: v1Att.AttestingIndices,
 		Data:             V1AttDataToV1Alpha1(v1Att.Data),
-		Signature:        v1Att.Signature,
+		Signatures:       v1Att.Signatures,
 	}
 }
 
@@ -359,8 +359,8 @@ func SignedBeaconBlock(block interfaces.ReadOnlySignedBeaconBlock) (*zondpbv1.Si
 func BeaconStateToProto(state state.BeaconState) (*zondpbv1.BeaconState, error) {
 	sourceFork := state.Fork()
 	sourceLatestBlockHeader := state.LatestBlockHeader()
-	sourceEth1Data := state.Eth1Data()
-	sourceEth1DataVotes := state.Eth1DataVotes()
+	sourceZond1Data := state.Zond1Data()
+	sourceZond1DataVotes := state.Zond1DataVotes()
 	sourceValidators := state.Validators()
 	sourcePrevEpochAtts, err := state.PreviousEpochAttestations()
 	if err != nil {
@@ -375,9 +375,9 @@ func BeaconStateToProto(state state.BeaconState) (*zondpbv1.BeaconState, error) 
 	sourceCurrJustifiedCheckpoint := state.CurrentJustifiedCheckpoint()
 	sourceFinalizedCheckpoint := state.FinalizedCheckpoint()
 
-	resultEth1DataVotes := make([]*zondpbv1.Eth1Data, len(sourceEth1DataVotes))
-	for i, vote := range sourceEth1DataVotes {
-		resultEth1DataVotes[i] = &zondpbv1.Eth1Data{
+	resultZond1DataVotes := make([]*zondpbv1.Zond1Data, len(sourceZond1DataVotes))
+	for i, vote := range sourceZond1DataVotes {
+		resultZond1DataVotes[i] = &zondpbv1.Zond1Data{
 			DepositRoot:  bytesutil.SafeCopyBytes(vote.DepositRoot),
 			DepositCount: vote.DepositCount,
 			BlockHash:    bytesutil.SafeCopyBytes(vote.BlockHash),
@@ -464,13 +464,13 @@ func BeaconStateToProto(state state.BeaconState) (*zondpbv1.BeaconState, error) 
 		BlockRoots:      bytesutil.SafeCopy2dBytes(state.BlockRoots()),
 		StateRoots:      bytesutil.SafeCopy2dBytes(state.StateRoots()),
 		HistoricalRoots: bytesutil.SafeCopy2dBytes(hRoot),
-		Eth1Data: &zondpbv1.Eth1Data{
-			DepositRoot:  bytesutil.SafeCopyBytes(sourceEth1Data.DepositRoot),
-			DepositCount: sourceEth1Data.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(sourceEth1Data.BlockHash),
+		Zond1Data: &zondpbv1.Zond1Data{
+			DepositRoot:  bytesutil.SafeCopyBytes(sourceZond1Data.DepositRoot),
+			DepositCount: sourceZond1Data.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(sourceZond1Data.BlockHash),
 		},
-		Eth1DataVotes:             resultEth1DataVotes,
-		Eth1DepositIndex:          state.Eth1DepositIndex(),
+		Zond1DataVotes:            resultZond1DataVotes,
+		Zond1DepositIndex:         state.Zond1DepositIndex(),
 		Validators:                resultValidators,
 		Balances:                  state.Balances(),
 		RandaoMixes:               bytesutil.SafeCopy2dBytes(state.RandaoMixes()),

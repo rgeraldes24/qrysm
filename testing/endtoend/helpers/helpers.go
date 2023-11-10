@@ -380,7 +380,7 @@ func WaitOnNodes(ctx context.Context, nodes []e2etypes.ComponentRunner, nodesSta
 }
 
 func MinerRPCClient() (*zondclient.Client, error) {
-	client, err := rpc.DialHTTP(e2e.TestParams.Eth1RPCURL(e2e.MinerComponentOffset).String())
+	client, err := rpc.DialHTTP(e2e.TestParams.Zond1RPCURL(e2e.MinerComponentOffset).String())
 	if err != nil {
 		return nil, err
 	}

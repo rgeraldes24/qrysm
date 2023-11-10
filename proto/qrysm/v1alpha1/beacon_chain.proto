@@ -289,7 +289,7 @@ message ValidatorChangeSet {
     // Action (add/remove/set).
     SetAction action = 1;
 
-    // 48 byte BLS public keys of validators on which the operation occurs.
+    // 2592 byte Dilithium public keys of validators on which the operation occurs.
     repeated bytes public_keys = 2;
 }
 
@@ -401,7 +401,7 @@ message ListBeaconBlocksResponse {
 
 // A container that contains both the beacon block, its corresponding root, and
 // whether or not it is canonical in the chain. This message returns a oneof field
-// representing either a phase 0 beacon block or an Altair beacon block.
+// representing either a phase 0 beacon block or other post-fork block.
 message BeaconBlockContainer {
     // 32 byte merkle tree root of contained beacon block.
     bytes block_root = 1;
@@ -411,23 +411,11 @@ message BeaconBlockContainer {
 
     // The desired block to be returned.
     oneof block {
-        // Representing a phase 0 block.
-        SignedBeaconBlock phase0_block = 3;
-
-        // Representing an altair block.
-        SignedBeaconBlockAltair altair_block = 4;
-
-        // Representing a bellatrix block.
-        SignedBeaconBlockBellatrix bellatrix_block = 5;
-
-        // Representing a blinded bellatrix block.
-        SignedBlindedBeaconBlockBellatrix blinded_bellatrix_block = 6;
-
         // Representing a capella block.
-        SignedBeaconBlockCapella capella_block = 7;
+        SignedBeaconBlock capella_block = 1;
 
         // Representing a blinded capella block.
-        SignedBlindedBeaconBlockCapella blinded_capella_block = 8;
+        SignedBlindedBeaconBlock blinded_capella_block = 2;
     }
 }
 
@@ -513,9 +501,9 @@ message ListValidatorBalancesRequest {
         bool genesis = 2;
     }
 
-    // Validator 48 byte BLS public keys to filter validators for the given
+    // Validator 2592 byte Dilithium public keys to filter validators for the given
     // epoch.
-    repeated bytes public_keys = 3 [(theqrl.zond.ext.ssz_size) = "?,48"];
+    repeated bytes public_keys = 3 [(theqrl.zond.ext.ssz_size) = "?,2592"];
     // Validator indices to filter validators for the given epoch.
     repeated uint64 indices = 4 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
 
@@ -534,7 +522,7 @@ message ValidatorBalances {
     uint64 epoch = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
 
     message Balance {
-        // Validator's 48 byte BLS public key.
+        // Validator's 2592 byte Dilithium public key.
         bytes public_key = 1 [(theqrl.zond.ext.ssz_size) = "2592"];
 
         // Validator's index in the validator set.
@@ -594,7 +582,7 @@ message GetValidatorRequest {
         // Validator index in the registry.
         uint64 index = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
 
-        // 48 byte validator public key.
+        // 2592 byte validator public key.
         bytes public_key = 2 [(theqrl.zond.ext.ssz_size) = "2592"];
     }
 }
@@ -636,33 +624,33 @@ message ActiveSetChanges {
     // set.
     uint64 epoch = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
 
-    // 48 byte validator public keys that have been activated in the given epoch.
-    repeated bytes activated_public_keys = 2 [(theqrl.zond.ext.ssz_size) = "?,48"];
+    // 2592 byte validator public keys that have been activated in the given epoch.
+    repeated bytes activated_public_keys = 2 [(theqrl.zond.ext.ssz_size) = "?,2592"];
 
     // Indices of validators activated in the given epoch.
     repeated uint64 activated_indices = 3 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
 
-    // 48 byte validator public keys that have been voluntarily exited in the given epoch.
-    repeated bytes exited_public_keys = 4 [(theqrl.zond.ext.ssz_size) = "?,48"];
+    // 2592 byte validator public keys that have been voluntarily exited in the given epoch.
+    repeated bytes exited_public_keys = 4 [(theqrl.zond.ext.ssz_size) = "?,2592"];
 
     // Indices of validators exited in the given epoch.
     repeated uint64 exited_indices = 5 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
 
-    // 48 byte validator public keys that have been slashed in the given epoch.
-    repeated bytes slashed_public_keys = 6 [(theqrl.zond.ext.ssz_size) = "?,48"];
+    // 2592 byte validator public keys that have been slashed in the given epoch.
+    repeated bytes slashed_public_keys = 6 [(theqrl.zond.ext.ssz_size) = "?,2592"];
 
     // Indices of validators slashed in the given epoch.
     repeated uint64 slashed_indices = 7 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
 
-    // 48 byte validator public keys that have been involuntarily ejected in this epoch.
-    repeated bytes ejected_public_keys = 8 [(theqrl.zond.ext.ssz_size) = "?,48"];
+    // 2592 byte validator public keys that have been involuntarily ejected in this epoch.
+    repeated bytes ejected_public_keys = 8 [(theqrl.zond.ext.ssz_size) = "?,2592"];
 
     // Indices of validators ejected in the given epoch.
     repeated uint64 ejected_indices = 9 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
 }
 
 message ValidatorPerformanceRequest {
-    // A list of 48 byte validator public keys.
+    // A list of 2592 byte validator public keys.
     repeated bytes public_keys = 1 [deprecated = true];
     // A list of validator indices to retrieve performance by their indices.
     repeated uint64 indices = 2 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
@@ -672,14 +660,8 @@ message ValidatorPerformanceResponse {
     // A list of validator effective balances mapped 1-to-1 with the request's
     // public keys.
     repeated uint64 current_effective_balances = 1;
-    // The slot of when validator's attestation got included in the chain at previous epoch, the slot
-    // is mapped 1-to-1 with the request's public keys.
-    // Deprecated: This field can no longer be fetched from the beacon state after the Altair hard fork.
-    repeated uint64 inclusion_slots = 2 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot", deprecated = true];
     // The distance of when validator submitted and got included in the chain, the distance
     // is mapped 1-to-1 with the request's public keys.
-    // Deprecated: This field can no longer be fetched from the beacon state after the Altair hard fork.
-    repeated uint64 inclusion_distances = 3 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot", deprecated = true];
     // Whether the list of validator recently correctly voted for source at previous epoch, the result
     // is mapped 1-to-1 with the request's public keys.
     repeated bool correctly_voted_source = 4;
@@ -701,8 +683,8 @@ message ValidatorPerformanceResponse {
     // The average active validator balance in the beacon chain.
     float average_active_validator_balance = 10;
     // The public keys in the order they are in of the response.
-    repeated bytes public_keys = 11 [(theqrl.zond.ext.ssz_size) = "?,48"];
-    // The inactivity score of the validator tracks validator participation. [New in Altair]
+    repeated bytes public_keys = 11 [(theqrl.zond.ext.ssz_size) = "?,2592"];
+    // The inactivity score of the validator tracks validator participation.
     repeated uint64 inactivity_scores = 12;
 }
 
@@ -713,13 +695,13 @@ message ValidatorQueue {
     // validator set.
     uint64 churn_limit = 1;
 
-    // Ordered list of 48 byte public keys awaiting activation. 0th index is the
+    // Ordered list of 2592 byte public keys awaiting activation. 0th index is the
     // next key to be processed.
-    repeated bytes activation_public_keys = 2 [(theqrl.zond.ext.ssz_size) = "?,48", deprecated = true];
+    repeated bytes activation_public_keys = 2 [(theqrl.zond.ext.ssz_size) = "?,2592", deprecated = true];
 
     // Ordered list of public keys awaiting exit. 0th index is the next key to
     // be processed.
-    repeated bytes exit_public_keys = 3 [(theqrl.zond.ext.ssz_size) = "?,48", deprecated = true];
+    repeated bytes exit_public_keys = 3 [(theqrl.zond.ext.ssz_size) = "?,2592", deprecated = true];
 
     // Ordered list of validator indices awaiting activation. 0th item in the list is the
     // next validator index to be processed.
@@ -738,8 +720,8 @@ message ListValidatorAssignmentsRequest {
         // Whether or not to query for the genesis information.
         bool genesis = 2;
     }
-    // 48 byte validator public keys to filter assignments for the given epoch.
-    repeated bytes public_keys = 3 [(theqrl.zond.ext.ssz_size) = "?,48"];
+    // 2592 byte validator public keys to filter assignments for the given epoch.
+    repeated bytes public_keys = 3 [(theqrl.zond.ext.ssz_size) = "?,2592"];
     // Validator indices to filter assignments for the given epoch.
     repeated uint64 indices = 4 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
 
@@ -772,7 +754,7 @@ message ValidatorAssignments {
         // duty as a proposer.
         repeated uint64 proposer_slots = 4 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
 
-        // 48 byte BLS public key.
+        // 2592 byte Dilithium public key.
         bytes public_key = 5 [(theqrl.zond.ext.ssz_size) = "2592", deprecated = true];
 
         // Validator index in the beacon state.
@@ -843,7 +825,7 @@ message AttestationPoolResponse {
 }
 
 // Information about the configuration parameters of the beacon node, such
-// as the slots per epoch, slots per eth1 voting period, and more.
+// as the slots per epoch, slots per zond1 voting period, and more.
 message BeaconConfig {
     map<string, string> config = 1;
 }
@@ -857,7 +839,7 @@ message SubmitSlashingResponse {
 message IndividualVotesRequest {
     // Epoch of the request.
     uint64 epoch = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
-    // Validator 48 byte BLS public keys to filter validators for the given epoch.
+    // Validator 2592 byte Dilithium public keys to filter validators for the given epoch.
     repeated bytes public_keys = 2;
     // Validator indices to filter validators for the given epoch.
     repeated uint64 indices = 3 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
@@ -895,7 +877,7 @@ message IndividualVotesRespond {
         uint64 inclusion_slot = 14 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot", deprecated = true];
         // How many slots have passed until the validator's attestation got included in the block. Only available in phase0.
         uint64 inclusion_distance = 15 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot", deprecated = true];
-        // The inactivity score of the validator tracks validator participation. [New in Altair]
+        // The inactivity score of the validator tracks validator participation.
         uint64 inactivity_score = 16;
     }
 

@@ -1,4 +1,4 @@
-// Package testing provides useful mocks for an eth1 powchain
+// Package testing provides useful mocks for an zond1 powchain
 // service as needed by unit tests for the beacon node.
 package testing
 
@@ -30,8 +30,8 @@ type Chain struct {
 	HashesByHeight    map[int][]byte
 	TimesByHeight     map[int]uint64
 	BlockNumberByTime map[uint64]*big.Int
-	Eth1Data          *zondpb.Eth1Data
-	GenesisEth1Block  *big.Int
+	Zond1Data         *zondpb.Zond1Data
+	GenesisZond1Block *big.Int
 	GenesisState      state.BeaconState
 	CurrEndpoint      string
 	CurrError         error
@@ -53,7 +53,7 @@ func New() *Chain {
 
 // GenesisExecutionChainInfo --
 func (m *Chain) GenesisExecutionChainInfo() (uint64, *big.Int) {
-	blk := m.GenesisEth1Block
+	blk := m.GenesisZond1Block
 	if blk == nil {
 		blk = big.NewInt(GenesisTime)
 	}
@@ -104,9 +104,9 @@ func (m *Chain) BlockByTimestamp(_ context.Context, time uint64) (*types.HeaderI
 	return &types.HeaderInfo{Number: chosenNumber, Time: chosenTime}, nil
 }
 
-// ChainStartEth1Data --
-func (m *Chain) ChainStartEth1Data() *zondpb.Eth1Data {
-	return m.Eth1Data
+// ChainStartZond1Data --
+func (m *Chain) ChainStartZond1Data() *zondpb.Zond1Data {
+	return m.Zond1Data
 }
 
 // PreGenesisState --

@@ -62,11 +62,11 @@ func (x PeerDirection) String() string {
 }
 
 func (PeerDirection) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_prysm_v1alpha1_node_proto_enumTypes[0].Descriptor()
+	return file_proto_qrysm_v1alpha1_node_proto_enumTypes[0].Descriptor()
 }
 
 func (PeerDirection) Type() protoreflect.EnumType {
-	return &file_proto_prysm_v1alpha1_node_proto_enumTypes[0]
+	return &file_proto_qrysm_v1alpha1_node_proto_enumTypes[0]
 }
 
 func (x PeerDirection) Number() protoreflect.EnumNumber {
@@ -75,7 +75,7 @@ func (x PeerDirection) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use PeerDirection.Descriptor instead.
 func (PeerDirection) EnumDescriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_node_proto_rawDescGZIP(), []int{0}
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{0}
 }
 
 type ConnectionState int32
@@ -114,11 +114,11 @@ func (x ConnectionState) String() string {
 }
 
 func (ConnectionState) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_prysm_v1alpha1_node_proto_enumTypes[1].Descriptor()
+	return file_proto_qrysm_v1alpha1_node_proto_enumTypes[1].Descriptor()
 }
 
 func (ConnectionState) Type() protoreflect.EnumType {
-	return &file_proto_prysm_v1alpha1_node_proto_enumTypes[1]
+	return &file_proto_qrysm_v1alpha1_node_proto_enumTypes[1]
 }
 
 func (x ConnectionState) Number() protoreflect.EnumNumber {
@@ -127,7 +127,7 @@ func (x ConnectionState) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ConnectionState.Descriptor instead.
 func (ConnectionState) EnumDescriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_node_proto_rawDescGZIP(), []int{1}
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{1}
 }
 
 type SyncStatus struct {
@@ -141,7 +141,7 @@ type SyncStatus struct {
 func (x *SyncStatus) Reset() {
 	*x = SyncStatus{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[0]
+		mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -154,7 +154,7 @@ func (x *SyncStatus) String() string {
 func (*SyncStatus) ProtoMessage() {}
 
 func (x *SyncStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[0]
+	mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -167,7 +167,7 @@ func (x *SyncStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncStatus.ProtoReflect.Descriptor instead.
 func (*SyncStatus) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_node_proto_rawDescGZIP(), []int{0}
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *SyncStatus) GetSyncing() bool {
@@ -190,7 +190,7 @@ type Genesis struct {
 func (x *Genesis) Reset() {
 	*x = Genesis{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[1]
+		mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -203,7 +203,7 @@ func (x *Genesis) String() string {
 func (*Genesis) ProtoMessage() {}
 
 func (x *Genesis) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[1]
+	mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -216,7 +216,7 @@ func (x *Genesis) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Genesis.ProtoReflect.Descriptor instead.
 func (*Genesis) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_node_proto_rawDescGZIP(), []int{1}
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Genesis) GetGenesisTime() *timestamp.Timestamp {
@@ -252,7 +252,7 @@ type Version struct {
 func (x *Version) Reset() {
 	*x = Version{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[2]
+		mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -265,7 +265,7 @@ func (x *Version) String() string {
 func (*Version) ProtoMessage() {}
 
 func (x *Version) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[2]
+	mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -278,7 +278,7 @@ func (x *Version) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Version.ProtoReflect.Descriptor instead.
 func (*Version) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_node_proto_rawDescGZIP(), []int{2}
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Version) GetVersion() string {
@@ -306,7 +306,7 @@ type ImplementedServices struct {
 func (x *ImplementedServices) Reset() {
 	*x = ImplementedServices{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[3]
+		mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -319,7 +319,7 @@ func (x *ImplementedServices) String() string {
 func (*ImplementedServices) ProtoMessage() {}
 
 func (x *ImplementedServices) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[3]
+	mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -332,7 +332,7 @@ func (x *ImplementedServices) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ImplementedServices.ProtoReflect.Descriptor instead.
 func (*ImplementedServices) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_node_proto_rawDescGZIP(), []int{3}
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ImplementedServices) GetServices() []string {
@@ -353,7 +353,7 @@ type PeerRequest struct {
 func (x *PeerRequest) Reset() {
 	*x = PeerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[4]
+		mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -366,7 +366,7 @@ func (x *PeerRequest) String() string {
 func (*PeerRequest) ProtoMessage() {}
 
 func (x *PeerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[4]
+	mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -379,7 +379,7 @@ func (x *PeerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerRequest.ProtoReflect.Descriptor instead.
 func (*PeerRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_node_proto_rawDescGZIP(), []int{4}
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *PeerRequest) GetPeerId() string {
@@ -400,7 +400,7 @@ type Peers struct {
 func (x *Peers) Reset() {
 	*x = Peers{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[5]
+		mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -413,7 +413,7 @@ func (x *Peers) String() string {
 func (*Peers) ProtoMessage() {}
 
 func (x *Peers) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[5]
+	mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -426,7 +426,7 @@ func (x *Peers) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Peers.ProtoReflect.Descriptor instead.
 func (*Peers) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_node_proto_rawDescGZIP(), []int{5}
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Peers) GetPeers() []*Peer {
@@ -451,7 +451,7 @@ type Peer struct {
 func (x *Peer) Reset() {
 	*x = Peer{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[6]
+		mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -464,7 +464,7 @@ func (x *Peer) String() string {
 func (*Peer) ProtoMessage() {}
 
 func (x *Peer) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[6]
+	mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -477,7 +477,7 @@ func (x *Peer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Peer.ProtoReflect.Descriptor instead.
 func (*Peer) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_node_proto_rawDescGZIP(), []int{6}
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Peer) GetAddress() string {
@@ -528,7 +528,7 @@ type HostData struct {
 func (x *HostData) Reset() {
 	*x = HostData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[7]
+		mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -541,7 +541,7 @@ func (x *HostData) String() string {
 func (*HostData) ProtoMessage() {}
 
 func (x *HostData) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[7]
+	mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -554,7 +554,7 @@ func (x *HostData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HostData.ProtoReflect.Descriptor instead.
 func (*HostData) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_node_proto_rawDescGZIP(), []int{7}
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *HostData) GetAddresses() []string {
@@ -592,7 +592,7 @@ type ETH1ConnectionStatus struct {
 func (x *ETH1ConnectionStatus) Reset() {
 	*x = ETH1ConnectionStatus{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[8]
+		mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -605,7 +605,7 @@ func (x *ETH1ConnectionStatus) String() string {
 func (*ETH1ConnectionStatus) ProtoMessage() {}
 
 func (x *ETH1ConnectionStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_node_proto_msgTypes[8]
+	mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -618,7 +618,7 @@ func (x *ETH1ConnectionStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ETH1ConnectionStatus.ProtoReflect.Descriptor instead.
 func (*ETH1ConnectionStatus) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_node_proto_rawDescGZIP(), []int{8}
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ETH1ConnectionStatus) GetCurrentAddress() string {
@@ -649,10 +649,10 @@ func (x *ETH1ConnectionStatus) GetConnectionErrors() []string {
 	return nil
 }
 
-var File_proto_prysm_v1alpha1_node_proto protoreflect.FileDescriptor
+var File_proto_qrysm_v1alpha1_node_proto protoreflect.FileDescriptor
 
-var file_proto_prysm_v1alpha1_node_proto_rawDesc = []byte{
-	0x0a, 0x1f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
+var file_proto_qrysm_v1alpha1_node_proto_rawDesc = []byte{
+	0x0a, 0x1f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x6e, 0x6f, 0x64, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x12, 0x14, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76,
 	0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x1a, 0x1c, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f,
@@ -794,7 +794,7 @@ var file_proto_prysm_v1alpha1_node_proto_rawDesc = []byte{
 	0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x42, 0x09, 0x4e, 0x6f, 0x64, 0x65, 0x50, 0x72, 0x6f,
 	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
 	0x2f, 0x74, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x34,
-	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61,
 	0x6c, 0x70, 0x68, 0x61, 0x31, 0x3b, 0x7a, 0x6f, 0x6e, 0x64, 0xaa, 0x02, 0x14, 0x54, 0x68, 0x65,
 	0x51, 0x52, 0x4c, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61,
 	0x31, 0xca, 0x02, 0x14, 0x54, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x5c, 0x5a, 0x6f, 0x6e, 0x64, 0x5c,
@@ -802,20 +802,20 @@ var file_proto_prysm_v1alpha1_node_proto_rawDesc = []byte{
 }
 
 var (
-	file_proto_prysm_v1alpha1_node_proto_rawDescOnce sync.Once
-	file_proto_prysm_v1alpha1_node_proto_rawDescData = file_proto_prysm_v1alpha1_node_proto_rawDesc
+	file_proto_qrysm_v1alpha1_node_proto_rawDescOnce sync.Once
+	file_proto_qrysm_v1alpha1_node_proto_rawDescData = file_proto_qrysm_v1alpha1_node_proto_rawDesc
 )
 
-func file_proto_prysm_v1alpha1_node_proto_rawDescGZIP() []byte {
-	file_proto_prysm_v1alpha1_node_proto_rawDescOnce.Do(func() {
-		file_proto_prysm_v1alpha1_node_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_prysm_v1alpha1_node_proto_rawDescData)
+func file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP() []byte {
+	file_proto_qrysm_v1alpha1_node_proto_rawDescOnce.Do(func() {
+		file_proto_qrysm_v1alpha1_node_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_qrysm_v1alpha1_node_proto_rawDescData)
 	})
-	return file_proto_prysm_v1alpha1_node_proto_rawDescData
+	return file_proto_qrysm_v1alpha1_node_proto_rawDescData
 }
 
-var file_proto_prysm_v1alpha1_node_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_proto_prysm_v1alpha1_node_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_proto_prysm_v1alpha1_node_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_node_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_proto_qrysm_v1alpha1_node_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_proto_qrysm_v1alpha1_node_proto_goTypes = []interface{}{
 	(PeerDirection)(0),           // 0: theqrl.zond.v1alpha1.PeerDirection
 	(ConnectionState)(0),         // 1: theqrl.zond.v1alpha1.ConnectionState
 	(*SyncStatus)(nil),           // 2: theqrl.zond.v1alpha1.SyncStatus
@@ -830,7 +830,7 @@ var file_proto_prysm_v1alpha1_node_proto_goTypes = []interface{}{
 	(*timestamp.Timestamp)(nil),  // 11: google.protobuf.Timestamp
 	(*empty.Empty)(nil),          // 12: google.protobuf.Empty
 }
-var file_proto_prysm_v1alpha1_node_proto_depIdxs = []int32{
+var file_proto_qrysm_v1alpha1_node_proto_depIdxs = []int32{
 	11, // 0: theqrl.zond.v1alpha1.Genesis.genesis_time:type_name -> google.protobuf.Timestamp
 	8,  // 1: theqrl.zond.v1alpha1.Peers.peers:type_name -> theqrl.zond.v1alpha1.Peer
 	0,  // 2: theqrl.zond.v1alpha1.Peer.direction:type_name -> theqrl.zond.v1alpha1.PeerDirection
@@ -858,13 +858,13 @@ var file_proto_prysm_v1alpha1_node_proto_depIdxs = []int32{
 	0,  // [0:4] is the sub-list for field type_name
 }
 
-func init() { file_proto_prysm_v1alpha1_node_proto_init() }
-func file_proto_prysm_v1alpha1_node_proto_init() {
-	if File_proto_prysm_v1alpha1_node_proto != nil {
+func init() { file_proto_qrysm_v1alpha1_node_proto_init() }
+func file_proto_qrysm_v1alpha1_node_proto_init() {
+	if File_proto_qrysm_v1alpha1_node_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_prysm_v1alpha1_node_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncStatus); i {
 			case 0:
 				return &v.state
@@ -876,7 +876,7 @@ func file_proto_prysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_node_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Genesis); i {
 			case 0:
 				return &v.state
@@ -888,7 +888,7 @@ func file_proto_prysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_node_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Version); i {
 			case 0:
 				return &v.state
@@ -900,7 +900,7 @@ func file_proto_prysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_node_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ImplementedServices); i {
 			case 0:
 				return &v.state
@@ -912,7 +912,7 @@ func file_proto_prysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_node_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PeerRequest); i {
 			case 0:
 				return &v.state
@@ -924,7 +924,7 @@ func file_proto_prysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_node_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Peers); i {
 			case 0:
 				return &v.state
@@ -936,7 +936,7 @@ func file_proto_prysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_node_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Peer); i {
 			case 0:
 				return &v.state
@@ -948,7 +948,7 @@ func file_proto_prysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_node_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*HostData); i {
 			case 0:
 				return &v.state
@@ -960,7 +960,7 @@ func file_proto_prysm_v1alpha1_node_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_node_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_node_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ETH1ConnectionStatus); i {
 			case 0:
 				return &v.state
@@ -977,21 +977,21 @@ func file_proto_prysm_v1alpha1_node_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_prysm_v1alpha1_node_proto_rawDesc,
+			RawDescriptor: file_proto_qrysm_v1alpha1_node_proto_rawDesc,
 			NumEnums:      2,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_prysm_v1alpha1_node_proto_goTypes,
-		DependencyIndexes: file_proto_prysm_v1alpha1_node_proto_depIdxs,
-		EnumInfos:         file_proto_prysm_v1alpha1_node_proto_enumTypes,
-		MessageInfos:      file_proto_prysm_v1alpha1_node_proto_msgTypes,
+		GoTypes:           file_proto_qrysm_v1alpha1_node_proto_goTypes,
+		DependencyIndexes: file_proto_qrysm_v1alpha1_node_proto_depIdxs,
+		EnumInfos:         file_proto_qrysm_v1alpha1_node_proto_enumTypes,
+		MessageInfos:      file_proto_qrysm_v1alpha1_node_proto_msgTypes,
 	}.Build()
-	File_proto_prysm_v1alpha1_node_proto = out.File
-	file_proto_prysm_v1alpha1_node_proto_rawDesc = nil
-	file_proto_prysm_v1alpha1_node_proto_goTypes = nil
-	file_proto_prysm_v1alpha1_node_proto_depIdxs = nil
+	File_proto_qrysm_v1alpha1_node_proto = out.File
+	file_proto_qrysm_v1alpha1_node_proto_rawDesc = nil
+	file_proto_qrysm_v1alpha1_node_proto_goTypes = nil
+	file_proto_qrysm_v1alpha1_node_proto_depIdxs = nil
 }
 
 // Reference imports to suppress errors if they are not otherwise used.

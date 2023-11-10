@@ -5,7 +5,7 @@ go_library(
     testonly = True,
     srcs = [
         "effective_balance_updates.go",
-        "eth1_data_reset.go",
+        "zond1_data_reset.go",
         "helpers.go",
         "historical_roots_update.go",
         "inactivity_updates.go",

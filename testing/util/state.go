@@ -82,7 +82,7 @@ func NewBeaconState(options ...NewBeaconStateOption) (state.BeaconState, error) 
 		RandaoMixes:                filledByteSlice2D(uint64(params.BeaconConfig().EpochsPerHistoricalVector), 32),
 		Validators:                 make([]*zondpb.Validator, 0),
 		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		Eth1Data: &zondpb.Eth1Data{
+		Zond1Data: &zondpb.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		},
@@ -90,7 +90,7 @@ func NewBeaconState(options ...NewBeaconStateOption) (state.BeaconState, error) 
 			PreviousVersion: make([]byte, 4),
 			CurrentVersion:  make([]byte, 4),
 		},
-		Eth1DataVotes:               make([]*zondpb.Eth1Data, 0),
+		Zond1DataVotes:              make([]*zondpb.Zond1Data, 0),
 		HistoricalRoots:             make([][]byte, 0),
 		JustificationBits:           bitfield.Bitvector4{0x0},
 		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
@@ -129,7 +129,7 @@ func NewBeaconStateAltair(options ...func(state *zondpb.BeaconStateAltair) error
 		RandaoMixes:                filledByteSlice2D(uint64(params.BeaconConfig().EpochsPerHistoricalVector), 32),
 		Validators:                 make([]*zondpb.Validator, 0),
 		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		Eth1Data: &zondpb.Eth1Data{
+		Zond1Data: &zondpb.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		},
@@ -137,7 +137,7 @@ func NewBeaconStateAltair(options ...func(state *zondpb.BeaconStateAltair) error
 			PreviousVersion: make([]byte, 4),
 			CurrentVersion:  make([]byte, 4),
 		},
-		Eth1DataVotes:               make([]*zondpb.Eth1Data, 0),
+		Zond1DataVotes:              make([]*zondpb.Zond1Data, 0),
 		HistoricalRoots:             make([][]byte, 0),
 		JustificationBits:           bitfield.Bitvector4{0x0},
 		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
@@ -184,7 +184,7 @@ func NewBeaconStateBellatrix(options ...func(state *zondpb.BeaconStateBellatrix)
 		RandaoMixes:                filledByteSlice2D(uint64(params.BeaconConfig().EpochsPerHistoricalVector), 32),
 		Validators:                 make([]*zondpb.Validator, 0),
 		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		Eth1Data: &zondpb.Eth1Data{
+		Zond1Data: &zondpb.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		},
@@ -192,7 +192,7 @@ func NewBeaconStateBellatrix(options ...func(state *zondpb.BeaconStateBellatrix)
 			PreviousVersion: make([]byte, 4),
 			CurrentVersion:  make([]byte, 4),
 		},
-		Eth1DataVotes:               make([]*zondpb.Eth1Data, 0),
+		Zond1DataVotes:              make([]*zondpb.Zond1Data, 0),
 		HistoricalRoots:             make([][]byte, 0),
 		JustificationBits:           bitfield.Bitvector4{0x0},
 		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
@@ -251,7 +251,7 @@ func NewBeaconStateCapella(options ...func(state *zondpb.BeaconStateCapella) err
 		RandaoMixes:                filledByteSlice2D(uint64(params.BeaconConfig().EpochsPerHistoricalVector), 32),
 		Validators:                 make([]*zondpb.Validator, 0),
 		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		Eth1Data: &zondpb.Eth1Data{
+		Zond1Data: &zondpb.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		},
@@ -259,7 +259,7 @@ func NewBeaconStateCapella(options ...func(state *zondpb.BeaconStateCapella) err
 			PreviousVersion: make([]byte, 4),
 			CurrentVersion:  make([]byte, 4),
 		},
-		Eth1DataVotes:               make([]*zondpb.Eth1Data, 0),
+		Zond1DataVotes:              make([]*zondpb.Zond1Data, 0),
 		HistoricalSummaries:         make([]*zondpb.HistoricalSummary, 0),
 		JustificationBits:           bitfield.Bitvector4{0x0},
 		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},

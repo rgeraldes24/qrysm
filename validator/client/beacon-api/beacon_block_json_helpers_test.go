@@ -67,20 +67,20 @@ func TestBeaconBlockJsonHelpers_JsonifyBlsToExecutionChanges(t *testing.T) {
 	assert.DeepEqual(t, expectedResult, result)
 }
 
-func TestBeaconBlockJsonHelpers_JsonifyEth1Data(t *testing.T) {
-	input := &zondpb.Eth1Data{
+func TestBeaconBlockJsonHelpers_JsonifyZond1Data(t *testing.T) {
+	input := &zondpb.Zond1Data{
 		DepositRoot:  []byte{1},
 		DepositCount: 2,
 		BlockHash:    []byte{3},
 	}
 
-	expectedResult := &apimiddleware.Eth1DataJson{
+	expectedResult := &apimiddleware.Zond1DataJson{
 		DepositRoot:  hexutil.Encode([]byte{1}),
 		DepositCount: "2",
 		BlockHash:    hexutil.Encode([]byte{3}),
 	}
 
-	result := jsonifyEth1Data(input)
+	result := jsonifyZond1Data(input)
 	assert.DeepEqual(t, expectedResult, result)
 }
 
@@ -101,7 +101,7 @@ func TestBeaconBlockJsonHelpers_JsonifyAttestations(t *testing.T) {
 					Root:  []byte{8},
 				},
 			},
-			Signature: []byte{9},
+			Signatures: []byte{9},
 		},
 		{
 			AggregationBits: []byte{10},
@@ -118,7 +118,7 @@ func TestBeaconBlockJsonHelpers_JsonifyAttestations(t *testing.T) {
 					Root:  []byte{17},
 				},
 			},
-			Signature: []byte{18},
+			Signatures: []byte{18},
 		},
 	}
 
@@ -181,7 +181,7 @@ func TestBeaconBlockJsonHelpers_JsonifyAttesterSlashings(t *testing.T) {
 						Root:  []byte{9},
 					},
 				},
-				Signature: []byte{10},
+				Signatures: []byte{10},
 			},
 			Attestation_2: &zondpb.IndexedAttestation{
 				AttestingIndices: []uint64{11, 12},
@@ -198,7 +198,7 @@ func TestBeaconBlockJsonHelpers_JsonifyAttesterSlashings(t *testing.T) {
 						Root:  []byte{19},
 					},
 				},
-				Signature: []byte{20},
+				Signatures: []byte{20},
 			},
 		},
 		{
@@ -217,7 +217,7 @@ func TestBeaconBlockJsonHelpers_JsonifyAttesterSlashings(t *testing.T) {
 						Root:  []byte{29},
 					},
 				},
-				Signature: []byte{30},
+				Signatures: []byte{30},
 			},
 			Attestation_2: &zondpb.IndexedAttestation{
 				AttestingIndices: []uint64{31, 32},
@@ -234,7 +234,7 @@ func TestBeaconBlockJsonHelpers_JsonifyAttesterSlashings(t *testing.T) {
 						Root:  []byte{39},
 					},
 				},
-				Signature: []byte{40},
+				Signatures: []byte{40},
 			},
 		},
 	}
@@ -555,7 +555,7 @@ func TestBeaconBlockJsonHelpers_JsonifyIndexedAttestation(t *testing.T) {
 				Root:  []byte{9},
 			},
 		},
-		Signature: []byte{10},
+		Signatures: []byte{10},
 	}
 
 	expectedResult := &apimiddleware.IndexedAttestationJson{

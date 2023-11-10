@@ -56,10 +56,10 @@ func (b *SignedBeaconBlock) SetGraffiti(g []byte) {
 	copy(b.block.body.graffiti[:], g)
 }
 
-// SetEth1Data sets the eth1 data in the block.
+// SetZond1Data sets the zond1 data in the block.
 // This function is not thread safe, it is only used during block creation.
-func (b *SignedBeaconBlock) SetEth1Data(e *zond.Eth1Data) {
-	b.block.body.eth1Data = e
+func (b *SignedBeaconBlock) SetZond1Data(e *zond.Zond1Data) {
+	b.block.body.zond1Data = e
 }
 
 // SetProposerSlashings sets the proposer slashings in the block.

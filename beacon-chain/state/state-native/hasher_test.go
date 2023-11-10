@@ -27,9 +27,9 @@ func TestComputeFieldRootsWithHasher_Phase0(t *testing.T) {
 	historicalRoots, err := util.PrepareRoots(int(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetHistoricalRoots(historicalRoots))
-	require.NoError(t, beaconState.SetEth1Data(eth1Data()))
-	require.NoError(t, beaconState.SetEth1DataVotes([]*zondpb.Eth1Data{eth1Data()}))
-	require.NoError(t, beaconState.SetEth1DepositIndex(123))
+	require.NoError(t, beaconState.SetZond1Data(zond1Data()))
+	require.NoError(t, beaconState.SetZond1DataVotes([]*zondpb.Zond1Data{zond1Data()}))
+	require.NoError(t, beaconState.SetZond1DepositIndex(123))
 	require.NoError(t, beaconState.SetValidators([]*zondpb.Validator{validator()}))
 	require.NoError(t, beaconState.SetBalances([]uint64{1, 2, 3}))
 	randaoMixes, err := util.PrepareRoots(int(params.BeaconConfig().EpochsPerHistoricalVector))
@@ -91,9 +91,9 @@ func TestComputeFieldRootsWithHasher_Altair(t *testing.T) {
 	historicalRoots, err := util.PrepareRoots(int(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetHistoricalRoots(historicalRoots))
-	require.NoError(t, beaconState.SetEth1Data(eth1Data()))
-	require.NoError(t, beaconState.SetEth1DataVotes([]*zondpb.Eth1Data{eth1Data()}))
-	require.NoError(t, beaconState.SetEth1DepositIndex(123))
+	require.NoError(t, beaconState.SetZond1Data(zond1Data()))
+	require.NoError(t, beaconState.SetZond1DataVotes([]*zondpb.Zond1Data{zond1Data()}))
+	require.NoError(t, beaconState.SetZond1DepositIndex(123))
 	require.NoError(t, beaconState.SetValidators([]*zondpb.Validator{validator()}))
 	require.NoError(t, beaconState.SetBalances([]uint64{1, 2, 3}))
 	randaoMixes, err := util.PrepareRoots(int(params.BeaconConfig().EpochsPerHistoricalVector))
@@ -161,9 +161,9 @@ func TestComputeFieldRootsWithHasher_Bellatrix(t *testing.T) {
 	historicalRoots, err := util.PrepareRoots(int(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetHistoricalRoots(historicalRoots))
-	require.NoError(t, beaconState.SetEth1Data(eth1Data()))
-	require.NoError(t, beaconState.SetEth1DataVotes([]*zondpb.Eth1Data{eth1Data()}))
-	require.NoError(t, beaconState.SetEth1DepositIndex(123))
+	require.NoError(t, beaconState.SetZond1Data(zond1Data()))
+	require.NoError(t, beaconState.SetZond1DataVotes([]*zondpb.Zond1Data{zond1Data()}))
+	require.NoError(t, beaconState.SetZond1DepositIndex(123))
 	require.NoError(t, beaconState.SetValidators([]*zondpb.Validator{validator()}))
 	require.NoError(t, beaconState.SetBalances([]uint64{1, 2, 3}))
 	randaoMixes, err := util.PrepareRoots(int(params.BeaconConfig().EpochsPerHistoricalVector))
@@ -235,9 +235,9 @@ func TestComputeFieldRootsWithHasher_Capella(t *testing.T) {
 	historicalRoots, err := util.PrepareRoots(int(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetHistoricalRoots(historicalRoots))
-	require.NoError(t, beaconState.SetEth1Data(eth1Data()))
-	require.NoError(t, beaconState.SetEth1DataVotes([]*zondpb.Eth1Data{eth1Data()}))
-	require.NoError(t, beaconState.SetEth1DepositIndex(123))
+	require.NoError(t, beaconState.SetZond1Data(zond1Data()))
+	require.NoError(t, beaconState.SetZond1DataVotes([]*zondpb.Zond1Data{zond1Data()}))
+	require.NoError(t, beaconState.SetZond1DepositIndex(123))
 	require.NoError(t, beaconState.SetValidators([]*zondpb.Validator{validator()}))
 	require.NoError(t, beaconState.SetBalances([]uint64{1, 2, 3}))
 	randaoMixes, err := util.PrepareRoots(int(params.BeaconConfig().EpochsPerHistoricalVector))
@@ -335,10 +335,10 @@ func latestBlockHeader() *zondpb.BeaconBlockHeader {
 	}
 }
 
-func eth1Data() *zondpb.Eth1Data {
+func zond1Data() *zondpb.Zond1Data {
 	dr := bytesutil.ToBytes32([]byte("deposit"))
 	bh := bytesutil.ToBytes32([]byte("block"))
-	return &zondpb.Eth1Data{
+	return &zondpb.Zond1Data{
 		DepositRoot:  dr[:],
 		DepositCount: 123,
 		BlockHash:    bh[:],

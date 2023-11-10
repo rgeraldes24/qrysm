@@ -10,24 +10,24 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/spectest/utils"
 )
 
-// RunEth1DataResetTests executes "epoch_processing/eth1_data_reset" tests.
-func RunEth1DataResetTests(t *testing.T, config string) {
+// RunZond1DataResetTests executes "epoch_processing/zond1_data_reset" tests.
+func RunZond1DataResetTests(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
 
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "altair", "epoch_processing/eth1_data_reset/pyspec_tests")
+	testFolders, testsFolderPath := utils.TestFolders(t, config, "altair", "epoch_processing/zond1_data_reset/pyspec_tests")
 	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "altair", "epoch_processing/eth1_data_reset/pyspec_tests")
+		t.Fatalf("No test folders found for %s/%s/%s", config, "altair", "epoch_processing/zond1_data_reset/pyspec_tests")
 	}
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
 			folderPath := path.Join(testsFolderPath, folder.Name())
-			RunEpochOperationTest(t, folderPath, processEth1DataResetWrapper)
+			RunEpochOperationTest(t, folderPath, processZond1DataResetWrapper)
 		})
 	}
 }
 
-func processEth1DataResetWrapper(t *testing.T, st state.BeaconState) (state.BeaconState, error) {
-	st, err := epoch.ProcessEth1DataReset(st)
+func processZond1DataResetWrapper(t *testing.T, st state.BeaconState) (state.BeaconState, error) {
+	st, err := epoch.ProcessZond1DataReset(st)
 	require.NoError(t, err, "Could not process final updates")
 	return st, nil
 }

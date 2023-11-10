@@ -145,7 +145,7 @@ func convertIndexedAttestationToProto(jsonAttestation *apimiddleware.IndexedAtte
 	return &zondpb.IndexedAttestation{
 		AttestingIndices: attestingIndices,
 		Data:             attestationData,
-		Signature:        signature,
+		Signatures:       signature,
 	}, nil
 }
 
@@ -193,7 +193,7 @@ func convertAttestationToProto(jsonAttestation *apimiddleware.AttestationJson) (
 	return &zondpb.Attestation{
 		AggregationBits: aggregationBits,
 		Data:            attestationData,
-		Signature:       signature,
+		Signatures:      signature,
 	}, nil
 }
 

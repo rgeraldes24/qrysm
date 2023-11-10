@@ -541,7 +541,7 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 		return nil, errors.New("default fileConfig is required, proposer settings file is either empty or an incorrect format")
 	}
 	if !common.IsHexAddress(fileConfig.DefaultConfig.FeeRecipient) {
-		return nil, errors.New("default fileConfig fee recipient is not a valid eth1 address")
+		return nil, errors.New("default fileConfig fee recipient is not a valid zond1 address")
 	}
 	psExists, err := db.ProposerSettingsExists(cliCtx.Context)
 	if err != nil {
@@ -627,7 +627,7 @@ func verifyOption(key string, option *validatorpb.ProposerOptionPayload) error {
 		return fmt.Errorf("fee recipient is required for proposer %s", key)
 	}
 	if !common.IsHexAddress(option.FeeRecipient) {
-		return errors.New("fee recipient is not a valid eth1 address")
+		return errors.New("fee recipient is not a valid zond1 address")
 	}
 	if err := warnNonChecksummedAddress(option.FeeRecipient); err != nil {
 		return err

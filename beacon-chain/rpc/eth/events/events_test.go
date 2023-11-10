@@ -294,7 +294,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 				Body: &zond.BeaconBlockBodyBellatrix{
 					RandaoReveal:  genesis.Block.Body.RandaoReveal,
 					Graffiti:      genesis.Block.Body.Graffiti,
-					Eth1Data:      genesis.Block.Body.Eth1Data,
+					Zond1Data:     genesis.Block.Body.Zond1Data,
 					SyncAggregate: &zond.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignature: make([]byte, 96)},
 					ExecutionPayload: &enginev1.ExecutionPayload{
 						BlockNumber:   1,
@@ -400,7 +400,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 				Body: &zond.BeaconBlockBodyCapella{
 					RandaoReveal:  genesis.Block.Body.RandaoReveal,
 					Graffiti:      genesis.Block.Body.Graffiti,
-					Eth1Data:      genesis.Block.Body.Eth1Data,
+					Zond1Data:     genesis.Block.Body.Zond1Data,
 					SyncAggregate: &zond.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignature: make([]byte, 96)},
 					ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 						BlockNumber:   1,

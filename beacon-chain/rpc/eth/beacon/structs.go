@@ -28,7 +28,7 @@ type BeaconBlock struct {
 
 type BeaconBlockBody struct {
 	RandaoReveal      string                `json:"randao_reveal" validate:"required"`
-	Eth1Data          Eth1Data              `json:"eth1_data" validate:"required"`
+	Zond1Data         Zond1Data             `json:"zond1_data" validate:"required"`
 	Graffiti          string                `json:"graffiti" validate:"required"`
 	ProposerSlashings []ProposerSlashing    `json:"proposer_slashings" validate:"required"`
 	AttesterSlashings []AttesterSlashing    `json:"attester_slashings" validate:"required"`
@@ -52,7 +52,7 @@ type BeaconBlockAltair struct {
 
 type BeaconBlockBodyAltair struct {
 	RandaoReveal      string                `json:"randao_reveal" validate:"required"`
-	Eth1Data          Eth1Data              `json:"eth1_data" validate:"required"`
+	Zond1Data         Zond1Data             `json:"zond1_data" validate:"required"`
 	Graffiti          string                `json:"graffiti" validate:"required"`
 	ProposerSlashings []ProposerSlashing    `json:"proposer_slashings" validate:"required"`
 	AttesterSlashings []AttesterSlashing    `json:"attester_slashings" validate:"required"`
@@ -77,7 +77,7 @@ type BeaconBlockBellatrix struct {
 
 type BeaconBlockBodyBellatrix struct {
 	RandaoReveal      string                `json:"randao_reveal" validate:"required"`
-	Eth1Data          Eth1Data              `json:"eth1_data" validate:"required"`
+	Zond1Data         Zond1Data             `json:"zond1_data" validate:"required"`
 	Graffiti          string                `json:"graffiti" validate:"required"`
 	ProposerSlashings []ProposerSlashing    `json:"proposer_slashings" validate:"required"`
 	AttesterSlashings []AttesterSlashing    `json:"attester_slashings" validate:"required"`
@@ -103,7 +103,7 @@ type BlindedBeaconBlockBellatrix struct {
 
 type BlindedBeaconBlockBodyBellatrix struct {
 	RandaoReveal           string                 `json:"randao_reveal" validate:"required"`
-	Eth1Data               Eth1Data               `json:"eth1_data" validate:"required"`
+	Zond1Data              Zond1Data              `json:"zond1_data" validate:"required"`
 	Graffiti               string                 `json:"graffiti" validate:"required"`
 	ProposerSlashings      []ProposerSlashing     `json:"proposer_slashings" validate:"required"`
 	AttesterSlashings      []AttesterSlashing     `json:"attester_slashings" validate:"required"`
@@ -129,7 +129,7 @@ type BeaconBlockCapella struct {
 
 type BeaconBlockBodyCapella struct {
 	RandaoReveal                string                             `json:"randao_reveal" validate:"required"`
-	Eth1Data                    Eth1Data                           `json:"eth1_data" validate:"required"`
+	Zond1Data                   Zond1Data                          `json:"zond1_data" validate:"required"`
 	Graffiti                    string                             `json:"graffiti" validate:"required"`
 	ProposerSlashings           []ProposerSlashing                 `json:"proposer_slashings" validate:"required"`
 	AttesterSlashings           []AttesterSlashing                 `json:"attester_slashings" validate:"required"`
@@ -156,7 +156,7 @@ type BlindedBeaconBlockCapella struct {
 
 type BlindedBeaconBlockBodyCapella struct {
 	RandaoReveal                string                             `json:"randao_reveal" validate:"required"`
-	Eth1Data                    Eth1Data                           `json:"eth1_data" validate:"required"`
+	Zond1Data                   Zond1Data                          `json:"zond1_data" validate:"required"`
 	Graffiti                    string                             `json:"graffiti" validate:"required"`
 	ProposerSlashings           []ProposerSlashing                 `json:"proposer_slashings" validate:"required"`
 	AttesterSlashings           []AttesterSlashing                 `json:"attester_slashings" validate:"required"`
@@ -168,7 +168,7 @@ type BlindedBeaconBlockBodyCapella struct {
 	DilithiumToExecutionChanges []SignedDilithiumToExecutionChange `json:"dilithium_to_execution_changes" validate:"required"`
 }
 
-type Eth1Data struct {
+type Zond1Data struct {
 	DepositRoot  string `json:"deposit_root" validate:"required"`
 	DepositCount string `json:"deposit_count" validate:"required"`
 	BlockHash    string `json:"block_hash" validate:"required"`
@@ -362,17 +362,17 @@ func (b *SignedBeaconBlock) ToGeneric() (*zond.GenericSignedBeaconBlock, error) 
 	if err != nil {
 		return nil, errors.Wrap(err, "could not decode b.Message.Body.RandaoReveal")
 	}
-	depositRoot, err := hexutil.Decode(b.Message.Body.Eth1Data.DepositRoot)
+	depositRoot, err := hexutil.Decode(b.Message.Body.Zond1Data.DepositRoot)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositRoot")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositRoot")
 	}
-	depositCount, err := strconv.ParseUint(b.Message.Body.Eth1Data.DepositCount, 10, 64)
+	depositCount, err := strconv.ParseUint(b.Message.Body.Zond1Data.DepositCount, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositCount")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositCount")
 	}
-	blockHash, err := hexutil.Decode(b.Message.Body.Eth1Data.BlockHash)
+	blockHash, err := hexutil.Decode(b.Message.Body.Zond1Data.BlockHash)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.BlockHash")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.BlockHash")
 	}
 	graffiti, err := hexutil.Decode(b.Message.Body.Graffiti)
 	if err != nil {
@@ -407,7 +407,7 @@ func (b *SignedBeaconBlock) ToGeneric() (*zond.GenericSignedBeaconBlock, error) 
 			StateRoot:     stateRoot,
 			Body: &zond.BeaconBlockBody{
 				RandaoReveal: randaoReveal,
-				Eth1Data: &zond.Eth1Data{
+				Zond1Data: &zond.Zond1Data{
 					DepositRoot:  depositRoot,
 					DepositCount: depositCount,
 					BlockHash:    blockHash,
@@ -450,17 +450,17 @@ func (b *SignedBeaconBlockAltair) ToGeneric() (*zond.GenericSignedBeaconBlock, e
 	if err != nil {
 		return nil, errors.Wrap(err, "could not decode b.Message.Body.RandaoReveal")
 	}
-	depositRoot, err := hexutil.Decode(b.Message.Body.Eth1Data.DepositRoot)
+	depositRoot, err := hexutil.Decode(b.Message.Body.Zond1Data.DepositRoot)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositRoot")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositRoot")
 	}
-	depositCount, err := strconv.ParseUint(b.Message.Body.Eth1Data.DepositCount, 10, 64)
+	depositCount, err := strconv.ParseUint(b.Message.Body.Zond1Data.DepositCount, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositCount")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositCount")
 	}
-	blockHash, err := hexutil.Decode(b.Message.Body.Eth1Data.BlockHash)
+	blockHash, err := hexutil.Decode(b.Message.Body.Zond1Data.BlockHash)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.BlockHash")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.BlockHash")
 	}
 	graffiti, err := hexutil.Decode(b.Message.Body.Graffiti)
 	if err != nil {
@@ -503,7 +503,7 @@ func (b *SignedBeaconBlockAltair) ToGeneric() (*zond.GenericSignedBeaconBlock, e
 			StateRoot:     stateRoot,
 			Body: &zond.BeaconBlockBodyAltair{
 				RandaoReveal: randaoReveal,
-				Eth1Data: &zond.Eth1Data{
+				Zond1Data: &zond.Zond1Data{
 					DepositRoot:  depositRoot,
 					DepositCount: depositCount,
 					BlockHash:    blockHash,
@@ -550,17 +550,17 @@ func (b *SignedBeaconBlockBellatrix) ToGeneric() (*zond.GenericSignedBeaconBlock
 	if err != nil {
 		return nil, errors.Wrap(err, "could not decode b.Message.Body.RandaoReveal")
 	}
-	depositRoot, err := hexutil.Decode(b.Message.Body.Eth1Data.DepositRoot)
+	depositRoot, err := hexutil.Decode(b.Message.Body.Zond1Data.DepositRoot)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositRoot")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositRoot")
 	}
-	depositCount, err := strconv.ParseUint(b.Message.Body.Eth1Data.DepositCount, 10, 64)
+	depositCount, err := strconv.ParseUint(b.Message.Body.Zond1Data.DepositCount, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositCount")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositCount")
 	}
-	blockHash, err := hexutil.Decode(b.Message.Body.Eth1Data.BlockHash)
+	blockHash, err := hexutil.Decode(b.Message.Body.Zond1Data.BlockHash)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.BlockHash")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.BlockHash")
 	}
 	graffiti, err := hexutil.Decode(b.Message.Body.Graffiti)
 	if err != nil {
@@ -662,7 +662,7 @@ func (b *SignedBeaconBlockBellatrix) ToGeneric() (*zond.GenericSignedBeaconBlock
 			StateRoot:     stateRoot,
 			Body: &zond.BeaconBlockBodyBellatrix{
 				RandaoReveal: randaoReveal,
-				Eth1Data: &zond.Eth1Data{
+				Zond1Data: &zond.Zond1Data{
 					DepositRoot:  depositRoot,
 					DepositCount: depositCount,
 					BlockHash:    blockHash,
@@ -725,17 +725,17 @@ func (b *SignedBlindedBeaconBlockBellatrix) ToGeneric() (*zond.GenericSignedBeac
 	if err != nil {
 		return nil, errors.Wrap(err, "could not decode b.Message.Body.RandaoReveal")
 	}
-	depositRoot, err := hexutil.Decode(b.Message.Body.Eth1Data.DepositRoot)
+	depositRoot, err := hexutil.Decode(b.Message.Body.Zond1Data.DepositRoot)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositRoot")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositRoot")
 	}
-	depositCount, err := strconv.ParseUint(b.Message.Body.Eth1Data.DepositCount, 10, 64)
+	depositCount, err := strconv.ParseUint(b.Message.Body.Zond1Data.DepositCount, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositCount")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositCount")
 	}
-	blockHash, err := hexutil.Decode(b.Message.Body.Eth1Data.BlockHash)
+	blockHash, err := hexutil.Decode(b.Message.Body.Zond1Data.BlockHash)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.BlockHash")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.BlockHash")
 	}
 	graffiti, err := hexutil.Decode(b.Message.Body.Graffiti)
 	if err != nil {
@@ -834,7 +834,7 @@ func (b *SignedBlindedBeaconBlockBellatrix) ToGeneric() (*zond.GenericSignedBeac
 			StateRoot:     stateRoot,
 			Body: &zond.BlindedBeaconBlockBodyBellatrix{
 				RandaoReveal: randaoReveal,
-				Eth1Data: &zond.Eth1Data{
+				Zond1Data: &zond.Zond1Data{
 					DepositRoot:  depositRoot,
 					DepositCount: depositCount,
 					BlockHash:    blockHash,
@@ -897,17 +897,17 @@ func (b *SignedBeaconBlockCapella) ToGeneric() (*zond.GenericSignedBeaconBlock, 
 	if err != nil {
 		return nil, errors.Wrap(err, "could not decode b.Message.Body.RandaoReveal")
 	}
-	depositRoot, err := hexutil.Decode(b.Message.Body.Eth1Data.DepositRoot)
+	depositRoot, err := hexutil.Decode(b.Message.Body.Zond1Data.DepositRoot)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositRoot")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositRoot")
 	}
-	depositCount, err := strconv.ParseUint(b.Message.Body.Eth1Data.DepositCount, 10, 64)
+	depositCount, err := strconv.ParseUint(b.Message.Body.Zond1Data.DepositCount, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositCount")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositCount")
 	}
-	blockHash, err := hexutil.Decode(b.Message.Body.Eth1Data.BlockHash)
+	blockHash, err := hexutil.Decode(b.Message.Body.Zond1Data.BlockHash)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.BlockHash")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.BlockHash")
 	}
 	graffiti, err := hexutil.Decode(b.Message.Body.Graffiti)
 	if err != nil {
@@ -1038,7 +1038,7 @@ func (b *SignedBeaconBlockCapella) ToGeneric() (*zond.GenericSignedBeaconBlock, 
 			StateRoot:     stateRoot,
 			Body: &zond.BeaconBlockBodyCapella{
 				RandaoReveal: randaoReveal,
-				Eth1Data: &zond.Eth1Data{
+				Zond1Data: &zond.Zond1Data{
 					DepositRoot:  depositRoot,
 					DepositCount: depositCount,
 					BlockHash:    blockHash,
@@ -1103,17 +1103,17 @@ func (b *SignedBlindedBeaconBlockCapella) ToGeneric() (*zond.GenericSignedBeacon
 	if err != nil {
 		return nil, errors.Wrap(err, "could not decode b.Message.Body.RandaoReveal")
 	}
-	depositRoot, err := hexutil.Decode(b.Message.Body.Eth1Data.DepositRoot)
+	depositRoot, err := hexutil.Decode(b.Message.Body.Zond1Data.DepositRoot)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositRoot")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositRoot")
 	}
-	depositCount, err := strconv.ParseUint(b.Message.Body.Eth1Data.DepositCount, 10, 64)
+	depositCount, err := strconv.ParseUint(b.Message.Body.Zond1Data.DepositCount, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.DepositCount")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.DepositCount")
 	}
-	blockHash, err := hexutil.Decode(b.Message.Body.Eth1Data.BlockHash)
+	blockHash, err := hexutil.Decode(b.Message.Body.Zond1Data.BlockHash)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not decode b.Message.Body.Eth1Data.BlockHash")
+		return nil, errors.Wrap(err, "could not decode b.Message.Body.Zond1Data.BlockHash")
 	}
 	graffiti, err := hexutil.Decode(b.Message.Body.Graffiti)
 	if err != nil {
@@ -1220,7 +1220,7 @@ func (b *SignedBlindedBeaconBlockCapella) ToGeneric() (*zond.GenericSignedBeacon
 			StateRoot:     stateRoot,
 			Body: &zond.BlindedBeaconBlockBodyCapella{
 				RandaoReveal: randaoReveal,
-				Eth1Data: &zond.Eth1Data{
+				Zond1Data: &zond.Zond1Data{
 					DepositRoot:  depositRoot,
 					DepositCount: depositCount,
 					BlockHash:    blockHash,

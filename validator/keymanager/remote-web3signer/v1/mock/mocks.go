@@ -111,7 +111,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 					StateRoot:     make([]byte, fieldparams.RootLength),
 					Body: &zond.BeaconBlockBody{
 						RandaoReveal: make([]byte, 32),
-						Eth1Data: &zond.Eth1Data{
+						Zond1Data: &zond.Zond1Data{
 							DepositRoot:  make([]byte, fieldparams.RootLength),
 							DepositCount: 0,
 							BlockHash:    make([]byte, 32),
@@ -224,7 +224,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 					StateRoot:     make([]byte, fieldparams.RootLength),
 					Body: &zond.BeaconBlockBodyAltair{
 						RandaoReveal: make([]byte, 32),
-						Eth1Data: &zond.Eth1Data{
+						Zond1Data: &zond.Zond1Data{
 							DepositRoot:  make([]byte, fieldparams.RootLength),
 							DepositCount: 0,
 							BlockHash:    make([]byte, 32),
@@ -672,7 +672,7 @@ func MockBeaconBlockAltair() *v1.BeaconBlockAltair {
 		StateRoot:     make([]byte, fieldparams.RootLength),
 		Body: &v1.BeaconBlockBodyAltair{
 			RandaoReveal: make([]byte, 32),
-			Eth1Data: &v1.Eth1Data{
+			Zond1Data: &v1.Zond1Data{
 				DepositRoot:  make([]byte, fieldparams.RootLength),
 				DepositCount: "0",
 				BlockHash:    make([]byte, 32),
@@ -742,7 +742,7 @@ func MockBeaconBlockAltair() *v1.BeaconBlockAltair {
 func MockBeaconBlockBody() *v1.BeaconBlockBody {
 	return &v1.BeaconBlockBody{
 		RandaoReveal: make([]byte, 32),
-		Eth1Data: &v1.Eth1Data{
+		Zond1Data: &v1.Zond1Data{
 			DepositRoot:  make([]byte, fieldparams.RootLength),
 			DepositCount: "0",
 			BlockHash:    make([]byte, 32),

@@ -306,12 +306,12 @@ func (vs *Server) validatorStatus(
 	// Unknown status means the validator has not been put into the state yet.
 	case zondpb.ValidatorStatus_UNKNOWN_STATUS:
 		// If no connection to ETH1, the deposit block number or position in queue cannot be determined.
-		if !vs.Eth1InfoFetcher.ExecutionClientConnected() {
+		if !vs.Zond1InfoFetcher.ExecutionClientConnected() {
 			log.Warn("Not connected to ETH1. Cannot determine validator ETH1 deposit block number")
 			return resp, nonExistentIndex
 		}
-		dep, eth1BlockNumBigInt := vs.DepositFetcher.DepositByPubkey(ctx, pubKey)
-		if eth1BlockNumBigInt == nil { // No deposit found in ETH1.
+		dep, zond1BlockNumBigInt := vs.DepositFetcher.DepositByPubkey(ctx, pubKey)
+		if zond1BlockNumBigInt == nil { // No deposit found in ETH1.
 			return resp, nonExistentIndex
 		}
 		domain, err := signing.ComputeDomain(
@@ -325,12 +325,12 @@ func (vs *Server) validatorStatus(
 		}
 		if err := deposit.VerifyDepositSignature(dep.Data, domain); err != nil {
 			resp.Status = zondpb.ValidatorStatus_INVALID
-			log.Warn("Invalid Eth1 deposit")
+			log.Warn("Invalid Zond1 deposit")
 			return resp, nonExistentIndex
 		}
 		// Set validator deposit status if their deposit is visible.
 		resp.Status = depositStatus(dep.Data.Amount)
-		resp.Eth1DepositBlockNumber = eth1BlockNumBigInt.Uint64()
+		resp.Zond1DepositBlockNumber = zond1BlockNumBigInt.Uint64()
 
 		return resp, nonExistentIndex
 	// Deposited, Pending or Partially Deposited mean the validator has been put into the state.
@@ -340,9 +340,9 @@ func (vs *Server) validatorStatus(
 				log.Warn("Not connected to ETH1. Cannot determine validator ETH1 deposit.")
 			} else {
 				// Check if there was a deposit.
-				_, eth1BlockNumBigInt := vs.DepositFetcher.DepositByPubkey(ctx, pubKey)
-				if eth1BlockNumBigInt != nil {
-					resp.Eth1DepositBlockNumber = eth1BlockNumBigInt.Uint64()
+				_, zond1BlockNumBigInt := vs.DepositFetcher.DepositByPubkey(ctx, pubKey)
+				if zond1BlockNumBigInt != nil {
+					resp.Zond1DepositBlockNumber = zond1BlockNumBigInt.Uint64()
 				}
 			}
 		}

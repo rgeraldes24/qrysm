@@ -17,16 +17,16 @@ func TestGenesisBeaconState_1000(t *testing.T) {
 	fuzzer.NilChance(0.1)
 	deposits := make([]*zondpb.Deposit, 300000)
 	var genesisTime uint64
-	eth1Data := &zondpb.Eth1Data{}
+	zond1Data := &zondpb.Zond1Data{}
 	for i := 0; i < 1000; i++ {
 		fuzzer.Fuzz(&deposits)
 		fuzzer.Fuzz(&genesisTime)
-		fuzzer.Fuzz(eth1Data)
-		gs, err := GenesisBeaconState(context.Background(), deposits, genesisTime, eth1Data)
+		fuzzer.Fuzz(zond1Data)
+		gs, err := GenesisBeaconState(context.Background(), deposits, genesisTime, zond1Data)
 		if err != nil {
 			if gs != nil {
 				t.Fatalf("Genesis state should be nil on err. found: %v on error: %v for inputs deposit: %v "+
-					"genesis time: %v eth1data: %v", gs, err, deposits, genesisTime, eth1Data)
+					"genesis time: %v zond1data: %v", gs, err, deposits, genesisTime, zond1Data)
 			}
 		}
 	}
@@ -40,16 +40,16 @@ func TestOptimizedGenesisBeaconState_1000(t *testing.T) {
 	var genesisTime uint64
 	preState, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
 	require.NoError(t, err)
-	eth1Data := &zondpb.Eth1Data{}
+	zond1Data := &zondpb.Zond1Data{}
 	for i := 0; i < 1000; i++ {
 		fuzzer.Fuzz(&genesisTime)
-		fuzzer.Fuzz(eth1Data)
+		fuzzer.Fuzz(zond1Data)
 		fuzzer.Fuzz(preState)
-		gs, err := OptimizedGenesisBeaconState(genesisTime, preState, eth1Data)
+		gs, err := OptimizedGenesisBeaconState(genesisTime, preState, zond1Data)
 		if err != nil {
 			if gs != nil {
 				t.Fatalf("Genesis state should be nil on err. found: %v on error: %v for inputs genesis time: %v "+
-					"pre state: %v eth1data: %v", gs, err, genesisTime, preState, eth1Data)
+					"pre state: %v zond1data: %v", gs, err, genesisTime, preState, zond1Data)
 			}
 		}
 	}

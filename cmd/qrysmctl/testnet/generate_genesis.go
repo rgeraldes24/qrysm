@@ -293,7 +293,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 	}
 
 	if f.OverrideZond1Data {
-		log.Print("Overriding Eth1Data with data from execution client")
+		log.Print("Overriding Zond1Data with data from execution client")
 		conn, err := rpc.Dial(generateGenesisStateFlags.ExecutionEndpoint)
 		if err != nil {
 			return nil, errors.Wrapf(
@@ -314,15 +314,15 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get hash tree root")
 		}
-		e1d := &zondpb.Eth1Data{
+		e1d := &zondpb.Zond1Data{
 			DepositRoot:  depositRoot[:],
 			DepositCount: 0,
 			BlockHash:    header.Hash().Bytes(),
 		}
-		if err := genesisState.SetEth1Data(e1d); err != nil {
+		if err := genesisState.SetZond1Data(e1d); err != nil {
 			return nil, err
 		}
-		if err := genesisState.SetEth1DepositIndex(0); err != nil {
+		if err := genesisState.SetZond1DepositIndex(0); err != nil {
 			return nil, err
 		}
 	}

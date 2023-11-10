@@ -53,23 +53,23 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTPhase0BlockToProto(block *apim
 		return nil, errors.Wrapf(err, "failed to decode randao reveal `%s`", block.Body.RandaoReveal)
 	}
 
-	if block.Body.Eth1Data == nil {
-		return nil, errors.New("eth1 data is nil")
+	if block.Body.Zond1Data == nil {
+		return nil, errors.New("zond1 data is nil")
 	}
 
-	depositRoot, err := hexutil.Decode(block.Body.Eth1Data.DepositRoot)
+	depositRoot, err := hexutil.Decode(block.Body.Zond1Data.DepositRoot)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode deposit root `%s`", block.Body.Eth1Data.DepositRoot)
+		return nil, errors.Wrapf(err, "failed to decode deposit root `%s`", block.Body.Zond1Data.DepositRoot)
 	}
 
-	depositCount, err := strconv.ParseUint(block.Body.Eth1Data.DepositCount, 10, 64)
+	depositCount, err := strconv.ParseUint(block.Body.Zond1Data.DepositCount, 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse deposit count `%s`", block.Body.Eth1Data.DepositCount)
+		return nil, errors.Wrapf(err, "failed to parse deposit count `%s`", block.Body.Zond1Data.DepositCount)
 	}
 
-	blockHash, err := hexutil.Decode(block.Body.Eth1Data.BlockHash)
+	blockHash, err := hexutil.Decode(block.Body.Zond1Data.BlockHash)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode block hash `%s`", block.Body.Eth1Data.BlockHash)
+		return nil, errors.Wrapf(err, "failed to decode block hash `%s`", block.Body.Zond1Data.BlockHash)
 	}
 
 	graffiti, err := hexutil.Decode(block.Body.Graffiti)
@@ -109,7 +109,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTPhase0BlockToProto(block *apim
 		StateRoot:     stateRoot,
 		Body: &zondpb.BeaconBlockBody{
 			RandaoReveal: randaoReveal,
-			Eth1Data: &zondpb.Eth1Data{
+			Zond1Data: &zondpb.Zond1Data{
 				DepositRoot:  depositRoot,
 				DepositCount: depositCount,
 				BlockHash:    blockHash,
@@ -139,7 +139,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTAltairBlockToProto(block *apim
 		StateRoot:     block.StateRoot,
 		Body: &apimiddleware.BeaconBlockBodyJson{
 			RandaoReveal:      block.Body.RandaoReveal,
-			Eth1Data:          block.Body.Eth1Data,
+			Zond1Data:         block.Body.Zond1Data,
 			Graffiti:          block.Body.Graffiti,
 			ProposerSlashings: block.Body.ProposerSlashings,
 			AttesterSlashings: block.Body.AttesterSlashings,
@@ -173,7 +173,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTAltairBlockToProto(block *apim
 		StateRoot:     phase0Block.StateRoot,
 		Body: &zondpb.BeaconBlockBodyAltair{
 			RandaoReveal:      phase0Block.Body.RandaoReveal,
-			Eth1Data:          phase0Block.Body.Eth1Data,
+			Zond1Data:         phase0Block.Body.Zond1Data,
 			Graffiti:          phase0Block.Body.Graffiti,
 			ProposerSlashings: phase0Block.Body.ProposerSlashings,
 			AttesterSlashings: phase0Block.Body.AttesterSlashings,
@@ -203,7 +203,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTBellatrixBlockToProto(block *a
 		StateRoot:     block.StateRoot,
 		Body: &apimiddleware.BeaconBlockBodyAltairJson{
 			RandaoReveal:      block.Body.RandaoReveal,
-			Eth1Data:          block.Body.Eth1Data,
+			Zond1Data:         block.Body.Zond1Data,
 			Graffiti:          block.Body.Graffiti,
 			ProposerSlashings: block.Body.ProposerSlashings,
 			AttesterSlashings: block.Body.AttesterSlashings,
@@ -298,7 +298,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTBellatrixBlockToProto(block *a
 		StateRoot:     altairBlock.StateRoot,
 		Body: &zondpb.BeaconBlockBodyBellatrix{
 			RandaoReveal:      altairBlock.Body.RandaoReveal,
-			Eth1Data:          altairBlock.Body.Eth1Data,
+			Zond1Data:         altairBlock.Body.Zond1Data,
 			Graffiti:          altairBlock.Body.Graffiti,
 			ProposerSlashings: altairBlock.Body.ProposerSlashings,
 			AttesterSlashings: altairBlock.Body.AttesterSlashings,
@@ -345,7 +345,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 		StateRoot:     block.StateRoot,
 		Body: &apimiddleware.BeaconBlockBodyBellatrixJson{
 			RandaoReveal:      block.Body.RandaoReveal,
-			Eth1Data:          block.Body.Eth1Data,
+			Zond1Data:         block.Body.Zond1Data,
 			Graffiti:          block.Body.Graffiti,
 			ProposerSlashings: block.Body.ProposerSlashings,
 			AttesterSlashings: block.Body.AttesterSlashings,
@@ -392,7 +392,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 		StateRoot:     bellatrixBlock.StateRoot,
 		Body: &zondpb.BeaconBlockBodyCapella{
 			RandaoReveal:      bellatrixBlock.Body.RandaoReveal,
-			Eth1Data:          bellatrixBlock.Body.Eth1Data,
+			Zond1Data:         bellatrixBlock.Body.Zond1Data,
 			Graffiti:          bellatrixBlock.Body.Graffiti,
 			ProposerSlashings: bellatrixBlock.Body.ProposerSlashings,
 			AttesterSlashings: bellatrixBlock.Body.AttesterSlashings,

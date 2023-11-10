@@ -47,7 +47,7 @@ CAPELLA_FORK_EPOCH: 10
 # ---------------------------------------------------------------
 # [customized] Faster for testing purposes
 SECONDS_PER_SLOT: 10 # Override for e2e tests
-# 14 (estimate from Eth1 mainnet)
+# 14 (estimate from Zond1 mainnet)
 SECONDS_PER_ETH1_BLOCK: 2 # Override for e2e tests
 # [customized] faster time for withdrawals
 MIN_VALIDATOR_WITHDRAWABILITY_DELAY: 1

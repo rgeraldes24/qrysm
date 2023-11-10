@@ -132,12 +132,12 @@ func (v *validator) SubmitAttestation(ctx context.Context, slot primitives.Slot,
 	attestation := &zondpb.Attestation{
 		Data:                    data,
 		AggregationBits:         aggregationBitfield,
-		Signature:               sig,
+		Signatures:              sig,
 		SignatureValidatorIndex: []uint64{uint64(duty.ValidatorIndex)},
 	}
 
 	// Set the signature of the attestation and send it out to the beacon node.
-	indexedAtt.Signature = sig
+	indexedAtt.Signatures = sig
 	if err := v.slashableAttestationCheck(ctx, indexedAtt, pubKey, signingRoot); err != nil {
 		log.WithError(err).Error("Failed attestation slashing protection check")
 		log.WithFields(
@@ -307,6 +307,6 @@ func attestationLogFields(pubKey [dilithium2.CryptoPublicKeyBytes]byte, indexedA
 		"sourceRoot":        fmt.Sprintf("%#x", indexedAtt.Data.Source.Root),
 		"targetEpoch":       indexedAtt.Data.Target.Epoch,
 		"targetRoot":        fmt.Sprintf("%#x", indexedAtt.Data.Target.Root),
-		"signature":         fmt.Sprintf("%#x", indexedAtt.Signature),
+		"signatures":        fmt.Sprintf("%#x", indexedAtt.Signatures),
 	}
 }

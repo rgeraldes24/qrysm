@@ -73,9 +73,9 @@ func GenerateFullBlockBellatrix(
 
 	numToGen = conf.NumDeposits
 	var newDeposits []*zondpb.Deposit
-	eth1Data := bState.Eth1Data()
+	zond1Data := bState.Zond1Data()
 	if numToGen > 0 {
-		newDeposits, eth1Data, err = generateDepositsAndEth1Data(bState, numToGen)
+		newDeposits, zond1Data, err = generateDepositsAndZond1Data(bState, numToGen)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed generating %d deposits:", numToGen)
 		}
@@ -175,7 +175,7 @@ func GenerateFullBlockBellatrix(
 		ParentRoot:    parentRoot[:],
 		ProposerIndex: idx,
 		Body: &zondpb.BeaconBlockBodyBellatrix{
-			Eth1Data:          eth1Data,
+			Zond1Data:         zond1Data,
 			RandaoReveal:      reveal,
 			ProposerSlashings: pSlashings,
 			AttesterSlashings: aSlashings,

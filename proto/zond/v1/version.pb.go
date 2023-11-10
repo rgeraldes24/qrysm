@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.30.0
 // 	protoc        v4.23.3
-// source: proto/zond/v2/version.proto
+// source: proto/zond/v1/version.proto
 
 package zond
 
@@ -57,11 +57,11 @@ func (x Version) String() string {
 }
 
 func (Version) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_zond_v2_version_proto_enumTypes[0].Descriptor()
+	return file_proto_zond_v1_version_proto_enumTypes[0].Descriptor()
 }
 
 func (Version) Type() protoreflect.EnumType {
-	return &file_proto_zond_v2_version_proto_enumTypes[0]
+	return &file_proto_zond_v1_version_proto_enumTypes[0]
 }
 
 func (x Version) Number() protoreflect.EnumNumber {
@@ -70,12 +70,12 @@ func (x Version) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Version.Descriptor instead.
 func (Version) EnumDescriptor() ([]byte, []int) {
-	return file_proto_zond_v2_version_proto_rawDescGZIP(), []int{0}
+	return file_proto_zond_v1_version_proto_rawDescGZIP(), []int{0}
 }
 
-var File_proto_zond_v2_version_proto protoreflect.FileDescriptor
+var File_proto_zond_v1_version_proto protoreflect.FileDescriptor
 
-var file_proto_zond_v2_version_proto_rawDesc = []byte{
+var file_proto_zond_v1_version_proto_rawDesc = []byte{
 	0x0a, 0x1b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x7a, 0x6f, 0x6e, 0x64, 0x2f, 0x76, 0x32, 0x2f,
 	0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0e, 0x74,
 	0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x32, 0x2a, 0x3d, 0x0a,
@@ -94,22 +94,22 @@ var file_proto_zond_v2_version_proto_rawDesc = []byte{
 }
 
 var (
-	file_proto_zond_v2_version_proto_rawDescOnce sync.Once
-	file_proto_zond_v2_version_proto_rawDescData = file_proto_zond_v2_version_proto_rawDesc
+	file_proto_zond_v1_version_proto_rawDescOnce sync.Once
+	file_proto_zond_v1_version_proto_rawDescData = file_proto_zond_v1_version_proto_rawDesc
 )
 
-func file_proto_zond_v2_version_proto_rawDescGZIP() []byte {
-	file_proto_zond_v2_version_proto_rawDescOnce.Do(func() {
-		file_proto_zond_v2_version_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_zond_v2_version_proto_rawDescData)
+func file_proto_zond_v1_version_proto_rawDescGZIP() []byte {
+	file_proto_zond_v1_version_proto_rawDescOnce.Do(func() {
+		file_proto_zond_v1_version_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_zond_v1_version_proto_rawDescData)
 	})
-	return file_proto_zond_v2_version_proto_rawDescData
+	return file_proto_zond_v1_version_proto_rawDescData
 }
 
-var file_proto_zond_v2_version_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_zond_v2_version_proto_goTypes = []interface{}{
-	(Version)(0), // 0: theqrl.zond.v2.Version
+var file_proto_zond_v1_version_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_proto_zond_v1_version_proto_goTypes = []interface{}{
+	(Version)(0), // 0: theqrl.zond.v1.Version
 }
-var file_proto_zond_v2_version_proto_depIdxs = []int32{
+var file_proto_zond_v1_version_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -117,27 +117,27 @@ var file_proto_zond_v2_version_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_proto_zond_v2_version_proto_init() }
-func file_proto_zond_v2_version_proto_init() {
-	if File_proto_zond_v2_version_proto != nil {
+func init() { file_proto_zond_v1_version_proto_init() }
+func file_proto_zond_v1_version_proto_init() {
+	if File_proto_zond_v1_version_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_zond_v2_version_proto_rawDesc,
+			RawDescriptor: file_proto_zond_v1_version_proto_rawDesc,
 			NumEnums:      1,
 			NumMessages:   0,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_proto_zond_v2_version_proto_goTypes,
-		DependencyIndexes: file_proto_zond_v2_version_proto_depIdxs,
-		EnumInfos:         file_proto_zond_v2_version_proto_enumTypes,
+		GoTypes:           file_proto_zond_v1_version_proto_goTypes,
+		DependencyIndexes: file_proto_zond_v1_version_proto_depIdxs,
+		EnumInfos:         file_proto_zond_v1_version_proto_enumTypes,
 	}.Build()
-	File_proto_zond_v2_version_proto = out.File
-	file_proto_zond_v2_version_proto_rawDesc = nil
-	file_proto_zond_v2_version_proto_goTypes = nil
-	file_proto_zond_v2_version_proto_depIdxs = nil
+	File_proto_zond_v1_version_proto = out.File
+	file_proto_zond_v1_version_proto_rawDesc = nil
+	file_proto_zond_v1_version_proto_goTypes = nil
+	file_proto_zond_v1_version_proto_depIdxs = nil
 }

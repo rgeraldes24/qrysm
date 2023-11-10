@@ -276,7 +276,7 @@ func TestBeaconBlockProtoHelpers_ConvertAttesterSlashingsToProto(t *testing.T) {
 								Root:  []byte{9},
 							},
 						},
-						Signature: []byte{10},
+						Signatures: []byte{10},
 					},
 					Attestation_2: &zondpb.IndexedAttestation{
 						AttestingIndices: []uint64{11, 12},
@@ -293,7 +293,7 @@ func TestBeaconBlockProtoHelpers_ConvertAttesterSlashingsToProto(t *testing.T) {
 								Root:  []byte{19},
 							},
 						},
-						Signature: []byte{20},
+						Signatures: []byte{20},
 					},
 				},
 				{
@@ -312,7 +312,7 @@ func TestBeaconBlockProtoHelpers_ConvertAttesterSlashingsToProto(t *testing.T) {
 								Root:  []byte{29},
 							},
 						},
-						Signature: []byte{30},
+						Signatures: []byte{30},
 					},
 					Attestation_2: &zondpb.IndexedAttestation{
 						AttestingIndices: []uint64{31, 32},
@@ -329,7 +329,7 @@ func TestBeaconBlockProtoHelpers_ConvertAttesterSlashingsToProto(t *testing.T) {
 								Root:  []byte{39},
 							},
 						},
-						Signature: []byte{40},
+						Signatures: []byte{40},
 					},
 				},
 			},
@@ -407,7 +407,7 @@ func TestBeaconBlockProtoHelpers_ConvertAttestationToProto(t *testing.T) {
 						Root:  []byte{9},
 					},
 				},
-				Signature: []byte{10},
+				Signatures: []byte{10},
 			},
 		},
 	}
@@ -542,7 +542,7 @@ func TestBeaconBlockProtoHelpers_ConvertAttestationsToProto(t *testing.T) {
 							Root:  []byte{8},
 						},
 					},
-					Signature: []byte{9},
+					Signatures: []byte{9},
 				},
 				{
 					AggregationBits: []byte{10},
@@ -559,7 +559,7 @@ func TestBeaconBlockProtoHelpers_ConvertAttestationsToProto(t *testing.T) {
 							Root:  []byte{17},
 						},
 					},
-					Signature: []byte{18},
+					Signatures: []byte{18},
 				},
 			},
 		},

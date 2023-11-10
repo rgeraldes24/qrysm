@@ -33,10 +33,10 @@ import (
 //	    block_roots=pre.block_roots,
 //	    state_roots=pre.state_roots,
 //	    historical_roots=pre.historical_roots,
-//	    # Eth1
-//	    eth1_data=pre.eth1_data,
-//	    eth1_data_votes=pre.eth1_data_votes,
-//	    eth1_deposit_index=pre.eth1_deposit_index,
+//	    # Zond1
+//	    zond1_data=pre.zond1_data,
+//	    zond1_data_votes=pre.zond1_data_votes,
+//	    zond1_deposit_index=pre.zond1_deposit_index,
 //	    # Registry
 //	    validators=pre.validators,
 //	    balances=pre.balances,
@@ -84,9 +84,9 @@ func UpgradeToAltair(ctx context.Context, state state.BeaconState) (state.Beacon
 		BlockRoots:                  state.BlockRoots(),
 		StateRoots:                  state.StateRoots(),
 		HistoricalRoots:             hrs,
-		Eth1Data:                    state.Eth1Data(),
-		Eth1DataVotes:               state.Eth1DataVotes(),
-		Eth1DepositIndex:            state.Eth1DepositIndex(),
+		Zond1Data:                   state.Zond1Data(),
+		Zond1DataVotes:              state.Zond1DataVotes(),
+		Zond1DepositIndex:           state.Zond1DepositIndex(),
 		Validators:                  state.Validators(),
 		Balances:                    state.Balances(),
 		RandaoMixes:                 state.RandaoMixes(),

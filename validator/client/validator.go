@@ -415,7 +415,7 @@ func (v *validator) checkAndLogValidatorStatus(statuses []*validatorStatus, acti
 		case zondpb.ValidatorStatus_EXITED:
 			log.Info("Validator exited")
 		case zondpb.ValidatorStatus_INVALID:
-			log.Warn("Invalid Eth1 deposit")
+			log.Warn("Invalid Zond1 deposit")
 		default:
 			log.WithFields(logrus.Fields{
 				"activationEpoch": status.status.ActivationEpoch,

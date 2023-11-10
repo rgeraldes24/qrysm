@@ -17,14 +17,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (vs *Server) packDepositsAndAttestations(ctx context.Context, head state.BeaconState, eth1Data *zondpb.Eth1Data) ([]*zondpb.Deposit, []*zondpb.Attestation, error) {
+func (vs *Server) packDepositsAndAttestations(ctx context.Context, head state.BeaconState, zond1Data *zondpb.Zond1Data) ([]*zondpb.Deposit, []*zondpb.Attestation, error) {
 	eg, egctx := errgroup.WithContext(ctx)
 	var deposits []*zondpb.Deposit
 	var atts []*zondpb.Attestation
 
 	eg.Go(func() error {
 		// Pack ETH1 deposits which have not been included in the beacon chain.
-		localDeposits, err := vs.deposits(egctx, head, eth1Data)
+		localDeposits, err := vs.deposits(egctx, head, zond1Data)
 		if err != nil {
 			return status.Errorf(codes.Internal, "Could not get ETH1 deposits: %v", err)
 		}
@@ -58,46 +58,46 @@ func (vs *Server) packDepositsAndAttestations(ctx context.Context, head state.Be
 }
 
 // deposits returns a list of pending deposits that are ready for inclusion in the next beacon
-// block. Determining deposits depends on the current eth1data vote for the block and whether or not
-// this eth1data has enough support to be considered for deposits inclusion. If current vote has
+// block. Determining deposits depends on the current zond1data vote for the block and whether or not
+// this zond1data has enough support to be considered for deposits inclusion. If current vote has
 // enough support, then use that vote for basis of determining deposits, otherwise use current state
-// eth1data.
+// zond1data.
 func (vs *Server) deposits(
 	ctx context.Context,
 	beaconState state.BeaconState,
-	currentVote *zondpb.Eth1Data,
+	currentVote *zondpb.Zond1Data,
 ) ([]*zondpb.Deposit, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.deposits")
 	defer span.End()
 
-	if vs.MockEth1Votes {
+	if vs.MockZond1Votes {
 		return []*zondpb.Deposit{}, nil
 	}
 
-	if !vs.Eth1InfoFetcher.ExecutionClientConnected() {
-		log.Warn("not connected to eth1 node, skip pending deposit insertion")
+	if !vs.Zond1InfoFetcher.ExecutionClientConnected() {
+		log.Warn("not connected to zond1 node, skip pending deposit insertion")
 		return []*zondpb.Deposit{}, nil
 	}
-	// Need to fetch if the deposits up to the state's latest eth1 data matches
+	// Need to fetch if the deposits up to the state's latest zond1 data matches
 	// the number of all deposits in this RPC call. If not, then we return nil.
-	canonicalEth1Data, canonicalEth1DataHeight, err := vs.canonicalEth1Data(ctx, beaconState, currentVote)
+	canonicalZond1Data, canonicalZond1DataHeight, err := vs.canonicalZond1Data(ctx, beaconState, currentVote)
 	if err != nil {
 		return nil, err
 	}
 
-	_, genesisEth1Block := vs.Eth1InfoFetcher.GenesisExecutionChainInfo()
-	if genesisEth1Block.Cmp(canonicalEth1DataHeight) == 0 {
+	_, genesisZond1Block := vs.Zond1InfoFetcher.GenesisExecutionChainInfo()
+	if genesisZond1Block.Cmp(canonicalZond1DataHeight) == 0 {
 		return []*zondpb.Deposit{}, nil
 	}
 
 	// If there are no pending deposits, exit early.
-	allPendingContainers := vs.PendingDepositsFetcher.PendingContainers(ctx, canonicalEth1DataHeight)
+	allPendingContainers := vs.PendingDepositsFetcher.PendingContainers(ctx, canonicalZond1DataHeight)
 	if len(allPendingContainers) == 0 {
 		log.Debug("no pending deposits for inclusion in block")
 		return []*zondpb.Deposit{}, nil
 	}
 
-	depositTrie, err := vs.depositTrie(ctx, canonicalEth1Data, canonicalEth1DataHeight)
+	depositTrie, err := vs.depositTrie(ctx, canonicalZond1Data, canonicalZond1DataHeight)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not retrieve deposit trie")
 	}
@@ -106,7 +106,7 @@ func (vs *Server) deposits(
 	// deposits are sorted from lowest to highest.
 	var pendingDeps []*zondpb.DepositContainer
 	for _, dep := range allPendingContainers {
-		if uint64(dep.Index) >= beaconState.Eth1DepositIndex() && uint64(dep.Index) < canonicalEth1Data.DepositCount {
+		if uint64(dep.Index) >= beaconState.Zond1DepositIndex() && uint64(dep.Index) < canonicalZond1Data.DepositCount {
 			pendingDeps = append(pendingDeps, dep)
 		}
 		// Don't try to pack more than the max allowed in a block
@@ -129,7 +129,7 @@ func (vs *Server) deposits(
 	return pendingDeposits, nil
 }
 
-func (vs *Server) depositTrie(ctx context.Context, canonicalEth1Data *zondpb.Eth1Data, canonicalEth1DataHeight *big.Int) (*trie.SparseMerkleTrie, error) {
+func (vs *Server) depositTrie(ctx context.Context, canonicalZond1Data *zondpb.Zond1Data, canonicalZond1DataHeight *big.Int) (*trie.SparseMerkleTrie, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.depositTrie")
 	defer span.End()
 
@@ -137,17 +137,17 @@ func (vs *Server) depositTrie(ctx context.Context, canonicalEth1Data *zondpb.Eth
 
 	finalizedDeposits := vs.DepositFetcher.FinalizedDeposits(ctx)
 	depositTrie = finalizedDeposits.Deposits
-	upToEth1DataDeposits := vs.DepositFetcher.NonFinalizedDeposits(ctx, finalizedDeposits.MerkleTrieIndex, canonicalEth1DataHeight)
+	upToZond1DataDeposits := vs.DepositFetcher.NonFinalizedDeposits(ctx, finalizedDeposits.MerkleTrieIndex, canonicalZond1DataHeight)
 	insertIndex := finalizedDeposits.MerkleTrieIndex + 1
 
-	if shouldRebuildTrie(canonicalEth1Data.DepositCount, uint64(len(upToEth1DataDeposits))) {
+	if shouldRebuildTrie(canonicalZond1Data.DepositCount, uint64(len(upToZond1DataDeposits))) {
 		log.WithFields(logrus.Fields{
-			"unfinalized deposits": len(upToEth1DataDeposits),
-			"total deposit count":  canonicalEth1Data.DepositCount,
+			"unfinalized deposits": len(upToZond1DataDeposits),
+			"total deposit count":  canonicalZond1Data.DepositCount,
 		}).Warn("Too many unfinalized deposits, building a deposit trie from scratch.")
-		return vs.rebuildDepositTrie(ctx, canonicalEth1Data, canonicalEth1DataHeight)
+		return vs.rebuildDepositTrie(ctx, canonicalZond1Data, canonicalZond1DataHeight)
 	}
-	for _, dep := range upToEth1DataDeposits {
+	for _, dep := range upToZond1DataDeposits {
 		depHash, err := dep.Data.HashTreeRoot()
 		if err != nil {
 			return nil, errors.Wrap(err, "could not hash deposit data")
@@ -157,23 +157,23 @@ func (vs *Server) depositTrie(ctx context.Context, canonicalEth1Data *zondpb.Eth
 		}
 		insertIndex++
 	}
-	valid, err := validateDepositTrie(depositTrie, canonicalEth1Data)
+	valid, err := validateDepositTrie(depositTrie, canonicalZond1Data)
 	// Log a warning here, as the cached trie is invalid.
 	if !valid {
 		log.WithError(err).Warn("Cached deposit trie is invalid, rebuilding it now")
-		return vs.rebuildDepositTrie(ctx, canonicalEth1Data, canonicalEth1DataHeight)
+		return vs.rebuildDepositTrie(ctx, canonicalZond1Data, canonicalZond1DataHeight)
 	}
 
 	return depositTrie, nil
 }
 
 // rebuilds our deposit trie by recreating it from all processed deposits till
-// specified eth1 block height.
-func (vs *Server) rebuildDepositTrie(ctx context.Context, canonicalEth1Data *zondpb.Eth1Data, canonicalEth1DataHeight *big.Int) (*trie.SparseMerkleTrie, error) {
+// specified zond1 block height.
+func (vs *Server) rebuildDepositTrie(ctx context.Context, canonicalZond1Data *zondpb.Zond1Data, canonicalZond1DataHeight *big.Int) (*trie.SparseMerkleTrie, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.rebuildDepositTrie")
 	defer span.End()
 
-	deposits := vs.DepositFetcher.AllDeposits(ctx, canonicalEth1DataHeight)
+	deposits := vs.DepositFetcher.AllDeposits(ctx, canonicalZond1DataHeight)
 	trieItems := make([][]byte, 0, len(deposits))
 	for _, dep := range deposits {
 		depHash, err := dep.Data.HashTreeRoot()
@@ -187,7 +187,7 @@ func (vs *Server) rebuildDepositTrie(ctx context.Context, canonicalEth1Data *zon
 		return nil, err
 	}
 
-	valid, err := validateDepositTrie(depositTrie, canonicalEth1Data)
+	valid, err := validateDepositTrie(depositTrie, canonicalZond1Data)
 	// Log an error here, as even with rebuilding the trie, it is still invalid.
 	if !valid {
 		log.WithError(err).Error("Rebuilt deposit trie is invalid")
@@ -195,20 +195,20 @@ func (vs *Server) rebuildDepositTrie(ctx context.Context, canonicalEth1Data *zon
 	return depositTrie, nil
 }
 
-// validate that the provided deposit trie matches up with the canonical eth1 data provided.
-func validateDepositTrie(trie *trie.SparseMerkleTrie, canonicalEth1Data *zondpb.Eth1Data) (bool, error) {
-	if trie == nil || canonicalEth1Data == nil {
-		return false, errors.New("nil trie or eth1data provided")
+// validate that the provided deposit trie matches up with the canonical zond1 data provided.
+func validateDepositTrie(trie *trie.SparseMerkleTrie, canonicalZond1Data *zondpb.Zond1Data) (bool, error) {
+	if trie == nil || canonicalZond1Data == nil {
+		return false, errors.New("nil trie or zond1data provided")
 	}
-	if trie.NumOfItems() != int(canonicalEth1Data.DepositCount) {
-		return false, errors.Errorf("wanted the canonical count of %d but received %d", canonicalEth1Data.DepositCount, trie.NumOfItems())
+	if trie.NumOfItems() != int(canonicalZond1Data.DepositCount) {
+		return false, errors.Errorf("wanted the canonical count of %d but received %d", canonicalZond1Data.DepositCount, trie.NumOfItems())
 	}
 	rt, err := trie.HashTreeRoot()
 	if err != nil {
 		return false, err
 	}
-	if !bytes.Equal(rt[:], canonicalEth1Data.DepositRoot) {
-		return false, errors.Errorf("wanted the canonical deposit root of %#x but received %#x", canonicalEth1Data.DepositRoot, rt)
+	if !bytes.Equal(rt[:], canonicalZond1Data.DepositRoot) {
+		return false, errors.Errorf("wanted the canonical deposit root of %#x but received %#x", canonicalZond1Data.DepositRoot, rt)
 	}
 	return true, nil
 }

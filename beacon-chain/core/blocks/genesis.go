@@ -26,7 +26,7 @@ func NewGenesisBlock(stateRoot []byte) *zondpb.SignedBeaconBlock {
 			StateRoot:  bytesutil.PadTo(stateRoot, 32),
 			Body: &zondpb.BeaconBlockBody{
 				RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-				Eth1Data: &zondpb.Eth1Data{
+				Zond1Data: &zondpb.Zond1Data{
 					DepositRoot: make([]byte, 32),
 					BlockHash:   make([]byte, 32),
 				},
@@ -54,7 +54,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 				StateRoot:  root[:],
 				Body: &zondpb.BeaconBlockBody{
 					RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-					Eth1Data: &zondpb.Eth1Data{
+					Zond1Data: &zondpb.Zond1Data{
 						DepositRoot: make([]byte, 32),
 						BlockHash:   make([]byte, 32),
 					},
@@ -70,7 +70,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 				StateRoot:  root[:],
 				Body: &zondpb.BeaconBlockBodyAltair{
 					RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-					Eth1Data: &zondpb.Eth1Data{
+					Zond1Data: &zondpb.Zond1Data{
 						DepositRoot: make([]byte, 32),
 						BlockHash:   make([]byte, 32),
 					},
@@ -90,7 +90,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 				StateRoot:  root[:],
 				Body: &zondpb.BeaconBlockBodyBellatrix{
 					RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-					Eth1Data: &zondpb.Eth1Data{
+					Zond1Data: &zondpb.Zond1Data{
 						DepositRoot: make([]byte, 32),
 						BlockHash:   make([]byte, 32),
 					},
@@ -121,7 +121,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 				StateRoot:  root[:],
 				Body: &zondpb.BeaconBlockBodyCapella{
 					RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-					Eth1Data: &zondpb.Eth1Data{
+					Zond1Data: &zondpb.Zond1Data{
 						DepositRoot: make([]byte, 32),
 						BlockHash:   make([]byte, 32),
 					},

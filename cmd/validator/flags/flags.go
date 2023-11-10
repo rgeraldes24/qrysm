@@ -176,7 +176,7 @@ var (
 	// ShowDepositDataFlag for accounts.
 	ShowDepositDataFlag = &cli.BoolFlag{
 		Name:  "show-deposit-data",
-		Usage: "Display raw eth1 tx deposit data for validator accounts",
+		Usage: "Display raw zond1 tx deposit data for validator accounts",
 		Value: false,
 	}
 	// ShowPrivateKeysFlag for accounts.

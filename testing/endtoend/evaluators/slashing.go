@@ -291,7 +291,7 @@ func generateSignedBeaconBlock(
 		StateRoot:     bytesutil.PadTo([]byte(stateRoot), hashLen),
 		ProposerIndex: proposerIndex,
 		Body: &zond.BeaconBlockBody{
-			Eth1Data: &zond.Eth1Data{
+			Zond1Data: &zond.Zond1Data{
 				BlockHash:    bytesutil.PadTo([]byte("bad block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("bad deposit root"), hashLen),
 				DepositCount: 1,

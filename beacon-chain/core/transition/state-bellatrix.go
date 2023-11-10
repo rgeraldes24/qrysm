@@ -23,8 +23,8 @@ import (
 //
 // Spec pseudocode definition:
 //
-//	def initialize_beacon_state_from_eth1(eth1_block_hash: Bytes32,
-//	                                    eth1_timestamp: uint64,
+//	def initialize_beacon_state_from_zond1(zond1_block_hash: Bytes32,
+//	                                    zond1_timestamp: uint64,
 //	                                    deposits: Sequence[Deposit]) -> BeaconState:
 //	  fork = Fork(
 //	      previous_version=GENESIS_FORK_VERSION,
@@ -32,18 +32,18 @@ import (
 //	      epoch=GENESIS_EPOCH,
 //	  )
 //	  state = BeaconState(
-//	      genesis_time=eth1_timestamp + GENESIS_DELAY,
+//	      genesis_time=zond1_timestamp + GENESIS_DELAY,
 //	      fork=fork,
-//	      eth1_data=Eth1Data(block_hash=eth1_block_hash, deposit_count=uint64(len(deposits))),
+//	      zond1_data=Zond1Data(block_hash=zond1_block_hash, deposit_count=uint64(len(deposits))),
 //	      latest_block_header=BeaconBlockHeader(body_root=hash_tree_root(BeaconBlockBody())),
-//	      randao_mixes=[eth1_block_hash] * EPOCHS_PER_HISTORICAL_VECTOR,  # Seed RANDAO with Eth1 entropy
+//	      randao_mixes=[zond1_block_hash] * EPOCHS_PER_HISTORICAL_VECTOR,  # Seed RANDAO with Zond1 entropy
 //	  )
 //
 //	  # Process deposits
 //	  leaves = list(map(lambda deposit: deposit.data, deposits))
 //	  for index, deposit in enumerate(deposits):
 //	      deposit_data_list = List[DepositData, 2**DEPOSIT_CONTRACT_TREE_DEPTH](*leaves[:index + 1])
-//	      state.eth1_data.deposit_root = hash_tree_root(deposit_data_list)
+//	      state.zond1_data.deposit_root = hash_tree_root(deposit_data_list)
 //	      process_deposit(state, deposit)
 //
 //	  # Process activations
@@ -60,14 +60,14 @@ import (
 //	  return state
 //
 // This method differs from the spec so as to process deposits beforehand instead of the end of the function.
-func GenesisBeaconStateBellatrix(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.Eth1Data, ep *enginev1.ExecutionPayload) (state.BeaconState, error) {
+func GenesisBeaconStateBellatrix(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, zond1Data *zondpb.Zond1Data, ep *enginev1.ExecutionPayload) (state.BeaconState, error) {
 	st, err := EmptyGenesisStateBellatrix()
 	if err != nil {
 		return nil, err
 	}
 
 	// Process initial deposits.
-	st, err = helpers.UpdateGenesisEth1Data(st, deposits, eth1Data)
+	st, err = helpers.UpdateGenesisZond1Data(st, deposits, zond1Data)
 	if err != nil {
 		return nil, err
 	}
@@ -77,29 +77,29 @@ func GenesisBeaconStateBellatrix(ctx context.Context, deposits []*zondpb.Deposit
 		return nil, errors.Wrap(err, "could not process validator deposits")
 	}
 
-	// After deposits have been processed, overwrite eth1data to what is passed in. This allows us to "pre-mine" validators
+	// After deposits have been processed, overwrite zond1data to what is passed in. This allows us to "pre-mine" validators
 	// without the deposit root and count mismatching the real deposit contract.
-	if err := st.SetEth1Data(eth1Data); err != nil {
+	if err := st.SetZond1Data(zond1Data); err != nil {
 		return nil, err
 	}
-	if err := st.SetEth1DepositIndex(eth1Data.DepositCount); err != nil {
+	if err := st.SetZond1DepositIndex(zond1Data.DepositCount); err != nil {
 		return nil, err
 	}
 
-	return OptimizedGenesisBeaconStateBellatrix(genesisTime, st, st.Eth1Data(), ep)
+	return OptimizedGenesisBeaconStateBellatrix(genesisTime, st, st.Zond1Data(), ep)
 }
 
 // OptimizedGenesisBeaconStateBellatrix is used to create a state that has already processed deposits. This is to efficiently
 // create a mainnet state at chainstart.
-func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.BeaconState, eth1Data *zondpb.Eth1Data, ep *enginev1.ExecutionPayload) (state.BeaconState, error) {
-	if eth1Data == nil {
-		return nil, errors.New("no eth1data provided for genesis state")
+func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.BeaconState, zond1Data *zondpb.Zond1Data, ep *enginev1.ExecutionPayload) (state.BeaconState, error) {
+	if zond1Data == nil {
+		return nil, errors.New("no zond1data provided for genesis state")
 	}
 
 	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
 	for i := 0; i < len(randaoMixes); i++ {
 		h := make([]byte, 32)
-		copy(h, eth1Data.BlockHash)
+		copy(h, zond1Data.BlockHash)
 		randaoMixes[i] = h
 	}
 
@@ -184,17 +184,17 @@ func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.Bea
 		StateRoots:      stateRoots,
 		Slashings:       slashings,
 
-		// Eth1 data.
-		Eth1Data:                     eth1Data,
-		Eth1DataVotes:                []*zondpb.Eth1Data{},
-		Eth1DepositIndex:             preState.Eth1DepositIndex(),
+		// Zond1 data.
+		Zond1Data:                    zond1Data,
+		Zond1DataVotes:               []*zondpb.Zond1Data{},
+		Zond1DepositIndex:            preState.Zond1DepositIndex(),
 		LatestExecutionPayloadHeader: eph,
 		InactivityScores:             scores,
 	}
 
 	bodyRoot, err := (&zondpb.BeaconBlockBodyBellatrix{
 		RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-		Eth1Data: &zondpb.Eth1Data{
+		Zond1Data: &zondpb.Zond1Data{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},
@@ -259,10 +259,10 @@ func EmptyGenesisStateBellatrix() (state.BeaconState, error) {
 		JustificationBits: []byte{0},
 		HistoricalRoots:   [][]byte{},
 
-		// Eth1 data.
-		Eth1Data:         &zondpb.Eth1Data{},
-		Eth1DataVotes:    []*zondpb.Eth1Data{},
-		Eth1DepositIndex: 0,
+		// Zond1 data.
+		Zond1Data:         &zondpb.Zond1Data{},
+		Zond1DataVotes:    []*zondpb.Zond1Data{},
+		Zond1DepositIndex: 0,
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeader{
 			ParentHash:       make([]byte, 32),
 			FeeRecipient:     make([]byte, 20),

@@ -39,19 +39,19 @@ service RemoteSigner {
 // ListPublicKeysResponse contains public keys
 // for the validator secrets managed by the remote signer.
 message ListPublicKeysResponse {
-    // List of 48 byte, BLS12-381 validating public keys.
+    // List of 2592 byte, Dilithium validating public keys.
     repeated bytes validating_public_keys = 2;
 }
 
 // SignRequest is a message type used by a keymanager
 // as part of Prysm's accounts v2 implementation.
 message SignRequest {
-    // 48 byte public key corresponding to an associated private key
+    // 2592 byte public key corresponding to an associated private key
     // being requested to sign data.
     bytes public_key = 1;
 
     // Raw bytes signing root the client is requesting to sign. The client is
-    // expected to determine these raw bytes from the appropriate BLS
+    // expected to determine these raw bytes from the appropriate Dilithium
     // signing domain as well as the signing root of the data structure
     // the bytes represent.
     bytes signing_root = 2;
@@ -70,21 +70,16 @@ message SignRequest {
         uint64 epoch = 106 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
 
         // Altair objects.
-        theqrl.zond.v1alpha1.BeaconBlockAltair block_altair = 107;
-        theqrl.zond.v1alpha1.SyncAggregatorSelectionData sync_aggregator_selection_data = 108;
-        theqrl.zond.v1alpha1.ContributionAndProof contribution_and_proof = 109;
-        bytes sync_message_block_root  = 110;
-
-        // Bellatrix objects.
-        theqrl.zond.v1alpha1.BeaconBlockBellatrix block_bellatrix = 111;
-        theqrl.zond.v1alpha1.BlindedBeaconBlockBellatrix blinded_block_bellatrix = 112;
+        theqrl.zond.v1alpha1.SyncAggregatorSelectionData sync_aggregator_selection_data = 107;
+        theqrl.zond.v1alpha1.ContributionAndProof contribution_and_proof = 108;
+        bytes sync_message_block_root  = 109;
 
         // Builder objects.
-        theqrl.zond.v1alpha1.ValidatorRegistrationV1 registration = 113;
+        theqrl.zond.v1alpha1.ValidatorRegistrationV1 registration = 110;
 
         // Capella objects.
-        theqrl.zond.v1alpha1.BeaconBlockCapella block_capella = 114;
-        theqrl.zond.v1alpha1.BlindedBeaconBlockCapella blinded_block_capella = 115;
+        theqrl.zond.v1alpha1.BeaconBlock block_capella = 111;
+        theqrl.zond.v1alpha1.BlindedBeaconBlock blinded_block_capella = 112;
     }
     reserved 4, 5; // Reserving old, deleted fields.
     uint64 signing_slot = 6 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
@@ -99,7 +94,7 @@ message SignResponse {
         FAILED = 3;
     }
 
-    // BLS12-381 signature for the data specified in the request.
+    // Dilithium signature for the data specified in the request.
     bytes signature = 1;
 
     // Status of the signing response, standardized as an enum

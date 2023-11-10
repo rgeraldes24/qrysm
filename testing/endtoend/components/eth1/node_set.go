@@ -1,4 +1,4 @@
-package eth1
+package zond1
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	e2etypes "github.com/theQRL/qrysm/v4/testing/endtoend/types"
 )
 
-// NodeSet represents a set of Eth1 nodes, none of which is a mining node.
+// NodeSet represents a set of Zond1 nodes, none of which is a mining node.
 type NodeSet struct {
 	e2etypes.ComponentRunner
 	started chan struct{}
@@ -17,7 +17,7 @@ type NodeSet struct {
 	nodes   []e2etypes.ComponentRunner
 }
 
-// NewNodeSet creates and returns a set of Eth1 nodes.
+// NewNodeSet creates and returns a set of Zond1 nodes.
 func NewNodeSet() *NodeSet {
 	return &NodeSet{
 		started: make(chan struct{}, 1),
@@ -31,10 +31,10 @@ func (s *NodeSet) SetMinerENR(enr string) {
 
 // Start starts all the execution nodes in set.
 func (s *NodeSet) Start(ctx context.Context) error {
-	// Create Eth1 nodes. The number of nodes is the same as the number of beacon nodes.
-	// We want each beacon node to connect to its own Eth1 node.
-	// We start up one Eth1 node less than the beacon node count because the first
-	// beacon node will connect to the already existing Eth1 miner.
+	// Create Zond1 nodes. The number of nodes is the same as the number of beacon nodes.
+	// We want each beacon node to connect to its own Zond1 node.
+	// We start up one Zond1 node less than the beacon node count because the first
+	// beacon node will connect to the already existing Zond1 miner.
 	totalNodeCount := e2e.TestParams.BeaconNodeCount + e2e.TestParams.LighthouseBeaconNodeCount - 1
 	nodes := make([]e2etypes.ComponentRunner, totalNodeCount)
 	for i := 0; i < totalNodeCount; i++ {

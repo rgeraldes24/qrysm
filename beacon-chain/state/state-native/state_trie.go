@@ -31,9 +31,9 @@ var phase0Fields = []types.FieldIndex{
 	types.BlockRoots,
 	types.StateRoots,
 	types.HistoricalRoots,
-	types.Eth1Data,
-	types.Eth1DataVotes,
-	types.Eth1DepositIndex,
+	types.Zond1Data,
+	types.Zond1DataVotes,
+	types.Zond1DepositIndex,
 	types.Validators,
 	types.Balances,
 	types.RandaoMixes,
@@ -55,9 +55,9 @@ var altairFields = []types.FieldIndex{
 	types.BlockRoots,
 	types.StateRoots,
 	types.HistoricalRoots,
-	types.Eth1Data,
-	types.Eth1DataVotes,
-	types.Eth1DepositIndex,
+	types.Zond1Data,
+	types.Zond1DataVotes,
+	types.Zond1DepositIndex,
 	types.Validators,
 	types.Balances,
 	types.RandaoMixes,
@@ -145,9 +145,9 @@ func InitializeFromProtoUnsafePhase0(st *zondpb.BeaconState) (state.BeaconState,
 		blockRoots:                  &bRoots,
 		stateRoots:                  &sRoots,
 		historicalRoots:             hRoots,
-		eth1Data:                    st.Eth1Data,
-		eth1DataVotes:               st.Eth1DataVotes,
-		eth1DepositIndex:            st.Eth1DepositIndex,
+		zond1Data:                   st.Zond1Data,
+		zond1DataVotes:              st.Zond1DataVotes,
+		zond1DepositIndex:           st.Zond1DepositIndex,
 		validators:                  st.Validators,
 		balances:                    st.Balances,
 		randaoMixes:                 &mixes,
@@ -182,7 +182,7 @@ func InitializeFromProtoUnsafePhase0(st *zondpb.BeaconState) (state.BeaconState,
 	b.sharedFieldReferences[types.BlockRoots] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.StateRoots] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.HistoricalRoots] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.Eth1DataVotes] = stateutil.NewRef(1)
+	b.sharedFieldReferences[types.Zond1DataVotes] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.Validators] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.Balances] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.RandaoMixes] = stateutil.NewRef(1)
@@ -231,9 +231,9 @@ func InitializeFromProtoUnsafeAltair(st *zondpb.BeaconStateAltair) (state.Beacon
 		blockRoots:                  &bRoots,
 		stateRoots:                  &sRoots,
 		historicalRoots:             hRoots,
-		eth1Data:                    st.Eth1Data,
-		eth1DataVotes:               st.Eth1DataVotes,
-		eth1DepositIndex:            st.Eth1DepositIndex,
+		zond1Data:                   st.Zond1Data,
+		zond1DataVotes:              st.Zond1DataVotes,
+		zond1DepositIndex:           st.Zond1DepositIndex,
 		validators:                  st.Validators,
 		balances:                    st.Balances,
 		randaoMixes:                 &mixes,
@@ -271,7 +271,7 @@ func InitializeFromProtoUnsafeAltair(st *zondpb.BeaconStateAltair) (state.Beacon
 	b.sharedFieldReferences[types.BlockRoots] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.StateRoots] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.HistoricalRoots] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.Eth1DataVotes] = stateutil.NewRef(1)
+	b.sharedFieldReferences[types.Zond1DataVotes] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.Validators] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.Balances] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.RandaoMixes] = stateutil.NewRef(1)
@@ -321,9 +321,9 @@ func InitializeFromProtoUnsafeBellatrix(st *zondpb.BeaconStateBellatrix) (state.
 		blockRoots:                   &bRoots,
 		stateRoots:                   &sRoots,
 		historicalRoots:              hRoots,
-		eth1Data:                     st.Eth1Data,
-		eth1DataVotes:                st.Eth1DataVotes,
-		eth1DepositIndex:             st.Eth1DepositIndex,
+		zond1Data:                    st.Zond1Data,
+		zond1DataVotes:               st.Zond1DataVotes,
+		zond1DepositIndex:            st.Zond1DepositIndex,
 		validators:                   st.Validators,
 		balances:                     st.Balances,
 		randaoMixes:                  &mixes,
@@ -362,7 +362,7 @@ func InitializeFromProtoUnsafeBellatrix(st *zondpb.BeaconStateBellatrix) (state.
 	b.sharedFieldReferences[types.BlockRoots] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.StateRoots] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.HistoricalRoots] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.Eth1DataVotes] = stateutil.NewRef(1)
+	b.sharedFieldReferences[types.Zond1DataVotes] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.Validators] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.Balances] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.RandaoMixes] = stateutil.NewRef(1)
@@ -413,9 +413,9 @@ func InitializeFromProtoUnsafeCapella(st *zondpb.BeaconStateCapella) (state.Beac
 		blockRoots:                          &bRoots,
 		stateRoots:                          &sRoots,
 		historicalRoots:                     hRoots,
-		eth1Data:                            st.Eth1Data,
-		eth1DataVotes:                       st.Eth1DataVotes,
-		eth1DepositIndex:                    st.Eth1DepositIndex,
+		zond1Data:                           st.Zond1Data,
+		zond1DataVotes:                      st.Zond1DataVotes,
+		zond1DepositIndex:                   st.Zond1DepositIndex,
 		validators:                          st.Validators,
 		balances:                            st.Balances,
 		randaoMixes:                         &mixes,
@@ -457,7 +457,7 @@ func InitializeFromProtoUnsafeCapella(st *zondpb.BeaconStateCapella) (state.Beac
 	b.sharedFieldReferences[types.BlockRoots] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.StateRoots] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.HistoricalRoots] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.Eth1DataVotes] = stateutil.NewRef(1)
+	b.sharedFieldReferences[types.Zond1DataVotes] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.Validators] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.Balances] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.RandaoMixes] = stateutil.NewRef(1)
@@ -497,7 +497,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 		// Primitive types, safe to copy.
 		genesisTime:                  b.genesisTime,
 		slot:                         b.slot,
-		eth1DepositIndex:             b.eth1DepositIndex,
+		zond1DepositIndex:            b.zond1DepositIndex,
 		nextWithdrawalIndex:          b.nextWithdrawalIndex,
 		nextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 
@@ -507,7 +507,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 		randaoMixes:               b.randaoMixes,
 		previousEpochAttestations: b.previousEpochAttestations,
 		currentEpochAttestations:  b.currentEpochAttestations,
-		eth1DataVotes:             b.eth1DataVotes,
+		zond1DataVotes:            b.zond1DataVotes,
 		slashings:                 b.slashings,
 
 		// Large arrays, increases over time.
@@ -524,7 +524,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 		justificationBits:                   b.justificationBitsVal(),
 		fork:                                b.forkVal(),
 		latestBlockHeader:                   b.latestBlockHeaderVal(),
-		eth1Data:                            b.eth1DataVal(),
+		zond1Data:                           b.zond1DataVal(),
 		previousJustifiedCheckpoint:         b.previousJustifiedCheckpointVal(),
 		currentJustifiedCheckpoint:          b.currentJustifiedCheckpointVal(),
 		finalizedCheckpoint:                 b.finalizedCheckpointVal(),
@@ -700,8 +700,8 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 		return b.genesisValidatorsRoot, nil
 	case types.Slot:
 		return ssz.Uint64Root(uint64(b.slot)), nil
-	case types.Eth1DepositIndex:
-		return ssz.Uint64Root(b.eth1DepositIndex), nil
+	case types.Zond1DepositIndex:
+		return ssz.Uint64Root(b.zond1DepositIndex), nil
 	case types.Fork:
 		return ssz.ForkRoot(b.fork)
 	case types.LatestBlockHeader:
@@ -732,14 +732,14 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 			hRoots[i] = b.historicalRoots[i][:]
 		}
 		return ssz.ByteArrayRootWithLimit(hRoots, fieldparams.HistoricalRootsLength)
-	case types.Eth1Data:
-		return stateutil.Eth1Root(b.eth1Data)
-	case types.Eth1DataVotes:
+	case types.Zond1Data:
+		return stateutil.Zond1Root(b.zond1Data)
+	case types.Zond1DataVotes:
 		if b.rebuildTrie[field] {
 			err := b.resetFieldTrie(
 				field,
-				b.eth1DataVotes,
-				params.BeaconConfig().Eth1DataVotesLength(),
+				b.zond1DataVotes,
+				params.BeaconConfig().Zond1DataVotesLength(),
 			)
 			if err != nil {
 				return [32]byte{}, err
@@ -747,7 +747,7 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 			delete(b.rebuildTrie, field)
 			return b.stateFieldLeaves[field].TrieRoot()
 		}
-		return b.recomputeFieldTrie(field, b.eth1DataVotes)
+		return b.recomputeFieldTrie(field, b.zond1DataVotes)
 	case types.Validators:
 		if b.rebuildTrie[field] {
 			err := b.resetFieldTrie(field, b.validators, fieldparams.ValidatorRegistryLimit)

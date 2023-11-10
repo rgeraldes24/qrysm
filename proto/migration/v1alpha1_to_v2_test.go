@@ -53,7 +53,7 @@ func Test_V1Alpha1BeaconBlockAltairToV2(t *testing.T) {
 	alphaBlock.ParentRoot = parentRoot
 	alphaBlock.StateRoot = stateRoot
 	alphaBlock.Body.RandaoReveal = randaoReveal
-	alphaBlock.Body.Eth1Data = &zondpbalpha.Eth1Data{
+	alphaBlock.Body.Zond1Data = &zondpbalpha.Zond1Data{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
@@ -61,8 +61,8 @@ func Test_V1Alpha1BeaconBlockAltairToV2(t *testing.T) {
 	syncCommitteeBits := bitfield.NewBitvector512()
 	syncCommitteeBits.SetBitAt(100, true)
 	alphaBlock.Body.SyncAggregate = &zondpbalpha.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: signature,
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{signature},
 	}
 
 	v2Block, err := V1Alpha1BeaconBlockAltairToV2(alphaBlock)
@@ -81,7 +81,7 @@ func Test_AltairToV1Alpha1SignedBlock(t *testing.T) {
 	v2Block.Message.ParentRoot = parentRoot
 	v2Block.Message.StateRoot = stateRoot
 	v2Block.Message.Body.RandaoReveal = randaoReveal
-	v2Block.Message.Body.Eth1Data = &zondpbv1.Eth1Data{
+	v2Block.Message.Body.Zond1Data = &zondpbv1.Zond1Data{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
@@ -89,8 +89,8 @@ func Test_AltairToV1Alpha1SignedBlock(t *testing.T) {
 	syncCommitteeBits := bitfield.NewBitvector512()
 	syncCommitteeBits.SetBitAt(100, true)
 	v2Block.Message.Body.SyncAggregate = &zondpbv1.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: signature,
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{signature},
 	}
 	v2Block.Signature = signature
 
@@ -110,7 +110,7 @@ func Test_BellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	v2Block.Message.ParentRoot = parentRoot
 	v2Block.Message.StateRoot = stateRoot
 	v2Block.Message.Body.RandaoReveal = randaoReveal
-	v2Block.Message.Body.Eth1Data = &zondpbv1.Eth1Data{
+	v2Block.Message.Body.Zond1Data = &zondpbv1.Zond1Data{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
@@ -118,8 +118,8 @@ func Test_BellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	syncCommitteeBits := bitfield.NewBitvector512()
 	syncCommitteeBits.SetBitAt(100, true)
 	v2Block.Message.Body.SyncAggregate = &zondpbv1.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: signature,
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{signature},
 	}
 	v2Block.Message.Body.ExecutionPayload = &enginev1.ExecutionPayload{
 		ParentHash:    parentHash,
@@ -155,7 +155,7 @@ func Test_BlindedBellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	v2Block.Message.ParentRoot = parentRoot
 	v2Block.Message.StateRoot = stateRoot
 	v2Block.Message.Body.RandaoReveal = randaoReveal
-	v2Block.Message.Body.Eth1Data = &zondpbv1.Eth1Data{
+	v2Block.Message.Body.Zond1Data = &zondpbv1.Zond1Data{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
@@ -163,8 +163,8 @@ func Test_BlindedBellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	syncCommitteeBits := bitfield.NewBitvector512()
 	syncCommitteeBits.SetBitAt(100, true)
 	v2Block.Message.Body.SyncAggregate = &zondpbv1.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: signature,
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{signature},
 	}
 	v2Block.Message.Body.ExecutionPayloadHeader = &enginev1.ExecutionPayloadHeader{
 		ParentHash:       parentHash,
@@ -200,7 +200,7 @@ func Test_V1Alpha1BeaconBlockBellatrixToV2(t *testing.T) {
 	alphaBlock.ParentRoot = parentRoot
 	alphaBlock.StateRoot = stateRoot
 	alphaBlock.Body.RandaoReveal = randaoReveal
-	alphaBlock.Body.Eth1Data = &zondpbalpha.Eth1Data{
+	alphaBlock.Body.Zond1Data = &zondpbalpha.Zond1Data{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
@@ -208,8 +208,8 @@ func Test_V1Alpha1BeaconBlockBellatrixToV2(t *testing.T) {
 	syncCommitteeBits := bitfield.NewBitvector512()
 	syncCommitteeBits.SetBitAt(100, true)
 	alphaBlock.Body.SyncAggregate = &zondpbalpha.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: signature,
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{signature},
 	}
 
 	v2Block, err := V1Alpha1BeaconBlockBellatrixToV2(alphaBlock)
@@ -228,7 +228,7 @@ func Test_V1Alpha1BeaconBlockBellatrixToV2Blinded(t *testing.T) {
 	alphaBlock.ParentRoot = parentRoot
 	alphaBlock.StateRoot = stateRoot
 	alphaBlock.Body.RandaoReveal = randaoReveal
-	alphaBlock.Body.Eth1Data = &zondpbalpha.Eth1Data{
+	alphaBlock.Body.Zond1Data = &zondpbalpha.Zond1Data{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
@@ -236,8 +236,8 @@ func Test_V1Alpha1BeaconBlockBellatrixToV2Blinded(t *testing.T) {
 	syncCommitteeBits := bitfield.NewBitvector512()
 	syncCommitteeBits.SetBitAt(100, true)
 	alphaBlock.Body.SyncAggregate = &zondpbalpha.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: signature,
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{signature},
 	}
 	alphaBlock.Body.ExecutionPayload.Transactions = [][]byte{[]byte("transaction1"), []byte("transaction2")}
 
@@ -257,7 +257,7 @@ func Test_V1Alpha1BeaconBlockCapellaToV2Blinded(t *testing.T) {
 	alphaBlock.ParentRoot = parentRoot
 	alphaBlock.StateRoot = stateRoot
 	alphaBlock.Body.RandaoReveal = randaoReveal
-	alphaBlock.Body.Eth1Data = &zondpbalpha.Eth1Data{
+	alphaBlock.Body.Zond1Data = &zondpbalpha.Zond1Data{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
@@ -265,8 +265,8 @@ func Test_V1Alpha1BeaconBlockCapellaToV2Blinded(t *testing.T) {
 	syncCommitteeBits := bitfield.NewBitvector512()
 	syncCommitteeBits.SetBitAt(100, true)
 	alphaBlock.Body.SyncAggregate = &zondpbalpha.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: signature,
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{signature},
 	}
 	alphaBlock.Body.ExecutionPayload.Transactions = [][]byte{[]byte("transaction1"), []byte("transaction2")}
 
@@ -299,17 +299,17 @@ func TestBeaconStateAltairToProto(t *testing.T) {
 		state.BlockRoots = [][]byte{bytesutil.PadTo([]byte("blockroots"), 32)}
 		state.StateRoots = [][]byte{bytesutil.PadTo([]byte("stateroots"), 32)}
 		state.HistoricalRoots = [][]byte{bytesutil.PadTo([]byte("historicalroots"), 32)}
-		state.Eth1Data = &zondpbalpha.Eth1Data{
+		state.Zond1Data = &zondpbalpha.Zond1Data{
 			DepositRoot:  bytesutil.PadTo([]byte("e1ddepositroot"), 32),
 			DepositCount: 6,
 			BlockHash:    bytesutil.PadTo([]byte("e1dblockhash"), 32),
 		}
-		state.Eth1DataVotes = []*zondpbalpha.Eth1Data{{
+		state.Zond1DataVotes = []*zondpbalpha.Zond1Data{{
 			DepositRoot:  bytesutil.PadTo([]byte("e1dvdepositroot"), 32),
 			DepositCount: 7,
 			BlockHash:    bytesutil.PadTo([]byte("e1dvblockhash"), 32),
 		}}
-		state.Eth1DepositIndex = 8
+		state.Zond1DepositIndex = 8
 		state.Validators = []*zondpbalpha.Validator{{
 			PublicKey:                  bytesutil.PadTo([]byte("publickey"), 48),
 			WithdrawalCredentials:      bytesutil.PadTo([]byte("withdrawalcredentials"), 32),
@@ -375,18 +375,18 @@ func TestBeaconStateAltairToProto(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("stateroots"), 32), result.StateRoots[0])
 	assert.Equal(t, 1, len(result.HistoricalRoots))
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("historicalroots"), 32), result.HistoricalRoots[0])
-	resultEth1Data := result.Eth1Data
-	require.NotNil(t, resultEth1Data)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1ddepositroot"), 32), resultEth1Data.DepositRoot)
-	assert.Equal(t, uint64(6), resultEth1Data.DepositCount)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dblockhash"), 32), resultEth1Data.BlockHash)
-	require.Equal(t, 1, len(result.Eth1DataVotes))
-	resultEth1DataVote := result.Eth1DataVotes[0]
-	require.NotNil(t, resultEth1DataVote)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvdepositroot"), 32), resultEth1DataVote.DepositRoot)
-	assert.Equal(t, uint64(7), resultEth1DataVote.DepositCount)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvblockhash"), 32), resultEth1DataVote.BlockHash)
-	assert.Equal(t, uint64(8), result.Eth1DepositIndex)
+	resultZond1Data := result.Zond1Data
+	require.NotNil(t, resultZond1Data)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1ddepositroot"), 32), resultZond1Data.DepositRoot)
+	assert.Equal(t, uint64(6), resultZond1Data.DepositCount)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dblockhash"), 32), resultZond1Data.BlockHash)
+	require.Equal(t, 1, len(result.Zond1DataVotes))
+	resultZond1DataVote := result.Zond1DataVotes[0]
+	require.NotNil(t, resultZond1DataVote)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvdepositroot"), 32), resultZond1DataVote.DepositRoot)
+	assert.Equal(t, uint64(7), resultZond1DataVote.DepositCount)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvblockhash"), 32), resultZond1DataVote.BlockHash)
+	assert.Equal(t, uint64(8), result.Zond1DepositIndex)
 	require.Equal(t, 1, len(result.Validators))
 	resultValidator := result.Validators[0]
 	require.NotNil(t, resultValidator)
@@ -446,17 +446,17 @@ func TestBeaconStateBellatrixToProto(t *testing.T) {
 		state.BlockRoots = [][]byte{bytesutil.PadTo([]byte("blockroots"), 32)}
 		state.StateRoots = [][]byte{bytesutil.PadTo([]byte("stateroots"), 32)}
 		state.HistoricalRoots = [][]byte{bytesutil.PadTo([]byte("historicalroots"), 32)}
-		state.Eth1Data = &zondpbalpha.Eth1Data{
+		state.Zond1Data = &zondpbalpha.Zond1Data{
 			DepositRoot:  bytesutil.PadTo([]byte("e1ddepositroot"), 32),
 			DepositCount: 6,
 			BlockHash:    bytesutil.PadTo([]byte("e1dblockhash"), 32),
 		}
-		state.Eth1DataVotes = []*zondpbalpha.Eth1Data{{
+		state.Zond1DataVotes = []*zondpbalpha.Zond1Data{{
 			DepositRoot:  bytesutil.PadTo([]byte("e1dvdepositroot"), 32),
 			DepositCount: 7,
 			BlockHash:    bytesutil.PadTo([]byte("e1dvblockhash"), 32),
 		}}
-		state.Eth1DepositIndex = 8
+		state.Zond1DepositIndex = 8
 		state.Validators = []*zondpbalpha.Validator{{
 			PublicKey:                  bytesutil.PadTo([]byte("publickey"), 48),
 			WithdrawalCredentials:      bytesutil.PadTo([]byte("withdrawalcredentials"), 32),
@@ -538,18 +538,18 @@ func TestBeaconStateBellatrixToProto(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("stateroots"), 32), result.StateRoots[0])
 	assert.Equal(t, 1, len(result.HistoricalRoots))
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("historicalroots"), 32), result.HistoricalRoots[0])
-	resultEth1Data := result.Eth1Data
-	require.NotNil(t, resultEth1Data)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1ddepositroot"), 32), resultEth1Data.DepositRoot)
-	assert.Equal(t, uint64(6), resultEth1Data.DepositCount)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dblockhash"), 32), resultEth1Data.BlockHash)
-	require.Equal(t, 1, len(result.Eth1DataVotes))
-	resultEth1DataVote := result.Eth1DataVotes[0]
-	require.NotNil(t, resultEth1DataVote)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvdepositroot"), 32), resultEth1DataVote.DepositRoot)
-	assert.Equal(t, uint64(7), resultEth1DataVote.DepositCount)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvblockhash"), 32), resultEth1DataVote.BlockHash)
-	assert.Equal(t, uint64(8), result.Eth1DepositIndex)
+	resultZond1Data := result.Zond1Data
+	require.NotNil(t, resultZond1Data)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1ddepositroot"), 32), resultZond1Data.DepositRoot)
+	assert.Equal(t, uint64(6), resultZond1Data.DepositCount)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dblockhash"), 32), resultZond1Data.BlockHash)
+	require.Equal(t, 1, len(result.Zond1DataVotes))
+	resultZond1DataVote := result.Zond1DataVotes[0]
+	require.NotNil(t, resultZond1DataVote)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvdepositroot"), 32), resultZond1DataVote.DepositRoot)
+	assert.Equal(t, uint64(7), resultZond1DataVote.DepositCount)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvblockhash"), 32), resultZond1DataVote.BlockHash)
+	assert.Equal(t, uint64(8), result.Zond1DepositIndex)
 	require.Equal(t, 1, len(result.Validators))
 	resultValidator := result.Validators[0]
 	require.NotNil(t, resultValidator)
@@ -625,17 +625,17 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 		state.BlockRoots = [][]byte{bytesutil.PadTo([]byte("blockroots"), 32)}
 		state.StateRoots = [][]byte{bytesutil.PadTo([]byte("stateroots"), 32)}
 		state.HistoricalRoots = [][]byte{bytesutil.PadTo([]byte("historicalroots"), 32)}
-		state.Eth1Data = &zondpbalpha.Eth1Data{
+		state.Zond1Data = &zondpbalpha.Zond1Data{
 			DepositRoot:  bytesutil.PadTo([]byte("e1ddepositroot"), 32),
 			DepositCount: 6,
 			BlockHash:    bytesutil.PadTo([]byte("e1dblockhash"), 32),
 		}
-		state.Eth1DataVotes = []*zondpbalpha.Eth1Data{{
+		state.Zond1DataVotes = []*zondpbalpha.Zond1Data{{
 			DepositRoot:  bytesutil.PadTo([]byte("e1dvdepositroot"), 32),
 			DepositCount: 7,
 			BlockHash:    bytesutil.PadTo([]byte("e1dvblockhash"), 32),
 		}}
-		state.Eth1DepositIndex = 8
+		state.Zond1DepositIndex = 8
 		state.Validators = []*zondpbalpha.Validator{{
 			PublicKey:                  bytesutil.PadTo([]byte("publickey"), 48),
 			WithdrawalCredentials:      bytesutil.PadTo([]byte("withdrawalcredentials"), 32),
@@ -729,18 +729,18 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("stateroots"), 32), result.StateRoots[0])
 	assert.Equal(t, 1, len(result.HistoricalRoots))
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("historicalroots"), 32), result.HistoricalRoots[0])
-	resultEth1Data := result.Eth1Data
-	require.NotNil(t, resultEth1Data)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1ddepositroot"), 32), resultEth1Data.DepositRoot)
-	assert.Equal(t, uint64(6), resultEth1Data.DepositCount)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dblockhash"), 32), resultEth1Data.BlockHash)
-	require.Equal(t, 1, len(result.Eth1DataVotes))
-	resultEth1DataVote := result.Eth1DataVotes[0]
-	require.NotNil(t, resultEth1DataVote)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvdepositroot"), 32), resultEth1DataVote.DepositRoot)
-	assert.Equal(t, uint64(7), resultEth1DataVote.DepositCount)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvblockhash"), 32), resultEth1DataVote.BlockHash)
-	assert.Equal(t, uint64(8), result.Eth1DepositIndex)
+	resultZond1Data := result.Zond1Data
+	require.NotNil(t, resultZond1Data)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1ddepositroot"), 32), resultZond1Data.DepositRoot)
+	assert.Equal(t, uint64(6), resultZond1Data.DepositCount)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dblockhash"), 32), resultZond1Data.BlockHash)
+	require.Equal(t, 1, len(result.Zond1DataVotes))
+	resultZond1DataVote := result.Zond1DataVotes[0]
+	require.NotNil(t, resultZond1DataVote)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvdepositroot"), 32), resultZond1DataVote.DepositRoot)
+	assert.Equal(t, uint64(7), resultZond1DataVote.DepositCount)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvblockhash"), 32), resultZond1DataVote.BlockHash)
+	assert.Equal(t, uint64(8), result.Zond1DepositIndex)
 	require.Equal(t, 1, len(result.Validators))
 	resultValidator := result.Validators[0]
 	require.NotNil(t, resultValidator)

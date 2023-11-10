@@ -200,7 +200,7 @@ func (BeaconBlockBody) RandaoReveal() [dilithium2.CryptoBytes]byte {
 	panic("implement me")
 }
 
-func (BeaconBlockBody) Eth1Data() *zond.Eth1Data {
+func (BeaconBlockBody) Zond1Data() *zond.Zond1Data {
 	panic("implement me")
 }
 
@@ -260,7 +260,7 @@ func (b *BeaconBlockBody) SetRandaoReveal([]byte) {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetEth1Data(*zond.Eth1Data) {
+func (b *BeaconBlockBody) SetZond1Data(*zond.Zond1Data) {
 	panic("implement me")
 }
 

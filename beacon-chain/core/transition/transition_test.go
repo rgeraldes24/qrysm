@@ -53,19 +53,19 @@ func TestExecuteStateTransition_IncorrectSlot(t *testing.T) {
 func TestExecuteStateTransition_FullProcess(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
 
-	eth1Data := &zondpb.Eth1Data{
+	zond1Data := &zondpb.Zond1Data{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
 	}
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
-	e := beaconState.Eth1Data()
+	e := beaconState.Zond1Data()
 	e.DepositCount = 100
-	require.NoError(t, beaconState.SetEth1Data(e))
+	require.NoError(t, beaconState.SetZond1Data(e))
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetEth1DataVotes([]*zondpb.Eth1Data{eth1Data}))
+	require.NoError(t, beaconState.SetZond1DataVotes([]*zondpb.Zond1Data{zond1Data}))
 
 	oldMix, err := beaconState.RandaoMixAtIndex(1)
 	require.NoError(t, err)
@@ -87,7 +87,7 @@ func TestExecuteStateTransition_FullProcess(t *testing.T) {
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
 	block.Block.Body.RandaoReveal = randaoReveal
-	block.Block.Body.Eth1Data = eth1Data
+	block.Block.Body.Zond1Data = zond1Data
 
 	wsb, err := consensusblocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -181,8 +181,8 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 	block.Block.Body.Attestations = attestations
 	block.Block.Body.AttesterSlashings = attesterSlashings
 	block.Block.Body.VoluntaryExits = exits
-	block.Block.Body.Eth1Data.DepositRoot = bytesutil.PadTo([]byte{2}, 32)
-	block.Block.Body.Eth1Data.BlockHash = bytesutil.PadTo([]byte{3}, 32)
+	block.Block.Body.Zond1Data.DepositRoot = bytesutil.PadTo([]byte{2}, 32)
+	block.Block.Body.Zond1Data.BlockHash = bytesutil.PadTo([]byte{3}, 32)
 	err = beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
 	require.NoError(t, err)
 	cp := beaconState.CurrentJustifiedCheckpoint()
@@ -468,8 +468,8 @@ func TestProcessBlock_OverMaxVoluntaryExits(t *testing.T) {
 
 func TestProcessBlock_IncorrectDeposits(t *testing.T) {
 	base := &zondpb.BeaconState{
-		Eth1Data:         &zondpb.Eth1Data{DepositCount: 100},
-		Eth1DepositIndex: 98,
+		Zond1Data:         &zondpb.Zond1Data{DepositCount: 100},
+		Zond1DepositIndex: 98,
 	}
 	s, err := state_native.InitializeFromProtoPhase0(base)
 	require.NoError(t, err)
@@ -481,7 +481,7 @@ func TestProcessBlock_IncorrectDeposits(t *testing.T) {
 		},
 	}
 	want := fmt.Sprintf("incorrect outstanding deposits in block body, wanted: %d, got: %d",
-		s.Eth1Data().DepositCount-s.Eth1DepositIndex(), len(b.Block.Body.Deposits))
+		s.Zond1Data().DepositCount-s.Zond1DepositIndex(), len(b.Block.Body.Deposits))
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
 	_, err = transition.VerifyOperationLengths(context.Background(), s, wsb)

@@ -208,7 +208,7 @@ func createAttestationSignatureBatch(
 		if err := attestation.IsValidAttestationIndices(ctx, ia); err != nil {
 			return nil, err
 		}
-		sigs[i] = ia.Signature
+		sigs[i] = ia.Signatures
 		indices := ia.AttestingIndices
 		pubkeys := make([][]byte, len(indices))
 		for j := 0; j < len(indices); j++ {

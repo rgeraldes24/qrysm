@@ -35,11 +35,11 @@ func jsonifyDilithiumToExecutionChanges(dilithiumToExecutionChanges []*zondpb.Si
 	return jsonDilithiumToExecutionChanges
 }
 
-func jsonifyEth1Data(eth1Data *zondpb.Eth1Data) *apimiddleware.Eth1DataJson {
-	return &apimiddleware.Eth1DataJson{
-		BlockHash:    hexutil.Encode(eth1Data.BlockHash),
-		DepositCount: uint64ToString(eth1Data.DepositCount),
-		DepositRoot:  hexutil.Encode(eth1Data.DepositRoot),
+func jsonifyZond1Data(zond1Data *zondpb.Zond1Data) *apimiddleware.Zond1DataJson {
+	return &apimiddleware.Zond1DataJson{
+		BlockHash:    hexutil.Encode(zond1Data.BlockHash),
+		DepositCount: uint64ToString(zond1Data.DepositCount),
+		DepositRoot:  hexutil.Encode(zond1Data.DepositRoot),
 	}
 }
 
@@ -136,7 +136,7 @@ func jsonifyIndexedAttestation(indexedAttestation *zondpb.IndexedAttestation) *a
 	return &apimiddleware.IndexedAttestationJson{
 		AttestingIndices: attestingIndices,
 		Data:             jsonifyAttestationData(indexedAttestation.Data),
-		Signature:        hexutil.Encode(indexedAttestation.Signature),
+		Signature:        hexutil.Encode(indexedAttestation.Signatures),
 	}
 }
 
@@ -160,7 +160,7 @@ func jsonifyAttestation(attestation *zondpb.Attestation) *apimiddleware.Attestat
 	return &apimiddleware.AttestationJson{
 		AggregationBits: hexutil.Encode(attestation.AggregationBits),
 		Data:            jsonifyAttestationData(attestation.Data),
-		Signature:       hexutil.Encode(attestation.Signature),
+		Signature:       hexutil.Encode(attestation.Signatures),
 	}
 }
 

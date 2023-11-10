@@ -59,15 +59,15 @@ type BeaconChainConfig struct {
 	SqrRootSlotsPerEpoch                      primitives.Slot  // SqrRootSlotsPerEpoch is a hard coded value where we take the square root of `SlotsPerEpoch` and round down.
 	MinSeedLookahead                          primitives.Epoch `yaml:"MIN_SEED_LOOKAHEAD" spec:"true"`                  // MinSeedLookahead is the duration of randao look ahead seed.
 	MaxSeedLookahead                          primitives.Epoch `yaml:"MAX_SEED_LOOKAHEAD" spec:"true"`                  // MaxSeedLookahead is the duration a validator has to wait for entry and exit in epoch.
-	EpochsPerEth1VotingPeriod                 primitives.Epoch `yaml:"EPOCHS_PER_ETH1_VOTING_PERIOD" spec:"true"`       // EpochsPerEth1VotingPeriod defines how often the merkle root of deposit receipts get updated in beacon node on per epoch basis.
+	EpochsPerZond1VotingPeriod                primitives.Epoch `yaml:"EPOCHS_PER_ETH1_VOTING_PERIOD" spec:"true"`       // EpochsPerZond1VotingPeriod defines how often the merkle root of deposit receipts get updated in beacon node on per epoch basis.
 	SlotsPerHistoricalRoot                    primitives.Slot  `yaml:"SLOTS_PER_HISTORICAL_ROOT" spec:"true"`           // SlotsPerHistoricalRoot defines how often the historical root is saved.
 	MinValidatorWithdrawabilityDelay          primitives.Epoch `yaml:"MIN_VALIDATOR_WITHDRAWABILITY_DELAY" spec:"true"` // MinValidatorWithdrawabilityDelay is the shortest amount of time a validator has to wait to withdraw.
 	ShardCommitteePeriod                      primitives.Epoch `yaml:"SHARD_COMMITTEE_PERIOD" spec:"true"`              // ShardCommitteePeriod is the minimum amount of epochs a validator must participate before exiting.
 	MinEpochsToInactivityPenalty              primitives.Epoch `yaml:"MIN_EPOCHS_TO_INACTIVITY_PENALTY" spec:"true"`    // MinEpochsToInactivityPenalty defines the minimum amount of epochs since finality to begin penalizing inactivity.
-	Eth1FollowDistance                        uint64           `yaml:"ETH1_FOLLOW_DISTANCE" spec:"true"`                // Eth1FollowDistance is the number of eth1.0 blocks to wait before considering a new deposit for voting. This only applies after the chain as been started.
+	Zond1FollowDistance                       uint64           `yaml:"ETH1_FOLLOW_DISTANCE" spec:"true"`                // Zond1FollowDistance is the number of zond1.0 blocks to wait before considering a new deposit for voting. This only applies after the chain as been started.
 	DeprecatedSafeSlotsToUpdateJustified      primitives.Slot  `yaml:"SAFE_SLOTS_TO_UPDATE_JUSTIFIED" spec:"true"`      // DeprecateSafeSlotsToUpdateJustified is the minimal slots needed to update justified check point.
 	DeprecatedSafeSlotsToImportOptimistically primitives.Slot  `yaml:"SAFE_SLOTS_TO_IMPORT_OPTIMISTICALLY" spec:"true"` // SafeSlotsToImportOptimistically is the minimal number of slots to wait before importing optimistically a pre-merge block
-	SecondsPerETH1Block                       uint64           `yaml:"SECONDS_PER_ETH1_BLOCK" spec:"true"`              // SecondsPerETH1Block is the approximate time for a single eth1 block to be produced.
+	SecondsPerETH1Block                       uint64           `yaml:"SECONDS_PER_ETH1_BLOCK" spec:"true"`              // SecondsPerETH1Block is the approximate time for a single zond1 block to be produced.
 
 	// Fork choice algorithm constants.
 	ProposerScoreBoost              uint64           `yaml:"PROPOSER_SCORE_BOOST" spec:"true"`                // ProposerScoreBoost defines a value that is a % of the committee weight for fork-choice boosting.
@@ -77,8 +77,8 @@ type BeaconChainConfig struct {
 	IntervalsPerSlot                uint64           `yaml:"INTERVALS_PER_SLOT" spec:"true"`                  // IntervalsPerSlot defines the number of fork choice intervals in a slot defined in the fork choice spec.
 
 	// Ethereum PoW parameters.
-	DepositChainID         uint64 `yaml:"DEPOSIT_CHAIN_ID" spec:"true"`         // DepositChainID of the eth1 network. This used for replay protection.
-	DepositNetworkID       uint64 `yaml:"DEPOSIT_NETWORK_ID" spec:"true"`       // DepositNetworkID of the eth1 network. This used for replay protection.
+	DepositChainID         uint64 `yaml:"DEPOSIT_CHAIN_ID" spec:"true"`         // DepositChainID of the zond1 network. This used for replay protection.
+	DepositNetworkID       uint64 `yaml:"DEPOSIT_NETWORK_ID" spec:"true"`       // DepositNetworkID of the zond1 network. This used for replay protection.
 	DepositContractAddress string `yaml:"DEPOSIT_CONTRACT_ADDRESS" spec:"true"` // DepositContractAddress is the address of the deposit contract.
 
 	// Validator parameters.
@@ -244,10 +244,10 @@ func configForkNames(b *BeaconChainConfig) map[[fieldparams.VersionLength]byte]s
 	return fvn
 }
 
-// Eth1DataVotesLength returns the maximum length of the votes on the Eth1 data,
+// Zond1DataVotesLength returns the maximum length of the votes on the Zond1 data,
 // computed from the parameters in BeaconChainConfig.
-func (b *BeaconChainConfig) Eth1DataVotesLength() uint64 {
-	return uint64(b.EpochsPerEth1VotingPeriod.Mul(uint64(b.SlotsPerEpoch)))
+func (b *BeaconChainConfig) Zond1DataVotesLength() uint64 {
+	return uint64(b.EpochsPerZond1VotingPeriod.Mul(uint64(b.SlotsPerEpoch)))
 }
 
 // PreviousEpochAttestationsLength returns the maximum length of the pending

@@ -1,4 +1,4 @@
-package eth1
+package zond1
 
 import (
 	"context"
@@ -48,20 +48,20 @@ func (node *Node) Start(ctx context.Context) error {
 		return errors.New("go-ethereum binary not found")
 	}
 
-	eth1Path := path.Join(e2e.TestParams.TestPath, "eth1data/"+strconv.Itoa(node.index)+"/")
+	zond1Path := path.Join(e2e.TestParams.TestPath, "zond1data/"+strconv.Itoa(node.index)+"/")
 	// Clear out potentially existing dir to prevent issues.
-	if _, err := os.Stat(eth1Path); !os.IsNotExist(err) {
-		if err = os.RemoveAll(eth1Path); err != nil {
+	if _, err := os.Stat(zond1Path); !os.IsNotExist(err) {
+		if err = os.RemoveAll(zond1Path); err != nil {
 			return err
 		}
 	}
 
-	if err := file.MkdirAll(eth1Path); err != nil {
+	if err := file.MkdirAll(zond1Path); err != nil {
 		return err
 	}
-	gethJsonPath := path.Join(eth1Path, "genesis.json")
+	gethJsonPath := path.Join(zond1Path, "genesis.json")
 
-	gen := interop.GethTestnetGenesis(e2e.TestParams.Eth1GenesisTime, params.BeaconConfig())
+	gen := interop.GethTestnetGenesis(e2e.TestParams.Zond1GenesisTime, params.BeaconConfig())
 	b, err := json.Marshal(gen)
 	if err != nil {
 		return err
@@ -70,13 +70,13 @@ func (node *Node) Start(ctx context.Context) error {
 	if err := file.WriteFile(gethJsonPath, b); err != nil {
 		return err
 	}
-	copyPath := path.Join(e2e.TestParams.LogPath, "eth1-genesis.json")
+	copyPath := path.Join(e2e.TestParams.LogPath, "zond1-genesis.json")
 	if err := file.WriteFile(copyPath, b); err != nil {
 		return err
 	}
 
-	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", eth1Path), gethJsonPath) // #nosec G204 -- Safe
-	initFile, err := helpers.DeleteAndCreateFile(e2e.TestParams.LogPath, "eth1-init_"+strconv.Itoa(node.index)+".log")
+	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", zond1Path), gethJsonPath) // #nosec G204 -- Safe
+	initFile, err := helpers.DeleteAndCreateFile(e2e.TestParams.LogPath, "zond1-init_"+strconv.Itoa(node.index)+".log")
 	if err != nil {
 		return err
 	}
@@ -90,12 +90,12 @@ func (node *Node) Start(ctx context.Context) error {
 
 	args := []string{
 		"--nat=none", // disable nat traversal in e2e, it is failure prone and not needed
-		fmt.Sprintf("--datadir=%s", eth1Path),
-		fmt.Sprintf("--http.port=%d", e2e.TestParams.Ports.Eth1RPCPort+node.index),
-		fmt.Sprintf("--ws.port=%d", e2e.TestParams.Ports.Eth1WSPort+node.index),
-		fmt.Sprintf("--authrpc.port=%d", e2e.TestParams.Ports.Eth1AuthRPCPort+node.index),
+		fmt.Sprintf("--datadir=%s", zond1Path),
+		fmt.Sprintf("--http.port=%d", e2e.TestParams.Ports.Zond1RPCPort+node.index),
+		fmt.Sprintf("--ws.port=%d", e2e.TestParams.Ports.Zond1WSPort+node.index),
+		fmt.Sprintf("--authrpc.port=%d", e2e.TestParams.Ports.Zond1AuthRPCPort+node.index),
 		fmt.Sprintf("--bootnodes=%s", node.enr),
-		fmt.Sprintf("--port=%d", e2e.TestParams.Ports.Eth1Port+node.index),
+		fmt.Sprintf("--port=%d", e2e.TestParams.Ports.Zond1Port+node.index),
 		fmt.Sprintf("--networkid=%d", NetworkId),
 		"--http",
 		"--http.api=engine,net,eth",
@@ -117,26 +117,26 @@ func (node *Node) Start(ctx context.Context) error {
 	var retryErr error
 	for retries := 0; retries < 3; retries++ {
 		retryErr = nil
-		log.Infof("Starting eth1 node %d, attempt %d with flags: %s", node.index, retries, strings.Join(args[2:], " "))
+		log.Infof("Starting zond1 node %d, attempt %d with flags: %s", node.index, retries, strings.Join(args[2:], " "))
 		runCmd := exec.CommandContext(ctx, binaryPath, args...) // #nosec G204 -- Safe
-		errLog, err := os.Create(path.Join(e2e.TestParams.LogPath, "eth1_"+strconv.Itoa(node.index)+".log"))
+		errLog, err := os.Create(path.Join(e2e.TestParams.LogPath, "zond1_"+strconv.Itoa(node.index)+".log"))
 		if err != nil {
 			return err
 		}
 		runCmd.Stderr = errLog
 		if err = runCmd.Start(); err != nil {
-			return fmt.Errorf("failed to start eth1 chain: %w", err)
+			return fmt.Errorf("failed to start zond1 chain: %w", err)
 		}
 		if err = helpers.WaitForTextInFile(errLog, "Started P2P networking"); err != nil {
 			kerr := runCmd.Process.Kill()
 			if kerr != nil {
 				log.WithError(kerr).Error("error sending kill to failed node command process")
 			}
-			retryErr = fmt.Errorf("P2P log not found, this means the eth1 chain had issues starting: %w", err)
+			retryErr = fmt.Errorf("P2P log not found, this means the zond1 chain had issues starting: %w", err)
 			continue
 		}
 		node.cmd = runCmd
-		log.Infof("eth1 node started after %d retries", retries)
+		log.Infof("zond1 node started after %d retries", retries)
 		break
 	}
 	if retryErr != nil {

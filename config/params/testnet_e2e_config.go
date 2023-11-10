@@ -12,7 +12,7 @@ const (
 func E2ETestConfig() *BeaconChainConfig {
 	e2eConfig := MinimalSpecConfig()
 	e2eConfig.DepositContractAddress = "0x4242424242424242424242424242424242424242"
-	e2eConfig.Eth1FollowDistance = 8
+	e2eConfig.Zond1FollowDistance = 8
 
 	// Misc.
 	e2eConfig.MinGenesisActiveValidatorCount = 256
@@ -25,14 +25,14 @@ func E2ETestConfig() *BeaconChainConfig {
 	e2eConfig.SlotsPerEpoch = 6
 	e2eConfig.SqrRootSlotsPerEpoch = 2
 	e2eConfig.SecondsPerETH1Block = 2
-	e2eConfig.EpochsPerEth1VotingPeriod = 2
+	e2eConfig.EpochsPerZond1VotingPeriod = 2
 	e2eConfig.ShardCommitteePeriod = 4
 	e2eConfig.MaxSeedLookahead = 1
 	e2eConfig.MinValidatorWithdrawabilityDelay = 1
 
 	// PoW parameters.
-	e2eConfig.DepositChainID = 1337   // Chain ID of eth1 dev net.
-	e2eConfig.DepositNetworkID = 1337 // Network ID of eth1 dev net.
+	e2eConfig.DepositChainID = 1337   // Chain ID of zond1 dev net.
+	e2eConfig.DepositNetworkID = 1337 // Network ID of zond1 dev net.
 
 	// Fork Parameters.
 	e2eConfig.AltairForkEpoch = AltairE2EForkEpoch
@@ -56,7 +56,7 @@ func E2ETestConfig() *BeaconChainConfig {
 func E2EMainnetTestConfig() *BeaconChainConfig {
 	e2eConfig := MainnetConfig().Copy()
 	e2eConfig.DepositContractAddress = "0x4242424242424242424242424242424242424242"
-	e2eConfig.Eth1FollowDistance = 8
+	e2eConfig.Zond1FollowDistance = 8
 
 	// Misc.
 	e2eConfig.MinGenesisActiveValidatorCount = 256
@@ -71,8 +71,8 @@ func E2EMainnetTestConfig() *BeaconChainConfig {
 	e2eConfig.MinValidatorWithdrawabilityDelay = 1
 
 	// PoW parameters.
-	e2eConfig.DepositChainID = 1337   // Chain ID of eth1 dev net.
-	e2eConfig.DepositNetworkID = 1337 // Network ID of eth1 dev net.
+	e2eConfig.DepositChainID = 1337   // Chain ID of zond1 dev net.
+	e2eConfig.DepositNetworkID = 1337 // Network ID of zond1 dev net.
 
 	// Altair Fork Parameters.
 	e2eConfig.AltairForkEpoch = AltairE2EForkEpoch

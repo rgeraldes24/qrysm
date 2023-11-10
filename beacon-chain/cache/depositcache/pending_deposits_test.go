@@ -79,9 +79,9 @@ func TestPendingDeposits_OK(t *testing.T) {
 	dc := DepositCache{}
 
 	dc.pendingDeposits = []*zondpb.DepositContainer{
-		{Eth1BlockHeight: 2, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("A")}}},
-		{Eth1BlockHeight: 4, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("B")}}},
-		{Eth1BlockHeight: 6, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("c")}}},
+		{Zond1BlockHeight: 2, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("A")}}},
+		{Zond1BlockHeight: 4, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("B")}}},
+		{Zond1BlockHeight: 6, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("c")}}},
 	}
 
 	deposits := dc.PendingDeposits(context.Background(), big.NewInt(4))
@@ -99,22 +99,22 @@ func TestPrunePendingDeposits_ZeroMerkleIndex(t *testing.T) {
 	dc := DepositCache{}
 
 	dc.pendingDeposits = []*zondpb.DepositContainer{
-		{Eth1BlockHeight: 2, Index: 2},
-		{Eth1BlockHeight: 4, Index: 4},
-		{Eth1BlockHeight: 6, Index: 6},
-		{Eth1BlockHeight: 8, Index: 8},
-		{Eth1BlockHeight: 10, Index: 10},
-		{Eth1BlockHeight: 12, Index: 12},
+		{Zond1BlockHeight: 2, Index: 2},
+		{Zond1BlockHeight: 4, Index: 4},
+		{Zond1BlockHeight: 6, Index: 6},
+		{Zond1BlockHeight: 8, Index: 8},
+		{Zond1BlockHeight: 10, Index: 10},
+		{Zond1BlockHeight: 12, Index: 12},
 	}
 
 	dc.PrunePendingDeposits(context.Background(), 0)
 	expected := []*zondpb.DepositContainer{
-		{Eth1BlockHeight: 2, Index: 2},
-		{Eth1BlockHeight: 4, Index: 4},
-		{Eth1BlockHeight: 6, Index: 6},
-		{Eth1BlockHeight: 8, Index: 8},
-		{Eth1BlockHeight: 10, Index: 10},
-		{Eth1BlockHeight: 12, Index: 12},
+		{Zond1BlockHeight: 2, Index: 2},
+		{Zond1BlockHeight: 4, Index: 4},
+		{Zond1BlockHeight: 6, Index: 6},
+		{Zond1BlockHeight: 8, Index: 8},
+		{Zond1BlockHeight: 10, Index: 10},
+		{Zond1BlockHeight: 12, Index: 12},
 	}
 	assert.DeepEqual(t, expected, dc.pendingDeposits)
 }
@@ -123,37 +123,37 @@ func TestPrunePendingDeposits_OK(t *testing.T) {
 	dc := DepositCache{}
 
 	dc.pendingDeposits = []*zondpb.DepositContainer{
-		{Eth1BlockHeight: 2, Index: 2},
-		{Eth1BlockHeight: 4, Index: 4},
-		{Eth1BlockHeight: 6, Index: 6},
-		{Eth1BlockHeight: 8, Index: 8},
-		{Eth1BlockHeight: 10, Index: 10},
-		{Eth1BlockHeight: 12, Index: 12},
+		{Zond1BlockHeight: 2, Index: 2},
+		{Zond1BlockHeight: 4, Index: 4},
+		{Zond1BlockHeight: 6, Index: 6},
+		{Zond1BlockHeight: 8, Index: 8},
+		{Zond1BlockHeight: 10, Index: 10},
+		{Zond1BlockHeight: 12, Index: 12},
 	}
 
 	dc.PrunePendingDeposits(context.Background(), 6)
 	expected := []*zondpb.DepositContainer{
-		{Eth1BlockHeight: 6, Index: 6},
-		{Eth1BlockHeight: 8, Index: 8},
-		{Eth1BlockHeight: 10, Index: 10},
-		{Eth1BlockHeight: 12, Index: 12},
+		{Zond1BlockHeight: 6, Index: 6},
+		{Zond1BlockHeight: 8, Index: 8},
+		{Zond1BlockHeight: 10, Index: 10},
+		{Zond1BlockHeight: 12, Index: 12},
 	}
 
 	assert.DeepEqual(t, expected, dc.pendingDeposits)
 
 	dc.pendingDeposits = []*zondpb.DepositContainer{
-		{Eth1BlockHeight: 2, Index: 2},
-		{Eth1BlockHeight: 4, Index: 4},
-		{Eth1BlockHeight: 6, Index: 6},
-		{Eth1BlockHeight: 8, Index: 8},
-		{Eth1BlockHeight: 10, Index: 10},
-		{Eth1BlockHeight: 12, Index: 12},
+		{Zond1BlockHeight: 2, Index: 2},
+		{Zond1BlockHeight: 4, Index: 4},
+		{Zond1BlockHeight: 6, Index: 6},
+		{Zond1BlockHeight: 8, Index: 8},
+		{Zond1BlockHeight: 10, Index: 10},
+		{Zond1BlockHeight: 12, Index: 12},
 	}
 
 	dc.PrunePendingDeposits(context.Background(), 10)
 	expected = []*zondpb.DepositContainer{
-		{Eth1BlockHeight: 10, Index: 10},
-		{Eth1BlockHeight: 12, Index: 12},
+		{Zond1BlockHeight: 10, Index: 10},
+		{Zond1BlockHeight: 12, Index: 12},
 	}
 
 	assert.DeepEqual(t, expected, dc.pendingDeposits)

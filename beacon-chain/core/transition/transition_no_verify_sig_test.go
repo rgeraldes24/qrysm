@@ -19,19 +19,19 @@ import (
 func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
 
-	eth1Data := &zondpb.Eth1Data{
+	zond1Data := &zondpb.Zond1Data{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
 	}
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
-	e := beaconState.Eth1Data()
+	e := beaconState.Zond1Data()
 	e.DepositCount = 100
-	require.NoError(t, beaconState.SetEth1Data(e))
+	require.NoError(t, beaconState.SetZond1Data(e))
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetEth1DataVotes([]*zondpb.Eth1Data{eth1Data}))
+	require.NoError(t, beaconState.SetZond1DataVotes([]*zondpb.Zond1Data{zond1Data}))
 
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 	epoch := time.CurrentEpoch(beaconState)
@@ -50,7 +50,7 @@ func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
 	block.Block.Body.RandaoReveal = randaoReveal
-	block.Block.Body.Eth1Data = eth1Data
+	block.Block.Body.Zond1Data = zond1Data
 
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -75,19 +75,19 @@ func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
 
-	eth1Data := &zondpb.Eth1Data{
+	zond1Data := &zondpb.Zond1Data{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
 	}
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
-	e := beaconState.Eth1Data()
+	e := beaconState.Zond1Data()
 	e.DepositCount = 100
-	require.NoError(t, beaconState.SetEth1Data(e))
+	require.NoError(t, beaconState.SetZond1Data(e))
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetEth1DataVotes([]*zondpb.Eth1Data{eth1Data}))
+	require.NoError(t, beaconState.SetZond1DataVotes([]*zondpb.Zond1Data{zond1Data}))
 
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 	epoch := time.CurrentEpoch(beaconState)
@@ -106,7 +106,7 @@ func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *test
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
 	block.Block.Body.RandaoReveal = randaoReveal
-	block.Block.Body.Eth1Data = eth1Data
+	block.Block.Body.Zond1Data = zond1Data
 
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)

@@ -10,11 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
 )
@@ -52,10 +49,9 @@ func ConvertToIndexed(ctx context.Context, attestation *zondpb.Attestation, comm
 	copy(signatureValidatorIndex, attestation.SignatureValidatorIndex)
 	sigsMap := make(map[uint64][]byte)
 	for i, validatorIndex := range signatureValidatorIndex {
-		offset := i * dilithium2.CryptoBytes
-		sigsMap[validatorIndex] = attestation.Signature[offset : offset+dilithium2.CryptoBytes]
+		sigsMap[validatorIndex] = attestation.Signatures[i]
 	}
-	signatures := make([]byte, 0, len(attestation.Signature))
+	signatures := make([][]byte, 0, len(attestation.Signatures))
 
 	sort.Slice(signatureValidatorIndex, func(i, j int) bool {
 		return signatureValidatorIndex[i] < signatureValidatorIndex[j]
@@ -65,12 +61,12 @@ func ConvertToIndexed(ctx context.Context, attestation *zondpb.Attestation, comm
 		if !ok {
 			return nil, errors.Errorf("ConvertToIndexed unkown validatorIndex in sigMap %d", validatorIndex)
 		}
-		signatures = append(signatures, sig...)
+		signatures = append(signatures, sig)
 	}
 
 	inAtt := &zondpb.IndexedAttestation{
 		Data:                    attestation.Data,
-		Signature:               signatures,
+		Signatures:              signatures,
 		SignatureValidatorIndex: signatureValidatorIndex,
 		AttestingIndices:        attIndices,
 	}
@@ -123,6 +119,7 @@ func AttestingIndices(bf bitfield.Bitfield, committee []primitives.ValidatorInde
 //	 domain = get_domain(state, DOMAIN_BEACON_ATTESTER, indexed_attestation.data.target.epoch)
 //	 signing_root = compute_signing_root(indexed_attestation.data, domain)
 //	 return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
+/*
 func VerifyIndexedAttestationSig(ctx context.Context, indexedAtt *zondpb.IndexedAttestation, pubKeys []dilithium.PublicKey, domain []byte) error {
 	ctx, span := trace.StartSpan(ctx, "attestationutil.VerifyIndexedAttestationSig")
 	defer span.End()
@@ -132,7 +129,7 @@ func VerifyIndexedAttestationSig(ctx context.Context, indexedAtt *zondpb.Indexed
 		return errors.Wrap(err, "could not get signing root of object")
 	}
 
-	sig, err := dilithium.SignatureFromBytes(indexedAtt.Signature)
+	sig, err := dilithium.SignatureFromBytes(indexedAtt.Signatures)
 	if err != nil {
 		return errors.Wrap(err, "could not convert bytes to signature")
 	}
@@ -143,6 +140,7 @@ func VerifyIndexedAttestationSig(ctx context.Context, indexedAtt *zondpb.Indexed
 	}
 	return nil
 }
+*/
 
 // IsValidAttestationIndices this helper function performs the first part of the
 // spec indexed attestation validation starting at Check if “indexed_attestation“

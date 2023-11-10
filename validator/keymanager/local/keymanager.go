@@ -386,7 +386,7 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 		fmt.Printf("Showing %d validator accounts\n", numAccounts)
 	}
 	fmt.Println(
-		au.BrightRed("View the eth1 deposit transaction data for your accounts " +
+		au.BrightRed("View the zond1 deposit transaction data for your accounts " +
 			"by running `validator accounts list --show-deposit-data`"),
 	)
 

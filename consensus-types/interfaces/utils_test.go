@@ -20,7 +20,7 @@ func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
 		Body: &zond.BeaconBlockBody{
-			Eth1Data: &zond.Eth1Data{
+			Zond1Data: &zond.Zond1Data{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
@@ -57,7 +57,7 @@ func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
 		Body: &zond.BeaconBlockBody{
-			Eth1Data: &zond.Eth1Data{
+			Zond1Data: &zond.Zond1Data{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
@@ -108,7 +108,7 @@ func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
 		Body: &zond.BeaconBlockBody{
-			Eth1Data: &zond.Eth1Data{
+			Zond1Data: &zond.Zond1Data{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
@@ -149,7 +149,7 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
 		Body: &zond.BeaconBlockBody{
-			Eth1Data: &zond.Eth1Data{
+			Zond1Data: &zond.Zond1Data{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,

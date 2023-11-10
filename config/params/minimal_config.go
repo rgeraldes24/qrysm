@@ -40,12 +40,12 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.SqrRootSlotsPerEpoch = 2
 	minimalConfig.MinSeedLookahead = 1
 	minimalConfig.MaxSeedLookahead = 4
-	minimalConfig.EpochsPerEth1VotingPeriod = 4
+	minimalConfig.EpochsPerZond1VotingPeriod = 4
 	minimalConfig.SlotsPerHistoricalRoot = 64
 	minimalConfig.MinValidatorWithdrawabilityDelay = 256
 	minimalConfig.ShardCommitteePeriod = 64
 	minimalConfig.MinEpochsToInactivityPenalty = 4
-	minimalConfig.Eth1FollowDistance = 16
+	minimalConfig.Zond1FollowDistance = 16
 	minimalConfig.SecondsPerETH1Block = 14
 
 	// State vector lengths
@@ -96,8 +96,8 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.EpochsPerSyncCommitteePeriod = 8
 
 	// Ethereum PoW parameters.
-	minimalConfig.DepositChainID = 5   // Chain ID of eth1 goerli.
-	minimalConfig.DepositNetworkID = 5 // Network ID of eth1 goerli.
+	minimalConfig.DepositChainID = 5   // Chain ID of zond1 goerli.
+	minimalConfig.DepositNetworkID = 5 // Network ID of zond1 goerli.
 	minimalConfig.DepositContractAddress = "0x1234567890123456789012345678901234567890"
 	// 2**256-2**10 for fake minimal network
 	minimalConfig.TerminalTotalDifficulty = "115792089237316195423570985008687907853269984665640564039457584007913129638912"

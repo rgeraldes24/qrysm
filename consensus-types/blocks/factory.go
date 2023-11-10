@@ -242,7 +242,7 @@ func BuildSignedBeaconBlockFromExecutionPayload(
 				StateRoot:     stateRoot[:],
 				Body: &zond.BeaconBlockBodyBellatrix{
 					RandaoReveal:      randaoReveal[:],
-					Eth1Data:          b.Body().Eth1Data(),
+					Zond1Data:         b.Body().Zond1Data(),
 					Graffiti:          graffiti[:],
 					ProposerSlashings: b.Body().ProposerSlashings(),
 					AttesterSlashings: b.Body().AttesterSlashings(),
@@ -268,7 +268,7 @@ func BuildSignedBeaconBlockFromExecutionPayload(
 				StateRoot:     stateRoot[:],
 				Body: &zond.BeaconBlockBodyCapella{
 					RandaoReveal:                randaoReveal[:],
-					Eth1Data:                    b.Body().Eth1Data(),
+					Zond1Data:                   b.Body().Zond1Data(),
 					Graffiti:                    graffiti[:],
 					ProposerSlashings:           b.Body().ProposerSlashings(),
 					AttesterSlashings:           b.Body().AttesterSlashings(),

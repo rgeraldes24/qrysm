@@ -24,11 +24,11 @@ func DeterministicGenesisStateBellatrix(t testing.TB, numValidators uint64) (sta
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
 	}
-	eth1Data, err := DeterministicEth1Data(len(deposits))
+	zond1Data, err := DeterministicZond1Data(len(deposits))
 	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get eth1data for %d deposits", numValidators))
+		t.Fatal(errors.Wrapf(err, "failed to get zond1data for %d deposits", numValidators))
 	}
-	beaconState, err := genesisBeaconStateBellatrix(context.Background(), deposits, uint64(0), eth1Data)
+	beaconState, err := genesisBeaconStateBellatrix(context.Background(), deposits, uint64(0), zond1Data)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get genesis beacon state of %d validators", numValidators))
 	}
@@ -37,14 +37,14 @@ func DeterministicGenesisStateBellatrix(t testing.TB, numValidators uint64) (sta
 }
 
 // genesisBeaconStateBellatrix returns the genesis beacon state.
-func genesisBeaconStateBellatrix(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.Eth1Data) (state.BeaconState, error) {
+func genesisBeaconStateBellatrix(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, zond1Data *zondpb.Zond1Data) (state.BeaconState, error) {
 	st, err := emptyGenesisStateBellatrix()
 	if err != nil {
 		return nil, err
 	}
 
 	// Process initial deposits.
-	st, err = helpers.UpdateGenesisEth1Data(st, deposits, eth1Data)
+	st, err = helpers.UpdateGenesisZond1Data(st, deposits, zond1Data)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func genesisBeaconStateBellatrix(ctx context.Context, deposits []*zondpb.Deposit
 		return nil, errors.Wrap(err, "could not process validator deposits")
 	}
 
-	return buildGenesisBeaconStateBellatrix(genesisTime, st, st.Eth1Data())
+	return buildGenesisBeaconStateBellatrix(genesisTime, st, st.Zond1Data())
 }
 
 // emptyGenesisStateBellatrix returns an empty genesis state in Bellatrix format.
@@ -77,25 +77,25 @@ func emptyGenesisStateBellatrix() (state.BeaconState, error) {
 		CurrentEpochParticipation:  []byte{},
 		PreviousEpochParticipation: []byte{},
 
-		// Eth1 data.
-		Eth1Data:         &zondpb.Eth1Data{},
-		Eth1DataVotes:    []*zondpb.Eth1Data{},
-		Eth1DepositIndex: 0,
+		// Zond1 data.
+		Zond1Data:         &zondpb.Zond1Data{},
+		Zond1DataVotes:    []*zondpb.Zond1Data{},
+		Zond1DepositIndex: 0,
 
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeader{},
 	}
 	return state_native.InitializeFromProtoBellatrix(st)
 }
 
-func buildGenesisBeaconStateBellatrix(genesisTime uint64, preState state.BeaconState, eth1Data *zondpb.Eth1Data) (state.BeaconState, error) {
-	if eth1Data == nil {
-		return nil, errors.New("no eth1data provided for genesis state")
+func buildGenesisBeaconStateBellatrix(genesisTime uint64, preState state.BeaconState, zond1Data *zondpb.Zond1Data) (state.BeaconState, error) {
+	if zond1Data == nil {
+		return nil, errors.New("no zond1data provided for genesis state")
 	}
 
 	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
 	for i := 0; i < len(randaoMixes); i++ {
 		h := make([]byte, 32)
-		copy(h, eth1Data.BlockHash)
+		copy(h, zond1Data.BlockHash)
 		randaoMixes[i] = h
 	}
 
@@ -183,16 +183,16 @@ func buildGenesisBeaconStateBellatrix(genesisTime uint64, preState state.BeaconS
 		StateRoots:      stateRoots,
 		Slashings:       slashings,
 
-		// Eth1 data.
-		Eth1Data:         eth1Data,
-		Eth1DataVotes:    []*zondpb.Eth1Data{},
-		Eth1DepositIndex: preState.Eth1DepositIndex(),
+		// Zond1 data.
+		Zond1Data:         zond1Data,
+		Zond1DataVotes:    []*zondpb.Zond1Data{},
+		Zond1DepositIndex: preState.Zond1DepositIndex(),
 	}
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
 	bodyRoot, err := (&zondpb.BeaconBlockBodyBellatrix{
 		RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-		Eth1Data: &zondpb.Eth1Data{
+		Zond1Data: &zondpb.Zond1Data{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},

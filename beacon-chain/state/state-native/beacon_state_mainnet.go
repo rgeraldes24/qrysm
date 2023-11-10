@@ -28,9 +28,9 @@ type BeaconState struct {
 	stateRoots                          *customtypes.StateRoots
 	historicalRoots                     customtypes.HistoricalRoots
 	historicalSummaries                 []*zondpb.HistoricalSummary
-	eth1Data                            *zondpb.Eth1Data
-	eth1DataVotes                       []*zondpb.Eth1Data
-	eth1DepositIndex                    uint64
+	zond1Data                           *zondpb.Zond1Data
+	zond1DataVotes                      []*zondpb.Zond1Data
+	zond1DepositIndex                   uint64
 	validators                          []*zondpb.Validator
 	balances                            []uint64
 	randaoMixes                         *customtypes.RandaoMixes

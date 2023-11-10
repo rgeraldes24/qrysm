@@ -34,52 +34,52 @@ import (
 
 // infostream is a struct for each instance of the infostream created by a client connection.
 type infostream struct {
-	ctx                 context.Context
-	headFetcher         blockchain.HeadFetcher
-	depositFetcher      depositcache.DepositFetcher
-	blockFetcher        execution.POWBlockFetcher
-	beaconDB            db.ReadOnlyDatabase
-	pubKeys             [][]byte
-	pubKeysMutex        *sync.RWMutex
-	stateChannel        chan *feed.Event
-	stateSub            event.Subscription
-	eth1Deposits        *cache.Cache
-	eth1DepositsMutex   *sync.RWMutex
-	eth1Blocktimes      *cache.Cache
-	eth1BlocktimesMutex *sync.RWMutex
-	currentEpoch        primitives.Epoch
-	stream              zondpb.BeaconChain_StreamValidatorsInfoServer
-	genesisTime         uint64
+	ctx                  context.Context
+	headFetcher          blockchain.HeadFetcher
+	depositFetcher       depositcache.DepositFetcher
+	blockFetcher         execution.POWBlockFetcher
+	beaconDB             db.ReadOnlyDatabase
+	pubKeys              [][]byte
+	pubKeysMutex         *sync.RWMutex
+	stateChannel         chan *feed.Event
+	stateSub             event.Subscription
+	zond1Deposits        *cache.Cache
+	zond1DepositsMutex   *sync.RWMutex
+	zond1Blocktimes      *cache.Cache
+	zond1BlocktimesMutex *sync.RWMutex
+	currentEpoch         primitives.Epoch
+	stream               zondpb.BeaconChain_StreamValidatorsInfoServer
+	genesisTime          uint64
 }
 
-// eth1Deposit contains information about a deposit made on the Ethereum 1 chain.
-type eth1Deposit struct {
+// zond1Deposit contains information about a deposit made on the Ethereum 1 chain.
+type zond1Deposit struct {
 	block *big.Int
 	data  *zondpb.Deposit_Data
 }
 
 var (
-	eth1DepositCacheHits = promauto.NewCounter(
+	zond1DepositCacheHits = promauto.NewCounter(
 		prometheus.CounterOpts{
-			Name: "infostream_eth1_deposit_cache_hits",
+			Name: "infostream_zond1_deposit_cache_hits",
 			Help: "The number of times the infostream Ethereum 1 deposit cache is hit.",
 		},
 	)
-	eth1DepositCacheMisses = promauto.NewCounter(
+	zond1DepositCacheMisses = promauto.NewCounter(
 		prometheus.CounterOpts{
-			Name: "infostream_eth1_deposit_cache_misses",
+			Name: "infostream_zond1_deposit_cache_misses",
 			Help: "The number of times the infostream Ethereum 1 deposit cache is missed.",
 		},
 	)
-	eth1BlocktimeCacheHits = promauto.NewCounter(
+	zond1BlocktimeCacheHits = promauto.NewCounter(
 		prometheus.CounterOpts{
-			Name: "infostream_eth1_blocktime_cache_hits",
+			Name: "infostream_zond1_blocktime_cache_hits",
 			Help: "The number of times the infostream Ethereum 1 block time cache is hit.",
 		},
 	)
-	eth1BlocktimeCacheMisses = promauto.NewCounter(
+	zond1BlocktimeCacheMisses = promauto.NewCounter(
 		prometheus.CounterOpts{
-			Name: "infostream_eth1_blocktime_cache_misses",
+			Name: "infostream_zond1_blocktime_cache_misses",
 			Help: "The number of times the infostream Ethereum 1 block time cache is missed.",
 		},
 	)
@@ -109,22 +109,22 @@ func (bs *Server) StreamValidatorsInfo(stream zondpb.BeaconChain_StreamValidator
 
 	// Create an infostream struct.  This will track relevant state for the stream.
 	infostream := &infostream{
-		ctx:                 bs.Ctx,
-		headFetcher:         bs.HeadFetcher,
-		depositFetcher:      bs.DepositFetcher,
-		blockFetcher:        bs.BlockFetcher,
-		beaconDB:            bs.BeaconDB,
-		pubKeys:             make([][]byte, 0),
-		pubKeysMutex:        &sync.RWMutex{},
-		stateChannel:        stateChannel,
-		stateSub:            bs.StateNotifier.StateFeed().Subscribe(stateChannel),
-		eth1Deposits:        cache.New(epochDuration, epochDuration*2),
-		eth1DepositsMutex:   &sync.RWMutex{},
-		eth1Blocktimes:      cache.New(epochDuration*12, epochDuration*24),
-		eth1BlocktimesMutex: &sync.RWMutex{},
-		currentEpoch:        primitives.Epoch(headState.Slot() / params.BeaconConfig().SlotsPerEpoch),
-		stream:              stream,
-		genesisTime:         headState.GenesisTime(),
+		ctx:                  bs.Ctx,
+		headFetcher:          bs.HeadFetcher,
+		depositFetcher:       bs.DepositFetcher,
+		blockFetcher:         bs.BlockFetcher,
+		beaconDB:             bs.BeaconDB,
+		pubKeys:              make([][]byte, 0),
+		pubKeysMutex:         &sync.RWMutex{},
+		stateChannel:         stateChannel,
+		stateSub:             bs.StateNotifier.StateFeed().Subscribe(stateChannel),
+		zond1Deposits:        cache.New(epochDuration, epochDuration*2),
+		zond1DepositsMutex:   &sync.RWMutex{},
+		zond1Blocktimes:      cache.New(epochDuration*12, epochDuration*24),
+		zond1BlocktimesMutex: &sync.RWMutex{},
+		currentEpoch:         primitives.Epoch(headState.Slot() / params.BeaconConfig().SlotsPerEpoch),
+		stream:               stream,
+		genesisTime:          headState.GenesisTime(),
 	}
 	defer infostream.stateSub.Unsubscribe()
 
@@ -339,31 +339,31 @@ func (is *infostream) generateValidatorInfo(
 // generatePendingValidatorInfo generates the validator info for a pending (or unknown) key.
 func (is *infostream) generatePendingValidatorInfo(info *zondpb.ValidatorInfo) (*zondpb.ValidatorInfo, error) {
 	key := string(info.PublicKey)
-	var deposit *eth1Deposit
-	is.eth1DepositsMutex.Lock()
-	if fetchedDeposit, exists := is.eth1Deposits.Get(key); exists {
-		eth1DepositCacheHits.Inc()
+	var deposit *zond1Deposit
+	is.zond1DepositsMutex.Lock()
+	if fetchedDeposit, exists := is.zond1Deposits.Get(key); exists {
+		zond1DepositCacheHits.Inc()
 		var ok bool
-		deposit, ok = fetchedDeposit.(*eth1Deposit)
+		deposit, ok = fetchedDeposit.(*zond1Deposit)
 		if !ok {
-			is.eth1DepositsMutex.Unlock()
-			return nil, errors.New("cached eth1 deposit is not type *eth1Deposit")
+			is.zond1DepositsMutex.Unlock()
+			return nil, errors.New("cached zond1 deposit is not type *zond1Deposit")
 		}
 	} else {
-		eth1DepositCacheMisses.Inc()
-		fetchedDeposit, eth1BlockNumber := is.depositFetcher.DepositByPubkey(is.ctx, info.PublicKey)
+		zond1DepositCacheMisses.Inc()
+		fetchedDeposit, zond1BlockNumber := is.depositFetcher.DepositByPubkey(is.ctx, info.PublicKey)
 		if fetchedDeposit == nil {
-			deposit = &eth1Deposit{}
-			is.eth1Deposits.Set(key, deposit, cache.DefaultExpiration)
+			deposit = &zond1Deposit{}
+			is.zond1Deposits.Set(key, deposit, cache.DefaultExpiration)
 		} else {
-			deposit = &eth1Deposit{
-				block: eth1BlockNumber,
+			deposit = &zond1Deposit{
+				block: zond1BlockNumber,
 				data:  fetchedDeposit.Data,
 			}
-			is.eth1Deposits.Set(key, deposit, cache.DefaultExpiration)
+			is.zond1Deposits.Set(key, deposit, cache.DefaultExpiration)
 		}
 	}
-	is.eth1DepositsMutex.Unlock()
+	is.zond1DepositsMutex.Unlock()
 	if deposit.block != nil {
 		info.Status = zondpb.ValidatorStatus_DEPOSITED
 		if queueTimestamp, err := is.depositQueueTimestamp(deposit.block); err != nil {
@@ -521,36 +521,36 @@ func (is *infostream) epochToTimestamp(epoch primitives.Epoch) uint64 {
 }
 
 // depositQueueTimestamp calculates the timestamp for exit of the validator from the deposit queue.
-func (is *infostream) depositQueueTimestamp(eth1BlockNumber *big.Int) (uint64, error) {
+func (is *infostream) depositQueueTimestamp(zond1BlockNumber *big.Int) (uint64, error) {
 	var blockTimestamp uint64
-	key := fmt.Sprintf("%v", eth1BlockNumber)
-	is.eth1BlocktimesMutex.Lock()
-	if cachedTimestamp, exists := is.eth1Blocktimes.Get(key); exists {
-		eth1BlocktimeCacheHits.Inc()
+	key := fmt.Sprintf("%v", zond1BlockNumber)
+	is.zond1BlocktimesMutex.Lock()
+	if cachedTimestamp, exists := is.zond1Blocktimes.Get(key); exists {
+		zond1BlocktimeCacheHits.Inc()
 		var ok bool
 		blockTimestamp, ok = cachedTimestamp.(uint64)
 		if !ok {
-			is.eth1BlocktimesMutex.Unlock()
+			is.zond1BlocktimesMutex.Unlock()
 			return 0, errors.New("cached timestamp is not type uint64")
 		}
 	} else {
-		eth1BlocktimeCacheMisses.Inc()
+		zond1BlocktimeCacheMisses.Inc()
 		var err error
-		blockTimestamp, err = is.blockFetcher.BlockTimeByHeight(is.ctx, eth1BlockNumber)
+		blockTimestamp, err = is.blockFetcher.BlockTimeByHeight(is.ctx, zond1BlockNumber)
 		if err != nil {
-			is.eth1BlocktimesMutex.Unlock()
+			is.zond1BlocktimesMutex.Unlock()
 			return 0, err
 		}
-		is.eth1Blocktimes.Set(key, blockTimestamp, cache.DefaultExpiration)
+		is.zond1Blocktimes.Set(key, blockTimestamp, cache.DefaultExpiration)
 	}
-	is.eth1BlocktimesMutex.Unlock()
+	is.zond1BlocktimesMutex.Unlock()
 
-	followTime := time.Duration(params.BeaconConfig().Eth1FollowDistance*params.BeaconConfig().SecondsPerETH1Block) * time.Second
-	eth1UnixTime := time.Unix(int64(blockTimestamp), 0).Add(followTime) // lint:ignore uintcast -- timestamp will not exceed int64 in your lifetime
+	followTime := time.Duration(params.BeaconConfig().Zond1FollowDistance*params.BeaconConfig().SecondsPerETH1Block) * time.Second
+	zond1UnixTime := time.Unix(int64(blockTimestamp), 0).Add(followTime) // lint:ignore uintcast -- timestamp will not exceed int64 in your lifetime
 
-	period := uint64(params.BeaconConfig().EpochsPerEth1VotingPeriod.Mul(uint64(params.BeaconConfig().SlotsPerEpoch)))
+	period := uint64(params.BeaconConfig().EpochsPerZond1VotingPeriod.Mul(uint64(params.BeaconConfig().SlotsPerEpoch)))
 	votingPeriod := time.Duration(period*params.BeaconConfig().SecondsPerSlot) * time.Second
-	activationTime := eth1UnixTime.Add(votingPeriod)
+	activationTime := zond1UnixTime.Add(votingPeriod)
 	eth2Genesis := time.Unix(int64(is.genesisTime), 0)
 
 	if eth2Genesis.After(activationTime) {

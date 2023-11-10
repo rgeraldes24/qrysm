@@ -75,7 +75,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signatures: make([][]byte, dilithium2.CryptoBytes),
 			},
 			wantedErr: "nil or missing indexed attestation data",
 		},
@@ -86,7 +86,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signatures: make([][]byte, dilithium2.CryptoBytes),
 			},
 			wantedErr: "expected non-empty",
 		},
@@ -97,7 +97,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signatures: make([][]byte, dilithium2.CryptoBytes),
 			},
 			wantedErr: "indices count exceeds",
 		},
@@ -108,7 +108,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signatures: make([][]byte, dilithium2.CryptoBytes),
 			},
 			wantedErr: "not uniquely sorted",
 		},
@@ -119,7 +119,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signatures: make([][]byte, dilithium2.CryptoBytes),
 			},
 		},
 		{
@@ -129,7 +129,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signatures: make([][]byte, dilithium2.CryptoBytes),
 			},
 		},
 		{
@@ -139,7 +139,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signatures: make([][]byte, dilithium2.CryptoBytes),
 			},
 		},
 	}
@@ -176,7 +176,7 @@ func BenchmarkIsValidAttestationIndices(b *testing.B) {
 		Data: &zond.AttestationData{
 			Target: &zond.Checkpoint{},
 		},
-		Signature: make([]byte, dilithium2.CryptoBytes),
+		Signatures: make([][]byte, dilithium2.CryptoBytes),
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

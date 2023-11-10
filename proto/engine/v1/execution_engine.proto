@@ -39,6 +39,8 @@ message ExecutionPayload {
 	bytes base_fee_per_gas      = 12 [(theqrl.zond.ext.ssz_size) = "32"];
 	bytes block_hash            = 13 [(theqrl.zond.ext.ssz_size) = "32"];
 	repeated bytes transactions = 14 [(theqrl.zond.ext.ssz_size) = "?,?", (theqrl.zond.ext.ssz_max)  = "1048576,1073741824"];
+	// MAX_WITHDRAWALS_PER_PAYLOAD
+	repeated Withdrawal withdrawals = 15 [(theqrl.zond.ext.ssz_max) = "withdrawal.size"];
 }
 
 message ExecutionPayloadBodyV1 {
@@ -46,27 +48,8 @@ message ExecutionPayloadBodyV1 {
 	repeated Withdrawal withdrawals = 2;
 }
 
-message ExecutionPayloadCapella {
-	bytes parent_hash           = 1 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes fee_recipient         = 2 [(theqrl.zond.ext.ssz_size) = "20"];
-	bytes state_root            = 3 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes receipts_root         = 4 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes logs_bloom            = 5 [(theqrl.zond.ext.ssz_size) = "256"];
-	bytes prev_randao           = 6 [(theqrl.zond.ext.ssz_size) = "32"];
-	uint64 block_number         = 7;
-	uint64 gas_limit            = 8;
-	uint64 gas_used             = 9;
-	uint64 timestamp            = 10;
-	bytes extra_data            = 11 [(theqrl.zond.ext.ssz_max) = "32"];
-	bytes base_fee_per_gas      = 12 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes block_hash            = 13 [(theqrl.zond.ext.ssz_size) = "32"];
-	repeated bytes transactions = 14 [(theqrl.zond.ext.ssz_size) = "?,?", (theqrl.zond.ext.ssz_max)  = "1048576,1073741824"];
-	// MAX_WITHDRAWALS_PER_PAYLOAD
-	repeated Withdrawal withdrawals = 15 [(theqrl.zond.ext.ssz_max) = "withdrawal.size"]; // New in Capella.
-}
-
-message ExecutionPayloadCapellaWithValue {
-	ExecutionPayloadCapella payload = 1;
+message ExecutionPayloadWithValue {
+	ExecutionPayload payload = 1;
 	bytes value = 2;
 }
 
@@ -85,24 +68,7 @@ message ExecutionPayloadHeader {
 	bytes base_fee_per_gas  = 12 [(theqrl.zond.ext.ssz_size) = "32"];
 	bytes block_hash        = 13 [(theqrl.zond.ext.ssz_size) = "32"];
 	bytes transactions_root = 14 [(theqrl.zond.ext.ssz_size) = "32"];
-}
-
-message ExecutionPayloadHeaderCapella {
-	bytes parent_hash       = 1 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes fee_recipient     = 2 [(theqrl.zond.ext.ssz_size) = "20"];
-	bytes state_root        = 3 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes receipts_root     = 4 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes logs_bloom        = 5 [(theqrl.zond.ext.ssz_size) = "256"];
-	bytes prev_randao       = 6 [(theqrl.zond.ext.ssz_size) = "32"];
-	uint64 block_number     = 7;
-	uint64 gas_limit        = 8;
-	uint64 gas_used         = 9;
-	uint64 timestamp        = 10;
-	bytes extra_data        = 11 [(theqrl.zond.ext.ssz_max) = "32"];
-	bytes base_fee_per_gas  = 12 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes block_hash        = 13 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes transactions_root = 14 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes withdrawals_root  = 15 [(theqrl.zond.ext.ssz_size) = "32"]; // New in Capella.
+	bytes withdrawals_root  = 15 [(theqrl.zond.ext.ssz_size) = "32"];
 }
 
 message TransitionConfiguration {
@@ -115,13 +81,7 @@ message PayloadAttributes {
 	uint64 timestamp              = 1;
 	bytes prev_randao             = 2 [(theqrl.zond.ext.ssz_size) = "32"];
 	bytes suggested_fee_recipient = 3 [(theqrl.zond.ext.ssz_size) = "20"];
-}
-
-message PayloadAttributesV2 {
-	uint64 timestamp              = 1;
-	bytes prev_randao             = 2 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes suggested_fee_recipient = 3 [(theqrl.zond.ext.ssz_size) = "20"];
-	repeated Withdrawal withdrawals = 4 [(theqrl.zond.ext.ssz_max) = "withdrawal.size"]; // New in Capella.
+	repeated Withdrawal withdrawals = 4 [(theqrl.zond.ext.ssz_max) = "withdrawal.size"];
 }
 
 message PayloadStatus {

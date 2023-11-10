@@ -1,6 +1,6 @@
 // Package depositcache is the source of validator deposits maintained
 // in-memory by the beacon node – deposits processed from the
-// eth1 powchain are then stored in this cache to be accessed by
+// zond1 powchain are then stored in this cache to be accessed by
 // any other service during a beacon node's runtime.
 package depositcache
 
@@ -96,7 +96,7 @@ func (dc *DepositCache) InsertDeposit(ctx context.Context, d *zondpb.Deposit, bl
 	}
 	// Keep the slice sorted on insertion in order to avoid costly sorting on retrieval.
 	heightIdx := sort.Search(len(dc.deposits), func(i int) bool { return dc.deposits[i].Index >= index })
-	depCtr := &zondpb.DepositContainer{Deposit: d, Eth1BlockHeight: blockNum, DepositRoot: depositRoot[:], Index: index}
+	depCtr := &zondpb.DepositContainer{Deposit: d, Zond1BlockHeight: blockNum, DepositRoot: depositRoot[:], Index: index}
 	newDeposits := append(
 		[]*zondpb.DepositContainer{depCtr},
 		dc.deposits[heightIdx:]...)
@@ -128,8 +128,8 @@ func (dc *DepositCache) InsertDepositContainers(ctx context.Context, ctrs []*zon
 	historicalDepositsCount.Add(float64(len(ctrs)))
 }
 
-// InsertFinalizedDeposits inserts deposits up to eth1DepositIndex (inclusive) into the finalized deposits cache.
-func (dc *DepositCache) InsertFinalizedDeposits(ctx context.Context, eth1DepositIndex int64) error {
+// InsertFinalizedDeposits inserts deposits up to zond1DepositIndex (inclusive) into the finalized deposits cache.
+func (dc *DepositCache) InsertFinalizedDeposits(ctx context.Context, zond1DepositIndex int64) error {
 	ctx, span := trace.StartSpan(ctx, "DepositsCache.InsertFinalizedDeposits")
 	defer span.End()
 	dc.depositsLock.Lock()
@@ -145,19 +145,19 @@ func (dc *DepositCache) InsertFinalizedDeposits(ctx context.Context, eth1Deposit
 	}
 	// In the event we have less deposits than we need to
 	// finalize we finalize till the index on which we do have it.
-	if len(dc.deposits) <= int(eth1DepositIndex) {
-		eth1DepositIndex = int64(len(dc.deposits)) - 1
+	if len(dc.deposits) <= int(zond1DepositIndex) {
+		zond1DepositIndex = int64(len(dc.deposits)) - 1
 	}
 	// If we finalize to some lower deposit index, we
 	// ignore it.
-	if int(eth1DepositIndex) < insertIndex {
+	if int(zond1DepositIndex) < insertIndex {
 		return nil
 	}
 	for _, d := range dc.deposits {
 		if d.Index <= dc.finalizedDeposits.MerkleTrieIndex {
 			continue
 		}
-		if d.Index > eth1DepositIndex {
+		if d.Index > zond1DepositIndex {
 			break
 		}
 		depHash, err := d.Deposit.Data.HashTreeRoot()
@@ -172,7 +172,7 @@ func (dc *DepositCache) InsertFinalizedDeposits(ctx context.Context, eth1Deposit
 
 	dc.finalizedDeposits = &FinalizedDeposits{
 		Deposits:        depositTrie,
-		MerkleTrieIndex: eth1DepositIndex,
+		MerkleTrieIndex: zond1DepositIndex,
 	}
 	return nil
 }
@@ -215,7 +215,7 @@ func (dc *DepositCache) AllDeposits(ctx context.Context, untilBlk *big.Int) []*z
 func (dc *DepositCache) allDeposits(untilBlk *big.Int) []*zondpb.Deposit {
 	var deposits []*zondpb.Deposit
 	for _, ctnr := range dc.deposits {
-		if untilBlk == nil || untilBlk.Uint64() >= ctnr.Eth1BlockHeight {
+		if untilBlk == nil || untilBlk.Uint64() >= ctnr.Zond1BlockHeight {
 			deposits = append(deposits, ctnr.Deposit)
 		}
 	}
@@ -229,8 +229,8 @@ func (dc *DepositCache) DepositsNumberAndRootAtHeight(ctx context.Context, block
 	defer span.End()
 	dc.depositsLock.RLock()
 	defer dc.depositsLock.RUnlock()
-	heightIdx := sort.Search(len(dc.deposits), func(i int) bool { return dc.deposits[i].Eth1BlockHeight > blockHeight.Uint64() })
-	// send the deposit root of the empty trie, if eth1follow distance is greater than the time of the earliest
+	heightIdx := sort.Search(len(dc.deposits), func(i int) bool { return dc.deposits[i].Zond1BlockHeight > blockHeight.Uint64() })
+	// send the deposit root of the empty trie, if zond1follow distance is greater than the time of the earliest
 	// deposit.
 	if heightIdx == 0 {
 		return 0, [32]byte{}
@@ -256,7 +256,7 @@ func (dc *DepositCache) DepositByPubkey(ctx context.Context, pubKey []byte) (*zo
 	// validator key has multiple deposits assigned to
 	// it.
 	deposit = deps[0].Deposit
-	blockNum = big.NewInt(int64(deps[0].Eth1BlockHeight))
+	blockNum = big.NewInt(int64(deps[0].Zond1BlockHeight))
 	return deposit, blockNum
 }
 
@@ -287,7 +287,7 @@ func (dc *DepositCache) NonFinalizedDeposits(ctx context.Context, lastFinalizedI
 
 	var deposits []*zondpb.Deposit
 	for _, d := range dc.deposits {
-		if (d.Index > lastFinalizedIndex) && (untilBlk == nil || untilBlk.Uint64() >= d.Eth1BlockHeight) {
+		if (d.Index > lastFinalizedIndex) && (untilBlk == nil || untilBlk.Uint64() >= d.Zond1BlockHeight) {
 			deposits = append(deposits, d.Deposit)
 		}
 	}

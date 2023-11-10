@@ -1,5 +1,5 @@
 // Package flags defines beacon-node specific runtime flags for
-// setting important values such as ports, eth1 endpoints, and more.
+// setting important values such as ports, zond1 endpoints, and more.
 package flags
 
 import (
@@ -125,10 +125,10 @@ var (
 		Usage: "The required number of valid peers to connect with before syncing.",
 		Value: 3,
 	}
-	// ContractDeploymentBlock is the block in which the eth1 deposit contract was deployed.
+	// ContractDeploymentBlock is the block in which the zond1 deposit contract was deployed.
 	ContractDeploymentBlock = &cli.IntFlag{
 		Name:  "contract-deployment-block",
-		Usage: "The eth1 block in which the deposit contract was deployed.",
+		Usage: "The zond1 block in which the deposit contract was deployed.",
 		Value: 11184524,
 	}
 	// SetGCPercent is the percentage of current live allocations at which the garbage collector is to run.
@@ -196,9 +196,9 @@ var (
 		Name:  "engine-endpoint-timeout-seconds",
 		Usage: "Sets the execution engine timeout (seconds) for execution payload semantics (forkchoiceUpdated, newPayload)",
 	}
-	// Eth1HeaderReqLimit defines a flag to set the maximum number of headers that a deposit log query can fetch. If none is set, 1000 will be the limit.
-	Eth1HeaderReqLimit = &cli.Uint64Flag{
-		Name:  "eth1-header-req-limit",
+	// Zond1HeaderReqLimit defines a flag to set the maximum number of headers that a deposit log query can fetch. If none is set, 1000 will be the limit.
+	Zond1HeaderReqLimit = &cli.Uint64Flag{
+		Name:  "zond1-header-req-limit",
 		Usage: "Sets the maximum number of headers that a deposit log query can fetch.",
 		Value: uint64(1000),
 	}
