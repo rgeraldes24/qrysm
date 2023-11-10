@@ -23,6 +23,7 @@ import "proto/zond/v1/attestation.proto";
 import "proto/zond/v1/beacon_block.proto";
 import "proto/zond/v1/beacon_state.proto";
 import "proto/zond/v1/validator.proto";
+import "proto/zond/v1/version.proto";
 import "proto/zond/v1/withdrawals.proto";
 
 option csharp_namespace = "TheQRL.Zond.V1";
@@ -194,12 +195,6 @@ message BlockHeadersResponse {
     bool finalized = 3;
 }
 
-message BlockRequest {
-    // The block identifier. Can be one of: "head" (canonical head in node's view), "genesis",
-    // "finalized", <slot>, <hex encoded blockRoot with 0x prefix>.
-    bytes block_id = 1;
-}
-
 message BlockHeaderResponse {
     BlockHeaderContainer data = 1;
     bool execution_optimistic = 2;
@@ -225,19 +220,28 @@ message BeaconBlockHeaderContainer {
     bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
+message BlockRequest {
+  // The block identifier. Can be one of: "head" (canonical head in node's view), "genesis",
+  // "finalized", <slot>, <hex encoded blockRoot with 0x prefix>.
+  bytes block_id = 1;
+}
+
 message BlockResponse {
-    BeaconBlockContainer data = 1;
+  Version version = 1;
+  SignedBeaconBlockContainer data = 2;
+  bool execution_optimistic = 3;
+  bool finalized = 4;
+}
+
+message BlindedBlockResponse {
+  Version version = 1;
+  SignedBlindedBeaconBlockContainer data = 2;
+  bool execution_optimistic = 3;
+  bool finalized = 4;
 }
 
 message BlockSSZResponse {
     bytes data = 1;
-}
-
-message BeaconBlockContainer {
-    BeaconBlock message = 1;
-
-    // 4595 byte Dilithium signature from the validator that produced this block.
-    bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
 // Beacon Pool related API service.

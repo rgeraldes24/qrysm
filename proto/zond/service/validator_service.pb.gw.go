@@ -18,9 +18,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
 	github_com_theQRL_qrysm_v4_consensus_types_primitives "github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/proto/zond/v1"
 	v1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	"github.com/theQRL/qrysm/v4/proto/zond/v2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
@@ -165,7 +163,7 @@ func local_request_BeaconValidator_GetProposerDuties_0(ctx context.Context, mars
 }
 
 func request_BeaconValidator_GetSyncCommitteeDuties_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconValidatorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq zond.SyncCommitteeDutiesRequest
+	var protoReq v1.SyncCommitteeDutiesRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -200,7 +198,7 @@ func request_BeaconValidator_GetSyncCommitteeDuties_0(ctx context.Context, marsh
 }
 
 func local_request_BeaconValidator_GetSyncCommitteeDuties_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconValidatorServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq zond.SyncCommitteeDutiesRequest
+	var protoReq v1.SyncCommitteeDutiesRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -235,10 +233,10 @@ func local_request_BeaconValidator_GetSyncCommitteeDuties_0(ctx context.Context,
 }
 
 var (
-	filter_BeaconValidator_ProduceBlockV2_0 = &utilities.DoubleArray{Encoding: map[string]int{"slot": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_BeaconValidator_ProduceBlock_0 = &utilities.DoubleArray{Encoding: map[string]int{"slot": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
-func request_BeaconValidator_ProduceBlockV2_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconValidatorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_BeaconValidator_ProduceBlock_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconValidatorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq v1.ProduceBlockRequest
 	var metadata runtime.ServerMetadata
 
@@ -263,16 +261,16 @@ func request_BeaconValidator_ProduceBlockV2_0(ctx context.Context, marshaler run
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_BeaconValidator_ProduceBlockV2_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_BeaconValidator_ProduceBlock_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.ProduceBlockV2(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ProduceBlock(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_BeaconValidator_ProduceBlockV2_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconValidatorServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_BeaconValidator_ProduceBlock_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconValidatorServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq v1.ProduceBlockRequest
 	var metadata runtime.ServerMetadata
 
@@ -297,20 +295,20 @@ func local_request_BeaconValidator_ProduceBlockV2_0(ctx context.Context, marshal
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_BeaconValidator_ProduceBlockV2_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_BeaconValidator_ProduceBlock_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.ProduceBlockV2(ctx, &protoReq)
+	msg, err := server.ProduceBlock(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
 var (
-	filter_BeaconValidator_ProduceBlockV2SSZ_0 = &utilities.DoubleArray{Encoding: map[string]int{"slot": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_BeaconValidator_ProduceBlockSSZ_0 = &utilities.DoubleArray{Encoding: map[string]int{"slot": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
-func request_BeaconValidator_ProduceBlockV2SSZ_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconValidatorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_BeaconValidator_ProduceBlockSSZ_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconValidatorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq v1.ProduceBlockRequest
 	var metadata runtime.ServerMetadata
 
@@ -335,16 +333,16 @@ func request_BeaconValidator_ProduceBlockV2SSZ_0(ctx context.Context, marshaler 
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_BeaconValidator_ProduceBlockV2SSZ_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_BeaconValidator_ProduceBlockSSZ_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.ProduceBlockV2SSZ(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ProduceBlockSSZ(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_BeaconValidator_ProduceBlockV2SSZ_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconValidatorServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_BeaconValidator_ProduceBlockSSZ_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconValidatorServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq v1.ProduceBlockRequest
 	var metadata runtime.ServerMetadata
 
@@ -369,11 +367,11 @@ func local_request_BeaconValidator_ProduceBlockV2SSZ_0(ctx context.Context, mars
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_BeaconValidator_ProduceBlockV2SSZ_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_BeaconValidator_ProduceBlockSSZ_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.ProduceBlockV2SSZ(ctx, &protoReq)
+	msg, err := server.ProduceBlockSSZ(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -661,7 +659,7 @@ func local_request_BeaconValidator_SubmitBeaconCommitteeSubscription_0(ctx conte
 }
 
 func request_BeaconValidator_SubmitSyncCommitteeSubscription_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconValidatorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq zond.SubmitSyncCommitteeSubscriptionsRequest
+	var protoReq v1.SubmitSyncCommitteeSubscriptionsRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -678,7 +676,7 @@ func request_BeaconValidator_SubmitSyncCommitteeSubscription_0(ctx context.Conte
 }
 
 func local_request_BeaconValidator_SubmitSyncCommitteeSubscription_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconValidatorServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq zond.SubmitSyncCommitteeSubscriptionsRequest
+	var protoReq v1.SubmitSyncCommitteeSubscriptionsRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -699,7 +697,7 @@ var (
 )
 
 func request_BeaconValidator_ProduceSyncCommitteeContribution_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconValidatorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq zond.ProduceSyncCommitteeContributionRequest
+	var protoReq v1.ProduceSyncCommitteeContributionRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -715,7 +713,7 @@ func request_BeaconValidator_ProduceSyncCommitteeContribution_0(ctx context.Cont
 }
 
 func local_request_BeaconValidator_ProduceSyncCommitteeContribution_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconValidatorServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq zond.ProduceSyncCommitteeContributionRequest
+	var protoReq v1.ProduceSyncCommitteeContributionRequest
 	var metadata runtime.ServerMetadata
 
 	if err := req.ParseForm(); err != nil {
@@ -731,7 +729,7 @@ func local_request_BeaconValidator_ProduceSyncCommitteeContribution_0(ctx contex
 }
 
 func request_BeaconValidator_GetLiveness_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconValidatorClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq zond.GetLivenessRequest
+	var protoReq v1.GetLivenessRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -766,7 +764,7 @@ func request_BeaconValidator_GetLiveness_0(ctx context.Context, marshaler runtim
 }
 
 func local_request_BeaconValidator_GetLiveness_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconValidatorServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq zond.GetLivenessRequest
+	var protoReq v1.GetLivenessRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -875,18 +873,18 @@ func RegisterBeaconValidatorHandlerServer(ctx context.Context, mux *runtime.Serv
 
 	})
 
-	mux.Handle("GET", pattern_BeaconValidator_ProduceBlockV2_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_BeaconValidator_ProduceBlock_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.service.BeaconValidator/ProduceBlockV2")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.service.BeaconValidator/ProduceBlock")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_BeaconValidator_ProduceBlockV2_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_BeaconValidator_ProduceBlock_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -894,22 +892,22 @@ func RegisterBeaconValidatorHandlerServer(ctx context.Context, mux *runtime.Serv
 			return
 		}
 
-		forward_BeaconValidator_ProduceBlockV2_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_BeaconValidator_ProduceBlock_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_BeaconValidator_ProduceBlockV2SSZ_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_BeaconValidator_ProduceBlockSSZ_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.service.BeaconValidator/ProduceBlockV2SSZ")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.service.BeaconValidator/ProduceBlockSSZ")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_BeaconValidator_ProduceBlockV2SSZ_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_BeaconValidator_ProduceBlockSSZ_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -917,7 +915,7 @@ func RegisterBeaconValidatorHandlerServer(ctx context.Context, mux *runtime.Serv
 			return
 		}
 
-		forward_BeaconValidator_ProduceBlockV2SSZ_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_BeaconValidator_ProduceBlockSSZ_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1229,43 +1227,43 @@ func RegisterBeaconValidatorHandlerClient(ctx context.Context, mux *runtime.Serv
 
 	})
 
-	mux.Handle("GET", pattern_BeaconValidator_ProduceBlockV2_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_BeaconValidator_ProduceBlock_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.service.BeaconValidator/ProduceBlockV2")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.service.BeaconValidator/ProduceBlock")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_BeaconValidator_ProduceBlockV2_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_BeaconValidator_ProduceBlock_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_BeaconValidator_ProduceBlockV2_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_BeaconValidator_ProduceBlock_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_BeaconValidator_ProduceBlockV2SSZ_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_BeaconValidator_ProduceBlockSSZ_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.service.BeaconValidator/ProduceBlockV2SSZ")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.service.BeaconValidator/ProduceBlockSSZ")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_BeaconValidator_ProduceBlockV2SSZ_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_BeaconValidator_ProduceBlockSSZ_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_BeaconValidator_ProduceBlockV2SSZ_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_BeaconValidator_ProduceBlockSSZ_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1459,9 +1457,9 @@ var (
 
 	pattern_BeaconValidator_GetSyncCommitteeDuties_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"internal", "zond", "v1", "validator", "duties", "sync", "epoch"}, ""))
 
-	pattern_BeaconValidator_ProduceBlockV2_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "zond", "v2", "validator", "blocks", "slot"}, ""))
+	pattern_BeaconValidator_ProduceBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "zond", "v1", "validator", "blocks", "slot"}, ""))
 
-	pattern_BeaconValidator_ProduceBlockV2SSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "zond", "v2", "validator", "blocks", "slot", "ssz"}, ""))
+	pattern_BeaconValidator_ProduceBlockSSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "zond", "v1", "validator", "blocks", "slot", "ssz"}, ""))
 
 	pattern_BeaconValidator_ProduceBlindedBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "zond", "v1", "validator", "blinded_blocks", "slot"}, ""))
 
@@ -1489,9 +1487,9 @@ var (
 
 	forward_BeaconValidator_GetSyncCommitteeDuties_0 = runtime.ForwardResponseMessage
 
-	forward_BeaconValidator_ProduceBlockV2_0 = runtime.ForwardResponseMessage
+	forward_BeaconValidator_ProduceBlock_0 = runtime.ForwardResponseMessage
 
-	forward_BeaconValidator_ProduceBlockV2SSZ_0 = runtime.ForwardResponseMessage
+	forward_BeaconValidator_ProduceBlockSSZ_0 = runtime.ForwardResponseMessage
 
 	forward_BeaconValidator_ProduceBlindedBlock_0 = runtime.ForwardResponseMessage
 

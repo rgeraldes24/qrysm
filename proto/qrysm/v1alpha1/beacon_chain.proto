@@ -32,7 +32,7 @@ option php_namespace = "TheQRL\\Zond\\v1alpha1";
 
 // Beacon chain API
 //
-// The beacon chain API can be used to access data relevant to the Ethereum Beacon Chain.
+// The beacon chain API can be used to access data relevant to the Zond Beacon Chain.
 service BeaconChain {
 
     // Retrieve attestations by block root, slot, or epoch.
@@ -85,7 +85,7 @@ service BeaconChain {
     // yet processed. Pool attestations eventually expire as the slot
     // advances, so an attestation missing from this request does not imply
     // that it was included in a block. The attestation may have expired.
-    // Refer to the Ethereum Beacon Chain specification for more details on how
+    // Refer to the Zond Beacon Chain specification for more details on how
     // attestations are processed and when they are no longer valid.
     // https://github.com/ethereum/consensus-specs/blob/dev/specs/core/0_beacon-chain.md#attestations
     rpc AttestationPool(AttestationPoolRequest) returns (AttestationPoolResponse) {
@@ -104,42 +104,6 @@ service BeaconChain {
     rpc ListBeaconBlocks(ListBlocksRequest) returns (ListBeaconBlocksResponse) {
         option (google.api.http) = {
             get: "/zond/v1alpha2/beacon/blocks"
-        };
-    }
-
-    // Server-side stream of all signed blocks as they are received by
-    // the beacon chain node.
-    // DEPRECATED: This endpoint is superseded by the /zond/v1/events Beacon API endpoint
-    rpc StreamBlocks(StreamBlocksRequest) returns (stream SignedBeaconBlock) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/beacon/blocks/stream"
-        };
-    }
-
-    // Server-side stream of information about the head of the beacon chain
-    // from the view of the beacon chain node.
-    //
-    // This includes the head block slot and root as well as information about
-    // the most recent finalized and justified slots.
-    // DEPRECATED: This endpoint is superseded by the /zond/v1/events Beacon API endpoint
-    rpc StreamChainHead(google.protobuf.Empty) returns (stream ChainHead) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/beacon/chainhead/stream"
-        };
-    }
-
-    // Retrieve information about the head of the beacon chain from the view of
-    // the beacon chain node.
-    //
-    // This includes the head block slot and root as well as information about
-    // the most recent finalized and justified slots.
-    // DEPRECATED: This endpoint is superseded by the /zond/v1/beacon Beacon API endpoint
-    rpc GetChainHead(google.protobuf.Empty) returns (ChainHead) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/beacon/chainhead"
         };
     }
 
@@ -240,16 +204,6 @@ service BeaconChain {
         };
     }
 
-    // Server-side stream of validator information at each epoch.
-    // DEPRECATED: Streaming Validator Info is no longer supported.
-    // The Beacon API /zond/v1/beacon/states/{state_id}/validators will provide validator info in unstreamed format.
-    rpc StreamValidatorsInfo(stream ValidatorChangeSet) returns (stream ValidatorInfo) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/beacon/validators/info/stream"
-        };
-    }
-
     // Submit an attester slashing object to the beacon node.
     rpc SubmitAttesterSlashing(AttesterSlashing) returns (SubmitSlashingResponse) {
         option (google.api.http) = {
@@ -280,17 +234,6 @@ enum SetAction {
     REMOVE_VALIDATOR_KEYS = 1;
     // SET_VALIDATOR_KEYS overwrites the existing keys.
     SET_VALIDATOR_KEYS = 2;
-}
-
-// ValidatorChangeSet updates the server's list of keys on which to operate.
-// DEPRECATED: This message's endpoint is superseded by the /zond/v1/events Beacon API endpoint
-message ValidatorChangeSet {
-    option deprecated = true;
-    // Action (add/remove/set).
-    SetAction action = 1;
-
-    // 2592 byte Dilithium public keys of validators on which the operation occurs.
-    repeated bytes public_keys = 2;
 }
 
 // Request for indexed attestations by target epoch.
@@ -412,10 +355,10 @@ message BeaconBlockContainer {
     // The desired block to be returned.
     oneof block {
         // Representing a capella block.
-        SignedBeaconBlock capella_block = 1;
+        SignedBeaconBlock capella_block = 3;
 
         // Representing a blinded capella block.
-        SignedBlindedBeaconBlock blinded_capella_block = 2;
+        SignedBlindedBeaconBlock blinded_capella_block = 4;
     }
 }
 
@@ -590,7 +533,7 @@ message GetValidatorRequest {
 message Validators {
     // Epoch which the state was considered to determine the active validator
     // set. This field is not optional. Zero value epoch indicates the validator
-    // set is from the Ethereum proof of stake genesis set.
+    // set is from the Zond proof of stake genesis set.
     uint64 epoch = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
 
     message ValidatorContainer {

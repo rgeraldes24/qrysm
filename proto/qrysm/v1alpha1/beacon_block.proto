@@ -56,7 +56,7 @@ message BeaconBlockBody {
     // The validators RANDAO reveal 4595 byte value.
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-    // A reference to the Ethereum 1.x chain.
+    // A reference to the Zond 1.x chain.
     Zond1Data zond1_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
@@ -120,7 +120,7 @@ message BlindedBeaconBlockBody {
     // The validators RANDAO reveal 4595 byte value.
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-    // A reference to the Ethereum 1.x chain.
+    // A reference to the Zond 1.x chain.
     Zond1Data zond1_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
@@ -194,7 +194,7 @@ message AttesterSlashing {
     IndexedAttestation attestation_2 = 2;
 }
 
-// Deposit into the Ethereum consensus from the Ethereum 1.x deposit contract.
+// Deposit into the Zond consensus from the Zond 1.x deposit contract.
 message Deposit {
     // DepositData that is encoded into a deposit signature.
     message Data {
@@ -236,7 +236,7 @@ message SignedVoluntaryExit {
     bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
-// Zond1Data represents references to the Ethereum 1.x deposit contract.
+// Zond1Data represents references to the Zond 1.x deposit contract.
 message Zond1Data {
     // The 32 byte deposit tree root for the last deposit included in this
     // block.
@@ -246,7 +246,7 @@ message Zond1Data {
     // including the deposits in this block.
     uint64 deposit_count = 2;
 
-    // The 32 byte block hash of the Ethereum 1.x block considered for deposit
+    // The 32 byte block hash of the Zond 1.x block considered for deposit
     // inclusion.
     bytes block_hash = 3 [(theqrl.zond.ext.ssz_size) = "32"];
 }

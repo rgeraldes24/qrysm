@@ -13,7 +13,6 @@ proto_library(
         "events.proto",
         "node.proto",
         "ssz.proto",
-        "validator.proto",
         "version.proto",
         ":ssz_proto_files",
     ],

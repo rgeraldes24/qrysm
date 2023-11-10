@@ -1,18 +1,6 @@
 package migration
 
-import (
-	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state"
-	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	"github.com/theQRL/qrysm/v4/encoding/ssz"
-	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
-	"google.golang.org/protobuf/proto"
-)
-
+/*
 // CapellaToV1Alpha1SignedBlock converts a v2 SignedBeaconBlockCapella proto to a v1alpha1 proto.
 func CapellaToV1Alpha1SignedBlock(capellaBlk *zondpbv2.SignedBeaconBlockCapella) (*zondpbalpha.SignedBeaconBlockCapella, error) {
 	marshaledBlk, err := proto.Marshal(capellaBlk)
@@ -482,3 +470,5 @@ func V1Alpha1SignedDilithiumToExecChangeToV2(alphaChange *zondpbalpha.SignedDili
 	}
 	return result
 }
+
+*/

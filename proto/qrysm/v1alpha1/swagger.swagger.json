@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Ethereum Serenity APIs",
+    "title": "Zond Serenity APIs",
     "description": "{{ index . description }}",
     "version": "v1alpha1",
     "license": {
@@ -58,7 +58,7 @@
     }
   },
   "externalDocs": {
-    "description": "Ethereum Consensus Specification on Github",
+    "description": "Zond Consensus Specification on Github",
     "url": "https://github.com/ethereum/consensus-specs"
   }
 }

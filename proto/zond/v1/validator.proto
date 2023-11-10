@@ -20,6 +20,7 @@ import "google/protobuf/descriptor.proto";
 import "proto/zond/ext/options.proto";
 import "proto/zond/v1/attestation.proto";
 import "proto/zond/v1/beacon_block.proto";
+import "proto/zond/v1/version.proto";
 
 option csharp_namespace = "TheQRL.Zond.V1";
 option go_package = "github.com/theQRL/qrysm/v4/proto/zond/v1";
@@ -29,13 +30,13 @@ option java_package = "org.theqrl.zond.v1";
 option php_namespace = "TheQRL\\Zond\\v1";
 
 message ValidatorContainer {
-    uint64 index = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];;
+    uint64 index = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
     uint64 balance = 2;
     ValidatorStatus status = 3;
     Validator validator = 4;
 }
 
-// An Ethereum validator.
+// A Zond validator.
 message Validator {
     // 2592 byte Dilithium public key used for the validator's activities.
     bytes pubkey = 1 [(theqrl.zond.ext.ssz_size) = "2592", (theqrl.zond.ext.spec_name) = "pubkey"];
@@ -50,24 +51,24 @@ message Validator {
     bool slashed = 4;
 
     // Epoch when the validator became eligible for activation. This field may
-    // be zero if the validator was present in the Ethereum proof of stake genesis. This
+    // be zero if the validator was present in the Zond proof of stake genesis. This
     // field is FAR_FUTURE_EPOCH if the validator has not been activated.
     uint64 activation_eligibility_epoch = 5 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
 
     // Epoch when the validator was activated. This field may be zero if the
-    // validator was present in the Ethereum proof of stake genesis. This field is
+    // validator was present in the Zond proof of stake genesis. This field is
     // FAR_FUTURE_EPOCH if the validator has not been activated.
     uint64 activation_epoch = 6 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
 
     // Epoch when the validator was exited. This field is FAR_FUTURE_EPOCH if
     // the validator has not exited.
-    // FAR_FUTURE_EPOCH is a constant defined by the official Ethereum Beacon Chain specification:
+    // FAR_FUTURE_EPOCH is a constant defined by the official Zond Beacon Chain specification:
     // https://github.com/ethereum/consensus-specs/blob/v0.9.2/specs/core/0_beacon-chain.md#constants
     uint64 exit_epoch = 7 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
 
     // Epoch when the validator is eligible to withdraw their funds. This field
     // is FAR_FUTURE_EPOCH if the validator has not exited.
-    // FAR_FUTURE_EPOCH is a constant defined by the official Ethereum Beacon Chain specification:
+    // FAR_FUTURE_EPOCH is a constant defined by the official Zond1Data Beacon Chain specification:
     // https://github.com/ethereum/consensus-specs/blob/v0.9.2/specs/core/0_beacon-chain.md#constants
     uint64 withdrawable_epoch = 8 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
 }
@@ -161,7 +162,7 @@ message ProduceBlockRequest {
 
 message ProduceBlockResponse {
   Version version = 1;
-  BeaconBlockContainerV2 data = 2;
+  BeaconBlockContainer data = 2;
 }
 
 message ProduceBlindedBlockResponse {
@@ -222,7 +223,7 @@ message SubmitValidatorRegistrationsRequest {
         // timestamp in utc seconds from unix epoch
         uint64 timestamp = 3;
         // validator public key
-        bytes pubkey = 4 [(theqrl.zond.ext.ssz_size) = "48"];
+        bytes pubkey = 4 [(theqrl.zond.ext.ssz_size) = "2592"];
     }
 
     message SignedValidatorRegistration {
@@ -304,7 +305,7 @@ message SyncCommitteeContribution {
   bytes aggregation_bits = 4 [(theqrl.zond.ext.ssz_size) = "sync_committee_aggregate_bytes.size", (theqrl.zond.ext.cast_type) = "sync_committee_aggregate_bits.type"];
 
   // Signature by the validator(s) over the block root of `slot`.
-  bytes signature = 5 [(theqrl.zond.ext.ssz_size) = "96"];
+  bytes signature = 5 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
 // Aggregated sync committee signature object with selection proof to support light client.
@@ -323,7 +324,7 @@ message SignedContributionAndProof {
   ContributionAndProof message = 1;
 
   // Signature of the aggregator that produced `message`.
-  bytes signature = 4 [(theqrl.zond.ext.ssz_size) = "96"];
+  bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
 message GetLivenessRequest {

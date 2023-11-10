@@ -34,7 +34,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     };
     external_docs: {
         url: "https://github.com/ethereum/consensus-specs";
-        description: "Ethereum Consensus Specification on Github";
+        description: "Zond Consensus Specification on Github";
     };
     host: "api.prylabs.net",
     schemes: HTTPS;

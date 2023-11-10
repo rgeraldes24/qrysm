@@ -60,7 +60,7 @@ message BeaconState {
   SyncCommittee next_sync_committee = 9003; 
 
   // Execution fields [10001-11000]
-  theqrl.engine.v1.ExecutionPayloadHeaderCapella latest_execution_payload_header = 10001;
+  theqrl.engine.v1.ExecutionPayloadHeader latest_execution_payload_header = 10001;
 
   // Capella fields [11001-12000]
   uint64 next_withdrawal_index = 11001; // [New in Capella]

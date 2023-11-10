@@ -5,8 +5,8 @@ import (
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 )
 
-// CopyETH1Data copies the provided zond1data object.
-func CopyETH1Data(data *Zond1Data) *Zond1Data {
+// CopyZOND1Data copies the provided zond1data object.
+func CopyZOND1Data(data *Zond1Data) *Zond1Data {
 	if data == nil {
 		return nil
 	}
@@ -87,48 +87,6 @@ func CopyCheckpoint(cp *Checkpoint) *Checkpoint {
 	return &Checkpoint{
 		Epoch: cp.Epoch,
 		Root:  bytesutil.SafeCopyBytes(cp.Root),
-	}
-}
-
-// CopySignedBeaconBlock copies the provided SignedBeaconBlock.
-func CopySignedBeaconBlock(sigBlock *SignedBeaconBlock) *SignedBeaconBlock {
-	if sigBlock == nil {
-		return nil
-	}
-	return &SignedBeaconBlock{
-		Block:     CopyBeaconBlock(sigBlock.Block),
-		Signature: bytesutil.SafeCopyBytes(sigBlock.Signature),
-	}
-}
-
-// CopyBeaconBlock copies the provided BeaconBlock.
-func CopyBeaconBlock(block *BeaconBlock) *BeaconBlock {
-	if block == nil {
-		return nil
-	}
-	return &BeaconBlock{
-		Slot:          block.Slot,
-		ProposerIndex: block.ProposerIndex,
-		ParentRoot:    bytesutil.SafeCopyBytes(block.ParentRoot),
-		StateRoot:     bytesutil.SafeCopyBytes(block.StateRoot),
-		Body:          CopyBeaconBlockBody(block.Body),
-	}
-}
-
-// CopyBeaconBlockBody copies the provided BeaconBlockBody.
-func CopyBeaconBlockBody(body *BeaconBlockBody) *BeaconBlockBody {
-	if body == nil {
-		return nil
-	}
-	return &BeaconBlockBody{
-		RandaoReveal:      bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Zond1Data:         CopyETH1Data(body.Zond1Data),
-		Graffiti:          bytesutil.SafeCopyBytes(body.Graffiti),
-		ProposerSlashings: CopyProposerSlashings(body.ProposerSlashings),
-		AttesterSlashings: CopyAttesterSlashings(body.AttesterSlashings),
-		Attestations:      CopyAttestations(body.Attestations),
-		Deposits:          CopyDeposits(body.Deposits),
-		VoluntaryExits:    CopySignedVoluntaryExits(body.VoluntaryExits),
 	}
 }
 
@@ -354,39 +312,39 @@ func CopySyncAggregate(a *SyncAggregate) *SyncAggregate {
 	}
 }
 
-// CopySignedBeaconBlockCapella copies the provided SignedBeaconBlockCapella.
-func CopySignedBeaconBlockCapella(sigBlock *SignedBeaconBlockCapella) *SignedBeaconBlockCapella {
+// CopySignedBeaconBlock copies the provided SignedBeaconBlock.
+func CopySignedBeaconBlock(sigBlock *SignedBeaconBlock) *SignedBeaconBlock {
 	if sigBlock == nil {
 		return nil
 	}
-	return &SignedBeaconBlockCapella{
-		Block:     CopyBeaconBlockCapella(sigBlock.Block),
+	return &SignedBeaconBlock{
+		Block:     CopyBeaconBlock(sigBlock.Block),
 		Signature: bytesutil.SafeCopyBytes(sigBlock.Signature),
 	}
 }
 
-// CopyBeaconBlockCapella copies the provided BeaconBlockCapella.
-func CopyBeaconBlockCapella(block *BeaconBlockCapella) *BeaconBlockCapella {
+// CopyBeaconBlock copies the provided BeaconBlock.
+func CopyBeaconBlock(block *BeaconBlock) *BeaconBlock {
 	if block == nil {
 		return nil
 	}
-	return &BeaconBlockCapella{
+	return &BeaconBlock{
 		Slot:          block.Slot,
 		ProposerIndex: block.ProposerIndex,
 		ParentRoot:    bytesutil.SafeCopyBytes(block.ParentRoot),
 		StateRoot:     bytesutil.SafeCopyBytes(block.StateRoot),
-		Body:          CopyBeaconBlockBodyCapella(block.Body),
+		Body:          CopyBeaconBlockBody(block.Body),
 	}
 }
 
 // CopyBeaconBlockBodyCapella copies the provided BeaconBlockBodyCapella.
-func CopyBeaconBlockBodyCapella(body *BeaconBlockBodyCapella) *BeaconBlockBodyCapella {
+func CopyBeaconBlockBody(body *BeaconBlockBody) *BeaconBlockBody {
 	if body == nil {
 		return nil
 	}
-	return &BeaconBlockBodyCapella{
+	return &BeaconBlockBody{
 		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Zond1Data:                   CopyETH1Data(body.Zond1Data),
+		Zond1Data:                   CopyZOND1Data(body.Zond1Data),
 		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),
@@ -394,28 +352,28 @@ func CopyBeaconBlockBodyCapella(body *BeaconBlockBodyCapella) *BeaconBlockBodyCa
 		Deposits:                    CopyDeposits(body.Deposits),
 		VoluntaryExits:              CopySignedVoluntaryExits(body.VoluntaryExits),
 		SyncAggregate:               CopySyncAggregate(body.SyncAggregate),
-		ExecutionPayload:            CopyExecutionPayloadCapella(body.ExecutionPayload),
+		ExecutionPayload:            CopyExecutionPayload(body.ExecutionPayload),
 		DilithiumToExecutionChanges: CopyDilithiumToExecutionChanges(body.DilithiumToExecutionChanges),
 	}
 }
 
-// CopySignedBlindedBeaconBlockCapella copies the provided SignedBlindedBeaconBlockCapella.
-func CopySignedBlindedBeaconBlockCapella(sigBlock *SignedBlindedBeaconBlockCapella) *SignedBlindedBeaconBlockCapella {
+// CopySignedBlindedBeaconBlock copies the provided SignedBlindedBeaconBlock.
+func CopySignedBlindedBeaconBlock(sigBlock *SignedBlindedBeaconBlock) *SignedBlindedBeaconBlock {
 	if sigBlock == nil {
 		return nil
 	}
-	return &SignedBlindedBeaconBlockCapella{
-		Block:     CopyBlindedBeaconBlockCapella(sigBlock.Block),
+	return &SignedBlindedBeaconBlock{
+		Block:     CopyBlindedBeaconBlock(sigBlock.Block),
 		Signature: bytesutil.SafeCopyBytes(sigBlock.Signature),
 	}
 }
 
-// CopyBlindedBeaconBlockCapella copies the provided BlindedBeaconBlockCapella.
-func CopyBlindedBeaconBlockCapella(block *BlindedBeaconBlockCapella) *BlindedBeaconBlockCapella {
+// CopyBlindedBeaconBlock copies the provided BlindedBeaconBlock.
+func CopyBlindedBeaconBlock(block *BlindedBeaconBlock) *BlindedBeaconBlock {
 	if block == nil {
 		return nil
 	}
-	return &BlindedBeaconBlockCapella{
+	return &BlindedBeaconBlock{
 		Slot:          block.Slot,
 		ProposerIndex: block.ProposerIndex,
 		ParentRoot:    bytesutil.SafeCopyBytes(block.ParentRoot),
@@ -425,13 +383,13 @@ func CopyBlindedBeaconBlockCapella(block *BlindedBeaconBlockCapella) *BlindedBea
 }
 
 // CopyBlindedBeaconBlockBodyCapella copies the provided BlindedBeaconBlockBodyCapella.
-func CopyBlindedBeaconBlockBodyCapella(body *BlindedBeaconBlockBodyCapella) *BlindedBeaconBlockBodyCapella {
+func CopyBlindedBeaconBlockBodyCapella(body *BlindedBeaconBlockBody) *BlindedBeaconBlockBody {
 	if body == nil {
 		return nil
 	}
-	return &BlindedBeaconBlockBodyCapella{
+	return &BlindedBeaconBlockBody{
 		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Zond1Data:                   CopyETH1Data(body.Zond1Data),
+		Zond1Data:                   CopyZOND1Data(body.Zond1Data),
 		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),
@@ -439,7 +397,7 @@ func CopyBlindedBeaconBlockBodyCapella(body *BlindedBeaconBlockBodyCapella) *Bli
 		Deposits:                    CopyDeposits(body.Deposits),
 		VoluntaryExits:              CopySignedVoluntaryExits(body.VoluntaryExits),
 		SyncAggregate:               CopySyncAggregate(body.SyncAggregate),
-		ExecutionPayloadHeader:      CopyExecutionPayloadHeaderCapella(body.ExecutionPayloadHeader),
+		ExecutionPayloadHeader:      CopyExecutionPayloadHeader(body.ExecutionPayloadHeader),
 		DilithiumToExecutionChanges: CopyDilithiumToExecutionChanges(body.DilithiumToExecutionChanges),
 	}
 }
@@ -465,59 +423,12 @@ func CopyExecutionPayload(payload *enginev1.ExecutionPayload) *enginev1.Executio
 		BaseFeePerGas: bytesutil.SafeCopyBytes(payload.BaseFeePerGas),
 		BlockHash:     bytesutil.SafeCopyBytes(payload.BlockHash),
 		Transactions:  bytesutil.SafeCopy2dBytes(payload.Transactions),
-	}
-}
-
-// CopyExecutionPayloadCapella copies the provided execution payload.
-func CopyExecutionPayloadCapella(payload *enginev1.ExecutionPayload) *enginev1.ExecutionPayload {
-	if payload == nil {
-		return nil
-	}
-
-	return &enginev1.ExecutionPayload{
-		ParentHash:    bytesutil.SafeCopyBytes(payload.ParentHash),
-		FeeRecipient:  bytesutil.SafeCopyBytes(payload.FeeRecipient),
-		StateRoot:     bytesutil.SafeCopyBytes(payload.StateRoot),
-		ReceiptsRoot:  bytesutil.SafeCopyBytes(payload.ReceiptsRoot),
-		LogsBloom:     bytesutil.SafeCopyBytes(payload.LogsBloom),
-		PrevRandao:    bytesutil.SafeCopyBytes(payload.PrevRandao),
-		BlockNumber:   payload.BlockNumber,
-		GasLimit:      payload.GasLimit,
-		GasUsed:       payload.GasUsed,
-		Timestamp:     payload.Timestamp,
-		ExtraData:     bytesutil.SafeCopyBytes(payload.ExtraData),
-		BaseFeePerGas: bytesutil.SafeCopyBytes(payload.BaseFeePerGas),
-		BlockHash:     bytesutil.SafeCopyBytes(payload.BlockHash),
-		Transactions:  bytesutil.SafeCopy2dBytes(payload.Transactions),
 		Withdrawals:   CopyWithdrawalSlice(payload.Withdrawals),
 	}
 }
 
 // CopyExecutionPayloadHeader copies the provided execution payload object.
 func CopyExecutionPayloadHeader(payload *enginev1.ExecutionPayloadHeader) *enginev1.ExecutionPayloadHeader {
-	if payload == nil {
-		return nil
-	}
-	return &enginev1.ExecutionPayloadHeader{
-		ParentHash:       bytesutil.SafeCopyBytes(payload.ParentHash),
-		FeeRecipient:     bytesutil.SafeCopyBytes(payload.FeeRecipient),
-		StateRoot:        bytesutil.SafeCopyBytes(payload.StateRoot),
-		ReceiptsRoot:     bytesutil.SafeCopyBytes(payload.ReceiptsRoot),
-		LogsBloom:        bytesutil.SafeCopyBytes(payload.LogsBloom),
-		PrevRandao:       bytesutil.SafeCopyBytes(payload.PrevRandao),
-		BlockNumber:      payload.BlockNumber,
-		GasLimit:         payload.GasLimit,
-		GasUsed:          payload.GasUsed,
-		Timestamp:        payload.Timestamp,
-		BaseFeePerGas:    bytesutil.SafeCopyBytes(payload.BaseFeePerGas),
-		ExtraData:        bytesutil.SafeCopyBytes(payload.ExtraData),
-		BlockHash:        bytesutil.SafeCopyBytes(payload.BlockHash),
-		TransactionsRoot: bytesutil.SafeCopyBytes(payload.TransactionsRoot),
-	}
-}
-
-// CopyExecutionPayloadHeaderCapella copies the provided execution payload object.
-func CopyExecutionPayloadHeaderCapella(payload *enginev1.ExecutionPayloadHeader) *enginev1.ExecutionPayloadHeader {
 	if payload == nil {
 		return nil
 	}

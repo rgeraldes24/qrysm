@@ -52,38 +52,12 @@ service BeaconNodeValidator {
         };
     }
 
-    // Stream validator duties for the requested validators.
-    //
-    // The duties consist of:
-    //   Proposer - the validator that creates a beacon chain block.
-    //   Attester — a validator that is part of a committee that needs to sign off on a beacon chain
-    // DEPRECATED: This endpoint is superseded by the /zond/v1/events Beacon API endpoint
-    rpc StreamDuties(DutiesRequest) returns (stream DutiesResponse) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/validator/duties/stream"
-        };
-    }
-
     // DomainData fetches the current Dilithium signature domain version information from the
     // running beacon node's state. This information is used when validators sign
     // blocks and attestations appropriately based on their duty.
     rpc DomainData(DomainRequest) returns (DomainResponse) {
         option (google.api.http) = {
             get: "/zond/v1alpha1/validator/domain"
-        };
-    }
-
-    // WaitForChainStart queries the logs of the Validator Deposit Contract on the Ethereum
-    // proof-of-work chain to verify the beacon chain has started its runtime and
-    // validators are ready to begin their responsibilities.
-    //
-    // If the chain has not yet started, this endpoint starts a server-side stream which updates
-    // the client when the beacon chain is ready.
-    rpc WaitForChainStart(google.protobuf.Empty) returns (stream ChainStartResponse) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/validator/chainstart/stream"
         };
     }
 
@@ -346,19 +320,6 @@ message SyncSubcommitteeIndexResponse {
     repeated uint64 indices = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.CommitteeIndex"];
 }
 
-// DEPRECATED: This endpoint StreamBlocks is superseded by the /zond/v1/events Beacon API endpoint
-message StreamBlocksResponse {
-    option deprecated = true;
-    oneof block {
-        // Representing a phase 0 block.
-        SignedBeaconBlock phase0_block = 1 ;
-
-        // Representing a capella block.
-        SignedBeaconBlockCapella capella_block = 2;
-    }
-}
-
-
 message DomainRequest {
     // The epoch for which the domain is being requested.
     uint64 epoch = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
@@ -485,11 +446,9 @@ message DutiesRequest {
 }
 
 message DutiesResponse {
-    repeated Duty duties = 1 [deprecated = true];
+    repeated Duty current_epoch_duties = 1;
 
-    repeated Duty current_epoch_duties = 2;
-
-    repeated Duty next_epoch_duties = 3;
+    repeated Duty next_epoch_duties = 2;
 
     message Duty {
         // The committee a validator is assigned to.
@@ -633,31 +592,21 @@ message Validator {
 
 // ValidatorParticipation stores participation metrics during a given epoch.
 message ValidatorParticipation {
-    // Percentage of validator participation in the given epoch. This field
-    // contains a value between 0 and 1.
-    float global_participation_rate = 1  [deprecated = true];
-
-    // The total amount of ether, in gwei, that has been used in voting.
-    uint64 voted_ether = 2 [deprecated = true];
-
-    // The total amount of ether, in gwei, that is eligible for voting.
-    uint64 eligible_ether = 3 [deprecated = true];
-
     // Total staked gwei that was active (i.e. eligible to vote) during the current epoch.
-    uint64 current_epoch_active_gwei = 4;
+    uint64 current_epoch_active_gwei = 1;
     // Total staked gwei that had attestations included in a block during the current epoch,
     // attestations by the same validator do not increase this figure.
-    uint64 current_epoch_attesting_gwei = 5;
+    uint64 current_epoch_attesting_gwei = 2;
     // Total staked gwei that attested to the majority-elected Casper FFG target epoch during the current epoch.
-    uint64 current_epoch_target_attesting_gwei = 6;
+    uint64 current_epoch_target_attesting_gwei = 3;
     // Same as current_epoch_active_gwei but for previous epoch.
-    uint64 previous_epoch_active_gwei = 7;
+    uint64 previous_epoch_active_gwei = 4;
     // Same as current_epoch_attesting_gwei but for previous epoch.
-    uint64 previous_epoch_attesting_gwei = 8;
+    uint64 previous_epoch_attesting_gwei = 5;
     // Same as current_epoch_target_attesting_gwei but for previous epoch.
-    uint64 previous_epoch_target_attesting_gwei = 9;
+    uint64 previous_epoch_target_attesting_gwei = 6;
     // Total staked gwei that attested to a head beacon block that is in the canonical chain.
-    uint64 previous_epoch_head_attesting_gwei = 10;
+    uint64 previous_epoch_head_attesting_gwei = 7;
 }
 
 // ValidatorInfo gives information about the state of a validator at a certain epoch.
@@ -721,13 +670,6 @@ message DoppelGangerResponse {
     repeated ValidatorResponse responses = 1;
 }
 
-// Request to only return blocks that is verified by the beacon node.
-// DEPRECATED: This endpoint StreamBlocks is superseded by the /zond/v1/events Beacon API endpoint, there is an internal GRPC endpoint /internal/zond/v1/events, this message will no longer be needed.
-message StreamBlocksRequest {
-    option deprecated = true;
-    bool verified_only = 1;
-}
-
 message PrepareBeaconProposerRequest {
     message FeeRecipientContainer {
         // The address of the fee recipient.
@@ -748,7 +690,7 @@ message FeeRecipientByPubKeyResponse {
 }
 
 message AssignValidatorToSubnetRequest {
-    bytes public_key = 1 [(theqrl.zond.ext.ssz_size) = "48", (theqrl.zond.ext.spec_name) = "pubkey"];
+    bytes public_key = 1 [(theqrl.zond.ext.ssz_size) = "2592", (theqrl.zond.ext.spec_name) = "pubkey"];
     ValidatorStatus status = 2;
 }
 

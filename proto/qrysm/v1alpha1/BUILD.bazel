@@ -96,7 +96,7 @@ ssz_gen_marshal(
         "Fork",
         "ForkData",
         "HistoricalBatch",
-        "Status",,
+        "Status",
         "BeaconState",
         "SigningData",
         "SyncCommittee",

@@ -2,13 +2,13 @@ package sync_contribution
 
 import (
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
-	v2 "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
 )
 
 // naiveSyncContributionAggregation aggregates naively, without any complex algorithms or optimizations.
 // Note: this is currently a naive implementation to the order of O(mn^2).
-func naiveSyncContributionAggregation(contributions []*v2.SyncCommitteeContribution) ([]*v2.SyncCommitteeContribution, error) {
+func naiveSyncContributionAggregation(contributions []*zond.SyncCommitteeContribution) ([]*zond.SyncCommitteeContribution, error) {
 	if len(contributions) <= 1 {
 		return contributions, nil
 	}
@@ -65,15 +65,15 @@ func naiveSyncContributionAggregation(contributions []*v2.SyncCommitteeContribut
 }
 
 // aggregates pair of sync contributions c1 and c2 together.
-func aggregate(c1, c2 *v2.SyncCommitteeContribution) (*v2.SyncCommitteeContribution, error) {
+func aggregate(c1, c2 *zond.SyncCommitteeContribution) (*zond.SyncCommitteeContribution, error) {
 	if o, err := c1.AggregationBits.Overlaps(c2.AggregationBits); err != nil {
 		return nil, err
 	} else if o {
 		return nil, aggregation.ErrBitsOverlap
 	}
 
-	baseContribution := v2.CopySyncCommitteeContribution(c1)
-	newContribution := v2.CopySyncCommitteeContribution(c2)
+	baseContribution := zond.CopySyncCommitteeContribution(c1)
+	newContribution := zond.CopySyncCommitteeContribution(c2)
 	if newContribution.AggregationBits.Count() > baseContribution.AggregationBits.Count() {
 		baseContribution, newContribution = newContribution, baseContribution
 	}

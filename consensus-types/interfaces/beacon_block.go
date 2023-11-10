@@ -20,13 +20,9 @@ type ReadOnlySignedBeaconBlock interface {
 	Copy() (ReadOnlySignedBeaconBlock, error)
 	Proto() (proto.Message, error)
 	PbGenericBlock() (*zondpb.GenericSignedBeaconBlock, error)
-	PbPhase0Block() (*zondpb.SignedBeaconBlock, error)
-	PbAltairBlock() (*zondpb.SignedBeaconBlockAltair, error)
 	ToBlinded() (ReadOnlySignedBeaconBlock, error)
-	PbBellatrixBlock() (*zondpb.SignedBeaconBlockBellatrix, error)
-	PbBlindedBellatrixBlock() (*zondpb.SignedBlindedBeaconBlockBellatrix, error)
-	PbCapellaBlock() (*zondpb.SignedBeaconBlockCapella, error)
-	PbBlindedCapellaBlock() (*zondpb.SignedBlindedBeaconBlockCapella, error)
+	PbCapellaBlock() (*zondpb.SignedBeaconBlock, error)
+	PbBlindedCapellaBlock() (*zondpb.SignedBlindedBeaconBlock, error)
 	ssz.Marshaler
 	ssz.Unmarshaler
 	Version() int
@@ -120,7 +116,6 @@ type ExecutionData interface {
 	TransactionsRoot() ([]byte, error)
 	Withdrawals() ([]*enginev1.Withdrawal, error)
 	WithdrawalsRoot() ([]byte, error)
-	PbCapella() (*enginev1.ExecutionPayloadCapella, error)
-	PbBellatrix() (*enginev1.ExecutionPayload, error)
+	PbCapella() (*enginev1.ExecutionPayload, error)
 	ValueInGwei() (uint64, error)
 }

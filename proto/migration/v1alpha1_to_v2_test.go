@@ -1,20 +1,6 @@
 package migration
 
-import (
-	"testing"
-
-	"github.com/prysmaticlabs/go-bitfield"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
-	"github.com/theQRL/qrysm/v4/testing/assert"
-	"github.com/theQRL/qrysm/v4/testing/require"
-	"github.com/theQRL/qrysm/v4/testing/util"
-)
-
+/*
 func TestV1Alpha1SignedContributionAndProofToV2(t *testing.T) {
 	alphaContribution := &zondpbalpha.SignedContributionAndProof{
 		Message: &zondpbalpha.ContributionAndProof{
@@ -820,3 +806,4 @@ func TestV1Alpha1SignedDilithiumToExecChangeToV2(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("fromdilithiumpubkey"), 48), change.Message.FromDilithiumPubkey)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("toexecutionaddress"), 20), change.Message.ToExecutionAddress)
 }
+*/

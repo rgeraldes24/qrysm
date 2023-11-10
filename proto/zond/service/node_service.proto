@@ -72,7 +72,7 @@ service BeaconNode {
   // format similar to a HTTP User-Agent field.
   //
   // Spec: https://ethereum.github.io/beacon-APIs/?urls.primaryName=v2.3.0#/Node/getNodeVersion
-  rpc GetVersion(google.protobuf.Empty) returns (v1.VersionResponse) {
+  rpc GetVersion(google.protobuf.Empty) returns (v1.NodeVersionResponse) {
     option (google.api.http) = {get: "/internal/zond/v1/node/version"};
   }
 

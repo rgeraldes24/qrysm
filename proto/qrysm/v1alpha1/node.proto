@@ -40,14 +40,14 @@ service Node {
         };
     }
 
-    // Retrieve information about the genesis of Ethereum proof of stake.
+    // Retrieve information about the genesis of Zond proof of stake.
     rpc GetGenesis(google.protobuf.Empty) returns (Genesis) {
         option (google.api.http) = {
             get: "/zond/v1alpha1/node/genesis"
         };
     }
 
-    // Retrieve information about the running Ethereum Beacon Node.
+    // Retrieve information about the running Zond Beacon Node.
     rpc GetVersion(google.protobuf.Empty) returns (Version) {
         option (google.api.http) = {
             get: "/zond/v1alpha1/node/version"
@@ -86,8 +86,8 @@ service Node {
         };
     }
 
-    // // Retrieve the status of the ETH1 connections.
-    rpc GetETH1ConnectionStatus(google.protobuf.Empty) returns (ETH1ConnectionStatus) {
+    // // Retrieve the status of the ZOND1 connections.
+    rpc GetZOND1ConnectionStatus(google.protobuf.Empty) returns (ZOND1ConnectionStatus) {
         option (google.api.http) = {
             get: "/zond/v1alpha1/node/zond1/connections"
         };
@@ -100,12 +100,12 @@ message SyncStatus {
     bool syncing = 1;
 }
 
-// Information about the genesis of Ethereum proof of stake.
+// Information about the genesis of Zond proof of stake.
 message Genesis {
     // UTC time specified in the chain start event in the deposit contract.
     google.protobuf.Timestamp genesis_time = 1;
 
-    // Address of the deposit contract in the Ethereum 1 chain.
+    // Address of the deposit contract in the Zond 1 chain.
     bytes deposit_contract_address = 2;
 
     // Root of the genesis validators deposits; used for domain separation
@@ -178,10 +178,10 @@ enum ConnectionState {
     CONNECTING = 3;
 }
 
-// ETH1ConnectionStatus states the current address and error of the ETH1 API
+// ZOND1ConnectionStatus states the current address and error of the ZOND1 API
 // endpoint. It also provides the addresses and errors for any fallback URLs. 
-message ETH1ConnectionStatus {
-    // Current ETH1 HTTP endpoint.
+message ZOND1ConnectionStatus {
+    // Current ZOND1 HTTP endpoint.
     string current_address = 1;
 
     // Current error (if any) of the current connection.

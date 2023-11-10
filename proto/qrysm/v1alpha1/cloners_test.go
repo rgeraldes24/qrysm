@@ -10,12 +10,12 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 )
 
-func TestCopyETH1Data(t *testing.T) {
+func TestCopyZOND1Data(t *testing.T) {
 	data := genZond1Data()
 
-	got := v1alpha1.CopyETH1Data(data)
+	got := v1alpha1.CopyZOND1Data(data)
 	if !reflect.DeepEqual(got, data) {
-		t.Errorf("CopyETH1Data() = %v, want %v", got, data)
+		t.Errorf("CopyZOND1Data() = %v, want %v", got, data)
 	}
 	assert.NotEmpty(t, got, "Copied zond1data has empty fields")
 }
