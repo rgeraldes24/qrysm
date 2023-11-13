@@ -238,7 +238,7 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 
 	if state.version == version.Capella {
 		// Execution payload root.
-		executionPayloadRoot, err := state.latestExecutionPayloadHeaderCapella.HashTreeRoot()
+		executionPayloadRoot, err := state.latestExecutionPayloadHeader.HashTreeRoot()
 		if err != nil {
 			return nil, err
 		}

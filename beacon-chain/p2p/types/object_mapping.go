@@ -38,36 +38,12 @@ func InitializeDataMaps() {
 				&zondpb.SignedBeaconBlock{Block: &zondpb.BeaconBlock{Body: &zondpb.BeaconBlockBody{}}},
 			)
 		},
-		bytesutil.ToBytes4(params.BeaconConfig().AltairForkVersion): func() (interfaces.ReadOnlySignedBeaconBlock, error) {
-			return blocks.NewSignedBeaconBlock(
-				&zondpb.SignedBeaconBlockAltair{Block: &zondpb.BeaconBlockAltair{Body: &zondpb.BeaconBlockBodyAltair{}}},
-			)
-		},
-		bytesutil.ToBytes4(params.BeaconConfig().BellatrixForkVersion): func() (interfaces.ReadOnlySignedBeaconBlock, error) {
-			return blocks.NewSignedBeaconBlock(
-				&zondpb.SignedBeaconBlockBellatrix{Block: &zondpb.BeaconBlockBellatrix{Body: &zondpb.BeaconBlockBodyBellatrix{}}},
-			)
-		},
-		bytesutil.ToBytes4(params.BeaconConfig().CapellaForkVersion): func() (interfaces.ReadOnlySignedBeaconBlock, error) {
-			return blocks.NewSignedBeaconBlock(
-				&zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{}}},
-			)
-		},
 	}
 
 	// Reset our metadata map.
 	MetaDataMap = map[[4]byte]func() metadata.Metadata{
 		bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion): func() metadata.Metadata {
 			return wrapper.WrappedMetadataV0(&zondpb.MetaDataV0{})
-		},
-		bytesutil.ToBytes4(params.BeaconConfig().AltairForkVersion): func() metadata.Metadata {
-			return wrapper.WrappedMetadataV1(&zondpb.MetaDataV1{})
-		},
-		bytesutil.ToBytes4(params.BeaconConfig().BellatrixForkVersion): func() metadata.Metadata {
-			return wrapper.WrappedMetadataV1(&zondpb.MetaDataV1{})
-		},
-		bytesutil.ToBytes4(params.BeaconConfig().CapellaForkVersion): func() metadata.Metadata {
-			return wrapper.WrappedMetadataV1(&zondpb.MetaDataV1{})
 		},
 	}
 }

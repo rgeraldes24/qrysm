@@ -168,7 +168,7 @@ func aggregateAttestations(atts []*zondpb.Attestation, keys []int, coverage *bit
 	}
 	var attsKeys []int
 	attsMap := make(map[int][]byte)
-	sigValidatorIndexMap := make(map[int][]uint64)
+	//sigValidatorIndexMap := make(map[int][]uint64)
 	for _, att := range atts {
 		for i, index := range att.AggregationBits.BitIndices() {
 			attsKeys = append(attsKeys, index)
@@ -177,21 +177,21 @@ func aggregateAttestations(atts []*zondpb.Attestation, keys []int, coverage *bit
 				continue
 			}
 			attsMap[index] = append(attsMap[index], att.Signatures[i]...)
-			sigValidatorIndexMap[index] = append(sigValidatorIndexMap[index], att.SignatureValidatorIndex[i])
+			//sigValidatorIndexMap[index] = append(sigValidatorIndexMap[index], att.SignatureValidatorIndex[i])
 		}
 	}
 	sort.Slice(attsKeys, func(x, y int) bool {
 		return attsKeys[x] < attsKeys[y]
 	})
 	signs := make([]dilithium.Signature, 0, len(keys))
-	signatureValidatorIndex := make([]uint64, 0, len(keys))
+	//signatureValidatorIndex := make([]uint64, 0, len(keys))
 	for _, key := range attsKeys {
 		sig, err := signatureFromBytes(attsMap[key])
 		if err != nil {
 			return key, err
 		}
 		signs = append(signs, sig)
-		signatureValidatorIndex = append(signatureValidatorIndex, sigValidatorIndexMap[key]...)
+		//signatureValidatorIndex = append(signatureValidatorIndex, sigValidatorIndexMap[key]...)
 	}
 
 	// Put aggregated attestation at a position of the first selected attestation.
@@ -200,8 +200,8 @@ func aggregateAttestations(atts []*zondpb.Attestation, keys []int, coverage *bit
 		AggregationBits: coverage.ToBitlist(),
 		Data:            data,
 		//Signature:              aggregateSignatures(signs).Marshal(),
-		Signatures:              unaggregatedSignatures(signs),
-		SignatureValidatorIndex: signatureValidatorIndex,
+		Signatures: unaggregatedSignatures(signs),
+		//SignatureValidatorIndex: signatureValidatorIndex,
 	}
 	return
 }

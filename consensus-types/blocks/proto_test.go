@@ -23,153 +23,15 @@ type fields struct {
 	syncAggregate               *zond.SyncAggregate
 	execPayload                 *enginev1.ExecutionPayload
 	execPayloadHeader           *enginev1.ExecutionPayloadHeader
-	execPayloadCapella          *enginev1.ExecutionPayloadCapella
-	execPayloadHeaderCapella    *enginev1.ExecutionPayloadHeaderCapella
 	dilithiumToExecutionChanges []*zond.SignedDilithiumToExecutionChange
 }
 
 func Test_SignedBeaconBlock_Proto(t *testing.T) {
 	f := getFields()
 
-	t.Run("Phase0", func(t *testing.T) {
+	t.Run("Capella", func(t *testing.T) {
 		expectedBlock := &zond.SignedBeaconBlock{
 			Block: &zond.BeaconBlock{
-				Slot:          128,
-				ProposerIndex: 128,
-				ParentRoot:    f.root[:],
-				StateRoot:     f.root[:],
-				Body:          bodyPbPhase0(),
-			},
-			Signature: f.sig[:],
-		}
-		block := &SignedBeaconBlock{
-			version: version.Phase0,
-			block: &BeaconBlock{
-				version:       version.Phase0,
-				slot:          128,
-				proposerIndex: 128,
-				parentRoot:    f.root,
-				stateRoot:     f.root,
-				body:          bodyPhase0(),
-			},
-			signature: f.sig,
-		}
-
-		result, err := block.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.SignedBeaconBlock)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBlock.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
-	t.Run("Altair", func(t *testing.T) {
-		expectedBlock := &zond.SignedBeaconBlockAltair{
-			Block: &zond.BeaconBlockAltair{
-				Slot:          128,
-				ProposerIndex: 128,
-				ParentRoot:    f.root[:],
-				StateRoot:     f.root[:],
-				Body:          bodyPbAltair(),
-			},
-			Signature: f.sig[:],
-		}
-		block := &SignedBeaconBlock{
-			version: version.Altair,
-			block: &BeaconBlock{
-				version:       version.Altair,
-				slot:          128,
-				proposerIndex: 128,
-				parentRoot:    f.root,
-				stateRoot:     f.root,
-				body:          bodyAltair(),
-			},
-			signature: f.sig,
-		}
-
-		result, err := block.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.SignedBeaconBlockAltair)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBlock.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
-	t.Run("Bellatrix", func(t *testing.T) {
-		expectedBlock := &zond.SignedBeaconBlockBellatrix{
-			Block: &zond.BeaconBlockBellatrix{
-				Slot:          128,
-				ProposerIndex: 128,
-				ParentRoot:    f.root[:],
-				StateRoot:     f.root[:],
-				Body:          bodyPbBellatrix(),
-			},
-			Signature: f.sig[:],
-		}
-		block := &SignedBeaconBlock{
-			version: version.Bellatrix,
-			block: &BeaconBlock{
-				version:       version.Bellatrix,
-				slot:          128,
-				proposerIndex: 128,
-				parentRoot:    f.root,
-				stateRoot:     f.root,
-				body:          bodyBellatrix(t),
-			},
-			signature: f.sig,
-		}
-
-		result, err := block.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.SignedBeaconBlockBellatrix)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBlock.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
-	t.Run("BellatrixBlind", func(t *testing.T) {
-		expectedBlock := &zond.SignedBlindedBeaconBlockBellatrix{
-			Block: &zond.BlindedBeaconBlockBellatrix{
-				Slot:          128,
-				ProposerIndex: 128,
-				ParentRoot:    f.root[:],
-				StateRoot:     f.root[:],
-				Body:          bodyPbBlindedBellatrix(),
-			},
-			Signature: f.sig[:],
-		}
-		block := &SignedBeaconBlock{
-			version: version.Bellatrix,
-			block: &BeaconBlock{
-				version:       version.Bellatrix,
-				slot:          128,
-				proposerIndex: 128,
-				parentRoot:    f.root,
-				stateRoot:     f.root,
-				body:          bodyBlindedBellatrix(t),
-			},
-			signature: f.sig,
-		}
-
-		result, err := block.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.SignedBlindedBeaconBlockBellatrix)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBlock.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
-	t.Run("Capella", func(t *testing.T) {
-		expectedBlock := &zond.SignedBeaconBlockCapella{
-			Block: &zond.BeaconBlockCapella{
 				Slot:          128,
 				ProposerIndex: 128,
 				ParentRoot:    f.root[:],
@@ -193,7 +55,7 @@ func Test_SignedBeaconBlock_Proto(t *testing.T) {
 
 		result, err := block.Proto()
 		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.SignedBeaconBlockCapella)
+		resultBlock, ok := result.(*zond.SignedBeaconBlock)
 		require.Equal(t, true, ok)
 		resultHTR, err := resultBlock.HashTreeRoot()
 		require.NoError(t, err)
@@ -202,8 +64,8 @@ func Test_SignedBeaconBlock_Proto(t *testing.T) {
 		assert.DeepEqual(t, expectedHTR, resultHTR)
 	})
 	t.Run("CapellaBlind", func(t *testing.T) {
-		expectedBlock := &zond.SignedBlindedBeaconBlockCapella{
-			Block: &zond.BlindedBeaconBlockCapella{
+		expectedBlock := &zond.SignedBlindedBeaconBlock{
+			Block: &zond.BlindedBeaconBlock{
 				Slot:          128,
 				ProposerIndex: 128,
 				ParentRoot:    f.root[:],
@@ -227,7 +89,7 @@ func Test_SignedBeaconBlock_Proto(t *testing.T) {
 
 		result, err := block.Proto()
 		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.SignedBlindedBeaconBlockCapella)
+		resultBlock, ok := result.(*zond.SignedBlindedBeaconBlock)
 		require.Equal(t, true, ok)
 		resultHTR, err := resultBlock.HashTreeRoot()
 		require.NoError(t, err)
@@ -240,116 +102,8 @@ func Test_SignedBeaconBlock_Proto(t *testing.T) {
 func Test_BeaconBlock_Proto(t *testing.T) {
 	f := getFields()
 
-	t.Run("Phase0", func(t *testing.T) {
-		expectedBlock := &zond.BeaconBlock{
-			Slot:          128,
-			ProposerIndex: 128,
-			ParentRoot:    f.root[:],
-			StateRoot:     f.root[:],
-			Body:          bodyPbPhase0(),
-		}
-		block := &BeaconBlock{
-			version:       version.Phase0,
-			slot:          128,
-			proposerIndex: 128,
-			parentRoot:    f.root,
-			stateRoot:     f.root,
-			body:          bodyPhase0(),
-		}
-
-		result, err := block.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BeaconBlock)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBlock.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
-	t.Run("Altair", func(t *testing.T) {
-		expectedBlock := &zond.BeaconBlockAltair{
-			Slot:          128,
-			ProposerIndex: 128,
-			ParentRoot:    f.root[:],
-			StateRoot:     f.root[:],
-			Body:          bodyPbAltair(),
-		}
-		block := &BeaconBlock{
-			version:       version.Altair,
-			slot:          128,
-			proposerIndex: 128,
-			parentRoot:    f.root,
-			stateRoot:     f.root,
-			body:          bodyAltair(),
-		}
-
-		result, err := block.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BeaconBlockAltair)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBlock.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
-	t.Run("Bellatrix", func(t *testing.T) {
-		expectedBlock := &zond.BeaconBlockBellatrix{
-			Slot:          128,
-			ProposerIndex: 128,
-			ParentRoot:    f.root[:],
-			StateRoot:     f.root[:],
-			Body:          bodyPbBellatrix(),
-		}
-		block := &BeaconBlock{
-			version:       version.Bellatrix,
-			slot:          128,
-			proposerIndex: 128,
-			parentRoot:    f.root,
-			stateRoot:     f.root,
-			body:          bodyBellatrix(t),
-		}
-
-		result, err := block.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BeaconBlockBellatrix)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBlock.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
-	t.Run("BellatrixBlind", func(t *testing.T) {
-		expectedBlock := &zond.BlindedBeaconBlockBellatrix{
-			Slot:          128,
-			ProposerIndex: 128,
-			ParentRoot:    f.root[:],
-			StateRoot:     f.root[:],
-			Body:          bodyPbBlindedBellatrix(),
-		}
-		block := &BeaconBlock{
-			version:       version.Bellatrix,
-			slot:          128,
-			proposerIndex: 128,
-			parentRoot:    f.root,
-			stateRoot:     f.root,
-			body:          bodyBlindedBellatrix(t),
-		}
-
-		result, err := block.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BlindedBeaconBlockBellatrix)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBlock.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
 	t.Run("Capella", func(t *testing.T) {
-		expectedBlock := &zond.BeaconBlockCapella{
+		expectedBlock := &zond.BeaconBlock{
 			Slot:          128,
 			ProposerIndex: 128,
 			ParentRoot:    f.root[:],
@@ -367,7 +121,7 @@ func Test_BeaconBlock_Proto(t *testing.T) {
 
 		result, err := block.Proto()
 		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BeaconBlockCapella)
+		resultBlock, ok := result.(*zond.BeaconBlock)
 		require.Equal(t, true, ok)
 		resultHTR, err := resultBlock.HashTreeRoot()
 		require.NoError(t, err)
@@ -376,7 +130,7 @@ func Test_BeaconBlock_Proto(t *testing.T) {
 		assert.DeepEqual(t, expectedHTR, resultHTR)
 	})
 	t.Run("CapellaBlind", func(t *testing.T) {
-		expectedBlock := &zond.BlindedBeaconBlockCapella{
+		expectedBlock := &zond.BlindedBeaconBlock{
 			Slot:          128,
 			ProposerIndex: 128,
 			ParentRoot:    f.root[:],
@@ -394,7 +148,7 @@ func Test_BeaconBlock_Proto(t *testing.T) {
 
 		result, err := block.Proto()
 		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BlindedBeaconBlockCapella)
+		resultBlock, ok := result.(*zond.BlindedBeaconBlock)
 		require.Equal(t, true, ok)
 		resultHTR, err := resultBlock.HashTreeRoot()
 		require.NoError(t, err)
@@ -405,65 +159,12 @@ func Test_BeaconBlock_Proto(t *testing.T) {
 }
 
 func Test_BeaconBlockBody_Proto(t *testing.T) {
-	t.Run("Phase0", func(t *testing.T) {
-		expectedBody := bodyPbPhase0()
-		body := bodyPhase0()
-
-		result, err := body.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BeaconBlockBody)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBody.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
-	t.Run("Altair", func(t *testing.T) {
-		expectedBody := bodyPbAltair()
-		body := bodyAltair()
-		result, err := body.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BeaconBlockBodyAltair)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBody.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
-	t.Run("Bellatrix", func(t *testing.T) {
-		expectedBody := bodyPbBellatrix()
-		body := bodyBellatrix(t)
-		result, err := body.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BeaconBlockBodyBellatrix)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBody.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
-	t.Run("BellatrixBlind", func(t *testing.T) {
-		expectedBody := bodyPbBlindedBellatrix()
-		body := bodyBlindedBellatrix(t)
-		result, err := body.Proto()
-		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BlindedBeaconBlockBodyBellatrix)
-		require.Equal(t, true, ok)
-		resultHTR, err := resultBlock.HashTreeRoot()
-		require.NoError(t, err)
-		expectedHTR, err := expectedBody.HashTreeRoot()
-		require.NoError(t, err)
-		assert.DeepEqual(t, expectedHTR, resultHTR)
-	})
 	t.Run("Capella", func(t *testing.T) {
 		expectedBody := bodyPbCapella()
 		body := bodyCapella(t)
 		result, err := body.Proto()
 		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BeaconBlockBodyCapella)
+		resultBlock, ok := result.(*zond.BeaconBlockBody)
 		require.Equal(t, true, ok)
 		resultHTR, err := resultBlock.HashTreeRoot()
 		require.NoError(t, err)
@@ -476,7 +177,7 @@ func Test_BeaconBlockBody_Proto(t *testing.T) {
 		body := bodyBlindedCapella(t)
 		result, err := body.Proto()
 		require.NoError(t, err)
-		resultBlock, ok := result.(*zond.BlindedBeaconBlockBodyCapella)
+		resultBlock, ok := result.(*zond.BlindedBeaconBlockBody)
 		require.Equal(t, true, ok)
 		resultHTR, err := resultBlock.HashTreeRoot()
 		require.NoError(t, err)
@@ -484,124 +185,24 @@ func Test_BeaconBlockBody_Proto(t *testing.T) {
 		require.NoError(t, err)
 		assert.DeepEqual(t, expectedHTR, resultHTR)
 	})
-	t.Run("Bellatrix - wrong payload type", func(t *testing.T) {
-		body := bodyBellatrix(t)
-		body.executionPayload = &executionPayloadHeader{}
-		_, err := body.Proto()
-		require.ErrorIs(t, err, errPayloadWrongType)
-	})
-	t.Run("BellatrixBlind - wrong payload type", func(t *testing.T) {
-		body := bodyBlindedBellatrix(t)
-		body.executionPayloadHeader = &executionPayload{}
-		_, err := body.Proto()
-		require.ErrorIs(t, err, errPayloadHeaderWrongType)
-	})
 	t.Run("Capella - wrong payload type", func(t *testing.T) {
 		body := bodyCapella(t)
-		body.executionPayload = &executionPayloadHeaderCapella{}
+		body.executionPayload = &executionPayloadHeader{}
 		_, err := body.Proto()
 		require.ErrorIs(t, err, errPayloadWrongType)
 	})
 	t.Run("CapellaBlind - wrong payload type", func(t *testing.T) {
 		body := bodyBlindedCapella(t)
-		body.executionPayloadHeader = &executionPayloadCapella{}
+		body.executionPayloadHeader = &executionPayload{}
 		_, err := body.Proto()
 		require.ErrorIs(t, err, errPayloadHeaderWrongType)
 	})
 }
 
-func Test_initSignedBlockFromProtoPhase0(t *testing.T) {
+func Test_initSignedBlockFromProtoCapella(t *testing.T) {
 	f := getFields()
 	expectedBlock := &zond.SignedBeaconBlock{
 		Block: &zond.BeaconBlock{
-			Slot:          128,
-			ProposerIndex: 128,
-			ParentRoot:    f.root[:],
-			StateRoot:     f.root[:],
-			Body:          bodyPbPhase0(),
-		},
-		Signature: f.sig[:],
-	}
-	resultBlock, err := initSignedBlockFromProtoPhase0(expectedBlock)
-	require.NoError(t, err)
-	resultHTR, err := resultBlock.block.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBlock.Block.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-	assert.DeepEqual(t, expectedBlock.Signature, resultBlock.signature[:])
-}
-
-func Test_initSignedBlockFromProtoAltair(t *testing.T) {
-	f := getFields()
-	expectedBlock := &zond.SignedBeaconBlockAltair{
-		Block: &zond.BeaconBlockAltair{
-			Slot:          128,
-			ProposerIndex: 128,
-			ParentRoot:    f.root[:],
-			StateRoot:     f.root[:],
-			Body:          bodyPbAltair(),
-		},
-		Signature: f.sig[:],
-	}
-	resultBlock, err := initSignedBlockFromProtoAltair(expectedBlock)
-	require.NoError(t, err)
-	resultHTR, err := resultBlock.block.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBlock.Block.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-	assert.DeepEqual(t, expectedBlock.Signature, resultBlock.signature[:])
-}
-
-func Test_initSignedBlockFromProtoBellatrix(t *testing.T) {
-	f := getFields()
-	expectedBlock := &zond.SignedBeaconBlockBellatrix{
-		Block: &zond.BeaconBlockBellatrix{
-			Slot:          128,
-			ProposerIndex: 128,
-			ParentRoot:    f.root[:],
-			StateRoot:     f.root[:],
-			Body:          bodyPbBellatrix(),
-		},
-		Signature: f.sig[:],
-	}
-	resultBlock, err := initSignedBlockFromProtoBellatrix(expectedBlock)
-	require.NoError(t, err)
-	resultHTR, err := resultBlock.block.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBlock.Block.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-	assert.DeepEqual(t, expectedBlock.Signature, resultBlock.signature[:])
-}
-
-func Test_initBlindedSignedBlockFromProtoBellatrix(t *testing.T) {
-	f := getFields()
-	expectedBlock := &zond.SignedBlindedBeaconBlockBellatrix{
-		Block: &zond.BlindedBeaconBlockBellatrix{
-			Slot:          128,
-			ProposerIndex: 128,
-			ParentRoot:    f.root[:],
-			StateRoot:     f.root[:],
-			Body:          bodyPbBlindedBellatrix(),
-		},
-		Signature: f.sig[:],
-	}
-	resultBlock, err := initBlindedSignedBlockFromProtoBellatrix(expectedBlock)
-	require.NoError(t, err)
-	resultHTR, err := resultBlock.block.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBlock.Block.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-	assert.DeepEqual(t, expectedBlock.Signature, resultBlock.signature[:])
-}
-
-func Test_initSignedBlockFromProtoCapella(t *testing.T) {
-	f := getFields()
-	expectedBlock := &zond.SignedBeaconBlockCapella{
-		Block: &zond.BeaconBlockCapella{
 			Slot:          128,
 			ProposerIndex: 128,
 			ParentRoot:    f.root[:],
@@ -622,8 +223,8 @@ func Test_initSignedBlockFromProtoCapella(t *testing.T) {
 
 func Test_initBlindedSignedBlockFromProtoCapella(t *testing.T) {
 	f := getFields()
-	expectedBlock := &zond.SignedBlindedBeaconBlockCapella{
-		Block: &zond.BlindedBeaconBlockCapella{
+	expectedBlock := &zond.SignedBlindedBeaconBlock{
+		Block: &zond.BlindedBeaconBlock{
 			Slot:          128,
 			ProposerIndex: 128,
 			ParentRoot:    f.root[:],
@@ -642,81 +243,9 @@ func Test_initBlindedSignedBlockFromProtoCapella(t *testing.T) {
 	assert.DeepEqual(t, expectedBlock.Signature, resultBlock.signature[:])
 }
 
-func Test_initBlockFromProtoPhase0(t *testing.T) {
-	f := getFields()
-	expectedBlock := &zond.BeaconBlock{
-		Slot:          128,
-		ProposerIndex: 128,
-		ParentRoot:    f.root[:],
-		StateRoot:     f.root[:],
-		Body:          bodyPbPhase0(),
-	}
-	resultBlock, err := initBlockFromProtoPhase0(expectedBlock)
-	require.NoError(t, err)
-	resultHTR, err := resultBlock.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBlock.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-}
-
-func Test_initBlockFromProtoAltair(t *testing.T) {
-	f := getFields()
-	expectedBlock := &zond.BeaconBlockAltair{
-		Slot:          128,
-		ProposerIndex: 128,
-		ParentRoot:    f.root[:],
-		StateRoot:     f.root[:],
-		Body:          bodyPbAltair(),
-	}
-	resultBlock, err := initBlockFromProtoAltair(expectedBlock)
-	require.NoError(t, err)
-	resultHTR, err := resultBlock.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBlock.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-}
-
-func Test_initBlockFromProtoBellatrix(t *testing.T) {
-	f := getFields()
-	expectedBlock := &zond.BeaconBlockBellatrix{
-		Slot:          128,
-		ProposerIndex: 128,
-		ParentRoot:    f.root[:],
-		StateRoot:     f.root[:],
-		Body:          bodyPbBellatrix(),
-	}
-	resultBlock, err := initBlockFromProtoBellatrix(expectedBlock)
-	require.NoError(t, err)
-	resultHTR, err := resultBlock.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBlock.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-}
-
-func Test_initBlockFromProtoBlindedBellatrix(t *testing.T) {
-	f := getFields()
-	expectedBlock := &zond.BlindedBeaconBlockBellatrix{
-		Slot:          128,
-		ProposerIndex: 128,
-		ParentRoot:    f.root[:],
-		StateRoot:     f.root[:],
-		Body:          bodyPbBlindedBellatrix(),
-	}
-	resultBlock, err := initBlindedBlockFromProtoBellatrix(expectedBlock)
-	require.NoError(t, err)
-	resultHTR, err := resultBlock.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBlock.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-}
-
 func Test_initBlockFromProtoCapella(t *testing.T) {
 	f := getFields()
-	expectedBlock := &zond.BeaconBlockCapella{
+	expectedBlock := &zond.BeaconBlock{
 		Slot:          128,
 		ProposerIndex: 128,
 		ParentRoot:    f.root[:],
@@ -734,7 +263,7 @@ func Test_initBlockFromProtoCapella(t *testing.T) {
 
 func Test_initBlockFromProtoBlindedCapella(t *testing.T) {
 	f := getFields()
-	expectedBlock := &zond.BlindedBeaconBlockCapella{
+	expectedBlock := &zond.BlindedBeaconBlock{
 		Slot:          128,
 		ProposerIndex: 128,
 		ParentRoot:    f.root[:],
@@ -746,50 +275,6 @@ func Test_initBlockFromProtoBlindedCapella(t *testing.T) {
 	resultHTR, err := resultBlock.HashTreeRoot()
 	require.NoError(t, err)
 	expectedHTR, err := expectedBlock.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-}
-
-func Test_initBlockBodyFromProtoPhase0(t *testing.T) {
-	expectedBody := bodyPbPhase0()
-	resultBody, err := initBlockBodyFromProtoPhase0(expectedBody)
-	require.NoError(t, err)
-	resultHTR, err := resultBody.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBody.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-}
-
-func Test_initBlockBodyFromProtoAltair(t *testing.T) {
-	expectedBody := bodyPbAltair()
-	resultBody, err := initBlockBodyFromProtoAltair(expectedBody)
-	require.NoError(t, err)
-	resultHTR, err := resultBody.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBody.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-}
-
-func Test_initBlockBodyFromProtoBellatrix(t *testing.T) {
-	expectedBody := bodyPbBellatrix()
-	resultBody, err := initBlockBodyFromProtoBellatrix(expectedBody)
-	require.NoError(t, err)
-	resultHTR, err := resultBody.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBody.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, expectedHTR, resultHTR)
-}
-
-func Test_initBlockBodyFromProtoBlindedBellatrix(t *testing.T) {
-	expectedBody := bodyPbBlindedBellatrix()
-	resultBody, err := initBlindedBlockBodyFromProtoBellatrix(expectedBody)
-	require.NoError(t, err)
-	resultHTR, err := resultBody.HashTreeRoot()
-	require.NoError(t, err)
-	expectedHTR, err := expectedBody.HashTreeRoot()
 	require.NoError(t, err)
 	assert.DeepEqual(t, expectedHTR, resultHTR)
 }
@@ -816,46 +301,9 @@ func Test_initBlockBodyFromProtoBlindedCapella(t *testing.T) {
 	assert.DeepEqual(t, expectedHTR, resultHTR)
 }
 
-func bodyPbPhase0() *zond.BeaconBlockBody {
+func bodyPbBellatrix() *zond.BeaconBlockBody {
 	f := getFields()
 	return &zond.BeaconBlockBody{
-		RandaoReveal: f.sig[:],
-		Zond1Data: &zond.Zond1Data{
-			DepositRoot:  f.root[:],
-			DepositCount: 128,
-			BlockHash:    f.root[:],
-		},
-		Graffiti:          f.root[:],
-		ProposerSlashings: f.proposerSlashings,
-		AttesterSlashings: f.attesterSlashings,
-		Attestations:      f.atts,
-		Deposits:          f.deposits,
-		VoluntaryExits:    f.voluntaryExits,
-	}
-}
-
-func bodyPbAltair() *zond.BeaconBlockBodyAltair {
-	f := getFields()
-	return &zond.BeaconBlockBodyAltair{
-		RandaoReveal: f.sig[:],
-		Zond1Data: &zond.Zond1Data{
-			DepositRoot:  f.root[:],
-			DepositCount: 128,
-			BlockHash:    f.root[:],
-		},
-		Graffiti:          f.root[:],
-		ProposerSlashings: f.proposerSlashings,
-		AttesterSlashings: f.attesterSlashings,
-		Attestations:      f.atts,
-		Deposits:          f.deposits,
-		VoluntaryExits:    f.voluntaryExits,
-		SyncAggregate:     f.syncAggregate,
-	}
-}
-
-func bodyPbBellatrix() *zond.BeaconBlockBodyBellatrix {
-	f := getFields()
-	return &zond.BeaconBlockBodyBellatrix{
 		RandaoReveal: f.sig[:],
 		Zond1Data: &zond.Zond1Data{
 			DepositRoot:  f.root[:],
@@ -873,29 +321,9 @@ func bodyPbBellatrix() *zond.BeaconBlockBodyBellatrix {
 	}
 }
 
-func bodyPbBlindedBellatrix() *zond.BlindedBeaconBlockBodyBellatrix {
+func bodyPbCapella() *zond.BeaconBlockBody {
 	f := getFields()
-	return &zond.BlindedBeaconBlockBodyBellatrix{
-		RandaoReveal: f.sig[:],
-		Zond1Data: &zond.Zond1Data{
-			DepositRoot:  f.root[:],
-			DepositCount: 128,
-			BlockHash:    f.root[:],
-		},
-		Graffiti:               f.root[:],
-		ProposerSlashings:      f.proposerSlashings,
-		AttesterSlashings:      f.attesterSlashings,
-		Attestations:           f.atts,
-		Deposits:               f.deposits,
-		VoluntaryExits:         f.voluntaryExits,
-		SyncAggregate:          f.syncAggregate,
-		ExecutionPayloadHeader: f.execPayloadHeader,
-	}
-}
-
-func bodyPbCapella() *zond.BeaconBlockBodyCapella {
-	f := getFields()
-	return &zond.BeaconBlockBodyCapella{
+	return &zond.BeaconBlockBody{
 		RandaoReveal: f.sig[:],
 		Zond1Data: &zond.Zond1Data{
 			DepositRoot:  f.root[:],
@@ -909,14 +337,14 @@ func bodyPbCapella() *zond.BeaconBlockBodyCapella {
 		Deposits:                    f.deposits,
 		VoluntaryExits:              f.voluntaryExits,
 		SyncAggregate:               f.syncAggregate,
-		ExecutionPayload:            f.execPayloadCapella,
+		ExecutionPayload:            f.execPayload,
 		DilithiumToExecutionChanges: f.dilithiumToExecutionChanges,
 	}
 }
 
-func bodyPbBlindedCapella() *zond.BlindedBeaconBlockBodyCapella {
+func bodyPbBlindedCapella() *zond.BlindedBeaconBlockBody {
 	f := getFields()
-	return &zond.BlindedBeaconBlockBodyCapella{
+	return &zond.BlindedBeaconBlockBody{
 		RandaoReveal: f.sig[:],
 		Zond1Data: &zond.Zond1Data{
 			DepositRoot:  f.root[:],
@@ -930,100 +358,14 @@ func bodyPbBlindedCapella() *zond.BlindedBeaconBlockBodyCapella {
 		Deposits:                    f.deposits,
 		VoluntaryExits:              f.voluntaryExits,
 		SyncAggregate:               f.syncAggregate,
-		ExecutionPayloadHeader:      f.execPayloadHeaderCapella,
+		ExecutionPayloadHeader:      f.execPayloadHeader,
 		DilithiumToExecutionChanges: f.dilithiumToExecutionChanges,
-	}
-}
-
-func bodyPhase0() *BeaconBlockBody {
-	f := getFields()
-	return &BeaconBlockBody{
-		version:      version.Phase0,
-		randaoReveal: f.sig,
-		zond1Data: &zond.Zond1Data{
-			DepositRoot:  f.root[:],
-			DepositCount: 128,
-			BlockHash:    f.root[:],
-		},
-		graffiti:          f.root,
-		proposerSlashings: f.proposerSlashings,
-		attesterSlashings: f.attesterSlashings,
-		attestations:      f.atts,
-		deposits:          f.deposits,
-		voluntaryExits:    f.voluntaryExits,
-	}
-}
-
-func bodyAltair() *BeaconBlockBody {
-	f := getFields()
-	return &BeaconBlockBody{
-		version:      version.Altair,
-		randaoReveal: f.sig,
-		zond1Data: &zond.Zond1Data{
-			DepositRoot:  f.root[:],
-			DepositCount: 128,
-			BlockHash:    f.root[:],
-		},
-		graffiti:          f.root,
-		proposerSlashings: f.proposerSlashings,
-		attesterSlashings: f.attesterSlashings,
-		attestations:      f.atts,
-		deposits:          f.deposits,
-		voluntaryExits:    f.voluntaryExits,
-		syncAggregate:     f.syncAggregate,
-	}
-}
-
-func bodyBellatrix(t *testing.T) *BeaconBlockBody {
-	f := getFields()
-	p, err := WrappedExecutionPayload(f.execPayload)
-	require.NoError(t, err)
-	return &BeaconBlockBody{
-		version:      version.Bellatrix,
-		randaoReveal: f.sig,
-		zond1Data: &zond.Zond1Data{
-			DepositRoot:  f.root[:],
-			DepositCount: 128,
-			BlockHash:    f.root[:],
-		},
-		graffiti:          f.root,
-		proposerSlashings: f.proposerSlashings,
-		attesterSlashings: f.attesterSlashings,
-		attestations:      f.atts,
-		deposits:          f.deposits,
-		voluntaryExits:    f.voluntaryExits,
-		syncAggregate:     f.syncAggregate,
-		executionPayload:  p,
-	}
-}
-
-func bodyBlindedBellatrix(t *testing.T) *BeaconBlockBody {
-	f := getFields()
-	ph, err := WrappedExecutionPayloadHeader(f.execPayloadHeader)
-	require.NoError(t, err)
-	return &BeaconBlockBody{
-		version:      version.Bellatrix,
-		isBlinded:    true,
-		randaoReveal: f.sig,
-		zond1Data: &zond.Zond1Data{
-			DepositRoot:  f.root[:],
-			DepositCount: 128,
-			BlockHash:    f.root[:],
-		},
-		graffiti:               f.root,
-		proposerSlashings:      f.proposerSlashings,
-		attesterSlashings:      f.attesterSlashings,
-		attestations:           f.atts,
-		deposits:               f.deposits,
-		voluntaryExits:         f.voluntaryExits,
-		syncAggregate:          f.syncAggregate,
-		executionPayloadHeader: ph,
 	}
 }
 
 func bodyCapella(t *testing.T) *BeaconBlockBody {
 	f := getFields()
-	p, err := WrappedExecutionPayloadCapella(f.execPayloadCapella, 0)
+	p, err := WrappedExecutionPayload(f.execPayload, 0)
 	require.NoError(t, err)
 	return &BeaconBlockBody{
 		version:      version.Capella,
@@ -1047,7 +389,7 @@ func bodyCapella(t *testing.T) *BeaconBlockBody {
 
 func bodyBlindedCapella(t *testing.T) *BeaconBlockBody {
 	f := getFields()
-	ph, err := WrappedExecutionPayloadHeaderCapella(f.execPayloadHeaderCapella, 0)
+	ph, err := WrappedExecutionPayloadHeader(f.execPayloadHeader, 0)
 	require.NoError(t, err)
 	return &BeaconBlockBody{
 		version:      version.Capella,
@@ -1098,7 +440,7 @@ func getFields() fields {
 	atts := make([]*zond.Attestation, 128)
 	for i := range atts {
 		atts[i] = &zond.Attestation{}
-		atts[i].Signature = sig[:]
+		atts[i].Signatures = [][]byte{sig[:]}
 		atts[i].AggregationBits = bitfield.NewBitlist(1)
 		atts[i].Data = &zond.AttestationData{
 			Slot:            128,
@@ -1152,7 +494,7 @@ func getFields() fields {
 					Root:  root[:],
 				},
 			},
-			Signature: sig[:],
+			Signatures: [][]byte{sig[:]},
 		},
 		Attestation_2: &zond.IndexedAttestation{
 			AttestingIndices: []uint64{1, 2, 8},
@@ -1169,7 +511,7 @@ func getFields() fields {
 					Root:  root[:],
 				},
 			},
-			Signature: sig[:],
+			Signatures: [][]byte{sig[:]},
 		},
 	}
 	voluntaryExit := &zond.SignedVoluntaryExit{
@@ -1184,46 +526,11 @@ func getFields() fields {
 	syncCommitteeBits.SetBitAt(2, true)
 	syncCommitteeBits.SetBitAt(8, true)
 	syncAggregate := &zond.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: sig[:],
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{sig[:]},
 	}
+
 	execPayload := &enginev1.ExecutionPayload{
-		ParentHash:    root[:],
-		FeeRecipient:  b20,
-		StateRoot:     root[:],
-		ReceiptsRoot:  root[:],
-		LogsBloom:     b256,
-		PrevRandao:    root[:],
-		BlockNumber:   128,
-		GasLimit:      128,
-		GasUsed:       128,
-		Timestamp:     128,
-		ExtraData:     root[:],
-		BaseFeePerGas: root[:],
-		BlockHash:     root[:],
-		Transactions: [][]byte{
-			[]byte("transaction1"),
-			[]byte("transaction2"),
-			[]byte("transaction8"),
-		},
-	}
-	execPayloadHeader := &enginev1.ExecutionPayloadHeader{
-		ParentHash:       root[:],
-		FeeRecipient:     b20,
-		StateRoot:        root[:],
-		ReceiptsRoot:     root[:],
-		LogsBloom:        b256,
-		PrevRandao:       root[:],
-		BlockNumber:      128,
-		GasLimit:         128,
-		GasUsed:          128,
-		Timestamp:        128,
-		ExtraData:        root[:],
-		BaseFeePerGas:    root[:],
-		BlockHash:        root[:],
-		TransactionsRoot: root[:],
-	}
-	execPayloadCapella := &enginev1.ExecutionPayloadCapella{
 		ParentHash:    root[:],
 		FeeRecipient:  b20,
 		StateRoot:     root[:],
@@ -1250,7 +557,7 @@ func getFields() fields {
 			},
 		},
 	}
-	execPayloadHeaderCapella := &enginev1.ExecutionPayloadHeaderCapella{
+	execPayloadHeader := &enginev1.ExecutionPayloadHeader{
 		ParentHash:       root[:],
 		FeeRecipient:     b20,
 		StateRoot:        root[:],
@@ -1287,8 +594,6 @@ func getFields() fields {
 		syncAggregate:               syncAggregate,
 		execPayload:                 execPayload,
 		execPayloadHeader:           execPayloadHeader,
-		execPayloadCapella:          execPayloadCapella,
-		execPayloadHeaderCapella:    execPayloadHeaderCapella,
 		dilithiumToExecutionChanges: dilithiumToExecutionChanges,
 	}
 }

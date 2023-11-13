@@ -11,7 +11,7 @@ import (
 )
 
 // ProcessZond1DataInBlock is an operation performed on each
-// beacon block to ensure the ETH1 data votes are processed
+// beacon block to ensure the ZOND1 data votes are processed
 // into the beacon state.
 //
 // Official spec definition:
@@ -58,7 +58,7 @@ func AreZond1DataEqual(a, b *zondpb.Zond1Data) bool {
 // votes to see if they match the zond1data.
 func Zond1DataHasEnoughSupport(beaconState state.ReadOnlyBeaconState, data *zondpb.Zond1Data) (bool, error) {
 	voteCount := uint64(0)
-	data = zondpb.CopyETH1Data(data)
+	data = zondpb.CopyZOND1Data(data)
 
 	for _, vote := range beaconState.Zond1DataVotes() {
 		if AreZond1DataEqual(vote, data) {

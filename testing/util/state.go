@@ -32,219 +32,16 @@ func FillRootsNaturalOpt(state *zondpb.BeaconState) error {
 	return nil
 }
 
-// FillRootsNaturalOptAltair is meant to be used as an option when calling NewBeaconStateAltair.
-// It fills state and block roots with hex representations of natural numbers starting with 0.
-// Example: 16 becomes 0x00...0f.
-func FillRootsNaturalOptAltair(state *zondpb.BeaconStateAltair) error {
-	roots, err := PrepareRoots(int(params.BeaconConfig().SlotsPerHistoricalRoot))
-	if err != nil {
-		return err
-	}
-	state.StateRoots = roots
-	state.BlockRoots = roots
-	return nil
-}
-
-// FillRootsNaturalOptBellatrix is meant to be used as an option when calling NewBeaconStateBellatrix.
-// It fills state and block roots with hex representations of natural numbers starting with 0.
-// Example: 16 becomes 0x00...0f.
-func FillRootsNaturalOptBellatrix(state *zondpb.BeaconStateBellatrix) error {
-	roots, err := PrepareRoots(int(params.BeaconConfig().SlotsPerHistoricalRoot))
-	if err != nil {
-		return err
-	}
-	state.StateRoots = roots
-	state.BlockRoots = roots
-	return nil
-}
-
-// FillRootsNaturalOptCapella is meant to be used as an option when calling NewBeaconStateCapella.
-// It fills state and block roots with hex representations of natural numbers starting with 0.
-// Example: 16 becomes 0x00...0f.
-func FillRootsNaturalOptCapella(state *zondpb.BeaconStateCapella) error {
-	roots, err := PrepareRoots(int(params.BeaconConfig().SlotsPerHistoricalRoot))
-	if err != nil {
-		return err
-	}
-	state.StateRoots = roots
-	state.BlockRoots = roots
-	return nil
-}
-
 type NewBeaconStateOption func(state *zondpb.BeaconState) error
 
 // NewBeaconState creates a beacon state with minimum marshalable fields.
-func NewBeaconState(options ...NewBeaconStateOption) (state.BeaconState, error) {
+func NewBeaconState(options ...func(state *zondpb.BeaconState) error) (state.BeaconState, error) {
+	pubkeys := make([][]byte, 512)
+	for i := range pubkeys {
+		pubkeys[i] = make([]byte, 2592)
+	}
+
 	seed := &zondpb.BeaconState{
-		BlockRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
-		StateRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
-		Slashings:                  make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector),
-		RandaoMixes:                filledByteSlice2D(uint64(params.BeaconConfig().EpochsPerHistoricalVector), 32),
-		Validators:                 make([]*zondpb.Validator, 0),
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		Zond1Data: &zondpb.Zond1Data{
-			DepositRoot: make([]byte, fieldparams.RootLength),
-			BlockHash:   make([]byte, 32),
-		},
-		Fork: &zondpb.Fork{
-			PreviousVersion: make([]byte, 4),
-			CurrentVersion:  make([]byte, 4),
-		},
-		Zond1DataVotes:              make([]*zondpb.Zond1Data, 0),
-		HistoricalRoots:             make([][]byte, 0),
-		JustificationBits:           bitfield.Bitvector4{0x0},
-		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		LatestBlockHeader:           HydrateBeaconHeader(&zondpb.BeaconBlockHeader{}),
-		PreviousEpochAttestations:   make([]*zondpb.PendingAttestation, 0),
-		CurrentEpochAttestations:    make([]*zondpb.PendingAttestation, 0),
-		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-	}
-
-	for _, opt := range options {
-		err := opt(seed)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	var st, err = state_native.InitializeFromProtoUnsafePhase0(seed)
-	if err != nil {
-		return nil, err
-	}
-
-	return st.Copy(), nil
-}
-
-// NewBeaconStateAltair creates a beacon state with minimum marshalable fields.
-func NewBeaconStateAltair(options ...func(state *zondpb.BeaconStateAltair) error) (state.BeaconState, error) {
-	pubkeys := make([][]byte, 512)
-	for i := range pubkeys {
-		pubkeys[i] = make([]byte, 2592)
-	}
-
-	seed := &zondpb.BeaconStateAltair{
-		BlockRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
-		StateRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
-		Slashings:                  make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector),
-		RandaoMixes:                filledByteSlice2D(uint64(params.BeaconConfig().EpochsPerHistoricalVector), 32),
-		Validators:                 make([]*zondpb.Validator, 0),
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		Zond1Data: &zondpb.Zond1Data{
-			DepositRoot: make([]byte, fieldparams.RootLength),
-			BlockHash:   make([]byte, 32),
-		},
-		Fork: &zondpb.Fork{
-			PreviousVersion: make([]byte, 4),
-			CurrentVersion:  make([]byte, 4),
-		},
-		Zond1DataVotes:              make([]*zondpb.Zond1Data, 0),
-		HistoricalRoots:             make([][]byte, 0),
-		JustificationBits:           bitfield.Bitvector4{0x0},
-		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		LatestBlockHeader:           HydrateBeaconHeader(&zondpb.BeaconBlockHeader{}),
-		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		PreviousEpochParticipation:  make([]byte, 0),
-		CurrentEpochParticipation:   make([]byte, 0),
-		CurrentSyncCommittee: &zondpb.SyncCommittee{
-			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 1327104),
-		},
-		NextSyncCommittee: &zondpb.SyncCommittee{
-			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 1327104),
-		},
-	}
-
-	for _, opt := range options {
-		err := opt(seed)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	var st, err = state_native.InitializeFromProtoUnsafeAltair(seed)
-	if err != nil {
-		return nil, err
-	}
-
-	return st.Copy(), nil
-}
-
-// NewBeaconStateBellatrix creates a beacon state with minimum marshalable fields.
-func NewBeaconStateBellatrix(options ...func(state *zondpb.BeaconStateBellatrix) error) (state.BeaconState, error) {
-	pubkeys := make([][]byte, 512)
-	for i := range pubkeys {
-		pubkeys[i] = make([]byte, 2592)
-	}
-
-	seed := &zondpb.BeaconStateBellatrix{
-		BlockRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
-		StateRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
-		Slashings:                  make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector),
-		RandaoMixes:                filledByteSlice2D(uint64(params.BeaconConfig().EpochsPerHistoricalVector), 32),
-		Validators:                 make([]*zondpb.Validator, 0),
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		Zond1Data: &zondpb.Zond1Data{
-			DepositRoot: make([]byte, fieldparams.RootLength),
-			BlockHash:   make([]byte, 32),
-		},
-		Fork: &zondpb.Fork{
-			PreviousVersion: make([]byte, 4),
-			CurrentVersion:  make([]byte, 4),
-		},
-		Zond1DataVotes:              make([]*zondpb.Zond1Data, 0),
-		HistoricalRoots:             make([][]byte, 0),
-		JustificationBits:           bitfield.Bitvector4{0x0},
-		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		LatestBlockHeader:           HydrateBeaconHeader(&zondpb.BeaconBlockHeader{}),
-		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		PreviousEpochParticipation:  make([]byte, 0),
-		CurrentEpochParticipation:   make([]byte, 0),
-		CurrentSyncCommittee: &zondpb.SyncCommittee{
-			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 1327104),
-		},
-		NextSyncCommittee: &zondpb.SyncCommittee{
-			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 1327104),
-		},
-		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeader{
-			ParentHash:       make([]byte, 32),
-			FeeRecipient:     make([]byte, 20),
-			StateRoot:        make([]byte, 32),
-			ReceiptsRoot:     make([]byte, 32),
-			LogsBloom:        make([]byte, 256),
-			PrevRandao:       make([]byte, 32),
-			ExtraData:        make([]byte, 0),
-			BaseFeePerGas:    make([]byte, 32),
-			BlockHash:        make([]byte, 32),
-			TransactionsRoot: make([]byte, 32),
-		},
-	}
-
-	for _, opt := range options {
-		err := opt(seed)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	var st, err = state_native.InitializeFromProtoUnsafeBellatrix(seed)
-	if err != nil {
-		return nil, err
-	}
-
-	return st.Copy(), nil
-}
-
-// NewBeaconStateCapella creates a beacon state with minimum marshalable fields.
-func NewBeaconStateCapella(options ...func(state *zondpb.BeaconStateCapella) error) (state.BeaconState, error) {
-	pubkeys := make([][]byte, 512)
-	for i := range pubkeys {
-		pubkeys[i] = make([]byte, 2592)
-	}
-
-	seed := &zondpb.BeaconStateCapella{
 		BlockRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
 		StateRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
 		Slashings:                  make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector),
@@ -275,7 +72,7 @@ func NewBeaconStateCapella(options ...func(state *zondpb.BeaconStateCapella) err
 			Pubkeys:         pubkeys,
 			AggregatePubkey: make([]byte, 1327104),
 		},
-		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
+		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeader{
 			ParentHash:       make([]byte, 32),
 			FeeRecipient:     make([]byte, 20),
 			StateRoot:        make([]byte, 32),

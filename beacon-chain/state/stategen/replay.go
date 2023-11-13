@@ -8,9 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/capella"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/execution"
-	prysmtime "github.com/theQRL/qrysm/v4/beacon-chain/core/time"
+	qrysmtime "github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db/filters"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -199,7 +197,7 @@ func ReplayProcessSlots(ctx context.Context, state state.BeaconState, slot primi
 		if err != nil {
 			return nil, errors.Wrap(err, "could not process slot")
 		}
-		if prysmtime.CanProcessEpoch(state) {
+		if qrysmtime.CanProcessEpoch(state) {
 			switch state.Version() {
 			case version.Phase0:
 				state, err = transition.ProcessEpochPrecompute(ctx, state)
@@ -222,29 +220,29 @@ func ReplayProcessSlots(ctx context.Context, state state.BeaconState, slot primi
 			return nil, errors.Wrap(err, "failed to increment state slot")
 		}
 
-		if prysmtime.CanUpgradeToAltair(state.Slot()) {
-			state, err = altair.UpgradeToAltair(ctx, state)
-			if err != nil {
-				tracing.AnnotateError(span, err)
-				return nil, err
-			}
-		}
+		// if prysmtime.CanUpgradeToAltair(state.Slot()) {
+		// 	state, err = altair.UpgradeToAltair(ctx, state)
+		// 	if err != nil {
+		// 		tracing.AnnotateError(span, err)
+		// 		return nil, err
+		// 	}
+		// }
 
-		if prysmtime.CanUpgradeToBellatrix(state.Slot()) {
-			state, err = execution.UpgradeToBellatrix(state)
-			if err != nil {
-				tracing.AnnotateError(span, err)
-				return nil, err
-			}
-		}
+		// if prysmtime.CanUpgradeToBellatrix(state.Slot()) {
+		// 	state, err = execution.UpgradeToBellatrix(state)
+		// 	if err != nil {
+		// 		tracing.AnnotateError(span, err)
+		// 		return nil, err
+		// 	}
+		// }
 
-		if prysmtime.CanUpgradeToCapella(state.Slot()) {
-			state, err = capella.UpgradeToCapella(state)
-			if err != nil {
-				tracing.AnnotateError(span, err)
-				return nil, err
-			}
-		}
+		// if prysmtime.CanUpgradeToCapella(state.Slot()) {
+		// 	state, err = capella.UpgradeToCapella(state)
+		// 	if err != nil {
+		// 		tracing.AnnotateError(span, err)
+		// 		return nil, err
+		// 	}
+		// }
 	}
 
 	return state, nil

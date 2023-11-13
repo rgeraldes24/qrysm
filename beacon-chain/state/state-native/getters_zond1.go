@@ -23,7 +23,7 @@ func (b *BeaconState) zond1DataVal() *zondpb.Zond1Data {
 		return nil
 	}
 
-	return zondpb.CopyETH1Data(b.zond1Data)
+	return zondpb.CopyZOND1Data(b.zond1Data)
 }
 
 // Zond1DataVotes corresponds to votes from Ethereum on the canonical proof-of-work chain
@@ -49,7 +49,7 @@ func (b *BeaconState) zond1DataVotesVal() []*zondpb.Zond1Data {
 
 	res := make([]*zondpb.Zond1Data, len(b.zond1DataVotes))
 	for i := 0; i < len(res); i++ {
-		res[i] = zondpb.CopyETH1Data(b.zond1DataVotes[i])
+		res[i] = zondpb.CopyZOND1Data(b.zond1DataVotes[i])
 	}
 	return res
 }

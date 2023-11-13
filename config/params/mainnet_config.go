@@ -208,14 +208,8 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	SafetyDecay: 10,
 
 	// Fork related values.
-	GenesisEpoch:         genesisForkEpoch,
-	GenesisForkVersion:   []byte{0, 0, 0, 0},
-	AltairForkVersion:    []byte{1, 0, 0, 0},
-	AltairForkEpoch:      mainnetAltairForkEpoch,
-	BellatrixForkVersion: []byte{2, 0, 0, 0},
-	BellatrixForkEpoch:   mainnetBellatrixForkEpoch,
-	CapellaForkVersion:   []byte{3, 0, 0, 0},
-	CapellaForkEpoch:     194048,
+	GenesisEpoch:       genesisForkEpoch,
+	GenesisForkVersion: []byte{0, 0, 0, 0},
 
 	// New values introduced in Altair hard fork 1.
 	// Participation flag indices.
@@ -280,17 +274,8 @@ func MainnetTestConfig() *BeaconChainConfig {
 // byte argument as the high byte (common across forks).
 func FillTestVersions(c *BeaconChainConfig, b byte) {
 	c.GenesisForkVersion = make([]byte, fieldparams.VersionLength)
-	c.AltairForkVersion = make([]byte, fieldparams.VersionLength)
-	c.BellatrixForkVersion = make([]byte, fieldparams.VersionLength)
-	c.CapellaForkVersion = make([]byte, fieldparams.VersionLength)
 
 	c.GenesisForkVersion[fieldparams.VersionLength-1] = b
-	c.AltairForkVersion[fieldparams.VersionLength-1] = b
-	c.BellatrixForkVersion[fieldparams.VersionLength-1] = b
-	c.CapellaForkVersion[fieldparams.VersionLength-1] = b
 
 	c.GenesisForkVersion[0] = 0
-	c.AltairForkVersion[0] = 1
-	c.BellatrixForkVersion[0] = 2
-	c.CapellaForkVersion[0] = 3
 }

@@ -18,59 +18,8 @@ func (b *BeaconState) ToProtoUnsafe() interface{} {
 	gvrCopy := b.genesisValidatorsRoot
 
 	switch b.version {
-	case version.Phase0:
+	case version.Capella:
 		return &zondpb.BeaconState{
-			GenesisTime:                 b.genesisTime,
-			GenesisValidatorsRoot:       gvrCopy[:],
-			Slot:                        b.slot,
-			Fork:                        b.fork,
-			LatestBlockHeader:           b.latestBlockHeader,
-			BlockRoots:                  b.blockRoots.Slice(),
-			StateRoots:                  b.stateRoots.Slice(),
-			HistoricalRoots:             b.historicalRoots.Slice(),
-			Zond1Data:                   b.zond1Data,
-			Zond1DataVotes:              b.zond1DataVotes,
-			Zond1DepositIndex:           b.zond1DepositIndex,
-			Validators:                  b.validators,
-			Balances:                    b.balances,
-			RandaoMixes:                 b.randaoMixes.Slice(),
-			Slashings:                   b.slashings,
-			PreviousEpochAttestations:   b.previousEpochAttestations,
-			CurrentEpochAttestations:    b.currentEpochAttestations,
-			JustificationBits:           b.justificationBits,
-			PreviousJustifiedCheckpoint: b.previousJustifiedCheckpoint,
-			CurrentJustifiedCheckpoint:  b.currentJustifiedCheckpoint,
-			FinalizedCheckpoint:         b.finalizedCheckpoint,
-		}
-	case version.Altair:
-		return &zondpb.BeaconStateAltair{
-			GenesisTime:                 b.genesisTime,
-			GenesisValidatorsRoot:       gvrCopy[:],
-			Slot:                        b.slot,
-			Fork:                        b.fork,
-			LatestBlockHeader:           b.latestBlockHeader,
-			BlockRoots:                  b.blockRoots.Slice(),
-			StateRoots:                  b.stateRoots.Slice(),
-			HistoricalRoots:             b.historicalRoots.Slice(),
-			Zond1Data:                   b.zond1Data,
-			Zond1DataVotes:              b.zond1DataVotes,
-			Zond1DepositIndex:           b.zond1DepositIndex,
-			Validators:                  b.validators,
-			Balances:                    b.balances,
-			RandaoMixes:                 b.randaoMixes.Slice(),
-			Slashings:                   b.slashings,
-			PreviousEpochParticipation:  b.previousEpochParticipation,
-			CurrentEpochParticipation:   b.currentEpochParticipation,
-			JustificationBits:           b.justificationBits,
-			PreviousJustifiedCheckpoint: b.previousJustifiedCheckpoint,
-			CurrentJustifiedCheckpoint:  b.currentJustifiedCheckpoint,
-			FinalizedCheckpoint:         b.finalizedCheckpoint,
-			InactivityScores:            b.inactivityScores,
-			CurrentSyncCommittee:        b.currentSyncCommittee,
-			NextSyncCommittee:           b.nextSyncCommittee,
-		}
-	case version.Bellatrix:
-		return &zondpb.BeaconStateBellatrix{
 			GenesisTime:                  b.genesisTime,
 			GenesisValidatorsRoot:        gvrCopy[:],
 			Slot:                         b.slot,
@@ -96,34 +45,6 @@ func (b *BeaconState) ToProtoUnsafe() interface{} {
 			CurrentSyncCommittee:         b.currentSyncCommittee,
 			NextSyncCommittee:            b.nextSyncCommittee,
 			LatestExecutionPayloadHeader: b.latestExecutionPayloadHeader,
-		}
-	case version.Capella:
-		return &zondpb.BeaconStateCapella{
-			GenesisTime:                  b.genesisTime,
-			GenesisValidatorsRoot:        gvrCopy[:],
-			Slot:                         b.slot,
-			Fork:                         b.fork,
-			LatestBlockHeader:            b.latestBlockHeader,
-			BlockRoots:                   b.blockRoots.Slice(),
-			StateRoots:                   b.stateRoots.Slice(),
-			HistoricalRoots:              b.historicalRoots.Slice(),
-			Zond1Data:                    b.zond1Data,
-			Zond1DataVotes:               b.zond1DataVotes,
-			Zond1DepositIndex:            b.zond1DepositIndex,
-			Validators:                   b.validators,
-			Balances:                     b.balances,
-			RandaoMixes:                  b.randaoMixes.Slice(),
-			Slashings:                    b.slashings,
-			PreviousEpochParticipation:   b.previousEpochParticipation,
-			CurrentEpochParticipation:    b.currentEpochParticipation,
-			JustificationBits:            b.justificationBits,
-			PreviousJustifiedCheckpoint:  b.previousJustifiedCheckpoint,
-			CurrentJustifiedCheckpoint:   b.currentJustifiedCheckpoint,
-			FinalizedCheckpoint:          b.finalizedCheckpoint,
-			InactivityScores:             b.inactivityScores,
-			CurrentSyncCommittee:         b.currentSyncCommittee,
-			NextSyncCommittee:            b.nextSyncCommittee,
-			LatestExecutionPayloadHeader: b.latestExecutionPayloadHeaderCapella,
 			NextWithdrawalIndex:          b.nextWithdrawalIndex,
 			NextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 			HistoricalSummaries:          b.historicalSummaries,
@@ -145,59 +66,8 @@ func (b *BeaconState) ToProto() interface{} {
 	gvrCopy := b.genesisValidatorsRoot
 
 	switch b.version {
-	case version.Phase0:
+	case version.Capella:
 		return &zondpb.BeaconState{
-			GenesisTime:                 b.genesisTime,
-			GenesisValidatorsRoot:       gvrCopy[:],
-			Slot:                        b.slot,
-			Fork:                        b.forkVal(),
-			LatestBlockHeader:           b.latestBlockHeaderVal(),
-			BlockRoots:                  b.blockRoots.Slice(),
-			StateRoots:                  b.stateRoots.Slice(),
-			HistoricalRoots:             b.historicalRoots.Slice(),
-			Zond1Data:                   b.zond1DataVal(),
-			Zond1DataVotes:              b.zond1DataVotesVal(),
-			Zond1DepositIndex:           b.zond1DepositIndex,
-			Validators:                  b.validatorsVal(),
-			Balances:                    b.balancesVal(),
-			RandaoMixes:                 b.randaoMixes.Slice(),
-			Slashings:                   b.slashingsVal(),
-			PreviousEpochAttestations:   b.previousEpochAttestationsVal(),
-			CurrentEpochAttestations:    b.currentEpochAttestationsVal(),
-			JustificationBits:           b.justificationBitsVal(),
-			PreviousJustifiedCheckpoint: b.previousJustifiedCheckpointVal(),
-			CurrentJustifiedCheckpoint:  b.currentJustifiedCheckpointVal(),
-			FinalizedCheckpoint:         b.finalizedCheckpointVal(),
-		}
-	case version.Altair:
-		return &zondpb.BeaconStateAltair{
-			GenesisTime:                 b.genesisTime,
-			GenesisValidatorsRoot:       gvrCopy[:],
-			Slot:                        b.slot,
-			Fork:                        b.forkVal(),
-			LatestBlockHeader:           b.latestBlockHeaderVal(),
-			BlockRoots:                  b.blockRoots.Slice(),
-			StateRoots:                  b.stateRoots.Slice(),
-			HistoricalRoots:             b.historicalRoots.Slice(),
-			Zond1Data:                   b.zond1DataVal(),
-			Zond1DataVotes:              b.zond1DataVotesVal(),
-			Zond1DepositIndex:           b.zond1DepositIndex,
-			Validators:                  b.validatorsVal(),
-			Balances:                    b.balancesVal(),
-			RandaoMixes:                 b.randaoMixes.Slice(),
-			Slashings:                   b.slashingsVal(),
-			PreviousEpochParticipation:  b.previousEpochParticipationVal(),
-			CurrentEpochParticipation:   b.currentEpochParticipationVal(),
-			JustificationBits:           b.justificationBitsVal(),
-			PreviousJustifiedCheckpoint: b.previousJustifiedCheckpointVal(),
-			CurrentJustifiedCheckpoint:  b.currentJustifiedCheckpointVal(),
-			FinalizedCheckpoint:         b.finalizedCheckpointVal(),
-			InactivityScores:            b.inactivityScoresVal(),
-			CurrentSyncCommittee:        b.currentSyncCommitteeVal(),
-			NextSyncCommittee:           b.nextSyncCommitteeVal(),
-		}
-	case version.Bellatrix:
-		return &zondpb.BeaconStateBellatrix{
 			GenesisTime:                  b.genesisTime,
 			GenesisValidatorsRoot:        gvrCopy[:],
 			Slot:                         b.slot,
@@ -223,34 +93,6 @@ func (b *BeaconState) ToProto() interface{} {
 			CurrentSyncCommittee:         b.currentSyncCommitteeVal(),
 			NextSyncCommittee:            b.nextSyncCommitteeVal(),
 			LatestExecutionPayloadHeader: b.latestExecutionPayloadHeaderVal(),
-		}
-	case version.Capella:
-		return &zondpb.BeaconStateCapella{
-			GenesisTime:                  b.genesisTime,
-			GenesisValidatorsRoot:        gvrCopy[:],
-			Slot:                         b.slot,
-			Fork:                         b.forkVal(),
-			LatestBlockHeader:            b.latestBlockHeaderVal(),
-			BlockRoots:                   b.blockRoots.Slice(),
-			StateRoots:                   b.stateRoots.Slice(),
-			HistoricalRoots:              b.historicalRoots.Slice(),
-			Zond1Data:                    b.zond1DataVal(),
-			Zond1DataVotes:               b.zond1DataVotesVal(),
-			Zond1DepositIndex:            b.zond1DepositIndex,
-			Validators:                   b.validatorsVal(),
-			Balances:                     b.balancesVal(),
-			RandaoMixes:                  b.randaoMixes.Slice(),
-			Slashings:                    b.slashingsVal(),
-			PreviousEpochParticipation:   b.previousEpochParticipationVal(),
-			CurrentEpochParticipation:    b.currentEpochParticipationVal(),
-			JustificationBits:            b.justificationBitsVal(),
-			PreviousJustifiedCheckpoint:  b.previousJustifiedCheckpointVal(),
-			CurrentJustifiedCheckpoint:   b.currentJustifiedCheckpointVal(),
-			FinalizedCheckpoint:          b.finalizedCheckpointVal(),
-			InactivityScores:             b.inactivityScoresVal(),
-			CurrentSyncCommittee:         b.currentSyncCommitteeVal(),
-			NextSyncCommittee:            b.nextSyncCommitteeVal(),
-			LatestExecutionPayloadHeader: b.latestExecutionPayloadHeaderCapellaVal(),
 			NextWithdrawalIndex:          b.nextWithdrawalIndex,
 			NextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 			HistoricalSummaries:          b.historicalSummariesVal(),
@@ -299,42 +141,12 @@ func (b *BeaconState) stateRootAtIndex(idx uint64) ([32]byte, error) {
 	return b.stateRoots[idx], nil
 }
 
-// ProtobufBeaconStatePhase0 transforms an input into beacon state in the form of protobuf.
-// Error is returned if the input is not type protobuf beacon state.
-func ProtobufBeaconStatePhase0(s interface{}) (*zondpb.BeaconState, error) {
-	pbState, ok := s.(*zondpb.BeaconState)
-	if !ok {
-		return nil, errors.New("input is not type zondpb.BeaconState")
-	}
-	return pbState, nil
-}
-
-// ProtobufBeaconStateAltair transforms an input into beacon state Altair in the form of protobuf.
-// Error is returned if the input is not type protobuf beacon state.
-func ProtobufBeaconStateAltair(s interface{}) (*zondpb.BeaconStateAltair, error) {
-	pbState, ok := s.(*zondpb.BeaconStateAltair)
-	if !ok {
-		return nil, errors.New("input is not type pb.BeaconStateAltair")
-	}
-	return pbState, nil
-}
-
-// ProtobufBeaconStateBellatrix transforms an input into beacon state Bellatrix in the form of protobuf.
-// Error is returned if the input is not type protobuf beacon state.
-func ProtobufBeaconStateBellatrix(s interface{}) (*zondpb.BeaconStateBellatrix, error) {
-	pbState, ok := s.(*zondpb.BeaconStateBellatrix)
-	if !ok {
-		return nil, errors.New("input is not type pb.BeaconStateBellatrix")
-	}
-	return pbState, nil
-}
-
 // ProtobufBeaconStateCapella transforms an input into beacon state Capella in the form of protobuf.
 // Error is returned if the input is not type protobuf beacon state.
-func ProtobufBeaconStateCapella(s interface{}) (*zondpb.BeaconStateCapella, error) {
-	pbState, ok := s.(*zondpb.BeaconStateCapella)
+func ProtobufBeaconStateCapella(s interface{}) (*zondpb.BeaconState, error) {
+	pbState, ok := s.(*zondpb.BeaconState)
 	if !ok {
-		return nil, errors.New("input is not type pb.BeaconStateCapella")
+		return nil, errors.New("input is not type pb.BeaconState")
 	}
 	return pbState, nil
 }

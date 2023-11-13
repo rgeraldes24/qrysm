@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/encoding/ssz"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
+	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 )
 
@@ -251,7 +251,7 @@ func DilithiumChangesSignatureBatch(
 // is from a previous fork.
 func VerifyDilithiumChangeSignature(
 	st state.ReadOnlyBeaconState,
-	change *zondpbv2.SignedDilithiumToExecutionChange,
+	change *zondpbv1.SignedDilithiumToExecutionChange,
 ) error {
 	c := params.BeaconConfig()
 	domain, err := signing.ComputeDomain(c.DomainDilithiumToExecutionChange, c.GenesisForkVersion, st.GenesisValidatorsRoot())

@@ -2,15 +2,9 @@ package attestations
 
 import (
 	"io"
-	"sort"
 	"testing"
 
-	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/qrysm/v4/config/params"
-	aggtesting "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/testing"
-	"github.com/theQRL/qrysm/v4/testing/assert"
-	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
 func TestMain(m *testing.M) {
@@ -86,6 +80,7 @@ func TestAggregateAttestations_AggregatePair_DiffLengthFails(t *testing.T) {
 }
 */
 
+/*
 func TestAggregateAttestations_Aggregate(t *testing.T) {
 	// Each test defines the aggregation bitfield inputs and the wanted output result.
 	bitlistLen := params.BeaconConfig().MaxValidatorsPerCommittee
@@ -262,3 +257,4 @@ func TestAggregateAttestations_Aggregate(t *testing.T) {
 		}
 	})
 }
+*/

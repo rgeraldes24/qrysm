@@ -179,30 +179,8 @@ func Test_BeaconBlock_Copy(t *testing.T) {
 	assert.NotEqual(t, cp, b)
 	assert.NotEqual(t, cp.Body(), bb)
 
-	b.version = version.Altair
-	b.body.version = b.version
-	cp, err = b.Copy()
-	require.NoError(t, err)
-	assert.NotEqual(t, cp, b)
-	assert.NotEqual(t, cp.Body(), bb)
-
-	b.version = version.Bellatrix
-	b.body.version = b.version
-	cp, err = b.Copy()
-	require.NoError(t, err)
-	assert.NotEqual(t, cp, b)
-	assert.NotEqual(t, cp.Body(), bb)
-
 	b.version = version.Capella
 	b.body.version = b.version
-	cp, err = b.Copy()
-	require.NoError(t, err)
-	assert.NotEqual(t, cp, b)
-	assert.NotEqual(t, cp.Body(), bb)
-
-	b.version = version.Bellatrix
-	b.body.version = b.version
-	b.body.isBlinded = true
 	cp, err = b.Copy()
 	require.NoError(t, err)
 	assert.NotEqual(t, cp, b)
@@ -366,7 +344,7 @@ func Test_BeaconBlockBody_VoluntaryExits(t *testing.T) {
 
 func Test_BeaconBlockBody_SyncAggregate(t *testing.T) {
 	sa := &zond.SyncAggregate{}
-	bb := &SignedBeaconBlock{version: version.Altair, block: &BeaconBlock{version: version.Altair, body: &BeaconBlockBody{version: version.Altair}}}
+	bb := &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{version: version.Capella, body: &BeaconBlockBody{version: version.Capella}}}
 	require.NoError(t, bb.SetSyncAggregate(sa))
 	result, err := bb.Block().Body().SyncAggregate()
 	require.NoError(t, err)
@@ -383,26 +361,17 @@ func Test_BeaconBlockBody_DilithiumToExecutionChanges(t *testing.T) {
 }
 
 func Test_BeaconBlockBody_Execution(t *testing.T) {
-	execution := &pb.ExecutionPayload{BlockNumber: 1}
-	e, err := WrappedExecutionPayload(execution)
+	executionCapella := &pb.ExecutionPayload{BlockNumber: 1}
+	eCapella, err := WrappedExecutionPayload(executionCapella, 0)
 	require.NoError(t, err)
-	bb := &SignedBeaconBlock{version: version.Bellatrix, block: &BeaconBlock{body: &BeaconBlockBody{version: version.Bellatrix}}}
-	require.NoError(t, bb.SetExecution(e))
-	result, err := bb.Block().Body().Execution()
-	require.NoError(t, err)
-	assert.DeepEqual(t, result, e)
-
-	executionCapella := &pb.ExecutionPayloadCapella{BlockNumber: 1}
-	eCapella, err := WrappedExecutionPayloadCapella(executionCapella, 0)
-	require.NoError(t, err)
-	bb = &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{body: &BeaconBlockBody{version: version.Capella}}}
+	bb := &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{body: &BeaconBlockBody{version: version.Capella}}}
 	require.NoError(t, bb.SetExecution(eCapella))
-	result, err = bb.Block().Body().Execution()
+	result, err := bb.Block().Body().Execution()
 	require.NoError(t, err)
 	assert.DeepEqual(t, result, eCapella)
 
-	executionCapellaHeader := &pb.ExecutionPayloadHeaderCapella{BlockNumber: 1}
-	eCapellaHeader, err := WrappedExecutionPayloadHeaderCapella(executionCapellaHeader, 0)
+	executionCapellaHeader := &pb.ExecutionPayloadHeader{BlockNumber: 1}
+	eCapellaHeader, err := WrappedExecutionPayloadHeader(executionCapellaHeader, 0)
 	require.NoError(t, err)
 	bb = &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{version: version.Capella, body: &BeaconBlockBody{version: version.Capella, isBlinded: true}}}
 	require.NoError(t, bb.SetExecution(eCapellaHeader))

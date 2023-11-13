@@ -50,7 +50,7 @@ type ReadOnlyDatabase interface {
 	// Deposit contract related handlers.
 	DepositContractAddress(ctx context.Context) ([]byte, error)
 	// ExecutionChainData operations.
-	ExecutionChainData(ctx context.Context) (*zondpb.ETH1ChainData, error)
+	ExecutionChainData(ctx context.Context) (*zondpb.ZOND1ChainData, error)
 	// Fee recipients operations.
 	FeeRecipientByValidatorID(ctx context.Context, id primitives.ValidatorIndex) (common.Address, error)
 	RegistrationByValidatorID(ctx context.Context, id primitives.ValidatorIndex) (*zondpb.ValidatorRegistrationV1, error)
@@ -82,7 +82,7 @@ type NoHeadAccessDatabase interface {
 	// Deposit contract related handlers.
 	SaveDepositContractAddress(ctx context.Context, addr common.Address) error
 	// SaveExecutionChainData operations.
-	SaveExecutionChainData(ctx context.Context, data *zondpb.ETH1ChainData) error
+	SaveExecutionChainData(ctx context.Context, data *zondpb.ZOND1ChainData) error
 	// Run any required database migrations.
 	RunMigrations(ctx context.Context) error
 	// Fee recipients operations.

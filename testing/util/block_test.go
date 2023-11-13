@@ -14,7 +14,6 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
@@ -213,95 +212,6 @@ func TestHydrateV1SignedBeaconBlock_NoError(t *testing.T) {
 	_, err = b.Block.HashTreeRoot()
 	require.NoError(t, err)
 	_, err = b.Block.Body.HashTreeRoot()
-	require.NoError(t, err)
-}
-
-func TestHydrateV2AltairSignedBeaconBlock_NoError(t *testing.T) {
-	b := &zondpbv2.SignedBeaconBlockAltair{}
-	b = HydrateV2AltairSignedBeaconBlock(b)
-	_, err := b.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Message.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Message.Body.HashTreeRoot()
-	require.NoError(t, err)
-}
-
-func TestHydrateV2BellatrixSignedBeaconBlock_NoError(t *testing.T) {
-	b := &zondpbv2.SignedBeaconBlockBellatrix{}
-	b = HydrateV2BellatrixSignedBeaconBlock(b)
-	_, err := b.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Message.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Message.Body.HashTreeRoot()
-	require.NoError(t, err)
-}
-
-func TestHydrateSignedBeaconBlockAltair_NoError(t *testing.T) {
-	b := &zondpbalpha.SignedBeaconBlockAltair{}
-	b = HydrateSignedBeaconBlockAltair(b)
-
-	// HTR should not error. It errors with incorrect field length sizes.
-	_, err := b.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Block.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Block.Body.HashTreeRoot()
-	require.NoError(t, err)
-}
-
-func TestHydrateSignedBlindedBeaconBlockBellatrix_NoError(t *testing.T) {
-	b := &zondpbalpha.SignedBlindedBeaconBlockBellatrix{}
-	b = HydrateSignedBlindedBeaconBlockBellatrix(b)
-	_, err := b.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Block.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Block.Body.HashTreeRoot()
-	require.NoError(t, err)
-}
-
-func TestHydrateBlindedBeaconBlockBellatrix_NoError(t *testing.T) {
-	b := &zondpbalpha.BlindedBeaconBlockBellatrix{}
-	b = HydrateBlindedBeaconBlockBellatrix(b)
-	_, err := b.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Body.HashTreeRoot()
-	require.NoError(t, err)
-}
-
-func TestHydrateBlindedBeaconBlockBodyBellatrix_NoError(t *testing.T) {
-	b := &zondpbalpha.BlindedBeaconBlockBodyBellatrix{}
-	b = HydrateBlindedBeaconBlockBodyBellatrix(b)
-	_, err := b.HashTreeRoot()
-	require.NoError(t, err)
-}
-
-func TestHydrateV2SignedBlindedBeaconBlockBellatrix_NoError(t *testing.T) {
-	b := &zondpbv2.SignedBlindedBeaconBlockBellatrix{}
-	b = HydrateV2SignedBlindedBeaconBlockBellatrix(b)
-	_, err := b.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Message.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Message.Body.HashTreeRoot()
-	require.NoError(t, err)
-}
-
-func TestHydrateV2BlindedBeaconBlockBellatrix_NoError(t *testing.T) {
-	b := &zondpbv2.BlindedBeaconBlockBellatrix{}
-	b = HydrateV2BlindedBeaconBlockBellatrix(b)
-	_, err := b.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Body.HashTreeRoot()
-	require.NoError(t, err)
-}
-
-func TestHydrateV2BlindedBeaconBlockBodyBellatrix_NoError(t *testing.T) {
-	b := &zondpbv2.BlindedBeaconBlockBodyBellatrix{}
-	b = HydrateV2BlindedBeaconBlockBodyBellatrix(b)
-	_, err := b.HashTreeRoot()
 	require.NoError(t, err)
 }
 

@@ -11,10 +11,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/capella"
 	e "github.com/theQRL/qrysm/v4/beacon-chain/core/epoch"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/execution"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/features"
@@ -269,29 +267,13 @@ func ProcessSlots(ctx context.Context, state state.BeaconState, slot primitives.
 			return nil, errors.Wrap(err, "failed to increment state slot")
 		}
 
-		if time.CanUpgradeToAltair(state.Slot()) {
-			state, err = altair.UpgradeToAltair(ctx, state)
-			if err != nil {
-				tracing.AnnotateError(span, err)
-				return nil, err
-			}
-		}
-
-		if time.CanUpgradeToBellatrix(state.Slot()) {
-			state, err = execution.UpgradeToBellatrix(state)
-			if err != nil {
-				tracing.AnnotateError(span, err)
-				return nil, err
-			}
-		}
-
-		if time.CanUpgradeToCapella(state.Slot()) {
-			state, err = capella.UpgradeToCapella(state)
-			if err != nil {
-				tracing.AnnotateError(span, err)
-				return nil, err
-			}
-		}
+		// if time.CanUpgradeToCapella(state.Slot()) {
+		// 	state, err = capella.UpgradeToCapella(state)
+		// 	if err != nil {
+		// 		tracing.AnnotateError(span, err)
+		// 		return nil, err
+		// 	}
+		// }
 	}
 
 	if highestSlot < state.Slot() {

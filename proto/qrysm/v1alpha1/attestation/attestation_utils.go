@@ -45,30 +45,30 @@ func ConvertToIndexed(ctx context.Context, attestation *zondpb.Attestation, comm
 		return attIndices[i] < attIndices[j]
 	})
 
-	signatureValidatorIndex := make([]uint64, len(attestation.SignatureValidatorIndex))
-	copy(signatureValidatorIndex, attestation.SignatureValidatorIndex)
-	sigsMap := make(map[uint64][]byte)
-	for i, validatorIndex := range signatureValidatorIndex {
-		sigsMap[validatorIndex] = attestation.Signatures[i]
-	}
+	//signatureValidatorIndex := make([]uint64, len(attestation.SignatureValidatorIndex))
+	//copy(signatureValidatorIndex, attestation.SignatureValidatorIndex)
+	//sigsMap := make(map[uint64][]byte)
+	// for i, validatorIndex := range signatureValidatorIndex {
+	// 	sigsMap[validatorIndex] = attestation.Signatures[i]
+	// }
 	signatures := make([][]byte, 0, len(attestation.Signatures))
 
-	sort.Slice(signatureValidatorIndex, func(i, j int) bool {
-		return signatureValidatorIndex[i] < signatureValidatorIndex[j]
-	})
-	for _, validatorIndex := range signatureValidatorIndex {
-		sig, ok := sigsMap[validatorIndex]
-		if !ok {
-			return nil, errors.Errorf("ConvertToIndexed unkown validatorIndex in sigMap %d", validatorIndex)
-		}
-		signatures = append(signatures, sig)
-	}
+	// sort.Slice(signatureValidatorIndex, func(i, j int) bool {
+	// 	return signatureValidatorIndex[i] < signatureValidatorIndex[j]
+	// })
+	// for _, validatorIndex := range signatureValidatorIndex {
+	// 	sig, ok := sigsMap[validatorIndex]
+	// 	if !ok {
+	// 		return nil, errors.Errorf("ConvertToIndexed unkown validatorIndex in sigMap %d", validatorIndex)
+	// 	}
+	// 	signatures = append(signatures, sig)
+	// }
 
 	inAtt := &zondpb.IndexedAttestation{
-		Data:                    attestation.Data,
-		Signatures:              signatures,
-		SignatureValidatorIndex: signatureValidatorIndex,
-		AttestingIndices:        attIndices,
+		Data:       attestation.Data,
+		Signatures: signatures,
+		//SignatureValidatorIndex: signatureValidatorIndex,
+		AttestingIndices: attIndices,
 	}
 	return inAtt, err
 }

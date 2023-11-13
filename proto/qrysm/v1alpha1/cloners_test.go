@@ -299,64 +299,34 @@ func TestCopyPayloadHeaderCapella(t *testing.T) {
 	assert.NotEmpty(t, got, "Copied execution payload header has empty fields")
 }
 
-func TestCopySignedBeaconBlockCapella(t *testing.T) {
-	sbb := genSignedBeaconBlockCapella()
+func TestCopySignedBlindedBeaconBlock(t *testing.T) {
+	sbb := genSignedBlindedBeaconBlock()
 
-	got := v1alpha1.CopySignedBeaconBlockCapella(sbb)
+	got := v1alpha1.CopySignedBlindedBeaconBlock(sbb)
 	if !reflect.DeepEqual(got, sbb) {
-		t.Errorf("CopySignedBeaconBlockCapella() = %v, want %v", got, sbb)
-	}
-	assert.NotEmpty(t, sbb, "Copied signed beacon block Capella has empty fields")
-}
-
-func TestCopyBeaconBlockCapella(t *testing.T) {
-	b := genBeaconBlockCapella()
-
-	got := v1alpha1.CopyBeaconBlockCapella(b)
-	if !reflect.DeepEqual(got, b) {
-		t.Errorf("CopyBeaconBlockCapella() = %v, want %v", got, b)
-	}
-	assert.NotEmpty(t, b, "Copied beacon block Capella has empty fields")
-}
-
-func TestCopyBeaconBlockBodyCapella(t *testing.T) {
-	bb := genBeaconBlockBodyCapella()
-
-	got := v1alpha1.CopyBeaconBlockBodyCapella(bb)
-	if !reflect.DeepEqual(got, bb) {
-		t.Errorf("CopyBeaconBlockBodyCapella() = %v, want %v", got, bb)
-	}
-	assert.NotEmpty(t, bb, "Copied beacon block body Capella has empty fields")
-}
-
-func TestCopySignedBlindedBeaconBlockCapella(t *testing.T) {
-	sbb := genSignedBlindedBeaconBlockCapella()
-
-	got := v1alpha1.CopySignedBlindedBeaconBlockCapella(sbb)
-	if !reflect.DeepEqual(got, sbb) {
-		t.Errorf("CopySignedBlindedBeaconBlockCapella() = %v, want %v", got, sbb)
+		t.Errorf("CopySignedBlindedBeaconBlock() = %v, want %v", got, sbb)
 	}
 	assert.NotEmpty(t, sbb, "Copied signed blinded beacon block Capella has empty fields")
 }
 
-func TestCopyBlindedBeaconBlockCapella(t *testing.T) {
-	b := genBlindedBeaconBlockCapella()
+func TestCopyBlindedBeaconBlock(t *testing.T) {
+	b := genBlindedBeaconBlock()
 
-	got := v1alpha1.CopyBlindedBeaconBlockCapella(b)
+	got := v1alpha1.CopyBlindedBeaconBlock(b)
 	if !reflect.DeepEqual(got, b) {
-		t.Errorf("CopyBlindedBeaconBlockCapella() = %v, want %v", got, b)
+		t.Errorf("CopyBlindedBeaconBlock() = %v, want %v", got, b)
 	}
-	assert.NotEmpty(t, b, "Copied blinded beacon block Capella has empty fields")
+	assert.NotEmpty(t, b, "Copied blinded beacon block has empty fields")
 }
 
-func TestCopyBlindedBeaconBlockBodyCapella(t *testing.T) {
-	bb := genBlindedBeaconBlockBodyCapella()
+func TestCopyBlindedBeaconBlockBody(t *testing.T) {
+	bb := genBlindedBeaconBlockBody()
 
 	got := v1alpha1.CopyBlindedBeaconBlockBodyCapella(bb)
 	if !reflect.DeepEqual(got, bb) {
 		t.Errorf("CopyBlindedBeaconBlockBodyCapella() = %v, want %v", got, bb)
 	}
-	assert.NotEmpty(t, bb, "Copied blinded beacon block body Capella has empty fields")
+	assert.NotEmpty(t, bb, "Copied blinded beacon block body has empty fields")
 }
 
 func bytes(length int) []byte {
@@ -462,29 +432,6 @@ func genSignedBeaconBlock() *v1alpha1.SignedBeaconBlock {
 	return &v1alpha1.SignedBeaconBlock{
 		Block:     genBeaconBlock(),
 		Signature: bytes(32),
-	}
-}
-
-func genBeaconBlock() *v1alpha1.BeaconBlock {
-	return &v1alpha1.BeaconBlock{
-		Slot:          4,
-		ProposerIndex: 5,
-		ParentRoot:    bytes(32),
-		StateRoot:     bytes(32),
-		Body:          genBeaconBlockBody(),
-	}
-}
-
-func genBeaconBlockBody() *v1alpha1.BeaconBlockBody {
-	return &v1alpha1.BeaconBlockBody{
-		RandaoReveal:      bytes(32),
-		Zond1Data:         genZond1Data(),
-		Graffiti:          bytes(32),
-		ProposerSlashings: genProposerSlashings(5),
-		AttesterSlashings: genAttesterSlashings(5),
-		Attestations:      genAttestations(5),
-		Deposits:          genDeposits(5),
-		VoluntaryExits:    genSignedVoluntaryExits(5),
 	}
 }
 
@@ -619,8 +566,8 @@ func genSyncAggregate() *v1alpha1.SyncAggregate {
 	}
 }
 
-func genBeaconBlockBodyCapella() *v1alpha1.BeaconBlockBodyCapella {
-	return &v1alpha1.BeaconBlockBodyCapella{
+func genBeaconBlockBody() *v1alpha1.BeaconBlockBody {
+	return &v1alpha1.BeaconBlockBody{
 		RandaoReveal:                bytes(4595),
 		Zond1Data:                   genZond1Data(),
 		Graffiti:                    bytes(32),
@@ -635,25 +582,25 @@ func genBeaconBlockBodyCapella() *v1alpha1.BeaconBlockBodyCapella {
 	}
 }
 
-func genBeaconBlockCapella() *v1alpha1.BeaconBlockCapella {
-	return &v1alpha1.BeaconBlockCapella{
+func genBeaconBlock() *v1alpha1.BeaconBlock {
+	return &v1alpha1.BeaconBlock{
 		Slot:          123455,
 		ProposerIndex: 55433,
 		ParentRoot:    bytes(32),
 		StateRoot:     bytes(32),
-		Body:          genBeaconBlockBodyCapella(),
+		Body:          genBeaconBlockBody(),
 	}
 }
 
-func genSignedBeaconBlockCapella() *v1alpha1.SignedBeaconBlockCapella {
-	return &v1alpha1.SignedBeaconBlockCapella{
-		Block:     genBeaconBlockCapella(),
+func genSignedBeaconBlockCapella() *v1alpha1.SignedBeaconBlock {
+	return &v1alpha1.SignedBeaconBlock{
+		Block:     genBeaconBlock(),
 		Signature: bytes(4595),
 	}
 }
 
-func genBlindedBeaconBlockBodyCapella() *v1alpha1.BlindedBeaconBlockBodyCapella {
-	return &v1alpha1.BlindedBeaconBlockBodyCapella{
+func genBlindedBeaconBlockBody() *v1alpha1.BlindedBeaconBlockBody {
+	return &v1alpha1.BlindedBeaconBlockBody{
 		RandaoReveal:                bytes(4595),
 		Zond1Data:                   genZond1Data(),
 		Graffiti:                    bytes(32),
@@ -668,19 +615,19 @@ func genBlindedBeaconBlockBodyCapella() *v1alpha1.BlindedBeaconBlockBodyCapella 
 	}
 }
 
-func genBlindedBeaconBlockCapella() *v1alpha1.BlindedBeaconBlockCapella {
-	return &v1alpha1.BlindedBeaconBlockCapella{
+func genBlindedBeaconBlock() *v1alpha1.BlindedBeaconBlock {
+	return &v1alpha1.BlindedBeaconBlock{
 		Slot:          123455,
 		ProposerIndex: 55433,
 		ParentRoot:    bytes(32),
 		StateRoot:     bytes(32),
-		Body:          genBlindedBeaconBlockBodyCapella(),
+		Body:          genBlindedBeaconBlockBody(),
 	}
 }
 
-func genSignedBlindedBeaconBlockCapella() *v1alpha1.SignedBlindedBeaconBlockCapella {
-	return &v1alpha1.SignedBlindedBeaconBlockCapella{
-		Block:     genBlindedBeaconBlockCapella(),
+func genSignedBlindedBeaconBlock() *v1alpha1.SignedBlindedBeaconBlock {
+	return &v1alpha1.SignedBlindedBeaconBlock{
+		Block:     genBlindedBeaconBlock(),
 		Signature: bytes(32),
 	}
 }

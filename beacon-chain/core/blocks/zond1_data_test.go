@@ -182,11 +182,11 @@ func TestProcessZond1Data_SetsCorrectly(t *testing.T) {
 		require.Equal(t, true, processedState.Version() == version.Phase0)
 	}
 
-	newETH1DataVotes := beaconState.Zond1DataVotes()
-	if len(newETH1DataVotes) <= 1 {
-		t.Error("Expected new ETH1 data votes to have length > 1")
+	newZOND1DataVotes := beaconState.Zond1DataVotes()
+	if len(newZOND1DataVotes) <= 1 {
+		t.Error("Expected new ZOND1 data votes to have length > 1")
 	}
-	if !proto.Equal(beaconState.Zond1Data(), zondpb.CopyETH1Data(b.Block.Body.Zond1Data)) {
+	if !proto.Equal(beaconState.Zond1Data(), zondpb.CopyZOND1Data(b.Block.Body.Zond1Data)) {
 		t.Errorf(
 			"Expected latest zond1 data to have been set to %v, received %v",
 			b.Block.Body.Zond1Data,

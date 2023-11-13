@@ -5,9 +5,6 @@ import (
 	"testing"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time"
 )
 
@@ -76,6 +73,7 @@ func Bitlists64WithMultipleBitSet(t testing.TB, n, length, count uint64) []*bitf
 	return lists
 }
 
+/*
 // MakeAttestationsFromBitlists creates list of attestations from list of bitlist.
 func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*zondpb.Attestation {
 	atts := make([]*zondpb.Attestation, len(bl))
@@ -86,12 +84,14 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*zondpb.Attestation {
 				Slot:           42,
 				CommitteeIndex: 1,
 			},
-			Signature: dilithium.NewAggregateSignature().Marshal(),
+			Signatures: [][]byte{dilithium.NewAggregateSignature().Marshal()},
 		}
 	}
 	return atts
 }
+*/
 
+/*
 // MakeSyncContributionsFromBitVector creates list of sync contributions from list of bitvector.
 func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector128) []*zondpb.SyncCommitteeContribution {
 	c := make([]*zondpb.SyncCommitteeContribution, len(bl))
@@ -105,3 +105,4 @@ func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector128) []*zondpb.Sy
 	}
 	return c
 }
+*/

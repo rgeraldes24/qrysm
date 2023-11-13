@@ -59,78 +59,11 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 						BlockHash:   make([]byte, 32),
 					},
 					Graffiti: make([]byte, 32),
-				},
-			},
-			Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
-		})
-	case *zondpb.BeaconStateAltair:
-		return blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockAltair{
-			Block: &zondpb.BeaconBlockAltair{
-				ParentRoot: params.BeaconConfig().ZeroHash[:],
-				StateRoot:  root[:],
-				Body: &zondpb.BeaconBlockBodyAltair{
-					RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-					Zond1Data: &zondpb.Zond1Data{
-						DepositRoot: make([]byte, 32),
-						BlockHash:   make([]byte, 32),
-					},
-					Graffiti: make([]byte, 32),
 					SyncAggregate: &zondpb.SyncAggregate{
-						SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-						SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
-					},
-				},
-			},
-			Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
-		})
-	case *zondpb.BeaconStateBellatrix:
-		return blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockBellatrix{
-			Block: &zondpb.BeaconBlockBellatrix{
-				ParentRoot: params.BeaconConfig().ZeroHash[:],
-				StateRoot:  root[:],
-				Body: &zondpb.BeaconBlockBodyBellatrix{
-					RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-					Zond1Data: &zondpb.Zond1Data{
-						DepositRoot: make([]byte, 32),
-						BlockHash:   make([]byte, 32),
-					},
-					Graffiti: make([]byte, 32),
-					SyncAggregate: &zondpb.SyncAggregate{
-						SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-						SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+						SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
+						SyncCommitteeSignatures: make([][]byte, fieldparams.SyncCommitteeLength),
 					},
 					ExecutionPayload: &enginev1.ExecutionPayload{
-						ParentHash:    make([]byte, 32),
-						FeeRecipient:  make([]byte, 20),
-						StateRoot:     make([]byte, 32),
-						ReceiptsRoot:  make([]byte, 32),
-						LogsBloom:     make([]byte, 256),
-						PrevRandao:    make([]byte, 32),
-						BaseFeePerGas: make([]byte, 32),
-						BlockHash:     make([]byte, 32),
-						Transactions:  make([][]byte, 0),
-					},
-				},
-			},
-			Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
-		})
-	case *zondpb.BeaconStateCapella:
-		return blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockCapella{
-			Block: &zondpb.BeaconBlockCapella{
-				ParentRoot: params.BeaconConfig().ZeroHash[:],
-				StateRoot:  root[:],
-				Body: &zondpb.BeaconBlockBodyCapella{
-					RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-					Zond1Data: &zondpb.Zond1Data{
-						DepositRoot: make([]byte, 32),
-						BlockHash:   make([]byte, 32),
-					},
-					Graffiti: make([]byte, 32),
-					SyncAggregate: &zondpb.SyncAggregate{
-						SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-						SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
-					},
-					ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 						ParentHash:    make([]byte, 32),
 						FeeRecipient:  make([]byte, 20),
 						StateRoot:     make([]byte, 32),

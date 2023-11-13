@@ -29,12 +29,6 @@ func SepoliaConfig() *BeaconChainConfig {
 	cfg.SecondsPerETH1Block = 14
 	cfg.DepositChainID = zond1Params.SepoliaChainConfig.ChainID.Uint64()
 	cfg.DepositNetworkID = zond1Params.SepoliaChainConfig.ChainID.Uint64()
-	cfg.AltairForkEpoch = 50
-	cfg.AltairForkVersion = []byte{0x90, 0x00, 0x00, 0x70}
-	cfg.BellatrixForkEpoch = 100
-	cfg.BellatrixForkVersion = []byte{0x90, 0x00, 0x00, 0x71}
-	cfg.CapellaForkEpoch = 56832
-	cfg.CapellaForkVersion = []byte{0x90, 0x00, 0x00, 0x72}
 	cfg.TerminalTotalDifficulty = "17000000000000000"
 	cfg.DepositContractAddress = "0x7f02C3E3c98b133055B8B348B2Ac625669Ed295D"
 	cfg.InitializeForkSchedule()

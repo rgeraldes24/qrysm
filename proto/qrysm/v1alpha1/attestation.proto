@@ -35,7 +35,7 @@ message Attestation {
     repeated bytes signatures = 3 [(theqrl.zond.ext.ssz_size) = "?,4595", (theqrl.zond.ext.ssz_max) = "2048"];
 
     // 2048 (number of signers)
-    repeated uint64 signatureValidatorIndex = 4 [(theqrl.zond.ext.ssz_max) = "2048"];
+    // repeated uint64 signatureValidatorIndex = 4 [(theqrl.zond.ext.ssz_max) = "2048"];
 }
 
 message AggregateAttestationAndProof {

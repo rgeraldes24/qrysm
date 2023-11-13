@@ -18,12 +18,13 @@ import (
 // This wrapper allows us to conform to a common interface so that beacon
 // blocks for future forks can also be applied across Prysm without issues.
 type executionPayload struct {
-	p *enginev1.ExecutionPayload
+	p     *enginev1.ExecutionPayload
+	value uint64
 }
 
 // WrappedExecutionPayload is a constructor which wraps a protobuf execution payload into an interface.
-func WrappedExecutionPayload(p *enginev1.ExecutionPayload) (interfaces.ExecutionData, error) {
-	w := executionPayload{p: p}
+func WrappedExecutionPayload(p *enginev1.ExecutionPayload, value uint64) (interfaces.ExecutionData, error) {
+	w := executionPayload{p: p, value: value}
 	if w.IsNil() {
 		return nil, consensus_types.ErrNilObjectWrapped
 	}
@@ -151,8 +152,8 @@ func (executionPayload) TransactionsRoot() ([]byte, error) {
 }
 
 // Withdrawals --
-func (executionPayload) Withdrawals() ([]*enginev1.Withdrawal, error) {
-	return nil, consensus_types.ErrUnsupportedField
+func (e executionPayload) Withdrawals() ([]*enginev1.Withdrawal, error) {
+	return e.p.Withdrawals, nil
 }
 
 // WithdrawalsRoot --
@@ -160,31 +161,27 @@ func (executionPayload) WithdrawalsRoot() ([]byte, error) {
 	return nil, consensus_types.ErrUnsupportedField
 }
 
-// PbBellatrix --
-func (e executionPayload) PbBellatrix() (*enginev1.ExecutionPayload, error) {
+// PbCapella --
+func (e executionPayload) PbCapella() (*enginev1.ExecutionPayload, error) {
 	return e.p, nil
 }
 
-// PbCapella --
-func (executionPayload) PbCapella() (*enginev1.ExecutionPayloadCapella, error) {
-	return nil, consensus_types.ErrUnsupportedField
-}
-
 // ValueInGwei --
-func (executionPayload) ValueInGwei() (uint64, error) {
-	return 0, consensus_types.ErrUnsupportedField
+func (e executionPayload) ValueInGwei() (uint64, error) {
+	return e.value, nil
 }
 
 // executionPayloadHeader is a convenience wrapper around a blinded beacon block body's execution header data structure
 // This wrapper allows us to conform to a common interface so that beacon
 // blocks for future forks can also be applied across Prysm without issues.
 type executionPayloadHeader struct {
-	p *enginev1.ExecutionPayloadHeader
+	p     *enginev1.ExecutionPayloadHeader
+	value uint64
 }
 
 // WrappedExecutionPayloadHeader is a constructor which wraps a protobuf execution header into an interface.
-func WrappedExecutionPayloadHeader(p *enginev1.ExecutionPayloadHeader) (interfaces.ExecutionData, error) {
-	w := executionPayloadHeader{p: p}
+func WrappedExecutionPayloadHeader(p *enginev1.ExecutionPayloadHeader, value uint64) (interfaces.ExecutionData, error) {
+	w := executionPayloadHeader{p: p, value: value}
 	if w.IsNil() {
 		return nil, consensus_types.ErrNilObjectWrapped
 	}
@@ -196,7 +193,7 @@ func (e executionPayloadHeader) IsNil() bool {
 	return e.p == nil
 }
 
-// IsBlinded returns true if the underlying data is a header.
+// IsBlinded returns true if the underlying data is blinded.
 func (executionPayloadHeader) IsBlinded() bool {
 	return true
 }
@@ -317,379 +314,22 @@ func (executionPayloadHeader) Withdrawals() ([]*enginev1.Withdrawal, error) {
 }
 
 // WithdrawalsRoot --
-func (executionPayloadHeader) WithdrawalsRoot() ([]byte, error) {
-	return nil, consensus_types.ErrUnsupportedField
-}
-
-// PbCapella --
-func (executionPayloadHeader) PbCapella() (*enginev1.ExecutionPayloadCapella, error) {
-	return nil, consensus_types.ErrUnsupportedField
-}
-
-// PbBellatrix --
-func (executionPayloadHeader) PbBellatrix() (*enginev1.ExecutionPayload, error) {
-	return nil, consensus_types.ErrUnsupportedField
-}
-
-// ValueInGwei --
-func (executionPayloadHeader) ValueInGwei() (uint64, error) {
-	return 0, consensus_types.ErrUnsupportedField
-}
-
-// PayloadToHeader converts `payload` into execution payload header format.
-func PayloadToHeader(payload interfaces.ExecutionData) (*enginev1.ExecutionPayloadHeader, error) {
-	txs, err := payload.Transactions()
-	if err != nil {
-		return nil, err
-	}
-	txRoot, err := ssz.TransactionsRoot(txs)
-	if err != nil {
-		return nil, err
-	}
-	return &enginev1.ExecutionPayloadHeader{
-		ParentHash:       bytesutil.SafeCopyBytes(payload.ParentHash()),
-		FeeRecipient:     bytesutil.SafeCopyBytes(payload.FeeRecipient()),
-		StateRoot:        bytesutil.SafeCopyBytes(payload.StateRoot()),
-		ReceiptsRoot:     bytesutil.SafeCopyBytes(payload.ReceiptsRoot()),
-		LogsBloom:        bytesutil.SafeCopyBytes(payload.LogsBloom()),
-		PrevRandao:       bytesutil.SafeCopyBytes(payload.PrevRandao()),
-		BlockNumber:      payload.BlockNumber(),
-		GasLimit:         payload.GasLimit(),
-		GasUsed:          payload.GasUsed(),
-		Timestamp:        payload.Timestamp(),
-		ExtraData:        bytesutil.SafeCopyBytes(payload.ExtraData()),
-		BaseFeePerGas:    bytesutil.SafeCopyBytes(payload.BaseFeePerGas()),
-		BlockHash:        bytesutil.SafeCopyBytes(payload.BlockHash()),
-		TransactionsRoot: txRoot[:],
-	}, nil
-}
-
-// executionPayloadCapella is a convenience wrapper around a beacon block body's execution payload data structure
-// This wrapper allows us to conform to a common interface so that beacon
-// blocks for future forks can also be applied across Prysm without issues.
-type executionPayloadCapella struct {
-	p     *enginev1.ExecutionPayloadCapella
-	value uint64
-}
-
-// WrappedExecutionPayloadCapella is a constructor which wraps a protobuf execution payload into an interface.
-func WrappedExecutionPayloadCapella(p *enginev1.ExecutionPayloadCapella, value uint64) (interfaces.ExecutionData, error) {
-	w := executionPayloadCapella{p: p, value: value}
-	if w.IsNil() {
-		return nil, consensus_types.ErrNilObjectWrapped
-	}
-	return w, nil
-}
-
-// IsNil checks if the underlying data is nil.
-func (e executionPayloadCapella) IsNil() bool {
-	return e.p == nil
-}
-
-// IsBlinded returns true if the underlying data is blinded.
-func (executionPayloadCapella) IsBlinded() bool {
-	return false
-}
-
-// MarshalSSZ --
-func (e executionPayloadCapella) MarshalSSZ() ([]byte, error) {
-	return e.p.MarshalSSZ()
-}
-
-// MarshalSSZTo --
-func (e executionPayloadCapella) MarshalSSZTo(dst []byte) ([]byte, error) {
-	return e.p.MarshalSSZTo(dst)
-}
-
-// SizeSSZ --
-func (e executionPayloadCapella) SizeSSZ() int {
-	return e.p.SizeSSZ()
-}
-
-// UnmarshalSSZ --
-func (e executionPayloadCapella) UnmarshalSSZ(buf []byte) error {
-	return e.p.UnmarshalSSZ(buf)
-}
-
-// HashTreeRoot --
-func (e executionPayloadCapella) HashTreeRoot() ([32]byte, error) {
-	return e.p.HashTreeRoot()
-}
-
-// HashTreeRootWith --
-func (e executionPayloadCapella) HashTreeRootWith(hh *fastssz.Hasher) error {
-	return e.p.HashTreeRootWith(hh)
-}
-
-// Proto --
-func (e executionPayloadCapella) Proto() proto.Message {
-	return e.p
-}
-
-// ParentHash --
-func (e executionPayloadCapella) ParentHash() []byte {
-	return e.p.ParentHash
-}
-
-// FeeRecipient --
-func (e executionPayloadCapella) FeeRecipient() []byte {
-	return e.p.FeeRecipient
-}
-
-// StateRoot --
-func (e executionPayloadCapella) StateRoot() []byte {
-	return e.p.StateRoot
-}
-
-// ReceiptsRoot --
-func (e executionPayloadCapella) ReceiptsRoot() []byte {
-	return e.p.ReceiptsRoot
-}
-
-// LogsBloom --
-func (e executionPayloadCapella) LogsBloom() []byte {
-	return e.p.LogsBloom
-}
-
-// PrevRandao --
-func (e executionPayloadCapella) PrevRandao() []byte {
-	return e.p.PrevRandao
-}
-
-// BlockNumber --
-func (e executionPayloadCapella) BlockNumber() uint64 {
-	return e.p.BlockNumber
-}
-
-// GasLimit --
-func (e executionPayloadCapella) GasLimit() uint64 {
-	return e.p.GasLimit
-}
-
-// GasUsed --
-func (e executionPayloadCapella) GasUsed() uint64 {
-	return e.p.GasUsed
-}
-
-// Timestamp --
-func (e executionPayloadCapella) Timestamp() uint64 {
-	return e.p.Timestamp
-}
-
-// ExtraData --
-func (e executionPayloadCapella) ExtraData() []byte {
-	return e.p.ExtraData
-}
-
-// BaseFeePerGas --
-func (e executionPayloadCapella) BaseFeePerGas() []byte {
-	return e.p.BaseFeePerGas
-}
-
-// BlockHash --
-func (e executionPayloadCapella) BlockHash() []byte {
-	return e.p.BlockHash
-}
-
-// Transactions --
-func (e executionPayloadCapella) Transactions() ([][]byte, error) {
-	return e.p.Transactions, nil
-}
-
-// TransactionsRoot --
-func (executionPayloadCapella) TransactionsRoot() ([]byte, error) {
-	return nil, consensus_types.ErrUnsupportedField
-}
-
-// Withdrawals --
-func (e executionPayloadCapella) Withdrawals() ([]*enginev1.Withdrawal, error) {
-	return e.p.Withdrawals, nil
-}
-
-// WithdrawalsRoot --
-func (executionPayloadCapella) WithdrawalsRoot() ([]byte, error) {
-	return nil, consensus_types.ErrUnsupportedField
-}
-
-// PbCapella --
-func (e executionPayloadCapella) PbCapella() (*enginev1.ExecutionPayloadCapella, error) {
-	return e.p, nil
-}
-
-// PbBellatrix --
-func (executionPayloadCapella) PbBellatrix() (*enginev1.ExecutionPayload, error) {
-	return nil, consensus_types.ErrUnsupportedField
-}
-
-// ValueInGwei --
-func (e executionPayloadCapella) ValueInGwei() (uint64, error) {
-	return e.value, nil
-}
-
-// executionPayloadHeaderCapella is a convenience wrapper around a blinded beacon block body's execution header data structure
-// This wrapper allows us to conform to a common interface so that beacon
-// blocks for future forks can also be applied across Prysm without issues.
-type executionPayloadHeaderCapella struct {
-	p     *enginev1.ExecutionPayloadHeaderCapella
-	value uint64
-}
-
-// WrappedExecutionPayloadHeaderCapella is a constructor which wraps a protobuf execution header into an interface.
-func WrappedExecutionPayloadHeaderCapella(p *enginev1.ExecutionPayloadHeaderCapella, value uint64) (interfaces.ExecutionData, error) {
-	w := executionPayloadHeaderCapella{p: p, value: value}
-	if w.IsNil() {
-		return nil, consensus_types.ErrNilObjectWrapped
-	}
-	return w, nil
-}
-
-// IsNil checks if the underlying data is nil.
-func (e executionPayloadHeaderCapella) IsNil() bool {
-	return e.p == nil
-}
-
-// IsBlinded returns true if the underlying data is blinded.
-func (executionPayloadHeaderCapella) IsBlinded() bool {
-	return true
-}
-
-// MarshalSSZ --
-func (e executionPayloadHeaderCapella) MarshalSSZ() ([]byte, error) {
-	return e.p.MarshalSSZ()
-}
-
-// MarshalSSZTo --
-func (e executionPayloadHeaderCapella) MarshalSSZTo(dst []byte) ([]byte, error) {
-	return e.p.MarshalSSZTo(dst)
-}
-
-// SizeSSZ --
-func (e executionPayloadHeaderCapella) SizeSSZ() int {
-	return e.p.SizeSSZ()
-}
-
-// UnmarshalSSZ --
-func (e executionPayloadHeaderCapella) UnmarshalSSZ(buf []byte) error {
-	return e.p.UnmarshalSSZ(buf)
-}
-
-// HashTreeRoot --
-func (e executionPayloadHeaderCapella) HashTreeRoot() ([32]byte, error) {
-	return e.p.HashTreeRoot()
-}
-
-// HashTreeRootWith --
-func (e executionPayloadHeaderCapella) HashTreeRootWith(hh *fastssz.Hasher) error {
-	return e.p.HashTreeRootWith(hh)
-}
-
-// Proto --
-func (e executionPayloadHeaderCapella) Proto() proto.Message {
-	return e.p
-}
-
-// ParentHash --
-func (e executionPayloadHeaderCapella) ParentHash() []byte {
-	return e.p.ParentHash
-}
-
-// FeeRecipient --
-func (e executionPayloadHeaderCapella) FeeRecipient() []byte {
-	return e.p.FeeRecipient
-}
-
-// StateRoot --
-func (e executionPayloadHeaderCapella) StateRoot() []byte {
-	return e.p.StateRoot
-}
-
-// ReceiptsRoot --
-func (e executionPayloadHeaderCapella) ReceiptsRoot() []byte {
-	return e.p.ReceiptsRoot
-}
-
-// LogsBloom --
-func (e executionPayloadHeaderCapella) LogsBloom() []byte {
-	return e.p.LogsBloom
-}
-
-// PrevRandao --
-func (e executionPayloadHeaderCapella) PrevRandao() []byte {
-	return e.p.PrevRandao
-}
-
-// BlockNumber --
-func (e executionPayloadHeaderCapella) BlockNumber() uint64 {
-	return e.p.BlockNumber
-}
-
-// GasLimit --
-func (e executionPayloadHeaderCapella) GasLimit() uint64 {
-	return e.p.GasLimit
-}
-
-// GasUsed --
-func (e executionPayloadHeaderCapella) GasUsed() uint64 {
-	return e.p.GasUsed
-}
-
-// Timestamp --
-func (e executionPayloadHeaderCapella) Timestamp() uint64 {
-	return e.p.Timestamp
-}
-
-// ExtraData --
-func (e executionPayloadHeaderCapella) ExtraData() []byte {
-	return e.p.ExtraData
-}
-
-// BaseFeePerGas --
-func (e executionPayloadHeaderCapella) BaseFeePerGas() []byte {
-	return e.p.BaseFeePerGas
-}
-
-// BlockHash --
-func (e executionPayloadHeaderCapella) BlockHash() []byte {
-	return e.p.BlockHash
-}
-
-// Transactions --
-func (executionPayloadHeaderCapella) Transactions() ([][]byte, error) {
-	return nil, consensus_types.ErrUnsupportedField
-}
-
-// TransactionsRoot --
-func (e executionPayloadHeaderCapella) TransactionsRoot() ([]byte, error) {
-	return e.p.TransactionsRoot, nil
-}
-
-// Withdrawals --
-func (executionPayloadHeaderCapella) Withdrawals() ([]*enginev1.Withdrawal, error) {
-	return nil, consensus_types.ErrUnsupportedField
-}
-
-// WithdrawalsRoot --
-func (e executionPayloadHeaderCapella) WithdrawalsRoot() ([]byte, error) {
+func (e executionPayloadHeader) WithdrawalsRoot() ([]byte, error) {
 	return e.p.WithdrawalsRoot, nil
 }
 
 // PbCapella --
-func (executionPayloadHeaderCapella) PbCapella() (*enginev1.ExecutionPayloadCapella, error) {
-	return nil, consensus_types.ErrUnsupportedField
-}
-
-// PbBellatrix --
-func (executionPayloadHeaderCapella) PbBellatrix() (*enginev1.ExecutionPayload, error) {
+func (executionPayloadHeader) PbCapella() (*enginev1.ExecutionPayload, error) {
 	return nil, consensus_types.ErrUnsupportedField
 }
 
 // ValueInGwei --
-func (e executionPayloadHeaderCapella) ValueInGwei() (uint64, error) {
+func (e executionPayloadHeader) ValueInGwei() (uint64, error) {
 	return e.value, nil
 }
 
-// PayloadToHeaderCapella converts `payload` into execution payload header format.
-func PayloadToHeaderCapella(payload interfaces.ExecutionData) (*enginev1.ExecutionPayloadHeaderCapella, error) {
+// PayloadToHeader converts `payload` into execution payload header format.
+func PayloadToHeader(payload interfaces.ExecutionData) (*enginev1.ExecutionPayloadHeader, error) {
 	txs, err := payload.Transactions()
 	if err != nil {
 		return nil, err
@@ -707,7 +347,7 @@ func PayloadToHeaderCapella(payload interfaces.ExecutionData) (*enginev1.Executi
 		return nil, err
 	}
 
-	return &enginev1.ExecutionPayloadHeaderCapella{
+	return &enginev1.ExecutionPayloadHeader{
 		ParentHash:       bytesutil.SafeCopyBytes(payload.ParentHash()),
 		FeeRecipient:     bytesutil.SafeCopyBytes(payload.FeeRecipient()),
 		StateRoot:        bytesutil.SafeCopyBytes(payload.StateRoot()),
