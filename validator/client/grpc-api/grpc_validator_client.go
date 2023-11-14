@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/validator/client/iface"
@@ -71,10 +70,6 @@ func (c *grpcValidatorClient) ProposeExit(ctx context.Context, in *zondpb.Signed
 	return c.beaconNodeValidatorClient.ProposeExit(ctx, in)
 }
 
-func (c *grpcValidatorClient) StreamBlocksAltair(ctx context.Context, in *zondpb.StreamBlocksRequest) (zondpb.BeaconNodeValidator_StreamBlocksAltairClient, error) {
-	return c.beaconNodeValidatorClient.StreamBlocksAltair(ctx, in)
-}
-
 func (c *grpcValidatorClient) SubmitAggregateSelectionProof(ctx context.Context, in *zondpb.AggregateSelectionRequest) (*zondpb.AggregateSelectionResponse, error) {
 	return c.beaconNodeValidatorClient.SubmitAggregateSelectionProof(ctx, in)
 }
@@ -112,17 +107,17 @@ func (c *grpcValidatorClient) WaitForActivation(ctx context.Context, in *zondpb.
 }
 
 // Deprecated: Do not use.
-func (c *grpcValidatorClient) WaitForChainStart(ctx context.Context, in *empty.Empty) (*zondpb.ChainStartResponse, error) {
-	stream, err := c.beaconNodeValidatorClient.WaitForChainStart(ctx, in)
-	if err != nil {
-		return nil, errors.Wrap(
-			iface.ErrConnectionIssue,
-			errors.Wrap(err, "could not setup beacon chain ChainStart streaming client").Error(),
-		)
-	}
+// func (c *grpcValidatorClient) WaitForChainStart(ctx context.Context, in *empty.Empty) (*zondpb.ChainStartResponse, error) {
+// 	stream, err := c.beaconNodeValidatorClient.WaitForChainStart(ctx, in)
+// 	if err != nil {
+// 		return nil, errors.Wrap(
+// 			iface.ErrConnectionIssue,
+// 			errors.Wrap(err, "could not setup beacon chain ChainStart streaming client").Error(),
+// 		)
+// 	}
 
-	return stream.Recv()
-}
+// 	return stream.Recv()
+// }
 
 func (c *grpcValidatorClient) AssignValidatorToSubnet(ctx context.Context, in *zondpb.AssignValidatorToSubnetRequest) (*empty.Empty, error) {
 	return c.beaconNodeValidatorClient.AssignValidatorToSubnet(ctx, in)

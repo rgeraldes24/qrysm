@@ -1,14 +1,7 @@
 package execution
 
-import (
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state"
-	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
-	"github.com/theQRL/qrysm/v4/config/params"
-	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-)
-
+// TODO(rgeraldes24): delete?
+/*
 // UpgradeToBellatrix updates inputs a generic state to return the version Bellatrix state.
 // It inserts an empty `ExecutionPayloadHeader` into the state.
 func UpgradeToBellatrix(state state.BeaconState) (state.BeaconState, error) {
@@ -87,3 +80,4 @@ func UpgradeToBellatrix(state state.BeaconState) (state.BeaconState, error) {
 
 	return state_native.InitializeFromProtoUnsafeBellatrix(s)
 }
+*/

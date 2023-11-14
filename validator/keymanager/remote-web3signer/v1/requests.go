@@ -113,34 +113,6 @@ func GetAttestationSignRequest(request *validatorpb.SignRequest, genesisValidato
 	}, nil
 }
 
-// GetBlockAltairSignRequest maps the request for signing type BLOCK_V2.
-func GetBlockAltairSignRequest(request *validatorpb.SignRequest, genesisValidatorsRoot []byte) (*BlockAltairSignRequest, error) {
-	beaconBlockAltair, ok := request.Object.(*validatorpb.SignRequest_BlockAltair)
-	if !ok {
-		return nil, errors.New("failed to cast request object to block altair")
-	}
-	if beaconBlockAltair == nil {
-		return nil, errors.New("invalid sign request: ReadOnlyBeaconBlock is nil")
-	}
-	fork, err := MapForkInfo(request.SigningSlot, genesisValidatorsRoot)
-	if err != nil {
-		return nil, err
-	}
-	blockAltair, err := MapBeaconBlockAltair(beaconBlockAltair.BlockAltair)
-	if err != nil {
-		return nil, err
-	}
-	return &BlockAltairSignRequest{
-		Type:        "BLOCK_V2",
-		ForkInfo:    fork,
-		SigningRoot: request.SigningRoot,
-		BeaconBlock: &BeaconBlockAltairBlockV2{
-			Version: "ALTAIR",
-			Block:   blockAltair,
-		},
-	}, nil
-}
-
 // GetRandaoRevealSignRequest maps the request for signing type RANDAO_REVEAL.
 func GetRandaoRevealSignRequest(request *validatorpb.SignRequest, genesisValidatorsRoot []byte) (*RandaoRevealSignRequest, error) {
 	randaoReveal, ok := request.Object.(*validatorpb.SignRequest_Epoch)
@@ -280,35 +252,6 @@ func GetBlockV2BlindedSignRequest(request *validatorpb.SignRequest, genesisValid
 	var b interfaces.ReadOnlyBeaconBlock
 	var version string
 	switch request.Object.(type) {
-	case *validatorpb.SignRequest_BlindedBlockBellatrix:
-		version = "BELLATRIX"
-		blindedBlockBellatrix, ok := request.Object.(*validatorpb.SignRequest_BlindedBlockBellatrix)
-		if !ok {
-			return nil, errors.New("failed to cast request object to blinded block bellatrix")
-		}
-		if blindedBlockBellatrix == nil {
-			return nil, errors.New("invalid sign request - blinded bellatrix block is nil")
-		}
-		beaconBlock, err := blocks.NewBeaconBlock(blindedBlockBellatrix.BlindedBlockBellatrix)
-		if err != nil {
-			return nil, err
-		}
-		b = beaconBlock
-	case *validatorpb.SignRequest_BlockBellatrix:
-		version = "BELLATRIX"
-		blockBellatrix, ok := request.Object.(*validatorpb.SignRequest_BlockBellatrix)
-		if !ok {
-			return nil, errors.New("failed to cast request object to bellatrix block")
-		}
-
-		if blockBellatrix == nil {
-			return nil, errors.New("invalid sign request: bellatrix block is nil")
-		}
-		beaconBlock, err := blocks.NewBeaconBlock(blockBellatrix.BlockBellatrix)
-		if err != nil {
-			return nil, err
-		}
-		b = beaconBlock
 	case *validatorpb.SignRequest_BlockCapella:
 		version = "CAPELLA"
 		blockCapella, ok := request.Object.(*validatorpb.SignRequest_BlockCapella)

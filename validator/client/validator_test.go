@@ -891,64 +891,6 @@ func TestCheckAndLogValidatorStatus_OK(t *testing.T) {
 	}
 }
 
-func TestService_ReceiveBlocks_NilBlock(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	valClient := validatormock.NewMockValidatorClient(ctrl)
-	v := validator{
-		blockFeed:       new(event.Feed),
-		validatorClient: valClient,
-	}
-	stream := mock2.NewMockBeaconNodeValidatorAltair_StreamBlocksClient(ctrl)
-	ctx, cancel := context.WithCancel(context.Background())
-	valClient.EXPECT().StreamBlocksAltair(
-		gomock.Any(),
-		&zondpb.StreamBlocksRequest{VerifiedOnly: true},
-	).Return(stream, nil)
-	stream.EXPECT().Context().Return(ctx).AnyTimes()
-	stream.EXPECT().Recv().Return(
-		&zondpb.StreamBlocksResponse{Block: &zondpb.StreamBlocksResponse_Phase0Block{
-			Phase0Block: &zondpb.SignedBeaconBlock{}}},
-		nil,
-	).Do(func() {
-		cancel()
-	})
-	connectionErrorChannel := make(chan error)
-	v.ReceiveBlocks(ctx, connectionErrorChannel)
-	require.Equal(t, primitives.Slot(0), v.highestValidSlot)
-}
-
-func TestService_ReceiveBlocks_SetHighest(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	client := validatormock.NewMockValidatorClient(ctrl)
-
-	v := validator{
-		validatorClient: client,
-		blockFeed:       new(event.Feed),
-	}
-	stream := mock2.NewMockBeaconNodeValidatorAltair_StreamBlocksClient(ctrl)
-	ctx, cancel := context.WithCancel(context.Background())
-	client.EXPECT().StreamBlocksAltair(
-		gomock.Any(),
-		&zondpb.StreamBlocksRequest{VerifiedOnly: true},
-	).Return(stream, nil)
-	stream.EXPECT().Context().Return(ctx).AnyTimes()
-	slot := primitives.Slot(100)
-	stream.EXPECT().Recv().Return(
-		&zondpb.StreamBlocksResponse{
-			Block: &zondpb.StreamBlocksResponse_Phase0Block{
-				Phase0Block: &zondpb.SignedBeaconBlock{Block: &zondpb.BeaconBlock{Slot: slot, Body: &zondpb.BeaconBlockBody{}}}},
-		},
-		nil,
-	).Do(func() {
-		cancel()
-	})
-	connectionErrorChannel := make(chan error)
-	v.ReceiveBlocks(ctx, connectionErrorChannel)
-	require.Equal(t, slot, v.highestValidSlot)
-}
-
 type doppelGangerRequestMatcher struct {
 	req *zondpb.DoppelGangerRequest
 }

@@ -76,7 +76,7 @@ func TestProposeBeaconBlock_BlindedCapella(t *testing.T) {
 	ctx := context.Background()
 
 	// Make sure that what we send in the POST body is the marshalled version of the protobuf block
-	headers := map[string]string{"Eth-Consensus-Version": "capella"}
+	headers := map[string]string{"Zond-Consensus-Version": "capella"}
 	jsonRestHandler.EXPECT().PostRestJson(
 		ctx,
 		"/zond/v1/beacon/blinded_blocks",

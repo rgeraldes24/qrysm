@@ -59,26 +59,6 @@ service BeaconChain {
         };
     }
 
-    // Server-side stream of attestations as they are received by
-    // the beacon chain node.
-    // DEPRECATED: This endpoint is superseded by the /zond/v1/events Beacon API endpoint
-    rpc StreamAttestations(google.protobuf.Empty) returns (stream Attestation) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/beacon/attestations/stream"
-        };
-    }
-
-    // Server-side stream of indexed attestations as they are received by
-    // the beacon chain node.
-    // DEPRECATED: This endpoint is superseded by the /zond/v1/events Beacon API endpoint
-    rpc StreamIndexedAttestations(google.protobuf.Empty) returns (stream IndexedAttestation) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/beacon/attestations/indexed/stream"
-        };
-    }
-
     // Retrieve attestations from pool.
     //
     // The server returns a list of attestations that have been seen but not
@@ -158,13 +138,6 @@ service BeaconChain {
         };
     }
 
-    // Retrieve the current validator queue information.
-    rpc GetValidatorQueue(google.protobuf.Empty) returns (ValidatorQueue) {
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/validators/queue"
-        };
-    }
-
     // GetValidatorPerformance reports a validator's latest balance along with other important
     // metrics on rewards and penalties throughout its lifecycle in the beacon chain.
     // The request takes in a list of validator public keys and returns a performance report
@@ -183,17 +156,6 @@ service BeaconChain {
     rpc ListValidatorAssignments(ListValidatorAssignmentsRequest) returns (ValidatorAssignments) {
         option (google.api.http) = {
             get: "/zond/v1alpha1/validators/assignments"
-        };
-    }
-
-    // Retrieve the validator participation information for a given epoch.
-    //
-    // This method returns information about the global participation of
-    // validator attestations. This endpoint allows for retrieval of genesis
-    // information via a boolean query filter.
-    rpc GetValidatorParticipation(GetValidatorParticipationRequest) returns (ValidatorParticipationResponse) {
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/validators/participation"
         };
     }
 
@@ -593,8 +555,6 @@ message ActiveSetChanges {
 }
 
 message ValidatorPerformanceRequest {
-    // A list of 2592 byte validator public keys.
-    repeated bytes public_keys = 1 [deprecated = true];
     // A list of validator indices to retrieve performance by their indices.
     repeated uint64 indices = 2 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
 }
@@ -629,30 +589,6 @@ message ValidatorPerformanceResponse {
     repeated bytes public_keys = 11 [(theqrl.zond.ext.ssz_size) = "?,2592"];
     // The inactivity score of the validator tracks validator participation.
     repeated uint64 inactivity_scores = 12;
-}
-
-// DEPRECATED: Prysm Web UI and associated endpoints will be fully removed in a future hard fork.
-message ValidatorQueue {
-    option deprecated = true;
-    // The amount of ether in gwei allowed to enter or exit the active
-    // validator set.
-    uint64 churn_limit = 1;
-
-    // Ordered list of 2592 byte public keys awaiting activation. 0th index is the
-    // next key to be processed.
-    repeated bytes activation_public_keys = 2 [(theqrl.zond.ext.ssz_size) = "?,2592", deprecated = true];
-
-    // Ordered list of public keys awaiting exit. 0th index is the next key to
-    // be processed.
-    repeated bytes exit_public_keys = 3 [(theqrl.zond.ext.ssz_size) = "?,2592", deprecated = true];
-
-    // Ordered list of validator indices awaiting activation. 0th item in the list is the
-    // next validator index to be processed.
-    repeated uint64 activation_validator_indices = 4 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
-
-    // Ordered list of validator indices awaiting exit. 0th item in the list is the
-    // next validator index to be processed.
-    repeated uint64 exit_validator_indices = 5 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
 }
 
 message ListValidatorAssignmentsRequest {
@@ -697,11 +633,8 @@ message ValidatorAssignments {
         // duty as a proposer.
         repeated uint64 proposer_slots = 4 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
 
-        // 2592 byte Dilithium public key.
-        bytes public_key = 5 [(theqrl.zond.ext.ssz_size) = "2592", deprecated = true];
-
         // Validator index in the beacon state.
-        uint64 validator_index = 6 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
+        uint64 validator_index = 5 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
     }
 
     // The epoch for which this set of validator assignments is valid.
@@ -716,31 +649,6 @@ message ValidatorAssignments {
 
     // Total count of CommitteeAssignments matching the request filter.
     int32 total_size = 4;
-}
-
-// DEPRECATED: Prysm Web UI and associated endpoints will be fully removed in a future hard fork.
-message GetValidatorParticipationRequest {
-    option deprecated = true;
-    oneof query_filter {
-        // Epoch to request participation information.
-        uint64 epoch = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
-
-        // Whether or not to query for the genesis information.
-        bool genesis = 2;
-    }
-}
-
-// DEPRECATED: Prysm Web UI and associated endpoints will be fully removed in a future hard fork.
-message ValidatorParticipationResponse {
-    option deprecated = true;
-    // Epoch which this message is applicable.
-    uint64 epoch = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
-
-    // Whether or not epoch has been finalized.
-    bool finalized = 2;
-
-    // The actual validator participation metrics.
-    ValidatorParticipation participation = 3;
 }
 
 message AttestationPoolRequest {
@@ -816,12 +724,8 @@ message IndividualVotesRespond {
         bool is_previous_epoch_head_attester = 12;
         // The current effective balance of the validator.
         uint64 current_epoch_effective_balance_gwei = 13;
-        // The slots of when the validator's attestation got included in the block. Only available in phase0.
-        uint64 inclusion_slot = 14 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot", deprecated = true];
-        // How many slots have passed until the validator's attestation got included in the block. Only available in phase0.
-        uint64 inclusion_distance = 15 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot", deprecated = true];
         // The inactivity score of the validator tracks validator participation.
-        uint64 inactivity_score = 16;
+        uint64 inactivity_score = 14;
     }
 
     repeated IndividualVote individual_votes = 1;

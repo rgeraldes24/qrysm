@@ -73,7 +73,7 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 	require.NoError(t, err)
 
 	// Make sure that what we send in the POST body is the marshalled version of the protobuf block
-	headers := map[string]string{"Eth-Consensus-Version": "capella"}
+	headers := map[string]string{"Zond-Consensus-Version": "capella"}
 	jsonRestHandler.EXPECT().PostRestJson(
 		context.Background(),
 		"/zond/v1/beacon/blocks",
@@ -96,7 +96,7 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 
 func generateSignedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Capella {
 	return &zondpb.GenericSignedBeaconBlock_Capella{
-		Capella: &zondpb.SignedBeaconBlockCapella{
+		Capella: &zondpb.SignedBeaconBlock{
 			Block:     test_helpers.GenerateProtoCapellaBeaconBlock(),
 			Signature: test_helpers.FillByteSlice(96, 127),
 		},

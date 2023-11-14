@@ -298,19 +298,6 @@ message DepositContract {
     string address = 2;
 }
 
-// DEPRECATED: GetWeakSubjectivity endpoint is no longer be supported
-message WeakSubjectivityResponse {
-    option deprecated = true;
-	WeakSubjectivityData data = 1;
-}
-
-// DEPRECATED: GetWeakSubjectivity endpoint is no longer be supported
-message WeakSubjectivityData {
-    option deprecated = true;
-    theqrl.zond.v1.Checkpoint ws_checkpoint = 1;
-    bytes state_root = 2;
-}
-
 message ForkChoiceDump {
     reserved 3;
     // Latest justified checkpoint in forkchoice store.

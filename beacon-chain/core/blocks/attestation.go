@@ -6,14 +6,11 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"go.opencensus.io/trace"
@@ -167,6 +164,7 @@ func ProcessAttestationNoVerifySignature(
 
 // VerifyAttestationSignature converts and attestation into an indexed attestation and verifies
 // the signature in that attestation.
+/*
 func VerifyAttestationSignature(ctx context.Context, beaconState state.ReadOnlyBeaconState, att *zondpb.Attestation) error {
 	if err := helpers.ValidateNilAttestation(att); err != nil {
 		return err
@@ -181,6 +179,7 @@ func VerifyAttestationSignature(ctx context.Context, beaconState state.ReadOnlyB
 	}
 	return VerifyIndexedAttestation(ctx, beaconState, indexedAtt)
 }
+*/
 
 // VerifyIndexedAttestation determines the validity of an indexed attestation.
 //
@@ -199,6 +198,7 @@ func VerifyAttestationSignature(ctx context.Context, beaconState state.ReadOnlyB
 //	  domain = get_domain(state, DOMAIN_BEACON_ATTESTER, indexed_attestation.data.target.epoch)
 //	  signing_root = compute_signing_root(indexed_attestation.data, domain)
 //	  return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
+/*
 func VerifyIndexedAttestation(ctx context.Context, beaconState state.ReadOnlyBeaconState, indexedAtt *zondpb.IndexedAttestation) error {
 	ctx, span := trace.StartSpan(ctx, "core.VerifyIndexedAttestation")
 	defer span.End()
@@ -227,3 +227,4 @@ func VerifyIndexedAttestation(ctx context.Context, beaconState state.ReadOnlyBea
 	}
 	return attestation.VerifyIndexedAttestationSig(ctx, indexedAtt, pubkeys, domain)
 }
+*/

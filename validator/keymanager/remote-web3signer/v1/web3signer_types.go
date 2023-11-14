@@ -38,14 +38,6 @@ type BlockSignRequest struct {
 	Block       *BeaconBlock  `json:"block" validate:"required"`
 }
 
-// BlockAltairSignRequest is a request object for web3signer sign api.
-type BlockAltairSignRequest struct {
-	Type        string                    `json:"type" validate:"required"`
-	ForkInfo    *ForkInfo                 `json:"fork_info" validate:"required"`
-	SigningRoot hexutil.Bytes             `json:"signingRoot"`
-	BeaconBlock *BeaconBlockAltairBlockV2 `json:"beacon_block" validate:"required"`
-}
-
 // BlockV2BlindedSignRequest is a request object for web3signer sign api
 // Supports Bellatrix(merge) and Capella
 type BlockV2BlindedSignRequest struct {
@@ -248,45 +240,11 @@ type VoluntaryExit struct {
 	ValidatorIndex string `json:"validator_index"` /* uint64 */
 }
 
-// BeaconBlockAltairBlockV2 a sub property of BlockAltairSignRequest.
-type BeaconBlockAltairBlockV2 struct {
-	Version string             `json:"version" enum:"true"`
-	Block   *BeaconBlockAltair `json:"block"`
-}
-
-// BeaconBlockAltair a sub property of BeaconBlockAltairBlockV2.
-type BeaconBlockAltair struct {
-	Slot          string                 `json:"slot"`
-	ProposerIndex string                 `json:"proposer_index"`
-	ParentRoot    hexutil.Bytes          `json:"parent_root"`
-	StateRoot     hexutil.Bytes          `json:"state_root"`
-	Body          *BeaconBlockBodyAltair `json:"body"`
-}
-
-// BeaconBlockBodyAltair a sub property of BeaconBlockAltair.
-type BeaconBlockBodyAltair struct {
-	RandaoReveal      hexutil.Bytes          `json:"randao_reveal"`
-	Zond1Data         *Zond1Data             `json:"zond1_data"`
-	Graffiti          hexutil.Bytes          `json:"graffiti"` /* Hash32 */
-	ProposerSlashings []*ProposerSlashing    `json:"proposer_slashings"`
-	AttesterSlashings []*AttesterSlashing    `json:"attester_slashings"`
-	Attestations      []*Attestation         `json:"attestations"`
-	Deposits          []*Deposit             `json:"deposits"`
-	VoluntaryExits    []*SignedVoluntaryExit `json:"voluntary_exits"`
-	SyncAggregate     *SyncAggregate         `json:"sync_aggregate"`
-}
-
 // BeaconBlockV2Blinded a field of BlockV2BlindedSignRequest.
 // Supports Bellatrix(merge) and Capella
 type BeaconBlockV2Blinded struct {
 	Version     string             `json:"version" enum:"true"`
 	BlockHeader *BeaconBlockHeader `json:"block_header"`
-}
-
-// SyncAggregate is a sub property of BeaconBlockBodyAltair.
-type SyncAggregate struct {
-	SyncCommitteeBits      hexutil.Bytes `json:"sync_committee_bits"`      /* SSZ hexadecimal string */
-	SyncCommitteeSignature hexutil.Bytes `json:"sync_committee_signature"` /* 96 byte hexadecimal string */
 }
 
 // BeaconBlockBlockV2 a sub property of BlockV2SignRequest.

@@ -1,20 +1,10 @@
 package blocks
 
 import (
-	"context"
-	"sort"
-
-	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state"
-	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/container/slice"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/slashings"
-	"github.com/theQRL/qrysm/v4/runtime/version"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 // ProcessAttesterSlashings is one of the operations performed
@@ -37,6 +27,7 @@ import (
 //	         slash_validator(state, index)
 //	         slashed_any = True
 //	 assert slashed_any
+/*
 func ProcessAttesterSlashings(
 	ctx context.Context,
 	beaconState state.BeaconState,
@@ -52,7 +43,9 @@ func ProcessAttesterSlashings(
 	}
 	return beaconState, nil
 }
+*/
 
+/*
 // ProcessAttesterSlashing processes individual attester slashing.
 func ProcessAttesterSlashing(
 	ctx context.Context,
@@ -129,6 +122,7 @@ func VerifyAttesterSlashing(ctx context.Context, beaconState state.ReadOnlyBeaco
 	}
 	return nil
 }
+*/
 
 // IsSlashableAttestationData verifies a slashing against the Casper Proof of Stake FFG rules.
 //

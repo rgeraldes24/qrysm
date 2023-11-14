@@ -11,7 +11,7 @@ import (
 type ValidatorClient interface {
 	GetDuties(ctx context.Context, in *zondpb.DutiesRequest) (*zondpb.DutiesResponse, error)
 	DomainData(ctx context.Context, in *zondpb.DomainRequest) (*zondpb.DomainResponse, error)
-	WaitForChainStart(ctx context.Context, in *empty.Empty) (*zondpb.ChainStartResponse, error)
+	//WaitForChainStart(ctx context.Context, in *empty.Empty) (*zondpb.ChainStartResponse, error)
 	WaitForActivation(ctx context.Context, in *zondpb.ValidatorActivationRequest) (zondpb.BeaconNodeValidator_WaitForActivationClient, error)
 	ValidatorIndex(ctx context.Context, in *zondpb.ValidatorIndexRequest) (*zondpb.ValidatorIndexResponse, error)
 	ValidatorStatus(ctx context.Context, in *zondpb.ValidatorStatusRequest) (*zondpb.ValidatorStatusResponse, error)
@@ -32,6 +32,5 @@ type ValidatorClient interface {
 	GetSyncSubcommitteeIndex(ctx context.Context, in *zondpb.SyncSubcommitteeIndexRequest) (*zondpb.SyncSubcommitteeIndexResponse, error)
 	GetSyncCommitteeContribution(ctx context.Context, in *zondpb.SyncCommitteeContributionRequest) (*zondpb.SyncCommitteeContribution, error)
 	SubmitSignedContributionAndProof(ctx context.Context, in *zondpb.SignedContributionAndProof) (*empty.Empty, error)
-	StreamBlocksAltair(ctx context.Context, in *zondpb.StreamBlocksRequest) (zondpb.BeaconNodeValidator_StreamBlocksAltairClient, error)
 	SubmitValidatorRegistrations(ctx context.Context, in *zondpb.SignedValidatorRegistrationsV1) (*empty.Empty, error)
 }

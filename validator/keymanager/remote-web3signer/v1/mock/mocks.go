@@ -73,7 +73,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 								Root: make([]byte, fieldparams.RootLength),
 							},
 						},
-						Signature: make([]byte, 96),
+						Signatures: make([][]byte, 1),
 					},
 					SelectionProof: make([]byte, dilithium2.CryptoBytes),
 				},
@@ -154,7 +154,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 											Root: make([]byte, fieldparams.RootLength),
 										},
 									},
-									Signature: make([]byte, dilithium2.CryptoBytes),
+									Signatures: make([][]byte, 3),
 								},
 								Attestation_2: &zond.IndexedAttestation{
 									AttestingIndices: []uint64{0, 1, 2},
@@ -167,7 +167,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 											Root: make([]byte, fieldparams.RootLength),
 										},
 									},
-									Signature: make([]byte, dilithium2.CryptoBytes),
+									Signatures: make([][]byte, 3),
 								},
 							},
 						},
@@ -183,7 +183,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 										Root: make([]byte, fieldparams.RootLength),
 									},
 								},
-								Signature: make([]byte, 96),
+								Signatures: make([][]byte, 96),
 							},
 						},
 						Deposits: []*zond.Deposit{
@@ -210,141 +210,6 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 				},
 			},
 			SigningSlot: 0,
-		}
-	case "BLOCK_V2", "BLOCK_V2_ALTAIR":
-		return &validatorpb.SignRequest{
-			PublicKey:       make([]byte, dilithium2.CryptoPublicKeyBytes),
-			SigningRoot:     make([]byte, fieldparams.RootLength),
-			SignatureDomain: make([]byte, 4),
-			Object: &validatorpb.SignRequest_BlockAltair{
-				BlockAltair: &zond.BeaconBlockAltair{
-					Slot:          0,
-					ProposerIndex: 0,
-					ParentRoot:    make([]byte, fieldparams.RootLength),
-					StateRoot:     make([]byte, fieldparams.RootLength),
-					Body: &zond.BeaconBlockBodyAltair{
-						RandaoReveal: make([]byte, 32),
-						Zond1Data: &zond.Zond1Data{
-							DepositRoot:  make([]byte, fieldparams.RootLength),
-							DepositCount: 0,
-							BlockHash:    make([]byte, 32),
-						},
-						Graffiti: make([]byte, 32),
-						ProposerSlashings: []*zond.ProposerSlashing{
-							{
-								Header_1: &zond.SignedBeaconBlockHeader{
-									Header: &zond.BeaconBlockHeader{
-										Slot:          0,
-										ProposerIndex: 0,
-										ParentRoot:    make([]byte, fieldparams.RootLength),
-										StateRoot:     make([]byte, fieldparams.RootLength),
-										BodyRoot:      make([]byte, fieldparams.RootLength),
-									},
-									Signature: make([]byte, dilithium2.CryptoBytes),
-								},
-								Header_2: &zond.SignedBeaconBlockHeader{
-									Header: &zond.BeaconBlockHeader{
-										Slot:          0,
-										ProposerIndex: 0,
-										ParentRoot:    make([]byte, fieldparams.RootLength),
-										StateRoot:     make([]byte, fieldparams.RootLength),
-										BodyRoot:      make([]byte, fieldparams.RootLength),
-									},
-									Signature: make([]byte, dilithium2.CryptoBytes),
-								},
-							},
-						},
-						AttesterSlashings: []*zond.AttesterSlashing{
-							{
-								Attestation_1: &zond.IndexedAttestation{
-									AttestingIndices: []uint64{0, 1, 2},
-									Data: &zond.AttestationData{
-										BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-										Source: &zond.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-										Target: &zond.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-									},
-									Signature: make([]byte, dilithium2.CryptoBytes),
-								},
-								Attestation_2: &zond.IndexedAttestation{
-									AttestingIndices: []uint64{0, 1, 2},
-									Data: &zond.AttestationData{
-										BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-										Source: &zond.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-										Target: &zond.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-									},
-									Signature: make([]byte, dilithium2.CryptoBytes),
-								},
-							},
-						},
-						Attestations: []*zond.Attestation{
-							{
-								AggregationBits: bitfield.Bitlist{0b1101},
-								Data: &zond.AttestationData{
-									BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-									Source: &zond.Checkpoint{
-										Root: make([]byte, fieldparams.RootLength),
-									},
-									Target: &zond.Checkpoint{
-										Root: make([]byte, fieldparams.RootLength),
-									},
-								},
-								Signature: make([]byte, 96),
-							},
-						},
-						Deposits: []*zond.Deposit{
-							{
-								Proof: [][]byte{[]byte("A")},
-								Data: &zond.Deposit_Data{
-									PublicKey:             make([]byte, dilithium2.CryptoPublicKeyBytes),
-									WithdrawalCredentials: make([]byte, 32),
-									Amount:                0,
-									Signature:             make([]byte, dilithium2.CryptoBytes),
-								},
-							},
-						},
-						VoluntaryExits: []*zond.SignedVoluntaryExit{
-							{
-								Exit: &zond.VoluntaryExit{
-									Epoch:          0,
-									ValidatorIndex: 0,
-								},
-								Signature: make([]byte, dilithium2.CryptoBytes),
-							},
-						},
-						SyncAggregate: &zond.SyncAggregate{
-							SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
-							SyncCommitteeBits:      MockSyncComitteeBits(),
-						},
-					},
-				},
-			},
-			SigningSlot: 0,
-		}
-	case "BLOCK_V2_BELLATRIX":
-		return &validatorpb.SignRequest{
-			PublicKey:       make([]byte, dilithium2.CryptoPublicKeyBytes),
-			SigningRoot:     make([]byte, fieldparams.RootLength),
-			SignatureDomain: make([]byte, 4),
-			Object: &validatorpb.SignRequest_BlockBellatrix{
-				BlockBellatrix: util.HydrateBeaconBlockBellatrix(&zond.BeaconBlockBellatrix{}),
-			},
-		}
-	case "BLOCK_V2_BLINDED_BELLATRIX":
-		return &validatorpb.SignRequest{
-			PublicKey:       make([]byte, dilithium2.CryptoPublicKeyBytes),
-			SigningRoot:     make([]byte, fieldparams.RootLength),
-			SignatureDomain: make([]byte, 4),
-			Object: &validatorpb.SignRequest_BlindedBlockBellatrix{
-				BlindedBlockBellatrix: util.HydrateBlindedBeaconBlockBellatrix(&zond.BlindedBeaconBlockBellatrix{}),
-			},
 		}
 	case "BLOCK_V2_CAPELLA":
 		return &validatorpb.SignRequest{
@@ -352,7 +217,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 			SigningRoot:     make([]byte, fieldparams.RootLength),
 			SignatureDomain: make([]byte, 4),
 			Object: &validatorpb.SignRequest_BlockCapella{
-				BlockCapella: util.HydrateBeaconBlockCapella(&zond.BeaconBlockCapella{}),
+				BlockCapella: util.HydrateBeaconBlock(&zond.BeaconBlock{}),
 			},
 		}
 	case "BLOCK_V2_BLINDED_CAPELLA":
@@ -361,7 +226,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 			SigningRoot:     make([]byte, fieldparams.RootLength),
 			SignatureDomain: make([]byte, 4),
 			Object: &validatorpb.SignRequest_BlindedBlockCapella{
-				BlindedBlockCapella: util.HydrateBlindedBeaconBlockCapella(&zond.BlindedBeaconBlockCapella{}),
+				BlindedBlockCapella: util.HydrateBlindedBeaconBlockCapella(&zond.BlindedBeaconBlock{}),
 			},
 		}
 	case "RANDAO_REVEAL":
@@ -497,19 +362,6 @@ func MockBlockSignRequest() *v1.BlockSignRequest {
 			ParentRoot:    make([]byte, fieldparams.RootLength),
 			StateRoot:     make([]byte, fieldparams.RootLength),
 			Body:          MockBeaconBlockBody(),
-		},
-	}
-}
-
-// MockBlockV2AltairSignRequest is a mock implementation of the BlockAltairSignRequest.
-func MockBlockV2AltairSignRequest() *v1.BlockAltairSignRequest {
-	return &v1.BlockAltairSignRequest{
-		Type:        "BLOCK_V2",
-		ForkInfo:    MockForkInfo(),
-		SigningRoot: make([]byte, fieldparams.RootLength),
-		BeaconBlock: &v1.BeaconBlockAltairBlockV2{
-			Version: "ALTAIR",
-			Block:   MockBeaconBlockAltair(),
 		},
 	}
 }
@@ -661,81 +513,6 @@ func MockIndexedAttestation() *v1.IndexedAttestation {
 			},
 		},
 		Signature: make([]byte, dilithium2.CryptoBytes),
-	}
-}
-
-func MockBeaconBlockAltair() *v1.BeaconBlockAltair {
-	return &v1.BeaconBlockAltair{
-		Slot:          "0",
-		ProposerIndex: "0",
-		ParentRoot:    make([]byte, fieldparams.RootLength),
-		StateRoot:     make([]byte, fieldparams.RootLength),
-		Body: &v1.BeaconBlockBodyAltair{
-			RandaoReveal: make([]byte, 32),
-			Zond1Data: &v1.Zond1Data{
-				DepositRoot:  make([]byte, fieldparams.RootLength),
-				DepositCount: "0",
-				BlockHash:    make([]byte, 32),
-			},
-			Graffiti: make([]byte, 32),
-			ProposerSlashings: []*v1.ProposerSlashing{
-				{
-					Signedheader1: &v1.SignedBeaconBlockHeader{
-						Message: &v1.BeaconBlockHeader{
-							Slot:          "0",
-							ProposerIndex: "0",
-							ParentRoot:    make([]byte, fieldparams.RootLength),
-							StateRoot:     make([]byte, fieldparams.RootLength),
-							BodyRoot:      make([]byte, fieldparams.RootLength),
-						},
-						Signature: make([]byte, dilithium2.CryptoBytes),
-					},
-					Signedheader2: &v1.SignedBeaconBlockHeader{
-						Message: &v1.BeaconBlockHeader{
-							Slot:          "0",
-							ProposerIndex: "0",
-							ParentRoot:    make([]byte, fieldparams.RootLength),
-							StateRoot:     make([]byte, fieldparams.RootLength),
-							BodyRoot:      make([]byte, fieldparams.RootLength),
-						},
-						Signature: make([]byte, dilithium2.CryptoBytes),
-					},
-				},
-			},
-			AttesterSlashings: []*v1.AttesterSlashing{
-				{
-					Attestation1: MockIndexedAttestation(),
-					Attestation2: MockIndexedAttestation(),
-				},
-			},
-			Attestations: []*v1.Attestation{
-				MockAttestation(),
-			},
-			Deposits: []*v1.Deposit{
-				{
-					Proof: []string{"0x41"},
-					Data: &v1.DepositData{
-						PublicKey:             make([]byte, dilithium2.CryptoPublicKeyBytes),
-						WithdrawalCredentials: make([]byte, 32),
-						Amount:                "0",
-						Signature:             make([]byte, dilithium2.CryptoBytes),
-					},
-				},
-			},
-			VoluntaryExits: []*v1.SignedVoluntaryExit{
-				{
-					Message: &v1.VoluntaryExit{
-						Epoch:          "0",
-						ValidatorIndex: "0",
-					},
-					Signature: make([]byte, dilithium2.CryptoBytes),
-				},
-			},
-			SyncAggregate: &v1.SyncAggregate{
-				SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
-				SyncCommitteeBits:      MockSyncComitteeBits(),
-			},
-		},
 	}
 }
 

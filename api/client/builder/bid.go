@@ -57,44 +57,11 @@ func (b signedBuilderBid) Signature() []byte {
 
 // Version --
 func (b signedBuilderBid) Version() int {
-	return version.Bellatrix
-}
-
-// IsNil --
-func (b signedBuilderBid) IsNil() bool {
-	return b.p == nil
-}
-
-type signedBuilderBidCapella struct {
-	p *zondpb.SignedBuilderBidCapella
-}
-
-// WrappedSignedBuilderBidCapella is a constructor which wraps a protobuf signed bit into an interface.
-func WrappedSignedBuilderBidCapella(p *zondpb.SignedBuilderBidCapella) (SignedBid, error) {
-	w := signedBuilderBidCapella{p: p}
-	if w.IsNil() {
-		return nil, consensus_types.ErrNilObjectWrapped
-	}
-	return w, nil
-}
-
-// Message --
-func (b signedBuilderBidCapella) Message() (Bid, error) {
-	return WrappedBuilderBidCapella(b.p.Message)
-}
-
-// Signature --
-func (b signedBuilderBidCapella) Signature() []byte {
-	return b.p.Signature
-}
-
-// Version --
-func (b signedBuilderBidCapella) Version() int {
 	return version.Capella
 }
 
 // IsNil --
-func (b signedBuilderBidCapella) IsNil() bool {
+func (b signedBuilderBid) IsNil() bool {
 	return b.p == nil
 }
 
@@ -111,14 +78,16 @@ func WrappedBuilderBid(p *zondpb.BuilderBid) (Bid, error) {
 	return w, nil
 }
 
-// Header --
+// Header returns the execution data interface.
 func (b builderBid) Header() (interfaces.ExecutionData, error) {
-	return blocks.WrappedExecutionPayloadHeader(b.p.Header)
+	// We have to convert big endian to little endian because the value is coming from the execution layer.
+	v := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(b.p.Value))
+	return blocks.WrappedExecutionPayloadHeader(b.p.Header, math.WeiToGwei(v))
 }
 
 // Version --
 func (b builderBid) Version() int {
-	return version.Bellatrix
+	return version.Capella
 }
 
 // Value --
@@ -143,55 +112,5 @@ func (b builderBid) HashTreeRoot() ([32]byte, error) {
 
 // HashTreeRootWith --
 func (b builderBid) HashTreeRootWith(hh *ssz.Hasher) error {
-	return b.p.HashTreeRootWith(hh)
-}
-
-type builderBidCapella struct {
-	p *zondpb.BuilderBidCapella
-}
-
-// WrappedBuilderBidCapella is a constructor which wraps a protobuf bid into an interface.
-func WrappedBuilderBidCapella(p *zondpb.BuilderBidCapella) (Bid, error) {
-	w := builderBidCapella{p: p}
-	if w.IsNil() {
-		return nil, consensus_types.ErrNilObjectWrapped
-	}
-	return w, nil
-}
-
-// Header returns the execution data interface.
-func (b builderBidCapella) Header() (interfaces.ExecutionData, error) {
-	// We have to convert big endian to little endian because the value is coming from the execution layer.
-	v := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(b.p.Value))
-	return blocks.WrappedExecutionPayloadHeaderCapella(b.p.Header, math.WeiToGwei(v))
-}
-
-// Version --
-func (b builderBidCapella) Version() int {
-	return version.Capella
-}
-
-// Value --
-func (b builderBidCapella) Value() []byte {
-	return b.p.Value
-}
-
-// Pubkey --
-func (b builderBidCapella) Pubkey() []byte {
-	return b.p.Pubkey
-}
-
-// IsNil --
-func (b builderBidCapella) IsNil() bool {
-	return b.p == nil
-}
-
-// HashTreeRoot --
-func (b builderBidCapella) HashTreeRoot() ([32]byte, error) {
-	return b.p.HashTreeRoot()
-}
-
-// HashTreeRootWith --
-func (b builderBidCapella) HashTreeRootWith(hh *ssz.Hasher) error {
 	return b.p.HashTreeRootWith(hh)
 }

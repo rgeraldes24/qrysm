@@ -46,7 +46,7 @@ func TestProcessAttesterSlashings_DataNotSlashable(t *testing.T) {
 	var registry []*zondpb.Validator
 	currentSlot := primitives.Slot(0)
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: registry,
 		Slot:       currentSlot,
 	})
@@ -65,7 +65,7 @@ func TestProcessAttesterSlashings_IndexedAttestationFailedToVerify(t *testing.T)
 	var registry []*zondpb.Validator
 	currentSlot := primitives.Slot(0)
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: registry,
 		Slot:       currentSlot,
 	})
@@ -115,7 +115,7 @@ func TestProcessAttesterSlashings_AppliesCorrectStatus(t *testing.T) {
 	sig0 := privKeys[0].Sign(signingRoot[:])
 	sig1 := privKeys[1].Sign(signingRoot[:])
 	aggregateSig := bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att1.Signature = aggregateSig.Marshal()
+	att1.Signatures = [][]byte{aggregateSig.Marshal()}
 
 	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
 		AttestingIndices: []uint64{0, 1},
@@ -125,7 +125,7 @@ func TestProcessAttesterSlashings_AppliesCorrectStatus(t *testing.T) {
 	sig0 = privKeys[0].Sign(signingRoot[:])
 	sig1 = privKeys[1].Sign(signingRoot[:])
 	aggregateSig = bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att2.Signature = aggregateSig.Marshal()
+	att2.Signatures = [][]byte{aggregateSig.Marshal()}
 
 	slashings := []*zondpb.AttesterSlashing{
 		{
@@ -184,7 +184,7 @@ func TestProcessAttesterSlashings_AppliesCorrectStatusAltair(t *testing.T) {
 	sig0 := privKeys[0].Sign(signingRoot[:])
 	sig1 := privKeys[1].Sign(signingRoot[:])
 	aggregateSig := bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att1.Signature = aggregateSig.Marshal()
+	att1.Signatures = [][]byte{aggregateSig.Marshal()}
 
 	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
 		AttestingIndices: []uint64{0, 1},
@@ -194,7 +194,7 @@ func TestProcessAttesterSlashings_AppliesCorrectStatusAltair(t *testing.T) {
 	sig0 = privKeys[0].Sign(signingRoot[:])
 	sig1 = privKeys[1].Sign(signingRoot[:])
 	aggregateSig = bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att2.Signature = aggregateSig.Marshal()
+	att2.Signatures = [][]byte{aggregateSig.Marshal()}
 
 	slashings := []*zondpb.AttesterSlashing{
 		{
@@ -253,7 +253,7 @@ func TestProcessAttesterSlashings_AppliesCorrectStatusBellatrix(t *testing.T) {
 	sig0 := privKeys[0].Sign(signingRoot[:])
 	sig1 := privKeys[1].Sign(signingRoot[:])
 	aggregateSig := bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att1.Signature = aggregateSig.Marshal()
+	att1.Signatures = [][]byte{aggregateSig.Marshal()}
 
 	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
 		AttestingIndices: []uint64{0, 1},
@@ -263,7 +263,7 @@ func TestProcessAttesterSlashings_AppliesCorrectStatusBellatrix(t *testing.T) {
 	sig0 = privKeys[0].Sign(signingRoot[:])
 	sig1 = privKeys[1].Sign(signingRoot[:])
 	aggregateSig = bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att2.Signature = aggregateSig.Marshal()
+	att2.Signatures = [][]byte{aggregateSig.Marshal()}
 
 	slashings := []*zondpb.AttesterSlashing{
 		{
@@ -322,7 +322,7 @@ func TestProcessAttesterSlashings_AppliesCorrectStatusCapella(t *testing.T) {
 	sig0 := privKeys[0].Sign(signingRoot[:])
 	sig1 := privKeys[1].Sign(signingRoot[:])
 	aggregateSig := bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att1.Signature = aggregateSig.Marshal()
+	att1.Signatures = [][]byte{aggregateSig.Marshal()}
 
 	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
 		AttestingIndices: []uint64{0, 1},
@@ -332,7 +332,7 @@ func TestProcessAttesterSlashings_AppliesCorrectStatusCapella(t *testing.T) {
 	sig0 = privKeys[0].Sign(signingRoot[:])
 	sig1 = privKeys[1].Sign(signingRoot[:])
 	aggregateSig = bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att2.Signature = aggregateSig.Marshal()
+	att2.Signatures = [][]byte{aggregateSig.Marshal()}
 
 	slashings := []*zondpb.AttesterSlashing{
 		{

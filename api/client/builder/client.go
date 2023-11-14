@@ -222,7 +222,7 @@ func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash
 	}
 	switch strings.ToLower(v.Version) {
 	case strings.ToLower(version.String(version.Capella)):
-		hr := &ExecHeaderResponseCapella{}
+		hr := &ExecHeaderResponse{}
 		if err := json.Unmarshal(hb, hr); err != nil {
 			return nil, errors.Wrapf(err, "error unmarshaling the builder GetHeader response, using slot=%d, parentHash=%#x, pubkey=%#x", slot, parentHash, pubkey)
 		}
@@ -230,7 +230,7 @@ func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not extract proto message from header")
 		}
-		return WrappedSignedBuilderBidCapella(p)
+		return WrappedSignedBuilderBid(p)
 	case strings.ToLower(version.String(version.Bellatrix)):
 		hr := &ExecHeaderResponse{}
 		if err := json.Unmarshal(hb, hr); err != nil {
@@ -280,57 +280,26 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 		return nil, errNotBlinded
 	}
 	switch sb.Version() {
-	case version.Bellatrix:
-		psb, err := sb.PbBlindedBellatrixBlock()
-		if err != nil {
-			return nil, errors.Wrapf(err, "could not get protobuf block")
-		}
-		b := &SignedBlindedBeaconBlockBellatrix{SignedBlindedBeaconBlockBellatrix: psb}
-		body, err := json.Marshal(b)
-		if err != nil {
-			return nil, errors.Wrap(err, "error encoding the SignedBlindedBeaconBlockBellatrix value body in SubmitBlindedBlock")
-		}
-
-		versionOpt := func(r *http.Request) {
-			r.Header.Add("Eth-Consensus-Version", version.String(version.Bellatrix))
-		}
-		rb, err := c.do(ctx, http.MethodPost, postBlindedBeaconBlockPath, bytes.NewBuffer(body), versionOpt)
-
-		if err != nil {
-			return nil, errors.Wrap(err, "error posting the SignedBlindedBeaconBlockBellatrix to the builder api")
-		}
-		ep := &ExecPayloadResponse{}
-		if err := json.Unmarshal(rb, ep); err != nil {
-			return nil, errors.Wrap(err, "error unmarshaling the builder SubmitBlindedBlock response")
-		}
-		if strings.ToLower(ep.Version) != version.String(version.Bellatrix) {
-			return nil, errors.New("not a bellatrix payload")
-		}
-		p, err := ep.ToProto()
-		if err != nil {
-			return nil, errors.Wrapf(err, "could not extract proto message from payload")
-		}
-		return blocks.WrappedExecutionPayload(p)
 	case version.Capella:
 		psb, err := sb.PbBlindedCapellaBlock()
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not get protobuf block")
 		}
-		b := &SignedBlindedBeaconBlockCapella{SignedBlindedBeaconBlockCapella: psb}
+		b := &SignedBlindedBeaconBlock{SignedBlindedBeaconBlock: psb}
 		body, err := json.Marshal(b)
 		if err != nil {
 			return nil, errors.Wrap(err, "error encoding the SignedBlindedBeaconBlockCapella value body in SubmitBlindedBlockCapella")
 		}
 
 		versionOpt := func(r *http.Request) {
-			r.Header.Add("Eth-Consensus-Version", version.String(version.Capella))
+			r.Header.Add("Zond-Consensus-Version", version.String(version.Capella))
 		}
 		rb, err := c.do(ctx, http.MethodPost, postBlindedBeaconBlockPath, bytes.NewBuffer(body), versionOpt)
 
 		if err != nil {
 			return nil, errors.Wrap(err, "error posting the SignedBlindedBeaconBlockCapella to the builder api")
 		}
-		ep := &ExecPayloadResponseCapella{}
+		ep := &ExecPayloadResponse{}
 		if err := json.Unmarshal(rb, ep); err != nil {
 			return nil, errors.Wrap(err, "error unmarshaling the builder SubmitBlindedBlockCapella response")
 		}
@@ -341,7 +310,7 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not extract proto message from payload")
 		}
-		return blocks.WrappedExecutionPayloadCapella(p, 0)
+		return blocks.WrappedExecutionPayload(p, 0)
 	default:
 		return nil, fmt.Errorf("unsupported block version %s", version.String(sb.Version()))
 	}

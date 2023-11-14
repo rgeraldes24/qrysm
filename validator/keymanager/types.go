@@ -89,7 +89,6 @@ type Keystore struct {
 	Pubkey      string                 `json:"pubkey"`
 	Version     uint                   `json:"version"`
 	Description string                 `json:"description"`
-	Name        string                 `json:"name,omitempty"` // field deprecated in favor of description, EIP2335
 	Path        string                 `json:"path"`
 }
 

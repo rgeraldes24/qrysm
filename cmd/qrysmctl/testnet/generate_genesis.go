@@ -266,10 +266,9 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		log.
 			WithField("shanghai", gen.Config.ShanghaiTime).
 			Info("setting fork zond times")
-		if v > version.Altair {
-			// set ttd to zero so EL goes post-merge immediately
-			gen.Config.TerminalTotalDifficulty = big.NewInt(0)
-		}
+
+		// set ttd to zero so EL goes post-merge immediately
+		gen.Config.TerminalTotalDifficulty = big.NewInt(0)
 	} else {
 		gen = interop.GethTestnetGenesis(f.GenesisTime, params.BeaconConfig())
 	}

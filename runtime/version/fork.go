@@ -10,10 +10,7 @@ const (
 )
 
 var versionToString = map[int]string{
-	Phase0:    "phase0",
-	Altair:    "altair",
-	Bellatrix: "bellatrix",
-	Capella:   "capella",
+	Capella: "capella",
 }
 
 // stringToVersion and allVersions are populated in init()

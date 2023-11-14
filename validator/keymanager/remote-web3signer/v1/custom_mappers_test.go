@@ -39,7 +39,7 @@ func TestMapAggregateAndProof(t *testing.T) {
 								Root: make([]byte, fieldparams.RootLength),
 							},
 						},
-						Signature: make([]byte, 96),
+						Signatures: make([][]byte, 8),
 					},
 					SelectionProof: make([]byte, dilithium2.CryptoBytes),
 				},
@@ -90,7 +90,7 @@ func TestMapAttestation(t *testing.T) {
 							Root: make([]byte, fieldparams.RootLength),
 						},
 					},
-					Signature: make([]byte, 96),
+					Signatures: make([][]byte, 8),
 				},
 			},
 			want:    mock.MockAttestation(),
@@ -177,7 +177,7 @@ func TestMapAttesterSlashing(t *testing.T) {
 								Root: make([]byte, fieldparams.RootLength),
 							},
 						},
-						Signature: make([]byte, dilithium2.CryptoBytes),
+						Signatures: make([][]byte, 3),
 					},
 					Attestation_2: &zondpb.IndexedAttestation{
 						AttestingIndices: []uint64{0, 1, 2},
@@ -190,7 +190,7 @@ func TestMapAttesterSlashing(t *testing.T) {
 								Root: make([]byte, fieldparams.RootLength),
 							},
 						},
-						Signature: make([]byte, dilithium2.CryptoBytes),
+						Signatures: make([][]byte, 3),
 					},
 				},
 			},
@@ -210,146 +210,6 @@ func TestMapAttesterSlashing(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got.Attestation1, tt.want.Attestation1) {
 				t.Errorf("MapAttesterSlashing() got = %v, want %v", got.Attestation1, tt.want.Attestation1)
-			}
-		})
-	}
-}
-
-func TestMapBeaconBlockAltair(t *testing.T) {
-	type args struct {
-		block *zondpb.BeaconBlockAltair
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *v1.BeaconBlockAltair
-		wantErr bool
-	}{
-		{
-			name: "Happy Path Test",
-			args: args{
-				block: &zondpb.BeaconBlockAltair{
-					Slot:          0,
-					ProposerIndex: 0,
-					ParentRoot:    make([]byte, fieldparams.RootLength),
-					StateRoot:     make([]byte, fieldparams.RootLength),
-					Body: &zondpb.BeaconBlockBodyAltair{
-						RandaoReveal: make([]byte, 32),
-						Zond1Data: &zondpb.Zond1Data{
-							DepositRoot:  make([]byte, fieldparams.RootLength),
-							DepositCount: 0,
-							BlockHash:    make([]byte, 32),
-						},
-						Graffiti: make([]byte, 32),
-						ProposerSlashings: []*zondpb.ProposerSlashing{
-							{
-								Header_1: &zondpb.SignedBeaconBlockHeader{
-									Header: &zondpb.BeaconBlockHeader{
-										Slot:          0,
-										ProposerIndex: 0,
-										ParentRoot:    make([]byte, fieldparams.RootLength),
-										StateRoot:     make([]byte, fieldparams.RootLength),
-										BodyRoot:      make([]byte, fieldparams.RootLength),
-									},
-									Signature: make([]byte, dilithium2.CryptoBytes),
-								},
-								Header_2: &zondpb.SignedBeaconBlockHeader{
-									Header: &zondpb.BeaconBlockHeader{
-										Slot:          0,
-										ProposerIndex: 0,
-										ParentRoot:    make([]byte, fieldparams.RootLength),
-										StateRoot:     make([]byte, fieldparams.RootLength),
-										BodyRoot:      make([]byte, fieldparams.RootLength),
-									},
-									Signature: make([]byte, dilithium2.CryptoBytes),
-								},
-							},
-						},
-						AttesterSlashings: []*zondpb.AttesterSlashing{
-							{
-								Attestation_1: &zondpb.IndexedAttestation{
-									AttestingIndices: []uint64{0, 1, 2},
-									Data: &zondpb.AttestationData{
-										BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-										Source: &zondpb.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-										Target: &zondpb.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-									},
-									Signature: make([]byte, dilithium2.CryptoBytes),
-								},
-								Attestation_2: &zondpb.IndexedAttestation{
-									AttestingIndices: []uint64{0, 1, 2},
-									Data: &zondpb.AttestationData{
-										BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-										Source: &zondpb.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-										Target: &zondpb.Checkpoint{
-											Root: make([]byte, fieldparams.RootLength),
-										},
-									},
-									Signature: make([]byte, dilithium2.CryptoBytes),
-								},
-							},
-						},
-						Attestations: []*zondpb.Attestation{
-							{
-								AggregationBits: bitfield.Bitlist{0b1101},
-								Data: &zondpb.AttestationData{
-									BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-									Source: &zondpb.Checkpoint{
-										Root: make([]byte, fieldparams.RootLength),
-									},
-									Target: &zondpb.Checkpoint{
-										Root: make([]byte, fieldparams.RootLength),
-									},
-								},
-								Signature: make([]byte, 96),
-							},
-						},
-						Deposits: []*zondpb.Deposit{
-							{
-								Proof: [][]byte{[]byte("A")},
-								Data: &zondpb.Deposit_Data{
-									PublicKey:             make([]byte, dilithium2.CryptoPublicKeyBytes),
-									WithdrawalCredentials: make([]byte, 32),
-									Amount:                0,
-									Signature:             make([]byte, dilithium2.CryptoBytes),
-								},
-							},
-						},
-						VoluntaryExits: []*zondpb.SignedVoluntaryExit{
-							{
-								Exit: &zondpb.VoluntaryExit{
-									Epoch:          0,
-									ValidatorIndex: 0,
-								},
-								Signature: make([]byte, dilithium2.CryptoBytes),
-							},
-						},
-						SyncAggregate: &zondpb.SyncAggregate{
-							SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
-							SyncCommitteeBits:      mock.MockSyncComitteeBits(),
-						},
-					},
-				},
-			},
-			want:    mock.MockBeaconBlockAltair(),
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := v1.MapBeaconBlockAltair(tt.args.block)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("MapBeaconBlockAltair() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got.Body, tt.want.Body) {
-				t.Errorf("MapBeaconBlockAltair() got = %v, want %v", got.Body.SyncAggregate, tt.want.Body.SyncAggregate)
 			}
 		})
 	}
@@ -413,7 +273,7 @@ func TestMapBeaconBlockBody(t *testing.T) {
 										Root: make([]byte, fieldparams.RootLength),
 									},
 								},
-								Signature: make([]byte, dilithium2.CryptoBytes),
+								Signatures: make([][]byte, 3),
 							},
 							Attestation_2: &zondpb.IndexedAttestation{
 								AttestingIndices: []uint64{0, 1, 2},
@@ -426,7 +286,7 @@ func TestMapBeaconBlockBody(t *testing.T) {
 										Root: make([]byte, fieldparams.RootLength),
 									},
 								},
-								Signature: make([]byte, dilithium2.CryptoBytes),
+								Signatures: make([][]byte, 3),
 							},
 						},
 					},
@@ -442,7 +302,7 @@ func TestMapBeaconBlockBody(t *testing.T) {
 									Root: make([]byte, fieldparams.RootLength),
 								},
 							},
-							Signature: make([]byte, 96),
+							Signatures: make([][]byte, 1),
 						},
 					},
 					Deposits: []*zondpb.Deposit{

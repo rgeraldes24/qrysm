@@ -68,7 +68,7 @@ func NewPreminedGenesis(ctx context.Context, t, nvals, pCreds uint64, version in
 
 func (s *PremineGenesisConfig) prepare(ctx context.Context) (state.BeaconState, error) {
 	switch s.Version {
-	case version.Phase0, version.Altair, version.Bellatrix, version.Capella:
+	case version.Capella:
 	default:
 		return nil, errors.Wrapf(errUnsupportedVersion, "version=%s", version.String(s.Version))
 	}
@@ -91,23 +91,8 @@ func (s *PremineGenesisConfig) empty() (state.BeaconState, error) {
 	var e state.BeaconState
 	var err error
 	switch s.Version {
-	case version.Phase0:
-		e, err = state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{})
-		if err != nil {
-			return nil, err
-		}
-	case version.Altair:
-		e, err = state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{})
-		if err != nil {
-			return nil, err
-		}
-	case version.Bellatrix:
-		e, err = state_native.InitializeFromProtoBellatrix(&zondpb.BeaconStateBellatrix{})
-		if err != nil {
-			return nil, err
-		}
 	case version.Capella:
-		e, err = state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{})
+		e, err = state_native.InitializeFromProtoCapella(&zondpb.BeaconState{})
 		if err != nil {
 			return nil, err
 		}
@@ -279,14 +264,8 @@ func (s *PremineGenesisConfig) setGenesisValidatorsRoot(g state.BeaconState) err
 func (s *PremineGenesisConfig) setFork(g state.BeaconState) error {
 	var pv, cv []byte
 	switch s.Version {
-	case version.Phase0:
-		pv, cv = params.BeaconConfig().GenesisForkVersion, params.BeaconConfig().GenesisForkVersion
-	case version.Altair:
-		pv, cv = params.BeaconConfig().GenesisForkVersion, params.BeaconConfig().AltairForkVersion
-	case version.Bellatrix:
-		pv, cv = params.BeaconConfig().AltairForkVersion, params.BeaconConfig().BellatrixForkVersion
 	case version.Capella:
-		pv, cv = params.BeaconConfig().BellatrixForkVersion, params.BeaconConfig().CapellaForkVersion
+		pv, cv = params.BeaconConfig().GenesisForkVersion, params.BeaconConfig().GenesisForkVersion
 	default:
 		return errUnsupportedVersion
 	}
@@ -337,7 +316,7 @@ type rooter interface {
 func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 	var body rooter
 	switch s.Version {
-	case version.Phase0:
+	case version.Capella:
 		body = &zondpb.BeaconBlockBody{
 			RandaoReveal: make([]byte, dilithium2.CryptoBytes),
 			Zond1Data: &zondpb.Zond1Data{
@@ -345,57 +324,11 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 				BlockHash:   make([]byte, 32),
 			},
 			Graffiti: make([]byte, 32),
-		}
-	case version.Altair:
-		body = &zondpb.BeaconBlockBodyAltair{
-			RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-			Zond1Data: &zondpb.Zond1Data{
-				DepositRoot: make([]byte, 32),
-				BlockHash:   make([]byte, 32),
-			},
-			Graffiti: make([]byte, 32),
 			SyncAggregate: &zondpb.SyncAggregate{
-				SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-				SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
-			},
-		}
-	case version.Bellatrix:
-		body = &zondpb.BeaconBlockBodyBellatrix{
-			RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-			Zond1Data: &zondpb.Zond1Data{
-				DepositRoot: make([]byte, 32),
-				BlockHash:   make([]byte, 32),
-			},
-			Graffiti: make([]byte, 32),
-			SyncAggregate: &zondpb.SyncAggregate{
-				SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-				SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+				SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
+				SyncCommitteeSignatures: make([][]byte, fieldparams.SyncCommitteeLength),
 			},
 			ExecutionPayload: &enginev1.ExecutionPayload{
-				ParentHash:    make([]byte, 32),
-				FeeRecipient:  make([]byte, 20),
-				StateRoot:     make([]byte, 32),
-				ReceiptsRoot:  make([]byte, 32),
-				LogsBloom:     make([]byte, 256),
-				PrevRandao:    make([]byte, 32),
-				BaseFeePerGas: make([]byte, 32),
-				BlockHash:     make([]byte, 32),
-				Transactions:  make([][]byte, 0),
-			},
-		}
-	case version.Capella:
-		body = &zondpb.BeaconBlockBodyCapella{
-			RandaoReveal: make([]byte, dilithium2.CryptoBytes),
-			Zond1Data: &zondpb.Zond1Data{
-				DepositRoot: make([]byte, 32),
-				BlockHash:   make([]byte, 32),
-			},
-			Graffiti: make([]byte, 32),
-			SyncAggregate: &zondpb.SyncAggregate{
-				SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-				SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
-			},
-			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 				ParentHash:    make([]byte, 32),
 				FeeRecipient:  make([]byte, 20),
 				StateRoot:     make([]byte, 32),
@@ -430,37 +363,8 @@ func (s *PremineGenesisConfig) setExecutionPayload(g state.BeaconState) error {
 
 	var ed interfaces.ExecutionData
 	switch s.Version {
-	case version.Bellatrix:
-		payload := &enginev1.ExecutionPayload{
-			ParentHash:    gb.ParentHash().Bytes(),
-			FeeRecipient:  gb.Coinbase().Bytes(),
-			StateRoot:     gb.Root().Bytes(),
-			ReceiptsRoot:  gb.ReceiptHash().Bytes(),
-			LogsBloom:     gb.Bloom().Bytes(),
-			PrevRandao:    params.BeaconConfig().ZeroHash[:],
-			BlockNumber:   gb.NumberU64(),
-			GasLimit:      gb.GasLimit(),
-			GasUsed:       gb.GasUsed(),
-			Timestamp:     gb.Time(),
-			ExtraData:     gb.Extra()[:32],
-			BaseFeePerGas: bytesutil.PadTo(bytesutil.ReverseByteOrder(gb.BaseFee().Bytes()), fieldparams.RootLength),
-			BlockHash:     gb.Hash().Bytes(),
-			Transactions:  make([][]byte, 0),
-		}
-		wep, err := blocks.WrappedExecutionPayload(payload)
-		if err != nil {
-			return err
-		}
-		eph, err := blocks.PayloadToHeader(wep)
-		if err != nil {
-			return err
-		}
-		ed, err = blocks.WrappedExecutionPayloadHeader(eph)
-		if err != nil {
-			return err
-		}
 	case version.Capella:
-		payload := &enginev1.ExecutionPayloadCapella{
+		payload := &enginev1.ExecutionPayload{
 			ParentHash:    gb.ParentHash().Bytes(),
 			FeeRecipient:  gb.Coinbase().Bytes(),
 			StateRoot:     gb.Root().Bytes(),
@@ -477,15 +381,15 @@ func (s *PremineGenesisConfig) setExecutionPayload(g state.BeaconState) error {
 			Transactions:  make([][]byte, 0),
 			Withdrawals:   make([]*enginev1.Withdrawal, 0),
 		}
-		wep, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
+		wep, err := blocks.WrappedExecutionPayload(payload, 0)
 		if err != nil {
 			return err
 		}
-		eph, err := blocks.PayloadToHeaderCapella(wep)
+		eph, err := blocks.PayloadToHeader(wep)
 		if err != nil {
 			return err
 		}
-		ed, err = blocks.WrappedExecutionPayloadHeaderCapella(eph, 0)
+		ed, err = blocks.WrappedExecutionPayloadHeader(eph, 0)
 		if err != nil {
 			return err
 		}

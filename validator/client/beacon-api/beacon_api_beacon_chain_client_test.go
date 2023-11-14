@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	gatewaymiddleware "github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/prysm/validator"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/qrysm/validator"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"

@@ -25,7 +25,6 @@ import (
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
 )
@@ -150,7 +149,7 @@ func getStateVersionAndPayload(st state.BeaconState) (int, interfaces.ExecutionD
 	var err error
 	preStateVersion := st.Version()
 	switch preStateVersion {
-	case version.Phase0, version.Altair:
+	//case version.Phase0, version.Altair:
 	default:
 		preStateHeader, err = st.LatestExecutionPayloadHeader()
 		if err != nil {

@@ -48,12 +48,6 @@ func BlockSignature(
 	switch b := block.(type) {
 	case *zondpb.BeaconBlock:
 		wsb, err = blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlock{Block: b})
-	case *zondpb.BeaconBlockAltair:
-		wsb, err = blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockAltair{Block: b})
-	case *zondpb.BeaconBlockBellatrix:
-		wsb, err = blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockBellatrix{Block: b})
-	case *zondpb.BeaconBlockCapella:
-		wsb, err = blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockCapella{Block: b})
 	default:
 		return nil, errors.New("unsupported block type")
 	}
@@ -68,12 +62,6 @@ func BlockSignature(
 	switch b := block.(type) {
 	case *zondpb.BeaconBlock:
 		b.StateRoot = s[:]
-	case *zondpb.BeaconBlockAltair:
-		b.StateRoot = s[:]
-	case *zondpb.BeaconBlockBellatrix:
-		b.StateRoot = s[:]
-	case *zondpb.BeaconBlockCapella:
-		b.StateRoot = s[:]
 	}
 
 	// Temporarily increasing the beacon state slot here since BeaconProposerIndex is a
@@ -81,12 +69,6 @@ func BlockSignature(
 	var blockSlot primitives.Slot
 	switch b := block.(type) {
 	case *zondpb.BeaconBlock:
-		blockSlot = b.Slot
-	case *zondpb.BeaconBlockAltair:
-		blockSlot = b.Slot
-	case *zondpb.BeaconBlockBellatrix:
-		blockSlot = b.Slot
-	case *zondpb.BeaconBlockCapella:
 		blockSlot = b.Slot
 	}
 
@@ -104,12 +86,6 @@ func BlockSignature(
 	var blockRoot [32]byte
 	switch b := block.(type) {
 	case *zondpb.BeaconBlock:
-		blockRoot, err = signing.ComputeSigningRoot(b, domain)
-	case *zondpb.BeaconBlockAltair:
-		blockRoot, err = signing.ComputeSigningRoot(b, domain)
-	case *zondpb.BeaconBlockBellatrix:
-		blockRoot, err = signing.ComputeSigningRoot(b, domain)
-	case *zondpb.BeaconBlockCapella:
 		blockRoot, err = signing.ComputeSigningRoot(b, domain)
 	}
 	if err != nil {

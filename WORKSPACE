@@ -333,21 +333,6 @@ all_content = """filegroup(name = "all", srcs = glob(["**"]), visibility = ["//v
 
 # External dependencies
 
-http_archive(
-    name = "prysm_web_ui",
-    build_file_content = """
-filegroup(
-    name = "site",
-    srcs = glob(["**/*"]),
-    visibility = ["//visibility:public"],
-)
-""",
-    sha256 = "5006614c33e358699b4e072c649cd4c3866f7d41a691449d5156f6c6e07a4c60",
-    urls = [
-        "https://github.com/prysmaticlabs/prysm-web-ui/releases/download/v2.0.3/prysm-web-ui.tar.gz",
-    ],
-)
-
 load("//:deps.bzl", "go_dependencies", "qrysm_deps")
 
 # gazelle:repository_macro deps.bzl%qrysm_deps

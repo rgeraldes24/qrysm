@@ -111,7 +111,7 @@ func TestFuzzZond1DataHasEnoughSupport_10000(t *testing.T) {
 	for i := 0; i < 100000; i++ {
 		fuzzer.Fuzz(zond1data)
 		fuzzer.Fuzz(&stateVotes)
-		s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Zond1DataVotes: stateVotes,
 		})
 		require.NoError(t, err)

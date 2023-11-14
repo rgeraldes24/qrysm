@@ -151,41 +151,6 @@ func TestGetBlockSignRequest(t *testing.T) {
 	}
 }
 
-func TestGetBlockV2AltairSignRequest(t *testing.T) {
-	type args struct {
-		request               *validatorpb.SignRequest
-		genesisValidatorsRoot []byte
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *v1.BlockAltairSignRequest
-		wantErr bool
-	}{
-		{
-			name: "Happy Path Test",
-			args: args{
-				request:               mock.GetMockSignRequest("BLOCK_V2"),
-				genesisValidatorsRoot: make([]byte, fieldparams.RootLength),
-			},
-			want:    mock.MockBlockV2AltairSignRequest(),
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := v1.GetBlockAltairSignRequest(tt.args.request, tt.args.genesisValidatorsRoot)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetBlockAltairSignRequest() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetBlockAltairSignRequest() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestGetRandaoRevealSignRequest(t *testing.T) {
 	type args struct {
 		request               *validatorpb.SignRequest

@@ -12,28 +12,7 @@ import (
 )
 
 func TestSyncCommitteeHeadState(t *testing.T) {
-	beaconState, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
-		Fork: &zondpb.Fork{
-			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
-			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
-		},
-	})
-	require.NoError(t, err)
-	phase0State, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
-		Fork: &zondpb.Fork{
-			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
-			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
-		},
-	})
-	require.NoError(t, err)
-	bellatrixState, err := state_native.InitializeFromProtoBellatrix(&zondpb.BeaconStateBellatrix{
-		Fork: &zondpb.Fork{
-			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
-			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
-		},
-	})
-	require.NoError(t, err)
-	capellaState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	capellaState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Fork: &zondpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,

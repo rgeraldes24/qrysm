@@ -1,24 +1,15 @@
 package evaluators
 
 import (
-	"context"
 	"time"
 
-	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
-	"github.com/theQRL/qrysm/v4/testing/endtoend/helpers"
-	"github.com/theQRL/qrysm/v4/testing/endtoend/policies"
-	"github.com/theQRL/qrysm/v4/testing/endtoend/types"
-	"github.com/theQRL/qrysm/v4/time/slots"
-	"google.golang.org/grpc"
 )
 
 var streamDeadline = 1 * time.Minute
 var startingFork = version.Phase0
 
+/*
 // AltairForkTransition ensures that the Altair hard fork has occurred successfully.
 var AltairForkTransition = types.Evaluator{
 	Name: "altair_fork_transition_%d",
@@ -176,3 +167,4 @@ func capellaForkOccurs(_ *types.EvaluationContext, conns ...*grpc.ClientConn) er
 	}
 	return nil
 }
+*/

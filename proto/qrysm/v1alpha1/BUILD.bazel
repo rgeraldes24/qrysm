@@ -25,7 +25,6 @@ proto_library(
         "beacon_chain.proto",
         "debug.proto",
         "finalized_block_root_container.proto",
-        "health.proto",
         "powchain.proto",
         "slasher.proto",
         "validator.proto",

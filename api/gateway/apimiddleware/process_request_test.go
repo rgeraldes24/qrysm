@@ -325,7 +325,7 @@ func TestWriteMiddlewareResponseHeadersAndBody(t *testing.T) {
 
 	t.Run("GET_invalid_status_code", func(t *testing.T) {
 		response := &http.Response{
-			Header: http.Header{"Grpc-Metadata-Eth-Consensus-Version": []string{"capella"}},
+			Header: http.Header{"Grpc-Metadata-Zond-Consensus-Version": []string{"capella"}},
 		}
 
 		// Set invalid status code.
