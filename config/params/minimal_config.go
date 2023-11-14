@@ -30,7 +30,7 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	// Initial values
 	minimalConfig.BLSWithdrawalPrefixByte = byte(0)
 	minimalConfig.DilithiumWithdrawalPrefixByte = byte(0)
-	minimalConfig.ETH1AddressWithdrawalPrefixByte = byte(1)
+	minimalConfig.ZOND1AddressWithdrawalPrefixByte = byte(1)
 	minimalConfig.ZondAddressWithdrawalPrefixByte = byte(1)
 
 	// Time parameters
@@ -46,7 +46,7 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.ShardCommitteePeriod = 64
 	minimalConfig.MinEpochsToInactivityPenalty = 4
 	minimalConfig.Zond1FollowDistance = 16
-	minimalConfig.SecondsPerETH1Block = 14
+	minimalConfig.SecondsPerZOND1Block = 14
 
 	// State vector lengths
 	minimalConfig.EpochsPerHistoricalVector = 64

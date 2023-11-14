@@ -1,4 +1,4 @@
-// Prometheus exporter for Ethereum address balances.
+// Prometheus exporter for Zond address balances.
 // Forked from https://github.com/hunterlong/ethexporter
 package main
 
@@ -25,12 +25,12 @@ var (
 	allWatching []*Watching
 	loadSeconds float64
 	totalLoaded int64
-	eth         *zondclient.Client
+	zond        *zondclient.Client
 )
 
 var (
 	port            = flag.Int("port", 9090, "Port to serve /metrics")
-	web3URL         = flag.String("web3-provider", "https://goerli.prylabs.net", "Web3 URL to access information about ETH1")
+	web3URL         = flag.String("web3-provider", "https://goerli.prylabs.net", "Web3 URL to access information about ZOND1")
 	prefix          = flag.String("prefix", "", "Metrics prefix.")
 	addressFilePath = flag.String("addresses", "", "File path to addresses text file.")
 )
@@ -48,7 +48,7 @@ func main() {
 		panic(err)
 	}
 
-	err = ConnectionToGeth(*web3URL)
+	err = ConnectionToGzond(*web3URL)
 	if err != nil {
 		panic(err)
 	}
@@ -60,7 +60,7 @@ func main() {
 			t1 := time.Now()
 			fmt.Printf("Checking %v wallets...\n", len(allWatching))
 			for _, v := range allWatching {
-				v.Balance = EthBalance(v.Address).String()
+				v.Balance = ZondBalance(v.Address).String()
 				totalLoaded++
 			}
 			t2 := time.Now()
@@ -72,7 +72,7 @@ func main() {
 
 	block := CurrentBlock()
 
-	fmt.Printf("ETHexporter has started on port %v using web3 server: %v at block #%v\n", *port, *web3URL, block)
+	fmt.Printf("ZONDexporter has started on port %v using web3 server: %v at block #%v\n", *port, *web3URL, block)
 
 	http.HandleFunc("/metrics", MetricsHTTP)
 	http.HandleFunc("/reload", ReloadHTTP)
@@ -90,25 +90,25 @@ type Watching struct {
 	Balance string
 }
 
-// ConnectionToGeth - Connect to remote server.
-func ConnectionToGeth(url string) error {
+// ConnectionToGzond - Connect to remote server.
+func ConnectionToGzond(url string) error {
 	var err error
-	eth, err = zondclient.Dial(url)
+	zond, err = zondclient.Dial(url)
 	return err
 }
 
-// EthBalance from remote server.
-func EthBalance(address string) *big.Float {
-	balance, err := eth.BalanceAt(context.TODO(), common.HexToAddress(address), nil)
+// ZondBalance from remote server.
+func ZondBalance(address string) *big.Float {
+	balance, err := zond.BalanceAt(context.TODO(), common.HexToAddress(address), nil)
 	if err != nil {
 		fmt.Printf("Error fetching Zond Balance for address: %v\n", address)
 	}
 	return ToEther(balance)
 }
 
-// CurrentBlock in ETH1.
+// CurrentBlock in ZOND1.
 func CurrentBlock() uint64 {
-	block, err := eth.BlockByNumber(context.TODO(), nil)
+	block, err := zond.BlockByNumber(context.TODO(), nil)
 	if err != nil {
 		fmt.Printf("Error fetching current block height: %v\n", err)
 		return 0
@@ -134,13 +134,13 @@ func MetricsHTTP(w http.ResponseWriter, _ *http.Request) {
 		bal := big.NewFloat(0)
 		bal.SetString(v.Balance)
 		total.Add(total, bal)
-		allOut = append(allOut, fmt.Sprintf("%veth_balance{name=\"%v\",address=\"%v\"} %v", *prefix, v.Name, v.Address, v.Balance))
+		allOut = append(allOut, fmt.Sprintf("%vzond_balance{name=\"%v\",address=\"%v\"} %v", *prefix, v.Name, v.Address, v.Balance))
 	}
 	allOut = append(allOut,
-		fmt.Sprintf("%veth_balance_total %0.18f", *prefix, total),
-		fmt.Sprintf("%veth_load_seconds %0.2f", *prefix, loadSeconds),
-		fmt.Sprintf("%veth_loaded_addresses %v", *prefix, totalLoaded),
-		fmt.Sprintf("%veth_total_addresses %v", *prefix, len(allWatching)))
+		fmt.Sprintf("%vzond_balance_total %0.18f", *prefix, total),
+		fmt.Sprintf("%vzond_load_seconds %0.2f", *prefix, loadSeconds),
+		fmt.Sprintf("%vzond_loaded_addresses %v", *prefix, totalLoaded),
+		fmt.Sprintf("%vzond_total_addresses %v", *prefix, len(allWatching)))
 
 	if _, err := fmt.Fprintln(w, strings.Join(allOut, "\n")); err != nil {
 		logrus.WithError(err).Error("Failed to write metrics")

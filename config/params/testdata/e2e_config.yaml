@@ -48,13 +48,13 @@ CAPELLA_FORK_EPOCH: 10
 # [customized] Faster for testing purposes
 SECONDS_PER_SLOT: 10 # Override for e2e tests
 # 14 (estimate from Zond1 mainnet)
-SECONDS_PER_ETH1_BLOCK: 2 # Override for e2e tests
+SECONDS_PER_ZOND1_BLOCK: 2 # Override for e2e tests
 # [customized] faster time for withdrawals
 MIN_VALIDATOR_WITHDRAWABILITY_DELAY: 1
 # [customized] higher frequency of committee turnover and faster time to acceptable voluntary exit
 SHARD_COMMITTEE_PERIOD: 4 # Override for e2e tests
 # [customized] process deposits more quickly, but insecure
-ETH1_FOLLOW_DISTANCE: 8 # Override for e2e tests
+ZOND1_FOLLOW_DISTANCE: 8 # Override for e2e tests
 
 
 # Validator cycle
@@ -112,7 +112,7 @@ MIN_SYNC_COMMITTEE_PARTICIPANTS: 1
 # ---------------------------------------------------------------
 CONFIG_NAME: "end-to-end"
 SLOTS_PER_EPOCH: 6
-EPOCHS_PER_ETH1_VOTING_PERIOD: 2
+EPOCHS_PER_ZOND1_VOTING_PERIOD: 2
 MAX_SEED_LOOKAHEAD: 1
 
 

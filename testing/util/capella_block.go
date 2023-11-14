@@ -30,7 +30,7 @@ func GenerateFullBlockCapella(
 	privs []bls.SecretKey,
 	conf *BlockGenConfig,
 	slot primitives.Slot,
-) (*zondpb.SignedBeaconBlockCapella, error) {
+) (*zondpb.SignedBeaconBlock, error) {
 	ctx := context.Background()
 	currentSlot := bState.Slot()
 	if currentSlot > slot {
@@ -117,7 +117,7 @@ func GenerateFullBlockCapella(
 		return nil, err
 	}
 	blockHash := indexToHash(uint64(slot))
-	newExecutionPayloadCapella := &v1.ExecutionPayloadCapella{
+	newExecutionPayloadCapella := &v1.ExecutionPayload{
 		ParentHash:    parentExecution.BlockHash(),
 		FeeRecipient:  make([]byte, 20),
 		StateRoot:     params.BeaconConfig().ZeroHash[:],
@@ -180,11 +180,11 @@ func GenerateFullBlockCapella(
 		}
 	}
 
-	block := &zondpb.BeaconBlockCapella{
+	block := &zondpb.BeaconBlock{
 		Slot:          slot,
 		ParentRoot:    parentRoot[:],
 		ProposerIndex: idx,
-		Body: &zondpb.BeaconBlockBodyCapella{
+		Body: &zondpb.BeaconBlockBody{
 			Zond1Data:                   zond1Data,
 			RandaoReveal:                reveal,
 			ProposerSlashings:           pSlashings,
@@ -205,7 +205,7 @@ func GenerateFullBlockCapella(
 		return nil, errors.Wrap(err, "could not compute block signature")
 	}
 
-	return &zondpb.SignedBeaconBlockCapella{Block: block, Signature: signature.Marshal()}, nil
+	return &zondpb.SignedBeaconBlock{Block: block, Signature: signature.Marshal()}, nil
 }
 
 // GenerateDilithiumToExecutionChange generates a valid dilithium to exec changes for validator `val` and its private key `priv` with the given beacon state `st`.

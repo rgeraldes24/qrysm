@@ -34,11 +34,8 @@ import (
 var (
 	supportedEngineEndpoints = []string{
 		NewPayloadMethod,
-		NewPayloadMethodV2,
 		ForkchoiceUpdatedMethod,
-		ForkchoiceUpdatedMethodV2,
 		GetPayloadMethod,
-		GetPayloadMethodV2,
 		ExchangeTransitionConfigurationMethod,
 		GetPayloadBodiesByHashV1,
 		GetPayloadBodiesByRangeV1,
@@ -46,18 +43,12 @@ var (
 )
 
 const (
-	// NewPayloadMethod v1 request string for JSON-RPC.
-	NewPayloadMethod = "engine_newPayloadV1"
-	// NewPayloadMethodV2 v2 request string for JSON-RPC.
-	NewPayloadMethodV2 = "engine_newPayloadV2"
+	// NewPayloadMethod request string for JSON-RPC.
+	NewPayloadMethod = "engine_newPayload"
 	// ForkchoiceUpdatedMethod v1 request string for JSON-RPC.
-	ForkchoiceUpdatedMethod = "engine_forkchoiceUpdatedV1"
-	// ForkchoiceUpdatedMethodV2 v2 request string for JSON-RPC.
-	ForkchoiceUpdatedMethodV2 = "engine_forkchoiceUpdatedV2"
-	// GetPayloadMethod v1 request string for JSON-RPC.
+	ForkchoiceUpdatedMethod = "engine_forkchoiceUpdated"
+	// GetPayloadMethod request string for JSON-RPC.
 	GetPayloadMethod = "engine_getPayloadV1"
-	// GetPayloadMethodV2 v2 request string for JSON-RPC.
-	GetPayloadMethodV2 = "engine_getPayloadV2"
 	// ExchangeTransitionConfigurationMethod v1 request string for JSON-RPC.
 	ExchangeTransitionConfigurationMethod = "engine_exchangeTransitionConfigurationV1"
 	// ExecutionBlockByHashMethod request string for JSON-RPC.
@@ -128,18 +119,9 @@ func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionDa
 	case *pb.ExecutionPayload:
 		payloadPb, ok := payload.Proto().(*pb.ExecutionPayload)
 		if !ok {
-			return nil, errors.New("execution data must be a Bellatrix or Capella execution payload")
-		}
-		err := s.rpcClient.CallContext(ctx, result, NewPayloadMethod, payloadPb)
-		if err != nil {
-			return nil, handleRPCError(err)
-		}
-	case *pb.ExecutionPayloadCapella:
-		payloadPb, ok := payload.Proto().(*pb.ExecutionPayloadCapella)
-		if !ok {
 			return nil, errors.New("execution data must be a Capella execution payload")
 		}
-		err := s.rpcClient.CallContext(ctx, result, NewPayloadMethodV2, payloadPb)
+		err := s.rpcClient.CallContext(ctx, result, NewPayloadMethod, payloadPb)
 		if err != nil {
 			return nil, handleRPCError(err)
 		}
@@ -181,21 +163,12 @@ func (s *Service) ForkchoiceUpdated(
 		return nil, nil, errors.New("nil payload attributer")
 	}
 	switch attrs.Version() {
-	case version.Bellatrix:
+	case version.Capella:
 		a, err := attrs.PbV1()
 		if err != nil {
 			return nil, nil, err
 		}
 		err = s.rpcClient.CallContext(ctx, result, ForkchoiceUpdatedMethod, state, a)
-		if err != nil {
-			return nil, nil, handleRPCError(err)
-		}
-	case version.Capella:
-		a, err := attrs.PbV2()
-		if err != nil {
-			return nil, nil, err
-		}
-		err = s.rpcClient.CallContext(ctx, result, ForkchoiceUpdatedMethodV2, state, a)
 		if err != nil {
 			return nil, nil, handleRPCError(err)
 		}
@@ -233,14 +206,14 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 	defer cancel()
 
 	if slots.ToEpoch(slot) >= params.BeaconConfig().CapellaForkEpoch {
-		result := &pb.ExecutionPayloadCapellaWithValue{}
+		result := &pb.ExecutionPayloadWithValue{}
 		err := s.rpcClient.CallContext(ctx, result, GetPayloadMethodV2, pb.PayloadIDBytes(payloadId))
 		if err != nil {
 			return nil, handleRPCError(err)
 		}
 
 		v := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(result.Value))
-		return blocks.WrappedExecutionPayloadCapella(result.Payload, math.WeiToGwei(v))
+		return blocks.WrappedExecutionPayload(result.Payload, math.WeiToGwei(v))
 	}
 
 	result := &pb.ExecutionPayload{}

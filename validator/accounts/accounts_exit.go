@@ -12,7 +12,6 @@ import (
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/io/file"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -156,12 +155,13 @@ func displayExitInfo(rawExitedKeys [][]byte, trimmedExitedKeys []string) {
 	if len(rawExitedKeys) > 0 {
 		urlFormattedPubKeys := make([]string, len(rawExitedKeys))
 		for i, key := range rawExitedKeys {
-			var baseUrl string
-			if params.BeaconConfig().ConfigName == params.PraterName || params.BeaconConfig().ConfigName == params.GoerliName {
-				baseUrl = "https://goerli.beaconcha.in/validator/"
-			} else {
-				baseUrl = "https://beaconcha.in/validator/"
-			}
+			baseUrl := "https://beaconcha.in/validator/"
+			// var baseUrl string
+			// if params.BeaconConfig().ConfigName == params.PraterName || params.BeaconConfig().ConfigName == params.GoerliName {
+			// 	baseUrl = "https://goerli.beaconcha.in/validator/"
+			// } else {
+			// 	baseUrl = "https://beaconcha.in/validator/"
+			// }
 			// Remove '0x' prefix
 			urlFormattedPubKeys[i] = baseUrl + hexutil.Encode(key)[2:]
 		}

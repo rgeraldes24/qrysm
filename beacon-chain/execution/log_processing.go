@@ -56,8 +56,8 @@ func (s *Service) GenesisExecutionChainInfo() (uint64, *big.Int) {
 	return s.chainStartData.GenesisTime, big.NewInt(int64(s.chainStartData.GenesisBlock))
 }
 
-// ProcessETH1Block processes logs from the provided zond1 block.
-func (s *Service) ProcessETH1Block(ctx context.Context, blkNum *big.Int) error {
+// ProcessZOND1Block processes logs from the provided zond1 block.
+func (s *Service) ProcessZOND1Block(ctx context.Context, blkNum *big.Int) error {
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{
 			s.cfg.depositContractAddr,
@@ -115,7 +115,7 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog zondtypes.Lo
 	}
 	// If we have already seen this Merkle index, skip processing the log.
 	// This can happen sometimes when we receive the same log twice from the
-	// ETH1.0 network, and prevents us from updating our trie
+	// ZOND1.0 network, and prevents us from updating our trie
 	// with the same log twice, causing an inconsistent state root.
 	index := int64(binary.LittleEndian.Uint64(merkleTreeIndex)) // lint:ignore uintcast -- MerkleTreeIndex should not exceed int64 in your lifetime.
 	if index <= s.lastReceivedMerkleIndex {
@@ -464,7 +464,7 @@ func (s *Service) requestBatchedHeadersAndLogs(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		err = s.ProcessETH1Block(ctx, big.NewInt(0).SetUint64(i))
+		err = s.ProcessZOND1Block(ctx, big.NewInt(0).SetUint64(i))
 		if err != nil {
 			return err
 		}
@@ -555,7 +555,7 @@ func (s *Service) savePowchainData(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	zond1Data := &zondpb.ETH1ChainData{
+	zond1Data := &zondpb.ZOND1ChainData{
 		CurrentZond1Data:  s.latestZond1Data,
 		ChainstartData:    s.chainStartData,
 		BeaconState:       pbState, // I promise not to mutate it!

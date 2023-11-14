@@ -62,7 +62,7 @@ func TestProcessDeposit_OK(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "Unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "Unable to setup web3 ZOND1.0 chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 
@@ -91,7 +91,7 @@ func TestProcessDeposit_InvalidMerkleBranch(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 
 	deposits, _, err := util.DeterministicDepositsAndKeys(1)
@@ -122,7 +122,7 @@ func TestProcessDeposit_InvalidPublicKey(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 
 	deposits, _, err := util.DeterministicDepositsAndKeys(1)
@@ -164,7 +164,7 @@ func TestProcessDeposit_InvalidSignature(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 
 	deposits, _, err := util.DeterministicDepositsAndKeys(1)
@@ -206,7 +206,7 @@ func TestProcessDeposit_UnableToVerify(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 
 	deposits, keys, err := util.DeterministicDepositsAndKeys(1)
@@ -244,7 +244,7 @@ func TestProcessDeposit_IncompleteDeposit(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 	require.NoError(t, web3Service.preGenesisState.SetValidators([]*zondpb.Validator{}))
 
@@ -313,7 +313,7 @@ func TestProcessDeposit_AllDepositedSuccessfully(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 
 	deposits, keys, err := util.DeterministicDepositsAndKeys(10)

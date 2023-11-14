@@ -75,9 +75,9 @@ func Test_SignedBeaconBlock_IsNil(t *testing.T) {
 }
 
 func Test_SignedBeaconBlock_Copy(t *testing.T) {
-	bb := &BeaconBlockBody{}
-	b := &BeaconBlock{body: bb}
-	sb := &SignedBeaconBlock{block: b}
+	bb := &BeaconBlockBody{version: version.Capella}
+	b := &BeaconBlock{version: version.Capella, body: bb}
+	sb := &SignedBeaconBlock{version: version.Capella, block: b}
 	cp, err := sb.Copy()
 	require.NoError(t, err)
 	assert.NotEqual(t, cp, sb)
@@ -92,7 +92,7 @@ func Test_SignedBeaconBlock_Version(t *testing.T) {
 
 func Test_SignedBeaconBlock_Header(t *testing.T) {
 	bb := &BeaconBlockBody{
-		version:      version.Phase0,
+		version:      version.Capella,
 		randaoReveal: [dilithium2.CryptoBytes]byte{},
 		zond1Data: &zond.Zond1Data{
 			DepositRoot: make([]byte, 32),
@@ -101,9 +101,9 @@ func Test_SignedBeaconBlock_Header(t *testing.T) {
 		graffiti: [32]byte{},
 	}
 	sb := &SignedBeaconBlock{
-		version: version.Phase0,
+		version: version.Capella,
 		block: &BeaconBlock{
-			version:       version.Phase0,
+			version:       version.Capella,
 			slot:          128,
 			proposerIndex: 128,
 			parentRoot:    bytesutil.ToBytes32([]byte("parentroot")),
@@ -225,7 +225,7 @@ func Test_BeaconBlock_HashTreeRoot(t *testing.T) {
 	pb := hydrateBeaconBlock()
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	b, err := initBlockFromProtoPhase0(pb)
+	b, err := initBlockFromProtoCapella(pb)
 	require.NoError(t, err)
 	actualHTR, err := b.HashTreeRoot()
 	require.NoError(t, err)
@@ -236,7 +236,7 @@ func Test_BeaconBlock_HashTreeRootWith(t *testing.T) {
 	pb := hydrateBeaconBlock()
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	b, err := initBlockFromProtoPhase0(pb)
+	b, err := initBlockFromProtoCapella(pb)
 	require.NoError(t, err)
 	h := ssz.DefaultHasherPool.Get()
 	require.NoError(t, b.HashTreeRootWith(h))
@@ -266,7 +266,7 @@ func Test_BeaconBlock_AsSignRequestObject(t *testing.T) {
 	pb := hydrateBeaconBlock()
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	b, err := initBlockFromProtoPhase0(pb)
+	b, err := initBlockFromProtoCapella(pb)
 	require.NoError(t, err)
 	signRequestObj, err := b.AsSignRequestObject()
 	require.NoError(t, err)
@@ -384,7 +384,7 @@ func Test_BeaconBlockBody_HashTreeRoot(t *testing.T) {
 	pb := hydrateBeaconBlockBody()
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	b, err := initBlockBodyFromProtoPhase0(pb)
+	b, err := initBlockBodyFromProtoCapella(pb)
 	require.NoError(t, err)
 	actualHTR, err := b.HashTreeRoot()
 	require.NoError(t, err)

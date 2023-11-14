@@ -3,18 +3,17 @@ package detect
 import (
 	"fmt"
 
-	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
-	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
-	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	"github.com/theQRL/qrysm/v4/network/forks"
-
 	"github.com/pkg/errors"
 	ssz "github.com/prysmaticlabs/fastssz"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
+	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
+	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	"github.com/theQRL/qrysm/v4/network/forks"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -61,12 +60,6 @@ func FromForkVersion(cv [fieldparams.VersionLength]byte) (*VersionedUnmarshaler,
 	var fork int
 	switch cv {
 	case bytesutil.ToBytes4(cfg.GenesisForkVersion):
-		fork = version.Phase0
-	case bytesutil.ToBytes4(cfg.AltairForkVersion):
-		fork = version.Altair
-	case bytesutil.ToBytes4(cfg.BellatrixForkVersion):
-		fork = version.Bellatrix
-	case bytesutil.ToBytes4(cfg.CapellaForkVersion):
 		fork = version.Capella
 	default:
 		return nil, errors.Wrapf(ErrForkNotFound, "version=%#x", cv)
@@ -83,38 +76,8 @@ func FromForkVersion(cv [fieldparams.VersionLength]byte) (*VersionedUnmarshaler,
 func (cf *VersionedUnmarshaler) UnmarshalBeaconState(marshaled []byte) (s state.BeaconState, err error) {
 	forkName := version.String(cf.Fork)
 	switch fork := cf.Fork; fork {
-	case version.Phase0:
-		st := &zondpb.BeaconState{}
-		err = st.UnmarshalSSZ(marshaled)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to unmarshal state, detected fork=%s", forkName)
-		}
-		s, err = state_native.InitializeFromProtoUnsafePhase0(st)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to init state trie from state, detected fork=%s", forkName)
-		}
-	case version.Altair:
-		st := &zondpb.BeaconStateAltair{}
-		err = st.UnmarshalSSZ(marshaled)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to unmarshal state, detected fork=%s", forkName)
-		}
-		s, err = state_native.InitializeFromProtoUnsafeAltair(st)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to init state trie from state, detected fork=%s", forkName)
-		}
-	case version.Bellatrix:
-		st := &zondpb.BeaconStateBellatrix{}
-		err = st.UnmarshalSSZ(marshaled)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to unmarshal state, detected fork=%s", forkName)
-		}
-		s, err = state_native.InitializeFromProtoUnsafeBellatrix(st)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to init state trie from state, detected fork=%s", forkName)
-		}
 	case version.Capella:
-		st := &zondpb.BeaconStateCapella{}
+		st := &zondpb.BeaconState{}
 		err = st.UnmarshalSSZ(marshaled)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to unmarshal state, detected fork=%s", forkName)
@@ -161,14 +124,8 @@ func (cf *VersionedUnmarshaler) UnmarshalBeaconBlock(marshaled []byte) (interfac
 
 	var blk ssz.Unmarshaler
 	switch cf.Fork {
-	case version.Phase0:
-		blk = &zondpb.SignedBeaconBlock{}
-	case version.Altair:
-		blk = &zondpb.SignedBeaconBlockAltair{}
-	case version.Bellatrix:
-		blk = &zondpb.SignedBeaconBlockBellatrix{}
 	case version.Capella:
-		blk = &zondpb.SignedBeaconBlockCapella{}
+		blk = &zondpb.SignedBeaconBlock{}
 	default:
 		forkName := version.String(cf.Fork)
 		return nil, fmt.Errorf("unable to initialize ReadOnlyBeaconBlock for fork version=%s at slot=%d", forkName, slot)
@@ -194,14 +151,8 @@ func (cf *VersionedUnmarshaler) UnmarshalBlindedBeaconBlock(marshaled []byte) (i
 
 	var blk ssz.Unmarshaler
 	switch cf.Fork {
-	case version.Phase0:
-		blk = &zondpb.SignedBeaconBlock{}
-	case version.Altair:
-		blk = &zondpb.SignedBeaconBlockAltair{}
-	case version.Bellatrix:
-		blk = &zondpb.SignedBlindedBeaconBlockBellatrix{}
 	case version.Capella:
-		blk = &zondpb.SignedBlindedBeaconBlockCapella{}
+		blk = &zondpb.SignedBlindedBeaconBlock{}
 	default:
 		forkName := version.String(cf.Fork)
 		return nil, fmt.Errorf("unable to initialize ReadOnlyBeaconBlock for fork version=%s at slot=%d", forkName, slot)

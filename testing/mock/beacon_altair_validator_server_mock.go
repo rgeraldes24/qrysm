@@ -64,20 +64,6 @@ func (mr *MockBeaconNodeValidatorAltair_StreamBlocksServerMockRecorder) RecvMsg(
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockBeaconNodeValidatorAltair_StreamBlocksServer)(nil).RecvMsg), arg0)
 }
 
-// Send mocks base method
-func (m *MockBeaconNodeValidatorAltair_StreamBlocksServer) Send(arg0 *v2.StreamBlocksResponse) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Send", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Send indicates an expected call of Send
-func (mr *MockBeaconNodeValidatorAltair_StreamBlocksServerMockRecorder) Send(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockBeaconNodeValidatorAltair_StreamBlocksServer)(nil).Send), arg0)
-}
-
 // SendHeader mocks base method
 func (m *MockBeaconNodeValidatorAltair_StreamBlocksServer) SendHeader(arg0 metadata.MD) error {
 	m.ctrl.T.Helper()

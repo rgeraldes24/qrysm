@@ -119,39 +119,16 @@ func InitWithReset(c *Flags) func() {
 
 // configureTestnet sets the config according to specified testnet flag
 func configureTestnet(ctx *cli.Context) error {
-	if ctx.Bool(PraterTestnet.Name) {
-		log.Warn("Running on the Prater Testnet")
-		if err := params.SetActive(params.PraterConfig().Copy()); err != nil {
-			return err
-		}
-		applyPraterFeatureFlags(ctx)
-		params.UsePraterNetworkConfig()
-	} else if ctx.Bool(SepoliaTestnet.Name) {
-		log.Warn("Running on the Sepolia Beacon Chain Testnet")
-		if err := params.SetActive(params.SepoliaConfig().Copy()); err != nil {
-			return err
-		}
-		applySepoliaFeatureFlags(ctx)
-		params.UseSepoliaNetworkConfig()
+	if ctx.IsSet(cmd.ChainConfigFileFlag.Name) {
+		log.Warn("Running on custom Zond network specified in a chain configuration yaml file")
 	} else {
-		if ctx.IsSet(cmd.ChainConfigFileFlag.Name) {
-			log.Warn("Running on custom Ethereum network specified in a chain configuration yaml file")
-		} else {
-			log.Warn("Running on Ethereum Mainnet")
-		}
-		if err := params.SetActive(params.MainnetConfig().Copy()); err != nil {
-			return err
-		}
+		log.Warn("Running on Zond Mainnet")
 	}
+	if err := params.SetActive(params.MainnetConfig().Copy()); err != nil {
+		return err
+	}
+
 	return nil
-}
-
-// Insert feature flags within the function to be enabled for Prater testnet.
-func applyPraterFeatureFlags(ctx *cli.Context) {
-}
-
-// Insert feature flags within the function to be enabled for Sepolia testnet.
-func applySepoliaFeatureFlags(ctx *cli.Context) {
 }
 
 // ConfigureBeaconChain sets the global config based

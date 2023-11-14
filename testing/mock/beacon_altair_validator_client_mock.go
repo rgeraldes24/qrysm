@@ -9,7 +9,6 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	v2 "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	metadata "google.golang.org/grpc/metadata"
 )
 
@@ -77,21 +76,6 @@ func (m *MockBeaconNodeValidatorAltair_StreamBlocksClient) Header() (metadata.MD
 func (mr *MockBeaconNodeValidatorAltair_StreamBlocksClientMockRecorder) Header() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Header", reflect.TypeOf((*MockBeaconNodeValidatorAltair_StreamBlocksClient)(nil).Header))
-}
-
-// Recv mocks base method
-func (m *MockBeaconNodeValidatorAltair_StreamBlocksClient) Recv() (*v2.StreamBlocksResponse, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Recv")
-	ret0, _ := ret[0].(*v2.StreamBlocksResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Recv indicates an expected call of Recv
-func (mr *MockBeaconNodeValidatorAltair_StreamBlocksClientMockRecorder) Recv() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Recv", reflect.TypeOf((*MockBeaconNodeValidatorAltair_StreamBlocksClient)(nil).Recv))
 }
 
 // RecvMsg mocks base method

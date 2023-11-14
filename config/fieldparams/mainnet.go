@@ -9,7 +9,7 @@ const (
 	RandaoMixesLength                     = 65536         // EPOCHS_PER_HISTORICAL_VECTOR
 	HistoricalRootsLength                 = 16777216      // HISTORICAL_ROOTS_LIMIT
 	ValidatorRegistryLimit                = 1099511627776 // VALIDATOR_REGISTRY_LIMIT
-	Zond1DataVotesLength                  = 2048          // SLOTS_PER_ETH1_VOTING_PERIOD
+	Zond1DataVotesLength                  = 2048          // SLOTS_PER_ZOND1_VOTING_PERIOD
 	PreviousEpochAttestationsLength       = 4096          // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
 	CurrentEpochAttestationsLength        = 4096          // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
 	SlashingsLength                       = 8192          // EPOCHS_PER_SLASHINGS_VECTOR

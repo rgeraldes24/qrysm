@@ -95,11 +95,11 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EffectiveBalanceIncrement: 1 * 1e9,
 
 	// Initial value constants.
-	BLSWithdrawalPrefixByte:         byte(0),
-	DilithiumWithdrawalPrefixByte:   byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
-	ETH1AddressWithdrawalPrefixByte: byte(1),
-	ZondAddressWithdrawalPrefixByte: byte(1), // TODO (cyyber): Change it to 0
-	ZeroHash:                        [32]byte{},
+	BLSWithdrawalPrefixByte:          byte(0),
+	DilithiumWithdrawalPrefixByte:    byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
+	ZOND1AddressWithdrawalPrefixByte: byte(1),
+	ZondAddressWithdrawalPrefixByte:  byte(1), // TODO (cyyber): Change it to 0
+	ZeroHash:                         [32]byte{},
 
 	// Time parameter constants.
 	MinAttestationInclusionDelay:     1,
@@ -137,7 +137,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Additional context: https://github.com/ethereum/consensus-specs/issues/2132
 	// Bug prompting this change: https://github.com/theQRL/qrysm/issues/7856
 	// Future optimization: https://github.com/theQRL/qrysm/issues/7739
-	SecondsPerETH1Block: 14,
+	SecondsPerZOND1Block: 14,
 
 	// State list length constants.
 	EpochsPerHistoricalVector: 65536,

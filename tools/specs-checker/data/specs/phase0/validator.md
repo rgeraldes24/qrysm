@@ -44,7 +44,7 @@ def compute_time_at_slot(state: BeaconState, slot: Slot) -> uint64:
 ```
 ```python
 def voting_period_start_time(state: BeaconState) -> uint64:
-    zond1_voting_period_start_slot = Slot(state.slot - state.slot % (EPOCHS_PER_ETH1_VOTING_PERIOD * SLOTS_PER_EPOCH))
+    zond1_voting_period_start_slot = Slot(state.slot - state.slot % (EPOCHS_PER_ZOND1_VOTING_PERIOD * SLOTS_PER_EPOCH))
     return compute_time_at_slot(state, zond1_voting_period_start_slot)
 ```
 ```python

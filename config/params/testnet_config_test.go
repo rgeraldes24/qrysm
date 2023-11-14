@@ -77,7 +77,7 @@ func compareConfigs(t *testing.T, expected, actual *params.BeaconChainConfig) {
 	require.DeepEqual(t, expected.MinEpochsToInactivityPenalty, actual.MinEpochsToInactivityPenalty)
 	require.DeepEqual(t, expected.Zond1FollowDistance, actual.Zond1FollowDistance)
 	require.DeepEqual(t, expected.DeprecatedSafeSlotsToUpdateJustified, actual.DeprecatedSafeSlotsToUpdateJustified)
-	require.DeepEqual(t, expected.SecondsPerETH1Block, actual.SecondsPerETH1Block)
+	require.DeepEqual(t, expected.SecondsPerZOND1Block, actual.SecondsPerZOND1Block)
 	require.DeepEqual(t, expected.ProposerScoreBoost, actual.ProposerScoreBoost)
 	require.DeepEqual(t, expected.IntervalsPerSlot, actual.IntervalsPerSlot)
 	require.DeepEqual(t, expected.DepositChainID, actual.DepositChainID)

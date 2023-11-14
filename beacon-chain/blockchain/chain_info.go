@@ -71,7 +71,7 @@ type HeadFetcher interface {
 	HeadStateReadOnly(ctx context.Context) (state.ReadOnlyBeaconState, error)
 	HeadValidatorsIndices(ctx context.Context, epoch primitives.Epoch) ([]primitives.ValidatorIndex, error)
 	HeadGenesisValidatorsRoot() [32]byte
-	HeadETH1Data() *zondpb.Zond1Data
+	HeadZOND1Data() *zondpb.Zond1Data
 	HeadPublicKeyToValidatorIndex(pubKey [dilithium2.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool)
 	HeadValidatorIndexToPublicKey(ctx context.Context, index primitives.ValidatorIndex) ([dilithium2.CryptoPublicKeyBytes]byte, error)
 	ChainHeads() ([][32]byte, []primitives.Slot)
@@ -254,8 +254,8 @@ func (s *Service) HeadGenesisValidatorsRoot() [32]byte {
 	return s.headGenesisValidatorsRoot()
 }
 
-// HeadETH1Data returns the zond1data of the current head state.
-func (s *Service) HeadETH1Data() *zondpb.Zond1Data {
+// HeadZOND1Data returns the zond1data of the current head state.
+func (s *Service) HeadZOND1Data() *zondpb.Zond1Data {
 	s.headLock.RLock()
 	defer s.headLock.RUnlock()
 
@@ -335,9 +335,9 @@ func (s *Service) HeadValidatorIndexToPublicKey(_ context.Context, index primiti
 
 // IsOptimistic returns true if the current head is optimistic.
 func (s *Service) IsOptimistic(_ context.Context) (bool, error) {
-	if slots.ToEpoch(s.CurrentSlot()) < params.BeaconConfig().BellatrixForkEpoch {
-		return false, nil
-	}
+	// if slots.ToEpoch(s.CurrentSlot()) < params.BeaconConfig().BellatrixForkEpoch {
+	// 	return false, nil
+	// }
 	s.headLock.RLock()
 	headRoot := s.head.root
 	headSlot := s.head.slot

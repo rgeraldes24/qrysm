@@ -209,14 +209,14 @@ func ProcessSlashings(state state.BeaconState, slashingMultiplier uint64) (state
 	return state, err
 }
 
-// ProcessZond1DataReset processes updates to ETH1 data votes during epoch processing.
+// ProcessZond1DataReset processes updates to ZOND1 data votes during epoch processing.
 //
 // Spec pseudocode definition:
 //
 //	def process_zond1_data_reset(state: BeaconState) -> None:
 //	  next_epoch = Epoch(get_current_epoch(state) + 1)
 //	  # Reset zond1 data votes
-//	  if next_epoch % EPOCHS_PER_ETH1_VOTING_PERIOD == 0:
+//	  if next_epoch % EPOCHS_PER_ZOND1_VOTING_PERIOD == 0:
 //	      state.zond1_data_votes = []
 func ProcessZond1DataReset(state state.BeaconState) (state.BeaconState, error) {
 	currentEpoch := time.CurrentEpoch(state)
@@ -411,7 +411,7 @@ func ProcessParticipationRecordUpdates(state state.BeaconState) (state.BeaconSta
 func ProcessFinalUpdates(state state.BeaconState) (state.BeaconState, error) {
 	var err error
 
-	// Reset ETH1 data votes.
+	// Reset ZOND1 data votes.
 	state, err = ProcessZond1DataReset(state)
 	if err != nil {
 		return nil, err

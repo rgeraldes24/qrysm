@@ -407,21 +407,6 @@ func (mr *MockBeaconChain_StreamValidatorsInfoServerMockRecorder) Context() *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockBeaconChain_StreamValidatorsInfoServer)(nil).Context))
 }
 
-// Recv mocks base method.
-func (m *MockBeaconChain_StreamValidatorsInfoServer) Recv() (*zond.ValidatorChangeSet, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Recv")
-	ret0, _ := ret[0].(*zond.ValidatorChangeSet)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Recv indicates an expected call of Recv.
-func (mr *MockBeaconChain_StreamValidatorsInfoServerMockRecorder) Recv() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Recv", reflect.TypeOf((*MockBeaconChain_StreamValidatorsInfoServer)(nil).Recv))
-}
-
 // RecvMsg mocks base method.
 func (m *MockBeaconChain_StreamValidatorsInfoServer) RecvMsg(arg0 interface{}) error {
 	m.ctrl.T.Helper()

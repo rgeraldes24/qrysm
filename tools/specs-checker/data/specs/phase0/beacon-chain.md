@@ -792,7 +792,7 @@ def process_slashings(state: BeaconState) -> None:
 def process_zond1_data_reset(state: BeaconState) -> None:
     next_epoch = Epoch(get_current_epoch(state) + 1)
     # Reset zond1 data votes
-    if next_epoch % EPOCHS_PER_ETH1_VOTING_PERIOD == 0:
+    if next_epoch % EPOCHS_PER_ZOND1_VOTING_PERIOD == 0:
         state.zond1_data_votes = []
 ```
 ```python
@@ -880,7 +880,7 @@ def process_randao(state: BeaconState, body: BeaconBlockBody) -> None:
 ```python
 def process_zond1_data(state: BeaconState, body: BeaconBlockBody) -> None:
     state.zond1_data_votes.append(body.zond1_data)
-    if state.zond1_data_votes.count(body.zond1_data) * 2 > EPOCHS_PER_ETH1_VOTING_PERIOD * SLOTS_PER_EPOCH:
+    if state.zond1_data_votes.count(body.zond1_data) * 2 > EPOCHS_PER_ZOND1_VOTING_PERIOD * SLOTS_PER_EPOCH:
         state.zond1_data = body.zond1_data
 ```
 ```python

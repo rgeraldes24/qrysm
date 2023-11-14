@@ -18,7 +18,6 @@ import (
 	"github.com/theQRL/qrysm/v4/proto/migration"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 )
 
 const (
@@ -27,7 +26,7 @@ const (
 	broadcastValidationConsensusAndEquivocation = "consensus_and_equivocation"
 )
 
-// PublishBlindedBlockV2 instructs the beacon node to use the components of the `SignedBlindedBeaconBlock` to construct and publish a
+// PublishBlindedBlock instructs the beacon node to use the components of the `SignedBlindedBeaconBlock` to construct and publish a
 // `SignedBeaconBlock` by swapping out the `transactions_root` for the corresponding full list of `transactions`.
 // The beacon node should broadcast a newly constructed `SignedBeaconBlock` to the beacon network,
 // to be included in the beacon chain. The beacon node is not required to validate the signed
@@ -37,19 +36,19 @@ const (
 // broadcast but a different status code is returned (202). Pre-Bellatrix, this endpoint will accept
 // a `SignedBeaconBlock`. The broadcast behaviour may be adjusted via the `broadcast_validation`
 // query parameter.
-func (bs *Server) PublishBlindedBlockV2(w http.ResponseWriter, r *http.Request) {
+func (bs *Server) PublishBlindedBlock(w http.ResponseWriter, r *http.Request) {
 	if ok := bs.checkSync(r.Context(), w); !ok {
 		return
 	}
 	isSSZ, err := http2.SszRequested(r)
 	if isSSZ && err == nil {
-		publishBlindedBlockV2SSZ(bs, w, r)
+		publishBlindedBlockSSZ(bs, w, r)
 	} else {
-		publishBlindedBlockV2(bs, w, r)
+		publishBlindedBlock(bs, w, r)
 	}
 }
 
-func publishBlindedBlockV2SSZ(bs *Server, w http.ResponseWriter, r *http.Request) {
+func publishBlindedBlockSSZ(bs *Server, w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		errJson := &http2.DefaultErrorJson{
@@ -59,7 +58,7 @@ func publishBlindedBlockV2SSZ(bs *Server, w http.ResponseWriter, r *http.Request
 		http2.WriteError(w, errJson)
 		return
 	}
-	capellaBlock := &zondpbv2.SignedBlindedBeaconBlockCapella{}
+	capellaBlock := &zondpbv1.SignedBlindedBeaconBlock{}
 	if err := capellaBlock.UnmarshalSSZ(body); err == nil {
 		v1block, err := migration.BlindedCapellaToV1Alpha1SignedBlock(capellaBlock)
 		if err != nil {
@@ -86,89 +85,7 @@ func publishBlindedBlockV2SSZ(bs *Server, w http.ResponseWriter, r *http.Request
 		bs.proposeBlock(r.Context(), w, genericBlock)
 		return
 	}
-	bellatrixBlock := &zondpbv2.SignedBlindedBeaconBlockBellatrix{}
-	if err := bellatrixBlock.UnmarshalSSZ(body); err == nil {
-		v1block, err := migration.BlindedBellatrixToV1Alpha1SignedBlock(bellatrixBlock)
-		if err != nil {
-			errJson := &http2.DefaultErrorJson{
-				Message: "Could not decode request body into consensus block: " + err.Error(),
-				Code:    http.StatusBadRequest,
-			}
-			http2.WriteError(w, errJson)
-			return
-		}
-		genericBlock := &zond.GenericSignedBeaconBlock{
-			Block: &zond.GenericSignedBeaconBlock_BlindedBellatrix{
-				BlindedBellatrix: v1block,
-			},
-		}
-		if err = bs.validateBroadcast(r, genericBlock); err != nil {
-			errJson := &http2.DefaultErrorJson{
-				Message: err.Error(),
-				Code:    http.StatusBadRequest,
-			}
-			http2.WriteError(w, errJson)
-			return
-		}
-		bs.proposeBlock(r.Context(), w, genericBlock)
-		return
-	}
 
-	// blinded is not supported before bellatrix hardfork
-	altairBlock := &zondpbv2.SignedBeaconBlockAltair{}
-	if err := altairBlock.UnmarshalSSZ(body); err == nil {
-		v1block, err := migration.AltairToV1Alpha1SignedBlock(altairBlock)
-		if err != nil {
-			errJson := &http2.DefaultErrorJson{
-				Message: "Could not decode request body into consensus block: " + err.Error(),
-				Code:    http.StatusBadRequest,
-			}
-			http2.WriteError(w, errJson)
-			return
-		}
-		genericBlock := &zond.GenericSignedBeaconBlock{
-			Block: &zond.GenericSignedBeaconBlock_Altair{
-				Altair: v1block,
-			},
-		}
-		if err = bs.validateBroadcast(r, genericBlock); err != nil {
-			errJson := &http2.DefaultErrorJson{
-				Message: err.Error(),
-				Code:    http.StatusBadRequest,
-			}
-			http2.WriteError(w, errJson)
-			return
-		}
-		bs.proposeBlock(r.Context(), w, genericBlock)
-		return
-	}
-	phase0Block := &zondpbv1.SignedBeaconBlock{}
-	if err := phase0Block.UnmarshalSSZ(body); err == nil {
-		v1block, err := migration.V1ToV1Alpha1SignedBlock(phase0Block)
-		if err != nil {
-			errJson := &http2.DefaultErrorJson{
-				Message: "Could not decode request body into consensus block: " + err.Error(),
-				Code:    http.StatusBadRequest,
-			}
-			http2.WriteError(w, errJson)
-			return
-		}
-		genericBlock := &zond.GenericSignedBeaconBlock{
-			Block: &zond.GenericSignedBeaconBlock_Phase0{
-				Phase0: v1block,
-			},
-		}
-		if err = bs.validateBroadcast(r, genericBlock); err != nil {
-			errJson := &http2.DefaultErrorJson{
-				Message: err.Error(),
-				Code:    http.StatusBadRequest,
-			}
-			http2.WriteError(w, errJson)
-			return
-		}
-		bs.proposeBlock(r.Context(), w, genericBlock)
-		return
-	}
 	errJson := &http2.DefaultErrorJson{
 		Message: "Body does not represent a valid block type",
 		Code:    http.StatusBadRequest,
@@ -176,7 +93,7 @@ func publishBlindedBlockV2SSZ(bs *Server, w http.ResponseWriter, r *http.Request
 	http2.WriteError(w, errJson)
 }
 
-func publishBlindedBlockV2(bs *Server, w http.ResponseWriter, r *http.Request) {
+func publishBlindedBlock(bs *Server, w http.ResponseWriter, r *http.Request) {
 	validate := validator.New()
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -293,7 +210,7 @@ func publishBlindedBlockV2(bs *Server, w http.ResponseWriter, r *http.Request) {
 	http2.WriteError(w, errJson)
 }
 
-// PublishBlockV2 instructs the beacon node to broadcast a newly signed beacon block to the beacon network,
+// PublishBlock instructs the beacon node to broadcast a newly signed beacon block to the beacon network,
 // to be included in the beacon chain. A success response (20x) indicates that the block
 // passed gossip validation and was successfully broadcast onto the network.
 // The beacon node is also expected to integrate the block into the state, but may broadcast it
@@ -301,19 +218,19 @@ func publishBlindedBlockV2(bs *Server, w http.ResponseWriter, r *http.Request) {
 // validation, a separate success response code (202) is used to indicate that the block was
 // successfully broadcast but failed integration. The broadcast behaviour may be adjusted via the
 // `broadcast_validation` query parameter.
-func (bs *Server) PublishBlockV2(w http.ResponseWriter, r *http.Request) {
+func (bs *Server) PublishBlock(w http.ResponseWriter, r *http.Request) {
 	if ok := bs.checkSync(r.Context(), w); !ok {
 		return
 	}
 	isSSZ, err := http2.SszRequested(r)
 	if isSSZ && err == nil {
-		publishBlockV2SSZ(bs, w, r)
+		publishBlockSSZ(bs, w, r)
 	} else {
-		publishBlockV2(bs, w, r)
+		publishBlock(bs, w, r)
 	}
 }
 
-func publishBlockV2SSZ(bs *Server, w http.ResponseWriter, r *http.Request) {
+func publishBlockSSZ(bs *Server, w http.ResponseWriter, r *http.Request) {
 	validate := validator.New()
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -324,7 +241,7 @@ func publishBlockV2SSZ(bs *Server, w http.ResponseWriter, r *http.Request) {
 		http2.WriteError(w, errJson)
 		return
 	}
-	capellaBlock := &zondpbv2.SignedBeaconBlockCapella{}
+	capellaBlock := &zondpbv1.SignedBeaconBlock{}
 	if err := capellaBlock.UnmarshalSSZ(body); err == nil {
 		if err = validate.Struct(capellaBlock); err == nil {
 			v1block, err := migration.CapellaToV1Alpha1SignedBlock(capellaBlock)
@@ -353,93 +270,6 @@ func publishBlockV2SSZ(bs *Server, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	bellatrixBlock := &zondpbv2.SignedBeaconBlockBellatrix{}
-	if err := bellatrixBlock.UnmarshalSSZ(body); err == nil {
-		if err = validate.Struct(bellatrixBlock); err == nil {
-			v1block, err := migration.BellatrixToV1Alpha1SignedBlock(bellatrixBlock)
-			if err != nil {
-				errJson := &http2.DefaultErrorJson{
-					Message: "Could not decode request body into consensus block: " + err.Error(),
-					Code:    http.StatusBadRequest,
-				}
-				http2.WriteError(w, errJson)
-				return
-			}
-			genericBlock := &zond.GenericSignedBeaconBlock{
-				Block: &zond.GenericSignedBeaconBlock_Bellatrix{
-					Bellatrix: v1block,
-				},
-			}
-			if err = bs.validateBroadcast(r, genericBlock); err != nil {
-				errJson := &http2.DefaultErrorJson{
-					Message: err.Error(),
-					Code:    http.StatusBadRequest,
-				}
-				http2.WriteError(w, errJson)
-				return
-			}
-			bs.proposeBlock(r.Context(), w, genericBlock)
-			return
-		}
-	}
-	altairBlock := &zondpbv2.SignedBeaconBlockAltair{}
-	if err := altairBlock.UnmarshalSSZ(body); err == nil {
-		if err = validate.Struct(altairBlock); err == nil {
-			v1block, err := migration.AltairToV1Alpha1SignedBlock(altairBlock)
-			if err != nil {
-				errJson := &http2.DefaultErrorJson{
-					Message: "Could not decode request body into consensus block: " + err.Error(),
-					Code:    http.StatusBadRequest,
-				}
-				http2.WriteError(w, errJson)
-				return
-			}
-			genericBlock := &zond.GenericSignedBeaconBlock{
-				Block: &zond.GenericSignedBeaconBlock_Altair{
-					Altair: v1block,
-				},
-			}
-			if err = bs.validateBroadcast(r, genericBlock); err != nil {
-				errJson := &http2.DefaultErrorJson{
-					Message: err.Error(),
-					Code:    http.StatusBadRequest,
-				}
-				http2.WriteError(w, errJson)
-				return
-			}
-			bs.proposeBlock(r.Context(), w, genericBlock)
-			return
-		}
-	}
-	phase0Block := &zondpbv1.SignedBeaconBlock{}
-	if err := phase0Block.UnmarshalSSZ(body); err == nil {
-		if err = validate.Struct(phase0Block); err == nil {
-			v1block, err := migration.V1ToV1Alpha1SignedBlock(phase0Block)
-			if err != nil {
-				errJson := &http2.DefaultErrorJson{
-					Message: "Could not decode request body into consensus block: " + err.Error(),
-					Code:    http.StatusBadRequest,
-				}
-				http2.WriteError(w, errJson)
-				return
-			}
-			genericBlock := &zond.GenericSignedBeaconBlock{
-				Block: &zond.GenericSignedBeaconBlock_Phase0{
-					Phase0: v1block,
-				},
-			}
-			if err = bs.validateBroadcast(r, genericBlock); err != nil {
-				errJson := &http2.DefaultErrorJson{
-					Message: err.Error(),
-					Code:    http.StatusBadRequest,
-				}
-				http2.WriteError(w, errJson)
-				return
-			}
-			bs.proposeBlock(r.Context(), w, genericBlock)
-			return
-		}
-	}
 	errJson := &http2.DefaultErrorJson{
 		Message: "Body does not represent a valid block type",
 		Code:    http.StatusBadRequest,
@@ -447,7 +277,7 @@ func publishBlockV2SSZ(bs *Server, w http.ResponseWriter, r *http.Request) {
 	http2.WriteError(w, errJson)
 }
 
-func publishBlockV2(bs *Server, w http.ResponseWriter, r *http.Request) {
+func publishBlock(bs *Server, w http.ResponseWriter, r *http.Request) {
 	validate := validator.New()
 	body, err := io.ReadAll(r.Body)
 	if err != nil {

@@ -67,7 +67,7 @@ func ProcessDilithiumToExecutionChanges(
 //	assert dilithium.Verify(address_change.from_dilitium_pubkey, signing_root, signed_address_change.signature)
 //
 //	validator.withdrawal_credentials = (
-//	    ETH1_ADDRESS_WITHDRAWAL_PREFIX
+//	    ZOND1_ADDRESS_WITHDRAWAL_PREFIX
 //	    + b'\x00' * 11
 //	    + address_change.to_execution_address
 //	)
@@ -80,7 +80,7 @@ func processDilithiumToExecutionChange(st state.BeaconState, signed *zondpb.Sign
 
 	message := signed.Message
 	newCredentials := make([]byte, executionToDilithiumPadding)
-	newCredentials[0] = params.BeaconConfig().ETH1AddressWithdrawalPrefixByte
+	newCredentials[0] = params.BeaconConfig().ZOND1AddressWithdrawalPrefixByte
 	val.WithdrawalCredentials = append(newCredentials, message.ToExecutionAddress...)
 	err = st.UpdateValidatorAtIndex(message.ValidatorIndex, val)
 	return st, err

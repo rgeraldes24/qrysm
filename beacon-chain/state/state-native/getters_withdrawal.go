@@ -93,7 +93,7 @@ func hasETH1WithdrawalCredential(val *zondpb.Validator) bool {
 		return false
 	}
 	cred := val.WithdrawalCredentials
-	return len(cred) > 0 && cred[0] == params.BeaconConfig().ETH1AddressWithdrawalPrefixByte
+	return len(cred) > 0 && cred[0] == params.BeaconConfig().ZOND1AddressWithdrawalPrefixByte
 }
 
 // isFullyWithdrawableValidator returns whether the validator is able to perform a full

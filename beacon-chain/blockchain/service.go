@@ -378,7 +378,7 @@ func (s *Service) onExecutionChainStart(ctx context.Context, genesisTime time.Ti
 
 // initializes the state and genesis block of the beacon chain to persistent storage
 // based on a genesis timestamp value obtained from the ChainStart event emitted
-// by the ETH1.0 Deposit Contract and the POWChain service of the node.
+// by the ZOND1.0 Deposit Contract and the POWChain service of the node.
 func (s *Service) initializeBeaconChain(
 	ctx context.Context,
 	genesisTime time.Time,

@@ -18,7 +18,7 @@ import (
 //
 //	def process_zond1_data(state: BeaconState, body: BeaconBlockBody) -> None:
 //	 state.zond1_data_votes.append(body.zond1_data)
-//	 if state.zond1_data_votes.count(body.zond1_data) * 2 > EPOCHS_PER_ETH1_VOTING_PERIOD * SLOTS_PER_EPOCH:
+//	 if state.zond1_data_votes.count(body.zond1_data) * 2 > EPOCHS_PER_ZOND1_VOTING_PERIOD * SLOTS_PER_EPOCH:
 //	     state.zond1_data = body.zond1_data
 func ProcessZond1DataInBlock(_ context.Context, beaconState state.BeaconState, zond1Data *zondpb.Zond1Data) (state.BeaconState, error) {
 	if beaconState == nil || beaconState.IsNil() {

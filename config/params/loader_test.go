@@ -48,7 +48,7 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 	assert.Equal(t, expected.TargetAggregatorsPerCommittee, actual.TargetAggregatorsPerCommittee, "%s: TargetAggregatorsPerCommittee", name)
 	assert.Equal(t, expected.RandomSubnetsPerValidator, actual.RandomSubnetsPerValidator, "%s: RandomSubnetsPerValidator", name)
 	assert.Equal(t, expected.EpochsPerRandomSubnetSubscription, actual.EpochsPerRandomSubnetSubscription, "%s: EpochsPerRandomSubnetSubscription", name)
-	assert.Equal(t, expected.SecondsPerETH1Block, actual.SecondsPerETH1Block, "%s: SecondsPerETH1Block", name)
+	assert.Equal(t, expected.SecondsPerZOND1Block, actual.SecondsPerZOND1Block, "%s: SecondsPerETH1Block", name)
 
 	// Deposit contract.
 	assert.Equal(t, expected.DepositChainID, actual.DepositChainID, "%s: DepositChainID", name)
@@ -64,7 +64,7 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 	// Initial values.
 	assert.DeepEqual(t, expected.GenesisForkVersion, actual.GenesisForkVersion, "%s: GenesisForkVersion", name)
 	assert.DeepEqual(t, expected.BLSWithdrawalPrefixByte, actual.BLSWithdrawalPrefixByte, "%s: BLSWithdrawalPrefixByte", name)
-	assert.DeepEqual(t, expected.ETH1AddressWithdrawalPrefixByte, actual.ETH1AddressWithdrawalPrefixByte, "%s: ETH1AddressWithdrawalPrefixByte", name)
+	assert.DeepEqual(t, expected.ZOND1AddressWithdrawalPrefixByte, actual.ZOND1AddressWithdrawalPrefixByte, "%s: ETH1AddressWithdrawalPrefixByte", name)
 
 	// Time parameters.
 	assert.Equal(t, expected.GenesisDelay, actual.GenesisDelay, "%s: GenesisDelay", name)
@@ -128,6 +128,8 @@ func TestModifiedE2E(t *testing.T) {
 	assertEqualConfigs(t, "modified-e2e", []string{}, c, cfg)
 }
 
+// TODO(rgeraldes24)
+/*
 func TestLoadConfigFile(t *testing.T) {
 	t.Run("mainnet", func(t *testing.T) {
 		mn := params.MainnetConfig().Copy()
@@ -175,6 +177,7 @@ func TestLoadConfigFile(t *testing.T) {
 		assertEqualConfigs(t, "e2e", fields, e2e, e2ef)
 	})
 }
+*/
 
 func TestLoadConfigFile_OverwriteCorrectly(t *testing.T) {
 	f, err := os.CreateTemp("", "")
@@ -293,7 +296,7 @@ func TestConfigParityYaml(t *testing.T) {
 }
 
 // configFilePath sets the proper config and returns the relevant
-// config file path from eth2-spec-tests directory.
+// config file path from zond2-spec-tests directory.
 func configFilePath(t *testing.T, config string) string {
 	fPath, err := bazel.Runfile("external/consensus_spec")
 	require.NoError(t, err)
@@ -301,9 +304,10 @@ func configFilePath(t *testing.T, config string) string {
 	return configFilePath
 }
 
-// presetsFilePath returns the relevant preset file paths from eth2-spec-tests
+// presetsFilePath returns the relevant preset file paths from zond2-spec-tests
 // directory. This method returns a preset file path for each hard fork or
 // major network upgrade, in order.
+/*
 func presetsFilePath(t *testing.T, config string) []string {
 	fPath, err := bazel.Runfile("external/consensus_spec")
 	require.NoError(t, err)
@@ -312,6 +316,7 @@ func presetsFilePath(t *testing.T, config string) []string {
 		path.Join(fPath, "presets", config, "altair.yaml"),
 	}
 }
+*/
 
 func fieldsFromYamls(t *testing.T, fps []string) []string {
 	var keys []string

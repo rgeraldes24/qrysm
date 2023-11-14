@@ -281,20 +281,20 @@ filegroup(
     url = "https://github.com/ethereum/consensus-specs/archive/refs/tags/%s.tar.gz" % consensus_spec_version,
 )
 
-http_archive(
-    name = "bls_spec_tests",
-    build_file_content = """
-filegroup(
-    name = "test_data",
-    srcs = glob([
-        "**/*.yaml",
-    ]),
-    visibility = ["//visibility:public"],
-)
-    """,
-    sha256 = "93c7d006e7c5b882cbd11dc9ec6c5d0e07f4a8c6b27a32f964eb17cf2db9763a",
-    url = "https://github.com/ethereum/bls12-381-tests/releases/download/%s/bls_tests_yaml.tar.gz" % bls_test_version,
-)
+# http_archive(
+#     name = "bls_spec_tests",
+#     build_file_content = """
+# filegroup(
+#     name = "test_data",
+#     srcs = glob([
+#         "**/*.yaml",
+#     ]),
+#     visibility = ["//visibility:public"],
+# )
+#     """,
+#     sha256 = "93c7d006e7c5b882cbd11dc9ec6c5d0e07f4a8c6b27a32f964eb17cf2db9763a",
+#     url = "https://github.com/ethereum/bls12-381-tests/releases/download/%s/bls_tests_yaml.tar.gz" % bls_test_version,
+# )
 
 http_archive(
     name = "eth2_networks",

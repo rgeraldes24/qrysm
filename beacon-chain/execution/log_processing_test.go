@@ -8,7 +8,7 @@ import (
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	ethereum "github.com/theQRL/go-zond"
+	zond "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
@@ -45,7 +45,7 @@ func TestProcessDepositLog_OK(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -66,7 +66,7 @@ func TestProcessDepositLog_OK(t *testing.T) {
 
 	testAcc.Backend.Commit()
 
-	query := ethereum.FilterQuery{
+	query := zond.FilterQuery{
 		Addresses: []common.Address{
 			web3Service.cfg.depositContractAddr,
 		},
@@ -114,7 +114,7 @@ func TestProcessDepositLog_InsertsPendingDeposit(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -138,7 +138,7 @@ func TestProcessDepositLog_InsertsPendingDeposit(t *testing.T) {
 
 	testAcc.Backend.Commit()
 
-	query := ethereum.FilterQuery{
+	query := zond.FilterQuery{
 		Addresses: []common.Address{
 			web3Service.cfg.depositContractAddr,
 		},
@@ -174,7 +174,7 @@ func TestUnpackDepositLogData_OK(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -193,7 +193,7 @@ func TestUnpackDepositLogData_OK(t *testing.T) {
 	require.NoError(t, err, "Could not deposit to deposit contract")
 	testAcc.Backend.Commit()
 
-	query := ethereum.FilterQuery{
+	query := zond.FilterQuery{
 		Addresses: []common.Address{
 			web3Service.cfg.depositContractAddr,
 		},
@@ -230,7 +230,7 @@ func TestProcessETH2GenesisLog_8DuplicatePubkeys(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -263,7 +263,7 @@ func TestProcessETH2GenesisLog_8DuplicatePubkeys(t *testing.T) {
 		testAcc.Backend.Commit()
 	}
 
-	query := ethereum.FilterQuery{
+	query := zond.FilterQuery{
 		Addresses: []common.Address{
 			web3Service.cfg.depositContractAddr,
 		},
@@ -305,7 +305,7 @@ func TestProcessETH2GenesisLog(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
@@ -336,7 +336,7 @@ func TestProcessETH2GenesisLog(t *testing.T) {
 		testAcc.Backend.Commit()
 	}
 
-	query := ethereum.FilterQuery{
+	query := zond.FilterQuery{
 		Addresses: []common.Address{
 			web3Service.cfg.depositContractAddr,
 		},
@@ -356,7 +356,7 @@ func TestProcessETH2GenesisLog(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	err = web3Service.ProcessETH1Block(context.Background(), big.NewInt(int64(logs[len(logs)-1].BlockNumber)))
+	err = web3Service.ProcessZOND1Block(context.Background(), big.NewInt(int64(logs[len(logs)-1].BlockNumber)))
 	require.NoError(t, err)
 
 	cachedDeposits := web3Service.chainStartData.ChainstartDeposits
@@ -398,7 +398,7 @@ func TestProcessETH2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 		WithDatabase(kvStore),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 .0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -409,7 +409,7 @@ func TestProcessETH2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 	web3Service.latestZond1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 	bConfig := params.MinimalSpecConfig().Copy()
 	bConfig.MinGenesisTime = 0
-	bConfig.SecondsPerETH1Block = 10
+	bConfig.SecondsPerZOND1Block = 10
 	params.OverrideBeaconConfig(bConfig)
 	nConfig := params.BeaconNetworkConfig()
 	nConfig.ContractDeploymentBlock = 0
@@ -495,7 +495,7 @@ func TestProcessETH2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 		WithDatabase(kvStore),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -505,7 +505,7 @@ func TestProcessETH2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 	web3Service.latestZond1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
 	web3Service.latestZond1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 	bConfig := params.MinimalSpecConfig().Copy()
-	bConfig.SecondsPerETH1Block = 10
+	bConfig.SecondsPerZOND1Block = 10
 	params.OverrideBeaconConfig(bConfig)
 	nConfig := params.BeaconNetworkConfig()
 	nConfig.ContractDeploymentBlock = 0
@@ -606,7 +606,7 @@ func newPowchainService(t *testing.T, zond1Backend *mock.TestAccount, beaconDB d
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(zond1Backend.ContractAddr, zond1Backend.Backend)
 	require.NoError(t, err)

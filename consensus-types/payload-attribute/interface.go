@@ -11,5 +11,4 @@ type Attributer interface {
 	SuggestedFeeRecipient() []byte
 	Withdrawals() ([]*enginev1.Withdrawal, error)
 	PbV1() (*enginev1.PayloadAttributes, error)
-	PbV2() (*enginev1.PayloadAttributesV2, error)
 }

@@ -21,7 +21,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
+	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -176,7 +176,7 @@ func TestListSyncCommittees(t *testing.T) {
 		BeaconDB:              db,
 		ChainInfoFetcher:      chainService,
 	}
-	req := &zondpbv2.StateSyncCommitteesRequest{StateId: stRoot[:]}
+	req := &zondpbv1.StateSyncCommitteesRequest{StateId: stRoot[:]}
 	resp, err := s.ListSyncCommittees(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp.Data)
@@ -317,7 +317,7 @@ func TestListSyncCommitteesFuture(t *testing.T) {
 		FinalizationFetcher:   chainService,
 		BeaconDB:              db,
 	}
-	req := &zondpbv2.StateSyncCommitteesRequest{StateId: []byte("head")}
+	req := &zondpbv1.StateSyncCommitteesRequest{StateId: []byte("head")}
 	epoch := 2 * params.BeaconConfig().EpochsPerSyncCommitteePeriod
 	req.Epoch = &epoch
 	_, err := s.ListSyncCommittees(ctx, req)
@@ -367,8 +367,8 @@ func TestSubmitPoolSyncCommitteeSignatures(t *testing.T) {
 		require.NoError(t, err)
 		sig, err := bytesutil2.FromHexString("0x" + strings.Repeat("0", 192))
 		require.NoError(t, err)
-		_, err = s.SubmitPoolSyncCommitteeSignatures(ctx, &zondpbv2.SubmitPoolSyncCommitteeSignatures{
-			Data: []*zondpbv2.SyncCommitteeMessage{
+		_, err = s.SubmitPoolSyncCommitteeSignatures(ctx, &zondpbv1.SubmitPoolSyncCommitteeSignatures{
+			Data: []*zondpbv1.SyncCommitteeMessage{
 				{
 					Slot:            0,
 					BeaconBlockRoot: root,
@@ -381,8 +381,8 @@ func TestSubmitPoolSyncCommitteeSignatures(t *testing.T) {
 	})
 
 	t.Run("Invalid message gRPC header", func(t *testing.T) {
-		_, err := s.SubmitPoolSyncCommitteeSignatures(ctx, &zondpbv2.SubmitPoolSyncCommitteeSignatures{
-			Data: []*zondpbv2.SyncCommitteeMessage{
+		_, err := s.SubmitPoolSyncCommitteeSignatures(ctx, &zondpbv1.SubmitPoolSyncCommitteeSignatures{
+			Data: []*zondpbv1.SyncCommitteeMessage{
 				{
 					Slot:            0,
 					BeaconBlockRoot: nil,
@@ -411,7 +411,7 @@ func TestValidateSyncCommitteeMessage(t *testing.T) {
 	sig, err := bytesutil2.FromHexString("0x" + strings.Repeat("0", 192))
 	require.NoError(t, err)
 	t.Run("valid", func(t *testing.T) {
-		msg := &zondpbv2.SyncCommitteeMessage{
+		msg := &zondpbv1.SyncCommitteeMessage{
 			Slot:            0,
 			BeaconBlockRoot: root,
 			ValidatorIndex:  0,
@@ -421,7 +421,7 @@ func TestValidateSyncCommitteeMessage(t *testing.T) {
 		assert.NoError(t, err)
 	})
 	t.Run("invalid block root", func(t *testing.T) {
-		msg := &zondpbv2.SyncCommitteeMessage{
+		msg := &zondpbv1.SyncCommitteeMessage{
 			Slot:            0,
 			BeaconBlockRoot: []byte("invalid"),
 			ValidatorIndex:  0,
@@ -432,7 +432,7 @@ func TestValidateSyncCommitteeMessage(t *testing.T) {
 		assert.ErrorContains(t, "invalid block root length", err)
 	})
 	t.Run("invalid block root", func(t *testing.T) {
-		msg := &zondpbv2.SyncCommitteeMessage{
+		msg := &zondpbv1.SyncCommitteeMessage{
 			Slot:            0,
 			BeaconBlockRoot: root,
 			ValidatorIndex:  0,

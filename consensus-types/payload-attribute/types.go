@@ -31,8 +31,6 @@ func New(i interface{}) (Attributer, error) {
 		return nil, blocks.ErrNilObject
 	case *enginev1.PayloadAttributes:
 		return initPayloadAttributeFromV1(a)
-	case *enginev1.PayloadAttributesV2:
-		return initPayloadAttributeFromV2(a)
 	default:
 		return nil, errors.Wrapf(errUnsupportedPayloadAttribute, "unable to create payload attribute from type %T", i)
 	}
@@ -46,19 +44,6 @@ func EmptyWithVersion(version int) Attributer {
 }
 
 func initPayloadAttributeFromV1(a *enginev1.PayloadAttributes) (Attributer, error) {
-	if a == nil {
-		return nil, errNilPayloadAttribute
-	}
-
-	return &data{
-		version:               version.Bellatrix,
-		prevRandao:            a.PrevRandao,
-		timeStamp:             a.Timestamp,
-		suggestedFeeRecipient: a.SuggestedFeeRecipient,
-	}, nil
-}
-
-func initPayloadAttributeFromV2(a *enginev1.PayloadAttributesV2) (Attributer, error) {
 	if a == nil {
 		return nil, errNilPayloadAttribute
 	}

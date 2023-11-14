@@ -36,7 +36,7 @@ func TestGetSpec(t *testing.T) {
 	config.TargetAggregatorsPerCommittee = 14
 	config.RandomSubnetsPerValidator = 15
 	config.EpochsPerRandomSubnetSubscription = 16
-	config.SecondsPerETH1Block = 17
+	config.SecondsPerZOND1Block = 17
 	config.DepositChainID = 18
 	config.DepositNetworkID = 19
 	config.DepositContractAddress = "DepositContractAddress"
@@ -45,14 +45,8 @@ func TestGetSpec(t *testing.T) {
 	config.EjectionBalance = 22
 	config.EffectiveBalanceIncrement = 23
 	config.GenesisForkVersion = []byte("GenesisForkVersion")
-	config.AltairForkVersion = []byte("AltairForkVersion")
-	config.AltairForkEpoch = 100
-	config.BellatrixForkVersion = []byte("BellatrixForkVersion")
-	config.BellatrixForkEpoch = 101
-	config.CapellaForkVersion = []byte("CapellaForkVersion")
-	config.CapellaForkEpoch = 103
 	config.BLSWithdrawalPrefixByte = byte('b')
-	config.ETH1AddressWithdrawalPrefixByte = byte('c')
+	config.ZOND1AddressWithdrawalPrefixByte = byte('c')
 	config.GenesisDelay = 24
 	config.SecondsPerSlot = 25
 	config.MinAttestationInclusionDelay = 26
@@ -167,7 +161,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "11", v)
 		case "SAFE_SLOTS_TO_UPDATE_JUSTIFIED":
 			assert.Equal(t, "0", v)
-		case "ETH1_FOLLOW_DISTANCE":
+		case "ZOND1_FOLLOW_DISTANCE":
 			assert.Equal(t, "13", v)
 		case "TARGET_AGGREGATORS_PER_COMMITTEE":
 			assert.Equal(t, "14", v)
@@ -175,7 +169,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "15", v)
 		case "EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION":
 			assert.Equal(t, "16", v)
-		case "SECONDS_PER_ETH1_BLOCK":
+		case "SECONDS_PER_ZOND1_BLOCK":
 			assert.Equal(t, "17", v)
 		case "DEPOSIT_CHAIN_ID":
 			assert.Equal(t, "18", v)
@@ -193,23 +187,11 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "23", v)
 		case "GENESIS_FORK_VERSION":
 			assert.Equal(t, "0x"+hex.EncodeToString([]byte("GenesisForkVersion")), v)
-		case "ALTAIR_FORK_VERSION":
-			assert.Equal(t, "0x"+hex.EncodeToString([]byte("AltairForkVersion")), v)
-		case "ALTAIR_FORK_EPOCH":
-			assert.Equal(t, "100", v)
-		case "BELLATRIX_FORK_VERSION":
-			assert.Equal(t, "0x"+hex.EncodeToString([]byte("BellatrixForkVersion")), v)
-		case "BELLATRIX_FORK_EPOCH":
-			assert.Equal(t, "101", v)
-		case "CAPELLA_FORK_VERSION":
-			assert.Equal(t, "0x"+hex.EncodeToString([]byte("CapellaForkVersion")), v)
-		case "CAPELLA_FORK_EPOCH":
-			assert.Equal(t, "103", v)
 		case "MIN_ANCHOR_POW_BLOCK_DIFFICULTY":
 			assert.Equal(t, "1000", v)
 		case "BLS_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x62", v)
-		case "ETH1_ADDRESS_WITHDRAWAL_PREFIX":
+		case "ZOND1_ADDRESS_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x63", v)
 		case "GENESIS_DELAY":
 			assert.Equal(t, "24", v)
@@ -223,7 +205,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "28", v)
 		case "MAX_SEED_LOOKAHEAD":
 			assert.Equal(t, "29", v)
-		case "EPOCHS_PER_ETH1_VOTING_PERIOD":
+		case "EPOCHS_PER_ZOND1_VOTING_PERIOD":
 			assert.Equal(t, "30", v)
 		case "SLOTS_PER_HISTORICAL_ROOT":
 			assert.Equal(t, "31", v)

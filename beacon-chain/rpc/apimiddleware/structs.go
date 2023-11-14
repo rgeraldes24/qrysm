@@ -5,7 +5,7 @@ import (
 
 	"github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/helpers"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
+	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 )
 
 //----------------
@@ -114,14 +114,10 @@ type BlockHeaderResponseJson struct {
 }
 
 type BlockResponseJson struct {
-	Data *SignedBeaconBlockContainerJson `json:"data"`
-}
-
-type BlockV2ResponseJson struct {
-	Version             string                            `json:"version" enum:"true"`
-	Data                *SignedBeaconBlockContainerV2Json `json:"data"`
-	ExecutionOptimistic bool                              `json:"execution_optimistic"`
-	Finalized           bool                              `json:"finalized"`
+	Version             string                          `json:"version" enum:"true"`
+	Data                *SignedBeaconBlockContainerJson `json:"data"`
+	ExecutionOptimistic bool                            `json:"execution_optimistic"`
+	Finalized           bool                            `json:"finalized"`
 }
 
 type BlindedBlockResponseJson struct {
@@ -203,22 +199,14 @@ type SyncingResponseJson struct {
 }
 
 type BeaconStateResponseJson struct {
-	Data *BeaconStateJson `json:"data"`
-}
-
-type BeaconStateV2ResponseJson struct {
-	Version             string                      `json:"version" enum:"true"`
-	Data                *BeaconStateContainerV2Json `json:"data"`
-	ExecutionOptimistic bool                        `json:"execution_optimistic"`
-	Finalized           bool                        `json:"finalized"`
+	Version             string                    `json:"version" enum:"true"`
+	Data                *BeaconStateContainerJson `json:"data"`
+	ExecutionOptimistic bool                      `json:"execution_optimistic"`
+	Finalized           bool                      `json:"finalized"`
 }
 
 type ForkChoiceHeadsResponseJson struct {
 	Data []*ForkChoiceHeadJson `json:"data"`
-}
-
-type V2ForkChoiceHeadsResponseJson struct {
-	Data []*V2ForkChoiceHeadJson `json:"data"`
 }
 
 type ForkScheduleResponseJson struct {
@@ -255,12 +243,8 @@ type SyncCommitteeDutiesResponseJson struct {
 }
 
 type ProduceBlockResponseJson struct {
-	Data *BeaconBlockJson `json:"data"`
-}
-
-type ProduceBlockResponseV2Json struct {
-	Version string                      `json:"version" enum:"true"`
-	Data    *BeaconBlockContainerV2Json `json:"data"`
+	Version string                    `json:"version" enum:"true"`
+	Data    *BeaconBlockContainerJson `json:"data"`
 }
 
 type ProduceBlindedBlockResponseJson struct {
@@ -358,19 +342,6 @@ type BlockRootContainerJson struct {
 	Root string `json:"root" hex:"true"`
 }
 
-type SignedBeaconBlockContainerJson struct {
-	Message   *BeaconBlockJson `json:"message"`
-	Signature string           `json:"signature" hex:"true"`
-}
-
-type BeaconBlockJson struct {
-	Slot          string               `json:"slot"`
-	ProposerIndex string               `json:"proposer_index"`
-	ParentRoot    string               `json:"parent_root" hex:"true"`
-	StateRoot     string               `json:"state_root" hex:"true"`
-	Body          *BeaconBlockBodyJson `json:"body"`
-}
-
 type BeaconBlockBodyJson struct {
 	RandaoReveal      string                     `json:"randao_reveal" hex:"true"`
 	Zond1Data         *Zond1DataJson             `json:"zond1_data"`
@@ -382,44 +353,22 @@ type BeaconBlockBodyJson struct {
 	VoluntaryExits    []*SignedVoluntaryExitJson `json:"voluntary_exits"`
 }
 
-type SignedBeaconBlockContainerV2Json struct {
-	Phase0Block    *BeaconBlockJson          `json:"phase0_block"`
-	AltairBlock    *BeaconBlockAltairJson    `json:"altair_block"`
-	BellatrixBlock *BeaconBlockBellatrixJson `json:"bellatrix_block"`
-	CapellaBlock   *BeaconBlockCapellaJson   `json:"capella_block"`
-	Signature      string                    `json:"signature" hex:"true"`
+type SignedBeaconBlockContainerJson struct {
+	CapellaBlock *BeaconBlockJson `json:"capella_block"`
+	Signature    string           `json:"signature" hex:"true"`
 }
 
 type SignedBlindedBeaconBlockContainerJson struct {
-	Phase0Block    *BeaconBlockJson                 `json:"phase0_block"`
-	AltairBlock    *BeaconBlockAltairJson           `json:"altair_block"`
-	BellatrixBlock *BlindedBeaconBlockBellatrixJson `json:"bellatrix_block"`
-	CapellaBlock   *BlindedBeaconBlockCapellaJson   `json:"capella_block"`
-	Signature      string                           `json:"signature" hex:"true"`
+	CapellaBlock *BlindedBeaconBlockJson `json:"capella_block"`
+	Signature    string                  `json:"signature" hex:"true"`
 }
 
-type BeaconBlockContainerV2Json struct {
-	Phase0Block    *BeaconBlockJson          `json:"phase0_block"`
-	AltairBlock    *BeaconBlockAltairJson    `json:"altair_block"`
-	BellatrixBlock *BeaconBlockBellatrixJson `json:"bellatrix_block"`
-	CapellaBlock   *BeaconBlockCapellaJson   `json:"capella_block"`
+type BeaconBlockContainerJson struct {
+	CapellaBlock *BeaconBlockJson `json:"capella_block"`
 }
 
 type BlindedBeaconBlockContainerJson struct {
-	Phase0Block    *BeaconBlockJson                 `json:"phase0_block"`
-	AltairBlock    *BeaconBlockAltairJson           `json:"altair_block"`
-	BellatrixBlock *BlindedBeaconBlockBellatrixJson `json:"bellatrix_block"`
-	CapellaBlock   *BlindedBeaconBlockCapellaJson   `json:"capella_block"`
-}
-
-type SignedBeaconBlockAltairContainerJson struct {
-	Message   *BeaconBlockAltairJson `json:"message"`
-	Signature string                 `json:"signature" hex:"true"`
-}
-
-type SignedBeaconBlockBellatrixContainerJson struct {
-	Message   *BeaconBlockBellatrixJson `json:"message"`
-	Signature string                    `json:"signature" hex:"true"`
+	CapellaBlock *BlindedBeaconBlockJson `json:"capella_block"`
 }
 
 type SignedBeaconBlockCapellaContainerJson struct {
@@ -453,7 +402,7 @@ type BeaconBlockBellatrixJson struct {
 	Body          *BeaconBlockBodyBellatrixJson `json:"body"`
 }
 
-type BeaconBlockCapellaJson struct {
+type BeaconBlockJson struct {
 	Slot          string                      `json:"slot"`
 	ProposerIndex string                      `json:"proposer_index"`
 	ParentRoot    string                      `json:"parent_root" hex:"true"`
@@ -469,7 +418,7 @@ type BlindedBeaconBlockBellatrixJson struct {
 	Body          *BlindedBeaconBlockBodyBellatrixJson `json:"body"`
 }
 
-type BlindedBeaconBlockCapellaJson struct {
+type BlindedBeaconBlockJson struct {
 	Slot          string                             `json:"slot"`
 	ProposerIndex string                             `json:"proposer_index"`
 	ParentRoot    string                             `json:"parent_root" hex:"true"`
@@ -869,11 +818,8 @@ type BeaconStateCapellaJson struct {
 	HistoricalSummaries          []*HistoricalSummaryJson           `json:"historical_summaries"`
 }
 
-type BeaconStateContainerV2Json struct {
-	Phase0State    *BeaconStateJson          `json:"phase0_state"`
-	AltairState    *BeaconStateAltairJson    `json:"altair_state"`
-	BellatrixState *BeaconStateBellatrixJson `json:"bellatrix_state"`
-	CapellaState   *BeaconStateCapellaJson   `json:"capella_state"`
+type BeaconStateContainerJson struct {
+	CapellaState *BeaconStateCapellaJson `json:"capella_state"`
 }
 
 type ForkJson struct {
@@ -929,11 +875,6 @@ type PendingAttestationJson struct {
 }
 
 type ForkChoiceHeadJson struct {
-	Root string `json:"root" hex:"true"`
-	Slot string `json:"slot"`
-}
-
-type V2ForkChoiceHeadJson struct {
 	Root                string `json:"root" hex:"true"`
 	Slot                string `json:"slot"`
 	ExecutionOptimistic bool   `json:"execution_optimistic"`
@@ -1070,7 +1011,7 @@ func (ssz *SszResponseJson) SSZData() string {
 }
 
 func (*SszResponseJson) SSZVersion() string {
-	return strings.ToLower(zondpbv2.Version_PHASE0.String())
+	return strings.ToLower(zondpbv1.Version_CAPELLA.String())
 }
 
 func (*SszResponseJson) SSZOptimistic() bool {
@@ -1153,13 +1094,8 @@ type EventChainReorgJson struct {
 }
 
 type EventPayloadAttributeStreamV1Json struct {
-	Version string `json:"version"`
-	Data    *EventPayloadAttributeV1Json
-}
-
-type EventPayloadAttributeStreamV2Json struct {
 	Version string                       `json:"version"`
-	Data    *EventPayloadAttributeV2Json `json:"data"`
+	Data    *EventPayloadAttributeV1Json `json:"data"`
 }
 
 type EventPayloadAttributeV1Json struct {
@@ -1171,22 +1107,7 @@ type EventPayloadAttributeV1Json struct {
 	PayloadAttributes *PayloadAttributesV1Json `json:"payload_attributes"`
 }
 
-type EventPayloadAttributeV2Json struct {
-	ProposerIndex     string                   `json:"proposer_index"`
-	ProposalSlot      string                   `json:"proposal_slot"`
-	ParentBlockNumber string                   `json:"parent_block_number"`
-	ParentBlockRoot   string                   `json:"parent_block_root" hex:"true"`
-	ParentBlockHash   string                   `json:"parent_block_hash" hex:"true"`
-	PayloadAttributes *PayloadAttributesV2Json `json:"payload_attributes"`
-}
-
 type PayloadAttributesV1Json struct {
-	Timestamp             string `json:"timestamp"`
-	Random                string `json:"prev_randao" hex:"true"`
-	SuggestedFeeRecipient string `json:"suggested_fee_recipient" hex:"true"`
-}
-
-type PayloadAttributesV2Json struct {
 	Timestamp             string            `json:"timestamp"`
 	Random                string            `json:"prev_randao" hex:"true"`
 	SuggestedFeeRecipient string            `json:"suggested_fee_recipient" hex:"true"`

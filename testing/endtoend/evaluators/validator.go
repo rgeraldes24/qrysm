@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
-	"github.com/theQRL/qrysm/v4/proto/zond/v2"
+	v1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/helpers"
 	e2eparams "github.com/theQRL/qrysm/v4/testing/endtoend/params"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/policies"
@@ -128,7 +128,7 @@ func validatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.ClientCo
 		expected = 0.95
 	}
 	if partRate < expected {
-		st, err := debugClient.GetBeaconStateV2(context.Background(), &zond.BeaconStateRequestV2{StateId: []byte("head")})
+		st, err := debugClient.GetBeaconState(context.Background(), &v1.BeaconStateRequest{StateId: []byte("head")})
 		if err != nil {
 			return errors.Wrap(err, "failed to get beacon state")
 		}
@@ -136,19 +136,7 @@ func validatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.ClientCo
 		var missTgtVals []uint64
 		var missHeadVals []uint64
 		switch obj := st.Data.State.(type) {
-		case *zond.BeaconStateContainer_Phase0State:
-		// Do Nothing
-		case *zond.BeaconStateContainer_AltairState:
-			missSrcVals, missTgtVals, missHeadVals, err = findMissingValidators(obj.AltairState.PreviousEpochParticipation)
-			if err != nil {
-				return errors.Wrap(err, "failed to get missing validators")
-			}
-		case *zond.BeaconStateContainer_BellatrixState:
-			missSrcVals, missTgtVals, missHeadVals, err = findMissingValidators(obj.BellatrixState.PreviousEpochParticipation)
-			if err != nil {
-				return errors.Wrap(err, "failed to get missing validators")
-			}
-		case *zond.BeaconStateContainer_CapellaState:
+		case *v1.BeaconStateContainer_CapellaState:
 			missSrcVals, missTgtVals, missHeadVals, err = findMissingValidators(obj.CapellaState.PreviousEpochParticipation)
 			if err != nil {
 				return errors.Wrap(err, "failed to get missing validators")
@@ -272,18 +260,6 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 }
 
 func syncCompatibleBlockFromCtr(container *zondpb.BeaconBlockContainer) (interfaces.ReadOnlySignedBeaconBlock, error) {
-	if container.GetPhase0Block() != nil {
-		return nil, errors.New("block doesn't support sync committees")
-	}
-	if container.GetAltairBlock() != nil {
-		return blocks.NewSignedBeaconBlock(container.GetAltairBlock())
-	}
-	if container.GetBellatrixBlock() != nil {
-		return blocks.NewSignedBeaconBlock(container.GetBellatrixBlock())
-	}
-	if container.GetBlindedBellatrixBlock() != nil {
-		return blocks.NewSignedBeaconBlock(container.GetBlindedBellatrixBlock())
-	}
 	if container.GetCapellaBlock() != nil {
 		return blocks.NewSignedBeaconBlock(container.GetCapellaBlock())
 	}

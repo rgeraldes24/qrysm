@@ -38,14 +38,14 @@ func (m *MockNodeClient) EXPECT() *MockNodeClientMockRecorder {
 }
 
 // GetETH1ConnectionStatus mocks base method.
-func (m *MockNodeClient) GetETH1ConnectionStatus(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.ETH1ConnectionStatus, error) {
+func (m *MockNodeClient) GetETH1ConnectionStatus(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.ZOND1ConnectionStatus, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetETH1ConnectionStatus", varargs...)
-	ret0, _ := ret[0].(*zond.ETH1ConnectionStatus)
+	ret0, _ := ret[0].(*zond.ZOND1ConnectionStatus)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -39,7 +39,7 @@ func TestLatestMainchainInfo_OK(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "Unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "Unable to setup web3 ZOND1.0 chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
@@ -80,7 +80,7 @@ func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = &mockExecution.RPCClient{}
@@ -113,7 +113,7 @@ func TestBlockHashByHeight_ReturnsError_WhenNoZond1Client(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = nil
@@ -136,7 +136,7 @@ func TestBlockExists_ValidHash(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
@@ -166,7 +166,7 @@ func TestBlockExists_InvalidHash(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 
@@ -185,7 +185,7 @@ func TestBlockExists_UsesCachedBlockInfo(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 
 	header := &types.HeaderInfo{
 		Number: big.NewInt(0),
@@ -319,7 +319,7 @@ func TestService_BlockTimeByHeight_ReturnsError_WhenNoZond1Client(t *testing.T) 
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 ZOND1.0 chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = nil

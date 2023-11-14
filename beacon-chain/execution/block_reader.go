@@ -115,7 +115,7 @@ func (s *Service) BlockByTimestamp(ctx context.Context, time uint64) (*types.Hea
 
 	numOfBlocks := uint64(0)
 	estimatedBlk := cursorNum.Uint64()
-	maxTimeBuffer := searchThreshold * params.BeaconConfig().SecondsPerETH1Block
+	maxTimeBuffer := searchThreshold * params.BeaconConfig().SecondsPerZOND1Block
 	// Terminate if we can't find an acceptable block after
 	// repeated searches.
 	for i := 0; i < repeatedSearches; i++ {
@@ -123,7 +123,7 @@ func (s *Service) BlockByTimestamp(ctx context.Context, time uint64) (*types.Hea
 			return nil, ctx.Err()
 		}
 		if time > cursorTime+maxTimeBuffer {
-			numOfBlocks = (time - cursorTime) / params.BeaconConfig().SecondsPerETH1Block
+			numOfBlocks = (time - cursorTime) / params.BeaconConfig().SecondsPerZOND1Block
 			// In the event we have an infeasible estimated block, this is a defensive
 			// check to ensure it does not exceed rational bounds.
 			if cursorNum.Uint64()+numOfBlocks > latestBlkHeight {
@@ -131,7 +131,7 @@ func (s *Service) BlockByTimestamp(ctx context.Context, time uint64) (*types.Hea
 			}
 			estimatedBlk = cursorNum.Uint64() + numOfBlocks
 		} else if time+maxTimeBuffer < cursorTime {
-			numOfBlocks = (cursorTime - time) / params.BeaconConfig().SecondsPerETH1Block
+			numOfBlocks = (cursorTime - time) / params.BeaconConfig().SecondsPerZOND1Block
 			// In the event we have an infeasible number of blocks
 			// we exit early.
 			if numOfBlocks >= cursorNum.Uint64() {

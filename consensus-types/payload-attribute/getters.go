@@ -43,31 +43,13 @@ func (a *data) PbV1() (*enginev1.PayloadAttributes, error) {
 	if a == nil {
 		return nil, errNilPayloadAttribute
 	}
-	if a.version != version.Bellatrix {
+	if a.version != version.Capella {
 		return nil, consensus_types.ErrNotSupported("PayloadAttributePbV1", a.version)
 	}
 	if a.timeStamp == 0 && len(a.prevRandao) == 0 {
 		return nil, nil
 	}
 	return &enginev1.PayloadAttributes{
-		Timestamp:             a.timeStamp,
-		PrevRandao:            a.prevRandao,
-		SuggestedFeeRecipient: a.suggestedFeeRecipient,
-	}, nil
-}
-
-// PbV2 returns the payload attribute in version 2.
-func (a *data) PbV2() (*enginev1.PayloadAttributesV2, error) {
-	if a == nil {
-		return nil, errNilPayloadAttribute
-	}
-	if a.version != version.Capella {
-		return nil, consensus_types.ErrNotSupported("PayloadAttributePbV2", a.version)
-	}
-	if a.timeStamp == 0 && len(a.prevRandao) == 0 {
-		return nil, nil
-	}
-	return &enginev1.PayloadAttributesV2{
 		Timestamp:             a.timeStamp,
 		PrevRandao:            a.prevRandao,
 		SuggestedFeeRecipient: a.suggestedFeeRecipient,

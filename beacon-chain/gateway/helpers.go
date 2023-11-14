@@ -12,14 +12,14 @@ import (
 // MuxConfig contains configuration that should be used when registering the beacon node in the gateway.
 type MuxConfig struct {
 	Handler      gateway.MuxHandler
-	EthPbMux     *gateway.PbMux
+	ZondPbMux    *gateway.PbMux
 	V1AlphaPbMux *gateway.PbMux
 }
 
 // DefaultConfig returns a fully configured MuxConfig with standard gateway behavior.
 func DefaultConfig(enableDebugRPCEndpoints bool, httpModules string) MuxConfig {
-	var v1AlphaPbHandler, ethPbHandler *gateway.PbMux
-	if flags.EnableHTTPPrysmAPI(httpModules) {
+	var v1AlphaPbHandler, zondPbHandler *gateway.PbMux
+	if flags.EnableHTTPQrysmAPI(httpModules) {
 		v1AlphaRegistrations := []gateway.PbHandlerRegistration{
 			zondpbalpha.RegisterNodeHandler,
 			zondpbalpha.RegisterBeaconChainHandler,
@@ -46,21 +46,21 @@ func DefaultConfig(enableDebugRPCEndpoints bool, httpModules string) MuxConfig {
 		)
 		v1AlphaPbHandler = &gateway.PbMux{
 			Registrations: v1AlphaRegistrations,
-			Patterns:      []string{"/zond/v1alpha1/", "/zond/v1alpha2/"},
+			Patterns:      []string{"/zond/v1alpha1/"},
 			Mux:           v1AlphaMux,
 		}
 	}
-	if flags.EnableHTTPEthAPI(httpModules) {
-		ethRegistrations := []gateway.PbHandlerRegistration{
+	if flags.EnableHTTPZondAPI(httpModules) {
+		zondRegistrations := []gateway.PbHandlerRegistration{
 			zondpbservice.RegisterBeaconNodeHandler,
 			zondpbservice.RegisterBeaconChainHandler,
 			zondpbservice.RegisterBeaconValidatorHandler,
 			zondpbservice.RegisterEventsHandler,
 		}
 		if enableDebugRPCEndpoints {
-			ethRegistrations = append(ethRegistrations, zondpbservice.RegisterBeaconDebugHandler)
+			zondRegistrations = append(zondRegistrations, zondpbservice.RegisterBeaconDebugHandler)
 		}
-		ethMux := gwruntime.NewServeMux(
+		zondMux := gwruntime.NewServeMux(
 			gwruntime.WithMarshalerOption(gwruntime.MIMEWildcard, &gwruntime.HTTPBodyMarshaler{
 				Marshaler: &gwruntime.JSONPb{
 					MarshalOptions: protojson.MarshalOptions{
@@ -73,15 +73,15 @@ func DefaultConfig(enableDebugRPCEndpoints bool, httpModules string) MuxConfig {
 				},
 			}),
 		)
-		ethPbHandler = &gateway.PbMux{
-			Registrations: ethRegistrations,
-			Patterns:      []string{"/internal/zond/v1/", "/internal/zond/v2/"},
-			Mux:           ethMux,
+		zondPbHandler = &gateway.PbMux{
+			Registrations: zondRegistrations,
+			Patterns:      []string{"/internal/zond/v1/"},
+			Mux:           zondMux,
 		}
 	}
 
 	return MuxConfig{
-		EthPbMux:     ethPbHandler,
+		ZondPbMux:    zondPbHandler,
 		V1AlphaPbMux: v1AlphaPbHandler,
 	}
 }
