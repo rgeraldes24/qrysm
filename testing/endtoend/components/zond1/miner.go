@@ -30,7 +30,7 @@ const (
 	EthAddress = "0x878705ba3f8bc32fcf7f4caa1a35e72af65cf766"
 )
 
-// Miner represents an ETH1 node which mines blocks.
+// Miner represents an ZOND1 node which mines blocks.
 type Miner struct {
 	e2etypes.ComponentRunner
 	started      chan struct{}
@@ -39,7 +39,7 @@ type Miner struct {
 	cmd          *exec.Cmd
 }
 
-// NewMiner creates and returns an ETH1 node miner.
+// NewMiner creates and returns an ZOND1 node miner.
 func NewMiner() *Miner {
 	return &Miner{
 		started: make(chan struct{}, 1),
@@ -81,30 +81,30 @@ func (m *Miner) initAttempt(ctx context.Context, attempt int) (*os.File, error) 
 		return nil, err
 	}
 
-	// find geth so we can run it.
+	// find gzond so we can run it.
 	binaryPath, found := bazel.FindBinary("cmd/gzond", "gzond")
 	if !found {
 		return nil, errors.New("go-ethereum binary not found")
 	}
 
-	gethJsonPath := path.Join(path.Dir(binaryPath), "genesis.json")
-	gen := interop.GethTestnetGenesis(e2e.TestParams.Zond1GenesisTime, params.BeaconConfig())
+	gzondJsonPath := path.Join(path.Dir(binaryPath), "genesis.json")
+	gen := interop.GzondTestnetGenesis(e2e.TestParams.Zond1GenesisTime, params.BeaconConfig())
 	log.Infof("zond1 miner genesis timestamp=%d", e2e.TestParams.Zond1GenesisTime)
 	b, err := json.Marshal(gen)
 	if err != nil {
 		return nil, err
 	}
-	if err := file.WriteFile(gethJsonPath, b); err != nil {
+	if err := file.WriteFile(gzondJsonPath, b); err != nil {
 		return nil, err
 	}
 
 	// write the same thing to the logs dir for inspection
-	gethJsonLogPath := e2e.TestParams.Logfile("genesis.json")
-	if err := file.WriteFile(gethJsonLogPath, b); err != nil {
+	gzondJsonLogPath := e2e.TestParams.Logfile("genesis.json")
+	if err := file.WriteFile(gzondJsonLogPath, b); err != nil {
 		return nil, err
 	}
 
-	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", m.DataDir()), gethJsonPath) // #nosec G204 -- Safe
+	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", m.DataDir()), gzondJsonPath) // #nosec G204 -- Safe
 
 	// redirect stderr to a log file
 	initFile, err := helpers.DeleteAndCreatePath(e2e.TestParams.Logfile("zond1-init_miner.log"))
@@ -113,7 +113,7 @@ func (m *Miner) initAttempt(ctx context.Context, attempt int) (*os.File, error) 
 	}
 	initCmd.Stderr = initFile
 
-	// run init command and wait until it exits. this will initialize the geth node (required before starting).
+	// run init command and wait until it exits. this will initialize the gzond node (required before starting).
 	if err = initCmd.Start(); err != nil {
 		return nil, err
 	}
@@ -186,8 +186,8 @@ func (m *Miner) initAttempt(ctx context.Context, attempt int) (*os.File, error) 
 	return minerLog, nil
 }
 
-// Start runs a mining ETH1 node.
-// The miner is responsible for moving the ETH1 chain forward and for deploying the deposit contract.
+// Start runs a mining ZOND1 node.
+// The miner is responsible for moving the ZOND1 chain forward and for deploying the deposit contract.
 func (m *Miner) Start(ctx context.Context) error {
 	// give the miner start a couple of tries, since the p2p networking check is flaky
 	var retryErr error
@@ -211,7 +211,7 @@ func (m *Miner) Start(ctx context.Context) error {
 	m.enr = enode
 	log.Infof("Communicated enode. Enode is %s", enode)
 
-	// Connect to the started geth dev chain.
+	// Connect to the started gzond dev chain.
 	client, err := rpc.DialHTTP(e2e.TestParams.Zond1RPCURL(e2e.MinerComponentOffset).String())
 	if err != nil {
 		return fmt.Errorf("failed to connect to ipc: %w", err)
@@ -247,7 +247,7 @@ func (m *Miner) Start(ctx context.Context) error {
 	return m.cmd.Wait()
 }
 
-// Started checks whether ETH1 node is started and ready to be queried.
+// Started checks whether ZOND1 node is started and ready to be queried.
 func (m *Miner) Started() <-chan struct{} {
 	return m.started
 }

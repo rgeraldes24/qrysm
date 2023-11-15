@@ -23,7 +23,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
 )
@@ -36,7 +36,7 @@ var (
 // Blocks that have already been seen are ignored. If the BLS signature is any valid signature,
 // this method rebroadcasts the message.
 func (s *Service) validateBeaconBlockPubSub(ctx context.Context, pid peer.ID, msg *pubsub.Message) (pubsub.ValidationResult, error) {
-	receivedTime := prysmTime.Now()
+	receivedTime := qrysmTime.Now()
 	// Validation runs on publish (not just subscriptions), so we should approve any message from
 	// ourselves.
 	if pid == s.cfg.p2p.PeerID() {
@@ -202,7 +202,7 @@ func (s *Service) validateBeaconBlockPubSub(ctx context.Context, pid peer.ID, ms
 	graffiti := blk.Block().Body().Graffiti()
 
 	sinceSlotStartTime := receivedTime.Sub(startTime)
-	validationTime := prysmTime.Now().Sub(receivedTime)
+	validationTime := qrysmTime.Now().Sub(receivedTime)
 	log.WithFields(logrus.Fields{
 		"blockSlot":          blk.Block().Slot(),
 		"sinceSlotStartTime": sinceSlotStartTime,
@@ -357,7 +357,7 @@ func captureArrivalTimeMetric(genesisTime uint64, currentSlot primitives.Slot) e
 	if err != nil {
 		return err
 	}
-	ms := prysmTime.Now().Sub(startTime) / time.Millisecond
+	ms := qrysmTime.Now().Sub(startTime) / time.Millisecond
 	arrivalBlockPropagationHistogram.Observe(float64(ms))
 	arrivalBlockPropagationGauge.Set(float64(ms))
 

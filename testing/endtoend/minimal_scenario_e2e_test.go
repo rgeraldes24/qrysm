@@ -24,7 +24,7 @@ func TestEndToEnd_MinimalConfig_ValidatorRESTApi(t *testing.T) {
 }
 
 func TestEndToEnd_ScenarioRun_EEOffline(t *testing.T) {
-	t.Skip("TODO(#10242) Prysm is current unable to handle an offline e2e")
+	t.Skip("TODO(#10242) Qrysm is current unable to handle an offline e2e")
 	runner := e2eMinimal(t, version.Phase0)
 
 	runner.config.Evaluators = scenarioEvals()

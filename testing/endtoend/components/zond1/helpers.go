@@ -12,10 +12,10 @@ import (
 	e2etypes "github.com/theQRL/qrysm/v4/testing/endtoend/types"
 )
 
-// NetworkId is the ID of the ETH1 chain.
+// NetworkId is the ID of the ZOND1 chain.
 const NetworkId = 1337
 
-// KeystorePassword is the password used to decrypt ETH1 keystores.
+// KeystorePassword is the password used to decrypt ZOND1 keystores.
 const KeystorePassword = "password"
 
 const minerPasswordFile = "password.txt"
@@ -29,7 +29,7 @@ var _ e2etypes.ComponentRunner = (*Miner)(nil)
 var _ e2etypes.ComponentRunner = (*Node)(nil)
 var _ e2etypes.EngineProxy = (*Proxy)(nil)
 
-// WaitForBlocks waits for a certain amount of blocks to be mined by the ETH1 chain before returning.
+// WaitForBlocks waits for a certain amount of blocks to be mined by the ZOND1 chain before returning.
 func WaitForBlocks(web3 *zondclient.Client, key *keystore.Key, blocksToWait uint64) error {
 	nonce, err := web3.PendingNonceAt(context.Background(), key.Address)
 	if err != nil {

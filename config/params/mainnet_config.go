@@ -178,7 +178,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	DomainApplicationBuilder:          bytesutil.Uint32ToBytes4(0x00000001),
 	DomainDilithiumToExecutionChange:  bytesutil.Uint32ToBytes4(0x0A000000),
 
-	// Prysm constants.
+	// Qrysm constants.
 	GweiPerEth:                     1000000000,
 	BLSSecretKeyLength:             32,
 	DilithiumPubkeyLength:          2592,

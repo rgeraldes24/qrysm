@@ -15,7 +15,7 @@ import (
 
 const (
 	// WalletDefaultDirName for accounts.
-	WalletDefaultDirName = "prysm-wallet-v2"
+	WalletDefaultDirName = "qrysm-wallet"
 	// DefaultGatewayHost for the validator client.
 	DefaultGatewayHost = "127.0.0.1"
 )
@@ -51,10 +51,10 @@ var (
 		Name:  "tls-cert",
 		Usage: "Certificate for secure gRPC. Pass this and the tls-key flag in order to use gRPC securely.",
 	}
-	// EnableRPCFlag enables controlling the validator client via gRPC (without web UI).
+	// EnableRPCFlag enables controlling the validator client via gRPC.
 	EnableRPCFlag = &cli.BoolFlag{
 		Name:  "rpc",
-		Usage: "Enables the RPC server for the validator client (without Web UI)",
+		Usage: "Enables the RPC server for the validator client",
 		Value: false,
 	}
 	// RPCHost defines the host on which the RPC server should listen.
@@ -132,10 +132,10 @@ var (
 		Usage: "Port used to listening and respond metrics for prometheus.",
 		Value: 8081,
 	}
-	// WalletDirFlag defines the path to a wallet directory for Prysm accounts.
+	// WalletDirFlag defines the path to a wallet directory for Qrysm accounts.
 	WalletDirFlag = &cli.StringFlag{
 		Name:  "wallet-dir",
-		Usage: "Path to a wallet directory on-disk for Prysm validator accounts",
+		Usage: "Path to a wallet directory on-disk for Qrysm validator accounts",
 		Value: filepath.Join(DefaultValidatorDir(), WalletDefaultDirName),
 	}
 	// AccountPasswordFileFlag is path to a file containing a password for a validator account.
@@ -285,7 +285,7 @@ var (
 	// web3signer documentation can be found in Consensys' web3signer project docs
 	Web3SignerURLFlag = &cli.StringFlag{
 		Name:  "validators-external-signer-url",
-		Usage: "URL for consensys' web3signer software to use with the Prysm validator client",
+		Usage: "URL for consensys' web3signer software to use with the Qrysm validator client",
 		Value: "",
 	}
 
@@ -308,12 +308,6 @@ var (
 	SkipDepositConfirmationFlag = &cli.BoolFlag{
 		Name:  "skip-deposit-confirmation",
 		Usage: "Skips the y/n confirmation userprompt for sending a deposit to the deposit contract",
-		Value: false,
-	}
-	// EnableWebFlag enables controlling the validator client via the Prysm web ui. This is a work in progress.
-	EnableWebFlag = &cli.BoolFlag{
-		Name:  "web",
-		Usage: "Enables the web portal for the validator client (work in progress)",
 		Value: false,
 	}
 	// SlashingProtectionExportDirFlag allows specifying the outpt directory

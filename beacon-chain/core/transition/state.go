@@ -186,12 +186,12 @@ func OptimizedGenesisBeaconState(genesisTime uint64, preState state.BeaconState,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
 
-		HistoricalRoots:           [][]byte{},
-		BlockRoots:                blockRoots,
-		StateRoots:                stateRoots,
-		Slashings:                 slashings,
-		CurrentEpochAttestations:  []*zondpb.PendingAttestation{},
-		PreviousEpochAttestations: []*zondpb.PendingAttestation{},
+		HistoricalRoots:            [][]byte{},
+		BlockRoots:                 blockRoots,
+		StateRoots:                 stateRoots,
+		Slashings:                  slashings,
+		CurrentEpochParticipation:  []byte{},
+		PreviousEpochParticipation: []byte{},
 
 		// Zond1 data.
 		Zond1Data:         zond1Data,
@@ -217,7 +217,7 @@ func OptimizedGenesisBeaconState(genesisTime uint64, preState state.BeaconState,
 		BodyRoot:   bodyRoot[:],
 	}
 
-	return state_native.InitializeFromProtoPhase0(st)
+	return state_native.InitializeFromProtoCapella(st)
 }
 
 // EmptyGenesisState returns an empty beacon state object.
@@ -234,17 +234,17 @@ func EmptyGenesisState() (state.BeaconState, error) {
 		Validators: []*zondpb.Validator{},
 		Balances:   []uint64{},
 
-		JustificationBits:         []byte{0},
-		HistoricalRoots:           [][]byte{},
-		CurrentEpochAttestations:  []*zondpb.PendingAttestation{},
-		PreviousEpochAttestations: []*zondpb.PendingAttestation{},
+		JustificationBits:          []byte{0},
+		HistoricalRoots:            [][]byte{},
+		CurrentEpochParticipation:  []byte{},
+		PreviousEpochParticipation: []byte{},
 
 		// Zond1 data.
 		Zond1Data:         &zondpb.Zond1Data{},
 		Zond1DataVotes:    []*zondpb.Zond1Data{},
 		Zond1DepositIndex: 0,
 	}
-	return state_native.InitializeFromProtoPhase0(st)
+	return state_native.InitializeFromProtoCapella(st)
 }
 
 // IsValidGenesisState gets called whenever there's a deposit event,

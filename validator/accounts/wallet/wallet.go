@@ -33,7 +33,7 @@ const (
 	// ConfirmPasswordPromptText for confirming a wallet password.
 	ConfirmPasswordPromptText = "Confirm password"
 	// DefaultWalletPasswordFile used to store a wallet password with appropriate permissions
-	// if a user signs up via the Prysm web UI via RPC.
+	// if a user signs up via the Qrysm web UI via RPC.
 	DefaultWalletPasswordFile = "walletpassword.txt"
 	// CheckExistsErrMsg for when there is an error while checking for a wallet
 	CheckExistsErrMsg = "could not check if wallet exists"
@@ -72,7 +72,7 @@ type Config struct {
 	WalletPassword string
 }
 
-// Wallet is a primitive in Prysm's account management which
+// Wallet is a primitive in Qrysm's account management which
 // has the capability of creating new accounts, reading existing accounts,
 // and providing secure access to Ethereum proof of stake secrets depending on an
 // associated keymanager (either imported, derived, or remote signing enabled).

@@ -277,7 +277,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				st, keys := util.DeterministicGenesisStateCapella(t, 128)
 				assert.NoError(t, st.ApplyToEveryValidator(func(idx int, val *zondpb.Validator) (bool, *zondpb.Validator, error) {
 					newCreds := make([]byte, 32)
-					newCreds[0] = params.BeaconConfig().ETH1AddressWithdrawalPrefixByte
+					newCreds[0] = params.BeaconConfig().ZOND1AddressWithdrawalPrefixByte
 					copy(newCreds[12:], wantedExecAddress)
 					val.WithdrawalCredentials = newCreds
 					return true, val, nil

@@ -37,7 +37,7 @@ func E2ETestConfig() *BeaconChainConfig {
 	// Terminal Total Difficulty.
 	e2eConfig.TerminalTotalDifficulty = "480"
 
-	// Prysm constants.
+	// Qrysm constants.
 	e2eConfig.ConfigName = EndToEndName
 	e2eConfig.GenesisForkVersion = []byte{0, 0, 0, 253}
 
@@ -69,7 +69,7 @@ func E2EMainnetTestConfig() *BeaconChainConfig {
 	// Terminal Total Difficulty.
 	e2eConfig.TerminalTotalDifficulty = "480"
 
-	// Prysm constants.
+	// Qrysm constants.
 	e2eConfig.ConfigName = EndToEndMainnetName
 	e2eConfig.GenesisForkVersion = []byte{0, 0, 0, 254}
 

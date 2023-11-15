@@ -33,7 +33,7 @@ func AccountsExit(c *cli.Context, r io.Reader) error {
 	grpcHeaders := strings.Split(c.String(flags.GrpcHeadersFlag.Name), ",")
 	beaconRPCProvider := c.String(flags.BeaconRPCProviderFlag.Name)
 	if !c.IsSet(flags.Web3SignerURLFlag.Name) && !c.IsSet(flags.WalletDirFlag.Name) && !c.IsSet(flags.InteropNumValidators.Name) {
-		return errors.Errorf("No validators found, please provide a prysm wallet directory via flag --%s "+
+		return errors.Errorf("No validators found, please provide a qrysm wallet directory via flag --%s "+
 			"or a web3signer location with corresponding public keys via flags --%s and --%s ",
 			flags.WalletDirFlag.Name,
 			flags.Web3SignerURLFlag.Name,

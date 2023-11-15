@@ -13,7 +13,7 @@ import (
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 )
 
-// IKeymanager defines a general keymanager interface for Prysm wallets.
+// IKeymanager defines a general keymanager interface for Qrysm wallets.
 type IKeymanager interface {
 	PublicKeysFetcher
 	Signer
@@ -93,7 +93,7 @@ type Keystore struct {
 }
 
 // Kind defines an enum for either local, derived, or remote-signing
-// keystores for Prysm wallets.
+// keystores for Qrysm wallets.
 type Kind int
 
 const (

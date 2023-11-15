@@ -85,52 +85,6 @@ var (
 	)
 )
 
-// StreamValidatorsInfo returns a stream of information for given validators.
-// Validators are supplied dynamically by the client, and can be added, removed and reset at any time.
-// Information about the current set of validators is supplied as soon as the end-of-epoch accounting has been processed,
-// providing a near real-time view of the state of the validators.
-// Note that this will stream information whilst syncing; this is intended, to allow for complete validator state capture
-// over time.  If this is not required then the client can either wait until the beacon node is synced, or filter results
-// based on the epoch value in the returned validator info.
-// DEPRECATED: Streaming Validator Info is no longer supported.
-// The Beacon API /zond/v1/beacon/states/{state_id}/validators will provide validator info in unstreamed format.
-func (bs *Server) StreamValidatorsInfo(stream zondpb.BeaconChain_StreamValidatorsInfoServer) error {
-	stateChannel := make(chan *feed.Event, params.BeaconConfig().SlotsPerEpoch)
-	epochDuration := time.Duration(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot)) * time.Second
-
-	// Fetch our current epoch.
-	headState, err := bs.HeadFetcher.HeadState(bs.Ctx)
-	if err != nil {
-		return status.Error(codes.Internal, "Could not access head state")
-	}
-	if headState == nil || headState.IsNil() {
-		return status.Error(codes.Internal, "Not ready to serve information")
-	}
-
-	// Create an infostream struct.  This will track relevant state for the stream.
-	infostream := &infostream{
-		ctx:                  bs.Ctx,
-		headFetcher:          bs.HeadFetcher,
-		depositFetcher:       bs.DepositFetcher,
-		blockFetcher:         bs.BlockFetcher,
-		beaconDB:             bs.BeaconDB,
-		pubKeys:              make([][]byte, 0),
-		pubKeysMutex:         &sync.RWMutex{},
-		stateChannel:         stateChannel,
-		stateSub:             bs.StateNotifier.StateFeed().Subscribe(stateChannel),
-		zond1Deposits:        cache.New(epochDuration, epochDuration*2),
-		zond1DepositsMutex:   &sync.RWMutex{},
-		zond1Blocktimes:      cache.New(epochDuration*12, epochDuration*24),
-		zond1BlocktimesMutex: &sync.RWMutex{},
-		currentEpoch:         primitives.Epoch(headState.Slot() / params.BeaconConfig().SlotsPerEpoch),
-		stream:               stream,
-		genesisTime:          headState.GenesisTime(),
-	}
-	defer infostream.stateSub.Unsubscribe()
-
-	return infostream.handleConnection()
-}
-
 // handleConnection handles the two-way connection between client and server.
 func (is *infostream) handleConnection() error {
 	// Handle messages from client.
@@ -446,7 +400,7 @@ func (is *infostream) calculateActivationTimeForPendingValidators(res []*zondpb.
 	return nil
 }
 
-// handleBlockProcessed handles the situation where a block has been processed by the Prysm server.
+// handleBlockProcessed handles the situation where a block has been processed by the Qrysm server.
 func (is *infostream) handleBlockProcessed() {
 	headState, err := is.headFetcher.HeadState(is.ctx)
 	if err != nil {
@@ -545,7 +499,7 @@ func (is *infostream) depositQueueTimestamp(zond1BlockNumber *big.Int) (uint64, 
 	}
 	is.zond1BlocktimesMutex.Unlock()
 
-	followTime := time.Duration(params.BeaconConfig().Zond1FollowDistance*params.BeaconConfig().SecondsPerETH1Block) * time.Second
+	followTime := time.Duration(params.BeaconConfig().Zond1FollowDistance*params.BeaconConfig().SecondsPerZOND1Block) * time.Second
 	zond1UnixTime := time.Unix(int64(blockTimestamp), 0).Add(followTime) // lint:ignore uintcast -- timestamp will not exceed int64 in your lifetime
 
 	period := uint64(params.BeaconConfig().EpochsPerZond1VotingPeriod.Mul(uint64(params.BeaconConfig().SlotsPerEpoch)))

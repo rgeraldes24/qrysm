@@ -99,7 +99,7 @@ go_test(
     ],
     args = ["-test.v"],
     data = [
-        "//:prysm_sh",
+        "//:qrysm_sh",
         "//cmd/beacon-chain",
         "//cmd/validator",
         "//config/params:custom_configs",
@@ -132,7 +132,7 @@ go_test(
     ],
     args = ["-test.v"],
     data = [
-        "//:prysm_sh",
+        "//:qrysm_sh",
         "//cmd/beacon-chain",
         "//cmd/validator",
         "//config/params:custom_configs",
@@ -164,7 +164,7 @@ go_test(
     ],
     args = ["-test.v"],
     data = [
-        "//:prysm_sh",
+        "//:qrysm_sh",
         "//cmd/beacon-chain",
         "//cmd/validator",
         "//config/params:custom_configs",
@@ -197,7 +197,7 @@ go_test(
     ],
     args = ["-test.v"],
     data = [
-        "//:prysm_sh",
+        "//:qrysm_sh",
         "//cmd/beacon-chain",
         "//cmd/validator",
         "//config/params:custom_configs",
@@ -230,7 +230,7 @@ go_test(
     ],
     args = ["-test.v"],
     data = [
-        "//:prysm_sh",
+        "//:qrysm_sh",
         "//cmd/beacon-chain",
         "//cmd/validator",
         "//config/params:custom_configs",

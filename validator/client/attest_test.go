@@ -26,7 +26,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"gopkg.in/d4l3k/messagediff.v1"
 )
 
@@ -333,7 +333,7 @@ func TestAttestToBlockHead_DoesNotAttestBeforeDelay(t *testing.T) {
 
 	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
-	validator.genesisTime = uint64(prysmTime.Now().Unix())
+	validator.genesisTime = uint64(qrysmTime.Now().Unix())
 	m.validatorClient.EXPECT().GetDuties(
 		gomock.Any(), // ctx
 		gomock.AssignableToTypeOf(&zondpb.DutiesRequest{}),
@@ -362,7 +362,7 @@ func TestAttestToBlockHead_DoesAttestAfterDelay(t *testing.T) {
 	wg.Add(1)
 	defer wg.Wait()
 
-	validator.genesisTime = uint64(prysmTime.Now().Unix())
+	validator.genesisTime = uint64(qrysmTime.Now().Unix())
 	validatorIndex := primitives.ValidatorIndex(5)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
 	var pubKey [dilithium2.CryptoPublicKeyBytes]byte

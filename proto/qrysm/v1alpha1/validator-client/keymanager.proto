@@ -44,7 +44,7 @@ message ListPublicKeysResponse {
 }
 
 // SignRequest is a message type used by a keymanager
-// as part of Prysm's accounts v2 implementation.
+// as part of Qrysm's accounts v2 implementation.
 message SignRequest {
     // 2592 byte public key corresponding to an associated private key
     // being requested to sign data.

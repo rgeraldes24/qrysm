@@ -247,12 +247,12 @@ func LogErrorOutput(t *testing.T, file io.Reader, title string, index int) {
 
 // WritePprofFiles writes the memory heap and cpu profile files to the test path.
 func WritePprofFiles(testDir string, index int) error {
-	url := fmt.Sprintf("http://127.0.0.1:%d/debug/pprof/heap", e2e.TestParams.Ports.PrysmBeaconNodePprofPort+index)
+	url := fmt.Sprintf("http://127.0.0.1:%d/debug/pprof/heap", e2e.TestParams.Ports.QrysmBeaconNodePprofPort+index)
 	filePath := filepath.Join(testDir, fmt.Sprintf(memoryHeapFileName, index))
 	if err := writeURLRespAtPath(url, filePath); err != nil {
 		return err
 	}
-	url = fmt.Sprintf("http://127.0.0.1:%d/debug/pprof/profile", e2e.TestParams.Ports.PrysmBeaconNodePprofPort+index)
+	url = fmt.Sprintf("http://127.0.0.1:%d/debug/pprof/profile", e2e.TestParams.Ports.QrysmBeaconNodePprofPort+index)
 	filePath = filepath.Join(testDir, fmt.Sprintf(cpuProfileFileName, index))
 	return writeURLRespAtPath(url, filePath)
 }
@@ -301,7 +301,7 @@ func NewLocalConnection(ctx context.Context, port int) (*grpc.ClientConn, error)
 func NewLocalConnections(ctx context.Context, numConns int) ([]*grpc.ClientConn, func(), error) {
 	conns := make([]*grpc.ClientConn, numConns)
 	for i := 0; i < len(conns); i++ {
-		conn, err := NewLocalConnection(ctx, e2e.TestParams.Ports.PrysmBeaconNodeRPCPort+i)
+		conn, err := NewLocalConnection(ctx, e2e.TestParams.Ports.QrysmBeaconNodeRPCPort+i)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -320,7 +320,7 @@ func NewLocalConnections(ctx context.Context, numConns int) ([]*grpc.ClientConn,
 func BeaconAPIHostnames(numConns int) []string {
 	hostnames := make([]string, 0)
 	for i := 0; i < numConns; i++ {
-		port := e2e.TestParams.Ports.PrysmBeaconNodeGatewayPort + i
+		port := e2e.TestParams.Ports.QrysmBeaconNodeGatewayPort + i
 		hostnames = append(hostnames, net.JoinHostPort("127.0.0.1", strconv.Itoa(port)))
 	}
 	return hostnames

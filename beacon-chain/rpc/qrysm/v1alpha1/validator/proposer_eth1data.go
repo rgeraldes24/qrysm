@@ -38,33 +38,33 @@ func (vs *Server) zond1DataMajorityVote(ctx context.Context, beaconState state.B
 	votingPeriodStartTime := vs.slotStartTime(slot)
 
 	if vs.MockZond1Votes {
-		return vs.mockETH1DataVote(ctx, slot)
+		return vs.mockZOND1DataVote(ctx, slot)
 	}
 	if !vs.Zond1InfoFetcher.ExecutionClientConnected() {
-		return vs.randomETH1DataVote(ctx)
+		return vs.randomZOND1DataVote(ctx)
 	}
 	zond1DataNotification = false
 
 	genesisTime, _ := vs.Zond1InfoFetcher.GenesisExecutionChainInfo()
-	followDistanceSeconds := params.BeaconConfig().Zond1FollowDistance * params.BeaconConfig().SecondsPerETH1Block
+	followDistanceSeconds := params.BeaconConfig().Zond1FollowDistance * params.BeaconConfig().SecondsPerZOND1Block
 	latestValidTime := votingPeriodStartTime - followDistanceSeconds
 	earliestValidTime := votingPeriodStartTime - 2*followDistanceSeconds
 
 	// Special case for starting from a pre-mined genesis: the zond1 vote should be genesis until the chain has advanced
-	// by ETH1_FOLLOW_DISTANCE. The head state should maintain the same ETH1Data until this condition has passed, so
+	// by ZOND1_FOLLOW_DISTANCE. The head state should maintain the same ZOND1Data until this condition has passed, so
 	// trust the existing head for the right zond1 vote until we can get a meaningful value from the deposit contract.
 	if latestValidTime < genesisTime+followDistanceSeconds {
 		log.WithField("genesisTime", genesisTime).WithField("latestValidTime", latestValidTime).Warn("voting period before genesis + follow distance, using zond1data from head")
-		return vs.HeadFetcher.HeadETH1Data(), nil
+		return vs.HeadFetcher.HeadZOND1Data(), nil
 	}
 
 	lastBlockByLatestValidTime, err := vs.Zond1BlockFetcher.BlockByTimestamp(ctx, latestValidTime)
 	if err != nil {
 		log.WithError(err).Error("Could not get last block by latest valid time")
-		return vs.randomETH1DataVote(ctx)
+		return vs.randomZOND1DataVote(ctx)
 	}
 	if lastBlockByLatestValidTime.Time < earliestValidTime {
-		return vs.HeadFetcher.HeadETH1Data(), nil
+		return vs.HeadFetcher.HeadZOND1Data(), nil
 	}
 
 	lastBlockDepositCount, lastBlockDepositRoot := vs.DepositFetcher.DepositsNumberAndRootAtHeight(ctx, lastBlockByLatestValidTime.Number)
@@ -72,11 +72,11 @@ func (vs *Server) zond1DataMajorityVote(ctx context.Context, beaconState state.B
 		return vs.ChainStartFetcher.ChainStartZond1Data(), nil
 	}
 
-	if lastBlockDepositCount >= vs.HeadFetcher.HeadETH1Data().DepositCount {
+	if lastBlockDepositCount >= vs.HeadFetcher.HeadZOND1Data().DepositCount {
 		h, err := vs.Zond1BlockFetcher.BlockHashByHeight(ctx, lastBlockByLatestValidTime.Number)
 		if err != nil {
 			log.WithError(err).Error("Could not get hash of last block by latest valid time")
-			return vs.randomETH1DataVote(ctx)
+			return vs.randomZOND1DataVote(ctx)
 		}
 		return &zondpb.Zond1Data{
 			BlockHash:    h.Bytes(),
@@ -84,7 +84,7 @@ func (vs *Server) zond1DataMajorityVote(ctx context.Context, beaconState state.B
 			DepositRoot:  lastBlockDepositRoot[:],
 		}, nil
 	}
-	return vs.HeadFetcher.HeadETH1Data(), nil
+	return vs.HeadFetcher.HeadZOND1Data(), nil
 }
 
 func (vs *Server) slotStartTime(slot primitives.Slot) uint64 {
@@ -125,15 +125,15 @@ func (vs *Server) canonicalZond1Data(
 	return canonicalZond1Data, canonicalZond1DataHeight, nil
 }
 
-func (vs *Server) mockETH1DataVote(ctx context.Context, slot primitives.Slot) (*zondpb.Zond1Data, error) {
+func (vs *Server) mockZOND1DataVote(ctx context.Context, slot primitives.Slot) (*zondpb.Zond1Data, error) {
 	if !zond1DataNotification {
-		log.Warn("Beacon Node is no longer connected to an ETH1 chain, so ETH1 data votes are now mocked.")
+		log.Warn("Beacon Node is no longer connected to an ZOND1 chain, so ZOND1 data votes are now mocked.")
 		zond1DataNotification = true
 	}
 	// If a mock zond1 data votes is specified, we use the following for the
 	// zond1data we provide to every proposer based on https://github.com/ethereum/eth2.0-pm/issues/62:
 	//
-	// slot_in_voting_period = current_slot % SLOTS_PER_ETH1_VOTING_PERIOD
+	// slot_in_voting_period = current_slot % SLOTS_PER_ZOND1_VOTING_PERIOD
 	// Zond1Data(
 	//   DepositRoot = hash(current_epoch + slot_in_voting_period),
 	//   DepositCount = state.zond1_deposit_index,
@@ -155,9 +155,9 @@ func (vs *Server) mockETH1DataVote(ctx context.Context, slot primitives.Slot) (*
 	}, nil
 }
 
-func (vs *Server) randomETH1DataVote(ctx context.Context) (*zondpb.Zond1Data, error) {
+func (vs *Server) randomZOND1DataVote(ctx context.Context) (*zondpb.Zond1Data, error) {
 	if !zond1DataNotification {
-		log.Warn("Beacon Node is no longer connected to an ETH1 chain, so ETH1 data votes are now random.")
+		log.Warn("Beacon Node is no longer connected to an ZOND1 chain, so ZOND1 data votes are now random.")
 		zond1DataNotification = true
 	}
 	headState, err := vs.HeadFetcher.HeadStateReadOnly(ctx)

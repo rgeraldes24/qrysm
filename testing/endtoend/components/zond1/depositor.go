@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/accounts/keystore"
 	"github.com/theQRL/go-zond/common"
-	gethtypes "github.com/theQRL/go-zond/core/types"
+	gzondTypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/v4/config/params"
 	contracts "github.com/theQRL/qrysm/v4/contracts/deposit"
@@ -132,7 +132,7 @@ func (h *DepositHistory) Balances(batch types.DepositBatch) map[[dilithium2.Cryp
 type SentDeposit struct {
 	root    [32]byte
 	deposit *zond.Deposit
-	tx      *gethtypes.Transaction
+	tx      *gzondTypes.Transaction
 	time    time.Time
 	batch   types.DepositBatch
 }
@@ -144,7 +144,7 @@ type SentDeposit struct {
 // the `partial` flag specifies that half of the deposits should be broken up into 2 transactions.
 // Once the set of deposits has been generated, it submits a transaction for each deposit
 // (using 2 transactions for partial deposits) and then uses WaitForBlocks (which spams the miner node with transactions
-// to and from its own address) to advance the chain until it has moved forward ETH1_FOLLOW_DISTANCE blocks.
+// to and from its own address) to advance the chain until it has moved forward ZOND1_FOLLOW_DISTANCE blocks.
 func (d *Depositor) SendAndMine(ctx context.Context, offset, nvals int, batch types.DepositBatch, partial bool) error {
 	balance, err := d.Client.BalanceAt(ctx, d.Key.Address, nil)
 	if err != nil {

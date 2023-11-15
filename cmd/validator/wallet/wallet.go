@@ -11,7 +11,7 @@ import (
 
 var log = logrus.WithField("prefix", "wallet")
 
-// Commands for wallets for Prysm validators.
+// Commands for wallets for Qrysm validators.
 var Commands = &cli.Command{
 	Name:     "wallet",
 	Category: "wallet",
@@ -31,8 +31,6 @@ var Commands = &cli.Command{
 				flags.Mnemonic25thWordFileFlag,
 				flags.SkipMnemonic25thWordCheckFlag,
 				features.Mainnet,
-				features.PraterTestnet,
-				features.SepoliaTestnet,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {
@@ -62,8 +60,6 @@ var Commands = &cli.Command{
 				flags.Mnemonic25thWordFileFlag,
 				flags.SkipMnemonic25thWordCheckFlag,
 				features.Mainnet,
-				features.PraterTestnet,
-				features.SepoliaTestnet,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {

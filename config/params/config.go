@@ -1,4 +1,4 @@
-// Package params defines important constants that are essential to Prysm services.
+// Package params defines important constants that are essential to Qrysm services.
 package params
 
 import (
@@ -47,27 +47,25 @@ type BeaconChainConfig struct {
 	// Initial value constants.
 	BLSWithdrawalPrefixByte          byte     `yaml:"BLS_WITHDRAWAL_PREFIX" spec:"true"`           // BLSWithdrawalPrefixByte is used for BLS withdrawal and it's the first byte.
 	DilithiumWithdrawalPrefixByte    byte     `yaml:"DILITHIUM_WITHDRAWAL_PREFIX" spec:"true"`     // DilithiumWithdrawalPrefixByte is used for Dilithium withdrawal and it's the first byte.
-	ZOND1AddressWithdrawalPrefixByte byte     `yaml:"ZOND1_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // ETH1AddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
+	ZOND1AddressWithdrawalPrefixByte byte     `yaml:"ZOND1_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // ZOND1AddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
 	ZondAddressWithdrawalPrefixByte  byte     `yaml:"ZOND_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"`  // ZondAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
 	ZeroHash                         [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
 
 	// Time parameters constants.
-	GenesisDelay                              uint64           `yaml:"GENESIS_DELAY" spec:"true"`                   // GenesisDelay is the minimum number of seconds to delay starting the Ethereum Beacon Chain genesis. Must be at least 1 second.
-	MinAttestationInclusionDelay              primitives.Slot  `yaml:"MIN_ATTESTATION_INCLUSION_DELAY" spec:"true"` // MinAttestationInclusionDelay defines how many slots validator has to wait to include attestation for beacon block.
-	SecondsPerSlot                            uint64           `yaml:"SECONDS_PER_SLOT" spec:"true"`                // SecondsPerSlot is how many seconds are in a single slot.
-	SlotsPerEpoch                             primitives.Slot  `yaml:"SLOTS_PER_EPOCH" spec:"true"`                 // SlotsPerEpoch is the number of slots in an epoch.
-	SqrRootSlotsPerEpoch                      primitives.Slot  // SqrRootSlotsPerEpoch is a hard coded value where we take the square root of `SlotsPerEpoch` and round down.
-	MinSeedLookahead                          primitives.Epoch `yaml:"MIN_SEED_LOOKAHEAD" spec:"true"`                  // MinSeedLookahead is the duration of randao look ahead seed.
-	MaxSeedLookahead                          primitives.Epoch `yaml:"MAX_SEED_LOOKAHEAD" spec:"true"`                  // MaxSeedLookahead is the duration a validator has to wait for entry and exit in epoch.
-	EpochsPerZond1VotingPeriod                primitives.Epoch `yaml:"EPOCHS_PER_ZOND1_VOTING_PERIOD" spec:"true"`      // EpochsPerZond1VotingPeriod defines how often the merkle root of deposit receipts get updated in beacon node on per epoch basis.
-	SlotsPerHistoricalRoot                    primitives.Slot  `yaml:"SLOTS_PER_HISTORICAL_ROOT" spec:"true"`           // SlotsPerHistoricalRoot defines how often the historical root is saved.
-	MinValidatorWithdrawabilityDelay          primitives.Epoch `yaml:"MIN_VALIDATOR_WITHDRAWABILITY_DELAY" spec:"true"` // MinValidatorWithdrawabilityDelay is the shortest amount of time a validator has to wait to withdraw.
-	ShardCommitteePeriod                      primitives.Epoch `yaml:"SHARD_COMMITTEE_PERIOD" spec:"true"`              // ShardCommitteePeriod is the minimum amount of epochs a validator must participate before exiting.
-	MinEpochsToInactivityPenalty              primitives.Epoch `yaml:"MIN_EPOCHS_TO_INACTIVITY_PENALTY" spec:"true"`    // MinEpochsToInactivityPenalty defines the minimum amount of epochs since finality to begin penalizing inactivity.
-	Zond1FollowDistance                       uint64           `yaml:"ZOND1_FOLLOW_DISTANCE" spec:"true"`               // Zond1FollowDistance is the number of zond1.0 blocks to wait before considering a new deposit for voting. This only applies after the chain as been started.
-	DeprecatedSafeSlotsToUpdateJustified      primitives.Slot  `yaml:"SAFE_SLOTS_TO_UPDATE_JUSTIFIED" spec:"true"`      // DeprecateSafeSlotsToUpdateJustified is the minimal slots needed to update justified check point.
-	DeprecatedSafeSlotsToImportOptimistically primitives.Slot  `yaml:"SAFE_SLOTS_TO_IMPORT_OPTIMISTICALLY" spec:"true"` // SafeSlotsToImportOptimistically is the minimal number of slots to wait before importing optimistically a pre-merge block
-	SecondsPerZOND1Block                      uint64           `yaml:"SECONDS_PER_ZOND1_BLOCK" spec:"true"`             // SecondsPerZOND1Block is the approximate time for a single zond1 block to be produced.
+	GenesisDelay                     uint64           `yaml:"GENESIS_DELAY" spec:"true"`                   // GenesisDelay is the minimum number of seconds to delay starting the Ethereum Beacon Chain genesis. Must be at least 1 second.
+	MinAttestationInclusionDelay     primitives.Slot  `yaml:"MIN_ATTESTATION_INCLUSION_DELAY" spec:"true"` // MinAttestationInclusionDelay defines how many slots validator has to wait to include attestation for beacon block.
+	SecondsPerSlot                   uint64           `yaml:"SECONDS_PER_SLOT" spec:"true"`                // SecondsPerSlot is how many seconds are in a single slot.
+	SlotsPerEpoch                    primitives.Slot  `yaml:"SLOTS_PER_EPOCH" spec:"true"`                 // SlotsPerEpoch is the number of slots in an epoch.
+	SqrRootSlotsPerEpoch             primitives.Slot  // SqrRootSlotsPerEpoch is a hard coded value where we take the square root of `SlotsPerEpoch` and round down.
+	MinSeedLookahead                 primitives.Epoch `yaml:"MIN_SEED_LOOKAHEAD" spec:"true"`                  // MinSeedLookahead is the duration of randao look ahead seed.
+	MaxSeedLookahead                 primitives.Epoch `yaml:"MAX_SEED_LOOKAHEAD" spec:"true"`                  // MaxSeedLookahead is the duration a validator has to wait for entry and exit in epoch.
+	EpochsPerZond1VotingPeriod       primitives.Epoch `yaml:"EPOCHS_PER_ZOND1_VOTING_PERIOD" spec:"true"`      // EpochsPerZond1VotingPeriod defines how often the merkle root of deposit receipts get updated in beacon node on per epoch basis.
+	SlotsPerHistoricalRoot           primitives.Slot  `yaml:"SLOTS_PER_HISTORICAL_ROOT" spec:"true"`           // SlotsPerHistoricalRoot defines how often the historical root is saved.
+	MinValidatorWithdrawabilityDelay primitives.Epoch `yaml:"MIN_VALIDATOR_WITHDRAWABILITY_DELAY" spec:"true"` // MinValidatorWithdrawabilityDelay is the shortest amount of time a validator has to wait to withdraw.
+	ShardCommitteePeriod             primitives.Epoch `yaml:"SHARD_COMMITTEE_PERIOD" spec:"true"`              // ShardCommitteePeriod is the minimum amount of epochs a validator must participate before exiting.
+	MinEpochsToInactivityPenalty     primitives.Epoch `yaml:"MIN_EPOCHS_TO_INACTIVITY_PENALTY" spec:"true"`    // MinEpochsToInactivityPenalty defines the minimum amount of epochs since finality to begin penalizing inactivity.
+	Zond1FollowDistance              uint64           `yaml:"ZOND1_FOLLOW_DISTANCE" spec:"true"`               // Zond1FollowDistance is the number of zond1.0 blocks to wait before considering a new deposit for voting. This only applies after the chain as been started.
+	SecondsPerZOND1Block             uint64           `yaml:"SECONDS_PER_ZOND1_BLOCK" spec:"true"`             // SecondsPerZOND1Block is the approximate time for a single zond1 block to be produced.
 
 	// Fork choice algorithm constants.
 	ProposerScoreBoost              uint64           `yaml:"PROPOSER_SCORE_BOOST" spec:"true"`                // ProposerScoreBoost defines a value that is a % of the committee weight for fork-choice boosting.
@@ -124,12 +122,12 @@ type BeaconChainConfig struct {
 	DomainApplicationBuilder          [4]byte // DomainApplicationBuilder defines the BLS signature domain for application builder.
 	DomainDilithiumToExecutionChange  [4]byte // DomainDilithiumToExecutionChange defines the Dilithium signature domain to change withdrawal addresses to Zond prefix
 
-	// Prysm constants.
+	// Qrysm constants.
 	GweiPerEth                     uint64                      // GweiPerEth is the amount of gwei corresponding to 1 eth.
 	BLSSecretKeyLength             int                         // BLSSecretKeyLength defines the expected length of BLS secret keys in bytes.
 	BLSPubkeyLength                int                         // BLSPubkeyLength defines the expected length of BLS public keys in bytes.
 	DilithiumPubkeyLength          int                         // DilithiumPubkeyLength defines the expected length of Dilithium public keys in bytes.
-	DefaultBufferSize              int                         // DefaultBufferSize for channels across the Prysm repository.
+	DefaultBufferSize              int                         // DefaultBufferSize for channels across the Qrysm repository.
 	ValidatorPrivkeyFileName       string                      // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
 	WithdrawalPrivkeyFileName      string                      // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
 	RPCSyncCheck                   time.Duration               // Number of seconds to query the sync service, to find out if the node is synced or not.

@@ -33,17 +33,17 @@ func (s *Server) ListKeystores(
 	ctx context.Context, _ *empty.Empty,
 ) (*zondpbservice.ListKeystoresResponse, error) {
 	if !s.walletInitialized {
-		return nil, status.Error(codes.FailedPrecondition, "Prysm Wallet not initialized. Please create a new wallet.")
+		return nil, status.Error(codes.FailedPrecondition, "Qrysm Wallet not initialized. Please create a new wallet.")
 	}
 	if s.validatorService == nil {
 		return nil, status.Error(codes.FailedPrecondition, "Validator service not ready. Please try again once validator is ready.")
 	}
 	km, err := s.validatorService.Keymanager()
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not get Prysm keymanager (possibly due to beacon node unavailable): %v", err)
+		return nil, status.Errorf(codes.Internal, "Could not get Qrysm keymanager (possibly due to beacon node unavailable): %v", err)
 	}
 	if s.wallet.KeymanagerKind() != keymanager.Derived && s.wallet.KeymanagerKind() != keymanager.Local {
-		return nil, status.Errorf(codes.FailedPrecondition, "Prysm validator keys are not stored locally with this keymanager type.")
+		return nil, status.Errorf(codes.FailedPrecondition, "Qrysm validator keys are not stored locally with this keymanager type.")
 	}
 	pubKeys, err := km.FetchValidatingPublicKeys(ctx)
 	if err != nil {
@@ -63,12 +63,12 @@ func (s *Server) ListKeystores(
 	}, nil
 }
 
-// ImportKeystores allows for importing keystores into Prysm with their slashing protection history.
+// ImportKeystores allows for importing keystores into Qrysm with their slashing protection history.
 func (s *Server) ImportKeystores(
 	ctx context.Context, req *zondpbservice.ImportKeystoresRequest,
 ) (*zondpbservice.ImportKeystoresResponse, error) {
 	if !s.walletInitialized {
-		statuses := groupImportErrors(req, "Prysm Wallet not initialized. Please create a new wallet.")
+		statuses := groupImportErrors(req, "Qrysm Wallet not initialized. Please create a new wallet.")
 		return &zondpbservice.ImportKeystoresResponse{Data: statuses}, nil
 	}
 	if s.validatorService == nil {
@@ -149,12 +149,12 @@ func groupImportErrors(req *zondpbservice.ImportKeystoresRequest, errorMessage s
 	return statuses
 }
 
-// DeleteKeystores allows for deleting specified public keys from Prysm.
+// DeleteKeystores allows for deleting specified public keys from Qrysm.
 func (s *Server) DeleteKeystores(
 	ctx context.Context, req *zondpbservice.DeleteKeystoresRequest,
 ) (*zondpbservice.DeleteKeystoresResponse, error) {
 	if !s.walletInitialized {
-		statuses := groupExportErrors(req, "Prysm Wallet not initialized. Please create a new wallet.")
+		statuses := groupExportErrors(req, "Qrysm Wallet not initialized. Please create a new wallet.")
 		return &zondpbservice.DeleteKeystoresResponse{Data: statuses}, nil
 	}
 	if s.validatorService == nil {
@@ -268,17 +268,17 @@ func (s *Server) slashingProtectionHistoryForDeletedKeys(
 // ListRemoteKeys returns a list of all public keys defined for web3signer keymanager type.
 func (s *Server) ListRemoteKeys(ctx context.Context, _ *empty.Empty) (*zondpbservice.ListRemoteKeysResponse, error) {
 	if !s.walletInitialized {
-		return nil, status.Error(codes.FailedPrecondition, "Prysm Wallet not initialized. Please create a new wallet.")
+		return nil, status.Error(codes.FailedPrecondition, "Qrysm Wallet not initialized. Please create a new wallet.")
 	}
 	if s.validatorService == nil {
 		return nil, status.Error(codes.FailedPrecondition, "Validator service not ready.")
 	}
 	km, err := s.validatorService.Keymanager()
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not get Prysm keymanager (possibly due to beacon node unavailable): %v", err)
+		return nil, status.Errorf(codes.Internal, "Could not get Qrysm keymanager (possibly due to beacon node unavailable): %v", err)
 	}
 	if s.wallet.KeymanagerKind() != keymanager.Web3Signer {
-		return nil, status.Errorf(codes.FailedPrecondition, "Prysm Wallet is not of type Web3Signer. Please execute validator client with web3signer flags.")
+		return nil, status.Errorf(codes.FailedPrecondition, "Qrysm Wallet is not of type Web3Signer. Please execute validator client with web3signer flags.")
 	}
 	pubKeys, err := km.FetchValidatingPublicKeys(ctx)
 	if err != nil {
@@ -300,17 +300,17 @@ func (s *Server) ListRemoteKeys(ctx context.Context, _ *empty.Empty) (*zondpbser
 // ImportRemoteKeys imports a list of public keys defined for web3signer keymanager type.
 func (s *Server) ImportRemoteKeys(ctx context.Context, req *zondpbservice.ImportRemoteKeysRequest) (*zondpbservice.ImportRemoteKeysResponse, error) {
 	if !s.walletInitialized {
-		return nil, status.Error(codes.FailedPrecondition, "Prysm Wallet not initialized. Please create a new wallet.")
+		return nil, status.Error(codes.FailedPrecondition, "Qrysm Wallet not initialized. Please create a new wallet.")
 	}
 	if s.validatorService == nil {
 		return nil, status.Error(codes.FailedPrecondition, "Validator service not ready.")
 	}
 	km, err := s.validatorService.Keymanager()
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Could not get Prysm keymanager (possibly due to beacon node unavailable): %v", err))
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Could not get Qrysm keymanager (possibly due to beacon node unavailable): %v", err))
 	}
 	if s.wallet.KeymanagerKind() != keymanager.Web3Signer {
-		return nil, status.Errorf(codes.FailedPrecondition, "Prysm Wallet is not of type Web3Signer. Please execute validator client with web3signer flags.")
+		return nil, status.Errorf(codes.FailedPrecondition, "Qrysm Wallet is not of type Web3Signer. Please execute validator client with web3signer flags.")
 	}
 	adder, ok := km.(keymanager.PublicKeyAdder)
 	if !ok {
@@ -327,7 +327,7 @@ func (s *Server) ImportRemoteKeys(ctx context.Context, req *zondpbservice.Import
 		}
 	}
 	if isUrlUsed {
-		log.Warnf("Setting web3signer base url for imported keys is not supported. Prysm only uses the url from --validators-external-signer-url flag for web3signer.")
+		log.Warnf("Setting web3signer base url for imported keys is not supported. Qrysm only uses the url from --validators-external-signer-url flag for web3signer.")
 	}
 
 	statuses, err := adder.AddPublicKeys(ctx, remoteKeys)
@@ -354,17 +354,17 @@ func groupImportRemoteKeysErrors(req *zondpbservice.ImportRemoteKeysRequest, err
 // DeleteRemoteKeys deletes a list of public keys defined for web3signer keymanager type.
 func (s *Server) DeleteRemoteKeys(ctx context.Context, req *zondpbservice.DeleteRemoteKeysRequest) (*zondpbservice.DeleteRemoteKeysResponse, error) {
 	if !s.walletInitialized {
-		return nil, status.Error(codes.FailedPrecondition, "Prysm Wallet not initialized. Please create a new wallet.")
+		return nil, status.Error(codes.FailedPrecondition, "Qrysm Wallet not initialized. Please create a new wallet.")
 	}
 	if s.validatorService == nil {
 		return nil, status.Error(codes.FailedPrecondition, "Validator service not ready.")
 	}
 	km, err := s.validatorService.Keymanager()
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not get Prysm keymanager (possibly due to beacon node unavailable): %v", err)
+		return nil, status.Errorf(codes.Internal, "Could not get Qrysm keymanager (possibly due to beacon node unavailable): %v", err)
 	}
 	if s.wallet.KeymanagerKind() != keymanager.Web3Signer {
-		return nil, status.Errorf(codes.FailedPrecondition, "Prysm Wallet is not of type Web3Signer. Please execute validator client with web3signer flags.")
+		return nil, status.Errorf(codes.FailedPrecondition, "Qrysm Wallet is not of type Web3Signer. Please execute validator client with web3signer flags.")
 	}
 	deleter, ok := km.(keymanager.PublicKeyDeleter)
 	if !ok {

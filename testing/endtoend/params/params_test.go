@@ -31,8 +31,8 @@ func TestStandardPorts(t *testing.T) {
 	testPorts := &ports{}
 	assert.NoError(t, initializeStandardPorts(2, 0, testPorts, &existingRegistrations))
 	assert.Equal(t, 16, len(existingRegistrations))
-	assert.NotEqual(t, 0, testPorts.PrysmBeaconNodeGatewayPort)
-	assert.NotEqual(t, 0, testPorts.PrysmBeaconNodeTCPPort)
+	assert.NotEqual(t, 0, testPorts.QrysmBeaconNodeGatewayPort)
+	assert.NotEqual(t, 0, testPorts.QrysmBeaconNodeTCPPort)
 	assert.NotEqual(t, 0, testPorts.JaegerTracingPort)
 }
 

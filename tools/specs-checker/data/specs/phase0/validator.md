@@ -50,8 +50,8 @@ def voting_period_start_time(state: BeaconState) -> uint64:
 ```python
 def is_candidate_block(block: Zond1Block, period_start: uint64) -> bool:
     return (
-        block.timestamp + SECONDS_PER_ETH1_BLOCK * ETH1_FOLLOW_DISTANCE <= period_start
-        and block.timestamp + SECONDS_PER_ETH1_BLOCK * ETH1_FOLLOW_DISTANCE * 2 >= period_start
+        block.timestamp + SECONDS_PER_ZOND1_BLOCK * ZOND1_FOLLOW_DISTANCE <= period_start
+        and block.timestamp + SECONDS_PER_ZOND1_BLOCK * ZOND1_FOLLOW_DISTANCE * 2 >= period_start
     )
 ```
 ```python

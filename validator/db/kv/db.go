@@ -42,7 +42,6 @@ var (
 // from our metrics fetching for performance reasons. For a detailed
 // summary, it can be read in https://github.com/theQRL/qrysm/issues/8274.
 var blockedBuckets = [][]byte{
-	deprecatedAttestationHistoryBucket,
 	lowestSignedSourceBucket,
 	lowestSignedTargetBucket,
 	lowestSignedProposalsBucket,
@@ -58,7 +57,7 @@ type Config struct {
 	PubKeys [][dilithium2.CryptoPublicKeyBytes]byte
 }
 
-// Store defines an implementation of the Prysm Database interface
+// Store defines an implementation of the Qrysm Database interface
 // using BoltDB as the underlying persistent kv-store for Ethereum consensus nodes.
 type Store struct {
 	db                                 *bolt.DB
@@ -142,7 +141,6 @@ func NewKVStore(ctx context.Context, dirPath string, config *Config) (*Store, er
 		return createBuckets(
 			tx,
 			genesisInfoBucket,
-			deprecatedAttestationHistoryBucket,
 			historicProposalsBucket,
 			lowestSignedSourceBucket,
 			lowestSignedTargetBucket,

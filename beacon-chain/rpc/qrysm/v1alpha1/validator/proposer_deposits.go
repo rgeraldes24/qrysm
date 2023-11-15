@@ -23,10 +23,10 @@ func (vs *Server) packDepositsAndAttestations(ctx context.Context, head state.Be
 	var atts []*zondpb.Attestation
 
 	eg.Go(func() error {
-		// Pack ETH1 deposits which have not been included in the beacon chain.
+		// Pack ZOND1 deposits which have not been included in the beacon chain.
 		localDeposits, err := vs.deposits(egctx, head, zond1Data)
 		if err != nil {
-			return status.Errorf(codes.Internal, "Could not get ETH1 deposits: %v", err)
+			return status.Errorf(codes.Internal, "Could not get ZOND1 deposits: %v", err)
 		}
 		// if the original context is cancelled, then cancel this routine too
 		select {
@@ -219,7 +219,7 @@ func constructMerkleProof(trie *trie.SparseMerkleTrie, index int, deposit *zondp
 		return nil, errors.Wrapf(err, "could not generate merkle proof for deposit at index %d", index)
 	}
 	// For every deposit, we construct a Merkle proof using the powchain service's
-	// in-memory deposits trie, which is updated only once the state's LatestETH1Data
+	// in-memory deposits trie, which is updated only once the state's LatestZOND1Data
 	// property changes during a state transition after a voting period.
 	deposit.Proof = proof
 	return deposit, nil

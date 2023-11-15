@@ -170,7 +170,7 @@ func createDepositData(privKey dilithium.DilithiumKey, pubKey dilithium.PublicKe
 	}
 	if withExecCreds {
 		newCredentials := make([]byte, 12)
-		newCredentials[0] = params.BeaconConfig().ETH1AddressWithdrawalPrefixByte
+		newCredentials[0] = params.BeaconConfig().ZOND1AddressWithdrawalPrefixByte
 		execAddr := bytesutil.ToBytes20(pubKey.Marshal())
 		depositMessage.WithdrawalCredentials = append(newCredentials, execAddr[:]...)
 	}

@@ -24,7 +24,7 @@ func TestBalanceCache_AddGetBalance(t *testing.T) {
 	raw := &zondpb.BeaconState{
 		BlockRoots: blockRoots,
 	}
-	st, err := state_native.InitializeFromProtoPhase0(raw)
+	st, err := state_native.InitializeFromProtoCapella(raw)
 	require.NoError(t, err)
 
 	cache := NewEffectiveBalanceCache()
@@ -68,7 +68,7 @@ func TestBalanceCache_BalanceKey(t *testing.T) {
 	raw := &zondpb.BeaconState{
 		BlockRoots: blockRoots,
 	}
-	st, err := state_native.InitializeFromProtoPhase0(raw)
+	st, err := state_native.InitializeFromProtoCapella(raw)
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(primitives.Slot(math.MaxUint64)))
 

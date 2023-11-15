@@ -22,7 +22,7 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/validator/accounts"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/local"
@@ -66,7 +66,7 @@ func createKeystore(t *testing.T, path string) (*keymanager.Keystore, string) {
 	encoded, err := json.MarshalIndent(keystoreFile, "", "\t")
 	require.NoError(t, err)
 	// Write the encoded keystore to disk with the timestamp appended
-	createdAt := prysmTime.Now().Unix()
+	createdAt := qrysmTime.Now().Unix()
 	fullPath := filepath.Join(path, fmt.Sprintf(local.KeystoreFileNameFormat, createdAt))
 	require.NoError(t, os.WriteFile(fullPath, encoded, os.ModePerm))
 	return keystoreFile, fullPath

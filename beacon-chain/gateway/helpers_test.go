@@ -32,7 +32,7 @@ func TestDefaultConfig(t *testing.T) {
 		assert.Equal(t, "/zond/v1alpha1/", cfg.V1AlphaPbMux.Patterns[0])
 		assert.Equal(t, 5, len(cfg.V1AlphaPbMux.Registrations))
 	})
-	t.Run("Without Prysm API", func(t *testing.T) {
+	t.Run("Without Qrysm API", func(t *testing.T) {
 		cfg := DefaultConfig(true, "zond")
 		assert.NotNil(t, cfg.ZondPbMux.Mux)
 		require.Equal(t, 2, len(cfg.ZondPbMux.Patterns))
@@ -40,8 +40,8 @@ func TestDefaultConfig(t *testing.T) {
 		assert.Equal(t, 5, len(cfg.ZondPbMux.Registrations))
 		assert.Equal(t, (*gateway.PbMux)(nil), cfg.V1AlphaPbMux)
 	})
-	t.Run("Without Eth API", func(t *testing.T) {
-		cfg := DefaultConfig(true, "prysm")
+	t.Run("Without Zond API", func(t *testing.T) {
+		cfg := DefaultConfig(true, "qrysm")
 		assert.Equal(t, (*gateway.PbMux)(nil), cfg.ZondPbMux)
 		assert.NotNil(t, cfg.V1AlphaPbMux.Mux)
 		require.Equal(t, 2, len(cfg.V1AlphaPbMux.Patterns))

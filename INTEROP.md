@@ -1,23 +1,23 @@
-# Prysm Client Interoperability Guide
+# Qrysm Client Interoperability Guide
 
-This README details how to setup Prysm for interop testing for usage with other Ethereum consensus clients.
+This README details how to setup Qrysm for interop testing for usage with other Ethereum consensus clients.
 
 ## Installation & Setup
 
 1. Install [Bazel](https://docs.bazel.build/versions/master/install.html) **(Recommended)**
-2. `git clone https://github.com/prysmaticlabs/prysm && cd prysm`
+2. `git clone https://github.com/theQRL/qrysm && cd qrysm`
 3. `bazel build //...`
 
 ## Starting from Genesis
 
-Prysm supports a few ways to quickly launch a beacon node from basic configurations:
+Qrysm supports a few ways to quickly launch a beacon node from basic configurations:
 
 - `NumValidators + GenesisTime`: Launches a beacon node by deterministically generating a state from a num-validators flag along with a genesis time **(Recommended)**
 - `SSZ Genesis`: Launches a beacon node  from a .ssz file containing a SSZ-encoded, genesis beacon state
 
 ## Generating a Genesis State
 
-To setup the necessary files for these quick starts, Prysm provides a tool to generate a `genesis.ssz` from
+To setup the necessary files for these quick starts, Qrysm provides a tool to generate a `genesis.ssz` from
 a deterministically generated set of validator private keys following the official interop YAML format 
 [here](https://github.com/ethereum/eth2.0-pm/blob/master/interop/mocked_start).
 
@@ -29,9 +29,6 @@ You can use `bazel run //tools/genesis-state-gen` to create a deterministic gene
 - **--num-validators** int: Number of validators to deterministically include in the generated genesis state
 - **--output-ssz** string: Output filename of the SSZ marshaling of the generated genesis state
 - **--config-name=interop** string: name of the beacon chain config to use when generating the state. ex mainnet|minimal|interop
-
-**deprecated flag: use --config-name instead**
-- **--mainnet-config** bool: Select whether genesis state should be generated with mainnet or minimal (default) params
 
 The example below creates 64 validator keys, instantiates a genesis state with those 64 validators and with genesis unix timestamp 1567542540,
 and finally writes a ssz encoded output to ~/Desktop/genesis.ssz. This file can be used to kickstart the beacon chain in the next section. When using the `--interop-*` flags, the beacon node will assume the `interop` config should be used, unless a different config is specified on the command line.

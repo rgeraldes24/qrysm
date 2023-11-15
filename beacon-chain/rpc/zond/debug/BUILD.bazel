@@ -14,7 +14,7 @@ go_library(
         "//beacon-chain/rpc/zond/helpers:go_default_library",
         "//beacon-chain/rpc/lookup:go_default_library",
         "//proto/migration:go_default_library",
-        "//proto/zond/v1:go_default_library",f
+        "//proto/zond/v1:go_default_library",
         "//runtime/version:go_default_library",
         "@io_opencensus_go//trace:go_default_library",
         "@org_golang_google_grpc//codes:go_default_library",

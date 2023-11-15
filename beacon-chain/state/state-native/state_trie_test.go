@@ -15,10 +15,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-func TestInitializeFromProto_Phase0(t *testing.T) {
-	testState, _ := util.DeterministicGenesisState(t, 64)
-	pbState, err := statenative.ProtobufBeaconStatePhase0(testState.ToProtoUnsafe())
-	require.NoError(t, err)
+func TestInitializeFromProto_Capella(t *testing.T) {
 	type test struct {
 		name  string
 		state *zondpb.BeaconState
@@ -40,118 +37,6 @@ func TestInitializeFromProto_Phase0(t *testing.T) {
 		{
 			name:  "empty state",
 			state: &zondpb.BeaconState{},
-		},
-		{
-			name:  "full state",
-			state: pbState,
-		},
-	}
-	for _, tt := range initTests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := statenative.InitializeFromProtoUnsafePhase0(tt.state)
-			if tt.error != "" {
-				assert.ErrorContains(t, tt.error, err)
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestInitializeFromProto_Altair(t *testing.T) {
-	type test struct {
-		name  string
-		state *zondpb.BeaconStateAltair
-		error string
-	}
-	initTests := []test{
-		{
-			name:  "nil state",
-			state: nil,
-			error: "received nil state",
-		},
-		{
-			name: "nil validators",
-			state: &zondpb.BeaconStateAltair{
-				Slot:       4,
-				Validators: nil,
-			},
-		},
-		{
-			name:  "empty state",
-			state: &zondpb.BeaconStateAltair{},
-		},
-	}
-	for _, tt := range initTests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := statenative.InitializeFromProtoAltair(tt.state)
-			if tt.error != "" {
-				require.ErrorContains(t, tt.error, err)
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestInitializeFromProto_Bellatrix(t *testing.T) {
-	type test struct {
-		name  string
-		state *zondpb.BeaconStateBellatrix
-		error string
-	}
-	initTests := []test{
-		{
-			name:  "nil state",
-			state: nil,
-			error: "received nil state",
-		},
-		{
-			name: "nil validators",
-			state: &zondpb.BeaconStateBellatrix{
-				Slot:       4,
-				Validators: nil,
-			},
-		},
-		{
-			name:  "empty state",
-			state: &zondpb.BeaconStateBellatrix{},
-		},
-	}
-	for _, tt := range initTests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := statenative.InitializeFromProtoBellatrix(tt.state)
-			if tt.error != "" {
-				require.ErrorContains(t, tt.error, err)
-			} else {
-				require.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestInitializeFromProto_Capella(t *testing.T) {
-	type test struct {
-		name  string
-		state *zondpb.BeaconStateCapella
-		error string
-	}
-	initTests := []test{
-		{
-			name:  "nil state",
-			state: nil,
-			error: "received nil state",
-		},
-		{
-			name: "nil validators",
-			state: &zondpb.BeaconStateCapella{
-				Slot:       4,
-				Validators: nil,
-			},
-		},
-		{
-			name:  "empty state",
-			state: &zondpb.BeaconStateCapella{},
 		},
 	}
 	for _, tt := range initTests {
@@ -166,10 +51,7 @@ func TestInitializeFromProto_Capella(t *testing.T) {
 	}
 }
 
-func TestInitializeFromProtoUnsafe_Phase0(t *testing.T) {
-	testState, _ := util.DeterministicGenesisState(t, 64)
-	pbState, err := statenative.ProtobufBeaconStatePhase0(testState.ToProtoUnsafe())
-	require.NoError(t, err)
+func TestInitializeFromProtoUnsafe_Capella(t *testing.T) {
 	type test struct {
 		name  string
 		state *zondpb.BeaconState
@@ -186,103 +68,6 @@ func TestInitializeFromProtoUnsafe_Phase0(t *testing.T) {
 		{
 			name:  "empty state",
 			state: &zondpb.BeaconState{},
-		},
-		{
-			name:  "full state",
-			state: pbState,
-		},
-	}
-	for _, tt := range initTests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := statenative.InitializeFromProtoUnsafePhase0(tt.state)
-			if tt.error != "" {
-				assert.ErrorContains(t, tt.error, err)
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestInitializeFromProtoUnsafe_Altair(t *testing.T) {
-	type test struct {
-		name  string
-		state *zondpb.BeaconStateAltair
-		error string
-	}
-	initTests := []test{
-		{
-			name: "nil validators",
-			state: &zondpb.BeaconStateAltair{
-				Slot:       4,
-				Validators: nil,
-			},
-		},
-		{
-			name:  "empty state",
-			state: &zondpb.BeaconStateAltair{},
-		},
-	}
-	for _, tt := range initTests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := statenative.InitializeFromProtoUnsafeAltair(tt.state)
-			if tt.error != "" {
-				assert.ErrorContains(t, tt.error, err)
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestInitializeFromProtoUnsafe_Bellatrix(t *testing.T) {
-	type test struct {
-		name  string
-		state *zondpb.BeaconStateBellatrix
-		error string
-	}
-	initTests := []test{
-		{
-			name: "nil validators",
-			state: &zondpb.BeaconStateBellatrix{
-				Slot:       4,
-				Validators: nil,
-			},
-		},
-		{
-			name:  "empty state",
-			state: &zondpb.BeaconStateBellatrix{},
-		},
-	}
-	for _, tt := range initTests {
-		t.Run(tt.name, func(t *testing.T) {
-			_, err := statenative.InitializeFromProtoUnsafeBellatrix(tt.state)
-			if tt.error != "" {
-				assert.ErrorContains(t, tt.error, err)
-			} else {
-				assert.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestInitializeFromProtoUnsafe_Capella(t *testing.T) {
-	type test struct {
-		name  string
-		state *zondpb.BeaconStateCapella
-		error string
-	}
-	initTests := []test{
-		{
-			name: "nil validators",
-			state: &zondpb.BeaconStateCapella{
-				Slot:       4,
-				Validators: nil,
-			},
-		},
-		{
-			name:  "empty state",
-			state: &zondpb.BeaconStateCapella{},
 		},
 	}
 	for _, tt := range initTests {

@@ -68,7 +68,7 @@ func (a *accountStore) Copy() *accountStore {
 	return storeCopy
 }
 
-// AccountsKeystoreRepresentation defines an internal Prysm representation
+// AccountsKeystoreRepresentation defines an internal Qrysm representation
 // of validator accounts, encrypted according to the EIP-2334 standard.
 type AccountsKeystoreRepresentation struct {
 	Crypto  map[string]interface{} `json:"crypto"`

@@ -27,7 +27,7 @@ type metadata struct {
 	basepath         string
 	params           func(encoding string, currentEpoch primitives.Epoch) []string
 	requestObject    interface{}
-	prysmResps       map[string]interface{}
+	qrysmResps       map[string]interface{}
 	lighthouseResps  map[string]interface{}
 	customEvaluation func(interface{}, interface{}) error
 }
@@ -38,7 +38,7 @@ var beaconPathsAndObjects = map[string]metadata{
 		params: func(_ string, _ primitives.Epoch) []string {
 			return []string{}
 		},
-		prysmResps: map[string]interface{}{
+		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.GenesisResponseJson{},
 		},
 		lighthouseResps: map[string]interface{}{
@@ -50,7 +50,7 @@ var beaconPathsAndObjects = map[string]metadata{
 		params: func(_ string, _ primitives.Epoch) []string {
 			return []string{"head"}
 		},
-		prysmResps: map[string]interface{}{
+		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.StateRootResponseJson{},
 		},
 		lighthouseResps: map[string]interface{}{
@@ -62,7 +62,7 @@ var beaconPathsAndObjects = map[string]metadata{
 		params: func(_ string, _ primitives.Epoch) []string {
 			return []string{"head"}
 		},
-		prysmResps: map[string]interface{}{
+		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.StateFinalityCheckpointResponseJson{},
 		},
 		lighthouseResps: map[string]interface{}{
@@ -81,7 +81,7 @@ var beaconPathsAndObjects = map[string]metadata{
 			return []string{"head"}
 
 		},
-		prysmResps: map[string]interface{}{
+		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.BlockResponseJson{},
 			"ssz":  []byte{},
 		},
@@ -95,7 +95,7 @@ var beaconPathsAndObjects = map[string]metadata{
 		params: func(_ string, _ primitives.Epoch) []string {
 			return []string{"finalized"}
 		},
-		prysmResps: map[string]interface{}{
+		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.StateForkResponseJson{},
 		},
 		lighthouseResps: map[string]interface{}{
@@ -107,11 +107,11 @@ var beaconPathsAndObjects = map[string]metadata{
 		params: func(_ string, e primitives.Epoch) []string {
 			return []string{"head"}
 		},
-		prysmResps: map[string]interface{}{
-			"json": &apimiddleware.BeaconStateV2ResponseJson{},
+		qrysmResps: map[string]interface{}{
+			"json": &apimiddleware.BeaconStateResponseJson{},
 		},
 		lighthouseResps: map[string]interface{}{
-			"json": &apimiddleware.BeaconStateV2ResponseJson{},
+			"json": &apimiddleware.BeaconStateResponseJson{},
 		},
 	},
 	"/validator/duties/proposer/{param1}": {
@@ -119,23 +119,23 @@ var beaconPathsAndObjects = map[string]metadata{
 		params: func(_ string, e primitives.Epoch) []string {
 			return []string{fmt.Sprintf("%v", e)}
 		},
-		prysmResps: map[string]interface{}{
+		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.ProposerDutiesResponseJson{},
 		},
 		lighthouseResps: map[string]interface{}{
 			"json": &apimiddleware.ProposerDutiesResponseJson{},
 		},
-		customEvaluation: func(prysmResp interface{}, lhouseResp interface{}) error {
+		customEvaluation: func(qrysmResp interface{}, lhouseResp interface{}) error {
 			castedl, ok := lhouseResp.(*apimiddleware.ProposerDutiesResponseJson)
 			if !ok {
 				return errors.New("failed to cast type")
 			}
 			if castedl.Data[0].Slot == "0" {
 				// remove the first item from lighthouse data since lighthouse is returning a value despite no proposer
-				// there is no proposer on slot 0 so prysm don't return anything for slot 0
+				// there is no proposer on slot 0 so qrysm don't return anything for slot 0
 				castedl.Data = castedl.Data[1:]
 			}
-			return compareJSONResponseObjects(prysmResp, castedl)
+			return compareJSONResponseObjects(qrysmResp, castedl)
 		},
 	},
 	"/validator/duties/attester/{param1}": {
@@ -151,13 +151,13 @@ var beaconPathsAndObjects = map[string]metadata{
 			}
 			return validatorIndices
 		}(),
-		prysmResps: map[string]interface{}{
+		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.AttesterDutiesResponseJson{},
 		},
 		lighthouseResps: map[string]interface{}{
 			"json": &apimiddleware.AttesterDutiesResponseJson{},
 		},
-		customEvaluation: func(prysmResp interface{}, lhouseResp interface{}) error {
+		customEvaluation: func(qrysmResp interface{}, lhouseResp interface{}) error {
 			castedp, ok := lhouseResp.(*apimiddleware.AttesterDutiesResponseJson)
 			if !ok {
 				return errors.New("failed to cast type")
@@ -169,9 +169,9 @@ var beaconPathsAndObjects = map[string]metadata{
 			if len(castedp.Data) == 0 ||
 				len(castedl.Data) == 0 ||
 				len(castedp.Data) != len(castedl.Data) {
-				return fmt.Errorf("attester data does not match, prysm: %d lighthouse: %d", len(castedp.Data), len(castedl.Data))
+				return fmt.Errorf("attester data does not match, qrysm: %d lighthouse: %d", len(castedp.Data), len(castedl.Data))
 			}
-			return compareJSONResponseObjects(prysmResp, castedl)
+			return compareJSONResponseObjects(qrysmResp, castedl)
 		},
 	},
 	"/beacon/headers/{param1}": {
@@ -183,7 +183,7 @@ var beaconPathsAndObjects = map[string]metadata{
 			}
 			return []string{fmt.Sprintf("%v", slot)}
 		},
-		prysmResps: map[string]interface{}{
+		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.BlockHeaderResponseJson{},
 		},
 		lighthouseResps: map[string]interface{}{
@@ -195,14 +195,14 @@ var beaconPathsAndObjects = map[string]metadata{
 		params: func(_ string, _ primitives.Epoch) []string {
 			return []string{}
 		},
-		prysmResps: map[string]interface{}{
+		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.IdentityResponseJson{},
 		},
 		lighthouseResps: map[string]interface{}{
 			"json": &apimiddleware.IdentityResponseJson{},
 		},
-		customEvaluation: func(prysmResp interface{}, lhouseResp interface{}) error {
-			castedp, ok := prysmResp.(*apimiddleware.IdentityResponseJson)
+		customEvaluation: func(qrysmResp interface{}, lhouseResp interface{}) error {
+			castedp, ok := qrysmResp.(*apimiddleware.IdentityResponseJson)
 			if !ok {
 				return errors.New("failed to cast type")
 			}
@@ -211,7 +211,7 @@ var beaconPathsAndObjects = map[string]metadata{
 				return errors.New("failed to cast type")
 			}
 			if castedp.Data == nil {
-				return errors.New("prysm node identity was empty")
+				return errors.New("qrysm node identity was empty")
 			}
 			if castedl.Data == nil {
 				return errors.New("lighthouse node identity was empty")
@@ -224,14 +224,14 @@ var beaconPathsAndObjects = map[string]metadata{
 		params: func(_ string, _ primitives.Epoch) []string {
 			return []string{}
 		},
-		prysmResps: map[string]interface{}{
+		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.PeersResponseJson{},
 		},
 		lighthouseResps: map[string]interface{}{
 			"json": &apimiddleware.PeersResponseJson{},
 		},
-		customEvaluation: func(prysmResp interface{}, lhouseResp interface{}) error {
-			castedp, ok := prysmResp.(*apimiddleware.PeersResponseJson)
+		customEvaluation: func(qrysmResp interface{}, lhouseResp interface{}) error {
+			castedp, ok := qrysmResp.(*apimiddleware.PeersResponseJson)
 			if !ok {
 				return errors.New("failed to cast type")
 			}
@@ -240,7 +240,7 @@ var beaconPathsAndObjects = map[string]metadata{
 				return errors.New("failed to cast type")
 			}
 			if castedp.Data == nil {
-				return errors.New("prysm node identity was empty")
+				return errors.New("qrysm node identity was empty")
 			}
 			if castedl.Data == nil {
 				return errors.New("lighthouse node identity was empty")
@@ -260,7 +260,7 @@ func withCompareBeaconAPIs(beaconNodeIdx int, conn *grpc.ClientConn) error {
 	currentEpoch := slots.EpochsSinceGenesis(genesisData.Data.GenesisTime.AsTime())
 
 	for path, meta := range beaconPathsAndObjects {
-		for key := range meta.prysmResps {
+		for key := range meta.qrysmResps {
 			switch key {
 			case "json":
 				jsonparams := meta.params("json", currentEpoch)
@@ -270,7 +270,7 @@ func withCompareBeaconAPIs(beaconNodeIdx int, conn *grpc.ClientConn) error {
 					meta.basepath,
 					apipath,
 					meta.requestObject,
-					beaconPathsAndObjects[path].prysmResps[key],
+					beaconPathsAndObjects[path].qrysmResps[key],
 					beaconPathsAndObjects[path].lighthouseResps[key],
 					meta.customEvaluation,
 				); err != nil {
@@ -283,11 +283,11 @@ func withCompareBeaconAPIs(beaconNodeIdx int, conn *grpc.ClientConn) error {
 				}
 				apipath := pathFromParams(path, sszparams)
 				fmt.Printf("executing ssz api path: %s\n", apipath)
-				prysmr, lighthouser, err := compareSSZMulticlient(beaconNodeIdx, meta.basepath, apipath)
+				qrysmr, lighthouser, err := compareSSZMulticlient(beaconNodeIdx, meta.basepath, apipath)
 				if err != nil {
 					return err
 				}
-				beaconPathsAndObjects[path].prysmResps[key] = prysmr
+				beaconPathsAndObjects[path].qrysmResps[key] = qrysmr
 				beaconPathsAndObjects[path].lighthouseResps[key] = lighthouser
 			default:
 				return fmt.Errorf("unknown encoding type %s", key)
@@ -299,7 +299,7 @@ func withCompareBeaconAPIs(beaconNodeIdx int, conn *grpc.ClientConn) error {
 
 func orderedEvaluationOnResponses(beaconPathsAndObjects map[string]metadata, genesisData *v1.GenesisResponse) error {
 	forkPathData := beaconPathsAndObjects["/beacon/states/{param1}/fork"]
-	prysmForkData, ok := forkPathData.prysmResps["json"].(*apimiddleware.StateForkResponseJson)
+	qrysmForkData, ok := forkPathData.qrysmResps["json"].(*apimiddleware.StateForkResponseJson)
 	if !ok {
 		return errors.New("failed to cast type")
 	}
@@ -307,18 +307,18 @@ func orderedEvaluationOnResponses(beaconPathsAndObjects map[string]metadata, gen
 	if !ok {
 		return errors.New("failed to cast type")
 	}
-	if prysmForkData.Data.Epoch != lighthouseForkData.Data.Epoch {
-		return fmt.Errorf("prysm epoch %v does not match lighthouse epoch %v",
-			prysmForkData.Data.Epoch,
+	if qrysmForkData.Data.Epoch != lighthouseForkData.Data.Epoch {
+		return fmt.Errorf("qrysm epoch %v does not match lighthouse epoch %v",
+			qrysmForkData.Data.Epoch,
 			lighthouseForkData.Data.Epoch)
 	}
 
-	finalizedEpoch, err := strconv.ParseUint(prysmForkData.Data.Epoch, 10, 64)
+	finalizedEpoch, err := strconv.ParseUint(qrysmForkData.Data.Epoch, 10, 64)
 	if err != nil {
 		return err
 	}
 	blockPathData := beaconPathsAndObjects["/beacon/blocks/{param1}"]
-	sszrspL, ok := blockPathData.prysmResps["ssz"].([]byte)
+	sszrspL, ok := blockPathData.qrysmResps["ssz"].([]byte)
 	if !ok {
 		return errors.New("failed to cast type")
 	}
@@ -336,7 +336,7 @@ func orderedEvaluationOnResponses(beaconPathsAndObjects map[string]metadata, gen
 			return errors.Wrap(err, "failed to unmarshal rysm ssz")
 		}
 		if len(blockP.Signature) == 0 || len(blockL.Signature) == 0 || hexutil.Encode(blockP.Signature) != hexutil.Encode(blockL.Signature) {
-			return errors.New("prysm signature does not match lighthouse signature")
+			return errors.New("qrysm signature does not match lighthouse signature")
 		}
 	} else if finalizedEpoch >= helpers.AltairE2EForkEpoch+2 && finalizedEpoch < helpers.BellatrixE2EForkEpoch {
 		blockP := &zondpb.SignedBeaconBlockAltair{}
@@ -345,11 +345,11 @@ func orderedEvaluationOnResponses(beaconPathsAndObjects map[string]metadata, gen
 			return errors.Wrap(err, "lighthouse ssz error")
 		}
 		if err := blockP.UnmarshalSSZ(sszrspP); err != nil {
-			return errors.Wrap(err, "prysm ssz error")
+			return errors.Wrap(err, "qrysm ssz error")
 		}
 
 		if len(blockP.Signature) == 0 || len(blockL.Signature) == 0 || hexutil.Encode(blockP.Signature) != hexutil.Encode(blockL.Signature) {
-			return fmt.Errorf("prysm response %v does not match lighthouse response %v",
+			return fmt.Errorf("qrysm response %v does not match lighthouse response %v",
 				blockP,
 				blockL)
 		}
@@ -360,43 +360,43 @@ func orderedEvaluationOnResponses(beaconPathsAndObjects map[string]metadata, gen
 			return errors.Wrap(err, "lighthouse ssz error")
 		}
 		if err := blockP.UnmarshalSSZ(sszrspP); err != nil {
-			return errors.Wrap(err, "prysm ssz error")
+			return errors.Wrap(err, "qrysm ssz error")
 		}
 
 		if len(blockP.Signature) == 0 || len(blockL.Signature) == 0 || hexutil.Encode(blockP.Signature) != hexutil.Encode(blockL.Signature) {
-			return fmt.Errorf("prysm response %v does not match lighthouse response %v",
+			return fmt.Errorf("qrysm response %v does not match lighthouse response %v",
 				blockP,
 				blockL)
 		}
 	}
 	blockheaderData := beaconPathsAndObjects["/beacon/headers/{param1}"]
-	prysmHeader, ok := blockheaderData.prysmResps["json"].(*apimiddleware.BlockHeaderResponseJson)
+	qrysmHeader, ok := blockheaderData.qrysmResps["json"].(*apimiddleware.BlockHeaderResponseJson)
 	if !ok {
 		return errors.New("failed to cast type")
 	}
 	proposerdutiesData := beaconPathsAndObjects["/validator/duties/proposer/{param1}"]
-	prysmDuties, ok := proposerdutiesData.prysmResps["json"].(*apimiddleware.ProposerDutiesResponseJson)
+	qrysmDuties, ok := proposerdutiesData.qrysmResps["json"].(*apimiddleware.ProposerDutiesResponseJson)
 	if !ok {
 		return errors.New("failed to cast type")
 	}
-	if prysmHeader.Data.Root != prysmDuties.DependentRoot {
+	if qrysmHeader.Data.Root != qrysmDuties.DependentRoot {
 		fmt.Printf("current slot: %v\n", slots.CurrentSlot(uint64(genesisData.Data.GenesisTime.AsTime().Unix())))
-		return fmt.Errorf("header root %s does not match duties root %s ", prysmHeader.Data.Root, prysmDuties.DependentRoot)
+		return fmt.Errorf("header root %s does not match duties root %s ", qrysmHeader.Data.Root, qrysmDuties.DependentRoot)
 	}
 
 	return nil
 }
 
-func compareJSONMulticlient(beaconNodeIdx int, base string, path string, requestObj, respJSONPrysm interface{}, respJSONLighthouse interface{}, customEvaluator func(interface{}, interface{}) error) error {
+func compareJSONMulticlient(beaconNodeIdx int, base string, path string, requestObj, respJSONQrysm interface{}, respJSONLighthouse interface{}, customEvaluator func(interface{}, interface{}) error) error {
 	if requestObj != nil {
 		if err := doMiddlewareJSONPostRequest(
 			base,
 			path,
 			beaconNodeIdx,
 			requestObj,
-			respJSONPrysm,
+			respJSONQrysm,
 		); err != nil {
-			return errors.Wrap(err, "could not perform POST request for Prysm JSON")
+			return errors.Wrap(err, "could not perform POST request for Qrysm JSON")
 		}
 
 		if err := doMiddlewareJSONPostRequest(
@@ -414,9 +414,9 @@ func compareJSONMulticlient(beaconNodeIdx int, base string, path string, request
 			base,
 			path,
 			beaconNodeIdx,
-			respJSONPrysm,
+			respJSONQrysm,
 		); err != nil {
-			return errors.Wrap(err, "could not perform GET request for Prysm JSON")
+			return errors.Wrap(err, "could not perform GET request for Qrysm JSON")
 		}
 
 		if err := doMiddlewareJSONGetRequest(
@@ -430,9 +430,9 @@ func compareJSONMulticlient(beaconNodeIdx int, base string, path string, request
 		}
 	}
 	if customEvaluator != nil {
-		return customEvaluator(respJSONPrysm, respJSONLighthouse)
+		return customEvaluator(respJSONQrysm, respJSONLighthouse)
 	} else {
-		return compareJSONResponseObjects(respJSONPrysm, respJSONLighthouse)
+		return compareJSONResponseObjects(respJSONQrysm, respJSONLighthouse)
 	}
 }
 
@@ -453,25 +453,25 @@ func compareSSZMulticlient(beaconNodeIdx int, base string, path string) ([]byte,
 		beaconNodeIdx,
 	)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not perform GET request for Prysm SSZ")
+		return nil, nil, errors.Wrap(err, "could not perform GET request for Qrysm SSZ")
 	}
 	if !bytes.Equal(sszrspL, sszrspP) {
-		return nil, nil, errors.New("prysm ssz response does not match lighthouse ssz response")
+		return nil, nil, errors.New("qrysm ssz response does not match lighthouse ssz response")
 	}
 	return sszrspP, sszrspL, nil
 }
 
-func compareJSONResponseObjects(prysmResp interface{}, lighthouseResp interface{}) error {
-	if !reflect.DeepEqual(prysmResp, lighthouseResp) {
-		p, err := json.Marshal(prysmResp)
+func compareJSONResponseObjects(qrysmResp interface{}, lighthouseResp interface{}) error {
+	if !reflect.DeepEqual(qrysmResp, lighthouseResp) {
+		p, err := json.Marshal(qrysmResp)
 		if err != nil {
-			return errors.Wrap(err, "failed to marshal Prysm response to JSON")
+			return errors.Wrap(err, "failed to marshal Qrysm response to JSON")
 		}
 		l, err := json.Marshal(lighthouseResp)
 		if err != nil {
 			return errors.Wrap(err, "failed to marshal Lighthouse response to JSON")
 		}
-		return fmt.Errorf("prysm response %s does not match lighthouse response %s",
+		return fmt.Errorf("qrysm response %s does not match lighthouse response %s",
 			string(p),
 			string(l))
 	}

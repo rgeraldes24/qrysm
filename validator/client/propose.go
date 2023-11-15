@@ -22,7 +22,7 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/v4/runtime/version"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"github.com/theQRL/qrysm/v4/validator/client/iface"
 	"go.opencensus.io/trace"
@@ -33,7 +33,7 @@ const signingRootErr = "could not get signing root"
 const signExitErr = "could not sign voluntary exit proposal"
 
 // ProposeBlock proposes a new beacon block for a given slot. This method collects the
-// previous beacon block, any pending deposits, and ETH1 data from the beacon
+// previous beacon block, any pending deposits, and ZOND1 data from the beacon
 // chain node to construct the new block. The new block is then processed with
 // the state root computation, and finally signed by the validator before being
 // sent back to the beacon node for broadcasting.
@@ -222,7 +222,7 @@ func ProposeExit(
 }
 
 func CurrentEpoch(genesisTime *timestamp.Timestamp) (primitives.Epoch, error) {
-	totalSecondsPassed := prysmTime.Now().Unix() - genesisTime.Seconds
+	totalSecondsPassed := qrysmTime.Now().Unix() - genesisTime.Seconds
 	currentSlot := primitives.Slot((uint64(totalSecondsPassed)) / params.BeaconConfig().SecondsPerSlot)
 	currentEpoch := slots.ToEpoch(currentSlot)
 	return currentEpoch, nil

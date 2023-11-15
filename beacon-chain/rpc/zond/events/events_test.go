@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed/operation"
 	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
-	prysmtime "github.com/theQRL/qrysm/v4/beacon-chain/core/time"
+	qrysmtime "github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -325,7 +325,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		srv.HeadFetcher = fetcher
 		srv.ChainInfoFetcher = fetcher
 
-		prevRando, err := helpers.RandaoMix(beaconState, prysmtime.CurrentEpoch(beaconState))
+		prevRando, err := helpers.RandaoMix(beaconState, qrysmtime.CurrentEpoch(beaconState))
 		require.NoError(t, err)
 
 		wantedPayload := &zondpb.EventPayloadAttributeV1{
@@ -433,7 +433,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		srv.HeadFetcher = fetcher
 		srv.ChainInfoFetcher = fetcher
 
-		prevRando, err := helpers.RandaoMix(beaconState, prysmtime.CurrentEpoch(beaconState))
+		prevRando, err := helpers.RandaoMix(beaconState, qrysmtime.CurrentEpoch(beaconState))
 		require.NoError(t, err)
 
 		wantedPayload := &zondpb.EventPayloadAttributeV2{

@@ -37,7 +37,7 @@ import (
 	"github.com/theQRL/qrysm/v4/monitoring/clientstats"
 	"github.com/theQRL/qrysm/v4/network"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -89,7 +89,7 @@ type POWBlockFetcher interface {
 	BlockExists(ctx context.Context, hash common.Hash) (bool, *big.Int, error)
 }
 
-// Chain defines a standard interface for the powchain service in Prysm.
+// Chain defines a standard interface for the powchain service in Qrysm.
 type Chain interface {
 	ChainStartFetcher
 	ChainInfoFetcher
@@ -136,7 +136,7 @@ type config struct {
 // Validator Registration Contract on the zond1 chain to kick off the beacon
 // chain's validator registration process.
 type Service struct {
-	connectedETH1           bool
+	connectedZOND1          bool
 	isRunning               bool
 	processingLock          sync.RWMutex
 	latestZond1DataLock     sync.RWMutex
@@ -147,7 +147,7 @@ type Service struct {
 	httpLogger              bind.ContractFilterer
 	rpcClient               RPCClient
 	headerCache             *headerCache // cache to store block hash/block height.
-	latestZond1Data         *zondpb.LatestETH1Data
+	latestZond1Data         *zondpb.LatestZOND1Data
 	depositContractCaller   *contracts.DepositContractCaller
 	depositTrie             *trie.SparseMerkleTrie
 	chainStartData          *zondpb.ChainStartData
@@ -178,7 +178,7 @@ func NewService(ctx context.Context, opts ...Option) (*Service, error) {
 			beaconNodeStatsUpdater: &NopBeaconNodeStatsUpdater{},
 			zond1HeaderReqLimit:    defaultZond1HeaderReqLimit,
 		},
-		latestZond1Data: &zondpb.LatestETH1Data{
+		latestZond1Data: &zondpb.LatestZOND1Data{
 			BlockHeight:        0,
 			BlockTime:          0,
 			BlockHash:          []byte{},
@@ -192,7 +192,7 @@ func NewService(ctx context.Context, opts ...Option) (*Service, error) {
 		},
 		lastReceivedMerkleIndex: -1,
 		preGenesisState:         genState,
-		zond1HeadTicker:         time.NewTicker(time.Duration(params.BeaconConfig().SecondsPerETH1Block) * time.Second),
+		zond1HeadTicker:         time.NewTicker(time.Duration(params.BeaconConfig().SecondsPerZOND1Block) * time.Second),
 	}
 
 	for _, opt := range opts {
@@ -286,7 +286,7 @@ func (s *Service) Status() error {
 
 // ExecutionClientConnected checks whether are connected via RPC.
 func (s *Service) ExecutionClientConnected() bool {
-	return s.connectedETH1
+	return s.connectedZOND1
 }
 
 // ExecutionClientEndpoint returns the URL of the current, connected execution client.
@@ -307,15 +307,15 @@ func (s *Service) updateBeaconNodeStats() {
 	s.cfg.beaconNodeStatsUpdater.Update(bs)
 }
 
-func (s *Service) updateConnectedETH1(state bool) {
-	s.connectedETH1 = state
+func (s *Service) updateConnectedZOND1(state bool) {
+	s.connectedZOND1 = state
 	s.updateBeaconNodeStats()
 }
 
 // refers to the latest zond1 block which follows the condition: zond1_timestamp +
-// SECONDS_PER_ETH1_BLOCK * ETH1_FOLLOW_DISTANCE <= current_unix_time
+// SECONDS_PER_ZOND1_BLOCK * ZOND1_FOLLOW_DISTANCE <= current_unix_time
 func (s *Service) followedBlockHeight(ctx context.Context) (uint64, error) {
-	followTime := params.BeaconConfig().Zond1FollowDistance * params.BeaconConfig().SecondsPerETH1Block
+	followTime := params.BeaconConfig().Zond1FollowDistance * params.BeaconConfig().SecondsPerZOND1Block
 	latestBlockTime := uint64(0)
 	if s.latestZond1Data.BlockTime > followTime {
 		latestBlockTime = s.latestZond1Data.BlockTime - followTime
@@ -458,13 +458,13 @@ func safelyHandlePanic() {
 	}
 }
 
-func (s *Service) handleETH1FollowDistance() {
+func (s *Service) handleZOND1FollowDistance() {
 	defer safelyHandlePanic()
 	ctx := s.ctx
 
 	// use a 5 minutes timeout for block time, because the max mining time is 278 sec (block 7208027)
 	// (analyzed the time of the block from 2018-09-01 to 2019-02-13)
-	fiveMinutesTimeout := prysmTime.Now().Add(-5 * time.Minute)
+	fiveMinutesTimeout := qrysmTime.Now().Add(-5 * time.Minute)
 	// check that web3 client is syncing
 	if time.Unix(int64(s.latestZond1Data.BlockTime), 0).Before(fiveMinutesTimeout) {
 		log.Warn("Execution client is not syncing")
@@ -593,7 +593,7 @@ func (s *Service) run(done <-chan struct{}) {
 			s.isRunning = false
 			s.runError = nil
 			s.rpcClient.Close()
-			s.updateConnectedETH1(false)
+			s.updateConnectedZOND1(false)
 			log.Debug("Context closed, exiting goroutine")
 			return
 		case <-s.zond1HeadTicker.C:
@@ -604,7 +604,7 @@ func (s *Service) run(done <-chan struct{}) {
 				continue
 			}
 			s.processBlockHeader(head)
-			s.handleETH1FollowDistance()
+			s.handleZOND1FollowDistance()
 		case <-chainstartTicker.C:
 			if s.chainStartData.Chainstarted {
 				chainstartTicker.Stop()
@@ -718,7 +718,7 @@ func (s *Service) determineEarliestVotingBlock(ctx context.Context, followBlock 
 		return 0, nil
 	}
 	votingTime := slots.VotingPeriodStartTime(genesisTime, currSlot)
-	followBackDist := 2 * params.BeaconConfig().SecondsPerETH1Block * params.BeaconConfig().Zond1FollowDistance
+	followBackDist := 2 * params.BeaconConfig().SecondsPerZOND1Block * params.BeaconConfig().Zond1FollowDistance
 	if followBackDist > votingTime {
 		return 0, errors.Errorf("invalid genesis time provided. %d > %d", followBackDist, votingTime)
 	}
@@ -735,7 +735,7 @@ func (s *Service) determineEarliestVotingBlock(ctx context.Context, followBlock 
 
 // initializes our service from the provided zond1data object by initializing all the relevant
 // fields and data.
-func (s *Service) initializeZond1Data(ctx context.Context, zond1DataInDB *zondpb.ETH1ChainData) error {
+func (s *Service) initializeZond1Data(ctx context.Context, zond1DataInDB *zondpb.ZOND1ChainData) error {
 	// The node has no zond1data persisted on disk, so we exit and instead
 	// request from contract logs.
 	if zond1DataInDB == nil {
@@ -812,7 +812,7 @@ func (s *Service) ensureValidPowchainData(ctx context.Context) error {
 			Zond1Data:          genState.Zond1Data(),
 			ChainstartDeposits: make([]*zondpb.Deposit, 0),
 		}
-		zond1Data = &zondpb.ETH1ChainData{
+		zond1Data = &zondpb.ZOND1ChainData{
 			CurrentZond1Data:  s.latestZond1Data,
 			ChainstartData:    s.chainStartData,
 			BeaconState:       pbState,

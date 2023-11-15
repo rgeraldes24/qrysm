@@ -178,7 +178,7 @@ func (a *Attestation) ToConsensus() (*zond.Attestation, error) {
 	return &zond.Attestation{
 		AggregationBits: aggBits,
 		Data:            data,
-		Signature:       sig,
+		Signatures:      sig,
 	}, nil
 }
 

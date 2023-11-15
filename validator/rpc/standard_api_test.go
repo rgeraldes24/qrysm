@@ -53,7 +53,7 @@ func TestServer_ListKeystores(t *testing.T) {
 	t.Run("wallet not ready", func(t *testing.T) {
 		s := Server{}
 		_, err := s.ListKeystores(context.Background(), &empty.Empty{})
-		require.ErrorContains(t, "Prysm Wallet not initialized. Please create a new wallet.", err)
+		require.ErrorContains(t, "Qrysm Wallet not initialized. Please create a new wallet.", err)
 	})
 	ctx := context.Background()
 	localWalletDir := setupWalletDir(t)
@@ -552,7 +552,7 @@ func TestServer_ListRemoteKeys(t *testing.T) {
 	t.Run("wallet not ready", func(t *testing.T) {
 		s := Server{}
 		_, err := s.ListKeystores(context.Background(), &empty.Empty{})
-		require.ErrorContains(t, "Prysm Wallet not initialized. Please create a new wallet.", err)
+		require.ErrorContains(t, "Qrysm Wallet not initialized. Please create a new wallet.", err)
 	})
 	ctx := context.Background()
 	w := wallet.NewWalletForWeb3Signer()
@@ -597,7 +597,7 @@ func TestServer_ImportRemoteKeys(t *testing.T) {
 	t.Run("wallet not ready", func(t *testing.T) {
 		s := Server{}
 		_, err := s.ListKeystores(context.Background(), &empty.Empty{})
-		require.ErrorContains(t, "Prysm Wallet not initialized. Please create a new wallet.", err)
+		require.ErrorContains(t, "Qrysm Wallet not initialized. Please create a new wallet.", err)
 	})
 	ctx := context.Background()
 	w := wallet.NewWalletForWeb3Signer()
@@ -652,7 +652,7 @@ func TestServer_DeleteRemoteKeys(t *testing.T) {
 	t.Run("wallet not ready", func(t *testing.T) {
 		s := Server{}
 		_, err := s.ListKeystores(context.Background(), &empty.Empty{})
-		require.ErrorContains(t, "Prysm Wallet not initialized. Please create a new wallet.", err)
+		require.ErrorContains(t, "Qrysm Wallet not initialized. Please create a new wallet.", err)
 	})
 	ctx := context.Background()
 	w := wallet.NewWalletForWeb3Signer()

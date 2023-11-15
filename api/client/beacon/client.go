@@ -246,7 +246,7 @@ func (c *Client) GetState(ctx context.Context, stateId StateOrBlockId) ([]byte, 
 	return b, nil
 }
 
-// GetWeakSubjectivity calls a proposed API endpoint that is unique to prysm
+// GetWeakSubjectivity calls a proposed API endpoint that is unique to qrysm
 // This api method does the following:
 // - computes weak subjectivity epoch
 // - finds the highest non-skipped block preceding the epoch

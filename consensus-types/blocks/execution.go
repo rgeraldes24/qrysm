@@ -16,7 +16,7 @@ import (
 
 // executionPayload is a convenience wrapper around a beacon block body's execution payload data structure
 // This wrapper allows us to conform to a common interface so that beacon
-// blocks for future forks can also be applied across Prysm without issues.
+// blocks for future forks can also be applied across Qrysm without issues.
 type executionPayload struct {
 	p     *enginev1.ExecutionPayload
 	value uint64
@@ -173,7 +173,7 @@ func (e executionPayload) ValueInGwei() (uint64, error) {
 
 // executionPayloadHeader is a convenience wrapper around a blinded beacon block body's execution header data structure
 // This wrapper allows us to conform to a common interface so that beacon
-// blocks for future forks can also be applied across Prysm without issues.
+// blocks for future forks can also be applied across Qrysm without issues.
 type executionPayloadHeader struct {
 	p     *enginev1.ExecutionPayloadHeader
 	value uint64

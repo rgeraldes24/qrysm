@@ -4,7 +4,7 @@ package params
 func InteropConfig() *BeaconChainConfig {
 	c := MainnetConfig().Copy()
 
-	// Prysm constants.
+	// Qrysm constants.
 	c.ConfigName = InteropName
 	c.GenesisForkVersion = []byte{0, 0, 0, 235}
 

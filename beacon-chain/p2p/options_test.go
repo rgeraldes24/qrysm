@@ -11,7 +11,7 @@ import (
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/protocol"
-	gethCrypto "github.com/theQRL/go-zond/crypto"
+	gzondCrypto "github.com/theQRL/go-zond/crypto"
 	"github.com/theQRL/go-zond/p2p/enode"
 	"github.com/theQRL/go-zond/p2p/enr"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
@@ -79,7 +79,7 @@ func TestPrivateKeyLoading_StaticPrivateKey(t *testing.T) {
 
 func TestIPV6Support(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	key, err := gethCrypto.GenerateKey()
+	key, err := gzondCrypto.GenerateKey()
 	require.NoError(t, err)
 	db, err := enode.OpenDB("")
 	if err != nil {

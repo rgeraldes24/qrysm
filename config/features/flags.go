@@ -40,7 +40,7 @@ var (
 	}
 	writeWalletPasswordOnWebOnboarding = &cli.BoolFlag{
 		Name: "write-wallet-password-on-web-onboarding",
-		Usage: "(Danger): Writes the wallet password to the wallet directory on completing Prysm web onboarding. " +
+		Usage: "(Danger): Writes the wallet password to the wallet directory on completing Qrysm web onboarding. " +
 			"We recommend against this flag unless you are an advanced user.",
 	}
 	aggregateFirstInterval = &cli.DurationFlag{

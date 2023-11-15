@@ -46,7 +46,7 @@ func TestInitiateValidatorExit_AlreadyExited(t *testing.T) {
 	base := &zondpb.BeaconState{Validators: []*zondpb.Validator{{
 		ExitEpoch: exitEpoch},
 	}}
-	state, err := state_native.InitializeFromProtoPhase0(base)
+	state, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 	newState, err := InitiateValidatorExit(context.Background(), state, 0)
 	require.NoError(t, err)
@@ -64,7 +64,7 @@ func TestInitiateValidatorExit_ProperExit(t *testing.T) {
 		{ExitEpoch: exitedEpoch + 2},
 		{ExitEpoch: params.BeaconConfig().FarFutureEpoch},
 	}}
-	state, err := state_native.InitializeFromProtoPhase0(base)
+	state, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 	newState, err := InitiateValidatorExit(context.Background(), state, idx)
 	require.NoError(t, err)
@@ -83,7 +83,7 @@ func TestInitiateValidatorExit_ChurnOverflow(t *testing.T) {
 		{ExitEpoch: exitedEpoch + 2}, // overflow here
 		{ExitEpoch: params.BeaconConfig().FarFutureEpoch},
 	}}
-	state, err := state_native.InitializeFromProtoPhase0(base)
+	state, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 	newState, err := InitiateValidatorExit(context.Background(), state, idx)
 	require.NoError(t, err)
@@ -104,7 +104,7 @@ func TestInitiateValidatorExit_WithdrawalOverflows(t *testing.T) {
 		{ExitEpoch: params.BeaconConfig().FarFutureEpoch - 1},
 		{EffectiveBalance: params.BeaconConfig().EjectionBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch},
 	}}
-	state, err := state_native.InitializeFromProtoPhase0(base)
+	state, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 	_, err = InitiateValidatorExit(context.Background(), state, 1)
 	require.ErrorContains(t, "addition overflows", err)
@@ -129,7 +129,7 @@ func TestSlashValidator_OK(t *testing.T) {
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		Balances:    balances,
 	}
-	state, err := state_native.InitializeFromProtoPhase0(base)
+	state, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 
 	slashedIdx := primitives.ValidatorIndex(3)
@@ -214,7 +214,7 @@ func TestActivatedValidatorIndices(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		s, err := state_native.InitializeFromProtoPhase0(tt.state)
+		s, err := state_native.InitializeFromProtoCapella(tt.state)
 		require.NoError(t, err)
 		activatedIndices := ActivatedValidatorIndices(time.CurrentEpoch(s), tt.state.Validators)
 		assert.DeepEqual(t, tt.wanted, activatedIndices)
@@ -268,7 +268,7 @@ func TestSlashedValidatorIndices(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		s, err := state_native.InitializeFromProtoPhase0(tt.state)
+		s, err := state_native.InitializeFromProtoCapella(tt.state)
 		require.NoError(t, err)
 		slashedIndices := SlashedValidatorIndices(time.CurrentEpoch(s), tt.state.Validators)
 		assert.DeepEqual(t, tt.wanted, slashedIndices)
@@ -328,7 +328,7 @@ func TestExitedValidatorIndices(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		s, err := state_native.InitializeFromProtoPhase0(tt.state)
+		s, err := state_native.InitializeFromProtoCapella(tt.state)
 		require.NoError(t, err)
 		activeCount, err := helpers.ActiveValidatorCount(context.Background(), s, time.PrevEpoch(s))
 		require.NoError(t, err)

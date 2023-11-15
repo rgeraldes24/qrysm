@@ -18,10 +18,10 @@ func doMiddlewareJSONGetRequest(template string, requestPath string, beaconNodeI
 		case "lighthouse":
 			port = params.TestParams.Ports.LighthouseBeaconNodeHTTPPort
 		default:
-			port = params.TestParams.Ports.PrysmBeaconNodeGatewayPort
+			port = params.TestParams.Ports.QrysmBeaconNodeGatewayPort
 		}
 	} else {
-		port = params.TestParams.Ports.PrysmBeaconNodeGatewayPort
+		port = params.TestParams.Ports.QrysmBeaconNodeGatewayPort
 	}
 
 	basePath := fmt.Sprintf(template, port+beaconNodeIdx)
@@ -49,10 +49,10 @@ func doMiddlewareSSZGetRequest(template string, requestPath string, beaconNodeId
 		case "lighthouse":
 			port = params.TestParams.Ports.LighthouseBeaconNodeHTTPPort
 		default:
-			port = params.TestParams.Ports.PrysmBeaconNodeGatewayPort
+			port = params.TestParams.Ports.QrysmBeaconNodeGatewayPort
 		}
 	} else {
-		port = params.TestParams.Ports.PrysmBeaconNodeGatewayPort
+		port = params.TestParams.Ports.QrysmBeaconNodeGatewayPort
 	}
 
 	basePath := fmt.Sprintf(template, port+beaconNodeIdx)
@@ -89,10 +89,10 @@ func doMiddlewareJSONPostRequest(template string, requestPath string, beaconNode
 		case "lighthouse":
 			port = params.TestParams.Ports.LighthouseBeaconNodeHTTPPort
 		default:
-			port = params.TestParams.Ports.PrysmBeaconNodeGatewayPort
+			port = params.TestParams.Ports.QrysmBeaconNodeGatewayPort
 		}
 	} else {
-		port = params.TestParams.Ports.PrysmBeaconNodeGatewayPort
+		port = params.TestParams.Ports.QrysmBeaconNodeGatewayPort
 	}
 	basePath := fmt.Sprintf(template, port+beaconNodeIdx)
 	b, err := json.Marshal(postData)

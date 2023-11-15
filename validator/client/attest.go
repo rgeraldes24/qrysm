@@ -22,7 +22,7 @@ import (
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"github.com/theQRL/qrysm/v4/validator/client/iface"
 	"go.opencensus.io/trace"
@@ -266,7 +266,7 @@ func (v *validator) waitOneThirdOrValidBlock(ctx context.Context, slot primitive
 	delay := slots.DivideSlotBy(3 /* a third of the slot duration */)
 	startTime := slots.StartTime(v.genesisTime, slot)
 	finalTime := startTime.Add(delay)
-	wait := prysmTime.Until(finalTime)
+	wait := qrysmTime.Until(finalTime)
 	if wait <= 0 {
 		return
 	}

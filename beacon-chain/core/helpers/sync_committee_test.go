@@ -32,7 +32,7 @@ func TestIsCurrentEpochSyncCommittee_UsingCache(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -63,7 +63,7 @@ func TestIsCurrentEpochSyncCommittee_UsingCommittee(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -91,7 +91,7 @@ func TestIsCurrentEpochSyncCommittee_DoesNotExist(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -119,7 +119,7 @@ func TestIsNextEpochSyncCommittee_UsingCache(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -148,7 +148,7 @@ func TestIsNextEpochSyncCommittee_UsingCommittee(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -174,7 +174,7 @@ func TestIsNextEpochSyncCommittee_DoesNotExist(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -202,7 +202,7 @@ func TestCurrentEpochSyncSubcommitteeIndices_UsingCache(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -233,7 +233,7 @@ func TestCurrentEpochSyncSubcommitteeIndices_UsingCommittee(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -274,7 +274,7 @@ func TestCurrentEpochSyncSubcommitteeIndices_DoesNotExist(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -302,7 +302,7 @@ func TestNextEpochSyncSubcommitteeIndices_UsingCache(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -331,7 +331,7 @@ func TestNextEpochSyncSubcommitteeIndices_UsingCommittee(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -359,7 +359,7 @@ func TestNextEpochSyncSubcommitteeIndices_DoesNotExist(t *testing.T) {
 		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
 	}
 
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 	})
 	require.NoError(t, err)
@@ -372,14 +372,14 @@ func TestNextEpochSyncSubcommitteeIndices_DoesNotExist(t *testing.T) {
 }
 
 func TestUpdateSyncCommitteeCache_BadSlot(t *testing.T) {
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Slot: 1,
 	})
 	require.NoError(t, err)
 	err = UpdateSyncCommitteeCache(state)
 	require.ErrorContains(t, "not at the end of the epoch to update cache", err)
 
-	state, err = state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err = state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Slot: params.BeaconConfig().SlotsPerEpoch - 1,
 	})
 	require.NoError(t, err)
@@ -388,7 +388,7 @@ func TestUpdateSyncCommitteeCache_BadSlot(t *testing.T) {
 }
 
 func TestUpdateSyncCommitteeCache_BadRoot(t *testing.T) {
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Slot:              primitives.Slot(params.BeaconConfig().EpochsPerSyncCommitteePeriod)*params.BeaconConfig().SlotsPerEpoch - 1,
 		LatestBlockHeader: &zondpb.BeaconBlockHeader{StateRoot: params.BeaconConfig().ZeroHash[:]},
 	})
@@ -417,7 +417,7 @@ func TestIsCurrentEpochSyncCommittee_SameBlockRoot(t *testing.T) {
 	for i := range blockRoots {
 		blockRoots[i] = make([]byte, 32)
 	}
-	state, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: validators,
 		BlockRoots: blockRoots,
 	})

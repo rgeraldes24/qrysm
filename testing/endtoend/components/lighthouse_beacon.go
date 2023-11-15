@@ -169,8 +169,8 @@ func (node *LighthouseBeaconNode) Start(ctx context.Context) error {
 		return err
 	}
 
-	prysmNodeCount := e2e.TestParams.BeaconNodeCount
-	jwtPath := path.Join(e2e.TestParams.TestPath, "zond1data/"+strconv.Itoa(node.index+prysmNodeCount)+"/")
+	qrysmNodeCount := e2e.TestParams.BeaconNodeCount
+	jwtPath := path.Join(e2e.TestParams.TestPath, "zond1data/"+strconv.Itoa(node.index+qrysmNodeCount)+"/")
 	jwtPath = path.Join(jwtPath, "gzond/jwtsecret")
 	args := []string{
 		"beacon_node",
@@ -183,8 +183,8 @@ func (node *LighthouseBeaconNode) Start(ctx context.Context) error {
 		fmt.Sprintf("--port=%d", e2e.TestParams.Ports.LighthouseBeaconNodeP2PPort+index),
 		fmt.Sprintf("--http-port=%d", e2e.TestParams.Ports.LighthouseBeaconNodeHTTPPort+index),
 		fmt.Sprintf("--target-peers=%d", 10),
-		fmt.Sprintf("--zond1-endpoints=http://127.0.0.1:%d", e2e.TestParams.Ports.Zond1RPCPort+prysmNodeCount+index),
-		fmt.Sprintf("--execution-endpoint=http://127.0.0.1:%d", e2e.TestParams.Ports.Zond1ProxyPort+prysmNodeCount+index),
+		fmt.Sprintf("--zond1-endpoints=http://127.0.0.1:%d", e2e.TestParams.Ports.Zond1RPCPort+qrysmNodeCount+index),
+		fmt.Sprintf("--execution-endpoint=http://127.0.0.1:%d", e2e.TestParams.Ports.Zond1ProxyPort+qrysmNodeCount+index),
 		fmt.Sprintf("--jwt-secrets=%s", jwtPath),
 		fmt.Sprintf("--boot-nodes=%s", node.enr),
 		fmt.Sprintf("--metrics-port=%d", e2e.TestParams.Ports.LighthouseBeaconNodeMetricsPort+index),

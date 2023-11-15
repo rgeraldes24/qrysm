@@ -19,7 +19,7 @@ import (
 )
 
 // Variables defined in the placeholderFields will not be tested in `TestLoadConfigFile`.
-// These are variables that we don't use in Prysm. (i.e. future hardfork, light client... etc)
+// These are variables that we don't use in Qrysm. (i.e. future hardfork, light client... etc)
 var placeholderFields = []string{"UPDATE_TIMEOUT", "DENEB_FORK_EPOCH", "DENEB_FORK_VERSION",
 	"ATTESTATION_SUBNET_EXTRA_BITS", "RESP_TIMEOUT", "MAX_REQUEST_BLOCKS", "EPOCHS_PER_SUBNET_SUBSCRIPTION",
 	"EIP6110_FORK_EPOCH", "MESSAGE_DOMAIN_INVALID_SNAPPY", "MIN_EPOCHS_FOR_BLOCK_REQUESTS", "MAXIMUM_GOSSIP_CLOCK_DISPARITY",
@@ -40,15 +40,12 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 	assert.Equal(t, expected.HysteresisDownwardMultiplier, actual.HysteresisDownwardMultiplier, "%s: HysteresisDownwardMultiplier", name)
 	assert.Equal(t, expected.HysteresisUpwardMultiplier, actual.HysteresisUpwardMultiplier, "%s: HysteresisUpwardMultiplier", name)
 
-	// Fork Choice params.
-	assert.Equal(t, expected.DeprecatedSafeSlotsToUpdateJustified, actual.DeprecatedSafeSlotsToUpdateJustified, "%s: SafeSlotsToUpdateJustified", name)
-
 	// Validator params.
 	assert.Equal(t, expected.Zond1FollowDistance, actual.Zond1FollowDistance, "%s: Zond1FollowDistance", name)
 	assert.Equal(t, expected.TargetAggregatorsPerCommittee, actual.TargetAggregatorsPerCommittee, "%s: TargetAggregatorsPerCommittee", name)
 	assert.Equal(t, expected.RandomSubnetsPerValidator, actual.RandomSubnetsPerValidator, "%s: RandomSubnetsPerValidator", name)
 	assert.Equal(t, expected.EpochsPerRandomSubnetSubscription, actual.EpochsPerRandomSubnetSubscription, "%s: EpochsPerRandomSubnetSubscription", name)
-	assert.Equal(t, expected.SecondsPerZOND1Block, actual.SecondsPerZOND1Block, "%s: SecondsPerETH1Block", name)
+	assert.Equal(t, expected.SecondsPerZOND1Block, actual.SecondsPerZOND1Block, "%s: SecondsPerZOND1Block", name)
 
 	// Deposit contract.
 	assert.Equal(t, expected.DepositChainID, actual.DepositChainID, "%s: DepositChainID", name)
@@ -64,7 +61,7 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 	// Initial values.
 	assert.DeepEqual(t, expected.GenesisForkVersion, actual.GenesisForkVersion, "%s: GenesisForkVersion", name)
 	assert.DeepEqual(t, expected.BLSWithdrawalPrefixByte, actual.BLSWithdrawalPrefixByte, "%s: BLSWithdrawalPrefixByte", name)
-	assert.DeepEqual(t, expected.ZOND1AddressWithdrawalPrefixByte, actual.ZOND1AddressWithdrawalPrefixByte, "%s: ETH1AddressWithdrawalPrefixByte", name)
+	assert.DeepEqual(t, expected.ZOND1AddressWithdrawalPrefixByte, actual.ZOND1AddressWithdrawalPrefixByte, "%s: ZOND1AddressWithdrawalPrefixByte", name)
 
 	// Time parameters.
 	assert.Equal(t, expected.GenesisDelay, actual.GenesisDelay, "%s: GenesisDelay", name)

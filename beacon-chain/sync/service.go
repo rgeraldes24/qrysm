@@ -36,7 +36,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -246,8 +246,8 @@ func (s *Service) waitForChainStart() {
 	// Register respective rpc handlers at state initialized event.
 	s.registerRPCHandlers()
 	// Wait for chainstart in separate routine.
-	if startTime.After(prysmTime.Now()) {
-		time.Sleep(prysmTime.Until(startTime))
+	if startTime.After(qrysmTime.Now()) {
+		time.Sleep(qrysmTime.Until(startTime))
 	}
 	log.WithField("starttime", startTime).Debug("Chain started in sync service")
 	s.markForChainStart()

@@ -18,7 +18,7 @@ const (
 	acceptTosPromptText = `
 Prysmatic Labs Terms of Use
 
-By downloading, accessing or using the Prysm implementation (“Prysm”), you (referenced herein
+By downloading, accessing or using the Qrysm implementation (“Qrysm”), you (referenced herein
 as “you” or the “user”) certify that you have read and agreed to the terms and conditions below.
 
 TERMS AND CONDITIONS: https://github.com/theQRL/qrysm/blob/master/TERMS_OF_SERVICE.md

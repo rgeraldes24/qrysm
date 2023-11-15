@@ -6,7 +6,6 @@ go_library(
         "attester_protection.go",
         "backup.go",
         "db.go",
-        "deprecated_attester_protection.go",
         "eip_blacklisted_keys.go",
         "genesis.go",
         "graffiti.go",
@@ -56,7 +55,6 @@ go_test(
     srcs = [
         "attester_protection_test.go",
         "backup_test.go",
-        "deprecated_attester_protection_test.go",
         "eip_blacklisted_keys_test.go",
         "genesis_test.go",
         "graffiti_test.go",

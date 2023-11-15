@@ -305,13 +305,13 @@ func (vs *Server) validatorStatus(
 	switch resp.Status {
 	// Unknown status means the validator has not been put into the state yet.
 	case zondpb.ValidatorStatus_UNKNOWN_STATUS:
-		// If no connection to ETH1, the deposit block number or position in queue cannot be determined.
+		// If no connection to ZOND1, the deposit block number or position in queue cannot be determined.
 		if !vs.Zond1InfoFetcher.ExecutionClientConnected() {
-			log.Warn("Not connected to ETH1. Cannot determine validator ETH1 deposit block number")
+			log.Warn("Not connected to ZOND1. Cannot determine validator ZOND1 deposit block number")
 			return resp, nonExistentIndex
 		}
 		dep, zond1BlockNumBigInt := vs.DepositFetcher.DepositByPubkey(ctx, pubKey)
-		if zond1BlockNumBigInt == nil { // No deposit found in ETH1.
+		if zond1BlockNumBigInt == nil { // No deposit found in ZOND1.
 			return resp, nonExistentIndex
 		}
 		domain, err := signing.ComputeDomain(
@@ -337,7 +337,7 @@ func (vs *Server) validatorStatus(
 	case zondpb.ValidatorStatus_DEPOSITED, zondpb.ValidatorStatus_PENDING, zondpb.ValidatorStatus_PARTIALLY_DEPOSITED:
 		if resp.Status == zondpb.ValidatorStatus_PENDING {
 			if vs.DepositFetcher == nil {
-				log.Warn("Not connected to ETH1. Cannot determine validator ETH1 deposit.")
+				log.Warn("Not connected to ZOND1. Cannot determine validator ZOND1 deposit.")
 			} else {
 				// Check if there was a deposit.
 				_, zond1BlockNumBigInt := vs.DepositFetcher.DepositByPubkey(ctx, pubKey)

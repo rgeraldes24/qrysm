@@ -1,17 +1,6 @@
 package state_native
 
-import (
-	"context"
-	"testing"
-
-	"github.com/theQRL/qrysm/v4/beacon-chain/state/state-native/types"
-	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/testing/assert"
-	"github.com/theQRL/qrysm/v4/testing/require"
-)
-
+/*
 func TestBeaconState_RotateAttestations(t *testing.T) {
 	st, err := InitializeFromProtoPhase0(&zondpb.BeaconState{
 		Slot:                      1,
@@ -74,3 +63,4 @@ func TestAppendBeyondIndicesLimit(t *testing.T) {
 	assert.Equal(t, true, s.rebuildTrie[types.Validators])
 	assert.Equal(t, len(s.dirtyIndices[types.Validators]), 0)
 }
+*/

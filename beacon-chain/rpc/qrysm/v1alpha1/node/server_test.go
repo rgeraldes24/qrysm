@@ -150,7 +150,7 @@ func TestNodeServer_ListPeers(t *testing.T) {
 	assert.Equal(t, zondpb.PeerDirection_OUTBOUND, res.Peers[1].Direction)
 }
 
-func TestNodeServer_GetETH1ConnectionStatus(t *testing.T) {
+func TestNodeServer_GetZOND1ConnectionStatus(t *testing.T) {
 	server := grpc.NewServer()
 	ep := "foo"
 	err := errors.New("error1")
@@ -165,7 +165,7 @@ func TestNodeServer_GetETH1ConnectionStatus(t *testing.T) {
 	zondpb.RegisterNodeServer(server, ns)
 	reflection.Register(server)
 
-	res, err := ns.GetETH1ConnectionStatus(context.Background(), &emptypb.Empty{})
+	res, err := ns.GetZOND1ConnectionStatus(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 	assert.Equal(t, ep, res.CurrentAddress)
 	assert.Equal(t, errStr, res.CurrentConnectionError)

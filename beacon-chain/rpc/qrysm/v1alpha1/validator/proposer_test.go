@@ -1588,7 +1588,7 @@ func TestProposer_Zond1Data_MajorityVote_SpansGenesis(t *testing.T) {
 		Zond1BlockFetcher: p,
 		BlockFetcher:      p,
 		DepositFetcher:    depositCache,
-		HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{BlockHash: headBlockHash, DepositCount: 0}},
+		HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{BlockHash: headBlockHash, DepositCount: 0}},
 	}
 
 	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
@@ -1604,7 +1604,7 @@ func TestProposer_Zond1Data_MajorityVote_SpansGenesis(t *testing.T) {
 }
 
 func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
-	followDistanceSecs := params.BeaconConfig().Zond1FollowDistance * params.BeaconConfig().SecondsPerETH1Block
+	followDistanceSecs := params.BeaconConfig().Zond1FollowDistance * params.BeaconConfig().SecondsPerZOND1Block
 	followSlots := followDistanceSecs / params.BeaconConfig().SecondsPerSlot
 	slot := primitives.Slot(64 + followSlots)
 	earliestValidTime, latestValidTime := majorityVoteBoundaryTime(slot)
@@ -1651,7 +1651,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -1687,7 +1687,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -1723,7 +1723,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -1760,7 +1760,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -1797,7 +1797,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -1834,7 +1834,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -1864,7 +1864,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: currentZond1Data},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: currentZond1Data},
 		}
 
 		ctx := context.Background()
@@ -1899,7 +1899,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -1929,7 +1929,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -1961,7 +1961,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: currentZond1Data},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: currentZond1Data},
 		}
 
 		ctx := context.Background()
@@ -1997,7 +1997,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -2034,7 +2034,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -2065,7 +2065,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -2099,7 +2099,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 1}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
@@ -2138,7 +2138,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			Zond1BlockFetcher: p,
 			BlockFetcher:      p,
 			DepositFetcher:    depositCache,
-			HeadFetcher:       &mock.ChainService{ETH1Data: &zondpb.Zond1Data{DepositCount: 0}},
+			HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{DepositCount: 0}},
 		}
 
 		ctx := context.Background()
@@ -2576,8 +2576,8 @@ func TestProposer_SubmitValidatorRegistrations(t *testing.T) {
 func majorityVoteBoundaryTime(slot primitives.Slot) (uint64, uint64) {
 	s := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerZond1VotingPeriod))
 	slotStartTime := uint64(mockExecution.GenesisTime) + uint64((slot - (slot % (s))).Mul(params.BeaconConfig().SecondsPerSlot))
-	earliestValidTime := slotStartTime - 2*params.BeaconConfig().SecondsPerETH1Block*params.BeaconConfig().Zond1FollowDistance
-	latestValidTime := slotStartTime - params.BeaconConfig().SecondsPerETH1Block*params.BeaconConfig().Zond1FollowDistance
+	earliestValidTime := slotStartTime - 2*params.BeaconConfig().SecondsPerZOND1Block*params.BeaconConfig().Zond1FollowDistance
+	latestValidTime := slotStartTime - params.BeaconConfig().SecondsPerZOND1Block*params.BeaconConfig().Zond1FollowDistance
 
 	return earliestValidTime, latestValidTime
 }

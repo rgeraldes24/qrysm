@@ -106,19 +106,6 @@ func (c *grpcValidatorClient) WaitForActivation(ctx context.Context, in *zondpb.
 	return c.beaconNodeValidatorClient.WaitForActivation(ctx, in)
 }
 
-// Deprecated: Do not use.
-// func (c *grpcValidatorClient) WaitForChainStart(ctx context.Context, in *empty.Empty) (*zondpb.ChainStartResponse, error) {
-// 	stream, err := c.beaconNodeValidatorClient.WaitForChainStart(ctx, in)
-// 	if err != nil {
-// 		return nil, errors.Wrap(
-// 			iface.ErrConnectionIssue,
-// 			errors.Wrap(err, "could not setup beacon chain ChainStart streaming client").Error(),
-// 		)
-// 	}
-
-// 	return stream.Recv()
-// }
-
 func (c *grpcValidatorClient) AssignValidatorToSubnet(ctx context.Context, in *zondpb.AssignValidatorToSubnetRequest) (*empty.Empty, error) {
 	return c.beaconNodeValidatorClient.AssignValidatorToSubnet(ctx, in)
 }

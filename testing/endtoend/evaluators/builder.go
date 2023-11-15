@@ -64,7 +64,7 @@ func builderActive(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) err
 		if err != nil {
 			return err
 		}
-		if string(execPayload.ExtraData()) != "prysm-builder" {
+		if string(execPayload.ExtraData()) != "qrysm-builder" {
 			return errors.Errorf("block with slot %d was not built by the builder. It has an extra data of %s", b.Block().Slot(), string(execPayload.ExtraData()))
 		}
 		if execPayload.GasLimit() == 0 {
@@ -98,7 +98,7 @@ func builderActive(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) err
 		if err != nil {
 			return err
 		}
-		if string(execPayload.ExtraData()) != "prysm-builder" {
+		if string(execPayload.ExtraData()) != "qrysm-builder" {
 			return errors.Errorf("block with slot %d was not built by the builder. It has an extra data of %s", b.Block().Slot(), string(execPayload.ExtraData()))
 		}
 	}

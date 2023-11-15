@@ -53,9 +53,6 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 		ev.DepositedValidatorsAreActive,
 		ev.ValidatorsVoteWithTheMajority,
 		ev.ColdStateCheckpoint,
-		ev.AltairForkTransition,
-		ev.BellatrixForkTransition,
-		ev.CapellaForkTransition,
 		ev.APIMiddlewareVerifyIntegrity,
 		ev.APIGatewayV1Alpha1VerifyIntegrity,
 		ev.FinishedSyncing,
@@ -76,7 +73,7 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 		TestSync:            true,
 		TestFeature:         true,
 		TestDeposits:        true,
-		UsePrysmShValidator: false,
+		UseQrysmShValidator: false,
 		UsePprof:            !longRunning,
 		TracingSinkEndpoint: tracingEndpoint,
 		Evaluators:          evals,
@@ -93,7 +90,7 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 	return newTestRunner(t, testConfig)
 }
 
-func e2eMainnet(t *testing.T, usePrysmSh, useMultiClient bool, cfg *params.BeaconChainConfig, cfgo ...types.E2EConfigOpt) *testRunner {
+func e2eMainnet(t *testing.T, useQrysmSh, useMultiClient bool, cfg *params.BeaconChainConfig, cfgo ...types.E2EConfigOpt) *testRunner {
 	params.SetupTestConfigCleanup(t)
 	require.NoError(t, params.SetActive(cfg))
 	if useMultiClient {
@@ -129,9 +126,6 @@ func e2eMainnet(t *testing.T, usePrysmSh, useMultiClient bool, cfg *params.Beaco
 		ev.ValidatorsHaveWithdrawn,
 		ev.DepositedValidatorsAreActive,
 		ev.ColdStateCheckpoint,
-		ev.AltairForkTransition,
-		ev.BellatrixForkTransition,
-		ev.CapellaForkTransition,
 		ev.APIMiddlewareVerifyIntegrity,
 		ev.APIGatewayV1Alpha1VerifyIntegrity,
 		ev.FinishedSyncing,
@@ -152,7 +146,7 @@ func e2eMainnet(t *testing.T, usePrysmSh, useMultiClient bool, cfg *params.Beaco
 		TestFeature:         true,
 		TestDeposits:        true,
 		UseFixedPeerIDs:     true,
-		UsePrysmShValidator: usePrysmSh,
+		UseQrysmShValidator: useQrysmSh,
 		UsePprof:            !longRunning,
 		TracingSinkEndpoint: tracingEndpoint,
 		Evaluators:          evals,
@@ -185,9 +179,6 @@ func scenarioEvals() []types.Evaluator {
 		ev.ProposeVoluntaryExit,
 		ev.ValidatorsHaveExited,
 		ev.ColdStateCheckpoint,
-		ev.AltairForkTransition,
-		ev.BellatrixForkTransition,
-		ev.CapellaForkTransition,
 		ev.APIMiddlewareVerifyIntegrity,
 		ev.APIGatewayV1Alpha1VerifyIntegrity,
 		ev.FinishedSyncing,
@@ -206,9 +197,6 @@ func scenarioEvalsMulti() []types.Evaluator {
 		ev.ProposeVoluntaryExit,
 		ev.ValidatorsHaveExited,
 		ev.ColdStateCheckpoint,
-		ev.AltairForkTransition,
-		ev.BellatrixForkTransition,
-		ev.CapellaForkTransition,
 		ev.APIMiddlewareVerifyIntegrity,
 		ev.APIGatewayV1Alpha1VerifyIntegrity,
 		ev.FinishedSyncing,

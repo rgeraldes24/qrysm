@@ -1,8 +1,6 @@
 package accounts
 
 import (
-	"os"
-
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/v4/cmd"
 	"github.com/theQRL/qrysm/v4/cmd/validator/flags"
@@ -13,7 +11,7 @@ import (
 
 var log = logrus.WithField("prefix", "accounts")
 
-// Commands for managing Prysm validator accounts.
+// Commands for managing Qrysm validator accounts.
 var Commands = &cli.Command{
 	Name:     "accounts",
 	Category: "accounts",
@@ -27,8 +25,6 @@ var Commands = &cli.Command{
 				flags.WalletPasswordFileFlag,
 				flags.DeletePublicKeysFlag,
 				features.Mainnet,
-				features.PraterTestnet,
-				features.SepoliaTestnet,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {
@@ -63,8 +59,6 @@ var Commands = &cli.Command{
 				flags.GrpcRetriesFlag,
 				flags.GrpcRetryDelayFlag,
 				features.Mainnet,
-				features.PraterTestnet,
-				features.SepoliaTestnet,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {
@@ -96,8 +90,6 @@ var Commands = &cli.Command{
 				flags.BackupPublicKeysFlag,
 				flags.BackupPasswordFile,
 				features.Mainnet,
-				features.PraterTestnet,
-				features.SepoliaTestnet,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {
@@ -126,8 +118,6 @@ var Commands = &cli.Command{
 				flags.AccountPasswordFileFlag,
 				flags.ImportPrivateKeyFileFlag,
 				features.Mainnet,
-				features.PraterTestnet,
-				features.SepoliaTestnet,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {
@@ -142,49 +132,6 @@ var Commands = &cli.Command{
 			Action: func(cliCtx *cli.Context) error {
 				if err := accountsImport(cliCtx); err != nil {
 					log.WithError(err).Fatal("Could not import accounts")
-				}
-				return nil
-			},
-		},
-		{
-			Name:        "voluntary-exit",
-			Description: "Performs a voluntary exit on selected accounts",
-			Flags: cmd.WrapFlags([]cli.Flag{
-				flags.WalletDirFlag,
-				flags.WalletPasswordFileFlag,
-				flags.AccountPasswordFileFlag,
-				flags.VoluntaryExitPublicKeysFlag,
-				flags.BeaconRPCProviderFlag,
-				flags.Web3SignerURLFlag,
-				flags.Web3SignerPublicValidatorKeysFlag,
-				flags.InteropNumValidators,
-				flags.InteropStartIndex,
-				cmd.GrpcMaxCallRecvMsgSizeFlag,
-				flags.CertFlag,
-				flags.GrpcHeadersFlag,
-				flags.GrpcRetriesFlag,
-				flags.GrpcRetryDelayFlag,
-				flags.ExitAllFlag,
-				flags.ForceExitFlag,
-				flags.VoluntaryExitJSONOutputPath,
-				features.Mainnet,
-				features.PraterTestnet,
-				features.SepoliaTestnet,
-				cmd.AcceptTosFlag,
-			}),
-			Before: func(cliCtx *cli.Context) error {
-				if err := cmd.LoadFlagsFromConfig(cliCtx, cliCtx.Command.Flags); err != nil {
-					return err
-				}
-				if err := tos.VerifyTosAcceptedOrPrompt(cliCtx); err != nil {
-					return err
-				}
-				return features.ConfigureValidator(cliCtx)
-			},
-			Action: func(cliCtx *cli.Context) error {
-				log.Info("This command will be deprecated in the future in favor of `qrysmctl validator exit`")
-				if err := AccountsExit(cliCtx, os.Stdin); err != nil {
-					log.WithError(err).Fatal("Could not perform voluntary exit")
 				}
 				return nil
 			},

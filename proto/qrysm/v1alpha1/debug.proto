@@ -17,7 +17,7 @@ option php_namespace = "TheQRL\\Zond\\v1alpha1";
 
 // Debug service API
 //
-// The debug service in Prysm provides API access to various utilities
+// The debug service in Qrysm provides API access to various utilities
 // for debugging the beacon node's functionality at runtime, such as being able
 // to retrieve the beacon state by block root or state root from the node directly.
 service Debug {
@@ -82,7 +82,7 @@ message SSZResponse {
 }
 
 message LoggingLevelRequest {
-    // The logging levels available in Prysm as an enum.
+    // The logging levels available in Qrysm as an enum.
     enum Level {
         INFO = 0;
         DEBUG = 1;

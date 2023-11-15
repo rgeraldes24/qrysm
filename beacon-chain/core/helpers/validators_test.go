@@ -47,7 +47,7 @@ func TestIsActiveValidatorUsingTrie_OK(t *testing.T) {
 		{a: 64, b: true},
 	}
 	val := &zondpb.Validator{ActivationEpoch: 10, ExitEpoch: 100}
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{Validators: []*zondpb.Validator{val}})
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{Validators: []*zondpb.Validator{val}})
 	require.NoError(t, err)
 	for _, test := range tests {
 		readOnlyVal, err := beaconState.ValidatorAtIndexReadOnly(0)
@@ -76,7 +76,7 @@ func TestIsActiveNonSlashedValidatorUsingTrie_OK(t *testing.T) {
 	for _, test := range tests {
 		val := &zondpb.Validator{ActivationEpoch: 10, ExitEpoch: 100}
 		val.Slashed = test.s
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{Validators: []*zondpb.Validator{val}})
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{Validators: []*zondpb.Validator{val}})
 		require.NoError(t, err)
 		readOnlyVal, err := beaconState.ValidatorAtIndexReadOnly(0)
 		require.NoError(t, err)
@@ -165,7 +165,7 @@ func TestIsSlashableValidator_OK(t *testing.T) {
 				assert.Equal(t, test.slashable, slashableValidator, "Expected active validator slashable to be %t", test.slashable)
 			})
 			t.Run("with trie", func(t *testing.T) {
-				beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{Validators: []*zondpb.Validator{test.validator}})
+				beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{Validators: []*zondpb.Validator{test.validator}})
 				require.NoError(t, err)
 				readOnlyVal, err := beaconState.ValidatorAtIndexReadOnly(0)
 				require.NoError(t, err)
@@ -190,7 +190,7 @@ func TestBeaconProposerIndex_OK(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators:  validators,
 		Slot:        0,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -251,7 +251,7 @@ func TestBeaconProposerIndex_BadState(t *testing.T) {
 		roots[i] = make([]byte, fieldparams.RootLength)
 	}
 
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators:  validators,
 		Slot:        0,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -275,7 +275,7 @@ func TestComputeProposerIndex_Compatibility(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
@@ -322,7 +322,7 @@ func TestActiveValidatorCount_Genesis(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Slot:        0,
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -359,7 +359,7 @@ func TestChurnLimit_OK(t *testing.T) {
 			}
 		}
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot:        1,
 			Validators:  validators,
 			RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -523,7 +523,7 @@ func TestActiveValidatorIndices(t *testing.T) {
 	defer ClearCache()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s, err := state_native.InitializeFromProtoPhase0(tt.args.state)
+			s, err := state_native.InitializeFromProtoCapella(tt.args.state)
 			require.NoError(t, err)
 			got, err := ActiveValidatorIndices(context.Background(), s, tt.args.epoch)
 			if tt.wantedErr != "" {
@@ -691,7 +691,7 @@ func TestIsIsEligibleForActivation(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s, err := state_native.InitializeFromProtoPhase0(tt.state)
+			s, err := state_native.InitializeFromProtoCapella(tt.state)
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, IsEligibleForActivation(s, tt.validator), "IsEligibleForActivation()")
 		})
@@ -729,7 +729,7 @@ func computeProposerIndexWithValidators(validators []*zondpb.Validator, activeIn
 }
 
 func TestLastActivatedValidatorIndex_OK(t *testing.T) {
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{})
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 
 	validators := make([]*zondpb.Validator, 4)

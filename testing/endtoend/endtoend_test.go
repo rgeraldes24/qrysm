@@ -1,5 +1,5 @@
-// Package endtoend performs full a end-to-end test for Prysm,
-// including spinning up an ETH1 dev chain, sending deposits to the deposit
+// Package endtoend performs full a end-to-end test for Qrysm,
+// including spinning up an ZOND1 dev chain, sending deposits to the deposit
 // contract, and making sure the beacon node and validators are running and
 // performing properly for a few epochs.
 package endtoend
@@ -194,7 +194,7 @@ func (r *testRunner) runEvaluators(ec *e2etypes.EvaluationContext, conns []*grpc
 func (r *testRunner) testDepositsAndTx(ctx context.Context, g *errgroup.Group,
 	keystorePath string, requiredNodes []e2etypes.ComponentRunner) {
 	minGenesisActiveCount := int(params.BeaconConfig().MinGenesisActiveValidatorCount)
-	// prysm web3signer doesn't support deposits
+	// qrysm web3signer doesn't support deposits
 	r.config.UseWeb3RemoteSigner = false
 	depositCheckValidator := components.NewValidatorNode(r.config, int(e2e.DepositCount), e2e.TestParams.BeaconNodeCount, minGenesisActiveCount)
 	g.Go(func() error {
@@ -312,7 +312,7 @@ func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, 
 	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{cpsyncer}); err != nil {
 		return fmt.Errorf("checkpoint sync beacon node not ready: %w", err)
 	}
-	c, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", e2e.TestParams.Ports.PrysmBeaconNodeRPCPort+i), grpc.WithInsecure())
+	c, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", e2e.TestParams.Ports.QrysmBeaconNodeRPCPort+i), grpc.WithInsecure())
 	require.NoError(r.t, err, "Failed to dial")
 
 	// this is so that the syncEvaluators checks can run on the checkpoint sync'd node
@@ -357,7 +357,7 @@ func (r *testRunner) testBeaconChainSync(ctx context.Context, g *errgroup.Group,
 	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{syncBeaconNode}); err != nil {
 		return fmt.Errorf("sync beacon node not ready: %w", err)
 	}
-	syncConn, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", e2e.TestParams.Ports.PrysmBeaconNodeRPCPort+index), grpc.WithInsecure())
+	syncConn, err := grpc.Dial(fmt.Sprintf("127.0.0.1:%d", e2e.TestParams.Ports.QrysmBeaconNodeRPCPort+index), grpc.WithInsecure())
 	require.NoError(t, err, "Failed to dial")
 	conns = append(conns, syncConn)
 
@@ -390,7 +390,7 @@ func (r *testRunner) testBeaconChainSync(ctx context.Context, g *errgroup.Group,
 
 func (r *testRunner) testDoppelGangerProtection(ctx context.Context) error {
 	// Exit if we are running from the previous release.
-	if r.config.UsePrysmShValidator {
+	if r.config.UseQrysmShValidator {
 		return nil
 	}
 	g, ctx := errgroup.WithContext(ctx)
@@ -604,7 +604,7 @@ func (r *testRunner) executeProvidedEvaluators(ec *e2etypes.EvaluationContext, c
 }
 
 // This interceptor will define the multi scenario run for our minimal tests.
-// 1) In the first scenario we will be taking a single prysm node and its validator offline.
+// 1) In the first scenario we will be taking a single qrysm node and its validator offline.
 // Along with that we will also take a single lighthouse node and its validator offline.
 // After 1 epoch we will then attempt to bring it online again.
 //
@@ -627,7 +627,7 @@ func (r *testRunner) multiScenarioMulticlient(ec *e2etypes.EvaluationContext, ep
 		require.NoError(r.t, r.comHandler.validatorNodes.ResumeAtIndex(0))
 		return true
 	case 16:
-		// Set it for prysm beacon node.
+		// Set it for qrysm beacon node.
 		component, err := r.comHandler.zond1Proxy.ComponentAtIndex(0)
 		require.NoError(r.t, err)
 		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayloadV2", func() interface{} {

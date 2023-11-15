@@ -44,7 +44,7 @@ func (s *Service) setupExecutionClientConnections(ctx context.Context, currEndpo
 		}
 		return errors.Wrap(err, errStr)
 	}
-	s.updateConnectedETH1(true)
+	s.updateConnectedZOND1(true)
 	s.runError = nil
 	return nil
 }
@@ -88,7 +88,7 @@ func (s *Service) pollConnectionStatus(ctx context.Context) {
 // Forces to retry an execution client connection.
 func (s *Service) retryExecutionClientConnection(ctx context.Context, err error) {
 	s.runError = errors.Wrap(err, "retryExecutionClientConnection")
-	s.updateConnectedETH1(false)
+	s.updateConnectedZOND1(false)
 	// Back off for a while before redialing.
 	time.Sleep(backOffPeriod)
 	currClient := s.rpcClient
@@ -131,7 +131,7 @@ func (s *Service) newRPCClientWithAuth(ctx context.Context, endpoint network.End
 }
 
 // Checks the chain ID of the execution client to ensure
-// it matches local parameters of what Prysm expects.
+// it matches local parameters of what Qrysm expects.
 func ensureCorrectExecutionChain(ctx context.Context, client *zondclient.Client) error {
 	cID, err := client.ChainID(ctx)
 	if err != nil {

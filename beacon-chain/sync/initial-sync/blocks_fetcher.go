@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
 	p2pTypes "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
-	prysmsync "github.com/theQRL/qrysm/v4/beacon-chain/sync"
+	qrysmsync "github.com/theQRL/qrysm/v4/beacon-chain/sync"
 	"github.com/theQRL/qrysm/v4/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -331,7 +331,7 @@ func (f *blocksFetcher) requestBlocks(
 	}
 	f.rateLimiter.Add(pid.String(), int64(req.Count))
 	l.Unlock()
-	return prysmsync.SendBeaconBlocksByRangeRequest(ctx, f.chain, f.p2p, pid, req, nil)
+	return qrysmsync.SendBeaconBlocksByRangeRequest(ctx, f.chain, f.p2p, pid, req, nil)
 }
 
 // requestBlocksByRoot is a wrapper for handling BeaconBlockByRootsReq requests/streams.
@@ -360,7 +360,7 @@ func (f *blocksFetcher) requestBlocksByRoot(
 	f.rateLimiter.Add(pid.String(), int64(len(*req)))
 	l.Unlock()
 
-	return prysmsync.SendBeaconBlocksByRootRequest(ctx, f.chain, f.p2p, pid, req, nil)
+	return qrysmsync.SendBeaconBlocksByRootRequest(ctx, f.chain, f.p2p, pid, req, nil)
 }
 
 // waitForBandwidth blocks up until peer's bandwidth is restored.

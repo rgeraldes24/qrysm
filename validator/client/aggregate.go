@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
@@ -155,7 +155,7 @@ func (v *validator) waitToSlotTwoThirds(ctx context.Context, slot primitives.Slo
 
 	startTime := slots.StartTime(v.genesisTime, slot)
 	finalTime := startTime.Add(delay)
-	wait := prysmTime.Until(finalTime)
+	wait := qrysmTime.Until(finalTime)
 	if wait <= 0 {
 		return
 	}

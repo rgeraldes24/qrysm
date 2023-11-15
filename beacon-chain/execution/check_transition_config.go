@@ -22,7 +22,7 @@ import (
 var (
 	checkTransitionPollingInterval = time.Second * 10
 	logTtdInterval                 = time.Minute
-	configMismatchLog              = "Configuration mismatch between your execution client and Prysm. " +
+	configMismatchLog              = "Configuration mismatch between your execution client and Qrysm. " +
 		"Please check your execution client and restart it with the proper configuration. If this is not done, " +
 		"your node will not be able to complete the proof-of-stake transition"
 	needsEnginePortLog = "Could not check execution client configuration. " +
@@ -33,7 +33,7 @@ var (
 		"https://docs.prylabs.network/docs/execution-node/authentication"
 )
 
-// Checks the transition configuration between Prysm and the connected execution node to ensure
+// Checks the transition configuration between Qrysm and the connected execution node to ensure
 // there are no differences in terminal block difficulty and block hash.
 // If there are any discrepancies, we must log errors to ensure users can resolve
 // the problem and be ready for the merge transition.
@@ -66,7 +66,7 @@ func (s *Service) checkTransitionConfiguration(
 	}
 
 	// We poll the execution client to see if the transition configuration has changed.
-	// This serves as a heartbeat to ensure the execution client and Prysm are ready for the
+	// This serves as a heartbeat to ensure the execution client and Qrysm are ready for the
 	// Bellatrix hard-fork transition.
 	ticker := time.NewTicker(checkTransitionPollingInterval)
 	logTtdTicker := time.NewTicker(logTtdInterval)
@@ -113,7 +113,7 @@ func (s *Service) checkTransitionConfiguration(
 }
 
 // We check if there is a configuration mismatch error between the execution client
-// and the Prysm beacon node. If so, we need to log errors in the node as it cannot successfully
+// and the Qrysm beacon node. If so, we need to log errors in the node as it cannot successfully
 // complete the merge transition for the Bellatrix hard fork.
 func (s *Service) handleExchangeConfigurationError(err error) {
 	if err == nil {

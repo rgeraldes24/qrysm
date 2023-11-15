@@ -1,12 +1,6 @@
 package state_native
 
-import (
-	"testing"
-
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/testing/require"
-)
-
+/*
 func TestBeaconState_PreviousEpochAttestations(t *testing.T) {
 	s, err := InitializeFromProtoPhase0(&zondpb.BeaconState{})
 	require.NoError(t, err)
@@ -44,3 +38,4 @@ func TestBeaconState_CurrentEpochAttestations(t *testing.T) {
 	got[0].ProposerIndex = 102
 	require.DeepNotEqual(t, want, got)
 }
+*/

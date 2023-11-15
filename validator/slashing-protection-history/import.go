@@ -19,7 +19,7 @@ import (
 )
 
 // ImportStandardProtectionJSON takes in EIP-3076 compliant JSON file used for slashing protection
-// by Ethereum validators and imports its data into Prysm's internal representation of slashing
+// by Ethereum validators and imports its data into Qrysm's internal representation of slashing
 // protection in the validator client's database. For more information, see the EIP document here:
 // https://eips.ethereum.org/EIPS/eip-3076.
 func ImportStandardProtectionJSON(ctx context.Context, validatorDB db.Database, r io.Reader) error {
@@ -56,7 +56,7 @@ func ImportStandardProtectionJSON(ctx context.Context, validatorDB db.Database, 
 	proposalHistoryByPubKey := make(map[[dilithium2.CryptoPublicKeyBytes]byte]kv.ProposalHistoryForPubkey)
 	for pubKey, signedBlocks := range signedBlocksByPubKey {
 		// Transform the processed signed blocks data from the JSON
-		// file into the internal Prysm representation of proposal history.
+		// file into the internal Qrysm representation of proposal history.
 		proposalHistory, err := transformSignedBlocks(ctx, signedBlocks)
 		if err != nil {
 			return errors.Wrapf(err, "could not parse signed blocks in JSON file for key %#x", pubKey)
@@ -66,7 +66,7 @@ func ImportStandardProtectionJSON(ctx context.Context, validatorDB db.Database, 
 
 	for pubKey, signedAtts := range signedAttsByPubKey {
 		// Transform the processed signed attestation data from the JSON
-		// file into the internal Prysm representation of attesting history.
+		// file into the internal Qrysm representation of attesting history.
 		historicalAtt, err := transformSignedAttestations(pubKey, signedAtts)
 		if err != nil {
 			return errors.Wrapf(err, "could not parse signed attestations in JSON file for key %#x", pubKey)

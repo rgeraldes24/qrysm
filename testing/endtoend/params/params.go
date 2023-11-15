@@ -44,12 +44,12 @@ type ports struct {
 	Zond1AuthRPCPort                int
 	Zond1WSPort                     int
 	Zond1ProxyPort                  int
-	PrysmBeaconNodeRPCPort          int
-	PrysmBeaconNodeUDPPort          int
-	PrysmBeaconNodeTCPPort          int
-	PrysmBeaconNodeGatewayPort      int
-	PrysmBeaconNodeMetricsPort      int
-	PrysmBeaconNodePprofPort        int
+	QrysmBeaconNodeRPCPort          int
+	QrysmBeaconNodeUDPPort          int
+	QrysmBeaconNodeTCPPort          int
+	QrysmBeaconNodeGatewayPort      int
+	QrysmBeaconNodeMetricsPort      int
+	QrysmBeaconNodePprofPort        int
 	LighthouseBeaconNodeP2PPort     int
 	LighthouseBeaconNodeHTTPPort    int
 	LighthouseBeaconNodeMetricsPort int
@@ -142,12 +142,12 @@ const (
 	Zond1AuthRPCPort = Zond1Port + 3*portSpan
 	Zond1ProxyPort   = Zond1Port + 4*portSpan
 
-	PrysmBeaconNodeRPCPort     = 4150
-	PrysmBeaconNodeUDPPort     = PrysmBeaconNodeRPCPort + portSpan
-	PrysmBeaconNodeTCPPort     = PrysmBeaconNodeRPCPort + 2*portSpan
-	PrysmBeaconNodeGatewayPort = PrysmBeaconNodeRPCPort + 3*portSpan
-	PrysmBeaconNodeMetricsPort = PrysmBeaconNodeRPCPort + 4*portSpan
-	PrysmBeaconNodePprofPort   = PrysmBeaconNodeRPCPort + 5*portSpan
+	QrysmBeaconNodeRPCPort     = 4150
+	QrysmBeaconNodeUDPPort     = QrysmBeaconNodeRPCPort + portSpan
+	QrysmBeaconNodeTCPPort     = QrysmBeaconNodeRPCPort + 2*portSpan
+	QrysmBeaconNodeGatewayPort = QrysmBeaconNodeRPCPort + 3*portSpan
+	QrysmBeaconNodeMetricsPort = QrysmBeaconNodeRPCPort + 4*portSpan
+	QrysmBeaconNodePprofPort   = QrysmBeaconNodeRPCPort + 5*portSpan
 
 	LighthouseBeaconNodeP2PPort     = 5150
 	LighthouseBeaconNodeHTTPPort    = LighthouseBeaconNodeP2PPort + portSpan
@@ -322,27 +322,27 @@ func initializeStandardPorts(shardCount, shardIndex int, ports *ports, existingR
 	if err != nil {
 		return err
 	}
-	beaconNodeRPCPort, err := port(PrysmBeaconNodeRPCPort, shardCount, shardIndex, existingRegistrations)
+	beaconNodeRPCPort, err := port(QrysmBeaconNodeRPCPort, shardCount, shardIndex, existingRegistrations)
 	if err != nil {
 		return err
 	}
-	beaconNodeUDPPort, err := port(PrysmBeaconNodeUDPPort, shardCount, shardIndex, existingRegistrations)
+	beaconNodeUDPPort, err := port(QrysmBeaconNodeUDPPort, shardCount, shardIndex, existingRegistrations)
 	if err != nil {
 		return err
 	}
-	beaconNodeTCPPort, err := port(PrysmBeaconNodeTCPPort, shardCount, shardIndex, existingRegistrations)
+	beaconNodeTCPPort, err := port(QrysmBeaconNodeTCPPort, shardCount, shardIndex, existingRegistrations)
 	if err != nil {
 		return err
 	}
-	beaconNodeGatewayPort, err := port(PrysmBeaconNodeGatewayPort, shardCount, shardIndex, existingRegistrations)
+	beaconNodeGatewayPort, err := port(QrysmBeaconNodeGatewayPort, shardCount, shardIndex, existingRegistrations)
 	if err != nil {
 		return err
 	}
-	beaconNodeMetricsPort, err := port(PrysmBeaconNodeMetricsPort, shardCount, shardIndex, existingRegistrations)
+	beaconNodeMetricsPort, err := port(QrysmBeaconNodeMetricsPort, shardCount, shardIndex, existingRegistrations)
 	if err != nil {
 		return err
 	}
-	beaconNodePprofPort, err := port(PrysmBeaconNodePprofPort, shardCount, shardIndex, existingRegistrations)
+	beaconNodePprofPort, err := port(QrysmBeaconNodePprofPort, shardCount, shardIndex, existingRegistrations)
 	if err != nil {
 		return err
 	}
@@ -365,12 +365,12 @@ func initializeStandardPorts(shardCount, shardIndex int, ports *ports, existingR
 	ports.Zond1AuthRPCPort = zond1AuthPort
 	ports.Zond1WSPort = zond1WSPort
 	ports.Zond1ProxyPort = zond1ProxyPort
-	ports.PrysmBeaconNodeRPCPort = beaconNodeRPCPort
-	ports.PrysmBeaconNodeUDPPort = beaconNodeUDPPort
-	ports.PrysmBeaconNodeTCPPort = beaconNodeTCPPort
-	ports.PrysmBeaconNodeGatewayPort = beaconNodeGatewayPort
-	ports.PrysmBeaconNodeMetricsPort = beaconNodeMetricsPort
-	ports.PrysmBeaconNodePprofPort = beaconNodePprofPort
+	ports.QrysmBeaconNodeRPCPort = beaconNodeRPCPort
+	ports.QrysmBeaconNodeUDPPort = beaconNodeUDPPort
+	ports.QrysmBeaconNodeTCPPort = beaconNodeTCPPort
+	ports.QrysmBeaconNodeGatewayPort = beaconNodeGatewayPort
+	ports.QrysmBeaconNodeMetricsPort = beaconNodeMetricsPort
+	ports.QrysmBeaconNodePprofPort = beaconNodePprofPort
 	ports.ValidatorMetricsPort = validatorMetricsPort
 	ports.ValidatorGatewayPort = validatorGatewayPort
 	ports.JaegerTracingPort = jaegerTracingPort

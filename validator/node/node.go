@@ -59,13 +59,12 @@ import (
 	remoteweb3signer "github.com/theQRL/qrysm/v4/validator/keymanager/remote-web3signer"
 	"github.com/theQRL/qrysm/v4/validator/rpc"
 	validatormiddleware "github.com/theQRL/qrysm/v4/validator/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/v4/validator/web"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/protobuf/encoding/protojson"
 	"gopkg.in/yaml.v2"
 )
 
-// ValidatorClient defines an instance of an Ethereum validator that manages
+// ValidatorClient defines an instance of an Zond validator that manages
 // the entire lifecycle of services attached to it participating in proof of stake.
 type ValidatorClient struct {
 	cliCtx            *cli.Context
@@ -79,7 +78,7 @@ type ValidatorClient struct {
 	stop              chan struct{} // Channel to wait for termination notifications.
 }
 
-// NewValidatorClient creates a new instance of the Prysm validator client.
+// NewValidatorClient creates a new instance of the Qrysm validator client.
 func NewValidatorClient(cliCtx *cli.Context) (*ValidatorClient, error) {
 	// TODO(#9883) - Maybe we can pass in a new validator client config instead of the cliCTX to abstract away the use of flags here .
 	if err := tracing2.Setup(
@@ -132,16 +131,16 @@ func NewValidatorClient(cliCtx *cli.Context) (*ValidatorClient, error) {
 	// If the --web flag is enabled to administer the validator
 	// client via a web portal, we start the validator client in a different way.
 	// Change Web flag name to enable keymanager API, look at merging initializeFromCLI and initializeForWeb maybe after WebUI DEPRECATED.
-	if cliCtx.IsSet(flags.EnableWebFlag.Name) {
-		if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) || cliCtx.IsSet(flags.Web3SignerPublicValidatorKeysFlag.Name) {
-			log.Warn("Remote Keymanager API enabled. Prysm web does not properly support web3signer at this time")
-		}
-		log.Info("Enabling web portal to manage the validator client")
-		if err := validatorClient.initializeForWeb(cliCtx); err != nil {
-			return nil, err
-		}
-		return validatorClient, nil
-	}
+	// if cliCtx.IsSet(flags.EnableWebFlag.Name) {
+	// 	if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) || cliCtx.IsSet(flags.Web3SignerPublicValidatorKeysFlag.Name) {
+	// 		log.Warn("Remote Keymanager API enabled. Qrysm web does not properly support web3signer at this time")
+	// 	}
+	// 	log.Info("Enabling web portal to manage the validator client")
+	// 	if err := validatorClient.initializeForWeb(cliCtx); err != nil {
+	// 		return nil, err
+	// 	}
+	// 	return validatorClient, nil
+	// }
 
 	if err := validatorClient.initializeFromCLI(cliCtx); err != nil {
 		return nil, err
@@ -190,7 +189,7 @@ func (c *ValidatorClient) Close() {
 	defer c.lock.Unlock()
 
 	c.services.StopAll()
-	log.Info("Stopping Prysm validator")
+	log.Info("Stopping Qrysm validator")
 	c.cancel()
 	close(c.stop)
 }
@@ -352,7 +351,7 @@ func (c *ValidatorClient) initializeForWeb(cliCtx *cli.Context) error {
 	gatewayPort := cliCtx.Int(flags.GRPCGatewayPort.Name)
 	webAddress := fmt.Sprintf("http://%s:%d", gatewayHost, gatewayPort)
 	log.WithField("address", webAddress).Info(
-		"Starting Prysm web UI on address, open in browser to access",
+		"Starting Qrysm web UI on address, open in browser to access",
 	)
 	return nil
 }
@@ -816,27 +815,22 @@ func (c *ValidatorClient) registerRPCGatewayService(cliCtx *cli.Context) error {
 	)
 	muxHandler := func(apiMware *apimiddleware.ApiProxyMiddleware, h http.HandlerFunc, w http.ResponseWriter, req *http.Request) {
 		// The validator gateway handler requires this special logic as it serves two kinds of APIs, namely
-		// the standard validator keymanager API under the /eth namespace, and the Prysm internal
+		// the standard validator keymanager API under the /zond namespace, and the Qrysm internal
 		// validator API under the /api namespace. Finally, it also serves requests to host the validator web UI.
-		if strings.HasPrefix(req.URL.Path, "/api/eth/") {
+		if strings.HasPrefix(req.URL.Path, "/api/zond/") {
 			req.URL.Path = strings.Replace(req.URL.Path, "/api", "", 1)
-			// If the prefix has /eth/, we handle it with the standard API gateway middleware.
+			// If the prefix has /zond/, we handle it with the standard API gateway middleware.
 			apiMware.ServeHTTP(w, req)
 		} else if strings.HasPrefix(req.URL.Path, "/api") {
 			req.URL.Path = strings.Replace(req.URL.Path, "/api", "", 1)
-			// Else, we handle with the Prysm API gateway without a middleware.
+			// Else, we handle with the Qrysm API gateway without a middleware.
 			h(w, req)
-		} else {
-			// Finally, we handle with the web server.
-			// DEPRECATED: Prysm Web UI and associated endpoints will be fully removed in a future hard fork.
-			web.Handler(w, req)
 		}
 	}
 
-	// remove "/accounts/", "/v2/" after WebUI DEPRECATED
 	pbHandler := &gateway.PbMux{
 		Registrations: registrations,
-		Patterns:      []string{"/accounts/", "/v2/", "/internal/zond/v1/"},
+		Patterns:      []string{"/internal/zond/v1/"},
 		Mux:           gwmux,
 	}
 	opts := []gateway.Option{

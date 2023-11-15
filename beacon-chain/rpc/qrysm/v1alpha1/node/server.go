@@ -221,7 +221,7 @@ func (ns *Server) ListPeers(ctx context.Context, _ *empty.Empty) (*zondpb.Peers,
 	}, nil
 }
 
-// GetZOND1ConnectionStatus gets data about the ETH1 endpoints.
+// GetZOND1ConnectionStatus gets data about the ZOND1 endpoints.
 func (ns *Server) GetZOND1ConnectionStatus(_ context.Context, _ *empty.Empty) (*zondpb.ZOND1ConnectionStatus, error) {
 	var currErr string
 	err := ns.POWChainInfoFetcher.ExecutionClientConnectionErr()
@@ -234,40 +234,3 @@ func (ns *Server) GetZOND1ConnectionStatus(_ context.Context, _ *empty.Empty) (*
 		Addresses:              []string{ns.POWChainInfoFetcher.ExecutionClientEndpoint()},
 	}, nil
 }
-
-// StreamBeaconLogs from the beacon node via a gRPC server-side stream.
-// DEPRECATED: This endpoint doesn't appear to be used and have been marked for deprecation.
-// func (ns *Server) StreamBeaconLogs(_ *empty.Empty, stream zondpb.Health_StreamBeaconLogsServer) error {
-// 	ch := make(chan []byte, ns.StreamLogsBufferSize)
-// 	sub := ns.LogsStreamer.LogsFeed().Subscribe(ch)
-// 	defer func() {
-// 		sub.Unsubscribe()
-// 		close(ch)
-// 	}()
-
-// 	recentLogs := ns.LogsStreamer.GetLastFewLogs()
-// 	logStrings := make([]string, len(recentLogs))
-// 	for i, log := range recentLogs {
-// 		logStrings[i] = string(log)
-// 	}
-// 	if err := stream.Send(&zondpb.LogsResponse{
-// 		Logs: logStrings,
-// 	}); err != nil {
-// 		return status.Errorf(codes.Unavailable, "Could not send over stream: %v", err)
-// 	}
-// 	for {
-// 		select {
-// 		case log := <-ch:
-// 			resp := &zondpb.LogsResponse{
-// 				Logs: []string{string(log)},
-// 			}
-// 			if err := stream.Send(resp); err != nil {
-// 				return status.Errorf(codes.Unavailable, "Could not send over stream: %v", err)
-// 			}
-// 		case err := <-sub.Err():
-// 			return status.Errorf(codes.Canceled, "Subscriber error, closing: %v", err)
-// 		case <-stream.Context().Done():
-// 			return status.Error(codes.Canceled, "Context canceled")
-// 		}
-// 	}
-// }

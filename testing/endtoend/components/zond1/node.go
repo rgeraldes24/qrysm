@@ -22,7 +22,7 @@ import (
 	e2etypes "github.com/theQRL/qrysm/v4/testing/endtoend/types"
 )
 
-// Node represents an ETH1 node.
+// Node represents an ZOND1 node.
 type Node struct {
 	e2etypes.ComponentRunner
 	started chan struct{}
@@ -31,7 +31,7 @@ type Node struct {
 	cmd     *exec.Cmd
 }
 
-// NewNode creates and returns ETH1 node.
+// NewNode creates and returns ZOND1 node.
 func NewNode(index int, enr string) *Node {
 	return &Node{
 		started: make(chan struct{}, 1),
@@ -40,7 +40,7 @@ func NewNode(index int, enr string) *Node {
 	}
 }
 
-// Start runs a non-mining ETH1 node.
+// Start runs a non-mining ZOND1 node.
 // To connect to a miner and start working properly, this node should be a part of a NodeSet.
 func (node *Node) Start(ctx context.Context) error {
 	binaryPath, found := bazel.FindBinary("cmd/gzond", "gzond")
@@ -59,15 +59,15 @@ func (node *Node) Start(ctx context.Context) error {
 	if err := file.MkdirAll(zond1Path); err != nil {
 		return err
 	}
-	gethJsonPath := path.Join(zond1Path, "genesis.json")
+	gzondJsonPath := path.Join(zond1Path, "genesis.json")
 
-	gen := interop.GethTestnetGenesis(e2e.TestParams.Zond1GenesisTime, params.BeaconConfig())
+	gen := interop.GzondTestnetGenesis(e2e.TestParams.Zond1GenesisTime, params.BeaconConfig())
 	b, err := json.Marshal(gen)
 	if err != nil {
 		return err
 	}
 
-	if err := file.WriteFile(gethJsonPath, b); err != nil {
+	if err := file.WriteFile(gzondJsonPath, b); err != nil {
 		return err
 	}
 	copyPath := path.Join(e2e.TestParams.LogPath, "zond1-genesis.json")
@@ -75,7 +75,7 @@ func (node *Node) Start(ctx context.Context) error {
 		return err
 	}
 
-	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", zond1Path), gethJsonPath) // #nosec G204 -- Safe
+	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", zond1Path), gzondJsonPath) // #nosec G204 -- Safe
 	initFile, err := helpers.DeleteAndCreateFile(e2e.TestParams.LogPath, "zond1-init_"+strconv.Itoa(node.index)+".log")
 	if err != nil {
 		return err
@@ -149,7 +149,7 @@ func (node *Node) Start(ctx context.Context) error {
 	return node.cmd.Wait()
 }
 
-// Started checks whether ETH1 node is started and ready to be queried.
+// Started checks whether ZOND1 node is started and ready to be queried.
 func (node *Node) Started() <-chan struct{} {
 	return node.started
 }

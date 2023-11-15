@@ -137,8 +137,3 @@ func (c *beaconApiValidatorClient) ValidatorStatus(ctx context.Context, in *zond
 func (c *beaconApiValidatorClient) WaitForActivation(ctx context.Context, in *zondpb.ValidatorActivationRequest) (zondpb.BeaconNodeValidator_WaitForActivationClient, error) {
 	return c.waitForActivation(ctx, in)
 }
-
-// Deprecated: Do not use.
-func (c *beaconApiValidatorClient) WaitForChainStart(ctx context.Context, _ *empty.Empty) (*zondpb.ChainStartResponse, error) {
-	return c.waitForChainStart(ctx)
-}

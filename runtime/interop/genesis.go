@@ -77,9 +77,9 @@ var minerBalance = big.NewInt(0)
 // The following value is for the key used by the e2e test "miner" node.
 const DefaultCliqueSigner = "0x0000000000000000000000000000000000000000000000000000000000000000878705ba3f8bc32fcf7f4caa1a35e72af65cf7660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 
-// GethShanghaiTime calculates the absolute time of the shanghai (aka capella) fork block
+// GzondShanghaiTime calculates the absolute time of the shanghai (aka capella) fork block
 // by adding the relative time of the capella the fork epoch to the given genesis timestamp.
-func GethShanghaiTime(genesisTime uint64, cfg *clparams.BeaconChainConfig) *uint64 {
+func GzondShanghaiTime(genesisTime uint64, cfg *clparams.BeaconChainConfig) *uint64 {
 	var shanghaiTime *uint64
 	if cfg.CapellaForkEpoch != math.MaxUint64 {
 		startSlot, err := slots.EpochStart(cfg.CapellaForkEpoch)
@@ -92,16 +92,16 @@ func GethShanghaiTime(genesisTime uint64, cfg *clparams.BeaconChainConfig) *uint
 	return shanghaiTime
 }
 
-// GethTestnetGenesis creates a genesis.json for zond1 clients with a set of defaults suitable for ephemeral testnets,
+// GzondTestnetGenesis creates a genesis.json for zond1 clients with a set of defaults suitable for ephemeral testnets,
 // like in an e2e test. The parameters are minimal but the full value is returned unmarshaled so that it can be
 // customized as desired.
-func GethTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *core.Genesis {
+func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *core.Genesis {
 	ttd, ok := big.NewInt(0).SetString(clparams.BeaconConfig().TerminalTotalDifficulty, 10)
 	if !ok {
 		panic(fmt.Sprintf("unable to parse TerminalTotalDifficulty as an integer = %s", clparams.BeaconConfig().TerminalTotalDifficulty))
 	}
 
-	shanghaiTime := GethShanghaiTime(genesisTime, cfg)
+	shanghaiTime := GzondShanghaiTime(genesisTime, cfg)
 	cc := &params.ChainConfig{
 		ChainID:                       big.NewInt(defaultTestChainId),
 		HomesteadBlock:                bigz,
@@ -122,7 +122,7 @@ func GethTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *co
 		TerminalTotalDifficulty:       ttd,
 		TerminalTotalDifficultyPassed: false,
 		Clique: &params.CliqueConfig{
-			Period: cfg.SecondsPerETH1Block,
+			Period: cfg.SecondsPerZOND1Block,
 			Epoch:  20000,
 		},
 		ShanghaiTime: shanghaiTime,

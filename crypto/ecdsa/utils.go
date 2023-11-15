@@ -22,7 +22,7 @@ func ConvertFromInterfacePrivKey(privkey crypto.PrivKey) (*ecdsa.PrivateKey, err
 	privKey := new(ecdsa.PrivateKey)
 	k := new(big.Int).SetBytes(rawKey)
 	privKey.D = k
-	privKey.Curve = gcrypto.S256() // Temporary hack, so libp2p Secp256k1 is recognized as geth Secp256k1 in disc v5.1.
+	privKey.Curve = gcrypto.S256() // Temporary hack, so libp2p Secp256k1 is recognized as gzond Secp256k1 in disc v5.1.
 	privKey.X, privKey.Y = gcrypto.S256().ScalarBaseMult(rawKey)
 	return privKey, nil
 }

@@ -67,7 +67,7 @@ func (*FaultyExecutionChain) ClearPreGenesisData() {
 	// no-op
 }
 
-// IsConnectedToETH1 --
-func (*FaultyExecutionChain) IsConnectedToETH1() bool {
+// IsConnectedToZOND1 --
+func (*FaultyExecutionChain) IsConnectedToZOND1() bool {
 	return true
 }

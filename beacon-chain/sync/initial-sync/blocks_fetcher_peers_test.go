@@ -15,7 +15,7 @@ import (
 	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmsync "github.com/theQRL/qrysm/v4/time"
 )
 
 func TestBlocksFetcher_selectFailOverPeer(t *testing.T) {
@@ -324,29 +324,29 @@ func TestBlocksFetcher_removeStalePeerLocks(t *testing.T) {
 			peersIn: []peerData{
 				{
 					peerID:   "a",
-					accessed: prysmTime.Now(),
+					accessed: qrysmsync.Now(),
 				},
 				{
 					peerID:   "b",
-					accessed: prysmTime.Now(),
+					accessed: qrysmsync.Now(),
 				},
 				{
 					peerID:   "c",
-					accessed: prysmTime.Now(),
+					accessed: qrysmsync.Now(),
 				},
 			},
 			peersOut: []peerData{
 				{
 					peerID:   "a",
-					accessed: prysmTime.Now(),
+					accessed: qrysmsync.Now(),
 				},
 				{
 					peerID:   "b",
-					accessed: prysmTime.Now(),
+					accessed: qrysmsync.Now(),
 				},
 				{
 					peerID:   "c",
-					accessed: prysmTime.Now(),
+					accessed: qrysmsync.Now(),
 				},
 			},
 		},
@@ -356,25 +356,25 @@ func TestBlocksFetcher_removeStalePeerLocks(t *testing.T) {
 			peersIn: []peerData{
 				{
 					peerID:   "a",
-					accessed: prysmTime.Now(),
+					accessed: qrysmsync.Now(),
 				},
 				{
 					peerID:   "b",
-					accessed: prysmTime.Now().Add(-peerLockMaxAge),
+					accessed: qrysmsync.Now().Add(-peerLockMaxAge),
 				},
 				{
 					peerID:   "c",
-					accessed: prysmTime.Now(),
+					accessed: qrysmsync.Now(),
 				},
 			},
 			peersOut: []peerData{
 				{
 					peerID:   "a",
-					accessed: prysmTime.Now(),
+					accessed: qrysmsync.Now(),
 				},
 				{
 					peerID:   "c",
-					accessed: prysmTime.Now(),
+					accessed: qrysmsync.Now(),
 				},
 			},
 		},
@@ -384,15 +384,15 @@ func TestBlocksFetcher_removeStalePeerLocks(t *testing.T) {
 			peersIn: []peerData{
 				{
 					peerID:   "a",
-					accessed: prysmTime.Now().Add(-peerLockMaxAge),
+					accessed: qrysmsync.Now().Add(-peerLockMaxAge),
 				},
 				{
 					peerID:   "b",
-					accessed: prysmTime.Now().Add(-peerLockMaxAge),
+					accessed: qrysmsync.Now().Add(-peerLockMaxAge),
 				},
 				{
 					peerID:   "c",
-					accessed: prysmTime.Now().Add(-peerLockMaxAge),
+					accessed: qrysmsync.Now().Add(-peerLockMaxAge),
 				},
 			},
 			peersOut: []peerData{},

@@ -145,7 +145,7 @@ func signedAttestationsByPubKey(ctx context.Context, validatorDB db.Database, pu
 	signedAttestations := make([]*format.SignedAttestation, 0)
 	for i := 0; i < len(history); i++ {
 		att := history[i]
-		// Special edge case due to a bug in Prysm's old slashing protection schema. The bug
+		// Special edge case due to a bug in Qrysm's old slashing protection schema. The bug
 		// manifests itself as the first entry in attester slashing protection history
 		// having a target epoch greater than the next entry in the list. If this manifests,
 		// we skip it to protect users. This check is the best trade-off we can make at

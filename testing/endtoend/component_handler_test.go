@@ -109,19 +109,19 @@ func (c *componentHandler) setup() {
 		})
 		return
 	}
-	// ETH1 miner.
+	// ZOND1 miner.
 	g.Go(func() error {
 		if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{bootNode}); err != nil {
 			return errors.Wrap(err, "miner require boot node to run")
 		}
 		miner.SetBootstrapENR(bootNode.ENR())
 		if err := miner.Start(ctx); err != nil {
-			return errors.Wrap(err, "failed to start the ETH1 miner")
+			return errors.Wrap(err, "failed to start the ZOND1 miner")
 		}
 		return nil
 	})
 
-	// ETH1 non-mining nodes.
+	// ZOND1 non-mining nodes.
 	zond1Nodes := zond1.NewNodeSet()
 	g.Go(func() error {
 		if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{miner}); err != nil {
@@ -129,7 +129,7 @@ func (c *componentHandler) setup() {
 		}
 		zond1Nodes.SetMinerENR(miner.ENR())
 		if err := zond1Nodes.Start(ctx); err != nil {
-			return errors.Wrap(err, "failed to start ETH1 nodes")
+			return errors.Wrap(err, "failed to start ZOND1 nodes")
 		}
 		return nil
 	})
@@ -262,8 +262,8 @@ func (c *componentHandler) printPIDs(logger func(string, ...interface{})) {
 	msg += fmt.Sprintf("Beacon chain nodes: %v\n", PIDsFromMultiComponentRunner(c.beaconNodes))
 	// Validator nodes
 	msg += fmt.Sprintf("Validators: %v\n", PIDsFromMultiComponentRunner(c.validatorNodes))
-	// ETH1 nodes
-	msg += fmt.Sprintf("ETH1 nodes: %v\n", PIDsFromMultiComponentRunner(c.zond1Nodes))
+	// ZOND1 nodes
+	msg += fmt.Sprintf("ZOND1 nodes: %v\n", PIDsFromMultiComponentRunner(c.zond1Nodes))
 
 	logger(msg)
 }

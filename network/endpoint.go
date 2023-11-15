@@ -72,7 +72,7 @@ func HttpEndpoint(zond1Provider string) Endpoint {
 	endpoint.Url = strings.TrimSpace(authValues[0])
 	if len(authValues) > 2 {
 		log.Errorf(
-			"ETH1 endpoint string can contain one comma for specifying the authorization header to access the provider."+
+			"ZOND1 endpoint string can contain one comma for specifying the authorization header to access the provider."+
 				" String contains too many commas: %d. Skipping authorization.", len(authValues)-1)
 	} else if len(authValues) == 2 {
 		switch Method(strings.TrimSpace(authValues[1])) {

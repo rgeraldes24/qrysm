@@ -77,7 +77,7 @@ func ToBuilderConfig(from *validatorpb.BuilderConfig) *BuilderConfig {
 	return config
 }
 
-// ProposerSettings is a Prysm internal representation of the fee recipient config on the validator client.
+// ProposerSettings is a Qrysm internal representation of the fee recipient config on the validator client.
 // validatorpb.ProposerSettingsPayload maps to ProposerSettings on import through the CLI.
 type ProposerSettings struct {
 	ProposeConfig map[[dilithium2.CryptoPublicKeyBytes]byte]*ProposerOption
@@ -125,12 +125,12 @@ func (ps *ProposerSettings) ToPayload() *validatorpb.ProposerSettingsPayload {
 	return payload
 }
 
-// FeeRecipientConfig is a prysm internal representation to see if the fee recipient was set.
+// FeeRecipientConfig is a qrysm internal representation to see if the fee recipient was set.
 type FeeRecipientConfig struct {
 	FeeRecipient common.Address
 }
 
-// ProposerOption is a Prysm internal representation of the ProposerOptionPayload on the validator client in bytes format instead of hex.
+// ProposerOption is a Qrysm internal representation of the ProposerOptionPayload on the validator client in bytes format instead of hex.
 type ProposerOption struct {
 	FeeRecipientConfig *FeeRecipientConfig
 	BuilderConfig      *BuilderConfig

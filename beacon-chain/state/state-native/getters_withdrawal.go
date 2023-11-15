@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-const ETH1AddressOffset = 12
+const ZOND1AddressOffset = 12
 
 // NextWithdrawalIndex returns the index that will be assigned to the next withdrawal.
 func (b *BeaconState) NextWithdrawalIndex() (uint64, error) {
@@ -62,7 +62,7 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 			withdrawals = append(withdrawals, &enginev1.Withdrawal{
 				Index:          withdrawalIndex,
 				ValidatorIndex: validatorIndex,
-				Address:        bytesutil.SafeCopyBytes(val.WithdrawalCredentials[ETH1AddressOffset:]),
+				Address:        bytesutil.SafeCopyBytes(val.WithdrawalCredentials[ZOND1AddressOffset:]),
 				Amount:         balance,
 			})
 			withdrawalIndex++
@@ -70,7 +70,7 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 			withdrawals = append(withdrawals, &enginev1.Withdrawal{
 				Index:          withdrawalIndex,
 				ValidatorIndex: validatorIndex,
-				Address:        bytesutil.SafeCopyBytes(val.WithdrawalCredentials[ETH1AddressOffset:]),
+				Address:        bytesutil.SafeCopyBytes(val.WithdrawalCredentials[ZOND1AddressOffset:]),
 				Amount:         balance - params.BeaconConfig().MaxEffectiveBalance,
 			})
 			withdrawalIndex++
@@ -86,9 +86,9 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 	return withdrawals, nil
 }
 
-// hasETH1WithdrawalCredential returns whether the validator has an ETH1
+// hasZOND1WithdrawalCredential returns whether the validator has an ZOND1
 // Withdrawal prefix. It assumes that the caller has a lock on the state
-func hasETH1WithdrawalCredential(val *zondpb.Validator) bool {
+func hasZOND1WithdrawalCredential(val *zondpb.Validator) bool {
 	if val == nil {
 		return false
 	}
@@ -103,7 +103,7 @@ func isFullyWithdrawableValidator(val *zondpb.Validator, epoch primitives.Epoch)
 	if val == nil {
 		return false
 	}
-	return hasETH1WithdrawalCredential(val) && val.WithdrawableEpoch <= epoch
+	return hasZOND1WithdrawalCredential(val) && val.WithdrawableEpoch <= epoch
 }
 
 // isPartiallyWithdrawable returns whether the validator is able to perform a
@@ -114,5 +114,5 @@ func isPartiallyWithdrawableValidator(val *zondpb.Validator, balance uint64) boo
 	}
 	hasMaxBalance := val.EffectiveBalance == params.BeaconConfig().MaxEffectiveBalance
 	hasExcessBalance := balance > params.BeaconConfig().MaxEffectiveBalance
-	return hasETH1WithdrawalCredential(val) && hasExcessBalance && hasMaxBalance
+	return hasZOND1WithdrawalCredential(val) && hasExcessBalance && hasMaxBalance
 }
