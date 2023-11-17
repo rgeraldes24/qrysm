@@ -116,8 +116,8 @@ func (ns *Server) GetPeer(ctx context.Context, req *zondpb.PeerRequest) (*zondpb
 		return nil, status.Error(codes.NotFound, "Peer not found")
 	}
 
-	v1ConnState := migration.V1Alpha1ConnectionStateToV1(zond.ConnectionState(state))
-	v1PeerDirection, err := migration.V1Alpha1PeerDirectionToV1(zond.PeerDirection(direction))
+	v1ConnState := migration.V1Alpha1ToV1ConnectionState(zond.ConnectionState(state))
+	v1PeerDirection, err := migration.V1Alpha1ToV1PeerDirection(zond.PeerDirection(direction))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not handle peer direction: %v", err)
 	}
@@ -247,13 +247,13 @@ func (ns *Server) PeerCount(ctx context.Context, _ *emptypb.Empty) (*zondpb.Peer
 
 // GetVersion requests that the beacon node identify information about its implementation in a
 // format similar to a HTTP User-Agent field.
-func (_ *Server) GetVersion(ctx context.Context, _ *emptypb.Empty) (*zondpb.VersionResponse, error) {
+func (_ *Server) GetVersion(ctx context.Context, _ *emptypb.Empty) (*zondpb.NodeVersionResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "node.GetVersion")
 	defer span.End()
 
 	v := fmt.Sprintf("Qrysm/%s (%s %s)", version.SemanticVersion(), runtime.GOOS, runtime.GOARCH)
-	return &zondpb.VersionResponse{
-		Data: &zondpb.Version{
+	return &zondpb.NodeVersionResponse{
+		Data: &zondpb.NodeVersion{
 			Version: v,
 		},
 	}, nil
@@ -373,8 +373,8 @@ func peerInfo(peerStatus *peers.Status, id peer.ID) (*zondpb.Peer, error) {
 	if zond.PeerDirection(direction) == zond.PeerDirection_UNKNOWN {
 		return nil, nil
 	}
-	v1ConnState := migration.V1Alpha1ConnectionStateToV1(zond.ConnectionState(connectionState))
-	v1PeerDirection, err := migration.V1Alpha1PeerDirectionToV1(zond.PeerDirection(direction))
+	v1ConnState := migration.V1Alpha1ToV1ConnectionState(zond.ConnectionState(connectionState))
+	v1PeerDirection, err := migration.V1Alpha1ToV1PeerDirection(zond.PeerDirection(direction))
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not handle peer direction")
 	}

@@ -49,7 +49,7 @@ var (
 	aggregationBits  = bitfield.Bitlist{0x01}
 )
 
-func Test_BlockIfaceToV1BlockHeader(t *testing.T) {
+func TestBlockIfaceToV1BlockHeader(t *testing.T) {
 	alphaBlock := util.HydrateSignedBeaconBlock(&zondpbalpha.SignedBeaconBlock{})
 	alphaBlock.Block.Slot = slot
 	alphaBlock.Block.ProposerIndex = validatorIndex
@@ -71,7 +71,7 @@ func Test_BlockIfaceToV1BlockHeader(t *testing.T) {
 	assert.DeepEqual(t, signature, v1Header.Signature)
 }
 
-func Test_V1Alpha1AggregateAttAndProofToV1(t *testing.T) {
+func TestV1Alpha1ToV1AggregateAttAndProof(t *testing.T) {
 	proof := [32]byte{1}
 	att := util.HydrateAttestation(&zondpbalpha.Attestation{
 		Data: &zondpbalpha.AttestationData{
@@ -83,13 +83,13 @@ func Test_V1Alpha1AggregateAttAndProofToV1(t *testing.T) {
 		Aggregate:       att,
 		SelectionProof:  proof[:],
 	}
-	v1 := V1Alpha1AggregateAttAndProofToV1(alpha)
+	v1 := V1Alpha1ToV1AggregateAttAndProof(alpha)
 	assert.Equal(t, v1.AggregatorIndex, primitives.ValidatorIndex(1))
 	assert.DeepSSZEqual(t, v1.Aggregate.Data.Slot, att.Data.Slot)
 	assert.DeepEqual(t, v1.SelectionProof, proof[:])
 }
 
-func Test_V1Alpha1ToV1SignedBlock(t *testing.T) {
+func TestV1Alpha1ToV1SignedBlock(t *testing.T) {
 	alphaBlock := util.HydrateSignedBeaconBlock(&zondpbalpha.SignedBeaconBlock{})
 	alphaBlock.Block.Slot = slot
 	alphaBlock.Block.ProposerIndex = validatorIndex
@@ -112,7 +112,7 @@ func Test_V1Alpha1ToV1SignedBlock(t *testing.T) {
 	assert.DeepEqual(t, alphaRoot, v1Root)
 }
 
-func Test_V1ToV1Alpha1SignedBlock(t *testing.T) {
+func TestV1ToV1Alpha1SignedBlock(t *testing.T) {
 	v1Block := util.HydrateV1SignedBeaconBlock(&zondpbv1.SignedBeaconBlock{})
 	v1Block.Message.Slot = slot
 	v1Block.Message.ProposerIndex = validatorIndex
@@ -135,7 +135,11 @@ func Test_V1ToV1Alpha1SignedBlock(t *testing.T) {
 	assert.DeepEqual(t, v1Root, alphaRoot)
 }
 
-func Test_V1ToV1Alpha1Block(t *testing.T) {
+func TestV1ToV1Alpha1SignedBlindedBlock(t *testing.T) {
+	// TODO(rgeraldes24)
+}
+
+func TestV1Alpha1ToV1Block(t *testing.T) {
 	alphaBlock := util.HydrateBeaconBlock(&zondpbalpha.BeaconBlock{})
 	alphaBlock.Slot = slot
 	alphaBlock.ProposerIndex = validatorIndex
@@ -157,7 +161,11 @@ func Test_V1ToV1Alpha1Block(t *testing.T) {
 	assert.DeepEqual(t, alphaRoot, v1Root)
 }
 
-func Test_V1Alpha1AttSlashingToV1(t *testing.T) {
+func TestV1Alpha1ToV1BlindedBlock(t *testing.T) {
+	// TODO(rgeraldes24)
+}
+
+func TestV1Alpha1ToV1AttSlashing(t *testing.T) {
 	alphaAttestation := &zondpbalpha.IndexedAttestation{
 		AttestingIndices: attestingIndices,
 		Data: &zondpbalpha.AttestationData{
@@ -180,7 +188,7 @@ func Test_V1Alpha1AttSlashingToV1(t *testing.T) {
 		Attestation_2: alphaAttestation,
 	}
 
-	v1Slashing := V1Alpha1AttSlashingToV1(alphaSlashing)
+	v1Slashing := V1Alpha1ToV1AttSlashing(alphaSlashing)
 	alphaRoot, err := alphaSlashing.HashTreeRoot()
 	require.NoError(t, err)
 	v1Root, err := v1Slashing.HashTreeRoot()
@@ -188,7 +196,15 @@ func Test_V1Alpha1AttSlashingToV1(t *testing.T) {
 	assert.DeepEqual(t, alphaRoot, v1Root)
 }
 
-func Test_V1Alpha1ProposerSlashingToV1(t *testing.T) {
+func TestV1Alpha1ToV1SignedHeader(t *testing.T) {
+	// TODO(rgeraldes24)
+}
+
+func TestV1ToV1Alpha1SignedHeader(t *testing.T) {
+	// TODO(rgeraldes24)
+}
+
+func TestV1Alpha1ToV1ProposerSlashing(t *testing.T) {
 	alphaHeader := util.HydrateSignedBeaconHeader(&zondpbalpha.SignedBeaconBlockHeader{})
 	alphaHeader.Header.Slot = slot
 	alphaHeader.Header.ProposerIndex = validatorIndex
@@ -201,7 +217,7 @@ func Test_V1Alpha1ProposerSlashingToV1(t *testing.T) {
 		Header_2: alphaHeader,
 	}
 
-	v1Slashing := V1Alpha1ProposerSlashingToV1(alphaSlashing)
+	v1Slashing := V1Alpha1ToV1ProposerSlashing(alphaSlashing)
 	alphaRoot, err := alphaSlashing.HashTreeRoot()
 	require.NoError(t, err)
 	v1Root, err := v1Slashing.HashTreeRoot()
@@ -209,7 +225,7 @@ func Test_V1Alpha1ProposerSlashingToV1(t *testing.T) {
 	assert.DeepEqual(t, alphaRoot, v1Root)
 }
 
-func Test_V1Alpha1ExitToV1(t *testing.T) {
+func TestV1Alpha1ToV1Exit(t *testing.T) {
 	alphaExit := &zondpbalpha.SignedVoluntaryExit{
 		Exit: &zondpbalpha.VoluntaryExit{
 			Epoch:          epoch,
@@ -218,7 +234,7 @@ func Test_V1Alpha1ExitToV1(t *testing.T) {
 		Signature: signature,
 	}
 
-	v1Exit := V1Alpha1ExitToV1(alphaExit)
+	v1Exit := V1Alpha1ToV1Exit(alphaExit)
 	alphaRoot, err := alphaExit.HashTreeRoot()
 	require.NoError(t, err)
 	v1Root, err := v1Exit.HashTreeRoot()
@@ -226,7 +242,7 @@ func Test_V1Alpha1ExitToV1(t *testing.T) {
 	assert.DeepEqual(t, alphaRoot, v1Root)
 }
 
-func Test_V1ExitToV1Alpha1(t *testing.T) {
+func TestV1ToV1Alpha1Exit(t *testing.T) {
 	v1Exit := &zondpbv1.SignedVoluntaryExit{
 		Message: &zondpbv1.VoluntaryExit{
 			Epoch:          epoch,
@@ -235,7 +251,7 @@ func Test_V1ExitToV1Alpha1(t *testing.T) {
 		Signature: signature,
 	}
 
-	alphaExit := V1ExitToV1Alpha1(v1Exit)
+	alphaExit := V1ToV1Alpha1Exit(v1Exit)
 	alphaRoot, err := alphaExit.HashTreeRoot()
 	require.NoError(t, err)
 	v1Root, err := v1Exit.HashTreeRoot()
@@ -243,7 +259,15 @@ func Test_V1ExitToV1Alpha1(t *testing.T) {
 	assert.DeepEqual(t, alphaRoot, v1Root)
 }
 
-func Test_V1AttSlashingToV1Alpha1(t *testing.T) {
+func TestV1ToV1Alpha1IndexedAtt(t *testing.T) {
+	// TODO(rgeraldes24)
+}
+
+func TestV1ToV1Alpha1AttData(t *testing.T) {
+	// TODO(rgeraldes24)
+}
+
+func TestV1ToV1Alpha1AttSlashing(t *testing.T) {
 	v1Attestation := &zondpbv1.IndexedAttestation{
 		AttestingIndices: attestingIndices,
 		Data: &zondpbv1.AttestationData{
@@ -266,7 +290,7 @@ func Test_V1AttSlashingToV1Alpha1(t *testing.T) {
 		Attestation_2: v1Attestation,
 	}
 
-	alphaSlashing := V1AttSlashingToV1Alpha1(v1Slashing)
+	alphaSlashing := V1ToV1Alpha1AttSlashing(v1Slashing)
 	alphaRoot, err := alphaSlashing.HashTreeRoot()
 	require.NoError(t, err)
 	v1Root, err := v1Slashing.HashTreeRoot()
@@ -274,7 +298,7 @@ func Test_V1AttSlashingToV1Alpha1(t *testing.T) {
 	assert.DeepEqual(t, v1Root, alphaRoot)
 }
 
-func Test_V1ProposerSlashingToV1Alpha1(t *testing.T) {
+func TestV1ToV1Alpha1ProposerSlashing(t *testing.T) {
 	v1Header := &zondpbv1.SignedBeaconBlockHeader{
 		Message: &zondpbv1.BeaconBlockHeader{
 			Slot:          slot,
@@ -290,7 +314,7 @@ func Test_V1ProposerSlashingToV1Alpha1(t *testing.T) {
 		SignedHeader_2: v1Header,
 	}
 
-	alphaSlashing := V1ProposerSlashingToV1Alpha1(v1Slashing)
+	alphaSlashing := V1ToV1Alpha1ProposerSlashing(v1Slashing)
 	alphaRoot, err := alphaSlashing.HashTreeRoot()
 	require.NoError(t, err)
 	v1Root, err := v1Slashing.HashTreeRoot()
@@ -298,7 +322,7 @@ func Test_V1ProposerSlashingToV1Alpha1(t *testing.T) {
 	assert.DeepEqual(t, alphaRoot, v1Root)
 }
 
-func Test_V1Alpha1AttToV1(t *testing.T) {
+func TestV1Alpha1ToV1Attestation(t *testing.T) {
 	alphaAtt := &zondpbalpha.Attestation{
 		AggregationBits: aggregationBits,
 		Data: &zondpbalpha.AttestationData{
@@ -317,7 +341,7 @@ func Test_V1Alpha1AttToV1(t *testing.T) {
 		Signatures: [][]byte{signature},
 	}
 
-	v1Att := V1Alpha1AttestationToV1(alphaAtt)
+	v1Att := V1Alpha1ToV1Attestation(alphaAtt)
 	v1Root, err := v1Att.HashTreeRoot()
 	require.NoError(t, err)
 	alphaRoot, err := alphaAtt.HashTreeRoot()
@@ -325,34 +349,7 @@ func Test_V1Alpha1AttToV1(t *testing.T) {
 	assert.DeepEqual(t, v1Root, alphaRoot)
 }
 
-func Test_V1AttToV1Alpha1(t *testing.T) {
-	v1Att := &zondpbv1.Attestation{
-		AggregationBits: aggregationBits,
-		Data: &zondpbv1.AttestationData{
-			Slot:            slot,
-			Index:           committeeIndex,
-			BeaconBlockRoot: beaconBlockRoot,
-			Source: &zondpbv1.Checkpoint{
-				Epoch: epoch,
-				Root:  sourceRoot,
-			},
-			Target: &zondpbv1.Checkpoint{
-				Epoch: epoch,
-				Root:  targetRoot,
-			},
-		},
-		Signatures: [][]byte{signature},
-	}
-
-	alphaAtt := V1AttToV1Alpha1(v1Att)
-	alphaRoot, err := alphaAtt.HashTreeRoot()
-	require.NoError(t, err)
-	v1Root, err := v1Att.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, v1Root, alphaRoot)
-}
-
-func Test_BlockInterfaceToV1Block(t *testing.T) {
+func TestBlockInterfaceToV1Block(t *testing.T) {
 	v1Alpha1Block := util.HydrateSignedBeaconBlock(&zondpbalpha.SignedBeaconBlock{})
 	v1Alpha1Block.Block.Slot = slot
 	v1Alpha1Block.Block.ProposerIndex = validatorIndex
@@ -377,7 +374,7 @@ func Test_BlockInterfaceToV1Block(t *testing.T) {
 	assert.DeepEqual(t, v1Root, v1Alpha1Root)
 }
 
-func Test_V1Alpha1ValidatorToV1(t *testing.T) {
+func TestV1Alpha1ToV1Validator(t *testing.T) {
 	v1Alpha1Validator := &zondpbalpha.Validator{
 		PublicKey:                  []byte("pubkey"),
 		WithdrawalCredentials:      []byte("withdraw"),
@@ -389,7 +386,7 @@ func Test_V1Alpha1ValidatorToV1(t *testing.T) {
 		WithdrawableEpoch:          1111,
 	}
 
-	v1Validator := V1Alpha1ValidatorToV1(v1Alpha1Validator)
+	v1Validator := V1Alpha1ToV1Validator(v1Alpha1Validator)
 	require.NotNil(t, v1Validator)
 	assert.DeepEqual(t, []byte("pubkey"), v1Validator.Pubkey)
 	assert.DeepEqual(t, []byte("withdraw"), v1Validator.WithdrawalCredentials)
@@ -401,7 +398,7 @@ func Test_V1Alpha1ValidatorToV1(t *testing.T) {
 	assert.Equal(t, primitives.Epoch(1111), v1Validator.WithdrawableEpoch)
 }
 
-func Test_V1ValidatorToV1Alpha1(t *testing.T) {
+func TestV1ToV1Alpha1Validator(t *testing.T) {
 	v1Validator := &zondpbv1.Validator{
 		Pubkey:                     []byte("pubkey"),
 		WithdrawalCredentials:      []byte("withdraw"),
@@ -413,7 +410,7 @@ func Test_V1ValidatorToV1Alpha1(t *testing.T) {
 		WithdrawableEpoch:          1111,
 	}
 
-	v1Alpha1Validator := V1ValidatorToV1Alpha1(v1Validator)
+	v1Alpha1Validator := V1ToV1Alpha1Validator(v1Validator)
 	require.NotNil(t, v1Alpha1Validator)
 	assert.DeepEqual(t, []byte("pubkey"), v1Alpha1Validator.PublicKey)
 	assert.DeepEqual(t, []byte("withdraw"), v1Alpha1Validator.WithdrawalCredentials)
@@ -425,7 +422,11 @@ func Test_V1ValidatorToV1Alpha1(t *testing.T) {
 	assert.Equal(t, primitives.Epoch(1111), v1Alpha1Validator.WithdrawableEpoch)
 }
 
-func Test_V1SignedAggregateAttAndProofToV1Alpha1(t *testing.T) {
+func TestSignedBeaconBlock(t *testing.T) {
+	// TODO(rgeraldes24)
+}
+
+func TestV1ToV1Alpha1SignedAggregateAttAndProof(t *testing.T) {
 	v1Att := &zondpbv1.SignedAggregateAttestationAndProof{
 		Message: &zondpbv1.AggregateAttestationAndProof{
 			AggregatorIndex: 1,
@@ -434,7 +435,7 @@ func Test_V1SignedAggregateAttAndProofToV1Alpha1(t *testing.T) {
 		},
 		Signature: signature,
 	}
-	v1Alpha1Att := V1SignedAggregateAttAndProofToV1Alpha1(v1Att)
+	v1Alpha1Att := V1ToV1Alpha1SignedAggregateAttAndProof(v1Att)
 
 	v1Root, err := v1Att.HashTreeRoot()
 	require.NoError(t, err)
@@ -443,9 +444,13 @@ func Test_V1SignedAggregateAttAndProofToV1Alpha1(t *testing.T) {
 	assert.DeepEqual(t, v1Root, v1Alpha1Root)
 }
 
-func Test_V1AttestationToV1Alpha1(t *testing.T) {
+func TestV1Alpha1ToV1IndexedAtt(t *testing.T) {
+	// TODO(rgeraldes24)
+}
+
+func TestV1ToV1Alpha1Attestation(t *testing.T) {
 	v1Att := util.HydrateV1Attestation(&zondpbv1.Attestation{})
-	v1Alpha1Att := V1AttToV1Alpha1(v1Att)
+	v1Alpha1Att := V1ToV1Alpha1Attestation(v1Att)
 
 	v1Root, err := v1Att.HashTreeRoot()
 	require.NoError(t, err)
@@ -454,7 +459,11 @@ func Test_V1AttestationToV1Alpha1(t *testing.T) {
 	assert.DeepEqual(t, v1Root, v1Alpha1Root)
 }
 
-func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
+func TestV1Alpha1ToV1AttData(t *testing.T) {
+	// TODO(rgeraldes24)
+}
+
+func TestV1Alpha1ToV1SignedContributionAndProof(t *testing.T) {
 	alphaContribution := &zondpbalpha.SignedContributionAndProof{
 		Message: &zondpbalpha.ContributionAndProof{
 			AggregatorIndex: validatorIndex,
@@ -469,7 +478,7 @@ func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
 		},
 		Signature: signature,
 	}
-	v1Contribution := V1Alpha1SignedContributionAndProofToV1(alphaContribution)
+	v1Contribution := V1Alpha1ToV1SignedContributionAndProof(alphaContribution)
 	require.NotNil(t, v1Contribution)
 	require.NotNil(t, v1Contribution.Message)
 	require.NotNil(t, v1Contribution.Message.Contribution)
@@ -485,7 +494,7 @@ func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
 	assert.DeepEqual(t, signature, contrib.Signature)
 }
 
-func Test_V1Alpha1BeaconBlockToV1Blinded(t *testing.T) {
+func TestV1Alpha1BeaconBlockToV1Blinded(t *testing.T) {
 	alphaBlock := util.HydrateBeaconBlock(&zondpbalpha.BeaconBlock{})
 	alphaBlock.Slot = slot
 	alphaBlock.ProposerIndex = validatorIndex
@@ -712,7 +721,7 @@ func TestBeaconStateToProto(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("statesummaryroot2"), 32), result.HistoricalSummaries[1].StateSummaryRoot)
 }
 
-func TestV1Alpha1SignedDilithiumToExecChangeToV1(t *testing.T) {
+func TestV1Alpha1ToV1SignedDilithiumToExecChange(t *testing.T) {
 	alphaChange := &zondpbalpha.SignedDilithiumToExecutionChange{
 		Message: &zondpbalpha.DilithiumToExecutionChange{
 			ValidatorIndex:      validatorIndex,
@@ -721,11 +730,15 @@ func TestV1Alpha1SignedDilithiumToExecChangeToV1(t *testing.T) {
 		},
 		Signature: signature,
 	}
-	change := V1Alpha1SignedDilithiumToExecChangeToV1(alphaChange)
+	change := V1Alpha1ToV1SignedDilithiumToExecChange(alphaChange)
 	require.NotNil(t, change)
 	require.NotNil(t, change.Message)
 	assert.DeepEqual(t, signature, change.Signature)
 	assert.Equal(t, validatorIndex, change.Message.ValidatorIndex)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("fromdilithiumpubkey"), 48), change.Message.FromDilithiumPubkey)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("toexecutionaddress"), 20), change.Message.ToExecutionAddress)
+}
+
+func TestV1ToV1Alpha1SignedDilithiumToExecutionChange(t *testing.T) {
+	//TODO(rgeraldes24)
 }

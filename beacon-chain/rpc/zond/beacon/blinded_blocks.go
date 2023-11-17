@@ -299,7 +299,7 @@ func (bs *Server) getBlindedBlockCapella(ctx context.Context, blk interfaces.Rea
 				if blindedCapellaBlk == nil {
 					return nil, errNilBlock
 				}
-				v2Blk, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV2Blinded(blindedCapellaBlk.Block)
+				v2Blk, err := migration.V1Alpha1ToV1BlindedBlock(blindedCapellaBlk.Block)
 				if err != nil {
 					return nil, errors.Wrapf(err, "Could not convert beacon block")
 				}
@@ -337,7 +337,7 @@ func (bs *Server) getBlindedBlockCapella(ctx context.Context, blk interfaces.Rea
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get signed beacon block")
 	}
-	v2Blk, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV2Blinded(blindedCapellaBlock.Block)
+	v2Blk, err := migration.V1Alpha1ToV1BlindedBlock(blindedCapellaBlock.Block)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not convert beacon block")
 	}
@@ -369,7 +369,7 @@ func (bs *Server) getBlindedSSZBlockCapella(ctx context.Context, blk interfaces.
 				if blindedCapellaBlk == nil {
 					return nil, errNilBlock
 				}
-				v2Blk, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV2Blinded(blindedCapellaBlk.Block)
+				v2Blk, err := migration.V1Alpha1ToV1BlindedBlock(blindedCapellaBlk.Block)
 				if err != nil {
 					return nil, errors.Wrapf(err, "could not get signed beacon block")
 				}
@@ -411,7 +411,7 @@ func (bs *Server) getBlindedSSZBlockCapella(ctx context.Context, blk interfaces.
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get signed beacon block")
 	}
-	v2Blk, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV2Blinded(blindedCapellaBlock.Block)
+	v2Blk, err := migration.V1Alpha1ToV1BlindedBlock(blindedCapellaBlock.Block)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get signed beacon block")
 	}
@@ -436,7 +436,7 @@ func (bs *Server) getBlindedSSZBlockCapella(ctx context.Context, blk interfaces.
 }
 
 func (bs *Server) submitBlindedCapellaBlock(ctx context.Context, blindedCapellaBlk *zondpbv1.BlindedBeaconBlock, sig []byte) error {
-	b, err := migration.BlindedCapellaToV1Alpha1SignedBlock(&zondpbv1.SignedBlindedBeaconBlock{
+	b, err := migration.V1ToV1Alpha1SignedBlindedBlock(&zondpbv1.SignedBlindedBeaconBlock{
 		Message:   blindedCapellaBlk,
 		Signature: sig,
 	})

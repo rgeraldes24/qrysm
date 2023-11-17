@@ -73,7 +73,7 @@ func (x LoggingLevelRequest_Level) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// : Use LoggingLevelRequest_Level.Descriptor instead.
+// Deprecated: Use LoggingLevelRequest_Level.Descriptor instead.
 func (LoggingLevelRequest_Level) EnumDescriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{5, 0}
 }
@@ -114,7 +114,7 @@ func (x *InclusionSlotRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// : Use InclusionSlotRequest.ProtoReflect.Descriptor instead.
+// Deprecated: Use InclusionSlotRequest.ProtoReflect.Descriptor instead.
 func (*InclusionSlotRequest) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{0}
 }
@@ -168,7 +168,7 @@ func (x *InclusionSlotResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// : Use InclusionSlotResponse.ProtoReflect.Descriptor instead.
+// Deprecated: Use InclusionSlotResponse.ProtoReflect.Descriptor instead.
 func (*InclusionSlotResponse) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{1}
 }
@@ -219,7 +219,7 @@ func (x *BeaconStateRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// : Use BeaconStateRequest.ProtoReflect.Descriptor instead.
+// Deprecated: Use BeaconStateRequest.ProtoReflect.Descriptor instead.
 func (*BeaconStateRequest) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{2}
 }
@@ -296,7 +296,7 @@ func (x *BlockRequestByRoot) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// : Use BlockRequestByRoot.ProtoReflect.Descriptor instead.
+// Deprecated: Use BlockRequestByRoot.ProtoReflect.Descriptor instead.
 func (*BlockRequestByRoot) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{3}
 }
@@ -343,7 +343,7 @@ func (x *SSZResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// : Use SSZResponse.ProtoReflect.Descriptor instead.
+// Deprecated: Use SSZResponse.ProtoReflect.Descriptor instead.
 func (*SSZResponse) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{4}
 }
@@ -390,7 +390,7 @@ func (x *LoggingLevelRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// : Use LoggingLevelRequest.ProtoReflect.Descriptor instead.
+// Deprecated: Use LoggingLevelRequest.ProtoReflect.Descriptor instead.
 func (*LoggingLevelRequest) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{5}
 }
@@ -437,7 +437,7 @@ func (x *DebugPeerResponses) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// : Use DebugPeerResponses.ProtoReflect.Descriptor instead.
+// Deprecated: Use DebugPeerResponses.ProtoReflect.Descriptor instead.
 func (*DebugPeerResponses) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{6}
 }
@@ -492,7 +492,7 @@ func (x *DebugPeerResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// : Use DebugPeerResponse.ProtoReflect.Descriptor instead.
+// Deprecated: Use DebugPeerResponse.ProtoReflect.Descriptor instead.
 func (*DebugPeerResponse) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{7}
 }
@@ -601,7 +601,7 @@ func (x *ScoreInfo) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// : Use ScoreInfo.ProtoReflect.Descriptor instead.
+// Deprecated: Use ScoreInfo.ProtoReflect.Descriptor instead.
 func (*ScoreInfo) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{8}
 }
@@ -693,7 +693,7 @@ func (x *TopicScoreSnapshot) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// : Use TopicScoreSnapshot.ProtoReflect.Descriptor instead.
+// Deprecated: Use TopicScoreSnapshot.ProtoReflect.Descriptor instead.
 func (*TopicScoreSnapshot) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{9}
 }
@@ -767,7 +767,7 @@ func (x *DebugPeerResponse_PeerInfo) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// : Use DebugPeerResponse_PeerInfo.ProtoReflect.Descriptor instead.
+// Deprecated: Use DebugPeerResponse_PeerInfo.ProtoReflect.Descriptor instead.
 func (*DebugPeerResponse_PeerInfo) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{7, 0}
 }

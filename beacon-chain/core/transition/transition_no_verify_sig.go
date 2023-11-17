@@ -251,13 +251,8 @@ func ProcessOperationsNoVerifyAttsSigs(
 
 	var err error
 	switch signedBeaconBlock.Version() {
-	case version.Phase0:
-		state, err = phase0Operations(ctx, state, signedBeaconBlock)
-		if err != nil {
-			return nil, err
-		}
-	case version.Altair, version.Bellatrix, version.Capella:
-		state, err = altairOperations(ctx, state, signedBeaconBlock)
+	case version.Capella:
+		state, err = capellaOperations(ctx, state, signedBeaconBlock)
 		if err != nil {
 			return nil, err
 		}
@@ -359,52 +354,29 @@ func ProcessBlockForStateRoot(
 	return state, nil
 }
 
-// This calls altair block operations.
-func altairOperations(
+// This calls capella block operations.
+func capellaOperations(
 	ctx context.Context,
 	st state.BeaconState,
 	signedBeaconBlock interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 	st, err := b.ProcessProposerSlashings(ctx, st, signedBeaconBlock.Block().Body().ProposerSlashings(), v.SlashValidator)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not process altair proposer slashing")
+		return nil, errors.Wrap(err, "could not process capella proposer slashing")
 	}
 	st, err = b.ProcessAttesterSlashings(ctx, st, signedBeaconBlock.Block().Body().AttesterSlashings(), v.SlashValidator)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not process altair attester slashing")
+		return nil, errors.Wrap(err, "could not process capella attester slashing")
 	}
 	st, err = altair.ProcessAttestationsNoVerifySignature(ctx, st, signedBeaconBlock)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not process altair attestation")
+		return nil, errors.Wrap(err, "could not process capella attestation")
 	}
 	if _, err := altair.ProcessDeposits(ctx, st, signedBeaconBlock.Block().Body().Deposits()); err != nil {
-		return nil, errors.Wrap(err, "could not process altair deposit")
+		return nil, errors.Wrap(err, "could not process capella deposit")
 	}
 	st, err = b.ProcessVoluntaryExits(ctx, st, signedBeaconBlock.Block().Body().VoluntaryExits())
 	if err != nil {
 		return nil, errors.Wrap(err, "could not process voluntary exits")
 	}
 	return b.ProcessDilithiumToExecutionChanges(st, signedBeaconBlock)
-}
-
-// This calls phase 0 block operations.
-func phase0Operations(
-	ctx context.Context,
-	st state.BeaconState,
-	signedBeaconBlock interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
-	st, err := b.ProcessProposerSlashings(ctx, st, signedBeaconBlock.Block().Body().ProposerSlashings(), v.SlashValidator)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not process block proposer slashings")
-	}
-	st, err = b.ProcessAttesterSlashings(ctx, st, signedBeaconBlock.Block().Body().AttesterSlashings(), v.SlashValidator)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not process block attester slashings")
-	}
-	st, err = b.ProcessAttestationsNoVerifySignature(ctx, st, signedBeaconBlock)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not process block attestations")
-	}
-	if _, err := b.ProcessDeposits(ctx, st, signedBeaconBlock.Block().Body().Deposits()); err != nil {
-		return nil, errors.Wrap(err, "could not process deposits")
-	}
-	return b.ProcessVoluntaryExits(ctx, st, signedBeaconBlock.Block().Body().VoluntaryExits())
 }

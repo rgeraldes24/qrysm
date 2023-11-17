@@ -1,14 +1,5 @@
 package sync_contribution
 
-import (
-	"testing"
-
-	"github.com/prysmaticlabs/go-bitfield"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
-	"github.com/theQRL/qrysm/v4/testing/require"
-)
-
 /*
 func TestAggregateAttestations_aggregate(t *testing.T) {
 	tests := []struct {
@@ -33,7 +24,6 @@ func TestAggregateAttestations_aggregate(t *testing.T) {
 		require.DeepSSZEqual(t, tt.want.AggregationBits, got.AggregationBits)
 	}
 }
-*/
 
 func TestAggregateAttestations_aggregate_OverlapFails(t *testing.T) {
 	tests := []struct {
@@ -55,7 +45,6 @@ func TestAggregateAttestations_aggregate_OverlapFails(t *testing.T) {
 	}
 }
 
-/*
 func TestAggregateAttestations_Aggregate(t *testing.T) {
 	tests := []struct {
 		name   string

@@ -60,7 +60,7 @@ func publishBlindedBlockSSZ(bs *Server, w http.ResponseWriter, r *http.Request) 
 	}
 	capellaBlock := &zondpbv1.SignedBlindedBeaconBlock{}
 	if err := capellaBlock.UnmarshalSSZ(body); err == nil {
-		v1block, err := migration.BlindedCapellaToV1Alpha1SignedBlock(capellaBlock)
+		v1block, err := migration.V1ToV1Alpha1SignedBlindedBlock(capellaBlock)
 		if err != nil {
 			errJson := &http2.DefaultErrorJson{
 				Message: "Could not decode request body into consensus block: " + err.Error(),
@@ -244,7 +244,7 @@ func publishBlockSSZ(bs *Server, w http.ResponseWriter, r *http.Request) {
 	capellaBlock := &zondpbv1.SignedBeaconBlock{}
 	if err := capellaBlock.UnmarshalSSZ(body); err == nil {
 		if err = validate.Struct(capellaBlock); err == nil {
-			v1block, err := migration.CapellaToV1Alpha1SignedBlock(capellaBlock)
+			v1block, err := migration.V1ToV1Alpha1SignedBlock(capellaBlock)
 			if err != nil {
 				errJson := &http2.DefaultErrorJson{
 					Message: "Could not decode request body into consensus block: " + err.Error(),

@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-// retrieves the signature batch from the raw data, public key,signature and domain provided.
+// retrieves the signature batch from the raw data, public key, signature and domain provided.
 func signatureBatch(signedData, pub, signature, domain []byte, desc string) (*dilithium.SignatureBatch, error) {
 	publicKey, err := dilithium.PublicKeyFromBytes(pub)
 	if err != nil {

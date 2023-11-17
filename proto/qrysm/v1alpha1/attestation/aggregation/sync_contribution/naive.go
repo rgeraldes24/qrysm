@@ -1,11 +1,6 @@
 package sync_contribution
 
-import (
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
-	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
-)
-
+/*
 // naiveSyncContributionAggregation aggregates naively, without any complex algorithms or optimizations.
 // Note: this is currently a naive implementation to the order of O(mn^2).
 func naiveSyncContributionAggregation(contributions []*zond.SyncCommitteeContribution) ([]*zond.SyncCommitteeContribution, error) {
@@ -63,7 +58,9 @@ func naiveSyncContributionAggregation(contributions []*zond.SyncCommitteeContrib
 
 	return contributions, nil
 }
+*/
 
+/*
 // aggregates pair of sync contributions c1 and c2 together.
 func aggregate(c1, c2 *zond.SyncCommitteeContribution) (*zond.SyncCommitteeContribution, error) {
 	if o, err := c1.AggregationBits.Overlaps(c2.AggregationBits); err != nil {
@@ -103,3 +100,4 @@ func aggregate(c1, c2 *zond.SyncCommitteeContribution) (*zond.SyncCommitteeContr
 
 	return baseContribution, nil
 }
+*/

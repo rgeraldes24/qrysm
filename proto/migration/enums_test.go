@@ -7,7 +7,7 @@ import (
 	v1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 )
 
-func TestV1Alpha1ConnectionStateToV1(t *testing.T) {
+func TestV1Alpha1ToV1ConnectionState(t *testing.T) {
 	tests := []struct {
 		name      string
 		connState zond.ConnectionState
@@ -36,14 +36,14 @@ func TestV1Alpha1ConnectionStateToV1(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := V1Alpha1ConnectionStateToV1(tt.connState); got != tt.want {
-				t.Errorf("V1Alpha1ConnectionStateToV1() = %v, want %v", got, tt.want)
+			if got := V1Alpha1ToV1ConnectionState(tt.connState); got != tt.want {
+				t.Errorf("V1Alpha1ToV1ConnectionState() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestV1Alpha1PeerDirectionToV1(t *testing.T) {
+func TestV1Alpha1ToV1PeerDirection(t *testing.T) {
 	tests := []struct {
 		name          string
 		peerDirection zond.PeerDirection
@@ -69,13 +69,13 @@ func TestV1Alpha1PeerDirectionToV1(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := V1Alpha1PeerDirectionToV1(tt.peerDirection)
+			got, err := V1Alpha1ToV1PeerDirection(tt.peerDirection)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("V1Alpha1PeerDirectionToV1() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("V1Alpha1ToV1PeerDirection() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("V1Alpha1PeerDirectionToV1() got = %v, want %v", got, tt.want)
+				t.Errorf("V1Alpha1ToV1PeerDirection() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

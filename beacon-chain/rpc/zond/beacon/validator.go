@@ -113,7 +113,7 @@ func (bs *Server) ListValidators(ctx context.Context, req *zondpb.StateValidator
 	epoch := slots.ToEpoch(st.Slot())
 	filteredVals := make([]*zondpb.ValidatorContainer, 0, len(valContainers))
 	for _, vc := range valContainers {
-		readOnlyVal, err := statenative.NewValidator(migration.V1ValidatorToV1Alpha1(vc.Validator))
+		readOnlyVal, err := statenative.NewValidator(migration.V1ToV1Alpha1Validator(vc.Validator))
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not convert validator: %v", err)
 		}
@@ -256,7 +256,7 @@ func valContainersByRequestIds(state state.BeaconState, validatorIds [][]byte) (
 				Index:     primitives.ValidatorIndex(i),
 				Balance:   allBalances[i],
 				Status:    subStatus,
-				Validator: migration.V1Alpha1ValidatorToV1(validator),
+				Validator: migration.V1Alpha1ToV1Validator(validator),
 			}
 		}
 	} else {
@@ -286,7 +286,7 @@ func valContainersByRequestIds(state state.BeaconState, validatorIds [][]byte) (
 			if err != nil {
 				return nil, errors.Wrap(err, "could not get validator")
 			}
-			v1Validator := migration.V1Alpha1ValidatorToV1(validator)
+			v1Validator := migration.V1Alpha1ToV1Validator(validator)
 			readOnlyVal, err := statenative.NewValidator(validator)
 			if err != nil {
 				return nil, status.Errorf(codes.Internal, "Could not convert validator: %v", err)

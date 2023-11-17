@@ -15,7 +15,7 @@ import (
 
 func TestSSZTagSize(t *testing.T) {
 	sigSize := dilithium2.CryptoBytes
-	pubKeySize := 48
+	pubKeySize := dilithium2.CryptoPublicKeyBytes
 	rootSize := 32
 
 	sizes, err := sszTagSizes(pb.Attestation{}, "Signature")

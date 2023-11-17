@@ -336,7 +336,7 @@ func (vs *Server) ProduceBlock(ctx context.Context, req *zondpbv1.ProduceBlockRe
 	}
 	capellaBlock, ok := v1alpha1resp.Block.(*zondpbalpha.GenericBeaconBlock_Capella)
 	if ok {
-		block, err := migration.V1Alpha1BeaconBlockCapellaToV2(capellaBlock.Capella)
+		block, err := migration.V1Alpha1ToV1Block(capellaBlock.Capella)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not prepare beacon block: %v", err)
 		}
@@ -392,7 +392,7 @@ func (vs *Server) ProduceBlockSSZ(ctx context.Context, req *zondpbv1.ProduceBloc
 	}
 	capellaBlock, ok := v1alpha1resp.Block.(*zondpbalpha.GenericBeaconBlock_Capella)
 	if ok {
-		block, err := migration.V1Alpha1BeaconBlockCapellaToV2(capellaBlock.Capella)
+		block, err := migration.V1Alpha1ToV1Block(capellaBlock.Capella)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not prepare beacon block: %v", err)
 		}
@@ -452,7 +452,7 @@ func (vs *Server) ProduceBlindedBlock(ctx context.Context, req *zondpbv1.Produce
 	}
 	capellaBlock, ok := v1alpha1resp.Block.(*zondpbalpha.GenericBeaconBlock_BlindedCapella)
 	if ok {
-		blk, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV2Blinded(capellaBlock.BlindedCapella)
+		blk, err := migration.V1Alpha1ToV1BlindedBlock(capellaBlock.BlindedCapella)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not prepare beacon block: %v", err)
 		}
@@ -508,7 +508,7 @@ func (vs *Server) ProduceBlindedBlockSSZ(ctx context.Context, req *zondpbv1.Prod
 	}
 	capellaBlock, ok := v1alpha1resp.Block.(*zondpbalpha.GenericBeaconBlock_BlindedCapella)
 	if ok {
-		block, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV2Blinded(capellaBlock.BlindedCapella)
+		block, err := migration.V1Alpha1ToV1BlindedBlock(capellaBlock.BlindedCapella)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not prepare beacon block: %v", err)
 		}
@@ -614,7 +614,7 @@ func (vs *Server) ProduceAttestationData(ctx context.Context, req *zondpbv1.Prod
 		// We simply return err because it's already of a gRPC error type.
 		return nil, err
 	}
-	attData := migration.V1Alpha1AttDataToV1(v1alpha1resp)
+	attData := migration.V1Alpha1ToV1AttData(v1alpha1resp)
 
 	return &zondpbv1.ProduceAttestationDataResponse{Data: attData}, nil
 }

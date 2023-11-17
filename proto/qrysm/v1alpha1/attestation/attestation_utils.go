@@ -10,83 +10,55 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
 )
 
-// ConvertToIndexed converts attestation to (almost) indexed-verifiable form.
-//
-// Note about spec pseudocode definition. The state was used by get_attesting_indices to determine
-// the attestation committee. Now that we provide this as an argument, we no longer need to provide
-// a state.
-//
-// Spec pseudocode definition:
-//
-//	def get_indexed_attestation(state: BeaconState, attestation: Attestation) -> IndexedAttestation:
-//	 """
-//	 Return the indexed attestation corresponding to ``attestation``.
-//	 """
-//	 attesting_indices = get_attesting_indices(state, attestation.data, attestation.aggregation_bits)
-//
-//	 return IndexedAttestation(
-//	     attesting_indices=sorted(attesting_indices),
-//	     data=attestation.data,
-//	     signature=attestation.signature,
-//	 )
-func ConvertToIndexed(ctx context.Context, attestation *zondpb.Attestation, committee []primitives.ValidatorIndex) (*zondpb.IndexedAttestation, error) {
-	attIndices, err := AttestingIndices(attestation.AggregationBits, committee)
-	if err != nil {
-		return nil, err
-	}
-
-	sort.Slice(attIndices, func(i, j int) bool {
-		return attIndices[i] < attIndices[j]
-	})
-
-	//signatureValidatorIndex := make([]uint64, len(attestation.SignatureValidatorIndex))
-	//copy(signatureValidatorIndex, attestation.SignatureValidatorIndex)
-	//sigsMap := make(map[uint64][]byte)
-	// for i, validatorIndex := range signatureValidatorIndex {
-	// 	sigsMap[validatorIndex] = attestation.Signatures[i]
-	// }
-	signatures := make([][]byte, 0, len(attestation.Signatures))
-
-	// sort.Slice(signatureValidatorIndex, func(i, j int) bool {
-	// 	return signatureValidatorIndex[i] < signatureValidatorIndex[j]
-	// })
-	// for _, validatorIndex := range signatureValidatorIndex {
-	// 	sig, ok := sigsMap[validatorIndex]
-	// 	if !ok {
-	// 		return nil, errors.Errorf("ConvertToIndexed unkown validatorIndex in sigMap %d", validatorIndex)
-	// 	}
-	// 	signatures = append(signatures, sig)
-	// }
-
-	inAtt := &zondpb.IndexedAttestation{
-		Data:       attestation.Data,
-		Signatures: signatures,
-		//SignatureValidatorIndex: signatureValidatorIndex,
-		AttestingIndices: attIndices,
-	}
-	return inAtt, err
+type signatureSlices struct {
+	signaturesIdxToValidatorIdx []uint64
+	signatures                  [][]byte
 }
 
-// AttestingIndices returns the attesting participants indices from the attestation data. The
-// committee is provided as an argument rather than a imported implementation from the spec definition.
-// Having the committee as an argument allows for re-use of beacon committees when possible.
-//
-// Spec pseudocode definition:
-//
-//	def get_attesting_indices(state: BeaconState,
-//	                       data: AttestationData,
-//	                       bits: Bitlist[MAX_VALIDATORS_PER_COMMITTEE]) -> Set[ValidatorIndex]:
-//	 """
-//	 Return the set of attesting indices corresponding to ``data`` and ``bits``.
-//	 """
-//	 committee = get_beacon_committee(state, data.slot, data.index)
-//	 return set(index for i, index in enumerate(committee) if bits[i])
+type sortByValidatorIdx signatureSlices
+
+func (s sortByValidatorIdx) Len() int {
+	return len(s.signatures)
+}
+
+func (s sortByValidatorIdx) Swap(i, j int) {
+	s.signaturesIdxToValidatorIdx[i], s.signaturesIdxToValidatorIdx[j] = s.signaturesIdxToValidatorIdx[j], s.signaturesIdxToValidatorIdx[i]
+	s.signatures[i], s.signatures[j] = s.signatures[j], s.signatures[i]
+}
+
+func (s sortByValidatorIdx) Less(i, j int) bool {
+	return s.signaturesIdxToValidatorIdx[i] < s.signaturesIdxToValidatorIdx[j]
+}
+
+// TODO(rgeraldes24): is committeeLen enough? instead of the committee
+// ConvertToIndexed converts attestation to (almost) indexed-verifiable form.
+func ConvertToIndexed(ctx context.Context, attestation *zondpb.Attestation, committee []primitives.ValidatorIndex) (*zondpb.IndexedAttestation, error) {
+	if bf := attestation.AggregationBits; bf.Len() != uint64(len(committee)) {
+		return nil, fmt.Errorf("bitfield length %d is not equal to committee length %d", bf.Len(), len(committee))
+	}
+
+	sigSlices := signatureSlices{
+		signaturesIdxToValidatorIdx: attestation.SignaturesIdxToValidatorIdx,
+		signatures:                  attestation.Signatures,
+	}
+	sort.Sort(sortByValidatorIdx(sigSlices))
+
+	return &zondpb.IndexedAttestation{
+		Data:             attestation.Data,
+		Signatures:       sigSlices.signatures,
+		AttestingIndices: sigSlices.signaturesIdxToValidatorIdx,
+	}, nil
+}
+
+// AttestingIndices returns the attesting participants indices from the attestation data.
 func AttestingIndices(bf bitfield.Bitfield, committee []primitives.ValidatorIndex) ([]uint64, error) {
 	if bf.Len() != uint64(len(committee)) {
 		return nil, fmt.Errorf("bitfield length %d is not equal to committee length %d", bf.Len(), len(committee))
@@ -100,67 +72,37 @@ func AttestingIndices(bf bitfield.Bitfield, committee []primitives.ValidatorInde
 	return indices, nil
 }
 
-// VerifyIndexedAttestationSig this helper function performs the last part of the
-// spec indexed attestation validation starting at Verify aggregate signature
-// comment.
-//
-// Spec pseudocode definition:
-//
-//	def is_valid_indexed_attestation(state: BeaconState, indexed_attestation: IndexedAttestation) -> bool:
-//	 """
-//	 Check if ``indexed_attestation`` is not empty, has sorted and unique indices and has a valid aggregate signature.
-//	 """
-//	 # Verify indices are sorted and unique
-//	 indices = indexed_attestation.attesting_indices
-//	 if len(indices) == 0 or not indices == sorted(set(indices)):
-//	     return False
-//	 # Verify aggregate signature
-//	 pubkeys = [state.validators[i].pubkey for i in indices]
-//	 domain = get_domain(state, DOMAIN_BEACON_ATTESTER, indexed_attestation.data.target.epoch)
-//	 signing_root = compute_signing_root(indexed_attestation.data, domain)
-//	 return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
-/*
-func VerifyIndexedAttestationSig(ctx context.Context, indexedAtt *zondpb.IndexedAttestation, pubKeys []dilithium.PublicKey, domain []byte) error {
+// TODO(rgeraldes24): make sure that we get the correct pub keys and in the correct order
+// VerifyIndexedAttestationSigs this helper function performs the last part of the
+// spec indexed attestation validation - signatures verification.
+func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *zondpb.IndexedAttestation, pubKeys []dilithium.PublicKey, domain []byte) error {
 	ctx, span := trace.StartSpan(ctx, "attestationutil.VerifyIndexedAttestationSig")
 	defer span.End()
-	indices := indexedAtt.AttestingIndices
+
 	messageHash, err := signing.ComputeSigningRoot(indexedAtt.Data, domain)
 	if err != nil {
 		return errors.Wrap(err, "could not get signing root of object")
 	}
 
-	sig, err := dilithium.SignatureFromBytes(indexedAtt.Signatures)
-	if err != nil {
-		return errors.Wrap(err, "could not convert bytes to signature")
+	fmt.Printf("%x\n", messageHash)
+
+	for i, rawSig := range indexedAtt.Signatures {
+		sig, err := dilithium.SignatureFromBytes(rawSig)
+		if err != nil {
+			return errors.Wrap(err, "could not convert bytes to signature")
+		}
+
+		if !sig.Verify(pubKeys[i], messageHash[:]) {
+			return signing.ErrSigFailedToVerify
+		}
 	}
 
-	voted := len(indices) > 0
-	if voted && !sig.FastAggregateVerify(pubKeys, messageHash) {
-		return signing.ErrSigFailedToVerify
-	}
 	return nil
 }
-*/
 
 // IsValidAttestationIndices this helper function performs the first part of the
 // spec indexed attestation validation starting at Check if “indexed_attestation“
 // comment and ends at Verify aggregate signature comment.
-//
-// Spec pseudocode definition:
-//
-//	def is_valid_indexed_attestation(state: BeaconState, indexed_attestation: IndexedAttestation) -> bool:
-//	  """
-//	  Check if ``indexed_attestation`` is not empty, has sorted and unique indices and has a valid aggregate signature.
-//	  """
-//	  # Verify indices are sorted and unique
-//	  indices = indexed_attestation.attesting_indices
-//	  if len(indices) == 0 or not indices == sorted(set(indices)):
-//	      return False
-//	  # Verify aggregate signature
-//	  pubkeys = [state.validators[i].pubkey for i in indices]
-//	  domain = get_domain(state, DOMAIN_BEACON_ATTESTER, indexed_attestation.data.target.epoch)
-//	  signing_root = compute_signing_root(indexed_attestation.data, domain)
-//	  return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
 func IsValidAttestationIndices(ctx context.Context, indexedAttestation *zondpb.IndexedAttestation) error {
 	ctx, span := trace.StartSpan(ctx, "attestationutil.IsValidAttestationIndices")
 	defer span.End()

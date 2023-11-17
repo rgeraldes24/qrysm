@@ -456,7 +456,7 @@ func TestListValidators_Status(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, len(resp.Data), 8192+2 /* 2 active */)
 		for _, datum := range resp.Data {
-			readOnlyVal, err := state_native.NewValidator(migration.V1ValidatorToV1Alpha1(datum.Validator))
+			readOnlyVal, err := state_native.NewValidator(migration.V1ToV1Alpha1Validator(datum.Validator))
 			require.NoError(t, err)
 			status, err := rpchelpers.ValidatorStatus(readOnlyVal, 0)
 			require.NoError(t, err)
@@ -494,7 +494,7 @@ func TestListValidators_Status(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, len(resp.Data), 8192+1 /* 1 active_ongoing */)
 		for _, datum := range resp.Data {
-			readOnlyVal, err := state_native.NewValidator(migration.V1ValidatorToV1Alpha1(datum.Validator))
+			readOnlyVal, err := state_native.NewValidator(migration.V1ToV1Alpha1Validator(datum.Validator))
 			require.NoError(t, err)
 			status, err := rpchelpers.ValidatorSubStatus(readOnlyVal, 0)
 			require.NoError(t, err)
@@ -531,7 +531,7 @@ func TestListValidators_Status(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, 4 /* 4 exited */, len(resp.Data))
 		for _, datum := range resp.Data {
-			readOnlyVal, err := state_native.NewValidator(migration.V1ValidatorToV1Alpha1(datum.Validator))
+			readOnlyVal, err := state_native.NewValidator(migration.V1ToV1Alpha1Validator(datum.Validator))
 			require.NoError(t, err)
 			status, err := rpchelpers.ValidatorStatus(readOnlyVal, 35)
 			require.NoError(t, err)
@@ -567,7 +567,7 @@ func TestListValidators_Status(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, 4 /* 4 exited */, len(resp.Data))
 		for _, datum := range resp.Data {
-			readOnlyVal, err := state_native.NewValidator(migration.V1ValidatorToV1Alpha1(datum.Validator))
+			readOnlyVal, err := state_native.NewValidator(migration.V1ToV1Alpha1Validator(datum.Validator))
 			require.NoError(t, err)
 			status, err := rpchelpers.ValidatorSubStatus(readOnlyVal, 35)
 			require.NoError(t, err)
@@ -603,7 +603,7 @@ func TestListValidators_Status(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, 2 /* 1 pending, 1 exited */, len(resp.Data))
 		for _, datum := range resp.Data {
-			readOnlyVal, err := state_native.NewValidator(migration.V1ValidatorToV1Alpha1(datum.Validator))
+			readOnlyVal, err := state_native.NewValidator(migration.V1ToV1Alpha1Validator(datum.Validator))
 			require.NoError(t, err)
 			status, err := rpchelpers.ValidatorStatus(readOnlyVal, 35)
 			require.NoError(t, err)

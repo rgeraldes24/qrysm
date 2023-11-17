@@ -285,8 +285,8 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 	resp, err := s.ListPoolAttesterSlashings(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 	require.Equal(t, 2, len(resp.Data))
-	assert.DeepEqual(t, migration.V1Alpha1AttSlashingToV1(slashing1), resp.Data[0])
-	assert.DeepEqual(t, migration.V1Alpha1AttSlashingToV1(slashing2), resp.Data[1])
+	assert.DeepEqual(t, migration.V1Alpha1ToV1AttSlashing(slashing1), resp.Data[0])
+	assert.DeepEqual(t, migration.V1Alpha1ToV1AttSlashing(slashing2), resp.Data[1])
 }
 
 func TestListPoolProposerSlashings(t *testing.T) {
@@ -345,8 +345,8 @@ func TestListPoolProposerSlashings(t *testing.T) {
 	resp, err := s.ListPoolProposerSlashings(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 	require.Equal(t, 2, len(resp.Data))
-	assert.DeepEqual(t, migration.V1Alpha1ProposerSlashingToV1(slashing1), resp.Data[0])
-	assert.DeepEqual(t, migration.V1Alpha1ProposerSlashingToV1(slashing2), resp.Data[1])
+	assert.DeepEqual(t, migration.V1Alpha1ToV1ProposerSlashing(slashing1), resp.Data[0])
+	assert.DeepEqual(t, migration.V1Alpha1ToV1ProposerSlashing(slashing2), resp.Data[1])
 }
 
 func TestListPoolVoluntaryExits(t *testing.T) {
@@ -375,8 +375,8 @@ func TestListPoolVoluntaryExits(t *testing.T) {
 	resp, err := s.ListPoolVoluntaryExits(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 	require.Equal(t, 2, len(resp.Data))
-	assert.DeepEqual(t, migration.V1Alpha1ExitToV1(exit1), resp.Data[0])
-	assert.DeepEqual(t, migration.V1Alpha1ExitToV1(exit2), resp.Data[1])
+	assert.DeepEqual(t, migration.V1Alpha1ToV1Exit(exit1), resp.Data[0])
+	assert.DeepEqual(t, migration.V1Alpha1ToV1Exit(exit2), resp.Data[1])
 }
 
 func TestSubmitAttesterSlashing_Ok(t *testing.T) {
@@ -452,7 +452,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 	require.NoError(t, err)
 	pendingSlashings := s.SlashingsPool.PendingAttesterSlashings(ctx, bs, true)
 	require.Equal(t, 1, len(pendingSlashings))
-	assert.DeepEqual(t, migration.V1AttSlashingToV1Alpha1(slashing), pendingSlashings[0])
+	assert.DeepEqual(t, migration.V1ToV1Alpha1AttSlashing(slashing), pendingSlashings[0])
 	assert.Equal(t, true, broadcaster.BroadcastCalled)
 	require.Equal(t, 1, len(broadcaster.BroadcastMessages))
 	_, ok := broadcaster.BroadcastMessages[0].(*zondpbv1alpha1.AttesterSlashing)
@@ -532,7 +532,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 	require.NoError(t, err)
 	pendingSlashings := s.SlashingsPool.PendingAttesterSlashings(ctx, bs, true)
 	require.Equal(t, 1, len(pendingSlashings))
-	assert.DeepEqual(t, migration.V1AttSlashingToV1Alpha1(slashing), pendingSlashings[0])
+	assert.DeepEqual(t, migration.V1ToV1Alpha1AttSlashing(slashing), pendingSlashings[0])
 	assert.Equal(t, true, broadcaster.BroadcastCalled)
 	require.Equal(t, 1, len(broadcaster.BroadcastMessages))
 	_, ok := broadcaster.BroadcastMessages[0].(*zondpbv1alpha1.AttesterSlashing)
@@ -649,7 +649,7 @@ func TestSubmitProposerSlashing_Ok(t *testing.T) {
 	require.NoError(t, err)
 	pendingSlashings := s.SlashingsPool.PendingProposerSlashings(ctx, bs, true)
 	require.Equal(t, 1, len(pendingSlashings))
-	assert.DeepEqual(t, migration.V1ProposerSlashingToV1Alpha1(slashing), pendingSlashings[0])
+	assert.DeepEqual(t, migration.V1ToV1Alpha1ProposerSlashing(slashing), pendingSlashings[0])
 	assert.Equal(t, true, broadcaster.BroadcastCalled)
 	require.Equal(t, 1, len(broadcaster.BroadcastMessages))
 	_, ok := broadcaster.BroadcastMessages[0].(*zondpbv1alpha1.ProposerSlashing)
@@ -721,7 +721,7 @@ func TestSubmitProposerSlashing_AcrossFork(t *testing.T) {
 	require.NoError(t, err)
 	pendingSlashings := s.SlashingsPool.PendingProposerSlashings(ctx, bs, true)
 	require.Equal(t, 1, len(pendingSlashings))
-	assert.DeepEqual(t, migration.V1ProposerSlashingToV1Alpha1(slashing), pendingSlashings[0])
+	assert.DeepEqual(t, migration.V1ToV1Alpha1ProposerSlashing(slashing), pendingSlashings[0])
 	assert.Equal(t, true, broadcaster.BroadcastCalled)
 	require.Equal(t, 1, len(broadcaster.BroadcastMessages))
 	_, ok := broadcaster.BroadcastMessages[0].(*zondpbv1alpha1.ProposerSlashing)
@@ -811,7 +811,7 @@ func TestSubmitVoluntaryExit_Ok(t *testing.T) {
 	pendingExits, err := s.VoluntaryExitsPool.PendingExits()
 	require.NoError(t, err)
 	require.Equal(t, 1, len(pendingExits))
-	assert.DeepEqual(t, migration.V1ExitToV1Alpha1(exit), pendingExits[0])
+	assert.DeepEqual(t, migration.V1ToV1Alpha1Exit(exit), pendingExits[0])
 	assert.Equal(t, true, broadcaster.BroadcastCalled)
 }
 
@@ -1254,8 +1254,8 @@ func TestListDilithiumToExecutionChanges(t *testing.T) {
 	resp, err := s.ListDilithiumToExecutionChanges(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 	require.Equal(t, 2, len(resp.Data))
-	assert.DeepEqual(t, migration.V1Alpha1SignedDilithiumToExecChangeToV2(change1), resp.Data[0])
-	assert.DeepEqual(t, migration.V1Alpha1SignedDilithiumToExecChangeToV2(change2), resp.Data[1])
+	assert.DeepEqual(t, migration.V1Alpha1ToV1SignedDilithiumToExecChange(change1), resp.Data[0])
+	assert.DeepEqual(t, migration.V1Alpha1ToV1SignedDilithiumToExecChange(change2), resp.Data[1])
 }
 
 func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
@@ -1350,8 +1350,8 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 	require.Equal(t, len(poolChanges), len(signedChanges))
 	require.NoError(t, err)
 	for i, v1alphaChange := range poolChanges {
-		v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV2(v1alphaChange)
-		require.DeepEqual(t, v2Change, signedChanges[i])
+		v1Change := migration.V1Alpha1ToV1SignedDilithiumToExecChange(v1alphaChange)
+		require.DeepEqual(t, v1Change, signedChanges[i])
 	}
 }
 
@@ -1462,8 +1462,8 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 	require.Equal(t, len(poolChanges), len(signedChanges))
 	require.NoError(t, err)
 	for i, v1alphaChange := range poolChanges {
-		v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV2(v1alphaChange)
-		require.DeepEqual(t, v2Change, signedChanges[i])
+		v1Change := migration.V1Alpha1ToV1SignedDilithiumToExecChange(v1alphaChange)
+		require.DeepEqual(t, v1Change, signedChanges[i])
 	}
 }
 
@@ -1560,10 +1560,10 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 	require.Equal(t, len(poolChanges)+1, len(signedChanges))
 	require.NoError(t, err)
 
-	v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV2(poolChanges[0])
-	require.DeepEqual(t, v2Change, signedChanges[0])
+	v1Change := migration.V1Alpha1ToV1SignedDilithiumToExecChange(poolChanges[0])
+	require.DeepEqual(t, v1Change, signedChanges[0])
 	for i := 2; i < numValidators; i++ {
-		v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV2(poolChanges[i-1])
-		require.DeepEqual(t, v2Change, signedChanges[i])
+		v1Change := migration.V1Alpha1ToV1SignedDilithiumToExecChange(poolChanges[i-1])
+		require.DeepEqual(t, v1Change, signedChanges[i])
 	}
 }

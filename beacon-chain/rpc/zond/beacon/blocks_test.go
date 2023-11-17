@@ -479,7 +479,7 @@ func TestServer_GetBlock(t *testing.T) {
 		blk, err := bs.GetBlock(ctx, &zondpbv1.BlockRequest{})
 		require.NoError(t, err)
 
-		v1Block, err := migration.V1Alpha1BeaconBlockCapellaToV2(b.Block)
+		v1Block, err := migration.V1Alpha1ToV1Block(b.Block)
 		require.NoError(t, err)
 		bellatrixBlock, ok := blk.Data.Message.(*zondpbv1.SignedBeaconBlockContainer_CapellaBlock)
 		require.Equal(t, true, ok)
@@ -487,7 +487,7 @@ func TestServer_GetBlock(t *testing.T) {
 		assert.Equal(t, zondpbv1.Version_CAPELLA, blk.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBeaconBlockBellatrix()
+		b := util.NewBeaconBlock()
 		sb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := sb.Block().HashTreeRoot()
@@ -904,7 +904,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 		resp, err := bs.ListBlockAttestations(ctx, &zondpbv1.BlockRequest{})
 		require.NoError(t, err)
 
-		v1Block, err := migration.V1Alpha1BeaconBlockAltairToV2(b.Block)
+		v1Block, err := migration.V1Alpha1ToV1Block(b.Block)
 		require.NoError(t, err)
 		assert.DeepEqual(t, v1Block.Body.Attestations, resp.Data)
 	})
@@ -961,7 +961,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 		resp, err := bs.ListBlockAttestations(ctx, &zondpbv1.BlockRequest{})
 		require.NoError(t, err)
 
-		v1Block, err := migration.V1Alpha1BeaconBlockBellatrixToV2(b.Block)
+		v1Block, err := migration.V1Alpha1ToV1Block(b.Block)
 		require.NoError(t, err)
 		assert.DeepEqual(t, v1Block.Body.Attestations, resp.Data)
 	})
@@ -1018,12 +1018,12 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 		resp, err := bs.ListBlockAttestations(ctx, &zondpbv1.BlockRequest{})
 		require.NoError(t, err)
 
-		v1Block, err := migration.V1Alpha1BeaconBlockCapellaToV2(b.Block)
+		v1Block, err := migration.V1Alpha1ToV1Block(b.Block)
 		require.NoError(t, err)
 		assert.DeepEqual(t, v1Block.Body.Attestations, resp.Data)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBeaconBlockBellatrix()
+		b := util.NewBeaconBlock()
 		sb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := sb.Block().HashTreeRoot()

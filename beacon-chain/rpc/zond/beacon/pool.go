@@ -42,7 +42,7 @@ func (bs *Server) ListPoolAttestations(ctx context.Context, req *zondpbv1.Attest
 	if isEmptyReq {
 		allAtts := make([]*zondpbv1.Attestation, len(attestations))
 		for i, att := range attestations {
-			allAtts[i] = migration.V1Alpha1AttestationToV1(att)
+			allAtts[i] = migration.V1Alpha1ToV1Attestation(att)
 		}
 		return &zondpbv1.AttestationsPoolResponse{Data: allAtts}, nil
 	}
@@ -54,9 +54,9 @@ func (bs *Server) ListPoolAttestations(ctx context.Context, req *zondpbv1.Attest
 		slotMatch := req.Slot != nil && att.Data.Slot == *req.Slot
 
 		if bothDefined && committeeIndexMatch && slotMatch {
-			filteredAtts = append(filteredAtts, migration.V1Alpha1AttestationToV1(att))
+			filteredAtts = append(filteredAtts, migration.V1Alpha1ToV1Attestation(att))
 		} else if !bothDefined && (committeeIndexMatch || slotMatch) {
-			filteredAtts = append(filteredAtts, migration.V1Alpha1AttestationToV1(att))
+			filteredAtts = append(filteredAtts, migration.V1Alpha1ToV1Attestation(att))
 		}
 	}
 	return &zondpbv1.AttestationsPoolResponse{Data: filteredAtts}, nil
@@ -71,7 +71,7 @@ func (bs *Server) SubmitAttestations(ctx context.Context, req *zondpbv1.SubmitAt
 	var validAttestations []*zondpbalpha.Attestation
 	var attFailures []*helpers.SingleIndexedVerificationFailure
 	for i, sourceAtt := range req.Data {
-		att := migration.V1AttToV1Alpha1(sourceAtt)
+		att := migration.V1ToV1Alpha1Attestation(sourceAtt)
 		if _, err := dilithium.SignatureFromBytes(att.Signature); err != nil {
 			attFailures = append(attFailures, &helpers.SingleIndexedVerificationFailure{
 				Index:   i,
@@ -155,7 +155,7 @@ func (bs *Server) ListPoolAttesterSlashings(ctx context.Context, _ *emptypb.Empt
 
 	slashings := make([]*zondpbv1.AttesterSlashing, len(sourceSlashings))
 	for i, s := range sourceSlashings {
-		slashings[i] = migration.V1Alpha1AttSlashingToV1(s)
+		slashings[i] = migration.V1Alpha1ToV1AttSlashing(s)
 	}
 
 	return &zondpbv1.AttesterSlashingsPoolResponse{
@@ -178,7 +178,7 @@ func (bs *Server) SubmitAttesterSlashing(ctx context.Context, req *zondpbv1.Atte
 		return nil, status.Errorf(codes.Internal, "Could not process slots: %v", err)
 	}
 
-	alphaSlashing := migration.V1AttSlashingToV1Alpha1(req)
+	alphaSlashing := migration.V1ToV1Alpha1AttSlashing(req)
 	err = blocks.VerifyAttesterSlashing(ctx, headState, alphaSlashing)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid attester slashing: %v", err)
@@ -211,7 +211,7 @@ func (bs *Server) ListPoolProposerSlashings(ctx context.Context, _ *emptypb.Empt
 
 	slashings := make([]*zondpbv1.ProposerSlashing, len(sourceSlashings))
 	for i, s := range sourceSlashings {
-		slashings[i] = migration.V1Alpha1ProposerSlashingToV1(s)
+		slashings[i] = migration.V1Alpha1ToV1ProposerSlashing(s)
 	}
 
 	return &zondpbv1.ProposerSlashingPoolResponse{
@@ -234,7 +234,7 @@ func (bs *Server) SubmitProposerSlashing(ctx context.Context, req *zondpbv1.Prop
 		return nil, status.Errorf(codes.Internal, "Could not process slots: %v", err)
 	}
 
-	alphaSlashing := migration.V1ProposerSlashingToV1Alpha1(req)
+	alphaSlashing := migration.V1ToV1Alpha1ProposerSlashing(req)
 	err = blocks.VerifyProposerSlashing(headState, alphaSlashing)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid proposer slashing: %v", err)
@@ -265,7 +265,7 @@ func (bs *Server) ListPoolVoluntaryExits(ctx context.Context, _ *emptypb.Empty) 
 	}
 	exits := make([]*zondpbv1.SignedVoluntaryExit, len(sourceExits))
 	for i, s := range sourceExits {
-		exits[i] = migration.V1Alpha1ExitToV1(s)
+		exits[i] = migration.V1Alpha1ToV1Exit(s)
 	}
 
 	return &zondpbv1.VoluntaryExitsPoolResponse{
@@ -296,7 +296,7 @@ func (bs *Server) SubmitVoluntaryExit(ctx context.Context, req *zondpbv1.SignedV
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not get exiting validator: %v", err)
 	}
-	alphaExit := migration.V1ExitToV1Alpha1(req)
+	alphaExit := migration.V1ToV1Alpha1Exit(req)
 	err = blocks.VerifyExitAndSignature(validator, headState.Slot(), headState.Fork(), alphaExit, headState.GenesisValidatorsRoot())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid voluntary exit: %v", err)
@@ -323,7 +323,7 @@ func (bs *Server) SubmitSignedDilithiumToExecutionChanges(ctx context.Context, r
 	var toBroadcast []*zondpbalpha.SignedDilithiumToExecutionChange
 
 	for i, change := range req.GetChanges() {
-		alphaChange := migration.V2SignedDilithiumToExecutionChangeToV1Alpha1(change)
+		alphaChange := migration.V1ToV1Alpha1SignedDilithiumToExecutionChange(change)
 		_, err = blocks.ValidateDilithiumToExecutionChange(st, alphaChange)
 		if err != nil {
 			failures = append(failures, &helpers.SingleIndexedVerificationFailure{
@@ -426,7 +426,7 @@ func (bs *Server) ListDilithiumToExecutionChanges(ctx context.Context, _ *emptyp
 
 	changes := make([]*zondpbv1.SignedDilithiumToExecutionChange, len(sourceChanges))
 	for i, ch := range sourceChanges {
-		changes[i] = migration.V1Alpha1SignedDilithiumToExecChangeToV2(ch)
+		changes[i] = migration.V1Alpha1ToV1SignedDilithiumToExecChange(ch)
 	}
 
 	return &zondpbv1.DilithiumToExecutionChangesPoolResponse{

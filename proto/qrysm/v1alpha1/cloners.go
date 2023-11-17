@@ -287,12 +287,18 @@ func CopySyncCommitteeContribution(c *SyncCommitteeContribution) *SyncCommitteeC
 	if c == nil {
 		return nil
 	}
+
+	signatures := make([][]byte, len(c.Signatures))
+	for i, sig := range c.Signatures {
+		signatures[i] = bytesutil.SafeCopyBytes(sig)
+	}
+
 	return &SyncCommitteeContribution{
 		Slot:              c.Slot,
 		BlockRoot:         bytesutil.SafeCopyBytes(c.BlockRoot),
 		SubcommitteeIndex: c.SubcommitteeIndex,
 		AggregationBits:   bytesutil.SafeCopyBytes(c.AggregationBits),
-		Signature:         bytesutil.SafeCopyBytes(c.Signature),
+		Signatures:        signatures,
 	}
 }
 

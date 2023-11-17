@@ -32,8 +32,9 @@ message Attestation {
 
     AttestationData data = 2;
 
-    // 4595 (signature size per signer) * 2048 (number of signers) bytes of unaggregated signatures
     repeated bytes signatures = 3 [(theqrl.zond.ext.ssz_size) = "?,4595", (theqrl.zond.ext.ssz_max) = "2048"];
+
+    repeated uint64 signaturesIdxToValidatorIdx = 4 [(theqrl.zond.ext.ssz_max) = "2048"];
 }
 
 message AggregateAttestationAndProof {

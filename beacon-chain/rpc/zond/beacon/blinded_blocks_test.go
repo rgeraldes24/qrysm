@@ -28,7 +28,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 	ctx := grpc.NewContextWithServerTransportStream(context.Background(), stream)
 
 	t.Run("Capella", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockCapella()
+		b := util.NewBlindedBeaconBlock()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 
@@ -39,7 +39,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 			OptimisticModeFetcher: mockChainService,
 		}
 
-		expected, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV2Blinded(b.Block)
+		expected, err := migration.V1Alpha1ToV1BlindedBlock(b.Block)
 		require.NoError(t, err)
 		resp, err := bs.GetBlindedBlock(ctx, &zondpbv1.BlockRequest{})
 		require.NoError(t, err)
@@ -49,7 +49,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockBellatrix()
+		b := util.NewBlindedBeaconBlock()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := blk.Block().HashTreeRoot()
@@ -112,7 +112,7 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("Capella", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockCapella()
+		b := util.NewBlindedBeaconBlock()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 
@@ -132,7 +132,7 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockBellatrix()
+		b := util.NewBlindedBeaconBlock()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := blk.Block().HashTreeRoot()
@@ -203,7 +203,7 @@ func TestServer_SubmitBlindedBlockSSZ(t *testing.T) {
 			SyncChecker:             &mockSync.Sync{IsSyncing: false},
 		}
 
-		b := util.NewBlindedBeaconBlockCapella()
+		b := util.NewBlindedBeaconBlock()
 		b.Block.Slot = params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().CapellaForkEpoch))
 		ssz, err := b.MarshalSSZ()
 		require.NoError(t, err)
@@ -221,7 +221,7 @@ func TestServer_SubmitBlindedBlockSSZ(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlock()
 		b.Block.Slot = params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().CapellaForkEpoch))
 		ssz, err := b.MarshalSSZ()
 		require.NoError(t, err)

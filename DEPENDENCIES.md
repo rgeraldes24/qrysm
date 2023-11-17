@@ -1,18 +1,18 @@
-# Dependency Management in Prysm
+# Dependency Management in Qrysm
 
-Prysm is go project with many complicated dependencies, including some c++ based libraries. There
-are two parts to Prysm's dependency management. Go modules and bazel managed dependencies. Be sure 
+Qrysm is go project with many complicated dependencies, including some c++ based libraries. There
+are two parts to Qrysm's dependency management. Go modules and bazel managed dependencies. Be sure 
 to read [Why Bazel?](https://github.com/prysmaticlabs/documentation/issues/138) to fully
 understand the reasoning behind an additional layer of build tooling via Bazel rather than a pure
 "go build" project.
 
 ## Go Module support
 
-The Prysm project officially supports go modules with some caveats. 
+The Qrysm project officially supports go modules with some caveats. 
 
 ### Caveat 1: Some c++ libraries are precompiled archives
 
-Given some of Prysm's c++ dependencies have very complicated project structures which make building
+Given some of Qrysm's c++ dependencies have very complicated project structures which make building
 difficult or impossible with "go build" alone. Additionally, building c++ dependencies with certain
 compilers, like clang / LLVM, offer a significant performance improvement. To get around this 
 issue, c++ dependencies have been precompiled as linkable archives. While there isn't necessarily
@@ -28,7 +28,7 @@ including complicated c++ dependencies.
 One key advantage of Bazel over vanilla `go build` is that Bazel automatically (re)builds generated
 pb.go files at build time when file changes are present in any protobuf definition file or after
 any updates to the protobuf compiler or other relevant dependencies. Vanilla go users should run
-the following scripts often to ensure their generated files are up to date. Furthermore, Prysm
+the following scripts often to ensure their generated files are up to date. Furthermore, Qrysm
 generates SSZ marshal related code based on defined data structures. These generated files must
 also be updated and checked in as frequently.
 

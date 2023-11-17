@@ -50,7 +50,7 @@ func (bs *Server) GetBlockHeader(ctx context.Context, req *zondpbv1.BlockRequest
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not get block header from block: %v", err)
 	}
-	header := migration.V1Alpha1SignedHeaderToV1(v1alpha1Header)
+	header := migration.V1Alpha1ToV1SignedHeader(v1alpha1Header)
 	headerRoot, err := header.Message.HashTreeRoot()
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not hash block header: %v", err)
@@ -121,7 +121,7 @@ func (bs *Server) ListBlockHeaders(ctx context.Context, req *zondpbv1.BlockHeade
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not get block header from block: %v", err)
 		}
-		header := migration.V1Alpha1SignedHeaderToV1(v1alpha1Header)
+		header := migration.V1Alpha1ToV1SignedHeader(v1alpha1Header)
 		headerRoot, err := header.Message.HashTreeRoot()
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not hash block header: %v", err)
@@ -509,7 +509,7 @@ func (bs *Server) ListBlockAttestations(ctx context.Context, req *zondpbv1.Block
 	v1Alpha1Attestations := blk.Block().Body().Attestations()
 	v1Attestations := make([]*zondpbv1.Attestation, 0, len(v1Alpha1Attestations))
 	for _, att := range v1Alpha1Attestations {
-		migratedAtt := migration.V1Alpha1AttestationToV1(att)
+		migratedAtt := migration.V1Alpha1ToV1Attestation(att)
 		v1Attestations = append(v1Attestations, migratedAtt)
 	}
 	root, err := blk.Block().HashTreeRoot()
@@ -557,7 +557,7 @@ func (bs *Server) getBlockCapella(ctx context.Context, blk interfaces.ReadOnlySi
 				if err != nil {
 					return nil, errors.Wrapf(err, "could not get signed beacon block")
 				}
-				v2Blk, err := migration.V1Alpha1BeaconBlockCapellaToV2(capellaBlk.Block)
+				v2Blk, err := migration.V1Alpha1ToV1Block(capellaBlk.Block)
 				if err != nil {
 					return nil, errors.Wrapf(err, "could not convert beacon block")
 				}
@@ -587,7 +587,7 @@ func (bs *Server) getBlockCapella(ctx context.Context, blk interfaces.ReadOnlySi
 	if capellaBlk == nil {
 		return nil, errNilBlock
 	}
-	v2Blk, err := migration.V1Alpha1BeaconBlockCapellaToV2(capellaBlk.Block)
+	v2Blk, err := migration.V1Alpha1ToV1Block(capellaBlk.Block)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not convert beacon block")
 	}
@@ -627,7 +627,7 @@ func (bs *Server) getSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnl
 				if err != nil {
 					return nil, errors.Wrapf(err, "could not get signed beacon block")
 				}
-				v2Blk, err := migration.V1Alpha1BeaconBlockCapellaToV2(capellaBlk.Block)
+				v2Blk, err := migration.V1Alpha1ToV1Block(capellaBlk.Block)
 				if err != nil {
 					return nil, errors.Wrapf(err, "could not convert signed beacon block")
 				}
@@ -662,7 +662,7 @@ func (bs *Server) getSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnl
 	if capellaBlk == nil {
 		return nil, errNilBlock
 	}
-	v2Blk, err := migration.V1Alpha1BeaconBlockCapellaToV2(capellaBlk.Block)
+	v2Blk, err := migration.V1Alpha1ToV1Block(capellaBlk.Block)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not convert signed beacon block")
 	}
@@ -687,7 +687,7 @@ func (bs *Server) getSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnl
 }
 
 func (bs *Server) submitCapellaBlock(ctx context.Context, capellaBlk *zondpbv1.BeaconBlock, sig []byte) error {
-	v1alpha1Blk, err := migration.CapellaToV1Alpha1SignedBlock(&zondpbv1.SignedBeaconBlock{Message: capellaBlk, Signature: sig})
+	v1alpha1Blk, err := migration.V1ToV1Alpha1SignedBlock(&zondpbv1.SignedBeaconBlock{Message: capellaBlk, Signature: sig})
 	if err != nil {
 		return status.Errorf(codes.InvalidArgument, "Could not convert block to v1 block")
 	}

@@ -61,7 +61,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 				Slot: 8,
 			},
 		})
-		wantedAtt := migration.V1Alpha1AttestationToV1(wantedAttV1alpha1)
+		wantedAtt := migration.V1Alpha1ToV1Attestation(wantedAttV1alpha1)
 		genericResponse, err := anypb.New(wantedAtt)
 		require.NoError(t, err)
 
@@ -93,7 +93,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 		wantedAttV1alpha1 := &zond.AggregateAttestationAndProof{
 			Aggregate: util.HydrateAttestation(&zond.Attestation{}),
 		}
-		wantedAtt := migration.V1Alpha1AggregateAttAndProofToV1(wantedAttV1alpha1)
+		wantedAtt := migration.V1Alpha1ToV1AggregateAttAndProof(wantedAttV1alpha1)
 		genericResponse, err := anypb.New(wantedAtt)
 		require.NoError(t, err)
 
@@ -129,7 +129,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 			},
 			Signature: make([]byte, 96),
 		}
-		wantedExit := migration.V1Alpha1ExitToV1(wantedExitV1alpha1)
+		wantedExit := migration.V1Alpha1ToV1Exit(wantedExitV1alpha1)
 		genericResponse, err := anypb.New(wantedExit)
 		require.NoError(t, err)
 
@@ -172,7 +172,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 			},
 			Signature: []byte("sig"),
 		}
-		wantedContribution := migration.V1Alpha1SignedContributionAndProofToV2(wantedContributionV1alpha1)
+		wantedContribution := migration.V1Alpha1ToV1SignedContributionAndProof(wantedContributionV1alpha1)
 		genericResponse, err := anypb.New(wantedContribution)
 		require.NoError(t, err)
 
@@ -209,7 +209,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 			},
 			Signature: make([]byte, 96),
 		}
-		wantedChange := migration.V1Alpha1SignedDilithiumToExecChangeToV2(wantedChangeV1alpha1)
+		wantedChange := migration.V1Alpha1ToV1SignedDilithiumToExecChange(wantedChangeV1alpha1)
 		genericResponse, err := anypb.New(wantedChange)
 		require.NoError(t, err)
 
