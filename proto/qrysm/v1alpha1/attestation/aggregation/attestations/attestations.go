@@ -18,7 +18,6 @@ var _ = logrus.WithField("prefix", "aggregation.attestations")
 // of attestations is provided for aggregation.
 var ErrInvalidAttestationCount = errors.New("invalid number of attestations")
 
-/*
 // Aggregate aggregates attestations. The minimal number of attestations is returned.
 // Aggregation occurs in-place i.e. contents of input array will be modified. Should you need to
 // preserve input attestations, clone them before aggregating.
@@ -26,6 +25,7 @@ func Aggregate(atts []*zondpb.Attestation) ([]*zondpb.Attestation, error) {
 	return MaxCoverAttestationAggregation(atts)
 }
 
+/*
 // AggregateDisjointOneBitAtts aggregates unaggregated attestations with the
 // exact same attestation data.
 func AggregateDisjointOneBitAtts(atts []*zondpb.Attestation) (*zondpb.Attestation, error) {
