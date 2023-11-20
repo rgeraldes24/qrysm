@@ -143,10 +143,10 @@ func V1Alpha1ToV1Attestation(v1alpha1Att *zondpbalpha.Attestation) *zondpbv1.Att
 		return &zondpbv1.Attestation{}
 	}
 	return &zondpbv1.Attestation{
-		AggregationBits:             v1alpha1Att.AggregationBits,
-		Data:                        V1Alpha1ToV1AttData(v1alpha1Att.Data),
-		Signatures:                  v1alpha1Att.Signatures,
-		SignaturesIdxToValidatorIdx: v1alpha1Att.SignaturesIdxToValidatorIdx,
+		ParticipationBits:               v1alpha1Att.ParticipationBits,
+		Data:                            V1Alpha1ToV1AttData(v1alpha1Att.Data),
+		Signatures:                      v1alpha1Att.Signatures,
+		SignaturesIdxToParticipationIdx: v1alpha1Att.SignaturesIdxToParticipationIdx,
 	}
 }
 
@@ -156,10 +156,10 @@ func V1ToV1Alpha1Attestation(v1Att *zondpbv1.Attestation) *zondpbalpha.Attestati
 		return &zondpbalpha.Attestation{}
 	}
 	return &zondpbalpha.Attestation{
-		AggregationBits:             v1Att.AggregationBits,
-		Data:                        V1ToV1Alpha1AttData(v1Att.Data),
-		Signatures:                  v1Att.Signatures,
-		SignaturesIdxToValidatorIdx: v1Att.SignaturesIdxToValidatorIdx,
+		ParticipationBits:               v1Att.ParticipationBits,
+		Data:                            V1ToV1Alpha1AttData(v1Att.Data),
+		Signatures:                      v1Att.Signatures,
+		SignaturesIdxToParticipationIdx: v1Att.SignaturesIdxToParticipationIdx,
 	}
 }
 
@@ -560,7 +560,7 @@ func V1Alpha1ToV1SignedContributionAndProof(alphaContribution *zondpbalpha.Signe
 				Slot:              alphaContribution.Message.Contribution.Slot,
 				BeaconBlockRoot:   alphaContribution.Message.Contribution.BlockRoot,
 				SubcommitteeIndex: alphaContribution.Message.Contribution.SubcommitteeIndex,
-				AggregationBits:   alphaContribution.Message.Contribution.AggregationBits,
+				ParticipationBits: alphaContribution.Message.Contribution.ParticipationBits,
 				Signatures:        alphaContribution.Message.Contribution.Signatures,
 			},
 			SelectionProof: alphaContribution.Message.SelectionProof,
@@ -671,7 +671,7 @@ func V1Alpha1BeaconBlockToV1Blinded(v1alpha1Block *zondpbalpha.BeaconBlock) (*zo
 		}
 
 		resultAttestations[i] = &zondpbv1.Attestation{
-			AggregationBits: bytesutil.SafeCopyBytes(a.AggregationBits),
+			ParticipationBits: bytesutil.SafeCopyBytes(a.ParticipationBits),
 			Data: &zondpbv1.AttestationData{
 				Slot:            a.Data.Slot,
 				Index:           a.Data.CommitteeIndex,

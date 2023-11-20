@@ -1,5 +1,6 @@
 package attestations
 
+/*
 import (
 	"sort"
 
@@ -28,7 +29,7 @@ func MaxCoverAttestationAggregation(atts []*zondpb.Attestation) ([]*zondpb.Attes
 	candidates := make([]*bitfield.Bitlist64, len(atts))
 	for i := 0; i < len(atts); i++ {
 		var err error
-		candidates[i], err = atts[i].AggregationBits.ToBitlist64()
+		candidates[i], err = atts[i].ParticipationBits.ToBitlist64()
 		if err != nil {
 			return nil, err
 		}
@@ -52,7 +53,7 @@ func MaxCoverAttestationAggregation(atts []*zondpb.Attestation) ([]*zondpb.Attes
 		// Find maximum non-overlapping coverage for subset of still non-processed candidates.
 		roundCandidates := candidates[len(aggregated) : len(aggregated)+len(unaggregated)]
 		selectedKeys, coverage, err := aggregation.MaxCover(
-			roundCandidates, len(roundCandidates), false /* allowOverlaps */)
+			roundCandidates, len(roundCandidates), false /* allowOverlaps )
 		if err != nil {
 			// Return aggregated attestations, and attestations that couldn't be aggregated.
 			return append(aggregated, unaggregated...), err
@@ -114,7 +115,7 @@ func MaxCoverAttestationAggregation(atts []*zondpb.Attestation) ([]*zondpb.Attes
 func NewMaxCover(atts []*zondpb.Attestation) *aggregation.MaxCoverProblem {
 	candidates := make([]*aggregation.MaxCoverCandidate, len(atts))
 	for i := 0; i < len(atts); i++ {
-		candidates[i] = aggregation.NewMaxCoverCandidate(i, &atts[i].AggregationBits)
+		candidates[i] = aggregation.NewMaxCoverCandidate(i, &atts[i].ParticipationBits)
 	}
 	return &aggregation.MaxCoverProblem{Candidates: candidates}
 }
@@ -139,7 +140,6 @@ func (al attList) aggregate(coverage bitfield.Bitlist) (*zondpb.Attestation, err
 		Signatures:      aggregateSignatures(signs).Marshal(),
 	}, nil
 }
-*/
 
 // padSelectedKeys adds additional value to every key.
 func padSelectedKeys(keys []int, pad int) []int {
@@ -170,7 +170,7 @@ func aggregateAttestations(atts []*zondpb.Attestation, keys []int, coverage *bit
 	attsMap := make(map[int][]byte)
 	//sigValidatorIndexMap := make(map[int][]uint64)
 	for _, att := range atts {
-		for i, index := range att.AggregationBits.BitIndices() {
+		for i, index := range att.ParticipationBits.BitIndices() {
 			attsKeys = append(attsKeys, index)
 			// Ignore if the validator index in committee already exists
 			if _, found := attsMap[index]; found {
@@ -197,8 +197,8 @@ func aggregateAttestations(atts []*zondpb.Attestation, keys []int, coverage *bit
 	// Put aggregated attestation at a position of the first selected attestation.
 	atts[targetIdx] = &zondpb.Attestation{
 		// Append size byte, which will be unnecessary on switch to Bitlist64.
-		AggregationBits: coverage.ToBitlist(),
-		Data:            data,
+		ParticipationBits: coverage.ToBitlist(),
+		Data:              data,
 		//Signature:              aggregateSignatures(signs).Marshal(),
 		Signatures: unaggregatedSignatures(signs),
 		//SignatureValidatorIndex: signatureValidatorIndex,
@@ -272,7 +272,7 @@ func (al attList) selectComplementUsingKeys(keys []int) attList {
 // hasCoverage returns true if a given coverage is found in attestations list.
 func (al attList) hasCoverage(coverage bitfield.Bitlist) (bool, error) {
 	for _, att := range al {
-		x, err := att.AggregationBits.Xor(coverage)
+		x, err := att.ParticipationBits.Xor(coverage)
 		if err != nil {
 			return false, err
 		}
@@ -289,12 +289,12 @@ func (al attList) filterContained() (attList, error) {
 		return al, nil
 	}
 	sort.Slice(al, func(i, j int) bool {
-		return al[i].AggregationBits.Count() > al[j].AggregationBits.Count()
+		return al[i].ParticipationBits.Count() > al[j].ParticipationBits.Count()
 	})
 	filtered := al[:0]
 	filtered = append(filtered, al[0])
 	for i := 1; i < len(al); i++ {
-		c, err := filtered[len(filtered)-1].AggregationBits.Contains(al[i].AggregationBits)
+		c, err := filtered[len(filtered)-1].ParticipationBits.Contains(al[i].ParticipationBits)
 		if err != nil {
 			return nil, err
 		}
@@ -314,13 +314,14 @@ func (al attList) validate() error {
 	if len(al) == 0 {
 		return errors.Wrap(aggregation.ErrInvalidMaxCoverProblem, "empty list")
 	}
-	if al[0].AggregationBits == nil || al[0].AggregationBits.Len() == 0 {
+	if al[0].ParticipationBits == nil || al[0].ParticipationBits.Len() == 0 {
 		return errors.Wrap(aggregation.ErrInvalidMaxCoverProblem, "bitlist cannot be nil or empty")
 	}
 	for i := 1; i < len(al); i++ {
-		if al[i].AggregationBits == nil || al[i].AggregationBits.Len() == 0 {
+		if al[i].ParticipationBits == nil || al[i].ParticipationBits.Len() == 0 {
 			return errors.Wrap(aggregation.ErrInvalidMaxCoverProblem, "bitlist cannot be nil or empty")
 		}
 	}
 	return nil
 }
+*/

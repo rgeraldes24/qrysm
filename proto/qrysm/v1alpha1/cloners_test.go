@@ -380,9 +380,10 @@ func TestCopyHistoricalSummaries(t *testing.T) {
 
 func genAttestation() *v1alpha1.Attestation {
 	return &v1alpha1.Attestation{
-		AggregationBits: bytes(32),
-		Data:            genAttData(),
-		Signatures:      [][]byte{bytes(32)},
+		ParticipationBits:               bytes(32),
+		Data:                            genAttData(),
+		Signatures:                      [][]byte{bytes(4595)},
+		SignaturesIdxToParticipationIdx: []uint64{1},
 	}
 }
 
@@ -431,7 +432,7 @@ func genPendingAttestation() *v1alpha1.PendingAttestation {
 func genSignedBeaconBlock() *v1alpha1.SignedBeaconBlock {
 	return &v1alpha1.SignedBeaconBlock{
 		Block:     genBeaconBlock(),
-		Signature: bytes(32),
+		Signature: bytes(4595),
 	}
 }
 
@@ -461,7 +462,7 @@ func genIndexedAttestation() *v1alpha1.IndexedAttestation {
 	return &v1alpha1.IndexedAttestation{
 		AttestingIndices: []uint64{1, 2, 3},
 		Data:             genAttData(),
-		Signatures:       [][]byte{bytes(32)},
+		Signatures:       [][]byte{bytes(4595)},
 	}
 }
 
@@ -486,16 +487,16 @@ func genBeaconBlockHeader() *v1alpha1.BeaconBlockHeader {
 func genSignedBeaconBlockHeader() *v1alpha1.SignedBeaconBlockHeader {
 	return &v1alpha1.SignedBeaconBlockHeader{
 		Header:    genBeaconBlockHeader(),
-		Signature: bytes(32),
+		Signature: bytes(4595),
 	}
 }
 
 func genDepositData() *v1alpha1.Deposit_Data {
 	return &v1alpha1.Deposit_Data{
-		PublicKey:             bytes(32),
+		PublicKey:             bytes(2592),
 		WithdrawalCredentials: bytes(32),
 		Amount:                20000,
-		Signature:             bytes(32),
+		Signature:             bytes(4595),
 	}
 }
 
@@ -524,7 +525,7 @@ func genVoluntaryExit() *v1alpha1.VoluntaryExit {
 func genSignedVoluntaryExit() *v1alpha1.SignedVoluntaryExit {
 	return &v1alpha1.SignedVoluntaryExit{
 		Exit:      genVoluntaryExit(),
-		Signature: bytes(32),
+		Signature: bytes(4595),
 	}
 }
 
@@ -538,7 +539,7 @@ func genSignedVoluntaryExits(num int) []*v1alpha1.SignedVoluntaryExit {
 
 func genValidator() *v1alpha1.Validator {
 	return &v1alpha1.Validator{
-		PublicKey:                  bytes(32),
+		PublicKey:                  bytes(2592),
 		WithdrawalCredentials:      bytes(32),
 		EffectiveBalance:           12345,
 		Slashed:                    true,
@@ -551,18 +552,19 @@ func genValidator() *v1alpha1.Validator {
 
 func genSyncCommitteeContribution() *v1alpha1.SyncCommitteeContribution {
 	return &v1alpha1.SyncCommitteeContribution{
-		Slot:              12333,
-		BlockRoot:         bytes(32),
-		SubcommitteeIndex: 4444,
-		AggregationBits:   bytes(32),
-		Signature:         bytes(32),
+		Slot:                            12333,
+		BlockRoot:                       bytes(32),
+		SubcommitteeIndex:               4444,
+		ParticipationBits:               bytes(32),
+		Signatures:                      [][]byte{bytes(4595), bytes(4595)},
+		SignaturesIdxToParticipationIdx: []uint64{1, 2},
 	}
 }
 
 func genSyncAggregate() *v1alpha1.SyncAggregate {
 	return &v1alpha1.SyncAggregate{
 		SyncCommitteeBits:       bytes(32),
-		SyncCommitteeSignatures: [][]byte{bytes(32)},
+		SyncCommitteeSignatures: [][]byte{bytes(4595)},
 	}
 }
 
@@ -628,7 +630,7 @@ func genBlindedBeaconBlock() *v1alpha1.BlindedBeaconBlock {
 func genSignedBlindedBeaconBlock() *v1alpha1.SignedBlindedBeaconBlock {
 	return &v1alpha1.SignedBlindedBeaconBlock{
 		Block:     genBlindedBeaconBlock(),
-		Signature: bytes(32),
+		Signature: bytes(4595),
 	}
 }
 
@@ -637,7 +639,7 @@ func genSyncCommitteeMessage() *v1alpha1.SyncCommitteeMessage {
 		Slot:           424555,
 		BlockRoot:      bytes(32),
 		ValidatorIndex: 5443,
-		Signature:      bytes(32),
+		Signature:      bytes(4595),
 	}
 }
 

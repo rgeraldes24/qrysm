@@ -4,7 +4,11 @@ import (
 	"io"
 	"testing"
 
+	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/sirupsen/logrus"
+	"github.com/theQRL/qrysm/v4/encoding/ssz/equality"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
 func TestMain(m *testing.M) {
@@ -13,7 +17,6 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
-/*
 func TestAggregateAttestations_AggregatePair(t *testing.T) {
 	tests := []struct {
 		a1   *zondpb.Attestation
@@ -21,19 +24,19 @@ func TestAggregateAttestations_AggregatePair(t *testing.T) {
 		want *zondpb.Attestation
 	}{
 		{
-			a1:   &zondpb.Attestation{AggregationBits: []byte{}},
-			a2:   &zondpb.Attestation{AggregationBits: []byte{}},
-			want: &zondpb.Attestation{AggregationBits: []byte{}},
+			a1:   &zondpb.Attestation{ParticipationBits: []byte{}},
+			a2:   &zondpb.Attestation{ParticipationBits: []byte{}},
+			want: &zondpb.Attestation{ParticipationBits: []byte{}},
 		},
 		{
-			a1:   &zondpb.Attestation{AggregationBits: bitfield.Bitlist{0x03}},
-			a2:   &zondpb.Attestation{AggregationBits: bitfield.Bitlist{0x02}},
-			want: &zondpb.Attestation{AggregationBits: []byte{0x03}},
+			a1:   &zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0x03}},
+			a2:   &zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0x02}},
+			want: &zondpb.Attestation{ParticipationBits: []byte{0x03}},
 		},
 		{
-			a1:   &zondpb.Attestation{AggregationBits: bitfield.Bitlist{0x02}},
-			a2:   &zondpb.Attestation{AggregationBits: bitfield.Bitlist{0x03}},
-			want: &zondpb.Attestation{AggregationBits: []byte{0x03}},
+			a1:   &zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0x02}},
+			a2:   &zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0x03}},
+			want: &zondpb.Attestation{ParticipationBits: []byte{0x03}},
 		},
 	}
 	for _, tt := range tests {
@@ -42,6 +45,9 @@ func TestAggregateAttestations_AggregatePair(t *testing.T) {
 		require.Equal(t, true, equality.DeepEqual(got, tt.want))
 	}
 }
+
+/*
+
 
 func TestAggregateAttestations_AggregatePair_OverlapFails(t *testing.T) {
 	tests := []struct {

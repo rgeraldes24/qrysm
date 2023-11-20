@@ -34,7 +34,7 @@ func ValidateNilAttestation(attestation *zondpb.Attestation) error {
 	if attestation.Data.Target == nil {
 		return errors.New("attestation's target can't be nil")
 	}
-	if attestation.AggregationBits == nil {
+	if attestation.ParticipationBits == nil {
 		return errors.New("attestation's bitfield can't be nil")
 	}
 	return nil
@@ -72,7 +72,7 @@ func IsAggregator(committeeCount uint64, slotSig []byte) (bool, error) {
 // IsAggregated returns true if the attestation is an aggregated attestation,
 // false otherwise.
 func IsAggregated(attestation *zondpb.Attestation) bool {
-	return attestation.AggregationBits.Count() > 1
+	return attestation.ParticipationBits.Count() > 1
 }
 
 // ComputeSubnetForAttestation returns the subnet for which the provided attestation will be broadcasted to.

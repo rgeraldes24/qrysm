@@ -1,7 +1,10 @@
 package sync_contribution
 
 import (
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
 )
 
 const (
@@ -17,11 +20,10 @@ type SyncContributionAggregationStrategy string
 
 var _ = logrus.WithField("prefix", "aggregation.sync_contribution")
 
-/*
 // Aggregate aggregates sync contributions. The minimal number of sync contributions is returned.
 // Aggregation occurs in-place i.e. contents of input array will be modified. Should you need to
 // preserve input sync contributions, clone them before aggregating.
-func Aggregate(cs []*zond.SyncCommitteeContribution) ([]*zond.SyncCommitteeContribution, error) {
+func Aggregate(cs []*zondpb.SyncCommitteeContribution) ([]*zondpb.SyncCommitteeContribution, error) {
 	strategy := NaiveAggregation
 	switch strategy {
 	case "", NaiveAggregation:
@@ -33,4 +35,3 @@ func Aggregate(cs []*zond.SyncCommitteeContribution) ([]*zond.SyncCommitteeContr
 		return nil, errors.Wrapf(aggregation.ErrInvalidStrategy, "%q", strategy)
 	}
 }
-*/

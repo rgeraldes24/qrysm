@@ -6,7 +6,6 @@ import (
 
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time"
 )
@@ -81,7 +80,7 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*zondpb.Attestation {
 	atts := make([]*zondpb.Attestation, len(bl))
 	for i, b := range bl {
 		atts[i] = &zondpb.Attestation{
-			AggregationBits: b,
+			ParticipationBits: b,
 			Data: &zondpb.AttestationData{
 				Slot:           42,
 				CommitteeIndex: 1,
@@ -97,10 +96,11 @@ func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector128) []*zondpb.Sy
 	c := make([]*zondpb.SyncCommitteeContribution, len(bl))
 	for i, b := range bl {
 		c[i] = &zondpb.SyncCommitteeContribution{
-			Slot:              primitives.Slot(1),
-			SubcommitteeIndex: 2,
-			AggregationBits:   b,
-			Signature:         dilithium.NewAggregateSignature().Marshal(),
+			Slot:                            primitives.Slot(1),
+			SubcommitteeIndex:               2,
+			ParticipationBits:               b,
+			Signatures:                      [][]byte{},
+			SignaturesIdxToParticipationIdx: []uint64{},
 		}
 	}
 	return c

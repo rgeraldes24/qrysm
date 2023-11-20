@@ -1,5 +1,6 @@
 package attestations
 
+/*
 import (
 	"testing"
 
@@ -36,7 +37,7 @@ func TestAggregateAttestations_MaxCover_NewMaxCover(t *testing.T) {
 			name: "single attestation",
 			args: args{
 				atts: []*zondpb.Attestation{
-					{AggregationBits: bitfield.Bitlist{0b00001010, 0b1}},
+					{ParticipationBits: bitfield.Bitlist{0b00001010, 0b1}},
 				},
 			},
 			want: &aggregation.MaxCoverProblem{
@@ -49,11 +50,11 @@ func TestAggregateAttestations_MaxCover_NewMaxCover(t *testing.T) {
 			name: "multiple attestations",
 			args: args{
 				atts: []*zondpb.Attestation{
-					{AggregationBits: bitfield.Bitlist{0b00001010, 0b1}},
-					{AggregationBits: bitfield.Bitlist{0b00101010, 0b1}},
-					{AggregationBits: bitfield.Bitlist{0b11111010, 0b1}},
-					{AggregationBits: bitfield.Bitlist{0b00000010, 0b1}},
-					{AggregationBits: bitfield.Bitlist{0b00000001, 0b1}},
+					{ParticipationBits: bitfield.Bitlist{0b00001010, 0b1}},
+					{ParticipationBits: bitfield.Bitlist{0b00101010, 0b1}},
+					{ParticipationBits: bitfield.Bitlist{0b11111010, 0b1}},
+					{ParticipationBits: bitfield.Bitlist{0b00000010, 0b1}},
+					{ParticipationBits: bitfield.Bitlist{0b00000001, 0b1}},
 				},
 			},
 			want: &aggregation.MaxCoverProblem{
@@ -98,7 +99,7 @@ func TestAggregateAttestations_MaxCover_AttList_validate(t *testing.T) {
 		{
 			name: "non first bitlist is nil",
 			atts: attList{
-				&zondpb.Attestation{AggregationBits: bitfield.NewBitlist(64)},
+				&zondpb.Attestation{ParticipationBits: bitfield.NewBitlist(64)},
 				&zondpb.Attestation{},
 			},
 			wantedErr: "bitlist cannot be nil or empty",
@@ -106,25 +107,25 @@ func TestAggregateAttestations_MaxCover_AttList_validate(t *testing.T) {
 		{
 			name: "first bitlist is empty",
 			atts: attList{
-				&zondpb.Attestation{AggregationBits: bitfield.Bitlist{}},
+				&zondpb.Attestation{ParticipationBits: bitfield.Bitlist{}},
 			},
 			wantedErr: "bitlist cannot be nil or empty",
 		},
 		{
 			name: "non first bitlist is empty",
 			atts: attList{
-				&zondpb.Attestation{AggregationBits: bitfield.NewBitlist(64)},
-				&zondpb.Attestation{AggregationBits: bitfield.Bitlist{}},
+				&zondpb.Attestation{ParticipationBits: bitfield.NewBitlist(64)},
+				&zondpb.Attestation{ParticipationBits: bitfield.Bitlist{}},
 			},
 			wantedErr: "bitlist cannot be nil or empty",
 		},
 		{
 			name: "valid bitlists",
 			atts: attList{
-				&zondpb.Attestation{AggregationBits: bitfield.NewBitlist(64)},
-				&zondpb.Attestation{AggregationBits: bitfield.NewBitlist(64)},
-				&zondpb.Attestation{AggregationBits: bitfield.NewBitlist(64)},
-				&zondpb.Attestation{AggregationBits: bitfield.NewBitlist(64)},
+				&zondpb.Attestation{ParticipationBits: bitfield.NewBitlist(64)},
+				&zondpb.Attestation{ParticipationBits: bitfield.NewBitlist(64)},
+				&zondpb.Attestation{ParticipationBits: bitfield.NewBitlist(64)},
+				&zondpb.Attestation{ParticipationBits: bitfield.NewBitlist(64)},
 			},
 		},
 	}
@@ -172,28 +173,28 @@ func TestAggregateAttestations_rearrangeProcessedAttestations(t *testing.T) {
 		{
 			name: "multiple processed, last attestation marked",
 			atts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x01}},
-				{AggregationBits: bitfield.Bitlist{0x02}},
-				{AggregationBits: bitfield.Bitlist{0x03}},
-				{AggregationBits: bitfield.Bitlist{0x04}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x01}},
+				{ParticipationBits: bitfield.Bitlist{0x02}},
+				{ParticipationBits: bitfield.Bitlist{0x03}},
+				{ParticipationBits: bitfield.Bitlist{0x04}},
 			},
 			keys: []int{1, 4}, // Only attestation at index 1, should be moved, att at 4 is already at the end.
 			wantAtts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x03}},
-				{AggregationBits: bitfield.Bitlist{0x02}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x03}},
+				{ParticipationBits: bitfield.Bitlist{0x02}},
 				nil, nil,
 			},
 		},
 		{
 			name: "all processed",
 			atts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x01}},
-				{AggregationBits: bitfield.Bitlist{0x02}},
-				{AggregationBits: bitfield.Bitlist{0x03}},
-				{AggregationBits: bitfield.Bitlist{0x04}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x01}},
+				{ParticipationBits: bitfield.Bitlist{0x02}},
+				{ParticipationBits: bitfield.Bitlist{0x03}},
+				{ParticipationBits: bitfield.Bitlist{0x04}},
 			},
 			keys: []int{0, 1, 2, 3, 4},
 			wantAtts: []*zondpb.Attestation{
@@ -203,78 +204,78 @@ func TestAggregateAttestations_rearrangeProcessedAttestations(t *testing.T) {
 		{
 			name: "operate on slice, single attestation marked",
 			atts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x01}},
-				{AggregationBits: bitfield.Bitlist{0x02}},
-				{AggregationBits: bitfield.Bitlist{0x03}},
-				{AggregationBits: bitfield.Bitlist{0x04}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x01}},
+				{ParticipationBits: bitfield.Bitlist{0x02}},
+				{ParticipationBits: bitfield.Bitlist{0x03}},
+				{ParticipationBits: bitfield.Bitlist{0x04}},
 				// Assuming some attestations have been already marked as nil, during previous rounds:
 				nil, nil, nil,
 			},
 			keys: []int{2},
 			wantAtts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x01}},
-				{AggregationBits: bitfield.Bitlist{0x04}},
-				{AggregationBits: bitfield.Bitlist{0x03}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x01}},
+				{ParticipationBits: bitfield.Bitlist{0x04}},
+				{ParticipationBits: bitfield.Bitlist{0x03}},
 				nil, nil, nil, nil,
 			},
 		},
 		{
 			name: "operate on slice, non-last attestation marked",
 			atts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x01}},
-				{AggregationBits: bitfield.Bitlist{0x02}},
-				{AggregationBits: bitfield.Bitlist{0x03}},
-				{AggregationBits: bitfield.Bitlist{0x04}},
-				{AggregationBits: bitfield.Bitlist{0x05}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x01}},
+				{ParticipationBits: bitfield.Bitlist{0x02}},
+				{ParticipationBits: bitfield.Bitlist{0x03}},
+				{ParticipationBits: bitfield.Bitlist{0x04}},
+				{ParticipationBits: bitfield.Bitlist{0x05}},
 				// Assuming some attestations have been already marked as nil, during previous rounds:
 				nil, nil, nil,
 			},
 			keys: []int{2, 3},
 			wantAtts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x01}},
-				{AggregationBits: bitfield.Bitlist{0x05}},
-				{AggregationBits: bitfield.Bitlist{0x04}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x01}},
+				{ParticipationBits: bitfield.Bitlist{0x05}},
+				{ParticipationBits: bitfield.Bitlist{0x04}},
 				nil, nil, nil, nil, nil,
 			},
 		},
 		{
 			name: "operate on slice, last attestation marked",
 			atts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x01}},
-				{AggregationBits: bitfield.Bitlist{0x02}},
-				{AggregationBits: bitfield.Bitlist{0x03}},
-				{AggregationBits: bitfield.Bitlist{0x04}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x01}},
+				{ParticipationBits: bitfield.Bitlist{0x02}},
+				{ParticipationBits: bitfield.Bitlist{0x03}},
+				{ParticipationBits: bitfield.Bitlist{0x04}},
 				// Assuming some attestations have been already marked as nil, during previous rounds:
 				nil, nil, nil,
 			},
 			keys: []int{2, 4},
 			wantAtts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x01}},
-				{AggregationBits: bitfield.Bitlist{0x03}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x01}},
+				{ParticipationBits: bitfield.Bitlist{0x03}},
 				nil, nil, nil, nil, nil,
 			},
 		},
 		{
 			name: "many items, many selected, keys unsorted",
 			atts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x01}},
-				{AggregationBits: bitfield.Bitlist{0x02}},
-				{AggregationBits: bitfield.Bitlist{0x03}},
-				{AggregationBits: bitfield.Bitlist{0x04}},
-				{AggregationBits: bitfield.Bitlist{0x05}},
-				{AggregationBits: bitfield.Bitlist{0x06}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x01}},
+				{ParticipationBits: bitfield.Bitlist{0x02}},
+				{ParticipationBits: bitfield.Bitlist{0x03}},
+				{ParticipationBits: bitfield.Bitlist{0x04}},
+				{ParticipationBits: bitfield.Bitlist{0x05}},
+				{ParticipationBits: bitfield.Bitlist{0x06}},
 			},
 			keys: []int{4, 1, 2, 5, 6},
 			wantAtts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x03}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x03}},
 				nil, nil, nil, nil, nil,
 			},
 		},
@@ -285,7 +286,7 @@ func TestAggregateAttestations_rearrangeProcessedAttestations(t *testing.T) {
 			for i := 0; i < len(tt.atts); i++ {
 				if tt.atts[i] != nil {
 					var err error
-					candidates[i], err = tt.atts[i].AggregationBits.ToBitlist64()
+					candidates[i], err = tt.atts[i].ParticipationBits.ToBitlist64()
 					if err != nil {
 						t.Error(err)
 					}

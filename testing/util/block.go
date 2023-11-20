@@ -465,7 +465,7 @@ func HydrateBeaconBlock(b *zondpb.BeaconBlock) *zondpb.BeaconBlock {
 	if b.StateRoot == nil {
 		b.StateRoot = make([]byte, fieldparams.RootLength)
 	}
-	b.Body = HydrateBeaconBlockBody(b.Body)
+	b.Body = HydrateV1BeaconBlockBody(b.Body)
 	return b
 }
 
@@ -516,19 +516,19 @@ func HydrateV1BeaconBlockBody(b *v1.BeaconBlockBody) *v1.BeaconBlockBody {
 	return b
 }
 
-// HydrateSignedBlindedBeaconBlockCapella hydrates a signed blinded beacon block with correct field length sizes
+// HydrateSignedBlindedBeaconBlock hydrates a signed blinded beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateSignedBlindedBeaconBlockCapella(b *zondpb.SignedBlindedBeaconBlock) *zondpb.SignedBlindedBeaconBlock {
+func HydrateSignedBlindedBeaconBlock(b *zondpb.SignedBlindedBeaconBlock) *zondpb.SignedBlindedBeaconBlock {
 	if b.Signature == nil {
 		b.Signature = make([]byte, dilithium2.CryptoBytes)
 	}
-	b.Block = HydrateBlindedBeaconBlockCapella(b.Block)
+	b.Block = HydrateBlindedBeaconBlock(b.Block)
 	return b
 }
 
-// HydrateBlindedBeaconBlockCapella hydrates a blinded beacon block with correct field length sizes
+// HydrateBlindedBeaconBlock hydrates a blinded beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateBlindedBeaconBlockCapella(b *zondpb.BlindedBeaconBlock) *zondpb.BlindedBeaconBlock {
+func HydrateBlindedBeaconBlock(b *zondpb.BlindedBeaconBlock) *zondpb.BlindedBeaconBlock {
 	if b == nil {
 		b = &zondpb.BlindedBeaconBlock{}
 	}
@@ -584,19 +584,19 @@ func HydrateBlindedBeaconBlockBody(b *zondpb.BlindedBeaconBlockBody) *zondpb.Bli
 	return b
 }
 
-// HydrateV2SignedBlindedBeaconBlockCapella hydrates a signed blinded beacon block with correct field length sizes
+// HydrateV1SignedBlindedBeaconBlock hydrates a signed blinded beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV2SignedBlindedBeaconBlockCapella(b *v1.SignedBlindedBeaconBlock) *v1.SignedBlindedBeaconBlock {
+func HydrateV1SignedBlindedBeaconBlock(b *v1.SignedBlindedBeaconBlock) *v1.SignedBlindedBeaconBlock {
 	if b.Signature == nil {
 		b.Signature = make([]byte, dilithium2.CryptoBytes)
 	}
-	b.Message = HydrateV2BlindedBeaconBlockCapella(b.Message)
+	b.Message = HydrateV1BlindedBeaconBlock(b.Message)
 	return b
 }
 
-// HydrateV2BlindedBeaconBlockCapella hydrates a blinded beacon block with correct field length sizes
+// HydrateV1BlindedBeaconBlock hydrates a blinded beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV2BlindedBeaconBlockCapella(b *v1.BlindedBeaconBlock) *v1.BlindedBeaconBlock {
+func HydrateV1BlindedBeaconBlock(b *v1.BlindedBeaconBlock) *v1.BlindedBeaconBlock {
 	if b == nil {
 		b = &v1.BlindedBeaconBlock{}
 	}
@@ -606,13 +606,13 @@ func HydrateV2BlindedBeaconBlockCapella(b *v1.BlindedBeaconBlock) *v1.BlindedBea
 	if b.StateRoot == nil {
 		b.StateRoot = make([]byte, fieldparams.RootLength)
 	}
-	b.Body = HydrateV2BlindedBeaconBlockBodyCapella(b.Body)
+	b.Body = HydrateV1BlindedBeaconBlockBody(b.Body)
 	return b
 }
 
-// HydrateV2BlindedBeaconBlockBodyCapella hydrates a blinded beacon block body with correct field length sizes
+// HydrateV1BlindedBeaconBlockBody hydrates a blinded beacon block body with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV2BlindedBeaconBlockBodyCapella(b *v1.BlindedBeaconBlockBody) *v1.BlindedBeaconBlockBody {
+func HydrateV1BlindedBeaconBlockBody(b *v1.BlindedBeaconBlockBody) *v1.BlindedBeaconBlockBody {
 	if b == nil {
 		b = &v1.BlindedBeaconBlockBody{}
 	}

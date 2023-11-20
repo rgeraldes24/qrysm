@@ -266,7 +266,7 @@ func VerifyAttestationBitfieldLengths(ctx context.Context, state state.ReadOnlyB
 		return errors.New("no committee exist for this attestation")
 	}
 
-	if err := VerifyBitfieldLength(att.AggregationBits, uint64(len(committee))); err != nil {
+	if err := VerifyBitfieldLength(att.ParticipationBits, uint64(len(committee))); err != nil {
 		return errors.Wrap(err, "failed to verify aggregation bitfield")
 	}
 	return nil

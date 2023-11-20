@@ -147,7 +147,7 @@ func ProcessAttestationNoVerifySignature(
 	}
 	pendingAtt := &zondpb.PendingAttestation{
 		Data:            data,
-		AggregationBits: att.AggregationBits,
+		AggregationBits: att.ParticipationBits,
 		InclusionDelay:  beaconState.Slot() - s,
 		ProposerIndex:   proposerIndex,
 	}

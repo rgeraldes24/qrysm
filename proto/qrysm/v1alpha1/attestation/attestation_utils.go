@@ -41,12 +41,13 @@ func (s sortByValidatorIdx) Less(i, j int) bool {
 // TODO(rgeraldes24): is committeeLen enough? instead of the committee
 // ConvertToIndexed converts attestation to (almost) indexed-verifiable form.
 func ConvertToIndexed(ctx context.Context, attestation *zondpb.Attestation, committee []primitives.ValidatorIndex) (*zondpb.IndexedAttestation, error) {
-	if bf := attestation.AggregationBits; bf.Len() != uint64(len(committee)) {
+	if bf := attestation.ParticipationBits; bf.Len() != uint64(len(committee)) {
 		return nil, fmt.Errorf("bitfield length %d is not equal to committee length %d", bf.Len(), len(committee))
 	}
 
+	// FIX given that we need to order by val idx and not participation idx but we are given the committee
 	sigSlices := signatureSlices{
-		signaturesIdxToValidatorIdx: attestation.SignaturesIdxToValidatorIdx,
+		signaturesIdxToValidatorIdx: attestation.SignaturesIdxToParticipationIdx,
 		signatures:                  attestation.Signatures,
 	}
 	sort.Sort(sortByValidatorIdx(sigSlices))
