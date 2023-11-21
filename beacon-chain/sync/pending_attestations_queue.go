@@ -141,7 +141,7 @@ func (s *Service) processAttestations(ctx context.Context, attestations []*zondp
 					log.WithError(err).Debug("Could not save unaggregated attestation")
 					continue
 				}
-				s.setSeenCommitteeIndicesSlot(att.Aggregate.Data.Slot, att.Aggregate.Data.CommitteeIndex, att.Aggregate.AggregationBits)
+				s.setSeenCommitteeIndicesSlot(att.Aggregate.Data.Slot, att.Aggregate.Data.CommitteeIndex, att.Aggregate.ParticipationBits)
 
 				valCount, err := helpers.ActiveValidatorCount(ctx, preState, slots.ToEpoch(att.Aggregate.Data.Slot))
 				if err != nil {

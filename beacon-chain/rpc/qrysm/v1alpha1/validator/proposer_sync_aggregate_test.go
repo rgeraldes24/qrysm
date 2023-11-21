@@ -27,7 +27,7 @@ func TestProposerSyncContributions_FilterByBlockRoot(t *testing.T) {
 		{
 			name: "single item, not found",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits[:]},
 			},
 			want: proposerSyncContributions{},
 		},
@@ -80,7 +80,7 @@ func TestProposerSyncContributions_FilterBySubcommitteeID(t *testing.T) {
 		{
 			name: "single item, not found",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits[:], SubcommitteeIndex: 1},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits[:], SubcommitteeIndex: 1},
 			},
 			want: proposerSyncContributions{},
 		},
@@ -195,194 +195,194 @@ func TestProposerSyncContributions_Dedup(t *testing.T) {
 		{
 			name: "single item",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits1[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits1[:]},
 			},
 		},
 		{
 			name: "two items no duplicates",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits2_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits2_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits2_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits2_2[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits2_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits2_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits2_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits2_1[:]},
 			},
 		},
 		{
 			name: "two items with duplicates",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits3[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits3[:]},
 			},
 		},
 		{
 			name: "sorted no duplicates",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_4[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_5[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_5[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_4[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_5[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_5[:]},
 			},
 		},
 		{
 			name: "sorted with duplicates",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits5_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits5_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits5_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits5_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits5_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits5_4[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits5_4[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits5_5[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits5_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits5_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits5_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits5_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits5_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits5_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits5_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits5_5[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits5_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits5_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits5_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits5_2[:]},
 			},
 		},
 		{
 			name: "all equal",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits6[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits6[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits6[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits6[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits6[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits6[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits6[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits6[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits6[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits6[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits6[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits6[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits6[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits6[:]},
 			},
 		},
 		{
 			name: "unsorted no duplicates",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits7_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits7_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits7_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits7_4[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits7_5[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits7_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits7_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits7_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits7_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits7_5[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits7_5[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits7_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits7_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits7_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits7_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits7_5[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits7_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits7_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits7_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits7_4[:]},
 			},
 		},
 		{
 			name: "unsorted with duplicates",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_4[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_5[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_6[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_5[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_6[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_4[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_6[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits8_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_6[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits8_3[:]},
 			},
 		},
 		{
 			name: "no proper subset (same root)",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits9_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits9_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits9_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits9_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits9_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits9_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits9_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits9_4[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits9_4[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits9_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits9_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits9_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits9_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits9_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits9_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits9_3[:]},
 			},
 		},
 		{
 			name: "proper subset (same root)",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits10_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits10_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits10_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits10_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits10_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits10_4[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits10_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits10_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits10_5[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits10_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits10_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits10_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits10_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits10_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits10_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits10_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits10_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits10_5[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits10_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits10_5[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits10_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits10_5[:]},
 			},
 		},
 		{
 			name: "no proper subset (different index)",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits11_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits11_2[:]},
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits11_3[:]},
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits11_4[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits11_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits11_2[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits11_3[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits11_4[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits11_4[:]},
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits11_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits11_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits11_1[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits11_4[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits11_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits11_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits11_1[:]},
 			},
 		},
 		{
 			name: "proper subset (different index 1)",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits12_1[:]},
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits12_2[:]},
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits12_1[:]},
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits12_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits12_3[:]},
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits12_4[:]},
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits12_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits12_3[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits12_5[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits12_1[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits12_2[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits12_1[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits12_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits12_3[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits12_4[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits12_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits12_3[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits12_5[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits12_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits12_5[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits12_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits12_5[:]},
 			},
 		},
 		{
 			name: "proper subset (different index 2)",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits13_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits13_2[:]},
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits13_1[:]},
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits13_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits13_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits13_2[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits13_1[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits13_2[:]},
 			},
 			want: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, AggregationBits: aggBits13_2[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits13_2[:]},
+				&v2.SyncCommitteeContribution{SubcommitteeIndex: 1, ParticipationBits: aggBits13_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits13_2[:]},
 			},
 		},
 	}
@@ -393,13 +393,13 @@ func TestProposerSyncContributions_Dedup(t *testing.T) {
 				t.Error(err)
 			}
 			sort.Slice(cs, func(i, j int) bool {
-				if cs[i].AggregationBits.Count() == cs[j].AggregationBits.Count() {
+				if cs[i].ParticipationBits.Count() == cs[j].ParticipationBits.Count() {
 					if cs[i].SubcommitteeIndex == cs[j].SubcommitteeIndex {
-						return bytes.Compare(cs[i].AggregationBits, cs[j].AggregationBits) <= 0
+						return bytes.Compare(cs[i].ParticipationBits, cs[j].ParticipationBits) <= 0
 					}
 					return cs[i].SubcommitteeIndex > cs[j].SubcommitteeIndex
 				}
-				return cs[i].AggregationBits.Count() > cs[j].AggregationBits.Count()
+				return cs[i].ParticipationBits.Count() > cs[j].ParticipationBits.Count()
 			})
 			assert.DeepEqual(t, tt.want, cs)
 		})
@@ -429,34 +429,34 @@ func TestProposerSyncContributions_MostProfitable(t *testing.T) {
 		{
 			name: "Same item",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits1[:]},
 			},
-			want: &v2.SyncCommitteeContribution{AggregationBits: aggBits1[:]},
+			want: &v2.SyncCommitteeContribution{ParticipationBits: aggBits1[:]},
 		},
 		{
 			name: "Same item again",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits2_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits2_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits2_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits2_2[:]},
 			},
-			want: &v2.SyncCommitteeContribution{AggregationBits: aggBits2_1[:]},
+			want: &v2.SyncCommitteeContribution{ParticipationBits: aggBits2_1[:]},
 		},
 		{
 			name: "most profitable at the start",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits3_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits3_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits3_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits3_2[:]},
 			},
-			want: &v2.SyncCommitteeContribution{AggregationBits: aggBits3_1[:]},
+			want: &v2.SyncCommitteeContribution{ParticipationBits: aggBits3_1[:]},
 		},
 		{
 			name: "most profitable at the end",
 			cs: proposerSyncContributions{
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_1[:]},
-				&v2.SyncCommitteeContribution{AggregationBits: aggBits4_2[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_1[:]},
+				&v2.SyncCommitteeContribution{ParticipationBits: aggBits4_2[:]},
 			},
-			want: &v2.SyncCommitteeContribution{AggregationBits: aggBits4_2[:]},
+			want: &v2.SyncCommitteeContribution{ParticipationBits: aggBits4_2[:]},
 		},
 	}
 	for _, tt := range tests {

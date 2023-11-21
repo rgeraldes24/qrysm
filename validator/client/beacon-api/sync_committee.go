@@ -145,9 +145,9 @@ func convertSyncContributionJsonToProto(contribution *apimiddleware.SyncCommitte
 		return nil, errors.Wrapf(err, "failed to parse subcommittee index `%s`", contribution.SubcommitteeIndex)
 	}
 
-	aggregationBits, err := hexutil.Decode(contribution.AggregationBits)
+	aggregationBits, err := hexutil.Decode(contribution.ParticipationBits)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode aggregation bits `%s`", contribution.AggregationBits)
+		return nil, errors.Wrapf(err, "failed to decode aggregation bits `%s`", contribution.ParticipationBits)
 	}
 
 	signature, err := hexutil.Decode(contribution.Signature)
@@ -159,7 +159,7 @@ func convertSyncContributionJsonToProto(contribution *apimiddleware.SyncCommitte
 		Slot:              primitives.Slot(slot),
 		BlockRoot:         blockRoot,
 		SubcommitteeIndex: subcommitteeIdx,
-		AggregationBits:   aggregationBits,
+		ParticipationBits: aggregationBits,
 		Signature:         signature,
 	}, nil
 }

@@ -27,7 +27,7 @@ func TestBeaconAggregateProofSubscriber_CanSaveAggregatedAttestation(t *testing.
 	a := &zondpb.SignedAggregateAttestationAndProof{
 		Message: &zondpb.AggregateAttestationAndProof{
 			Aggregate: util.HydrateAttestation(&zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0x07},
+				ParticipationBits: bitfield.Bitlist{0x07},
 			}),
 			AggregatorIndex: 100,
 		},
@@ -49,8 +49,8 @@ func TestBeaconAggregateProofSubscriber_CanSaveUnaggregatedAttestation(t *testin
 	a := &zondpb.SignedAggregateAttestationAndProof{
 		Message: &zondpb.AggregateAttestationAndProof{
 			Aggregate: util.HydrateAttestation(&zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0x03},
-				Signature:       make([]byte, dilithium2.CryptoBytes),
+				ParticipationBits: bitfield.Bitlist{0x03},
+				Signature:         make([]byte, dilithium2.CryptoBytes),
 			}),
 			AggregatorIndex: 100,
 		},

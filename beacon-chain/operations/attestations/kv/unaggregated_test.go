@@ -29,7 +29,7 @@ func TestKV_Unaggregated_SaveUnaggregatedAttestation(t *testing.T) {
 		},
 		{
 			name:          "already aggregated",
-			att:           &zondpb.Attestation{AggregationBits: bitfield.Bitlist{0b10101}, Data: &zondpb.AttestationData{Slot: 2}},
+			att:           &zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0b10101}, Data: &zondpb.AttestationData{Slot: 2}},
 			wantErrString: "attestation is aggregated",
 		},
 		{
@@ -43,7 +43,7 @@ func TestKV_Unaggregated_SaveUnaggregatedAttestation(t *testing.T) {
 		},
 		{
 			name:  "normal save",
-			att:   util.HydrateAttestation(&zondpb.Attestation{AggregationBits: bitfield.Bitlist{0b0001}}),
+			att:   util.HydrateAttestation(&zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0b0001}}),
 			count: 1,
 		},
 		{
@@ -52,7 +52,7 @@ func TestKV_Unaggregated_SaveUnaggregatedAttestation(t *testing.T) {
 				Data: &zondpb.AttestationData{
 					Slot: 100,
 				},
-				AggregationBits: bitfield.Bitlist{0b10000001},
+				ParticipationBits: bitfield.Bitlist{0b10000001},
 			}),
 			count: 0,
 		},
@@ -102,7 +102,7 @@ func TestKV_Unaggregated_SaveUnaggregatedAttestations(t *testing.T) {
 			name: "has aggregated",
 			atts: []*zondpb.Attestation{
 				util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}}),
-				{AggregationBits: bitfield.Bitlist{0b1111}, Data: &zondpb.AttestationData{Slot: 2}},
+				{ParticipationBits: bitfield.Bitlist{0b1111}, Data: &zondpb.AttestationData{Slot: 2}},
 				util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}}),
 			},
 			wantErrString: "attestation is aggregated",
@@ -135,16 +135,16 @@ func TestKV_Unaggregated_DeleteUnaggregatedAttestation(t *testing.T) {
 
 	t.Run("aggregated attestation", func(t *testing.T) {
 		cache := NewAttCaches()
-		att := &zondpb.Attestation{AggregationBits: bitfield.Bitlist{0b1111}, Data: &zondpb.AttestationData{Slot: 2}}
+		att := &zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0b1111}, Data: &zondpb.AttestationData{Slot: 2}}
 		err := cache.DeleteUnaggregatedAttestation(att)
 		assert.ErrorContains(t, "attestation is aggregated", err)
 	})
 
 	t.Run("successful deletion", func(t *testing.T) {
 		cache := NewAttCaches()
-		att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b101}})
-		att2 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}, AggregationBits: bitfield.Bitlist{0b110}})
-		att3 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, AggregationBits: bitfield.Bitlist{0b110}})
+		att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b101}})
+		att2 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}, ParticipationBits: bitfield.Bitlist{0b110}})
+		att3 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, ParticipationBits: bitfield.Bitlist{0b110}})
 		atts := []*zondpb.Attestation{att1, att2, att3}
 		require.NoError(t, cache.SaveUnaggregatedAttestations(atts))
 		for _, att := range atts {
@@ -169,9 +169,9 @@ func TestKV_Unaggregated_DeleteSeenUnaggregatedAttestations(t *testing.T) {
 	t.Run("none seen", func(t *testing.T) {
 		cache := NewAttCaches()
 		atts := []*zondpb.Attestation{
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1001}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1010}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1100}}),
+			util.HydrateAttestation(&zondpb.Attestation{Data: d, ParticipationBits: bitfield.Bitlist{0b1001}}),
+			util.HydrateAttestation(&zondpb.Attestation{Data: d, ParticipationBits: bitfield.Bitlist{0b1010}}),
+			util.HydrateAttestation(&zondpb.Attestation{Data: d, ParticipationBits: bitfield.Bitlist{0b1100}}),
 		}
 		require.NoError(t, cache.SaveUnaggregatedAttestations(atts))
 		assert.Equal(t, 3, cache.UnaggregatedAttestationCount())
@@ -186,9 +186,9 @@ func TestKV_Unaggregated_DeleteSeenUnaggregatedAttestations(t *testing.T) {
 	t.Run("some seen", func(t *testing.T) {
 		cache := NewAttCaches()
 		atts := []*zondpb.Attestation{
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1001}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1010}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1100}}),
+			util.HydrateAttestation(&zondpb.Attestation{Data: d, ParticipationBits: bitfield.Bitlist{0b1001}}),
+			util.HydrateAttestation(&zondpb.Attestation{Data: d, ParticipationBits: bitfield.Bitlist{0b1010}}),
+			util.HydrateAttestation(&zondpb.Attestation{Data: d, ParticipationBits: bitfield.Bitlist{0b1100}}),
 		}
 		require.NoError(t, cache.SaveUnaggregatedAttestations(atts))
 		assert.Equal(t, 3, cache.UnaggregatedAttestationCount())
@@ -202,7 +202,7 @@ func TestKV_Unaggregated_DeleteSeenUnaggregatedAttestations(t *testing.T) {
 		assert.Equal(t, 2, cache.UnaggregatedAttestationCount())
 		returned, err := cache.UnaggregatedAttestations()
 		sort.Slice(returned, func(i, j int) bool {
-			return bytes.Compare(returned[i].AggregationBits, returned[j].AggregationBits) < 0
+			return bytes.Compare(returned[i].ParticipationBits, returned[j].ParticipationBits) < 0
 		})
 		require.NoError(t, err)
 		assert.DeepEqual(t, []*zondpb.Attestation{atts[0], atts[2]}, returned)
@@ -211,9 +211,9 @@ func TestKV_Unaggregated_DeleteSeenUnaggregatedAttestations(t *testing.T) {
 	t.Run("all seen", func(t *testing.T) {
 		cache := NewAttCaches()
 		atts := []*zondpb.Attestation{
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1001}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1010}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1100}}),
+			util.HydrateAttestation(&zondpb.Attestation{Data: d, ParticipationBits: bitfield.Bitlist{0b1001}}),
+			util.HydrateAttestation(&zondpb.Attestation{Data: d, ParticipationBits: bitfield.Bitlist{0b1010}}),
+			util.HydrateAttestation(&zondpb.Attestation{Data: d, ParticipationBits: bitfield.Bitlist{0b1100}}),
 		}
 		require.NoError(t, cache.SaveUnaggregatedAttestations(atts))
 		assert.Equal(t, 3, cache.UnaggregatedAttestationCount())
@@ -236,9 +236,9 @@ func TestKV_Unaggregated_DeleteSeenUnaggregatedAttestations(t *testing.T) {
 func TestKV_Unaggregated_UnaggregatedAttestationsBySlotIndex(t *testing.T) {
 	cache := NewAttCaches()
 
-	att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1, CommitteeIndex: 1}, AggregationBits: bitfield.Bitlist{0b101}})
-	att2 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1, CommitteeIndex: 2}, AggregationBits: bitfield.Bitlist{0b110}})
-	att3 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2, CommitteeIndex: 1}, AggregationBits: bitfield.Bitlist{0b110}})
+	att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1, CommitteeIndex: 1}, ParticipationBits: bitfield.Bitlist{0b101}})
+	att2 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1, CommitteeIndex: 2}, ParticipationBits: bitfield.Bitlist{0b110}})
+	att3 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2, CommitteeIndex: 1}, ParticipationBits: bitfield.Bitlist{0b110}})
 	atts := []*zondpb.Attestation{att1, att2, att3}
 
 	for _, att := range atts {

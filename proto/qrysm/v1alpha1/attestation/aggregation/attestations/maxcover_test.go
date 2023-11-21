@@ -333,8 +333,8 @@ func TestAggregateAttestations_aggregateAttestations(t *testing.T) {
 		{
 			name: "two attestations, none selected",
 			atts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x01}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x01}},
 			},
 			wantTargetIdx: 0,
 			wantErr:       ErrInvalidAttestationCount.Error(),
@@ -343,8 +343,8 @@ func TestAggregateAttestations_aggregateAttestations(t *testing.T) {
 		{
 			name: "two attestations, one selected",
 			atts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x00}},
-				{AggregationBits: bitfield.Bitlist{0x01}},
+				{ParticipationBits: bitfield.Bitlist{0x00}},
+				{ParticipationBits: bitfield.Bitlist{0x01}},
 			},
 			wantTargetIdx: 0,
 			wantErr:       ErrInvalidAttestationCount.Error(),
@@ -353,12 +353,12 @@ func TestAggregateAttestations_aggregateAttestations(t *testing.T) {
 		{
 			name: "two attestations, both selected, empty coverage",
 			atts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0b00000001, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0b00000110, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0b00000001, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0b00000110, 0b1}, Signatures: [][]byte{sign}},
 			},
 			wantAtts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0b00000111, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0b00000110, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0b00000111, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0b00000110, 0b1}, Signatures: [][]byte{sign}},
 			},
 			wantTargetIdx: 0,
 			wantErr:       "invalid or empty coverage",
@@ -367,12 +367,12 @@ func TestAggregateAttestations_aggregateAttestations(t *testing.T) {
 		{
 			name: "two attestations, both selected",
 			atts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000001, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000010, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000001, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000010, 0b1}, Signatures: [][]byte{sign}},
 			},
 			wantAtts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000011, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000010, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000011, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000010, 0b1}, Signatures: [][]byte{sign}},
 			},
 			wantTargetIdx: 0,
 			keys:          []int{0, 1},
@@ -387,20 +387,20 @@ func TestAggregateAttestations_aggregateAttestations(t *testing.T) {
 		{
 			name: "many attestations, several selected",
 			atts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000001, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000010, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000100, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00001000, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00010000, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00100000, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000001, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000010, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000100, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00001000, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00010000, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00100000, 0b1}, Signatures: [][]byte{sign}},
 			},
 			wantAtts: []*zondpb.Attestation{
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000001, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00010110, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000100, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00001000, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00010000, 0b1}, Signatures: [][]byte{sign}},
-				{AggregationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00100000, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000001, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00010110, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00000100, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00001000, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00010000, 0b1}, Signatures: [][]byte{sign}},
+				{ParticipationBits: bitfield.Bitlist{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0b00100000, 0b1}, Signatures: [][]byte{sign}},
 			},
 			wantTargetIdx: 1,
 			keys:          []int{1, 2, 4},
@@ -426,7 +426,7 @@ func TestAggregateAttestations_aggregateAttestations(t *testing.T) {
 			extractBitlists := func(atts []*zondpb.Attestation) []bitfield.Bitlist {
 				bl := make([]bitfield.Bitlist, len(atts))
 				for i, att := range atts {
-					bl[i] = att.AggregationBits
+					bl[i] = att.ParticipationBits
 				}
 				return bl
 			}

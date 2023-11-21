@@ -156,7 +156,7 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 		Data: &zondpb.AttestationData{
 			Target: &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		},
-		AggregationBits: bitfield.Bitlist{0xC0, 0xC0, 0xC0, 0xC0, 0x01},
+		ParticipationBits: bitfield.Bitlist{0xC0, 0xC0, 0xC0, 0xC0, 0x01},
 	})
 	attestations := []*zondpb.Attestation{blockAtt}
 	var exits []*zondpb.SignedVoluntaryExit
@@ -306,12 +306,12 @@ func createFullBlockWithOperations(t *testing.T) (state.BeaconState,
 			Slot:   beaconState.Slot(),
 			Target: &zondpb.Checkpoint{Epoch: time.CurrentEpoch(beaconState)},
 			Source: &zondpb.Checkpoint{Root: mockRoot[:]}},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	})
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, blockAtt.Data.Slot, blockAtt.Data.CommitteeIndex)
 	assert.NoError(t, err)
-	attestingIndices, err := attestation.AttestingIndices(blockAtt.AggregationBits, committee)
+	attestingIndices, err := attestation.AttestingIndices(blockAtt.ParticipationBits, committee)
 	require.NoError(t, err)
 	assert.NoError(t, err)
 	hashTreeRoot, err = signing.ComputeSigningRoot(blockAtt.Data, domain)

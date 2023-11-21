@@ -77,7 +77,7 @@ func TestServer_ListAttestations_Genesis(t *testing.T) {
 	}
 
 	att := util.HydrateAttestation(&zondpb.Attestation{
-		AggregationBits: bitfield.NewBitlist(0),
+		ParticipationBits: bitfield.NewBitlist(0),
 		Data: &zondpb.AttestationData{
 			Slot:           2,
 			CommitteeIndex: 1,
@@ -124,7 +124,7 @@ func TestServer_ListAttestations_NoPagination(t *testing.T) {
 					BeaconBlockRoot: bytesutil.PadTo([]byte("root"), 32),
 					Slot:            i,
 				},
-				AggregationBits: bitfield.Bitlist{0b11},
+				ParticipationBits: bitfield.Bitlist{0b11},
 			},
 		}
 		util.SaveBlock(t, ctx, db, blockExample)
@@ -174,8 +174,8 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 									},
 									Slot: 3,
 								},
-								AggregationBits: bitfield.Bitlist{0b11},
-								Signatures:      [][]byte{bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes)},
+								ParticipationBits: bitfield.Bitlist{0b11},
+								Signatures:        [][]byte{bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes)},
 							},
 						},
 					},
@@ -199,8 +199,8 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 								},
 								Slot: 4 + params.BeaconConfig().SlotsPerEpoch,
 							},
-							AggregationBits: bitfield.Bitlist{0b11},
-							Signatures:      [][]byte{bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes)},
+							ParticipationBits: bitfield.Bitlist{0b11},
+							Signatures:        [][]byte{bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes)},
 						},
 					},
 				},
@@ -225,8 +225,8 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 									},
 									Slot: 4,
 								},
-								AggregationBits: bitfield.Bitlist{0b11},
-								Signatures:      [][]byte{bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes)},
+								ParticipationBits: bitfield.Bitlist{0b11},
+								Signatures:        [][]byte{bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes)},
 							},
 						},
 					},
@@ -275,7 +275,7 @@ func TestServer_ListAttestations_Pagination_CustomPageParameters(t *testing.T) {
 						CommitteeIndex: s,
 						Slot:           i,
 					},
-					AggregationBits: bitfield.Bitlist{0b11},
+					ParticipationBits: bitfield.Bitlist{0b11},
 				}),
 			}
 			util.SaveBlock(t, ctx, db, blockExample)
@@ -380,8 +380,8 @@ func TestServer_ListAttestations_Pagination_OutOfRange(t *testing.T) {
 								Target:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 								Slot:            i,
 							},
-							AggregationBits: bitfield.Bitlist{0b11},
-							Signatures:      make([][]byte, dilithium2.CryptoBytes),
+							ParticipationBits: bitfield.Bitlist{0b11},
+							Signatures:        make([][]byte, dilithium2.CryptoBytes),
 						},
 					},
 				},
@@ -434,8 +434,8 @@ func TestServer_ListAttestations_Pagination_DefaultPageSize(t *testing.T) {
 					Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
 					Slot:            i,
 				},
-				Signatures:      [][]byte{bytesutil.PadTo([]byte("root"), dilithium2.CryptoBytes)},
-				AggregationBits: bitfield.Bitlist{0b11},
+				Signatures:        [][]byte{bytesutil.PadTo([]byte("root"), dilithium2.CryptoBytes)},
+				ParticipationBits: bitfield.Bitlist{0b11},
 			},
 		}
 		util.SaveBlock(t, ctx, db, blockExample)
@@ -478,7 +478,7 @@ func TestServer_mapAttestationToTargetRoot(t *testing.T) {
 					Root: targetRoot[:],
 				},
 			},
-			AggregationBits: bitfield.Bitlist{0b11},
+			ParticipationBits: bitfield.Bitlist{0b11},
 		}
 
 	}
@@ -525,7 +525,7 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 					Slot:           i,
 					CommitteeIndex: 0,
 				},
-				AggregationBits: bitfield.NewBitlist(128 / uint64(params.BeaconConfig().SlotsPerEpoch)),
+				ParticipationBits: bitfield.NewBitlist(128 / uint64(params.BeaconConfig().SlotsPerEpoch)),
 			},
 		}
 		util.SaveBlock(t, ctx, db, blockExample)
@@ -627,7 +627,7 @@ func TestServer_ListIndexedAttestations_OldEpoch(t *testing.T) {
 									Root:  make([]byte, fieldparams.RootLength),
 								},
 							},
-							AggregationBits: bitfield.Bitlist{0b11},
+							ParticipationBits: bitfield.Bitlist{0b11},
 						},
 					},
 				},
@@ -706,8 +706,8 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{1}, 32)},
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{1}, 32)},
 			},
-			AggregationBits: bitfield.Bitlist{0b1101},
-			Signatures:      [][]byte{bytesutil.PadTo([]byte{1}, dilithium2.CryptoBytes)},
+			ParticipationBits: bitfield.Bitlist{0b1101},
+			Signatures:        [][]byte{bytesutil.PadTo([]byte{1}, dilithium2.CryptoBytes)},
 		},
 		{
 			Data: &zondpb.AttestationData{
@@ -716,8 +716,8 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{2}, 32)},
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{2}, 32)},
 			},
-			AggregationBits: bitfield.Bitlist{0b1101},
-			Signatures:      [][]byte{bytesutil.PadTo([]byte{2}, dilithium2.CryptoBytes)},
+			ParticipationBits: bitfield.Bitlist{0b1101},
+			Signatures:        [][]byte{bytesutil.PadTo([]byte{2}, dilithium2.CryptoBytes)},
 		},
 		{
 			Data: &zondpb.AttestationData{
@@ -726,8 +726,8 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{3}, 32)},
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{3}, 32)},
 			},
-			AggregationBits: bitfield.Bitlist{0b1101},
-			Signatures:      [][]byte{bytesutil.PadTo([]byte{3}, dilithium2.CryptoBytes)},
+			ParticipationBits: bitfield.Bitlist{0b1101},
+			Signatures:        [][]byte{bytesutil.PadTo([]byte{3}, dilithium2.CryptoBytes)},
 		},
 	}
 	require.NoError(t, bs.AttestationsPool.SaveAggregatedAttestations(atts))
@@ -921,7 +921,7 @@ func TestServer_StreamIndexedAttestations_OK(t *testing.T) {
 			attExample.Data.CommitteeIndex = committeeIndex
 			aggregationBitfield := bitfield.NewBitlist(uint64(committeeLength))
 			aggregationBitfield.SetBitAt(indexInCommittee, true)
-			attExample.AggregationBits = aggregationBitfield
+			attExample.ParticipationBits = aggregationBitfield
 			atts[encoded] = append(atts[encoded], attExample)
 		}
 	}
@@ -1034,9 +1034,9 @@ func TestServer_StreamAttestations_OnSlotTick(t *testing.T) {
 	}
 
 	atts := []*zondpb.Attestation{
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b1101}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}, AggregationBits: bitfield.Bitlist{0b1101}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, AggregationBits: bitfield.Bitlist{0b1101}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b1101}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}, ParticipationBits: bitfield.Bitlist{0b1101}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, ParticipationBits: bitfield.Bitlist{0b1101}}),
 	}
 
 	mockStream := mock.NewMockBeaconChain_StreamAttestationsServer(ctrl)

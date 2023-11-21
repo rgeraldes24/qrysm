@@ -147,7 +147,7 @@ func TestAttestToBlockHead_AttestsCorrectly(t *testing.T) {
 			Target:          &zondpb.Checkpoint{Root: targetRoot[:]},
 			Source:          &zondpb.Checkpoint{Root: sourceRoot[:], Epoch: 3},
 		},
-		AggregationBits: aggregationBitfield,
+		ParticipationBits: aggregationBitfield,
 		Signatures:      make([]byte, 96),
 	}
 
@@ -437,7 +437,7 @@ func TestAttestToBlockHead_CorrectBitfieldLength(t *testing.T) {
 
 	validator.SubmitAttestation(context.Background(), 30, pubKey)
 
-	assert.Equal(t, 2, len(generatedAttestation.AggregationBits))
+	assert.Equal(t, 2, len(generatedAttestation.ParticipationBits))
 }
 
 func TestSignAttestation(t *testing.T) {

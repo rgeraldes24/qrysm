@@ -128,9 +128,9 @@ type AggregateAndProof struct {
 
 // Attestation a sub property of AggregateAndProofSignRequest.
 type Attestation struct {
-	AggregationBits hexutil.Bytes    `json:"aggregation_bits"` /*hex bitlist*/
-	Data            *AttestationData `json:"data"`
-	Signature       hexutil.Bytes    `json:"signature"`
+	ParticipationBits hexutil.Bytes    `json:"aggregation_bits"` /*hex bitlist*/
+	Data              *AttestationData `json:"data"`
+	Signature         hexutil.Bytes    `json:"signature"`
 }
 
 // AttestationData a sub property of Attestation.
@@ -283,7 +283,7 @@ type SyncCommitteeContribution struct {
 	Slot              string        `json:"slot"`               /* uint64 */
 	BeaconBlockRoot   hexutil.Bytes `json:"beacon_block_root"`  /* Hash32 */ // Qrysm uses BlockRoot instead of BeaconBlockRoot
 	SubcommitteeIndex string        `json:"subcommittee_index"` /* uint64 */
-	AggregationBits   hexutil.Bytes `json:"aggregation_bits"`   /* SSZ hexadecimal string */
+	ParticipationBits hexutil.Bytes `json:"aggregation_bits"`   /* SSZ hexadecimal string */
 	Signature         hexutil.Bytes `json:"signature"`          /* 96 byte hexadecimal string */
 }
 

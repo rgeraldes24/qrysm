@@ -30,7 +30,7 @@ var (
 // -the contribution and proof itself
 // -the message within contribution and proof
 // -the contribution within contribution and proof
-// -the aggregation bits within contribution
+// -the participation bits within contribution
 func ValidateNilSyncContribution(s *zondpb.SignedContributionAndProof) error {
 	if s == nil {
 		return errors.New("signed message can't be nil")
@@ -41,24 +41,13 @@ func ValidateNilSyncContribution(s *zondpb.SignedContributionAndProof) error {
 	if s.Message.Contribution == nil {
 		return errors.New("inner contribution can't be nil")
 	}
-	if s.Message.Contribution.AggregationBits == nil {
+	if s.Message.Contribution.ParticipationBits == nil {
 		return errors.New("contribution's bitfield can't be nil")
 	}
 	return nil
 }
 
 // NextSyncCommittee returns the next sync committee for a given state.
-//
-// Spec code:
-// def get_next_sync_committee(state: BeaconState) -> SyncCommittee:
-//
-//	"""
-//	Return the next sync committee, with possible pubkey duplicates.
-//	"""
-//	indices = get_next_sync_committee_indices(state)
-//	pubkeys = [state.validators[index].pubkey for index in indices]
-//	aggregate_pubkey = bls.AggregatePKs(pubkeys)
-//	return SyncCommittee(pubkeys=pubkeys, aggregate_pubkey=aggregate_pubkey)
 func NextSyncCommittee(ctx context.Context, s state.BeaconState) (*zondpb.SyncCommittee, error) {
 	indices, err := NextSyncCommitteeIndices(ctx, s)
 	if err != nil {
@@ -69,13 +58,8 @@ func NextSyncCommittee(ctx context.Context, s state.BeaconState) (*zondpb.SyncCo
 		p := s.PubkeyAtIndex(index)
 		pubkeys[i] = p[:]
 	}
-	appendedPubKeys := make([]byte, 0, len(pubkeys))
-	for _, pubKey := range pubkeys {
-		appendedPubKeys = append(appendedPubKeys, pubKey...)
-	}
 	return &zondpb.SyncCommittee{
-		Pubkeys:         pubkeys,
-		AggregatePubkey: appendedPubKeys,
+		Pubkeys: pubkeys,
 	}, nil
 }
 

@@ -44,7 +44,7 @@ func TestPendingExits(t *testing.T) {
 }
 
 func TestExitsForInclusion(t *testing.T) {
-	spb := &zondpb.BeaconStateCapella{
+	spb := &zondpb.BeaconState{
 		Fork: &zondpb.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,

@@ -165,7 +165,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 					Slot:              1,
 					BlockRoot:         []byte("root"),
 					SubcommitteeIndex: 1,
-					AggregationBits:   bitfield.NewBitvector128(),
+					ParticipationBits: bitfield.NewBitvector128(),
 					Signature:         []byte("sig"),
 				},
 				SelectionProof: []byte("proof"),

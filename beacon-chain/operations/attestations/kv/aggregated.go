@@ -258,7 +258,7 @@ func (c *AttCaches) DeleteAggregatedAttestation(att *zondpb.Attestation) error {
 
 	filtered := make([]*zondpb.Attestation, 0)
 	for _, a := range attList {
-		if c, err := att.AggregationBits.Contains(a.AggregationBits); err != nil {
+		if c, err := att.ParticipationBits.Contains(a.ParticipationBits); err != nil {
 			return err
 		} else if !c {
 			filtered = append(filtered, a)
@@ -287,7 +287,7 @@ func (c *AttCaches) HasAggregatedAttestation(att *zondpb.Attestation) (bool, err
 	defer c.aggregatedAttLock.RUnlock()
 	if atts, ok := c.aggregatedAtt[r]; ok {
 		for _, a := range atts {
-			if c, err := a.AggregationBits.Contains(att.AggregationBits); err != nil {
+			if c, err := a.ParticipationBits.Contains(att.ParticipationBits); err != nil {
 				return false, err
 			} else if c {
 				return true, nil
@@ -299,7 +299,7 @@ func (c *AttCaches) HasAggregatedAttestation(att *zondpb.Attestation) (bool, err
 	defer c.blockAttLock.RUnlock()
 	if atts, ok := c.blockAtt[r]; ok {
 		for _, a := range atts {
-			if c, err := a.AggregationBits.Contains(att.AggregationBits); err != nil {
+			if c, err := a.ParticipationBits.Contains(att.ParticipationBits); err != nil {
 				return false, err
 			} else if c {
 				return true, nil

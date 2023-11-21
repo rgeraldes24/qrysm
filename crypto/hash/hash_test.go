@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	fuzz "github.com/google/gofuzz"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -87,7 +86,7 @@ func TestHashProtoFuzz(t *testing.T) {
 
 func BenchmarkHashProto(b *testing.B) {
 	att := &zondpb.Attestation{
-		AggregationBits: nil,
+		ParticipationBits: nil,
 		Data: &zondpb.AttestationData{
 			Slot:            5,
 			CommitteeIndex:  3,
@@ -95,7 +94,7 @@ func BenchmarkHashProto(b *testing.B) {
 			Source:          nil,
 			Target:          nil,
 		},
-		Signature: bls.NewAggregateSignature().Marshal(),
+		Signatures: [][]byte{},
 	}
 
 	for i := 0; i < b.N; i++ {

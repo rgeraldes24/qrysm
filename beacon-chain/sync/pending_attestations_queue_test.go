@@ -77,12 +77,12 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
 	assert.NoError(t, err)
-	attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	attestingIndices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	require.NoError(t, err)
 	attesterDomain, err := signing.Domain(beaconState.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, beaconState.GenesisValidatorsRoot())
 	require.NoError(t, err)
@@ -169,9 +169,9 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	require.NoError(t, err)
 	a := &zondpb.AggregateAttestationAndProof{
 		Aggregate: &zondpb.Attestation{
-			Signature:       priv.Sign([]byte("foo")).Marshal(),
-			AggregationBits: bitfield.Bitlist{0x02},
-			Data:            util.HydrateAttestationData(&zondpb.AttestationData{}),
+			Signature:         priv.Sign([]byte("foo")).Marshal(),
+			ParticipationBits: bitfield.Bitlist{0x02},
+			Data:              util.HydrateAttestationData(&zondpb.AttestationData{}),
 		},
 		SelectionProof: make([]byte, dilithium2.CryptoBytes),
 	}
@@ -201,11 +201,11 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: r32[:]},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), s, att.Data.Slot, att.Data.CommitteeIndex)
 	assert.NoError(t, err)
-	attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	attestingIndices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	require.NoError(t, err)
 	attesterDomain, err := signing.Domain(s.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, s.GenesisValidatorsRoot())
 	require.NoError(t, err)
@@ -280,12 +280,12 @@ func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
 	assert.NoError(t, err)
-	attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	attestingIndices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	require.NoError(t, err)
 	attesterDomain, err := signing.Domain(beaconState.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, beaconState.GenesisValidatorsRoot())
 	require.NoError(t, err)

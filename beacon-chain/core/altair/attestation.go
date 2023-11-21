@@ -35,7 +35,7 @@ func ProcessAttestationsNoVerifySignature(
 		return nil, err
 	}
 	for idx, att := range body.Attestations() {
-		beaconState, err = ProcessAttestationNoVerifySignature(ctx, beaconState, att, totalBalance)
+		beaconState, err = ProcessAttestationNoVerifySignatures(ctx, beaconState, att, totalBalance)
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not verify attestation at index %d in block", idx)
 		}
@@ -43,15 +43,15 @@ func ProcessAttestationsNoVerifySignature(
 	return beaconState, nil
 }
 
-// ProcessAttestationNoVerifySignature processes the attestation without verifying the attestation signature. This
+// ProcessAttestationNoVerifySignatures processes the attestation without verifying the attestation signatures. This
 // method is used to validate attestations whose signatures have already been verified or will be verified later.
-func ProcessAttestationNoVerifySignature(
+func ProcessAttestationNoVerifySignatures(
 	ctx context.Context,
 	beaconState state.BeaconState,
 	att *zondpb.Attestation,
 	totalBalance uint64,
 ) (state.BeaconState, error) {
-	ctx, span := trace.StartSpan(ctx, "altair.ProcessAttestationNoVerifySignature")
+	ctx, span := trace.StartSpan(ctx, "altair.ProcessAttestationNoVerifySignatures")
 	defer span.End()
 
 	if err := blocks.VerifyAttestationNoVerifySignature(ctx, beaconState, att); err != nil {
@@ -70,7 +70,7 @@ func ProcessAttestationNoVerifySignature(
 	if err != nil {
 		return nil, err
 	}
-	indices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	indices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	if err != nil {
 		return nil, err
 	}

@@ -441,7 +441,7 @@ func getFields() fields {
 	for i := range atts {
 		atts[i] = &zond.Attestation{}
 		atts[i].Signatures = [][]byte{sig[:]}
-		atts[i].AggregationBits = bitfield.NewBitlist(1)
+		atts[i].ParticipationBits = bitfield.NewBitlist(1)
 		atts[i].Data = &zond.AttestationData{
 			Slot:            128,
 			CommitteeIndex:  128,

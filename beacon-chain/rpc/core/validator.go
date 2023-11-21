@@ -259,7 +259,7 @@ func (s *Service) SubmitSignedAggregateSelectionProof(
 		"slot":            req.SignedAggregateAndProof.Message.Aggregate.Data.Slot,
 		"committeeIndex":  req.SignedAggregateAndProof.Message.Aggregate.Data.CommitteeIndex,
 		"validatorIndex":  req.SignedAggregateAndProof.Message.AggregatorIndex,
-		"aggregatedCount": req.SignedAggregateAndProof.Message.Aggregate.AggregationBits.Count(),
+		"aggregatedCount": req.SignedAggregateAndProof.Message.Aggregate.ParticipationBits.Count(),
 	}).Debug("Broadcasting aggregated attestation and proof")
 
 	return nil

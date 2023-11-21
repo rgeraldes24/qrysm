@@ -27,7 +27,7 @@ import (
 // NewAttestation creates an attestation block with minimum marshalable fields.
 func NewAttestation() *zondpb.Attestation {
 	return &zondpb.Attestation{
-		AggregationBits: bitfield.Bitlist{0b1101},
+		ParticipationBits: bitfield.Bitlist{0b1101},
 		Data: &zondpb.AttestationData{
 			BeaconBlockRoot: make([]byte, fieldparams.RootLength),
 			Source: &zondpb.Checkpoint{
@@ -182,9 +182,9 @@ func GenerateAttestations(
 			}
 
 			att := &zondpb.Attestation{
-				Data:            attData,
-				AggregationBits: aggregationBits,
-				Signatures:      bls.AggregateSignatures(sigs).Marshal(),
+				Data:              attData,
+				ParticipationBits: aggregationBits,
+				Signatures:        bls.AggregateSignatures(sigs).Marshal(),
 			}
 			attestations = append(attestations, att)
 		}
@@ -198,8 +198,8 @@ func HydrateAttestation(a *zondpb.Attestation) *zondpb.Attestation {
 	if a.Signatures == nil {
 		a.Signatures = make([]byte, 96)
 	}
-	if a.AggregationBits == nil {
-		a.AggregationBits = make([]byte, 1)
+	if a.ParticipationBits == nil {
+		a.ParticipationBits = make([]byte, 1)
 	}
 	if a.Data == nil {
 		a.Data = &zondpb.AttestationData{}
@@ -214,8 +214,8 @@ func HydrateV1Attestation(a *attv1.Attestation) *attv1.Attestation {
 	if a.Signatures == nil {
 		a.Signatures = make([]byte, 96)
 	}
-	if a.AggregationBits == nil {
-		a.AggregationBits = make([]byte, 1)
+	if a.ParticipationBits == nil {
+		a.ParticipationBits = make([]byte, 1)
 	}
 	if a.Data == nil {
 		a.Data = &attv1.AttestationData{}

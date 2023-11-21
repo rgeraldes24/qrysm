@@ -150,7 +150,7 @@ func TestStateReferenceCopy_NoUnexpectedRandaoMutation_Capella(t *testing.T) {
 func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 	assertAttFound := func(vals []*zondpb.PendingAttestation, val uint64) {
 		for i := range vals {
-			if reflect.DeepEqual(vals[i].AggregationBits, bitfield.NewBitlist(val)) {
+			if reflect.DeepEqual(vals[i].ParticipationBits, bitfield.NewBitlist(val)) {
 				return
 			}
 		}
@@ -159,7 +159,7 @@ func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 	}
 	assertAttNotFound := func(vals []*zondpb.PendingAttestation, val uint64) {
 		for i := range vals {
-			if reflect.DeepEqual(vals[i].AggregationBits, bitfield.NewBitlist(val)) {
+			if reflect.DeepEqual(vals[i].ParticipationBits, bitfield.NewBitlist(val)) {
 				t.Log(string(debug.Stack()))
 				t.Fatalf("Unexpected attestation found (%v): %v", vals, val)
 				return
@@ -176,8 +176,8 @@ func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 
 	// Update initial state.
 	atts := []*zondpb.PendingAttestation{
-		{AggregationBits: bitfield.NewBitlist(1)},
-		{AggregationBits: bitfield.NewBitlist(2)},
+		{ParticipationBits: bitfield.NewBitlist(1)},
+		{ParticipationBits: bitfield.NewBitlist(2)},
 	}
 	a.setPreviousEpochAttestations(atts[:1])
 	a.setCurrentEpochAttestations(atts[:1])
@@ -261,7 +261,7 @@ func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 		require.NoError(t, err)
 		for i := range currEpochAtts {
 			att := zondpb.CopyPendingAttestation(currEpochAtts[i])
-			att.AggregationBits = bitfield.NewBitlist(3)
+			att.ParticipationBits = bitfield.NewBitlist(3)
 			currEpochAtts[i] = att
 		}
 		state.setCurrentEpochAttestations(currEpochAtts)
@@ -275,7 +275,7 @@ func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 		require.NoError(t, err)
 		for i := range prevEpochAtts {
 			att := zondpb.CopyPendingAttestation(prevEpochAtts[i])
-			att.AggregationBits = bitfield.NewBitlist(3)
+			att.ParticipationBits = bitfield.NewBitlist(3)
 			prevEpochAtts[i] = att
 		}
 		state.setPreviousEpochAttestations(prevEpochAtts)

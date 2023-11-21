@@ -25,7 +25,6 @@ func Aggregate(atts []*zondpb.Attestation) ([]*zondpb.Attestation, error) {
 	return MaxCoverAttestationAggregation(atts)
 }
 
-/*
 // AggregateDisjointOneBitAtts aggregates unaggregated attestations with the
 // exact same attestation data.
 func AggregateDisjointOneBitAtts(atts []*zondpb.Attestation) (*zondpb.Attestation, error) {
@@ -62,7 +61,6 @@ func AggregateDisjointOneBitAtts(atts []*zondpb.Attestation) (*zondpb.Attestatio
 	}
 	return atts[0], nil
 }
-*/
 
 // AggregatePair aggregates pair of attestations a1 and a2 together.
 func AggregatePair(a1, a2 *zondpb.Attestation) (*zondpb.Attestation, error) {

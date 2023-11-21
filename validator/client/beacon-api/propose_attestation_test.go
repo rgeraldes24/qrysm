@@ -17,7 +17,7 @@ import (
 
 func TestProposeAttestation(t *testing.T) {
 	attestation := &zondpb.Attestation{
-		AggregationBits: test_helpers.FillByteSlice(4, 74),
+		ParticipationBits: test_helpers.FillByteSlice(4, 74),
 		Data: &zondpb.AttestationData{
 			Slot:            75,
 			CommitteeIndex:  76,
@@ -53,15 +53,15 @@ func TestProposeAttestation(t *testing.T) {
 		{
 			name: "nil attestation data",
 			attestation: &zondpb.Attestation{
-				AggregationBits: test_helpers.FillByteSlice(4, 74),
-				Signatures:      test_helpers.FillByteSlice(96, 82),
+				ParticipationBits: test_helpers.FillByteSlice(4, 74),
+				Signatures:        test_helpers.FillByteSlice(96, 82),
 			},
 			expectedErrorMessage: "attestation data is nil",
 		},
 		{
 			name: "nil source checkpoint",
 			attestation: &zondpb.Attestation{
-				AggregationBits: test_helpers.FillByteSlice(4, 74),
+				ParticipationBits: test_helpers.FillByteSlice(4, 74),
 				Data: &zondpb.AttestationData{
 					Target: &zondpb.Checkpoint{},
 				},
@@ -72,7 +72,7 @@ func TestProposeAttestation(t *testing.T) {
 		{
 			name: "nil target checkpoint",
 			attestation: &zondpb.Attestation{
-				AggregationBits: test_helpers.FillByteSlice(4, 74),
+				ParticipationBits: test_helpers.FillByteSlice(4, 74),
 				Data: &zondpb.AttestationData{
 					Source: &zondpb.Checkpoint{},
 				},
@@ -94,7 +94,7 @@ func TestProposeAttestation(t *testing.T) {
 		{
 			name: "nil signature",
 			attestation: &zondpb.Attestation{
-				AggregationBits: test_helpers.FillByteSlice(4, 74),
+				ParticipationBits: test_helpers.FillByteSlice(4, 74),
 				Data: &zondpb.AttestationData{
 					Source: &zondpb.Checkpoint{},
 					Target: &zondpb.Checkpoint{},

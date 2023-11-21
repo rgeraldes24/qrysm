@@ -46,11 +46,11 @@ func TestConvertToIndexed(t *testing.T) {
 					Signatures:                      [][]byte{[]byte("sig2"), []byte("sig0"), []byte("sig1")},
 					SignaturesIdxToParticipationIdx: []uint64{2, 0, 1},
 				},
-				committee: []primitives.ValidatorIndex{0, 1, 2},
+				committee: []primitives.ValidatorIndex{25, 30, 17},
 			},
 			want: &zondpb.IndexedAttestation{
-				AttestingIndices: []uint64{0, 1, 2},
-				Signatures:       [][]byte{[]byte("sig0"), []byte("sig1"), []byte("sig2")},
+				AttestingIndices: []uint64{17, 25, 30},
+				Signatures:       [][]byte{[]byte("sig2"), []byte("sig0"), []byte("sig1")},
 			},
 		},
 		{
@@ -61,10 +61,10 @@ func TestConvertToIndexed(t *testing.T) {
 					Signatures:                      [][]byte{[]byte("sig0"), []byte("sig2")},
 					SignaturesIdxToParticipationIdx: []uint64{0, 2},
 				},
-				committee: []primitives.ValidatorIndex{0, 1, 2},
+				committee: []primitives.ValidatorIndex{40, 50, 60},
 			},
 			want: &zondpb.IndexedAttestation{
-				AttestingIndices: []uint64{0, 2},
+				AttestingIndices: []uint64{40, 60},
 				Signatures:       [][]byte{[]byte("sig0"), []byte("sig2")},
 			},
 		},

@@ -50,7 +50,7 @@ func (cs proposerSyncContributions) dedup() (proposerSyncContributions, error) {
 			a := cs[i]
 			for j := i + 1; j < len(cs); j++ {
 				b := cs[j]
-				if aContainsB, err := a.AggregationBits.Contains(b.AggregationBits); err != nil {
+				if aContainsB, err := a.ParticipationBits.Contains(b.ParticipationBits); err != nil {
 					return nil, err
 				} else if aContainsB {
 					// a contains b, b is redundant.
@@ -58,7 +58,7 @@ func (cs proposerSyncContributions) dedup() (proposerSyncContributions, error) {
 					cs[len(cs)-1] = nil
 					cs = cs[:len(cs)-1]
 					j--
-				} else if bContainsA, err := b.AggregationBits.Contains(a.GetAggregationBits()); err != nil {
+				} else if bContainsA, err := b.ParticipationBits.Contains(a.GetAggregationBits()); err != nil {
 					return nil, err
 				} else if bContainsA {
 					// b contains a, a is redundant.
@@ -86,7 +86,7 @@ func (cs proposerSyncContributions) mostProfitable() *zond.SyncCommitteeContribu
 		return mostProfitable
 	}
 	for _, c := range cs[1:] {
-		if c.AggregationBits.Count() > mostProfitable.AggregationBits.Count() {
+		if c.ParticipationBits.Count() > mostProfitable.ParticipationBits.Count() {
 			mostProfitable = c
 		}
 	}

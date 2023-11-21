@@ -42,7 +42,7 @@ func TestProcessAttestationNoVerifySignature_BeaconFuzzIssue78(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	_, err = blocks.ProcessAttestationNoVerifySignature(ctx, st, att)
+	_, err = blocks.ProcessAttestationNoVerifySignatures(ctx, st, att)
 	require.ErrorContains(t, "committee index 1 >= committee count 1", err)
 }
 
@@ -61,7 +61,7 @@ func TestVerifyAttestationNoVerifySignature_IncorrectSourceEpoch(t *testing.T) {
 			Source: &zondpb.Checkpoint{Epoch: 99, Root: mockRoot[:]},
 			Target: &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, 32)},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 
 	var zeroSig [96]byte

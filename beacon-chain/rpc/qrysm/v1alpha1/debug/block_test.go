@@ -71,8 +71,8 @@ func TestServer_GetAttestationInclusionSlot(t *testing.T) {
 			BeaconBlockRoot: make([]byte, 32),
 			Slot:            1,
 		},
-		AggregationBits: bitfield.Bitlist{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01},
-		Signature:       make([]byte, dilithium2.CryptoBytes),
+		ParticipationBits: bitfield.Bitlist{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01},
+		Signature:         make([]byte, dilithium2.CryptoBytes),
 	}
 	b := util.NewBeaconBlock()
 	b.Block.Slot = 2

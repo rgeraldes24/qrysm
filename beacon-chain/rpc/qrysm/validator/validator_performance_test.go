@@ -431,8 +431,8 @@ func setHeadState(t *testing.T, headState state.BeaconState, publicKeys [][48]by
 					Target: &zondpb.Checkpoint{Root: make([]byte, 32)},
 					Source: &zondpb.Checkpoint{Root: make([]byte, 32)},
 				},
-				AggregationBits: bitfield.Bitlist{},
-				InclusionDelay:  1,
+				ParticipationBits: bitfield.Bitlist{},
+				InclusionDelay:    1,
 			}
 			require.NoError(t, headState.AppendPreviousEpochAttestations(atts[i]))
 		}

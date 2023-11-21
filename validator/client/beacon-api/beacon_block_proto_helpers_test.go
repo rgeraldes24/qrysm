@@ -501,7 +501,7 @@ func TestBeaconBlockProtoHelpers_ConvertAttestationsToProto(t *testing.T) {
 			expectedErrorMessage: "failed to decode aggregation bits `foo`",
 			generateInput: func() []*apimiddleware.AttestationJson {
 				input := generateAttestations()
-				input[0].AggregationBits = "foo"
+				input[0].ParticipationBits = "foo"
 				return input
 			},
 		},
@@ -528,7 +528,7 @@ func TestBeaconBlockProtoHelpers_ConvertAttestationsToProto(t *testing.T) {
 			generateInput: generateAttestations,
 			expectedResult: []*zondpb.Attestation{
 				{
-					AggregationBits: []byte{1},
+					ParticipationBits: []byte{1},
 					Data: &zondpb.AttestationData{
 						Slot:            2,
 						CommitteeIndex:  3,
@@ -545,7 +545,7 @@ func TestBeaconBlockProtoHelpers_ConvertAttestationsToProto(t *testing.T) {
 					Signatures: []byte{9},
 				},
 				{
-					AggregationBits: []byte{10},
+					ParticipationBits: []byte{10},
 					Data: &zondpb.AttestationData{
 						Slot:            11,
 						CommitteeIndex:  12,
@@ -1250,7 +1250,7 @@ func generateCheckpoint() *apimiddleware.CheckpointJson {
 func generateAttestations() []*apimiddleware.AttestationJson {
 	return []*apimiddleware.AttestationJson{
 		{
-			AggregationBits: hexutil.Encode([]byte{1}),
+			ParticipationBits: hexutil.Encode([]byte{1}),
 			Data: &apimiddleware.AttestationDataJson{
 				Slot:            "2",
 				CommitteeIndex:  "3",
@@ -1267,7 +1267,7 @@ func generateAttestations() []*apimiddleware.AttestationJson {
 			Signature: hexutil.Encode([]byte{9}),
 		},
 		{
-			AggregationBits: hexutil.Encode([]byte{10}),
+			ParticipationBits: hexutil.Encode([]byte{10}),
 			Data: &apimiddleware.AttestationDataJson{
 				Slot:            "11",
 				CommitteeIndex:  "12",

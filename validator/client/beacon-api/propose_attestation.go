@@ -45,7 +45,7 @@ func checkNilAttestation(attestation *zondpb.Attestation) error {
 		return errors.New("source/target in attestation data is nil")
 	}
 
-	if len(attestation.AggregationBits) == 0 {
+	if len(attestation.ParticipationBits) == 0 {
 		return errors.New("attestation aggregation bits is empty")
 	}
 

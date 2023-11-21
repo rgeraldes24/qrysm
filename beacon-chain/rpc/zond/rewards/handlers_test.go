@@ -75,14 +75,14 @@ func TestBlockRewards(t *testing.T) {
 	b.Block.ProposerIndex = 12
 	b.Block.Body.Attestations = []*zond.Attestation{
 		{
-			AggregationBits: bitfield.Bitlist{0b00000111},
-			Data:            util.HydrateAttestationData(&zond.AttestationData{}),
-			Signature:       make([]byte, dilithium2.CryptoBytes),
+			ParticipationBits: bitfield.Bitlist{0b00000111},
+			Data:              util.HydrateAttestationData(&zond.AttestationData{}),
+			Signature:         make([]byte, dilithium2.CryptoBytes),
 		},
 		{
-			AggregationBits: bitfield.Bitlist{0b00000111},
-			Data:            util.HydrateAttestationData(&zond.AttestationData{}),
-			Signature:       make([]byte, dilithium2.CryptoBytes),
+			ParticipationBits: bitfield.Bitlist{0b00000111},
+			Data:              util.HydrateAttestationData(&zond.AttestationData{}),
+			Signature:         make([]byte, dilithium2.CryptoBytes),
 		},
 	}
 	attData1 := util.HydrateAttestationData(&zond.AttestationData{BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32)})

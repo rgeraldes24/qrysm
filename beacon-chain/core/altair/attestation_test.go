@@ -92,7 +92,7 @@ func TestProcessAttestations_CurrentEpochFFGDataMismatches(t *testing.T) {
 				Target: &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, fieldparams.RootLength)},
 				Source: &zondpb.Checkpoint{Epoch: 1, Root: make([]byte, fieldparams.RootLength)},
 			},
-			AggregationBits: bitfield.Bitlist{0x09},
+			ParticipationBits: bitfield.Bitlist{0x09},
 		},
 	}
 	b := util.NewBeaconBlockAltair()
@@ -132,7 +132,7 @@ func TestProcessAttestations_PrevEpochFFGDataMismatches(t *testing.T) {
 				Target: &zondpb.Checkpoint{Epoch: 1, Root: make([]byte, fieldparams.RootLength)},
 				Slot:   params.BeaconConfig().SlotsPerEpoch,
 			},
-			AggregationBits: aggBits,
+			ParticipationBits: aggBits,
 		},
 	}
 	b := util.NewBeaconBlockAltair()
@@ -170,7 +170,7 @@ func TestProcessAttestations_InvalidAggregationBitsLength(t *testing.T) {
 		Data: &zondpb.AttestationData{
 			Source: &zondpb.Checkpoint{Epoch: 0, Root: []byte("hello-world")},
 			Target: &zondpb.Checkpoint{Epoch: 0}},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 
 	b := util.NewBeaconBlockAltair()
@@ -206,7 +206,7 @@ func TestProcessAttestations_OK(t *testing.T) {
 			Source: &zondpb.Checkpoint{Root: mockRoot[:]},
 			Target: &zondpb.Checkpoint{Root: mockRoot[:]},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	})
 
 	cfc := beaconState.CurrentJustifiedCheckpoint()
@@ -215,7 +215,7 @@ func TestProcessAttestations_OK(t *testing.T) {
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
 	require.NoError(t, err)
-	attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	attestingIndices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	require.NoError(t, err)
 	sigs := make([]bls.Signature, len(attestingIndices))
 	for i, indice := range attestingIndices {
@@ -254,7 +254,7 @@ func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, fieldparams.RootLength)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, fieldparams.RootLength)},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 	var zeroSig [96]byte
 	att.Signature = zeroSig[:]
@@ -265,7 +265,7 @@ func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
 
 	b, err := helpers.TotalActiveBalance(beaconState)
 	require.NoError(t, err)
-	beaconState, err = altair.ProcessAttestationNoVerifySignature(context.Background(), beaconState, att, b)
+	beaconState, err = altair.ProcessAttestationNoVerifySignatures(context.Background(), beaconState, att, b)
 	require.NoError(t, err)
 
 	p, err := beaconState.CurrentEpochParticipation()
@@ -273,7 +273,7 @@ func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
 	require.NoError(t, err)
-	indices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	indices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	require.NoError(t, err)
 	for _, index := range indices {
 		has, err := altair.HasValidatorFlag(p[index], params.BeaconConfig().TimelyHeadFlagIndex)

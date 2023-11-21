@@ -83,7 +83,7 @@ func generateSignedAggregateAndProofJson() *zondpb.SignedAggregateAttestationAnd
 		Message: &zondpb.AggregateAttestationAndProof{
 			AggregatorIndex: 72,
 			Aggregate: &zondpb.Attestation{
-				AggregationBits: test_helpers.FillByteSlice(4, 74),
+				ParticipationBits: test_helpers.FillByteSlice(4, 74),
 				Data: &zondpb.AttestationData{
 					Slot:            75,
 					CommitteeIndex:  76,

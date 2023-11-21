@@ -123,7 +123,7 @@ func (s *Service) seen(att *zondpb.Attestation) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	incomingBits := att.AggregationBits
+	incomingBits := att.ParticipationBits
 	savedBits, ok := s.forkChoiceProcessedRoots.Get(attRoot)
 	if ok {
 		savedBitlist, ok := savedBits.(bitfield.Bitlist)

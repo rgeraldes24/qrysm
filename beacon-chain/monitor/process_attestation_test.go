@@ -23,7 +23,7 @@ func TestGetAttestingIndices(t *testing.T) {
 			Slot:           1,
 			CommitteeIndex: 0,
 		},
-		AggregationBits: bitfield.Bitlist{0b11, 0b1},
+		ParticipationBits: bitfield.Bitlist{0b11, 0b1},
 	}
 	attestingIndices, err := attestingIndices(ctx, beaconState, att)
 	require.NoError(t, err)
@@ -52,7 +52,7 @@ func TestProcessIncludedAttestationTwoTracked(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 			},
 		},
-		AggregationBits: bitfield.Bitlist{0b11, 0b1},
+		ParticipationBits: bitfield.Bitlist{0b11, 0b1},
 	}
 	s.processIncludedAttestation(context.Background(), state, att)
 	wanted1 := "\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=32000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=2 prefix=monitor"
@@ -87,7 +87,7 @@ func TestProcessUnaggregatedAttestationStateNotCached(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 			},
 		},
-		AggregationBits: bitfield.Bitlist{0b11, 0b1},
+		ParticipationBits: bitfield.Bitlist{0b11, 0b1},
 	}
 	s.processUnaggregatedAttestation(ctx, att)
 	require.LogsContain(t, hook, "Skipping unaggregated attestation due to state not found in cache")
@@ -120,7 +120,7 @@ func TestProcessUnaggregatedAttestationStateCached(t *testing.T) {
 				Root:  root[:],
 			},
 		},
-		AggregationBits: bitfield.Bitlist{0b11, 0b1},
+		ParticipationBits: bitfield.Bitlist{0b11, 0b1},
 	}
 	require.NoError(t, s.config.StateGen.SaveState(ctx, root, state))
 	s.processUnaggregatedAttestation(context.Background(), att)
@@ -158,7 +158,7 @@ func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 				},
 			},
-			AggregationBits: bitfield.Bitlist{0b11, 0b1},
+			ParticipationBits: bitfield.Bitlist{0b11, 0b1},
 		},
 	}
 	s.processAggregatedAttestation(ctx, att)
@@ -194,7 +194,7 @@ func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 					Root:  root[:],
 				},
 			},
-			AggregationBits: bitfield.Bitlist{0b10, 0b1},
+			ParticipationBits: bitfield.Bitlist{0b10, 0b1},
 		},
 	}
 
@@ -227,7 +227,7 @@ func TestProcessAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("hello-world"), 32),
 			},
 		},
-		AggregationBits: bitfield.Bitlist{0b11, 0b1},
+		ParticipationBits: bitfield.Bitlist{0b11, 0b1},
 	}
 
 	block := &zondpb.BeaconBlockAltair{

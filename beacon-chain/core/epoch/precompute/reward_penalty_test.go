@@ -32,8 +32,8 @@ func TestProcessRewardsAndPenaltiesPrecompute(t *testing.T) {
 				Target: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				Source: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 			},
-			AggregationBits: bitfield.Bitlist{0x00, 0x00, 0x00, 0x00, 0xC0, 0xC0, 0xC0, 0xC0, 0x01},
-			InclusionDelay:  1,
+			ParticipationBits: bitfield.Bitlist{0x00, 0x00, 0x00, 0x00, 0xC0, 0xC0, 0xC0, 0xC0, 0x01},
+			InclusionDelay:    1,
 		}
 	}
 	base.PreviousEpochAttestations = atts
@@ -76,8 +76,8 @@ func TestAttestationDeltaPrecompute(t *testing.T) {
 				},
 				BeaconBlockRoot: emptyRoot[:],
 			},
-			AggregationBits: bitfield.Bitlist{0xC0, 0xC0, 0xC0, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x01},
-			InclusionDelay:  1,
+			ParticipationBits: bitfield.Bitlist{0xC0, 0xC0, 0xC0, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x01},
+			InclusionDelay:    1,
 		}
 	}
 	base.PreviousEpochAttestations = atts
@@ -160,8 +160,8 @@ func TestAttestationDeltas_ZeroEpoch(t *testing.T) {
 				},
 				BeaconBlockRoot: emptyRoot[:],
 			},
-			AggregationBits: bitfield.Bitlist{0x00, 0x00, 0x00, 0x00, 0xC0, 0xC0, 0xC0, 0xC0, 0x01},
-			InclusionDelay:  1,
+			ParticipationBits: bitfield.Bitlist{0x00, 0x00, 0x00, 0x00, 0xC0, 0xC0, 0xC0, 0xC0, 0x01},
+			InclusionDelay:    1,
 		}
 	}
 	base.PreviousEpochAttestations = atts
@@ -196,7 +196,7 @@ func TestAttestationDeltas_ZeroInclusionDelay(t *testing.T) {
 				},
 				BeaconBlockRoot: emptyRoot[:],
 			},
-			AggregationBits: bitfield.Bitlist{0xC0, 0xC0, 0xC0, 0xC0, 0x01},
+			ParticipationBits: bitfield.Bitlist{0xC0, 0xC0, 0xC0, 0xC0, 0x01},
 			// Inclusion delay of 0 is not possible in a valid state and could cause a divide by
 			// zero panic.
 			InclusionDelay: 0,
@@ -223,8 +223,8 @@ func TestProcessRewardsAndPenaltiesPrecompute_SlashedInactivePenalty(t *testing.
 				Target: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				Source: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 			},
-			AggregationBits: bitfield.Bitlist{0x00, 0x00, 0x00, 0x00, 0xC0, 0xC0, 0xC0, 0xC0, 0x01},
-			InclusionDelay:  1,
+			ParticipationBits: bitfield.Bitlist{0x00, 0x00, 0x00, 0x00, 0xC0, 0xC0, 0xC0, 0xC0, 0x01},
+			InclusionDelay:    1,
 		}
 	}
 	base.PreviousEpochAttestations = atts

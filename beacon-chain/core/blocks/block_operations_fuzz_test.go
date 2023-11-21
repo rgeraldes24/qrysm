@@ -26,7 +26,7 @@ func TestFuzzProcessAttestationNoVerify_10000(t *testing.T) {
 		fuzzer.Fuzz(att)
 		s, err := state_native.InitializeFromProtoUnsafePhase0(state)
 		require.NoError(t, err)
-		_, err = ProcessAttestationNoVerifySignature(ctx, s, att)
+		_, err = ProcessAttestationNoVerifySignatures(ctx, s, att)
 		_ = err
 	}
 }

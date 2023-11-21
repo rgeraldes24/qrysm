@@ -478,18 +478,19 @@ func TestZond1DataMarshal(t *testing.T) {
 	require.Equal(t, expected, string(b))
 }
 
-func pbSyncAggregate() *zond.SyncAggregate {
+func pbSyncAggregate(t *testing.T) *zond.SyncAggregate {
 	return &zond.SyncAggregate{
-		SyncCommitteeSignatures: make([][]byte, 512),
-		SyncCommitteeBits:       bitfield.Bitvector512{0x01},
+		SyncCommitteeSignatures:     [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
+		SyncCommitteeBits:           bitfield.Bitvector512{0x01},
+		SignaturesIdxToCommitteeIdx: []uint64{0},
 	}
 }
 
 func TestSyncAggregate_MarshalJSON(t *testing.T) {
-	sa := &SyncAggregate{pbSyncAggregate()}
+	sa := &SyncAggregate{pbSyncAggregate(t)}
 	b, err := json.Marshal(sa)
 	require.NoError(t, err)
-	expected := `{"sync_committee_bits":"0x01","sync_committee_signature":"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"}`
+	expected := `{"sync_committee_bits":"0x01","sync_committee_signatures":["0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"]}`
 	require.Equal(t, expected, string(b))
 }
 
@@ -537,7 +538,7 @@ func TestVoluntaryExit(t *testing.T) {
 
 func pbAttestation(t *testing.T) *zond.Attestation {
 	return &zond.Attestation{
-		AggregationBits: bitfield.Bitlist{0x01},
+		ParticipationBits: bitfield.Bitlist{0x01},
 		Data: &zond.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  1,
@@ -551,7 +552,8 @@ func pbAttestation(t *testing.T) *zond.Attestation {
 				Root:  ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
 			},
 		},
-		Signatures: [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
+		Signatures:                      [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
+		SignaturesIdxToParticipationIdx: []uint64{0},
 	}
 }
 
@@ -561,7 +563,7 @@ func TestAttestationMarshal(t *testing.T) {
 	}
 	b, err := json.Marshal(a)
 	require.NoError(t, err)
-	expected := `{"aggregation_bits":"0x01","data":{"slot":"1","index":"1","beacon_block_root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2","source":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"},"target":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"}},"signature":"0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"}`
+	expected := `{"participation_bits":"0x01","data":{"slot":"1","index":"1","beacon_block_root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2","source":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"},"target":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"}},"signatures":["0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"],"signatures_idx_to_participation_idx":["0"]}`
 	require.Equal(t, expected, string(b))
 }
 
@@ -610,7 +612,7 @@ func TestAttesterSlashing_MarshalJSON(t *testing.T) {
 	}
 	b, err := json.Marshal(as)
 	require.NoError(t, err)
-	expected := `{"attestation_1":{"attesting_indices":["1"],"data":{"slot":"1","index":"1","beacon_block_root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2","source":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"},"target":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"}},"signature":"0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"},"attestation_2":{"attesting_indices":["1"],"data":{"slot":"1","index":"1","beacon_block_root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2","source":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"},"target":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"}},"signature":"0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"}}`
+	expected := `{"attestation_1":{"attesting_indices":["1"],"data":{"slot":"1","index":"1","beacon_block_root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2","source":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"},"target":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"}},"signatures":["0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"]},"attestation_2":{"attesting_indices":["1"],"data":{"slot":"1","index":"1","beacon_block_root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2","source":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"},"target":{"epoch":"1","root":"0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"}},"signatures":["0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"]}}`
 	require.Equal(t, expected, string(b))
 }
 
@@ -648,27 +650,6 @@ func TestProposerSlashings(t *testing.T) {
 }
 
 func pbExecutionPayloadHeader(t *testing.T) *v1.ExecutionPayloadHeader {
-	bfpg, err := stringToUint256("452312848583266388373324160190187140051835877600158453279131187530910662656")
-	require.NoError(t, err)
-	return &v1.ExecutionPayloadHeader{
-		ParentHash:       ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
-		FeeRecipient:     ezDecode(t, "0xabcf8e0d4e9587369b2301d0790347320302cc09"),
-		StateRoot:        ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
-		ReceiptsRoot:     ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
-		LogsBloom:        ezDecode(t, "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-		PrevRandao:       ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
-		BlockNumber:      1,
-		GasLimit:         1,
-		GasUsed:          1,
-		Timestamp:        1,
-		ExtraData:        ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
-		BaseFeePerGas:    bfpg.SSZBytes(),
-		BlockHash:        ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
-		TransactionsRoot: ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
-	}
-}
-
-func pbExecutionPayloadHeaderCapella(t *testing.T) *v1.ExecutionPayloadHeader {
 	bfpg, err := stringToUint256("452312848583266388373324160190187140051835877600158453279131187530910662656")
 	require.NoError(t, err)
 	return &v1.ExecutionPayloadHeader{
@@ -848,7 +829,7 @@ func TestUint256UnmarshalTooBig(t *testing.T) {
 	require.ErrorContains(t, "unable to decode into Uint256", err)
 }
 
-func TestMarshalBlindedBeaconBlockBodyCapella(t *testing.T) {
+func TestMarshalBlindedBeaconBlockBody(t *testing.T) {
 	expected, err := os.ReadFile("testdata/blinded-block.json")
 	require.NoError(t, err)
 	b := &BlindedBeaconBlock{BlindedBeaconBlock: &zond.BlindedBeaconBlock{
@@ -865,8 +846,8 @@ func TestMarshalBlindedBeaconBlockBodyCapella(t *testing.T) {
 			Attestations:           []*zond.Attestation{pbAttestation(t)},
 			Deposits:               []*zond.Deposit{pbDeposit(t)},
 			VoluntaryExits:         []*zond.SignedVoluntaryExit{pbSignedVoluntaryExit(t)},
-			SyncAggregate:          pbSyncAggregate(),
-			ExecutionPayloadHeader: pbExecutionPayloadHeaderCapella(t),
+			SyncAggregate:          pbSyncAggregate(t),
+			ExecutionPayloadHeader: pbExecutionPayloadHeader(t),
 		},
 	}}
 	m, err := json.Marshal(b)

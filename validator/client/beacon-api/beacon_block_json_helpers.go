@@ -158,9 +158,9 @@ func jsonifyAttestationData(attestationData *zondpb.AttestationData) *apimiddlew
 
 func jsonifyAttestation(attestation *zondpb.Attestation) *apimiddleware.AttestationJson {
 	return &apimiddleware.AttestationJson{
-		AggregationBits: hexutil.Encode(attestation.AggregationBits),
-		Data:            jsonifyAttestationData(attestation.Data),
-		Signature:       hexutil.Encode(attestation.Signatures),
+		ParticipationBits: hexutil.Encode(attestation.ParticipationBits),
+		Data:              jsonifyAttestationData(attestation.Data),
+		Signature:         hexutil.Encode(attestation.Signatures),
 	}
 }
 

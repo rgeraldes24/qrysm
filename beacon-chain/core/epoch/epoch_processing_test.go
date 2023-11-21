@@ -32,7 +32,7 @@ func TestUnslashedAttestingIndices_CanSortAndFilter(t *testing.T) {
 			Data: &zondpb.AttestationData{Source: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				Target: &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, fieldparams.RootLength)},
 			},
-			AggregationBits: bitfield.Bitlist{0x00, 0xFF, 0xFF, 0xFF},
+			ParticipationBits: bitfield.Bitlist{0x00, 0xFF, 0xFF, 0xFF},
 		}
 	}
 
@@ -78,7 +78,7 @@ func TestUnslashedAttestingIndices_DuplicatedAttestations(t *testing.T) {
 		atts[i] = &zondpb.PendingAttestation{
 			Data: &zondpb.AttestationData{Source: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				Target: &zondpb.Checkpoint{Epoch: 0}},
-			AggregationBits: bitfield.Bitlist{0x00, 0xFF, 0xFF, 0xFF},
+			ParticipationBits: bitfield.Bitlist{0x00, 0xFF, 0xFF, 0xFF},
 		}
 	}
 
@@ -118,7 +118,7 @@ func TestAttestingBalance_CorrectBalance(t *testing.T) {
 				Source: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				Slot:   primitives.Slot(i),
 			},
-			AggregationBits: bitfield.Bitlist{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+			ParticipationBits: bitfield.Bitlist{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 				0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01},
 		}
 	}

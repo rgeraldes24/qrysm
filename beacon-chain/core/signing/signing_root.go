@@ -156,8 +156,9 @@ func VerifyBlockSigningRoot(pub, signature, domain []byte, rootFunc func() ([32]
 	if err != nil {
 		return err
 	}
+	// TODO(rgeraldes24) - review
 	// We assume only one signature batch is returned here.
-	sig := set.Signatures[0]
+	sig := set.Signatures[0][0]
 	publicKey := set.PublicKeys[0][0]
 	root := set.Messages[0]
 
@@ -185,7 +186,7 @@ func BlockSignatureBatch(pub, signature, domain []byte, rootFunc func() ([32]byt
 	}
 	desc := BlockSignature
 	return &dilithium.SignatureBatch{
-		Signatures:   [][]byte{signature},
+		Signatures:   [][][]byte{{signature}},
 		PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
 		Messages:     [][32]byte{root},
 		Descriptions: []string{desc},

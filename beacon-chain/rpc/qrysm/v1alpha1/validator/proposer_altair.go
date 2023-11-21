@@ -80,7 +80,7 @@ func (vs *Server) getSyncAggregate(ctx context.Context, slot primitives.Slot, ro
 		if c == nil {
 			continue
 		}
-		bitsHolder[i] = c.AggregationBits
+		bitsHolder[i] = c.ParticipationBits
 		if len(c.Signature)%dilithium2.CryptoBytes != 0 {
 			return nil, fmt.Errorf(
 				"combined Signature length is %d is not in the multiple of %d",

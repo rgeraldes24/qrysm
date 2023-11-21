@@ -87,7 +87,7 @@ func TestBeaconBlockJsonHelpers_JsonifyZond1Data(t *testing.T) {
 func TestBeaconBlockJsonHelpers_JsonifyAttestations(t *testing.T) {
 	input := []*zondpb.Attestation{
 		{
-			AggregationBits: []byte{1},
+			ParticipationBits: []byte{1},
 			Data: &zondpb.AttestationData{
 				Slot:            2,
 				CommitteeIndex:  3,
@@ -104,7 +104,7 @@ func TestBeaconBlockJsonHelpers_JsonifyAttestations(t *testing.T) {
 			Signatures: []byte{9},
 		},
 		{
-			AggregationBits: []byte{10},
+			ParticipationBits: []byte{10},
 			Data: &zondpb.AttestationData{
 				Slot:            11,
 				CommitteeIndex:  12,
@@ -124,7 +124,7 @@ func TestBeaconBlockJsonHelpers_JsonifyAttestations(t *testing.T) {
 
 	expectedResult := []*apimiddleware.AttestationJson{
 		{
-			AggregationBits: hexutil.Encode([]byte{1}),
+			ParticipationBits: hexutil.Encode([]byte{1}),
 			Data: &apimiddleware.AttestationDataJson{
 				Slot:            "2",
 				CommitteeIndex:  "3",
@@ -141,7 +141,7 @@ func TestBeaconBlockJsonHelpers_JsonifyAttestations(t *testing.T) {
 			Signature: hexutil.Encode([]byte{9}),
 		},
 		{
-			AggregationBits: hexutil.Encode([]byte{10}),
+			ParticipationBits: hexutil.Encode([]byte{10}),
 			Data: &apimiddleware.AttestationDataJson{
 				Slot:            "11",
 				CommitteeIndex:  "12",

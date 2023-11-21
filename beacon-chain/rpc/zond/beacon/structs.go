@@ -185,9 +185,9 @@ type AttesterSlashing struct {
 }
 
 type Attestation struct {
-	AggregationBits string          `json:"aggregation_bits" validate:"required"`
-	Data            AttestationData `json:"data" validate:"required"`
-	Signature       string          `json:"signature" validate:"required"`
+	ParticipationBits string          `json:"aggregation_bits" validate:"required"`
+	Data              AttestationData `json:"data" validate:"required"`
+	Signature         string          `json:"signature" validate:"required"`
 }
 
 type Deposit struct {
@@ -1508,7 +1508,7 @@ func convertAtts(src []Attestation) ([]*zond.Attestation, error) {
 			return nil, errors.Wrapf(err, "could not decode b.Message.Body.Attestations[%d].Data.Target.Root", i)
 		}
 		atts[i] = &zond.Attestation{
-			AggregationBits: []byte(a.AggregationBits),
+			ParticipationBits: []byte(a.ParticipationBits),
 			Data: &zond.AttestationData{
 				Slot:            primitives.Slot(slot),
 				CommitteeIndex:  primitives.CommitteeIndex(committeeIndex),

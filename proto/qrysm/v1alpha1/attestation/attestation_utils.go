@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"runtime"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -16,11 +17,12 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
+	"golang.org/x/sync/errgroup"
 )
 
 type signatureSlices struct {
-	signaturesIdxToValidatorIdx []uint64
-	signatures                  [][]byte
+	attestingIndices []uint64
+	signatures       [][]byte
 }
 
 type sortByValidatorIdx signatureSlices
@@ -30,35 +32,41 @@ func (s sortByValidatorIdx) Len() int {
 }
 
 func (s sortByValidatorIdx) Swap(i, j int) {
-	s.signaturesIdxToValidatorIdx[i], s.signaturesIdxToValidatorIdx[j] = s.signaturesIdxToValidatorIdx[j], s.signaturesIdxToValidatorIdx[i]
+	s.attestingIndices[i], s.attestingIndices[j] = s.attestingIndices[j], s.attestingIndices[i]
 	s.signatures[i], s.signatures[j] = s.signatures[j], s.signatures[i]
 }
 
 func (s sortByValidatorIdx) Less(i, j int) bool {
-	return s.signaturesIdxToValidatorIdx[i] < s.signaturesIdxToValidatorIdx[j]
+	return s.attestingIndices[i] < s.attestingIndices[j]
 }
 
-// TODO(rgeraldes24): is committeeLen enough? instead of the committee
 // ConvertToIndexed converts attestation to (almost) indexed-verifiable form.
 func ConvertToIndexed(ctx context.Context, attestation *zondpb.Attestation, committee []primitives.ValidatorIndex) (*zondpb.IndexedAttestation, error) {
 	if bf := attestation.ParticipationBits; bf.Len() != uint64(len(committee)) {
 		return nil, fmt.Errorf("bitfield length %d is not equal to committee length %d", bf.Len(), len(committee))
 	}
 
-	// FIX given that we need to order by val idx and not participation idx but we are given the committee
+	// replace committee indices with the validator idx
+	attestingIndices := make([]uint64, len(attestation.SignaturesIdxToParticipationIdx))
+	for i, committeeIdx := range attestation.SignaturesIdxToParticipationIdx {
+		attestingIndices[i] = uint64(committee[committeeIdx])
+	}
+
 	sigSlices := signatureSlices{
-		signaturesIdxToValidatorIdx: attestation.SignaturesIdxToParticipationIdx,
-		signatures:                  attestation.Signatures,
+		attestingIndices: attestingIndices,
+		signatures:       attestation.Signatures,
 	}
 	sort.Sort(sortByValidatorIdx(sigSlices))
 
 	return &zondpb.IndexedAttestation{
 		Data:             attestation.Data,
 		Signatures:       sigSlices.signatures,
-		AttestingIndices: sigSlices.signaturesIdxToValidatorIdx,
+		AttestingIndices: sigSlices.attestingIndices,
 	}, nil
 }
 
+// NOTE(rgeraldes24) - AttestingIndices can be simplified since we already index the participation idx.
+// The only issue is that it is not sorted and we need to double check if that's necessary.
 // AttestingIndices returns the attesting participants indices from the attestation data.
 func AttestingIndices(bf bitfield.Bitfield, committee []primitives.ValidatorIndex) ([]uint64, error) {
 	if bf.Len() != uint64(len(committee)) {
@@ -73,7 +81,7 @@ func AttestingIndices(bf bitfield.Bitfield, committee []primitives.ValidatorInde
 	return indices, nil
 }
 
-// TODO(rgeraldes24): make sure that we get the correct pub keys and in the correct order
+// NOTE(rgeraldes24): order of pubkeys is correct via VerifyIndexedAttestation.
 // VerifyIndexedAttestationSigs this helper function performs the last part of the
 // spec indexed attestation validation - signatures verification.
 func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *zondpb.IndexedAttestation, pubKeys []dilithium.PublicKey, domain []byte) error {
@@ -85,7 +93,9 @@ func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *zondpb.Indexe
 		return errors.Wrap(err, "could not get signing root of object")
 	}
 
-	fmt.Printf("%x\n", messageHash)
+	n := runtime.GOMAXPROCS(0) - 1
+	grp := errgroup.Group{}
+	grp.SetLimit(n)
 
 	for i, rawSig := range indexedAtt.Signatures {
 		sig, err := dilithium.SignatureFromBytes(rawSig)
@@ -93,9 +103,18 @@ func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *zondpb.Indexe
 			return errors.Wrap(err, "could not convert bytes to signature")
 		}
 
-		if !sig.Verify(pubKeys[i], messageHash[:]) {
-			return signing.ErrSigFailedToVerify
-		}
+		iCopy := i
+		grp.Go(func() error {
+			if !sig.Verify(pubKeys[iCopy], messageHash[:]) {
+				return signing.ErrSigFailedToVerify
+			}
+
+			return nil
+		})
+	}
+
+	if err := grp.Wait(); err != nil {
+		return err
 	}
 
 	return nil

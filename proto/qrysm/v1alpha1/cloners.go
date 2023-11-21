@@ -37,10 +37,10 @@ func CopyPendingAttestation(att *PendingAttestation) *PendingAttestation {
 	}
 	data := CopyAttestationData(att.Data)
 	return &PendingAttestation{
-		AggregationBits: bytesutil.SafeCopyBytes(att.AggregationBits),
-		Data:            data,
-		InclusionDelay:  att.InclusionDelay,
-		ProposerIndex:   att.ProposerIndex,
+		ParticipationBits: bytesutil.SafeCopyBytes(att.ParticipationBits),
+		Data:              data,
+		InclusionDelay:    att.InclusionDelay,
+		ProposerIndex:     att.ProposerIndex,
 	}
 }
 

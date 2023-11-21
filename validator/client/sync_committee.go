@@ -144,7 +144,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 			log.WithError(err).Error("Could not get sync committee contribution")
 			return
 		}
-		if contribution.AggregationBits.Count() == 0 {
+		if contribution.ParticipationBits.Count() == 0 {
 			log.WithFields(logrus.Fields{
 				"slot":   slot,
 				"pubkey": pubKey,
@@ -181,7 +181,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 			"blockRoot":          fmt.Sprintf("%#x", bytesutil.Trunc(contributionAndProof.Contribution.BlockRoot)),
 			"subcommitteeIndex":  contributionAndProof.Contribution.SubcommitteeIndex,
 			"aggregatorIndex":    contributionAndProof.AggregatorIndex,
-			"bitsCount":          contributionAndProof.Contribution.AggregationBits.Count(),
+			"bitsCount":          contributionAndProof.Contribution.ParticipationBits.Count(),
 		}).Info("Submitted new sync contribution and proof")
 	}
 }

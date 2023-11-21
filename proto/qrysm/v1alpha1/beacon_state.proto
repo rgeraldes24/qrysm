@@ -76,8 +76,8 @@ message Fork {
 
 message PendingAttestation {
   // Bitfield representation of validator indices that have voted exactly
-  // the same vote and have been aggregated into this attestation.
-  bytes aggregation_bits = 1 [(theqrl.zond.ext.ssz_max) = "2048", (theqrl.zond.ext.cast_type) = "github.com/prysmaticlabs/go-bitfield.Bitlist"];
+  // the same vote and have been included into this attestation.
+  bytes participation_bits = 1 [(theqrl.zond.ext.ssz_max) = "2048", (theqrl.zond.ext.cast_type) = "github.com/prysmaticlabs/go-bitfield.Bitlist"];
   AttestationData data = 2;
   // The difference of when attestation gets created and get included on chain.
   uint64 inclusion_delay = 3 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
@@ -143,7 +143,6 @@ message DepositMessage {
 // SyncCommittee serves as committees to facilitate light client syncing to beacon chain.
 message SyncCommittee {
   repeated bytes pubkeys = 1  [(theqrl.zond.ext.ssz_size) = "sync_committee_bits.size,2592"];
-  bytes aggregate_pubkey = 2 [(theqrl.zond.ext.ssz_size) = "1327104"];
 }
 
 // SyncAggregatorSelectionData is used to sign over and then check whether the aggregator is selected within a subcommittee.

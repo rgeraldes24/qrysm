@@ -9,9 +9,10 @@ import (
 )
 
 type Attestation struct {
-	AggregationBits string           `json:"aggregation_bits" validate:"required,hexadecimal"`
-	Data            *AttestationData `json:"data" validate:"required"`
-	Signature       string           `json:"signature" validate:"required,hexadecimal"`
+	ParticipationBits               string           `json:"aggregation_bits" validate:"required,hexadecimal"`
+	Data                            *AttestationData `json:"data" validate:"required"`
+	Signatures                      []string         `json:"signatures" validate:"required,hexadecimal"`
+	SignaturesIdxToParticipationIdx []string         `json:"signatures_idx_to_participation_idx" validate:"required,hexadecimal"`
 }
 
 type AttestationData struct {
@@ -39,11 +40,12 @@ type ContributionAndProof struct {
 }
 
 type SyncCommitteeContribution struct {
-	Slot              string `json:"slot" validate:"required,number,gte=0"`
-	BeaconBlockRoot   string `json:"beacon_block_root" hex:"true" validate:"required,hexadecimal"`
-	SubcommitteeIndex string `json:"subcommittee_index" validate:"required,number,gte=0"`
-	AggregationBits   string `json:"aggregation_bits" hex:"true" validate:"required,hexadecimal"`
-	Signature         string `json:"signature" hex:"true" validate:"required,hexadecimal"`
+	Slot                            string   `json:"slot" validate:"required,number,gte=0"`
+	BeaconBlockRoot                 string   `json:"beacon_block_root" hex:"true" validate:"required,hexadecimal"`
+	SubcommitteeIndex               string   `json:"subcommittee_index" validate:"required,number,gte=0"`
+	ParticipationBits               string   `json:"aggregation_bits" hex:"true" validate:"required,hexadecimal"`
+	Signatures                      []string `json:"signatures" hex:"true" validate:"required,hexadecimal"`
+	SignaturesIdxToParticipationIdx []string `json:"signatures_idx_to_participation_idx" validate:"required,hexadecimal"`
 }
 
 type SignedAggregateAttestationAndProof struct {
@@ -107,21 +109,30 @@ func (s *SyncCommitteeContribution) ToConsensus() (*zond.SyncCommitteeContributi
 	if err != nil {
 		return nil, NewDecodeError(err, "SubcommitteeIndex")
 	}
-	aggBits, err := hexutil.Decode(s.AggregationBits)
+	aggBits, err := hexutil.Decode(s.ParticipationBits)
 	if err != nil {
-		return nil, NewDecodeError(err, "AggregationBits")
+		return nil, NewDecodeError(err, "ParticipationBits")
 	}
-	sig, err := hexutil.Decode(s.Signature)
-	if err != nil {
-		return nil, NewDecodeError(err, "Signature")
+	sigs := make([][]byte, len(s.Signatures))
+	for i, sig := range s.Signatures {
+		sigs[i] = hexutil.Decode(sig)
+	}
+	indices := make([]uint64, len(s.SignaturesIdxToParticipationIdx))
+	for i, idx := range s.SignaturesIdxToParticipationIdx {
+		idxUint, err := strconv.ParseUint(idx, 10, 64)
+		if err != nil {
+			return nil, NewDecodeError(err, "SignaturesIdxToParticipationIdx")
+		}
+		indices[i] = idxUint
 	}
 
 	return &zond.SyncCommitteeContribution{
-		Slot:              primitives.Slot(slot),
-		BlockRoot:         bbRoot,
-		SubcommitteeIndex: subcommitteeIndex,
-		AggregationBits:   aggBits,
-		Signature:         sig,
+		Slot:                            primitives.Slot(slot),
+		BlockRoot:                       bbRoot,
+		SubcommitteeIndex:               subcommitteeIndex,
+		ParticipationBits:               aggBits,
+		Signatures:                      sigs,
+		SignaturesIdxToParticipationIdx: indices,
 	}, nil
 }
 
@@ -162,23 +173,32 @@ func (a *AggregateAttestationAndProof) ToConsensus() (*zond.AggregateAttestation
 }
 
 func (a *Attestation) ToConsensus() (*zond.Attestation, error) {
-	aggBits, err := hexutil.Decode(a.AggregationBits)
+	aggBits, err := hexutil.Decode(a.ParticipationBits)
 	if err != nil {
-		return nil, NewDecodeError(err, "AggregationBits")
+		return nil, NewDecodeError(err, "ParticipationBits")
 	}
 	data, err := a.Data.ToConsensus()
 	if err != nil {
 		return nil, NewDecodeError(err, "Data")
 	}
-	sig, err := hexutil.Decode(a.Signature)
-	if err != nil {
-		return nil, NewDecodeError(err, "Signature")
+	sigs := make([][]byte, len(a.Signatures))
+	for i, sig := range a.Signatures {
+		sigs[i] = hexutil.Decode(sig)
+	}
+	indices := make([]uint64, len(a.SignaturesIdxToParticipationIdx))
+	for i, idx := range a.SignaturesIdxToParticipationIdx {
+		idxUint, err := strconv.ParseUint(idx, 10, 64)
+		if err != nil {
+			return nil, NewDecodeError(err, "SignaturesIdxToParticipationIdx")
+		}
+		indices[i] = idxUint
 	}
 
 	return &zond.Attestation{
-		AggregationBits: aggBits,
-		Data:            data,
-		Signatures:      sig,
+		ParticipationBits:               aggBits,
+		Data:                            data,
+		Signatures:                      sigs,
+		SignaturesIdxToParticipationIdx: indices,
 	}, nil
 }
 

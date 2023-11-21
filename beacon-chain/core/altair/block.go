@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"runtime"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	p2pType "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
@@ -16,6 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time/slots"
+	"golang.org/x/sync/errgroup"
 )
 
 // ProcessSyncAggregate verifies sync committee aggregate signature signing over the previous slot block root.
@@ -48,50 +49,57 @@ import (
 //	    else:
 //	        decrease_balance(state, participant_index, participant_reward)
 func ProcessSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb.SyncAggregate) (state.BeaconState, uint64, error) {
-	s, votedKeys, reward, err := processSyncAggregate(ctx, s, sync)
+	s, votedKeys, sigs, reward, err := processSyncAggregate(ctx, s, sync)
 	if err != nil {
 		return nil, 0, errors.Wrap(err, "could not filter sync committee votes")
 	}
 
-	if err := VerifySyncCommitteeSig(s, votedKeys, sync.SyncCommitteeSignature); err != nil {
-		return nil, 0, errors.Wrap(err, "could not verify sync committee signature")
+	if err := VerifySyncCommitteeSigs(s, votedKeys, sigs); err != nil {
+		return nil, 0, errors.Wrap(err, "could not verify sync committee signatures")
 	}
 	return s, reward, nil
 }
 
 // processSyncAggregate applies all the logic in the spec function `process_sync_aggregate` except
-// verifying the BLS signatures. It returns the modified beacons state, the list of validators'
-// public keys that voted (for future signature verification) and the proposer reward for including
+// verifying the Dilithium signatures. It returns the modified beacons state, the list of validators'
+// public keys that voted (for future signature verification), and the proposer reward for including
 // sync aggregate messages.
 func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb.SyncAggregate) (
 	state.BeaconState,
 	[]dilithium.PublicKey,
+	[][]byte,
 	uint64,
 	error) {
 	currentSyncCommittee, err := s.CurrentSyncCommittee()
 	if err != nil {
-		return nil, nil, 0, err
+		return nil, nil, nil, 0, err
 	}
 	if currentSyncCommittee == nil {
-		return nil, nil, 0, errors.New("nil current sync committee in state")
+		return nil, nil, nil, 0, errors.New("nil current sync committee in state")
 	}
 	committeeKeys := currentSyncCommittee.Pubkeys
 	if sync.SyncCommitteeBits.Len() > uint64(len(committeeKeys)) {
-		return nil, nil, 0, errors.New("bits length exceeds committee length")
+		return nil, nil, nil, 0, errors.New("bits length exceeds committee length")
 	}
 	votedKeys := make([]dilithium.PublicKey, 0, len(committeeKeys))
 
+	sigs := make([][]byte, 0, len(committeeKeys))
+	mapCommitteeIdxToSigIdx := make(map[uint64]int)
+	for sigIdx, committeeIdx := range sync.SignaturesIdxToCommitteeIdx {
+		mapCommitteeIdxToSigIdx[committeeIdx] = sigIdx
+	}
+
 	activeBalance, err := helpers.TotalActiveBalance(s)
 	if err != nil {
-		return nil, nil, 0, err
+		return nil, nil, nil, 0, err
 	}
 	proposerReward, participantReward, err := SyncRewards(activeBalance)
 	if err != nil {
-		return nil, nil, 0, err
+		return nil, nil, nil, 0, err
 	}
 	proposerIndex, err := helpers.BeaconProposerIndex(ctx, s)
 	if err != nil {
-		return nil, nil, 0, err
+		return nil, nil, nil, 0, err
 	}
 
 	earnedProposerReward := uint64(0)
@@ -99,33 +107,35 @@ func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb
 		vIdx, exists := s.ValidatorIndexByPubkey(bytesutil.ToBytes2592(committeeKeys[i]))
 		// Impossible scenario.
 		if !exists {
-			return nil, nil, 0, errors.New("validator public key does not exist in state")
+			return nil, nil, nil, 0, errors.New("validator public key does not exist in state")
 		}
 
 		if sync.SyncCommitteeBits.BitAt(i) {
 			pubKey, err := dilithium.PublicKeyFromBytes(committeeKeys[i])
 			if err != nil {
-				return nil, nil, 0, err
+				return nil, nil, nil, 0, err
 			}
 			votedKeys = append(votedKeys, pubKey)
 			if err := helpers.IncreaseBalance(s, vIdx, participantReward); err != nil {
-				return nil, nil, 0, err
+				return nil, nil, nil, 0, err
 			}
+			sigIdx := mapCommitteeIdxToSigIdx[i]
+			sigs = append(sigs, sync.SyncCommitteeSignatures[sigIdx])
 			earnedProposerReward += proposerReward
 		} else {
 			if err := helpers.DecreaseBalance(s, vIdx, participantReward); err != nil {
-				return nil, nil, 0, err
+				return nil, nil, nil, 0, err
 			}
 		}
 	}
 	if err := helpers.IncreaseBalance(s, proposerIndex, earnedProposerReward); err != nil {
-		return nil, nil, 0, err
+		return nil, nil, nil, 0, err
 	}
-	return s, votedKeys, earnedProposerReward, err
+	return s, votedKeys, sigs, earnedProposerReward, err
 }
 
-// VerifySyncCommitteeSig verifies sync committee signature `syncSig` is valid with respect to public keys `syncKeys`.
-func VerifySyncCommitteeSig(s state.BeaconState, syncKeys []dilithium.PublicKey, syncSig []byte) error {
+// VerifySyncCommitteeSigs verifies sync committee signatures `syncSigs` is valid with respect to public keys `syncKeys`.
+func VerifySyncCommitteeSigs(s state.BeaconState, syncKeys []dilithium.PublicKey, syncSigs [][]byte) error {
 	ps := slots.PrevSlot(s.Slot())
 	d, err := signing.Domain(s.Fork(), slots.ToEpoch(ps), params.BeaconConfig().DomainSyncCommittee, s.GenesisValidatorsRoot())
 	if err != nil {
@@ -141,22 +151,33 @@ func VerifySyncCommitteeSig(s state.BeaconState, syncKeys []dilithium.PublicKey,
 		return err
 	}
 
-	if (len(syncKeys) != 0 && len(syncSig) != 1) && (len(syncSig) != len(syncKeys)*dilithium2.CryptoBytes) {
-		return fmt.Errorf("syncSig and syncKeys length mismatch | syncSig len %d | syncKeys len %d",
-			len(syncSig), len(syncKeys))
+	n := runtime.GOMAXPROCS(0) - 1
+	grp := errgroup.Group{}
+	grp.SetLimit(n)
+
+	for i, sig := range syncSigs {
+		iCopy := i
+		sigCopy := make([]byte, len(sig))
+		copy(sigCopy, sig)
+		grp.Go(func() error {
+			sig, err := dilithium.SignatureFromBytes(sigCopy)
+			if err != nil {
+				return err
+			}
+
+			if !sig.Verify(syncKeys[iCopy], r[:]) {
+				return fmt.Errorf("invalid sync committee signature at %d %s %s",
+					iCopy, hex.EncodeToString(syncKeys[iCopy].Marshal()), hex.EncodeToString(sig.Marshal()))
+			}
+
+			return nil
+		})
 	}
 
-	for i, syncKey := range syncKeys {
-		offset := i * dilithium2.CryptoBytes
-		sig, err := dilithium.SignatureFromBytes(syncSig[offset : offset+dilithium2.CryptoBytes])
-		if err != nil {
-			return err
-		}
-		if !sig.Verify(syncKey, r[:]) {
-			return fmt.Errorf("invalid sync committee signature at %d %s %s",
-				i, hex.EncodeToString(syncKey.Marshal()), hex.EncodeToString(sig.Marshal()))
-		}
+	if err := grp.Wait(); err != nil {
+		return err
 	}
+
 	return nil
 }
 

@@ -156,7 +156,7 @@ func pendingAttestation(prefix string) *zondpb.PendingAttestation {
 	bbr := bytesutil.ToBytes32([]byte(prefix + "beacon"))
 	r := bytesutil.ToBytes32([]byte(prefix + "root"))
 	return &zondpb.PendingAttestation{
-		AggregationBits: bitfield.Bitlist{0x00, 0xFF, 0xFF, 0xFF},
+		ParticipationBits: bitfield.Bitlist{0x00, 0xFF, 0xFF, 0xFF},
 		Data: &zondpb.AttestationData{
 			Slot:            123,
 			CommitteeIndex:  123,

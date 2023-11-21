@@ -394,7 +394,7 @@ func testSignedBlindedBeaconBlockCapella(t *testing.T) *zond.SignedBlindedBeacon
 				},
 				Attestations: []*zond.Attestation{
 					{
-						AggregationBits: bitfield.Bitlist{0x01},
+						ParticipationBits: bitfield.Bitlist{0x01},
 						Data: &zond.AttestationData{
 							Slot:            1,
 							CommitteeIndex:  1,

@@ -222,14 +222,14 @@ func generateAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []bls.S
 	aggBits.SetBitAt(index, true)
 	aggBits.SetBitAt(index+1, true)
 	att := util.HydrateAttestation(&zondpb.Attestation{
-		Data:            &zondpb.AttestationData{CommitteeIndex: 1},
-		AggregationBits: aggBits,
+		Data:              &zondpb.AttestationData{CommitteeIndex: 1},
+		ParticipationBits: aggBits,
 	})
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), state, att.Data.Slot, att.Data.CommitteeIndex)
 	if err != nil {
 		return nil, err
 	}
-	attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	attestingIndices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	if err != nil {
 		return nil, err
 	}
@@ -262,13 +262,13 @@ func generateUnaggregatedAtt(state state.ReadOnlyBeaconState, index uint64, priv
 		Data: &zondpb.AttestationData{
 			CommitteeIndex: 1,
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	})
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), state, att.Data.Slot, att.Data.CommitteeIndex)
 	if err != nil {
 		return nil, err
 	}
-	attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	attestingIndices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	if err != nil {
 		return nil, err
 	}
@@ -310,15 +310,15 @@ func TestSubmitAggregateAndProof_PreferOwnAttestation(t *testing.T) {
 	att0, err := generateAtt(beaconState, 0, privKeys)
 	require.NoError(t, err)
 	att0.Data.BeaconBlockRoot = bytesutil.PadTo([]byte("foo"), fieldparams.RootLength)
-	att0.AggregationBits = bitfield.Bitlist{0b11100}
+	att0.ParticipationBits = bitfield.Bitlist{0b11100}
 	att1, err := generateAtt(beaconState, 0, privKeys)
 	require.NoError(t, err)
 	att1.Data.BeaconBlockRoot = bytesutil.PadTo([]byte("bar"), fieldparams.RootLength)
-	att1.AggregationBits = bitfield.Bitlist{0b11001}
+	att1.ParticipationBits = bitfield.Bitlist{0b11001}
 	att2, err := generateAtt(beaconState, 2, privKeys)
 	require.NoError(t, err)
 	att2.Data.BeaconBlockRoot = bytesutil.PadTo([]byte("foo"), fieldparams.RootLength)
-	att2.AggregationBits = bitfield.Bitlist{0b11110}
+	att2.ParticipationBits = bitfield.Bitlist{0b11110}
 
 	err = beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
 	require.NoError(t, err)
@@ -365,11 +365,11 @@ func TestSubmitAggregateAndProof_SelectsMostBitsWhenOwnAttestationNotPresent(t *
 	att0, err := generateAtt(beaconState, 0, privKeys)
 	require.NoError(t, err)
 	att0.Data.BeaconBlockRoot = bytesutil.PadTo([]byte("foo"), fieldparams.RootLength)
-	att0.AggregationBits = bitfield.Bitlist{0b11100}
+	att0.ParticipationBits = bitfield.Bitlist{0b11100}
 	att1, err := generateAtt(beaconState, 2, privKeys)
 	require.NoError(t, err)
 	att1.Data.BeaconBlockRoot = bytesutil.PadTo([]byte("bar"), fieldparams.RootLength)
-	att1.AggregationBits = bitfield.Bitlist{0b11110}
+	att1.ParticipationBits = bitfield.Bitlist{0b11110}
 
 	err = beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
 	require.NoError(t, err)

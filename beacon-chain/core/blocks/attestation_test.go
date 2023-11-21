@@ -30,7 +30,7 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 	aggBits1.SetBitAt(1, true)
 	att1 := &zondpb.Attestation{
 		Data:            data,
-		AggregationBits: aggBits1,
+		ParticipationBits: aggBits1,
 	}
 
 	cfc := beaconState.CurrentJustifiedCheckpoint()
@@ -40,7 +40,7 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att1.Data.Slot, att1.Data.CommitteeIndex)
 	require.NoError(t, err)
-	attestingIndices1, err := attestation.AttestingIndices(att1.AggregationBits, committee)
+	attestingIndices1, err := attestation.AttestingIndices(att1.ParticipationBits, committee)
 	require.NoError(t, err)
 	sigs := make([]bls.Signature, len(attestingIndices1))
 	for i, indice := range attestingIndices1 {
@@ -57,12 +57,12 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 	aggBits2.SetBitAt(2, true)
 	att2 := &zondpb.Attestation{
 		Data:            data,
-		AggregationBits: aggBits2,
+		ParticipationBits: aggBits2,
 	}
 
 	committee, err = helpers.BeaconCommitteeFromState(context.Background(), beaconState, att2.Data.Slot, att2.Data.CommitteeIndex)
 	require.NoError(t, err)
-	attestingIndices2, err := attestation.AttestingIndices(att2.AggregationBits, committee)
+	attestingIndices2, err := attestation.AttestingIndices(att2.ParticipationBits, committee)
 	require.NoError(t, err)
 	sigs = make([]bls.Signature, len(attestingIndices2))
 	for i, indice := range attestingIndices2 {
@@ -107,7 +107,7 @@ func TestProcessAttestationsNoVerify_OK(t *testing.T) {
 			Source: &zondpb.Checkpoint{Epoch: 0, Root: mockRoot[:]},
 			Target: &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, 32)},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 
 	var zeroSig [dilithium2.CryptoBytes]byte
@@ -120,7 +120,7 @@ func TestProcessAttestationsNoVerify_OK(t *testing.T) {
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(ckp))
 	require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
-	_, err = blocks.ProcessAttestationNoVerifySignature(context.TODO(), beaconState, att)
+	_, err = blocks.ProcessAttestationNoVerifySignatures(context.TODO(), beaconState, att)
 	assert.NoError(t, err)
 }
 
@@ -138,7 +138,7 @@ func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 			Source: &zondpb.Checkpoint{Epoch: 0, Root: mockRoot[:]},
 			Target: &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, 32)},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 
 	var zeroSig [dilithium2.CryptoBytes]byte
@@ -167,7 +167,7 @@ func TestVerifyAttestationNoVerifySignature_BadAttIdx(t *testing.T) {
 			Source:         &zondpb.Checkpoint{Epoch: 0, Root: mockRoot[:]},
 			Target:         &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, 32)},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 	var zeroSig [dilithium2.CryptoBytes]byte
 	att.Signatures = [][]byte{zeroSig[:]}
@@ -219,7 +219,7 @@ func TestConvertToIndexed_OK(t *testing.T) {
 		Signatures: [][]byte{sig[:]},
 	})
 	for _, tt := range tests {
-		att.AggregationBits = tt.aggregationBitfield
+		att.ParticipationBits = tt.aggregationBitfield
 		wanted := &zondpb.IndexedAttestation{
 			AttestingIndices: tt.wantedAttestingIndices,
 			Data:             att.Data,
@@ -356,8 +356,8 @@ func TestValidateIndexedAttestation_BadAttestationsSignatureSet(t *testing.T) {
 				CommitteeIndex: 1,
 				Slot:           1,
 			},
-			Signatures:      [][]byte{sig.Marshal()},
-			AggregationBits: list,
+			Signatures:        [][]byte{sig.Marshal()},
+			ParticipationBits: list,
 		})
 	}
 
@@ -376,8 +376,8 @@ func TestValidateIndexedAttestation_BadAttestationsSignatureSet(t *testing.T) {
 					Root: []byte{},
 				},
 			},
-			Signatures:      [][]byte{sig.Marshal()},
-			AggregationBits: list,
+			Signatures:        [][]byte{sig.Marshal()},
+			ParticipationBits: list,
 		})
 	}
 
@@ -414,7 +414,7 @@ func TestVerifyAttestations_HandlesPlannedFork(t *testing.T) {
 	comm1, err := helpers.BeaconCommitteeFromState(context.Background(), st, 1 , 0)
 	require.NoError(t, err)
 	att1 := util.HydrateAttestation(&zondpb.Attestation{
-		AggregationBits: bitfield.NewBitlist(uint64(len(comm1))),
+		ParticipationBits: bitfield.NewBitlist(uint64(len(comm1))),
 		Data: &zondpb.AttestationData{
 			Slot: 1,
 		},
@@ -425,7 +425,7 @@ func TestVerifyAttestations_HandlesPlannedFork(t *testing.T) {
 	require.NoError(t, err)
 	var sigs []bls.Signature
 	for i, u := range comm1 {
-		att1.AggregationBits.SetBitAt(uint64(i), true)
+		att1.ParticipationBits.SetBitAt(uint64(i), true)
 		sigs = append(sigs, keys[u].Sign(root[:]))
 	}
 	att1.Signatures = bls.AggregateSignatures(sigs).Marshal()
@@ -433,7 +433,7 @@ func TestVerifyAttestations_HandlesPlannedFork(t *testing.T) {
 	comm2, err := helpers.BeaconCommitteeFromState(context.Background(), st, 1*params.BeaconConfig().SlotsPerEpoch+1, 1)
 	require.NoError(t, err)
 	att2 := util.HydrateAttestation(&zondpb.Attestation{
-		AggregationBits: bitfield.NewBitlist(uint64(len(comm2))),
+		ParticipationBits: bitfield.NewBitlist(uint64(len(comm2))),
 		Data: &zondpb.AttestationData{
 			Slot:           1*params.BeaconConfig().SlotsPerEpoch + 1,
 			CommitteeIndex: 1,
@@ -445,7 +445,7 @@ func TestVerifyAttestations_HandlesPlannedFork(t *testing.T) {
 	require.NoError(t, err)
 	sigs = nil
 	for i, u := range comm2 {
-		att2.AggregationBits.SetBitAt(uint64(i), true)
+		att2.ParticipationBits.SetBitAt(uint64(i), true)
 		sigs = append(sigs, keys[u].Sign(root[:]))
 	}
 	att2.Signature = bls.AggregateSignatures(sigs).Marshal()
@@ -475,7 +475,7 @@ func TestRetrieveAttestationSignatureSet_VerifiesMultipleAttestations(t *testing
 	comm1, err := helpers.BeaconCommitteeFromState(context.Background(), st, 1, 0)
 	require.NoError(t, err)
 	att1 := util.HydrateAttestation(&zondpb.Attestation{
-		AggregationBits: bitfield.NewBitlist(uint64(len(comm1))),
+		ParticipationBits: bitfield.NewBitlist(uint64(len(comm1))),
 		Data: &zondpb.AttestationData{
 			Slot: 1,
 		},
@@ -486,7 +486,7 @@ func TestRetrieveAttestationSignatureSet_VerifiesMultipleAttestations(t *testing
 	require.NoError(t, err)
 	var sigs []bls.Signature
 	for i, u := range comm1 {
-		att1.AggregationBits.SetBitAt(uint64(i), true)
+		att1.ParticipationBits.SetBitAt(uint64(i), true)
 		sigs = append(sigs, keys[u].Sign(root[:]))
 	}
 	att1.Signatures = bls.AggregateSignatures(sigs).Marshal()
@@ -494,7 +494,7 @@ func TestRetrieveAttestationSignatureSet_VerifiesMultipleAttestations(t *testing
 	comm2, err := helpers.BeaconCommitteeFromState(context.Background(), st, 1, 1)
 	require.NoError(t, err)
 	att2 := util.HydrateAttestation(&zondpb.Attestation{
-		AggregationBits: bitfield.NewBitlist(uint64(len(comm2))),
+		ParticipationBits: bitfield.NewBitlist(uint64(len(comm2))),
 		Data: &zondpb.AttestationData{
 			Slot:           1,
 			CommitteeIndex: 1,
@@ -504,7 +504,7 @@ func TestRetrieveAttestationSignatureSet_VerifiesMultipleAttestations(t *testing
 	require.NoError(t, err)
 	sigs = nil
 	for i, u := range comm2 {
-		att2.AggregationBits.SetBitAt(uint64(i), true)
+		att2.ParticipationBits.SetBitAt(uint64(i), true)
 		sigs = append(sigs, keys[u].Sign(root[:]))
 	}
 	att2.Signature = bls.AggregateSignatures(sigs).Marshal()
@@ -541,7 +541,7 @@ func TestRetrieveAttestationSignatureSet_AcrossFork(t *testing.T) {
 	comm1, err := helpers.BeaconCommitteeFromState(ctx, st, 1 slot, 0)
 	require.NoError(t, err)
 	att1 := util.HydrateAttestation(&zondpb.Attestation{
-		AggregationBits: bitfield.NewBitlist(uint64(len(comm1))),
+		ParticipationBits: bitfield.NewBitlist(uint64(len(comm1))),
 		Data: &zondpb.AttestationData{
 			Slot: 1,
 		},
@@ -552,7 +552,7 @@ func TestRetrieveAttestationSignatureSet_AcrossFork(t *testing.T) {
 	require.NoError(t, err)
 	var sigs []bls.Signature
 	for i, u := range comm1 {
-		att1.AggregationBits.SetBitAt(uint64(i), true)
+		att1.ParticipationBits.SetBitAt(uint64(i), true)
 		sigs = append(sigs, keys[u].Sign(root[:]))
 	}
 	att1.Signatures = bls.AggregateSignatures(sigs).Marshal()
@@ -560,7 +560,7 @@ func TestRetrieveAttestationSignatureSet_AcrossFork(t *testing.T) {
 	comm2, err := helpers.BeaconCommitteeFromState(ctx, st, 1, 1)
 	require.NoError(t, err)
 	att2 := util.HydrateAttestation(&zondpb.Attestation{
-		AggregationBits: bitfield.NewBitlist(uint64(len(comm2))),
+		ParticipationBits: bitfield.NewBitlist(uint64(len(comm2))),
 		Data: &zondpb.AttestationData{
 			Slot:           1,
 			CommitteeIndex: 1,
@@ -570,7 +570,7 @@ func TestRetrieveAttestationSignatureSet_AcrossFork(t *testing.T) {
 	require.NoError(t, err)
 	sigs = nil
 	for i, u := range comm2 {
-		att2.AggregationBits.SetBitAt(uint64(i), true)
+		att2.ParticipationBits.SetBitAt(uint64(i), true)
 		sigs = append(sigs, keys[u].Sign(root[:]))
 	}
 	att2.Signature = bls.AggregateSignatures(sigs).Marshal()

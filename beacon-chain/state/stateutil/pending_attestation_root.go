@@ -16,7 +16,7 @@ func PendingAttRootWithHasher(att *zondpb.PendingAttestation) ([32]byte, error) 
 	var fieldRoots [][32]byte
 
 	// Bitfield.
-	aggregationRoot, err := ssz.BitlistRoot(att.AggregationBits, params.BeaconConfig().MaxValidatorsPerCommittee)
+	aggregationRoot, err := ssz.BitlistRoot(att.ParticipationBits, params.BeaconConfig().MaxValidatorsPerCommittee)
 	if err != nil {
 		return [32]byte{}, err
 	}

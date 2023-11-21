@@ -801,7 +801,7 @@ func (vs *Server) ProduceSyncCommitteeContribution(
 		Slot:              req.Slot,
 		BeaconBlockRoot:   req.BeaconBlockRoot,
 		SubcommitteeIndex: req.SubcommitteeIndex,
-		AggregationBits:   v1alpha1Resp.Bits,
+		ParticipationBits: v1alpha1Resp.Bits,
 		Signature:         v1alpha1Resp.AggregatedSig,
 	}
 

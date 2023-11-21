@@ -86,7 +86,7 @@ func (a proposerAtts) filter(ctx context.Context, st state.BeaconState) (propose
 	var attestationProcessor func(context.Context, state.BeaconState, *zondpb.Attestation) (state.BeaconState, error)
 
 	if st.Version() == version.Phase0 {
-		attestationProcessor = blocks.ProcessAttestationNoVerifySignature
+		attestationProcessor = blocks.ProcessAttestationNoVerifySignatures
 	} else if st.Version() >= version.Altair {
 		// Use a wrapper here, as go needs strong typing for the function signature.
 		attestationProcessor = func(ctx context.Context, st state.BeaconState, attestation *zondpb.Attestation) (state.BeaconState, error) {
@@ -94,7 +94,7 @@ func (a proposerAtts) filter(ctx context.Context, st state.BeaconState) (propose
 			if err != nil {
 				return nil, err
 			}
-			return altair.ProcessAttestationNoVerifySignature(ctx, st, attestation, totalBalance)
+			return altair.ProcessAttestationNoVerifySignatures(ctx, st, attestation, totalBalance)
 		}
 	} else {
 		// Exit early if there is an unknown state type.
@@ -139,7 +139,7 @@ func (a proposerAtts) sortByProfitabilityUsingMaxCover() (proposerAtts, error) {
 		candidates := make([]*bitfield.Bitlist64, len(atts))
 		for i := 0; i < len(atts); i++ {
 			var err error
-			candidates[i], err = atts[i].AggregationBits.ToBitlist64()
+			candidates[i], err = atts[i].ParticipationBits.ToBitlist64()
 			if err != nil {
 				return nil, err
 			}
@@ -158,10 +158,10 @@ func (a proposerAtts) sortByProfitabilityUsingMaxCover() (proposerAtts, error) {
 				leftoverAtts[i] = atts[key]
 			}
 			sort.Slice(selectedAtts, func(i, j int) bool {
-				return selectedAtts[i].AggregationBits.Count() > selectedAtts[j].AggregationBits.Count()
+				return selectedAtts[i].ParticipationBits.Count() > selectedAtts[j].ParticipationBits.Count()
 			})
 			sort.Slice(leftoverAtts, func(i, j int) bool {
-				return leftoverAtts[i].AggregationBits.Count() > leftoverAtts[j].AggregationBits.Count()
+				return leftoverAtts[i].ParticipationBits.Count() > leftoverAtts[j].ParticipationBits.Count()
 			})
 			return append(selectedAtts, leftoverAtts...), nil
 		}
@@ -216,7 +216,7 @@ func (a proposerAtts) dedup() (proposerAtts, error) {
 			a := atts[i]
 			for j := i + 1; j < len(atts); j++ {
 				b := atts[j]
-				if c, err := a.AggregationBits.Contains(b.AggregationBits); err != nil {
+				if c, err := a.ParticipationBits.Contains(b.ParticipationBits); err != nil {
 					return nil, err
 				} else if c {
 					// a contains b, b is redundant.
@@ -224,7 +224,7 @@ func (a proposerAtts) dedup() (proposerAtts, error) {
 					atts[len(atts)-1] = nil
 					atts = atts[:len(atts)-1]
 					j--
-				} else if c, err := b.AggregationBits.Contains(a.AggregationBits); err != nil {
+				} else if c, err := b.ParticipationBits.Contains(a.ParticipationBits); err != nil {
 					return nil, err
 				} else if c {
 					// b contains a, a is redundant.

@@ -27,7 +27,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 	root1 := bytesutil.PadTo([]byte("root1"), 32)
 	sig1 := bytesutil.PadTo([]byte("sig1"), fieldparams.BLSSignatureLength)
 	attSlot1 := &zondpbalpha.Attestation{
-		AggregationBits: []byte{0, 1},
+		ParticipationBits: []byte{0, 1},
 		Data: &zondpbalpha.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  1,
@@ -46,7 +46,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 	root21 := bytesutil.PadTo([]byte("root2_1"), 32)
 	sig21 := bytesutil.PadTo([]byte("sig2_1"), fieldparams.BLSSignatureLength)
 	attslot21 := &zondpbalpha.Attestation{
-		AggregationBits: []byte{0, 1, 1},
+		ParticipationBits: []byte{0, 1, 1},
 		Data: &zondpbalpha.AttestationData{
 			Slot:            2,
 			CommitteeIndex:  2,
@@ -65,7 +65,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 	root22 := bytesutil.PadTo([]byte("root2_2"), 32)
 	sig22 := bytesutil.PadTo([]byte("sig2_2"), fieldparams.BLSSignatureLength)
 	attslot22 := &zondpbalpha.Attestation{
-		AggregationBits: []byte{0, 1, 1, 1},
+		ParticipationBits: []byte{0, 1, 1, 1},
 		Data: &zondpbalpha.AttestationData{
 			Slot:            2,
 			CommitteeIndex:  3,
@@ -84,7 +84,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 	root33 := bytesutil.PadTo([]byte("root3_3"), 32)
 	sig33 := bls.NewAggregateSignature().Marshal()
 	attslot33 := &zondpbalpha.Attestation{
-		AggregationBits: []byte{1, 0, 0, 1},
+		ParticipationBits: []byte{1, 0, 0, 1},
 		Data: &zondpbalpha.AttestationData{
 			Slot:            2,
 			CommitteeIndex:  3,
@@ -122,7 +122,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 		require.NotNil(t, resp)
 		require.NotNil(t, resp.Data)
-		assert.DeepEqual(t, "0x00010101", resp.Data.AggregationBits)
+		assert.DeepEqual(t, "0x00010101", resp.Data.ParticipationBits)
 		assert.DeepEqual(t, hexutil.Encode(sig22), resp.Data.Signature)
 		assert.Equal(t, "2", resp.Data.Data.Slot)
 		assert.Equal(t, "3", resp.Data.Data.CommitteeIndex)
@@ -139,7 +139,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 		err = s.AttestationsPool.SaveUnaggregatedAttestation(attslot33)
 		require.NoError(t, err)
 		newAtt := zondpbalpha.CopyAttestation(attslot33)
-		newAtt.AggregationBits = []byte{0, 1, 0, 1}
+		newAtt.ParticipationBits = []byte{0, 1, 0, 1}
 		err = s.AttestationsPool.SaveUnaggregatedAttestation(newAtt)
 		require.NoError(t, err)
 
@@ -156,7 +156,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 		resp := &AggregateAttestationResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 		require.NotNil(t, resp)
-		assert.DeepEqual(t, "0x01010001", resp.Data.AggregationBits)
+		assert.DeepEqual(t, "0x01010001", resp.Data.ParticipationBits)
 	})
 	t.Run("no matching attestation", func(t *testing.T) {
 		attDataRoot := hexutil.Encode(bytesutil.PadTo([]byte("foo"), 32))
@@ -232,7 +232,7 @@ func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *te
 	root := bytesutil.PadTo([]byte("root"), 32)
 	sig := bytesutil.PadTo([]byte("sig"), fieldparams.BLSSignatureLength)
 	att1 := &zondpbalpha.Attestation{
-		AggregationBits: []byte{3, 0, 0, 1},
+		ParticipationBits: []byte{3, 0, 0, 1},
 		Data: &zondpbalpha.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  1,
@@ -249,7 +249,7 @@ func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *te
 		Signature: sig,
 	}
 	att2 := &zondpbalpha.Attestation{
-		AggregationBits: []byte{0, 3, 0, 1},
+		ParticipationBits: []byte{0, 3, 0, 1},
 		Data: &zondpbalpha.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  1,
@@ -284,7 +284,7 @@ func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *te
 	resp := &AggregateAttestationResponse{}
 	require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 	require.NotNil(t, resp)
-	assert.DeepEqual(t, "0x03000001", resp.Data.AggregationBits)
+	assert.DeepEqual(t, "0x03000001", resp.Data.ParticipationBits)
 }
 
 func TestSubmitContributionAndProofs(t *testing.T) {

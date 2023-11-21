@@ -1526,9 +1526,9 @@ func TestServer_GetValidatorParticipation_CurrentAndPrevEpoch(t *testing.T) {
 	}
 
 	atts := []*zondpb.PendingAttestation{{
-		Data:            util.HydrateAttestationData(&zondpb.AttestationData{}),
-		InclusionDelay:  1,
-		AggregationBits: bitfield.NewBitlist(validatorCount / uint64(params.BeaconConfig().SlotsPerEpoch)),
+		Data:              util.HydrateAttestationData(&zondpb.AttestationData{}),
+		InclusionDelay:    1,
+		ParticipationBits: bitfield.NewBitlist(validatorCount / uint64(params.BeaconConfig().SlotsPerEpoch)),
 	}}
 	headState, err := util.NewBeaconState()
 	require.NoError(t, err)
@@ -1608,9 +1608,9 @@ func TestServer_GetValidatorParticipation_OrphanedUntilGenesis(t *testing.T) {
 	}
 
 	atts := []*zondpb.PendingAttestation{{
-		Data:            util.HydrateAttestationData(&zondpb.AttestationData{}),
-		InclusionDelay:  1,
-		AggregationBits: bitfield.NewBitlist((validatorCount / 3) / uint64(params.BeaconConfig().SlotsPerEpoch)),
+		Data:              util.HydrateAttestationData(&zondpb.AttestationData{}),
+		InclusionDelay:    1,
+		ParticipationBits: bitfield.NewBitlist((validatorCount / 3) / uint64(params.BeaconConfig().SlotsPerEpoch)),
 	}}
 	headState, err := util.NewBeaconState()
 	require.NoError(t, err)
@@ -1825,8 +1825,8 @@ func TestGetValidatorPerformance_OK(t *testing.T) {
 				Target: &zondpb.Checkpoint{Root: make([]byte, 32)},
 				Source: &zondpb.Checkpoint{Root: make([]byte, 32)},
 			},
-			AggregationBits: bitfield.Bitlist{},
-			InclusionDelay:  1,
+			ParticipationBits: bitfield.Bitlist{},
+			InclusionDelay:    1,
 		}
 		require.NoError(t, headState.AppendPreviousEpochAttestations(atts[i]))
 	}
@@ -2382,9 +2382,9 @@ func TestServer_GetIndividualVotes_Working(t *testing.T) {
 
 	bf := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
 	att1 := util.NewAttestation()
-	att1.AggregationBits = bf
+	att1.ParticipationBits = bf
 	att2 := util.NewAttestation()
-	att2.AggregationBits = bf
+	att2.ParticipationBits = bf
 	rt := [32]byte{'A'}
 	att1.Data.Target.Root = rt[:]
 	att1.Data.BeaconBlockRoot = rt[:]
@@ -2395,11 +2395,11 @@ func TestServer_GetIndividualVotes_Working(t *testing.T) {
 	att2.Data.Target.Root = rt[:]
 	att2.Data.BeaconBlockRoot = newRt[:]
 	err = beaconState.AppendPreviousEpochAttestations(&zondpb.PendingAttestation{
-		Data: att1.Data, AggregationBits: bf, InclusionDelay: 1,
+		Data: att1.Data, ParticipationBits: bf, InclusionDelay: 1,
 	})
 	require.NoError(t, err)
 	err = beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{
-		Data: att2.Data, AggregationBits: bf, InclusionDelay: 1,
+		Data: att2.Data, ParticipationBits: bf, InclusionDelay: 1,
 	})
 	require.NoError(t, err)
 

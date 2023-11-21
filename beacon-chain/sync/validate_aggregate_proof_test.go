@@ -45,11 +45,11 @@ func TestVerifyIndexInCommittee_CanVerify(t *testing.T) {
 	bf.SetBitAt(0, true)
 	att := &zondpb.Attestation{Data: &zondpb.AttestationData{
 		Target: &zondpb.Checkpoint{Epoch: 0}},
-		AggregationBits: bf}
+		ParticipationBits: bf}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), s, att.Data.Slot, att.Data.CommitteeIndex)
 	assert.NoError(t, err)
-	indices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	indices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	require.NoError(t, err)
 	require.NoError(t, validateIndexInCommittee(ctx, s, att, primitives.ValidatorIndex(indices[0])))
 
@@ -69,7 +69,7 @@ func TestVerifyIndexInCommittee_ExistsInBeaconCommittee(t *testing.T) {
 	bf := []byte{0xff}
 	att := &zondpb.Attestation{Data: &zondpb.AttestationData{
 		Target: &zondpb.Checkpoint{Epoch: 0}},
-		AggregationBits: bf}
+		ParticipationBits: bf}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), s, att.Data.Slot, att.Data.CommitteeIndex)
 	require.NoError(t, err)
@@ -169,8 +169,8 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		},
-		AggregationBits: aggBits,
-		Signature:       make([]byte, dilithium2.CryptoBytes),
+		ParticipationBits: aggBits,
+		Signature:         make([]byte, dilithium2.CryptoBytes),
 	}
 
 	aggregateAndProof := &zondpb.AggregateAttestationAndProof{
@@ -253,8 +253,8 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		},
-		AggregationBits: aggBits,
-		Signature:       make([]byte, dilithium2.CryptoBytes),
+		ParticipationBits: aggBits,
+		Signature:         make([]byte, dilithium2.CryptoBytes),
 	}
 
 	aggregateAndProof := &zondpb.AggregateAttestationAndProof{
@@ -322,12 +322,12 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
 	assert.NoError(t, err)
-	attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	attestingIndices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	require.NoError(t, err)
 	assert.NoError(t, err)
 	attesterDomain, err := signing.Domain(beaconState.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, beaconState.GenesisValidatorsRoot())
@@ -426,12 +426,12 @@ func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
 	require.NoError(t, err)
-	attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	attestingIndices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	require.NoError(t, err)
 	attesterDomain, err := signing.Domain(beaconState.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, beaconState.GenesisValidatorsRoot())
 	require.NoError(t, err)
@@ -545,12 +545,12 @@ func TestValidateAggregateAndProof_BadBlock(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
 	assert.NoError(t, err)
-	attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	attestingIndices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	require.NoError(t, err)
 	assert.NoError(t, err)
 	attesterDomain, err := signing.Domain(beaconState.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, beaconState.GenesisValidatorsRoot())
@@ -636,12 +636,12 @@ func TestValidateAggregateAndProof_RejectWhenAttEpochDoesntEqualTargetEpoch(t *t
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 1, Root: root[:]},
 		},
-		AggregationBits: aggBits,
+		ParticipationBits: aggBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
 	assert.NoError(t, err)
-	attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+	attestingIndices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 	require.NoError(t, err)
 	assert.NoError(t, err)
 	attesterDomain, err := signing.Domain(beaconState.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, beaconState.GenesisValidatorsRoot())

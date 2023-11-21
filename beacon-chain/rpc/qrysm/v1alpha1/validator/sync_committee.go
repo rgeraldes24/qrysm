@@ -110,7 +110,7 @@ func (vs *Server) GetSyncCommitteeContribution(
 		Slot:              req.Slot,
 		BlockRoot:         headRoot,
 		SubcommitteeIndex: req.SubnetId,
-		AggregationBits:   bits,
+		ParticipationBits: bits,
 		Signature:         aggregatedSig,
 	}
 

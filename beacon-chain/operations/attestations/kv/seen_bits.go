@@ -21,7 +21,7 @@ func (c *AttCaches) insertSeenBit(att *zondpb.Attestation) error {
 		}
 		alreadyExists := false
 		for _, bit := range seenBits {
-			if c, err := bit.Contains(att.AggregationBits); err != nil {
+			if c, err := bit.Contains(att.ParticipationBits); err != nil {
 				return err
 			} else if c {
 				alreadyExists = true
@@ -29,13 +29,13 @@ func (c *AttCaches) insertSeenBit(att *zondpb.Attestation) error {
 			}
 		}
 		if !alreadyExists {
-			seenBits = append(seenBits, att.AggregationBits)
+			seenBits = append(seenBits, att.ParticipationBits)
 		}
 		c.seenAtt.Set(string(r[:]), seenBits, cache.DefaultExpiration /* one epoch */)
 		return nil
 	}
 
-	c.seenAtt.Set(string(r[:]), []bitfield.Bitlist{att.AggregationBits}, cache.DefaultExpiration /* one epoch */)
+	c.seenAtt.Set(string(r[:]), []bitfield.Bitlist{att.ParticipationBits}, cache.DefaultExpiration /* one epoch */)
 	return nil
 }
 
@@ -52,7 +52,7 @@ func (c *AttCaches) hasSeenBit(att *zondpb.Attestation) (bool, error) {
 			return false, errors.New("could not convert to bitlist type")
 		}
 		for _, bit := range seenBits {
-			if c, err := bit.Contains(att.AggregationBits); err != nil {
+			if c, err := bit.Contains(att.ParticipationBits); err != nil {
 				return false, err
 			} else if c {
 				return true, nil

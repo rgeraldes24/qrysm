@@ -235,7 +235,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 					},
 					Attestations: []*zondpb.Attestation{
 						{
-							AggregationBits: test_helpers.FillByteSlice(4, 74),
+							ParticipationBits: test_helpers.FillByteSlice(4, 74),
 							Data: &zondpb.AttestationData{
 								Slot:            75,
 								CommitteeIndex:  76,
@@ -252,7 +252,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 							Signatures: test_helpers.FillByteSlice(96, 82),
 						},
 						{
-							AggregationBits: test_helpers.FillByteSlice(4, 83),
+							ParticipationBits: test_helpers.FillByteSlice(4, 83),
 							Data: &zondpb.AttestationData{
 								Slot:            84,
 								CommitteeIndex:  85,

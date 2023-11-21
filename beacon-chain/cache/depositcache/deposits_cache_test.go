@@ -322,7 +322,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk0"), 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 		},
@@ -332,7 +332,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk1"), 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 		},
@@ -342,7 +342,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk1"), 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 		},
@@ -352,7 +352,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk2"), 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 		},
@@ -379,7 +379,7 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 0,
@@ -389,7 +389,7 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 1,
@@ -399,7 +399,7 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 2,
@@ -410,7 +410,7 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 			Data: &zondpb.Deposit_Data{
 				PublicKey:             bytesutil.PadTo([]byte{3}, 2592),
 				WithdrawalCredentials: make([]byte, 32),
-				Signature:             make([]byte, 96),
+				Signature:             make([]byte, 4595),
 			},
 		},
 		Index: 3,
@@ -447,7 +447,7 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 0,
@@ -457,7 +457,7 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 1,
@@ -468,7 +468,7 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 			Data: &zondpb.Deposit_Data{
 				PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
 				WithdrawalCredentials: make([]byte, 32),
-				Signature:             make([]byte, 96),
+				Signature:             make([]byte, 4595),
 			},
 		},
 		Index: 2,
@@ -520,7 +520,7 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 0,
@@ -530,7 +530,7 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 1,
@@ -540,7 +540,7 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 2,
@@ -565,7 +565,7 @@ func TestFinalizedDeposits_HandleLowerZond1DepositIndex(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 0,
@@ -575,7 +575,7 @@ func TestFinalizedDeposits_HandleLowerZond1DepositIndex(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 1,
@@ -585,7 +585,7 @@ func TestFinalizedDeposits_HandleLowerZond1DepositIndex(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 2,
@@ -595,7 +595,7 @@ func TestFinalizedDeposits_HandleLowerZond1DepositIndex(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{3}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 3,
@@ -605,7 +605,7 @@ func TestFinalizedDeposits_HandleLowerZond1DepositIndex(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{4}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 4,
@@ -615,7 +615,7 @@ func TestFinalizedDeposits_HandleLowerZond1DepositIndex(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{5}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 5,
@@ -654,7 +654,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 0,
@@ -665,7 +665,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 1,
@@ -678,7 +678,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 2,
@@ -689,7 +689,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{3}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 3,
@@ -711,7 +711,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 0,
@@ -722,7 +722,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 1,
@@ -735,7 +735,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 2,
@@ -746,7 +746,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{3}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: 3,
@@ -768,7 +768,7 @@ func TestFinalizedDeposits_ReturnsTrieCorrectly(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{uint8(index)}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 			Index: index,

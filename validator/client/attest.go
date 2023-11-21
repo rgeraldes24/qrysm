@@ -131,7 +131,7 @@ func (v *validator) SubmitAttestation(ctx context.Context, slot primitives.Slot,
 	aggregationBitfield.SetBitAt(indexInCommittee, true)
 	attestation := &zondpb.Attestation{
 		Data:                    data,
-		AggregationBits:         aggregationBitfield,
+		ParticipationBits:       aggregationBitfield,
 		Signatures:              sig,
 		SignatureValidatorIndex: []uint64{uint64(duty.ValidatorIndex)},
 	}

@@ -1,7 +1,7 @@
 package dilithium
 
 import (
-	"github.com/theQRL/qrysm/v4/crypto/bls/common"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium/dilithiumt"
 )
 
@@ -46,8 +46,8 @@ func VerifySignature(sig []byte, msg [32]byte, pubKey common.PublicKey) (bool, e
 	return dilithiumt.VerifySignature(sig, msg, pubKey)
 }
 
-func VerifyMultipleSignatures(sigs [][]byte, msgs [][32]byte, pubKeys [][]common.PublicKey) (bool, error) {
-	return dilithiumt.VerifyMultipleSignatures(sigs, msgs, pubKeys)
+func VerifyMultipleSignatures(sigsBatches [][][]byte, msgsBatches [][32]byte, pubKeysBatches [][]common.PublicKey) (bool, error) {
+	return dilithiumt.VerifyMultipleSignatures(sigsBatches, msgsBatches, pubKeysBatches)
 }
 
 func NewAggregateSignature() common.Signature {

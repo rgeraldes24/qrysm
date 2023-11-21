@@ -23,9 +23,9 @@ import (
 func TestService_beaconBlockSubscriber(t *testing.T) {
 	pooledAttestations := []*zondpb.Attestation{
 		// Aggregated.
-		util.HydrateAttestation(&zondpb.Attestation{AggregationBits: bitfield.Bitlist{0b00011111}}),
+		util.HydrateAttestation(&zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0b00011111}}),
 		// Unaggregated.
-		util.HydrateAttestation(&zondpb.Attestation{AggregationBits: bitfield.Bitlist{0b00010001}}),
+		util.HydrateAttestation(&zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0b00010001}}),
 	}
 
 	type args struct {

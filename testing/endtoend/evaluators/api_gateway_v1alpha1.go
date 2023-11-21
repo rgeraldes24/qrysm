@@ -151,9 +151,9 @@ func withCompareListAttestations(beaconNodeIdx int, conn *grpc.ClientConn) error
 		Target          *checkpointJSON `json:"target"`
 	}
 	type attestationJSON struct {
-		AggregationBits string               `json:"aggregationBits"`
-		Data            *attestationDataJSON `json:"data"`
-		Signature       string               `json:"signature"`
+		ParticipationBits string               `json:"aggregationBits"`
+		Data              *attestationDataJSON `json:"data"`
+		Signature         string               `json:"signature"`
 	}
 	type attestationsResponseJSON struct {
 		Attestations  []*attestationJSON `json:"attestations"`
@@ -194,12 +194,12 @@ func withCompareListAttestations(beaconNodeIdx int, conn *grpc.ClientConn) error
 	}
 	for i, att := range respJSON.Attestations {
 		grpcAtt := resp.Attestations[i]
-		if att.AggregationBits != base64.StdEncoding.EncodeToString(grpcAtt.AggregationBits) {
+		if att.ParticipationBits != base64.StdEncoding.EncodeToString(grpcAtt.ParticipationBits) {
 			return fmt.Errorf(
 				"HTTP gateway attestation %d aggregation bits %s does not match gRPC %d",
 				i,
-				att.AggregationBits,
-				grpcAtt.AggregationBits,
+				att.ParticipationBits,
+				grpcAtt.ParticipationBits,
 			)
 		}
 		data := att.Data

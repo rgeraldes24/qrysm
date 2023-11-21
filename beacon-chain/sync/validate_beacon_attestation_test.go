@@ -90,7 +90,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		{
 			name: "valid attestation signature",
 			msg: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0b101},
+				ParticipationBits: bitfield.Bitlist{0b101},
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: validBlockRoot[:],
 					CommitteeIndex:  0,
@@ -109,7 +109,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		{
 			name: "valid attestation signature with nil topic",
 			msg: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0b101},
+				ParticipationBits: bitfield.Bitlist{0b101},
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: validBlockRoot[:],
 					CommitteeIndex:  0,
@@ -128,7 +128,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		{
 			name: "bad target epoch",
 			msg: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0b101},
+				ParticipationBits: bitfield.Bitlist{0b101},
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: validBlockRoot[:],
 					CommitteeIndex:  0,
@@ -147,7 +147,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		{
 			name: "already seen",
 			msg: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0b101},
+				ParticipationBits: bitfield.Bitlist{0b101},
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: validBlockRoot[:],
 					CommitteeIndex:  0,
@@ -163,7 +163,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		{
 			name: "invalid beacon block",
 			msg: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0b101},
+				ParticipationBits: bitfield.Bitlist{0b101},
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: invalidRoot[:],
 					CommitteeIndex:  0,
@@ -179,7 +179,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		{
 			name: "committee index exceeds committee length",
 			msg: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0b101},
+				ParticipationBits: bitfield.Bitlist{0b101},
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: validBlockRoot[:],
 					CommitteeIndex:  4,
@@ -195,7 +195,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		{
 			name: "wrong committee index",
 			msg: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0b101},
+				ParticipationBits: bitfield.Bitlist{0b101},
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: validBlockRoot[:],
 					CommitteeIndex:  2,
@@ -211,7 +211,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		{
 			name: "already aggregated",
 			msg: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0b1011},
+				ParticipationBits: bitfield.Bitlist{0b1011},
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: validBlockRoot[:],
 					CommitteeIndex:  1,
@@ -227,7 +227,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		{
 			name: "missing block",
 			msg: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0b101},
+				ParticipationBits: bitfield.Bitlist{0b101},
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: bytesutil.PadTo([]byte("missing"), fieldparams.RootLength),
 					CommitteeIndex:  1,
@@ -243,7 +243,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		{
 			name: "invalid attestation",
 			msg: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0b101},
+				ParticipationBits: bitfield.Bitlist{0b101},
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: validBlockRoot[:],
 					CommitteeIndex:  1,
@@ -270,7 +270,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 				attRoot, err := signing.ComputeSigningRoot(tt.msg.Data, domain)
 				require.NoError(t, err)
 				for i := 0; ; i++ {
-					if tt.msg.AggregationBits.BitAt(uint64(i)) {
+					if tt.msg.ParticipationBits.BitAt(uint64(i)) {
 						tt.msg.Signature = keys[com[i]].Sign(attRoot[:]).Marshal()
 						break
 					}

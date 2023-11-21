@@ -184,10 +184,10 @@ func TestProcessAttestations(t *testing.T) {
 	bf := bitfield.NewBitlist(c)
 	att1 := &zondpb.Attestation{Data: &zondpb.AttestationData{
 		Target: &zondpb.Checkpoint{Epoch: 0}},
-		AggregationBits: bf}
+		ParticipationBits: bf}
 	att2 := &zondpb.Attestation{Data: &zondpb.AttestationData{
 		Target: &zondpb.Checkpoint{Epoch: 0}},
-		AggregationBits: bf}
+		ParticipationBits: bf}
 	rt := [32]byte{'A'}
 	att1.Data.Target.Root = rt[:]
 	att1.Data.BeaconBlockRoot = rt[:]
@@ -197,9 +197,9 @@ func TestProcessAttestations(t *testing.T) {
 	require.NoError(t, beaconState.SetBlockRoots(br))
 	att2.Data.Target.Root = newRt[:]
 	att2.Data.BeaconBlockRoot = newRt[:]
-	err := beaconState.AppendPreviousEpochAttestations(&zondpb.PendingAttestation{Data: att1.Data, AggregationBits: bf, InclusionDelay: 1})
+	err := beaconState.AppendPreviousEpochAttestations(&zondpb.PendingAttestation{Data: att1.Data, ParticipationBits: bf, InclusionDelay: 1})
 	require.NoError(t, err)
-	err = beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{Data: att2.Data, AggregationBits: bf, InclusionDelay: 1})
+	err = beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{Data: att2.Data, ParticipationBits: bf, InclusionDelay: 1})
 	require.NoError(t, err)
 
 	pVals := make([]*precompute.Validator, validators)
@@ -211,7 +211,7 @@ func TestProcessAttestations(t *testing.T) {
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att1.Data.Slot, att1.Data.CommitteeIndex)
 	require.NoError(t, err)
-	indices, err := attestation.AttestingIndices(att1.AggregationBits, committee)
+	indices, err := attestation.AttestingIndices(att1.ParticipationBits, committee)
 	require.NoError(t, err)
 	for _, i := range indices {
 		if !pVals[i].IsPrevEpochAttester {
@@ -220,7 +220,7 @@ func TestProcessAttestations(t *testing.T) {
 	}
 	committee, err = helpers.BeaconCommitteeFromState(context.Background(), beaconState, att2.Data.Slot, att2.Data.CommitteeIndex)
 	require.NoError(t, err)
-	indices, err = attestation.AttestingIndices(att2.AggregationBits, committee)
+	indices, err = attestation.AttestingIndices(att2.ParticipationBits, committee)
 	require.NoError(t, err)
 	for _, i := range indices {
 		assert.Equal(t, true, pVals[i].IsPrevEpochAttester, "Not a prev epoch attester")

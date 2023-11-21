@@ -143,7 +143,7 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlock {
 			},
 			Attestations: []*zondpb.Attestation{
 				{
-					AggregationBits: FillByteSlice(4, 74),
+					ParticipationBits: FillByteSlice(4, 74),
 					Data: &zondpb.AttestationData{
 						Slot:            75,
 						CommitteeIndex:  76,
@@ -160,7 +160,7 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlock {
 					Signatures: [][]byte{FillByteSlice(96, 82)},
 				},
 				{
-					AggregationBits: FillByteSlice(4, 83),
+					ParticipationBits: FillByteSlice(4, 83),
 					Data: &zondpb.AttestationData{
 						Slot:            84,
 						CommitteeIndex:  85,
@@ -408,7 +408,7 @@ func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockCapellaJson {
 			},
 			Attestations: []*apimiddleware.AttestationJson{
 				{
-					AggregationBits: FillEncodedByteSlice(4, 74),
+					ParticipationBits: FillEncodedByteSlice(4, 74),
 					Data: &apimiddleware.AttestationDataJson{
 						Slot:            "75",
 						CommitteeIndex:  "76",
@@ -425,7 +425,7 @@ func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockCapellaJson {
 					Signature: FillEncodedByteSlice(96, 82),
 				},
 				{
-					AggregationBits: FillEncodedByteSlice(4, 83),
+					ParticipationBits: FillEncodedByteSlice(4, 83),
 					Data: &apimiddleware.AttestationDataJson{
 						Slot:            "84",
 						CommitteeIndex:  "85",

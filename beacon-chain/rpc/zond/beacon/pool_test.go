@@ -43,7 +43,7 @@ func TestListPoolAttestations(t *testing.T) {
 	bs, err := util.NewBeaconState()
 	require.NoError(t, err)
 	att1 := &zondpbv1alpha1.Attestation{
-		AggregationBits: []byte{1, 10},
+		ParticipationBits: []byte{1, 10},
 		Data: &zondpbv1alpha1.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  1,
@@ -60,7 +60,7 @@ func TestListPoolAttestations(t *testing.T) {
 		Signature: bytesutil.PadTo([]byte("signature1"), 96),
 	}
 	att2 := &zondpbv1alpha1.Attestation{
-		AggregationBits: []byte{4, 40},
+		ParticipationBits: []byte{4, 40},
 		Data: &zondpbv1alpha1.AttestationData{
 			Slot:            4,
 			CommitteeIndex:  4,
@@ -77,7 +77,7 @@ func TestListPoolAttestations(t *testing.T) {
 		Signature: bytesutil.PadTo([]byte("signature4"), 96),
 	}
 	att3 := &zondpbv1alpha1.Attestation{
-		AggregationBits: []byte{2, 20},
+		ParticipationBits: []byte{2, 20},
 		Data: &zondpbv1alpha1.AttestationData{
 			Slot:            2,
 			CommitteeIndex:  2,
@@ -94,7 +94,7 @@ func TestListPoolAttestations(t *testing.T) {
 		Signature: bytesutil.PadTo([]byte("signature2"), 96),
 	}
 	att4 := &zondpbv1alpha1.Attestation{
-		AggregationBits: bitfield.NewBitlist(8),
+		ParticipationBits: bitfield.NewBitlist(8),
 		Data: &zondpbv1alpha1.AttestationData{
 			Slot:            4,
 			CommitteeIndex:  4,
@@ -111,7 +111,7 @@ func TestListPoolAttestations(t *testing.T) {
 		Signature: bytesutil.PadTo([]byte("signature2"), 96),
 	}
 	att5 := &zondpbv1alpha1.Attestation{
-		AggregationBits: bitfield.NewBitlist(8),
+		ParticipationBits: bitfield.NewBitlist(8),
 		Data: &zondpbv1alpha1.AttestationData{
 			Slot:            2,
 			CommitteeIndex:  4,
@@ -128,7 +128,7 @@ func TestListPoolAttestations(t *testing.T) {
 		Signature: bytesutil.PadTo([]byte("signature1"), 96),
 	}
 	att6 := &zondpbv1alpha1.Attestation{
-		AggregationBits: bitfield.NewBitlist(8),
+		ParticipationBits: bitfield.NewBitlist(8),
 		Data: &zondpbv1alpha1.AttestationData{
 			Slot:            2,
 			CommitteeIndex:  4,
@@ -973,7 +973,7 @@ func TestServer_SubmitAttestations_Ok(t *testing.T) {
 		Root:  bytesutil.PadTo([]byte("sourceroot1"), 32),
 	}
 	att1 := &zondpbv1.Attestation{
-		AggregationBits: b,
+		ParticipationBits: b,
 		Data: &zondpbv1.AttestationData{
 			Slot:            0,
 			Index:           0,
@@ -987,7 +987,7 @@ func TestServer_SubmitAttestations_Ok(t *testing.T) {
 		Signature: make([]byte, 96),
 	}
 	att2 := &zondpbv1.Attestation{
-		AggregationBits: b,
+		ParticipationBits: b,
 		Data: &zondpbv1.AttestationData{
 			Slot:            0,
 			Index:           0,
@@ -1085,7 +1085,7 @@ func TestServer_SubmitAttestations_ValidAttestationSubmitted(t *testing.T) {
 	b := bitfield.NewBitlist(1)
 	b.SetBitAt(0, true)
 	attValid := &zondpbv1.Attestation{
-		AggregationBits: b,
+		ParticipationBits: b,
 		Data: &zondpbv1.AttestationData{
 			Slot:            0,
 			Index:           0,
@@ -1099,7 +1099,7 @@ func TestServer_SubmitAttestations_ValidAttestationSubmitted(t *testing.T) {
 		Signature: make([]byte, 96),
 	}
 	attInvalidSignature := &zondpbv1.Attestation{
-		AggregationBits: b,
+		ParticipationBits: b,
 		Data: &zondpbv1.AttestationData{
 			Slot:            0,
 			Index:           0,
@@ -1186,7 +1186,7 @@ func TestServer_SubmitAttestations_InvalidAttestationGRPCHeader(t *testing.T) {
 	b := bitfield.NewBitlist(1)
 	b.SetBitAt(0, true)
 	att := &zondpbv1.Attestation{
-		AggregationBits: b,
+		ParticipationBits: b,
 		Data: &zondpbv1.AttestationData{
 			Slot:            0,
 			Index:           0,

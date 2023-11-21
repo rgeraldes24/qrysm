@@ -52,9 +52,9 @@ func TestSubmitAggregateSelectionProof(t *testing.T) {
 	require.NoError(t, err)
 
 	aggregateAttestation := &zondpb.Attestation{
-		AggregationBits: test_helpers.FillByteSlice(4, 74),
-		Data:            attestationDataProto,
-		Signatures:      test_helpers.FillByteSlice(96, 82),
+		ParticipationBits: test_helpers.FillByteSlice(4, 74),
+		Data:              attestationDataProto,
+		Signatures:        test_helpers.FillByteSlice(96, 82),
 	}
 
 	ctrl := gomock.NewController(t)

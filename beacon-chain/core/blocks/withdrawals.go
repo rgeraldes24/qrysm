@@ -219,7 +219,7 @@ func DilithiumChangesSignatureBatch(
 		return dilithium.NewSet(), nil
 	}
 	batch := &dilithium.SignatureBatch{
-		Signatures:   make([][]byte, len(changes)),
+		Signatures:   make([][][]byte, len(changes)),
 		PublicKeys:   make([][]dilithium.PublicKey, len(changes)),
 		Messages:     make([][32]byte, len(changes)),
 		Descriptions: make([]string, len(changes)),
@@ -230,7 +230,7 @@ func DilithiumChangesSignatureBatch(
 		return nil, errors.Wrap(err, "could not compute signing domain")
 	}
 	for i, change := range changes {
-		batch.Signatures[i] = change.Signature
+		batch.Signatures[i] = append(batch.Signatures[i], change.Signature)
 		publicKey, err := dilithium.PublicKeyFromBytes(change.Message.FromDilithiumPubkey)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not convert bytes to public key")

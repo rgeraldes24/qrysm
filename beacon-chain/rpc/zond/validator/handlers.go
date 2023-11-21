@@ -48,7 +48,7 @@ func (s *Server) GetAggregateAttestation(w http.ResponseWriter, r *http.Request)
 				return
 			}
 			if bytes.Equal(root[:], attDataRootBytes) {
-				if bestMatchingAtt == nil || len(att.AggregationBits) > len(bestMatchingAtt.AggregationBits) {
+				if bestMatchingAtt == nil || len(att.ParticipationBits) > len(bestMatchingAtt.ParticipationBits) {
 					bestMatchingAtt = att
 				}
 			}
@@ -61,7 +61,7 @@ func (s *Server) GetAggregateAttestation(w http.ResponseWriter, r *http.Request)
 
 	response := &AggregateAttestationResponse{
 		Data: &shared.Attestation{
-			AggregationBits: hexutil.Encode(bestMatchingAtt.AggregationBits),
+			ParticipationBits: hexutil.Encode(bestMatchingAtt.ParticipationBits),
 			Data: &shared.AttestationData{
 				Slot:            strconv.FormatUint(uint64(bestMatchingAtt.Data.Slot), 10),
 				CommitteeIndex:  strconv.FormatUint(uint64(bestMatchingAtt.Data.CommitteeIndex), 10),

@@ -49,7 +49,7 @@ func MapAttestation(attestation *zondpb.Attestation) (*Attestation, error) {
 	if attestation == nil {
 		return nil, fmt.Errorf("attestation is nil")
 	}
-	if attestation.AggregationBits == nil {
+	if attestation.ParticipationBits == nil {
 		return nil, fmt.Errorf("aggregation bits in attestation is nil")
 	}
 	data, err := MapAttestationData(attestation.Data)
@@ -57,9 +57,9 @@ func MapAttestation(attestation *zondpb.Attestation) (*Attestation, error) {
 		return nil, err
 	}
 	return &Attestation{
-		AggregationBits: []byte(attestation.AggregationBits),
-		Data:            data,
-		Signature:       attestation.Signatures,
+		ParticipationBits: []byte(attestation.ParticipationBits),
+		Data:              data,
+		Signature:         attestation.Signatures,
 	}, nil
 }
 
@@ -290,7 +290,7 @@ func MapContributionAndProof(contribution *zondpb.ContributionAndProof) (*Contri
 	if contribution.Contribution == nil {
 		return nil, fmt.Errorf("contribution in ContributionAndProof is nil")
 	}
-	if contribution.Contribution.AggregationBits == nil {
+	if contribution.Contribution.ParticipationBits == nil {
 		return nil, fmt.Errorf("aggregation bits in ContributionAndProof is nil")
 	}
 	return &ContributionAndProof{
@@ -300,7 +300,7 @@ func MapContributionAndProof(contribution *zondpb.ContributionAndProof) (*Contri
 			Slot:              fmt.Sprint(contribution.Contribution.Slot),
 			BeaconBlockRoot:   contribution.Contribution.BlockRoot,
 			SubcommitteeIndex: fmt.Sprint(contribution.Contribution.SubcommitteeIndex),
-			AggregationBits:   []byte(contribution.Contribution.AggregationBits),
+			ParticipationBits: []byte(contribution.Contribution.ParticipationBits),
 			Signature:         contribution.Contribution.Signature,
 		},
 	}, nil

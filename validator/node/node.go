@@ -581,7 +581,7 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 				return nil, errors.Wrapf(err, "could not decode public key %s", key)
 			}
 			if len(decodedKey) != dilithium2.CryptoPublicKeyBytes {
-				return nil, fmt.Errorf("%v  is not a bls public key", key)
+				return nil, fmt.Errorf("%v  is not a dilithium public key", key)
 			}
 			if err := verifyOption(key, option); err != nil {
 				return nil, err

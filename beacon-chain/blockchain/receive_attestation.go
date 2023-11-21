@@ -190,7 +190,7 @@ func (s *Service) processAttestations(ctx context.Context, disparity time.Durati
 				"committeeIndex":   a.Data.CommitteeIndex,
 				"beaconBlockRoot":  fmt.Sprintf("%#x", bytesutil.Trunc(a.Data.BeaconBlockRoot)),
 				"targetRoot":       fmt.Sprintf("%#x", bytesutil.Trunc(a.Data.Target.Root)),
-				"aggregationCount": a.AggregationBits.Count(),
+				"aggregationCount": a.ParticipationBits.Count(),
 			}).WithError(err).Warn("Could not process attestation for fork choice")
 		}
 	}

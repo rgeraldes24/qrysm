@@ -30,7 +30,7 @@ func MockSyncComitteeBits() []byte {
 }
 
 func MockAggregationBits() []byte {
-	currSize := new(zond.SyncCommitteeContribution).AggregationBits.Len()
+	currSize := new(zond.SyncCommitteeContribution).ParticipationBits.Len()
 	switch currSize {
 	case 128:
 		return bitfield.NewBitvector128()
@@ -63,7 +63,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 				AggregateAttestationAndProof: &zond.AggregateAttestationAndProof{
 					AggregatorIndex: 0,
 					Aggregate: &zond.Attestation{
-						AggregationBits: bitfield.Bitlist{0b1101},
+						ParticipationBits: bitfield.Bitlist{0b1101},
 						Data: &zond.AttestationData{
 							BeaconBlockRoot: make([]byte, fieldparams.RootLength),
 							Source: &zond.Checkpoint{
@@ -173,7 +173,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 						},
 						Attestations: []*zond.Attestation{
 							{
-								AggregationBits: bitfield.Bitlist{0b1101},
+								ParticipationBits: bitfield.Bitlist{0b1101},
 								Data: &zond.AttestationData{
 									BeaconBlockRoot: make([]byte, fieldparams.RootLength),
 									Source: &zond.Checkpoint{
@@ -251,7 +251,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 						Slot:              0,
 						BlockRoot:         make([]byte, fieldparams.RootLength),
 						SubcommitteeIndex: 0,
-						AggregationBits:   MockAggregationBits(),
+						ParticipationBits: MockAggregationBits(),
 						Signature:         make([]byte, dilithium2.CryptoBytes),
 					},
 					SelectionProof: make([]byte, dilithium2.CryptoBytes),
@@ -478,7 +478,7 @@ func MockForkInfo() *v1.ForkInfo {
 // MockAttestation is a mock implementation of the Attestation.
 func MockAttestation() *v1.Attestation {
 	return &v1.Attestation{
-		AggregationBits: []byte(bitfield.Bitlist{0b1101}),
+		ParticipationBits: []byte(bitfield.Bitlist{0b1101}),
 		Data: &v1.AttestationData{
 			Slot:            "0",
 			Index:           "0",
@@ -588,7 +588,7 @@ func MockContributionAndProof() *v1.ContributionAndProof {
 			Slot:              "0",
 			BeaconBlockRoot:   make([]byte, fieldparams.RootLength),
 			SubcommitteeIndex: "0",
-			AggregationBits:   MockAggregationBits(),
+			ParticipationBits: MockAggregationBits(),
 			Signature:         make([]byte, dilithium2.CryptoBytes),
 		},
 		SelectionProof: make([]byte, dilithium2.CryptoBytes),

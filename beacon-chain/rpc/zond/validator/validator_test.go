@@ -1374,7 +1374,7 @@ func TestProduceSyncCommitteeContribution(t *testing.T) {
 	assert.Equal(t, primitives.Slot(0), resp.Data.Slot)
 	assert.Equal(t, uint64(0), resp.Data.SubcommitteeIndex)
 	assert.DeepEqual(t, root, resp.Data.BeaconBlockRoot)
-	aggregationBits := resp.Data.AggregationBits
+	aggregationBits := resp.Data.ParticipationBits
 	assert.Equal(t, true, aggregationBits.BitAt(0))
 	assert.DeepEqual(t, sig, resp.Data.Signature)
 

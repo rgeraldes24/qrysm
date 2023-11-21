@@ -301,7 +301,7 @@ func TestReceiveEvents_AggregatedAtt(t *testing.T) {
 		base64Val := "Zm9v"
 		data := AggregatedAttReceivedDataJson{
 			Aggregate: &AttestationJson{
-				AggregationBits: base64Val,
+				ParticipationBits: base64Val,
 				Data: &AttestationDataJson{
 					Slot:            "1",
 					CommitteeIndex:  "1",
@@ -344,7 +344,7 @@ func TestReceiveEvents_UnaggregatedAtt(t *testing.T) {
 	go func() {
 		base64Val := "Zm9v"
 		data := UnaggregatedAttReceivedDataJson{
-			AggregationBits: base64Val,
+			ParticipationBits: base64Val,
 			Data: &AttestationDataJson{
 				Slot:            "1",
 				CommitteeIndex:  "1",

@@ -31,14 +31,14 @@ func TestPruneExpired_Ticker(t *testing.T) {
 	ad2 := util.HydrateAttestationData(&zondpb.AttestationData{Slot: 1})
 
 	atts := []*zondpb.Attestation{
-		{Data: ad1, AggregationBits: bitfield.Bitlist{0b1000, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
-		{Data: ad2, AggregationBits: bitfield.Bitlist{0b1000, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
+		{Data: ad1, ParticipationBits: bitfield.Bitlist{0b1000, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
+		{Data: ad2, ParticipationBits: bitfield.Bitlist{0b1000, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
 	}
 	require.NoError(t, s.cfg.Pool.SaveUnaggregatedAttestations(atts))
 	require.Equal(t, 2, s.cfg.Pool.UnaggregatedAttestationCount(), "Unexpected number of attestations")
 	atts = []*zondpb.Attestation{
-		{Data: ad1, AggregationBits: bitfield.Bitlist{0b1101, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
-		{Data: ad2, AggregationBits: bitfield.Bitlist{0b1101, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
+		{Data: ad1, ParticipationBits: bitfield.Bitlist{0b1101, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
+		{Data: ad2, ParticipationBits: bitfield.Bitlist{0b1101, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
 	}
 	require.NoError(t, s.cfg.Pool.SaveAggregatedAttestations(atts))
 	assert.Equal(t, 2, s.cfg.Pool.AggregatedAttestationCount())
@@ -89,10 +89,10 @@ func TestPruneExpired_PruneExpiredAtts(t *testing.T) {
 
 	ad2 := util.HydrateAttestationData(&zondpb.AttestationData{})
 
-	att1 := &zondpb.Attestation{Data: ad1, AggregationBits: bitfield.Bitlist{0b1101}}
-	att2 := &zondpb.Attestation{Data: ad1, AggregationBits: bitfield.Bitlist{0b1111}}
-	att3 := &zondpb.Attestation{Data: ad2, AggregationBits: bitfield.Bitlist{0b1101}}
-	att4 := &zondpb.Attestation{Data: ad2, AggregationBits: bitfield.Bitlist{0b1110}}
+	att1 := &zondpb.Attestation{Data: ad1, ParticipationBits: bitfield.Bitlist{0b1101}}
+	att2 := &zondpb.Attestation{Data: ad1, ParticipationBits: bitfield.Bitlist{0b1111}}
+	att3 := &zondpb.Attestation{Data: ad2, ParticipationBits: bitfield.Bitlist{0b1101}}
+	att4 := &zondpb.Attestation{Data: ad2, ParticipationBits: bitfield.Bitlist{0b1110}}
 	atts := []*zondpb.Attestation{att1, att2, att3, att4}
 	require.NoError(t, s.cfg.Pool.SaveAggregatedAttestations(atts))
 	require.NoError(t, s.cfg.Pool.SaveBlockAttestations(atts))

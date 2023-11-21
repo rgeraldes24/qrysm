@@ -18,20 +18,20 @@ import (
 func TestHasVoted_OK(t *testing.T) {
 	// Setting bitlist to 11111111.
 	pendingAttestation := &zondpb.Attestation{
-		AggregationBits: []byte{0xFF, 0x01},
+		ParticipationBits: []byte{0xFF, 0x01},
 	}
 
-	for i := uint64(0); i < pendingAttestation.AggregationBits.Len(); i++ {
-		assert.Equal(t, true, pendingAttestation.AggregationBits.BitAt(i), "Validator voted but received didn't vote")
+	for i := uint64(0); i < pendingAttestation.ParticipationBits.Len(); i++ {
+		assert.Equal(t, true, pendingAttestation.ParticipationBits.BitAt(i), "Validator voted but received didn't vote")
 	}
 
 	// Setting bit field to 10101010.
 	pendingAttestation = &zondpb.Attestation{
-		AggregationBits: []byte{0xAA, 0x1},
+		ParticipationBits: []byte{0xAA, 0x1},
 	}
 
-	for i := uint64(0); i < pendingAttestation.AggregationBits.Len(); i++ {
-		voted := pendingAttestation.AggregationBits.BitAt(i)
+	for i := uint64(0); i < pendingAttestation.ParticipationBits.Len(); i++ {
+		voted := pendingAttestation.ParticipationBits.BitAt(i)
 		if i%2 == 0 && voted {
 			t.Error("validator didn't vote but received voted")
 		}

@@ -24,7 +24,7 @@ func (c *AttCaches) SaveBlockAttestation(att *zondpb.Attestation) error {
 
 	// Ensure that this attestation is not already fully contained in an existing attestation.
 	for _, a := range atts {
-		if c, err := a.AggregationBits.Contains(att.AggregationBits); err != nil {
+		if c, err := a.ParticipationBits.Contains(att.ParticipationBits); err != nil {
 			return err
 		} else if c {
 			return nil

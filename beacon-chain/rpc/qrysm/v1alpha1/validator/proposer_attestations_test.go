@@ -15,20 +15,20 @@ import (
 
 func TestProposer_ProposerAtts_sortByProfitability(t *testing.T) {
 	atts := proposerAtts([]*zondpb.Attestation{
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 4}, AggregationBits: bitfield.Bitlist{0b11100000}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b11000000}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}, AggregationBits: bitfield.Bitlist{0b11100000}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 4}, AggregationBits: bitfield.Bitlist{0b11110000}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b11100000}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, AggregationBits: bitfield.Bitlist{0b11000000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 4}, ParticipationBits: bitfield.Bitlist{0b11100000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b11000000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}, ParticipationBits: bitfield.Bitlist{0b11100000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 4}, ParticipationBits: bitfield.Bitlist{0b11110000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b11100000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, ParticipationBits: bitfield.Bitlist{0b11000000}}),
 	})
 	want := proposerAtts([]*zondpb.Attestation{
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 4}, AggregationBits: bitfield.Bitlist{0b11110000}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 4}, AggregationBits: bitfield.Bitlist{0b11100000}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, AggregationBits: bitfield.Bitlist{0b11000000}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}, AggregationBits: bitfield.Bitlist{0b11100000}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b11100000}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b11000000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 4}, ParticipationBits: bitfield.Bitlist{0b11110000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 4}, ParticipationBits: bitfield.Bitlist{0b11100000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, ParticipationBits: bitfield.Bitlist{0b11000000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}, ParticipationBits: bitfield.Bitlist{0b11100000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b11100000}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b11000000}}),
 	})
 	atts, err := atts.sortByProfitability()
 	if err != nil {
@@ -46,7 +46,7 @@ func TestProposer_ProposerAtts_sortByProfitabilityUsingMaxCover(t *testing.T) {
 		var atts proposerAtts
 		for _, att := range data {
 			atts = append(atts, util.HydrateAttestation(&zondpb.Attestation{
-				Data: &zondpb.AttestationData{Slot: att.slot}, AggregationBits: att.bits}))
+				Data: &zondpb.AttestationData{Slot: att.slot}, ParticipationBits: att.bits}))
 		}
 		return atts
 	}
@@ -213,194 +213,194 @@ func TestProposer_ProposerAtts_dedup(t *testing.T) {
 		{
 			name: "single item",
 			atts: proposerAtts{
-				&zondpb.Attestation{AggregationBits: bitfield.Bitlist{}},
+				&zondpb.Attestation{ParticipationBits: bitfield.Bitlist{}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{AggregationBits: bitfield.Bitlist{}},
+				&zondpb.Attestation{ParticipationBits: bitfield.Bitlist{}},
 			},
 		},
 		{
 			name: "two items no duplicates",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b10111110, 0x01}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01111111, 0x01}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b10111110, 0x01}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01111111, 0x01}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01111111, 0x01}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b10111110, 0x01}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01111111, 0x01}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b10111110, 0x01}},
 			},
 		},
 		{
 			name: "two items with duplicates",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0xba, 0x01}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0xba, 0x01}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0xba, 0x01}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0xba, 0x01}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0xba, 0x01}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0xba, 0x01}},
 			},
 		},
 		{
 			name: "sorted no duplicates",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00101011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b10100000, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00010000, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00101011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b10100000, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00010000, 0b1}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00101011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b10100000, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00010000, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00101011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b10100000, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00010000, 0b1}},
 			},
 		},
 		{
 			name: "sorted with duplicates",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000001, 0b1}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
 			},
 		},
 		{
 			name: "all equal",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
 			},
 		},
 		{
 			name: "unsorted no duplicates",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00100010, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b10100101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00010000, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00100010, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b10100101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00010000, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b10100101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00100010, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00010000, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b10100101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00100010, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00010000, 0b1}},
 			},
 		},
 		{
 			name: "unsorted with duplicates",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b10100101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b10100101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000001, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b10100101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b10100101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000001, 0b1}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b10100101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b10100101, 0b1}},
 			},
 		},
 		{
 			name: "no proper subset (same root)",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b10000001, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00011001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b10000001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00011001, 0b1}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00011001, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b10000001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00011001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b10000001, 0b1}},
 			},
 		},
 		{
 			name: "proper subset (same root)",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000001, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000001, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
 			},
 		},
 		{
 			name: "no proper subset (different root)",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000101, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b10000001, 0b1}},
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b00011001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000101, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b10000001, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b00011001, 0b1}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b00011001, 0b1}},
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b10000001, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000101, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b00011001, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b10000001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000101, 0b1}},
 			},
 		},
 		{
 			name: "proper subset (different root 1)",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b00001111, 0b1}},
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b00001111, 0b1}},
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b00001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000001, 0b1}},
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b00000011, 0b1}},
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00000001, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b00001111, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b00001111, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b00001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000001, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b00000011, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00000001, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b01101101, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b01101101, 0b1}},
 			},
 		},
 		{
 			name: "proper subset (different root 2)",
 			atts: proposerAtts{
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b00001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b00001111, 0b1}},
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b00001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b00001111, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
 			},
 			want: proposerAtts{
-				&zondpb.Attestation{Data: data2, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
-				&zondpb.Attestation{Data: data1, AggregationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data2, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
+				&zondpb.Attestation{Data: data1, ParticipationBits: bitfield.Bitlist{0b11001111, 0b1}},
 			},
 		},
 	}
@@ -411,13 +411,13 @@ func TestProposer_ProposerAtts_dedup(t *testing.T) {
 				t.Error(err)
 			}
 			sort.Slice(atts, func(i, j int) bool {
-				if atts[i].AggregationBits.Count() == atts[j].AggregationBits.Count() {
+				if atts[i].ParticipationBits.Count() == atts[j].ParticipationBits.Count() {
 					if atts[i].Data.Slot == atts[j].Data.Slot {
-						return bytes.Compare(atts[i].AggregationBits, atts[j].AggregationBits) <= 0
+						return bytes.Compare(atts[i].ParticipationBits, atts[j].ParticipationBits) <= 0
 					}
 					return atts[i].Data.Slot > atts[j].Data.Slot
 				}
-				return atts[i].AggregationBits.Count() > atts[j].AggregationBits.Count()
+				return atts[i].ParticipationBits.Count() > atts[j].ParticipationBits.Count()
 			})
 			assert.DeepEqual(t, tt.want, atts)
 		})

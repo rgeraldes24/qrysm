@@ -619,9 +619,9 @@ type FeeRecipientJson struct {
 }
 
 type AttestationJson struct {
-	AggregationBits string               `json:"aggregation_bits" hex:"true"`
-	Data            *AttestationDataJson `json:"data"`
-	Signature       string               `json:"signature" hex:"true"`
+	ParticipationBits string               `json:"aggregation_bits" hex:"true"`
+	Data              *AttestationDataJson `json:"data"`
+	Signature         string               `json:"signature" hex:"true"`
 }
 
 type AttestationDataJson struct {
@@ -868,10 +868,10 @@ type SyncCommitteeValidatorsJson struct {
 }
 
 type PendingAttestationJson struct {
-	AggregationBits string               `json:"aggregation_bits" hex:"true"`
-	Data            *AttestationDataJson `json:"data"`
-	InclusionDelay  string               `json:"inclusion_delay"`
-	ProposerIndex   string               `json:"proposer_index"`
+	ParticipationBits string               `json:"aggregation_bits" hex:"true"`
+	Data              *AttestationDataJson `json:"data"`
+	InclusionDelay    string               `json:"inclusion_delay"`
+	ProposerIndex     string               `json:"proposer_index"`
 }
 
 type ForkChoiceHeadJson struct {
@@ -933,7 +933,7 @@ type SyncCommitteeContributionJson struct {
 	Slot              string `json:"slot"`
 	BeaconBlockRoot   string `json:"beacon_block_root" hex:"true"`
 	SubcommitteeIndex string `json:"subcommittee_index"`
-	AggregationBits   string `json:"aggregation_bits" hex:"true"`
+	ParticipationBits string `json:"aggregation_bits" hex:"true"`
 	Signature         string `json:"signature" hex:"true"`
 }
 
@@ -1070,9 +1070,9 @@ type AggregatedAttReceivedDataJson struct {
 }
 
 type UnaggregatedAttReceivedDataJson struct {
-	AggregationBits string               `json:"aggregation_bits" hex:"true"`
-	Data            *AttestationDataJson `json:"data"`
-	Signature       string               `json:"signature" hex:"true"`
+	ParticipationBits string               `json:"aggregation_bits" hex:"true"`
+	Data              *AttestationDataJson `json:"data"`
+	Signature         string               `json:"signature" hex:"true"`
 }
 
 type EventFinalizedCheckpointJson struct {

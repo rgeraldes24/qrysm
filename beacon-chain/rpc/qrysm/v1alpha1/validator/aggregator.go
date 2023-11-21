@@ -86,16 +86,16 @@ func (vs *Server) SubmitAggregateSelectionProof(ctx context.Context, req *zondpb
 		// looking at the attestation's committee index against the validator's committee index
 		// and check the aggregate bits to ensure the validator's index is set.
 		if aggregatedAtt.Data.CommitteeIndex == req.CommitteeIndex &&
-			aggregatedAtt.AggregationBits.BitAt(indexInCommittee) &&
-			(!best.AggregationBits.BitAt(indexInCommittee) ||
-				aggregatedAtt.AggregationBits.Count() > best.AggregationBits.Count()) {
+			aggregatedAtt.ParticipationBits.BitAt(indexInCommittee) &&
+			(!best.ParticipationBits.BitAt(indexInCommittee) ||
+				aggregatedAtt.ParticipationBits.Count() > best.ParticipationBits.Count()) {
 			best = aggregatedAtt
 		}
 
 		// If the "best" still doesn't contain the validator's index, check the aggregation bits to
 		// choose the attestation with the most bits set.
-		if !best.AggregationBits.BitAt(indexInCommittee) &&
-			aggregatedAtt.AggregationBits.Count() > best.AggregationBits.Count() {
+		if !best.ParticipationBits.BitAt(indexInCommittee) &&
+			aggregatedAtt.ParticipationBits.Count() > best.ParticipationBits.Count() {
 			best = aggregatedAtt
 		}
 	}

@@ -4,9 +4,7 @@ import (
 	"context"
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
-	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
@@ -63,6 +61,7 @@ import (
 //	post.current_sync_committee = get_next_sync_committee(post)
 //	post.next_sync_committee = get_next_sync_committee(post)
 //	return post
+/*
 func UpgradeToAltair(ctx context.Context, state state.BeaconState) (state.BeaconState, error) {
 	epoch := time.CurrentEpoch(state)
 
@@ -125,6 +124,7 @@ func UpgradeToAltair(ctx context.Context, state state.BeaconState) (state.Beacon
 	}
 	return newState, nil
 }
+*/
 
 // TranslateParticipation translates pending attestations into participation bits, then inserts the bits into beacon state.
 // This is helper function to convert phase 0 beacon state(pending_attestations) to Altair beacon state(participation_bits).
@@ -158,7 +158,7 @@ func TranslateParticipation(ctx context.Context, state state.BeaconState, atts [
 		if err != nil {
 			return nil, err
 		}
-		indices, err := attestation.AttestingIndices(att.AggregationBits, committee)
+		indices, err := attestation.AttestingIndices(att.ParticipationBits, committee)
 		if err != nil {
 			return nil, err
 		}

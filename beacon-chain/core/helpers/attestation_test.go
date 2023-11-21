@@ -68,7 +68,7 @@ func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {
 	})
 	require.NoError(t, err)
 	att := &zondpb.Attestation{
-		AggregationBits: []byte{'A'},
+		ParticipationBits: []byte{'A'},
 		Data: &zondpb.AttestationData{
 			Slot:            34,
 			CommitteeIndex:  4,
@@ -240,7 +240,7 @@ func TestValidateNilAttestation(t *testing.T) {
 					Target: &zondpb.Checkpoint{},
 					Source: &zondpb.Checkpoint{},
 				},
-				AggregationBits: []byte{},
+				ParticipationBits: []byte{},
 			},
 			errString: "",
 		},
@@ -269,7 +269,7 @@ func TestValidateSlotTargetEpoch(t *testing.T) {
 					Target: &zondpb.Checkpoint{Epoch: 1},
 					Source: &zondpb.Checkpoint{},
 				},
-				AggregationBits: []byte{},
+				ParticipationBits: []byte{},
 			},
 			errString: "slot 0 does not match target epoch 1",
 		},
@@ -281,7 +281,7 @@ func TestValidateSlotTargetEpoch(t *testing.T) {
 					Target: &zondpb.Checkpoint{Epoch: 2},
 					Source: &zondpb.Checkpoint{},
 				},
-				AggregationBits: []byte{},
+				ParticipationBits: []byte{},
 			},
 			errString: "",
 		},

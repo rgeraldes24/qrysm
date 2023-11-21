@@ -33,7 +33,7 @@ func (c beaconApiValidatorClient) submitSignedContributionAndProof(ctx context.C
 					Slot:              strconv.FormatUint(uint64(in.Message.Contribution.Slot), 10),
 					BeaconBlockRoot:   hexutil.Encode(in.Message.Contribution.BlockRoot),
 					SubcommitteeIndex: strconv.FormatUint(in.Message.Contribution.SubcommitteeIndex, 10),
-					AggregationBits:   hexutil.Encode(in.Message.Contribution.AggregationBits),
+					ParticipationBits: hexutil.Encode(in.Message.Contribution.ParticipationBits),
 					Signature:         hexutil.Encode(in.Message.Contribution.Signature),
 				},
 				SelectionProof: hexutil.Encode(in.Message.SelectionProof),

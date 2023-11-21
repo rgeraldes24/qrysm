@@ -46,7 +46,7 @@ func TestSyncCommitteeHeadState(t *testing.T) {
 			key:  primitives.Slot(1),
 			put: &put{
 				slot:  primitives.Slot(1),
-				state: phase0State,
+				state: capellaState,
 			},
 			wantPutErr: true,
 			wantErr:    true,
@@ -61,7 +61,7 @@ func TestSyncCommitteeHeadState(t *testing.T) {
 			key:  primitives.Slot(2),
 			put: &put{
 				slot:  primitives.Slot(1),
-				state: beaconState,
+				state: capellaState,
 			},
 			wantErr: true,
 		},
@@ -70,16 +70,16 @@ func TestSyncCommitteeHeadState(t *testing.T) {
 			key:  primitives.Slot(1),
 			put: &put{
 				slot:  primitives.Slot(1),
-				state: beaconState,
+				state: capellaState,
 			},
-			want: beaconState,
+			want: capellaState,
 		},
 		{
 			name: "not found when non-existent key in non-empty cache (bellatrix state)",
 			key:  primitives.Slot(2),
 			put: &put{
 				slot:  primitives.Slot(1),
-				state: bellatrixState,
+				state: capellaState,
 			},
 			wantErr: true,
 		},
@@ -88,9 +88,9 @@ func TestSyncCommitteeHeadState(t *testing.T) {
 			key:  primitives.Slot(100),
 			put: &put{
 				slot:  primitives.Slot(100),
-				state: bellatrixState,
+				state: capellaState,
 			},
-			want: bellatrixState,
+			want: capellaState,
 		},
 		{
 			name: "found with key (capella state)",

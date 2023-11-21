@@ -29,7 +29,7 @@ func TestMapAggregateAndProof(t *testing.T) {
 				from: &zondpb.AggregateAttestationAndProof{
 					AggregatorIndex: 0,
 					Aggregate: &zondpb.Attestation{
-						AggregationBits: bitfield.Bitlist{0b1101},
+						ParticipationBits: bitfield.Bitlist{0b1101},
 						Data: &zondpb.AttestationData{
 							BeaconBlockRoot: make([]byte, fieldparams.RootLength),
 							Source: &zondpb.Checkpoint{
@@ -80,7 +80,7 @@ func TestMapAttestation(t *testing.T) {
 			name: "HappyPathTest",
 			args: args{
 				attestation: &zondpb.Attestation{
-					AggregationBits: bitfield.Bitlist{0b1101},
+					ParticipationBits: bitfield.Bitlist{0b1101},
 					Data: &zondpb.AttestationData{
 						BeaconBlockRoot: make([]byte, fieldparams.RootLength),
 						Source: &zondpb.Checkpoint{
@@ -292,7 +292,7 @@ func TestMapBeaconBlockBody(t *testing.T) {
 					},
 					Attestations: []*zondpb.Attestation{
 						{
-							AggregationBits: bitfield.Bitlist{0b1101},
+							ParticipationBits: bitfield.Bitlist{0b1101},
 							Data: &zondpb.AttestationData{
 								BeaconBlockRoot: make([]byte, fieldparams.RootLength),
 								Source: &zondpb.Checkpoint{
@@ -364,7 +364,7 @@ func TestMapContributionAndProof(t *testing.T) {
 						Slot:              0,
 						BlockRoot:         make([]byte, fieldparams.RootLength),
 						SubcommitteeIndex: 0,
-						AggregationBits:   mock.MockAggregationBits(),
+						ParticipationBits: mock.MockAggregationBits(),
 						Signature:         make([]byte, dilithium2.CryptoBytes),
 					},
 					SelectionProof: make([]byte, dilithium2.CryptoBytes),

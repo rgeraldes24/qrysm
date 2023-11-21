@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"go.opencensus.io/trace"
@@ -32,7 +32,7 @@ func ProcessAttestationsNoVerifySignature(
 	body := b.Block().Body()
 	var err error
 	for idx, att := range body.Attestations() {
-		beaconState, err = ProcessAttestationNoVerifySignature(ctx, beaconState, att)
+		beaconState, err = ProcessAttestationNoVerifySignatures(ctx, beaconState, att)
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not verify attestation at index %d in block", idx)
 		}
@@ -124,14 +124,14 @@ func VerifyAttestationNoVerifySignature(
 	return attestation.IsValidAttestationIndices(ctx, indexedAtt)
 }
 
-// ProcessAttestationNoVerifySignature processes the attestation without verifying the attestation signature. This
+// ProcessAttestationNoVerifySignatures processes the attestation without verifying the attestation signatures. This
 // method is used to validate attestations whose signatures have already been verified.
-func ProcessAttestationNoVerifySignature(
+func ProcessAttestationNoVerifySignatures(
 	ctx context.Context,
 	beaconState state.BeaconState,
 	att *zondpb.Attestation,
 ) (state.BeaconState, error) {
-	ctx, span := trace.StartSpan(ctx, "core.ProcessAttestationNoVerifySignature")
+	ctx, span := trace.StartSpan(ctx, "core.ProcessAttestationNoVerifySignatures")
 	defer span.End()
 
 	if err := VerifyAttestationNoVerifySignature(ctx, beaconState, att); err != nil {
@@ -146,10 +146,10 @@ func ProcessAttestationNoVerifySignature(
 		return nil, err
 	}
 	pendingAtt := &zondpb.PendingAttestation{
-		Data:            data,
-		AggregationBits: att.ParticipationBits,
-		InclusionDelay:  beaconState.Slot() - s,
-		ProposerIndex:   proposerIndex,
+		Data:              data,
+		ParticipationBits: att.ParticipationBits,
+		InclusionDelay:    beaconState.Slot() - s,
+		ProposerIndex:     proposerIndex,
 	}
 
 	if data.Target.Epoch == currEpoch {
@@ -183,22 +183,6 @@ func VerifyAttestationSignature(ctx context.Context, beaconState state.ReadOnlyB
 }
 
 // VerifyIndexedAttestation determines the validity of an indexed attestation.
-//
-// Spec pseudocode definition:
-//
-//	def is_valid_indexed_attestation(state: BeaconState, indexed_attestation: IndexedAttestation) -> bool:
-//	  """
-//	  Check if ``indexed_attestation`` is not empty, has sorted and unique indices and has a valid aggregate signature.
-//	  """
-//	  # Verify indices are sorted and unique
-//	  indices = indexed_attestation.attesting_indices
-//	  if len(indices) == 0 or not indices == sorted(set(indices)):
-//	      return False
-//	  # Verify aggregate signature
-//	  pubkeys = [state.validators[i].pubkey for i in indices]
-//	  domain = get_domain(state, DOMAIN_BEACON_ATTESTER, indexed_attestation.data.target.epoch)
-//	  signing_root = compute_signing_root(indexed_attestation.data, domain)
-//	  return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
 func VerifyIndexedAttestation(ctx context.Context, beaconState state.ReadOnlyBeaconState, indexedAtt *zondpb.IndexedAttestation) error {
 	ctx, span := trace.StartSpan(ctx, "core.VerifyIndexedAttestation")
 	defer span.End()
@@ -216,10 +200,10 @@ func VerifyIndexedAttestation(ctx context.Context, beaconState state.ReadOnlyBea
 		return err
 	}
 	indices := indexedAtt.AttestingIndices
-	var pubkeys []bls.PublicKey
+	var pubkeys []dilithium.PublicKey
 	for i := 0; i < len(indices); i++ {
 		pubkeyAtIdx := beaconState.PubkeyAtIndex(primitives.ValidatorIndex(indices[i]))
-		pk, err := bls.PublicKeyFromBytes(pubkeyAtIdx[:])
+		pk, err := dilithium.PublicKeyFromBytes(pubkeyAtIdx[:])
 		if err != nil {
 			return errors.Wrap(err, "could not deserialize validator public key")
 		}

@@ -175,9 +175,9 @@ func convertAttestationToProto(jsonAttestation *apimiddleware.AttestationJson) (
 		return nil, errors.New("json attestation is nil")
 	}
 
-	aggregationBits, err := hexutil.Decode(jsonAttestation.AggregationBits)
+	aggregationBits, err := hexutil.Decode(jsonAttestation.ParticipationBits)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode aggregation bits `%s`", jsonAttestation.AggregationBits)
+		return nil, errors.Wrapf(err, "failed to decode aggregation bits `%s`", jsonAttestation.ParticipationBits)
 	}
 
 	attestationData, err := convertAttestationDataToProto(jsonAttestation.Data)
@@ -191,9 +191,9 @@ func convertAttestationToProto(jsonAttestation *apimiddleware.AttestationJson) (
 	}
 
 	return &zondpb.Attestation{
-		AggregationBits: aggregationBits,
-		Data:            attestationData,
-		Signatures:      signature,
+		ParticipationBits: aggregationBits,
+		Data:              attestationData,
+		Signatures:        signature,
 	}, nil
 }
 

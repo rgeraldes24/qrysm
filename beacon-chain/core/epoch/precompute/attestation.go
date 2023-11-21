@@ -58,7 +58,7 @@ func ProcessAttestations(
 		if err != nil {
 			return nil, nil, err
 		}
-		indices, err := attestation.AttestingIndices(a.AggregationBits, committee)
+		indices, err := attestation.AttestingIndices(a.ParticipationBits, committee)
 		if err != nil {
 			return nil, nil, err
 		}

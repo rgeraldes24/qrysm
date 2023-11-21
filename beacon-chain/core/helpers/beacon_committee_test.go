@@ -317,7 +317,7 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 	}{
 		{
 			attestation: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0x05},
+				ParticipationBits: bitfield.Bitlist{0x05},
 				Data: &zondpb.AttestationData{
 					CommitteeIndex: 5,
 					Target:         &zondpb.Checkpoint{Root: make([]byte, 32)},
@@ -328,7 +328,7 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 		{
 
 			attestation: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0x06},
+				ParticipationBits: bitfield.Bitlist{0x06},
 				Data: &zondpb.AttestationData{
 					CommitteeIndex: 10,
 					Target:         &zondpb.Checkpoint{Root: make([]byte, 32)},
@@ -338,7 +338,7 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 		},
 		{
 			attestation: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0x06},
+				ParticipationBits: bitfield.Bitlist{0x06},
 				Data: &zondpb.AttestationData{
 					CommitteeIndex: 20,
 					Target:         &zondpb.Checkpoint{Root: make([]byte, 32)},
@@ -348,7 +348,7 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 		},
 		{
 			attestation: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0x06},
+				ParticipationBits: bitfield.Bitlist{0x06},
 				Data: &zondpb.AttestationData{
 					CommitteeIndex: 20,
 					Target:         &zondpb.Checkpoint{Root: make([]byte, 32)},
@@ -358,7 +358,7 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 		},
 		{
 			attestation: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0xFF, 0xC0, 0x01},
+				ParticipationBits: bitfield.Bitlist{0xFF, 0xC0, 0x01},
 				Data: &zondpb.AttestationData{
 					CommitteeIndex: 5,
 					Target:         &zondpb.Checkpoint{Root: make([]byte, 32)},
@@ -369,7 +369,7 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 		},
 		{
 			attestation: &zondpb.Attestation{
-				AggregationBits: bitfield.Bitlist{0xFF, 0x01},
+				ParticipationBits: bitfield.Bitlist{0xFF, 0x01},
 				Data: &zondpb.AttestationData{
 					CommitteeIndex: 20,
 					Target:         &zondpb.Checkpoint{Root: make([]byte, 32)},

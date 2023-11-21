@@ -798,7 +798,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 		b := util.NewBeaconBlock()
 		b.Block.Body.Attestations = []*zondpbalpha.Attestation{
 			{
-				AggregationBits: bitfield.Bitlist{0x00},
+				ParticipationBits: bitfield.Bitlist{0x00},
 				Data: &zondpbalpha.AttestationData{
 					Slot:            123,
 					CommitteeIndex:  123,
@@ -815,7 +815,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 				Signature: bytesutil.PadTo([]byte("sig1"), 96),
 			},
 			{
-				AggregationBits: bitfield.Bitlist{0x01},
+				ParticipationBits: bitfield.Bitlist{0x01},
 				Data: &zondpbalpha.AttestationData{
 					Slot:            456,
 					CommitteeIndex:  456,
@@ -855,7 +855,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 		b := util.NewBeaconBlockAltair()
 		b.Block.Body.Attestations = []*zondpbalpha.Attestation{
 			{
-				AggregationBits: bitfield.Bitlist{0x00},
+				ParticipationBits: bitfield.Bitlist{0x00},
 				Data: &zondpbalpha.AttestationData{
 					Slot:            123,
 					CommitteeIndex:  123,
@@ -872,7 +872,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 				Signature: bytesutil.PadTo([]byte("sig1"), 96),
 			},
 			{
-				AggregationBits: bitfield.Bitlist{0x01},
+				ParticipationBits: bitfield.Bitlist{0x01},
 				Data: &zondpbalpha.AttestationData{
 					Slot:            456,
 					CommitteeIndex:  456,
@@ -912,7 +912,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 		b := util.NewBeaconBlockBellatrix()
 		b.Block.Body.Attestations = []*zondpbalpha.Attestation{
 			{
-				AggregationBits: bitfield.Bitlist{0x00},
+				ParticipationBits: bitfield.Bitlist{0x00},
 				Data: &zondpbalpha.AttestationData{
 					Slot:            123,
 					CommitteeIndex:  123,
@@ -929,7 +929,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 				Signature: bytesutil.PadTo([]byte("sig1"), 96),
 			},
 			{
-				AggregationBits: bitfield.Bitlist{0x01},
+				ParticipationBits: bitfield.Bitlist{0x01},
 				Data: &zondpbalpha.AttestationData{
 					Slot:            456,
 					CommitteeIndex:  456,
@@ -969,7 +969,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 		b := util.NewBeaconBlockCapella()
 		b.Block.Body.Attestations = []*zondpbalpha.Attestation{
 			{
-				AggregationBits: bitfield.Bitlist{0x00},
+				ParticipationBits: bitfield.Bitlist{0x00},
 				Data: &zondpbalpha.AttestationData{
 					Slot:            123,
 					CommitteeIndex:  123,
@@ -986,7 +986,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 				Signature: bytesutil.PadTo([]byte("sig1"), 96),
 			},
 			{
-				AggregationBits: bitfield.Bitlist{0x01},
+				ParticipationBits: bitfield.Bitlist{0x01},
 				Data: &zondpbalpha.AttestationData{
 					Slot:            456,
 					CommitteeIndex:  456,
