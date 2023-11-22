@@ -231,16 +231,6 @@ func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash
 			return nil, errors.Wrapf(err, "could not extract proto message from header")
 		}
 		return WrappedSignedBuilderBid(p)
-	case strings.ToLower(version.String(version.Bellatrix)):
-		hr := &ExecHeaderResponse{}
-		if err := json.Unmarshal(hb, hr); err != nil {
-			return nil, errors.Wrapf(err, "error unmarshaling the builder GetHeader response, using slot=%d, parentHash=%#x, pubkey=%#x", slot, parentHash, pubkey)
-		}
-		p, err := hr.ToProto()
-		if err != nil {
-			return nil, errors.Wrap(err, "could not extract proto message from header")
-		}
-		return WrappedSignedBuilderBid(p)
 	default:
 		return nil, fmt.Errorf("unsupported header version %s", strings.ToLower(v.Version))
 	}

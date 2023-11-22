@@ -2,7 +2,6 @@ package precompute
 
 import (
 	"bytes"
-	"context"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
@@ -10,13 +9,10 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/monitoring/tracing"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
-	"github.com/theQRL/qrysm/v4/runtime/version"
-	"go.opencensus.io/trace"
 )
 
+/*
 // ProcessAttestations process the attestations in state and update individual validator's pre computes,
 // it also tracks and updates epoch attesting balances.
 func ProcessAttestations(
@@ -69,6 +65,7 @@ func ProcessAttestations(
 
 	return vp, pBal, nil
 }
+*/
 
 // AttestedCurrentEpoch returns true if attestation `a` attested once in current epoch and/or epoch boundary block.
 func AttestedCurrentEpoch(s state.ReadOnlyBeaconState, a *zondpb.PendingAttestation) (bool, bool, error) {
@@ -180,10 +177,7 @@ func UpdateBalance(vp []*Validator, bBal *Balance, stateVersion int) *Balance {
 			if v.IsCurrentEpochTargetAttester {
 				bBal.CurrentEpochTargetAttested += v.CurrentEpochEffectiveBalance
 			}
-			if stateVersion == version.Phase0 && v.IsPrevEpochAttester {
-				bBal.PrevEpochAttested += v.CurrentEpochEffectiveBalance
-			}
-			if stateVersion >= version.Altair && v.IsPrevEpochSourceAttester {
+			if v.IsPrevEpochSourceAttester {
 				bBal.PrevEpochAttested += v.CurrentEpochEffectiveBalance
 			}
 			if v.IsPrevEpochTargetAttester {

@@ -66,22 +66,6 @@ func (b *BeaconBlock) Proto() (proto.Message, error) {
 	}
 
 	switch b.version {
-	case version.Phase0:
-		var body *zond.BeaconBlockBody
-		if bodyMessage != nil {
-			var ok bool
-			body, ok = bodyMessage.(*zond.BeaconBlockBody)
-			if !ok {
-				return nil, errIncorrectBodyVersion
-			}
-		}
-		return &zond.BeaconBlock{
-			Slot:          b.slot,
-			ProposerIndex: b.proposerIndex,
-			ParentRoot:    b.parentRoot[:],
-			StateRoot:     b.stateRoot[:],
-			Body:          body,
-		}, nil
 	case version.Capella:
 		if b.IsBlinded() {
 			var body *zond.BlindedBeaconBlockBody
@@ -211,26 +195,6 @@ func initBlindedSignedBlockFromProtoCapella(pb *zond.SignedBlindedBeaconBlock) (
 	return b, nil
 }
 
-func initBlockFromProtoPhase0(pb *zond.BeaconBlock) (*BeaconBlock, error) {
-	if pb == nil {
-		return nil, errNilBlock
-	}
-
-	body, err := initBlockBodyFromProtoPhase0(pb.Body)
-	if err != nil {
-		return nil, err
-	}
-	b := &BeaconBlock{
-		version:       version.Phase0,
-		slot:          pb.Slot,
-		proposerIndex: pb.ProposerIndex,
-		parentRoot:    bytesutil.ToBytes32(pb.ParentRoot),
-		stateRoot:     bytesutil.ToBytes32(pb.StateRoot),
-		body:          body,
-	}
-	return b, nil
-}
-
 func initBlockFromProtoCapella(pb *zond.BeaconBlock) (*BeaconBlock, error) {
 	if pb == nil {
 		return nil, errNilBlock
@@ -267,26 +231,6 @@ func initBlindedBlockFromProtoCapella(pb *zond.BlindedBeaconBlock) (*BeaconBlock
 		parentRoot:    bytesutil.ToBytes32(pb.ParentRoot),
 		stateRoot:     bytesutil.ToBytes32(pb.StateRoot),
 		body:          body,
-	}
-	return b, nil
-}
-
-func initBlockBodyFromProtoPhase0(pb *zond.BeaconBlockBody) (*BeaconBlockBody, error) {
-	if pb == nil {
-		return nil, errNilBlockBody
-	}
-
-	b := &BeaconBlockBody{
-		version:           version.Phase0,
-		isBlinded:         false,
-		randaoReveal:      bytesutil.ToBytes4595(pb.RandaoReveal),
-		zond1Data:         pb.Zond1Data,
-		graffiti:          bytesutil.ToBytes32(pb.Graffiti),
-		proposerSlashings: pb.ProposerSlashings,
-		attesterSlashings: pb.AttesterSlashings,
-		attestations:      pb.Attestations,
-		deposits:          pb.Deposits,
-		voluntaryExits:    pb.VoluntaryExits,
 	}
 	return b, nil
 }

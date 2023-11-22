@@ -10,10 +10,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
-	e "github.com/theQRL/qrysm/v4/beacon-chain/core/epoch"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/features"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -22,7 +18,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/math"
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"go.opencensus.io/trace"
 )
 
@@ -245,23 +240,25 @@ func ProcessSlots(ctx context.Context, state state.BeaconState, slot primitives.
 			tracing.AnnotateError(span, err)
 			return nil, errors.Wrap(err, "could not process slot")
 		}
-		if time.CanProcessEpoch(state) {
-			if state.Version() == version.Phase0 {
-				state, err = ProcessEpochPrecompute(ctx, state)
-				if err != nil {
-					tracing.AnnotateError(span, err)
-					return nil, errors.Wrap(err, "could not process epoch with optimizations")
+		/*
+			if time.CanProcessEpoch(state) {
+				if state.Version() == version.Phase0 {
+					state, err = ProcessEpochPrecompute(ctx, state)
+					if err != nil {
+						tracing.AnnotateError(span, err)
+						return nil, errors.Wrap(err, "could not process epoch with optimizations")
+					}
+				} else if state.Version() >= version.Altair {
+					state, err = altair.ProcessEpoch(ctx, state)
+					if err != nil {
+						tracing.AnnotateError(span, err)
+						return nil, errors.Wrap(err, "could not process epoch")
+					}
+				} else {
+					return nil, errors.New("beacon state should have a version")
 				}
-			} else if state.Version() >= version.Altair {
-				state, err = altair.ProcessEpoch(ctx, state)
-				if err != nil {
-					tracing.AnnotateError(span, err)
-					return nil, errors.Wrap(err, "could not process epoch")
-				}
-			} else {
-				return nil, errors.New("beacon state should have a version")
 			}
-		}
+		*/
 		if err := state.SetSlot(state.Slot() + 1); err != nil {
 			tracing.AnnotateError(span, err)
 			return nil, errors.Wrap(err, "failed to increment state slot")
@@ -338,6 +335,7 @@ func VerifyOperationLengths(_ context.Context, state state.BeaconState, b interf
 	return state, nil
 }
 
+/*
 // ProcessEpochPrecompute describes the per epoch operations that are performed on the beacon state.
 // It's optimized by pre computing validator attested info and epoch total/attested balances upfront.
 func ProcessEpochPrecompute(ctx context.Context, state state.BeaconState) (state.BeaconState, error) {
@@ -383,3 +381,4 @@ func ProcessEpochPrecompute(ctx context.Context, state state.BeaconState) (state
 	}
 	return state, nil
 }
+*/

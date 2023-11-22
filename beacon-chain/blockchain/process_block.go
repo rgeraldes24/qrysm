@@ -443,11 +443,6 @@ func (s *Service) pruneAttsFromPool(headBlock interfaces.ReadOnlySignedBeaconBlo
 
 // validateMergeTransitionBlock validates the merge transition block.
 func (s *Service) validateMergeTransitionBlock(ctx context.Context, stateVersion int, stateHeader interfaces.ExecutionData, blk interfaces.ReadOnlySignedBeaconBlock) error {
-	// Skip validation if block is older than Bellatrix.
-	if blocks.IsPreBellatrixVersion(blk.Block().Version()) {
-		return nil
-	}
-
 	// Skip validation if block has an empty payload.
 	payload, err := blk.Block().Body().Execution()
 	if err != nil {
@@ -459,12 +454,6 @@ func (s *Service) validateMergeTransitionBlock(ctx context.Context, stateVersion
 	}
 	if isEmpty {
 		return nil
-	}
-
-	// Handle case where pre-state is Altair but block contains payload.
-	// To reach here, the block must have contained a valid payload.
-	if blocks.IsPreBellatrixVersion(stateVersion) {
-		return s.validateMergeBlock(ctx, blk)
 	}
 
 	// Skip validation if the block is not a merge transition block.

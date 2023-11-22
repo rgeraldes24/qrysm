@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/helpers"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/helpers"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 )
 
@@ -342,17 +342,6 @@ type BlockRootContainerJson struct {
 	Root string `json:"root" hex:"true"`
 }
 
-type BeaconBlockBodyJson struct {
-	RandaoReveal      string                     `json:"randao_reveal" hex:"true"`
-	Zond1Data         *Zond1DataJson             `json:"zond1_data"`
-	Graffiti          string                     `json:"graffiti" hex:"true"`
-	ProposerSlashings []*ProposerSlashingJson    `json:"proposer_slashings"`
-	AttesterSlashings []*AttesterSlashingJson    `json:"attester_slashings"`
-	Attestations      []*AttestationJson         `json:"attestations"`
-	Deposits          []*DepositJson             `json:"deposits"`
-	VoluntaryExits    []*SignedVoluntaryExitJson `json:"voluntary_exits"`
-}
-
 type SignedBeaconBlockContainerJson struct {
 	CapellaBlock *BeaconBlockJson `json:"capella_block"`
 	Signature    string           `json:"signature" hex:"true"`
@@ -372,88 +361,34 @@ type BlindedBeaconBlockContainerJson struct {
 }
 
 type SignedBeaconBlockCapellaContainerJson struct {
-	Message   *BeaconBlockCapellaJson `json:"message"`
-	Signature string                  `json:"signature" hex:"true"`
-}
-
-type SignedBlindedBeaconBlockBellatrixContainerJson struct {
-	Message   *BlindedBeaconBlockBellatrixJson `json:"message"`
-	Signature string                           `json:"signature" hex:"true"`
+	Message   *BeaconBlockJson `json:"message"`
+	Signature string           `json:"signature" hex:"true"`
 }
 
 type SignedBlindedBeaconBlockCapellaContainerJson struct {
-	Message   *BlindedBeaconBlockCapellaJson `json:"message"`
-	Signature string                         `json:"signature" hex:"true"`
-}
-
-type BeaconBlockAltairJson struct {
-	Slot          string                     `json:"slot"`
-	ProposerIndex string                     `json:"proposer_index"`
-	ParentRoot    string                     `json:"parent_root" hex:"true"`
-	StateRoot     string                     `json:"state_root" hex:"true"`
-	Body          *BeaconBlockBodyAltairJson `json:"body"`
-}
-
-type BeaconBlockBellatrixJson struct {
-	Slot          string                        `json:"slot"`
-	ProposerIndex string                        `json:"proposer_index"`
-	ParentRoot    string                        `json:"parent_root" hex:"true"`
-	StateRoot     string                        `json:"state_root" hex:"true"`
-	Body          *BeaconBlockBodyBellatrixJson `json:"body"`
+	Message   *BlindedBeaconBlockJson `json:"message"`
+	Signature string                  `json:"signature" hex:"true"`
 }
 
 type BeaconBlockJson struct {
+	Slot          string               `json:"slot"`
+	ProposerIndex string               `json:"proposer_index"`
+	ParentRoot    string               `json:"parent_root" hex:"true"`
+	StateRoot     string               `json:"state_root" hex:"true"`
+	Body          *BeaconBlockBodyJson `json:"body"`
+}
+
+type BlindedBeaconBlockJson struct {
 	Slot          string                      `json:"slot"`
 	ProposerIndex string                      `json:"proposer_index"`
 	ParentRoot    string                      `json:"parent_root" hex:"true"`
 	StateRoot     string                      `json:"state_root" hex:"true"`
-	Body          *BeaconBlockBodyCapellaJson `json:"body"`
+	Body          *BlindedBeaconBlockBodyJson `json:"body"`
 }
 
-type BlindedBeaconBlockBellatrixJson struct {
-	Slot          string                               `json:"slot"`
-	ProposerIndex string                               `json:"proposer_index"`
-	ParentRoot    string                               `json:"parent_root" hex:"true"`
-	StateRoot     string                               `json:"state_root" hex:"true"`
-	Body          *BlindedBeaconBlockBodyBellatrixJson `json:"body"`
-}
-
-type BlindedBeaconBlockJson struct {
-	Slot          string                             `json:"slot"`
-	ProposerIndex string                             `json:"proposer_index"`
-	ParentRoot    string                             `json:"parent_root" hex:"true"`
-	StateRoot     string                             `json:"state_root" hex:"true"`
-	Body          *BlindedBeaconBlockBodyCapellaJson `json:"body"`
-}
-
-type BeaconBlockBodyAltairJson struct {
-	RandaoReveal      string                     `json:"randao_reveal" hex:"true"`
-	Zond1Data         *Zond1DataJson             `json:"zond1_data"`
-	Graffiti          string                     `json:"graffiti" hex:"true"`
-	ProposerSlashings []*ProposerSlashingJson    `json:"proposer_slashings"`
-	AttesterSlashings []*AttesterSlashingJson    `json:"attester_slashings"`
-	Attestations      []*AttestationJson         `json:"attestations"`
-	Deposits          []*DepositJson             `json:"deposits"`
-	VoluntaryExits    []*SignedVoluntaryExitJson `json:"voluntary_exits"`
-	SyncAggregate     *SyncAggregateJson         `json:"sync_aggregate"`
-}
-
-type BeaconBlockBodyBellatrixJson struct {
-	RandaoReveal      string                     `json:"randao_reveal" hex:"true"`
-	Zond1Data         *Zond1DataJson             `json:"zond1_data"`
-	Graffiti          string                     `json:"graffiti" hex:"true"`
-	ProposerSlashings []*ProposerSlashingJson    `json:"proposer_slashings"`
-	AttesterSlashings []*AttesterSlashingJson    `json:"attester_slashings"`
-	Attestations      []*AttestationJson         `json:"attestations"`
-	Deposits          []*DepositJson             `json:"deposits"`
-	VoluntaryExits    []*SignedVoluntaryExitJson `json:"voluntary_exits"`
-	SyncAggregate     *SyncAggregateJson         `json:"sync_aggregate"`
-	ExecutionPayload  *ExecutionPayloadJson      `json:"execution_payload"`
-}
-
-type BeaconBlockBodyCapellaJson struct {
+type BeaconBlockBodyJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	Zond1Data                   *Zond1DataJson                          `json:"zond1_data"`
+	Eth1Data                    *Eth1DataJson                           `json:"eth1_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -461,26 +396,13 @@ type BeaconBlockBodyCapellaJson struct {
 	Deposits                    []*DepositJson                          `json:"deposits"`
 	VoluntaryExits              []*SignedVoluntaryExitJson              `json:"voluntary_exits"`
 	SyncAggregate               *SyncAggregateJson                      `json:"sync_aggregate"`
-	ExecutionPayload            *ExecutionPayloadCapellaJson            `json:"execution_payload"`
+	ExecutionPayload            *ExecutionPayloadJson                   `json:"execution_payload"`
 	DilithiumToExecutionChanges []*SignedDilithiumToExecutionChangeJson `json:"dilithium_to_execution_changes"`
 }
 
-type BlindedBeaconBlockBodyBellatrixJson struct {
-	RandaoReveal           string                      `json:"randao_reveal" hex:"true"`
-	Zond1Data              *Zond1DataJson              `json:"zond1_data"`
-	Graffiti               string                      `json:"graffiti" hex:"true"`
-	ProposerSlashings      []*ProposerSlashingJson     `json:"proposer_slashings"`
-	AttesterSlashings      []*AttesterSlashingJson     `json:"attester_slashings"`
-	Attestations           []*AttestationJson          `json:"attestations"`
-	Deposits               []*DepositJson              `json:"deposits"`
-	VoluntaryExits         []*SignedVoluntaryExitJson  `json:"voluntary_exits"`
-	SyncAggregate          *SyncAggregateJson          `json:"sync_aggregate"`
-	ExecutionPayloadHeader *ExecutionPayloadHeaderJson `json:"execution_payload_header"`
-}
-
-type BlindedBeaconBlockBodyCapellaJson struct {
+type BlindedBeaconBlockBodyJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	Zond1Data                   *Zond1DataJson                          `json:"zond1_data"`
+	Eth1Data                    *Eth1DataJson                           `json:"eth1_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -488,28 +410,11 @@ type BlindedBeaconBlockBodyCapellaJson struct {
 	Deposits                    []*DepositJson                          `json:"deposits"`
 	VoluntaryExits              []*SignedVoluntaryExitJson              `json:"voluntary_exits"`
 	SyncAggregate               *SyncAggregateJson                      `json:"sync_aggregate"`
-	ExecutionPayloadHeader      *ExecutionPayloadHeaderCapellaJson      `json:"execution_payload_header"`
+	ExecutionPayloadHeader      *ExecutionPayloadHeaderJson             `json:"execution_payload_header"`
 	DilithiumToExecutionChanges []*SignedDilithiumToExecutionChangeJson `json:"dilithium_to_execution_changes"`
 }
 
 type ExecutionPayloadJson struct {
-	ParentHash    string   `json:"parent_hash" hex:"true"`
-	FeeRecipient  string   `json:"fee_recipient" hex:"true"`
-	StateRoot     string   `json:"state_root" hex:"true"`
-	ReceiptsRoot  string   `json:"receipts_root" hex:"true"`
-	LogsBloom     string   `json:"logs_bloom" hex:"true"`
-	PrevRandao    string   `json:"prev_randao" hex:"true"`
-	BlockNumber   string   `json:"block_number"`
-	GasLimit      string   `json:"gas_limit"`
-	GasUsed       string   `json:"gas_used"`
-	TimeStamp     string   `json:"timestamp"`
-	ExtraData     string   `json:"extra_data" hex:"true"`
-	BaseFeePerGas string   `json:"base_fee_per_gas" uint256:"true"`
-	BlockHash     string   `json:"block_hash" hex:"true"`
-	Transactions  []string `json:"transactions" hex:"true"`
-}
-
-type ExecutionPayloadCapellaJson struct {
 	ParentHash    string            `json:"parent_hash" hex:"true"`
 	FeeRecipient  string            `json:"fee_recipient" hex:"true"`
 	StateRoot     string            `json:"state_root" hex:"true"`
@@ -542,29 +447,13 @@ type ExecutionPayloadHeaderJson struct {
 	BaseFeePerGas    string `json:"base_fee_per_gas" uint256:"true"`
 	BlockHash        string `json:"block_hash" hex:"true"`
 	TransactionsRoot string `json:"transactions_root" hex:"true"`
-}
-
-type ExecutionPayloadHeaderCapellaJson struct {
-	ParentHash       string `json:"parent_hash" hex:"true"`
-	FeeRecipient     string `json:"fee_recipient" hex:"true"`
-	StateRoot        string `json:"state_root" hex:"true"`
-	ReceiptsRoot     string `json:"receipts_root" hex:"true"`
-	LogsBloom        string `json:"logs_bloom" hex:"true"`
-	PrevRandao       string `json:"prev_randao" hex:"true"`
-	BlockNumber      string `json:"block_number"`
-	GasLimit         string `json:"gas_limit"`
-	GasUsed          string `json:"gas_used"`
-	TimeStamp        string `json:"timestamp"`
-	ExtraData        string `json:"extra_data" hex:"true"`
-	BaseFeePerGas    string `json:"base_fee_per_gas" uint256:"true"`
-	BlockHash        string `json:"block_hash" hex:"true"`
-	TransactionsRoot string `json:"transactions_root" hex:"true"`
 	WithdrawalsRoot  string `json:"withdrawals_root" hex:"true"`
 }
 
 type SyncAggregateJson struct {
-	SyncCommitteeBits      string `json:"sync_committee_bits" hex:"true"`
-	SyncCommitteeSignature string `json:"sync_committee_signature" hex:"true"`
+	SyncCommitteeBits           string   `json:"sync_committee_bits" hex:"true"`
+	SyncCommitteeSignatures     string   `json:"sync_committee_signatures" hex:"true"`
+	SignaturesIdxToCommitteeIdx []string `json:"signatures_idx_to_committee_idx" hex:"true"`
 }
 
 type BlockHeaderContainerJson struct {
@@ -591,7 +480,7 @@ type BeaconBlockHeaderJson struct {
 	BodyRoot      string `json:"body_root" hex:"true"`
 }
 
-type Zond1DataJson struct {
+type Eth1DataJson struct {
 	DepositRoot  string `json:"deposit_root" hex:"true"`
 	DepositCount string `json:"deposit_count"`
 	BlockHash    string `json:"block_hash" hex:"true"`
@@ -610,7 +499,7 @@ type AttesterSlashingJson struct {
 type IndexedAttestationJson struct {
 	AttestingIndices []string             `json:"attesting_indices"`
 	Data             *AttestationDataJson `json:"data"`
-	Signature        string               `json:"signature" hex:"true"`
+	Signatures       []string             `json:"signatures" hex:"true"`
 }
 
 type FeeRecipientJson struct {
@@ -619,9 +508,10 @@ type FeeRecipientJson struct {
 }
 
 type AttestationJson struct {
-	ParticipationBits string               `json:"aggregation_bits" hex:"true"`
-	Data              *AttestationDataJson `json:"data"`
-	Signature         string               `json:"signature" hex:"true"`
+	ParticipationBits               string               `json:"participation_bits" hex:"true"`
+	Data                            *AttestationDataJson `json:"data"`
+	Signatures                      []string             `json:"signatures" hex:"true"`
+	SignaturesIdxToParticipationIdx []string             `json:"signatures_idx_to_participation_idx" hex:"true"`
 }
 
 type AttestationDataJson struct {
@@ -709,57 +599,6 @@ type WithdrawalJson struct {
 }
 
 type BeaconStateJson struct {
-	GenesisTime                 string                    `json:"genesis_time"`
-	GenesisValidatorsRoot       string                    `json:"genesis_validators_root" hex:"true"`
-	Slot                        string                    `json:"slot"`
-	Fork                        *ForkJson                 `json:"fork"`
-	LatestBlockHeader           *BeaconBlockHeaderJson    `json:"latest_block_header"`
-	BlockRoots                  []string                  `json:"block_roots" hex:"true"`
-	StateRoots                  []string                  `json:"state_roots" hex:"true"`
-	HistoricalRoots             []string                  `json:"historical_roots" hex:"true"`
-	Zond1Data                   *Zond1DataJson            `json:"zond1_data"`
-	Zond1DataVotes              []*Zond1DataJson          `json:"zond1_data_votes"`
-	Zond1DepositIndex           string                    `json:"zond1_deposit_index"`
-	Validators                  []*ValidatorJson          `json:"validators"`
-	Balances                    []string                  `json:"balances"`
-	RandaoMixes                 []string                  `json:"randao_mixes" hex:"true"`
-	Slashings                   []string                  `json:"slashings"`
-	PreviousEpochAttestations   []*PendingAttestationJson `json:"previous_epoch_attestations"`
-	CurrentEpochAttestations    []*PendingAttestationJson `json:"current_epoch_attestations"`
-	JustificationBits           string                    `json:"justification_bits" hex:"true"`
-	PreviousJustifiedCheckpoint *CheckpointJson           `json:"previous_justified_checkpoint"`
-	CurrentJustifiedCheckpoint  *CheckpointJson           `json:"current_justified_checkpoint"`
-	FinalizedCheckpoint         *CheckpointJson           `json:"finalized_checkpoint"`
-}
-
-type BeaconStateAltairJson struct {
-	GenesisTime                 string                 `json:"genesis_time"`
-	GenesisValidatorsRoot       string                 `json:"genesis_validators_root" hex:"true"`
-	Slot                        string                 `json:"slot"`
-	Fork                        *ForkJson              `json:"fork"`
-	LatestBlockHeader           *BeaconBlockHeaderJson `json:"latest_block_header"`
-	BlockRoots                  []string               `json:"block_roots" hex:"true"`
-	StateRoots                  []string               `json:"state_roots" hex:"true"`
-	HistoricalRoots             []string               `json:"historical_roots" hex:"true"`
-	Zond1Data                   *Zond1DataJson         `json:"zond1_data"`
-	Zond1DataVotes              []*Zond1DataJson       `json:"zond1_data_votes"`
-	Zond1DepositIndex           string                 `json:"zond1_deposit_index"`
-	Validators                  []*ValidatorJson       `json:"validators"`
-	Balances                    []string               `json:"balances"`
-	RandaoMixes                 []string               `json:"randao_mixes" hex:"true"`
-	Slashings                   []string               `json:"slashings"`
-	PreviousEpochParticipation  EpochParticipation     `json:"previous_epoch_participation"`
-	CurrentEpochParticipation   EpochParticipation     `json:"current_epoch_participation"`
-	JustificationBits           string                 `json:"justification_bits" hex:"true"`
-	PreviousJustifiedCheckpoint *CheckpointJson        `json:"previous_justified_checkpoint"`
-	CurrentJustifiedCheckpoint  *CheckpointJson        `json:"current_justified_checkpoint"`
-	FinalizedCheckpoint         *CheckpointJson        `json:"finalized_checkpoint"`
-	InactivityScores            []string               `json:"inactivity_scores"`
-	CurrentSyncCommittee        *SyncCommitteeJson     `json:"current_sync_committee"`
-	NextSyncCommittee           *SyncCommitteeJson     `json:"next_sync_committee"`
-}
-
-type BeaconStateBellatrixJson struct {
 	GenesisTime                  string                      `json:"genesis_time"`
 	GenesisValidatorsRoot        string                      `json:"genesis_validators_root" hex:"true"`
 	Slot                         string                      `json:"slot"`
@@ -768,9 +607,9 @@ type BeaconStateBellatrixJson struct {
 	BlockRoots                   []string                    `json:"block_roots" hex:"true"`
 	StateRoots                   []string                    `json:"state_roots" hex:"true"`
 	HistoricalRoots              []string                    `json:"historical_roots" hex:"true"`
-	Zond1Data                    *Zond1DataJson              `json:"zond1_data"`
-	Zond1DataVotes               []*Zond1DataJson            `json:"zond1_data_votes"`
-	Zond1DepositIndex            string                      `json:"zond1_deposit_index"`
+	Eth1Data                     *Eth1DataJson               `json:"eth1_data"`
+	Eth1DataVotes                []*Eth1DataJson             `json:"eth1_data_votes"`
+	Eth1DepositIndex             string                      `json:"eth1_deposit_index"`
 	Validators                   []*ValidatorJson            `json:"validators"`
 	Balances                     []string                    `json:"balances"`
 	RandaoMixes                  []string                    `json:"randao_mixes" hex:"true"`
@@ -785,41 +624,13 @@ type BeaconStateBellatrixJson struct {
 	CurrentSyncCommittee         *SyncCommitteeJson          `json:"current_sync_committee"`
 	NextSyncCommittee            *SyncCommitteeJson          `json:"next_sync_committee"`
 	LatestExecutionPayloadHeader *ExecutionPayloadHeaderJson `json:"latest_execution_payload_header"`
-}
-
-type BeaconStateCapellaJson struct {
-	GenesisTime                  string                             `json:"genesis_time"`
-	GenesisValidatorsRoot        string                             `json:"genesis_validators_root" hex:"true"`
-	Slot                         string                             `json:"slot"`
-	Fork                         *ForkJson                          `json:"fork"`
-	LatestBlockHeader            *BeaconBlockHeaderJson             `json:"latest_block_header"`
-	BlockRoots                   []string                           `json:"block_roots" hex:"true"`
-	StateRoots                   []string                           `json:"state_roots" hex:"true"`
-	HistoricalRoots              []string                           `json:"historical_roots" hex:"true"`
-	Zond1Data                    *Zond1DataJson                     `json:"zond1_data"`
-	Zond1DataVotes               []*Zond1DataJson                   `json:"zond1_data_votes"`
-	Zond1DepositIndex            string                             `json:"zond1_deposit_index"`
-	Validators                   []*ValidatorJson                   `json:"validators"`
-	Balances                     []string                           `json:"balances"`
-	RandaoMixes                  []string                           `json:"randao_mixes" hex:"true"`
-	Slashings                    []string                           `json:"slashings"`
-	PreviousEpochParticipation   EpochParticipation                 `json:"previous_epoch_participation"`
-	CurrentEpochParticipation    EpochParticipation                 `json:"current_epoch_participation"`
-	JustificationBits            string                             `json:"justification_bits" hex:"true"`
-	PreviousJustifiedCheckpoint  *CheckpointJson                    `json:"previous_justified_checkpoint"`
-	CurrentJustifiedCheckpoint   *CheckpointJson                    `json:"current_justified_checkpoint"`
-	FinalizedCheckpoint          *CheckpointJson                    `json:"finalized_checkpoint"`
-	InactivityScores             []string                           `json:"inactivity_scores"`
-	CurrentSyncCommittee         *SyncCommitteeJson                 `json:"current_sync_committee"`
-	NextSyncCommittee            *SyncCommitteeJson                 `json:"next_sync_committee"`
-	LatestExecutionPayloadHeader *ExecutionPayloadHeaderCapellaJson `json:"latest_execution_payload_header"`
-	NextWithdrawalIndex          string                             `json:"next_withdrawal_index"`
-	NextWithdrawalValidatorIndex string                             `json:"next_withdrawal_validator_index"`
-	HistoricalSummaries          []*HistoricalSummaryJson           `json:"historical_summaries"`
+	NextWithdrawalIndex          string                      `json:"next_withdrawal_index"`
+	NextWithdrawalValidatorIndex string                      `json:"next_withdrawal_validator_index"`
+	HistoricalSummaries          []*HistoricalSummaryJson    `json:"historical_summaries"`
 }
 
 type BeaconStateContainerJson struct {
-	CapellaState *BeaconStateCapellaJson `json:"capella_state"`
+	CapellaState *BeaconStateJson `json:"capella_state"`
 }
 
 type ForkJson struct {
@@ -858,8 +669,7 @@ type CommitteeJson struct {
 }
 
 type SyncCommitteeJson struct {
-	Pubkeys         []string `json:"pubkeys" hex:"true"`
-	AggregatePubkey string   `json:"aggregate_pubkey" hex:"true"`
+	Pubkeys []string `json:"pubkeys" hex:"true"`
 }
 
 type SyncCommitteeValidatorsJson struct {
@@ -868,7 +678,7 @@ type SyncCommitteeValidatorsJson struct {
 }
 
 type PendingAttestationJson struct {
-	ParticipationBits string               `json:"aggregation_bits" hex:"true"`
+	ParticipationBits string               `json:"participation_bits" hex:"true"`
 	Data              *AttestationDataJson `json:"data"`
 	InclusionDelay    string               `json:"inclusion_delay"`
 	ProposerIndex     string               `json:"proposer_index"`
@@ -930,11 +740,12 @@ type ContributionAndProofJson struct {
 }
 
 type SyncCommitteeContributionJson struct {
-	Slot              string `json:"slot"`
-	BeaconBlockRoot   string `json:"beacon_block_root" hex:"true"`
-	SubcommitteeIndex string `json:"subcommittee_index"`
-	ParticipationBits string `json:"aggregation_bits" hex:"true"`
-	Signature         string `json:"signature" hex:"true"`
+	Slot                            string   `json:"slot"`
+	BeaconBlockRoot                 string   `json:"beacon_block_root" hex:"true"`
+	SubcommitteeIndex               string   `json:"subcommittee_index"`
+	ParticipationBits               string   `json:"participation_bits" hex:"true"`
+	Signatures                      string   `json:"signatures" hex:"true"`
+	SignaturesIdxToParticipationIdx []string `json:"signatures_idx_to_participation_idx" hex:"true"`
 }
 
 type ValidatorRegistrationJson struct {
@@ -1070,7 +881,7 @@ type AggregatedAttReceivedDataJson struct {
 }
 
 type UnaggregatedAttReceivedDataJson struct {
-	ParticipationBits string               `json:"aggregation_bits" hex:"true"`
+	ParticipationBits string               `json:"participation_bits" hex:"true"`
 	Data              *AttestationDataJson `json:"data"`
 	Signature         string               `json:"signature" hex:"true"`
 }
@@ -1094,8 +905,13 @@ type EventChainReorgJson struct {
 }
 
 type EventPayloadAttributeStreamV1Json struct {
+	Version string `json:"version"`
+	Data    *EventPayloadAttributeV1Json
+}
+
+type EventPayloadAttributeStreamV2Json struct {
 	Version string                       `json:"version"`
-	Data    *EventPayloadAttributeV1Json `json:"data"`
+	Data    *EventPayloadAttributeV2Json `json:"data"`
 }
 
 type EventPayloadAttributeV1Json struct {
@@ -1107,7 +923,22 @@ type EventPayloadAttributeV1Json struct {
 	PayloadAttributes *PayloadAttributesV1Json `json:"payload_attributes"`
 }
 
+type EventPayloadAttributeV2Json struct {
+	ProposerIndex     string                   `json:"proposer_index"`
+	ProposalSlot      string                   `json:"proposal_slot"`
+	ParentBlockNumber string                   `json:"parent_block_number"`
+	ParentBlockRoot   string                   `json:"parent_block_root" hex:"true"`
+	ParentBlockHash   string                   `json:"parent_block_hash" hex:"true"`
+	PayloadAttributes *PayloadAttributesV2Json `json:"payload_attributes"`
+}
+
 type PayloadAttributesV1Json struct {
+	Timestamp             string `json:"timestamp"`
+	Random                string `json:"prev_randao" hex:"true"`
+	SuggestedFeeRecipient string `json:"suggested_fee_recipient" hex:"true"`
+}
+
+type PayloadAttributesV2Json struct {
 	Timestamp             string            `json:"timestamp"`
 	Random                string            `json:"prev_randao" hex:"true"`
 	SuggestedFeeRecipient string            `json:"suggested_fee_recipient" hex:"true"`

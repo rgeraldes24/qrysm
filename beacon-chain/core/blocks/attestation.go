@@ -10,8 +10,6 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
-	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -19,9 +17,10 @@ import (
 	"go.opencensus.io/trace"
 )
 
-// ProcessAttestationsNoVerifySignature applies processing operations to a block's inner attestation
+/*
+// ProcessAttestationsNoVerifySignatures applies processing operations to a block's inner attestation
 // records. The only difference would be that the attestation signature would not be verified.
-func ProcessAttestationsNoVerifySignature(
+func ProcessAttestationsNoVerifySignatures(
 	ctx context.Context,
 	beaconState state.BeaconState,
 	b interfaces.ReadOnlySignedBeaconBlock,
@@ -39,6 +38,7 @@ func ProcessAttestationsNoVerifySignature(
 	}
 	return beaconState, nil
 }
+*/
 
 // VerifyAttestationNoVerifySignature verifies the attestation without verifying the attestation signature. This is
 // used before processing attestation with the beacon state.
@@ -124,6 +124,8 @@ func VerifyAttestationNoVerifySignature(
 	return attestation.IsValidAttestationIndices(ctx, indexedAtt)
 }
 
+// TODO (rgeraldes24) - not used anymore?
+/*
 // ProcessAttestationNoVerifySignatures processes the attestation without verifying the attestation signatures. This
 // method is used to validate attestations whose signatures have already been verified.
 func ProcessAttestationNoVerifySignatures(
@@ -164,6 +166,7 @@ func ProcessAttestationNoVerifySignatures(
 
 	return beaconState, nil
 }
+*/
 
 // VerifyAttestationSignature converts and attestation into an indexed attestation and verifies
 // the signature in that attestation.

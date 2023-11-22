@@ -115,7 +115,11 @@ func (s *SyncCommitteeContribution) ToConsensus() (*zond.SyncCommitteeContributi
 	}
 	sigs := make([][]byte, len(s.Signatures))
 	for i, sig := range s.Signatures {
-		sigs[i] = hexutil.Decode(sig)
+		s, err := hexutil.Decode(sig)
+		if err != nil {
+			return nil, NewDecodeError(err, "Signatures")
+		}
+		sigs[i] = s
 	}
 	indices := make([]uint64, len(s.SignaturesIdxToParticipationIdx))
 	for i, idx := range s.SignaturesIdxToParticipationIdx {
@@ -183,7 +187,11 @@ func (a *Attestation) ToConsensus() (*zond.Attestation, error) {
 	}
 	sigs := make([][]byte, len(a.Signatures))
 	for i, sig := range a.Signatures {
-		sigs[i] = hexutil.Decode(sig)
+		s, err := hexutil.Decode(sig)
+		if err != nil {
+			return nil, NewDecodeError(err, "Signatures")
+		}
+		sigs[i] = s
 	}
 	indices := make([]uint64, len(a.SignaturesIdxToParticipationIdx))
 	for i, idx := range a.SignaturesIdxToParticipationIdx {

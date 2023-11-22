@@ -21,11 +21,11 @@ func (b *BeaconState) SetLatestExecutionPayloadHeader(val interfaces.ExecutionDa
 			return errors.Wrap(err, "could not convert payload to header")
 		}
 		b.latestExecutionPayloadHeader = latest
-		b.markFieldAsDirty(types.LatestExecutionPayloadHeaderCapella)
+		b.markFieldAsDirty(types.LatestExecutionPayloadHeader)
 		return nil
 	case *enginev1.ExecutionPayloadHeader:
 		b.latestExecutionPayloadHeader = header
-		b.markFieldAsDirty(types.LatestExecutionPayloadHeaderCapella)
+		b.markFieldAsDirty(types.LatestExecutionPayloadHeader)
 		return nil
 	default:
 		return errors.New("value must be an execution payload header")

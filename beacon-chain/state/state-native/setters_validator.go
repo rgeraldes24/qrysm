@@ -7,7 +7,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 )
 
 // SetValidators for the beacon state. Updates the entire
@@ -207,10 +206,6 @@ func (b *BeaconState) AppendInactivityScore(s uint64) error {
 	b.lock.Lock()
 	defer b.lock.Unlock()
 
-	if b.version == version.Phase0 {
-		return errNotSupported("AppendInactivityScore", b.version)
-	}
-
 	scores := b.inactivityScores
 	if b.sharedFieldReferences[types.InactivityScores].Refs() > 1 {
 		scores = b.inactivityScoresVal()
@@ -228,10 +223,6 @@ func (b *BeaconState) AppendInactivityScore(s uint64) error {
 func (b *BeaconState) SetInactivityScores(val []uint64) error {
 	b.lock.Lock()
 	defer b.lock.Unlock()
-
-	if b.version == version.Phase0 {
-		return errNotSupported("SetInactivityScores", b.version)
-	}
 
 	b.sharedFieldReferences[types.InactivityScores].MinusRef()
 	b.sharedFieldReferences[types.InactivityScores] = stateutil.NewRef(1)

@@ -30,5 +30,6 @@ func load(b []byte) (state.BeaconState, error) {
 	if err := st.UnmarshalSSZ(b); err != nil {
 		return nil, err
 	}
-	return state_native.InitializeFromProtoUnsafePhase0(st)
+	//return state_native.InitializeFromProtoUnsafePhase0(st)
+	return state_native.InitializeFromProtoUnsafeCapella(st)
 }

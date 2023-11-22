@@ -633,7 +633,7 @@ func TestComputeProposerIndex(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			bState := &zondpb.BeaconState{Validators: tt.args.validators}
-			stTrie, err := state_native.InitializeFromProtoUnsafePhase0(bState)
+			stTrie, err := state_native.InitializeFromProtoUnsafeCapella(bState)
 			require.NoError(t, err)
 			got, err := ComputeProposerIndex(stTrie, tt.args.indices, tt.args.seed)
 			if tt.wantedErr != "" {

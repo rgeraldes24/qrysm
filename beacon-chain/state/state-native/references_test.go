@@ -167,7 +167,7 @@ func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 		}
 	}
 
-	s, err := InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	s, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	a, ok := s.(*BeaconState)
 	require.Equal(t, true, ok)

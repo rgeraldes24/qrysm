@@ -128,9 +128,10 @@ type AggregateAndProof struct {
 
 // Attestation a sub property of AggregateAndProofSignRequest.
 type Attestation struct {
-	ParticipationBits hexutil.Bytes    `json:"aggregation_bits"` /*hex bitlist*/
-	Data              *AttestationData `json:"data"`
-	Signature         hexutil.Bytes    `json:"signature"`
+	ParticipationBits               hexutil.Bytes    `json:"aggregation_bits"` /*hex bitlist*/
+	Data                            *AttestationData `json:"data"`
+	Signatures                      []hexutil.Bytes  `json:"signatures"`
+	SignaturesIdxToParticipationIdx []string         `json:"signatures_idx_to_participation_idx"` /* uint64[] */
 }
 
 // AttestationData a sub property of Attestation.
@@ -209,7 +210,7 @@ type AttesterSlashing struct {
 type IndexedAttestation struct {
 	AttestingIndices []string         `json:"attesting_indices"` /* uint64[] */
 	Data             *AttestationData `json:"data"`
-	Signature        hexutil.Bytes    `json:"signature"`
+	Signatures       []hexutil.Bytes  `json:"signatures"`
 }
 
 // Deposit a sub property of DepositSignRequest.
@@ -280,11 +281,12 @@ type ContributionAndProof struct {
 
 // SyncCommitteeContribution a sub property of AggregatorSelectionSignRequest.
 type SyncCommitteeContribution struct {
-	Slot              string        `json:"slot"`               /* uint64 */
-	BeaconBlockRoot   hexutil.Bytes `json:"beacon_block_root"`  /* Hash32 */ // Qrysm uses BlockRoot instead of BeaconBlockRoot
-	SubcommitteeIndex string        `json:"subcommittee_index"` /* uint64 */
-	ParticipationBits hexutil.Bytes `json:"aggregation_bits"`   /* SSZ hexadecimal string */
-	Signature         hexutil.Bytes `json:"signature"`          /* 96 byte hexadecimal string */
+	Slot                            string          `json:"slot"`               /* uint64 */
+	BeaconBlockRoot                 hexutil.Bytes   `json:"beacon_block_root"`  /* Hash32 */ // Qrysm uses BlockRoot instead of BeaconBlockRoot
+	SubcommitteeIndex               string          `json:"subcommittee_index"` /* uint64 */
+	ParticipationBits               hexutil.Bytes   `json:"aggregation_bits"`   /* SSZ hexadecimal string */
+	Signatures                      []hexutil.Bytes `json:"signatures"`
+	SignaturesIdxToParticipationIdx []string        `json:"signatures_idx_to_participation_idx"` /* uint64[] */
 }
 
 // ValidatorRegistration a sub property of ValidatorRegistrationSignRequest

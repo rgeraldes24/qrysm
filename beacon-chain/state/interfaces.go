@@ -48,7 +48,6 @@ type ReadOnlyBeaconState interface {
 	ReadOnlyValidators
 	ReadOnlyBalances
 	ReadOnlyCheckpoint
-	ReadOnlyAttestations
 	ReadOnlyWithdrawals
 	ReadOnlyParticipation
 	ReadOnlyInactivity
@@ -79,7 +78,7 @@ type WriteOnlyBeaconState interface {
 	WriteOnlyValidators
 	WriteOnlyBalances
 	WriteOnlyCheckpoint
-	WriteOnlyAttestations
+	//WriteOnlyAttestations
 	WriteOnlyParticipation
 	WriteOnlyInactivity
 	WriteOnlySyncCommittee
@@ -91,7 +90,6 @@ type WriteOnlyBeaconState interface {
 	SetHistoricalRoots(val [][]byte) error
 	SetSlashings(val []uint64) error
 	UpdateSlashingsAtIndex(idx, val uint64) error
-	AppendHistoricalRoots(root [32]byte) error
 	AppendHistoricalSummaries(*zondpb.HistoricalSummary) error
 	SetLatestExecutionPayloadHeader(payload interfaces.ExecutionData) error
 	SetNextWithdrawalIndex(i uint64) error
@@ -165,12 +163,6 @@ type ReadOnlyZond1Data interface {
 	Zond1Data() *zondpb.Zond1Data
 	Zond1DataVotes() []*zondpb.Zond1Data
 	Zond1DepositIndex() uint64
-}
-
-// ReadOnlyAttestations defines a struct which only has read access to attestations methods.
-type ReadOnlyAttestations interface {
-	PreviousEpochAttestations() ([]*zondpb.PendingAttestation, error)
-	CurrentEpochAttestations() ([]*zondpb.PendingAttestation, error)
 }
 
 // ReadOnlyWithdrawals defines a struct which only has read access to withdrawal methods.
@@ -247,13 +239,9 @@ type WriteOnlyCheckpoint interface {
 }
 
 // WriteOnlyAttestations defines a struct which only has write access to attestations methods.
-type WriteOnlyAttestations interface {
-	AppendCurrentEpochAttestations(val *zondpb.PendingAttestation) error
-	AppendPreviousEpochAttestations(val *zondpb.PendingAttestation) error
-	SetPreviousEpochAttestations([]*zondpb.PendingAttestation) error
-	SetCurrentEpochAttestations([]*zondpb.PendingAttestation) error
-	RotateAttestations() error
-}
+//type WriteOnlyAttestations interface {
+//	RotateAttestations() error
+//}
 
 // WriteOnlyParticipation defines a struct which only has write access to participation methods.
 type WriteOnlyParticipation interface {

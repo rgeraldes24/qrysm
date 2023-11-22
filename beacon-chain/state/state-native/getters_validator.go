@@ -9,7 +9,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 )
 
 // ValidatorIndexOutOfRangeError represents an error scenario where a validator does not exist
@@ -253,10 +252,6 @@ func (b *BeaconState) slashingsVal() []uint64 {
 
 // InactivityScores of validators participating in consensus on the beacon chain.
 func (b *BeaconState) InactivityScores() ([]uint64, error) {
-	if b.version == version.Phase0 {
-		return nil, errNotSupported("InactivityScores", b.version)
-	}
-
 	if b.inactivityScores == nil {
 		return nil, nil
 	}

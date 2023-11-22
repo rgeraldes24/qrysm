@@ -244,6 +244,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 	}
 }
 
+/*
 func TestProcessFinalUpdates_CanProcess(t *testing.T) {
 	s := buildState(t, params.BeaconConfig().SlotsPerHistoricalRoot-1, uint64(params.BeaconConfig().SlotsPerEpoch))
 	ce := time.CurrentEpoch(s)
@@ -283,6 +284,7 @@ func TestProcessFinalUpdates_CanProcess(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotNil(t, currAtt, "Nil value stored in current epoch attestations instead of empty slice")
 }
+*/
 
 func TestProcessRegistryUpdates_NoRotation(t *testing.T) {
 	base := &zondpb.BeaconState{

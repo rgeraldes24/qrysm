@@ -21,7 +21,7 @@ import (
 
 // ProcessAttestationsNoVerifySignature applies processing operations to a block's inner attestation
 // records. The only difference would be that the attestation signature would not be verified.
-func ProcessAttestationsNoVerifySignature(
+func ProcessAttestationsNoVerifySignatures(
 	ctx context.Context,
 	beaconState state.BeaconState,
 	b interfaces.ReadOnlySignedBeaconBlock,

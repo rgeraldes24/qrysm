@@ -21,8 +21,8 @@ func init() {
 	// Initialize the composite arrays.
 	fieldMap[types.Zond1DataVotes] = types.CompositeArray
 	fieldMap[types.Validators] = types.CompositeArray
-	fieldMap[types.PreviousEpochAttestations] = types.CompositeArray
-	fieldMap[types.CurrentEpochAttestations] = types.CompositeArray
+	//fieldMap[types.PreviousEpochAttestations] = types.CompositeArray
+	//fieldMap[types.CurrentEpochAttestations] = types.CompositeArray
 	fieldMap[types.Balances] = types.CompressedArray
 }
 

@@ -2,6 +2,7 @@
 // genesis states and keys.
 package interop
 
+/*
 import (
 	"context"
 
@@ -18,7 +19,7 @@ import (
 // GenerateGenesisStateBellatrix deterministically given a genesis time and number of validators.
 // If a genesis time of 0 is supplied it is set to the current time.
 func GenerateGenesisStateBellatrix(ctx context.Context, genesisTime, numValidators uint64, ep *enginev1.ExecutionPayload, ed *zondpb.Zond1Data) (*zondpb.BeaconStateBellatrix, []*zondpb.Deposit, error) {
-	privKeys, pubKeys, err := DeterministicallyGenerateKeys(0 /*startIndex*/, numValidators)
+	privKeys, pubKeys, err := DeterministicallyGenerateKeys(0 startIndex, numValidators)
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "could not deterministically generate keys for %d validators", numValidators)
 	}
@@ -60,3 +61,4 @@ func GenerateGenesisStateBellatrixFromDepositData(
 	}
 	return pbState, deposits, nil
 }
+*/

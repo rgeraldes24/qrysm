@@ -531,9 +531,6 @@ func (b *BeaconBlockBody) VoluntaryExits() []*zond.SignedVoluntaryExit {
 
 // SyncAggregate returns the sync aggregate in the block.
 func (b *BeaconBlockBody) SyncAggregate() (*zond.SyncAggregate, error) {
-	if b.version == version.Phase0 {
-		return nil, consensus_types.ErrNotSupported("SyncAggregate", b.version)
-	}
 	return b.syncAggregate, nil
 }
 

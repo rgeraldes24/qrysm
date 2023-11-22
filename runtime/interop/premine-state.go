@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/container/trie"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -90,6 +90,7 @@ func (s *PremineGenesisConfig) prepare(ctx context.Context) (state.BeaconState, 
 func (s *PremineGenesisConfig) empty() (state.BeaconState, error) {
 	var e state.BeaconState
 	var err error
+
 	switch s.Version {
 	case version.Capella:
 		e, err = state_native.InitializeFromProtoCapella(&zondpb.BeaconState{})
@@ -130,14 +131,7 @@ func (s *PremineGenesisConfig) empty() (state.BeaconState, error) {
 	if err = e.SetZond1DataVotes([]*zondpb.Zond1Data{}); err != nil {
 		return nil, err
 	}
-	if s.Version == version.Phase0 {
-		if err = e.SetCurrentEpochAttestations([]*zondpb.PendingAttestation{}); err != nil {
-			return nil, err
-		}
-		if err = e.SetPreviousEpochAttestations([]*zondpb.PendingAttestation{}); err != nil {
-			return nil, err
-		}
-	}
+
 	return e.Copy(), nil
 }
 
@@ -185,7 +179,7 @@ func (s *PremineGenesisConfig) deposits() ([]*zondpb.Deposit, error) {
 	return deposits, nil
 }
 
-func (s *PremineGenesisConfig) keys() ([]bls.SecretKey, []bls.PublicKey, error) {
+func (s *PremineGenesisConfig) keys() ([]dilithium.DilithiumKey, []dilithium.PublicKey, error) {
 	prv, pub, err := DeterministicallyGenerateKeys(0, s.NVals)
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "could not deterministically generate keys for %d validators", s.NVals)
@@ -278,10 +272,6 @@ func (s *PremineGenesisConfig) setFork(g state.BeaconState) error {
 }
 
 func (s *PremineGenesisConfig) setInactivityScores(g state.BeaconState) error {
-	if s.Version < version.Altair {
-		return nil
-	}
-
 	scores, err := g.InactivityScores()
 	if err != nil {
 		return err
@@ -296,9 +286,6 @@ func (s *PremineGenesisConfig) setInactivityScores(g state.BeaconState) error {
 }
 
 func (s *PremineGenesisConfig) setSyncCommittees(g state.BeaconState) error {
-	if s.Version < version.Altair {
-		return nil
-	}
 	sc, err := altair.NextSyncCommittee(context.Background(), g)
 	if err != nil {
 		return err

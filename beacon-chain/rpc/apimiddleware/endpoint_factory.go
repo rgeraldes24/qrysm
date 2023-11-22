@@ -125,7 +125,7 @@ func (_ *BeaconEndpointFactory) Create(path string) (*apimiddleware.Endpoint, er
 		endpoint.Hooks = apimiddleware.HookCollection{
 			OnPreSerializeMiddlewareResponseIntoJson: serializeBlock,
 		}
-		endpoint.CustomHandlers = []apimiddleware.CustomHandler{handleGetBeaconBlockSSZV2}
+		endpoint.CustomHandlers = []apimiddleware.CustomHandler{handleGetBeaconBlockSSZ}
 	case "/zond/v1/beacon/blocks/{block_id}/root":
 		endpoint.GetResponse = &BlockRootResponseJson{}
 	case "/zond/v1/beacon/blocks/{block_id}/attestations":
@@ -187,9 +187,9 @@ func (_ *BeaconEndpointFactory) Create(path string) (*apimiddleware.Endpoint, er
 	case "/zond/v1/debug/beacon/states/{state_id}":
 		endpoint.GetResponse = &BeaconStateResponseJson{}
 		endpoint.Hooks = apimiddleware.HookCollection{
-			OnPreSerializeMiddlewareResponseIntoJson: serializeV2State,
+			OnPreSerializeMiddlewareResponseIntoJson: serializeState,
 		}
-		endpoint.CustomHandlers = []apimiddleware.CustomHandler{handleGetBeaconStateSSZV2}
+		endpoint.CustomHandlers = []apimiddleware.CustomHandler{handleGetBeaconStateSSZ}
 	case "/zond/v1/debug/beacon/heads":
 		endpoint.GetResponse = &ForkChoiceHeadsResponseJson{}
 	case "/zond/v1/debug/fork_choice":

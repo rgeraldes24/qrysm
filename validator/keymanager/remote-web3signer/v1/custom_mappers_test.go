@@ -365,7 +365,7 @@ func TestMapContributionAndProof(t *testing.T) {
 						BlockRoot:         make([]byte, fieldparams.RootLength),
 						SubcommitteeIndex: 0,
 						ParticipationBits: mock.MockAggregationBits(),
-						Signature:         make([]byte, dilithium2.CryptoBytes),
+						Signatures:        make([]byte, dilithium2.CryptoBytes),
 					},
 					SelectionProof: make([]byte, dilithium2.CryptoBytes),
 				},

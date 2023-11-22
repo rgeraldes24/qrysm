@@ -37,7 +37,7 @@ func TestRemovePendingDeposit_OK(t *testing.T) {
 		PublicKey:             make([]byte, 2592),
 		WithdrawalCredentials: make([]byte, 32),
 		Amount:                0,
-		Signature:             make([]byte, 96),
+		Signature:             make([]byte, 4595),
 	}
 	depToRemove := &zondpb.Deposit{Proof: proof1, Data: data}
 	otherDep := &zondpb.Deposit{Proof: proof2, Data: data}
@@ -67,7 +67,7 @@ func TestPendingDeposit_RoundTrip(t *testing.T) {
 		PublicKey:             make([]byte, 2592),
 		WithdrawalCredentials: make([]byte, 32),
 		Amount:                0,
-		Signature:             make([]byte, 96),
+		Signature:             make([]byte, 4595),
 	}
 	dep := &zondpb.Deposit{Proof: proof, Data: data}
 	dc.InsertPendingDeposit(context.Background(), dep, 111, 100, [32]byte{})

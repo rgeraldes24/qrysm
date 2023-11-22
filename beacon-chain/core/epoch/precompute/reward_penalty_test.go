@@ -38,7 +38,7 @@ func TestProcessRewardsAndPenaltiesPrecompute(t *testing.T) {
 	}
 	base.PreviousEpochAttestations = atts
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(base)
+	beaconState, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 
 	vp, bp, err := New(context.Background(), beaconState)
@@ -48,7 +48,7 @@ func TestProcessRewardsAndPenaltiesPrecompute(t *testing.T) {
 
 	processedState, err := ProcessRewardsAndPenaltiesPrecompute(beaconState, bp, vp, AttestationsDelta, ProposersDelta)
 	require.NoError(t, err)
-	require.Equal(t, true, processedState.Version() == version.Phase0)
+	require.Equal(t, true, processedState.Version() == version.Capella)
 
 	// Indices that voted everything except for head, lost a bit money
 	wanted := uint64(31999810265)
@@ -81,7 +81,7 @@ func TestAttestationDeltaPrecompute(t *testing.T) {
 		}
 	}
 	base.PreviousEpochAttestations = atts
-	beaconState, err := state_native.InitializeFromProtoPhase0(base)
+	beaconState, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 	slashedAttestedIndices := []primitives.ValidatorIndex{1413}
 	for _, i := range slashedAttestedIndices {
@@ -165,7 +165,7 @@ func TestAttestationDeltas_ZeroEpoch(t *testing.T) {
 		}
 	}
 	base.PreviousEpochAttestations = atts
-	beaconState, err := state_native.InitializeFromProtoPhase0(base)
+	beaconState, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 
 	pVals, pBal, err := New(context.Background(), beaconState)
@@ -203,7 +203,7 @@ func TestAttestationDeltas_ZeroInclusionDelay(t *testing.T) {
 		}
 	}
 	base.PreviousEpochAttestations = atts
-	beaconState, err := state_native.InitializeFromProtoPhase0(base)
+	beaconState, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 
 	pVals, pBal, err := New(context.Background(), beaconState)
@@ -229,7 +229,7 @@ func TestProcessRewardsAndPenaltiesPrecompute_SlashedInactivePenalty(t *testing.
 	}
 	base.PreviousEpochAttestations = atts
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(base)
+	beaconState, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch*10))
 

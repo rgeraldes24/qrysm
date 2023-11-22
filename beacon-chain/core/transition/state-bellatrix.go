@@ -1,5 +1,6 @@
 package transition
 
+/*
 import (
 	"context"
 
@@ -278,3 +279,4 @@ func EmptyGenesisStateBellatrix() (state.BeaconState, error) {
 
 	return state_native.InitializeFromProtoBellatrix(st)
 }
+*/

@@ -66,8 +66,8 @@ func generateSyncAggregate(st state.BeaconState, privs []bls.SecretKey, parentRo
 	}
 	if len(sigs) == 0 {
 		fakeSig := [96]byte{0xC0}
-		return &zondpb.SyncAggregate{SyncCommitteeSignature: fakeSig[:], SyncCommitteeBits: bVector}, nil
+		return &zondpb.SyncAggregate{SyncCommitteeSignatures: [][]byte{fakeSig[:]}, SyncCommitteeBits: bVector}, nil
 	}
 	aggSig := bls.AggregateSignatures(sigs)
-	return &zondpb.SyncAggregate{SyncCommitteeSignature: aggSig.Marshal(), SyncCommitteeBits: bVector}, nil
+	return &zondpb.SyncAggregate{SyncCommitteeSignatures: aggSig.Marshal(), SyncCommitteeBits: bVector}, nil
 }

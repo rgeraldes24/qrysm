@@ -10,7 +10,6 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/genesis"
 	statenative "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
-	"github.com/theQRL/qrysm/v4/config/features"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -113,14 +112,17 @@ func (s *Store) GenesisState(ctx context.Context) (state.BeaconState, error) {
 func (s *Store) SaveState(ctx context.Context, st state.ReadOnlyBeaconState, blockRoot [32]byte) error {
 	ctx, span := trace.StartSpan(ctx, "BeaconDB.SaveState")
 	defer span.End()
-	ok, err := s.isStateValidatorMigrationOver()
-	if err != nil {
-		return err
-	}
-	if ok {
-		return s.SaveStatesEfficient(ctx, []state.ReadOnlyBeaconState{st}, [][32]byte{blockRoot})
-	}
-	return s.SaveStates(ctx, []state.ReadOnlyBeaconState{st}, [][32]byte{blockRoot})
+	/*
+		ok, err := s.isStateValidatorMigrationOver()
+		if err != nil {
+			return err
+		}
+		if ok {
+			return s.SaveStatesEfficient(ctx, []state.ReadOnlyBeaconState{st}, [][32]byte{blockRoot})
+		}
+		return s.SaveStates(ctx, []state.ReadOnlyBeaconState{st}, [][32]byte{blockRoot})
+	*/
+	return s.SaveStatesEfficient(ctx, []state.ReadOnlyBeaconState{st}, [][32]byte{blockRoot})
 }
 
 // SaveStates stores multiple states to the db using the provided corresponding roots.
@@ -229,71 +231,6 @@ func (s *Store) saveStatesEfficientInternal(ctx context.Context, tx *bolt.Tx, bl
 		// look at issue https://github.com/theQRL/qrysm/issues/9262.
 		switch rawType := states[i].ToProtoUnsafe().(type) {
 		case *zondpb.BeaconState:
-			pbState, err := statenative.ProtobufBeaconStatePhase0(rawType)
-			if err != nil {
-				return err
-			}
-			if pbState == nil {
-				return errors.New("nil state")
-			}
-			valEntries := pbState.Validators
-			pbState.Validators = make([]*zondpb.Validator, 0)
-			encodedState, err := encode(ctx, pbState)
-			if err != nil {
-				return err
-			}
-			if err := bucket.Put(rt[:], encodedState); err != nil {
-				return err
-			}
-			pbState.Validators = valEntries
-			if err := valIdxBkt.Put(rt[:], validatorKeys[i]); err != nil {
-				return err
-			}
-		case *zondpb.BeaconStateAltair:
-			pbState, err := statenative.ProtobufBeaconStateAltair(rawType)
-			if err != nil {
-				return err
-			}
-			if pbState == nil {
-				return errors.New("nil state")
-			}
-			valEntries := pbState.Validators
-			pbState.Validators = make([]*zondpb.Validator, 0)
-			rawObj, err := pbState.MarshalSSZ()
-			if err != nil {
-				return err
-			}
-			encodedState := snappy.Encode(nil, append(altairKey, rawObj...))
-			if err := bucket.Put(rt[:], encodedState); err != nil {
-				return err
-			}
-			pbState.Validators = valEntries
-			if err := valIdxBkt.Put(rt[:], validatorKeys[i]); err != nil {
-				return err
-			}
-		case *zondpb.BeaconStateBellatrix:
-			pbState, err := statenative.ProtobufBeaconStateBellatrix(rawType)
-			if err != nil {
-				return err
-			}
-			if pbState == nil {
-				return errors.New("nil state")
-			}
-			valEntries := pbState.Validators
-			pbState.Validators = make([]*zondpb.Validator, 0)
-			rawObj, err := pbState.MarshalSSZ()
-			if err != nil {
-				return err
-			}
-			encodedState := snappy.Encode(nil, append(bellatrixKey, rawObj...))
-			if err := bucket.Put(rt[:], encodedState); err != nil {
-				return err
-			}
-			pbState.Validators = valEntries
-			if err := valIdxBkt.Put(rt[:], validatorKeys[i]); err != nil {
-				return err
-			}
-		case *zondpb.BeaconStateCapella:
 			pbState, err := statenative.ProtobufBeaconStateCapella(rawType)
 			if err != nil {
 				return err
@@ -414,35 +351,60 @@ func (s *Store) DeleteState(ctx context.Context, blockRoot [32]byte) error {
 			return errors.Wrap(err, "could not delete root for DB indices")
 		}
 
-		ok, err := s.isStateValidatorMigrationOver()
+		// ok, err := s.isStateValidatorMigrationOver()
+		// if err != nil {
+		// 	return err
+		// }
+		// if ok {
+		// 	// remove the validator entry keys for the corresponding state.
+		// 	idxBkt := tx.Bucket(blockRootValidatorHashesBucket)
+		// 	compressedValidatorHashes := idxBkt.Get(blockRoot[:])
+		// 	err = idxBkt.Delete(blockRoot[:])
+		// 	if err != nil {
+		// 		return err
+		// 	}
+
+		// 	// remove the respective validator entries from the cache.
+		// 	if len(compressedValidatorHashes) == 0 {
+		// 		return errors.Errorf("invalid compressed validator keys length")
+		// 	}
+		// 	validatorHashes, sErr := snappy.Decode(nil, compressedValidatorHashes)
+		// 	if sErr != nil {
+		// 		return errors.Wrap(sErr, "failed to uncompress validator keys")
+		// 	}
+		// 	if len(validatorHashes)%hashLength != 0 {
+		// 		return errors.Errorf("invalid validator keys length: %d", len(validatorHashes))
+		// 	}
+		// 	for i := 0; i < len(validatorHashes); i += hashLength {
+		// 		key := validatorHashes[i : i+hashLength]
+		// 		s.validatorEntryCache.Del(key)
+		// 		validatorEntryCacheDelete.Inc()
+		// 	}
+		// }
+
+		// remove the validator entry keys for the corresponding state.
+		idxBkt := tx.Bucket(blockRootValidatorHashesBucket)
+		compressedValidatorHashes := idxBkt.Get(blockRoot[:])
+		err = idxBkt.Delete(blockRoot[:])
 		if err != nil {
 			return err
 		}
-		if ok {
-			// remove the validator entry keys for the corresponding state.
-			idxBkt := tx.Bucket(blockRootValidatorHashesBucket)
-			compressedValidatorHashes := idxBkt.Get(blockRoot[:])
-			err = idxBkt.Delete(blockRoot[:])
-			if err != nil {
-				return err
-			}
 
-			// remove the respective validator entries from the cache.
-			if len(compressedValidatorHashes) == 0 {
-				return errors.Errorf("invalid compressed validator keys length")
-			}
-			validatorHashes, sErr := snappy.Decode(nil, compressedValidatorHashes)
-			if sErr != nil {
-				return errors.Wrap(sErr, "failed to uncompress validator keys")
-			}
-			if len(validatorHashes)%hashLength != 0 {
-				return errors.Errorf("invalid validator keys length: %d", len(validatorHashes))
-			}
-			for i := 0; i < len(validatorHashes); i += hashLength {
-				key := validatorHashes[i : i+hashLength]
-				s.validatorEntryCache.Del(key)
-				validatorEntryCacheDelete.Inc()
-			}
+		// remove the respective validator entries from the cache.
+		if len(compressedValidatorHashes) == 0 {
+			return errors.Errorf("invalid compressed validator keys length")
+		}
+		validatorHashes, sErr := snappy.Decode(nil, compressedValidatorHashes)
+		if sErr != nil {
+			return errors.Wrap(sErr, "failed to uncompress validator keys")
+		}
+		if len(validatorHashes)%hashLength != 0 {
+			return errors.Errorf("invalid validator keys length: %d", len(validatorHashes))
+		}
+		for i := 0; i < len(validatorHashes); i += hashLength {
+			key := validatorHashes[i : i+hashLength]
+			s.validatorEntryCache.Del(key)
+			validatorEntryCacheDelete.Inc()
 		}
 
 		return bkt.Delete(blockRoot[:])
@@ -474,60 +436,24 @@ func (s *Store) unmarshalState(_ context.Context, enc []byte, validatorEntries [
 	switch {
 	case hasCapellaKey(enc):
 		// Marshal state bytes to capella beacon state.
-		protoState := &zondpb.BeaconStateCapella{}
+		protoState := &zondpb.BeaconState{}
 		if err := protoState.UnmarshalSSZ(enc[len(capellaKey):]); err != nil {
 			return nil, errors.Wrap(err, "failed to unmarshal encoding for capella")
 		}
-		ok, err := s.isStateValidatorMigrationOver()
-		if err != nil {
-			return nil, err
-		}
-		if ok {
-			protoState.Validators = validatorEntries
-		}
+		/*
+			ok, err := s.isStateValidatorMigrationOver()
+			if err != nil {
+				return nil, err
+			}
+			if ok {
+				protoState.Validators = validatorEntries
+			}
+		*/
+		protoState.Validators = validatorEntries
 		return statenative.InitializeFromProtoUnsafeCapella(protoState)
-	case hasBellatrixKey(enc):
-		// Marshal state bytes to bellatrix beacon state.
-		protoState := &zondpb.BeaconStateBellatrix{}
-		if err := protoState.UnmarshalSSZ(enc[len(bellatrixKey):]); err != nil {
-			return nil, errors.Wrap(err, "failed to unmarshal encoding for bellatrix")
-		}
-		ok, err := s.isStateValidatorMigrationOver()
-		if err != nil {
-			return nil, err
-		}
-		if ok {
-			protoState.Validators = validatorEntries
-		}
-		return statenative.InitializeFromProtoUnsafeBellatrix(protoState)
-	case hasAltairKey(enc):
-		// Marshal state bytes to altair beacon state.
-		protoState := &zondpb.BeaconStateAltair{}
-		if err := protoState.UnmarshalSSZ(enc[len(altairKey):]); err != nil {
-			return nil, errors.Wrap(err, "failed to unmarshal encoding for altair")
-		}
-		ok, err := s.isStateValidatorMigrationOver()
-		if err != nil {
-			return nil, err
-		}
-		if ok {
-			protoState.Validators = validatorEntries
-		}
-		return statenative.InitializeFromProtoUnsafeAltair(protoState)
 	default:
-		// Marshal state bytes to phase 0 beacon state.
-		protoState := &zondpb.BeaconState{}
-		if err := protoState.UnmarshalSSZ(enc); err != nil {
-			return nil, errors.Wrap(err, "failed to unmarshal encoding")
-		}
-		ok, err := s.isStateValidatorMigrationOver()
-		if err != nil {
-			return nil, err
-		}
-		if ok {
-			protoState.Validators = validatorEntries
-		}
-		return statenative.InitializeFromProtoUnsafePhase0(protoState)
+		// TODO(rgeraldes24)
+		return nil, nil
 	}
 }
 
@@ -536,38 +462,6 @@ func marshalState(ctx context.Context, st state.ReadOnlyBeaconState) ([]byte, er
 	switch st.ToProtoUnsafe().(type) {
 	case *zondpb.BeaconState:
 		rState, ok := st.ToProtoUnsafe().(*zondpb.BeaconState)
-		if !ok {
-			return nil, errors.New("non valid inner state")
-		}
-		return encode(ctx, rState)
-	case *zondpb.BeaconStateAltair:
-		rState, ok := st.ToProtoUnsafe().(*zondpb.BeaconStateAltair)
-		if !ok {
-			return nil, errors.New("non valid inner state")
-		}
-		if rState == nil {
-			return nil, errors.New("nil state")
-		}
-		rawObj, err := rState.MarshalSSZ()
-		if err != nil {
-			return nil, err
-		}
-		return snappy.Encode(nil, append(altairKey, rawObj...)), nil
-	case *zondpb.BeaconStateBellatrix:
-		rState, ok := st.ToProtoUnsafe().(*zondpb.BeaconStateBellatrix)
-		if !ok {
-			return nil, errors.New("non valid inner state")
-		}
-		if rState == nil {
-			return nil, errors.New("nil state")
-		}
-		rawObj, err := rState.MarshalSSZ()
-		if err != nil {
-			return nil, err
-		}
-		return snappy.Encode(nil, append(bellatrixKey, rawObj...)), nil
-	case *zondpb.BeaconStateCapella:
-		rState, ok := st.ToProtoUnsafe().(*zondpb.BeaconStateCapella)
 		if !ok {
 			return nil, errors.New("non valid inner state")
 		}
@@ -587,17 +481,19 @@ func marshalState(ctx context.Context, st state.ReadOnlyBeaconState) ([]byte, er
 // Retrieve the validator entries for a given block root. These entries are stored in a
 // separate bucket to reduce state size.
 func (s *Store) validatorEntries(ctx context.Context, blockRoot [32]byte) ([]*zondpb.Validator, error) {
-	ok, err := s.isStateValidatorMigrationOver()
-	if err != nil {
-		return nil, err
-	}
-	if !ok {
-		return make([]*zondpb.Validator, 0), nil
-	}
+	/*
+		ok, err := s.isStateValidatorMigrationOver()
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			return make([]*zondpb.Validator, 0), nil
+		}
+	*/
 	ctx, span := trace.StartSpan(ctx, "BeaconDB.validatorEntries")
 	defer span.End()
 	var validatorEntries []*zondpb.Validator
-	err = s.db.View(func(tx *bolt.Tx) error {
+	err := s.db.View(func(tx *bolt.Tx) error {
 		// get the validator keys from the index bucket
 		idxBkt := tx.Bucket(blockRootValidatorHashesBucket)
 		valKey := idxBkt.Get(blockRoot[:])
@@ -855,6 +751,7 @@ func (s *Store) CleanUpDirtyStates(ctx context.Context, slotsPerArchivedPoint pr
 	return err
 }
 
+/*
 func (s *Store) isStateValidatorMigrationOver() (bool, error) {
 	// if flag is enabled, then always follow the new code path.
 	if features.Get().EnableHistoricalSpaceRepresentation {
@@ -874,3 +771,4 @@ func (s *Store) isStateValidatorMigrationOver() (bool, error) {
 	}
 	return returnFlag, nil
 }
+*/

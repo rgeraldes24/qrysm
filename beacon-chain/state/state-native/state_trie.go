@@ -22,31 +22,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var phase0Fields = []types.FieldIndex{
-	types.GenesisTime,
-	types.GenesisValidatorsRoot,
-	types.Slot,
-	types.Fork,
-	types.LatestBlockHeader,
-	types.BlockRoots,
-	types.StateRoots,
-	types.HistoricalRoots,
-	types.Zond1Data,
-	types.Zond1DataVotes,
-	types.Zond1DepositIndex,
-	types.Validators,
-	types.Balances,
-	types.RandaoMixes,
-	types.Slashings,
-	types.PreviousEpochAttestations,
-	types.CurrentEpochAttestations,
-	types.JustificationBits,
-	types.PreviousJustifiedCheckpoint,
-	types.CurrentJustifiedCheckpoint,
-	types.FinalizedCheckpoint,
-}
-
-var altairFields = []types.FieldIndex{
+var capellaFields = []types.FieldIndex{
 	types.GenesisTime,
 	types.GenesisValidatorsRoot,
 	types.Slot,
@@ -71,114 +47,19 @@ var altairFields = []types.FieldIndex{
 	types.InactivityScores,
 	types.CurrentSyncCommittee,
 	types.NextSyncCommittee,
-}
-
-var bellatrixFields = append(altairFields, types.LatestExecutionPayloadHeader)
-
-var capellaFields = append(
-	altairFields,
-	types.LatestExecutionPayloadHeaderCapella,
+	types.LatestExecutionPayloadHeader,
 	types.NextWithdrawalIndex,
 	types.NextWithdrawalValidatorIndex,
 	types.HistoricalSummaries,
-)
+}
 
 const (
-	phase0SharedFieldRefCount    = 10
-	altairSharedFieldRefCount    = 11
-	bellatrixSharedFieldRefCount = 12
-	capellaSharedFieldRefCount   = 14
+	capellaSharedFieldRefCount = 14
 )
 
 // InitializeFromProtoCapella the beacon state from a protobuf representation.
 func InitializeFromProtoCapella(st *zondpb.BeaconState) (state.BeaconState, error) {
 	return InitializeFromProtoUnsafeCapella(proto.Clone(st).(*zondpb.BeaconState))
-}
-
-// InitializeFromProtoUnsafePhase0 directly uses the beacon state protobuf fields
-// and sets them as fields of the BeaconState type.
-func InitializeFromProtoUnsafePhase0(st *zondpb.BeaconState) (state.BeaconState, error) {
-	if st == nil {
-		return nil, errors.New("received nil state")
-	}
-
-	var bRoots customtypes.BlockRoots
-	for i, r := range st.BlockRoots {
-		copy(bRoots[i][:], r)
-	}
-	var sRoots customtypes.StateRoots
-	for i, r := range st.StateRoots {
-		copy(sRoots[i][:], r)
-	}
-	hRoots := customtypes.HistoricalRoots(make([][32]byte, len(st.HistoricalRoots)))
-	for i, r := range st.HistoricalRoots {
-		copy(hRoots[i][:], r)
-	}
-	var mixes customtypes.RandaoMixes
-	for i, m := range st.RandaoMixes {
-		copy(mixes[i][:], m)
-	}
-
-	fieldCount := params.BeaconConfig().BeaconStateFieldCount
-	b := &BeaconState{
-		version:               version.Phase0,
-		genesisTime:           st.GenesisTime,
-		genesisValidatorsRoot: bytesutil.ToBytes32(st.GenesisValidatorsRoot),
-		slot:                  st.Slot,
-		fork:                  st.Fork,
-		latestBlockHeader:     st.LatestBlockHeader,
-		blockRoots:            &bRoots,
-		stateRoots:            &sRoots,
-		historicalRoots:       hRoots,
-		zond1Data:             st.Zond1Data,
-		zond1DataVotes:        st.Zond1DataVotes,
-		zond1DepositIndex:     st.Zond1DepositIndex,
-		validators:            st.Validators,
-		balances:              st.Balances,
-		randaoMixes:           &mixes,
-		slashings:             st.Slashings,
-		// previousEpochAttestations:   st.PreviousEpochAttestations,
-		// currentEpochAttestations:    st.CurrentEpochAttestations,
-		justificationBits:           st.JustificationBits,
-		previousJustifiedCheckpoint: st.PreviousJustifiedCheckpoint,
-		currentJustifiedCheckpoint:  st.CurrentJustifiedCheckpoint,
-		finalizedCheckpoint:         st.FinalizedCheckpoint,
-
-		dirtyFields:           make(map[types.FieldIndex]bool, fieldCount),
-		dirtyIndices:          make(map[types.FieldIndex][]uint64, fieldCount),
-		stateFieldLeaves:      make(map[types.FieldIndex]*fieldtrie.FieldTrie, fieldCount),
-		sharedFieldReferences: make(map[types.FieldIndex]*stateutil.Reference, phase0SharedFieldRefCount),
-		rebuildTrie:           make(map[types.FieldIndex]bool, fieldCount),
-		valMapHandler:         stateutil.NewValMapHandler(st.Validators),
-	}
-
-	for _, f := range phase0Fields {
-		b.dirtyFields[f] = true
-		b.rebuildTrie[f] = true
-		b.dirtyIndices[f] = []uint64{}
-		trie, err := fieldtrie.NewFieldTrie(f, types.BasicArray, nil, 0)
-		if err != nil {
-			return nil, err
-		}
-		b.stateFieldLeaves[f] = trie
-	}
-
-	// Initialize field reference tracking for shared data.
-	b.sharedFieldReferences[types.BlockRoots] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.StateRoots] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.HistoricalRoots] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.Zond1DataVotes] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.Validators] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.Balances] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.RandaoMixes] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.Slashings] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.PreviousEpochAttestations] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.CurrentEpochAttestations] = stateutil.NewRef(1)
-
-	state.StateCount.Inc()
-	// Finalizer runs when dst is being destroyed in garbage collection.
-	runtime.SetFinalizer(b, finalizerCleanup)
-	return b, nil
 }
 
 // InitializeFromProtoUnsafeCapella directly uses the beacon state protobuf fields
@@ -205,7 +86,7 @@ func InitializeFromProtoUnsafeCapella(st *zondpb.BeaconState) (state.BeaconState
 		mixes[i] = bytesutil.ToBytes32(m)
 	}
 
-	fieldCount := params.BeaconConfig().BeaconStateCapellaFieldCount
+	fieldCount := params.BeaconConfig().BeaconStateFieldCount
 	b := &BeaconState{
 		version:                      version.Capella,
 		genesisTime:                  st.GenesisTime,
@@ -268,8 +149,8 @@ func InitializeFromProtoUnsafeCapella(st *zondpb.BeaconState) (state.BeaconState
 	b.sharedFieldReferences[types.PreviousEpochParticipationBits] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.CurrentEpochParticipationBits] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.InactivityScores] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.LatestExecutionPayloadHeaderCapella] = stateutil.NewRef(1) // New in Capella.
-	b.sharedFieldReferences[types.HistoricalSummaries] = stateutil.NewRef(1)                 // New in Capella.
+	b.sharedFieldReferences[types.LatestExecutionPayloadHeader] = stateutil.NewRef(1) // New in Capella.
+	b.sharedFieldReferences[types.HistoricalSummaries] = stateutil.NewRef(1)          // New in Capella.
 
 	state.StateCount.Inc()
 	// Finalizer runs when dst is being destroyed in garbage collection.
@@ -284,14 +165,8 @@ func (b *BeaconState) Copy() state.BeaconState {
 
 	var fieldCount int
 	switch b.version {
-	case version.Phase0:
-		fieldCount = params.BeaconConfig().BeaconStateFieldCount
-	case version.Altair:
-		fieldCount = params.BeaconConfig().BeaconStateAltairFieldCount
-	case version.Bellatrix:
-		fieldCount = params.BeaconConfig().BeaconStateBellatrixFieldCount
 	case version.Capella:
-		fieldCount = params.BeaconConfig().BeaconStateCapellaFieldCount
+		fieldCount = params.BeaconConfig().BeaconStateFieldCount
 	}
 
 	dst := &BeaconState{
@@ -305,13 +180,13 @@ func (b *BeaconState) Copy() state.BeaconState {
 		nextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 
 		// Large arrays, infrequently changed, constant size.
-		blockRoots:                b.blockRoots,
-		stateRoots:                b.stateRoots,
-		randaoMixes:               b.randaoMixes,
-		previousEpochAttestations: b.previousEpochAttestations,
-		currentEpochAttestations:  b.currentEpochAttestations,
-		zond1DataVotes:            b.zond1DataVotes,
-		slashings:                 b.slashings,
+		blockRoots:  b.blockRoots,
+		stateRoots:  b.stateRoots,
+		randaoMixes: b.randaoMixes,
+		//previousEpochAttestations: b.previousEpochAttestations,
+		//currentEpochAttestations:  b.currentEpochAttestations,
+		zond1DataVotes: b.zond1DataVotes,
+		slashings:      b.slashings,
 
 		// Large arrays, increases over time.
 		balances:                   b.balances,
@@ -345,12 +220,6 @@ func (b *BeaconState) Copy() state.BeaconState {
 	}
 
 	switch b.version {
-	case version.Phase0:
-		dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, phase0SharedFieldRefCount)
-	case version.Altair:
-		dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, altairSharedFieldRefCount)
-	case version.Bellatrix:
-		dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, bellatrixSharedFieldRefCount)
 	case version.Capella:
 		dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, capellaSharedFieldRefCount)
 	}
@@ -434,14 +303,8 @@ func (b *BeaconState) initializeMerkleLayers(ctx context.Context) error {
 	layers := stateutil.Merkleize(fieldRoots)
 	b.merkleLayers = layers
 	switch b.version {
-	case version.Phase0:
-		b.dirtyFields = make(map[types.FieldIndex]bool, params.BeaconConfig().BeaconStateFieldCount)
-	case version.Altair:
-		b.dirtyFields = make(map[types.FieldIndex]bool, params.BeaconConfig().BeaconStateAltairFieldCount)
-	case version.Bellatrix:
-		b.dirtyFields = make(map[types.FieldIndex]bool, params.BeaconConfig().BeaconStateBellatrixFieldCount)
 	case version.Capella:
-		b.dirtyFields = make(map[types.FieldIndex]bool, params.BeaconConfig().BeaconStateCapellaFieldCount)
+		b.dirtyFields = make(map[types.FieldIndex]bool, params.BeaconConfig().BeaconStateFieldCount)
 	}
 
 	return nil
@@ -582,34 +445,36 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 		return b.recomputeFieldTrie(13, b.randaoMixes)
 	case types.Slashings:
 		return ssz.SlashingsRoot(b.slashings)
-	case types.PreviousEpochAttestations:
-		if b.rebuildTrie[field] {
-			err := b.resetFieldTrie(
-				field,
-				b.previousEpochAttestations,
-				params.BeaconConfig().PreviousEpochAttestationsLength(),
-			)
-			if err != nil {
-				return [32]byte{}, err
+	/*
+		case types.PreviousEpochAttestations:
+			if b.rebuildTrie[field] {
+				err := b.resetFieldTrie(
+					field,
+					b.previousEpochAttestations,
+					params.BeaconConfig().PreviousEpochAttestationsLength(),
+				)
+				if err != nil {
+					return [32]byte{}, err
+				}
+				delete(b.rebuildTrie, field)
+				return b.stateFieldLeaves[field].TrieRoot()
 			}
-			delete(b.rebuildTrie, field)
-			return b.stateFieldLeaves[field].TrieRoot()
-		}
-		return b.recomputeFieldTrie(field, b.previousEpochAttestations)
-	case types.CurrentEpochAttestations:
-		if b.rebuildTrie[field] {
-			err := b.resetFieldTrie(
-				field,
-				b.currentEpochAttestations,
-				params.BeaconConfig().CurrentEpochAttestationsLength(),
-			)
-			if err != nil {
-				return [32]byte{}, err
+			return b.recomputeFieldTrie(field, b.previousEpochAttestations)
+		case types.CurrentEpochAttestations:
+			if b.rebuildTrie[field] {
+				err := b.resetFieldTrie(
+					field,
+					b.currentEpochAttestations,
+					params.BeaconConfig().CurrentEpochAttestationsLength(),
+				)
+				if err != nil {
+					return [32]byte{}, err
+				}
+				delete(b.rebuildTrie, field)
+				return b.stateFieldLeaves[field].TrieRoot()
 			}
-			delete(b.rebuildTrie, field)
-			return b.stateFieldLeaves[field].TrieRoot()
-		}
-		return b.recomputeFieldTrie(field, b.currentEpochAttestations)
+			return b.recomputeFieldTrie(field, b.currentEpochAttestations)
+	*/
 	case types.PreviousEpochParticipationBits:
 		return stateutil.ParticipationBitsRoot(b.previousEpochParticipation)
 	case types.CurrentEpochParticipationBits:

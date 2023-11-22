@@ -65,12 +65,10 @@ func NewBeaconState(options ...func(state *zondpb.BeaconState) error) (state.Bea
 		PreviousEpochParticipation:  make([]byte, 0),
 		CurrentEpochParticipation:   make([]byte, 0),
 		CurrentSyncCommittee: &zondpb.SyncCommittee{
-			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 1327104),
+			Pubkeys: pubkeys,
 		},
 		NextSyncCommittee: &zondpb.SyncCommittee{
-			Pubkeys:         pubkeys,
-			AggregatePubkey: make([]byte, 1327104),
+			Pubkeys: pubkeys,
 		},
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeader{
 			ParentHash:       make([]byte, 32),

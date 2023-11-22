@@ -1,12 +1,6 @@
 package util
 
-import (
-	"context"
-	"testing"
-
-	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/testing/require"
-)
+/*
 
 func TestDeterministicGenesisStateBellatrix(t *testing.T) {
 	st, k := DeterministicGenesisStateBellatrix(t, params.BeaconConfig().MaxCommitteesPerSlot)
@@ -26,3 +20,5 @@ func TestGenesisBeaconStateBellatrix(t *testing.T) {
 	require.Equal(t, gt, st.GenesisTime())
 	require.Equal(t, params.BeaconConfig().MaxCommitteesPerSlot, uint64(st.NumValidators()))
 }
+
+*/

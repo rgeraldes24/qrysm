@@ -93,6 +93,7 @@ func TestVerifyAttestationNoVerifySignature_IncorrectSlotTargetEpoch(t *testing.
 	assert.ErrorContains(t, wanted, err)
 }
 
+/*
 func TestProcessAttestationsNoVerify_OK(t *testing.T) {
 	// Attestation with an empty signature
 
@@ -123,7 +124,9 @@ func TestProcessAttestationsNoVerify_OK(t *testing.T) {
 	_, err = blocks.ProcessAttestationNoVerifySignatures(context.TODO(), beaconState, att)
 	assert.NoError(t, err)
 }
+*/
 
+/*
 func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 	// Attestation with an empty signature
 
@@ -154,7 +157,9 @@ func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 	err = blocks.VerifyAttestationNoVerifySignature(context.TODO(), beaconState, att)
 	assert.NoError(t, err)
 }
+*/
 
+/*
 func TestVerifyAttestationNoVerifySignature_BadAttIdx(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisState(t, 100)
 	aggBits := bitfield.NewBitlist(3)
@@ -179,6 +184,7 @@ func TestVerifyAttestationNoVerifySignature_BadAttIdx(t *testing.T) {
 	err := blocks.VerifyAttestationNoVerifySignature(context.TODO(), beaconState, att)
 	require.ErrorContains(t, "committee index 100 >= committee count 1", err)
 }
+*/
 
 func TestConvertToIndexed_OK(t *testing.T) {
 	helpers.ClearCache()

@@ -12,13 +12,13 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stateutil"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // DeterministicGenesisStateCapella returns a genesis state in Capella format made using the deterministic deposits.
-func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state.BeaconState, []bls.SecretKey) {
+func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.SecretKey) {
 	deposits, privKeys, err := DeterministicDepositsAndKeys(numValidators)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
@@ -58,7 +58,7 @@ func genesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, 
 
 // emptyGenesisStateCapella returns an empty genesis state in Capella format.
 func emptyGenesisStateCapella() (state.BeaconState, error) {
-	st := &zondpb.BeaconStateCapella{
+	st := &zondpb.BeaconState{
 		// Misc fields.
 		Slot: 0,
 		Fork: &zondpb.Fork{
@@ -81,7 +81,7 @@ func emptyGenesisStateCapella() (state.BeaconState, error) {
 		Zond1DataVotes:    []*zondpb.Zond1Data{},
 		Zond1DepositIndex: 0,
 
-		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{},
+		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeader{},
 	}
 	return state_native.InitializeFromProtoCapella(st)
 }
@@ -134,7 +134,7 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 	if err != nil {
 		return nil, err
 	}
-	st := &zondpb.BeaconStateCapella{
+	st := &zondpb.BeaconState{
 		// Misc fields.
 		Slot:                  0,
 		GenesisTime:           genesisTime,
@@ -183,7 +183,7 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 	}
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
-	bodyRoot, err := (&zondpb.BeaconBlockBodyCapella{
+	bodyRoot, err := (&zondpb.BeaconBlockBody{
 		RandaoReveal: make([]byte, dilithium2.CryptoBytes),
 		Zond1Data: &zondpb.Zond1Data{
 			DepositRoot: make([]byte, 32),
@@ -191,10 +191,10 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 		},
 		Graffiti: make([]byte, 32),
 		SyncAggregate: &zondpb.SyncAggregate{
-			SyncCommitteeBits:      scBits[:],
-			SyncCommitteeSignature: make([]byte, 96),
+			SyncCommitteeBits:       scBits[:],
+			SyncCommitteeSignatures: make([][]byte, 0, fieldparams.SyncAggregateSyncCommitteeBytesLength),
 		},
-		ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+		ExecutionPayload: &enginev1.ExecutionPayload{
 			ParentHash:    make([]byte, 32),
 			FeeRecipient:  make([]byte, 20),
 			StateRoot:     make([]byte, 32),
@@ -221,20 +221,15 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 		j := i % uint64(len(vals))
 		pubKeys = append(pubKeys, vals[j].PublicKey)
 	}
-	aggregated, err := bls.AggregatePublicKeys(pubKeys)
-	if err != nil {
-		return nil, err
-	}
+
 	st.CurrentSyncCommittee = &zondpb.SyncCommittee{
-		Pubkeys:         pubKeys,
-		AggregatePubkey: aggregated.Marshal(),
+		Pubkeys: pubKeys,
 	}
 	st.NextSyncCommittee = &zondpb.SyncCommittee{
-		Pubkeys:         pubKeys,
-		AggregatePubkey: aggregated.Marshal(),
+		Pubkeys: pubKeys,
 	}
 
-	st.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderCapella{
+	st.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeader{
 		ParentHash:       make([]byte, 32),
 		FeeRecipient:     make([]byte, 20),
 		StateRoot:        make([]byte, 32),

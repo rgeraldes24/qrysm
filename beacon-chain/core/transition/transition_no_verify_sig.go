@@ -338,10 +338,6 @@ func ProcessBlockForStateRoot(
 		return nil, errors.Wrap(err, "could not process block operation")
 	}
 
-	if signed.Block().Version() == version.Phase0 {
-		return state, nil
-	}
-
 	sa, err := signed.Block().Body().SyncAggregate()
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get sync aggregate from block")
@@ -367,7 +363,7 @@ func capellaOperations(
 	if err != nil {
 		return nil, errors.Wrap(err, "could not process capella attester slashing")
 	}
-	st, err = altair.ProcessAttestationsNoVerifySignature(ctx, st, signedBeaconBlock)
+	st, err = altair.ProcessAttestationsNoVerifySignatures(ctx, st, signedBeaconBlock)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not process capella attestation")
 	}

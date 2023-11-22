@@ -88,8 +88,8 @@ func marshallBeaconBlockCapella(block *zondpb.SignedBeaconBlock) ([]byte, error)
 				RandaoReveal:      hexutil.Encode(block.Block.Body.RandaoReveal),
 				VoluntaryExits:    JsonifySignedVoluntaryExits(block.Block.Body.VoluntaryExits),
 				SyncAggregate: &apimiddleware.SyncAggregateJson{
-					SyncCommitteeBits:      hexutil.Encode(block.Block.Body.SyncAggregate.SyncCommitteeBits),
-					SyncCommitteeSignature: hexutil.Encode(block.Block.Body.SyncAggregate.SyncCommitteeSignature),
+					SyncCommitteeBits:       hexutil.Encode(block.Block.Body.SyncAggregate.SyncCommitteeBits),
+					SyncCommitteeSignatures: hexutil.Encode(block.Block.Body.SyncAggregate.SyncCommitteeSignature),
 				},
 				ExecutionPayload: &apimiddleware.ExecutionPayloadCapellaJson{
 					BaseFeePerGas: bytesutil.LittleEndianBytesToBigInt(block.Block.Body.ExecutionPayload.BaseFeePerGas).String(),
@@ -119,7 +119,7 @@ func marshallBeaconBlockCapella(block *zondpb.SignedBeaconBlock) ([]byte, error)
 func marshallBeaconBlockBlindedCapella(block *zondpb.SignedBlindedBeaconBlock) ([]byte, error) {
 	signedBeaconBlockCapellaJson := &apimiddleware.SignedBlindedBeaconBlockCapellaContainerJson{
 		Signature: hexutil.Encode(block.Signature),
-		Message: &apimiddleware.BlindedBeaconBlockCapellaJson{
+		Message: &apimiddleware.BlindedBeaconBlockJson{
 			ParentRoot:    hexutil.Encode(block.Block.ParentRoot),
 			ProposerIndex: uint64ToString(block.Block.ProposerIndex),
 			Slot:          uint64ToString(block.Block.Slot),

@@ -27,7 +27,7 @@ func TestBeaconState_MatchPreviousJustifiedCheckpt_Phase0(t *testing.T) {
 	testtmpl.VerifyBeaconStateMatchPreviousJustifiedCheckptNative(
 		t,
 		func(cp *zondpb.Checkpoint) (state.BeaconState, error) {
-			return InitializeFromProtoPhase0(&zondpb.BeaconState{PreviousJustifiedCheckpoint: cp})
+			return InitializeFromProtoCapella(&zondpb.BeaconState{PreviousJustifiedCheckpoint: cp})
 		},
 	)
 }

@@ -759,12 +759,10 @@ func TestBeaconStateToProto(t *testing.T) {
 		state.CurrentEpochParticipation = []byte("currentepochparticipation")
 		state.InactivityScores = []uint64{1, 2, 3}
 		state.CurrentSyncCommittee = &zondpbalpha.SyncCommittee{
-			Pubkeys:         [][]byte{bytesutil.PadTo([]byte("cscpubkeys"), 48)},
-			AggregatePubkey: bytesutil.PadTo([]byte("cscaggregatepubkey"), 48),
+			Pubkeys: [][]byte{bytesutil.PadTo([]byte("cscpubkeys"), 48)},
 		}
 		state.NextSyncCommittee = &zondpbalpha.SyncCommittee{
-			Pubkeys:         [][]byte{bytesutil.PadTo([]byte("nscpubkeys"), 48)},
-			AggregatePubkey: bytesutil.PadTo([]byte("nscaggregatepubkey"), 48),
+			Pubkeys: [][]byte{bytesutil.PadTo([]byte("nscpubkeys"), 48)},
 		}
 		state.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeader{
 			ParentHash:       bytesutil.PadTo([]byte("parenthash"), 32),
@@ -867,10 +865,8 @@ func TestBeaconStateToProto(t *testing.T) {
 	assert.DeepEqual(t, []uint64{1, 2, 3}, result.InactivityScores)
 	require.NotNil(t, result.CurrentSyncCommittee)
 	assert.DeepEqual(t, [][]byte{bytesutil.PadTo([]byte("cscpubkeys"), 48)}, result.CurrentSyncCommittee.Pubkeys)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("cscaggregatepubkey"), 48), result.CurrentSyncCommittee.AggregatePubkey)
 	require.NotNil(t, result.NextSyncCommittee)
 	assert.DeepEqual(t, [][]byte{bytesutil.PadTo([]byte("nscpubkeys"), 48)}, result.NextSyncCommittee.Pubkeys)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("nscaggregatepubkey"), 48), result.NextSyncCommittee.AggregatePubkey)
 	resultLatestExecutionPayloadHeader := result.LatestExecutionPayloadHeader
 	require.NotNil(t, resultLatestExecutionPayloadHeader)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("parenthash"), 32), resultLatestExecutionPayloadHeader.ParentHash)

@@ -56,10 +56,14 @@ func MapAttestation(attestation *zondpb.Attestation) (*Attestation, error) {
 	if err != nil {
 		return nil, err
 	}
+	signatures := make([]hexutil.Bytes, len(attestation.Signatures))
+	for i, sig := range attestation.Signatures {
+		signatures[i] = sig
+	}
 	return &Attestation{
 		ParticipationBits: []byte(attestation.ParticipationBits),
 		Data:              data,
-		Signature:         attestation.Signatures,
+		Signatures:        signatures,
 	}, nil
 }
 
@@ -227,10 +231,14 @@ func MapIndexedAttestation(attestation *zondpb.IndexedAttestation) (*IndexedAtte
 	if err != nil {
 		return nil, errors.Wrap(err, "could not map attestation data to IndexedAttestation")
 	}
+	signatures := make([]hexutil.Bytes, len(attestation.Signatures))
+	for i, sig := range attestation.Signatures {
+		signatures[i] = sig
+	}
 	return &IndexedAttestation{
 		AttestingIndices: attestingIndices,
 		Data:             attestationData,
-		Signature:        attestation.Signatures,
+		Signatures:       signatures,
 	}, nil
 }
 
@@ -293,6 +301,10 @@ func MapContributionAndProof(contribution *zondpb.ContributionAndProof) (*Contri
 	if contribution.Contribution.ParticipationBits == nil {
 		return nil, fmt.Errorf("aggregation bits in ContributionAndProof is nil")
 	}
+	signatures := make([]hexutil.Bytes, len(contribution.Contribution.Signatures))
+	for i, sig := range contribution.Contribution.Signatures {
+		signatures[i] = sig
+	}
 	return &ContributionAndProof{
 		AggregatorIndex: fmt.Sprint(contribution.AggregatorIndex),
 		SelectionProof:  contribution.SelectionProof,
@@ -301,7 +313,7 @@ func MapContributionAndProof(contribution *zondpb.ContributionAndProof) (*Contri
 			BeaconBlockRoot:   contribution.Contribution.BlockRoot,
 			SubcommitteeIndex: fmt.Sprint(contribution.Contribution.SubcommitteeIndex),
 			ParticipationBits: []byte(contribution.Contribution.ParticipationBits),
-			Signature:         contribution.Contribution.Signature,
+			Signatures:        signatures,
 		},
 	}, nil
 }
