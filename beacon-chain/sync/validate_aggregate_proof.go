@@ -285,7 +285,7 @@ func validateSelectionIndex(
 		return nil, err
 	}
 	return &dilithium.SignatureBatch{
-		Signatures:   [][]byte{proof},
+		Signatures:   [][][]byte{[][]byte{proof}},
 		PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
 		Messages:     [][32]byte{root},
 		Descriptions: []string{signing.SelectionProof},
@@ -313,7 +313,7 @@ func aggSigSet(s state.ReadOnlyBeaconState, a *zondpb.SignedAggregateAttestation
 		return nil, err
 	}
 	return &dilithium.SignatureBatch{
-		Signatures:   [][]byte{a.Signature},
+		Signatures:   [][][]byte{[][]byte{a.Signature}},
 		PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
 		Messages:     [][32]byte{root},
 		Descriptions: []string{signing.AggregatorSignature},

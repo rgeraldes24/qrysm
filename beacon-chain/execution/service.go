@@ -748,7 +748,7 @@ func (s *Service) initializeZond1Data(ctx context.Context, zond1DataInDB *zondpb
 	}
 	s.chainStartData = zond1DataInDB.ChainstartData
 	if !reflect.ValueOf(zond1DataInDB.BeaconState).IsZero() {
-		s.preGenesisState, err = native.InitializeFromProtoPhase0(zond1DataInDB.BeaconState)
+		s.preGenesisState, err = native.InitializeFromProtoCapella(zond1DataInDB.BeaconState)
 		if err != nil {
 			return errors.Wrap(err, "Could not initialize state trie")
 		}
@@ -801,7 +801,7 @@ func (s *Service) ensureValidPowchainData(ctx context.Context) error {
 		return errors.Wrap(err, "unable to retrieve zond1 data")
 	}
 	if zond1Data == nil || !zond1Data.ChainstartData.Chainstarted || !validateDepositContainers(zond1Data.DepositContainers) {
-		pbState, err := native.ProtobufBeaconStatePhase0(s.preGenesisState.ToProtoUnsafe())
+		pbState, err := native.ProtobufBeaconStateCapella(s.preGenesisState.ToProtoUnsafe())
 		if err != nil {
 			return err
 		}

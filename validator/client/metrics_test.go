@@ -10,7 +10,6 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 func TestUpdateLogAggregateStats(t *testing.T) {
@@ -93,7 +92,8 @@ func TestUpdateLogAltairAggregateStats(t *testing.T) {
 		startBalances:        make(map[[dilithium2.CryptoPublicKeyBytes]byte]uint64),
 		prevBalance:          make(map[[dilithium2.CryptoPublicKeyBytes]byte]uint64),
 		voteStats: voteStats{
-			startEpoch: params.BeaconConfig().AltairForkEpoch, // this would otherwise have been previously set in LogValidatorGainsAndLosses()
+			//startEpoch: params.BeaconConfig().AltairForkEpoch, // this would otherwise have been previously set in LogValidatorGainsAndLosses()
+			startEpoch: 0,
 		},
 	}
 
@@ -151,8 +151,9 @@ func TestUpdateLogAltairAggregateStats(t *testing.T) {
 		if i == len(responses)-1 { // Handle last log.
 			hook = logTest.NewGlobal()
 		}
-		altairStart, err := slots.EpochStart(params.BeaconConfig().AltairForkEpoch)
-		require.NoError(t, err)
+		//altairStart, err := slots.EpochStart(params.BeaconConfig().AltairForkEpoch)
+		//require.NoError(t, err)
+		altairStart := primitives.Slot(0)
 
 		v.UpdateLogAggregateStats(val, altairStart+params.BeaconConfig().SlotsPerEpoch*primitives.Slot(i+1))
 	}

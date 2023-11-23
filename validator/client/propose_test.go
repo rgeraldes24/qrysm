@@ -142,26 +142,18 @@ func TestProposeBlock_DomainDataIsNil(t *testing.T) {
 
 func TestProposeBlock_RequestBlockFailed(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.AltairForkEpoch = 2
-	cfg.BellatrixForkEpoch = 4
-	params.OverrideBeaconConfig(cfg)
+	//cfg := params.BeaconConfig().Copy()
+	//cfg.AltairForkEpoch = 2
+	//cfg.BellatrixForkEpoch = 4
+	//params.OverrideBeaconConfig(cfg)
 
 	tests := []struct {
 		name string
 		slot primitives.Slot
 	}{
 		{
-			name: "phase 0",
+			name: "capella",
 			slot: 1,
-		},
-		{
-			name: "altair",
-			slot: params.BeaconConfig().SlotsPerEpoch.Mul(uint64(cfg.AltairForkEpoch)),
-		},
-		{
-			name: "bellatrix",
-			slot: params.BeaconConfig().SlotsPerEpoch.Mul(uint64(cfg.BellatrixForkEpoch)),
 		},
 	}
 
@@ -195,26 +187,10 @@ func TestProposeBlock_ProposeBlockFailed(t *testing.T) {
 		block *zondpb.GenericBeaconBlock
 	}{
 		{
-			name: "phase0",
+			name: "capella",
 			block: &zondpb.GenericBeaconBlock{
-				Block: &zondpb.GenericBeaconBlock_Phase0{
-					Phase0: util.NewBeaconBlock().Block,
-				},
-			},
-		},
-		{
-			name: "altair",
-			block: &zondpb.GenericBeaconBlock{
-				Block: &zondpb.GenericBeaconBlock_Altair{
-					Altair: util.NewBeaconBlockAltair().Block,
-				},
-			},
-		},
-		{
-			name: "bellatrix",
-			block: &zondpb.GenericBeaconBlock{
-				Block: &zondpb.GenericBeaconBlock_Bellatrix{
-					Bellatrix: util.NewBeaconBlockBellatrix().Block,
+				Block: &zondpb.GenericBeaconBlock_Capella{
+					Capella: util.NewBeaconBlock().Block,
 				},
 			},
 		},
@@ -264,7 +240,7 @@ func TestProposeBlock_BlocksDoubleProposal(t *testing.T) {
 		blocks []*zondpb.GenericBeaconBlock
 	}{
 		{
-			name: "phase0",
+			name: "capella",
 			blocks: func() []*zondpb.GenericBeaconBlock {
 				block0, block1 := util.NewBeaconBlock(), util.NewBeaconBlock()
 				block1.Block.Body.Graffiti = blockGraffiti[:]
@@ -273,44 +249,8 @@ func TestProposeBlock_BlocksDoubleProposal(t *testing.T) {
 				for _, block := range []*zondpb.SignedBeaconBlock{block0, block1} {
 					block.Block.Slot = slot
 					blocks = append(blocks, &zondpb.GenericBeaconBlock{
-						Block: &zondpb.GenericBeaconBlock_Phase0{
-							Phase0: block.Block,
-						},
-					})
-				}
-				return blocks
-			}(),
-		},
-		{
-			name: "altair",
-			blocks: func() []*zondpb.GenericBeaconBlock {
-				block0, block1 := util.NewBeaconBlockAltair(), util.NewBeaconBlockAltair()
-				block1.Block.Body.Graffiti = blockGraffiti[:]
-
-				var blocks []*zondpb.GenericBeaconBlock
-				for _, block := range []*zondpb.SignedBeaconBlockAltair{block0, block1} {
-					block.Block.Slot = slot
-					blocks = append(blocks, &zondpb.GenericBeaconBlock{
-						Block: &zondpb.GenericBeaconBlock_Altair{
-							Altair: block.Block,
-						},
-					})
-				}
-				return blocks
-			}(),
-		},
-		{
-			name: "bellatrix",
-			blocks: func() []*zondpb.GenericBeaconBlock {
-				block0, block1 := util.NewBeaconBlockBellatrix(), util.NewBeaconBlockBellatrix()
-				block1.Block.Body.Graffiti = blockGraffiti[:]
-
-				var blocks []*zondpb.GenericBeaconBlock
-				for _, block := range []*zondpb.SignedBeaconBlockBellatrix{block0, block1} {
-					block.Block.Slot = slot
-					blocks = append(blocks, &zondpb.GenericBeaconBlock{
-						Block: &zondpb.GenericBeaconBlock_Bellatrix{
-							Bellatrix: block.Block,
+						Block: &zondpb.GenericBeaconBlock_Capella{
+							Capella: block.Block,
 						},
 					})
 				}
@@ -389,8 +329,8 @@ func TestProposeBlock_BlocksDoubleProposal_After54KEpochs(t *testing.T) {
 		gomock.Any(), // ctx
 		gomock.AssignableToTypeOf(&zondpb.BlockRequest{}),
 	).Return(&zondpb.GenericBeaconBlock{
-		Block: &zondpb.GenericBeaconBlock_Phase0{
-			Phase0: testBlock.Block,
+		Block: &zondpb.GenericBeaconBlock_Capella{
+			Capella: testBlock.Block,
 		},
 	}, nil /*err*/)
 
@@ -403,8 +343,8 @@ func TestProposeBlock_BlocksDoubleProposal_After54KEpochs(t *testing.T) {
 		gomock.Any(), // ctx
 		gomock.AssignableToTypeOf(&zondpb.BlockRequest{}),
 	).Return(&zondpb.GenericBeaconBlock{
-		Block: &zondpb.GenericBeaconBlock_Phase0{
-			Phase0: secondTestBlock.Block,
+		Block: &zondpb.GenericBeaconBlock_Capella{
+			Capella: secondTestBlock.Block,
 		},
 	}, nil /*err*/)
 	m.validatorClient.EXPECT().DomainData(
@@ -463,8 +403,8 @@ func TestProposeBlock_AllowsPastProposals(t *testing.T) {
 				gomock.Any(), // ctx
 				gomock.AssignableToTypeOf(&zondpb.BlockRequest{}),
 			).Return(&zondpb.GenericBeaconBlock{
-				Block: &zondpb.GenericBeaconBlock_Phase0{
-					Phase0: blk.Block,
+				Block: &zondpb.GenericBeaconBlock_Capella{
+					Capella: blk.Block,
 				},
 			}, nil /*err*/)
 
@@ -487,8 +427,8 @@ func TestProposeBlock_AllowsPastProposals(t *testing.T) {
 				gomock.Any(), // ctx
 				gomock.AssignableToTypeOf(&zondpb.BlockRequest{}),
 			).Return(&zondpb.GenericBeaconBlock{
-				Block: &zondpb.GenericBeaconBlock_Phase0{
-					Phase0: blk2.Block,
+				Block: &zondpb.GenericBeaconBlock_Capella{
+					Capella: blk2.Block,
 				},
 			}, nil /*err*/)
 			validator.ProposeBlock(context.Background(), tt.pastSlot, pubKey)
@@ -512,59 +452,11 @@ func testProposeBlock(t *testing.T, graffiti []byte) {
 		block *zondpb.GenericBeaconBlock
 	}{
 		{
-			name: "phase0",
-			block: &zondpb.GenericBeaconBlock{
-				Block: &zondpb.GenericBeaconBlock_Phase0{
-					Phase0: func() *zondpb.BeaconBlock {
-						blk := util.NewBeaconBlock()
-						blk.Block.Body.Graffiti = graffiti
-						return blk.Block
-					}(),
-				},
-			},
-		},
-		{
-			name: "altair",
-			block: &zondpb.GenericBeaconBlock{
-				Block: &zondpb.GenericBeaconBlock_Altair{
-					Altair: func() *zondpb.BeaconBlockAltair {
-						blk := util.NewBeaconBlockAltair()
-						blk.Block.Body.Graffiti = graffiti
-						return blk.Block
-					}(),
-				},
-			},
-		},
-		{
-			name: "bellatrix",
-			block: &zondpb.GenericBeaconBlock{
-				Block: &zondpb.GenericBeaconBlock_Bellatrix{
-					Bellatrix: func() *zondpb.BeaconBlockBellatrix {
-						blk := util.NewBeaconBlockBellatrix()
-						blk.Block.Body.Graffiti = graffiti
-						return blk.Block
-					}(),
-				},
-			},
-		},
-		{
-			name: "bellatrix blind block",
-			block: &zondpb.GenericBeaconBlock{
-				Block: &zondpb.GenericBeaconBlock_BlindedBellatrix{
-					BlindedBellatrix: func() *zondpb.BlindedBeaconBlockBellatrix {
-						blk := util.NewBlindedBeaconBlockBellatrix()
-						blk.Block.Body.Graffiti = graffiti
-						return blk.Block
-					}(),
-				},
-			},
-		},
-		{
 			name: "capella",
 			block: &zondpb.GenericBeaconBlock{
 				Block: &zondpb.GenericBeaconBlock_Capella{
-					Capella: func() *zondpb.BeaconBlockCapella {
-						blk := util.NewBeaconBlockCapella()
+					Capella: func() *zondpb.BeaconBlock {
+						blk := util.NewBeaconBlock()
 						blk.Block.Body.Graffiti = graffiti
 						return blk.Block
 					}(),
@@ -575,8 +467,8 @@ func testProposeBlock(t *testing.T, graffiti []byte) {
 			name: "capella blind block",
 			block: &zondpb.GenericBeaconBlock{
 				Block: &zondpb.GenericBeaconBlock_BlindedCapella{
-					BlindedCapella: func() *zondpb.BlindedBeaconBlockCapella {
-						blk := util.NewBlindedBeaconBlockCapella()
+					BlindedCapella: func() *zondpb.BlindedBeaconBlock {
+						blk := util.NewBlindedBeaconBlock()
 						blk.Block.Body.Graffiti = graffiti
 						return blk.Block
 					}(),
@@ -785,69 +677,6 @@ func TestSignBlock(t *testing.T) {
 	// Verify the returned block root matches the expected root using the proposer signature
 	// domain.
 	wantedBlockRoot, err := signing.ComputeSigningRoot(b, proposerDomain)
-	if err != nil {
-		require.NoError(t, err)
-	}
-	require.DeepEqual(t, wantedBlockRoot, blockRoot)
-}
-
-func TestSignAltairBlock(t *testing.T) {
-	validator, m, _, finish := setup(t)
-	defer finish()
-
-	kp := testKeyFromBytes(t, []byte{1})
-	proposerDomain := make([]byte, 32)
-	m.validatorClient.EXPECT().
-		DomainData(gomock.Any(), gomock.Any()).
-		Return(&zondpb.DomainResponse{SignatureDomain: proposerDomain}, nil)
-	ctx := context.Background()
-	blk := util.NewBeaconBlockAltair()
-	blk.Block.Slot = 1
-	blk.Block.ProposerIndex = 100
-	validator.keyManager = newMockKeymanager(t, kp)
-	wb, err := blocks.NewBeaconBlock(blk.Block)
-	require.NoError(t, err)
-	sig, blockRoot, err := validator.signBlock(ctx, kp.pub, 0, 0, wb)
-	require.NoError(t, err, "%x,%v", sig, err)
-	// Verify the returned block root matches the expected root using the proposer signature
-	// domain.
-	wantedBlockRoot, err := signing.ComputeSigningRoot(wb, proposerDomain)
-	if err != nil {
-		require.NoError(t, err)
-	}
-	require.DeepEqual(t, wantedBlockRoot, blockRoot)
-}
-
-func TestSignBellatrixBlock(t *testing.T) {
-	validator, m, _, finish := setup(t)
-	defer finish()
-
-	secretKey, err := dilithium.SecretKeyFromBytes(bytesutil.PadTo([]byte{1}, common2.SeedSize))
-	require.NoError(t, err, "Failed to generate key from bytes")
-	publicKey := secretKey.PublicKey()
-	proposerDomain := make([]byte, 32)
-	m.validatorClient.EXPECT().
-		DomainData(gomock.Any(), gomock.Any()).
-		Return(&zondpb.DomainResponse{SignatureDomain: proposerDomain}, nil)
-	ctx := context.Background()
-	blk := util.NewBeaconBlockBellatrix()
-	blk.Block.Slot = 1
-	blk.Block.ProposerIndex = 100
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
-	copy(pubKey[:], publicKey.Marshal())
-	km := &mockKeymanager{
-		keysMap: map[[dilithium2.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey{
-			pubKey: secretKey,
-		},
-	}
-	validator.keyManager = km
-	wb, err := blocks.NewBeaconBlock(blk.Block)
-	require.NoError(t, err)
-	sig, blockRoot, err := validator.signBlock(ctx, pubKey, 0, 0, wb)
-	require.NoError(t, err, "%x,%v", sig, err)
-	// Verify the returned block root matches the expected root using the proposer signature
-	// domain.
-	wantedBlockRoot, err := signing.ComputeSigningRoot(wb, proposerDomain)
 	if err != nil {
 		require.NoError(t, err)
 	}

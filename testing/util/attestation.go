@@ -16,7 +16,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	attv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
@@ -37,7 +37,7 @@ func NewAttestation() *zondpb.Attestation {
 				Root: make([]byte, fieldparams.RootLength),
 			},
 		},
-		Signatures: make([]byte, 96),
+		Signatures: make([][]byte, 1),
 	}
 }
 
@@ -49,7 +49,7 @@ func NewAttestation() *zondpb.Attestation {
 //
 // If you request 4 attestations, but there are 8 committees, you will get 4 fully aggregated attestations.
 func GenerateAttestations(
-	bState state.BeaconState, privs []bls.SecretKey, numToGen uint64, slot primitives.Slot, randomRoot bool,
+	bState state.BeaconState, privs []dilithium.DilithiumKey, numToGen uint64, slot primitives.Slot, randomRoot bool,
 ) ([]*zondpb.Attestation, error) {
 	var attestations []*zondpb.Attestation
 	generateHeadState := false
@@ -169,11 +169,11 @@ func GenerateAttestations(
 		committeeSize := uint64(len(committee))
 		bitsPerAtt := committeeSize / uint64(attsPerCommittee)
 		for i := uint64(0); i < committeeSize; i += bitsPerAtt {
-			aggregationBits := bitfield.NewBitlist(committeeSize)
-			var sigs []bls.Signature
+			participationBits := bitfield.NewBitlist(committeeSize)
+			var sigs [][]byte
 			for b := i; b < i+bitsPerAtt; b++ {
-				aggregationBits.SetBitAt(b, true)
-				sigs = append(sigs, privs[committee[b]].Sign(dataRoot[:]))
+				participationBits.SetBitAt(b, true)
+				sigs = [][]byte{privs[committee[b]].Sign(dataRoot[:]).Marshal()}
 			}
 
 			// bls.AggregateSignatures will return nil if sigs is 0.
@@ -183,8 +183,8 @@ func GenerateAttestations(
 
 			att := &zondpb.Attestation{
 				Data:              attData,
-				ParticipationBits: aggregationBits,
-				Signatures:        bls.AggregateSignatures(sigs).Marshal(),
+				ParticipationBits: participationBits,
+				Signatures:        sigs,
 			}
 			attestations = append(attestations, att)
 		}
@@ -196,7 +196,7 @@ func GenerateAttestations(
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateAttestation(a *zondpb.Attestation) *zondpb.Attestation {
 	if a.Signatures == nil {
-		a.Signatures = make([]byte, 96)
+		a.Signatures = make([][]byte, 0)
 	}
 	if a.ParticipationBits == nil {
 		a.ParticipationBits = make([]byte, 1)
@@ -212,7 +212,7 @@ func HydrateAttestation(a *zondpb.Attestation) *zondpb.Attestation {
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateV1Attestation(a *attv1.Attestation) *attv1.Attestation {
 	if a.Signatures == nil {
-		a.Signatures = make([]byte, 96)
+		a.Signatures = make([][]byte, 1)
 	}
 	if a.ParticipationBits == nil {
 		a.ParticipationBits = make([]byte, 1)
@@ -270,7 +270,7 @@ func HydrateV1AttestationData(d *attv1.AttestationData) *attv1.AttestationData {
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateIndexedAttestation(a *zondpb.IndexedAttestation) *zondpb.IndexedAttestation {
 	if a.Signatures == nil {
-		a.Signatures = make([]byte, 96)
+		a.Signatures = make([][]byte, 1)
 	}
 	if a.Data == nil {
 		a.Data = &zondpb.AttestationData{}

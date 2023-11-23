@@ -14,7 +14,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
 	"github.com/theQRL/qrysm/v4/time"
-	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
 )
 
@@ -33,9 +32,26 @@ type rpcHandler func(context.Context, interface{}, libp2pcore.Stream) error
 
 // registerRPCHandlers for p2p RPC.
 func (s *Service) registerRPCHandlers() {
-	currEpoch := slots.ToEpoch(s.cfg.clock.CurrentSlot())
-	// Register V2 handlers if we are past altair fork epoch.
-	if currEpoch >= params.BeaconConfig().AltairForkEpoch {
+	/*
+		currEpoch := slots.ToEpoch(s.cfg.clock.CurrentSlot())
+
+		// Register V2 handlers if we are past altair fork epoch.
+		if currEpoch >= params.BeaconConfig().AltairForkEpoch {
+			s.registerRPC(
+				p2p.RPCStatusTopicV1,
+				s.statusRPCHandler,
+			)
+			s.registerRPC(
+				p2p.RPCGoodByeTopicV1,
+				s.goodbyeRPCHandler,
+			)
+			s.registerRPC(
+				p2p.RPCPingTopicV1,
+				s.pingHandler,
+			)
+			s.registerRPCHandlersAltair()
+			return
+		}
 		s.registerRPC(
 			p2p.RPCStatusTopicV1,
 			s.statusRPCHandler,
@@ -45,12 +61,23 @@ func (s *Service) registerRPCHandlers() {
 			s.goodbyeRPCHandler,
 		)
 		s.registerRPC(
+			p2p.RPCBlocksByRangeTopicV1,
+			s.beaconBlocksByRangeRPCHandler,
+		)
+		s.registerRPC(
+			p2p.RPCBlocksByRootTopicV1,
+			s.beaconBlocksRootRPCHandler,
+		)
+		s.registerRPC(
 			p2p.RPCPingTopicV1,
 			s.pingHandler,
 		)
-		s.registerRPCHandlersAltair()
-		return
-	}
+		s.registerRPC(
+			p2p.RPCMetaDataTopicV1,
+			s.metaDataHandler,
+		)
+	*/
+
 	s.registerRPC(
 		p2p.RPCStatusTopicV1,
 		s.statusRPCHandler,
@@ -58,6 +85,10 @@ func (s *Service) registerRPCHandlers() {
 	s.registerRPC(
 		p2p.RPCGoodByeTopicV1,
 		s.goodbyeRPCHandler,
+	)
+	s.registerRPC(
+		p2p.RPCPingTopicV1,
+		s.pingHandler,
 	)
 	s.registerRPC(
 		p2p.RPCBlocksByRangeTopicV1,
@@ -68,15 +99,14 @@ func (s *Service) registerRPCHandlers() {
 		s.beaconBlocksRootRPCHandler,
 	)
 	s.registerRPC(
-		p2p.RPCPingTopicV1,
-		s.pingHandler,
-	)
-	s.registerRPC(
 		p2p.RPCMetaDataTopicV1,
 		s.metaDataHandler,
 	)
+
+	return
 }
 
+/*
 // registerRPCHandlers for altair.
 func (s *Service) registerRPCHandlersAltair() {
 	s.registerRPC(
@@ -92,6 +122,7 @@ func (s *Service) registerRPCHandlersAltair() {
 		s.metaDataHandler,
 	)
 }
+*/
 
 // Remove all v1 Stream handlers that are no longer supported
 // from altair onwards.
@@ -168,7 +199,7 @@ func (s *Service) registerRPC(baseTopic string, handle rpcHandler) {
 
 		// since metadata requests do not have any data in the payload, we
 		// do not decode anything.
-		if baseTopic == p2p.RPCMetaDataTopicV1 || baseTopic == p2p.RPCMetaDataTopicV2 {
+		if baseTopic == p2p.RPCMetaDataTopicV1 {
 			if err := handle(ctx, base, stream); err != nil {
 				messageFailedProcessingCounter.WithLabelValues(topic).Inc()
 				if err != p2ptypes.ErrWrongForkDigestVersion {

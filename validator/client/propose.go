@@ -145,36 +145,34 @@ func (v *validator) ProposeBlock(ctx context.Context, slot primitives.Slot, pubK
 		trace.Int64Attribute("numAttestations", int64(len(blk.Block().Body().Attestations()))),
 	)
 
-	if blk.Version() >= version.Bellatrix {
-		p, err := blk.Block().Body().Execution()
+	p, err := blk.Block().Body().Execution()
+	if err != nil {
+		log.WithError(err).Error("Failed to get execution payload")
+		return
+	}
+	log = log.WithFields(logrus.Fields{
+		"payloadHash": fmt.Sprintf("%#x", bytesutil.Trunc(p.BlockHash())),
+		"parentHash":  fmt.Sprintf("%#x", bytesutil.Trunc(p.ParentHash())),
+		"blockNumber": p.BlockNumber,
+	})
+	if !blk.IsBlinded() {
+		txs, err := p.Transactions()
 		if err != nil {
-			log.WithError(err).Error("Failed to get execution payload")
+			log.WithError(err).Error("Failed to get execution payload transactions")
 			return
 		}
-		log = log.WithFields(logrus.Fields{
-			"payloadHash": fmt.Sprintf("%#x", bytesutil.Trunc(p.BlockHash())),
-			"parentHash":  fmt.Sprintf("%#x", bytesutil.Trunc(p.ParentHash())),
-			"blockNumber": p.BlockNumber,
-		})
-		if !blk.IsBlinded() {
-			txs, err := p.Transactions()
-			if err != nil {
-				log.WithError(err).Error("Failed to get execution payload transactions")
-				return
-			}
-			log = log.WithField("txCount", len(txs))
+		log = log.WithField("txCount", len(txs))
+	}
+	if p.GasLimit() != 0 {
+		log = log.WithField("gasUtilized", float64(p.GasUsed())/float64(p.GasLimit()))
+	}
+	if blk.Version() >= version.Capella && !blk.IsBlinded() {
+		withdrawals, err := p.Withdrawals()
+		if err != nil {
+			log.WithError(err).Error("Failed to get execution payload withdrawals")
+			return
 		}
-		if p.GasLimit() != 0 {
-			log = log.WithField("gasUtilized", float64(p.GasUsed())/float64(p.GasLimit()))
-		}
-		if blk.Version() >= version.Capella && !blk.IsBlinded() {
-			withdrawals, err := p.Withdrawals()
-			if err != nil {
-				log.WithError(err).Error("Failed to get execution payload withdrawals")
-				return
-			}
-			log = log.WithField("withdrawalCount", len(withdrawals))
-		}
+		log = log.WithField("withdrawalCount", len(withdrawals))
 	}
 
 	blkRoot := fmt.Sprintf("%#x", bytesutil.Trunc(blkResp.BlockRoot))

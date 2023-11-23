@@ -3,7 +3,6 @@ package execution
 import (
 	"context"
 	"errors"
-	"math"
 	"math/big"
 	"time"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/network"
 	pb "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 var (
@@ -41,9 +39,10 @@ func (s *Service) checkTransitionConfiguration(
 	ctx context.Context, blockNotifications chan *feed.Event,
 ) {
 	// If Bellatrix fork epoch is not set, we do not run this check.
-	if params.BeaconConfig().BellatrixForkEpoch == math.MaxUint64 {
-		return
-	}
+	// if params.BeaconConfig().BellatrixForkEpoch == math.MaxUint64 {
+	// 	return
+	// }
+
 	i := new(big.Int)
 	i.SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
 	ttd := new(uint256.Int)
@@ -101,8 +100,7 @@ func (s *Service) checkTransitionConfiguration(
 			s.handleExchangeConfigurationError(err)
 			cancel()
 		case <-logTtdTicker.C:
-			currentEpoch := slots.ToEpoch(slots.CurrentSlot(s.chainStartData.GetGenesisTime()))
-			if currentEpoch >= params.BeaconConfig().BellatrixForkEpoch && !hasTtdReached {
+			if !hasTtdReached {
 				hasTtdReached, err = s.logTtdStatus(ctx, ttd)
 				if err != nil {
 					log.WithError(err).Error("Could not log ttd status")

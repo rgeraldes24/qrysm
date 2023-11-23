@@ -6,6 +6,8 @@ import (
 
 	"github.com/pkg/errors"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
@@ -18,7 +20,7 @@ import (
 )
 
 // DeterministicGenesisStateCapella returns a genesis state in Capella format made using the deterministic deposits.
-func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.SecretKey) {
+func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.DilithiumKey) {
 	deposits, privKeys, err := DeterministicDepositsAndKeys(numValidators)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
@@ -62,8 +64,8 @@ func emptyGenesisStateCapella() (state.BeaconState, error) {
 		// Misc fields.
 		Slot: 0,
 		Fork: &zondpb.Fork{
-			PreviousVersion: params.BeaconConfig().BellatrixForkVersion,
-			CurrentVersion:  params.BeaconConfig().CapellaForkVersion,
+			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
+			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			Epoch:           0,
 		},
 		// Validator registry fields.
@@ -243,4 +245,22 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 	}
 
 	return state_native.InitializeFromProtoCapella(st)
+}
+
+// processPreGenesisDeposits processes a deposit for the beacon state Altair before chain start.
+func processPreGenesisDeposits(
+	ctx context.Context,
+	beaconState state.BeaconState,
+	deposits []*zondpb.Deposit,
+) (state.BeaconState, error) {
+	var err error
+	beaconState, err = altair.ProcessDeposits(ctx, beaconState, deposits)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not process deposit")
+	}
+	beaconState, err = blocks.ActivateValidatorWithEffectiveBalance(beaconState, deposits)
+	if err != nil {
+		return nil, err
+	}
+	return beaconState, nil
 }

@@ -60,9 +60,9 @@ func (s *Service) registerForUpcomingFork(currEpoch primitives.Epoch) error {
 			return nil
 		}
 		s.registerSubscribers(nextEpoch, digest)
-		if nextEpoch == params.BeaconConfig().AltairForkEpoch {
-			s.registerRPCHandlersAltair()
-		}
+		// if nextEpoch == params.BeaconConfig().AltairForkEpoch {
+		// 	s.registerRPCHandlersAltair()
+		// }
 	}
 	return nil
 }

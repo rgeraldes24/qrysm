@@ -481,10 +481,6 @@ func (s *Service) isInitialized() bool {
 // increaseMaxMessageSizesForBellatrix increases the max sizes of gossip and chunk from 1 Mb to 10Mb,
 // if the current epoch is or above the configured BellatrixForkEpoch.
 func (s *Service) increaseMaxMessageSizesForBellatrix() {
-	currentSlot := slots.Since(s.genesisTime)
-	currentEpoch := slots.ToEpoch(currentSlot)
-	if currentEpoch >= params.BeaconConfig().BellatrixForkEpoch {
-		encoder.SetMaxGossipSizeForBellatrix()
-		encoder.SetMaxChunkSizeForBellatrix()
-	}
+	encoder.SetMaxGossipSizeForBellatrix()
+	encoder.SetMaxChunkSizeForBellatrix()
 }

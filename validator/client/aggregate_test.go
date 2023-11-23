@@ -23,7 +23,7 @@ import (
 func TestSubmitAggregateAndProof_GetDutiesRequestFailure(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, _, validatorKey, finish := setup(t)
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{}}
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{}}
 	defer finish()
 
 	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
@@ -39,7 +39,7 @@ func TestSubmitAggregateAndProof_SignFails(t *testing.T) {
 	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.duties = &zondpb.DutiesResponse{
-		Duties: []*zondpb.DutiesResponse_Duty{
+		CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 			{
 				PublicKey: validatorKey.PublicKey().Marshal(),
 			},
@@ -58,7 +58,7 @@ func TestSubmitAggregateAndProof_SignFails(t *testing.T) {
 		AggregateAndProof: &zondpb.AggregateAttestationAndProof{
 			AggregatorIndex: 0,
 			Aggregate: util.HydrateAttestation(&zondpb.Attestation{
-				AggregationBits: make([]byte, 1),
+				ParticipationBits: make([]byte, 1),
 			}),
 			SelectionProof: make([]byte, 96),
 		},
@@ -78,7 +78,7 @@ func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.duties = &zondpb.DutiesResponse{
-		Duties: []*zondpb.DutiesResponse_Duty{
+		CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 			{
 				PublicKey: validatorKey.PublicKey().Marshal(),
 			},
@@ -97,7 +97,7 @@ func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 		AggregateAndProof: &zondpb.AggregateAttestationAndProof{
 			AggregatorIndex: 0,
 			Aggregate: util.HydrateAttestation(&zondpb.Attestation{
-				AggregationBits: make([]byte, 1),
+				ParticipationBits: make([]byte, 1),
 			}),
 			SelectionProof: make([]byte, 96),
 		},
@@ -160,7 +160,7 @@ func TestAggregateAndProofSignature_CanSignValidSignature(t *testing.T) {
 	agg := &zondpb.AggregateAttestationAndProof{
 		AggregatorIndex: 0,
 		Aggregate: util.HydrateAttestation(&zondpb.Attestation{
-			AggregationBits: bitfield.NewBitlist(1),
+			ParticipationBits: bitfield.NewBitlist(1),
 		}),
 		SelectionProof: make([]byte, 96),
 	}

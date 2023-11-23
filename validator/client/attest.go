@@ -130,14 +130,14 @@ func (v *validator) SubmitAttestation(ctx context.Context, slot primitives.Slot,
 	aggregationBitfield := bitfield.NewBitlist(uint64(len(duty.Committee)))
 	aggregationBitfield.SetBitAt(indexInCommittee, true)
 	attestation := &zondpb.Attestation{
-		Data:                    data,
-		ParticipationBits:       aggregationBitfield,
-		Signatures:              sig,
-		SignatureValidatorIndex: []uint64{uint64(duty.ValidatorIndex)},
+		Data:                            data,
+		ParticipationBits:               aggregationBitfield,
+		Signatures:                      [][]byte{sig},
+		SignaturesIdxToParticipationIdx: []uint64{indexInCommittee},
 	}
 
 	// Set the signature of the attestation and send it out to the beacon node.
-	indexedAtt.Signatures = sig
+	indexedAtt.Signatures = [][]byte{sig}
 	if err := v.slashableAttestationCheck(ctx, indexedAtt, pubKey, signingRoot); err != nil {
 		log.WithError(err).Error("Failed attestation slashing protection check")
 		log.WithFields(
@@ -187,7 +187,7 @@ func (v *validator) duty(pubKey [dilithium2.CryptoPublicKeyBytes]byte) (*zondpb.
 		return nil, errors.New("no duties for validators")
 	}
 
-	for _, duty := range v.duties.Duties {
+	for _, duty := range v.duties.CurrentEpochDuties {
 		if bytes.Equal(pubKey[:], duty.PublicKey) {
 			return duty, nil
 		}

@@ -658,7 +658,7 @@ func (v *validator) subscribeToSubnets(ctx context.Context, res *zondpb.DutiesRe
 // validator assignments are unknown. Otherwise returns a valid ValidatorRole map.
 func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[dilithium2.CryptoPublicKeyBytes]byte][]iface.ValidatorRole, error) {
 	rolesAt := make(map[[dilithium2.CryptoPublicKeyBytes]byte][]iface.ValidatorRole)
-	for validator, duty := range v.duties.Duties {
+	for validator, duty := range v.duties.CurrentEpochDuties {
 		var roles []iface.ValidatorRole
 
 		if duty == nil {

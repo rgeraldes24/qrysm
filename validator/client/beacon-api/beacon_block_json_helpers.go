@@ -113,6 +113,41 @@ func JsonifySignedVoluntaryExits(voluntaryExits []*zondpb.SignedVoluntaryExit) [
 	return jsonSignedVoluntaryExits
 }
 
+// JsonifySignedSyncAggregate converts a sync aggregate struct to a JSON hex string compatible format.
+func JsonifySignedSyncAggregate(syncAggregate *zondpb.SyncAggregate) *apimiddleware.SyncAggregateJson {
+
+	/*
+		jsonSignedVoluntaryExits := make([]*apimiddleware.SignedVoluntaryExitJson, len(voluntaryExits))
+		for index, signedVoluntaryExit := range voluntaryExits {
+			jsonSignedVoluntaryExit := &apimiddleware.SignedVoluntaryExitJson{
+				Exit: &apimiddleware.VoluntaryExitJson{
+					Epoch:          uint64ToString(signedVoluntaryExit.Exit.Epoch),
+					ValidatorIndex: uint64ToString(signedVoluntaryExit.Exit.ValidatorIndex),
+				},
+				Signature: hexutil.Encode(signedVoluntaryExit.Signature),
+			}
+			jsonSignedVoluntaryExits[index] = jsonSignedVoluntaryExit
+		}
+		return jsonSignedVoluntaryExits
+	*/
+
+	syncCommitteeSigs := make([]string, len(syncAggregate.SyncCommitteeSignatures))
+	for i, sig := range syncAggregate.SyncCommitteeSignatures {
+		syncCommitteeSigs[i] = hexutil.Encode(sig)
+	}
+
+	sigsIdxToParticipationIdx := make([]string, len(syncAggregate.SignaturesIdxToCommitteeIdx))
+	for i, participationIdx := range syncAggregate.SignaturesIdxToCommitteeIdx {
+		sigsIdxToParticipationIdx[i] = uint64ToString(participationIdx)
+	}
+
+	return &apimiddleware.SyncAggregateJson{
+		SyncCommitteeBits:           hexutil.Encode(syncAggregate.SyncCommitteeBits),
+		SyncCommitteeSignatures:     syncCommitteeSigs,
+		SignaturesIdxToCommitteeIdx: sigsIdxToParticipationIdx,
+	}
+}
+
 func jsonifySignedBeaconBlockHeader(signedBeaconBlockHeader *zondpb.SignedBeaconBlockHeader) *apimiddleware.SignedBeaconBlockHeaderJson {
 	return &apimiddleware.SignedBeaconBlockHeaderJson{
 		Header: &apimiddleware.BeaconBlockHeaderJson{
@@ -132,11 +167,15 @@ func jsonifyIndexedAttestation(indexedAttestation *zondpb.IndexedAttestation) *a
 		attestingIndex := uint64ToString(attestingIndex)
 		attestingIndices[index] = attestingIndex
 	}
+	signatures := make([]string, len(indexedAttestation.Signatures))
+	for i, sig := range indexedAttestation.Signatures {
+		signatures[i] = hexutil.Encode(sig)
+	}
 
 	return &apimiddleware.IndexedAttestationJson{
 		AttestingIndices: attestingIndices,
 		Data:             jsonifyAttestationData(indexedAttestation.Data),
-		Signature:        hexutil.Encode(indexedAttestation.Signatures),
+		Signatures:       signatures,
 	}
 }
 
@@ -157,10 +196,20 @@ func jsonifyAttestationData(attestationData *zondpb.AttestationData) *apimiddlew
 }
 
 func jsonifyAttestation(attestation *zondpb.Attestation) *apimiddleware.AttestationJson {
+	signatures := make([]string, len(attestation.Signatures))
+	for i, sig := range attestation.Signatures {
+		signatures[i] = hexutil.Encode(sig)
+	}
+	signaturesIdxToParticipationIdx := make([]string, len(attestation.SignaturesIdxToParticipationIdx))
+	for i, participationIdx := range attestation.SignaturesIdxToParticipationIdx {
+		signaturesIdxToParticipationIdx[i] = uint64ToString(participationIdx)
+	}
+
 	return &apimiddleware.AttestationJson{
-		ParticipationBits: hexutil.Encode(attestation.ParticipationBits),
-		Data:              jsonifyAttestationData(attestation.Data),
-		Signature:         hexutil.Encode(attestation.Signatures),
+		ParticipationBits:               hexutil.Encode(attestation.ParticipationBits),
+		Data:                            jsonifyAttestationData(attestation.Data),
+		Signatures:                      signatures,
+		SignaturesIdxToParticipationIdx: signaturesIdxToParticipationIdx,
 	}
 }
 

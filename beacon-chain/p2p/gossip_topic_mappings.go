@@ -3,7 +3,6 @@ package p2p
 import (
 	"reflect"
 
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"google.golang.org/protobuf/proto"
@@ -27,15 +26,18 @@ var gossipTopicMappings = map[string]proto.Message{
 // versioned by epoch.
 func GossipTopicMappings(topic string, epoch primitives.Epoch) proto.Message {
 	if topic == BlockSubnetTopicFormat {
-		if epoch >= params.BeaconConfig().CapellaForkEpoch {
-			return &zondpb.SignedBeaconBlockCapella{}
-		}
-		if epoch >= params.BeaconConfig().BellatrixForkEpoch {
-			return &zondpb.SignedBeaconBlockBellatrix{}
-		}
-		if epoch >= params.BeaconConfig().AltairForkEpoch {
-			return &zondpb.SignedBeaconBlockAltair{}
-		}
+		/*
+			if epoch >= params.BeaconConfig().CapellaForkEpoch {
+				return &zondpb.SignedBeaconBlockCapella{}
+			}
+			if epoch >= params.BeaconConfig().BellatrixForkEpoch {
+				return &zondpb.SignedBeaconBlockBellatrix{}
+			}
+			if epoch >= params.BeaconConfig().AltairForkEpoch {
+				return &zondpb.SignedBeaconBlockAltair{}
+			}
+		*/
+		return &zondpb.SignedBeaconBlock{}
 	}
 	return gossipTopicMappings[topic]
 }
@@ -59,9 +61,9 @@ func init() {
 		GossipTypeMapping[reflect.TypeOf(v)] = k
 	}
 	// Specially handle Altair objects.
-	GossipTypeMapping[reflect.TypeOf(&zondpb.SignedBeaconBlockAltair{})] = BlockSubnetTopicFormat
+	//GossipTypeMapping[reflect.TypeOf(&zondpb.SignedBeaconBlockAltair{})] = BlockSubnetTopicFormat
 	// Specially handle Bellatrix objects.
-	GossipTypeMapping[reflect.TypeOf(&zondpb.SignedBeaconBlockBellatrix{})] = BlockSubnetTopicFormat
+	//GossipTypeMapping[reflect.TypeOf(&zondpb.SignedBeaconBlockBellatrix{})] = BlockSubnetTopicFormat
 	// Specially handle Capella objects
-	GossipTypeMapping[reflect.TypeOf(&zondpb.SignedBeaconBlockCapella{})] = BlockSubnetTopicFormat
+	GossipTypeMapping[reflect.TypeOf(&zondpb.SignedBeaconBlock{})] = BlockSubnetTopicFormat
 }

@@ -17,7 +17,6 @@ import (
 	"github.com/theQRL/qrysm/v4/network/forks"
 	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/metadata"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -53,26 +52,12 @@ func (s *Service) metaDataHandler(_ context.Context, _ interface{}, stream libp2
 	currMd := s.cfg.p2p.Metadata()
 	switch streamVersion {
 	case p2p.SchemaVersionV1:
-		// We have a v1 metadata object saved locally, so we
-		// convert it back to a v0 metadata object.
-		if currMd.Version() != version.Phase0 {
-			currMd = wrapper.WrappedMetadataV0(
-				&pb.MetaDataV0{
-					Attnets:   currMd.AttnetsBitfield(),
-					SeqNumber: currMd.SequenceNumber(),
-				})
-		}
-	case p2p.SchemaVersionV2:
-		// We have a v0 metadata object saved locally, so we
-		// convert it to a v1 metadata object.
-		if currMd.Version() != version.Altair {
-			currMd = wrapper.WrappedMetadataV1(
-				&pb.MetaDataV1{
-					Attnets:   currMd.AttnetsBitfield(),
-					SeqNumber: currMd.SequenceNumber(),
-					Syncnets:  bitfield.Bitvector4{byte(0x00)},
-				})
-		}
+		currMd = wrapper.WrappedMetadataV0(
+			&pb.MetaDataV0{
+				Attnets:   currMd.AttnetsBitfield(),
+				SeqNumber: currMd.SequenceNumber(),
+				Syncnets:  bitfield.Bitvector4{byte(0x00)},
+			})
 	}
 	if _, err := stream.Write([]byte{responseCodeSuccess}); err != nil {
 		return err
@@ -89,7 +74,7 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 	ctx, cancel := context.WithTimeout(ctx, respTimeout)
 	defer cancel()
 
-	topic, err := p2p.TopicFromMessage(p2p.MetadataMessageName, slots.ToEpoch(s.cfg.clock.CurrentSlot()))
+	topic, err := p2p.TopicFromMessage(p2p.MetadataMessageName /*, slots.ToEpoch(s.cfg.clock.CurrentSlot())*/)
 	if err != nil {
 		return nil, err
 	}
@@ -118,12 +103,15 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 	}
 	// Defensive check to ensure valid objects are being sent.
 	topicVersion := ""
-	switch msg.Version() {
-	case version.Phase0:
-		topicVersion = p2p.SchemaVersionV1
-	case version.Altair:
-		topicVersion = p2p.SchemaVersionV2
-	}
+	/*
+		switch msg.Version() {
+		case version.Phase0:
+			topicVersion = p2p.SchemaVersionV1
+		case version.Altair:
+			topicVersion = p2p.SchemaVersionV2
+		}
+	*/
+	topicVersion = p2p.SchemaVersionV1
 	if err := validateVersion(topicVersion, stream); err != nil {
 		return nil, err
 	}

@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
-	"github.com/theQRL/qrysm/v4/config/params"
 	types "github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -16,7 +15,8 @@ const broadcastDilithiumChangesRateLimit = 128
 
 // This routine broadcasts known Dilithium changes at the Capella fork.
 func (s *Service) broadcastDilithiumChanges(currSlot types.Slot) {
-	capellaSlotStart, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
+	// TODO(rgeraldes24)
+	capellaSlotStart, err := slots.EpochStart(0)
 	if err != nil {
 		// only possible error is an overflow, so we exit early from the method
 		return

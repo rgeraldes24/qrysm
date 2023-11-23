@@ -966,7 +966,8 @@ func Test_beaconApiBeaconChainClient_GetValidatorPerformance(t *testing.T) {
 	}
 
 	got, err := c.GetValidatorPerformance(ctx, &zondpb.ValidatorPerformanceRequest{
-		PublicKeys: [][]byte{publicKeys[0][:], publicKeys[2][:], publicKeys[1][:]},
+		Indices: []primitives.ValidatorIndex{},
+		//PublicKeys: [][]byte{publicKeys[0][:], publicKeys[2][:], publicKeys[1][:]},
 	})
 	require.NoError(t, err)
 	require.DeepEqual(t, want.PublicKeys, got.PublicKeys)

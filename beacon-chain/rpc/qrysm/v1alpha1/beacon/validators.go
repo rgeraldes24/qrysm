@@ -24,7 +24,6 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // ListValidatorBalances retrieves the validator balances for a given set of public keys.
@@ -471,185 +470,6 @@ func (bs *Server) GetValidatorActiveSetChanges(
 	}, nil
 }
 
-// GetValidatorParticipation retrieves the validator participation information for a given epoch,
-// it returns the information about validator's participation rate in voting on the proof of stake
-// rules based on their balance compared to the total active validator balance.
-func (bs *Server) GetValidatorParticipation(
-	ctx context.Context, req *zondpb.GetValidatorParticipationRequest,
-) (*zondpb.ValidatorParticipationResponse, error) {
-	currentSlot := bs.GenesisTimeFetcher.CurrentSlot()
-	currentEpoch := slots.ToEpoch(currentSlot)
-
-	var requestedEpoch primitives.Epoch
-	switch q := req.QueryFilter.(type) {
-	case *zondpb.GetValidatorParticipationRequest_Genesis:
-		requestedEpoch = 0
-	case *zondpb.GetValidatorParticipationRequest_Epoch:
-		requestedEpoch = q.Epoch
-	default:
-		requestedEpoch = currentEpoch
-	}
-
-	if requestedEpoch > currentEpoch {
-		return nil, status.Errorf(
-			codes.InvalidArgument,
-			"Cannot retrieve information about an epoch greater than current epoch, current epoch %d, requesting %d",
-			currentEpoch,
-			requestedEpoch,
-		)
-	}
-	// Use the last slot of requested epoch to obtain current and previous epoch attestations.
-	// This ensures that we don't miss previous attestations when input requested epochs.
-	endSlot, err := slots.EpochEnd(requestedEpoch)
-	if err != nil {
-		return nil, err
-	}
-	// Get as close as we can to the end of the current epoch without going past the current slot.
-	// The above check ensures a future *epoch* isn't requested, but the end slot of the requested epoch could still
-	// be past the current slot. In that case, use the current slot as the best approximation of the requested epoch.
-	// Replayer will make sure the slot ultimately used is canonical.
-	if endSlot > currentSlot {
-		endSlot = currentSlot
-	}
-
-	// ReplayerBuilder ensures that a canonical chain is followed to the slot
-	beaconState, err := bs.ReplayerBuilder.ReplayerForSlot(endSlot).ReplayBlocks(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Internal, fmt.Sprintf("error replaying blocks for state at slot %d: %v", endSlot, err))
-	}
-	var v []*precompute.Validator
-	var b *precompute.Balance
-
-	if beaconState.Version() == version.Phase0 {
-		v, b, err = precompute.New(ctx, beaconState)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not set up pre compute instance: %v", err)
-		}
-		_, b, err = precompute.ProcessAttestations(ctx, beaconState, v, b)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not pre compute attestations: %v", err)
-		}
-	} else if beaconState.Version() >= version.Altair {
-		v, b, err = altair.InitializePrecomputeValidators(ctx, beaconState)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not set up altair pre compute instance: %v", err)
-		}
-		_, b, err = altair.ProcessEpochParticipation(ctx, beaconState, b, v)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not pre compute attestations: %v", err)
-		}
-	} else {
-		return nil, status.Errorf(codes.Internal, "Invalid state type retrieved with a version of %d", beaconState.Version())
-	}
-
-	cp := bs.FinalizationFetcher.FinalizedCheckpt()
-	p := &zondpb.ValidatorParticipationResponse{
-		Epoch:     requestedEpoch,
-		Finalized: requestedEpoch <= cp.Epoch,
-		Participation: &zondpb.ValidatorParticipation{
-			CurrentEpochActiveGwei:           b.ActiveCurrentEpoch,
-			CurrentEpochAttestingGwei:        b.CurrentEpochAttested,
-			CurrentEpochTargetAttestingGwei:  b.CurrentEpochTargetAttested,
-			PreviousEpochActiveGwei:          b.ActivePrevEpoch,
-			PreviousEpochAttestingGwei:       b.PrevEpochAttested,
-			PreviousEpochTargetAttestingGwei: b.PrevEpochTargetAttested,
-			PreviousEpochHeadAttestingGwei:   b.PrevEpochHeadAttested,
-		},
-	}
-
-	return p, nil
-}
-
-// GetValidatorQueue retrieves the current validator queue information.
-func (bs *Server) GetValidatorQueue(
-	ctx context.Context, _ *emptypb.Empty,
-) (*zondpb.ValidatorQueue, error) {
-	headState, err := bs.HeadFetcher.HeadState(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not get head state: %v", err)
-	}
-	// Queue the validators whose eligible to activate and sort them by activation eligibility epoch number.
-	// Additionally, determine those validators queued to exit
-	awaitingExit := make([]primitives.ValidatorIndex, 0)
-	exitEpochs := make([]primitives.Epoch, 0)
-	activationQ := make([]primitives.ValidatorIndex, 0)
-	vals := headState.Validators()
-	for idx, validator := range vals {
-		eligibleActivated := validator.ActivationEligibilityEpoch != params.BeaconConfig().FarFutureEpoch
-		canBeActive := validator.ActivationEpoch >= helpers.ActivationExitEpoch(headState.FinalizedCheckpointEpoch())
-		if eligibleActivated && canBeActive {
-			activationQ = append(activationQ, primitives.ValidatorIndex(idx))
-		}
-		if validator.ExitEpoch != params.BeaconConfig().FarFutureEpoch {
-			exitEpochs = append(exitEpochs, validator.ExitEpoch)
-			awaitingExit = append(awaitingExit, primitives.ValidatorIndex(idx))
-		}
-	}
-	sort.Slice(activationQ, func(i, j int) bool {
-		return vals[i].ActivationEligibilityEpoch < vals[j].ActivationEligibilityEpoch
-	})
-	sort.Slice(awaitingExit, func(i, j int) bool {
-		return vals[i].WithdrawableEpoch < vals[j].WithdrawableEpoch
-	})
-
-	// Only activate just enough validators according to the activation churn limit.
-	activeValidatorCount, err := helpers.ActiveValidatorCount(ctx, headState, coreTime.CurrentEpoch(headState))
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not get active validator count: %v", err)
-	}
-	churnLimit, err := helpers.ValidatorChurnLimit(activeValidatorCount)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not compute churn limit: %v", err)
-	}
-
-	exitQueueEpoch := primitives.Epoch(0)
-	for _, i := range exitEpochs {
-		if exitQueueEpoch < i {
-			exitQueueEpoch = i
-		}
-	}
-	exitQueueChurn := uint64(0)
-	for _, val := range vals {
-		if val.ExitEpoch == exitQueueEpoch {
-			exitQueueChurn++
-		}
-	}
-	// Prevent churn limit from causing index out of bound issues.
-	if churnLimit < exitQueueChurn {
-		// If we are above the churn limit, we simply increase the churn by one.
-		exitQueueEpoch++
-	}
-
-	// We use the exit queue churn to determine if we have passed a churn limit.
-	minEpoch := exitQueueEpoch + params.BeaconConfig().MinValidatorWithdrawabilityDelay
-	exitQueueIndices := make([]primitives.ValidatorIndex, 0)
-	for _, valIdx := range awaitingExit {
-		val := vals[valIdx]
-		// Ensure the validator has not yet exited before adding its index to the exit queue.
-		if val.WithdrawableEpoch < minEpoch && !validatorHasExited(val, coreTime.CurrentEpoch(headState)) {
-			exitQueueIndices = append(exitQueueIndices, valIdx)
-		}
-	}
-
-	// Get the public keys for the validators in the queues up to the allowed churn limits.
-	activationQueueKeys := make([][]byte, len(activationQ))
-	exitQueueKeys := make([][]byte, len(exitQueueIndices))
-	for i, idx := range activationQ {
-		activationQueueKeys[i] = vals[idx].PublicKey
-	}
-	for i, idx := range exitQueueIndices {
-		exitQueueKeys[i] = vals[idx].PublicKey
-	}
-
-	return &zondpb.ValidatorQueue{
-		ChurnLimit:                 churnLimit,
-		ActivationPublicKeys:       activationQueueKeys,
-		ExitPublicKeys:             exitQueueKeys,
-		ActivationValidatorIndices: activationQ,
-		ExitValidatorIndices:       exitQueueIndices,
-	}, nil
-}
-
 // GetValidatorPerformance reports the validator's latest balance along with other important metrics on
 // rewards and penalties throughout its lifecycle in the beacon chain.
 func (bs *Server) GetValidatorPerformance(
@@ -711,19 +531,10 @@ func (bs *Server) GetIndividualVotes(
 
 	var v []*precompute.Validator
 	var bal *precompute.Balance
-	if st.Version() == version.Phase0 {
-		v, bal, err = precompute.New(ctx, st)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not set up pre compute instance: %v", err)
-		}
-		v, _, err = precompute.ProcessAttestations(ctx, st, v, bal)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not pre compute attestations: %v", err)
-		}
-	} else if st.Version() >= version.Altair {
+	if st.Version() >= version.Capella {
 		v, bal, err = altair.InitializePrecomputeValidators(ctx, st)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not set up altair pre compute instance: %v", err)
+			return nil, status.Errorf(codes.Internal, "Could not set up capella pre compute instance: %v", err)
 		}
 		v, _, err = altair.ProcessEpochParticipation(ctx, st, bal, v)
 		if err != nil {
@@ -757,8 +568,6 @@ func (bs *Server) GetIndividualVotes(
 			IsPreviousEpochTargetAttester:    v[index].IsPrevEpochTargetAttester,
 			IsPreviousEpochHeadAttester:      v[index].IsPrevEpochHeadAttester,
 			CurrentEpochEffectiveBalanceGwei: v[index].CurrentEpochEffectiveBalance,
-			InclusionSlot:                    v[index].InclusionSlot,
-			InclusionDistance:                v[index].InclusionDistance,
 			InactivityScore:                  v[index].InactivityScore,
 		})
 	}

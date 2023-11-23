@@ -36,10 +36,10 @@ func (m *MockbeaconBlockConverter) EXPECT() *MockbeaconBlockConverterMockRecorde
 }
 
 // ConvertRESTCapellaBlockToProto mocks base method.
-func (m *MockbeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*zond.BeaconBlockCapella, error) {
+func (m *MockbeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockJson) (*zond.BeaconBlock, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ConvertRESTCapellaBlockToProto", block)
-	ret0, _ := ret[0].(*zond.BeaconBlockCapella)
+	ret0, _ := ret[0].(*zond.BeaconBlock)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -39,8 +39,7 @@ func (vs *Server) GetValidatorPerformance(w http.ResponseWriter, r *http.Request
 	computed, err := vs.CoreService.ComputeValidatorPerformance(
 		r.Context(),
 		&zondpb.ValidatorPerformanceRequest{
-			PublicKeys: req.PublicKeys,
-			Indices:    req.Indices,
+			Indices: req.Indices,
 		},
 	)
 	if err != nil {

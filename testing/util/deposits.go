@@ -5,8 +5,6 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
-
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"

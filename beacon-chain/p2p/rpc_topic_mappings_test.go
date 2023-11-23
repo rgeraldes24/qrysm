@@ -7,8 +7,6 @@ import (
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -48,7 +46,7 @@ func TestTopicDeconstructor(t *testing.T) {
 		{
 			name:          "malformed status topic",
 			topic:         protocolPrefix + "/statis" + SchemaVersionV1,
-			expectedError: "unable to find a valid message for /eth2/beacon_chain/req/statis/1",
+			expectedError: "unable to find a valid message for /zond2/beacon_chain/req/statis/1",
 			output:        []string{""},
 		},
 		{
@@ -60,7 +58,7 @@ func TestTopicDeconstructor(t *testing.T) {
 		{
 			name:          "beacon block by range topic with malformed version",
 			topic:         protocolPrefix + BeaconBlocksByRangeMessageName + "/v" + "/ssz_snappy",
-			expectedError: "unable to find a valid schema version for /eth2/beacon_chain/req/beacon_blocks_by_range/v/ssz_snappy",
+			expectedError: "unable to find a valid schema version for /zond2/beacon_chain/req/beacon_blocks_by_range/v/ssz_snappy",
 			output:        []string{""},
 		},
 	}
@@ -83,19 +81,18 @@ func TestTopicDeconstructor(t *testing.T) {
 
 func TestTopicFromMessage_CorrectType(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	bCfg := params.BeaconConfig().Copy()
-	forkEpoch := primitives.Epoch(100)
-	bCfg.AltairForkEpoch = forkEpoch
-	bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.AltairForkVersion)] = primitives.Epoch(100)
-	params.OverrideBeaconConfig(bCfg)
+	//bCfg := params.BeaconConfig().Copy()
+	//bCfg.AltairForkEpoch = forkEpoch
+	//bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.AltairForkVersion)] = primitives.Epoch(100)
+	//params.OverrideBeaconConfig(bCfg)
 
 	// Garbage Message
 	badMsg := "wljdjska"
-	_, err := TopicFromMessage(badMsg, 0)
+	_, err := TopicFromMessage(badMsg)
 	assert.ErrorContains(t, fmt.Sprintf("%s: %s", invalidRPCMessageType, badMsg), err)
 	// Before Fork
 	for m := range messageMapping {
-		topic, err := TopicFromMessage(m, 0)
+		topic, err := TopicFromMessage(m)
 		assert.NoError(t, err)
 
 		assert.Equal(t, true, strings.Contains(topic, SchemaVersionV1))
@@ -104,21 +101,23 @@ func TestTopicFromMessage_CorrectType(t *testing.T) {
 		assert.Equal(t, SchemaVersionV1, version)
 	}
 
-	// Altair Fork
-	for m := range messageMapping {
-		topic, err := TopicFromMessage(m, forkEpoch)
-		assert.NoError(t, err)
+	/*
+		for m := range messageMapping {
+			//topic, err := TopicFromMessage(m, forkEpoch)
+			topic, err := TopicFromMessage(m)
+			assert.NoError(t, err)
 
-		if altairMapping[m] {
-			assert.Equal(t, true, strings.Contains(topic, SchemaVersionV2))
-			_, _, version, err := TopicDeconstructor(topic)
-			assert.NoError(t, err)
-			assert.Equal(t, SchemaVersionV2, version)
-		} else {
-			assert.Equal(t, true, strings.Contains(topic, SchemaVersionV1))
-			_, _, version, err := TopicDeconstructor(topic)
-			assert.NoError(t, err)
-			assert.Equal(t, SchemaVersionV1, version)
+			if altairMapping[m] {
+				assert.Equal(t, true, strings.Contains(topic, SchemaVersionV2))
+				_, _, version, err := TopicDeconstructor(topic)
+				assert.NoError(t, err)
+				assert.Equal(t, SchemaVersionV2, version)
+			} else {
+				assert.Equal(t, true, strings.Contains(topic, SchemaVersionV1))
+				_, _, version, err := TopicDeconstructor(topic)
+				assert.NoError(t, err)
+				assert.Equal(t, SchemaVersionV1, version)
+			}
 		}
-	}
+	*/
 }

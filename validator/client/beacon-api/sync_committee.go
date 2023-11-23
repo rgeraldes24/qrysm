@@ -150,16 +150,32 @@ func convertSyncContributionJsonToProto(contribution *apimiddleware.SyncCommitte
 		return nil, errors.Wrapf(err, "failed to decode aggregation bits `%s`", contribution.ParticipationBits)
 	}
 
-	signature, err := hexutil.Decode(contribution.Signature)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode contribution signature `%s`", contribution.Signature)
+	var signatures [][]byte
+	for _, sig := range contribution.Signatures {
+		decodedSig, err := hexutil.Decode(sig)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to decode contribution signature `%s`", sig)
+		}
+
+		signatures = append(signatures, decodedSig)
+	}
+
+	var signaturesIdxToParticipationIdx []uint64
+	for _, participationIdx := range contribution.SignaturesIdxToParticipationIdx {
+		participationIdxUint, err := strconv.ParseUint(participationIdx, 10, 64)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to parse slot `%s`", contribution.Slot)
+		}
+
+		signaturesIdxToParticipationIdx = append(signaturesIdxToParticipationIdx, participationIdxUint)
 	}
 
 	return &zondpb.SyncCommitteeContribution{
-		Slot:              primitives.Slot(slot),
-		BlockRoot:         blockRoot,
-		SubcommitteeIndex: subcommitteeIdx,
-		ParticipationBits: aggregationBits,
-		Signature:         signature,
+		Slot:                            primitives.Slot(slot),
+		BlockRoot:                       blockRoot,
+		SubcommitteeIndex:               subcommitteeIdx,
+		ParticipationBits:               aggregationBits,
+		Signatures:                      signatures,
+		SignaturesIdxToParticipationIdx: signaturesIdxToParticipationIdx,
 	}, nil
 }

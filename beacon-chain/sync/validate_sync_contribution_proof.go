@@ -131,7 +131,7 @@ func rejectIncorrectSubcommitteeIndex(
 
 func rejectEmptyContribution(m *zondpb.SignedContributionAndProof) validationFn {
 	return func(ctx context.Context) (pubsub.ValidationResult, error) {
-		bVector := m.Message.Contribution.AggregationBits
+		bVector := m.Message.Contribution.ParticipationBits
 		// In the event no bit is set for the
 		// sync contribution, we reject the message.
 		if bVector.Count() == 0 {
@@ -238,7 +238,7 @@ func (s *Service) rejectInvalidContributionSignature(m *zondpb.SignedContributio
 		set := &dilithium.SignatureBatch{
 			Messages:     [][32]byte{root},
 			PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
-			Signatures:   [][]byte{m.Signature},
+			Signatures:   [][][]byte{[][]byte{m.Signature}},
 			Descriptions: []string{signing.ContributionSignature},
 		}
 		return s.validateWithBatchVerifier(ctx, "sync contribution signature", set)
@@ -257,7 +257,7 @@ func (s *Service) rejectInvalidSyncAggregateSignature(m *zondpb.SignedContributi
 		if err != nil {
 			return pubsub.ValidationIgnore, err
 		}
-		bVector := m.Message.Contribution.AggregationBits
+		bVector := m.Message.Contribution.ParticipationBits
 		// In the event no bit is set for the
 		// sync contribution, we reject the message.
 		if bVector.Count() == 0 {
@@ -287,7 +287,7 @@ func (s *Service) rejectInvalidSyncAggregateSignature(m *zondpb.SignedContributi
 		set := &dilithium.SignatureBatch{
 			Messages:     [][32]byte{sigRoot},
 			PublicKeys:   [][]dilithium.PublicKey{publicKeys},
-			Signatures:   [][]byte{m.Message.Contribution.Signature},
+			Signatures:   [][][]byte{m.Message.Contribution.Signatures},
 			Descriptions: []string{signing.SyncAggregateSignature},
 		}
 		return s.validateWithBatchVerifier(ctx, "sync contribution aggregate signature", set)
@@ -323,21 +323,21 @@ func (s *Service) setSyncContributionBits(c *zondpb.SyncCommitteeContribution) e
 	b = append(b, bytesutil.Bytes32(c.SubcommitteeIndex)...)
 	v, ok := s.syncContributionBitsOverlapCache.Get(string(b))
 	if !ok {
-		s.syncContributionBitsOverlapCache.Add(string(b), [][]byte{c.AggregationBits.Bytes()})
+		s.syncContributionBitsOverlapCache.Add(string(b), [][]byte{c.ParticipationBits.Bytes()})
 		return nil
 	}
 	bitsList, ok := v.([][]byte)
 	if !ok {
 		return errors.New("could not convert cached value to []bitfield.Bitvector")
 	}
-	has, err := bitListOverlaps(bitsList, c.AggregationBits)
+	has, err := bitListOverlaps(bitsList, c.ParticipationBits)
 	if err != nil {
 		return err
 	}
 	if has {
 		return nil
 	}
-	s.syncContributionBitsOverlapCache.Add(string(b), append(bitsList, c.AggregationBits.Bytes()))
+	s.syncContributionBitsOverlapCache.Add(string(b), append(bitsList, c.ParticipationBits.Bytes()))
 	return nil
 }
 
@@ -355,7 +355,7 @@ func (s *Service) hasSeenSyncContributionBits(c *zondpb.SyncCommitteeContributio
 	if !ok {
 		return false, errors.New("could not convert cached value to []bitfield.Bitvector128")
 	}
-	return bitListOverlaps(bitsList, c.AggregationBits.Bytes())
+	return bitListOverlaps(bitsList, c.ParticipationBits.Bytes())
 }
 
 // bitListOverlaps returns true if there's an overlap between two bitlists.
@@ -399,7 +399,7 @@ func (s *Service) verifySyncSelectionData(ctx context.Context, m *zondpb.Contrib
 	set := &dilithium.SignatureBatch{
 		Messages:     [][32]byte{root},
 		PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
-		Signatures:   [][]byte{m.SelectionProof},
+		Signatures:   [][][]byte{[][]byte{m.SelectionProof}},
 		Descriptions: []string{signing.SyncSelectionProof},
 	}
 	valid, err := s.validateWithBatchVerifier(ctx, "sync contribution selection signature", set)

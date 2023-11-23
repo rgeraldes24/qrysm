@@ -27,7 +27,6 @@ import (
 	"github.com/theQRL/qrysm/v4/math"
 	pb "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
-	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
 )
 
@@ -205,23 +204,34 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 	ctx, cancel := context.WithDeadline(ctx, d)
 	defer cancel()
 
-	if slots.ToEpoch(slot) >= params.BeaconConfig().CapellaForkEpoch {
-		result := &pb.ExecutionPayloadWithValue{}
-		err := s.rpcClient.CallContext(ctx, result, GetPayloadMethodV2, pb.PayloadIDBytes(payloadId))
-		if err != nil {
-			return nil, handleRPCError(err)
-		}
+	// if slots.ToEpoch(slot) >= params.BeaconConfig().CapellaForkEpoch {
+	// 	result := &pb.ExecutionPayloadWithValue{}
+	// 	err := s.rpcClient.CallContext(ctx, result, GetPayloadMethodV2, pb.PayloadIDBytes(payloadId))
+	// 	if err != nil {
+	// 		return nil, handleRPCError(err)
+	// 	}
 
-		v := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(result.Value))
-		return blocks.WrappedExecutionPayload(result.Payload, math.WeiToGwei(v))
-	}
+	// 	v := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(result.Value))
+	// 	return blocks.WrappedExecutionPayload(result.Payload, math.WeiToGwei(v))
+	// }
 
-	result := &pb.ExecutionPayload{}
+	result := &pb.ExecutionPayloadWithValue{}
 	err := s.rpcClient.CallContext(ctx, result, GetPayloadMethod, pb.PayloadIDBytes(payloadId))
 	if err != nil {
 		return nil, handleRPCError(err)
 	}
-	return blocks.WrappedExecutionPayload(result)
+
+	v := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(result.Value))
+	return blocks.WrappedExecutionPayload(result.Payload, math.WeiToGwei(v))
+
+	/*
+		result := &pb.ExecutionPayload{}
+		err := s.rpcClient.CallContext(ctx, result, GetPayloadMethod, pb.PayloadIDBytes(payloadId))
+		if err != nil {
+			return nil, handleRPCError(err)
+		}
+		return blocks.WrappedExecutionPayload(result)
+	*/
 }
 
 // ExchangeTransitionConfiguration calls the engine_exchangeTransitionConfigurationV1 method via JSON-RPC.
@@ -520,11 +530,13 @@ func (s *Service) ReconstructFullBlock(
 	// simply return the block with an empty execution payload.
 	if bytes.Equal(header.BlockHash(), params.BeaconConfig().ZeroHash[:]) {
 		var payload interface{}
-		if blindedBlock.Version() == version.Bellatrix {
-			payload = buildEmptyExecutionPayload()
-		} else {
-			payload = buildEmptyExecutionPayloadCapella()
-		}
+		// if blindedBlock.Version() == version.Bellatrix {
+		// 	payload = buildEmptyExecutionPayload()
+		// } else {
+		// 	payload = buildEmptyExecutionPayloadCapella()
+		// }
+		payload = buildEmptyExecutionPayload()
+
 		return blocks.BuildSignedBeaconBlockFromExecutionPayload(blindedBlock, payload)
 	}
 
@@ -584,11 +596,12 @@ func (s *Service) ReconstructFullBellatrixBlockBatch(
 	// execution payload.
 	for _, realIdx := range zeroExecPayloads {
 		var payload interface{}
-		if blindedBlocks[realIdx].Version() == version.Bellatrix {
-			payload = buildEmptyExecutionPayload()
-		} else {
-			payload = buildEmptyExecutionPayloadCapella()
-		}
+		// if blindedBlocks[realIdx].Version() == version.Bellatrix {
+		// 	payload = buildEmptyExecutionPayload()
+		// } else {
+		// 	payload = buildEmptyExecutionPayloadCapella()
+		// }
+		payload = buildEmptyExecutionPayload()
 		fullBlock, err := blocks.BuildSignedBeaconBlockFromExecutionPayload(blindedBlocks[realIdx], payload)
 		if err != nil {
 			return nil, err
@@ -712,25 +725,7 @@ func fullPayloadFromExecutionBlock(
 		txs[i] = txBin
 	}
 
-	if block.Version == version.Bellatrix {
-		return blocks.WrappedExecutionPayload(&pb.ExecutionPayload{
-			ParentHash:    header.ParentHash(),
-			FeeRecipient:  header.FeeRecipient(),
-			StateRoot:     header.StateRoot(),
-			ReceiptsRoot:  header.ReceiptsRoot(),
-			LogsBloom:     header.LogsBloom(),
-			PrevRandao:    header.PrevRandao(),
-			BlockNumber:   header.BlockNumber(),
-			GasLimit:      header.GasLimit(),
-			GasUsed:       header.GasUsed(),
-			Timestamp:     header.Timestamp(),
-			ExtraData:     header.ExtraData(),
-			BaseFeePerGas: header.BaseFeePerGas(),
-			BlockHash:     blockHash[:],
-			Transactions:  txs,
-		})
-	}
-	return blocks.WrappedExecutionPayloadCapella(&pb.ExecutionPayloadCapella{
+	return blocks.WrappedExecutionPayload(&pb.ExecutionPayload{
 		ParentHash:    header.ParentHash(),
 		FeeRecipient:  header.FeeRecipient(),
 		StateRoot:     header.StateRoot(),
@@ -756,25 +751,25 @@ func fullPayloadFromPayloadBody(
 		return nil, errors.New("execution block and header cannot be nil")
 	}
 
-	if bVersion == version.Bellatrix {
-		return blocks.WrappedExecutionPayload(&pb.ExecutionPayload{
-			ParentHash:    header.ParentHash(),
-			FeeRecipient:  header.FeeRecipient(),
-			StateRoot:     header.StateRoot(),
-			ReceiptsRoot:  header.ReceiptsRoot(),
-			LogsBloom:     header.LogsBloom(),
-			PrevRandao:    header.PrevRandao(),
-			BlockNumber:   header.BlockNumber(),
-			GasLimit:      header.GasLimit(),
-			GasUsed:       header.GasUsed(),
-			Timestamp:     header.Timestamp(),
-			ExtraData:     header.ExtraData(),
-			BaseFeePerGas: header.BaseFeePerGas(),
-			BlockHash:     header.BlockHash(),
-			Transactions:  body.Transactions,
-		})
-	}
-	return blocks.WrappedExecutionPayloadCapella(&pb.ExecutionPayloadCapella{
+	// if bVersion == version.Bellatrix {
+	// 	return blocks.WrappedExecutionPayload(&pb.ExecutionPayload{
+	// 		ParentHash:    header.ParentHash(),
+	// 		FeeRecipient:  header.FeeRecipient(),
+	// 		StateRoot:     header.StateRoot(),
+	// 		ReceiptsRoot:  header.ReceiptsRoot(),
+	// 		LogsBloom:     header.LogsBloom(),
+	// 		PrevRandao:    header.PrevRandao(),
+	// 		BlockNumber:   header.BlockNumber(),
+	// 		GasLimit:      header.GasLimit(),
+	// 		GasUsed:       header.GasUsed(),
+	// 		Timestamp:     header.Timestamp(),
+	// 		ExtraData:     header.ExtraData(),
+	// 		BaseFeePerGas: header.BaseFeePerGas(),
+	// 		BlockHash:     header.BlockHash(),
+	// 		Transactions:  body.Transactions,
+	// 	})
+	// }
+	return blocks.WrappedExecutionPayload(&pb.ExecutionPayload{
 		ParentHash:    header.ParentHash(),
 		FeeRecipient:  header.FeeRecipient(),
 		StateRoot:     header.StateRoot(),
@@ -878,6 +873,7 @@ func tDStringToUint256(td string) (*uint256.Int, error) {
 	return i, nil
 }
 
+/*
 func buildEmptyExecutionPayload() *pb.ExecutionPayload {
 	return &pb.ExecutionPayload{
 		ParentHash:    make([]byte, fieldparams.RootLength),
@@ -892,9 +888,10 @@ func buildEmptyExecutionPayload() *pb.ExecutionPayload {
 		ExtraData:     make([]byte, 0),
 	}
 }
+*/
 
-func buildEmptyExecutionPayloadCapella() *pb.ExecutionPayloadCapella {
-	return &pb.ExecutionPayloadCapella{
+func buildEmptyExecutionPayload() *pb.ExecutionPayload {
+	return &pb.ExecutionPayload{
 		ParentHash:    make([]byte, fieldparams.RootLength),
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     make([]byte, fieldparams.RootLength),

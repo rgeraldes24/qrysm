@@ -99,40 +99,35 @@ func (s *Service) registerSubscribers(epoch primitives.Epoch, digest [4]byte) {
 			digest,
 		)
 	}
-	// Altair Fork Version
-	if epoch >= params.BeaconConfig().AltairForkEpoch {
-		s.subscribe(
-			p2p.SyncContributionAndProofSubnetTopicFormat,
-			s.validateSyncContributionAndProof,
-			s.syncContributionAndProofSubscriber,
+
+	s.subscribe(
+		p2p.SyncContributionAndProofSubnetTopicFormat,
+		s.validateSyncContributionAndProof,
+		s.syncContributionAndProofSubscriber,
+		digest,
+	)
+	if flags.Get().SubscribeToAllSubnets {
+		s.subscribeStaticWithSyncSubnets(
+			p2p.SyncCommitteeSubnetTopicFormat,
+			s.validateSyncCommitteeMessage,   /* validator */
+			s.syncCommitteeMessageSubscriber, /* message handler */
 			digest,
 		)
-		if flags.Get().SubscribeToAllSubnets {
-			s.subscribeStaticWithSyncSubnets(
-				p2p.SyncCommitteeSubnetTopicFormat,
-				s.validateSyncCommitteeMessage,   /* validator */
-				s.syncCommitteeMessageSubscriber, /* message handler */
-				digest,
-			)
-		} else {
-			s.subscribeDynamicWithSyncSubnets(
-				p2p.SyncCommitteeSubnetTopicFormat,
-				s.validateSyncCommitteeMessage,   /* validator */
-				s.syncCommitteeMessageSubscriber, /* message handler */
-				digest,
-			)
-		}
+	} else {
+		s.subscribeDynamicWithSyncSubnets(
+			p2p.SyncCommitteeSubnetTopicFormat,
+			s.validateSyncCommitteeMessage,   /* validator */
+			s.syncCommitteeMessageSubscriber, /* message handler */
+			digest,
+		)
 	}
 
-	// New Gossip Topic in Capella
-	if epoch >= params.BeaconConfig().CapellaForkEpoch {
-		s.subscribe(
-			p2p.DilithiumToExecutionChangeSubnetTopicFormat,
-			s.validateDilithiumToExecutionChange,
-			s.dilithiumToExecutionChangeSubscriber,
-			digest,
-		)
-	}
+	s.subscribe(
+		p2p.DilithiumToExecutionChangeSubnetTopicFormat,
+		s.validateDilithiumToExecutionChange,
+		s.dilithiumToExecutionChangeSubscriber,
+		digest,
+	)
 }
 
 // subscribe to a given topic with a given validator and subscription handler.

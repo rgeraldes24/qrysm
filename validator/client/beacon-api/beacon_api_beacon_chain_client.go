@@ -312,19 +312,9 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *zond
 	}, nil
 }
 
-func (c beaconApiBeaconChainClient) GetValidatorQueue(ctx context.Context, in *empty.Empty) (*zondpb.ValidatorQueue, error) {
-	if c.fallbackClient != nil {
-		return c.fallbackClient.GetValidatorQueue(ctx, in)
-	}
-
-	// TODO: Implement me
-	panic("beaconApiBeaconChainClient.GetValidatorQueue is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.")
-}
-
 func (c beaconApiBeaconChainClient) GetValidatorPerformance(ctx context.Context, in *zondpb.ValidatorPerformanceRequest) (*zondpb.ValidatorPerformanceResponse, error) {
 	request, err := json.Marshal(validator.ValidatorPerformanceRequest{
-		PublicKeys: in.PublicKeys,
-		Indices:    in.Indices,
+		Indices: in.Indices,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal request")
@@ -351,15 +341,6 @@ func (c beaconApiBeaconChainClient) GetValidatorPerformance(ctx context.Context,
 		PublicKeys:                    resp.PublicKeys,
 		InactivityScores:              resp.InactivityScores,
 	}, nil
-}
-
-func (c beaconApiBeaconChainClient) GetValidatorParticipation(ctx context.Context, in *zondpb.GetValidatorParticipationRequest) (*zondpb.ValidatorParticipationResponse, error) {
-	if c.fallbackClient != nil {
-		return c.fallbackClient.GetValidatorParticipation(ctx, in)
-	}
-
-	// TODO: Implement me
-	panic("beaconApiBeaconChainClient.GetValidatorParticipation is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.")
 }
 
 func NewBeaconApiBeaconChainClientWithFallback(host string, timeout time.Duration, fallbackClient iface.BeaconChainClient) iface.BeaconChainClient {

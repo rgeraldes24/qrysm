@@ -29,12 +29,12 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 
 	jsonCapellaBlock := &apimiddleware.SignedBeaconBlockCapellaContainerJson{
 		Signature: hexutil.Encode(capellaBlock.Capella.Signature),
-		Message: &apimiddleware.BeaconBlockCapellaJson{
+		Message: &apimiddleware.BeaconBlockJson{
 			ParentRoot:    hexutil.Encode(capellaBlock.Capella.Block.ParentRoot),
 			ProposerIndex: uint64ToString(capellaBlock.Capella.Block.ProposerIndex),
 			Slot:          uint64ToString(capellaBlock.Capella.Block.Slot),
 			StateRoot:     hexutil.Encode(capellaBlock.Capella.Block.StateRoot),
-			Body: &apimiddleware.BeaconBlockBodyCapellaJson{
+			Body: &apimiddleware.BeaconBlockBodyJson{
 				Attestations:      jsonifyAttestations(capellaBlock.Capella.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(capellaBlock.Capella.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(capellaBlock.Capella.Block.Body.Deposits),
@@ -43,11 +43,8 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 				ProposerSlashings: jsonifyProposerSlashings(capellaBlock.Capella.Block.Body.ProposerSlashings),
 				RandaoReveal:      hexutil.Encode(capellaBlock.Capella.Block.Body.RandaoReveal),
 				VoluntaryExits:    JsonifySignedVoluntaryExits(capellaBlock.Capella.Block.Body.VoluntaryExits),
-				SyncAggregate: &apimiddleware.SyncAggregateJson{
-					SyncCommitteeBits:      hexutil.Encode(capellaBlock.Capella.Block.Body.SyncAggregate.SyncCommitteeBits),
-					SyncCommitteeSignature: hexutil.Encode(capellaBlock.Capella.Block.Body.SyncAggregate.SyncCommitteeSignature),
-				},
-				ExecutionPayload: &apimiddleware.ExecutionPayloadCapellaJson{
+				SyncAggregate:     JsonifySignedSyncAggregate(capellaBlock.Capella.Block.Body.SyncAggregate),
+				ExecutionPayload: &apimiddleware.ExecutionPayloadJson{
 					BaseFeePerGas: bytesutil.LittleEndianBytesToBigInt(capellaBlock.Capella.Block.Body.ExecutionPayload.BaseFeePerGas).String(),
 					BlockHash:     hexutil.Encode(capellaBlock.Capella.Block.Body.ExecutionPayload.BlockHash),
 					BlockNumber:   uint64ToString(capellaBlock.Capella.Block.Body.ExecutionPayload.BlockNumber),

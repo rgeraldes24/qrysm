@@ -13,7 +13,7 @@ import (
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -137,7 +137,7 @@ func DeterministicGenesisStateWithGenesisBlock(
 	ctx context.Context,
 	db iface.HeadAccessDatabase,
 	numValidators uint64,
-) (state.BeaconState, [32]byte, []bls.SecretKey) {
+) (state.BeaconState, [32]byte, []dilithium.DilithiumKey) {
 	genesisState, privateKeys := DeterministicGenesisState(t, numValidators)
 	stateRoot, err := genesisState.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")

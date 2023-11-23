@@ -15,9 +15,7 @@ func (s *Service) forkWatcher() {
 		select {
 		case currSlot := <-slotTicker.C():
 			currEpoch := slots.ToEpoch(currSlot)
-			if currEpoch == params.BeaconConfig().AltairForkEpoch ||
-				currEpoch == params.BeaconConfig().BellatrixForkEpoch ||
-				currEpoch == params.BeaconConfig().CapellaForkEpoch {
+			if currEpoch == 0 {
 				// If we are in the fork epoch, we update our enr with
 				// the updated fork digest. These repeatedly does
 				// this over the epoch, which might be slightly wasteful
@@ -30,10 +28,13 @@ func (s *Service) forkWatcher() {
 				}
 
 				// from Bellatrix Epoch, the MaxGossipSize and the MaxChunkSize is changed to 10Mb.
-				if currEpoch == params.BeaconConfig().BellatrixForkEpoch {
-					encoder.SetMaxGossipSizeForBellatrix()
-					encoder.SetMaxChunkSizeForBellatrix()
-				}
+				// if currEpoch == params.BeaconConfig().BellatrixForkEpoch {
+				// 	encoder.SetMaxGossipSizeForBellatrix()
+				// 	encoder.SetMaxChunkSizeForBellatrix()
+				// }
+				encoder.SetMaxGossipSizeForBellatrix()
+				encoder.SetMaxChunkSizeForBellatrix()
+
 			}
 		case <-s.ctx.Done():
 			log.Debug("Context closed, exiting goroutine")

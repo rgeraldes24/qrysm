@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/bazelbuild/rules_go/go/tools/bazel"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/io/file"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -148,7 +147,7 @@ func TestEIP3076SpecTests(t *testing.T) {
 							Target:          &zondpb.Checkpoint{Epoch: target, Root: make([]byte, 32)},
 							Source:          &zondpb.Checkpoint{Epoch: source, Root: make([]byte, 32)},
 						},
-						Signatures: make([]byte, dilithium2.CryptoBytes),
+						Signatures: [][]byte{},
 					}
 
 					var signingRoot [32]byte

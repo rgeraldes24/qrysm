@@ -2,7 +2,6 @@ package beacon_api
 
 import (
 	"context"
-	"encoding/binary"
 	"fmt"
 	"strconv"
 
@@ -11,7 +10,6 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -78,17 +76,17 @@ func (c *beaconApiValidatorClient) checkDoppelGanger(ctx context.Context, in *zo
 		return nil, errors.Wrapf(err, "failed to get fork")
 	}
 
-	forkVersionBytes, err := hexutil.Decode(forkResponse.Data.CurrentVersion)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode fork version")
-	}
+	// forkVersionBytes, err := hexutil.Decode(forkResponse.Data.CurrentVersion)
+	// if err != nil {
+	// 	return nil, errors.Wrapf(err, "failed to decode fork version")
+	// }
 
-	forkVersion := binary.LittleEndian.Uint32(forkVersionBytes)
+	// forkVersion := binary.LittleEndian.Uint32(forkVersionBytes)
 
-	if forkVersion == version.Phase0 {
-		log.Info("Skipping doppelganger check for Phase 0")
-		return buildResponse(stringPubKeys, stringPubKeyToDoppelGangerInfo), nil
-	}
+	// if forkVersion == version.Phase0 {
+	// 	log.Info("Skipping doppelganger check for Phase 0")
+	// 	return buildResponse(stringPubKeys, stringPubKeyToDoppelGangerInfo), nil
+	// }
 
 	// Retrieve current epoch.
 	headers, err := c.getHeaders(ctx)

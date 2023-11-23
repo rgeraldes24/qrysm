@@ -189,9 +189,9 @@ func (s *Service) notifyNewPayload(ctx context.Context, preStateVersion int,
 	if blk == nil {
 		return false, errors.New("signed beacon block can't be nil")
 	}
-	if preStateVersion < version.Bellatrix {
-		return true, nil
-	}
+	// if preStateVersion < version.Bellatrix {
+	// 	return true, nil
+	// }
 	if err := consensusblocks.BeaconBlockIsNil(blk); err != nil {
 		return false, err
 	}
@@ -313,21 +313,11 @@ func (s *Service) getPayloadAttribute(ctx context.Context, st state.BeaconState,
 			log.WithError(err).Error("Could not get expected withdrawals to get payload attribute")
 			return false, emptyAttri, 0
 		}
-		attr, err = payloadattribute.New(&enginev1.PayloadAttributesV2{
-			Timestamp:             uint64(t.Unix()),
-			PrevRandao:            prevRando,
-			SuggestedFeeRecipient: feeRecipient.Bytes(),
-			Withdrawals:           withdrawals,
-		})
-		if err != nil {
-			log.WithError(err).Error("Could not get payload attribute")
-			return false, emptyAttri, 0
-		}
-	case version.Bellatrix:
 		attr, err = payloadattribute.New(&enginev1.PayloadAttributes{
 			Timestamp:             uint64(t.Unix()),
 			PrevRandao:            prevRando,
 			SuggestedFeeRecipient: feeRecipient.Bytes(),
+			Withdrawals:           withdrawals,
 		})
 		if err != nil {
 			log.WithError(err).Error("Could not get payload attribute")

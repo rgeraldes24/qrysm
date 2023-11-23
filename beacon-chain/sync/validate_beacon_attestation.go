@@ -117,7 +117,7 @@ func (s *Service) validateCommitteeIndexBeaconAttestation(ctx context.Context, p
 	}
 
 	// Verify this the first attestation received for the participating validator for the slot.
-	if s.hasSeenCommitteeIndicesSlot(att.Data.Slot, att.Data.CommitteeIndex, att.AggregationBits) {
+	if s.hasSeenCommitteeIndicesSlot(att.Data.Slot, att.Data.CommitteeIndex, att.ParticipationBits) {
 		return pubsub.ValidationIgnore, nil
 	}
 
@@ -163,7 +163,7 @@ func (s *Service) validateCommitteeIndexBeaconAttestation(ctx context.Context, p
 		return validationRes, err
 	}
 
-	s.setSeenCommitteeIndicesSlot(att.Data.Slot, att.Data.CommitteeIndex, att.AggregationBits)
+	s.setSeenCommitteeIndicesSlot(att.Data.Slot, att.Data.CommitteeIndex, att.ParticipationBits)
 
 	msg.ValidatorData = att
 
@@ -211,14 +211,14 @@ func (s *Service) validateUnaggregatedAttWithState(ctx context.Context, a *zond.
 	}
 
 	// Verify number of aggregation bits matches the committee size.
-	if err := helpers.VerifyBitfieldLength(a.AggregationBits, uint64(len(committee))); err != nil {
+	if err := helpers.VerifyBitfieldLength(a.ParticipationBits, uint64(len(committee))); err != nil {
 		return pubsub.ValidationReject, err
 	}
 
 	// Attestation must be unaggregated and the bit index must exist in the range of committee indices.
 	// Note: The Ethereum Beacon chain spec suggests (len(get_attesting_indices(state, attestation.data, attestation.aggregation_bits)) == 1)
 	// however this validation can be achieved without use of get_attesting_indices which is an O(n) lookup.
-	if a.AggregationBits.Count() != 1 || a.AggregationBits.BitIndices()[0] >= len(committee) {
+	if a.ParticipationBits.Count() != 1 || a.ParticipationBits.BitIndices()[0] >= len(committee) {
 		return pubsub.ValidationReject, errors.New("attestation bitfield is invalid")
 	}
 

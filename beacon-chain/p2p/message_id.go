@@ -47,18 +47,25 @@ func MsgID(genesisValidatorsRoot []byte, pmsg *pubsubpb.Message) string {
 		copy(msg, "invalid")
 		return string(msg)
 	}
-	if fEpoch >= params.BeaconConfig().AltairForkEpoch {
-		return postAltairMsgID(pmsg, fEpoch)
-	}
-	decodedData, err := encoder.DecodeSnappy(pmsg.Data, params.BeaconNetworkConfig().GossipMaxSize)
-	if err != nil {
-		combinedData := append(params.BeaconNetworkConfig().MessageDomainInvalidSnappy[:], pmsg.Data...)
+
+	/*
+		if fEpoch >= params.BeaconConfig().AltairForkEpoch {
+			return postAltairMsgID(pmsg, fEpoch)
+		}
+	*/
+	return postAltairMsgID(pmsg, fEpoch)
+
+	/*
+		decodedData, err := encoder.DecodeSnappy(pmsg.Data, params.BeaconNetworkConfig().GossipMaxSize)
+		if err != nil {
+			combinedData := append(params.BeaconNetworkConfig().MessageDomainInvalidSnappy[:], pmsg.Data...)
+			h := hash.Hash(combinedData)
+			return string(h[:20])
+		}
+		combinedData := append(params.BeaconNetworkConfig().MessageDomainValidSnappy[:], decodedData...)
 		h := hash.Hash(combinedData)
 		return string(h[:20])
-	}
-	combinedData := append(params.BeaconNetworkConfig().MessageDomainValidSnappy[:], decodedData...)
-	h := hash.Hash(combinedData)
-	return string(h[:20])
+	*/
 }
 
 // Spec:
@@ -78,10 +85,11 @@ func postAltairMsgID(pmsg *pubsubpb.Message, fEpoch primitives.Epoch) string {
 	topicLenBytes := bytesutil.Uint64ToBytesLittleEndian(uint64(topicLen)) // topicLen cannot be negative
 
 	// beyond Bellatrix epoch, allow 10 Mib gossip data size
-	gossipPubSubSize := params.BeaconNetworkConfig().GossipMaxSize
-	if fEpoch >= params.BeaconConfig().BellatrixForkEpoch {
-		gossipPubSubSize = params.BeaconNetworkConfig().GossipMaxSizeBellatrix
-	}
+	// gossipPubSubSize := params.BeaconNetworkConfig().GossipMaxSize
+	// if fEpoch >= params.BeaconConfig().BellatrixForkEpoch {
+	// 	gossipPubSubSize = params.BeaconNetworkConfig().GossipMaxSizeBellatrix
+	// }
+	gossipPubSubSize := params.BeaconNetworkConfig().GossipMaxSizeBellatrix
 
 	decodedData, err := encoder.DecodeSnappy(pmsg.Data, gossipPubSubSize)
 	if err != nil {

@@ -10,7 +10,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
@@ -38,20 +37,19 @@ func (c beaconApiValidatorClient) getDuties(ctx context.Context, in *zondpb.Duti
 	}
 
 	// Sync committees are an Altair feature
-	fetchSyncDuties := in.Epoch >= params.BeaconConfig().AltairForkEpoch
+	//fetchSyncDuties := in.Epoch >= params.BeaconConfig().AltairForkEpoch
 
-	currentEpochDuties, err := c.getDutiesForEpoch(ctx, in.Epoch, multipleValidatorStatus, fetchSyncDuties)
+	currentEpochDuties, err := c.getDutiesForEpoch(ctx, in.Epoch, multipleValidatorStatus)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get duties for current epoch `%d`", in.Epoch)
 	}
 
-	nextEpochDuties, err := c.getDutiesForEpoch(ctx, in.Epoch+1, multipleValidatorStatus, fetchSyncDuties)
+	nextEpochDuties, err := c.getDutiesForEpoch(ctx, in.Epoch+1, multipleValidatorStatus)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get duties for next epoch `%d`", in.Epoch+1)
 	}
 
 	return &zondpb.DutiesResponse{
-		Duties:             currentEpochDuties,
 		CurrentEpochDuties: currentEpochDuties,
 		NextEpochDuties:    nextEpochDuties,
 	}, nil
@@ -61,7 +59,6 @@ func (c beaconApiValidatorClient) getDutiesForEpoch(
 	ctx context.Context,
 	epoch primitives.Epoch,
 	multipleValidatorStatus *zondpb.MultipleValidatorStatusResponse,
-	fetchSyncDuties bool,
 ) ([]*zondpb.DutiesResponse_Duty, error) {
 	attesterDuties, err := c.dutiesProvider.GetAttesterDuties(ctx, epoch, multipleValidatorStatus.Indices)
 	if err != nil {
@@ -69,10 +66,8 @@ func (c beaconApiValidatorClient) getDutiesForEpoch(
 	}
 
 	var syncDuties []*apimiddleware.SyncCommitteeDuty
-	if fetchSyncDuties {
-		if syncDuties, err = c.dutiesProvider.GetSyncDuties(ctx, epoch, multipleValidatorStatus.Indices); err != nil {
-			return nil, errors.Wrapf(err, "failed to get sync duties for epoch `%d`", epoch)
-		}
+	if syncDuties, err = c.dutiesProvider.GetSyncDuties(ctx, epoch, multipleValidatorStatus.Indices); err != nil {
+		return nil, errors.Wrapf(err, "failed to get sync duties for epoch `%d`", epoch)
 	}
 
 	var proposerDuties []*apimiddleware.ProposerDutyJson

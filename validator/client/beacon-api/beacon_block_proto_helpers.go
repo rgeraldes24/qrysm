@@ -132,9 +132,13 @@ func convertIndexedAttestationToProto(jsonAttestation *apimiddleware.IndexedAtte
 		attestingIndices[index] = attestingIndex
 	}
 
-	signature, err := hexutil.Decode(jsonAttestation.Signature)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode attestation signature `%s`", jsonAttestation.Signature)
+	signatures := make([][]byte, len(jsonAttestation.Signatures))
+	var err error
+	for i, sig := range jsonAttestation.Signatures {
+		signatures[i], err = hexutil.Decode(sig)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to decode attestation signature `%s`", jsonAttestation.Signatures[i])
+		}
 	}
 
 	attestationData, err := convertAttestationDataToProto(jsonAttestation.Data)
@@ -145,7 +149,7 @@ func convertIndexedAttestationToProto(jsonAttestation *apimiddleware.IndexedAtte
 	return &zondpb.IndexedAttestation{
 		AttestingIndices: attestingIndices,
 		Data:             attestationData,
-		Signatures:       signature,
+		Signatures:       signatures,
 	}, nil
 }
 
@@ -175,7 +179,7 @@ func convertAttestationToProto(jsonAttestation *apimiddleware.AttestationJson) (
 		return nil, errors.New("json attestation is nil")
 	}
 
-	aggregationBits, err := hexutil.Decode(jsonAttestation.ParticipationBits)
+	participationBits, err := hexutil.Decode(jsonAttestation.ParticipationBits)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to decode aggregation bits `%s`", jsonAttestation.ParticipationBits)
 	}
@@ -185,15 +189,27 @@ func convertAttestationToProto(jsonAttestation *apimiddleware.AttestationJson) (
 		return nil, errors.Wrap(err, "failed to get attestation data")
 	}
 
-	signature, err := hexutil.Decode(jsonAttestation.Signature)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode attestation signature `%s`", jsonAttestation.Signature)
+	signatures := make([][]byte, len(jsonAttestation.Signatures))
+	for i, sig := range jsonAttestation.Signatures {
+		signatures[i], err = hexutil.Decode(sig)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to decode attestation signature `%s`", sig)
+		}
+	}
+
+	signaturesIdxToParticipationIdx := make([]uint64, len(jsonAttestation.SignaturesIdxToParticipationIdx))
+	for i, participationIdx := range jsonAttestation.SignaturesIdxToParticipationIdx {
+		signaturesIdxToParticipationIdx[i], err = strconv.ParseUint(participationIdx, 10, 64)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to parse attestation signature to participation index `%s`", participationIdx)
+		}
 	}
 
 	return &zondpb.Attestation{
-		ParticipationBits: aggregationBits,
-		Data:              attestationData,
-		Signatures:        signature,
+		ParticipationBits:               participationBits,
+		Data:                            attestationData,
+		Signatures:                      signatures,
+		SignaturesIdxToParticipationIdx: signaturesIdxToParticipationIdx,
 	}, nil
 }
 

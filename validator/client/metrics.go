@@ -7,7 +7,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -238,16 +237,9 @@ func (v *validator) LogValidatorGainsAndLosses(ctx context.Context, slot primiti
 		return nil
 	}
 
-	var pks [][dilithium2.CryptoPublicKeyBytes]byte
-	var err error
-	pks, err = v.keyManager.FetchValidatingPublicKeys(ctx)
-	if err != nil {
-		return err
-	}
-	pubKeys := bytesutil.FromBytes2592Array(pks)
-
+	// TODO(rgeraldes24)
 	req := &zondpb.ValidatorPerformanceRequest{
-		PublicKeys: pubKeys,
+		Indices: []primitives.ValidatorIndex{},
 	}
 	resp, err := v.beaconClient.GetValidatorPerformance(ctx, req)
 	if err != nil {
@@ -345,12 +337,10 @@ func (v *validator) logForEachValidator(index int, pubKey []byte, resp *zondpb.V
 			"percentChangeSinceStart": fmt.Sprintf("%.5f%%", percentSinceStart*100),
 		}
 
-		if slots.ToEpoch(slot) >= params.BeaconConfig().AltairForkEpoch {
-			if index < len(resp.InactivityScores) {
-				previousEpochSummaryFields["inactivityScore"] = resp.InactivityScores[index]
-			} else {
-				log.WithField("pubKey", truncatedKey).Warn("Missing inactivity score")
-			}
+		if index < len(resp.InactivityScores) {
+			previousEpochSummaryFields["inactivityScore"] = resp.InactivityScores[index]
+		} else {
+			log.WithField("pubKey", truncatedKey).Warn("Missing inactivity score")
 		}
 
 		log.WithFields(previousEpochSummaryFields).Info("Previous epoch voting summary")
@@ -372,11 +362,8 @@ func (v *validator) logForEachValidator(index int, pubKey []byte, resp *zondpb.V
 				ValidatorCorrectlyVotedHeadGaugeVec.WithLabelValues(fmtKey).Set(0)
 			}
 
-			// Phase0 specific metrics
-			if slots.ToEpoch(slot) >= params.BeaconConfig().AltairForkEpoch {
-				if index < len(resp.InactivityScores) {
-					ValidatorInactivityScoreGaugeVec.WithLabelValues(fmtKey).Set(float64(resp.InactivityScores[index]))
-				}
+			if index < len(resp.InactivityScores) {
+				ValidatorInactivityScoreGaugeVec.WithLabelValues(fmtKey).Set(float64(resp.InactivityScores[index]))
 			}
 		}
 	}
@@ -410,8 +397,8 @@ func (v *validator) UpdateLogAggregateStats(resp *zondpb.ValidatorPerformanceRes
 			attested++
 			summary.totalAttestedCount++
 		}
-		// Altair metrics
-		if slots.ToEpoch(slot) > params.BeaconConfig().AltairForkEpoch && i < len(resp.InactivityScores) {
+
+		if i < len(resp.InactivityScores) {
 			inactivityScore += int(resp.InactivityScores[i])
 		}
 	}
@@ -430,8 +417,8 @@ func (v *validator) UpdateLogAggregateStats(resp *zondpb.ValidatorPerformanceRes
 		"correctlyVotedHeadPct":   fmt.Sprintf("%.0f%%", (float64(correctHead)/float64(attested))*100),
 	}
 
-	// Altair summary fields.
-	if slots.ToEpoch(slot) > params.BeaconConfig().AltairForkEpoch && attested > 0 {
+	// summary fields.
+	if attested > 0 {
 		epochSummaryFields["averageInactivityScore"] = fmt.Sprintf("%.0f", float64(inactivityScore)/float64(len(resp.PublicKeys)))
 	}
 
@@ -459,11 +446,6 @@ func (v *validator) UpdateLogAggregateStats(resp *zondpb.ValidatorPerformanceRes
 		"correctlyVotedTargetPct":  fmt.Sprintf("%.0f%%", (float64(summary.totalCorrectTarget)/float64(summary.totalAttestedCount))*100),
 		"correctlyVotedHeadPct":    fmt.Sprintf("%.0f%%", (float64(summary.totalCorrectHead)/float64(summary.totalAttestedCount))*100),
 		"pctChangeCombinedBalance": fmt.Sprintf("%.5f%%", (float64(totalPrevBal)-float64(totalStartBal))/float64(totalStartBal)*100),
-	}
-
-	// Add phase0 specific fields
-	if slots.ToEpoch(slot) < params.BeaconConfig().AltairForkEpoch {
-		launchSummaryFields["averageInclusionDistance"] = fmt.Sprintf("%.2f slots", float64(summary.totalDistance)/float64(summary.totalAttestedCount))
 	}
 
 	log.WithFields(launchSummaryFields).Info("Vote summary since launch")

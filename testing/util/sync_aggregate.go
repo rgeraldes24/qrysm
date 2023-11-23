@@ -30,7 +30,7 @@ func generateSyncAggregate(st state.BeaconState, privs []bls.SecretKey, parentRo
 			return nil, err
 		}
 	}
-	sigs := make([]bls.Signature, 0, len(syncCommittee.Pubkeys))
+	sigs := make([][]byte, 0, len(syncCommittee.Pubkeys))
 	var bVector []byte
 	currSize := new(zondpb.SyncAggregate).SyncCommitteeBits.Len()
 	switch currSize {
@@ -56,7 +56,7 @@ func generateSyncAggregate(st state.BeaconState, privs []bls.SecretKey, parentRo
 		if err != nil {
 			return nil, err
 		}
-		sigs = append(sigs, privs[idx].Sign(r[:]))
+		sigs = append(sigs, privs[idx].Sign(r[:]).Marshal())
 		if currSize == 512 {
 			bitfield.Bitvector512(bVector).SetBitAt(uint64(i), true)
 		}
@@ -65,9 +65,9 @@ func generateSyncAggregate(st state.BeaconState, privs []bls.SecretKey, parentRo
 		}
 	}
 	if len(sigs) == 0 {
-		fakeSig := [96]byte{0xC0}
+		fakeSig := [4595]byte{0xC0}
 		return &zondpb.SyncAggregate{SyncCommitteeSignatures: [][]byte{fakeSig[:]}, SyncCommitteeBits: bVector}, nil
 	}
-	aggSig := bls.AggregateSignatures(sigs)
-	return &zondpb.SyncAggregate{SyncCommitteeSignatures: aggSig.Marshal(), SyncCommitteeBits: bVector}, nil
+	//aggSig := bls.AggregateSignatures(sigs)
+	return &zondpb.SyncAggregate{SyncCommitteeSignatures: sigs, SyncCommitteeBits: bVector}, nil
 }

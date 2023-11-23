@@ -16,7 +16,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -97,7 +96,8 @@ func (s *Service) getBlkParentHashAndTD(ctx context.Context, blkHash []byte) ([]
 	if blk == nil {
 		return nil, nil, errors.New("pow block is nil")
 	}
-	blk.Version = version.Bellatrix
+	// TODO(rgeraldes24)
+	//blk.Version = version.Bellatrix
 	blkTDBig, err := hexutil.DecodeBig(blk.TotalDifficulty)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not decode merge block total difficulty")

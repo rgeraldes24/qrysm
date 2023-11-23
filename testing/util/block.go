@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -83,7 +83,7 @@ func NewBeaconBlock() *zondpb.SignedBeaconBlock {
 // Use BlockGenConfig to declare the conditions you would like the block generated under.
 func GenerateFullBlock(
 	bState state.BeaconState,
-	privs []bls.SecretKey,
+	privs []dilithium.DilithiumKey,
 	conf *BlockGenConfig,
 	slot primitives.Slot,
 ) (*zondpb.SignedBeaconBlock, error) {
@@ -205,7 +205,7 @@ func GenerateFullBlock(
 // GenerateProposerSlashingForValidator for a specific validator index.
 func GenerateProposerSlashingForValidator(
 	bState state.BeaconState,
-	priv bls.SecretKey,
+	priv dilithium.DilithiumKey,
 	idx primitives.ValidatorIndex,
 ) (*zondpb.ProposerSlashing, error) {
 	header1 := HydrateSignedBeaconHeader(&zondpb.SignedBeaconBlockHeader{
@@ -244,7 +244,7 @@ func GenerateProposerSlashingForValidator(
 
 func generateProposerSlashings(
 	bState state.BeaconState,
-	privs []bls.SecretKey,
+	privs []dilithium.DilithiumKey,
 	numSlashings uint64,
 ) ([]*zondpb.ProposerSlashing, error) {
 	proposerSlashings := make([]*zondpb.ProposerSlashing, numSlashings)
@@ -265,7 +265,7 @@ func generateProposerSlashings(
 // GenerateAttesterSlashingForValidator for a specific validator index.
 func GenerateAttesterSlashingForValidator(
 	bState state.BeaconState,
-	priv bls.SecretKey,
+	priv dilithium.DilithiumKey,
 	idx primitives.ValidatorIndex,
 ) (*zondpb.AttesterSlashing, error) {
 	currentEpoch := time.CurrentEpoch(bState)
@@ -286,11 +286,11 @@ func GenerateAttesterSlashingForValidator(
 		},
 		AttestingIndices: []uint64{uint64(idx)},
 	}
-	var err error
-	att1.Signatures, err = signing.ComputeDomainAndSign(bState, currentEpoch, att1.Data, params.BeaconConfig().DomainBeaconAttester, priv)
+	sig, err := signing.ComputeDomainAndSign(bState, currentEpoch, att1.Data, params.BeaconConfig().DomainBeaconAttester, priv)
 	if err != nil {
 		return nil, err
 	}
+	att1.Signatures = [][]byte{sig}
 
 	att2 := &zondpb.IndexedAttestation{
 		Data: &zondpb.AttestationData{
@@ -308,10 +308,11 @@ func GenerateAttesterSlashingForValidator(
 		},
 		AttestingIndices: []uint64{uint64(idx)},
 	}
-	att2.Signatures, err = signing.ComputeDomainAndSign(bState, currentEpoch, att2.Data, params.BeaconConfig().DomainBeaconAttester, priv)
+	sig2, err := signing.ComputeDomainAndSign(bState, currentEpoch, att2.Data, params.BeaconConfig().DomainBeaconAttester, priv)
 	if err != nil {
 		return nil, err
 	}
+	att2.Signatures = [][]byte{sig2}
 
 	return &zondpb.AttesterSlashing{
 		Attestation_1: att1,
@@ -321,7 +322,7 @@ func GenerateAttesterSlashingForValidator(
 
 func generateAttesterSlashings(
 	bState state.BeaconState,
-	privs []bls.SecretKey,
+	privs []dilithium.DilithiumKey,
 	numSlashings uint64,
 ) ([]*zondpb.AttesterSlashing, error) {
 	attesterSlashings := make([]*zondpb.AttesterSlashing, numSlashings)
@@ -363,7 +364,7 @@ func generateDepositsAndZond1Data(
 	return currentDeposits[previousDepsLen:], zond1Data, nil
 }
 
-func GenerateVoluntaryExits(bState state.BeaconState, k bls.SecretKey, idx primitives.ValidatorIndex) (*zondpb.SignedVoluntaryExit, error) {
+func GenerateVoluntaryExits(bState state.BeaconState, k dilithium.DilithiumKey, idx primitives.ValidatorIndex) (*zondpb.SignedVoluntaryExit, error) {
 	currentEpoch := time.CurrentEpoch(bState)
 	exit := &zondpb.SignedVoluntaryExit{
 		Exit: &zondpb.VoluntaryExit{
@@ -381,7 +382,7 @@ func GenerateVoluntaryExits(bState state.BeaconState, k bls.SecretKey, idx primi
 
 func generateVoluntaryExits(
 	bState state.BeaconState,
-	privs []bls.SecretKey,
+	privs []dilithium.DilithiumKey,
 	numExits uint64,
 ) ([]*zondpb.SignedVoluntaryExit, error) {
 	currentEpoch := time.CurrentEpoch(bState)
@@ -465,7 +466,48 @@ func HydrateBeaconBlock(b *zondpb.BeaconBlock) *zondpb.BeaconBlock {
 	if b.StateRoot == nil {
 		b.StateRoot = make([]byte, fieldparams.RootLength)
 	}
-	b.Body = HydrateV1BeaconBlockBody(b.Body)
+	b.Body = HydrateBeaconBlockBody(b.Body)
+	return b
+}
+
+// HydrateBeaconBlockBody hydrates a beacon block body with correct field length sizes
+// to comply with fssz marshalling and unmarshalling rules.
+func HydrateBeaconBlockBody(b *zondpb.BeaconBlockBody) *zondpb.BeaconBlockBody {
+	if b == nil {
+		b = &zondpb.BeaconBlockBody{}
+	}
+	if b.RandaoReveal == nil {
+		b.RandaoReveal = make([]byte, dilithium2.CryptoBytes)
+	}
+	if b.Graffiti == nil {
+		b.Graffiti = make([]byte, fieldparams.RootLength)
+	}
+	if b.Zond1Data == nil {
+		b.Zond1Data = &zondpb.Zond1Data{
+			DepositRoot: make([]byte, fieldparams.RootLength),
+			BlockHash:   make([]byte, fieldparams.RootLength),
+		}
+	}
+	if b.SyncAggregate == nil {
+		b.SyncAggregate = &zondpb.SyncAggregate{
+			SyncCommitteeBits:       make([]byte, fieldparams.SyncAggregateSyncCommitteeBytesLength),
+			SyncCommitteeSignatures: make([][]byte, 0),
+		}
+	}
+	if b.ExecutionPayload == nil {
+		b.ExecutionPayload = &enginev1.ExecutionPayload{
+			ParentHash:    make([]byte, fieldparams.RootLength),
+			FeeRecipient:  make([]byte, 20),
+			StateRoot:     make([]byte, fieldparams.RootLength),
+			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
+			LogsBloom:     make([]byte, 256),
+			PrevRandao:    make([]byte, fieldparams.RootLength),
+			BaseFeePerGas: make([]byte, fieldparams.RootLength),
+			BlockHash:     make([]byte, fieldparams.RootLength),
+			Transactions:  make([][]byte, 0),
+			ExtraData:     make([]byte, 0),
+		}
+	}
 	return b
 }
 
@@ -475,7 +517,7 @@ func HydrateV1SignedBeaconBlock(b *v1.SignedBeaconBlock) *v1.SignedBeaconBlock {
 	if b.Signature == nil {
 		b.Signature = make([]byte, dilithium2.CryptoBytes)
 	}
-	b.Block = HydrateV1BeaconBlock(b.Block)
+	b.Message = HydrateV1BeaconBlock(b.Message)
 	return b
 }
 

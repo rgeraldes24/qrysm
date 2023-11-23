@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/helpers"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/helpers"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 )
 
@@ -388,7 +388,7 @@ type BlindedBeaconBlockJson struct {
 
 type BeaconBlockBodyJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	Eth1Data                    *Eth1DataJson                           `json:"eth1_data"`
+	Zond1Data                   *Zond1DataJson                          `json:"zond1_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -402,7 +402,7 @@ type BeaconBlockBodyJson struct {
 
 type BlindedBeaconBlockBodyJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	Eth1Data                    *Eth1DataJson                           `json:"eth1_data"`
+	Zond1Data                   *Zond1DataJson                          `json:"zond1_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -452,7 +452,7 @@ type ExecutionPayloadHeaderJson struct {
 
 type SyncAggregateJson struct {
 	SyncCommitteeBits           string   `json:"sync_committee_bits" hex:"true"`
-	SyncCommitteeSignatures     string   `json:"sync_committee_signatures" hex:"true"`
+	SyncCommitteeSignatures     []string `json:"sync_committee_signatures" hex:"true"`
 	SignaturesIdxToCommitteeIdx []string `json:"signatures_idx_to_committee_idx" hex:"true"`
 }
 
@@ -480,7 +480,7 @@ type BeaconBlockHeaderJson struct {
 	BodyRoot      string `json:"body_root" hex:"true"`
 }
 
-type Eth1DataJson struct {
+type Zond1DataJson struct {
 	DepositRoot  string `json:"deposit_root" hex:"true"`
 	DepositCount string `json:"deposit_count"`
 	BlockHash    string `json:"block_hash" hex:"true"`
@@ -607,9 +607,9 @@ type BeaconStateJson struct {
 	BlockRoots                   []string                    `json:"block_roots" hex:"true"`
 	StateRoots                   []string                    `json:"state_roots" hex:"true"`
 	HistoricalRoots              []string                    `json:"historical_roots" hex:"true"`
-	Eth1Data                     *Eth1DataJson               `json:"eth1_data"`
-	Eth1DataVotes                []*Eth1DataJson             `json:"eth1_data_votes"`
-	Eth1DepositIndex             string                      `json:"eth1_deposit_index"`
+	Zond1Data                    *Zond1DataJson              `json:"zond1_data"`
+	Zond1DataVotes               []*Zond1DataJson            `json:"zond1_data_votes"`
+	Zond1DepositIndex            string                      `json:"zond1_deposit_index"`
 	Validators                   []*ValidatorJson            `json:"validators"`
 	Balances                     []string                    `json:"balances"`
 	RandaoMixes                  []string                    `json:"randao_mixes" hex:"true"`
@@ -744,7 +744,7 @@ type SyncCommitteeContributionJson struct {
 	BeaconBlockRoot                 string   `json:"beacon_block_root" hex:"true"`
 	SubcommitteeIndex               string   `json:"subcommittee_index"`
 	ParticipationBits               string   `json:"participation_bits" hex:"true"`
-	Signatures                      string   `json:"signatures" hex:"true"`
+	Signatures                      []string `json:"signatures" hex:"true"`
 	SignaturesIdxToParticipationIdx []string `json:"signatures_idx_to_participation_idx" hex:"true"`
 }
 

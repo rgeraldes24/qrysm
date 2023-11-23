@@ -44,7 +44,7 @@ func (c beaconApiValidatorClient) getBeaconBlock(ctx context.Context, slot primi
 
 	switch produceBlockResponseJson.Version {
 	case "capella":
-		jsonCapellaBlock := apimiddleware.BeaconBlockCapellaJson{}
+		jsonCapellaBlock := apimiddleware.BeaconBlockJson{}
 		if err := decoder.Decode(&jsonCapellaBlock); err != nil {
 			return nil, errors.Wrap(err, "failed to decode capella block response json")
 		}
