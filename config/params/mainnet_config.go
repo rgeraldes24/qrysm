@@ -95,7 +95,6 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EffectiveBalanceIncrement: 1 * 1e9,
 
 	// Initial value constants.
-	BLSWithdrawalPrefixByte:          byte(0),
 	DilithiumWithdrawalPrefixByte:    byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
 	ZOND1AddressWithdrawalPrefixByte: byte(1),
 	ZondAddressWithdrawalPrefixByte:  byte(1), // TODO (cyyber): Change it to 0
@@ -186,7 +185,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	WithdrawalPrivkeyFileName: "/shardwithdrawalkey",
 	ValidatorPrivkeyFileName:  "/validatorprivatekey",
 	RPCSyncCheck:              1,
-	EmptySignature:            [96]byte{},
+	EmptySignature:            [dilithium2.CryptoBytes]byte{},
 	EmptyDilithiumSignature:   [dilithium2.CryptoBytes]byte{},
 	DefaultPageSize:           250,
 	MaxPeersToSync:            15,

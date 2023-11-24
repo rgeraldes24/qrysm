@@ -59,6 +59,11 @@ func (s *Server) GetAggregateAttestation(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	signatures := make([]string, len(bestMatchingAtt.Signatures))
+	for i, sig := range bestMatchingAtt.Signatures {
+		signatures[i] = hexutil.Encode(sig)
+	}
+
 	response := &AggregateAttestationResponse{
 		Data: &shared.Attestation{
 			ParticipationBits: hexutil.Encode(bestMatchingAtt.ParticipationBits),
@@ -75,7 +80,7 @@ func (s *Server) GetAggregateAttestation(w http.ResponseWriter, r *http.Request)
 					Root:  hexutil.Encode(bestMatchingAtt.Data.Target.Root),
 				},
 			},
-			Signature: hexutil.Encode(bestMatchingAtt.Signature),
+			Signatures: signatures,
 		}}
 	http2.WriteJson(w, response)
 }

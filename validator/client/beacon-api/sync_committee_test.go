@@ -187,7 +187,7 @@ func TestGetSyncCommitteeContribution(t *testing.T) {
 		BeaconBlockRoot:   blockRoot,
 		SubcommitteeIndex: "1",
 		ParticipationBits: "0x01",
-		Signature:         "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505",
+		Signatures:        []string{"0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"},
 	}
 
 	tests := []struct {

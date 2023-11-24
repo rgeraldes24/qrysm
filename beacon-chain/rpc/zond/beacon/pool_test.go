@@ -15,15 +15,14 @@ import (
 	qrysmtime "github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec"
-	blstoexecmock "github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec/mock"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
+	dilithiumtoexecmock "github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec/mock"
 	slashingsmock "github.com/theQRL/qrysm/v4/beacon-chain/operations/slashings/mock"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/voluntaryexits/mock"
 	p2pMock "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls/common"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -57,7 +56,7 @@ func TestListPoolAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
-		Signature: bytesutil.PadTo([]byte("signature1"), 96),
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), 4595)},
 	}
 	att2 := &zondpbv1alpha1.Attestation{
 		ParticipationBits: []byte{4, 40},
@@ -74,7 +73,7 @@ func TestListPoolAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot4"), 32),
 			},
 		},
-		Signature: bytesutil.PadTo([]byte("signature4"), 96),
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature4"), 4595)},
 	}
 	att3 := &zondpbv1alpha1.Attestation{
 		ParticipationBits: []byte{2, 20},
@@ -91,7 +90,7 @@ func TestListPoolAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signature: bytesutil.PadTo([]byte("signature2"), 96),
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), 4595)},
 	}
 	att4 := &zondpbv1alpha1.Attestation{
 		ParticipationBits: bitfield.NewBitlist(8),
@@ -108,7 +107,7 @@ func TestListPoolAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signature: bytesutil.PadTo([]byte("signature2"), 96),
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), 4595)},
 	}
 	att5 := &zondpbv1alpha1.Attestation{
 		ParticipationBits: bitfield.NewBitlist(8),
@@ -125,7 +124,7 @@ func TestListPoolAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signature: bytesutil.PadTo([]byte("signature1"), 96),
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), 4595)},
 	}
 	att6 := &zondpbv1alpha1.Attestation{
 		ParticipationBits: bitfield.NewBitlist(8),
@@ -142,7 +141,7 @@ func TestListPoolAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signature: bytesutil.PadTo([]byte("signature2"), 96),
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), 4595)},
 	}
 	s := &Server{
 		ChainInfoFetcher: &blockchainmock.ChainService{State: bs},
@@ -220,7 +219,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 				},
 			},
-			Signature: bytesutil.PadTo([]byte("signature1"), 96),
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), 4595)},
 		},
 		Attestation_2: &zondpbv1alpha1.IndexedAttestation{
 			AttestingIndices: []uint64{2, 20},
@@ -237,7 +236,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signature: bytesutil.PadTo([]byte("signature2"), 96),
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), 4595)},
 		},
 	}
 	slashing2 := &zondpbv1alpha1.AttesterSlashing{
@@ -256,7 +255,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot3"), 32),
 				},
 			},
-			Signature: bytesutil.PadTo([]byte("signature3"), 96),
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature3"), 4595)},
 		},
 		Attestation_2: &zondpbv1alpha1.IndexedAttestation{
 			AttestingIndices: []uint64{4, 40},
@@ -273,7 +272,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot4"), 32),
 				},
 			},
-			Signature: bytesutil.PadTo([]byte("signature4"), 96),
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature4"), 4595)},
 		},
 	}
 
@@ -301,7 +300,7 @@ func TestListPoolProposerSlashings(t *testing.T) {
 				StateRoot:     bytesutil.PadTo([]byte("stateroot1"), 32),
 				BodyRoot:      bytesutil.PadTo([]byte("bodyroot1"), 32),
 			},
-			Signature: bytesutil.PadTo([]byte("signature1"), 96),
+			Signature: bytesutil.PadTo([]byte("signature1"), 4595),
 		},
 		Header_2: &zondpbv1alpha1.SignedBeaconBlockHeader{
 			Header: &zondpbv1alpha1.BeaconBlockHeader{
@@ -311,7 +310,7 @@ func TestListPoolProposerSlashings(t *testing.T) {
 				StateRoot:     bytesutil.PadTo([]byte("stateroot2"), 32),
 				BodyRoot:      bytesutil.PadTo([]byte("bodyroot2"), 32),
 			},
-			Signature: bytesutil.PadTo([]byte("signature2"), 96),
+			Signature: bytesutil.PadTo([]byte("signature2"), 4595),
 		},
 	}
 	slashing2 := &zondpbv1alpha1.ProposerSlashing{
@@ -323,7 +322,7 @@ func TestListPoolProposerSlashings(t *testing.T) {
 				StateRoot:     bytesutil.PadTo([]byte("stateroot3"), 32),
 				BodyRoot:      bytesutil.PadTo([]byte("bodyroot3"), 32),
 			},
-			Signature: bytesutil.PadTo([]byte("signature3"), 96),
+			Signature: bytesutil.PadTo([]byte("signature3"), 4595),
 		},
 		Header_2: &zondpbv1alpha1.SignedBeaconBlockHeader{
 			Header: &zondpbv1alpha1.BeaconBlockHeader{
@@ -333,7 +332,7 @@ func TestListPoolProposerSlashings(t *testing.T) {
 				StateRoot:     bytesutil.PadTo([]byte("stateroot4"), 32),
 				BodyRoot:      bytesutil.PadTo([]byte("bodyroot4"), 32),
 			},
-			Signature: bytesutil.PadTo([]byte("signature4"), 96),
+			Signature: bytesutil.PadTo([]byte("signature4"), 4595),
 		},
 	}
 
@@ -357,14 +356,14 @@ func TestListPoolVoluntaryExits(t *testing.T) {
 			Epoch:          1,
 			ValidatorIndex: 1,
 		},
-		Signature: bytesutil.PadTo([]byte("signature1"), 96),
+		Signature: bytesutil.PadTo([]byte("signature1"), 4595),
 	}
 	exit2 := &zondpbv1alpha1.SignedVoluntaryExit{
 		Exit: &zondpbv1alpha1.VoluntaryExit{
 			Epoch:          2,
 			ValidatorIndex: 2,
 		},
-		Signature: bytesutil.PadTo([]byte("signature2"), 96),
+		Signature: bytesutil.PadTo([]byte("signature2"), 4595),
 	}
 
 	s := &Server{
@@ -412,7 +411,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 				},
 			},
-			Signature: make([]byte, 96),
+			Signatures: [][]byte{},
 		},
 		Attestation_2: &zondpbv1.IndexedAttestation{
 			AttestingIndices: []uint64{0},
@@ -429,7 +428,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signature: make([]byte, 96),
+			Signatures: [][]byte{},
 		},
 	}
 
@@ -488,7 +487,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 				},
 			},
-			Signature: make([]byte, 96),
+			Signatures: [][]byte{},
 		},
 		Attestation_2: &zondpbv1.IndexedAttestation{
 			AttestingIndices: []uint64{0},
@@ -505,7 +504,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signature: make([]byte, 96),
+			Signatures: [][]byte{},
 		},
 	}
 
@@ -563,7 +562,7 @@ func TestSubmitAttesterSlashing_InvalidSlashing(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
-		Signature: make([]byte, 96),
+		Signatures: [][]byte{},
 	}
 
 	slashing := &zondpbv1.AttesterSlashing{
@@ -610,7 +609,7 @@ func TestSubmitProposerSlashing_Ok(t *testing.T) {
 				StateRoot:     bytesutil.PadTo([]byte("stateroot1"), 32),
 				BodyRoot:      bytesutil.PadTo([]byte("bodyroot1"), 32),
 			},
-			Signature: make([]byte, 96),
+			Signature: make([]byte, 4595),
 		},
 		SignedHeader_2: &zondpbv1.SignedBeaconBlockHeader{
 			Message: &zondpbv1.BeaconBlockHeader{
@@ -620,7 +619,7 @@ func TestSubmitProposerSlashing_Ok(t *testing.T) {
 				StateRoot:     bytesutil.PadTo([]byte("stateroot2"), 32),
 				BodyRoot:      bytesutil.PadTo([]byte("bodyroot2"), 32),
 			},
-			Signature: make([]byte, 96),
+			Signature: make([]byte, 4595),
 		},
 	}
 
@@ -662,10 +661,10 @@ func TestSubmitProposerSlashing_AcrossFork(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
 
-	params.SetupTestConfigCleanup(t)
-	config := params.BeaconConfig()
-	config.AltairForkEpoch = 1
-	params.OverrideBeaconConfig(config)
+	// params.SetupTestConfigCleanup(t)
+	// config := params.BeaconConfig()
+	// config.AltairForkEpoch = 1
+	// params.OverrideBeaconConfig(config)
 
 	bs, keys := util.DeterministicGenesisState(t, 1)
 
@@ -678,7 +677,7 @@ func TestSubmitProposerSlashing_AcrossFork(t *testing.T) {
 				StateRoot:     bytesutil.PadTo([]byte("stateroot1"), 32),
 				BodyRoot:      bytesutil.PadTo([]byte("bodyroot1"), 32),
 			},
-			Signature: make([]byte, 96),
+			Signature: make([]byte, 4595),
 		},
 		SignedHeader_2: &zondpbv1.SignedBeaconBlockHeader{
 			Message: &zondpbv1.BeaconBlockHeader{
@@ -688,7 +687,7 @@ func TestSubmitProposerSlashing_AcrossFork(t *testing.T) {
 				StateRoot:     bytesutil.PadTo([]byte("stateroot2"), 32),
 				BodyRoot:      bytesutil.PadTo([]byte("bodyroot2"), 32),
 			},
-			Signature: make([]byte, 96),
+			Signature: make([]byte, 4595),
 		},
 	}
 
@@ -745,7 +744,7 @@ func TestSubmitProposerSlashing_InvalidSlashing(t *testing.T) {
 			StateRoot:     bytesutil.PadTo([]byte("stateroot1"), 32),
 			BodyRoot:      bytesutil.PadTo([]byte("bodyroot1"), 32),
 		},
-		Signature: make([]byte, 96),
+		Signature: make([]byte, 4595),
 	}
 
 	slashing := &zondpbv1.ProposerSlashing{
@@ -790,7 +789,7 @@ func TestSubmitVoluntaryExit_Ok(t *testing.T) {
 			Epoch:          0,
 			ValidatorIndex: 0,
 		},
-		Signature: make([]byte, 96),
+		Signature: make([]byte, 4595),
 	}
 
 	sb, err := signing.ComputeDomainAndSign(bs, exit.Message.Epoch, exit.Message, params.BeaconConfig().DomainVoluntaryExit, keys[0])
@@ -821,10 +820,10 @@ func TestSubmitVoluntaryExit_AcrossFork(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
 
-	params.SetupTestConfigCleanup(t)
-	config := params.BeaconConfig()
-	config.AltairForkEpoch = params.BeaconConfig().ShardCommitteePeriod + 1
-	params.OverrideBeaconConfig(config)
+	// params.SetupTestConfigCleanup(t)
+	// config := params.BeaconConfig()
+	// config.AltairForkEpoch = params.BeaconConfig().ShardCommitteePeriod + 1
+	// params.OverrideBeaconConfig(config)
 
 	bs, keys := util.DeterministicGenesisState(t, 1)
 	// Satisfy activity time required before exiting.
@@ -835,7 +834,7 @@ func TestSubmitVoluntaryExit_AcrossFork(t *testing.T) {
 			Epoch:          params.BeaconConfig().ShardCommitteePeriod + 1,
 			ValidatorIndex: 0,
 		},
-		Signature: make([]byte, 96),
+		Signature: make([]byte, 4595),
 	}
 
 	newBs := bs.Copy()
@@ -882,7 +881,7 @@ func TestSubmitVoluntaryExit_InvalidValidatorIndex(t *testing.T) {
 			Epoch:          0,
 			ValidatorIndex: 99,
 		},
-		Signature: make([]byte, 96),
+		Signature: make([]byte, 4595),
 	}
 
 	broadcaster := &p2pMock.MockBroadcaster{}
@@ -920,7 +919,7 @@ func TestSubmitVoluntaryExit_InvalidExit(t *testing.T) {
 			Epoch:          0,
 			ValidatorIndex: 0,
 		},
-		Signature: make([]byte, 96),
+		Signature: make([]byte, 4595),
 	}
 
 	broadcaster := &p2pMock.MockBroadcaster{}
@@ -984,7 +983,7 @@ func TestServer_SubmitAttestations_Ok(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
-		Signature: make([]byte, 96),
+		Signatures: [][]byte{},
 	}
 	att2 := &zondpbv1.Attestation{
 		ParticipationBits: b,
@@ -998,7 +997,7 @@ func TestServer_SubmitAttestations_Ok(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signature: make([]byte, 96),
+		Signatures: [][]byte{},
 	}
 
 	for _, att := range []*zondpbv1.Attestation{att1, att2} {
@@ -1096,7 +1095,7 @@ func TestServer_SubmitAttestations_ValidAttestationSubmitted(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
-		Signature: make([]byte, 96),
+		Signatures: [][]byte{},
 	}
 	attInvalidSignature := &zondpbv1.Attestation{
 		ParticipationBits: b,
@@ -1110,7 +1109,7 @@ func TestServer_SubmitAttestations_ValidAttestationSubmitted(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signature: make([]byte, 96),
+		Signatures: [][]byte{},
 	}
 
 	// Don't sign attInvalidSignature.
@@ -1200,7 +1199,7 @@ func TestServer_SubmitAttestations_InvalidAttestationGRPCHeader(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signature: nil,
+		Signatures: nil,
 	}
 
 	chain := &blockchainmock.ChainService{State: bs}
@@ -1224,7 +1223,7 @@ func TestServer_SubmitAttestations_InvalidAttestationGRPCHeader(t *testing.T) {
 	require.Equal(t, true, ok, "could not retrieve custom error metadata value")
 	assert.DeepEqual(
 		t,
-		[]string{"{\"failures\":[{\"index\":0,\"message\":\"Incorrect attestation signature: could not create signature from byte slice: signature must be 96 bytes\"}]}"},
+		[]string{"{\"failures\":[{\"index\":0,\"message\":\"Incorrect attestation signature: could not create signature from byte slice: signature must be 4595 bytes\"}]}"},
 		v,
 	)
 }
@@ -1236,7 +1235,7 @@ func TestListDilithiumToExecutionChanges(t *testing.T) {
 			FromDilithiumPubkey: bytesutil.PadTo([]byte("pubkey1"), 48),
 			ToExecutionAddress:  bytesutil.PadTo([]byte("address1"), 20),
 		},
-		Signature: bytesutil.PadTo([]byte("signature1"), 96),
+		Signature: bytesutil.PadTo([]byte("signature1"), 4595),
 	}
 	change2 := &zondpbv1alpha1.SignedDilithiumToExecutionChange{
 		Message: &zondpbv1alpha1.DilithiumToExecutionChange{
@@ -1244,11 +1243,11 @@ func TestListDilithiumToExecutionChanges(t *testing.T) {
 			FromDilithiumPubkey: bytesutil.PadTo([]byte("pubkey2"), 48),
 			ToExecutionAddress:  bytesutil.PadTo([]byte("address2"), 20),
 		},
-		Signature: bytesutil.PadTo([]byte("signature2"), 96),
+		Signature: bytesutil.PadTo([]byte("signature2"), 4595),
 	}
 
 	s := &Server{
-		DilithiumChangesPool: &blstoexecmock.PoolMock{Changes: []*zondpbv1alpha1.SignedDilithiumToExecutionChange{change1, change2}},
+		DilithiumChangesPool: &dilithiumtoexecmock.PoolMock{Changes: []*zondpbv1alpha1.SignedDilithiumToExecutionChange{change1, change2}},
 	}
 
 	resp, err := s.ListDilithiumToExecutionChanges(context.Background(), &emptypb.Empty{})
@@ -1265,16 +1264,16 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 	defer transition.SkipSlotCache.Enable()
 
 	params.SetupTestConfigCleanup(t)
-	c := params.BeaconConfig().Copy()
-	// Required for correct committee size calculation.
-	c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
-	params.OverrideBeaconConfig(c)
+	// c := params.BeaconConfig().Copy()
+	// // Required for correct committee size calculation.
+	// c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
+	// params.OverrideBeaconConfig(c)
 
-	spb := &zondpbv1alpha1.BeaconStateCapella{
+	spb := &zondpbv1alpha1.BeaconState{
 		Fork: &zondpbv1alpha1.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
-			Epoch:           params.BeaconConfig().CapellaForkEpoch,
+			//Epoch:           params.BeaconConfig().CapellaForkEpoch,
 		},
 	}
 	numValidators := 10
@@ -1335,7 +1334,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 		AttestationsPool:     attestations.NewPool(),
 		Broadcaster:          broadcaster,
 		OperationNotifier:    &blockchainmock.MockOperationNotifier{},
-		DilithiumChangesPool: blstoexec.NewPool(),
+		DilithiumChangesPool: dilithiumtoexec.NewPool(),
 	}
 
 	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv1.SubmitDilithiumToExecutionChangesRequest{
@@ -1446,7 +1445,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 		AttestationsPool:     attestations.NewPool(),
 		Broadcaster:          broadcaster,
 		OperationNotifier:    &blockchainmock.MockOperationNotifier{},
-		DilithiumChangesPool: blstoexec.NewPool(),
+		DilithiumChangesPool: dilithiumtoexec.NewPool(),
 	}
 
 	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv1.SubmitDilithiumToExecutionChangesRequest{
@@ -1545,7 +1544,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 		AttestationsPool:     attestations.NewPool(),
 		Broadcaster:          broadcaster,
 		OperationNotifier:    &blockchainmock.MockOperationNotifier{},
-		DilithiumChangesPool: blstoexec.NewPool(),
+		DilithiumChangesPool: dilithiumtoexec.NewPool(),
 	}
 
 	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv1.SubmitDilithiumToExecutionChangesRequest{

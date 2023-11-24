@@ -160,18 +160,20 @@ func aggregateAttestations(atts []*zondpb.Attestation, keys []int, coverage *bit
 	}
 
 	var data *zondpb.AttestationData
-	sigs := make([][]byte, 0)                      // TODO(rgeraldes24) - review capacity
-	sigsIdxToParticipationIdx := make([]uint64, 0) // TODO(rgeraldes24) - review capacity
-	duplicates := make(map[uint64]struct{})        // TODO(rgeraldes24) is there room for duplicates?
+	sigs := make([][]byte, 0) // TODO(rgeraldes24) - review capacity
+	//sigsIdxToParticipationIdx := make([]uint64, 0) // TODO(rgeraldes24) - review capacity
+	//duplicates := make(map[uint64]struct{})        // TODO(rgeraldes24) is there room for duplicates?
 
 	for i, idx := range keys {
 		for j := 0; j < len(atts[idx].Signatures); j++ {
-			if _, duplicate := duplicates[atts[idx].SignaturesIdxToParticipationIdx[j]]; duplicate {
-				continue
-			}
-			duplicates[atts[idx].SignaturesIdxToParticipationIdx[j]] = struct{}{}
-			sigs = append(sigs, atts[idx].Signatures[j])                                                                // TODO copy?
-			sigsIdxToParticipationIdx = append(sigsIdxToParticipationIdx, atts[idx].SignaturesIdxToParticipationIdx[j]) // TODO copy?
+			// TODO(rgeraldes24)
+			/*
+				if _, duplicate := duplicates[atts[idx].SignaturesIdxToParticipationIdx[j]]; duplicate {
+					continue
+				}
+				duplicates[atts[idx].SignaturesIdxToParticipationIdx[j]] = struct{}{}
+			*/
+			sigs = append(sigs, atts[idx].Signatures[j]) // TODO copy?
 		}
 
 		if i == 0 {
@@ -183,10 +185,9 @@ func aggregateAttestations(atts []*zondpb.Attestation, keys []int, coverage *bit
 	// Put aggregated attestation at a position of the first selected attestation.
 	atts[targetIdx] = &zondpb.Attestation{
 		// Append size byte, which will be unnecessary on switch to Bitlist64.
-		ParticipationBits:               coverage.ToBitlist(),
-		Data:                            data,
-		Signatures:                      sigs,
-		SignaturesIdxToParticipationIdx: sigsIdxToParticipationIdx,
+		ParticipationBits: coverage.ToBitlist(),
+		Data:              data,
+		Signatures:        sigs,
 	}
 	return
 }

@@ -143,10 +143,9 @@ func V1Alpha1ToV1Attestation(v1alpha1Att *zondpbalpha.Attestation) *zondpbv1.Att
 		return &zondpbv1.Attestation{}
 	}
 	return &zondpbv1.Attestation{
-		ParticipationBits:               v1alpha1Att.ParticipationBits,
-		Data:                            V1Alpha1ToV1AttData(v1alpha1Att.Data),
-		Signatures:                      v1alpha1Att.Signatures,
-		SignaturesIdxToParticipationIdx: v1alpha1Att.SignaturesIdxToParticipationIdx,
+		ParticipationBits: v1alpha1Att.ParticipationBits,
+		Data:              V1Alpha1ToV1AttData(v1alpha1Att.Data),
+		Signatures:        v1alpha1Att.Signatures,
 	}
 }
 
@@ -156,10 +155,9 @@ func V1ToV1Alpha1Attestation(v1Att *zondpbv1.Attestation) *zondpbalpha.Attestati
 		return &zondpbalpha.Attestation{}
 	}
 	return &zondpbalpha.Attestation{
-		ParticipationBits:               v1Att.ParticipationBits,
-		Data:                            V1ToV1Alpha1AttData(v1Att.Data),
-		Signatures:                      v1Att.Signatures,
-		SignaturesIdxToParticipationIdx: v1Att.SignaturesIdxToParticipationIdx,
+		ParticipationBits: v1Att.ParticipationBits,
+		Data:              V1ToV1Alpha1AttData(v1Att.Data),
+		Signatures:        v1Att.Signatures,
 	}
 }
 

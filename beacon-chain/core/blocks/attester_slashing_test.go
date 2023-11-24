@@ -10,7 +10,6 @@ import (
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -112,20 +111,18 @@ func TestProcessAttesterSlashings_AppliesCorrectStatus(t *testing.T) {
 	require.NoError(t, err)
 	signingRoot, err := signing.ComputeSigningRoot(att1.Data, domain)
 	assert.NoError(t, err, "Could not get signing root of beacon block header")
-	sig0 := privKeys[0].Sign(signingRoot[:])
-	sig1 := privKeys[1].Sign(signingRoot[:])
-	aggregateSig := bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att1.Signatures = [][]byte{aggregateSig.Marshal()}
+	sig0 := privKeys[0].Sign(signingRoot[:]).Marshal()
+	sig1 := privKeys[1].Sign(signingRoot[:]).Marshal()
+	att1.Signatures = [][]byte{sig0, sig1}
 
 	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
 		AttestingIndices: []uint64{0, 1},
 	})
 	signingRoot, err = signing.ComputeSigningRoot(att2.Data, domain)
 	assert.NoError(t, err, "Could not get signing root of beacon block header")
-	sig0 = privKeys[0].Sign(signingRoot[:])
-	sig1 = privKeys[1].Sign(signingRoot[:])
-	aggregateSig = bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att2.Signatures = [][]byte{aggregateSig.Marshal()}
+	sig0 = privKeys[0].Sign(signingRoot[:]).Marshal()
+	sig1 = privKeys[1].Sign(signingRoot[:]).Marshal()
+	att2.Signatures = [][]byte{sig0, sig1}
 
 	slashings := []*zondpb.AttesterSlashing{
 		{
@@ -181,20 +178,18 @@ func TestProcessAttesterSlashings_AppliesCorrectStatusAltair(t *testing.T) {
 	require.NoError(t, err)
 	signingRoot, err := signing.ComputeSigningRoot(att1.Data, domain)
 	assert.NoError(t, err, "Could not get signing root of beacon block header")
-	sig0 := privKeys[0].Sign(signingRoot[:])
-	sig1 := privKeys[1].Sign(signingRoot[:])
-	aggregateSig := bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att1.Signatures = [][]byte{aggregateSig.Marshal()}
+	sig0 := privKeys[0].Sign(signingRoot[:]).Marshal()
+	sig1 := privKeys[1].Sign(signingRoot[:]).Marshal()
+	att1.Signatures = [][]byte{sig0, sig1}
 
 	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
 		AttestingIndices: []uint64{0, 1},
 	})
 	signingRoot, err = signing.ComputeSigningRoot(att2.Data, domain)
 	assert.NoError(t, err, "Could not get signing root of beacon block header")
-	sig0 = privKeys[0].Sign(signingRoot[:])
-	sig1 = privKeys[1].Sign(signingRoot[:])
-	aggregateSig = bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att2.Signatures = [][]byte{aggregateSig.Marshal()}
+	sig0 = privKeys[0].Sign(signingRoot[:]).Marshal()
+	sig1 = privKeys[1].Sign(signingRoot[:]).Marshal()
+	att2.Signatures = [][]byte{sig0, sig1}
 
 	slashings := []*zondpb.AttesterSlashing{
 		{
@@ -250,20 +245,18 @@ func TestProcessAttesterSlashings_AppliesCorrectStatusBellatrix(t *testing.T) {
 	require.NoError(t, err)
 	signingRoot, err := signing.ComputeSigningRoot(att1.Data, domain)
 	assert.NoError(t, err, "Could not get signing root of beacon block header")
-	sig0 := privKeys[0].Sign(signingRoot[:])
-	sig1 := privKeys[1].Sign(signingRoot[:])
-	aggregateSig := bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att1.Signatures = [][]byte{aggregateSig.Marshal()}
+	sig0 := privKeys[0].Sign(signingRoot[:]).Marshal()
+	sig1 := privKeys[1].Sign(signingRoot[:]).Marshal()
+	att1.Signatures = [][]byte{sig0, sig1}
 
 	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
 		AttestingIndices: []uint64{0, 1},
 	})
 	signingRoot, err = signing.ComputeSigningRoot(att2.Data, domain)
 	assert.NoError(t, err, "Could not get signing root of beacon block header")
-	sig0 = privKeys[0].Sign(signingRoot[:])
-	sig1 = privKeys[1].Sign(signingRoot[:])
-	aggregateSig = bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att2.Signatures = [][]byte{aggregateSig.Marshal()}
+	sig0 = privKeys[0].Sign(signingRoot[:]).Marshal()
+	sig1 = privKeys[1].Sign(signingRoot[:]).Marshal()
+	att2.Signatures = [][]byte{sig0, sig1}
 
 	slashings := []*zondpb.AttesterSlashing{
 		{
@@ -319,20 +312,18 @@ func TestProcessAttesterSlashings_AppliesCorrectStatusCapella(t *testing.T) {
 	require.NoError(t, err)
 	signingRoot, err := signing.ComputeSigningRoot(att1.Data, domain)
 	assert.NoError(t, err, "Could not get signing root of beacon block header")
-	sig0 := privKeys[0].Sign(signingRoot[:])
-	sig1 := privKeys[1].Sign(signingRoot[:])
-	aggregateSig := bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att1.Signatures = [][]byte{aggregateSig.Marshal()}
+	sig0 := privKeys[0].Sign(signingRoot[:]).Marshal()
+	sig1 := privKeys[1].Sign(signingRoot[:]).Marshal()
+	att1.Signatures = [][]byte{sig0, sig1}
 
 	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
 		AttestingIndices: []uint64{0, 1},
 	})
 	signingRoot, err = signing.ComputeSigningRoot(att2.Data, domain)
 	assert.NoError(t, err, "Could not get signing root of beacon block header")
-	sig0 = privKeys[0].Sign(signingRoot[:])
-	sig1 = privKeys[1].Sign(signingRoot[:])
-	aggregateSig = bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att2.Signatures = [][]byte{aggregateSig.Marshal()}
+	sig0 = privKeys[0].Sign(signingRoot[:]).Marshal()
+	sig1 = privKeys[1].Sign(signingRoot[:]).Marshal()
+	att2.Signatures = [][]byte{sig0, sig1}
 
 	slashings := []*zondpb.AttesterSlashing{
 		{

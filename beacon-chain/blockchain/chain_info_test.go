@@ -47,7 +47,7 @@ func prepareForkchoiceState(
 		BlockHash: payloadHash[:],
 	}
 
-	base := &zondpb.BeaconStateBellatrix{
+	base := &zondpb.BeaconState{
 		Slot:                         slot,
 		RandaoMixes:                  make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		BlockRoots:                   make([][]byte, 1),
@@ -58,7 +58,7 @@ func prepareForkchoiceState(
 	}
 
 	base.BlockRoots[0] = append(base.BlockRoots[0], blockRoot[:]...)
-	st, err := state_native.InitializeFromProtoBellatrix(base)
+	st, err := state_native.InitializeFromProtoCapella(base)
 	return st, blockRoot, err
 }
 
@@ -135,7 +135,7 @@ func TestUnrealizedJustifiedBlockHash(t *testing.T) {
 
 func TestHeadSlot_CanRetrieve(t *testing.T) {
 	c := &Service{}
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{})
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
 	require.NoError(t, err)
@@ -176,7 +176,7 @@ func TestHeadRoot_UseDB(t *testing.T) {
 func TestHeadBlock_CanRetrieve(t *testing.T) {
 	b := util.NewBeaconBlock()
 	b.Block.Slot = 1
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{})
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	wsb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -191,7 +191,7 @@ func TestHeadBlock_CanRetrieve(t *testing.T) {
 }
 
 func TestHeadState_CanRetrieve(t *testing.T) {
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{Slot: 2, GenesisValidatorsRoot: params.BeaconConfig().ZeroHash[:]})
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{Slot: 2, GenesisValidatorsRoot: params.BeaconConfig().ZeroHash[:]})
 	require.NoError(t, err)
 	c := &Service{}
 	c.head = &head{state: s}
@@ -208,7 +208,7 @@ func TestGenesisTime_CanRetrieve(t *testing.T) {
 
 func TestCurrentFork_CanRetrieve(t *testing.T) {
 	f := &zondpb.Fork{Epoch: 999}
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{Fork: f})
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{Fork: f})
 	require.NoError(t, err)
 	c := &Service{}
 	c.head = &head{state: s}
@@ -233,7 +233,7 @@ func TestGenesisValidatorsRoot_CanRetrieve(t *testing.T) {
 	c := &Service{}
 	assert.Equal(t, [32]byte{}, c.GenesisValidatorsRoot(), "Did not get correct genesis validators root")
 
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{GenesisValidatorsRoot: []byte{'a'}})
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{GenesisValidatorsRoot: []byte{'a'}})
 	require.NoError(t, err)
 	c.head = &head{state: s}
 	assert.Equal(t, [32]byte{'a'}, c.GenesisValidatorsRoot(), "Did not get correct genesis validators root")
@@ -247,7 +247,7 @@ func TestHeadZOND1Data_Nil(t *testing.T) {
 
 func TestHeadZOND1Data_CanRetrieve(t *testing.T) {
 	d := &zondpb.Zond1Data{DepositCount: 999}
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{Zond1Data: d})
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{Zond1Data: d})
 	require.NoError(t, err)
 	c := &Service{}
 	c.head = &head{state: s}
@@ -404,9 +404,9 @@ func TestService_HeadValidatorIndexToPublicKeyNil(t *testing.T) {
 
 func TestService_IsOptimistic(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig()
-	cfg.BellatrixForkEpoch = 0
-	params.OverrideBeaconConfig(cfg)
+	// cfg := params.BeaconConfig()
+	// cfg.BellatrixForkEpoch = 0
+	// params.OverrideBeaconConfig(cfg)
 
 	ctx := context.Background()
 	ojc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}

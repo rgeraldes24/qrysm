@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"path/filepath"
 	"time"
 
 	middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -16,7 +15,6 @@ import (
 	"github.com/theQRL/qrysm/v4/io/logs"
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	"github.com/theQRL/qrysm/v4/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/v4/validator/client"
@@ -168,19 +166,19 @@ func (s *Server) Start() {
 	s.grpcServer = grpc.NewServer(opts...)
 
 	// Register a gRPC client to the beacon node.
-	if err := s.registerBeaconClient(); err != nil {
-		log.WithError(err).Fatal("Could not register beacon chain gRPC client")
-	}
+	// if err := s.registerBeaconClient(); err != nil {
+	// 	log.WithError(err).Fatal("Could not register beacon chain gRPC client")
+	// }
 
 	// Register services available for the gRPC server.
 	reflection.Register(s.grpcServer)
-	validatorpb.RegisterAuthServer(s.grpcServer, s)
-	validatorpb.RegisterWalletServer(s.grpcServer, s)
-	validatorpb.RegisterHealthServer(s.grpcServer, s)
-	validatorpb.RegisterBeaconServer(s.grpcServer, s)
-	validatorpb.RegisterAccountsServer(s.grpcServer, s)
+	// validatorpb.RegisterAuthServer(s.grpcServer, s)
+	// validatorpb.RegisterWalletServer(s.grpcServer, s)
+	// validatorpb.RegisterHealthServer(s.grpcServer, s)
+	// validatorpb.RegisterBeaconServer(s.grpcServer, s)
+	// validatorpb.RegisterAccountsServer(s.grpcServer, s)
 	zondpbservice.RegisterKeyManagementServer(s.grpcServer, s)
-	validatorpb.RegisterSlashingProtectionServer(s.grpcServer, s)
+	// validatorpb.RegisterSlashingProtectionServer(s.grpcServer, s)
 
 	go func() {
 		if s.listener != nil {
@@ -190,17 +188,19 @@ func (s *Server) Start() {
 		}
 	}()
 	log.WithField("address", address).Info("gRPC server listening on address")
-	if s.walletDir != "" {
-		token, err := s.initializeAuthToken(s.walletDir)
-		if err != nil {
-			log.WithError(err).Error("Could not initialize web auth token")
-			return
+	/*
+		if s.walletDir != "" {
+			token, err := s.initializeAuthToken(s.walletDir)
+			if err != nil {
+				log.WithError(err).Error("Could not initialize web auth token")
+				return
+			}
+			validatorWebAddr := fmt.Sprintf("%s:%d", s.validatorGatewayHost, s.validatorGatewayPort)
+			authTokenPath := filepath.Join(s.walletDir, authTokenFileName)
+			logValidatorWebAuth(validatorWebAddr, token, authTokenPath)
+			go s.refreshAuthTokenFromFileChanges(s.ctx, authTokenPath)
 		}
-		validatorWebAddr := fmt.Sprintf("%s:%d", s.validatorGatewayHost, s.validatorGatewayPort)
-		authTokenPath := filepath.Join(s.walletDir, authTokenFileName)
-		logValidatorWebAuth(validatorWebAddr, token, authTokenPath)
-		go s.refreshAuthTokenFromFileChanges(s.ctx, authTokenPath)
-	}
+	*/
 }
 
 // Stop the gRPC server.

@@ -10,7 +10,7 @@ import (
 // HydrateSyncCommittee hydrates the provided sync committee message.
 func HydrateSyncCommittee(s *zondpb.SyncCommitteeMessage) *zondpb.SyncCommitteeMessage {
 	if s.Signature == nil {
-		s.Signature = make([]byte, 96)
+		s.Signature = make([]byte, 4595)
 	}
 	if s.BlockRoot == nil {
 		s.BlockRoot = make([]byte, fieldparams.RootLength)

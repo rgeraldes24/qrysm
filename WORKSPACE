@@ -338,10 +338,6 @@ load("//:deps.bzl", "go_dependencies", "qrysm_deps")
 # gazelle:repository_macro deps.bzl%qrysm_deps
 qrysm_deps()
 
-load("@qrysm//third_party/herumi:herumi.bzl", "bls_dependencies")
-
-bls_dependencies()
-
 load("@qrysm//testing/endtoend:deps.bzl", "e2e_deps")
 
 e2e_deps()

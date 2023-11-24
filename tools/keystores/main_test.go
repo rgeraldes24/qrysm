@@ -15,7 +15,6 @@ import (
 	"github.com/theQRL/go-qrllib/common"
 	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -49,7 +48,7 @@ func setupCliContext(
 	return cli.NewContext(&app, set, nil)
 }
 
-func createRandomKeystore(t testing.TB, password string) (*keymanager.Keystore, bls.SecretKey) {
+func createRandomKeystore(t testing.TB, password string) (*keymanager.Keystore, dilithium.DilithiumKey) {
 	var seed [common.SeedSize]uint8
 	_, err := rand.Read(seed[:])
 	require.NoError(t, err)
@@ -66,7 +65,8 @@ func createRandomKeystore(t testing.TB, password string) (*keymanager.Keystore, 
 		Pubkey:  fmt.Sprintf("%x", pubKey),
 		ID:      id.String(),
 		Version: encryptor.Version(),
-		Name:    encryptor.Name(),
+		// TODO(rgeraldes24)
+		//Name:    encryptor.Name(),
 	}, validatingKey
 }
 

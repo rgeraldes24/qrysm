@@ -11,7 +11,6 @@ go_library(
         "reward.go",
         "sync_committee.go",
         "transition.go",
-        "upgrade.go",
     ],
     importpath = "github.com/theQRL/qrysm/v4/beacon-chain/core/altair",
     visibility = ["//visibility:public"],
@@ -57,7 +56,6 @@ go_test(
         "reward_test.go",
         "sync_committee_test.go",
         "transition_test.go",
-        "upgrade_test.go",
     ],
     embed = [":go_default_library"],
     deps = [
@@ -74,7 +72,6 @@ go_test(
         "//consensus-types/blocks:go_default_library",
         "//consensus-types/primitives:go_default_library",
         "//container/trie:go_default_library",
-        "//crypto/bls:go_default_library",
         "//encoding/bytesutil:go_default_library",
         "//math:go_default_library",
         "//proto/qrysm/v1alpha1:go_default_library",

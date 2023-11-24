@@ -115,7 +115,7 @@ func TestFuzzverifySigningRoot_10000(_ *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	st := &zondpb.BeaconState{}
 	var pubkey [dilithium2.CryptoPublicKeyBytes]byte
-	var sig [96]byte
+	var sig [4595]byte
 	var domain [4]byte
 	var p []byte
 	var s []byte

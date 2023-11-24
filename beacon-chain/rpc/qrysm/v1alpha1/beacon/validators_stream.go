@@ -1,5 +1,6 @@
 package beacon
 
+/*
 import (
 	"context"
 	"errors"
@@ -512,3 +513,4 @@ func (is *infostream) depositQueueTimestamp(zond1BlockNumber *big.Int) (uint64, 
 	}
 	return uint64(activationTime.Unix()), nil
 }
+*/

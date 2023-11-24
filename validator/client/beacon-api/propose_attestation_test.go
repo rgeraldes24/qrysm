@@ -31,7 +31,7 @@ func TestProposeAttestation(t *testing.T) {
 				Root:  test_helpers.FillByteSlice(32, 81),
 			},
 		},
-		Signatures: test_helpers.FillByteSlice(96, 82),
+		Signatures: [][]byte{test_helpers.FillByteSlice(4595, 82)},
 	}
 
 	tests := []struct {
@@ -54,7 +54,7 @@ func TestProposeAttestation(t *testing.T) {
 			name: "nil attestation data",
 			attestation: &zondpb.Attestation{
 				ParticipationBits: test_helpers.FillByteSlice(4, 74),
-				Signatures:        test_helpers.FillByteSlice(96, 82),
+				Signatures:        [][]byte{test_helpers.FillByteSlice(4595, 82)},
 			},
 			expectedErrorMessage: "attestation data is nil",
 		},
@@ -65,7 +65,7 @@ func TestProposeAttestation(t *testing.T) {
 				Data: &zondpb.AttestationData{
 					Target: &zondpb.Checkpoint{},
 				},
-				Signatures: test_helpers.FillByteSlice(96, 82),
+				Signatures: [][]byte{test_helpers.FillByteSlice(4595, 82)},
 			},
 			expectedErrorMessage: "source/target in attestation data is nil",
 		},
@@ -76,7 +76,7 @@ func TestProposeAttestation(t *testing.T) {
 				Data: &zondpb.AttestationData{
 					Source: &zondpb.Checkpoint{},
 				},
-				Signatures: test_helpers.FillByteSlice(96, 82),
+				Signatures: [][]byte{test_helpers.FillByteSlice(4595, 82)},
 			},
 			expectedErrorMessage: "source/target in attestation data is nil",
 		},
@@ -87,7 +87,7 @@ func TestProposeAttestation(t *testing.T) {
 					Source: &zondpb.Checkpoint{},
 					Target: &zondpb.Checkpoint{},
 				},
-				Signatures: test_helpers.FillByteSlice(96, 82),
+				Signatures: [][]byte{test_helpers.FillByteSlice(4595, 82)},
 			},
 			expectedErrorMessage: "attestation aggregation bits is empty",
 		},

@@ -230,7 +230,7 @@ func importPrivateKeyAsAccount(ctx context.Context, wallet *wallet.Wallet, impor
 	}
 	privKey, err := dilithium.SecretKeyFromBytes(privKeyBytes)
 	if err != nil {
-		return errors.Wrap(err, "not a valid BLS private key")
+		return errors.Wrap(err, "not a valid Dilithium private key")
 	}
 	keystore, err := createKeystoreFromPrivateKey(privKey, wallet.Password())
 	if err != nil {
@@ -277,9 +277,9 @@ func readKeystoreFile(_ context.Context, keystoreFilePath string) (*keymanager.K
 	if keystoreFile.Pubkey == "" {
 		return nil, errors.New("could not decode keystore json")
 	}
-	if keystoreFile.Description == "" && keystoreFile.Name != "" {
-		keystoreFile.Description = keystoreFile.Name
-	}
+	// if keystoreFile.Description == "" && keystoreFile.Name != "" {
+	// 	keystoreFile.Description = keystoreFile.Name
+	// }
 	return keystoreFile, nil
 }
 

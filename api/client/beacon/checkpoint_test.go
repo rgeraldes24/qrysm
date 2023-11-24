@@ -95,7 +95,7 @@ func TestFallbackVersionCheck(t *testing.T) {
 func TestFname(t *testing.T) {
 	vu := &detect.VersionedUnmarshaler{
 		Config: params.MainnetConfig(),
-		Fork:   version.Phase0,
+		Fork:   version.Capella,
 	}
 	slot := primitives.Slot(23)
 	prefix := "block"
@@ -106,7 +106,7 @@ func TestFname(t *testing.T) {
 	require.Equal(t, expected, actual)
 
 	vu.Config = params.MinimalSpecConfig()
-	vu.Fork = version.Altair
+	vu.Fork = version.Capella
 	slot = 17
 	prefix = "state"
 	copy(root[29:], []byte{0x17, 0x17, 0x17})
@@ -119,7 +119,8 @@ func TestDownloadWeakSubjectivityCheckpoint(t *testing.T) {
 	ctx := context.Background()
 	cfg := params.MainnetConfig().Copy()
 
-	epoch := cfg.AltairForkEpoch - 1
+	//epoch := cfg.AltairForkEpoch - 1
+	epoch := primitives.Epoch(0)
 	// set up checkpoint state, using the epoch that will be computed as the ws checkpoint state based on the head state
 	wSlot, err := slots.EpochStart(epoch)
 	require.NoError(t, err)
@@ -344,7 +345,7 @@ func forkForEpoch(cfg *params.BeaconChainConfig, epoch primitives.Epoch) (*zondp
 }
 
 func defaultTestHeadState(t *testing.T, cfg *params.BeaconChainConfig) (state.BeaconState, primitives.Epoch) {
-	st, err := util.NewBeaconStateAltair()
+	st, err := util.NewBeaconState()
 	require.NoError(t, err)
 
 	fork, err := forkForEpoch(cfg, cfg.AltairForkEpoch)

@@ -33,8 +33,6 @@ message Attestation {
     AttestationData data = 2;
 
     repeated bytes signatures = 3 [(theqrl.zond.ext.ssz_size) = "?,4595", (theqrl.zond.ext.ssz_max) = "2048"];
-
-    repeated uint64 signaturesIdxToParticipationIdx = 4 [(theqrl.zond.ext.ssz_max) = "2048"];
 }
 
 message AggregateAttestationAndProof {

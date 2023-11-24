@@ -42,18 +42,13 @@ func (s sortByValidatorIdx) Less(i, j int) bool {
 
 // ConvertToIndexed converts attestation to (almost) indexed-verifiable form.
 func ConvertToIndexed(ctx context.Context, attestation *zondpb.Attestation, committee []primitives.ValidatorIndex) (*zondpb.IndexedAttestation, error) {
-	if bf := attestation.ParticipationBits; bf.Len() != uint64(len(committee)) {
-		return nil, fmt.Errorf("bitfield length %d is not equal to committee length %d", bf.Len(), len(committee))
-	}
-
-	// replace committee indices with the validator idx
-	attestingIndices := make([]uint64, len(attestation.SignaturesIdxToParticipationIdx))
-	for i, committeeIdx := range attestation.SignaturesIdxToParticipationIdx {
-		attestingIndices[i] = uint64(committee[committeeIdx])
+	attIndices, err := AttestingIndices(attestation.ParticipationBits, committee)
+	if err != nil {
+		return nil, err
 	}
 
 	sigSlices := signatureSlices{
-		attestingIndices: attestingIndices,
+		attestingIndices: attIndices,
 		signatures:       attestation.Signatures,
 	}
 	sort.Sort(sortByValidatorIdx(sigSlices))

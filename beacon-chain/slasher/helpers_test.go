@@ -410,7 +410,7 @@ func Test_validateBlockHeaderIntegrity(t *testing.T) {
 	type args struct {
 		header *zondpb.SignedBeaconBlockHeader
 	}
-	fakeSig := make([]byte, 96)
+	fakeSig := make([]byte, 4595)
 	copy(fakeSig, "hi")
 	tests := []struct {
 		name string

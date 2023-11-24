@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -85,9 +84,7 @@ func (a proposerAtts) filter(ctx context.Context, st state.BeaconState) (propose
 	invalidAtts := make([]*zondpb.Attestation, 0, len(a))
 	var attestationProcessor func(context.Context, state.BeaconState, *zondpb.Attestation) (state.BeaconState, error)
 
-	if st.Version() == version.Phase0 {
-		attestationProcessor = blocks.ProcessAttestationNoVerifySignatures
-	} else if st.Version() >= version.Altair {
+	if st.Version() >= version.Capella {
 		// Use a wrapper here, as go needs strong typing for the function signature.
 		attestationProcessor = func(ctx context.Context, st state.BeaconState, attestation *zondpb.Attestation) (state.BeaconState, error) {
 			totalBalance, err := helpers.TotalActiveBalance(st)

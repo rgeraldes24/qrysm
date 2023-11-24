@@ -103,8 +103,6 @@ func (ds *Server) getPeer(pid peer.ID) (*zondpb.DebugPeerResponse, error) {
 		switch {
 		case metadata.MetadataObjV0() != nil:
 			peerInfo.MetadataV0 = metadata.MetadataObjV0()
-		case metadata.MetadataObjV1() != nil:
-			peerInfo.MetadataV1 = metadata.MetadataObjV1()
 		}
 	}
 	addresses := peerStore.Addrs(pid)

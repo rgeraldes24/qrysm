@@ -1,8 +1,6 @@
 package attestations
 
 import (
-	"fmt"
-
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -98,21 +96,10 @@ func AggregatePair(a1, a2 *zondpb.Attestation) (*zondpb.Attestation, error) {
 		return baseAtt, nil
 	}
 
-	// convert the signaturesIdxToParticipationIdx from a list to a map to allow for
-	// a quick search for the sig index that we will use to include the new signature
-	mapParticipationIdxToSigIdx := make(map[uint64]int)
-	for sigIdx, participationIdx := range newAtt.SignaturesIdxToParticipationIdx {
-		mapParticipationIdxToSigIdx[participationIdx] = sigIdx
-	}
-
-	// include sig and participation
 	for _, participationIdx := range newParticipants {
-		sigIdx, ok := mapParticipationIdxToSigIdx[participationIdx]
-		if !ok {
-			return nil, fmt.Errorf("Signature for validator with index %d not found", participationIdx)
-		}
-		baseAtt.Signatures = append(baseAtt.Signatures, newAtt.Signatures[sigIdx])
-		baseAtt.SignaturesIdxToParticipationIdx = append(baseAtt.SignaturesIdxToParticipationIdx, participationIdx)
+		// TODO (rgeraldes24)
+		// figure out the index in which to add the signature based on the participation
+		//baseAtt.Signatures = append(baseAtt.Signatures, newAtt.Signatures[sigIdx])
 		baseAtt.ParticipationBits.SetBitAt(participationIdx, true)
 	}
 

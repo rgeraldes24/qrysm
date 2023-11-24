@@ -227,7 +227,7 @@ func validateSyncCommitteeMessage(msg *zondpbv1.SyncCommitteeMessage) error {
 	if len(msg.BeaconBlockRoot) != 32 {
 		return errors.New("invalid block root length")
 	}
-	if len(msg.Signature) != 96 {
+	if len(msg.Signature) != 4595 {
 		return errors.New("invalid signature length")
 	}
 	return nil

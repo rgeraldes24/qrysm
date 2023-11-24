@@ -28,6 +28,8 @@ import (
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	validatorserviceconfig "github.com/theQRL/qrysm/v4/config/validator/service"
+	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
+	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -310,6 +312,53 @@ func (v *validator) WaitForSync(ctx context.Context) error {
 		case <-ctx.Done():
 			return errors.New("context has been canceled, exiting goroutine")
 		}
+	}
+}
+
+// ReceiveBlocks starts a gRPC client stream listener to obtain
+// blocks from the beacon node. Upon receiving a block, the service
+// broadcasts it to a feed for other usages to subscribe to.
+func (v *validator) ReceiveBlocks(ctx context.Context, connectionErrorChannel chan<- error) {
+	stream, err := v.validatorClient.StreamBlocksAltair(ctx, &zondpb.StreamBlocksRequest{VerifiedOnly: true})
+	if err != nil {
+		log.WithError(err).Error("Failed to retrieve blocks stream, " + iface.ErrConnectionIssue.Error())
+		connectionErrorChannel <- errors.Wrap(iface.ErrConnectionIssue, err.Error())
+		return
+	}
+
+	for {
+		if ctx.Err() == context.Canceled {
+			log.WithError(ctx.Err()).Error("Context canceled - shutting down blocks receiver")
+			return
+		}
+		res, err := stream.Recv()
+		if err != nil {
+			log.WithError(err).Error("Could not receive blocks from beacon node, " + iface.ErrConnectionIssue.Error())
+			connectionErrorChannel <- errors.Wrap(iface.ErrConnectionIssue, err.Error())
+			return
+		}
+		if res == nil || res.Block == nil {
+			continue
+		}
+		var blk interfaces.ReadOnlySignedBeaconBlock
+		switch b := res.Block.(type) {
+		case *zondpb.StreamBlocksResponse_CapellaBlock:
+			blk, err = blocks.NewSignedBeaconBlock(b.CapellaBlock)
+		}
+		if err != nil {
+			log.WithError(err).Error("Failed to wrap signed block")
+			continue
+		}
+		if blk == nil || blk.IsNil() {
+			log.Error("Received nil block")
+			continue
+		}
+		v.highestValidSlotLock.Lock()
+		if blk.Block().Slot() > v.highestValidSlot {
+			v.highestValidSlot = blk.Block().Slot()
+		}
+		v.highestValidSlotLock.Unlock()
+		v.blockFeed.Send(blk)
 	}
 }
 

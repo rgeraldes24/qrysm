@@ -43,7 +43,6 @@ go_test(
     ],
     embed = [":go_default_library"],
     deps = [
-        "//crypto/bls:go_default_library",
         "//crypto/dilithium:go_default_library",
         "//crypto/rand:go_default_library",
         "//proto/qrysm/v1alpha1/validator-client:go_default_library",

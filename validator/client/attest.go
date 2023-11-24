@@ -130,10 +130,9 @@ func (v *validator) SubmitAttestation(ctx context.Context, slot primitives.Slot,
 	aggregationBitfield := bitfield.NewBitlist(uint64(len(duty.Committee)))
 	aggregationBitfield.SetBitAt(indexInCommittee, true)
 	attestation := &zondpb.Attestation{
-		Data:                            data,
-		ParticipationBits:               aggregationBitfield,
-		Signatures:                      [][]byte{sig},
-		SignaturesIdxToParticipationIdx: []uint64{indexInCommittee},
+		Data:              data,
+		ParticipationBits: aggregationBitfield,
+		Signatures:        [][]byte{sig},
 	}
 
 	// Set the signature of the attestation and send it out to the beacon node.

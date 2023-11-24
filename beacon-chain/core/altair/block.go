@@ -84,10 +84,6 @@ func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb
 	votedKeys := make([]dilithium.PublicKey, 0, len(committeeKeys))
 
 	sigs := make([][]byte, 0, len(committeeKeys))
-	mapCommitteeIdxToSigIdx := make(map[uint64]int)
-	for sigIdx, committeeIdx := range sync.SignaturesIdxToCommitteeIdx {
-		mapCommitteeIdxToSigIdx[committeeIdx] = sigIdx
-	}
 
 	activeBalance, err := helpers.TotalActiveBalance(s)
 	if err != nil {
@@ -119,8 +115,9 @@ func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb
 			if err := helpers.IncreaseBalance(s, vIdx, participantReward); err != nil {
 				return nil, nil, nil, 0, err
 			}
-			sigIdx := mapCommitteeIdxToSigIdx[i]
-			sigs = append(sigs, sync.SyncCommitteeSignatures[sigIdx])
+			// TODO(rgeraldes24)
+			//sigIdx := mapCommitteeIdxToSigIdx[i]
+			//sigs = append(sigs, sync.SyncCommitteeSignatures[sigIdx])
 			earnedProposerReward += proposerReward
 		} else {
 			if err := helpers.DecreaseBalance(s, vIdx, participantReward); err != nil {

@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/container/slice"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	e2e "github.com/theQRL/qrysm/v4/testing/endtoend/params"
@@ -279,7 +279,7 @@ func generateSignedBeaconBlock(
 	chainHead *zond.ChainHead,
 	proposerIndex primitives.ValidatorIndex,
 	valClient zond.BeaconNodeValidatorClient,
-	privKeys []bls.SecretKey,
+	privKeys []dilithium.DilithiumKey,
 	stateRoot string,
 ) (*zond.GenericSignedBeaconBlock, error) {
 	ctx := context.Background()

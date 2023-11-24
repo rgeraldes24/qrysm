@@ -310,6 +310,4 @@ message SyncAggregate {
 
     // Dilithium signatures of the sync committee for the ones that voted.
     repeated bytes sync_committee_signatures = 2 [(theqrl.zond.ext.ssz_size) = "?,4595", (theqrl.zond.ext.ssz_max) = "sync_committee_bits.size"];
-
-    repeated uint64 signaturesIdxToCommitteeIdx = 3 [(theqrl.zond.ext.ssz_max) = "2048"];
 }

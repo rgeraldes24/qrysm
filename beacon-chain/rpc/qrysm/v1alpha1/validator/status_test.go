@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/container/trie"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -50,7 +50,7 @@ func TestValidatorStatus_DepositedZond1(t *testing.T) {
 			0: uint64(height),
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	vs := &Server{
 		DepositFetcher: depositCache,
@@ -92,7 +92,7 @@ func TestValidatorStatus_Deposited(t *testing.T) {
 			0: uint64(height),
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	vs := &Server{
 		DepositFetcher: depositCache,
@@ -137,7 +137,7 @@ func TestValidatorStatus_PartiallyDeposited(t *testing.T) {
 			0: uint64(height),
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{
 		Validators: []*zondpb.Validator{
 			{
 				PublicKey:                  pubKey1,
@@ -192,7 +192,7 @@ func TestValidatorStatus_Pending_MultipleDeposits(t *testing.T) {
 			0: uint64(height),
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{
 		Validators: []*zondpb.Validator{
 			{
 				PublicKey:                  pubKey1,
@@ -246,7 +246,7 @@ func TestValidatorStatus_Pending(t *testing.T) {
 
 	depData := &zondpb.Deposit_Data{
 		PublicKey:             pubKey,
-		Signature:             bytesutil.PadTo([]byte("hi"), 96),
+		Signature:             bytesutil.PadTo([]byte("hi"), 4595),
 		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
 	}
 
@@ -305,11 +305,11 @@ func TestValidatorStatus_Exiting(t *testing.T) {
 			ExitEpoch:         exitEpoch,
 			WithdrawableEpoch: withdrawableEpoch},
 		}}
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(st)
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(st)
 	require.NoError(t, err)
 	depData := &zondpb.Deposit_Data{
 		PublicKey:             pubKey,
-		Signature:             bytesutil.PadTo([]byte("hi"), 96),
+		Signature:             bytesutil.PadTo([]byte("hi"), 4595),
 		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
 	}
 
@@ -364,11 +364,11 @@ func TestValidatorStatus_Slashing(t *testing.T) {
 			PublicKey:         pubKey,
 			WithdrawableEpoch: epoch + 1},
 		}}
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(st)
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(st)
 	require.NoError(t, err)
 	depData := &zondpb.Deposit_Data{
 		PublicKey:             pubKey,
-		Signature:             bytesutil.PadTo([]byte("hi"), 96),
+		Signature:             bytesutil.PadTo([]byte("hi"), 4595),
 		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
 	}
 
@@ -426,7 +426,7 @@ func TestValidatorStatus_Exited(t *testing.T) {
 	require.NoError(t, err)
 	depData := &zondpb.Deposit_Data{
 		PublicKey:             pubKey,
-		Signature:             bytesutil.PadTo([]byte("hi"), 96),
+		Signature:             bytesutil.PadTo([]byte("hi"), 4595),
 		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
 	}
 
@@ -467,7 +467,7 @@ func TestValidatorStatus_UnknownStatus(t *testing.T) {
 	depositCache, err := depositcache.New()
 	require.NoError(t, err)
 
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{
 		Slot: 0,
 	})
 	require.NoError(t, err)
@@ -492,7 +492,7 @@ func TestActivationStatus_OK(t *testing.T) {
 	deposits, _, err := util.DeterministicDepositsAndKeys(4)
 	require.NoError(t, err)
 	pubKeys := [][]byte{deposits[0].Data.PublicKey, deposits[1].Data.PublicKey, deposits[2].Data.PublicKey, deposits[3].Data.PublicKey}
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{
 		Slot: 4000,
 		Validators: []*zondpb.Validator{
 			{
@@ -583,9 +583,9 @@ func TestOptimisticStatus(t *testing.T) {
 	err := server.optimisticStatus(context.Background())
 	require.NoError(t, err)
 
-	cfg := params.BeaconConfig().Copy()
-	cfg.BellatrixForkEpoch = 2
-	params.OverrideBeaconConfig(cfg)
+	// cfg := params.BeaconConfig().Copy()
+	// cfg.BellatrixForkEpoch = 2
+	// params.OverrideBeaconConfig(cfg)
 
 	server = &Server{OptimisticModeFetcher: &mockChain.ChainService{Optimistic: true}, TimeFetcher: &mockChain.ChainService{}}
 	err = server.optimisticStatus(context.Background())
@@ -665,7 +665,7 @@ func TestValidatorStatus_CorrectActivationQueue(t *testing.T) {
 	for i := 0; i < 6; i++ {
 		depData := &zondpb.Deposit_Data{
 			PublicKey:             pubKey(uint64(i)),
-			Signature:             bytesutil.PadTo([]byte("hi"), 96),
+			Signature:             bytesutil.PadTo([]byte("hi"), 4595),
 			WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
 		}
 
@@ -713,7 +713,7 @@ func TestMultipleValidatorStatus_Pubkeys(t *testing.T) {
 		deposits[4].Data.PublicKey,
 		deposits[5].Data.PublicKey,
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{
 		Slot: 4000,
 		Validators: []*zondpb.Validator{
 			{
@@ -1265,7 +1265,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 }
 
 func createStateSetupPhase0(t *testing.T, head primitives.Epoch) (state.BeaconState,
-	state.BeaconState, []bls.SecretKey) {
+	state.BeaconState, []dilithium.DilithiumKey) {
 	gs, keys := util.DeterministicGenesisState(t, 64)
 	hs := gs.Copy()
 
@@ -1282,7 +1282,7 @@ func createStateSetupPhase0(t *testing.T, head primitives.Epoch) (state.BeaconSt
 }
 
 func createStateSetupAltair(t *testing.T, head primitives.Epoch) (state.BeaconState,
-	state.BeaconState, []bls.SecretKey) {
+	state.BeaconState, []dilithium.DilithiumKey) {
 	gs, keys := util.DeterministicGenesisStateAltair(t, 64)
 	hs := gs.Copy()
 

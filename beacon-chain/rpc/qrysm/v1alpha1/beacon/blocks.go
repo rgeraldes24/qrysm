@@ -90,32 +90,6 @@ func convertToBlockContainer(blk interfaces.ReadOnlySignedBeaconBlock, root [32]
 	}
 
 	switch blk.Version() {
-	case version.Phase0:
-		rBlk, err := blk.PbPhase0Block()
-		if err != nil {
-			return nil, err
-		}
-		ctr.Block = &zondpb.BeaconBlockContainer_Phase0Block{Phase0Block: rBlk}
-	case version.Altair:
-		rBlk, err := blk.PbAltairBlock()
-		if err != nil {
-			return nil, err
-		}
-		ctr.Block = &zondpb.BeaconBlockContainer_AltairBlock{AltairBlock: rBlk}
-	case version.Bellatrix:
-		if blk.IsBlinded() {
-			rBlk, err := blk.PbBlindedBellatrixBlock()
-			if err != nil {
-				return nil, err
-			}
-			ctr.Block = &zondpb.BeaconBlockContainer_BlindedBellatrixBlock{BlindedBellatrixBlock: rBlk}
-		} else {
-			rBlk, err := blk.PbBellatrixBlock()
-			if err != nil {
-				return nil, err
-			}
-			ctr.Block = &zondpb.BeaconBlockContainer_BellatrixBlock{BellatrixBlock: rBlk}
-		}
 	case version.Capella:
 		if blk.IsBlinded() {
 			rBlk, err := blk.PbBlindedCapellaBlock()

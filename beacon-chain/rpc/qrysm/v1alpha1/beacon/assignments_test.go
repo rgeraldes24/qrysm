@@ -216,14 +216,12 @@ func TestServer_ListAssignments_Pagination_DefaultPageSize_NoArchive(t *testing.
 	committeeAssignments, proposerIndexToSlots, err := helpers.CommitteeAssignments(context.Background(), s, 0)
 	require.NoError(t, err)
 	for _, index := range activeIndices[0:params.BeaconConfig().DefaultPageSize] {
-		val, err := s.ValidatorAtIndex(index)
 		require.NoError(t, err)
 		wanted = append(wanted, &zondpb.ValidatorAssignments_CommitteeAssignment{
 			BeaconCommittees: committeeAssignments[index].Committee,
 			CommitteeIndex:   committeeAssignments[index].CommitteeIndex,
 			AttesterSlot:     committeeAssignments[index].AttesterSlot,
 			ProposerSlots:    proposerIndexToSlots[index],
-			PublicKey:        val.PublicKey,
 			ValidatorIndex:   index,
 		})
 	}
@@ -286,14 +284,12 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 	committeeAssignments, proposerIndexToSlots, err := helpers.CommitteeAssignments(context.Background(), s, 0)
 	require.NoError(t, err)
 	for _, index := range activeIndices[1:4] {
-		val, err := s.ValidatorAtIndex(index)
 		require.NoError(t, err)
 		wanted = append(wanted, &zondpb.ValidatorAssignments_CommitteeAssignment{
 			BeaconCommittees: committeeAssignments[index].Committee,
 			CommitteeIndex:   committeeAssignments[index].CommitteeIndex,
 			AttesterSlot:     committeeAssignments[index].AttesterSlot,
 			ProposerSlots:    proposerIndexToSlots[index],
-			PublicKey:        val.PublicKey,
 			ValidatorIndex:   index,
 		})
 	}
@@ -354,14 +350,12 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 	committeeAssignments, proposerIndexToSlots, err := helpers.CommitteeAssignments(context.Background(), s, 0)
 	require.NoError(t, err)
 	for _, index := range activeIndices[3:5] {
-		val, err := s.ValidatorAtIndex(index)
 		require.NoError(t, err)
 		assignments = append(assignments, &zondpb.ValidatorAssignments_CommitteeAssignment{
 			BeaconCommittees: committeeAssignments[index].Committee,
 			CommitteeIndex:   committeeAssignments[index].CommitteeIndex,
 			AttesterSlot:     committeeAssignments[index].AttesterSlot,
 			ProposerSlots:    proposerIndexToSlots[index],
-			PublicKey:        val.PublicKey,
 			ValidatorIndex:   index,
 		})
 	}
@@ -382,14 +376,12 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 	cAssignments, proposerIndexToSlots, err := helpers.CommitteeAssignments(context.Background(), s, 0)
 	require.NoError(t, err)
 	for _, index := range activeIndices[6:7] {
-		val, err := s.ValidatorAtIndex(index)
 		require.NoError(t, err)
 		assignments = append(assignments, &zondpb.ValidatorAssignments_CommitteeAssignment{
 			BeaconCommittees: cAssignments[index].Committee,
 			CommitteeIndex:   cAssignments[index].CommitteeIndex,
 			AttesterSlot:     cAssignments[index].AttesterSlot,
 			ProposerSlots:    proposerIndexToSlots[index],
-			PublicKey:        val.PublicKey,
 			ValidatorIndex:   index,
 		})
 	}

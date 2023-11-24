@@ -812,7 +812,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root1"), 32),
 					},
 				},
-				Signature: bytesutil.PadTo([]byte("sig1"), 96),
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), 4595)},
 			},
 			{
 				ParticipationBits: bitfield.Bitlist{0x01},
@@ -829,7 +829,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root2"), 32),
 					},
 				},
-				Signature: bytesutil.PadTo([]byte("sig2"), 96),
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), 4595)},
 			},
 		}
 		sb, err := blocks.NewSignedBeaconBlock(b)
@@ -869,7 +869,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root1"), 32),
 					},
 				},
-				Signature: bytesutil.PadTo([]byte("sig1"), 96),
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), 4595)},
 			},
 			{
 				ParticipationBits: bitfield.Bitlist{0x01},
@@ -886,7 +886,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root2"), 32),
 					},
 				},
-				Signature: bytesutil.PadTo([]byte("sig2"), 96),
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), 4595)},
 			},
 		}
 		sb, err := blocks.NewSignedBeaconBlock(b)
@@ -926,7 +926,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root1"), 32),
 					},
 				},
-				Signature: bytesutil.PadTo([]byte("sig1"), 96),
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), 4595)},
 			},
 			{
 				ParticipationBits: bitfield.Bitlist{0x01},
@@ -943,7 +943,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root2"), 32),
 					},
 				},
-				Signature: bytesutil.PadTo([]byte("sig2"), 96),
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), 4595)},
 			},
 		}
 		sb, err := blocks.NewSignedBeaconBlock(b)
@@ -983,7 +983,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root1"), 32),
 					},
 				},
-				Signature: bytesutil.PadTo([]byte("sig1"), 96),
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), 4595)},
 			},
 			{
 				ParticipationBits: bitfield.Bitlist{0x01},
@@ -1000,7 +1000,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root2"), 32),
 					},
 				},
-				Signature: bytesutil.PadTo([]byte("sig2"), 96),
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), 4595)},
 			},
 		}
 		sb, err := blocks.NewSignedBeaconBlock(b)

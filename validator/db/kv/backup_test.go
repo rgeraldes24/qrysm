@@ -60,7 +60,7 @@ func TestStore_NestedBackup(t *testing.T) {
 				Root:  root[:],
 			},
 		},
-		Signature: make([]byte, 96),
+		Signatures: [][]byte{},
 	}
 	require.NoError(t, db.SaveGenesisValidatorsRoot(ctx, root[:]))
 	require.NoError(t, db.SaveAttestationForPubKey(context.Background(), keys[0], [32]byte{'C'}, idxAtt))

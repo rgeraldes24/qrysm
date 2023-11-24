@@ -4,14 +4,12 @@ import (
 	"testing"
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
-	"github.com/theQRL/qrysm/v4/testing/util"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -43,7 +41,7 @@ func TestCurrentEpoch_OK(t *testing.T) {
 		{slot: 200, epoch: 6},
 	}
 	for _, tt := range tests {
-		st, err := state_native.InitializeFromProtoPhase0(&zond.BeaconState{Slot: tt.slot})
+		st, err := state_native.InitializeFromProtoCapella(&zond.BeaconState{Slot: tt.slot})
 		require.NoError(t, err)
 		assert.Equal(t, tt.epoch, time.CurrentEpoch(st), "ActiveCurrentEpoch(%d)", st.Slot())
 	}
@@ -59,7 +57,7 @@ func TestPrevEpoch_OK(t *testing.T) {
 		{slot: 2 * params.BeaconConfig().SlotsPerEpoch, epoch: 1},
 	}
 	for _, tt := range tests {
-		st, err := state_native.InitializeFromProtoPhase0(&zond.BeaconState{Slot: tt.slot})
+		st, err := state_native.InitializeFromProtoCapella(&zond.BeaconState{Slot: tt.slot})
 		require.NoError(t, err)
 		assert.Equal(t, tt.epoch, time.PrevEpoch(st), "ActivePrevEpoch(%d)", st.Slot())
 	}
@@ -77,7 +75,7 @@ func TestNextEpoch_OK(t *testing.T) {
 		{slot: 200, epoch: primitives.Epoch(200/params.BeaconConfig().SlotsPerEpoch + 1)},
 	}
 	for _, tt := range tests {
-		st, err := state_native.InitializeFromProtoPhase0(&zond.BeaconState{Slot: tt.slot})
+		st, err := state_native.InitializeFromProtoCapella(&zond.BeaconState{Slot: tt.slot})
 		require.NoError(t, err)
 		assert.Equal(t, tt.epoch, time.NextEpoch(st), "NextEpoch(%d)", st.Slot())
 	}
@@ -109,18 +107,19 @@ func TestCanProcessEpoch_TrueOnEpochsLastSlot(t *testing.T) {
 
 	for _, tt := range tests {
 		b := &zond.BeaconState{Slot: tt.slot}
-		s, err := state_native.InitializeFromProtoPhase0(b)
+		s, err := state_native.InitializeFromProtoCapella(b)
 		require.NoError(t, err)
 		assert.Equal(t, tt.canProcessEpoch, time.CanProcessEpoch(s), "CanProcessEpoch(%d)", tt.slot)
 	}
 }
 
+/*
 func TestAltairCompatible(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig()
-	cfg.AltairForkEpoch = 1
-	cfg.BellatrixForkEpoch = 2
-	params.OverrideBeaconConfig(cfg)
+	// cfg := params.BeaconConfig()
+	// cfg.AltairForkEpoch = 1
+	// cfg.BellatrixForkEpoch = 2
+	// params.OverrideBeaconConfig(cfg)
 
 	type args struct {
 		s state.BeaconState
@@ -132,7 +131,7 @@ func TestAltairCompatible(t *testing.T) {
 		want bool
 	}{
 		{
-			name: "phase0 state",
+			name: "capella state",
 			args: args{
 				s: func() state.BeaconState {
 					st, _ := util.DeterministicGenesisState(t, 1)
@@ -141,50 +140,52 @@ func TestAltairCompatible(t *testing.T) {
 			},
 			want: false,
 		},
-		{
-			name: "altair state, altair epoch",
-			args: args{
-				s: func() state.BeaconState {
-					st, _ := util.DeterministicGenesisStateAltair(t, 1)
-					return st
-				}(),
-				e: params.BeaconConfig().AltairForkEpoch,
+		/*
+			{
+				name: "altair state, altair epoch",
+				args: args{
+					s: func() state.BeaconState {
+						st, _ := util.DeterministicGenesisStateAltair(t, 1)
+						return st
+					}(),
+					e: params.BeaconConfig().AltairForkEpoch,
+				},
+				want: true,
 			},
-			want: true,
-		},
-		{
-			name: "bellatrix state, bellatrix epoch",
-			args: args{
-				s: func() state.BeaconState {
-					st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
-					return st
-				}(),
-				e: params.BeaconConfig().BellatrixForkEpoch,
+			{
+				name: "bellatrix state, bellatrix epoch",
+				args: args{
+					s: func() state.BeaconState {
+						st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+						return st
+					}(),
+					e: params.BeaconConfig().BellatrixForkEpoch,
+				},
+				want: true,
 			},
-			want: true,
-		},
-		{
-			name: "bellatrix state, altair epoch",
-			args: args{
-				s: func() state.BeaconState {
-					st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
-					return st
-				}(),
-				e: params.BeaconConfig().AltairForkEpoch,
+			{
+				name: "bellatrix state, altair epoch",
+				args: args{
+					s: func() state.BeaconState {
+						st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+						return st
+					}(),
+					e: params.BeaconConfig().AltairForkEpoch,
+				},
+				want: true,
 			},
-			want: true,
-		},
-		{
-			name: "bellatrix state, phase0 epoch",
-			args: args{
-				s: func() state.BeaconState {
-					st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
-					return st
-				}(),
+			{
+				name: "bellatrix state, phase0 epoch",
+				args: args{
+					s: func() state.BeaconState {
+						st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+						return st
+					}(),
+				},
+				want: false,
 			},
-			want: false,
-		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := time.HigherEqualThanAltairVersionAndEpoch(tt.args.s, tt.args.e); got != tt.want {
@@ -193,38 +194,4 @@ func TestAltairCompatible(t *testing.T) {
 		})
 	}
 }
-
-func TestCanUpgradeToCapella(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-	bc := params.BeaconConfig()
-	bc.CapellaForkEpoch = 5
-	params.OverrideBeaconConfig(bc)
-	tests := []struct {
-		name string
-		slot primitives.Slot
-		want bool
-	}{
-		{
-			name: "not epoch start",
-			slot: 1,
-			want: false,
-		},
-		{
-			name: "not capella epoch",
-			slot: params.BeaconConfig().SlotsPerEpoch,
-			want: false,
-		},
-		{
-			name: "capella epoch",
-			slot: primitives.Slot(params.BeaconConfig().CapellaForkEpoch) * params.BeaconConfig().SlotsPerEpoch,
-			want: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := time.CanUpgradeToCapella(tt.slot); got != tt.want {
-				t.Errorf("CanUpgradeToCapella() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+*/

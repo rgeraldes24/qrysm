@@ -263,14 +263,6 @@ func ProcessSlots(ctx context.Context, state state.BeaconState, slot primitives.
 			tracing.AnnotateError(span, err)
 			return nil, errors.Wrap(err, "failed to increment state slot")
 		}
-
-		// if time.CanUpgradeToCapella(state.Slot()) {
-		// 	state, err = capella.UpgradeToCapella(state)
-		// 	if err != nil {
-		// 		tracing.AnnotateError(span, err)
-		// 		return nil, err
-		// 	}
-		// }
 	}
 
 	if highestSlot < state.Slot() {

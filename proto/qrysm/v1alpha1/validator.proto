@@ -61,6 +61,18 @@ service BeaconNodeValidator {
         };
     }
 
+    // WaitForChainStart queries the logs of the Validator Deposit Contract on the Ethereum
+    // proof-of-work chain to verify the beacon chain has started its runtime and
+    // validators are ready to begin their responsibilities.
+    //
+    // If the chain has not yet started, this endpoint starts a server-side stream which updates
+    // the client when the beacon chain is ready.
+    rpc WaitForChainStart(google.protobuf.Empty) returns (stream ChainStartResponse) {
+        option (google.api.http) = {
+            get: "/zond/v1alpha1/validator/chainstart/stream"
+        };
+    }
+
     // WaitForActivation checks if a validator public key exists in the active validator
     // registry of the current beacon state. If the validator is NOT yet active, it starts a
     // server-side stream which updates the client whenever the validator becomes active in
@@ -268,6 +280,16 @@ service BeaconNodeValidator {
         };
     }
 
+    // Server-side stream of all signed blocks as they are received by
+    // the beacon chain node.
+    rpc StreamBlocksAltair(StreamBlocksRequest) returns (stream StreamBlocksResponse) {
+        option (google.api.http) = {
+            get: "/zond/v1alpha1/validator/blocks/stream"
+        };
+        option deprecated = true;
+    }
+
+
     rpc SubmitValidatorRegistrations(SignedValidatorRegistrationsV1) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             post: "/zond/v1alpha1/validator/registration"
@@ -282,9 +304,9 @@ service BeaconNodeValidator {
         };
     }
 
-    rpc AggregatedSigAndAggregationBits(AggregatedSigAndAggregationBitsRequest) returns (AggregatedSigAndAggregationBitsResponse) {
+    rpc SignaturesAndParticipationBits(SignaturesAndParticipationBitsRequest) returns (SignaturesAndParticipationBitsResponse) {
         option (google.api.http) = {
-            get: "/zond/v1alpha1/validator/blocks/aggregated_sig_and_aggregation_bits"
+            get: "/zond/v1alpha1/validator/blocks/signatures_and_participation_bits"
         };
     }
 }
@@ -318,6 +340,13 @@ message SyncSubcommitteeIndexResponse {
     // The subcommittee index itself.
     // If the total validator count is not sufficient, there could be more than one index.
     repeated uint64 indices = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.CommitteeIndex"];
+}
+
+message StreamBlocksResponse {
+    oneof block {
+        // Representing a capella block.
+        SignedBeaconBlock capella_block = 1;
+    }
 }
 
 message DomainRequest {
@@ -670,6 +699,13 @@ message DoppelGangerResponse {
     repeated ValidatorResponse responses = 1;
 }
 
+// Request to only return blocks that is verified by the beacon node.
+message StreamBlocksRequest {
+    option deprecated = true;
+    bool verified_only = 1;
+}
+
+
 message PrepareBeaconProposerRequest {
     message FeeRecipientContainer {
         // The address of the fee recipient.
@@ -694,14 +730,14 @@ message AssignValidatorToSubnetRequest {
     ValidatorStatus status = 2;
 }
 
-message AggregatedSigAndAggregationBitsRequest {
+message SignaturesAndParticipationBitsRequest {
     repeated SyncCommitteeMessage msgs = 1;
     uint64 slot = 2 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
     uint64 subnet_id = 3;
     bytes block_root = 4 [(theqrl.zond.ext.ssz_size) = "32"];
 }
 
-message AggregatedSigAndAggregationBitsResponse {
-    bytes aggregated_sig = 1;
-    bytes bits = 2;
+message SignaturesAndParticipationBitsResponse {
+    repeated bytes signatures = 1;
+    bytes participation_bits = 2;
 }

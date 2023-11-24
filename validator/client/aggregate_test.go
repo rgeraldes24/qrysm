@@ -60,7 +60,7 @@ func TestSubmitAggregateAndProof_SignFails(t *testing.T) {
 			Aggregate: util.HydrateAttestation(&zondpb.Attestation{
 				ParticipationBits: make([]byte, 1),
 			}),
-			SelectionProof: make([]byte, 96),
+			SelectionProof: make([]byte, 4595),
 		},
 	}, nil)
 
@@ -99,7 +99,7 @@ func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 			Aggregate: util.HydrateAttestation(&zondpb.Attestation{
 				ParticipationBits: make([]byte, 1),
 			}),
-			SelectionProof: make([]byte, 96),
+			SelectionProof: make([]byte, 4595),
 		},
 	}, nil)
 
@@ -162,7 +162,7 @@ func TestAggregateAndProofSignature_CanSignValidSignature(t *testing.T) {
 		Aggregate: util.HydrateAttestation(&zondpb.Attestation{
 			ParticipationBits: bitfield.NewBitlist(1),
 		}),
-		SelectionProof: make([]byte, 96),
+		SelectionProof: make([]byte, 4595),
 	}
 	sig, err := validator.aggregateAndProofSig(context.Background(), pubKey, agg, 0 /* slot */)
 	require.NoError(t, err)

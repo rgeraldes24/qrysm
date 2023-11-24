@@ -7,7 +7,7 @@ import (
 	dbtest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	mockstategen "github.com/theQRL/qrysm/v4/beacon-chain/state/stategen/mock"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -21,9 +21,9 @@ func setupService(t *testing.T, params *Parameters) *Simulator {
 	// We setup validators in the beacon state along with their
 	// private keys used to generate valid signatures in generated objects.
 	validators := make([]*zondpb.Validator, params.NumValidators)
-	privKeys := make(map[primitives.ValidatorIndex]bls.SecretKey)
+	privKeys := make(map[primitives.ValidatorIndex]dilithium.DilithiumKey)
 	for valIdx := range validators {
-		privKey, err := bls.RandKey()
+		privKey, err := dilithium.RandKey()
 		require.NoError(t, err)
 		privKeys[primitives.ValidatorIndex(valIdx)] = privKey
 		validators[valIdx] = &zondpb.Validator{

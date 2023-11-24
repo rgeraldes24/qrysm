@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	util "github.com/wealdtech/go-eth2-util"
@@ -110,7 +110,7 @@ func TestDerivationFromSeed(t *testing.T) {
 	}
 }
 
-func secretKeyFromBigNum(s string) (bls.SecretKey, error) {
+func secretKeyFromBigNum(s string) (dilithium.DilithiumKey, error) {
 	num := new(big.Int)
 	num, ok := num.SetString(s, 10)
 	if !ok {
@@ -120,5 +120,5 @@ func secretKeyFromBigNum(s string) (bls.SecretKey, error) {
 	if len(bts) != 32 {
 		return nil, errors.Errorf("provided big number string sets to a key unequal to 32 bytes: %d != 32", len(bts))
 	}
-	return bls.SecretKeyFromBytes(bts)
+	return dilithium.SecretKeyFromBytes(bts)
 }

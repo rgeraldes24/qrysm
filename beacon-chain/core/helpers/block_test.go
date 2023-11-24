@@ -61,7 +61,7 @@ func TestBlockRootAtSlot_CorrectBlockRoot(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			s.Slot = tt.stateSlot
-			state, err := state_native.InitializeFromProtoPhase0(s)
+			state, err := state_native.InitializeFromProtoCapella(s)
 			require.NoError(t, err)
 			wantedSlot := tt.slot
 			result, err := helpers.BlockRootAtSlot(state, wantedSlot)
@@ -111,7 +111,7 @@ func TestBlockRootAtSlot_OutOfBounds(t *testing.T) {
 	}
 	for _, tt := range tests {
 		state.Slot = tt.stateSlot
-		s, err := state_native.InitializeFromProtoPhase0(state)
+		s, err := state_native.InitializeFromProtoCapella(state)
 		require.NoError(t, err)
 		_, err = helpers.BlockRootAtSlot(s, tt.slot)
 		assert.ErrorContains(t, tt.expectedErr, err)

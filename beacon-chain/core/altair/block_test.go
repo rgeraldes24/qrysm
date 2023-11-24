@@ -14,7 +14,7 @@ import (
 	p2pType "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -39,19 +39,16 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 	ps := slots.PrevSlot(beaconState.Slot())
 	pbr, err := helpers.BlockRootAtSlot(beaconState, ps)
 	require.NoError(t, err)
-	sigs := make([]bls.Signature, len(indices))
+	sigs := make([][]byte, len(indices))
 	for i, indice := range indices {
 		b := p2pType.SSZBytes(pbr)
 		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
 		require.NoError(t, err)
-		sig, err := bls.SignatureFromBytes(sb)
-		require.NoError(t, err)
-		sigs[i] = sig
+		sigs[i] = sb
 	}
-	aggregatedSig := bls.AggregateSignatures(sigs).Marshal()
 	syncAggregate := &zondpb.SyncAggregate{
-		SyncCommitteeBits:      syncBits,
-		SyncCommitteeSignature: aggregatedSig,
+		SyncCommitteeBits:       syncBits,
+		SyncCommitteeSignatures: sigs,
 	}
 
 	var reward uint64
@@ -115,19 +112,16 @@ func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
 	ps := slots.PrevSlot(beaconState.Slot())
 	pbr, err := helpers.BlockRootAtSlot(beaconState, ps)
 	require.NoError(t, err)
-	sigs := make([]bls.Signature, len(indices))
+	sigs := make([][]byte, len(indices))
 	for i, indice := range indices {
 		b := p2pType.SSZBytes(pbr)
 		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
 		require.NoError(t, err)
-		sig, err := bls.SignatureFromBytes(sb)
-		require.NoError(t, err)
-		sigs[i] = sig
+		sigs[i] = sb
 	}
-	aggregatedSig := bls.AggregateSignatures(sigs).Marshal()
 	syncAggregate := &zondpb.SyncAggregate{
-		SyncCommitteeBits:      syncBits,
-		SyncCommitteeSignature: aggregatedSig,
+		SyncCommitteeBits:       syncBits,
+		SyncCommitteeSignatures: sigs,
 	}
 
 	_, _, err = altair.ProcessSyncAggregate(context.Background(), beaconState, syncAggregate)
@@ -150,21 +144,18 @@ func TestProcessSyncCommittee_MixParticipation_GoodSignature(t *testing.T) {
 	ps := slots.PrevSlot(beaconState.Slot())
 	pbr, err := helpers.BlockRootAtSlot(beaconState, ps)
 	require.NoError(t, err)
-	sigs := make([]bls.Signature, 0, len(indices))
+	sigs := make([][]byte, 0, len(indices))
 	for i, indice := range indices {
 		if syncBits.BitAt(uint64(i)) {
 			b := p2pType.SSZBytes(pbr)
 			sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
 			require.NoError(t, err)
-			sig, err := bls.SignatureFromBytes(sb)
-			require.NoError(t, err)
-			sigs = append(sigs, sig)
+			sigs = append(sigs, sb)
 		}
 	}
-	aggregatedSig := bls.AggregateSignatures(sigs).Marshal()
 	syncAggregate := &zondpb.SyncAggregate{
-		SyncCommitteeBits:      syncBits,
-		SyncCommitteeSignature: aggregatedSig,
+		SyncCommitteeBits:       syncBits,
+		SyncCommitteeSignatures: sigs,
 	}
 
 	_, _, err = altair.ProcessSyncAggregate(context.Background(), beaconState, syncAggregate)
@@ -267,24 +258,21 @@ func Test_VerifySyncCommitteeSig(t *testing.T) {
 	ps := slots.PrevSlot(beaconState.Slot())
 	pbr, err := helpers.BlockRootAtSlot(beaconState, ps)
 	require.NoError(t, err)
-	sigs := make([]bls.Signature, len(indices))
-	pks := make([]bls.PublicKey, len(indices))
+	sigs := make([][]byte, len(indices))
+	pks := make([]dilithium.PublicKey, len(indices))
 	for i, indice := range indices {
 		b := p2pType.SSZBytes(pbr)
 		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
 		require.NoError(t, err)
-		sig, err := bls.SignatureFromBytes(sb)
-		require.NoError(t, err)
-		sigs[i] = sig
+		sigs[i] = sb
 		pks[i] = privKeys[indice].PublicKey()
 	}
-	aggregatedSig := bls.AggregateSignatures(sigs).Marshal()
 
-	blsKey, err := bls.RandKey()
+	dilithiumKey, err := dilithium.RandKey()
 	require.NoError(t, err)
-	require.ErrorContains(t, "invalid sync committee signature", altair.VerifySyncCommitteeSig(beaconState, pks, blsKey.Sign([]byte{'m', 'e', 'o', 'w'}).Marshal()))
+	require.ErrorContains(t, "invalid sync committee signature", altair.VerifySyncCommitteeSigs(beaconState, pks, dilithiumKey.Sign([]byte{'m', 'e', 'o', 'w'}).Marshal()))
 
-	require.NoError(t, altair.VerifySyncCommitteeSig(beaconState, pks, aggregatedSig))
+	require.NoError(t, altair.VerifySyncCommitteeSigs(beaconState, pks, sigs))
 }
 
 func Test_SyncRewards(t *testing.T) {

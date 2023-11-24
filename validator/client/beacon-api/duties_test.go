@@ -758,7 +758,7 @@ func TestGetDutiesForEpoch_Error(t *testing.T) {
 						{Status: zondpb.ValidatorStatus_PENDING},
 					},
 				},
-				true,
+				//true,
 			)
 			assert.ErrorContains(t, testCase.expectedError, err)
 		})
@@ -1003,7 +1003,7 @@ func TestGetDutiesForEpoch_Valid(t *testing.T) {
 				ctx,
 				epoch,
 				multipleValidatorStatus,
-				testCase.fetchSyncDuties,
+				//testCase.fetchSyncDuties,
 			)
 			require.NoError(t, err)
 			assert.DeepEqual(t, expectedDuties, duties)
@@ -1020,10 +1020,12 @@ func TestGetDuties_Valid(t *testing.T) {
 			name:  "genesis epoch",
 			epoch: params.BeaconConfig().GenesisEpoch,
 		},
-		{
-			name:  "altair epoch",
-			epoch: params.BeaconConfig().AltairForkEpoch,
-		},
+		/*
+			{
+				name:  "altair epoch",
+				epoch: params.BeaconConfig().AltairForkEpoch,
+			},
+		*/
 	}
 
 	for _, testCase := range testCases {
@@ -1099,7 +1101,9 @@ func TestGetDuties_Valid(t *testing.T) {
 				nil,
 			).Times(2)
 
-			fetchSyncDuties := testCase.epoch >= params.BeaconConfig().AltairForkEpoch
+			// TODO(rgeraldes24)
+			//fetchSyncDuties := testCase.epoch >= params.BeaconConfig().AltairForkEpoch
+			fetchSyncDuties := true
 			if fetchSyncDuties {
 				dutiesProvider.EXPECT().GetSyncDuties(
 					ctx,
@@ -1267,7 +1271,7 @@ func TestGetDuties_Valid(t *testing.T) {
 				ctx,
 				testCase.epoch,
 				multipleValidatorStatus,
-				fetchSyncDuties,
+				//fetchSyncDuties,
 			)
 			require.NoError(t, err)
 
@@ -1275,12 +1279,11 @@ func TestGetDuties_Valid(t *testing.T) {
 				ctx,
 				testCase.epoch+1,
 				multipleValidatorStatus,
-				fetchSyncDuties,
+				//fetchSyncDuties,
 			)
 			require.NoError(t, err)
 
 			expectedDuties := &zondpb.DutiesResponse{
-				Duties:             expectedCurrentEpochDuties,
 				CurrentEpochDuties: expectedCurrentEpochDuties,
 				NextEpochDuties:    expectedNextEpochDuties,
 			}

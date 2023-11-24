@@ -42,7 +42,7 @@ func TestService_ValidateSyncCommitteeMessage(t *testing.T) {
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{'A'},
 	}
-	var emptySig [96]byte
+	var emptySig [4595]byte
 	type args struct {
 		pid   peer.ID
 		msg   *zondpb.SyncCommitteeMessage

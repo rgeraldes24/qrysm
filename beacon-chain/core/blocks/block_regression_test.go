@@ -9,7 +9,6 @@ import (
 	v "github.com/theQRL/qrysm/v4/beacon-chain/core/validators"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -42,19 +41,18 @@ func TestProcessAttesterSlashings_RegressionSlashableIndices(t *testing.T) {
 	att1 := &zondpb.IndexedAttestation{
 		Data:             util.HydrateAttestationData(&zondpb.AttestationData{Target: &zondpb.Checkpoint{Epoch: 0, Root: root1[:]}}),
 		AttestingIndices: setA,
-		Signature:        make([]byte, 96),
+		Signatures:       [][]byte{},
 	}
 	domain, err := signing.Domain(beaconState.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, beaconState.GenesisValidatorsRoot())
 	require.NoError(t, err)
 	signingRoot, err := signing.ComputeSigningRoot(att1.Data, domain)
 	require.NoError(t, err, "Could not get signing root of beacon block header")
-	var aggSigs []bls.Signature
+	var sigs [][]byte
 	for _, index := range setA {
-		sig := privKeys[index].Sign(signingRoot[:])
-		aggSigs = append(aggSigs, sig)
+		sig := privKeys[index].Sign(signingRoot[:]).Marshal()
+		sigs = append(sigs, sig)
 	}
-	aggregateSig := bls.AggregateSignatures(aggSigs)
-	att1.Signature = aggregateSig.Marshal()
+	att1.Signatures = sigs
 
 	root2 := [32]byte{'d', 'o', 'u', 'b', 'l', 'e', '2'}
 	att2 := &zondpb.IndexedAttestation{
@@ -62,17 +60,15 @@ func TestProcessAttesterSlashings_RegressionSlashableIndices(t *testing.T) {
 			Target: &zondpb.Checkpoint{Root: root2[:]},
 		}),
 		AttestingIndices: setB,
-		Signature:        make([]byte, 96),
+		Signatures:       [][]byte{},
 	}
 	signingRoot, err = signing.ComputeSigningRoot(att2.Data, domain)
 	assert.NoError(t, err, "Could not get signing root of beacon block header")
-	aggSigs = []bls.Signature{}
+	sigs = [][]byte{}
 	for _, index := range setB {
-		sig := privKeys[index].Sign(signingRoot[:])
-		aggSigs = append(aggSigs, sig)
+		sig := privKeys[index].Sign(signingRoot[:]).Marshal()
+		sigs = append(sigs, sig)
 	}
-	aggregateSig = bls.AggregateSignatures(aggSigs)
-	att2.Signature = aggregateSig.Marshal()
 
 	slashings := []*zondpb.AttesterSlashing{
 		{

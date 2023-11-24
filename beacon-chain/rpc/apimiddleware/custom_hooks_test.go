@@ -99,7 +99,7 @@ func TestWrapValidatorIndicesArray(t *testing.T) {
 	})
 }
 
-func TestWrapBLSChangesArray(t *testing.T) {
+func TestWrapDilithiumChangesArray(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		endpoint := &apimiddleware.Endpoint{
 			PostRequest: &SubmitDilithiumToExecutionChangesRequest{},

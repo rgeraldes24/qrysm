@@ -48,7 +48,7 @@ func prepareForkchoiceState(
 		Epoch: finalizedEpoch,
 	}
 
-	base := &zondpb.BeaconStateBellatrix{
+	base := &zondpb.BeaconState{
 		Slot:                         slot,
 		RandaoMixes:                  make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		CurrentJustifiedCheckpoint:   justifiedCheckpoint,
@@ -57,7 +57,7 @@ func prepareForkchoiceState(
 		LatestBlockHeader:            blockHeader,
 	}
 
-	st, err := state_native.InitializeFromProtoBellatrix(base)
+	st, err := state_native.InitializeFromProtoCapella(base)
 	return st, blockRoot, err
 }
 

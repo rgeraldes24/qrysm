@@ -65,7 +65,7 @@ func TestVerifyAttestationNoVerifySignature_IncorrectSourceEpoch(t *testing.T) {
 		ParticipationBits: aggBits,
 	}
 
-	var zeroSig [96]byte
+	var zeroSig [4595]byte
 	att.Signature = zeroSig[:]
 
 	err := beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)

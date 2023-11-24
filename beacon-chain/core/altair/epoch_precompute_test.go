@@ -17,7 +17,7 @@ import (
 
 func TestInitializeEpochValidators_Ok(t *testing.T) {
 	ffe := params.BeaconConfig().FarFutureEpoch
-	s, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Slot: params.BeaconConfig().SlotsPerEpoch,
 		// Validator 0 is slashed
 		// Validator 1 is withdrawable
@@ -65,7 +65,7 @@ func TestInitializeEpochValidators_Ok(t *testing.T) {
 
 func TestInitializeEpochValidators_Overflow(t *testing.T) {
 	ffe := params.BeaconConfig().FarFutureEpoch
-	s, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Slot: params.BeaconConfig().SlotsPerEpoch,
 		Validators: []*zondpb.Validator{
 			{WithdrawableEpoch: ffe, ExitEpoch: ffe, EffectiveBalance: math.MaxUint64},
@@ -79,7 +79,7 @@ func TestInitializeEpochValidators_Overflow(t *testing.T) {
 }
 
 func TestInitializeEpochValidators_BadState(t *testing.T) {
-	s, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators:       []*zondpb.Validator{{}},
 		InactivityScores: []uint64{},
 	})
@@ -149,7 +149,7 @@ func TestProcessEpochParticipation_InactiveValidator(t *testing.T) {
 		}
 		return b
 	}
-	st, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Slot: 2 * params.BeaconConfig().SlotsPerEpoch,
 		Validators: []*zondpb.Validator{
 			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},                                                  // Inactive
@@ -488,7 +488,7 @@ func testState() (state.BeaconState, error) {
 		}
 		return b
 	}
-	return state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	return state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Slot: 2 * params.BeaconConfig().SlotsPerEpoch,
 		Validators: []*zondpb.Validator{
 			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch},
@@ -525,7 +525,7 @@ func testStateBellatrix() (state.BeaconState, error) {
 		}
 		return b
 	}
-	return state_native.InitializeFromProtoBellatrix(&zondpb.BeaconStateBellatrix{
+	return state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Slot: 2 * params.BeaconConfig().SlotsPerEpoch,
 		Validators: []*zondpb.Validator{
 			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch},

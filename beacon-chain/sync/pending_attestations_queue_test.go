@@ -22,7 +22,7 @@ import (
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
@@ -165,11 +165,11 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 		blkRootToPendingAtts: make(map[[32]byte][]*zondpb.SignedAggregateAttestationAndProof),
 	}
 
-	priv, err := bls.RandKey()
+	priv, err := dilithium.RandKey()
 	require.NoError(t, err)
 	a := &zondpb.AggregateAttestationAndProof{
 		Aggregate: &zondpb.Attestation{
-			Signature:         priv.Sign([]byte("foo")).Marshal(),
+			Signatures:        [][]byte{priv.Sign([]byte("foo")).Marshal()},
 			ParticipationBits: bitfield.Bitlist{0x02},
 			Data:              util.HydrateAttestationData(&zondpb.AttestationData{}),
 		},
@@ -212,7 +212,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	hashTreeRoot, err := signing.ComputeSigningRoot(att.Data, attesterDomain)
 	assert.NoError(t, err)
 	for _, i := range attestingIndices {
-		att.Signature = privKeys[i].Sign(hashTreeRoot[:]).Marshal()
+		att.Signatures = [][]byte{privKeys[i].Sign(hashTreeRoot[:]).Marshal()}
 	}
 
 	// Arbitrary aggregator index for testing purposes.
@@ -291,12 +291,12 @@ func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 	require.NoError(t, err)
 	hashTreeRoot, err := signing.ComputeSigningRoot(att.Data, attesterDomain)
 	assert.NoError(t, err)
-	sigs := make([]bls.Signature, len(attestingIndices))
+	sigs := make([][]byte, len(attestingIndices))
 	for i, indice := range attestingIndices {
 		sig := privKeys[indice].Sign(hashTreeRoot[:])
-		sigs[i] = sig
+		sigs[i] = sig.Marshal()
 	}
-	att.Signature = bls.AggregateSignatures(sigs).Marshal()
+	att.Signatures = sigs
 
 	// Arbitrary aggregator index for testing purposes.
 	aggregatorIndex := committee[0]

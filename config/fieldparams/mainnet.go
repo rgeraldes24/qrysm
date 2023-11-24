@@ -15,8 +15,8 @@ const (
 	SlashingsLength                       = 8192          // EPOCHS_PER_SLASHINGS_VECTOR
 	SyncCommitteeLength                   = 512           // SYNC_COMMITTEE_SIZE
 	RootLength                            = 32            // RootLength defines the byte length of a Merkle root.
-	BLSSignatureLength                    = 96            // BLSSignatureLength defines the byte length of a BLSSignature.
-	DilithiumPubkeyLength                 = 48            // DilithiumPubkeyLength defines the byte length of a BLSSignature.
+	DilithiumSignatureLength              = 4595          // DilithiumSignatureLength defines the byte length of a DilithiumSignature.
+	DilithiumPubkeyLength                 = 48            // DilithiumPubkeyLength defines the byte length of a DilithiumSignature.
 	MaxTxsPerPayloadLength                = 1048576       // MaxTxsPerPayloadLength defines the maximum number of transactions that can be included in a payload.
 	MaxBytesPerTxLength                   = 1073741824    // MaxBytesPerTxLength defines the maximum number of bytes that can be included in a transaction.
 	FeeRecipientLength                    = 20            // FeeRecipientLength defines the byte length of a fee recipient.

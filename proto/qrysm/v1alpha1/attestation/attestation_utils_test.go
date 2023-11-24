@@ -9,8 +9,8 @@ import (
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls/common"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -42,9 +42,8 @@ func TestConvertToIndexed(t *testing.T) {
 			name: "Full committee attested",
 			args: args{
 				attestation: &zondpb.Attestation{
-					ParticipationBits:               bitfield.Bitlist{0b1111},
-					Signatures:                      [][]byte{[]byte("sig2"), []byte("sig0"), []byte("sig1")},
-					SignaturesIdxToParticipationIdx: []uint64{2, 0, 1},
+					ParticipationBits: bitfield.Bitlist{0b1111},
+					Signatures:        [][]byte{[]byte("sig2"), []byte("sig0"), []byte("sig1")},
 				},
 				committee: []primitives.ValidatorIndex{25, 30, 17},
 			},
@@ -57,9 +56,8 @@ func TestConvertToIndexed(t *testing.T) {
 			name: "Partial committee attested",
 			args: args{
 				attestation: &zondpb.Attestation{
-					ParticipationBits:               bitfield.Bitlist{0b1101},
-					Signatures:                      [][]byte{[]byte("sig0"), []byte("sig2")},
-					SignaturesIdxToParticipationIdx: []uint64{0, 2},
+					ParticipationBits: bitfield.Bitlist{0b1101},
+					Signatures:        [][]byte{[]byte("sig0"), []byte("sig2")},
 				},
 				committee: []primitives.ValidatorIndex{40, 50, 60},
 			},

@@ -262,7 +262,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		}
 		// set timestamps for genesis and shanghai fork
 		gen.Timestamp = f.GenesisTime
-		gen.Config.ShanghaiTime = interop.GethShanghaiTime(f.GenesisTime, params.BeaconConfig())
+		gen.Config.ShanghaiTime = interop.GzondShanghaiTime(f.GenesisTime, params.BeaconConfig())
 		log.
 			WithField("shanghai", gen.Config.ShanghaiTime).
 			Info("setting fork zond times")
@@ -270,7 +270,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		// set ttd to zero so EL goes post-merge immediately
 		gen.Config.TerminalTotalDifficulty = big.NewInt(0)
 	} else {
-		gen = interop.GethTestnetGenesis(f.GenesisTime, params.BeaconConfig())
+		gen = interop.GzondTestnetGenesis(f.GenesisTime, params.BeaconConfig())
 	}
 
 	if f.GzondGenesisJsonOut != "" {

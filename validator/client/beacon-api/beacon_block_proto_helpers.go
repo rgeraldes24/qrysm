@@ -197,19 +197,10 @@ func convertAttestationToProto(jsonAttestation *apimiddleware.AttestationJson) (
 		}
 	}
 
-	signaturesIdxToParticipationIdx := make([]uint64, len(jsonAttestation.SignaturesIdxToParticipationIdx))
-	for i, participationIdx := range jsonAttestation.SignaturesIdxToParticipationIdx {
-		signaturesIdxToParticipationIdx[i], err = strconv.ParseUint(participationIdx, 10, 64)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to parse attestation signature to participation index `%s`", participationIdx)
-		}
-	}
-
 	return &zondpb.Attestation{
-		ParticipationBits:               participationBits,
-		Data:                            attestationData,
-		Signatures:                      signatures,
-		SignaturesIdxToParticipationIdx: signaturesIdxToParticipationIdx,
+		ParticipationBits: participationBits,
+		Data:              attestationData,
+		Signatures:        signatures,
 	}, nil
 }
 
@@ -420,7 +411,7 @@ func convertWithdrawalsToProto(jsonWithdrawals []*apimiddleware.WithdrawalJson) 
 }
 
 func convertDilithiumToExecutionChangesToProto(jsonSignedDilithiumToExecutionChanges []*apimiddleware.SignedDilithiumToExecutionChangeJson) ([]*zondpb.SignedDilithiumToExecutionChange, error) {
-	signedBlsToExecutionChanges := make([]*zondpb.SignedDilithiumToExecutionChange, len(jsonSignedDilithiumToExecutionChanges))
+	signedDilithiumToExecutionChanges := make([]*zondpb.SignedDilithiumToExecutionChange, len(jsonSignedDilithiumToExecutionChanges))
 
 	for index, jsonDilithiumToExecutionChange := range jsonSignedDilithiumToExecutionChanges {
 		if jsonDilithiumToExecutionChange == nil {
@@ -438,7 +429,7 @@ func convertDilithiumToExecutionChangesToProto(jsonSignedDilithiumToExecutionCha
 
 		fromDilithiumPubkey, err := hexutil.Decode(jsonDilithiumToExecutionChange.Message.FromDilithiumPubkey)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to decode bls pubkey `%s`", jsonDilithiumToExecutionChange.Message.FromDilithiumPubkey)
+			return nil, errors.Wrapf(err, "failed to decode dilithium pubkey `%s`", jsonDilithiumToExecutionChange.Message.FromDilithiumPubkey)
 		}
 
 		toExecutionAddress, err := hexutil.Decode(jsonDilithiumToExecutionChange.Message.ToExecutionAddress)
@@ -451,7 +442,7 @@ func convertDilithiumToExecutionChangesToProto(jsonSignedDilithiumToExecutionCha
 			return nil, errors.Wrapf(err, "failed to decode signature `%s`", jsonDilithiumToExecutionChange.Signature)
 		}
 
-		signedBlsToExecutionChanges[index] = &zondpb.SignedDilithiumToExecutionChange{
+		signedDilithiumToExecutionChanges[index] = &zondpb.SignedDilithiumToExecutionChange{
 			Message: &zondpb.DilithiumToExecutionChange{
 				ValidatorIndex:      primitives.ValidatorIndex(validatorIndex),
 				FromDilithiumPubkey: fromDilithiumPubkey,
@@ -461,5 +452,5 @@ func convertDilithiumToExecutionChangesToProto(jsonSignedDilithiumToExecutionCha
 		}
 	}
 
-	return signedBlsToExecutionChanges, nil
+	return signedDilithiumToExecutionChanges, nil
 }

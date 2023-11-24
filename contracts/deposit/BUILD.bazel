@@ -40,7 +40,6 @@ go_test(
         "//config/params:go_default_library",
         "//container/trie:go_default_library",
         "//contracts/deposit/mock:go_default_library",
-        "//crypto/bls:go_default_library",
         "//crypto/dilithium:go_default_library",
         "//proto/qrysm/v1alpha1:go_default_library",
         "//runtime/interop:go_default_library",

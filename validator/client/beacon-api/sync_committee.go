@@ -160,22 +160,11 @@ func convertSyncContributionJsonToProto(contribution *apimiddleware.SyncCommitte
 		signatures = append(signatures, decodedSig)
 	}
 
-	var signaturesIdxToParticipationIdx []uint64
-	for _, participationIdx := range contribution.SignaturesIdxToParticipationIdx {
-		participationIdxUint, err := strconv.ParseUint(participationIdx, 10, 64)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to parse slot `%s`", contribution.Slot)
-		}
-
-		signaturesIdxToParticipationIdx = append(signaturesIdxToParticipationIdx, participationIdxUint)
-	}
-
 	return &zondpb.SyncCommitteeContribution{
-		Slot:                            primitives.Slot(slot),
-		BlockRoot:                       blockRoot,
-		SubcommitteeIndex:               subcommitteeIdx,
-		ParticipationBits:               aggregationBits,
-		Signatures:                      signatures,
-		SignaturesIdxToParticipationIdx: signaturesIdxToParticipationIdx,
+		Slot:              primitives.Slot(slot),
+		BlockRoot:         blockRoot,
+		SubcommitteeIndex: subcommitteeIdx,
+		ParticipationBits: aggregationBits,
+		Signatures:        signatures,
 	}, nil
 }

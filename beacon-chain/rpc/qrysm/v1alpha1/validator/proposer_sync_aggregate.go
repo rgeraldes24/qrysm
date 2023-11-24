@@ -58,7 +58,7 @@ func (cs proposerSyncContributions) dedup() (proposerSyncContributions, error) {
 					cs[len(cs)-1] = nil
 					cs = cs[:len(cs)-1]
 					j--
-				} else if bContainsA, err := b.ParticipationBits.Contains(a.GetAggregationBits()); err != nil {
+				} else if bContainsA, err := b.ParticipationBits.Contains(a.GetParticipationBits()); err != nil {
 					return nil, err
 				} else if bContainsA {
 					// b contains a, a is redundant.

@@ -787,13 +787,13 @@ func (vs *Server) ProduceSyncCommitteeContribution(
 	if msgs == nil {
 		return nil, status.Errorf(codes.NotFound, "No subcommittee messages found")
 	}
-	v1alpha1Req := &zondpbalpha.AggregatedSigAndAggregationBitsRequest{
+	v1alpha1Req := &zondpbalpha.SignaturesAndParticipationBitsRequest{
 		Msgs:      msgs,
 		Slot:      req.Slot,
 		SubnetId:  req.SubcommitteeIndex,
 		BlockRoot: req.BeaconBlockRoot,
 	}
-	v1alpha1Resp, err := vs.V1Alpha1Server.AggregatedSigAndAggregationBits(ctx, v1alpha1Req)
+	v1alpha1Resp, err := vs.V1Alpha1Server.SignaturesAndParticipationBits(ctx, v1alpha1Req)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not get contribution data: %v", err)
 	}
@@ -801,8 +801,8 @@ func (vs *Server) ProduceSyncCommitteeContribution(
 		Slot:              req.Slot,
 		BeaconBlockRoot:   req.BeaconBlockRoot,
 		SubcommitteeIndex: req.SubcommitteeIndex,
-		ParticipationBits: v1alpha1Resp.Bits,
-		Signature:         v1alpha1Resp.AggregatedSig,
+		ParticipationBits: v1alpha1Resp.ParticipationBits,
+		Signatures:        v1alpha1Resp.Signatures,
 	}
 
 	return &zondpbv1.ProduceSyncCommitteeContributionResponse{

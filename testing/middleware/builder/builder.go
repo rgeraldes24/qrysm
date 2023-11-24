@@ -30,7 +30,7 @@ import (
 	types "github.com/theQRL/qrysm/v4/consensus-types/primitives"
 
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/math"
 	"github.com/theQRL/qrysm/v4/network"
@@ -286,7 +286,7 @@ func (p *Builder) handleHeaderRequest(w http.ResponseWriter, req *http.Request) 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	secKey, err := bls.RandKey()
+	secKey, err := dilithium.RandKey()
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not retrieve secret key")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -362,7 +362,7 @@ func (p *Builder) handleHeadeRequestCapella(w http.ResponseWriter) {
 		return
 	}
 
-	secKey, err := bls.RandKey()
+	secKey, err := dilithium.RandKey()
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not retrieve secret key")
 		http.Error(w, err.Error(), http.StatusInternalServerError)

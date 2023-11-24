@@ -247,6 +247,22 @@ func (mr *MockValidatorClientMockRecorder) ProposeExit(arg0, arg1 interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProposeExit", reflect.TypeOf((*MockValidatorClient)(nil).ProposeExit), arg0, arg1)
 }
 
+// StreamBlocksAltair mocks base method.
+func (m *MockValidatorClient) StreamBlocksAltair(arg0 context.Context, arg1 *zond.StreamBlocksRequest) (zond.BeaconNodeValidator_StreamBlocksAltairClient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StreamBlocksAltair", arg0, arg1)
+	ret0, _ := ret[0].(zond.BeaconNodeValidator_StreamBlocksAltairClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StreamBlocksAltair indicates an expected call of StreamBlocksAltair.
+func (mr *MockValidatorClientMockRecorder) StreamBlocksAltair(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamBlocksAltair", reflect.TypeOf((*MockValidatorClient)(nil).StreamBlocksAltair), arg0, arg1)
+}
+
+
 // SubmitAggregateSelectionProof mocks base method.
 func (m *MockValidatorClient) SubmitAggregateSelectionProof(arg0 context.Context, arg1 *zond.AggregateSelectionRequest) (*zond.AggregateSelectionResponse, error) {
 	m.ctrl.T.Helper()

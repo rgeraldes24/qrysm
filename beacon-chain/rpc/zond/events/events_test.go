@@ -127,7 +127,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 				Epoch:          1,
 				ValidatorIndex: 1,
 			},
-			Signature: make([]byte, 96),
+			Signature: make([]byte, 4595),
 		}
 		wantedExit := migration.V1Alpha1ToV1Exit(wantedExitV1alpha1)
 		genericResponse, err := anypb.New(wantedExit)
@@ -166,7 +166,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 					BlockRoot:         []byte("root"),
 					SubcommitteeIndex: 1,
 					ParticipationBits: bitfield.NewBitvector128(),
-					Signature:         []byte("sig"),
+					Signatures:        [][]byte{[]byte("sig")},
 				},
 				SelectionProof: []byte("proof"),
 			},
@@ -207,7 +207,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 				FromDilithiumPubkey: []byte("from"),
 				ToExecutionAddress:  []byte("to"),
 			},
-			Signature: make([]byte, 96),
+			Signature: make([]byte, 4595),
 		}
 		wantedChange := migration.V1Alpha1ToV1SignedDilithiumToExecChange(wantedChangeV1alpha1)
 		genericResponse, err := anypb.New(wantedChange)
@@ -270,99 +270,6 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 			feed: srv.StateNotifier.StateFeed(),
 		})
 	})
-	t.Run(PayloadAttributesTopic+"_bellatrix", func(t *testing.T) {
-		ctx := context.Background()
-
-		beaconState, _ := util.DeterministicGenesisStateBellatrix(t, 1)
-		err := beaconState.SetSlot(2)
-		require.NoError(t, err, "Count not set slot")
-		stateRoot, err := beaconState.HashTreeRoot(ctx)
-		require.NoError(t, err, "Could not hash genesis state")
-
-		genesis := b.NewGenesisBlock(stateRoot[:])
-
-		parentRoot, err := genesis.Block.HashTreeRoot()
-		require.NoError(t, err, "Could not get signing root")
-
-		var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
-		blk := &zond.SignedBeaconBlockBellatrix{
-			Block: &zond.BeaconBlockBellatrix{
-				ProposerIndex: 0,
-				Slot:          1,
-				ParentRoot:    parentRoot[:],
-				StateRoot:     genesis.Block.StateRoot,
-				Body: &zond.BeaconBlockBodyBellatrix{
-					RandaoReveal:  genesis.Block.Body.RandaoReveal,
-					Graffiti:      genesis.Block.Body.Graffiti,
-					Zond1Data:     genesis.Block.Body.Zond1Data,
-					SyncAggregate: &zond.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignature: make([]byte, 96)},
-					ExecutionPayload: &enginev1.ExecutionPayload{
-						BlockNumber:   1,
-						ParentHash:    make([]byte, fieldparams.RootLength),
-						FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
-						StateRoot:     make([]byte, fieldparams.RootLength),
-						ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-						LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
-						PrevRandao:    make([]byte, fieldparams.RootLength),
-						BaseFeePerGas: make([]byte, fieldparams.RootLength),
-						BlockHash:     make([]byte, fieldparams.RootLength),
-					},
-				},
-			},
-			Signature: genesis.Signature,
-		}
-		signedBlk, err := blocks.NewSignedBeaconBlock(blk)
-		require.NoError(t, err)
-		srv, ctrl, mockStream := setupServer(ctx, t)
-		defer ctrl.Finish()
-		fetcher := &mockChain.ChainService{
-			Genesis:        time.Now(),
-			State:          beaconState,
-			Block:          signedBlk,
-			Root:           make([]byte, 32),
-			ValidatorsRoot: [32]byte{},
-		}
-		srv.HeadFetcher = fetcher
-		srv.ChainInfoFetcher = fetcher
-
-		prevRando, err := helpers.RandaoMix(beaconState, qrysmtime.CurrentEpoch(beaconState))
-		require.NoError(t, err)
-
-		wantedPayload := &zondpb.EventPayloadAttributeV1{
-			Version: version.String(version.Bellatrix),
-			Data: &zondpb.EventPayloadAttributeV1_BasePayloadAttribute{
-				ProposerIndex:     0,
-				ProposalSlot:      2,
-				ParentBlockNumber: 1,
-				ParentBlockRoot:   make([]byte, 32),
-				ParentBlockHash:   make([]byte, 32),
-				PayloadAttributes: &enginev1.PayloadAttributes{
-					Timestamp:             24,
-					PrevRandao:            prevRando,
-					SuggestedFeeRecipient: make([]byte, 20),
-				},
-			},
-		}
-		genericResponse, err := anypb.New(wantedPayload)
-		require.NoError(t, err)
-		wantedMessage := &gateway.EventSource{
-			Event: PayloadAttributesTopic,
-			Data:  genericResponse,
-		}
-
-		assertFeedSendAndReceive(ctx, &assertFeedArgs{
-			t:             t,
-			srv:           srv,
-			topics:        []string{PayloadAttributesTopic},
-			stream:        mockStream,
-			shouldReceive: wantedMessage,
-			itemToSend: &feed.Event{
-				Type: statefeed.NewHead,
-				Data: wantedPayload,
-			},
-			feed: srv.StateNotifier.StateFeed(),
-		})
-	})
 	t.Run(PayloadAttributesTopic+"_capella", func(t *testing.T) {
 		ctx := context.Background()
 		beaconState, _ := util.DeterministicGenesisStateCapella(t, 1)
@@ -391,18 +298,18 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		require.NoError(t, err, "Could get expected withdrawals")
 		require.NotEqual(t, len(withdrawals), 0)
 		var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
-		blk := &zond.SignedBeaconBlockCapella{
-			Block: &zond.BeaconBlockCapella{
+		blk := &zond.SignedBeaconBlock{
+			Block: &zond.BeaconBlock{
 				ProposerIndex: 0,
 				Slot:          1,
 				ParentRoot:    parentRoot[:],
 				StateRoot:     genesis.Block.StateRoot,
-				Body: &zond.BeaconBlockBodyCapella{
+				Body: &zond.BeaconBlockBody{
 					RandaoReveal:  genesis.Block.Body.RandaoReveal,
 					Graffiti:      genesis.Block.Body.Graffiti,
 					Zond1Data:     genesis.Block.Body.Zond1Data,
-					SyncAggregate: &zond.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignature: make([]byte, 96)},
-					ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+					SyncAggregate: &zond.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
+					ExecutionPayload: &enginev1.ExecutionPayload{
 						BlockNumber:   1,
 						ParentHash:    make([]byte, fieldparams.RootLength),
 						FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
@@ -436,15 +343,15 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		prevRando, err := helpers.RandaoMix(beaconState, qrysmtime.CurrentEpoch(beaconState))
 		require.NoError(t, err)
 
-		wantedPayload := &zondpb.EventPayloadAttributeV2{
+		wantedPayload := &zondpb.EventPayloadAttributeV1{
 			Version: version.String(version.Capella),
-			Data: &zondpb.EventPayloadAttributeV2_BasePayloadAttribute{
+			Data: &zondpb.EventPayloadAttributeV1_BasePayloadAttribute{
 				ProposerIndex:     0,
 				ProposalSlot:      2,
 				ParentBlockNumber: 1,
 				ParentBlockRoot:   make([]byte, 32),
 				ParentBlockHash:   make([]byte, 32),
-				PayloadAttributes: &enginev1.PayloadAttributesV2{
+				PayloadAttributes: &enginev1.PayloadAttributes{
 					Timestamp:             24,
 					PrevRandao:            prevRando,
 					SuggestedFeeRecipient: make([]byte, 20),

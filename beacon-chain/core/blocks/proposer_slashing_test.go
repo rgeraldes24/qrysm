@@ -13,7 +13,7 @@ import (
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -339,11 +339,11 @@ func TestVerifyProposerSlashing(t *testing.T) {
 	beaconState, sks := util.DeterministicGenesisState(t, 2)
 	currentSlot := primitives.Slot(0)
 	require.NoError(t, beaconState.SetSlot(currentSlot))
-	rand1, err := bls.RandKey()
+	rand1, err := dilithium.RandKey()
 	require.NoError(t, err)
 	sig1 := rand1.Sign([]byte("foo")).Marshal()
 
-	rand2, err := bls.RandKey()
+	rand2, err := dilithium.RandKey()
 	require.NoError(t, err)
 	sig2 := rand2.Sign([]byte("bar")).Marshal()
 

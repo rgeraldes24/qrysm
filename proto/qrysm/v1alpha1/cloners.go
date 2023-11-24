@@ -52,19 +52,15 @@ func CopyAttestation(att *Attestation) *Attestation {
 		return nil
 	}
 
-	signaturesIdxToParticipationIdx := make([]uint64, len(att.SignaturesIdxToParticipationIdx))
-	copy(signaturesIdxToParticipationIdx, att.SignaturesIdxToParticipationIdx)
-
 	signatures = make([][]byte, len(att.Signatures))
 	for i, sig := range att.Signatures {
 		signatures[i] = bytesutil.SafeCopyBytes(sig)
 	}
 
 	return &Attestation{
-		ParticipationBits:               bytesutil.SafeCopyBytes(att.ParticipationBits),
-		Data:                            CopyAttestationData(att.Data),
-		Signatures:                      signatures,
-		SignaturesIdxToParticipationIdx: signaturesIdxToParticipationIdx,
+		ParticipationBits: bytesutil.SafeCopyBytes(att.ParticipationBits),
+		Data:              CopyAttestationData(att.Data),
+		Signatures:        signatures,
 	}
 }
 
@@ -296,16 +292,12 @@ func CopySyncCommitteeContribution(c *SyncCommitteeContribution) *SyncCommitteeC
 		signatures[i] = bytesutil.SafeCopyBytes(sig)
 	}
 
-	signaturesIdxToParticipationIdx := make([]uint64, len(c.SignaturesIdxToParticipationIdx))
-	copy(signaturesIdxToParticipationIdx, c.SignaturesIdxToParticipationIdx)
-
 	return &SyncCommitteeContribution{
-		Slot:                            c.Slot,
-		BlockRoot:                       bytesutil.SafeCopyBytes(c.BlockRoot),
-		SubcommitteeIndex:               c.SubcommitteeIndex,
-		ParticipationBits:               bytesutil.SafeCopyBytes(c.ParticipationBits),
-		Signatures:                      signatures,
-		SignaturesIdxToParticipationIdx: signaturesIdxToParticipationIdx,
+		Slot:              c.Slot,
+		BlockRoot:         bytesutil.SafeCopyBytes(c.BlockRoot),
+		SubcommitteeIndex: c.SubcommitteeIndex,
+		ParticipationBits: bytesutil.SafeCopyBytes(c.ParticipationBits),
+		Signatures:        signatures,
 	}
 }
 

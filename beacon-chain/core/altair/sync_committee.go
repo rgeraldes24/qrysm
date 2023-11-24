@@ -162,7 +162,7 @@ func SyncSubCommitteePubkeys(syncCommittee *zondpb.SyncCommittee, subComIdx prim
 // IsSyncCommitteeAggregator checks whether the provided signature is for a valid
 // aggregator.
 //
-// def is_sync_committee_aggregator(signature: BLSSignature) -> bool:
+// def is_sync_committee_aggregator(signature: Signature) -> bool:
 //
 //	modulo = max(1, SYNC_COMMITTEE_SIZE // SYNC_COMMITTEE_SUBNET_COUNT // TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE)
 //	return bytes_to_uint64(hash(signature)[0:8]) % modulo == 0

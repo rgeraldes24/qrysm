@@ -114,10 +114,10 @@ func TestReplayBlocks_LowerSlotBlock(t *testing.T) {
 
 func TestReplayBlocks_ThroughForkBoundary(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	bCfg := params.BeaconConfig().Copy()
-	bCfg.AltairForkEpoch = 1
-	bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.AltairForkVersion)] = 1
-	params.OverrideBeaconConfig(bCfg)
+	// bCfg := params.BeaconConfig().Copy()
+	// bCfg.AltairForkEpoch = 1
+	// bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.AltairForkVersion)] = 1
+	// params.OverrideBeaconConfig(bCfg)
 
 	beaconState, _ := util.DeterministicGenesisState(t, 32)
 	genesisBlock := blocks.NewGenesisBlock([]byte{})

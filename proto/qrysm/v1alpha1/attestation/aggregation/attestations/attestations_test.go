@@ -49,36 +49,30 @@ func TestAggregatePair(t *testing.T) {
 		},
 		{
 			a1: &zondpb.Attestation{
-				ParticipationBits:               bitfield.Bitlist{0x03},
-				Signatures:                      [][]byte{sig0, sig1},
-				SignaturesIdxToParticipationIdx: []uint64{0, 1},
+				ParticipationBits: bitfield.Bitlist{0x03},
+				Signatures:        [][]byte{sig0, sig1},
 			},
 			a2: &zondpb.Attestation{
-				ParticipationBits:               bitfield.Bitlist{0x02},
-				Signatures:                      [][]byte{sig1},
-				SignaturesIdxToParticipationIdx: []uint64{1},
+				ParticipationBits: bitfield.Bitlist{0x02},
+				Signatures:        [][]byte{sig1},
 			},
 			want: &zondpb.Attestation{
-				ParticipationBits:               []byte{0x03},
-				Signatures:                      [][]byte{sig0, sig1},
-				SignaturesIdxToParticipationIdx: []uint64{0, 1},
+				ParticipationBits: []byte{0x03},
+				Signatures:        [][]byte{sig0, sig1},
 			},
 		},
 		{
 			a1: &zondpb.Attestation{
-				ParticipationBits:               bitfield.Bitlist{0x02},
-				Signatures:                      [][]byte{sig1},
-				SignaturesIdxToParticipationIdx: []uint64{1},
+				ParticipationBits: bitfield.Bitlist{0x02},
+				Signatures:        [][]byte{sig1},
 			},
 			a2: &zondpb.Attestation{
-				ParticipationBits:               bitfield.Bitlist{0x03},
-				Signatures:                      [][]byte{sig0, sig1},
-				SignaturesIdxToParticipationIdx: []uint64{0, 1},
+				ParticipationBits: bitfield.Bitlist{0x03},
+				Signatures:        [][]byte{sig0, sig1},
 			},
 			want: &zondpb.Attestation{
-				ParticipationBits:               []byte{0x03},
-				Signatures:                      [][]byte{sig0, sig1},
-				SignaturesIdxToParticipationIdx: []uint64{0, 1},
+				ParticipationBits: []byte{0x03},
+				Signatures:        [][]byte{sig0, sig1},
 			},
 		},
 	}
@@ -162,16 +156,14 @@ func TestAggregate(t *testing.T) {
 			name: "single attestation",
 			inputs: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000010, 0b1},
-					Signatures:                      [][]byte{sig0, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000010, 0b1},
+					Signatures:        [][]byte{sig0, sig8},
 				},
 			},
 			want: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000010, 0b1},
-					Signatures:                      [][]byte{sig0, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000010, 0b1},
+					Signatures:        [][]byte{sig0, sig8},
 				},
 			},
 		},
@@ -179,21 +171,18 @@ func TestAggregate(t *testing.T) {
 			name: "two attestations with no overlap",
 			inputs: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000001, 0b1},
-					Signatures:                      [][]byte{sig0, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000001, 0b1},
+					Signatures:        [][]byte{sig0, sig8},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000010, 0b1},
-					Signatures:                      [][]byte{sig1, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{1, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000010, 0b1},
+					Signatures:        [][]byte{sig1, sig8},
 				},
 			},
 			want: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000011, 0b1},
-					Signatures:                      [][]byte{sig0, sig8, sig1},
-					SignaturesIdxToParticipationIdx: []uint64{0, 8, 1},
+					ParticipationBits: bitfield.Bitlist{0b00000011, 0b1},
+					Signatures:        [][]byte{sig0, sig8, sig1},
 				},
 			},
 		},
@@ -201,26 +190,22 @@ func TestAggregate(t *testing.T) {
 			name: "two attestations with overlap",
 			inputs: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000101, 0b1},
-					Signatures:                      [][]byte{sig0, sig2, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 2, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000101, 0b1},
+					Signatures:        [][]byte{sig0, sig2, sig8},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000110, 0b1},
-					Signatures:                      [][]byte{sig1, sig2, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{1, 2, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000110, 0b1},
+					Signatures:        [][]byte{sig1, sig2, sig8},
 				},
 			},
 			want: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000101, 0b1},
-					Signatures:                      [][]byte{sig0, sig2, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 2, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000101, 0b1},
+					Signatures:        [][]byte{sig0, sig2, sig8},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000110, 0b1},
-					Signatures:                      [][]byte{sig1, sig2, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{1, 2, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000110, 0b1},
+					Signatures:        [][]byte{sig1, sig2, sig8},
 				},
 			},
 		},
@@ -229,36 +214,30 @@ func TestAggregate(t *testing.T) {
 			name: "some attestations overlap",
 			inputs: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00001001, 0b1},
-					Signatures:                      [][]byte{sig0, sig3, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 3, 8},
+					ParticipationBits: bitfield.Bitlist{0b00001001, 0b1},
+					Signatures:        [][]byte{sig0, sig3, sig8},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00010110, 0b1},
-					Signatures:                      [][]byte{sig1, sig2, sig4, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{1, 2, 4, 8},
+					ParticipationBits: bitfield.Bitlist{0b00010110, 0b1},
+					Signatures:        [][]byte{sig1, sig2, sig4, sig8},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00001010, 0b1},
-					Signatures:                      [][]byte{sig1, sig3, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{1, 3, 8},
+					ParticipationBits: bitfield.Bitlist{0b00001010, 0b1},
+					Signatures:        [][]byte{sig1, sig3, sig8},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00110001, 0b1},
-					Signatures:                      [][]byte{sig0, sig4, sig5, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 4, 5, 8},
+					ParticipationBits: bitfield.Bitlist{0b00110001, 0b1},
+					Signatures:        [][]byte{sig0, sig4, sig5, sig8},
 				},
 			},
 			want: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00111011, 0b1},
-					Signatures:                      [][]byte{sig0, sig4, sig5, sig8, sig1, sig3},
-					SignaturesIdxToParticipationIdx: []uint64{0, 4, 5, 8, 1, 3},
+					ParticipationBits: bitfield.Bitlist{0b00111011, 0b1},
+					Signatures:        [][]byte{sig0, sig4, sig5, sig8, sig1, sig3},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00011111, 0b1},
-					Signatures:                      [][]byte{sig0, sig3, sig8, sig1, sig2, sig4},
-					SignaturesIdxToParticipationIdx: []uint64{0, 3, 8, 1, 2, 4},
+					ParticipationBits: bitfield.Bitlist{0b00011111, 0b1},
+					Signatures:        [][]byte{sig0, sig3, sig8, sig1, sig2, sig4},
 				},
 			},
 		},
@@ -267,31 +246,26 @@ func TestAggregate(t *testing.T) {
 			name: "some attestations produce duplicates which are removed",
 			inputs: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000101, 0b1},
-					Signatures:                      [][]byte{sig0, sig2, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 2, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000101, 0b1},
+					Signatures:        [][]byte{sig0, sig2, sig8},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000110, 0b1},
-					Signatures:                      [][]byte{sig1, sig2, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{1, 2, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000110, 0b1},
+					Signatures:        [][]byte{sig1, sig2, sig8},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00001010, 0b1},
-					Signatures:                      [][]byte{sig1, sig3, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{1, 3, 8},
+					ParticipationBits: bitfield.Bitlist{0b00001010, 0b1},
+					Signatures:        [][]byte{sig1, sig3, sig8},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00001001, 0b1},
-					Signatures:                      [][]byte{sig0, sig3, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 3, 8},
+					ParticipationBits: bitfield.Bitlist{0b00001001, 0b1},
+					Signatures:        [][]byte{sig0, sig3, sig8},
 				},
 			},
 			want: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00001111, 0b1},
-					Signatures:                      [][]byte{sig0, sig2, sig8, sig1, sig3},
-					SignaturesIdxToParticipationIdx: []uint64{0, 2, 8, 1, 3},
+					ParticipationBits: bitfield.Bitlist{0b00001111, 0b1},
+					Signatures:        [][]byte{sig0, sig2, sig8, sig1, sig3},
 				},
 			},
 		},
@@ -299,21 +273,18 @@ func TestAggregate(t *testing.T) {
 			name: "two attestations where one is fully contained within the other",
 			inputs: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000001, 0b1},
-					Signatures:                      [][]byte{sig0, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000001, 0b1},
+					Signatures:        [][]byte{sig0, sig8},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000011, 0b1},
-					Signatures:                      [][]byte{sig0, sig1, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000011, 0b1},
+					Signatures:        [][]byte{sig0, sig1, sig8},
 				},
 			},
 			want: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000011, 0b1},
-					Signatures:                      [][]byte{sig0, sig1, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000011, 0b1},
+					Signatures:        [][]byte{sig0, sig1, sig8},
 				},
 			},
 		},
@@ -321,21 +292,18 @@ func TestAggregate(t *testing.T) {
 			name: "two attestations where one is fully contained within the other reversed",
 			inputs: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000001, 0b1},
-					Signatures:                      [][]byte{sig0, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000001, 0b1},
+					Signatures:        [][]byte{sig0, sig8},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000011, 0b1},
-					Signatures:                      [][]byte{sig0, sig1, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000011, 0b1},
+					Signatures:        [][]byte{sig0, sig1, sig8},
 				},
 			},
 			want: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000011, 0b1},
-					Signatures:                      [][]byte{sig0, sig1, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000011, 0b1},
+					Signatures:        [][]byte{sig0, sig1, sig8},
 				},
 			},
 		},
@@ -343,36 +311,30 @@ func TestAggregate(t *testing.T) {
 			name: "attestations with different bitlist lengths",
 			inputs: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000011, 0b10},
-					Signatures:                      [][]byte{sig0, sig1, sig9},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1, 9},
+					ParticipationBits: bitfield.Bitlist{0b00000011, 0b10},
+					Signatures:        [][]byte{sig0, sig1, sig9},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000111, 0b100},
-					Signatures:                      [][]byte{sig0, sig1, sig10},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1, 10},
+					ParticipationBits: bitfield.Bitlist{0b00000111, 0b100},
+					Signatures:        [][]byte{sig0, sig1, sig10},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000100, 0b1},
-					Signatures:                      [][]byte{sig2, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{2, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000100, 0b1},
+					Signatures:        [][]byte{sig2, sig8},
 				},
 			},
 			want: []*zondpb.Attestation{
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000011, 0b10},
-					Signatures:                      [][]byte{sig0, sig1, sig9},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1, 9},
+					ParticipationBits: bitfield.Bitlist{0b00000011, 0b10},
+					Signatures:        [][]byte{sig0, sig1, sig9},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000111, 0b100},
-					Signatures:                      [][]byte{sig0, sig1, sig10},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1, 10},
+					ParticipationBits: bitfield.Bitlist{0b00000111, 0b100},
+					Signatures:        [][]byte{sig0, sig1, sig10},
 				},
 				{
-					ParticipationBits:               bitfield.Bitlist{0b00000100, 0b1},
-					Signatures:                      [][]byte{sig2, sig8},
-					SignaturesIdxToParticipationIdx: []uint64{2, 8},
+					ParticipationBits: bitfield.Bitlist{0b00000100, 0b1},
+					Signatures:        [][]byte{sig2, sig8},
 				},
 			},
 			err: bitfield.ErrBitlistDifferentLength,
@@ -413,7 +375,6 @@ func TestAggregate(t *testing.T) {
 			for i, w := range tt.want {
 				assert.DeepEqual(t, w.ParticipationBits.Bytes(), got[i].ParticipationBits.Bytes())
 				assert.DeepEqual(t, w.Signatures, got[i].Signatures)
-				assert.DeepEqual(t, w.SignaturesIdxToParticipationIdx, got[i].SignaturesIdxToParticipationIdx)
 			}
 		}
 		t.Run(tt.name, func(t *testing.T) {

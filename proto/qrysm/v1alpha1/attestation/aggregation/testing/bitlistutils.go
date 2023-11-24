@@ -96,11 +96,10 @@ func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector128) []*zondpb.Sy
 	c := make([]*zondpb.SyncCommitteeContribution, len(bl))
 	for i, b := range bl {
 		c[i] = &zondpb.SyncCommitteeContribution{
-			Slot:                            primitives.Slot(1),
-			SubcommitteeIndex:               2,
-			ParticipationBits:               b,
-			Signatures:                      [][]byte{},
-			SignaturesIdxToParticipationIdx: []uint64{},
+			Slot:              primitives.Slot(1),
+			SubcommitteeIndex: 2,
+			ParticipationBits: b,
+			Signatures:        [][]byte{},
 		}
 	}
 	return c

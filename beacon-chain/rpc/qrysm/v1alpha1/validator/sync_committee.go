@@ -6,11 +6,9 @@ import (
 	"sort"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"golang.org/x/sync/errgroup"
@@ -102,7 +100,7 @@ func (vs *Server) GetSyncCommitteeContribution(
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not get head root: %v", err)
 	}
-	aggregatedSig, bits, err := vs.aggregatedSigAndAggregationBits(ctx, msgs, req.Slot, req.SubnetId, headRoot)
+	sigs, bits, err := vs.signaturesAndParticipationBits(ctx, msgs, req.Slot, req.SubnetId, headRoot)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not get contribution data: %v", err)
 	}
@@ -111,7 +109,7 @@ func (vs *Server) GetSyncCommitteeContribution(
 		BlockRoot:         headRoot,
 		SubcommitteeIndex: req.SubnetId,
 		ParticipationBits: bits,
-		Signature:         aggregatedSig,
+		Signatures:        sigs,
 	}
 
 	return contribution, nil
@@ -129,26 +127,26 @@ func (vs *Server) SubmitSignedContributionAndProof(
 	return &emptypb.Empty{}, nil
 }
 
-// AggregatedSigAndAggregationBits returns the aggregated signature and aggregation bits
+// SignaturesAndParticipationBits returns the signatures and participation bits
 // associated with a particular set of sync committee messages.
-func (vs *Server) AggregatedSigAndAggregationBits(
+func (vs *Server) SignaturesAndParticipationBits(
 	ctx context.Context,
-	req *zondpb.AggregatedSigAndAggregationBitsRequest,
-) (*zondpb.AggregatedSigAndAggregationBitsResponse, error) {
-	aggregatedSig, bits, err := vs.aggregatedSigAndAggregationBits(ctx, req.Msgs, req.Slot, req.SubnetId, req.BlockRoot)
+	req *zondpb.SignaturesAndParticipationBitsRequest,
+) (*zondpb.SignaturesAndParticipationBitsResponse, error) {
+	sigs, bits, err := vs.signaturesAndParticipationBits(ctx, req.Msgs, req.Slot, req.SubnetId, req.BlockRoot)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &zondpb.AggregatedSigAndAggregationBitsResponse{AggregatedSig: aggregatedSig, Bits: bits}, nil
+	return &zondpb.SignaturesAndParticipationBitsResponse{Signatures: sigs, ParticipationBits: bits}, nil
 }
 
-func (vs *Server) aggregatedSigAndAggregationBits(
+func (vs *Server) signaturesAndParticipationBits(
 	ctx context.Context,
 	msgs []*zondpb.SyncCommitteeMessage,
 	slot primitives.Slot,
 	subnetId uint64,
 	blockRoot []byte,
-) ([]byte, []byte, error) {
+) ([][]byte, []byte, error) {
 	subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
 	sigs := make([][]byte, 0, subCommitteeSize)
 	bits := zondpb.NewSyncCommitteeAggregationBits()
@@ -159,7 +157,7 @@ func (vs *Server) aggregatedSigAndAggregationBits(
 		if bytes.Equal(blockRoot, msg.BlockRoot) {
 			headSyncCommitteeIndices, err := vs.HeadFetcher.HeadSyncCommitteeIndices(ctx, msg.ValidatorIndex, slot)
 			if err != nil {
-				return []byte{}, nil, errors.Wrapf(err, "could not get sync subcommittee index")
+				return nil, nil, errors.Wrapf(err, "could not get sync subcommittee index")
 			}
 			for _, index := range headSyncCommitteeIndices {
 				i := uint64(index)
@@ -181,21 +179,11 @@ func (vs *Server) aggregatedSigAndAggregationBits(
 	for _, syncCommitteeIndex := range appendedSyncCommitteeIndices {
 		msg, ok := syncCommitteeIndicesSigMap[syncCommitteeIndex]
 		if !ok {
-			return []byte{}, nil, errors.Errorf("could not get sync subcommittee index %d "+
+			return nil, nil, errors.Errorf("could not get sync subcommittee index %d "+
 				"in syncCommitteeIndicesSigMap", syncCommitteeIndex)
 		}
 		sigs = append(sigs, msg.Signature)
 	}
 
-	aggregatedSig := make([]byte, dilithium2.CryptoBytes)
-	aggregatedSig[0] = 0xC0
-	if len(sigs) != 0 {
-		uncompressedSigs, err := dilithium.MultipleSignaturesFromBytes(sigs)
-		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not decompress signatures")
-		}
-		aggregatedSig = dilithium.UnaggregatedSignatures(uncompressedSigs)
-	}
-
-	return aggregatedSig, bits, nil
+	return sigs, bits, nil
 }

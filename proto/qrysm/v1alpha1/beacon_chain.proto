@@ -83,7 +83,19 @@ service BeaconChain {
     // allows for retrieval of genesis information via a boolean query filter.
     rpc ListBeaconBlocks(ListBlocksRequest) returns (ListBeaconBlocksResponse) {
         option (google.api.http) = {
-            get: "/zond/v1alpha2/beacon/blocks"
+            get: "/zond/v1alpha1/beacon/blocks"
+        };
+    }
+
+    // Server-side stream of information about the head of the beacon chain
+    // from the view of the beacon chain node.
+    //
+    // This includes the head block slot and root as well as information about
+    // the most recent finalized and justified slots.
+    rpc GetChainHead(google.protobuf.Empty) returns (ChainHead) {
+        option deprecated = true;
+        option (google.api.http) = {
+            get: "/zond/v1alpha1/beacon/chainhead"
         };
     }
 

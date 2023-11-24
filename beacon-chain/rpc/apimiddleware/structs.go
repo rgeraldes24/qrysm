@@ -451,9 +451,8 @@ type ExecutionPayloadHeaderJson struct {
 }
 
 type SyncAggregateJson struct {
-	SyncCommitteeBits           string   `json:"sync_committee_bits" hex:"true"`
-	SyncCommitteeSignatures     []string `json:"sync_committee_signatures" hex:"true"`
-	SignaturesIdxToCommitteeIdx []string `json:"signatures_idx_to_committee_idx" hex:"true"`
+	SyncCommitteeBits       string   `json:"sync_committee_bits" hex:"true"`
+	SyncCommitteeSignatures []string `json:"sync_committee_signatures" hex:"true"`
 }
 
 type BlockHeaderContainerJson struct {
@@ -508,10 +507,9 @@ type FeeRecipientJson struct {
 }
 
 type AttestationJson struct {
-	ParticipationBits               string               `json:"participation_bits" hex:"true"`
-	Data                            *AttestationDataJson `json:"data"`
-	Signatures                      []string             `json:"signatures" hex:"true"`
-	SignaturesIdxToParticipationIdx []string             `json:"signatures_idx_to_participation_idx" hex:"true"`
+	ParticipationBits string               `json:"participation_bits" hex:"true"`
+	Data              *AttestationDataJson `json:"data"`
+	Signatures        []string             `json:"signatures" hex:"true"`
 }
 
 type AttestationDataJson struct {
@@ -740,12 +738,11 @@ type ContributionAndProofJson struct {
 }
 
 type SyncCommitteeContributionJson struct {
-	Slot                            string   `json:"slot"`
-	BeaconBlockRoot                 string   `json:"beacon_block_root" hex:"true"`
-	SubcommitteeIndex               string   `json:"subcommittee_index"`
-	ParticipationBits               string   `json:"participation_bits" hex:"true"`
-	Signatures                      []string `json:"signatures" hex:"true"`
-	SignaturesIdxToParticipationIdx []string `json:"signatures_idx_to_participation_idx" hex:"true"`
+	Slot              string   `json:"slot"`
+	BeaconBlockRoot   string   `json:"beacon_block_root" hex:"true"`
+	SubcommitteeIndex string   `json:"subcommittee_index"`
+	ParticipationBits string   `json:"participation_bits" hex:"true"`
+	Signatures        []string `json:"signatures" hex:"true"`
 }
 
 type ValidatorRegistrationJson struct {

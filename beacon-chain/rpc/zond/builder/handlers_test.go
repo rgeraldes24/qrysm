@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	http2 "github.com/theQRL/qrysm/v4/network/http"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -25,7 +25,7 @@ import (
 )
 
 func TestExpectedWithdrawals_BadRequest(t *testing.T) {
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconState()
 	slotsAhead := 5000
 	require.NoError(t, err)
 	capellaSlot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
@@ -105,12 +105,12 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 }
 
 func TestExpectedWithdrawals(t *testing.T) {
-	st, err := util.NewBeaconStateCapella()
+	st, err := util.NewBeaconState()
 	slotsAhead := 5000
 	require.NoError(t, err)
-	capellaSlot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
-	currentSlot := capellaSlot + primitives.Slot(slotsAhead)
+	//capellaSlot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
+	//require.NoError(t, err)
+	//currentSlot := capellaSlot + primitives.Slot(slotsAhead)
 	require.NoError(t, st.SetSlot(currentSlot))
 	mockChainService := &mock.ChainService{Optimistic: true}
 
@@ -125,10 +125,10 @@ func TestExpectedWithdrawals(t *testing.T) {
 		validators := make([]*zond.Validator, 0, valCount)
 		balances := make([]uint64, 0, valCount)
 		for i := 0; i < valCount; i++ {
-			blsKey, err := bls.RandKey()
+			dilithiumKey, err := dilithium.RandKey()
 			require.NoError(t, err)
 			val := &zond.Validator{
-				PublicKey:             blsKey.PublicKey().Marshal(),
+				PublicKey:             dilithiumKey.PublicKey().Marshal(),
 				WithdrawalCredentials: make([]byte, 32),
 				ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 				WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,

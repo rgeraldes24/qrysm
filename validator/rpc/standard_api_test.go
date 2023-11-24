@@ -22,7 +22,7 @@ import (
 	validatorserviceconfig "github.com/theQRL/qrysm/v4/config/validator/service"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/consensus-types/validator"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
@@ -534,7 +534,7 @@ func createRandomKeystore(t testing.TB, password string) *keymanager.Keystore {
 	encryptor := keystorev4.New()
 	id, err := uuid.NewRandom()
 	require.NoError(t, err)
-	validatingKey, err := bls.RandKey()
+	validatingKey, err := dilithium.RandKey()
 	require.NoError(t, err)
 	pubKey := validatingKey.PublicKey().Marshal()
 	cryptoFields, err := encryptor.Encrypt(validatingKey.Marshal(), password)
@@ -862,7 +862,7 @@ func TestServer_ListFeeRecipientByPubkey_InvalidPubKey(t *testing.T) {
 	}
 
 	_, err := s.ListFeeRecipientByPubkey(ctx, req)
-	require.ErrorContains(t, "not a valid bls public key", err)
+	require.ErrorContains(t, "not a valid dilithium public key", err)
 }
 
 func TestServer_FeeRecipientByPubkey(t *testing.T) {
@@ -1050,7 +1050,7 @@ func TestServer_SetFeeRecipientByPubkey_InvalidPubKey(t *testing.T) {
 	}
 
 	_, err := s.SetFeeRecipientByPubkey(ctx, req)
-	require.ErrorContains(t, "not a valid bls public key", err)
+	require.ErrorContains(t, "not a valid dilithium public key", err)
 }
 
 func TestServer_SetGasLimit_InvalidFeeRecipient(t *testing.T) {
@@ -1149,7 +1149,7 @@ func TestServer_DeleteFeeRecipientByPubkey_InvalidPubKey(t *testing.T) {
 	}
 
 	_, err := s.DeleteFeeRecipientByPubkey(ctx, req)
-	require.ErrorContains(t, "not a valid bls public key", err)
+	require.ErrorContains(t, "not a valid dilithium public key", err)
 }
 
 func TestServer_GetGasLimit(t *testing.T) {
@@ -1411,7 +1411,7 @@ func TestServer_SetGasLimit_InvalidPubKey(t *testing.T) {
 	}
 
 	_, err := s.SetGasLimit(ctx, req)
-	require.ErrorContains(t, "not a valid bls public key", err)
+	require.ErrorContains(t, "not a valid dilithium public key", err)
 }
 
 func TestServer_DeleteGasLimit(t *testing.T) {

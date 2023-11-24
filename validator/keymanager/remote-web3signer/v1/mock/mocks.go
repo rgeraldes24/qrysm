@@ -183,7 +183,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 										Root: make([]byte, fieldparams.RootLength),
 									},
 								},
-								Signatures: make([][]byte, 96),
+								Signatures: [][]byte{},
 							},
 						},
 						Deposits: []*zond.Deposit{
@@ -252,7 +252,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 						BlockRoot:         make([]byte, fieldparams.RootLength),
 						SubcommitteeIndex: 0,
 						ParticipationBits: MockAggregationBits(),
-						Signature:         make([]byte, dilithium2.CryptoBytes),
+						Signatures:        [][]byte{},
 					},
 					SelectionProof: make([]byte, dilithium2.CryptoBytes),
 				},
@@ -492,7 +492,7 @@ func MockAttestation() *v1.Attestation {
 				Root:  hexutil.Encode(make([]byte, fieldparams.RootLength)),
 			},
 		},
-		Signature: make([]byte, dilithium2.CryptoBytes),
+		Signatures: []hexutil.Bytes{},
 	}
 }
 
@@ -512,7 +512,7 @@ func MockIndexedAttestation() *v1.IndexedAttestation {
 				Root:  hexutil.Encode(make([]byte, fieldparams.RootLength)),
 			},
 		},
-		Signature: make([]byte, dilithium2.CryptoBytes),
+		Signatures: []hexutil.Bytes{},
 	}
 }
 
@@ -589,7 +589,7 @@ func MockContributionAndProof() *v1.ContributionAndProof {
 			BeaconBlockRoot:   make([]byte, fieldparams.RootLength),
 			SubcommitteeIndex: "0",
 			ParticipationBits: MockAggregationBits(),
-			Signature:         make([]byte, dilithium2.CryptoBytes),
+			Signatures:        []hexutil.Bytes{},
 		},
 		SelectionProof: make([]byte, dilithium2.CryptoBytes),
 	}

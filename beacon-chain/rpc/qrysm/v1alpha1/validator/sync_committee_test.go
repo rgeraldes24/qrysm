@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -111,7 +111,7 @@ func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 		},
 		TimeFetcher: &mock.ChainService{Genesis: time.Now()},
 	}
-	secKey, err := bls.RandKey()
+	secKey, err := dilithium.RandKey()
 	require.NoError(t, err)
 	sig := secKey.Sign([]byte{'A'}).Marshal()
 	msg := &zondpb.SyncCommitteeMessage{

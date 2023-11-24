@@ -11,7 +11,6 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/execution"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
@@ -233,9 +232,6 @@ func TestGetBellatrixDuties_SyncCommitteeOK(t *testing.T) {
 	}
 	require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch*primitives.Slot(params.BeaconConfig().EpochsPerSyncCommitteePeriod)-1))
 	require.NoError(t, helpers.UpdateSyncCommitteeCache(bs))
-
-	bs, err = execution.UpgradeToBellatrix(bs)
-	require.NoError(t, err)
 
 	pubkeysAs48ByteType := make([][dilithium2.CryptoPublicKeyBytes]byte, len(pubKeys))
 	for i, pk := range pubKeys {

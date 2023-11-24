@@ -11,7 +11,7 @@ import (
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -32,7 +32,7 @@ func TestProcessVoluntaryExits_NotActiveLongEnoughToExit(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		},
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: registry,
 		Slot:       10,
 	})
@@ -62,7 +62,7 @@ func TestProcessVoluntaryExits_ExitAlreadySubmitted(t *testing.T) {
 			ExitEpoch: 10,
 		},
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: registry,
 		Slot:       0,
 	})
@@ -94,7 +94,7 @@ func TestProcessVoluntaryExits_AppliesCorrectStatus(t *testing.T) {
 			ActivationEpoch: 0,
 		},
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: registry,
 		Fork: &zondpb.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -106,7 +106,7 @@ func TestProcessVoluntaryExits_AppliesCorrectStatus(t *testing.T) {
 	err = state.SetSlot(state.Slot() + params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod)))
 	require.NoError(t, err)
 
-	priv, err := bls.RandKey()
+	priv, err := dilithium.RandKey()
 	require.NoError(t, err)
 
 	val, err := state.ValidatorAtIndex(0)
@@ -183,7 +183,7 @@ func TestVerifyExitAndSignature(t *testing.T) {
 				require.NoError(t, err)
 				sb, err := signing.ComputeDomainAndSign(bs, signedExit.Exit.Epoch, signedExit.Exit, params.BeaconConfig().DomainVoluntaryExit, keys[0])
 				require.NoError(t, err)
-				sig, err := bls.SignatureFromBytes(sb)
+				sig, err := dilithium.SignatureFromBytes(sb)
 				require.NoError(t, err)
 				signedExit.Signature = sig.Marshal()
 				return validator, signedExit, fork, bs.GenesisValidatorsRoot(), nil
@@ -212,7 +212,7 @@ func TestVerifyExitAndSignature(t *testing.T) {
 
 				sb, err := signing.ComputeDomainAndSign(bs, signedExit.Exit.Epoch, signedExit.Exit, params.BeaconConfig().DomainVoluntaryExit, keys[0])
 				require.NoError(t, err)
-				sig, err := bls.SignatureFromBytes(sb)
+				sig, err := dilithium.SignatureFromBytes(sb)
 				require.NoError(t, err)
 				signedExit.Signature = sig.Marshal()
 				genesisRoot := [32]byte{'a'}

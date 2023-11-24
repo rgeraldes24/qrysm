@@ -69,7 +69,7 @@ func (s *Service) Start() {
 		if err := genesisState.UnmarshalSSZ(data); err != nil {
 			log.WithError(err).Fatal("Could not unmarshal pre-loaded state")
 		}
-		genesisTrie, err := state_native.InitializeFromProtoPhase0(genesisState)
+		genesisTrie, err := state_native.InitializeFromProtoCapella(genesisState)
 		if err != nil {
 			log.WithError(err).Fatal("Could not get state trie")
 		}
@@ -84,7 +84,7 @@ func (s *Service) Start() {
 	if err != nil {
 		log.WithError(err).Fatal("Could not generate interop genesis state")
 	}
-	genesisTrie, err := state_native.InitializeFromProtoPhase0(genesisState)
+	genesisTrie, err := state_native.InitializeFromProtoCapella(genesisState)
 	if err != nil {
 		log.WithError(err).Fatal("Could not get state trie")
 	}
@@ -125,7 +125,7 @@ func (_ *Service) ChainStartZond1Data() *zondpb.Zond1Data {
 
 // PreGenesisState returns an empty beacon state.
 func (_ *Service) PreGenesisState() state.BeaconState {
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{})
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{})
 	if err != nil {
 		panic("could not initialize state")
 	}

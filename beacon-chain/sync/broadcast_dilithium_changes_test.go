@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	testingdb "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
-	"github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	mockp2p "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
@@ -21,14 +21,11 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 func TestBroadcastDilithiumChanges(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	c := params.BeaconConfig()
-	c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
-	params.OverrideBeaconConfig(c)
+
 	chainService := &mockChain.ChainService{
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{'A'},
@@ -38,9 +35,9 @@ func TestBroadcastDilithiumChanges(t *testing.T) {
 		WithInitialSync(&mockSync.Sync{IsSyncing: false}),
 		WithChainService(chainService),
 		WithOperationNotifier(chainService.OperationNotifier()),
-		WithDilithiumToExecPool(blstoexec.NewPool()),
+		WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 	)
-	var emptySig [96]byte
+	var emptySig [4595]byte
 	s.cfg.dilithiumToExecPool.InsertDilithiumToExecChange(&zondpb.SignedDilithiumToExecutionChange{
 		Message: &zondpb.DilithiumToExecutionChange{
 			ValidatorIndex:      10,
@@ -50,17 +47,14 @@ func TestBroadcastDilithiumChanges(t *testing.T) {
 		Signature: emptySig[:],
 	})
 
-	capellaStart, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
-	s.broadcastDilithiumChanges(capellaStart + 1)
+	capellaStart := primitives.Slot(0)
+	s.broadcastDilithiumChanges(capellaStart)
 }
 
 func TestRateDilithiumChanges(t *testing.T) {
 	logHook := logTest.NewGlobal()
 	params.SetupTestConfigCleanup(t)
-	c := params.BeaconConfig()
-	c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
-	params.OverrideBeaconConfig(c)
+
 	chainService := &mockChain.ChainService{
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{'A'},
@@ -71,7 +65,7 @@ func TestRateDilithiumChanges(t *testing.T) {
 		WithInitialSync(&mockSync.Sync{IsSyncing: false}),
 		WithChainService(chainService),
 		WithOperationNotifier(chainService.OperationNotifier()),
-		WithDilithiumToExecPool(blstoexec.NewPool()),
+		WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 	)
 	beaconDB := testingdb.SetupDB(t)
 	s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
@@ -90,7 +84,7 @@ func TestRateDilithiumChanges(t *testing.T) {
 			FromDilithiumPubkey: keys[i+1].PublicKey().Marshal(),
 			ToExecutionAddress:  bytesutil.PadTo([]byte("address"), 20),
 		}
-		epoch := params.BeaconConfig().CapellaForkEpoch + 1
+		epoch := primitives.Epoch(0)
 		domain, err := signing.Domain(st.Fork(), epoch, params.BeaconConfig().DomainDilithiumToExecutionChange, st.GenesisValidatorsRoot())
 		assert.NoError(t, err)
 		htr, err := signing.SigningData(message.HashTreeRoot, domain)
@@ -104,8 +98,9 @@ func TestRateDilithiumChanges(t *testing.T) {
 	}
 
 	require.Equal(t, false, p1.BroadcastCalled)
-	slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
+	//slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
+	//require.NoError(t, err)
+	slot := primitives.Slot(0)
 	s.broadcastDilithiumChanges(slot)
 	time.Sleep(100 * time.Millisecond) // Need a sleep for the go routine to be ready
 	require.Equal(t, true, p1.BroadcastCalled)
@@ -124,7 +119,7 @@ func TestBroadcastDilithiumBatch_changes_slice(t *testing.T) {
 	}
 	signed := &zondpb.SignedDilithiumToExecutionChange{
 		Message:   message,
-		Signature: make([]byte, 96),
+		Signature: make([]byte, 4595),
 	}
 	changes := make([]*zondpb.SignedDilithiumToExecutionChange, 200)
 	for i := 0; i < len(changes); i++ {
@@ -140,7 +135,7 @@ func TestBroadcastDilithiumBatch_changes_slice(t *testing.T) {
 		WithInitialSync(&mockSync.Sync{IsSyncing: false}),
 		WithChainService(chainService),
 		WithOperationNotifier(chainService.OperationNotifier()),
-		WithDilithiumToExecPool(blstoexec.NewPool()),
+		WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 	)
 	beaconDB := testingdb.SetupDB(t)
 	s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())

@@ -46,7 +46,7 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 	for i, indice := range attestingIndices1 {
 		sb, err := signing.ComputeDomainAndSign(beaconState, 0, att1.Data, params.BeaconConfig().DomainBeaconAttester, privKeys[indice])
 		require.NoError(t, err)
-		sig, err := bls.SignatureFromBytes(sb)
+		sig, err := .SignatureFromBytes(sb)
 		require.NoError(t, err)
 		sigs[i] = sig
 	}

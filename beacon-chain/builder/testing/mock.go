@@ -8,13 +8,11 @@ import (
 	"github.com/theQRL/qrysm/v4/api/client/builder"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	v1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 // Config defines a config struct for dependencies into the service.
@@ -26,10 +24,8 @@ type Config struct {
 type MockBuilderService struct {
 	HasConfigured         bool
 	Payload               *v1.ExecutionPayload
-	PayloadCapella        *v1.ExecutionPayloadCapella
 	ErrSubmitBlindedBlock error
 	Bid                   *zondpb.SignedBuilderBid
-	BidCapella            *zondpb.SignedBuilderBidCapella
 	RegistrationCache     *cache.RegistrationCache
 	ErrGetHeader          error
 	ErrRegisterValidator  error
@@ -43,14 +39,7 @@ func (s *MockBuilderService) Configured() bool {
 
 // SubmitBlindedBlock for mocking.
 func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, _ interfaces.ReadOnlySignedBeaconBlock) (interfaces.ExecutionData, error) {
-	if s.Payload != nil {
-		w, err := blocks.WrappedExecutionPayload(s.Payload)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not wrap payload")
-		}
-		return w, s.ErrSubmitBlindedBlock
-	}
-	w, err := blocks.WrappedExecutionPayloadCapella(s.PayloadCapella, 0)
+	w, err := blocks.WrappedExecutionPayload(s.Payload, 0)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not wrap capella payload")
 	}
@@ -59,9 +48,6 @@ func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, _ interfaces.
 
 // GetHeader for mocking.
 func (s *MockBuilderService) GetHeader(_ context.Context, slot primitives.Slot, _ [32]byte, _ [dilithium2.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
-	if slots.ToEpoch(slot) >= params.BeaconConfig().CapellaForkEpoch || s.BidCapella != nil {
-		return builder.WrappedSignedBuilderBidCapella(s.BidCapella)
-	}
 	w, err := builder.WrappedSignedBuilderBid(s.Bid)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not wrap capella bid")

@@ -289,10 +289,10 @@ func TestService_CheckForPreviousEpochFork(t *testing.T) {
 					ValidatorsRoot: [32]byte{'A'},
 				}
 				clock := startup.NewClock(chainService.Genesis, chainService.ValidatorsRoot)
-				bCfg := params.BeaconConfig().Copy()
-				bCfg.AltairForkEpoch = 1
-				bCfg.BellatrixForkEpoch = 3
-				params.OverrideBeaconConfig(bCfg)
+				// bCfg := params.BeaconConfig().Copy()
+				// bCfg.AltairForkEpoch = 1
+				// bCfg.BellatrixForkEpoch = 3
+				// params.OverrideBeaconConfig(bCfg)
 				params.BeaconConfig().InitializeForkSchedule()
 				ctx, cancel := context.WithCancel(context.Background())
 				r := &Service{

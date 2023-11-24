@@ -37,19 +37,19 @@ func (m *MockBeaconNodeValidatorServer) EXPECT() *MockBeaconNodeValidatorServerM
 	return m.recorder
 }
 
-// AggregatedSigAndAggregationBits mocks base method.
-func (m *MockBeaconNodeValidatorServer) AggregatedSigAndAggregationBits(arg0 context.Context, arg1 *zond.AggregatedSigAndAggregationBitsRequest) (*zond.AggregatedSigAndAggregationBitsResponse, error) {
+// SignaturesAndParticipationBits mocks base method.
+func (m *MockBeaconNodeValidatorServer) SignaturesAndParticipationBits(arg0 context.Context, arg1 *zond.SignaturesAndParticipationBitsRequest) (*zond.SignaturesAndParticipationBitsResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AggregatedSigAndAggregationBits", arg0, arg1)
-	ret0, _ := ret[0].(*zond.AggregatedSigAndAggregationBitsResponse)
+	ret := m.ctrl.Call(m, "SignaturesAndParticipationBits", arg0, arg1)
+	ret0, _ := ret[0].(*zond.SignaturesAndParticipationBitsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// AggregatedSigAndAggregationBits indicates an expected call of AggregatedSigAndAggregationBits.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) AggregatedSigAndAggregationBits(arg0, arg1 interface{}) *gomock.Call {
+// SignaturesAndParticipationBits indicates an expected call of SignaturesAndParticipationBits.
+func (mr *MockBeaconNodeValidatorServerMockRecorder) SignaturesAndParticipationBits(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AggregatedSigAndAggregationBits", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).AggregatedSigAndAggregationBits), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignaturesAndParticipationBits", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).SignaturesAndParticipationBits), arg0, arg1)
 }
 
 // AssignValidatorToSubnet mocks base method.

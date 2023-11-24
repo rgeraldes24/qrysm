@@ -573,24 +573,18 @@ type Attestation struct {
 
 // MarshalJSON returns a JSON byte array representation of Attestation.
 func (a *Attestation) MarshalJSON() ([]byte, error) {
-	sigsIdxToParticipationIdx := make([]string, len(a.Attestation.SignaturesIdxToParticipationIdx))
-	for i, idx := range a.Attestation.SignaturesIdxToParticipationIdx {
-		sigsIdxToParticipationIdx[i] = fmt.Sprintf("%d", idx)
-	}
 	signatures := make([]hexutil.Bytes, len(a.Attestation.Signatures))
 	for i, sig := range a.Attestation.Signatures {
 		signatures[i] = sig
 	}
 	return json.Marshal(struct {
-		ParticipationBits               hexutil.Bytes    `json:"participation_bits"`
-		Data                            *AttestationData `json:"data"`
-		Signatures                      []hexutil.Bytes  `json:"signatures"`
-		SignaturesIdxToParticipationIdx []string         `json:"signatures_idx_to_participation_idx"`
+		ParticipationBits hexutil.Bytes    `json:"participation_bits"`
+		Data              *AttestationData `json:"data"`
+		Signatures        []hexutil.Bytes  `json:"signatures"`
 	}{
-		ParticipationBits:               hexutil.Bytes(a.Attestation.ParticipationBits),
-		Data:                            &AttestationData{a.Attestation.Data},
-		Signatures:                      signatures,
-		SignaturesIdxToParticipationIdx: sigsIdxToParticipationIdx,
+		ParticipationBits: hexutil.Bytes(a.Attestation.ParticipationBits),
+		Data:              &AttestationData{a.Attestation.Data},
+		Signatures:        signatures,
 	})
 }
 
@@ -677,19 +671,13 @@ func (s *SyncAggregate) MarshalJSON() ([]byte, error) {
 	for i, sig := range s.SyncAggregate.SyncCommitteeSignatures {
 		signatures[i] = sig
 	}
-	// TODO(rgeraldes24): review (merge loops)
-	sigsIdxToCommitteeIdx := make([]string, len(s.SyncAggregate.SignaturesIdxToCommitteeIdx))
-	for i, idx := range s.SyncAggregate.SignaturesIdxToCommitteeIdx {
-		sigsIdxToCommitteeIdx[i] = fmt.Sprintf("%d", idx)
-	}
+
 	return json.Marshal(struct {
-		SyncCommitteeBits           hexutil.Bytes   `json:"sync_committee_bits"`
-		SyncCommitteeSignatures     []hexutil.Bytes `json:"sync_committee_signatures"`
-		SignaturesIdxToCommitteeIdx []string        `json:"signatures_idx_to_committee_idx"`
+		SyncCommitteeBits       hexutil.Bytes   `json:"sync_committee_bits"`
+		SyncCommitteeSignatures []hexutil.Bytes `json:"sync_committee_signatures"`
 	}{
-		SyncCommitteeBits:           hexutil.Bytes(s.SyncAggregate.SyncCommitteeBits),
-		SyncCommitteeSignatures:     signatures,
-		SignaturesIdxToCommitteeIdx: sigsIdxToCommitteeIdx,
+		SyncCommitteeBits:       hexutil.Bytes(s.SyncAggregate.SyncCommitteeBits),
+		SyncCommitteeSignatures: signatures,
 	})
 }
 

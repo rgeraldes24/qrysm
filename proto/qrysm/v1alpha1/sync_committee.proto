@@ -56,8 +56,6 @@ message SyncCommitteeContribution {
   
   // Signature by the validator(s) over the block root of `slot`.
   repeated bytes signatures = 5 [(theqrl.zond.ext.ssz_size) = "?,4595", (theqrl.zond.ext.ssz_max) = "2048"];
-
-  repeated uint64 signaturesIdxToParticipationIdx = 6 [(theqrl.zond.ext.ssz_max) = "2048"];
 }
 
 // Aggregated sync committee signature object with selection proof to support light client.

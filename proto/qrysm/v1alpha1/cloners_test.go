@@ -380,10 +380,9 @@ func TestCopyHistoricalSummaries(t *testing.T) {
 
 func genAttestation() *v1alpha1.Attestation {
 	return &v1alpha1.Attestation{
-		ParticipationBits:               bytes(32),
-		Data:                            genAttData(),
-		Signatures:                      [][]byte{bytes(4595)},
-		SignaturesIdxToParticipationIdx: []uint64{1},
+		ParticipationBits: bytes(32),
+		Data:              genAttData(),
+		Signatures:        [][]byte{bytes(4595)},
 	}
 }
 
@@ -422,10 +421,10 @@ func genZond1Data() *v1alpha1.Zond1Data {
 
 func genPendingAttestation() *v1alpha1.PendingAttestation {
 	return &v1alpha1.PendingAttestation{
-		AggregationBits: bytes(32),
-		Data:            genAttData(),
-		InclusionDelay:  3,
-		ProposerIndex:   5,
+		ParticipationBits: bytes(32),
+		Data:              genAttData(),
+		InclusionDelay:    3,
+		ProposerIndex:     5,
 	}
 }
 
@@ -552,12 +551,11 @@ func genValidator() *v1alpha1.Validator {
 
 func genSyncCommitteeContribution() *v1alpha1.SyncCommitteeContribution {
 	return &v1alpha1.SyncCommitteeContribution{
-		Slot:                            12333,
-		BlockRoot:                       bytes(32),
-		SubcommitteeIndex:               4444,
-		ParticipationBits:               bytes(32),
-		Signatures:                      [][]byte{bytes(4595), bytes(4595)},
-		SignaturesIdxToParticipationIdx: []uint64{1, 2},
+		Slot:              12333,
+		BlockRoot:         bytes(32),
+		SubcommitteeIndex: 4444,
+		ParticipationBits: bytes(32),
+		Signatures:        [][]byte{bytes(4595), bytes(4595)},
 	}
 }
 

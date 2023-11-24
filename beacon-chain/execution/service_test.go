@@ -373,7 +373,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 48),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 		},
@@ -384,7 +384,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 48),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 		},
@@ -395,7 +395,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 48),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 		},

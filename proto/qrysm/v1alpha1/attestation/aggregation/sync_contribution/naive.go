@@ -1,8 +1,6 @@
 package sync_contribution
 
 import (
-	"fmt"
-
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
 )
@@ -101,23 +99,27 @@ func naiveAggregate(c1, c2 *zondpb.SyncCommitteeContribution) (*zondpb.SyncCommi
 		return baseContribution, nil
 	}
 
-	// convert the signaturesIdxToParticipationIdx from a list to a map to allow for
-	// a quick search for the sig index that we will use to include the new signature
-	mapParticipationIdxToSigIdx := make(map[uint64]int)
-	for sigIdx, participationIdx := range newContribution.SignaturesIdxToParticipationIdx {
-		mapParticipationIdxToSigIdx[participationIdx] = sigIdx
-	}
+	// TODO(rgeraldes24)
 
-	// include sig and participation
-	for _, participationIdx := range newParticipants {
-		sigIdx, ok := mapParticipationIdxToSigIdx[participationIdx]
-		if !ok {
-			return nil, fmt.Errorf("Signature for validator with index %d not found", participationIdx)
+	/*
+		// convert the signaturesIdxToParticipationIdx from a list to a map to allow for
+		// a quick search for the sig index that we will use to include the new signature
+		mapParticipationIdxToSigIdx := make(map[uint64]int)
+		for sigIdx, participationIdx := range newContribution.SignaturesIdxToParticipationIdx {
+			mapParticipationIdxToSigIdx[participationIdx] = sigIdx
 		}
-		baseContribution.Signatures = append(baseContribution.Signatures, newContribution.Signatures[sigIdx])
-		baseContribution.SignaturesIdxToParticipationIdx = append(baseContribution.SignaturesIdxToParticipationIdx, participationIdx)
-		baseContribution.ParticipationBits.SetBitAt(participationIdx, true)
-	}
+
+		// include sig and participation
+		for _, participationIdx := range newParticipants {
+			sigIdx, ok := mapParticipationIdxToSigIdx[participationIdx]
+			if !ok {
+				return nil, fmt.Errorf("Signature for validator with index %d not found", participationIdx)
+			}
+			baseContribution.Signatures = append(baseContribution.Signatures, newContribution.Signatures[sigIdx])
+			baseContribution.SignaturesIdxToParticipationIdx = append(baseContribution.SignaturesIdxToParticipationIdx, participationIdx)
+			baseContribution.ParticipationBits.SetBitAt(participationIdx, true)
+		}
+	*/
 
 	return baseContribution, nil
 }

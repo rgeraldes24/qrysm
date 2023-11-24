@@ -3,6 +3,7 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 go_library(
     name = "go_default_library",
     srcs = [
+        "constants.go",
         "dilithium.go",
         "interface.go",
         "signature_batch.go",

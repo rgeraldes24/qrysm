@@ -45,7 +45,6 @@ type BeaconChainConfig struct {
 	EffectiveBalanceIncrement uint64 `yaml:"EFFECTIVE_BALANCE_INCREMENT" spec:"true"` // EffectiveBalanceIncrement is used for converting the high balance into the low balance for validators.
 
 	// Initial value constants.
-	BLSWithdrawalPrefixByte          byte     `yaml:"BLS_WITHDRAWAL_PREFIX" spec:"true"`           // BLSWithdrawalPrefixByte is used for BLS withdrawal and it's the first byte.
 	DilithiumWithdrawalPrefixByte    byte     `yaml:"DILITHIUM_WITHDRAWAL_PREFIX" spec:"true"`     // DilithiumWithdrawalPrefixByte is used for Dilithium withdrawal and it's the first byte.
 	ZOND1AddressWithdrawalPrefixByte byte     `yaml:"ZOND1_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // ZOND1AddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
 	ZondAddressWithdrawalPrefixByte  byte     `yaml:"ZOND_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"`  // ZondAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
@@ -131,7 +130,7 @@ type BeaconChainConfig struct {
 	ValidatorPrivkeyFileName  string                      // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
 	WithdrawalPrivkeyFileName string                      // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
 	RPCSyncCheck              time.Duration               // Number of seconds to query the sync service, to find out if the node is synced or not.
-	EmptySignature            [96]byte                    // EmptySignature is used to represent a zeroed out BLS Signature.
+	EmptySignature            [4595]byte                  // EmptySignature is used to represent a zeroed out Dilithium Signature.
 	EmptyDilithiumSignature   [dilithium.CryptoBytes]byte // EmptyDilithiumSignature is used to represent a zeroed out Dilithium Signature.
 	DefaultPageSize           int                         // DefaultPageSize defines the default page size for RPC server request.
 	MaxPeersToSync            int                         // MaxPeersToSync describes the limit for number of peers in round robin sync.

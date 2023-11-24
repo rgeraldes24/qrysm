@@ -96,7 +96,7 @@ func TestProcessExitP2PTrackedIndices(t *testing.T) {
 			ValidatorIndex: 1,
 			Epoch:          1,
 		},
-		Signature: make([]byte, 96),
+		Signature: make([]byte, 4595),
 	}
 	s.processExit(exit)
 	require.LogsContain(t, hook, "\"Voluntary exit was processed\" ValidatorIndex=1")

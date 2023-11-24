@@ -333,7 +333,7 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*zondpb.De
 		// Create the new deposits and add them to the trie. Always use the first validator to create deposit
 		for i := uint64(0); i < numRequired; i++ {
 			withdrawalCreds := hash.Hash(publicKeys[1].Marshal())
-			withdrawalCreds[0] = params.BeaconConfig().BLSWithdrawalPrefixByte
+			withdrawalCreds[0] = params.BeaconConfig().DilithiumWithdrawalPrefixByte
 
 			depositMessage := &zondpb.DepositMessage{
 				PublicKey:             publicKeys[1].Marshal(),

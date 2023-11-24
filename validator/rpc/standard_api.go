@@ -91,9 +91,9 @@ func (s *Server) ImportKeystores(
 	for i := 0; i < len(req.Keystores); i++ {
 		k := &keymanager.Keystore{}
 		err = json.Unmarshal([]byte(req.Keystores[i]), k)
-		if k.Description == "" && k.Name != "" {
-			k.Description = k.Name
-		}
+		// if k.Description == "" && k.Name != "" {
+		// 	k.Description = k.Name
+		// }
 		if err != nil {
 			// we want to ignore unmarshal errors for now, proper status in importKeystore
 			k.Pubkey = "invalid format"
@@ -677,7 +677,7 @@ func (s *Server) DeleteFeeRecipientByPubkey(ctx context.Context, req *zondpbserv
 func validatePublicKey(pubkey []byte) error {
 	if len(pubkey) != dilithium2.CryptoPublicKeyBytes {
 		return status.Errorf(
-			codes.InvalidArgument, "Provided public key in path is not byte length %d and not a valid bls public key", dilithium2.CryptoPublicKeyBytes)
+			codes.InvalidArgument, "Provided public key in path is not byte length %d and not a valid dilithium public key", dilithium2.CryptoPublicKeyBytes)
 	}
 	return nil
 }

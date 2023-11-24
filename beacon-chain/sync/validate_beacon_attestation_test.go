@@ -276,7 +276,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 					}
 				}
 			} else {
-				tt.msg.Signature = make([]byte, 96)
+				tt.msg.Signatures = [][]byte{}
 			}
 			buf := new(bytes.Buffer)
 			_, err := p.Encoding().EncodeGossip(buf, tt.msg)

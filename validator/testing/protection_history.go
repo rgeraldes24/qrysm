@@ -6,7 +6,7 @@ import (
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/validator/db/kv"
@@ -97,7 +97,7 @@ func MockAttestingAndProposalHistories(pubkeys [][dilithium2.CryptoPublicKeyByte
 func CreateRandomPubKeys(numValidators int) ([][dilithium2.CryptoPublicKeyBytes]byte, error) {
 	pubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, numValidators)
 	for i := 0; i < numValidators; i++ {
-		randKey, err := bls.RandKey()
+		randKey, err := dilithium.RandKey()
 		if err != nil {
 			return nil, err
 		}

@@ -219,30 +219,6 @@ func ReplayProcessSlots(ctx context.Context, state state.BeaconState, slot primi
 			tracing.AnnotateError(span, err)
 			return nil, errors.Wrap(err, "failed to increment state slot")
 		}
-
-		// if qrysmTime.CanUpgradeToAltair(state.Slot()) {
-		// 	state, err = altair.UpgradeToAltair(ctx, state)
-		// 	if err != nil {
-		// 		tracing.AnnotateError(span, err)
-		// 		return nil, err
-		// 	}
-		// }
-
-		// if qrysmTime.CanUpgradeToBellatrix(state.Slot()) {
-		// 	state, err = execution.UpgradeToBellatrix(state)
-		// 	if err != nil {
-		// 		tracing.AnnotateError(span, err)
-		// 		return nil, err
-		// 	}
-		// }
-
-		// if qrysmTime.CanUpgradeToCapella(state.Slot()) {
-		// 	state, err = capella.UpgradeToCapella(state)
-		// 	if err != nil {
-		// 		tracing.AnnotateError(span, err)
-		// 		return nil, err
-		// 	}
-		// }
 	}
 
 	return state, nil

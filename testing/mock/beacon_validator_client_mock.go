@@ -38,24 +38,24 @@ func (m *MockBeaconNodeValidatorClient) EXPECT() *MockBeaconNodeValidatorClientM
 	return m.recorder
 }
 
-// AggregatedSigAndAggregationBits mocks base method.
-func (m *MockBeaconNodeValidatorClient) AggregatedSigAndAggregationBits(arg0 context.Context, arg1 *zond.AggregatedSigAndAggregationBitsRequest, arg2 ...grpc.CallOption) (*zond.AggregatedSigAndAggregationBitsResponse, error) {
+// SignaturesAndParticipationBits mocks base method.
+func (m *MockBeaconNodeValidatorClient) SignaturesAndParticipationBits(arg0 context.Context, arg1 *zond.SignaturesAndParticipationBitsRequest, arg2 ...grpc.CallOption) (*zond.SignaturesAndParticipationBitsResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "AggregatedSigAndAggregationBits", varargs...)
-	ret0, _ := ret[0].(*zond.AggregatedSigAndAggregationBitsResponse)
+	ret := m.ctrl.Call(m, "SignaturesAndParticipationBits", varargs...)
+	ret0, _ := ret[0].(*zond.SignaturesAndParticipationBitsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// AggregatedSigAndAggregationBits indicates an expected call of AggregatedSigAndAggregationBits.
-func (mr *MockBeaconNodeValidatorClientMockRecorder) AggregatedSigAndAggregationBits(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// SignaturesAndParticipationBits indicates an expected call of SignaturesAndParticipationBits.
+func (mr *MockBeaconNodeValidatorClientMockRecorder) SignaturesAndParticipationBits(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AggregatedSigAndAggregationBits", reflect.TypeOf((*MockBeaconNodeValidatorClient)(nil).AggregatedSigAndAggregationBits), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignaturesAndParticipationBits", reflect.TypeOf((*MockBeaconNodeValidatorClient)(nil).SignaturesAndParticipationBits), varargs...)
 }
 
 // AssignValidatorToSubnet mocks base method.

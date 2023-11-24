@@ -72,10 +72,8 @@ func (vs *Server) GetBeaconBlock(ctx context.Context, req *zondpb.BlockRequest) 
 	}
 
 	// An optimistic validator MUST NOT produce a block (i.e., sign across the DOMAIN_BEACON_PROPOSER domain).
-	if slots.ToEpoch(req.Slot) >= params.BeaconConfig().BellatrixForkEpoch {
-		if err := vs.optimisticStatus(ctx); err != nil {
-			return nil, status.Errorf(codes.Unavailable, "Validator is not ready to propose: %v", err)
-		}
+	if err := vs.optimisticStatus(ctx); err != nil {
+		return nil, status.Errorf(codes.Unavailable, "Validator is not ready to propose: %v", err)
 	}
 
 	sBlk, err := getEmptyBlock(req.Slot)
@@ -173,22 +171,11 @@ func (vs *Server) GetBeaconBlock(ctx context.Context, req *zondpb.BlockRequest) 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not convert block to proto: %v", err)
 	}
-	if slots.ToEpoch(req.Slot) >= params.BeaconConfig().CapellaForkEpoch {
-		if sBlk.IsBlinded() {
-			return &zondpb.GenericBeaconBlock{Block: &zondpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: pb.(*zondpb.BlindedBeaconBlockCapella)}}, nil
-		}
-		return &zondpb.GenericBeaconBlock{Block: &zondpb.GenericBeaconBlock_Capella{Capella: pb.(*zondpb.BeaconBlockCapella)}}, nil
+
+	if sBlk.IsBlinded() {
+		return &zondpb.GenericBeaconBlock{Block: &zondpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: pb.(*zondpb.BlindedBeaconBlock)}}, nil
 	}
-	if slots.ToEpoch(req.Slot) >= params.BeaconConfig().BellatrixForkEpoch {
-		if sBlk.IsBlinded() {
-			return &zondpb.GenericBeaconBlock{Block: &zondpb.GenericBeaconBlock_BlindedBellatrix{BlindedBellatrix: pb.(*zondpb.BlindedBeaconBlockBellatrix)}}, nil
-		}
-		return &zondpb.GenericBeaconBlock{Block: &zondpb.GenericBeaconBlock_Bellatrix{Bellatrix: pb.(*zondpb.BeaconBlockBellatrix)}}, nil
-	}
-	if slots.ToEpoch(req.Slot) >= params.BeaconConfig().AltairForkEpoch {
-		return &zondpb.GenericBeaconBlock{Block: &zondpb.GenericBeaconBlock_Altair{Altair: pb.(*zondpb.BeaconBlockAltair)}}, nil
-	}
-	return &zondpb.GenericBeaconBlock{Block: &zondpb.GenericBeaconBlock_Phase0{Phase0: pb.(*zondpb.BeaconBlock)}}, nil
+	return &zondpb.GenericBeaconBlock{Block: &zondpb.GenericBeaconBlock_Capella{Capella: pb.(*zondpb.BeaconBlock)}}, nil
 }
 
 func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.SignedBeaconBlock, head state.BeaconState) error {

@@ -102,6 +102,10 @@ func (c *beaconApiValidatorClient) ProposeExit(ctx context.Context, in *zondpb.S
 	return c.proposeExit(ctx, in)
 }
 
+func (c *beaconApiValidatorClient) StreamBlocksAltair(ctx context.Context, in *zondpb.StreamBlocksRequest) (zondpb.BeaconNodeValidator_StreamBlocksAltairClient, error) {
+	return c.streamBlocks(ctx, in, time.Second), nil
+}
+
 func (c *beaconApiValidatorClient) SubmitAggregateSelectionProof(ctx context.Context, in *zondpb.AggregateSelectionRequest) (*zondpb.AggregateSelectionResponse, error) {
 	return c.submitAggregateSelectionProof(ctx, in)
 }
@@ -136,4 +140,8 @@ func (c *beaconApiValidatorClient) ValidatorStatus(ctx context.Context, in *zond
 
 func (c *beaconApiValidatorClient) WaitForActivation(ctx context.Context, in *zondpb.ValidatorActivationRequest) (zondpb.BeaconNodeValidator_WaitForActivationClient, error) {
 	return c.waitForActivation(ctx, in)
+}
+
+func (c *beaconApiValidatorClient) WaitForChainStart(ctx context.Context, _ *empty.Empty) (*zondpb.ChainStartResponse, error) {
+	return c.waitForChainStart(ctx)
 }

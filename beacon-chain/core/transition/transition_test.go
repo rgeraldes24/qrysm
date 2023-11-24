@@ -17,7 +17,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
@@ -35,7 +34,7 @@ func TestExecuteStateTransition_IncorrectSlot(t *testing.T) {
 	base := &zondpb.BeaconState{
 		Slot: 5,
 	}
-	beaconState, err := state_native.InitializeFromProtoPhase0(base)
+	beaconState, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 	block := &zondpb.SignedBeaconBlock{
 		Block: &zondpb.BeaconBlock{
@@ -122,14 +121,14 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 					ProposerIndex: 3,
 					Slot:          1,
 				},
-				Signature: bytesutil.PadTo([]byte("A"), 96),
+				Signature: bytesutil.PadTo([]byte("A"), 4595),
 			}),
 			Header_2: util.HydrateSignedBeaconHeader(&zondpb.SignedBeaconBlockHeader{
 				Header: &zondpb.BeaconBlockHeader{
 					ProposerIndex: 3,
 					Slot:          1,
 				},
-				Signature: bytesutil.PadTo([]byte("B"), 96),
+				Signature: bytesutil.PadTo([]byte("B"), 4595),
 			}),
 		},
 	}
@@ -138,12 +137,12 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 			Attestation_1: &zondpb.IndexedAttestation{
 				Data:             util.HydrateAttestationData(&zondpb.AttestationData{}),
 				AttestingIndices: []uint64{0, 1},
-				Signature:        make([]byte, 96),
+				Signatures:       [][]byte{},
 			},
 			Attestation_2: &zondpb.IndexedAttestation{
 				Data:             util.HydrateAttestationData(&zondpb.AttestationData{}),
 				AttestingIndices: []uint64{0, 1},
-				Signature:        make([]byte, 96),
+				Signatures:       [][]byte{},
 			},
 		},
 	}
@@ -265,10 +264,9 @@ func createFullBlockWithOperations(t *testing.T) (state.BeaconState,
 	require.NoError(t, err)
 	hashTreeRoot, err := signing.ComputeSigningRoot(att1.Data, domain)
 	require.NoError(t, err)
-	sig0 := privKeys[0].Sign(hashTreeRoot[:])
-	sig1 := privKeys[1].Sign(hashTreeRoot[:])
-	aggregateSig := bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att1.Signature = aggregateSig.Marshal()
+	sig0 := privKeys[0].Sign(hashTreeRoot[:]).Marshal()
+	sig1 := privKeys[1].Sign(hashTreeRoot[:]).Marshal()
+	att1.Signatures = [][]byte{sig0, sig1}
 
 	mockRoot3 := [32]byte{'B'}
 	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
@@ -281,10 +279,9 @@ func createFullBlockWithOperations(t *testing.T) (state.BeaconState,
 
 	hashTreeRoot, err = signing.ComputeSigningRoot(att2.Data, domain)
 	require.NoError(t, err)
-	sig0 = privKeys[0].Sign(hashTreeRoot[:])
-	sig1 = privKeys[1].Sign(hashTreeRoot[:])
-	aggregateSig = bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att2.Signature = aggregateSig.Marshal()
+	sig0 = privKeys[0].Sign(hashTreeRoot[:]).Marshal()
+	sig1 = privKeys[1].Sign(hashTreeRoot[:]).Marshal()
+	att2.Signatures = [][]byte{sig0, sig1}
 
 	attesterSlashings := []*zondpb.AttesterSlashing{
 		{
@@ -316,12 +313,12 @@ func createFullBlockWithOperations(t *testing.T) (state.BeaconState,
 	assert.NoError(t, err)
 	hashTreeRoot, err = signing.ComputeSigningRoot(blockAtt.Data, domain)
 	assert.NoError(t, err)
-	sigs := make([]bls.Signature, len(attestingIndices))
+	sigs := make([][]byte, len(attestingIndices))
 	for i, indice := range attestingIndices {
 		sig := privKeys[indice].Sign(hashTreeRoot[:])
-		sigs[i] = sig
+		sigs[i] = sig.Marshal()
 	}
-	blockAtt.Signature = bls.AggregateSignatures(sigs).Marshal()
+	blockAtt.Signatures = sigs
 
 	exit := &zondpb.SignedVoluntaryExit{
 		Exit: &zondpb.VoluntaryExit{

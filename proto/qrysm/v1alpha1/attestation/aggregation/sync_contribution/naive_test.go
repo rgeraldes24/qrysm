@@ -29,105 +29,87 @@ func TestNaiveAggregate(t *testing.T) {
 	}{
 		{
 			a1: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig1},
-				SignaturesIdxToParticipationIdx: []uint64{1},
+				ParticipationBits: bitfield.Bitvector128{0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig1},
 			},
 			a2: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig0},
-				SignaturesIdxToParticipationIdx: []uint64{0},
+				ParticipationBits: bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig0},
 			},
 			want: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig1, sig0},
-				SignaturesIdxToParticipationIdx: []uint64{1, 0},
+				ParticipationBits: bitfield.Bitvector128{0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig1, sig0},
 			},
 		},
 
 		{
 			a1: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig0},
-				SignaturesIdxToParticipationIdx: []uint64{0},
+				ParticipationBits: bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig0},
 			},
 			a2: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig1},
-				SignaturesIdxToParticipationIdx: []uint64{1},
+				ParticipationBits: bitfield.Bitvector128{0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig1},
 			},
 			want: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig0, sig1},
-				SignaturesIdxToParticipationIdx: []uint64{0, 1},
+				ParticipationBits: bitfield.Bitvector128{0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig0, sig1},
 			},
 		},
 		{
 			a1: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig0},
-				SignaturesIdxToParticipationIdx: []uint64{0},
+				ParticipationBits: bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig0},
 			},
 			a2: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig2, sig1},
-				SignaturesIdxToParticipationIdx: []uint64{2, 1},
+				ParticipationBits: bitfield.Bitvector128{0x06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig2, sig1},
 			},
 			want: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x07, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig2, sig1, sig0},
-				SignaturesIdxToParticipationIdx: []uint64{2, 1, 0},
+				ParticipationBits: bitfield.Bitvector128{0x07, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig2, sig1, sig0},
 			},
 		},
 		{
 			a1: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig2, sig1},
-				SignaturesIdxToParticipationIdx: []uint64{2, 1},
+				ParticipationBits: bitfield.Bitvector128{0x06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig2, sig1},
 			},
 			a2: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig0},
-				SignaturesIdxToParticipationIdx: []uint64{0},
+				ParticipationBits: bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig0},
 			},
 			want: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x07, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig2, sig1, sig0},
-				SignaturesIdxToParticipationIdx: []uint64{2, 1, 0},
+				ParticipationBits: bitfield.Bitvector128{0x07, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig2, sig1, sig0},
 			},
 		},
 		{
 			a1: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig0},
-				SignaturesIdxToParticipationIdx: []uint64{0},
+				ParticipationBits: bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig0},
 			},
 			a2: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x02, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig2, sig8},
-				SignaturesIdxToParticipationIdx: []uint64{2, 8},
+				ParticipationBits: bitfield.Bitvector128{0x02, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig2, sig8},
 			},
 			want: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x03, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig2, sig8, sig0},
-				SignaturesIdxToParticipationIdx: []uint64{2, 8, 0},
+				ParticipationBits: bitfield.Bitvector128{0x03, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig2, sig8, sig0},
 			},
 		},
 		{
 			a1: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:                      [][]byte{sig0},
-				SignaturesIdxToParticipationIdx: []uint64{0},
+				ParticipationBits: bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				Signatures:        [][]byte{sig0},
 			},
 			a2: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80},
-				Signatures:                      [][]byte{sig127, sig2},
-				SignaturesIdxToParticipationIdx: []uint64{127, 2},
+				ParticipationBits: bitfield.Bitvector128{0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80},
+				Signatures:        [][]byte{sig127, sig2},
 			},
 			want: &zondpb.SyncCommitteeContribution{
-				ParticipationBits:               bitfield.Bitvector128{0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80},
-				Signatures:                      [][]byte{sig127, sig2, sig0},
-				SignaturesIdxToParticipationIdx: []uint64{127, 2, 0},
+				ParticipationBits: bitfield.Bitvector128{0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80},
+				Signatures:        [][]byte{sig127, sig2, sig0},
 			},
 		},
 	}
@@ -136,9 +118,7 @@ func TestNaiveAggregate(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepSSZEqual(t, tt.want.ParticipationBits, got.ParticipationBits)
 		require.Equal(t, len(tt.want.Signatures), len(got.Signatures))
-		require.Equal(t, len(tt.want.SignaturesIdxToParticipationIdx), len(got.SignaturesIdxToParticipationIdx))
 		assert.DeepEqual(t, tt.want.Signatures, got.Signatures)
-		assert.DeepEqual(t, tt.want.SignaturesIdxToParticipationIdx, got.SignaturesIdxToParticipationIdx)
 	}
 }
 
@@ -192,16 +172,14 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "single attestation",
 			inputs: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000010, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig1},
-					SignaturesIdxToParticipationIdx: []uint64{1},
+					ParticipationBits: bitfield.Bitvector128{0b00000010, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig1},
 				},
 			},
 			want: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000010, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig1},
-					SignaturesIdxToParticipationIdx: []uint64{1},
+					ParticipationBits: bitfield.Bitvector128{0b00000010, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig1},
 				},
 			},
 		},
@@ -209,21 +187,18 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "two attestations with no overlap",
 			inputs: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0},
-					SignaturesIdxToParticipationIdx: []uint64{0},
+					ParticipationBits: bitfield.Bitvector128{0b00000001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000010, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig1},
-					SignaturesIdxToParticipationIdx: []uint64{1},
+					ParticipationBits: bitfield.Bitvector128{0b00000010, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig1},
 				},
 			},
 			want: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig1},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1},
+					ParticipationBits: bitfield.Bitvector128{0b00000011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig1},
 				},
 			},
 		},
@@ -231,26 +206,22 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "two attestations with overlap",
 			inputs: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig2},
-					SignaturesIdxToParticipationIdx: []uint64{0, 2},
+					ParticipationBits: bitfield.Bitvector128{0b00000101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig2},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig1, sig2},
-					SignaturesIdxToParticipationIdx: []uint64{1, 2},
+					ParticipationBits: bitfield.Bitvector128{0b00000110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig1, sig2},
 				},
 			},
 			want: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig2},
-					SignaturesIdxToParticipationIdx: []uint64{0, 2},
+					ParticipationBits: bitfield.Bitvector128{0b00000101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig2},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig1, sig2},
-					SignaturesIdxToParticipationIdx: []uint64{1, 2},
+					ParticipationBits: bitfield.Bitvector128{0b00000110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig1, sig2},
 				},
 			},
 		},
@@ -258,36 +229,30 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "some attestations overlap",
 			inputs: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00001001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig3},
-					SignaturesIdxToParticipationIdx: []uint64{0, 3},
+					ParticipationBits: bitfield.Bitvector128{0b00001001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig3},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00010110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig1, sig2, sig4},
-					SignaturesIdxToParticipationIdx: []uint64{1, 2, 4},
+					ParticipationBits: bitfield.Bitvector128{0b00010110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig1, sig2, sig4},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00001010, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig1, sig3},
-					SignaturesIdxToParticipationIdx: []uint64{1, 3},
+					ParticipationBits: bitfield.Bitvector128{0b00001010, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig1, sig3},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00110001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig4, sig5},
-					SignaturesIdxToParticipationIdx: []uint64{0, 4, 5},
+					ParticipationBits: bitfield.Bitvector128{0b00110001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig4, sig5},
 				},
 			},
 			want: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00011111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig1, sig2, sig4, sig0, sig3},
-					SignaturesIdxToParticipationIdx: []uint64{1, 2, 4, 0, 3},
+					ParticipationBits: bitfield.Bitvector128{0b00011111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig1, sig2, sig4, sig0, sig3},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00111011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig4, sig5, sig1, sig3},
-					SignaturesIdxToParticipationIdx: []uint64{0, 4, 5, 1, 3},
+					ParticipationBits: bitfield.Bitvector128{0b00111011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig4, sig5, sig1, sig3},
 				},
 			},
 		},
@@ -295,32 +260,27 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "some attestations produce duplicates which are removed",
 			inputs: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig2},
-					SignaturesIdxToParticipationIdx: []uint64{0, 2},
+					ParticipationBits: bitfield.Bitvector128{0b00000101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig2},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig1, sig2},
-					SignaturesIdxToParticipationIdx: []uint64{1, 2},
+					ParticipationBits: bitfield.Bitvector128{0b00000110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig1, sig2},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00001010, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig1, sig3},
-					SignaturesIdxToParticipationIdx: []uint64{1, 3},
+					ParticipationBits: bitfield.Bitvector128{0b00001010, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig1, sig3},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00001001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig3},
-					SignaturesIdxToParticipationIdx: []uint64{0, 3},
+					ParticipationBits: bitfield.Bitvector128{0b00001001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig3},
 				},
 			},
 			want: []*zondpb.SyncCommitteeContribution{
 				// both 0&1 and 2&3 produce this bitlist
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00001111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig2, sig1, sig3},
-					SignaturesIdxToParticipationIdx: []uint64{0, 2, 1, 3},
+					ParticipationBits: bitfield.Bitvector128{0b00001111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig2, sig1, sig3},
 				},
 			},
 		},
@@ -328,21 +288,18 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "two attestations where one is fully contained within the other",
 			inputs: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0},
-					SignaturesIdxToParticipationIdx: []uint64{0},
+					ParticipationBits: bitfield.Bitvector128{0b00000001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig1},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1},
+					ParticipationBits: bitfield.Bitvector128{0b00000011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig1},
 				},
 			},
 			want: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig1},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1},
+					ParticipationBits: bitfield.Bitvector128{0b00000011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig1},
 				},
 			},
 		},
@@ -350,21 +307,18 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			name: "two attestations where one is fully contained within the other reversed",
 			inputs: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig1},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1},
+					ParticipationBits: bitfield.Bitvector128{0b00000011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig1},
 				},
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0},
-					SignaturesIdxToParticipationIdx: []uint64{0},
+					ParticipationBits: bitfield.Bitvector128{0b00000001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0},
 				},
 			},
 			want: []*zondpb.SyncCommitteeContribution{
 				{
-					ParticipationBits:               bitfield.Bitvector128{0b00000011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:                      [][]byte{sig0, sig1},
-					SignaturesIdxToParticipationIdx: []uint64{0, 1},
+					ParticipationBits: bitfield.Bitvector128{0b00000011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					Signatures:        [][]byte{sig0, sig1},
 				},
 			},
 		},
@@ -384,7 +338,6 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			for i, w := range tt.want {
 				assert.DeepEqual(t, w.ParticipationBits.Bytes(), got[i].ParticipationBits.Bytes())
 				assert.DeepEqual(t, w.Signatures, got[i].Signatures)
-				assert.DeepEqual(t, w.SignaturesIdxToParticipationIdx, got[i].SignaturesIdxToParticipationIdx)
 			}
 		}
 		t.Run(fmt.Sprintf("%s/%s", tt.name, NaiveAggregation), func(t *testing.T) {

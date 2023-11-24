@@ -45,7 +45,7 @@ func TestGetSpec(t *testing.T) {
 	config.EjectionBalance = 22
 	config.EffectiveBalanceIncrement = 23
 	config.GenesisForkVersion = []byte("GenesisForkVersion")
-	config.BLSWithdrawalPrefixByte = byte('b')
+	config.DilithiumWithdrawalPrefixByte = byte('b')
 	config.ZOND1AddressWithdrawalPrefixByte = byte('c')
 	config.GenesisDelay = 24
 	config.SecondsPerSlot = 25
@@ -189,7 +189,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "0x"+hex.EncodeToString([]byte("GenesisForkVersion")), v)
 		case "MIN_ANCHOR_POW_BLOCK_DIFFICULTY":
 			assert.Equal(t, "1000", v)
-		case "BLS_WITHDRAWAL_PREFIX":
+		case "DILITHIUM_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x62", v)
 		case "ZOND1_ADDRESS_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x63", v)

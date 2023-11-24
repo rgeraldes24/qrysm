@@ -34,7 +34,7 @@ func TestSignedValidatorRegistration_MarshalJSON(t *testing.T) {
 			Timestamp:    0,
 			Pubkey:       make([]byte, 2592),
 		},
-		Signature: make([]byte, 96),
+		Signature: make([]byte, 4595),
 	}
 	a := &SignedValidatorRegistration{SignedValidatorRegistrationV1: svr}
 	je, err := json.Marshal(a)
@@ -480,9 +480,8 @@ func TestZond1DataMarshal(t *testing.T) {
 
 func pbSyncAggregate(t *testing.T) *zond.SyncAggregate {
 	return &zond.SyncAggregate{
-		SyncCommitteeSignatures:     [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
-		SyncCommitteeBits:           bitfield.Bitvector512{0x01},
-		SignaturesIdxToCommitteeIdx: []uint64{0},
+		SyncCommitteeSignatures: [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
+		SyncCommitteeBits:       bitfield.Bitvector512{0x01},
 	}
 }
 
@@ -552,8 +551,7 @@ func pbAttestation(t *testing.T) *zond.Attestation {
 				Root:  ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
 			},
 		},
-		Signatures:                      [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
-		SignaturesIdxToParticipationIdx: []uint64{0},
+		Signatures: [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
 	}
 }
 

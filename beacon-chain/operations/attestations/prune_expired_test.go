@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/async"
 	"github.com/theQRL/qrysm/v4/config/params"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -31,14 +30,14 @@ func TestPruneExpired_Ticker(t *testing.T) {
 	ad2 := util.HydrateAttestationData(&zondpb.AttestationData{Slot: 1})
 
 	atts := []*zondpb.Attestation{
-		{Data: ad1, ParticipationBits: bitfield.Bitlist{0b1000, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
-		{Data: ad2, ParticipationBits: bitfield.Bitlist{0b1000, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
+		{Data: ad1, ParticipationBits: bitfield.Bitlist{0b1000, 0b1}, Signatures: [][]byte{}},
+		{Data: ad2, ParticipationBits: bitfield.Bitlist{0b1000, 0b1}, Signatures: [][]byte{}},
 	}
 	require.NoError(t, s.cfg.Pool.SaveUnaggregatedAttestations(atts))
 	require.Equal(t, 2, s.cfg.Pool.UnaggregatedAttestationCount(), "Unexpected number of attestations")
 	atts = []*zondpb.Attestation{
-		{Data: ad1, ParticipationBits: bitfield.Bitlist{0b1101, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
-		{Data: ad2, ParticipationBits: bitfield.Bitlist{0b1101, 0b1}, Signature: make([]byte, dilithium2.CryptoBytes)},
+		{Data: ad1, ParticipationBits: bitfield.Bitlist{0b1101, 0b1}, Signatures: [][]byte{}},
+		{Data: ad2, ParticipationBits: bitfield.Bitlist{0b1101, 0b1}, Signatures: [][]byte{}},
 	}
 	require.NoError(t, s.cfg.Pool.SaveAggregatedAttestations(atts))
 	assert.Equal(t, 2, s.cfg.Pool.AggregatedAttestationCount())

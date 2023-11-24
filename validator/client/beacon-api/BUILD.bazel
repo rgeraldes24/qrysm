@@ -28,6 +28,7 @@ go_library(
         "registration.go",
         "state_validators.go",
         "status.go",
+        "stream_blocks.go",
         "submit_aggregate_selection_proof.go",
         "submit_signed_aggregate_proof.go",
         "submit_signed_contribution_and_proof.go",

@@ -31,7 +31,7 @@ func TestValidatorStatus_Active(t *testing.T) {
 
 	depData := &zondpb.Deposit_Data{
 		PublicKey:             pubkey,
-		Signature:             bytesutil.PadTo([]byte("hi"), 96),
+		Signature:             bytesutil.PadTo([]byte("hi"), 4595),
 		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
 	}
 

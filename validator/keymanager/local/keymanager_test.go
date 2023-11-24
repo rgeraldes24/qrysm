@@ -115,7 +115,7 @@ func TestLocalKeymanager_Sign(t *testing.T) {
 	require.NoError(t, json.Unmarshal(encodedKeystore, keystoreFile))
 
 	// We extract the validator signing private key from the keystore
-	// by utilizing the password and initialize a new BLS secret key from
+	// by utilizing the password and initialize a new Dilithium secret key from
 	// its raw bytes.
 	decryptor := keystorev4.New()
 	enc, err := decryptor.Decrypt(keystoreFile.Crypto, dr.wallet.Password())

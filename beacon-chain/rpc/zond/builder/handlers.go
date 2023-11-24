@@ -46,7 +46,8 @@ func (s *Server) ExpectedWithdrawals(w http.ResponseWriter, r *http.Request) {
 		proposalSlot = st.Slot() + 1
 	}
 	// Perform sanity checks on proposal slot before computing state
-	capellaStart, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
+	//capellaStart, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
+	capellaStart, err := slots.EpochStart(0)
 	if err != nil {
 		http2.WriteError(w, handleWrapError(err, "could not calculate Capella start slot", http.StatusInternalServerError))
 		return

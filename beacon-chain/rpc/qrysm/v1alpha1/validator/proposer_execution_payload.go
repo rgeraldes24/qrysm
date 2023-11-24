@@ -10,14 +10,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db/kv"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
-	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	payloadattribute "github.com/theQRL/qrysm/v4/consensus-types/payload-attribute"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -46,10 +44,6 @@ var (
 func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBeaconBlock, st state.BeaconState) (interfaces.ExecutionData, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.getLocalPayload")
 	defer span.End()
-
-	if blk.Version() < version.Bellatrix {
-		return nil, nil
-	}
 
 	slot := blk.Slot()
 	vIdx := blk.ProposerIndex()
@@ -92,34 +86,18 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 	}
 
 	var parentHash []byte
-	var hasTerminalBlock bool
-	mergeComplete, err := blocks.IsMergeTransitionComplete(st)
-	if err != nil {
-		return nil, err
-	}
 
 	t, err := slots.ToTime(st.GenesisTime(), slot)
 	if err != nil {
 		return nil, err
 	}
-	if mergeComplete {
-		header, err := st.LatestExecutionPayloadHeader()
-		if err != nil {
-			return nil, err
-		}
-		parentHash = header.BlockHash()
-	} else {
-		if activationEpochNotReached(slot) {
-			return consensusblocks.WrappedExecutionPayload(emptyPayload())
-		}
-		parentHash, hasTerminalBlock, err = vs.getTerminalBlockHashIfExists(ctx, uint64(t.Unix()))
-		if err != nil {
-			return nil, err
-		}
-		if !hasTerminalBlock {
-			return consensusblocks.WrappedExecutionPayload(emptyPayload())
-		}
+
+	header, err := st.LatestExecutionPayloadHeader()
+	if err != nil {
+		return nil, err
 	}
+	parentHash = header.BlockHash()
+
 	payloadIDCacheMiss.Inc()
 
 	random, err := helpers.RandaoMix(st, time.CurrentEpoch(st))
@@ -130,10 +108,8 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 	finalizedBlockHash := [32]byte{}
 	justifiedBlockHash := [32]byte{}
 
-	if st.Version() >= version.Altair {
-		finalizedBlockHash = vs.FinalizationFetcher.FinalizedBlockHash()
-		justifiedBlockHash = vs.FinalizationFetcher.UnrealizedJustifiedPayloadBlockHash()
-	}
+	finalizedBlockHash = vs.FinalizationFetcher.FinalizedBlockHash()
+	justifiedBlockHash = vs.FinalizationFetcher.UnrealizedJustifiedPayloadBlockHash()
 
 	f := &enginev1.ForkchoiceState{
 		HeadBlockHash:      parentHash,
@@ -147,20 +123,11 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 		if err != nil {
 			return nil, err
 		}
-		attr, err = payloadattribute.New(&enginev1.PayloadAttributesV2{
-			Timestamp:             uint64(t.Unix()),
-			PrevRandao:            random,
-			SuggestedFeeRecipient: feeRecipient.Bytes(),
-			Withdrawals:           withdrawals,
-		})
-		if err != nil {
-			return nil, err
-		}
-	case version.Bellatrix:
 		attr, err = payloadattribute.New(&enginev1.PayloadAttributes{
 			Timestamp:             uint64(t.Unix()),
 			PrevRandao:            random,
 			SuggestedFeeRecipient: feeRecipient.Bytes(),
+			Withdrawals:           withdrawals,
 		})
 		if err != nil {
 			return nil, err
@@ -234,9 +201,6 @@ func (vs *Server) getBuilderPayload(ctx context.Context,
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.getBuilderPayload")
 	defer span.End()
 
-	if slots.ToEpoch(slot) < params.BeaconConfig().BellatrixForkEpoch {
-		return nil, nil
-	}
 	canUseBuilder, err := vs.canUseBuilder(ctx, slot, vIdx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to check if we can use the builder")
@@ -264,22 +228,8 @@ func activationEpochNotReached(slot primitives.Slot) bool {
 	return false
 }
 
-func emptyPayload() *enginev1.ExecutionPayload {
+func emptyPayloadCapella() *enginev1.ExecutionPayload {
 	return &enginev1.ExecutionPayload{
-		ParentHash:    make([]byte, fieldparams.RootLength),
-		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
-		StateRoot:     make([]byte, fieldparams.RootLength),
-		ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-		LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
-		PrevRandao:    make([]byte, fieldparams.RootLength),
-		BaseFeePerGas: make([]byte, fieldparams.RootLength),
-		BlockHash:     make([]byte, fieldparams.RootLength),
-		Transactions:  make([][]byte, 0),
-	}
-}
-
-func emptyPayloadCapella() *enginev1.ExecutionPayloadCapella {
-	return &enginev1.ExecutionPayloadCapella{
 		ParentHash:    make([]byte, fieldparams.RootLength),
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     make([]byte, fieldparams.RootLength),

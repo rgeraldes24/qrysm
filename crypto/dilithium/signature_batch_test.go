@@ -10,7 +10,6 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/theQRL/qrysm/v4/crypto/bls/common"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -262,7 +261,7 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 				}
 				allSigs := append(signatures, signatures...)
 				// Make it a non-unique entry
-				allSigs[10] = make([]byte, 96)
+				allSigs[10] = make([]byte, 4595)
 				allPubs := append(pubs, pubs...)
 				allMsgs := append(messages, messages...)
 				// Insert it back at the end
@@ -270,7 +269,7 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 				pubs = append(pubs, pubs[10])
 				messages = append(messages, messages[10])
 				// Zero out to expected result
-				signatures[10] = make([]byte, 96)
+				signatures[10] = make([]byte, 4595)
 				return &SignatureBatch{
 						Signatures:   allSigs,
 						PublicKeys:   allPubs,
@@ -316,7 +315,7 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 				}
 				allSigs := append(signatures, signatures...)
 				// Make it a non-unique entry
-				allSigs[10] = make([]byte, 96)
+				allSigs[10] = make([]byte, 4595)
 
 				allPubs := append(pubs, pubs...)
 				allPubs[20] = keys[len(keys)-1].PublicKey()
@@ -329,7 +328,7 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 				pubs = append(pubs, pubs[10])
 				messages = append(messages, messages[10])
 				// Zero out to expected result
-				signatures[10] = make([]byte, 96)
+				signatures[10] = make([]byte, 4595)
 
 				// Insert it back at the end
 				signatures = append(signatures, signatures[20])
@@ -473,7 +472,7 @@ func TestSignatureBatch_AggregateBatch(t *testing.T) {
 					messages = append(messages, msg)
 					pubs = append(pubs, k.PublicKey())
 				}
-				signatures[10] = make([]byte, 96)
+				signatures[10] = make([]byte, 4595)
 				return &SignatureBatch{
 					Signatures:   signatures,
 					PublicKeys:   pubs,
@@ -689,7 +688,7 @@ func NewInvalidSignatureSet(t *testing.T, msgBody string, num int, throwErr bool
 		msg := messageBytes(fmt.Sprintf("%s%d", msgBody, i))
 		var sig []byte
 		if throwErr {
-			sig = make([]byte, 96)
+			sig = make([]byte, 4595)
 		} else {
 			badMsg := messageBytes("badmsg")
 			sig = priv.Sign(badMsg[:]).Marshal()

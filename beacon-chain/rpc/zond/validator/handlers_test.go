@@ -15,7 +15,6 @@ import (
 	p2pmock "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/core"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/v4/network/http"
 	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -25,7 +24,7 @@ import (
 
 func TestGetAggregateAttestation(t *testing.T) {
 	root1 := bytesutil.PadTo([]byte("root1"), 32)
-	sig1 := bytesutil.PadTo([]byte("sig1"), fieldparams.BLSSignatureLength)
+	sig1 := bytesutil.PadTo([]byte("sig1"), fieldparams.DilithiumSignatureLength)
 	attSlot1 := &zondpbalpha.Attestation{
 		ParticipationBits: []byte{0, 1},
 		Data: &zondpbalpha.AttestationData{
@@ -41,10 +40,10 @@ func TestGetAggregateAttestation(t *testing.T) {
 				Root:  root1,
 			},
 		},
-		Signature: sig1,
+		Signatures: [][]byte{sig1},
 	}
 	root21 := bytesutil.PadTo([]byte("root2_1"), 32)
-	sig21 := bytesutil.PadTo([]byte("sig2_1"), fieldparams.BLSSignatureLength)
+	sig21 := bytesutil.PadTo([]byte("sig2_1"), fieldparams.DilithiumSignatureLength)
 	attslot21 := &zondpbalpha.Attestation{
 		ParticipationBits: []byte{0, 1, 1},
 		Data: &zondpbalpha.AttestationData{
@@ -60,10 +59,10 @@ func TestGetAggregateAttestation(t *testing.T) {
 				Root:  root21,
 			},
 		},
-		Signature: sig21,
+		Signatures: [][]byte{sig21},
 	}
 	root22 := bytesutil.PadTo([]byte("root2_2"), 32)
-	sig22 := bytesutil.PadTo([]byte("sig2_2"), fieldparams.BLSSignatureLength)
+	sig22 := bytesutil.PadTo([]byte("sig2_2"), fieldparams.DilithiumSignatureLength)
 	attslot22 := &zondpbalpha.Attestation{
 		ParticipationBits: []byte{0, 1, 1, 1},
 		Data: &zondpbalpha.AttestationData{
@@ -79,10 +78,10 @@ func TestGetAggregateAttestation(t *testing.T) {
 				Root:  root22,
 			},
 		},
-		Signature: sig22,
+		Signatures: [][]byte{sig22},
 	}
 	root33 := bytesutil.PadTo([]byte("root3_3"), 32)
-	sig33 := bls.NewAggregateSignature().Marshal()
+	//sig33 := bls.NewAggregateSignature().Marshal()
 	attslot33 := &zondpbalpha.Attestation{
 		ParticipationBits: []byte{1, 0, 0, 1},
 		Data: &zondpbalpha.AttestationData{
@@ -98,7 +97,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 				Root:  root33,
 			},
 		},
-		Signature: sig33,
+		Signatures: [][]byte{},
 	}
 	pool := attestations.NewPool()
 	err := pool.SaveAggregatedAttestations([]*zondpbalpha.Attestation{attSlot1, attslot21, attslot22})
@@ -123,7 +122,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 		require.NotNil(t, resp)
 		require.NotNil(t, resp.Data)
 		assert.DeepEqual(t, "0x00010101", resp.Data.ParticipationBits)
-		assert.DeepEqual(t, hexutil.Encode(sig22), resp.Data.Signature)
+		assert.DeepEqual(t, hexutil.Encode(sig22), resp.Data.Signatures)
 		assert.Equal(t, "2", resp.Data.Data.Slot)
 		assert.Equal(t, "3", resp.Data.Data.CommitteeIndex)
 		assert.DeepEqual(t, hexutil.Encode(root22), resp.Data.Data.BeaconBlockRoot)
@@ -230,7 +229,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 
 func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *testing.T) {
 	root := bytesutil.PadTo([]byte("root"), 32)
-	sig := bytesutil.PadTo([]byte("sig"), fieldparams.BLSSignatureLength)
+	sig := bytesutil.PadTo([]byte("sig"), fieldparams.DilithiumSignatureLength)
 	att1 := &zondpbalpha.Attestation{
 		ParticipationBits: []byte{3, 0, 0, 1},
 		Data: &zondpbalpha.AttestationData{
@@ -246,7 +245,7 @@ func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *te
 				Root:  root,
 			},
 		},
-		Signature: sig,
+		Signatures: [][]byte{sig},
 	}
 	att2 := &zondpbalpha.Attestation{
 		ParticipationBits: []byte{0, 3, 0, 1},
@@ -263,7 +262,7 @@ func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *te
 				Root:  root,
 			},
 		},
-		Signature: sig,
+		Signatures: [][]byte{sig},
 	}
 	pool := attestations.NewPool()
 	err := pool.SaveAggregatedAttestations([]*zondpbalpha.Attestation{att1, att2})
