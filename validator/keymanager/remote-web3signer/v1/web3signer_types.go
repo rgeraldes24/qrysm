@@ -1,4 +1,4 @@
-// Package v1 defines mappings of types as defined by the web3signer official specification for its v1 version i.e. /api/v1/eth2
+// Package v1 defines mappings of types as defined by the web3signer official specification for its v1 version i.e. /api/v1/zond2
 /* Web3Signer Specs are found by searching Consensys' Web3Signer API specification*/
 package v1
 
@@ -38,13 +38,12 @@ type BlockSignRequest struct {
 	Block       *BeaconBlock  `json:"block" validate:"required"`
 }
 
-// BlockV2BlindedSignRequest is a request object for web3signer sign api
-// Supports Bellatrix(merge) and Capella
-type BlockV2BlindedSignRequest struct {
-	Type        string                `json:"type" validate:"required"`
-	ForkInfo    *ForkInfo             `json:"fork_info" validate:"required"`
-	SigningRoot hexutil.Bytes         `json:"signingRoot"`
-	BeaconBlock *BeaconBlockV2Blinded `json:"beacon_block" validate:"required"`
+// BlockBlindedSignRequest is a request object for web3signer sign api
+type BlockBlindedSignRequest struct {
+	Type        string              `json:"type" validate:"required"`
+	ForkInfo    *ForkInfo           `json:"fork_info" validate:"required"`
+	SigningRoot hexutil.Bytes       `json:"signingRoot"`
+	BeaconBlock *BeaconBlockBlinded `json:"beacon_block" validate:"required"`
 }
 
 // DepositSignRequest Not currently supported by Qrysm.
@@ -148,7 +147,7 @@ type Checkpoint struct {
 	Root  string `json:"root"`
 }
 
-// BeaconBlock a sub property of BeaconBlockBlockV2.
+// BeaconBlock a sub property of BeaconBlockBlock.
 type BeaconBlock struct {
 	Slot          string           `json:"slot"`           /* uint64 */
 	ProposerIndex string           `json:"proposer_index"` /* uint64 */
@@ -240,17 +239,20 @@ type VoluntaryExit struct {
 	ValidatorIndex string `json:"validator_index"` /* uint64 */
 }
 
-// BeaconBlockV2Blinded a field of BlockV2BlindedSignRequest.
-// Supports Bellatrix(merge) and Capella
-type BeaconBlockV2Blinded struct {
+// BeaconBlockBlinded a field of BlockBlindedSignRequest.
+type BeaconBlockBlinded struct {
 	Version     string             `json:"version" enum:"true"`
 	BlockHeader *BeaconBlockHeader `json:"block_header"`
 }
 
-// BeaconBlockBlockV2 a sub property of BlockV2SignRequest.
-type BeaconBlockBlockV2 struct {
-	Version string       `json:"version" enum:"true"`
-	Block   *BeaconBlock `json:"beacon_block"`
+// BeaconBlockBlock a sub property of BlockSignRequest.
+type BeaconBlockBlock struct {
+	Version       string           `json:"version" enum:"true"`
+	Slot          string           `json:"slot"`           /* uint64 */
+	ProposerIndex string           `json:"proposer_index"` /* uint64 */
+	ParentRoot    hexutil.Bytes    `json:"parent_root"`
+	StateRoot     hexutil.Bytes    `json:"state_root"`
+	Body          *BeaconBlockBody `json:"body"`
 }
 
 // RandaoReveal a sub property of RandaoRevealSignRequest.

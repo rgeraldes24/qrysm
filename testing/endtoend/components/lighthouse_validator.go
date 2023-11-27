@@ -22,7 +22,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/endtoend/types"
 	e2etypes "github.com/theQRL/qrysm/v4/testing/endtoend/types"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
-	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
+	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"golang.org/x/sync/errgroup"
 )
 

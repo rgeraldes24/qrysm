@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -17,11 +16,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/mock"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	validatormock "github.com/theQRL/qrysm/v4/testing/validator-mock"
-	walletMock "github.com/theQRL/qrysm/v4/validator/accounts/testing"
-	"github.com/theQRL/qrysm/v4/validator/keymanager/derived"
-	constant "github.com/theQRL/qrysm/v4/validator/testing"
-	"github.com/tyler-smith/go-bip39"
-	util "github.com/wealdtech/go-eth2-util"
 )
 
 func TestWaitActivation_ContextCanceled(t *testing.T) {
@@ -270,81 +264,83 @@ func TestWaitForActivation_AccountsChanged(t *testing.T) {
 		assert.LogsContain(t, hook, "Validator activated")
 	})
 
-	t.Run("Derived keymanager", func(t *testing.T) {
-		seed := bip39.NewSeed(constant.TestMnemonic, "")
-		inactivePrivKey, err :=
-			util.PrivateKeyFromSeedAndPath(seed, fmt.Sprintf(derived.ValidatingKeyDerivationPathTemplate, 0))
-		require.NoError(t, err)
-		var inactivePubKey [dilithium2.CryptoPublicKeyBytes]byte
-		copy(inactivePubKey[:], inactivePrivKey.PublicKey().Marshal())
-		activePrivKey, err :=
-			util.PrivateKeyFromSeedAndPath(seed, fmt.Sprintf(derived.ValidatingKeyDerivationPathTemplate, 1))
-		require.NoError(t, err)
-		var activePubKey [dilithium2.CryptoPublicKeyBytes]byte
-		copy(activePubKey[:], activePrivKey.PublicKey().Marshal())
-		wallet := &walletMock.Wallet{
-			Files:            make(map[string]map[string][]byte),
-			AccountPasswords: make(map[string]string),
-			WalletPassword:   "secretPassw0rd$1999",
-		}
-		ctx := context.Background()
-		km, err := derived.NewKeymanager(ctx, &derived.SetupConfig{
-			Wallet:           wallet,
-			ListenForChanges: true,
-		})
-		require.NoError(t, err)
-		err = km.RecoverAccountsFromMnemonic(ctx, constant.TestMnemonic, derived.DefaultMnemonicLanguage, "", 1)
-		require.NoError(t, err)
-		validatorClient := validatormock.NewMockValidatorClient(ctrl)
-		beaconClient := validatormock.NewMockBeaconChainClient(ctrl)
-		v := validator{
-			validatorClient: validatorClient,
-			keyManager:      km,
-			genesisTime:     1,
-			beaconClient:    beaconClient,
-		}
-
-		inactiveResp := generateMockStatusResponse([][]byte{inactivePubKey[:]})
-		inactiveResp.Statuses[0].Status.Status = zondpb.ValidatorStatus_UNKNOWN_STATUS
-		inactiveClientStream := mock.NewMockBeaconNodeValidator_WaitForActivationClient(ctrl)
-		validatorClient.EXPECT().WaitForActivation(
-			gomock.Any(),
-			&zondpb.ValidatorActivationRequest{
-				PublicKeys: [][]byte{inactivePubKey[:]},
-			},
-		).Return(inactiveClientStream, nil)
-		beaconClient.EXPECT().ListValidators(gomock.Any(), gomock.Any()).Return(&zondpb.Validators{}, nil).AnyTimes()
-		inactiveClientStream.EXPECT().Recv().Return(
-			inactiveResp,
-			nil,
-		).AnyTimes()
-
-		activeResp := generateMockStatusResponse([][]byte{inactivePubKey[:], activePubKey[:]})
-		activeResp.Statuses[0].Status.Status = zondpb.ValidatorStatus_UNKNOWN_STATUS
-		activeResp.Statuses[1].Status.Status = zondpb.ValidatorStatus_ACTIVE
-		activeClientStream := mock.NewMockBeaconNodeValidator_WaitForActivationClient(ctrl)
-		validatorClient.EXPECT().WaitForActivation(
-			gomock.Any(),
-			&zondpb.ValidatorActivationRequest{
-				PublicKeys: [][]byte{inactivePubKey[:], activePubKey[:]},
-			},
-		).Return(activeClientStream, nil)
-		activeClientStream.EXPECT().Recv().Return(
-			activeResp,
-			nil,
-		)
-
-		channel := make(chan [][dilithium2.CryptoPublicKeyBytes]byte)
-		go func() {
-			// We add the active key into the keymanager and simulate a key refresh.
-			time.Sleep(time.Second * 1)
-			err = km.RecoverAccountsFromMnemonic(ctx, constant.TestMnemonic, derived.DefaultMnemonicLanguage, "", 2)
+	/*
+		t.Run("Derived keymanager", func(t *testing.T) {
+			seed := bip39.NewSeed(constant.TestMnemonic, "")
+			inactivePrivKey, err :=
+				util.PrivateKeyFromSeedAndPath(seed, fmt.Sprintf(derived.ValidatingKeyDerivationPathTemplate, 0))
 			require.NoError(t, err)
-			channel <- [][dilithium2.CryptoPublicKeyBytes]byte{}
-		}()
+			var inactivePubKey [dilithium2.CryptoPublicKeyBytes]byte
+			copy(inactivePubKey[:], inactivePrivKey.PublicKey().Marshal())
+			activePrivKey, err :=
+				util.PrivateKeyFromSeedAndPath(seed, fmt.Sprintf(derived.ValidatingKeyDerivationPathTemplate, 1))
+			require.NoError(t, err)
+			var activePubKey [dilithium2.CryptoPublicKeyBytes]byte
+			copy(activePubKey[:], activePrivKey.PublicKey().Marshal())
+			wallet := &walletMock.Wallet{
+				Files:            make(map[string]map[string][]byte),
+				AccountPasswords: make(map[string]string),
+				WalletPassword:   "secretPassw0rd$1999",
+			}
+			ctx := context.Background()
+			km, err := derived.NewKeymanager(ctx, &derived.SetupConfig{
+				Wallet:           wallet,
+				ListenForChanges: true,
+			})
+			require.NoError(t, err)
+			err = km.RecoverAccountsFromMnemonic(ctx, constant.TestMnemonic, derived.DefaultMnemonicLanguage, "", 1)
+			require.NoError(t, err)
+			validatorClient := validatormock.NewMockValidatorClient(ctrl)
+			beaconClient := validatormock.NewMockBeaconChainClient(ctrl)
+			v := validator{
+				validatorClient: validatorClient,
+				keyManager:      km,
+				genesisTime:     1,
+				beaconClient:    beaconClient,
+			}
 
-		assert.NoError(t, v.internalWaitForActivation(context.Background(), channel))
-		assert.LogsContain(t, hook, "Waiting for deposit to be observed by beacon node")
-		assert.LogsContain(t, hook, "Validator activated")
-	})
+			inactiveResp := generateMockStatusResponse([][]byte{inactivePubKey[:]})
+			inactiveResp.Statuses[0].Status.Status = zondpb.ValidatorStatus_UNKNOWN_STATUS
+			inactiveClientStream := mock.NewMockBeaconNodeValidator_WaitForActivationClient(ctrl)
+			validatorClient.EXPECT().WaitForActivation(
+				gomock.Any(),
+				&zondpb.ValidatorActivationRequest{
+					PublicKeys: [][]byte{inactivePubKey[:]},
+				},
+			).Return(inactiveClientStream, nil)
+			beaconClient.EXPECT().ListValidators(gomock.Any(), gomock.Any()).Return(&zondpb.Validators{}, nil).AnyTimes()
+			inactiveClientStream.EXPECT().Recv().Return(
+				inactiveResp,
+				nil,
+			).AnyTimes()
+
+			activeResp := generateMockStatusResponse([][]byte{inactivePubKey[:], activePubKey[:]})
+			activeResp.Statuses[0].Status.Status = zondpb.ValidatorStatus_UNKNOWN_STATUS
+			activeResp.Statuses[1].Status.Status = zondpb.ValidatorStatus_ACTIVE
+			activeClientStream := mock.NewMockBeaconNodeValidator_WaitForActivationClient(ctrl)
+			validatorClient.EXPECT().WaitForActivation(
+				gomock.Any(),
+				&zondpb.ValidatorActivationRequest{
+					PublicKeys: [][]byte{inactivePubKey[:], activePubKey[:]},
+				},
+			).Return(activeClientStream, nil)
+			activeClientStream.EXPECT().Recv().Return(
+				activeResp,
+				nil,
+			)
+
+			channel := make(chan [][dilithium2.CryptoPublicKeyBytes]byte)
+			go func() {
+				// We add the active key into the keymanager and simulate a key refresh.
+				time.Sleep(time.Second * 1)
+				err = km.RecoverAccountsFromMnemonic(ctx, constant.TestMnemonic, derived.DefaultMnemonicLanguage, "", 2)
+				require.NoError(t, err)
+				channel <- [][dilithium2.CryptoPublicKeyBytes]byte{}
+			}()
+
+			assert.NoError(t, v.internalWaitForActivation(context.Background(), channel))
+			assert.LogsContain(t, hook, "Waiting for deposit to be observed by beacon node")
+			assert.LogsContain(t, hook, "Validator activated")
+		})
+	*/
 }

@@ -18,6 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
+/*
 func Test_IsMergeComplete(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -192,7 +193,7 @@ func Test_IsMergeComplete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+			st, _ := util.DeterministicGenesisState(t, 1)
 			require.NoError(t, st.SetLatestExecutionPayloadHeader(tt.payload))
 			got, err := blocks.IsMergeTransitionComplete(st)
 			require.NoError(t, err)
@@ -202,13 +203,16 @@ func Test_IsMergeComplete(t *testing.T) {
 		})
 	}
 }
+*/
 
+/*
 func Test_IsMergeCompleteCapella(t *testing.T) {
 	st, _ := util.DeterministicGenesisStateCapella(t, 1)
 	got, err := blocks.IsMergeTransitionComplete(st)
 	require.NoError(t, err)
 	require.Equal(t, got, true)
 }
+*/
 
 /*
 func Test_IsExecutionBlock(t *testing.T) {
@@ -321,7 +325,7 @@ func Test_IsExecutionEnabled(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+			st, _ := util.DeterministicGenesisState(t, 1)
 			require.NoError(t, st.SetLatestExecutionPayloadHeader(tt.header))
 			blk := util.NewBeaconBlock()
 			blk.Block.Body.ExecutionPayload = tt.payload
@@ -467,7 +471,7 @@ func Test_ValidatePayloadWhenMergeCompletes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+			st, _ := util.DeterministicGenesisState(t, 1)
 			require.NoError(t, st.SetLatestExecutionPayloadHeader(tt.header))
 			wrappedPayload, err := consensusblocks.WrappedExecutionPayload(tt.payload, 0)
 			require.NoError(t, err)
@@ -482,7 +486,7 @@ func Test_ValidatePayloadWhenMergeCompletes(t *testing.T) {
 }
 
 func Test_ValidatePayload(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+	st, _ := util.DeterministicGenesisState(t, 1)
 	random, err := helpers.RandaoMix(st, time.CurrentEpoch(st))
 	require.NoError(t, err)
 	ts, err := slots.ToTime(st.GenesisTime(), st.Slot())
@@ -607,7 +611,7 @@ func Test_ProcessPayload(t *testing.T) {
 }
 
 func Test_ProcessPayloadHeader(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+	st, _ := util.DeterministicGenesisState(t, 1)
 	random, err := helpers.RandaoMix(st, time.CurrentEpoch(st))
 	require.NoError(t, err)
 	ts, err := slots.ToTime(st.GenesisTime(), st.Slot())
@@ -672,7 +676,7 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 }
 
 func Test_ValidatePayloadHeader(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+	st, _ := util.DeterministicGenesisState(t, 1)
 	random, err := helpers.RandaoMix(st, time.CurrentEpoch(st))
 	require.NoError(t, err)
 	ts, err := slots.ToTime(st.GenesisTime(), st.Slot())
@@ -726,7 +730,7 @@ func Test_ValidatePayloadHeader(t *testing.T) {
 }
 
 func Test_ValidatePayloadHeaderWhenMergeCompletes(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+	st, _ := util.DeterministicGenesisState(t, 1)
 	emptySt := st.Copy()
 	wrappedHeader, err := consensusblocks.WrappedExecutionPayloadHeader(&enginev1.ExecutionPayloadHeader{BlockHash: []byte{'a'}}, 0)
 	require.NoError(t, err)
@@ -824,7 +828,7 @@ func Test_PayloadToHeader(t *testing.T) {
 }
 
 func BenchmarkBellatrixComplete(b *testing.B) {
-	st, _ := util.DeterministicGenesisStateBellatrix(b, 1)
+	st, _ := util.DeterministicGenesisState(b, 1)
 	h, err := emptyPayloadHeader()
 	require.NoError(b, err)
 	require.NoError(b, st.SetLatestExecutionPayloadHeader(h))

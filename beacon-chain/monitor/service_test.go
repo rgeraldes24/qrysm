@@ -25,7 +25,7 @@ import (
 
 func setupService(t *testing.T) *Service {
 	beaconDB := testDB.SetupDB(t)
-	state, _ := util.DeterministicGenesisStateAltair(t, 256)
+	state, _ := util.DeterministicGenesisState(t, 256)
 
 	pubKeys := make([][]byte, 3)
 	pubKeys[0] = state.Validators()[0].PublicKey
@@ -119,7 +119,7 @@ func TestTrackedIndex(t *testing.T) {
 func TestUpdateSyncCommitteeTrackedVals(t *testing.T) {
 	hook := logTest.NewGlobal()
 	s := setupService(t)
-	state, _ := util.DeterministicGenesisStateAltair(t, 1024)
+	state, _ := util.DeterministicGenesisState(t, 1024)
 
 	s.updateSyncCommitteeTrackedVals(state)
 	require.LogsDoNotContain(t, hook, "Sync committee assignments will not be reported")
@@ -211,13 +211,13 @@ func TestMonitorRoutine(t *testing.T) {
 		wg.Done()
 	}()
 
-	genesis, keys := util.DeterministicGenesisStateAltair(t, 64)
+	genesis, keys := util.DeterministicGenesisState(t, 64)
 	c, err := altair.NextSyncCommittee(ctx, genesis)
 	require.NoError(t, err)
 	require.NoError(t, genesis.SetCurrentSyncCommittee(c))
 
 	genConfig := util.DefaultBlockGenConfig()
-	block, err := util.GenerateFullBlockAltair(genesis, keys, genConfig, 1)
+	block, err := util.GenerateFullBlock(genesis, keys, genConfig, 1)
 	require.NoError(t, err)
 	root, err := block.GetBlock().HashTreeRoot()
 	require.NoError(t, err)

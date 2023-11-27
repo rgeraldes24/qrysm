@@ -730,7 +730,7 @@ func TestBeaconStateToProto(t *testing.T) {
 		}}
 		state.Zond1DepositIndex = 8
 		state.Validators = []*zondpbalpha.Validator{{
-			PublicKey:                  bytesutil.PadTo([]byte("publickey"), 48),
+			PublicKey:                  bytesutil.PadTo([]byte("publickey"), 2592),
 			WithdrawalCredentials:      bytesutil.PadTo([]byte("withdrawalcredentials"), 32),
 			EffectiveBalance:           9,
 			Slashed:                    true,
@@ -759,10 +759,10 @@ func TestBeaconStateToProto(t *testing.T) {
 		state.CurrentEpochParticipation = []byte("currentepochparticipation")
 		state.InactivityScores = []uint64{1, 2, 3}
 		state.CurrentSyncCommittee = &zondpbalpha.SyncCommittee{
-			Pubkeys: [][]byte{bytesutil.PadTo([]byte("cscpubkeys"), 48)},
+			Pubkeys: [][]byte{bytesutil.PadTo([]byte("cscpubkeys"), 2592)},
 		}
 		state.NextSyncCommittee = &zondpbalpha.SyncCommittee{
-			Pubkeys: [][]byte{bytesutil.PadTo([]byte("nscpubkeys"), 48)},
+			Pubkeys: [][]byte{bytesutil.PadTo([]byte("nscpubkeys"), 2592)},
 		}
 		state.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeader{
 			ParentHash:       bytesutil.PadTo([]byte("parenthash"), 32),
@@ -835,7 +835,7 @@ func TestBeaconStateToProto(t *testing.T) {
 	require.Equal(t, 1, len(result.Validators))
 	resultValidator := result.Validators[0]
 	require.NotNil(t, resultValidator)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("publickey"), 48), resultValidator.Pubkey)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("publickey"), 2592), resultValidator.Pubkey)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("withdrawalcredentials"), 32), resultValidator.WithdrawalCredentials)
 	assert.Equal(t, uint64(9), resultValidator.EffectiveBalance)
 	assert.Equal(t, true, resultValidator.Slashed)
@@ -864,9 +864,9 @@ func TestBeaconStateToProto(t *testing.T) {
 	assert.DeepEqual(t, []byte("currentepochparticipation"), result.CurrentEpochParticipation)
 	assert.DeepEqual(t, []uint64{1, 2, 3}, result.InactivityScores)
 	require.NotNil(t, result.CurrentSyncCommittee)
-	assert.DeepEqual(t, [][]byte{bytesutil.PadTo([]byte("cscpubkeys"), 48)}, result.CurrentSyncCommittee.Pubkeys)
+	assert.DeepEqual(t, [][]byte{bytesutil.PadTo([]byte("cscpubkeys"), 2592)}, result.CurrentSyncCommittee.Pubkeys)
 	require.NotNil(t, result.NextSyncCommittee)
-	assert.DeepEqual(t, [][]byte{bytesutil.PadTo([]byte("nscpubkeys"), 48)}, result.NextSyncCommittee.Pubkeys)
+	assert.DeepEqual(t, [][]byte{bytesutil.PadTo([]byte("nscpubkeys"), 2592)}, result.NextSyncCommittee.Pubkeys)
 	resultLatestExecutionPayloadHeader := result.LatestExecutionPayloadHeader
 	require.NotNil(t, resultLatestExecutionPayloadHeader)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("parenthash"), 32), resultLatestExecutionPayloadHeader.ParentHash)
@@ -896,7 +896,7 @@ func TestV1Alpha1ToV1SignedDilithiumToExecChange(t *testing.T) {
 	alphaChange := &zondpbalpha.SignedDilithiumToExecutionChange{
 		Message: &zondpbalpha.DilithiumToExecutionChange{
 			ValidatorIndex:      validatorIndex,
-			FromDilithiumPubkey: bytesutil.PadTo([]byte("fromdilithiumpubkey"), 48),
+			FromDilithiumPubkey: bytesutil.PadTo([]byte("fromdilithiumpubkey"), 2592),
 			ToExecutionAddress:  bytesutil.PadTo([]byte("toexecutionaddress"), 20),
 		},
 		Signature: signature,
@@ -906,7 +906,7 @@ func TestV1Alpha1ToV1SignedDilithiumToExecChange(t *testing.T) {
 	require.NotNil(t, change.Message)
 	assert.DeepEqual(t, signature, change.Signature)
 	assert.Equal(t, validatorIndex, change.Message.ValidatorIndex)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("fromdilithiumpubkey"), 48), change.Message.FromDilithiumPubkey)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("fromdilithiumpubkey"), 2592), change.Message.FromDilithiumPubkey)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("toexecutionaddress"), 20), change.Message.ToExecutionAddress)
 }
 
@@ -914,7 +914,7 @@ func TestV1ToV1Alpha1SignedDilithiumToExecutionChange(t *testing.T) {
 	v1Change := &zondpbv1.SignedDilithiumToExecutionChange{
 		Message: &zondpbv1.DilithiumToExecutionChange{
 			ValidatorIndex:      validatorIndex,
-			FromDilithiumPubkey: bytesutil.PadTo([]byte("fromdilithiumpubkey"), 48),
+			FromDilithiumPubkey: bytesutil.PadTo([]byte("fromdilithiumpubkey"), 2592),
 			ToExecutionAddress:  bytesutil.PadTo([]byte("toexecutionaddress"), 20),
 		},
 		Signature: signature,
@@ -924,6 +924,6 @@ func TestV1ToV1Alpha1SignedDilithiumToExecutionChange(t *testing.T) {
 	require.NotNil(t, change.Message)
 	assert.DeepEqual(t, signature, change.Signature)
 	assert.Equal(t, validatorIndex, change.Message.ValidatorIndex)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("fromdilithiumpubkey"), 48), change.Message.FromDilithiumPubkey)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("fromdilithiumpubkey"), 2592), change.Message.FromDilithiumPubkey)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("toexecutionaddress"), 20), change.Message.ToExecutionAddress)
 }

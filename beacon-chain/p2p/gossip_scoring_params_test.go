@@ -29,7 +29,7 @@ func TestCorrect_ActiveValidatorsCount(t *testing.T) {
 		validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 		for i := 0; i < len(validators); i++ {
 			validators[i] = &zondpb.Validator{
-				PublicKey:             make([]byte, 48),
+				PublicKey:             make([]byte, 2592),
 				WithdrawalCredentials: make([]byte, 32),
 				ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 				Slashed:               false,
@@ -46,7 +46,7 @@ func TestCorrect_ActiveValidatorsCount(t *testing.T) {
 	assert.Equal(t, int(params.BeaconConfig().MinGenesisActiveValidatorCount), int(vals), "mainnet genesis active count isn't accurate")
 	for i := 0; i < 100; i++ {
 		require.NoError(t, bState.AppendValidator(&zondpb.Validator{
-			PublicKey:             make([]byte, 48),
+			PublicKey:             make([]byte, 2592),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               false,

@@ -50,7 +50,7 @@ func TestGetBeaconStateV2(t *testing.T) {
 		util.SaveBlock(t, ctx, db, blk)
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
-		fakeState, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+		fakeState, _ := util.DeterministicGenesisState(t, 1)
 		server := &Server{
 			Stater: &testutil.MockStater{
 				BeaconState: fakeState,
@@ -76,7 +76,7 @@ func TestGetBeaconStateV2(t *testing.T) {
 		util.SaveBlock(t, ctx, db, blk)
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
-		fakeState, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+		fakeState, _ := util.DeterministicGenesisState(t, 1)
 		headerRoot, err := fakeState.LatestBlockHeader().HashTreeRoot()
 		require.NoError(t, err)
 		chainService := &blockchainmock.ChainService{

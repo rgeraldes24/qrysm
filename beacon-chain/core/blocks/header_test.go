@@ -151,7 +151,7 @@ func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 	for i := 0; i < len(validators); i++ {
 		validators[i] = &zondpb.Validator{
-			PublicKey:             make([]byte, 48),
+			PublicKey:             make([]byte, 2592),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               true,
@@ -192,7 +192,7 @@ func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 	for i := 0; i < len(validators); i++ {
 		validators[i] = &zondpb.Validator{
-			PublicKey:             make([]byte, 48),
+			PublicKey:             make([]byte, 2592),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               true,

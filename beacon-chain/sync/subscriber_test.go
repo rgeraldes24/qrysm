@@ -59,7 +59,7 @@ func TestSubscribe_ReceivesValidMessage(t *testing.T) {
 	var err error
 	p2pService.Digest, err = r.currentForkDigest()
 	require.NoError(t, err)
-	topic := "/eth2/%x/voluntary_exit"
+	topic := "/zond2/%x/voluntary_exit"
 	var wg sync.WaitGroup
 	wg.Add(1)
 
@@ -102,7 +102,7 @@ func TestSubscribe_UnsubscribeTopic(t *testing.T) {
 	var err error
 	p2pService.Digest, err = r.currentForkDigest()
 	require.NoError(t, err)
-	topic := "/eth2/%x/voluntary_exit"
+	topic := "/zond2/%x/voluntary_exit"
 
 	r.subscribe(topic, r.noopValidator, func(_ context.Context, msg proto.Message) error {
 		return nil
@@ -150,7 +150,7 @@ func TestSubscribe_ReceivesAttesterSlashing(t *testing.T) {
 		chainStarted:              abool.New(),
 		subHandler:                newSubTopicHandler(),
 	}
-	topic := "/eth2/%x/attester_slashing"
+	topic := "/zond2/%x/attester_slashing"
 	var wg sync.WaitGroup
 	wg.Add(1)
 	var err error
@@ -203,7 +203,7 @@ func TestSubscribe_ReceivesProposerSlashing(t *testing.T) {
 		chainStarted:              abool.New(),
 		subHandler:                newSubTopicHandler(),
 	}
-	topic := "/eth2/%x/proposer_slashing"
+	topic := "/zond2/%x/proposer_slashing"
 	var wg sync.WaitGroup
 	wg.Add(1)
 	params.SetupTestConfigCleanup(t)
@@ -292,7 +292,7 @@ func TestRevalidateSubscription_CorrectlyFormatsTopic(t *testing.T) {
 	require.NoError(t, err)
 	subscriptions := make(map[uint64]*pubsub.Subscription, params.BeaconConfig().MaxCommitteesPerSlot)
 
-	defaultTopic := "/eth2/testing/%#x/committee%d"
+	defaultTopic := "/zond2/testing/%#x/committee%d"
 	// committee index 1
 	fullTopic := fmt.Sprintf(defaultTopic, digest, 1) + r.cfg.p2p.Encoding().ProtocolSuffix()
 	_, topVal := r.wrapAndReportValidation(fullTopic, r.noopValidator)
@@ -329,7 +329,7 @@ func TestStaticSubnets(t *testing.T) {
 		chainStarted: abool.New(),
 		subHandler:   newSubTopicHandler(),
 	}
-	defaultTopic := "/eth2/%x/beacon_attestation_%d"
+	defaultTopic := "/zond2/%x/beacon_attestation_%d"
 	d, err := r.currentForkDigest()
 	assert.NoError(t, err)
 	r.subscribeStaticWithSubnets(defaultTopic, r.noopValidator, func(_ context.Context, msg proto.Message) error {
@@ -500,7 +500,7 @@ func TestFilterSubnetPeers(t *testing.T) {
 	defer cache.SubnetIDs.EmptyAllCaches()
 	digest, err := r.currentForkDigest()
 	assert.NoError(t, err)
-	defaultTopic := "/eth2/%x/beacon_attestation_%d" + r.cfg.p2p.Encoding().ProtocolSuffix()
+	defaultTopic := "/zond2/%x/beacon_attestation_%d" + r.cfg.p2p.Encoding().ProtocolSuffix()
 	subnet10 := r.addDigestAndIndexToTopic(defaultTopic, digest, 10)
 	cache.SubnetIDs.AddAggregatorSubnetID(currSlot, 10)
 
@@ -619,7 +619,6 @@ func TestSubscribeWithSyncSubnets_StaticSwitchFork(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
 	params.SetupTestConfigCleanup(t)
 	cfg := params.BeaconConfig()
-	cfg.AltairForkEpoch = 1
 	cfg.SecondsPerSlot = 1
 	params.OverrideBeaconConfig(cfg)
 	params.BeaconConfig().InitializeForkSchedule()
@@ -659,7 +658,6 @@ func TestSubscribeWithSyncSubnets_DynamicSwitchFork(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	p := p2ptest.NewTestP2P(t)
 	cfg := params.BeaconConfig().Copy()
-	cfg.AltairForkEpoch = 1
 	cfg.SecondsPerSlot = 1
 	cfg.SlotsPerEpoch = 4
 	params.OverrideBeaconConfig(cfg)

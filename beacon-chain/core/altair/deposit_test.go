@@ -47,7 +47,7 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 	deposit := &zondpb.Deposit{
 		Data: &zondpb.Deposit_Data{
-			PublicKey:             bytesutil.PadTo([]byte{1, 2, 3}, 48),
+			PublicKey:             bytesutil.PadTo([]byte{1, 2, 3}, 2592),
 			WithdrawalCredentials: make([]byte, 32),
 			Signature:             make([]byte, 4595),
 		},

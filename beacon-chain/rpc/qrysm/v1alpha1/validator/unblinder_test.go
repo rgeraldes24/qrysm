@@ -220,7 +220,7 @@ func Test_unblindBuilderBlock(t *testing.T) {
 				PayloadCapella: pCapella,
 			},
 			returnedBlk: func() interfaces.SignedBeaconBlock {
-				b := util.NewBeaconBlockCapella()
+				b := util.NewBeaconBlock()
 				b.Block.Slot = 1
 				b.Block.ProposerIndex = 2
 				b.Block.Body.DilithiumToExecutionChanges = []*zond.SignedDilithiumToExecutionChange{

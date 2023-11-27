@@ -124,11 +124,6 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 
 	params.SetupTestConfigCleanup(t)
-	// cfg := params.BeaconConfig().Copy()
-	// cfg.CapellaForkEpoch = 3
-	// cfg.BellatrixForkEpoch = 2
-	// cfg.AltairForkEpoch = 1
-	// params.OverrideBeaconConfig(cfg)
 	beaconState, privKeys := util.DeterministicGenesisState(t, 64)
 
 	stateRoot, err := beaconState.HashTreeRoot(ctx)
@@ -230,10 +225,6 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 
 func TestServer_GetBeaconBlock_Optimistic(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	// cfg := params.BeaconConfig().Copy()
-	// cfg.BellatrixForkEpoch = 2
-	// cfg.AltairForkEpoch = 1
-	// params.OverrideBeaconConfig(cfg)
 
 	// bellatrixSlot, err := slots.EpochStart(params.BeaconConfig().BellatrixForkEpoch)
 	// require.NoError(t, err)
@@ -527,7 +518,7 @@ func TestProposer_PendingDeposits_OutsideZond1FollowWindow(t *testing.T) {
 			Zond1BlockHeight: 2,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -537,7 +528,7 @@ func TestProposer_PendingDeposits_OutsideZond1FollowWindow(t *testing.T) {
 			Zond1BlockHeight: 8,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -550,7 +541,7 @@ func TestProposer_PendingDeposits_OutsideZond1FollowWindow(t *testing.T) {
 			Zond1BlockHeight: 400,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("c"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -560,7 +551,7 @@ func TestProposer_PendingDeposits_OutsideZond1FollowWindow(t *testing.T) {
 			Zond1BlockHeight: 600,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("d"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -666,7 +657,7 @@ func TestProposer_PendingDeposits_FollowsCorrectZond1Block(t *testing.T) {
 			Zond1BlockHeight: 8,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -676,7 +667,7 @@ func TestProposer_PendingDeposits_FollowsCorrectZond1Block(t *testing.T) {
 			Zond1BlockHeight: 14,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -689,7 +680,7 @@ func TestProposer_PendingDeposits_FollowsCorrectZond1Block(t *testing.T) {
 			Zond1BlockHeight: 5000,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("c"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -699,7 +690,7 @@ func TestProposer_PendingDeposits_FollowsCorrectZond1Block(t *testing.T) {
 			Zond1BlockHeight: 6000,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("d"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -780,7 +771,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateZond1DepositIndex(t *testi
 			Index: 0,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -789,7 +780,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateZond1DepositIndex(t *testi
 			Index: 1,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -802,7 +793,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateZond1DepositIndex(t *testi
 			Index: i,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -880,7 +871,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 			Index: 0,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -889,7 +880,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 			Index: 1,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -902,7 +893,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 			Index: i,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -978,7 +969,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 			Index: 0,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -987,7 +978,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 			Index: 1,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1000,7 +991,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 			Index: i,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1080,7 +1071,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			Zond1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1090,7 +1081,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			Zond1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1103,7 +1094,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			Zond1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("c"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1113,7 +1104,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			Zond1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("d"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1196,7 +1187,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			Zond1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1206,7 +1197,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			Zond1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1219,7 +1210,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			Zond1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("c"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1229,7 +1220,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			Zond1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("d"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1411,7 +1402,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 		Zond1BlockHeight: 0,
 		Deposit: &zondpb.Deposit{
 			Data: &zondpb.Deposit_Data{
-				PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+				PublicKey:             bytesutil.PadTo([]byte("a"), 2592),
 				Signature:             make([]byte, 4595),
 				WithdrawalCredentials: make([]byte, 32),
 			}},
@@ -2081,7 +2072,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestZond1DataEqGenesisZond1Block
 			Index: 0,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -2090,7 +2081,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestZond1DataEqGenesisZond1Block
 			Index: 1,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -2103,7 +2094,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestZond1DataEqGenesisZond1Block
 			Index: i,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 2592),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},

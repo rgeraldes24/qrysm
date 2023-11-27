@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
@@ -72,7 +71,7 @@ func TestServer_GetAttestationInclusionSlot(t *testing.T) {
 			Slot:            1,
 		},
 		ParticipationBits: bitfield.Bitlist{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x01},
-		Signature:         make([]byte, dilithium2.CryptoBytes),
+		Signatures:        [][]byte{},
 	}
 	b := util.NewBeaconBlock()
 	b.Block.Slot = 2

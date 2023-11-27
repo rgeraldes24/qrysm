@@ -38,7 +38,7 @@ func TestOptimizedGenesisBeaconState_1000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	fuzzer.NilChance(0.1)
 	var genesisTime uint64
-	preState, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	preState, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	zond1Data := &zondpb.Zond1Data{}
 	for i := 0; i < 1000; i++ {

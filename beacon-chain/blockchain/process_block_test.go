@@ -666,10 +666,6 @@ func TestOnBlock_InvalidSignature(t *testing.T) {
 
 func TestOnBlock_CallNewPayloadAndForkchoiceUpdated(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	config := params.BeaconConfig()
-	config.AltairForkEpoch = 1
-	config.BellatrixForkEpoch = 2
-	params.OverrideBeaconConfig(config)
 
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
@@ -839,27 +835,9 @@ func Test_getStateVersionAndPayload(t *testing.T) {
 		header  *enginev1.ExecutionPayloadHeader
 	}{
 		{
-			name: "phase 0 state",
+			name: "capella state",
 			st: func() state.BeaconState {
 				s, _ := util.DeterministicGenesisState(t, 1)
-				return s
-			}(),
-			version: version.Phase0,
-			header:  (*enginev1.ExecutionPayloadHeader)(nil),
-		},
-		{
-			name: "altair state",
-			st: func() state.BeaconState {
-				s, _ := util.DeterministicGenesisStateAltair(t, 1)
-				return s
-			}(),
-			version: version.Altair,
-			header:  (*enginev1.ExecutionPayloadHeader)(nil),
-		},
-		{
-			name: "bellatrix state",
-			st: func() state.BeaconState {
-				s, _ := util.DeterministicGenesisStateBellatrix(t, 1)
 				wrappedHeader, err := consensusblocks.WrappedExecutionPayloadHeader(&enginev1.ExecutionPayloadHeader{
 					BlockNumber: 1,
 				})
@@ -867,7 +845,7 @@ func Test_getStateVersionAndPayload(t *testing.T) {
 				require.NoError(t, s.SetLatestExecutionPayloadHeader(wrappedHeader))
 				return s
 			}(),
-			version: version.Bellatrix,
+			version: version.Capella,
 			header: &enginev1.ExecutionPayloadHeader{
 				BlockNumber: 1,
 			},
@@ -1163,8 +1141,6 @@ func TestStore_NoViableHead_FCU(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig()
 	config.SlotsPerEpoch = 6
-	config.AltairForkEpoch = 1
-	config.BellatrixForkEpoch = 2
 	params.OverrideBeaconConfig(config)
 
 	mockEngine := &mockExecution.EngineClient{ErrNewPayload: execution.ErrAcceptedSyncingPayloadStatus, ErrForkchoiceUpdated: execution.ErrAcceptedSyncingPayloadStatus}
@@ -1342,8 +1318,6 @@ func TestStore_NoViableHead_NewPayload(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig()
 	config.SlotsPerEpoch = 6
-	config.AltairForkEpoch = 1
-	config.BellatrixForkEpoch = 2
 	params.OverrideBeaconConfig(config)
 
 	mockEngine := &mockExecution.EngineClient{ErrNewPayload: execution.ErrAcceptedSyncingPayloadStatus, ErrForkchoiceUpdated: execution.ErrAcceptedSyncingPayloadStatus}
@@ -1521,8 +1495,6 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig()
 	config.SlotsPerEpoch = 6
-	config.AltairForkEpoch = 1
-	config.BellatrixForkEpoch = 2
 	params.OverrideBeaconConfig(config)
 
 	mockEngine := &mockExecution.EngineClient{ErrNewPayload: execution.ErrAcceptedSyncingPayloadStatus, ErrForkchoiceUpdated: execution.ErrAcceptedSyncingPayloadStatus}
@@ -1728,7 +1700,7 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 	// Import block 30, it should justify Epoch 4 and become HEAD, the node
 	// recovers
 	driftGenesisTime(service, 30, 0)
-	b, err = util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), 30)
+	b, err = util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 30)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1759,8 +1731,6 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig()
 	config.SlotsPerEpoch = 6
-	config.AltairForkEpoch = 1
-	config.BellatrixForkEpoch = 2
 	params.OverrideBeaconConfig(config)
 
 	mockEngine := &mockExecution.EngineClient{ErrNewPayload: execution.ErrAcceptedSyncingPayloadStatus, ErrForkchoiceUpdated: execution.ErrAcceptedSyncingPayloadStatus}

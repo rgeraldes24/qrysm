@@ -211,7 +211,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 			},
 			SigningSlot: 0,
 		}
-	case "BLOCK_V2_CAPELLA":
+	case "BLOCK_CAPELLA":
 		return &validatorpb.SignRequest{
 			PublicKey:       make([]byte, dilithium2.CryptoPublicKeyBytes),
 			SigningRoot:     make([]byte, fieldparams.RootLength),
@@ -220,13 +220,13 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 				BlockCapella: util.HydrateBeaconBlock(&zond.BeaconBlock{}),
 			},
 		}
-	case "BLOCK_V2_BLINDED_CAPELLA":
+	case "BLOCK_BLINDED_CAPELLA":
 		return &validatorpb.SignRequest{
 			PublicKey:       make([]byte, dilithium2.CryptoPublicKeyBytes),
 			SigningRoot:     make([]byte, fieldparams.RootLength),
 			SignatureDomain: make([]byte, 4),
 			Object: &validatorpb.SignRequest_BlindedBlockCapella{
-				BlindedBlockCapella: util.HydrateBlindedBeaconBlockCapella(&zond.BlindedBeaconBlock{}),
+				BlindedBlockCapella: util.HydrateBlindedBeaconBlock(&zond.BlindedBeaconBlock{}),
 			},
 		}
 	case "RANDAO_REVEAL":
@@ -366,12 +366,12 @@ func MockBlockSignRequest() *v1.BlockSignRequest {
 	}
 }
 
-func MockBlockV2BlindedSignRequest(bodyRoot []byte, version string) *v1.BlockV2BlindedSignRequest {
-	return &v1.BlockV2BlindedSignRequest{
-		Type:        "BLOCK_V2",
+func MockBlockBlindedSignRequest(bodyRoot []byte, version string) *v1.BlockBlindedSignRequest {
+	return &v1.BlockBlindedSignRequest{
+		Type:        "BLOCK_V1",
 		ForkInfo:    MockForkInfo(),
 		SigningRoot: make([]byte, fieldparams.RootLength),
-		BeaconBlock: &v1.BeaconBlockV2Blinded{
+		BeaconBlock: &v1.BeaconBlockBlinded{
 			Version: version,
 			BlockHeader: &v1.BeaconBlockHeader{
 				Slot:          "0",

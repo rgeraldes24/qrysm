@@ -15,7 +15,6 @@ import (
 	"github.com/theQRL/qrysm/v4/validator/accounts/iface"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/local"
-	util "github.com/wealdtech/go-eth2-util"
 )
 
 const (
@@ -59,6 +58,7 @@ func NewKeymanager(
 // RecoverAccountsFromMnemonic given a mnemonic phrase, is able to regenerate N accounts
 // from a derived seed, encrypt them according to the EIP-2334 JSON standard, and write them
 // to disk. Then, the mnemonic is never stored nor used by the validator.
+/*
 func (km *Keymanager) RecoverAccountsFromMnemonic(
 	ctx context.Context, mnemonic, mnemonicLanguage, mnemonicPassphrase string, numAccounts int,
 ) error {
@@ -80,6 +80,7 @@ func (km *Keymanager) RecoverAccountsFromMnemonic(
 	}
 	return km.localKM.ImportKeypairs(ctx, privKeys, pubKeys)
 }
+*/
 
 // ExtractKeystores retrieves the secret keys for specified public keys
 // in the function input, encrypts them using the specified password,

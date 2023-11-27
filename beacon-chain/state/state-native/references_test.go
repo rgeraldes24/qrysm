@@ -6,7 +6,6 @@ import (
 	"runtime/debug"
 	"testing"
 
-	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/state-native/types"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -147,6 +146,7 @@ func TestStateReferenceCopy_NoUnexpectedRandaoMutation_Capella(t *testing.T) {
 	assertRefCount(t, b, types.RandaoMixes, 1)
 }
 
+/*
 func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 	assertAttFound := func(vals []*zondpb.PendingAttestation, val uint64) {
 		for i := range vals {
@@ -171,146 +171,147 @@ func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 	require.NoError(t, err)
 	a, ok := s.(*BeaconState)
 	require.Equal(t, true, ok)
-	assertRefCount(t, a, types.PreviousEpochAttestations, 1)
-	assertRefCount(t, a, types.CurrentEpochAttestations, 1)
+	//assertRefCount(t, a, types.PreviousEpochAttestations, 1)
+	//assertRefCount(t, a, types.CurrentEpochAttestations, 1)
 
 	// Update initial state.
 	atts := []*zondpb.PendingAttestation{
 		{ParticipationBits: bitfield.NewBitlist(1)},
 		{ParticipationBits: bitfield.NewBitlist(2)},
 	}
-	a.setPreviousEpochAttestations(atts[:1])
-	a.setCurrentEpochAttestations(atts[:1])
-	curAtt, err := a.CurrentEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(curAtt), "Unexpected number of attestations")
-	preAtt, err := a.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(preAtt), "Unexpected number of attestations")
+	//a.setPreviousEpochAttestations(atts[:1])
+	//a.setCurrentEpochAttestations(atts[:1])
+	//curAtt, err := a.CurrentEpochAttestations()
+	//require.NoError(t, err)
+	//assert.Equal(t, 1, len(curAtt), "Unexpected number of attestations")
+	//preAtt, err := a.PreviousEpochAttestations()
+	//require.NoError(t, err)
+	//assert.Equal(t, 1, len(preAtt), "Unexpected number of attestations")
 
 	// Copy, increases reference count.
 	copied := a.Copy()
 	b, ok := copied.(*BeaconState)
 	require.Equal(t, true, ok)
-	assertRefCount(t, a, types.PreviousEpochAttestations, 2)
-	assertRefCount(t, a, types.CurrentEpochAttestations, 2)
-	assertRefCount(t, b, types.PreviousEpochAttestations, 2)
-	assertRefCount(t, b, types.CurrentEpochAttestations, 2)
-	prevAtts, err := b.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(prevAtts), "Unexpected number of attestations")
-	currAtts, err := b.CurrentEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(currAtts), "Unexpected number of attestations")
+	//assertRefCount(t, a, types.PreviousEpochAttestations, 2)
+	//assertRefCount(t, a, types.CurrentEpochAttestations, 2)
+	//assertRefCount(t, b, types.PreviousEpochAttestations, 2)
+	//assertRefCount(t, b, types.CurrentEpochAttestations, 2)
+	//prevAtts, err := b.PreviousEpochAttestations()
+	//require.NoError(t, err)
+	//assert.Equal(t, 1, len(prevAtts), "Unexpected number of attestations")
+	//currAtts, err := b.CurrentEpochAttestations()
+	//require.NoError(t, err)
+	//assert.Equal(t, 1, len(currAtts), "Unexpected number of attestations")
 
 	// Assert shared state.
-	currAttsA, err := a.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsA, err := a.PreviousEpochAttestations()
-	require.NoError(t, err)
-	currAttsB, err := b.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsB, err := b.PreviousEpochAttestations()
-	require.NoError(t, err)
-	if len(currAttsA) != len(currAttsB) || len(currAttsA) < 1 {
-		t.Errorf("Unexpected number of attestations, want: %v", 1)
-	}
-	if len(prevAttsA) != len(prevAttsB) || len(prevAttsA) < 1 {
-		t.Errorf("Unexpected number of attestations, want: %v", 1)
-	}
-	assertAttFound(currAttsA, 1)
-	assertAttFound(prevAttsA, 1)
-	assertAttFound(currAttsB, 1)
-	assertAttFound(prevAttsB, 1)
+	//currAttsA, err := a.CurrentEpochAttestations()
+	//require.NoError(t, err)
+	//prevAttsA, err := a.PreviousEpochAttestations()
+	//require.NoError(t, err)
+	//currAttsB, err := b.CurrentEpochAttestations()
+	//require.NoError(t, err)
+	//prevAttsB, err := b.PreviousEpochAttestations()
+	//require.NoError(t, err)
+	// if len(currAttsA) != len(currAttsB) || len(currAttsA) < 1 {
+	// 	t.Errorf("Unexpected number of attestations, want: %v", 1)
+	// }
+	// if len(prevAttsA) != len(prevAttsB) || len(prevAttsA) < 1 {
+	// 	t.Errorf("Unexpected number of attestations, want: %v", 1)
+	// }
+	// assertAttFound(currAttsA, 1)
+	// assertAttFound(prevAttsA, 1)
+	// assertAttFound(currAttsB, 1)
+	// assertAttFound(prevAttsB, 1)
 
 	// Extend state attestations.
-	require.NoError(t, a.AppendCurrentEpochAttestations(atts[1]))
-	require.NoError(t, a.AppendPreviousEpochAttestations(atts[1]))
-	curAtt, err = a.CurrentEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 2, len(curAtt), "Unexpected number of attestations")
-	preAtt, err = a.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 2, len(preAtt), "Unexpected number of attestations")
-	currAttsA, err = a.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsA, err = a.PreviousEpochAttestations()
-	require.NoError(t, err)
-	currAttsB, err = b.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsB, err = b.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assertAttFound(currAttsA, 1)
-	assertAttFound(prevAttsA, 1)
-	assertAttFound(currAttsA, 2)
-	assertAttFound(prevAttsA, 2)
-	assertAttFound(currAttsB, 1)
-	assertAttFound(prevAttsB, 1)
-	assertAttNotFound(currAttsB, 2)
-	assertAttNotFound(prevAttsB, 2)
+	// require.NoError(t, a.AppendCurrentEpochAttestations(atts[1]))
+	// require.NoError(t, a.AppendPreviousEpochAttestations(atts[1]))
+	// curAtt, err = a.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// assert.Equal(t, 2, len(curAtt), "Unexpected number of attestations")
+	// preAtt, err = a.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// assert.Equal(t, 2, len(preAtt), "Unexpected number of attestations")
+	// currAttsA, err = a.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// prevAttsA, err = a.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// currAttsB, err = b.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// prevAttsB, err = b.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// assertAttFound(currAttsA, 1)
+	// assertAttFound(prevAttsA, 1)
+	// assertAttFound(currAttsA, 2)
+	// assertAttFound(prevAttsA, 2)
+	// assertAttFound(currAttsB, 1)
+	// assertAttFound(prevAttsB, 1)
+	// assertAttNotFound(currAttsB, 2)
+	// assertAttNotFound(prevAttsB, 2)
 
 	// Mutator should only affect calling state: a.
-	applyToEveryAttestation := func(state *BeaconState) {
-		// One MUST copy on write.
-		currEpochAtts, err := state.CurrentEpochAttestations()
-		require.NoError(t, err)
-		atts = make([]*zondpb.PendingAttestation, len(currEpochAtts))
-		copy(atts, currEpochAtts)
-		state.setCurrentEpochAttestations(atts)
-		currEpochAtts, err = state.CurrentEpochAttestations()
-		require.NoError(t, err)
-		for i := range currEpochAtts {
-			att := zondpb.CopyPendingAttestation(currEpochAtts[i])
-			att.ParticipationBits = bitfield.NewBitlist(3)
-			currEpochAtts[i] = att
-		}
-		state.setCurrentEpochAttestations(currEpochAtts)
+	// applyToEveryAttestation := func(state *BeaconState) {
+	// 	// One MUST copy on write.
+	// 	currEpochAtts, err := state.CurrentEpochAttestations()
+	// 	require.NoError(t, err)
+	// 	atts = make([]*zondpb.PendingAttestation, len(currEpochAtts))
+	// 	copy(atts, currEpochAtts)
+	// 	state.setCurrentEpochAttestations(atts)
+	// 	currEpochAtts, err = state.CurrentEpochAttestations()
+	// 	require.NoError(t, err)
+	// 	for i := range currEpochAtts {
+	// 		att := zondpb.CopyPendingAttestation(currEpochAtts[i])
+	// 		att.ParticipationBits = bitfield.NewBitlist(3)
+	// 		currEpochAtts[i] = att
+	// 	}
+	// 	state.setCurrentEpochAttestations(currEpochAtts)
 
-		prevEpochAtts, err := state.PreviousEpochAttestations()
-		require.NoError(t, err)
-		atts = make([]*zondpb.PendingAttestation, len(prevEpochAtts))
-		copy(atts, prevEpochAtts)
-		state.setPreviousEpochAttestations(atts)
-		prevEpochAtts, err = state.PreviousEpochAttestations()
-		require.NoError(t, err)
-		for i := range prevEpochAtts {
-			att := zondpb.CopyPendingAttestation(prevEpochAtts[i])
-			att.ParticipationBits = bitfield.NewBitlist(3)
-			prevEpochAtts[i] = att
-		}
-		state.setPreviousEpochAttestations(prevEpochAtts)
-	}
-	applyToEveryAttestation(a)
+	// 	prevEpochAtts, err := state.PreviousEpochAttestations()
+	// 	require.NoError(t, err)
+	// 	atts = make([]*zondpb.PendingAttestation, len(prevEpochAtts))
+	// 	copy(atts, prevEpochAtts)
+	// 	state.setPreviousEpochAttestations(atts)
+	// 	prevEpochAtts, err = state.PreviousEpochAttestations()
+	// 	require.NoError(t, err)
+	// 	for i := range prevEpochAtts {
+	// 		att := zondpb.CopyPendingAttestation(prevEpochAtts[i])
+	// 		att.ParticipationBits = bitfield.NewBitlist(3)
+	// 		prevEpochAtts[i] = att
+	// 	}
+	// 	state.setPreviousEpochAttestations(prevEpochAtts)
+	// }
+	// applyToEveryAttestation(a)
 
-	// Assert no shared state mutation occurred only on state a (copy on write).
-	currAttsA, err = a.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsA, err = a.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assertAttFound(currAttsA, 3)
-	assertAttFound(prevAttsA, 3)
-	assertAttNotFound(currAttsA, 1)
-	assertAttNotFound(prevAttsA, 1)
-	assertAttNotFound(currAttsA, 2)
-	assertAttNotFound(prevAttsA, 2)
-	// State b must be unaffected.
-	currAttsB, err = b.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsB, err = b.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assertAttNotFound(currAttsB, 3)
-	assertAttNotFound(prevAttsB, 3)
-	assertAttFound(currAttsB, 1)
-	assertAttFound(prevAttsB, 1)
-	assertAttNotFound(currAttsB, 2)
-	assertAttNotFound(prevAttsB, 2)
+	// // Assert no shared state mutation occurred only on state a (copy on write).
+	// currAttsA, err = a.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// prevAttsA, err = a.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// assertAttFound(currAttsA, 3)
+	// assertAttFound(prevAttsA, 3)
+	// assertAttNotFound(currAttsA, 1)
+	// assertAttNotFound(prevAttsA, 1)
+	// assertAttNotFound(currAttsA, 2)
+	// assertAttNotFound(prevAttsA, 2)
+	// // State b must be unaffected.
+	// currAttsB, err = b.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// prevAttsB, err = b.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// assertAttNotFound(currAttsB, 3)
+	// assertAttNotFound(prevAttsB, 3)
+	// assertAttFound(currAttsB, 1)
+	// assertAttFound(prevAttsB, 1)
+	// assertAttNotFound(currAttsB, 2)
+	// assertAttNotFound(prevAttsB, 2)
 
-	// Copy on write happened, reference counters are reset.
-	assertRefCount(t, a, types.CurrentEpochAttestations, 1)
-	assertRefCount(t, b, types.CurrentEpochAttestations, 1)
-	assertRefCount(t, a, types.PreviousEpochAttestations, 1)
-	assertRefCount(t, b, types.PreviousEpochAttestations, 1)
+	// // Copy on write happened, reference counters are reset.
+	// assertRefCount(t, a, types.CurrentEpochAttestations, 1)
+	// assertRefCount(t, b, types.CurrentEpochAttestations, 1)
+	// assertRefCount(t, a, types.PreviousEpochAttestations, 1)
+	// assertRefCount(t, b, types.PreviousEpochAttestations, 1)
 }
+*/
 
 func TestValidatorReferences_RemainsConsistent_Capella(t *testing.T) {
 	s, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{
@@ -342,7 +343,7 @@ func TestValidatorReferences_RemainsConsistent_Capella(t *testing.T) {
 
 	// Ensure reference is properly accounted for.
 	assert.NoError(t, a.ReadFromEveryValidator(func(idx int, val state.ReadOnlyValidator) error {
-		assert.NotEqual(t, bytesutil.ToBytes48([]byte{'V'}), val.PublicKey())
+		assert.NotEqual(t, bytesutil.ToBytes2592([]byte{'V'}), val.PublicKey())
 		return nil
 	}))
 }

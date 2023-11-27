@@ -723,7 +723,7 @@ func genDilithiumToExecutionChange() *v1alpha1.SignedDilithiumToExecutionChange 
 	return &v1alpha1.SignedDilithiumToExecutionChange{
 		Message: &v1alpha1.DilithiumToExecutionChange{
 			ValidatorIndex:      123456,
-			FromDilithiumPubkey: bytes(48),
+			FromDilithiumPubkey: bytes(2592),
 			ToExecutionAddress:  bytes(20),
 		},
 		Signature: bytes(4595),

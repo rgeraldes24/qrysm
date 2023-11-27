@@ -385,7 +385,7 @@ func TestService_HeadValidatorIndexToPublicKey(t *testing.T) {
 	v, err := s.ValidatorAtIndex(0)
 	require.NoError(t, err)
 
-	require.Equal(t, bytesutil.ToBytes48(v.PublicKey), p)
+	require.Equal(t, bytesutil.ToBytes2592(v.PublicKey), p)
 }
 
 func TestService_HeadValidatorIndexToPublicKeyNil(t *testing.T) {
@@ -404,9 +404,6 @@ func TestService_HeadValidatorIndexToPublicKeyNil(t *testing.T) {
 
 func TestService_IsOptimistic(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	// cfg := params.BeaconConfig()
-	// cfg.BellatrixForkEpoch = 0
-	// params.OverrideBeaconConfig(cfg)
 
 	ctx := context.Background()
 	ojc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
@@ -430,6 +427,7 @@ func TestService_IsOptimistic(t *testing.T) {
 	require.Equal(t, true, opt)
 }
 
+/*
 func TestService_IsOptimisticBeforeBellatrix(t *testing.T) {
 	ctx := context.Background()
 	c := &Service{genesisTime: time.Now()}
@@ -437,6 +435,7 @@ func TestService_IsOptimisticBeforeBellatrix(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, false, opt)
 }
+*/
 
 func TestService_IsOptimisticForRoot(t *testing.T) {
 	ctx := context.Background()

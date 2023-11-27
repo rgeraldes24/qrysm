@@ -44,7 +44,7 @@ func TestProcessDilithiumToExecutionChange(t *testing.T) {
 				WithdrawalCredentials: digest[:],
 			},
 		}
-		st, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Validators: registry,
 			Fork: &zondpb.Fork{
 				CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -90,7 +90,7 @@ func TestProcessDilithiumToExecutionChange(t *testing.T) {
 				WithdrawalCredentials: digest[:],
 			},
 		}
-		st, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Validators: registry,
 			Fork: &zondpb.Fork{
 				CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -132,7 +132,7 @@ func TestProcessDilithiumToExecutionChange(t *testing.T) {
 				WithdrawalCredentials: digest[:],
 			},
 		}
-		st, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Validators: registry,
 			Fork: &zondpb.Fork{
 				CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -170,7 +170,7 @@ func TestProcessDilithiumToExecutionChange(t *testing.T) {
 				WithdrawalCredentials: params.BeaconConfig().ZeroHash[:],
 			},
 		}
-		st, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Validators: registry,
 			Fork: &zondpb.Fork{
 				CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -213,7 +213,7 @@ func TestProcessDilithiumToExecutionChange(t *testing.T) {
 		}
 		registry[0].WithdrawalCredentials[0] = params.BeaconConfig().ZOND1AddressWithdrawalPrefixByte
 
-		st, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Validators: registry,
 			Fork: &zondpb.Fork{
 				CurrentVersion:  params.BeaconConfig().GenesisForkVersion,

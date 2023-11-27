@@ -222,7 +222,7 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 	var genRoot [32]byte
 	// Populate the database with blocks that would match the request.
 	for i := req.StartSlot; i < req.StartSlot.Add(req.Step*req.Count); i += primitives.Slot(req.Step) {
-		blk := util.NewBlindedBeaconBlockBellatrix()
+		blk := util.NewBlindedBeaconBlock()
 		blk.Block.Slot = i
 		blk.Block.Body.ExecutionPayloadHeader = header
 		if i == 0 {
@@ -259,7 +259,7 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 		defer wg.Done()
 		for i := newReq.StartSlot; i < newReq.StartSlot.Add(newReq.Count*newReq.Step); i += primitives.Slot(newReq.Step) {
 			expectSuccess(t, stream)
-			res := util.NewBeaconBlockBellatrix()
+			res := util.NewBeaconBlock()
 			assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 			if res.Block.Slot.SubSlot(newReq.StartSlot).Mod(newReq.Step) != 0 {
 				t.Errorf("Received unexpected block slot %d", res.Block.Slot)

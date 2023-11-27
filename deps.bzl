@@ -88,8 +88,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_andreasbriese_bbloom",
         importpath = "github.com/AndreasBriese/bbloom",
-        sum = "h1:HD8gA2tkByhMAwYaFAX9w2l7vxvBQ5NMoxDrkhqhtn4=",
-        version = "v0.0.0-20190306092124-e2d15f34fcf9",
+        sum = "h1:cTp8I5+VIoKjsnZuH8vjyaysT/ses3EvZeaV/1UkF2M=",
+        version = "v0.0.0-20190825152654-46b345b51c96",
     )
 
     go_repository(
@@ -787,8 +787,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_dgraph_io_badger",
         importpath = "github.com/dgraph-io/badger",
-        sum = "h1:DshxFxZWXUcO0xX476VJC07Xsr6ZCBVRHKZ93Oh7Evo=",
-        version = "v1.6.0",
+        sum = "h1:mNw0qs90GVgGGWylh0umH5iag1j6n/PeJtNvL6KY/x8=",
+        version = "v1.6.2",
     )
 
     go_repository(
@@ -1026,8 +1026,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_fjl_gencodec",
         importpath = "github.com/fjl/gencodec",
-        sum = "h1:CndMRAH4JIwxbW8KYq6Q+cGWcGHz0FjGR3QqcInWcW0=",
-        version = "v0.0.0-20220412091415-8bb9e558978c",
+        sum = "h1:bBLctRc7kr01YGvaDfgLbTwjFNW5jdp5y5rj8XXBHfY=",
+        version = "v0.0.0-20230517082657-f9840df7b83e",
     )
 
     go_repository(
@@ -1841,12 +1841,6 @@ def qrysm_deps():
         version = "v1.1.2",
     )
 
-    go_repository(
-        name = "com_github_herumi_bls_eth_go_binary",
-        importpath = "github.com/herumi/bls-eth-go-binary",
-        sum = "h1:wCMygKUQhmcQAjlk2Gquzq6dLmyMv2kF+llRspoRgrk=",
-        version = "v0.0.0-20210917013441-d37c07cfda4e",
-    )
     go_repository(
         name = "com_github_holiman_big",
         importpath = "github.com/holiman/big",
@@ -3297,8 +3291,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_prysmaticlabs_fastssz",
         importpath = "github.com/prysmaticlabs/fastssz",
-        sum = "h1:Y3PcvUrnneMWLuypZpwPz8P70/DQsz6KgV9JveKpyZs=",
-        version = "v0.0.0-20220628121656-93dfe28febab",
+        sum = "h1:c3p3UzV4vFA7xaCDphnDWOjpxcadrQ26l5b+ypsvyxo=",
+        version = "v0.0.0-20221107182844-78142813af44",
     )
 
     go_repository(
@@ -4061,22 +4055,6 @@ def qrysm_deps():
         importpath = "github.com/wealdtech/go-bytesutil",
         sum = "h1:ocEg3Ke2GkZ4vQw5lp46rmO+pfqCCTgq35gqOy8JKVc=",
         version = "v1.1.1",
-    )
-
-    go_repository(
-        name = "com_github_wealdtech_go_eth2_types_v2",
-        build_directives = [
-            "gazelle:resolve go github.com/herumi/bls-eth-go-binary/bls @herumi_bls_eth_go_binary//:go_default_library",
-        ],
-        importpath = "github.com/wealdtech/go-eth2-types/v2",
-        sum = "h1:tiA6T88M6XQIbrV5Zz53l1G5HtRERcxQfmET225V4Ls=",
-        version = "v2.5.2",
-    )
-    go_repository(
-        name = "com_github_wealdtech_go_eth2_util",
-        importpath = "github.com/wealdtech/go-eth2-util",
-        sum = "h1:2INPeOR35x5LdFFpSzyw954WzTD+DFyHe3yKlJnG5As=",
-        version = "v1.6.3",
     )
 
     go_repository(
@@ -5698,6 +5676,13 @@ def go_dependencies():
         version = "v0.7.4",
     )
     go_repository(
+        name = "com_github_herumi_bls_eth_go_binary",
+        importpath = "github.com/herumi/bls-eth-go-binary",
+        sum = "h1:wCMygKUQhmcQAjlk2Gquzq6dLmyMv2kF+llRspoRgrk=",
+        version = "v0.0.0-20210917013441-d37c07cfda4e",
+    )
+
+    go_repository(
         name = "com_github_holiman_billy",
         importpath = "github.com/holiman/billy",
         sum = "h1:3JQNjnMRil1yD0IfZKHF9GxxWKDJGj8I0IqOUol//sw=",
@@ -5906,6 +5891,19 @@ def go_dependencies():
         sum = "h1:CI58ub/yz8UnaSMu9eS3o3fFnoJqA6zShtZNbgIfRgI=",
         version = "v0.0.0-20230825000054-1d9fefb6afe7",
     )
+    go_repository(
+        name = "com_github_wealdtech_go_eth2_types_v2",
+        importpath = "github.com/wealdtech/go-eth2-types/v2",
+        sum = "h1:tiA6T88M6XQIbrV5Zz53l1G5HtRERcxQfmET225V4Ls=",
+        version = "v2.5.2",
+    )
+    go_repository(
+        name = "com_github_wealdtech_go_eth2_util",
+        importpath = "github.com/wealdtech/go-eth2-util",
+        sum = "h1:2INPeOR35x5LdFFpSzyw954WzTD+DFyHe3yKlJnG5As=",
+        version = "v1.6.3",
+    )
+
     go_repository(
         name = "com_github_xhit_go_str2duration_v2",
         importpath = "github.com/xhit/go-str2duration/v2",

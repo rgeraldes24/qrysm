@@ -15,6 +15,7 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/math"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 )
 
 // ProcessPreGenesisDeposits processes a deposit for the beacon state before chainstart.
@@ -275,7 +276,7 @@ func verifyDepositDataWithDomain(ctx context.Context, deps []*zondpb.Deposit, do
 		}
 		msgs[i] = sr
 	}
-	verify, err := dilithium.VerifyMultipleSignatures(sigs, msgs, pks)
+	verify, err := dilithium.VerifyMultipleSignatures([][][]byte{sigs}, msgs, [][]common.PublicKey{pks})
 	if err != nil {
 		return errors.Errorf("could not verify multiple signatures: %v", err)
 	}

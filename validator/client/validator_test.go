@@ -1536,8 +1536,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					},
 					genesisTime: 0,
 				}
-				// set bellatrix as current epoch
-				//params.BeaconConfig().BellatrixForkEpoch = 0
+
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
 				km, err := v.Keymanager()

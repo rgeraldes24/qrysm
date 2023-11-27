@@ -507,7 +507,6 @@ func TestProcessSlots_ThroughAltairEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig()
-	conf.AltairForkEpoch = 5
 	params.OverrideBeaconConfig(conf)
 
 	st, _ := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
@@ -542,7 +541,6 @@ func TestProcessSlots_OnlyAltairEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig()
-	conf.AltairForkEpoch = 5
 	params.OverrideBeaconConfig(conf)
 
 	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
@@ -578,7 +576,7 @@ func TestProcessSlots_OnlyBellatrixEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
-	conf.BellatrixForkEpoch = 5
+	//conf.BellatrixForkEpoch = 5
 	params.OverrideBeaconConfig(conf)
 
 	st, _ := util.DeterministicGenesisStateBellatrix(t, params.BeaconConfig().MaxValidatorsPerCommittee)
@@ -615,7 +613,7 @@ func TestProcessSlots_ThroughBellatrixEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig()
-	conf.BellatrixForkEpoch = 5
+	//conf.BellatrixForkEpoch = 5
 	params.OverrideBeaconConfig(conf)
 
 	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)

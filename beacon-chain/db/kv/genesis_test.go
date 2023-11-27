@@ -59,8 +59,8 @@ func TestLoadCapellaFromFile(t *testing.T) {
 	require.Equal(t, 1, len(suffix))
 	reversioned := cfg.Copy()
 	params.FillTestVersions(reversioned, suffix[0])
-	reversioned.CapellaForkEpoch = 0
-	require.Equal(t, [4]byte{3, 0, 0, 10}, bytesutil.ToBytes4(reversioned.CapellaForkVersion))
+	//reversioned.CapellaForkEpoch = 0
+	require.Equal(t, [4]byte{3, 0, 0, 10}, bytesutil.ToBytes4(reversioned.GenesisForkVersion))
 	reversioned.ConfigName = "capella-genesis-test"
 	undo, err := params.SetActiveWithUndo(reversioned)
 	require.NoError(t, err)

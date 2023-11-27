@@ -70,7 +70,7 @@ func TestZond1DataHasEnoughSupport(t *testing.T) {
 			c.EpochsPerZond1VotingPeriod = tt.votingPeriodLength
 			params.OverrideBeaconConfig(c)
 
-			s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+			s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 				Zond1DataVotes: tt.stateVotes,
 			})
 			require.NoError(t, err)
@@ -160,7 +160,7 @@ func TestAreZond1DataEqual(t *testing.T) {
 }
 
 func TestProcessZond1Data_SetsCorrectly(t *testing.T) {
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Zond1DataVotes: []*zondpb.Zond1Data{},
 	})
 	require.NoError(t, err)
@@ -179,7 +179,7 @@ func TestProcessZond1Data_SetsCorrectly(t *testing.T) {
 	for i := uint64(0); i < period; i++ {
 		processedState, err := blocks.ProcessZond1DataInBlock(context.Background(), beaconState, b.Block.Body.Zond1Data)
 		require.NoError(t, err)
-		require.Equal(t, true, processedState.Version() == version.Phase0)
+		require.Equal(t, true, processedState.Version() == version.Capella)
 	}
 
 	newZOND1DataVotes := beaconState.Zond1DataVotes()

@@ -24,6 +24,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/encoding/ssz"
@@ -1232,7 +1233,7 @@ func TestListDilithiumToExecutionChanges(t *testing.T) {
 	change1 := &zondpbv1alpha1.SignedDilithiumToExecutionChange{
 		Message: &zondpbv1alpha1.DilithiumToExecutionChange{
 			ValidatorIndex:      1,
-			FromDilithiumPubkey: bytesutil.PadTo([]byte("pubkey1"), 48),
+			FromDilithiumPubkey: bytesutil.PadTo([]byte("pubkey1"), 2592),
 			ToExecutionAddress:  bytesutil.PadTo([]byte("address1"), 20),
 		},
 		Signature: bytesutil.PadTo([]byte("signature1"), 4595),
@@ -1240,7 +1241,7 @@ func TestListDilithiumToExecutionChanges(t *testing.T) {
 	change2 := &zondpbv1alpha1.SignedDilithiumToExecutionChange{
 		Message: &zondpbv1alpha1.DilithiumToExecutionChange{
 			ValidatorIndex:      2,
-			FromDilithiumPubkey: bytesutil.PadTo([]byte("pubkey2"), 48),
+			FromDilithiumPubkey: bytesutil.PadTo([]byte("pubkey2"), 2592),
 			ToExecutionAddress:  bytesutil.PadTo([]byte("address2"), 20),
 		},
 		Signature: bytesutil.PadTo([]byte("signature2"), 4595),
@@ -1264,10 +1265,6 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 	defer transition.SkipSlotCache.Enable()
 
 	params.SetupTestConfigCleanup(t)
-	// c := params.BeaconConfig().Copy()
-	// // Required for correct committee size calculation.
-	// c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
-	// params.OverrideBeaconConfig(c)
 
 	spb := &zondpbv1alpha1.BeaconState{
 		Fork: &zondpbv1alpha1.Fork{
@@ -1363,7 +1360,6 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	c := params.BeaconConfig().Copy()
 	// Required for correct committee size calculation.
-	c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
 	params.OverrideBeaconConfig(c)
 
 	spb := &zondpbv1alpha1.BeaconStateBellatrix{
@@ -1473,10 +1469,6 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 	defer transition.SkipSlotCache.Enable()
 
 	params.SetupTestConfigCleanup(t)
-	c := params.BeaconConfig().Copy()
-	// Required for correct committee size calculation.
-	c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
-	params.OverrideBeaconConfig(c)
 
 	spb := &zondpbv1alpha1.BeaconStateCapella{
 		Fork: &zondpbv1alpha1.Fork{

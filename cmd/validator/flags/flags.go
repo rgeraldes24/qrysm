@@ -149,30 +149,30 @@ var (
 		Usage: "Path to a plain-text, .txt file containing your wallet password",
 	}
 	// Mnemonic25thWordFileFlag defines a path to a file containing a "25th" word mnemonic passphrase for advanced users.
-	Mnemonic25thWordFileFlag = &cli.StringFlag{
-		Name:  "mnemonic-25th-word-file",
-		Usage: "(Advanced) Path to a plain-text, .txt file containing a 25th word passphrase for your mnemonic for HD wallets",
-	}
+	// Mnemonic25thWordFileFlag = &cli.StringFlag{
+	// 	Name:  "mnemonic-25th-word-file",
+	// 	Usage: "(Advanced) Path to a plain-text, .txt file containing a 25th word passphrase for your mnemonic for HD wallets",
+	// }
 	// SkipMnemonic25thWordCheckFlag allows for skipping a check for mnemonic 25th word passphrases for HD wallets.
-	SkipMnemonic25thWordCheckFlag = &cli.StringFlag{
-		Name:  "skip-mnemonic-25th-word-check",
-		Usage: "Allows for skipping the check for a mnemonic 25th word passphrase for HD wallets",
-	}
+	// SkipMnemonic25thWordCheckFlag = &cli.StringFlag{
+	// 	Name:  "skip-mnemonic-25th-word-check",
+	// 	Usage: "Allows for skipping the check for a mnemonic 25th word passphrase for HD wallets",
+	// }
 	// ImportPrivateKeyFileFlag allows for directly importing a private key hex string as an account.
 	ImportPrivateKeyFileFlag = &cli.StringFlag{
 		Name:  "import-private-key-file",
 		Usage: "Path to a plain-text, .txt file containing a hex string representation of a private key to import",
 	}
 	// MnemonicFileFlag is used to enter a file to mnemonic phrase for new wallet creation, non-interactively.
-	MnemonicFileFlag = &cli.StringFlag{
-		Name:  "mnemonic-file",
-		Usage: "File to retrieve mnemonic for non-interactively passing a mnemonic phrase into wallet recover.",
-	}
+	// MnemonicFileFlag = &cli.StringFlag{
+	// 	Name:  "mnemonic-file",
+	// 	Usage: "File to retrieve mnemonic for non-interactively passing a mnemonic phrase into wallet recover.",
+	// }
 	// MnemonicLanguageFlag is used to specify the language of the mnemonic.
-	MnemonicLanguageFlag = &cli.StringFlag{
-		Name:  "mnemonic-language",
-		Usage: "Allows specifying mnemonic language. Supported languages are: english|chinese_traditional|chinese_simplified|czech|french|japanese|korean|italian|spanish",
-	}
+	// MnemonicLanguageFlag = &cli.StringFlag{
+	// 	Name:  "mnemonic-language",
+	// 	Usage: "Allows specifying mnemonic language. Supported languages are: english|chinese_traditional|chinese_simplified|czech|french|japanese|korean|italian|spanish",
+	// }
 	// ShowDepositDataFlag for accounts.
 	ShowDepositDataFlag = &cli.BoolFlag{
 		Name:  "show-deposit-data",
@@ -192,11 +192,11 @@ var (
 		Value: false,
 	}
 	// NumAccountsFlag defines the amount of accounts to generate for derived wallets.
-	NumAccountsFlag = &cli.IntFlag{
-		Name:  "num-accounts",
-		Usage: "Number of accounts to generate for derived wallets",
-		Value: 1,
-	}
+	// NumAccountsFlag = &cli.IntFlag{
+	// 	Name:  "num-accounts",
+	// 	Usage: "Number of accounts to generate for derived wallets",
+	// 	Value: 1,
+	// }
 	// DeletePublicKeysFlag defines a comma-separated list of hex string public keys
 	// for accounts which a user desires to delete from their wallet.
 	DeletePublicKeysFlag = &cli.StringFlag{
@@ -283,20 +283,20 @@ var (
 	// Web3SignerURLFlag defines the URL for a web3signer to connect to.
 	// example:--validators-external-signer-url=http://localhost:9000
 	// web3signer documentation can be found in Consensys' web3signer project docs
-	Web3SignerURLFlag = &cli.StringFlag{
-		Name:  "validators-external-signer-url",
-		Usage: "URL for consensys' web3signer software to use with the Qrysm validator client",
-		Value: "",
-	}
+	// Web3SignerURLFlag = &cli.StringFlag{
+	// 	Name:  "validators-external-signer-url",
+	// 	Usage: "URL for consensys' web3signer software to use with the Qrysm validator client",
+	// 	Value: "",
+	// }
 
 	// Web3SignerPublicValidatorKeysFlag defines a comma-separated list of hex string public keys or external url for web3signer to use for validator signing.
 	// example with external url: --validators-external-signer-public-keys= https://web3signer.com/api/v1/eth2/publicKeys
 	// example with public key: --validators-external-signer-public-keys=0xa99a...e44c,0xb89b...4a0b
 	// web3signer documentation can be found in Consensys' web3signer project docs```
-	Web3SignerPublicValidatorKeysFlag = &cli.StringSliceFlag{
-		Name:  "validators-external-signer-public-keys",
-		Usage: "comma separated list of public keys OR an external url endpoint for the validator to retrieve public keys from for usage with web3signer",
-	}
+	// Web3SignerPublicValidatorKeysFlag = &cli.StringSliceFlag{
+	// 	Name:  "validators-external-signer-public-keys",
+	// 	Usage: "comma separated list of public keys OR an external url endpoint for the validator to retrieve public keys from for usage with web3signer",
+	// }
 
 	// KeymanagerKindFlag defines the kind of keymanager desired by a user during wallet creation.
 	KeymanagerKindFlag = &cli.StringFlag{
@@ -366,11 +366,11 @@ func DefaultValidatorDir() string {
 	home := file.HomeDir()
 	if home != "" {
 		if runtime.GOOS == "darwin" {
-			return filepath.Join(home, "Library", "Eth2Validators")
+			return filepath.Join(home, "Library", "Zond2Validators")
 		} else if runtime.GOOS == "windows" {
-			return filepath.Join(home, "AppData", "Local", "Eth2Validators")
+			return filepath.Join(home, "AppData", "Local", "Zond2Validators")
 		} else {
-			return filepath.Join(home, ".eth2validators")
+			return filepath.Join(home, ".zond2validators")
 		}
 	}
 	// As we cannot guess a stable location, return empty and handle later

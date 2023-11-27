@@ -204,9 +204,6 @@ func TestBlockRewards(t *testing.T) {
 
 func TestAttestationRewards(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	// cfg := params.BeaconConfig()
-	// cfg.AltairForkEpoch = 1
-	// params.OverrideBeaconConfig(cfg)
 	helpers.ClearCache()
 
 	valCount := 64
@@ -484,9 +481,6 @@ func TestAttestationRewards(t *testing.T) {
 
 func TestSyncCommiteeRewards(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	// cfg := params.BeaconConfig()
-	// cfg.AltairForkEpoch = 1
-	// params.OverrideBeaconConfig(cfg)
 	helpers.ClearCache()
 
 	const valCount = 1024

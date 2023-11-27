@@ -1,15 +1,11 @@
 package precompute_test
 
 import (
-	"context"
 	"testing"
 
-	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/config/params"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -66,7 +62,7 @@ func TestUpdateBalance(t *testing.T) {
 		PrevEpochTargetAttested:    100 * params.BeaconConfig().EffectiveBalanceIncrement,
 		PrevEpochHeadAttested:      200 * params.BeaconConfig().EffectiveBalanceIncrement,
 	}
-	pBal := precompute.UpdateBalance(vp, &precompute.Balance{}, version.Phase0)
+	pBal := precompute.UpdateBalance(vp, &precompute.Balance{}, version.Capella)
 	assert.DeepEqual(t, wantedPBal, pBal, "Incorrect balance calculations")
 }
 
@@ -90,7 +86,7 @@ func TestUpdateBalanceDifferentVersions(t *testing.T) {
 		PrevEpochTargetAttested:    100 * params.BeaconConfig().EffectiveBalanceIncrement,
 		PrevEpochHeadAttested:      200 * params.BeaconConfig().EffectiveBalanceIncrement,
 	}
-	pBal := precompute.UpdateBalance(vp, &precompute.Balance{}, version.Bellatrix)
+	pBal := precompute.UpdateBalance(vp, &precompute.Balance{}, version.Capella)
 	assert.DeepEqual(t, wantedPBal, pBal, "Incorrect balance calculations")
 
 	pBal = precompute.UpdateBalance(vp, &precompute.Balance{}, version.Capella)
@@ -173,6 +169,7 @@ func TestAttestedCurrentEpoch(t *testing.T) {
 	assert.Equal(t, true, votedTarget, "Did not vote target")
 }
 
+/*
 func TestProcessAttestations(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
@@ -197,16 +194,16 @@ func TestProcessAttestations(t *testing.T) {
 	require.NoError(t, beaconState.SetBlockRoots(br))
 	att2.Data.Target.Root = newRt[:]
 	att2.Data.BeaconBlockRoot = newRt[:]
-	err := beaconState.AppendPreviousEpochAttestations(&zondpb.PendingAttestation{Data: att1.Data, ParticipationBits: bf, InclusionDelay: 1})
-	require.NoError(t, err)
-	err = beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{Data: att2.Data, ParticipationBits: bf, InclusionDelay: 1})
-	require.NoError(t, err)
+	//err := beaconState.AppendPreviousEpochAttestations(&zondpb.PendingAttestation{Data: att1.Data, ParticipationBits: bf, InclusionDelay: 1})
+	//require.NoError(t, err)
+	//err = beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{Data: att2.Data, ParticipationBits: bf, InclusionDelay: 1})
+	//require.NoError(t, err)
 
 	pVals := make([]*precompute.Validator, validators)
 	for i := 0; i < len(pVals); i++ {
 		pVals[i] = &precompute.Validator{CurrentEpochEffectiveBalance: 100}
 	}
-	pVals, _, err = precompute.ProcessAttestations(context.Background(), beaconState, pVals, &precompute.Balance{})
+	pVals, _, err := precompute.ProcessAttestations(context.Background(), beaconState, pVals, &precompute.Balance{})
 	require.NoError(t, err)
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att1.Data.Slot, att1.Data.CommitteeIndex)
@@ -228,6 +225,7 @@ func TestProcessAttestations(t *testing.T) {
 		assert.Equal(t, true, pVals[i].IsPrevEpochHeadAttester, "Not a prev epoch head attester")
 	}
 }
+*/
 
 func TestEnsureBalancesLowerBound(t *testing.T) {
 	b := &precompute.Balance{}

@@ -35,7 +35,7 @@ func FillDBWithBlocks(ctx context.Context, t *testing.T, beaconDB db.Database) (
 		blks[i], err = blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		blkContainers[i] = &zondpbalpha.BeaconBlockContainer{
-			Block:     &zondpbalpha.BeaconBlockContainer_Phase0Block{Phase0Block: b},
+			Block:     &zondpbalpha.BeaconBlockContainer_CapellaBlock{CapellaBlock: b},
 			BlockRoot: root[:],
 		}
 	}
@@ -43,7 +43,7 @@ func FillDBWithBlocks(ctx context.Context, t *testing.T, beaconDB db.Database) (
 	headRoot := bytesutil.ToBytes32(blkContainers[len(blks)-1].BlockRoot)
 	summary := &zondpbalpha.StateSummary{
 		Root: headRoot[:],
-		Slot: blkContainers[len(blks)-1].Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block.Block.Slot,
+		Slot: blkContainers[len(blks)-1].Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock.Block.Slot,
 	}
 	require.NoError(t, beaconDB.SaveStateSummary(ctx, summary))
 	require.NoError(t, beaconDB.SaveHeadBlockRoot(ctx, headRoot))

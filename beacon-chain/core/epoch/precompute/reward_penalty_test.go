@@ -1,26 +1,6 @@
 package precompute
 
-import (
-	"context"
-	"testing"
-
-	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/go-bitfield"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state"
-	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
-	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
-	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/math"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
-	"github.com/theQRL/qrysm/v4/testing/assert"
-	"github.com/theQRL/qrysm/v4/testing/require"
-)
-
+/*
 func TestProcessRewardsAndPenaltiesPrecompute(t *testing.T) {
 	e := params.BeaconConfig().SlotsPerEpoch
 	validatorCount := uint64(2048)
@@ -142,7 +122,9 @@ func TestAttestationDeltaPrecompute(t *testing.T) {
 		assert.Equal(t, wanted, penalties[i], "Unexpected penalty balance")
 	}
 }
+*/
 
+/*
 func TestAttestationDeltas_ZeroEpoch(t *testing.T) {
 	e := params.BeaconConfig().SlotsPerEpoch
 	validatorCount := uint64(2048)
@@ -178,7 +160,9 @@ func TestAttestationDeltas_ZeroEpoch(t *testing.T) {
 	_, _, err = AttestationsDelta(beaconState, pBal, pVals)
 	require.NoError(t, err)
 }
+*/
 
+/*
 func TestAttestationDeltas_ZeroInclusionDelay(t *testing.T) {
 	e := params.BeaconConfig().SlotsPerEpoch
 	validatorCount := uint64(2048)
@@ -211,6 +195,7 @@ func TestAttestationDeltas_ZeroInclusionDelay(t *testing.T) {
 	_, _, err = ProcessAttestations(context.Background(), beaconState, pVals, pBal)
 	require.ErrorContains(t, "attestation with inclusion delay of 0", err)
 }
+
 
 func TestProcessRewardsAndPenaltiesPrecompute_SlashedInactivePenalty(t *testing.T) {
 	e := params.BeaconConfig().SlotsPerEpoch
@@ -377,3 +362,4 @@ func baseReward(state state.ReadOnlyBeaconState, index primitives.ValidatorIndex
 		math.IntegerSquareRoot(totalBalance) / params.BeaconConfig().BaseRewardsPerEpoch
 	return baseReward, nil
 }
+*/

@@ -1,14 +1,10 @@
 package util
 
 import (
-	"context"
 	"sync"
-	"testing"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
@@ -254,6 +250,7 @@ func DeterministicZond1Data(size int) (*zondpb.Zond1Data, error) {
 	return zond1Data, nil
 }
 
+/*
 // DeterministicGenesisState returns a genesis state made using the deterministic deposits.
 func DeterministicGenesisState(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.DilithiumKey) {
 	deposits, privKeys, err := DeterministicDepositsAndKeys(numValidators)
@@ -271,6 +268,7 @@ func DeterministicGenesisState(t testing.TB, numValidators uint64) (state.Beacon
 
 	return beaconState, privKeys
 }
+*/
 
 // DepositTrieFromDeposits takes an array of deposits and returns the deposit trie.
 func DepositTrieFromDeposits(deposits []*zondpb.Deposit) (*trie.SparseMerkleTrie, [][32]byte, error) {

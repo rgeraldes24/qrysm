@@ -36,9 +36,6 @@ func (c beaconApiValidatorClient) getDuties(ctx context.Context, in *zondpb.Duti
 		return nil, errors.Wrap(err, "failed to get validator status")
 	}
 
-	// Sync committees are an Altair feature
-	//fetchSyncDuties := in.Epoch >= params.BeaconConfig().AltairForkEpoch
-
 	currentEpochDuties, err := c.getDutiesForEpoch(ctx, in.Epoch, multipleValidatorStatus)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get duties for current epoch `%d`", in.Epoch)

@@ -127,7 +127,7 @@ func TestProcessDeposit_InvalidPublicKey(t *testing.T) {
 
 	deposits, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	deposits[0].Data.PublicKey = bytesutil.PadTo([]byte("junk"), 48)
+	deposits[0].Data.PublicKey = bytesutil.PadTo([]byte("junk"), 2592)
 
 	leaf, err := deposits[0].Data.HashTreeRoot()
 	require.NoError(t, err, "Could not hash deposit")

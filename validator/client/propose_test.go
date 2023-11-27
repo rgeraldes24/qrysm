@@ -142,10 +142,6 @@ func TestProposeBlock_DomainDataIsNil(t *testing.T) {
 
 func TestProposeBlock_RequestBlockFailed(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	//cfg := params.BeaconConfig().Copy()
-	//cfg.AltairForkEpoch = 2
-	//cfg.BellatrixForkEpoch = 4
-	//params.OverrideBeaconConfig(cfg)
 
 	tests := []struct {
 		name string

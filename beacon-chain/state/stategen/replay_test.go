@@ -40,7 +40,7 @@ func TestReplayBlocks_AllSkipSlots(t *testing.T) {
 	copy(mockRoot[:], "hello-world")
 	cp.Root = mockRoot[:]
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
+	//require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	service := New(beaconDB, doublylinkedtree.New())
 	targetSlot := params.BeaconConfig().SlotsPerEpoch - 1
@@ -69,7 +69,7 @@ func TestReplayBlocks_SameSlot(t *testing.T) {
 	copy(mockRoot[:], "hello-world")
 	cp.Root = mockRoot[:]
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
+	//require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	service := New(beaconDB, doublylinkedtree.New())
 	targetSlot := beaconState.Slot()
@@ -99,7 +99,7 @@ func TestReplayBlocks_LowerSlotBlock(t *testing.T) {
 	copy(mockRoot[:], "hello-world")
 	cp.Root = mockRoot[:]
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
+	//require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	service := New(beaconDB, doublylinkedtree.New())
 	targetSlot := beaconState.Slot()
@@ -114,10 +114,6 @@ func TestReplayBlocks_LowerSlotBlock(t *testing.T) {
 
 func TestReplayBlocks_ThroughForkBoundary(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	// bCfg := params.BeaconConfig().Copy()
-	// bCfg.AltairForkEpoch = 1
-	// bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.AltairForkVersion)] = 1
-	// params.OverrideBeaconConfig(bCfg)
 
 	beaconState, _ := util.DeterministicGenesisState(t, 32)
 	genesisBlock := blocks.NewGenesisBlock([]byte{})
@@ -137,19 +133,11 @@ func TestReplayBlocks_ThroughForkBoundary(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verify state is version Altair.
-	assert.Equal(t, version.Altair, newState.Version())
+	assert.Equal(t, version.Capella, newState.Version())
 }
 
 func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	bCfg := params.BeaconConfig().Copy()
-	bCfg.AltairForkEpoch = 1
-	bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.AltairForkVersion)] = 1
-	bCfg.BellatrixForkEpoch = 2
-	bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.BellatrixForkVersion)] = 2
-	bCfg.CapellaForkEpoch = 3
-	bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.CapellaForkVersion)] = 3
-	params.OverrideBeaconConfig(bCfg)
 
 	beaconState, _ := util.DeterministicGenesisState(t, 32)
 	genesisBlock := blocks.NewGenesisBlock([]byte{})
@@ -169,7 +157,7 @@ func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verify state is version Bellatrix.
-	assert.Equal(t, version.Bellatrix, newState.Version())
+	assert.Equal(t, version.Capella, newState.Version())
 
 	targetSlot = params.BeaconConfig().SlotsPerEpoch * 3
 	newState, err = service.replayBlocks(context.Background(), newState, []interfaces.ReadOnlySignedBeaconBlock{}, targetSlot)

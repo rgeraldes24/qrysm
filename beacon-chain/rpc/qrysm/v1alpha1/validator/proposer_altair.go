@@ -98,16 +98,16 @@ func (vs *Server) getSyncAggregate(ctx context.Context, slot primitives.Slot, ro
 		syncBits = append(syncBits, b...)
 	}
 	syncSig := dilithium.UnaggregatedSignatures(sigsHolder)
-	var syncSigBytes []byte
+	var syncSigsBytes [][]byte
 	if syncSig == nil {
 		var infSig = [dilithium2.CryptoBytes]byte{0xC0} // Infinity signature if itself is nil.
 		syncSigBytes = infSig[:]
 	} else {
-		syncSigBytes = syncSig
+		syncSigBytes = [][]byte{syncSig}
 	}
 
 	return &zondpb.SyncAggregate{
-		SyncCommitteeBits:      syncBits,
-		SyncCommitteeSignature: syncSigBytes,
+		SyncCommitteeBits:       syncBits,
+		SyncCommitteeSignatures: syncSigsBytes,
 	}, nil
 }

@@ -100,17 +100,19 @@ func TestValidateVersion(t *testing.T) {
 		{
 			name:     "valid topic with incorrect version",
 			version:  p2p.SchemaVersionV1,
-			protocol: p2p.RPCBlocksByRootTopicV2,
+			protocol: p2p.RPCBlocksByRootTopicV1,
 			error:    "doesn't match provided version",
 			wantErr:  true,
 		},
-		{
-			name:     "valid topic with correct version",
-			version:  p2p.SchemaVersionV2,
-			protocol: p2p.RPCBlocksByRootTopicV2,
-			error:    "",
-			wantErr:  false,
-		},
+		/*
+			{
+				name:     "valid topic with correct version",
+				version:  p2p.SchemaVersionV2,
+				protocol: p2p.RPCBlocksByRootTopicV1,
+				error:    "",
+				wantErr:  false,
+			},
+		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

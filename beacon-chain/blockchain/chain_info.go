@@ -335,9 +335,6 @@ func (s *Service) HeadValidatorIndexToPublicKey(_ context.Context, index primiti
 
 // IsOptimistic returns true if the current head is optimistic.
 func (s *Service) IsOptimistic(_ context.Context) (bool, error) {
-	// if slots.ToEpoch(s.CurrentSlot()) < params.BeaconConfig().BellatrixForkEpoch {
-	// 	return false, nil
-	// }
 	s.headLock.RLock()
 	headRoot := s.head.root
 	headSlot := s.head.slot

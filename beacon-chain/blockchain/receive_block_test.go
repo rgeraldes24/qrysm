@@ -302,19 +302,9 @@ func TestHandleBlockDilithiumToExecutionChanges(t *testing.T) {
 	service, tr := minimalTestService(t)
 	pool := tr.dilithiumPool
 
-	t.Run("pre Capella block", func(t *testing.T) {
-		body := &zondpb.BeaconBlockBodyBellatrix{}
-		pbb := &zondpb.BeaconBlockBellatrix{
-			Body: body,
-		}
-		blk, err := blocks.NewBeaconBlock(pbb)
-		require.NoError(t, err)
-		require.NoError(t, service.markIncludedBlockDilithiumToExecChanges(blk))
-	})
-
 	t.Run("Post Capella no changes", func(t *testing.T) {
-		body := &zondpb.BeaconBlockBodyCapella{}
-		pbb := &zondpb.BeaconBlockCapella{
+		body := &zondpb.BeaconBlockBody{}
+		pbb := &zondpb.BeaconBlock{
 			Body: body,
 		}
 		blk, err := blocks.NewBeaconBlock(pbb)
@@ -330,10 +320,10 @@ func TestHandleBlockDilithiumToExecutionChanges(t *testing.T) {
 		signedChange := &zondpb.SignedDilithiumToExecutionChange{
 			Message: change,
 		}
-		body := &zondpb.BeaconBlockBodyCapella{
+		body := &zondpb.BeaconBlockBody{
 			DilithiumToExecutionChanges: []*zondpb.SignedDilithiumToExecutionChange{signedChange},
 		}
-		pbb := &zondpb.BeaconBlockCapella{
+		pbb := &zondpb.BeaconBlock{
 			Body: body,
 		}
 		blk, err := blocks.NewBeaconBlock(pbb)

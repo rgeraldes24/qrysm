@@ -14,7 +14,6 @@ import (
 	"github.com/theQRL/qrysm/v4/async/event"
 	"github.com/theQRL/qrysm/v4/io/logs"
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	"github.com/theQRL/qrysm/v4/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/v4/validator/client"
@@ -59,7 +58,6 @@ type Server struct {
 	beaconChainClient         iface.BeaconChainClient
 	beaconNodeClient          iface.NodeClient
 	beaconNodeValidatorClient iface.ValidatorClient
-	beaconNodeHealthClient    zondpb.HealthClient
 	valDB                     db.Database
 	ctx                       context.Context
 	cancel                    context.CancelFunc

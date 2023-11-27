@@ -23,7 +23,7 @@ import (
 )
 
 func TestExecuteAltairStateTransitionNoVerify_FullProcess(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateAltair(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
 
 	syncCommittee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -55,7 +55,7 @@ func TestExecuteAltairStateTransitionNoVerify_FullProcess(t *testing.T) {
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), nextSlotState)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockAltair()
+	block := util.NewBeaconBlock()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
@@ -93,7 +93,7 @@ func TestExecuteAltairStateTransitionNoVerify_FullProcess(t *testing.T) {
 	block.Block.StateRoot = stateRoot[:]
 
 	c := beaconState.Copy()
-	sig, err := util.BlockSignatureAltair(c, block.Block, privKeys)
+	sig, err := util.BlockSignature(c, block.Block, privKeys)
 	require.NoError(t, err)
 	block.Signature = sig.Marshal()
 
@@ -107,7 +107,7 @@ func TestExecuteAltairStateTransitionNoVerify_FullProcess(t *testing.T) {
 }
 
 func TestExecuteAltairStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateAltair(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
 
 	syncCommittee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -139,7 +139,7 @@ func TestExecuteAltairStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), nextSlotState)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockAltair()
+	block := util.NewBeaconBlock()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
@@ -178,7 +178,7 @@ func TestExecuteAltairStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t
 	block.Block.StateRoot = stateRoot[:]
 
 	c := beaconState.Copy()
-	sig, err := util.BlockSignatureAltair(c, block.Block, privKeys)
+	sig, err := util.BlockSignature(c, block.Block, privKeys)
 	require.NoError(t, err)
 	block.Signature = sig.Marshal()
 
@@ -202,7 +202,7 @@ func TestExecuteStateTransitionNoVerifyAnySig_PassesProcessingConditions(t *test
 }
 
 func TestProcessEpoch_BadBalanceAltair(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateAltair(t, 100)
+	s, _ := util.DeterministicGenesisState(t, 100)
 	assert.NoError(t, s.SetSlot(63))
 	assert.NoError(t, s.UpdateBalancesAtIndex(0, math.MaxUint64))
 	participation := byte(0)
@@ -223,13 +223,13 @@ func TestProcessEpoch_BadBalanceAltair(t *testing.T) {
 }
 
 func createFullAltairBlockWithOperations(t *testing.T) (state.BeaconState,
-	*zondpb.SignedBeaconBlockAltair) {
-	beaconState, privKeys := util.DeterministicGenesisStateAltair(t, 32)
+	*zondpb.SignedBeaconBlock) {
+	beaconState, privKeys := util.DeterministicGenesisState(t, 32)
 	sCom, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	assert.NoError(t, err)
 	assert.NoError(t, beaconState.SetCurrentSyncCommittee(sCom))
 	tState := beaconState.Copy()
-	blk, err := util.GenerateFullBlockAltair(tState, privKeys,
+	blk, err := util.GenerateFullBlock(tState, privKeys,
 		&util.BlockGenConfig{NumAttestations: 1, NumVoluntaryExits: 0, NumDeposits: 0}, 1)
 	require.NoError(t, err)
 

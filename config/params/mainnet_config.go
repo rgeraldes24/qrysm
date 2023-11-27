@@ -20,10 +20,6 @@ func MainnetConfig() *BeaconChainConfig {
 const (
 	// Genesis Fork Epoch for the mainnet config.
 	genesisForkEpoch = 0
-	// Altair Fork Epoch for mainnet config.
-	mainnetAltairForkEpoch = 74240 // Oct 27, 2021, 10:56:23am UTC
-	// Bellatrix Fork Epoch for mainnet config.
-	mainnetBellatrixForkEpoch = 144896 // Sept 6, 2022, 11:34:47am UTC
 )
 
 var mainnetNetworkConfig = &NetworkConfig{

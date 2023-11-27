@@ -28,7 +28,7 @@ func TestGetBlock(t *testing.T) {
 		canonicalRoots[bytesutil.ToBytes32(bContr.BlockRoot)] = true
 	}
 	headBlock := blkContainers[len(blkContainers)-1]
-	nextSlot := headBlock.GetPhase0Block().Block.Slot + 1
+	nextSlot := headBlock.GetCapellaBlock().Block.Slot + 1
 
 	b2 := util.NewBeaconBlock()
 	b2.Block.Slot = 30
@@ -43,7 +43,7 @@ func TestGetBlock(t *testing.T) {
 	b4.Block.ParentRoot = bytesutil.PadTo([]byte{8}, 32)
 	util.SaveBlock(t, ctx, beaconDB, b4)
 
-	wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block)
+	wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 	require.NoError(t, err)
 
 	fetcher := &BeaconDbBlocker{
@@ -69,7 +69,7 @@ func TestGetBlock(t *testing.T) {
 		{
 			name:    "slot",
 			blockID: []byte("30"),
-			want:    blkContainers[30].Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block,
+			want:    blkContainers[30].Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock,
 		},
 		{
 			name:    "bad formatting",
@@ -79,7 +79,7 @@ func TestGetBlock(t *testing.T) {
 		{
 			name:    "canonical",
 			blockID: []byte("30"),
-			want:    blkContainers[30].Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block,
+			want:    blkContainers[30].Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock,
 		},
 		{
 			name:    "non canonical",
@@ -89,12 +89,12 @@ func TestGetBlock(t *testing.T) {
 		{
 			name:    "head",
 			blockID: []byte("head"),
-			want:    headBlock.Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block,
+			want:    headBlock.Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock,
 		},
 		{
 			name:    "finalized",
 			blockID: []byte("finalized"),
-			want:    blkContainers[64].Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block,
+			want:    blkContainers[64].Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock,
 		},
 		{
 			name:    "genesis",
@@ -109,7 +109,7 @@ func TestGetBlock(t *testing.T) {
 		{
 			name:    "root",
 			blockID: blkContainers[20].BlockRoot,
-			want:    blkContainers[20].Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block,
+			want:    blkContainers[20].Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock,
 		},
 		{
 			name:    "non-existent root",
@@ -134,7 +134,7 @@ func TestGetBlock(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			pbBlock, err := result.PbPhase0Block()
+			pbBlock, err := result.PbCapellaBlock()
 			require.NoError(t, err)
 			if !reflect.DeepEqual(pbBlock, tt.want) {
 				t.Error("Expected blocks to equal")

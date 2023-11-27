@@ -75,17 +75,6 @@ type E2EConfig struct {
 }
 
 func GenesisFork() int {
-	// cfg := params.BeaconConfig()
-	// if cfg.CapellaForkEpoch == 0 {
-	// 	return version.Capella
-	// }
-	// if cfg.BellatrixForkEpoch == 0 {
-	// 	return version.Bellatrix
-	// }
-	// if cfg.AltairForkEpoch == 0 {
-	// 	return version.Altair
-	// }
-	// return version.Phase0
 	return version.Capella
 }
 

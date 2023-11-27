@@ -72,7 +72,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, 2592),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -99,7 +99,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, 2592),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -122,7 +122,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				s.cfg.dilithiumToExecPool.InsertDilithiumToExecChange(&zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      10,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, 2592),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -135,7 +135,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      10,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, 2592),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -180,7 +180,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, 2592),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -215,7 +215,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, 2592),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -253,7 +253,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, 2592),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -298,7 +298,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, 2592),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -339,7 +339,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, 2592),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -383,7 +383,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, 2592),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],

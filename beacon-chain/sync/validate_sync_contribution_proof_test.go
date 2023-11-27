@@ -11,6 +11,7 @@ import (
 	pubsubpb "github.com/libp2p/go-libp2p-pubsub/pb"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/prysmaticlabs/prysm/shared/bls"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
@@ -90,7 +91,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signatures:         [][]byte{emptySig[:]},
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -1007,7 +1008,7 @@ func TestValidateSyncContributionAndProof(t *testing.T) {
 	}
 }
 
-func fillUpBlocksAndState(ctx context.Context, t *testing.T, beaconDB db.Database) ([32]byte, []dilithium.SecretKey) {
+func fillUpBlocksAndState(ctx context.Context, t *testing.T, beaconDB db.Database) ([32]byte, []dilithium.DilithiumKey) {
 	gs, keys := util.DeterministicGenesisStateAltair(t, 64)
 	sCom, err := altair.NextSyncCommittee(ctx, gs)
 	assert.NoError(t, err)

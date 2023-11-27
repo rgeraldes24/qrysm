@@ -179,8 +179,8 @@ func (vs *Server) GetProposerDuties(ctx context.Context, req *zondpbv1.ProposerD
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not get validator: %v", err)
 		}
-		pubkey48 := val.PublicKey()
-		pubkey := pubkey48[:]
+		pubkey2592 := val.PublicKey()
+		pubkey := pubkey2592[:]
 		for _, s := range ss {
 			vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(s, index, [8]byte{} /* payloadID */, [32]byte{} /* head root */)
 			duties = append(duties, &zondpbv1.ProposerDuty{
@@ -266,8 +266,8 @@ func (vs *Server) GetSyncCommitteeDuties(ctx context.Context, req *zondpbv1.Sync
 	}
 	committeePubkeys := make(map[[dilithium2.CryptoPublicKeyBytes]byte][]uint64)
 	for j, pubkey := range committee.Pubkeys {
-		pubkey48 := bytesutil.ToBytes2592(pubkey)
-		committeePubkeys[pubkey48] = append(committeePubkeys[pubkey48], uint64(j))
+		pubkey2592 := bytesutil.ToBytes2592(pubkey)
+		committeePubkeys[pubkey2592] = append(committeePubkeys[pubkey2592], uint64(j))
 	}
 
 	duties, err := syncCommitteeDuties(req.Index, st, committeePubkeys)
@@ -756,7 +756,7 @@ func (vs *Server) SubmitSyncCommitteeSubscription(ctx context.Context, req *zond
 	}
 
 	for i, sub := range req.Data {
-		pubkey48 := validators[i].PublicKey()
+		pubkey2592 := validators[i].PublicKey()
 		// Handle overflow in the event current epoch is less than end epoch.
 		// This is an impossible condition, so it is a defensive check.
 		epochsToWatch, err := sub.UntilEpoch.SafeSub(uint64(startEpoch))
@@ -766,7 +766,7 @@ func (vs *Server) SubmitSyncCommitteeSubscription(ctx context.Context, req *zond
 		epochDuration := time.Duration(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot)) * time.Second
 		totalDuration := epochDuration * time.Duration(epochsToWatch)
 
-		cache.SyncSubnetIDs.AddSyncCommitteeSubnets(pubkey48[:], startEpoch, sub.SyncCommitteeIndices, totalDuration)
+		cache.SyncSubnetIDs.AddSyncCommitteeSubnets(pubkey2592[:], startEpoch, sub.SyncCommitteeIndices, totalDuration)
 	}
 
 	return &empty.Empty{}, nil

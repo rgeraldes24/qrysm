@@ -41,7 +41,7 @@ func TestBroadcastDilithiumChanges(t *testing.T) {
 	s.cfg.dilithiumToExecPool.InsertDilithiumToExecChange(&zondpb.SignedDilithiumToExecutionChange{
 		Message: &zondpb.DilithiumToExecutionChange{
 			ValidatorIndex:      10,
-			FromDilithiumPubkey: make([]byte, 48),
+			FromDilithiumPubkey: make([]byte, 2592),
 			ToExecutionAddress:  make([]byte, 20),
 		},
 		Signature: emptySig[:],
@@ -114,7 +114,7 @@ func TestRateDilithiumChanges(t *testing.T) {
 
 func TestBroadcastDilithiumBatch_changes_slice(t *testing.T) {
 	message := &zondpb.DilithiumToExecutionChange{
-		FromDilithiumPubkey: make([]byte, 48),
+		FromDilithiumPubkey: make([]byte, 2592),
 		ToExecutionAddress:  make([]byte, 20),
 	}
 	signed := &zondpb.SignedDilithiumToExecutionChange{

@@ -2,7 +2,6 @@ package util
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pkg/errors"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
@@ -34,9 +33,9 @@ type BlockGenConfig struct {
 	NumAttestations      uint64
 	NumDeposits          uint64
 	NumVoluntaryExits    uint64
-	NumTransactions      uint64 // Only for post Bellatrix blocks
+	NumTransactions      uint64
 	FullSyncAggregate    bool
-	NumDilithiumChanges  uint64 // Only for post Capella blocks
+	NumDilithiumChanges  uint64
 }
 
 // DefaultBlockGenConfig returns the block config that utilizes the
@@ -78,129 +77,6 @@ func NewBeaconBlock() *zondpb.SignedBeaconBlock {
 	}
 }
 */
-
-// GenerateFullBlock generates a fully valid block with the requested parameters.
-// Use BlockGenConfig to declare the conditions you would like the block generated under.
-func GenerateFullBlock(
-	bState state.BeaconState,
-	privs []dilithium.DilithiumKey,
-	conf *BlockGenConfig,
-	slot primitives.Slot,
-) (*zondpb.SignedBeaconBlock, error) {
-	ctx := context.Background()
-	currentSlot := bState.Slot()
-	if currentSlot > slot {
-		return nil, fmt.Errorf("current slot in state is larger than given slot. %d > %d", currentSlot, slot)
-	}
-	bState = bState.Copy()
-
-	if conf == nil {
-		conf = &BlockGenConfig{}
-	}
-
-	var err error
-	var pSlashings []*zondpb.ProposerSlashing
-	numToGen := conf.NumProposerSlashings
-	if numToGen > 0 {
-		pSlashings, err = generateProposerSlashings(bState, privs, numToGen)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed generating %d proposer slashings:", numToGen)
-		}
-	}
-
-	numToGen = conf.NumAttesterSlashings
-	var aSlashings []*zondpb.AttesterSlashing
-	if numToGen > 0 {
-		aSlashings, err = generateAttesterSlashings(bState, privs, numToGen)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed generating %d attester slashings:", numToGen)
-		}
-	}
-
-	numToGen = conf.NumAttestations
-	var atts []*zondpb.Attestation
-	if numToGen > 0 {
-		atts, err = GenerateAttestations(bState, privs, numToGen, slot, false)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed generating %d attestations:", numToGen)
-		}
-	}
-
-	numToGen = conf.NumDeposits
-	var newDeposits []*zondpb.Deposit
-	zond1Data := bState.Zond1Data()
-	if numToGen > 0 {
-		newDeposits, zond1Data, err = generateDepositsAndZond1Data(bState, numToGen)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed generating %d deposits:", numToGen)
-		}
-	}
-
-	numToGen = conf.NumVoluntaryExits
-	var exits []*zondpb.SignedVoluntaryExit
-	if numToGen > 0 {
-		exits, err = generateVoluntaryExits(bState, privs, numToGen)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed generating %d voluntary exits:", numToGen)
-		}
-	}
-
-	newHeader := bState.LatestBlockHeader()
-	prevStateRoot, err := bState.HashTreeRoot(ctx)
-	if err != nil {
-		return nil, err
-	}
-	newHeader.StateRoot = prevStateRoot[:]
-	parentRoot, err := newHeader.HashTreeRoot()
-	if err != nil {
-		return nil, err
-	}
-
-	if slot == currentSlot {
-		slot = currentSlot + 1
-	}
-
-	// Temporarily incrementing the beacon state slot here since BeaconProposerIndex is a
-	// function deterministic on beacon state slot.
-	if err := bState.SetSlot(slot); err != nil {
-		return nil, err
-	}
-	reveal, err := RandaoReveal(bState, time.CurrentEpoch(bState), privs)
-	if err != nil {
-		return nil, err
-	}
-
-	idx, err := helpers.BeaconProposerIndex(ctx, bState)
-	if err != nil {
-		return nil, err
-	}
-
-	block := &zondpb.BeaconBlock{
-		Slot:          slot,
-		ParentRoot:    parentRoot[:],
-		ProposerIndex: idx,
-		Body: &zondpb.BeaconBlockBody{
-			Zond1Data:         zond1Data,
-			RandaoReveal:      reveal,
-			ProposerSlashings: pSlashings,
-			AttesterSlashings: aSlashings,
-			Attestations:      atts,
-			VoluntaryExits:    exits,
-			Deposits:          newDeposits,
-			Graffiti:          make([]byte, fieldparams.RootLength),
-		},
-	}
-	if err := bState.SetSlot(currentSlot); err != nil {
-		return nil, err
-	}
-
-	signature, err := BlockSignature(bState, block, privs)
-	if err != nil {
-		return nil, err
-	}
-
-	return &zondpb.SignedBeaconBlock{Block: block, Signature: signature.Marshal()}, nil
-}
 
 // GenerateProposerSlashingForValidator for a specific validator index.
 func GenerateProposerSlashingForValidator(
@@ -584,7 +460,7 @@ func HydrateBlindedBeaconBlock(b *zondpb.BlindedBeaconBlock) *zondpb.BlindedBeac
 	return b
 }
 
-// HydrateBlindedBeaconBlockBodyCapella hydrates a blinded beacon block body with correct field length sizes
+// HydrateBlindedBeaconBlockBody hydrates a blinded beacon block body with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateBlindedBeaconBlockBody(b *zondpb.BlindedBeaconBlockBody) *zondpb.BlindedBeaconBlockBody {
 	if b == nil {

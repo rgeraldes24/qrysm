@@ -61,24 +61,24 @@ func TestLocalKeymanager_FetchValidatingSeeds(t *testing.T) {
 	// First, generate accounts and their keystore.json files.
 	ctx := context.Background()
 	numAccounts := 10
-	wantedPrivateKeys := make([][32]byte, numAccounts)
+	wantedSeeds := make([][48]byte, numAccounts)
 	for i := 0; i < numAccounts; i++ {
-		privKey, err := dilithium.RandKey()
+		seed, err := dilithium.RandKey()
 		require.NoError(t, err)
-		privKeyData := privKey.Marshal()
-		pubKey := bytesutil.ToBytes2592(privKey.PublicKey().Marshal())
-		wantedPrivateKeys[i] = bytesutil.ToBytes32(privKeyData)
+		seedData := seed.Marshal()
+		pubKey := bytesutil.ToBytes2592(seed.PublicKey().Marshal())
+		wantedSeeds[i] = bytesutil.ToBytes48(seedData)
 		dr.accountsStore.PublicKeys = append(dr.accountsStore.PublicKeys, pubKey[:])
-		dr.accountsStore.Seeds = append(dr.accountsStore.Seeds, privKeyData)
+		dr.accountsStore.Seeds = append(dr.accountsStore.Seeds, seedData)
 	}
 	require.NoError(t, dr.initializeKeysCachesFromKeystore())
-	privateKeys, err := dr.FetchValidatingSeeds(ctx)
+	seeds, err := dr.FetchValidatingSeeds(ctx)
 	require.NoError(t, err)
-	assert.Equal(t, numAccounts, len(privateKeys))
+	assert.Equal(t, numAccounts, len(seeds))
 	// FetchValidatingSeeds is also used in generating the output of account list
 	// therefore the results must be in the same order as the order in which the accounts were created
-	for i, key := range wantedPrivateKeys {
-		assert.Equal(t, key, privateKeys[i])
+	for i, key := range wantedSeeds {
+		assert.Equal(t, key, seeds[i])
 	}
 }
 

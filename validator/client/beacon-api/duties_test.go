@@ -1101,19 +1101,14 @@ func TestGetDuties_Valid(t *testing.T) {
 				nil,
 			).Times(2)
 
-			// TODO(rgeraldes24)
-			//fetchSyncDuties := testCase.epoch >= params.BeaconConfig().AltairForkEpoch
-			fetchSyncDuties := true
-			if fetchSyncDuties {
-				dutiesProvider.EXPECT().GetSyncDuties(
-					ctx,
-					testCase.epoch,
-					multipleValidatorStatus.Indices,
-				).Return(
-					generateValidSyncDuties(pubkeys, validatorIndices),
-					nil,
-				).Times(2)
-			}
+			dutiesProvider.EXPECT().GetSyncDuties(
+				ctx,
+				testCase.epoch,
+				multipleValidatorStatus.Indices,
+			).Return(
+				generateValidSyncDuties(pubkeys, validatorIndices),
+				nil,
+			).Times(2)
 
 			dutiesProvider.EXPECT().GetCommittees(
 				ctx,
@@ -1140,16 +1135,14 @@ func TestGetDuties_Valid(t *testing.T) {
 				nil,
 			).Times(2)
 
-			if fetchSyncDuties {
-				dutiesProvider.EXPECT().GetSyncDuties(
-					ctx,
-					testCase.epoch+1,
-					validatorIndices,
-				).Return(
-					reverseSlice(generateValidSyncDuties(pubkeys, validatorIndices)),
-					nil,
-				).Times(2)
-			}
+			dutiesProvider.EXPECT().GetSyncDuties(
+				ctx,
+				testCase.epoch+1,
+				validatorIndices,
+			).Return(
+				reverseSlice(generateValidSyncDuties(pubkeys, validatorIndices)),
+				nil,
+			).Times(2)
 
 			stateValidatorsProvider := mock.NewMockstateValidatorsProvider(ctrl)
 			stateValidatorsProvider.EXPECT().GetStateValidators(
@@ -1271,7 +1264,6 @@ func TestGetDuties_Valid(t *testing.T) {
 				ctx,
 				testCase.epoch,
 				multipleValidatorStatus,
-				//fetchSyncDuties,
 			)
 			require.NoError(t, err)
 
@@ -1279,7 +1271,6 @@ func TestGetDuties_Valid(t *testing.T) {
 				ctx,
 				testCase.epoch+1,
 				multipleValidatorStatus,
-				//fetchSyncDuties,
 			)
 			require.NoError(t, err)
 

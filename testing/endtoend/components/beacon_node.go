@@ -249,7 +249,7 @@ func (node *BeaconNode) Start(ctx context.Context) error {
 	}
 	args := []string{
 		fmt.Sprintf("--%s=%s", genesis.StatePath.Name, genesisPath),
-		fmt.Sprintf("--%s=%s/eth2-beacon-node-%d", cmdshared.DataDirFlag.Name, e2e.TestParams.TestPath, index),
+		fmt.Sprintf("--%s=%s/zond2-beacon-node-%d", cmdshared.DataDirFlag.Name, e2e.TestParams.TestPath, index),
 		fmt.Sprintf("--%s=%s", cmdshared.LogFileName.Name, stdOutFile.Name()),
 		fmt.Sprintf("--%s=%s", flags.DepositContractFlag.Name, params.BeaconConfig().DepositContractAddress),
 		fmt.Sprintf("--%s=%d", flags.RPCPort.Name, e2e.TestParams.Ports.QrysmBeaconNodeRPCPort+index),

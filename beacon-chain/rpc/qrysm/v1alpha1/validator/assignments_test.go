@@ -130,9 +130,9 @@ func TestGetAltairDuties_SyncCommitteeOK(t *testing.T) {
 	require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch*primitives.Slot(params.BeaconConfig().EpochsPerSyncCommitteePeriod)-1))
 	require.NoError(t, helpers.UpdateSyncCommitteeCache(bs))
 
-	pubkeysAs48ByteType := make([][dilithium2.CryptoPublicKeyBytes]byte, len(pubKeys))
+	pubkeysAs2592ByteType := make([][dilithium2.CryptoPublicKeyBytes]byte, len(pubKeys))
 	for i, pk := range pubKeys {
-		pubkeysAs48ByteType[i] = bytesutil.ToBytes2592(pk)
+		pubkeysAs2592ByteType[i] = bytesutil.ToBytes2592(pk)
 	}
 
 	slot := uint64(params.BeaconConfig().SlotsPerEpoch) * uint64(params.BeaconConfig().EpochsPerSyncCommitteePeriod) * params.BeaconConfig().SecondsPerSlot
@@ -200,10 +200,6 @@ func TestGetAltairDuties_SyncCommitteeOK(t *testing.T) {
 
 func TestGetBellatrixDuties_SyncCommitteeOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.AltairForkEpoch = primitives.Epoch(0)
-	cfg.BellatrixForkEpoch = primitives.Epoch(1)
-	params.OverrideBeaconConfig(cfg)
 
 	genesis := util.NewBeaconBlock()
 	deposits, _, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().SyncCommitteeSize)
@@ -233,9 +229,9 @@ func TestGetBellatrixDuties_SyncCommitteeOK(t *testing.T) {
 	require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch*primitives.Slot(params.BeaconConfig().EpochsPerSyncCommitteePeriod)-1))
 	require.NoError(t, helpers.UpdateSyncCommitteeCache(bs))
 
-	pubkeysAs48ByteType := make([][dilithium2.CryptoPublicKeyBytes]byte, len(pubKeys))
+	pubkeysAs2592ByteType := make([][dilithium2.CryptoPublicKeyBytes]byte, len(pubKeys))
 	for i, pk := range pubKeys {
-		pubkeysAs48ByteType[i] = bytesutil.ToBytes2592(pk)
+		pubkeysAs2592ByteType[i] = bytesutil.ToBytes2592(pk)
 	}
 
 	slot := uint64(params.BeaconConfig().SlotsPerEpoch) * uint64(params.BeaconConfig().EpochsPerSyncCommitteePeriod) * params.BeaconConfig().SecondsPerSlot
@@ -343,7 +339,7 @@ func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 	}
 
-	unknownPubkey := bytesutil.PadTo([]byte{'u'}, 48)
+	unknownPubkey := bytesutil.PadTo([]byte{'u'}, 2592)
 	req := &zondpb.DutiesRequest{
 		PublicKeys: [][]byte{unknownPubkey},
 	}

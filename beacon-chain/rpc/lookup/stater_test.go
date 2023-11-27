@@ -395,9 +395,9 @@ func TestStateBySlot_FutureSlot(t *testing.T) {
 }
 
 func TestStateBySlot_AfterHeadSlot(t *testing.T) {
-	headSt, err := statenative.InitializeFromProtoPhase0(&zondpb.BeaconState{Slot: 100})
+	headSt, err := statenative.InitializeFromProtoCapella(&zondpb.BeaconState{Slot: 100})
 	require.NoError(t, err)
-	slotSt, err := statenative.InitializeFromProtoPhase0(&zondpb.BeaconState{Slot: 101})
+	slotSt, err := statenative.InitializeFromProtoCapella(&zondpb.BeaconState{Slot: 101})
 	require.NoError(t, err)
 	currentSlot := primitives.Slot(102)
 	mock := &chainMock.ChainService{State: headSt, Slot: &currentSlot}

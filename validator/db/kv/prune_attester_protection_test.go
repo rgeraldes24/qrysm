@@ -43,7 +43,7 @@ func TestPruneAttestations_OK(t *testing.T) {
 	numKeys := uint64(64)
 	pks := make([][dilithium2.CryptoPublicKeyBytes]byte, 0, numKeys)
 	for i := uint64(0); i < numKeys; i++ {
-		pks = append(pks, bytesutil.ToBytes2592(bytesutil.ToBytes(i, 48)))
+		pks = append(pks, bytesutil.ToBytes2592(bytesutil.ToBytes(i, 2592)))
 	}
 	validatorDB := setupDB(t, pks)
 
@@ -92,7 +92,7 @@ func BenchmarkPruneAttestations(b *testing.B) {
 	numKeys := uint64(8)
 	pks := make([][dilithium2.CryptoPublicKeyBytes]byte, 0, numKeys)
 	for i := uint64(0); i < numKeys; i++ {
-		pks = append(pks, bytesutil.ToBytes2592(bytesutil.ToBytes(i, 48)))
+		pks = append(pks, bytesutil.ToBytes2592(bytesutil.ToBytes(i, 2592)))
 	}
 	validatorDB := setupDB(b, pks)
 

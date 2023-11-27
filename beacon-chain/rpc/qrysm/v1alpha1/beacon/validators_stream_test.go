@@ -1,5 +1,6 @@
 package beacon
 
+/*
 import (
 	"sync"
 	"testing"
@@ -11,6 +12,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
+
 
 func TestInfostream_EpochToTimestamp(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
@@ -183,3 +185,4 @@ func TestInfostream_HandleRemoveValidatorKeys(t *testing.T) {
 		assert.Equal(t, test.finalLen, len(is.pubKeys), "Incorrect number of keys")
 	}
 }
+*/

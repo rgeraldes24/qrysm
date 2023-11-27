@@ -22,12 +22,12 @@ func TestIsCurrentEpochSyncCommittee_UsingCache(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -51,12 +51,12 @@ func TestIsCurrentEpochSyncCommittee_UsingCommittee(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -77,12 +77,12 @@ func TestIsCurrentEpochSyncCommittee_DoesNotExist(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -103,12 +103,12 @@ func TestIsNextEpochSyncCommittee_UsingCache(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -130,12 +130,12 @@ func TestIsNextEpochSyncCommittee_UsingCommittee(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -154,12 +154,12 @@ func TestIsNextEpochSyncCommittee_DoesNotExist(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -180,12 +180,12 @@ func TestCurrentEpochSyncSubcommitteeIndices_UsingCache(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -209,12 +209,12 @@ func TestCurrentEpochSyncSubcommitteeIndices_UsingCommittee(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -248,12 +248,12 @@ func TestCurrentEpochSyncSubcommitteeIndices_DoesNotExist(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -274,12 +274,12 @@ func TestNextEpochSyncSubcommitteeIndices_UsingCache(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -301,12 +301,12 @@ func TestNextEpochSyncSubcommitteeIndices_UsingCommittee(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -327,12 +327,12 @@ func TestNextEpochSyncSubcommitteeIndices_DoesNotExist(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
@@ -379,12 +379,12 @@ func TestIsCurrentEpochSyncCommittee_SameBlockRoot(t *testing.T) {
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 2592))
 	}
 
 	blockRoots := make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot)

@@ -41,8 +41,7 @@ func Test_currentCommitteeIndicesFromState(t *testing.T) {
 		wantedCommittee[i] = vals[i].PublicKey
 	}
 	require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
-		Pubkeys:         wantedCommittee,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
+		Pubkeys: wantedCommittee,
 	}))
 
 	t.Run("OK", func(t *testing.T) {
@@ -52,10 +51,9 @@ func Test_currentCommitteeIndicesFromState(t *testing.T) {
 		require.DeepEqual(t, wantedCommittee, committee.Pubkeys)
 	})
 	t.Run("validator in committee not found in state", func(t *testing.T) {
-		wantedCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 48)
+		wantedCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 2592)
 		require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
-			Pubkeys:         wantedCommittee,
-			AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
+			Pubkeys: wantedCommittee,
 		}))
 		_, _, err := currentCommitteeIndicesFromState(st)
 		require.ErrorContains(t, "index not found for pubkey", err)
@@ -63,7 +61,7 @@ func Test_currentCommitteeIndicesFromState(t *testing.T) {
 }
 
 func Test_nextCommitteeIndicesFromState(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().SyncCommitteeSize)
+	st, _ := util.DeterministicGenesisState(t, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
 	wantedCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	wantedIndices := make([]primitives.ValidatorIndex, len(wantedCommittee))
@@ -72,8 +70,7 @@ func Test_nextCommitteeIndicesFromState(t *testing.T) {
 		wantedCommittee[i] = vals[i].PublicKey
 	}
 	require.NoError(t, st.SetNextSyncCommittee(&zondpbalpha.SyncCommittee{
-		Pubkeys:         wantedCommittee,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
+		Pubkeys: wantedCommittee,
 	}))
 
 	t.Run("OK", func(t *testing.T) {
@@ -83,10 +80,9 @@ func Test_nextCommitteeIndicesFromState(t *testing.T) {
 		require.DeepEqual(t, wantedCommittee, committee.Pubkeys)
 	})
 	t.Run("validator in committee not found in state", func(t *testing.T) {
-		wantedCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 48)
+		wantedCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 2592)
 		require.NoError(t, st.SetNextSyncCommittee(&zondpbalpha.SyncCommittee{
-			Pubkeys:         wantedCommittee,
-			AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
+			Pubkeys: wantedCommittee,
 		}))
 		_, _, err := nextCommitteeIndicesFromState(st)
 		require.ErrorContains(t, "index not found for pubkey", err)
@@ -94,15 +90,14 @@ func Test_nextCommitteeIndicesFromState(t *testing.T) {
 }
 
 func Test_extractSyncSubcommittees(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().SyncCommitteeSize)
+	st, _ := util.DeterministicGenesisState(t, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
 	syncCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	for i := 0; i < len(syncCommittee); i++ {
 		syncCommittee[i] = vals[i].PublicKey
 	}
 	require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
-		Pubkeys:         syncCommittee,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
+		Pubkeys: syncCommittee,
 	}))
 
 	commSize := params.BeaconConfig().SyncCommitteeSize
@@ -133,10 +128,9 @@ func Test_extractSyncSubcommittees(t *testing.T) {
 		}
 	})
 	t.Run("validator in subcommittee not found in state", func(t *testing.T) {
-		syncCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 48)
+		syncCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 2592)
 		require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
-			Pubkeys:         syncCommittee,
-			AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
+			Pubkeys: syncCommittee,
 		}))
 		committee, err := st.CurrentSyncCommittee()
 		require.NoError(t, err)
@@ -147,15 +141,14 @@ func Test_extractSyncSubcommittees(t *testing.T) {
 
 func TestListSyncCommittees(t *testing.T) {
 	ctx := context.Background()
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().SyncCommitteeSize)
+	st, _ := util.DeterministicGenesisState(t, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
 	for i := 0; i < len(syncCommittee); i++ {
 		syncCommittee[i] = vals[i].PublicKey
 	}
 	require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
-		Pubkeys:         syncCommittee,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
+		Pubkeys: syncCommittee,
 	}))
 	stRoot, err := st.HashTreeRoot(ctx)
 	require.NoError(t, err)
@@ -292,15 +285,14 @@ func (m *futureSyncMockFetcher) StateBySlot(context.Context, primitives.Slot) (s
 
 func TestListSyncCommitteesFuture(t *testing.T) {
 	ctx := context.Background()
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().SyncCommitteeSize)
+	st, _ := util.DeterministicGenesisState(t, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
 	for i := 0; i < len(syncCommittee); i++ {
 		syncCommittee[i] = vals[i].PublicKey
 	}
 	require.NoError(t, st.SetNextSyncCommittee(&zondpbalpha.SyncCommittee{
-		Pubkeys:         syncCommittee,
-		AggregatePubkey: bytesutil.PadTo([]byte{}, params.BeaconConfig().DilithiumPubkeyLength),
+		Pubkeys: syncCommittee,
 	}))
 	db := dbTest.SetupDB(t)
 
@@ -349,7 +341,7 @@ func TestListSyncCommitteesFuture(t *testing.T) {
 
 func TestSubmitPoolSyncCommitteeSignatures(t *testing.T) {
 	ctx := grpc.NewContextWithServerTransportStream(context.Background(), &runtime.ServerTransportStream{})
-	st, _ := util.DeterministicGenesisStateAltair(t, 10)
+	st, _ := util.DeterministicGenesisState(t, 10)
 
 	alphaServer := &validator.Server{
 		SyncCommitteePool: synccommittee.NewStore(),

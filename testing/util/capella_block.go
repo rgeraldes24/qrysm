@@ -23,11 +23,10 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-// GenerateFullBlockCapella generates a fully valid Capella block with the requested parameters.
+// GenerateFullBlock generates a fully valid Capella block with the requested parameters.
 // Use BlockGenConfig to declare the conditions you would like the block generated under.
 // This function modifies the passed state as follows:
-
-func GenerateFullBlockCapella(
+func GenerateFullBlock(
 	bState state.BeaconState,
 	privs []dilithium.DilithiumKey,
 	conf *BlockGenConfig,

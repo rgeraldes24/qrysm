@@ -12,8 +12,8 @@ import (
 )
 
 func Test_logStateTransitionData(t *testing.T) {
-	payloadBlk := &zondpb.BeaconBlockBellatrix{
-		Body: &zondpb.BeaconBlockBodyBellatrix{
+	payloadBlk := &zondpb.BeaconBlock{
+		Body: &zondpb.BeaconBlockBody{
 			SyncAggregate: &zondpb.SyncAggregate{},
 			ExecutionPayload: &enginev1.ExecutionPayload{
 				BlockHash:    []byte{1, 2, 3},

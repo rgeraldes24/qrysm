@@ -39,8 +39,6 @@ func TestServer_setExecutionData(t *testing.T) {
 
 	ctx := context.Background()
 	cfg := params.BeaconConfig().Copy()
-	cfg.BellatrixForkEpoch = 0
-	cfg.CapellaForkEpoch = 0
 	params.OverrideBeaconConfig(cfg)
 	params.SetupTestConfigCleanup(t)
 
@@ -49,7 +47,7 @@ func TestServer_setExecutionData(t *testing.T) {
 	wrappedHeaderCapella, err := blocks.WrappedExecutionPayloadHeaderCapella(&v1.ExecutionPayloadHeaderCapella{BlockNumber: 1}, 0)
 	require.NoError(t, err)
 	require.NoError(t, capellaTransitionState.SetLatestExecutionPayloadHeader(wrappedHeaderCapella))
-	b2pbCapella := util.NewBeaconBlockCapella()
+	b2pbCapella := util.NewBeaconBlock()
 	b2rCapella, err := b2pbCapella.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b2pbCapella)
@@ -76,7 +74,7 @@ func TestServer_setExecutionData(t *testing.T) {
 	}
 
 	t.Run("No builder configured. Use local block", func(t *testing.T) {
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
 		require.NoError(t, err)
 		b := blk.Block()
 		localPayload, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
@@ -89,7 +87,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.Equal(t, uint64(1), e.BlockNumber()) // Local block
 	})
 	t.Run("Builder configured. Builder Block has higher value. Incorrect withdrawals", func(t *testing.T) {
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
 		require.NoError(t, err)
 		require.NoError(t, vs.BeaconDB.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{blk.Block().ProposerIndex()},
 			[]*zondpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, dilithium2.CryptoPublicKeyBytes)}}))
@@ -191,7 +189,7 @@ func TestServer_setExecutionData(t *testing.T) {
 			HasConfigured: true,
 			Cfg:           &builderTest.Config{BeaconDB: beaconDB},
 		}
-		wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
 		require.NoError(t, err)
 		chain := &blockchainTest.ChainService{ForkChoiceStore: doublylinkedtree.New(), Genesis: time.Now(), Block: wb}
 		vs.ForkFetcher = chain
@@ -210,7 +208,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.Equal(t, uint64(2), e.BlockNumber()) // Builder block
 	})
 	t.Run("Builder configured. Local block has higher value", func(t *testing.T) {
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
 		require.NoError(t, err)
 		vs.ExecutionEngineCaller = &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 2}
 		b := blk.Block()
@@ -230,7 +228,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		cfg.LocalBlockValueBoost = 1 // Boost 1%.
 		params.OverrideBeaconConfig(cfg)
 
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
 		require.NoError(t, err)
 		vs.ExecutionEngineCaller = &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 1}
 		b := blk.Block()
@@ -246,7 +244,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.LogsContain(t, hook, "builderGweiValue=1 localBoostPercentage=1 localGweiValue=1")
 	})
 	t.Run("Builder configured. Builder returns fault. Use local block", func(t *testing.T) {
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
 		require.NoError(t, err)
 		vs.BlockBuilder = &builderTest.MockBuilderService{
 			ErrGetHeader:  errors.New("fault"),
@@ -269,7 +267,6 @@ func TestServer_getPayloadHeader(t *testing.T) {
 	genesis := time.Now().Add(-time.Duration(params.BeaconConfig().SlotsPerEpoch) * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
 	params.SetupTestConfigCleanup(t)
 	bc := params.BeaconConfig()
-	bc.BellatrixForkEpoch = 1
 	params.OverrideBeaconConfig(bc)
 	fakeCapellaEpoch := primitives.Epoch(10)
 	params.SetupTestConfigCleanup(t)

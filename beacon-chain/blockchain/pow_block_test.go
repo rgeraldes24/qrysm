@@ -124,10 +124,10 @@ func Test_validateMergeBlock(t *testing.T) {
 		},
 		TotalDifficulty: "0x1",
 	}
-	blk := &zondpb.SignedBeaconBlockBellatrix{
-		Block: &zondpb.BeaconBlockBellatrix{
+	blk := &zondpb.SignedBeaconBlock{
+		Block: &zondpb.BeaconBlock{
 			Slot: 1,
-			Body: &zondpb.BeaconBlockBodyBellatrix{
+			Body: &zondpb.BeaconBlockBody{
 				ExecutionPayload: &enginev1.ExecutionPayload{
 					ParentHash: a[:],
 				},

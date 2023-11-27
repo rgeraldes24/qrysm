@@ -274,7 +274,7 @@ func TestListValidators(t *testing.T) {
 		}
 
 		existingKey := st.PubkeyAtIndex(primitives.ValidatorIndex(1))
-		pubkeys := [][]byte{existingKey[:], []byte(strings.Repeat("f", 48))}
+		pubkeys := [][]byte{existingKey[:], []byte(strings.Repeat("f", 2592))}
 		resp, err := s.ListValidators(ctx, &zondpb.StateValidatorsRequest{
 			StateId: []byte("head"),
 			Id:      pubkeys,

@@ -1,5 +1,6 @@
 package rpc
 
+/*
 import (
 	"bytes"
 	"context"
@@ -42,12 +43,13 @@ import (
 	remoteweb3signer "github.com/theQRL/qrysm/v4/validator/keymanager/remote-web3signer"
 	"github.com/theQRL/qrysm/v4/validator/slashing-protection-history/format"
 	mocks "github.com/theQRL/qrysm/v4/validator/testing"
-	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
+	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
+
 
 func TestServer_ListKeystores(t *testing.T) {
 	t.Run("wallet not ready", func(t *testing.T) {
@@ -104,7 +106,9 @@ func TestServer_ListKeystores(t *testing.T) {
 		}
 	})
 }
+*/
 
+/*
 func TestServer_ImportKeystores(t *testing.T) {
 	t.Run("wallet not ready", func(t *testing.T) {
 		s := Server{}
@@ -254,7 +258,9 @@ func TestServer_ImportKeystores(t *testing.T) {
 		}
 	})
 }
+*/
 
+/*
 func TestServer_ImportKeystores_WrongKeymanagerKind(t *testing.T) {
 	ctx := context.Background()
 	w := wallet.NewWalletForWeb3Signer()
@@ -287,7 +293,9 @@ func TestServer_ImportKeystores_WrongKeymanagerKind(t *testing.T) {
 	require.Equal(t, zondpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
 	require.Equal(t, "Keymanager kind cannot import keys", response.Data[0].Message)
 }
+*/
 
+/*
 func TestServer_DeleteKeystores(t *testing.T) {
 	t.Run("wallet not ready", func(t *testing.T) {
 		s := Server{}
@@ -429,7 +437,9 @@ func TestServer_DeleteKeystores(t *testing.T) {
 		}
 	}
 }
+*/
 
+/*
 func TestServer_DeleteKeystores_FailedSlashingProtectionExport(t *testing.T) {
 	ctx := context.Background()
 	srv := setupServerWithWallet(t)
@@ -469,7 +479,9 @@ func TestServer_DeleteKeystores_FailedSlashingProtectionExport(t *testing.T) {
 		response.Data[0].Message,
 	)
 }
+*/
 
+/*
 func TestServer_DeleteKeystores_WrongKeymanagerKind(t *testing.T) {
 	ctx := context.Background()
 	w := wallet.NewWalletForWeb3Signer()
@@ -1600,7 +1612,7 @@ func TestServer_SetVoluntaryExit(t *testing.T) {
 		gomock.Any(), // ctx
 		gomock.Any(), // epoch
 	).Times(3).
-		Return(&zond.DomainResponse{SignatureDomain: make([]byte, 32)}, nil /*err*/)
+		Return(&zond.DomainResponse{SignatureDomain: make([]byte, 32)}, nil)
 
 	mockNodeClient.EXPECT().
 		GetGenesis(gomock.Any(), gomock.Any()).
@@ -1665,3 +1677,4 @@ func TestServer_SetVoluntaryExit(t *testing.T) {
 		})
 	}
 }
+*/

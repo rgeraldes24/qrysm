@@ -271,7 +271,7 @@ func TestBeaconState_ValidatorMutation_Phase0(t *testing.T) {
 	_ = testState.Copy()
 
 	require.NoError(t, testState.UpdateValidatorAtIndex(15, &zondpb.Validator{
-		PublicKey:                  make([]byte, 48),
+		PublicKey:                  make([]byte, 2592),
 		WithdrawalCredentials:      make([]byte, 32),
 		EffectiveBalance:           1111,
 		Slashed:                    false,
@@ -295,7 +295,7 @@ func TestBeaconState_ValidatorMutation_Phase0(t *testing.T) {
 	assert.Equal(t, rt, rt2)
 
 	require.NoError(t, newState1.UpdateValidatorAtIndex(150, &zondpb.Validator{
-		PublicKey:                  make([]byte, 48),
+		PublicKey:                  make([]byte, 2592),
 		WithdrawalCredentials:      make([]byte, 32),
 		EffectiveBalance:           2111,
 		Slashed:                    false,
@@ -338,7 +338,7 @@ func TestBeaconState_ValidatorMutation_Altair(t *testing.T) {
 	_ = testState.Copy()
 
 	require.NoError(t, testState.UpdateValidatorAtIndex(15, &zondpb.Validator{
-		PublicKey:                  make([]byte, 48),
+		PublicKey:                  make([]byte, 2592),
 		WithdrawalCredentials:      make([]byte, 32),
 		EffectiveBalance:           1111,
 		Slashed:                    false,
@@ -362,7 +362,7 @@ func TestBeaconState_ValidatorMutation_Altair(t *testing.T) {
 	assert.Equal(t, rt, rt2)
 
 	require.NoError(t, newState1.UpdateValidatorAtIndex(150, &zondpb.Validator{
-		PublicKey:                  make([]byte, 48),
+		PublicKey:                  make([]byte, 2592),
 		WithdrawalCredentials:      make([]byte, 32),
 		EffectiveBalance:           2111,
 		Slashed:                    false,
@@ -406,7 +406,7 @@ func TestBeaconState_ValidatorMutation_Capella(t *testing.T) {
 	_ = testState.Copy()
 
 	require.NoError(t, testState.UpdateValidatorAtIndex(15, &zondpb.Validator{
-		PublicKey:                  make([]byte, 48),
+		PublicKey:                  make([]byte, 2592),
 		WithdrawalCredentials:      make([]byte, 32),
 		EffectiveBalance:           1111,
 		Slashed:                    false,
@@ -430,7 +430,7 @@ func TestBeaconState_ValidatorMutation_Capella(t *testing.T) {
 	assert.Equal(t, rt, rt2)
 
 	require.NoError(t, newState1.UpdateValidatorAtIndex(150, &zondpb.Validator{
-		PublicKey:                  make([]byte, 48),
+		PublicKey:                  make([]byte, 2592),
 		WithdrawalCredentials:      make([]byte, 32),
 		EffectiveBalance:           2111,
 		Slashed:                    false,

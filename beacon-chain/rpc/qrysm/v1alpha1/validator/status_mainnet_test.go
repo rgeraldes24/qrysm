@@ -63,7 +63,7 @@ func TestValidatorStatus_Active(t *testing.T) {
 			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 			PublicKey:         pubkey},
 		}}
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(st)
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(st)
 	require.NoError(t, err)
 
 	timestamp := time.Unix(int64(params.BeaconConfig().Zond1FollowDistance), 0).Unix()

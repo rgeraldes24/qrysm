@@ -439,7 +439,7 @@ func TestSaveOrphanedAtts_CanFilter(t *testing.T) {
 	r2, err := blk2.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk4 := util.NewBeaconBlockCapella()
+	blk4 := util.NewBeaconBlock()
 	blkConfig.NumDilithiumChanges = 0
 	blk4.Block.Slot = 4
 	blk4.Block.ParentRoot = rG[:]

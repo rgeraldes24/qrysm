@@ -138,7 +138,7 @@ func zond1Data() *zondpb.Zond1Data {
 }
 
 func validator() *zondpb.Validator {
-	pk := bytesutil.ToBytes48([]byte("public"))
+	pk := bytesutil.ToBytes2592([]byte("public"))
 	wc := bytesutil.ToBytes32([]byte("withdrawal"))
 	return &zondpb.Validator{
 		PublicKey:                  pk[:],
@@ -192,13 +192,11 @@ func checkpoint(prefix string) *zondpb.Checkpoint {
 func syncCommittee(prefix string) *zondpb.SyncCommittee {
 	pubkeys := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	for i := range pubkeys {
-		key := bytesutil.ToBytes48([]byte(prefix + "pubkey"))
+		key := bytesutil.ToBytes2592([]byte(prefix + "pubkey"))
 		pubkeys[i] = key[:]
 	}
-	agg := bytesutil.ToBytes48([]byte(prefix + "aggregate"))
 	return &zondpb.SyncCommittee{
-		Pubkeys:         pubkeys,
-		AggregatePubkey: agg[:],
+		Pubkeys: pubkeys,
 	}
 }
 

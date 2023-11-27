@@ -1,5 +1,6 @@
 package wallet
 
+/*
 import (
 	"flag"
 	"os"

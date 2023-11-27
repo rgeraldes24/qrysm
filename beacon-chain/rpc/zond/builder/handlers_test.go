@@ -28,7 +28,7 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 	st, err := util.NewBeaconState()
 	slotsAhead := 5000
 	require.NoError(t, err)
-	capellaSlot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
+	capellaSlot, err := slots.EpochStart(0)
 	require.NoError(t, err)
 	currentSlot := capellaSlot + primitives.Slot(slotsAhead)
 	require.NoError(t, st.SetSlot(currentSlot))
@@ -109,8 +109,9 @@ func TestExpectedWithdrawals(t *testing.T) {
 	slotsAhead := 5000
 	require.NoError(t, err)
 	//capellaSlot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	//require.NoError(t, err)
-	//currentSlot := capellaSlot + primitives.Slot(slotsAhead)
+	capellaSlot, err := slots.EpochStart(0)
+	require.NoError(t, err)
+	currentSlot := capellaSlot + primitives.Slot(slotsAhead)
 	require.NoError(t, st.SetSlot(currentSlot))
 	mockChainService := &mock.ChainService{Optimistic: true}
 

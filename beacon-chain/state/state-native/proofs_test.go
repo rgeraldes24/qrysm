@@ -11,11 +11,11 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-func TestBeaconStateMerkleProofs_bellatrix(t *testing.T) {
+func TestBeaconStateMerkleProofs(t *testing.T) {
 	ctx := context.Background()
-	bellatrix, err := util.NewBeaconStateBellatrix()
+	st, err := util.NewBeaconState()
 	require.NoError(t, err)
-	htr, err := bellatrix.HashTreeRoot(ctx)
+	htr, err := st.HashTreeRoot(ctx)
 	require.NoError(t, err)
 	results := []string{
 		"0x173669ae8794c057def63b20372114a628abb029354a2ef50d7a1aaa9a3dab4a",
@@ -25,7 +25,7 @@ func TestBeaconStateMerkleProofs_bellatrix(t *testing.T) {
 		"0x4616e1d9312a92eb228e8cd5483fa1fca64d99781d62129bc53718d194b98c45",
 	}
 	t.Run("current sync committee", func(t *testing.T) {
-		cscp, err := bellatrix.CurrentSyncCommitteeProof(ctx)
+		cscp, err := st.CurrentSyncCommitteeProof(ctx)
 		require.NoError(t, err)
 		require.Equal(t, len(cscp), 5)
 		for i, bytes := range cscp {
@@ -33,7 +33,7 @@ func TestBeaconStateMerkleProofs_bellatrix(t *testing.T) {
 		}
 	})
 	t.Run("next sync committee", func(t *testing.T) {
-		nscp, err := bellatrix.NextSyncCommitteeProof(ctx)
+		nscp, err := st.NextSyncCommitteeProof(ctx)
 		require.NoError(t, err)
 		require.Equal(t, len(nscp), 5)
 		for i, bytes := range nscp {
@@ -41,25 +41,25 @@ func TestBeaconStateMerkleProofs_bellatrix(t *testing.T) {
 		}
 	})
 	t.Run("finalized root", func(t *testing.T) {
-		finalizedRoot := bellatrix.FinalizedCheckpoint().Root
-		proof, err := bellatrix.FinalizedRootProof(ctx)
+		finalizedRoot := st.FinalizedCheckpoint().Root
+		proof, err := st.FinalizedRootProof(ctx)
 		require.NoError(t, err)
 		gIndex := statenative.FinalizedRootGeneralizedIndex()
 		valid := trie.VerifyMerkleProof(htr[:], finalizedRoot, gIndex, proof)
 		require.Equal(t, true, valid)
 	})
 	t.Run("recomputes root on dirty fields", func(t *testing.T) {
-		currentRoot, err := bellatrix.HashTreeRoot(ctx)
+		currentRoot, err := st.HashTreeRoot(ctx)
 		require.NoError(t, err)
-		cpt := bellatrix.FinalizedCheckpoint()
+		cpt := st.FinalizedCheckpoint()
 		require.NoError(t, err)
 
 		// Edit the checkpoint.
 		cpt.Epoch = 100
-		require.NoError(t, bellatrix.SetFinalizedCheckpoint(cpt))
+		require.NoError(t, st.SetFinalizedCheckpoint(cpt))
 
 		// Produce a proof for the finalized root.
-		proof, err := bellatrix.FinalizedRootProof(ctx)
+		proof, err := st.FinalizedRootProof(ctx)
 		require.NoError(t, err)
 
 		// We expect the previous step to have triggered
@@ -67,12 +67,12 @@ func TestBeaconStateMerkleProofs_bellatrix(t *testing.T) {
 		// in a new hash tree root as the finalized checkpoint had previously
 		// changed and should have been marked as a dirty state field.
 		// The proof validity should be false for the old root, but true for the new.
-		finalizedRoot := bellatrix.FinalizedCheckpoint().Root
+		finalizedRoot := st.FinalizedCheckpoint().Root
 		gIndex := statenative.FinalizedRootGeneralizedIndex()
 		valid := trie.VerifyMerkleProof(currentRoot[:], finalizedRoot, gIndex, proof)
 		require.Equal(t, false, valid)
 
-		newRoot, err := bellatrix.HashTreeRoot(ctx)
+		newRoot, err := st.HashTreeRoot(ctx)
 		require.NoError(t, err)
 
 		valid = trie.VerifyMerkleProof(newRoot[:], finalizedRoot, gIndex, proof)

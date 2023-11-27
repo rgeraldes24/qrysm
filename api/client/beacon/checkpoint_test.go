@@ -101,7 +101,7 @@ func TestFname(t *testing.T) {
 	prefix := "block"
 	var root [32]byte
 	copy(root[:], []byte{0x23, 0x23, 0x23})
-	expected := "block_mainnet_phase0_23-0x2323230000000000000000000000000000000000000000000000000000000000.ssz"
+	expected := "block_mainnet_capella_23-0x2323230000000000000000000000000000000000000000000000000000000000.ssz"
 	actual := fname(prefix, vu, slot, root)
 	require.Equal(t, expected, actual)
 
@@ -110,7 +110,7 @@ func TestFname(t *testing.T) {
 	slot = 17
 	prefix = "state"
 	copy(root[29:], []byte{0x17, 0x17, 0x17})
-	expected = "state_minimal_altair_17-0x2323230000000000000000000000000000000000000000000000000000171717.ssz"
+	expected = "state_minimal_capella_17-0x2323230000000000000000000000000000000000000000000000000000171717.ssz"
 	actual = fname(prefix, vu, slot, root)
 	require.Equal(t, expected, actual)
 }
@@ -119,7 +119,6 @@ func TestDownloadWeakSubjectivityCheckpoint(t *testing.T) {
 	ctx := context.Background()
 	cfg := params.MainnetConfig().Copy()
 
-	//epoch := cfg.AltairForkEpoch - 1
 	epoch := primitives.Epoch(0)
 	// set up checkpoint state, using the epoch that will be computed as the ws checkpoint state based on the head state
 	wSlot, err := slots.EpochStart(epoch)
@@ -348,11 +347,11 @@ func defaultTestHeadState(t *testing.T, cfg *params.BeaconChainConfig) (state.Be
 	st, err := util.NewBeaconState()
 	require.NoError(t, err)
 
-	fork, err := forkForEpoch(cfg, cfg.AltairForkEpoch)
+	fork, err := forkForEpoch(cfg, 0)
 	require.NoError(t, err)
 	require.NoError(t, st.SetFork(fork))
 
-	slot, err := slots.EpochStart(cfg.AltairForkEpoch)
+	slot, err := slots.EpochStart(0)
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(slot))
 
@@ -393,7 +392,8 @@ func TestDownloadFinalizedData(t *testing.T) {
 	cfg := params.MainnetConfig().Copy()
 
 	// avoid the altair zone because genesis tests are easier to set up
-	epoch := cfg.AltairForkEpoch - 1
+	//epoch := cfg.AltairForkEpoch - 1
+	epoch := primitives.Epoch(0)
 	// set up checkpoint state, using the epoch that will be computed as the ws checkpoint state based on the head state
 	slot, err := slots.EpochStart(epoch)
 	require.NoError(t, err)

@@ -19,8 +19,8 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
-// DeterministicGenesisStateCapella returns a genesis state in Capella format made using the deterministic deposits.
-func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.DilithiumKey) {
+// DeterministicGenesisState returns a genesis state in Capella format made using the deterministic deposits.
+func DeterministicGenesisState(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.DilithiumKey) {
 	deposits, privKeys, err := DeterministicDepositsAndKeys(numValidators)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
@@ -29,7 +29,7 @@ func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get zond1data for %d deposits", numValidators))
 	}
-	beaconState, err := genesisBeaconStateCapella(context.Background(), deposits, uint64(0), zond1Data)
+	beaconState, err := genesisBeaconState(context.Background(), deposits, uint64(0), zond1Data)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get genesis beacon state of %d validators", numValidators))
 	}
@@ -37,9 +37,9 @@ func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state
 	return beaconState, privKeys
 }
 
-// genesisBeaconStateCapella returns the genesis beacon state.
-func genesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, zond1Data *zondpb.Zond1Data) (state.BeaconState, error) {
-	st, err := emptyGenesisStateCapella()
+// genesisBeaconState returns the genesis beacon state.
+func genesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, zond1Data *zondpb.Zond1Data) (state.BeaconState, error) {
+	st, err := emptyGenesisState()
 	if err != nil {
 		return nil, err
 	}
@@ -55,11 +55,11 @@ func genesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, 
 		return nil, errors.Wrap(err, "could not process validator deposits")
 	}
 
-	return buildGenesisBeaconStateCapella(genesisTime, st, st.Zond1Data())
+	return buildGenesisBeaconState(genesisTime, st, st.Zond1Data())
 }
 
-// emptyGenesisStateCapella returns an empty genesis state in Capella format.
-func emptyGenesisStateCapella() (state.BeaconState, error) {
+// emptyGenesisState returns an empty genesis state in Capella format.
+func emptyGenesisState() (state.BeaconState, error) {
 	st := &zondpb.BeaconState{
 		// Misc fields.
 		Slot: 0,
@@ -88,7 +88,7 @@ func emptyGenesisStateCapella() (state.BeaconState, error) {
 	return state_native.InitializeFromProtoCapella(st)
 }
 
-func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, zond1Data *zondpb.Zond1Data) (state.BeaconState, error) {
+func buildGenesisBeaconState(genesisTime uint64, preState state.BeaconState, zond1Data *zondpb.Zond1Data) (state.BeaconState, error) {
 	if zond1Data == nil {
 		return nil, errors.New("no zond1data provided for genesis state")
 	}

@@ -126,7 +126,7 @@ func TestPingRPCHandler_SendsPing(t *testing.T) {
 		rateLimiter: newRateLimiter(p2),
 	}
 	// Setup streams
-	pcl := protocol.ID("/eth2/beacon_chain/req/ping/1/ssz_snappy")
+	pcl := protocol.ID("/zond2/beacon_chain/req/ping/1/ssz_snappy")
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 

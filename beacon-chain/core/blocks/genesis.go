@@ -1,5 +1,5 @@
 // Package blocks contains block processing libraries according to
-// the Ethereum beacon chain spec.
+// the Zond beacon chain spec.
 package blocks
 
 import (

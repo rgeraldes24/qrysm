@@ -11,7 +11,6 @@ import (
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/spectest/utils"
@@ -96,7 +95,7 @@ func RunForkTransitionTest(t *testing.T, config string) {
 			require.NoError(t, err)
 
 			bc := params.BeaconConfig().Copy()
-			bc.AltairForkEpoch = primitives.Epoch(config.ForkEpoch)
+			//bc.AltairForkEpoch = primitives.Epoch(config.ForkEpoch)
 			params.OverrideBeaconConfig(bc)
 
 			ctx := context.Background()

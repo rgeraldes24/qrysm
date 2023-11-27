@@ -188,7 +188,7 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
 
-	genesis, keys := util.DeterministicGenesisStateAltair(t, 64)
+	genesis, keys := util.DeterministicGenesisState(t, 64)
 	c, err := altair.NextSyncCommittee(ctx, genesis)
 	require.NoError(t, err)
 	require.NoError(t, genesis.SetCurrentSyncCommittee(c))
@@ -196,7 +196,7 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	genConfig := util.DefaultBlockGenConfig()
 	genConfig.NumProposerSlashings = 1
 	genConfig.FullSyncAggregate = true
-	b, err := util.GenerateFullBlockAltair(genesis, keys, genConfig, 1)
+	b, err := util.GenerateFullBlock(genesis, keys, genConfig, 1)
 	require.NoError(t, err)
 	s := setupService(t)
 

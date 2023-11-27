@@ -169,7 +169,6 @@ go_test(
         "@com_github_theqrl_go_zond//common:go_default_library",
         "@com_github_theqrl_go_zond//common/hexutil:go_default_library",
         "@com_github_tyler_smith_go_bip39//:go_default_library",
-        "@com_github_wealdtech_go_eth2_util//:go_default_library",
         "@in_gopkg_d4l3k_messagediff_v1//:go_default_library",
         "@io_bazel_rules_go//go/tools/bazel:go_default_library",
         "@io_bazel_rules_go//proto/wkt:empty_go_proto",

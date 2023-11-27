@@ -24,12 +24,12 @@ var Commands = &cli.Command{
 			Flags: cmd.WrapFlags([]cli.Flag{
 				flags.WalletDirFlag,
 				flags.KeymanagerKindFlag,
-				flags.RemoteSignerCertPathFlag,
-				flags.RemoteSignerKeyPathFlag,
-				flags.RemoteSignerCACertPathFlag,
+				//flags.RemoteSignerCertPathFlag,
+				//flags.RemoteSignerKeyPathFlag,
+				//flags.RemoteSignerCACertPathFlag,
 				flags.WalletPasswordFileFlag,
-				flags.Mnemonic25thWordFileFlag,
-				flags.SkipMnemonic25thWordCheckFlag,
+				//flags.Mnemonic25thWordFileFlag,
+				//flags.SkipMnemonic25thWordCheckFlag,
 				features.Mainnet,
 				cmd.AcceptTosFlag,
 			}),
@@ -49,34 +49,36 @@ var Commands = &cli.Command{
 				return nil
 			},
 		},
-		{
-			Name:  "recover",
-			Usage: "uses a derived wallet seed recovery phase to recreate an existing HD wallet",
-			Flags: cmd.WrapFlags([]cli.Flag{
-				flags.WalletDirFlag,
-				flags.MnemonicFileFlag,
-				flags.WalletPasswordFileFlag,
-				flags.NumAccountsFlag,
-				flags.Mnemonic25thWordFileFlag,
-				flags.SkipMnemonic25thWordCheckFlag,
-				features.Mainnet,
-				cmd.AcceptTosFlag,
-			}),
-			Before: func(cliCtx *cli.Context) error {
-				if err := cmd.LoadFlagsFromConfig(cliCtx, cliCtx.Command.Flags); err != nil {
-					return err
-				}
-				if err := tos.VerifyTosAcceptedOrPrompt(cliCtx); err != nil {
-					return err
-				}
-				return features.ConfigureBeaconChain(cliCtx)
+		/*
+			{
+				Name:  "recover",
+				Usage: "uses a derived wallet seed recovery phase to recreate an existing HD wallet",
+				Flags: cmd.WrapFlags([]cli.Flag{
+					flags.WalletDirFlag,
+					//flags.MnemonicFileFlag,
+					flags.WalletPasswordFileFlag,
+					//flags.NumAccountsFlag,
+					//flags.Mnemonic25thWordFileFlag,
+					//flags.SkipMnemonic25thWordCheckFlag,
+					features.Mainnet,
+					cmd.AcceptTosFlag,
+				}),
+				Before: func(cliCtx *cli.Context) error {
+					if err := cmd.LoadFlagsFromConfig(cliCtx, cliCtx.Command.Flags); err != nil {
+						return err
+					}
+					if err := tos.VerifyTosAcceptedOrPrompt(cliCtx); err != nil {
+						return err
+					}
+					return features.ConfigureBeaconChain(cliCtx)
+				},
+				Action: func(cliCtx *cli.Context) error {
+					if err := walletRecover(cliCtx); err != nil {
+						log.WithError(err).Fatal("Could not recover wallet")
+					}
+					return nil
+				},
 			},
-			Action: func(cliCtx *cli.Context) error {
-				if err := walletRecover(cliCtx); err != nil {
-					log.WithError(err).Fatal("Could not recover wallet")
-				}
-				return nil
-			},
-		},
+		*/
 	},
 }

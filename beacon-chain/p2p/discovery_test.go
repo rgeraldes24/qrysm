@@ -404,7 +404,6 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 
 				// Update params
 				cfg := params.BeaconConfig().Copy()
-				cfg.AltairForkEpoch = 5
 				params.OverrideBeaconConfig(cfg)
 				params.BeaconConfig().InitializeForkSchedule()
 
@@ -415,8 +414,8 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
-				assert.Equal(t, version.Altair, s.metaData.Version())
-				assert.DeepEqual(t, bitfield.Bitvector4{0x00}, s.metaData.MetadataObjV1().Syncnets)
+				assert.Equal(t, version.Capella, s.metaData.Version())
+				assert.DeepEqual(t, bitfield.Bitvector4{0x00}, s.metaData.MetadataObjV0().Syncnets)
 				assert.DeepEqual(t, bitfield.Bitvector64{0xe, 0x0, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0}, s.metaData.AttnetsBitfield())
 			},
 		},
@@ -435,7 +434,6 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 
 				// Update params
 				cfg := params.BeaconConfig().Copy()
-				cfg.AltairForkEpoch = 5
 				params.OverrideBeaconConfig(cfg)
 				params.BeaconConfig().InitializeForkSchedule()
 
@@ -445,8 +443,8 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
-				assert.Equal(t, version.Altair, s.metaData.Version())
-				assert.DeepEqual(t, bitfield.Bitvector4{0x00}, s.metaData.MetadataObjV1().Syncnets)
+				assert.Equal(t, version.Capella, s.metaData.Version())
+				assert.DeepEqual(t, bitfield.Bitvector4{0x00}, s.metaData.MetadataObjV0().Syncnets)
 				assert.DeepEqual(t, bitfield.Bitvector64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, s.metaData.AttnetsBitfield())
 			},
 		},
@@ -465,7 +463,6 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 
 				// Update params
 				cfg := params.BeaconConfig().Copy()
-				cfg.AltairForkEpoch = 5
 				params.OverrideBeaconConfig(cfg)
 				params.BeaconConfig().InitializeForkSchedule()
 
@@ -477,8 +474,8 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
-				assert.Equal(t, version.Altair, s.metaData.Version())
-				assert.DeepEqual(t, bitfield.Bitvector4{0x03}, s.metaData.MetadataObjV1().Syncnets)
+				assert.Equal(t, version.Capella, s.metaData.Version())
+				assert.DeepEqual(t, bitfield.Bitvector4{0x03}, s.metaData.MetadataObjV0().Syncnets)
 				assert.DeepEqual(t, bitfield.Bitvector64{0xe, 0x0, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0}, s.metaData.AttnetsBitfield())
 			},
 		},

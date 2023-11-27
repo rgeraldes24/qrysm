@@ -583,10 +583,6 @@ func TestOptimisticStatus(t *testing.T) {
 	err := server.optimisticStatus(context.Background())
 	require.NoError(t, err)
 
-	// cfg := params.BeaconConfig().Copy()
-	// cfg.BellatrixForkEpoch = 2
-	// params.OverrideBeaconConfig(cfg)
-
 	server = &Server{OptimisticModeFetcher: &mockChain.ChainService{Optimistic: true}, TimeFetcher: &mockChain.ChainService{}}
 	err = server.optimisticStatus(context.Background())
 	s, ok := status.FromError(err)

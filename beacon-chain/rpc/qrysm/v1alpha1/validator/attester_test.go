@@ -47,7 +47,7 @@ func TestProposeAttestation_OK(t *testing.T) {
 	validators := make([]*zondpb.Validator, 64)
 	for i := 0; i < len(validators); i++ {
 		validators[i] = &zondpb.Validator{
-			PublicKey:             make([]byte, 48),
+			PublicKey:             make([]byte, 2592),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
@@ -173,7 +173,6 @@ func TestGetAttestationData_SyncNotReady(t *testing.T) {
 func TestGetAttestationData_Optimistic(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	cfg := params.BeaconConfig().Copy()
-	cfg.BellatrixForkEpoch = 0
 	params.OverrideBeaconConfig(cfg)
 
 	as := &Server{

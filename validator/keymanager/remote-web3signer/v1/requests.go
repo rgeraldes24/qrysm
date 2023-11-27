@@ -243,9 +243,8 @@ func GetSyncCommitteeContributionAndProofSignRequest(request *validatorpb.SignRe
 	}, nil
 }
 
-// GetBlockV2BlindedSignRequest maps the request for signing types
-// Supports Bellatrix and Capella
-func GetBlockV2BlindedSignRequest(request *validatorpb.SignRequest, genesisValidatorsRoot []byte) (*BlockV2BlindedSignRequest, error) {
+// GetBlockBlindedSignRequest maps the request for signing types
+func GetBlockBlindedSignRequest(request *validatorpb.SignRequest, genesisValidatorsRoot []byte) (*BlockBlindedSignRequest, error) {
 	if request == nil {
 		return nil, errors.New("nil sign request provided")
 	}
@@ -291,11 +290,11 @@ func GetBlockV2BlindedSignRequest(request *validatorpb.SignRequest, genesisValid
 	if err != nil {
 		return nil, err
 	}
-	return &BlockV2BlindedSignRequest{
-		Type:        "BLOCK_V2",
+	return &BlockBlindedSignRequest{
+		Type:        "BLOCK_V1",
 		ForkInfo:    fork,
 		SigningRoot: request.SigningRoot,
-		BeaconBlock: &BeaconBlockV2Blinded{
+		BeaconBlock: &BeaconBlockBlinded{
 			Version: version,
 			BlockHeader: &BeaconBlockHeader{
 				Slot:          fmt.Sprint(beaconBlockHeader.Slot),

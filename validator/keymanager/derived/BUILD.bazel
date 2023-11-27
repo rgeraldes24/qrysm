@@ -30,7 +30,6 @@ go_library(
         "@com_github_theqrl_go_qrllib//dilithium:go_default_library",
         "@com_github_theqrl_go_qrllib//qrl:go_default_library",
         "@com_github_tyler_smith_go_bip39//:go_default_library",
-        "@com_github_wealdtech_go_eth2_util//:go_default_library",
     ],
 )
 
@@ -54,6 +53,5 @@ go_test(
         "@com_github_theqrl_go_qrllib//dilithium:go_default_library",
         "@com_github_tyler_smith_go_bip39//:go_default_library",
         "@com_github_tyler_smith_go_bip39//wordlists:go_default_library",
-        "@com_github_wealdtech_go_eth2_util//:go_default_library",
     ],
 )

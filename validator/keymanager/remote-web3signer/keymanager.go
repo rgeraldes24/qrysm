@@ -153,25 +153,25 @@ func getSignRequestJson(ctx context.Context, validator *validator.Validate, requ
 		aggregationSlotSignRequestsTotal.Inc()
 		return json.Marshal(aggregationSlotSignRequest)
 	case *validatorpb.SignRequest_BlockCapella:
-		blockv2CapellaSignRequest, err := web3signerv1.GetBlockV2BlindedSignRequest(request, genesisValidatorsRoot)
+		blockCapellaSignRequest, err := web3signerv1.GetBlockBlindedSignRequest(request, genesisValidatorsRoot)
 		if err != nil {
 			return nil, err
 		}
-		if err = validator.StructCtx(ctx, blockv2CapellaSignRequest); err != nil {
+		if err = validator.StructCtx(ctx, blockCapellaSignRequest); err != nil {
 			return nil, err
 		}
 		blockCapellaSignRequestsTotal.Inc()
-		return json.Marshal(blockv2CapellaSignRequest)
+		return json.Marshal(blockCapellaSignRequest)
 	case *validatorpb.SignRequest_BlindedBlockCapella:
-		blindedBlockv2CapellaSignRequest, err := web3signerv1.GetBlockV2BlindedSignRequest(request, genesisValidatorsRoot)
+		blindedBlockCapellaSignRequest, err := web3signerv1.GetBlockBlindedSignRequest(request, genesisValidatorsRoot)
 		if err != nil {
 			return nil, err
 		}
-		if err = validator.StructCtx(ctx, blindedBlockv2CapellaSignRequest); err != nil {
+		if err = validator.StructCtx(ctx, blindedBlockCapellaSignRequest); err != nil {
 			return nil, err
 		}
 		blindedBlockCapellaSignRequestsTotal.Inc()
-		return json.Marshal(blindedBlockv2CapellaSignRequest)
+		return json.Marshal(blindedBlockCapellaSignRequest)
 	// We do not support "DEPOSIT" type.
 	/*
 		case *validatorpb.:

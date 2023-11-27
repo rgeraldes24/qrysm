@@ -43,7 +43,7 @@ var errInvalidTopic = errors.New("invalid topic format")
 const digestLength = 4
 
 // Specifies the prefix for any pubsub topic.
-const gossipTopicPrefix = "/eth2/"
+const gossipTopicPrefix = "/zond2/"
 
 // JoinTopic will join PubSub topic, if not already joined.
 func (s *Service) JoinTopic(topic string, opts ...pubsub.TopicOpt) (*pubsub.Topic, error) {
@@ -183,7 +183,7 @@ func convertTopicScores(topicMap map[string]*pubsub.TopicScoreSnapshot) map[stri
 }
 
 // ExtractGossipDigest extracts the relevant fork digest from the gossip topic.
-// Topics are in the form of /eth2/{fork-digest}/{topic} and this method extracts the
+// Topics are in the form of /zond2/{fork-digest}/{topic} and this method extracts the
 // fork digest from the topic string to a 4 byte array.
 func ExtractGossipDigest(topic string) ([4]byte, error) {
 	// Ensure the topic prefix is correct.

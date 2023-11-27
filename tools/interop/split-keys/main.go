@@ -12,7 +12,6 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"flag"
 	"fmt"
@@ -23,10 +22,11 @@ import (
 	"github.com/theQRL/qrysm/v4/io/file"
 	"github.com/theQRL/qrysm/v4/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
-	"github.com/theQRL/qrysm/v4/validator/keymanager/derived"
+
+	//"github.com/theQRL/qrysm/v4/validator/keymanager/derived"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/local"
 	"github.com/tyler-smith/go-bip39"
-	util "github.com/wealdtech/go-eth2-util"
+	//util "github.com/wealdtech/go-eth2-util"
 )
 
 var (
@@ -50,10 +50,15 @@ func main() {
 		}
 	}()
 
-	pubKeys, privKeys, err := generateKeysFromMnemonicList(bufio.NewScanner(f), *keysPerMnemonicFlag)
-	if err != nil {
-		log.Fatal(err)
-	}
+	/*
+		pubKeys, privKeys, err := generateKeysFromMnemonicList(bufio.NewScanner(f), *keysPerMnemonicFlag)
+		if err != nil {
+			log.Fatal(err)
+		}
+	*/
+
+	pubKeys := [][]byte{}
+	privKeys := [][]byte{}
 
 	log.Printf("Splitting %d keys across %d wallets\n", len(privKeys), *numberOfWalletsFlag)
 	wPass, err := file.ReadFileAsBytes(*walletPasswordFileFlag)
@@ -84,14 +89,16 @@ func seedFromMnemonic(mnemonic, mnemonicPassphrase string) ([]byte, error) {
 	return bip39.NewSeed(mnemonic, mnemonicPassphrase), nil
 }
 
+/*
 func generateKeysFromMnemonicList(mnemonicListFile *bufio.Scanner, keysPerMnemonic int) (pubKeys, privKeys [][]byte, err error) {
 	pubKeys = make([][]byte, 0)
 	privKeys = make([][]byte, 0)
-	var seed []byte
+	//var seed []byte
 	for mnemonicListFile.Scan() {
+
 		log.Printf("Generating %d keys from mnemonic\n", keysPerMnemonic)
 		mnemonic := mnemonicListFile.Text()
-		seed, err = seedFromMnemonic(mnemonic, "" /* 25th word*/)
+		seed, err = seedFromMnemonic(mnemonic, "")
 		if err != nil {
 			return
 		}
@@ -99,6 +106,8 @@ func generateKeysFromMnemonicList(mnemonicListFile *bufio.Scanner, keysPerMnemon
 			if i%250 == 0 && i > 0 {
 				log.Printf("%d/%d keys generated\n", i, keysPerMnemonic)
 			}
+
+			// TODO (rgeraldes24)
 			privKey, seedErr := util.PrivateKeyFromSeedAndPath(
 				seed, fmt.Sprintf(derived.ValidatingKeyDerivationPathTemplate, i),
 			)
@@ -106,12 +115,14 @@ func generateKeysFromMnemonicList(mnemonicListFile *bufio.Scanner, keysPerMnemon
 				err = seedErr
 				return
 			}
+
 			privKeys = append(privKeys, privKey.Marshal())
 			pubKeys = append(pubKeys, privKey.PublicKey().Marshal())
 		}
 	}
 	return
 }
+*/
 
 func spreadKeysAcrossLocalWallets(
 	pubKeys,

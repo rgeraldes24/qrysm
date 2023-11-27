@@ -1,17 +1,13 @@
 package derived
 
+/*
 import (
-	"encoding/hex"
-	"fmt"
 	"math/big"
-	"testing"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
-	"github.com/theQRL/qrysm/v4/testing/assert"
-	"github.com/theQRL/qrysm/v4/testing/require"
-	util "github.com/wealdtech/go-eth2-util"
 )
+
 
 func TestDerivationFromMnemonic(t *testing.T) {
 	mnemonic := "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
@@ -40,7 +36,9 @@ func TestDerivationFromMnemonic(t *testing.T) {
 	assert.DeepEqual(t, expectedMasterSK.Marshal(), withdrawalKey.Marshal())
 	assert.DeepEqual(t, expectedChildSK.Marshal(), validatingKey.Marshal())
 }
+*/
 
+/*
 func TestDerivationFromSeed(t *testing.T) {
 	type fields struct {
 		seed       string
@@ -110,6 +108,7 @@ func TestDerivationFromSeed(t *testing.T) {
 	}
 }
 
+
 func secretKeyFromBigNum(s string) (dilithium.DilithiumKey, error) {
 	num := new(big.Int)
 	num, ok := num.SetString(s, 10)
@@ -122,3 +121,4 @@ func secretKeyFromBigNum(s string) (dilithium.DilithiumKey, error) {
 	}
 	return dilithium.SecretKeyFromBytes(bts)
 }
+*/

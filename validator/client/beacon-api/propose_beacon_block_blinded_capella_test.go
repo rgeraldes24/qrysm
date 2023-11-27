@@ -270,7 +270,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 						{
 							Proof: test_helpers.FillByteArraySlice(33, test_helpers.FillByteSlice(32, 92)),
 							Data: &zondpb.Deposit_Data{
-								PublicKey:             test_helpers.FillByteSlice(48, 94),
+								PublicKey:             test_helpers.FillByteSlice(2592, 94),
 								WithdrawalCredentials: test_helpers.FillByteSlice(32, 95),
 								Amount:                96,
 								Signature:             test_helpers.FillByteSlice(4595, 97),
@@ -279,7 +279,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 						{
 							Proof: test_helpers.FillByteArraySlice(33, test_helpers.FillByteSlice(32, 98)),
 							Data: &zondpb.Deposit_Data{
-								PublicKey:             test_helpers.FillByteSlice(48, 100),
+								PublicKey:             test_helpers.FillByteSlice(2592, 100),
 								WithdrawalCredentials: test_helpers.FillByteSlice(32, 101),
 								Amount:                102,
 								Signature:             test_helpers.FillByteSlice(4595, 103),
@@ -327,7 +327,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 						{
 							Message: &zondpb.DilithiumToExecutionChange{
 								ValidatorIndex:      127,
-								FromDilithiumPubkey: test_helpers.FillByteSlice(48, 128),
+								FromDilithiumPubkey: test_helpers.FillByteSlice(2592, 128),
 								ToExecutionAddress:  test_helpers.FillByteSlice(20, 129),
 							},
 							Signature: test_helpers.FillByteSlice(4595, 130),
@@ -335,7 +335,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 						{
 							Message: &zondpb.DilithiumToExecutionChange{
 								ValidatorIndex:      131,
-								FromDilithiumPubkey: test_helpers.FillByteSlice(48, 132),
+								FromDilithiumPubkey: test_helpers.FillByteSlice(2592, 132),
 								ToExecutionAddress:  test_helpers.FillByteSlice(20, 133),
 							},
 							Signature: test_helpers.FillByteSlice(4595, 134),

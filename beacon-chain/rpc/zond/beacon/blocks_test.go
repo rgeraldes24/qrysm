@@ -386,26 +386,6 @@ func TestServer_SubmitBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	ctx := context.Background()
 
-	t.Run("Phase 0", func(t *testing.T) {
-		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
-		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), gomock.Any())
-		server := &Server{
-			V1Alpha1ValidatorServer: v1alpha1Server,
-			SyncChecker:             &mockSync.Sync{IsSyncing: false},
-		}
-
-		b := util.NewBeaconBlock()
-		ssz, err := b.MarshalSSZ()
-		require.NoError(t, err)
-		blockReq := &zondpbv1.SSZContainer{
-			Data: ssz,
-		}
-		md := metadata.MD{}
-		md.Set(api.VersionHeader, "phase0")
-		sszCtx := metadata.NewIncomingContext(ctx, md)
-		_, err = server.SubmitBlockSSZ(sszCtx, blockReq)
-		assert.NoError(t, err)
-	})
 	t.Run("Capella", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), gomock.Any())
@@ -414,7 +394,7 @@ func TestServer_SubmitBlockSSZ(t *testing.T) {
 			SyncChecker:             &mockSync.Sync{IsSyncing: false},
 		}
 
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlock()
 		b.Block.Slot = params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().CapellaForkEpoch))
 		ssz, err := b.MarshalSSZ()
 		require.NoError(t, err)
@@ -966,7 +946,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 		assert.DeepEqual(t, v1Block.Body.Attestations, resp.Data)
 	})
 	t.Run("Capella", func(t *testing.T) {
-		b := util.NewBeaconBlockCapella()
+		b := util.NewBeaconBlock()
 		b.Block.Body.Attestations = []*zondpbalpha.Attestation{
 			{
 				ParticipationBits: bitfield.Bitlist{0x00},

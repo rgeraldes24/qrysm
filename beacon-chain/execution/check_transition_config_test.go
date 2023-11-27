@@ -30,9 +30,6 @@ import (
 
 func Test_checkTransitionConfiguration(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.BellatrixForkEpoch = 0
-	params.OverrideBeaconConfig(cfg)
 	hook := logTest.NewGlobal()
 
 	t.Run("context canceled", func(t *testing.T) {
@@ -67,9 +64,9 @@ func Test_checkTransitionConfiguration(t *testing.T) {
 		}()
 		payload := emptyPayload()
 		payload.GasUsed = 21000
-		wrappedBlock, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockBellatrix{
-			Block: &zondpb.BeaconBlockBellatrix{
-				Body: &zondpb.BeaconBlockBodyBellatrix{
+		wrappedBlock, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlock{
+			Block: &zondpb.BeaconBlock{
+				Body: &zondpb.BeaconBlockBody{
 					ExecutionPayload: payload,
 				},
 			}},

@@ -129,7 +129,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 	var blkRoots p2pTypes.BeaconBlockByRootsReq
 	// Populate the database with blocks that would match the request.
 	for i := primitives.Slot(1); i < 11; i++ {
-		blk := util.NewBlindedBeaconBlockBellatrix()
+		blk := util.NewBlindedBeaconBlock()
 		blk.Block.Body.ExecutionPayloadHeader = header
 		blk.Block.Slot = i
 		root, err := blk.Block.HashTreeRoot()
@@ -162,7 +162,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 		defer wg.Done()
 		for i := range blkRoots {
 			expectSuccess(t, stream)
-			res := util.NewBeaconBlockBellatrix()
+			res := util.NewBeaconBlock()
 			assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 			if uint64(res.Block.Slot) != uint64(i+1) {
 				t.Errorf("Received unexpected block slot %d but wanted %d", res.Block.Slot, i+1)
@@ -226,7 +226,7 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 	}
 
 	// Setup streams
-	pcl := protocol.ID("/eth2/beacon_chain/req/beacon_blocks_by_root/1/ssz_snappy")
+	pcl := protocol.ID("/zond2/beacon_chain/req/beacon_blocks_by_root/1/ssz_snappy")
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(10000, 10000, time.Second, false)
 

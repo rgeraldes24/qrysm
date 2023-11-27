@@ -52,8 +52,8 @@ var (
 	)
 	// KeymanagerKindSelections as friendly text.
 	KeymanagerKindSelections = map[keymanager.Kind]string{
-		keymanager.Local:      "Imported Wallet (Recommended)",
-		keymanager.Derived:    "HD Wallet",
+		keymanager.Local: "Imported Wallet (Recommended)",
+		//keymanager.Derived:    "HD Wallet",
 		keymanager.Web3Signer: "Consensys Web3Signer (Advanced)",
 	}
 	// ValidateExistingPass checks that an input cannot be empty.

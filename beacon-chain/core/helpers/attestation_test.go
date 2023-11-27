@@ -50,7 +50,7 @@ func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {
 	validators := make([]*zondpb.Validator, validatorCount)
 
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, 2592)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey:             k,
