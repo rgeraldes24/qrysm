@@ -1,5 +1,6 @@
 package derived
 
+/*
 import (
 	"context"
 	"fmt"
@@ -80,7 +81,6 @@ func (km *Keymanager) RecoverAccountsFromMnemonic(
 	}
 	return km.localKM.ImportKeypairs(ctx, privKeys, pubKeys)
 }
-*/
 
 // ExtractKeystores retrieves the secret keys for specified public keys
 // in the function input, encrypts them using the specified password,
@@ -175,3 +175,4 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 	}
 	return nil
 }
+*/

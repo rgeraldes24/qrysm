@@ -86,6 +86,7 @@ service KeyManagement {
     };
   }
 
+/*
   // ListRemoteKeys for all web3signer public validator keys known to the keymanager.
   //
   // HTTP response status codes:
@@ -127,6 +128,7 @@ service KeyManagement {
       body: "*"
     };
   }
+*/
 
   // ListFeeRecipientByPubkey returns the hex encoded fee recipient address for the given pubkey.
   //
@@ -286,7 +288,7 @@ message DeletedKeystoreStatus {
   string message = 2;
 }
 
-
+/*
 message ListRemoteKeysResponse {
   message Keystore {
     bytes pubkey = 1;
@@ -336,6 +338,7 @@ message DeletedRemoteKeysStatus {
   Status status = 1;
   string message = 2;
 }
+*/
 
 
 message PubkeyRequest {

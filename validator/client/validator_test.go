@@ -36,12 +36,10 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 	validatormock "github.com/theQRL/qrysm/v4/testing/validator-mock"
-	"github.com/theQRL/qrysm/v4/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/v4/validator/client/iface"
 	dbTest "github.com/theQRL/qrysm/v4/validator/db/testing"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/local"
-	remoteweb3signer "github.com/theQRL/qrysm/v4/validator/keymanager/remote-web3signer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -1191,6 +1189,7 @@ func TestIsSyncCommitteeAggregator_OK(t *testing.T) {
 	require.Equal(t, true, aggregator)
 }
 
+/*
 func TestValidator_WaitForKeymanagerInitialization_web3Signer(t *testing.T) {
 	ctx := context.Background()
 	db := dbTest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
@@ -1205,8 +1204,8 @@ func TestValidator_WaitForKeymanagerInitialization_web3Signer(t *testing.T) {
 		bytesutil.ToBytes2592(decodedKey),
 	}
 	v := validator{
-		db:     db,
-		useWeb: false,
+		db: db,
+		//useWeb: false,
 		wallet: w,
 		Web3SignerConfig: &remoteweb3signer.SetupConfig{
 			BaseEndpoint:       "http://localhost:8545",
@@ -1219,7 +1218,9 @@ func TestValidator_WaitForKeymanagerInitialization_web3Signer(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, km)
 }
+*/
 
+/*
 func TestValidator_WaitForKeymanagerInitialization_Web(t *testing.T) {
 	ctx := context.Background()
 	db := dbTest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
@@ -1249,6 +1250,7 @@ func TestValidator_WaitForKeymanagerInitialization_Web(t *testing.T) {
 	})
 	<-wait
 }
+*/
 
 func TestValidator_WaitForKeymanagerInitialization_Interop(t *testing.T) {
 	ctx := context.Background()
@@ -1258,8 +1260,8 @@ func TestValidator_WaitForKeymanagerInitialization_Interop(t *testing.T) {
 	err := db.SaveGenesisValidatorsRoot(ctx, root)
 	require.NoError(t, err)
 	v := validator{
-		db:     db,
-		useWeb: false,
+		db: db,
+		//useWeb: false,
 		interopKeysConfig: &local.InteropKeymanagerConfig{
 			NumValidatorKeys: 2,
 			Offset:           1,
@@ -1308,7 +1310,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					db:                           db,
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
+					//useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 2,
 						Offset:           1,
@@ -1390,7 +1392,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					db:                           db,
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
+					//useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 2,
 						Offset:           1,
@@ -1468,7 +1470,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					db:                           db,
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
+					//useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 2,
 						Offset:           1,
@@ -1529,7 +1531,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					db:                           db,
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
+					//useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
 						Offset:           1,
@@ -1596,7 +1598,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					db:                           db,
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
+					//useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
 						Offset:           1,
@@ -1660,7 +1662,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					db:                           db,
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
+					//useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
 						Offset:           1,
@@ -1712,7 +1714,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					db:                           db,
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
+					//useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
 						Offset:           1,
@@ -1755,7 +1757,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					db:                           db,
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
+					//useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
 						Offset:           1,

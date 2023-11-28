@@ -187,7 +187,7 @@ func TestBeaconApiValidatorClient_ProposeBeaconBlockError(t *testing.T) {
 	jsonRestHandler.EXPECT().PostRestJson(
 		ctx,
 		"/zond/v1/beacon/blocks",
-		map[string]string{"Zond-Consensus-Version": "phase0"},
+		map[string]string{"Zond-Consensus-Version": "capella"},
 		gomock.Any(),
 		nil,
 	).Return(

@@ -32,6 +32,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 				return beaconBlock
 			},
 		},
+
 		{
 			name:                 "nil zond1 data",
 			expectedErrorMessage: "zond1 data is nil",
@@ -41,6 +42,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 				return beaconBlock
 			},
 		},
+
 		{
 			name:                 "bad slot",
 			expectedErrorMessage: "failed to parse slot `foo`",
@@ -56,42 +58,6 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
 				beaconBlock.ProposerIndex = "bar"
-				return beaconBlock
-			},
-		},
-		{
-			name:                 "nil execution payload",
-			expectedErrorMessage: "execution payload is nil",
-			generateData: func() *apimiddleware.BeaconBlockJson {
-				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.ExecutionPayload = nil
-				return beaconBlock
-			},
-		},
-		{
-			name:                 "bad bellatrix fields",
-			expectedErrorMessage: "failed to get the bellatrix fields of the capella block",
-			generateData: func() *apimiddleware.BeaconBlockJson {
-				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.Zond1Data = nil
-				return beaconBlock
-			},
-		},
-		{
-			name:                 "bad withdrawals",
-			expectedErrorMessage: "failed to get withdrawals",
-			generateData: func() *apimiddleware.BeaconBlockJson {
-				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.ExecutionPayload.Withdrawals[0] = nil
-				return beaconBlock
-			},
-		},
-		{
-			name:                 "bad dilithium execution changes",
-			expectedErrorMessage: "failed to get dilithium to execution changes",
-			generateData: func() *apimiddleware.BeaconBlockJson {
-				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.DilithiumToExecutionChanges[0] = nil
 				return beaconBlock
 			},
 		},
@@ -213,15 +179,6 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad phase0 fields",
-			expectedErrorMessage: "failed to get the phase0 fields of the altair block",
-			generateData: func() *apimiddleware.BeaconBlockJson {
-				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.Zond1Data = nil
-				return beaconBlock
-			},
-		},
-		{
 			name:                 "bad sync committee bits",
 			expectedErrorMessage: "failed to decode sync committee bits `foo`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
@@ -249,16 +206,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad altair fields",
-			expectedErrorMessage: "failed to get the altair fields of the bellatrix block",
-			generateData: func() *apimiddleware.BeaconBlockJson {
-				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.Zond1Data = nil
-				return beaconBlock
-			},
-		},
-		{
-			name:                 "bad parent hash",
+			name:                 "bad exec payload parent hash",
 			expectedErrorMessage: "failed to decode execution payload parent hash `foo`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -267,7 +215,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad fee recipient",
+			name:                 "bad exec payload fee recipient",
 			expectedErrorMessage: "failed to decode execution payload fee recipient `bar`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -276,7 +224,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad state root",
+			name:                 "bad exec payload state root",
 			expectedErrorMessage: "failed to decode execution payload state root `foo`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -285,7 +233,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad receipts root",
+			name:                 "bad exec payload receipts root",
 			expectedErrorMessage: "failed to decode execution payload receipts root `bar`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -294,7 +242,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad logs bloom",
+			name:                 "bad exec payload logs bloom",
 			expectedErrorMessage: "failed to decode execution payload logs bloom `foo`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -303,7 +251,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad prev randao",
+			name:                 "bad exec payload prev randao",
 			expectedErrorMessage: "failed to decode execution payload prev randao `bar`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -312,7 +260,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad block number",
+			name:                 "bad exec payload block number",
 			expectedErrorMessage: "failed to parse execution payload block number `foo`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -321,7 +269,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad gas limit",
+			name:                 "bad exec payload gas limit",
 			expectedErrorMessage: "failed to parse execution payload gas limit `bar`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -330,7 +278,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad gas used",
+			name:                 "bad exec payload gas used",
 			expectedErrorMessage: "failed to parse execution payload gas used `foo`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -339,7 +287,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad timestamp",
+			name:                 "bad exec payload timestamp",
 			expectedErrorMessage: "failed to parse execution payload timestamp `bar`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -348,7 +296,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad extra data",
+			name:                 "bad exec payload extra data",
 			expectedErrorMessage: "failed to decode execution payload extra data `foo`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -357,7 +305,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad base fee per gas",
+			name:                 "bad exec payload base fee per gas",
 			expectedErrorMessage: "failed to parse execution payload base fee per gas `bar`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -366,7 +314,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad block hash",
+			name:                 "bad exec payload block hash",
 			expectedErrorMessage: "failed to decode execution payload block hash `foo`",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
@@ -375,11 +323,29 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "bad transactions",
+			name:                 "bad exec payload transactions",
 			expectedErrorMessage: "failed to get execution payload transactions",
 			generateData: func() *apimiddleware.BeaconBlockJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
 				beaconBlock.Body.ExecutionPayload.Transactions[0] = "bar"
+				return beaconBlock
+			},
+		},
+		{
+			name:                 "bad exec payload withdrawals",
+			expectedErrorMessage: "failed to get withdrawals",
+			generateData: func() *apimiddleware.BeaconBlockJson {
+				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
+				beaconBlock.Body.ExecutionPayload.Withdrawals[0] = nil
+				return beaconBlock
+			},
+		},
+		{
+			name:                 "bad dilithium execution changes",
+			expectedErrorMessage: "failed to get dilithium to execution changes",
+			generateData: func() *apimiddleware.BeaconBlockJson {
+				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
+				beaconBlock.Body.DilithiumToExecutionChanges[0] = nil
 				return beaconBlock
 			},
 		},

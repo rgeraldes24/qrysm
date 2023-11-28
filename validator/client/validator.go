@@ -43,7 +43,6 @@ import (
 	"github.com/theQRL/qrysm/v4/validator/graffiti"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/local"
-	remoteweb3signer "github.com/theQRL/qrysm/v4/validator/keymanager/remote-web3signer"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -66,8 +65,8 @@ var (
 )
 
 type validator struct {
-	logValidatorBalances               bool
-	useWeb                             bool
+	logValidatorBalances bool
+	//useWeb                             bool
 	emitAccountMetrics                 bool
 	domainDataLock                     sync.Mutex
 	attLogsLock                        sync.Mutex
@@ -102,9 +101,9 @@ type validator struct {
 	graffiti                           []byte
 	voteStats                          voteStats
 	syncCommitteeStats                 syncCommitteeStats
-	Web3SignerConfig                   *remoteweb3signer.SetupConfig
-	proposerSettings                   *validatorserviceconfig.ProposerSettings
-	walletInitializedChannel           chan *wallet.Wallet
+	//Web3SignerConfig                   *remoteweb3signer.SetupConfig
+	proposerSettings         *validatorserviceconfig.ProposerSettings
+	walletInitializedChannel chan *wallet.Wallet
 }
 
 type validatorStatus struct {
@@ -120,39 +119,60 @@ func (v *validator) Done() {
 
 // WaitForKeymanagerInitialization checks if the validator needs to wait for
 func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
-	genesisRoot, err := v.db.GenesisValidatorsRoot(ctx)
-	if err != nil {
-		return errors.Wrap(err, "unable to retrieve valid genesis validators root while initializing key manager")
+	// genesisRoot, err := v.db.GenesisValidatorsRoot(ctx)
+	// if err != nil {
+	// 	return errors.Wrap(err, "unable to retrieve valid genesis validators root while initializing key manager")
+	// }
+
+	/*
+		if v.useWeb && v.wallet == nil {
+			log.Info("Waiting for keymanager to initialize validator client with web UI")
+			// if wallet is not set, wait for it to be set through the UI
+			km, err := waitForWebWalletInitialization(ctx, v.walletInitializedFeed, v.walletInitializedChannel)
+			if err != nil {
+				return err
+			}
+			v.keyManager = km
+		} else {
+			if v.interopKeysConfig != nil {
+				keyManager, err := local.NewInteropKeymanager(ctx, v.interopKeysConfig.Offset, v.interopKeysConfig.NumValidatorKeys)
+				if err != nil {
+					return errors.Wrap(err, "could not generate interop keys for key manager")
+				}
+				v.keyManager = keyManager
+			} else if v.wallet == nil {
+				return errors.New("wallet not set")
+			} else {
+				if v.Web3SignerConfig != nil {
+					v.Web3SignerConfig.GenesisValidatorsRoot = genesisRoot
+				}
+				keyManager, err := v.wallet.InitializeKeymanager(ctx, accountsiface.InitKeymanagerConfig{ListenForChanges: true //, Web3SignerConfig: v.Web3SignerConfig})
+				if err != nil {
+					return errors.Wrap(err, "could not initialize key manager")
+				}
+				v.keyManager = keyManager
+			}
+		}*/
+
+	if v.interopKeysConfig != nil {
+		keyManager, err := local.NewInteropKeymanager(ctx, v.interopKeysConfig.Offset, v.interopKeysConfig.NumValidatorKeys)
+		if err != nil {
+			return errors.Wrap(err, "could not generate interop keys for key manager")
+		}
+		v.keyManager = keyManager
+	} else if v.wallet == nil {
+		return errors.New("wallet not set")
+	} else {
+		// if v.Web3SignerConfig != nil {
+		// 	v.Web3SignerConfig.GenesisValidatorsRoot = genesisRoot
+		// }
+		keyManager, err := v.wallet.InitializeKeymanager(ctx, accountsiface.InitKeymanagerConfig{ListenForChanges: true /*, Web3SignerConfig: v.Web3SignerConfig*/})
+		if err != nil {
+			return errors.Wrap(err, "could not initialize key manager")
+		}
+		v.keyManager = keyManager
 	}
 
-	if v.useWeb && v.wallet == nil {
-		log.Info("Waiting for keymanager to initialize validator client with web UI")
-		// if wallet is not set, wait for it to be set through the UI
-		km, err := waitForWebWalletInitialization(ctx, v.walletInitializedFeed, v.walletInitializedChannel)
-		if err != nil {
-			return err
-		}
-		v.keyManager = km
-	} else {
-		if v.interopKeysConfig != nil {
-			keyManager, err := local.NewInteropKeymanager(ctx, v.interopKeysConfig.Offset, v.interopKeysConfig.NumValidatorKeys)
-			if err != nil {
-				return errors.Wrap(err, "could not generate interop keys for key manager")
-			}
-			v.keyManager = keyManager
-		} else if v.wallet == nil {
-			return errors.New("wallet not set")
-		} else {
-			if v.Web3SignerConfig != nil {
-				v.Web3SignerConfig.GenesisValidatorsRoot = genesisRoot
-			}
-			keyManager, err := v.wallet.InitializeKeymanager(ctx, accountsiface.InitKeymanagerConfig{ListenForChanges: true, Web3SignerConfig: v.Web3SignerConfig})
-			if err != nil {
-				return errors.Wrap(err, "could not initialize key manager")
-			}
-			v.keyManager = keyManager
-		}
-	}
 	recheckKeys(ctx, v.db, v.keyManager)
 	return nil
 }

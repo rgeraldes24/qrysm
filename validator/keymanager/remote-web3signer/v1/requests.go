@@ -1,5 +1,6 @@
 package v1
 
+/*
 import (
 	"fmt"
 
@@ -328,3 +329,4 @@ func GetValidatorRegistrationSignRequest(request *validatorpb.SignRequest) (*Val
 		},
 	}, nil
 }
+*/

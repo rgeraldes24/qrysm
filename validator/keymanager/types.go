@@ -62,14 +62,14 @@ type KeyStoreExtractor interface {
 }
 
 // PublicKeyAdder allows adding public keys to the keymanager.
-type PublicKeyAdder interface {
-	AddPublicKeys(ctx context.Context, publicKeys [][dilithium2.CryptoPublicKeyBytes]byte) ([]*zondpbservice.ImportedRemoteKeysStatus, error)
-}
+// type PublicKeyAdder interface {
+// 	AddPublicKeys(ctx context.Context, publicKeys [][dilithium2.CryptoPublicKeyBytes]byte) ([]*zondpbservice.ImportedRemoteKeysStatus, error)
+// }
 
 // PublicKeyDeleter allows deleting public keys set in keymanager.
-type PublicKeyDeleter interface {
-	DeletePublicKeys(ctx context.Context, publicKeys [][dilithium2.CryptoPublicKeyBytes]byte) ([]*zondpbservice.DeletedRemoteKeysStatus, error)
-}
+// type PublicKeyDeleter interface {
+// 	DeletePublicKeys(ctx context.Context, publicKeys [][dilithium2.CryptoPublicKeyBytes]byte) ([]*zondpbservice.DeletedRemoteKeysStatus, error)
+// }
 
 type ListKeymanagerAccountConfig struct {
 	ShowDepositData          bool

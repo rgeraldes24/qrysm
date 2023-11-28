@@ -1,12 +1,12 @@
 package derived
 
+/*
 const (
 	password = "secretPassw0rd$1999"
 )
 
 // We test that using a '25th word' mnemonic passphrase leads to different
 // public keys derived than not specifying the passphrase.
-/*
 func TestDerivedKeymanager_MnemnonicPassphrase_DifferentResults(t *testing.T) {
 	ctx := context.Background()
 	wallet := &mock.Wallet{

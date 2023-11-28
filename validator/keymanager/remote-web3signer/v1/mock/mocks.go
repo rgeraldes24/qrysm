@@ -1,5 +1,6 @@
 package mock
 
+/*
 import (
 	"fmt"
 
@@ -594,3 +595,4 @@ func MockContributionAndProof() *v1.ContributionAndProof {
 		SelectionProof: make([]byte, dilithium2.CryptoBytes),
 	}
 }
+*/

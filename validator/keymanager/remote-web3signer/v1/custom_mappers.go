@@ -1,5 +1,6 @@
 package v1
 
+/*
 import (
 	"fmt"
 
@@ -317,3 +318,4 @@ func MapContributionAndProof(contribution *zondpb.ContributionAndProof) (*Contri
 		},
 	}, nil
 }
+*/

@@ -31,7 +31,6 @@ import (
 	validatorHelpers "github.com/theQRL/qrysm/v4/validator/helpers"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/local"
-	remoteweb3signer "github.com/theQRL/qrysm/v4/validator/keymanager/remote-web3signer"
 	"go.opencensus.io/plugin/ocgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -73,13 +72,13 @@ type ValidatorService struct {
 	db                    db.Database
 	grpcHeaders           []string
 	graffiti              []byte
-	Web3SignerConfig      *remoteweb3signer.SetupConfig
-	proposerSettings      *validatorserviceconfig.ProposerSettings
+	//Web3SignerConfig      *remoteweb3signer.SetupConfig
+	proposerSettings *validatorserviceconfig.ProposerSettings
 }
 
 // Config for the validator service.
 type Config struct {
-	UseWeb                     bool
+	//UseWeb                     bool
 	LogValidatorBalances       bool
 	EmitAccountMetrics         bool
 	InteropKeysConfig          *local.InteropKeymanagerConfig
@@ -96,10 +95,10 @@ type Config struct {
 	GrpcHeadersFlag            string
 	GraffitiFlag               string
 	Endpoint                   string
-	Web3SignerConfig           *remoteweb3signer.SetupConfig
-	ProposerSettings           *validatorserviceconfig.ProposerSettings
-	BeaconApiEndpoint          string
-	BeaconApiTimeout           time.Duration
+	//Web3SignerConfig           *remoteweb3signer.SetupConfig
+	ProposerSettings  *validatorserviceconfig.ProposerSettings
+	BeaconApiEndpoint string
+	BeaconApiTimeout  time.Duration
 }
 
 // NewValidatorService creates a new validator service for the service
@@ -123,11 +122,11 @@ func NewValidatorService(ctx context.Context, cfg *Config) (*ValidatorService, e
 		db:                    cfg.ValDB,
 		wallet:                cfg.Wallet,
 		walletInitializedFeed: cfg.WalletInitializedFeed,
-		useWeb:                cfg.UseWeb,
-		interopKeysConfig:     cfg.InteropKeysConfig,
-		graffitiStruct:        cfg.GraffitiStruct,
-		Web3SignerConfig:      cfg.Web3SignerConfig,
-		proposerSettings:      cfg.ProposerSettings,
+		//useWeb:                cfg.UseWeb,
+		interopKeysConfig: cfg.InteropKeysConfig,
+		graffitiStruct:    cfg.GraffitiStruct,
+		//Web3SignerConfig:      cfg.Web3SignerConfig,
+		proposerSettings: cfg.ProposerSettings,
 	}
 
 	dialOpts := ConstructDialOptions(
@@ -209,7 +208,7 @@ func (v *ValidatorService) Start() {
 		aggregatedSlotCommitteeIDCache: aggregatedSlotCommitteeIDCache,
 		voteStats:                      voteStats{startEpoch: primitives.Epoch(^uint64(0))},
 		syncCommitteeStats:             syncCommitteeStats{},
-		useWeb:                         v.useWeb,
+		//useWeb:                         v.useWeb,
 		interopKeysConfig:              v.interopKeysConfig,
 		wallet:                         v.wallet,
 		walletInitializedFeed:          v.walletInitializedFeed,
@@ -217,9 +216,9 @@ func (v *ValidatorService) Start() {
 		graffitiStruct:                 v.graffitiStruct,
 		graffitiOrderedIndex:           graffitiOrderedIndex,
 		eipImportBlacklistedPublicKeys: slashablePublicKeys,
-		Web3SignerConfig:               v.Web3SignerConfig,
-		proposerSettings:               v.proposerSettings,
-		walletInitializedChannel:       make(chan *wallet.Wallet, 1),
+		//Web3SignerConfig:               v.Web3SignerConfig,
+		proposerSettings:         v.proposerSettings,
+		walletInitializedChannel: make(chan *wallet.Wallet, 1),
 	}
 
 	// To resolve a race condition at startup due to the interface

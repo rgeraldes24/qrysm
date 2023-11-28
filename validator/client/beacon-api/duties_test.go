@@ -767,16 +767,10 @@ func TestGetDutiesForEpoch_Error(t *testing.T) {
 
 func TestGetDutiesForEpoch_Valid(t *testing.T) {
 	testCases := []struct {
-		name            string
-		fetchSyncDuties bool
+		name string
 	}{
 		{
-			name:            "fetch attester and proposer duties",
-			fetchSyncDuties: false,
-		},
-		{
-			name:            "fetch attester and sync and proposer duties",
-			fetchSyncDuties: true,
+			name: "fetch attester and sync and proposer duties",
 		},
 	}
 
@@ -854,16 +848,14 @@ func TestGetDutiesForEpoch_Valid(t *testing.T) {
 				nil,
 			).Times(1)
 
-			if testCase.fetchSyncDuties {
-				dutiesProvider.EXPECT().GetSyncDuties(
-					ctx,
-					epoch,
-					multipleValidatorStatus.Indices,
-				).Return(
-					generateValidSyncDuties(pubkeys, validatorIndices),
-					nil,
-				).Times(1)
-			}
+			dutiesProvider.EXPECT().GetSyncDuties(
+				ctx,
+				epoch,
+				multipleValidatorStatus.Indices,
+			).Return(
+				generateValidSyncDuties(pubkeys, validatorIndices),
+				nil,
+			).Times(1)
 
 			var expectedProposerSlots1 []primitives.Slot
 			var expectedProposerSlots2 []primitives.Slot
@@ -958,33 +950,33 @@ func TestGetDutiesForEpoch_Valid(t *testing.T) {
 					Status:          statuses[5],
 					ValidatorIndex:  validatorIndices[5],
 					ProposerSlots:   expectedProposerSlots2,
-					IsSyncCommittee: testCase.fetchSyncDuties,
+					IsSyncCommittee: true,
 				},
 				{
 					PublicKey:       pubkeys[6],
 					Status:          statuses[6],
 					ValidatorIndex:  validatorIndices[6],
 					ProposerSlots:   expectedProposerSlots3,
-					IsSyncCommittee: testCase.fetchSyncDuties,
+					IsSyncCommittee: true,
 				},
 				{
 					PublicKey:       pubkeys[7],
 					Status:          statuses[7],
 					ValidatorIndex:  validatorIndices[7],
 					ProposerSlots:   expectedProposerSlots4,
-					IsSyncCommittee: testCase.fetchSyncDuties,
+					IsSyncCommittee: true,
 				},
 				{
 					PublicKey:       pubkeys[8],
 					Status:          statuses[8],
 					ValidatorIndex:  validatorIndices[8],
-					IsSyncCommittee: testCase.fetchSyncDuties,
+					IsSyncCommittee: true,
 				},
 				{
 					PublicKey:       pubkeys[9],
 					Status:          statuses[9],
 					ValidatorIndex:  validatorIndices[9],
-					IsSyncCommittee: testCase.fetchSyncDuties,
+					IsSyncCommittee: true,
 				},
 				{
 					PublicKey:      pubkeys[10],
@@ -1003,7 +995,6 @@ func TestGetDutiesForEpoch_Valid(t *testing.T) {
 				ctx,
 				epoch,
 				multipleValidatorStatus,
-				//testCase.fetchSyncDuties,
 			)
 			require.NoError(t, err)
 			assert.DeepEqual(t, expectedDuties, duties)

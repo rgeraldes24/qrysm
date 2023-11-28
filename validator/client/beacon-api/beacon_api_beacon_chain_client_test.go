@@ -16,7 +16,6 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/qrysm/validator"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -932,18 +931,14 @@ func TestGetChainHead(t *testing.T) {
 }
 
 func Test_beaconApiBeaconChainClient_GetValidatorPerformance(t *testing.T) {
-	publicKeys := [][2592]byte{
-		bytesutil.ToBytes2592([]byte{1}),
-		bytesutil.ToBytes2592([]byte{2}),
-		bytesutil.ToBytes2592([]byte{3}),
-	}
+	indices := []primitives.ValidatorIndex{0, 1, 2}
 
 	ctx := context.Background()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	request, err := json.Marshal(validator.ValidatorPerformanceRequest{
-		PublicKeys: [][]byte{publicKeys[0][:], publicKeys[2][:], publicKeys[1][:]},
+		Indices: indices,
 	})
 	require.NoError(t, err)
 
@@ -966,8 +961,7 @@ func Test_beaconApiBeaconChainClient_GetValidatorPerformance(t *testing.T) {
 	}
 
 	got, err := c.GetValidatorPerformance(ctx, &zondpb.ValidatorPerformanceRequest{
-		Indices: []primitives.ValidatorIndex{},
-		//PublicKeys: [][]byte{publicKeys[0][:], publicKeys[2][:], publicKeys[1][:]},
+		Indices: indices,
 	})
 	require.NoError(t, err)
 	require.DeepEqual(t, want.PublicKeys, got.PublicKeys)

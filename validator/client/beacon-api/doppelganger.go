@@ -18,10 +18,10 @@ type DoppelGangerInfo struct {
 	response       *zondpb.DoppelGangerResponse_ValidatorResponse
 }
 
+// TODO(rgeraldes24) - return early if we are not past the first 2 epochs.
 func (c *beaconApiValidatorClient) checkDoppelGanger(ctx context.Context, in *zondpb.DoppelGangerRequest) (*zondpb.DoppelGangerResponse, error) {
 	// Check if there is any doppelganger validator for the last 2 epochs.
 	// - Check if the beacon node is synced
-	// - If we are in Phase0, we consider there is no doppelganger.
 	// - If all validators we want to check doppelganger existence were live in local antislashing
 	//   database for the last 2 epochs, we consider there is no doppelganger.
 	//   This is typically the case when we reboot the validator client.
@@ -69,24 +69,6 @@ func (c *beaconApiValidatorClient) checkDoppelGanger(ctx context.Context, in *zo
 	if isSyncing {
 		return nil, errors.New("beacon node not synced")
 	}
-
-	// Retrieve fork version -- Return early if we are in phase0.
-	forkResponse, err := c.getFork(ctx)
-	if err != nil || forkResponse == nil || forkResponse.Data == nil {
-		return nil, errors.Wrapf(err, "failed to get fork")
-	}
-
-	// forkVersionBytes, err := hexutil.Decode(forkResponse.Data.CurrentVersion)
-	// if err != nil {
-	// 	return nil, errors.Wrapf(err, "failed to decode fork version")
-	// }
-
-	// forkVersion := binary.LittleEndian.Uint32(forkVersionBytes)
-
-	// if forkVersion == version.Phase0 {
-	// 	log.Info("Skipping doppelganger check for Phase 0")
-	// 	return buildResponse(stringPubKeys, stringPubKeyToDoppelGangerInfo), nil
-	// }
 
 	// Retrieve current epoch.
 	headers, err := c.getHeaders(ctx)
@@ -152,6 +134,7 @@ func (c *beaconApiValidatorClient) checkDoppelGanger(ctx context.Context, in *zo
 	// Get validators liveness for the last epoch.
 	// We request a state 1 epoch ago. We are guaranteed to have currentEpoch > 2
 	// since we assume that we are not in phase0.
+	// TODO(rgeraldes24) - review
 	previousEpoch := currentEpoch - 1
 
 	indexToPreviousLiveness, err := c.getIndexToLiveness(ctx, previousEpoch, indexes)

@@ -112,8 +112,8 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 				v := validator{
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
-					genesisTime:                  0,
+					//useWeb:                       false,
+					genesisTime: 0,
 				}
 				v.signedValidatorRegistrations[bytesutil.ToBytes2592(validatorKey.PublicKey().Marshal())] = &zondpb.SignedValidatorRegistrationV1{
 					Message: &zondpb.ValidatorRegistrationV1{
@@ -140,8 +140,8 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 				v := validator{
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
-					genesisTime:                  0,
+					//useWeb:                       false,
+					genesisTime: 0,
 				}
 				v.signedValidatorRegistrations[bytesutil.ToBytes2592(validatorKey.PublicKey().Marshal())] = &zondpb.SignedValidatorRegistrationV1{
 					Message: &zondpb.ValidatorRegistrationV1{
@@ -168,8 +168,8 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 				v := validator{
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
-					genesisTime:                  0,
+					//useWeb:                       false,
+					genesisTime: 0,
 				}
 				v.signedValidatorRegistrations[bytesutil.ToBytes2592(validatorKey.PublicKey().Marshal())] = &zondpb.SignedValidatorRegistrationV1{
 					Message: &zondpb.ValidatorRegistrationV1{
@@ -196,8 +196,8 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 				v := validator{
 					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					useWeb:                       false,
-					genesisTime:                  0,
+					//useWeb:                       false,
+					genesisTime: 0,
 				}
 				return &v
 			},

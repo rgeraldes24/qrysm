@@ -1,5 +1,6 @@
 package remote_web3signer
 
+/*
 import (
 	"context"
 	"encoding/hex"
@@ -337,3 +338,4 @@ func TestKeymanager_DeletePublicKeys(t *testing.T) {
 		require.Equal(t, zondpbservice.DeletedRemoteKeysStatus_NOT_FOUND, status.Status)
 	}
 }
+*/

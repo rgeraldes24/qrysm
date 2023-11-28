@@ -18,7 +18,6 @@ import (
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	"github.com/theQRL/qrysm/v4/validator/client"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
-	"github.com/theQRL/qrysm/v4/validator/keymanager/derived"
 	slashingprotection "github.com/theQRL/qrysm/v4/validator/slashing-protection-history"
 	"github.com/theQRL/qrysm/v4/validator/slashing-protection-history/format"
 	"google.golang.org/grpc"
@@ -54,9 +53,9 @@ func (s *Server) ListKeystores(
 		keystoreResponse[i] = &zondpbservice.ListKeystoresResponse_Keystore{
 			ValidatingPubkey: pubKeys[i][:],
 		}
-		if s.wallet.KeymanagerKind() == keymanager.Derived {
-			keystoreResponse[i].DerivationPath = fmt.Sprintf(derived.ValidatingKeyDerivationPathTemplate, i)
-		}
+		// if s.wallet.KeymanagerKind() == keymanager.Derived {
+		// 	keystoreResponse[i].DerivationPath = fmt.Sprintf(derived.ValidatingKeyDerivationPathTemplate, i)
+		// }
 	}
 	return &zondpbservice.ListKeystoresResponse{
 		Data: keystoreResponse,
@@ -265,6 +264,7 @@ func (s *Server) slashingProtectionHistoryForDeletedKeys(
 	return slashingprotection.ExportStandardProtectionJSON(ctx, s.valDB, filteredKeys...)
 }
 
+/*
 // ListRemoteKeys returns a list of all public keys defined for web3signer keymanager type.
 func (s *Server) ListRemoteKeys(ctx context.Context, _ *empty.Empty) (*zondpbservice.ListRemoteKeysResponse, error) {
 	if !s.walletInitialized {
@@ -351,6 +351,7 @@ func groupImportRemoteKeysErrors(req *zondpbservice.ImportRemoteKeysRequest, err
 	return statuses
 }
 
+
 // DeleteRemoteKeys deletes a list of public keys defined for web3signer keymanager type.
 func (s *Server) DeleteRemoteKeys(ctx context.Context, req *zondpbservice.DeleteRemoteKeysRequest) (*zondpbservice.DeleteRemoteKeysResponse, error) {
 	if !s.walletInitialized {
@@ -395,6 +396,7 @@ func groupDeleteRemoteKeysErrors(req *zondpbservice.DeleteRemoteKeysRequest, err
 	}
 	return statuses
 }
+*/
 
 func (s *Server) GetGasLimit(_ context.Context, req *zondpbservice.PubkeyRequest) (*zondpbservice.GetGasLimitResponse, error) {
 	if s.validatorService == nil {

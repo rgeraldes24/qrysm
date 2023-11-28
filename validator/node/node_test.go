@@ -25,7 +25,6 @@ import (
 	"github.com/theQRL/qrysm/v4/validator/db/iface"
 	dbTest "github.com/theQRL/qrysm/v4/validator/db/testing"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
-	remoteweb3signer "github.com/theQRL/qrysm/v4/validator/keymanager/remote-web3signer"
 	"github.com/urfave/cli/v2"
 )
 
@@ -54,7 +53,7 @@ func TestNode_Builds(t *testing.T) {
 		accounts.WithWalletDir(dir),
 		accounts.WithKeymanagerType(keymanager.Local),
 		accounts.WithWalletPassword(walletPassword),
-		accounts.WithSkipMnemonicConfirm(true),
+		//accounts.WithSkipMnemonicConfirm(true),
 	}
 	acc, err := accounts.NewCLIManager(opts...)
 	require.NoError(t, err)
@@ -75,6 +74,7 @@ func TestClearDB(t *testing.T) {
 	require.LogsContain(t, hook, "Removing database")
 }
 
+/*
 // TestWeb3SignerConfig tests the web3 signer config returns the correct values.
 func TestWeb3SignerConfig(t *testing.T) {
 	pubkey1decoded, err := hexutil.Decode("0xa99a76ed7796f7be22d5b7e85deeb7c5677e88e511e0b337618f8c4eb61349b4bf2d153f649f7b53359fe8b94a38e44c")
@@ -207,6 +207,7 @@ func TestWeb3SignerConfig(t *testing.T) {
 		})
 	}
 }
+*/
 
 func TestProposerSettings(t *testing.T) {
 	hook := logtest.NewGlobal()
