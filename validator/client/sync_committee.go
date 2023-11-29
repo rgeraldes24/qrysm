@@ -133,6 +133,8 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 		if !isAggregator {
 			continue
 		}
+		fmt.Println("Chegou")
+
 		subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
 		subnet := uint64(comIdx) / subCommitteeSize
 		contribution, err := v.validatorClient.GetSyncCommitteeContribution(ctx, &zondpb.SyncCommitteeContributionRequest{

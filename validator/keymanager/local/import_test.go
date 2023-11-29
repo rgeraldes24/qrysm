@@ -129,6 +129,7 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 		}
 		require.LogsContain(t, hook, "Successfully imported validator key(s)")
 	})
+
 	t.Run("each imported keystore with a different password succeeds", func(t *testing.T) {
 		numKeystores := 5
 		keystores := make([]*keymanager.Keystore, numKeystores)
@@ -149,6 +150,7 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 			require.Equal(t, zondpbservice.ImportedKeystoreStatus_IMPORTED, status.Status)
 		}
 	})
+
 	t.Run("some succeed, some fail to decrypt, some duplicated", func(t *testing.T) {
 		keystores := make([]*keymanager.Keystore, 0)
 		passwords := make([]string, 0)
@@ -198,7 +200,9 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 		require.NoError(t, err)
 		require.LogsContain(t, hook, fmt.Sprintf("%#x", bytesutil.Trunc(b)))
 		require.LogsContain(t, hook, "Successfully imported validator key(s)")
+
 	})
+
 	t.Run("All fail or duplicated", func(t *testing.T) {
 		// First keystore is normal.
 		keystore1 := createRandomKeystore(t, password)
