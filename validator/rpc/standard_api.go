@@ -584,7 +584,7 @@ func (s *Server) SetFeeRecipientByPubkey(ctx context.Context, req *zondpbservice
 
 	if !common.IsHexAddress(encoded) {
 		return nil, status.Error(
-			codes.InvalidArgument, "Fee recipient is not a valid Ethereum address")
+			codes.InvalidArgument, "Fee recipient is not a valid Zond address")
 	}
 	settings := s.validatorService.ProposerSettings()
 	switch {

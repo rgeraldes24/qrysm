@@ -266,7 +266,7 @@ func TestSubmitSignedContributionAndProof_BadDomain(t *testing.T) {
 func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) {
 	hook := logTest.NewGlobal()
 	// Hardcode secret key in order to have a valid aggregator signature.
-	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd")
+	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4d")
 	assert.NoError(t, err)
 	validatorKey, err := dilithium.SecretKeyFromBytes(rawKey)
 	assert.NoError(t, err)

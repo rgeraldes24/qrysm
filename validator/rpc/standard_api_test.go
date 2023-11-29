@@ -1080,7 +1080,7 @@ func TestServer_SetGasLimit_InvalidFeeRecipient(t *testing.T) {
 	}
 
 	_, err = s.SetFeeRecipientByPubkey(ctx, req)
-	require.ErrorContains(t, "Fee recipient is not a valid Ethereum address", err)
+	require.ErrorContains(t, "Fee recipient is not a valid Zond address", err)
 }
 
 func TestServer_DeleteFeeRecipientByPubkey(t *testing.T) {

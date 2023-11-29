@@ -58,7 +58,6 @@ import (
 	validatormiddleware "github.com/theQRL/qrysm/v4/validator/rpc/apimiddleware"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/protobuf/encoding/protojson"
-	"gopkg.in/yaml.v2"
 )
 
 // ValidatorClient defines an instance of an Zond validator that manages
@@ -538,12 +537,12 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 			return nil, err
 		}
 	}
+
 	if cliCtx.IsSet(flags.ProposerSettingsURLFlag.Name) {
 		if err := unmarshalFromURL(cliCtx.Context, cliCtx.String(flags.ProposerSettingsURLFlag.Name), &fileConfig); err != nil {
 			return nil, err
 		}
 	}
-
 	// this condition triggers if SuggestedFeeRecipientFlag,ProposerSettingsFlag or ProposerSettingsURLFlag did not create any settings
 	if fileConfig == nil {
 		// Checks the db or enable builder settings before starting the node without proposer settings
@@ -552,7 +551,6 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 	}
 	// convert file config to proposer config for internal use
 	vpSettings := &validatorServiceConfig.ProposerSettings{}
-
 	// default fileConfig is mandatory
 	if fileConfig.DefaultConfig == nil {
 		return nil, errors.New("default fileConfig is required, proposer settings file is either empty or an incorrect format")
@@ -564,6 +562,7 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 	if err != nil {
 		return nil, err
 	}
+
 	if err := warnNonChecksummedAddress(fileConfig.DefaultConfig.FeeRecipient); err != nil {
 		return nil, err
 	}
@@ -573,7 +572,6 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 		},
 		BuilderConfig: validatorServiceConfig.ToBuilderConfig(fileConfig.DefaultConfig.Builder),
 	}
-
 	if builderConfigFromFlag != nil {
 		config := builderConfigFromFlag.Clone()
 		if config.GasLimit == validator.Uint64(params.BeaconConfig().DefaultBuilderGasLimit) && vpSettings.DefaultConfig.BuilderConfig != nil {
@@ -583,7 +581,6 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 	} else if vpSettings.DefaultConfig.BuilderConfig != nil {
 		vpSettings.DefaultConfig.BuilderConfig.GasLimit = reviewGasLimit(vpSettings.DefaultConfig.BuilderConfig.GasLimit)
 	}
-
 	if psExists {
 		// if settings exist update the default
 		if err := db.UpdateProposerSettingsDefault(cliCtx.Context, vpSettings.DefaultConfig); err != nil {
@@ -721,10 +718,10 @@ func warnNonChecksummedAddress(feeRecipient string) error {
 		return errors.Wrapf(err, "could not decode fee recipient %s", feeRecipient)
 	}
 	if !mixedcaseAddress.ValidChecksum() {
-		log.Warnf("Fee recipient %s is not a checksum Ethereum address. "+
+		log.Warnf("Fee recipient %s is not a checksum Zond address. "+
 			"The checksummed address is %s and will be used as the fee recipient. "+
 			"We recommend using a mixed-case address (checksum) "+
-			"to prevent spelling mistakes in your fee recipient Ethereum address", feeRecipient, mixedcaseAddress.Address().Hex())
+			"to prevent spelling mistakes in your fee recipient Zond address", feeRecipient, mixedcaseAddress.Address().Hex())
 	}
 	return nil
 }
@@ -967,8 +964,8 @@ func unmarshalFromFile(ctx context.Context, from string, to interface{}) error {
 		return errors.Wrap(err, "failed to open file")
 	}
 
-	if err := yaml.Unmarshal(b, to); err != nil {
-		return errors.Wrap(err, "failed to unmarshal yaml file")
+	if err := json.Unmarshal(b, to); err != nil {
+		return errors.Wrap(err, "failed to unmarshal json file")
 	}
 
 	return nil

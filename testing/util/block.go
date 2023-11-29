@@ -481,7 +481,7 @@ func HydrateBlindedBeaconBlockBody(b *zondpb.BlindedBeaconBlockBody) *zondpb.Bli
 	if b.SyncAggregate == nil {
 		b.SyncAggregate = &zondpb.SyncAggregate{
 			SyncCommitteeBits:       make([]byte, fieldparams.SyncAggregateSyncCommitteeBytesLength),
-			SyncCommitteeSignatures: make([][]byte, fieldparams.SyncCommitteeLength),
+			SyncCommitteeSignatures: make([][]byte, 0),
 		}
 	}
 	if b.ExecutionPayloadHeader == nil {
@@ -549,7 +549,7 @@ func HydrateV1BlindedBeaconBlockBody(b *v1.BlindedBeaconBlockBody) *v1.BlindedBe
 	if b.SyncAggregate == nil {
 		b.SyncAggregate = &v1.SyncAggregate{
 			SyncCommitteeBits:       make([]byte, 64),
-			SyncCommitteeSignatures: make([][]byte, 512),
+			SyncCommitteeSignatures: make([][]byte, 0),
 		}
 	}
 	if b.ExecutionPayloadHeader == nil {
