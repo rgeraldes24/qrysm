@@ -64,6 +64,7 @@ func PubKeyFromHex(str string) ([dilithium2.CryptoPublicKeyBytes]byte, error) {
 	}
 	var pk [dilithium2.CryptoPublicKeyBytes]byte
 	copy(pk[:], pubKeyBytes[:dilithium2.CryptoPublicKeyBytes])
+
 	return pk, nil
 }
 

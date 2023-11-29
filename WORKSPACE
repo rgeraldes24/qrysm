@@ -194,7 +194,7 @@ filegroup(
     visibility = ["//visibility:public"],
 )
     """,
-    sha256 = "e5a77bdcf2ea2d9e35482ec2571ea129507e02b9a8e3d04c43e2abd422c2202b",
+    sha256 = "d4c333e53aaedc29fbec9406022c4a43511dd5310007d5d264aeaaff92e087d3",
     url = "https://github.com/rgeraldes24/slashing-protection-interchange-tests/releases/download/v0.1.0/eip-3076-tests-0.1.0.tar.gz",
 )
 

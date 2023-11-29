@@ -174,7 +174,6 @@ func IsSyncCommitteeAggregator(sig []byte) (bool, error) {
 	cfg := params.BeaconConfig()
 	modulo := math.Max(1, cfg.SyncCommitteeSize/cfg.SyncCommitteeSubnetCount/cfg.TargetAggregatorsPerSyncSubcommittee)
 	hashedSig := hash.Hash(sig)
-	fmt.Println(bytesutil.FromBytes8(hashedSig[:8]) % modulo)
 	return bytesutil.FromBytes8(hashedSig[:8])%modulo == 0, nil
 }
 

@@ -81,6 +81,7 @@ func TestEIP3076SpecTests(t *testing.T) {
 			if tt.Name == "" {
 				t.Skip("Skipping eip3076TestCase with empty name")
 			}
+
 			for _, step := range tt.Steps {
 				// Set up validator client, one new validator client per eip3076TestCase.
 				// This ensures we initialize a new (empty) slashing protection database.

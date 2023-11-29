@@ -46,6 +46,7 @@ func (v *validator) slashableAttestationCheck(
 	if err != nil {
 		return err
 	}
+
 	signingRootsDiffer := slashings.SigningRootsDiffer(existingSigningRoot, signingRoot)
 
 	// Based on EIP3076, validator should refuse to sign any attestation with target epoch less
@@ -94,5 +95,6 @@ func (v *validator) slashableAttestationCheck(
 			return errors.New(failedPostAttSignExternalErr)
 		}
 	}
+
 	return nil
 }
