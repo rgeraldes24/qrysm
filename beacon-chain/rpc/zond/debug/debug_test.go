@@ -19,7 +19,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func TestGetBeaconStateV2(t *testing.T) {
+func TestGetBeaconState(t *testing.T) {
 	ctx := context.Background()
 	db := dbTest.SetupDB(t)
 
@@ -124,7 +124,7 @@ func TestGetBeaconStateSSZ(t *testing.T) {
 	})
 }
 
-func TestListForkChoiceHeadsV2(t *testing.T) {
+func TestListForkChoiceHeads(t *testing.T) {
 	ctx := context.Background()
 
 	expectedSlotsAndRoots := []struct {

@@ -196,7 +196,8 @@ func GenerateAttestations(
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateAttestation(a *zondpb.Attestation) *zondpb.Attestation {
 	if a.Signatures == nil {
-		a.Signatures = make([][]byte, 0)
+		sig := make([]byte, 4595)
+		a.Signatures = [][]byte{sig}
 	}
 	if a.ParticipationBits == nil {
 		a.ParticipationBits = make([]byte, 1)
@@ -212,7 +213,8 @@ func HydrateAttestation(a *zondpb.Attestation) *zondpb.Attestation {
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateV1Attestation(a *attv1.Attestation) *attv1.Attestation {
 	if a.Signatures == nil {
-		a.Signatures = make([][]byte, 1)
+		sig := make([]byte, 4595)
+		a.Signatures = [][]byte{sig}
 	}
 	if a.ParticipationBits == nil {
 		a.ParticipationBits = make([]byte, 1)
@@ -270,7 +272,8 @@ func HydrateV1AttestationData(d *attv1.AttestationData) *attv1.AttestationData {
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateIndexedAttestation(a *zondpb.IndexedAttestation) *zondpb.IndexedAttestation {
 	if a.Signatures == nil {
-		a.Signatures = make([][]byte, 1)
+		sig := make([]byte, 4595)
+		a.Signatures = [][]byte{sig}
 	}
 	if a.Data == nil {
 		a.Data = &zondpb.AttestationData{}

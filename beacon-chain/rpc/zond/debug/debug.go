@@ -78,7 +78,7 @@ func (ds *Server) GetBeaconStateSSZ(ctx context.Context, req *zondpbv1.BeaconSta
 
 // ListForkChoiceHeads retrieves the leaves of the current fork choice tree.
 func (ds *Server) ListForkChoiceHeads(ctx context.Context, _ *emptypb.Empty) (*zondpbv1.ForkChoiceHeadsResponse, error) {
-	ctx, span := trace.StartSpan(ctx, "debug.ListForkChoiceHeadsV2")
+	ctx, span := trace.StartSpan(ctx, "debug.ListForkChoiceHeads")
 	defer span.End()
 
 	headRoots, headSlots := ds.HeadFetcher.ChainHeads()

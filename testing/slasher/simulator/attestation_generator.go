@@ -6,8 +6,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
@@ -81,11 +79,15 @@ func (s *Simulator) generateAttestationsForSlot(
 			attestations = append(attestations, att)
 			if rand.NewGenerator().Float64() < s.srvConfig.Params.AttesterSlashingProbab {
 				slashableAtt := makeSlashableFromAtt(att, []uint64{indices[0]})
-				aggSig, err := s.aggregateSigForAttestation(beaconState, slashableAtt)
-				if err != nil {
-					return nil, nil, err
-				}
-				slashableAtt.Signature = aggSig.Marshal()
+				// TODO(rgeraldes24) - review
+				/*
+					aggSig, err := s.aggregateSigForAttestation(beaconState, slashableAtt)
+					if err != nil {
+						return nil, nil, err
+					}
+				*/
+				//slashableAtt.Signature = aggSig.Marshal()
+				slashableAtt.Signatures = [][]byte{}
 				slashedIndices = append(slashedIndices, slashableAtt.AttestingIndices...)
 				slashings = append(slashings, &zondpb.AttesterSlashing{
 					Attestation_1: att,
@@ -152,7 +154,7 @@ func makeSlashableFromAtt(att *zondpb.IndexedAttestation, indices []uint64) *zon
 	return &zondpb.IndexedAttestation{
 		AttestingIndices: indices,
 		Data:             attData,
-		Signature:        params.BeaconConfig().EmptyDilithiumSignature[:],
+		Signatures:       [][]byte{params.BeaconConfig().EmptyDilithiumSignature[:]},
 	}
 }
 
@@ -173,6 +175,6 @@ func makeDoubleVoteFromAtt(att *zondpb.IndexedAttestation, indices []uint64) *zo
 	return &zondpb.IndexedAttestation{
 		AttestingIndices: indices,
 		Data:             attData,
-		Signature:        params.BeaconConfig().EmptyDilithiumSignature[:],
+		Signatures:       [][]byte{params.BeaconConfig().EmptyDilithiumSignature[:]},
 	}
 }

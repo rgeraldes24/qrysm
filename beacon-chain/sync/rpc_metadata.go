@@ -103,14 +103,6 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 	}
 	// Defensive check to ensure valid objects are being sent.
 	topicVersion := ""
-	/*
-		switch msg.Version() {
-		case version.Phase0:
-			topicVersion = p2p.SchemaVersionV1
-		case version.Altair:
-			topicVersion = p2p.SchemaVersionV2
-		}
-	*/
 	topicVersion = p2p.SchemaVersionV1
 	if err := validateVersion(topicVersion, stream); err != nil {
 		return nil, err

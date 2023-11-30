@@ -107,7 +107,7 @@ func (s *SyncCommitteeContribution) ToConsensus() (*zond.SyncCommitteeContributi
 	if err != nil {
 		return nil, NewDecodeError(err, "SubcommitteeIndex")
 	}
-	aggBits, err := hexutil.Decode(s.ParticipationBits)
+	participationBits, err := hexutil.Decode(s.ParticipationBits)
 	if err != nil {
 		return nil, NewDecodeError(err, "ParticipationBits")
 	}
@@ -124,7 +124,7 @@ func (s *SyncCommitteeContribution) ToConsensus() (*zond.SyncCommitteeContributi
 		Slot:              primitives.Slot(slot),
 		BlockRoot:         bbRoot,
 		SubcommitteeIndex: subcommitteeIndex,
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 		Signatures:        sigs,
 	}, nil
 }
@@ -166,7 +166,7 @@ func (a *AggregateAttestationAndProof) ToConsensus() (*zond.AggregateAttestation
 }
 
 func (a *Attestation) ToConsensus() (*zond.Attestation, error) {
-	aggBits, err := hexutil.Decode(a.ParticipationBits)
+	participationBits, err := hexutil.Decode(a.ParticipationBits)
 	if err != nil {
 		return nil, NewDecodeError(err, "ParticipationBits")
 	}
@@ -184,7 +184,7 @@ func (a *Attestation) ToConsensus() (*zond.Attestation, error) {
 	}
 
 	return &zond.Attestation{
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 		Data:              data,
 		Signatures:        sigs,
 	}, nil

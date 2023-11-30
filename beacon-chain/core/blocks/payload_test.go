@@ -596,7 +596,7 @@ func Test_ProcessPayload(t *testing.T) {
 
 // TODO(rgeraldes24) - copy tests above if necessary
 func Test_ProcessPayload(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateCapella(t, 1)
+	st, _ := util.DeterministicGenesisState(t, 1)
 	header, err := emptyPayloadHeader()
 	require.NoError(t, err)
 	require.NoError(t, st.SetLatestExecutionPayloadHeader(header))

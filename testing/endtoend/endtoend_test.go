@@ -630,7 +630,7 @@ func (r *testRunner) multiScenarioMulticlient(ec *e2etypes.EvaluationContext, ep
 		// Set it for qrysm beacon node.
 		component, err := r.comHandler.zond1Proxy.ComponentAtIndex(0)
 		require.NoError(r.t, err)
-		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayloadV2", func() interface{} {
+		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayload", func() interface{} {
 			return &enginev1.PayloadStatus{
 				Status:          enginev1.PayloadStatus_SYNCING,
 				LatestValidHash: make([]byte, 32),
@@ -641,7 +641,7 @@ func (r *testRunner) multiScenarioMulticlient(ec *e2etypes.EvaluationContext, ep
 		// Set it for lighthouse beacon node.
 		component, err = r.comHandler.zond1Proxy.ComponentAtIndex(2)
 		require.NoError(r.t, err)
-		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayloadV2", func() interface{} {
+		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayload", func() interface{} {
 			return &enginev1.PayloadStatus{
 				Status:          enginev1.PayloadStatus_SYNCING,
 				LatestValidHash: make([]byte, 32),
@@ -650,7 +650,7 @@ func (r *testRunner) multiScenarioMulticlient(ec *e2etypes.EvaluationContext, ep
 			return true
 		})
 
-		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_forkchoiceUpdatedV2", func() interface{} {
+		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_forkchoiceUpdated", func() interface{} {
 			return &ForkchoiceUpdatedResponse{
 				Status: &enginev1.PayloadStatus{
 					Status:          enginev1.PayloadStatus_SYNCING,
@@ -670,17 +670,17 @@ func (r *testRunner) multiScenarioMulticlient(ec *e2etypes.EvaluationContext, ep
 		require.NoError(r.t, err)
 		engineProxy, ok := component.(e2etypes.EngineProxy)
 		require.Equal(r.t, true, ok)
-		engineProxy.RemoveRequestInterceptor("engine_newPayloadV2")
-		engineProxy.ReleaseBackedUpRequests("engine_newPayloadV2")
+		engineProxy.RemoveRequestInterceptor("engine_newPayload")
+		engineProxy.ReleaseBackedUpRequests("engine_newPayload")
 
 		// Remove for lighthouse too
 		component, err = r.comHandler.zond1Proxy.ComponentAtIndex(2)
 		require.NoError(r.t, err)
 		engineProxy, ok = component.(e2etypes.EngineProxy)
 		require.Equal(r.t, true, ok)
-		engineProxy.RemoveRequestInterceptor("engine_newPayloadV2")
-		engineProxy.RemoveRequestInterceptor("engine_forkchoiceUpdatedV2")
-		engineProxy.ReleaseBackedUpRequests("engine_newPayloadV2")
+		engineProxy.RemoveRequestInterceptor("engine_newPayload")
+		engineProxy.RemoveRequestInterceptor("engine_forkchoiceUpdated")
+		engineProxy.ReleaseBackedUpRequests("engine_newPayload")
 
 		return true
 	case 13, 14, 18, 19:
@@ -737,7 +737,7 @@ func (r *testRunner) multiScenario(ec *e2etypes.EvaluationContext, epoch uint64,
 	case 21:
 		component, err := r.comHandler.zond1Proxy.ComponentAtIndex(0)
 		require.NoError(r.t, err)
-		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayloadV2", func() interface{} {
+		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayload", func() interface{} {
 			return &enginev1.PayloadStatus{
 				Status:          enginev1.PayloadStatus_SYNCING,
 				LatestValidHash: make([]byte, 32),
@@ -754,8 +754,8 @@ func (r *testRunner) multiScenario(ec *e2etypes.EvaluationContext, epoch uint64,
 		require.NoError(r.t, err)
 		engineProxy, ok := component.(e2etypes.EngineProxy)
 		require.Equal(r.t, true, ok)
-		engineProxy.RemoveRequestInterceptor("engine_newPayloadV2")
-		engineProxy.ReleaseBackedUpRequests("engine_newPayloadV2")
+		engineProxy.RemoveRequestInterceptor("engine_newPayload")
+		engineProxy.ReleaseBackedUpRequests("engine_newPayload")
 
 		return true
 	case 13, 14, 18, 19, 23, 24:

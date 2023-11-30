@@ -350,8 +350,8 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 			SignatureDomain: make([]byte, 32),
 		}, nil)
 
-	aggBits := bitfield.NewBitvector128()
-	aggBits.SetBitAt(0, true)
+	participationBits := bitfield.NewBitvector128()
+	participationBits.SetBitAt(0, true)
 	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
 		gomock.Any(), // ctx
 		&zondpb.SyncCommitteeContributionRequest{
@@ -362,7 +362,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	).Return(&zondpb.SyncCommitteeContribution{
 		BlockRoot:         make([]byte, fieldparams.RootLength),
 		Signatures:        [][]byte{},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}, nil)
 
 	m.validatorClient.EXPECT().
@@ -428,8 +428,8 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 			SignatureDomain: make([]byte, 32),
 		}, nil)
 
-	aggBits := bitfield.NewBitvector128()
-	aggBits.SetBitAt(0, true)
+	participationBits := bitfield.NewBitvector128()
+	participationBits.SetBitAt(0, true)
 	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
 		gomock.Any(), // ctx
 		&zondpb.SyncCommitteeContributionRequest{
@@ -440,7 +440,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	).Return(&zondpb.SyncCommitteeContribution{
 		BlockRoot:         make([]byte, fieldparams.RootLength),
 		Signatures:        [][]byte{},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}, nil)
 
 	m.validatorClient.EXPECT().

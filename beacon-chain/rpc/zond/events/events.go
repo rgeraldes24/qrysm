@@ -149,8 +149,8 @@ func handleBlockOperationEvents(
 		if !ok {
 			return nil
 		}
-		v2Data := migration.V1Alpha1ToV1SignedContributionAndProof(contributionData.Contribution)
-		return streamData(stream, SyncCommitteeContributionTopic, v2Data)
+		v1Data := migration.V1Alpha1ToV1SignedContributionAndProof(contributionData.Contribution)
+		return streamData(stream, SyncCommitteeContributionTopic, v1Data)
 	case operation.DilithiumToExecutionChangeReceived:
 		if _, ok := requestedTopics[DilithiumToExecutionChangeTopic]; !ok {
 			return nil
@@ -159,8 +159,8 @@ func handleBlockOperationEvents(
 		if !ok {
 			return nil
 		}
-		v2Change := migration.V1Alpha1ToV1SignedDilithiumToExecChange(changeData.Change)
-		return streamData(stream, DilithiumToExecutionChangeTopic, v2Change)
+		v1Change := migration.V1Alpha1ToV1SignedDilithiumToExecChange(changeData.Change)
+		return streamData(stream, DilithiumToExecutionChangeTopic, v1Change)
 
 	default:
 		return nil

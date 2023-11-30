@@ -29,7 +29,7 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
 		Zond1Data:  zond1Data,
@@ -62,7 +62,7 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 	require.NoError(t, err, "Could not generate proof")
 
 	deposit.Proof = proof
-	beaconState, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Zond1Data: &zondpb.Zond1Data{
 			DepositRoot: []byte{0},
 			BlockHash:   []byte{1},
@@ -87,7 +87,7 @@ func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
 		Zond1Data:  zond1Data,
@@ -145,7 +145,7 @@ func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T)
 	balances := []uint64{0, 50}
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
-	beaconState, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
 		Zond1Data: &zondpb.Zond1Data{
@@ -173,7 +173,7 @@ func TestProcessDeposit_AddsNewValidatorDeposit(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
 		Zond1Data:  zond1Data,
@@ -216,7 +216,7 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
 		Zond1Data:  zond1Data,

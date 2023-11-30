@@ -159,8 +159,8 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(context.Background(), s, root))
 
-	aggBits := bitfield.NewBitlist(3)
-	aggBits.SetBitAt(0, true)
+	participationBits := bitfield.NewBitlist(3)
+	participationBits.SetBitAt(0, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			Slot:            1,
@@ -168,7 +168,7 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 		Signatures:        [][]byte{},
 	}
 
@@ -243,8 +243,8 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	aggBits := bitfield.NewBitlist(3)
-	aggBits.SetBitAt(0, true)
+	participationBits := bitfield.NewBitlist(3)
+	participationBits.SetBitAt(0, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			Slot:            1,
@@ -252,7 +252,7 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 		Signatures:        [][]byte{},
 	}
 
@@ -312,8 +312,8 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(context.Background(), s, root))
 
-	aggBits := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
-	aggBits.SetBitAt(0, true)
+	participationBits := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
+	participationBits.SetBitAt(0, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			Slot:            1,
@@ -321,7 +321,7 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
@@ -416,8 +416,8 @@ func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(context.Background(), s, root))
 
-	aggBits := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
-	aggBits.SetBitAt(0, true)
+	participationBits := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
+	participationBits.SetBitAt(0, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			Slot:            1,
@@ -425,7 +425,7 @@ func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
@@ -536,15 +536,15 @@ func TestValidateAggregateAndProof_BadBlock(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(context.Background(), s, root))
 
-	aggBits := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
-	aggBits.SetBitAt(0, true)
+	participationBits := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
+	participationBits.SetBitAt(0, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			BeaconBlockRoot: root[:],
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
@@ -627,15 +627,15 @@ func TestValidateAggregateAndProof_RejectWhenAttEpochDoesntEqualTargetEpoch(t *t
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(context.Background(), s, root))
 
-	aggBits := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
-	aggBits.SetBitAt(0, true)
+	participationBits := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
+	participationBits.SetBitAt(0, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			BeaconBlockRoot: root[:],
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 1, Root: root[:]},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)

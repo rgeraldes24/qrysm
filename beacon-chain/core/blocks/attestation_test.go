@@ -25,12 +25,12 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 		Source: &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		Target: &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 	})
-	aggBits1 := bitfield.NewBitlist(3)
-	aggBits1.SetBitAt(0, true)
-	aggBits1.SetBitAt(1, true)
+	participationBits1 := bitfield.NewBitlist(3)
+	participationBits1.SetBitAt(0, true)
+	participationBits1.SetBitAt(1, true)
 	att1 := &zondpb.Attestation{
 		Data:            data,
-		ParticipationBits: aggBits1,
+		ParticipationBits: participationBits1,
 	}
 
 	cfc := beaconState.CurrentJustifiedCheckpoint()
@@ -52,12 +52,12 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 	}
 	att1.Signature = bls.AggregateSignatures(sigs).Marshal()
 
-	aggBits2 := bitfield.NewBitlist(3)
-	aggBits2.SetBitAt(1, true)
-	aggBits2.SetBitAt(2, true)
+	participationBits2 := bitfield.NewBitlist(3)
+	participationBits2.SetBitAt(1, true)
+	participationBits2.SetBitAt(2, true)
 	att2 := &zondpb.Attestation{
 		Data:            data,
-		ParticipationBits: aggBits2,
+		ParticipationBits: participationBits2,
 	}
 
 	committee, err = helpers.BeaconCommitteeFromState(context.Background(), beaconState, att2.Data.Slot, att2.Data.CommitteeIndex)
@@ -99,8 +99,8 @@ func TestProcessAttestationsNoVerify_OK(t *testing.T) {
 
 	beaconState, _ := util.DeterministicGenesisState(t, 100)
 
-	aggBits := bitfield.NewBitlist(3)
-	aggBits.SetBitAt(1, true)
+	participationBits := bitfield.NewBitlist(3)
+	participationBits.SetBitAt(1, true)
 	var mockRoot [32]byte
 	copy(mockRoot[:], "hello-world")
 	att := &zondpb.Attestation{
@@ -108,7 +108,7 @@ func TestProcessAttestationsNoVerify_OK(t *testing.T) {
 			Source: &zondpb.Checkpoint{Epoch: 0, Root: mockRoot[:]},
 			Target: &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, 32)},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 
 	var zeroSig [dilithium2.CryptoBytes]byte
@@ -132,8 +132,8 @@ func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 
 	beaconState, _ := util.DeterministicGenesisState(t, 100)
 
-	aggBits := bitfield.NewBitlist(3)
-	aggBits.SetBitAt(1, true)
+	participationBits := bitfield.NewBitlist(3)
+	participationBits.SetBitAt(1, true)
 	var mockRoot [32]byte
 	copy(mockRoot[:], "hello-world")
 	att := &zondpb.Attestation{
@@ -141,7 +141,7 @@ func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 			Source: &zondpb.Checkpoint{Epoch: 0, Root: mockRoot[:]},
 			Target: &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, 32)},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 
 	var zeroSig [dilithium2.CryptoBytes]byte
@@ -162,8 +162,8 @@ func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 /*
 func TestVerifyAttestationNoVerifySignature_BadAttIdx(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisState(t, 100)
-	aggBits := bitfield.NewBitlist(3)
-	aggBits.SetBitAt(1, true)
+	participationBits := bitfield.NewBitlist(3)
+	participationBits.SetBitAt(1, true)
 	var mockRoot [32]byte
 	copy(mockRoot[:], "hello-world")
 	att := &zondpb.Attestation{
@@ -172,7 +172,7 @@ func TestVerifyAttestationNoVerifySignature_BadAttIdx(t *testing.T) {
 			Source:         &zondpb.Checkpoint{Epoch: 0, Root: mockRoot[:]},
 			Target:         &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, 32)},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 	var zeroSig [dilithium2.CryptoBytes]byte
 	att.Signatures = [][]byte{zeroSig[:]}

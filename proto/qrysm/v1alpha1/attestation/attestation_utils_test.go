@@ -43,7 +43,7 @@ func TestConvertToIndexed(t *testing.T) {
 			args: args{
 				attestation: &zondpb.Attestation{
 					ParticipationBits: bitfield.Bitlist{0b1111},
-					Signatures:        [][]byte{[]byte("sig2"), []byte("sig0"), []byte("sig1")},
+					Signatures:        [][]byte{[]byte("sig0"), []byte("sig1"), []byte("sig2")},
 				},
 				committee: []primitives.ValidatorIndex{25, 30, 17},
 			},
@@ -552,6 +552,32 @@ func TestVerifyIndexedAttestationSigs(t *testing.T) {
 			} else {
 				require.ErrorContains(t, tt.err, err)
 			}
+		})
+	}
+}
+
+func TestNewBits(t *testing.T) {
+	type args struct {
+		baseField bitfield.Bitlist
+		newField  bitfield.Bitlist
+	}
+	tests := []struct {
+		name string
+		args args
+		want []uint64
+	}{
+		{
+			name: "zero new bits",
+			args: args{
+				baseField: bitfield.Bitlist{0b0000},
+				newField:  bitfield.Bitlist{0b0000},
+			},
+			want: []uint64{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.DeepEqual(t, tt.want, attestation.NewBits(tt.args.baseField, tt.args.newField))
 		})
 	}
 }

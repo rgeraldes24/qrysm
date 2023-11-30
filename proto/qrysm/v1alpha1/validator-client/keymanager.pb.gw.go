@@ -103,7 +103,7 @@ func RegisterRemoteSignerHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.validator.accounts.v2.RemoteSigner/ListValidatingPublicKeys")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.validator.accounts.v1.RemoteSigner/ListValidatingPublicKeys")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -126,7 +126,7 @@ func RegisterRemoteSignerHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.validator.accounts.v2.RemoteSigner/Sign")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.validator.accounts.v1.RemoteSigner/Sign")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -188,7 +188,7 @@ func RegisterRemoteSignerHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.validator.accounts.v2.RemoteSigner/ListValidatingPublicKeys")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.validator.accounts.v1.RemoteSigner/ListValidatingPublicKeys")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -208,7 +208,7 @@ func RegisterRemoteSignerHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.validator.accounts.v2.RemoteSigner/Sign")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.validator.accounts.v1.RemoteSigner/Sign")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -228,9 +228,9 @@ func RegisterRemoteSignerHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_RemoteSigner_ListValidatingPublicKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 0}, []string{"accounts", "v2", "remote"}, ""))
+	pattern_RemoteSigner_ListValidatingPublicKeys_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 0}, []string{"accounts", "v1", "remote"}, ""))
 
-	pattern_RemoteSigner_Sign_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"accounts", "v2", "remote", "sign"}, ""))
+	pattern_RemoteSigner_Sign_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"accounts", "v1", "remote", "sign"}, ""))
 )
 
 var (

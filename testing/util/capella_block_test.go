@@ -12,7 +12,7 @@ import (
 )
 
 func TestGenerateDilithiumToExecutionChange(t *testing.T) {
-	st, keys := DeterministicGenesisStateCapella(t, 64)
+	st, keys := DeterministicGenesisState(t, 64)
 	change, err := GenerateDilithiumToExecutionChange(st, keys[0], 0)
 	require.NoError(t, err)
 

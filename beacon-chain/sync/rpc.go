@@ -32,52 +32,6 @@ type rpcHandler func(context.Context, interface{}, libp2pcore.Stream) error
 
 // registerRPCHandlers for p2p RPC.
 func (s *Service) registerRPCHandlers() {
-	/*
-		currEpoch := slots.ToEpoch(s.cfg.clock.CurrentSlot())
-
-		// Register V2 handlers if we are past altair fork epoch.
-		if currEpoch >= params.BeaconConfig().AltairForkEpoch {
-			s.registerRPC(
-				p2p.RPCStatusTopicV1,
-				s.statusRPCHandler,
-			)
-			s.registerRPC(
-				p2p.RPCGoodByeTopicV1,
-				s.goodbyeRPCHandler,
-			)
-			s.registerRPC(
-				p2p.RPCPingTopicV1,
-				s.pingHandler,
-			)
-			s.registerRPCHandlersAltair()
-			return
-		}
-		s.registerRPC(
-			p2p.RPCStatusTopicV1,
-			s.statusRPCHandler,
-		)
-		s.registerRPC(
-			p2p.RPCGoodByeTopicV1,
-			s.goodbyeRPCHandler,
-		)
-		s.registerRPC(
-			p2p.RPCBlocksByRangeTopicV1,
-			s.beaconBlocksByRangeRPCHandler,
-		)
-		s.registerRPC(
-			p2p.RPCBlocksByRootTopicV1,
-			s.beaconBlocksRootRPCHandler,
-		)
-		s.registerRPC(
-			p2p.RPCPingTopicV1,
-			s.pingHandler,
-		)
-		s.registerRPC(
-			p2p.RPCMetaDataTopicV1,
-			s.metaDataHandler,
-		)
-	*/
-
 	s.registerRPC(
 		p2p.RPCStatusTopicV1,
 		s.statusRPCHandler,
@@ -105,24 +59,6 @@ func (s *Service) registerRPCHandlers() {
 
 	return
 }
-
-/*
-// registerRPCHandlers for altair.
-func (s *Service) registerRPCHandlersAltair() {
-	s.registerRPC(
-		p2p.RPCBlocksByRangeTopicV2,
-		s.beaconBlocksByRangeRPCHandler,
-	)
-	s.registerRPC(
-		p2p.RPCBlocksByRootTopicV2,
-		s.beaconBlocksRootRPCHandler,
-	)
-	s.registerRPC(
-		p2p.RPCMetaDataTopicV2,
-		s.metaDataHandler,
-	)
-}
-*/
 
 // Remove all v1 Stream handlers that are no longer supported
 // from altair onwards.

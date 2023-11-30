@@ -69,15 +69,15 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	root, err := sb.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	aggBits := bitfield.NewBitlist(8)
-	aggBits.SetBitAt(1, true)
+	participationBits := bitfield.NewBitlist(8)
+	participationBits.SetBitAt(1, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			BeaconBlockRoot: root[:],
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)
@@ -193,15 +193,15 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	validators := uint64(256)
 
 	_, privKeys := util.DeterministicGenesisState(t, validators)
-	aggBits := bitfield.NewBitlist(8)
-	aggBits.SetBitAt(1, true)
+	participationBits := bitfield.NewBitlist(8)
+	participationBits.SetBitAt(1, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			BeaconBlockRoot: r32[:],
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: r32[:]},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), s, att.Data.Slot, att.Data.CommitteeIndex)
 	assert.NoError(t, err)
@@ -271,16 +271,16 @@ func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 	root, err := sb.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	aggBits := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
-	aggBits.SetBitAt(0, true)
-	aggBits.SetBitAt(1, true)
+	participationBits := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
+	participationBits.SetBitAt(0, true)
+	participationBits.SetBitAt(1, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			BeaconBlockRoot: root[:],
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att.Data.Slot, att.Data.CommitteeIndex)

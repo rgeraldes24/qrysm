@@ -602,7 +602,7 @@ func TestSerializeState(t *testing.T) {
 	})
 }
 
-func TestSerializeProducedV2Block(t *testing.T) {
+func TestSerializeProducedBlock(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		response := &ProduceBlockResponseJson{
 			Version: zondpbv1.Version_CAPELLA.String(),

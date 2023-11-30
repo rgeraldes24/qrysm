@@ -27,7 +27,7 @@ func TestSyncCommitteeIndices_CanGet(t *testing.T) {
 				EffectiveBalance: params.BeaconConfig().MinDepositAmount,
 			}
 		}
-		st, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+		st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Validators:  validators,
 			RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		})
@@ -94,7 +94,7 @@ func TestSyncCommitteeIndices_DifferentPeriods(t *testing.T) {
 				EffectiveBalance: params.BeaconConfig().MinDepositAmount,
 			}
 		}
-		st, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+		st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Validators:  validators,
 			RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		})
@@ -131,7 +131,7 @@ func TestSyncCommittee_CanGet(t *testing.T) {
 				PublicKey:        dilithiumKey.PublicKey().Marshal(),
 			}
 		}
-		st, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+		st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Validators:  validators,
 			RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		})
@@ -225,7 +225,7 @@ func TestValidateNilSyncContribution(t *testing.T) {
 			s: &zondpb.SignedContributionAndProof{
 				Message: &zondpb.ContributionAndProof{
 					Contribution: &zondpb.SyncCommitteeContribution{
-						AggregationBits: []byte{},
+						ParticipationBits: []byte{},
 					},
 				}},
 			wantErr: false,
@@ -377,7 +377,7 @@ func getState(t *testing.T, count uint64) state.BeaconState {
 			PublicKey:        dilithiumKey.PublicKey().Marshal(),
 		}
 	}
-	st, err := state_native.InitializeFromProtoAltair(&zondpb.BeaconStateAltair{
+	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})

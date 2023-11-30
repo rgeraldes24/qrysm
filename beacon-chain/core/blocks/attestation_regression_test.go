@@ -53,8 +53,8 @@ func TestVerifyAttestationNoVerifySignature_IncorrectSourceEpoch(t *testing.T) {
 
 	beaconState, _ := util.DeterministicGenesisState(t, 100)
 
-	aggBits := bitfield.NewBitlist(3)
-	aggBits.SetBitAt(1, true)
+	participationBits := bitfield.NewBitlist(3)
+	participationBits.SetBitAt(1, true)
 	var mockRoot [32]byte
 	copy(mockRoot[:], "hello-world")
 	att := &zondpb.Attestation{
@@ -62,7 +62,7 @@ func TestVerifyAttestationNoVerifySignature_IncorrectSourceEpoch(t *testing.T) {
 			Source: &zondpb.Checkpoint{Epoch: 99, Root: mockRoot[:]},
 			Target: &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, 32)},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 
 	var zeroSig [4595]byte

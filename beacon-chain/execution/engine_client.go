@@ -204,17 +204,6 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 	ctx, cancel := context.WithDeadline(ctx, d)
 	defer cancel()
 
-	// if slots.ToEpoch(slot) >= params.BeaconConfig().CapellaForkEpoch {
-	// 	result := &pb.ExecutionPayloadWithValue{}
-	// 	err := s.rpcClient.CallContext(ctx, result, GetPayloadMethodV2, pb.PayloadIDBytes(payloadId))
-	// 	if err != nil {
-	// 		return nil, handleRPCError(err)
-	// 	}
-
-	// 	v := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(result.Value))
-	// 	return blocks.WrappedExecutionPayload(result.Payload, math.WeiToGwei(v))
-	// }
-
 	result := &pb.ExecutionPayloadWithValue{}
 	err := s.rpcClient.CallContext(ctx, result, GetPayloadMethod, pb.PayloadIDBytes(payloadId))
 	if err != nil {
@@ -223,15 +212,6 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 
 	v := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(result.Value))
 	return blocks.WrappedExecutionPayload(result.Payload, math.WeiToGwei(v))
-
-	/*
-		result := &pb.ExecutionPayload{}
-		err := s.rpcClient.CallContext(ctx, result, GetPayloadMethod, pb.PayloadIDBytes(payloadId))
-		if err != nil {
-			return nil, handleRPCError(err)
-		}
-		return blocks.WrappedExecutionPayload(result)
-	*/
 }
 
 // ExchangeTransitionConfiguration calls the engine_exchangeTransitionConfigurationV1 method via JSON-RPC.

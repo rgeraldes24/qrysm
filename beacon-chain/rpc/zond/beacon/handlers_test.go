@@ -28,7 +28,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-func TestPublishBlockV2(t *testing.T) {
+func TestPublishBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	t.Run("Phase 0", func(t *testing.T) {
@@ -45,7 +45,7 @@ func TestPublishBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(phase0Block)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("Altair", func(t *testing.T) {
@@ -62,7 +62,7 @@ func TestPublishBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(altairBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("Bellatrix", func(t *testing.T) {
@@ -79,7 +79,7 @@ func TestPublishBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(bellatrixBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("Capella", func(t *testing.T) {
@@ -96,7 +96,7 @@ func TestPublishBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(capellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("invalid block", func(t *testing.T) {
@@ -107,7 +107,7 @@ func TestPublishBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(blindedBellatrixBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Body does not represent a valid block type"))
 	})
@@ -123,13 +123,13 @@ func TestPublishBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte("foo")))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusServiceUnavailable, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Beacon node is currently syncing and not serving request on that endpoint"))
 	})
 }
 
-func TestPublishBlockV2SSZ(t *testing.T) {
+func TestPublishBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	t.Run("Bellatrix", func(t *testing.T) {
@@ -153,7 +153,7 @@ func TestPublishBlockV2SSZ(t *testing.T) {
 		request.Header.Set("Accept", "application/octet-stream")
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("Capella", func(t *testing.T) {
@@ -178,7 +178,7 @@ func TestPublishBlockV2SSZ(t *testing.T) {
 		request.Header.Set("Accept", "application/octet-stream")
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("invalid block", func(t *testing.T) {
@@ -189,13 +189,13 @@ func TestPublishBlockV2SSZ(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(blindedBellatrixBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Body does not represent a valid block type"))
 	})
 }
 
-func TestPublishBlindedBlockV2(t *testing.T) {
+func TestPublishBlindedBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	t.Run("Phase 0", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
@@ -211,7 +211,7 @@ func TestPublishBlindedBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(phase0Block)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("Altair", func(t *testing.T) {
@@ -228,7 +228,7 @@ func TestPublishBlindedBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(altairBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("Bellatrix", func(t *testing.T) {
@@ -245,7 +245,7 @@ func TestPublishBlindedBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(blindedBellatrixBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("Capella", func(t *testing.T) {
@@ -262,7 +262,7 @@ func TestPublishBlindedBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(blindedCapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("invalid block", func(t *testing.T) {
@@ -273,7 +273,7 @@ func TestPublishBlindedBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(bellatrixBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Body does not represent a valid block type"))
 	})
@@ -289,39 +289,14 @@ func TestPublishBlindedBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte("foo")))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusServiceUnavailable, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Beacon node is currently syncing and not serving request on that endpoint"))
 	})
 }
 
-func TestPublishBlindedBlockV2SSZ(t *testing.T) {
+func TestPublishBlindedBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
-	t.Run("Bellatrix", func(t *testing.T) {
-		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
-		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
-			_, ok := req.Block.(*zond.GenericSignedBeaconBlock_BlindedBellatrix)
-			return ok
-		}))
-		server := &Server{
-			V1Alpha1ValidatorServer: v1alpha1Server,
-			SyncChecker:             &mockSync.Sync{IsSyncing: false},
-		}
-
-		var bellablock SignedBlindedBeaconBlockBellatrix
-		err := json.Unmarshal([]byte(blindedBellatrixBlock), &bellablock)
-		require.NoError(t, err)
-		genericBlock, err := bellablock.ToGeneric()
-		require.NoError(t, err)
-		sszvalue, err := genericBlock.GetBlindedBellatrix().MarshalSSZ()
-		require.NoError(t, err)
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader(sszvalue))
-		request.Header.Set("Accept", "application/octet-stream")
-		writer := httptest.NewRecorder()
-		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
-		assert.Equal(t, http.StatusOK, writer.Code)
-	})
 	t.Run("Capella", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
@@ -333,7 +308,7 @@ func TestPublishBlindedBlockV2SSZ(t *testing.T) {
 			SyncChecker:             &mockSync.Sync{IsSyncing: false},
 		}
 
-		var cblock SignedBlindedBeaconBlockCapella
+		var cblock SignedBlindedBeaconBlock
 		err := json.Unmarshal([]byte(blindedCapellaBlock), &cblock)
 		require.NoError(t, err)
 		genericBlock, err := cblock.ToGeneric()
@@ -344,7 +319,7 @@ func TestPublishBlindedBlockV2SSZ(t *testing.T) {
 		request.Header.Set("Accept", "application/octet-stream")
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("invalid block", func(t *testing.T) {
@@ -355,7 +330,7 @@ func TestPublishBlindedBlockV2SSZ(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(bellatrixBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Body does not represent a valid block type"))
 	})

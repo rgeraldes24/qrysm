@@ -295,7 +295,7 @@ func (vs *Server) GetSyncCommitteeDuties(ctx context.Context, req *zondpbv1.Sync
 	}, nil
 }
 
-// ProduceBlockV2 requests the beacon node to produce a valid unsigned beacon block, which can then be signed by a proposer and submitted.
+// ProduceBlock requests the beacon node to produce a valid unsigned beacon block, which can then be signed by a proposer and submitted.
 // By definition `/zond/v1/validator/blocks/{slot}`, does not produce block using mev-boost and relayer network.
 // The following endpoint states that the returned object is a BeaconBlock, not a BlindedBeaconBlock. As such, the block must return a full ExecutionPayload:
 // https://ethereum.github.io/beacon-APIs/?urls.primaryName=v2.3.0#/Validator/produceBlockV2

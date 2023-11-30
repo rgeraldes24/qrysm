@@ -76,7 +76,7 @@ func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {
 			Source:          nil,
 			Target:          nil,
 		},
-		Signature: []byte{'B'},
+		Signatures: [][]byte{[]byte{'B'}},
 	}
 	valCount, err := helpers.ActiveValidatorCount(context.Background(), state, slots.ToEpoch(att.Data.Slot))
 	require.NoError(t, err)

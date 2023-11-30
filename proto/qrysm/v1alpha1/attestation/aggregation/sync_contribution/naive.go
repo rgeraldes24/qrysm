@@ -2,7 +2,9 @@ package sync_contribution
 
 import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
+	"golang.org/x/exp/slices" // TODO(rgeraldes24) replace with stdlib with go 1.21
 )
 
 // naiveSyncContributionAggregation aggregates naively, without any complex algorithms or optimizations.
@@ -79,47 +81,50 @@ func naiveAggregate(c1, c2 *zondpb.SyncCommitteeContribution) (*zondpb.SyncCommi
 		baseContribution, newContribution = newContribution, baseContribution
 	}
 
-	newParticipants := make([]uint64, 0)
-	for i := 0; i < len(baseContribution.ParticipationBits); i++ {
-		// start checking the byte and move to bits if a new participant is found
-		if baseContribution.ParticipationBits[i]^(baseContribution.ParticipationBits[i]|newContribution.ParticipationBits[i]) != 0 {
-			// identify the new participants in this byte
-			var bitIdx uint64 = uint64(i) * 8
-			for j := 0; j < 8; j, bitIdx = j+1, bitIdx+1 {
-				// base contribution bit must be set to zero and the new contribution bit must be set to one
-				if !baseContribution.ParticipationBits.BitAt(bitIdx) && newContribution.ParticipationBits.BitAt(bitIdx) {
-					newParticipants = append(newParticipants, bitIdx)
-				}
-			}
-		}
-	}
-
-	// base contribution already contains all the participants of the new contribution
-	if len(newParticipants) == 0 {
+	contributorsToAdd := attestation.NewBits(baseContribution.ParticipationBits, newContribution.ParticipationBits)
+	// base contribution already contains all the participants of the new attestation
+	if len(contributorsToAdd) == 0 {
 		return baseContribution, nil
 	}
 
-	// TODO(rgeraldes24)
+	// update the signatures slice
+	// 1. map the new contribution participants to their signature
+	// 2. figure out the insert index of the contributors to add(sorted) on the slice of
+	// the base contributors(sorted) and update the base signatures slice accordigly
+	mapNewContributionParticipantToSig := make(map[int][]byte)
+	for i, participant := range newContribution.ParticipationBits.BitIndices() {
+		// @NOTE(rgeraldes24) we could just map the ones we need
+		mapNewContributionParticipantToSig[participant] = newContribution.Signatures[i]
+	}
 
-	/*
-		// convert the signaturesIdxToParticipationIdx from a list to a map to allow for
-		// a quick search for the sig index that we will use to include the new signature
-		mapParticipationIdxToSigIdx := make(map[uint64]int)
-		for sigIdx, participationIdx := range newContribution.SignaturesIdxToParticipationIdx {
-			mapParticipationIdxToSigIdx[participationIdx] = sigIdx
+	baseParticipants := baseContribution.ParticipationBits.BitIndices()
+	startingIdx := 0
+	for i, participant := range contributorsToAdd {
+		insertIdx, err := attestation.SearchInsertIdxWithStartingIdx(baseParticipants, startingIdx, participantNum)
+		if err != nil {
+			return nil, err
 		}
 
-		// include sig and participation
-		for _, participationIdx := range newParticipants {
-			sigIdx, ok := mapParticipationIdxToSigIdx[participationIdx]
-			if !ok {
-				return nil, fmt.Errorf("Signature for validator with index %d not found", participationIdx)
+		// no need for more index searches; just append the signatures of the remaining
+		// participants that we need to add.
+		if insertIdx > (len(baseParticipants) - 1) {
+			for _, missingParticipant := range participantsToAdd[i:] {
+				slices.Insert(baseContribution.Signatures, insertIdx, mapNewContributionParticipantToSig[missingParticipant])
 			}
-			baseContribution.Signatures = append(baseContribution.Signatures, newContribution.Signatures[sigIdx])
-			baseContribution.SignaturesIdxToParticipationIdx = append(baseContribution.SignaturesIdxToParticipationIdx, participationIdx)
-			baseContribution.ParticipationBits.SetBitAt(participationIdx, true)
+			break
 		}
-	*/
+
+		slices.Insert(baseParticipants, insertIdx, participant)
+		slices.Insert(baseContribution.Signatures, insertIdx, mapNewContributionParticipantToSig[participant])
+		startingIdx = insertIdx + 1
+	}
+
+	// update the participants bitlist
+	participants, err := baseContribution.ParticipationBits.Or(newContribution.ParticipationBits)
+	if err != nil {
+		return nil, err
+	}
+	baseContribution.ParticipationBits = participants
 
 	return baseContribution, nil
 }

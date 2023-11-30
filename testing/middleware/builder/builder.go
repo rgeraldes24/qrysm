@@ -47,13 +47,8 @@ const (
 
 	// ForkchoiceUpdatedMethod v1 request string for JSON-RPC.
 	ForkchoiceUpdatedMethod = "engine_forkchoiceUpdatedV1"
-	// ForkchoiceUpdatedMethodV2 v2 request string for JSON-RPC.
-	ForkchoiceUpdatedMethodV2 = "engine_forkchoiceUpdatedV2"
 	// GetPayloadMethod v1 request string for JSON-RPC.
 	GetPayloadMethod = "engine_getPayloadV1"
-	// GetPayloadMethodV2 v2 request string for JSON-RPC.
-	GetPayloadMethodV2 = "engine_getPayloadV2"
-	// ExchangeTransitionConfigurationMethod v1 request string for JSON-RPC.
 )
 
 var (
@@ -85,11 +80,11 @@ type ExecPayloadResponse struct {
 	Data    *v1.ExecutionPayload `json:"data"`
 }
 
-type ExecHeaderResponseCapella struct {
+type ExecHeaderResponse struct {
 	Version string `json:"version"`
 	Data    struct {
-		Signature hexutil.Bytes                 `json:"signature"`
-		Message   *builderAPI.BuilderBidCapella `json:"message"`
+		Signature hexutil.Bytes          `json:"signature"`
+		Message   *builderAPI.BuilderBid `json:"message"`
 	} `json:"data"`
 }
 
@@ -226,7 +221,7 @@ func (p *Builder) handleEngineCalls(req, resp []byte) {
 	}
 	p.cfg.logger.Infof("Received engine call %s", rpcObj.Method)
 	switch rpcObj.Method {
-	case ForkchoiceUpdatedMethod, ForkchoiceUpdatedMethodV2:
+	case ForkchoiceUpdatedMethod:
 		result := &ForkchoiceUpdatedResponse{}
 		err = json.Unmarshal(resp, result)
 		if err != nil {
@@ -276,7 +271,7 @@ func (p *Builder) handleHeaderRequest(w http.ResponseWriter, req *http.Request) 
 	ax := types.Slot(slot)
 	currEpoch := types.Epoch(ax / params.BeaconConfig().SlotsPerEpoch)
 	if currEpoch >= params.BeaconConfig().CapellaForkEpoch {
-		p.handleHeadeRequestCapella(w)
+		p.handleHeadeRequest(w)
 		return
 	}
 
@@ -334,7 +329,7 @@ func (p *Builder) handleHeaderRequest(w http.ResponseWriter, req *http.Request) 
 	}
 	sig := secKey.Sign(rt[:])
 	hdrResp := &builderAPI.ExecHeaderResponse{
-		Version: "bellatrix",
+		Version: "capella",
 		Data: struct {
 			Signature hexutil.Bytes          `json:"signature"`
 			Message   *builderAPI.BuilderBid `json:"message"`
@@ -354,8 +349,8 @@ func (p *Builder) handleHeaderRequest(w http.ResponseWriter, req *http.Request) 
 	w.WriteHeader(http.StatusOK)
 }
 
-func (p *Builder) handleHeadeRequestCapella(w http.ResponseWriter) {
-	b, err := p.retrievePendingBlockCapella()
+func (p *Builder) handleHeadeRequest(w http.ResponseWriter) {
+	b, err := p.retrievePendingBlock()
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not retrieve pending block")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -373,26 +368,26 @@ func (p *Builder) handleHeadeRequestCapella(w http.ResponseWriter) {
 	// Is used as the helper modifies the big.Int
 	weiVal := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(b.Value))
 	weiVal = weiVal.Mul(weiVal, big.NewInt(2))
-	wObj, err := blocks.WrappedExecutionPayloadCapella(b.Payload, math.WeiToGwei(weiVal))
+	wObj, err := blocks.WrappedExecutionPayload(b.Payload, math.WeiToGwei(weiVal))
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not wrap execution payload")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	hdr, err := blocks.PayloadToHeaderCapella(wObj)
+	hdr, err := blocks.PayloadToHeader(wObj)
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not make payload into header")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	val := builderAPI.Uint256{Int: v}
-	wrappedHdr := &builderAPI.ExecutionPayloadHeaderCapella{ExecutionPayloadHeaderCapella: hdr}
-	bid := &builderAPI.BuilderBidCapella{
+	wrappedHdr := &builderAPI.ExecutionPayloadHeader{ExecutionPayloadHeader: hdr}
+	bid := &builderAPI.BuilderBid{
 		Header: wrappedHdr,
 		Value:  val,
 		Pubkey: secKey.PublicKey().Marshal(),
 	}
-	sszBid := &zond.BuilderBidCapella{
+	sszBid := &zond.BuilderBid{
 		Header: hdr,
 		Value:  val.SSZBytes(),
 		Pubkey: secKey.PublicKey().Marshal(),
@@ -412,11 +407,11 @@ func (p *Builder) handleHeadeRequestCapella(w http.ResponseWriter) {
 		return
 	}
 	sig := secKey.Sign(rt[:])
-	hdrResp := &ExecHeaderResponseCapella{
+	hdrResp := &ExecHeaderResponse{
 		Version: "capella",
 		Data: struct {
-			Signature hexutil.Bytes                 `json:"signature"`
-			Message   *builderAPI.BuilderBidCapella `json:"message"`
+			Signature hexutil.Bytes          `json:"signature"`
+			Message   *builderAPI.BuilderBid `json:"message"`
 		}{
 			Signature: sig.Marshal(),
 			Message:   bid,
@@ -434,8 +429,8 @@ func (p *Builder) handleHeadeRequestCapella(w http.ResponseWriter) {
 }
 
 func (p *Builder) handleBlindedBlock(w http.ResponseWriter, req *http.Request) {
-	sb := &builderAPI.SignedBlindedBeaconBlockBellatrix{
-		SignedBlindedBeaconBlockBellatrix: &zond.SignedBlindedBeaconBlockBellatrix{},
+	sb := &builderAPI.SignedBlindedBeaconBlock{
+		SignedBlindedBeaconBlock: &zond.SignedBlindedBeaconBlock{},
 	}
 	err := json.NewDecoder(req.Body).Decode(sb)
 	if err != nil {
@@ -467,20 +462,20 @@ func (p *Builder) handleBlindedBlock(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	bellPayload, err := p.currPayload.PbBellatrix()
+	capellaPayload, err := p.currPayload.PbCapella()
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not retrieve the payload")
 		http.Error(w, "payload not found", http.StatusInternalServerError)
 		return
 	}
-	convertedPayload, err := builderAPI.FromProto(bellPayload)
+	convertedPayload, err := builderAPI.FromProto(capellaPayload)
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not convert the payload")
 		http.Error(w, "payload not found", http.StatusInternalServerError)
 		return
 	}
 	execResp := &builderAPI.ExecPayloadResponse{
-		Version: "bellatrix",
+		Version: "capella",
 		Data:    convertedPayload,
 	}
 	err = json.NewEncoder(w).Encode(execResp)
@@ -492,36 +487,12 @@ func (p *Builder) handleBlindedBlock(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (p *Builder) retrievePendingBlock() (*v1.ExecutionPayload, error) {
-	result := &engine.ExecutableData{}
-	if p.currId == nil {
-		return nil, errors.New("no payload id is cached")
-	}
-	err := p.execClient.CallContext(context.Background(), result, GetPayloadMethod, *p.currId)
-	if err != nil {
-		return nil, err
-	}
-	payloadEnv, err := modifyExecutionPayload(*result, big.NewInt(0))
-	if err != nil {
-		return nil, err
-	}
-	marshalledOutput, err := payloadEnv.ExecutionPayload.MarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	bellatrixPayload := &v1.ExecutionPayload{}
-	if err = json.Unmarshal(marshalledOutput, bellatrixPayload); err != nil {
-		return nil, err
-	}
-	return bellatrixPayload, nil
-}
-
-func (p *Builder) retrievePendingBlockCapella() (*v1.ExecutionPayloadCapellaWithValue, error) {
+func (p *Builder) retrievePendingBlock() (*v1.ExecutionPayloadWithValue, error) {
 	result := &engine.ExecutionPayloadEnvelope{}
 	if p.currId == nil {
 		return nil, errors.New("no payload id is cached")
 	}
-	err := p.execClient.CallContext(context.Background(), result, GetPayloadMethodV2, *p.currId)
+	err := p.execClient.CallContext(context.Background(), result, GetPayloadMethod, *p.currId)
 	if err != nil {
 		return nil, err
 	}

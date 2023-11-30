@@ -296,14 +296,14 @@ func createFullBlockWithOperations(t *testing.T) (state.BeaconState,
 	}
 	require.NoError(t, beaconState.SetBlockRoots(blockRoots))
 
-	aggBits := bitfield.NewBitlist(1)
-	aggBits.SetBitAt(0, true)
+	participationBits := bitfield.NewBitlist(1)
+	participationBits.SetBitAt(0, true)
 	blockAtt := util.HydrateAttestation(&zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			Slot:   beaconState.Slot(),
 			Target: &zondpb.Checkpoint{Epoch: time.CurrentEpoch(beaconState)},
 			Source: &zondpb.Checkpoint{Root: mockRoot[:]}},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	})
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, blockAtt.Data.Slot, blockAtt.Data.CommitteeIndex)

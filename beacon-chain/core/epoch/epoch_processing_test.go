@@ -508,7 +508,7 @@ func TestProcessHistoricalDataUpdate(t *testing.T) {
 		{
 			name: "after capella can process and get historical summary",
 			st: func() state.BeaconState {
-				st, _ := util.DeterministicGenesisStateCapella(t, 1)
+				st, _ := util.DeterministicGenesisState(t, 1)
 				st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerHistoricalRoot-1)
 				require.NoError(t, err)
 				return st

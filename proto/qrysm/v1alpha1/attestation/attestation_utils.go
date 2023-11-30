@@ -83,6 +83,10 @@ func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *zondpb.Indexe
 	ctx, span := trace.StartSpan(ctx, "attestationutil.VerifyIndexedAttestationSig")
 	defer span.End()
 
+	if len(indexedAtt.Signatures) != len(pubKeys) {
+		return fmt.Errorf("signatures length %d is not equal to pub keys length %d", len(indexedAtt.Signatures), len(pubKeys))
+	}
+
 	messageHash, err := signing.ComputeSigningRoot(indexedAtt.Data, domain)
 	if err != nil {
 		return errors.Wrap(err, "could not get signing root of object")
@@ -91,8 +95,8 @@ func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *zondpb.Indexe
 	n := runtime.GOMAXPROCS(0) - 1
 	grp := errgroup.Group{}
 	grp.SetLimit(n)
-
 	for i, rawSig := range indexedAtt.Signatures {
+		// move inside the code below?
 		sig, err := dilithium.SignatureFromBytes(rawSig)
 		if err != nil {
 			return errors.Wrap(err, "could not convert bytes to signature")
@@ -175,4 +179,43 @@ func CheckPointIsEqual(checkPt1, checkPt2 *zondpb.Checkpoint) bool {
 		return false
 	}
 	return true
+}
+
+func NewBits(baseList bitfield.Bitlist, newList bitfield.Bitlist) []uint64 {
+	newBits := make([]uint64, 0, len(newList))
+	for i := 0; i < len(baseList); i++ {
+		// start checking the byte and move to bits if a new participant is found
+		if baseList[i]^(baseList[i]|newList[i]) != 0 {
+			var bitIdx uint64 = uint64(i) * 8
+			for j := 0; j < 8; j, bitIdx = j+1, bitIdx+1 {
+				// base field bit must be set to zero and the new field bit must be set to one
+				if !baseList.BitAt(bitIdx) && newList.BitAt(bitIdx) {
+					newBits = append(newBits, bitIdx)
+				}
+			}
+		}
+	}
+	return newBits
+}
+
+func SearchInsertIdxWithStartingIdx(slc []int, startingIdx int, target int) (int, error) {
+	slcLen := len(slc)
+
+	if startingIdx > (slcLen - 1) {
+		return 0, fmt.Errorf("Invalid starting index %d for slice length %d", startingIdx, slcLen)
+	}
+
+	if slcLen == 0 {
+		return 0, nil
+	}
+
+	if target <= slc[startingIdx] {
+		return startingIdx, nil
+	}
+
+	if target > slc[slcLen-1] {
+		return slcLen, nil
+	}
+
+	return 0, nil
 }

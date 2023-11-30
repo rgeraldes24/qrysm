@@ -20,9 +20,9 @@ func RunSSZStaticTests(t *testing.T, config string) {
 
 func customHtr(t *testing.T, htrs []common.HTR, object interface{}) []common.HTR {
 	switch object.(type) {
-	case *zondpb.BeaconStateCapella:
+	case *zondpb.BeaconState:
 		htrs = append(htrs, func(s interface{}) ([32]byte, error) {
-			beaconState, err := state_native.InitializeFromProtoCapella(s.(*zondpb.BeaconStateCapella))
+			beaconState, err := state_native.InitializeFromProtoCapella(s.(*zondpb.BeaconState))
 			require.NoError(t, err)
 			return beaconState.HashTreeRoot(context.Background())
 		})
@@ -35,9 +35,9 @@ func unmarshalledSSZ(t *testing.T, serializedBytes []byte, folderName string) (i
 	var obj interface{}
 	switch folderName {
 	case "ExecutionPayload":
-		obj = &enginev1.ExecutionPayloadCapella{}
+		obj = &enginev1.ExecutionPayload{}
 	case "ExecutionPayloadHeader":
-		obj = &enginev1.ExecutionPayloadHeaderCapella{}
+		obj = &enginev1.ExecutionPayloadHeader{}
 	case "Attestation":
 		obj = &zondpb.Attestation{}
 	case "AttestationData":
@@ -47,13 +47,13 @@ func unmarshalledSSZ(t *testing.T, serializedBytes []byte, folderName string) (i
 	case "AggregateAndProof":
 		obj = &zondpb.AggregateAttestationAndProof{}
 	case "BeaconBlock":
-		obj = &zondpb.BeaconBlockCapella{}
+		obj = &zondpb.BeaconBlock{}
 	case "BeaconBlockBody":
-		obj = &zondpb.BeaconBlockBodyCapella{}
+		obj = &zondpb.BeaconBlockBody{}
 	case "BeaconBlockHeader":
 		obj = &zondpb.BeaconBlockHeader{}
 	case "BeaconState":
-		obj = &zondpb.BeaconStateCapella{}
+		obj = &zondpb.BeaconState{}
 	case "Checkpoint":
 		obj = &zondpb.Checkpoint{}
 	case "Deposit":
@@ -85,7 +85,7 @@ func unmarshalledSSZ(t *testing.T, serializedBytes []byte, folderName string) (i
 	case "SignedAggregateAndProof":
 		obj = &zondpb.SignedAggregateAttestationAndProof{}
 	case "SignedBeaconBlock":
-		obj = &zondpb.SignedBeaconBlockCapella{}
+		obj = &zondpb.SignedBeaconBlock{}
 	case "SignedBeaconBlockHeader":
 		obj = &zondpb.SignedBeaconBlockHeader{}
 	case "SignedVoluntaryExit":

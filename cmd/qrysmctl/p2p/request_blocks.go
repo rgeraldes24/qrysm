@@ -129,11 +129,6 @@ func cliActionRequestBlocks(cliCtx *cli.Context) error {
 	) error {
 		return nil
 	})
-	c.registerRPCHandler(p2p.RPCBlocksByRangeTopicV2, func(
-		ctx context.Context, i interface{}, stream libp2pcore.Stream,
-	) error {
-		return nil
-	})
 
 	if err := c.connectToPeers(ctx, allPeers...); err != nil {
 		return err

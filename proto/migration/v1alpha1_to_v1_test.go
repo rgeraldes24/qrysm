@@ -30,7 +30,7 @@ var (
 	parentRoot        = bytesutil.PadTo([]byte("parentroot"), fieldparams.RootLength)
 	stateRoot         = bytesutil.PadTo([]byte("stateroot"), fieldparams.RootLength)
 	signature         = bytesutil.PadTo([]byte("signatures"), 4595)
-	signatures        = [][]byte{bytesutil.PadTo([]byte("signatures"), 4595)}
+	signatures        = [][]byte{signature}
 	randaoReveal      = bytesutil.PadTo([]byte("randaoreveal"), 4595)
 	depositRoot       = bytesutil.PadTo([]byte("depositroot"), fieldparams.RootLength)
 	blockHash         = bytesutil.PadTo([]byte("blockhash"), 32)
@@ -38,7 +38,7 @@ var (
 	sourceRoot        = bytesutil.PadTo([]byte("sourceroot"), fieldparams.RootLength)
 	targetRoot        = bytesutil.PadTo([]byte("targetroot"), fieldparams.RootLength)
 	bodyRoot          = bytesutil.PadTo([]byte("bodyroot"), fieldparams.RootLength)
-	selectionProof    = bytesutil.PadTo([]byte("selectionproof"), 96)
+	selectionProof    = bytesutil.PadTo([]byte("selectionproof"), 4595)
 	parentHash        = bytesutil.PadTo([]byte("parenthash"), 32)
 	feeRecipient      = bytesutil.PadTo([]byte("feerecipient"), 20)
 	receiptsRoot      = bytesutil.PadTo([]byte("receiptsroot"), 32)
@@ -70,24 +70,6 @@ func TestBlockIfaceToV1BlockHeader(t *testing.T) {
 	assert.DeepEqual(t, parentRoot, v1Header.Message.ParentRoot)
 	assert.DeepEqual(t, stateRoot, v1Header.Message.StateRoot)
 	assert.DeepEqual(t, signature, v1Header.Signature)
-}
-
-func TestV1Alpha1ToV1AggregateAttAndProof(t *testing.T) {
-	proof := [32]byte{1}
-	att := util.HydrateAttestation(&zondpbalpha.Attestation{
-		Data: &zondpbalpha.AttestationData{
-			Slot: 5,
-		},
-	})
-	alpha := &zondpbalpha.AggregateAttestationAndProof{
-		AggregatorIndex: 1,
-		Aggregate:       att,
-		SelectionProof:  proof[:],
-	}
-	v1 := V1Alpha1ToV1AggregateAttAndProof(alpha)
-	assert.Equal(t, v1.AggregatorIndex, primitives.ValidatorIndex(1))
-	assert.DeepSSZEqual(t, v1.Aggregate.Data.Slot, att.Data.Slot)
-	assert.DeepEqual(t, v1.SelectionProof, proof[:])
 }
 
 func TestV1Alpha1ToV1SignedBlock(t *testing.T) {
@@ -128,13 +110,30 @@ func TestV1ToV1Alpha1SignedBlock(t *testing.T) {
 	v1Block.Signature = signature
 
 	alphaBlock, err := V1ToV1Alpha1SignedBlock(v1Block)
-
 	require.NoError(t, err)
 	alphaRoot, err := alphaBlock.HashTreeRoot()
 	require.NoError(t, err)
 	v1Root, err := v1Block.HashTreeRoot()
 	require.NoError(t, err)
 	assert.DeepEqual(t, v1Root, alphaRoot)
+}
+
+func TestV1Alpha1ToV1AggregateAttAndProof(t *testing.T) {
+	proof := [32]byte{1}
+	att := util.HydrateAttestation(&zondpbalpha.Attestation{
+		Data: &zondpbalpha.AttestationData{
+			Slot: 5,
+		},
+	})
+	alpha := &zondpbalpha.AggregateAttestationAndProof{
+		AggregatorIndex: 1,
+		Aggregate:       att,
+		SelectionProof:  proof[:],
+	}
+	v1 := V1Alpha1ToV1AggregateAttAndProof(alpha)
+	assert.Equal(t, v1.AggregatorIndex, primitives.ValidatorIndex(1))
+	assert.DeepSSZEqual(t, v1.Aggregate.Data.Slot, att.Data.Slot)
+	assert.DeepEqual(t, v1.SelectionProof, proof[:])
 }
 
 func TestV1ToV1Alpha1SignedBlindedBlock(t *testing.T) {
@@ -220,7 +219,7 @@ func TestV1Alpha1ToV1AttSlashing(t *testing.T) {
 				Root:  targetRoot,
 			},
 		},
-		Signatures: [][]byte{signature},
+		Signatures: signatures,
 	}
 	alphaSlashing := &zondpbalpha.AttesterSlashing{
 		Attestation_1: alphaAttestation,
@@ -244,7 +243,7 @@ func TestV1Alpha1ToV1SignedHeader(t *testing.T) {
 	alphaHeader.Header.BodyRoot = bodyRoot
 	alphaHeader.Signature = signature
 	v1Header := V1Alpha1ToV1SignedHeader(alphaHeader)
-	assert.DeepEqual(t, bodyRoot[:], v1Header.Message.BodyRoot)
+	assert.DeepEqual(t, bodyRoot, v1Header.Message.BodyRoot)
 	assert.Equal(t, slot, v1Header.Message.Slot)
 	assert.Equal(t, validatorIndex, v1Header.Message.ProposerIndex)
 	assert.DeepEqual(t, parentRoot, v1Header.Message.ParentRoot)
@@ -264,7 +263,7 @@ func TestV1ToV1Alpha1SignedHeader(t *testing.T) {
 		Signature: signature,
 	}
 	v1alpha1 := V1ToV1Alpha1SignedHeader(v1Header)
-	assert.DeepEqual(t, bodyRoot[:], v1alpha1.Header.BodyRoot)
+	assert.DeepEqual(t, bodyRoot, v1alpha1.Header.BodyRoot)
 	assert.Equal(t, slot, v1alpha1.Header.Slot)
 	assert.Equal(t, validatorIndex, v1alpha1.Header.ProposerIndex)
 	assert.DeepEqual(t, parentRoot, v1alpha1.Header.ParentRoot)
@@ -343,7 +342,7 @@ func TestV1ToV1Alpha1IndexedAtt(t *testing.T) {
 				Root:  targetRoot,
 			},
 		},
-		Signatures: [][]byte{signature},
+		Signatures: signatures,
 	}
 	v1IdxAtt := V1Alpha1ToV1IndexedAtt(alphaAttestation)
 	assert.DeepEqual(t, attestingIndices, v1IdxAtt.AttestingIndices)
@@ -354,7 +353,7 @@ func TestV1ToV1Alpha1IndexedAtt(t *testing.T) {
 	assert.DeepEqual(t, sourceRoot, v1IdxAtt.Data.Source.Root)
 	assert.Equal(t, epoch, v1IdxAtt.Data.Target.Epoch)
 	assert.DeepEqual(t, targetRoot, v1IdxAtt.Data.Target.Root)
-	assert.DeepEqual(t, signature, v1IdxAtt.Signatures)
+	assert.DeepEqual(t, signatures, v1IdxAtt.Signatures)
 }
 
 func TestV1ToV1Alpha1AttData(t *testing.T) {
@@ -374,11 +373,11 @@ func TestV1ToV1Alpha1AttData(t *testing.T) {
 	alphaAttData := V1ToV1Alpha1AttData(v1AttData)
 	assert.Equal(t, slot, alphaAttData.Slot)
 	assert.Equal(t, committeeIndex, alphaAttData.CommitteeIndex)
-	assert.DeepEqual(t, beaconBlockRoot[:], alphaAttData.BeaconBlockRoot)
+	assert.DeepEqual(t, beaconBlockRoot, alphaAttData.BeaconBlockRoot)
 	assert.Equal(t, epoch, alphaAttData.Source.Epoch)
-	assert.DeepEqual(t, sourceRoot[:], alphaAttData.Source.Root)
+	assert.DeepEqual(t, sourceRoot, alphaAttData.Source.Root)
 	assert.Equal(t, epoch, alphaAttData.Target.Epoch)
-	assert.DeepEqual(t, targetRoot[:], alphaAttData.Source.Root)
+	assert.DeepEqual(t, targetRoot, alphaAttData.Target.Root)
 }
 
 func TestV1Alpha1ToV1AttData(t *testing.T) {
@@ -398,11 +397,11 @@ func TestV1Alpha1ToV1AttData(t *testing.T) {
 	v1AttData := V1Alpha1ToV1AttData(alphaAttData)
 	assert.Equal(t, slot, v1AttData.Slot)
 	assert.Equal(t, committeeIndex, v1AttData.Index)
-	assert.DeepEqual(t, beaconBlockRoot[:], v1AttData.BeaconBlockRoot)
+	assert.DeepEqual(t, beaconBlockRoot, v1AttData.BeaconBlockRoot)
 	assert.Equal(t, epoch, v1AttData.Source.Epoch)
-	assert.DeepEqual(t, sourceRoot[:], v1AttData.Source.Root)
+	assert.DeepEqual(t, sourceRoot, v1AttData.Source.Root)
 	assert.Equal(t, epoch, v1AttData.Target.Epoch)
-	assert.DeepEqual(t, targetRoot[:], v1AttData.Source.Root)
+	assert.DeepEqual(t, targetRoot, v1AttData.Target.Root)
 }
 
 func TestV1ToV1Alpha1AttSlashing(t *testing.T) {
@@ -421,7 +420,7 @@ func TestV1ToV1Alpha1AttSlashing(t *testing.T) {
 				Root:  targetRoot,
 			},
 		},
-		Signatures: [][]byte{signature},
+		Signatures: signatures,
 	}
 	v1Slashing := &zondpbv1.AttesterSlashing{
 		Attestation_1: v1Attestation,
@@ -476,7 +475,7 @@ func TestV1Alpha1ToV1Attestation(t *testing.T) {
 				Root:  targetRoot,
 			},
 		},
-		Signatures: [][]byte{signature},
+		Signatures: signatures,
 	}
 
 	v1Att := V1Alpha1ToV1Attestation(alphaAtt)
@@ -613,7 +612,7 @@ func TestV1Alpha1ToV1IndexedAtt(t *testing.T) {
 				Root:  targetRoot,
 			},
 		},
-		Signatures: [][]byte{signature},
+		Signatures: signatures,
 	}
 	v1IdxAtt := V1Alpha1ToV1IndexedAtt(alphaAttestation)
 	assert.DeepEqual(t, attestingIndices, v1IdxAtt.AttestingIndices)
@@ -624,7 +623,7 @@ func TestV1Alpha1ToV1IndexedAtt(t *testing.T) {
 	assert.DeepEqual(t, sourceRoot, v1IdxAtt.Data.Source.Root)
 	assert.Equal(t, epoch, v1IdxAtt.Data.Target.Epoch)
 	assert.DeepEqual(t, targetRoot, v1IdxAtt.Data.Target.Root)
-	assert.DeepEqual(t, signature, v1IdxAtt.Signatures)
+	assert.DeepEqual(t, signatures, v1IdxAtt.Signatures)
 }
 
 func TestV1ToV1Alpha1Attestation(t *testing.T) {
@@ -685,7 +684,7 @@ func TestV1Alpha1BeaconBlockToV1Blinded(t *testing.T) {
 	syncCommitteeBits.SetBitAt(100, true)
 	alphaBlock.Body.SyncAggregate = &zondpbalpha.SyncAggregate{
 		SyncCommitteeBits:       syncCommitteeBits,
-		SyncCommitteeSignatures: [][]byte{signature},
+		SyncCommitteeSignatures: signatures,
 	}
 	alphaBlock.Body.ExecutionPayload.Transactions = [][]byte{[]byte("transaction1"), []byte("transaction2")}
 

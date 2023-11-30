@@ -122,8 +122,8 @@ func TestProcessAttestations_CurrentEpochFFGDataMismatches(t *testing.T) {
 func TestProcessAttestations_PrevEpochFFGDataMismatches(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisState(t, 100)
 
-	aggBits := bitfield.NewBitlist(3)
-	aggBits.SetBitAt(0, true)
+	participationBits := bitfield.NewBitlist(3)
+	participationBits.SetBitAt(0, true)
 	attestations := []*zondpb.Attestation{
 		{
 			Data: &zondpb.AttestationData{
@@ -131,7 +131,7 @@ func TestProcessAttestations_PrevEpochFFGDataMismatches(t *testing.T) {
 				Target: &zondpb.Checkpoint{Epoch: 1, Root: make([]byte, fieldparams.RootLength)},
 				Slot:   params.BeaconConfig().SlotsPerEpoch,
 			},
-			ParticipationBits: aggBits,
+			ParticipationBits: participationBits,
 		},
 	}
 	b := util.NewBeaconBlock()
@@ -164,12 +164,12 @@ func TestProcessAttestations_PrevEpochFFGDataMismatches(t *testing.T) {
 func TestProcessAttestations_InvalidAggregationBitsLength(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisState(t, 100)
 
-	aggBits := bitfield.NewBitlist(4)
+	participationBits := bitfield.NewBitlist(4)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			Source: &zondpb.Checkpoint{Epoch: 0, Root: []byte("hello-world")},
 			Target: &zondpb.Checkpoint{Epoch: 0}},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 
 	b := util.NewBeaconBlock()
@@ -196,8 +196,8 @@ func TestProcessAttestations_InvalidAggregationBitsLength(t *testing.T) {
 func TestProcessAttestations_OK(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
 
-	aggBits := bitfield.NewBitlist(3)
-	aggBits.SetBitAt(0, true)
+	participationBits := bitfield.NewBitlist(3)
+	participationBits.SetBitAt(0, true)
 	var mockRoot [32]byte
 	copy(mockRoot[:], "hello-world")
 	att := util.HydrateAttestation(&zondpb.Attestation{
@@ -205,7 +205,7 @@ func TestProcessAttestations_OK(t *testing.T) {
 			Source: &zondpb.Checkpoint{Root: mockRoot[:]},
 			Target: &zondpb.Checkpoint{Root: mockRoot[:]},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	})
 
 	cfc := beaconState.CurrentJustifiedCheckpoint()
@@ -240,9 +240,9 @@ func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
 	err := beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
 	require.NoError(t, err)
 
-	aggBits := bitfield.NewBitlist(2)
-	aggBits.SetBitAt(0, true)
-	aggBits.SetBitAt(1, true)
+	participationBits := bitfield.NewBitlist(2)
+	participationBits.SetBitAt(0, true)
+	participationBits.SetBitAt(1, true)
 	r, err := helpers.BlockRootAtSlot(beaconState, 0)
 	require.NoError(t, err)
 	att := &zondpb.Attestation{
@@ -251,7 +251,7 @@ func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, fieldparams.RootLength)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, fieldparams.RootLength)},
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	}
 	var zeroSig [4595]byte
 	att.Signatures = [][]byte{zeroSig[:]}
@@ -408,15 +408,15 @@ func TestValidatorFlag_Add_ExceedsLength(t *testing.T) {
 
 func TestFuzzProcessAttestationsNoVerify_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
-	st := &zondpb.BeaconStateAltair{}
-	b := &zondpb.SignedBeaconBlockAltair{Block: &zondpb.BeaconBlock{}}
+	st := &zondpb.BeaconState{}
+	b := &zondpb.SignedBeaconBlock{Block: &zondpb.BeaconBlock{}}
 	for i := 0; i < 10000; i++ {
 		fuzzer.Fuzz(st)
 		fuzzer.Fuzz(b)
 		if b.Block == nil {
 			b.Block = &zondpb.BeaconBlock{}
 		}
-		s, err := state_native.InitializeFromProtoUnsafe(st)
+		s, err := state_native.InitializeFromProtoUnsafeCapella(st)
 		require.NoError(t, err)
 		if b.Block == nil || b.Block.Body == nil {
 			continue

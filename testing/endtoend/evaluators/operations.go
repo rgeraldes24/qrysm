@@ -479,22 +479,6 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 		var slot primitives.Slot
 		var vote []byte
 		switch blk.Block.(type) {
-		case *zondpb.BeaconBlockContainer_Phase0Block:
-			b := blk.GetPhase0Block().Block
-			slot = b.Slot
-			vote = b.Body.Zond1Data.BlockHash
-		case *zondpb.BeaconBlockContainer_AltairBlock:
-			b := blk.GetAltairBlock().Block
-			slot = b.Slot
-			vote = b.Body.Zond1Data.BlockHash
-		case *zondpb.BeaconBlockContainer_BellatrixBlock:
-			b := blk.GetBellatrixBlock().Block
-			slot = b.Slot
-			vote = b.Body.Zond1Data.BlockHash
-		case *zondpb.BeaconBlockContainer_BlindedBellatrixBlock:
-			b := blk.GetBlindedBellatrixBlock().Block
-			slot = b.Slot
-			vote = b.Body.Zond1Data.BlockHash
 		case *zondpb.BeaconBlockContainer_CapellaBlock:
 			b := blk.GetCapellaBlock().Block
 			slot = b.Slot
@@ -504,7 +488,7 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 			slot = b.Slot
 			vote = b.Body.Zond1Data.BlockHash
 		default:
-			return errors.New("block neither phase0,altair or bellatrix")
+			return errors.New("unknown block type")
 		}
 		ec.SeenVotes[slot] = vote
 

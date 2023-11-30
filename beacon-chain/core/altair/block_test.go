@@ -24,7 +24,7 @@ import (
 )
 
 func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, privKeys := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -97,7 +97,7 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 }
 
 func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, privKeys := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -129,7 +129,7 @@ func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
 }
 
 func TestProcessSyncCommittee_MixParticipation_GoodSignature(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, privKeys := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -164,7 +164,7 @@ func TestProcessSyncCommittee_MixParticipation_GoodSignature(t *testing.T) {
 
 // This is a regression test #11696
 func TestProcessSyncCommittee_DontPrecompute(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, _ := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -192,7 +192,7 @@ func TestProcessSyncCommittee_DontPrecompute(t *testing.T) {
 }
 
 func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, _ := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -243,7 +243,7 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 }
 
 func Test_VerifySyncCommitteeSig(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, privKeys := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)

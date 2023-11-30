@@ -16,7 +16,7 @@ import (
 func Test_BaseReward(t *testing.T) {
 	helpers.ClearCache()
 	genState := func(valCount uint64) state.ReadOnlyBeaconState {
-		s, _ := util.DeterministicGenesisStateAltair(t, valCount)
+		s, _ := util.DeterministicGenesisState(t, valCount)
 		return s
 	}
 	tests := []struct {
@@ -69,7 +69,7 @@ func Test_BaseReward(t *testing.T) {
 
 func Test_BaseRewardWithTotalBalance(t *testing.T) {
 	helpers.ClearCache()
-	s, _ := util.DeterministicGenesisStateAltair(t, 1)
+	s, _ := util.DeterministicGenesisState(t, 1)
 	tests := []struct {
 		name          string
 		valIdx        primitives.ValidatorIndex

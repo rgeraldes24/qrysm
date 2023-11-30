@@ -60,7 +60,7 @@ func RunFinalityTest(t *testing.T, config string) {
 				require.NoError(t, err)
 				blockSSZ, err := snappy.Decode(nil /* dst */, blockFile)
 				require.NoError(t, err, "Failed to decompress")
-				block := &zondpb.SignedBeaconBlockCapella{}
+				block := &zondpb.SignedBeaconBlock{}
 				require.NoError(t, block.UnmarshalSSZ(blockSSZ), "Failed to unmarshal")
 				wsb, err := blocks.NewSignedBeaconBlock(block)
 				require.NoError(t, err)
@@ -74,9 +74,9 @@ func RunFinalityTest(t *testing.T, config string) {
 			require.NoError(t, err)
 			postBeaconStateSSZ, err := snappy.Decode(nil /* dst */, postBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
-			postBeaconState := &zondpb.BeaconStateCapella{}
+			postBeaconState := &zondpb.BeaconState{}
 			require.NoError(t, postBeaconState.UnmarshalSSZ(postBeaconStateSSZ), "Failed to unmarshal")
-			pbState, err := state_native.ProtobufBeaconStateCapella(beaconState.ToProtoUnsafe())
+			pbState, err := state_native.ProtobufBeaconState(beaconState.ToProtoUnsafe())
 			require.NoError(t, err)
 			if !proto.Equal(pbState, postBeaconState) {
 				t.Fatal("Post state does not match expected")

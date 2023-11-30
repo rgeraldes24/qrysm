@@ -218,12 +218,12 @@ func TestSubmitAggregateAndProof_AggregateNotOk(t *testing.T) {
 }
 
 func generateAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilithium.DilithiumKey) (*zondpb.Attestation, error) {
-	aggBits := bitfield.NewBitlist(4)
-	aggBits.SetBitAt(index, true)
-	aggBits.SetBitAt(index+1, true)
+	participationBits := bitfield.NewBitlist(4)
+	participationBits.SetBitAt(index, true)
+	participationBits.SetBitAt(index+1, true)
 	att := util.HydrateAttestation(&zondpb.Attestation{
 		Data:              &zondpb.AttestationData{CommitteeIndex: 1},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	})
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), state, att.Data.Slot, att.Data.CommitteeIndex)
 	if err != nil {
@@ -256,13 +256,13 @@ func generateAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilit
 }
 
 func generateUnaggregatedAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilithium.DilithiumKey) (*zondpb.Attestation, error) {
-	aggBits := bitfield.NewBitlist(4)
-	aggBits.SetBitAt(index, true)
+	participationBits := bitfield.NewBitlist(4)
+	participationBits.SetBitAt(index, true)
 	att := util.HydrateAttestation(&zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			CommitteeIndex: 1,
 		},
-		ParticipationBits: aggBits,
+		ParticipationBits: participationBits,
 	})
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), state, att.Data.Slot, att.Data.CommitteeIndex)
 	if err != nil {

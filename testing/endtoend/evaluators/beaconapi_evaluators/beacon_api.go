@@ -70,7 +70,7 @@ var beaconPathsAndObjects = map[string]metadata{
 		},
 	},
 	"/beacon/blocks/{param1}": {
-		basepath: v2MiddlewarePathTemplate,
+		basepath: v1MiddlewarePathTemplate,
 		params: func(t string, e primitives.Epoch) []string {
 			if t == "ssz" {
 				if e < 4 {
@@ -103,7 +103,7 @@ var beaconPathsAndObjects = map[string]metadata{
 		},
 	},
 	"/debug/beacon/states/{param1}": {
-		basepath: v2MiddlewarePathTemplate,
+		basepath: v1MiddlewarePathTemplate,
 		params: func(_ string, e primitives.Epoch) []string {
 			return []string{"head"}
 		},

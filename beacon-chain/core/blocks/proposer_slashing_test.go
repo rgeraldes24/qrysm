@@ -189,7 +189,7 @@ func TestProcessProposerSlashings_AppliesCorrectStatus(t *testing.T) {
 func TestProcessProposerSlashings_AppliesCorrectStatusCapella(t *testing.T) {
 	// We test the case when data is correct and verify the validator
 	// registry has been updated.
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
 	proposerIdx := primitives.ValidatorIndex(1)
 
 	header1 := &zondpb.SignedBeaconBlockHeader{

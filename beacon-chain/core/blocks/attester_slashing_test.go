@@ -163,7 +163,7 @@ func TestProcessAttesterSlashings_AppliesCorrectStatus(t *testing.T) {
 }
 
 func TestProcessAttesterSlashings_AppliesCorrectStatusCapella(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
 	for _, vv := range beaconState.Validators() {
 		vv.WithdrawableEpoch = primitives.Epoch(params.BeaconConfig().SlotsPerEpoch)
 	}

@@ -42,7 +42,7 @@ func RunBlockProcessingTest(t *testing.T, config, folderPath string) {
 			require.NoError(t, err)
 			preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
-			beaconStateBase := &zondpb.BeaconStateCapella{}
+			beaconStateBase := &zondpb.BeaconState{}
 			require.NoError(t, beaconStateBase.UnmarshalSSZ(preBeaconStateSSZ), "Failed to unmarshal")
 			beaconState, err := state_native.InitializeFromProtoCapella(beaconStateBase)
 			require.NoError(t, err)
@@ -62,7 +62,7 @@ func RunBlockProcessingTest(t *testing.T, config, folderPath string) {
 				require.NoError(t, err)
 				blockSSZ, err := snappy.Decode(nil /* dst */, blockFile)
 				require.NoError(t, err, "Failed to decompress")
-				block := &zondpb.SignedBeaconBlockCapella{}
+				block := &zondpb.SignedBeaconBlock{}
 				require.NoError(t, block.UnmarshalSSZ(blockSSZ), "Failed to unmarshal")
 				wsb, err := blocks.NewSignedBeaconBlock(block)
 				require.NoError(t, err)
@@ -93,7 +93,7 @@ func RunBlockProcessingTest(t *testing.T, config, folderPath string) {
 				postBeaconStateSSZ, err := snappy.Decode(nil /* dst */, postBeaconStateFile)
 				require.NoError(t, err, "Failed to decompress")
 
-				postBeaconState := &zondpb.BeaconStateCapella{}
+				postBeaconState := &zondpb.BeaconState{}
 				require.NoError(t, postBeaconState.UnmarshalSSZ(postBeaconStateSSZ), "Failed to unmarshal")
 				pbState, err := state_native.ProtobufBeaconStateCapella(beaconState.ToProtoUnsafe())
 				require.NoError(t, err)
