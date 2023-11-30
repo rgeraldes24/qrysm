@@ -556,28 +556,106 @@ func TestVerifyIndexedAttestationSigs(t *testing.T) {
 	}
 }
 
-func TestNewBits(t *testing.T) {
+func TestSearchInsertIdxWithOffset(t *testing.T) {
 	type args struct {
-		baseField bitfield.Bitlist
-		newField  bitfield.Bitlist
+		slc        []int
+		initialIdx int
+		target     int
 	}
 	tests := []struct {
 		name string
 		args args
-		want []uint64
+		err  string
+		want int
 	}{
 		{
-			name: "zero new bits",
 			args: args{
-				baseField: bitfield.Bitlist{0b0000},
-				newField:  bitfield.Bitlist{0b0000},
+				slc:        []int{},
+				initialIdx: 0,
 			},
-			want: []uint64{},
+			want: 0,
+		},
+		{
+			args: args{
+				slc:        []int{0, 10, 12, 26},
+				initialIdx: 4,
+			},
+			err: "Invalid initial index",
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 0,
+				target:     4,
+			},
+			want: 0,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 2,
+				target:     4,
+			},
+			want: 2,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 0,
+				target:     28,
+			},
+			want: 4,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 0,
+				target:     13,
+			},
+			want: 3,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 2,
+				target:     13,
+			},
+			want: 3,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 3,
+				target:     13,
+			},
+			want: 3,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 2,
+				target:     11,
+			},
+			want: 2,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 11, 12, 26},
+				initialIdx: 3,
+				target:     13,
+			},
+			want: 4,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.DeepEqual(t, tt.want, attestation.NewBits(tt.args.baseField, tt.args.newField))
+			got, err := attestation.SearchInsertIdxWithOffset(tt.args.slc, tt.args.initialIdx, tt.args.target)
+			if tt.err == "" {
+				require.NoError(t, err)
+				assert.DeepEqual(t, tt.want, got)
+			} else {
+				require.ErrorContains(t, tt.err, err)
+			}
 		})
 	}
 }

@@ -1,12 +1,12 @@
 package attestations
 
 import (
-	"golang.org/x/exp/slices" // TODO(rgeraldes24) replace with stdlib with go 1.21
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
+	"golang.org/x/exp/slices" // TODO(rgeraldes24) replace with stdlib with go 1.21
 )
 
 // attList represents list of attestations, defined for easier en masse operations (filtering, sorting).
@@ -78,45 +78,55 @@ func AggregatePair(a1, a2 *zondpb.Attestation) (*zondpb.Attestation, error) {
 		baseAtt, newAtt = newAtt, baseAtt
 	}
 
-	participantsToAdd := attestation.NewBits(baseAtt.ParticipationBits, newAtt.ParticipationBits)
+	// update the signatures slice
+	// 1. check for new participants in the new attestation with the help of an aux map
+	// containing the base participants and index the new required signatures.
+	// 2. search for the insert index of the participants to add(sorted) on the slice of
+	// the base participants(sorted) and update the base signatures slice accordingly
+	duplicates := make(map[int]struct{})
+	baseParticipants := baseAtt.ParticipationBits.BitIndices()
+	for _, baseParticipant := range baseParticipants {
+		duplicates[baseParticipant] = struct{}{}
+	}
+
+	newParticipants := newAtt.ParticipationBits.BitIndices()
+	participantsToAdd := make([]int, 0, len(newParticipants))
+	sigIndex := make(map[int][]byte)
+	for i, newParticipant := range newParticipants {
+		_, ok := duplicates[newParticipant]
+		if !ok {
+			participantsToAdd = append(participantsToAdd, newParticipant)
+			sigIndex[newParticipant] = newAtt.Signatures[i]
+		}
+	}
+
 	// base attestation already contains all the participants of the new attestation
 	if len(participantsToAdd) == 0 {
 		return baseAtt, nil
 	}
 
-	// update the signatures slice
-	// 1. map the new attestation participants to their signature
-	// 2. figure out the insert index of the participants to add(sorted) on the slice of
-	// the base participants(sorted) and update the base signatures slice accordigly
-	mapNewAttParticipantToSig := make(map[int][]byte)
-	for i, participant := range newAtt.ParticipationBits.BitIndices() {
-		// @NOTE(rgeraldes24) we could just map the ones we need 
-		mapNewAttParticipantToSig[participant] = newAtt.Signatures[i]
-	}
-
-	baseParticipants := baseAtt.ParticipationBits.BitIndices()
-	startingIdx := 0
+	initialIdx := 0
 	for i, participant := range participantsToAdd {
-		insertIdx, err := attestation.SearchInsertIdxWithStartingIdx(baseParticipants, startingIdx, participantNum)
+		insertIdx, err := attestation.SearchInsertIdxWithOffset(baseParticipants, initialIdx, participant)
 		if err != nil {
 			return nil, err
 		}
 
-		// no need for more index searches; just append the signatures of the remaining 
+		// no need for more index searches; just append the signatures of the remaining
 		// participants that we need to add.
 		if insertIdx > (len(baseParticipants) - 1) {
 			for _, missingParticipant := range participantsToAdd[i:] {
-				slices.Insert(baseAtt.Signatures, insertIdx, mapNewAttParticipantToSig[missingParticipant])
+				slices.Insert(baseAtt.Signatures, insertIdx, sigIndex[missingParticipant])
 			}
 			break
 		}
 
 		slices.Insert(baseParticipants, insertIdx, participant)
-		slices.Insert(baseAtt.Signatures, insertIdx, mapNewAttParticipantToSig[participantNum]])
-		startingIdx = insertIdx + 1
+		slices.Insert(baseAtt.Signatures, insertIdx, sigIndex[participant])
+		initialIdx = insertIdx + 1
 	}
 
-	// update the participants bitlist
+	// update the participants bitfield
 	participants, err := baseAtt.ParticipationBits.Or(newAtt.ParticipationBits)
 	if err != nil {
 		return nil, err

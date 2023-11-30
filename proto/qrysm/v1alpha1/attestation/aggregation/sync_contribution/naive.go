@@ -81,45 +81,55 @@ func naiveAggregate(c1, c2 *zondpb.SyncCommitteeContribution) (*zondpb.SyncCommi
 		baseContribution, newContribution = newContribution, baseContribution
 	}
 
-	contributorsToAdd := attestation.NewBits(baseContribution.ParticipationBits, newContribution.ParticipationBits)
-	// base contribution already contains all the participants of the new attestation
-	if len(contributorsToAdd) == 0 {
+	// update the signatures slice
+	// 1. check for new participants in the new contribution with the help of an aux map
+	// containing the base participants and index the new required signatures.
+	// 2. search for the insert index of the participants to add(sorted) on the slice of
+	// the base participants(sorted) and update the base signatures slice accordingly
+	duplicates := make(map[int]struct{})
+	baseParticipants := baseContribution.ParticipationBits.BitIndices()
+	for _, baseParticipant := range baseParticipants {
+		duplicates[baseParticipant] = struct{}{}
+	}
+
+	newParticipants := newContribution.ParticipationBits.BitIndices()
+	participantsToAdd := make([]int, 0, len(newParticipants))
+	sigIndex := make(map[int][]byte)
+	for i, newParticipant := range newParticipants {
+		_, ok := duplicates[newParticipant]
+		if !ok {
+			participantsToAdd = append(participantsToAdd, newParticipant)
+			sigIndex[newParticipant] = newContribution.Signatures[i]
+		}
+	}
+
+	// base attestation already contains all the participants of the new attestation
+	if len(participantsToAdd) == 0 {
 		return baseContribution, nil
 	}
 
-	// update the signatures slice
-	// 1. map the new contribution participants to their signature
-	// 2. figure out the insert index of the contributors to add(sorted) on the slice of
-	// the base contributors(sorted) and update the base signatures slice accordigly
-	mapNewContributionParticipantToSig := make(map[int][]byte)
-	for i, participant := range newContribution.ParticipationBits.BitIndices() {
-		// @NOTE(rgeraldes24) we could just map the ones we need
-		mapNewContributionParticipantToSig[participant] = newContribution.Signatures[i]
-	}
-
-	baseParticipants := baseContribution.ParticipationBits.BitIndices()
-	startingIdx := 0
-	for i, participant := range contributorsToAdd {
-		insertIdx, err := attestation.SearchInsertIdxWithStartingIdx(baseParticipants, startingIdx, participantNum)
+	initialIdx := 0
+	for i, participant := range participantsToAdd {
+		insertIdx, err := attestation.SearchInsertIdxWithOffset(baseParticipants, initialIdx, participant)
 		if err != nil {
 			return nil, err
 		}
 
-		// no need for more index searches; just append the signatures of the remaining
-		// participants that we need to add.
+		// no need for more index searches - the remaining indexes to add are greater
+		// than the ones in the base participation.
 		if insertIdx > (len(baseParticipants) - 1) {
 			for _, missingParticipant := range participantsToAdd[i:] {
-				slices.Insert(baseContribution.Signatures, insertIdx, mapNewContributionParticipantToSig[missingParticipant])
+				slices.Insert(baseContribution.Signatures, insertIdx, sigIndex[missingParticipant])
 			}
 			break
 		}
 
 		slices.Insert(baseParticipants, insertIdx, participant)
-		slices.Insert(baseContribution.Signatures, insertIdx, mapNewContributionParticipantToSig[participant])
-		startingIdx = insertIdx + 1
+		slices.Insert(baseContribution.Signatures, insertIdx, sigIndex[participant])
+		initialIdx = insertIdx + 1
 	}
 
-	// update the participants bitlist
+	// update the participants bitfield
 	participants, err := baseContribution.ParticipationBits.Or(newContribution.ParticipationBits)
 	if err != nil {
 		return nil, err

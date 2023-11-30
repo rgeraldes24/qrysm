@@ -181,15 +181,22 @@ func CheckPointIsEqual(checkPt1, checkPt2 *zondpb.Checkpoint) bool {
 	return true
 }
 
-func NewBits(baseList bitfield.Bitlist, newList bitfield.Bitlist) []uint64 {
-	newBits := make([]uint64, 0, len(newList))
-	for i := 0; i < len(baseList); i++ {
+func NewBits(baseField bitfield.Bitfield, newField bitfield.Bitfield) []int {
+	baseFieldBytes := baseField.Bytes()
+	if len(baseFieldBytes) == 0 {
+		return newField.BitIndices()
+	}
+
+	newFieldBytes := newField.Bytes()
+	newBits := make([]int, 0, newField.Count())
+
+	for i := 0; i < len(baseFieldBytes); i++ {
 		// start checking the byte and move to bits if a new participant is found
-		if baseList[i]^(baseList[i]|newList[i]) != 0 {
-			var bitIdx uint64 = uint64(i) * 8
+		if baseFieldBytes[i]^(baseFieldBytes[i]|newFieldBytes[i]) != 0 {
+			var bitIdx int = i * 8
 			for j := 0; j < 8; j, bitIdx = j+1, bitIdx+1 {
 				// base field bit must be set to zero and the new field bit must be set to one
-				if !baseList.BitAt(bitIdx) && newList.BitAt(bitIdx) {
+				if !baseField.BitAt(uint64(bitIdx)) && newField.BitAt(uint64(bitIdx)) {
 					newBits = append(newBits, bitIdx)
 				}
 			}
@@ -198,24 +205,39 @@ func NewBits(baseList bitfield.Bitlist, newList bitfield.Bitlist) []uint64 {
 	return newBits
 }
 
-func SearchInsertIdxWithStartingIdx(slc []int, startingIdx int, target int) (int, error) {
-	slcLen := len(slc)
+func SearchInsertIdxWithOffset(arr []int, initialIdx int, target int) (int, error) {
+	arrLen := len(arr)
 
-	if startingIdx > (slcLen - 1) {
-		return 0, fmt.Errorf("Invalid starting index %d for slice length %d", startingIdx, slcLen)
-	}
-
-	if slcLen == 0 {
+	if arrLen == 0 {
 		return 0, nil
 	}
 
-	if target <= slc[startingIdx] {
-		return startingIdx, nil
+	if initialIdx > (arrLen - 1) {
+		return 0, fmt.Errorf("Invalid initial index %d for slice length %d", initialIdx, arrLen)
 	}
 
-	if target > slc[slcLen-1] {
-		return slcLen, nil
+	if target <= arr[initialIdx] {
+		return initialIdx, nil
 	}
 
-	return 0, nil
+	if target > arr[arrLen-1] {
+		return arrLen, nil
+	}
+
+	low := initialIdx
+	high := arrLen - 1
+
+	for low <= high {
+		mid := (low + high) / 2
+		if arr[mid] == target {
+			return mid + 1, nil
+		}
+		if arr[mid] > target {
+			high = mid - 1
+		} else {
+			low = mid + 1
+		}
+	}
+
+	return low, nil
 }
