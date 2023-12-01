@@ -116,13 +116,13 @@ func AggregatePair(a1, a2 *zondpb.Attestation) (*zondpb.Attestation, error) {
 		// participants that we need to add.
 		if insertIdx > (len(baseParticipants) - 1) {
 			for _, missingParticipant := range participantsToAdd[i:] {
-				slices.Insert(baseAtt.Signatures, insertIdx, sigIndex[missingParticipant])
+				baseAtt.Signatures = slices.Insert(baseAtt.Signatures, insertIdx, sigIndex[missingParticipant])
 			}
 			break
 		}
 
-		slices.Insert(baseParticipants, insertIdx, participant)
-		slices.Insert(baseAtt.Signatures, insertIdx, sigIndex[participant])
+		baseParticipants = slices.Insert(baseParticipants, insertIdx, participant)
+		baseAtt.Signatures = slices.Insert(baseAtt.Signatures, insertIdx, sigIndex[participant])
 		initialIdx = insertIdx + 1
 	}
 

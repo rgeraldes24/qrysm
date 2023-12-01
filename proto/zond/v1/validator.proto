@@ -302,7 +302,7 @@ message SyncCommitteeContribution {
 
   // A bit is set if a signature from the validator at the corresponding
   // index in the subcommittee is present in the aggregate `signature`.
-  bytes participation_bits = 4 [(theqrl.zond.ext.ssz_size) = "sync_committee_aggregate_bytes.size", (theqrl.zond.ext.cast_type) = "sync_committee_aggregate_bits.type"];
+  bytes participation_bits = 4 [(theqrl.zond.ext.ssz_size) = "sync_committee_participation_bytes.size", (theqrl.zond.ext.cast_type) = "sync_committee_participation_bits.type"];
 
   // Signature by the validator(s) over the block root of `slot`.
   repeated bytes signatures = 5 [(theqrl.zond.ext.ssz_size) = "?,4595", (theqrl.zond.ext.ssz_max) = "2048"];

@@ -18,8 +18,8 @@ mainnet = {
     "sync_committee_bits.size": "512", #SYNC_COMMITTEE_SIZE
     "sync_committee_bytes.size": "64",
     "sync_committee_bits.type": "github.com/prysmaticlabs/go-bitfield.Bitvector512",
-    "sync_committee_aggregate_bytes.size": "16",
-    "sync_committee_aggregate_bits.type": "github.com/prysmaticlabs/go-bitfield.Bitvector128",
+    "sync_committee_participation_bytes.size": "16",
+    "sync_committee_participation_bits.type": "github.com/prysmaticlabs/go-bitfield.Bitvector128",
     "withdrawal.size": "16",
 }
 
@@ -34,8 +34,8 @@ minimal = {
     "sync_committee_bits.size": "32",
     "sync_committee_bytes.size": "4",
     "sync_committee_bits.type": "github.com/prysmaticlabs/go-bitfield.Bitvector32",
-    "sync_committee_aggregate_bytes.size": "1",
-    "sync_committee_aggregate_bits.type": "github.com/prysmaticlabs/go-bitfield.Bitvector8",
+    "sync_committee_participation_bytes.size": "1",
+    "sync_committee_participation_bits.type": "github.com/prysmaticlabs/go-bitfield.Bitvector8",
     "withdrawal.size": "4",
 }
 

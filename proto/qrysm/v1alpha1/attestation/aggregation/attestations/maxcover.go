@@ -6,7 +6,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/go-bitfield"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
+	"golang.org/x/exp/slices"
 )
 
 // MaxCoverAttestationAggregation relies on Maximum Coverage greedy algorithm for aggregation.
@@ -160,25 +162,62 @@ func aggregateAttestations(atts []*zondpb.Attestation, keys []int, coverage *bit
 	}
 
 	var data *zondpb.AttestationData
-	sigs := make([][]byte, 0) // TODO(rgeraldes24) - review capacity
-	//sigsIdxToParticipationIdx := make([]uint64, 0) // TODO(rgeraldes24) - review capacity
-	//duplicates := make(map[uint64]struct{})        // TODO(rgeraldes24) is there room for duplicates?
+	sigs := make([][]byte, 0, len(keys))
+	participants := make([]int, 0, len(keys))
+	duplicates := make(map[int]struct{})
 
 	for i, idx := range keys {
-		for j := 0; j < len(atts[idx].Signatures); j++ {
-			// TODO(rgeraldes24)
-			/*
-				if _, duplicate := duplicates[atts[idx].SignaturesIdxToParticipationIdx[j]]; duplicate {
-					continue
-				}
-				duplicates[atts[idx].SignaturesIdxToParticipationIdx[j]] = struct{}{}
-			*/
-			sigs = append(sigs, atts[idx].Signatures[j]) // TODO copy?
-		}
+		newAtt := atts[idx]
 
 		if i == 0 {
-			data = zondpb.CopyAttestationData(atts[idx].Data)
+			for _, participant := range newAtt.ParticipationBits.BitIndices() {
+				duplicates[participant] = struct{}{}
+			}
+
+			participants = append(participants, newAtt.ParticipationBits.BitIndices()...)
+			sigs = append(sigs, newAtt.Signatures...)
+
+			data = zondpb.CopyAttestationData(newAtt.Data)
 			targetIdx = idx
+
+			continue
+		}
+
+		newParticipants := newAtt.ParticipationBits.BitIndices()
+		participantsToAdd := make([]int, 0, len(newParticipants))
+		sigIndex := make(map[int][]byte)
+		for i, newParticipant := range newParticipants {
+			_, ok := duplicates[newParticipant]
+			if !ok {
+				duplicates[newParticipant] = struct{}{}
+				participantsToAdd = append(participantsToAdd, newParticipant)
+				sigIndex[newParticipant] = newAtt.Signatures[i]
+			}
+		}
+
+		if len(participantsToAdd) == 0 {
+			continue
+		}
+
+		initialIdx := 0
+		for i, participant := range participantsToAdd {
+			insertIdx, err := attestation.SearchInsertIdxWithOffset(participants, initialIdx, participant)
+			if err != nil {
+				return 0, err
+			}
+
+			// no need for more index searches
+			if insertIdx > (len(participants) - 1) {
+				for _, missingParticipant := range participantsToAdd[i:] {
+					participants = slices.Insert(participants, insertIdx, participant)
+					sigs = slices.Insert(sigs, insertIdx, sigIndex[missingParticipant])
+				}
+				break
+			}
+
+			participants = slices.Insert(participants, insertIdx, participant)
+			sigs = slices.Insert(sigs, insertIdx, sigIndex[participant])
+			initialIdx = insertIdx + 1
 		}
 	}
 

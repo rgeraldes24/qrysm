@@ -38,10 +38,9 @@ func TestNaiveAggregate(t *testing.T) {
 			},
 			want: &zondpb.SyncCommitteeContribution{
 				ParticipationBits: bitfield.Bitvector128{0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:        [][]byte{sig1, sig0},
+				Signatures:        [][]byte{sig0, sig1},
 			},
 		},
-
 		{
 			a1: &zondpb.SyncCommitteeContribution{
 				ParticipationBits: bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -63,17 +62,17 @@ func TestNaiveAggregate(t *testing.T) {
 			},
 			a2: &zondpb.SyncCommitteeContribution{
 				ParticipationBits: bitfield.Bitvector128{0x06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:        [][]byte{sig2, sig1},
+				Signatures:        [][]byte{sig1, sig2},
 			},
 			want: &zondpb.SyncCommitteeContribution{
 				ParticipationBits: bitfield.Bitvector128{0x07, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:        [][]byte{sig2, sig1, sig0},
+				Signatures:        [][]byte{sig0, sig1, sig2},
 			},
 		},
 		{
 			a1: &zondpb.SyncCommitteeContribution{
 				ParticipationBits: bitfield.Bitvector128{0x06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:        [][]byte{sig2, sig1},
+				Signatures:        [][]byte{sig1, sig2},
 			},
 			a2: &zondpb.SyncCommitteeContribution{
 				ParticipationBits: bitfield.Bitvector128{0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -81,7 +80,7 @@ func TestNaiveAggregate(t *testing.T) {
 			},
 			want: &zondpb.SyncCommitteeContribution{
 				ParticipationBits: bitfield.Bitvector128{0x07, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:        [][]byte{sig2, sig1, sig0},
+				Signatures:        [][]byte{sig0, sig1, sig2},
 			},
 		},
 		{
@@ -95,7 +94,7 @@ func TestNaiveAggregate(t *testing.T) {
 			},
 			want: &zondpb.SyncCommitteeContribution{
 				ParticipationBits: bitfield.Bitvector128{0x03, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Signatures:        [][]byte{sig2, sig8, sig0},
+				Signatures:        [][]byte{sig0, sig2, sig8},
 			},
 		},
 		{
@@ -105,11 +104,11 @@ func TestNaiveAggregate(t *testing.T) {
 			},
 			a2: &zondpb.SyncCommitteeContribution{
 				ParticipationBits: bitfield.Bitvector128{0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80},
-				Signatures:        [][]byte{sig127, sig2},
+				Signatures:        [][]byte{sig2, sig127},
 			},
 			want: &zondpb.SyncCommitteeContribution{
 				ParticipationBits: bitfield.Bitvector128{0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x80},
-				Signatures:        [][]byte{sig127, sig2, sig0},
+				Signatures:        [][]byte{sig0, sig2, sig127},
 			},
 		},
 	}
@@ -245,14 +244,15 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 					Signatures:        [][]byte{sig0, sig4, sig5},
 				},
 			},
+
 			want: []*zondpb.SyncCommitteeContribution{
 				{
 					ParticipationBits: bitfield.Bitvector128{0b00011111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:        [][]byte{sig1, sig2, sig4, sig0, sig3},
+					Signatures:        [][]byte{sig0, sig1, sig2, sig3, sig4},
 				},
 				{
 					ParticipationBits: bitfield.Bitvector128{0b00111011, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:        [][]byte{sig0, sig4, sig5, sig1, sig3},
+					Signatures:        [][]byte{sig0, sig1, sig3, sig4, sig5},
 				},
 			},
 		},
@@ -280,7 +280,7 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 				// both 0&1 and 2&3 produce this bitlist
 				{
 					ParticipationBits: bitfield.Bitvector128{0b00001111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					Signatures:        [][]byte{sig0, sig2, sig1, sig3},
+					Signatures:        [][]byte{sig0, sig1, sig2, sig3},
 				},
 			},
 		},
@@ -323,7 +323,6 @@ func TestNaiveSyncContributionAggregation(t *testing.T) {
 			},
 		},
 	}
-
 	for _, tt := range tests {
 		runner := func() {
 			got, err := naiveSyncContributionAggregation(tt.inputs)

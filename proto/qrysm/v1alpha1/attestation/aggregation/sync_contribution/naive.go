@@ -119,13 +119,13 @@ func naiveAggregate(c1, c2 *zondpb.SyncCommitteeContribution) (*zondpb.SyncCommi
 		// than the ones in the base participation.
 		if insertIdx > (len(baseParticipants) - 1) {
 			for _, missingParticipant := range participantsToAdd[i:] {
-				slices.Insert(baseContribution.Signatures, insertIdx, sigIndex[missingParticipant])
+				baseContribution.Signatures = slices.Insert(baseContribution.Signatures, insertIdx, sigIndex[missingParticipant])
 			}
 			break
 		}
 
-		slices.Insert(baseParticipants, insertIdx, participant)
-		slices.Insert(baseContribution.Signatures, insertIdx, sigIndex[participant])
+		baseParticipants = slices.Insert(baseParticipants, insertIdx, participant)
+		baseContribution.Signatures = slices.Insert(baseContribution.Signatures, insertIdx, sigIndex[participant])
 		initialIdx = insertIdx + 1
 	}
 
