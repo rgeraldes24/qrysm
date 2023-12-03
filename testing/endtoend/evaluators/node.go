@@ -105,7 +105,7 @@ func peersConnect(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) erro
 		if err != nil {
 			return err
 		}
-		expectedPeers := len(conns) - 1 + e2e.TestParams.LighthouseBeaconNodeCount
+		expectedPeers := len(conns) - 1
 		if expectedPeers != len(peersResp.Peers) {
 			return fmt.Errorf("unexpected amount of peers, expected %d, received %d", expectedPeers, len(peersResp.Peers))
 		}

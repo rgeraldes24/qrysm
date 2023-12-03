@@ -35,13 +35,3 @@ func TestStandardPorts(t *testing.T) {
 	assert.NotEqual(t, 0, testPorts.QrysmBeaconNodeTCPPort)
 	assert.NotEqual(t, 0, testPorts.JaegerTracingPort)
 }
-
-func TestMulticlientPorts(t *testing.T) {
-	var existingRegistrations []int
-	testPorts := &ports{}
-	assert.NoError(t, initializeMulticlientPorts(2, 0, testPorts, &existingRegistrations))
-	assert.Equal(t, 3, len(existingRegistrations))
-	assert.NotEqual(t, 0, testPorts.LighthouseBeaconNodeHTTPPort)
-	assert.NotEqual(t, 0, testPorts.LighthouseBeaconNodeMetricsPort)
-	assert.NotEqual(t, 0, testPorts.LighthouseBeaconNodeP2PPort)
-}

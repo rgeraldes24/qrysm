@@ -195,7 +195,7 @@ func (r *testRunner) testDepositsAndTx(ctx context.Context, g *errgroup.Group,
 	keystorePath string, requiredNodes []e2etypes.ComponentRunner) {
 	minGenesisActiveCount := int(params.BeaconConfig().MinGenesisActiveValidatorCount)
 	// qrysm web3signer doesn't support deposits
-	r.config.UseWeb3RemoteSigner = false
+	//r.config.UseWeb3RemoteSigner = false
 	depositCheckValidator := components.NewValidatorNode(r.config, int(e2e.DepositCount), e2e.TestParams.BeaconNodeCount, minGenesisActiveCount)
 	g.Go(func() error {
 		if err := helpers.ComponentsStarted(ctx, requiredNodes); err != nil {
@@ -335,7 +335,7 @@ func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, 
 func (r *testRunner) testBeaconChainSync(ctx context.Context, g *errgroup.Group,
 	conns []*grpc.ClientConn, tickingStartTime time.Time, bootnodeEnr, minerEnr string) error {
 	t, config := r.t, r.config
-	index := e2e.TestParams.BeaconNodeCount + e2e.TestParams.LighthouseBeaconNodeCount
+	index := e2e.TestParams.BeaconNodeCount
 	ethNode := zond1.NewNode(index, minerEnr)
 	g.Go(func() error {
 		return ethNode.Start(ctx)
@@ -499,7 +499,7 @@ func (r *testRunner) defaultEndToEndRun() error {
 		return errors.Wrap(err, "one or more evaluators failed")
 	}
 
-	index := e2e.TestParams.BeaconNodeCount + e2e.TestParams.LighthouseBeaconNodeCount
+	index := e2e.TestParams.BeaconNodeCount
 	if config.TestSync {
 		if err := r.testBeaconChainSync(ctx, g, conns, tickingStartTime, bootNode.ENR(), zond1Miner.ENR()); err != nil {
 			return errors.Wrap(err, "beacon chain sync test failed")
@@ -638,17 +638,17 @@ func (r *testRunner) multiScenarioMulticlient(ec *e2etypes.EvaluationContext, ep
 		}, func() bool {
 			return true
 		})
-		// Set it for lighthouse beacon node.
-		component, err = r.comHandler.zond1Proxy.ComponentAtIndex(2)
-		require.NoError(r.t, err)
-		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayload", func() interface{} {
-			return &enginev1.PayloadStatus{
-				Status:          enginev1.PayloadStatus_SYNCING,
-				LatestValidHash: make([]byte, 32),
-			}
-		}, func() bool {
-			return true
-		})
+		// // Set it for lighthouse beacon node.
+		// component, err = r.comHandler.zond1Proxy.ComponentAtIndex(2)
+		// require.NoError(r.t, err)
+		// component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayload", func() interface{} {
+		// 	return &enginev1.PayloadStatus{
+		// 		Status:          enginev1.PayloadStatus_SYNCING,
+		// 		LatestValidHash: make([]byte, 32),
+		// 	}
+		// }, func() bool {
+		// 	return true
+		// })
 
 		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_forkchoiceUpdated", func() interface{} {
 			return &ForkchoiceUpdatedResponse{
@@ -673,14 +673,14 @@ func (r *testRunner) multiScenarioMulticlient(ec *e2etypes.EvaluationContext, ep
 		engineProxy.RemoveRequestInterceptor("engine_newPayload")
 		engineProxy.ReleaseBackedUpRequests("engine_newPayload")
 
-		// Remove for lighthouse too
-		component, err = r.comHandler.zond1Proxy.ComponentAtIndex(2)
-		require.NoError(r.t, err)
-		engineProxy, ok = component.(e2etypes.EngineProxy)
-		require.Equal(r.t, true, ok)
-		engineProxy.RemoveRequestInterceptor("engine_newPayload")
-		engineProxy.RemoveRequestInterceptor("engine_forkchoiceUpdated")
-		engineProxy.ReleaseBackedUpRequests("engine_newPayload")
+		// // Remove for lighthouse too
+		// component, err = r.comHandler.zond1Proxy.ComponentAtIndex(2)
+		// require.NoError(r.t, err)
+		// engineProxy, ok = component.(e2etypes.EngineProxy)
+		// require.Equal(r.t, true, ok)
+		// engineProxy.RemoveRequestInterceptor("engine_newPayload")
+		// engineProxy.RemoveRequestInterceptor("engine_forkchoiceUpdated")
+		// engineProxy.ReleaseBackedUpRequests("engine_newPayload")
 
 		return true
 	case 13, 14, 18, 19:

@@ -86,17 +86,17 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 		require.Equal(t, balances[indices[i-1]], balances[indices[i]])
 	}
 
-	// Increased balance validator count should equal to sync committee count
+	// Increased balance validator count should equal to sync committee count + 1 (block proposer)
 	increased := uint64(0)
 	for _, balance := range balances {
 		if balance > params.BeaconConfig().MaxEffectiveBalance {
 			increased++
 		}
 	}
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, increased)
+	require.Equal(t, params.BeaconConfig().SyncCommitteeSize+1, increased)
 }
 
-func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
+func TestProcessSyncCommittee_MixParticipation_BadSignatures(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
@@ -112,12 +112,15 @@ func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
 	ps := slots.PrevSlot(beaconState.Slot())
 	pbr, err := helpers.BlockRootAtSlot(beaconState, ps)
 	require.NoError(t, err)
-	sigs := make([][]byte, len(indices))
+	sigs := make([][]byte, 0, len(indices))
 	for i, indice := range indices {
-		b := p2pType.SSZBytes(pbr)
-		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
-		require.NoError(t, err)
-		sigs[i] = sb
+		// include signatures of the members that did not participate
+		if !syncBits.BitAt(uint64(i)) {
+			b := p2pType.SSZBytes(pbr)
+			sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
+			require.NoError(t, err)
+			sigs = append(sigs, sb)
+		}
 	}
 	syncAggregate := &zondpb.SyncAggregate{
 		SyncCommitteeBits:       syncBits,
@@ -128,7 +131,7 @@ func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
 	require.ErrorContains(t, "invalid sync committee signature", err)
 }
 
-func TestProcessSyncCommittee_MixParticipation_GoodSignature(t *testing.T) {
+func TestProcessSyncCommittee_MixParticipation_GoodSignatures(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
@@ -202,6 +205,7 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 	for i := range syncBits {
 		syncBits[i] = 0xAA
 	}
+
 	syncAggregate := &zondpb.SyncAggregate{
 		SyncCommitteeBits: syncBits,
 	}
@@ -239,10 +243,11 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 			}
 		}
 	}
-	require.Equal(t, uint64(32000035108), balances[proposerIndex])
+
+	require.Equal(t, uint64(32000036096), balances[proposerIndex])
 }
 
-func Test_VerifySyncCommitteeSig(t *testing.T) {
+func Test_VerifySyncCommitteeSigs(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
@@ -268,10 +273,19 @@ func Test_VerifySyncCommitteeSig(t *testing.T) {
 		pks[i] = privKeys[indice].PublicKey()
 	}
 
+	// invalid sigs
 	dilithiumKey, err := dilithium.RandKey()
 	require.NoError(t, err)
-	require.ErrorContains(t, "invalid sync committee signature", altair.VerifySyncCommitteeSigs(beaconState, pks, dilithiumKey.Sign([]byte{'m', 'e', 'o', 'w'}).Marshal()))
+	invalidSigs := make([][]byte, len(pks))
+	for i := range invalidSigs {
+		invalidSigs[i] = dilithiumKey.Sign([]byte{'m', 'e', 'o', 'w'}).Marshal()
+	}
+	require.ErrorContains(t, "invalid sync committee signature at index", altair.VerifySyncCommitteeSigs(beaconState, pks, invalidSigs))
 
+	// number of sigs != pubkeys
+	require.ErrorContains(t, "number of pubkeys", altair.VerifySyncCommitteeSigs(beaconState, pks, sigs[:len(sigs)-1]))
+
+	// valid sigs
 	require.NoError(t, altair.VerifySyncCommitteeSigs(beaconState, pks, sigs))
 }
 

@@ -11,13 +11,6 @@ import (
 
 var (
 	knownAgentVersions = []string{
-		// "lighthouse",
-		// "nimbus",
-		// "prysm",
-		// "teku",
-		// "lodestar",
-		// "js-libp2p",
-		// "rust-libp2p",
 		"qrysm",
 	}
 	p2pPeerCount = promauto.NewGaugeVec(prometheus.GaugeOpts{

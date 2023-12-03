@@ -15,7 +15,6 @@ import (
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	v1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/helpers"
-	e2eparams "github.com/theQRL/qrysm/v4/testing/endtoend/params"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/policies"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/types"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -25,7 +24,7 @@ import (
 
 var expectedParticipation = 0.99
 
-var expectedMulticlientParticipation = 0.98
+//var expectedMulticlientParticipation = 0.98
 
 var expectedSyncParticipation = 0.99
 
@@ -118,9 +117,7 @@ func validatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.ClientCo
 
 	partRate := participation.Participation.GlobalParticipationRate
 	expected := float32(expectedParticipation)
-	if e2eparams.TestParams.LighthouseBeaconNodeCount != 0 {
-		expected = float32(expectedMulticlientParticipation)
-	}
+
 	if participation.Epoch > 0 && participation.Epoch.Sub(1) == helpers.BellatrixE2EForkEpoch {
 		// Reduce Participation requirement to 95% to account for longer EE calls for
 		// the merge block. Target and head will likely be missed for a few validators at

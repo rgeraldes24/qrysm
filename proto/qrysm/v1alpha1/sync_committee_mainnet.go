@@ -6,7 +6,7 @@ import (
 	"github.com/prysmaticlabs/go-bitfield"
 )
 
-func NewSyncCommitteeAggregationBits() bitfield.Bitvector128 {
+func NewSyncCommitteeParticipationBits() bitfield.Bitvector128 {
 	return bitfield.NewBitvector128()
 }
 

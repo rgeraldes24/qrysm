@@ -226,7 +226,7 @@ func (node *BeaconNode) Start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	expectedNumOfPeers := e2e.TestParams.BeaconNodeCount + e2e.TestParams.LighthouseBeaconNodeCount - 1
+	expectedNumOfPeers := e2e.TestParams.BeaconNodeCount
 	if node.config.TestSync {
 		expectedNumOfPeers += 1
 	}

@@ -149,7 +149,7 @@ func (vs *Server) signaturesAndParticipationBits(
 ) ([][]byte, []byte, error) {
 	subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
 	sigs := make([][]byte, 0, subCommitteeSize)
-	bits := zondpb.NewSyncCommitteeAggregationBits()
+	bits := zondpb.NewSyncCommitteeParticipationBits()
 	syncCommitteeIndicesSigMap := make(map[primitives.CommitteeIndex]*zondpb.SyncCommitteeMessage)
 	appendedSyncCommitteeIndices := make([]primitives.CommitteeIndex, 0)
 

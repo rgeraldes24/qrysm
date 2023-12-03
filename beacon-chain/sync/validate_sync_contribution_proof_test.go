@@ -11,7 +11,6 @@ import (
 	pubsubpb "github.com/libp2p/go-libp2p-pubsub/pb"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/prysmaticlabs/go-bitfield"
-	"github.com/prysmaticlabs/prysm/shared/bls"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
@@ -777,15 +776,15 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							rawBytes := p2ptypes.SSZBytes(headRoot[:])
 							sigRoot, err := signing.ComputeSigningRoot(&rawBytes, d)
 							assert.NoError(t, err)
-							var sigs []dilithium.Signature
+							var sigs [][]byte
 							for i, p2 := range coms {
 								idx, ok := hState.ValidatorIndexByPubkey(bytesutil.ToBytes2592(p2))
 								assert.Equal(t, true, ok)
-								sig := keys[idx].Sign(sigRoot[:])
+								sig := keys[idx].Sign(sigRoot[:]).Marshal()
 								sigs = append(sigs, sig)
 								msg.Message.Contribution.ParticipationBits.SetBitAt(uint64(i), true)
 							}
-							msg.Message.Contribution.Signature = bls.AggregateSignatures(sigs).Marshal()
+							msg.Message.Contribution.Signatures = sigs
 							sigRoot, err = signing.ComputeSigningRoot(msg.Message, cd)
 							assert.NoError(t, err)
 							contrSig := keys[idx].Sign(sigRoot[:])

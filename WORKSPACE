@@ -338,10 +338,6 @@ load("//:deps.bzl", "go_dependencies", "qrysm_deps")
 # gazelle:repository_macro deps.bzl%qrysm_deps
 qrysm_deps()
 
-load("@qrysm//testing/endtoend:deps.bzl", "e2e_deps")
-
-e2e_deps()
-
 load(
     "@io_bazel_rules_docker//go:image.bzl",
     _go_image_repos = "repositories",

@@ -18,7 +18,6 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/zond/service"
 	v1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	"github.com/theQRL/qrysm/v4/testing/endtoend/helpers"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"google.golang.org/grpc"
 )
@@ -28,7 +27,6 @@ type metadata struct {
 	params           func(encoding string, currentEpoch primitives.Epoch) []string
 	requestObject    interface{}
 	qrysmResps       map[string]interface{}
-	lighthouseResps  map[string]interface{}
 	customEvaluation func(interface{}, interface{}) error
 }
 
@@ -41,9 +39,6 @@ var beaconPathsAndObjects = map[string]metadata{
 		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.GenesisResponseJson{},
 		},
-		lighthouseResps: map[string]interface{}{
-			"json": &apimiddleware.GenesisResponseJson{},
-		},
 	},
 	"/beacon/states/{param1}/root": {
 		basepath: v1MiddlewarePathTemplate,
@@ -53,9 +48,6 @@ var beaconPathsAndObjects = map[string]metadata{
 		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.StateRootResponseJson{},
 		},
-		lighthouseResps: map[string]interface{}{
-			"json": &apimiddleware.StateRootResponseJson{},
-		},
 	},
 	"/beacon/states/{param1}/finality_checkpoints": {
 		basepath: v1MiddlewarePathTemplate,
@@ -63,9 +55,6 @@ var beaconPathsAndObjects = map[string]metadata{
 			return []string{"head"}
 		},
 		qrysmResps: map[string]interface{}{
-			"json": &apimiddleware.StateFinalityCheckpointResponseJson{},
-		},
-		lighthouseResps: map[string]interface{}{
 			"json": &apimiddleware.StateFinalityCheckpointResponseJson{},
 		},
 	},
@@ -85,10 +74,6 @@ var beaconPathsAndObjects = map[string]metadata{
 			"json": &apimiddleware.BlockResponseJson{},
 			"ssz":  []byte{},
 		},
-		lighthouseResps: map[string]interface{}{
-			"json": &apimiddleware.BlockResponseJson{},
-			"ssz":  []byte{},
-		},
 	},
 	"/beacon/states/{param1}/fork": {
 		basepath: v1MiddlewarePathTemplate,
@@ -96,9 +81,6 @@ var beaconPathsAndObjects = map[string]metadata{
 			return []string{"finalized"}
 		},
 		qrysmResps: map[string]interface{}{
-			"json": &apimiddleware.StateForkResponseJson{},
-		},
-		lighthouseResps: map[string]interface{}{
 			"json": &apimiddleware.StateForkResponseJson{},
 		},
 	},
@@ -110,9 +92,6 @@ var beaconPathsAndObjects = map[string]metadata{
 		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.BeaconStateResponseJson{},
 		},
-		lighthouseResps: map[string]interface{}{
-			"json": &apimiddleware.BeaconStateResponseJson{},
-		},
 	},
 	"/validator/duties/proposer/{param1}": {
 		basepath: v1MiddlewarePathTemplate,
@@ -120,9 +99,6 @@ var beaconPathsAndObjects = map[string]metadata{
 			return []string{fmt.Sprintf("%v", e)}
 		},
 		qrysmResps: map[string]interface{}{
-			"json": &apimiddleware.ProposerDutiesResponseJson{},
-		},
-		lighthouseResps: map[string]interface{}{
 			"json": &apimiddleware.ProposerDutiesResponseJson{},
 		},
 		customEvaluation: func(qrysmResp interface{}, lhouseResp interface{}) error {
@@ -154,9 +130,6 @@ var beaconPathsAndObjects = map[string]metadata{
 		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.AttesterDutiesResponseJson{},
 		},
-		lighthouseResps: map[string]interface{}{
-			"json": &apimiddleware.AttesterDutiesResponseJson{},
-		},
 		customEvaluation: func(qrysmResp interface{}, lhouseResp interface{}) error {
 			castedp, ok := lhouseResp.(*apimiddleware.AttesterDutiesResponseJson)
 			if !ok {
@@ -186,9 +159,6 @@ var beaconPathsAndObjects = map[string]metadata{
 		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.BlockHeaderResponseJson{},
 		},
-		lighthouseResps: map[string]interface{}{
-			"json": &apimiddleware.BlockHeaderResponseJson{},
-		},
 	},
 	"/node/identity": {
 		basepath: v1MiddlewarePathTemplate,
@@ -196,9 +166,6 @@ var beaconPathsAndObjects = map[string]metadata{
 			return []string{}
 		},
 		qrysmResps: map[string]interface{}{
-			"json": &apimiddleware.IdentityResponseJson{},
-		},
-		lighthouseResps: map[string]interface{}{
 			"json": &apimiddleware.IdentityResponseJson{},
 		},
 		customEvaluation: func(qrysmResp interface{}, lhouseResp interface{}) error {
@@ -227,9 +194,6 @@ var beaconPathsAndObjects = map[string]metadata{
 		qrysmResps: map[string]interface{}{
 			"json": &apimiddleware.PeersResponseJson{},
 		},
-		lighthouseResps: map[string]interface{}{
-			"json": &apimiddleware.PeersResponseJson{},
-		},
 		customEvaluation: func(qrysmResp interface{}, lhouseResp interface{}) error {
 			castedp, ok := qrysmResp.(*apimiddleware.PeersResponseJson)
 			if !ok {
@@ -241,9 +205,6 @@ var beaconPathsAndObjects = map[string]metadata{
 			}
 			if castedp.Data == nil {
 				return errors.New("qrysm node identity was empty")
-			}
-			if castedl.Data == nil {
-				return errors.New("lighthouse node identity was empty")
 			}
 			return nil
 		},
@@ -271,7 +232,6 @@ func withCompareBeaconAPIs(beaconNodeIdx int, conn *grpc.ClientConn) error {
 					apipath,
 					meta.requestObject,
 					beaconPathsAndObjects[path].qrysmResps[key],
-					beaconPathsAndObjects[path].lighthouseResps[key],
 					meta.customEvaluation,
 				); err != nil {
 					return err
@@ -283,12 +243,12 @@ func withCompareBeaconAPIs(beaconNodeIdx int, conn *grpc.ClientConn) error {
 				}
 				apipath := pathFromParams(path, sszparams)
 				fmt.Printf("executing ssz api path: %s\n", apipath)
-				qrysmr, lighthouser, err := compareSSZMulticlient(beaconNodeIdx, meta.basepath, apipath)
-				if err != nil {
-					return err
-				}
+				// qrysmr, lighthouser, err := compareSSZMulticlient(beaconNodeIdx, meta.basepath, apipath)
+				// if err != nil {
+				// 	return err
+				// }
 				beaconPathsAndObjects[path].qrysmResps[key] = qrysmr
-				beaconPathsAndObjects[path].lighthouseResps[key] = lighthouser
+				// beaconPathsAndObjects[path].lighthouseResps[key] = lighthouser
 			default:
 				return fmt.Errorf("unknown encoding type %s", key)
 			}
@@ -326,49 +286,22 @@ func orderedEvaluationOnResponses(beaconPathsAndObjects map[string]metadata, gen
 	if !ok {
 		return errors.New("failed to cast type")
 	}
-	if finalizedEpoch < helpers.AltairE2EForkEpoch+2 {
-		blockP := &zondpb.SignedBeaconBlock{}
-		blockL := &zondpb.SignedBeaconBlock{}
-		if err := blockL.UnmarshalSSZ(sszrspL); err != nil {
-			return errors.Wrap(err, "failed to unmarshal lighthouse ssz")
-		}
-		if err := blockP.UnmarshalSSZ(sszrspP); err != nil {
-			return errors.Wrap(err, "failed to unmarshal rysm ssz")
-		}
-		if len(blockP.Signature) == 0 || len(blockL.Signature) == 0 || hexutil.Encode(blockP.Signature) != hexutil.Encode(blockL.Signature) {
-			return errors.New("qrysm signature does not match lighthouse signature")
-		}
-	} else if finalizedEpoch >= helpers.AltairE2EForkEpoch+2 && finalizedEpoch < helpers.BellatrixE2EForkEpoch {
-		blockP := &zondpb.SignedBeaconBlockAltair{}
-		blockL := &zondpb.SignedBeaconBlockAltair{}
-		if err := blockL.UnmarshalSSZ(sszrspL); err != nil {
-			return errors.Wrap(err, "lighthouse ssz error")
-		}
-		if err := blockP.UnmarshalSSZ(sszrspP); err != nil {
-			return errors.Wrap(err, "qrysm ssz error")
-		}
 
-		if len(blockP.Signature) == 0 || len(blockL.Signature) == 0 || hexutil.Encode(blockP.Signature) != hexutil.Encode(blockL.Signature) {
-			return fmt.Errorf("qrysm response %v does not match lighthouse response %v",
-				blockP,
-				blockL)
-		}
-	} else {
-		blockP := &zondpb.SignedBeaconBlockBellatrix{}
-		blockL := &zondpb.SignedBeaconBlockBellatrix{}
-		if err := blockL.UnmarshalSSZ(sszrspL); err != nil {
-			return errors.Wrap(err, "lighthouse ssz error")
-		}
-		if err := blockP.UnmarshalSSZ(sszrspP); err != nil {
-			return errors.Wrap(err, "qrysm ssz error")
-		}
-
-		if len(blockP.Signature) == 0 || len(blockL.Signature) == 0 || hexutil.Encode(blockP.Signature) != hexutil.Encode(blockL.Signature) {
-			return fmt.Errorf("qrysm response %v does not match lighthouse response %v",
-				blockP,
-				blockL)
-		}
+	blockP := &zondpb.SignedBeaconBlock{}
+	blockL := &zondpb.SignedBeaconBlock{}
+	if err := blockL.UnmarshalSSZ(sszrspL); err != nil {
+		return errors.Wrap(err, "lighthouse ssz error")
 	}
+	if err := blockP.UnmarshalSSZ(sszrspP); err != nil {
+		return errors.Wrap(err, "qrysm ssz error")
+	}
+
+	if len(blockP.Signature) == 0 || len(blockL.Signature) == 0 || hexutil.Encode(blockP.Signature) != hexutil.Encode(blockL.Signature) {
+		return fmt.Errorf("qrysm response %v does not match lighthouse response %v",
+			blockP,
+			blockL)
+	}
+
 	blockheaderData := beaconPathsAndObjects["/beacon/headers/{param1}"]
 	qrysmHeader, ok := blockheaderData.qrysmResps["json"].(*apimiddleware.BlockHeaderResponseJson)
 	if !ok {

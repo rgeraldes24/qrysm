@@ -18,23 +18,21 @@ import (
 )
 
 type componentHandler struct {
-	t                        *testing.T
-	cfg                      *e2etypes.E2EConfig
-	ctx                      context.Context
-	done                     func()
-	group                    *errgroup.Group
-	keygen                   e2etypes.ComponentRunner
-	tracingSink              e2etypes.ComponentRunner
-	web3Signer               e2etypes.ComponentRunner
-	bootnode                 e2etypes.ComponentRunner
-	zond1Miner               e2etypes.ComponentRunner
-	builders                 e2etypes.MultipleComponentRunners
-	zond1Proxy               e2etypes.MultipleComponentRunners
-	zond1Nodes               e2etypes.MultipleComponentRunners
-	beaconNodes              e2etypes.MultipleComponentRunners
-	validatorNodes           e2etypes.MultipleComponentRunners
-	lighthouseBeaconNodes    e2etypes.MultipleComponentRunners
-	lighthouseValidatorNodes e2etypes.MultipleComponentRunners
+	t           *testing.T
+	cfg         *e2etypes.E2EConfig
+	ctx         context.Context
+	done        func()
+	group       *errgroup.Group
+	keygen      e2etypes.ComponentRunner
+	tracingSink e2etypes.ComponentRunner
+	//web3Signer               e2etypes.ComponentRunner
+	bootnode       e2etypes.ComponentRunner
+	zond1Miner     e2etypes.ComponentRunner
+	builders       e2etypes.MultipleComponentRunners
+	zond1Proxy     e2etypes.MultipleComponentRunners
+	zond1Nodes     e2etypes.MultipleComponentRunners
+	beaconNodes    e2etypes.MultipleComponentRunners
+	validatorNodes e2etypes.MultipleComponentRunners
 }
 
 func NewComponentHandler(cfg *e2etypes.E2EConfig, t *testing.T) *componentHandler {
@@ -58,10 +56,7 @@ func (c *componentHandler) setup() {
 	t.Logf("Starting time: %s\n", time.Now().String())
 	t.Logf("Log Path: %s\n", e2e.TestParams.LogPath)
 
-	multiClientActive := e2e.TestParams.LighthouseBeaconNodeCount > 0
-	var keyGen e2etypes.ComponentRunner
-	var lighthouseValidatorNodes e2etypes.MultipleComponentRunners
-	var lighthouseNodes *components.LighthouseBeaconNodeSet
+	// var keyGen e2etypes.ComponentRunner
 
 	tracingSink := components.NewTracingSink(config.TracingSinkEndpoint)
 	g.Go(func() error {
@@ -69,28 +64,18 @@ func (c *componentHandler) setup() {
 	})
 	c.tracingSink = tracingSink
 
-	if multiClientActive {
-		keyGen = components.NewKeystoreGenerator()
+	// var web3RemoteSigner *components.Web3RemoteSigner
+	// if config.UseWeb3RemoteSigner {
+	// 	web3RemoteSigner = components.NewWeb3RemoteSigner()
+	// 	g.Go(func() error {
+	// 		if err := web3RemoteSigner.Start(ctx); err != nil {
+	// 			return errors.Wrap(err, "failed to start web3 remote signer")
+	// 		}
+	// 		return nil
+	// 	})
+	// 	c.web3Signer = web3RemoteSigner
 
-		// Generate lighthouse keystores.
-		g.Go(func() error {
-			return keyGen.Start(ctx)
-		})
-		c.keygen = keyGen
-	}
-
-	var web3RemoteSigner *components.Web3RemoteSigner
-	if config.UseWeb3RemoteSigner {
-		web3RemoteSigner = components.NewWeb3RemoteSigner()
-		g.Go(func() error {
-			if err := web3RemoteSigner.Start(ctx); err != nil {
-				return errors.Wrap(err, "failed to start web3 remote signer")
-			}
-			return nil
-		})
-		c.web3Signer = web3RemoteSigner
-
-	}
+	// }
 
 	// Boot node.
 	bootNode := components.NewBootNode()
@@ -189,27 +174,13 @@ func (c *componentHandler) setup() {
 	})
 	c.beaconNodes = beaconNodes
 
-	if multiClientActive {
-		lighthouseNodes = components.NewLighthouseBeaconNodes(config)
-		g.Go(func() error {
-			if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{zond1Nodes, proxies, bootNode, beaconNodes}); err != nil {
-				return errors.Wrap(err, "lighthouse beacon nodes require proxies, execution, beacon and boot node to run")
-			}
-			lighthouseNodes.SetENR(bootNode.ENR())
-			if err := lighthouseNodes.Start(ctx); err != nil {
-				return errors.Wrap(err, "failed to start lighthouse beacon nodes")
-			}
-			return nil
-		})
-		c.lighthouseBeaconNodes = lighthouseNodes
-	}
 	// Validator nodes.
 	validatorNodes := components.NewValidatorNodeSet(config)
 	g.Go(func() error {
 		comps := []e2etypes.ComponentRunner{beaconNodes}
-		if config.UseWeb3RemoteSigner {
-			comps = append(comps, web3RemoteSigner)
-		}
+		// if config.UseWeb3RemoteSigner {
+		// 	comps = append(comps, web3RemoteSigner)
+		// }
 		if err := helpers.ComponentsStarted(ctx, comps); err != nil {
 			return errors.Wrap(err, "validator nodes require components to run")
 		}
@@ -220,25 +191,10 @@ func (c *componentHandler) setup() {
 	})
 	c.validatorNodes = validatorNodes
 
-	if multiClientActive {
-		// Lighthouse Validator nodes.
-		lighthouseValidatorNodes = components.NewLighthouseValidatorNodeSet(config)
-		g.Go(func() error {
-			if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{keyGen, lighthouseNodes}); err != nil {
-				return errors.Wrap(err, "lighthouse validator nodes require lighthouse beacon nodes to run")
-			}
-			if err := lighthouseValidatorNodes.Start(ctx); err != nil {
-				return errors.Wrap(err, "failed to start lighthouse validator nodes")
-			}
-			return nil
-		})
-		c.lighthouseValidatorNodes = lighthouseValidatorNodes
-	}
 	c.group = g
 }
 
 func (c *componentHandler) required() []e2etypes.ComponentRunner {
-	multiClientActive := e2e.TestParams.LighthouseBeaconNodeCount > 0
 	requiredComponents := []e2etypes.ComponentRunner{
 		c.tracingSink, c.zond1Nodes, c.bootnode, c.beaconNodes, c.validatorNodes,
 	}
@@ -246,9 +202,6 @@ func (c *componentHandler) required() []e2etypes.ComponentRunner {
 		requiredComponents = append(requiredComponents, c.builders)
 	} else {
 		requiredComponents = append(requiredComponents, c.zond1Proxy)
-	}
-	if multiClientActive {
-		requiredComponents = append(requiredComponents, []e2etypes.ComponentRunner{c.keygen, c.lighthouseBeaconNodes, c.lighthouseValidatorNodes}...)
 	}
 	return requiredComponents
 }

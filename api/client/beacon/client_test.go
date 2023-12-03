@@ -21,8 +21,8 @@ func TestParseNodeVersion(t *testing.T) {
 			err:  client.ErrInvalidNodeVersion,
 		},
 		{
-			name: "Prysm as the version string",
-			v:    "Prysm",
+			name: "Qrysm as the version string",
+			v:    "Qrysm",
 			err:  client.ErrInvalidNodeVersion,
 		},
 		{
@@ -32,9 +32,9 @@ func TestParseNodeVersion(t *testing.T) {
 		},
 		{
 			name: "complete version",
-			v:    "Prysm/v2.0.6 (linux amd64)",
+			v:    "Qrysm/v2.0.6 (linux amd64)",
 			nv: &NodeVersion{
-				implementation: "Prysm",
+				implementation: "Qrysm",
 				semver:         "v2.0.6",
 				systemInfo:     "(linux amd64)",
 			},

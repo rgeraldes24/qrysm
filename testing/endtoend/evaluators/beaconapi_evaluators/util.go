@@ -15,8 +15,6 @@ func doMiddlewareJSONGetRequest(template string, requestPath string, beaconNodeI
 	var port int
 	if len(bnType) > 0 {
 		switch bnType[0] {
-		case "lighthouse":
-			port = params.TestParams.Ports.LighthouseBeaconNodeHTTPPort
 		default:
 			port = params.TestParams.Ports.QrysmBeaconNodeGatewayPort
 		}
@@ -46,8 +44,6 @@ func doMiddlewareSSZGetRequest(template string, requestPath string, beaconNodeId
 	var port int
 	if len(bnType) > 0 {
 		switch bnType[0] {
-		case "lighthouse":
-			port = params.TestParams.Ports.LighthouseBeaconNodeHTTPPort
 		default:
 			port = params.TestParams.Ports.QrysmBeaconNodeGatewayPort
 		}
@@ -86,8 +82,6 @@ func doMiddlewareJSONPostRequest(template string, requestPath string, beaconNode
 	var port int
 	if len(bnType) > 0 {
 		switch bnType[0] {
-		case "lighthouse":
-			port = params.TestParams.Ports.LighthouseBeaconNodeHTTPPort
 		default:
 			port = params.TestParams.Ports.QrysmBeaconNodeGatewayPort
 		}

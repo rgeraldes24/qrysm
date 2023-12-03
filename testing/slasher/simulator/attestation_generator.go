@@ -6,6 +6,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
@@ -62,7 +64,7 @@ func (s *Simulator) generateAttestationsForSlot(
 			att := &zondpb.IndexedAttestation{
 				AttestingIndices: indices,
 				Data:             attData,
-				Signature:        params.BeaconConfig().EmptyDilithiumSignature[:],
+				Signatures:       make([][]byte, 0),
 			}
 			beaconState, err := s.srvConfig.AttestationStateFetcher.AttestationTargetState(ctx, att.Data.Target)
 			if err != nil {
@@ -70,24 +72,20 @@ func (s *Simulator) generateAttestationsForSlot(
 			}
 
 			// Sign the attestation with a valid signature.
-			aggSig, err := s.aggregateSigForAttestation(beaconState, att)
+			sigs, err := s.sigsForAttestation(beaconState, att)
 			if err != nil {
 				return nil, nil, err
 			}
-			att.Signature = aggSig.Marshal()
+			att.Signatures = sigs
 
 			attestations = append(attestations, att)
 			if rand.NewGenerator().Float64() < s.srvConfig.Params.AttesterSlashingProbab {
 				slashableAtt := makeSlashableFromAtt(att, []uint64{indices[0]})
-				// TODO(rgeraldes24) - review
-				/*
-					aggSig, err := s.aggregateSigForAttestation(beaconState, slashableAtt)
-					if err != nil {
-						return nil, nil, err
-					}
-				*/
-				//slashableAtt.Signature = aggSig.Marshal()
-				slashableAtt.Signatures = [][]byte{}
+				sigs, err := s.sigsForAttestation(beaconState, slashableAtt)
+				if err != nil {
+					return nil, nil, err
+				}
+				slashableAtt.Signatures = sigs
 				slashedIndices = append(slashedIndices, slashableAtt.AttestingIndices...)
 				slashings = append(slashings, &zondpb.AttesterSlashing{
 					Attestation_1: att,
@@ -108,10 +106,9 @@ func (s *Simulator) generateAttestationsForSlot(
 	return attestations, slashings, nil
 }
 
-/*
-func (s *Simulator) aggregateSigForAttestation(
+func (s *Simulator) sigsForAttestation(
 	beaconState state.ReadOnlyBeaconState, att *zondpb.IndexedAttestation,
-) (dilithium.Signature, error) {
+) ([][]byte, error) {
 	domain, err := signing.Domain(
 		beaconState.Fork(),
 		att.Data.Target.Epoch,
@@ -125,14 +122,13 @@ func (s *Simulator) aggregateSigForAttestation(
 	if err != nil {
 		return nil, err
 	}
-	sigs := make([]dilithium.Signature, len(att.AttestingIndices))
+	sigs := make([][]byte, len(att.AttestingIndices))
 	for i, validatorIndex := range att.AttestingIndices {
 		privKey := s.srvConfig.PrivateKeysByValidatorIndex[primitives.ValidatorIndex(validatorIndex)]
-		sigs[i] = privKey.Sign(signingRoot[:])
+		sigs[i] = privKey.Sign(signingRoot[:]).Marshal()
 	}
-	return bls.AggregateSignatures(sigs), nil
+	return sigs, nil
 }
-*/
 
 func makeSlashableFromAtt(att *zondpb.IndexedAttestation, indices []uint64) *zondpb.IndexedAttestation {
 	if att.Data.Source.Epoch <= 2 {

@@ -90,14 +90,10 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 	return newTestRunner(t, testConfig)
 }
 
-func e2eMainnet(t *testing.T, useQrysmSh, useMultiClient bool, cfg *params.BeaconChainConfig, cfgo ...types.E2EConfigOpt) *testRunner {
+func e2eMainnet(t *testing.T, useQrysmSh /*useMultiClient bool,*/, cfg *params.BeaconChainConfig, cfgo ...types.E2EConfigOpt) *testRunner {
 	params.SetupTestConfigCleanup(t)
 	require.NoError(t, params.SetActive(cfg))
-	if useMultiClient {
-		require.NoError(t, e2eParams.InitMultiClient(t, e2eParams.StandardBeaconCount, e2eParams.StandardLighthouseNodeCount))
-	} else {
-		require.NoError(t, e2eParams.Init(t, e2eParams.StandardBeaconCount))
-	}
+	require.NoError(t, e2eParams.Init(t, e2eParams.StandardBeaconCount))
 	// Run for 10 epochs if not in long-running to confirm long-running has no issues.
 	var err error
 	epochsToRun := 12

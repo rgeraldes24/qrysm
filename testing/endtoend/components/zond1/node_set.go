@@ -35,7 +35,7 @@ func (s *NodeSet) Start(ctx context.Context) error {
 	// We want each beacon node to connect to its own Zond1 node.
 	// We start up one Zond1 node less than the beacon node count because the first
 	// beacon node will connect to the already existing Zond1 miner.
-	totalNodeCount := e2e.TestParams.BeaconNodeCount + e2e.TestParams.LighthouseBeaconNodeCount - 1
+	totalNodeCount := e2e.TestParams.BeaconNodeCount
 	nodes := make([]e2etypes.ComponentRunner, totalNodeCount)
 	for i := 0; i < totalNodeCount; i++ {
 		// We start indexing nodes from 1 because the miner has an implicit 0 index.

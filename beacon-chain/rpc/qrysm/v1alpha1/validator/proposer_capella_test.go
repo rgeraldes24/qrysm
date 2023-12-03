@@ -591,3 +591,18 @@ func TestEmptyTransactionsRoot(t *testing.T) {
 	require.NoError(t, err)
 	require.DeepEqual(t, r, emptyTransactionsRoot)
 }
+
+func TestServer_SetSyncAggregate_EmptyCase(t *testing.T) {
+	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+	require.NoError(t, err)
+	s := &Server{} // Sever is not initialized with sync committee pool.
+	s.setSyncAggregate(context.Background(), b)
+	agg, err := b.Block().Body().SyncAggregate()
+	require.NoError(t, err)
+
+	want := &zondpb.SyncAggregate{
+		SyncCommitteeBits:       make([]byte, params.BeaconConfig().SyncCommitteeSize/8),
+		SyncCommitteeSignatures: [][]byte{},
+	}
+	require.DeepEqual(t, want, agg)
+}
