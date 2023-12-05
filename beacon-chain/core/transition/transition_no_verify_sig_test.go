@@ -2,11 +2,16 @@ package transition_test
 
 import (
 	"context"
+	"math"
 	"testing"
 
+	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
+	p2pType "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -19,6 +24,10 @@ import (
 func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
 
+	syncCommittee, err := altair.NextSyncCommittee(context.Background(), beaconState)
+	require.NoError(t, err)
+	require.NoError(t, beaconState.SetCurrentSyncCommittee(syncCommittee))
+
 	zond1Data := &zondpb.Zond1Data{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
@@ -52,28 +61,56 @@ func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 	block.Block.Body.RandaoReveal = randaoReveal
 	block.Block.Body.Zond1Data = zond1Data
 
+	syncBits := bitfield.NewBitvector512()
+	for i := range syncBits {
+		syncBits[i] = 0xff
+	}
+	indices, err := altair.NextSyncCommitteeIndices(context.Background(), beaconState)
+	require.NoError(t, err)
+	h := zondpb.CopyBeaconBlockHeader(beaconState.LatestBlockHeader())
+	prevStateRoot, err := beaconState.HashTreeRoot(context.Background())
+	require.NoError(t, err)
+	h.StateRoot = prevStateRoot[:]
+	pbr, err := h.HashTreeRoot()
+	require.NoError(t, err)
+	syncSigs := make([][]byte, len(indices))
+	for i, indice := range indices {
+		b := p2pType.SSZBytes(pbr[:])
+		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
+		require.NoError(t, err)
+		syncSigs[i] = sb
+	}
+	syncAggregate := &zondpb.SyncAggregate{
+		SyncCommitteeBits:       syncBits,
+		SyncCommitteeSignatures: syncSigs,
+	}
+	block.Block.Body.SyncAggregate = syncAggregate
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	stateRoot, err := transition.CalculateStateRoot(context.Background(), beaconState, wsb)
 	require.NoError(t, err)
-
 	block.Block.StateRoot = stateRoot[:]
 
-	sig, err := util.BlockSignature(beaconState, block.Block, privKeys)
+	c := beaconState.Copy()
+	sig, err := util.BlockSignature(c, block.Block, privKeys)
 	require.NoError(t, err)
 	block.Signature = sig.Marshal()
 
 	wsb, err = blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	set, _, err := transition.ExecuteStateTransitionNoVerifyAnySig(context.Background(), beaconState, wsb)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	verified, err := set.Verify()
-	assert.NoError(t, err)
-	assert.Equal(t, true, verified, "Could not verify signature set")
+	require.NoError(t, err)
+	require.Equal(t, true, verified, "Could not verify signature set")
 }
 
 func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+
+	syncCommittee, err := altair.NextSyncCommittee(context.Background(), beaconState)
+	require.NoError(t, err)
+	require.NoError(t, beaconState.SetCurrentSyncCommittee(syncCommittee))
 
 	zond1Data := &zondpb.Zond1Data{
 		DepositCount: 100,
@@ -108,14 +145,39 @@ func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *test
 	block.Block.Body.RandaoReveal = randaoReveal
 	block.Block.Body.Zond1Data = zond1Data
 
+	syncBits := bitfield.NewBitvector512()
+	for i := range syncBits {
+		syncBits[i] = 0xff
+	}
+	indices, err := altair.NextSyncCommitteeIndices(context.Background(), beaconState)
+	require.NoError(t, err)
+	h := zondpb.CopyBeaconBlockHeader(beaconState.LatestBlockHeader())
+	prevStateRoot, err := beaconState.HashTreeRoot(context.Background())
+	require.NoError(t, err)
+	h.StateRoot = prevStateRoot[:]
+	pbr, err := h.HashTreeRoot()
+	require.NoError(t, err)
+	syncSigs := make([][]byte, len(indices))
+	for i, indice := range indices {
+		b := p2pType.SSZBytes(pbr[:])
+		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
+		require.NoError(t, err)
+		syncSigs[i] = sb
+	}
+	syncAggregate := &zondpb.SyncAggregate{
+		SyncCommitteeBits:       syncBits,
+		SyncCommitteeSignatures: syncSigs,
+	}
+	block.Block.Body.SyncAggregate = syncAggregate
+
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	stateRoot, err := transition.CalculateStateRoot(context.Background(), beaconState, wsb)
 	require.NoError(t, err)
-
 	block.Block.StateRoot = stateRoot[:]
 
-	sig, err := util.BlockSignature(beaconState, block.Block, privKeys)
+	c := beaconState.Copy()
+	sig, err := util.BlockSignature(c, block.Block, privKeys)
 	require.NoError(t, err)
 	block.Signature = sig.Marshal()
 
@@ -126,8 +188,20 @@ func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *test
 	require.ErrorContains(t, "could not validate state root", err)
 }
 
+func TestExecuteStateTransitionNoVerifyAnySig_PassesProcessingConditions(t *testing.T) {
+	beaconState, block := createFullBlockWithOperations(t)
+	wsb, err := blocks.NewSignedBeaconBlock(block)
+	require.NoError(t, err)
+	set, _, err := transition.ExecuteStateTransitionNoVerifyAnySig(context.Background(), beaconState, wsb)
+	require.NoError(t, err)
+	// Test Signature set verifies.
+	verified, err := set.Verify()
+	require.NoError(t, err)
+	require.Equal(t, true, verified, "Could not verify signature set")
+}
+
 func TestProcessBlockNoVerify_PassesProcessingConditions(t *testing.T) {
-	beaconState, block, _, _, _ := createFullBlockWithOperations(t)
+	beaconState, block := createFullBlockWithOperations(t)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	set, _, err := transition.ProcessBlockNoVerifyAnySig(context.Background(), beaconState, wsb)
@@ -138,8 +212,8 @@ func TestProcessBlockNoVerify_PassesProcessingConditions(t *testing.T) {
 	assert.Equal(t, true, verified, "Could not verify signature set.")
 }
 
-func TestProcessBlockNoVerifyAnySigAltair_OK(t *testing.T) {
-	beaconState, block := createFullAltairBlockWithOperations(t)
+func TestProcessBlockNoVerifyAnySigCapella_OK(t *testing.T) {
+	beaconState, block := createFullBlockWithOperations(t)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	beaconState, err = transition.ProcessSlots(context.Background(), beaconState, wsb.Block().Slot())
@@ -152,7 +226,7 @@ func TestProcessBlockNoVerifyAnySigAltair_OK(t *testing.T) {
 }
 
 func TestProcessBlockNoVerify_SigSetContainsDescriptions(t *testing.T) {
-	beaconState, block, _, _, _ := createFullBlockWithOperations(t)
+	beaconState, block := createFullBlockWithOperations(t)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	set, _, err := transition.ProcessBlockNoVerifyAnySig(context.Background(), beaconState, wsb)
@@ -163,28 +237,8 @@ func TestProcessBlockNoVerify_SigSetContainsDescriptions(t *testing.T) {
 	assert.Equal(t, "attestation signature", set.Descriptions[2])
 }
 
-func TestProcessOperationsNoVerifyAttsSigs_OK(t *testing.T) {
-	beaconState, block := createFullAltairBlockWithOperations(t)
-	wsb, err := blocks.NewSignedBeaconBlock(block)
-	require.NoError(t, err)
-	beaconState, err = transition.ProcessSlots(context.Background(), beaconState, wsb.Block().Slot())
-	require.NoError(t, err)
-	_, err = transition.ProcessOperationsNoVerifyAttsSigs(context.Background(), beaconState, wsb)
-	require.NoError(t, err)
-}
-
-func TestProcessOperationsNoVerifyAttsSigsBellatrix_OK(t *testing.T) {
-	beaconState, block := createFullBellatrixBlockWithOperations(t)
-	wsb, err := blocks.NewSignedBeaconBlock(block)
-	require.NoError(t, err)
-	beaconState, err = transition.ProcessSlots(context.Background(), beaconState, wsb.Block().Slot())
-	require.NoError(t, err)
-	_, err = transition.ProcessOperationsNoVerifyAttsSigs(context.Background(), beaconState, wsb)
-	require.NoError(t, err)
-}
-
 func TestProcessOperationsNoVerifyAttsSigsCapella_OK(t *testing.T) {
-	beaconState, block := createFullCapellaBlockWithOperations(t)
+	beaconState, block := createFullBlockWithOperations(t)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	beaconState, err = transition.ProcessSlots(context.Background(), beaconState, wsb.Block().Slot())
@@ -194,7 +248,7 @@ func TestProcessOperationsNoVerifyAttsSigsCapella_OK(t *testing.T) {
 }
 
 func TestCalculateStateRootAltair_OK(t *testing.T) {
-	beaconState, block := createFullAltairBlockWithOperations(t)
+	beaconState, block := createFullBlockWithOperations(t)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	r, err := transition.CalculateStateRoot(context.Background(), beaconState, wsb)
@@ -204,9 +258,30 @@ func TestCalculateStateRootAltair_OK(t *testing.T) {
 
 func TestProcessBlockDifferentVersion(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisState(t, 64) // Phase 0 state
-	_, block := createFullAltairBlockWithOperations(t)
+	_, block := createFullBlockWithOperations(t)
 	wsb, err := blocks.NewSignedBeaconBlock(block) // Altair block
 	require.NoError(t, err)
 	_, _, err = transition.ProcessBlockNoVerifyAnySig(context.Background(), beaconState, wsb)
 	require.ErrorContains(t, "state and block are different version. 0 != 1", err)
+}
+
+func TestProcessEpoch_BadBalance(t *testing.T) {
+	s, _ := util.DeterministicGenesisState(t, 100)
+	assert.NoError(t, s.SetSlot(63))
+	assert.NoError(t, s.UpdateBalancesAtIndex(0, math.MaxUint64))
+	participation := byte(0)
+	participation, err := altair.AddValidatorFlag(participation, params.BeaconConfig().TimelyHeadFlagIndex)
+	require.NoError(t, err)
+	participation, err = altair.AddValidatorFlag(participation, params.BeaconConfig().TimelySourceFlagIndex)
+	require.NoError(t, err)
+	participation, err = altair.AddValidatorFlag(participation, params.BeaconConfig().TimelyTargetFlagIndex)
+	require.NoError(t, err)
+
+	epochParticipation, err := s.CurrentEpochParticipation()
+	assert.NoError(t, err)
+	epochParticipation[0] = participation
+	assert.NoError(t, s.SetCurrentParticipationBits(epochParticipation))
+	assert.NoError(t, s.SetPreviousParticipationBits(epochParticipation))
+	_, err = altair.ProcessEpoch(context.Background(), s)
+	assert.ErrorContains(t, "addition overflows", err)
 }

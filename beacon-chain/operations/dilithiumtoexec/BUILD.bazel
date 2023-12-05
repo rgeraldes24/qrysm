@@ -35,6 +35,7 @@ go_test(
         "//config/params:go_default_library",
         "//consensus-types/primitives:go_default_library",
         "//crypto/dilithium:go_default_library",
+        "//crypto/dilithium/common:go_default_library",
         "//crypto/hash:go_default_library",
         "//encoding/ssz:go_default_library",
         "//proto/qrysm/v1alpha1:go_default_library",

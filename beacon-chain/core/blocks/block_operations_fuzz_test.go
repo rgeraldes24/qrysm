@@ -313,7 +313,7 @@ func TestFuzzVerifyAttestation_10000(t *testing.T) {
 		fuzzer.Fuzz(attestation)
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
 		require.NoError(t, err)
-		err = VerifyAttestationSignature(ctx, s, attestation)
+		err = VerifyAttestationSignatures(ctx, s, attestation)
 		_ = err
 	}
 }

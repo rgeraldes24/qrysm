@@ -26,21 +26,6 @@ import (
 //
 // WARNING: This method does not validate any signatures (i.e. calling `state_transition()` with `validate_result=False`).
 // This method also modifies the passed in state.
-//
-// Spec pseudocode definition:
-//
-//	def state_transition(state: BeaconState, signed_block: ReadOnlySignedBeaconBlock, validate_result: bool=True) -> None:
-//	  block = signed_block.message
-//	  # Process slots (including those with no blocks) since block
-//	  process_slots(state, block.slot)
-//	  # Verify signature
-//	  if validate_result:
-//	      assert verify_block_signature(state, signed_block)
-//	  # Process block
-//	  process_block(state, block)
-//	  # Verify state root
-//	  if validate_result:
-//	      assert block.state_root == hash_tree_root(state)
 func ExecuteStateTransitionNoVerifyAnySig(
 	ctx context.Context,
 	st state.BeaconState,
@@ -93,21 +78,6 @@ func ExecuteStateTransitionNoVerifyAnySig(
 //
 // WARNING: This method does not validate any Dilithium signatures (i.e. calling `state_transition()` with `validate_result=False`).
 // This is used for proposer to compute state root before proposing a new block, and this does not modify state.
-//
-// Spec pseudocode definition:
-//
-//	def state_transition(state: BeaconState, signed_block: ReadOnlySignedBeaconBlock, validate_result: bool=True) -> None:
-//	  block = signed_block.message
-//	  # Process slots (including those with no blocks) since block
-//	  process_slots(state, block.slot)
-//	  # Verify signature
-//	  if validate_result:
-//	      assert verify_block_signature(state, signed_block)
-//	  # Process block
-//	  process_block(state, block)
-//	  # Verify state root
-//	  if validate_result:
-//	      assert block.state_root == hash_tree_root(state)
 func CalculateStateRoot(
 	ctx context.Context,
 	state state.BeaconState,
@@ -150,14 +120,6 @@ func CalculateStateRoot(
 // transformations as defined in the Ethereum Serenity specification. It does not validate
 // any block signature except for deposit and slashing signatures. It also returns the relevant
 // signature set from all the respective methods.
-//
-// Spec pseudocode definition:
-//
-//	def process_block(state: BeaconState, block: ReadOnlyBeaconBlock) -> None:
-//	  process_block_header(state, block)
-//	  process_randao(state, block.body)
-//	  process_zond1_data(state, block.body)
-//	  process_operations(state, block.body)
 func ProcessBlockNoVerifyAnySig(
 	ctx context.Context,
 	st state.BeaconState,
@@ -219,22 +181,6 @@ func ProcessBlockNoVerifyAnySig(
 //
 // WARNING: This method does not verify attestation signatures.
 // This is used to perform the block operations as fast as possible.
-//
-// Spec pseudocode definition:
-//
-//	def process_operations(state: BeaconState, body: ReadOnlyBeaconBlockBody) -> None:
-//	  # Verify that outstanding deposits are processed up to the maximum number of deposits
-//	  assert len(body.deposits) == min(MAX_DEPOSITS, state.zond1_data.deposit_count - state.zond1_deposit_index)
-//
-//	  def for_ops(operations: Sequence[Any], fn: Callable[[BeaconState, Any], None]) -> None:
-//	      for operation in operations:
-//	          fn(state, operation)
-//
-//	  for_ops(body.proposer_slashings, process_proposer_slashing)
-//	  for_ops(body.attester_slashings, process_attester_slashing)
-//	  for_ops(body.attestations, process_attestation)
-//	  for_ops(body.deposits, process_deposit)
-//	  for_ops(body.voluntary_exits, process_voluntary_exit)
 func ProcessOperationsNoVerifyAttsSigs(
 	ctx context.Context,
 	state state.BeaconState,
@@ -265,17 +211,6 @@ func ProcessOperationsNoVerifyAttsSigs(
 
 // ProcessBlockForStateRoot processes the state for state root computation. It skips proposer signature
 // and randao signature verifications.
-//
-// Spec pseudocode definition:
-// def process_block(state: BeaconState, block: ReadOnlyBeaconBlock) -> None:
-//
-//	process_block_header(state, block)
-//	if is_execution_enabled(state, block.body):
-//	    process_execution_payload(state, block.body.execution_payload, EXECUTION_ENGINE)  # [New in Bellatrix]
-//	process_randao(state, block.body)
-//	process_zond1_data(state, block.body)
-//	process_operations(state, block.body)
-//	process_sync_aggregate(state, block.body.sync_aggregate)
 func ProcessBlockForStateRoot(
 	ctx context.Context,
 	state state.BeaconState,

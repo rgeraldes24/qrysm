@@ -27,14 +27,6 @@ var CommitteeCacheInProgressHit = promauto.NewCounter(prometheus.CounterOpts{
 
 // IsActiveValidator returns the boolean value on whether the validator
 // is active or not.
-//
-// Spec pseudocode definition:
-//
-//	def is_active_validator(validator: Validator, epoch: Epoch) -> bool:
-//	  """
-//	  Check if ``validator`` is active.
-//	  """
-//	  return validator.activation_epoch <= epoch < validator.exit_epoch
 func IsActiveValidator(validator *zondpb.Validator, epoch primitives.Epoch) bool {
 	return checkValidatorActiveStatus(validator.ActivationEpoch, validator.ExitEpoch, epoch)
 }
@@ -56,14 +48,6 @@ func checkValidatorActiveStatus(activationEpoch, exitEpoch, epoch primitives.Epo
 
 // IsSlashableValidator returns the boolean value on whether the validator
 // is slashable or not.
-//
-// Spec pseudocode definition:
-//
-//	def is_slashable_validator(validator: Validator, epoch: Epoch) -> bool:
-//	"""
-//	Check if ``validator`` is slashable.
-//	"""
-//	return (not validator.slashed) and (validator.activation_epoch <= epoch < validator.withdrawable_epoch)
 func IsSlashableValidator(activationEpoch, withdrawableEpoch primitives.Epoch, slashed bool, epoch primitives.Epoch) bool {
 	return checkValidatorSlashable(activationEpoch, withdrawableEpoch, slashed, epoch)
 }
@@ -85,14 +69,6 @@ func checkValidatorSlashable(activationEpoch, withdrawableEpoch primitives.Epoch
 // WARNING: This method allocates a new copy of the validator index set and is
 // considered to be very memory expensive. Avoid using this unless you really
 // need the active validator indices for some specific reason.
-//
-// Spec pseudocode definition:
-//
-//	def get_active_validator_indices(state: BeaconState, epoch: Epoch) -> Sequence[ValidatorIndex]:
-//	  """
-//	  Return the sequence of active validator indices at ``epoch``.
-//	  """
-//	  return [ValidatorIndex(i) for i, v in enumerate(state.validators) if is_active_validator(v, epoch)]
 func ActiveValidatorIndices(ctx context.Context, s state.ReadOnlyBeaconState, epoch primitives.Epoch) ([]primitives.ValidatorIndex, error) {
 	seed, err := Seed(s, epoch, params.BeaconConfig().DomainBeaconAttester)
 	if err != nil {
@@ -194,29 +170,12 @@ func ActiveValidatorCount(ctx context.Context, s state.ReadOnlyBeaconState, epoc
 
 // ActivationExitEpoch takes in epoch number and returns when
 // the validator is eligible for activation and exit.
-//
-// Spec pseudocode definition:
-//
-//	def compute_activation_exit_epoch(epoch: Epoch) -> Epoch:
-//	  """
-//	  Return the epoch during which validator activations and exits initiated in ``epoch`` take effect.
-//	  """
-//	  return Epoch(epoch + 1 + MAX_SEED_LOOKAHEAD)
 func ActivationExitEpoch(epoch primitives.Epoch) primitives.Epoch {
 	return epoch + 1 + params.BeaconConfig().MaxSeedLookahead
 }
 
 // ValidatorChurnLimit returns the number of validators that are allowed to
 // enter and exit validator pool for an epoch.
-//
-// Spec pseudocode definition:
-//
-//	def get_validator_churn_limit(state: BeaconState) -> uint64:
-//	 """
-//	 Return the validator churn limit for the current epoch.
-//	 """
-//	 active_validator_indices = get_active_validator_indices(state, get_current_epoch(state))
-//	 return max(MIN_PER_EPOCH_CHURN_LIMIT, uint64(len(active_validator_indices)) // CHURN_LIMIT_QUOTIENT)
 func ValidatorChurnLimit(activeValidatorCount uint64) (uint64, error) {
 	churnLimit := activeValidatorCount / params.BeaconConfig().ChurnLimitQuotient
 	if churnLimit < params.BeaconConfig().MinPerEpochChurnLimit {
@@ -226,17 +185,6 @@ func ValidatorChurnLimit(activeValidatorCount uint64) (uint64, error) {
 }
 
 // BeaconProposerIndex returns proposer index of a current slot.
-//
-// Spec pseudocode definition:
-//
-//	def get_beacon_proposer_index(state: BeaconState) -> ValidatorIndex:
-//	  """
-//	  Return the beacon proposer index at the current slot.
-//	  """
-//	  epoch = get_current_epoch(state)
-//	  seed = hash(get_seed(state, epoch, DOMAIN_BEACON_PROPOSER) + uint_to_bytes(state.slot))
-//	  indices = get_active_validator_indices(state, epoch)
-//	  return compute_proposer_index(state, indices, seed)
 func BeaconProposerIndex(ctx context.Context, state state.ReadOnlyBeaconState) (primitives.ValidatorIndex, error) {
 	e := time.CurrentEpoch(state)
 	// The cache uses the state root of the previous epoch - minimum_seed_lookahead last slot as key. (e.g. Starting epoch 1, slot 32, the key would be block root at slot 31)
@@ -285,25 +233,6 @@ func BeaconProposerIndex(ctx context.Context, state state.ReadOnlyBeaconState) (
 }
 
 // ComputeProposerIndex returns the index sampled by effective balance, which is used to calculate proposer.
-//
-// nolint:dupword
-// Spec pseudocode definition:
-//
-//	def compute_proposer_index(state: BeaconState, indices: Sequence[ValidatorIndex], seed: Bytes32) -> ValidatorIndex:
-//	  """
-//	  Return from ``indices`` a random index sampled by effective balance.
-//	  """
-//	  assert len(indices) > 0
-//	  MAX_RANDOM_BYTE = 2**8 - 1
-//	  i = uint64(0)
-//	  total = uint64(len(indices))
-//	  while True:
-//	      candidate_index = indices[compute_shuffled_index(i % total, total, seed)]
-//	      random_byte = hash(seed + uint_to_bytes(uint64(i // 32)))[i % 32]
-//	      effective_balance = state.validators[candidate_index].effective_balance
-//	      if effective_balance * MAX_RANDOM_BYTE >= MAX_EFFECTIVE_BALANCE * random_byte:
-//	          return candidate_index
-//	      i += 1
 func ComputeProposerIndex(bState state.ReadOnlyValidators, activeIndices []primitives.ValidatorIndex, seed [32]byte) (primitives.ValidatorIndex, error) {
 	length := uint64(len(activeIndices))
 	if length == 0 {
@@ -337,17 +266,6 @@ func ComputeProposerIndex(bState state.ReadOnlyValidators, activeIndices []primi
 
 // IsEligibleForActivationQueue checks if the validator is eligible to
 // be placed into the activation queue.
-//
-// Spec pseudocode definition:
-//
-//	def is_eligible_for_activation_queue(validator: Validator) -> bool:
-//	  """
-//	  Check if ``validator`` is eligible to be placed into the activation queue.
-//	  """
-//	  return (
-//	      validator.activation_eligibility_epoch == FAR_FUTURE_EPOCH
-//	      and validator.effective_balance == MAX_EFFECTIVE_BALANCE
-//	  )
 func IsEligibleForActivationQueue(validator *zondpb.Validator) bool {
 	return isEligibileForActivationQueue(validator.ActivationEligibilityEpoch, validator.EffectiveBalance)
 }
@@ -365,19 +283,6 @@ func isEligibileForActivationQueue(activationEligibilityEpoch primitives.Epoch, 
 }
 
 // IsEligibleForActivation checks if the validator is eligible for activation.
-//
-// Spec pseudocode definition:
-//
-//	def is_eligible_for_activation(state: BeaconState, validator: Validator) -> bool:
-//	  """
-//	  Check if ``validator`` is eligible for activation.
-//	  """
-//	  return (
-//	      # Placement in queue is finalized
-//	      validator.activation_eligibility_epoch <= state.finalized_checkpoint.epoch
-//	      # Has not yet been activated
-//	      and validator.activation_epoch == FAR_FUTURE_EPOCH
-//	  )
 func IsEligibleForActivation(state state.ReadOnlyCheckpoint, validator *zondpb.Validator) bool {
 	finalizedEpoch := state.FinalizedCheckpointEpoch()
 	return isEligibleForActivation(validator.ActivationEligibilityEpoch, validator.ActivationEpoch, finalizedEpoch)

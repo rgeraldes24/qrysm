@@ -244,48 +244,6 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 	}
 }
 
-/*
-func TestProcessFinalUpdates_CanProcess(t *testing.T) {
-	s := buildState(t, params.BeaconConfig().SlotsPerHistoricalRoot-1, uint64(params.BeaconConfig().SlotsPerEpoch))
-	ce := time.CurrentEpoch(s)
-	ne := ce + 1
-	require.NoError(t, s.SetZond1DataVotes([]*zondpb.Zond1Data{}))
-	balances := s.Balances()
-	balances[0] = 31.75 * 1e9
-	balances[1] = 31.74 * 1e9
-	require.NoError(t, s.SetBalances(balances))
-
-	slashings := s.Slashings()
-	slashings[ce] = 0
-	require.NoError(t, s.SetSlashings(slashings))
-	mixes := s.RandaoMixes()
-	mixes[ce] = []byte{'A'}
-	require.NoError(t, s.SetRandaoMixes(mixes))
-	newS, err := epoch.ProcessFinalUpdates(s)
-	require.NoError(t, err)
-
-	// Verify effective balance is correctly updated.
-	assert.Equal(t, params.BeaconConfig().MaxEffectiveBalance, newS.Validators()[0].EffectiveBalance, "Effective balance incorrectly updated")
-	assert.Equal(t, uint64(31*1e9), newS.Validators()[1].EffectiveBalance, "Effective balance incorrectly updated")
-
-	// Verify slashed balances correctly updated.
-	assert.Equal(t, newS.Slashings()[ce], newS.Slashings()[ne], "Unexpected slashed balance")
-
-	// Verify randao is correctly updated in the right position.
-	mix, err := newS.RandaoMixAtIndex(uint64(ne))
-	assert.NoError(t, err)
-	assert.DeepNotEqual(t, params.BeaconConfig().ZeroHash[:], mix, "latest RANDAO still zero hashes")
-
-	// Verify historical root accumulator was appended.
-	roots, err := newS.HistoricalRoots()
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(roots), "Unexpected slashed balance")
-	currAtt, err := newS.CurrentEpochAttestations()
-	require.NoError(t, err)
-	assert.NotNil(t, currAtt, "Nil value stored in current epoch attestations instead of empty slice")
-}
-*/
-
 func TestProcessRegistryUpdates_NoRotation(t *testing.T) {
 	base := &zondpb.BeaconState{
 		Slot: 5 * params.BeaconConfig().SlotsPerEpoch,

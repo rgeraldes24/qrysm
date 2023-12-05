@@ -70,6 +70,8 @@ func BenchmarkExecuteStateTransition_WithCache(b *testing.B) {
 	}
 }
 
+// NOTE(rgeraldes24) - ProcessEpochPrecompute replaced by ProcessEpoch after Altair fork
+/*
 func BenchmarkProcessEpoch_2FullEpochs(b *testing.B) {
 	undo, err := benchmark.SetBenchmarkConfig()
 	require.NoError(b, err)
@@ -92,6 +94,7 @@ func BenchmarkProcessEpoch_2FullEpochs(b *testing.B) {
 		require.NoError(b, err)
 	}
 }
+*/
 
 func BenchmarkHashTreeRoot_FullState(b *testing.B) {
 	beaconState, err := benchmark.PreGenstateFullEpochs()
@@ -124,7 +127,7 @@ func BenchmarkHashTreeRootState_FullState(b *testing.B) {
 func BenchmarkMarshalState_FullState(b *testing.B) {
 	beaconState, err := benchmark.PreGenstateFullEpochs()
 	require.NoError(b, err)
-	natState, err := state_native.ProtobufBeaconStatePhase0(beaconState.ToProtoUnsafe())
+	natState, err := state_native.ProtobufBeaconStateCapella(beaconState.ToProtoUnsafe())
 	require.NoError(b, err)
 	b.Run("Proto_Marshal", func(b *testing.B) {
 		b.ResetTimer()
@@ -148,7 +151,7 @@ func BenchmarkMarshalState_FullState(b *testing.B) {
 func BenchmarkUnmarshalState_FullState(b *testing.B) {
 	beaconState, err := benchmark.PreGenstateFullEpochs()
 	require.NoError(b, err)
-	natState, err := state_native.ProtobufBeaconStatePhase0(beaconState.ToProtoUnsafe())
+	natState, err := state_native.ProtobufBeaconStateCapella(beaconState.ToProtoUnsafe())
 	require.NoError(b, err)
 	protoObject, err := proto.Marshal(natState)
 	require.NoError(b, err)

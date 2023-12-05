@@ -17,37 +17,14 @@ import (
 	"go.opencensus.io/trace"
 )
 
-/*
-// ProcessAttestationsNoVerifySignatures applies processing operations to a block's inner attestation
-// records. The only difference would be that the attestation signature would not be verified.
-func ProcessAttestationsNoVerifySignatures(
-	ctx context.Context,
-	beaconState state.BeaconState,
-	b interfaces.ReadOnlySignedBeaconBlock,
-) (state.BeaconState, error) {
-	if err := blocks.BeaconBlockIsNil(b); err != nil {
-		return nil, err
-	}
-	body := b.Block().Body()
-	var err error
-	for idx, att := range body.Attestations() {
-		beaconState, err = ProcessAttestationNoVerifySignatures(ctx, beaconState, att)
-		if err != nil {
-			return nil, errors.Wrapf(err, "could not verify attestation at index %d in block", idx)
-		}
-	}
-	return beaconState, nil
-}
-*/
-
-// VerifyAttestationNoVerifySignature verifies the attestation without verifying the attestation signature. This is
+// VerifyAttestationNoVerifySignatures verifies the attestation without verifying the attestation signature. This is
 // used before processing attestation with the beacon state.
-func VerifyAttestationNoVerifySignature(
+func VerifyAttestationNoVerifySignatures(
 	ctx context.Context,
 	beaconState state.ReadOnlyBeaconState,
 	att *zondpb.Attestation,
 ) error {
-	ctx, span := trace.StartSpan(ctx, "core.VerifyAttestationNoVerifySignature")
+	ctx, span := trace.StartSpan(ctx, "core.VerifyAttestationNoVerifySignatures")
 	defer span.End()
 
 	if err := helpers.ValidateNilAttestation(att); err != nil {
@@ -120,57 +97,14 @@ func VerifyAttestationNoVerifySignature(
 	if err != nil {
 		return err
 	}
+	fmt.Println(indexedAtt.AttestingIndices)
 
 	return attestation.IsValidAttestationIndices(ctx, indexedAtt)
 }
 
-// TODO (rgeraldes24) - not used anymore?
-/*
-// ProcessAttestationNoVerifySignatures processes the attestation without verifying the attestation signatures. This
-// method is used to validate attestations whose signatures have already been verified.
-func ProcessAttestationNoVerifySignatures(
-	ctx context.Context,
-	beaconState state.BeaconState,
-	att *zondpb.Attestation,
-) (state.BeaconState, error) {
-	ctx, span := trace.StartSpan(ctx, "core.ProcessAttestationNoVerifySignatures")
-	defer span.End()
-
-	if err := VerifyAttestationNoVerifySignature(ctx, beaconState, att); err != nil {
-		return nil, err
-	}
-
-	currEpoch := time.CurrentEpoch(beaconState)
-	data := att.Data
-	s := att.Data.Slot
-	proposerIndex, err := helpers.BeaconProposerIndex(ctx, beaconState)
-	if err != nil {
-		return nil, err
-	}
-	pendingAtt := &zondpb.PendingAttestation{
-		Data:              data,
-		ParticipationBits: att.ParticipationBits,
-		InclusionDelay:    beaconState.Slot() - s,
-		ProposerIndex:     proposerIndex,
-	}
-
-	if data.Target.Epoch == currEpoch {
-		if err := beaconState.AppendCurrentEpochAttestations(pendingAtt); err != nil {
-			return nil, err
-		}
-	} else {
-		if err := beaconState.AppendPreviousEpochAttestations(pendingAtt); err != nil {
-			return nil, err
-		}
-	}
-
-	return beaconState, nil
-}
-*/
-
-// VerifyAttestationSignature converts and attestation into an indexed attestation and verifies
+// VerifyAttestationSignatures converts and attestation into an indexed attestation and verifies
 // the signature in that attestation.
-func VerifyAttestationSignature(ctx context.Context, beaconState state.ReadOnlyBeaconState, att *zondpb.Attestation) error {
+func VerifyAttestationSignatures(ctx context.Context, beaconState state.ReadOnlyBeaconState, att *zondpb.Attestation) error {
 	if err := helpers.ValidateNilAttestation(att); err != nil {
 		return err
 	}

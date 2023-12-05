@@ -20,9 +20,9 @@ func TestSkipSlotCache_OK(t *testing.T) {
 	transition.SkipSlotCache.Enable()
 	defer transition.SkipSlotCache.Disable()
 	bState, privs := util.DeterministicGenesisState(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
-	pbState, err := state_native.ProtobufBeaconStatePhase0(bState.ToProto())
+	pbState, err := state_native.ProtobufBeaconStateCapella(bState.ToProto())
 	require.NoError(t, err)
-	originalState, err := state_native.InitializeFromProtoPhase0(pbState)
+	originalState, err := state_native.InitializeFromProtoCapella(pbState)
 	require.NoError(t, err)
 
 	blkCfg := util.DefaultBlockGenConfig()
@@ -36,7 +36,7 @@ func TestSkipSlotCache_OK(t *testing.T) {
 	require.NoError(t, err)
 	executedState, err := transition.ExecuteStateTransition(context.Background(), originalState, wsb)
 	require.NoError(t, err, "Could not run state transition")
-	require.Equal(t, true, executedState.Version() == version.Phase0)
+	require.Equal(t, true, executedState.Version() == version.Capella)
 	wsb, err = blocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
 	bState, err = transition.ExecuteStateTransition(context.Background(), bState, wsb)
@@ -47,9 +47,9 @@ func TestSkipSlotCache_OK(t *testing.T) {
 
 func TestSkipSlotCache_ConcurrentMixup(t *testing.T) {
 	bState, privs := util.DeterministicGenesisState(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
-	pbState, err := state_native.ProtobufBeaconStatePhase0(bState.ToProto())
+	pbState, err := state_native.ProtobufBeaconStateCapella(bState.ToProto())
 	require.NoError(t, err)
-	originalState, err := state_native.InitializeFromProtoPhase0(pbState)
+	originalState, err := state_native.InitializeFromProtoCapella(pbState)
 	require.NoError(t, err)
 
 	blkCfg := util.DefaultBlockGenConfig()
@@ -65,7 +65,7 @@ func TestSkipSlotCache_ConcurrentMixup(t *testing.T) {
 	require.NoError(t, err)
 	executedState, err := transition.ExecuteStateTransition(context.Background(), originalState, wsb)
 	require.NoError(t, err, "Could not run state transition")
-	require.Equal(t, true, executedState.Version() == version.Phase0)
+	require.Equal(t, true, executedState.Version() == version.Capella)
 
 	// Create two shallow but different forks
 	var s1, s0 state.BeaconState

@@ -75,7 +75,6 @@ func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
 }
 
 func TestProcessBlockHeader_WrongProposerSig(t *testing.T) {
-
 	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
 	require.NoError(t, beaconState.SetLatestBlockHeader(util.HydrateBeaconHeader(&zondpb.BeaconBlockHeader{
 		Slot: 9,

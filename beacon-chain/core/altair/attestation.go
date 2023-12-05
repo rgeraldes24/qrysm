@@ -54,7 +54,7 @@ func ProcessAttestationNoVerifySignatures(
 	ctx, span := trace.StartSpan(ctx, "altair.ProcessAttestationNoVerifySignatures")
 	defer span.End()
 
-	if err := blocks.VerifyAttestationNoVerifySignature(ctx, beaconState, att); err != nil {
+	if err := blocks.VerifyAttestationNoVerifySignatures(ctx, beaconState, att); err != nil {
 		return nil, err
 	}
 
@@ -136,15 +136,6 @@ func AddValidatorFlag(flag, flagPosition uint8) (uint8, error) {
 }
 
 // EpochParticipation sets and returns the proposer reward numerator and epoch participation.
-//
-// Spec code:
-//
-//	proposer_reward_numerator = 0
-//	for index in get_attesting_indices(state, data, attestation.aggregation_bits):
-//	    for flag_index, weight in enumerate(PARTICIPATION_FLAG_WEIGHTS):
-//	        if flag_index in participation_flag_indices and not has_flag(epoch_participation[index], flag_index):
-//	            epoch_participation[index] = add_flag(epoch_participation[index], flag_index)
-//	            proposer_reward_numerator += get_base_reward(state, index) * weight
 func EpochParticipation(beaconState state.BeaconState, indices []uint64, epochParticipation []byte, participatedFlags map[uint8]bool, totalBalance uint64) (uint64, []byte, error) {
 	cfg := params.BeaconConfig()
 	sourceFlagIndex := cfg.TimelySourceFlagIndex
@@ -212,35 +203,6 @@ func RewardProposer(ctx context.Context, beaconState state.BeaconState, proposer
 
 // AttestationParticipationFlagIndices retrieves a map of attestation scoring based on Altair's participation flag indices.
 // This is used to facilitate process attestation during state transition and during upgrade to altair state.
-//
-// Spec code:
-// def get_attestation_participation_flag_indices(state: BeaconState,
-//
-//	                                           data: AttestationData,
-//	                                           inclusion_delay: uint64) -> Sequence[int]:
-//	"""
-//	Return the flag indices that are satisfied by an attestation.
-//	"""
-//	if data.target.epoch == get_current_epoch(state):
-//	    justified_checkpoint = state.current_justified_checkpoint
-//	else:
-//	    justified_checkpoint = state.previous_justified_checkpoint
-//
-//	# Matching roots
-//	is_matching_source = data.source == justified_checkpoint
-//	is_matching_target = is_matching_source and data.target.root == get_block_root(state, data.target.epoch)
-//	is_matching_head = is_matching_target and data.beacon_block_root == get_block_root_at_slot(state, data.slot)
-//	assert is_matching_source
-//
-//	participation_flag_indices = []
-//	if is_matching_source and inclusion_delay <= integer_squareroot(SLOTS_PER_EPOCH):
-//	    participation_flag_indices.append(TIMELY_SOURCE_FLAG_INDEX)
-//	if is_matching_target and inclusion_delay <= SLOTS_PER_EPOCH:
-//	    participation_flag_indices.append(TIMELY_TARGET_FLAG_INDEX)
-//	if is_matching_head and inclusion_delay == MIN_ATTESTATION_INCLUSION_DELAY:
-//	    participation_flag_indices.append(TIMELY_HEAD_FLAG_INDEX)
-//
-//	return participation_flag_indices
 func AttestationParticipationFlagIndices(beaconState state.BeaconState, data *zondpb.AttestationData, delay primitives.Slot) (map[uint8]bool, error) {
 	currEpoch := time.CurrentEpoch(beaconState)
 	var justifiedCheckpt *zondpb.Checkpoint
@@ -280,12 +242,6 @@ func AttestationParticipationFlagIndices(beaconState state.BeaconState, data *zo
 }
 
 // MatchingStatus returns the matching statues for attestation data's source target and head.
-//
-// Spec code:
-//
-//	is_matching_source = data.source == justified_checkpoint
-//	is_matching_target = is_matching_source and data.target.root == get_block_root(state, data.target.epoch)
-//	is_matching_head = is_matching_target and data.beacon_block_root == get_block_root_at_slot(state, data.slot)
 func MatchingStatus(beaconState state.BeaconState, data *zondpb.AttestationData, cp *zondpb.Checkpoint) (matchedSrc, matchedTgt, matchedHead bool, err error) {
 	matchedSrc = attestation.CheckPointIsEqual(data.Source, cp)
 

@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -18,8 +18,8 @@ import (
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -187,7 +187,7 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 	cp := beaconState.CurrentJustifiedCheckpoint()
 	cp.Root = []byte("hello-world")
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
+	//require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 	wsb, err := consensusblocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	_, err = transition.VerifyOperationLengths(context.Background(), beaconState, wsb)
@@ -196,198 +196,52 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 }
 
 func createFullBlockWithOperations(t *testing.T) (state.BeaconState,
-	*zondpb.SignedBeaconBlock, []*zondpb.Attestation, []*zondpb.ProposerSlashing, []*zondpb.SignedVoluntaryExit) {
+	*zondpb.SignedBeaconBlock) {
 	beaconState, privKeys := util.DeterministicGenesisState(t, 32)
-	genesisBlock := blocks.NewGenesisBlock([]byte{})
-	bodyRoot, err := genesisBlock.Block.HashTreeRoot()
-	require.NoError(t, err)
-	err = beaconState.SetLatestBlockHeader(&zondpb.BeaconBlockHeader{
-		Slot:       genesisBlock.Block.Slot,
-		ParentRoot: genesisBlock.Block.ParentRoot,
-		StateRoot:  params.BeaconConfig().ZeroHash[:],
-		BodyRoot:   bodyRoot[:],
-	})
-	require.NoError(t, err)
-	err = beaconState.SetSlashings(make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector))
-	require.NoError(t, err)
-	cp := beaconState.CurrentJustifiedCheckpoint()
-	var mockRoot [32]byte
-	copy(mockRoot[:], "hello-world")
-	cp.Root = mockRoot[:]
-	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
-
-	proposerSlashIdx := primitives.ValidatorIndex(3)
-	slotsPerEpoch := params.BeaconConfig().SlotsPerEpoch
-	err = beaconState.SetSlot(slotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod)) + params.BeaconConfig().MinAttestationInclusionDelay)
-	require.NoError(t, err)
-
-	currentEpoch := time.CurrentEpoch(beaconState)
-	header1 := util.HydrateSignedBeaconHeader(&zondpb.SignedBeaconBlockHeader{
-		Header: &zondpb.BeaconBlockHeader{
-			ProposerIndex: proposerSlashIdx,
-			Slot:          1,
-			StateRoot:     bytesutil.PadTo([]byte("A"), 32),
-		},
-	})
-	header1.Signature, err = signing.ComputeDomainAndSign(beaconState, currentEpoch, header1.Header, params.BeaconConfig().DomainBeaconProposer, privKeys[proposerSlashIdx])
-	require.NoError(t, err)
-
-	header2 := util.HydrateSignedBeaconHeader(&zondpb.SignedBeaconBlockHeader{
-		Header: &zondpb.BeaconBlockHeader{
-			ProposerIndex: proposerSlashIdx,
-			Slot:          1,
-			StateRoot:     bytesutil.PadTo([]byte("B"), 32),
-		},
-	})
-	header2.Signature, err = signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), header2.Header, params.BeaconConfig().DomainBeaconProposer, privKeys[proposerSlashIdx])
-	require.NoError(t, err)
-
-	proposerSlashings := []*zondpb.ProposerSlashing{
-		{
-			Header_1: header1,
-			Header_2: header2,
-		},
-	}
-	validators := beaconState.Validators()
-	validators[proposerSlashIdx].PublicKey = privKeys[proposerSlashIdx].PublicKey().Marshal()
-	require.NoError(t, beaconState.SetValidators(validators))
-
-	mockRoot2 := [32]byte{'A'}
-	att1 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
-		Data: &zondpb.AttestationData{
-			Source: &zondpb.Checkpoint{Epoch: 0, Root: mockRoot2[:]},
-		},
-		AttestingIndices: []uint64{0, 1},
-	})
-	domain, err := signing.Domain(beaconState.Fork(), currentEpoch, params.BeaconConfig().DomainBeaconAttester, beaconState.GenesisValidatorsRoot())
-	require.NoError(t, err)
-	hashTreeRoot, err := signing.ComputeSigningRoot(att1.Data, domain)
-	require.NoError(t, err)
-	sig0 := privKeys[0].Sign(hashTreeRoot[:]).Marshal()
-	sig1 := privKeys[1].Sign(hashTreeRoot[:]).Marshal()
-	att1.Signatures = [][]byte{sig0, sig1}
-
-	mockRoot3 := [32]byte{'B'}
-	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
-		Data: &zondpb.AttestationData{
-			Source: &zondpb.Checkpoint{Epoch: 0, Root: mockRoot3[:]},
-			Target: &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, fieldparams.RootLength)},
-		},
-		AttestingIndices: []uint64{0, 1},
-	})
-
-	hashTreeRoot, err = signing.ComputeSigningRoot(att2.Data, domain)
-	require.NoError(t, err)
-	sig0 = privKeys[0].Sign(hashTreeRoot[:]).Marshal()
-	sig1 = privKeys[1].Sign(hashTreeRoot[:]).Marshal()
-	att2.Signatures = [][]byte{sig0, sig1}
-
-	attesterSlashings := []*zondpb.AttesterSlashing{
-		{
-			Attestation_1: att1,
-			Attestation_2: att2,
-		},
-	}
-
-	var blockRoots [][]byte
-	for i := uint64(0); i < uint64(params.BeaconConfig().SlotsPerHistoricalRoot); i++ {
-		blockRoots = append(blockRoots, []byte{byte(i)})
-	}
-	require.NoError(t, beaconState.SetBlockRoots(blockRoots))
-
-	participationBits := bitfield.NewBitlist(1)
-	participationBits.SetBitAt(0, true)
-	blockAtt := util.HydrateAttestation(&zondpb.Attestation{
-		Data: &zondpb.AttestationData{
-			Slot:   beaconState.Slot(),
-			Target: &zondpb.Checkpoint{Epoch: time.CurrentEpoch(beaconState)},
-			Source: &zondpb.Checkpoint{Root: mockRoot[:]}},
-		ParticipationBits: participationBits,
-	})
-
-	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, blockAtt.Data.Slot, blockAtt.Data.CommitteeIndex)
+	sCom, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	assert.NoError(t, err)
-	attestingIndices, err := attestation.AttestingIndices(blockAtt.ParticipationBits, committee)
-	require.NoError(t, err)
-	assert.NoError(t, err)
-	hashTreeRoot, err = signing.ComputeSigningRoot(blockAtt.Data, domain)
-	assert.NoError(t, err)
-	sigs := make([][]byte, len(attestingIndices))
-	for i, indice := range attestingIndices {
-		sig := privKeys[indice].Sign(hashTreeRoot[:])
-		sigs[i] = sig.Marshal()
-	}
-	blockAtt.Signatures = sigs
-
-	exit := &zondpb.SignedVoluntaryExit{
-		Exit: &zondpb.VoluntaryExit{
-			ValidatorIndex: 10,
-			Epoch:          0,
-		},
-	}
-	exit.Signature, err = signing.ComputeDomainAndSign(beaconState, currentEpoch, exit.Exit, params.BeaconConfig().DomainVoluntaryExit, privKeys[exit.Exit.ValidatorIndex])
+	assert.NoError(t, beaconState.SetCurrentSyncCommittee(sCom))
+	tState := beaconState.Copy()
+	blk, err := util.GenerateFullBlock(tState, privKeys,
+		&util.BlockGenConfig{NumAttestations: 1, NumVoluntaryExits: 0, NumDeposits: 0}, 1)
 	require.NoError(t, err)
 
-	header := beaconState.LatestBlockHeader()
-	prevStateRoot, err := beaconState.HashTreeRoot(context.Background())
-	require.NoError(t, err)
-	header.StateRoot = prevStateRoot[:]
-	require.NoError(t, beaconState.SetLatestBlockHeader(header))
-	parentRoot, err := beaconState.LatestBlockHeader().HashTreeRoot()
-	require.NoError(t, err)
-	copied := beaconState.Copy()
-	require.NoError(t, copied.SetSlot(beaconState.Slot()+1))
-	randaoReveal, err := util.RandaoReveal(copied, currentEpoch, privKeys)
-	require.NoError(t, err)
-	proposerIndex, err := helpers.BeaconProposerIndex(context.Background(), copied)
-	require.NoError(t, err)
-	block := util.HydrateSignedBeaconBlock(&zondpb.SignedBeaconBlock{
+	blkCapella := &zondpb.SignedBeaconBlock{
 		Block: &zondpb.BeaconBlock{
-			ParentRoot:    parentRoot[:],
-			Slot:          beaconState.Slot() + 1,
-			ProposerIndex: proposerIndex,
+			Slot:          blk.Block.Slot,
+			ProposerIndex: blk.Block.ProposerIndex,
+			ParentRoot:    blk.Block.ParentRoot,
+			StateRoot:     blk.Block.StateRoot,
 			Body: &zondpb.BeaconBlockBody{
-				RandaoReveal:      randaoReveal,
-				ProposerSlashings: proposerSlashings,
-				AttesterSlashings: attesterSlashings,
-				Attestations:      []*zondpb.Attestation{blockAtt},
-				VoluntaryExits:    []*zondpb.SignedVoluntaryExit{exit},
+				RandaoReveal:      blk.Block.Body.RandaoReveal,
+				Zond1Data:         blk.Block.Body.Zond1Data,
+				Graffiti:          blk.Block.Body.Graffiti,
+				ProposerSlashings: blk.Block.Body.ProposerSlashings,
+				AttesterSlashings: blk.Block.Body.AttesterSlashings,
+				Attestations:      blk.Block.Body.Attestations,
+				Deposits:          blk.Block.Body.Deposits,
+				VoluntaryExits:    blk.Block.Body.VoluntaryExits,
+				SyncAggregate:     blk.Block.Body.SyncAggregate,
+				ExecutionPayload: &enginev1.ExecutionPayload{
+					ParentHash:    make([]byte, fieldparams.RootLength),
+					FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
+					StateRoot:     make([]byte, fieldparams.RootLength),
+					ReceiptsRoot:  make([]byte, fieldparams.RootLength),
+					LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
+					PrevRandao:    make([]byte, fieldparams.RootLength),
+					BaseFeePerGas: bytesutil.PadTo([]byte{1, 2, 3, 4}, fieldparams.RootLength),
+					BlockHash:     make([]byte, fieldparams.RootLength),
+					Transactions:  make([][]byte, 0),
+					Withdrawals:   make([]*enginev1.Withdrawal, 0),
+					ExtraData:     make([]byte, 0),
+				},
 			},
 		},
-	})
-
-	sig, err := util.BlockSignature(beaconState, block.Block, privKeys)
-	require.NoError(t, err)
-	block.Signature = sig.Marshal()
-
-	require.NoError(t, beaconState.SetSlot(block.Block.Slot))
-	return beaconState, block, []*zondpb.Attestation{blockAtt}, proposerSlashings, []*zondpb.SignedVoluntaryExit{exit}
-}
-
-func TestProcessEpochPrecompute_CanProcess(t *testing.T) {
-	epoch := primitives.Epoch(1)
-
-	atts := []*zondpb.PendingAttestation{{Data: &zondpb.AttestationData{Target: &zondpb.Checkpoint{Root: make([]byte, 32)}}, InclusionDelay: 1}}
-	slashing := make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector)
-	base := &zondpb.BeaconState{
-		Slot:                       params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch)) + 1,
-		BlockRoots:                 make([][]byte, 128),
-		Slashings:                  slashing,
-		RandaoMixes:                make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
-		CurrentEpochAttestations:   atts,
-		FinalizedCheckpoint:        &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		JustificationBits:          bitfield.Bitvector4{0x00},
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+		Signature: nil,
 	}
-	s, err := state_native.InitializeFromProtoPhase0(base)
-	require.NoError(t, err)
-	require.NoError(t, s.SetValidators([]*zondpb.Validator{}))
-	newState, err := transition.ProcessEpochPrecompute(context.Background(), s)
-	require.NoError(t, err)
-	assert.Equal(t, uint64(0), newState.Slashings()[2], "Unexpected slashed balance")
+	beaconStateCapella, _ := util.DeterministicGenesisState(t, 32)
+	return beaconStateCapella, blkCapella
 }
-
 func TestProcessBlock_OverMaxProposerSlashings(t *testing.T) {
 	maxSlashings := params.BeaconConfig().MaxProposerSlashings
 	b := &zondpb.SignedBeaconBlock{
@@ -399,7 +253,7 @@ func TestProcessBlock_OverMaxProposerSlashings(t *testing.T) {
 	}
 	want := fmt.Sprintf("number of proposer slashings (%d) in block body exceeds allowed threshold of %d",
 		len(b.Block.Body.ProposerSlashings), params.BeaconConfig().MaxProposerSlashings)
-	s, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	s, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -418,7 +272,7 @@ func TestProcessBlock_OverMaxAttesterSlashings(t *testing.T) {
 	}
 	want := fmt.Sprintf("number of attester slashings (%d) in block body exceeds allowed threshold of %d",
 		len(b.Block.Body.AttesterSlashings), params.BeaconConfig().MaxAttesterSlashings)
-	s, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	s, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -436,7 +290,7 @@ func TestProcessBlock_OverMaxAttestations(t *testing.T) {
 	}
 	want := fmt.Sprintf("number of attestations (%d) in block body exceeds allowed threshold of %d",
 		len(b.Block.Body.Attestations), params.BeaconConfig().MaxAttestations)
-	s, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	s, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -455,7 +309,7 @@ func TestProcessBlock_OverMaxVoluntaryExits(t *testing.T) {
 	}
 	want := fmt.Sprintf("number of voluntary exits (%d) in block body exceeds allowed threshold of %d",
 		len(b.Block.Body.VoluntaryExits), maxExits)
-	s, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	s, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -468,7 +322,7 @@ func TestProcessBlock_IncorrectDeposits(t *testing.T) {
 		Zond1Data:         &zondpb.Zond1Data{DepositCount: 100},
 		Zond1DepositIndex: 98,
 	}
-	s, err := state_native.InitializeFromProtoPhase0(base)
+	s, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
 	b := &zondpb.SignedBeaconBlock{
 		Block: &zondpb.BeaconBlock{
@@ -487,7 +341,7 @@ func TestProcessBlock_IncorrectDeposits(t *testing.T) {
 
 func TestProcessSlots_SameSlotAsParentState(t *testing.T) {
 	slot := primitives.Slot(2)
-	parentState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{Slot: slot})
+	parentState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{Slot: slot})
 	require.NoError(t, err)
 
 	_, err = transition.ProcessSlots(context.Background(), parentState, slot)
@@ -496,130 +350,55 @@ func TestProcessSlots_SameSlotAsParentState(t *testing.T) {
 
 func TestProcessSlots_LowerSlotAsParentState(t *testing.T) {
 	slot := primitives.Slot(2)
-	parentState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{Slot: slot})
+	parentState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{Slot: slot})
 	require.NoError(t, err)
 
 	_, err = transition.ProcessSlots(context.Background(), parentState, slot-1)
 	assert.ErrorContains(t, "expected state.slot 2 < slot 1", err)
 }
 
-func TestProcessSlots_ThroughAltairEpoch(t *testing.T) {
+func TestProcessSlots_OnlyCapellaEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	params.SetupTestConfigCleanup(t)
-	conf := params.BeaconConfig()
-	params.OverrideBeaconConfig(conf)
+
+	st, _ := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*6))
+	require.Equal(t, version.Capella, st.Version())
+	st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerEpoch*10)
+	require.NoError(t, err)
+	require.Equal(t, version.Capella, st.Version())
+
+	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
+
+	s, err := st.InactivityScores()
+	require.NoError(t, err)
+	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(s)))
+
+	p, err := st.PreviousEpochParticipation()
+	require.NoError(t, err)
+	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
+
+	p, err = st.CurrentEpochParticipation()
+	require.NoError(t, err)
+	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
+
+	sc, err := st.CurrentSyncCommittee()
+	require.NoError(t, err)
+	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
+
+	sc, err = st.NextSyncCommittee()
+	require.NoError(t, err)
+	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
+}
+
+func TestProcessSlots_ThroughCapellaEpoch(t *testing.T) {
+	transition.SkipSlotCache.Disable()
+	params.SetupTestConfigCleanup(t)
 
 	st, _ := util.DeterministicGenesisState(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerEpoch*10)
 	require.NoError(t, err)
-	require.Equal(t, version.Altair, st.Version())
-
-	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
-
-	s, err := st.InactivityScores()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(s)))
-
-	p, err := st.PreviousEpochParticipation()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
-
-	p, err = st.CurrentEpochParticipation()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
-
-	sc, err := st.CurrentSyncCommittee()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
-
-	sc, err = st.NextSyncCommittee()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
-}
-
-func TestProcessSlots_OnlyAltairEpoch(t *testing.T) {
-	transition.SkipSlotCache.Disable()
-	params.SetupTestConfigCleanup(t)
-	conf := params.BeaconConfig()
-	params.OverrideBeaconConfig(conf)
-
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
-	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*6))
-	st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerEpoch*10)
-	require.NoError(t, err)
-	require.Equal(t, version.Altair, st.Version())
-
-	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
-
-	s, err := st.InactivityScores()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(s)))
-
-	p, err := st.PreviousEpochParticipation()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
-
-	p, err = st.CurrentEpochParticipation()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
-
-	sc, err := st.CurrentSyncCommittee()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
-
-	sc, err = st.NextSyncCommittee()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
-}
-
-func TestProcessSlots_OnlyBellatrixEpoch(t *testing.T) {
-	transition.SkipSlotCache.Disable()
-	params.SetupTestConfigCleanup(t)
-	conf := params.BeaconConfig().Copy()
-	//conf.BellatrixForkEpoch = 5
-	params.OverrideBeaconConfig(conf)
-
-	st, _ := util.DeterministicGenesisStateBellatrix(t, params.BeaconConfig().MaxValidatorsPerCommittee)
-	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*6))
-	require.Equal(t, version.Bellatrix, st.Version())
-	st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerEpoch*10)
-	require.NoError(t, err)
-	require.Equal(t, version.Bellatrix, st.Version())
-
-	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
-
-	s, err := st.InactivityScores()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(s)))
-
-	p, err := st.PreviousEpochParticipation()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
-
-	p, err = st.CurrentEpochParticipation()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
-
-	sc, err := st.CurrentSyncCommittee()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
-
-	sc, err = st.NextSyncCommittee()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
-}
-
-func TestProcessSlots_ThroughBellatrixEpoch(t *testing.T) {
-	transition.SkipSlotCache.Disable()
-	params.SetupTestConfigCleanup(t)
-	conf := params.BeaconConfig()
-	//conf.BellatrixForkEpoch = 5
-	params.OverrideBeaconConfig(conf)
-
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
-	st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerEpoch*10)
-	require.NoError(t, err)
-	require.Equal(t, version.Bellatrix, st.Version())
+	require.Equal(t, version.Capella, st.Version())
 
 	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
 }

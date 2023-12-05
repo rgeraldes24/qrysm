@@ -68,17 +68,6 @@ func ComputeDomainAndSign(st state.ReadOnlyBeaconState, epoch primitives.Epoch, 
 }
 
 // ComputeSigningRoot computes the root of the object by calculating the hash tree root of the signing data with the given domain.
-//
-// Spec pseudocode definition:
-//
-//		def compute_signing_root(ssz_object: SSZObject, domain: Domain) -> Root:
-//	   """
-//	   Return the signing root for the corresponding signing data.
-//	   """
-//	   return hash_tree_root(SigningData(
-//	       object_root=hash_tree_root(ssz_object),
-//	       domain=domain,
-//	   ))
 func ComputeSigningRoot(object fssz.HashRoot, domain []byte) ([32]byte, error) {
 	return SigningData(object.HashTreeRoot, domain)
 }
@@ -156,7 +145,7 @@ func VerifyBlockSigningRoot(pub, signature, domain []byte, rootFunc func() ([32]
 	if err != nil {
 		return err
 	}
-	// TODO(rgeraldes24) - review
+
 	// We assume only one signature batch is returned here.
 	sig := set.Signatures[0][0]
 	publicKey := set.PublicKeys[0][0]
@@ -193,20 +182,8 @@ func BlockSignatureBatch(pub, signature, domain []byte, rootFunc func() ([32]byt
 	}, nil
 }
 
-// ComputeDomain returns the domain version for BLS private key to sign and verify with a zeroed 4-byte
+// ComputeDomain returns the domain version for Dilithium private key to sign and verify with a zeroed 4-byte
 // array as the fork version.
-//
-// def compute_domain(domain_type: DomainType, fork_version: Version=None, genesis_validators_root: Root=None) -> Domain:
-//
-//	"""
-//	Return the domain for the ``domain_type`` and ``fork_version``.
-//	"""
-//	if fork_version is None:
-//	    fork_version = GENESIS_FORK_VERSION
-//	if genesis_validators_root is None:
-//	    genesis_validators_root = Root()  # all bytes zero by default
-//	fork_data_root = compute_fork_data_root(fork_version, genesis_validators_root)
-//	return Domain(domain_type + fork_data_root[:28])
 func ComputeDomain(domainType [DomainByteLength]byte, forkVersion, genesisValidatorsRoot []byte) ([]byte, error) {
 	if forkVersion == nil {
 		forkVersion = params.BeaconConfig().GenesisForkVersion
@@ -225,7 +202,7 @@ func ComputeDomain(domainType [DomainByteLength]byte, forkVersion, genesisValida
 	return domain(domainType, forkDataRoot[:]), nil
 }
 
-// This returns the bls domain given by the domain type and fork data root.
+// This returns the dilithium domain given by the domain type and fork data root.
 func domain(domainType [DomainByteLength]byte, forkDataRoot []byte) []byte {
 	var b []byte
 	b = append(b, domainType[:4]...)
@@ -233,20 +210,8 @@ func domain(domainType [DomainByteLength]byte, forkDataRoot []byte) []byte {
 	return b
 }
 
-// this returns the 32byte fork data root for the “current_version“ and “genesis_validators_root“.
+// computeForkDataRoot returns the 32byte fork data root for the “current_version“ and “genesis_validators_root“.
 // This is used primarily in signature domains to avoid collisions across forks/chains.
-//
-// Spec pseudocode definition:
-//
-//		def compute_fork_data_root(current_version: Version, genesis_validators_root: Root) -> Root:
-//	   """
-//	   Return the 32-byte fork data root for the ``current_version`` and ``genesis_validators_root``.
-//	   This is used primarily in signature domains to avoid collisions across forks/chains.
-//	   """
-//	   return hash_tree_root(ForkData(
-//	       current_version=current_version,
-//	       genesis_validators_root=genesis_validators_root,
-//	   ))
 func computeForkDataRoot(version, root []byte) ([32]byte, error) {
 	digestMapLock.RLock()
 	if val, ok := digestMap[string(version)+string(root)]; ok {
@@ -271,16 +236,6 @@ func computeForkDataRoot(version, root []byte) ([32]byte, error) {
 }
 
 // ComputeForkDigest returns the fork for the current version and genesis validators root
-//
-// Spec pseudocode definition:
-//
-//		def compute_fork_digest(current_version: Version, genesis_validators_root: Root) -> ForkDigest:
-//	   """
-//	   Return the 4-byte fork digest for the ``current_version`` and ``genesis_validators_root``.
-//	   This is a digest primarily used for domain separation on the p2p layer.
-//	   4-bytes suffices for practical separation of forks/chains.
-//	   """
-//	   return ForkDigest(compute_fork_data_root(current_version, genesis_validators_root)[:4])
 func ComputeForkDigest(version, genesisValidatorsRoot []byte) ([4]byte, error) {
 	dataRoot, err := computeForkDataRoot(version, genesisValidatorsRoot)
 	if err != nil {

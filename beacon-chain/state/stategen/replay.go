@@ -199,12 +199,6 @@ func ReplayProcessSlots(ctx context.Context, state state.BeaconState, slot primi
 		}
 		if qrysmtime.CanProcessEpoch(state) {
 			switch state.Version() {
-			// case version.Phase0:
-			// 	state, err = transition.ProcessEpochPrecompute(ctx, state)
-			// 	if err != nil {
-			// 		tracing.AnnotateError(span, err)
-			// 		return nil, errors.Wrap(err, "could not process epoch with optimizations")
-			// 	}
 			case /*version.Altair, version.Bellatrix,*/ version.Capella:
 				state, err = altair.ProcessEpoch(ctx, state)
 				if err != nil {

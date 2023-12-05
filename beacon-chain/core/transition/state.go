@@ -17,46 +17,6 @@ import (
 
 // GenesisBeaconState gets called when MinGenesisActiveValidatorCount count of
 // full deposits were made to the deposit contract and the ChainStart log gets emitted.
-//
-// Spec pseudocode definition:
-//
-//	def initialize_beacon_state_from_zond1(zond1_block_hash: Bytes32,
-//	                                    zond1_timestamp: uint64,
-//	                                    deposits: Sequence[Deposit]) -> BeaconState:
-//	  fork = Fork(
-//	      previous_version=GENESIS_FORK_VERSION,
-//	      current_version=GENESIS_FORK_VERSION,
-//	      epoch=GENESIS_EPOCH,
-//	  )
-//	  state = BeaconState(
-//	      genesis_time=zond1_timestamp + GENESIS_DELAY,
-//	      fork=fork,
-//	      zond1_data=Zond1Data(block_hash=zond1_block_hash, deposit_count=uint64(len(deposits))),
-//	      latest_block_header=BeaconBlockHeader(body_root=hash_tree_root(BeaconBlockBody())),
-//	      randao_mixes=[zond1_block_hash] * EPOCHS_PER_HISTORICAL_VECTOR,  # Seed RANDAO with Zond1 entropy
-//	  )
-//
-//	  # Process deposits
-//	  leaves = list(map(lambda deposit: deposit.data, deposits))
-//	  for index, deposit in enumerate(deposits):
-//	      deposit_data_list = List[DepositData, 2**DEPOSIT_CONTRACT_TREE_DEPTH](*leaves[:index + 1])
-//	      state.zond1_data.deposit_root = hash_tree_root(deposit_data_list)
-//	      process_deposit(state, deposit)
-//
-//	  # Process activations
-//	  for index, validator in enumerate(state.validators):
-//	      balance = state.balances[index]
-//	      validator.effective_balance = min(balance - balance % EFFECTIVE_BALANCE_INCREMENT, MAX_EFFECTIVE_BALANCE)
-//	      if validator.effective_balance == MAX_EFFECTIVE_BALANCE:
-//	          validator.activation_eligibility_epoch = GENESIS_EPOCH
-//	          validator.activation_epoch = GENESIS_EPOCH
-//
-//	  # Set genesis validators root for domain separation and chain versioning
-//	  state.genesis_validators_root = hash_tree_root(state.validators)
-//
-//	  return state
-//
-// This method differs from the spec so as to process deposits beforehand instead of the end of the function.
 func GenesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, zond1Data *zondpb.Zond1Data) (state.BeaconState, error) {
 	st, err := EmptyGenesisState()
 	if err != nil {
@@ -250,18 +210,6 @@ func EmptyGenesisState() (state.BeaconState, error) {
 // IsValidGenesisState gets called whenever there's a deposit event,
 // it checks whether there's enough effective balance to trigger and
 // if the minimum genesis time arrived already.
-//
-// Spec pseudocode definition:
-//
-//	def is_valid_genesis_state(state: BeaconState) -> bool:
-//	   if state.genesis_time < MIN_GENESIS_TIME:
-//	       return False
-//	   if len(get_active_validator_indices(state, GENESIS_EPOCH)) < MIN_GENESIS_ACTIVE_VALIDATOR_COUNT:
-//	       return False
-//	   return True
-//
-// This method has been modified from the spec to allow whole states not to be saved
-// but instead only cache the relevant information.
 func IsValidGenesisState(chainStartDepositCount, currentTime uint64) bool {
 	if currentTime < params.BeaconConfig().MinGenesisTime {
 		return false

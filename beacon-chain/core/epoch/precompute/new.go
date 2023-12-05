@@ -3,6 +3,8 @@
 // records and balances, for faster computation.
 package precompute
 
+// TODO(rgeraldes24) - not sure if needed; double check
+/*
 import (
 	"context"
 
@@ -57,3 +59,4 @@ func New(ctx context.Context, s state.BeaconState) ([]*Validator, *Balance, erro
 	}
 	return pValidators, pBal, nil
 }
+*/

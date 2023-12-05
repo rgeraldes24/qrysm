@@ -18,7 +18,6 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/ssz"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 )
 
 const executionToDilithiumPadding = 12
@@ -30,9 +29,6 @@ const executionToDilithiumPadding = 12
 func ProcessDilithiumToExecutionChanges(
 	st state.BeaconState,
 	signed interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
-	if signed.Version() < version.Capella {
-		return st, nil
-	}
 	changes, err := signed.Block().Body().DilithiumToExecutionChanges()
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get DilithiumToExecutionChanges")
@@ -52,25 +48,6 @@ func ProcessDilithiumToExecutionChanges(
 
 // processDilithiumToExecutionChange validates a SignedDilithiumToExecution message and
 // changes the validator's withdrawal address accordingly.
-//
-// Spec pseudocode definition:
-//
-// def process_dilithium_to_execution_change(state: BeaconState, signed_address_change: SignedDilithiumToExecutionChange) -> None:
-//
-//	validator = state.validators[address_change.validator_index]
-//
-//	assert validator.withdrawal_credentials[:1] == DILITHIUM_WITHDRAWAL_PREFIX
-//	assert validator.withdrawal_credentials[1:] == hash(address_change.from_dilithium_pubkey)[1:]
-//
-//	domain = get_domain(state, DOMAIN_DILITHIUM_TO_EXECUTION_CHANGE)
-//	signing_root = compute_signing_root(address_change, domain)
-//	assert dilithium.Verify(address_change.from_dilitium_pubkey, signing_root, signed_address_change.signature)
-//
-//	validator.withdrawal_credentials = (
-//	    ZOND1_ADDRESS_WITHDRAWAL_PREFIX
-//	    + b'\x00' * 11
-//	    + address_change.to_execution_address
-//	)
 func processDilithiumToExecutionChange(st state.BeaconState, signed *zondpb.SignedDilithiumToExecutionChange) (state.BeaconState, error) {
 	// Checks that the message passes the validation conditions.
 	val, err := ValidateDilithiumToExecutionChange(st, signed)
@@ -118,33 +95,6 @@ func ValidateDilithiumToExecutionChange(st state.ReadOnlyBeaconState, signed *zo
 
 // ProcessWithdrawals processes the validator withdrawals from the provided execution payload
 // into the beacon state.
-//
-// Spec pseudocode definition:
-//
-// def process_withdrawals(state: BeaconState, payload: ExecutionPayload) -> None:
-//
-//	expected_withdrawals = get_expected_withdrawals(state)
-//	assert len(payload.withdrawals) == len(expected_withdrawals)
-//
-//	for expected_withdrawal, withdrawal in zip(expected_withdrawals, payload.withdrawals):
-//	    assert withdrawal == expected_withdrawal
-//	    decrease_balance(state, withdrawal.validator_index, withdrawal.amount)
-//
-//	# Update the next withdrawal index if this block contained withdrawals
-//	if len(expected_withdrawals) != 0:
-//	    latest_withdrawal = expected_withdrawals[-1]
-//	    state.next_withdrawal_index = WithdrawalIndex(latest_withdrawal.index + 1)
-//
-//	# Update the next validator index to start the next withdrawal sweep
-//	if len(expected_withdrawals) == MAX_WITHDRAWALS_PER_PAYLOAD:
-//	    # Next sweep starts after the latest withdrawal's validator index
-//	    next_validator_index = ValidatorIndex((expected_withdrawals[-1].validator_index + 1) % len(state.validators))
-//	    state.next_withdrawal_validator_index = next_validator_index
-//	else:
-//	    # Advance sweep by the max length of the sweep if there was not a full set of withdrawals
-//	    next_index = state.next_withdrawal_validator_index + MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP
-//	    next_validator_index = ValidatorIndex(next_index % len(state.validators))
-//	    state.next_withdrawal_validator_index = next_validator_index
 func ProcessWithdrawals(st state.BeaconState, executionData interfaces.ExecutionData) (state.BeaconState, error) {
 	expectedWithdrawals, err := st.ExpectedWithdrawals()
 	if err != nil {

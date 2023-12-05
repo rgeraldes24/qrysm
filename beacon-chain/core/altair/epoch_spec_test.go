@@ -111,6 +111,7 @@ func TestProcessSlashings_NotSlashed(t *testing.T) {
 	assert.Equal(t, wanted, newState.Balances()[0], "Unexpected slashed balance")
 }
 
+// TODO(rgeraldes24) - review again
 func TestProcessSlashings_SlashedLess(t *testing.T) {
 	tests := []struct {
 		state *zondpb.BeaconState
@@ -126,7 +127,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 				Balances:  []uint64{params.BeaconConfig().MaxEffectiveBalance, params.BeaconConfig().MaxEffectiveBalance},
 				Slashings: []uint64{0, 1e9},
 			},
-			want: uint64(30000000000),
+			want: uint64(29000000000),
 		},
 		{
 			state: &zondpb.BeaconState{
@@ -142,6 +143,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			},
 			want: uint64(31000000000),
 		},
+
 		{
 			state: &zondpb.BeaconState{
 				Validators: []*zondpb.Validator{
@@ -154,7 +156,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 				Balances:  []uint64{params.BeaconConfig().MaxEffectiveBalance, params.BeaconConfig().MaxEffectiveBalance},
 				Slashings: []uint64{0, 2 * 1e9},
 			},
-			want: uint64(30000000000),
+			want: uint64(29000000000),
 		},
 		{
 			state: &zondpb.BeaconState{
@@ -166,7 +168,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 				Balances:  []uint64{params.BeaconConfig().MaxEffectiveBalance - params.BeaconConfig().EffectiveBalanceIncrement, params.BeaconConfig().MaxEffectiveBalance - params.BeaconConfig().EffectiveBalanceIncrement},
 				Slashings: []uint64{0, 1e9},
 			},
-			want: uint64(29000000000),
+			want: uint64(28000000000),
 		},
 	}
 

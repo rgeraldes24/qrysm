@@ -7,7 +7,6 @@ go_library(
         "justification_finalization.go",
         "new.go",
         "reward_penalty.go",
-        "slashing.go",
         "type.go",
     ],
     importpath = "github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute",
@@ -41,7 +40,6 @@ go_test(
         "new_test.go",
         "precompute_test.go",
         "reward_penalty_test.go",
-        "slashing_test.go",
     ],
     embed = [":go_default_library"],
     deps = [

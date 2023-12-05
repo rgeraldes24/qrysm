@@ -1,5 +1,7 @@
 package precompute
 
+import "testing"
+
 /*
 func TestProcessRewardsAndPenaltiesPrecompute(t *testing.T) {
 	e := params.BeaconConfig().SlotsPerEpoch
@@ -122,9 +124,7 @@ func TestAttestationDeltaPrecompute(t *testing.T) {
 		assert.Equal(t, wanted, penalties[i], "Unexpected penalty balance")
 	}
 }
-*/
 
-/*
 func TestAttestationDeltas_ZeroEpoch(t *testing.T) {
 	e := params.BeaconConfig().SlotsPerEpoch
 	validatorCount := uint64(2048)
@@ -160,9 +160,7 @@ func TestAttestationDeltas_ZeroEpoch(t *testing.T) {
 	_, _, err = AttestationsDelta(beaconState, pBal, pVals)
 	require.NoError(t, err)
 }
-*/
 
-/*
 func TestAttestationDeltas_ZeroInclusionDelay(t *testing.T) {
 	e := params.BeaconConfig().SlotsPerEpoch
 	validatorCount := uint64(2048)
@@ -363,3 +361,6 @@ func baseReward(state state.ReadOnlyBeaconState, index primitives.ValidatorIndex
 	return baseReward, nil
 }
 */
+
+// TODO(rgeraldes24)
+func TestEligibleForRewards(t *testing.T) {}

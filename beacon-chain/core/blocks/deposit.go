@@ -12,10 +12,10 @@ import (
 	"github.com/theQRL/qrysm/v4/container/trie"
 	"github.com/theQRL/qrysm/v4/contracts/deposit"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/math"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 )
 
 // ProcessPreGenesisDeposits processes a deposit for the beacon state before chainstart.
@@ -70,11 +70,6 @@ func ActivateValidatorWithEffectiveBalance(beaconState state.BeaconState, deposi
 // ProcessDeposits is one of the operations performed on each processed
 // beacon block to verify queued validators from the Ethereum 1.0 Deposit Contract
 // into the beacon chain.
-//
-// Spec pseudocode definition:
-//
-//	For each deposit in block.body.deposits:
-//	  process_deposit(state, deposit)
 func ProcessDeposits(
 	ctx context.Context,
 	beaconState state.BeaconState,
@@ -119,44 +114,6 @@ func BatchVerifyDepositsSignatures(ctx context.Context, deposits []*zondpb.Depos
 // into the registry as a new validator or balance change.
 // Returns the resulting state, a boolean to indicate whether or not the deposit
 // resulted in a new validator entry into the beacon state, and any error.
-//
-// Spec pseudocode definition:
-// def process_deposit(state: BeaconState, deposit: Deposit) -> None:
-//
-//	# Verify the Merkle branch
-//	assert is_valid_merkle_branch(
-//	    leaf=hash_tree_root(deposit.data),
-//	    branch=deposit.proof,
-//	    depth=DEPOSIT_CONTRACT_TREE_DEPTH + 1,  # Add 1 for the List length mix-in
-//	    index=state.zond1_deposit_index,
-//	    root=state.zond1_data.deposit_root,
-//	)
-//
-//	# Deposits must be processed in order
-//	state.zond1_deposit_index += 1
-//
-//	pubkey = deposit.data.pubkey
-//	amount = deposit.data.amount
-//	validator_pubkeys = [v.pubkey for v in state.validators]
-//	if pubkey not in validator_pubkeys:
-//	    # Verify the deposit signature (proof of possession) which is not checked by the deposit contract
-//	    deposit_message = DepositMessage(
-//	        pubkey=deposit.data.pubkey,
-//	        withdrawal_credentials=deposit.data.withdrawal_credentials,
-//	        amount=deposit.data.amount,
-//	    )
-//	    domain = compute_domain(DOMAIN_DEPOSIT)  # Fork-agnostic domain since deposits are valid across forks
-//	    signing_root = compute_signing_root(deposit_message, domain)
-//	    if not bls.Verify(pubkey, signing_root, deposit.data.signature):
-//	        return
-//
-//	    # Add validator and balance entries
-//	    state.validators.append(get_validator_from_deposit(state, deposit))
-//	    state.balances.append(amount)
-//	else:
-//	    # Increase balance by deposit amount
-//	    index = ValidatorIndex(validator_pubkeys.index(pubkey))
-//	    increase_balance(state, index, amount)
 func ProcessDeposit(beaconState state.BeaconState, deposit *zondpb.Deposit, verifySignature bool) (state.BeaconState, bool, error) {
 	var newValidator bool
 	if err := verifyDeposit(beaconState, deposit); err != nil {

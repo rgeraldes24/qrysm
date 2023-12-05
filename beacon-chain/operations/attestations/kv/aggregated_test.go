@@ -27,7 +27,7 @@ func TestKV_Aggregated_AggregateUnaggregatedAttestations(t *testing.T) {
 	priv, err := dilithium.RandKey()
 	require.NoError(t, err)
 	sig1 := priv.Sign([]byte{'a'})
-	sig2 := priv.Sign([]byte{'b'})
+	//sig2 := priv.Sign([]byte{'b'})
 	att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b1001}, Signatures: [][]byte{sig1.Marshal()}})
 	att2 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b1010}, Signatures: [][]byte{sig1.Marshal()}})
 	att3 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b1100}, Signatures: [][]byte{sig1.Marshal()}})

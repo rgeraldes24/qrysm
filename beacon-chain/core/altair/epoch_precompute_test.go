@@ -244,44 +244,6 @@ func TestAttestationsDelta(t *testing.T) {
 	require.DeepEqual(t, want, penalties)
 }
 
-func TestAttestationsDeltaBellatrix(t *testing.T) {
-	s, err := testStateBellatrix()
-	require.NoError(t, err)
-	validators, balance, err := InitializePrecomputeValidators(context.Background(), s)
-	require.NoError(t, err)
-	validators, balance, err = ProcessEpochParticipation(context.Background(), s, balance, validators)
-	require.NoError(t, err)
-	deltas, err := AttestationsDelta(s, balance, validators)
-	require.NoError(t, err)
-
-	rewards := make([]uint64, len(deltas))
-	penalties := make([]uint64, len(deltas))
-	for i, d := range deltas {
-		rewards[i] = d.HeadReward + d.SourceReward + d.TargetReward
-		penalties[i] = d.SourcePenalty + d.TargetPenalty
-	}
-
-	// Reward amount should increase as validator index increases due to setup.
-	for i := 1; i < len(rewards); i++ {
-		require.Equal(t, true, rewards[i] > rewards[i-1])
-	}
-
-	// Penalty amount should decrease as validator index increases due to setup.
-	for i := 1; i < len(penalties); i++ {
-		require.Equal(t, true, penalties[i] <= penalties[i-1])
-	}
-
-	// First index should have 0 reward.
-	require.Equal(t, uint64(0), rewards[0])
-	// Last index should have 0 penalty.
-	require.Equal(t, uint64(0), penalties[len(penalties)-1])
-
-	want := []uint64{0, 939146, 2101898, 2414946}
-	require.DeepEqual(t, want, rewards)
-	want = []uint64{3577700, 2325505, 0, 0}
-	require.DeepEqual(t, want, penalties)
-}
-
 func TestProcessRewardsAndPenaltiesPrecompute_Ok(t *testing.T) {
 	s, err := testState()
 	require.NoError(t, err)
@@ -477,43 +439,6 @@ func TestProcessInactivityScores_NonEligibleValidator(t *testing.T) {
 }
 
 func testState() (state.BeaconState, error) {
-	generateParticipation := func(flags ...uint8) byte {
-		b := byte(0)
-		var err error
-		for _, flag := range flags {
-			b, err = AddValidatorFlag(b, flag)
-			if err != nil {
-				return 0
-			}
-		}
-		return b
-	}
-	return state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
-		Slot: 2 * params.BeaconConfig().SlotsPerEpoch,
-		Validators: []*zondpb.Validator{
-			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch},
-			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch},
-			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch},
-			{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance, ExitEpoch: params.BeaconConfig().FarFutureEpoch},
-		},
-		CurrentEpochParticipation: []byte{
-			0,
-			generateParticipation(params.BeaconConfig().TimelySourceFlagIndex),
-			generateParticipation(params.BeaconConfig().TimelySourceFlagIndex, params.BeaconConfig().TimelyTargetFlagIndex),
-			generateParticipation(params.BeaconConfig().TimelySourceFlagIndex, params.BeaconConfig().TimelyTargetFlagIndex, params.BeaconConfig().TimelyHeadFlagIndex),
-		},
-		PreviousEpochParticipation: []byte{
-			0,
-			generateParticipation(params.BeaconConfig().TimelySourceFlagIndex),
-			generateParticipation(params.BeaconConfig().TimelySourceFlagIndex, params.BeaconConfig().TimelyTargetFlagIndex),
-			generateParticipation(params.BeaconConfig().TimelySourceFlagIndex, params.BeaconConfig().TimelyTargetFlagIndex, params.BeaconConfig().TimelyHeadFlagIndex),
-		},
-		InactivityScores: []uint64{0, 0, 0, 0},
-		Balances:         []uint64{0, 0, 0, 0},
-	})
-}
-
-func testStateBellatrix() (state.BeaconState, error) {
 	generateParticipation := func(flags ...uint8) byte {
 		b := byte(0)
 		var err error

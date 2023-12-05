@@ -10,6 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/features"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -18,28 +20,11 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/math"
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
+	"github.com/theQRL/qrysm/v4/runtime/version"
 	"go.opencensus.io/trace"
 )
 
 // ExecuteStateTransition defines the procedure for a state transition function.
-//
-// Note: This method differs from the spec pseudocode as it uses a batch signature verification.
-// See: ExecuteStateTransitionNoVerifyAnySig
-//
-// Spec pseudocode definition:
-//
-//	def state_transition(state: BeaconState, signed_block: ReadOnlySignedBeaconBlock, validate_result: bool=True) -> None:
-//	  block = signed_block.message
-//	  # Process slots (including those with no blocks) since block
-//	  process_slots(state, block.slot)
-//	  # Verify signature
-//	  if validate_result:
-//	      assert verify_block_signature(state, signed_block)
-//	  # Process block
-//	  process_block(state, block)
-//	  # Verify state root
-//	  if validate_result:
-//	      assert block.state_root == hash_tree_root(state)
 func ExecuteStateTransition(
 	ctx context.Context,
 	state state.BeaconState,
@@ -79,18 +64,6 @@ func ExecuteStateTransition(
 
 // ProcessSlot happens every slot and focuses on the slot counter and block roots record updates.
 // It happens regardless if there's an incoming block or not.
-// Spec pseudocode definition:
-//
-//	def process_slot(state: BeaconState) -> None:
-//	  # Cache state root
-//	  previous_state_root = hash_tree_root(state)
-//	  state.state_roots[state.slot % SLOTS_PER_HISTORICAL_ROOT] = previous_state_root
-//	  # Cache latest block header state root
-//	  if state.latest_block_header.state_root == Bytes32():
-//	      state.latest_block_header.state_root = previous_state_root
-//	  # Cache block root
-//	  previous_block_root = hash_tree_root(state.latest_block_header)
-//	  state.block_roots[state.slot % SLOTS_PER_HISTORICAL_ROOT] = previous_block_root
 func ProcessSlot(ctx context.Context, state state.BeaconState) (state.BeaconState, error) {
 	ctx, span := trace.StartSpan(ctx, "core.state.ProcessSlot")
 	defer span.End()
@@ -166,17 +139,6 @@ func ProcessSlotsIfPossible(ctx context.Context, state state.BeaconState, target
 }
 
 // ProcessSlots process through skip slots and apply epoch transition when it's needed
-//
-// Spec pseudocode definition:
-//
-//	def process_slots(state: BeaconState, slot: Slot) -> None:
-//	  assert state.slot < slot
-//	  while state.slot < slot:
-//	      process_slot(state)
-//	      # Process epoch on the start slot of the next epoch
-//	      if (state.slot + 1) % SLOTS_PER_EPOCH == 0:
-//	          process_epoch(state)
-//	      state.slot = Slot(state.slot + 1)
 func ProcessSlots(ctx context.Context, state state.BeaconState, slot primitives.Slot) (state.BeaconState, error) {
 	ctx, span := trace.StartSpan(ctx, "core.state.ProcessSlots")
 	defer span.End()
@@ -240,25 +202,17 @@ func ProcessSlots(ctx context.Context, state state.BeaconState, slot primitives.
 			tracing.AnnotateError(span, err)
 			return nil, errors.Wrap(err, "could not process slot")
 		}
-		/*
-			if time.CanProcessEpoch(state) {
-				if state.Version() == version.Phase0 {
-					state, err = ProcessEpochPrecompute(ctx, state)
-					if err != nil {
-						tracing.AnnotateError(span, err)
-						return nil, errors.Wrap(err, "could not process epoch with optimizations")
-					}
-				} else if state.Version() >= version.Altair {
-					state, err = altair.ProcessEpoch(ctx, state)
-					if err != nil {
-						tracing.AnnotateError(span, err)
-						return nil, errors.Wrap(err, "could not process epoch")
-					}
-				} else {
-					return nil, errors.New("beacon state should have a version")
+		if time.CanProcessEpoch(state) {
+			if state.Version() >= version.Capella {
+				state, err = altair.ProcessEpoch(ctx, state)
+				if err != nil {
+					tracing.AnnotateError(span, err)
+					return nil, errors.Wrap(err, "could not process epoch")
 				}
+			} else {
+				return nil, errors.New("beacon state should have a version")
 			}
-		*/
+		}
 		if err := state.SetSlot(state.Slot() + 1); err != nil {
 			tracing.AnnotateError(span, err)
 			return nil, errors.Wrap(err, "failed to increment state slot")
@@ -326,51 +280,3 @@ func VerifyOperationLengths(_ context.Context, state state.BeaconState, b interf
 
 	return state, nil
 }
-
-/*
-// ProcessEpochPrecompute describes the per epoch operations that are performed on the beacon state.
-// It's optimized by pre computing validator attested info and epoch total/attested balances upfront.
-func ProcessEpochPrecompute(ctx context.Context, state state.BeaconState) (state.BeaconState, error) {
-	ctx, span := trace.StartSpan(ctx, "core.state.ProcessEpochPrecompute")
-	defer span.End()
-	span.AddAttributes(trace.Int64Attribute("epoch", int64(time.CurrentEpoch(state)))) // lint:ignore uintcast -- This is OK for tracing.
-
-	if state == nil || state.IsNil() {
-		return nil, errors.New("nil state")
-	}
-	vp, bp, err := precompute.New(ctx, state)
-	if err != nil {
-		return nil, err
-	}
-	vp, bp, err = precompute.ProcessAttestations(ctx, state, vp, bp)
-	if err != nil {
-		return nil, err
-	}
-
-	state, err = precompute.ProcessJustificationAndFinalizationPreCompute(state, bp)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not process justification")
-	}
-
-	state, err = precompute.ProcessRewardsAndPenaltiesPrecompute(state, bp, vp, precompute.AttestationsDelta, precompute.ProposersDelta)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not process rewards and penalties")
-	}
-
-	state, err = e.ProcessRegistryUpdates(ctx, state)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not process registry updates")
-	}
-
-	err = precompute.ProcessSlashingsPrecompute(state, bp)
-	if err != nil {
-		return nil, err
-	}
-
-	state, err = e.ProcessFinalUpdates(state)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not process final updates")
-	}
-	return state, nil
-}
-*/

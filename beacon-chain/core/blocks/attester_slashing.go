@@ -20,23 +20,6 @@ import (
 // ProcessAttesterSlashings is one of the operations performed
 // on each processed beacon block to slash attesters based on
 // Casper FFG slashing conditions if any slashable events occurred.
-//
-// Spec pseudocode definition:
-//
-//	def process_attester_slashing(state: BeaconState, attester_slashing: AttesterSlashing) -> None:
-//	 attestation_1 = attester_slashing.attestation_1
-//	 attestation_2 = attester_slashing.attestation_2
-//	 assert is_slashable_attestation_data(attestation_1.data, attestation_2.data)
-//	 assert is_valid_indexed_attestation(state, attestation_1)
-//	 assert is_valid_indexed_attestation(state, attestation_2)
-//
-//	 slashed_any = False
-//	 indices = set(attestation_1.attesting_indices).intersection(attestation_2.attesting_indices)
-//	 for index in sorted(indices):
-//	     if is_slashable_validator(state.validators[index], get_current_epoch(state)):
-//	         slash_validator(state, index)
-//	         slashed_any = True
-//	 assert slashed_any
 func ProcessAttesterSlashings(
 	ctx context.Context,
 	beaconState state.BeaconState,

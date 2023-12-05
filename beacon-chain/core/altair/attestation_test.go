@@ -235,7 +235,7 @@ func TestProcessAttestations_OK(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
+func TestProcessAttestationNoVerifySignatures_SourceTargetHead(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisState(t, 64)
 	err := beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
 	require.NoError(t, err)
@@ -253,8 +253,8 @@ func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
 		},
 		ParticipationBits: participationBits,
 	}
-	var zeroSig [4595]byte
-	att.Signatures = [][]byte{zeroSig[:]}
+	var sig0, sig1 [4595]byte
+	att.Signatures = [][]byte{sig0[:], sig1[:]}
 
 	ckp := beaconState.CurrentJustifiedCheckpoint()
 	copy(ckp.Root, make([]byte, fieldparams.RootLength))

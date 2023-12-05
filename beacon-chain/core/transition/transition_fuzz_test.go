@@ -155,6 +155,7 @@ func TestFuzzCanProcessEpoch_10000(t *testing.T) {
 	}
 }
 
+// NOTE(rgeraldes24) - ProcessEpochPrecompute replaced by ProcessEpoch after Altair fork
 /*
 func TestFuzzProcessEpochPrecompute_1000(t *testing.T) {
 	SkipSlotCache.Disable()

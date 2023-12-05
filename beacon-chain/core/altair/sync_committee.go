@@ -132,21 +132,6 @@ func NextSyncCommitteeIndices(ctx context.Context, s state.BeaconState) ([]primi
 }
 
 // SyncSubCommitteePubkeys returns the pubkeys participating in a sync subcommittee.
-//
-// def get_sync_subcommittee_pubkeys(state: BeaconState, subcommittee_index: uint64) -> Sequence[BLSPubkey]:
-//
-//	# Committees assigned to `slot` sign for `slot - 1`
-//	# This creates the exceptional logic below when transitioning between sync committee periods
-//	next_slot_epoch = compute_epoch_at_slot(Slot(state.slot + 1))
-//	if compute_sync_committee_period(get_current_epoch(state)) == compute_sync_committee_period(next_slot_epoch):
-//	    sync_committee = state.current_sync_committee
-//	else:
-//	    sync_committee = state.next_sync_committee
-//
-//	# Return pubkeys for the subcommittee index
-//	sync_subcommittee_size = SYNC_COMMITTEE_SIZE // SYNC_COMMITTEE_SUBNET_COUNT
-//	i = subcommittee_index * sync_subcommittee_size
-//	return sync_committee.pubkeys[i:i + sync_subcommittee_size]
 func SyncSubCommitteePubkeys(syncCommittee *zondpb.SyncCommittee, subComIdx primitives.CommitteeIndex) ([][]byte, error) {
 	cfg := params.BeaconConfig()
 	subCommSize := cfg.SyncCommitteeSize / cfg.SyncCommitteeSubnetCount
@@ -161,11 +146,6 @@ func SyncSubCommitteePubkeys(syncCommittee *zondpb.SyncCommittee, subComIdx prim
 
 // IsSyncCommitteeAggregator checks whether the provided signature is for a valid
 // aggregator.
-//
-// def is_sync_committee_aggregator(signature: Signature) -> bool:
-//
-//	modulo = max(1, SYNC_COMMITTEE_SIZE // SYNC_COMMITTEE_SUBNET_COUNT // TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE)
-//	return bytes_to_uint64(hash(signature)[0:8]) % modulo == 0
 func IsSyncCommitteeAggregator(sig []byte) (bool, error) {
 	if len(sig) != dilithium2.CryptoBytes {
 		return false, errors.New("incorrect sig length")

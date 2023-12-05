@@ -1,5 +1,6 @@
 package epoch
 
+// TODO(rgeraldes24) - benchmark epoch transition(altair) instead since this method is not used anymore
 /*
 func TestFuzzFinalUpdates_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
