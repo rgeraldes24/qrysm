@@ -192,7 +192,7 @@ func Test_getBlkParentHashAndTD(t *testing.T) {
 }
 
 func Test_validateTerminalBlockHash(t *testing.T) {
-	wrapped, err := blocks.WrappedExecutionPayload(&enginev1.ExecutionPayload{})
+	wrapped, err := blocks.WrappedExecutionPayload(&enginev1.ExecutionPayload{}, 0)
 	require.NoError(t, err)
 	ok, err := canUseValidatedTerminalBlockHash(1, wrapped)
 	require.NoError(t, err)
@@ -213,7 +213,7 @@ func Test_validateTerminalBlockHash(t *testing.T) {
 
 	wrapped, err = blocks.WrappedExecutionPayload(&enginev1.ExecutionPayload{
 		ParentHash: cfg.TerminalBlockHash.Bytes(),
-	})
+	}, 0)
 	require.NoError(t, err)
 	ok, err = canUseValidatedTerminalBlockHash(1, wrapped)
 	require.NoError(t, err)
@@ -222,7 +222,7 @@ func Test_validateTerminalBlockHash(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	blk, err := blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockBellatrix(&zondpb.SignedBeaconBlockBellatrix{}))
+	blk, err := blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlock(&zondpb.SignedBeaconBlock{}))
 	require.NoError(t, err)
 	blk.SetSlot(1)
 	require.NoError(t, blk.SetExecution(wrapped))

@@ -148,14 +148,21 @@ func getStateVersionAndPayload(st state.BeaconState) (int, interfaces.ExecutionD
 	var preStateHeader interfaces.ExecutionData
 	var err error
 	preStateVersion := st.Version()
-	switch preStateVersion {
-	//case version.Phase0, version.Altair:
-	default:
-		preStateHeader, err = st.LatestExecutionPayloadHeader()
-		if err != nil {
-			return 0, nil, err
+	/*
+		switch preStateVersion {
+		default:
+			preStateHeader, err = st.LatestExecutionPayloadHeader()
+			if err != nil {
+				return 0, nil, err
+			}
 		}
+	*/
+
+	preStateHeader, err = st.LatestExecutionPayloadHeader()
+	if err != nil {
+		return 0, nil, err
 	}
+
 	return preStateVersion, preStateHeader, nil
 }
 
@@ -255,17 +262,20 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []interfaces.ReadOnlySi
 	var isValidPayload bool
 	for i, b := range blks {
 		isValidPayload, err = s.notifyNewPayload(ctx,
-			postVersionAndHeaders[i].version,
+			/*postVersionAndHeaders[i].version,*/
 			postVersionAndHeaders[i].header, b)
 		if err != nil {
 			return s.handleInvalidExecutionError(ctx, err, blockRoots[i], b.Block().ParentRoot())
 		}
-		if isValidPayload {
-			if err := s.validateMergeTransitionBlock(ctx, preVersionAndHeaders[i].version,
-				preVersionAndHeaders[i].header, b); err != nil {
-				return err
+		// TODO(rgeraldes24) - double check that is not necessary
+		/*
+			if isValidPayload {
+				if err := s.validateMergeTransitionBlock(ctx, preVersionAndHeaders[i].version,
+					preVersionAndHeaders[i].header, b); err != nil {
+					return err
+				}
 			}
-		}
+		*/
 		args := &forkchoicetypes.BlockAndCheckpoints{Block: b.Block(),
 			JustifiedCheckpoint: jCheckpoints[i],
 			FinalizedCheckpoint: fCheckpoints[i]}
@@ -441,6 +451,7 @@ func (s *Service) pruneAttsFromPool(headBlock interfaces.ReadOnlySignedBeaconBlo
 	return nil
 }
 
+/*
 // validateMergeTransitionBlock validates the merge transition block.
 func (s *Service) validateMergeTransitionBlock(ctx context.Context, stateVersion int, stateHeader interfaces.ExecutionData, blk interfaces.ReadOnlySignedBeaconBlock) error {
 	// Skip validation if block has an empty payload.
@@ -467,6 +478,7 @@ func (s *Service) validateMergeTransitionBlock(ctx context.Context, stateVersion
 	}
 	return s.validateMergeBlock(ctx, blk)
 }
+*/
 
 // This routine checks if there is a cached proposer payload ID available for the next slot proposer.
 // If there is not, it will call forkchoice updated with the correct payload attribute then cache the payload ID.

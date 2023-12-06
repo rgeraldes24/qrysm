@@ -16,10 +16,59 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time"
 )
 
+// GenerateGenesisState deterministically given a genesis time and number of validators.
+// If a genesis time of 0 is supplied it is set to the current time.
+func GenerateGenesisState(ctx context.Context, genesisTime, numValidators uint64, ep *enginev1.ExecutionPayload, ed *zondpb.Zond1Data) (*zondpb.BeaconState, []*zondpb.Deposit, error) {
+	privKeys, pubKeys, err := DeterministicallyGenerateKeys(0, numValidators)
+	if err != nil {
+		return nil, nil, errors.Wrapf(err, "could not deterministically generate keys for %d validators", numValidators)
+	}
+	depositDataItems, depositDataRoots, err := DepositDataFromKeys(privKeys, pubKeys)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "could not generate deposit data from keys")
+	}
+	return GenerateGenesisStateFromDepositData(ctx, genesisTime, depositDataItems, depositDataRoots, ep, ed)
+}
+
+// GenerateGenesisStateFromDepositData creates a genesis state given a list of
+// deposit data items and their corresponding roots.
+func GenerateGenesisStateFromDepositData(
+	ctx context.Context, genesisTime uint64, depositData []*zondpb.Deposit_Data, depositDataRoots [][]byte, ep *enginev1.ExecutionPayload, e1d *zondpb.Zond1Data,
+) (*zondpb.BeaconState, []*zondpb.Deposit, error) {
+	t, err := trie.GenerateTrieFromItems(depositDataRoots, params.BeaconConfig().DepositContractTreeDepth)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "could not generate Merkle trie for deposit proofs")
+	}
+	deposits, err := GenerateDepositsFromData(depositData, t)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "could not generate deposits from the deposit data provided")
+	}
+	if genesisTime == 0 {
+		genesisTime = uint64(time.Now().Unix())
+	}
+	beaconState, err := coreState.GenesisBeaconState(ctx, deposits, genesisTime, e1d, ep)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "could not generate genesis state")
+	}
+	bsi := beaconState.ToProtoUnsafe()
+	pbb, ok := bsi.(*zondpb.BeaconState)
+	if !ok {
+		return nil, nil, errors.New("unexpected BeaconState version")
+	}
+	pbState, err := statenative.ProtobufBeaconStateCapella(pbb)
+	if err != nil {
+		return nil, nil, err
+	}
+	return pbState, deposits, nil
+}
+
+// TODO(rgeraldes24) - old version
+/*
 var (
 	// This is the recommended mock zond1 block hash according to the Ethereum consensus interop guidelines.
 	// https://github.com/ethereum/eth2.0-pm/blob/a085c9870f3956d6228ed2a40cd37f0c6580ecd7/interop/mocked_start/README.md
@@ -29,7 +78,7 @@ var (
 // GenerateGenesisState deterministically given a genesis time and number of validators.
 // If a genesis time of 0 is supplied it is set to the current time.
 func GenerateGenesisState(ctx context.Context, genesisTime, numValidators uint64) (*zondpb.BeaconState, []*zondpb.Deposit, error) {
-	privKeys, pubKeys, err := DeterministicallyGenerateKeys(0 /*startIndex*/, numValidators)
+	privKeys, pubKeys, err := DeterministicallyGenerateKeys(0, numValidators)
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "could not deterministically generate keys for %d validators", numValidators)
 	}
@@ -75,6 +124,7 @@ func GenerateGenesisStateFromDepositData(
 	}
 	return pbState, deposits, nil
 }
+*/
 
 // GenerateDepositsFromData a list of deposit items by creating proofs for each of them from a sparse Merkle trie.
 func GenerateDepositsFromData(depositDataItems []*zondpb.Deposit_Data, trie *trie.SparseMerkleTrie) ([]*zondpb.Deposit, error) {

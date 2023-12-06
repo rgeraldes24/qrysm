@@ -118,19 +118,13 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgsBatches [][32]byte, pu
 	grp := errgroup.Group{}
 	grp.SetLimit(n)
 
-	for i, sigsBatch := range sigsBatches {
-		// make sure that we have the same number of elements per verification request
-		var (
-			lenSigsBatch    = len(sigsBatch)
-			lenMsgsBatch    = len(msgsBatches[i])
-			lenPubKeysBatch = len(pubKeysBatches[i])
-		)
-		if lenSigsBatch != lenPubKeysBatch || lenSigsBatches != lenMsgsBatch {
-			return false, pkgerrors.Errorf("provided signatures, pubkeys and messages have differing lengths. S: %d, P: %d, M: %d, Batch: %d",
-				lenSigsBatches, lenPubKeysBatch, lenMsgsBatch, i)
+	for i := 0; i < lenMsgsBatches; i++ {
+		if len(sigsBatches[i]) != len(pubKeysBatches[i]) {
+			return false, pkgerrors.Errorf("provided signatures, pubkeys have differing lengths. S: %d, P: %d, Batch: %d",
+				len(sigsBatches[i]), len(pubKeysBatches[i]), i)
 		}
 
-		for j, sig := range sigsBatch {
+		for j, sig := range sigsBatches[i] {
 			sigCopy := make([]byte, len(sig))
 			copy(sigCopy, sig)
 			iCopy := i

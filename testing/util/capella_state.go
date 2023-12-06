@@ -193,8 +193,7 @@ func buildGenesisBeaconState(genesisTime uint64, preState state.BeaconState, zon
 		},
 		Graffiti: make([]byte, 32),
 		SyncAggregate: &zondpb.SyncAggregate{
-			SyncCommitteeBits:       scBits[:],
-			SyncCommitteeSignatures: make([][]byte, 0, fieldparams.SyncAggregateSyncCommitteeBytesLength),
+			SyncCommitteeBits: scBits[:],
 		},
 		ExecutionPayload: &enginev1.ExecutionPayload{
 			ParentHash:    make([]byte, 32),

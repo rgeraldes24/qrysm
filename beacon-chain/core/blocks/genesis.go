@@ -61,7 +61,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 					Graffiti: make([]byte, 32),
 					SyncAggregate: &zondpb.SyncAggregate{
 						SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
-						SyncCommitteeSignatures: make([][]byte, fieldparams.SyncCommitteeLength),
+						SyncCommitteeSignatures: make([][]byte, 0),
 					},
 					ExecutionPayload: &enginev1.ExecutionPayload{
 						ParentHash:    make([]byte, 32),

@@ -80,6 +80,7 @@ func (s *PremineGenesisConfig) prepare(ctx context.Context) (state.BeaconState, 
 	if err = s.processDeposits(ctx, st); err != nil {
 		return nil, err
 	}
+
 	if err = s.populate(st); err != nil {
 		return nil, err
 	}
@@ -313,7 +314,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 			Graffiti: make([]byte, 32),
 			SyncAggregate: &zondpb.SyncAggregate{
 				SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
-				SyncCommitteeSignatures: make([][]byte, fieldparams.SyncCommitteeLength),
+				SyncCommitteeSignatures: make([][]byte, 0),
 			},
 			ExecutionPayload: &enginev1.ExecutionPayload{
 				ParentHash:    make([]byte, 32),

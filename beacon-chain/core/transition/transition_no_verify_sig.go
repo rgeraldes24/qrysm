@@ -162,17 +162,16 @@ func ProcessBlockNoVerifyAnySig(
 	set := dilithium.NewSet()
 	set.Join(bSet).Join(rSet).Join(aSet)
 
-	if blk.Version() >= version.Capella {
-		changes, err := signed.Block().Body().DilithiumToExecutionChanges()
-		if err != nil {
-			return nil, nil, errors.Wrap(err, "could not get DilithiumToExecutionChanges")
-		}
-		cSet, err := b.DilithiumChangesSignatureBatch(st, changes)
-		if err != nil {
-			return nil, nil, errors.Wrap(err, "could not get DilithiumToExecutionChanges signatures")
-		}
-		set.Join(cSet)
+	changes, err := signed.Block().Body().DilithiumToExecutionChanges()
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "could not get DilithiumToExecutionChanges")
 	}
+	cSet, err := b.DilithiumChangesSignatureBatch(st, changes)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "could not get DilithiumToExecutionChanges signatures")
+	}
+	set.Join(cSet)
+
 	return set, st, nil
 }
 
@@ -198,7 +197,7 @@ func ProcessOperationsNoVerifyAttsSigs(
 	var err error
 	switch signedBeaconBlock.Version() {
 	case version.Capella:
-		state, err = capellaOperations(ctx, state, signedBeaconBlock)
+		state, err = altairOperations(ctx, state, signedBeaconBlock)
 		if err != nil {
 			return nil, err
 		}
@@ -286,7 +285,7 @@ func ProcessBlockForStateRoot(
 }
 
 // This calls capella block operations.
-func capellaOperations(
+func altairOperations(
 	ctx context.Context,
 	st state.BeaconState,
 	signedBeaconBlock interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {

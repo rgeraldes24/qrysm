@@ -33,7 +33,7 @@ func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
 
-	altairBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockAltair())
+	altairBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlock())
 	altairBlkRoot, err := altairBlk.Block().HashTreeRoot()
 	require.NoError(t, err)
 	Blk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlock())
@@ -71,7 +71,7 @@ func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, BlkRoot))
 
 	// Intentionally generate a bad state such that `hash_tree_root` fails during `process_slot`
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{})
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	arg := &notifyForkchoiceUpdateArg{
 		headState: s,
@@ -89,7 +89,7 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
 
-	altairBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockAltair())
+	altairBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlock())
 	altairBlkRoot, err := altairBlk.Block().HashTreeRoot()
 	require.NoError(t, err)
 	Blk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlock())
@@ -121,14 +121,6 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 		newForkchoiceErr error
 		errString        string
 	}{
-		{
-			name: "phase0 block",
-			blk: func() interfaces.ReadOnlyBeaconBlock {
-				b, err := consensusblocks.NewBeaconBlock(&zondpb.BeaconBlock{Body: &zondpb.BeaconBlockBody{}})
-				require.NoError(t, err)
-				return b
-			}(),
-		},
 		{
 			name: "altair block",
 			blk: func() interfaces.ReadOnlyBeaconBlock {
@@ -470,7 +462,6 @@ func Test_NotifyNewPayload(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, fcs := tr.ctx, tr.fcs
 
-	phase0State, _ := util.DeterministicGenesisState(t, 1)
 	capellaState, _ := util.DeterministicGenesisState(t, 1)
 	State, _ := util.DeterministicGenesisState(t, 2)
 	a := &zondpb.SignedBeaconBlock{
@@ -681,9 +672,9 @@ func Test_NotifyNewPayload(t *testing.T) {
 			state, blkRoot, err := prepareForkchoiceState(ctx, 0, root, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 			require.NoError(t, err)
 			require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, state, blkRoot))
-			postVersion, postHeader, err := getStateVersionAndPayload(tt.postState)
+			_, postHeader, err := getStateVersionAndPayload(tt.postState)
 			require.NoError(t, err)
-			isValidPayload, err := service.notifyNewPayload(ctx, postVersion, postHeader, tt.blk)
+			isValidPayload, err := service.notifyNewPayload(ctx, postHeader, tt.blk)
 			if tt.errString != "" {
 				require.ErrorContains(t, tt.errString, err)
 				if tt.invalidBlock {
@@ -732,9 +723,9 @@ func Test_NotifyNewPayload_SetOptimisticToValid(t *testing.T) {
 		TotalDifficulty: "0x1",
 	}
 	service.cfg.ExecutionEngineCaller = e
-	postVersion, postHeader, err := getStateVersionAndPayload(State)
+	_, postHeader, err := getStateVersionAndPayload(State)
 	require.NoError(t, err)
-	validated, err := service.notifyNewPayload(ctx, postVersion, postHeader, Blk)
+	validated, err := service.notifyNewPayload(ctx, postHeader, Blk)
 	require.NoError(t, err)
 	require.Equal(t, true, validated)
 }
@@ -792,7 +783,7 @@ func Test_GetPayloadAttribute(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx := tr.ctx
 
-	st, _ := util.DeterministicGenesisStateCapella(t, 1)
+	st, _ := util.DeterministicGenesisState(t, 1)
 	hasPayload, _, vId := service.getPayloadAttribute(ctx, st, 0, []byte{})
 	require.Equal(t, false, hasPayload)
 	require.Equal(t, primitives.ValidatorIndex(0), vId)

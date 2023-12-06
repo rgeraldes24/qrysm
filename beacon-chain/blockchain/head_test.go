@@ -416,24 +416,24 @@ func TestSaveOrphanedAtts_CanFilter(t *testing.T) {
 	// Chain setup
 	// 0 -- 1 -- 2
 	//  \-4
-	st, keys := util.DeterministicGenesisStateCapella(t, 64)
+	st, keys := util.DeterministicGenesisState(t, 64)
 	blkConfig := util.DefaultBlockGenConfig()
 	blkConfig.NumDilithiumChanges = 5
-	blkG, err := util.GenerateFullBlockCapella(st, keys, blkConfig, 1)
+	blkG, err := util.GenerateFullBlock(st, keys, blkConfig, 1)
 	assert.NoError(t, err)
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, blkG)
 	rG, err := blkG.Block.HashTreeRoot()
 	require.NoError(t, err)
 
 	blkConfig.NumDilithiumChanges = 10
-	blk1, err := util.GenerateFullBlockCapella(st, keys, blkConfig, 2)
+	blk1, err := util.GenerateFullBlock(st, keys, blkConfig, 2)
 	assert.NoError(t, err)
 	blk1.Block.ParentRoot = rG[:]
 	r1, err := blk1.Block.HashTreeRoot()
 	require.NoError(t, err)
 
 	blkConfig.NumDilithiumChanges = 15
-	blk2, err := util.GenerateFullBlockCapella(st, keys, blkConfig, 3)
+	blk2, err := util.GenerateFullBlock(st, keys, blkConfig, 3)
 	assert.NoError(t, err)
 	blk2.Block.ParentRoot = r1[:]
 	r2, err := blk2.Block.HashTreeRoot()
@@ -448,7 +448,7 @@ func TestSaveOrphanedAtts_CanFilter(t *testing.T) {
 	ojc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	ofc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 
-	for _, blk := range []*zondpb.SignedBeaconBlockCapella{blkG, blk1, blk2, blk4} {
+	for _, blk := range []*zondpb.SignedBeaconBlock{blkG, blk1, blk2, blk4} {
 		r, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		state, blkRoot, err := prepareForkchoiceState(ctx, blk.Block.Slot, r, bytesutil.ToBytes32(blk.Block.ParentRoot), [32]byte{}, ojc, ofc)
@@ -587,23 +587,23 @@ func TestUpdateHead_noSavedChanges(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, st, blkRoot))
 
-	bellatrixBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockBellatrix())
-	bellatrixBlkRoot, err := bellatrixBlk.Block().HashTreeRoot()
+	capellaBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlock())
+	capellaBlkRoot, err := capellaBlk.Block().HashTreeRoot()
 	require.NoError(t, err)
 	fcp := &zondpb.Checkpoint{
-		Root:  bellatrixBlkRoot[:],
+		Root:  capellaBlkRoot[:],
 		Epoch: 0,
 	}
-	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, bellatrixBlkRoot))
+	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, capellaBlkRoot))
 
-	bellatrixState, _ := util.DeterministicGenesisStateBellatrix(t, 2)
-	require.NoError(t, beaconDB.SaveState(ctx, bellatrixState, bellatrixBlkRoot))
-	service.cfg.StateGen.SaveFinalizedState(0, bellatrixBlkRoot, bellatrixState)
+	capellaState, _ := util.DeterministicGenesisState(t, 2)
+	require.NoError(t, beaconDB.SaveState(ctx, capellaState, capellaBlkRoot))
+	service.cfg.StateGen.SaveFinalizedState(0, capellaBlkRoot, capellaState)
 
 	headRoot := service.headRoot()
 	require.Equal(t, [32]byte{}, headRoot)
 
-	st, blkRoot, err = prepareForkchoiceState(ctx, 0, bellatrixBlkRoot, [32]byte{}, [32]byte{}, fcp, fcp)
+	st, blkRoot, err = prepareForkchoiceState(ctx, 0, capellaBlkRoot, [32]byte{}, [32]byte{}, fcp, fcp)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, st, blkRoot))
 	fcs.SetBalancesByRooter(func(context.Context, [32]byte) ([]uint64, error) { return []uint64{1, 2}, nil })

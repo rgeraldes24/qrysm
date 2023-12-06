@@ -179,7 +179,7 @@ func (s *Service) getPayloadHash(ctx context.Context, root []byte) ([32]byte, er
 
 // notifyNewPayload signals execution engine on a new payload.
 // It returns true if the EL has returned VALID for the block
-func (s *Service) notifyNewPayload(ctx context.Context, preStateVersion int,
+func (s *Service) notifyNewPayload(ctx context.Context,
 	preStateHeader interfaces.ExecutionData, blk interfaces.ReadOnlySignedBeaconBlock) (bool, error) {
 	ctx, span := trace.StartSpan(ctx, "blockChain.notifyNewPayload")
 	defer span.End()
@@ -189,9 +189,7 @@ func (s *Service) notifyNewPayload(ctx context.Context, preStateVersion int,
 	if blk == nil {
 		return false, errors.New("signed beacon block can't be nil")
 	}
-	// if preStateVersion < version.Bellatrix {
-	// 	return true, nil
-	// }
+
 	if err := consensusblocks.BeaconBlockIsNil(blk); err != nil {
 		return false, err
 	}

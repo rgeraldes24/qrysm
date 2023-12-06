@@ -427,16 +427,6 @@ func TestService_IsOptimistic(t *testing.T) {
 	require.Equal(t, true, opt)
 }
 
-/*
-func TestService_IsOptimisticBeforeBellatrix(t *testing.T) {
-	ctx := context.Background()
-	c := &Service{genesisTime: time.Now()}
-	opt, err := c.IsOptimistic(ctx)
-	require.NoError(t, err)
-	require.Equal(t, false, opt)
-}
-*/
-
 func TestService_IsOptimisticForRoot(t *testing.T) {
 	ctx := context.Background()
 	c := &Service{cfg: &config{ForkChoiceStore: doublylinkedtree.New()}, head: &head{root: [32]byte{'b'}}}

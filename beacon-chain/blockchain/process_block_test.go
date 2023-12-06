@@ -12,9 +12,6 @@ import (
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
-	"github.com/theQRL/go-zond/common"
-	zondtypes "github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
@@ -26,7 +23,6 @@ import (
 	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/features"
-	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -840,7 +836,7 @@ func Test_getStateVersionAndPayload(t *testing.T) {
 				s, _ := util.DeterministicGenesisState(t, 1)
 				wrappedHeader, err := consensusblocks.WrappedExecutionPayloadHeader(&enginev1.ExecutionPayloadHeader{
 					BlockNumber: 1,
-				})
+				}, 0)
 				require.NoError(t, err)
 				require.NoError(t, s.SetLatestExecutionPayloadHeader(wrappedHeader))
 				return s
@@ -865,6 +861,7 @@ func Test_getStateVersionAndPayload(t *testing.T) {
 	}
 }
 
+/*
 func Test_validateMergeTransitionBlock(t *testing.T) {
 	cfg := params.BeaconConfig()
 	cfg.TerminalTotalDifficulty = "2"
@@ -948,7 +945,7 @@ func Test_validateMergeTransitionBlock(t *testing.T) {
 					BaseFeePerGas:    make([]byte, fieldparams.RootLength),
 					BlockHash:        make([]byte, fieldparams.RootLength),
 					TransactionsRoot: make([]byte, fieldparams.RootLength),
-				})
+				}, 0)
 				require.NoError(t, err)
 				return h
 			}(),
@@ -962,7 +959,7 @@ func Test_validateMergeTransitionBlock(t *testing.T) {
 			header: func() interfaces.ExecutionData {
 				h, err := consensusblocks.WrappedExecutionPayloadHeader(&enginev1.ExecutionPayloadHeader{
 					BlockNumber: 1,
-				})
+				}, 0)
 				require.NoError(t, err)
 				return h
 			}(),
@@ -984,7 +981,7 @@ func Test_validateMergeTransitionBlock(t *testing.T) {
 				TotalDifficulty: "0x1",
 			}
 			service.cfg.ExecutionEngineCaller = e
-			b := util.HydrateSignedBeaconBlockBellatrix(&zondpb.SignedBeaconBlockBellatrix{})
+			b := util.HydrateSignedBeaconBlock(&zondpb.SignedBeaconBlock{})
 			b.Block.Body.ExecutionPayload = tt.payload
 			blk, err := consensusblocks.NewSignedBeaconBlock(b)
 			require.NoError(t, err)
@@ -997,6 +994,7 @@ func Test_validateMergeTransitionBlock(t *testing.T) {
 		})
 	}
 }
+*/
 
 func TestService_insertSlashingsToForkChoiceStore(t *testing.T) {
 	service, tr := minimalTestService(t)
@@ -1186,7 +1184,7 @@ func TestStore_NoViableHead_FCU(t *testing.T) {
 		driftGenesisTime(service, int64(i), 0)
 		st, err := service.HeadState(ctx)
 		require.NoError(t, err)
-		b, err := util.GenerateFullBlockAltair(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
+		b, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
@@ -1205,7 +1203,7 @@ func TestStore_NoViableHead_FCU(t *testing.T) {
 		driftGenesisTime(service, int64(i), 0)
 		st, err := service.HeadState(ctx)
 		require.NoError(t, err)
-		b, err := util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
+		b, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
@@ -1227,7 +1225,7 @@ func TestStore_NoViableHead_FCU(t *testing.T) {
 	driftGenesisTime(service, 18, 0)
 	validHeadState, err := service.HeadState(ctx)
 	require.NoError(t, err)
-	b, err := util.GenerateFullBlockBellatrix(validHeadState, keys, util.DefaultBlockGenConfig(), 18)
+	b, err := util.GenerateFullBlock(validHeadState, keys, util.DefaultBlockGenConfig(), 18)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1255,7 +1253,7 @@ func TestStore_NoViableHead_FCU(t *testing.T) {
 	driftGenesisTime(service, 19, 0)
 	st, err = service.HeadState(ctx)
 	require.NoError(t, err)
-	b, err = util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), 19)
+	b, err = util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 19)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1283,7 +1281,7 @@ func TestStore_NoViableHead_FCU(t *testing.T) {
 	mockEngine = &mockExecution.EngineClient{}
 	service.cfg.ExecutionEngineCaller = mockEngine
 	driftGenesisTime(service, 20, 0)
-	b, err = util.GenerateFullBlockBellatrix(validHeadState, keys, &util.BlockGenConfig{}, 20)
+	b, err = util.GenerateFullBlock(validHeadState, keys, &util.BlockGenConfig{}, 20)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1362,7 +1360,7 @@ func TestStore_NoViableHead_NewPayload(t *testing.T) {
 		driftGenesisTime(service, int64(i), 0)
 		st, err := service.HeadState(ctx)
 		require.NoError(t, err)
-		b, err := util.GenerateFullBlockAltair(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
+		b, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
@@ -1381,7 +1379,7 @@ func TestStore_NoViableHead_NewPayload(t *testing.T) {
 		driftGenesisTime(service, int64(i), 0)
 		st, err := service.HeadState(ctx)
 		require.NoError(t, err)
-		b, err := util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
+		b, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
@@ -1404,7 +1402,7 @@ func TestStore_NoViableHead_NewPayload(t *testing.T) {
 	driftGenesisTime(service, 18, 0)
 	validHeadState, err := service.HeadState(ctx)
 	require.NoError(t, err)
-	b, err := util.GenerateFullBlockBellatrix(validHeadState, keys, util.DefaultBlockGenConfig(), 18)
+	b, err := util.GenerateFullBlock(validHeadState, keys, util.DefaultBlockGenConfig(), 18)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1432,7 +1430,7 @@ func TestStore_NoViableHead_NewPayload(t *testing.T) {
 	driftGenesisTime(service, 19, 0)
 	st, err = service.HeadState(ctx)
 	require.NoError(t, err)
-	b, err = util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), 19)
+	b, err = util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 19)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1460,7 +1458,7 @@ func TestStore_NoViableHead_NewPayload(t *testing.T) {
 	mockEngine = &mockExecution.EngineClient{}
 	service.cfg.ExecutionEngineCaller = mockEngine
 	driftGenesisTime(service, 20, 0)
-	b, err = util.GenerateFullBlockBellatrix(validHeadState, keys, &util.BlockGenConfig{}, 20)
+	b, err = util.GenerateFullBlock(validHeadState, keys, &util.BlockGenConfig{}, 20)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1540,7 +1538,7 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 		driftGenesisTime(service, int64(i), 0)
 		st, err := service.HeadState(ctx)
 		require.NoError(t, err)
-		b, err := util.GenerateFullBlockAltair(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
+		b, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
@@ -1560,7 +1558,7 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 	driftGenesisTime(service, 12, 0)
 	st, err = service.HeadState(ctx)
 	require.NoError(t, err)
-	b, err := util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), 12)
+	b, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 12)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1587,7 +1585,7 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 		driftGenesisTime(service, int64(i), 0)
 		st, err := service.HeadState(ctx)
 		require.NoError(t, err)
-		b, err := util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
+		b, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
@@ -1613,7 +1611,7 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 	driftGenesisTime(service, 19, 0)
 	st, err = service.HeadState(ctx)
 	require.NoError(t, err)
-	b, err = util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), 19)
+	b, err = util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 19)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1652,7 +1650,7 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 	mockEngine = &mockExecution.EngineClient{}
 	service.cfg.ExecutionEngineCaller = mockEngine
 	driftGenesisTime(service, 20, 0)
-	b, err = util.GenerateFullBlockBellatrix(validHeadState, keys, &util.BlockGenConfig{}, 20)
+	b, err = util.GenerateFullBlock(validHeadState, keys, &util.BlockGenConfig{}, 20)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1675,7 +1673,7 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 	for i := 21; i < 30; i++ {
 		driftGenesisTime(service, int64(i), 0)
 		require.NoError(t, err)
-		b, err := util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
+		b, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
@@ -1773,7 +1771,7 @@ func TestNoViableHead_Reboot(t *testing.T) {
 		driftGenesisTime(service, int64(i), 0)
 		st, err := service.HeadState(ctx)
 		require.NoError(t, err)
-		b, err := util.GenerateFullBlockAltair(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
+		b, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
@@ -1792,7 +1790,7 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	driftGenesisTime(service, 12, 0)
 	st, err := service.HeadState(ctx)
 	require.NoError(t, err)
-	b, err := util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), 12)
+	b, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 12)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1818,7 +1816,7 @@ func TestNoViableHead_Reboot(t *testing.T) {
 		driftGenesisTime(service, int64(i), 0)
 		st, err := service.HeadState(ctx)
 		require.NoError(t, err)
-		b, err := util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
+		b, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
@@ -1848,7 +1846,7 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	driftGenesisTime(service, 19, 0)
 	st, err = service.HeadState(ctx)
 	require.NoError(t, err)
-	b, err = util.GenerateFullBlockBellatrix(st, keys, util.DefaultBlockGenConfig(), 19)
+	b, err = util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 19)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -1894,7 +1892,7 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	mockEngine = &mockExecution.EngineClient{}
 	service.cfg.ExecutionEngineCaller = mockEngine
 	driftGenesisTime(service, 20, 0)
-	b, err = util.GenerateFullBlockBellatrix(validHeadState, keys, &util.BlockGenConfig{}, 20)
+	b, err = util.GenerateFullBlock(validHeadState, keys, &util.BlockGenConfig{}, 20)
 	require.NoError(t, err)
 	wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)

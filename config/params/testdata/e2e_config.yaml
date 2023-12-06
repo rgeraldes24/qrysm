@@ -27,22 +27,6 @@ GENESIS_FORK_VERSION: 0x000000fd
 GENESIS_DELAY: 10 # Override for e2e tests
 
 
-# Forking
-# ---------------------------------------------------------------
-# Values provided for illustrative purposes.
-# Individual tests/testnets may set different values.
-
-# Altair
-ALTAIR_FORK_VERSION: 0x010000fd
-ALTAIR_FORK_EPOCH: 6 # Override for e2e
-# Bellatrix
-BELLATRIX_FORK_VERSION: 0x020000fd
-BELLATRIX_FORK_EPOCH: 8
-# Capella
-CAPELLA_FORK_VERSION: 0x030000fd
-CAPELLA_FORK_EPOCH: 10
-
-
 # Time parameters
 # ---------------------------------------------------------------
 # [customized] Faster for testing purposes

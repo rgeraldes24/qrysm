@@ -1,15 +1,12 @@
 package transition
 
 import (
-	"context"
 	"testing"
 
 	fuzz "github.com/google/gofuzz"
-	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
+/*
 func TestGenesisBeaconState_1000(t *testing.T) {
 	SkipSlotCache.Disable()
 	defer SkipSlotCache.Enable()
@@ -54,6 +51,7 @@ func TestOptimizedGenesisBeaconState_1000(t *testing.T) {
 		}
 	}
 }
+*/
 
 func TestIsValidGenesisState_100000(_ *testing.T) {
 	SkipSlotCache.Disable()

@@ -170,10 +170,10 @@ func GenerateAttestations(
 		bitsPerAtt := committeeSize / uint64(attsPerCommittee)
 		for i := uint64(0); i < committeeSize; i += bitsPerAtt {
 			participationBits := bitfield.NewBitlist(committeeSize)
-			var sigs [][]byte
+			sigs := make([][]byte, 0)
 			for b := i; b < i+bitsPerAtt; b++ {
 				participationBits.SetBitAt(b, true)
-				sigs = [][]byte{privs[committee[b]].Sign(dataRoot[:]).Marshal()}
+				sigs = append(sigs, privs[committee[b]].Sign(dataRoot[:]).Marshal())
 			}
 
 			// bls.AggregateSignatures will return nil if sigs is 0.

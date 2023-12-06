@@ -17,7 +17,6 @@ import (
 	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
-	"github.com/theQRL/qrysm/v4/cmd/flags"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
 	"github.com/theQRL/qrysm/v4/io/file"
@@ -29,15 +28,15 @@ import (
 
 var (
 	generateGenesisStateFlags = struct {
-		DepositJsonFile     string
-		ChainConfigFile     string
-		ConfigName          string
-		NumValidators       uint64
-		GenesisTime         uint64
-		OutputSSZ           string
-		OutputJSON          string
-		OutputYaml          string
-		ForkName            string
+		DepositJsonFile string
+		ChainConfigFile string
+		ConfigName      string
+		NumValidators   uint64
+		GenesisTime     uint64
+		OutputSSZ       string
+		OutputJSON      string
+		OutputYaml      string
+		//ForkName            string
 		OverrideZond1Data   bool
 		ExecutionEndpoint   string
 		GzondGenesisJsonIn  string
@@ -121,13 +120,15 @@ var (
 				Usage:       "Endpoint to preferred execution client. If unset, defaults to Gzond",
 				Value:       "http://localhost:8545",
 			},
-			flags.EnumValue{
-				Name:        "fork",
-				Usage:       fmt.Sprintf("Name of the BeaconState schema to use in output encoding [%s]", strings.Join(versionNames(), ",")),
-				Enum:        versionNames(),
-				Value:       versionNames()[0],
-				Destination: &generateGenesisStateFlags.ForkName,
-			}.GenericFlag(),
+			/*
+				flags.EnumValue{
+					Name:        "fork",
+					Usage:       fmt.Sprintf("Name of the BeaconState schema to use in output encoding [%s]", strings.Join(versionNames(), ",")),
+					Enum:        versionNames(),
+					Value:       versionNames()[0],
+					Destination: &generateGenesisStateFlags.ForkName,
+				}.GenericFlag(),
+			*/
 			outputSSZFlag,
 			outputYamlFlag,
 			outputJsonFlag,
@@ -224,7 +225,8 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		log.Info("No genesis time specified, defaulting to now()")
 	}
 
-	v, err := version.FromString(f.ForkName)
+	v, err := version.FromString(versionNames()[0])
+	//v, err := version.FromString(f.ForkName)
 	if err != nil {
 		return nil, err
 	}
@@ -262,7 +264,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		}
 		// set timestamps for genesis and shanghai fork
 		gen.Timestamp = f.GenesisTime
-		gen.Config.ShanghaiTime = interop.GzondShanghaiTime(f.GenesisTime, params.BeaconConfig())
+		gen.Config.ShanghaiTime = interop.GzondShanghaiTime(f.GenesisTime)
 		log.
 			WithField("shanghai", gen.Config.ShanghaiTime).
 			Info("setting fork zond times")

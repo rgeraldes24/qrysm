@@ -1,5 +1,7 @@
 package interop
 
+// TODO(rgeraldes24) - not used?
+/*
 import (
 	"context"
 	"time"
@@ -15,7 +17,7 @@ import (
 // GeneratePreminedGenesisState deterministically given a genesis time and number of validators.
 // If a genesis time of 0 is supplied it is set to the current time.
 func GeneratePreminedGenesisState(ctx context.Context, genesisTime, numValidators uint64, e1d *zondpb.Zond1Data) (*zondpb.BeaconState, []*zondpb.Deposit, error) {
-	privKeys, pubKeys, err := DeterministicallyGenerateKeys(0 /*startIndex*/, numValidators)
+	privKeys, pubKeys, err := DeterministicallyGenerateKeys(0, numValidators)
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "could not deterministically generate keys for %d validators", numValidators)
 	}
@@ -61,3 +63,4 @@ func GeneratePreminedGenesisStateFromDepositData(
 	}
 	return pbState, deposits, nil
 }
+*/

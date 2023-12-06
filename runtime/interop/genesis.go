@@ -79,17 +79,8 @@ const DefaultCliqueSigner = "0x0000000000000000000000000000000000000000000000000
 
 // GzondShanghaiTime calculates the absolute time of the shanghai (aka capella) fork block
 // by adding the relative time of the capella the fork epoch to the given genesis timestamp.
-func GzondShanghaiTime(genesisTime uint64, cfg *clparams.BeaconChainConfig) *uint64 {
+func GzondShanghaiTime(genesisTime uint64) *uint64 {
 	var shanghaiTime *uint64
-
-	// if cfg.CapellaForkEpoch != math.MaxUint64 {
-	// 	startSlot, err := slots.EpochStart(cfg.CapellaForkEpoch)
-	// 	if err == nil {
-	// 		startTime := slots.StartTime(genesisTime, startSlot)
-	// 		newTime := uint64(startTime.Unix())
-	// 		shanghaiTime = &newTime
-	// 	}
-	// }
 
 	startSlot, err := slots.EpochStart(0)
 	if err == nil {
@@ -110,7 +101,7 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 		panic(fmt.Sprintf("unable to parse TerminalTotalDifficulty as an integer = %s", clparams.BeaconConfig().TerminalTotalDifficulty))
 	}
 
-	shanghaiTime := GzondShanghaiTime(genesisTime, cfg)
+	shanghaiTime := GzondShanghaiTime(genesisTime)
 	cc := &params.ChainConfig{
 		ChainID:                       big.NewInt(defaultTestChainId),
 		HomesteadBlock:                bigz,

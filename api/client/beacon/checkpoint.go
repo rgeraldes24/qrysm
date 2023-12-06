@@ -178,7 +178,7 @@ func computeBackwardsCompatible(ctx context.Context, client *Client) (*WeakSubje
 		return nil, errors.Wrap(err, "unable to proceed with fallback method without confirming node version")
 	}
 	if nv.implementation == qrysmImplementationName && semver.Compare(nv.semver, qrysmMinimumVersion) < 0 {
-		return nil, errors.Wrapf(errUnsupportedPrysmCheckpointVersion, "%s < minimum (%s)", nv.semver, prysmMinimumVersion)
+		return nil, errors.Wrapf(errUnsupportedPrysmCheckpointVersion, "%s < minimum (%s)", nv.semver, qrysmMinimumVersion)
 	}
 	epoch, err := getWeakSubjectivityEpochFromHead(ctx, client)
 	if err != nil {
