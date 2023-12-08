@@ -2,13 +2,9 @@ package testing
 
 import (
 	"context"
-	"math/big"
 
-	"github.com/holiman/uint256"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	payloadattribute "github.com/theQRL/qrysm/v4/consensus-types/payload-attribute"
@@ -112,6 +108,7 @@ func (e *EngineClient) ReconstructFullBellatrixBlockBatch(
 	return fullBlocks, nil
 }
 
+/*
 // GetTerminalBlockHash --
 func (e *EngineClient) GetTerminalBlockHash(ctx context.Context, transitionTime uint64) ([]byte, bool, error) {
 	ttd := new(big.Int)
@@ -140,7 +137,7 @@ func (e *EngineClient) GetTerminalBlockHash(ctx context.Context, transitionTime 
 		if parentHash == params.BeaconConfig().ZeroHash {
 			return nil, false, nil
 		}
-		parentBlk, err := e.ExecutionBlockByHash(ctx, parentHash, false /* with txs */)
+		parentBlk, err := e.ExecutionBlockByHash(ctx, parentHash, false)
 		if err != nil {
 			return nil, false, errors.Wrap(err, "could not get parent execution block")
 		}
@@ -163,3 +160,4 @@ func (e *EngineClient) GetTerminalBlockHash(ctx context.Context, transitionTime 
 		blk = parentBlk
 	}
 }
+*/

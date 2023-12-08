@@ -740,6 +740,7 @@ func TestReconstructFullBellatrixBlockBatch(t *testing.T) {
 	})
 }
 
+/*
 func TestServer_getPowBlockHashAtTerminalTotalDifficulty(t *testing.T) {
 	tests := []struct {
 		name                  string
@@ -903,6 +904,7 @@ func TestServer_getPowBlockHashAtTerminalTotalDifficulty(t *testing.T) {
 		})
 	}
 }
+*/
 
 func Test_tDStringToUint256(t *testing.T) {
 	i, err := tDStringToUint256("0x0")

@@ -47,13 +47,14 @@ func TestService_headCurrentSyncCommitteeIndices(t *testing.T) {
 	indices, err := c.headCurrentSyncCommitteeIndices(context.Background(), 0, primitives.Slot(slot))
 	require.NoError(t, err)
 
-	// NextSyncCommittee becomes CurrentSyncCommittee so it should be empty by default.
-	require.Equal(t, 0, len(indices))
+	// NextSyncCommittee becomes CurrentSyncCommittee so it should be 4 by default.
+	require.Equal(t, 4, len(indices))
 }
 
+// NOTE(rgeraldes24) - this test also panics in the prysm repo; added a beaconDB
 func TestService_headNextSyncCommitteeIndices(t *testing.T) {
 	s, _ := util.DeterministicGenesisState(t, params.BeaconConfig().TargetCommitteeSize)
-	c := &Service{}
+	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
 	c.head = &head{state: s}
 
 	// Process slot up to `EpochsPerSyncCommitteePeriod` so it can `ProcessSyncCommitteeUpdates`.
@@ -94,9 +95,10 @@ func TestService_HeadSyncCommitteeDomain(t *testing.T) {
 	require.DeepEqual(t, wanted, d)
 }
 
+// NOTE(rgeraldes24) - this test also panics in the prysm repo; added a beaconDB
 func TestService_HeadSyncContributionProofDomain(t *testing.T) {
 	s, _ := util.DeterministicGenesisState(t, params.BeaconConfig().TargetCommitteeSize)
-	c := &Service{}
+	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
 	c.head = &head{state: s}
 
 	wanted, err := signing.Domain(s.Fork(), slots.ToEpoch(s.Slot()), params.BeaconConfig().DomainContributionAndProof, s.GenesisValidatorsRoot())
@@ -108,9 +110,10 @@ func TestService_HeadSyncContributionProofDomain(t *testing.T) {
 	require.DeepEqual(t, wanted, d)
 }
 
+// NOTE(rgeraldes24) - this test also panics in the prysm repo; added a beaconDB
 func TestService_HeadSyncSelectionProofDomain(t *testing.T) {
 	s, _ := util.DeterministicGenesisState(t, params.BeaconConfig().TargetCommitteeSize)
-	c := &Service{}
+	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
 	c.head = &head{state: s}
 
 	wanted, err := signing.Domain(s.Fork(), slots.ToEpoch(s.Slot()), params.BeaconConfig().DomainSyncCommitteeSelectionProof, s.GenesisValidatorsRoot())

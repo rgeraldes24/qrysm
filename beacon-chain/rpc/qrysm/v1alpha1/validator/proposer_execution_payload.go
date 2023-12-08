@@ -177,6 +177,7 @@ func warnIfFeeRecipientDiffers(payload interfaces.ExecutionData, feeRecipient co
 //	        return None
 //
 //	return get_pow_block_at_terminal_total_difficulty(pow_chain)
+/*
 func (vs *Server) getTerminalBlockHashIfExists(ctx context.Context, transitionTime uint64) ([]byte, bool, error) {
 	terminalBlockHash := params.BeaconConfig().TerminalBlockHash
 	// Terminal block hash override takes precedence over terminal total difficulty.
@@ -194,6 +195,7 @@ func (vs *Server) getTerminalBlockHashIfExists(ctx context.Context, transitionTi
 
 	return vs.ExecutionEngineCaller.GetTerminalBlockHash(ctx, transitionTime)
 }
+*/
 
 func (vs *Server) getBuilderPayload(ctx context.Context,
 	slot primitives.Slot,

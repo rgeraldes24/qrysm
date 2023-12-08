@@ -97,7 +97,6 @@ func VerifyAttestationNoVerifySignatures(
 	if err != nil {
 		return err
 	}
-	fmt.Println(indexedAtt.AttestingIndices)
 
 	return attestation.IsValidAttestationIndices(ctx, indexedAtt)
 }

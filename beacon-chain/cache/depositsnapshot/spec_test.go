@@ -3,6 +3,7 @@ package depositsnapshot
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"strconv"
 	"strings"
 	"testing"
@@ -165,6 +166,7 @@ func readTestCases() ([]testCase, error) {
 		return nil, err
 	}
 	for _, ff := range testFolders {
+		fmt.Println(ff.ShortPath)
 		if strings.Contains(ff.ShortPath, "eip4881_spec_tests") &&
 			strings.Contains(ff.ShortPath, "eip-4881/test_cases.yaml") {
 			enc, err := file.ReadFileAsBytes(ff.Path)

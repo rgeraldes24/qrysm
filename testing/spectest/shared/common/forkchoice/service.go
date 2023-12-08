@@ -116,6 +116,8 @@ func (m *engineMock) ExecutionBlockByHash(_ context.Context, hash common.Hash, _
 	}, nil
 }
 
+/*
 func (m *engineMock) GetTerminalBlockHash(context.Context, uint64) ([]byte, bool, error) {
 	return nil, false, nil
 }
+*/

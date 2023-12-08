@@ -1,5 +1,6 @@
 package blockchain
 
+/*
 import (
 	"fmt"
 	"math/big"
@@ -228,3 +229,4 @@ func Test_validateTerminalBlockHash(t *testing.T) {
 	require.NoError(t, blk.SetExecution(wrapped))
 	require.NoError(t, service.validateMergeBlock(ctx, blk))
 }
+*/

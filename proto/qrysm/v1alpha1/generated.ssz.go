@@ -3,6 +3,8 @@
 package zond
 
 import (
+	"fmt"
+
 	ssz "github.com/prysmaticlabs/fastssz"
 	github_com_theQRL_qrysm_v4_consensus_types_primitives "github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	v1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -1084,7 +1086,7 @@ func (b *BeaconBlockBody) UnmarshalSSZ(buf []byte) error {
 		b.Graffiti = make([]byte, 0, len(buf[4667:4699]))
 	}
 	b.Graffiti = append(b.Graffiti, buf[4667:4699]...)
-
+	
 	// Offset (3) 'ProposerSlashings'
 	if o3 = ssz.ReadOffset(buf[4699:4703]); o3 > size {
 		return ssz.ErrOffset
@@ -4171,12 +4173,13 @@ func (b *BeaconState) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 
 // UnmarshalSSZ ssz unmarshals the BeaconState object
 func (b *BeaconState) UnmarshalSSZ(buf []byte) error {
+	fmt.Println("test")
 	var err error
 	size := uint64(len(buf))
 	if size < 5341613 {
 		return ssz.ErrSize
 	}
-
+	
 	tail := buf
 	var o7, o9, o11, o12, o15, o16, o21, o24, o27 uint64
 
@@ -4191,7 +4194,7 @@ func (b *BeaconState) UnmarshalSSZ(buf []byte) error {
 
 	// Field (2) 'Slot'
 	b.Slot = github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot(ssz.UnmarshallUint64(buf[40:48]))
-
+	
 	// Field (3) 'Fork'
 	if b.Fork == nil {
 		b.Fork = new(Fork)

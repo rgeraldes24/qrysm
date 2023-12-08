@@ -41,16 +41,19 @@ func TestSyncCommitteeHeadState(t *testing.T) {
 			wantPutErr: true,
 			wantErr:    true,
 		},
-		{
-			name: "putting invalid state in",
-			key:  primitives.Slot(1),
-			put: &put{
-				slot:  primitives.Slot(1),
-				state: capellaState,
+		// TODO(rgeraldes) - test not valid anymore
+		/*
+			{
+				name: "putting invalid state in",
+				key:  primitives.Slot(1),
+				put: &put{
+					slot:  primitives.Slot(1),
+					state: capellaState,
+				},
+				wantPutErr: true,
+				wantErr:    true,
 			},
-			wantPutErr: true,
-			wantErr:    true,
-		},
+		*/
 		{
 			name:    "not found when empty cache",
 			key:     primitives.Slot(1),
@@ -75,31 +78,13 @@ func TestSyncCommitteeHeadState(t *testing.T) {
 			want: capellaState,
 		},
 		{
-			name: "not found when non-existent key in non-empty cache (bellatrix state)",
+			name: "not found when non-existent key in non-empty cache",
 			key:  primitives.Slot(2),
 			put: &put{
 				slot:  primitives.Slot(1),
 				state: capellaState,
 			},
 			wantErr: true,
-		},
-		{
-			name: "found with key (bellatrix state)",
-			key:  primitives.Slot(100),
-			put: &put{
-				slot:  primitives.Slot(100),
-				state: capellaState,
-			},
-			want: capellaState,
-		},
-		{
-			name: "found with key (capella state)",
-			key:  primitives.Slot(200),
-			put: &put{
-				slot:  primitives.Slot(200),
-				state: capellaState,
-			},
-			want: capellaState,
 		},
 	}
 	for _, tt := range tests {

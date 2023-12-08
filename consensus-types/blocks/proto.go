@@ -239,7 +239,6 @@ func initBlockBodyFromProtoCapella(pb *zond.BeaconBlockBody) (*BeaconBlockBody, 
 	if pb == nil {
 		return nil, errNilBlockBody
 	}
-
 	p, err := WrappedExecutionPayload(pb.ExecutionPayload, 0)
 	// We allow the payload to be nil
 	if err != nil && err != consensus_types.ErrNilObjectWrapped {

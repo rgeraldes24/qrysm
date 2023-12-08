@@ -1,5 +1,6 @@
 package blockchain
 
+/*
 import (
 	"bytes"
 	"context"
@@ -72,7 +73,7 @@ func (s *Service) validateMergeBlock(ctx context.Context, b interfaces.ReadOnlyS
 
 // getBlkParentHashAndTD retrieves the parent hash and total difficulty of the given block.
 func (s *Service) getBlkParentHashAndTD(ctx context.Context, blkHash []byte) ([]byte, *uint256.Int, error) {
-	blk, err := s.cfg.ExecutionEngineCaller.ExecutionBlockByHash(ctx, common.BytesToHash(blkHash), false /* no txs */)
+	blk, err := s.cfg.ExecutionEngineCaller.ExecutionBlockByHash(ctx, common.BytesToHash(blkHash), false //no txs )
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not get pow block")
 	}
@@ -120,3 +121,4 @@ func validateTerminalBlockDifficulties(currentDifficulty *uint256.Int, parentDif
 	parentTotalDifficultyValid := ttd.Cmp(parentDifficulty) > 0
 	return totalDifficultyReached && parentTotalDifficultyValid, nil
 }
+*/

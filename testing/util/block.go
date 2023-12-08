@@ -364,6 +364,7 @@ func HydrateBeaconBlockBody(b *zondpb.BeaconBlockBody) *zondpb.BeaconBlockBody {
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}
 	}
+
 	if b.SyncAggregate == nil {
 		b.SyncAggregate = &zondpb.SyncAggregate{
 			SyncCommitteeBits:       make([]byte, fieldparams.SyncAggregateSyncCommitteeBytesLength),
@@ -382,8 +383,34 @@ func HydrateBeaconBlockBody(b *zondpb.BeaconBlockBody) *zondpb.BeaconBlockBody {
 			BlockHash:     make([]byte, fieldparams.RootLength),
 			Transactions:  make([][]byte, 0),
 			ExtraData:     make([]byte, 0),
+			Withdrawals:   make([]*enginev1.Withdrawal, 0),
 		}
 	}
+
+	if b.ProposerSlashings == nil {
+		b.ProposerSlashings = make([]*zondpb.ProposerSlashing, 0)
+	}
+
+	if b.AttesterSlashings == nil {
+		b.AttesterSlashings = make([]*zondpb.AttesterSlashing, 0)
+	}
+
+	if b.VoluntaryExits == nil {
+		b.VoluntaryExits = make([]*zondpb.SignedVoluntaryExit, 0)
+	}
+
+	if b.Deposits == nil {
+		b.Deposits = make([]*zondpb.Deposit, 0)
+	}
+
+	if b.Attestations == nil {
+		b.Attestations = make([]*zondpb.Attestation, 0)
+	}
+
+	if b.DilithiumToExecutionChanges == nil {
+		b.DilithiumToExecutionChanges = make([]*zondpb.SignedDilithiumToExecutionChange, 0)
+	}
+
 	return b
 }
 

@@ -440,15 +440,6 @@ func (s *Store) unmarshalState(_ context.Context, enc []byte, validatorEntries [
 		if err := protoState.UnmarshalSSZ(enc[len(capellaKey):]); err != nil {
 			return nil, errors.Wrap(err, "failed to unmarshal encoding for capella")
 		}
-		/*
-			ok, err := s.isStateValidatorMigrationOver()
-			if err != nil {
-				return nil, err
-			}
-			if ok {
-				protoState.Validators = validatorEntries
-			}
-		*/
 		protoState.Validators = validatorEntries
 		return statenative.InitializeFromProtoUnsafeCapella(protoState)
 	default:

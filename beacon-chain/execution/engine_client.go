@@ -10,7 +10,6 @@ import (
 
 	"github.com/holiman/uint256"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
@@ -95,7 +94,7 @@ type EngineCaller interface {
 		ctx context.Context, cfg *pb.TransitionConfiguration,
 	) error
 	ExecutionBlockByHash(ctx context.Context, hash common.Hash, withTxs bool) (*pb.ExecutionBlock, error)
-	GetTerminalBlockHash(ctx context.Context, transitionTime uint64) ([]byte, bool, error)
+	//GetTerminalBlockHash(ctx context.Context, transitionTime uint64) ([]byte, bool, error)
 }
 
 var EmptyBlockHash = errors.New("Block hash is empty 0x0000...")
@@ -299,6 +298,7 @@ func (s *Service) ExchangeCapabilities(ctx context.Context) ([]string, error) {
 //	        return block
 //
 //	return None
+/*
 func (s *Service) GetTerminalBlockHash(ctx context.Context, transitionTime uint64) ([]byte, bool, error) {
 	ttd := new(big.Int)
 	ttd.SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
@@ -328,7 +328,7 @@ func (s *Service) GetTerminalBlockHash(ctx context.Context, transitionTime uint6
 		if parentHash == params.BeaconConfig().ZeroHash {
 			return nil, false, nil
 		}
-		parentBlk, err := s.ExecutionBlockByHash(ctx, parentHash, false /* no txs */)
+		parentBlk, err := s.ExecutionBlockByHash(ctx, parentHash, false)
 		if err != nil {
 			return nil, false, errors.Wrap(err, "could not get parent execution block")
 		}
@@ -367,6 +367,7 @@ func (s *Service) GetTerminalBlockHash(ctx context.Context, transitionTime uint6
 		blk = parentBlk
 	}
 }
+*/
 
 // LatestExecutionBlock fetches the latest execution engine block by calling
 // zond_blockByNumber via JSON-RPC.

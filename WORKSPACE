@@ -209,13 +209,11 @@ filegroup(
     visibility = ["//visibility:public"],
 )
     """,
-    sha256 = "89cb659498c0d196fc9f957f8b849b2e1a5c041c3b2b3ae5432ac5c26944297e",
-    url = "https://github.com/ethereum/EIPs/archive/5480440fe51742ed23342b68cf106cefd427e39d.tar.gz",
+    sha256 = "38d6a6a5937afcc2586213e7848388e80384b58a078cd034a3b12e162f7775e3",
+    url = "https://github.com/rgeraldes24/EIPs/archive/902ac24c60dfa171c4d60e7d027c7cf95eae1c98.tar.gz",
 )
 
 consensus_spec_version = "v1.4.0-alpha.1"
-
-bls_test_version = "v0.1.1"
 
 http_archive(
     name = "consensus_spec_tests_general",
@@ -280,21 +278,6 @@ filegroup(
     strip_prefix = "consensus-specs-" + consensus_spec_version[1:],
     url = "https://github.com/ethereum/consensus-specs/archive/refs/tags/%s.tar.gz" % consensus_spec_version,
 )
-
-# http_archive(
-#     name = "bls_spec_tests",
-#     build_file_content = """
-# filegroup(
-#     name = "test_data",
-#     srcs = glob([
-#         "**/*.yaml",
-#     ]),
-#     visibility = ["//visibility:public"],
-# )
-#     """,
-#     sha256 = "93c7d006e7c5b882cbd11dc9ec6c5d0e07f4a8c6b27a32f964eb17cf2db9763a",
-#     url = "https://github.com/ethereum/bls12-381-tests/releases/download/%s/bls_tests_yaml.tar.gz" % bls_test_version,
-# )
 
 http_archive(
     name = "eth2_networks",

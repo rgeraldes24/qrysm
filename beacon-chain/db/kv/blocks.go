@@ -849,12 +849,7 @@ func marshalBlockBlinded(
 ) ([]byte, error) {
 	blindedBlock, err := blk.ToBlinded()
 	if err != nil {
-		switch {
-		case errors.Is(err, blocks.ErrUnsupportedVersion):
-			return marshalBlockFull(ctx, blk)
-		default:
-			return nil, errors.Wrap(err, "could not convert block to blinded format")
-		}
+		return nil, errors.Wrap(err, "could not convert block to blinded format")
 	}
 	encodedBlock, err := blindedBlock.MarshalSSZ()
 	if err != nil {

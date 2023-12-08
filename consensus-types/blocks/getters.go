@@ -111,9 +111,6 @@ func (b *SignedBeaconBlock) PbBlindedCapellaBlock() (*zond.SignedBlindedBeaconBl
 
 // ToBlinded converts a non-blinded block to its blinded equivalent.
 func (b *SignedBeaconBlock) ToBlinded() (interfaces.ReadOnlySignedBeaconBlock, error) {
-	// if b.version < version.Bellatrix {
-	// 	return nil, ErrUnsupportedVersion
-	// }
 	if b.IsBlinded() {
 		return b, nil
 	}

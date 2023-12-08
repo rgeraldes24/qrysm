@@ -7,7 +7,6 @@ import (
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-zond/common"
-	zondtypes "github.com/theQRL/go-zond/core/types"
 	chainMock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
@@ -263,6 +262,7 @@ func TestServer_getExecutionPayload_UnexpectedFeeRecipient(t *testing.T) {
 	require.LogsContain(t, hook, "Fee recipient address from execution client is not what was expected")
 }
 
+/*
 func TestServer_getTerminalBlockHashIfExists(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	tests := []struct {
@@ -361,3 +361,4 @@ func TestServer_getTerminalBlockHashIfExists(t *testing.T) {
 		})
 	}
 }
+*/
