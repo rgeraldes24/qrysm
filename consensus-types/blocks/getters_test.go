@@ -99,6 +99,25 @@ func Test_SignedBeaconBlock_Header(t *testing.T) {
 			BlockHash:   make([]byte, 32),
 		},
 		graffiti: [32]byte{},
+		syncAggregate: &zond.SyncAggregate{
+			SyncCommitteeBits:       make([]byte, 64),
+			SyncCommitteeSignatures: make([][]byte, 0),
+		},
+		executionPayload: executionPayload{
+			p: &pb.ExecutionPayload{
+				ParentHash:    make([]byte, 32),
+				FeeRecipient:  make([]byte, 20),
+				StateRoot:     make([]byte, 32),
+				ReceiptsRoot:  make([]byte, 32),
+				LogsBloom:     make([]byte, 256),
+				PrevRandao:    make([]byte, 32),
+				ExtraData:     make([]byte, 32),
+				BaseFeePerGas: make([]byte, 32),
+				BlockHash:     make([]byte, 32),
+				Transactions:  make([][]byte, 0),
+				Withdrawals:   make([]*pb.Withdrawal, 0),
+			},
+		},
 	}
 	sb := &SignedBeaconBlock{
 		version: version.Capella,
@@ -130,7 +149,7 @@ func Test_SignedBeaconBlock_UnmarshalSSZ(t *testing.T) {
 	require.NoError(t, err)
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	sb := &SignedBeaconBlock{}
+	sb := &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{body: &BeaconBlockBody{isBlinded: false}}}
 	require.NoError(t, sb.UnmarshalSSZ(buf))
 	msg, err := sb.Proto()
 	require.NoError(t, err)
@@ -172,8 +191,8 @@ func Test_BeaconBlock_Body(t *testing.T) {
 }
 
 func Test_BeaconBlock_Copy(t *testing.T) {
-	bb := &BeaconBlockBody{randaoReveal: bytesutil2.ToBytes4595([]byte{246}), graffiti: bytesutil.ToBytes32([]byte("graffiti"))}
-	b := &BeaconBlock{body: bb, slot: 123, proposerIndex: 456, parentRoot: bytesutil.ToBytes32([]byte("parentroot")), stateRoot: bytesutil.ToBytes32([]byte("stateroot"))}
+	bb := &BeaconBlockBody{version: version.Capella, randaoReveal: bytesutil2.ToBytes4595([]byte{246}), graffiti: bytesutil.ToBytes32([]byte("graffiti"))}
+	b := &BeaconBlock{version: version.Capella, body: bb, slot: 123, proposerIndex: 456, parentRoot: bytesutil.ToBytes32([]byte("parentroot")), stateRoot: bytesutil.ToBytes32([]byte("stateroot"))}
 	cp, err := b.Copy()
 	require.NoError(t, err)
 	assert.NotEqual(t, cp, b)
@@ -251,7 +270,7 @@ func Test_BeaconBlock_UnmarshalSSZ(t *testing.T) {
 	require.NoError(t, err)
 	expectedHTR, err := pb.HashTreeRoot()
 	require.NoError(t, err)
-	b := &BeaconBlock{}
+	b := &BeaconBlock{version: version.Capella, body: &BeaconBlockBody{isBlinded: false}}
 	require.NoError(t, b.UnmarshalSSZ(buf))
 	msg, err := b.Proto()
 	require.NoError(t, err)
@@ -270,9 +289,9 @@ func Test_BeaconBlock_AsSignRequestObject(t *testing.T) {
 	require.NoError(t, err)
 	signRequestObj, err := b.AsSignRequestObject()
 	require.NoError(t, err)
-	actualSignRequestObj, ok := signRequestObj.(*validatorpb.SignRequest_Block)
+	actualSignRequestObj, ok := signRequestObj.(*validatorpb.SignRequest_BlockCapella)
 	require.Equal(t, true, ok)
-	actualHTR, err := actualSignRequestObj.Block.HashTreeRoot()
+	actualHTR, err := actualSignRequestObj.BlockCapella.HashTreeRoot()
 	require.NoError(t, err)
 	assert.DeepEqual(t, expectedHTR, actualHTR)
 }
@@ -291,7 +310,7 @@ func Test_BeaconBlockBody_IsNil(t *testing.T) {
 func Test_BeaconBlockBody_RandaoReveal(t *testing.T) {
 	bb := &SignedBeaconBlock{block: &BeaconBlock{body: &BeaconBlockBody{}}}
 	bb.SetRandaoReveal([]byte("randaoreveal"))
-	assert.DeepEqual(t, bytesutil.ToBytes96([]byte("randaoreveal")), bb.Block().Body().RandaoReveal())
+	assert.DeepEqual(t, bytesutil.ToBytes4595([]byte("randaoreveal")), bb.Block().Body().RandaoReveal())
 }
 
 func Test_BeaconBlockBody_Zond1Data(t *testing.T) {
@@ -413,6 +432,23 @@ func hydrateBeaconBlockBody() *zond.BeaconBlockBody {
 		Zond1Data: &zond.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
+		},
+		SyncAggregate: &zond.SyncAggregate{
+			SyncCommitteeBits:       make([]byte, 64),
+			SyncCommitteeSignatures: make([][]byte, 0),
+		},
+		ExecutionPayload: &pb.ExecutionPayload{
+			ParentHash:    make([]byte, fieldparams.RootLength),
+			FeeRecipient:  make([]byte, 20),
+			StateRoot:     make([]byte, fieldparams.RootLength),
+			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
+			LogsBloom:     make([]byte, 256),
+			PrevRandao:    make([]byte, fieldparams.RootLength),
+			ExtraData:     make([]byte, fieldparams.RootLength),
+			BaseFeePerGas: make([]byte, fieldparams.RootLength),
+			BlockHash:     make([]byte, fieldparams.RootLength),
+			Transactions:  make([][]byte, 0),
+			Withdrawals:   make([]*pb.Withdrawal, 0),
 		},
 	}
 }

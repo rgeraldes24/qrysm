@@ -39,8 +39,8 @@ func getHappyPathTestServer(file string, t *testing.T) *httptest.Server {
 			} else if r.RequestURI == "/zond/v1/beacon/states/head/fork" {
 				err := json.NewEncoder(w).Encode(&apimiddleware.StateForkResponseJson{
 					Data: &apimiddleware.ForkJson{
-						PreviousVersion: hexutil.Encode(params.BeaconConfig().CapellaForkVersion),
-						CurrentVersion:  hexutil.Encode(params.BeaconConfig().CapellaForkVersion),
+						PreviousVersion: hexutil.Encode(params.BeaconConfig().GenesisForkVersion),
+						CurrentVersion:  hexutil.Encode(params.BeaconConfig().GenesisForkVersion),
 						Epoch:           "1350",
 					},
 					ExecutionOptimistic: false,
@@ -230,9 +230,9 @@ func TestCallWithdrawalEndpoint_Errors(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				err := json.NewEncoder(w).Encode(&apimiddleware.StateForkResponseJson{
 					Data: &apimiddleware.ForkJson{
-						PreviousVersion: hexutil.Encode(params.BeaconConfig().CapellaForkVersion),
-						CurrentVersion:  hexutil.Encode(params.BeaconConfig().CapellaForkVersion),
-						Epoch:           fmt.Sprintf("%d", params.BeaconConfig().CapellaForkEpoch),
+						PreviousVersion: hexutil.Encode(params.BeaconConfig().GenesisForkVersion),
+						CurrentVersion:  hexutil.Encode(params.BeaconConfig().GenesisForkVersion),
+						Epoch:           fmt.Sprintf("%d", params.BeaconConfig().GenesisForkVersion),
 					},
 					ExecutionOptimistic: false,
 					Finalized:           true,
@@ -288,8 +288,8 @@ func TestCallWithdrawalEndpoint_ForkBeforeCapella(t *testing.T) {
 
 			err := json.NewEncoder(w).Encode(&apimiddleware.StateForkResponseJson{
 				Data: &apimiddleware.ForkJson{
-					PreviousVersion: hexutil.Encode(params.BeaconConfig().BellatrixForkVersion),
-					CurrentVersion:  hexutil.Encode(params.BeaconConfig().BellatrixForkVersion),
+					PreviousVersion: hexutil.Encode(params.BeaconConfig().GenesisForkVersion),
+					CurrentVersion:  hexutil.Encode(params.BeaconConfig().GenesisForkVersion),
 					Epoch:           "1000",
 				},
 				ExecutionOptimistic: false,

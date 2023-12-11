@@ -217,7 +217,7 @@ func (bs *Server) SubmitBlockSSZ(ctx context.Context, req *zondpbv1.SSZContainer
 	}
 
 	switch forkVer {
-	case bytesutil.ToBytes4(params.BeaconConfig().CapellaForkVersion):
+	case bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion):
 		if block.IsBlinded() {
 			return nil, status.Error(codes.InvalidArgument, "Submitted block is blinded")
 		}
@@ -228,60 +228,6 @@ func (bs *Server) SubmitBlockSSZ(ctx context.Context, req *zondpbv1.SSZContainer
 		_, err = bs.V1Alpha1ValidatorServer.ProposeBeaconBlock(ctx, &zond.GenericSignedBeaconBlock{
 			Block: &zond.GenericSignedBeaconBlock_Capella{
 				Capella: b,
-			},
-		})
-		if err != nil {
-			if strings.Contains(err.Error(), validator.CouldNotDecodeBlock) {
-				return &emptypb.Empty{}, status.Error(codes.InvalidArgument, err.Error())
-			}
-			return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not propose block: %v", err)
-		}
-		return &emptypb.Empty{}, nil
-	case bytesutil.ToBytes4(params.BeaconConfig().BellatrixForkVersion):
-		if block.IsBlinded() {
-			return nil, status.Error(codes.InvalidArgument, "Submitted block is blinded")
-		}
-		b, err := block.PbBellatrixBlock()
-		if err != nil {
-			return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not get proto block: %v", err)
-		}
-		_, err = bs.V1Alpha1ValidatorServer.ProposeBeaconBlock(ctx, &zond.GenericSignedBeaconBlock{
-			Block: &zond.GenericSignedBeaconBlock_Bellatrix{
-				Bellatrix: b,
-			},
-		})
-		if err != nil {
-			if strings.Contains(err.Error(), validator.CouldNotDecodeBlock) {
-				return &emptypb.Empty{}, status.Error(codes.InvalidArgument, err.Error())
-			}
-			return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not propose block: %v", err)
-		}
-		return &emptypb.Empty{}, nil
-	case bytesutil.ToBytes4(params.BeaconConfig().AltairForkVersion):
-		b, err := block.PbAltairBlock()
-		if err != nil {
-			return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not get proto block: %v", err)
-		}
-		_, err = bs.V1Alpha1ValidatorServer.ProposeBeaconBlock(ctx, &zond.GenericSignedBeaconBlock{
-			Block: &zond.GenericSignedBeaconBlock_Altair{
-				Altair: b,
-			},
-		})
-		if err != nil {
-			if strings.Contains(err.Error(), validator.CouldNotDecodeBlock) {
-				return &emptypb.Empty{}, status.Error(codes.InvalidArgument, err.Error())
-			}
-			return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not propose block: %v", err)
-		}
-		return &emptypb.Empty{}, nil
-	case bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion):
-		b, err := block.PbPhase0Block()
-		if err != nil {
-			return &emptypb.Empty{}, status.Errorf(codes.Internal, "Could not get proto block: %v", err)
-		}
-		_, err = bs.V1Alpha1ValidatorServer.ProposeBeaconBlock(ctx, &zond.GenericSignedBeaconBlock{
-			Block: &zond.GenericSignedBeaconBlock_Phase0{
-				Phase0: b,
 			},
 		})
 		if err != nil {
@@ -311,37 +257,11 @@ func (bs *Server) GetBlock(ctx context.Context, req *zondpbv1.BlockRequest) (*zo
 		return nil, errors.Wrapf(err, "could not get block root")
 	}
 
-	result, err := getBlockPhase0(blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get signed beacon block: %v", err)
-	}
 	if err := grpc.SetHeader(ctx, metadata.Pairs(api.VersionHeader, version.String(blk.Version()))); err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not set "+api.VersionHeader+" header: %v", err)
 	}
-	result, err = getBlockAltair(blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get signed beacon block: %v", err)
-	}
-	result, err = bs.getBlockBellatrix(ctx, blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get signed beacon block: %v", err)
-	}
-	result, err = bs.getBlockCapella(ctx, blk)
+
+	result, err := bs.getBlockCapella(ctx, blk)
 	if result != nil {
 		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
 		return result, nil
@@ -368,34 +288,7 @@ func (bs *Server) GetBlockSSZ(ctx context.Context, req *zondpbv1.BlockRequest) (
 		return nil, errors.Wrapf(err, "could not get block root")
 	}
 
-	result, err := getSSZBlockPhase0(blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get signed beacon block: %v", err)
-	}
-	result, err = getSSZBlockAltair(blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get signed beacon block: %v", err)
-	}
-	result, err = bs.getSSZBlockBellatrix(ctx, blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get signed beacon block: %v", err)
-	}
-	result, err = bs.getSSZBlockCapella(ctx, blk)
+	result, err := bs.getSSZBlockCapella(ctx, blk)
 	if result != nil {
 		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
 		return result, nil

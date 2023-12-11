@@ -77,7 +77,7 @@ type ExecutionPayloadReconstructor interface {
 	ReconstructFullBlock(
 		ctx context.Context, blindedBlock interfaces.ReadOnlySignedBeaconBlock,
 	) (interfaces.SignedBeaconBlock, error)
-	ReconstructFullBellatrixBlockBatch(
+	ReconstructFullBlockBatch(
 		ctx context.Context, blindedBlocks []interfaces.ReadOnlySignedBeaconBlock,
 	) ([]interfaces.SignedBeaconBlock, error)
 }
@@ -509,17 +509,9 @@ func (s *Service) ReconstructFullBlock(
 
 	// If the payload header has a block hash of 0x0, it means we are pre-merge and should
 	// simply return the block with an empty execution payload.
-	if bytes.Equal(header.BlockHash(), params.BeaconConfig().ZeroHash[:]) {
-		var payload interface{}
-		// if blindedBlock.Version() == version.Bellatrix {
-		// 	payload = buildEmptyExecutionPayload()
-		// } else {
-		// 	payload = buildEmptyExecutionPayloadCapella()
-		// }
-		payload = buildEmptyExecutionPayload()
-
-		return blocks.BuildSignedBeaconBlockFromExecutionPayload(blindedBlock, payload)
-	}
+	// if bytes.Equal(header.BlockHash(), params.BeaconConfig().ZeroHash[:]) {
+	// 	return blocks.BuildSignedBeaconBlockFromExecutionPayload(blindedBlock, buildEmptyExecutionPayload())
+	// }
 
 	executionBlockHash := common.BytesToHash(header.BlockHash())
 	payload, err := s.retrievePayloadFromExecutionHash(ctx, executionBlockHash, header, blindedBlock.Version())
@@ -534,9 +526,9 @@ func (s *Service) ReconstructFullBlock(
 	return fullBlock, nil
 }
 
-// ReconstructFullBellatrixBlockBatch takes in a batch of blinded beacon blocks and reconstructs
+// ReconstructFullBlockBatch takes in a batch of blinded beacon blocks and reconstructs
 // them with a full execution payload for each block via the engine API.
-func (s *Service) ReconstructFullBellatrixBlockBatch(
+func (s *Service) ReconstructFullBlockBatch(
 	ctx context.Context, blindedBlocks []interfaces.ReadOnlySignedBeaconBlock,
 ) ([]interfaces.SignedBeaconBlock, error) {
 	if len(blindedBlocks) == 0 {
@@ -544,7 +536,7 @@ func (s *Service) ReconstructFullBellatrixBlockBatch(
 	}
 	executionHashes := []common.Hash{}
 	validExecPayloads := []int{}
-	zeroExecPayloads := []int{}
+	// zeroExecPayloads := []int{}
 	for i, b := range blindedBlocks {
 		if err := blocks.BeaconBlockIsNil(b); err != nil {
 			return nil, errors.Wrap(err, "cannot reconstruct bellatrix block from nil data")
@@ -559,36 +551,39 @@ func (s *Service) ReconstructFullBellatrixBlockBatch(
 		if header.IsNil() {
 			return nil, errors.New("execution payload header in blinded block was nil")
 		}
+
+		// NOTE(rgeraldes24) - we wont have blocks pre-merge
 		// Determine if the block is pre-merge or post-merge. Depending on the result,
 		// we will ask the execution engine for the full payload.
-		if bytes.Equal(header.BlockHash(), params.BeaconConfig().ZeroHash[:]) {
-			zeroExecPayloads = append(zeroExecPayloads, i)
-		} else {
-			executionBlockHash := common.BytesToHash(header.BlockHash())
-			validExecPayloads = append(validExecPayloads, i)
-			executionHashes = append(executionHashes, executionBlockHash)
-		}
+		/*
+			if bytes.Equal(header.BlockHash(), params.BeaconConfig().ZeroHash[:]) {
+				zeroExecPayloads = append(zeroExecPayloads, i)
+			} else {
+				executionBlockHash := common.BytesToHash(header.BlockHash())
+				validExecPayloads = append(validExecPayloads, i)
+				executionHashes = append(executionHashes, executionBlockHash)
+			}
+		*/
+		executionBlockHash := common.BytesToHash(header.BlockHash())
+		validExecPayloads = append(validExecPayloads, i)
+		executionHashes = append(executionHashes, executionBlockHash)
 	}
 	fullBlocks, err := s.retrievePayloadsFromExecutionHashes(ctx, executionHashes, validExecPayloads, blindedBlocks)
 	if err != nil {
 		return nil, err
 	}
-	// For blocks that are pre-merge we simply reconstruct them via an empty
-	// execution payload.
-	for _, realIdx := range zeroExecPayloads {
-		var payload interface{}
-		// if blindedBlocks[realIdx].Version() == version.Bellatrix {
-		// 	payload = buildEmptyExecutionPayload()
-		// } else {
-		// 	payload = buildEmptyExecutionPayloadCapella()
-		// }
-		payload = buildEmptyExecutionPayload()
-		fullBlock, err := blocks.BuildSignedBeaconBlockFromExecutionPayload(blindedBlocks[realIdx], payload)
-		if err != nil {
-			return nil, err
+
+	/*
+		// For blocks that are pre-merge we simply reconstruct them via an empty
+		// execution payload.
+		for _, realIdx := range zeroExecPayloads {
+			fullBlock, err := blocks.BuildSignedBeaconBlockFromExecutionPayload(blindedBlocks[realIdx], buildEmptyExecutionPayload())
+			if err != nil {
+				return nil, err
+			}
+			fullBlocks[realIdx] = fullBlock
 		}
-		fullBlocks[realIdx] = fullBlock
-	}
+	*/
 	reconstructedExecutionPayloadCount.Add(float64(len(blindedBlocks)))
 	return fullBlocks, nil
 }
@@ -732,24 +727,6 @@ func fullPayloadFromPayloadBody(
 		return nil, errors.New("execution block and header cannot be nil")
 	}
 
-	// if bVersion == version.Bellatrix {
-	// 	return blocks.WrappedExecutionPayload(&pb.ExecutionPayload{
-	// 		ParentHash:    header.ParentHash(),
-	// 		FeeRecipient:  header.FeeRecipient(),
-	// 		StateRoot:     header.StateRoot(),
-	// 		ReceiptsRoot:  header.ReceiptsRoot(),
-	// 		LogsBloom:     header.LogsBloom(),
-	// 		PrevRandao:    header.PrevRandao(),
-	// 		BlockNumber:   header.BlockNumber(),
-	// 		GasLimit:      header.GasLimit(),
-	// 		GasUsed:       header.GasUsed(),
-	// 		Timestamp:     header.Timestamp(),
-	// 		ExtraData:     header.ExtraData(),
-	// 		BaseFeePerGas: header.BaseFeePerGas(),
-	// 		BlockHash:     header.BlockHash(),
-	// 		Transactions:  body.Transactions,
-	// 	})
-	// }
 	return blocks.WrappedExecutionPayload(&pb.ExecutionPayload{
 		ParentHash:    header.ParentHash(),
 		FeeRecipient:  header.FeeRecipient(),
@@ -854,7 +831,6 @@ func tDStringToUint256(td string) (*uint256.Int, error) {
 	return i, nil
 }
 
-/*
 func buildEmptyExecutionPayload() *pb.ExecutionPayload {
 	return &pb.ExecutionPayload{
 		ParentHash:    make([]byte, fieldparams.RootLength),
@@ -867,22 +843,7 @@ func buildEmptyExecutionPayload() *pb.ExecutionPayload {
 		BlockHash:     make([]byte, fieldparams.RootLength),
 		Transactions:  make([][]byte, 0),
 		ExtraData:     make([]byte, 0),
-	}
-}
-*/
-
-func buildEmptyExecutionPayload() *pb.ExecutionPayload {
-	return &pb.ExecutionPayload{
-		ParentHash:    make([]byte, fieldparams.RootLength),
-		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
-		StateRoot:     make([]byte, fieldparams.RootLength),
-		ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-		LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
-		PrevRandao:    make([]byte, fieldparams.RootLength),
-		BaseFeePerGas: make([]byte, fieldparams.RootLength),
-		BlockHash:     make([]byte, fieldparams.RootLength),
-		Transactions:  make([][]byte, 0),
-		ExtraData:     make([]byte, 0),
+		Withdrawals:   make([]*pb.Withdrawal, 0),
 	}
 }
 

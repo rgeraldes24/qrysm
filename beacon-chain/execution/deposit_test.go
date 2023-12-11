@@ -110,6 +110,7 @@ func TestProcessDeposit_InvalidMerkleBranch(t *testing.T) {
 	assert.ErrorContains(t, want, err)
 }
 
+// TODO(rgeraldes24) - check if it makes sense to keep this test
 func TestProcessDeposit_InvalidPublicKey(t *testing.T) {
 	hook := logTest.NewGlobal()
 	beaconDB := testDB.SetupDB(t)
@@ -149,9 +150,13 @@ func TestProcessDeposit_InvalidPublicKey(t *testing.T) {
 	err = web3Service.processDeposit(context.Background(), zond1Data, deposits[0])
 	require.NoError(t, err)
 
-	require.LogsContain(t, hook, pubKeyErr)
+	//require.LogsContain(t, hook, pubKeyErr)
+	// NOTE(rgeraldes24) - BLS has a unique validation during the pubkey parsing
+	require.LogsContain(t, hook, "could not verify deposit data signature")
+	require.LogsContain(t, hook, "signature did not verify")
 }
 
+// TODO(rgeraldes24) - same test as the next one after the change?
 func TestProcessDeposit_InvalidSignature(t *testing.T) {
 	hook := logTest.NewGlobal()
 	beaconDB := testDB.SetupDB(t)
@@ -191,7 +196,9 @@ func TestProcessDeposit_InvalidSignature(t *testing.T) {
 	require.NoError(t, err)
 
 	require.LogsContain(t, hook, "could not verify deposit data signature")
-	require.LogsContain(t, hook, "could not convert bytes to signature")
+	// NOTE(rgeraldes24) - BLS has a unique validation during the sig parsing
+	// require.LogsContain(t, hook, "could not convert bytes to signature")
+	require.LogsContain(t, hook, "signature did not verify")
 }
 
 func TestProcessDeposit_UnableToVerify(t *testing.T) {

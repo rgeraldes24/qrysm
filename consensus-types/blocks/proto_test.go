@@ -414,12 +414,12 @@ func bodyBlindedCapella(t *testing.T) *BeaconBlockBody {
 
 func getFields() fields {
 	b20 := make([]byte, 20)
-	b48 := make([]byte, 48)
+	b2592 := make([]byte, 2592)
 	b256 := make([]byte, 256)
 	var root [32]byte
 	var sig [dilithium2.CryptoBytes]byte
 	b20[0], b20[5], b20[10] = 'q', 'u', 'x'
-	b48[0], b48[5], b48[10] = 'b', 'a', 'r'
+	b2592[0], b2592[5], b2592[10] = 'b', 'a', 'r'
 	b256[0], b256[5], b256[10] = 'x', 'y', 'z'
 	root[0], root[5], root[10] = 'a', 'b', 'c'
 	sig[0], sig[5], sig[10] = 'd', 'e', 'f'
@@ -431,7 +431,7 @@ func getFields() fields {
 			deposits[i].Proof[j] = root[:]
 		}
 		deposits[i].Data = &zond.Deposit_Data{
-			PublicKey:             b48,
+			PublicKey:             b2592,
 			WithdrawalCredentials: root[:],
 			Amount:                128,
 			Signature:             sig[:],
@@ -577,7 +577,7 @@ func getFields() fields {
 	dilithiumToExecutionChanges := []*zond.SignedDilithiumToExecutionChange{{
 		Message: &zond.DilithiumToExecutionChange{
 			ValidatorIndex:      128,
-			FromDilithiumPubkey: b48,
+			FromDilithiumPubkey: b2592,
 			ToExecutionAddress:  b20,
 		},
 		Signature: sig[:],

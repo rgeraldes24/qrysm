@@ -17,6 +17,7 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // blockContainer represents an instance of
@@ -227,6 +228,16 @@ func (bs *Server) listBlocksForGenesis(ctx context.Context, _ *zondpb.ListBlocks
 		root:        root,
 		isCanonical: true,
 	}}, 1, strconv.Itoa(0), nil
+}
+
+// GetChainHead retrieves information about the head of the beacon chain from
+// the view of the beacon chain node.
+//
+// This includes the head block slot and root as well as information about
+// the most recent finalized and justified slots.
+// DEPRECATED: This endpoint is superseded by the /zond/v1/beacon API endpoint
+func (bs *Server) GetChainHead(ctx context.Context, _ *emptypb.Empty) (*zondpb.ChainHead, error) {
+	return bs.chainHeadRetrieval(ctx)
 }
 
 // Retrieve chain head information from the DB and the current beacon state.

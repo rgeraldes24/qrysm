@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	ethereum "github.com/theQRL/go-zond"
+	zond "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/accounts/abi/bind/backends"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
@@ -45,14 +45,14 @@ type goodLogger struct {
 
 func (_ *goodLogger) Close() {}
 
-func (g *goodLogger) SubscribeFilterLogs(ctx context.Context, q ethereum.FilterQuery, ch chan<- zondTypes.Log) (ethereum.Subscription, error) {
+func (g *goodLogger) SubscribeFilterLogs(ctx context.Context, q zond.FilterQuery, ch chan<- zondTypes.Log) (zond.Subscription, error) {
 	if g.backend == nil {
 		return new(event.Feed).Subscribe(ch), nil
 	}
 	return g.backend.SubscribeFilterLogs(ctx, q, ch)
 }
 
-func (g *goodLogger) FilterLogs(ctx context.Context, q ethereum.FilterQuery) ([]zondTypes.Log, error) {
+func (g *goodLogger) FilterLogs(ctx context.Context, q zond.FilterQuery) ([]zondTypes.Log, error) {
 	if g.backend == nil {
 		logs := make([]zondTypes.Log, 3)
 		for i := 0; i < len(logs); i++ {
@@ -280,7 +280,7 @@ func TestHandlePanic_OK(t *testing.T) {
 	// nil zond1DataFetcher would panic if cached value not used
 	web3Service.rpcClient = nil
 	web3Service.processBlockHeader(nil)
-	require.LogsContain(t, hook, "Panicked when handling data from ETH 1.0 Chain!")
+	require.LogsContain(t, hook, "Panicked when handling data from ZOND 1.0 Chain!")
 }
 
 func TestLogTillGenesis_OK(t *testing.T) {

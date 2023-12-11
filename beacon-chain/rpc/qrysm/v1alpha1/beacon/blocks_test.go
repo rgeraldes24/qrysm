@@ -1,6 +1,5 @@
 package beacon
 
-/*
 import (
 	"context"
 	"fmt"
@@ -933,4 +932,3 @@ func TestServer_ConvertToBlockContainer(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, container.GetBlindedCapellaBlock())
 }
-*/

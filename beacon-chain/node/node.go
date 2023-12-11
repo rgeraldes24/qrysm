@@ -899,8 +899,8 @@ func (b *BeaconNode) registerGRPCGateway(router *mux.Router) error {
 	if gatewayConfig.V1AlphaPbMux != nil {
 		muxs = append(muxs, gatewayConfig.V1AlphaPbMux)
 	}
-	if gatewayConfig.EthPbMux != nil {
-		muxs = append(muxs, gatewayConfig.EthPbMux)
+	if gatewayConfig.ZondPbMux != nil {
+		muxs = append(muxs, gatewayConfig.ZondPbMux)
 	}
 
 	opts := []apigateway.Option{
@@ -914,7 +914,7 @@ func (b *BeaconNode) registerGRPCGateway(router *mux.Router) error {
 		apigateway.WithAllowedOrigins(allowedOrigins),
 		apigateway.WithTimeout(uint64(timeout)),
 	}
-	if flags.EnableHTTPEthAPI(httpModules) {
+	if flags.EnableHTTPZondAPI(httpModules) {
 		opts = append(opts, apigateway.WithApiMiddleware(&apimiddleware.BeaconEndpointFactory{}))
 	}
 	g, err := apigateway.New(b.ctx, opts...)

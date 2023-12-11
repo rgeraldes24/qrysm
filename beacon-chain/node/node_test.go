@@ -22,6 +22,7 @@ import (
 	"github.com/theQRL/qrysm/v4/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/v4/config/features"
 	"github.com/theQRL/qrysm/v4/config/params"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime"
 	"github.com/theQRL/qrysm/v4/runtime/interop"
@@ -92,7 +93,7 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 	set.Uint64(flags.InteropNumValidatorsFlag.Name, numValidators, "")
 	set.String("suggested-fee-recipient", "0x6e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
 	require.NoError(t, set.Set("suggested-fee-recipient", "0x6e35733c5af9B61374A128e6F85f553aF09ff89A"))
-	genesisState, _, err := interop.GenerateGenesisState(context.Background(), 0, numValidators)
+	genesisState, _, err := interop.GenerateGenesisState(context.Background(), 0, numValidators, &enginev1.ExecutionPayload{}, &zondpb.Zond1Data{})
 	require.NoError(t, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < 2; i++ {
 		var someRoot [32]byte

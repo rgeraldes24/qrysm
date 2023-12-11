@@ -404,7 +404,8 @@ func (s *Service) Start() {
 	s.cfg.Router.HandleFunc("/zond/v1/beacon/blinded_blocks", beaconChainServerV1.PublishBlindedBlock).Methods(http.MethodPost)
 	zondpbv1alpha1.RegisterNodeServer(s.grpcServer, nodeServer)
 	zondpbservice.RegisterBeaconNodeServer(s.grpcServer, nodeServerV1)
-	zondpbv1alpha1.RegisterHealthServer(s.grpcServer, nodeServer)
+	// TODO(rgeraldes24) review
+	// zondpbv1alpha1.RegisterHealthServer(s.grpcServer, nodeServer)
 	zondpbv1alpha1.RegisterBeaconChainServer(s.grpcServer, beaconChainServer)
 	zondpbservice.RegisterBeaconChainServer(s.grpcServer, beaconChainServerV1)
 	zondpbservice.RegisterEventsServer(s.grpcServer, &events.Server{

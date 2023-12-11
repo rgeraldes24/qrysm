@@ -72,11 +72,18 @@ func (bs *Server) SubmitAttestations(ctx context.Context, req *zondpbv1.SubmitAt
 	var attFailures []*helpers.SingleIndexedVerificationFailure
 	for i, sourceAtt := range req.Data {
 		att := migration.V1ToV1Alpha1Attestation(sourceAtt)
-		if _, err := dilithium.SignatureFromBytes(att.Signature); err != nil {
-			attFailures = append(attFailures, &helpers.SingleIndexedVerificationFailure{
-				Index:   i,
-				Message: "Incorrect attestation signature: " + err.Error(),
-			})
+		sigErr := false
+		for _, sig := range att.Signatures {
+			if _, err := dilithium.SignatureFromBytes(sig); err != nil {
+				attFailures = append(attFailures, &helpers.SingleIndexedVerificationFailure{
+					Index:   i,
+					Message: "Incorrect attestation signature: " + err.Error(),
+				})
+				sigErr = true
+				break
+			}
+		}
+		if sigErr {
 			continue
 		}
 

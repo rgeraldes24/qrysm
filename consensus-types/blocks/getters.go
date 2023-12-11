@@ -468,6 +468,7 @@ func (b *BeaconBlock) Copy() (interfaces.ReadOnlyBeaconBlock, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {

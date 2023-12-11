@@ -6,6 +6,7 @@ go_library(
         "aggregator.go",
         "assignments.go",
         "attester.go",
+        "blocks.go",
         "exit.go",
         "log.go",
         "proposer.go",

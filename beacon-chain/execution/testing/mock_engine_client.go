@@ -93,8 +93,8 @@ func (e *EngineClient) ReconstructFullBlock(
 	return blocks.BuildSignedBeaconBlockFromExecutionPayload(blindedBlock, payload)
 }
 
-// ReconstructFullBellatrixBlockBatch --
-func (e *EngineClient) ReconstructFullBellatrixBlockBatch(
+// ReconstructFullBlockBatch --
+func (e *EngineClient) ReconstructFullBlockBatch(
 	ctx context.Context, blindedBlocks []interfaces.ReadOnlySignedBeaconBlock,
 ) ([]interfaces.SignedBeaconBlock, error) {
 	fullBlocks := make([]interfaces.SignedBeaconBlock, 0, len(blindedBlocks))
