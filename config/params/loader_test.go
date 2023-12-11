@@ -18,6 +18,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// TODO(rgeraldes24) - review
 // Variables defined in the placeholderFields will not be tested in `TestLoadConfigFile`.
 // These are variables that we don't use in Qrysm. (i.e. future hardfork, light client... etc)
 var placeholderFields = []string{"UPDATE_TIMEOUT", "DENEB_FORK_EPOCH", "DENEB_FORK_VERSION",
@@ -104,7 +105,6 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 	assert.Equal(t, expected.DomainVoluntaryExit, actual.DomainVoluntaryExit, "%s: DomainVoluntaryExit", name)
 	assert.Equal(t, expected.DomainSelectionProof, actual.DomainSelectionProof, "%s: DomainSelectionProof", name)
 	assert.Equal(t, expected.DomainAggregateAndProof, actual.DomainAggregateAndProof, "%s: DomainAggregateAndProof", name)
-	assert.Equal(t, expected.TerminalTotalDifficulty, actual.TerminalTotalDifficulty, "%s: TerminalTotalDifficulty", name)
 	assert.Equal(t, expected.SqrRootSlotsPerEpoch, actual.SqrRootSlotsPerEpoch, "%s: SqrRootSlotsPerEpoch", name)
 	assert.DeepEqual(t, expected.GenesisForkVersion, actual.GenesisForkVersion, "%s: GenesisForkVersion", name)
 
@@ -114,16 +114,15 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 func TestModifiedE2E(t *testing.T) {
 	c := params.E2ETestConfig().Copy()
 	c.DepositContractAddress = "0x4242424242424242424242424242424242424242"
-	c.TerminalTotalDifficulty = "0"
+	//c.TerminalTotalDifficulty = "0"
 	y := params.ConfigToYaml(c)
 	cfg, err := params.UnmarshalConfig(y, nil)
 	require.NoError(t, err)
 	assertEqualConfigs(t, "modified-e2e", []string{}, c, cfg)
 }
 
-// TODO(rgeraldes24)
-/*
 func TestLoadConfigFile(t *testing.T) {
+
 	t.Run("mainnet", func(t *testing.T) {
 		mn := params.MainnetConfig().Copy()
 		mainnetPresetsFiles := presetsFilePath(t, "mainnet")
@@ -170,7 +169,6 @@ func TestLoadConfigFile(t *testing.T) {
 		assertEqualConfigs(t, "e2e", fields, e2e, e2ef)
 	})
 }
-*/
 
 func TestLoadConfigFile_OverwriteCorrectly(t *testing.T) {
 	f, err := os.CreateTemp("", "")
@@ -300,16 +298,13 @@ func configFilePath(t *testing.T, config string) string {
 // presetsFilePath returns the relevant preset file paths from zond2-spec-tests
 // directory. This method returns a preset file path for each hard fork or
 // major network upgrade, in order.
-/*
 func presetsFilePath(t *testing.T, config string) []string {
 	fPath, err := bazel.Runfile("external/consensus_spec")
 	require.NoError(t, err)
 	return []string{
-		path.Join(fPath, "presets", config, "phase0.yaml"),
-		path.Join(fPath, "presets", config, "altair.yaml"),
+		path.Join(fPath, "presets", config, "capella.yaml"),
 	}
 }
-*/
 
 func fieldsFromYamls(t *testing.T, fps []string) []string {
 	var keys []string

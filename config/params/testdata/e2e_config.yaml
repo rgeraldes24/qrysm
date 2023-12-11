@@ -3,18 +3,6 @@
 # Extends the minimal preset
 PRESET_BASE: 'minimal'
 
-
-
-# Transition
-# ---------------------------------------------------------------
-# TBD, 2**256-2**10 is a placeholder, e2e is 480
-TERMINAL_TOTAL_DIFFICULTY: 480
-# By default, don't use these params
-#TERMINAL_BLOCK_HASH: 0x0000000000000000000000000000000000000000000000000000000000000000
-#TERMINAL_BLOCK_HASH_ACTIVATION_EPOCH: 18446744073709551615
-
-
-
 # Genesis
 # ---------------------------------------------------------------
 # [customized]
@@ -72,11 +60,11 @@ DEPOSIT_CONTRACT_ADDRESS: 0x4242424242424242424242424242424242424242
 # Updated penalty values
 # ---------------------------------------------------------------
 # 3 * 2**24 (= 50,331,648)
-INACTIVITY_PENALTY_QUOTIENT_ALTAIR: 50331648
+INACTIVITY_PENALTY_QUOTIENT: 33554432
 # 2**6 (= 64)
-MIN_SLASHING_PENALTY_QUOTIENT_ALTAIR: 64
+MIN_SLASHING_PENALTY_QUOTIENT: 64
 # 2
-PROPORTIONAL_SLASHING_MULTIPLIER_ALTAIR: 2
+PROPORTIONAL_SLASHING_MULTIPLIER: 2
 
 
 # Sync committee

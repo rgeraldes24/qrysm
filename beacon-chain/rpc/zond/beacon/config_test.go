@@ -86,14 +86,8 @@ func TestGetSpec(t *testing.T) {
 	config.SyncCommitteeSize = 63
 	config.InactivityScoreBias = 65
 	config.EpochsPerSyncCommitteePeriod = 66
-	config.InactivityPenaltyQuotientAltair = 67
-	config.MinSlashingPenaltyQuotientAltair = 68
-	config.ProportionalSlashingMultiplierAltair = 69
 	config.InactivityScoreRecoveryRate = 70
 	config.MinSyncCommitteeParticipants = 71
-	config.TerminalBlockHash = common.HexToHash("TerminalBlockHash")
-	config.TerminalBlockHashActivationEpoch = 72
-	config.TerminalTotalDifficulty = "73"
 	config.DefaultFeeRecipient = common.HexToAddress("DefaultFeeRecipient")
 	config.MaxWithdrawalsPerPayload = 74
 	config.MaxDilithiumToExecutionChanges = 75
@@ -319,20 +313,8 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "0x00000001", v)
 		case "TRANSITION_TOTAL_DIFFICULTY":
 			assert.Equal(t, "0", v)
-		case "TERMINAL_BLOCK_HASH_ACTIVATION_EPOCH":
-			assert.Equal(t, "72", v)
-		case "TERMINAL_BLOCK_HASH":
-			assert.Equal(t, common.HexToHash("TerminalBlockHash"), common.HexToHash(v))
-		case "TERMINAL_TOTAL_DIFFICULTY":
-			assert.Equal(t, "73", v)
 		case "DefaultFeeRecipient":
 			assert.Equal(t, common.HexToAddress("DefaultFeeRecipient"), v)
-		case "PROPORTIONAL_SLASHING_MULTIPLIER_BELLATRIX":
-			assert.Equal(t, "3", v)
-		case "MIN_SLASHING_PENALTY_QUOTIENT_BELLATRIX":
-			assert.Equal(t, "32", v)
-		case "INACTIVITY_PENALTY_QUOTIENT_BELLATRIX":
-			assert.Equal(t, "16777216", v)
 		case "PROPOSER_SCORE_BOOST":
 			assert.Equal(t, "40", v)
 		case "INTERVALS_PER_SLOT":

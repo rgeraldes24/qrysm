@@ -95,32 +95,35 @@ func GzondShanghaiTime(genesisTime uint64) *uint64 {
 // GzondTestnetGenesis creates a genesis.json for zond1 clients with a set of defaults suitable for ephemeral testnets,
 // like in an e2e test. The parameters are minimal but the full value is returned unmarshaled so that it can be
 // customized as desired.
+// TODO(rgeraldes24) - review
 func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *core.Genesis {
-	ttd, ok := big.NewInt(0).SetString(clparams.BeaconConfig().TerminalTotalDifficulty, 10)
-	if !ok {
-		panic(fmt.Sprintf("unable to parse TerminalTotalDifficulty as an integer = %s", clparams.BeaconConfig().TerminalTotalDifficulty))
-	}
+	// ttd, ok := big.NewInt(0).SetString(clparams.BeaconConfig().TerminalTotalDifficulty, 10)
+	// if !ok {
+	// 	panic(fmt.Sprintf("unable to parse TerminalTotalDifficulty as an integer = %s", clparams.BeaconConfig().TerminalTotalDifficulty))
+	// }
 
 	shanghaiTime := GzondShanghaiTime(genesisTime)
 	cc := &params.ChainConfig{
-		ChainID:                       big.NewInt(defaultTestChainId),
-		HomesteadBlock:                bigz,
-		DAOForkBlock:                  bigz,
-		EIP150Block:                   bigz,
-		EIP155Block:                   bigz,
-		EIP158Block:                   bigz,
-		ByzantiumBlock:                bigz,
-		ConstantinopleBlock:           bigz,
-		PetersburgBlock:               bigz,
-		IstanbulBlock:                 bigz,
-		MuirGlacierBlock:              bigz,
-		BerlinBlock:                   bigz,
-		LondonBlock:                   bigz,
-		ArrowGlacierBlock:             bigz,
-		GrayGlacierBlock:              bigz,
-		MergeNetsplitBlock:            bigz,
-		TerminalTotalDifficulty:       ttd,
-		TerminalTotalDifficultyPassed: false,
+		ChainID:             big.NewInt(defaultTestChainId),
+		HomesteadBlock:      bigz,
+		DAOForkBlock:        bigz,
+		EIP150Block:         bigz,
+		EIP155Block:         bigz,
+		EIP158Block:         bigz,
+		ByzantiumBlock:      bigz,
+		ConstantinopleBlock: bigz,
+		PetersburgBlock:     bigz,
+		IstanbulBlock:       bigz,
+		MuirGlacierBlock:    bigz,
+		BerlinBlock:         bigz,
+		LondonBlock:         bigz,
+		ArrowGlacierBlock:   bigz,
+		GrayGlacierBlock:    bigz,
+		MergeNetsplitBlock:  bigz,
+		//TerminalTotalDifficulty:       ttd,
+		TerminalTotalDifficulty: big.NewInt(0),
+		//TerminalTotalDifficultyPassed: false,
+		TerminalTotalDifficultyPassed: true,
 		Clique: &params.CliqueConfig{
 			Period: cfg.SecondsPerZOND1Block,
 			Epoch:  20000,

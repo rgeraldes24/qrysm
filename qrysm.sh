@@ -2,19 +2,20 @@
 
 set -eu
 
-# Use this script to download the latest Prysm release binary.
+# Use this script to download the latest Qrysm release binary.
 # Usage: ./qrysm.sh PROCESS [--download-only] FLAGS
 #   PROCESS can be one of beacon-chain or validator.
 #   FLAGS are the flags or arguments passed to the PROCESS.
 #   If --download-only flag is passed, binaries are checked for updates,
 #   downloaded if necessary, no process is started.
 # Downloaded binaries are saved to ./dist.
-# Use USE_PRYSM_VERSION to specify a specific release version.
-#   Example: USE_PRYSM_VERSION=v0.3.3 ./qrysm.sh beacon-chain
-# Use USE_PRYSM_MODERN to specify a non-portable version of BLST
-#   Example: USE_PRYSM_MODERN=true ./qrysm.sh beacon-chain
+# Use USE_QRYSM_VERSION to specify a specific release version.
+#   Example: USE_QRYSM_VERSION=v0.3.3 ./qrysm.sh beacon-chain
+# Use USE_QRYSM_MODERN to specify a non-portable version of BLST
+#   Example: USE_QRYSM_MODERN=true ./qrysm.sh beacon-chain
 
-readonly PRYLABS_SIGNING_KEY=0AE0051D647BA3C1A917AF4072E33E4DF1A5036E
+# TODO(rgeraldes24) new key
+readonly THEQRL_SIGNING_KEY=0AE0051D647BA3C1A917AF4072E33E4DF1A5036E
 
 function color() {
     # Usage: color "31;5" "string"
@@ -67,8 +68,8 @@ function get_realpath() {
 
 # Complain if no arguments were provided.
 if [ "$#" -lt 1 ]; then
-    color "31" "Usage: ./prysm.sh PROCESS FLAGS."
-    color "31" "       ./prysm.sh PROCESS --download-only."
+    color "31" "Usage: ./qrysm.sh PROCESS FLAGS."
+    color "31" "       ./qrysm.sh PROCESS --download-only."
     color "31" "PROCESS can be beacon-chain, validator, or client-stats."
     exit 1
 fi
@@ -105,22 +106,23 @@ fi
 
 mkdir -p "$wrapper_dir"
 
-function get_prysm_version() {
-    if [[ -n ${USE_PRYSM_VERSION:-} ]]; then
-        readonly reason="specified in \$USE_PRYSM_VERSION"
-        readonly prysm_version="${USE_PRYSM_VERSION}"
+function get_qrysm_version() {
+    if [[ -n ${USE_QRYSM_VERSION:-} ]]; then
+        readonly reason="specified in \$USE_QRYSM_VERSION"
+        readonly qrysm_version="${USE_QRYSM_VERSION}"
     else
-        # Find the latest Prysm version available for download.
+        # Find the latest Qrysm version available for download.
         readonly reason="automatically selected latest available version"
-        prysm_version=$(curl -f -s https://prysmaticlabs.com/releases/latest) || (color "31" "Starting prysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/theQRL/qrysm/releases/" && exit 1)
-        readonly prysm_version
+        # TODO(rgeraldes24) links
+        qrysm_version=$(curl -f -s https://prysmaticlabs.com/releases/latest) || (color "31" "Starting qrysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/theQRL/qrysm/releases/" && exit 1)
+        readonly qrysm_version
     fi
 }
 
 function verify() {
     file=$1
 
-    skip=${PRYSM_ALLOW_UNVERIFIED_BINARIES-0}
+    skip=${QRYSM_ALLOW_UNVERIFIED_BINARIES-0}
     if [[ $skip == 1 ]]; then
         return 0
     fi
@@ -128,70 +130,73 @@ function verify() {
     hash shasum 2>/dev/null || {
         checkSum="sha256sum"
         hash sha256sum 2>/dev/null || {
-            echo >&2 "SHA checksum utility not available. Either install one (shasum or sha256sum) or run with PRYSM_ALLOW_UNVERIFIED_BINARIES=1."
+            echo >&2 "SHA checksum utility not available. Either install one (shasum or sha256sum) or run with QRYSM_ALLOW_UNVERIFIED_BINARIES=1."
             exit 1
         }
     }
     hash gpg 2>/dev/null || {
-        echo >&2 "gpg is not available. Either install it or run with PRYSM_ALLOW_UNVERIFIED_BINARIES=1."
+        echo >&2 "gpg is not available. Either install it or run with QRYSM_ALLOW_UNVERIFIED_BINARIES=1."
         exit 1
     }
 
     color "37" "Verifying binary integrity."
 
-    gpg --list-keys "$PRYLABS_SIGNING_KEY" >/dev/null 2>&1 || curl --silent https://prysmaticlabs.com/releases/pgp_keys.asc | gpg --import
+    # TODO(rgeraldes24) links
+    gpg --list-keys "$THEQRL_SIGNING_KEY" >/dev/null 2>&1 || curl --silent https://prysmaticlabs.com/releases/pgp_keys.asc | gpg --import
     (
         cd "$wrapper_dir"
         $checkSum -c "${file}.sha256" || failed_verification
     )
     (
         cd "$wrapper_dir"
-        gpg -u "$PRYLABS_SIGNING_KEY" --verify "${file}.sig" "$file" || failed_verification
+        gpg -u "$THEQRL_SIGNING_KEY" --verify "${file}.sig" "$file" || failed_verification
     )
 
-    color "32;1" "Verified ${file} has been signed by Prysmatic Labs."
+    color "32;1" "Verified ${file} has been signed by QRL."
 }
 
 function failed_verification() {
     MSG=$(
         cat <<-END
-Failed to verify Prysm binary. Please erase downloads in the
+Failed to verify Qrysm binary. Please erase downloads in the
 dist directory and run this script again. Alternatively, you can use a
-A prior version by specifying environment variable USE_PRYSM_VERSION
-with the specific version, as desired. Example: USE_PRYSM_VERSION=v1.0.0-alpha.5
+A prior version by specifying environment variable USE_QRYSM_VERSION
+with the specific version, as desired. Example: USE_QRYSM_VERSION=v1.0.0-alpha.5
 If you must wish to continue running an unverified binary, specific the
-environment variable PRYSM_ALLOW_UNVERIFIED_BINARIES=1
+environment variable QRYSM_ALLOW_UNVERIFIED_BINARIES=1
 END
     )
     color "31" "$MSG"
     exit 1
 }
 
-get_prysm_version
+get_qrysm_version
 
-color "37" "Latest Prysm version is $prysm_version."
+color "37" "Latest Qrysm version is $qrysm_version."
 
-if [ "${USE_PRYSM_MODERN:=false}" = "true" ]; then
-    BEACON_CHAIN_REAL="${wrapper_dir}/beacon-chain-${prysm_version}-modern-${system}-${arch}"
+if [ "${USE_QRYSM_MODERN:=false}" = "true" ]; then
+    BEACON_CHAIN_REAL="${wrapper_dir}/beacon-chain-${qrysm_version}-modern-${system}-${arch}"
 else
-    BEACON_CHAIN_REAL="${wrapper_dir}/beacon-chain-${prysm_version}-${system}-${arch}"
+    BEACON_CHAIN_REAL="${wrapper_dir}/beacon-chain-${qrysm_version}-${system}-${arch}"
 fi
-VALIDATOR_REAL="${wrapper_dir}/validator-${prysm_version}-${system}-${arch}"
-CLIENT_STATS_REAL="${wrapper_dir}/client-stats-${prysm_version}-${system}-${arch}"
+VALIDATOR_REAL="${wrapper_dir}/validator-${qrysm_version}-${system}-${arch}"
+CLIENT_STATS_REAL="${wrapper_dir}/client-stats-${qrysm_version}-${system}-${arch}"
 
 if [[ $1 == beacon-chain ]]; then
     if [[ ! -x $BEACON_CHAIN_REAL ]]; then
-        color "34" "Downloading beacon chain@${prysm_version} to ${BEACON_CHAIN_REAL} (${reason})"
-        if [ "${USE_PRYSM_MODERN}" = "true" ]; then
-            file=beacon-chain-${prysm_version}-modern-${system}-${arch}
+        color "34" "Downloading beacon chain@${qrysm_version} to ${BEACON_CHAIN_REAL} (${reason})"
+        if [ "${USE_QRYSM_MODERN}" = "true" ]; then
+            file=beacon-chain-${qrysm_version}-modern-${system}-${arch}
         else
-            file=beacon-chain-${prysm_version}-${system}-${arch}
+            file=beacon-chain-${qrysm_version}-${system}-${arch}
         fi
+        # TODO(rgeraldes24) links
         res=$(curl -w '%{http_code}\n' -f -L "https://prysmaticlabs.com/releases/${file}"  -o "$BEACON_CHAIN_REAL" | ( grep 404 || true ) )
         if [[ $res == 404 ]];then
-            echo "No prysm beacon chain found for ${prysm_version},(${file}) exit"
+            echo "No qrysm beacon chain found for ${qrysm_version},(${file}) exit"
             exit 1
         fi
+        # TODO(rgeraldes24) links
         curl --silent -L "https://prysmaticlabs.com/releases/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
         curl --silent -L "https://prysmaticlabs.com/releases/${file}.sig" -o "${wrapper_dir}/${file}.sig"
         chmod +x "$BEACON_CHAIN_REAL"
@@ -202,14 +207,16 @@ fi
 
 if [[ $1 == validator ]]; then
     if [[ ! -x $VALIDATOR_REAL ]]; then
-        color "34" "Downloading validator@${prysm_version} to ${VALIDATOR_REAL} (${reason})"
+        color "34" "Downloading validator@${qrysm_version} to ${VALIDATOR_REAL} (${reason})"
 
-        file=validator-${prysm_version}-${system}-${arch}
+        file=validator-${qrysm_version}-${system}-${arch}
+        # TODO(rgeraldes24) links
         res=$(curl -w '%{http_code}\n' -f -L "https://prysmaticlabs.com/releases/${file}" -o "$VALIDATOR_REAL" | ( grep 404 || true ) )
         if [[ $res == 404 ]];then
-            echo "No prysm validator found for ${prysm_version}, (${file}) exit"
+            echo "No qrysm validator found for ${qrysm_version}, (${file}) exit"
             exit 1
         fi
+        # TODO(rgeraldes24) links
         curl --silent -L "https://prysmaticlabs.com/releases/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
         curl --silent -L "https://prysmaticlabs.com/releases/${file}.sig" -o "${wrapper_dir}/${file}.sig"
         chmod +x "$VALIDATOR_REAL"
@@ -220,14 +227,16 @@ fi
 
 if [[ $1 == client-stats ]]; then
     if [[ ! -x $CLIENT_STATS_REAL ]]; then
-        color "34" "Downloading client-stats@${prysm_version} to ${CLIENT_STATS_REAL} (${reason})"
+        color "34" "Downloading client-stats@${qrysm_version} to ${CLIENT_STATS_REAL} (${reason})"
 
-        file=client-stats-${prysm_version}-${system}-${arch}
+        file=client-stats-${qrysm_version}-${system}-${arch}
+        # TODO(rgeraldes24) links
         res=$(curl -w '%{http_code}\n' -f -L "https://prysmaticlabs.com/releases/${file}" -o "$CLIENT_STATS_REAL" | ( grep 404 || true ) )
         if [[ $res == 404 ]];then
-            echo "No prysm client stats found for ${prysm_version},(${file}) exit"
+            echo "No qrysm client stats found for ${qrysm_version},(${file}) exit"
             exit 1
         fi
+        # TODO(rgeraldes24) links
         curl --silent -L "https://prysmaticlabs.com/releases/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
         curl --silent -L "https://prysmaticlabs.com/releases/${file}.sig" -o "${wrapper_dir}/${file}.sig"
         chmod +x "$CLIENT_STATS_REAL"
@@ -256,8 +265,8 @@ client-stats)
 
 *)
     color "31" "Process '$1' is not found!"
-    color "31" "Usage: ./prysm.sh PROCESS FLAGS."
-    color "31" "       ./prysm.sh PROCESS --download-only."
+    color "31" "Usage: ./qrysm.sh PROCESS FLAGS."
+    color "31" "       ./qrysm.sh PROCESS --download-only."
     color "31" "PROCESS can be beacon-chain, validator, or client-stats."
     exit 1
     ;;
@@ -270,5 +279,5 @@ if [[ "$#" -gt 1 ]] && [[ $2 == --download-only ]]; then
     exit 0
 fi
 
-color "36" "Starting Prysm $1 ${*:2}"
+color "36" "Starting Qrysm $1 ${*:2}"
 exec -a "$0" "${process}" "${@:2}"

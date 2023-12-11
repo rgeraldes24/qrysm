@@ -182,8 +182,5 @@ func compareConfigs(t *testing.T, expected, actual *BeaconChainConfig) {
 	require.DeepEqual(t, expected.MinSlashingPenaltyQuotient, actual.MinSlashingPenaltyQuotient)
 	require.DeepEqual(t, expected.ProportionalSlashingMultiplier, actual.ProportionalSlashingMultiplier)
 	require.DeepEqual(t, expected.MinSyncCommitteeParticipants, actual.MinSyncCommitteeParticipants)
-	require.DeepEqual(t, expected.TerminalBlockHash, actual.TerminalBlockHash)
-	require.DeepEqual(t, expected.TerminalBlockHashActivationEpoch, actual.TerminalBlockHashActivationEpoch)
-	require.DeepEqual(t, expected.TerminalTotalDifficulty, actual.TerminalTotalDifficulty)
 	require.DeepEqual(t, expected.DefaultFeeRecipient, actual.DefaultFeeRecipient)
 }

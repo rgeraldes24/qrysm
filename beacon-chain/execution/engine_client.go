@@ -94,7 +94,7 @@ type EngineCaller interface {
 		ctx context.Context, cfg *pb.TransitionConfiguration,
 	) error
 	ExecutionBlockByHash(ctx context.Context, hash common.Hash, withTxs bool) (*pb.ExecutionBlock, error)
-	//GetTerminalBlockHash(ctx context.Context, transitionTime uint64) ([]byte, bool, error)
+	//(ctx context.Context, transitionTime uint64) ([]byte, bool, error)
 }
 
 var EmptyBlockHash = errors.New("Block hash is empty 0x0000...")
@@ -233,26 +233,28 @@ func (s *Service) ExchangeTransitionConfiguration(
 
 	// We surface an error to the user if local configuration settings mismatch
 	// according to the response from the execution node.
-	cfgTerminalHash := params.BeaconConfig().TerminalBlockHash[:]
-	if !bytes.Equal(cfgTerminalHash, result.TerminalBlockHash) {
+	// TODO(rgeraldes24) - remove
+	// cfgTerminalHash := params.BeaconConfig().TerminalBlockHash[:]
+	if !bytes.Equal(cfg.TerminalBlockHash, result.TerminalBlockHash) {
 		return errors.Wrapf(
 			ErrConfigMismatch,
 			"got %#x from execution node, wanted %#x",
 			result.TerminalBlockHash,
-			cfgTerminalHash,
+			cfg.TerminalBlockHash,
 		)
 	}
-	ttdCfg := params.BeaconConfig().TerminalTotalDifficulty
+	// TODO(rgeraldes24) - remove
+	// ttdCfg := params.BeaconConfig().TerminalTotalDifficulty
 	ttdResult, err := hexutil.DecodeBig(result.TerminalTotalDifficulty)
 	if err != nil {
 		return errors.Wrap(err, "could not decode received terminal total difficulty")
 	}
-	if ttdResult.String() != ttdCfg {
+	if ttdResult.String() != cfg.TerminalTotalDifficulty {
 		return errors.Wrapf(
 			ErrConfigMismatch,
 			"got %s from execution node, wanted %s",
 			ttdResult.String(),
-			ttdCfg,
+			cfg.TerminalTotalDifficulty,
 		)
 	}
 	return nil
@@ -283,91 +285,6 @@ func (s *Service) ExchangeCapabilities(ctx context.Context) ([]string, error) {
 	}
 	return result.SupportedMethods, handleRPCError(err)
 }
-
-// GetTerminalBlockHash returns the valid terminal block hash based on total difficulty.
-//
-// Spec code:
-// def get_pow_block_at_terminal_total_difficulty(pow_chain: Dict[Hash32, PowBlock]) -> Optional[PowBlock]:
-//
-//	# `pow_chain` abstractly represents all blocks in the PoW chain
-//	for block in pow_chain:
-//	    parent = pow_chain[block.parent_hash]
-//	    block_reached_ttd = block.total_difficulty >= TERMINAL_TOTAL_DIFFICULTY
-//	    parent_reached_ttd = parent.total_difficulty >= TERMINAL_TOTAL_DIFFICULTY
-//	    if block_reached_ttd and not parent_reached_ttd:
-//	        return block
-//
-//	return None
-/*
-func (s *Service) GetTerminalBlockHash(ctx context.Context, transitionTime uint64) ([]byte, bool, error) {
-	ttd := new(big.Int)
-	ttd.SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
-	terminalTotalDifficulty, overflows := uint256.FromBig(ttd)
-	if overflows {
-		return nil, false, errors.New("could not convert terminal total difficulty to uint256")
-	}
-	blk, err := s.LatestExecutionBlock(ctx)
-	if err != nil {
-		return nil, false, errors.Wrap(err, "could not get latest execution block")
-	}
-	if blk == nil {
-		return nil, false, errors.New("latest execution block is nil")
-	}
-
-	for {
-		if ctx.Err() != nil {
-			return nil, false, ctx.Err()
-		}
-		currentTotalDifficulty, err := tDStringToUint256(blk.TotalDifficulty)
-		if err != nil {
-			return nil, false, errors.Wrap(err, "could not convert total difficulty to uint256")
-		}
-		blockReachedTTD := currentTotalDifficulty.Cmp(terminalTotalDifficulty) >= 0
-
-		parentHash := blk.ParentHash
-		if parentHash == params.BeaconConfig().ZeroHash {
-			return nil, false, nil
-		}
-		parentBlk, err := s.ExecutionBlockByHash(ctx, parentHash, false)
-		if err != nil {
-			return nil, false, errors.Wrap(err, "could not get parent execution block")
-		}
-		if parentBlk == nil {
-			return nil, false, errors.New("parent execution block is nil")
-		}
-
-		if blockReachedTTD {
-			parentTotalDifficulty, err := tDStringToUint256(parentBlk.TotalDifficulty)
-			if err != nil {
-				return nil, false, errors.Wrap(err, "could not convert total difficulty to uint256")
-			}
-
-			// If terminal block has time same timestamp or greater than transition time,
-			// then the node violates the invariant that a block's timestamp must be
-			// greater than its parent's timestamp. Execution layer will reject
-			// a fcu call with such payload attributes. It's best that we return `None` in this a case.
-			parentReachedTTD := parentTotalDifficulty.Cmp(terminalTotalDifficulty) >= 0
-			if !parentReachedTTD {
-				if blk.Time >= transitionTime {
-					return nil, false, nil
-				}
-
-				log.WithFields(logrus.Fields{
-					"number":   blk.Number,
-					"hash":     fmt.Sprintf("%#x", bytesutil.Trunc(blk.Hash[:])),
-					"td":       blk.TotalDifficulty,
-					"parentTd": parentBlk.TotalDifficulty,
-					"ttd":      terminalTotalDifficulty,
-				}).Info("Retrieved terminal block hash")
-				return blk.Hash[:], true, nil
-			}
-		} else {
-			return nil, false, nil
-		}
-		blk = parentBlk
-	}
-}
-*/
 
 // LatestExecutionBlock fetches the latest execution engine block by calling
 // zond_blockByNumber via JSON-RPC.

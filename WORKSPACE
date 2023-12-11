@@ -213,55 +213,39 @@ filegroup(
     url = "https://github.com/rgeraldes24/EIPs/archive/902ac24c60dfa171c4d60e7d027c7cf95eae1c98.tar.gz",
 )
 
-consensus_spec_version = "v1.4.0-alpha.1"
+consensus_spec_version = "v0.1.0"
 
-http_archive(
-    name = "consensus_spec_tests_general",
-    build_file_content = """
-filegroup(
-    name = "test_data",
-    srcs = glob([
-        "**/*.ssz_snappy",
-        "**/*.yaml",
-    ]),
-    visibility = ["//visibility:public"],
-)
-    """,
-    sha256 = "1118a663be4a00ba00f0635eb20287157f2b2f993aed64335bfbcd04af424c2b",
-    url = "https://github.com/ethereum/consensus-spec-tests/releases/download/%s/general.tar.gz" % consensus_spec_version,
-)
+#http_archive(
+#    name = "consensus_spec_tests_minimal",
+#    build_file_content = """
+#filegroup(
+#    name = "test_data",
+#    srcs = glob([
+#        "**/*.ssz_snappy",
+#        "**/*.yaml",
+#    ]),
+#    visibility = ["//visibility:public"],
+#)
+#    """,
+#    #sha256 = "acde6e10940d14f22277eda5b55b65a24623ac88e4c7a2e34134a6069f5eea82",
+#    url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/minimal.tar.gz" % consensus_spec_version,
+#)
 
-http_archive(
-    name = "consensus_spec_tests_minimal",
-    build_file_content = """
-filegroup(
-    name = "test_data",
-    srcs = glob([
-        "**/*.ssz_snappy",
-        "**/*.yaml",
-    ]),
-    visibility = ["//visibility:public"],
-)
-    """,
-    sha256 = "acde6e10940d14f22277eda5b55b65a24623ac88e4c7a2e34134a6069f5eea82",
-    url = "https://github.com/ethereum/consensus-spec-tests/releases/download/%s/minimal.tar.gz" % consensus_spec_version,
-)
-
-http_archive(
-    name = "consensus_spec_tests_mainnet",
-    build_file_content = """
-filegroup(
-    name = "test_data",
-    srcs = glob([
-        "**/*.ssz_snappy",
-        "**/*.yaml",
-    ]),
-    visibility = ["//visibility:public"],
-)
-    """,
-    sha256 = "49c022f3a3478cea849ba8f877a9f7e4c1ded549edddc09993550bbc5bb192e1",
-    url = "https://github.com/ethereum/consensus-spec-tests/releases/download/%s/mainnet.tar.gz" % consensus_spec_version,
-)
+#http_archive(
+#    name = "consensus_spec_tests_mainnet",
+#    build_file_content = """
+#filegroup(
+#    name = "test_data",
+#    srcs = glob([
+#        "**/*.ssz_snappy",
+#        "**/*.yaml",
+#    ]),
+#    visibility = ["//visibility:public"],
+#)
+#    """,
+#    #sha256 = "49c022f3a3478cea849ba8f877a9f7e4c1ded549edddc09993550bbc5bb192e1",
+#    url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/mainnet.tar.gz" % consensus_spec_version,
+#)
 
 http_archive(
     name = "consensus_spec",
@@ -274,26 +258,26 @@ filegroup(
     visibility = ["//visibility:public"],
 )
     """,
-    sha256 = "c3e246ff01f6b7b9e9e41939954a6ff89dfca7297415f88781809165fa83267c",
-    strip_prefix = "consensus-specs-" + consensus_spec_version[1:],
-    url = "https://github.com/ethereum/consensus-specs/archive/refs/tags/%s.tar.gz" % consensus_spec_version,
+    sha256 = "a7dbcbac3fcdf7e3e8b73775a65c5b88fafed44b62789521664ec2de3f21ccde",
+    strip_prefix = "consensus-specs-786885a593d4fcb23cbf3e179bfa10a61cd7ac68",
+    url = "https://github.com/rgeraldes24/consensus-specs/archive/786885a593d4fcb23cbf3e179bfa10a61cd7ac68.tar.gz",
 )
 
-http_archive(
-    name = "eth2_networks",
-    build_file_content = """
-filegroup(
-    name = "configs",
-    srcs = glob([
-        "shared/**/config.yaml",
-    ]),
-    visibility = ["//visibility:public"],
-)
-    """,
-    sha256 = "2701e1e1a3ec10c673fe7dbdbbe6f02c8ae8c922aebbf6e720d8c72d5458aafe",
-    strip_prefix = "eth2-networks-7b4897888cebef23801540236f73123e21774954",
-    url = "https://github.com/eth-clients/eth2-networks/archive/7b4897888cebef23801540236f73123e21774954.tar.gz",
-)
+# http_archive(
+#     name = "eth2_networks",
+#     build_file_content = """
+# filegroup(
+#     name = "configs",
+#     srcs = glob([
+#         "shared/**/config.yaml",
+#     ]),
+#     visibility = ["//visibility:public"],
+# )
+#     """,
+#     sha256 = "2701e1e1a3ec10c673fe7dbdbbe6f02c8ae8c922aebbf6e720d8c72d5458aafe",
+#     strip_prefix = "eth2-networks-7b4897888cebef23801540236f73123e21774954",
+#     url = "https://github.com/eth-clients/eth2-networks/archive/7b4897888cebef23801540236f73123e21774954.tar.gz",
+# )
 
 http_archive(
     name = "com_github_bazelbuild_buildtools",

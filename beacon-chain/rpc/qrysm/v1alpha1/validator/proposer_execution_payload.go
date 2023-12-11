@@ -19,7 +19,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	payloadattribute "github.com/theQRL/qrysm/v4/consensus-types/payload-attribute"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -57,10 +56,10 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 	case errors.As(err, kv.ErrNotFoundFeeRecipient):
 		// If fee recipient is not found in DB and not set from beacon node CLI,
 		// use the burn address.
-		if feeRecipient.String() == params.BeaconConfig().EthBurnAddressHex {
+		if feeRecipient.String() == params.BeaconConfig().ZondBurnAddressHex {
 			logrus.WithFields(logrus.Fields{
 				"validatorIndex": vIdx,
-				"burnAddress":    params.BeaconConfig().EthBurnAddressHex,
+				"burnAddress":    params.BeaconConfig().ZondBurnAddressHex,
 			}).Warn("Fee recipient is currently using the burn address, " +
 				"you will not be rewarded transaction fees on this setting. " +
 				"Please set a different zond address as the fee recipient. " +
@@ -164,39 +163,6 @@ func warnIfFeeRecipientDiffers(payload interfaces.ExecutionData, feeRecipient co
 	}
 }
 
-// This returns the valid terminal block hash with an existence bool value.
-//
-// Spec code:
-// def get_terminal_pow_block(pow_chain: Dict[Hash32, PowBlock]) -> Optional[PowBlock]:
-//
-//	if TERMINAL_BLOCK_HASH != Hash32():
-//	    # Terminal block hash override takes precedence over terminal total difficulty
-//	    if TERMINAL_BLOCK_HASH in pow_chain:
-//	        return pow_chain[TERMINAL_BLOCK_HASH]
-//	    else:
-//	        return None
-//
-//	return get_pow_block_at_terminal_total_difficulty(pow_chain)
-/*
-func (vs *Server) getTerminalBlockHashIfExists(ctx context.Context, transitionTime uint64) ([]byte, bool, error) {
-	terminalBlockHash := params.BeaconConfig().TerminalBlockHash
-	// Terminal block hash override takes precedence over terminal total difficulty.
-	if params.BeaconConfig().TerminalBlockHash != params.BeaconConfig().ZeroHash {
-		exists, _, err := vs.Zond1BlockFetcher.BlockExists(ctx, terminalBlockHash)
-		if err != nil {
-			return nil, false, err
-		}
-		if !exists {
-			return nil, false, nil
-		}
-
-		return terminalBlockHash.Bytes(), true, nil
-	}
-
-	return vs.ExecutionEngineCaller.GetTerminalBlockHash(ctx, transitionTime)
-}
-*/
-
 func (vs *Server) getBuilderPayload(ctx context.Context,
 	slot primitives.Slot,
 	vIdx primitives.ValidatorIndex) (interfaces.ExecutionData, error) {
@@ -213,21 +179,6 @@ func (vs *Server) getBuilderPayload(ctx context.Context,
 	}
 
 	return vs.getPayloadHeaderFromBuilder(ctx, slot, vIdx)
-}
-
-// activationEpochNotReached returns true if activation epoch has not been reach.
-// Which satisfy the following conditions in spec:
-//
-//	  is_terminal_block_hash_set = TERMINAL_BLOCK_HASH != Hash32()
-//	  is_activation_epoch_reached = get_current_epoch(state) >= TERMINAL_BLOCK_HASH_ACTIVATION_EPOCH
-//	  if is_terminal_block_hash_set and not is_activation_epoch_reached:
-//		return True
-func activationEpochNotReached(slot primitives.Slot) bool {
-	terminalBlockHashSet := bytesutil.ToBytes32(params.BeaconConfig().TerminalBlockHash.Bytes()) != [32]byte{}
-	if terminalBlockHashSet {
-		return params.BeaconConfig().TerminalBlockHashActivationEpoch > slots.ToEpoch(slot)
-	}
-	return false
 }
 
 func emptyPayloadCapella() *enginev1.ExecutionPayload {

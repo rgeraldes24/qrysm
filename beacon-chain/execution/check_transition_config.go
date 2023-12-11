@@ -38,19 +38,14 @@ var (
 func (s *Service) checkTransitionConfiguration(
 	ctx context.Context, blockNotifications chan *feed.Event,
 ) {
-	// If Bellatrix fork epoch is not set, we do not run this check.
-	// if params.BeaconConfig().BellatrixForkEpoch == math.MaxUint64 {
-	// 	return
-	// }
-
-	i := new(big.Int)
-	i.SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
+	zeroBig := big.NewInt(0)
 	ttd := new(uint256.Int)
-	ttd.SetFromBig(i)
+	ttd.SetFromBig(zeroBig)
+	blockHash := [32]byte{}
 	cfg := &pb.TransitionConfiguration{
 		TerminalTotalDifficulty: ttd.Hex(),
-		TerminalBlockHash:       params.BeaconConfig().TerminalBlockHash[:],
-		TerminalBlockNumber:     big.NewInt(0).Bytes(), // A value of 0 is recommended in the request.
+		TerminalBlockHash:       blockHash[:],
+		TerminalBlockNumber:     zeroBig.Bytes(), // A value of 0 is recommended in the request.
 	}
 	err := s.ExchangeTransitionConfiguration(ctx, cfg)
 	if err != nil {

@@ -28,9 +28,6 @@ func E2ETestConfig() *BeaconChainConfig {
 	e2eConfig.DepositChainID = 1337   // Chain ID of zond1 dev net.
 	e2eConfig.DepositNetworkID = 1337 // Network ID of zond1 dev net.
 
-	// Terminal Total Difficulty.
-	e2eConfig.TerminalTotalDifficulty = "480"
-
 	// Qrysm constants.
 	e2eConfig.ConfigName = EndToEndName
 	e2eConfig.GenesisForkVersion = []byte{0, 0, 0, 253}
@@ -59,9 +56,6 @@ func E2EMainnetTestConfig() *BeaconChainConfig {
 	// PoW parameters.
 	e2eConfig.DepositChainID = 1337   // Chain ID of zond1 dev net.
 	e2eConfig.DepositNetworkID = 1337 // Network ID of zond1 dev net.
-
-	// Terminal Total Difficulty.
-	e2eConfig.TerminalTotalDifficulty = "480"
 
 	// Qrysm constants.
 	e2eConfig.ConfigName = EndToEndMainnetName
