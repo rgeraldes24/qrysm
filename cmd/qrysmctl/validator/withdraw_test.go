@@ -276,6 +276,8 @@ func TestCallWithdrawalEndpoint_Errors(t *testing.T) {
 	assert.LogsContain(t, hook, "Could not validate SignedDilithiumToExecutionChange")
 }
 
+// TODO (rgeraldes24) - remove
+/*
 func TestCallWithdrawalEndpoint_ForkBeforeCapella(t *testing.T) {
 	file := "./testdata/change-operations.json"
 	baseurl := "127.0.0.1:3500"
@@ -324,6 +326,7 @@ func TestCallWithdrawalEndpoint_ForkBeforeCapella(t *testing.T) {
 	err = setWithdrawalAddresses(cliCtx)
 	require.ErrorContains(t, "setting withdrawals using the DilithiumtoExecutionChange endpoint is only available after the Capella/Shanghai hard fork.", err)
 }
+*/
 
 func TestVerifyWithdrawal_Mutiple(t *testing.T) {
 	file := "./testdata/change-operations-multiple.json"

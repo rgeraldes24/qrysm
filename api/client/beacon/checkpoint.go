@@ -162,8 +162,8 @@ const (
 	qrysmImplementationName = "Qrysm"
 )
 
-// errUnsupportedPrysmCheckpointVersion indicates remote beacon node can't be used for checkpoint retrieval.
-var errUnsupportedPrysmCheckpointVersion = errors.New("node does not meet minimum version requirements for checkpoint retrieval")
+// errUnsupportedQrysmCheckpointVersion indicates remote beacon node can't be used for checkpoint retrieval.
+var errUnsupportedQrysmCheckpointVersion = errors.New("node does not meet minimum version requirements for checkpoint retrieval")
 
 // for older endpoints or clients that do not support the weak_subjectivity api method
 // we gather the necessary data for a checkpoint sync by:
@@ -178,7 +178,7 @@ func computeBackwardsCompatible(ctx context.Context, client *Client) (*WeakSubje
 		return nil, errors.Wrap(err, "unable to proceed with fallback method without confirming node version")
 	}
 	if nv.implementation == qrysmImplementationName && semver.Compare(nv.semver, qrysmMinimumVersion) < 0 {
-		return nil, errors.Wrapf(errUnsupportedPrysmCheckpointVersion, "%s < minimum (%s)", nv.semver, qrysmMinimumVersion)
+		return nil, errors.Wrapf(errUnsupportedQrysmCheckpointVersion, "%s < minimum (%s)", nv.semver, qrysmMinimumVersion)
 	}
 	epoch, err := getWeakSubjectivityEpochFromHead(ctx, client)
 	if err != nil {

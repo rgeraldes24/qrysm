@@ -11,7 +11,6 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	zondtypes "github.com/theQRL/go-zond/core/types"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -76,11 +75,11 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 	})
 	t.Run("transition configuration", func(t *testing.T) {
 		blockHash := [32]byte{'h', 'e', 'a', 'd'}
-		bInt := new(big.Int)
-		_, ok := bInt.SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
-		require.Equal(t, true, ok)
+		//bInt := new(big.Int)
+		//_, ok := bInt.SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
+		//require.Equal(t, true, ok)
 		ttdNum := new(uint256.Int)
-		ttdNum.SetFromBig(bInt)
+		ttdNum.SetFromBig(big.NewInt(0))
 		jsonPayload := &enginev1.TransitionConfiguration{
 			TerminalBlockHash:       blockHash[:],
 			TerminalTotalDifficulty: ttdNum.Hex(),

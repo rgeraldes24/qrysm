@@ -215,37 +215,37 @@ filegroup(
 
 consensus_spec_version = "v0.1.0"
 
-#http_archive(
-#    name = "consensus_spec_tests_minimal",
-#    build_file_content = """
-#filegroup(
-#    name = "test_data",
-#    srcs = glob([
-#        "**/*.ssz_snappy",
-#        "**/*.yaml",
-#    ]),
-#    visibility = ["//visibility:public"],
-#)
-#    """,
-#    #sha256 = "acde6e10940d14f22277eda5b55b65a24623ac88e4c7a2e34134a6069f5eea82",
-#    url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/minimal.tar.gz" % consensus_spec_version,
-#)
+http_archive(
+   name = "consensus_spec_tests_minimal",
+   build_file_content = """
+filegroup(
+   name = "test_data",
+   srcs = glob([
+       "**/*.ssz_snappy",
+       "**/*.yaml",
+   ]),
+   visibility = ["//visibility:public"],
+)
+   """,
+   sha256 = "7e980bf0f1e095814683bfa35335b46e6476c96d8b33326432394717b05da611",
+   url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/minimal.tar.gz" % consensus_spec_version,
+)
 
-#http_archive(
-#    name = "consensus_spec_tests_mainnet",
-#    build_file_content = """
-#filegroup(
-#    name = "test_data",
-#    srcs = glob([
-#        "**/*.ssz_snappy",
-#        "**/*.yaml",
-#    ]),
-#    visibility = ["//visibility:public"],
-#)
-#    """,
-#    #sha256 = "49c022f3a3478cea849ba8f877a9f7e4c1ded549edddc09993550bbc5bb192e1",
-#    url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/mainnet.tar.gz" % consensus_spec_version,
-#)
+http_archive(
+   name = "consensus_spec_tests_mainnet",
+   build_file_content = """
+filegroup(
+   name = "test_data",
+   srcs = glob([
+       "**/*.ssz_snappy",
+       "**/*.yaml",
+   ]),
+   visibility = ["//visibility:public"],
+)
+   """,
+   sha256 = "7bf3e4c07a293f41a79bcfabbb5dad3a13f9d96a0e920b773456fbb6ac80520c",
+   url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/mainnet.tar.gz" % consensus_spec_version,
+)
 
 http_archive(
     name = "consensus_spec",

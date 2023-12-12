@@ -7,7 +7,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/logrusorgru/aurora"
@@ -17,7 +16,6 @@ import (
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/v4/api/client/beacon"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/urfave/cli/v2"
 	"go.opencensus.io/trace"
 )
@@ -88,25 +86,28 @@ func callWithdrawalEndpoints(ctx context.Context, host string, request []*apimid
 	if err != nil {
 		return err
 	}
-	fork, err := client.GetFork(ctx, "head")
-	if err != nil {
-		return errors.Wrap(err, "could not retrieve current fork information")
-	}
-	spec, err := client.GetConfigSpec(ctx)
-	if err != nil {
-		return err
-	}
-	forkEpoch, ok := spec.Data["CAPELLA_FORK_EPOCH"]
-	if !ok {
-		return errors.New("Configs used on beacon node do not contain CAPELLA_FORK_EPOCH")
-	}
-	capellaForkEpoch, err := strconv.Atoi(forkEpoch)
-	if err != nil {
-		return errors.New("could not convert CAPELLA_FORK_EPOCH to a number")
-	}
-	if fork.Epoch < primitives.Epoch(capellaForkEpoch) {
-		return errors.New("setting withdrawals using the DilithiumtoExecutionChange endpoint is only available after the Capella/Shanghai hard fork.")
-	}
+
+	// TODO(rgeraldes24) - remove
+	// fork, err := client.GetFork(ctx, "head")
+	// if err != nil {
+	// 	return errors.Wrap(err, "could not retrieve current fork information")
+	// }
+	// spec, err := client.GetConfigSpec(ctx)
+	// if err != nil {
+	// 	return err
+	// }
+	// forkEpoch, ok := spec.Data["CAPELLA_FORK_EPOCH"]
+	// if !ok {
+	// 	return errors.New("Configs used on beacon node do not contain CAPELLA_FORK_EPOCH")
+	// }
+	// capellaForkEpoch, err := strconv.Atoi(forkEpoch)
+	// if err != nil {
+	// 	return errors.New("could not convert CAPELLA_FORK_EPOCH to a number")
+	// }
+	// if fork.Epoch < primitives.Epoch(capellaForkEpoch) {
+	// 	return errors.New("setting withdrawals using the DilithiumtoExecutionChange endpoint is only available after the Capella/Shanghai hard fork.")
+	// }
+
 	err = client.SubmitChangeDilithiumtoExecution(ctx, request)
 	if err != nil && strings.Contains(err.Error(), "POST error") {
 		// just log the error, so we can check the pool for partial inclusions.
