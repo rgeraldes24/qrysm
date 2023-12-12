@@ -50,7 +50,7 @@ func TestBeaconAggregateProofSubscriber_CanSaveUnaggregatedAttestation(t *testin
 		Message: &zondpb.AggregateAttestationAndProof{
 			Aggregate: util.HydrateAttestation(&zondpb.Attestation{
 				ParticipationBits: bitfield.Bitlist{0x03},
-				Signature:         make([]byte, dilithium2.CryptoBytes),
+				Signatures:        make([][]byte, 0),
 			}),
 			AggregatorIndex: 100,
 		},

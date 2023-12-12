@@ -39,6 +39,8 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
+// TODO(rgeraldes24) - double check (tests might not be covering all the func)
+
 var discoveryWaitTime = 1 * time.Second
 
 func init() {
@@ -360,7 +362,7 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 				assert.NoError(t, err)
 				s.dv5Listener = listener
 				s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{0x00})
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
@@ -381,7 +383,7 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 				assert.NoError(t, err)
 				s.dv5Listener = listener
 				s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01})
+				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}, []byte{0x00})
 				cache.SubnetIDs.AddPersistentCommittee([]byte{'A'}, []uint64{1, 2, 3, 23}, 0)
 				return s
 			},
@@ -409,7 +411,7 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 
 				s.dv5Listener = listener
 				s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01})
+				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}, []byte{0x00})
 				cache.SubnetIDs.AddPersistentCommittee([]byte{'A'}, []uint64{1, 2, 3, 23}, 0)
 				return s
 			},
@@ -439,7 +441,7 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 
 				s.dv5Listener = listener
 				s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{0x00})
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
@@ -468,7 +470,7 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 
 				s.dv5Listener = listener
 				s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{0x00})
 				cache.SubnetIDs.AddPersistentCommittee([]byte{'A'}, []uint64{1, 2, 3, 23}, 0)
 				cache.SyncSubnetIDs.AddSyncCommitteeSubnets([]byte{'A'}, 0, []uint64{0, 1}, 0)
 				return s

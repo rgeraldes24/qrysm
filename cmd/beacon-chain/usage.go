@@ -137,10 +137,6 @@ var appHelpFlagGroups = []flagGroup{
 		Name: "merge",
 		Flags: []cli.Flag{
 			flags.SuggestedFeeRecipient,
-			// TODO(rgeraldes24) - remove
-			// flags.TerminalTotalDifficultyOverride,
-			// flags.TerminalBlockHashOverride,
-			// flags.TerminalBlockHashActivationEpochOverride,
 		},
 	},
 	{

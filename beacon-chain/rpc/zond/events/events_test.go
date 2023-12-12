@@ -272,7 +272,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 	})
 	t.Run(PayloadAttributesTopic+"_capella", func(t *testing.T) {
 		ctx := context.Background()
-		beaconState, _ := util.DeterministicGenesisStateCapella(t, 1)
+		beaconState, _ := util.DeterministicGenesisState(t, 1)
 		validator, err := beaconState.ValidatorAtIndex(0)
 		require.NoError(t, err, "Could not get validator")
 		by, err := hexutil.Decode("0x010000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b")

@@ -32,7 +32,7 @@ func (s *Service) CanSubscribe(topic string) bool {
 	if parts[0] != "" {
 		return false
 	}
-	if parts[1] != "eth2" {
+	if parts[1] != "zond2" {
 		return false
 	}
 
@@ -42,33 +42,7 @@ func (s *Service) CanSubscribe(topic string) bool {
 		return false
 	}
 
-	/*
-		phase0ForkDigest, err := s.currentForkDigest()
-		if err != nil {
-			log.WithError(err).Error("Could not determine fork digest")
-			return false
-		}
-		altairForkDigest, err := forks.ForkDigestFromEpoch(params.BeaconConfig().AltairForkEpoch, s.genesisValidatorsRoot)
-		if err != nil {
-			log.WithError(err).Error("Could not determine altair fork digest")
-			return false
-		}
-		bellatrixForkDigest, err := forks.ForkDigestFromEpoch(params.BeaconConfig().BellatrixForkEpoch, s.genesisValidatorsRoot)
-		if err != nil {
-			log.WithError(err).Error("Could not determine Bellatrix fork digest")
-			return false
-		}
-		capellaForkDigest, err := forks.ForkDigestFromEpoch(params.BeaconConfig().CapellaForkEpoch, s.genesisValidatorsRoot)
-		if err != nil {
-			log.WithError(err).Error("Could not determine Capella fork digest")
-			return false
-		}
-	*/
-
 	switch parts[2] {
-	//case fmt.Sprintf("%x", phase0ForkDigest):
-	//case fmt.Sprintf("%x", altairForkDigest):
-	//case fmt.Sprintf("%x", bellatrixForkDigest):
 	case fmt.Sprintf("%x", capellaForkDigest):
 	default:
 		return false

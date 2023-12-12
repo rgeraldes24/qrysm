@@ -124,7 +124,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -157,7 +157,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -196,7 +196,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -235,7 +235,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -275,7 +275,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -333,7 +333,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -395,7 +395,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -439,7 +439,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							msg.Message.SelectionProof = sig.Marshal()
 							msg.Message.Contribution.Slot = slots.PrevSlot(hState.Slot())
 							msg.Message.Contribution.SubcommitteeIndex = i
-							msg.Message.Contribution.Signature = infiniteSig[:]
+							msg.Message.Contribution.Signatures = [][]byte{infiniteSig[:]}
 							msg.Message.Contribution.BlockRoot = headRoot[:]
 							msg.Message.Contribution.ParticipationBits = bitfield.NewBitvector128()
 							msg.Message.Contribution.ParticipationBits.SetBitAt(1, true)
@@ -472,7 +472,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -515,7 +515,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							msg.Message.SelectionProof = sig.Marshal()
 							msg.Message.Contribution.Slot = slots.PrevSlot(hState.Slot())
 							msg.Message.Contribution.SubcommitteeIndex = i
-							msg.Message.Contribution.Signature = badSig.Marshal()
+							msg.Message.Contribution.Signatures = [][]byte{badSig.Marshal()}
 							msg.Message.Contribution.BlockRoot = headRoot[:]
 							msg.Message.Contribution.ParticipationBits = bitfield.NewBitvector128()
 							msg.Message.Contribution.ParticipationBits.SetBitAt(1, true)
@@ -551,7 +551,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -594,7 +594,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							msg.Message.SelectionProof = sig.Marshal()
 							msg.Message.Contribution.Slot = slots.PrevSlot(hState.Slot())
 							msg.Message.Contribution.SubcommitteeIndex = i
-							msg.Message.Contribution.Signature = infiniteSig[:]
+							msg.Message.Contribution.Signatures = [][]byte{infiniteSig[:]}
 							msg.Message.Contribution.BlockRoot = headRoot[:]
 							msg.Message.Contribution.ParticipationBits = bitfield.NewBitvector128()
 							sigRoot, err := signing.ComputeSigningRoot(msg.Message, cd)
@@ -632,7 +632,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -688,7 +688,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							assert.Equal(t, true, ok)
 							sig = keys[valIdx].Sign(sigRoot[:])
 							msg.Message.Contribution.ParticipationBits.SetBitAt(uint64(0), true)
-							msg.Message.Contribution.Signature = sig.Marshal()
+							msg.Message.Contribution.Signatures = [][]byte{sig.Marshal()}
 
 							sigRoot, err = signing.ComputeSigningRoot(msg.Message, cd)
 							assert.NoError(t, err)
@@ -725,7 +725,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -821,7 +821,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 							SubcommitteeIndex: 1,
 							BlockRoot:         params.BeaconConfig().ZeroHash[:],
 							ParticipationBits: bitfield.NewBitvector128(),
-							Signature:         emptySig[:],
+							Signatures:        [][]byte{emptySig[:]},
 						},
 						SelectionProof: emptySig[:],
 					},
@@ -886,7 +886,7 @@ func TestValidateSyncContributionAndProof(t *testing.T) {
 				SubcommitteeIndex: 1,
 				BlockRoot:         params.BeaconConfig().ZeroHash[:],
 				ParticipationBits: bitfield.NewBitvector128(),
-				Signature:         emptySig[:],
+				Signatures:        [][]byte{emptySig[:]},
 			},
 			SelectionProof: emptySig[:],
 		},
@@ -943,7 +943,7 @@ func TestValidateSyncContributionAndProof(t *testing.T) {
 				assert.Equal(t, true, ok)
 				sig = keys[valIdx].Sign(sigRoot[:])
 				msg.Message.Contribution.ParticipationBits.SetBitAt(uint64(0), true)
-				msg.Message.Contribution.Signature = sig.Marshal()
+				msg.Message.Contribution.Signatures = [][]byte{sig.Marshal()}
 
 				sigRoot, err = signing.ComputeSigningRoot(msg.Message, cd)
 				assert.NoError(t, err)
@@ -1008,7 +1008,7 @@ func TestValidateSyncContributionAndProof(t *testing.T) {
 }
 
 func fillUpBlocksAndState(ctx context.Context, t *testing.T, beaconDB db.Database) ([32]byte, []dilithium.DilithiumKey) {
-	gs, keys := util.DeterministicGenesisStateAltair(t, 64)
+	gs, keys := util.DeterministicGenesisState(t, 64)
 	sCom, err := altair.NextSyncCommittee(ctx, gs)
 	assert.NoError(t, err)
 	assert.NoError(t, gs.SetCurrentSyncCommittee(sCom))
@@ -1017,7 +1017,7 @@ func fillUpBlocksAndState(ctx context.Context, t *testing.T, beaconDB db.Databas
 	testState := gs.Copy()
 	var hRoot [32]byte
 	for i := primitives.Slot(1); i <= params.BeaconConfig().SlotsPerEpoch; i++ {
-		blk, err := util.GenerateFullBlockAltair(testState, keys, util.DefaultBlockGenConfig(), i)
+		blk, err := util.GenerateFullBlock(testState, keys, util.DefaultBlockGenConfig(), i)
 		require.NoError(t, err)
 		r, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)

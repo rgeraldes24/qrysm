@@ -18,10 +18,10 @@ func TestExtractBlockDataType(t *testing.T) {
 	// Precompute digests
 	genDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, params.BeaconConfig().ZeroHash[:])
 	require.NoError(t, err)
-	altairDigest, err := signing.ComputeForkDigest(params.BeaconConfig().AltairForkVersion, params.BeaconConfig().ZeroHash[:])
-	require.NoError(t, err)
-	bellatrixDigest, err := signing.ComputeForkDigest(params.BeaconConfig().BellatrixForkVersion, params.BeaconConfig().ZeroHash[:])
-	require.NoError(t, err)
+	// altairDigest, err := signing.ComputeForkDigest(params.BeaconConfig().AltairForkVersion, params.BeaconConfig().ZeroHash[:])
+	// require.NoError(t, err)
+	// bellatrixDigest, err := signing.ComputeForkDigest(params.BeaconConfig().BellatrixForkVersion, params.BeaconConfig().ZeroHash[:])
+	// require.NoError(t, err)
 
 	type args struct {
 		digest []byte
@@ -78,32 +78,34 @@ func TestExtractBlockDataType(t *testing.T) {
 			}(),
 			wantErr: false,
 		},
-		{
-			name: "altair fork version",
-			args: args{
-				digest: altairDigest[:],
-				chain:  &mock.ChainService{ValidatorsRoot: [32]byte{}},
+		/*
+			{
+				name: "altair fork version",
+				args: args{
+					digest: altairDigest[:],
+					chain:  &mock.ChainService{ValidatorsRoot: [32]byte{}},
+				},
+				want: func() interfaces.ReadOnlySignedBeaconBlock {
+					wsb, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockAltair{Block: &zondpb.BeaconBlockAltair{Body: &zondpb.BeaconBlockBodyAltair{}}})
+					require.NoError(t, err)
+					return wsb
+				}(),
+				wantErr: false,
 			},
-			want: func() interfaces.ReadOnlySignedBeaconBlock {
-				wsb, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockAltair{Block: &zondpb.BeaconBlockAltair{Body: &zondpb.BeaconBlockBodyAltair{}}})
-				require.NoError(t, err)
-				return wsb
-			}(),
-			wantErr: false,
-		},
-		{
-			name: "bellatrix fork version",
-			args: args{
-				digest: bellatrixDigest[:],
-				chain:  &mock.ChainService{ValidatorsRoot: [32]byte{}},
+			{
+				name: "bellatrix fork version",
+				args: args{
+					digest: bellatrixDigest[:],
+					chain:  &mock.ChainService{ValidatorsRoot: [32]byte{}},
+				},
+				want: func() interfaces.ReadOnlySignedBeaconBlock {
+					wsb, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockBellatrix{Block: &zondpb.BeaconBlockBellatrix{Body: &zondpb.BeaconBlockBodyBellatrix{}}})
+					require.NoError(t, err)
+					return wsb
+				}(),
+				wantErr: false,
 			},
-			want: func() interfaces.ReadOnlySignedBeaconBlock {
-				wsb, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockBellatrix{Block: &zondpb.BeaconBlockBellatrix{Body: &zondpb.BeaconBlockBodyBellatrix{}}})
-				require.NoError(t, err)
-				return wsb
-			}(),
-			wantErr: false,
-		},
+		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -66,10 +66,6 @@ var appFlags = []cli.Flag{
 	flags.Zond1HeaderReqLimit,
 	flags.MinPeersPerSubnet,
 	flags.SuggestedFeeRecipient,
-	// TODO(rgeraldes24) - remove
-	// flags.TerminalTotalDifficultyOverride,
-	// flags.TerminalBlockHashOverride,
-	// flags.TerminalBlockHashActivationEpochOverride,
 	flags.MevRelayEndpoint,
 	flags.MaxBuilderEpochMissedSlots,
 	flags.MaxBuilderConsecutiveMissedSlots,

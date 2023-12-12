@@ -89,7 +89,8 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	hashTreeRoot, err := signing.ComputeSigningRoot(att.Data, attesterDomain)
 	assert.NoError(t, err)
 	for _, i := range attestingIndices {
-		att.Signature = privKeys[i].Sign(hashTreeRoot[:]).Marshal()
+		// TODO(rgeraldes24) double check
+		att.Signatures = [][]byte{privKeys[i].Sign(hashTreeRoot[:]).Marshal()}
 	}
 
 	// Arbitrary aggregator index for testing purposes.

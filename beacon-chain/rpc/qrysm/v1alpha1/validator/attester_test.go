@@ -202,7 +202,7 @@ func TestGetAttestationData_Optimistic(t *testing.T) {
 
 func TestAttestationDataSlot_handlesInProgressRequest(t *testing.T) {
 	s := &zondpb.BeaconState{Slot: 100}
-	state, err := state_native.InitializeFromProtoPhase0(s)
+	state, err := state_native.InitializeFromProtoCapella(s)
 	require.NoError(t, err)
 	ctx := context.Background()
 	chainService := &mock.ChainService{

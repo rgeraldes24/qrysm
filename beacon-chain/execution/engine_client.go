@@ -233,8 +233,6 @@ func (s *Service) ExchangeTransitionConfiguration(
 
 	// We surface an error to the user if local configuration settings mismatch
 	// according to the response from the execution node.
-	// TODO(rgeraldes24) - remove
-	// cfgTerminalHash := params.BeaconConfig().TerminalBlockHash[:]
 	if !bytes.Equal(cfg.TerminalBlockHash, result.TerminalBlockHash) {
 		return errors.Wrapf(
 			ErrConfigMismatch,
@@ -243,8 +241,6 @@ func (s *Service) ExchangeTransitionConfiguration(
 			cfg.TerminalBlockHash,
 		)
 	}
-	// TODO(rgeraldes24) - remove
-	// ttdCfg := params.BeaconConfig().TerminalTotalDifficulty
 	ttdResult, err := hexutil.DecodeBig(result.TerminalTotalDifficulty)
 	if err != nil {
 		return errors.Wrap(err, "could not decode received terminal total difficulty")

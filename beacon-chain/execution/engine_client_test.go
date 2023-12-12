@@ -1021,10 +1021,13 @@ func fixtures() map[string]interface{} {
 		},
 		PayloadId: &id,
 	}
-	b, _ := new(big.Int).SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
-	ttd, _ := uint256.FromBig(b)
+	// b, _ := new(big.Int).SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
+	// ttd, _ := uint256.FromBig(b)
+	ttd, _ := uint256.FromBig(big.NewInt(0))
+	tbh := [32]byte{}
 	transitionCfg := &pb.TransitionConfiguration{
-		TerminalBlockHash:       params.BeaconConfig().TerminalBlockHash[:],
+		//TerminalBlockHash:       params.BeaconConfig().TerminalBlockHash[:],
+		TerminalBlockHash:       tbh[:],
 		TerminalTotalDifficulty: ttd.Hex(),
 		TerminalBlockNumber:     big.NewInt(0).Bytes(),
 	}

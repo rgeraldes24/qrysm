@@ -430,7 +430,7 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 	ctx := context.Background()
 	genesisTime := time.Now()
 	numVals := uint64(11)
-	st, _ := util.DeterministicGenesisStateAltair(t, numVals)
+	st, _ := util.DeterministicGenesisState(t, numVals)
 	require.NoError(t, st.SetGenesisTime(uint64(genesisTime.Unix())))
 	vals := st.Validators()
 	currCommittee := &zondpbalpha.SyncCommittee{}
@@ -564,7 +564,7 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 		// in this test we swap validators in the current and next sync committee inside the new state
 
 		newSyncPeriodStartSlot := primitives.Slot(uint64(params.BeaconConfig().EpochsPerSyncCommitteePeriod) * uint64(params.BeaconConfig().SlotsPerEpoch))
-		newSyncPeriodSt, _ := util.DeterministicGenesisStateAltair(t, numVals)
+		newSyncPeriodSt, _ := util.DeterministicGenesisState(t, numVals)
 		require.NoError(t, newSyncPeriodSt.SetSlot(newSyncPeriodStartSlot))
 		require.NoError(t, newSyncPeriodSt.SetGenesisTime(uint64(genesisTime.Unix())))
 		vals := newSyncPeriodSt.Validators()
@@ -628,7 +628,7 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 		slot, err := slots.EpochStart(1)
 		require.NoError(t, err)
 
-		state, err := util.NewBeaconStateBellatrix()
+		state, err := util.NewBeaconState()
 		require.NoError(t, err)
 		require.NoError(t, state.SetSlot(slot))
 
@@ -710,7 +710,7 @@ func TestProduceBlock(t *testing.T) {
 		assert.Equal(t, primitives.Slot(123), containerBlock.CapellaBlock.Slot)
 	})
 	t.Run("Capella blinded", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlockCapella{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlock{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -723,7 +723,7 @@ func TestProduceBlock(t *testing.T) {
 		assert.ErrorContains(t, "Prepared Capella beacon block is blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Bellatrix{Bellatrix: &zondpbalpha.BeaconBlockBellatrix{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlock{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -785,7 +785,7 @@ func TestProduceBlockSSZ(t *testing.T) {
 		assert.ErrorContains(t, "Prepared Capella beacon block is blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Bellatrix{Bellatrix: &zondpbalpha.BeaconBlockBellatrix{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlock{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -835,7 +835,7 @@ func TestProduceBlindedBlock(t *testing.T) {
 		assert.Equal(t, primitives.Slot(123), containerBlock.CapellaBlock.Slot)
 	})
 	t.Run("Capella full", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlockCapella{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlock{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -849,7 +849,7 @@ func TestProduceBlindedBlock(t *testing.T) {
 		assert.ErrorContains(t, "Prepared beacon block is not blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedBellatrix{BlindedBellatrix: &zondpbalpha.BlindedBeaconBlockBellatrix{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlock{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -1600,11 +1600,11 @@ func TestGetLiveness(t *testing.T) {
 	// Epoch 0 - both validators not live
 	// Epoch 1 - validator with index 1 is live
 	// Epoch 2 - validator with index 0 is live
-	oldSt, err := util.NewBeaconStateBellatrix()
+	oldSt, err := util.NewBeaconState()
 	require.NoError(t, err)
 	require.NoError(t, oldSt.AppendCurrentParticipationBits(0))
 	require.NoError(t, oldSt.AppendCurrentParticipationBits(0))
-	headSt, err := util.NewBeaconStateBellatrix()
+	headSt, err := util.NewBeaconState()
 	require.NoError(t, err)
 	require.NoError(t, headSt.SetSlot(params.BeaconConfig().SlotsPerEpoch*2))
 	require.NoError(t, headSt.AppendPreviousParticipationBits(0))

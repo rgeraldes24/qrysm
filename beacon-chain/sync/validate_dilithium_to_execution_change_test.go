@@ -142,51 +142,52 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				}},
 			want: pubsub.ValidationIgnore,
 		},
+		/*
+			{
+				name: "Non-Capella HeadState Valid Execution Change Message",
+				svcopts: []Option{
+					WithP2P(mockp2p.NewTestP2P(t)),
+					WithInitialSync(&mockSync.Sync{IsSyncing: false}),
+					WithChainService(chainService),
+					WithOperationNotifier(chainService.OperationNotifier()),
+					WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
+				},
+				clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot*10)), [32]byte{'A'}),
+				setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
+					s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
+					s.cfg.beaconDB = beaconDB
+					s.initCaches()
+					st, keys := util.DeterministicGenesisStateBellatrix(t, 128)
+					s.cfg.chain = &mockChain.ChainService{
+						State: st,
+					}
 
-		{
-			name: "Non-Capella HeadState Valid Execution Change Message",
-			svcopts: []Option{
-				WithP2P(mockp2p.NewTestP2P(t)),
-				WithInitialSync(&mockSync.Sync{IsSyncing: false}),
-				WithChainService(chainService),
-				WithOperationNotifier(chainService.OperationNotifier()),
-				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
+					msg.Message.ValidatorIndex = 50
+					// Provide invalid withdrawal key for validator
+					msg.Message.FromDilithiumPubkey = keys[51].PublicKey().Marshal()
+					msg.Message.ToExecutionAddress = wantedExecAddress
+					epoch := slots.ToEpoch(st.Slot())
+					domain, err := signing.Domain(st.Fork(), epoch, params.BeaconConfig().DomainDilithiumToExecutionChange, st.GenesisValidatorsRoot())
+					assert.NoError(t, err)
+					htr, err := signing.SigningData(msg.Message.HashTreeRoot, domain)
+					assert.NoError(t, err)
+					msg.Signature = keys[51].Sign(htr[:]).Marshal()
+					return s, topic
+				},
+				args: args{
+					pid:   "random",
+					topic: fmt.Sprintf(defaultTopic, fakeDigest),
+					msg: &zondpb.SignedDilithiumToExecutionChange{
+						Message: &zondpb.DilithiumToExecutionChange{
+							ValidatorIndex:      0,
+							FromDilithiumPubkey: make([]byte, 2592),
+							ToExecutionAddress:  make([]byte, 20),
+						},
+						Signature: emptySig[:],
+					}},
+				want: pubsub.ValidationAccept,
 			},
-			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot*10)), [32]byte{'A'}),
-			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
-				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
-				s.cfg.beaconDB = beaconDB
-				s.initCaches()
-				st, keys := util.DeterministicGenesisStateBellatrix(t, 128)
-				s.cfg.chain = &mockChain.ChainService{
-					State: st,
-				}
-
-				msg.Message.ValidatorIndex = 50
-				// Provide invalid withdrawal key for validator
-				msg.Message.FromDilithiumPubkey = keys[51].PublicKey().Marshal()
-				msg.Message.ToExecutionAddress = wantedExecAddress
-				epoch := slots.ToEpoch(st.Slot())
-				domain, err := signing.Domain(st.Fork(), epoch, params.BeaconConfig().DomainDilithiumToExecutionChange, st.GenesisValidatorsRoot())
-				assert.NoError(t, err)
-				htr, err := signing.SigningData(msg.Message.HashTreeRoot, domain)
-				assert.NoError(t, err)
-				msg.Signature = keys[51].Sign(htr[:]).Marshal()
-				return s, topic
-			},
-			args: args{
-				pid:   "random",
-				topic: fmt.Sprintf(defaultTopic, fakeDigest),
-				msg: &zondpb.SignedDilithiumToExecutionChange{
-					Message: &zondpb.DilithiumToExecutionChange{
-						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 2592),
-						ToExecutionAddress:  make([]byte, 20),
-					},
-					Signature: emptySig[:],
-				}},
-			want: pubsub.ValidationAccept,
-		},
+		*/
 		{
 			name: "Non-existent Validator Index",
 			svcopts: []Option{
@@ -201,7 +202,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
-				st, _ := util.DeterministicGenesisStateCapella(t, 128)
+				st, _ := util.DeterministicGenesisState(t, 128)
 				s.cfg.chain = &mockChain.ChainService{
 					State: st,
 				}
@@ -236,7 +237,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
-				st, keys := util.DeterministicGenesisStateCapella(t, 128)
+				st, keys := util.DeterministicGenesisState(t, 128)
 				s.cfg.chain = &mockChain.ChainService{
 					State: st,
 				}
@@ -267,14 +268,14 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithInitialSync(&mockSync.Sync{IsSyncing: false}),
 				WithChainService(chainService),
 				WithOperationNotifier(chainService.OperationNotifier()),
-				WithDilithiumToExecPool(bldilithiumtoexecstoexec.NewPool()),
+				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Duration(10)), [32]byte{'A'}),
 			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
-				st, keys := util.DeterministicGenesisStateCapella(t, 128)
+				st, keys := util.DeterministicGenesisState(t, 128)
 				assert.NoError(t, st.ApplyToEveryValidator(func(idx int, val *zondpb.Validator) (bool, *zondpb.Validator, error) {
 					newCreds := make([]byte, 32)
 					newCreds[0] = params.BeaconConfig().ZOND1AddressWithdrawalPrefixByte
@@ -319,7 +320,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
-				st, keys := util.DeterministicGenesisStateCapella(t, 128)
+				st, keys := util.DeterministicGenesisState(t, 128)
 				s.cfg.chain = &mockChain.ChainService{
 					State: st,
 				}
@@ -360,7 +361,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
-				st, keys := util.DeterministicGenesisStateCapella(t, 128)
+				st, keys := util.DeterministicGenesisState(t, 128)
 				s.cfg.chain = &mockChain.ChainService{
 					State: st,
 				}

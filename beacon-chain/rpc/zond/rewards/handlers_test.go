@@ -96,12 +96,12 @@ func TestBlockRewards(t *testing.T) {
 			Attestation_1: &zond.IndexedAttestation{
 				AttestingIndices: []uint64{0},
 				Data:             attData1,
-				Signatures:       secretKeys[0].Sign(sigRoot1[:]).Marshal(),
+				Signatures:       [][]byte{secretKeys[0].Sign(sigRoot1[:]).Marshal()},
 			},
 			Attestation_2: &zond.IndexedAttestation{
 				AttestingIndices: []uint64{0},
 				Data:             attData2,
-				Signatures:       secretKeys[0].Sign(sigRoot2[:]).Marshal(),
+				Signatures:       [][]byte{secretKeys[0].Sign(sigRoot2[:]).Marshal()},
 			},
 		},
 	}
@@ -147,9 +147,9 @@ func TestBlockRewards(t *testing.T) {
 	require.NoError(t, err)
 	// Bits set in sync committee bits determine which validators will be treated as participating in sync committee.
 	// These validators have to sign the message.
-	sig1, err := secretKeys[47].Sign(r[:]).Marshal()
+	sig1 := secretKeys[47].Sign(r[:]).Marshal()
 	require.NoError(t, err)
-	sig2, err := secretKeys[19].Sign(r[:]).Marshal()
+	sig2 := secretKeys[19].Sign(r[:]).Marshal()
 	require.NoError(t, err)
 	b.Block.Body.SyncAggregate = &zond.SyncAggregate{SyncCommitteeBits: scBits, SyncCommitteeSignatures: [][]byte{sig1, sig2}}
 
@@ -529,9 +529,9 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	require.NoError(t, err)
 	// Bits set in sync committee bits determine which validators will be treated as participating in sync committee.
 	// These validators have to sign the message.
-	sigs := make([][]byte), fieldparams.SyncCommitteeLength-10)
+	sigs := make([][]byte, fieldparams.SyncCommitteeLength-10)
 	for i := range sigs {
-		sigs[i], err = secretKeys[i].Sign(r[:]).Marshal()
+		sigs[i] = secretKeys[i].Sign(r[:]).Marshal()
 		require.NoError(t, err)
 	}
 	b.Block.Body.SyncAggregate = &zond.SyncAggregate{SyncCommitteeBits: scBits, SyncCommitteeSignatures: sigs}

@@ -55,11 +55,11 @@ func TestMarshalToEnvelope(t *testing.T) {
 	d := struct {
 		Version string `json:"version"`
 	}{
-		Version: "Prysm/v2.0.5 (linux amd64)",
+		Version: "Qrysm/v2.0.5 (linux amd64)",
 	}
 	encoded, err := marshalToEnvelope(d)
 	require.NoError(t, err)
-	expected := `{"data":{"version":"Prysm/v2.0.5 (linux amd64)"}}`
+	expected := `{"data":{"version":"Qrysm/v2.0.5 (linux amd64)"}}`
 	require.Equal(t, expected, string(encoded))
 }
 

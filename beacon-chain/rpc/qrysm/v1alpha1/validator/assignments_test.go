@@ -98,9 +98,9 @@ func TestGetDuties_OK(t *testing.T) {
 
 func TestGetAltairDuties_SyncCommitteeOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.AltairForkEpoch = primitives.Epoch(0)
-	params.OverrideBeaconConfig(cfg)
+	//cfg := params.BeaconConfig().Copy()
+	//cfg.AltairForkEpoch = primitives.Epoch(0)
+	//params.OverrideBeaconConfig(cfg)
 
 	genesis := util.NewBeaconBlock()
 	deposits, _, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().SyncCommitteeSize)
@@ -299,9 +299,9 @@ func TestGetBellatrixDuties_SyncCommitteeOK(t *testing.T) {
 
 func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.AltairForkEpoch = primitives.Epoch(0)
-	params.OverrideBeaconConfig(cfg)
+	//cfg := params.BeaconConfig().Copy()
+	//cfg.AltairForkEpoch = primitives.Epoch(0)
+	//params.OverrideBeaconConfig(cfg)
 
 	genesis := util.NewBeaconBlock()
 	deposits, _, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().SyncCommitteeSize)

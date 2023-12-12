@@ -71,7 +71,7 @@ func TestRateDilithiumChanges(t *testing.T) {
 	s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 	s.cfg.beaconDB = beaconDB
 	s.initCaches()
-	st, keys := util.DeterministicGenesisStateCapella(t, 256)
+	st, keys := util.DeterministicGenesisState(t, 256)
 	s.cfg.chain = &mockChain.ChainService{
 		ValidatorsRoot: [32]byte{'A'},
 		Genesis:        time.Now().Add(-time.Second * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Duration(10)),
@@ -141,7 +141,7 @@ func TestBroadcastDilithiumBatch_changes_slice(t *testing.T) {
 	s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 	s.cfg.beaconDB = beaconDB
 	s.initCaches()
-	st, _ := util.DeterministicGenesisStateCapella(t, 32)
+	st, _ := util.DeterministicGenesisState(t, 32)
 	s.cfg.chain = &mockChain.ChainService{
 		ValidatorsRoot: [32]byte{'A'},
 		Genesis:        time.Now().Add(-time.Second * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Duration(10)),

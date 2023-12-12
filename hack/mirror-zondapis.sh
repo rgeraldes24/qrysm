@@ -13,7 +13,7 @@ set -e
 
 ## Define variables.
 GH_API="https://api.github.com"
-GH_REPO="$GH_API/repos/prysmaticlabs/zondapis"
+GH_REPO="$GH_API/repos/theQRL/zondapis"
 
 AUTH="Authorization: token $GITHUB_SECRET_ACCESS_TOKEN"
 ## skipcq: SH-2034
@@ -63,7 +63,7 @@ find ./zond -name '*.proto' -print0 |
 
 find ./zond -name '*.proto' -print0 |
     while IFS= read -r -d '' line; do
-        sed -i 's/prysmaticlabs\/prysm\/proto\/zond/prysmaticlabs\/zondapis\/zond/g' "$line"
+        sed -i 's/theQRL\/prysm\/proto\/zond/theQRL\/zondapis\/zond/g' "$line"
     done
 
 if git diff-index --quiet HEAD --; then
@@ -75,6 +75,6 @@ fi
 
 # Push to the mirror repository
 git add --all
-GIT_AUTHOR_EMAIL=contact@prysmaticlabs.com GIT_AUTHOR_NAME=prysm-bot GIT_COMMITTER_NAME=prysm-bot GIT_COMMITTER_EMAIL=contact@prysmaticlabs.com git commit -am "Mirrored from github.com/prysmaticlabs/prysm@$BUILDKITE_COMMIT"
+GIT_AUTHOR_EMAIL=contact@theQRL.com GIT_AUTHOR_NAME=prysm-bot GIT_COMMITTER_NAME=prysm-bot GIT_COMMITTER_EMAIL=contact@theQRL.com git commit -am "Mirrored from github.com/theQRL/prysm@$BUILDKITE_COMMIT"
 git remote set-url origin https://prylabs:"$GITHUB_SECRET_ACCESS_TOKEN"@github.com/theQRL/zondapis.git
 git push origin master

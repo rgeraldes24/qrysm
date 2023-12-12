@@ -9,6 +9,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/hash"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -36,7 +37,7 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 	require.NoError(t, err)
 	zond1Data, err := util.DeterministicZond1Data(len(deposits))
 	require.NoError(t, err)
-	newState, err := transition.GenesisBeaconState(context.Background(), deposits, genesisTime, zond1Data)
+	newState, err := transition.GenesisBeaconState(context.Background(), deposits, genesisTime, zond1Data, &enginev1.ExecutionPayload{})
 	require.NoError(t, err, "Could not execute GenesisBeaconState")
 
 	// Misc fields checks.
@@ -94,9 +95,9 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 func TestGenesisState_HashEquality(t *testing.T) {
 	deposits, _, err := util.DeterministicDepositsAndKeys(100)
 	require.NoError(t, err)
-	state1, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zondpb.Zond1Data{BlockHash: make([]byte, 32)})
+	state1, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zondpb.Zond1Data{BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayload{})
 	require.NoError(t, err)
-	state, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zondpb.Zond1Data{BlockHash: make([]byte, 32)})
+	state, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zondpb.Zond1Data{BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayload{})
 	require.NoError(t, err)
 
 	pbState1, err := state_native.ProtobufBeaconStateCapella(state1.ToProto())
@@ -114,7 +115,7 @@ func TestGenesisState_HashEquality(t *testing.T) {
 }
 
 func TestGenesisState_InitializesLatestBlockHashes(t *testing.T) {
-	s, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{})
+	s, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
 	require.NoError(t, err)
 	got, want := uint64(len(s.BlockRoots())), uint64(params.BeaconConfig().SlotsPerHistoricalRoot)
 	assert.Equal(t, want, got, "Wrong number of recent block hashes")
@@ -128,6 +129,6 @@ func TestGenesisState_InitializesLatestBlockHashes(t *testing.T) {
 }
 
 func TestGenesisState_FailsWithoutZond1data(t *testing.T) {
-	_, err := transition.GenesisBeaconState(context.Background(), nil, 0, nil)
+	_, err := transition.GenesisBeaconState(context.Background(), nil, 0, nil, &enginev1.ExecutionPayload{})
 	assert.ErrorContains(t, "no zond1data provided for genesis state", err)
 }

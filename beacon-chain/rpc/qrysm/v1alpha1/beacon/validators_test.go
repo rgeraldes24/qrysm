@@ -2004,7 +2004,7 @@ func TestGetValidatorPerformanceCapella_OK(t *testing.T) {
 
 	ctx := context.Background()
 	epoch := primitives.Epoch(1)
-	headState, _ := util.DeterministicGenesisStateCapella(t, 32)
+	headState, _ := util.DeterministicGenesisState(t, 32)
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
 
 	defaultBal := params.BeaconConfig().MaxEffectiveBalance
@@ -2365,7 +2365,7 @@ func TestServer_GetIndividualVotes_CapellaEndOfEpoch(t *testing.T) {
 	endSlot, err := slots.EpochEnd(1)
 	assert.NoError(t, err)
 
-	beaconState, _ = util.DeterministicGenesisStateCapella(t, validators)
+	beaconState, _ = util.DeterministicGenesisState(t, validators)
 	require.NoError(t, beaconState.SetSlot(endSlot))
 
 	pb, err := beaconState.CurrentEpochParticipation()

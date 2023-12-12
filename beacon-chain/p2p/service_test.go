@@ -313,6 +313,7 @@ func TestService_JoinLeaveTopic(t *testing.T) {
 	assert.Equal(t, 0, len(s.joinedTopics))
 
 	topic := fmt.Sprintf(AttestationSubnetTopicFormat, fd, 42) + "/" + encoder.ProtocolSuffixSSZSnappy
+	fmt.Println(topic)
 	topicHandle, err := s.JoinTopic(topic)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(s.joinedTopics))

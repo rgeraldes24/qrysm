@@ -13,6 +13,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// TODO(rgeraldes24)
 const (
 	acceptTosFilename   = "tosaccepted"
 	acceptTosPromptText = `

@@ -24,7 +24,7 @@ func TestGetBeaconState(t *testing.T) {
 	db := dbTest.SetupDB(t)
 
 	t.Run("Capella", func(t *testing.T) {
-		fakeState, _ := util.DeterministicGenesisStateCapella(t, 1)
+		fakeState, _ := util.DeterministicGenesisState(t, 1)
 		server := &Server{
 			Stater: &testutil.MockStater{
 				BeaconState: fakeState,
@@ -104,7 +104,7 @@ func TestGetBeaconState(t *testing.T) {
 
 func TestGetBeaconStateSSZ(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
-		fakeState, _ := util.DeterministicGenesisStateCapella(t, 1)
+		fakeState, _ := util.DeterministicGenesisState(t, 1)
 		sszState, err := fakeState.MarshalSSZ()
 		require.NoError(t, err)
 

@@ -13,7 +13,6 @@ import (
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -50,7 +49,7 @@ func fillDBTestBlocks(ctx context.Context, t *testing.T, beaconDB db.Database) (
 		blks[i], err = blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		blkContainers[i] = &zondpbalpha.BeaconBlockContainer{
-			Block:     &zondpbalpha.BeaconBlockContainer_Phase0Block{Phase0Block: b},
+			Block:     &zondpbalpha.BeaconBlockContainer_CapellaBlock{CapellaBlock: b},
 			BlockRoot: root[:],
 		}
 	}
@@ -58,7 +57,7 @@ func fillDBTestBlocks(ctx context.Context, t *testing.T, beaconDB db.Database) (
 	headRoot := bytesutil.ToBytes32(blkContainers[len(blks)-1].BlockRoot)
 	summary := &zondpbalpha.StateSummary{
 		Root: headRoot[:],
-		Slot: blkContainers[len(blks)-1].Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block.Block.Slot,
+		Slot: blkContainers[len(blks)-1].Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock.Block.Slot,
 	}
 	require.NoError(t, beaconDB.SaveStateSummary(ctx, summary))
 	require.NoError(t, beaconDB.SaveHeadBlockRoot(ctx, headRoot))
@@ -188,7 +187,7 @@ func TestServer_ListBlockHeaders(t *testing.T) {
 	util.SaveBlock(t, ctx, beaconDB, b4)
 
 	t.Run("list headers", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 		mockChainFetcher := &mock.ChainService{
 			DB:                  beaconDB,
@@ -215,7 +214,7 @@ func TestServer_ListBlockHeaders(t *testing.T) {
 				name: "slot",
 				slot: primitives.Slot(30),
 				want: []*zondpbalpha.SignedBeaconBlock{
-					blkContainers[30].Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block,
+					blkContainers[30].Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock,
 					b1,
 					b2,
 				},
@@ -224,7 +223,7 @@ func TestServer_ListBlockHeaders(t *testing.T) {
 				name:       "parent root",
 				parentRoot: b1.Block.ParentRoot,
 				want: []*zondpbalpha.SignedBeaconBlock{
-					blkContainers[1].Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block,
+					blkContainers[1].Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock,
 					b1,
 					b3,
 					b4,
@@ -269,7 +268,7 @@ func TestServer_ListBlockHeaders(t *testing.T) {
 	})
 
 	t.Run("execution optimistic", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 		mockChainFetcher := &mock.ChainService{
 			DB:                  beaconDB,
@@ -297,7 +296,7 @@ func TestServer_ListBlockHeaders(t *testing.T) {
 	})
 
 	t.Run("finalized", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 		child1 := util.NewBeaconBlock()
 		child1.Block.ParentRoot = bytesutil.PadTo([]byte("parent"), 32)
@@ -395,7 +394,7 @@ func TestServer_SubmitBlockSSZ(t *testing.T) {
 		}
 
 		b := util.NewBeaconBlock()
-		b.Block.Slot = params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().CapellaForkEpoch))
+		b.Block.Slot = 0 //params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().CapellaForkEpoch))
 		ssz, err := b.MarshalSSZ()
 		require.NoError(t, err)
 		blockReq := &zondpbv1.SSZContainer{
@@ -412,8 +411,8 @@ func TestServer_SubmitBlockSSZ(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		b := util.NewBlindedBeaconBlockCapella()
-		b.Block.Slot = params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().CapellaForkEpoch))
+		b := util.NewBlindedBeaconBlock()
+		b.Block.Slot = 0 //params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().CapellaForkEpoch))
 		ssz, err := b.MarshalSSZ()
 		require.NoError(t, err)
 		blockReq := &zondpbv1.SSZContainer{
@@ -549,7 +548,7 @@ func TestServer_GetBlockSSZ(t *testing.T) {
 		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBeaconBlockBellatrix()
+		b := util.NewBeaconBlock()
 		sb, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := sb.Block().HashTreeRoot()
@@ -612,7 +611,7 @@ func TestServer_GetBlockRoot(t *testing.T) {
 	headBlock := blkContainers[len(blkContainers)-1]
 
 	t.Run("get root", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 		mockChainFetcher := &mock.ChainService{
 			DB:                  beaconDB,
@@ -705,7 +704,7 @@ func TestServer_GetBlockRoot(t *testing.T) {
 	})
 
 	t.Run("execution optimistic", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 		mockChainFetcher := &mock.ChainService{
 			DB:                  beaconDB,
@@ -733,7 +732,7 @@ func TestServer_GetBlockRoot(t *testing.T) {
 	})
 
 	t.Run("finalized", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zondpbalpha.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 		mockChainFetcher := &mock.ChainService{
 			DB:                  beaconDB,
@@ -774,177 +773,179 @@ func TestServer_GetBlockRoot(t *testing.T) {
 func TestServer_ListBlockAttestations(t *testing.T) {
 	ctx := context.Background()
 
-	t.Run("Phase 0", func(t *testing.T) {
-		b := util.NewBeaconBlock()
-		b.Block.Body.Attestations = []*zondpbalpha.Attestation{
-			{
-				ParticipationBits: bitfield.Bitlist{0x00},
-				Data: &zondpbalpha.AttestationData{
-					Slot:            123,
-					CommitteeIndex:  123,
-					BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32),
-					Source: &zondpbalpha.Checkpoint{
-						Epoch: 123,
-						Root:  bytesutil.PadTo([]byte("root1"), 32),
+	/*
+		t.Run("Phase 0", func(t *testing.T) {
+			b := util.NewBeaconBlock()
+			b.Block.Body.Attestations = []*zondpbalpha.Attestation{
+				{
+					ParticipationBits: bitfield.Bitlist{0x00},
+					Data: &zondpbalpha.AttestationData{
+						Slot:            123,
+						CommitteeIndex:  123,
+						BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32),
+						Source: &zondpbalpha.Checkpoint{
+							Epoch: 123,
+							Root:  bytesutil.PadTo([]byte("root1"), 32),
+						},
+						Target: &zondpbalpha.Checkpoint{
+							Epoch: 123,
+							Root:  bytesutil.PadTo([]byte("root1"), 32),
+						},
 					},
-					Target: &zondpbalpha.Checkpoint{
-						Epoch: 123,
-						Root:  bytesutil.PadTo([]byte("root1"), 32),
-					},
+					Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), 4595)},
 				},
-				Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), 4595)},
-			},
-			{
-				ParticipationBits: bitfield.Bitlist{0x01},
-				Data: &zondpbalpha.AttestationData{
-					Slot:            456,
-					CommitteeIndex:  456,
-					BeaconBlockRoot: bytesutil.PadTo([]byte("root2"), 32),
-					Source: &zondpbalpha.Checkpoint{
-						Epoch: 456,
-						Root:  bytesutil.PadTo([]byte("root2"), 32),
+				{
+					ParticipationBits: bitfield.Bitlist{0x01},
+					Data: &zondpbalpha.AttestationData{
+						Slot:            456,
+						CommitteeIndex:  456,
+						BeaconBlockRoot: bytesutil.PadTo([]byte("root2"), 32),
+						Source: &zondpbalpha.Checkpoint{
+							Epoch: 456,
+							Root:  bytesutil.PadTo([]byte("root2"), 32),
+						},
+						Target: &zondpbalpha.Checkpoint{
+							Epoch: 456,
+							Root:  bytesutil.PadTo([]byte("root2"), 32),
+						},
 					},
-					Target: &zondpbalpha.Checkpoint{
-						Epoch: 456,
-						Root:  bytesutil.PadTo([]byte("root2"), 32),
-					},
+					Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), 4595)},
 				},
-				Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), 4595)},
-			},
-		}
-		sb, err := blocks.NewSignedBeaconBlock(b)
-		require.NoError(t, err)
-		mockBlockFetcher := &testutil.MockBlocker{BlockToReturn: sb}
-		mockChainService := &mock.ChainService{
-			FinalizedRoots: map[[32]byte]bool{},
-		}
-		bs := &Server{
-			OptimisticModeFetcher: mockChainService,
-			FinalizationFetcher:   mockChainService,
-			Blocker:               mockBlockFetcher,
-		}
+			}
+			sb, err := blocks.NewSignedBeaconBlock(b)
+			require.NoError(t, err)
+			mockBlockFetcher := &testutil.MockBlocker{BlockToReturn: sb}
+			mockChainService := &mock.ChainService{
+				FinalizedRoots: map[[32]byte]bool{},
+			}
+			bs := &Server{
+				OptimisticModeFetcher: mockChainService,
+				FinalizationFetcher:   mockChainService,
+				Blocker:               mockBlockFetcher,
+			}
 
-		resp, err := bs.ListBlockAttestations(ctx, &zondpbv1.BlockRequest{})
-		require.NoError(t, err)
+			resp, err := bs.ListBlockAttestations(ctx, &zondpbv1.BlockRequest{})
+			require.NoError(t, err)
 
-		v1Block, err := migration.V1Alpha1ToV1SignedBlock(b)
-		require.NoError(t, err)
-		assert.DeepEqual(t, v1Block.Block.Body.Attestations, resp.Data)
-	})
-	t.Run("Altair", func(t *testing.T) {
-		b := util.NewBeaconBlockAltair()
-		b.Block.Body.Attestations = []*zondpbalpha.Attestation{
-			{
-				ParticipationBits: bitfield.Bitlist{0x00},
-				Data: &zondpbalpha.AttestationData{
-					Slot:            123,
-					CommitteeIndex:  123,
-					BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32),
-					Source: &zondpbalpha.Checkpoint{
-						Epoch: 123,
-						Root:  bytesutil.PadTo([]byte("root1"), 32),
+			v1Block, err := migration.V1Alpha1ToV1SignedBlock(b)
+			require.NoError(t, err)
+			assert.DeepEqual(t, v1Block.Block.Body.Attestations, resp.Data)
+		})
+		t.Run("Altair", func(t *testing.T) {
+			b := util.NewBeaconBlockAltair()
+			b.Block.Body.Attestations = []*zondpbalpha.Attestation{
+				{
+					ParticipationBits: bitfield.Bitlist{0x00},
+					Data: &zondpbalpha.AttestationData{
+						Slot:            123,
+						CommitteeIndex:  123,
+						BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32),
+						Source: &zondpbalpha.Checkpoint{
+							Epoch: 123,
+							Root:  bytesutil.PadTo([]byte("root1"), 32),
+						},
+						Target: &zondpbalpha.Checkpoint{
+							Epoch: 123,
+							Root:  bytesutil.PadTo([]byte("root1"), 32),
+						},
 					},
-					Target: &zondpbalpha.Checkpoint{
-						Epoch: 123,
-						Root:  bytesutil.PadTo([]byte("root1"), 32),
-					},
+					Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), 4595)},
 				},
-				Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), 4595)},
-			},
-			{
-				ParticipationBits: bitfield.Bitlist{0x01},
-				Data: &zondpbalpha.AttestationData{
-					Slot:            456,
-					CommitteeIndex:  456,
-					BeaconBlockRoot: bytesutil.PadTo([]byte("root2"), 32),
-					Source: &zondpbalpha.Checkpoint{
-						Epoch: 456,
-						Root:  bytesutil.PadTo([]byte("root2"), 32),
+				{
+					ParticipationBits: bitfield.Bitlist{0x01},
+					Data: &zondpbalpha.AttestationData{
+						Slot:            456,
+						CommitteeIndex:  456,
+						BeaconBlockRoot: bytesutil.PadTo([]byte("root2"), 32),
+						Source: &zondpbalpha.Checkpoint{
+							Epoch: 456,
+							Root:  bytesutil.PadTo([]byte("root2"), 32),
+						},
+						Target: &zondpbalpha.Checkpoint{
+							Epoch: 456,
+							Root:  bytesutil.PadTo([]byte("root2"), 32),
+						},
 					},
-					Target: &zondpbalpha.Checkpoint{
-						Epoch: 456,
-						Root:  bytesutil.PadTo([]byte("root2"), 32),
-					},
+					Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), 4595)},
 				},
-				Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), 4595)},
-			},
-		}
-		sb, err := blocks.NewSignedBeaconBlock(b)
-		require.NoError(t, err)
-		mockBlockFetcher := &testutil.MockBlocker{BlockToReturn: sb}
-		mockChainService := &mock.ChainService{
-			FinalizedRoots: map[[32]byte]bool{},
-		}
-		bs := &Server{
-			OptimisticModeFetcher: mockChainService,
-			FinalizationFetcher:   mockChainService,
-			Blocker:               mockBlockFetcher,
-		}
+			}
+			sb, err := blocks.NewSignedBeaconBlock(b)
+			require.NoError(t, err)
+			mockBlockFetcher := &testutil.MockBlocker{BlockToReturn: sb}
+			mockChainService := &mock.ChainService{
+				FinalizedRoots: map[[32]byte]bool{},
+			}
+			bs := &Server{
+				OptimisticModeFetcher: mockChainService,
+				FinalizationFetcher:   mockChainService,
+				Blocker:               mockBlockFetcher,
+			}
 
-		resp, err := bs.ListBlockAttestations(ctx, &zondpbv1.BlockRequest{})
-		require.NoError(t, err)
+			resp, err := bs.ListBlockAttestations(ctx, &zondpbv1.BlockRequest{})
+			require.NoError(t, err)
 
-		v1Block, err := migration.V1Alpha1ToV1Block(b.Block)
-		require.NoError(t, err)
-		assert.DeepEqual(t, v1Block.Body.Attestations, resp.Data)
-	})
-	t.Run("Bellatrix", func(t *testing.T) {
-		b := util.NewBeaconBlockBellatrix()
-		b.Block.Body.Attestations = []*zondpbalpha.Attestation{
-			{
-				ParticipationBits: bitfield.Bitlist{0x00},
-				Data: &zondpbalpha.AttestationData{
-					Slot:            123,
-					CommitteeIndex:  123,
-					BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32),
-					Source: &zondpbalpha.Checkpoint{
-						Epoch: 123,
-						Root:  bytesutil.PadTo([]byte("root1"), 32),
+			v1Block, err := migration.V1Alpha1ToV1Block(b.Block)
+			require.NoError(t, err)
+			assert.DeepEqual(t, v1Block.Body.Attestations, resp.Data)
+		})
+		t.Run("Bellatrix", func(t *testing.T) {
+			b := util.NewBeaconBlockBellatrix()
+			b.Block.Body.Attestations = []*zondpbalpha.Attestation{
+				{
+					ParticipationBits: bitfield.Bitlist{0x00},
+					Data: &zondpbalpha.AttestationData{
+						Slot:            123,
+						CommitteeIndex:  123,
+						BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32),
+						Source: &zondpbalpha.Checkpoint{
+							Epoch: 123,
+							Root:  bytesutil.PadTo([]byte("root1"), 32),
+						},
+						Target: &zondpbalpha.Checkpoint{
+							Epoch: 123,
+							Root:  bytesutil.PadTo([]byte("root1"), 32),
+						},
 					},
-					Target: &zondpbalpha.Checkpoint{
-						Epoch: 123,
-						Root:  bytesutil.PadTo([]byte("root1"), 32),
-					},
+					Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), 4595)},
 				},
-				Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), 4595)},
-			},
-			{
-				ParticipationBits: bitfield.Bitlist{0x01},
-				Data: &zondpbalpha.AttestationData{
-					Slot:            456,
-					CommitteeIndex:  456,
-					BeaconBlockRoot: bytesutil.PadTo([]byte("root2"), 32),
-					Source: &zondpbalpha.Checkpoint{
-						Epoch: 456,
-						Root:  bytesutil.PadTo([]byte("root2"), 32),
+				{
+					ParticipationBits: bitfield.Bitlist{0x01},
+					Data: &zondpbalpha.AttestationData{
+						Slot:            456,
+						CommitteeIndex:  456,
+						BeaconBlockRoot: bytesutil.PadTo([]byte("root2"), 32),
+						Source: &zondpbalpha.Checkpoint{
+							Epoch: 456,
+							Root:  bytesutil.PadTo([]byte("root2"), 32),
+						},
+						Target: &zondpbalpha.Checkpoint{
+							Epoch: 456,
+							Root:  bytesutil.PadTo([]byte("root2"), 32),
+						},
 					},
-					Target: &zondpbalpha.Checkpoint{
-						Epoch: 456,
-						Root:  bytesutil.PadTo([]byte("root2"), 32),
-					},
+					Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), 4595)},
 				},
-				Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), 4595)},
-			},
-		}
-		sb, err := blocks.NewSignedBeaconBlock(b)
-		require.NoError(t, err)
-		mockBlockFetcher := &testutil.MockBlocker{BlockToReturn: sb}
-		mockChainService := &mock.ChainService{
-			FinalizedRoots: map[[32]byte]bool{},
-		}
-		bs := &Server{
-			OptimisticModeFetcher: mockChainService,
-			FinalizationFetcher:   mockChainService,
-			Blocker:               mockBlockFetcher,
-		}
+			}
+			sb, err := blocks.NewSignedBeaconBlock(b)
+			require.NoError(t, err)
+			mockBlockFetcher := &testutil.MockBlocker{BlockToReturn: sb}
+			mockChainService := &mock.ChainService{
+				FinalizedRoots: map[[32]byte]bool{},
+			}
+			bs := &Server{
+				OptimisticModeFetcher: mockChainService,
+				FinalizationFetcher:   mockChainService,
+				Blocker:               mockBlockFetcher,
+			}
 
-		resp, err := bs.ListBlockAttestations(ctx, &zondpbv1.BlockRequest{})
-		require.NoError(t, err)
+			resp, err := bs.ListBlockAttestations(ctx, &zondpbv1.BlockRequest{})
+			require.NoError(t, err)
 
-		v1Block, err := migration.V1Alpha1ToV1Block(b.Block)
-		require.NoError(t, err)
-		assert.DeepEqual(t, v1Block.Body.Attestations, resp.Data)
-	})
+			v1Block, err := migration.V1Alpha1ToV1Block(b.Block)
+			require.NoError(t, err)
+			assert.DeepEqual(t, v1Block.Body.Attestations, resp.Data)
+		})
+	*/
 	t.Run("Capella", func(t *testing.T) {
 		b := util.NewBeaconBlock()
 		b.Block.Body.Attestations = []*zondpbalpha.Attestation{

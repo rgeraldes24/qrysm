@@ -139,16 +139,16 @@ func (wsd *WeakSubjectivityData) CheckpointString() string {
 	return fmt.Sprintf("%#x:%d", wsd.BlockRoot, wsd.Epoch)
 }
 
-// ComputeWeakSubjectivityCheckpoint attempts to use the prysm weak_subjectivity api
+// ComputeWeakSubjectivityCheckpoint attempts to use the qrysm weak_subjectivity api
 // to obtain the current weak_subjectivity checkpoint.
-// For non-prysm nodes, the same computation will be performed with extra steps,
+// For non-qrysm nodes, the same computation will be performed with extra steps,
 // using the head state downloaded from the beacon node api.
 func ComputeWeakSubjectivityCheckpoint(ctx context.Context, client *Client) (*WeakSubjectivityData, error) {
 	ws, err := client.GetWeakSubjectivity(ctx)
 	if err != nil {
 		// a 404/405 is expected if querying an endpoint that doesn't support the weak subjectivity checkpoint api
 		if !errors.Is(err, base.ErrNotOK) {
-			return nil, errors.Wrap(err, "unexpected API response for prysm-only weak subjectivity checkpoint API")
+			return nil, errors.Wrap(err, "unexpected API response for qrysm-only weak subjectivity checkpoint API")
 		}
 		// fall back to vanilla Beacon Node API method
 		return computeBackwardsCompatible(ctx, client)
@@ -244,7 +244,7 @@ func computeBackwardsCompatible(ctx context.Context, client *Client) (*WeakSubje
 }
 
 // this method downloads the head state, which can be used to find the correct chain config
-// and use prysm's helper methods to compute the latest weak subjectivity epoch.
+// and use qrysm's helper methods to compute the latest weak subjectivity epoch.
 func getWeakSubjectivityEpochFromHead(ctx context.Context, client *Client) (primitives.Epoch, error) {
 	headBytes, err := client.GetState(ctx, IdHead)
 	if err != nil {

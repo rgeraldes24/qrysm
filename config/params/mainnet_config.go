@@ -162,7 +162,6 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 
 	// Qrysm constants.
 	GweiPerEth:                1000000000,
-	BLSSecretKeyLength:        32,
 	DilithiumPubkeyLength:     2592,
 	DefaultBufferSize:         10000,
 	WithdrawalPrivkeyFileName: "/shardwithdrawalkey",
