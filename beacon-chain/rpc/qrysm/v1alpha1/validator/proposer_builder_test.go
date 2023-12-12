@@ -152,7 +152,7 @@ func createState(
 	finalized *zondpb.Checkpoint,
 ) (state.BeaconState, [32]byte, error) {
 
-	base := &zondpb.BeaconStateBellatrix{
+	base := &zondpb.BeaconState{
 		Slot:                       slot,
 		RandaoMixes:                make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		BlockRoots:                 make([][]byte, 1),
@@ -167,6 +167,6 @@ func createState(
 	}
 
 	base.BlockRoots[0] = append(base.BlockRoots[0], blockRoot[:]...)
-	st, err := state_native.InitializeFromProtoBellatrix(base)
+	st, err := state_native.InitializeFromProtoCapella(base)
 	return st, blockRoot, err
 }

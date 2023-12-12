@@ -12,7 +12,6 @@ import (
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/proto/migration"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
@@ -204,7 +203,7 @@ func TestServer_SubmitBlindedBlockSSZ(t *testing.T) {
 		}
 
 		b := util.NewBlindedBeaconBlock()
-		b.Block.Slot = params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().CapellaForkEpoch))
+		b.Block.Slot = 10 //params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().CapellaForkEpoch))
 		ssz, err := b.MarshalSSZ()
 		require.NoError(t, err)
 		blockReq := &zondpbv1.SSZContainer{
@@ -222,7 +221,7 @@ func TestServer_SubmitBlindedBlockSSZ(t *testing.T) {
 		}
 
 		b := util.NewBeaconBlock()
-		b.Block.Slot = params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().CapellaForkEpoch))
+		b.Block.Slot = 10 //params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().CapellaForkEpoch))
 		ssz, err := b.MarshalSSZ()
 		require.NoError(t, err)
 		blockReq := &zondpbv1.SSZContainer{

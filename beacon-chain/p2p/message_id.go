@@ -48,24 +48,7 @@ func MsgID(genesisValidatorsRoot []byte, pmsg *pubsubpb.Message) string {
 		return string(msg)
 	}
 
-	/*
-		if fEpoch >= params.BeaconConfig().AltairForkEpoch {
-			return postAltairMsgID(pmsg, fEpoch)
-		}
-	*/
 	return postAltairMsgID(pmsg, fEpoch)
-
-	/*
-		decodedData, err := encoder.DecodeSnappy(pmsg.Data, params.BeaconNetworkConfig().GossipMaxSize)
-		if err != nil {
-			combinedData := append(params.BeaconNetworkConfig().MessageDomainInvalidSnappy[:], pmsg.Data...)
-			h := hash.Hash(combinedData)
-			return string(h[:20])
-		}
-		combinedData := append(params.BeaconNetworkConfig().MessageDomainValidSnappy[:], decodedData...)
-		h := hash.Hash(combinedData)
-		return string(h[:20])
-	*/
 }
 
 // Spec:

@@ -193,13 +193,13 @@ func wrapSyncCommitteeSignaturesArray(
 }
 
 type capellaPublishBlockRequestJson struct {
-	CapellaBlock *BeaconBlockJson `json:"capella_block"`
-	Signature    string           `json:"signature" hex:"true"`
+	CapellaBlock *BeaconBlockCapellaJson `json:"capella_block"`
+	Signature    string                  `json:"signature" hex:"true"`
 }
 
 type capellaPublishBlindedBlockRequestJson struct {
-	CapellaBlock *BlindedBeaconBlockJson `json:"capella_block"`
-	Signature    string                  `json:"signature" hex:"true"`
+	CapellaBlock *BlindedBeaconBlockCapellaJson `json:"capella_block"`
+	Signature    string                         `json:"signature" hex:"true"`
 }
 
 // setInitialPublishBlockPostRequest is triggered before we deserialize the request JSON into a struct.
@@ -224,10 +224,8 @@ func setInitialPublishBlockPostRequest(endpoint *apimiddleware.Endpoint,
 	if err := json.Unmarshal(buf, &s); err != nil {
 		return false, apimiddleware.InternalServerErrorWithMessage(err, "could not read slot from body")
 	}
-
 	endpoint.PostRequest = &SignedBeaconBlockCapellaContainerJson{}
 	req.Body = io.NopCloser(bytes.NewBuffer(buf))
-
 	return true, nil
 }
 
@@ -270,7 +268,6 @@ func setInitialPublishBlindedBlockPostRequest(endpoint *apimiddleware.Endpoint,
 	if err := json.Unmarshal(buf, &s); err != nil {
 		return false, apimiddleware.InternalServerErrorWithMessage(err, "could not read slot from body")
 	}
-
 	endpoint.PostRequest = &SignedBlindedBeaconBlockCapellaContainerJson{}
 	req.Body = io.NopCloser(bytes.NewBuffer(buf))
 	return true, nil
@@ -403,8 +400,8 @@ func serializeBlindedBlock(response interface{}) (apimiddleware.RunDefault, []by
 }
 
 type capellaStateResponseJson struct {
-	Version string           `json:"version" enum:"true"`
-	Data    *BeaconStateJson `json:"data"`
+	Version string                  `json:"version" enum:"true"`
+	Data    *BeaconStateCapellaJson `json:"data"`
 }
 
 func serializeState(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
@@ -432,13 +429,13 @@ func serializeState(response interface{}) (apimiddleware.RunDefault, []byte, api
 }
 
 type capellaProduceBlockResponseJson struct {
-	Version string           `json:"version" enum:"true"`
-	Data    *BeaconBlockJson `json:"data"`
+	Version string                  `json:"version" enum:"true"`
+	Data    *BeaconBlockCapellaJson `json:"data"`
 }
 
 type capellaProduceBlindedBlockResponseJson struct {
-	Version string                  `json:"version" enum:"true"`
-	Data    *BlindedBeaconBlockJson `json:"data"`
+	Version string                         `json:"version" enum:"true"`
+	Data    *BlindedBeaconBlockCapellaJson `json:"data"`
 }
 
 func serializeProducedBlock(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {

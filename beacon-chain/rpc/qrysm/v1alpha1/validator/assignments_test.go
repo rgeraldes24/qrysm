@@ -19,6 +19,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -39,7 +40,7 @@ func TestGetDuties_OK(t *testing.T) {
 	require.NoError(t, err)
 	zond1Data, err := util.DeterministicZond1Data(len(deposits))
 	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
+	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data, &enginev1.ExecutionPayload{})
 	require.NoError(t, err, "Could not setup genesis bs")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
@@ -370,7 +371,7 @@ func TestGetDuties_CurrentEpoch_ShouldNotFail(t *testing.T) {
 	require.NoError(t, err)
 	zond1Data, err := util.DeterministicZond1Data(len(deposits))
 	require.NoError(t, err)
-	bState, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
+	bState, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data, &enginev1.ExecutionPayload{})
 	require.NoError(t, err, "Could not setup genesis state")
 	// Set state to non-epoch start slot.
 	require.NoError(t, bState.SetSlot(5))
@@ -412,7 +413,7 @@ func TestGetDuties_MultipleKeys_OK(t *testing.T) {
 	require.NoError(t, err)
 	zond1Data, err := util.DeterministicZond1Data(len(deposits))
 	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
+	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data, &enginev1.ExecutionPayload{})
 	require.NoError(t, err, "Could not setup genesis bs")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
@@ -501,7 +502,7 @@ func BenchmarkCommitteeAssignment(b *testing.B) {
 	require.NoError(b, err)
 	zond1Data, err := util.DeterministicZond1Data(len(deposits))
 	require.NoError(b, err)
-	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
+	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data, &enginev1.ExecutionPayload{})
 	require.NoError(b, err, "Could not setup genesis bs")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(b, err, "Could not get signing root")

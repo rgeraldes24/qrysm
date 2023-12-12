@@ -277,6 +277,20 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) ProposeExit(arg0, arg1 inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProposeExit", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).ProposeExit), arg0, arg1)
 }
 
+// StreamBlocksAltair mocks base method.
+func (m *MockBeaconNodeValidatorServer) StreamBlocksAltair(arg0 *zond.StreamBlocksRequest, arg1 zond.BeaconNodeValidator_StreamBlocksAltairServer) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StreamBlocksAltair", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// StreamBlocksAltair indicates an expected call of StreamBlocksAltair.
+func (mr *MockBeaconNodeValidatorServerMockRecorder) StreamBlocksAltair(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamBlocksAltair", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).StreamBlocksAltair), arg0, arg1)
+}
+
 // SubmitAggregateSelectionProof mocks base method.
 func (m *MockBeaconNodeValidatorServer) SubmitAggregateSelectionProof(arg0 context.Context, arg1 *zond.AggregateSelectionRequest) (*zond.AggregateSelectionResponse, error) {
 	m.ctrl.T.Helper()
@@ -409,6 +423,20 @@ func (m *MockBeaconNodeValidatorServer) WaitForActivation(arg0 *zond.ValidatorAc
 func (mr *MockBeaconNodeValidatorServerMockRecorder) WaitForActivation(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForActivation", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).WaitForActivation), arg0, arg1)
+}
+
+// WaitForChainStart mocks base method.
+func (m *MockBeaconNodeValidatorServer) WaitForChainStart(arg0 *emptypb.Empty, arg1 zond.BeaconNodeValidator_WaitForChainStartServer) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WaitForChainStart", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// WaitForChainStart indicates an expected call of WaitForChainStart.
+func (mr *MockBeaconNodeValidatorServerMockRecorder) WaitForChainStart(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForChainStart", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).WaitForChainStart), arg0, arg1)
 }
 
 // MockBeaconNodeValidator_WaitForActivationServer is a mock of BeaconNodeValidator_WaitForActivationServer interface.

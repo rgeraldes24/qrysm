@@ -29,7 +29,7 @@ func DeterministicGenesisState(t testing.TB, numValidators uint64) (state.Beacon
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get zond1data for %d deposits", numValidators))
 	}
-	beaconState, err := genesisBeaconState(context.Background(), deposits, uint64(0), zond1Data)
+	beaconState, err := GenesisBeaconState(context.Background(), deposits, uint64(0), zond1Data)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get genesis beacon state of %d validators", numValidators))
 	}
@@ -38,7 +38,7 @@ func DeterministicGenesisState(t testing.TB, numValidators uint64) (state.Beacon
 }
 
 // genesisBeaconState returns the genesis beacon state.
-func genesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, zond1Data *zondpb.Zond1Data) (state.BeaconState, error) {
+func GenesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, zond1Data *zondpb.Zond1Data) (state.BeaconState, error) {
 	st, err := emptyGenesisState()
 	if err != nil {
 		return nil, err

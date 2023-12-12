@@ -95,13 +95,16 @@ func (s *Service) deregisterFromPastFork(currEpoch primitives.Epoch) error {
 		if !s.subHandler.digestExists(prevDigest) {
 			return nil
 		}
-		prevFork, err := forks.Fork(epochBeforeFork)
-		if err != nil {
-			return errors.Wrap(err, "failed to determine previous epoch fork data")
-		}
-		if prevFork.Epoch == params.BeaconConfig().GenesisEpoch {
-			s.unregisterPhase0Handlers()
-		}
+
+		// TODO(rgeraldes24) - remove
+		// prevFork, err := forks.Fork(epochBeforeFork)
+		// if err != nil {
+		// 	return errors.Wrap(err, "failed to determine previous epoch fork data")
+		// }
+		// if prevFork.Epoch == params.BeaconConfig().GenesisEpoch {
+		// 	s.unregisterPhase0Handlers()
+		// }
+
 		// Run through all our current active topics and see
 		// if there are any subscriptions to be removed.
 		for _, t := range s.subHandler.allTopics() {

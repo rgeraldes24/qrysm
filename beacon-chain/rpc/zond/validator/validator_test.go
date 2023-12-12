@@ -26,6 +26,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -44,7 +45,7 @@ func TestGetAttesterDuties(t *testing.T) {
 	require.NoError(t, err)
 	zond1Data, err := util.DeterministicZond1Data(len(deposits))
 	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
+	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data, &enginev1.ExecutionPayload{})
 	require.NoError(t, err, "Could not set up genesis state")
 	// Set state to non-epoch start slot.
 	require.NoError(t, bs.SetSlot(5))
@@ -231,7 +232,7 @@ func TestGetProposerDuties(t *testing.T) {
 	}
 
 	t.Run("Ok", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
+		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data, &enginev1.ExecutionPayload{})
 		require.NoError(t, err, "Could not set up genesis state")
 		require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 		require.NoError(t, bs.SetBlockRoots(roots))
@@ -271,7 +272,7 @@ func TestGetProposerDuties(t *testing.T) {
 	})
 
 	t.Run("Next epoch", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
+		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data, &enginev1.ExecutionPayload{})
 		require.NoError(t, err, "Could not set up genesis state")
 		require.NoError(t, bs.SetBlockRoots(roots))
 		chainSlot := primitives.Slot(0)
@@ -310,7 +311,7 @@ func TestGetProposerDuties(t *testing.T) {
 	})
 
 	t.Run("Prune payload ID cache ok", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
+		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data, &enginev1.ExecutionPayload{})
 		require.NoError(t, err, "Could not set up genesis state")
 		require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 		require.NoError(t, bs.SetBlockRoots(roots))
@@ -349,7 +350,7 @@ func TestGetProposerDuties(t *testing.T) {
 	})
 
 	t.Run("Epoch out of bound", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
+		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data, &enginev1.ExecutionPayload{})
 		require.NoError(t, err, "Could not set up genesis state")
 		// Set state to non-epoch start slot.
 		require.NoError(t, bs.SetSlot(5))
@@ -377,7 +378,7 @@ func TestGetProposerDuties(t *testing.T) {
 	})
 
 	t.Run("execution optimistic", func(t *testing.T) {
-		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
+		bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data, &enginev1.ExecutionPayload{})
 		require.NoError(t, err, "Could not set up genesis state")
 		// Set state to non-epoch start slot.
 		require.NoError(t, bs.SetSlot(5))
@@ -693,7 +694,7 @@ func TestProduceBlock(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("Capella", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlockCapella{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlock{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -772,7 +773,7 @@ func TestProduceBlockSSZ(t *testing.T) {
 		assert.DeepEqual(t, expectedData, resp.Data)
 	})
 	t.Run("Capella blinded", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlockCapella{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlock{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -816,7 +817,7 @@ func TestProduceBlindedBlock(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("Capella", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlockCapella{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlock{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -921,7 +922,7 @@ func TestProduceBlindedBlockSSZ(t *testing.T) {
 		assert.ErrorContains(t, "Prepared Capella beacon block is not blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedBellatrix{BlindedBellatrix: &zondpbalpha.BlindedBeaconBlockBellatrix{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlock{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -1039,7 +1040,7 @@ func TestSubmitBeaconCommitteeSubscription(t *testing.T) {
 	require.NoError(t, err)
 	zond1Data, err := util.DeterministicZond1Data(len(deposits))
 	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
+	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, zond1Data, &enginev1.ExecutionPayload{})
 	require.NoError(t, err, "Could not set up genesis state")
 	// Set state to non-epoch start slot.
 	require.NoError(t, bs.SetSlot(5))
@@ -1372,7 +1373,7 @@ func TestProduceSyncCommitteeContribution(t *testing.T) {
 	assert.DeepEqual(t, root, resp.Data.BeaconBlockRoot)
 	aggregationBits := resp.Data.ParticipationBits
 	assert.Equal(t, true, aggregationBits.BitAt(0))
-	assert.DeepEqual(t, sig, resp.Data.Signature)
+	assert.DeepEqual(t, sig, resp.Data.Signatures)
 
 	syncCommitteePool = synccommittee.NewStore()
 	v1Server = &v1alpha1validator.Server{
@@ -1664,7 +1665,7 @@ func TestGetLiveness(t *testing.T) {
 		require.ErrorContains(t, "Requested epoch cannot be in the future", err)
 	})
 	t.Run("unknown validator index", func(t *testing.T) {
-		_, err := server.GetLiveness(ctx, &zondpbv.GetLivenessRequest{
+		_, err := server.GetLiveness(ctx, &zondpbv1.GetLivenessRequest{
 			Epoch: 0,
 			Index: []primitives.ValidatorIndex{0, 1, 2},
 		})

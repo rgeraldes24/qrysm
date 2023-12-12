@@ -43,8 +43,8 @@ func TestServer_setExecutionData(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
 	beaconDB := dbTest.SetupDB(t)
-	capellaTransitionState, _ := util.DeterministicGenesisStateCapella(t, 1)
-	wrappedHeaderCapella, err := blocks.WrappedExecutionPayloadHeaderCapella(&v1.ExecutionPayloadHeaderCapella{BlockNumber: 1}, 0)
+	capellaTransitionState, _ := util.DeterministicGenesisState(t, 1)
+	wrappedHeaderCapella, err := blocks.WrappedExecutionPayloadHeader(&v1.ExecutionPayloadHeader{BlockNumber: 1}, 0)
 	require.NoError(t, err)
 	require.NoError(t, capellaTransitionState.SetLatestExecutionPayloadHeader(wrappedHeaderCapella))
 	b2pbCapella := util.NewBeaconBlock()
@@ -64,7 +64,7 @@ func TestServer_setExecutionData(t *testing.T) {
 	}}
 	id := &v1.PayloadIDBytes{0x1}
 	vs := &Server{
-		ExecutionEngineCaller:  &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 1, Withdrawals: withdrawals}, BlockValue: 0},
+		ExecutionEngineCaller:  &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayload: &v1.ExecutionPayload{BlockNumber: 1, Withdrawals: withdrawals}, BlockValue: 0},
 		HeadFetcher:            &blockchainTest.ChainService{State: capellaTransitionState},
 		FinalizationFetcher:    &blockchainTest.ChainService{},
 		BeaconDB:               beaconDB,
@@ -95,8 +95,8 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		sk, err := dilithium.RandKey()
 		require.NoError(t, err)
-		bid := &zondpb.BuilderBidCapella{
-			Header: &v1.ExecutionPayloadHeaderCapella{
+		bid := &zondpb.BuilderBid{
+			Header: &v1.ExecutionPayloadHeader{
 				FeeRecipient:     make([]byte, fieldparams.FeeRecipientLength),
 				StateRoot:        make([]byte, fieldparams.RootLength),
 				ReceiptsRoot:     make([]byte, fieldparams.RootLength),
@@ -118,16 +118,16 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		sr, err := signing.ComputeSigningRoot(bid, domain)
 		require.NoError(t, err)
-		sBid := &zondpb.SignedBuilderBidCapella{
+		sBid := &zondpb.SignedBuilderBid{
 			Message:   bid,
 			Signature: sk.Sign(sr[:]).Marshal(),
 		}
 		vs.BlockBuilder = &builderTest.MockBuilderService{
-			BidCapella:    sBid,
+			Bid:           sBid,
 			HasConfigured: true,
 			Cfg:           &builderTest.Config{BeaconDB: beaconDB},
 		}
-		wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockBellatrix())
+		wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
 		require.NoError(t, err)
 		chain := &blockchainTest.ChainService{ForkChoiceStore: doublylinkedtree.New(), Genesis: time.Now(), Block: wb}
 		vs.ForkchoiceFetcher = chain
@@ -146,7 +146,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.Equal(t, uint64(1), e.BlockNumber()) // Local block because incorrect withdrawals
 	})
 	t.Run("Builder configured. Builder Block has higher value. Correct withdrawals.", func(t *testing.T) {
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBlindedBeaconBlockCapella())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBlindedBeaconBlock())
 		require.NoError(t, err)
 		require.NoError(t, vs.BeaconDB.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{blk.Block().ProposerIndex()},
 			[]*zondpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, dilithium2.CryptoPublicKeyBytes)}}))
@@ -157,8 +157,8 @@ func TestServer_setExecutionData(t *testing.T) {
 		wr, err := ssz.WithdrawalSliceRoot(withdrawals, fieldparams.MaxWithdrawalsPerPayload)
 		require.NoError(t, err)
 		builderValue := bytesutil.ReverseByteOrder(big.NewInt(1e9).Bytes())
-		bid := &zondpb.BuilderBidCapella{
-			Header: &v1.ExecutionPayloadHeaderCapella{
+		bid := &zondpb.BuilderBid{
+			Header: &v1.ExecutionPayloadHeader{
 				FeeRecipient:     make([]byte, fieldparams.FeeRecipientLength),
 				StateRoot:        make([]byte, fieldparams.RootLength),
 				ReceiptsRoot:     make([]byte, fieldparams.RootLength),
@@ -180,12 +180,12 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		sr, err := signing.ComputeSigningRoot(bid, domain)
 		require.NoError(t, err)
-		sBid := &zondpb.SignedBuilderBidCapella{
+		sBid := &zondpb.SignedBuilderBid{
 			Message:   bid,
 			Signature: sk.Sign(sr[:]).Marshal(),
 		}
 		vs.BlockBuilder = &builderTest.MockBuilderService{
-			BidCapella:    sBid,
+			Bid:           sBid,
 			HasConfigured: true,
 			Cfg:           &builderTest.Config{BeaconDB: beaconDB},
 		}
@@ -210,7 +210,7 @@ func TestServer_setExecutionData(t *testing.T) {
 	t.Run("Builder configured. Local block has higher value", func(t *testing.T) {
 		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
 		require.NoError(t, err)
-		vs.ExecutionEngineCaller = &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 2}
+		vs.ExecutionEngineCaller = &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayload: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 2}
 		b := blk.Block()
 		localPayload, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
 		require.NoError(t, err)
@@ -349,21 +349,22 @@ func TestServer_getPayloadHeader(t *testing.T) {
 		mock                  *builderTest.MockBuilderService
 		fetcher               *blockchainTest.ChainService
 		err                   string
-		returnedHeader        *v1.ExecutionPayloadHeader
-		returnedHeaderCapella *v1.ExecutionPayloadHeaderCapella
+		returnedHeaderCapella *v1.ExecutionPayloadHeader
 	}{
-		{
-			name: "can't request before bellatrix epoch",
-			mock: &builderTest.MockBuilderService{},
-			fetcher: &blockchainTest.ChainService{
-				Block: func() interfaces.ReadOnlySignedBeaconBlock {
-					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
-					require.NoError(t, err)
-					return wb
-				}(),
+		/*
+			{
+				name: "can't request before bellatrix epoch",
+				mock: &builderTest.MockBuilderService{},
+				fetcher: &blockchainTest.ChainService{
+					Block: func() interfaces.ReadOnlySignedBeaconBlock {
+						wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+						require.NoError(t, err)
+						return wb
+					}(),
+				},
+				err: "can't get payload header from builder before bellatrix epoch",
 			},
-			err: "can't get payload header from builder before bellatrix epoch",
-		},
+		*/
 		{
 			name: "get header failed",
 			mock: &builderTest.MockBuilderService{

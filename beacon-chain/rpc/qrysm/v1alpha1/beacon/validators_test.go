@@ -1840,7 +1840,8 @@ func TestGetValidatorPerformance_OK(t *testing.T) {
 	}
 
 	res, err := bs.GetValidatorPerformance(ctx, &zondpb.ValidatorPerformanceRequest{
-		PublicKeys: [][]byte{publicKey1[:], publicKey3[:], publicKey2[:]},
+		// TODO(rgeraldes24)
+		//PublicKeys: [][]byte{publicKey1[:], publicKey3[:], publicKey2[:]},
 	})
 	require.NoError(t, err)
 	if !proto.Equal(want, res) {
@@ -2347,7 +2348,7 @@ func TestServer_GetIndividualVotes_CapellaEndOfEpoch(t *testing.T) {
 	ctx := context.Background()
 
 	validators := uint64(32)
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, validators)
+	beaconState, _ := util.DeterministicGenesisState(t, validators)
 	startSlot, err := slots.EpochStart(1)
 	assert.NoError(t, err)
 	require.NoError(t, beaconState.SetSlot(startSlot))

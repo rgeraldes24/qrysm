@@ -438,31 +438,33 @@ func TestProcessHistoricalDataUpdate(t *testing.T) {
 				require.Equal(t, 0, len(roots))
 			},
 		},
-		{
-			name: "before capella can process and get historical root",
-			st: func() state.BeaconState {
-				st, _ := util.DeterministicGenesisState(t, 1)
-				st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerHistoricalRoot-1)
-				require.NoError(t, err)
-				return st
-			},
-			verifier: func(st state.BeaconState) {
-				roots, err := st.HistoricalRoots()
-				require.NoError(t, err)
-				require.Equal(t, 1, len(roots))
+		/*
+			{
+				name: "before capella can process and get historical root",
+				st: func() state.BeaconState {
+					st, _ := util.DeterministicGenesisState(t, 1)
+					st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerHistoricalRoot-1)
+					require.NoError(t, err)
+					return st
+				},
+				verifier: func(st state.BeaconState) {
+					roots, err := st.HistoricalRoots()
+					require.NoError(t, err)
+					require.Equal(t, 1, len(roots))
 
-				b := &zondpb.HistoricalBatch{
-					BlockRoots: st.BlockRoots(),
-					StateRoots: st.StateRoots(),
-				}
-				r, err := b.HashTreeRoot()
-				require.NoError(t, err)
-				require.DeepEqual(t, r[:], roots[0])
+					b := &zondpb.HistoricalBatch{
+						BlockRoots: st.BlockRoots(),
+						StateRoots: st.StateRoots(),
+					}
+					r, err := b.HashTreeRoot()
+					require.NoError(t, err)
+					require.DeepEqual(t, r[:], roots[0])
 
-				_, err = st.HistoricalSummaries()
-				require.ErrorContains(t, "HistoricalSummaries is not supported for phase0", err)
+					_, err = st.HistoricalSummaries()
+					require.ErrorContains(t, "HistoricalSummaries is not supported for phase0", err)
+				},
 			},
-		},
+		*/
 		{
 			name: "after capella can process and get historical summary",
 			st: func() state.BeaconState {

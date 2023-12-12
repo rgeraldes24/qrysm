@@ -438,7 +438,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 		require.NoError(t, err)
 		sig, err := dilithium.SignatureFromBytes(sb)
 		require.NoError(t, err)
-		att.Signature = sig.Marshal()
+		att.Signatures = [][]byte{sig.Marshal()}
 	}
 
 	broadcaster := &p2pMock.MockBroadcaster{}
@@ -459,6 +459,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 	assert.Equal(t, true, ok)
 }
 
+// TODO (rgeraldes24) double check
 func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 	ctx := context.Background()
 
@@ -466,9 +467,9 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 	defer transition.SkipSlotCache.Enable()
 
 	params.SetupTestConfigCleanup(t)
-	config := params.BeaconConfig()
-	config.AltairForkEpoch = 1
-	params.OverrideBeaconConfig(config)
+	// config := params.BeaconConfig()
+	// config.AltairForkEpoch = 1
+	// params.OverrideBeaconConfig(config)
 
 	bs, keys := util.DeterministicGenesisState(t, 1)
 
@@ -518,7 +519,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 		require.NoError(t, err)
 		sig, err := dilithium.SignatureFromBytes(sb)
 		require.NoError(t, err)
-		att.Signature = sig.Marshal()
+		att.Signatures = [][]byte{sig.Marshal()}
 	}
 
 	broadcaster := &p2pMock.MockBroadcaster{}
@@ -1012,7 +1013,7 @@ func TestServer_SubmitAttestations_Ok(t *testing.T) {
 		require.NoError(t, err)
 		sig, err := dilithium.SignatureFromBytes(sb)
 		require.NoError(t, err)
-		att.Signature = sig.Marshal()
+		att.Signatures = [][]byte{sig.Marshal()}
 	}
 
 	broadcaster := &p2pMock.MockBroadcaster{}
@@ -1124,7 +1125,7 @@ func TestServer_SubmitAttestations_ValidAttestationSubmitted(t *testing.T) {
 	require.NoError(t, err)
 	sig, err := dilithium.SignatureFromBytes(sb)
 	require.NoError(t, err)
-	attValid.Signature = sig.Marshal()
+	attValid.Signatures = [][]byte{sig.Marshal()}
 
 	broadcaster := &p2pMock.MockBroadcaster{}
 	chainService := &blockchainmock.ChainService{State: bs}
@@ -1305,8 +1306,9 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 		dilithiumChanges[i] = message
 	}
 	spb.Validators = validators
-	slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
+	//slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
+	slot := primitives.Slot(0)
+	//require.NoError(t, err)
 	spb.Slot = slot
 	st, err := state_native.InitializeFromProtoCapella(spb)
 	require.NoError(t, err)
@@ -1351,6 +1353,8 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 	}
 }
 
+// TODO(rgeraldes) review if necessary
+/*
 func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 	ctx := context.Background()
 
@@ -1461,6 +1465,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 		require.DeepEqual(t, v1Change, signedChanges[i])
 	}
 }
+*/
 
 func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 	ctx := context.Background()
@@ -1470,11 +1475,11 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 
 	params.SetupTestConfigCleanup(t)
 
-	spb := &zondpbv1alpha1.BeaconStateCapella{
+	spb := &zondpbv1alpha1.BeaconState{
 		Fork: &zondpbv1alpha1.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
-			Epoch:           params.BeaconConfig().CapellaForkEpoch,
+			//Epoch:           params.BeaconConfig().CapellaForkEpoch,
 		},
 	}
 	numValidators := 10
@@ -1509,8 +1514,9 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 		dilithiumChanges[i] = message
 	}
 	spb.Validators = validators
-	slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
+	//slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
+	//require.NoError(t, err)
+	slot := primitives.Slot(0)
 	spb.Slot = slot
 	st, err := state_native.InitializeFromProtoCapella(spb)
 	require.NoError(t, err)

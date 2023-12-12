@@ -32,7 +32,7 @@ import (
 )
 
 func Test_currentCommitteeIndicesFromState(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().SyncCommitteeSize)
+	st, _ := util.DeterministicGenesisState(t, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
 	wantedCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	wantedIndices := make([]primitives.ValidatorIndex, len(wantedCommittee))

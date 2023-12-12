@@ -56,14 +56,16 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 			state:        st,
 			errorMessage: "invalid proposal slot value",
 		},
-		{
-			name: "proposal slot < Capella start slot",
-			path: "/zond/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot=" +
-				strconv.FormatUint(uint64(capellaSlot)-1, 10),
-			urlParams:    map[string]string{"state_id": "head"},
-			state:        st,
-			errorMessage: "expected withdrawals are not supported before Capella fork",
-		},
+		/*
+			{
+				name: "proposal slot < Capella start slot",
+				path: "/zond/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot=" +
+					strconv.FormatUint(uint64(capellaSlot)-1, 10),
+				urlParams:    map[string]string{"state_id": "head"},
+				state:        st,
+				errorMessage: "expected withdrawals are not supported before Capella fork",
+			},
+		*/
 		{
 			name: "proposal slot == Capella start slot",
 			path: "/zond/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot=" +
