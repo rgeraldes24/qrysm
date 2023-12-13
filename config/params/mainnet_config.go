@@ -79,8 +79,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 
 	// Initial value constants.
 	DilithiumWithdrawalPrefixByte:    byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
-	ZOND1AddressWithdrawalPrefixByte: byte(1),
-	ZondAddressWithdrawalPrefixByte:  byte(1), // TODO (cyyber): Change it to 0
+	ZOND1AddressWithdrawalPrefixByte: byte(1), // TODO (cyyber): Change it to 0
 	ZeroHash:                         [32]byte{},
 
 	// Time parameter constants.

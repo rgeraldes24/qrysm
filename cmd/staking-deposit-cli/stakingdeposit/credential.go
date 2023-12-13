@@ -50,7 +50,7 @@ func (c *Credential) WithdrawalPK() []byte {
 func (c *Credential) WithdrawalPrefix() uint8 {
 	withdrawalAddress := c.ZondWithdrawalAddress()
 	if reflect.DeepEqual(withdrawalAddress, common.Address{}) {
-		return params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+		return params.BeaconConfig().ZOND1AddressWithdrawalPrefixByte
 	}
 	return params.BeaconConfig().DilithiumWithdrawalPrefixByte
 }
@@ -68,12 +68,12 @@ func (c *Credential) WithdrawalCredentials() [32]byte {
 		withdrawalCredentials[0] = params.BeaconConfig().DilithiumWithdrawalPrefixByte
 		h := hash.Hash(c.WithdrawalPK())
 		copy(withdrawalCredentials[1:], h[1:])
-	case params.BeaconConfig().ZondAddressWithdrawalPrefixByte:
+	case params.BeaconConfig().ZOND1AddressWithdrawalPrefixByte:
 		zondWithdrawalAddress := c.ZondWithdrawalAddress()
 		if reflect.DeepEqual(zondWithdrawalAddress, common.Address{}) {
 			panic(fmt.Errorf("empty zond withdrawal address"))
 		}
-		withdrawalCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+		withdrawalCredentials[0] = params.BeaconConfig().ZOND1AddressWithdrawalPrefixByte
 		// 1 byte reserved for withdrawal prefix
 		if common.AddressLength > len(withdrawalCredentials)-1 {
 			panic(fmt.Errorf("address length %d is more than remaining length in withdrawal credentials %d",

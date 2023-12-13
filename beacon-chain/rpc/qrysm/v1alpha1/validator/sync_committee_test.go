@@ -60,7 +60,7 @@ func TestGetSyncMessageBlockRoot_Optimistic(t *testing.T) {
 }
 
 func TestSubmitSyncMessage_OK(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, 10)
+	st, _ := util.DeterministicGenesisState(t, 10)
 	server := &Server{
 		SyncCommitteePool: synccommittee.NewStore(),
 		P2P:               &mockp2p.MockBroadcaster{},
@@ -98,7 +98,7 @@ func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 }
 
 func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, 10)
+	st, _ := util.DeterministicGenesisState(t, 10)
 	server := &Server{
 		SyncCommitteePool: synccommittee.NewStore(),
 		P2P:               &mockp2p.MockBroadcaster{},
@@ -130,7 +130,7 @@ func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 			PublicKey: val.PublicKey,
 			SubnetId:  1})
 	require.NoError(t, err)
-	assert.DeepEqual(t, sig, contr.Signature)
+	assert.DeepEqual(t, sig, contr.Signatures)
 }
 
 func TestSubmitSignedContributionAndProof_OK(t *testing.T) {

@@ -49,7 +49,8 @@ var appFlags = []cli.Flag{
 	flags.GRPCGatewayPort,
 	flags.GPRCGatewayCorsDomain,
 	flags.MinSyncPeers,
-	flags.ContractDeploymentBlock,
+	// TODO(rgeraldes24) remove
+	//flags.ContractDeploymentBlock,
 	flags.SetGCPercent,
 	flags.BlockBatchLimit,
 	flags.BlockBatchLimitBurstFactor,

@@ -125,12 +125,13 @@ var (
 		Usage: "The required number of valid peers to connect with before syncing.",
 		Value: 3,
 	}
+	// TODO(rgeraldes24) - remove
 	// ContractDeploymentBlock is the block in which the zond1 deposit contract was deployed.
-	ContractDeploymentBlock = &cli.IntFlag{
-		Name:  "contract-deployment-block",
-		Usage: "The zond1 block in which the deposit contract was deployed.",
-		Value: 11184524,
-	}
+	// ContractDeploymentBlock = &cli.IntFlag{
+	// 	Name:  "contract-deployment-block",
+	// 	Usage: "The zond1 block in which the deposit contract was deployed.",
+	// 	Value: 11184524,
+	// }
 	// SetGCPercent is the percentage of current live allocations at which the garbage collector is to run.
 	SetGCPercent = &cli.IntFlag{
 		Name:  "gc-percent",
@@ -220,7 +221,7 @@ var (
 	// SuggestedFeeRecipient specifies the fee recipient for the transaction fees.
 	SuggestedFeeRecipient = &cli.StringFlag{
 		Name:  "suggested-fee-recipient",
-		Usage: "Post bellatrix, this address will receive the transaction fees produced by any blocks from this node. Default to junk whilst bellatrix is in development state. Validator client can override this value through the preparebeaconproposer api.",
+		Usage: "This address receives the transaction fees produced by any blocks from this node. Default to junk whilst bellatrix is in development state. Validator client can override this value through the preparebeaconproposer api.",
 		Value: params.BeaconConfig().ZondBurnAddressHex,
 	}
 	// SlasherDirFlag defines a path on disk where the slasher database is stored.

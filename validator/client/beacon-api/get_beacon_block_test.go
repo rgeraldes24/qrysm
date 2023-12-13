@@ -41,7 +41,7 @@ func TestGetBeaconBlock_RequestFailed(t *testing.T) {
 }
 
 func TestGetBeaconBlock_Error(t *testing.T) {
-	capellaBeaconBlockBytes, err := json.Marshal(apimiddleware.BeaconBlockJson{})
+	capellaBeaconBlockBytes, err := json.Marshal(apimiddleware.BeaconBlockCapellaJson{})
 	require.NoError(t, err)
 
 	testCases := []struct {

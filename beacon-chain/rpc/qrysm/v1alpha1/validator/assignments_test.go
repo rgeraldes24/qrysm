@@ -97,6 +97,7 @@ func TestGetDuties_OK(t *testing.T) {
 	}
 }
 
+/*
 func TestGetAltairDuties_SyncCommitteeOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	//cfg := params.BeaconConfig().Copy()
@@ -198,6 +199,7 @@ func TestGetAltairDuties_SyncCommitteeOK(t *testing.T) {
 		require.NotEqual(t, res.CurrentEpochDuties[i].IsSyncCommittee, res.NextEpochDuties[i].IsSyncCommittee)
 	}
 }
+*/
 
 func TestGetBellatrixDuties_SyncCommitteeOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

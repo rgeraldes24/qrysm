@@ -67,6 +67,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
+
 	t.Run("finalized", func(t *testing.T) {
 		b := util.NewBeaconBlock()
 		blk, err := blocks.NewSignedBeaconBlock(b)
@@ -78,8 +79,9 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 			FinalizedRoots: map[[32]byte]bool{root: true},
 		}
 		bs := &Server{
-			FinalizationFetcher: mockChainService,
-			Blocker:             &testutil.MockBlocker{BlockToReturn: blk},
+			FinalizationFetcher:   mockChainService,
+			Blocker:               &testutil.MockBlocker{BlockToReturn: blk},
+			OptimisticModeFetcher: mockChainService,
 		}
 
 		resp, err := bs.GetBlindedBlock(ctx, &zondpbv1.BlockRequest{BlockId: root[:]})
@@ -97,14 +99,16 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 			FinalizedRoots: map[[32]byte]bool{root: false},
 		}
 		bs := &Server{
-			FinalizationFetcher: mockChainService,
-			Blocker:             &testutil.MockBlocker{BlockToReturn: blk},
+			FinalizationFetcher:   mockChainService,
+			Blocker:               &testutil.MockBlocker{BlockToReturn: blk},
+			OptimisticModeFetcher: mockChainService,
 		}
 
 		resp, err := bs.GetBlindedBlock(ctx, &zondpbv1.BlockRequest{BlockId: root[:]})
 		require.NoError(t, err)
 		assert.Equal(t, false, resp.Finalized)
 	})
+
 }
 
 func TestServer_GetBlindedBlockSSZ(t *testing.T) {
@@ -161,8 +165,9 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 			FinalizedRoots: map[[32]byte]bool{root: true},
 		}
 		bs := &Server{
-			FinalizationFetcher: mockChainService,
-			Blocker:             &testutil.MockBlocker{BlockToReturn: blk},
+			FinalizationFetcher:   mockChainService,
+			Blocker:               &testutil.MockBlocker{BlockToReturn: blk},
+			OptimisticModeFetcher: mockChainService,
 		}
 
 		resp, err := bs.GetBlindedBlockSSZ(ctx, &zondpbv1.BlockRequest{BlockId: root[:]})
@@ -180,8 +185,9 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 			FinalizedRoots: map[[32]byte]bool{root: false},
 		}
 		bs := &Server{
-			FinalizationFetcher: mockChainService,
-			Blocker:             &testutil.MockBlocker{BlockToReturn: blk},
+			FinalizationFetcher:   mockChainService,
+			Blocker:               &testutil.MockBlocker{BlockToReturn: blk},
+			OptimisticModeFetcher: mockChainService,
 		}
 
 		resp, err := bs.GetBlindedBlockSSZ(ctx, &zondpbv1.BlockRequest{BlockId: root[:]})

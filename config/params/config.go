@@ -47,7 +47,6 @@ type BeaconChainConfig struct {
 	// Initial value constants.
 	DilithiumWithdrawalPrefixByte    byte     `yaml:"DILITHIUM_WITHDRAWAL_PREFIX" spec:"true"`     // DilithiumWithdrawalPrefixByte is used for Dilithium withdrawal and it's the first byte.
 	ZOND1AddressWithdrawalPrefixByte byte     `yaml:"ZOND1_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // ZOND1AddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
-	ZondAddressWithdrawalPrefixByte  byte     `yaml:"ZOND_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"`  // ZondAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
 	ZeroHash                         [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
 
 	// Time parameters constants.

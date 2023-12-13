@@ -54,9 +54,10 @@ func TestSubmitAggregateAndProof_CantFindValidatorIndex(t *testing.T) {
 	require.NoError(t, err)
 
 	server := &Server{
-		HeadFetcher: &mock.ChainService{State: s},
-		SyncChecker: &mockSync.Sync{IsSyncing: false},
-		TimeFetcher: &mock.ChainService{Genesis: time.Now()},
+		HeadFetcher:           &mock.ChainService{State: s},
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now()},
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	priv, err := dilithium.RandKey()
@@ -81,10 +82,11 @@ func TestSubmitAggregateAndProof_IsAggregatorAndNoAtts(t *testing.T) {
 	require.NoError(t, err)
 
 	server := &Server{
-		HeadFetcher: &mock.ChainService{State: s},
-		SyncChecker: &mockSync.Sync{IsSyncing: false},
-		AttPool:     attestations.NewPool(),
-		TimeFetcher: &mock.ChainService{Genesis: time.Now()},
+		HeadFetcher:           &mock.ChainService{State: s},
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		AttPool:               attestations.NewPool(),
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now()},
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	priv, err := dilithium.RandKey()
@@ -114,11 +116,12 @@ func TestSubmitAggregateAndProof_UnaggregateOk(t *testing.T) {
 	require.NoError(t, err)
 
 	aggregatorServer := &Server{
-		HeadFetcher: &mock.ChainService{State: beaconState},
-		SyncChecker: &mockSync.Sync{IsSyncing: false},
-		AttPool:     attestations.NewPool(),
-		P2P:         &mockp2p.MockBroadcaster{},
-		TimeFetcher: &mock.ChainService{Genesis: time.Now()},
+		HeadFetcher:           &mock.ChainService{State: beaconState},
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		AttPool:               attestations.NewPool(),
+		P2P:                   &mockp2p.MockBroadcaster{},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now()},
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	priv, err := dilithium.RandKey()
@@ -135,7 +138,7 @@ func TestSubmitAggregateAndProof_UnaggregateOk(t *testing.T) {
 }
 
 /*
-TODO(rgeraldes24)
+TODO(rgeraldes24) - might be related to OptimisticModeFetcher: &mock.ChainService{Optimistic: false} missing on the server
 func TestSubmitAggregateAndProof_AggregateOk(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	c := params.MinimalSpecConfig().Copy()
@@ -195,11 +198,12 @@ func TestSubmitAggregateAndProof_AggregateNotOk(t *testing.T) {
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+params.BeaconConfig().MinAttestationInclusionDelay))
 
 	aggregatorServer := &Server{
-		HeadFetcher: &mock.ChainService{State: beaconState},
-		SyncChecker: &mockSync.Sync{IsSyncing: false},
-		AttPool:     attestations.NewPool(),
-		P2P:         &mockp2p.MockBroadcaster{},
-		TimeFetcher: &mock.ChainService{Genesis: time.Now()},
+		HeadFetcher:           &mock.ChainService{State: beaconState},
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		AttPool:               attestations.NewPool(),
+		P2P:                   &mockp2p.MockBroadcaster{},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now()},
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	priv, err := dilithium.RandKey()
@@ -324,11 +328,12 @@ func TestSubmitAggregateAndProof_PreferOwnAttestation(t *testing.T) {
 	require.NoError(t, err)
 
 	aggregatorServer := &Server{
-		HeadFetcher: &mock.ChainService{State: beaconState},
-		SyncChecker: &mockSync.Sync{IsSyncing: false},
-		AttPool:     attestations.NewPool(),
-		P2P:         &mockp2p.MockBroadcaster{},
-		TimeFetcher: &mock.ChainService{Genesis: time.Now()},
+		HeadFetcher:           &mock.ChainService{State: beaconState},
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		AttPool:               attestations.NewPool(),
+		P2P:                   &mockp2p.MockBroadcaster{},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now()},
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	priv, err := dilithium.RandKey()
@@ -375,11 +380,12 @@ func TestSubmitAggregateAndProof_SelectsMostBitsWhenOwnAttestationNotPresent(t *
 	require.NoError(t, err)
 
 	aggregatorServer := &Server{
-		HeadFetcher: &mock.ChainService{State: beaconState},
-		SyncChecker: &mockSync.Sync{IsSyncing: false},
-		AttPool:     attestations.NewPool(),
-		P2P:         &mockp2p.MockBroadcaster{},
-		TimeFetcher: &mock.ChainService{Genesis: time.Now()},
+		HeadFetcher:           &mock.ChainService{State: beaconState},
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		AttPool:               attestations.NewPool(),
+		P2P:                   &mockp2p.MockBroadcaster{},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now()},
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	priv, err := dilithium.RandKey()

@@ -357,7 +357,7 @@ func TestSubmitPoolSyncCommitteeSignatures(t *testing.T) {
 	t.Run("Ok", func(t *testing.T) {
 		root, err := bytesutil2.FromHexString("0x" + strings.Repeat("0", 64))
 		require.NoError(t, err)
-		sig, err := bytesutil2.FromHexString("0x" + strings.Repeat("0", 192))
+		sig, err := bytesutil2.FromHexString("0x" + strings.Repeat("0", 9190))
 		require.NoError(t, err)
 		_, err = s.SubmitPoolSyncCommitteeSignatures(ctx, &zondpbv1.SubmitPoolSyncCommitteeSignatures{
 			Data: []*zondpbv1.SyncCommitteeMessage{
@@ -400,7 +400,7 @@ func TestSubmitPoolSyncCommitteeSignatures(t *testing.T) {
 func TestValidateSyncCommitteeMessage(t *testing.T) {
 	root, err := bytesutil2.FromHexString("0x" + strings.Repeat("0", 64))
 	require.NoError(t, err)
-	sig, err := bytesutil2.FromHexString("0x" + strings.Repeat("0", 192))
+	sig, err := bytesutil2.FromHexString("0x" + strings.Repeat("0", 9190))
 	require.NoError(t, err)
 	t.Run("valid", func(t *testing.T) {
 		msg := &zondpbv1.SyncCommitteeMessage{

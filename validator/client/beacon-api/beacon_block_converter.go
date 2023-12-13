@@ -14,13 +14,13 @@ import (
 )
 
 type beaconBlockConverter interface {
-	ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockJson) (*zondpb.BeaconBlock, error)
+	ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*zondpb.BeaconBlock, error)
 }
 
 type beaconApiBeaconBlockConverter struct{}
 
 // ConvertRESTCapellaBlockToProto converts a Capella JSON beacon block to its protobuf equivalent
-func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockJson) (*zondpb.BeaconBlock, error) {
+func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*zondpb.BeaconBlock, error) {
 	if block.Body == nil {
 		return nil, errors.New("block body is nil")
 	}

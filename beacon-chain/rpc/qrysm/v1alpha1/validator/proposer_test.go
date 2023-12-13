@@ -58,6 +58,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+/*
 func TestServer_GetBeaconBlock_Phase0(t *testing.T) {
 	db := dbutil.SetupDB(t)
 	ctx := context.Background()
@@ -117,6 +118,7 @@ func TestServer_GetBeaconBlock_Phase0(t *testing.T) {
 	assert.Equal(t, params.BeaconConfig().MaxAttesterSlashings, uint64(len(phase0Blk.Phase0.Body.AttesterSlashings)))
 	assert.DeepEqual(t, attSlashings, phase0Blk.Phase0.Body.AttesterSlashings)
 }
+*/
 
 func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	db := dbutil.SetupDB(t)
@@ -137,8 +139,9 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	require.NoError(t, db.SaveState(ctx, beaconState, parentRoot), "Could not save genesis state")
 	require.NoError(t, db.SaveHeadBlockRoot(ctx, parentRoot), "Could not save genesis state")
 
-	capellaSlot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
+	//capellaSlot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
+	//require.NoError(t, err)
+	capellaSlot := primitives.Slot(0)
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
 	blk := &zondpb.SignedBeaconBlock{
@@ -195,8 +198,8 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 
 	proposerServer := getProposerServer(db, beaconState, parentRoot[:])
 	proposerServer.ExecutionEngineCaller = &mockExecution.EngineClient{
-		PayloadIDBytes:          &enginev1.PayloadIDBytes{1},
-		ExecutionPayloadCapella: payload,
+		PayloadIDBytes:   &enginev1.PayloadIDBytes{1},
+		ExecutionPayload: payload,
 	}
 
 	randaoReveal, err := util.RandaoReveal(beaconState, 0, privKeys)
@@ -301,40 +304,43 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 		name  string
 		block func([32]byte) *zondpb.GenericSignedBeaconBlock
 	}{
-		{
-			name: "phase0",
-			block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
-				blockToPropose := util.NewBeaconBlock()
-				blockToPropose.Block.Slot = 5
-				blockToPropose.Block.ParentRoot = parent[:]
-				blk := &zondpb.GenericSignedBeaconBlock_Phase0{Phase0: blockToPropose}
-				return &zondpb.GenericSignedBeaconBlock{Block: blk}
+		/*
+			{
+				name: "phase0",
+				block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
+					blockToPropose := util.NewBeaconBlock()
+					blockToPropose.Block.Slot = 5
+					blockToPropose.Block.ParentRoot = parent[:]
+					blk := &zondpb.GenericSignedBeaconBlock_Phase0{Phase0: blockToPropose}
+					return &zondpb.GenericSignedBeaconBlock{Block: blk}
+				},
 			},
-		},
-		{
-			name: "altair",
-			block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
-				blockToPropose := util.NewBeaconBlockAltair()
-				blockToPropose.Block.Slot = 5
-				blockToPropose.Block.ParentRoot = parent[:]
-				blk := &zondpb.GenericSignedBeaconBlock_Altair{Altair: blockToPropose}
-				return &zondpb.GenericSignedBeaconBlock{Block: blk}
+			{
+				name: "altair",
+				block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
+					blockToPropose := util.NewBeaconBlockAltair()
+					blockToPropose.Block.Slot = 5
+					blockToPropose.Block.ParentRoot = parent[:]
+					blk := &zondpb.GenericSignedBeaconBlock_Altair{Altair: blockToPropose}
+					return &zondpb.GenericSignedBeaconBlock{Block: blk}
+				},
 			},
-		},
-		{
-			name: "bellatrix",
-			block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
-				blockToPropose := util.NewBeaconBlockBellatrix()
-				blockToPropose.Block.Slot = 5
-				blockToPropose.Block.ParentRoot = parent[:]
-				blk := &zondpb.GenericSignedBeaconBlock_Bellatrix{Bellatrix: blockToPropose}
-				return &zondpb.GenericSignedBeaconBlock{Block: blk}
+			{
+				name: "bellatrix",
+				block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
+					blockToPropose := util.NewBeaconBlockBellatrix()
+					blockToPropose.Block.Slot = 5
+					blockToPropose.Block.ParentRoot = parent[:]
+					blk := &zondpb.GenericSignedBeaconBlock_Bellatrix{Bellatrix: blockToPropose}
+					return &zondpb.GenericSignedBeaconBlock{Block: blk}
+				},
 			},
-		},
+		*/
+		// TODO(rgeraldes24) - add normal Capella
 		{
 			name: "blind capella",
 			block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
-				blockToPropose := util.NewBlindedBeaconBlockCapella()
+				blockToPropose := util.NewBlindedBeaconBlock()
 				blockToPropose.Block.Slot = 5
 				blockToPropose.Block.ParentRoot = parent[:]
 				txRoot, err := ssz.TransactionsRoot([][]byte{})
@@ -363,7 +369,7 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 				BlockReceiver: c,
 				BlockNotifier: c.BlockNotifier(),
 				P2P:           mockp2p.NewTestP2P(t),
-				BlockBuilder:  &builderTest.MockBuilderService{HasConfigured: true, PayloadCapella: emptyPayloadCapella()},
+				BlockBuilder:  &builderTest.MockBuilderService{HasConfigured: true, Payload: emptyPayload()},
 			}
 			blockToPropose := tt.block(bsRoot)
 			res, err := proposerServer.ProposeBeaconBlock(context.Background(), blockToPropose)
@@ -499,7 +505,7 @@ func TestProposer_PendingDeposits_OutsideZond1FollowWindow(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Zond1Data: &zondpb.Zond1Data{
 			BlockHash:   bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot: make([]byte, 32),
@@ -631,7 +637,7 @@ func TestProposer_PendingDeposits_FollowsCorrectZond1Block(t *testing.T) {
 		votes = append(votes, vote)
 	}
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Zond1Data: &zondpb.Zond1Data{
 			BlockHash:    []byte("0x0"),
 			DepositRoot:  make([]byte, 32),
@@ -850,7 +856,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Zond1Data: &zondpb.Zond1Data{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
@@ -948,7 +954,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Zond1Data: &zondpb.Zond1Data{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
@@ -1046,7 +1052,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Zond1Data: &zondpb.Zond1Data{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
@@ -1162,7 +1168,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Zond1Data: &zondpb.Zond1Data{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
@@ -1379,7 +1385,7 @@ func TestProposer_Zond1Data_MajorityVote_SpansGenesis(t *testing.T) {
 		HeadFetcher:       &mock.ChainService{ZOND1Data: &zondpb.Zond1Data{BlockHash: headBlockHash, DepositCount: 0}},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 		Slot: slot,
 		Zond1DataVotes: []*zondpb.Zond1Data{
 			{BlockHash: []byte("earliest"), DepositCount: 1},
@@ -1423,7 +1429,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("first"), DepositCount: 1},
@@ -1459,7 +1465,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("earliest"), DepositCount: 1},
@@ -1495,7 +1501,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(51, earliestValidTime+1, []byte("first")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("first"), DepositCount: 1},
@@ -1532,7 +1538,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(51, earliestValidTime+1, []byte("first")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("before_range"), DepositCount: 1},
@@ -1569,7 +1575,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(100, latestValidTime, []byte("latest")).
 			InsertBlock(101, latestValidTime+1, []byte("after_range"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("first"), DepositCount: 1},
@@ -1606,7 +1612,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("unknown"), DepositCount: 1},
@@ -1640,7 +1646,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(49, earliestValidTime-1, []byte("before_range")).
 			InsertBlock(101, latestValidTime+1, []byte("after_range"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 		})
 		require.NoError(t, err)
@@ -1672,7 +1678,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(101, latestValidTime+1, []byte("after_range"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("before_range"), DepositCount: 1},
@@ -1706,7 +1712,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(50, earliestValidTime, []byte("earliest")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot:           slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{}})
 		require.NoError(t, err)
@@ -1736,7 +1742,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(50, earliestValidTime, []byte("earliest")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 		})
 		require.NoError(t, err)
@@ -1770,7 +1776,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("first"), DepositCount: 1},
@@ -1806,7 +1812,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			InsertBlock(52, earliestValidTime+2, []byte("second")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("no_new_deposits"), DepositCount: 0},
@@ -1839,7 +1845,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 		t.Skip()
 		p := mockExecution.New().InsertBlock(50, earliestValidTime, []byte("earliest"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("earliest"), DepositCount: 1},
@@ -1873,7 +1879,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 			// because of earliest block increment in the algorithm.
 			InsertBlock(50, earliestValidTime+1, []byte("first"))
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("before_range"), DepositCount: 1},
@@ -1912,7 +1918,7 @@ func TestProposer_Zond1Data_MajorityVote(t *testing.T) {
 		depositCache, err := depositcache.New()
 		require.NoError(t, err)
 
-		beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconState{
 			Slot: slot,
 			Zond1DataVotes: []*zondpb.Zond1Data{
 				{BlockHash: []byte("earliest"), DepositCount: 1},
@@ -2146,11 +2152,11 @@ func TestProposer_DeleteAttsInPool_Aggregated(t *testing.T) {
 	require.NoError(t, err)
 	sig := priv.Sign([]byte("foo")).Marshal()
 	aggregatedAtts := []*zondpb.Attestation{
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10101}, Signature: sig}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b11010}, Signature: sig})}
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10101}, Signatures: [][]byte{sig}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b11010}, Signatures: [][]byte{sig}})}
 	unaggregatedAtts := []*zondpb.Attestation{
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10010}, Signature: sig}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10100}, Signature: sig})}
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10010}, Signatures: [][]byte{sig}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10100}, Signatures: [][]byte{sig}})}
 
 	require.NoError(t, s.AttPool.SaveAggregatedAttestations(aggregatedAtts))
 	require.NoError(t, s.AttPool.SaveUnaggregatedAttestations(unaggregatedAtts))

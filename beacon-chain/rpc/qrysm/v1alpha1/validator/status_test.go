@@ -849,7 +849,7 @@ func TestMultipleValidatorStatus_Indices(t *testing.T) {
 			},
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(beaconState)
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(beaconState)
 	require.NoError(t, err)
 	block := util.NewBeaconBlock()
 	genesisRoot, err := block.Block.HashTreeRoot()
@@ -924,7 +924,7 @@ func TestValidatorStatus_Invalid(t *testing.T) {
 			0: uint64(height),
 		},
 	}
-	stateObj, err := state_native.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	stateObj, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
 	require.NoError(t, err)
 	vs := &Server{
 		DepositFetcher: depositCache,
@@ -1279,7 +1279,7 @@ func createStateSetupPhase0(t *testing.T, head primitives.Epoch) (state.BeaconSt
 
 func createStateSetupAltair(t *testing.T, head primitives.Epoch) (state.BeaconState,
 	state.BeaconState, []dilithium.DilithiumKey) {
-	gs, keys := util.DeterministicGenesisStateAltair(t, 64)
+	gs, keys := util.DeterministicGenesisState(t, 64)
 	hs := gs.Copy()
 
 	// Head State

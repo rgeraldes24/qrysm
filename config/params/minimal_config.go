@@ -30,7 +30,6 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	// Initial values
 	minimalConfig.DilithiumWithdrawalPrefixByte = byte(0)
 	minimalConfig.ZOND1AddressWithdrawalPrefixByte = byte(1)
-	minimalConfig.ZondAddressWithdrawalPrefixByte = byte(1)
 
 	// Time parameters
 	minimalConfig.SecondsPerSlot = 6

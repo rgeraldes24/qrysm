@@ -272,13 +272,13 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlock {
 	}
 }
 
-func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockJson {
-	return &apimiddleware.BeaconBlockJson{
+func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockCapellaJson {
+	return &apimiddleware.BeaconBlockCapellaJson{
 		Slot:          "1",
 		ProposerIndex: "2",
 		ParentRoot:    FillEncodedByteSlice(32, 3),
 		StateRoot:     FillEncodedByteSlice(32, 4),
-		Body: &apimiddleware.BeaconBlockBodyJson{
+		Body: &apimiddleware.BeaconBlockBodyCapellaJson{
 			RandaoReveal: FillEncodedByteSlice(4595, 5),
 			Zond1Data: &apimiddleware.Zond1DataJson{
 				DepositRoot:  FillEncodedByteSlice(32, 6),
@@ -482,7 +482,7 @@ func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockJson {
 				SyncCommitteeBits:       FillEncodedByteSlice(64, 110),
 				SyncCommitteeSignatures: []string{FillEncodedByteSlice(4595, 111)},
 			},
-			ExecutionPayload: &apimiddleware.ExecutionPayloadJson{
+			ExecutionPayload: &apimiddleware.ExecutionPayloadCapellaJson{
 				ParentHash:    FillEncodedByteSlice(32, 112),
 				FeeRecipient:  FillEncodedByteSlice(20, 113),
 				StateRoot:     FillEncodedByteSlice(32, 114),

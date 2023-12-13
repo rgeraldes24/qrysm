@@ -30,12 +30,12 @@ func TestProposeBeaconBlock_BlindedCapella(t *testing.T) {
 
 	jsonBlindedCapellaBlock := &apimiddleware.SignedBlindedBeaconBlockCapellaContainerJson{
 		Signature: hexutil.Encode(blindedCapellaBlock.BlindedCapella.Signature),
-		Message: &apimiddleware.BlindedBeaconBlockJson{
+		Message: &apimiddleware.BlindedBeaconBlockCapellaJson{
 			ParentRoot:    hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.ParentRoot),
 			ProposerIndex: uint64ToString(blindedCapellaBlock.BlindedCapella.Block.ProposerIndex),
 			Slot:          uint64ToString(blindedCapellaBlock.BlindedCapella.Block.Slot),
 			StateRoot:     hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.StateRoot),
-			Body: &apimiddleware.BlindedBeaconBlockBodyJson{
+			Body: &apimiddleware.BlindedBeaconBlockBodyCapellaJson{
 				Attestations:      jsonifyAttestations(blindedCapellaBlock.BlindedCapella.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(blindedCapellaBlock.BlindedCapella.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(blindedCapellaBlock.BlindedCapella.Block.Body.Deposits),
@@ -45,7 +45,7 @@ func TestProposeBeaconBlock_BlindedCapella(t *testing.T) {
 				RandaoReveal:      hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.RandaoReveal),
 				VoluntaryExits:    JsonifySignedVoluntaryExits(blindedCapellaBlock.BlindedCapella.Block.Body.VoluntaryExits),
 				SyncAggregate:     JsonifySignedSyncAggregate(blindedCapellaBlock.BlindedCapella.Block.Body.SyncAggregate),
-				ExecutionPayloadHeader: &apimiddleware.ExecutionPayloadHeaderJson{
+				ExecutionPayloadHeader: &apimiddleware.ExecutionPayloadHeaderCapellaJson{
 					BaseFeePerGas:    bytesutil.LittleEndianBytesToBigInt(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.BaseFeePerGas).String(),
 					BlockHash:        hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.BlockHash),
 					BlockNumber:      uint64ToString(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.BlockNumber),

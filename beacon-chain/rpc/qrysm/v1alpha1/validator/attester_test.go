@@ -76,11 +76,12 @@ func TestProposeAttestation_OK(t *testing.T) {
 
 func TestProposeAttestation_IncorrectSignature(t *testing.T) {
 	attesterServer := &Server{
-		HeadFetcher:       &mock.ChainService{},
-		P2P:               &mockp2p.MockBroadcaster{},
-		AttestationCache:  cache.NewAttestationCache(),
-		AttPool:           attestations.NewPool(),
-		OperationNotifier: (&mock.ChainService{}).OperationNotifier(),
+		HeadFetcher:           &mock.ChainService{},
+		P2P:                   &mockp2p.MockBroadcaster{},
+		AttestationCache:      cache.NewAttestationCache(),
+		AttPool:               attestations.NewPool(),
+		OperationNotifier:     (&mock.ChainService{}).OperationNotifier(),
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	req := util.HydrateAttestation(&zondpb.Attestation{})
@@ -134,7 +135,8 @@ func TestGetAttestationData_OK(t *testing.T) {
 		TimeFetcher: &mock.ChainService{
 			Genesis: time.Now().Add(time.Duration(-1*offset) * time.Second),
 		},
-		StateNotifier: chainService.StateNotifier(),
+		StateNotifier:         chainService.StateNotifier(),
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	req := &zondpb.AttestationDataRequest{
@@ -211,11 +213,12 @@ func TestAttestationDataSlot_handlesInProgressRequest(t *testing.T) {
 	slot := primitives.Slot(2)
 	offset := int64(slot.Mul(params.BeaconConfig().SecondsPerSlot))
 	server := &Server{
-		HeadFetcher:      &mock.ChainService{State: state},
-		AttestationCache: cache.NewAttestationCache(),
-		SyncChecker:      &mockSync.Sync{IsSyncing: false},
-		TimeFetcher:      &mock.ChainService{Genesis: time.Now().Add(time.Duration(-1*offset) * time.Second)},
-		StateNotifier:    chainService.StateNotifier(),
+		HeadFetcher:           &mock.ChainService{State: state},
+		AttestationCache:      cache.NewAttestationCache(),
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now().Add(time.Duration(-1*offset) * time.Second)},
+		StateNotifier:         chainService.StateNotifier(),
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	req := &zondpb.AttestationDataRequest{
@@ -259,9 +262,10 @@ func TestServer_GetAttestationData_InvalidRequestSlot(t *testing.T) {
 	slot := 3*params.BeaconConfig().SlotsPerEpoch + 1
 	offset := int64(slot.Mul(params.BeaconConfig().SecondsPerSlot))
 	attesterServer := &Server{
-		SyncChecker: &mockSync.Sync{IsSyncing: false},
-		HeadFetcher: &mock.ChainService{},
-		TimeFetcher: &mock.ChainService{Genesis: time.Now().Add(time.Duration(-1*offset) * time.Second)},
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		HeadFetcher:           &mock.ChainService{},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now().Add(time.Duration(-1*offset) * time.Second)},
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	req := &zondpb.AttestationDataRequest{
@@ -407,8 +411,9 @@ func TestGetAttestationData_SucceedsInFirstEpoch(t *testing.T) {
 		FinalizationFetcher: &mock.ChainService{
 			CurrentJustifiedCheckPoint: beaconState.CurrentJustifiedCheckpoint(),
 		},
-		TimeFetcher:   &mock.ChainService{Genesis: qrysmTime.Now().Add(time.Duration(-1*offset) * time.Second)},
-		StateNotifier: chainService.StateNotifier(),
+		TimeFetcher:           &mock.ChainService{Genesis: qrysmTime.Now().Add(time.Duration(-1*offset) * time.Second)},
+		StateNotifier:         chainService.StateNotifier(),
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	req := &zondpb.AttestationDataRequest{

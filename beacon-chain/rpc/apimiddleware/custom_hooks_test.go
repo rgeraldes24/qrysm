@@ -24,7 +24,7 @@ func TestWrapAttestationArray(t *testing.T) {
 		endpoint := &apimiddleware.Endpoint{
 			PostRequest: &SubmitAttestationRequestJson{},
 		}
-		unwrappedAtts := []*AttestationJson{{AggregationBits: "1010"}}
+		unwrappedAtts := []*AttestationJson{{ParticipationBits: "1010"}}
 		unwrappedAttsJson, err := json.Marshal(unwrappedAtts)
 		require.NoError(t, err)
 
@@ -39,7 +39,7 @@ func TestWrapAttestationArray(t *testing.T) {
 		wrappedAtts := &SubmitAttestationRequestJson{}
 		require.NoError(t, json.NewDecoder(request.Body).Decode(wrappedAtts))
 		require.Equal(t, 1, len(wrappedAtts.Data), "wrong number of wrapped items")
-		assert.Equal(t, "1010", wrappedAtts.Data[0].AggregationBits)
+		assert.Equal(t, "1010", wrappedAtts.Data[0].ParticipationBits)
 	})
 
 	t.Run("invalid_body", func(t *testing.T) {

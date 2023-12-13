@@ -648,7 +648,7 @@ func Test_NotifyNewPayload(t *testing.T) {
 
 func Test_NotifyNewPayload_SetOptimisticToValid(t *testing.T) {
 	cfg := params.BeaconConfig()
-	cfg.TerminalTotalDifficulty = "2"
+	//cfg.TerminalTotalDifficulty = "2"
 	params.OverrideBeaconConfig(cfg)
 
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))

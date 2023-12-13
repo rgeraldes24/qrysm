@@ -181,7 +181,7 @@ func (vs *Server) getBuilderPayload(ctx context.Context,
 	return vs.getPayloadHeaderFromBuilder(ctx, slot, vIdx)
 }
 
-func emptyPayloadCapella() *enginev1.ExecutionPayload {
+func emptyPayload() *enginev1.ExecutionPayload {
 	return &enginev1.ExecutionPayload{
 		ParentHash:    make([]byte, fieldparams.RootLength),
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),

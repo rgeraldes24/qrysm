@@ -261,25 +261,25 @@ var (
 
 	// RemoteSignerCertPathFlag defines the path to a client.crt file for a wallet to connect to
 	// a secure signer via TLS and gRPC.
-	RemoteSignerCertPathFlag = &cli.StringFlag{
-		Name:  "remote-signer-crt-path",
-		Usage: "/path/to/client.crt for establishing a secure, TLS gRPC connection to a remote signer server",
-		Value: "",
-	}
+	// RemoteSignerCertPathFlag = &cli.StringFlag{
+	// 	Name:  "remote-signer-crt-path",
+	// 	Usage: "/path/to/client.crt for establishing a secure, TLS gRPC connection to a remote signer server",
+	// 	Value: "",
+	// }
 	// RemoteSignerKeyPathFlag defines the path to a client.key file for a wallet to connect to
 	// a secure signer via TLS and gRPC.
-	RemoteSignerKeyPathFlag = &cli.StringFlag{
-		Name:  "remote-signer-key-path",
-		Usage: "/path/to/client.key for establishing a secure, TLS gRPC connection to a remote signer server",
-		Value: "",
-	}
+	// RemoteSignerKeyPathFlag = &cli.StringFlag{
+	// 	Name:  "remote-signer-key-path",
+	// 	Usage: "/path/to/client.key for establishing a secure, TLS gRPC connection to a remote signer server",
+	// 	Value: "",
+	// }
 	// RemoteSignerCACertPathFlag defines the path to a ca.crt file for a wallet to connect to
 	// a secure signer via TLS and gRPC.
-	RemoteSignerCACertPathFlag = &cli.StringFlag{
-		Name:  "remote-signer-ca-crt-path",
-		Usage: "/path/to/ca.crt for establishing a secure, TLS gRPC connection to a remote signer server",
-		Value: "",
-	}
+	// RemoteSignerCACertPathFlag = &cli.StringFlag{
+	// 	Name:  "remote-signer-ca-crt-path",
+	// 	Usage: "/path/to/ca.crt for establishing a secure, TLS gRPC connection to a remote signer server",
+	// 	Value: "",
+	// }
 	// Web3SignerURLFlag defines the URL for a web3signer to connect to.
 	// example:--validators-external-signer-url=http://localhost:9000
 	// web3signer documentation can be found in Consensys' web3signer project docs

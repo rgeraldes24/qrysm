@@ -29,12 +29,12 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 
 	jsonCapellaBlock := &apimiddleware.SignedBeaconBlockCapellaContainerJson{
 		Signature: hexutil.Encode(capellaBlock.Capella.Signature),
-		Message: &apimiddleware.BeaconBlockJson{
+		Message: &apimiddleware.BeaconBlockCapellaJson{
 			ParentRoot:    hexutil.Encode(capellaBlock.Capella.Block.ParentRoot),
 			ProposerIndex: uint64ToString(capellaBlock.Capella.Block.ProposerIndex),
 			Slot:          uint64ToString(capellaBlock.Capella.Block.Slot),
 			StateRoot:     hexutil.Encode(capellaBlock.Capella.Block.StateRoot),
-			Body: &apimiddleware.BeaconBlockBodyJson{
+			Body: &apimiddleware.BeaconBlockBodyCapellaJson{
 				Attestations:      jsonifyAttestations(capellaBlock.Capella.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(capellaBlock.Capella.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(capellaBlock.Capella.Block.Body.Deposits),
@@ -44,7 +44,7 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 				RandaoReveal:      hexutil.Encode(capellaBlock.Capella.Block.Body.RandaoReveal),
 				VoluntaryExits:    JsonifySignedVoluntaryExits(capellaBlock.Capella.Block.Body.VoluntaryExits),
 				SyncAggregate:     JsonifySignedSyncAggregate(capellaBlock.Capella.Block.Body.SyncAggregate),
-				ExecutionPayload: &apimiddleware.ExecutionPayloadJson{
+				ExecutionPayload: &apimiddleware.ExecutionPayloadCapellaJson{
 					BaseFeePerGas: bytesutil.LittleEndianBytesToBigInt(capellaBlock.Capella.Block.Body.ExecutionPayload.BaseFeePerGas).String(),
 					BlockHash:     hexutil.Encode(capellaBlock.Capella.Block.Body.ExecutionPayload.BlockHash),
 					BlockNumber:   uint64ToString(capellaBlock.Capella.Block.Body.ExecutionPayload.BlockNumber),

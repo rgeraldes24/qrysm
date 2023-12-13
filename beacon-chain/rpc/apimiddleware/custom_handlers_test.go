@@ -301,7 +301,7 @@ func TestReceiveEvents_AggregatedAtt(t *testing.T) {
 		base64Val := "Zm9v"
 		data := AggregatedAttReceivedDataJson{
 			Aggregate: &AttestationJson{
-				AggregationBits: base64Val,
+				ParticipationBits: base64Val,
 				Data: &AttestationDataJson{
 					Slot:            "1",
 					CommitteeIndex:  "1",
@@ -309,7 +309,7 @@ func TestReceiveEvents_AggregatedAtt(t *testing.T) {
 					Source:          nil,
 					Target:          nil,
 				},
-				Signature: base64Val,
+				Signatures: []string{base64Val},
 			},
 		}
 		bData, err := json.Marshal(data)
@@ -327,7 +327,7 @@ func TestReceiveEvents_AggregatedAtt(t *testing.T) {
 	assert.Equal(t, true, errJson == nil)
 
 	expectedEvent := `event: attestation
-data: {"aggregation_bits":"0x666f6f","data":{"slot":"1","index":"1","beacon_block_root":"0x666f6f","source":null,"target":null},"signature":"0x666f6f"}
+data: {"participation_bits":"0x666f6f","data":{"slot":"1","index":"1","beacon_block_root":"0x666f6f","source":null,"target":null},"signatures":["0x666f6f"]}
 
 `
 	assert.DeepEqual(t, expectedEvent, w.Body.String())
@@ -344,7 +344,7 @@ func TestReceiveEvents_UnaggregatedAtt(t *testing.T) {
 	go func() {
 		base64Val := "Zm9v"
 		data := UnaggregatedAttReceivedDataJson{
-			AggregationBits: base64Val,
+			ParticipationBits: base64Val,
 			Data: &AttestationDataJson{
 				Slot:            "1",
 				CommitteeIndex:  "1",
@@ -352,7 +352,7 @@ func TestReceiveEvents_UnaggregatedAtt(t *testing.T) {
 				Source:          nil,
 				Target:          nil,
 			},
-			Signature: base64Val,
+			Signatures: []string{base64Val},
 		}
 		bData, err := json.Marshal(data)
 		require.NoError(t, err)
@@ -369,7 +369,7 @@ func TestReceiveEvents_UnaggregatedAtt(t *testing.T) {
 	assert.Equal(t, true, errJson == nil)
 
 	expectedEvent := `event: attestation
-data: {"aggregation_bits":"0x666f6f","data":{"slot":"1","index":"1","beacon_block_root":"0x666f6f","source":null,"target":null},"signature":"0x666f6f"}
+data: {"participation_bits":"0x666f6f","data":{"slot":"1","index":"1","beacon_block_root":"0x666f6f","source":null,"target":null},"signatures":["0x666f6f"]}
 
 `
 	assert.DeepEqual(t, expectedEvent, w.Body.String())

@@ -76,9 +76,10 @@ func TestAttestationDataAtSlot_HandlesFarAwayJustifiedEpoch(t *testing.T) {
 		FinalizationFetcher: &mock.ChainService{
 			CurrentJustifiedCheckPoint: beaconState.CurrentJustifiedCheckpoint(),
 		},
-		SyncChecker:   &mockSync.Sync{IsSyncing: false},
-		TimeFetcher:   &mock.ChainService{Genesis: time.Now().Add(time.Duration(-1*offset) * time.Second)},
-		StateNotifier: chainService.StateNotifier(),
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now().Add(time.Duration(-1*offset) * time.Second)},
+		StateNotifier:         chainService.StateNotifier(),
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	req := &zondpb.AttestationDataRequest{
