@@ -117,7 +117,7 @@ func TestServer_ListAttestations_NoPagination(t *testing.T) {
 		blockExample := util.NewBeaconBlock()
 		blockExample.Block.Body.Attestations = []*zondpb.Attestation{
 			{
-				Signatures: make([][]byte, dilithium2.CryptoBytes),
+				Signatures: make([][]byte, 0),
 				Data: &zondpb.AttestationData{
 					Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
 					Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
@@ -381,7 +381,7 @@ func TestServer_ListAttestations_Pagination_OutOfRange(t *testing.T) {
 								Slot:            i,
 							},
 							ParticipationBits: bitfield.Bitlist{0b11},
-							Signatures:        make([][]byte, dilithium2.CryptoBytes),
+							Signatures:        make([][]byte, 0),
 						},
 					},
 				},
@@ -513,7 +513,7 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 		blockExample := util.NewBeaconBlock()
 		blockExample.Block.Body.Attestations = []*zondpb.Attestation{
 			{
-				Signatures: make([][]byte, dilithium2.CryptoBytes),
+				Signatures: make([][]byte, 0),
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: make([]byte, fieldparams.RootLength),
 					Target: &zondpb.Checkpoint{

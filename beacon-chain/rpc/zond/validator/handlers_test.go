@@ -122,7 +122,8 @@ func TestGetAggregateAttestation(t *testing.T) {
 		require.NotNil(t, resp)
 		require.NotNil(t, resp.Data)
 		assert.DeepEqual(t, "0x00010101", resp.Data.ParticipationBits)
-		assert.DeepEqual(t, hexutil.Encode(sig22), resp.Data.Signatures)
+		// TODO(rgeraldes24) - double check the next line
+		assert.DeepEqual(t, hexutil.Encode(sig22), resp.Data.Signatures[0])
 		assert.Equal(t, "2", resp.Data.Data.Slot)
 		assert.Equal(t, "3", resp.Data.Data.CommitteeIndex)
 		assert.DeepEqual(t, hexutil.Encode(root22), resp.Data.Data.BeaconBlockRoot)

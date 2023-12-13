@@ -28,7 +28,7 @@ import (
 
 // pubKey is a helper to generate a well-formed public key.
 func pubKey(i uint64) []byte {
-	pubKey := make([]byte, dilithium2.CryptoSecretKeyBytes)
+	pubKey := make([]byte, dilithium2.CryptoPublicKeyBytes)
 	binary.LittleEndian.PutUint64(pubKey, i)
 	return pubKey
 }

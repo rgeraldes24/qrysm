@@ -331,14 +331,15 @@ func TestServer_GetAttestationData_HeadStateSlotGreaterThanRequestSlot(t *testin
 	}
 	offset = int64(slot.Mul(params.BeaconConfig().SecondsPerSlot))
 	attesterServer := &Server{
-		P2P:                 &mockp2p.MockBroadcaster{},
-		SyncChecker:         &mockSync.Sync{IsSyncing: false},
-		AttestationCache:    cache.NewAttestationCache(),
-		HeadFetcher:         &mock.ChainService{State: beaconState, Root: blockRoot[:]},
-		FinalizationFetcher: &mock.ChainService{CurrentJustifiedCheckPoint: beaconState.CurrentJustifiedCheckpoint()},
-		TimeFetcher:         &mock.ChainService{Genesis: time.Now().Add(time.Duration(-1*offset) * time.Second)},
-		StateNotifier:       chainService.StateNotifier(),
-		StateGen:            stategen.New(db, doublylinkedtree.New()),
+		P2P:                   &mockp2p.MockBroadcaster{},
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		AttestationCache:      cache.NewAttestationCache(),
+		HeadFetcher:           &mock.ChainService{State: beaconState, Root: blockRoot[:]},
+		FinalizationFetcher:   &mock.ChainService{CurrentJustifiedCheckPoint: beaconState.CurrentJustifiedCheckpoint()},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now().Add(time.Duration(-1*offset) * time.Second)},
+		StateNotifier:         chainService.StateNotifier(),
+		StateGen:              stategen.New(db, doublylinkedtree.New()),
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 	require.NoError(t, db.SaveState(ctx, beaconState, blockRoot))
 	util.SaveBlock(t, ctx, db, block)

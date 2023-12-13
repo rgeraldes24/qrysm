@@ -28,8 +28,9 @@ import (
 func TestGetSyncMessageBlockRoot_OK(t *testing.T) {
 	r := []byte{'a'}
 	server := &Server{
-		HeadFetcher: &mock.ChainService{Root: r},
-		TimeFetcher: &mock.ChainService{Genesis: time.Now()},
+		HeadFetcher:           &mock.ChainService{Root: r},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now()},
+		OptimisticModeFetcher: &mock.ChainService{},
 	}
 	res, err := server.GetSyncMessageBlockRoot(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
@@ -106,7 +107,8 @@ func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 			State:                st,
 			SyncCommitteeIndices: []primitives.CommitteeIndex{10},
 		},
-		TimeFetcher: &mock.ChainService{Genesis: time.Now()},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now()},
+		OptimisticModeFetcher: &mock.ChainService{},
 	}
 	secKey, err := dilithium.RandKey()
 	require.NoError(t, err)
@@ -130,7 +132,8 @@ func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 			PublicKey: val.PublicKey,
 			SubnetId:  1})
 	require.NoError(t, err)
-	assert.DeepEqual(t, sig, contr.Signatures)
+	// TODO(rgeraldes24) - double check
+	assert.DeepEqual(t, sig, contr.Signatures[0])
 }
 
 func TestSubmitSignedContributionAndProof_OK(t *testing.T) {
@@ -146,6 +149,7 @@ func TestSubmitSignedContributionAndProof_OK(t *testing.T) {
 			Contribution: &zondpb.SyncCommitteeContribution{
 				Slot:              1,
 				SubcommitteeIndex: 2,
+				Signatures:        make([][]byte, 0),
 			},
 		},
 	}

@@ -36,9 +36,9 @@ type NewBeaconStateOption func(state *zondpb.BeaconState) error
 
 // NewBeaconState creates a beacon state with minimum marshalable fields.
 func NewBeaconState(options ...func(state *zondpb.BeaconState) error) (state.BeaconState, error) {
-	pubkeys := make([][]byte, 512)
-	for i := range pubkeys {
-		pubkeys[i] = make([]byte, 2592)
+	pubkeys := make([][]byte, 0, params.BeaconConfig().SyncCommitteeSize)
+	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
+		pubkeys = append(pubkeys, make([]byte, 2592))
 	}
 
 	seed := &zondpb.BeaconState{

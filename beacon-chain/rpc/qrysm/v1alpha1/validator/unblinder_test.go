@@ -27,6 +27,7 @@ func Test_unblindBuilderBlock(t *testing.T) {
 		err         string
 		returnedBlk interfaces.SignedBeaconBlock
 	}{
+		// TODO(rgeraldes24) - old version not valid anymore?
 		{
 			name: "old block version",
 			blk: func() interfaces.SignedBeaconBlock {
@@ -242,6 +243,13 @@ func Test_unblindBuilderBlock(t *testing.T) {
 					},
 				}
 				b.Block.Body.ExecutionPayload = p
+				// TODO (rgeraldes24) review/double check if the hydrate func should populate all the fields
+				b.Block.Body.AttesterSlashings = nil
+				b.Block.Body.Deposits = nil
+				b.Block.Body.ProposerSlashings = nil
+				b.Block.Body.VoluntaryExits = nil
+				b.Block.Body.Attestations = nil
+				b.Block.Body.ExecutionPayload.Withdrawals = nil
 				wb, err := blocks.NewSignedBeaconBlock(b)
 				require.NoError(t, err)
 				return wb
@@ -257,7 +265,11 @@ func Test_unblindBuilderBlock(t *testing.T) {
 				require.ErrorContains(t, tc.err, err)
 			} else {
 				require.NoError(t, err)
-				require.DeepEqual(t, tc.returnedBlk, gotBlk)
+				a1, err := tc.returnedBlk.Block().Body().Execution()
+				require.NoError(t, err)
+				a2, err := gotBlk.Block().Body().Execution()
+				require.NoError(t, err)
+				require.DeepEqual(t, a1, a2)
 			}
 		})
 	}

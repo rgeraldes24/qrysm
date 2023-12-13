@@ -216,8 +216,8 @@ filegroup(
 consensus_spec_version = "v0.1.0"
 
 http_archive(
-   name = "consensus_spec_tests_minimal",
-   build_file_content = """
+    name = "consensus_spec_tests_minimal",
+    build_file_content = """
 filegroup(
    name = "test_data",
    srcs = glob([
@@ -227,13 +227,13 @@ filegroup(
    visibility = ["//visibility:public"],
 )
    """,
-   sha256 = "7e980bf0f1e095814683bfa35335b46e6476c96d8b33326432394717b05da611",
-   url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/minimal.tar.gz" % consensus_spec_version,
+    sha256 = "7e980bf0f1e095814683bfa35335b46e6476c96d8b33326432394717b05da611",
+    url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/minimal.tar.gz" % consensus_spec_version,
 )
 
 http_archive(
-   name = "consensus_spec_tests_mainnet",
-   build_file_content = """
+    name = "consensus_spec_tests_mainnet",
+    build_file_content = """
 filegroup(
    name = "test_data",
    srcs = glob([
@@ -243,8 +243,8 @@ filegroup(
    visibility = ["//visibility:public"],
 )
    """,
-   sha256 = "7bf3e4c07a293f41a79bcfabbb5dad3a13f9d96a0e920b773456fbb6ac80520c",
-   url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/mainnet.tar.gz" % consensus_spec_version,
+    sha256 = "7bf3e4c07a293f41a79bcfabbb5dad3a13f9d96a0e920b773456fbb6ac80520c",
+    url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/mainnet.tar.gz" % consensus_spec_version,
 )
 
 http_archive(
@@ -300,7 +300,7 @@ all_content = """filegroup(name = "all", srcs = glob(["**"]), visibility = ["//v
 
 # External dependencies
 
-load("//:deps.bzl", "go_dependencies", "qrysm_deps")
+load("//:deps.bzl", "go_dependencies", "prysm_deps", "qrysm_deps")
 
 # gazelle:repository_macro deps.bzl%qrysm_deps
 qrysm_deps()
@@ -331,7 +331,10 @@ load("@com_github_atlassian_bazel_tools//gometalinter:deps.bzl", "gometalinter_d
 
 gometalinter_dependencies()
 
-load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
+
+# gazelle:repository_macro deps.bzl%prysm_deps
+prysm_deps()
 
 # gazelle:repository_macro deps.bzl%go_dependencies
 go_dependencies()

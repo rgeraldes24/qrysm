@@ -32,7 +32,7 @@ func NewGenesisBlock(stateRoot []byte) *zondpb.SignedBeaconBlock {
 				},
 				Graffiti: make([]byte, 32),
 				SyncAggregate: &zondpb.SyncAggregate{
-					SyncCommitteeBits: make([]byte, 64),
+					SyncCommitteeBits: make([]byte, fieldparams.SyncCommitteeLength/8),
 				},
 				ExecutionPayload: &enginev1.ExecutionPayload{
 					ParentHash:    make([]byte, 32),
