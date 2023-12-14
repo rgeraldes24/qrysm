@@ -2,6 +2,7 @@ package validator
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
@@ -69,17 +70,20 @@ func TestServer_getExecutionPayload(t *testing.T) {
 		validatorIndx     primitives.ValidatorIndex
 	}{
 		// TODO(rgeraldes24) double check
+
+		{
+			name: "transition completed, nil payload id",
+			//st:        transitionSt,
+			st:        capellaTransitionState,
+			errString: "nil payload with block hash",
+		},
+		{
+			name: "transition completed, happy case (has fee recipient in Db)",
+			//st:        transitionSt,
+			st:        capellaTransitionState,
+			payloadID: &pb.PayloadIDBytes{0x1},
+		},
 		/*
-			{
-				name:      "transition completed, nil payload id",
-				st:        transitionSt,
-				errString: "nil payload with block hash",
-			},
-			{
-				name:      "transition completed, happy case (has fee recipient in Db)",
-				st:        transitionSt,
-				payloadID: &pb.PayloadIDBytes{0x1},
-			},
 			{
 				name:          "transition completed, happy case (doesn't have fee recipient in Db)",
 				st:            transitionSt,
@@ -93,30 +97,34 @@ func TestServer_getExecutionPayload(t *testing.T) {
 			payloadID:     &pb.PayloadIDBytes{0x1},
 			validatorIndx: 1,
 		},
+		{
+			name: "transition completed, happy case, (payload ID cached)",
+			//st:            transitionSt,
+			st:            capellaTransitionState,
+			validatorIndx: 100,
+		},
+		{
+			name: "transition completed, could not prepare payload",
+			//st:            transitionSt,
+			st:            capellaTransitionState,
+			forkchoiceErr: errors.New("fork choice error"),
+			errString:     "could not prepare payload",
+		},
+		// TODO(rgeraldes24) - transition has been completed in our case (starting from capella)
 		/*
 			{
-				name:          "transition completed, happy case, (payload ID cached)",
-				st:            transitionSt,
-				validatorIndx: 100,
+				name:      "transition not-completed, latest exec block is nil",
+				st:        nonTransitionSt,
+				errString: "latest execution block is nil",
 			},
-			{
-				name:          "transition completed, could not prepare payload",
-				st:            transitionSt,
-				forkchoiceErr: errors.New("fork choice error"),
-				errString:     "could not prepare payload",
-			},
+			/*
+				{
+					name:              "transition not-completed, activation epoch not reached",
+					st:                nonTransitionSt,
+					terminalBlockHash: [32]byte{0x1},
+					activationEpoch:   1,
+				},
 		*/
-		{
-			name:      "transition not-completed, latest exec block is nil",
-			st:        nonTransitionSt,
-			errString: "latest execution block is nil",
-		},
-		{
-			name:              "transition not-completed, activation epoch not reached",
-			st:                nonTransitionSt,
-			terminalBlockHash: [32]byte{0x1},
-			activationEpoch:   1,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

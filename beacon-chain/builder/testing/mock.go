@@ -27,9 +27,9 @@ type MockBuilderService struct {
 	ErrSubmitBlindedBlock error
 	Bid                   *zondpb.SignedBuilderBid
 	RegistrationCache     *cache.RegistrationCache
-	ErrGetHeader          error
-	ErrRegisterValidator  error
-	Cfg                   *Config
+	// ErrGetHeader          error // not used anymore with Capella
+	ErrRegisterValidator error
+	Cfg                  *Config
 }
 
 // Configured for mocking.
@@ -48,11 +48,7 @@ func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, _ interfaces.
 
 // GetHeader for mocking.
 func (s *MockBuilderService) GetHeader(_ context.Context, slot primitives.Slot, _ [32]byte, _ [dilithium2.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
-	w, err := builder.WrappedSignedBuilderBid(s.Bid)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not wrap capella bid")
-	}
-	return w, s.ErrGetHeader
+	return builder.WrappedSignedBuilderBid(s.Bid)
 }
 
 // RegistrationByValidatorID returns either the values from the cache or db.

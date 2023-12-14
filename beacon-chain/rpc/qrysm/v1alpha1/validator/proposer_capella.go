@@ -11,7 +11,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/api/client/builder"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -291,10 +290,9 @@ func (vs *Server) setSyncAggregate(ctx context.Context, blk interfaces.SignedBea
 	syncAggregate, err := vs.getSyncAggregate(ctx, blk.Block().Slot()-1, blk.Block().ParentRoot())
 	if err != nil {
 		log.WithError(err).Error("Could not get sync aggregate")
-		emptySig := [dilithium2.CryptoBytes]byte{0xC0}
 		emptyAggregate := &zondpb.SyncAggregate{
 			SyncCommitteeBits:       make([]byte, params.BeaconConfig().SyncCommitteeSize/8),
-			SyncCommitteeSignatures: [][]byte{emptySig[:]},
+			SyncCommitteeSignatures: [][]byte{},
 		}
 		if err := blk.SetSyncAggregate(emptyAggregate); err != nil {
 			log.WithError(err).Error("Could not set sync aggregate")

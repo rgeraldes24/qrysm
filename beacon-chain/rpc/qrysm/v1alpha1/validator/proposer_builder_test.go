@@ -129,8 +129,13 @@ func TestServer_canUseBuilder(t *testing.T) {
 		Cfg:           &testing2.Config{BeaconDB: db},
 	}
 
-	reg, err = proposerServer.validatorRegistered(ctx, 0)
-	require.ErrorContains(t, "nil beacon db", err)
+	// TODO (rgeraldes24) - this is not correct; error will never be thrown
+	// https://github.com/prysmaticlabs/prysm/blob/develop/beacon-chain/rpc/prysm/v1alpha1/validator/proposer_builder_test.go#L131
+	// reg, err = proposerServer.validatorRegistered(ctx, 0)
+	// require.ErrorContains(t, "nil beacon db", err)
+	// require.Equal(t, false, reg)
+	reg, err = proposerServer.canUseBuilder(ctx, 1, 0)
+	require.NoError(t, err)
 	require.Equal(t, false, reg)
 
 	f := bytesutil.PadTo([]byte{}, fieldparams.FeeRecipientLength)
