@@ -17,7 +17,7 @@ import (
 )
 
 // ENR key used for Ethereum consensus-related fork data.
-var eth2ENRKey = params.BeaconNetworkConfig().ETH2Key
+var zond2ENRKey = params.BeaconNetworkConfig().ZOND2Key
 
 // ForkDigest returns the current fork digest of
 // the node according to the local clock.
@@ -106,7 +106,7 @@ func addForkEntry(
 	if err != nil {
 		return nil, err
 	}
-	forkEntry := enr.WithEntry(eth2ENRKey, enc)
+	forkEntry := enr.WithEntry(zond2ENRKey, enc)
 	node.Set(forkEntry)
 	return node, nil
 }
@@ -115,7 +115,7 @@ func addForkEntry(
 // under the Ethereum consensus EnrKey
 func forkEntry(record *enr.Record) (*pb.ENRForkID, error) {
 	sszEncodedForkEntry := make([]byte, 16)
-	entry := enr.WithEntry(eth2ENRKey, &sszEncodedForkEntry)
+	entry := enr.WithEntry(zond2ENRKey, &sszEncodedForkEntry)
 	err := record.Load(entry)
 	if err != nil {
 		return nil, err

@@ -161,6 +161,8 @@ func TestStore_SaveCheckpointState(t *testing.T) {
 	require.NoError(t, err)
 	err = s.SetBalances([]uint64{0})
 	require.NoError(t, err)
+	err = s.SetInactivityScores([]uint64{0})
+	require.NoError(t, err)
 	r := [32]byte{'g'}
 	require.NoError(t, service.cfg.BeaconDB.SaveState(ctx, s, r))
 

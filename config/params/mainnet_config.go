@@ -35,12 +35,12 @@ var mainnetNetworkConfig = &NetworkConfig{
 	MaximumGossipClockDisparity:     500 * time.Millisecond,
 	MessageDomainInvalidSnappy:      [4]byte{00, 00, 00, 00},
 	MessageDomainValidSnappy:        [4]byte{01, 00, 00, 00},
-	ETH2Key:                         "eth2",
+	ZOND2Key:                        "zond2",
 	AttSubnetKey:                    "attnets",
 	SyncCommsSubnetKey:              "syncnets",
 	MinimumPeersInSubnetSearch:      20,
-	ContractDeploymentBlock:         11184524, // Note: contract was deployed in block 11052984 but no transactions were sent until 11184524.
-	BootstrapNodes:                  []string{
+	//ContractDeploymentBlock:         11184524, // Note: contract was deployed in block 11052984 but no transactions were sent until 11184524.
+	BootstrapNodes: []string{
 		// QRL bootnodes
 		// "enr:-Ku4QHqVeJ8PPICcWk1vSn_XcSkjOkNiTg6Fmii5j6vUQgvzMc9L1goFnLKgXqBJspJjIsB91LTOleFmyWWrFVATGngBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC1MD8qAAAAAP__________gmlkgnY0gmlwhAMRHkWJc2VjcDI1NmsxoQKLVXFOhp2uX6jeT0DvvDpPcU8FWMjQdR4wMuORMhpX24N1ZHCCIyg",
 		// "enr:-Ku4QG-2_Md3sZIAUebGYT6g0SMskIml77l6yR-M_JXc-UdNHCmHQeOiMLbylPejyJsdAPsTHJyjJB2sYGDLe0dn8uYBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpC1MD8qAAAAAP__________gmlkgnY0gmlwhBLY-NyJc2VjcDI1NmsxoQORcM6e19T1T9gi7jxEZjk_sjVLGFscUNqAY9obgZaxbIN1ZHCCIyg",

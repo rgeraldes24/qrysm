@@ -13,6 +13,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -147,10 +148,11 @@ func (vs *Server) ProposeAttestation(ctx context.Context, att *zondpb.Attestatio
 	ctx, span := trace.StartSpan(ctx, "AttesterServer.ProposeAttestation")
 	defer span.End()
 
-	// TODO(rgeraldes24): review
-	// if _, err := dilithium.SignatureFromBytes(att.Signatures); err != nil {
-	// 	return nil, status.Error(codes.InvalidArgument, "Incorrect attestation signature")
-	// }
+	for i, sig := range att.Signatures {
+		if _, err := dilithium.SignatureFromBytes(sig); err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "Incorrect attestation signature - index %d", i)
+		}
+	}
 
 	root, err := att.Data.HashTreeRoot()
 	if err != nil {

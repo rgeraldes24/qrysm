@@ -2,7 +2,6 @@ package genesis
 
 import (
 	_ "embed"
-	"fmt"
 
 	"github.com/golang/snappy"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -29,7 +28,6 @@ func load(b []byte) (state.BeaconState, error) {
 		return nil, err
 	}
 	if err := st.UnmarshalSSZ(b); err != nil {
-		fmt.Println("UnmarshalSSZ")
 		return nil, err
 	}
 	//return state_native.InitializeFromProtoUnsafePhase0(st)

@@ -277,7 +277,7 @@ func createGenesisTime(timeStamp uint64) uint64 {
 // updates the deposit trie with the data from each individual log.
 func (s *Service) processPastLogs(ctx context.Context) error {
 	currentBlockNum := s.latestZond1Data.LastRequestedBlock
-	//deploymentBlock := params.BeaconNetworkConfig().ContractDeploymentBlock
+	// deploymentBlock := params.BeaconNetworkConfig().ContractDeploymentBlock
 	// NOTE(rgeraldes24) - pure PoS
 	deploymentBlock := uint64(0)
 	// Start from the deployment block if our last requested block

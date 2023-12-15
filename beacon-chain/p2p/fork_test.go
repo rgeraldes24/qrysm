@@ -227,7 +227,7 @@ func TestDiscv5_AddRetrieveForkEntryENR(t *testing.T) {
 	}
 	enc, err := enrForkID.MarshalSSZ()
 	require.NoError(t, err)
-	entry := enr.WithEntry(eth2ENRKey, enc)
+	entry := enr.WithEntry(zond2ENRKey, enc)
 	// In epoch 1 of current time, the fork version should be
 	// {0, 0, 0, 1} according to the configuration override above.
 	temp := t.TempDir()

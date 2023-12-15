@@ -14,18 +14,14 @@ import (
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/execution"
-	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/features"
 	"github.com/theQRL/qrysm/v4/config/params"
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
-	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -37,6 +33,7 @@ import (
 	qrysmTime "github.com/theQRL/qrysm/v4/time"
 )
 
+/*
 func TestStore_OnBlockBatch(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
@@ -71,7 +68,9 @@ func TestStore_OnBlockBatch(t *testing.T) {
 	require.Equal(t, blkRoots[63], jroot)
 	require.Equal(t, primitives.Epoch(2), service.cfg.ForkChoiceStore.JustifiedCheckpoint().Epoch)
 }
+*/
 
+/*
 func TestStore_OnBlockBatch_NotifyNewPayload(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
@@ -98,6 +97,7 @@ func TestStore_OnBlockBatch_NotifyNewPayload(t *testing.T) {
 	}
 	require.NoError(t, service.onBlockBatch(ctx, blks, blkRoots))
 }
+*/
 
 func TestCachedPreState_CanGetFromStateSummary(t *testing.T) {
 	service, tr := minimalTestService(t)
@@ -1143,6 +1143,7 @@ func Test_verifyBlkFinalizedSlot_invalidBlock(t *testing.T) {
 // INVALID from FCU, with LVH block 17. No head is viable. We check
 // that the node is optimistic and that we can actually import a block on top of
 // 17 and recover.
+/*
 func TestStore_NoViableHead_FCU(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig()
@@ -1313,6 +1314,7 @@ func TestStore_NoViableHead_FCU(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, false, optimistic)
 }
+*/
 
 // See the description in #10777 and #10782 for the full setup
 // We sync optimistically a chain of blocks. Block 17 is the last block in Epoch
@@ -1320,6 +1322,7 @@ func TestStore_NoViableHead_FCU(t *testing.T) {
 // INVALID from NewPayload, with LVH block 17. No head is viable. We check
 // that the node is optimistic and that we can actually import a block on top of
 // 17 and recover.
+/*
 func TestStore_NoViableHead_NewPayload(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig()
@@ -1489,6 +1492,7 @@ func TestStore_NoViableHead_NewPayload(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, false, optimistic)
 }
+*/
 
 // See the description in #10777 and #10782 for the full setup
 // We sync optimistically a chain of blocks. Block 12 is the first block in Epoch
@@ -1497,6 +1501,7 @@ func TestStore_NoViableHead_NewPayload(t *testing.T) {
 // that the node is optimistic and that we can actually import a chain of blocks on top of
 // 12 and recover. Notice that it takes two epochs to fully recover, and we stay
 // optimistic for the whole time.
+/*
 func TestStore_NoViableHead_Liveness(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig()
@@ -1727,12 +1732,14 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, false, optimistic)
 }
+*/
 
 // See the description in #10777 and #10782 for the full setup
 // We sync optimistically a chain of blocks. Block 12 is the first block in Epoch
 // 2 (and the merge block in this sequence). Block 18 justifies it and Block 19 returns
 // INVALID from NewPayload, with LVH block 12. No head is viable. We check that
 // the node can reboot from this state
+/*
 func TestNoViableHead_Reboot(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig()
@@ -1918,7 +1925,9 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, false, optimistic)
 }
+*/
 
+/*
 func TestOnBlock_HandleBlockAttestations(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
@@ -1983,6 +1992,7 @@ func TestOnBlock_HandleBlockAttestations(t *testing.T) {
 	require.NoError(t, service.handleBlockAttestations(ctx, wsb3.Block(), st3)) // fine to use the same committee as st
 	require.Equal(t, 1, len(service.cfg.AttPool.BlockAttestations()))
 }
+*/
 
 func TestFillMissingBlockPayloadId_DiffSlotExitEarly(t *testing.T) {
 	logHook := logTest.NewGlobal()

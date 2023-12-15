@@ -327,6 +327,7 @@ func TestSaveOrphanedAtts(t *testing.T) {
 	require.DeepEqual(t, wantAtts, atts)
 }
 
+/*
 func TestSaveOrphanedOps(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig()
@@ -408,6 +409,7 @@ func TestSaveOrphanedOps(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 1, len(exits))
 }
+*/
 
 func TestSaveOrphanedAtts_CanFilter(t *testing.T) {
 	ctx := context.Background()

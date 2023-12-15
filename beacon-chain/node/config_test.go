@@ -122,16 +122,18 @@ func TestConfigureNetwork(t *testing.T) {
 	set := flag.NewFlagSet("test", 0)
 	bootstrapNodes := cli.StringSlice{}
 	set.Var(&bootstrapNodes, cmd.BootstrapNode.Name, "")
-	set.Int(flags.ContractDeploymentBlock.Name, 0, "")
+	// TODO (rgeraldes24) remove
+	// set.Int(flags.ContractDeploymentBlock.Name, 0, "")
 	require.NoError(t, set.Set(cmd.BootstrapNode.Name, "node1"))
 	require.NoError(t, set.Set(cmd.BootstrapNode.Name, "node2"))
-	require.NoError(t, set.Set(flags.ContractDeploymentBlock.Name, strconv.Itoa(100)))
+	// require.NoError(t, set.Set(flags.ContractDeploymentBlock.Name, strconv.Itoa(100)))
 	cliCtx := cli.NewContext(&app, set, nil)
 
 	configureNetwork(cliCtx)
 
 	assert.DeepEqual(t, []string{"node1", "node2"}, params.BeaconNetworkConfig().BootstrapNodes)
-	assert.Equal(t, uint64(100), params.BeaconNetworkConfig().ContractDeploymentBlock)
+	// TODO (rgeraldes24) remove
+	//assert.Equal(t, uint64(100), params.BeaconNetworkConfig().ContractDeploymentBlock)
 }
 
 func TestConfigureNetwork_ConfigFile(t *testing.T) {
