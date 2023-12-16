@@ -11,7 +11,6 @@ import (
 	"math/big"
 	"net"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -27,7 +26,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
-	types "github.com/theQRL/qrysm/v4/consensus-types/primitives"
 
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
@@ -263,90 +261,95 @@ func (p *Builder) handleHeaderRequest(w http.ResponseWriter, req *http.Request) 
 		http.Error(w, "no valid slot provided", http.StatusBadRequest)
 		return
 	}
-	slot, err := strconv.Atoi(reqSlot)
-	if err != nil {
-		http.Error(w, "invalid slot provided", http.StatusBadRequest)
-		return
-	}
-	ax := types.Slot(slot)
-	currEpoch := types.Epoch(ax / params.BeaconConfig().SlotsPerEpoch)
-	if currEpoch >= params.BeaconConfig().CapellaForkEpoch {
-		p.handleHeadeRequest(w)
-		return
-	}
+	// slot, err := strconv.Atoi(reqSlot)
+	// if err != nil {
+	// 	http.Error(w, "invalid slot provided", http.StatusBadRequest)
+	// 	return
+	// }
+	// ax := types.Slot(slot)
+	// currEpoch := types.Epoch(ax / params.BeaconConfig().SlotsPerEpoch)
 
-	b, err := p.retrievePendingBlock()
-	if err != nil {
-		p.cfg.logger.WithError(err).Error("Could not retrieve pending block")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	secKey, err := dilithium.RandKey()
-	if err != nil {
-		p.cfg.logger.WithError(err).Error("Could not retrieve secret key")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	wObj, err := blocks.WrappedExecutionPayload(b)
-	if err != nil {
-		p.cfg.logger.WithError(err).Error("Could not wrap execution payload")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	hdr, err := blocks.PayloadToHeader(wObj)
-	if err != nil {
-		p.cfg.logger.WithError(err).Error("Could not make payload into header")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	gEth := big.NewInt(int64(params.BeaconConfig().GweiPerEth))
-	weiEth := gEth.Mul(gEth, gEth)
-	val := builderAPI.Uint256{Int: weiEth}
-	wrappedHdr := &builderAPI.ExecutionPayloadHeader{ExecutionPayloadHeader: hdr}
-	bid := &builderAPI.BuilderBid{
-		Header: wrappedHdr,
-		Value:  val,
-		Pubkey: secKey.PublicKey().Marshal(),
-	}
-	sszBid := &zond.BuilderBid{
-		Header: hdr,
-		Value:  val.SSZBytes(),
-		Pubkey: secKey.PublicKey().Marshal(),
-	}
-	d, err := signing.ComputeDomain(params.BeaconConfig().DomainApplicationBuilder,
-		nil, /* fork version */
-		nil /* genesis val root */)
-	if err != nil {
-		p.cfg.logger.WithError(err).Error("Could not compute the domain")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	rt, err := signing.ComputeSigningRoot(sszBid, d)
-	if err != nil {
-		p.cfg.logger.WithError(err).Error("Could not compute the signing root")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	sig := secKey.Sign(rt[:])
-	hdrResp := &builderAPI.ExecHeaderResponse{
-		Version: "capella",
-		Data: struct {
-			Signature hexutil.Bytes          `json:"signature"`
-			Message   *builderAPI.BuilderBid `json:"message"`
-		}{
-			Signature: sig.Marshal(),
-			Message:   bid,
-		},
-	}
+	// if currEpoch >= params.BeaconConfig().CapellaForkEpoch {
+	// 	p.handleHeadeRequest(w)
+	// 	return
+	// }
 
-	err = json.NewEncoder(w).Encode(hdrResp)
-	if err != nil {
-		p.cfg.logger.WithError(err).Error("Could not encode response")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	p.currPayload = wObj
-	w.WriteHeader(http.StatusOK)
+	p.handleHeadeRequest(w)
+
+	/*
+		b, err := p.retrievePendingBlock()
+		if err != nil {
+			p.cfg.logger.WithError(err).Error("Could not retrieve pending block")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		secKey, err := dilithium.RandKey()
+		if err != nil {
+			p.cfg.logger.WithError(err).Error("Could not retrieve secret key")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		wObj, err := blocks.WrappedExecutionPayload(b)
+		if err != nil {
+			p.cfg.logger.WithError(err).Error("Could not wrap execution payload")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		hdr, err := blocks.PayloadToHeader(wObj)
+		if err != nil {
+			p.cfg.logger.WithError(err).Error("Could not make payload into header")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		gEth := big.NewInt(int64(params.BeaconConfig().GweiPerEth))
+		weiEth := gEth.Mul(gEth, gEth)
+		val := builderAPI.Uint256{Int: weiEth}
+		wrappedHdr := &builderAPI.ExecutionPayloadHeader{ExecutionPayloadHeader: hdr}
+		bid := &builderAPI.BuilderBid{
+			Header: wrappedHdr,
+			Value:  val,
+			Pubkey: secKey.PublicKey().Marshal(),
+		}
+		sszBid := &zond.BuilderBid{
+			Header: hdr,
+			Value:  val.SSZBytes(),
+			Pubkey: secKey.PublicKey().Marshal(),
+		}
+		d, err := signing.ComputeDomain(params.BeaconConfig().DomainApplicationBuilder,
+			nil,
+			nil)
+		if err != nil {
+			p.cfg.logger.WithError(err).Error("Could not compute the domain")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		rt, err := signing.ComputeSigningRoot(sszBid, d)
+		if err != nil {
+			p.cfg.logger.WithError(err).Error("Could not compute the signing root")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		sig := secKey.Sign(rt[:])
+		hdrResp := &builderAPI.ExecHeaderResponse{
+			Version: "capella",
+			Data: struct {
+				Signature hexutil.Bytes          `json:"signature"`
+				Message   *builderAPI.BuilderBid `json:"message"`
+			}{
+				Signature: sig.Marshal(),
+				Message:   bid,
+			},
+		}
+
+		err = json.NewEncoder(w).Encode(hdrResp)
+		if err != nil {
+			p.cfg.logger.WithError(err).Error("Could not encode response")
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		p.currPayload = wObj
+		w.WriteHeader(http.StatusOK)
+	*/
 }
 
 func (p *Builder) handleHeadeRequest(w http.ResponseWriter) {
@@ -443,13 +446,13 @@ func (p *Builder) handleBlindedBlock(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	if payload, err := p.currPayload.PbCapella(); err == nil {
-		convertedPayload, err := builderAPI.FromProtoCapella(payload)
+		convertedPayload, err := builderAPI.FromProto(payload)
 		if err != nil {
 			p.cfg.logger.WithError(err).Error("Could not convert the payload")
 			http.Error(w, "payload not found", http.StatusInternalServerError)
 			return
 		}
-		execResp := &builderAPI.ExecPayloadResponseCapella{
+		execResp := &builderAPI.ExecPayloadResponse{
 			Version: "capella",
 			Data:    convertedPayload,
 		}
@@ -504,7 +507,7 @@ func (p *Builder) retrievePendingBlock() (*v1.ExecutionPayloadWithValue, error) 
 	if err != nil {
 		return nil, err
 	}
-	capellaPayload := &v1.ExecutionPayloadCapellaWithValue{}
+	capellaPayload := &v1.ExecutionPayloadWithValue{}
 	if err = json.Unmarshal(marshalledOutput, capellaPayload); err != nil {
 		return nil, err
 	}

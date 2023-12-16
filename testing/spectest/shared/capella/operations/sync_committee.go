@@ -31,7 +31,7 @@ func RunSyncCommitteeTest(t *testing.T, config string) {
 			sc := &zondpb.SyncAggregate{}
 			require.NoError(t, sc.UnmarshalSSZ(syncCommitteeSSZ), "Failed to unmarshal")
 
-			body := &zondpb.BeaconBlockBodyCapella{SyncAggregate: sc}
+			body := &zondpb.BeaconBlockBody{SyncAggregate: sc}
 			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				st, _, err := altair.ProcessSyncAggregate(context.Background(), s, body.SyncAggregate)
 				if err != nil {

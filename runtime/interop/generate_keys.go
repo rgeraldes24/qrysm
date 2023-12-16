@@ -11,9 +11,9 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 )
 
-const (
-	blsWithdrawalPrefixByte = byte(0)
-)
+// const (
+// 	blsWithdrawalPrefixByte = byte(0)
+// )
 
 // DeterministicallyGenerateKeys creates BLS private keys using a fixed curve order according to
 // the algorithm specified in the Ethereum beacon chain specification interop mock start section found here:

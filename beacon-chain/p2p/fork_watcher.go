@@ -34,7 +34,6 @@ func (s *Service) forkWatcher() {
 				// }
 				encoder.SetMaxGossipSizeForBellatrix()
 				encoder.SetMaxChunkSizeForBellatrix()
-
 			}
 		case <-s.ctx.Done():
 			log.Debug("Context closed, exiting goroutine")

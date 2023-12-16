@@ -24,17 +24,18 @@ func (s *Store) RunUpMigrations(ctx context.Context) error {
 		if err := s.migrateSourceTargetEpochsBucketUp(ctx); err != nil {
 			return err
 		}
-
-		for _, m := range upMigrations {
-			if ctx.Err() != nil {
-				return ctx.Err()
-			}
-
-			if err := s.db.Update(m); err != nil {
-				return err
-			}
-		}
 	*/
+
+	for _, m := range upMigrations {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+
+		if err := s.db.Update(m); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -48,16 +49,17 @@ func (s *Store) RunDownMigrations(ctx context.Context) error {
 		if err := s.migrateSourceTargetEpochsBucketDown(ctx); err != nil {
 			return err
 		}
-
-		for _, m := range downMigrations {
-			if ctx.Err() != nil {
-				return ctx.Err()
-			}
-
-			if err := s.db.Update(m); err != nil {
-				return err
-			}
-		}
 	*/
+
+	for _, m := range downMigrations {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+
+		if err := s.db.Update(m); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }

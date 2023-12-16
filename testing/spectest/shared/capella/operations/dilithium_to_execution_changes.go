@@ -32,7 +32,7 @@ func RunDilithiumToExecutionChangeTest(t *testing.T, config string) {
 			change := &zondpb.SignedDilithiumToExecutionChange{}
 			require.NoError(t, change.UnmarshalSSZ(changeSSZ), "Failed to unmarshal")
 
-			body := &zondpb.BeaconBlockBodyCapella{
+			body := &zondpb.BeaconBlockBody{
 				DilithiumToExecutionChanges: []*zondpb.SignedDilithiumToExecutionChange{change},
 			}
 			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {

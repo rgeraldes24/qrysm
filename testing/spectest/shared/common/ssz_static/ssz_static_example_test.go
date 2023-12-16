@@ -49,7 +49,7 @@ func ExampleRunSSZStaticTests() {
 		switch object.(type) {
 		case *zondpb.BeaconState:
 			htrs = append(htrs, func(s interface{}) ([32]byte, error) {
-				beaconState, err := state_native.InitializeFromProtoPhase0(s.(*zondpb.BeaconState))
+				beaconState, err := state_native.InitializeFromProtoCapella(s.(*zondpb.BeaconState))
 				require.NoError(t, err)
 				return beaconState.HashTreeRoot(context.TODO())
 			})

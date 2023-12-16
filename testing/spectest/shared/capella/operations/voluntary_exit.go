@@ -31,7 +31,7 @@ func RunVoluntaryExitTest(t *testing.T, config string) {
 			voluntaryExit := &zondpb.SignedVoluntaryExit{}
 			require.NoError(t, voluntaryExit.UnmarshalSSZ(exitSSZ), "Failed to unmarshal")
 
-			body := &zondpb.BeaconBlockBodyCapella{VoluntaryExits: []*zondpb.SignedVoluntaryExit{voluntaryExit}}
+			body := &zondpb.BeaconBlockBody{VoluntaryExits: []*zondpb.SignedVoluntaryExit{voluntaryExit}}
 			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				return blocks.ProcessVoluntaryExits(ctx, s, b.Block().Body().VoluntaryExits())
 			})

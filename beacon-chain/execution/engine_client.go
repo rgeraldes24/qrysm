@@ -10,13 +10,12 @@ import (
 
 	"github.com/holiman/uint256"
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond"
+	zond "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	zondRPC "github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution/types"
 	"github.com/theQRL/qrysm/v4/config/features"
-	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -744,6 +743,8 @@ func tDStringToUint256(td string) (*uint256.Int, error) {
 	return i, nil
 }
 
+// TODO(rgeraldes24) - remove
+/*
 func buildEmptyExecutionPayload() *pb.ExecutionPayload {
 	return &pb.ExecutionPayload{
 		ParentHash:    make([]byte, fieldparams.RootLength),
@@ -759,6 +760,7 @@ func buildEmptyExecutionPayload() *pb.ExecutionPayload {
 		Withdrawals:   make([]*pb.Withdrawal, 0),
 	}
 }
+*/
 
 func toBlockNumArg(number *big.Int) string {
 	if number == nil {

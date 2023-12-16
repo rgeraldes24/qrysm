@@ -6,7 +6,7 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-var migrationCompleted = []byte("done")
+// var migrationCompleted = []byte("done")
 
 type migration func(context.Context, *bolt.DB) error
 

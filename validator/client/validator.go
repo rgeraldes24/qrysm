@@ -177,7 +177,9 @@ func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
 	return nil
 }
 
+// TODO(rgeraldes24) - remove
 // subscribe to channel for when the wallet is initialized
+/*
 func waitForWebWalletInitialization(
 	ctx context.Context,
 	walletInitializedEvent *event.Feed,
@@ -201,6 +203,7 @@ func waitForWebWalletInitialization(
 		}
 	}
 }
+*/
 
 // recheckKeys checks if the validator has any keys that need to be rechecked.
 // the keymanager implements a subscription to push these updates to the validator.
@@ -1243,10 +1246,10 @@ type voteStats struct {
 	startEpoch          primitives.Epoch
 	totalAttestedCount  uint64
 	totalRequestedCount uint64
-	totalDistance       primitives.Slot
-	totalCorrectSource  uint64
-	totalCorrectTarget  uint64
-	totalCorrectHead    uint64
+	// totalDistance       primitives.Slot
+	totalCorrectSource uint64
+	totalCorrectTarget uint64
+	totalCorrectHead   uint64
 }
 
 // This tracks all validators' submissions for sync committees.

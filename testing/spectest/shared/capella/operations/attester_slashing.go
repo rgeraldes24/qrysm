@@ -32,7 +32,7 @@ func RunAttesterSlashingTest(t *testing.T, config string) {
 			attSlashing := &zondpb.AttesterSlashing{}
 			require.NoError(t, attSlashing.UnmarshalSSZ(attSlashingSSZ), "Failed to unmarshal")
 
-			body := &zondpb.BeaconBlockBodyCapella{AttesterSlashings: []*zondpb.AttesterSlashing{attSlashing}}
+			body := &zondpb.BeaconBlockBody{AttesterSlashings: []*zondpb.AttesterSlashing{attSlashing}}
 			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				return blocks.ProcessAttesterSlashings(ctx, s, b.Block().Body().AttesterSlashings(), validators.SlashValidator)
 			})

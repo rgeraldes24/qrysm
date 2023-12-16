@@ -115,7 +115,6 @@ func JsonifySignedVoluntaryExits(voluntaryExits []*zondpb.SignedVoluntaryExit) [
 
 // JsonifySignedSyncAggregate converts a sync aggregate struct to a JSON hex string compatible format.
 func JsonifySignedSyncAggregate(syncAggregate *zondpb.SyncAggregate) *apimiddleware.SyncAggregateJson {
-
 	/*
 		jsonSignedVoluntaryExits := make([]*apimiddleware.SignedVoluntaryExitJson, len(voluntaryExits))
 		for index, signedVoluntaryExit := range voluntaryExits {

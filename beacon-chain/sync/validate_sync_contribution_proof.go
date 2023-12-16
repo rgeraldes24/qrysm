@@ -238,7 +238,7 @@ func (s *Service) rejectInvalidContributionSignature(m *zondpb.SignedContributio
 		set := &dilithium.SignatureBatch{
 			Messages:     [][32]byte{root},
 			PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
-			Signatures:   [][][]byte{[][]byte{m.Signature}},
+			Signatures:   [][][]byte{{m.Signature}},
 			Descriptions: []string{signing.ContributionSignature},
 		}
 		return s.validateWithBatchVerifier(ctx, "sync contribution signature", set)

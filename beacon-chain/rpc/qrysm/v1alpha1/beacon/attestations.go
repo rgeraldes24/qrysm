@@ -15,8 +15,6 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
-	attaggregation "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/attestations"
-	"github.com/theQRL/qrysm/v4/time/slots"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -195,10 +193,12 @@ func (bs *Server) ListIndexedAttestations(
 	}, nil
 }
 
+// This method was used by a func StreamIndexedAttestations that has been deprecated
+/*
 // already being done by the attestation pool in the operations service.
 func (bs *Server) collectReceivedAttestations(ctx context.Context) {
 	attsByRoot := make(map[[32]byte][]*zondpb.Attestation)
-	twoThirdsASlot := 2 * slots.DivideSlotBy(3) /* 2/3 slot duration */
+	twoThirdsASlot := 2 * slots.DivideSlotBy(3) // 2/3 slot duration
 	ticker := slots.NewSlotTickerWithOffset(bs.GenesisTimeFetcher.GenesisTime(), twoThirdsASlot, params.BeaconConfig().SecondsPerSlot)
 	for {
 		select {
@@ -235,6 +235,7 @@ func (bs *Server) collectReceivedAttestations(ctx context.Context) {
 		}
 	}
 }
+*/
 
 // AttestationPool retrieves pending attestations.
 //

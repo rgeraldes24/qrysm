@@ -866,6 +866,7 @@ func (c *ValidatorClient) registerRPCGatewayService(cliCtx *cli.Context) error {
 	return c.services.RegisterService(gw)
 }
 
+/*
 func setWalletPasswordFilePath(cliCtx *cli.Context) error {
 	walletDir := cliCtx.String(flags.WalletDirFlag.Name)
 	defaultWalletPasswordFilePath := filepath.Join(walletDir, wallet.DefaultWalletPasswordFile)
@@ -889,6 +890,7 @@ func setWalletPasswordFilePath(cliCtx *cli.Context) error {
 	}
 	return nil
 }
+*/
 
 func clearDB(ctx context.Context, dataDir string, force bool) error {
 	var err error

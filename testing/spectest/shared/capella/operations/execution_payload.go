@@ -33,14 +33,14 @@ func RunExecutionPayloadTest(t *testing.T, config string) {
 			require.NoError(t, err)
 			blockSSZ, err := snappy.Decode(nil /* dst */, blockBodyFile)
 			require.NoError(t, err, "Failed to decompress")
-			block := &zondpb.BeaconBlockBodyCapella{}
+			block := &zondpb.BeaconBlockBody{}
 			require.NoError(t, block.UnmarshalSSZ(blockSSZ), "Failed to unmarshal")
 
 			preBeaconStateFile, err := util.BazelFileBytes(testsFolderPath, folder.Name(), "pre.ssz_snappy")
 			require.NoError(t, err)
 			preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
-			preBeaconStateBase := &zondpb.BeaconStateCapella{}
+			preBeaconStateBase := &zondpb.BeaconState{}
 			require.NoError(t, preBeaconStateBase.UnmarshalSSZ(preBeaconStateSSZ), "Failed to unmarshal")
 			preBeaconState, err := state_native.InitializeFromProtoCapella(preBeaconStateBase)
 			require.NoError(t, err)
@@ -53,7 +53,7 @@ func RunExecutionPayloadTest(t *testing.T, config string) {
 				require.NoError(t, err)
 			}
 
-			payload, err := blocks2.WrappedExecutionPayloadCapella(block.ExecutionPayload, 0)
+			payload, err := blocks2.WrappedExecutionPayload(block.ExecutionPayload, 0)
 			require.NoError(t, err)
 
 			file, err := util.BazelFileBytes(testsFolderPath, folder.Name(), "execution.yaml")
@@ -62,7 +62,8 @@ func RunExecutionPayloadTest(t *testing.T, config string) {
 			require.NoError(t, utils.UnmarshalYaml(file, config), "Failed to Unmarshal")
 
 			if postSSZExists {
-				require.NoError(t, blocks.ValidatePayloadWhenMergeCompletes(preBeaconState, payload))
+				// TODO(rgeraldes24) - review
+				// require.NoError(t, blocks.ValidatePayloadWhenMergeCompletes(preBeaconState, payload))
 				require.NoError(t, blocks.ValidatePayload(preBeaconState, payload))
 				require.NoError(t, preBeaconState.SetLatestExecutionPayloadHeader(payload))
 				postBeaconStateFile, err := os.ReadFile(postSSZFilepath) // #nosec G304
@@ -70,7 +71,7 @@ func RunExecutionPayloadTest(t *testing.T, config string) {
 				postBeaconStateSSZ, err := snappy.Decode(nil /* dst */, postBeaconStateFile)
 				require.NoError(t, err, "Failed to decompress")
 
-				postBeaconState := &zondpb.BeaconStateCapella{}
+				postBeaconState := &zondpb.BeaconState{}
 				require.NoError(t, postBeaconState.UnmarshalSSZ(postBeaconStateSSZ), "Failed to unmarshal")
 				pbState, err := state_native.ProtobufBeaconStateCapella(preBeaconState.ToProto())
 				require.NoError(t, err)
@@ -80,11 +81,13 @@ func RunExecutionPayloadTest(t *testing.T, config string) {
 					t.Fatal("Post state does not match expected")
 				}
 			} else if config.Valid {
-				err1 := blocks.ValidatePayloadWhenMergeCompletes(preBeaconState, payload)
+				// TODO(rgeraldes24) - review
+				// require.NoError(t, blocks.ValidatePayloadWhenMergeCompletes(preBeaconState, payload))
 				err2 := blocks.ValidatePayload(preBeaconState, payload)
 				// Note: This doesn't test anything worthwhile. It essentially tests
 				// that *any* error has occurred, not any specific error.
-				if err1 == nil && err2 == nil {
+				// TODO(rgeraldes24) - review
+				if /*err1 == nil && */ err2 == nil {
 					t.Fatal("Did not fail when expected")
 				}
 				t.Logf("Expected failure; failure reason = %v", err)

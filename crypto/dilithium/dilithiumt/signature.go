@@ -131,7 +131,6 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgsBatches [][32]byte, pu
 			jCopy := j
 
 			grp.Go(func() error {
-
 				ok, err := VerifySignature(sigCopy, msgsBatches[iCopy], pubKeysBatches[iCopy][jCopy])
 				if err != nil {
 					return err

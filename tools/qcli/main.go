@@ -64,7 +64,7 @@ func main() {
 						"signed_block_header|" +
 						"signed_voluntary_exit|" +
 						"voluntary_exit|" +
-						"state_capella",
+						"state",
 					Required:    true,
 					Destination: &sszType,
 				},
@@ -77,7 +77,7 @@ func main() {
 				case "signed_block":
 					data = &zondpb.SignedBeaconBlock{}
 				case "blinded_block":
-					data = &zondpb.BlindedBeaconBlockBellatrix{}
+					data = &zondpb.BlindedBeaconBlock{}
 				case "attestation":
 					data = &zondpb.Attestation{}
 				case "block_header":
@@ -94,8 +94,8 @@ func main() {
 					data = &zondpb.SignedVoluntaryExit{}
 				case "voluntary_exit":
 					data = &zondpb.VoluntaryExit{}
-				case "state_capella":
-					data = &zondpb.BeaconStateCapella{}
+				case "state":
+					data = &zondpb.BeaconState{}
 				default:
 					log.Fatal("Invalid type")
 				}
@@ -117,9 +117,9 @@ func main() {
 				&cli.StringFlag{
 					Name: "data-type",
 					Usage: "ssz file data type: " +
-						"block_capella|" +
-						"blinded_block_capella|" +
-						"signed_block_capella|" +
+						"block|" +
+						"blinded_block|" +
+						"signed_block|" +
 						"attestation|" +
 						"block_header|" +
 						"deposit|" +
@@ -127,7 +127,7 @@ func main() {
 						"signed_block_header|" +
 						"signed_voluntary_exit|" +
 						"voluntary_exit|" +
-						"state_capella",
+						"state",
 					Required:    true,
 					Destination: &sszType,
 				},
@@ -197,7 +197,7 @@ func main() {
 				if err := dataFetcher(preStatePath, preState); err != nil {
 					log.Fatal(err)
 				}
-				stateObj, err := state_native.InitializeFromProtoPhase0(preState)
+				stateObj, err := state_native.InitializeFromProtoCapella(preState)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -269,8 +269,8 @@ func prettyPrint(sszPath string, data fssz.Unmarshaler) {
 
 func benchmarkHash(sszPath string, sszType string) {
 	switch sszType {
-	case "state_capella":
-		st := &zondpb.BeaconStateCapella{}
+	case "state":
+		st := &zondpb.BeaconState{}
 		rawFile, err := os.ReadFile(sszPath) // #nosec G304
 		if err != nil {
 			log.Fatal(err)

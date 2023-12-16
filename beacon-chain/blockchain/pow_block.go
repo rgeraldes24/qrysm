@@ -1,5 +1,6 @@
 package blockchain
 
+// TODO(rgeraldes24) - remove
 /*
 import (
 	"bytes"

@@ -18,6 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/io/file"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/interop"
 	"github.com/theQRL/qrysm/v4/testing/benchmark"
@@ -77,7 +78,7 @@ func main() {
 }
 
 func generateGenesisBeaconState() error {
-	genesisState, _, err := interop.GenerateGenesisState(context.Background(), 0, benchmark.ValidatorCount)
+	genesisState, _, err := interop.GenerateGenesisState(context.Background(), 0, benchmark.ValidatorCount, &enginev1.ExecutionPayload{}, &zondpb.Zond1Data{})
 	if err != nil {
 		return err
 	}
@@ -234,5 +235,5 @@ func genesisBeaconState() (state.BeaconState, error) {
 	if err := genesisState.UnmarshalSSZ(beaconBytes); err != nil {
 		return nil, errors.Wrap(err, "cannot unmarshal genesis state file")
 	}
-	return state_native.InitializeFromProtoUnsafePhase0(genesisState)
+	return state_native.InitializeFromProtoUnsafeCapella(genesisState)
 }

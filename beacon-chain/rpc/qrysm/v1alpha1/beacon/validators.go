@@ -470,6 +470,90 @@ func (bs *Server) GetValidatorActiveSetChanges(
 	}, nil
 }
 
+// GetValidatorParticipation retrieves the validator participation information for a given epoch,
+// it returns the information about validator's participation rate in voting on the proof of stake
+// rules based on their balance compared to the total active validator balance.
+func (bs *Server) GetValidatorParticipation(
+	ctx context.Context, req *zondpb.GetValidatorParticipationRequest,
+) (*zondpb.ValidatorParticipationResponse, error) {
+	currentSlot := bs.GenesisTimeFetcher.CurrentSlot()
+	currentEpoch := slots.ToEpoch(currentSlot)
+
+	var requestedEpoch primitives.Epoch
+	switch q := req.QueryFilter.(type) {
+	case *zondpb.GetValidatorParticipationRequest_Genesis:
+		requestedEpoch = 0
+	case *zondpb.GetValidatorParticipationRequest_Epoch:
+		requestedEpoch = q.Epoch
+	default:
+		requestedEpoch = currentEpoch
+	}
+
+	if requestedEpoch > currentEpoch {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			"Cannot retrieve information about an epoch greater than current epoch, current epoch %d, requesting %d",
+			currentEpoch,
+			requestedEpoch,
+		)
+	}
+	// Use the last slot of requested epoch to obtain current and previous epoch attestations.
+	// This ensures that we don't miss previous attestations when input requested epochs.
+	endSlot, err := slots.EpochEnd(requestedEpoch)
+	if err != nil {
+		return nil, err
+	}
+	// Get as close as we can to the end of the current epoch without going past the current slot.
+	// The above check ensures a future *epoch* isn't requested, but the end slot of the requested epoch could still
+	// be past the current slot. In that case, use the current slot as the best approximation of the requested epoch.
+	// Replayer will make sure the slot ultimately used is canonical.
+	if endSlot > currentSlot {
+		endSlot = currentSlot
+	}
+
+	// ReplayerBuilder ensures that a canonical chain is followed to the slot
+	beaconState, err := bs.ReplayerBuilder.ReplayerForSlot(endSlot).ReplayBlocks(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, fmt.Sprintf("error replaying blocks for state at slot %d: %v", endSlot, err))
+	}
+	var v []*precompute.Validator
+	var b *precompute.Balance
+
+	if beaconState.Version() >= version.Capella {
+		v, b, err = altair.InitializePrecomputeValidators(ctx, beaconState)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "Could not set up altair pre compute instance: %v", err)
+		}
+		_, b, err = altair.ProcessEpochParticipation(ctx, beaconState, b, v)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "Could not pre compute attestations: %v", err)
+		}
+	} else {
+		return nil, status.Errorf(codes.Internal, "Invalid state type retrieved with a version of %d", beaconState.Version())
+	}
+
+	cp := bs.FinalizationFetcher.FinalizedCheckpt()
+	p := &zondpb.ValidatorParticipationResponse{
+		Epoch:     requestedEpoch,
+		Finalized: requestedEpoch <= cp.Epoch,
+		Participation: &zondpb.ValidatorParticipation{
+			// TODO(7130): Remove these three deprecated fields.
+			GlobalParticipationRate:          float32(b.PrevEpochTargetAttested) / float32(b.ActivePrevEpoch),
+			VotedEther:                       b.PrevEpochTargetAttested,
+			EligibleEther:                    b.ActivePrevEpoch,
+			CurrentEpochActiveGwei:           b.ActiveCurrentEpoch,
+			CurrentEpochAttestingGwei:        b.CurrentEpochAttested,
+			CurrentEpochTargetAttestingGwei:  b.CurrentEpochTargetAttested,
+			PreviousEpochActiveGwei:          b.ActivePrevEpoch,
+			PreviousEpochAttestingGwei:       b.PrevEpochAttested,
+			PreviousEpochTargetAttestingGwei: b.PrevEpochTargetAttested,
+			PreviousEpochHeadAttestingGwei:   b.PrevEpochHeadAttested,
+		},
+	}
+
+	return p, nil
+}
+
 // GetValidatorPerformance reports the validator's latest balance along with other important metrics on
 // rewards and penalties throughout its lifecycle in the beacon chain.
 func (bs *Server) GetValidatorPerformance(
@@ -578,6 +662,8 @@ func (bs *Server) GetIndividualVotes(
 }
 
 // Determines whether a validator has already exited.
+// NOTE(rgeraldes24) - used for the validator queue func that has been deprecated
+/*
 func validatorHasExited(validator *zondpb.Validator, currentEpoch primitives.Epoch) bool {
 	farFutureEpoch := params.BeaconConfig().FarFutureEpoch
 	if currentEpoch < validator.ActivationEligibilityEpoch {
@@ -597,6 +683,7 @@ func validatorHasExited(validator *zondpb.Validator, currentEpoch primitives.Epo
 	}
 	return true
 }
+*/
 
 func validatorStatus(validator *zondpb.Validator, epoch primitives.Epoch) zondpb.ValidatorStatus {
 	farFutureEpoch := params.BeaconConfig().FarFutureEpoch

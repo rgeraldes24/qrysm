@@ -25,13 +25,12 @@ import (
 
 	//"github.com/theQRL/qrysm/v4/validator/keymanager/derived"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/local"
-	"github.com/tyler-smith/go-bip39"
 	//util "github.com/wealdtech/go-eth2-util"
 )
 
 var (
-	mnemonicsFileFlag      = flag.String("mnemonics-file", "", "File containing mnemonics, one mnemonic per line")
-	keysPerMnemonicFlag    = flag.Int("keys-per-mnemonic", 0, "The number of keys per mnemonic to generate")
+	mnemonicsFileFlag = flag.String("mnemonics-file", "", "File containing mnemonics, one mnemonic per line")
+	// keysPerMnemonicFlag    = flag.Int("keys-per-mnemonic", 0, "The number of keys per mnemonic to generate")
 	numberOfWalletsFlag    = flag.Int("num-wallets", 0, "Number of wallets to generate")
 	walletOutDirFlag       = flag.String("out-dir", "", "Output directory for wallet files")
 	walletPasswordFileFlag = flag.String("wallet-password-file", "", "File containing the password to encrypt all generated wallets")
@@ -82,12 +81,14 @@ func main() {
 
 // Uses the provided mnemonic seed phrase to generate the
 // appropriate seed file for recovering a derived wallets.
+/*
 func seedFromMnemonic(mnemonic, mnemonicPassphrase string) ([]byte, error) {
 	if ok := bip39.IsMnemonicValid(mnemonic); !ok {
 		return nil, bip39.ErrInvalidMnemonic
 	}
 	return bip39.NewSeed(mnemonic, mnemonicPassphrase), nil
 }
+*/
 
 /*
 func generateKeysFromMnemonicList(mnemonicListFile *bufio.Scanner, keysPerMnemonic int) (pubKeys, privKeys [][]byte, err error) {

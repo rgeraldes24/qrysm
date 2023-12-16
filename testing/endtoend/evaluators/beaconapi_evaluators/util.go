@@ -1,16 +1,6 @@
 package beaconapi_evaluators
 
-import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-
-	log "github.com/sirupsen/logrus"
-	"github.com/theQRL/qrysm/v4/testing/endtoend/params"
-)
-
+/*
 func doMiddlewareJSONGetRequest(template string, requestPath string, beaconNodeIdx int, dst interface{}, bnType ...string) error {
 	var port int
 	if len(bnType) > 0 {
@@ -38,7 +28,9 @@ func doMiddlewareJSONGetRequest(template string, requestPath string, beaconNodeI
 	}
 	return json.NewDecoder(httpResp.Body).Decode(&dst)
 }
+*/
 
+/*
 func doMiddlewareSSZGetRequest(template string, requestPath string, beaconNodeIdx int, bnType ...string) ([]byte, error) {
 	client := &http.Client{}
 	var port int
@@ -77,7 +69,9 @@ func doMiddlewareSSZGetRequest(template string, requestPath string, beaconNodeId
 
 	return body, nil
 }
+*/
 
+/*
 func doMiddlewareJSONPostRequest(template string, requestPath string, beaconNodeIdx int, postData, dst interface{}, bnType ...string) error {
 	var port int
 	if len(bnType) > 0 {
@@ -110,9 +104,12 @@ func doMiddlewareJSONPostRequest(template string, requestPath string, beaconNode
 	}
 	return json.NewDecoder(httpResp.Body).Decode(&dst)
 }
+*/
 
+/*
 func closeBody(body io.Closer) {
 	if err := body.Close(); err != nil {
 		log.WithError(err).Error("could not close response body")
 	}
 }
+*/

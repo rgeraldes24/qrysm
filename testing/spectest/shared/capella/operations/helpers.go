@@ -28,14 +28,14 @@ type blockOperation func(context.Context, state.BeaconState, interfaces.ReadOnly
 func RunBlockOperationTest(
 	t *testing.T,
 	folderPath string,
-	body *zondpb.BeaconBlockBodyCapella,
+	body *zondpb.BeaconBlockBody,
 	operationFn blockOperation,
 ) {
 	preBeaconStateFile, err := util.BazelFileBytes(path.Join(folderPath, "pre.ssz_snappy"))
 	require.NoError(t, err)
 	preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 	require.NoError(t, err, "Failed to decompress")
-	preStateBase := &zondpb.BeaconStateCapella{}
+	preStateBase := &zondpb.BeaconState{}
 	if err := preStateBase.UnmarshalSSZ(preBeaconStateSSZ); err != nil {
 		t.Fatalf("Failed to unmarshal: %v", err)
 	}
@@ -65,7 +65,7 @@ func RunBlockOperationTest(
 		postBeaconStateSSZ, err := snappy.Decode(nil /* dst */, postBeaconStateFile)
 		require.NoError(t, err, "Failed to decompress")
 
-		postBeaconState := &zondpb.BeaconStateCapella{}
+		postBeaconState := &zondpb.BeaconState{}
 		if err := postBeaconState.UnmarshalSSZ(postBeaconStateSSZ); err != nil {
 			t.Fatalf("Failed to unmarshal: %v", err)
 		}

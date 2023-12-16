@@ -55,8 +55,6 @@ func (s *Service) registerRPCHandlers() {
 		p2p.RPCMetaDataTopicV1,
 		s.metaDataHandler,
 	)
-
-	return
 }
 
 // TODO(rgeraldes24) - remove
