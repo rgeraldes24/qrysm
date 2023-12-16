@@ -15,7 +15,6 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/interop"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/components"
-	"github.com/theQRL/qrysm/v4/testing/endtoend/helpers"
 	e2e "github.com/theQRL/qrysm/v4/testing/endtoend/params"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/policies"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/types"
@@ -24,11 +23,13 @@ import (
 )
 
 var FeeRecipientIsPresent = types.Evaluator{
-	Name:       "fee_recipient_is_present_%d",
-	Policy:     policies.AfterNthEpoch(helpers.BellatrixE2EForkEpoch),
+	Name: "fee_recipient_is_present_%d",
+	// Policy:     policies.AfterNthEpoch(helpers.BellatrixE2EForkEpoch),
+	Policy:     policies.AfterNthEpoch(0),
 	Evaluation: feeRecipientIsPresent,
 }
 
+/*
 func lhKeyMap() (map[string]bool, error) {
 	if e2e.TestParams.LighthouseBeaconNodeCount == 0 {
 		return nil, nil
@@ -47,6 +48,7 @@ func lhKeyMap() (map[string]bool, error) {
 	}
 	return km, nil
 }
+*/
 
 func valKeyMap() (map[string]bool, error) {
 	nvals := params.BeaconConfig().MinGenesisActiveValidatorCount
@@ -85,14 +87,16 @@ func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 	if err != nil {
 		return err
 	}
-	lhkeys, err := lhKeyMap()
-	if err != nil {
-		return err
-	}
+	/*
+		lhkeys, err := lhKeyMap()
+		if err != nil {
+			return err
+		}
+	*/
 
 	for _, ctr := range blks.BlockContainers {
-		if ctr.GetBellatrixBlock() != nil {
-			bb := ctr.GetBellatrixBlock().Block
+		if ctr.GetCapellaBlock() != nil {
+			bb := ctr.GetCapellaBlock().Block
 			payload := bb.Body.ExecutionPayload
 			// If the beacon chain has transitioned to Bellatrix, but the EL hasn't hit TTD, we could see a few slots
 			// of blocks with empty payloads.
@@ -107,7 +111,8 @@ func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 			fr := common.BytesToAddress(payload.FeeRecipient)
 			gvr := &zondpb.GetValidatorRequest{
 				QueryFilter: &zondpb.GetValidatorRequest_Index{
-					Index: ctr.GetBellatrixBlock().Block.ProposerIndex,
+					// Index: ctr.GetBellatrixBlock().Block.ProposerIndex,
+					Index: ctr.GetCapellaBlock().Block.ProposerIndex,
 				},
 			}
 			validator, err := client.GetValidator(context.Background(), gvr)
@@ -116,10 +121,10 @@ func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 			}
 			pk := hexutil.Encode(validator.GetPublicKey())
 
-			if _, ok := lhkeys[pk]; ok {
-				// Don't check lighthouse keys.
-				continue
-			}
+			// if _, ok := lhkeys[pk]; ok {
+			// 	// Don't check lighthouse keys.
+			// 	continue
+			// }
 
 			// In e2e we generate deterministic keys by validator index, and then use a slice of their public key bytes
 			// as the fee recipient, so that this will also be deterministic, so this test can statelessly verify it.

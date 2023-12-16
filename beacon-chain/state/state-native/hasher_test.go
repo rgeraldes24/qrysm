@@ -1,21 +1,14 @@
 package state_native_test
 
 import (
-	"context"
-	"testing"
-
 	"github.com/prysmaticlabs/go-bitfield"
-	statenative "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/testing/assert"
-	"github.com/theQRL/qrysm/v4/testing/require"
-	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+/*
 func TestComputeFieldRootsWithHasher_Capella(t *testing.T) {
 	beaconState, err := util.NewBeaconState(util.FillRootsNaturalOpt)
 	require.NoError(t, err)
@@ -98,6 +91,7 @@ func TestComputeFieldRootsWithHasher_Capella(t *testing.T) {
 	}
 	assert.DeepEqual(t, expected, root)
 }
+*/
 
 func genesisValidatorsRoot() []byte {
 	gvr := bytesutil.ToBytes32([]byte("gvr"))

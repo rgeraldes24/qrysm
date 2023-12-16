@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/testing/endtoend/helpers"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/policies"
 	e2etypes "github.com/theQRL/qrysm/v4/testing/endtoend/types"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -16,8 +15,9 @@ import (
 
 // BuilderIsActive checks that the builder is indeed producing the respective payloads
 var BuilderIsActive = e2etypes.Evaluator{
-	Name:       "builder_is_active_at_epoch_%d",
-	Policy:     policies.OnwardsNthEpoch(helpers.BellatrixE2EForkEpoch),
+	Name: "builder_is_active_at_epoch_%d",
+	// Policy:     policies.OnwardsNthEpoch(helpers.BellatrixE2EForkEpoch),
+	Policy:     policies.OnwardsNthEpoch(0),
 	Evaluation: builderActive,
 }
 
@@ -36,8 +36,10 @@ func builderActive(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) err
 		lowestBound = currEpoch - 1
 	}
 
-	if lowestBound < helpers.BellatrixE2EForkEpoch {
-		lowestBound = helpers.BellatrixE2EForkEpoch
+	// if lowestBound < helpers.BellatrixE2EForkEpoch {
+	// TODO(rgeraldes24) - I think that the following code is not necessary given the logic before
+	if lowestBound < 0 {
+		lowestBound = 0
 	}
 	blockCtrs, err := beaconClient.ListBeaconBlocks(context.Background(), &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: lowestBound}})
 	if err != nil {
@@ -52,7 +54,8 @@ func builderActive(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) err
 		if b.IsNil() {
 			return errors.New("nil block provided")
 		}
-		forkStartSlot, err := slots.EpochStart(helpers.BellatrixE2EForkEpoch)
+		// forkStartSlot, err := slots.EpochStart(helpers.BellatrixE2EForkEpoch)
+		forkStartSlot, err := slots.EpochStart(0)
 		if err != nil {
 			return err
 		}
@@ -86,7 +89,8 @@ func builderActive(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) err
 		if b.IsNil() {
 			return errors.New("nil block provided")
 		}
-		forkStartSlot, err := slots.EpochStart(helpers.BellatrixE2EForkEpoch)
+		// forkStartSlot, err := slots.EpochStart(helpers.BellatrixE2EForkEpoch)
+		forkStartSlot, err := slots.EpochStart(0)
 		if err != nil {
 			return err
 		}

@@ -18,14 +18,14 @@ import (
 )
 
 type componentHandler struct {
-	t           *testing.T
-	cfg         *e2etypes.E2EConfig
-	ctx         context.Context
-	done        func()
-	group       *errgroup.Group
-	keygen      e2etypes.ComponentRunner
+	t     *testing.T
+	cfg   *e2etypes.E2EConfig
+	ctx   context.Context
+	done  func()
+	group *errgroup.Group
+	// keygen      e2etypes.ComponentRunner // TODO(rgeraldes24) - to remove (used for lighthouse nodes key generation)
 	tracingSink e2etypes.ComponentRunner
-	//web3Signer               e2etypes.ComponentRunner
+	// web3Signer               e2etypes.ComponentRunner
 	bootnode       e2etypes.ComponentRunner
 	zond1Miner     e2etypes.ComponentRunner
 	builders       e2etypes.MultipleComponentRunners
@@ -55,8 +55,6 @@ func (c *componentHandler) setup() {
 	t.Logf("Shard index: %d\n", e2e.TestParams.TestShardIndex)
 	t.Logf("Starting time: %s\n", time.Now().String())
 	t.Logf("Log Path: %s\n", e2e.TestParams.LogPath)
-
-	// var keyGen e2etypes.ComponentRunner
 
 	tracingSink := components.NewTracingSink(config.TracingSinkEndpoint)
 	g.Go(func() error {
@@ -120,9 +118,9 @@ func (c *componentHandler) setup() {
 	})
 	c.zond1Nodes = zond1Nodes
 
-	if config.TestCheckpointSync {
-		appendDebugEndpoints(config)
-	}
+	// if config.TestCheckpointSync {
+	// 	appendDebugEndpoints(config)
+	// }
 
 	var builders *components.BuilderSet
 	var proxies *zond1.ProxySet

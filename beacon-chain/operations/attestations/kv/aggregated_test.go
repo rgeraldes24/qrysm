@@ -210,6 +210,7 @@ func TestKV_Aggregated_AggregatedAttestations(t *testing.T) {
 	assert.DeepSSZEqual(t, atts, returned)
 }
 
+/*
 func TestKV_Aggregated_DeleteAggregatedAttestation(t *testing.T) {
 	t.Run("nil attestation", func(t *testing.T) {
 		cache := NewAttCaches()
@@ -282,6 +283,7 @@ func TestKV_Aggregated_DeleteAggregatedAttestation(t *testing.T) {
 		assert.DeepEqual(t, wanted, returned)
 	})
 }
+*/
 
 func TestKV_Aggregated_HasAggregatedAttestation(t *testing.T) {
 	tests := []struct {

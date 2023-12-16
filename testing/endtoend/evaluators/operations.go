@@ -87,8 +87,9 @@ var ValidatorsHaveExited = e2etypes.Evaluator{
 
 // SubmitWithdrawal sends a withdrawal from a previously exited validator.
 var SubmitWithdrawal = e2etypes.Evaluator{
-	Name:       "submit_withdrawal_epoch_%d",
-	Policy:     policies.BetweenEpochs(helpers.CapellaE2EForkEpoch-2, helpers.CapellaE2EForkEpoch+1),
+	Name: "submit_withdrawal_epoch_%d",
+	// Policy:     policies.BetweenEpochs(helpers.CapellaE2EForkEpoch-2, helpers.CapellaE2EForkEpoch+1),
+	Policy:     policies.BetweenEpochs(6, 9),
 	Evaluation: submitWithdrawal,
 }
 
@@ -102,7 +103,8 @@ var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 		validWithdrawnEpoch := exitSubmissionEpoch + 1 + params.BeaconConfig().MaxSeedLookahead
 		// Only run this for minimal setups after capella
 		if params.BeaconConfig().ConfigName == params.EndToEndName {
-			validWithdrawnEpoch = helpers.CapellaE2EForkEpoch + 1
+			// validWithdrawnEpoch = helpers.CapellaE2EForkEpoch + 1
+			validWithdrawnEpoch = 9
 		}
 		requiredPolicy := policies.OnEpoch(validWithdrawnEpoch)
 		return requiredPolicy(currentEpoch)

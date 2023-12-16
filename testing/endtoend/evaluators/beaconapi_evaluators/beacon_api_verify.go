@@ -1,5 +1,6 @@
 package beaconapi_evaluators
 
+/*
 import (
 	"github.com/theQRL/qrysm/v4/testing/endtoend/policies"
 	e2etypes "github.com/theQRL/qrysm/v4/testing/endtoend/types"
@@ -43,3 +44,4 @@ func runAPIComparisonFunctions(beaconNodeIdx int, conn *grpc.ClientConn, fs ...a
 	}
 	return nil
 }
+*/

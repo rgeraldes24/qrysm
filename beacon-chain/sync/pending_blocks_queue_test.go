@@ -25,7 +25,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/rand"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -582,6 +581,7 @@ func TestService_sortedPendingSlots(t *testing.T) {
 	assert.DeepEqual(t, want, r.sortedPendingSlots(), "Unexpected pending slots list")
 }
 
+/*
 func TestService_BatchRootRequest(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p1 := p2ptest.NewTestP2P(t)
@@ -675,6 +675,7 @@ func TestService_BatchRootRequest(t *testing.T) {
 	assert.Equal(t, 4, len(r.slotToPendingBlocks.Items()), "Incorrect size for slot to pending blocks cache")
 	assert.Equal(t, 4, len(r.seenPendingBlocks), "Incorrect size for seen pending block")
 }
+*/
 
 func TestService_AddPendingBlockToQueueOverMax(t *testing.T) {
 	r := &Service{

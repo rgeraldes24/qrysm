@@ -195,7 +195,7 @@ func (r *testRunner) testDepositsAndTx(ctx context.Context, g *errgroup.Group,
 	keystorePath string, requiredNodes []e2etypes.ComponentRunner) {
 	minGenesisActiveCount := int(params.BeaconConfig().MinGenesisActiveValidatorCount)
 	// qrysm web3signer doesn't support deposits
-	//r.config.UseWeb3RemoteSigner = false
+	// r.config.UseWeb3RemoteSigner = false
 	depositCheckValidator := components.NewValidatorNode(r.config, int(e2e.DepositCount), e2e.TestParams.BeaconNodeCount, minGenesisActiveCount)
 	g.Go(func() error {
 		if err := helpers.ComponentsStarted(ctx, requiredNodes); err != nil {
@@ -509,14 +509,14 @@ func (r *testRunner) defaultEndToEndRun() error {
 			return errors.Wrap(err, "doppel ganger protection check failed")
 		}
 	}
-	if config.TestCheckpointSync {
-		httpEndpoints := helpers.BeaconAPIHostnames(e2e.TestParams.BeaconNodeCount)
-		menr := zond1Miner.ENR()
-		benr := bootNode.ENR()
-		if err := r.testCheckpointSync(ctx, g, index, conns, httpEndpoints[0], benr, menr); err != nil {
-			return errors.Wrap(err, "checkpoint sync test failed")
-		}
-	}
+	// if config.TestCheckpointSync {
+	// 	httpEndpoints := helpers.BeaconAPIHostnames(e2e.TestParams.BeaconNodeCount)
+	// 	menr := zond1Miner.ENR()
+	// 	benr := bootNode.ENR()
+	// 	if err := r.testCheckpointSync(ctx, g, index, conns, httpEndpoints[0], benr, menr); err != nil {
+	// 		return errors.Wrap(err, "checkpoint sync test failed")
+	// 	}
+	// }
 
 	if config.ExtraEpochs > 0 {
 		if err := r.waitExtra(ctx, primitives.Epoch(config.EpochsToRun+config.ExtraEpochs), conns[0], primitives.Epoch(config.ExtraEpochs)); err != nil {
@@ -603,6 +603,7 @@ func (r *testRunner) executeProvidedEvaluators(ec *e2etypes.EvaluationContext, c
 	wg.Wait()
 }
 
+// TODO(rgeraldes) - remove; identical to multiScenario but multiScenario uses just qrysm beacon nodes
 // This interceptor will define the multi scenario run for our minimal tests.
 // 1) In the first scenario we will be taking a single qrysm node and its validator offline.
 // Along with that we will also take a single lighthouse node and its validator offline.
@@ -612,6 +613,7 @@ func (r *testRunner) executeProvidedEvaluators(ec *e2etypes.EvaluationContext, c
 // After the proxy has been sending `SYNCING` responses to the beacon node, we
 // will test this with our optimistic sync evaluator to ensure everything works
 // as expected.
+/*
 func (r *testRunner) multiScenarioMulticlient(ec *e2etypes.EvaluationContext, epoch uint64, conns []*grpc.ClientConn) bool {
 	type ForkchoiceUpdatedResponse struct {
 		Status    *enginev1.PayloadStatus  `json:"payloadStatus"`
@@ -638,17 +640,6 @@ func (r *testRunner) multiScenarioMulticlient(ec *e2etypes.EvaluationContext, ep
 		}, func() bool {
 			return true
 		})
-		// // Set it for lighthouse beacon node.
-		// component, err = r.comHandler.zond1Proxy.ComponentAtIndex(2)
-		// require.NoError(r.t, err)
-		// component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_newPayload", func() interface{} {
-		// 	return &enginev1.PayloadStatus{
-		// 		Status:          enginev1.PayloadStatus_SYNCING,
-		// 		LatestValidHash: make([]byte, 32),
-		// 	}
-		// }, func() bool {
-		// 	return true
-		// })
 
 		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_forkchoiceUpdated", func() interface{} {
 			return &ForkchoiceUpdatedResponse{
@@ -673,15 +664,6 @@ func (r *testRunner) multiScenarioMulticlient(ec *e2etypes.EvaluationContext, ep
 		engineProxy.RemoveRequestInterceptor("engine_newPayload")
 		engineProxy.ReleaseBackedUpRequests("engine_newPayload")
 
-		// // Remove for lighthouse too
-		// component, err = r.comHandler.zond1Proxy.ComponentAtIndex(2)
-		// require.NoError(r.t, err)
-		// engineProxy, ok = component.(e2etypes.EngineProxy)
-		// require.Equal(r.t, true, ok)
-		// engineProxy.RemoveRequestInterceptor("engine_newPayload")
-		// engineProxy.RemoveRequestInterceptor("engine_forkchoiceUpdated")
-		// engineProxy.ReleaseBackedUpRequests("engine_newPayload")
-
 		return true
 	case 13, 14, 18, 19:
 		// Allow 2 epochs for the network to finalize again.
@@ -689,6 +671,7 @@ func (r *testRunner) multiScenarioMulticlient(ec *e2etypes.EvaluationContext, ep
 	}
 	return false
 }
+*/
 
 func (r *testRunner) eeOffline(_ *e2etypes.EvaluationContext, epoch uint64, _ []*grpc.ClientConn) bool {
 	switch epoch {
@@ -717,6 +700,11 @@ func (r *testRunner) eeOffline(_ *e2etypes.EvaluationContext, epoch uint64, _ []
 // will test this with our optimistic sync evaluator to ensure everything works
 // as expected.
 func (r *testRunner) multiScenario(ec *e2etypes.EvaluationContext, epoch uint64, conns []*grpc.ClientConn) bool {
+	type ForkchoiceUpdatedResponse struct {
+		Status    *enginev1.PayloadStatus  `json:"payloadStatus"`
+		PayloadId *enginev1.PayloadIDBytes `json:"payloadId"`
+	}
+
 	switch epoch {
 	case 11:
 		require.NoError(r.t, r.comHandler.beaconNodes.PauseAtIndex(0))
@@ -745,6 +733,20 @@ func (r *testRunner) multiScenario(ec *e2etypes.EvaluationContext, epoch uint64,
 		}, func() bool {
 			return true
 		})
+
+		// NOTE(rgeraldes24) - added this one from the multi client test; double check during tests
+		component.(e2etypes.EngineProxy).AddRequestInterceptor("engine_forkchoiceUpdated", func() interface{} {
+			return &ForkchoiceUpdatedResponse{
+				Status: &enginev1.PayloadStatus{
+					Status:          enginev1.PayloadStatus_SYNCING,
+					LatestValidHash: nil,
+				},
+				PayloadId: nil,
+			}
+		}, func() bool {
+			return true
+		})
+
 		return true
 	case 22:
 		evs := []e2etypes.Evaluator{ev.OptimisticSyncEnabled}

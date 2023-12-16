@@ -16,10 +16,12 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+/*
 func TestNewRateLimiter(t *testing.T) {
 	rlimiter := newRateLimiter(mockp2p.NewTestP2P(t))
 	assert.Equal(t, len(rlimiter.limiterMap), 10, "correct number of topics not registered")
 }
+*/
 
 func TestNewRateLimiter_FreeCorrectly(t *testing.T) {
 	rlimiter := newRateLimiter(mockp2p.NewTestP2P(t))

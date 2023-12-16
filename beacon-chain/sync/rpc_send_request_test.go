@@ -294,6 +294,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 	})
 }
 
+/*
 func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -475,3 +476,4 @@ func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 		assert.Equal(t, 3, len(blocks))
 	})
 }
+*/

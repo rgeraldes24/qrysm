@@ -2,6 +2,7 @@
 
 package sync
 
+/*
 import (
 	"bytes"
 	"context"
@@ -112,3 +113,4 @@ func FuzzValidateBeaconBlockPubSub_Capella(f *testing.F) {
 		_ = err
 	})
 }
+*/

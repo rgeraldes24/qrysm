@@ -55,6 +55,7 @@ func (s *ValidatorNodeSet) Start(ctx context.Context) error {
 	// Always using genesis count since using anything else would be difficult to test for.
 	validatorNum := int(params.BeaconConfig().MinGenesisActiveValidatorCount)
 	qrysmBeaconNodeNum := e2e.TestParams.BeaconNodeCount
+	// beaconNodeNum := qrysmBeaconNodeNum + e2e.TestParams.LighthouseBeaconNodeCount
 	beaconNodeNum := qrysmBeaconNodeNum
 	if validatorNum%beaconNodeNum != 0 {
 		return errors.New("validator count is not easily divisible by beacon node count")
@@ -253,24 +254,23 @@ func (v *ValidatorNode) Start(ctx context.Context) error {
 	if !v.config.UseQrysmShValidator {
 		args = append(args, features.E2EValidatorFlags...)
 	}
-	/*
-		if v.config.UseWeb3RemoteSigner {
-			// Write the pubkeys as comma separated hex strings with 0x prefix.
-			// See: https://docs.teku.consensys.net/en/latest/HowTo/External-Signer/Use-External-Signer/
-			args = append(args,
-				fmt.Sprintf("--%s=http://localhost:%d", flags.Web3SignerURLFlag.Name, Web3RemoteSignerPort),
-				fmt.Sprintf("--%s=%s", flags.Web3SignerPublicValidatorKeysFlag.Name, strings.Join(validatorHexPubKeys, ",")))
-		} else {
-			// When not using remote key signer, use interop keys.
-			args = append(args,
-				fmt.Sprintf("--%s=%d", flags.InteropNumValidators.Name, validatorNum),
-				fmt.Sprintf("--%s=%d", flags.InteropStartIndex.Name, offset),
-			)
-			if v.config.UseBuilder {
-				args = append(args, fmt.Sprintf("--%s", flags.EnableBuilderFlag.Name))
-			}
-		}
-	*/
+
+	// if v.config.UseWeb3RemoteSigner {
+	// 	// Write the pubkeys as comma separated hex strings with 0x prefix.
+	// 	// See: https://docs.teku.consensys.net/en/latest/HowTo/External-Signer/Use-External-Signer/
+	// 	args = append(args,
+	// 		fmt.Sprintf("--%s=http://localhost:%d", flags.Web3SignerURLFlag.Name, Web3RemoteSignerPort),
+	// 		fmt.Sprintf("--%s=%s", flags.Web3SignerPublicValidatorKeysFlag.Name, strings.Join(validatorHexPubKeys, ",")))
+	// } else {
+	// 	// When not using remote key signer, use interop keys.
+	// 	args = append(args,
+	// 		fmt.Sprintf("--%s=%d", flags.InteropNumValidators.Name, validatorNum),
+	// 		fmt.Sprintf("--%s=%d", flags.InteropStartIndex.Name, offset),
+	// 	)
+	// 	if v.config.UseBuilder {
+	// 		args = append(args, fmt.Sprintf("--%s", flags.EnableBuilderFlag.Name))
+	// 	}
+	// }
 
 	// When not using remote key signer, use interop keys.
 	args = append(args,

@@ -582,7 +582,7 @@ message CommitteeSubnetsSubscribeRequest {
     repeated bool is_aggregator = 3;
 }
 
-// An Ethereum validator.
+// A Zond validator.
 message Validator {
     // 2592 byte Dilithium public key used for the validator's activities.
     bytes public_key = 1 [(theqrl.zond.ext.ssz_size) = "2592", (theqrl.zond.ext.spec_name) = "pubkey"];
@@ -619,23 +619,34 @@ message Validator {
     uint64 withdrawable_epoch = 8 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
 }
 
+// NOTE(rgeraldes24) - field marked as deprecated are still being used for logs/e2e tests
 // ValidatorParticipation stores participation metrics during a given epoch.
 message ValidatorParticipation {
+    // Percentage of validator participation in the given epoch. This field
+    // contains a value between 0 and 1.
+    float global_participation_rate = 1  [deprecated = true];
+
+    // The total amount of ether, in gwei, that has been used in voting.
+    uint64 voted_ether = 2 [deprecated = true];
+
+    // The total amount of ether, in gwei, that is eligible for voting.
+    uint64 eligible_ether = 3 [deprecated = true];
+
     // Total staked gwei that was active (i.e. eligible to vote) during the current epoch.
-    uint64 current_epoch_active_gwei = 1;
+    uint64 current_epoch_active_gwei = 4;
     // Total staked gwei that had attestations included in a block during the current epoch,
     // attestations by the same validator do not increase this figure.
-    uint64 current_epoch_attesting_gwei = 2;
+    uint64 current_epoch_attesting_gwei = 5;
     // Total staked gwei that attested to the majority-elected Casper FFG target epoch during the current epoch.
-    uint64 current_epoch_target_attesting_gwei = 3;
+    uint64 current_epoch_target_attesting_gwei = 6;
     // Same as current_epoch_active_gwei but for previous epoch.
-    uint64 previous_epoch_active_gwei = 4;
+    uint64 previous_epoch_active_gwei = 7;
     // Same as current_epoch_attesting_gwei but for previous epoch.
-    uint64 previous_epoch_attesting_gwei = 5;
+    uint64 previous_epoch_attesting_gwei = 8;
     // Same as current_epoch_target_attesting_gwei but for previous epoch.
-    uint64 previous_epoch_target_attesting_gwei = 6;
+    uint64 previous_epoch_target_attesting_gwei = 9;
     // Total staked gwei that attested to a head beacon block that is in the canonical chain.
-    uint64 previous_epoch_head_attesting_gwei = 7;
+    uint64 previous_epoch_head_attesting_gwei = 10;
 }
 
 // ValidatorInfo gives information about the state of a validator at a certain epoch.

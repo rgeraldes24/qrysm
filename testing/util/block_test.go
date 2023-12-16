@@ -209,9 +209,9 @@ func TestHydrateV1SignedBeaconBlock_NoError(t *testing.T) {
 	b = HydrateV1SignedBeaconBlock(b)
 	_, err := b.HashTreeRoot()
 	require.NoError(t, err)
-	_, err = b.Block.HashTreeRoot()
+	_, err = b.Message.HashTreeRoot()
 	require.NoError(t, err)
-	_, err = b.Block.Body.HashTreeRoot()
+	_, err = b.Message.Body.HashTreeRoot()
 	require.NoError(t, err)
 }
 

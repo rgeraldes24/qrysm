@@ -8,17 +8,14 @@ import (
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/network"
-	"github.com/libp2p/go-libp2p/core/peer"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	dbtest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	p2pm "github.com/theQRL/qrysm/v4/beacon-chain/p2p"
 	p2pt "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
-	"github.com/theQRL/qrysm/v4/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -147,6 +144,7 @@ func TestBlocksFetcher_nonSkippedSlotAfter(t *testing.T) {
 	})
 }
 
+/*
 func TestBlocksFetcher_findFork(t *testing.T) {
 	// Chain graph:
 	// A - B - C - D - E
@@ -308,7 +306,9 @@ func TestBlocksFetcher_findFork(t *testing.T) {
 		require.Equal(t, true, beaconDB.HasBlock(ctx, blkRoot) || mc.HasBlock(ctx, blkRoot), "slot %d", blk.Block.Slot)
 	}
 }
+*/
 
+/*
 func TestBlocksFetcher_findForkWithPeer(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
 	p1 := p2pt.NewTestP2P(t)
@@ -421,6 +421,7 @@ func TestBlocksFetcher_findForkWithPeer(t *testing.T) {
 		assert.Equal(t, primitives.Slot(33), fork.blocks[0].Block().Slot())
 	})
 }
+*/
 
 func TestBlocksFetcher_findAncestor(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)

@@ -14,7 +14,6 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	v1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	"github.com/theQRL/qrysm/v4/testing/endtoend/helpers"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/policies"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/types"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -24,7 +23,7 @@ import (
 
 var expectedParticipation = 0.99
 
-//var expectedMulticlientParticipation = 0.98
+// var expectedMulticlientParticipation = 0.98
 
 var expectedSyncParticipation = 0.99
 
@@ -47,8 +46,9 @@ var ValidatorsParticipatingAtEpoch = func(epoch primitives.Epoch) types.Evaluato
 // ValidatorSyncParticipation ensures the expected amount of sync committee participants
 // are active.
 var ValidatorSyncParticipation = types.Evaluator{
-	Name:       "validator_sync_participation_%d",
-	Policy:     policies.OnwardsNthEpoch(helpers.AltairE2EForkEpoch),
+	Name: "validator_sync_participation_%d",
+	// Policy:     policies.OnwardsNthEpoch(helpers.AltairE2EForkEpoch),
+	Policy:     policies.OnwardsNthEpoch(0),
 	Evaluation: validatorsSyncParticipation,
 }
 
@@ -117,13 +117,17 @@ func validatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.ClientCo
 
 	partRate := participation.Participation.GlobalParticipationRate
 	expected := float32(expectedParticipation)
+	// if e2eparams.TestParams.LighthouseBeaconNodeCount != 0 {
+	// 	expected = float32(expectedMulticlientParticipation)
+	// }
 
-	if participation.Epoch > 0 && participation.Epoch.Sub(1) == helpers.BellatrixE2EForkEpoch {
-		// Reduce Participation requirement to 95% to account for longer EE calls for
-		// the merge block. Target and head will likely be missed for a few validators at
-		// slot 0.
-		expected = 0.95
-	}
+	// TODO(rgeraldes24) double check/review
+	// if participation.Epoch > 0 && participation.Epoch.Sub(1) == helpers.BellatrixE2EForkEpoch {
+	// 	// Reduce Participation requirement to 95% to account for longer EE calls for
+	// 	// the merge block. Target and head will likely be missed for a few validators at
+	// 	// slot 0.
+	// 	expected = 0.95
+	// }
 	if partRate < expected {
 		st, err := debugClient.GetBeaconState(context.Background(), &v1.BeaconStateRequest{StateId: []byte("head")})
 		if err != nil {
@@ -172,13 +176,14 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 		lowestBound = currEpoch - 1
 	}
 
-	if lowestBound < helpers.AltairE2EForkEpoch {
-		lowestBound = helpers.AltairE2EForkEpoch
-	}
+	// if lowestBound < helpers.AltairE2EForkEpoch {
+	// 	lowestBound = helpers.AltairE2EForkEpoch
+	// }
 	blockCtrs, err := altairClient.ListBeaconBlocks(context.Background(), &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: lowestBound}})
 	if err != nil {
 		return errors.Wrap(err, "failed to get validator participation")
 	}
+	// TODO(rgeraldes24) - review
 	for _, ctr := range blockCtrs.BlockContainers {
 		b, err := syncCompatibleBlockFromCtr(ctr)
 		if err != nil {
@@ -188,22 +193,22 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 		if b.IsNil() {
 			return errors.New("nil block provided")
 		}
-		forkStartSlot, err := slots.EpochStart(helpers.AltairE2EForkEpoch)
-		if err != nil {
-			return err
-		}
-		if forkStartSlot == b.Block().Slot() {
-			// Skip fork slot.
-			continue
-		}
+		// forkStartSlot, err := slots.EpochStart(helpers.AltairE2EForkEpoch)
+		// if err != nil {
+		// 	return err
+		// }
+		// if forkStartSlot == b.Block().Slot() {
+		// 	// Skip fork slot.
+		// 	continue
+		// }
 		expectedParticipation := expectedSyncParticipation
-		switch slots.ToEpoch(b.Block().Slot()) {
-		case helpers.AltairE2EForkEpoch:
-			// Drop expected sync participation figure.
-			expectedParticipation = 0.90
-		default:
-			// no-op
-		}
+		// switch slots.ToEpoch(b.Block().Slot()) {
+		// case helpers.AltairE2EForkEpoch:
+		// 	// Drop expected sync participation figure.
+		// 	expectedParticipation = 0.90
+		// default:
+		// 	// no-op
+		// }
 		syncAgg, err := b.Block().Body().SyncAggregate()
 		if err != nil {
 			return err
@@ -229,18 +234,18 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 		if b.IsNil() {
 			return errors.New("nil block provided")
 		}
-		forkSlot, err := slots.EpochStart(helpers.AltairE2EForkEpoch)
-		if err != nil {
-			return err
-		}
-		nexForkSlot, err := slots.EpochStart(helpers.BellatrixE2EForkEpoch)
-		if err != nil {
-			return err
-		}
+		// forkSlot, err := slots.EpochStart(helpers.AltairE2EForkEpoch)
+		// if err != nil {
+		// 	return err
+		// }
+		// nexForkSlot, err := slots.EpochStart(helpers.BellatrixE2EForkEpoch)
+		// if err != nil {
+		// 	return err
+		// }
 		switch b.Block().Slot() {
-		case forkSlot, forkSlot + 1, nexForkSlot:
-			// Skip evaluation of the slot.
-			continue
+		// case forkSlot, forkSlot + 1, nexForkSlot:
+		// 	// Skip evaluation of the slot.
+		// 	continue
 		default:
 			// no-op
 		}

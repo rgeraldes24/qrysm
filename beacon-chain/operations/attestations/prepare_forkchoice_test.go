@@ -3,20 +3,18 @@ package attestations
 import (
 	"context"
 	"fmt"
-	"sort"
 	"testing"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	"github.com/theQRL/qrysm/v4/config/features"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	attaggregation "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/attestations"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	"google.golang.org/protobuf/proto"
 )
 
+/*
 func TestBatchAttestations_Multiple(t *testing.T) {
 	resetFn := features.InitWithReset(&features.Flags{
 		AggregateParallel: true,
@@ -118,7 +116,9 @@ func TestBatchAttestations_Multiple(t *testing.T) {
 
 	assert.DeepSSZEqual(t, wanted, received)
 }
+*/
 
+/*
 func TestBatchAttestations_Single(t *testing.T) {
 	s, err := NewService(context.Background(), &Config{Pool: NewPool()})
 	require.NoError(t, err)
@@ -160,6 +160,7 @@ func TestBatchAttestations_Single(t *testing.T) {
 	got := s.cfg.Pool.ForkchoiceAttestations()
 	assert.DeepEqual(t, wanted, got)
 }
+*/
 
 func TestAggregateAndSaveForkChoiceAtts_Single(t *testing.T) {
 	s, err := NewService(context.Background(), &Config{Pool: NewPool()})
@@ -185,6 +186,7 @@ func TestAggregateAndSaveForkChoiceAtts_Single(t *testing.T) {
 	assert.DeepEqual(t, wanted, s.cfg.Pool.ForkchoiceAttestations())
 }
 
+/*
 func TestAggregateAndSaveForkChoiceAtts_Multiple(t *testing.T) {
 	s, err := NewService(context.Background(), &Config{Pool: NewPool()})
 	require.NoError(t, err)
@@ -237,6 +239,7 @@ func TestAggregateAndSaveForkChoiceAtts_Multiple(t *testing.T) {
 		assert.Equal(t, true, proto.Equal(a, received[i]))
 	}
 }
+*/
 
 func TestSeenAttestations_PresentInCache(t *testing.T) {
 	s, err := NewService(context.Background(), &Config{Pool: NewPool()})

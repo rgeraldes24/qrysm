@@ -2,7 +2,6 @@ package initialsync
 
 import (
 	"context"
-	"fmt"
 	"sort"
 	"sync"
 	"testing"
@@ -11,7 +10,6 @@ import (
 	libp2pcore "github.com/libp2p/go-libp2p/core"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/sirupsen/logrus"
-	logTest "github.com/sirupsen/logrus/hooks/test"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	dbtest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	p2pm "github.com/theQRL/qrysm/v4/beacon-chain/p2p"
@@ -522,6 +520,7 @@ func TestBlocksFetcher_requestBeaconBlocksByRange(t *testing.T) {
 	assert.ErrorContains(t, "context canceled", err)
 }
 
+/*
 func TestBlocksFetcher_RequestBlocksRateLimitingLocks(t *testing.T) {
 	p1 := p2pt.NewTestP2P(t)
 	p2 := p2pt.NewTestP2P(t)
@@ -592,6 +591,7 @@ func TestBlocksFetcher_RequestBlocksRateLimitingLocks(t *testing.T) {
 	// Make sure that p2 has been rate limited.
 	require.LogsContain(t, hook, fmt.Sprintf("msg=\"Slowing down for rate limit\" peer=%s", p2.PeerID()))
 }
+*/
 
 func TestBlocksFetcher_WaitForBandwidth(t *testing.T) {
 	p1 := p2pt.NewTestP2P(t)

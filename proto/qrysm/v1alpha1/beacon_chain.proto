@@ -193,6 +193,17 @@ service BeaconChain {
             get: "/zond/v1alpha1/validators/assignments"
         };
     }
+    
+    // Retrieve the validator participation information for a given epoch.
+    //
+    // This method returns information about the global participation of
+    // validator attestations. This endpoint allows for retrieval of genesis
+    // information via a boolean query filter.
+    rpc GetValidatorParticipation(GetValidatorParticipationRequest) returns (ValidatorParticipationResponse) {
+        option (google.api.http) = {
+            get: "/zond/v1alpha1/validators/participation"
+        };
+    }
 
     // Retrieve the current configuration parameters of the beacon chain.
     rpc GetBeaconConfig(google.protobuf.Empty) returns (BeaconConfig) {
@@ -684,6 +695,29 @@ message ValidatorAssignments {
 
     // Total count of CommitteeAssignments matching the request filter.
     int32 total_size = 4;
+}
+
+message GetValidatorParticipationRequest {
+    // option deprecated = true; NOTE(rgeraldes24) - still used for e2e tests
+    oneof query_filter {
+        // Epoch to request participation information.
+        uint64 epoch = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
+
+        // Whether or not to query for the genesis information.
+        bool genesis = 2;
+    }
+}
+
+message ValidatorParticipationResponse {
+    // option deprecated = true; NOTE(rgeraldes24) - still used for e2e tests
+    // Epoch which this message is applicable.
+    uint64 epoch = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
+
+    // Whether or not epoch has been finalized.
+    bool finalized = 2;
+
+    // The actual validator participation metrics.
+    ValidatorParticipation participation = 3;
 }
 
 message AttestationPoolRequest {

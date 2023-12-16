@@ -14,7 +14,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/proto/zond/service"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	"github.com/theQRL/qrysm/v4/testing/endtoend/helpers"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/params"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/policies"
 	e2etypes "github.com/theQRL/qrysm/v4/testing/endtoend/types"
@@ -38,11 +37,12 @@ type validatorContainerJson struct {
 	Validator *validatorJson `json:"validator"`
 }
 
-// APIMiddlewareVerifyIntegrity tests our API Middleware for the official Ethereum API.
+// APIMiddlewareVerifyIntegrity tests our API Middleware for the official Zond API.
 // This ensures our API Middleware returns good data compared to gRPC.
 var APIMiddlewareVerifyIntegrity = e2etypes.Evaluator{
-	Name:       "api_middleware_verify_integrity_epoch_%d",
-	Policy:     policies.OnEpoch(helpers.AltairE2EForkEpoch),
+	Name: "api_middleware_verify_integrity_epoch_%d",
+	// Policy:     policies.OnEpoch(helpers.AltairE2EForkEpoch),
+	Policy:     policies.OnEpoch(6), // TODO(rgeraldes24) replace with const
 	Evaluation: apiMiddlewareVerify,
 }
 
@@ -206,7 +206,8 @@ func withCompareAttesterDuties(beaconNodeIdx int, conn *grpc.ClientConn) error {
 	ctx := context.Background()
 	validatorClient := service.NewBeaconValidatorClient(conn)
 	resp, err := validatorClient.GetAttesterDuties(ctx, &zondpbv1.AttesterDutiesRequest{
-		Epoch: helpers.AltairE2EForkEpoch,
+		// Epoch: helpers.AltairE2EForkEpoch,
+		Epoch: 6, // TODO(rgeraldes24) replace with const
 		Index: []primitives.ValidatorIndex{0},
 	})
 	if err != nil {
@@ -216,7 +217,8 @@ func withCompareAttesterDuties(beaconNodeIdx int, conn *grpc.ClientConn) error {
 	reqJSON := []string{"0"}
 	respJSON := &attesterDutiesResponseJson{}
 	if err := doMiddlewareJSONPostRequestV1(
-		"/validator/duties/attester/"+strconv.Itoa(helpers.AltairE2EForkEpoch),
+		// "/validator/duties/attester/"+strconv.Itoa(helpers.AltairE2EForkEpoch),
+		"/validator/duties/attester/"+strconv.Itoa(6), // TODO(rgeraldes24) replace with const
 		beaconNodeIdx,
 		reqJSON,
 		respJSON,

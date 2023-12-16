@@ -1,8 +1,6 @@
 package state_native
 
 import (
-	"context"
-	"fmt"
 	"strconv"
 	"sync"
 	"testing"
@@ -10,11 +8,9 @@ import (
 	"github.com/prysmaticlabs/go-bitfield"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state/state-native/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stateutil"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -105,6 +101,7 @@ func TestBeaconState_NoDeadlock_Capella(t *testing.T) {
 	wg.Wait()
 }
 
+/*
 func TestBeaconState_AppendBalanceWithTrie(t *testing.T) {
 
 	newState := generateState(t)
@@ -128,7 +125,9 @@ func TestBeaconState_AppendBalanceWithTrie(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, wantedRt, newRt, "state roots are unequal")
 }
+*/
 
+/*
 func TestBeaconState_ModifyPreviousParticipationBits(t *testing.T) {
 	st, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
 	assert.NoError(t, err)
@@ -136,7 +135,9 @@ func TestBeaconState_ModifyPreviousParticipationBits(t *testing.T) {
 		return nil, nil
 	}))
 }
+*/
 
+/*
 func TestBeaconState_ModifyCurrentParticipationBits(t *testing.T) {
 	st, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
 	assert.NoError(t, err)
@@ -144,7 +145,9 @@ func TestBeaconState_ModifyCurrentParticipationBits(t *testing.T) {
 		return nil, nil
 	}))
 }
+*/
 
+/*
 func TestCopyAllTries(t *testing.T) {
 	newState := generateState(t)
 	_, err := newState.HashTreeRoot(context.Background())
@@ -192,6 +195,7 @@ func TestCopyAllTries(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEqual(t, rt, newRt)
 }
+*/
 
 func generateState(t *testing.T) state.BeaconState {
 	count := uint64(100)

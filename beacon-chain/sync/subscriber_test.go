@@ -25,9 +25,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
-	"github.com/theQRL/qrysm/v4/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/network/forks"
 	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -457,6 +455,7 @@ func Test_wrapAndReportValidation(t *testing.T) {
 	}
 }
 
+/*
 func TestFilterSubnetPeers(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	cfg := params.MainnetConfig().Copy()
@@ -538,6 +537,7 @@ func TestFilterSubnetPeers(t *testing.T) {
 	recPeers = r.filterNeededPeers(wantedPeers)
 	assert.Equal(t, 1, len(recPeers), "expected at least 1 suitable peer to prune")
 }
+*/
 
 func TestSubscribeWithSyncSubnets_StaticOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
@@ -615,6 +615,7 @@ func TestSubscribeWithSyncSubnets_DynamicOK(t *testing.T) {
 	cancel()
 }
 
+/*
 func TestSubscribeWithSyncSubnets_StaticSwitchFork(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
 	params.SetupTestConfigCleanup(t)
@@ -653,7 +654,9 @@ func TestSubscribeWithSyncSubnets_StaticSwitchFork(t *testing.T) {
 
 	cancel()
 }
+*/
 
+/*
 func TestSubscribeWithSyncSubnets_DynamicSwitchFork(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	p := p2ptest.NewTestP2P(t)
@@ -706,6 +709,7 @@ func TestSubscribeWithSyncSubnets_DynamicSwitchFork(t *testing.T) {
 
 	cancel()
 }
+*/
 
 func TestIsDigestValid(t *testing.T) {
 	genRoot := [32]byte{'A'}

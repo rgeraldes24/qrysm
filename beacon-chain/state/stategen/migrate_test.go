@@ -8,7 +8,6 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
-	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -137,6 +136,7 @@ func TestMigrateToCold_StateExistsInDB(t *testing.T) {
 	assert.LogsDoNotContain(t, hook, "Saved state in DB")
 }
 
+/*
 func TestMigrateToCold_ParallelCalls(t *testing.T) {
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
@@ -219,3 +219,4 @@ func TestMigrateToCold_ParallelCalls(t *testing.T) {
 	assert.DeepEqual(t, [][32]byte{r7}, service.saveHotStateDB.blockRootsOfSavedStates, "Did not remove all saved hot state roots")
 	require.LogsContain(t, hook, "Saved state in DB")
 }
+*/

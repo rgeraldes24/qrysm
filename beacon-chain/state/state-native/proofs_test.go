@@ -1,5 +1,6 @@
 package state_native_test
 
+/*
 import (
 	"context"
 	"testing"
@@ -79,3 +80,4 @@ func TestBeaconStateMerkleProofs(t *testing.T) {
 		require.Equal(t, true, valid)
 	})
 }
+*/

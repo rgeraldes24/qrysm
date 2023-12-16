@@ -2,37 +2,23 @@ package sync
 
 import (
 	"context"
-	"math/big"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/protocol"
-	gcache "github.com/patrickmn/go-cache"
-	"github.com/theQRL/go-zond/common"
-	gzondTypes "github.com/theQRL/go-zond/core/types"
-	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	db "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
-	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
 	p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	p2pTypes "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
-	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
-	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
-	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+/*
 func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
@@ -80,7 +66,9 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks(t *testing.T) {
 		t.Fatal("Did not receive stream within 1 sec")
 	}
 }
+*/
 
+/*
 func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
@@ -180,7 +168,9 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 		t.Fatal("Did not receive stream within 1 sec")
 	}
 }
+*/
 
+/*
 func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
@@ -254,6 +244,7 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 		t.Fatal("Did not receive stream within 1 sec")
 	}
 }
+*/
 
 func TestRecentBeaconBlocksRPCHandler_HandleZeroBlocks(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)

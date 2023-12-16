@@ -8,7 +8,6 @@ import (
 
 	"github.com/theQRL/qrysm/v4/config/params"
 	ev "github.com/theQRL/qrysm/v4/testing/endtoend/evaluators"
-	"github.com/theQRL/qrysm/v4/testing/endtoend/evaluators/beaconapi_evaluators"
 	e2eParams "github.com/theQRL/qrysm/v4/testing/endtoend/params"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/types"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -90,7 +89,7 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 	return newTestRunner(t, testConfig)
 }
 
-func e2eMainnet(t *testing.T, useQrysmSh /*useMultiClient bool,*/, cfg *params.BeaconChainConfig, cfgo ...types.E2EConfigOpt) *testRunner {
+func e2eMainnet(t *testing.T, useQrysmSh bool, cfg *params.BeaconChainConfig, cfgo ...types.E2EConfigOpt) *testRunner {
 	params.SetupTestConfigCleanup(t)
 	require.NoError(t, params.SetActive(cfg))
 	require.NoError(t, e2eParams.Init(t, e2eParams.StandardBeaconCount))
@@ -155,9 +154,10 @@ func e2eMainnet(t *testing.T, useQrysmSh /*useMultiClient bool,*/, cfg *params.B
 
 	// In the event we use the cross-client e2e option, we add in an additional
 	// evaluator for multiclient runs to verify the beacon api conformance.
-	if testConfig.UseValidatorCrossClient {
-		testConfig.Evaluators = append(testConfig.Evaluators, beaconapi_evaluators.BeaconAPIMultiClientVerifyIntegrity)
-	}
+	// TODO(rgeraldes24) - remove; we don't support multiple client api comparison
+	// if testConfig.UseValidatorCrossClient {
+	// 	testConfig.Evaluators = append(testConfig.Evaluators, beaconapi_evaluators.BeaconAPIMultiClientVerifyIntegrity)
+	// }
 	if testConfig.UseBuilder {
 		testConfig.Evaluators = append(testConfig.Evaluators, ev.BuilderIsActive)
 	}
@@ -183,6 +183,7 @@ func scenarioEvals() []types.Evaluator {
 	}
 }
 
+/*
 func scenarioEvalsMulti() []types.Evaluator {
 	return []types.Evaluator{
 		ev.PeersConnect,
@@ -199,3 +200,4 @@ func scenarioEvalsMulti() []types.Evaluator {
 		ev.AllNodesHaveSameHead,
 	}
 }
+*/
