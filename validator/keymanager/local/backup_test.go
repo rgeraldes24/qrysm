@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -13,7 +13,7 @@ import (
 )
 
 func TestLocalKeymanager_ExtractKeystores(t *testing.T) {
-	dilithiumKeysCache = make(map[[dilithium2.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey)
+	dilithiumKeysCache = make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey)
 	dr := &Keymanager{}
 	validatingKeys := make([]dilithium.DilithiumKey, 10)
 	for i := 0; i < len(validatingKeys); i++ {

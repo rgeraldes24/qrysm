@@ -5,7 +5,6 @@ go_library(
     testonly = True,
     srcs = [
         "constants.go",
-        "mock_protector.go",
         "mock_slasher.go",
         "protection_history.go",
     ],

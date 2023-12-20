@@ -1,0 +1,45 @@
+syntax = "proto3";
+package theqrl.validator.accounts.v1;
+
+import "proto/qrysm/v1alpha1/beacon_chain.proto";
+import "proto/qrysm/v1alpha1/node.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "TheQRL.Validator.Accounts.V1";
+option go_package = "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client;validatorpb";
+option java_multiple_files = true;
+option java_outer_classname = "SlashingProto";
+option java_package = "org.theqrl.validator.accounts.v1";
+option php_namespace = "TheQRL\\Validator\\Accounts\\V1";
+
+
+// Slashing Protection imports and exports can be provided through validator CLI command as well as Keymanager API https://ethereum.github.io/keymanager-APIs/ import and delete.
+service SlashingProtection {
+    rpc ExportSlashingProtection(google.protobuf.Empty) returns (ExportSlashingProtectionResponse) {
+        option deprecated = true;
+        option (google.api.http) = {
+            get: "/v1/validator/slashing-protection/export"
+        };
+    }
+    rpc ImportSlashingProtection(ImportSlashingProtectionRequest) returns (google.protobuf.Empty) {
+        option deprecated = true;
+        option (google.api.http) = {
+            post: "/v1/validator/slashing-protection/import"
+            body: "*"
+        };
+    }
+}
+
+message ExportSlashingProtectionResponse {
+    option deprecated = true;
+    // JSON representation of the slash protection
+    string file = 1;
+}
+
+message ImportSlashingProtectionRequest {
+    option deprecated = true;
+    // JSON representation of the slash protection
+    string slashing_protection_json = 1;
+}
+

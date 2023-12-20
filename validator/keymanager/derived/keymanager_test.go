@@ -83,16 +83,14 @@ func TestDerivedKeymanager_FetchValidatingPublicKeys(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, numAccounts, len(publicKeys))
 
-	wantedPubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, numAccounts)
-	// TODO (rgeraldes24)
-
-		for i := 0; i < numAccounts; i++ {
-			privKey, err := util.PrivateKeyFromSeedAndPath(derivedSeed, fmt.Sprintf(ValidatingKeyDerivationPathTemplate, i))
-			require.NoError(t, err)
-			var pubKey [dilithium2.CryptoPublicKeyBytes]byte
-			copy(pubKey[:], privKey.PublicKey().Marshal())
-			wantedPubKeys[i] = pubKey
-		}
+	wantedPubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, numAccounts
+	for i := 0; i < numAccounts; i++ {
+		privKey, err := util.PrivateKeyFromSeedAndPath(derivedSeed, fmt.Sprintf(ValidatingKeyDerivationPathTemplate, i))
+		require.NoError(t, err)
+		var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+		copy(pubKey[:], privKey.PublicKey().Marshal())
+		wantedPubKeys[i] = pubKey
+	}`
 
 
 	// FetchValidatingPublicKeys is also used in generating the output of account list
@@ -161,7 +159,7 @@ func TestDerivedKeymanager_Sign(t *testing.T) {
 	pubKeys, err := dr.FetchValidatingPublicKeys(ctx)
 	require.NoError(t, err)
 	// We prepare naive data to sign.
-	data := []byte("eth2data")
+	data := []byte("zond2data")
 	signRequest := &validatorpb.SignRequest{
 		PublicKey:   pubKeys[0][:],
 		SigningRoot: data,

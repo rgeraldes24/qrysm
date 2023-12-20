@@ -7,9 +7,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
-	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -24,6 +21,7 @@ import (
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 )
 
+/*
 var derivationPathRegex = regexp.MustCompile(`m_12381_3600_(\d+)_(\d+)_(\d+)`)
 
 // byDerivationPath implements sort.Interface based on a
@@ -66,6 +64,7 @@ func (fileNames byDerivationPath) Less(i, j int) bool {
 func (fileNames byDerivationPath) Swap(i, j int) {
 	fileNames[i], fileNames[j] = fileNames[j], fileNames[i]
 }
+*/
 
 // ImportAccountsConfig defines values to run the import accounts function.
 type ImportAccountsConfig struct {
@@ -112,7 +111,7 @@ func (acm *AccountsCLIManager) Import(ctx context.Context) error {
 		}
 		// Sort the imported keystores by derivation path if they
 		// specify this value in their filename.
-		sort.Sort(byDerivationPath(filesInDir))
+		// sort.Sort(byDerivationPath(filesInDir))
 		for _, name := range filesInDir {
 			keystore, err := readKeystoreFile(ctx, filepath.Join(acm.keysDir, name))
 			if err != nil && strings.Contains(err.Error(), "could not decode keystore json") {
@@ -256,9 +255,9 @@ func importPrivateKeyAsAccount(ctx context.Context, wallet *wallet.Wallet, impor
 			)
 			return nil
 		case zondpbservice.ImportedKeystoreStatus_ERROR:
-			return fmt.Errorf("Could not import keystore for %s: %s", keystore.Pubkey, status.Message)
+			return fmt.Errorf("could not import keystore for %s: %s", keystore.Pubkey, status.Message)
 		case zondpbservice.ImportedKeystoreStatus_DUPLICATE:
-			return fmt.Errorf("Duplicate key %s skipped", keystore.Pubkey)
+			return fmt.Errorf("duplicate key %s skipped", keystore.Pubkey)
 		}
 	}
 
@@ -308,8 +307,10 @@ func createKeystoreFromPrivateKey(dilithiumKey dilithium.DilithiumKey, walletPas
 
 // Extracts the account index, j, from a derivation path in a file name
 // with the format m_12381_3600_j_0_0.
+/*
 func accountIndexFromFileName(derivationPath string) string {
 	derivationPath = derivationPath[13:]
 	accIndexEnd := strings.Index(derivationPath, "_")
 	return derivationPath[:accIndexEnd]
 }
+*/

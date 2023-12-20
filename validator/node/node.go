@@ -25,7 +25,7 @@ import (
 	"github.com/pkg/errors"
 	fastssz "github.com/prysmaticlabs/fastssz"
 	"github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/api/gateway"
@@ -123,20 +123,6 @@ func NewValidatorClient(cliCtx *cli.Context) (*ValidatorClient, error) {
 	}
 
 	configureFastSSZHashingAlgorithm()
-
-	// If the --web flag is enabled to administer the validator
-	// client via a web portal, we start the validator client in a different way.
-	// Change Web flag name to enable keymanager API, look at merging initializeFromCLI and initializeForWeb maybe after WebUI DEPRECATED.
-	// if cliCtx.IsSet(flags.EnableWebFlag.Name) {
-	// 	if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) || cliCtx.IsSet(flags.Web3SignerPublicValidatorKeysFlag.Name) {
-	// 		log.Warn("Remote Keymanager API enabled. Qrysm web does not properly support web3signer at this time")
-	// 	}
-	// 	log.Info("Enabling web portal to manage the validator client")
-	// 	if err := validatorClient.initializeForWeb(cliCtx); err != nil {
-	// 		return nil, err
-	// 	}
-	// 	return validatorClient, nil
-	// }
 
 	if err := validatorClient.initializeFromCLI(cliCtx); err != nil {
 		return nil, err
@@ -287,88 +273,6 @@ func (c *ValidatorClient) initializeFromCLI(cliCtx *cli.Context) error {
 	return nil
 }
 
-/*
-func (c *ValidatorClient) initializeForWeb(cliCtx *cli.Context) error {
-	var err error
-	dataDir := cliCtx.String(flags.WalletDirFlag.Name)
-	if cliCtx.IsSet(flags.Web3SignerURLFlag.Name) {
-		c.wallet = wallet.NewWalletForWeb3Signer()
-	} else {
-		// Read the wallet password file from the cli context.
-		if err = setWalletPasswordFilePath(cliCtx); err != nil {
-			return errors.Wrap(err, "could not read wallet password file")
-		}
-
-		// Read the wallet from the specified path.
-		w, err := wallet.OpenWalletOrElseCli(cliCtx, func(cliCtx *cli.Context) (*wallet.Wallet, error) {
-			return nil, nil
-		})
-		if err != nil {
-			return errors.Wrap(err, "could not open wallet")
-		}
-		c.wallet = w
-		if c.wallet != nil {
-			dataDir = c.wallet.AccountsDir()
-		}
-	}
-
-	if cliCtx.String(cmd.DataDirFlag.Name) != cmd.DefaultDataDir() {
-		dataDir = cliCtx.String(cmd.DataDirFlag.Name)
-	}
-	clearFlag := cliCtx.Bool(cmd.ClearDB.Name)
-	forceClearFlag := cliCtx.Bool(cmd.ForceClearDB.Name)
-
-	if clearFlag || forceClearFlag {
-		if dataDir == "" {
-			dataDir = cmd.DefaultDataDir()
-			if dataDir == "" {
-				// skipcq: RVV-A0003
-				log.Fatal(
-					"Could not determine your system'c HOME path, please specify a --datadir you wish " +
-						"to use for your validator data",
-				)
-			}
-		}
-		if err := clearDB(cliCtx.Context, dataDir, forceClearFlag); err != nil {
-			return err
-		}
-	}
-	log.WithField("databasePath", dataDir).Info("Checking DB")
-	valDB, err := kv.NewKVStore(cliCtx.Context, dataDir, &kv.Config{
-		PubKeys: nil,
-	})
-	if err != nil {
-		return errors.Wrap(err, "could not initialize db")
-	}
-	c.db = valDB
-	if err := valDB.RunUpMigrations(cliCtx.Context); err != nil {
-		return errors.Wrap(err, "could not run database migration")
-	}
-
-	if !cliCtx.Bool(cmd.DisableMonitoringFlag.Name) {
-		if err := c.registerPrometheusService(cliCtx); err != nil {
-			return err
-		}
-	}
-	if err := c.registerValidatorService(cliCtx); err != nil {
-		return err
-	}
-	if err := c.registerRPCService(cliCtx); err != nil {
-		return err
-	}
-	if err := c.registerRPCGatewayService(cliCtx); err != nil {
-		return err
-	}
-	gatewayHost := cliCtx.String(flags.GRPCGatewayHost.Name)
-	gatewayPort := cliCtx.Int(flags.GRPCGatewayPort.Name)
-	webAddress := fmt.Sprintf("http://%s:%d", gatewayHost, gatewayPort)
-	log.WithField("address", webAddress).Info(
-		"Starting Qrysm web UI on address, open in browser to access",
-	)
-	return nil
-}
-*/
-
 func (c *ValidatorClient) registerPrometheusService(cliCtx *cli.Context) error {
 	var additionalHandlers []prometheus.Handler
 	if cliCtx.IsSet(cmd.EnableBackupWebhookFlag.Name) {
@@ -441,11 +345,10 @@ func (c *ValidatorClient) registerValidatorService(cliCtx *cli.Context) error {
 		GrpcRetryDelay:             grpcRetryDelay,
 		GrpcHeadersFlag:            c.cliCtx.String(flags.GrpcHeadersFlag.Name),
 		ValDB:                      c.db,
-		//UseWeb:                     c.cliCtx.Bool(flags.EnableWebFlag.Name),
-		InteropKeysConfig:     interopKeysConfig,
-		Wallet:                c.wallet,
-		WalletInitializedFeed: c.walletInitialized,
-		GraffitiStruct:        gStruct,
+		InteropKeysConfig:          interopKeysConfig,
+		Wallet:                     c.wallet,
+		WalletInitializedFeed:      c.walletInitialized,
+		GraffitiStruct:             gStruct,
 		//Web3SignerConfig:      wsc,
 		ProposerSettings:  bpc,
 		BeaconApiTimeout:  time.Second * 30,
@@ -492,7 +395,7 @@ func Web3SignerConfig(cliCtx *cli.Context) (*remoteweb3signer.SetupConfig, error
 			}
 			if len(pks) > 0 {
 				pks = slice.Unique[string](pks)
-				var validatorKeys [][dilithium2.CryptoPublicKeyBytes]byte
+				var validatorKeys [][dilithium.CryptoPublicKeyBytes]byte
 				for _, key := range pks {
 					decodedKey, decodeErr := hexutil.Decode(key)
 					if decodeErr != nil {
@@ -589,13 +492,13 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 	}
 
 	if fileConfig.ProposerConfig != nil && len(fileConfig.ProposerConfig) != 0 {
-		vpSettings.ProposeConfig = make(map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorServiceConfig.ProposerOption)
+		vpSettings.ProposeConfig = make(map[[dilithium.CryptoPublicKeyBytes]byte]*validatorServiceConfig.ProposerOption)
 		for key, option := range fileConfig.ProposerConfig {
 			decodedKey, err := hexutil.Decode(key)
 			if err != nil {
 				return nil, errors.Wrapf(err, "could not decode public key %s", key)
 			}
-			if len(decodedKey) != dilithium2.CryptoPublicKeyBytes {
+			if len(decodedKey) != dilithium.CryptoPublicKeyBytes {
 				return nil, fmt.Errorf("%v  is not a dilithium public key", key)
 			}
 			if err := verifyOption(key, option); err != nil {
@@ -802,13 +705,6 @@ func (c *ValidatorClient) registerRPCGatewayService(cliCtx *cli.Context) error {
 	maxCallSize := cliCtx.Uint64(cmd.GrpcMaxCallRecvMsgSizeFlag.Name)
 
 	registrations := []gateway.PbHandlerRegistration{
-		//validatorpb.RegisterAuthHandler,
-		//validatorpb.RegisterWalletHandler,
-		//pb.RegisterHealthHandler,
-		//validatorpb.RegisterHealthHandler,
-		//validatorpb.RegisterAccountsHandler,
-		//validatorpb.RegisterBeaconHandler,
-		//validatorpb.RegisterSlashingProtectionHandler,
 		zondpbservice.RegisterKeyManagementHandler,
 	}
 	gwmux := gwruntime.NewServeMux(
@@ -865,32 +761,6 @@ func (c *ValidatorClient) registerRPCGatewayService(cliCtx *cli.Context) error {
 	}
 	return c.services.RegisterService(gw)
 }
-
-/*
-func setWalletPasswordFilePath(cliCtx *cli.Context) error {
-	walletDir := cliCtx.String(flags.WalletDirFlag.Name)
-	defaultWalletPasswordFilePath := filepath.Join(walletDir, wallet.DefaultWalletPasswordFile)
-	if file.FileExists(defaultWalletPasswordFilePath) {
-		// Ensure file has proper permissions.
-		hasPerms, err := file.HasReadWritePermissions(defaultWalletPasswordFilePath)
-		if err != nil {
-			return err
-		}
-		if !hasPerms {
-			return fmt.Errorf(
-				"wallet password file %s does not have proper 0600 permissions",
-				defaultWalletPasswordFilePath,
-			)
-		}
-
-		// Set the filepath into the cli context.
-		if err := cliCtx.Set(flags.WalletPasswordFileFlag.Name, defaultWalletPasswordFilePath); err != nil {
-			return errors.Wrap(err, "could not set default wallet password file path")
-		}
-	}
-	return nil
-}
-*/
 
 func clearDB(ctx context.Context, dataDir string, force bool) error {
 	var err error

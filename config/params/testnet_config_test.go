@@ -1,7 +1,6 @@
 package params_test
 
 import (
-	"path"
 	"path/filepath"
 	"testing"
 
@@ -12,12 +11,15 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
+// NOTE(rgeraldes24) - used for testnet config comparison with upstream
+/*
 func testnetConfigFilePath(t *testing.T, network string) string {
 	fPath, err := bazel.Runfile("external/zond2_networks")
 	require.NoError(t, err)
 	configFilePath := path.Join(fPath, "shared", network, "config.yaml")
 	return configFilePath
 }
+*/
 
 func TestE2EConfigParity(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

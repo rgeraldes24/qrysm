@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	localKeysPath    = "/zond/v1/keystores"
-	remoteKeysPath   = "/zond/v1/remotekeys"
+	localKeysPath = "/zond/v1/keystores"
+	// remoteKeysPath   = "/zond/v1/remotekeys"
 	feeRecipientPath = "/zond/v1/validator/{pubkey}/feerecipient"
 )
 
@@ -37,12 +37,15 @@ func (c *Client) GetValidatorPubKeys(ctx context.Context) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	jsonremote, err := c.GetRemoteValidatorKeys(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if len(jsonlocal.Keystores) == 0 && len(jsonremote.Keystores) == 0 {
-		return nil, errors.New("there are no local keys or remote keys on the validator")
+	/*
+		jsonremote, err := c.GetRemoteValidatorKeys(ctx)
+		if err != nil {
+			return nil, err
+		}
+	*/
+	if len(jsonlocal.Keystores) == 0 /* && len(jsonremote.Keystores) == 0 */ {
+		// return nil, errors.New("there are no local keys or remote keys on the validator")
+		return nil, errors.New("there are no local keys on the validator")
 	}
 
 	hexKeys := make(map[string]bool)
@@ -50,9 +53,11 @@ func (c *Client) GetValidatorPubKeys(ctx context.Context) ([]string, error) {
 	for index := range jsonlocal.Keystores {
 		hexKeys[jsonlocal.Keystores[index].ValidatingPubkey] = true
 	}
-	for index := range jsonremote.Keystores {
-		hexKeys[jsonremote.Keystores[index].Pubkey] = true
-	}
+	/*
+		for index := range jsonremote.Keystores {
+			hexKeys[jsonremote.Keystores[index].Pubkey] = true
+		}
+	*/
 	keys := make([]string, 0)
 	for k := range hexKeys {
 		keys = append(keys, k)
@@ -73,6 +78,7 @@ func (c *Client) GetLocalValidatorKeys(ctx context.Context) (*apimiddleware.List
 	return jsonlocal, nil
 }
 
+/*
 // GetRemoteValidatorKeys calls the keymanager APIs for web3signer validator keys
 func (c *Client) GetRemoteValidatorKeys(ctx context.Context) (*apimiddleware.ListRemoteKeysResponseJson, error) {
 	remoteBytes, err := c.Get(ctx, remoteKeysPath, client.WithAuthorizationToken(c.Token()))
@@ -89,6 +95,7 @@ func (c *Client) GetRemoteValidatorKeys(ctx context.Context) (*apimiddleware.Lis
 	}
 	return jsonremote, nil
 }
+*/
 
 // GetFeeRecipientAddresses takes a list of validators in hex format and returns an equal length list of fee recipients in hex format.
 func (c *Client) GetFeeRecipientAddresses(ctx context.Context, validators []string) ([]string, error) {

@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/v4/build/bazel"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -18,11 +18,21 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
+// NOTE(rgeraldes24) old version
+/*
 func TestDisplayExitInfo(t *testing.T) {
 	logHook := test.NewGlobal()
 	key := []byte("0x123456")
 	displayExitInfo([][]byte{key}, []string{string(key)})
 	assert.LogsContain(t, logHook, "https://beaconcha.in/validator/3078313233343536")
+}
+*/
+
+func TestDisplayExitInfo(t *testing.T) {
+	logHook := test.NewGlobal()
+	key := []byte("0x123456")
+	displayExitInfo([][]byte{key}, []string{string(key)})
+	assert.LogsContain(t, logHook, "0x123456")
 }
 
 func TestDisplayExitInfo_NoKeys(t *testing.T) {
@@ -34,7 +44,7 @@ func TestDisplayExitInfo_NoKeys(t *testing.T) {
 func TestPrepareAllKeys(t *testing.T) {
 	key1 := bytesutil.ToBytes2592([]byte("key1"))
 	key2 := bytesutil.ToBytes2592([]byte("key2"))
-	raw, formatted := prepareAllKeys([][dilithium2.CryptoPublicKeyBytes]byte{key1, key2})
+	raw, formatted := prepareAllKeys([][dilithium.CryptoPublicKeyBytes]byte{key1, key2})
 	require.Equal(t, 2, len(raw))
 	require.Equal(t, 2, len(formatted))
 	assert.DeepEqual(t, bytesutil.ToBytes2592([]byte{107, 101, 121, 49}), bytesutil.ToBytes2592(raw[0]))

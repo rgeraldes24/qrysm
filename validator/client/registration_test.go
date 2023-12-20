@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithium "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common/hexutil"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -110,10 +110,9 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 			},
 			validatorSetter: func(t *testing.T) *validator {
 				v := validator{
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					//useWeb:                       false,
-					genesisTime: 0,
+					pubkeyToValidatorIndex:       make(map[[dilithium.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithium.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					genesisTime:                  0,
 				}
 				v.signedValidatorRegistrations[bytesutil.ToBytes2592(validatorKey.PublicKey().Marshal())] = &zondpb.SignedValidatorRegistrationV1{
 					Message: &zondpb.ValidatorRegistrationV1{
@@ -138,10 +137,9 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 			},
 			validatorSetter: func(t *testing.T) *validator {
 				v := validator{
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					//useWeb:                       false,
-					genesisTime: 0,
+					pubkeyToValidatorIndex:       make(map[[dilithium.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithium.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					genesisTime:                  0,
 				}
 				v.signedValidatorRegistrations[bytesutil.ToBytes2592(validatorKey.PublicKey().Marshal())] = &zondpb.SignedValidatorRegistrationV1{
 					Message: &zondpb.ValidatorRegistrationV1{
@@ -166,10 +164,9 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 			},
 			validatorSetter: func(t *testing.T) *validator {
 				v := validator{
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					//useWeb:                       false,
-					genesisTime: 0,
+					pubkeyToValidatorIndex:       make(map[[dilithium.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithium.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					genesisTime:                  0,
 				}
 				v.signedValidatorRegistrations[bytesutil.ToBytes2592(validatorKey.PublicKey().Marshal())] = &zondpb.SignedValidatorRegistrationV1{
 					Message: &zondpb.ValidatorRegistrationV1{
@@ -194,10 +191,9 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 			},
 			validatorSetter: func(t *testing.T) *validator {
 				v := validator{
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
-					//useWeb:                       false,
-					genesisTime: 0,
+					pubkeyToValidatorIndex:       make(map[[dilithium.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithium.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					genesisTime:                  0,
 				}
 				return &v
 			},

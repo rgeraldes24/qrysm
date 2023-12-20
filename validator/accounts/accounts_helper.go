@@ -10,7 +10,7 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/cmd/validator/flags"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -21,7 +21,7 @@ import (
 )
 
 // selectAccounts Ask user to select accounts via an interactive user prompt.
-func selectAccounts(selectionPrompt string, pubKeys [][dilithium2.CryptoPublicKeyBytes]byte) (filteredPubKeys []dilithium.PublicKey, err error) {
+func selectAccounts(selectionPrompt string, pubKeys [][dilithiumlib.CryptoPublicKeyBytes]byte) (filteredPubKeys []dilithium.PublicKey, err error) {
 	pubKeyStrings := make([]string, len(pubKeys))
 	for i, pk := range pubKeys {
 		name := petnames.DeterministicName(pk[:], "-")
@@ -100,7 +100,7 @@ func selectAccounts(selectionPrompt string, pubKeys [][dilithium2.CryptoPublicKe
 func FilterPublicKeysFromUserInput(
 	cliCtx *cli.Context,
 	publicKeysFlag *cli.StringFlag,
-	validatingPublicKeys [][dilithium2.CryptoPublicKeyBytes]byte,
+	validatingPublicKeys [][dilithiumlib.CryptoPublicKeyBytes]byte,
 	selectionPrompt string,
 ) ([]dilithium.PublicKey, error) {
 	if cliCtx.IsSet(publicKeysFlag.Name) {
@@ -140,7 +140,7 @@ func filterPublicKeys(pubKeyStrings []string) ([]dilithium.PublicKey, error) {
 func FilterExitAccountsFromUserInput(
 	cliCtx *cli.Context,
 	r io.Reader,
-	validatingPublicKeys [][dilithium2.CryptoPublicKeyBytes]byte,
+	validatingPublicKeys [][dilithiumlib.CryptoPublicKeyBytes]byte,
 	forceExit bool,
 ) (rawPubKeys [][]byte, formattedPubKeys []string, err error) {
 	if !cliCtx.IsSet(flags.ExitAllFlag.Name) {
@@ -205,7 +205,8 @@ func FilterExitAccountsFromUserInput(
 	promptHeader := au.Red("===============IMPORTANT===============")
 	promptDescription := "Please navigate to the following website and make sure you understand the current implications " +
 		"of a voluntary exit before making the final decision:"
-	promptURL := au.Blue("https://docs.prylabs.network/docs/wallet/exiting-a-validator")
+
+	promptURL := au.Blue("https://docs.theqrl.org/wallet/exiting-a-validator")
 	promptQuestion := "If you still want to continue with the voluntary exit, please input a phrase found at the above URL"
 	promptText := fmt.Sprintf("%s\n%s\n%s\n%s", promptHeader, promptDescription, promptURL, promptQuestion)
 	resp, err := prompt.ValidatePrompt(r, promptText, func(input string) error {

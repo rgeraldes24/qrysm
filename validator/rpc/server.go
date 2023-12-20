@@ -55,7 +55,6 @@ type Config struct {
 type Server struct {
 	logsStreamer              logs.Streamer
 	streamLogsBufferSize      int
-	beaconChainClient         iface.BeaconChainClient
 	beaconNodeClient          iface.NodeClient
 	beaconNodeValidatorClient iface.ValidatorClient
 	valDB                     db.Database
@@ -87,8 +86,6 @@ type Server struct {
 	validatorMonitoringPort   int
 	validatorGatewayHost      string
 	validatorGatewayPort      int
-	beaconApiEndpoint         string
-	beaconApiTimeout          time.Duration
 }
 
 // NewServer instantiates a new gRPC server.
@@ -163,20 +160,9 @@ func (s *Server) Start() {
 	}
 	s.grpcServer = grpc.NewServer(opts...)
 
-	// Register a gRPC client to the beacon node.
-	// if err := s.registerBeaconClient(); err != nil {
-	// 	log.WithError(err).Fatal("Could not register beacon chain gRPC client")
-	// }
-
 	// Register services available for the gRPC server.
 	reflection.Register(s.grpcServer)
-	// validatorpb.RegisterAuthServer(s.grpcServer, s)
-	// validatorpb.RegisterWalletServer(s.grpcServer, s)
-	// validatorpb.RegisterHealthServer(s.grpcServer, s)
-	// validatorpb.RegisterBeaconServer(s.grpcServer, s)
-	// validatorpb.RegisterAccountsServer(s.grpcServer, s)
 	zondpbservice.RegisterKeyManagementServer(s.grpcServer, s)
-	// validatorpb.RegisterSlashingProtectionServer(s.grpcServer, s)
 
 	go func() {
 		if s.listener != nil {
@@ -186,19 +172,6 @@ func (s *Server) Start() {
 		}
 	}()
 	log.WithField("address", address).Info("gRPC server listening on address")
-	/*
-		if s.walletDir != "" {
-			token, err := s.initializeAuthToken(s.walletDir)
-			if err != nil {
-				log.WithError(err).Error("Could not initialize web auth token")
-				return
-			}
-			validatorWebAddr := fmt.Sprintf("%s:%d", s.validatorGatewayHost, s.validatorGatewayPort)
-			authTokenPath := filepath.Join(s.walletDir, authTokenFileName)
-			logValidatorWebAuth(validatorWebAddr, token, authTokenPath)
-			go s.refreshAuthTokenFromFileChanges(s.ctx, authTokenPath)
-		}
-	*/
 }
 
 // Stop the gRPC server.

@@ -8,7 +8,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/v4/async"
 	"github.com/theQRL/qrysm/v4/config/features"
@@ -107,7 +107,7 @@ func (km *Keymanager) reloadAccountsFromKeystore(keystore *AccountsKeystoreRepre
 	if len(newAccountsStore.PublicKeys) != len(newAccountsStore.Seeds) {
 		return errors.New("number of public and private keys in keystore do not match")
 	}
-	pubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, len(newAccountsStore.PublicKeys))
+	pubKeys := make([][dilithiumlib.CryptoPublicKeyBytes]byte, len(newAccountsStore.PublicKeys))
 	for i := 0; i < len(newAccountsStore.Seeds); i++ {
 		privKey, err := dilithium.SecretKeyFromBytes(newAccountsStore.Seeds[i])
 		if err != nil {

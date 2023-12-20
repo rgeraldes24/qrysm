@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -41,7 +41,7 @@ func TestStore_Backup(t *testing.T) {
 }
 
 func TestStore_NestedBackup(t *testing.T) {
-	keys := [][dilithium2.CryptoPublicKeyBytes]byte{{'A'}, {'B'}}
+	keys := [][dilithium.CryptoPublicKeyBytes]byte{{'A'}, {'B'}}
 	db := setupDB(t, keys)
 	ctx := context.Background()
 	root := [32]byte{1}

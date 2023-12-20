@@ -301,7 +301,7 @@ var (
 	// KeymanagerKindFlag defines the kind of keymanager desired by a user during wallet creation.
 	KeymanagerKindFlag = &cli.StringFlag{
 		Name:  "keymanager-kind",
-		Usage: "Kind of keymanager, either imported or remote, specified during wallet creation",
+		Usage: "Kind of keymanager specified during wallet creation. Only imported is supported at the moment.",
 		Value: "",
 	}
 	// SkipDepositConfirmationFlag skips the y/n confirmation userprompt for sending a deposit to the deposit contract.

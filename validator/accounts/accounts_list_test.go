@@ -35,10 +35,10 @@ const (
 )
 
 type testWalletConfig struct {
-	exitAll                 bool
-	skipDepositConfirm      bool
-	keymanagerKind          keymanager.Kind
-	numAccounts             int64
+	exitAll            bool
+	skipDepositConfirm bool
+	keymanagerKind     keymanager.Kind
+	// numAccounts             int64
 	grpcHeaders             string
 	privateKeyFile          string
 	accountPasswordFile     string

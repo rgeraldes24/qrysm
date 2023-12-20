@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -140,7 +140,7 @@ func PerformVoluntaryExit(
 	return rawExitedKeys, formattedExitedKeys, nil
 }
 
-func prepareAllKeys(validatingKeys [][dilithium2.CryptoPublicKeyBytes]byte) (raw [][]byte, formatted []string) {
+func prepareAllKeys(validatingKeys [][dilithium.CryptoPublicKeyBytes]byte) (raw [][]byte, formatted []string) {
 	raw = make([][]byte, len(validatingKeys))
 	formatted = make([]string, len(validatingKeys))
 	for i, pk := range validatingKeys {
@@ -153,27 +153,30 @@ func prepareAllKeys(validatingKeys [][dilithium2.CryptoPublicKeyBytes]byte) (raw
 
 func displayExitInfo(rawExitedKeys [][]byte, trimmedExitedKeys []string) {
 	if len(rawExitedKeys) > 0 {
-		urlFormattedPubKeys := make([]string, len(rawExitedKeys))
-		for i, key := range rawExitedKeys {
-			baseUrl := "https://beaconcha.in/validator/"
-			// TODO(rgeraldes24)
-			// var baseUrl string
-			// if params.BeaconConfig().ConfigName == params.PraterName || params.BeaconConfig().ConfigName == params.GoerliName {
-			// 	baseUrl = "https://goerli.beaconcha.in/validator/"
-			// } else {
-			// 	baseUrl = "https://beaconcha.in/validator/"
-			// }
-			// Remove '0x' prefix
-			urlFormattedPubKeys[i] = baseUrl + hexutil.Encode(key)[2:]
+		// urlFormattedPubKeys := make([]string, len(rawExitedKeys))
+		// for i, key := range rawExitedKeys {
+		// 	var baseUrl string
+		// 	if params.BeaconConfig().ConfigName == params.PraterName || params.BeaconConfig().ConfigName == params.GoerliName {
+		// 		baseUrl = "https://goerli.beaconcha.in/validator/"
+		// 	} else {
+		// 		baseUrl = "https://beaconcha.in/validator/"
+		// 	}
+		// 	// Remove '0x' prefix
+		// 	urlFormattedPubKeys[i] = baseUrl + hexutil.Encode(key)[2:]
+		// }
+
+		// ifaceKeys := make([]interface{}, len(urlFormattedPubKeys))
+		// for i, k := range urlFormattedPubKeys {
+		// 	ifaceKeys[i] = k
+		// }
+
+		ifaceKeys := make([]interface{}, len(rawExitedKeys))
+		for i, k := range rawExitedKeys {
+			ifaceKeys[i] = hexutil.Encode(k)
 		}
 
-		ifaceKeys := make([]interface{}, len(urlFormattedPubKeys))
-		for i, k := range urlFormattedPubKeys {
-			ifaceKeys[i] = k
-		}
-
-		info := fmt.Sprintf("Voluntary exit was successful for the accounts listed. "+
-			"URLs where you can track each validator's exit:\n"+strings.Repeat("%s\n", len(ifaceKeys)), ifaceKeys...)
+		info := fmt.Sprintf("Voluntary exit was successful for the accounts listed:\n"+
+			strings.Repeat("%s\n", len(ifaceKeys)), ifaceKeys...)
 
 		log.WithField("publicKeys", strings.Join(trimmedExitedKeys, ", ")).Info(info)
 	} else {

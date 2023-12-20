@@ -1,5 +1,8 @@
 package util
 
+// TODO(rgeraldes24) - used for the altair full block generation; double
+// check if needs to be included for the capella full block generation
+/*
 import (
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/go-bitfield"
@@ -71,3 +74,4 @@ func generateSyncAggregate(st state.BeaconState, privs []dilithium.DilithiumKey,
 
 	return &zondpb.SyncAggregate{SyncCommitteeSignatures: sigs, SyncCommitteeBits: bVector}, nil
 }
+*/

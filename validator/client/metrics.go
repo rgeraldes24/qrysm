@@ -7,6 +7,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -237,9 +238,16 @@ func (v *validator) LogValidatorGainsAndLosses(ctx context.Context, slot primiti
 		return nil
 	}
 
-	// TODO(rgeraldes24)
+	var pks [][dilithium.CryptoPublicKeyBytes]byte
+	var err error
+	pks, err = v.keyManager.FetchValidatingPublicKeys(ctx)
+	if err != nil {
+		return err
+	}
+	pubKeys := bytesutil.FromBytes2592Array(pks)
+
 	req := &zondpb.ValidatorPerformanceRequest{
-		Indices: []primitives.ValidatorIndex{},
+		PublicKeys: pubKeys,
 	}
 	resp, err := v.beaconClient.GetValidatorPerformance(ctx, req)
 	if err != nil {

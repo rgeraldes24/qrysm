@@ -49,23 +49,24 @@ func (acm *AccountsCLIManager) WalletCreate(ctx context.Context) (*wallet.Wallet
 			"Successfully created wallet with ability to import keystores",
 		)
 	/*
-		case keymanager.Derived:
-			if err = createDerivedKeymanagerWallet(
-				ctx,
-				w,
-				acm.mnemonic25thWord,
-				acm.mnemonicLanguage,
-				acm.skipMnemonicConfirm,
-				acm.numAccounts,
-			); err != nil {
-				return nil, errors.Wrap(err, "could not initialize wallet")
-			}
-			log.WithField("--wallet-dir", acm.walletDir).Info(
-				"Successfully created HD wallet from mnemonic and regenerated accounts",
-			)
+			case keymanager.Derived:
+				if err = createDerivedKeymanagerWallet(
+					ctx,
+					w,
+					acm.mnemonic25thWord,
+					acm.mnemonicLanguage,
+					acm.skipMnemonicConfirm,
+					acm.numAccounts,
+				); err != nil {
+					return nil, errors.Wrap(err, "could not initialize wallet")
+				}
+				log.WithField("--wallet-dir", acm.walletDir).Info(
+					"Successfully created HD wallet from mnemonic and regenerated accounts",
+				)
+
+		case keymanager.Web3Signer:
+			return nil, errors.New("web3signer keymanager does not require persistent wallets.")
 	*/
-	case keymanager.Web3Signer:
-		return nil, errors.New("web3signer keymanager does not require persistent wallets.")
 	default:
 		return nil, errors.Wrapf(err, errKeymanagerNotSupported, w.KeymanagerKind())
 	}

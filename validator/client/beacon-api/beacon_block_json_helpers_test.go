@@ -181,7 +181,7 @@ func TestBeaconBlockJsonHelpers_JsonifyAttesterSlashings(t *testing.T) {
 						Root:  []byte{9},
 					},
 				},
-				Signatures: [][]byte{[]byte{10}},
+				Signatures: [][]byte{{10}},
 			},
 			Attestation_2: &zondpb.IndexedAttestation{
 				AttestingIndices: []uint64{11, 12},

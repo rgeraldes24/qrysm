@@ -20,6 +20,7 @@ proto_library(
     name = "proto",
     srcs = [
         "keymanager.proto",
+        "slashing.proto",
     ],
     visibility = ["//visibility:public"],
     deps = [

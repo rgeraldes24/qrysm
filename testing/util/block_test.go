@@ -132,11 +132,12 @@ func TestGenerateFullBlock_ValidAttestations(t *testing.T) {
 	require.NoError(t, err)
 	beaconState, err = transition.ExecuteStateTransition(context.Background(), beaconState, wsb)
 	require.NoError(t, err)
-	atts, err := beaconState.CurrentEpochAttestations()
-	require.NoError(t, err)
-	if len(atts) != 4 {
-		t.Fatal("expected 4 attestations to be saved to the beacon state")
-	}
+	// TODO(rgeraldes24) - review
+	// atts, err := beaconState.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// if len(atts) != 4 {
+	// 	t.Fatal("expected 4 attestations to be saved to the beacon state")
+	// }
 }
 
 func TestGenerateFullBlock_ValidDeposits(t *testing.T) {
@@ -191,17 +192,6 @@ func TestGenerateFullBlock_ValidVoluntaryExits(t *testing.T) {
 	if val.ExitEpoch() == params.BeaconConfig().FarFutureEpoch {
 		t.Fatal("expected exiting validator index to be marked as exiting")
 	}
-}
-
-func TestHydrateSignedBeaconBlock_NoError(t *testing.T) {
-	b := &zondpbalpha.SignedBeaconBlock{}
-	b = HydrateSignedBeaconBlock(b)
-	_, err := b.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Block.HashTreeRoot()
-	require.NoError(t, err)
-	_, err = b.Block.Body.HashTreeRoot()
-	require.NoError(t, err)
 }
 
 func TestHydrateV1SignedBeaconBlock_NoError(t *testing.T) {

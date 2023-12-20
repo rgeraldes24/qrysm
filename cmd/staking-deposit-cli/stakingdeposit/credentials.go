@@ -40,8 +40,7 @@ func (c *Credentials) ExportDepositDataJSON(folder string) (string, error) {
 	fileFolder := filepath.Join(folder, fmt.Sprintf("deposit_data-%d.json", time.Now().Unix()))
 	jsonDepositDataList, err := json.Marshal(depositDataList)
 	if err != nil {
-		// TODO(rgeraldes24) - error is not nil (line 41) but it returns nil
-		return "", nil
+		return "", err
 	}
 
 	if runtime.GOOS == "linux" {

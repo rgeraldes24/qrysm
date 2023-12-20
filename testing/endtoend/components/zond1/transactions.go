@@ -3,24 +3,15 @@ package zond1
 import (
 	"context"
 	"fmt"
-	"math/big"
 	mathRand "math/rand"
-	"os"
 	"time"
 
-	"github.com/MariusVanDerWijden/FuzzyVM/filler"
-	txfuzz "github.com/rgeraldes24/tx-fuzz"
+	// txfuzz "github.com/rgeraldes24/tx-fuzz"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-qrllib/dilithium"
-	"github.com/theQRL/go-zond/accounts/keystore"
-	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/go-zond/rpc"
-	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	e2e "github.com/theQRL/qrysm/v4/testing/endtoend/params"
-	"golang.org/x/sync/errgroup"
 )
 
 type TransactionGenerator struct {
@@ -54,11 +45,11 @@ func (t *TransactionGenerator) Start(ctx context.Context) error {
 	// deterministically generated.
 	mathRand.Seed(seed)
 
-	keystoreBytes, err := os.ReadFile(t.keystore) // #nosec G304
-	if err != nil {
-		return err
-	}
-	mineKey, err := keystore.DecryptKey(keystoreBytes, KeystorePassword)
+	// keystoreBytes, err := os.ReadFile(t.keystore) // #nosec G304
+	// if err != nil {
+	// 	return err
+	// }
+	// mineKey, err := keystore.DecryptKey(keystoreBytes, KeystorePassword)
 	if err != nil {
 		return err
 	}
@@ -68,20 +59,22 @@ func (t *TransactionGenerator) Start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	f := filler.NewFiller(rnd)
+	// f := filler.NewFiller(rnd)
 	// Broadcast Transactions every 3 blocks
 	txPeriod := time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second
 	ticker := time.NewTicker(txPeriod)
-	gasPrice := big.NewInt(1e11)
+	// gasPrice := big.NewInt(1e11)
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
-			err := SendTransaction(client, mineKey.Dilithium, f, gasPrice, mineKey.Address.String(), 100, false)
-			if err != nil {
-				return err
-			}
+			/*
+				err := SendTransaction(client, mineKey.Dilithium, f, gasPrice, mineKey.Address.String(), 100, false)
+				if err != nil {
+					return err
+				}
+			*/
 		}
 	}
 }
@@ -91,6 +84,8 @@ func (s *TransactionGenerator) Started() <-chan struct{} {
 	return s.started
 }
 
+// TODO(rgeraldes24) - fix tx-fuzz dep
+/*
 func SendTransaction(client *rpc.Client, key *dilithium.Dilithium, f *filler.Filler, gasPrice *big.Int, addr string, N uint64, al bool) error {
 	backend := zondclient.NewClient(client)
 
@@ -140,6 +135,7 @@ func SendTransaction(client *rpc.Client, key *dilithium.Dilithium, f *filler.Fil
 	}
 	return g.Wait()
 }
+*/
 
 // Pause pauses the component and its underlying process.
 func (t *TransactionGenerator) Pause() error {
