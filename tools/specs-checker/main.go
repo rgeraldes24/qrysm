@@ -20,7 +20,7 @@ var (
 //go:embed data
 var specFS embed.FS
 
-// TODO(rgeraldes24) - review
+// TODO(rgeraldes24): review
 var specDirs = map[string][]string{
 	"specs/phase0": {
 		"beacon-chain.md",

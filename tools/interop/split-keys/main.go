@@ -108,7 +108,6 @@ func generateKeysFromMnemonicList(mnemonicListFile *bufio.Scanner, keysPerMnemon
 				log.Printf("%d/%d keys generated\n", i, keysPerMnemonic)
 			}
 
-			// TODO (rgeraldes24)
 			privKey, seedErr := util.PrivateKeyFromSeedAndPath(
 				seed, fmt.Sprintf(derived.ValidatingKeyDerivationPathTemplate, i),
 			)

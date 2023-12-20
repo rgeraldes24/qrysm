@@ -65,8 +65,8 @@ func createRandomKeystore(t testing.TB, password string) (*keymanager.Keystore, 
 		Pubkey:  fmt.Sprintf("%x", pubKey),
 		ID:      id.String(),
 		Version: encryptor.Version(),
-		// TODO(rgeraldes24)
-		//Name:    encryptor.Name(),
+		// NOTE(rgeraldes24): our keystore implementation does not have this field
+		// Name: encryptor.Name(),
 	}, validatingKey
 }
 

@@ -108,7 +108,7 @@ func (c *Client) GetFeeRecipientAddresses(ctx context.Context, validators []stri
 		if feejson.Data == nil {
 			continue
 		}
-		feeRecipients[index] = feejson.Data.Ethaddress
+		feeRecipients[index] = feejson.Data.ZondAddress
 	}
 	return feeRecipients, nil
 }

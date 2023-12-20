@@ -192,7 +192,6 @@ func selectorAndFunc(pass *analysis.Pass, call *ast.CallExpr) (*ast.SelectorExpr
 	}
 
 	return sel, fn, true
-
 }
 
 func ignoreCall(pass *analysis.Pass, call *ast.CallExpr) bool {

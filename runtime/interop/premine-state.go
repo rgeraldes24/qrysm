@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	b "github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
@@ -80,7 +80,6 @@ func (s *PremineGenesisConfig) prepare(ctx context.Context) (state.BeaconState, 
 	if err = s.processDeposits(ctx, st); err != nil {
 		return nil, err
 	}
-
 	if err = s.populate(st); err != nil {
 		return nil, err
 	}
@@ -306,7 +305,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 	switch s.Version {
 	case version.Capella:
 		body = &zondpb.BeaconBlockBody{
-			RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+			RandaoReveal: make([]byte, dilithiumlib.CryptoBytes),
 			Zond1Data: &zondpb.Zond1Data{
 				DepositRoot: make([]byte, 32),
 				BlockHash:   make([]byte, 32),

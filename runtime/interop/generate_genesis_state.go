@@ -21,6 +21,15 @@ import (
 	"github.com/theQRL/qrysm/v4/time"
 )
 
+// NOTE(@rgeraldes24): used by the old phase 0 genesis generation; review
+/*
+var (
+	// This is the recommended mock zond1 block hash according to the Ethereum consensus interop guidelines.
+	// https://github.com/ethereum/eth2.0-pm/blob/a085c9870f3956d6228ed2a40cd37f0c6580ecd7/interop/mocked_start/README.md
+	mockZond1BlockHash = []byte{66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66}
+)
+*/
+
 // GenerateGenesisState deterministically given a genesis time and number of validators.
 // If a genesis time of 0 is supplied it is set to the current time.
 func GenerateGenesisState(ctx context.Context, genesisTime, numValidators uint64, ep *enginev1.ExecutionPayload, ed *zondpb.Zond1Data) (*zondpb.BeaconState, []*zondpb.Deposit, error) {
@@ -66,65 +75,6 @@ func GenerateGenesisStateFromDepositData(
 	}
 	return pbState, deposits, nil
 }
-
-// TODO(rgeraldes24) - old version
-/*
-var (
-	// This is the recommended mock zond1 block hash according to the Ethereum consensus interop guidelines.
-	// https://github.com/ethereum/eth2.0-pm/blob/a085c9870f3956d6228ed2a40cd37f0c6580ecd7/interop/mocked_start/README.md
-	mockZond1BlockHash = []byte{66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66}
-)
-
-// GenerateGenesisState deterministically given a genesis time and number of validators.
-// If a genesis time of 0 is supplied it is set to the current time.
-func GenerateGenesisState(ctx context.Context, genesisTime, numValidators uint64) (*zondpb.BeaconState, []*zondpb.Deposit, error) {
-	privKeys, pubKeys, err := DeterministicallyGenerateKeys(0, numValidators)
-	if err != nil {
-		return nil, nil, errors.Wrapf(err, "could not deterministically generate keys for %d validators", numValidators)
-	}
-	depositDataItems, depositDataRoots, err := DepositDataFromKeys(privKeys, pubKeys)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not generate deposit data from keys")
-	}
-	return GenerateGenesisStateFromDepositData(ctx, genesisTime, depositDataItems, depositDataRoots)
-}
-
-// GenerateGenesisStateFromDepositData creates a genesis state given a list of
-// deposit data items and their corresponding roots.
-func GenerateGenesisStateFromDepositData(
-	ctx context.Context, genesisTime uint64, depositData []*zondpb.Deposit_Data, depositDataRoots [][]byte,
-) (*zondpb.BeaconState, []*zondpb.Deposit, error) {
-	t, err := trie.GenerateTrieFromItems(depositDataRoots, params.BeaconConfig().DepositContractTreeDepth)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not generate Merkle trie for deposit proofs")
-	}
-	deposits, err := GenerateDepositsFromData(depositData, t)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not generate deposits from the deposit data provided")
-	}
-	root, err := t.HashTreeRoot()
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not hash tree root of deposit trie")
-	}
-	if genesisTime == 0 {
-		genesisTime = uint64(time.Now().Unix())
-	}
-	beaconState, err := coreState.GenesisBeaconState(ctx, deposits, genesisTime, &zondpb.Zond1Data{
-		DepositRoot:  root[:],
-		DepositCount: uint64(len(deposits)),
-		BlockHash:    mockZond1BlockHash,
-	})
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not generate genesis state")
-	}
-
-	pbState, err := statenative.ProtobufBeaconStateCapella(beaconState.ToProtoUnsafe())
-	if err != nil {
-		return nil, nil, err
-	}
-	return pbState, deposits, nil
-}
-*/
 
 // GenerateDepositsFromData a list of deposit items by creating proofs for each of them from a sparse Merkle trie.
 func GenerateDepositsFromData(depositDataItems []*zondpb.Deposit_Data, trie *trie.SparseMerkleTrie) ([]*zondpb.Deposit, error) {
@@ -215,7 +165,7 @@ func depositDataFromKeys(privKeys []dilithium.DilithiumKey, pubKeys []dilithium.
 func createDepositData(privKey dilithium.DilithiumKey, pubKey dilithium.PublicKey, withExecCreds bool) (*zondpb.Deposit_Data, error) {
 	depositMessage := &zondpb.DepositMessage{
 		PublicKey:             pubKey.Marshal(),
-		WithdrawalCredentials: withdrawalCredentialsHash(privKey),
+		WithdrawalCredentials: withdrawalCredentialsHash(pubKey.Marshal()),
 		Amount:                params.BeaconConfig().MaxEffectiveBalance,
 	}
 	if withExecCreds {
@@ -245,23 +195,8 @@ func createDepositData(privKey dilithium.DilithiumKey, pubKey dilithium.PublicKe
 	return di, nil
 }
 
-// withdrawalCredentialsHash forms a 32 byte hash of the withdrawal public
-// address.
-//
-// The specification is as follows:
-//
-//	withdrawal_credentials[:1] == BLS_WITHDRAWAL_PREFIX_BYTE
-//	withdrawal_credentials[1:] == hash(withdrawal_pubkey)[1:]
-//
-// where withdrawal_credentials is of type bytes32.
-
-// TODO(rgeraldes24)
-// func withdrawalCredentialsHash(pubKey []byte) []byte {
-// 	h := hash.Hash(pubKey)
-// 	return append([]byte{blsWithdrawalPrefixByte}, h[1:]...)[:32]
-// }
-
-func withdrawalCredentialsHash(withdrawalKey dilithium.DilithiumKey) []byte {
-	h := hash.Hash(withdrawalKey.PublicKey().Marshal())
-	return append([]byte{params.BeaconConfig().DilithiumWithdrawalPrefixByte}, h[1:]...)[:32]
+// withdrawalCredentialsHash forms a 32 byte hash of the withdrawal public address.
+func withdrawalCredentialsHash(pubKey []byte) []byte {
+	h := hash.Hash(pubKey)
+	return append([]byte{dilithiumWithdrawalPrefixByte}, h[1:]...)[:32]
 }

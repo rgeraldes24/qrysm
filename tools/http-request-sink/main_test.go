@@ -14,17 +14,17 @@ import (
 )
 
 type sampleRPCRequest struct {
-	Name      string `json:"name"`
-	ETHMethod string `json:"eth_method"`
-	Address   string `json:"address"`
+	Name       string `json:"name"`
+	ZONDMethod string `json:"zond_method"`
+	Address    string `json:"address"`
 }
 
 func Test_parseAndCaptureRequest(t *testing.T) {
 	tmpFile := filepath.Join(t.TempDir(), "faketest.log")
 	body := &sampleRPCRequest{
-		Name:      "eth2",
-		ETHMethod: "eth2_produceBlock",
-		Address:   "0x0923920930923",
+		Name:       "zond2",
+		ZONDMethod: "zond2_produceBlock",
+		Address:    "0x0923920930923",
 	}
 	enc, err := json.Marshal(body)
 	require.NoError(t, err)

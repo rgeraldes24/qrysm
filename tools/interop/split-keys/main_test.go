@@ -32,7 +32,6 @@ var (
 	}
 )
 
-// TODO(rgeraldes24)
 /*
 func Test_generateKeysFromMnemonicList(t *testing.T) {
 	rdr := strings.NewReader(testMnemonic)

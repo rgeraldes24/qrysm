@@ -11,13 +11,12 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 )
 
-// const (
-// 	blsWithdrawalPrefixByte = byte(0)
-// )
+const (
+	// TODO(@rgeraldes24): replace with config param?
+	dilithiumWithdrawalPrefixByte = byte(0)
+)
 
-// DeterministicallyGenerateKeys creates BLS private keys using a fixed curve order according to
-// the algorithm specified in the Ethereum beacon chain specification interop mock start section found here:
-// https://github.com/ethereum/eth2.0-pm/blob/a085c9870f3956d6228ed2a40cd37f0c6580ecd7/interop/mocked_start/README.md
+// DeterministicallyGenerateKeys creates Dilithium private keys.
 func DeterministicallyGenerateKeys(startIndex, numKeys uint64) ([]dilithium.DilithiumKey, []dilithium.PublicKey, error) {
 	dilithiumKeys := make([]dilithium.DilithiumKey, numKeys)
 	pubKeys := make([]dilithium.PublicKey, numKeys)
