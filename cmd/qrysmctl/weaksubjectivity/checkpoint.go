@@ -1,5 +1,6 @@
 package weaksubjectivity
 
+/*
 import (
 	"context"
 	"fmt"
@@ -61,3 +62,4 @@ func cliActionCheckpoint(_ *cli.Context) error {
 	fmt.Printf("--weak-subjectivity-checkpoint=%s\n\n", ws.CheckpointString())
 	return nil
 }
+*/

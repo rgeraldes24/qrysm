@@ -1,4 +1,4 @@
-// Package main defines a validator client, a critical actor in Ethereum which manages
+// Package main defines a validator client, a critical actor in QRL which manages
 // a keystore of private keys, connects to a beacon node to receive assignments,
 // and submits blocks/attestations as needed.
 package main
@@ -116,7 +116,7 @@ func init() {
 func main() {
 	app := cli.App{}
 	app.Name = "validator"
-	app.Usage = `launches an Ethereum validator client that interacts with a beacon chain, starts proposer and attester services, p2p connections, and more`
+	app.Usage = `launches a QRL validator client that interacts with a beacon chain, starts proposer and attester services, p2p connections, and more`
 	app.Version = version.Version()
 	app.Action = func(ctx *cli.Context) error {
 		if err := startNode(ctx); err != nil {
@@ -173,7 +173,7 @@ func main() {
 		}
 
 		// Fix data dir for Windows users.
-		outdatedDataDir := filepath.Join(file.HomeDir(), "AppData", "Roaming", "Eth2Validators")
+		outdatedDataDir := filepath.Join(file.HomeDir(), "AppData", "Roaming", "Zond2Validators")
 		currentDataDir := flags.DefaultValidatorDir()
 		if err := cmd.FixDefaultDataDir(outdatedDataDir, currentDataDir); err != nil {
 			log.WithError(err).Error("Cannot update data directory")

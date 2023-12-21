@@ -144,9 +144,15 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 	if err != nil {
 		panic(fmt.Errorf("could not get signingData.HashTreeRoot() | reason %v", err))
 	}
-	// TODO(rgeraldes24) - handle error
+
 	sig, err := dilithium.SignatureFromBytes(signature)
+	if err != nil {
+		panic(fmt.Errorf("failed to load signature from bytes | reason %v", err))
+	}
 	publicKey, err := dilithium.PublicKeyFromBytes(pubKey)
+	if err != nil {
+		panic(fmt.Errorf("failed to load public key from bytes | reason %v", err))
+	}
 
 	return sig.Verify(publicKey, ctrRoot[:])
 }

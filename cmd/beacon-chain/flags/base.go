@@ -125,13 +125,7 @@ var (
 		Usage: "The required number of valid peers to connect with before syncing.",
 		Value: 3,
 	}
-	// TODO(rgeraldes24) - remove
-	// ContractDeploymentBlock is the block in which the zond1 deposit contract was deployed.
-	// ContractDeploymentBlock = &cli.IntFlag{
-	// 	Name:  "contract-deployment-block",
-	// 	Usage: "The zond1 block in which the deposit contract was deployed.",
-	// 	Value: 11184524,
-	// }
+
 	// SetGCPercent is the percentage of current live allocations at which the garbage collector is to run.
 	SetGCPercent = &cli.IntFlag{
 		Name:  "gc-percent",

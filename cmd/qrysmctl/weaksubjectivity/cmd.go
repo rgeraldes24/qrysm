@@ -1,5 +1,6 @@
 package weaksubjectivity
 
+/*
 import "github.com/urfave/cli/v2"
 
 var Commands = []*cli.Command{
@@ -12,3 +13,4 @@ var Commands = []*cli.Command{
 		},
 	},
 }
+*/

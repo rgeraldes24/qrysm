@@ -32,11 +32,11 @@ func DefaultDataDir() string {
 	home := file.HomeDir()
 	if home != "" {
 		if runtime.GOOS == "darwin" {
-			return filepath.Join(home, "Library", "Eth2")
+			return filepath.Join(home, "Library", "Zond2")
 		} else if runtime.GOOS == "windows" {
-			return filepath.Join(home, "AppData", "Local", "Eth2")
+			return filepath.Join(home, "AppData", "Local", "Zond2")
 		} else {
-			return filepath.Join(home, ".eth2")
+			return filepath.Join(home, ".zond2")
 		}
 	}
 	// As we cannot guess a stable location, return empty and handle later
@@ -67,7 +67,7 @@ func FixDefaultDataDir(prevDataDir, curDataDir string) error {
 		return err
 	}
 	if !prevDataDirExists {
-		// If no previous "%APPDATA%\Eth2" found, nothing to patch and move to new default location.
+		// If no previous "%APPDATA%\Zond2" found, nothing to patch and move to new default location.
 		return nil
 	}
 
