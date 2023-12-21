@@ -7,8 +7,6 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	base "github.com/theQRL/qrysm/v4/api/client"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -16,8 +14,6 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/ssz/detect"
 	"github.com/theQRL/qrysm/v4/io/file"
 	"github.com/theQRL/qrysm/v4/runtime/version"
-	"github.com/theQRL/qrysm/v4/time/slots"
-	"golang.org/x/mod/semver"
 )
 
 var errCheckpointBlockMismatch = errors.New("mismatch between checkpoint sync state and block")
@@ -123,6 +119,7 @@ func DownloadFinalizedData(ctx context.Context, client *Client) (*OriginData, er
 	}, nil
 }
 
+/*
 // WeakSubjectivityData represents the state root, block root and epoch of the BeaconState + ReadOnlySignedBeaconBlock
 // that falls at the beginning of the current weak subjectivity period. These values can be used to construct
 // a weak subjectivity checkpoint beacon node flag to be used for validation.
@@ -268,3 +265,4 @@ func getWeakSubjectivityEpochFromHead(ctx context.Context, client *Client) (prim
 	log.Printf("(computed client-side) weak subjectivity epoch = %d", epoch)
 	return epoch, nil
 }
+*/

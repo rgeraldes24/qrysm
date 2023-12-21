@@ -4,14 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"testing"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/api/client"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	blocktest "github.com/theQRL/qrysm/v4/consensus-types/blocks/testing"
@@ -63,6 +61,7 @@ func TestMarshalToEnvelope(t *testing.T) {
 	require.Equal(t, expected, string(encoded))
 }
 
+/*
 func TestFallbackVersionCheck(t *testing.T) {
 	trans := &testRT{rt: func(req *http.Request) (*http.Response, error) {
 		res := &http.Response{Request: req}
@@ -91,6 +90,7 @@ func TestFallbackVersionCheck(t *testing.T) {
 	_, err = ComputeWeakSubjectivityCheckpoint(ctx, c)
 	require.ErrorIs(t, err, errUnsupportedQrysmCheckpointVersion)
 }
+*/
 
 func TestFname(t *testing.T) {
 	vu := &detect.VersionedUnmarshaler{
@@ -115,11 +115,12 @@ func TestFname(t *testing.T) {
 	require.Equal(t, expected, actual)
 }
 
+/*
 func TestDownloadWeakSubjectivityCheckpoint(t *testing.T) {
 	ctx := context.Background()
 	cfg := params.MainnetConfig().Copy()
 
-	epoch := primitives.Epoch(0)
+	epoch := cfg.AltairForkEpoch - 1
 	// set up checkpoint state, using the epoch that will be computed as the ws checkpoint state based on the head state
 	wSlot, err := slots.EpochStart(epoch)
 	require.NoError(t, err)
@@ -208,10 +209,11 @@ func TestDownloadWeakSubjectivityCheckpoint(t *testing.T) {
 	require.Equal(t, expectedWSD.StateRoot, wsd.StateRoot)
 	require.Equal(t, expectedWSD.BlockRoot, wsd.BlockRoot)
 }
+*/
 
 // runs computeBackwardsCompatible directly
 // and via ComputeWeakSubjectivityCheckpoint with a round tripper that triggers the backwards compatible code path
-/* TODO(rgeraldes24) state slot
+/*
 func TestDownloadBackwardsCompatibleCombined(t *testing.T) {
 	ctx := context.Background()
 	cfg := params.MainnetConfig()
@@ -222,6 +224,7 @@ func TestDownloadBackwardsCompatibleCombined(t *testing.T) {
 
 	fmt.Println(expectedEpoch)
 	// set up checkpoint state, using the epoch that will be computed as the ws checkpoint state based on the head state
+	fmt.Println(expectedEpoch)
 	wSlot, err := slots.EpochStart(expectedEpoch)
 	require.NoError(t, err)
 	wst, err := util.NewBeaconState()
@@ -305,7 +308,7 @@ func TestDownloadBackwardsCompatibleCombined(t *testing.T) {
 }
 */
 
-/* TODO(rgeraldes24) double check math
+/*
 func TestGetWeakSubjectivityEpochFromHead(t *testing.T) {
 	st, expectedEpoch := defaultTestHeadState(t, params.MainnetConfig())
 	serialized, err := st.MarshalSSZ()
@@ -348,16 +351,16 @@ func forkForEpoch(cfg *params.BeaconChainConfig, epoch primitives.Epoch) (*zondp
 	}, nil
 }
 
+/*
 func defaultTestHeadState(t *testing.T, cfg *params.BeaconChainConfig) (state.BeaconState, primitives.Epoch) {
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateAltair()
 	require.NoError(t, err)
 
-	epoch := primitives.Epoch(0)
-	fork, err := forkForEpoch(cfg, epoch)
+	fork, err := forkForEpoch(cfg, cfg.AltairForkEpoch)
 	require.NoError(t, err)
 	require.NoError(t, st.SetFork(fork))
 
-	slot, err := slots.EpochStart(epoch)
+	slot, err := slots.EpochStart(cfg.AltairForkEpoch)
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(slot))
 
@@ -392,6 +395,7 @@ func populateValidators(cfg *params.BeaconChainConfig, st state.BeaconState, val
 	}
 	return st.SetBalances(balances)
 }
+*/
 
 func TestDownloadFinalizedData(t *testing.T) {
 	ctx := context.Background()

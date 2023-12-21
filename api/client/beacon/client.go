@@ -26,10 +26,10 @@ import (
 )
 
 const (
-	getSignedBlockPath             = "/zond/v1/beacon/blocks"
-	getBlockRootPath               = "/zond/v1/beacon/blocks/{{.Id}}/root"
-	getForkForStatePath            = "/zond/v1/beacon/states/{{.Id}}/fork"
-	getWeakSubjectivityPath        = "/zond/v1/beacon/weak_subjectivity"
+	getSignedBlockPath  = "/zond/v1/beacon/blocks"
+	getBlockRootPath    = "/zond/v1/beacon/blocks/{{.Id}}/root"
+	getForkForStatePath = "/zond/v1/beacon/states/{{.Id}}/fork"
+	// getWeakSubjectivityPath        = "/zond/v1/beacon/weak_subjectivity" NOTE(@rgeraldes24): deprecated
 	getForkSchedulePath            = "/zond/v1/config/fork_schedule"
 	getConfigSpecPath              = "/zond/v1/config/spec"
 	getStatePath                   = "/zond/v1/debug/beacon/states"
@@ -37,9 +37,9 @@ const (
 	changeDilithiumtoExecutionPath = "/zond/v1/beacon/pool/dilithium_to_execution_changes"
 )
 
-// StateOrBlockId represents the block_id / state_id parameters that several of the Eth Beacon API methods accept.
+// StateOrBlockId represents the block_id / state_id parameters that several of the Zond Beacon API methods accept.
 // StateOrBlockId constants are defined for named identifiers, and helper methods are provided
-// for slot and root identifiers. Example text from the Eth Beacon Node API documentation:
+// for slot and root identifiers. Example text from the Zond Beacon Node API documentation:
 //
 // "Block identifier can be one of: "head" (canonical head in node's view), "genesis", "finalized",
 // <slot>, <hex encoded blockRoot with 0x prefix>."
@@ -84,7 +84,7 @@ func renderGetBlockPath(id StateOrBlockId) string {
 	return path.Join(getSignedBlockPath, string(id))
 }
 
-// Client provides a collection of helper methods for calling the Eth Beacon Node API endpoints.
+// Client provides a collection of helper methods for calling the  Beacon Node API endpoints.
 type Client struct {
 	*client.Client
 }
@@ -246,11 +246,13 @@ func (c *Client) GetState(ctx context.Context, stateId StateOrBlockId) ([]byte, 
 	return b, nil
 }
 
+// NOTE(@rgeraldes24) - deprecated
 // GetWeakSubjectivity calls a proposed API endpoint that is unique to qrysm
 // This api method does the following:
 // - computes weak subjectivity epoch
 // - finds the highest non-skipped block preceding the epoch
 // - returns the htr of the found block and returns this + the value of state_root from the block
+/*
 func (c *Client) GetWeakSubjectivity(ctx context.Context) (*WeakSubjectivityData, error) {
 	body, err := c.Get(ctx, getWeakSubjectivityPath)
 	if err != nil {
@@ -279,6 +281,7 @@ func (c *Client) GetWeakSubjectivity(ctx context.Context) (*WeakSubjectivityData
 		StateRoot: bytesutil.ToBytes32(stateRoot),
 	}, nil
 }
+*/
 
 // SubmitChangeDilithiumtoExecution calls a beacon API endpoint to set the withdrawal addresses based on the given signed messages.
 // If the API responds with something other than OK there will be failure messages associated to the corresponding request message.
