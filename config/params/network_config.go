@@ -29,8 +29,6 @@ type NetworkConfig struct {
 	MinimumPeersInSubnetSearch uint64 // PeersInSubnetSearch is the required amount of peers that we need to be able to lookup in a subnet search.
 
 	// Chain Network Config
-	// TODO(rgeraldes24) - remove from config, in our case it will be zero always!
-	// ContractDeploymentBlock uint64   // ContractDeploymentBlock is the zond1 block in which the deposit contract is deployed.
 	BootstrapNodes []string // BootstrapNodes are the addresses of the bootnodes.
 }
 

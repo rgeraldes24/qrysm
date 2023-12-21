@@ -263,8 +263,9 @@ filegroup(
     url = "https://github.com/rgeraldes24/consensus-specs/archive/786885a593d4fcb23cbf3e179bfa10a61cd7ac68.tar.gz",
 )
 
+# TODO(@rgeraldes24)
 # http_archive(
-#     name = "eth2_networks",
+#     name = "zond2_networks",
 #     build_file_content = """
 # filegroup(
 #     name = "configs",
