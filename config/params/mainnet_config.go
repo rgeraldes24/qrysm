@@ -4,7 +4,7 @@ import (
 	"math"
 	"time"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithium "github.com/theQRL/go-qrllib/dilithium"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 )
@@ -166,8 +166,8 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	WithdrawalPrivkeyFileName: "/shardwithdrawalkey",
 	ValidatorPrivkeyFileName:  "/validatorprivatekey",
 	RPCSyncCheck:              1,
-	EmptySignature:            [dilithium2.CryptoBytes]byte{},
-	EmptyDilithiumSignature:   [dilithium2.CryptoBytes]byte{},
+	EmptySignature:            [dilithium.CryptoBytes]byte{},
+	EmptyDilithiumSignature:   [dilithium.CryptoBytes]byte{},
 	DefaultPageSize:           250,
 	MaxPeersToSync:            15,
 	SlotsPerArchivedPoint:     2048,

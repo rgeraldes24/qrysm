@@ -7,7 +7,7 @@ import (
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/v4/api/client/builder"
 	blockchainTest "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
@@ -89,7 +89,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
 		require.NoError(t, err)
 		require.NoError(t, vs.BeaconDB.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{blk.Block().ProposerIndex()},
-			[]*zondpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, dilithium2.CryptoPublicKeyBytes)}}))
+			[]*zondpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, dilithiumlib.CryptoPublicKeyBytes)}}))
 		ti, err := slots.ToTime(uint64(time.Now().Unix()), 0)
 		require.NoError(t, err)
 		sk, err := dilithium.RandKey()
@@ -148,7 +148,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		blk, err := blocks.NewSignedBeaconBlock(util.NewBlindedBeaconBlock())
 		require.NoError(t, err)
 		require.NoError(t, vs.BeaconDB.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{blk.Block().ProposerIndex()},
-			[]*zondpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, dilithium2.CryptoPublicKeyBytes)}}))
+			[]*zondpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, dilithiumlib.CryptoPublicKeyBytes)}}))
 		ti, err := slots.ToTime(uint64(time.Now().Unix()), 0)
 		require.NoError(t, err)
 		sk, err := dilithium.RandKey()

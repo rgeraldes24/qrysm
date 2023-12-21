@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
@@ -186,7 +186,7 @@ func buildGenesisBeaconState(genesisTime uint64, preState state.BeaconState, zon
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
 	bodyRoot, err := (&zondpb.BeaconBlockBody{
-		RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+		RandaoReveal: make([]byte, dilithiumlib.CryptoBytes),
 		Zond1Data: &zondpb.Zond1Data{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),

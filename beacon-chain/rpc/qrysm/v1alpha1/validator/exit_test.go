@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
 	opfeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/operation"
@@ -138,7 +138,7 @@ func TestProposeExit_NoPanic(t *testing.T) {
 
 	_, err = server.ProposeExit(context.Background(), req)
 	require.ErrorContains(t, "invalid signature provided", err, "Expected error for no signature exists")
-	req.Signature = bytesutil.FromBytes2592([dilithium2.CryptoPublicKeyBytes]byte{})
+	req.Signature = bytesutil.FromBytes2592([dilithium.CryptoPublicKeyBytes]byte{})
 
 	_, err = server.ProposeExit(context.Background(), req)
 	require.ErrorContains(t, "invalid signature provided", err, "Expected error for invalid signature length")

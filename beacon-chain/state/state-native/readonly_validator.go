@@ -2,7 +2,7 @@ package state_native
 
 import (
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -64,8 +64,8 @@ func (v readOnlyValidator) ExitEpoch() primitives.Epoch {
 
 // PublicKey returns the public key of the
 // read only validator.
-func (v readOnlyValidator) PublicKey() [dilithium2.CryptoPublicKeyBytes]byte {
-	var pubkey [dilithium2.CryptoPublicKeyBytes]byte
+func (v readOnlyValidator) PublicKey() [dilithium.CryptoPublicKeyBytes]byte {
+	var pubkey [dilithium.CryptoPublicKeyBytes]byte
 	copy(pubkey[:], v.validator.PublicKey)
 	return pubkey
 }

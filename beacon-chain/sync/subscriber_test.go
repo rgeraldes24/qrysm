@@ -12,7 +12,7 @@ import (
 	pubsubpb "github.com/libp2p/go-libp2p-pubsub/pb"
 	"github.com/libp2p/go-libp2p/core/peer"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/async/abool"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
@@ -72,7 +72,7 @@ func TestSubscribe_ReceivesValidMessage(t *testing.T) {
 	}, p2pService.Digest)
 	r.markForChainStart()
 
-	p2pService.ReceivePubSub(topic, &pb.SignedVoluntaryExit{Exit: &pb.VoluntaryExit{Epoch: 55}, Signature: make([]byte, dilithium2.CryptoBytes)})
+	p2pService.ReceivePubSub(topic, &pb.SignedVoluntaryExit{Exit: &pb.VoluntaryExit{Epoch: 55}, Signature: make([]byte, dilithium.CryptoBytes)})
 
 	if util.WaitTimeout(&wg, time.Second) {
 		t.Fatal("Did not receive PubSub in 1 second")
@@ -262,7 +262,7 @@ func TestSubscribe_HandlesPanic(t *testing.T) {
 		panic("bad")
 	}, p.Digest)
 	r.markForChainStart()
-	p.ReceivePubSub(topic, &pb.SignedVoluntaryExit{Exit: &pb.VoluntaryExit{Epoch: 55}, Signature: make([]byte, dilithium2.CryptoBytes)})
+	p.ReceivePubSub(topic, &pb.SignedVoluntaryExit{Exit: &pb.VoluntaryExit{Epoch: 55}, Signature: make([]byte, dilithium.CryptoBytes)})
 
 	if util.WaitTimeout(&wg, time.Second) {
 		t.Fatal("Did not receive PubSub in 1 second")

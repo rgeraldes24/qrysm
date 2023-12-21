@@ -10,7 +10,7 @@ import (
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	pubsubpb "github.com/libp2p/go-libp2p-pubsub/pb"
 	"github.com/prysmaticlabs/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
@@ -108,11 +108,11 @@ func TestValidateAggregateAndProof_NoBlock(t *testing.T) {
 	})
 
 	aggregateAndProof := &zondpb.AggregateAttestationAndProof{
-		SelectionProof:  bytesutil.PadTo([]byte{'A'}, dilithium2.CryptoBytes),
+		SelectionProof:  bytesutil.PadTo([]byte{'A'}, dilithium.CryptoBytes),
 		Aggregate:       att,
 		AggregatorIndex: 0,
 	}
-	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium2.CryptoBytes)}
+	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium.CryptoBytes)}
 
 	c := lruwrpr.New(10)
 	r := &Service{
@@ -176,9 +176,9 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 
 	aggregateAndProof := &zondpb.AggregateAttestationAndProof{
 		Aggregate:      att,
-		SelectionProof: make([]byte, dilithium2.CryptoBytes),
+		SelectionProof: make([]byte, dilithium.CryptoBytes),
 	}
-	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium2.CryptoBytes)}
+	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium.CryptoBytes)}
 
 	require.NoError(t, beaconState.SetGenesisTime(uint64(time.Now().Unix())))
 
@@ -261,9 +261,9 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 
 	aggregateAndProof := &zondpb.AggregateAttestationAndProof{
 		Aggregate:      att,
-		SelectionProof: make([]byte, dilithium2.CryptoBytes),
+		SelectionProof: make([]byte, dilithium.CryptoBytes),
 	}
-	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium2.CryptoBytes)}
+	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium.CryptoBytes)}
 
 	require.NoError(t, beaconState.SetGenesisTime(uint64(time.Now().Unix())))
 	r := &Service{

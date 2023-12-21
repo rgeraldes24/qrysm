@@ -3,7 +3,7 @@ package validator_service_config
 import (
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -17,7 +17,7 @@ func Test_Proposer_Setting_Cloning(t *testing.T) {
 	key1, err := hexutil.Decode(key1hex)
 	require.NoError(t, err)
 	settings := &ProposerSettings{
-		ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*ProposerOption{
+		ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*ProposerOption{
 			bytesutil.ToBytes2592(key1): {
 				FeeRecipientConfig: &FeeRecipientConfig{
 					FeeRecipient: common.HexToAddress("0x50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
@@ -104,7 +104,7 @@ func TestProposerSettings_ShouldBeSaved(t *testing.T) {
 	key1, err := hexutil.Decode(key1hex)
 	require.NoError(t, err)
 	type fields struct {
-		ProposeConfig map[[dilithium2.CryptoPublicKeyBytes]byte]*ProposerOption
+		ProposeConfig map[[dilithium.CryptoPublicKeyBytes]byte]*ProposerOption
 		DefaultConfig *ProposerOption
 	}
 	tests := []struct {
@@ -115,7 +115,7 @@ func TestProposerSettings_ShouldBeSaved(t *testing.T) {
 		{
 			name: "Should be saved, proposeconfig populated and no default config",
 			fields: fields{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*ProposerOption{
 					bytesutil.ToBytes2592(key1): {
 						FeeRecipientConfig: &FeeRecipientConfig{
 							FeeRecipient: common.HexToAddress("0x50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
@@ -151,7 +151,7 @@ func TestProposerSettings_ShouldBeSaved(t *testing.T) {
 		{
 			name: "Should be saved, all populated",
 			fields: fields{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*ProposerOption{
 					bytesutil.ToBytes2592(key1): {
 						FeeRecipientConfig: &FeeRecipientConfig{
 							FeeRecipient: common.HexToAddress("0x50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),

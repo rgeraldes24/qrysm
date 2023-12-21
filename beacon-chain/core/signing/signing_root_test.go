@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	fuzz "github.com/google/gofuzz"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -110,7 +110,7 @@ func TestSigningRoot_ComputeForkDigest(t *testing.T) {
 func TestFuzzverifySigningRoot_10000(_ *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	st := &zondpb.BeaconState{}
-	var pubkey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubkey [dilithium.CryptoPublicKeyBytes]byte
 	var sig [4595]byte
 	var domain [4]byte
 	var p []byte

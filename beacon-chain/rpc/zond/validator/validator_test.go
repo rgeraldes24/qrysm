@@ -8,7 +8,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	builderTest "github.com/theQRL/qrysm/v4/beacon-chain/builder/testing"
@@ -1432,7 +1432,7 @@ func TestPrepareBeaconProposer(t *testing.T) {
 				request: &zondpbv1.PrepareBeaconProposerRequest{
 					Recipients: []*zondpbv1.PrepareBeaconProposerRequest_FeeRecipientContainer{
 						{
-							FeeRecipient:   make([]byte, dilithium2.CryptoPublicKeyBytes),
+							FeeRecipient:   make([]byte, dilithium.CryptoPublicKeyBytes),
 							ValidatorIndex: 1,
 						},
 					},
@@ -1560,12 +1560,12 @@ func TestServer_SubmitValidatorRegistrations(t *testing.T) {
 					Registrations: []*zondpbv1.SubmitValidatorRegistrationsRequest_SignedValidatorRegistration{
 						{
 							Message: &zondpbv1.SubmitValidatorRegistrationsRequest_ValidatorRegistration{
-								FeeRecipient: make([]byte, dilithium2.CryptoPublicKeyBytes),
+								FeeRecipient: make([]byte, dilithium.CryptoPublicKeyBytes),
 								GasLimit:     30000000,
 								Timestamp:    uint64(time.Now().Unix()),
-								Pubkey:       make([]byte, dilithium2.CryptoPublicKeyBytes),
+								Pubkey:       make([]byte, dilithium.CryptoPublicKeyBytes),
 							},
-							Signature: make([]byte, dilithium2.CryptoBytes),
+							Signature: make([]byte, dilithium.CryptoBytes),
 						},
 					},
 				},

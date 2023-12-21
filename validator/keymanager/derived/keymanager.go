@@ -8,7 +8,7 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
 	common2 "github.com/theQRL/go-qrllib/common"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/async/event"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"

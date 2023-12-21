@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/api/client/builder"
 	"github.com/theQRL/qrysm/v4/beacon-chain/blockchain"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
@@ -26,7 +26,7 @@ var ErrNoBuilder = errors.New("builder endpoint not configured")
 // BlockBuilder defines the interface for interacting with the block builder
 type BlockBuilder interface {
 	SubmitBlindedBlock(ctx context.Context, block interfaces.ReadOnlySignedBeaconBlock) (interfaces.ExecutionData, error)
-	GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubKey [dilithium2.CryptoPublicKeyBytes]byte) (builder.SignedBid, error)
+	GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubKey [dilithium.CryptoPublicKeyBytes]byte) (builder.SignedBid, error)
 	RegisterValidator(ctx context.Context, reg []*zondpb.SignedValidatorRegistrationV1) error
 	RegistrationByValidatorID(ctx context.Context, id primitives.ValidatorIndex) (*zondpb.ValidatorRegistrationV1, error)
 	Configured() bool
@@ -103,7 +103,7 @@ func (s *Service) SubmitBlindedBlock(ctx context.Context, b interfaces.ReadOnlyS
 }
 
 // GetHeader retrieves the header for a given slot and parent hash from the builder relay network.
-func (s *Service) GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubKey [dilithium2.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
+func (s *Service) GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubKey [dilithium.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
 	ctx, span := trace.StartSpan(ctx, "builder.GetHeader")
 	defer span.End()
 	start := time.Now()

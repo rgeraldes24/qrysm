@@ -6,7 +6,7 @@ import (
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	blockchainTest "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/builder"
 	testing2 "github.com/theQRL/qrysm/v4/beacon-chain/builder/testing"
@@ -92,7 +92,7 @@ func TestServer_validatorRegistered(t *testing.T) {
 	require.Equal(t, false, reg)
 
 	f := bytesutil.PadTo([]byte{}, fieldparams.FeeRecipientLength)
-	p := bytesutil.PadTo([]byte{}, dilithium2.CryptoPublicKeyBytes)
+	p := bytesutil.PadTo([]byte{}, dilithium.CryptoPublicKeyBytes)
 	require.NoError(t, db.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{0, 1},
 		[]*zondpb.ValidatorRegistrationV1{{FeeRecipient: f, Timestamp: uint64(time.Now().Unix()), Pubkey: p}, {FeeRecipient: f, Timestamp: uint64(time.Now().Unix()), Pubkey: p}}))
 
@@ -139,7 +139,7 @@ func TestServer_canUseBuilder(t *testing.T) {
 	require.Equal(t, false, reg)
 
 	f := bytesutil.PadTo([]byte{}, fieldparams.FeeRecipientLength)
-	p := bytesutil.PadTo([]byte{}, dilithium2.CryptoPublicKeyBytes)
+	p := bytesutil.PadTo([]byte{}, dilithium.CryptoPublicKeyBytes)
 	require.NoError(t, db.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{0},
 		[]*zondpb.ValidatorRegistrationV1{{FeeRecipient: f, Timestamp: uint64(time.Now().Unix()), Pubkey: p}}))
 

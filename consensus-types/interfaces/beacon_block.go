@@ -2,7 +2,7 @@ package interfaces
 
 import (
 	ssz "github.com/prysmaticlabs/fastssz"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithium "github.com/theQRL/go-qrllib/dilithium"
 	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -15,7 +15,7 @@ import (
 // a signed beacon block.
 type ReadOnlySignedBeaconBlock interface {
 	Block() ReadOnlyBeaconBlock
-	Signature() [dilithium2.CryptoBytes]byte
+	Signature() [dilithium.CryptoBytes]byte
 	IsNil() bool
 	Copy() (ReadOnlySignedBeaconBlock, error)
 	Proto() (proto.Message, error)
@@ -53,7 +53,7 @@ type ReadOnlyBeaconBlock interface {
 // ReadOnlyBeaconBlockBody describes the method set employed by an object
 // that is a beacon block body.
 type ReadOnlyBeaconBlockBody interface {
-	RandaoReveal() [dilithium2.CryptoBytes]byte
+	RandaoReveal() [dilithium.CryptoBytes]byte
 	Zond1Data() *zondpb.Zond1Data
 	Graffiti() [field_params.RootLength]byte
 	ProposerSlashings() []*zondpb.ProposerSlashing

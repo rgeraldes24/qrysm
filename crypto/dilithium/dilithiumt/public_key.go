@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 )
@@ -15,7 +15,7 @@ var maxKeys = 1000000
 var pubkeyCache = lruwrpr.New(maxKeys)
 
 type PublicKey struct {
-	p *[dilithium2.CryptoPublicKeyBytes]uint8
+	p *[dilithium.CryptoPublicKeyBytes]uint8
 }
 
 func (p *PublicKey) Marshal() []byte {
@@ -23,14 +23,14 @@ func (p *PublicKey) Marshal() []byte {
 }
 
 func PublicKeyFromBytes(pubKey []byte) (common.PublicKey, error) {
-	if len(pubKey) != dilithium2.CryptoPublicKeyBytes {
-		return nil, fmt.Errorf("public key must be %d bytes", dilithium2.CryptoPublicKeyBytes)
+	if len(pubKey) != dilithium.CryptoPublicKeyBytes {
+		return nil, fmt.Errorf("public key must be %d bytes", dilithium.CryptoPublicKeyBytes)
 	}
-	newKey := (*[dilithium2.CryptoPublicKeyBytes]uint8)(pubKey)
+	newKey := (*[dilithium.CryptoPublicKeyBytes]uint8)(pubKey)
 	if cv, ok := pubkeyCache.Get(*newKey); ok {
 		return cv.(*PublicKey).Copy(), nil
 	}
-	var p [dilithium2.CryptoPublicKeyBytes]uint8
+	var p [dilithium.CryptoPublicKeyBytes]uint8
 	copy(p[:], pubKey)
 	pubKeyObj := &PublicKey{p: &p}
 	copiedKey := pubKeyObj.Copy()
@@ -49,7 +49,7 @@ func (p *PublicKey) Copy() common.PublicKey {
 }
 
 func (p *PublicKey) IsInfinite() bool {
-	var zeroKey [dilithium2.CryptoPublicKeyBytes]uint8
+	var zeroKey [dilithium.CryptoPublicKeyBytes]uint8
 	return reflect.DeepEqual(p.p, zeroKey)
 }
 

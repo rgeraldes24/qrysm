@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/api/client/builder"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
@@ -47,7 +47,7 @@ func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, _ interfaces.
 }
 
 // GetHeader for mocking.
-func (s *MockBuilderService) GetHeader(_ context.Context, slot primitives.Slot, _ [32]byte, _ [dilithium2.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
+func (s *MockBuilderService) GetHeader(_ context.Context, slot primitives.Slot, _ [32]byte, _ [dilithium.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
 	return builder.WrappedSignedBuilderBid(s.Bid)
 }
 

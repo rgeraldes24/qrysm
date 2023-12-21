@@ -10,7 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/async/event"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
@@ -39,7 +39,7 @@ type ChainService struct {
 	Optimistic                  bool
 	ValidAttestation            bool
 	ValidatorsRoot              [32]byte
-	PublicKey                   [dilithium2.CryptoPublicKeyBytes]byte
+	PublicKey                   [dilithium.CryptoPublicKeyBytes]byte
 	FinalizedCheckPoint         *zondpb.Checkpoint
 	CurrentJustifiedCheckPoint  *zondpb.Checkpoint
 	PreviousJustifiedCheckPoint *zondpb.Checkpoint
@@ -412,12 +412,12 @@ func (_ *ChainService) ChainHeads() ([][32]byte, []primitives.Slot) {
 }
 
 // HeadPublicKeyToValidatorIndex mocks HeadPublicKeyToValidatorIndex and always return 0 and true.
-func (_ *ChainService) HeadPublicKeyToValidatorIndex(_ [dilithium2.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool) {
+func (_ *ChainService) HeadPublicKeyToValidatorIndex(_ [dilithium.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool) {
 	return 0, true
 }
 
 // HeadValidatorIndexToPublicKey mocks HeadValidatorIndexToPublicKey and always return empty and nil.
-func (s *ChainService) HeadValidatorIndexToPublicKey(_ context.Context, _ primitives.ValidatorIndex) ([dilithium2.CryptoPublicKeyBytes]byte, error) {
+func (s *ChainService) HeadValidatorIndexToPublicKey(_ context.Context, _ primitives.ValidatorIndex) ([dilithium.CryptoPublicKeyBytes]byte, error) {
 	return s.PublicKey, nil
 }
 

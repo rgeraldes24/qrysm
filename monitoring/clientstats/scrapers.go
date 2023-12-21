@@ -198,7 +198,7 @@ func populateBeaconNodeStats(pf metricMap) BeaconNodeStats {
 	} else {
 		m = f.Metric[0]
 		if int64(m.Gauge.GetValue()) == bs.SyncBeaconHeadSlot {
-			bs.SyncEth2Synced = true
+			bs.SyncZond2Synced = true
 		}
 	}
 

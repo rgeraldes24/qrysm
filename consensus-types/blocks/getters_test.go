@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	ssz "github.com/prysmaticlabs/fastssz"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -93,7 +93,7 @@ func Test_SignedBeaconBlock_Version(t *testing.T) {
 func Test_SignedBeaconBlock_Header(t *testing.T) {
 	bb := &BeaconBlockBody{
 		version:      version.Capella,
-		randaoReveal: [dilithium2.CryptoBytes]byte{},
+		randaoReveal: [dilithium.CryptoBytes]byte{},
 		zond1Data: &zond.Zond1Data{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
@@ -412,7 +412,7 @@ func Test_BeaconBlockBody_HashTreeRoot(t *testing.T) {
 
 func hydrateSignedBeaconBlock() *zond.SignedBeaconBlock {
 	return &zond.SignedBeaconBlock{
-		Signature: make([]byte, dilithium2.CryptoBytes),
+		Signature: make([]byte, dilithium.CryptoBytes),
 		Block:     hydrateBeaconBlock(),
 	}
 }
@@ -427,7 +427,7 @@ func hydrateBeaconBlock() *zond.BeaconBlock {
 
 func hydrateBeaconBlockBody() *zond.BeaconBlockBody {
 	return &zond.BeaconBlockBody{
-		RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+		RandaoReveal: make([]byte, dilithium.CryptoBytes),
 		Graffiti:     make([]byte, fieldparams.RootLength),
 		Zond1Data: &zond.Zond1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),

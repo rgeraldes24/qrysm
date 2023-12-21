@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/theQRL/go-qrllib/common"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 )
 
 func StrSeedToBinSeed(strSeed string) [common.SeedSize]uint8 {
@@ -33,20 +33,20 @@ func EncodeHex(hexBytes []byte) string {
 	return fmt.Sprintf("0x%x", hexBytes)
 }
 
-func ToSizedDilithiumSignature(sig []byte) [dilithium2.CryptoBytes]byte {
-	if len(sig) != dilithium2.CryptoBytes {
+func ToSizedDilithiumSignature(sig []byte) [dilithium.CryptoBytes]byte {
+	if len(sig) != dilithium.CryptoBytes {
 		panic(fmt.Errorf("cannot convert sig to sized dilithium sig, invalid sig length %d", len(sig)))
 	}
-	var sizedSig [dilithium2.CryptoBytes]byte
+	var sizedSig [dilithium.CryptoBytes]byte
 	copy(sizedSig[:], sig)
 	return sizedSig
 }
 
-func ToSizedDilithiumPublicKey(pk []byte) [dilithium2.CryptoPublicKeyBytes]byte {
-	if len(pk) != dilithium2.CryptoPublicKeyBytes {
+func ToSizedDilithiumPublicKey(pk []byte) [dilithium.CryptoPublicKeyBytes]byte {
+	if len(pk) != dilithium.CryptoPublicKeyBytes {
 		panic(fmt.Errorf("cannot convert pk to sized dilithium pk, invalid pk length %d", len(pk)))
 	}
-	var sizedPK [dilithium2.CryptoPublicKeyBytes]byte
+	var sizedPK [dilithium.CryptoPublicKeyBytes]byte
 	copy(sizedPK[:], pk)
 	return sizedPK
 }

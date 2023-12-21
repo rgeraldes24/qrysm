@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
@@ -66,8 +66,8 @@ func (vs *Server) MultipleValidatorStatus(
 	}
 	responseCap := len(req.PublicKeys) + len(req.Indices)
 	pubKeys := make([][]byte, 0, responseCap)
-	filtered := make(map[[dilithium2.CryptoPublicKeyBytes]byte]bool)
-	filtered[[dilithium2.CryptoPublicKeyBytes]byte{}] = true // Filter out keys with all zeros.
+	filtered := make(map[[dilithium.CryptoPublicKeyBytes]byte]bool)
+	filtered[[dilithium.CryptoPublicKeyBytes]byte{}] = true // Filter out keys with all zeros.
 	// Filter out duplicate public keys.
 	for _, pubKey := range req.PublicKeys {
 		pubkeyBytes := bytesutil.ToBytes2592(pubKey)

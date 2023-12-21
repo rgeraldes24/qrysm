@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	buildertesting "github.com/theQRL/qrysm/v4/api/client/builder/testing"
 	blockchainTesting "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	dbtesting "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
@@ -60,7 +60,7 @@ func Test_BuilderMethodsWithouClient(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, false, s.Configured())
 
-	_, err = s.GetHeader(context.Background(), 0, [32]byte{}, [dilithium2.CryptoPublicKeyBytes]byte{})
+	_, err = s.GetHeader(context.Background(), 0, [32]byte{}, [dilithium.CryptoPublicKeyBytes]byte{})
 	assert.ErrorContains(t, ErrNoBuilder.Error(), err)
 
 	_, err = s.SubmitBlindedBlock(context.Background(), nil)

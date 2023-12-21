@@ -3,7 +3,7 @@ package testing
 import (
 	"context"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/api/client/builder"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -27,7 +27,7 @@ func (MockClient) NodeURL() string {
 }
 
 // GetHeader --
-func (MockClient) GetHeader(_ context.Context, _ primitives.Slot, _ [32]byte, _ [dilithium2.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
+func (MockClient) GetHeader(_ context.Context, _ primitives.Slot, _ [32]byte, _ [dilithium.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
 	return nil, nil
 }
 

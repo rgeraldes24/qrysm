@@ -1,3 +1,4 @@
+# TODO(@rgeraldes24) we might not use this one; remove
 #!/usr/bin/env bash
 #
 # Script to mirror a tag from Prysm into ZondAPIs protocol buffers

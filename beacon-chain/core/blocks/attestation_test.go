@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
@@ -106,7 +106,7 @@ func TestVerifyAttestationNoVerifySignature_BadAttIdx(t *testing.T) {
 		},
 		ParticipationBits: participationBits,
 	}
-	var zeroSig [dilithium2.CryptoBytes]byte
+	var zeroSig [dilithium.CryptoBytes]byte
 	att.Signatures = [][]byte{zeroSig[:]}
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+params.BeaconConfig().MinAttestationInclusionDelay))
 	ckp := beaconState.CurrentJustifiedCheckpoint()

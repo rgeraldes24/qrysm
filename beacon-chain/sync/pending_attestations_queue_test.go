@@ -8,7 +8,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/prysmaticlabs/go-bitfield"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/p2p/enr"
 	"github.com/theQRL/qrysm/v4/async/abool"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
@@ -174,7 +174,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 			ParticipationBits: bitfield.Bitlist{0x02},
 			Data:              util.HydrateAttestationData(&zondpb.AttestationData{}),
 		},
-		SelectionProof: make([]byte, dilithium2.CryptoBytes),
+		SelectionProof: make([]byte, dilithiumlib.CryptoBytes),
 	}
 
 	b := util.NewBeaconBlock()
@@ -183,7 +183,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b)
 	require.NoError(t, r.cfg.beaconDB.SaveState(context.Background(), s, r32))
 
-	r.blkRootToPendingAtts[r32] = []*zondpb.SignedAggregateAttestationAndProof{{Message: a, Signature: make([]byte, dilithium2.CryptoBytes)}}
+	r.blkRootToPendingAtts[r32] = []*zondpb.SignedAggregateAttestationAndProof{{Message: a, Signature: make([]byte, dilithiumlib.CryptoBytes)}}
 	require.NoError(t, r.processPendingAtts(context.Background()))
 
 	assert.Equal(t, false, p1.BroadcastCalled, "Broadcasted bad aggregate")

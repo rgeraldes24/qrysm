@@ -51,7 +51,7 @@ func TestBeaconNodeScraper(t *testing.T) {
 
 	// BeaconNodeStats
 	require.Equal(t, int64(256552), bs.SyncBeaconHeadSlot)
-	require.Equal(t, true, bs.SyncEth2Synced)
+	require.Equal(t, true, bs.SyncZond2Synced)
 	require.Equal(t, int64(7365341184), bs.DiskBeaconchainBytesTotal)
 	require.Equal(t, int64(37), bs.NetworkPeersConnected)
 	require.Equal(t, true, bs.SyncZond1Connected)
@@ -94,10 +94,10 @@ func TestInvertZond1Metrics(t *testing.T) {
 	}
 }
 
-func TestFalseEth2Synced(t *testing.T) {
+func TestFalseZond2Synced(t *testing.T) {
 	bnScraper := beaconNodeScraper{}
-	eth2NotSynced := strings.Replace(prometheusTestBody, "beacon_head_slot 256552", "beacon_head_slot 256559", 1)
-	bnScraper.tripper = &mockRT{body: eth2NotSynced}
+	zond2NotSynced := strings.Replace(prometheusTestBody, "beacon_head_slot 256552", "beacon_head_slot 256559", 1)
+	bnScraper.tripper = &mockRT{body: zond2NotSynced}
 	r, err := bnScraper.Scrape()
 	require.NoError(t, err, "Unexpected error calling beaconNodeScraper.Scrape")
 
@@ -105,7 +105,7 @@ func TestFalseEth2Synced(t *testing.T) {
 	err = json.NewDecoder(r).Decode(bs)
 	require.NoError(t, err, "Unexpected error decoding result of beaconNodeScraper.Scrape")
 
-	require.Equal(t, false, bs.SyncEth2Synced)
+	require.Equal(t, false, bs.SyncZond2Synced)
 }
 
 func TestValidatorScraper(t *testing.T) {

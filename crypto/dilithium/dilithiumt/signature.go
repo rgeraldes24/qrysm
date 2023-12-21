@@ -7,9 +7,8 @@ import (
 	"runtime"
 
 	pkgerrors "github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
-	dilithiumCommon "github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -17,14 +16,14 @@ var ErrSignatureVerificationFailed = errors.New("signature verification failed")
 
 // Signature used in the BLS signature scheme.
 type Signature struct {
-	s *[dilithium2.CryptoBytes]uint8
+	s *[dilithium.CryptoBytes]uint8
 }
 
 func SignatureFromBytes(sig []byte) (common.Signature, error) {
-	if len(sig) != dilithium2.CryptoBytes {
-		return nil, fmt.Errorf("signature must be %d bytes", dilithium2.CryptoBytes)
+	if len(sig) != dilithium.CryptoBytes {
+		return nil, fmt.Errorf("signature must be %d bytes", dilithium.CryptoBytes)
 	}
-	var signature [dilithium2.CryptoBytes]uint8
+	var signature [dilithium.CryptoBytes]uint8
 	copy(signature[:], sig)
 	return &Signature{s: &signature}, nil
 }
@@ -38,13 +37,13 @@ func MultipleSignaturesFromBytes(multiSigs [][]byte) ([]common.Signature, error)
 		return nil, fmt.Errorf("0 signatures provided to the method")
 	}
 	for _, s := range multiSigs {
-		if len(s) != dilithium2.CryptoBytes {
-			return nil, fmt.Errorf("signature must be %d bytes", dilithium2.CryptoBytes)
+		if len(s) != dilithium.CryptoBytes {
+			return nil, fmt.Errorf("signature must be %d bytes", dilithium.CryptoBytes)
 		}
 	}
 	wrappedSigs := make([]common.Signature, len(multiSigs))
 	for i, signature := range multiSigs {
-		var copiedSig [dilithium2.CryptoBytes]uint8
+		var copiedSig [dilithium.CryptoBytes]uint8
 		copy(copiedSig[:], signature)
 		wrappedSigs[i] = &Signature{s: &copiedSig}
 	}
@@ -52,7 +51,7 @@ func MultipleSignaturesFromBytes(multiSigs [][]byte) ([]common.Signature, error)
 }
 
 func (s *Signature) Verify(pubKey common.PublicKey, msg []byte) bool {
-	return dilithium2.Verify(msg, *s.s, pubKey.(*PublicKey).p)
+	return dilithium.Verify(msg, *s.s, pubKey.(*PublicKey).p)
 }
 
 func (s *Signature) AggregateVerify(pubKeys []common.PublicKey, msgs [][32]byte) bool {
@@ -64,7 +63,7 @@ func (s *Signature) FastAggregateVerify(pubKeys []common.PublicKey, msg [32]byte
 }
 
 func (s *Signature) Eth2FastAggregateVerify(pubKeys []common.PublicKey, msg [32]byte) bool {
-	if len(pubKeys) == 0 && bytes.Equal(s.Marshal(), dilithiumCommon.InfiniteSignature[:]) {
+	if len(pubKeys) == 0 && bytes.Equal(s.Marshal(), common.InfiniteSignature[:]) {
 		return true
 	}
 	panic("Eth2FastAggregateVerify not supported for dilithium")

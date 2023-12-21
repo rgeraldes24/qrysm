@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
@@ -212,7 +212,7 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 
 	st, votedKeys, _, err := altair.ProcessSyncAggregateEported(context.Background(), beaconState, syncAggregate)
 	require.NoError(t, err)
-	votedMap := make(map[[dilithium2.CryptoPublicKeyBytes]byte]bool)
+	votedMap := make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]bool)
 	for _, key := range votedKeys {
 		votedMap[bytesutil.ToBytes2592(key.Marshal())] = true
 	}

@@ -31,13 +31,13 @@ type CommonStats struct {
 	ClientBuild            int64  `json:"client_build"`
 	// TODO(#8849): parse the grpc connection string to determine
 	// if multiple addresses are present
-	SyncEth2FallbackConfigured bool `json:"sync_eth2_fallback_configured"`
+	SyncZond2FallbackConfigured bool `json:"sync_zond2_fallback_configured"`
 	// N/A -- when multiple addresses are provided to grpc, requests are
 	// load-balanced between the provided endpoints.
 	// This is different from a "fallback" configuration where
 	// the second address is treated as a failover.
-	SyncEth2FallbackConnected bool `json:"sync_eth2_fallback_connected"`
-	APIMessage                `json:",inline"`
+	SyncZond2FallbackConnected bool `json:"sync_zond2_fallback_connected"`
+	APIMessage                 `json:",inline"`
 }
 
 // BeaconNodeStats embeds CommonStats and represents metrics specific to
@@ -51,7 +51,7 @@ type BeaconNodeStats struct {
 	// TODO(#8850): add support for this after slasher refactor is merged
 	SlasherActive             bool  `json:"slasher_active"`
 	SyncZond1Connected        bool  `json:"sync_zond1_connected"`
-	SyncEth2Synced            bool  `json:"sync_eth2_synced"`
+	SyncZond2Synced           bool  `json:"sync_zond2_synced"`
 	DiskBeaconchainBytesTotal int64 `json:"disk_beaconchain_bytes_total"`
 	// N/A -- would require significant network code changes at this time
 	NetworkLibp2pBytesTotalReceive int64 `json:"network_libp2p_bytes_total_receive"`

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
 	opfeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/operation"
@@ -89,7 +89,7 @@ func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 			SyncCommitteeIndices: []primitives.CommitteeIndex{0},
 		},
 	}
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	// Request slot 0, should get the index 0 for validator 0.
 	res, err := server.GetSyncSubcommitteeIndex(context.Background(), &zondpb.SyncSubcommitteeIndexRequest{
 		PublicKey: pubKey[:], Slot: primitives.Slot(0),

@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/core"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
@@ -413,7 +413,7 @@ func TestSubmitSignedAggregateSelectionProof_ZeroHashesSignatures(t *testing.T) 
 	}
 	req := &zondpb.SignedAggregateSubmitRequest{
 		SignedAggregateAndProof: &zondpb.SignedAggregateAttestationAndProof{
-			Signature: make([]byte, dilithium2.CryptoBytes),
+			Signature: make([]byte, dilithiumlib.CryptoBytes),
 			Message: &zondpb.AggregateAttestationAndProof{
 				Aggregate: &zondpb.Attestation{
 					Data: &zondpb.AttestationData{},
@@ -431,7 +431,7 @@ func TestSubmitSignedAggregateSelectionProof_ZeroHashesSignatures(t *testing.T) 
 				Aggregate: &zondpb.Attestation{
 					Data: &zondpb.AttestationData{},
 				},
-				SelectionProof: make([]byte, dilithium2.CryptoBytes),
+				SelectionProof: make([]byte, dilithiumlib.CryptoBytes),
 			},
 		},
 	}

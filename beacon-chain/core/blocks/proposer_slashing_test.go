@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	v "github.com/theQRL/qrysm/v4/beacon-chain/core/validators"
@@ -105,7 +105,7 @@ func TestProcessProposerSlashings_ValidatorNotSlashable(t *testing.T) {
 					Slot:          0,
 					BodyRoot:      []byte("foo"),
 				},
-				Signature: bytesutil.PadTo([]byte("A"), dilithium2.CryptoBytes),
+				Signature: bytesutil.PadTo([]byte("A"), dilithiumlib.CryptoBytes),
 			},
 			Header_2: &zondpb.SignedBeaconBlockHeader{
 				Header: &zondpb.BeaconBlockHeader{
@@ -113,7 +113,7 @@ func TestProcessProposerSlashings_ValidatorNotSlashable(t *testing.T) {
 					Slot:          0,
 					BodyRoot:      []byte("bar"),
 				},
-				Signature: bytesutil.PadTo([]byte("B"), dilithium2.CryptoBytes),
+				Signature: bytesutil.PadTo([]byte("B"), dilithiumlib.CryptoBytes),
 			},
 		},
 	}

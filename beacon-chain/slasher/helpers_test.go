@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	slashertypes "github.com/theQRL/qrysm/v4/beacon-chain/slasher/types"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -443,7 +443,7 @@ func Test_validateBlockHeaderIntegrity(t *testing.T) {
 			args: args{
 				header: &zondpb.SignedBeaconBlockHeader{
 					Header:    &zondpb.BeaconBlockHeader{},
-					Signature: make([]byte, dilithium2.CryptoBytes+1),
+					Signature: make([]byte, dilithium.CryptoBytes+1),
 				},
 			},
 			want: false,

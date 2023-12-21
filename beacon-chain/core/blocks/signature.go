@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -54,7 +54,7 @@ func verifySignature(signedData, pub, signature, domain []byte) error {
 		return errors.Errorf("signatures batch with index 0 contains %d signatures instead of 1", len(set.Signatures[0]))
 	}
 
-	totalSigsLen := len(set.PublicKeys[0]) * dilithium2.CryptoBytes
+	totalSigsLen := len(set.PublicKeys[0]) * dilithiumlib.CryptoBytes
 	if totalSigsLen != len(set.Signatures[0]) {
 		return errors.Errorf("signature set length is %d instead of %d", len(set.Signatures[0]), totalSigsLen)
 	}

@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
@@ -27,7 +27,7 @@ import (
 
 // pubKey is a helper to generate a well-formed public key.
 func pubKey(i uint64) []byte {
-	pubKey := make([]byte, dilithium2.CryptoPublicKeyBytes)
+	pubKey := make([]byte, dilithium.CryptoPublicKeyBytes)
 	binary.LittleEndian.PutUint64(pubKey, i)
 	return pubKey
 }
@@ -131,7 +131,7 @@ func TestGetAltairDuties_SyncCommitteeOK(t *testing.T) {
 	require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch*primitives.Slot(params.BeaconConfig().EpochsPerSyncCommitteePeriod)-1))
 	require.NoError(t, helpers.UpdateSyncCommitteeCache(bs))
 
-	pubkeysAs2592ByteType := make([][dilithium2.CryptoPublicKeyBytes]byte, len(pubKeys))
+	pubkeysAs2592ByteType := make([][dilithium.CryptoPublicKeyBytes]byte, len(pubKeys))
 	for i, pk := range pubKeys {
 		pubkeysAs2592ByteType[i] = bytesutil.ToBytes2592(pk)
 	}
@@ -233,7 +233,7 @@ func TestGetBellatrixDuties_SyncCommitteeOK(t *testing.T) {
 	require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch*primitives.Slot(params.BeaconConfig().EpochsPerSyncCommitteePeriod)-1))
 	require.NoError(t, helpers.UpdateSyncCommitteeCache(bs))
 
-	pubkeysAs2592ByteType := make([][dilithium2.CryptoPublicKeyBytes]byte, len(pubKeys))
+	pubkeysAs2592ByteType := make([][dilithium.CryptoPublicKeyBytes]byte, len(pubKeys))
 	for i, pk := range pubKeys {
 		pubkeysAs2592ByteType[i] = bytesutil.ToBytes2592(pk)
 	}
@@ -383,7 +383,7 @@ func TestGetDuties_CurrentEpoch_ShouldNotFail(t *testing.T) {
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 
-	pubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, len(deposits))
+	pubKeys := make([][dilithium.CryptoPublicKeyBytes]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
 	for i := 0; i < len(deposits); i++ {
 		pubKeys[i] = bytesutil.ToBytes2592(deposits[i].Data.PublicKey)
@@ -422,7 +422,7 @@ func TestGetDuties_MultipleKeys_OK(t *testing.T) {
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 
-	pubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, len(deposits))
+	pubKeys := make([][dilithium.CryptoPublicKeyBytes]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
 	for i := 0; i < len(deposits); i++ {
 		pubKeys[i] = bytesutil.ToBytes2592(deposits[i].Data.PublicKey)
@@ -513,7 +513,7 @@ func BenchmarkCommitteeAssignment(b *testing.B) {
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(b, err, "Could not get signing root")
 
-	pubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, len(deposits))
+	pubKeys := make([][dilithium.CryptoPublicKeyBytes]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
 	for i := 0; i < len(deposits); i++ {
 		pubKeys[i] = bytesutil.ToBytes2592(deposits[i].Data.PublicKey)

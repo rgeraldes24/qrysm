@@ -11,7 +11,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/builder"
@@ -87,7 +87,7 @@ func (vs *Server) GetAttesterDuties(ctx context.Context, req *zondpbv1.AttesterD
 	duties := make([]*zondpbv1.AttesterDuty, 0, len(req.Index))
 	for _, index := range req.Index {
 		pubkey := s.PubkeyAtIndex(index)
-		var zeroPubkey [dilithium2.CryptoPublicKeyBytes]byte
+		var zeroPubkey [dilithium.CryptoPublicKeyBytes]byte
 		if bytes.Equal(pubkey[:], zeroPubkey[:]) {
 			return nil, status.Errorf(codes.InvalidArgument, "Invalid validator index")
 		}
@@ -264,7 +264,7 @@ func (vs *Server) GetSyncCommitteeDuties(ctx context.Context, req *zondpbv1.Sync
 			return nil, status.Errorf(codes.Internal, "Could not get sync committee: %v", err)
 		}
 	}
-	committeePubkeys := make(map[[dilithium2.CryptoPublicKeyBytes]byte][]uint64)
+	committeePubkeys := make(map[[dilithium.CryptoPublicKeyBytes]byte][]uint64)
 	for j, pubkey := range committee.Pubkeys {
 		pubkey2592 := bytesutil.ToBytes2592(pubkey)
 		committeePubkeys[pubkey2592] = append(committeePubkeys[pubkey2592], uint64(j))
@@ -944,7 +944,7 @@ func syncCommitteeDutiesLastValidEpoch(currentEpoch primitives.Epoch) primitives
 func syncCommitteeDuties(
 	valIndices []primitives.ValidatorIndex,
 	st state.BeaconState,
-	committeePubkeys map[[dilithium2.CryptoPublicKeyBytes]byte][]uint64,
+	committeePubkeys map[[dilithium.CryptoPublicKeyBytes]byte][]uint64,
 ) ([]*zondpbv1.SyncCommitteeDuty, error) {
 	duties := make([]*zondpbv1.SyncCommitteeDuty, 0)
 	for _, index := range valIndices {
@@ -952,7 +952,7 @@ func syncCommitteeDuties(
 			ValidatorIndex: index,
 		}
 		valPubkey2592 := st.PubkeyAtIndex(index)
-		var zeroPubkey [dilithium2.CryptoPublicKeyBytes]byte
+		var zeroPubkey [dilithium.CryptoPublicKeyBytes]byte
 		if bytes.Equal(valPubkey2592[:], zeroPubkey[:]) {
 			return nil, errInvalidValIndex
 		}

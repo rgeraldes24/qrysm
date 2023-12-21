@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -114,7 +114,7 @@ func (b *BeaconState) ValidatorAtIndexReadOnly(idx primitives.ValidatorIndex) (s
 }
 
 // ValidatorIndexByPubkey returns a given validator by its 2592-byte public key.
-func (b *BeaconState) ValidatorIndexByPubkey(key [dilithium2.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool) {
+func (b *BeaconState) ValidatorIndexByPubkey(key [dilithium.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool) {
 	if b == nil || b.valMapHandler == nil || b.valMapHandler.IsNil() {
 		return 0, false
 	}
@@ -131,15 +131,15 @@ func (b *BeaconState) ValidatorIndexByPubkey(key [dilithium2.CryptoPublicKeyByte
 
 // PubkeyAtIndex returns the pubkey at the given
 // validator index.
-func (b *BeaconState) PubkeyAtIndex(idx primitives.ValidatorIndex) [dilithium2.CryptoPublicKeyBytes]byte {
+func (b *BeaconState) PubkeyAtIndex(idx primitives.ValidatorIndex) [dilithium.CryptoPublicKeyBytes]byte {
 	if uint64(idx) >= uint64(len(b.validators)) {
-		return [dilithium2.CryptoPublicKeyBytes]byte{}
+		return [dilithium.CryptoPublicKeyBytes]byte{}
 	}
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
 	if b.validators[idx] == nil {
-		return [dilithium2.CryptoPublicKeyBytes]byte{}
+		return [dilithium.CryptoPublicKeyBytes]byte{}
 	}
 	return bytesutil.ToBytes2592(b.validators[idx].PublicKey)
 }

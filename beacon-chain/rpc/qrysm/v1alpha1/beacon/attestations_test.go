@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	chainMock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
@@ -175,7 +175,7 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 									Slot: 3,
 								},
 								ParticipationBits: bitfield.Bitlist{0b11},
-								Signatures:        [][]byte{bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes)},
+								Signatures:        [][]byte{bytesutil.PadTo([]byte("sig"), dilithium.CryptoBytes)},
 							},
 						},
 					},
@@ -200,7 +200,7 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 								Slot: 4 + params.BeaconConfig().SlotsPerEpoch,
 							},
 							ParticipationBits: bitfield.Bitlist{0b11},
-							Signatures:        [][]byte{bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes)},
+							Signatures:        [][]byte{bytesutil.PadTo([]byte("sig"), dilithium.CryptoBytes)},
 						},
 					},
 				},
@@ -226,7 +226,7 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 									Slot: 4,
 								},
 								ParticipationBits: bitfield.Bitlist{0b11},
-								Signatures:        [][]byte{bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes)},
+								Signatures:        [][]byte{bytesutil.PadTo([]byte("sig"), dilithium.CryptoBytes)},
 							},
 						},
 					},
@@ -434,7 +434,7 @@ func TestServer_ListAttestations_Pagination_DefaultPageSize(t *testing.T) {
 					Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
 					Slot:            i,
 				},
-				Signatures:        [][]byte{bytesutil.PadTo([]byte("root"), dilithium2.CryptoBytes)},
+				Signatures:        [][]byte{bytesutil.PadTo([]byte("root"), dilithium.CryptoBytes)},
 				ParticipationBits: bitfield.Bitlist{0b11},
 			},
 		}
@@ -707,7 +707,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{1}, 32)},
 			},
 			ParticipationBits: bitfield.Bitlist{0b1101},
-			Signatures:        [][]byte{bytesutil.PadTo([]byte{1}, dilithium2.CryptoBytes)},
+			Signatures:        [][]byte{bytesutil.PadTo([]byte{1}, dilithium.CryptoBytes)},
 		},
 		{
 			Data: &zondpb.AttestationData{
@@ -717,7 +717,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{2}, 32)},
 			},
 			ParticipationBits: bitfield.Bitlist{0b1101},
-			Signatures:        [][]byte{bytesutil.PadTo([]byte{2}, dilithium2.CryptoBytes)},
+			Signatures:        [][]byte{bytesutil.PadTo([]byte{2}, dilithium.CryptoBytes)},
 		},
 		{
 			Data: &zondpb.AttestationData{
@@ -727,7 +727,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{3}, 32)},
 			},
 			ParticipationBits: bitfield.Bitlist{0b1101},
-			Signatures:        [][]byte{bytesutil.PadTo([]byte{3}, dilithium2.CryptoBytes)},
+			Signatures:        [][]byte{bytesutil.PadTo([]byte{3}, dilithium.CryptoBytes)},
 		},
 	}
 	require.NoError(t, bs.AttestationsPool.SaveAggregatedAttestations(atts))

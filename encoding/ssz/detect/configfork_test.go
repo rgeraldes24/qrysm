@@ -30,11 +30,6 @@ func TestSlotFromBlock(t *testing.T) {
 }
 
 func TestByState(t *testing.T) {
-	// undo, err := hackCapellaMaxuint()
-	// require.NoError(t, err)
-	// defer func() {
-	// 	require.NoError(t, undo())
-	// }()
 	bc := params.BeaconConfig()
 	cases := []struct {
 		name        string
@@ -79,13 +74,8 @@ func stateForVersion(v int) (state.BeaconState, error) {
 
 func TestUnmarshalState(t *testing.T) {
 	ctx := context.Background()
-	// undo, err := hackCapellaMaxuint()
-	// require.NoError(t, err)
-	// defer func() {
-	// 	require.NoError(t, undo())
-	// }()
 	bc := params.BeaconConfig()
-	// require.NoError(t, err)
+
 	cases := []struct {
 		name        string
 		version     int
@@ -122,24 +112,9 @@ func TestUnmarshalState(t *testing.T) {
 	}
 }
 
-// func hackCapellaMaxuint() (func() error, error) {
-// 	// We monkey patch the config to use a smaller value for the bellatrix fork epoch.
-// 	// Upstream configs use MaxUint64, which leads to a multiplication overflow when converting epoch->slot.
-// 	// Unfortunately we have unit tests that assert our config matches the upstream config, so we have to choose between
-// 	// breaking conformance, adding a special case to the conformance unit test, or patch it here.
-// 	bc := params.MainnetConfig().Copy()
-// 	bc.CapellaForkEpoch = math.MaxUint32
-// 	undo, err := params.SetActiveWithUndo(bc)
-// 	return undo, err
-// }
-
 func TestUnmarshalBlock(t *testing.T) {
-	// undo, err := hackCapellaMaxuint()
-	// require.NoError(t, err)
-	// defer func() {
-	// 	require.NoError(t, undo())
-	// }()
 	genv := bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion)
+
 	cases := []struct {
 		b       func(*testing.T, primitives.Slot) interfaces.ReadOnlySignedBeaconBlock
 		name    string
@@ -152,6 +127,7 @@ func TestUnmarshalBlock(t *testing.T) {
 			b:       signedTestBlockCapella,
 			version: genv,
 		},
+		// NOTE(@rgeraldes24): tests not valid atm since we just have one fork
 		/*
 			{
 				name:    "last slot of phase 0",
@@ -222,19 +198,7 @@ func TestUnmarshalBlock(t *testing.T) {
 }
 
 func TestUnmarshalBlindedBlock(t *testing.T) {
-	// undo, err := hackCapellaMaxuint()
-	// require.NoError(t, err)
-	// defer func() {
-	// 	require.NoError(t, undo())
-	// }()
 	genv := bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion)
-	// TODO (remove)
-	// altairv := bytesutil.ToBytes4(params.BeaconConfig().AltairForkVersion)
-	// bellav := bytesutil.ToBytes4(params.BeaconConfig().BellatrixForkVersion)
-	// altairS, err := slots.EpochStart(params.BeaconConfig().AltairForkEpoch)
-	// require.NoError(t, err)
-	// bellaS, err := slots.EpochStart(params.BeaconConfig().BellatrixForkEpoch)
-	// require.NoError(t, err)
 	cases := []struct {
 		b       func(*testing.T, primitives.Slot) interfaces.ReadOnlySignedBeaconBlock
 		name    string
@@ -242,60 +206,58 @@ func TestUnmarshalBlindedBlock(t *testing.T) {
 		slot    primitives.Slot
 		err     error
 	}{
-		// {
-		// 	name:    "genesis - slot 0",
-		// 	b:       signedTestBlockCapella,
-		// 	version: genv,
-		// },
 		{
-			name:    "genesis - slot 0 blinded",
+			name:    "genesis - slot 0",
 			b:       signedTestBlindedBlockCapella,
 			version: genv,
 		},
-		// {
-		// 	name:    "last slot of phase 0",
-		// 	b:       signedTestBlockGenesis,
-		// 	version: genv,
-		// 	slot:    altairS - 1,
-		// },
-		// {
-		// 	name:    "first slot of altair",
-		// 	b:       signedTestBlockAltair,
-		// 	version: altairv,
-		// 	slot:    altairS,
-		// },
-		// {
-		// 	name:    "last slot of altair",
-		// 	b:       signedTestBlockAltair,
-		// 	version: altairv,
-		// 	slot:    bellaS - 1,
-		// },
-		// {
-		// 	name:    "first slot of bellatrix",
-		// 	b:       signedTestBlindedBlockBellatrix,
-		// 	version: bellav,
-		// 	slot:    bellaS,
-		// },
-		// {
-		// 	name:    "bellatrix block in altair slot",
-		// 	b:       signedTestBlindedBlockBellatrix,
-		// 	version: bellav,
-		// 	slot:    bellaS - 1,
-		// 	err:     errBlockForkMismatch,
-		// },
-		// {
-		// 	name:    "genesis block in altair slot",
-		// 	b:       signedTestBlockGenesis,
-		// 	version: genv,
-		// 	slot:    bellaS - 1,
-		// 	err:     errBlockForkMismatch,
-		// },
-		// {
-		// 	name:    "altair block in genesis slot",
-		// 	b:       signedTestBlockAltair,
-		// 	version: altairv,
-		// 	err:     errBlockForkMismatch,
-		// },
+		// NOTE(@rgeraldes24): tests not valid atm since we just have one fork
+		/*
+			{
+				name:    "last slot of phase 0",
+				b:       signedTestBlockGenesis,
+				version: genv,
+				slot:    altairS - 1,
+			},
+			{
+				name:    "first slot of altair",
+				b:       signedTestBlockAltair,
+				version: altairv,
+				slot:    altairS,
+			},
+			{
+				name:    "last slot of altair",
+				b:       signedTestBlockAltair,
+				version: altairv,
+				slot:    bellaS - 1,
+			},
+			{
+				name:    "first slot of bellatrix",
+				b:       signedTestBlindedBlockBellatrix,
+				version: bellav,
+				slot:    bellaS,
+			},
+			{
+				name:    "bellatrix block in altair slot",
+				b:       signedTestBlindedBlockBellatrix,
+				version: bellav,
+				slot:    bellaS - 1,
+				err:     errBlockForkMismatch,
+			},
+			{
+				name:    "genesis block in altair slot",
+				b:       signedTestBlockGenesis,
+				version: genv,
+				slot:    bellaS - 1,
+				err:     errBlockForkMismatch,
+			},
+			{
+				name:    "altair block in genesis slot",
+				b:       signedTestBlockAltair,
+				version: altairv,
+				err:     errBlockForkMismatch,
+			},
+		*/
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

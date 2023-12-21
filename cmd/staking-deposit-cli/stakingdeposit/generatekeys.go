@@ -7,7 +7,7 @@ import (
 	"os"
 	"reflect"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/cmd/staking-deposit-cli/config"
 	"github.com/theQRL/qrysm/v4/cmd/staking-deposit-cli/misc"
@@ -84,7 +84,7 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 
 	signature := misc.DecodeHex(depositData.Signature)
 
-	if len(pubKey) != dilithium2.CryptoPublicKeyBytes {
+	if len(pubKey) != dilithiumlib.CryptoPublicKeyBytes {
 		return false
 	}
 	if !reflect.DeepEqual(pubKey, depositKey.PublicKey().Marshal()) {
@@ -114,7 +114,7 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 		panic(fmt.Errorf("invalid prefixbyte withdrawalCredentials[0] %x", withdrawalCredentials[0]))
 	}
 
-	if len(signature) != dilithium2.CryptoBytes {
+	if len(signature) != dilithiumlib.CryptoBytes {
 		panic(fmt.Errorf("invalid dilitihium signature length %d", len(signature)))
 	}
 

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	coreTime "github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -147,7 +147,7 @@ func SyncSubCommitteePubkeys(syncCommittee *zondpb.SyncCommittee, subComIdx prim
 // IsSyncCommitteeAggregator checks whether the provided signature is for a valid
 // aggregator.
 func IsSyncCommitteeAggregator(sig []byte) (bool, error) {
-	if len(sig) != dilithium2.CryptoBytes {
+	if len(sig) != dilithium.CryptoBytes {
 		return false, errors.New("incorrect sig length")
 	}
 

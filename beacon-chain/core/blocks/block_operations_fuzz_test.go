@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	fuzz "github.com/google/gofuzz"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	v "github.com/theQRL/qrysm/v4/beacon-chain/core/validators"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -58,7 +58,7 @@ func TestFuzzProcessBlockHeader_10000(t *testing.T) {
 func TestFuzzverifyDepositDataSigningRoot_10000(_ *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	var ba []byte
-	var pubkey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubkey [dilithium.CryptoPublicKeyBytes]byte
 	var sig [4595]byte
 	var domain [4]byte
 	var p []byte

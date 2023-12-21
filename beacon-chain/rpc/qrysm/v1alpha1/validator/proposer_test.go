@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/go-bitfield"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
@@ -2247,7 +2247,7 @@ func TestProposer_PrepareBeaconProposer(t *testing.T) {
 				request: &zondpb.PrepareBeaconProposerRequest{
 					Recipients: []*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
 						{
-							FeeRecipient:   make([]byte, dilithium2.CryptoPublicKeyBytes),
+							FeeRecipient:   make([]byte, dilithiumlib.CryptoPublicKeyBytes),
 							ValidatorIndex: 1,
 						},
 					},

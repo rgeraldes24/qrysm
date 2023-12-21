@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	corehelpers "github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -120,7 +120,7 @@ var ValidatorsVoteWithTheMajority = e2etypes.Evaluator{
 }
 
 type mismatch struct {
-	k [dilithium2.CryptoPublicKeyBytes]byte
+	k [dilithium.CryptoPublicKeyBytes]byte
 	e uint64
 	o uint64
 }
@@ -143,7 +143,7 @@ func processesDepositsInBlocks(ec *e2etypes.EvaluationContext, conns ...*grpc.Cl
 	if err != nil {
 		return errors.Wrap(err, "failed to get blocks from beacon-chain")
 	}
-	observed := make(map[[dilithium2.CryptoPublicKeyBytes]byte]uint64)
+	observed := make(map[[dilithium.CryptoPublicKeyBytes]byte]uint64)
 	for _, blk := range blks.BlockContainers {
 		sb, err := blocks.BeaconBlockContainerToSignedBeaconBlock(blk)
 		if err != nil {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
@@ -297,7 +297,7 @@ func generateSignedBeaconBlock(
 				DepositRoot:  bytesutil.PadTo([]byte("bad deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("bad randao"), dilithium2.CryptoBytes),
+			RandaoReveal:      bytesutil.PadTo([]byte("bad randao"), dilithiumlib.CryptoBytes),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*zond.ProposerSlashing{},
 			AttesterSlashings: []*zond.AttesterSlashing{},

@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stateutil"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
@@ -22,7 +22,7 @@ func TestValidatorMap_DistinctCopy(t *testing.T) {
 	vals := make([]*zondpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &zondpb.Validator{
@@ -50,7 +50,7 @@ func TestBeaconState_NoDeadlock_Capella(t *testing.T) {
 	vals := make([]*zondpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &zondpb.Validator{
@@ -203,7 +203,7 @@ func generateState(t *testing.T) state.BeaconState {
 	bals := make([]uint64, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &zondpb.Validator{

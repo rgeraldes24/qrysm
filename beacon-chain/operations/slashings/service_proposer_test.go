@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -192,7 +192,7 @@ func TestPool_InsertProposerSlashing_SigFailsVerify_ClearPool(t *testing.T) {
 		slashings[i] = sl
 	}
 	// We mess up the signature of the second slashing.
-	badSig := make([]byte, dilithium2.CryptoBytes)
+	badSig := make([]byte, dilithium.CryptoBytes)
 	copy(badSig, "muahaha")
 	slashings[1].Header_1.Signature = badSig
 	p := &Pool{
