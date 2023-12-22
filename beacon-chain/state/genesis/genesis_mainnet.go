@@ -15,7 +15,7 @@ var (
 	// TODO(rgeraldes24): add final mainnet genesis
 	// deposit new-seed --num-validators=64 --chain-name=mainnet
 	//go:embed mainnet.ssz.snappy
-	mainnetRawSSZCompressed []byte // 5.5Mb
+	mainnetRawSSZCompressed []byte // 2.8Mb
 )
 
 func init() {
