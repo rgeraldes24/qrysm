@@ -43,6 +43,9 @@ func GenerateKeys(validatorStartIndex, numValidators uint64,
 		panic(fmt.Errorf("export keystores failed. reason: %v", err))
 	}
 	depositFile, err := credentials.ExportDepositDataJSON(folder)
+	if err != nil {
+		panic(fmt.Errorf("failed to export deposit data. reason: %v", err))
+	}
 	if !credentials.VerifyKeystores(keystoreFileFolders, keystorePassword) {
 		panic("failed to verify the keystores")
 	}

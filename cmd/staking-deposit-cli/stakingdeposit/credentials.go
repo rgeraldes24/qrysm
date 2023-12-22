@@ -43,9 +43,16 @@ func (c *Credentials) ExportDepositDataJSON(folder string) (string, error) {
 		return "", err
 	}
 
-	if runtime.GOOS == "linux" {
-		err = os.WriteFile(fileFolder, jsonDepositDataList, 0440)
+	// TODO(rgeraldes24): there is a new version on the latest qrysm repo
+	// if runtime.GOOS == "linux" {
+	// 	if err = os.WriteFile(fileFolder, jsonDepositDataList, 0440); err != nil {
+	// 		return "", err
+	// 	}
+	// }
+	if err = os.WriteFile(fileFolder, jsonDepositDataList, 0440); err != nil {
+		return "", err
 	}
+
 	return fileFolder, nil
 }
 
