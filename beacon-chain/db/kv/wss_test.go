@@ -1,7 +1,5 @@
 package kv
 
-// TODO (rgeraldes24) - fix embedded genesis file
-/*
 import (
 	"context"
 	"testing"
@@ -12,7 +10,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
-
 
 func TestSaveOrigin(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
@@ -48,4 +45,3 @@ func TestSaveOrigin(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, true, db.IsFinalizedBlock(ctx, broot))
 }
-*/

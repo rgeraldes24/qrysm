@@ -48,7 +48,7 @@ func testGenesisDataSaved(t *testing.T, db iface.Database) {
 	require.Equal(t, gbHTR, headHTR, "head block does not match genesis block")
 }
 
-// NOTE(rgeraldes24): this test is not necessary for our case since the genesis
+// NOTE(rgeraldes24): this test is not necessary for our case since the mainnet genesis
 // is already under the capella fork.
 /*
 func TestLoadCapellaFromFile(t *testing.T) {

@@ -403,7 +403,17 @@ func (s *Store) unmarshalState(_ context.Context, enc []byte, validatorEntries [
 	}
 
 	switch {
-	case hasCapellaKey(enc):
+	// TODO(rgeraldes24) - remove
+	// case hasCapellaKey(enc):
+	// 	// Marshal state bytes to capella beacon state.
+	// 	protoState := &zondpb.BeaconState{}
+	// 	if err := protoState.UnmarshalSSZ(enc[len(capellaKey):]); err != nil {
+	// 		return nil, errors.Wrap(err, "failed to unmarshal encoding for capella")
+	// 	}
+	// 	protoState.Validators = validatorEntries
+	// 	return statenative.InitializeFromProtoUnsafeCapella(protoState)
+	default:
+		// NOTE(rgeraldes24) - we might optimize further by removing the capellaKey from the data
 		// Marshal state bytes to capella beacon state.
 		protoState := &zondpb.BeaconState{}
 		if err := protoState.UnmarshalSSZ(enc[len(capellaKey):]); err != nil {
@@ -411,9 +421,6 @@ func (s *Store) unmarshalState(_ context.Context, enc []byte, validatorEntries [
 		}
 		protoState.Validators = validatorEntries
 		return statenative.InitializeFromProtoUnsafeCapella(protoState)
-	default:
-		// TODO(rgeraldes24)
-		return nil, nil
 	}
 }
 

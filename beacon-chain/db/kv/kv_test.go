@@ -68,6 +68,7 @@ func Test_setupBlockStorageType(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepEqual(t, wantedBlk, retrievedBlk)
 	})
+	// TODO(rgeraldes24)
 	/*
 		t.Run("existing database with blinded blocks but no key in metadata bucket should continue storing blinded blocks", func(t *testing.T) {
 			store := setupDB(t)
