@@ -1,6 +1,12 @@
 package genesis_test
 
-/*
+import (
+	"testing"
+
+	"github.com/theQRL/qrysm/v4/beacon-chain/state/genesis"
+	"github.com/theQRL/qrysm/v4/config/params"
+)
+
 func TestGenesisState(t *testing.T) {
 	tests := []struct {
 		name string
@@ -24,4 +30,3 @@ func TestGenesisState(t *testing.T) {
 		})
 	}
 }
-*/
