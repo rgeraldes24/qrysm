@@ -7,6 +7,7 @@ import (
 
 	"github.com/bazelbuild/rules_go/go/tools/bazel"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db/iface"
+	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -47,8 +48,8 @@ func testGenesisDataSaved(t *testing.T, db iface.Database) {
 	require.Equal(t, gbHTR, headHTR, "head block does not match genesis block")
 }
 
-// TODO (rgeraldes24) - Unexpected error: version=0x0300000a not found in any known fork choice schedule: unable to find requested BeaconChainConfig
-// test file needs to be modified
+// NOTE(rgeraldes24): this test is not necessary for our case since the genesis
+// is already under the capella fork.
 /*
 func TestLoadCapellaFromFile(t *testing.T) {
 	cfg, err := params.ByName(params.MainnetName)
@@ -82,8 +83,6 @@ func TestLoadCapellaFromFile(t *testing.T) {
 }
 */
 
-// TODO(rgeraldes24) - review file
-/*
 func TestLoadGenesisFromFile(t *testing.T) {
 	// for this test to work, we need the active config to have these properties:
 	// - fork version schedule that matches mainnnet.genesis.ssz
@@ -130,7 +129,6 @@ func TestLoadGenesisFromFile(t *testing.T) {
 	require.NoError(t, db.LoadGenesis(context.Background(), sb))
 	testGenesisDataSaved(t, db)
 }
-*/
 
 func TestLoadGenesisFromFile_mismatchedForkVersion(t *testing.T) {
 	fp := "testdata/altona.genesis.ssz"
@@ -146,8 +144,6 @@ func TestLoadGenesisFromFile_mismatchedForkVersion(t *testing.T) {
 	assert.ErrorContains(t, "not found in any known fork choice schedule", db.LoadGenesis(context.Background(), sb))
 }
 
-// TODO(rgeraldes24)
-/*
 func TestEnsureEmbeddedGenesis(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	// Embedded Genesis works with Mainnet config
@@ -180,4 +176,3 @@ func TestEnsureEmbeddedGenesis(t *testing.T) {
 
 	testGenesisDataSaved(t, db)
 }
-*/
