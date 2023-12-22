@@ -1,20 +1,20 @@
 package monitor
 
 import (
+	"bytes"
 	"context"
 	"testing"
 
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// TODO(rgeraldes24) - fix
-/*
 func TestGetAttestingIndices(t *testing.T) {
 	ctx := context.Background()
 	beaconState, _ := util.DeterministicGenesisState(t, 256)
@@ -27,10 +27,8 @@ func TestGetAttestingIndices(t *testing.T) {
 	}
 	attestingIndices, err := attestingIndices(ctx, beaconState, att)
 	require.NoError(t, err)
-	require.DeepEqual(t, attestingIndices, []uint64{0xc, 0x2})
-
+	require.DeepEqual(t, attestingIndices, []uint64{0x6e, 0xa5})
 }
-
 
 func TestProcessIncludedAttestationTwoTracked(t *testing.T) {
 	hook := logTest.NewGlobal()
@@ -56,12 +54,11 @@ func TestProcessIncludedAttestationTwoTracked(t *testing.T) {
 		ParticipationBits: bitfield.Bitlist{0b11, 0b1},
 	}
 	s.processIncludedAttestation(context.Background(), state, att)
-	wanted1 := "\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=32000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=2 prefix=monitor"
-	wanted2 := "\"Attestation included\" BalanceChange=100000000 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=32000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=12 prefix=monitor"
+	wanted1 := "\"Attestation included\" BalanceChange=0 CorrectHead=false CorrectSource=false CorrectTarget=false Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=32000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=110 prefix=monitor"
+	wanted2 := "\"Attestation included\" BalanceChange=100000000 CorrectHead=false CorrectSource=false CorrectTarget=false Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=32000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=165 prefix=monitor"
 	require.LogsContain(t, hook, wanted1)
 	require.LogsContain(t, hook, wanted2)
 }
-*/
 
 func TestProcessUnaggregatedAttestationStateNotCached(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
@@ -96,8 +93,6 @@ func TestProcessUnaggregatedAttestationStateNotCached(t *testing.T) {
 	logrus.SetLevel(logrus.InfoLevel)
 }
 
-// TODO(rgeraldes24) - fix
-/*
 func TestProcessUnaggregatedAttestationStateCached(t *testing.T) {
 	ctx := context.Background()
 	hook := logTest.NewGlobal()
@@ -128,12 +123,11 @@ func TestProcessUnaggregatedAttestationStateCached(t *testing.T) {
 	}
 	require.NoError(t, s.config.StateGen.SaveState(ctx, root, state))
 	s.processUnaggregatedAttestation(context.Background(), att)
-	wanted1 := "\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=2 prefix=monitor"
-	wanted2 := "\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=12 prefix=monitor"
+	wanted1 := "\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=110 prefix=monitor"
+	wanted2 := "\"Processed unaggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=165 prefix=monitor"
 	require.LogsContain(t, hook, wanted1)
 	require.LogsContain(t, hook, wanted2)
 }
-*/
 
 func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
@@ -148,7 +142,7 @@ func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 	require.NoError(t, state.SetCurrentParticipationBits(participation))
 
 	att := &zondpb.AggregateAttestationAndProof{
-		AggregatorIndex: 2,
+		AggregatorIndex: 110,
 		Aggregate: &zondpb.Attestation{
 			Data: &zondpb.AttestationData{
 				Slot:            1,
@@ -167,13 +161,11 @@ func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 		},
 	}
 	s.processAggregatedAttestation(ctx, att)
-	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=2 BeaconBlockRoot=0x000000000000 Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
+	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=110 BeaconBlockRoot=0x000000000000 Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
 	require.LogsContain(t, hook, "Skipping aggregated attestation due to state not found in cache")
 	logrus.SetLevel(logrus.InfoLevel)
 }
 
-// TODO(rgeraldes24) - fix
-/*
 func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
@@ -186,7 +178,7 @@ func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 	copy(root[:], "hello-world")
 
 	att := &zondpb.AggregateAttestationAndProof{
-		AggregatorIndex: 2,
+		AggregatorIndex: 110,
 		Aggregate: &zondpb.Attestation{
 			Data: &zondpb.AttestationData{
 				Slot:            1,
@@ -207,14 +199,11 @@ func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 
 	require.NoError(t, s.config.StateGen.SaveState(ctx, root, state))
 	s.processAggregatedAttestation(ctx, att)
-	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=2 BeaconBlockRoot=0x68656c6c6f2d Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
-	require.LogsContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=2 prefix=monitor")
-	require.LogsDoNotContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=12 prefix=monitor")
+	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=110 BeaconBlockRoot=0x68656c6c6f2d Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
+	require.LogsContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=165 prefix=monitor")
+	require.LogsDoNotContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=110 prefix=monitor")
 }
-*/
 
-// TODO(rgeraldes24) - fix
-/*
 func TestProcessAttestations(t *testing.T) {
 	hook := logTest.NewGlobal()
 	s := setupService(t)
@@ -250,10 +239,9 @@ func TestProcessAttestations(t *testing.T) {
 	wrappedBlock, err := blocks.NewBeaconBlock(block)
 	require.NoError(t, err)
 	s.processAttestations(ctx, state, wrappedBlock)
-	wanted1 := "\"Attestation included\" BalanceChange=0 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=32000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=2 prefix=monitor"
-	wanted2 := "\"Attestation included\" BalanceChange=100000000 CorrectHead=true CorrectSource=true CorrectTarget=true Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=32000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=12 prefix=monitor"
+	wanted1 := "\"Attestation included\" BalanceChange=0 CorrectHead=false CorrectSource=false CorrectTarget=false Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=32000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=110 prefix=monitor"
+	wanted2 := "\"Attestation included\" BalanceChange=100000000 CorrectHead=false CorrectSource=false CorrectTarget=false Head=0x68656c6c6f2d InclusionSlot=2 NewBalance=32000000000 Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=165 prefix=monitor"
 	require.LogsContain(t, hook, wanted1)
 	require.LogsContain(t, hook, wanted2)
 
 }
-*/

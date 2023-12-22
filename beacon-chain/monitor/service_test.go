@@ -39,22 +39,23 @@ func setupService(t *testing.T) *Service {
 	}
 
 	trackedVals := map[primitives.ValidatorIndex]bool{
-		1:  true,
-		2:  true,
-		12: true,
-		15: true,
+		1:   true,
+		15:  true,
+		110: true,
+		165: true,
+		// 31:  true, TODO(rgeraldes24) TestMonitorRoutine
 	}
 	latestPerformance := map[primitives.ValidatorIndex]ValidatorLatestPerformance{
 		1: {
 			balance: 32000000000,
 		},
-		2: {
-			balance: 32000000000,
-		},
-		12: {
+		15: {
 			balance: 31900000000,
 		},
-		15: {
+		110: {
+			balance: 32000000000,
+		},
+		165: {
 			balance: 31900000000,
 		},
 	}
@@ -72,13 +73,13 @@ func setupService(t *testing.T) *Service {
 			totalSyncCommitteeContributions: 0,
 			totalSyncCommitteeAggregations:  0,
 		},
-		2:  {},
-		12: {},
-		15: {},
+		15:  {},
+		110: {},
+		165: {},
 	}
 	trackedSyncCommitteeIndices := map[primitives.ValidatorIndex][]primitives.CommitteeIndex{
-		1:  {0, 1, 2, 3},
-		12: {4, 5},
+		1:   {0, 1, 2, 3},
+		165: {4, 5},
 	}
 	return &Service{
 		config: &ValidatorMonitorConfig{
@@ -109,7 +110,6 @@ func TestTrackedIndex(t *testing.T) {
 	require.Equal(t, s.trackedIndex(primitives.ValidatorIndex(3)), false)
 }
 
-// TODO(rgeraldes24) fix
 /*
 func TestUpdateSyncCommitteeTrackedVals(t *testing.T) {
 	hook := logTest.NewGlobal()
@@ -120,7 +120,7 @@ func TestUpdateSyncCommitteeTrackedVals(t *testing.T) {
 	require.LogsDoNotContain(t, hook, "Sync committee assignments will not be reported")
 	newTrackedSyncIndices := map[primitives.ValidatorIndex][]primitives.CommitteeIndex{
 		1: {1, 3, 4},
-		2: {2},
+		110: {2},
 	}
 	require.DeepEqual(t, s.trackedSyncCommitteeIndices, newTrackedSyncIndices)
 }
@@ -144,7 +144,7 @@ func TestStart(t *testing.T) {
 	// wait for Logrus
 	time.Sleep(1000 * time.Millisecond)
 	require.LogsContain(t, hook, "Synced to head epoch, starting reporting performance")
-	require.LogsContain(t, hook, "\"Starting service\" ValidatorIndices=\"[1 2 12 15]\"")
+	require.LogsContain(t, hook, "\"Starting service\" ValidatorIndices=\"[1 15 110 165]\"")
 	s.Lock()
 	require.Equal(t, s.isLogging, true, "monitor is not running")
 	s.Unlock()
@@ -163,13 +163,13 @@ func TestInitializePerformanceStructures(t *testing.T) {
 		1: {
 			balance: 32000000000,
 		},
-		2: {
-			balance: 32000000000,
-		},
-		12: {
-			balance: 32000000000,
-		},
 		15: {
+			balance: 32000000000,
+		},
+		110: {
+			balance: 32000000000,
+		},
+		165: {
 			balance: 32000000000,
 		},
 	}
@@ -177,13 +177,13 @@ func TestInitializePerformanceStructures(t *testing.T) {
 		1: {
 			startBalance: 32000000000,
 		},
-		2: {
-			startBalance: 32000000000,
-		},
-		12: {
-			startBalance: 32000000000,
-		},
 		15: {
+			startBalance: 32000000000,
+		},
+		110: {
+			startBalance: 32000000000,
+		},
+		165: {
 			startBalance: 32000000000,
 		},
 	}
@@ -192,7 +192,6 @@ func TestInitializePerformanceStructures(t *testing.T) {
 	require.DeepEqual(t, s.aggregatedPerformance, aggregatedPerformance)
 }
 
-// TODO(rgeraldes24) - fix
 /*
 func TestMonitorRoutine(t *testing.T) {
 	ctx := context.Background()
@@ -237,7 +236,6 @@ func TestMonitorRoutine(t *testing.T) {
 	time.Sleep(1000 * time.Millisecond)
 	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=32000000000 ParentRoot=0xf732eaeb7fae ProposerIndex=15 Slot=1 Version=1 prefix=monitor", bytesutil.Trunc(root[:]))
 	require.LogsContain(t, hook, wanted1)
-
 }
 */
 
