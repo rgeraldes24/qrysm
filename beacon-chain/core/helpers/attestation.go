@@ -64,7 +64,6 @@ func IsAggregator(committeeCount uint64, slotSig []byte) (bool, error) {
 
 // IsAggregated returns true if the attestation is an aggregated attestation,
 // false otherwise.
-// TODO (rgeraldes24) - better naming
 func IsAggregated(attestation *zondpb.Attestation) bool {
 	return attestation.ParticipationBits.Count() > 1
 }

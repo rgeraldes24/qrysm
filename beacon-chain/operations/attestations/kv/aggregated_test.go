@@ -210,7 +210,6 @@ func TestKV_Aggregated_AggregatedAttestations(t *testing.T) {
 	assert.DeepSSZEqual(t, atts, returned)
 }
 
-/*
 func TestKV_Aggregated_DeleteAggregatedAttestation(t *testing.T) {
 	t.Run("nil attestation", func(t *testing.T) {
 		cache := NewAttCaches()
@@ -218,14 +217,12 @@ func TestKV_Aggregated_DeleteAggregatedAttestation(t *testing.T) {
 		att := util.HydrateAttestation(&zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0b10101}, Data: &zondpb.AttestationData{Slot: 2}})
 		assert.NoError(t, cache.DeleteAggregatedAttestation(att))
 	})
-
 	t.Run("non aggregated attestation", func(t *testing.T) {
 		cache := NewAttCaches()
 		att := util.HydrateAttestation(&zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0b1001}, Data: &zondpb.AttestationData{Slot: 2}})
 		err := cache.DeleteAggregatedAttestation(att)
 		assert.ErrorContains(t, "attestation is not aggregated", err)
 	})
-
 	t.Run("invalid hash", func(t *testing.T) {
 		cache := NewAttCaches()
 		att := &zondpb.Attestation{
@@ -240,20 +237,31 @@ func TestKV_Aggregated_DeleteAggregatedAttestation(t *testing.T) {
 		wantErr := "could not tree hash attestation data: --.BeaconBlockRoot (" + fssz.ErrBytesLength.Error() + ")"
 		assert.ErrorContains(t, wantErr, err)
 	})
-
 	t.Run("nonexistent attestation", func(t *testing.T) {
 		cache := NewAttCaches()
 		att := util.HydrateAttestation(&zondpb.Attestation{ParticipationBits: bitfield.Bitlist{0b1111}, Data: &zondpb.AttestationData{Slot: 2}})
 		assert.NoError(t, cache.DeleteAggregatedAttestation(att))
 	})
-
 	t.Run("non-filtered deletion", func(t *testing.T) {
+		// NOTE(rgeraldes24): this test is not ok on the original repo even though it passes
+		// could not create signature from byte slice: could not unmarshal bytes into signature
+		// which leads to a deletion of an attestation on the SaveAggregatedAttestations that
+		// ends up influencing the final result; the result should be two attestations instead
+		// of just att2 because att3 and att4 are aggregated which should lead to a filtered deletion
+		// since we ask to delete att3 below
+		// I've disabled att4 for now to have a non-filtered deletion
+		priv, err := dilithium.RandKey()
+		require.NoError(t, err)
+		// sig0 := priv.Sign([]byte{'a'}).Marshal()
+		sig1 := priv.Sign([]byte{'b'}).Marshal()
+		// sig2 := priv.Sign([]byte{'c'}).Marshal()
+		sig3 := priv.Sign([]byte{'d'}).Marshal()
 		cache := NewAttCaches()
-		att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b11010}})
-		att2 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}, ParticipationBits: bitfield.Bitlist{0b11010}})
-		att3 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, ParticipationBits: bitfield.Bitlist{0b11010}})
-		att4 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, ParticipationBits: bitfield.Bitlist{0b10101}})
-		atts := []*zondpb.Attestation{att1, att2, att3, att4}
+		att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b11010}, Signatures: [][]byte{sig1, sig3}})
+		att2 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}, ParticipationBits: bitfield.Bitlist{0b11010}, Signatures: [][]byte{sig1, sig3}})
+		att3 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, ParticipationBits: bitfield.Bitlist{0b11010}, Signatures: [][]byte{sig1, sig3}})
+		// att4 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, ParticipationBits: bitfield.Bitlist{0b10101}, Signatures: [][]byte{sig0, sig2}})
+		atts := []*zondpb.Attestation{att1, att2, att3 /*att4*/}
 		require.NoError(t, cache.SaveAggregatedAttestations(atts))
 		require.NoError(t, cache.DeleteAggregatedAttestation(att1))
 		require.NoError(t, cache.DeleteAggregatedAttestation(att3))
@@ -262,7 +270,6 @@ func TestKV_Aggregated_DeleteAggregatedAttestation(t *testing.T) {
 		wanted := []*zondpb.Attestation{att2}
 		assert.DeepEqual(t, wanted, returned)
 	})
-
 	t.Run("filtered deletion", func(t *testing.T) {
 		cache := NewAttCaches()
 		att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b110101}})
@@ -283,7 +290,6 @@ func TestKV_Aggregated_DeleteAggregatedAttestation(t *testing.T) {
 		assert.DeepEqual(t, wanted, returned)
 	})
 }
-*/
 
 func TestKV_Aggregated_HasAggregatedAttestation(t *testing.T) {
 	tests := []struct {
