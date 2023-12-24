@@ -567,19 +567,28 @@ func (s *Store) slotByBlockRoot(ctx context.Context, tx *bolt.Tx, blockRoot []by
 			}
 			return s.Slot(), nil
 		}
-		b := &zondpb.SignedBeaconBlock{}
-		err := decode(ctx, enc, b)
+
+		// NOTE(rgeraldes24): this seems like a core bug because the block can be saved as blinded
+		// b := &zondpb.SignedBeaconBlock{}
+		// err := decode(ctx, enc, b)
+		// if err != nil {
+		// 	return 0, err
+		// }
+		// wsb, err := blocks.NewSignedBeaconBlock(b)
+		// if err != nil {
+		// 	return 0, err
+		// }
+
+		wsb, err := unmarshalBlock(ctx, enc)
 		if err != nil {
 			return 0, err
 		}
-		wsb, err := blocks.NewSignedBeaconBlock(b)
-		if err != nil {
-			return 0, err
-		}
+
 		if err := blocks.BeaconBlockIsNil(wsb); err != nil {
 			return 0, err
 		}
-		return b.Block.Slot, nil
+
+		return wsb.Block().Slot(), nil
 	}
 	stateSummary := &zondpb.StateSummary{}
 	if err := decode(ctx, enc, stateSummary); err != nil {

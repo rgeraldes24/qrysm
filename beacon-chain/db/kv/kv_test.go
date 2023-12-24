@@ -2,6 +2,7 @@ package kv
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/theQRL/qrysm/v4/config/features"
@@ -9,6 +10,7 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	bolt "go.etcd.io/bbolt"
 )
 
 // setupDB instantiates and returns a Store instance.
@@ -68,125 +70,125 @@ func Test_setupBlockStorageType(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepEqual(t, wantedBlk, retrievedBlk)
 	})
-	// TODO(rgeraldes24)
-	/*
-		t.Run("existing database with blinded blocks but no key in metadata bucket should continue storing blinded blocks", func(t *testing.T) {
-			store := setupDB(t)
-			require.NoError(t, store.db.Update(func(tx *bolt.Tx) error {
-				return tx.Bucket(chainMetadataBucket).Put(saveBlindedBeaconBlocksKey, []byte{1})
-			}))
 
-			blk := util.NewBlindedBeaconBlock()
-			blk.Block.Body.ExecutionPayloadHeader.BlockNumber = 1
-			wrappedBlock, err := blocks.NewSignedBeaconBlock(blk)
-			require.NoError(t, err)
-			root, err := wrappedBlock.Block().HashTreeRoot()
-			require.NoError(t, err)
-			require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
-			require.NoError(t, store.SaveStateSummary(ctx, &zondpb.StateSummary{Root: root[:]}))
-			require.NoError(t, store.SaveHeadBlockRoot(ctx, root))
-			retrievedBlk, err := store.Block(ctx, root)
-			require.NoError(t, err)
-			require.Equal(t, true, retrievedBlk.IsBlinded())
-			require.DeepEqual(t, wrappedBlock, retrievedBlk)
+	t.Run("existing database with blinded blocks but no key in metadata bucket should continue storing blinded blocks", func(t *testing.T) {
+		store := setupDB(t)
+		require.NoError(t, store.db.Update(func(tx *bolt.Tx) error {
+			return tx.Bucket(chainMetadataBucket).Put(saveBlindedBeaconBlocksKey, []byte{1})
+		}))
 
-			// We then delete the key from the bucket.
-			require.NoError(t, store.db.Update(func(tx *bolt.Tx) error {
-				return tx.Bucket(chainMetadataBucket).Delete(saveBlindedBeaconBlocksKey)
-			}))
+		blk := util.NewBlindedBeaconBlock()
+		blk.Block.Body.ExecutionPayloadHeader.BlockNumber = 1
+		wrappedBlock, err := blocks.NewSignedBeaconBlock(blk)
+		require.NoError(t, err)
+		root, err := wrappedBlock.Block().HashTreeRoot()
+		require.NoError(t, err)
+		require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
+		require.NoError(t, store.SaveStateSummary(ctx, &zondpb.StateSummary{Root: root[:]}))
+		require.NoError(t, store.SaveHeadBlockRoot(ctx, root))
+		retrievedBlk, err := store.Block(ctx, root)
+		require.NoError(t, err)
+		require.Equal(t, true, retrievedBlk.IsBlinded())
+		require.DeepEqual(t, wrappedBlock, retrievedBlk)
 
-			// Not a fresh database, has blinded blocks already and should continue being that way.
-			err = store.setupBlockStorageType(ctx)
-			require.NoError(t, err)
+		// We then delete the key from the bucket.
+		require.NoError(t, store.db.Update(func(tx *bolt.Tx) error {
+			return tx.Bucket(chainMetadataBucket).Delete(saveBlindedBeaconBlocksKey)
+		}))
 
-			var shouldSaveBlinded bool
-			require.NoError(t, store.db.Update(func(tx *bolt.Tx) error {
-				bkt := tx.Bucket(chainMetadataBucket)
-				shouldSaveBlinded = len(bkt.Get(saveBlindedBeaconBlocksKey)) > 0
-				return nil
-			}))
+		// Not a fresh database, has blinded blocks already and should continue being that way.
+		err = store.setupBlockStorageType(ctx)
+		require.NoError(t, err)
 
-			// Should have set the chain metadata bucket to save blinded
-			require.Equal(t, true, shouldSaveBlinded)
+		var shouldSaveBlinded bool
+		require.NoError(t, store.db.Update(func(tx *bolt.Tx) error {
+			bkt := tx.Bucket(chainMetadataBucket)
+			shouldSaveBlinded = len(bkt.Get(saveBlindedBeaconBlocksKey)) > 0
+			return nil
+		}))
 
-			blkFull := util.NewBeaconBlock()
-			blkFull.Block.Body.ExecutionPayload.BlockNumber = 2
-			wrappedBlock, err = blocks.NewSignedBeaconBlock(blkFull)
-			require.NoError(t, err)
-			root, err = wrappedBlock.Block().HashTreeRoot()
-			require.NoError(t, err)
-			require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
-			retrievedBlk, err = store.Block(ctx, root)
-			require.NoError(t, err)
+		// Should have set the chain metadata bucket to save blinded
+		require.Equal(t, true, shouldSaveBlinded)
 
-			require.Equal(t, true, retrievedBlk.IsBlinded())
-			wrappedBlinded, err := wrappedBlock.ToBlinded()
-			require.NoError(t, err)
-			require.DeepEqual(t, wrappedBlinded, retrievedBlk)
+		blkFull := util.NewBeaconBlock()
+		blkFull.Block.Body.ExecutionPayload.BlockNumber = 2
+		wrappedBlock, err = blocks.NewSignedBeaconBlock(blkFull)
+		require.NoError(t, err)
+		root, err = wrappedBlock.Block().HashTreeRoot()
+		require.NoError(t, err)
+		require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
+		retrievedBlk, err = store.Block(ctx, root)
+		require.NoError(t, err)
+
+		require.Equal(t, true, retrievedBlk.IsBlinded())
+		wrappedBlinded, err := wrappedBlock.ToBlinded()
+		require.NoError(t, err)
+		require.DeepEqual(t, wrappedBlinded, retrievedBlk)
+	})
+	t.Run("existing database with full blocks type should continue storing full blocks", func(t *testing.T) {
+		store := setupDB(t)
+		require.NoError(t, store.db.Update(func(tx *bolt.Tx) error {
+			return tx.Bucket(chainMetadataBucket).Delete(saveBlindedBeaconBlocksKey)
+		}))
+
+		blk := util.NewBeaconBlock()
+		blk.Block.Body.ExecutionPayload.BlockNumber = 1
+		wrappedBlock, err := blocks.NewSignedBeaconBlock(blk)
+		require.NoError(t, err)
+		root, err := wrappedBlock.Block().HashTreeRoot()
+		require.NoError(t, err)
+		require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
+		require.NoError(t, store.SaveStateSummary(ctx, &zondpb.StateSummary{Root: root[:]}))
+		require.NoError(t, store.SaveHeadBlockRoot(ctx, root))
+		retrievedBlk, err := store.Block(ctx, root)
+		require.NoError(t, err)
+		require.Equal(t, false, retrievedBlk.IsBlinded())
+		require.DeepEqual(t, wrappedBlock, retrievedBlk)
+
+		// Not a fresh database, has full blocks already and should continue being that way.
+		err = store.setupBlockStorageType(ctx)
+		require.NoError(t, err)
+
+		blk = util.NewBeaconBlock()
+		blk.Block.Body.ExecutionPayload.BlockNumber = 2
+		wrappedBlock, err = blocks.NewSignedBeaconBlock(blk)
+		require.NoError(t, err)
+		root, err = wrappedBlock.Block().HashTreeRoot()
+		require.NoError(t, err)
+		require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
+		retrievedBlk, err = store.Block(ctx, root)
+		require.NoError(t, err)
+		require.Equal(t, false, retrievedBlk.IsBlinded())
+		require.DeepEqual(t, wrappedBlock, retrievedBlk)
+	})
+
+	t.Run("existing database with blinded blocks type should error if user enables full blocks feature flag", func(t *testing.T) {
+		store := setupDB(t)
+
+		blk := util.NewBeaconBlock()
+		blk.Block.Body.ExecutionPayload.BlockNumber = 1
+		wrappedBlock, err := blocks.NewSignedBeaconBlock(blk)
+		require.NoError(t, err)
+		root, err := wrappedBlock.Block().HashTreeRoot()
+		require.NoError(t, err)
+		require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
+		require.NoError(t, store.SaveStateSummary(ctx, &zondpb.StateSummary{Root: root[:]}))
+		require.NoError(t, store.SaveHeadBlockRoot(ctx, root))
+		retrievedBlk, err := store.Block(ctx, root)
+		require.NoError(t, err)
+		require.Equal(t, true, retrievedBlk.IsBlinded())
+		wantedBlk, err := wrappedBlock.ToBlinded()
+		require.NoError(t, err)
+		require.DeepEqual(t, wantedBlk, retrievedBlk)
+
+		// Trying to enable full blocks with a database that is already storing blinded blocks should error.
+		resetFn := features.InitWithReset(&features.Flags{
+			SaveFullExecutionPayloads: true,
 		})
-		t.Run("existing database with full blocks type should continue storing full blocks", func(t *testing.T) {
-			store := setupDB(t)
-			require.NoError(t, store.db.Update(func(tx *bolt.Tx) error {
-				return tx.Bucket(chainMetadataBucket).Delete(saveBlindedBeaconBlocksKey)
-			}))
+		defer resetFn()
+		err = store.setupBlockStorageType(ctx)
+		errMsg := "cannot use the %s flag with this existing database, as it has already been initialized"
+		require.ErrorContains(t, fmt.Sprintf(errMsg, features.SaveFullExecutionPayloads.Name), err)
+	})
 
-			blk := util.NewBeaconBlock()
-			blk.Block.Body.ExecutionPayload.BlockNumber = 1
-			wrappedBlock, err := blocks.NewSignedBeaconBlock(blk)
-			require.NoError(t, err)
-			root, err := wrappedBlock.Block().HashTreeRoot()
-			require.NoError(t, err)
-			require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
-			require.NoError(t, store.SaveStateSummary(ctx, &zondpb.StateSummary{Root: root[:]}))
-			require.NoError(t, store.SaveHeadBlockRoot(ctx, root))
-			retrievedBlk, err := store.Block(ctx, root)
-			require.NoError(t, err)
-			require.Equal(t, false, retrievedBlk.IsBlinded())
-			require.DeepEqual(t, wrappedBlock, retrievedBlk)
-
-			// Not a fresh database, has full blocks already and should continue being that way.
-			err = store.setupBlockStorageType(ctx)
-			require.NoError(t, err)
-
-			blk = util.NewBeaconBlock()
-			blk.Block.Body.ExecutionPayload.BlockNumber = 2
-			wrappedBlock, err = blocks.NewSignedBeaconBlock(blk)
-			require.NoError(t, err)
-			root, err = wrappedBlock.Block().HashTreeRoot()
-			require.NoError(t, err)
-			require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
-			retrievedBlk, err = store.Block(ctx, root)
-			require.NoError(t, err)
-			require.Equal(t, false, retrievedBlk.IsBlinded())
-			require.DeepEqual(t, wrappedBlock, retrievedBlk)
-		})
-		t.Run("existing database with blinded blocks type should error if user enables full blocks feature flag", func(t *testing.T) {
-			store := setupDB(t)
-
-			blk := util.NewBeaconBlock()
-			blk.Block.Body.ExecutionPayload.BlockNumber = 1
-			wrappedBlock, err := blocks.NewSignedBeaconBlock(blk)
-			require.NoError(t, err)
-			root, err := wrappedBlock.Block().HashTreeRoot()
-			require.NoError(t, err)
-			require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
-			require.NoError(t, store.SaveStateSummary(ctx, &zondpb.StateSummary{Root: root[:]}))
-			require.NoError(t, store.SaveHeadBlockRoot(ctx, root))
-			retrievedBlk, err := store.Block(ctx, root)
-			require.NoError(t, err)
-			require.Equal(t, true, retrievedBlk.IsBlinded())
-			wantedBlk, err := wrappedBlock.ToBlinded()
-			require.NoError(t, err)
-			require.DeepEqual(t, wantedBlk, retrievedBlk)
-
-			// Trying to enable full blocks with a database that is already storing blinded blocks should error.
-			resetFn := features.InitWithReset(&features.Flags{
-				SaveFullExecutionPayloads: true,
-			})
-			defer resetFn()
-			err = store.setupBlockStorageType(ctx)
-			errMsg := "cannot use the %s flag with this existing database, as it has already been initialized"
-			require.ErrorContains(t, fmt.Sprintf(errMsg, features.SaveFullExecutionPayloads.Name), err)
-		})
-	*/
 }
