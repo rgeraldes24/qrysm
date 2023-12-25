@@ -3,44 +3,49 @@ package beacon
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/mock"
 	testing2 "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
+	mock2 "github.com/theQRL/qrysm/v4/testing/mock"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
 func TestPublishBlock(t *testing.T) {
-	//ctrl := gomock.NewController(t)
+	ctrl := gomock.NewController(t)
 
-	// TODO(rgeraldes24) fix
-	/*
-		t.Run("Capella", func(t *testing.T) {
-			v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
-			v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
-				_, ok := req.Block.(*zond.GenericSignedBeaconBlock_Capella)
-				return ok
-			}))
-			server := &Server{
-				V1Alpha1ValidatorServer: v1alpha1Server,
-				SyncChecker:             &mockSync.Sync{IsSyncing: false},
-			}
+	t.Run("Capella", func(t *testing.T) {
+		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
+		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
+			_, ok := req.Block.(*zond.GenericSignedBeaconBlock_Capella)
+			return ok
+		}))
+		server := &Server{
+			V1Alpha1ValidatorServer: v1alpha1Server,
+			SyncChecker:             &mockSync.Sync{IsSyncing: false},
+		}
 
-			request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(capellaBlock)))
-			writer := httptest.NewRecorder()
-			writer.Body = &bytes.Buffer{}
-			server.PublishBlock(writer, request)
-			assert.Equal(t, http.StatusOK, writer.Code)
-		})
-	*/
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(capellaBlock)))
+		writer := httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+		server.PublishBlock(writer, request)
+		fmt.Println(writer.Body.String())
+		assert.Equal(t, http.StatusOK, writer.Code)
+	})
+
 	t.Run("invalid block", func(t *testing.T) {
 		server := &Server{
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
@@ -72,36 +77,34 @@ func TestPublishBlock(t *testing.T) {
 }
 
 func TestPublishBlockSSZ(t *testing.T) {
-	//ctrl := gomock.NewController(t)
+	ctrl := gomock.NewController(t)
 
-	// TODO(rgeraldes24) fix
-	/*
-		t.Run("Capella", func(t *testing.T) {
-			v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
-			v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
-				_, ok := req.Block.(*zond.GenericSignedBeaconBlock_Capella)
-				return ok
-			}))
-			server := &Server{
-				V1Alpha1ValidatorServer: v1alpha1Server,
-				SyncChecker:             &mockSync.Sync{IsSyncing: false},
-			}
+	t.Run("Capella", func(t *testing.T) {
+		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
+		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
+			_, ok := req.Block.(*zond.GenericSignedBeaconBlock_Capella)
+			return ok
+		}))
+		server := &Server{
+			V1Alpha1ValidatorServer: v1alpha1Server,
+			SyncChecker:             &mockSync.Sync{IsSyncing: false},
+		}
 
-			var cblock SignedBeaconBlock
-			err := json.Unmarshal([]byte(capellaBlock), &cblock)
-			require.NoError(t, err)
-			genericBlock, err := cblock.ToGeneric()
-			require.NoError(t, err)
-			sszvalue, err := genericBlock.GetCapella().MarshalSSZ()
-			require.NoError(t, err)
-			request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader(sszvalue))
-			request.Header.Set("Accept", "application/octet-stream")
-			writer := httptest.NewRecorder()
-			writer.Body = &bytes.Buffer{}
-			server.PublishBlock(writer, request)
-			assert.Equal(t, http.StatusOK, writer.Code)
-		})
-	*/
+		var cblock SignedBeaconBlock
+		err := json.Unmarshal([]byte(capellaBlock), &cblock)
+		require.NoError(t, err)
+		genericBlock, err := cblock.ToGeneric()
+		require.NoError(t, err)
+		sszvalue, err := genericBlock.GetCapella().MarshalSSZ()
+		require.NoError(t, err)
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader(sszvalue))
+		request.Header.Set("Accept", "application/octet-stream")
+		writer := httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+		server.PublishBlock(writer, request)
+		assert.Equal(t, http.StatusOK, writer.Code)
+	})
+
 	t.Run("invalid block", func(t *testing.T) {
 		server := &Server{
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
@@ -117,28 +120,26 @@ func TestPublishBlockSSZ(t *testing.T) {
 }
 
 func TestPublishBlindedBlock(t *testing.T) {
-	// ctrl := gomock.NewController(t)
+	ctrl := gomock.NewController(t)
 
-	// TODO (rgeraldes24) fix
-	/*
-		t.Run("Capella", func(t *testing.T) {
-			v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
-			v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
-				_, ok := req.Block.(*zond.GenericSignedBeaconBlock_BlindedCapella)
-				return ok
-			}))
-			server := &Server{
-				V1Alpha1ValidatorServer: v1alpha1Server,
-				SyncChecker:             &mockSync.Sync{IsSyncing: false},
-			}
+	t.Run("Capella", func(t *testing.T) {
+		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
+		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
+			_, ok := req.Block.(*zond.GenericSignedBeaconBlock_BlindedCapella)
+			return ok
+		}))
+		server := &Server{
+			V1Alpha1ValidatorServer: v1alpha1Server,
+			SyncChecker:             &mockSync.Sync{IsSyncing: false},
+		}
 
-			request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(blindedCapellaBlock)))
-			writer := httptest.NewRecorder()
-			writer.Body = &bytes.Buffer{}
-			server.PublishBlindedBlock(writer, request)
-			assert.Equal(t, http.StatusOK, writer.Code)
-		})
-	*/
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(blindedCapellaBlock)))
+		writer := httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+		server.PublishBlindedBlock(writer, request)
+		assert.Equal(t, http.StatusOK, writer.Code)
+	})
+
 	t.Run("invalid block", func(t *testing.T) {
 		server := &Server{
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
@@ -170,35 +171,34 @@ func TestPublishBlindedBlock(t *testing.T) {
 }
 
 func TestPublishBlindedBlockSSZ(t *testing.T) {
-	// ctrl := gomock.NewController(t)
-	// TODO (rgeraldes24) fix
-	/*
-		t.Run("Capella", func(t *testing.T) {
-			v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
-			v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
-				_, ok := req.Block.(*zond.GenericSignedBeaconBlock_BlindedCapella)
-				return ok
-			}))
-			server := &Server{
-				V1Alpha1ValidatorServer: v1alpha1Server,
-				SyncChecker:             &mockSync.Sync{IsSyncing: false},
-			}
+	ctrl := gomock.NewController(t)
 
-			var cblock SignedBlindedBeaconBlock
-			err := json.Unmarshal([]byte(blindedCapellaBlock), &cblock)
-			require.NoError(t, err)
-			genericBlock, err := cblock.ToGeneric()
-			require.NoError(t, err)
-			sszvalue, err := genericBlock.GetBlindedCapella().MarshalSSZ()
-			require.NoError(t, err)
-			request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader(sszvalue))
-			request.Header.Set("Accept", "application/octet-stream")
-			writer := httptest.NewRecorder()
-			writer.Body = &bytes.Buffer{}
-			server.PublishBlindedBlock(writer, request)
-			assert.Equal(t, http.StatusOK, writer.Code)
-		})
-	*/
+	t.Run("Capella", func(t *testing.T) {
+		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
+		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
+			_, ok := req.Block.(*zond.GenericSignedBeaconBlock_BlindedCapella)
+			return ok
+		}))
+		server := &Server{
+			V1Alpha1ValidatorServer: v1alpha1Server,
+			SyncChecker:             &mockSync.Sync{IsSyncing: false},
+		}
+
+		var cblock SignedBlindedBeaconBlock
+		err := json.Unmarshal([]byte(blindedCapellaBlock), &cblock)
+		require.NoError(t, err)
+		genericBlock, err := cblock.ToGeneric()
+		require.NoError(t, err)
+		sszvalue, err := genericBlock.GetBlindedCapella().MarshalSSZ()
+		require.NoError(t, err)
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader(sszvalue))
+		request.Header.Set("Accept", "application/octet-stream")
+		writer := httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+		server.PublishBlindedBlock(writer, request)
+		assert.Equal(t, http.StatusOK, writer.Code)
+	})
+
 	t.Run("invalid block", func(t *testing.T) {
 		server := &Server{
 			SyncChecker: &mockSync.Sync{IsSyncing: false},

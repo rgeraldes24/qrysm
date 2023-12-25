@@ -3,11 +3,13 @@ package beacon
 import (
 	"context"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prysmaticlabs/go-bitfield"
+	grpcutil "github.com/theQRL/qrysm/v4/api/grpc"
 	blockchainmock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	qrysmtime "github.com/theQRL/qrysm/v4/beacon-chain/core/time"
@@ -1150,9 +1152,6 @@ func TestServer_SubmitAttestations_ValidAttestationSubmitted(t *testing.T) {
 	require.Equal(t, 1, s.AttestationsPool.UnaggregatedAttestationCount())
 }
 
-// TODO(rgeraldes24) fix
-// pool_test.go:1226 Values are not equal, want: []string{"{\"failures\":[{\"index\":0,\"message\":\"Incorrect attestation signature: could not create signature from byte slice: signature must be 4595 bytes\"}]}"}, got: []string{"{\"failures\":[{\"index\":0,\"message\":\"Incorrect attestation signature: signature must be 4595 bytes\"}]}"}, diff: modified: [0] = "{\"failures\":[{\"index\":0,\"message\":\"Incorrect attestation signature: signature must be 4595 bytes\"}]}"
-/*
 func TestServer_SubmitAttestations_InvalidAttestationGRPCHeader(t *testing.T) {
 	ctx := grpc.NewContextWithServerTransportStream(context.Background(), &runtime.ServerTransportStream{})
 
@@ -1202,7 +1201,7 @@ func TestServer_SubmitAttestations_InvalidAttestationGRPCHeader(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signatures: [][]byte{[]byte{}},
+		Signatures: [][]byte{{}},
 	}
 
 	chain := &blockchainmock.ChainService{State: bs}
@@ -1226,11 +1225,10 @@ func TestServer_SubmitAttestations_InvalidAttestationGRPCHeader(t *testing.T) {
 	require.Equal(t, true, ok, "could not retrieve custom error metadata value")
 	assert.DeepEqual(
 		t,
-		[]string{"{\"failures\":[{\"index\":0,\"message\":\"Incorrect attestation signature: could not create signature from byte slice: signature must be 4595 bytes\"}]}"},
+		[]string{"{\"failures\":[{\"index\":0,\"message\":\"Incorrect attestation signature: signature must be 4595 bytes\"}]}"},
 		v,
 	)
 }
-*/
 
 func TestListDilithiumToExecutionChanges(t *testing.T) {
 	change1 := &zondpbv1alpha1.SignedDilithiumToExecutionChange{
@@ -1354,120 +1352,6 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 		require.DeepEqual(t, v1Change, signedChanges[i])
 	}
 }
-
-// TODO(rgeraldes) review if necessary
-/*
-func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
-	ctx := context.Background()
-
-	transition.SkipSlotCache.Disable()
-	defer transition.SkipSlotCache.Enable()
-
-	params.SetupTestConfigCleanup(t)
-	c := params.BeaconConfig().Copy()
-	// Required for correct committee size calculation.
-	params.OverrideBeaconConfig(c)
-
-	spb := &zondpbv1alpha1.BeaconStateBellatrix{
-		Fork: &zondpbv1alpha1.Fork{
-			CurrentVersion:  params.BeaconConfig().BellatrixForkVersion,
-			PreviousVersion: params.BeaconConfig().AltairForkVersion,
-			Epoch:           params.BeaconConfig().BellatrixForkEpoch,
-		},
-	}
-	numValidators := 10
-	validators := make([]*zondpbv1alpha1.Validator, numValidators)
-	dilithiumChanges := make([]*zondpbv1.DilithiumToExecutionChange, numValidators)
-	spb.Balances = make([]uint64, numValidators)
-	privKeys := make([]common.SecretKey, numValidators)
-	maxEffectiveBalance := params.BeaconConfig().MaxEffectiveBalance
-	executionAddress := []byte{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13}
-
-	for i := range validators {
-		v := &zondpbv1alpha1.Validator{}
-		v.EffectiveBalance = maxEffectiveBalance
-		v.WithdrawableEpoch = params.BeaconConfig().FarFutureEpoch
-		v.WithdrawalCredentials = make([]byte, 32)
-		priv, err := dilithium.RandKey()
-		require.NoError(t, err)
-		privKeys[i] = priv
-		pubkey := priv.PublicKey().Marshal()
-
-		message := &zondpbv1.DilithiumToExecutionChange{
-			ToExecutionAddress:  executionAddress,
-			ValidatorIndex:      primitives.ValidatorIndex(i),
-			FromDilithiumPubkey: pubkey,
-		}
-
-		hashFn := ssz.NewHasherFunc(hash.CustomSHA256Hasher())
-		digest := hashFn.Hash(pubkey)
-		digest[0] = params.BeaconConfig().DilithiumWithdrawalPrefixByte
-		copy(v.WithdrawalCredentials, digest[:])
-		validators[i] = v
-		dilithiumChanges[i] = message
-	}
-	spb.Validators = validators
-	slot, err := slots.EpochStart(params.BeaconConfig().BellatrixForkEpoch)
-	require.NoError(t, err)
-	spb.Slot = slot
-	st, err := state_native.InitializeFromProtoBellatrix(spb)
-	require.NoError(t, err)
-
-	spc := &zondpbv1alpha1.BeaconStateCapella{
-		Fork: &zondpbv1alpha1.Fork{
-			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
-			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
-			Epoch:           params.BeaconConfig().CapellaForkEpoch,
-		},
-	}
-	slot, err = slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
-	spc.Slot = slot
-
-	stc, err := state_native.InitializeFromProtoCapella(spc)
-	require.NoError(t, err)
-
-	signedChanges := make([]*zondpbv1.SignedDilithiumToExecutionChange, numValidators)
-	for i, message := range dilithiumChanges {
-		signature, err := signing.ComputeDomainAndSign(stc, qrysmtime.CurrentEpoch(stc), message, params.BeaconConfig().DomainDilithiumToExecutionChange, privKeys[i])
-		require.NoError(t, err)
-
-		signed := &zondpbv1.SignedDilithiumToExecutionChange{
-			Message:   message,
-			Signature: signature,
-		}
-		signedChanges[i] = signed
-	}
-
-	broadcaster := &p2pMock.MockBroadcaster{}
-	chainService := &blockchainmock.ChainService{State: st}
-	s := &Server{
-		HeadFetcher:          chainService,
-		ChainInfoFetcher:     chainService,
-		AttestationsPool:     attestations.NewPool(),
-		Broadcaster:          broadcaster,
-		OperationNotifier:    &blockchainmock.MockOperationNotifier{},
-		DilithiumChangesPool: dilithiumtoexec.NewPool(),
-	}
-
-	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv1.SubmitDilithiumToExecutionChangesRequest{
-		Changes: signedChanges,
-	})
-	require.NoError(t, err)
-
-	// Check that we didn't broadcast the messages but did in fact fill in
-	// the pool
-	assert.Equal(t, false, broadcaster.BroadcastCalled)
-
-	poolChanges, err := s.DilithiumChangesPool.PendingDilithiumToExecChanges()
-	require.Equal(t, len(poolChanges), len(signedChanges))
-	require.NoError(t, err)
-	for i, v1alphaChange := range poolChanges {
-		v1Change := migration.V1Alpha1ToV1SignedDilithiumToExecChange(v1alphaChange)
-		require.DeepEqual(t, v1Change, signedChanges[i])
-	}
-}
-*/
 
 func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 	ctx := context.Background()

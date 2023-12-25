@@ -1,10 +1,7 @@
 package rewards
 
-// TODO(rgeraldes) TestBlockRewards - fix body.Attestations, include sigs
-/*
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -15,7 +12,6 @@ import (
 
 	"github.com/prysmaticlabs/go-bitfield"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
@@ -27,7 +23,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/v4/network/http"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -35,6 +30,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+/*
 func TestBlockRewards(t *testing.T) {
 	helpers.ClearCache()
 
@@ -188,6 +184,7 @@ func TestBlockRewards(t *testing.T) {
 		assert.Equal(t, false, resp.Finalized)
 	})
 }
+*/
 
 func TestAttestationRewards(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
@@ -721,4 +718,3 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		assert.Equal(t, "Validator index 9999 is too large. Maximum allowed index is 1023", e.Message)
 	})
 }
-*/

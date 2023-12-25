@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"google.golang.org/grpc"
-
 	"github.com/golang/mock/gomock"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/theQRL/qrysm/v4/api"
@@ -19,6 +17,7 @@ import (
 	mock2 "github.com/theQRL/qrysm/v4/testing/mock"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 

@@ -84,7 +84,7 @@ type AttesterSlashing struct {
 }
 
 type Attestation struct {
-	ParticipationBits string          `json:"aggregation_bits" validate:"required"`
+	ParticipationBits string          `json:"participation_bits" validate:"required"`
 	Data              AttestationData `json:"data" validate:"required"`
 	Signatures        []string        `json:"signatures" validate:"required"`
 }
