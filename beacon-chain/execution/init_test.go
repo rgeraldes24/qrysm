@@ -1,7 +1,5 @@
 package execution
 
-// FIX
-/*
 import (
 	"github.com/theQRL/qrysm/v4/config/params"
 )
@@ -12,4 +10,3 @@ func init() {
 		panic(err)
 	}
 }
-*/

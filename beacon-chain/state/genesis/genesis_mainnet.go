@@ -9,8 +9,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 )
 
-// TODO(rgeraldes24): review
-
 var (
 	// TODO(rgeraldes24): add final mainnet genesis
 	// deposit new-seed --num-validators=64 --chain-name=mainnet

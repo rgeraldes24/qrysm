@@ -2,8 +2,10 @@ package beacon
 
 import (
 	"context"
+	"encoding/hex"
 	"testing"
 
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -13,7 +15,6 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-/*
 func TestGetSpec(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig().Copy()
@@ -123,7 +124,7 @@ func TestGetSpec(t *testing.T) {
 	resp, err := server.GetSpec(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 
-	assert.Equal(t, 108, len(resp.Data))
+	assert.Equal(t, 89, len(resp.Data))
 	for k, v := range resp.Data {
 		switch k {
 		case "CONFIG_NAME":
@@ -272,12 +273,6 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "65", v)
 		case "EPOCHS_PER_SYNC_COMMITTEE_PERIOD":
 			assert.Equal(t, "66", v)
-		case "INACTIVITY_PENALTY_QUOTIENT_ALTAIR":
-			assert.Equal(t, "67", v)
-		case "MIN_SLASHING_PENALTY_QUOTIENT_ALTAIR":
-			assert.Equal(t, "68", v)
-		case "PROPORTIONAL_SLASHING_MULTIPLIER_ALTAIR":
-			assert.Equal(t, "69", v)
 		case "INACTIVITY_SCORE_RECOVERY_RATE":
 			assert.Equal(t, "70", v)
 		case "MIN_SYNC_COMMITTEE_PARTICIPANTS":
@@ -336,7 +331,6 @@ func TestGetSpec(t *testing.T) {
 		}
 	}
 }
-*/
 
 func TestGetDepositContract(t *testing.T) {
 	const chainId = 99

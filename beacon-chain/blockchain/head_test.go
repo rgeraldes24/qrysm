@@ -1,21 +1,29 @@
 package blockchain
 
 import (
+	"bytes"
 	"context"
+	"sort"
 	"testing"
+	"time"
 
+	logTest "github.com/sirupsen/logrus/hooks/test"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
+	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
+	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-// fix embedded mainnet genesis
-/*
 func TestSaveHead_Same(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
@@ -141,7 +149,6 @@ func TestSaveHead_Different_Reorg(t *testing.T) {
 	require.LogsContain(t, hook, "distance=1")
 	require.LogsContain(t, hook, "depth=1")
 }
-*/
 
 func Test_notifyNewHeadEvent(t *testing.T) {
 	t.Run("genesis_state_root", func(t *testing.T) {
@@ -209,8 +216,6 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 	})
 }
 
-// fix embedded mainnet genesis
-/*
 func TestRetrieveHead_ReadOnly(t *testing.T) {
 	ctx := context.Background()
 	beaconDB := testDB.SetupDB(t)
@@ -252,7 +257,6 @@ func TestRetrieveHead_ReadOnly(t *testing.T) {
 
 	assert.Equal(t, rOnlyState, service.head.state, "Head is not the same object")
 }
-*/
 
 // NOTE(rgeraldes24) - initial slot must be 1 instead of 0 because with the capella block we
 // get the following error: Unexpected error: expected state.slot 0 < slot 0
@@ -410,8 +414,6 @@ func TestSaveOrphanedOps(t *testing.T) {
 }
 */
 
-// Fix embedded mainnet genesis
-/*
 func TestSaveOrphanedAtts_CanFilter(t *testing.T) {
 	ctx := context.Background()
 	beaconDB := testDB.SetupDB(t)
@@ -469,10 +471,7 @@ func TestSaveOrphanedAtts_CanFilter(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 15, len(pending))
 }
-*/
 
-// Fix embedded mainnet genesis
-/*
 func TestSaveOrphanedAtts_DoublyLinkedTrie(t *testing.T) {
 	ctx := context.Background()
 	beaconDB := testDB.SetupDB(t)
@@ -537,7 +536,6 @@ func TestSaveOrphanedAtts_DoublyLinkedTrie(t *testing.T) {
 	})
 	require.DeepEqual(t, wantAtts, atts)
 }
-*/
 
 /*
 func TestSaveOrphanedAtts_CanFilter_DoublyLinkedTrie(t *testing.T) {

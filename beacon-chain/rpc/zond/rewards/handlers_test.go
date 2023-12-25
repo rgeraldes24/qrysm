@@ -2,6 +2,7 @@ package rewards
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/prysmaticlabs/go-bitfield"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
@@ -23,6 +25,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/v4/network/http"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -30,7 +33,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-/*
 func TestBlockRewards(t *testing.T) {
 	helpers.ClearCache()
 
@@ -69,16 +71,20 @@ func TestBlockRewards(t *testing.T) {
 	b.Block.Slot = 2
 	// we have to set the proposer index to the value that will be randomly chosen (fortunately it's deterministic)
 	b.Block.ProposerIndex = 12
+	dilithiumKey, err := dilithium.RandKey()
+	require.NoError(t, err)
+	sig0 := dilithiumKey.Sign([]byte("sig0")).Marshal()
+	sig1 := dilithiumKey.Sign([]byte("sig1")).Marshal()
 	b.Block.Body.Attestations = []*zond.Attestation{
 		{
 			ParticipationBits: bitfield.Bitlist{0b00000111},
 			Data:              util.HydrateAttestationData(&zond.AttestationData{}),
-			Signatures:        [][]byte{},
+			Signatures:        [][]byte{sig0, sig1},
 		},
 		{
 			ParticipationBits: bitfield.Bitlist{0b00000111},
 			Data:              util.HydrateAttestationData(&zond.AttestationData{}),
-			Signatures:        [][]byte{},
+			Signatures:        [][]byte{sig0, sig1},
 		},
 	}
 	attData1 := util.HydrateAttestationData(&zond.AttestationData{BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32)})
@@ -145,7 +151,7 @@ func TestBlockRewards(t *testing.T) {
 	require.NoError(t, err)
 	// Bits set in sync committee bits determine which validators will be treated as participating in sync committee.
 	// These validators have to sign the message.
-	sig1 := secretKeys[47].Sign(r[:]).Marshal()
+	sig1 = secretKeys[47].Sign(r[:]).Marshal()
 	require.NoError(t, err)
 	sig2 := secretKeys[19].Sign(r[:]).Marshal()
 	require.NoError(t, err)
@@ -172,6 +178,7 @@ func TestBlockRewards(t *testing.T) {
 
 		s.BlockRewards(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
+		fmt.Println(writer.Body.String())
 		resp := &BlockRewardsResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 		assert.Equal(t, "12", resp.Data.ProposerIndex)
@@ -184,7 +191,6 @@ func TestBlockRewards(t *testing.T) {
 		assert.Equal(t, false, resp.Finalized)
 	})
 }
-*/
 
 func TestAttestationRewards(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

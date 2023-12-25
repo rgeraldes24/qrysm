@@ -7,6 +7,7 @@ import (
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
+	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
@@ -16,8 +17,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// Fix embedded mainnet genesis
-/*
 func TestService_isNewProposer(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
@@ -26,10 +25,7 @@ func TestService_isNewProposer(t *testing.T) {
 	service.cfg.ProposerSlotIndexCache.SetProposerAndPayloadIDs(service.CurrentSlot()+1, 0, [8]byte{}, [32]byte{})
 	require.Equal(t, true, service.isNewProposer(service.CurrentSlot()+1))
 }
-*/
 
-// Fix embedded mainnet genesis
-/*
 func TestService_isNewHead(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
@@ -45,10 +41,7 @@ func TestService_isNewHead(t *testing.T) {
 	require.Equal(t, true, service.isNewHead([32]byte{2}))
 	require.Equal(t, false, service.isNewHead([32]byte{3}))
 }
-*/
 
-// Fix embedded mainnet genesis
-/*
 func TestService_getHeadStateAndBlock(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
@@ -71,12 +64,10 @@ func TestService_getHeadStateAndBlock(t *testing.T) {
 	gotBlk, err := service.cfg.BeaconDB.Block(context.Background(), r)
 	require.NoError(t, err)
 
-	// NOTE(rgeraldes24) - in capella the block will be saved as blinded
 	blindedBlk, err := blk.ToBlinded()
 	require.NoError(t, err)
 	require.DeepEqual(t, blindedBlk, gotBlk)
 }
-*/
 
 func TestService_forkchoiceUpdateWithExecution_exceptionalCases(t *testing.T) {
 	hook := logTest.NewGlobal()

@@ -822,11 +822,6 @@ func TestSubmitVoluntaryExit_AcrossFork(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
 
-	// params.SetupTestConfigCleanup(t)
-	// config := params.BeaconConfig()
-	// config.AltairForkEpoch = params.BeaconConfig().ShardCommitteePeriod + 1
-	// params.OverrideBeaconConfig(config)
-
 	bs, keys := util.DeterministicGenesisState(t, 1)
 	// Satisfy activity time required before exiting.
 	require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod))))
@@ -1306,9 +1301,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 		dilithiumChanges[i] = message
 	}
 	spb.Validators = validators
-	//slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
 	slot := primitives.Slot(0)
-	//require.NoError(t, err)
 	spb.Slot = slot
 	st, err := state_native.InitializeFromProtoCapella(spb)
 	require.NoError(t, err)
@@ -1400,8 +1393,6 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 		dilithiumChanges[i] = message
 	}
 	spb.Validators = validators
-	//slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	//require.NoError(t, err)
 	slot := primitives.Slot(0)
 	spb.Slot = slot
 	st, err := state_native.InitializeFromProtoCapella(spb)

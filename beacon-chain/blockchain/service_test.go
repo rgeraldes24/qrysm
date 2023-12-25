@@ -102,7 +102,7 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 	return chainService
 }
 
-// Fix embedded mainnet genesis
+// TODO FIX
 /*
 func TestChainStartStop_Initialized(t *testing.T) {
 	hook := logTest.NewGlobal()

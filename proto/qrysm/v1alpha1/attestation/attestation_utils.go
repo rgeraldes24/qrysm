@@ -138,7 +138,7 @@ func IsValidAttestationIndices(ctx context.Context, indexedAttestation *zondpb.I
 	}
 	for i := 1; i < len(indices); i++ {
 		if indices[i-1] >= indices[i] {
-			return errors.New("attesting indices is not uniquely sorted")
+			return errors.New("attesting indices are not uniquely sorted")
 		}
 	}
 	return nil

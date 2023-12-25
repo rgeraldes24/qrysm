@@ -213,7 +213,7 @@ func TestPublishBlindedBlockSSZ(t *testing.T) {
 	})
 }
 
-// TODO(rgeraldes24) - fix GenerateFullBlock does not work for slot 0
+// TODO: FIX
 /*
 func TestValidateConsensus(t *testing.T) {
 	ctx := context.Background()

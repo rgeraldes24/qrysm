@@ -1,7 +1,5 @@
 package blockchain
 
-// TODO(rgeraldes24) fix
-/*
 import (
 	"github.com/theQRL/qrysm/v4/config/params"
 )
@@ -12,4 +10,3 @@ func init() {
 		panic(err)
 	}
 }
-*/

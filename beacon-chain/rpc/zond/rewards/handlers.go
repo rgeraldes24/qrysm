@@ -63,7 +63,7 @@ func (s *Server) BlockRewards(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 		errJson := &http2.DefaultErrorJson{
-			Message: "Could not get attestation rewards" + err.Error(),
+			Message: "Could not get attestation rewards: " + err.Error(),
 			Code:    http.StatusInternalServerError,
 		}
 		http2.WriteError(w, errJson)

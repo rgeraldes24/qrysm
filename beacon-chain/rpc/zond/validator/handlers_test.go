@@ -227,7 +227,6 @@ func TestGetAggregateAttestation(t *testing.T) {
 	})
 }
 
-// FIX
 /*
 func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *testing.T) {
 	root := bytesutil.PadTo([]byte("root"), 32)
