@@ -1,6 +1,5 @@
 package debug
 
-/*
 import (
 	"context"
 	"testing"
@@ -13,13 +12,13 @@ import (
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// TODO(rgeraldes24) - might be failing because of saving the block as a blinded block
 func TestServer_GetBlock(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
@@ -36,7 +35,13 @@ func TestServer_GetBlock(t *testing.T) {
 		BlockRoot: blockRoot[:],
 	})
 	require.NoError(t, err)
-	wanted, err := b.MarshalSSZ()
+
+	wsb, err := blocks.NewSignedBeaconBlock(b)
+	require.NoError(t, err)
+	wsbBlinded, err := wsb.ToBlinded()
+	require.NoError(t, err)
+
+	wanted, err := wsbBlinded.MarshalSSZ()
 	require.NoError(t, err)
 	assert.DeepEqual(t, wanted, res.Encoded)
 
@@ -86,4 +91,3 @@ func TestServer_GetAttestationInclusionSlot(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, params.BeaconConfig().FarFutureSlot, res.Slot)
 }
-*/

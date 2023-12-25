@@ -29,7 +29,6 @@ go_test(
     name = "go_default_test",
     srcs = [
         "handlers_test.go",
-        "server_test.go",
     ],
     embed = [":go_default_library"],
     deps = [

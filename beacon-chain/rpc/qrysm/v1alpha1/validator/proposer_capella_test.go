@@ -206,7 +206,6 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, uint64(2), e.BlockNumber()) // Builder block
 	})
-	// TODO(rgeraldes24) fix
 	t.Run("Builder configured. Local block has higher value", func(t *testing.T) {
 		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
 		require.NoError(t, err)
@@ -629,5 +628,3 @@ func TestServer_SetSyncAggregate_EmptyCase(t *testing.T) {
 
 	require.DeepEqual(t, want, agg)
 }
-
-// TODO(rgeraldes24) - TestServer_SetSyncAggregate test other scenarios?

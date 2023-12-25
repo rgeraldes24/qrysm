@@ -33,18 +33,6 @@ func TestServer_getExecutionPayload(t *testing.T) {
 		Root: b1r[:],
 	}))
 
-	// transitionSt, _ := util.DeterministicGenesisState(t, 1)
-	// wrappedHeader, err := blocks.WrappedExecutionPayloadHeader(&pb.ExecutionPayloadHeader{BlockNumber: 1})
-	// require.NoError(t, err)
-	// require.NoError(t, transitionSt.SetLatestExecutionPayloadHeader(wrappedHeader))
-	// b2pb := util.NewBeaconBlock()
-	// b2r, err := b2pb.Block.HashTreeRoot()
-	// require.NoError(t, err)
-	// util.SaveBlock(t, context.Background(), beaconDB, b2pb)
-	// require.NoError(t, transitionSt.SetFinalizedCheckpoint(&zondpb.Checkpoint{
-	// 	Root: b2r[:],
-	// }))
-
 	capellaTransitionState, _ := util.DeterministicGenesisState(t, 1)
 	wrappedHeaderCapella, err := blocks.WrappedExecutionPayloadHeader(&pb.ExecutionPayloadHeader{BlockNumber: 1}, 0)
 	require.NoError(t, err)
@@ -70,7 +58,6 @@ func TestServer_getExecutionPayload(t *testing.T) {
 		validatorIndx     primitives.ValidatorIndex
 	}{
 		// TODO(rgeraldes24) double check
-
 		{
 			name: "transition completed, nil payload id",
 			//st:        transitionSt,

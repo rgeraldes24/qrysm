@@ -39,7 +39,8 @@ func (vs *Server) GetValidatorPerformance(w http.ResponseWriter, r *http.Request
 	computed, err := vs.CoreService.ComputeValidatorPerformance(
 		r.Context(),
 		&zondpb.ValidatorPerformanceRequest{
-			Indices: req.Indices,
+			PublicKeys: req.PublicKeys,
+			Indices:    req.Indices,
 		},
 	)
 	if err != nil {
@@ -55,7 +56,7 @@ func (vs *Server) GetValidatorPerformance(w http.ResponseWriter, r *http.Request
 		BalancesBeforeEpochTransition: computed.BalancesBeforeEpochTransition,
 		BalancesAfterEpochTransition:  computed.BalancesAfterEpochTransition,
 		MissingValidators:             computed.MissingValidators,
-		InactivityScores:              computed.InactivityScores, // Only populated in Altair
+		InactivityScores:              computed.InactivityScores,
 	}
 	http2.WriteJson(w, response)
 }

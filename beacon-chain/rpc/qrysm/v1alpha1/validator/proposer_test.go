@@ -2,6 +2,7 @@ package validator
 
 import (
 	"context"
+	"fmt"
 	"math/big"
 	"testing"
 	"time"
@@ -48,6 +49,7 @@ import (
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
+	attaggregation "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/attestations"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -56,68 +58,6 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 )
-
-/*
-func TestServer_GetBeaconBlock_Phase0(t *testing.T) {
-	db := dbutil.SetupDB(t)
-	ctx := context.Background()
-
-	beaconState, privKeys := util.DeterministicGenesisState(t, 64)
-	stateRoot, err := beaconState.HashTreeRoot(ctx)
-	require.NoError(t, err, "Could not hash genesis state")
-
-	genesis := b.NewGenesisBlock(stateRoot[:])
-	genBlk := &zondpb.SignedBeaconBlock{
-		Block: &zondpb.BeaconBlock{
-			Slot:       genesis.Block.Slot,
-			ParentRoot: genesis.Block.ParentRoot,
-			StateRoot:  genesis.Block.StateRoot,
-			Body: &zondpb.BeaconBlockBody{
-				RandaoReveal: genesis.Block.Body.RandaoReveal,
-				Graffiti:     genesis.Block.Body.Graffiti,
-				Zond1Data:    genesis.Block.Body.Zond1Data,
-			},
-		},
-		Signature: genesis.Signature,
-	}
-	util.SaveBlock(t, ctx, db, genBlk)
-
-	parentRoot, err := genBlk.Block.HashTreeRoot()
-	require.NoError(t, err, "Could not get signing root")
-	require.NoError(t, db.SaveState(ctx, beaconState, parentRoot), "Could not save genesis state")
-	require.NoError(t, db.SaveHeadBlockRoot(ctx, parentRoot), "Could not save genesis state")
-
-	require.NoError(t, err, "Could not get signing root")
-	require.NoError(t, db.SaveState(ctx, beaconState, parentRoot), "Could not save genesis state")
-	require.NoError(t, db.SaveHeadBlockRoot(ctx, parentRoot), "Could not save genesis state")
-
-	proposerServer := getProposerServer(db, beaconState, parentRoot[:])
-
-	randaoReveal, err := util.RandaoReveal(beaconState, 0, privKeys)
-	require.NoError(t, err)
-
-	graffiti := bytesutil.ToBytes32([]byte("zond2"))
-	req := &zondpb.BlockRequest{
-		Slot:         1,
-		RandaoReveal: randaoReveal,
-		Graffiti:     graffiti[:],
-	}
-	proposerSlashings, attSlashings := injectSlashings(t, beaconState, privKeys, proposerServer)
-
-	block, err := proposerServer.GetBeaconBlock(ctx, req)
-	require.NoError(t, err)
-	phase0Blk, ok := block.GetBlock().(*zondpb.GenericBeaconBlock_Phase0)
-	require.Equal(t, true, ok)
-	assert.Equal(t, req.Slot, phase0Blk.Phase0.Slot)
-	assert.DeepEqual(t, parentRoot[:], phase0Blk.Phase0.ParentRoot, "Expected block to have correct parent root")
-	assert.DeepEqual(t, randaoReveal, phase0Blk.Phase0.Body.RandaoReveal, "Expected block to have correct randao reveal")
-	assert.DeepEqual(t, req.Graffiti, phase0Blk.Phase0.Body.Graffiti, "Expected block to have correct Graffiti")
-	assert.Equal(t, params.BeaconConfig().MaxProposerSlashings, uint64(len(phase0Blk.Phase0.Body.ProposerSlashings)))
-	assert.DeepEqual(t, proposerSlashings, phase0Blk.Phase0.Body.ProposerSlashings)
-	assert.Equal(t, params.BeaconConfig().MaxAttesterSlashings, uint64(len(phase0Blk.Phase0.Body.AttesterSlashings)))
-	assert.DeepEqual(t, attSlashings, phase0Blk.Phase0.Body.AttesterSlashings)
-}
-*/
 
 func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	db := dbutil.SetupDB(t)
@@ -226,9 +166,6 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 func TestServer_GetBeaconBlock_Optimistic(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
-	// bellatrixSlot, err := slots.EpochStart(params.BeaconConfig().BellatrixForkEpoch)
-	// require.NoError(t, err)
-
 	mockChainService := &mock.ChainService{ForkChoiceStore: doublylinkedtree.New()}
 	proposerServer := &Server{
 		OptimisticModeFetcher: &mock.ChainService{Optimistic: true},
@@ -301,39 +238,16 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 		name  string
 		block func([32]byte) *zondpb.GenericSignedBeaconBlock
 	}{
-		/*
-			{
-				name: "phase0",
-				block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
-					blockToPropose := util.NewBeaconBlock()
-					blockToPropose.Block.Slot = 5
-					blockToPropose.Block.ParentRoot = parent[:]
-					blk := &zondpb.GenericSignedBeaconBlock_Phase0{Phase0: blockToPropose}
-					return &zondpb.GenericSignedBeaconBlock{Block: blk}
-				},
+		{
+			name: "capella",
+			block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
+				blockToPropose := util.NewBeaconBlock()
+				blockToPropose.Block.Slot = 5
+				blockToPropose.Block.ParentRoot = parent[:]
+				blk := &zondpb.GenericSignedBeaconBlock_Capella{Capella: blockToPropose}
+				return &zondpb.GenericSignedBeaconBlock{Block: blk}
 			},
-			{
-				name: "altair",
-				block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
-					blockToPropose := util.NewBeaconBlockAltair()
-					blockToPropose.Block.Slot = 5
-					blockToPropose.Block.ParentRoot = parent[:]
-					blk := &zondpb.GenericSignedBeaconBlock_Altair{Altair: blockToPropose}
-					return &zondpb.GenericSignedBeaconBlock{Block: blk}
-				},
-			},
-			{
-				name: "bellatrix",
-				block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
-					blockToPropose := util.NewBeaconBlockBellatrix()
-					blockToPropose.Block.Slot = 5
-					blockToPropose.Block.ParentRoot = parent[:]
-					blk := &zondpb.GenericSignedBeaconBlock_Bellatrix{Bellatrix: blockToPropose}
-					return &zondpb.GenericSignedBeaconBlock{Block: blk}
-				},
-			},
-		*/
-		// TODO(rgeraldes24) - add normal Capella
+		},
 		{
 			name: "blind capella",
 			block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
@@ -2143,21 +2057,25 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestZond1DataEqGenesisZond1Block
 	assert.Equal(t, 0, len(deposits), "Received unexpected number of pending deposits")
 }
 
-// TODO(rgeraldes24) fix
-/*
 func TestProposer_DeleteAttsInPool_Aggregated(t *testing.T) {
 	s := &Server{
 		AttPool: attestations.NewPool(),
 	}
 	priv, err := dilithium.RandKey()
 	require.NoError(t, err)
-	sig := priv.Sign([]byte("foo")).Marshal()
+
+	// TODO(rgeraldes24): refactor
+	sig0 := priv.Sign([]byte("foo0")).Marshal()
+	sig1 := priv.Sign([]byte("foo1")).Marshal()
+	sig2 := priv.Sign([]byte("foo2")).Marshal()
+	sig3 := priv.Sign([]byte("foo3")).Marshal()
+
 	aggregatedAtts := []*zondpb.Attestation{
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10101}, Signatures: [][]byte{sig}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b11010}, Signatures: [][]byte{sig}})}
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10101}, Signatures: [][]byte{sig0, sig2}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b11010}, Signatures: [][]byte{sig1, sig3}})}
 	unaggregatedAtts := []*zondpb.Attestation{
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10010}, Signatures: [][]byte{sig}}),
-		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10100}, Signatures: [][]byte{sig}})}
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10010}, Signatures: [][]byte{sig1}}),
+		util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, ParticipationBits: bitfield.Bitlist{0b10100}, Signatures: [][]byte{sig2}})}
 
 	require.NoError(t, s.AttPool.SaveAggregatedAttestations(aggregatedAtts))
 	require.NoError(t, s.AttPool.SaveUnaggregatedAttestations(unaggregatedAtts))
@@ -2170,34 +2088,39 @@ func TestProposer_DeleteAttsInPool_Aggregated(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(atts), "Did not delete unaggregated attestation")
 }
-*/
 
-// TODO(rgeraldes24) - fix
-/*
 func TestProposer_GetSyncAggregate_OK(t *testing.T) {
 	proposerServer := &Server{
 		SyncChecker:       &mockSync.Sync{IsSyncing: false},
 		SyncCommitteePool: synccommittee.NewStore(),
 	}
 
+	priv, err := dilithium.RandKey()
+	require.NoError(t, err)
+	sigsLen := 8
+	sigs := make([][]byte, 0, sigsLen)
+	for i := 0; i < sigsLen; i++ {
+		sigs = append(sigs, priv.Sign([]byte(fmt.Sprintf("foo%d", i))).Marshal())
+	}
+
 	r := params.BeaconConfig().ZeroHash
 	conts := []*zondpb.SyncCommitteeContribution{
-		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{}, ParticipationBits: []byte{0b0001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{}, ParticipationBits: []byte{0b1001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{}, ParticipationBits: []byte{0b1110}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{}, ParticipationBits: []byte{0b0001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{}, ParticipationBits: []byte{0b1001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{}, ParticipationBits: []byte{0b1110}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{}, ParticipationBits: []byte{0b0001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{}, ParticipationBits: []byte{0b1001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{}, ParticipationBits: []byte{0b1110}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{}, ParticipationBits: []byte{0b0001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{}, ParticipationBits: []byte{0b1001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{}, ParticipationBits: []byte{0b1110}, BlockRoot: r[:]},
-		{Slot: 2, SubcommitteeIndex: 0, Signatures: [][]byte{}, ParticipationBits: []byte{0b10101010}, BlockRoot: r[:]},
-		{Slot: 2, SubcommitteeIndex: 1, Signatures: [][]byte{}, ParticipationBits: []byte{0b10101010}, BlockRoot: r[:]},
-		{Slot: 2, SubcommitteeIndex: 2, Signatures: [][]byte{}, ParticipationBits: []byte{0b10101010}, BlockRoot: r[:]},
-		{Slot: 2, SubcommitteeIndex: 3, Signatures: [][]byte{}, ParticipationBits: []byte{0b10101010}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[0]}, ParticipationBits: []byte{0b0001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[0], sigs[3]}, ParticipationBits: []byte{0b1001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[1], sigs[2], sigs[3]}, ParticipationBits: []byte{0b1110}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{sigs[0]}, ParticipationBits: []byte{0b0001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{sigs[0], sigs[3]}, ParticipationBits: []byte{0b1001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{sigs[1], sigs[2], sigs[3]}, ParticipationBits: []byte{0b1110}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{sigs[0]}, ParticipationBits: []byte{0b0001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{sigs[0], sigs[3]}, ParticipationBits: []byte{0b1001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{sigs[1], sigs[2], sigs[3]}, ParticipationBits: []byte{0b1110}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{sigs[0]}, ParticipationBits: []byte{0b0001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{sigs[0], sigs[3]}, ParticipationBits: []byte{0b1001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{sigs[1], sigs[2], sigs[3]}, ParticipationBits: []byte{0b1110}, BlockRoot: r[:]},
+		{Slot: 2, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[1], sigs[3], sigs[5], sigs[7]}, ParticipationBits: []byte{0b10101010}, BlockRoot: r[:]},
+		{Slot: 2, SubcommitteeIndex: 1, Signatures: [][]byte{sigs[1], sigs[3], sigs[5], sigs[7]}, ParticipationBits: []byte{0b10101010}, BlockRoot: r[:]},
+		{Slot: 2, SubcommitteeIndex: 2, Signatures: [][]byte{sigs[1], sigs[3], sigs[5], sigs[7]}, ParticipationBits: []byte{0b10101010}, BlockRoot: r[:]},
+		{Slot: 2, SubcommitteeIndex: 3, Signatures: [][]byte{sigs[1], sigs[3], sigs[5], sigs[7]}, ParticipationBits: []byte{0b10101010}, BlockRoot: r[:]},
 	}
 
 	for _, cont := range conts {
@@ -2216,7 +2139,6 @@ func TestProposer_GetSyncAggregate_OK(t *testing.T) {
 	require.NoError(t, err)
 	require.DeepEqual(t, bitfield.NewBitvector32(), aggregate.SyncCommitteeBits)
 }
-*/
 
 func TestProposer_PrepareBeaconProposer(t *testing.T) {
 	type args struct {

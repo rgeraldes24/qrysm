@@ -11,8 +11,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
-// FIX
-/*
 func TestDebugServer_GetPeer(t *testing.T) {
 	peersProvider := &mockP2p.MockPeersProvider{}
 	mP2P := mockP2p.NewTestP2P(t)
@@ -29,7 +27,6 @@ func TestDebugServer_GetPeer(t *testing.T) {
 	assert.Equal(t, int(zondpb.PeerDirection_INBOUND), int(res.Direction), "Expected 1st peer to be an inbound connection")
 	assert.Equal(t, zondpb.ConnectionState_CONNECTED, res.ConnectionState, "Expected peer to be connected")
 }
-*/
 
 func TestDebugServer_ListPeers(t *testing.T) {
 	peersProvider := &mockP2p.MockPeersProvider{}

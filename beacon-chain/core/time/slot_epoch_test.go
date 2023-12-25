@@ -113,6 +113,7 @@ func TestCanProcessEpoch_TrueOnEpochsLastSlot(t *testing.T) {
 	}
 }
 
+// TODO(rgeraldes24)
 /*
 func TestAltairCompatible(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

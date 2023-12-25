@@ -18,6 +18,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"golang.org/x/sync/errgroup"
@@ -94,26 +95,26 @@ func (s *Service) ComputeValidatorPerformance(
 	missingValidators := make([][]byte, 0, responseCap)
 
 	filtered := map[primitives.ValidatorIndex]bool{} // Track filtered validators to prevent duplication in the response.
-	/*
-		// Convert the list of validator public keys to validator indices and add to the indices set.
-		for _, pubKey := range req.PublicKeys {
-			// Skip empty public key.
-			if len(pubKey) == 0 {
-				continue
-			}
-			pubkeyBytes := bytesutil.ToBytes2592(pubKey)
-			idx, ok := headState.ValidatorIndexByPubkey(pubkeyBytes)
-			if !ok {
-				// Validator index not found, track as missing.
-				missingValidators = append(missingValidators, pubKey)
-				continue
-			}
-			if !filtered[idx] {
-				validatorIndices = append(validatorIndices, idx)
-				filtered[idx] = true
-			}
+
+	// Convert the list of validator public keys to validator indices and add to the indices set.
+	for _, pubKey := range req.PublicKeys {
+		// Skip empty public key.
+		if len(pubKey) == 0 {
+			continue
 		}
-	*/
+		pubkeyBytes := bytesutil.ToBytes2592(pubKey)
+		idx, ok := headState.ValidatorIndexByPubkey(pubkeyBytes)
+		if !ok {
+			// Validator index not found, track as missing.
+			missingValidators = append(missingValidators, pubKey)
+			continue
+		}
+		if !filtered[idx] {
+			validatorIndices = append(validatorIndices, idx)
+			filtered[idx] = true
+		}
+	}
+
 	// Add provided indices to the indices set.
 	for _, idx := range req.Indices {
 		if !filtered[idx] {
@@ -163,12 +164,6 @@ func (s *Service) ComputeValidatorPerformance(
 		correctlyVotedTarget = append(correctlyVotedTarget, summary.IsPrevEpochTargetAttester)
 		correctlyVotedHead = append(correctlyVotedHead, summary.IsPrevEpochHeadAttester)
 
-		// if headState.Version() == version.Phase0 {
-		// 	correctlyVotedSource = append(correctlyVotedSource, summary.IsPrevEpochAttester)
-		// } else {
-		// 	correctlyVotedSource = append(correctlyVotedSource, summary.IsPrevEpochSourceAttester)
-		// 	inactivityScores = append(inactivityScores, summary.InactivityScore)
-		// }
 		correctlyVotedSource = append(correctlyVotedSource, summary.IsPrevEpochSourceAttester)
 		inactivityScores = append(inactivityScores, summary.InactivityScore)
 	}
@@ -182,7 +177,7 @@ func (s *Service) ComputeValidatorPerformance(
 		BalancesBeforeEpochTransition: beforeTransitionBalances,
 		BalancesAfterEpochTransition:  afterTransitionBalances,
 		MissingValidators:             missingValidators,
-		InactivityScores:              inactivityScores, // Only populated in Altair
+		InactivityScores:              inactivityScores,
 	}, nil
 }
 

@@ -2,10 +2,9 @@ package validator
 
 import (
 	"context"
+	"reflect"
 	"testing"
 	"time"
-
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/core"
 
 	"github.com/prysmaticlabs/go-bitfield"
 	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
@@ -14,6 +13,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/attestations"
 	mockp2p "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
@@ -23,6 +23,7 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
+	attaggregation "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/attestations"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -137,8 +138,6 @@ func TestSubmitAggregateAndProof_UnaggregateOk(t *testing.T) {
 	require.NoError(t, err)
 }
 
-/*
-TODO(rgeraldes24) - might be related to OptimisticModeFetcher: &mock.ChainService{Optimistic: false} missing on the server
 func TestSubmitAggregateAndProof_AggregateOk(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	c := params.MinimalSpecConfig().Copy()
@@ -157,11 +156,12 @@ func TestSubmitAggregateAndProof_AggregateOk(t *testing.T) {
 	require.NoError(t, err)
 
 	aggregatorServer := &Server{
-		HeadFetcher: &mock.ChainService{State: beaconState},
-		SyncChecker: &mockSync.Sync{IsSyncing: false},
-		AttPool:     attestations.NewPool(),
-		P2P:         &mockp2p.MockBroadcaster{},
-		TimeFetcher: &mock.ChainService{Genesis: time.Now()},
+		HeadFetcher:           &mock.ChainService{State: beaconState},
+		SyncChecker:           &mockSync.Sync{IsSyncing: false},
+		AttPool:               attestations.NewPool(),
+		P2P:                   &mockp2p.MockBroadcaster{},
+		TimeFetcher:           &mock.ChainService{Genesis: time.Now()},
+		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
 	priv, err := dilithium.RandKey()
@@ -184,7 +184,6 @@ func TestSubmitAggregateAndProof_AggregateOk(t *testing.T) {
 		t.Error("Did not receive wanted attestation")
 	}
 }
-*/
 
 func TestSubmitAggregateAndProof_AggregateNotOk(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

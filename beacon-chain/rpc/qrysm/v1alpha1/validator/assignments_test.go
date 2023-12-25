@@ -96,113 +96,9 @@ func TestGetDuties_OK(t *testing.T) {
 	}
 }
 
+// TODO FIX
 /*
-func TestGetAltairDuties_SyncCommitteeOK(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-	//cfg := params.BeaconConfig().Copy()
-	//cfg.AltairForkEpoch = primitives.Epoch(0)
-	//params.OverrideBeaconConfig(cfg)
-
-	genesis := util.NewBeaconBlock()
-	deposits, _, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().SyncCommitteeSize)
-	require.NoError(t, err)
-	zond1Data, err := util.DeterministicZond1Data(len(deposits))
-	require.NoError(t, err)
-	bs, err := util.GenesisBeaconState(context.Background(), deposits, 0, zond1Data)
-	require.NoError(t, err, "Could not setup genesis bs")
-	h := &zondpb.BeaconBlockHeader{
-		StateRoot:  bytesutil.PadTo([]byte{'a'}, fieldparams.RootLength),
-		ParentRoot: bytesutil.PadTo([]byte{'b'}, fieldparams.RootLength),
-		BodyRoot:   bytesutil.PadTo([]byte{'c'}, fieldparams.RootLength),
-	}
-	require.NoError(t, bs.SetLatestBlockHeader(h))
-	genesisRoot, err := genesis.Block.HashTreeRoot()
-	require.NoError(t, err, "Could not get signing root")
-
-	syncCommittee, err := altair.NextSyncCommittee(context.Background(), bs)
-	require.NoError(t, err)
-	require.NoError(t, bs.SetCurrentSyncCommittee(syncCommittee))
-	pubKeys := make([][]byte, len(deposits))
-	indices := make([]uint64, len(deposits))
-	for i := 0; i < len(deposits); i++ {
-		pubKeys[i] = deposits[i].Data.PublicKey
-		indices[i] = uint64(i)
-	}
-	require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch*primitives.Slot(params.BeaconConfig().EpochsPerSyncCommitteePeriod)-1))
-	require.NoError(t, helpers.UpdateSyncCommitteeCache(bs))
-
-	pubkeysAs2592ByteType := make([][dilithium.CryptoPublicKeyBytes]byte, len(pubKeys))
-	for i, pk := range pubKeys {
-		pubkeysAs2592ByteType[i] = bytesutil.ToBytes2592(pk)
-	}
-
-	slot := uint64(params.BeaconConfig().SlotsPerEpoch) * uint64(params.BeaconConfig().EpochsPerSyncCommitteePeriod) * params.BeaconConfig().SecondsPerSlot
-	chain := &mockChain.ChainService{
-		State: bs, Root: genesisRoot[:], Genesis: time.Now().Add(time.Duration(-1*int64(slot-1)) * time.Second),
-	}
-	vs := &Server{
-		HeadFetcher:            chain,
-		TimeFetcher:            chain,
-		Zond1InfoFetcher:       &mockExecution.Chain{},
-		SyncChecker:            &mockSync.Sync{IsSyncing: false},
-		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
-	}
-
-	// Test the first validator in registry.
-	req := &zondpb.DutiesRequest{
-		PublicKeys: [][]byte{deposits[0].Data.PublicKey},
-	}
-	res, err := vs.GetDuties(context.Background(), req)
-	require.NoError(t, err, "Could not call epoch committee assignment")
-	if res.CurrentEpochDuties[0].AttesterSlot > bs.Slot()+params.BeaconConfig().SlotsPerEpoch {
-		t.Errorf("Assigned slot %d can't be higher than %d",
-			res.CurrentEpochDuties[0].AttesterSlot, bs.Slot()+params.BeaconConfig().SlotsPerEpoch)
-	}
-
-	// Test the last validator in registry.
-	lastValidatorIndex := params.BeaconConfig().SyncCommitteeSize - 1
-	req = &zondpb.DutiesRequest{
-		PublicKeys: [][]byte{deposits[lastValidatorIndex].Data.PublicKey},
-	}
-	res, err = vs.GetDuties(context.Background(), req)
-	require.NoError(t, err, "Could not call epoch committee assignment")
-	if res.CurrentEpochDuties[0].AttesterSlot > bs.Slot()+params.BeaconConfig().SlotsPerEpoch {
-		t.Errorf("Assigned slot %d can't be higher than %d",
-			res.CurrentEpochDuties[0].AttesterSlot, bs.Slot()+params.BeaconConfig().SlotsPerEpoch)
-	}
-
-	// We request for duties for all validators.
-	req = &zondpb.DutiesRequest{
-		PublicKeys: pubKeys,
-		Epoch:      0,
-	}
-	res, err = vs.GetDuties(context.Background(), req)
-	require.NoError(t, err, "Could not call epoch committee assignment")
-	for i := 0; i < len(res.CurrentEpochDuties); i++ {
-		require.Equal(t, primitives.ValidatorIndex(i), res.CurrentEpochDuties[i].ValidatorIndex)
-	}
-	for i := 0; i < len(res.CurrentEpochDuties); i++ {
-		require.Equal(t, true, res.CurrentEpochDuties[i].IsSyncCommittee)
-		// Current epoch and next epoch duties should be equal before the sync period epoch boundary.
-		require.Equal(t, res.CurrentEpochDuties[i].IsSyncCommittee, res.NextEpochDuties[i].IsSyncCommittee)
-	}
-
-	// Current epoch and next epoch duties should not be equal at the sync period epoch boundary.
-	req = &zondpb.DutiesRequest{
-		PublicKeys: pubKeys,
-		Epoch:      params.BeaconConfig().EpochsPerSyncCommitteePeriod - 1,
-	}
-	res, err = vs.GetDuties(context.Background(), req)
-	require.NoError(t, err, "Could not call epoch committee assignment")
-	for i := 0; i < len(res.CurrentEpochDuties); i++ {
-		require.NotEqual(t, res.CurrentEpochDuties[i].IsSyncCommittee, res.NextEpochDuties[i].IsSyncCommittee)
-	}
-}
-*/
-
-// TODO(rgeraldes24) fix
-/*
-func TestGetBellatrixDuties_SyncCommitteeOK(t *testing.T) {
+func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
 	genesis := util.NewBeaconBlock()
@@ -451,7 +347,7 @@ func TestGetDuties_MultipleKeys_OK(t *testing.T) {
 	assert.Equal(t, 2, len(res.CurrentEpochDuties))
 	// TODO(rgeraldes24) double check
 	assert.Equal(t, primitives.Slot(5), res.CurrentEpochDuties[0].AttesterSlot)
-	assert.Equal(t, primitives.Slot(5), res.CurrentEpochDuties[0].AttesterSlot)
+	assert.Equal(t, primitives.Slot(2), res.CurrentEpochDuties[1].AttesterSlot)
 	// assert.Equal(t, primitives.Slot(4), res.CurrentEpochDuties[0].AttesterSlot)
 	// assert.Equal(t, primitives.Slot(4), res.CurrentEpochDuties[1].AttesterSlot)
 }

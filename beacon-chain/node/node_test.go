@@ -3,24 +3,37 @@ package node
 import (
 	"context"
 	"flag"
+	"fmt"
+	"os"
+	"strconv"
 	"testing"
+	"time"
+	"path/filepath"
 
+	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/blockchain"
+	"github.com/theQRL/qrysm/v4/beacon-chain/builder"
 	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
+	"github.com/theQRL/qrysm/v4/beacon-chain/execution"
 	"github.com/theQRL/qrysm/v4/beacon-chain/monitor"
 	"github.com/theQRL/qrysm/v4/cmd"
+	"github.com/theQRL/qrysm/v4/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/v4/config/features"
+	"github.com/theQRL/qrysm/v4/config/params"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime"
+	"github.com/theQRL/qrysm/v4/runtime/interop"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/urfave/cli/v2"
+	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 )
 
 // Ensure BeaconNode implements interfaces.
 var _ statefeed.Notifier = (*BeaconNode)(nil)
 
 // Test that beacon chain node can close.
-// TODO(rgeraldes24) - Fix embedded state mainnet
-/*
 func TestNodeClose_OK(t *testing.T) {
 	hook := logTest.NewGlobal()
 	tmp := fmt.Sprintf("%s/datadirtest2", t.TempDir())
@@ -45,10 +58,7 @@ func TestNodeClose_OK(t *testing.T) {
 
 	require.LogsContain(t, hook, "Stopping beacon node")
 }
-*/
 
-// TODO(rgeraldes24) - Fix embedded state mainnet
-/*
 func TestNodeStart_Ok(t *testing.T) {
 	hook := logTest.NewGlobal()
 	app := cli.App{}
@@ -72,10 +82,7 @@ func TestNodeStart_Ok(t *testing.T) {
 	require.LogsContain(t, hook, "Starting beacon node")
 
 }
-*/
 
-// TODO(rgeraldes24) - Fix embedded state mainnet
-/*
 func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 	numValidators := uint64(1)
 	hook := logTest.NewGlobal()
@@ -100,7 +107,7 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 	require.NoError(t, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < 2; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		genesisState.Validators = append(genesisState.Validators, &zondpb.Validator{
@@ -133,10 +140,8 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 	require.LogsContain(t, hook, "Starting beacon node")
 	require.NoError(t, os.Remove("genesis_ssz.json"))
 }
-*/
 
-// TODO(rgeraldes24) - Fix embedded state mainnet
-/*
+
 // TestClearDB tests clearing the database
 func TestClearDB(t *testing.T) {
 	hook := logTest.NewGlobal()
@@ -162,7 +167,6 @@ func TestClearDB(t *testing.T) {
 
 	require.LogsContain(t, hook, "Removing database")
 }
-*/
 
 func TestMonitor_RegisteredCorrectly(t *testing.T) {
 	app := cli.App{}
