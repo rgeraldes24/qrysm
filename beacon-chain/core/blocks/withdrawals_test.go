@@ -18,6 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 	"github.com/theQRL/qrysm/v4/encoding/ssz"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
+	"github.com/theQRL/qrysm/v4/proto/migration"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -1148,7 +1149,6 @@ func TestProcessDilithiumToExecutionChanges(t *testing.T) {
 	}
 }
 
-/*
 func TestDilithiumChangesSignatureBatch(t *testing.T) {
 	spb := &zondpb.BeaconState{
 		Fork: &zondpb.Fork{
@@ -1209,11 +1209,11 @@ func TestDilithiumChangesSignatureBatch(t *testing.T) {
 	require.Equal(t, true, verify)
 
 	// Verify a single change
-	change := migration.V1Alpha1SignedDilithiumToExecChangeToV1(signedChanges[0])
+	change := migration.V1Alpha1ToV1SignedDilithiumToExecChange(signedChanges[0])
 	require.NoError(t, blocks.VerifyDilithiumChangeSignature(st, change))
 }
-*/
 
+// NOTE(rgeraldes24): this test is not valid atm
 /*
 func TestDilithiumChangesSignatureBatchWrongFork(t *testing.T) {
 	spb := &zondpb.BeaconState{
@@ -1276,11 +1276,12 @@ func TestDilithiumChangesSignatureBatchWrongFork(t *testing.T) {
 	require.Equal(t, false, verify)
 
 	// Verify a single change
-	change := migration.V1Alpha1SignedDilithiumToExecChangeToV2(signedChanges[0])
+	change := migration.V1Alpha1ToV2SignedDilithiumToExecChange(signedChanges[0])
 	require.ErrorIs(t, signing.ErrSigFailedToVerify, blocks.VerifyDilithiumChangeSignature(st, change))
 }
 */
 
+// NOTE(rgeraldes24): this test is not valid atm
 /*
 func TestDilithiumChangesSignatureBatchFromBellatrix(t *testing.T) {
 	cfg := params.BeaconConfig()
@@ -1366,7 +1367,7 @@ func TestDilithiumChangesSignatureBatchFromBellatrix(t *testing.T) {
 	require.Equal(t, true, verify)
 
 	// Verify a single change
-	change := migration.V1Alpha1SignedDilithiumToExecChangeToV1(signedChanges[0])
+	change := migration.V1Alpha1ToV1SignedDilithiumToExecChange(signedChanges[0])
 	require.NoError(t, blocks.VerifyDilithiumChangeSignature(st, change))
 	params.OverrideBeaconConfig(savedConfig)
 }

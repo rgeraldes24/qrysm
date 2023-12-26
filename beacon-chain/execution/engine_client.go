@@ -93,7 +93,6 @@ type EngineCaller interface {
 		ctx context.Context, cfg *pb.TransitionConfiguration,
 	) error
 	ExecutionBlockByHash(ctx context.Context, hash common.Hash, withTxs bool) (*pb.ExecutionBlock, error)
-	//(ctx context.Context, transitionTime uint64) ([]byte, bool, error)
 }
 
 var EmptyBlockHash = errors.New("Block hash is empty 0x0000...")
@@ -235,20 +234,17 @@ func (s *Service) ExchangeTransitionConfiguration(
 	if !bytes.Equal(cfg.TerminalBlockHash, result.TerminalBlockHash) {
 		return errors.Wrapf(
 			ErrConfigMismatch,
-			"got %#x from execution node, wanted %#x",
+			"got terminal block hash %#x from execution node, wanted %#x",
 			result.TerminalBlockHash,
 			cfg.TerminalBlockHash,
 		)
 	}
-	ttdResult, err := hexutil.DecodeBig(result.TerminalTotalDifficulty)
-	if err != nil {
-		return errors.Wrap(err, "could not decode received terminal total difficulty")
-	}
-	if ttdResult.String() != cfg.TerminalTotalDifficulty {
+
+	if result.TerminalTotalDifficulty != cfg.TerminalTotalDifficulty {
 		return errors.Wrapf(
 			ErrConfigMismatch,
-			"got %s from execution node, wanted %s",
-			ttdResult.String(),
+			"got terminal total difficulty %s from execution node, wanted %s",
+			result.TerminalTotalDifficulty,
 			cfg.TerminalTotalDifficulty,
 		)
 	}
@@ -419,12 +415,6 @@ func (s *Service) ReconstructFullBlock(
 		return nil, errors.New("execution payload header in blinded block was nil")
 	}
 
-	// If the payload header has a block hash of 0x0, it means we are pre-merge and should
-	// simply return the block with an empty execution payload.
-	// if bytes.Equal(header.BlockHash(), params.BeaconConfig().ZeroHash[:]) {
-	// 	return blocks.BuildSignedBeaconBlockFromExecutionPayload(blindedBlock, buildEmptyExecutionPayload())
-	// }
-
 	executionBlockHash := common.BytesToHash(header.BlockHash())
 	payload, err := s.retrievePayloadFromExecutionHash(ctx, executionBlockHash, header, blindedBlock.Version())
 	if err != nil {
@@ -448,7 +438,6 @@ func (s *Service) ReconstructFullBlockBatch(
 	}
 	executionHashes := []common.Hash{}
 	validExecPayloads := []int{}
-	// zeroExecPayloads := []int{}
 	for i, b := range blindedBlocks {
 		if err := blocks.BeaconBlockIsNil(b); err != nil {
 			return nil, errors.Wrap(err, "cannot reconstruct bellatrix block from nil data")
@@ -464,18 +453,6 @@ func (s *Service) ReconstructFullBlockBatch(
 			return nil, errors.New("execution payload header in blinded block was nil")
 		}
 
-		// NOTE(rgeraldes24) - we wont have blocks pre-merge
-		// Determine if the block is pre-merge or post-merge. Depending on the result,
-		// we will ask the execution engine for the full payload.
-		/*
-			if bytes.Equal(header.BlockHash(), params.BeaconConfig().ZeroHash[:]) {
-				zeroExecPayloads = append(zeroExecPayloads, i)
-			} else {
-				executionBlockHash := common.BytesToHash(header.BlockHash())
-				validExecPayloads = append(validExecPayloads, i)
-				executionHashes = append(executionHashes, executionBlockHash)
-			}
-		*/
 		executionBlockHash := common.BytesToHash(header.BlockHash())
 		validExecPayloads = append(validExecPayloads, i)
 		executionHashes = append(executionHashes, executionBlockHash)
@@ -485,17 +462,6 @@ func (s *Service) ReconstructFullBlockBatch(
 		return nil, err
 	}
 
-	/*
-		// For blocks that are pre-merge we simply reconstruct them via an empty
-		// execution payload.
-		for _, realIdx := range zeroExecPayloads {
-			fullBlock, err := blocks.BuildSignedBeaconBlockFromExecutionPayload(blindedBlocks[realIdx], buildEmptyExecutionPayload())
-			if err != nil {
-				return nil, err
-			}
-			fullBlocks[realIdx] = fullBlock
-		}
-	*/
 	reconstructedExecutionPayloadCount.Add(float64(len(blindedBlocks)))
 	return fullBlocks, nil
 }
@@ -742,25 +708,6 @@ func tDStringToUint256(td string) (*uint256.Int, error) {
 	}
 	return i, nil
 }
-
-// TODO(rgeraldes24) - remove
-/*
-func buildEmptyExecutionPayload() *pb.ExecutionPayload {
-	return &pb.ExecutionPayload{
-		ParentHash:    make([]byte, fieldparams.RootLength),
-		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
-		StateRoot:     make([]byte, fieldparams.RootLength),
-		ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-		LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
-		PrevRandao:    make([]byte, fieldparams.RootLength),
-		BaseFeePerGas: make([]byte, fieldparams.RootLength),
-		BlockHash:     make([]byte, fieldparams.RootLength),
-		Transactions:  make([][]byte, 0),
-		ExtraData:     make([]byte, 0),
-		Withdrawals:   make([]*pb.Withdrawal, 0),
-	}
-}
-*/
 
 func toBlockNumArg(number *big.Int) string {
 	if number == nil {

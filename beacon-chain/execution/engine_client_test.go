@@ -32,6 +32,7 @@ import (
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
+	"github.com/theQRL/qrysm/v4/testing/util"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -397,47 +398,44 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepEqual(t, want, resp)
 	})
-	// FIX
-	/*
-		t.Run(ExchangeTransitionConfigurationMethod, func(t *testing.T) {
-			want, ok := fix["TransitionConfiguration"].(*pb.TransitionConfiguration)
-			require.Equal(t, true, ok)
-			encodedReq, err := json.Marshal(want)
+	t.Run(ExchangeTransitionConfigurationMethod, func(t *testing.T) {
+		want, ok := fix["TransitionConfiguration"].(*pb.TransitionConfiguration)
+		require.Equal(t, true, ok)
+		encodedReq, err := json.Marshal(want)
+		require.NoError(t, err)
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			defer func() {
+				require.NoError(t, r.Body.Close())
+			}()
+			enc, err := io.ReadAll(r.Body)
 			require.NoError(t, err)
-			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", "application/json")
-				defer func() {
-					require.NoError(t, r.Body.Close())
-				}()
-				enc, err := io.ReadAll(r.Body)
-				require.NoError(t, err)
-				jsonRequestString := string(enc)
-				// We expect the JSON string RPC request contains the right arguments.
-				require.Equal(t, true, strings.Contains(
-					jsonRequestString, string(encodedReq),
-				))
-				resp := map[string]interface{}{
-					"jsonrpc": "2.0",
-					"id":      1,
-					"result":  want,
-				}
-				err = json.NewEncoder(w).Encode(resp)
-				require.NoError(t, err)
-			}))
-			defer srv.Close()
-
-			rpcClient, err := rpc.DialHTTP(srv.URL)
+			jsonRequestString := string(enc)
+			// We expect the JSON string RPC request contains the right arguments.
+			require.Equal(t, true, strings.Contains(
+				jsonRequestString, string(encodedReq),
+			))
+			resp := map[string]interface{}{
+				"jsonrpc": "2.0",
+				"id":      1,
+				"result":  want,
+			}
+			err = json.NewEncoder(w).Encode(resp)
 			require.NoError(t, err)
-			defer rpcClient.Close()
+		}))
+		defer srv.Close()
 
-			client := &Service{}
-			client.rpcClient = rpcClient
+		rpcClient, err := rpc.DialHTTP(srv.URL)
+		require.NoError(t, err)
+		defer rpcClient.Close()
 
-			// We call the RPC method via HTTP and expect a proper result.
-			err = client.ExchangeTransitionConfiguration(ctx, want)
-			require.NoError(t, err)
-		})
-	*/
+		client := &Service{}
+		client.rpcClient = rpcClient
+
+		// We call the RPC method via HTTP and expect a proper result.
+		err = client.ExchangeTransitionConfiguration(ctx, want)
+		require.NoError(t, err)
+	})
 	t.Run(ExecutionBlockByHashMethod, func(t *testing.T) {
 		arg := common.BytesToHash([]byte("foo"))
 		want, ok := fix["ExecutionBlock"].(*pb.ExecutionBlock)
@@ -478,7 +476,6 @@ func TestClient_HTTP(t *testing.T) {
 	})
 }
 
-/*
 func TestReconstructFullBlock(t *testing.T) {
 	ctx := context.Background()
 	t.Run("nil block", func(t *testing.T) {
@@ -496,88 +493,88 @@ func TestReconstructFullBlock(t *testing.T) {
 		_, err = service.ReconstructFullBlock(ctx, wrapped)
 		require.ErrorContains(t, want, err)
 	})
-	t.Run("properly reconstructs block with correct payload", func(t *testing.T) {
-		fix := fixtures()
-		payload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
-		require.Equal(t, true, ok)
+	// TODO(rgeraldes24)
+	/*
+		t.Run("properly reconstructs block with correct payload", func(t *testing.T) {
+			fix := fixtures()
+			payload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
+			require.Equal(t, true, ok)
 
-		jsonPayload := make(map[string]interface{})
-		tx := zondtypes.NewTransaction(
-			0,
-			common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-			big.NewInt(0), 0, big.NewInt(0),
-			nil,
-		)
-		txs := []*zondtypes.Transaction{tx}
-		encodedBinaryTxs := make([][]byte, 1)
-		var err error
-		encodedBinaryTxs[0], err = txs[0].MarshalBinary()
-		require.NoError(t, err)
-		payload.Transactions = encodedBinaryTxs
-		jsonPayload["transactions"] = txs
-		num := big.NewInt(1)
-		encodedNum := hexutil.EncodeBig(num)
-		jsonPayload["hash"] = hexutil.Encode(payload.BlockHash)
-		jsonPayload["parentHash"] = common.BytesToHash([]byte("parent"))
-		jsonPayload["sha3Uncles"] = common.BytesToHash([]byte("uncles"))
-		jsonPayload["miner"] = common.BytesToAddress([]byte("miner"))
-		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
-		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
-		jsonPayload["receiptsRoot"] = common.BytesToHash([]byte("receipts"))
-		jsonPayload["logsBloom"] = zondtypes.BytesToBloom([]byte("bloom"))
-		jsonPayload["gasLimit"] = hexutil.EncodeUint64(1)
-		jsonPayload["gasUsed"] = hexutil.EncodeUint64(2)
-		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
-		jsonPayload["number"] = encodedNum
-		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
-		jsonPayload["totalDifficulty"] = "0x123456"
-		jsonPayload["difficulty"] = encodedNum
-		jsonPayload["size"] = encodedNum
-		jsonPayload["baseFeePerGas"] = encodedNum
-		jsonPayload["withdrawals"] = []*zondtypes.Withdrawal{}
+			jsonPayload := make(map[string]interface{})
+			tx := zondtypes.NewTransaction(
+				0,
+				common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
+				big.NewInt(0), 0, big.NewInt(0),
+				nil,
+			)
+			txs := []*zondtypes.Transaction{tx}
+			encodedBinaryTxs := make([][]byte, 1)
+			var err error
+			encodedBinaryTxs[0], err = txs[0].MarshalBinary()
+			require.NoError(t, err)
+			payload.Transactions = encodedBinaryTxs
+			jsonPayload["transactions"] = txs
+			num := big.NewInt(1)
+			encodedNum := hexutil.EncodeBig(num)
+			jsonPayload["hash"] = hexutil.Encode(payload.BlockHash)
+			jsonPayload["parentHash"] = common.BytesToHash([]byte("parent"))
+			jsonPayload["sha3Uncles"] = common.BytesToHash([]byte("uncles"))
+			jsonPayload["miner"] = common.BytesToAddress([]byte("miner"))
+			jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
+			jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
+			jsonPayload["receiptsRoot"] = common.BytesToHash([]byte("receipts"))
+			jsonPayload["logsBloom"] = zondtypes.BytesToBloom([]byte("bloom"))
+			jsonPayload["gasLimit"] = hexutil.EncodeUint64(1)
+			jsonPayload["gasUsed"] = hexutil.EncodeUint64(2)
+			jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
+			jsonPayload["number"] = encodedNum
+			jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
+			jsonPayload["totalDifficulty"] = "0x123456"
+			jsonPayload["difficulty"] = encodedNum
+			jsonPayload["size"] = encodedNum
+			jsonPayload["baseFeePerGas"] = encodedNum
+			jsonPayload["withdrawals"] = []*zondtypes.Withdrawal{}
 
-		wrappedPayload, err := blocks.WrappedExecutionPayload(payload, 0)
-		require.NoError(t, err)
-		header, err := blocks.PayloadToHeader(wrappedPayload)
-		require.NoError(t, err)
+			wrappedPayload, err := blocks.WrappedExecutionPayload(payload, 0)
+			require.NoError(t, err)
+			header, err := blocks.PayloadToHeader(wrappedPayload)
+			require.NoError(t, err)
 
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			defer func() {
-				require.NoError(t, r.Body.Close())
-			}()
-			respJSON := map[string]interface{}{
-				"jsonrpc": "2.0",
-				"id":      1,
-				"result":  jsonPayload,
-			}
-			require.NoError(t, json.NewEncoder(w).Encode(respJSON))
-		}))
-		defer srv.Close()
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				defer func() {
+					require.NoError(t, r.Body.Close())
+				}()
+				respJSON := map[string]interface{}{
+					"jsonrpc": "2.0",
+					"id":      1,
+					"result":  jsonPayload,
+				}
+				require.NoError(t, json.NewEncoder(w).Encode(respJSON))
+			}))
+			defer srv.Close()
 
-		rpcClient, err := rpc.DialHTTP(srv.URL)
-		require.NoError(t, err)
-		defer rpcClient.Close()
+			rpcClient, err := rpc.DialHTTP(srv.URL)
+			require.NoError(t, err)
+			defer rpcClient.Close()
 
-		service := &Service{}
-		service.rpcClient = rpcClient
-		blindedBlock := util.NewBlindedBeaconBlock()
+			service := &Service{}
+			service.rpcClient = rpcClient
+			blindedBlock := util.NewBlindedBeaconBlock()
 
-		blindedBlock.Block.Body.ExecutionPayloadHeader = header
-		wrapped, err := blocks.NewSignedBeaconBlock(blindedBlock)
-		require.NoError(t, err)
-		reconstructed, err := service.ReconstructFullBlock(ctx, wrapped)
-		require.NoError(t, err)
+			blindedBlock.Block.Body.ExecutionPayloadHeader = header
+			wrapped, err := blocks.NewSignedBeaconBlock(blindedBlock)
+			require.NoError(t, err)
+			reconstructed, err := service.ReconstructFullBlock(ctx, wrapped)
+			require.NoError(t, err)
 
-		got, err := reconstructed.Block().Body().Execution()
-		require.NoError(t, err)
-		require.DeepEqual(t, payload, got.Proto())
-	})
+			got, err := reconstructed.Block().Body().Execution()
+			require.NoError(t, err)
+			require.DeepEqual(t, payload, got.Proto())
+		})
+	*/
 }
-*/
 
-// TODO(rgeraldes24) - fix
-/*
 func TestReconstructFullBlockBatch(t *testing.T) {
 	ctx := context.Background()
 	t.Run("nil block", func(t *testing.T) {
@@ -595,117 +592,119 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		_, err = service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrapped})
 		require.ErrorContains(t, want, err)
 	})
-	t.Run("properly reconstructs block batch with correct payload", func(t *testing.T) {
-		fix := fixtures()
-		payload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
-		require.Equal(t, true, ok)
+	// TODO(rgeraldes24)
+	/*
+		t.Run("properly reconstructs block batch with correct payload", func(t *testing.T) {
+			fix := fixtures()
+			payload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
+			require.Equal(t, true, ok)
 
-		jsonPayload := make(map[string]interface{})
-		tx := zondtypes.NewTransaction(
-			0,
-			common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-			big.NewInt(0), 0, big.NewInt(0),
-			nil,
-		)
-		txs := []*zondtypes.Transaction{tx}
-		encodedBinaryTxs := make([][]byte, 1)
-		var err error
-		encodedBinaryTxs[0], err = txs[0].MarshalBinary()
-		require.NoError(t, err)
-		payload.Transactions = encodedBinaryTxs
-		jsonPayload["transactions"] = txs
-		num := big.NewInt(1)
-		encodedNum := hexutil.EncodeBig(num)
-		jsonPayload["hash"] = hexutil.Encode(payload.BlockHash)
-		jsonPayload["parentHash"] = common.BytesToHash([]byte("parent"))
-		jsonPayload["sha3Uncles"] = common.BytesToHash([]byte("uncles"))
-		jsonPayload["miner"] = common.BytesToAddress([]byte("miner"))
-		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
-		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
-		jsonPayload["receiptsRoot"] = common.BytesToHash([]byte("receipts"))
-		jsonPayload["logsBloom"] = zondtypes.BytesToBloom([]byte("bloom"))
-		jsonPayload["gasLimit"] = hexutil.EncodeUint64(1)
-		jsonPayload["gasUsed"] = hexutil.EncodeUint64(2)
-		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
-		jsonPayload["number"] = encodedNum
-		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
-		jsonPayload["totalDifficulty"] = "0x123456"
-		jsonPayload["difficulty"] = encodedNum
-		jsonPayload["size"] = encodedNum
-		jsonPayload["baseFeePerGas"] = encodedNum
-		jsonPayload["withdrawals"] = []*zondtypes.Withdrawal{}
+			jsonPayload := make(map[string]interface{})
+			tx := zondtypes.NewTransaction(
+				0,
+				common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
+				big.NewInt(0), 0, big.NewInt(0),
+				nil,
+			)
+			txs := []*zondtypes.Transaction{tx}
+			encodedBinaryTxs := make([][]byte, 1)
+			var err error
+			encodedBinaryTxs[0], err = txs[0].MarshalBinary()
+			require.NoError(t, err)
+			payload.Transactions = encodedBinaryTxs
+			jsonPayload["transactions"] = txs
+			num := big.NewInt(1)
+			encodedNum := hexutil.EncodeBig(num)
+			jsonPayload["hash"] = hexutil.Encode(payload.BlockHash)
+			jsonPayload["parentHash"] = common.BytesToHash([]byte("parent"))
+			jsonPayload["sha3Uncles"] = common.BytesToHash([]byte("uncles"))
+			jsonPayload["miner"] = common.BytesToAddress([]byte("miner"))
+			jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
+			jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
+			jsonPayload["receiptsRoot"] = common.BytesToHash([]byte("receipts"))
+			jsonPayload["logsBloom"] = zondtypes.BytesToBloom([]byte("bloom"))
+			jsonPayload["gasLimit"] = hexutil.EncodeUint64(1)
+			jsonPayload["gasUsed"] = hexutil.EncodeUint64(2)
+			jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
+			jsonPayload["number"] = encodedNum
+			jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
+			jsonPayload["totalDifficulty"] = "0x123456"
+			jsonPayload["difficulty"] = encodedNum
+			jsonPayload["size"] = encodedNum
+			jsonPayload["baseFeePerGas"] = encodedNum
+			jsonPayload["withdrawals"] = []*zondtypes.Withdrawal{}
 
-		wrappedPayload, err := blocks.WrappedExecutionPayload(payload, 0)
-		require.NoError(t, err)
-		header, err := blocks.PayloadToHeader(wrappedPayload)
-		require.NoError(t, err)
+			wrappedPayload, err := blocks.WrappedExecutionPayload(payload, 0)
+			require.NoError(t, err)
+			header, err := blocks.PayloadToHeader(wrappedPayload)
+			require.NoError(t, err)
 
-		bellatrixBlock := util.NewBlindedBeaconBlock()
-		wanted := util.NewBeaconBlock()
-		wanted.Block.Slot = 1
-		// Make sure block hash is the zero hash.
-		bellatrixBlock.Block.Body.ExecutionPayloadHeader.BlockHash = make([]byte, 32)
-		bellatrixBlock.Block.Slot = 1
-		wrappedEmpty, err := blocks.NewSignedBeaconBlock(bellatrixBlock)
-		require.NoError(t, err)
-		wantedWrappedEmpty, err := blocks.NewSignedBeaconBlock(wanted)
-		require.NoError(t, err)
+			capellaBlock := util.NewBlindedBeaconBlock()
+			wanted := util.NewBeaconBlock()
+			wanted.Block.Slot = 1
+			// Make sure block hash is the zero hash.
+			capellaBlock.Block.Body.ExecutionPayloadHeader.BlockHash = make([]byte, 32)
+			capellaBlock.Block.Slot = 1
+			wrappedEmpty, err := blocks.NewSignedBeaconBlock(capellaBlock)
+			require.NoError(t, err)
+			wantedWrappedEmpty, err := blocks.NewSignedBeaconBlock(wanted)
+			require.NoError(t, err)
 
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			defer func() {
-				require.NoError(t, r.Body.Close())
-			}()
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				defer func() {
+					require.NoError(t, r.Body.Close())
+				}()
 
-			respJSON := []map[string]interface{}{
-				{
-					"jsonrpc": "2.0",
-					"id":      1,
-					"result":  jsonPayload,
-				},
-				{
-					"jsonrpc": "2.0",
-					"id":      2,
-					"result":  jsonPayload,
-				},
-			}
-			require.NoError(t, json.NewEncoder(w).Encode(respJSON))
-			require.NoError(t, json.NewEncoder(w).Encode(respJSON))
+				respJSON := []map[string]interface{}{
+					{
+						"jsonrpc": "2.0",
+						"id":      1,
+						"result":  jsonPayload,
+					},
+					{
+						"jsonrpc": "2.0",
+						"id":      2,
+						"result":  jsonPayload,
+					},
+				}
+				require.NoError(t, json.NewEncoder(w).Encode(respJSON))
+				require.NoError(t, json.NewEncoder(w).Encode(respJSON))
 
-		}))
-		defer srv.Close()
+			}))
+			defer srv.Close()
 
-		rpcClient, err := rpc.DialHTTP(srv.URL)
-		require.NoError(t, err)
-		defer rpcClient.Close()
+			rpcClient, err := rpc.DialHTTP(srv.URL)
+			require.NoError(t, err)
+			defer rpcClient.Close()
 
-		service := &Service{}
-		service.rpcClient = rpcClient
-		blindedBlock := util.NewBlindedBeaconBlock()
+			service := &Service{}
+			service.rpcClient = rpcClient
+			blindedBlock := util.NewBlindedBeaconBlock()
 
-		blindedBlock.Block.Body.ExecutionPayloadHeader = header
-		wrapped, err := blocks.NewSignedBeaconBlock(blindedBlock)
-		require.NoError(t, err)
-		copiedWrapped, err := wrapped.Copy()
-		require.NoError(t, err)
+			blindedBlock.Block.Body.ExecutionPayloadHeader = header
+			wrapped, err := blocks.NewSignedBeaconBlock(blindedBlock)
+			require.NoError(t, err)
+			copiedWrapped, err := wrapped.Copy()
+			require.NoError(t, err)
 
-		reconstructed, err := service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrappedEmpty, wrapped, copiedWrapped})
-		require.NoError(t, err)
+			reconstructed, err := service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrappedEmpty, wrapped, copiedWrapped})
+			require.NoError(t, err)
 
-		// Make sure empty blocks are handled correctly
-		require.DeepEqual(t, wantedWrappedEmpty, reconstructed[0])
+			// Make sure empty blocks are handled correctly
+			require.DeepEqual(t, wantedWrappedEmpty, reconstructed[0])
 
-		// Handle normal execution blocks correctly
-		got, err := reconstructed[1].Block().Body().Execution()
-		require.NoError(t, err)
-		require.DeepEqual(t, payload, got.Proto())
+			// Handle normal execution blocks correctly
+			got, err := reconstructed[1].Block().Body().Execution()
+			require.NoError(t, err)
+			require.DeepEqual(t, payload, got.Proto())
 
-		got, err = reconstructed[2].Block().Body().Execution()
-		require.NoError(t, err)
-		require.DeepEqual(t, payload, got.Proto())
-	})
+			got, err = reconstructed[2].Block().Body().Execution()
+			require.NoError(t, err)
+			require.DeepEqual(t, payload, got.Proto())
+		})
+	*/
 }
-*/
 
 func Test_tDStringToUint256(t *testing.T) {
 	i, err := tDStringToUint256("0x0")
@@ -1024,12 +1023,9 @@ func fixtures() map[string]interface{} {
 		},
 		PayloadId: &id,
 	}
-	// b, _ := new(big.Int).SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
-	// ttd, _ := uint256.FromBig(b)
 	ttd, _ := uint256.FromBig(big.NewInt(0))
 	tbh := [32]byte{}
 	transitionCfg := &pb.TransitionConfiguration{
-		//TerminalBlockHash:       params.BeaconConfig().TerminalBlockHash[:],
 		TerminalBlockHash:       tbh[:],
 		TerminalTotalDifficulty: ttd.Hex(),
 		TerminalBlockNumber:     big.NewInt(0).Bytes(),

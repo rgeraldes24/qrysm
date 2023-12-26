@@ -70,32 +70,6 @@ func BenchmarkExecuteStateTransition_WithCache(b *testing.B) {
 	}
 }
 
-// NOTE(rgeraldes24) - ProcessEpochPrecompute replaced by ProcessEpoch after Altair fork
-/*
-func BenchmarkProcessEpoch_2FullEpochs(b *testing.B) {
-	undo, err := benchmark.SetBenchmarkConfig()
-	require.NoError(b, err)
-	defer undo()
-	beaconState, err := benchmark.PreGenstateFullEpochs()
-	require.NoError(b, err)
-
-	// We have to reset slot back to last epoch to hydrate cache. Since
-	// some attestations in block are from previous epoch
-	currentSlot := beaconState.Slot()
-	require.NoError(b, beaconState.SetSlot(beaconState.Slot()-params.BeaconConfig().SlotsPerEpoch))
-	require.NoError(b, helpers.UpdateCommitteeCache(context.Background(), beaconState, time.CurrentEpoch(beaconState)))
-	require.NoError(b, beaconState.SetSlot(currentSlot))
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		// ProcessEpochPrecompute is the optimized version of process epoch. It's enabled by default
-		// at run time.
-		_, err := coreState.ProcessEpochPrecompute(context.Background(), beaconState.Copy())
-		require.NoError(b, err)
-	}
-}
-*/
-
 func BenchmarkHashTreeRoot_FullState(b *testing.B) {
 	beaconState, err := benchmark.PreGenstateFullEpochs()
 	require.NoError(b, err)

@@ -1,14 +1,28 @@
 package execution
 
 import (
+	"context"
+	"fmt"
 	"testing"
 
+	logTest "github.com/sirupsen/logrus/hooks/test"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
+	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
+	testing2 "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/container/trie"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
+	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-const pubKeyErr = "could not convert bytes to public key"
+// const pubKeyErr = "could not convert bytes to public key"
 
 func TestDepositContractAddress_EmptyAddress(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
@@ -37,7 +51,6 @@ func TestDepositContractAddress_OK(t *testing.T) {
 	assert.Equal(t, params.BeaconConfig().DepositContractAddress, addr)
 }
 
-/*
 func TestProcessDeposit_OK(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	server, endpoint, err := testing2.SetupRPCServer()
@@ -66,9 +79,7 @@ func TestProcessDeposit_OK(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 1, int(valcount), "Did not get correct active validator count")
 }
-*/
 
-/*
 func TestProcessDeposit_InvalidMerkleBranch(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	server, endpoint, err := testing2.SetupRPCServer()
@@ -98,9 +109,9 @@ func TestProcessDeposit_InvalidMerkleBranch(t *testing.T) {
 
 	assert.ErrorContains(t, want, err)
 }
-*/
 
-// TODO(rgeraldes24) - check if it makes sense to keep this test
+// NOTE(rgeraldes24) - this test is not valid with dilithium because we don't do
+// a point validation that happens with BLS
 /*
 func TestProcessDeposit_InvalidPublicKey(t *testing.T) {
 	hook := logTest.NewGlobal()
@@ -142,13 +153,14 @@ func TestProcessDeposit_InvalidPublicKey(t *testing.T) {
 	require.NoError(t, err)
 
 	//require.LogsContain(t, hook, pubKeyErr)
-	// NOTE(rgeraldes24) - BLS has a unique validation during the pubkey parsing
+	// NOTE(rgeraldes24) - BLS has a unique validation that we don't have for dilithium
 	require.LogsContain(t, hook, "could not verify deposit data signature")
 	require.LogsContain(t, hook, "signature did not verify")
 }
 */
 
-// TODO(rgeraldes24) - same test as the next one after the change?
+// NOTE(rgeraldes24) - this test is not valid with dilithium because we don't do
+// a point validation that happens with BLS
 /*
 func TestProcessDeposit_InvalidSignature(t *testing.T) {
 	hook := logTest.NewGlobal()
@@ -167,7 +179,7 @@ func TestProcessDeposit_InvalidSignature(t *testing.T) {
 
 	deposits, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	var fakeSig [dilithium2.CryptoBytes]byte
+	var fakeSig [dilithiumlib.CryptoBytes]byte
 	copy(fakeSig[:], []byte{'F', 'A', 'K', 'E'})
 	deposits[0].Data.Signature = fakeSig[:]
 
@@ -189,13 +201,12 @@ func TestProcessDeposit_InvalidSignature(t *testing.T) {
 	require.NoError(t, err)
 
 	require.LogsContain(t, hook, "could not verify deposit data signature")
-	// NOTE(rgeraldes24) - BLS has a unique validation during the sig parsing
+	// NOTE(rgeraldes24) - BLS has a unique validation that we don't have for dilithium
 	// require.LogsContain(t, hook, "could not convert bytes to signature")
 	require.LogsContain(t, hook, "signature did not verify")
 }
 */
 
-/*
 func TestProcessDeposit_UnableToVerify(t *testing.T) {
 	hook := logTest.NewGlobal()
 	beaconDB := testDB.SetupDB(t)
@@ -233,9 +244,7 @@ func TestProcessDeposit_UnableToVerify(t *testing.T) {
 
 	require.LogsContain(t, hook, want)
 }
-*/
 
-/*
 func TestProcessDeposit_IncompleteDeposit(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	server, endpoint, err := testing2.SetupRPCServer()
@@ -255,7 +264,7 @@ func TestProcessDeposit_IncompleteDeposit(t *testing.T) {
 		Data: &zondpb.Deposit_Data{
 			Amount:                params.BeaconConfig().EffectiveBalanceIncrement, // incomplete deposit
 			WithdrawalCredentials: bytesutil.PadTo([]byte("testing"), 32),
-			Signature:             bytesutil.PadTo([]byte("test"), dilithium2.CryptoBytes),
+			Signature:             bytesutil.PadTo([]byte("test"), dilithiumlib.CryptoBytes),
 		},
 	}
 
@@ -304,9 +313,7 @@ func TestProcessDeposit_IncompleteDeposit(t *testing.T) {
 		require.Equal(t, 0, int(valcount), "Did not get correct active validator count")
 	}
 }
-*/
 
-/*
 func TestProcessDeposit_AllDepositedSuccessfully(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	server, endpoint, err := testing2.SetupRPCServer()
@@ -340,4 +347,3 @@ func TestProcessDeposit_AllDepositedSuccessfully(t *testing.T) {
 		assert.Equal(t, params.BeaconConfig().MaxEffectiveBalance, val.EffectiveBalance)
 	}
 }
-*/

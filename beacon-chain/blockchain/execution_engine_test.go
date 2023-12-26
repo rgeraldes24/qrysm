@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -8,8 +9,10 @@ import (
 	"github.com/theQRL/go-zond/common"
 	zondtypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
+	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
 	bstate "github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/features"
@@ -21,6 +24,7 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	v1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
@@ -233,8 +237,6 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 	}
 }
 
-// Fix
-/*
 func Test_NotifyForkchoiceUpdate_NIlLVH(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
@@ -307,15 +309,13 @@ func Test_NotifyForkchoiceUpdate_NIlLVH(t *testing.T) {
 	require.Equal(t, brd, InvalidAncestorRoots(err)[0])
 	require.Equal(t, 1, len(InvalidAncestorRoots(err)))
 }
-*/
 
+//	A <- B <- C <- D
+//	     \
+//	       ---------- E <- F
+//	                   \
+//	                     ------ G
 //
-//
-//  A <- B <- C <- D
-//       \
-//         ---------- E <- F
-//                     \
-//                       ------ G
 // D is the current head, attestations for F and G come late, both are invalid.
 // We switch recursively to F then G and finally to D.
 //
@@ -323,7 +323,6 @@ func Test_NotifyForkchoiceUpdate_NIlLVH(t *testing.T) {
 // 1. forkchoice removes blocks F and G from the forkchoice implementation
 // 2. forkchoice removes the weights of these blocks
 // 3. the blockchain package calls fcu to obtain heads G -> F -> D.
-/* FIX
 func Test_NotifyForkchoiceUpdateRecursive_DoublyLinkedTree(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
@@ -453,7 +452,6 @@ func Test_NotifyForkchoiceUpdateRecursive_DoublyLinkedTree(t *testing.T) {
 	require.Equal(t, false, fcs.HasNode(brg))
 	require.Equal(t, true, fcs.HasNode(bre))
 }
-*/
 
 func Test_NotifyNewPayload(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
@@ -650,7 +648,6 @@ func Test_NotifyNewPayload(t *testing.T) {
 
 func Test_NotifyNewPayload_SetOptimisticToValid(t *testing.T) {
 	cfg := params.BeaconConfig()
-	//cfg.TerminalTotalDifficulty = "2"
 	params.OverrideBeaconConfig(cfg)
 
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
@@ -774,8 +771,6 @@ func Test_GetPayloadAttribute(t *testing.T) {
 	require.Equal(t, 0, len(a))
 }
 
-// Fix beacon-chain/state/genesis/mainnet.ssz file to match capella
-/*
 func Test_UpdateLastValidatedCheckpoint(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MainnetConfig())
@@ -884,10 +879,7 @@ func Test_UpdateLastValidatedCheckpoint(t *testing.T) {
 	require.NoError(t, err)
 	require.DeepEqual(t, oldCp, got)
 }
-*/
 
-// TODO (rgeraldes24) fix
-/*
 func TestService_removeInvalidBlockAndState(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
@@ -932,7 +924,6 @@ func TestService_removeInvalidBlockAndState(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, false, has)
 }
-*/
 
 func TestService_getPayloadHash(t *testing.T) {
 	service, tr := minimalTestService(t)

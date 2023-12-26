@@ -387,7 +387,6 @@ func TestVerifyAttestations_HandlesPlannedFork(t *testing.T) {
 }
 */
 
-// TODO(rgeraldes24) - come back to this one after the first test iteration
 func TestRetrieveAttestationSignatureSet_VerifiesMultipleAttestations(t *testing.T) {
 	ctx := context.Background()
 	numOfValidators := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(4))

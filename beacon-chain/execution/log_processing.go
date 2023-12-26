@@ -10,7 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	ethereum "github.com/theQRL/go-zond"
+	zond "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/common"
 	zondtypes "github.com/theQRL/go-zond/core/types"
@@ -58,7 +58,7 @@ func (s *Service) GenesisExecutionChainInfo() (uint64, *big.Int) {
 
 // ProcessZOND1Block processes logs from the provided zond1 block.
 func (s *Service) ProcessZOND1Block(ctx context.Context, blkNum *big.Int) error {
-	query := ethereum.FilterQuery{
+	query := zond.FilterQuery{
 		Addresses: []common.Address{
 			s.cfg.depositContractAddr,
 		},
@@ -211,7 +211,7 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog zondtypes.Lo
 				log.WithFields(logrus.Fields{
 					"deposits":          deposits,
 					"genesisValidators": valCount,
-				}).Info("Processing deposits from Ethereum 1 chain")
+				}).Info("Processing deposits from Zond 1 chain")
 			}
 		}
 	} else {
@@ -277,8 +277,6 @@ func createGenesisTime(timeStamp uint64) uint64 {
 // updates the deposit trie with the data from each individual log.
 func (s *Service) processPastLogs(ctx context.Context) error {
 	currentBlockNum := s.latestZond1Data.LastRequestedBlock
-	// deploymentBlock := params.BeaconNetworkConfig().ContractDeploymentBlock
-	// NOTE(rgeraldes24) - pure PoS
 	deploymentBlock := uint64(0)
 	// Start from the deployment block if our last requested block
 	// is behind it. This is as the deposit logs can only start from the
@@ -367,7 +365,7 @@ func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint6
 	if end > latestFollowHeight {
 		end = latestFollowHeight
 	}
-	query := ethereum.FilterQuery{
+	query := zond.FilterQuery{
 		Addresses: []common.Address{
 			s.cfg.depositContractAddr,
 		},

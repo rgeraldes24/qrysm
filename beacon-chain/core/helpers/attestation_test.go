@@ -13,11 +13,11 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
+	"github.com/theQRL/qrysm/v4/testing/util"
 	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-/*
 func TestAttestation_IsAggregator(t *testing.T) {
 	t.Run("aggregator", func(t *testing.T) {
 		beaconState, privKeys := util.DeterministicGenesisState(t, 100)
@@ -36,13 +36,13 @@ func TestAttestation_IsAggregator(t *testing.T) {
 
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
 		require.NoError(t, err)
-		sig := privKeys[0].Sign([]byte{'A'})
+		sig := privKeys[0].Sign([]byte{'B'})
 		agg, err := helpers.IsAggregator(uint64(len(committee)), sig.Marshal())
 		require.NoError(t, err)
 		assert.Equal(t, false, agg, "Wanted aggregator false")
 	})
+
 }
-*/
 
 func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {
 	// Create 10 committees

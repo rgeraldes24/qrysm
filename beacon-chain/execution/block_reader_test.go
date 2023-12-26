@@ -1,17 +1,22 @@
 package execution
 
-/*
 import (
 	"context"
 	"math/big"
 	"testing"
+	"time"
 
+	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-zond/common/hexutil"
 	zondTypes "github.com/theQRL/go-zond/core/types"
 	dbutil "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/execution/types"
+	contracts "github.com/theQRL/qrysm/v4/contracts/deposit"
+	"github.com/theQRL/qrysm/v4/contracts/deposit/mock"
+	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
-*/
 
 func setDefaultMocks(service *Service) *Service {
 	service.httpLogger = &goodLogger{}
@@ -19,8 +24,6 @@ func setDefaultMocks(service *Service) *Service {
 	return service
 }
 
-// TODO(rgeraldes24) fix
-/*
 func TestLatestMainchainInfo_OK(t *testing.T) {
 	testAcc, err := mock.Setup()
 	require.NoError(t, err, "Unable to set up simulated backend")
@@ -65,9 +68,7 @@ func TestLatestMainchainInfo_OK(t *testing.T) {
 	assert.Equal(t, hexutil.Encode(web3Service.latestZond1Data.BlockHash), header.Hash.Hex())
 	assert.Equal(t, web3Service.latestZond1Data.BlockTime, header.Time)
 }
-*/
 
-/*
 func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
@@ -100,9 +101,7 @@ func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, true, exists, "Expected block info to be cached")
 }
-*/
 
-/*
 func TestBlockHashByHeight_ReturnsError_WhenNoZond1Client(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
@@ -123,9 +122,7 @@ func TestBlockHashByHeight_ReturnsError_WhenNoZond1Client(t *testing.T) {
 	_, err = web3Service.BlockHashByHeight(ctx, big.NewInt(0))
 	require.ErrorContains(t, "nil rpc client", err)
 }
-*/
 
-/*
 func TestBlockExists_ValidHash(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	testAcc, err := mock.Setup()
@@ -156,9 +153,7 @@ func TestBlockExists_ValidHash(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, true, exists, "Expected block to be cached")
 }
-*/
 
-/*
 func TestBlockExists_InvalidHash(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
@@ -177,9 +172,7 @@ func TestBlockExists_InvalidHash(t *testing.T) {
 	_, _, err = web3Service.BlockExists(context.Background(), common.BytesToHash([]byte{0}))
 	require.NotNil(t, err, "Expected BlockExists to error with invalid hash")
 }
-*/
 
-/*
 func TestBlockExists_UsesCachedBlockInfo(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
@@ -205,9 +198,7 @@ func TestBlockExists_UsesCachedBlockInfo(t *testing.T) {
 	require.Equal(t, true, exists)
 	require.Equal(t, 0, height.Cmp(header.Number))
 }
-*/
 
-/*
 func TestService_BlockNumberByTimestamp(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	testAcc, err := mock.Setup()
@@ -239,9 +230,7 @@ func TestService_BlockNumberByTimestamp(t *testing.T) {
 		t.Error("Returned a block with zero number, expected to be non zero")
 	}
 }
-*/
 
-/*
 func TestService_BlockNumberByTimestampLessTargetTime(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	testAcc, err := mock.Setup()
@@ -279,9 +268,7 @@ func TestService_BlockNumberByTimestampLessTargetTime(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEqual(t, hd.Number.Uint64(), blk.Number.Uint64(), "retrieved block is not less than the head")
 }
-*/
 
-/*
 func TestService_BlockNumberByTimestampMoreTargetTime(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	testAcc, err := mock.Setup()
@@ -319,9 +306,7 @@ func TestService_BlockNumberByTimestampMoreTargetTime(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, hd.Number.Uint64(), blk.Number.Uint64(), "retrieved block is not equal to the head")
 }
-*/
 
-/*
 func TestService_BlockTimeByHeight_ReturnsError_WhenNoZond1Client(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
@@ -342,4 +327,3 @@ func TestService_BlockTimeByHeight_ReturnsError_WhenNoZond1Client(t *testing.T) 
 	_, err = web3Service.BlockTimeByHeight(ctx, big.NewInt(0))
 	require.ErrorContains(t, "nil rpc client", err)
 }
-*/

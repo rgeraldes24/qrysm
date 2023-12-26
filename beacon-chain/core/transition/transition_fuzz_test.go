@@ -155,26 +155,6 @@ func TestFuzzCanProcessEpoch_10000(t *testing.T) {
 	}
 }
 
-// NOTE(rgeraldes24) - ProcessEpochPrecompute replaced by ProcessEpoch after Altair fork
-/*
-func TestFuzzProcessEpochPrecompute_1000(t *testing.T) {
-	SkipSlotCache.Disable()
-	defer SkipSlotCache.Enable()
-	ctx := context.Background()
-	state, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconState{})
-	require.NoError(t, err)
-	fuzzer := fuzz.NewWithSeed(0)
-	fuzzer.NilChance(0.1)
-	for i := 0; i < 1000; i++ {
-		fuzzer.Fuzz(state)
-		s, err := ProcessEpochPrecompute(ctx, state)
-		if err != nil && s != nil {
-			t.Fatalf("state should be nil on err. found: %v on error: %v for state: %v", s, err, state)
-		}
-	}
-}
-*/
-
 func TestFuzzProcessBlockForStateRoot_1000(t *testing.T) {
 	SkipSlotCache.Disable()
 	defer SkipSlotCache.Enable()

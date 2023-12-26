@@ -15,25 +15,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
-/*
-//TODO(rgeraldes24) - method not used anymore(ProcessAttestationNoVerifySignatures)
-func TestFuzzProcessAttestationNoVerify_10000(t *testing.T) {
-	fuzzer := fuzz.NewWithSeed(0)
-	ctx := context.Background()
-	state := &zondpb.BeaconState{}
-	att := &zondpb.Attestation{}
-
-	for i := 0; i < 10000; i++ {
-		fuzzer.Fuzz(state)
-		fuzzer.Fuzz(att)
-		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
-		require.NoError(t, err)
-		_, err = ProcessAttestationNoVerifySignatures(ctx, s, att)
-		_ = err
-	}
-}
-*/
-
 func TestFuzzProcessBlockHeader_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	state := &zondpb.BeaconState{}
@@ -263,31 +244,6 @@ func TestFuzzslashableAttesterIndices_10000(_ *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24) - review, method(ProcessAttestationsNoVerifySignatures) not used by capella
-/*
-func TestFuzzProcessAttestationsNoVerify_10000(t *testing.T) {
-	fuzzer := fuzz.NewWithSeed(0)
-	state := &zondpb.BeaconState{}
-	b := &zondpb.SignedBeaconBlock{}
-	ctx := context.Background()
-	for i := 0; i < 10000; i++ {
-		fuzzer.Fuzz(state)
-		fuzzer.Fuzz(b)
-		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
-		require.NoError(t, err)
-		if b.Block == nil || b.Block.Body == nil {
-			continue
-		}
-		wsb, err := blocks.NewSignedBeaconBlock(b)
-		require.NoError(t, err)
-		r, err := ProcessAttestationsNoVerifySignatures(ctx, s, wsb)
-		if err != nil && r != nil {
-			t.Fatalf("return value should be nil on err. found: %v on error: %v for state: %v and block: %v", r, err, state, b)
-		}
-	}
-}
-*/
-
 func TestFuzzVerifyIndexedAttestationn_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	state := &zondpb.BeaconState{}
@@ -303,7 +259,7 @@ func TestFuzzVerifyIndexedAttestationn_10000(t *testing.T) {
 	}
 }
 
-// FIX
+// TODO FIX
 /*
 func TestFuzzVerifyAttestation_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)

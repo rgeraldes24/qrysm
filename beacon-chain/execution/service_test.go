@@ -3,6 +3,7 @@ package execution
 import (
 	"context"
 	"math/big"
+	"strings"
 	"testing"
 	"time"
 
@@ -80,7 +81,6 @@ func (g *goodNotifier) StateFeed() *event.Feed {
 
 var depositsReqForChainStart = 64
 
-/*
 func TestStart_OK(t *testing.T) {
 	hook := logTest.NewGlobal()
 	beaconDB := dbutil.SetupDB(t)
@@ -114,9 +114,7 @@ func TestStart_OK(t *testing.T) {
 	hook.Reset()
 	web3Service.cancel()
 }
-*/
 
-/*
 func TestStart_NoHttpEndpointDefinedFails_WithoutChainStarted(t *testing.T) {
 	hook := logTest.NewGlobal()
 	beaconDB := dbutil.SetupDB(t)
@@ -130,9 +128,7 @@ func TestStart_NoHttpEndpointDefinedFails_WithoutChainStarted(t *testing.T) {
 	require.NoError(t, err)
 	require.LogsDoNotContain(t, hook, "missing address")
 }
-*/
 
-/*
 func TestStop_OK(t *testing.T) {
 	hook := logTest.NewGlobal()
 	testAcc, err := mock.Setup()
@@ -163,9 +159,7 @@ func TestStop_OK(t *testing.T) {
 
 	hook.Reset()
 }
-*/
 
-/*
 func TestService_Zond1Synced(t *testing.T) {
 	testAcc, err := mock.Setup()
 	require.NoError(t, err, "Unable to set up simulated backend")
@@ -190,9 +184,7 @@ func TestService_Zond1Synced(t *testing.T) {
 	assert.NoError(t, testAcc.Backend.AdjustTime(now.Sub(time.Unix(int64(currTime), 0))))
 	testAcc.Backend.Commit()
 }
-*/
 
-/*
 func TestFollowBlock_OK(t *testing.T) {
 	testAcc, err := mock.Setup()
 	require.NoError(t, err, "Unable to set up simulated backend")
@@ -244,7 +236,6 @@ func TestFollowBlock_OK(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, expectedHeight, h, "Unexpected block height")
 }
-*/
 
 func TestStatus(t *testing.T) {
 	now := time.Now()

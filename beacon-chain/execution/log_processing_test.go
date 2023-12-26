@@ -2,18 +2,28 @@ package execution
 
 import (
 	"context"
+	"encoding/binary"
+	"math/big"
 	"testing"
+	"time"
 
+	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/theQRL/go-zond"
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
+	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
+	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	contracts "github.com/theQRL/qrysm/v4/contracts/deposit"
 	"github.com/theQRL/qrysm/v4/contracts/deposit/mock"
+	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
+	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-/*
 func TestProcessDepositLog_OK(t *testing.T) {
 	hook := logTest.NewGlobal()
 
@@ -84,9 +94,7 @@ func TestProcessDepositLog_OK(t *testing.T) {
 
 	hook.Reset()
 }
-*/
 
-/*
 func TestProcessDepositLog_InsertsPendingDeposit(t *testing.T) {
 	hook := logTest.NewGlobal()
 	testAcc, err := mock.Setup()
@@ -151,9 +159,7 @@ func TestProcessDepositLog_InsertsPendingDeposit(t *testing.T) {
 
 	hook.Reset()
 }
-*/
 
-/*
 func TestUnpackDepositLogData_OK(t *testing.T) {
 	testAcc, err := mock.Setup()
 	require.NoError(t, err, "Unable to set up simulated backend")
@@ -204,9 +210,7 @@ func TestUnpackDepositLogData_OK(t *testing.T) {
 	require.DeepEqual(t, data.Signature, loggedSig, "Proof of Possession is not the same as the data that was put in")
 	require.DeepEqual(t, data.WithdrawalCredentials, withCreds, "Withdrawal Credentials is not the same as the data that was put in")
 }
-*/
 
-/*
 func TestProcessZOND2GenesisLog_8DuplicatePubkeys(t *testing.T) {
 	hook := logTest.NewGlobal()
 	testAcc, err := mock.Setup()
@@ -277,9 +281,7 @@ func TestProcessZOND2GenesisLog_8DuplicatePubkeys(t *testing.T) {
 	require.LogsDoNotContain(t, hook, "Minimum number of validators reached for beacon-chain to start")
 	hook.Reset()
 }
-*/
 
-/*
 func TestProcessZOND2GenesisLog(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	cfg := params.BeaconConfig().Copy()
@@ -375,9 +377,7 @@ func TestProcessZOND2GenesisLog(t *testing.T) {
 
 	hook.Reset()
 }
-*/
 
-/*
 func TestProcessZOND2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	hook := logTest.NewGlobal()
@@ -412,7 +412,6 @@ func TestProcessZOND2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 	bConfig.SecondsPerZOND1Block = 10
 	params.OverrideBeaconConfig(bConfig)
 	nConfig := params.BeaconNetworkConfig()
-	//nConfig.ContractDeploymentBlock = 0
 	params.OverrideBeaconNetworkConfig(nConfig)
 
 	testAcc.Backend.Commit()
@@ -474,9 +473,7 @@ func TestProcessZOND2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 
 	hook.Reset()
 }
-*/
 
-/*
 func TestProcessZOND2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	hook := logTest.NewGlobal()
@@ -510,7 +507,6 @@ func TestProcessZOND2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 	bConfig.SecondsPerZOND1Block = 10
 	params.OverrideBeaconConfig(bConfig)
 	nConfig := params.BeaconNetworkConfig()
-	//nConfig.ContractDeploymentBlock = 0
 	params.OverrideBeaconNetworkConfig(nConfig)
 
 	testAcc.Backend.Commit()
@@ -583,9 +579,7 @@ func TestProcessZOND2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 
 	hook.Reset()
 }
-*/
 
-/*
 func TestCheckForChainstart_NoValidator(t *testing.T) {
 	hook := logTest.NewGlobal()
 	testAcc, err := mock.Setup()
@@ -595,7 +589,6 @@ func TestCheckForChainstart_NoValidator(t *testing.T) {
 	s.processChainStartIfReady(context.Background(), [32]byte{}, nil, 0)
 	require.LogsDoNotContain(t, hook, "Could not determine active validator count from pre genesis state")
 }
-*/
 
 func newPowchainService(t *testing.T, zond1Backend *mock.TestAccount, beaconDB db.Database) *Service {
 	depositCache, err := depositcache.New()

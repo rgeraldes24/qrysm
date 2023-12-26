@@ -17,8 +17,10 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	pb "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
+	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
 func FuzzForkChoiceResponse(f *testing.F) {
@@ -165,6 +167,8 @@ func FuzzExecutionPayload(f *testing.F) {
 func FuzzExecutionBlock(f *testing.F) {
 	f.Skip("Is skipped until false positive rate can be resolved.")
 	logsBloom := [256]byte{'j', 'u', 'n', 'k'}
+	priv, err := dilithium.RandKey()
+	require.NoError(f, err)
 	addr := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	innerData := &types.DynamicFeeTx{
 		ChainID:   big.NewInt(math.MaxInt),
@@ -176,11 +180,8 @@ func FuzzExecutionBlock(f *testing.F) {
 		Value:     big.NewInt(math.MaxInt),
 		Data:      []byte{'r', 'a', 'n', 'd', 'o', 'm'},
 
-		// Signature values
-		// TODO(rgeraldes24)
-		//V: big.NewInt(0),
-		//R: big.NewInt(math.MaxInt),
-		//S: big.NewInt(math.MaxInt),
+		Signature: priv.Sign([]byte("foo")).Marshal(),
+		PublicKey: priv.PublicKey().Marshal(),
 	}
 	tx := types.NewTx(innerData)
 	execBlock := &pb.ExecutionBlock{

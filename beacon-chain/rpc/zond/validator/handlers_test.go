@@ -227,7 +227,6 @@ func TestGetAggregateAttestation(t *testing.T) {
 	})
 }
 
-/*
 func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *testing.T) {
 	root := bytesutil.PadTo([]byte("root"), 32)
 	sig := bytesutil.PadTo([]byte("sig"), fieldparams.DilithiumSignatureLength)
@@ -284,9 +283,13 @@ func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *te
 	resp := &AggregateAttestationResponse{}
 	require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 	require.NotNil(t, resp)
-	assert.DeepEqual(t, "0x03000001", resp.Data.ParticipationBits)
+	// NOTE(rgeraldes24) - this test is not ok in the original repo the result is not correct
+	// The test on the original repo thrown this error
+	// "could not create signature from byte slice: could not unmarshal bytes into signature
+	// that ends up removing one attestation and influences the final result
+	// assert.DeepEqual(t, "0x03000001", resp.Data.ParticipationBits)
+	assert.DeepEqual(t, "0x03030001", resp.Data.ParticipationBits)
 }
-*/
 
 func TestSubmitContributionAndProofs(t *testing.T) {
 	c := &core.Service{

@@ -3,9 +3,9 @@ package blocks
 import (
 	"context"
 	"encoding/binary"
+	"runtime"
 
 	"github.com/pkg/errors"
-	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -17,6 +17,7 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/time/slots"
+	"golang.org/x/sync/errgroup"
 )
 
 // retrieves the signature batch from the raw data, public key, signature and domain provided.
@@ -50,25 +51,33 @@ func verifySignature(signedData, pub, signature, domain []byte) error {
 	if len(set.Signatures) != 1 {
 		return errors.Errorf("signature set contains multiple signatures batches instead of 1")
 	}
-	if len(set.Signatures[0]) != 1 {
-		return errors.Errorf("signatures batch with index 0 contains %d signatures instead of 1", len(set.Signatures[0]))
-	}
 
-	totalSigsLen := len(set.PublicKeys[0]) * dilithiumlib.CryptoBytes
-	if totalSigsLen != len(set.Signatures[0]) {
-		return errors.Errorf("signature set length is %d instead of %d", len(set.Signatures[0]), totalSigsLen)
-	}
 	// We assume only one signature set is returned here.
-	sig := set.Signatures[0][0]
-	publicKey := set.PublicKeys[0][0]
+	sigs := set.Signatures[0]
+	publicKeys := set.PublicKeys[0]
 	root := set.Messages[0]
 
-	rSig, err := dilithium.SignatureFromBytes(sig)
-	if err != nil {
-		return err
+	n := runtime.GOMAXPROCS(0) - 1
+	grp := errgroup.Group{}
+	grp.SetLimit(n)
+
+	for i := 0; i < len(sigs); i++ {
+		iCopy := i
+		grp.Go(func() error {
+			rSig, err := dilithium.SignatureFromBytes(sigs[iCopy])
+			if err != nil {
+				return err
+			}
+			if !rSig.Verify(publicKeys[iCopy], root[:]) {
+				return signing.ErrSigFailedToVerify
+			}
+
+			return nil
+		})
 	}
-	if !rSig.Verify(publicKey, root[:]) {
-		return signing.ErrSigFailedToVerify
+
+	if err := grp.Wait(); err != nil {
+		return err
 	}
 
 	return nil

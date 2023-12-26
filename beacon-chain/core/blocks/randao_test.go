@@ -1,7 +1,5 @@
 package blocks_test
 
-// FIX
-/*
 import (
 	"context"
 	"encoding/binary"
@@ -93,4 +91,3 @@ func TestRandaoSignatureSet_OK(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, true, verified, "Unable to verify randao signature set")
 }
-*/
