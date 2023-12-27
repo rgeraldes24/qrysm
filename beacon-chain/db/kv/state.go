@@ -112,16 +112,7 @@ func (s *Store) GenesisState(ctx context.Context) (state.BeaconState, error) {
 func (s *Store) SaveState(ctx context.Context, st state.ReadOnlyBeaconState, blockRoot [32]byte) error {
 	ctx, span := trace.StartSpan(ctx, "BeaconDB.SaveState")
 	defer span.End()
-	/*
-		ok, err := s.isStateValidatorMigrationOver()
-		if err != nil {
-			return err
-		}
-		if ok {
-			return s.SaveStatesEfficient(ctx, []state.ReadOnlyBeaconState{st}, [][32]byte{blockRoot})
-		}
-		return s.SaveStates(ctx, []state.ReadOnlyBeaconState{st}, [][32]byte{blockRoot})
-	*/
+
 	return s.SaveStatesEfficient(ctx, []state.ReadOnlyBeaconState{st}, [][32]byte{blockRoot})
 }
 
@@ -448,18 +439,9 @@ func marshalState(ctx context.Context, st state.ReadOnlyBeaconState) ([]byte, er
 // Retrieve the validator entries for a given block root. These entries are stored in a
 // separate bucket to reduce state size.
 func (s *Store) validatorEntries(ctx context.Context, blockRoot [32]byte) ([]*zondpb.Validator, error) {
-	/*
-		ok, err := s.isStateValidatorMigrationOver()
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return make([]*zondpb.Validator, 0), nil
-		}
-	*/
 	ctx, span := trace.StartSpan(ctx, "BeaconDB.validatorEntries")
 	defer span.End()
-	var validatorEntries []*zondpb.Validator
+	validatorEntries := make([]*zondpb.Validator, 0)
 	err := s.db.View(func(tx *bolt.Tx) error {
 		// get the validator keys from the index bucket
 		idxBkt := tx.Bucket(blockRootValidatorHashesBucket)
@@ -726,25 +708,3 @@ func (s *Store) CleanUpDirtyStates(ctx context.Context, slotsPerArchivedPoint pr
 
 	return err
 }
-
-/*
-func (s *Store) isStateValidatorMigrationOver() (bool, error) {
-	// if flag is enabled, then always follow the new code path.
-	if features.Get().EnableHistoricalSpaceRepresentation {
-		return true, nil
-	}
-
-	// if the flag is not enabled, but the migration is over, then
-	// follow the new code path as if the flag is enabled.
-	returnFlag := false
-	if err := s.db.View(func(tx *bolt.Tx) error {
-		mb := tx.Bucket(migrationsBucket)
-		b := mb.Get(migrationStateValidatorsKey)
-		returnFlag = bytes.Equal(b, migrationCompleted)
-		return nil
-	}); err != nil {
-		return returnFlag, err
-	}
-	return returnFlag, nil
-}
-*/

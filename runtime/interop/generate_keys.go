@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	// TODO(@rgeraldes24): replace with config param?
 	dilithiumWithdrawalPrefixByte = byte(0)
 )
 

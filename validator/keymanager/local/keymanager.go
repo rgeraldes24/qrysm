@@ -413,11 +413,10 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 		if !cfg.ShowDepositData {
 			continue
 		}
-		// TODO(@rgeraldes24): review
 		fmt.Printf(
 			"%s\n",
-			au.BrightRed("If you imported your account coming from the zond2 launchpad, you will find your "+
-				"deposit_data.json in the zond2.0-deposit-cli's validator_keys folder"),
+			au.BrightRed("If you imported your account coming from the QRL launchpad, you will find your "+
+				"deposit_data.json in the staking-deposit-cli's validator_keys folder"),
 		)
 		fmt.Println("")
 	}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -14,7 +15,12 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-/*
+// NOTE(rgeraldes24): cache is not empty when running tests like TestService_HeadSyncCommitteeIndices
+// along with the other package tests - without filtering(--test_filter) the specific test via bazel.
+func init() {
+	transition.SkipSlotCache.Disable()
+}
+
 func TestService_HeadSyncCommitteeIndices(t *testing.T) {
 	s, _ := util.DeterministicGenesisState(t, params.BeaconConfig().TargetCommitteeSize)
 	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
@@ -37,9 +43,7 @@ func TestService_HeadSyncCommitteeIndices(t *testing.T) {
 	require.NoError(t, err)
 	require.DeepNotEqual(t, a, b)
 }
-*/
 
-/*
 func TestService_headCurrentSyncCommitteeIndices(t *testing.T) {
 	s, _ := util.DeterministicGenesisState(t, params.BeaconConfig().TargetCommitteeSize)
 	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
@@ -53,12 +57,10 @@ func TestService_headCurrentSyncCommitteeIndices(t *testing.T) {
 	// NextSyncCommittee becomes CurrentSyncCommittee so it should be 4 by default.
 	require.Equal(t, 4, len(indices))
 }
-*/
 
-// NOTE(rgeraldes24) - this test also panics in the prysm repo; added a beaconDB
 func TestService_headNextSyncCommitteeIndices(t *testing.T) {
 	s, _ := util.DeterministicGenesisState(t, params.BeaconConfig().TargetCommitteeSize)
-	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
+	c := &Service{}
 	c.head = &head{state: s}
 
 	// Process slot up to `EpochsPerSyncCommitteePeriod` so it can `ProcessSyncCommitteeUpdates`.
@@ -99,10 +101,9 @@ func TestService_HeadSyncCommitteeDomain(t *testing.T) {
 	require.DeepEqual(t, wanted, d)
 }
 
-// NOTE(rgeraldes24) - this test also panics in the prysm repo; added a beaconDB
 func TestService_HeadSyncContributionProofDomain(t *testing.T) {
 	s, _ := util.DeterministicGenesisState(t, params.BeaconConfig().TargetCommitteeSize)
-	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
+	c := &Service{}
 	c.head = &head{state: s}
 
 	wanted, err := signing.Domain(s.Fork(), slots.ToEpoch(s.Slot()), params.BeaconConfig().DomainContributionAndProof, s.GenesisValidatorsRoot())
@@ -114,10 +115,9 @@ func TestService_HeadSyncContributionProofDomain(t *testing.T) {
 	require.DeepEqual(t, wanted, d)
 }
 
-// NOTE(rgeraldes24) - this test also panics in the prysm repo; added a beaconDB
 func TestService_HeadSyncSelectionProofDomain(t *testing.T) {
 	s, _ := util.DeterministicGenesisState(t, params.BeaconConfig().TargetCommitteeSize)
-	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
+	c := &Service{}
 	c.head = &head{state: s}
 
 	wanted, err := signing.Domain(s.Fork(), slots.ToEpoch(s.Slot()), params.BeaconConfig().DomainSyncCommitteeSelectionProof, s.GenesisValidatorsRoot())

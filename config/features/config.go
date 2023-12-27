@@ -37,14 +37,13 @@ const disabledFeatureFlag = "Disabled feature flag"
 // Flags is a struct to represent which features the client will perform on runtime.
 type Flags struct {
 	// Feature related flags.
-	RemoteSlasherProtection             bool // RemoteSlasherProtection utilizes a beacon node with --slasher mode for validator slashing protection.
-	WriteSSZStateTransitions            bool // WriteSSZStateTransitions to tmp directory.
-	EnablePeerScorer                    bool // EnablePeerScorer enables experimental peer scoring in p2p.
-	DisableReorgLateBlocks              bool // DisableReorgLateBlocks disables reorgs of late blocks.
-	WriteWalletPasswordOnWebOnboarding  bool // WriteWalletPasswordOnWebOnboarding writes the password to disk after Qrysm web signup.
-	EnableDoppelGanger                  bool // EnableDoppelGanger enables doppelganger protection on startup for the validator.
-	EnableHistoricalSpaceRepresentation bool // EnableHistoricalSpaceRepresentation enables the saving of registry validators in separate buckets to save space
-	EnableBeaconRESTApi                 bool // EnableBeaconRESTApi enables experimental usage of the beacon REST API by the validator when querying a beacon node
+	RemoteSlasherProtection            bool // RemoteSlasherProtection utilizes a beacon node with --slasher mode for validator slashing protection.
+	WriteSSZStateTransitions           bool // WriteSSZStateTransitions to tmp directory.
+	EnablePeerScorer                   bool // EnablePeerScorer enables experimental peer scoring in p2p.
+	DisableReorgLateBlocks             bool // DisableReorgLateBlocks disables reorgs of late blocks.
+	WriteWalletPasswordOnWebOnboarding bool // WriteWalletPasswordOnWebOnboarding writes the password to disk after Qrysm web signup.
+	EnableDoppelGanger                 bool // EnableDoppelGanger enables doppelganger protection on startup for the validator.
+	EnableBeaconRESTApi                bool // EnableBeaconRESTApi enables experimental usage of the beacon REST API by the validator when querying a beacon node
 	// Logging related toggles.
 	DisableGRPCConnectionLogs bool // Disables logging when a new grpc client has connected.
 	EnableFullSSZDataLogging  bool // Enables logging for full ssz data on rejected gossip messages
@@ -169,10 +168,6 @@ func ConfigureBeaconChain(ctx *cli.Context) error {
 	if ctx.Bool(enableSlasherFlag.Name) {
 		log.WithField(enableSlasherFlag.Name, enableSlasherFlag.Usage).Warn(enabledFeatureFlag)
 		cfg.EnableSlasher = true
-	}
-	if ctx.Bool(enableHistoricalSpaceRepresentation.Name) {
-		log.WithField(enableHistoricalSpaceRepresentation.Name, enableHistoricalSpaceRepresentation.Usage).Warn(enabledFeatureFlag)
-		cfg.EnableHistoricalSpaceRepresentation = true
 	}
 	if ctx.Bool(disableStakinContractCheck.Name) {
 		logEnabled(disableStakinContractCheck)

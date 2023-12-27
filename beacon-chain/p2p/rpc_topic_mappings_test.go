@@ -81,10 +81,6 @@ func TestTopicDeconstructor(t *testing.T) {
 
 func TestTopicFromMessage_CorrectType(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	//bCfg := params.BeaconConfig().Copy()
-	//bCfg.AltairForkEpoch = forkEpoch
-	//bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.AltairForkVersion)] = primitives.Epoch(100)
-	//params.OverrideBeaconConfig(bCfg)
 
 	// Garbage Message
 	badMsg := "wljdjska"

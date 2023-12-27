@@ -21,15 +21,6 @@ import (
 	"github.com/theQRL/qrysm/v4/time"
 )
 
-// NOTE(@rgeraldes24): used by the old phase 0 genesis generation; review
-/*
-var (
-	// This is the recommended mock zond1 block hash according to the Ethereum consensus interop guidelines.
-	// https://github.com/ethereum/eth2.0-pm/blob/a085c9870f3956d6228ed2a40cd37f0c6580ecd7/interop/mocked_start/README.md
-	mockZond1BlockHash = []byte{66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66}
-)
-*/
-
 // GenerateGenesisState deterministically given a genesis time and number of validators.
 // If a genesis time of 0 is supplied it is set to the current time.
 func GenerateGenesisState(ctx context.Context, genesisTime, numValidators uint64, ep *enginev1.ExecutionPayload, ed *zondpb.Zond1Data) (*zondpb.BeaconState, []*zondpb.Deposit, error) {

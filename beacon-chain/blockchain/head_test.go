@@ -258,6 +258,7 @@ func TestRetrieveHead_ReadOnly(t *testing.T) {
 	assert.Equal(t, rOnlyState, service.head.state, "Head is not the same object")
 }
 
+// TODO
 // NOTE(rgeraldes24) - initial slot must be 1 instead of 0 because with the capella block we
 // get the following error: Unexpected error: expected state.slot 0 < slot 0
 // This applies to other tests.
@@ -537,6 +538,7 @@ func TestSaveOrphanedAtts_DoublyLinkedTrie(t *testing.T) {
 	require.DeepEqual(t, wantAtts, atts)
 }
 
+// TODO
 /*
 func TestSaveOrphanedAtts_CanFilter_DoublyLinkedTrie(t *testing.T) {
 	ctx := context.Background()

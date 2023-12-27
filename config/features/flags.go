@@ -93,12 +93,6 @@ var (
 		Name:  "disable-staking-contract-check",
 		Usage: "Disables checking of staking contract deposits when proposing blocks, useful for devnets",
 	}
-	enableHistoricalSpaceRepresentation = &cli.BoolFlag{
-		Name: "enable-historical-state-representation",
-		Usage: "Enables the beacon chain to save historical states in a space efficient manner." +
-			" (Warning): Once enabled, this feature migrates your database in to a new schema and " +
-			"there is no going back. At worst, your entire database might get corrupted.",
-	}
 	enableStartupOptimistic = &cli.BoolFlag{
 		Name:   "startup-optimistic",
 		Usage:  "Treats every block as optimistically synced at launch. Use with caution",
@@ -182,7 +176,6 @@ var BeaconChainFlags = append(deprecatedBeaconFlags, append(deprecatedFlags, []c
 	disablePeerScorer,
 	disableBroadcastSlashingFlag,
 	enableSlasherFlag,
-	enableHistoricalSpaceRepresentation,
 	disableStakinContractCheck,
 	disableReorgLateBlocks,
 	SaveFullExecutionPayloads,

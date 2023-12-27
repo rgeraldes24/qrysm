@@ -239,14 +239,11 @@ func TestGenesisValidatorsRoot_CanRetrieve(t *testing.T) {
 	assert.Equal(t, [32]byte{'a'}, c.GenesisValidatorsRoot(), "Did not get correct genesis validators root")
 }
 
-// TODO FIX
-/*
 func TestHeadZOND1Data_Nil(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	c := setupBeaconChain(t, beaconDB)
 	assert.DeepEqual(t, &zondpb.Zond1Data{}, c.HeadZOND1Data(), "Incorrect pre chain start value")
 }
-*/
 
 func TestHeadZOND1Data_CanRetrieve(t *testing.T) {
 	d := &zondpb.Zond1Data{DepositCount: 999}

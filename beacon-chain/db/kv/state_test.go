@@ -56,7 +56,7 @@ func TestState_CanSaveRetrieveValidatorEntries(t *testing.T) {
 
 	// enable historical state representation flag to test this
 	resetCfg := features.InitWithReset(&features.Flags{
-		EnableHistoricalSpaceRepresentation: true,
+		// EnableHistoricalSpaceRepresentation: true,
 	})
 	defer resetCfg()
 
@@ -109,7 +109,7 @@ func TestStateAltair_CanSaveRetrieveValidatorEntries(t *testing.T) {
 
 	// enable historical state representation flag to test this
 	resetCfg := features.InitWithReset(&features.Flags{
-		EnableHistoricalSpaceRepresentation: true,
+		// EnableHistoricalSpaceRepresentation: true,
 	})
 	defer resetCfg()
 
@@ -161,7 +161,7 @@ func TestState_CanSaveRetrieveValidatorEntriesFromCache(t *testing.T) {
 
 	// enable historical state representation flag to test this
 	resetCfg := features.InitWithReset(&features.Flags{
-		EnableHistoricalSpaceRepresentation: true,
+		// EnableHistoricalSpaceRepresentation: true,
 	})
 	defer resetCfg()
 
@@ -217,7 +217,7 @@ func TestState_CanSaveRetrieveValidatorEntriesWithoutCache(t *testing.T) {
 
 	// enable historical state representation flag to test this
 	resetCfg := features.InitWithReset(&features.Flags{
-		EnableHistoricalSpaceRepresentation: true,
+		// EnableHistoricalSpaceRepresentation: true,
 	})
 	defer resetCfg()
 
@@ -272,7 +272,7 @@ func TestState_DeleteState(t *testing.T) {
 
 	// enable historical state representation flag to test this
 	resetCfg := features.InitWithReset(&features.Flags{
-		EnableHistoricalSpaceRepresentation: true,
+		// EnableHistoricalSpaceRepresentation: true,
 	})
 	defer resetCfg()
 
@@ -792,7 +792,7 @@ func TestStateBellatrix_CanSaveRetrieveValidatorEntries(t *testing.T) {
 
 	// enable historical state representation flag to test this
 	resetCfg := features.InitWithReset(&features.Flags{
-		EnableHistoricalSpaceRepresentation: true,
+		// EnableHistoricalSpaceRepresentation: true,
 	})
 	defer resetCfg()
 

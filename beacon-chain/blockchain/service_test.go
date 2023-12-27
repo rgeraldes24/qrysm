@@ -1,11 +1,13 @@
 package blockchain
 
 import (
+	"bytes"
 	"context"
 	"reflect"
 	"testing"
 	"time"
 
+	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
@@ -20,6 +22,9 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
+	"github.com/theQRL/qrysm/v4/config/features"
+	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/container/trie"
@@ -28,6 +33,8 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	"github.com/theQRL/qrysm/v4/time/slots"
+	"google.golang.org/protobuf/proto"
 )
 
 func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
@@ -102,8 +109,6 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 	return chainService
 }
 
-// TODO FIX
-/*
 func TestChainStartStop_Initialized(t *testing.T) {
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
@@ -140,10 +145,7 @@ func TestChainStartStop_Initialized(t *testing.T) {
 	assert.Equal(t, context.Canceled, chainService.ctx.Err(), "Context was not canceled")
 	require.LogsContain(t, hook, "data already exists")
 }
-*/
 
-// Fix embedded mainnet genesis
-/*
 func TestChainStartStop_GenesisZeroHashes(t *testing.T) {
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
@@ -174,56 +176,7 @@ func TestChainStartStop_GenesisZeroHashes(t *testing.T) {
 	assert.Equal(t, context.Canceled, chainService.ctx.Err(), "Context was not canceled")
 	require.LogsContain(t, hook, "data already exists")
 }
-*/
 
-/*
-func TestChainService_InitializeBeaconChain(t *testing.T) {
-	helpers.ClearCache()
-	beaconDB := testDB.SetupDB(t)
-	ctx := context.Background()
-
-	bc := setupBeaconChain(t, beaconDB)
-	var err error
-
-	// Set up 10 deposits pre chain start for validators to register
-	count := uint64(10)
-	deposits, _, err := util.DeterministicDepositsAndKeys(count)
-	require.NoError(t, err)
-	dt, _, err := util.DepositTrieFromDeposits(deposits)
-	require.NoError(t, err)
-	hashTreeRoot, err := dt.HashTreeRoot()
-	require.NoError(t, err)
-	genState, err := transition.EmptyGenesisState()
-	require.NoError(t, err)
-	err = genState.SetZond1Data(&zondpb.Zond1Data{
-		DepositRoot:  hashTreeRoot[:],
-		DepositCount: uint64(len(deposits)),
-		BlockHash:    make([]byte, 32),
-	})
-	require.NoError(t, err)
-	genState, err = blocks.ProcessPreGenesisDeposits(ctx, genState, deposits)
-	require.NoError(t, err)
-
-	_, err = bc.initializeBeaconChain(ctx, time.Unix(0, 0), genState, &zondpb.Zond1Data{DepositRoot: hashTreeRoot[:], BlockHash: make([]byte, 32)})
-	require.NoError(t, err)
-
-	_, err = bc.HeadState(ctx)
-	assert.NoError(t, err)
-	headBlk, err := bc.HeadBlock(ctx)
-	require.NoError(t, err)
-	if headBlk == nil {
-		t.Error("Head state can't be nil after initialize beacon chain")
-	}
-	r, err := bc.HeadRoot(ctx)
-	require.NoError(t, err)
-	if bytesutil.ToBytes32(r) == params.BeaconConfig().ZeroHash {
-		t.Error("Canonical root for slot 0 can't be zeros after initialize beacon chain")
-	}
-}
-*/
-
-// Fix embedded mainnet genesis
-/*
 func TestChainService_CorrectGenesisRoots(t *testing.T) {
 	ctx := context.Background()
 	beaconDB := testDB.SetupDB(t)
@@ -255,10 +208,7 @@ func TestChainService_CorrectGenesisRoots(t *testing.T) {
 
 	require.NoError(t, chainService.Stop(), "Unable to stop chain service")
 }
-*/
 
-// FIX - ReadFromEveryValidator - b.validators is nil when it should be []
-/*
 func TestChainService_InitializeChainInfo(t *testing.T) {
 	genesis := util.NewBeaconBlock()
 	genesisRoot, err := genesis.Block.HashTreeRoot()
@@ -291,7 +241,13 @@ func TestChainService_InitializeChainInfo(t *testing.T) {
 	require.NoError(t, err)
 	pb, err := headBlk.Proto()
 	require.NoError(t, err)
-	assert.DeepEqual(t, headBlock, pb, "Head block incorrect")
+	wsb, err := blocks.NewSignedBeaconBlock(headBlock)
+	require.NoError(t, err)
+	wanted, err := wsb.ToBlinded()
+	require.NoError(t, err)
+	wantedPb, err := wanted.Proto()
+	require.NoError(t, err)
+	assert.Equal(t, proto.Equal(wantedPb, pb), true)
 	s, err := c.HeadState(ctx)
 	require.NoError(t, err)
 	assert.DeepSSZEqual(t, headState.ToProtoUnsafe(), s.ToProtoUnsafe(), "Head state incorrect")
@@ -303,10 +259,7 @@ func TestChainService_InitializeChainInfo(t *testing.T) {
 	}
 	assert.Equal(t, genesisRoot, c.originBlockRoot, "Genesis block root incorrect")
 }
-*/
 
-// FIX - ReadFromEveryValidator - b.validators is nil when it should be []
-/*
 func TestChainService_InitializeChainInfo_SetHeadAtGenesis(t *testing.T) {
 	genesis := util.NewBeaconBlock()
 	genesisRoot, err := genesis.Block.HashTreeRoot()
@@ -345,9 +298,14 @@ func TestChainService_InitializeChainInfo_SetHeadAtGenesis(t *testing.T) {
 	assert.Equal(t, genesisRoot, c.originBlockRoot, "Genesis block root incorrect")
 	pb, err := c.head.block.Proto()
 	require.NoError(t, err)
-	assert.DeepEqual(t, headBlock, pb)
+	wsb, err := blocks.NewSignedBeaconBlock(headBlock)
+	require.NoError(t, err)
+	wanted, err := wsb.ToBlinded()
+	require.NoError(t, err)
+	wantedPb, err := wanted.Proto()
+	require.NoError(t, err)
+	assert.Equal(t, proto.Equal(wantedPb, pb), true)
 }
-*/
 
 func TestChainService_SaveHeadNoDB(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
@@ -410,26 +368,6 @@ func TestServiceStop_SaveCachedBlocks(t *testing.T) {
 	require.Equal(t, true, s.cfg.BeaconDB.HasBlock(ctx, r))
 }
 
-/*
-func TestProcessChainStartTime_ReceivedFeed(t *testing.T) {
-	ctx := context.Background()
-	beaconDB := testDB.SetupDB(t)
-	service := setupBeaconChain(t, beaconDB)
-	mgs := &MockClockSetter{}
-	service.clockSetter = mgs
-	gt := time.Now()
-	service.onExecutionChainStart(context.Background(), gt)
-	gs, err := beaconDB.GenesisState(ctx)
-	require.NoError(t, err)
-	require.NotEqual(t, nil, gs)
-	require.Equal(t, 32, len(gs.GenesisValidatorsRoot()))
-	var zero [32]byte
-	require.DeepNotEqual(t, gs.GenesisValidatorsRoot(), zero[:])
-	require.Equal(t, gt, mgs.G.GenesisTime())
-	require.Equal(t, bytesutil.ToBytes32(gs.GenesisValidatorsRoot()), mgs.G.GenesisValidatorsRoot())
-}
-*/
-
 func BenchmarkHasBlockDB(b *testing.B) {
 	beaconDB := testDB.SetupDB(b)
 	ctx := context.Background()
@@ -470,7 +408,6 @@ func BenchmarkHasBlockForkChoiceStore_DoublyLinkedTree(b *testing.B) {
 }
 
 // FIX - ReadFromEveryValidator - b.validators is nil when it should be []
-/*
 func TestChainService_EverythingOptimistic(t *testing.T) {
 	resetFn := features.InitWithReset(&features.Flags{
 		EnableStartOptimistic: true,
@@ -510,7 +447,6 @@ func TestChainService_EverythingOptimistic(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, true, op)
 }
-*/
 
 // MockClockSetter satisfies the ClockSetter interface for testing the conditions where blockchain.Service should
 // call SetGenesis.

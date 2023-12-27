@@ -49,10 +49,7 @@ func init() {
 	for k, v := range gossipTopicMappings {
 		GossipTypeMapping[reflect.TypeOf(v)] = k
 	}
-	// Specially handle Altair objects.
-	//GossipTypeMapping[reflect.TypeOf(&zondpb.SignedBeaconBlockAltair{})] = BlockSubnetTopicFormat
-	// Specially handle Bellatrix objects.
-	//GossipTypeMapping[reflect.TypeOf(&zondpb.SignedBeaconBlockBellatrix{})] = BlockSubnetTopicFormat
+
 	// Specially handle Capella objects
 	GossipTypeMapping[reflect.TypeOf(&zondpb.SignedBeaconBlock{})] = BlockSubnetTopicFormat
 }

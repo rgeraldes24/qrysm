@@ -109,6 +109,7 @@ func TestProcessAttestations_Ok(t *testing.T) {
 	require.LogsDoNotContain(t, hook, "Could not process attestation for fork choice")
 }
 
+// TODO
 /*
 func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	service, tr := minimalTestService(t)

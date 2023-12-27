@@ -1,26 +1,29 @@
 package blockchain
 
-/*
 import (
 	"context"
-	"sync"
 	"testing"
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	blockchainTesting "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/operations/voluntaryexits"
+	// blockchainTesting "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	// "github.com/theQRL/qrysm/v4/beacon-chain/operations/voluntaryexits"
+	// "github.com/theQRL/qrysm/v4/beacon-chain/operations/voluntaryexits"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
-	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
+
+	// "github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	// "github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	// "github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	// "github.com/theQRL/qrysm/v4/testing/util"
 )
 
+/*
 func TestService_ReceiveBlock(t *testing.T) {
 	ctx := context.Background()
 
@@ -47,7 +50,7 @@ func TestService_ReceiveBlock(t *testing.T) {
 		{
 			name: "applies block with state transition",
 			args: args{
-				block: genFullBlock(t, util.DefaultBlockGenConfig(), 2 ),
+				block: genFullBlock(t, util.DefaultBlockGenConfig(), 2),
 			},
 			check: func(t *testing.T, s *Service) {
 				if hs := s.head.state.Slot(); hs != 2 {
@@ -149,7 +152,9 @@ func TestService_ReceiveBlock(t *testing.T) {
 	}
 	wg.Wait()
 }
+*/
 
+/*
 func TestService_ReceiveBlockUpdateHead(t *testing.T) {
 	s, tr := minimalTestService(t,
 		WithExitPool(voluntaryexits.NewPool()),
@@ -245,6 +250,7 @@ func TestService_ReceiveBlockBatch(t *testing.T) {
 		})
 	}
 }
+*/
 
 func TestService_HasBlock(t *testing.T) {
 	s, _ := minimalTestService(t)
@@ -336,4 +342,3 @@ func TestHandleBlockDilithiumToExecutionChanges(t *testing.T) {
 		require.Equal(t, false, pool.ValidatorExists(idx))
 	})
 }
-*/
