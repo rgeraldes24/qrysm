@@ -214,6 +214,7 @@ func TestValidateBeaconBlockPubSub_CanRecoverStateSummary(t *testing.T) {
 	assert.NotNil(t, m.ValidatorData, "Decoded message was not set on the message validator data")
 }
 
+// TODO
 /*
 func TestValidateBeaconBlockPubSub_IsInCache(t *testing.T) {
 	db := dbtest.SetupDB(t)

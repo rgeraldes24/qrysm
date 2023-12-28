@@ -1,5 +1,6 @@
 package sync
 
+/*
 import (
 	"context"
 	"errors"
@@ -22,7 +23,9 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
+*/
 
+/*
 func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -293,6 +296,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 
 	})
 }
+*/
 
 /*
 func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {

@@ -250,26 +250,6 @@ func DeterministicZond1Data(size int) (*zondpb.Zond1Data, error) {
 	return zond1Data, nil
 }
 
-/*
-// DeterministicGenesisState returns a genesis state made using the deterministic deposits.
-func DeterministicGenesisState(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.DilithiumKey) {
-	deposits, privKeys, err := DeterministicDepositsAndKeys(numValidators)
-	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
-	}
-	zond1Data, err := DeterministicZond1Data(len(deposits))
-	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get zond1data for %d deposits", numValidators))
-	}
-	beaconState, err := transition.GenesisBeaconState(context.Background(), deposits, uint64(0), zond1Data)
-	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get genesis beacon state of %d validators", numValidators))
-	}
-
-	return beaconState, privKeys
-}
-*/
-
 // DepositTrieFromDeposits takes an array of deposits and returns the deposit trie.
 func DepositTrieFromDeposits(deposits []*zondpb.Deposit) (*trie.SparseMerkleTrie, [][32]byte, error) {
 	encodedDeposits := make([][]byte, len(deposits))

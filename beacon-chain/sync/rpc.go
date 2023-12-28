@@ -57,19 +57,6 @@ func (s *Service) registerRPCHandlers() {
 	)
 }
 
-// TODO(rgeraldes24) - remove
-// Remove all v1 Stream handlers that are no longer supported
-// from altair onwards.
-// func (s *Service) unregisterPhase0Handlers() {
-// 	fullBlockRangeTopic := p2p.RPCBlocksByRangeTopicV1 + s.cfg.p2p.Encoding().ProtocolSuffix()
-// 	fullBlockRootTopic := p2p.RPCBlocksByRootTopicV1 + s.cfg.p2p.Encoding().ProtocolSuffix()
-// 	fullMetadataTopic := p2p.RPCMetaDataTopicV1 + s.cfg.p2p.Encoding().ProtocolSuffix()
-
-// 	s.cfg.p2p.Host().RemoveStreamHandler(protocol.ID(fullBlockRangeTopic))
-// 	s.cfg.p2p.Host().RemoveStreamHandler(protocol.ID(fullBlockRootTopic))
-// 	s.cfg.p2p.Host().RemoveStreamHandler(protocol.ID(fullMetadataTopic))
-// }
-
 // registerRPC for a given topic with an expected protobuf message type.
 func (s *Service) registerRPC(baseTopic string, handle rpcHandler) {
 	topic := baseTopic + s.cfg.p2p.Encoding().ProtocolSuffix()

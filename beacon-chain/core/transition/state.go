@@ -20,6 +20,7 @@ import (
 
 // GenesisBeaconState gets called when MinGenesisActiveValidatorCount count of
 // full deposits were made to the deposit contract and the ChainStart log gets emitted.
+// TODO(rgeraldes24) - review/remove?
 func GenesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, zond1Data *zondpb.Zond1Data, ep *enginev1.ExecutionPayload) (state.BeaconState, error) {
 	st, err := EmptyGenesisState()
 	if err != nil {

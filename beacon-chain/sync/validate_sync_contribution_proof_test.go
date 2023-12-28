@@ -22,6 +22,7 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
+// TODO
 /*
 func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 	database := testingdb.SetupDB(t)

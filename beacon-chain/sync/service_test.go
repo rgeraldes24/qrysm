@@ -1,18 +1,23 @@
 package sync
 
 import (
+	"context"
 	"testing"
 	"time"
 
+	gcache "github.com/patrickmn/go-cache"
 	"github.com/theQRL/qrysm/v4/async/abool"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
+	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
 func TestService_StatusZeroEpoch(t *testing.T) {
@@ -36,7 +41,6 @@ func TestService_StatusZeroEpoch(t *testing.T) {
 	assert.NoError(t, r.Status(), "Wanted non failing status")
 }
 
-/*
 func TestSyncHandlers_WaitToSync(t *testing.T) {
 	p2p := p2ptest.NewTestP2P(t)
 	chainService := &mockChain.ChainService{
@@ -63,8 +67,8 @@ func TestSyncHandlers_WaitToSync(t *testing.T) {
 	var vr [32]byte
 	require.NoError(t, gs.SetClock(startup.NewClock(time.Now(), vr)))
 	b := []byte("sk")
-	b32 := bytesutil.ToBytes32(b)
-	sk, err := dilithium.SecretKeyFromBytes(b32[:])
+	b48 := bytesutil.ToBytes48(b)
+	sk, err := dilithium.SecretKeyFromBytes(b48[:])
 	require.NoError(t, err)
 
 	msg := util.NewBeaconBlock()
@@ -75,9 +79,7 @@ func TestSyncHandlers_WaitToSync(t *testing.T) {
 	time.Sleep(400 * time.Millisecond)
 	require.Equal(t, true, r.chainStarted.IsSet(), "Did not receive chain start event.")
 }
-*/
 
-/*
 func TestSyncHandlers_WaitForChainStart(t *testing.T) {
 	p2p := p2ptest.NewTestP2P(t)
 	chainService := &mockChain.ChainService{
@@ -104,7 +106,6 @@ func TestSyncHandlers_WaitForChainStart(t *testing.T) {
 
 	require.Equal(t, true, r.chainStarted.IsSet(), "Did not receive chain start event.")
 }
-*/
 
 /*
 func TestSyncHandlers_WaitTillSynced(t *testing.T) {
@@ -147,8 +148,8 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	defer sub.Unsubscribe()
 
 	b := []byte("sk")
-	b32 := bytesutil.ToBytes32(b)
-	sk, err := dilithium.SecretKeyFromBytes(b32[:])
+	b48 := bytesutil.ToBytes48(b)
+	sk, err := dilithium.SecretKeyFromBytes(b48[:])
 	require.NoError(t, err)
 	msg := util.NewBeaconBlock()
 	msg.Block.ParentRoot = util.Random32Bytes(t)

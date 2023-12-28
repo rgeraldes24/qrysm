@@ -12,7 +12,6 @@ import (
 	"github.com/theQRL/qrysm/v4/container/trie"
 	"github.com/theQRL/qrysm/v4/contracts/deposit"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/math"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -206,8 +205,8 @@ func verifyDepositDataWithDomain(ctx context.Context, deps []*zondpb.Deposit, do
 	if len(deps) == 0 {
 		return nil
 	}
-	pks := make([]dilithium.PublicKey, len(deps))
-	sigs := make([][]byte, len(deps))
+	pks := make([][]dilithium.PublicKey, len(deps))
+	sigs := make([][][]byte, len(deps))
 	msgs := make([][32]byte, len(deps))
 	for i, dep := range deps {
 		if ctx.Err() != nil {
@@ -220,8 +219,8 @@ func verifyDepositDataWithDomain(ctx context.Context, deps []*zondpb.Deposit, do
 		if err != nil {
 			return err
 		}
-		pks[i] = dpk
-		sigs[i] = dep.Data.Signature
+		pks[i] = []dilithium.PublicKey{dpk}
+		sigs[i] = [][]byte{dep.Data.Signature}
 		depositMessage := &zondpb.DepositMessage{
 			PublicKey:             dep.Data.PublicKey,
 			WithdrawalCredentials: dep.Data.WithdrawalCredentials,
@@ -233,7 +232,7 @@ func verifyDepositDataWithDomain(ctx context.Context, deps []*zondpb.Deposit, do
 		}
 		msgs[i] = sr
 	}
-	verify, err := dilithium.VerifyMultipleSignatures([][][]byte{sigs}, msgs, [][]common.PublicKey{pks})
+	verify, err := dilithium.VerifyMultipleSignatures(sigs, msgs, pks)
 	if err != nil {
 		return errors.Errorf("could not verify multiple signatures: %v", err)
 	}

@@ -84,7 +84,6 @@ func (fs *fakeStream) Protocol() protocol.ID {
 	return fs.protocol
 }
 
-/*
 func TestValidateVersion(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -100,22 +99,23 @@ func TestValidateVersion(t *testing.T) {
 			error:    "unable to find a valid protocol prefix",
 			wantErr:  true,
 		},
+
 		{
-			name:     "valid topic with incorrect version",
-			version:  p2p.SchemaVersionV1,
+			name: "valid topic with incorrect version",
+			// version:  p2p.SchemaVersionV1,
+			version:  "/3",
 			protocol: p2p.RPCBlocksByRootTopicV1,
 			error:    "doesn't match provided version",
 			wantErr:  true,
 		},
 
-			{
-				name:     "valid topic with correct version",
-				version:  p2p.SchemaVersionV2,
-				protocol: p2p.RPCBlocksByRootTopicV1,
-				error:    "",
-				wantErr:  false,
-			},
-
+		{
+			name:     "valid topic with correct version",
+			version:  p2p.SchemaVersionV1,
+			protocol: p2p.RPCBlocksByRootTopicV1,
+			error:    "",
+			wantErr:  false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -130,4 +130,3 @@ func TestValidateVersion(t *testing.T) {
 		})
 	}
 }
-*/

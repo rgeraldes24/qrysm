@@ -233,6 +233,7 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 	}
 }
 
+// TODO
 /*
 func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 	db := dbtest.SetupDB(t)

@@ -1,12 +1,13 @@
 package sync
 
-/*
 import (
 	"context"
 	"testing"
 	"time"
 
+	logTest "github.com/sirupsen/logrus/hooks/test"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	testingdb "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
@@ -15,7 +16,9 @@ import (
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
@@ -44,11 +47,10 @@ func TestBroadcastDilithiumChanges(t *testing.T) {
 		Signature: emptySig[:],
 	})
 
-	capellaStart := primitives.Slot(0)
-	s.broadcastDilithiumChanges(capellaStart)
+	currSlot := primitives.Slot(1)
+	s.broadcastDilithiumChanges(currSlot)
 }
 
-/*
 func TestRateDilithiumChanges(t *testing.T) {
 	logHook := logTest.NewGlobal()
 	params.SetupTestConfigCleanup(t)
@@ -96,10 +98,8 @@ func TestRateDilithiumChanges(t *testing.T) {
 	}
 
 	require.Equal(t, false, p1.BroadcastCalled)
-	//slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	//require.NoError(t, err)
-	slot := primitives.Slot(0)
-	s.broadcastDilithiumChanges(slot)
+	currSlot := primitives.Slot(0)
+	s.broadcastDilithiumChanges(currSlot)
 	time.Sleep(100 * time.Millisecond) // Need a sleep for the go routine to be ready
 	require.Equal(t, true, p1.BroadcastCalled)
 	require.LogsDoNotContain(t, logHook, "could not")
@@ -149,4 +149,3 @@ func TestBroadcastDilithiumBatch_changes_slice(t *testing.T) {
 	s.broadcastDilithiumBatch(s.ctx, &changes)
 	require.Equal(t, 200-128, len(changes))
 }
-*/

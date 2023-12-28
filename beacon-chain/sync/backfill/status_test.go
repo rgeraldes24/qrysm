@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	blocktest "github.com/theQRL/qrysm/v4/consensus-types/blocks/testing"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -173,7 +174,7 @@ func TestReload(t *testing.T) {
 		err      error
 		expected *Status
 	}{
-		/*{
+		{
 			name: "origin not found, implying genesis sync ",
 			db: &mockBackfillDB{
 				genesisBlockRoot: goodBlockRoot(params.BeaconConfig().ZeroHash),
@@ -316,7 +317,7 @@ func TestReload(t *testing.T) {
 				backfillBlockRoot: goodBlockRoot(backfillRoot),
 			},
 			err: derp,
-		},*/
+		},
 		{
 			name: "complete happy path",
 			db: &mockBackfillDB{
