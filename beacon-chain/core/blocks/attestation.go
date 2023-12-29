@@ -93,6 +93,7 @@ func VerifyAttestationNoVerifySignatures(
 	if err != nil {
 		return err
 	}
+
 	indexedAtt, err := attestation.ConvertToIndexed(ctx, att, committee)
 	if err != nil {
 		return err

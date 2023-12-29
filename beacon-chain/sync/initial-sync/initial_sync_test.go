@@ -1,5 +1,6 @@
 package initialsync
 
+/*
 import (
 	"context"
 	"fmt"
@@ -269,6 +270,7 @@ func extendBlockSequence(t *testing.T, inSeq []*zondpb.SignedBeaconBlock, size i
 	return outSeq
 }
 
+// TODO(rgeraldes24): /beacon_blocks_by_root/1 has been deprecated in capella
 // connectPeerHavingBlocks connect host with a peer having provided blocks.
 func connectPeerHavingBlocks(
 	t *testing.T, host *p2pt.TestP2P, blks []*zondpb.SignedBeaconBlock, finalizedSlot primitives.Slot,
@@ -337,3 +339,4 @@ func connectPeerHavingBlocks(
 
 	return p.PeerID()
 }
+*/

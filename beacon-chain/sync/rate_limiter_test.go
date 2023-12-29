@@ -37,7 +37,7 @@ func TestRateLimiter_ExceedCapacity(t *testing.T) {
 	rlimiter := newRateLimiter(p1)
 
 	// BlockByRange
-	topic := p2p.RPCBlocksByRangeTopicV1 + p1.Encoding().ProtocolSuffix()
+	topic := p2p.RPCBlocksByRangeTopicV2 + p1.Encoding().ProtocolSuffix()
 
 	wg := sync.WaitGroup{}
 	p2.BHost.SetStreamHandler(protocol.ID(topic), func(stream network.Stream) {
@@ -74,7 +74,7 @@ func TestRateLimiter_ExceedRawCapacity(t *testing.T) {
 	rlimiter := newRateLimiter(p1)
 
 	// BlockByRange
-	topic := p2p.RPCBlocksByRangeTopicV1 + p1.Encoding().ProtocolSuffix()
+	topic := p2p.RPCBlocksByRangeTopicV2 + p1.Encoding().ProtocolSuffix()
 
 	wg := sync.WaitGroup{}
 	p2.BHost.SetStreamHandler(protocol.ID(topic), func(stream network.Stream) {

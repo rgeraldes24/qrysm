@@ -160,6 +160,7 @@ func TestStatusRPCHandler_ConnectsOnGenesis(t *testing.T) {
 	assert.Equal(t, 1, len(p1.BHost.Network().Peers()), "Handler disconnected with peer")
 }
 
+// TODO(rgeraldes24)
 /*
 func TestStatusRPCHandler_ReturnsHelloMessage(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)

@@ -15,6 +15,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
+// RPCMetaDataTopicV1
 /*
 func TestMetaDataRPCHandler_ReceivesMetadata(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
@@ -69,6 +70,7 @@ func TestMetaDataRPCHandler_ReceivesMetadata(t *testing.T) {
 }
 */
 
+// RPCMetaDataTopicV1
 /*
 func TestMetadataRPCHandler_SendsMetadata(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
@@ -137,9 +139,10 @@ func TestMetadataRPCHandler_SendsMetadata(t *testing.T) {
 /*
 func TestMetadataRPCHandler_SendsMetadataAltair(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	bCfg := params.BeaconConfig().Copy()
-	params.OverrideBeaconConfig(bCfg)
-	params.BeaconConfig().InitializeForkSchedule()
+	// bCfg := params.BeaconConfig().Copy()
+	// bCfg.AltairForkEpoch = 5
+	// params.OverrideBeaconConfig(bCfg)
+	// params.BeaconConfig().InitializeForkSchedule()
 
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
@@ -176,7 +179,7 @@ func TestMetadataRPCHandler_SendsMetadataAltair(t *testing.T) {
 	}
 
 	// Setup streams
-	pcl := protocol.ID(p2p.RPCMetaDataTopicV1 + r.cfg.p2p.Encoding().ProtocolSuffix())
+	pcl := protocol.ID(p2p.RPCMetaDataTopicV2 + r.cfg.p2p.Encoding().ProtocolSuffix())
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(2, 2, time.Second, false)
 	r2.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(2, 2, time.Second, false)
@@ -197,7 +200,7 @@ func TestMetadataRPCHandler_SendsMetadataAltair(t *testing.T) {
 	}
 
 	// Fix up peer with the correct metadata.
-	p2.LocalMetadata = wrapper.WrappedMetadataV0(&pb.MetaDataV0{
+	p2.LocalMetadata = wrapper.WrappedMetadataV1(&pb.MetaDataV1{
 		SeqNumber: 2,
 		Attnets:   bitfield[:],
 		Syncnets:  []byte{0x0},
@@ -271,6 +274,7 @@ func TestExtractMetaDataType(t *testing.T) {
 			want:    nil,
 			wantErr: true,
 		},
+		// TODO(rgeraldes24): review
 		{
 			name: "genesis fork version",
 			args: args{

@@ -142,7 +142,8 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				}},
 			want: pubsub.ValidationIgnore,
 		},
-		// TODO
+		// NOTE(rgeraldes24): not valid for now since the head state is always going to be capella
+		// TODO(rgeraldes24): review again
 		/*
 			{
 				name: "Non-Capella HeadState Valid Execution Change Message",

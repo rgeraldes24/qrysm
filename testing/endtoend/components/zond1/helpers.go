@@ -20,7 +20,7 @@ const KeystorePassword = "password"
 
 const minerPasswordFile = "password.txt"
 
-// TODO(rgeraldes24) - might have to change the key
+// TODO(rgeraldes24): might have to change the key
 const minerFile = "UTC--2021-12-22T19-14-08.590377700Z--878705ba3f8bc32fcf7f4caa1a35e72af65cf766"
 const timeGapPerMiningTX = 250 * time.Millisecond
 

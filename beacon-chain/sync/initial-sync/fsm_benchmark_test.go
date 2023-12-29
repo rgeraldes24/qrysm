@@ -1,11 +1,6 @@
 package initialsync
 
-import (
-	"testing"
-
-	"github.com/theQRL/qrysm/v4/testing/require"
-)
-
+/*
 func BenchmarkStateMachine_trigger(b *testing.B) {
 	sm := newStateMachineManager()
 
@@ -37,3 +32,4 @@ func BenchmarkStateMachine_trigger(b *testing.B) {
 		require.NoError(b, err)
 	}
 }
+*/

@@ -18,6 +18,7 @@ func TestExtractBlockDataType(t *testing.T) {
 	// Precompute digests
 	genDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, params.BeaconConfig().ZeroHash[:])
 	require.NoError(t, err)
+	// TODO(rgeraldes24): remove
 	// altairDigest, err := signing.ComputeForkDigest(params.BeaconConfig().AltairForkVersion, params.BeaconConfig().ZeroHash[:])
 	// require.NoError(t, err)
 	// bellatrixDigest, err := signing.ComputeForkDigest(params.BeaconConfig().BellatrixForkVersion, params.BeaconConfig().ZeroHash[:])

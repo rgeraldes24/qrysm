@@ -17,6 +17,7 @@ import (
 	"github.com/theQRL/qrysm/v4/network/forks"
 	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/metadata"
+	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -52,12 +53,26 @@ func (s *Service) metaDataHandler(_ context.Context, _ interface{}, stream libp2
 	currMd := s.cfg.p2p.Metadata()
 	switch streamVersion {
 	case p2p.SchemaVersionV1:
-		currMd = wrapper.WrappedMetadataV0(
-			&pb.MetaDataV0{
-				Attnets:   currMd.AttnetsBitfield(),
-				SeqNumber: currMd.SequenceNumber(),
-				Syncnets:  bitfield.Bitvector4{byte(0x00)},
-			})
+		// We have a v1 metadata object saved locally, so we
+		// convert it back to a v0 metadata object.
+		if currMd.Version() != version.Phase0 {
+			currMd = wrapper.WrappedMetadataV0(
+				&pb.MetaDataV0{
+					Attnets:   currMd.AttnetsBitfield(),
+					SeqNumber: currMd.SequenceNumber(),
+				})
+		}
+	case p2p.SchemaVersionV2:
+		// We have a v0 metadata object saved locally, so we
+		// convert it to a v1 metadata object.
+		if currMd.Version() != version.Altair {
+			currMd = wrapper.WrappedMetadataV1(
+				&pb.MetaDataV1{
+					Attnets:   currMd.AttnetsBitfield(),
+					SeqNumber: currMd.SequenceNumber(),
+					Syncnets:  bitfield.Bitvector4{byte(0x00)},
+				})
+		}
 	}
 	if _, err := stream.Write([]byte{responseCodeSuccess}); err != nil {
 		return err
@@ -103,7 +118,12 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 	}
 	// Defensive check to ensure valid objects are being sent.
 	topicVersion := ""
-	topicVersion = p2p.SchemaVersionV1
+	switch msg.Version() {
+	case version.Phase0:
+		topicVersion = p2p.SchemaVersionV1
+	case version.Altair:
+		topicVersion = p2p.SchemaVersionV2
+	}
 	if err := validateVersion(topicVersion, stream); err != nil {
 		return nil, err
 	}

@@ -1,6 +1,5 @@
 package sync
 
-/*
 import (
 	"context"
 	"errors"
@@ -23,13 +22,12 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
-*/
 
-/*
 func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRangeTopicV1)
+	// pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRangeTopicV1)
+	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRangeTopicV2)
 
 	t.Run("stream error", func(t *testing.T) {
 		p1 := p2ptest.NewTestP2P(t)
@@ -296,9 +294,8 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 
 	})
 }
-*/
 
-/*
+/* TODO(rgeraldes24): could not extract block data type
 func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

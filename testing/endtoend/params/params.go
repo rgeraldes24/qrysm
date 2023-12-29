@@ -222,63 +222,6 @@ func Init(t *testing.T, beaconNodeCount int) error {
 	return nil
 }
 
-// TODO(rgeraldes24) - remove?
-/*
-// InitMultiClient initializes the multiclient E2E config, properly handling test sharding.
-func InitMultiClient(t *testing.T, beaconNodeCount int, lighthouseNodeCount int) error {
-	testPath := bazel.TestTmpDir()
-	logPath, ok := os.LookupEnv("TEST_UNDECLARED_OUTPUTS_DIR")
-	if !ok {
-		return errors.New("expected TEST_UNDECLARED_OUTPUTS_DIR to be defined")
-	}
-	logPath = path.Join(logPath, t.Name())
-	if err := file.MkdirAll(logPath); err != nil {
-		return err
-	}
-	testTotalShardsStr, ok := os.LookupEnv("TEST_TOTAL_SHARDS")
-	if !ok {
-		testTotalShardsStr = "1"
-	}
-	testTotalShards, err := strconv.Atoi(testTotalShardsStr)
-	if err != nil {
-		return err
-	}
-	testShardIndexStr, ok := os.LookupEnv("TEST_SHARD_INDEX")
-	if !ok {
-		testShardIndexStr = "0"
-	}
-	testShardIndex, err := strconv.Atoi(testShardIndexStr)
-	if err != nil {
-		return err
-	}
-
-	var existingRegistrations []int
-	testPorts := &ports{}
-	err = initializeStandardPorts(testTotalShards, testShardIndex, testPorts, &existingRegistrations)
-	if err != nil {
-		return err
-	}
-	// err = initializeMulticlientPorts(testTotalShards, testShardIndex, testPorts, &existingRegistrations)
-	// if err != nil {
-	// 	return err
-	// }
-
-	genTime := uint64(time.Now().Unix()) + StartupBufferSecs
-	TestParams = &params{
-		TestPath:        filepath.Join(testPath, fmt.Sprintf("shard-%d", testShardIndex)),
-		LogPath:         logPath,
-		TestShardIndex:  testShardIndex,
-		BeaconNodeCount: beaconNodeCount,
-		//LighthouseBeaconNodeCount: lighthouseNodeCount,
-		Ports:                  testPorts,
-		CLGenesisTime:          genTime,
-		Zond1GenesisTime:       genTime,
-		NumberOfExecutionCreds: PregenesisExecCreds,
-	}
-	return nil
-}
-*/
-
 // port returns a safe port number based on the seed and shard data.
 func port(seed, shardCount, shardIndex int, existingRegistrations *[]int) (int, error) {
 	portToRegister := seed + portSpan/shardCount*shardIndex

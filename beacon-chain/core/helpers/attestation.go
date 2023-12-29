@@ -59,9 +59,6 @@ func IsAggregator(committeeCount uint64, slotSig []byte) (bool, error) {
 	}
 
 	b := hash.Hash(slotSig)
-	fmt.Println(committeeCount)
-	fmt.Println(modulo)
-	fmt.Println(binary.LittleEndian.Uint64(b[:8]))
 	return binary.LittleEndian.Uint64(b[:8])%modulo == 0, nil
 }
 

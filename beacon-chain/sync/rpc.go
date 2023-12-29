@@ -44,15 +44,15 @@ func (s *Service) registerRPCHandlers() {
 		s.pingHandler,
 	)
 	s.registerRPC(
-		p2p.RPCBlocksByRangeTopicV1,
+		p2p.RPCBlocksByRangeTopicV2,
 		s.beaconBlocksByRangeRPCHandler,
 	)
 	s.registerRPC(
-		p2p.RPCBlocksByRootTopicV1,
+		p2p.RPCBlocksByRootTopicV2,
 		s.beaconBlocksRootRPCHandler,
 	)
 	s.registerRPC(
-		p2p.RPCMetaDataTopicV1,
+		p2p.RPCMetaDataTopicV2,
 		s.metaDataHandler,
 	)
 }
@@ -120,7 +120,7 @@ func (s *Service) registerRPC(baseTopic string, handle rpcHandler) {
 
 		// since metadata requests do not have any data in the payload, we
 		// do not decode anything.
-		if baseTopic == p2p.RPCMetaDataTopicV1 {
+		if baseTopic == p2p.RPCMetaDataTopicV2 {
 			if err := handle(ctx, base, stream); err != nil {
 				messageFailedProcessingCounter.WithLabelValues(topic).Inc()
 				if err != p2ptypes.ErrWrongForkDigestVersion {

@@ -8,6 +8,7 @@ import (
 	gcache "github.com/patrickmn/go-cache"
 	"github.com/theQRL/qrysm/v4/async/abool"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
@@ -18,6 +19,8 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	// dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
+	// "github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
 )
 
 func TestService_StatusZeroEpoch(t *testing.T) {
@@ -51,9 +54,10 @@ func TestSyncHandlers_WaitToSync(t *testing.T) {
 	r := Service{
 		ctx: context.Background(),
 		cfg: &config{
-			p2p:         p2p,
-			chain:       chainService,
-			initialSync: &mockSync.Sync{IsSyncing: false},
+			p2p:                 p2p,
+			chain:               chainService,
+			initialSync:         &mockSync.Sync{IsSyncing: false},
+			dilithiumToExecPool: dilithiumtoexec.NewPool(),
 		},
 		chainStarted: abool.New(),
 		clockWaiter:  gs,
@@ -107,6 +111,7 @@ func TestSyncHandlers_WaitForChainStart(t *testing.T) {
 	require.Equal(t, true, r.chainStarted.IsSet(), "Did not receive chain start event.")
 }
 
+// TODO(rgeraldes24)
 /*
 func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	p2p := p2ptest.NewTestP2P(t)
@@ -120,11 +125,12 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	r := Service{
 		ctx: ctx,
 		cfg: &config{
-			p2p:           p2p,
-			beaconDB:      dbTest.SetupDB(t),
-			chain:         chainService,
-			blockNotifier: chainService.BlockNotifier(),
-			initialSync:   &mockSync.Sync{IsSyncing: false},
+			p2p:                 p2p,
+			beaconDB:            dbTest.SetupDB(t),
+			chain:               chainService,
+			blockNotifier:       chainService.BlockNotifier(),
+			initialSync:         &mockSync.Sync{IsSyncing: false},
+			dilithiumToExecPool: dilithiumtoexec.NewPool(),
 		},
 		chainStarted:        abool.New(),
 		subHandler:          newSubTopicHandler(),
@@ -177,7 +183,6 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 }
 */
 
-/*
 func TestSyncService_StopCleanly(t *testing.T) {
 	p2p := p2ptest.NewTestP2P(t)
 	chainService := &mockChain.ChainService{
@@ -190,9 +195,10 @@ func TestSyncService_StopCleanly(t *testing.T) {
 		ctx:    ctx,
 		cancel: cancel,
 		cfg: &config{
-			p2p:         p2p,
-			chain:       chainService,
-			initialSync: &mockSync.Sync{IsSyncing: false},
+			p2p:                 p2p,
+			chain:               chainService,
+			initialSync:         &mockSync.Sync{IsSyncing: false},
+			dilithiumToExecPool: dilithiumtoexec.NewPool(),
 		},
 		chainStarted:        abool.New(),
 		subHandler:          newSubTopicHandler(),
@@ -227,4 +233,3 @@ func TestSyncService_StopCleanly(t *testing.T) {
 	require.Equal(t, 0, len(r.cfg.p2p.PubSub().GetTopics()))
 	require.Equal(t, 0, len(r.cfg.p2p.Host().Mux().Protocols()))
 }
-*/

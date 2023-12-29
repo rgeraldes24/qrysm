@@ -37,7 +37,6 @@ func TestContextWrite_NoWrites(t *testing.T) {
 	}
 }
 
-/*
 func TestContextRead_NoReads(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	nPeer := p2ptest.NewTestP2P(t)
@@ -72,7 +71,6 @@ func TestContextRead_NoReads(t *testing.T) {
 		t.Fatal("Did not receive stream within 1 sec")
 	}
 }
-*/
 
 var _ = withProtocol(&fakeStream{})
 
@@ -99,20 +97,17 @@ func TestValidateVersion(t *testing.T) {
 			error:    "unable to find a valid protocol prefix",
 			wantErr:  true,
 		},
-
 		{
-			name: "valid topic with incorrect version",
-			// version:  p2p.SchemaVersionV1,
-			version:  "/3",
-			protocol: p2p.RPCBlocksByRootTopicV1,
+			name:     "valid topic with incorrect version",
+			version:  p2p.SchemaVersionV1,
+			protocol: p2p.RPCBlocksByRootTopicV2,
 			error:    "doesn't match provided version",
 			wantErr:  true,
 		},
-
 		{
 			name:     "valid topic with correct version",
-			version:  p2p.SchemaVersionV1,
-			protocol: p2p.RPCBlocksByRootTopicV1,
+			version:  p2p.SchemaVersionV2,
+			protocol: p2p.RPCBlocksByRootTopicV2,
 			error:    "",
 			wantErr:  false,
 		},

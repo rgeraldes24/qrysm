@@ -1,6 +1,7 @@
 package p2p
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"net"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/theQRL/go-zond/p2p/enr"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	ecdsaprysm "github.com/theQRL/qrysm/v4/crypto/ecdsa"
+	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -34,6 +36,9 @@ type Listener interface {
 // RefreshENR uses an epoch to refresh the enr entry for our node
 // with the tracked committee ids for the epoch, allowing our node
 // to be dynamically discoverable by others given our tracked committee ids.
+// RefreshENR uses an epoch to refresh the enr entry for our node
+// with the tracked committee ids for the epoch, allowing our node
+// to be dynamically discoverable by others given our tracked committee ids.
 func (s *Service) RefreshENR() {
 	// return early if discv5 isnt running
 	if s.dv5Listener == nil || !s.isInitialized() {
@@ -44,17 +49,32 @@ func (s *Service) RefreshENR() {
 	for _, idx := range committees {
 		bitV.SetBitAt(idx, true)
 	}
-
+	currentBitV, err := attBitvector(s.dv5Listener.Self().Record())
+	if err != nil {
+		log.WithError(err).Error("Could not retrieve att bitfield")
+		return
+	}
+	// Compare current epoch with our fork epochs
 	currEpoch := slots.ToEpoch(slots.CurrentSlot(uint64(s.genesisTime.Unix())))
 
-	// Retrieve sync subnets from application level cache.
+	// Retrieve sync subnets from application level
+	// cache.
 	bitS := bitfield.Bitvector4{byte(0x00)}
 	committees = cache.SyncSubnetIDs.GetAllSubnets(currEpoch)
 	for _, idx := range committees {
 		bitS.SetBitAt(idx, true)
 	}
-
-	s.updateSubnetRecordWithMetadata(bitV, bitS)
+	currentBitS, err := syncBitvector(s.dv5Listener.Self().Record())
+	if err != nil {
+		log.WithError(err).Error("Could not retrieve sync bitfield")
+		return
+	}
+	if bytes.Equal(bitV, currentBitV) && bytes.Equal(bitS, currentBitS) &&
+		s.Metadata().Version() == version.Altair {
+		// return early if bitfields haven't changed
+		return
+	}
+	s.updateSubnetRecordWithMetadataV2(bitV, bitS)
 
 	// ping all peers to inform them of new metadata
 	s.pingPeers()

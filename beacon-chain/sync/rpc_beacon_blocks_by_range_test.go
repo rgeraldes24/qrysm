@@ -13,6 +13,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+// TODO(rgeraldes24): RPCBlocksByRangeTopicV1
 /*
 func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)

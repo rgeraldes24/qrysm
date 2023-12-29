@@ -13,13 +13,14 @@ import (
 	p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	p2ptypes "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
+	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
 	"github.com/theQRL/qrysm/v4/testing/assert"
+	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-/*
 func TestGoodByeRPCHandler_Disconnects_With_Peer(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	cfg := params.MainnetConfig().Copy()
@@ -66,9 +67,7 @@ func TestGoodByeRPCHandler_Disconnects_With_Peer(t *testing.T) {
 		t.Error("Peer is still not disconnected despite sending a goodbye message")
 	}
 }
-*/
 
-/*
 func TestGoodByeRPCHandler_BackOffPeer(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
@@ -146,7 +145,6 @@ func TestGoodByeRPCHandler_BackOffPeer(t *testing.T) {
 	// Add a little bit of allowance
 	require.Equal(t, true, diff.Seconds() <= 1)
 }
-*/
 
 func TestSendGoodbye_SendsMessage(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)

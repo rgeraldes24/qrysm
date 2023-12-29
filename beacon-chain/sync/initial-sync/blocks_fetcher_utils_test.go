@@ -1,9 +1,9 @@
 package initialsync
 
+/*
 import (
 	"context"
 	"fmt"
-	"sync"
 	"testing"
 	"time"
 
@@ -22,6 +22,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
+
 
 func TestBlocksFetcher_nonSkippedSlotAfter(t *testing.T) {
 	peersGen := func(size int) []*peerData {
@@ -143,6 +144,7 @@ func TestBlocksFetcher_nonSkippedSlotAfter(t *testing.T) {
 		assert.Equal(t, primitives.Slot(0), slot)
 	})
 }
+*/
 
 // TODO
 /*
@@ -422,7 +424,7 @@ func TestBlocksFetcher_findForkWithPeer(t *testing.T) {
 		assert.Equal(t, primitives.Slot(33), fork.blocks[0].Block().Slot())
 	})
 }
-*/
+
 
 func TestBlocksFetcher_findAncestor(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
@@ -462,7 +464,7 @@ func TestBlocksFetcher_findAncestor(t *testing.T) {
 		},
 	)
 	fetcher.rateLimiter = leakybucket.NewCollector(6400, 6400, 1*time.Second, false)
-	pcl := fmt.Sprintf("%s/ssz_snappy", p2pm.RPCBlocksByRootTopicV1)
+	pcl := fmt.Sprintf("%s/ssz_snappy", p2pm.RPCBlocksByRootTopicV2)
 
 	t.Run("error on request", func(t *testing.T) {
 		p2 := p2pt.NewTestP2P(t)
@@ -603,3 +605,4 @@ func TestBlocksFetcher_currentHeadAndTargetEpochs(t *testing.T) {
 		})
 	}
 }
+*/

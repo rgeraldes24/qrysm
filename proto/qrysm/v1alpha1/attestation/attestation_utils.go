@@ -47,9 +47,12 @@ func ConvertToIndexed(ctx context.Context, attestation *zondpb.Attestation, comm
 		return nil, err
 	}
 
+	sigsCopy := make([][]byte, len(attestation.Signatures))
+	copy(sigsCopy, attestation.Signatures)
+
 	sigSlices := signatureSlices{
 		attestingIndices: attIndices,
-		signatures:       attestation.Signatures,
+		signatures:       sigsCopy,
 	}
 	sort.Sort(sortByValidatorIdx(sigSlices))
 

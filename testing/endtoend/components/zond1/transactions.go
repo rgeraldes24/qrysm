@@ -50,9 +50,9 @@ func (t *TransactionGenerator) Start(ctx context.Context) error {
 	// 	return err
 	// }
 	// mineKey, err := keystore.DecryptKey(keystoreBytes, KeystorePassword)
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 	rnd := make([]byte, 10000)
 	// #nosec G404
 	_, err = mathRand.Read(rnd)

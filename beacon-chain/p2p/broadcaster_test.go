@@ -258,11 +258,9 @@ func TestService_BroadcastAttestationWithDiscoveryAttempts(t *testing.T) {
 		if i == 2 {
 			s.dv5Listener = listener
 			s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
-			bitVAtt := bitfield.NewBitvector64()
-			bitVAtt.SetBitAt(subnet, true)
-			bitVSync := bitfield.NewBitvector4()
-			bitVSync.SetBitAt(0, true)
-			s.updateSubnetRecordWithMetadata(bitVAtt, bitVSync)
+			bitV := bitfield.NewBitvector64()
+			bitV.SetBitAt(subnet, true)
+			s.updateSubnetRecordWithMetadata(bitV)
 		}
 		assert.NoError(t, err, "Could not start discovery for node")
 		listeners = append(listeners, listener)

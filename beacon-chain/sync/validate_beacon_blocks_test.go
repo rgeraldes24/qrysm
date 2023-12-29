@@ -31,6 +31,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -214,8 +215,6 @@ func TestValidateBeaconBlockPubSub_CanRecoverStateSummary(t *testing.T) {
 	assert.NotNil(t, m.ValidatorData, "Decoded message was not set on the message validator data")
 }
 
-// TODO
-/*
 func TestValidateBeaconBlockPubSub_IsInCache(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
@@ -281,7 +280,6 @@ func TestValidateBeaconBlockPubSub_IsInCache(t *testing.T) {
 	assert.Equal(t, true, result)
 	assert.NotNil(t, m.ValidatorData, "Decoded message was not set on the message validator data")
 }
-*/
 
 func TestValidateBeaconBlockPubSub_ValidProposerSignature(t *testing.T) {
 	db := dbtest.SetupDB(t)
@@ -486,14 +484,13 @@ func TestValidateBeaconBlockPubSub_AdvanceEpochsForState(t *testing.T) {
 	assert.NotNil(t, m.ValidatorData, "Decoded message was not set on the message validator data")
 }
 
-/*
 func TestValidateBeaconBlockPubSub_Syncing(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
 	b := []byte("sk")
-	b32 := bytesutil.ToBytes32(b)
-	sk, err := dilithium.SecretKeyFromBytes(b32[:])
+	b48 := bytesutil.ToBytes48(b)
+	sk, err := dilithium.SecretKeyFromBytes(b48[:])
 	require.NoError(t, err)
 	msg := util.NewBeaconBlock()
 	msg.Block.ParentRoot = util.Random32Bytes(t)
@@ -527,7 +524,6 @@ func TestValidateBeaconBlockPubSub_Syncing(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, res, pubsub.ValidationIgnore, "block is ignored until fully synced")
 }
-*/
 
 func TestValidateBeaconBlockPubSub_IgnoreAndQueueBlocksFromNearFuture(t *testing.T) {
 	db := dbtest.SetupDB(t)
@@ -597,14 +593,13 @@ func TestValidateBeaconBlockPubSub_IgnoreAndQueueBlocksFromNearFuture(t *testing
 	assert.Equal(t, true, len(r.pendingBlocksInCache(msg.Block.Slot)) == 1)
 }
 
-/*
 func TestValidateBeaconBlockPubSub_RejectBlocksFromFuture(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
 	b := []byte("sk")
-	b32 := bytesutil.ToBytes32(b)
-	sk, err := dilithium.SecretKeyFromBytes(b32[:])
+	b48 := bytesutil.ToBytes48(b)
+	sk, err := dilithium.SecretKeyFromBytes(b48[:])
 	require.NoError(t, err)
 	msg := util.NewBeaconBlock()
 	msg.Block.Slot = 10
@@ -645,16 +640,14 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromFuture(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, res, pubsub.ValidationIgnore, "block from the future should be ignored")
 }
-*/
 
-/*
 func TestValidateBeaconBlockPubSub_RejectBlocksFromThePast(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	b := []byte("sk")
-	b32 := bytesutil.ToBytes32(b)
+	b48 := bytesutil.ToBytes48(b)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	sk, err := dilithium.SecretKeyFromBytes(b32[:])
+	sk, err := dilithium.SecretKeyFromBytes(b48[:])
 	require.NoError(t, err)
 	msg := util.NewBeaconBlock()
 	msg.Block.ParentRoot = util.Random32Bytes(t)
@@ -698,9 +691,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromThePast(t *testing.T) {
 	require.ErrorContains(t, "greater or equal to block slot", err)
 	assert.Equal(t, res, pubsub.ValidationIgnore, "block from the past should be ignored")
 }
-*/
 
-/*
 func TestValidateBeaconBlockPubSub_SeenProposerSlot(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
@@ -762,7 +753,6 @@ func TestValidateBeaconBlockPubSub_SeenProposerSlot(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, res, pubsub.ValidationIgnore, "seen proposer block should be ignored")
 }
-*/
 
 func TestValidateBeaconBlockPubSub_FilterByFinalizedEpoch(t *testing.T) {
 	hook := logTest.NewGlobal()
@@ -995,7 +985,6 @@ func TestValidateBeaconBlockPubSub_InvalidParentBlock(t *testing.T) {
 	assert.Equal(t, res, pubsub.ValidationIgnore, "block with invalid parent should be ignored")
 }
 
-/*
 func TestValidateBeaconBlockPubSub_RejectBlocksFromBadParent(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
@@ -1077,7 +1066,6 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromBadParent(t *testing.T) {
 	assert.ErrorContains(t, "invalid parent", err)
 	assert.Equal(t, res, pubsub.ValidationReject)
 }
-*/
 
 func TestService_setBadBlock_DoesntSetWithContextErr(t *testing.T) {
 	s := Service{}
@@ -1181,7 +1169,6 @@ func TestValidateBeaconBlockPubSub_ValidExecutionPayload(t *testing.T) {
 	require.Equal(t, true, result)
 }
 
-/*
 func TestValidateBeaconBlockPubSub_InvalidPayloadTimestamp(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
@@ -1252,9 +1239,8 @@ func TestValidateBeaconBlockPubSub_InvalidPayloadTimestamp(t *testing.T) {
 	result := res == pubsub.ValidationReject
 	assert.Equal(t, true, result)
 }
-*/
 
-// TODO (rgeraldes24)
+// TODO(rgeraldes24): review
 /*
 func Test_validateBellatrixBeaconBlock(t *testing.T) {
 	db := dbtest.SetupDB(t)
@@ -1345,7 +1331,6 @@ func Test_validateBeaconBlockParentValidation(t *testing.T) {
 	require.ErrorContains(t, "parent of the block is optimistic", r.validateBellatrixBeaconBlock(ctx, beaconState, blk.Block()))
 }
 
-/*
 func Test_validateBeaconBlockProcessingWhenParentIsOptimistic(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
@@ -1418,7 +1403,6 @@ func Test_validateBeaconBlockProcessingWhenParentIsOptimistic(t *testing.T) {
 	result := res == pubsub.ValidationAccept
 	assert.Equal(t, true, result)
 }
-*/
 
 func Test_getBlockFields(t *testing.T) {
 	hook := logTest.NewGlobal()

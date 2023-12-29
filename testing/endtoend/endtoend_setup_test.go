@@ -152,12 +152,6 @@ func e2eMainnet(t *testing.T, useQrysmSh bool, cfg *params.BeaconChainConfig, cf
 		o(testConfig)
 	}
 
-	// In the event we use the cross-client e2e option, we add in an additional
-	// evaluator for multiclient runs to verify the beacon api conformance.
-	// TODO(rgeraldes24) - remove; we don't support multiple client api comparison
-	// if testConfig.UseValidatorCrossClient {
-	// 	testConfig.Evaluators = append(testConfig.Evaluators, beaconapi_evaluators.BeaconAPIMultiClientVerifyIntegrity)
-	// }
 	if testConfig.UseBuilder {
 		testConfig.Evaluators = append(testConfig.Evaluators, ev.BuilderIsActive)
 	}

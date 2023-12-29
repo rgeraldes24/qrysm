@@ -18,6 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+// TODO(rgeraldes24): RPCBlocksByRootTopicV1
 /*
 func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
@@ -170,6 +171,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 }
 */
 
+// TODO(rgeraldes24): /beacon_blocks_by_root/1 has been deprecated in capella
 /*
 func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
@@ -254,7 +256,7 @@ func TestRecentBeaconBlocksRPCHandler_HandleZeroBlocks(t *testing.T) {
 	d := db.SetupDB(t)
 
 	r := &Service{cfg: &config{p2p: p1, beaconDB: d}, rateLimiter: newRateLimiter(p1)}
-	pcl := protocol.ID(p2p.RPCBlocksByRootTopicV1)
+	pcl := protocol.ID(p2p.RPCBlocksByRootTopicV2)
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 

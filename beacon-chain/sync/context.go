@@ -51,6 +51,8 @@ func expectRpcContext(stream network.Stream) (bool, error) {
 	}
 	switch version {
 	case p2p.SchemaVersionV1:
+		return false, nil
+	case p2p.SchemaVersionV2:
 		return true, nil
 	default:
 		return false, errors.New("invalid version of %s registered for topic: %s")

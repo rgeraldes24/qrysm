@@ -18,12 +18,11 @@ import (
 )
 
 type componentHandler struct {
-	t     *testing.T
-	cfg   *e2etypes.E2EConfig
-	ctx   context.Context
-	done  func()
-	group *errgroup.Group
-	// keygen      e2etypes.ComponentRunner // TODO(rgeraldes24) - to remove (used for lighthouse nodes key generation)
+	t           *testing.T
+	cfg         *e2etypes.E2EConfig
+	ctx         context.Context
+	done        func()
+	group       *errgroup.Group
 	tracingSink e2etypes.ComponentRunner
 	// web3Signer               e2etypes.ComponentRunner
 	bootnode       e2etypes.ComponentRunner

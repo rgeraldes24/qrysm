@@ -56,7 +56,6 @@ func ExecuteStateTransitionNoVerifyAnySig(
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not process block")
 	}
-
 	// State root validation.
 	postStateRoot, err := st.HashTreeRoot(ctx)
 	if err != nil {
@@ -227,6 +226,7 @@ func ProcessBlockForStateRoot(
 	if err != nil {
 		return nil, errors.Wrap(err, "could not hash tree root beacon block body")
 	}
+
 	parentRoot := blk.ParentRoot()
 	state, err = b.ProcessBlockHeaderNoVerify(ctx, state, blk.Slot(), blk.ProposerIndex(), parentRoot[:], bodyRoot[:])
 	if err != nil {

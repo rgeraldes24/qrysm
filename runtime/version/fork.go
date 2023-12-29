@@ -2,7 +2,12 @@ package version
 
 import "github.com/pkg/errors"
 
-const Capella = 3
+const (
+	Phase0 = iota
+	Altair
+	Bellatrix
+	Capella
+)
 
 var versionToString = map[int]string{
 	Capella: "capella",
