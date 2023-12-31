@@ -455,7 +455,7 @@ func Test_wrapAndReportValidation(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): this one fails sometimes
+// NOTE(rgeraldes24): this one fails sometimes
 /*
 func TestFilterSubnetPeers(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

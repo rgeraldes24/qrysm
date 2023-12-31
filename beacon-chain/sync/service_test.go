@@ -8,6 +8,8 @@ import (
 	gcache "github.com/patrickmn/go-cache"
 	"github.com/theQRL/qrysm/v4/async/abool"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
+	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
@@ -19,8 +21,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	// dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
-	// "github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
 )
 
 func TestService_StatusZeroEpoch(t *testing.T) {
@@ -111,8 +111,6 @@ func TestSyncHandlers_WaitForChainStart(t *testing.T) {
 	require.Equal(t, true, r.chainStarted.IsSet(), "Did not receive chain start event.")
 }
 
-// TODO(rgeraldes24)
-/*
 func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	p2p := p2ptest.NewTestP2P(t)
 	chainService := &mockChain.ChainService{
@@ -181,7 +179,6 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	}
 	assert.NoError(t, ctx.Err())
 }
-*/
 
 func TestSyncService_StopCleanly(t *testing.T) {
 	p2p := p2ptest.NewTestP2P(t)

@@ -1,6 +1,6 @@
 # Spec Tests
 
-Spec testing vectors: https://github.com/ethereum/consensus-spec-tests
+Spec testing vectors: https://github.com/theQRL/consensus-spec-tests
 
 To run all `mainnet` spec tests:
 

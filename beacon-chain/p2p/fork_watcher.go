@@ -1,7 +1,6 @@
 package p2p
 
 import (
-	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/encoder"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
@@ -26,14 +25,6 @@ func (s *Service) forkWatcher() {
 						log.WithError(err).Error("Could not add fork entry")
 					}
 				}
-
-				// from Bellatrix Epoch, the MaxGossipSize and the MaxChunkSize is changed to 10Mb.
-				// if currEpoch == params.BeaconConfig().BellatrixForkEpoch {
-				// 	encoder.SetMaxGossipSizeForBellatrix()
-				// 	encoder.SetMaxChunkSizeForBellatrix()
-				// }
-				encoder.SetMaxGossipSizeForBellatrix()
-				encoder.SetMaxChunkSizeForBellatrix()
 			}
 		case <-s.ctx.Done():
 			log.Debug("Context closed, exiting goroutine")

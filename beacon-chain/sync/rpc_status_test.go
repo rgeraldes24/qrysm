@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/go-zond/p2p/enr"
 	"github.com/theQRL/qrysm/v4/async/abool"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/db/kv"
 	testingDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/peers"
@@ -18,6 +19,7 @@ import (
 	p2ptypes "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -29,6 +31,8 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestStatusRPCHandler_Disconnects_OnForkVersionMismatch(t *testing.T) {
@@ -160,8 +164,6 @@ func TestStatusRPCHandler_ConnectsOnGenesis(t *testing.T) {
 	assert.Equal(t, 1, len(p1.BHost.Network().Peers()), "Handler disconnected with peer")
 }
 
-// TODO(rgeraldes24)
-/*
 func TestStatusRPCHandler_ReturnsHelloMessage(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
@@ -179,8 +181,9 @@ func TestStatusRPCHandler_ReturnsHelloMessage(t *testing.T) {
 	finalized.Block.Slot = blkSlot
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
-	require.NoError(t, err)
+	// genesisState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
+	// require.NoError(t, err)
+	genesisState, _ := util.DeterministicGenesisState(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), headRoot))
 	util.SaveBlock(t, context.Background(), db, finalized)
@@ -255,7 +258,6 @@ func TestStatusRPCHandler_ReturnsHelloMessage(t *testing.T) {
 		t.Fatal("Did not receive stream within 1 sec")
 	}
 }
-*/
 
 func TestHandshakeHandlers_Roundtrip(t *testing.T) {
 	ctx := context.Background()
@@ -412,7 +414,6 @@ func TestHandshakeHandlers_Roundtrip(t *testing.T) {
 	assert.Equal(t, numActive2-1, numActive3, "Number of active peers unexpected")
 }
 
-/*
 func TestStatusRPCRequest_RequestSent(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
@@ -426,8 +427,10 @@ func TestStatusRPCRequest_RequestSent(t *testing.T) {
 	finalized.Block.Slot = 40
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
-	require.NoError(t, err)
+	// TODO(rgeraldes24): review
+	// genesisState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
+	// require.NoError(t, err)
+	genesisState, _ := util.DeterministicGenesisState(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), headRoot))
 	finalizedCheckpt := &zondpb.Checkpoint{
@@ -489,9 +492,7 @@ func TestStatusRPCRequest_RequestSent(t *testing.T) {
 
 	assert.Equal(t, 1, len(p1.BHost.Network().Peers()), "Expected peers to continue being connected")
 }
-*/
 
-/*
 func TestStatusRPCRequest_FinalizedBlockExists(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
@@ -507,8 +508,9 @@ func TestStatusRPCRequest_FinalizedBlockExists(t *testing.T) {
 	finalized.Block.Slot = blkSlot
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{DepositRoot: make([]byte, 32), BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayload{})
-	require.NoError(t, err)
+	// genesisState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{DepositRoot: make([]byte, 32), BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayload{})
+	// require.NoError(t, err)
+	genesisState, _ := util.DeterministicGenesisState(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), headRoot))
 	blk := util.NewBeaconBlock()
@@ -591,14 +593,13 @@ func TestStatusRPCRequest_FinalizedBlockExists(t *testing.T) {
 
 	assert.Equal(t, 1, len(p1.BHost.Network().Peers()), "Expected peers to continue being connected")
 }
-*/
 
-/*
 func TestStatusRPCRequest_FinalizedBlockSkippedSlots(t *testing.T) {
 	db, err := kv.NewKVStore(context.Background(), t.TempDir())
 	require.NoError(t, err)
-	bState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{DepositRoot: make([]byte, 32), BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayload{})
-	require.NoError(t, err)
+	bState, _ := util.DeterministicGenesisState(t, 1)
+	// bState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{DepositRoot: make([]byte, 32), BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayload{})
+	// require.NoError(t, err)
 
 	blk := util.NewBeaconBlock()
 	blk.Block.Slot = 0
@@ -784,9 +785,7 @@ func TestStatusRPCRequest_FinalizedBlockSkippedSlots(t *testing.T) {
 	}
 	assert.NoError(t, db.Close())
 }
-*/
 
-/*
 func TestStatusRPCRequest_BadPeerHandshake(t *testing.T) {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
@@ -803,8 +802,9 @@ func TestStatusRPCRequest_BadPeerHandshake(t *testing.T) {
 	finalized := util.NewBeaconBlock()
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconState(ctx, nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
-	require.NoError(t, err)
+	// genesisState, err := transition.GenesisBeaconState(ctx, nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
+	// require.NoError(t, err)
+	genesisState, _ := util.DeterministicGenesisState(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), headRoot))
 	finalizedCheckpt := &zondpb.Checkpoint{
@@ -878,9 +878,7 @@ func TestStatusRPCRequest_BadPeerHandshake(t *testing.T) {
 
 	assert.Equal(t, true, p1.Peers().Scorers().IsBadPeer(p2.PeerID()), "Peer is not marked as bad")
 }
-*/
 
-/*
 func TestStatusRPC_ValidGenesisMessage(t *testing.T) {
 	// Set up a head state with data we expect.
 	head := util.NewBeaconBlock()
@@ -892,8 +890,9 @@ func TestStatusRPC_ValidGenesisMessage(t *testing.T) {
 	finalized.Block.Slot = blkSlot
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
-	require.NoError(t, err)
+	// genesisState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
+	// require.NoError(t, err)
+	genesisState, _ := util.DeterministicGenesisState(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), headRoot))
 	finalizedCheckpt := &zondpb.Checkpoint{
@@ -931,9 +930,7 @@ func TestStatusRPC_ValidGenesisMessage(t *testing.T) {
 	})
 	require.NoError(t, err)
 }
-*/
 
-/*
 func TestShouldResync(t *testing.T) {
 	type args struct {
 		genesis  time.Time
@@ -983,8 +980,9 @@ func TestShouldResync(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		headState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
-		require.NoError(t, err)
+		// headState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
+		// require.NoError(t, err)
+		headState, _ := util.DeterministicGenesisState(t, 1)
 		require.NoError(t, headState.SetSlot(tt.args.headSlot))
 		chain := &mock.ChainService{
 			State:   headState,
@@ -1005,7 +1003,6 @@ func TestShouldResync(t *testing.T) {
 		})
 	}
 }
-*/
 
 func makeBlocks(t *testing.T, i, n uint64, previousRoot [32]byte) []interfaces.ReadOnlySignedBeaconBlock {
 	blocks := make([]*zondpb.SignedBeaconBlock, n)

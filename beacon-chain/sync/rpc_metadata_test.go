@@ -1,31 +1,57 @@
 package sync
 
 import (
+	// "context"
+	"context"
 	"reflect"
+	"sync"
+
+	// "sync"
 	"testing"
 	"time"
 
+	// "github.com/libp2p/go-libp2p/core/network"
+	// "github.com/libp2p/go-libp2p/core/protocol"
+	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/theQRL/qrysm/v4/beacon-chain/blockchain"
+	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	db "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
+	p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
+	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
+	"github.com/theQRL/qrysm/v4/encoding/ssz/equality"
+
+	// mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
+	// db "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
+	// "github.com/theQRL/qrysm/v4/beacon-chain/p2p"
+	// p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/wrapper"
+
+	// leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
 	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/metadata"
+
+	// "github.com/theQRL/qrysm/v4/testing/assert"
+	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
+	"github.com/theQRL/qrysm/v4/testing/util"
+	// "github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// RPCMetaDataTopicV1
-/*
 func TestMetaDataRPCHandler_ReceivesMetadata(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
 	p1.Connect(p2)
 	assert.Equal(t, 1, len(p1.BHost.Network().Peers()), "Expected peers to be connected")
 	bitfield := [8]byte{'A', 'B'}
-	p1.LocalMetadata = wrapper.WrappedMetadataV0(&pb.MetaDataV0{
+	p1.LocalMetadata = wrapper.WrappedMetadataV1(&pb.MetaDataV1{
 		SeqNumber: 2,
 		Attnets:   bitfield[:],
+		Syncnets:  []byte{'A'},
 	})
 
 	// Set up a head state in the database with data we expect.
@@ -42,7 +68,8 @@ func TestMetaDataRPCHandler_ReceivesMetadata(t *testing.T) {
 	}
 
 	// Setup streams
-	pcl := protocol.ID(p2p.RPCMetaDataTopicV1)
+	// pcl := protocol.ID(p2p.RPCMetaDataTopicV1)
+	pcl := protocol.ID(p2p.RPCMetaDataTopicV2)
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 	var wg sync.WaitGroup
@@ -50,9 +77,9 @@ func TestMetaDataRPCHandler_ReceivesMetadata(t *testing.T) {
 	p2.BHost.SetStreamHandler(pcl, func(stream network.Stream) {
 		defer wg.Done()
 		expectSuccess(t, stream)
-		out := new(pb.MetaDataV0)
+		out := new(pb.MetaDataV1)
 		assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, out))
-		assert.DeepEqual(t, p1.LocalMetadata.InnerObject(), out, "MetadataV0 unequal")
+		assert.DeepEqual(t, p1.LocalMetadata.InnerObject(), out, "MetadataV1 unequal")
 	})
 	stream1, err := p1.BHost.NewStream(context.Background(), p2.BHost.ID(), pcl)
 	require.NoError(t, err)
@@ -68,19 +95,17 @@ func TestMetaDataRPCHandler_ReceivesMetadata(t *testing.T) {
 		t.Error("Peer is disconnected despite receiving a valid ping")
 	}
 }
-*/
 
-// RPCMetaDataTopicV1
-/*
 func TestMetadataRPCHandler_SendsMetadata(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
 	p1.Connect(p2)
 	assert.Equal(t, 1, len(p1.BHost.Network().Peers()), "Expected peers to be connected")
 	bitfield := [8]byte{'A', 'B'}
-	p2.LocalMetadata = wrapper.WrappedMetadataV0(&pb.MetaDataV0{
+	p2.LocalMetadata = wrapper.WrappedMetadataV1(&pb.MetaDataV1{
 		SeqNumber: 2,
 		Attnets:   bitfield[:],
+		Syncnets:  []byte{'A'},
 	})
 
 	// Set up a head state in the database with data we expect.
@@ -106,7 +131,7 @@ func TestMetadataRPCHandler_SendsMetadata(t *testing.T) {
 	}
 
 	// Setup streams
-	pcl := protocol.ID(p2p.RPCMetaDataTopicV1 + r.cfg.p2p.Encoding().ProtocolSuffix())
+	pcl := protocol.ID(p2p.RPCMetaDataTopicV2 + r.cfg.p2p.Encoding().ProtocolSuffix())
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 	r2.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
@@ -122,7 +147,7 @@ func TestMetadataRPCHandler_SendsMetadata(t *testing.T) {
 	assert.NoError(t, err)
 
 	if !equality.DeepEqual(md.InnerObject(), p2.LocalMetadata.InnerObject()) {
-		t.Fatalf("MetadataV0 unequal, received %v but wanted %v", md, p2.LocalMetadata)
+		t.Fatalf("MetadataV1 unequal, received %v but wanted %v", md, p2.LocalMetadata)
 	}
 
 	if util.WaitTimeout(&wg, 1*time.Second) {
@@ -134,8 +159,8 @@ func TestMetadataRPCHandler_SendsMetadata(t *testing.T) {
 		t.Error("Peer is disconnected despite receiving a valid ping")
 	}
 }
-*/
 
+// NOTE(rgeraldes24): similar test as above, this one has one more test; remove?
 /*
 func TestMetadataRPCHandler_SendsMetadataAltair(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
@@ -234,8 +259,6 @@ func TestExtractMetaDataType(t *testing.T) {
 	// Precompute digests
 	genDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, params.BeaconConfig().ZeroHash[:])
 	require.NoError(t, err)
-	// altairDigest, err := signing.ComputeForkDigest(params.BeaconConfig().AltairForkVersion, params.BeaconConfig().ZeroHash[:])
-	// require.NoError(t, err)
 
 	type args struct {
 		digest []byte
@@ -253,7 +276,7 @@ func TestExtractMetaDataType(t *testing.T) {
 				digest: []byte{},
 				clock:  startup.NewClock(time.Now(), [32]byte{}),
 			},
-			want:    wrapper.WrappedMetadataV0(&pb.MetaDataV0{}),
+			want:    wrapper.WrappedMetadataV1(&pb.MetaDataV1{}),
 			wantErr: false,
 		},
 		{
@@ -274,27 +297,15 @@ func TestExtractMetaDataType(t *testing.T) {
 			want:    nil,
 			wantErr: true,
 		},
-		// TODO(rgeraldes24): review
 		{
 			name: "genesis fork version",
 			args: args{
 				digest: genDigest[:],
 				clock:  startup.NewClock(time.Now(), [32]byte{}),
 			},
-			want:    wrapper.WrappedMetadataV0(&pb.MetaDataV0{}),
+			want:    wrapper.WrappedMetadataV1(&pb.MetaDataV1{}),
 			wantErr: false,
 		},
-		/*
-			{
-				name: "altair fork version",
-				args: args{
-					digest: altairDigest[:],
-					clock:  startup.NewClock(time.Now(), [32]byte{}),
-				},
-				want:    wrapper.WrappedMetadataV1(&pb.MetaDataV1{}),
-				wantErr: false,
-			},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

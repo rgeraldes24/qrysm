@@ -43,7 +43,7 @@ func InitializeDataMaps() {
 	// Reset our metadata map.
 	MetaDataMap = map[[4]byte]func() metadata.Metadata{
 		bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion): func() metadata.Metadata {
-			return wrapper.WrappedMetadataV0(&zondpb.MetaDataV0{})
+			return wrapper.WrappedMetadataV1(&zondpb.MetaDataV1{})
 		},
 	}
 }

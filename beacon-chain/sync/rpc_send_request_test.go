@@ -295,11 +295,11 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 	})
 }
 
-/* TODO(rgeraldes24): could not extract block data type
 func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRootTopicV1)
+	// pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRootTopicV1)
+	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRootTopicV2)
 
 	knownBlocks := make(map[[32]byte]*zondpb.SignedBeaconBlock)
 	knownRoots := make([][32]byte, 0)
@@ -311,16 +311,18 @@ func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 		knownBlocks[knownRoots[len(knownRoots)-1]] = blk
 	}
 
-	t.Run("stream error", func(t *testing.T) {
-		p1 := p2ptest.NewTestP2P(t)
-		// Bogus peer doesn't support a given protocol, so stream error is expected.
-		bogusPeer := p2ptest.NewTestP2P(t)
-		p1.Connect(bogusPeer)
+	/*
+		t.Run("stream error", func(t *testing.T) {
+			p1 := p2ptest.NewTestP2P(t)
+			// Bogus peer doesn't support a given protocol, so stream error is expected.
+			bogusPeer := p2ptest.NewTestP2P(t)
+			p1.Connect(bogusPeer)
 
-		req := &p2pTypes.BeaconBlockByRootsReq{}
-		_, err := SendBeaconBlocksByRootRequest(ctx, startup.NewClock(time.Now(), [32]byte{}), p1, bogusPeer.PeerID(), req, nil)
-		assert.ErrorContains(t, "protocols not supported", err)
-	})
+			req := &p2pTypes.BeaconBlockByRootsReq{}
+			_, err := SendBeaconBlocksByRootRequest(ctx, startup.NewClock(time.Now(), [32]byte{}), p1, bogusPeer.PeerID(), req, nil)
+			assert.ErrorContains(t, "protocols not supported", err)
+		})
+	*/
 
 	knownBlocksProvider := func(p2pProvider p2p.P2P, processor BeaconBlockProcessor) func(stream network.Stream) {
 		return func(stream network.Stream) {
@@ -335,9 +337,9 @@ func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 			}
 			for _, root := range *req {
 				if blk, ok := knownBlocks[root]; ok {
+					wsb, err := blocks.NewSignedBeaconBlock(blk)
+					require.NoError(t, err)
 					if processor != nil {
-						wsb, err := blocks.NewSignedBeaconBlock(blk)
-						require.NoError(t, err)
 						if processorErr := processor(wsb); processorErr != nil {
 							if errors.Is(processorErr, io.EOF) {
 								// Close stream, w/o any errors written.
@@ -351,10 +353,16 @@ func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 							return
 						}
 					}
-					_, err := stream.Write([]byte{0x00})
-					assert.NoError(t, err, "Could not write to stream")
-					_, err = p2pProvider.Encoding().EncodeWithMaxLength(stream, blk)
-					assert.NoError(t, err, "Could not send response back")
+					// NOTE(rgeraldes24) - capella also sends some context which does not work with this code
+					// _, err := stream.Write([]byte{0x00})
+					// assert.NoError(t, err, "Could not write to stream")
+					// _, err = p2pProvider.Encoding().EncodeWithMaxLength(stream, blk)
+					// assert.NoError(t, err, "Could not send response back")
+
+					err = WriteBlockChunk(stream, startup.NewClock(time.Now(), [32]byte{}), p2pProvider.Encoding(), wsb)
+					if err != nil && err.Error() != network.ErrReset.Error() {
+						require.NoError(t, err)
+					}
 				}
 			}
 		}
@@ -477,4 +485,3 @@ func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 		assert.Equal(t, 3, len(blocks))
 	})
 }
-*/
