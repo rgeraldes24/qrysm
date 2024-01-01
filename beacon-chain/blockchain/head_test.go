@@ -24,6 +24,10 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
+// NOTE(rgeraldes24): I add to bump the slot number in some tests because Capella's
+// util.GenerateFullBlock does not work when generating a block with the same slot
+// as the state given which was not the case before.
+
 func TestSaveHead_Same(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
@@ -258,12 +262,6 @@ func TestRetrieveHead_ReadOnly(t *testing.T) {
 	assert.Equal(t, rOnlyState, service.head.state, "Head is not the same object")
 }
 
-// TODO
-// NOTE(rgeraldes24) - initial slot must be 1 instead of 0 because with the capella block we
-// get the following error: Unexpected error: expected state.slot 0 < slot 0
-// This applies to other tests.
-// Fix embedded mainnet genesis
-/*
 func TestSaveOrphanedAtts(t *testing.T) {
 	ctx := context.Background()
 	beaconDB := testDB.SetupDB(t)
@@ -329,9 +327,7 @@ func TestSaveOrphanedAtts(t *testing.T) {
 	})
 	require.DeepEqual(t, wantAtts, atts)
 }
-*/
 
-/*
 func TestSaveOrphanedOps(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig()
@@ -342,26 +338,27 @@ func TestSaveOrphanedOps(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
 	service.genesisTime = time.Now().Add(time.Duration(-10*int64(1)*int64(params.BeaconConfig().SecondsPerSlot)) * time.Second)
+	service.cfg.DilithiumToExecPool = dilithiumtoexec.NewPool()
 
 	// Chain setup
 	// 0 -- 1 -- 2 -- 3
 	//  \-4
 	st, keys := util.DeterministicGenesisState(t, 64)
 	service.head = &head{state: st}
-	blkG, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 0)
+	blkG, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 1)
 	assert.NoError(t, err)
 
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, blkG)
 	rG, err := blkG.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk1, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 1)
+	blk1, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 2)
 	assert.NoError(t, err)
 	blk1.Block.ParentRoot = rG[:]
 	r1, err := blk1.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk2, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 2)
+	blk2, err := util.GenerateFullBlock(st, keys, util.DefaultBlockGenConfig(), 3)
 	assert.NoError(t, err)
 	blk2.Block.ParentRoot = r1[:]
 	r2, err := blk2.Block.HashTreeRoot()
@@ -372,14 +369,14 @@ func TestSaveOrphanedOps(t *testing.T) {
 	blkConfig.NumProposerSlashings = 1
 	blkConfig.NumAttesterSlashings = 1
 	blkConfig.NumVoluntaryExits = 1
-	blk3, err := util.GenerateFullBlock(st, keys, blkConfig, 3)
+	blk3, err := util.GenerateFullBlock(st, keys, blkConfig, 4)
 	assert.NoError(t, err)
 	blk3.Block.ParentRoot = r2[:]
 	r3, err := blk3.Block.HashTreeRoot()
 	require.NoError(t, err)
 
 	blk4 := util.NewBeaconBlock()
-	blk4.Block.Slot = 4
+	blk4.Block.Slot = 5
 	blk4.Block.ParentRoot = rG[:]
 	r4, err := blk4.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -413,7 +410,6 @@ func TestSaveOrphanedOps(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 1, len(exits))
 }
-*/
 
 func TestSaveOrphanedAtts_CanFilter(t *testing.T) {
 	ctx := context.Background()
@@ -538,13 +534,11 @@ func TestSaveOrphanedAtts_DoublyLinkedTrie(t *testing.T) {
 	require.DeepEqual(t, wantAtts, atts)
 }
 
-// TODO
-/*
 func TestSaveOrphanedAtts_CanFilter_DoublyLinkedTrie(t *testing.T) {
 	ctx := context.Background()
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
-	service.genesisTime = time.Now().Add(time.Duration(-1*int64(params.BeaconConfig().SlotsPerEpoch+2)*int64(params.BeaconConfig().SecondsPerSlot)) * time.Second)
+	service.genesisTime = time.Now().Add(time.Duration(-1*int64(params.BeaconConfig().SlotsPerEpoch+3)*int64(params.BeaconConfig().SecondsPerSlot)) * time.Second)
 
 	// Chain setup
 	// 0 -- 1 -- 2
@@ -588,7 +582,6 @@ func TestSaveOrphanedAtts_CanFilter_DoublyLinkedTrie(t *testing.T) {
 	require.NoError(t, service.saveOrphanedOperations(ctx, r2, r4))
 	require.Equal(t, 0, service.cfg.AttPool.AggregatedAttestationCount())
 }
-*/
 
 func TestUpdateHead_noSavedChanges(t *testing.T) {
 	service, tr := minimalTestService(t)

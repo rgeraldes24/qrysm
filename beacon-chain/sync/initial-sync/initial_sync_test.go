@@ -1,6 +1,6 @@
 package initialsync
 
-/*
+
 import (
 	"context"
 	"fmt"
@@ -74,6 +74,7 @@ func TestMain(m *testing.M) {
 	m.Run()
 }
 
+
 func initializeTestServices(t *testing.T, slots []primitives.Slot, peers []*peerData) (*mock.ChainService, *p2pt.TestP2P, db.Database) {
 	cache.initializeRootCache(slots, t)
 	beaconDB := dbtest.SetupDB(t)
@@ -100,6 +101,7 @@ func initializeTestServices(t *testing.T, slots []primitives.Slot, peers []*peer
 		ValidatorsRoot: [32]byte{},
 	}, p, beaconDB
 }
+
 
 // makeGenesisTime where now is the current slot.
 func makeGenesisTime(currentSlot primitives.Slot) time.Time {
@@ -167,7 +169,7 @@ func connectPeers(t *testing.T, host *p2pt.TestP2P, data []*peerData, peerStatus
 
 // connectPeer connects a peer to a local host.
 func connectPeer(t *testing.T, host *p2pt.TestP2P, datum *peerData, peerStatus *peers.Status) peer.ID {
-	const topic = "/zond2/beacon_chain/req/beacon_blocks_by_range/1/ssz_snappy"
+	const topic = "/zond2/beacon_chain/req/beacon_blocks_by_range/2/ssz_snappy"
 	p := p2pt.NewTestP2P(t)
 	p.SetStreamHandler(topic, func(stream network.Stream) {
 		defer func() {
@@ -270,7 +272,6 @@ func extendBlockSequence(t *testing.T, inSeq []*zondpb.SignedBeaconBlock, size i
 	return outSeq
 }
 
-// TODO(rgeraldes24): /beacon_blocks_by_root/1 has been deprecated in capella
 // connectPeerHavingBlocks connect host with a peer having provided blocks.
 func connectPeerHavingBlocks(
 	t *testing.T, host *p2pt.TestP2P, blks []*zondpb.SignedBeaconBlock, finalizedSlot primitives.Slot,
@@ -278,7 +279,7 @@ func connectPeerHavingBlocks(
 ) peer.ID {
 	p := p2pt.NewTestP2P(t)
 
-	p.SetStreamHandler("/zond2/beacon_chain/req/beacon_blocks_by_range/1/ssz_snappy", func(stream network.Stream) {
+	p.SetStreamHandler("/zond2/beacon_chain/req/beacon_blocks_by_range/2/ssz_snappy", func(stream network.Stream) {
 		defer func() {
 			_err := stream.Close()
 			_ = _err
@@ -297,7 +298,7 @@ func connectPeerHavingBlocks(
 		}
 	})
 
-	p.SetStreamHandler("/zond2/beacon_chain/req/beacon_blocks_by_root/1/ssz_snappy", func(stream network.Stream) {
+	p.SetStreamHandler("/zond2/beacon_chain/req/beacon_blocks_by_root/2/ssz_snappy", func(stream network.Stream) {
 		defer func() {
 			_err := stream.Close()
 			_ = _err
@@ -339,4 +340,3 @@ func connectPeerHavingBlocks(
 
 	return p.PeerID()
 }
-*/

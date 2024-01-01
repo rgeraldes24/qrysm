@@ -8,7 +8,9 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
+	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -109,7 +111,6 @@ func TestProcessAttestations_Ok(t *testing.T) {
 	require.LogsDoNotContain(t, hook, "Could not process attestation for fork choice")
 }
 
-// TODO
 /*
 func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	service, tr := minimalTestService(t)
@@ -169,7 +170,6 @@ func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 }
 */
 
-/*
 func TestService_UpdateHead_NoAtts(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, fcs := tr.ctx, tr.fcs
@@ -216,4 +216,3 @@ func TestService_UpdateHead_NoAtts(t *testing.T) {
 
 	require.Equal(t, 0, len(service.cfg.AttPool.ForkchoiceAttestations())) // Validate att pool is empty
 }
-*/

@@ -2,28 +2,24 @@ package blockchain
 
 import (
 	"context"
+	"sync"
 	"testing"
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	// blockchainTesting "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-	// "github.com/theQRL/qrysm/v4/beacon-chain/operations/voluntaryexits"
-	// "github.com/theQRL/qrysm/v4/beacon-chain/operations/voluntaryexits"
+	blockchainTesting "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/voluntaryexits"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
-
-	// "github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	// "github.com/theQRL/qrysm/v4/consensus-types/interfaces"
+	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	// "github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	// "github.com/theQRL/qrysm/v4/testing/util"
 )
 
-/*
 func TestService_ReceiveBlock(t *testing.T) {
 	ctx := context.Background()
 
@@ -82,42 +78,45 @@ func TestService_ReceiveBlock(t *testing.T) {
 				}
 			},
 		},
-		{
-			name: "updates exit pool",
-			args: args{
-				block: genFullBlock(t, &util.BlockGenConfig{
-					NumProposerSlashings: 0,
-					NumAttesterSlashings: 0,
-					NumAttestations:      0,
-					NumDeposits:          0,
-					NumVoluntaryExits:    3,
+		// TODO(rgeraldes24)
+		/*
+				{
+					name: "updates exit pool",
+					args: args{
+						block: genFullBlock(t, &util.BlockGenConfig{
+							NumProposerSlashings: 0,
+							NumAttesterSlashings: 0,
+							NumAttestations:      0,
+							NumDeposits:          0,
+							NumVoluntaryExits:    3,
+						},
+							1,
+						),
+					},
+					check: func(t *testing.T, s *Service) {
+						pending, err := s.cfg.ExitPool.PendingExits()
+						require.NoError(t, err)
+						if len(pending) != 0 {
+							t.Errorf(
+								"Did not mark the correct number of exits. Got %d pending but wanted %d",
+								len(pending),
+								0,
+							)
+						}
+					},
 				},
-					1,
-				),
+			{
+				name: "notifies block processed on state feed",
+				args: args{
+					block: genFullBlock(t, util.DefaultBlockGenConfig(), 1),
+				},
+				check: func(t *testing.T, s *Service) {
+					if recvd := len(s.cfg.StateNotifier.(*blockchainTesting.MockStateNotifier).ReceivedEvents()); recvd < 1 {
+						t.Errorf("Received %d state notifications, expected at least 1", recvd)
+					}
+				},
 			},
-			check: func(t *testing.T, s *Service) {
-				pending, err := s.cfg.ExitPool.PendingExits()
-				require.NoError(t, err)
-				if len(pending) != 0 {
-					t.Errorf(
-						"Did not mark the correct number of exits. Got %d pending but wanted %d",
-						len(pending),
-						0,
-					)
-				}
-			},
-		},
-		{
-			name: "notifies block processed on state feed",
-			args: args{
-				block: genFullBlock(t, util.DefaultBlockGenConfig(), 1),
-			},
-			check: func(t *testing.T, s *Service) {
-				if recvd := len(s.cfg.StateNotifier.(*blockchainTesting.MockStateNotifier).ReceivedEvents()); recvd < 1 {
-					t.Errorf("Received %d state notifications, expected at least 1", recvd)
-				}
-			},
-		},
+		*/
 	}
 
 	wg := new(sync.WaitGroup)
@@ -152,9 +151,7 @@ func TestService_ReceiveBlock(t *testing.T) {
 	}
 	wg.Wait()
 }
-*/
 
-/*
 func TestService_ReceiveBlockUpdateHead(t *testing.T) {
 	s, tr := minimalTestService(t,
 		WithExitPool(voluntaryexits.NewPool()),
@@ -250,7 +247,6 @@ func TestService_ReceiveBlockBatch(t *testing.T) {
 		})
 	}
 }
-*/
 
 func TestService_HasBlock(t *testing.T) {
 	s, _ := minimalTestService(t)

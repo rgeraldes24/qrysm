@@ -1,6 +1,5 @@
 package initialsync
 
-/*
 import (
 	"errors"
 	"fmt"
@@ -462,4 +461,3 @@ func TestStateMachine_isFirstLast(t *testing.T) {
 	keys := []primitives.Slot{32, 64, 128, 196, 512}
 	assert.DeepEqual(t, smm.keys, keys, "Keys not sorted")
 }
-*/

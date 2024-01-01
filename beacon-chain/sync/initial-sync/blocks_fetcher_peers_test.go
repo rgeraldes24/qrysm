@@ -1,6 +1,5 @@
 package initialsync
 
-/*
 import (
 	"context"
 	"math"
@@ -433,4 +432,3 @@ func TestBlocksFetcher_removeStalePeerLocks(t *testing.T) {
 		})
 	}
 }
-*/

@@ -402,7 +402,7 @@ func TestDownloadFinalizedData(t *testing.T) {
 	cfg := params.MainnetConfig().Copy()
 
 	// avoid the altair zone because genesis tests are easier to set up
-	//epoch := cfg.AltairForkEpoch - 1
+	// epoch := cfg.AltairForkEpoch - 1
 	epoch := primitives.Epoch(0)
 	// set up checkpoint state, using the epoch that will be computed as the ws checkpoint state based on the head state
 	slot, err := slots.EpochStart(epoch)

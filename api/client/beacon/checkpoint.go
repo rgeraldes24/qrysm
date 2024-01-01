@@ -119,6 +119,7 @@ func DownloadFinalizedData(ctx context.Context, client *Client) (*OriginData, er
 	}, nil
 }
 
+// NOTE(rgeraldes24): deprecated by the Qrysm team
 /*
 // WeakSubjectivityData represents the state root, block root and epoch of the BeaconState + ReadOnlySignedBeaconBlock
 // that falls at the beginning of the current weak subjectivity period. These values can be used to construct

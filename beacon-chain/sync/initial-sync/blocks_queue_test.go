@@ -1,6 +1,5 @@
 package initialsync
 
-/*
 import (
 	"context"
 	"fmt"
@@ -1362,4 +1361,3 @@ func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 		require.Equal(t, true, beaconDB.HasBlock(ctx, blkRoot) || mc.HasBlock(ctx, blkRoot), "slot %d", blk.Block.Slot)
 	}
 }
-*/
