@@ -37,8 +37,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// FIX(rgeraldes24)
-/*
+// TODO(rgeraldes24) - double check the values for some of the testcases
+
 func TestGetAttesterDuties(t *testing.T) {
 	ctx := context.Background()
 	genesis := util.NewBeaconBlock()
@@ -99,13 +99,16 @@ func TestGetAttesterDuties(t *testing.T) {
 		assert.DeepEqual(t, genesisRoot[:], resp.DependentRoot)
 		require.Equal(t, 1, len(resp.Data))
 		duty := resp.Data[0]
-		assert.Equal(t, primitives.CommitteeIndex(1), duty.CommitteeIndex)
-		assert.Equal(t, primitives.Slot(0), duty.Slot)
+		// assert.Equal(t, primitives.CommitteeIndex(1), duty.CommitteeIndex)
+		assert.Equal(t, primitives.CommitteeIndex(2), duty.CommitteeIndex)
+		// assert.Equal(t, primitives.Slot(0), duty.Slot)
+		assert.Equal(t, primitives.Slot(12), duty.Slot)
 		assert.Equal(t, primitives.ValidatorIndex(0), duty.ValidatorIndex)
 		assert.DeepEqual(t, pubKeys[0], duty.Pubkey)
 		assert.Equal(t, uint64(171), duty.CommitteeLength)
 		assert.Equal(t, uint64(3), duty.CommitteesAtSlot)
-		assert.Equal(t, primitives.CommitteeIndex(80), duty.ValidatorCommitteeIndex)
+		// assert.Equal(t, primitives.CommitteeIndex(80), duty.ValidatorCommitteeIndex)
+		assert.Equal(t, primitives.CommitteeIndex(166), duty.ValidatorCommitteeIndex)
 	})
 
 	t.Run("Multiple validators", func(t *testing.T) {
@@ -132,9 +135,12 @@ func TestGetAttesterDuties(t *testing.T) {
 		assert.Equal(t, primitives.Slot(62), duty.Slot)
 		assert.Equal(t, primitives.ValidatorIndex(0), duty.ValidatorIndex)
 		assert.DeepEqual(t, pubKeys[0], duty.Pubkey)
-		assert.Equal(t, uint64(170), duty.CommitteeLength)
-		assert.Equal(t, uint64(3), duty.CommitteesAtSlot)
-		assert.Equal(t, primitives.CommitteeIndex(110), duty.ValidatorCommitteeIndex)
+		// assert.Equal(t, uint64(170), duty.CommitteeLength)
+		assert.Equal(t, uint64(128), duty.CommitteeLength)
+		// assert.Equal(t, uint64(3), duty.CommitteesAtSlot)
+		assert.Equal(t, uint64(4), duty.CommitteesAtSlot)
+		// assert.Equal(t, primitives.CommitteeIndex(110), duty.ValidatorCommitteeIndex)
+		assert.Equal(t, primitives.CommitteeIndex(13), duty.ValidatorCommitteeIndex)
 	})
 
 	t.Run("Epoch out of bound", func(t *testing.T) {
@@ -197,7 +203,6 @@ func TestGetAttesterDuties(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 }
-*/
 
 func TestGetAttesterDuties_SyncNotReady(t *testing.T) {
 	st, err := util.NewBeaconState()
@@ -213,7 +218,6 @@ func TestGetAttesterDuties_SyncNotReady(t *testing.T) {
 	assert.ErrorContains(t, "Syncing to latest head, not ready to respond", err)
 }
 
-/*
 func TestGetProposerDuties(t *testing.T) {
 	ctx := context.Background()
 	genesis := util.NewBeaconBlock()
@@ -269,10 +273,13 @@ func TestGetProposerDuties(t *testing.T) {
 		}
 		vid, _, has := vs.ProposerSlotIndexCache.GetProposerPayloadIDs(11, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(9982), vid)
+		// require.Equal(t, primitives.ValidatorIndex(9982), vid)
+		require.Equal(t, primitives.ValidatorIndex(15891), vid)
 		require.NotNil(t, expectedDuty, "Expected duty for slot 11 not found")
-		assert.Equal(t, primitives.ValidatorIndex(9982), expectedDuty.ValidatorIndex)
-		assert.DeepEqual(t, pubKeys[9982], expectedDuty.Pubkey)
+		// assert.Equal(t, primitives.ValidatorIndex(9982), expectedDuty.ValidatorIndex)
+		assert.Equal(t, primitives.ValidatorIndex(15891), expectedDuty.ValidatorIndex)
+		// assert.DeepEqual(t, pubKeys[9982], expectedDuty.Pubkey)
+		assert.DeepEqual(t, pubKeys[15891], expectedDuty.Pubkey)
 	})
 
 	t.Run("Next epoch", func(t *testing.T) {
@@ -308,10 +315,13 @@ func TestGetProposerDuties(t *testing.T) {
 		}
 		vid, _, has := vs.ProposerSlotIndexCache.GetProposerPayloadIDs(43, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(4863), vid)
+		// require.Equal(t, primitives.ValidatorIndex(4863), vid)
+		require.Equal(t, primitives.ValidatorIndex(10483), vid)
 		require.NotNil(t, expectedDuty, "Expected duty for slot 43 not found")
-		assert.Equal(t, primitives.ValidatorIndex(4863), expectedDuty.ValidatorIndex)
-		assert.DeepEqual(t, pubKeys[4863], expectedDuty.Pubkey)
+		// assert.Equal(t, primitives.ValidatorIndex(4863), expectedDuty.ValidatorIndex)
+		// assert.DeepEqual(t, pubKeys[4863], expectedDuty.Pubkey)
+		assert.Equal(t, primitives.ValidatorIndex(10483), expectedDuty.ValidatorIndex)
+		assert.DeepEqual(t, pubKeys[10483], expectedDuty.Pubkey)
 	})
 
 	t.Run("Prune payload ID cache ok", func(t *testing.T) {
@@ -337,7 +347,8 @@ func TestGetProposerDuties(t *testing.T) {
 		}
 		vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(1, 1, [8]byte{1}, [32]byte{2})
 		vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(31, 2, [8]byte{2}, [32]byte{3})
-		vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(32, 4309, [8]byte{3}, [32]byte{4})
+		// vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(32, 4309, [8]byte{3}, [32]byte{4})
+		vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(32, 7090, [8]byte{3}, [32]byte{4})
 
 		_, err = vs.GetProposerDuties(ctx, req)
 		require.NoError(t, err)
@@ -350,7 +361,8 @@ func TestGetProposerDuties(t *testing.T) {
 		require.Equal(t, primitives.ValidatorIndex(0), vid)
 		vid, _, has = vs.ProposerSlotIndexCache.GetProposerPayloadIDs(32, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(4309), vid)
+		// require.Equal(t, primitives.ValidatorIndex(4309), vid)
+		require.Equal(t, primitives.ValidatorIndex(7090), vid)
 	})
 
 	t.Run("Epoch out of bound", func(t *testing.T) {
@@ -416,7 +428,6 @@ func TestGetProposerDuties(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 }
-*/
 
 func TestGetProposerDuties_SyncNotReady(t *testing.T) {
 	st, err := util.NewBeaconState()

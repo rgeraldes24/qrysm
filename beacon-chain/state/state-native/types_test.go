@@ -19,8 +19,6 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// FIX(rgeraldes24)
-/*
 func TestBeaconState_ProtoBeaconStateCompatibility(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	ctx := context.Background()
@@ -53,7 +51,6 @@ func TestBeaconState_ProtoBeaconStateCompatibility(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, r1, r2, "Mismatched roots")
 }
-*/
 
 func setupGenesisState(tb testing.TB, count uint64) *zondpb.BeaconState {
 	genesisState, _, err := interop.GenerateGenesisState(context.Background(), 0, count, &enginev1.ExecutionPayload{}, &zondpb.Zond1Data{})
@@ -74,6 +71,18 @@ func setupGenesisState(tb testing.TB, count uint64) *zondpb.BeaconState {
 			WithdrawableEpoch:          1,
 		})
 		genesisState.Balances = append(genesisState.Balances, params.BeaconConfig().MaxEffectiveBalance)
+		genesisState.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeader{
+			ParentHash:       make([]byte, 32),
+			FeeRecipient:     make([]byte, 20),
+			StateRoot:        make([]byte, 32),
+			ReceiptsRoot:     make([]byte, 32),
+			LogsBloom:        make([]byte, 256),
+			PrevRandao:       make([]byte, 32),
+			BaseFeePerGas:    make([]byte, 32),
+			BlockHash:        make([]byte, 32),
+			TransactionsRoot: make([]byte, 32),
+			WithdrawalsRoot:  make([]byte, 32),
+		}
 	}
 	return genesisState
 }

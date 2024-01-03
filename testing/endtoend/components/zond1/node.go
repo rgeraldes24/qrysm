@@ -45,7 +45,7 @@ func NewNode(index int, enr string) *Node {
 func (node *Node) Start(ctx context.Context) error {
 	binaryPath, found := bazel.FindBinary("cmd/gzond", "gzond")
 	if !found {
-		return errors.New("go-ethereum binary not found")
+		return errors.New("go-zond binary not found")
 	}
 
 	zond1Path := path.Join(e2e.TestParams.TestPath, "zond1data/"+strconv.Itoa(node.index)+"/")
@@ -98,19 +98,19 @@ func (node *Node) Start(ctx context.Context) error {
 		fmt.Sprintf("--port=%d", e2e.TestParams.Ports.Zond1Port+node.index),
 		fmt.Sprintf("--networkid=%d", NetworkId),
 		"--http",
-		"--http.api=engine,net,eth",
+		"--http.api=engine,net,zond",
 		"--http.addr=127.0.0.1",
 		"--http.corsdomain=\"*\"",
 		"--http.vhosts=\"*\"",
 		"--rpc.allow-unprotected-txs",
 		"--ws",
-		"--ws.api=net,eth,engine",
+		"--ws.api=net,zond,engine",
 		"--ws.addr=127.0.0.1",
 		"--ws.origins=\"*\"",
 		"--ipcdisable",
 		"--verbosity=4",
 		"--syncmode=full",
-		fmt.Sprintf("--txpool.locals=%s", EthAddress),
+		// fmt.Sprintf("--txpool.locals=%s", ZondAddress),
 	}
 
 	// give the miner start a couple of tries, since the p2p networking check is flaky

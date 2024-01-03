@@ -8,9 +8,6 @@ package zond
 
 import (
 	context "context"
-	reflect "reflect"
-	sync "sync"
-
 	empty "github.com/golang/protobuf/ptypes/empty"
 	github_com_theQRL_qrysm_v4_consensus_types_primitives "github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	_ "github.com/theQRL/qrysm/v4/proto/zond/ext"
@@ -20,6 +17,8 @@ import (
 	status "google.golang.org/grpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	reflect "reflect"
+	sync "sync"
 )
 
 const (

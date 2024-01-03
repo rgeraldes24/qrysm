@@ -17,6 +17,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestReplayBlocks_AllSkipSlots(t *testing.T) {
@@ -166,8 +167,6 @@ func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	assert.Equal(t, version.Capella, newState.Version())
 }
 
-// FIX(rgeraldes24): blinded blocks
-/*
 func TestLoadBlocks_FirstBranch(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	ctx := context.Background()
@@ -191,16 +190,21 @@ func TestLoadBlocks_FirstBranch(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}
 }
-*/
 
-/*
 func TestLoadBlocks_SecondBranch(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	ctx := context.Background()
@@ -222,16 +226,21 @@ func TestLoadBlocks_SecondBranch(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}
 }
-*/
 
-/*
 func TestLoadBlocks_ThirdBranch(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	ctx := context.Background()
@@ -255,16 +264,21 @@ func TestLoadBlocks_ThirdBranch(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}
 }
-*/
 
-/*
 func TestLoadBlocks_SameSlots(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	ctx := context.Background()
@@ -286,16 +300,21 @@ func TestLoadBlocks_SameSlots(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}
 }
-*/
 
-/*
 func TestLoadBlocks_SameEndSlots(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	ctx := context.Background()
@@ -316,16 +335,21 @@ func TestLoadBlocks_SameEndSlots(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}
 }
-*/
 
-/*
 func TestLoadBlocks_SameEndSlotsWith2blocks(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	ctx := context.Background()
@@ -345,14 +369,20 @@ func TestLoadBlocks_SameEndSlotsWith2blocks(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}
 }
-*/
 
 func TestLoadBlocks_BadStart(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)

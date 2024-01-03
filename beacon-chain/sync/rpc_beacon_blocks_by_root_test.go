@@ -9,6 +9,7 @@ import (
 
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/protocol"
+	gcache "github.com/patrickmn/go-cache"
 	"github.com/theQRL/go-zond/common"
 	gzondTypes "github.com/theQRL/go-zond/core/types"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
@@ -19,11 +20,14 @@ import (
 	p2pTypes "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
+	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	"github.com/theQRL/qrysm/v4/network/forks"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -229,8 +233,6 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 	}
 }
 
-// FIX(rgeraldes24)
-/*
 func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
@@ -245,8 +247,6 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 	require.NoError(t, err)
 	blockBRoot, err := blockB.Block.HashTreeRoot()
 	require.NoError(t, err)
-	// genesisState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Zond1Data{}, &enginev1.ExecutionPayload{})
-	// require.NoError(t, err)
 	genesisState, _ := util.DeterministicGenesisState(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), blockARoot))
@@ -292,6 +292,10 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 		for _, blk := range response {
 			_, err := stream.Write([]byte{responseCodeSuccess})
 			assert.NoError(t, err, "Could not write to stream")
+			vRoot := r.cfg.clock.GenesisValidatorsRoot()
+			digest, err := forks.ForkDigestFromEpoch(params.BeaconConfig().GenesisEpoch, vRoot[:])
+			assert.NoError(t, err)
+			assert.NoError(t, writeContextToStream(digest[:], stream))
 			_, err = p2.Encoding().EncodeWithMaxLength(stream, blk)
 			assert.NoError(t, err, "Could not send response back")
 		}
@@ -305,7 +309,6 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 		t.Fatal("Did not receive stream within 1 sec")
 	}
 }
-*/
 
 func TestRecentBeaconBlocksRPCHandler_HandleZeroBlocks(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)

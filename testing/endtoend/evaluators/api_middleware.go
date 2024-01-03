@@ -55,7 +55,7 @@ func apiMiddlewareVerify(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientCon
 		if err := runAPIComparisonFunctions(
 			beaconNodeIdx,
 			conn,
-			withCompareValidatorsEth,
+			withCompareValidatorsEth, // TODO(rgeraldes24): name
 			withCompareSyncCommittee,
 			withCompareAttesterDuties,
 		); err != nil {

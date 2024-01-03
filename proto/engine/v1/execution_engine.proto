@@ -119,6 +119,7 @@ message Withdrawal {
 	uint64 amount = 4;
 }
 
+/*
 // Blobs bundle is retrieved through engine-api from the execution layer client.
 // It consists of the necessary components for constructing a blobs sidecar object to gossip through p2p.
 message BlobsBundle {
@@ -137,6 +138,7 @@ message Blob {
 	// Each blob consists of `BLS_FIELD_ELEMENT`(32) multiplies `FIELD_ELEMENTS_PER_BLOB`(4096)
 	bytes data = 1 [(theqrl.zond.ext.ssz_size) = "131072"]; // 32 * 4096 = 131072
 }
+*/
 
 message ExchangeCapabilities {
 	repeated string supported_methods = 1;

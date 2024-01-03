@@ -3786,15 +3786,6 @@ def qrysm_deps():
         version = "v1.2.0",
     )
 
-    http_archive(
-        name = "com_github_supranational_blst",
-        urls = [
-            "https://github.com/supranational/blst/archive/61758ce4e1d18e6929658ac3a29fa39ad91cd294.tar.gz",
-        ],
-        strip_prefix = "blst-61758ce4e1d18e6929658ac3a29fa39ad91cd294",
-        build_file = "//third_party:blst/blst.BUILD",
-        sha256 = "acc022ddcf6181f8f402365d6382ea66c4352a10fe5490defd53b0db89739c42",
-    )
     go_repository(
         name = "com_github_syndtr_goleveldb",
         importpath = "github.com/syndtr/goleveldb",
@@ -5491,20 +5482,6 @@ def go_dependencies():
     )
 
     go_repository(
-        name = "com_github_crate_crypto_go_kzg_4844",
-        importpath = "github.com/crate-crypto/go-kzg-4844",
-        sum = "h1:UVuHOE+5tIWrim4zf/Xaa43+MIsDCPyW76QhUpiMGj4=",
-        version = "v0.2.0",
-    )
-
-    go_repository(
-        name = "com_github_ethereum_c_kzg_4844",
-        importpath = "github.com/ethereum/c-kzg-4844",
-        sum = "h1:+cUvymlnoDDQgMInp25Bo3OmLajmmY8mLJ/tLjqd77Q=",
-        version = "v0.2.0",
-    )
-
-    go_repository(
         name = "com_github_google_subcommands",
         importpath = "github.com/google/subcommands",
         sum = "h1:vWQspBTo2nEqTUFita5/KeEWlUL8kQObDFbub/EN9oE=",
@@ -5598,6 +5575,6 @@ def prysm_deps():
             "//third_party:com_github_theqrl_go_zond_secp256k1.patch",
         ],
         replace = "github.com/rgeraldes24/go-zond",
-        sum = "h1:z+h/Y0IHZ3GqP9Dari1t1S30lVAen8pZ8kwIR76x0fs=",
-        version = "v0.0.0-20231107110758-b16b5dd04c42",
+        sum = "h1:AR4ObTiRtRONNYaGvtFaBSLDxOdYIRFM8FKM+6WqiIg=",
+        version = "v0.0.0-20240103180830-45f6d6271c58",
     )

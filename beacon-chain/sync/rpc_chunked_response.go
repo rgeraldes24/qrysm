@@ -1,6 +1,9 @@
 package sync
 
 import (
+	"fmt"
+	"runtime/debug"
+
 	libp2pcore "github.com/libp2p/go-libp2p/core"
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/blockchain"
@@ -124,9 +127,12 @@ func extractBlockDataType(digest []byte, tor blockchain.TemporalOracle) (interfa
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println(rDigest)
+		fmt.Println(digest)
 		if rDigest == bytesutil.ToBytes4(digest) {
 			return blkFunc()
 		}
 	}
+	debug.PrintStack()
 	return nil, errors.Wrapf(ErrNoValidDigest, "could not extract block data type, saw digest=%#x, genesis=%v, vr=%#x", digest, tor.GenesisTime(), tor.GenesisValidatorsRoot())
 }

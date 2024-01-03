@@ -319,7 +319,6 @@ func TestBlocksFetcher_findFork(t *testing.T) {
 }
 */
 
-/*
 func TestBlocksFetcher_findForkWithPeer(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
 	p1 := p2pt.NewTestP2P(t)
@@ -393,19 +392,21 @@ func TestBlocksFetcher_findForkWithPeer(t *testing.T) {
 		assert.ErrorContains(t, "no alternative blocks exist within scanned range", err)
 	})
 
-	t.Run("first block is diverging - backtrack successfully", func(t *testing.T) {
-		forkedSlot := primitives.Slot(24)
-		altBlocks := extendBlockSequence(t, knownBlocks[:forkedSlot], 128)
-		p2 := connectPeerHavingBlocks(t, p1, altBlocks, 128, p1.Peers())
-		time.Sleep(100 * time.Millisecond)
-		defer func() {
-			assert.NoError(t, p1.Disconnect(p2))
-		}()
-		fork, err := fetcher.findForkWithPeer(ctx, p2, 64)
-		require.NoError(t, err)
-		require.Equal(t, 10, len(fork.blocks))
-		assert.Equal(t, forkedSlot, fork.blocks[0].Block().Slot(), "Expected slot %d to be ancestor", forkedSlot)
-	})
+	/*
+		t.Run("first block is diverging - backtrack successfully", func(t *testing.T) {
+			forkedSlot := primitives.Slot(24)
+			altBlocks := extendBlockSequence(t, knownBlocks[:forkedSlot], 128)
+			p2 := connectPeerHavingBlocks(t, p1, altBlocks, 128, p1.Peers())
+			time.Sleep(100 * time.Millisecond)
+			defer func() {
+				assert.NoError(t, p1.Disconnect(p2))
+			}()
+			fork, err := fetcher.findForkWithPeer(ctx, p2, 64)
+			require.NoError(t, err)
+			require.Equal(t, 10, len(fork.blocks))
+			assert.Equal(t, forkedSlot, fork.blocks[0].Block().Slot(), "Expected slot %d to be ancestor", forkedSlot)
+		})
+	*/
 
 	t.Run("first block is diverging - no common ancestor", func(t *testing.T) {
 		altBlocks := extendBlockSequence(t, []*zondpb.SignedBeaconBlock{}, 128)
@@ -432,7 +433,6 @@ func TestBlocksFetcher_findForkWithPeer(t *testing.T) {
 		assert.Equal(t, primitives.Slot(33), fork.blocks[0].Block().Slot())
 	})
 }
-*/
 
 func TestBlocksFetcher_findAncestor(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)

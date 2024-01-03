@@ -24,11 +24,6 @@ echo  set USE_QRYSM_VERSION=v1.0.0-alpha3
 echo  to resume using the latest release:
 echo   set USE_QRYSM_VERSION=
 echo.
-echo To specify a non-portable version of BLST:
-echo  set USE_QRYSM_MODERN=1
-echo  to resume using the portable version:
-echo  unset USE_QRYSM_MODERN=
-echo. 
 echo To automatically restart crashed processes:
 echo  set QRYSM_AUTORESTART=true^& .\qrysm.bat beacon-chain
 echo  to stop autorestart run:

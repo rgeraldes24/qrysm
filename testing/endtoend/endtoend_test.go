@@ -269,11 +269,11 @@ func (r *testRunner) waitForMatchingHead(ctx context.Context, timeout time.Durat
 
 func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, i int, conns []*grpc.ClientConn, bnAPI, enr, minerEnr string) error {
 	matchTimeout := 3 * time.Minute
-	ethNode := zond1.NewNode(i, minerEnr)
+	zondNode := zond1.NewNode(i, minerEnr)
 	g.Go(func() error {
-		return ethNode.Start(ctx)
+		return zondNode.Start(ctx)
 	})
-	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{ethNode}); err != nil {
+	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{zondNode}); err != nil {
 		return fmt.Errorf("sync beacon node not ready: %w", err)
 	}
 	proxyNode := zond1.NewProxy(i)
@@ -336,11 +336,11 @@ func (r *testRunner) testBeaconChainSync(ctx context.Context, g *errgroup.Group,
 	conns []*grpc.ClientConn, tickingStartTime time.Time, bootnodeEnr, minerEnr string) error {
 	t, config := r.t, r.config
 	index := e2e.TestParams.BeaconNodeCount
-	ethNode := zond1.NewNode(index, minerEnr)
+	zondNode := zond1.NewNode(index, minerEnr)
 	g.Go(func() error {
-		return ethNode.Start(ctx)
+		return zondNode.Start(ctx)
 	})
-	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{ethNode}); err != nil {
+	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{zondNode}); err != nil {
 		return fmt.Errorf("sync beacon node not ready: %w", err)
 	}
 	proxyNode := zond1.NewProxy(index)
@@ -499,12 +499,12 @@ func (r *testRunner) defaultEndToEndRun() error {
 		return errors.Wrap(err, "one or more evaluators failed")
 	}
 
-	index := e2e.TestParams.BeaconNodeCount
+	// index := e2e.TestParams.BeaconNodeCount
 	if config.TestSync {
 		if err := r.testBeaconChainSync(ctx, g, conns, tickingStartTime, bootNode.ENR(), zond1Miner.ENR()); err != nil {
 			return errors.Wrap(err, "beacon chain sync test failed")
 		}
-		index += 1
+		// index += 1
 		if err := r.testDoppelGangerProtection(ctx); err != nil {
 			return errors.Wrap(err, "doppel ganger protection check failed")
 		}

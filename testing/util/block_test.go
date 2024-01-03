@@ -1,12 +1,22 @@
 package util
 
+import (
+	"testing"
+
+	coreBlock "github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
+	"github.com/theQRL/qrysm/v4/config/params"
+	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
+	"github.com/theQRL/qrysm/v4/testing/require"
+)
+
 // FIX(rgeraldes24): expected state.slot 0 < slot 0
 /*
 import (
 	"context"
 	"testing"
 
-	coreBlock "github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
+
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition/stateutils"
@@ -14,8 +24,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
@@ -195,6 +203,7 @@ func TestGenerateFullBlock_ValidVoluntaryExits(t *testing.T) {
 		t.Fatal("expected exiting validator index to be marked as exiting")
 	}
 }
+*/
 
 func TestHydrateV1SignedBeaconBlock_NoError(t *testing.T) {
 	b := &zondpbv1.SignedBeaconBlock{}
@@ -274,4 +283,3 @@ func TestGenerateVoluntaryExits(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, coreBlock.VerifyExitAndSignature(val, 0, beaconState.Fork(), exit, beaconState.GenesisValidatorsRoot()))
 }
-*/

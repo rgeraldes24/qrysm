@@ -11,8 +11,6 @@ set -eu
 # Downloaded binaries are saved to ./dist.
 # Use USE_QRYSM_VERSION to specify a specific release version.
 #   Example: USE_QRYSM_VERSION=v0.3.3 ./qrysm.sh beacon-chain
-# Use USE_QRYSM_MODERN to specify a non-portable version of BLST
-#   Example: USE_QRYSM_MODERN=true ./qrysm.sh beacon-chain
 
 # TODO(rgeraldes24) new key
 readonly THEQRL_SIGNING_KEY=0AE0051D647BA3C1A917AF4072E33E4DF1A5036E

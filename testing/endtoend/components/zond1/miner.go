@@ -26,9 +26,9 @@ import (
 	e2etypes "github.com/theQRL/qrysm/v4/testing/endtoend/types"
 )
 
-const (
-	EthAddress = "0x878705ba3f8bc32fcf7f4caa1a35e72af65cf766"
-)
+// const (
+// 	ZondAddress = "0x878705ba3f8bc32fcf7f4caa1a35e72af65cf766"
+// )
 
 // Miner represents an ZOND1 node which mines blocks.
 type Miner struct {
@@ -84,7 +84,7 @@ func (m *Miner) initAttempt(ctx context.Context, attempt int) (*os.File, error) 
 	// find gzond so we can run it.
 	binaryPath, found := bazel.FindBinary("cmd/gzond", "gzond")
 	if !found {
-		return nil, errors.New("go-ethereum binary not found")
+		return nil, errors.New("go-zond binary not found")
 	}
 
 	gzondJsonPath := path.Join(path.Dir(binaryPath), "genesis.json")
@@ -132,24 +132,24 @@ func (m *Miner) initAttempt(ctx context.Context, attempt int) (*os.File, error) 
 		fmt.Sprintf("--port=%d", e2e.TestParams.Ports.Zond1Port),
 		fmt.Sprintf("--networkid=%d", NetworkId),
 		"--http",
-		"--http.api=engine,net,eth",
+		"--http.api=engine,net,zond",
 		"--http.addr=127.0.0.1",
 		"--http.corsdomain=\"*\"",
 		"--http.vhosts=\"*\"",
 		"--rpc.allow-unprotected-txs",
 		"--ws",
-		"--ws.api=net,eth,engine",
+		"--ws.api=net,zond,engine",
 		"--ws.addr=127.0.0.1",
 		"--ws.origins=\"*\"",
 		"--ipcdisable",
 		"--verbosity=4",
-		"--mine",
-		fmt.Sprintf("--unlock=%s", EthAddress),
-		"--allow-insecure-unlock",
+		// "--mine",
+		// fmt.Sprintf("--unlock=%s", ZondAddress),
+		// "--allow-insecure-unlock",
 		"--syncmode=full",
-		fmt.Sprintf("--miner.etherbase=%s", EthAddress),
-		fmt.Sprintf("--txpool.locals=%s", EthAddress),
-		fmt.Sprintf("--password=%s", pwFile),
+		// fmt.Sprintf("--miner.etherbase=%s", ZondAddress),
+		// fmt.Sprintf("--txpool.locals=%s", ZondAddress),
+		// fmt.Sprintf("--password=%s", pwFile),
 	}
 
 	keystorePath, err := e2e.TestParams.Paths.MinerKeyPath()

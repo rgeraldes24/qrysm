@@ -25,7 +25,9 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
+	"github.com/theQRL/qrysm/v4/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/network/forks"
 	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -455,9 +457,6 @@ func Test_wrapAndReportValidation(t *testing.T) {
 	}
 }
 
-// FIX(rgeraldes24)
-// NOTE(rgeraldes24): this one fails sometimes
-/*
 func TestFilterSubnetPeers(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	cfg := params.MainnetConfig().Copy()
@@ -539,7 +538,6 @@ func TestFilterSubnetPeers(t *testing.T) {
 	recPeers = r.filterNeededPeers(wantedPeers)
 	assert.Equal(t, 1, len(recPeers), "expected at least 1 suitable peer to prune")
 }
-*/
 
 func TestSubscribeWithSyncSubnets_StaticOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
@@ -617,12 +615,13 @@ func TestSubscribeWithSyncSubnets_DynamicOK(t *testing.T) {
 	cancel()
 }
 
-// FIX(rgeraldes24) - check if the following tests are still valid
+// NOTE(rgeraldes24): test not valid at the moment
 /*
 func TestSubscribeWithSyncSubnets_StaticSwitchFork(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
 	params.SetupTestConfigCleanup(t)
 	cfg := params.BeaconConfig()
+	cfg.AltairForkEpoch = 1
 	cfg.SecondsPerSlot = 1
 	params.OverrideBeaconConfig(cfg)
 	params.BeaconConfig().InitializeForkSchedule()
@@ -659,6 +658,7 @@ func TestSubscribeWithSyncSubnets_StaticSwitchFork(t *testing.T) {
 }
 */
 
+// NOTE(rgeraldes24): test not valid at the moment
 /*
 func TestSubscribeWithSyncSubnets_DynamicSwitchFork(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

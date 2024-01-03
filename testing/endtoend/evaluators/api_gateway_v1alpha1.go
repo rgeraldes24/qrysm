@@ -262,7 +262,7 @@ func withCompareListAttestations(beaconNodeIdx int, conn *grpc.ClientConn) error
 		}
 		if len(att.Signatures) != len(grpcAtt.Signatures) {
 			return fmt.Errorf(
-				"HTTP gateway attestation %d signatures length %s does not match gRPC %d",
+				"HTTP gateway attestation %d signatures length %d does not match gRPC %d",
 				i,
 				len(att.Signatures),
 				len(grpcAtt.Signatures),
