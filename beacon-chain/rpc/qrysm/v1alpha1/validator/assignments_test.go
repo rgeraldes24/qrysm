@@ -96,7 +96,7 @@ func TestGetDuties_OK(t *testing.T) {
 	}
 }
 
-// TODO FIX
+// FIX(rgeraldes24)
 /*
 func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

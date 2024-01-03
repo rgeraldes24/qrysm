@@ -79,6 +79,7 @@ func TestInitializeFromProtoUnsafe_Capella(t *testing.T) {
 	}
 }
 
+// FIX(rgeraldes24)
 /*
 func TestBeaconState_HashTreeRoot(t *testing.T) {
 	testState, _ := util.DeterministicGenesisState(t, 64)

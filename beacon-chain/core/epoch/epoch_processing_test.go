@@ -2,6 +2,7 @@ package epoch_test
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"testing"
 
@@ -20,6 +21,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestUnslashedAttestingIndices_CanSortAndFilter(t *testing.T) {
@@ -162,8 +164,7 @@ func TestProcessSlashings_NotSlashed(t *testing.T) {
 	assert.Equal(t, wanted, newState.Balances()[0], "Unexpected slashed balance")
 }
 
-// FIX
-/*
+// TODO(rgeraldes24): update penalty calcs with the bellatrix multiplier
 func TestProcessSlashings_SlashedLess(t *testing.T) {
 	tests := []struct {
 		state *zondpb.BeaconState
@@ -181,7 +182,8 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			},
 			// penalty    = validator balance / increment * (2*total_penalties) / total_balance * increment
 			// 1000000000 = (32 * 1e9)        / (1 * 1e9) * (1*1e9)             / (32*1e9)      * (1 * 1e9)
-			want: uint64(31000000000), // 32 * 1e9 - 1000000000
+			// want: uint64(31000000000), // 32 * 1e9 - 1000000000 (phase0)
+			want: uint64(29000000000), // (bellatrix multiplier)
 		},
 		{
 			state: &zondpb.BeaconState{
@@ -197,7 +199,8 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			},
 			// penalty    = validator balance / increment * (2*total_penalties) / total_balance * increment
 			// 500000000 = (32 * 1e9)        / (1 * 1e9) * (1*1e9)             / (32*1e9)      * (1 * 1e9)
-			want: uint64(32000000000), // 32 * 1e9 - 500000000
+			// want: uint64(32000000000), // 32 * 1e9 - 500000000 (phase0)
+			want: uint64(31000000000), // (bellatrix multiplier)
 		},
 		{
 			state: &zondpb.BeaconState{
@@ -213,7 +216,8 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			},
 			// penalty    = validator balance / increment * (3*total_penalties) / total_balance * increment
 			// 1000000000 = (32 * 1e9)        / (1 * 1e9) * (1*2e9)             / (64*1e9)      * (1 * 1e9)
-			want: uint64(31000000000), // 32 * 1e9 - 1000000000
+			// want: uint64(31000000000), // 32 * 1e9 - 1000000000 (phase0)
+			want: uint64(29000000000), // (bellatrix multiplier)
 		},
 		{
 			state: &zondpb.BeaconState{
@@ -227,7 +231,8 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			},
 			// penalty    = validator balance           / increment * (3*total_penalties) / total_balance        * increment
 			// 2000000000 = (32  * 1e9 - 1*1e9)         / (1 * 1e9) * (2*1e9)             / (31*1e9)             * (1 * 1e9)
-			want: uint64(30000000000), // 32 * 1e9 - 2000000000
+			// want: uint64(30000000000), // 32 * 1e9 - 2000000000 (phase0)
+			want: uint64(28000000000), // (bellatrix multiplier)
 		},
 	}
 
@@ -237,13 +242,13 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			s, err := state_native.InitializeFromProtoCapella(tt.state)
 			require.NoError(t, err)
 			helpers.ClearCache()
+			// newState, err := epoch.ProcessSlashings(s, 1) // old phase 0
 			newState, err := epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplier)
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, newState.Balances()[0], "ProcessSlashings({%v}) = newState; newState.Balances[0] = %d", original, newState.Balances()[0])
 		})
 	}
 }
-*/
 
 func TestProcessRegistryUpdates_NoRotation(t *testing.T) {
 	base := &zondpb.BeaconState{
@@ -439,6 +444,7 @@ func TestProcessHistoricalDataUpdate(t *testing.T) {
 				require.Equal(t, 0, len(roots))
 			},
 		},
+		// NOTE(rgeraldes24): test is not valid
 		/*
 			{
 				name: "before capella can process and get historical root",

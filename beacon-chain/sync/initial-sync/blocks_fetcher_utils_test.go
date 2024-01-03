@@ -154,7 +154,7 @@ func TestBlocksFetcher_nonSkippedSlotAfter(t *testing.T) {
 	})
 }
 
-// TODO
+// FIX(rgeraldes24)
 /*
 func TestBlocksFetcher_findFork(t *testing.T) {
 	// Chain graph:

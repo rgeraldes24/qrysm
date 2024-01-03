@@ -37,7 +37,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// TODO(rgeraldes24) fix
+// FIX(rgeraldes24)
 /*
 func TestGetAttesterDuties(t *testing.T) {
 	ctx := context.Background()

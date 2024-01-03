@@ -1,9 +1,15 @@
 package util
 
-/*
+import (
+	"context"
+	"testing"
 
-func TestDeterministicGenesisStateBellatrix(t *testing.T) {
-	st, k := DeterministicGenesisStateBellatrix(t, params.BeaconConfig().MaxCommitteesPerSlot)
+	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/testing/require"
+)
+
+func TestDeterministicGenesisState(t *testing.T) {
+	st, k := DeterministicGenesisState(t, params.BeaconConfig().MaxCommitteesPerSlot)
 	require.Equal(t, params.BeaconConfig().MaxCommitteesPerSlot, uint64(len(k)))
 	require.Equal(t, params.BeaconConfig().MaxCommitteesPerSlot, uint64(st.NumValidators()))
 }
@@ -15,10 +21,8 @@ func TestGenesisBeaconStateBellatrix(t *testing.T) {
 	zond1Data, err := DeterministicZond1Data(len(deposits))
 	require.NoError(t, err)
 	gt := uint64(10000)
-	st, err := genesisBeaconStateBellatrix(ctx, deposits, gt, zond1Data)
+	st, err := GenesisBeaconState(ctx, deposits, gt, zond1Data)
 	require.NoError(t, err)
 	require.Equal(t, gt, st.GenesisTime())
 	require.Equal(t, params.BeaconConfig().MaxCommitteesPerSlot, uint64(st.NumValidators()))
 }
-
-*/

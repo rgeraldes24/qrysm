@@ -16,6 +16,8 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 )
 
+// FIX(rgeraldes24)
+
 func TestService_CheckForNextEpochFork(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	tests := []struct {

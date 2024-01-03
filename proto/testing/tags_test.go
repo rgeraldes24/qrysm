@@ -18,6 +18,7 @@ func TestSSZTagSize(t *testing.T) {
 	pubKeySize := dilithium.CryptoPublicKeyBytes
 	rootSize := 32
 
+	// TODO(rgeraldes24): review
 	// sizes, err := sszTagSizes(pb.Attestation{}, "Signature")
 	// require.NoError(t, err)
 	// assert.Equal(t, sigSize, sizes[0], "Unexpected signature size")

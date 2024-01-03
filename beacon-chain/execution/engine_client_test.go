@@ -493,7 +493,7 @@ func TestReconstructFullBlock(t *testing.T) {
 		_, err = service.ReconstructFullBlock(ctx, wrapped)
 		require.ErrorContains(t, want, err)
 	})
-	// TODO(rgeraldes24)
+	// FIX(rgeraldes24)
 	/*
 		t.Run("properly reconstructs block with correct payload", func(t *testing.T) {
 			fix := fixtures()
@@ -592,7 +592,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		_, err = service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrapped})
 		require.ErrorContains(t, want, err)
 	})
-	// TODO(rgeraldes24)
+	// FIX(rgeraldes24)
 	/*
 		t.Run("properly reconstructs block batch with correct payload", func(t *testing.T) {
 			fix := fixtures()

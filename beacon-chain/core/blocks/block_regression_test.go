@@ -1,6 +1,6 @@
 package blocks_test
 
-// TODO(rgeraldes24)
+// FIX(rgeraldes24)
 /*
 import (
 	"context"

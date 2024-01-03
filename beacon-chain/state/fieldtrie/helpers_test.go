@@ -84,6 +84,7 @@ func TestValidateIndices_CompressedField(t *testing.T) {
 
 }
 
+// FIX(rgeraldes24)
 /*
 func TestFieldTrie_NativeState_fieldConvertersNative(t *testing.T) {
 	type args struct {

@@ -1,45 +1,30 @@
 package sync
 
 import (
-	// "context"
 	"context"
 	"reflect"
 	"sync"
-
-	// "sync"
 	"testing"
 	"time"
 
-	// "github.com/libp2p/go-libp2p/core/network"
-	// "github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/theQRL/qrysm/v4/beacon-chain/blockchain"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	db "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
 	p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
-	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
-	"github.com/theQRL/qrysm/v4/encoding/ssz/equality"
-
-	// mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
-	// db "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
-	// "github.com/theQRL/qrysm/v4/beacon-chain/p2p"
-	// p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/wrapper"
-
-	// leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
+	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
+	"github.com/theQRL/qrysm/v4/encoding/ssz/equality"
 	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/metadata"
-
-	// "github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	// "github.com/theQRL/qrysm/v4/testing/util"
 )
 
 func TestMetaDataRPCHandler_ReceivesMetadata(t *testing.T) {
@@ -160,14 +145,8 @@ func TestMetadataRPCHandler_SendsMetadata(t *testing.T) {
 	}
 }
 
-// NOTE(rgeraldes24): similar test as above, this one has one more test; remove?
-/*
 func TestMetadataRPCHandler_SendsMetadataAltair(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	// bCfg := params.BeaconConfig().Copy()
-	// bCfg.AltairForkEpoch = 5
-	// params.OverrideBeaconConfig(bCfg)
-	// params.BeaconConfig().InitializeForkSchedule()
 
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
@@ -253,7 +232,6 @@ func TestMetadataRPCHandler_SendsMetadataAltair(t *testing.T) {
 		t.Error("Peer is disconnected despite receiving a valid ping")
 	}
 }
-*/
 
 func TestExtractMetaDataType(t *testing.T) {
 	// Precompute digests

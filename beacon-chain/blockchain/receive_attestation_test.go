@@ -111,6 +111,7 @@ func TestProcessAttestations_Ok(t *testing.T) {
 	require.LogsDoNotContain(t, hook, "Could not process attestation for fork choice")
 }
 
+// FIX(rgeraldes24)
 /*
 func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	service, tr := minimalTestService(t)
@@ -119,7 +120,7 @@ func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	service.genesisTime = qrysmTime.Now().Add(-2 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
 	genesisState, pks := util.DeterministicGenesisState(t, 64)
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
-	ojc := &zondpb.Checkpoint{Epoch: 0, Root: service.originBlockRoot[:]}
+	// ojc := &zondpb.Checkpoint{Epoch: 0, Root: service.originBlockRoot[:]}
 	require.NoError(t, fcs.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 0, Root: service.originBlockRoot}))
 	copied := genesisState.Copy()
 	// Generate a new block for attesters to attest
@@ -129,6 +130,8 @@ func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	require.NoError(t, err)
 	wsb, err := blocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
+	fmt.Println("TROOT")
+	fmt.Println(tRoot)
 
 	preState, err := service.getBlockPreState(ctx, wsb.Block())
 	require.NoError(t, err)
@@ -146,27 +149,29 @@ func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.AttPool.SaveForkchoiceAttestations(atts))
 	// Verify the target is in forkchoice
+	fmt.Println("HasNode")
+	fmt.Println(bytesutil.ToBytes32(atts[0].Data.BeaconBlockRoot))
 	require.Equal(t, true, fcs.HasNode(bytesutil.ToBytes32(atts[0].Data.BeaconBlockRoot)))
-	require.Equal(t, tRoot, bytesutil.ToBytes32(atts[0].Data.BeaconBlockRoot))
-	require.Equal(t, true, fcs.HasNode(service.originBlockRoot))
+	// require.Equal(t, tRoot, bytesutil.ToBytes32(atts[0].Data.BeaconBlockRoot))
+	// require.Equal(t, true, fcs.HasNode(service.originBlockRoot))
 
-	// Insert a new block to forkchoice
-	b, err := util.GenerateFullBlock(genesisState, pks, util.DefaultBlockGenConfig(), 2)
-	require.NoError(t, err)
-	b.Block.ParentRoot = service.originBlockRoot[:]
-	r, err := b.Block.HashTreeRoot()
-	require.NoError(t, err)
-	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b)
-	state, blkRoot, err := prepareForkchoiceState(ctx, 2, r, service.originBlockRoot, [32]byte{'b'}, ojc, ojc)
-	require.NoError(t, err)
-	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, state, blkRoot))
-	require.Equal(t, 3, fcs.NodeCount())
-	service.head.root = r // Old head
+	// // Insert a new block to forkchoice
+	// b, err := util.GenerateFullBlock(genesisState, pks, util.DefaultBlockGenConfig(), 2)
+	// require.NoError(t, err)
+	// b.Block.ParentRoot = service.originBlockRoot[:]
+	// r, err := b.Block.HashTreeRoot()
+	// require.NoError(t, err)
+	// util.SaveBlock(t, ctx, service.cfg.BeaconDB, b)
+	// state, blkRoot, err := prepareForkchoiceState(ctx, 2, r, service.originBlockRoot, [32]byte{'b'}, ojc, ojc)
+	// require.NoError(t, err)
+	// require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, state, blkRoot))
+	// require.Equal(t, 3, fcs.NodeCount())
+	// service.head.root = r // Old head
 
-	require.Equal(t, 1, len(service.cfg.AttPool.ForkchoiceAttestations()))
-	service.UpdateHead(ctx, 0)
-	require.Equal(t, tRoot, service.headRoot())
-	require.Equal(t, 0, len(service.cfg.AttPool.ForkchoiceAttestations())) // Validate att pool is empty
+	// require.Equal(t, 1, len(service.cfg.AttPool.ForkchoiceAttestations()))
+	// service.UpdateHead(ctx, 0)
+	// require.Equal(t, tRoot, service.headRoot())
+	// require.Equal(t, 0, len(service.cfg.AttPool.ForkchoiceAttestations())) // Validate att pool is empty
 }
 */
 

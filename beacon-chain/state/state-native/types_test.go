@@ -19,6 +19,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// FIX(rgeraldes24)
 /*
 func TestBeaconState_ProtoBeaconStateCompatibility(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

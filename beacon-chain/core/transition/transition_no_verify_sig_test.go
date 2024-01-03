@@ -188,7 +188,7 @@ func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *test
 	require.ErrorContains(t, "could not validate state root", err)
 }
 
-// FIX
+// FIX(rgeraldes24)
 /*
 func TestExecuteStateTransitionNoVerifyAnySig_PassesProcessingConditions(t *testing.T) {
 	beaconState, block := createFullBlockWithOperations(t)
@@ -203,7 +203,7 @@ func TestExecuteStateTransitionNoVerifyAnySig_PassesProcessingConditions(t *test
 }
 */
 
-// FIX
+// FIX(rgeraldes24)
 /*
 func TestProcessBlockNoVerify_PassesProcessingConditions(t *testing.T) {
 	beaconState, block := createFullBlockWithOperations(t)
@@ -218,7 +218,7 @@ func TestProcessBlockNoVerify_PassesProcessingConditions(t *testing.T) {
 }
 */
 
-// FIX
+// FIX(rgeraldes24)
 /*
 func TestProcessBlockNoVerifyAnySigCapella_OK(t *testing.T) {
 	beaconState, block := createFullBlockWithOperations(t)
@@ -234,7 +234,7 @@ func TestProcessBlockNoVerifyAnySigCapella_OK(t *testing.T) {
 }
 */
 
-// Fix
+// FIX(rgeraldes24)
 /*
 func TestProcessBlockNoVerify_SigSetContainsDescriptions(t *testing.T) {
 	beaconState, block := createFullBlockWithOperations(t)

@@ -8,6 +8,7 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
+// FIX(rgeraldes24)
 /*
 func TestComputeFieldRootsWithHasher_Capella(t *testing.T) {
 	beaconState, err := util.NewBeaconState(util.FillRootsNaturalOpt)

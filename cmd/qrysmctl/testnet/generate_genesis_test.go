@@ -1,12 +1,11 @@
 package testnet
 
 import (
-	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"testing"
 
-	"github.com/theQRL/go-qrllib/common"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	cryptodilithium "github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/runtime/interop"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -26,28 +25,15 @@ func Test_genesisStateFromJSONValidators(t *testing.T) {
 	}
 }
 
-/*
-var seed [common.SeedSize]uint8
-
-_, err := rand.Read(seed[:])
-if err != nil {
-	return nil, fmt.Errorf("failed to generate random seed for Dilithium address: %v", err)
-}
-*/
-
 func createGenesisDepositData(t *testing.T, numKeys int) ([]*depositDataJSON, error) {
 	pubKeys := make([]cryptodilithium.PublicKey, numKeys)
 	privKeys := make([]cryptodilithium.DilithiumKey, numKeys)
 	for i := 0; i < numKeys; i++ {
-		var seed [common.SeedSize]uint8
-		_, err := rand.Read(seed[:])
+		randKey, err := dilithium.RandKey()
 		require.NoError(t, err)
 
-		d, err := cryptodilithium.SecretKeyFromBytes(seed[:])
-		require.NoError(t, err)
-
-		privKeys[i] = d
-		pubKeys[i] = d.PublicKey()
+		privKeys[i] = randKey
+		pubKeys[i] = randKey.PublicKey()
 	}
 	dataList, _, err := interop.DepositDataFromKeys(privKeys, pubKeys)
 	require.NoError(t, err)

@@ -5,7 +5,6 @@ go_library(
     srcs = [
         "doc.go",
         "error.go",
-        "getters_attestation.go",
         "getters_block.go",
         "getters_checkpoint.go",
         "getters_zond1.go",
@@ -20,7 +19,6 @@ go_library(
         "hasher.go",
         "proofs.go",
         "readonly_validator.go",
-        "setters_attestation.go",
         "setters_block.go",
         "setters_checkpoint.go",
         "setters_zond1.go",
@@ -75,7 +73,6 @@ go_library(
 go_test(
     name = "go_default_test",
     srcs = [
-        "getters_attestation_test.go",
         "getters_block_test.go",
         "getters_checkpoint_test.go",
         "getters_participation_test.go",
@@ -86,7 +83,6 @@ go_test(
         "proofs_test.go",
         "readonly_validator_test.go",
         "references_test.go",
-        "setters_attestation_test.go",
         "setters_withdrawal_test.go",
         "state_fuzz_test.go",
         "state_test.go",

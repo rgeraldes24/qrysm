@@ -1,6 +1,6 @@
 package util
 
-// TODO(rgeraldes24): expected state.slot 0 < slot 0
+// FIX(rgeraldes24): expected state.slot 0 < slot 0
 /*
 import (
 	"context"

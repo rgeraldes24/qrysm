@@ -1,9 +1,12 @@
 package monitor
 
 import (
+	"context"
+	"fmt"
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -181,12 +184,11 @@ func TestProcessProposedBlock(t *testing.T) {
 
 }
 
-/*
 func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
 
-	genesis, keys := util.DeterministicGenesisState(t, 64)
+	genesis, keys := util.DeterministicGenesisState(t, 256)
 	c, err := altair.NextSyncCommittee(ctx, genesis)
 	require.NoError(t, err)
 	require.NoError(t, genesis.SetCurrentSyncCommittee(c))
@@ -218,30 +220,24 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 		s.aggregatedPerformance[idx] = ValidatorAggregatedPerformance{}
 	}
 	s.RUnlock()
-	fmt.Println("AQUI")
-	fmt.Println(s.TrackedValidators)
-	fmt.Println(s.trackedSyncCommitteeIndices)
 	s.updateSyncCommitteeTrackedVals(genesis)
-	fmt.Println("AQUI")
-	fmt.Println(s.TrackedValidators)
-	fmt.Println(s.trackedSyncCommitteeIndices)
 
 	root, err := b.GetBlock().HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, s.config.StateGen.SaveState(ctx, root, genesis))
-	// wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=32000000000 ParentRoot=0xf732eaeb7fae ProposerIndex=15 Slot=1 Version=1 prefix=monitor", bytesutil.Trunc(root[:]))
+	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=32000000000 ParentRoot=0x4757ee53ebc8 ProposerIndex=42 Slot=1 Version=3 prefix=monitor", bytesutil.Trunc(root[:]))
 	wanted2 := fmt.Sprintf("\"Proposer slashing was included\" BodyRoot1=0x000100000000 BodyRoot2=0x000200000000 ProposerIndex=%d SlashingSlot=0 Slot=1 prefix=monitor", idx)
-	wanted3 := "\"Sync committee contribution included\" BalanceChange=0 ContribCount=3 ExpectedContribCount=3 NewBalance=32000000000 ValidatorIndex=1 prefix=monitor"
+	// wanted3 := "\"Sync committee contribution included\" BalanceChange=0 ContribCount=3 ExpectedContribCount=3 NewBalance=32000000000 ValidatorIndex=1 prefix=monitor"
+	wanted3 := "\"Sync committee contribution included\" BalanceChange=0 ContribCount=0 ExpectedContribCount=3 NewBalance=32000000000 ValidatorIndex=1 prefix=monitor"
 	// wanted4 := "\"Sync committee contribution included\" BalanceChange=0 ContribCount=1 ExpectedContribCount=1 NewBalance=32000000000 ValidatorIndex=2 prefix=monitor"
 	wrapped, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
 	s.processBlock(ctx, wrapped)
-	// require.LogsContain(t, hook, wanted1)
+	require.LogsContain(t, hook, wanted1)
 	require.LogsContain(t, hook, wanted2)
 	require.LogsContain(t, hook, wanted3)
 	// require.LogsContain(t, hook, wanted4)
 }
-*/
 
 func TestLogAggregatedPerformance(t *testing.T) {
 	hook := logTest.NewGlobal()

@@ -74,35 +74,6 @@ func TestExtractBlockDataType(t *testing.T) {
 			}(),
 			wantErr: false,
 		},
-		// TODO(rgeraldes24): remove
-		/*
-			{
-				name: "altair fork version",
-				args: args{
-					digest: altairDigest[:],
-					chain:  &mock.ChainService{ValidatorsRoot: [32]byte{}},
-				},
-				want: func() interfaces.ReadOnlySignedBeaconBlock {
-					wsb, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockAltair{Block: &zondpb.BeaconBlockAltair{Body: &zondpb.BeaconBlockBodyAltair{}}})
-					require.NoError(t, err)
-					return wsb
-				}(),
-				wantErr: false,
-			},
-			{
-				name: "bellatrix fork version",
-				args: args{
-					digest: bellatrixDigest[:],
-					chain:  &mock.ChainService{ValidatorsRoot: [32]byte{}},
-				},
-				want: func() interfaces.ReadOnlySignedBeaconBlock {
-					wsb, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockBellatrix{Block: &zondpb.BeaconBlockBellatrix{Body: &zondpb.BeaconBlockBodyBellatrix{}}})
-					require.NoError(t, err)
-					return wsb
-				}(),
-				wantErr: false,
-			},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -213,7 +213,7 @@ func TestPublishBlindedBlockSSZ(t *testing.T) {
 	})
 }
 
-// TODO: FIX
+// FIX(rgeraldes24)
 /*
 func TestValidateConsensus(t *testing.T) {
 	ctx := context.Background()

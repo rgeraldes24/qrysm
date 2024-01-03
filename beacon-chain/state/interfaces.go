@@ -238,6 +238,7 @@ type WriteOnlyCheckpoint interface {
 	SetJustificationBits(val bitfield.Bitvector4) error
 }
 
+// FIX(rgeraldes24)
 // WriteOnlyAttestations defines a struct which only has write access to attestations methods.
 //type WriteOnlyAttestations interface {
 //	RotateAttestations() error

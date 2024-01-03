@@ -229,7 +229,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 	}
 }
 
-// TODO(rgeraldes24) - fix
+// FIX(rgeraldes24)
 /*
 func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)

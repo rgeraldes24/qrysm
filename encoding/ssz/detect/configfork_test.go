@@ -127,7 +127,7 @@ func TestUnmarshalBlock(t *testing.T) {
 			b:       signedTestBlockCapella,
 			version: genv,
 		},
-		// NOTE(@rgeraldes24): tests not valid atm since we just have one fork
+		// NOTE(rgeraldes24): tests not valid atm since we just have one fork
 		/*
 			{
 				name:    "last slot of phase 0",
@@ -211,7 +211,7 @@ func TestUnmarshalBlindedBlock(t *testing.T) {
 			b:       signedTestBlindedBlockCapella,
 			version: genv,
 		},
-		// NOTE(@rgeraldes24): tests not valid atm since we just have one fork
+		// NOTE(rgeraldes24): tests not valid atm since we just have one fork
 		/*
 			{
 				name:    "last slot of phase 0",

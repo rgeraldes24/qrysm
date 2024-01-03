@@ -1,6 +1,7 @@
 package blocks_test
 
 import (
+	"encoding/hex"
 	"testing"
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
@@ -433,8 +434,9 @@ func Test_ValidatePayloadHeader(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24) add setup to cover the withdrawal processing which was not tested before
-/*
+// TODO(rgeraldes24): add more tests to cover the ProcessWithdrawals parts
+// that was not tested before and see if we can replace the harcoded value
+// of wdRoot with an existing var with the value
 func Test_ProcessPayloadHeader(t *testing.T) {
 	st, _ := util.DeterministicGenesisState(t, 1)
 	random, err := helpers.RandaoMix(st, time.CurrentEpoch(st))
@@ -444,6 +446,8 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 	wrappedHeader, err := consensusblocks.WrappedExecutionPayloadHeader(&enginev1.ExecutionPayloadHeader{BlockHash: []byte{'a'}}, 0)
 	require.NoError(t, err)
 	require.NoError(t, st.SetLatestExecutionPayloadHeader(wrappedHeader))
+	wdRoot, err := hex.DecodeString("792930bbd5baac43bcc798ee49aa8185ef76bb3b44ba62b91d86ae569e4bb535")
+	require.NoError(t, err)
 	tests := []struct {
 		name   string
 		header interfaces.ExecutionData
@@ -459,6 +463,8 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 				p.ParentHash = []byte{'a'}
 				p.PrevRandao = random
 				p.Timestamp = uint64(ts.Unix())
+				p.WithdrawalsRoot = wdRoot
+
 				return h
 			}(), err: nil,
 		},
@@ -470,6 +476,7 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 				p, ok := h.Proto().(*enginev1.ExecutionPayloadHeader)
 				require.Equal(t, true, ok)
 				p.ParentHash = []byte{'b'}
+				p.WithdrawalsRoot = wdRoot
 				return h
 			}(),
 			err: blocks.ErrInvalidPayloadBlockHash,
@@ -481,7 +488,7 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 				require.NoError(t, err)
 				p, ok := h.Proto().(*enginev1.ExecutionPayloadHeader)
 				require.Equal(t, true, ok)
-				p.ParentHash = []byte{'a'}
+				p.WithdrawalsRoot = wdRoot
 				return h
 			}(),
 			err: blocks.ErrInvalidPayloadPrevRandao,
@@ -493,9 +500,9 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 				require.NoError(t, err)
 				p, ok := h.Proto().(*enginev1.ExecutionPayloadHeader)
 				require.Equal(t, true, ok)
-				p.ParentHash = []byte{'a'}
 				p.PrevRandao = random
 				p.Timestamp = 1
+				p.WithdrawalsRoot = wdRoot
 				return h
 			}(),
 			err: blocks.ErrInvalidPayloadTimeStamp,
@@ -505,7 +512,6 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			st, err := blocks.ProcessPayloadHeader(st, tt.header)
 			if err != nil {
-				require.NoError(t, err)
 				require.Equal(t, tt.err.Error(), err.Error())
 			} else {
 				require.Equal(t, tt.err, err)
@@ -520,7 +526,6 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 		})
 	}
 }
-*/
 
 func Test_PayloadToHeader(t *testing.T) {
 	p := emptyPayload()

@@ -455,6 +455,7 @@ func Test_wrapAndReportValidation(t *testing.T) {
 	}
 }
 
+// FIX(rgeraldes24)
 // NOTE(rgeraldes24): this one fails sometimes
 /*
 func TestFilterSubnetPeers(t *testing.T) {
@@ -616,7 +617,7 @@ func TestSubscribeWithSyncSubnets_DynamicOK(t *testing.T) {
 	cancel()
 }
 
-// TODO(rgeraldes24) - check if the follwing tests are still valid
+// FIX(rgeraldes24) - check if the following tests are still valid
 /*
 func TestSubscribeWithSyncSubnets_StaticSwitchFork(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)

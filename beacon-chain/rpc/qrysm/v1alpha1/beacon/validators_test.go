@@ -1352,7 +1352,7 @@ func TestServer_GetValidatorParticipation_CannotRequestFutureEpoch(t *testing.T)
 	assert.ErrorContains(t, wanted, err)
 }
 
-// TODO(rgeraldes24) - this test can be removed since we have the new version with bits bellow
+// FIX(rgeraldes24) - this test can be removed since we have the new version with bits bellow
 /*
 func TestServer_GetValidatorParticipation_CurrentAndPrevEpoch(t *testing.T) {
 	helpers.ClearCache()

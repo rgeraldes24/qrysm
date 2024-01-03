@@ -177,6 +177,7 @@ func scenarioEvals() []types.Evaluator {
 	}
 }
 
+// NOTE(rgeraldes24): not valid for now(multiple clients)
 /*
 func scenarioEvalsMulti() []types.Evaluator {
 	return []types.Evaluator{

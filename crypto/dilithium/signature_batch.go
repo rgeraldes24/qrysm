@@ -113,7 +113,7 @@ func (s *SignatureBatch) Copy() *SignatureBatch {
 	}
 }
 
-// TODO(rgeraldes24)
+// FIX(rgeraldes24)
 // RemoveDuplicates removes duplicate signature sets from the signature batch.
 func (s *SignatureBatch) RemoveDuplicates() (int, *SignatureBatch, error) {
 	if len(s.Signatures) == 0 || len(s.PublicKeys) == 0 || len(s.Messages) == 0 {

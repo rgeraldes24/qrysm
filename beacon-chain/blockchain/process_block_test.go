@@ -1776,6 +1776,7 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	require.Equal(t, false, optimistic)
 }
 
+// FIX(rgeraldes24)
 /*
 func TestOnBlock_HandleBlockAttestations(t *testing.T) {
 	service, tr := minimalTestService(t)

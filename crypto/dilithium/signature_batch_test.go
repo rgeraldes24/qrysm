@@ -1,7 +1,6 @@
 package dilithium
 
-// TODO(rgeraldes24)
-
+// FIX(rgeraldes24)
 /*
 import (
 	"bytes"

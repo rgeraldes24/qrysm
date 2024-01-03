@@ -1,5 +1,6 @@
 package beaconapi_evaluators
 
+// NOTE(rgeraldes24): not valid for now(multiple clients)
 /*
 import (
 	"github.com/theQRL/qrysm/v4/testing/endtoend/policies"

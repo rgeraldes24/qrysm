@@ -246,7 +246,7 @@ func (c *Client) GetState(ctx context.Context, stateId StateOrBlockId) ([]byte, 
 	return b, nil
 }
 
-// NOTE(@rgeraldes24) - deprecated
+// NOTE(rgeraldes24): deprecated
 // GetWeakSubjectivity calls a proposed API endpoint that is unique to qrysm
 // This api method does the following:
 // - computes weak subjectivity epoch

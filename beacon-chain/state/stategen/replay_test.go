@@ -166,7 +166,7 @@ func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	assert.Equal(t, version.Capella, newState.Version())
 }
 
-// TODO(rgeraldes24): blinded blocks
+// FIX(rgeraldes24): blinded blocks
 /*
 func TestLoadBlocks_FirstBranch(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)

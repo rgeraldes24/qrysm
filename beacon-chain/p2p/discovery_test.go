@@ -22,22 +22,19 @@ import (
 	"github.com/theQRL/go-zond/p2p/enode"
 	"github.com/theQRL/go-zond/p2p/enr"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-
-	// "github.com/theQRL/qrysm/v4/beacon-chain/cache"
+	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/peers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/peers/peerdata"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/peers/scorers"
 	testp2p "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
-
-	// "github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/wrapper"
 	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	qrysmNetwork "github.com/theQRL/qrysm/v4/network"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-
-	// "github.com/theQRL/qrysm/v4/runtime/version"
+	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -341,8 +338,6 @@ func addPeer(t *testing.T, p *peers.Status, state peerdata.PeerConnectionState) 
 	return id
 }
 
-// TODO
-/*
 func TestRefreshENR_ForkBoundaries(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	// Clean up caches after usage.
@@ -421,7 +416,7 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
-				assert.Equal(t, version.Capella, s.metaData.Version())
+				assert.Equal(t, version.Altair, s.metaData.Version())
 				assert.DeepEqual(t, bitfield.Bitvector4{0x00}, s.metaData.MetadataObjV1().Syncnets)
 				assert.DeepEqual(t, bitfield.Bitvector64{0xe, 0x0, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0}, s.metaData.AttnetsBitfield())
 			},
@@ -450,7 +445,7 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
-				assert.Equal(t, version.Capella, s.metaData.Version())
+				assert.Equal(t, version.Altair, s.metaData.Version())
 				assert.DeepEqual(t, bitfield.Bitvector4{0x00}, s.metaData.MetadataObjV1().Syncnets)
 				assert.DeepEqual(t, bitfield.Bitvector64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, s.metaData.AttnetsBitfield())
 			},
@@ -481,7 +476,7 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
-				assert.Equal(t, version.Capella, s.metaData.Version())
+				assert.Equal(t, version.Altair, s.metaData.Version())
 				assert.DeepEqual(t, bitfield.Bitvector4{0x03}, s.metaData.MetadataObjV1().Syncnets)
 				assert.DeepEqual(t, bitfield.Bitvector64{0xe, 0x0, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0}, s.metaData.AttnetsBitfield())
 			},
@@ -498,4 +493,3 @@ func TestRefreshENR_ForkBoundaries(t *testing.T) {
 		})
 	}
 }
-*/

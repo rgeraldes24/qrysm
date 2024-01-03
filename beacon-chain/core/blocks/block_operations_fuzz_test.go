@@ -259,7 +259,8 @@ func TestFuzzVerifyIndexedAttestationn_10000(t *testing.T) {
 	}
 }
 
-// TODO FIX
+// TODO(rgeraldes24): number os sigs must match the number of participants
+// and fuzz is not taking care of that as of now
 /*
 func TestFuzzVerifyAttestation_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)

@@ -146,6 +146,7 @@ func TestStateReferenceCopy_NoUnexpectedRandaoMutation_Capella(t *testing.T) {
 	assertRefCount(t, b, types.RandaoMixes, 1)
 }
 
+// FIX(rgeraldes24)
 /*
 func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 	assertAttFound := func(vals []*zondpb.PendingAttestation, val uint64) {

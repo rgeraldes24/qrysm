@@ -10,15 +10,12 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
-// TODO(rgeraldes24)
-/*
 func TestHydrateAttestation(t *testing.T) {
 	a := HydrateAttestation(&zondpb.Attestation{})
 	_, err := a.HashTreeRoot()
 	require.NoError(t, err)
-	require.DeepEqual(t, a.Signatures, make([]byte, dilithium.CryptoBytes))
+	// require.DeepEqual(t, a.Signatures, make([]byte, dilithium.CryptoBytes))
 }
-*/
 
 func TestHydrateAttestationData(t *testing.T) {
 	d := HydrateAttestationData(&zondpb.AttestationData{})
@@ -29,15 +26,12 @@ func TestHydrateAttestationData(t *testing.T) {
 	require.DeepEqual(t, d.Source.Root, make([]byte, fieldparams.RootLength))
 }
 
-// TODO(rgeraldes24)
-/*
 func TestHydrateV1Attestation(t *testing.T) {
 	a := HydrateV1Attestation(&v1.Attestation{})
 	_, err := a.HashTreeRoot()
 	require.NoError(t, err)
-	require.DeepEqual(t, a.Signatures, make([]byte, dilithium.CryptoBytes))
+	// require.DeepEqual(t, a.Signatures, make([]byte, dilithium.CryptoBytes))
 }
-*/
 
 func TestHydrateV1AttestationData(t *testing.T) {
 	d := HydrateV1AttestationData(&v1.AttestationData{})

@@ -113,30 +113,37 @@ func TestFork(t *testing.T) {
 	}
 }
 
+// NOTE(rgeraldes24): test not valid at the moment since we just have one fork
+/*
 func TestRetrieveForkDataFromDigest(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	cfg := params.BeaconConfig().Copy()
 	cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
 	cfg.GenesisEpoch = 0
+	cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
+	cfg.AltairForkEpoch = 10
+	cfg.BellatrixForkVersion = []byte{'A', 'B', 'C', 'Z'}
+	cfg.BellatrixForkEpoch = 100
 	cfg.InitializeForkSchedule()
 	params.OverrideBeaconConfig(cfg)
-	//genValRoot := [32]byte{'A', 'B', 'C', 'D'}
-	//digest, err := signing.ComputeForkDigest([]byte{'A', 'B', 'C', 'F'}, genValRoot[:])
-	//assert.NoError(t, err)
+	genValRoot := [32]byte{'A', 'B', 'C', 'D'}
+	digest, err := signing.ComputeForkDigest([]byte{'A', 'B', 'C', 'F'}, genValRoot[:])
+	assert.NoError(t, err)
 
-	// version, epoch, err := RetrieveForkDataFromDigest(digest, genValRoot[:])
-	// assert.NoError(t, err)
-	// assert.Equal(t, [4]byte{'A', 'B', 'C', 'F'}, version)
-	// assert.Equal(t, epoch, primitives.Epoch(10))
+	version, epoch, err := RetrieveForkDataFromDigest(digest, genValRoot[:])
+	assert.NoError(t, err)
+	assert.Equal(t, [4]byte{'A', 'B', 'C', 'F'}, version)
+	assert.Equal(t, epoch, primitives.Epoch(10))
 
-	// digest, err = signing.ComputeForkDigest([]byte{'A', 'B', 'C', 'Z'}, genValRoot[:])
-	// assert.NoError(t, err)
+	digest, err = signing.ComputeForkDigest([]byte{'A', 'B', 'C', 'Z'}, genValRoot[:])
+	assert.NoError(t, err)
 
-	// version, epoch, err = RetrieveForkDataFromDigest(digest, genValRoot[:])
-	// assert.NoError(t, err)
-	// assert.Equal(t, [4]byte{'A', 'B', 'C', 'Z'}, version)
-	// assert.Equal(t, epoch, primitives.Epoch(100))
+	version, epoch, err = RetrieveForkDataFromDigest(digest, genValRoot[:])
+	assert.NoError(t, err)
+	assert.Equal(t, [4]byte{'A', 'B', 'C', 'Z'}, version)
+	assert.Equal(t, epoch, primitives.Epoch(100))
 }
+*/
 
 func TestIsForkNextEpoch(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

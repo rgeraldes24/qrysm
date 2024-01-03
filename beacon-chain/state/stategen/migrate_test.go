@@ -136,7 +136,7 @@ func TestMigrateToCold_StateExistsInDB(t *testing.T) {
 	assert.LogsDoNotContain(t, hook, "Saved state in DB")
 }
 
-// TODO
+// FIX(rgeraldes24)
 /*
 func TestMigrateToCold_ParallelCalls(t *testing.T) {
 	hook := logTest.NewGlobal()

@@ -581,6 +581,7 @@ func TestService_sortedPendingSlots(t *testing.T) {
 	assert.DeepEqual(t, want, r.sortedPendingSlots(), "Unexpected pending slots list")
 }
 
+// FIX(rgeraldes24)
 // TODO(rgeraldes24): /beacon_blocks_by_root/1 has been deprecated in capella
 /*
 func TestService_BatchRootRequest(t *testing.T) {
