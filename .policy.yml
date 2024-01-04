@@ -1,3 +1,4 @@
+# TODO(rgeraldes24): teams
 policy:
   approval:
     - or:
@@ -20,7 +21,7 @@ approval_rules:
     requires:
       count: 1
       teams:
-        - "prysmaticlabs/core-team"
+        - "theQRL/core-team"
   - name: only proto files are changed
     if:
       only_changed_files:
@@ -34,7 +35,7 @@ approval_rules:
     requires:
       count: 1
       teams:
-        - "prysmaticlabs/core-team"
+        - "theQRL/core-team"
   - name: touches consensus critical code
     if:
       only_changed_files:
@@ -47,7 +48,7 @@ approval_rules:
     requires:
       count: 2
       teams:
-        - "prysmaticlabs/core-team"
+        - "theQRL/core-team"
   - name: touches sync/blockchain/p2p code
     if:
       only_changed_files:
@@ -61,7 +62,7 @@ approval_rules:
     requires:
       count: 2
       teams:
-        - "prysmaticlabs/core-team"
+        - "theQRL/core-team"
   - name: large line count
     if:
       modified_lines:
@@ -77,7 +78,7 @@ approval_rules:
     requires:
       count: 2
       teams:
-        - "prysmaticlabs/core-team"
+        - "theQRL/core-team"
   - name: is critical priority
     if:
       has_labels:
@@ -88,4 +89,4 @@ approval_rules:
     requires:
       count: 3
       teams:
-        - "prysmaticlabs/core-team"
+        - "theQRL/core-team"

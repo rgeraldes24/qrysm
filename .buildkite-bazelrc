@@ -8,7 +8,7 @@
 #build:remote-cache --strategy=Closure=standalone
 #build:remote-cache --strategy=Genrule=standalone
 
-# Prysm specific remote-cache properties.
+# Qrysm specific remote-cache properties.
 #build:remote-cache --disk_cache=
 build:remote-cache --remote_download_toplevel
 build:remote-cache --remote_cache=grpc://bazel-remote-cache:9092
@@ -47,7 +47,7 @@ build:nostamp --nostamp
 
 # Build metadata
 build --build_metadata=ROLE=CI
-build --build_metadata=REPO_URL=https://github.com/prysmaticlabs/prysm.git
+build --build_metadata=REPO_URL=https://github.com/theQRL/qrysm.git
 build --workspace_status_command=./hack/workspace_status_ci.sh
 
 # Buildbuddy

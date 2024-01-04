@@ -1,8 +1,6 @@
+# TODO(rgeraldes24): teams
 # Automatically require code review from core-team.
-* @prysmaticlabs/core-team
+# * @theQRL/core-team
 
-# Starlark code owners
-*.bzl @prestonvanloon
-
-# Anyone on prylabs team can approve dependency updates.
-deps.bzl @prysmaticlabs/core-team
+# Anyone on theQRL team can approve dependency updates.
+# deps.bzl @theQRL/core-team
