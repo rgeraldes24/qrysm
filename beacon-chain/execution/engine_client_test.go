@@ -68,7 +68,7 @@ func TestClient_IPC(t *testing.T) {
 
 	params.SetupTestConfigCleanup(t)
 
-	t.Run(GetPayloadMethod, func(t *testing.T) {
+	t.Run(GetPayloadMethodV2, func(t *testing.T) {
 		want, ok := fix["ExecutionPayloadWithValue"].(*pb.ExecutionPayloadWithValue)
 		require.Equal(t, true, ok)
 		payloadId := [8]byte{1}
@@ -78,7 +78,7 @@ func TestClient_IPC(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepEqual(t, want, resPb)
 	})
-	t.Run(ForkchoiceUpdatedMethod, func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV2, func(t *testing.T) {
 		want, ok := fix["ForkchoiceUpdatedResponse"].(*ForkchoiceUpdatedResponse)
 		require.Equal(t, true, ok)
 		p, err := payloadattribute.New(&pb.PayloadAttributes{})
@@ -88,7 +88,7 @@ func TestClient_IPC(t *testing.T) {
 		require.DeepEqual(t, want.Status.LatestValidHash, validHash)
 		require.DeepEqual(t, want.PayloadId, payloadID)
 	})
-	t.Run(NewPayloadMethod, func(t *testing.T) {
+	t.Run(NewPayloadMethodV2, func(t *testing.T) {
 		want, ok := fix["ValidPayloadStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
 		req, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
@@ -128,7 +128,7 @@ func TestClient_HTTP(t *testing.T) {
 
 	params.SetupTestConfigCleanup(t)
 
-	t.Run(GetPayloadMethod, func(t *testing.T) {
+	t.Run(GetPayloadMethodV2, func(t *testing.T) {
 		payloadId := [8]byte{1}
 		want, ok := fix["ExecutionPayloadWithValue"].(*pb.GetPayloadResponseJson)
 		require.Equal(t, true, ok)
@@ -181,7 +181,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, uint64(1236), v)
 	})
-	t.Run(ForkchoiceUpdatedMethod+" VALID status", func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV2+" VALID status", func(t *testing.T) {
 		forkChoiceState := &pb.ForkchoiceState{
 			HeadBlockHash:      []byte("head"),
 			SafeBlockHash:      []byte("safe"),
@@ -204,7 +204,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, want.Status.LatestValidHash, validHash)
 		require.DeepEqual(t, want.PayloadId, payloadID)
 	})
-	t.Run(ForkchoiceUpdatedMethod+" VALID status", func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV2+" VALID status", func(t *testing.T) {
 		forkChoiceState := &pb.ForkchoiceState{
 			HeadBlockHash:      []byte("head"),
 			SafeBlockHash:      []byte("safe"),
@@ -228,7 +228,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, want.Status.LatestValidHash, validHash)
 		require.DeepEqual(t, want.PayloadId, payloadID)
 	})
-	t.Run(ForkchoiceUpdatedMethod+" SYNCING status", func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV2+" SYNCING status", func(t *testing.T) {
 		forkChoiceState := &pb.ForkchoiceState{
 			HeadBlockHash:      []byte("head"),
 			SafeBlockHash:      []byte("safe"),
@@ -252,7 +252,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, (*pb.PayloadIDBytes)(nil), payloadID)
 		require.DeepEqual(t, []byte(nil), validHash)
 	})
-	t.Run(ForkchoiceUpdatedMethod+" INVALID status", func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV2+" INVALID status", func(t *testing.T) {
 		forkChoiceState := &pb.ForkchoiceState{
 			HeadBlockHash:      []byte("head"),
 			SafeBlockHash:      []byte("safe"),
@@ -275,7 +275,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, (*pb.PayloadIDBytes)(nil), payloadID)
 		require.DeepEqual(t, want.Status.LatestValidHash, validHash)
 	})
-	t.Run(ForkchoiceUpdatedMethod+" UNKNOWN status", func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV2+" UNKNOWN status", func(t *testing.T) {
 		forkChoiceState := &pb.ForkchoiceState{
 			HeadBlockHash:      []byte("head"),
 			SafeBlockHash:      []byte("safe"),
@@ -298,7 +298,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, (*pb.PayloadIDBytes)(nil), payloadID)
 		require.DeepEqual(t, []byte(nil), validHash)
 	})
-	t.Run(NewPayloadMethod+" VALID status", func(t *testing.T) {
+	t.Run(NewPayloadMethodV2+" VALID status", func(t *testing.T) {
 		execPayload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
 		require.Equal(t, true, ok)
 		want, ok := fix["ValidPayloadStatus"].(*pb.PayloadStatus)
@@ -312,7 +312,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepEqual(t, want.LatestValidHash, resp)
 	})
-	t.Run(NewPayloadMethod+" SYNCING status", func(t *testing.T) {
+	t.Run(NewPayloadMethodV2+" SYNCING status", func(t *testing.T) {
 		execPayload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
 		require.Equal(t, true, ok)
 		want, ok := fix["SyncingStatus"].(*pb.PayloadStatus)
@@ -326,7 +326,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.ErrorIs(t, ErrAcceptedSyncingPayloadStatus, err)
 		require.DeepEqual(t, []uint8(nil), resp)
 	})
-	t.Run(NewPayloadMethod+" INVALID_BLOCK_HASH status", func(t *testing.T) {
+	t.Run(NewPayloadMethodV2+" INVALID_BLOCK_HASH status", func(t *testing.T) {
 		execPayload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
 		require.Equal(t, true, ok)
 		want, ok := fix["InvalidBlockHashStatus"].(*pb.PayloadStatus)
@@ -340,7 +340,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.ErrorIs(t, ErrInvalidBlockHashPayloadStatus, err)
 		require.DeepEqual(t, []uint8(nil), resp)
 	})
-	t.Run(NewPayloadMethod+" INVALID status", func(t *testing.T) {
+	t.Run(NewPayloadMethodV2+" INVALID status", func(t *testing.T) {
 		execPayload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
 		require.Equal(t, true, ok)
 		want, ok := fix["InvalidStatus"].(*pb.PayloadStatus)
@@ -354,7 +354,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.ErrorIs(t, ErrInvalidPayloadStatus, err)
 		require.DeepEqual(t, want.LatestValidHash, resp)
 	})
-	t.Run(NewPayloadMethod+" UNKNOWN status", func(t *testing.T) {
+	t.Run(NewPayloadMethodV2+" UNKNOWN status", func(t *testing.T) {
 		execPayload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
 		require.Equal(t, true, ok)
 		want, ok := fix["UnknownStatus"].(*pb.PayloadStatus)

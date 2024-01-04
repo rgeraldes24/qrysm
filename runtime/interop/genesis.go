@@ -15,7 +15,7 @@ import (
 
 // defaultMinerAddress is used to send deposits and test transactions in the e2e test.
 // This account is given a large initial balance in the genesis block in test setups.
-const defaultMinerAddress = "0x878705ba3f8bc32fcf7f4caa1a35e72af65cf766"
+const defaultMinerAddress = "0x205547bA6232eEc096770f7161d57dEA54FD13D0"
 const defaultTestChainId int64 = 1337
 const defaultCoinbase = "0x0000000000000000000000000000000000000000"
 const defaultDifficulty = "0"

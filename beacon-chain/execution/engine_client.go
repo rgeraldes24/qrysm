@@ -30,9 +30,9 @@ import (
 
 var (
 	supportedEngineEndpoints = []string{
-		NewPayloadMethod,
-		ForkchoiceUpdatedMethod,
-		GetPayloadMethod,
+		NewPayloadMethodV2,
+		ForkchoiceUpdatedMethodV2,
+		GetPayloadMethodV2,
 		ExchangeTransitionConfigurationMethod,
 		GetPayloadBodiesByHashV1,
 		GetPayloadBodiesByRangeV1,
@@ -40,12 +40,12 @@ var (
 )
 
 const (
-	// NewPayloadMethod request string for JSON-RPC.
-	NewPayloadMethod = "engine_newPayload"
-	// ForkchoiceUpdatedMethod v1 request string for JSON-RPC.
-	ForkchoiceUpdatedMethod = "engine_forkchoiceUpdated"
-	// GetPayloadMethod request string for JSON-RPC.
-	GetPayloadMethod = "engine_getPayloadV1"
+	// NewPayloadMethodV2 v2 request string for JSON-RPC.
+	NewPayloadMethodV2 = "engine_newPayloadV2"
+	// ForkchoiceUpdatedMethodV2 v2 request string for JSON-RPC.
+	ForkchoiceUpdatedMethodV2 = "engine_forkchoiceUpdatedV2"
+	// GetPayloadMethodV2 v2 request string for JSON-RPC.
+	GetPayloadMethodV2 = "engine_getPayloadV2"
 	// ExchangeTransitionConfigurationMethod v1 request string for JSON-RPC.
 	ExchangeTransitionConfigurationMethod = "engine_exchangeTransitionConfigurationV1"
 	// ExecutionBlockByHashMethod request string for JSON-RPC.
@@ -117,7 +117,7 @@ func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionDa
 		if !ok {
 			return nil, errors.New("execution data must be a Capella execution payload")
 		}
-		err := s.rpcClient.CallContext(ctx, result, NewPayloadMethod, payloadPb)
+		err := s.rpcClient.CallContext(ctx, result, NewPayloadMethodV2, payloadPb)
 		if err != nil {
 			return nil, handleRPCError(err)
 		}
@@ -164,7 +164,7 @@ func (s *Service) ForkchoiceUpdated(
 		if err != nil {
 			return nil, nil, err
 		}
-		err = s.rpcClient.CallContext(ctx, result, ForkchoiceUpdatedMethod, state, a)
+		err = s.rpcClient.CallContext(ctx, result, ForkchoiceUpdatedMethodV2, state, a)
 		if err != nil {
 			return nil, nil, handleRPCError(err)
 		}
@@ -202,7 +202,7 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 	defer cancel()
 
 	result := &pb.ExecutionPayloadWithValue{}
-	err := s.rpcClient.CallContext(ctx, result, GetPayloadMethod, pb.PayloadIDBytes(payloadId))
+	err := s.rpcClient.CallContext(ctx, result, GetPayloadMethodV2, pb.PayloadIDBytes(payloadId))
 	if err != nil {
 		return nil, handleRPCError(err)
 	}

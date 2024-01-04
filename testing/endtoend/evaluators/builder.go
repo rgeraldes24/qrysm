@@ -17,7 +17,7 @@ import (
 var BuilderIsActive = e2etypes.Evaluator{
 	Name: "builder_is_active_at_epoch_%d",
 	// Policy:     policies.OnwardsNthEpoch(helpers.BellatrixE2EForkEpoch),
-	Policy:     policies.OnwardsNthEpoch(0),
+	Policy:     policies.OnwardsNthEpoch(8),
 	Evaluation: builderActive,
 }
 

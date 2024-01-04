@@ -3,6 +3,7 @@ package zond1
 import (
 	"context"
 	"math/big"
+	"math/rand"
 	"time"
 
 	"github.com/theQRL/go-zond/accounts/keystore"
@@ -16,7 +17,7 @@ import (
 const NetworkId = 1337
 
 // KeystorePassword is the password used to decrypt ZOND1 keystores.
-const KeystorePassword = "password"
+const KeystorePassword = ""
 
 const minerPasswordFile = "password.txt"
 
@@ -48,12 +49,24 @@ func WaitForBlocks(web3 *zondclient.Client, key *keystore.Key, blocksToWait uint
 	finishBlock := block.NumberU64() + blocksToWait
 
 	for block.NumberU64() <= finishBlock {
-		gasPrice, err := web3.SuggestGasPrice(context.Background())
-		if err != nil {
-			return err
-		}
-		spamTX := types.NewTransaction(nonce, key.Address, big.NewInt(0), params.SpamTxGasLimit, gasPrice, []byte{})
-		signed, err := types.SignTx(spamTX, types.NewEIP155Signer(chainID), key.Dilithium)
+		// gasPrice, err := web3.SuggestGasPrice(context.Background())
+		// if err != nil {
+		// 	return err
+		// }
+
+		spamTX := types.NewTx(&types.DynamicFeeTx{
+			Nonce: nonce,
+			To:    &key.Address,
+			Value: big.NewInt(100),
+			// Gas:       100,
+			Gas:       params.SpamTxGasLimit,
+			GasFeeCap: big.NewInt(int64(500)),
+			GasTipCap: big.NewInt(int64(rand.Intn(500 + 1))),
+			Data:      nil,
+		})
+
+		// spamTX := types.NewTransaction(nonce, key.Address, big.NewInt(0), params.SpamTxGasLimit, gasPrice, []byte{})
+		signed, err := types.SignTx(spamTX, types.NewLondonSigner(chainID), key.Dilithium)
 		if err != nil {
 			return err
 		}
