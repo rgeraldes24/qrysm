@@ -1,18 +1,18 @@
-# Dependency Management in Prysm
+# Dependency Management in Qrysm
 
-Prysm is go project with many complicated dependencies, including some c++ based libraries. There
-are two parts to Prysm's dependency management. Go modules and bazel managed dependencies. Be sure 
+Qrysm is go project with many complicated dependencies, including some c++ based libraries. There
+are two parts to Qrysm's dependency management. Go modules and bazel managed dependencies. Be sure 
 to read [Why Bazel?](https://github.com/prysmaticlabs/documentation/issues/138) to fully
 understand the reasoning behind an additional layer of build tooling via Bazel rather than a pure
 "go build" project.
 
 ## Go Module support
 
-The Prysm project officially supports go modules with some caveats. 
+The Qrysm project officially supports go modules with some caveats. 
 
 ### Caveat 1: Some c++ libraries are precompiled archives
 
-Given some of Prysm's c++ dependencies have very complicated project structures which make building
+Given some of Qrysm's c++ dependencies have very complicated project structures which make building
 difficult or impossible with "go build" alone. Additionally, building c++ dependencies with certain
 compilers, like clang / LLVM, offer a significant performance improvement. To get around this 
 issue, c++ dependencies have been precompiled as linkable archives. While there isn't necessarily
@@ -28,7 +28,7 @@ including complicated c++ dependencies.
 One key advantage of Bazel over vanilla `go build` is that Bazel automatically (re)builds generated
 pb.go files at build time when file changes are present in any protobuf definition file or after
 any updates to the protobuf compiler or other relevant dependencies. Vanilla go users should run
-the following scripts often to ensure their generated files are up to date. Furthermore, Prysm
+the following scripts often to ensure their generated files are up to date. Furthermore, Qrysm
 generates SSZ marshal related code based on defined data structures. These generated files must
 also be updated and checked in as frequently.
 
@@ -41,7 +41,7 @@ also be updated and checked in as frequently.
 
 ### Caveat 3: Compile-time optimizations 
 
-When Prysmatic Labs builds production binaries, they use the "release" configuration of bazel to
+When QRL builds production binaries, they use the "release" configuration of bazel to
 compile with several compiler optimizations and recommended production build configurations.
 Additionally, the release build properly stamps the built binaries to include helpful metadata
 about how and when the binary was built. 
@@ -60,8 +60,8 @@ bazel build //beacon-chain --config=release
 Example:
 
 ```bash
-go get github.com/prysmaticlabs/example@v1.2.3
-bazel run //:gazelle -- update-repos -from_file=go.mod -to_macro=deps.bzl%prysm_deps -prune=true
+go get github.com/theQRL/example@v1.2.3
+bazel run //:gazelle -- update-repos -from_file=go.mod -to_macro=deps.bzl%qrysm_deps -prune=true
 ```
 
 The deps.bzl file should have been updated with the dependency and any transitive dependencies. 

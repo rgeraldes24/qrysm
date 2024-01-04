@@ -1,39 +1,40 @@
+# TODO(rgeraldes24): links
 # Contribution Guidelines
 
 Note: The latest and most up-to-date documentation can be found on our [docs portal](https://docs.prylabs.network/docs/contribute/contribution-guidelines).
 
-Excited by our work and want to get involved in building out our sharding releases? Or maybe you haven't learned as much about the Ethereum protocol but are a savvy developer? 
+Excited by our work and want to get involved in building out our sharding releases? Or maybe you haven't learned as much about the Zond protocol but are a savvy developer? 
 
 You can explore our [Open Issues](https://github.com/theQRL/qrysm/issues) in-the works for our different releases. Feel free to fork our repo and start creating PR’s after assigning yourself to an issue of interest. We are always chatting on [Discord](https://discord.gg/CTYGPUJ) drop us a line there if you want to get more involved or have any questions on our implementation!
 
 ## Contribution Steps
 
-**1. Set up Prysm following the instructions in README.md.**
+**1. Set up Qrysm following the instructions in README.md.**
 
-**2. Fork the Prysm repo.**
+**2. Fork the Qrysm repo.**
 
-Sign in to your GitHub account or create a new account if you do not have one already. Then navigate your browser to https://github.com/prysmaticlabs/prysm/. In the upper right hand corner of the page, click “fork”. This will create a copy of the Prysm repo in your account.
+Sign in to your GitHub account or create a new account if you do not have one already. Then navigate your browser to https://github.com/theQRL/qrysm/. In the upper right hand corner of the page, click “fork”. This will create a copy of the Qrysm repo in your account.
 
-**3. Create a local clone of Prysm.**
+**3. Create a local clone of Qrysm.**
 
 ```
-$ mkdir -p $GOPATH/src/github.com/prysmaticlabs
-$ cd $GOPATH/src/github.com/prysmaticlabs
-$ git clone https://github.com/prysmaticlabs/prysm.git
-$ cd $GOPATH/src/github.com/prysmaticlabs/prysm
+$ mkdir -p $GOPATH/src/github.com/theQRL
+$ cd $GOPATH/src/github.com/theQRL
+$ git clone https://github.com/theQRL/qrysm.git
+$ cd $GOPATH/src/github.com/theQRL/qrysm
 ```
 
 **4. Link your local clone to the fork on your GitHub repo.**
 
 ```
-$ git remote add myprysmrepo https://github.com/<your_github_user_name>/prysm.git
+$ git remote add myqrysmrepo https://github.com/<your_github_user_name>/qrysm.git
 ```
 
-**5. Link your local clone to the Prysmatic Labs repo so that you can easily fetch future changes to the Prysmatic Labs repo.**
+**5. Link your local clone to the QRL repo so that you can easily fetch future changes to the QRL repo.**
 
 ```
-$ git remote add prysm https://github.com/prysmaticlabs/prysm.git
-$ git remote -v (you should see myrepo and prysm in the list of remotes)
+$ git remote add qrysm https://github.com/theQRL/qrysm.git
+$ git remote -v (you should see myrepo and qrysm in the list of remotes)
 ```
 
 **6. Find an issue to work on.**
@@ -48,7 +49,7 @@ $ git checkout -b feature-in-progress-branch
 
 **8. Make improvements to the code.**
 
-Each time you work on the code be sure that you are working on the branch that you have created as opposed to your local copy of the Prysmatic Labs repo. Keeping your changes segregated in this branch will make it easier to merge your changes into the repo later.
+Each time you work on the code be sure that you are working on the branch that you have created as opposed to your local copy of the QRL repo. Keeping your changes segregated in this branch will make it easier to merge your changes into the repo later.
 
 ```
 $ git checkout feature-in-progress-branch
@@ -78,13 +79,13 @@ $ git commit  -m “Message to explain what the commit covers”
 
 You can use the –amend flag to include previous commits that have not yet been pushed to an upstream repo to the current commit.
 
-**12. Fetch any changes that have occurred in the Prysmatic Labs Prysm repo since you started work.**
+**12. Fetch any changes that have occurred in the QRL Qrysm repo since you started work.**
 
 ```
-$ git fetch prysm
+$ git fetch qrysm
 ```
 
-**13. Pull latest version of Prysm.**
+**13. Pull latest version of Qrysm.**
 
 ```
 $ git pull origin master
@@ -106,9 +107,9 @@ Your version of the conflicting code
 '>>>>> Your Commit
 ```
 
-The code from the Prysm repo is inserted between <<< and === while the change you have made is inserted between === and >>>>. Remove everything between <<<< and >>> and replace it with code that resolves the conflict. Repeat the process for all files listed by git status that have conflicts.
+The code from the Qrysm repo is inserted between <<< and === while the change you have made is inserted between === and >>>>. Remove everything between <<<< and >>> and replace it with code that resolves the conflict. Repeat the process for all files listed by git status that have conflicts.
 
-**14. Push your changes to your fork of the Prysm repo.**
+**14. Push your changes to your fork of the Qrysm repo.**
 
 Use git push to move your changes to your fork of the repo.
 
@@ -116,13 +117,13 @@ Use git push to move your changes to your fork of the repo.
 $ git push myrepo feature-in-progress-branch
 ```
 
-**15. Check to be sure your fork of the Prysm repo contains your feature branch with the latest edits.**
+**15. Check to be sure your fork of the Qrysm repo contains your feature branch with the latest edits.**
 
 Navigate to your fork of the repo on GitHub. On the upper left where the current branch is listed, change the branch to your feature-in-progress-branch. Open the files that you have worked on and check to make sure they include your changes.
 
 **16. Create a pull request.**
 
-Navigate your browser to https://github.com/prysmaticlabs/prysm and click on the new pull request button. In the “base” box on the left, leave the default selection “base master”, the branch that you want your changes to be applied to. In the “compare” box on the right, select feature-in-progress-branch, the branch containing the changes you want to apply. You will then be asked to answer a few questions about your pull request. After you complete the questionnaire, the pull request will appear in the list of pull requests at https://github.com/theQRL/qrysm/pulls.
+Navigate your browser to https://github.com/theQRL/qrysm and click on the new pull request button. In the “base” box on the left, leave the default selection “base master”, the branch that you want your changes to be applied to. In the “compare” box on the right, select feature-in-progress-branch, the branch containing the changes you want to apply. You will then be asked to answer a few questions about your pull request. After you complete the questionnaire, the pull request will appear in the list of pull requests at https://github.com/theQRL/qrysm/pulls.
 
 **17. Respond to comments by Core Contributors.**
 
@@ -133,7 +134,7 @@ Core Contributors may ask questions and request that you make edits. If you set 
  You can do this with an interactive rebase. Start by running the following command to determine the commit that is the base of your branch...
 
 ```
-$ git merge-base feature-in-progress-branch prysm/master
+$ git merge-base feature-in-progress-branch qrysm/master
 ```
 
 **19. The previous command will return a commit-hash that you should use in the following command.**
@@ -174,7 +175,7 @@ We consider two types of contributions to our repo and categorize them as follow
 
 ### Part-Time Contributors
 
-Anyone can become a part-time contributor and help out on implementing Ethereum consensus. The responsibilities of a part-time contributor include:
+Anyone can become a part-time contributor and help out on implementing Zond consensus. The responsibilities of a part-time contributor include:
 
 -   Engaging in Gitter conversations, asking the questions on how to begin contributing to the project
 -   Opening up GitHub issues to express interest in code to implement
@@ -187,15 +188,15 @@ Anyone can become a part-time contributor and help out on implementing Ethereum 
 
 ### Core Contributors
 
-Core contributors are remote contractors of Prysmatic Labs, LLC. and are considered critical team members of our organization. Core devs have all the responsibilities of part-time contributors plus the majority of the following:
+Core contributors are remote contractors of the QRL and are considered critical team members of our organization. Core devs have all the responsibilities of part-time contributors plus the majority of the following:
 
 -   Stay up to date on the latest beacon chain specification
 -   Monitor GitHub issues and PR’s to make sure owner, labels, descriptions are correct
 -   Formulate independent ideas, suggest new work to do, point out improvements to existing approaches
 -   Participate in code review, ensure code quality is excellent, and ensure high code coverage
 -   Help with social media presence, write bi-weekly development update
--   Represent Prysmatic Labs at events to help spread the word on scalability research and solutions
+-   Represent QRL at events to help spread the word on scalability research and solutions
 
 We love working with people that are autonomous, bring independent thoughts to the team, and are excited for their work! We believe in a merit-based approach to becoming a core contributor, and any part-time contributor that puts in the time, work, and drive can become a core member of our team.
 
-![eth](https://steemitimages.com/DQmV1NASyCJYusDjY1WCvpoWiXh32HyumQHFQhY8zYZ6WDH/source.gif)
+![zond](https://steemitimages.com/DQmV1NASyCJYusDjY1WCvpoWiXh32HyumQHFQhY8zYZ6WDH/source.gif)

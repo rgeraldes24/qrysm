@@ -1,4 +1,5 @@
 ## Terms of Use
+# TODO(rgeraldes24): update terms of service
 
 Effective as of Oct 14, 2020
 

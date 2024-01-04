@@ -1,23 +1,24 @@
-# Prysm Client Interoperability Guide
+# TODO(rgeraldes24): links
+# Qrysm Client Interoperability Guide
 
-This README details how to setup Prysm for interop testing for usage with other Ethereum consensus clients.
+This README details how to setup Qrysm for interop testing for usage with other Zond consensus clients.
 
 ## Installation & Setup
 
 1. Install [Bazel](https://docs.bazel.build/versions/master/install.html) **(Recommended)**
-2. `git clone https://github.com/prysmaticlabs/prysm && cd prysm`
+2. `git clone https://github.com/theQRL/qrysm && cd qrysm`
 3. `bazel build //...`
 
 ## Starting from Genesis
 
-Prysm supports a few ways to quickly launch a beacon node from basic configurations:
+Qrysm supports a few ways to quickly launch a beacon node from basic configurations:
 
 - `NumValidators + GenesisTime`: Launches a beacon node by deterministically generating a state from a num-validators flag along with a genesis time **(Recommended)**
 - `SSZ Genesis`: Launches a beacon node  from a .ssz file containing a SSZ-encoded, genesis beacon state
 
 ## Generating a Genesis State
 
-To setup the necessary files for these quick starts, Prysm provides a tool to generate a `genesis.ssz` from
+To setup the necessary files for these quick starts, Qrysm provides a tool to generate a `genesis.ssz` from
 a deterministically generated set of validator private keys following the official interop YAML format 
 [here](https://github.com/ethereum/eth2.0-pm/blob/master/interop/mocked_start).
 
@@ -54,7 +55,7 @@ bazel run //beacon-chain -- \
 --force-clear-db \
 --min-sync-peers=0 \
 --interop-num-validators 64 \
---interop-eth1data-votes
+--interop-zond1data-votes
 ```
 
 This will deterministically generate a beacon genesis state and start
@@ -79,7 +80,7 @@ Assuming you generated a `genesis.ssz` file with 64 validators, open up two term
 --force-clear-db \
 --min-sync-peers=0 \
 --interop-genesis-state /path/to/genesis.ssz \
---interop-eth1data-votes
+--interop-zond1data-votes
 ```
 
 Wait a bit until your beacon chain starts, and in the other window:
