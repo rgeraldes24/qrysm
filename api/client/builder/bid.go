@@ -1,14 +1,10 @@
 package builder
 
 import (
-	"math/big"
-
 	ssz "github.com/prysmaticlabs/fastssz"
 	consensus_types "github.com/theQRL/qrysm/v4/consensus-types"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	"github.com/theQRL/qrysm/v4/math"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 )
@@ -81,8 +77,7 @@ func WrappedBuilderBid(p *zondpb.BuilderBid) (Bid, error) {
 // Header returns the execution data interface.
 func (b builderBid) Header() (interfaces.ExecutionData, error) {
 	// We have to convert big endian to little endian because the value is coming from the execution layer.
-	v := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(b.p.Value))
-	return blocks.WrappedExecutionPayloadHeader(b.p.Header, math.WeiToGwei(v))
+	return blocks.WrappedExecutionPayloadHeader(b.p.Header, blocks.PayloadValueToGwei(b.p.Value))
 }
 
 // Version --

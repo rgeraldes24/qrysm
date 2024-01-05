@@ -18,6 +18,7 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/api/client"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/network/forks"
@@ -147,14 +148,14 @@ func (c *Client) GetFork(ctx context.Context, stateId StateOrBlockId) (*zondpb.F
 	if err != nil {
 		return nil, errors.Wrapf(err, "error requesting fork by state id = %s", stateId)
 	}
-	fr := &forkResponse{}
-	dataWrapper := &struct{ Data *forkResponse }{Data: fr}
+	fr := &shared.Fork{}
+	dataWrapper := &struct{ Data *shared.Fork }{Data: fr}
 	err = json.Unmarshal(body, dataWrapper)
 	if err != nil {
 		return nil, errors.Wrap(err, "error decoding json response in GetFork")
 	}
 
-	return fr.Fork()
+	return fr.ToConsensus()
 }
 
 // GetForkSchedule retrieve all forks, past present and future, of which this node is aware.
@@ -337,40 +338,8 @@ func (c *Client) GetDilithiumtoExecutionChanges(ctx context.Context) (*apimiddle
 	return poolResponse, nil
 }
 
-type forkResponse struct {
-	PreviousVersion string `json:"previous_version"`
-	CurrentVersion  string `json:"current_version"`
-	Epoch           string `json:"epoch"`
-}
-
-func (f *forkResponse) Fork() (*zondpb.Fork, error) {
-	epoch, err := strconv.ParseUint(f.Epoch, 10, 64)
-	if err != nil {
-		return nil, err
-	}
-	cSlice, err := hexutil.Decode(f.CurrentVersion)
-	if err != nil {
-		return nil, err
-	}
-	if len(cSlice) != 4 {
-		return nil, fmt.Errorf("got %d byte version for CurrentVersion, expected 4 bytes. hex=%s", len(cSlice), f.CurrentVersion)
-	}
-	pSlice, err := hexutil.Decode(f.PreviousVersion)
-	if err != nil {
-		return nil, err
-	}
-	if len(pSlice) != 4 {
-		return nil, fmt.Errorf("got %d byte version, expected 4 bytes. version hex=%s", len(pSlice), f.PreviousVersion)
-	}
-	return &zondpb.Fork{
-		CurrentVersion:  cSlice,
-		PreviousVersion: pSlice,
-		Epoch:           primitives.Epoch(epoch),
-	}, nil
-}
-
 type forkScheduleResponse struct {
-	Data []forkResponse
+	Data []shared.Fork
 }
 
 func (fsr *forkScheduleResponse) OrderedForkSchedule() (forks.OrderedSchedule, error) {

@@ -335,7 +335,6 @@ func (s *Service) removeInvalidBlockAndState(ctx context.Context, blkRoots [][32
 		if err := s.cfg.StateGen.DeleteStateFromCaches(ctx, root); err != nil {
 			return err
 		}
-
 		// Delete block also deletes the state as well.
 		if err := s.cfg.BeaconDB.DeleteBlock(ctx, root); err != nil {
 			// TODO(10487): If a caller requests to delete a root that's justified and finalized. We should gracefully shutdown.

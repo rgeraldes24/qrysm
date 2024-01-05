@@ -25,7 +25,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/features"
 	"github.com/theQRL/qrysm/v4/config/params"
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
-	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -45,8 +44,7 @@ func TestStore_OnBlockBatch(t *testing.T) {
 	require.NoError(t, service.saveGenesisData(ctx, st))
 	bState := st.Copy()
 
-	var blks []interfaces.ReadOnlySignedBeaconBlock
-	var blkRoots [][32]byte
+	var blks []consensusblocks.ROBlock
 	for i := 1; i < 98; i++ {
 		b, err := util.GenerateFullBlock(bState, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
@@ -59,16 +57,15 @@ func TestStore_OnBlockBatch(t *testing.T) {
 		require.NoError(t, service.saveInitSyncBlock(ctx, root, wsb))
 		wsb, err = consensusblocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
-		blks = append(blks, wsb)
-		blkRoots = append(blkRoots, root)
+		rwsb, err := consensusblocks.NewROBlock(wsb)
+		require.NoError(t, err)
+		blks = append(blks, rwsb)
 	}
-	err := service.onBlockBatch(ctx, blks, blkRoots[1:])
-	require.ErrorIs(t, errWrongBlockCount, err)
-	err = service.onBlockBatch(ctx, blks, blkRoots)
+	err := service.onBlockBatch(ctx, blks)
 	require.NoError(t, err)
 	jcp := service.CurrentJustifiedCheckpt()
 	jroot := bytesutil.ToBytes32(jcp.Root)
-	require.Equal(t, blkRoots[63], jroot)
+	require.Equal(t, blks[63].Root(), jroot)
 	require.Equal(t, primitives.Epoch(2), service.cfg.ForkChoiceStore.JustifiedCheckpoint().Epoch)
 }
 
@@ -80,8 +77,7 @@ func TestStore_OnBlockBatch_NotifyNewPayload(t *testing.T) {
 	require.NoError(t, service.saveGenesisData(ctx, st))
 	bState := st.Copy()
 
-	var blks []interfaces.ReadOnlySignedBeaconBlock
-	var blkRoots [][32]byte
+	var blks []consensusblocks.ROBlock
 	blkCount := 4
 	for i := 1; i <= blkCount+1; i++ {
 		b, err := util.GenerateFullBlock(bState, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
@@ -90,13 +86,12 @@ func TestStore_OnBlockBatch_NotifyNewPayload(t *testing.T) {
 		require.NoError(t, err)
 		bState, err = transition.ExecuteStateTransition(ctx, bState, wsb)
 		require.NoError(t, err)
-		root, err := b.Block.HashTreeRoot()
+		rwsb, err := consensusblocks.NewROBlock(wsb)
 		require.NoError(t, err)
-		require.NoError(t, service.saveInitSyncBlock(ctx, root, wsb))
-		blks = append(blks, wsb)
-		blkRoots = append(blkRoots, root)
+		require.NoError(t, service.saveInitSyncBlock(ctx, rwsb.Root(), wsb))
+		blks = append(blks, rwsb)
 	}
-	require.NoError(t, service.onBlockBatch(ctx, blks, blkRoots))
+	require.NoError(t, service.onBlockBatch(ctx, blks))
 }
 
 func TestCachedPreState_CanGetFromStateSummary(t *testing.T) {
@@ -695,7 +690,7 @@ func TestInsertFinalizedDeposits(t *testing.T) {
 	gs, _ := util.DeterministicGenesisState(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetZond1Data(&zondpb.Zond1Data{DepositCount: 10}))
+	assert.NoError(t, gs.SetZond1Data(&zondpb.Zond1Data{DepositCount: 10, BlockHash: make([]byte, 32)}))
 	assert.NoError(t, gs.SetZond1DepositIndex(8))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	var zeroSig [4595]byte
@@ -709,8 +704,9 @@ func TestInsertFinalizedDeposits(t *testing.T) {
 		}, Proof: [][]byte{root}}, 100+i, int64(i), bytesutil.ToBytes32(root)))
 	}
 	service.insertFinalizedDeposits(ctx, [32]byte{'m', 'o', 'c', 'k'})
-	fDeposits := depositCache.FinalizedDeposits(ctx)
-	assert.Equal(t, 7, int(fDeposits.MerkleTrieIndex), "Finalized deposits not inserted correctly")
+	fDeposits, err := depositCache.FinalizedDeposits(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, 7, int(fDeposits.MerkleTrieIndex()), "Finalized deposits not inserted correctly")
 	deps := depositCache.AllDeposits(ctx, big.NewInt(107))
 	for _, d := range deps {
 		assert.DeepEqual(t, [][]byte(nil), d.Proof, "Proofs are not empty")
@@ -724,7 +720,7 @@ func TestInsertFinalizedDeposits_PrunePendingDeposits(t *testing.T) {
 	gs, _ := util.DeterministicGenesisState(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetZond1Data(&zondpb.Zond1Data{DepositCount: 10}))
+	assert.NoError(t, gs.SetZond1Data(&zondpb.Zond1Data{DepositCount: 10, BlockHash: make([]byte, 32)}))
 	assert.NoError(t, gs.SetZond1DepositIndex(8))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	var zeroSig [4595]byte
@@ -744,8 +740,9 @@ func TestInsertFinalizedDeposits_PrunePendingDeposits(t *testing.T) {
 		}, Proof: [][]byte{root}}, 100+i, int64(i), bytesutil.ToBytes32(root))
 	}
 	service.insertFinalizedDeposits(ctx, [32]byte{'m', 'o', 'c', 'k'})
-	fDeposits := depositCache.FinalizedDeposits(ctx)
-	assert.Equal(t, 7, int(fDeposits.MerkleTrieIndex), "Finalized deposits not inserted correctly")
+	fDeposits, err := depositCache.FinalizedDeposits(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, 7, int(fDeposits.MerkleTrieIndex()), "Finalized deposits not inserted correctly")
 	deps := depositCache.AllDeposits(ctx, big.NewInt(107))
 	for _, d := range deps {
 		assert.DeepEqual(t, [][]byte(nil), d.Proof, "Proofs are not empty")
@@ -763,11 +760,11 @@ func TestInsertFinalizedDeposits_MultipleFinalizedRoutines(t *testing.T) {
 	gs, _ := util.DeterministicGenesisState(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetZond1Data(&zondpb.Zond1Data{DepositCount: 7}))
+	assert.NoError(t, gs.SetZond1Data(&zondpb.Zond1Data{DepositCount: 7, BlockHash: make([]byte, 32)}))
 	assert.NoError(t, gs.SetZond1DepositIndex(6))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	gs2 := gs.Copy()
-	assert.NoError(t, gs2.SetZond1Data(&zondpb.Zond1Data{DepositCount: 15}))
+	assert.NoError(t, gs2.SetZond1Data(&zondpb.Zond1Data{DepositCount: 15, BlockHash: make([]byte, 32)}))
 	assert.NoError(t, gs2.SetZond1DepositIndex(13))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k', '2'}, gs2))
 	var zeroSig [4595]byte
@@ -781,11 +778,11 @@ func TestInsertFinalizedDeposits_MultipleFinalizedRoutines(t *testing.T) {
 		}, Proof: [][]byte{root}}, 100+i, int64(i), bytesutil.ToBytes32(root)))
 	}
 	// Insert 3 deposits before hand.
-	require.NoError(t, depositCache.InsertFinalizedDeposits(ctx, 2))
-
+	require.NoError(t, depositCache.InsertFinalizedDeposits(ctx, 2, [32]byte{}, 0))
 	service.insertFinalizedDeposits(ctx, [32]byte{'m', 'o', 'c', 'k'})
-	fDeposits := depositCache.FinalizedDeposits(ctx)
-	assert.Equal(t, 5, int(fDeposits.MerkleTrieIndex), "Finalized deposits not inserted correctly")
+	fDeposits, err := depositCache.FinalizedDeposits(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, 5, int(fDeposits.MerkleTrieIndex()), "Finalized deposits not inserted correctly")
 
 	deps := depositCache.AllDeposits(ctx, big.NewInt(105))
 	for _, d := range deps {
@@ -794,8 +791,9 @@ func TestInsertFinalizedDeposits_MultipleFinalizedRoutines(t *testing.T) {
 
 	// Insert New Finalized State with higher deposit count.
 	service.insertFinalizedDeposits(ctx, [32]byte{'m', 'o', 'c', 'k', '2'})
-	fDeposits = depositCache.FinalizedDeposits(ctx)
-	assert.Equal(t, 12, int(fDeposits.MerkleTrieIndex), "Finalized deposits not inserted correctly")
+	fDeposits, err = depositCache.FinalizedDeposits(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, 12, int(fDeposits.MerkleTrieIndex()), "Finalized deposits not inserted correctly")
 	deps = depositCache.AllDeposits(ctx, big.NewInt(112))
 	for _, d := range deps {
 		assert.DeepEqual(t, [][]byte(nil), d.Proof, "Proofs are not empty")
@@ -1763,8 +1761,10 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	require.NoError(t, err)
 	root, err = b.Block.HashTreeRoot()
 	require.NoError(t, err)
+	rwsb, err := consensusblocks.NewROBlock(wsb)
+	require.NoError(t, err)
 	// We use onBlockBatch here because the valid chain is missing in forkchoice
-	require.NoError(t, service.onBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wsb}, [][32]byte{root}))
+	require.NoError(t, service.onBlockBatch(ctx, []consensusblocks.ROBlock{rwsb}))
 	// Check that the head is now VALID and the node is not optimistic
 	require.Equal(t, genesisRoot, service.ensureRootNotZeros(service.cfg.ForkChoiceStore.CachedHeadRoot()))
 	headRoot, err = service.HeadRoot(ctx)

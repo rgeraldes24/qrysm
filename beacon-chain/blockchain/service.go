@@ -13,7 +13,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/async/event"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
-	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
 	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution"
@@ -55,6 +54,7 @@ type Service struct {
 	clockSetter          startup.ClockSetter
 	clockWaiter          startup.ClockWaiter
 	syncComplete         chan struct{}
+	blockBeingSynced     *currentlySyncingBlock
 }
 
 // config options for the service.
@@ -62,7 +62,7 @@ type config struct {
 	BeaconBlockBuf          int
 	ChainStartFetcher       execution.ChainStartFetcher
 	BeaconDB                db.HeadAccessDatabase
-	DepositCache            *depositcache.DepositCache
+	DepositCache            *cache.DepositCache
 	ProposerSlotIndexCache  *cache.ProposerPayloadIDsCache
 	AttPool                 attestations.Pool
 	ExitPool                voluntaryexits.PoolManager
@@ -94,6 +94,7 @@ func NewService(ctx context.Context, opts ...Option) (*Service, error) {
 		checkpointStateCache: cache.NewCheckpointStateCache(),
 		initSyncBlocks:       make(map[[32]byte]interfaces.ReadOnlySignedBeaconBlock),
 		cfg:                  &config{ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache()},
+		blockBeingSynced:     &currentlySyncingBlock{roots: make(map[[32]byte]struct{})},
 	}
 	for _, opt := range opts {
 		if err := opt(srv); err != nil {

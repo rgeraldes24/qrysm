@@ -71,7 +71,7 @@ func logBlockSyncStatus(block interfaces.ReadOnlyBeaconBlock, blockRoot [32]byte
 	level := log.Logger.GetLevel()
 	if level >= logrus.DebugLevel {
 		parentRoot := block.ParentRoot()
-		log.WithFields(logrus.Fields{
+		lf := logrus.Fields{
 			"slot":                      block.Slot(),
 			"slotInEpoch":               block.Slot() % params.BeaconConfig().SlotsPerEpoch,
 			"block":                     fmt.Sprintf("0x%s...", hex.EncodeToString(blockRoot[:])[:8]),
@@ -85,7 +85,8 @@ func logBlockSyncStatus(block interfaces.ReadOnlyBeaconBlock, blockRoot [32]byte
 			"sinceSlotStartTime":        qrysmTime.Now().Sub(startTime),
 			"chainServiceProcessedTime": qrysmTime.Now().Sub(receivedTime),
 			"deposits":                  len(block.Body().Deposits()),
-		}).Debug("Synced new block")
+		}
+		log.WithFields(lf).Debug("Synced new block")
 	} else {
 		log.WithFields(logrus.Fields{
 			"slot":           block.Slot(),

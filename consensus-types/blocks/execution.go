@@ -3,6 +3,7 @@ package blocks
 import (
 	"bytes"
 	"errors"
+	"math/big"
 
 	fastssz "github.com/prysmaticlabs/fastssz"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
@@ -10,6 +11,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/encoding/ssz"
+	"github.com/theQRL/qrysm/v4/math"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	"google.golang.org/protobuf/proto"
 )
@@ -421,4 +423,11 @@ func IsEmptyExecutionData(data interfaces.ExecutionData) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+// PayloadValueToGwei returns a Gwei value given the payload's value
+func PayloadValueToGwei(value []byte) math.Gwei {
+	// We have to convert big endian to little endian because the value is coming from the execution layer.
+	v := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(value))
+	return math.WeiToGwei(v)
 }

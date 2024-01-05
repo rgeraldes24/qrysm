@@ -67,10 +67,10 @@ bazel_skylib_workspace()
 
 http_archive(
     name = "bazel_gazelle",
-    sha256 = "5982e5463f171da99e3bdaeff8c0f48283a7a5f396ec5282910b9e8a49c0dd7e",
+    sha256 = "29d5dafc2a5582995488c6735115d1d366fcd6a0fc2e2a153f02988706349825",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.25.0/bazel-gazelle-v0.25.0.tar.gz",
-        "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.25.0/bazel-gazelle-v0.25.0.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.31.0/bazel-gazelle-v0.31.0.tar.gz",
+        "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.31.0/bazel-gazelle-v0.31.0.tar.gz",
     ],
 )
 
@@ -87,6 +87,24 @@ http_archive(
     urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.25.0/rules_docker-v0.25.0.tar.gz"],
 )
 
+# http_archive(
+#     name = "rules_oci",
+#     sha256 = "c71c25ed333a4909d2dd77e0b16c39e9912525a98c7fa85144282be8d04ef54c",
+#     strip_prefix = "rules_oci-1.3.4",
+#     url = "https://github.com/bazel-contrib/rules_oci/releases/download/v1.3.4/rules_oci-v1.3.4.tar.gz",
+# )
+
+# load("@rules_oci//oci:dependencies.bzl", "rules_oci_dependencies")
+
+# rules_oci_dependencies()
+
+# load("@rules_oci//oci:repositories.bzl", "LATEST_CRANE_VERSION", "oci_register_toolchains")
+
+# oci_register_toolchains(
+#     name = "oci",
+#     crane_version = LATEST_CRANE_VERSION,
+# )
+
 http_archive(
     name = "io_bazel_rules_go",
     patch_args = ["-p1"],
@@ -94,10 +112,10 @@ http_archive(
         # Expose internals of go_test for custom build transitions.
         "//third_party:io_bazel_rules_go_test.patch",
     ],
-    sha256 = "6b65cb7917b4d1709f9410ffe00ecf3e160edf674b78c54a894471320862184f",
+    sha256 = "bfc5ce70b9d1634ae54f4e7b495657a18a04e0d596785f672d35d5f505ab491a",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.39.0/rules_go-v0.39.0.zip",
-        "https://github.com/bazelbuild/rules_go/releases/download/v0.39.0/rules_go-v0.39.0.zip",
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.40.0/rules_go-v0.40.0.zip",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.40.0/rules_go-v0.40.0.zip",
     ],
 )
 
@@ -167,12 +185,30 @@ container_pull(
     repository = "pinglamb/alpine-glibc",
 )
 
+# load("@rules_oci//oci:pull.bzl", "oci_pull")
+
+# # A multi-arch base image
+# oci_pull(
+#     name = "linux_debian11_multiarch_base",  # Debian bullseye
+#     digest = "sha256:9b8e0854865dcaf49470b4ec305df45957020fbcf17b71eeb50ffd3bc5bf885d",  # 2023-05-17
+#     image = "gcr.io/distroless/cc-debian11",
+#     platforms = [
+#         "linux/amd64",
+#         "linux/arm64",
+#     ],
+#     reproducible = True,
+# )
+
+# load("@qrysm//tools:image_deps.bzl", "qrysm_image_deps")
+
+# qrysm_image_deps()
+
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
 
 go_rules_dependencies()
 
 go_register_toolchains(
-    go_version = "1.20.6",
+    go_version = "1.20.9",
     nogo = "@//:nogo",
 )
 
@@ -213,6 +249,8 @@ filegroup(
     url = "https://github.com/rgeraldes24/EIPs/archive/902ac24c60dfa171c4d60e7d027c7cf95eae1c98.tar.gz",
 )
 
+consensus_spec_test_version = "v0.1.0"
+
 consensus_spec_version = "v0.1.0"
 
 http_archive(
@@ -228,7 +266,7 @@ filegroup(
 )
    """,
     sha256 = "7e980bf0f1e095814683bfa35335b46e6476c96d8b33326432394717b05da611",
-    url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/minimal.tar.gz" % consensus_spec_version,
+    url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/minimal.tar.gz" % consensus_spec_test_version,
 )
 
 http_archive(
@@ -244,7 +282,7 @@ filegroup(
 )
    """,
     sha256 = "7bf3e4c07a293f41a79bcfabbb5dad3a13f9d96a0e920b773456fbb6ac80520c",
-    url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/mainnet.tar.gz" % consensus_spec_version,
+    url = "https://github.com/rgeraldes24/consensus-spec-tests/releases/download/%s/mainnet.tar.gz" % consensus_spec_test_version,
 )
 
 http_archive(
@@ -296,9 +334,6 @@ http_archive(
     ],
 )
 
-# Group the sources of the library so that CMake rule have access to it
-all_content = """filegroup(name = "all", srcs = glob(["**"]), visibility = ["//visibility:public"])"""
-
 # External dependencies
 
 load("//:deps.bzl", "go_dependencies", "prysm_deps", "qrysm_deps")
@@ -324,10 +359,6 @@ load(
 
 _cc_image_repos()
 
-load("@io_bazel_rules_go//extras:embed_data_deps.bzl", "go_embed_data_dependencies")
-
-go_embed_data_dependencies()
-
 load("@com_github_atlassian_bazel_tools//gometalinter:deps.bzl", "gometalinter_dependencies")
 
 gometalinter_dependencies()
@@ -341,10 +372,6 @@ prysm_deps()
 go_dependencies()
 
 gazelle_dependencies()
-
-load("@com_github_bazelbuild_buildtools//buildifier:deps.bzl", "buildifier_dependencies")
-
-buildifier_dependencies()
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 

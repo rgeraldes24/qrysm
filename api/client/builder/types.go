@@ -10,90 +10,10 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	types "github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	"github.com/theQRL/qrysm/v4/math"
 	v1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
-
-// SignedValidatorRegistration a struct for signed validator registrations.
-type SignedValidatorRegistration struct {
-	*zond.SignedValidatorRegistrationV1
-}
-
-// ValidatorRegistration a struct for validator registrations.
-type ValidatorRegistration struct {
-	*zond.ValidatorRegistrationV1
-}
-
-// MarshalJSON returns a json representation copy of signed validator registration.
-func (r *SignedValidatorRegistration) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Message   *ValidatorRegistration `json:"message"`
-		Signature hexutil.Bytes          `json:"signature"`
-	}{
-		Message:   &ValidatorRegistration{r.Message},
-		Signature: r.SignedValidatorRegistrationV1.Signature,
-	})
-}
-
-// UnmarshalJSON returns a byte representation of signed validator registration from json.
-func (r *SignedValidatorRegistration) UnmarshalJSON(b []byte) error {
-	if r.SignedValidatorRegistrationV1 == nil {
-		r.SignedValidatorRegistrationV1 = &zond.SignedValidatorRegistrationV1{}
-	}
-	o := struct {
-		Message   *ValidatorRegistration `json:"message"`
-		Signature hexutil.Bytes          `json:"signature"`
-	}{}
-	if err := json.Unmarshal(b, &o); err != nil {
-		return err
-	}
-	r.Message = o.Message.ValidatorRegistrationV1
-	r.Signature = o.Signature
-	return nil
-}
-
-// MarshalJSON returns a json representation copy of validator registration.
-func (r *ValidatorRegistration) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		FeeRecipient hexutil.Bytes `json:"fee_recipient"`
-		GasLimit     string        `json:"gas_limit"`
-		Timestamp    string        `json:"timestamp"`
-		Pubkey       hexutil.Bytes `json:"pubkey"`
-	}{
-		FeeRecipient: r.FeeRecipient,
-		GasLimit:     fmt.Sprintf("%d", r.GasLimit),
-		Timestamp:    fmt.Sprintf("%d", r.Timestamp),
-		Pubkey:       r.Pubkey,
-	})
-}
-
-// UnmarshalJSON returns a byte representation of validator registration from json.
-func (r *ValidatorRegistration) UnmarshalJSON(b []byte) error {
-	if r.ValidatorRegistrationV1 == nil {
-		r.ValidatorRegistrationV1 = &zond.ValidatorRegistrationV1{}
-	}
-	o := struct {
-		FeeRecipient hexutil.Bytes `json:"fee_recipient"`
-		GasLimit     string        `json:"gas_limit"`
-		Timestamp    string        `json:"timestamp"`
-		Pubkey       hexutil.Bytes `json:"pubkey"`
-	}{}
-	if err := json.Unmarshal(b, &o); err != nil {
-		return err
-	}
-
-	r.FeeRecipient = o.FeeRecipient
-	r.Pubkey = o.Pubkey
-	var err error
-	if r.GasLimit, err = strconv.ParseUint(o.GasLimit, 10, 64); err != nil {
-		return errors.Wrap(err, "failed to parse gas limit")
-	}
-	if r.Timestamp, err = strconv.ParseUint(o.Timestamp, 10, 64); err != nil {
-		return errors.Wrap(err, "failed to parse timestamp")
-	}
-
-	return nil
-}
 
 var errInvalidUint256 = errors.New("invalid Uint256")
 var errDecodeUint256 = errors.New("unable to decode into Uint256")
@@ -103,14 +23,10 @@ type Uint256 struct {
 	*big.Int
 }
 
-func isValidUint256(bi *big.Int) bool {
-	return bi.Cmp(big.NewInt(0)) >= 0 && bi.BitLen() <= 256
-}
-
 func stringToUint256(s string) (Uint256, error) {
 	bi := new(big.Int)
 	_, ok := bi.SetString(s, 10)
-	if !ok || !isValidUint256(bi) {
+	if !ok || !math.IsValidUint256(bi) {
 		return Uint256{}, errors.Wrapf(errDecodeUint256, "value=%s", s)
 	}
 	return Uint256{Int: bi}, nil
@@ -119,7 +35,7 @@ func stringToUint256(s string) (Uint256, error) {
 // sszBytesToUint256 creates a Uint256 from a ssz-style (little-endian byte slice) representation.
 func sszBytesToUint256(b []byte) (Uint256, error) {
 	bi := bytesutil.LittleEndianBytesToBigInt(b)
-	if !isValidUint256(bi) {
+	if !math.IsValidUint256(bi) {
 		return Uint256{}, errors.Wrapf(errDecodeUint256, "value=%s", b)
 	}
 	return Uint256{Int: bi}, nil
@@ -127,7 +43,7 @@ func sszBytesToUint256(b []byte) (Uint256, error) {
 
 // SSZBytes creates an ssz-style (little-endian byte slice) representation of the Uint256.
 func (s Uint256) SSZBytes() []byte {
-	if !isValidUint256(s.Int) {
+	if !math.IsValidUint256(s.Int) {
 		return []byte{}
 	}
 	return bytesutil.PadTo(bytesutil.ReverseByteOrder(s.Int.Bytes()), 32)
@@ -154,7 +70,7 @@ func (s *Uint256) UnmarshalText(t []byte) error {
 	if !ok {
 		return errors.Wrapf(errDecodeUint256, "value=%s", t)
 	}
-	if !isValidUint256(z) {
+	if !math.IsValidUint256(z) {
 		return errors.Wrapf(errDecodeUint256, "value=%s", t)
 	}
 	s.Int = z
@@ -174,7 +90,7 @@ func (s Uint256) MarshalJSON() ([]byte, error) {
 
 // MarshalText returns a text byte representation of Uint256.
 func (s Uint256) MarshalText() ([]byte, error) {
-	if !isValidUint256(s.Int) {
+	if !math.IsValidUint256(s.Int) {
 		return nil, errors.Wrapf(errInvalidUint256, "value=%s", s.Int)
 	}
 	return []byte(s.String()), nil
@@ -730,102 +646,6 @@ func (ch *DilithiumToExecutionChange) MarshalJSON() ([]byte, error) {
 		ValidatorIndex:      fmt.Sprintf("%d", ch.ValidatorIndex),
 		FromDilithiumPubkey: ch.FromDilithiumPubkey,
 		ToExecutionAddress:  ch.ToExecutionAddress,
-	})
-}
-
-// SignedBlindedBeaconBlockCapella is part of the request object sent to builder API /zond/v1/builder/blinded_blocks for Capella.
-type SignedBlindedBeaconBlock struct {
-	*zond.SignedBlindedBeaconBlock
-}
-
-// BlindedBeaconBlock is a field in SignedBlindedBeaconBlock.
-type BlindedBeaconBlock struct {
-	*zond.BlindedBeaconBlock
-}
-
-// BlindedBeaconBlockBodyCapella is a field in BlindedBeaconBlock.
-type BlindedBeaconBlockBody struct {
-	*zond.BlindedBeaconBlockBody
-}
-
-// MarshalJSON returns a JSON byte array representation of SignedBlindedBeaconBlock.
-func (b *SignedBlindedBeaconBlock) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Message   *BlindedBeaconBlock `json:"message"`
-		Signature hexutil.Bytes       `json:"signature"`
-	}{
-		Message:   &BlindedBeaconBlock{b.Block},
-		Signature: b.Signature,
-	})
-}
-
-// MarshalJSON returns a JSON byte array representation of BlindedBeaconBlock.
-func (b *BlindedBeaconBlock) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Slot          string                  `json:"slot"`
-		ProposerIndex string                  `json:"proposer_index"`
-		ParentRoot    hexutil.Bytes           `json:"parent_root"`
-		StateRoot     hexutil.Bytes           `json:"state_root"`
-		Body          *BlindedBeaconBlockBody `json:"body"`
-	}{
-		Slot:          fmt.Sprintf("%d", b.Slot),
-		ProposerIndex: fmt.Sprintf("%d", b.ProposerIndex),
-		ParentRoot:    b.ParentRoot,
-		StateRoot:     b.StateRoot,
-		Body:          &BlindedBeaconBlockBody{b.Body},
-	})
-}
-
-// MarshalJSON returns a JSON byte array representation of BlindedBeaconBlockBodyCapella
-func (b *BlindedBeaconBlockBody) MarshalJSON() ([]byte, error) {
-	sve := make([]*SignedVoluntaryExit, len(b.VoluntaryExits))
-	for i := range b.VoluntaryExits {
-		sve[i] = &SignedVoluntaryExit{SignedVoluntaryExit: b.VoluntaryExits[i]}
-	}
-	deps := make([]*Deposit, len(b.Deposits))
-	for i := range b.Deposits {
-		deps[i] = &Deposit{Deposit: b.Deposits[i]}
-	}
-	atts := make([]*Attestation, len(b.Attestations))
-	for i := range b.Attestations {
-		atts[i] = &Attestation{Attestation: b.Attestations[i]}
-	}
-	atsl := make([]*AttesterSlashing, len(b.AttesterSlashings))
-	for i := range b.AttesterSlashings {
-		atsl[i] = &AttesterSlashing{AttesterSlashing: b.AttesterSlashings[i]}
-	}
-	pros := make([]*ProposerSlashing, len(b.ProposerSlashings))
-	for i := range b.ProposerSlashings {
-		pros[i] = &ProposerSlashing{ProposerSlashing: b.ProposerSlashings[i]}
-	}
-	chs := make([]*SignedDilithiumToExecutionChange, len(b.DilithiumToExecutionChanges))
-	for i := range b.DilithiumToExecutionChanges {
-		chs[i] = &SignedDilithiumToExecutionChange{SignedDilithiumToExecutionChange: b.DilithiumToExecutionChanges[i]}
-	}
-	return json.Marshal(struct {
-		RandaoReveal                hexutil.Bytes                       `json:"randao_reveal"`
-		Zond1Data                   *Zond1Data                          `json:"zond1_data"`
-		Graffiti                    hexutil.Bytes                       `json:"graffiti"`
-		ProposerSlashings           []*ProposerSlashing                 `json:"proposer_slashings"`
-		AttesterSlashings           []*AttesterSlashing                 `json:"attester_slashings"`
-		Attestations                []*Attestation                      `json:"attestations"`
-		Deposits                    []*Deposit                          `json:"deposits"`
-		VoluntaryExits              []*SignedVoluntaryExit              `json:"voluntary_exits"`
-		DilithiumToExecutionChanges []*SignedDilithiumToExecutionChange `json:"dilithium_to_execution_changes"`
-		SyncAggregate               *SyncAggregate                      `json:"sync_aggregate"`
-		ExecutionPayloadHeader      *ExecutionPayloadHeader             `json:"execution_payload_header"`
-	}{
-		RandaoReveal:                b.RandaoReveal,
-		Zond1Data:                   &Zond1Data{b.Zond1Data},
-		Graffiti:                    b.Graffiti,
-		ProposerSlashings:           pros,
-		AttesterSlashings:           atsl,
-		Attestations:                atts,
-		Deposits:                    deps,
-		VoluntaryExits:              sve,
-		DilithiumToExecutionChanges: chs,
-		SyncAggregate:               &SyncAggregate{b.SyncAggregate},
-		ExecutionPayloadHeader:      &ExecutionPayloadHeader{ExecutionPayloadHeader: b.ExecutionPayloadHeader},
 	})
 }
 
