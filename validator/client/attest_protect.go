@@ -7,7 +7,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-qrllib/dilithium"
-	"github.com/theQRL/qrysm/v4/config/features"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/slashings"
 	"github.com/theQRL/qrysm/v4/validator/db/kv"
@@ -15,7 +14,6 @@ import (
 )
 
 var failedAttLocalProtectionErr = "attempted to make slashable attestation, rejected by local slashing protection"
-var failedPostAttSignExternalErr = "attempted to make slashable attestation, rejected by external slasher service"
 
 // Checks if an attestation is slashable by comparing it with the attesting
 // history for the given public key in our DB. If it is not, we then update the history
@@ -81,19 +79,6 @@ func (v *validator) slashableAttestationCheck(
 
 	if err := v.db.SaveAttestationForPubKey(ctx, pubKey, signingRoot, indexedAtt); err != nil {
 		return errors.Wrap(err, "could not save attestation history for validator public key")
-	}
-
-	if features.Get().RemoteSlasherProtection {
-		slashing, err := v.slashingProtectionClient.IsSlashableAttestation(ctx, indexedAtt)
-		if err != nil {
-			return errors.Wrap(err, "could not check if attestation is slashable")
-		}
-		if slashing != nil && len(slashing.AttesterSlashings) > 0 {
-			if v.emitAccountMetrics {
-				ValidatorAttestFailVecSlasher.WithLabelValues(fmtKey).Inc()
-			}
-			return errors.New(failedPostAttSignExternalErr)
-		}
 	}
 
 	return nil

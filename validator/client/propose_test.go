@@ -33,7 +33,6 @@ import (
 type mocks struct {
 	validatorClient *validatormock.MockValidatorClient
 	nodeClient      *validatormock.MockNodeClient
-	slasherClient   *validatormock.MockSlasherClient
 	signfunc        func(context.Context, *validatorpb.SignRequest) (dilithium.Signature, error)
 }
 
@@ -78,7 +77,6 @@ func setupWithKey(t *testing.T, validatorKey dilithium.DilithiumKey) (*validator
 	m := &mocks{
 		validatorClient: validatormock.NewMockValidatorClient(ctrl),
 		nodeClient:      validatormock.NewMockNodeClient(ctrl),
-		slasherClient:   validatormock.NewMockSlasherClient(ctrl),
 		signfunc: func(ctx context.Context, req *validatorpb.SignRequest) (dilithium.Signature, error) {
 			return mockSignature{}, nil
 		},
@@ -88,7 +86,6 @@ func setupWithKey(t *testing.T, validatorKey dilithium.DilithiumKey) (*validator
 		db:                             valDB,
 		keyManager:                     newMockKeymanager(t, keypair{pub: pubKey, pri: validatorKey}),
 		validatorClient:                m.validatorClient,
-		slashingProtectionClient:       m.slasherClient,
 		graffiti:                       []byte{},
 		attLogs:                        make(map[[32]byte]*attSubmitted),
 		aggregatedSlotCommitteeIDCache: aggregatedSlotCommitteeIDCache,

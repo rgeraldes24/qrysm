@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
 	gomock "github.com/golang/mock/gomock"
 	apimiddleware "github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
 	primitives "github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -36,11 +37,10 @@ func (m *MockstateValidatorsProvider) EXPECT() *MockstateValidatorsProviderMockR
 	return m.recorder
 }
 
-// GetStateValidators mocks base method.
-func (m *MockstateValidatorsProvider) GetStateValidators(arg0 context.Context, arg1 []string, arg2 []int64, arg3 []string) (*apimiddleware.StateValidatorsResponseJson, error) {
+func (m *MockstateValidatorsProvider) GetStateValidators(arg0 context.Context, arg1 []string, arg2 []int64, arg3 []string) (*beacon.GetValidatorsResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetStateValidators", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(*apimiddleware.StateValidatorsResponseJson)
+	ret0, _ := ret[0].(*beacon.GetValidatorsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -52,10 +52,10 @@ func (mr *MockstateValidatorsProviderMockRecorder) GetStateValidators(arg0, arg1
 }
 
 // GetStateValidatorsForHead mocks base method.
-func (m *MockstateValidatorsProvider) GetStateValidatorsForHead(arg0 context.Context, arg1 []string, arg2 []primitives.ValidatorIndex, arg3 []string) (*apimiddleware.StateValidatorsResponseJson, error) {
+func (m *MockstateValidatorsProvider) GetStateValidatorsForHead(arg0 context.Context, arg1 []string, arg2 []primitives.ValidatorIndex, arg3 []string) (*beacon.GetValidatorsResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetStateValidatorsForHead", arg0, arg1, arg2, arg3)
-	ret0, _ := ret[0].(*apimiddleware.StateValidatorsResponseJson)
+	ret0, _ := ret[0].(*beacon.GetValidatorsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -67,10 +67,10 @@ func (mr *MockstateValidatorsProviderMockRecorder) GetStateValidatorsForHead(arg
 }
 
 // GetStateValidatorsForSlot mocks base method.
-func (m *MockstateValidatorsProvider) GetStateValidatorsForSlot(arg0 context.Context, arg1 primitives.Slot, arg2 []string, arg3 []primitives.ValidatorIndex, arg4 []string) (*apimiddleware.StateValidatorsResponseJson, error) {
+func (m *MockstateValidatorsProvider) GetStateValidatorsForSlot(arg0 context.Context, arg1 primitives.Slot, arg2 []string, arg3 []primitives.ValidatorIndex, arg4 []string) (*beacon.GetValidatorsResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetStateValidatorsForSlot", arg0, arg1, arg2, arg3, arg4)
-	ret0, _ := ret[0].(*apimiddleware.StateValidatorsResponseJson)
+	ret0, _ := ret[0].(*beacon.GetValidatorsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

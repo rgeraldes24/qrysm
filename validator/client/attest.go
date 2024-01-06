@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/sirupsen/logrus"
+	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/async"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
@@ -182,6 +182,8 @@ func (v *validator) SubmitAttestation(ctx context.Context, slot primitives.Slot,
 
 // Given the validator public key, this gets the validator assignment.
 func (v *validator) duty(pubKey [dilithium.CryptoPublicKeyBytes]byte) (*zondpb.DutiesResponse_Duty, error) {
+	v.dutiesLock.RLock()
+	defer v.dutiesLock.RUnlock()
 	if v.duties == nil {
 		return nil, errors.New("no duties for validators")
 	}

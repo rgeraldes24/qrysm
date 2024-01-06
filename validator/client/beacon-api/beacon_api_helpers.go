@@ -10,9 +10,10 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
+	"github.com/prysmaticlabs/prysm/v4/beacon-chain/rpc/eth/validator"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
@@ -48,10 +49,10 @@ func buildURL(path string, queryParams ...neturl.Values) string {
 	return fmt.Sprintf("%s?%s", path, queryParams[0].Encode())
 }
 
-func (c *beaconApiValidatorClient) getFork(ctx context.Context) (*apimiddleware.StateForkResponseJson, error) {
+func (c *beaconApiValidatorClient) getFork(ctx context.Context) (*beacon.GetStateForkResponse, error) {
 	const endpoint = "/zond/v1/beacon/states/head/fork"
 
-	stateForkResponseJson := &apimiddleware.StateForkResponseJson{}
+	stateForkResponseJson := &beacon.GetStateForkResponse{}
 
 	if _, err := c.jsonRestHandler.GetRestJsonResponse(
 		ctx,
@@ -64,10 +65,10 @@ func (c *beaconApiValidatorClient) getFork(ctx context.Context) (*apimiddleware.
 	return stateForkResponseJson, nil
 }
 
-func (c *beaconApiValidatorClient) getHeaders(ctx context.Context) (*apimiddleware.BlockHeadersResponseJson, error) {
+func (c *beaconApiValidatorClient) getHeaders(ctx context.Context) (*beacon.GetBlockHeadersResponse, error) {
 	const endpoint = "/zond/v1/beacon/headers"
 
-	blockHeadersResponseJson := &apimiddleware.BlockHeadersResponseJson{}
+	blockHeadersResponseJson := &beacon.GetBlockHeadersResponse{}
 
 	if _, err := c.jsonRestHandler.GetRestJsonResponse(
 		ctx,
@@ -80,11 +81,11 @@ func (c *beaconApiValidatorClient) getHeaders(ctx context.Context) (*apimiddlewa
 	return blockHeadersResponseJson, nil
 }
 
-func (c *beaconApiValidatorClient) getLiveness(ctx context.Context, epoch primitives.Epoch, validatorIndexes []string) (*apimiddleware.LivenessResponseJson, error) {
+func (c *beaconApiValidatorClient) getLiveness(ctx context.Context, epoch primitives.Epoch, validatorIndexes []string) (*validator.GetLivenessResponse, error) {
 	const endpoint = "/zond/v1/validator/liveness/"
 	url := endpoint + strconv.FormatUint(uint64(epoch), 10)
 
-	livenessResponseJson := &apimiddleware.LivenessResponseJson{}
+	livenessResponseJson := &validator.GetLivenessResponse{}
 
 	marshalledJsonValidatorIndexes, err := json.Marshal(validatorIndexes)
 	if err != nil {

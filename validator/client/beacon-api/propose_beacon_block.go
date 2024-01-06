@@ -71,7 +71,7 @@ func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *zo
 }
 
 func marshallBeaconBlockCapella(block *zondpb.SignedBeaconBlock) ([]byte, error) {
-	signedBeaconBlockCapellaJson := &apimiddleware.SignedBeaconBlockCapellaContainerJson{
+	signedBeaconBlockCapellaJson := &apimiddleware.SignedBeaconBlockCapellaJson{
 		Signature: hexutil.Encode(block.Signature),
 		Message: &apimiddleware.BeaconBlockCapellaJson{
 			ParentRoot:    hexutil.Encode(block.Block.ParentRoot),
@@ -114,7 +114,7 @@ func marshallBeaconBlockCapella(block *zondpb.SignedBeaconBlock) ([]byte, error)
 }
 
 func marshallBeaconBlockBlindedCapella(block *zondpb.SignedBlindedBeaconBlock) ([]byte, error) {
-	signedBeaconBlockCapellaJson := &apimiddleware.SignedBlindedBeaconBlockCapellaContainerJson{
+	signedBeaconBlockCapellaJson := &apimiddleware.SignedBlindedBeaconBlockCapellaJson{
 		Signature: hexutil.Encode(block.Signature),
 		Message: &apimiddleware.BlindedBeaconBlockCapellaJson{
 			ParentRoot:    hexutil.Encode(block.Block.ParentRoot),
