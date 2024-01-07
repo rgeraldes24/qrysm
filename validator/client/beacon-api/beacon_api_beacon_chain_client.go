@@ -12,8 +12,8 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/qrysm/validator"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -28,8 +28,8 @@ type beaconApiBeaconChainClient struct {
 
 const getValidatorPerformanceEndpoint = "/qrysm/validators/performance"
 
-func (c beaconApiBeaconChainClient) getHeadBlockHeaders(ctx context.Context) (*beacon.GetBlockHeaderResponse, error) {
-	blockHeader := beacon.GetBlockHeaderResponse{}
+func (c beaconApiBeaconChainClient) getHeadBlockHeaders(ctx context.Context) (*apimiddleware.BlockHeaderResponseJson, error) {
+	blockHeader := apimiddleware.BlockHeaderResponseJson{}
 	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/zond/v1/beacon/headers/head", &blockHeader); err != nil {
 		return nil, errors.Wrap(err, "failed to get head block header")
 	}
@@ -48,7 +48,7 @@ func (c beaconApiBeaconChainClient) getHeadBlockHeaders(ctx context.Context) (*b
 func (c beaconApiBeaconChainClient) GetChainHead(ctx context.Context, _ *empty.Empty) (*zondpb.ChainHead, error) {
 	const endpoint = "/zond/v1/beacon/states/head/finality_checkpoints"
 
-	finalityCheckpoints := beacon.GetFinalityCheckpointsResponse{}
+	finalityCheckpoints := apimiddleware.StateFinalityCheckpointResponseJson{}
 	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, endpoint, &finalityCheckpoints); err != nil {
 		return nil, errors.Wrapf(err, "failed to query %s", endpoint)
 	}
@@ -184,7 +184,7 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *zond
 		pubkeys[idx] = hexutil.Encode(pubkey)
 	}
 
-	var stateValidators *beacon.GetValidatorsResponse
+	var stateValidators *apimiddleware.StateValidatorsResponseJson
 	var epoch primitives.Epoch
 
 	switch queryFilter := in.QueryFilter.(type) {
@@ -244,9 +244,9 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *zond
 			return nil, errors.Errorf("state validator at index `%d` is nil", idx)
 		}
 
-		pubkey, err := hexutil.Decode(stateValidator.Validator.Pubkey)
+		pubkey, err := hexutil.Decode(stateValidator.Validator.PublicKey)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to decode validator pubkey `%s`", stateValidator.Validator.Pubkey)
+			return nil, errors.Wrapf(err, "failed to decode validator pubkey `%s`", stateValidator.Validator.PublicKey)
 		}
 
 		withdrawalCredentials, err := hexutil.Decode(stateValidator.Validator.WithdrawalCredentials)

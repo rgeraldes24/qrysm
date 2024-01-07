@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
+	rpcmiddleware "github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -19,8 +19,8 @@ import (
 func TestGetRestJsonResponse_Valid(t *testing.T) {
 	const endpoint = "/example/rest/api/endpoint"
 
-	genesisJson := &beacon.GetGenesisResponse{
-		Data: &beacon.Genesis{
+	genesisJson := &rpcmiddleware.GenesisResponseJson{
+		Data: &rpcmiddleware.GenesisResponse_GenesisJson{
 			GenesisTime:           "123",
 			GenesisValidatorsRoot: "0x456",
 			GenesisForkVersion:    "0x789",
@@ -49,7 +49,7 @@ func TestGetRestJsonResponse_Valid(t *testing.T) {
 		host:       server.URL,
 	}
 
-	responseJson := &beacon.GetGenesisResponse{}
+	responseJson := &rpcmiddleware.GenesisResponseJson{}
 	_, err := jsonRestHandler.GetRestJsonResponse(ctx, endpoint+"?arg1=abc&arg2=def", responseJson)
 	assert.NoError(t, err)
 	assert.DeepEqual(t, genesisJson, responseJson)
@@ -82,7 +82,7 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 				Message: "Bad request",
 			},
 			timeout:      time.Second * 5,
-			responseJson: &beacon.GetGenesisResponse{},
+			responseJson: &rpcmiddleware.GenesisResponseJson{},
 		},
 		{
 			name:                 "404 error",
@@ -93,7 +93,7 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 				Message: "Not found",
 			},
 			timeout:      time.Second * 5,
-			responseJson: &beacon.GetGenesisResponse{},
+			responseJson: &rpcmiddleware.GenesisResponseJson{},
 		},
 		{
 			name:                 "500 error",
@@ -104,7 +104,7 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 				Message: "Internal server error",
 			},
 			timeout:      time.Second * 5,
-			responseJson: &beacon.GetGenesisResponse{},
+			responseJson: &rpcmiddleware.GenesisResponseJson{},
 		},
 		{
 			name:                 "999 error",
@@ -115,28 +115,28 @@ func TestGetRestJsonResponse_Error(t *testing.T) {
 				Message: "Invalid error",
 			},
 			timeout:      time.Second * 5,
-			responseJson: &beacon.GetGenesisResponse{},
+			responseJson: &rpcmiddleware.GenesisResponseJson{},
 		},
 		{
 			name:                 "bad error json formatting",
 			funcHandler:          invalidJsonErrHandler,
 			expectedErrorMessage: "failed to decode error json",
 			timeout:              time.Second * 5,
-			responseJson:         &beacon.GetGenesisResponse{},
+			responseJson:         &rpcmiddleware.GenesisResponseJson{},
 		},
 		{
 			name:                 "bad response json formatting",
 			funcHandler:          invalidJsonResponseHandler,
 			expectedErrorMessage: "failed to decode response json",
 			timeout:              time.Second * 5,
-			responseJson:         &beacon.GetGenesisResponse{},
+			responseJson:         &rpcmiddleware.GenesisResponseJson{},
 		},
 		{
 			name:                 "timeout",
 			funcHandler:          httpErrorJsonHandler(http.StatusNotFound, "Not found"),
 			expectedErrorMessage: "failed to query REST API",
 			timeout:              1,
-			responseJson:         &beacon.GetGenesisResponse{},
+			responseJson:         &rpcmiddleware.GenesisResponseJson{},
 		},
 	}
 
@@ -164,8 +164,8 @@ func TestPostRestJson_Valid(t *testing.T) {
 	const endpoint = "/example/rest/api/endpoint"
 	dataBytes := []byte{1, 2, 3, 4, 5}
 
-	genesisJson := &beacon.GetGenesisResponse{
-		Data: &beacon.Genesis{
+	genesisJson := &rpcmiddleware.GenesisResponseJson{
+		Data: &rpcmiddleware.GenesisResponse_GenesisJson{
 			GenesisTime:           "123",
 			GenesisValidatorsRoot: "0x456",
 			GenesisForkVersion:    "0x789",
@@ -182,13 +182,13 @@ func TestPostRestJson_Valid(t *testing.T) {
 			name:         "nil headers",
 			headers:      nil,
 			data:         bytes.NewBuffer(dataBytes),
-			responseJson: &beacon.GetGenesisResponse{},
+			responseJson: &rpcmiddleware.GenesisResponseJson{},
 		},
 		{
 			name:         "empty headers",
 			headers:      map[string]string{},
 			data:         bytes.NewBuffer(dataBytes),
-			responseJson: &beacon.GetGenesisResponse{},
+			responseJson: &rpcmiddleware.GenesisResponseJson{},
 		},
 		{
 			name:         "nil response json",
@@ -256,7 +256,7 @@ func TestPostRestJson_Error(t *testing.T) {
 		expectedErrorJson    *apimiddleware.DefaultErrorJson
 		expectedErrorMessage string
 		timeout              time.Duration
-		responseJson         *beacon.GetGenesisResponse
+		responseJson         *rpcmiddleware.GenesisResponseJson
 		data                 *bytes.Buffer
 	}{
 		{
@@ -275,7 +275,7 @@ func TestPostRestJson_Error(t *testing.T) {
 				Message: "Bad request",
 			},
 			timeout:      time.Second * 5,
-			responseJson: &beacon.GetGenesisResponse{},
+			responseJson: &rpcmiddleware.GenesisResponseJson{},
 			data:         &bytes.Buffer{},
 		},
 		{
@@ -323,7 +323,7 @@ func TestPostRestJson_Error(t *testing.T) {
 			funcHandler:          invalidJsonResponseHandler,
 			expectedErrorMessage: "failed to decode response json",
 			timeout:              time.Second * 5,
-			responseJson:         &beacon.GetGenesisResponse{},
+			responseJson:         &rpcmiddleware.GenesisResponseJson{},
 			data:                 &bytes.Buffer{},
 		},
 		{
@@ -394,7 +394,7 @@ func TestJsonHandler_ContextError(t *testing.T) {
 	_, err = jsonRestHandler.GetRestJsonResponse(
 		ctx,
 		endpoint,
-		&beacon.GetGenesisResponse{},
+		&rpcmiddleware.GenesisResponseJson{},
 	)
 
 	assert.ErrorContains(t, context.Canceled.Error(), err)

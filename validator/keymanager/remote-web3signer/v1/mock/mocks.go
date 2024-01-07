@@ -4,7 +4,7 @@ package mock
 import (
 	"fmt"
 
-	"github.com/theQRL/go-bitfield"
+	"github.com/prysmaticlabs/go-bitfield"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common/hexutil"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"

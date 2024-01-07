@@ -10,7 +10,6 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/validator"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -59,9 +58,9 @@ func TestSubscribeCommitteeSubnets_Valid(t *testing.T) {
 		nil,
 	).Times(1)
 
-	duties := make([]*validator.AttesterDuty, len(subscribeSlots))
+	duties := make([]*apimiddleware.AttesterDutyJson, len(subscribeSlots))
 	for index := range duties {
-		duties[index] = &validator.AttesterDuty{
+		duties[index] = &apimiddleware.AttesterDutyJson{
 			ValidatorIndex:   strconv.FormatUint(uint64(validatorIndices[index]), 10),
 			CommitteeIndex:   strconv.FormatUint(uint64(committeeIndices[index]), 10),
 			CommitteesAtSlot: strconv.FormatUint(committeesAtSlot[index], 10),
@@ -76,7 +75,7 @@ func TestSubscribeCommitteeSubnets_Valid(t *testing.T) {
 		slots.ToEpoch(subscribeSlots[0]),
 		validatorIndices,
 	).Return(
-		[]*validator.AttesterDuty{
+		[]*apimiddleware.AttesterDutyJson{
 			{
 				CommitteesAtSlot: strconv.FormatUint(committeesAtSlot[0], 10),
 				Slot:             strconv.FormatUint(uint64(subscribeSlots[0]), 10),
@@ -94,7 +93,7 @@ func TestSubscribeCommitteeSubnets_Valid(t *testing.T) {
 		slots.ToEpoch(subscribeSlots[2]),
 		validatorIndices,
 	).Return(
-		[]*validator.AttesterDuty{
+		[]*apimiddleware.AttesterDutyJson{
 			{
 				CommitteesAtSlot: strconv.FormatUint(committeesAtSlot[2], 10),
 				Slot:             strconv.FormatUint(uint64(subscribeSlots[2]), 10),
@@ -126,7 +125,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 		name                    string
 		subscribeRequest        *zondpb.CommitteeSubnetsSubscribeRequest
 		validatorIndices        []primitives.ValidatorIndex
-		attesterDuty            *validator.AttesterDuty
+		attesterDuty            *apimiddleware.AttesterDutyJson
 		dutiesError             error
 		expectGetDutiesQuery    bool
 		expectSubscribeRestCall bool
@@ -197,7 +196,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 				IsAggregator: []bool{false},
 			},
 			validatorIndices: []primitives.ValidatorIndex{3},
-			attesterDuty: &validator.AttesterDuty{
+			attesterDuty: &apimiddleware.AttesterDutyJson{
 				Slot:             "foo",
 				CommitteesAtSlot: "1",
 			},
@@ -212,7 +211,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 				IsAggregator: []bool{false},
 			},
 			validatorIndices: []primitives.ValidatorIndex{3},
-			attesterDuty: &validator.AttesterDuty{
+			attesterDuty: &apimiddleware.AttesterDutyJson{
 				Slot:             "1",
 				CommitteesAtSlot: "foo",
 			},
@@ -227,7 +226,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 				IsAggregator: []bool{false},
 			},
 			validatorIndices: []primitives.ValidatorIndex{3},
-			attesterDuty: &validator.AttesterDuty{
+			attesterDuty: &apimiddleware.AttesterDutyJson{
 				Slot:             "2",
 				CommitteesAtSlot: "3",
 			},
@@ -242,7 +241,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 				IsAggregator: []bool{false},
 			},
 			validatorIndices: []primitives.ValidatorIndex{3},
-			attesterDuty: &validator.AttesterDuty{
+			attesterDuty: &apimiddleware.AttesterDutyJson{
 				Slot:             "1",
 				CommitteesAtSlot: "2",
 			},
@@ -266,7 +265,7 @@ func TestSubscribeCommitteeSubnets_Error(t *testing.T) {
 					gomock.Any(),
 					gomock.Any(),
 				).Return(
-					[]*validator.AttesterDuty{testCase.attesterDuty},
+					[]*apimiddleware.AttesterDutyJson{testCase.attesterDuty},
 					testCase.dutiesError,
 				).Times(1)
 			}

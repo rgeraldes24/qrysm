@@ -74,12 +74,12 @@ func (c *waitForActivationClient) Recv() (*zondpb.ValidatorActivationResponse, e
 		}
 
 		for _, data := range stateValidators.Data {
-			pubkey, err := hexutil.Decode(data.Validator.Pubkey)
+			pubkey, err := hexutil.Decode(data.Validator.PublicKey)
 			if err != nil {
 				return nil, errors.Wrap(err, "failed to parse validator public key")
 			}
 
-			stringRetrievedPubKeys[data.Validator.Pubkey] = struct{}{}
+			stringRetrievedPubKeys[data.Validator.PublicKey] = struct{}{}
 
 			index, err := strconv.ParseUint(data.Index, 10, 64)
 			if err != nil {

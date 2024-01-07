@@ -12,9 +12,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/validator"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -36,14 +33,14 @@ func TestSubmitSyncMessage_Valid(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	jsonSyncCommitteeMessage := &shared.SyncCommitteeMessage{
+	jsonSyncCommitteeMessage := &apimiddleware.SyncCommitteeMessageJson{
 		Slot:            "42",
 		BeaconBlockRoot: beaconBlockRoot,
 		ValidatorIndex:  "12345",
 		Signature:       signature,
 	}
 
-	marshalledJsonRegistrations, err := json.Marshal([]*shared.SyncCommitteeMessage{jsonSyncCommitteeMessage})
+	marshalledJsonRegistrations, err := json.Marshal([]*apimiddleware.SyncCommitteeMessageJson{jsonSyncCommitteeMessage})
 	require.NoError(t, err)
 
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
@@ -271,7 +268,7 @@ func TestGetSyncSubCommitteeIndex(t *testing.T) {
 		Indices: []primitives.CommitteeIndex{123, 456},
 	}
 
-	syncDuties := []*validator.SyncCommitteeDuty{
+	syncDuties := []*apimiddleware.SyncCommitteeDuty{
 		{
 			Pubkey:         hexutil.Encode([]byte{1}),
 			ValidatorIndex: validatorIndex,
@@ -287,7 +284,7 @@ func TestGetSyncSubCommitteeIndex(t *testing.T) {
 
 	tests := []struct {
 		name             string
-		duties           []*validator.SyncCommitteeDuty
+		duties           []*apimiddleware.SyncCommitteeDuty
 		validatorsErr    error
 		dutiesErr        error
 		expectedErrorMsg string
@@ -298,7 +295,7 @@ func TestGetSyncSubCommitteeIndex(t *testing.T) {
 		},
 		{
 			name:             "no sync duties",
-			duties:           []*validator.SyncCommitteeDuty{},
+			duties:           []*apimiddleware.SyncCommitteeDuty{},
 			expectedErrorMsg: fmt.Sprintf("no sync committee duty for the given slot %d", slot),
 		},
 		{
@@ -320,16 +317,16 @@ func TestGetSyncSubCommitteeIndex(t *testing.T) {
 			jsonRestHandler.EXPECT().GetRestJsonResponse(
 				ctx,
 				fmt.Sprintf("%s?id=%s", validatorsEndpoint, pubkeyStr),
-				&beacon.GetValidatorsResponse{},
+				&apimiddleware.StateValidatorsResponseJson{},
 			).SetArg(
 				2,
-				beacon.GetValidatorsResponse{
-					Data: []*beacon.ValidatorContainer{
+				apimiddleware.StateValidatorsResponseJson{
+					Data: []*apimiddleware.ValidatorContainerJson{
 						{
 							Index:  validatorIndex,
 							Status: "active_ongoing",
-							Validator: &beacon.Validator{
-								Pubkey: stringPubKey,
+							Validator: &apimiddleware.ValidatorJson{
+								PublicKey: stringPubKey,
 							},
 						},
 					},
@@ -352,10 +349,10 @@ func TestGetSyncSubCommitteeIndex(t *testing.T) {
 				fmt.Sprintf("%s/%d", syncDutiesEndpoint, slots.ToEpoch(slot)),
 				nil,
 				bytes.NewBuffer(validatorIndicesBytes),
-				&validator.GetSyncCommitteeDutiesResponse{},
+				&apimiddleware.SyncCommitteeDutiesResponseJson{},
 			).SetArg(
 				4,
-				validator.GetSyncCommitteeDutiesResponse{
+				apimiddleware.SyncCommitteeDutiesResponseJson{
 					Data: test.duties,
 				},
 			).Return(

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/theQRL/go-bitfield"
+	"github.com/prysmaticlabs/go-bitfield"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"

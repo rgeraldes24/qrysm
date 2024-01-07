@@ -10,7 +10,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -33,9 +33,9 @@ func TestRegistration_Valid(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	jsonRegistrations := []*shared.SignedValidatorRegistration{
+	jsonRegistrations := []*apimiddleware.SignedValidatorRegistrationJson{
 		{
-			Message: &shared.ValidatorRegistration{
+			Message: &apimiddleware.ValidatorRegistrationJson{
 				FeeRecipient: feeRecipient1,
 				GasLimit:     "100",
 				Timestamp:    "1000",
@@ -44,7 +44,7 @@ func TestRegistration_Valid(t *testing.T) {
 			Signature: signature1,
 		},
 		{
-			Message: &shared.ValidatorRegistration{
+			Message: &apimiddleware.ValidatorRegistrationJson{
 				FeeRecipient: feeRecipient2,
 				GasLimit:     "200",
 				Timestamp:    "2000",
@@ -53,7 +53,7 @@ func TestRegistration_Valid(t *testing.T) {
 			Signature: signature2,
 		},
 		{
-			Message: &shared.ValidatorRegistration{
+			Message: &apimiddleware.ValidatorRegistrationJson{
 				FeeRecipient: feeRecipient3,
 				GasLimit:     "300",
 				Timestamp:    "3000",

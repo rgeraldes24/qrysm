@@ -8,7 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
+	rpcmiddleware "github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -35,7 +35,7 @@ func TestIndex_Nominal(t *testing.T) {
 	pubKey, url := getPubKeyAndURL(t)
 	ctx := context.Background()
 
-	stateValidatorsResponseJson := beacon.GetValidatorsResponse{}
+	stateValidatorsResponseJson := rpcmiddleware.StateValidatorsResponseJson{}
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 
 	jsonRestHandler.EXPECT().GetRestJsonResponse(
@@ -47,13 +47,13 @@ func TestIndex_Nominal(t *testing.T) {
 		nil,
 	).SetArg(
 		2,
-		beacon.GetValidatorsResponse{
-			Data: []*beacon.ValidatorContainer{
+		rpcmiddleware.StateValidatorsResponseJson{
+			Data: []*rpcmiddleware.ValidatorContainerJson{
 				{
 					Index:  "55293",
 					Status: "active_ongoing",
-					Validator: &beacon.Validator{
-						Pubkey: stringPubKey,
+					Validator: &rpcmiddleware.ValidatorJson{
+						PublicKey: stringPubKey,
 					},
 				},
 			},
@@ -84,7 +84,7 @@ func TestIndex_UnexistingValidator(t *testing.T) {
 	pubKey, url := getPubKeyAndURL(t)
 	ctx := context.Background()
 
-	stateValidatorsResponseJson := beacon.GetValidatorsResponse{}
+	stateValidatorsResponseJson := rpcmiddleware.StateValidatorsResponseJson{}
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 
 	jsonRestHandler.EXPECT().GetRestJsonResponse(
@@ -96,8 +96,8 @@ func TestIndex_UnexistingValidator(t *testing.T) {
 		nil,
 	).SetArg(
 		2,
-		beacon.GetValidatorsResponse{
-			Data: []*beacon.ValidatorContainer{},
+		rpcmiddleware.StateValidatorsResponseJson{
+			Data: []*rpcmiddleware.ValidatorContainerJson{},
 		},
 	).Times(1)
 
@@ -125,7 +125,7 @@ func TestIndex_BadIndexError(t *testing.T) {
 	pubKey, url := getPubKeyAndURL(t)
 	ctx := context.Background()
 
-	stateValidatorsResponseJson := beacon.GetValidatorsResponse{}
+	stateValidatorsResponseJson := rpcmiddleware.StateValidatorsResponseJson{}
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 
 	jsonRestHandler.EXPECT().GetRestJsonResponse(
@@ -137,13 +137,13 @@ func TestIndex_BadIndexError(t *testing.T) {
 		nil,
 	).SetArg(
 		2,
-		beacon.GetValidatorsResponse{
-			Data: []*beacon.ValidatorContainer{
+		rpcmiddleware.StateValidatorsResponseJson{
+			Data: []*rpcmiddleware.ValidatorContainerJson{
 				{
 					Index:  "This is not an index",
 					Status: "active_ongoing",
-					Validator: &beacon.Validator{
-						Pubkey: stringPubKey,
+					Validator: &rpcmiddleware.ValidatorJson{
+						PublicKey: stringPubKey,
 					},
 				},
 			},
@@ -173,7 +173,7 @@ func TestIndex_JsonResponseError(t *testing.T) {
 	pubKey, url := getPubKeyAndURL(t)
 	ctx := context.Background()
 
-	stateValidatorsResponseJson := beacon.GetValidatorsResponse{}
+	stateValidatorsResponseJson := rpcmiddleware.StateValidatorsResponseJson{}
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 
 	jsonRestHandler.EXPECT().GetRestJsonResponse(

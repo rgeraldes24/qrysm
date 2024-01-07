@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/v4/api"
 	"github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
 )
 
@@ -67,7 +66,6 @@ func (c beaconApiJsonRestHandler) PostRestJson(ctx context.Context, apiEndpoint 
 	for headerKey, headerValue := range headers {
 		req.Header.Set(headerKey, headerValue)
 	}
-	req.Header.Set("Content-Type", api.JsonMediaType)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {

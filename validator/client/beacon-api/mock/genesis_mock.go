@@ -9,7 +9,6 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
 	apimiddleware "github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
 	apimiddleware0 "github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
 )
@@ -38,10 +37,10 @@ func (m *MockgenesisProvider) EXPECT() *MockgenesisProviderMockRecorder {
 }
 
 // GetGenesis mocks base method.
-func (m *MockgenesisProvider) GetGenesis(ctx context.Context) (*beacon.Genesis, *apimiddleware.DefaultErrorJson, error) {
+func (m *MockgenesisProvider) GetGenesis(ctx context.Context) (*apimiddleware0.GenesisResponse_GenesisJson, *apimiddleware.DefaultErrorJson, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetGenesis", ctx)
-	ret0, _ := ret[0].(*beacon.Genesis)
+	ret0, _ := ret[0].(*apimiddleware0.GenesisResponse_GenesisJson)
 	ret1, _ := ret[1].(*apimiddleware.DefaultErrorJson)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2

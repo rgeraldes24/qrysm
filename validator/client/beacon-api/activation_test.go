@@ -9,7 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
+	rpcmiddleware "github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/v4/config/params"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -108,7 +108,7 @@ func TestActivation_Nominal(t *testing.T) {
 		},
 	}
 
-	stateValidatorsResponseJson := beacon.GetValidatorsResponse{}
+	stateValidatorsResponseJson := rpcmiddleware.StateValidatorsResponseJson{}
 
 	// Instantiate a cancellable context.
 	ctx, cancel := context.WithCancel(context.Background())
@@ -125,27 +125,27 @@ func TestActivation_Nominal(t *testing.T) {
 		nil,
 	).SetArg(
 		2,
-		beacon.GetValidatorsResponse{
-			Data: []*beacon.ValidatorContainer{
+		rpcmiddleware.StateValidatorsResponseJson{
+			Data: []*rpcmiddleware.ValidatorContainerJson{
 				{
 					Index:  "55293",
 					Status: "active_ongoing",
-					Validator: &beacon.Validator{
-						Pubkey: stringPubKeys[0],
+					Validator: &rpcmiddleware.ValidatorJson{
+						PublicKey: stringPubKeys[0],
 					},
 				},
 				{
 					Index:  "11877",
 					Status: "active_exiting",
-					Validator: &beacon.Validator{
-						Pubkey: stringPubKeys[1],
+					Validator: &rpcmiddleware.ValidatorJson{
+						PublicKey: stringPubKeys[1],
 					},
 				},
 				{
 					Index:  "210439",
 					Status: "exited_slashed",
-					Validator: &beacon.Validator{
-						Pubkey: stringPubKeys[3],
+					Validator: &rpcmiddleware.ValidatorJson{
+						PublicKey: stringPubKeys[3],
 					},
 				},
 			},
@@ -186,17 +186,17 @@ func TestActivation_Nominal(t *testing.T) {
 func TestActivation_InvalidData(t *testing.T) {
 	testCases := []struct {
 		name                 string
-		data                 []*beacon.ValidatorContainer
+		data                 []*rpcmiddleware.ValidatorContainerJson
 		expectedErrorMessage string
 	}{
 		{
 			name: "bad validator public key",
-			data: []*beacon.ValidatorContainer{
+			data: []*rpcmiddleware.ValidatorContainerJson{
 				{
 					Index:  "55293",
 					Status: "active_ongoing",
-					Validator: &beacon.Validator{
-						Pubkey: "NotAPubKey",
+					Validator: &rpcmiddleware.ValidatorJson{
+						PublicKey: "NotAPubKey",
 					},
 				},
 			},
@@ -204,12 +204,12 @@ func TestActivation_InvalidData(t *testing.T) {
 		},
 		{
 			name: "bad validator index",
-			data: []*beacon.ValidatorContainer{
+			data: []*rpcmiddleware.ValidatorContainerJson{
 				{
 					Index:  "NotAnIndex",
 					Status: "active_ongoing",
-					Validator: &beacon.Validator{
-						Pubkey: stringPubKey,
+					Validator: &rpcmiddleware.ValidatorJson{
+						PublicKey: stringPubKey,
 					},
 				},
 			},
@@ -217,12 +217,12 @@ func TestActivation_InvalidData(t *testing.T) {
 		},
 		{
 			name: "invalid validator status",
-			data: []*beacon.ValidatorContainer{
+			data: []*rpcmiddleware.ValidatorContainerJson{
 				{
 					Index:  "12345",
 					Status: "NotAStatus",
-					Validator: &beacon.Validator{
-						Pubkey: stringPubKey,
+					Validator: &rpcmiddleware.ValidatorJson{
+						PublicKey: stringPubKey,
 					},
 				},
 			},
@@ -248,7 +248,7 @@ func TestActivation_InvalidData(t *testing.T) {
 					nil,
 				).SetArg(
 					2,
-					beacon.GetValidatorsResponse{
+					rpcmiddleware.StateValidatorsResponseJson{
 						Data: testCase.data,
 					},
 				).Times(1)

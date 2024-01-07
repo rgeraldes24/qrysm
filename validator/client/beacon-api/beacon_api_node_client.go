@@ -75,19 +75,13 @@ func (c *beaconApiNodeClient) GetGenesis(ctx context.Context, _ *empty.Empty) (*
 	}, nil
 }
 
-func (c *beaconApiNodeClient) GetVersion(ctx context.Context, _ *empty.Empty) (*zondpb.Version, error) {
-	var versionResponse apimiddleware.VersionResponseJson
-	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/zond/v1/node/version", &versionResponse); err != nil {
-		return nil, errors.Wrapf(err, "failed to query node version")
+func (c *beaconApiNodeClient) GetVersion(ctx context.Context, in *empty.Empty) (*zondpb.Version, error) {
+	if c.fallbackClient != nil {
+		return c.fallbackClient.GetVersion(ctx, in)
 	}
 
-	if versionResponse.Data == nil || versionResponse.Data.Version == "" {
-		return nil, errors.New("empty version response")
-	}
-
-	return &zondpb.Version{
-		Version: versionResponse.Data.Version,
-	}, nil
+	// TODO: Implement me
+	panic("beaconApiNodeClient.GetVersion is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiNodeClientWithFallback.")
 }
 
 func (c *beaconApiNodeClient) ListPeers(ctx context.Context, in *empty.Empty) (*zondpb.Peers, error) {

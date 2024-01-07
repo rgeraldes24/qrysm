@@ -8,9 +8,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/validator"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
 	gomock "github.com/golang/mock/gomock"
+	apimiddleware "github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
 	primitives "github.com/theQRL/qrysm/v4/consensus-types/primitives"
 )
 
@@ -38,10 +37,10 @@ func (m *MockdutiesProvider) EXPECT() *MockdutiesProviderMockRecorder {
 }
 
 // GetAttesterDuties mocks base method.
-func (m *MockdutiesProvider) GetAttesterDuties(ctx context.Context, epoch primitives.Epoch, validatorIndices []primitives.ValidatorIndex) ([]*validator.AttesterDuty, error) {
+func (m *MockdutiesProvider) GetAttesterDuties(ctx context.Context, epoch primitives.Epoch, validatorIndices []primitives.ValidatorIndex) ([]*apimiddleware.AttesterDutyJson, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAttesterDuties", ctx, epoch, validatorIndices)
-	ret0, _ := ret[0].([]*validator.AttesterDuty)
+	ret0, _ := ret[0].([]*apimiddleware.AttesterDutyJson)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -53,10 +52,10 @@ func (mr *MockdutiesProviderMockRecorder) GetAttesterDuties(ctx, epoch, validato
 }
 
 // GetCommittees mocks base method.
-func (m *MockdutiesProvider) GetCommittees(ctx context.Context, epoch primitives.Epoch) ([]*shared.Committee, error) {
+func (m *MockdutiesProvider) GetCommittees(ctx context.Context, epoch primitives.Epoch) ([]*apimiddleware.CommitteeJson, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCommittees", ctx, epoch)
-	ret0, _ := ret[0].([]*shared.Committee)
+	ret0, _ := ret[0].([]*apimiddleware.CommitteeJson)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -68,10 +67,10 @@ func (mr *MockdutiesProviderMockRecorder) GetCommittees(ctx, epoch interface{}) 
 }
 
 // GetProposerDuties mocks base method.
-func (m *MockdutiesProvider) GetProposerDuties(ctx context.Context, epoch primitives.Epoch) ([]*validator.ProposerDuty, error) {
+func (m *MockdutiesProvider) GetProposerDuties(ctx context.Context, epoch primitives.Epoch) ([]*apimiddleware.ProposerDutyJson, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProposerDuties", ctx, epoch)
-	ret0, _ := ret[0].([]*validator.ProposerDuty)
+	ret0, _ := ret[0].([]*apimiddleware.ProposerDutyJson)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -83,10 +82,10 @@ func (mr *MockdutiesProviderMockRecorder) GetProposerDuties(ctx, epoch interface
 }
 
 // GetSyncDuties mocks base method.
-func (m *MockdutiesProvider) GetSyncDuties(ctx context.Context, epoch primitives.Epoch, validatorIndices []primitives.ValidatorIndex) ([]*validator.SyncCommitteeDuty, error) {
+func (m *MockdutiesProvider) GetSyncDuties(ctx context.Context, epoch primitives.Epoch, validatorIndices []primitives.ValidatorIndex) ([]*apimiddleware.SyncCommitteeDuty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSyncDuties", ctx, epoch, validatorIndices)
-	ret0, _ := ret[0].([]*validator.SyncCommitteeDuty)
+	ret0, _ := ret[0].([]*apimiddleware.SyncCommitteeDuty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

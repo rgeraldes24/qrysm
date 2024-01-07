@@ -85,7 +85,7 @@ func (c beaconApiValidatorClient) getHeadSignedBeaconBlock(ctx context.Context) 
 
 	switch signedBlockResponseJson.Version {
 	case "capella":
-		jsonCapellaBlock := apimiddleware.SignedBeaconBlockCapellaJson{}
+		jsonCapellaBlock := apimiddleware.SignedBeaconBlockCapellaContainerJson{}
 		if err := decoder.Decode(&jsonCapellaBlock); err != nil {
 			return nil, errors.Wrap(err, "failed to decode signed capella block response json")
 		}

@@ -10,7 +10,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -19,14 +18,14 @@ import (
 func (c *beaconApiValidatorClient) submitSyncMessage(ctx context.Context, syncMessage *zondpb.SyncCommitteeMessage) error {
 	const endpoint = "/zond/v1/beacon/pool/sync_committees"
 
-	jsonSyncCommitteeMessage := &shared.SyncCommitteeMessage{
+	jsonSyncCommitteeMessage := &apimiddleware.SyncCommitteeMessageJson{
 		Slot:            strconv.FormatUint(uint64(syncMessage.Slot), 10),
 		BeaconBlockRoot: hexutil.Encode(syncMessage.BlockRoot),
 		ValidatorIndex:  strconv.FormatUint(uint64(syncMessage.ValidatorIndex), 10),
 		Signature:       hexutil.Encode(syncMessage.Signature),
 	}
 
-	marshalledJsonSyncCommitteeMessage, err := json.Marshal([]*shared.SyncCommitteeMessage{jsonSyncCommitteeMessage})
+	marshalledJsonSyncCommitteeMessage, err := json.Marshal([]*apimiddleware.SyncCommitteeMessageJson{jsonSyncCommitteeMessage})
 	if err != nil {
 		return errors.Wrap(err, "failed to marshal sync committee message")
 	}

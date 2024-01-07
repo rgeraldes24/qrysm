@@ -10,9 +10,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/validator"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/helpers"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -98,11 +96,11 @@ func TestGetFork_Nominal(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	stateForkResponseJson := beacon.GetStateForkResponse{}
+	stateForkResponseJson := apimiddleware.StateForkResponseJson{}
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 
-	expected := beacon.GetStateForkResponse{
-		Data: &shared.Fork{
+	expected := apimiddleware.StateForkResponseJson{
+		Data: &apimiddleware.ForkJson{
 			PreviousVersion: "0x1",
 			CurrentVersion:  "0x2",
 			Epoch:           "3",
@@ -163,14 +161,14 @@ func TestGetHeaders_Nominal(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	blockHeadersResponseJson := beacon.GetBlockHeadersResponse{}
+	blockHeadersResponseJson := apimiddleware.BlockHeadersResponseJson{}
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 
-	expected := beacon.GetBlockHeadersResponse{
-		Data: []*shared.SignedBeaconBlockHeaderContainer{
+	expected := apimiddleware.BlockHeadersResponseJson{
+		Data: []*apimiddleware.BlockHeaderContainerJson{
 			{
-				Header: &shared.SignedBeaconBlockHeader{
-					Message: &shared.BeaconBlockHeader{
+				Header: &apimiddleware.BeaconBlockHeaderContainerJson{
+					Message: &apimiddleware.BeaconBlockHeaderJson{
 						Slot: "42",
 					},
 				},
@@ -232,14 +230,17 @@ func TestGetLiveness_Nominal(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	livenessResponseJson := validator.GetLivenessResponse{}
+	livenessResponseJson := apimiddleware.LivenessResponseJson{}
 
 	indexes := []string{"1", "2"}
 	marshalledIndexes, err := json.Marshal(indexes)
 	require.NoError(t, err)
 
-	expected := validator.GetLivenessResponse{
-		Data: []*validator.ValidatorLiveness{
+	expected := apimiddleware.LivenessResponseJson{
+		Data: []*struct {
+			Index  string `json:"index"`
+			IsLive bool   `json:"is_live"`
+		}{
 			{
 				Index:  "1",
 				IsLive: true,
@@ -325,7 +326,7 @@ func TestGetIsSyncing_Nominal(t *testing.T) {
 			jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 
 			expected := apimiddleware.SyncingResponseJson{
-				Data: &shared.SyncDetails{
+				Data: &helpers.SyncDetailsJson{
 					IsSyncing: testCase.isSyncing,
 				},
 			}

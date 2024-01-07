@@ -10,9 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/validator"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/helpers"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -50,16 +48,16 @@ func TestCheckDoppelGanger_Nominal(t *testing.T) {
 		doppelGangerInput          *zondpb.DoppelGangerRequest
 		doppelGangerExpectedOutput *zondpb.DoppelGangerResponse
 		getSyncingOutput           *apimiddleware.SyncingResponseJson
-		//getForkOutput               *beacon.GetStateForkResponse
-		getHeadersOutput            *beacon.GetBlockHeadersResponse
+		//getForkOutput               *apimiddleware.StateForkResponseJson
+		getHeadersOutput            *apimiddleware.BlockHeadersResponseJson
 		getStateValidatorsInterface *struct {
 			input  []string
-			output *beacon.GetValidatorsResponse
+			output *apimiddleware.StateValidatorsResponseJson
 		}
 		getLivelinessInterfaces []struct {
 			inputUrl           string
 			inputStringIndexes []string
-			output             *validator.GetLivenessResponse
+			output             *apimiddleware.LivenessResponseJson
 		}
 	}{
 		{
@@ -110,22 +108,22 @@ func TestCheckDoppelGanger_Nominal(t *testing.T) {
 				},
 			},
 			getSyncingOutput: &apimiddleware.SyncingResponseJson{
-				Data: &shared.SyncDetails{
+				Data: &helpers.SyncDetailsJson{
 					IsSyncing: false,
 				},
 			},
-			// getForkOutput: &beacon.GetStateForkResponse{
-			// 	Data: &shared.Fork{
+			// getForkOutput: &apimiddleware.StateForkResponseJson{
+			// 	Data: &apimiddleware.ForkJson{
 			// 		PreviousVersion: "0x01000000",
 			// 		CurrentVersion:  "0x02000000",
 			// 		Epoch:           "2",
 			// 	},
 			// },
-			getHeadersOutput: &beacon.GetBlockHeadersResponse{
-				Data: []*shared.SignedBeaconBlockHeaderContainer{
+			getHeadersOutput: &apimiddleware.BlockHeadersResponseJson{
+				Data: []*apimiddleware.BlockHeaderContainerJson{
 					{
-						Header: &shared.SignedBeaconBlockHeader{
-							Message: &shared.BeaconBlockHeader{
+						Header: &apimiddleware.BeaconBlockHeaderContainerJson{
+							Message: &apimiddleware.BeaconBlockHeaderJson{
 								Slot: "99",
 							},
 						},
@@ -156,22 +154,22 @@ func TestCheckDoppelGanger_Nominal(t *testing.T) {
 				},
 			},
 			getSyncingOutput: &apimiddleware.SyncingResponseJson{
-				Data: &shared.SyncDetails{
+				Data: &helpers.SyncDetailsJson{
 					IsSyncing: false,
 				},
 			},
-			// getForkOutput: &beacon.GetStateForkResponse{
-			// 	Data: &shared.Fork{
+			// getForkOutput: &apimiddleware.StateForkResponseJson{
+			// 	Data: &apimiddleware.ForkJson{
 			// 		PreviousVersion: "0x01000000",
 			// 		CurrentVersion:  "0x02000000",
 			// 		Epoch:           "2",
 			// 	},
 			// },
-			getHeadersOutput: &beacon.GetBlockHeadersResponse{
-				Data: []*shared.SignedBeaconBlockHeaderContainer{
+			getHeadersOutput: &apimiddleware.BlockHeadersResponseJson{
+				Data: []*apimiddleware.BlockHeaderContainerJson{
 					{
-						Header: &shared.SignedBeaconBlockHeader{
-							Message: &shared.BeaconBlockHeader{
+						Header: &apimiddleware.BeaconBlockHeaderContainerJson{
+							Message: &apimiddleware.BeaconBlockHeaderJson{
 								Slot: "3201",
 							},
 						},
@@ -180,7 +178,7 @@ func TestCheckDoppelGanger_Nominal(t *testing.T) {
 			},
 			getStateValidatorsInterface: &struct {
 				input  []string
-				output *beacon.GetValidatorsResponse
+				output *apimiddleware.StateValidatorsResponseJson
 			}{
 				input: []string{
 					// no stringPubKey1 since recent
@@ -190,21 +188,21 @@ func TestCheckDoppelGanger_Nominal(t *testing.T) {
 					stringPubKey5, // non existing validator
 					stringPubKey6, // not recent - not duplicate
 				},
-				output: &beacon.GetValidatorsResponse{
-					Data: []*beacon.ValidatorContainer{
+				output: &apimiddleware.StateValidatorsResponseJson{
+					Data: []*apimiddleware.ValidatorContainerJson{
 						// No "11111" since corresponding validator is recent
-						{Index: "22222", Validator: &beacon.Validator{Pubkey: stringPubKey2}}, // not recent - duplicate on previous epoch
-						{Index: "33333", Validator: &beacon.Validator{Pubkey: stringPubKey3}}, // not recent - duplicate on current epoch
-						{Index: "44444", Validator: &beacon.Validator{Pubkey: stringPubKey4}}, // not recent - duplicate on both previous and current epoch
+						{Index: "22222", Validator: &apimiddleware.ValidatorJson{PublicKey: stringPubKey2}}, // not recent - duplicate on previous epoch
+						{Index: "33333", Validator: &apimiddleware.ValidatorJson{PublicKey: stringPubKey3}}, // not recent - duplicate on current epoch
+						{Index: "44444", Validator: &apimiddleware.ValidatorJson{PublicKey: stringPubKey4}}, // not recent - duplicate on both previous and current epoch
 						// No "55555" sicee corresponding validator does not exist
-						{Index: "66666", Validator: &beacon.Validator{Pubkey: stringPubKey6}}, // not recent - not duplicate
+						{Index: "66666", Validator: &apimiddleware.ValidatorJson{PublicKey: stringPubKey6}}, // not recent - not duplicate
 					},
 				},
 			},
 			getLivelinessInterfaces: []struct {
 				inputUrl           string
 				inputStringIndexes []string
-				output             *validator.GetLivenessResponse
+				output             *apimiddleware.LivenessResponseJson
 			}{
 				{
 					inputUrl: "/zond/v1/validator/liveness/99", // previous epoch
@@ -216,8 +214,11 @@ func TestCheckDoppelGanger_Nominal(t *testing.T) {
 						// No "55555" since corresponding validator it does not exist
 						"66666", // not recent - not duplicate
 					},
-					output: &validator.GetLivenessResponse{
-						Data: []*validator.ValidatorLiveness{
+					output: &apimiddleware.LivenessResponseJson{
+						Data: []*struct {
+							Index  string `json:"index"`
+							IsLive bool   `json:"is_live"`
+						}{
 							// No "11111" since corresponding validator is recent
 							{Index: "22222", IsLive: true},  // not recent - duplicate on previous epoch
 							{Index: "33333", IsLive: false}, // not recent - duplicate on current epoch
@@ -237,8 +238,11 @@ func TestCheckDoppelGanger_Nominal(t *testing.T) {
 						// No "55555" since corresponding validator it does not exist
 						"66666", // not recent - not duplicate
 					},
-					output: &validator.GetLivenessResponse{
-						Data: []*validator.ValidatorLiveness{
+					output: &apimiddleware.LivenessResponseJson{
+						Data: []*struct {
+							Index  string `json:"index"`
+							IsLive bool   `json:"is_live"`
+						}{
 							// No "11111" since corresponding validator is recent
 							{Index: "22222", IsLive: false}, // not recent - duplicate on previous epoch
 							{Index: "33333", IsLive: true},  // not recent - duplicate on current epoch
@@ -278,7 +282,7 @@ func TestCheckDoppelGanger_Nominal(t *testing.T) {
 			}
 
 			// if testCase.getForkOutput != nil {
-			// 	stateForkResponseJson := beacon.GetStateForkResponse{}
+			// 	stateForkResponseJson := apimiddleware.StateForkResponseJson{}
 
 			// 	jsonRestHandler.EXPECT().GetRestJsonResponse(
 			// 		ctx,
@@ -294,7 +298,7 @@ func TestCheckDoppelGanger_Nominal(t *testing.T) {
 			// }
 
 			if testCase.getHeadersOutput != nil {
-				blockHeadersResponseJson := beacon.GetBlockHeadersResponse{}
+				blockHeadersResponseJson := apimiddleware.BlockHeadersResponseJson{}
 
 				jsonRestHandler.EXPECT().GetRestJsonResponse(
 					ctx,
@@ -311,7 +315,7 @@ func TestCheckDoppelGanger_Nominal(t *testing.T) {
 
 			if testCase.getLivelinessInterfaces != nil {
 				for _, iface := range testCase.getLivelinessInterfaces {
-					livenessResponseJson := validator.GetLivenessResponse{}
+					livenessResponseJson := apimiddleware.LivenessResponseJson{}
 
 					marshalledIndexes, err := json.Marshal(iface.inputStringIndexes)
 					require.NoError(t, err)
@@ -375,22 +379,22 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 	}
 
 	standardGetSyncingOutput := &apimiddleware.SyncingResponseJson{
-		Data: &shared.SyncDetails{
+		Data: &helpers.SyncDetailsJson{
 			IsSyncing: false,
 		},
 	}
 
-	// standardGetForkOutput := &beacon.GetStateForkResponse{
-	// 	Data: &shared.Fork{
+	// standardGetForkOutput := &apimiddleware.StateForkResponseJson{
+	// 	Data: &apimiddleware.ForkJson{
 	// 		CurrentVersion: "0x02000000",
 	// 	},
 	// }
 
-	standardGetHeadersOutput := &beacon.GetBlockHeadersResponse{
-		Data: []*shared.SignedBeaconBlockHeaderContainer{
+	standardGetHeadersOutput := &apimiddleware.BlockHeadersResponseJson{
+		Data: []*apimiddleware.BlockHeaderContainerJson{
 			{
-				Header: &shared.SignedBeaconBlockHeader{
-					Message: &shared.BeaconBlockHeader{
+				Header: &apimiddleware.BeaconBlockHeaderContainerJson{
+					Message: &apimiddleware.BeaconBlockHeaderJson{
 						Slot: "1000",
 					},
 				},
@@ -400,16 +404,16 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 
 	standardGetStateValidatorsInterface := &struct {
 		input  []string
-		output *beacon.GetValidatorsResponse
+		output *apimiddleware.StateValidatorsResponseJson
 		err    error
 	}{
 		input: []string{stringPubKey},
-		output: &beacon.GetValidatorsResponse{
-			Data: []*beacon.ValidatorContainer{
+		output: &apimiddleware.StateValidatorsResponseJson{
+			Data: []*apimiddleware.ValidatorContainerJson{
 				{
 					Index: "42",
-					Validator: &beacon.Validator{
-						Pubkey: stringPubKey,
+					Validator: &apimiddleware.ValidatorJson{
+						PublicKey: stringPubKey,
 					},
 				},
 			},
@@ -422,19 +426,19 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 		inputValidatorRequests []*zondpb.DoppelGangerRequest_ValidatorRequest
 		getSyncingOutput       *apimiddleware.SyncingResponseJson
 		getSyncingError        error
-		// getForkOutput               *beacon.GetStateForkResponse
+		// getForkOutput               *apimiddleware.StateForkResponseJson
 		// getForkError                error
-		getHeadersOutput            *beacon.GetBlockHeadersResponse
+		getHeadersOutput            *apimiddleware.BlockHeadersResponseJson
 		getHeadersError             error
 		getStateValidatorsInterface *struct {
 			input  []string
-			output *beacon.GetValidatorsResponse
+			output *apimiddleware.StateValidatorsResponseJson
 			err    error
 		}
 		getLivenessInterfaces []struct {
 			inputUrl           string
 			inputStringIndexes []string
-			output             *validator.GetLivenessResponse
+			output             *apimiddleware.LivenessResponseJson
 			err                error
 		}
 	}{
@@ -455,7 +459,7 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			expectedErrorMessage:   "beacon node not synced",
 			inputValidatorRequests: standardInputValidatorRequests,
 			getSyncingOutput: &apimiddleware.SyncingResponseJson{
-				Data: &shared.SyncDetails{
+				Data: &helpers.SyncDetailsJson{
 					IsSyncing: true,
 				},
 			},
@@ -466,7 +470,7 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 				expectedErrorMessage:   "failed to get fork",
 				inputValidatorRequests: standardInputValidatorRequests,
 				getSyncingOutput:       standardGetSyncingOutput,
-				// getForkOutput:          &beacon.GetStateForkResponse{},
+				// getForkOutput:          &apimiddleware.StateForkResponseJson{},
 				// getForkError: errors.New("custom error"),
 			},
 			{
@@ -474,7 +478,7 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 				expectedErrorMessage:   "failed to decode fork version",
 				inputValidatorRequests: standardInputValidatorRequests,
 				getSyncingOutput:       standardGetSyncingOutput,
-				//getForkOutput:          &beacon.GetStateForkResponse{Data: &shared.Fork{CurrentVersion: "not a version"}},
+				//getForkOutput:          &apimiddleware.StateForkResponseJson{Data: &apimiddleware.ForkJson{CurrentVersion: "not a version"}},
 			},
 		*/
 		{
@@ -483,7 +487,7 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			inputValidatorRequests: standardInputValidatorRequests,
 			getSyncingOutput:       standardGetSyncingOutput,
 			//getForkOutput:          standardGetForkOutput,
-			getHeadersOutput: &beacon.GetBlockHeadersResponse{},
+			getHeadersOutput: &apimiddleware.BlockHeadersResponseJson{},
 			getHeadersError:  errors.New("custom error"),
 		},
 		{
@@ -492,11 +496,11 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			inputValidatorRequests: standardInputValidatorRequests,
 			getSyncingOutput:       standardGetSyncingOutput,
 			//getForkOutput:          standardGetForkOutput,
-			getHeadersOutput: &beacon.GetBlockHeadersResponse{
-				Data: []*shared.SignedBeaconBlockHeaderContainer{
+			getHeadersOutput: &apimiddleware.BlockHeadersResponseJson{
+				Data: []*apimiddleware.BlockHeaderContainerJson{
 					{
-						Header: &shared.SignedBeaconBlockHeader{
-							Message: &shared.BeaconBlockHeader{
+						Header: &apimiddleware.BeaconBlockHeaderContainerJson{
+							Message: &apimiddleware.BeaconBlockHeaderJson{
 								Slot: "not a slot",
 							},
 						},
@@ -513,7 +517,7 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			getHeadersOutput: standardGetHeadersOutput,
 			getStateValidatorsInterface: &struct {
 				input  []string
-				output *beacon.GetValidatorsResponse
+				output *apimiddleware.StateValidatorsResponseJson
 				err    error
 			}{
 				input: []string{stringPubKey},
@@ -529,11 +533,11 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			getHeadersOutput: standardGetHeadersOutput,
 			getStateValidatorsInterface: &struct {
 				input  []string
-				output *beacon.GetValidatorsResponse
+				output *apimiddleware.StateValidatorsResponseJson
 				err    error
 			}{
 				input:  []string{stringPubKey},
-				output: &beacon.GetValidatorsResponse{Data: []*beacon.ValidatorContainer{nil}},
+				output: &apimiddleware.StateValidatorsResponseJson{Data: []*apimiddleware.ValidatorContainerJson{nil}},
 			},
 		},
 		{
@@ -545,11 +549,11 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			getHeadersOutput: standardGetHeadersOutput,
 			getStateValidatorsInterface: &struct {
 				input  []string
-				output *beacon.GetValidatorsResponse
+				output *apimiddleware.StateValidatorsResponseJson
 				err    error
 			}{
 				input:  []string{stringPubKey},
-				output: &beacon.GetValidatorsResponse{Data: []*beacon.ValidatorContainer{{Validator: nil}}},
+				output: &apimiddleware.StateValidatorsResponseJson{Data: []*apimiddleware.ValidatorContainerJson{{Validator: nil}}},
 			},
 		},
 		{
@@ -563,13 +567,13 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			getLivenessInterfaces: []struct {
 				inputUrl           string
 				inputStringIndexes []string
-				output             *validator.GetLivenessResponse
+				output             *apimiddleware.LivenessResponseJson
 				err                error
 			}{
 				{
 					inputUrl:           "/zond/v1/validator/liveness/30",
 					inputStringIndexes: []string{"42"},
-					output:             &validator.GetLivenessResponse{},
+					output:             &apimiddleware.LivenessResponseJson{},
 					err:                errors.New("custom error"),
 				},
 			},
@@ -585,14 +589,17 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			getLivenessInterfaces: []struct {
 				inputUrl           string
 				inputStringIndexes []string
-				output             *validator.GetLivenessResponse
+				output             *apimiddleware.LivenessResponseJson
 				err                error
 			}{
 				{
 					inputUrl:           "/zond/v1/validator/liveness/30",
 					inputStringIndexes: []string{"42"},
-					output: &validator.GetLivenessResponse{
-						Data: []*validator.ValidatorLiveness{nil},
+					output: &apimiddleware.LivenessResponseJson{
+						Data: []*struct {
+							Index  string `json:"index"`
+							IsLive bool   `json:"is_live"`
+						}{nil},
 					},
 				},
 			},
@@ -608,20 +615,23 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			getLivenessInterfaces: []struct {
 				inputUrl           string
 				inputStringIndexes []string
-				output             *validator.GetLivenessResponse
+				output             *apimiddleware.LivenessResponseJson
 				err                error
 			}{
 				{
 					inputUrl:           "/zond/v1/validator/liveness/30",
 					inputStringIndexes: []string{"42"},
-					output: &validator.GetLivenessResponse{
-						Data: []*validator.ValidatorLiveness{},
+					output: &apimiddleware.LivenessResponseJson{
+						Data: []*struct {
+							Index  string `json:"index"`
+							IsLive bool   `json:"is_live"`
+						}{},
 					},
 				},
 				{
 					inputUrl:           "/zond/v1/validator/liveness/31",
 					inputStringIndexes: []string{"42"},
-					output:             &validator.GetLivenessResponse{},
+					output:             &apimiddleware.LivenessResponseJson{},
 					err:                errors.New("custom error"),
 				},
 			},
@@ -637,21 +647,27 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			getLivenessInterfaces: []struct {
 				inputUrl           string
 				inputStringIndexes []string
-				output             *validator.GetLivenessResponse
+				output             *apimiddleware.LivenessResponseJson
 				err                error
 			}{
 				{
 					inputUrl:           "/zond/v1/validator/liveness/30",
 					inputStringIndexes: []string{"42"},
-					output: &validator.GetLivenessResponse{
-						Data: []*validator.ValidatorLiveness{},
+					output: &apimiddleware.LivenessResponseJson{
+						Data: []*struct {
+							Index  string `json:"index"`
+							IsLive bool   `json:"is_live"`
+						}{},
 					},
 				},
 				{
 					inputUrl:           "/zond/v1/validator/liveness/31",
 					inputStringIndexes: []string{"42"},
-					output: &validator.GetLivenessResponse{
-						Data: []*validator.ValidatorLiveness{},
+					output: &apimiddleware.LivenessResponseJson{
+						Data: []*struct {
+							Index  string `json:"index"`
+							IsLive bool   `json:"is_live"`
+						}{},
 					},
 				},
 			},
@@ -667,14 +683,17 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			getLivenessInterfaces: []struct {
 				inputUrl           string
 				inputStringIndexes []string
-				output             *validator.GetLivenessResponse
+				output             *apimiddleware.LivenessResponseJson
 				err                error
 			}{
 				{
 					inputUrl:           "/zond/v1/validator/liveness/30",
 					inputStringIndexes: []string{"42"},
-					output: &validator.GetLivenessResponse{
-						Data: []*validator.ValidatorLiveness{
+					output: &apimiddleware.LivenessResponseJson{
+						Data: []*struct {
+							Index  string `json:"index"`
+							IsLive bool   `json:"is_live"`
+						}{
 							{
 								Index: "42",
 							},
@@ -684,8 +703,11 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 				{
 					inputUrl:           "/zond/v1/validator/liveness/31",
 					inputStringIndexes: []string{"42"},
-					output: &validator.GetLivenessResponse{
-						Data: []*validator.ValidatorLiveness{},
+					output: &apimiddleware.LivenessResponseJson{
+						Data: []*struct {
+							Index  string `json:"index"`
+							IsLive bool   `json:"is_live"`
+						}{},
 					},
 				},
 			},
@@ -718,7 +740,7 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			}
 
 			// if testCase.getForkOutput != nil {
-			// 	stateForkResponseJson := beacon.GetStateForkResponse{}
+			// 	stateForkResponseJson := apimiddleware.StateForkResponseJson{}
 
 			// 	jsonRestHandler.EXPECT().GetRestJsonResponse(
 			// 		ctx,
@@ -734,7 +756,7 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			// }
 
 			if testCase.getHeadersOutput != nil {
-				blockHeadersResponseJson := beacon.GetBlockHeadersResponse{}
+				blockHeadersResponseJson := apimiddleware.BlockHeadersResponseJson{}
 
 				jsonRestHandler.EXPECT().GetRestJsonResponse(
 					ctx,
@@ -765,7 +787,7 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 
 			if testCase.getLivenessInterfaces != nil {
 				for _, iface := range testCase.getLivenessInterfaces {
-					livenessResponseJson := validator.GetLivenessResponse{}
+					livenessResponseJson := apimiddleware.LivenessResponseJson{}
 
 					marshalledIndexes, err := json.Marshal(iface.inputStringIndexes)
 					require.NoError(t, err)
