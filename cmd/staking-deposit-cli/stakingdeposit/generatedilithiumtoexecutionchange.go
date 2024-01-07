@@ -168,6 +168,9 @@ func ValidateDilithiumToExecutionChange(dilithiumToExecutionChange *DilithiumToE
 		chainSetting.GenesisForkVersion,    /*forkVersion*/
 		chainSetting.GenesisValidatorsRoot, /*genesisValidatorsRoot*/
 	)
+	if err != nil {
+		panic(fmt.Errorf("failed to compute domain %v", err))
+	}
 
 	signingData := &zondpb.SigningData{
 		ObjectRoot: root[:],

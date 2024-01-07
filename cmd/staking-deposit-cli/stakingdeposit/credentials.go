@@ -43,14 +43,22 @@ func (c *Credentials) ExportDepositDataJSON(folder string) (string, error) {
 		return "", err
 	}
 
-	// TODO(rgeraldes24): there is a new version on the latest qrysm repo
-	// if runtime.GOOS == "linux" {
-	// 	if err = os.WriteFile(fileFolder, jsonDepositDataList, 0440); err != nil {
-	// 		return "", err
-	// 	}
-	// }
-	if err = os.WriteFile(fileFolder, jsonDepositDataList, 0440); err != nil {
+	f, err := os.Create(fileFolder)
+	if err != nil {
 		return "", err
+	}
+	defer f.Close()
+
+	if _, err := f.Write(jsonDepositDataList); err != nil {
+		return "", err
+	}
+	if err := f.Sync(); err != nil {
+		return "", err
+	}
+	if runtime.GOOS != "windows" {
+		if err := os.Chmod(fileFolder, 0440); err != nil {
+			return "", err
+		}
 	}
 
 	return fileFolder, nil
@@ -78,13 +86,25 @@ func (c *Credentials) ExportDilithiumToExecutionChangeJSON(folder string, valida
 		return "", err
 	}
 
-	if runtime.GOOS == "linux" {
-		err = os.WriteFile(fileFolder, jsonDepositDataList, 0440)
-		if err != nil {
+	f, err := os.Create(fileFolder)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	if _, err := f.Write(jsonDepositDataList); err != nil {
+		return "", err
+	}
+	if err := f.Sync(); err != nil {
+		return "", err
+	}
+	if runtime.GOOS != "windows" {
+		if err := os.Chmod(fileFolder, 0440); err != nil {
 			return "", err
 		}
 	}
-	return fileFolder, err
+
+	return fileFolder, nil
 }
 
 func NewCredentialsFromSeed(seed string, numKeys uint64, amounts []uint64,

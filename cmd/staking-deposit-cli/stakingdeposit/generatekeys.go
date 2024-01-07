@@ -139,6 +139,10 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 		config.ToHex(depositData.ForkVersion), /*forkVersion*/
 		nil,                                   /*genesisValidatorsRoot*/
 	)
+	if err != nil {
+		panic(fmt.Errorf("could not get compute domain | reason %v", err))
+	}
+
 	signingData := &zondpb.SigningData{
 		ObjectRoot: root[:],
 		Domain:     domain,
