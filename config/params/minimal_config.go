@@ -23,8 +23,8 @@ func MinimalSpecConfig() *BeaconChainConfig {
 
 	// Gwei values
 	minimalConfig.MinDepositAmount = 1e9
-	minimalConfig.MaxEffectiveBalance = 32e9
-	minimalConfig.EjectionBalance = 16e9
+	minimalConfig.MaxEffectiveBalance = 40000e9
+	minimalConfig.EjectionBalance = 20000e9
 	minimalConfig.EffectiveBalanceIncrement = 1e9
 
 	// Initial values
@@ -44,7 +44,7 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.ShardCommitteePeriod = 64
 	minimalConfig.MinEpochsToInactivityPenalty = 4
 	minimalConfig.Zond1FollowDistance = 16
-	minimalConfig.SecondsPerZOND1Block = 14
+	minimalConfig.SecondsPerZOND1Block = 60
 
 	// State vector lengths
 	minimalConfig.EpochsPerHistoricalVector = 64
