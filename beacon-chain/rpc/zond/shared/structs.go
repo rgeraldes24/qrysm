@@ -9,7 +9,7 @@ import (
 )
 
 type Attestation struct {
-	ParticipationBits string           `json:"participation_bits" validate:"required,hexadecimal"`
+	ParticipationBits string           `json:"aggregation_bits" validate:"required,hexadecimal"`
 	Data              *AttestationData `json:"data" validate:"required"`
 	Signatures        []string         `json:"signatures" validate:"required,hexadecimal"`
 }
@@ -42,7 +42,7 @@ type SyncCommitteeContribution struct {
 	Slot              string   `json:"slot" validate:"required,number,gte=0"`
 	BeaconBlockRoot   string   `json:"beacon_block_root" hex:"true" validate:"required,hexadecimal"`
 	SubcommitteeIndex string   `json:"subcommittee_index" validate:"required,number,gte=0"`
-	ParticipationBits string   `json:"participation_bits" hex:"true" validate:"required,hexadecimal"`
+	ParticipationBits string   `json:"aggregation_bits" hex:"true" validate:"required,hexadecimal"`
 	Signatures        []string `json:"signatures" hex:"true" validate:"required,hexadecimal"`
 }
 
@@ -234,31 +234,5 @@ func (c *Checkpoint) ToConsensus() (*zond.Checkpoint, error) {
 	return &zond.Checkpoint{
 		Epoch: primitives.Epoch(epoch),
 		Root:  root,
-	}, nil
-}
-
-type Fork struct {
-	PreviousVersion string `json:"previous_version"`
-	CurrentVersion  string `json:"current_version"`
-	Epoch           string `json:"epoch"`
-}
-
-func (s *Fork) ToConsensus() (*zond.Fork, error) {
-	previousVersion, err := hexutil.Decode(s.PreviousVersion)
-	if err != nil {
-		return nil, NewDecodeError(err, "PreviousVersion")
-	}
-	currentVersion, err := hexutil.Decode(s.CurrentVersion)
-	if err != nil {
-		return nil, NewDecodeError(err, "CurrentVersion")
-	}
-	epoch, err := strconv.ParseUint(s.Epoch, 10, 64)
-	if err != nil {
-		return nil, NewDecodeError(err, "Epoch")
-	}
-	return &zond.Fork{
-		PreviousVersion: previousVersion,
-		CurrentVersion:  currentVersion,
-		Epoch:           primitives.Epoch(epoch),
 	}, nil
 }

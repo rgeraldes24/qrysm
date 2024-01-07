@@ -3,6 +3,7 @@ package blockchain
 import (
 	"github.com/theQRL/qrysm/v4/async/event"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
+	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
 	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution"
@@ -61,7 +62,7 @@ func WithExecutionEngineCaller(c execution.EngineCaller) Option {
 }
 
 // WithDepositCache for deposit lifecycle after chain inclusion.
-func WithDepositCache(c *cache.DepositCache) Option {
+func WithDepositCache(c *depositcache.DepositCache) Option {
 	return func(s *Service) error {
 		s.cfg.DepositCache = c
 		return nil

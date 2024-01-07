@@ -3,7 +3,6 @@ package blockchain
 import (
 	"bytes"
 	"context"
-	"time"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
@@ -13,7 +12,6 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/features"
-	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -22,6 +20,7 @@ import (
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
+	"github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
 	"golang.org/x/sync/errgroup"
@@ -33,10 +32,8 @@ var epochsSinceFinalitySaveHotStateDB = primitives.Epoch(100)
 // BlockReceiver interface defines the methods of chain service for receiving and processing new blocks.
 type BlockReceiver interface {
 	ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySignedBeaconBlock, blockRoot [32]byte) error
-	ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock) error
+	ReceiveBlockBatch(ctx context.Context, blocks []interfaces.ReadOnlySignedBeaconBlock, blkRoots [][32]byte) error
 	HasBlock(ctx context.Context, root [32]byte) bool
-	RecentBlockSlot(root [32]byte) (primitives.Slot, error)
-	BlockBeingSynced([32]byte) bool
 }
 
 // SlashingReceiver interface defines the methods of chain service for receiving validated slashing over the wire.
@@ -53,9 +50,6 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	ctx, span := trace.StartSpan(ctx, "blockChain.ReceiveBlock")
 	defer span.End()
 	receivedTime := time.Now()
-	s.blockBeingSynced.set(blockRoot)
-	defer s.blockBeingSynced.unset(blockRoot)
-
 	blockCopy, err := block.Copy()
 	if err != nil {
 		return err
@@ -100,6 +94,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	if err := s.savePostStateInfo(ctx, blockRoot, blockCopy, postState); err != nil {
 		return errors.Wrap(err, "could not save post state info")
 	}
+
 	if err := s.postBlockProcess(ctx, blockCopy, blockRoot, postState, isValidPayload); err != nil {
 		err := errors.Wrap(err, "could not process block")
 		tracing.AnnotateError(span, err)
@@ -176,7 +171,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 // ReceiveBlockBatch processes the whole block batch at once, assuming the block batch is linear ,transitioning
 // the state, performing batch verification of all collected signatures and then performing the appropriate
 // actions for a block post-transition.
-func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock) error {
+func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []interfaces.ReadOnlySignedBeaconBlock, blkRoots [][32]byte) error {
 	ctx, span := trace.StartSpan(ctx, "blockChain.ReceiveBlockBatch")
 	defer span.End()
 
@@ -184,21 +179,20 @@ func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock
 	defer s.cfg.ForkChoiceStore.Unlock()
 
 	// Apply state transition on the incoming newly received block batches, one by one.
-	if err := s.onBlockBatch(ctx, blocks); err != nil {
+	if err := s.onBlockBatch(ctx, blocks, blkRoots); err != nil {
 		err := errors.Wrap(err, "could not process block in batch")
 		tracing.AnnotateError(span, err)
 		return err
 	}
 
-	lastBR := blocks[len(blocks)-1].Root()
+	lastBR := blkRoots[len(blkRoots)-1]
 	optimistic, err := s.cfg.ForkChoiceStore.IsOptimistic(lastBR)
 	if err != nil {
 		lastSlot := blocks[len(blocks)-1].Block().Slot()
 		log.WithError(err).Errorf("Could not check if block is optimistic, Root: %#x, Slot: %d", lastBR, lastSlot)
 		optimistic = true
 	}
-
-	for _, b := range blocks {
+	for i, b := range blocks {
 		blockCopy, err := b.Copy()
 		if err != nil {
 			return err
@@ -208,7 +202,7 @@ func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock
 			Type: statefeed.BlockProcessed,
 			Data: &statefeed.BlockProcessedData{
 				Slot:        blockCopy.Block().Slot(),
-				BlockRoot:   b.Root(),
+				BlockRoot:   blkRoots[i],
 				SignedBlock: blockCopy,
 				Verified:    true,
 				Optimistic:  optimistic,
@@ -241,11 +235,6 @@ func (s *Service) ReceiveBlockBatch(ctx context.Context, blocks []blocks.ROBlock
 // HasBlock returns true if the block of the input root exists in initial sync blocks cache or DB.
 func (s *Service) HasBlock(ctx context.Context, root [32]byte) bool {
 	return s.hasBlockInInitSyncOrDB(ctx, root)
-}
-
-// RecentBlockSlot returns block slot form fork choice store
-func (s *Service) RecentBlockSlot(root [32]byte) (primitives.Slot, error) {
-	return s.cfg.ForkChoiceStore.Slot(root)
 }
 
 // ReceiveAttesterSlashing receives an attester slashing and inserts it to forkchoice

@@ -1,9 +1,7 @@
 package api
 
 const (
-	VersionHeader                 = "Zond-Consensus-Version"
-	ExecutionPayloadBlindedHeader = "Zond-Execution-Payload-Blinded"
-	ExecutionPayloadValueHeader   = "Zond-Execution-Payload-Value"
-	JsonMediaType                 = "application/json"
-	OctetStreamMediaType          = "application/octet-stream"
+	VersionHeader        = "Zond-Consensus-Version"
+	JsonMediaType        = "application/json"
+	OctetStreamMediaType = "application/octet-stream"
 )

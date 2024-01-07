@@ -15,11 +15,9 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/go-qrllib/dilithium"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
 	"github.com/theQRL/qrysm/v4/network"
 	"github.com/theQRL/qrysm/v4/network/authorization"
@@ -250,13 +248,9 @@ func (c *Client) RegisterValidator(ctx context.Context, svr []*zondpb.SignedVali
 		tracing.AnnotateError(span, err)
 		return err
 	}
-	vs := make([]*shared.SignedValidatorRegistration, len(svr))
+	vs := make([]*SignedValidatorRegistration, len(svr))
 	for i := 0; i < len(svr); i++ {
-		svrJson, err := shared.SignedValidatorRegistrationFromConsensus(svr[i])
-		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("failed to encode to SignedValidatorRegistration at index %d", i))
-		}
-		vs[i] = svrJson
+		vs[i] = &SignedValidatorRegistration{SignedValidatorRegistrationV1: svr[i]}
 	}
 	body, err := json.Marshal(vs)
 	if err != nil {
@@ -281,10 +275,7 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not get protobuf block")
 		}
-		b, err := shared.SignedBlindedBeaconBlockCapellaFromConsensus(&zondpb.SignedBlindedBeaconBlock{Block: psb.Block, Signature: bytesutil.SafeCopyBytes(psb.Signature)})
-		if err != nil {
-			return nil, errors.Wrapf(err, "could not convert SignedBlindedBeaconBlockCapella to json marshalable type")
-		}
+		b := &SignedBlindedBeaconBlock{SignedBlindedBeaconBlock: psb}
 		body, err := json.Marshal(b)
 		if err != nil {
 			return nil, errors.Wrap(err, "error encoding the SignedBlindedBeaconBlockCapella value body in SubmitBlindedBlockCapella")
@@ -309,12 +300,7 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not extract proto message from payload")
 		}
-
-		payload, err := blocks.WrappedExecutionPayload(p, 0)
-		if err != nil {
-			return nil, errors.Wrapf(err, "could not wrap execution payload in interface")
-		}
-		return payload, nil
+		return blocks.WrappedExecutionPayload(p, 0)
 	default:
 		return nil, fmt.Errorf("unsupported block version %s", version.String(sb.Version()))
 	}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/common"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -236,8 +235,7 @@ func (s *Service) insertFinalizedDeposits(ctx context.Context, fRoot [32]byte) {
 	// to be included(rather than the last one to be processed). This was most likely
 	// done as the state cannot represent signed integers.
 	finalizedZond1DepIdx := zond1DepositIndex - 1
-	if err = s.cfg.DepositCache.InsertFinalizedDeposits(ctx, int64(finalizedZond1DepIdx), common.Hash(finalizedState.Zond1Data().BlockHash),
-		0 /* Setting a zero value as we have no access to block height */); err != nil {
+	if err = s.cfg.DepositCache.InsertFinalizedDeposits(ctx, int64(finalizedZond1DepIdx)); err != nil {
 		log.WithError(err).Error("could not insert finalized deposits")
 		return
 	}
@@ -249,7 +247,7 @@ func (s *Service) insertFinalizedDeposits(ctx context.Context, fRoot [32]byte) {
 	// to the provided zond1 deposit index.
 	s.cfg.DepositCache.PrunePendingDeposits(ctx, int64(zond1DepositIndex)) // lint:ignore uintcast -- Deposit index should not exceed int64 in your lifetime.
 
-	log.WithField("duration", time.Since(startTime).String()).Debugf("Finalized deposit insertion completed at index %d", finalizedZond1DepIdx)
+	log.WithField("duration", time.Since(startTime).String()).Debug("Finalized deposit insertion completed")
 }
 
 // This ensures that the input root defaults to using genesis root instead of zero hashes. This is needed for handling
