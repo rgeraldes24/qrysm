@@ -1,7 +1,7 @@
 package state_native_test
 
 import (
-	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"

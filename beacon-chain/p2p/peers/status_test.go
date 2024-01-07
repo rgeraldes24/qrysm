@@ -10,7 +10,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	ma "github.com/multiformats/go-multiaddr"
-	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-zond/p2p/enr"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/peers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/peers/peerdata"

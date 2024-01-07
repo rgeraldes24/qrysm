@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time"

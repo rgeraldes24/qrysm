@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/prysmaticlabs/go-bitfield"
 	log "github.com/sirupsen/logrus"
+	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"

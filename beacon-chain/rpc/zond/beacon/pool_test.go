@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/go-bitfield"
 	grpcutil "github.com/theQRL/qrysm/v4/api/grpc"
 	blockchainmock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"

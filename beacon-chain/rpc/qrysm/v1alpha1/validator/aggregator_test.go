@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/go-bitfield"
 	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"

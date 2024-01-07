@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-zond/common/hexutil"
 	v1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"

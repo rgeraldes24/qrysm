@@ -6,7 +6,7 @@ package state
 import (
 	"context"
 
-	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"

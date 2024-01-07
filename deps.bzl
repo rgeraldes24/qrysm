@@ -37,8 +37,8 @@ def qrysm_deps():
     go_repository(
         name = "co_honnef_go_tools",
         importpath = "honnef.co/go/tools",
-        sum = "h1:qTakTkI6ni6LFD5sBwwsdSO+AQqbSIxOauHTTQKZ/7o=",
-        version = "v0.1.3",
+        sum = "h1:UoveltGrhghAA7ePc+e+QYDHXrBps2PqFZiHkGR/xK8=",
+        version = "v0.0.1-2020.1.4",
     )
 
     go_repository(
@@ -909,8 +909,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_edsrzf_mmap_go",
         importpath = "github.com/edsrzf/mmap-go",
-        sum = "h1:6EUwBLQ/Mcr1EYLE4Tn1VdW1A4ckqCQWZBw8Hr0kjpQ=",
-        version = "v1.1.0",
+        sum = "h1:CEBF7HpRnUCSJgGUb5h1Gm7e3VkmVDrR8lvWVLtrOFw=",
+        version = "v1.0.0",
     )
     go_repository(
         name = "com_github_eknkc_amber",
@@ -981,8 +981,8 @@ def qrysm_deps():
         patches = [
             "//third_party:com_github_ethereum_go_ethereum_secp256k1.patch",
         ],
-        sum = "h1:bdnhLPtqETd4m3mS8BGMNvBTf36bO5bx/hxE2zljOa0=",
-        version = "v1.12.0",
+        sum = "h1:i/7d9RBBwiXCEuyduBQzJw/mKmnvzsN14jqBmytw72s=",
+        version = "v1.10.26",
     )
 
     go_repository(
@@ -1322,8 +1322,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_go_sql_driver_mysql",
         importpath = "github.com/go-sql-driver/mysql",
-        sum = "h1:g24URVg0OFbNUTx9qqY1IRZ9D9z3iPyi5zKhQZpNwpA=",
-        version = "v1.4.1",
+        sum = "h1:7LxgVwFb2hIQtMm87NdgAVfXjnt4OePseqT1tKx+opk=",
+        version = "v1.4.0",
     )
 
     go_repository(
@@ -2101,8 +2101,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_jmespath_go_jmespath",
         importpath = "github.com/jmespath/go-jmespath",
-        sum = "h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=",
-        version = "v0.4.0",
+        sum = "h1:pmfjZENx5imkbgOkpRUYLnmbU7UEFbjtDA2hxJ1ichM=",
+        version = "v0.0.0-20180206201540-c2b33e8439af",
     )
     go_repository(
         name = "com_github_jmespath_go_jmespath_internal_testify",
@@ -3124,8 +3124,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_pborman_uuid",
         importpath = "github.com/pborman/uuid",
-        sum = "h1:+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw=",
-        version = "v1.2.1",
+        sum = "h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=",
+        version = "v1.2.0",
     )
     go_repository(
         name = "com_github_pelletier_go_toml",
@@ -3254,8 +3254,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_prometheus_tsdb",
         importpath = "github.com/prometheus/tsdb",
-        sum = "h1:If5rVCMTp6W2SiRAQFlbpJNgVlgMEd+U2GZckwK38ic=",
-        version = "v0.10.0",
+        sum = "h1:YZcsG11NqnK4czYLrWd9mpEuAJIHVQLwdrleYfszMAA=",
+        version = "v0.7.1",
     )
     go_repository(
         name = "com_github_prysmaticlabs_fastssz",
@@ -3265,10 +3265,10 @@ def qrysm_deps():
     )
 
     go_repository(
-        name = "com_github_prysmaticlabs_go_bitfield",
-        importpath = "github.com/prysmaticlabs/go-bitfield",
-        sum = "h1:0tVE4tdWQK9ZpYygoV7+vS6QkDvQVySboMVEIxBJmXw=",
-        version = "v0.0.0-20210809151128-385d8c5e3fb7",
+        name = "com_github_theqrl_go_bitfield",
+        importpath = "github.com/theQRL/go-bitfield",
+        sum = "h1:cU1QlEDDZ3zI6uya2Bbz+ldjvy+j6yhTmDtLkipDvz4=",
+        version = "v0.0.0-20231204084259-f3b877be8f63",
     )
     go_repository(
         name = "com_github_prysmaticlabs_gohashtree",
@@ -3718,8 +3718,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_spf13_cobra",
         importpath = "github.com/spf13/cobra",
-        sum = "h1:X+jTBEBqF0bHN+9cSMgmfuvv2VHJ9ezmFNf9Y/XstYU=",
-        version = "v1.5.0",
+        sum = "h1:O63eWlXlvyw4YdsuatjRIU6emvJ2fqz+PTdMEoxIT2s=",
+        version = "v1.0.1-0.20201006035406-b97b5ead31f7",
     )
     go_repository(
         name = "com_github_spf13_jwalterweatherman",
@@ -3744,8 +3744,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_stackexchange_wmi",
         importpath = "github.com/StackExchange/wmi",
-        sum = "h1:VIkavFPXSjcnS+O8yTq7NI32k0R5Aj+v39y29VYDOSA=",
-        version = "v1.2.1",
+        sum = "h1:fLjPD/aNc3UIOA6tDi6QXUemppXK3P9BI7mr2hd6gx8=",
+        version = "v0.0.0-20180116203802-5d049714c4a6",
     )
     go_repository(
         name = "com_github_status_im_keycard_go",
@@ -5493,6 +5493,12 @@ def go_dependencies():
         importpath = "github.com/mmcloughlin/profile",
         sum = "h1:jhDmAqPyebOsVDOCICJoINoLb/AnLBaUw58nFzxWS2w=",
         version = "v0.1.1",
+    )
+    go_repository(
+        name = "com_github_prysmaticlabs_go_bitfield",
+        importpath = "github.com/prysmaticlabs/go-bitfield",
+        sum = "h1:Ws/Of2yg9JTVV9n8lQGXAf1RDDNthAu3SvTj93HkHgM=",
+        version = "v0.0.0-20210108222456-8e92c3709aa0",
     )
 
     go_repository(

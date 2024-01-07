@@ -11,7 +11,7 @@ import (
 
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/host"
-	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-zond/p2p/discover"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/peers"

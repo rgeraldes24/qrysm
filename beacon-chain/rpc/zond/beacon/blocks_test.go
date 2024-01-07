@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/prysmaticlabs/go-bitfield"
+	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/v4/api"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"

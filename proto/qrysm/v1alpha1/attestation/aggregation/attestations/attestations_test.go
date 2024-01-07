@@ -6,8 +6,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/sirupsen/logrus"
+	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/v4/encoding/ssz/equality"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"

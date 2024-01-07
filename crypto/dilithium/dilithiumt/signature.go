@@ -14,7 +14,7 @@ import (
 
 var ErrSignatureVerificationFailed = errors.New("signature verification failed")
 
-// Signature used in the BLS signature scheme.
+// Signature used in the Dilithium signature scheme.
 type Signature struct {
 	s *[dilithium.CryptoBytes]uint8
 }
@@ -135,6 +135,7 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgsBatches [][32]byte, pu
 					return err
 				}
 				if !ok {
+					// TODO(rgeraldes24): add index to know which verification failed
 					return ErrSignatureVerificationFailed
 				}
 
