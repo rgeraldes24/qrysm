@@ -49,15 +49,17 @@ jobs:
       - *restore_bazel_cache
       - *set_bazelrc
       - run: |
-          # bin/bazel build --config=release --config=linux_amd64 --define=blst_modern=false //cmd/beacon-chain
           rm -rf /tmp/bazel-cache/output-root/install
-          bin/bazel build --config=release --define=blst_modern=false //cmd/beacon-chain
-          #cp bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /tmp/beacon-chain-${CIRCLE_TAG}-linux-amd64
-          cp bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /tmp/beacon-chain
-          #(cd /tmp && sha256sum beacon-chain-${CIRCLE_TAG}-linux-amd64 > beacon-chain-${CIRCLE_TAG}-linux-amd64.sha256)
-          (cd /tmp && sha256sum beacon-chain > beacon-chain.sha256)
-          # TODO(rgeraldes24): replace default key
-          #gpg -o /tmp/beacon-chain-${CIRCLE_TAG}-linux-amd64.sig --default-key 0AE0051D647BA3C1A917AF4072E33E4DF1A5036E --sign --detach-sig /tmp/beacon-chain-${CIRCLE_TAG}-linux-amd64
+          
+          bin/bazel build --config=release --config=linux_amd64 --define=blst_modern=false //cmd/beacon-chain //cmd/validator
+          
+          cp bazel-bin/cmd/beacon-chain/beacon-chain_/beacon-chain /tmp/beacon-chain-${CIRCLE_TAG}-linux-amd64
+          cp bazel-bin/cmd/validator/validator_/validator /tmp/validator-${CIRCLE_TAG}-linux-amd64
+
+          (cd /tmp && sha256sum beacon-chain-${CIRCLE_TAG}-linux-amd64 > beacon-chain-${CIRCLE_TAG}-linux-amd64.sha256)
+          (cd /tmp && sha256sum validator-${CIRCLE_TAG}-linux-amd64 > validator-${CIRCLE_TAG}-linux-amd64.sha256)
+
+          # TODO(rgeraldes24): replace default key --default-key 0AE0051D647BA3C1A917AF4072E33E4DF1A5036E 
           # TODO(rgeraldes24): remove as soon as the key is available in the machine
           gpg --full-gen-key --batch <(echo "Key-Type: 1"; \
                              echo "Key-Length: 4096"; \
@@ -67,14 +69,18 @@ jobs:
                              echo "Name-Real: Root Superuser"; \
                              echo "Name-Email: root@handbook.westarete.com"; \
                              echo "%no-protection"; )
-          gpg -o /tmp/beacon-chain.sig --sign --detach-sig /tmp/beacon-chain
-          #./hack/upload-github-release-asset.sh github_api_token=$TOKEN owner=prysmaticlabs repo=prysm tag=${CIRCLE_TAG} filename=/tmp/beacon-chain-${CIRCLE_TAG}-linux-amd64
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=prysm tag=v0.1.0 filename=/tmp/beacon-chain
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=prysm tag=v0.1.0 filename=/tmp/beacon-chain.sha256
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=prysm tag=v0.1.0 filename=/tmp/beacon-chain.sig
+          gpg -o /tmp/beacon-chain-${CIRCLE_TAG}-linux-amd64.sig --sign --detach-sig /tmp/beacon-chain-${CIRCLE_TAG}-linux-amd64
+          gpg -o /tmp/validator-${CIRCLE_TAG}-linux-amd64.sig --sign --detach-sig /tmp/validator-${CIRCLE_TAG}-linux-amd64
+
+          # TODO(rgeraldes24): change owner to 'theQRL' and repo to 'qrysm' and tag to ${CIRCLE_TAG}
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=prysm tag=v0.1.0 filename=/tmp/beacon-chain-${CIRCLE_TAG}-linux-amd64
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=prysm tag=v0.1.0 filename=/tmp/beacon-chain-${CIRCLE_TAG}-linux-amd64.sha256
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=prysm tag=v0.1.0 filename=/tmp/beacon-chain-${CIRCLE_TAG}-linux-amd64.sig
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=prysm tag=v0.1.0 filename=/tmp/validator-${CIRCLE_TAG}-linux-amd64
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=prysm tag=v0.1.0 filename=/tmp/validator-${CIRCLE_TAG}-linux-amd64.sha256
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=prysm tag=v0.1.0 filename=/tmp/validator-${CIRCLE_TAG}-linux-amd64.sig
       - *clean_bazel_cache
       - *save_bazel_cache
-
 
   # publish-windows-amd64-beacon-chain-binary:
   #   docker:
@@ -126,11 +132,12 @@ workflows:
   release:
     jobs:
       - publish-linux-amd64-beacon-chain-binary
+      - publish-linux-arm64-beacon-chain-binary
+      #- publish-windows-amd64-beacon-chain-binary
+      #- publish-darwin-amd64-beacon-chain-binary
           # filters:
           #   tags:
           #     only: /^circlev.*/
           #     #only: /^v.*/
           #   # branches:
           #   #   ignore: /.*/
-      #- publish-windows-amd64-beacon-chain-binary
-      #- publish-darwin-amd64-beacon-chain-binary
