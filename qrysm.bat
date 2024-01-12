@@ -47,7 +47,9 @@ if %WinOS%==64BIT (
 mkdir %wrapper_dir%
 
 REM get_qrysm_version - Find the latest Qrysm version available for download.
-(for /f %%i in ('curl -f -s https://prysmaticlabs.com/releases/latest') do set qrysm_version=%%i) || (echo [31mERROR: Starting qrysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/theQRL/qrysm/releases/ [0m && exit /b 1)
+:: TODO(rgeraldes24): windows does not support the jq command the way we do for the unix version
+:: (for /f %%i in ('curl -f -s https://prysmaticlabs.com/releases/latest') do set qrysm_version=%%i) || (echo [31mERROR: Starting qrysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/theQRL/qrysm/releases/ [0m && exit /b 1)
+set qrysm_version="v0.1.1"
 echo [37mLatest qrysm release is %qrysm_version%.[0m
 IF defined USE_QRYSM_VERSION (
     echo [33mdetected variable USE_QRYSM_VERSION=%USE_QRYSM_VERSION%[0m
@@ -67,14 +69,14 @@ if "%~1"=="beacon-chain" (
         echo [32mBeacon chain is up to date.[0m
     ) else (
         echo [35mDownloading beacon chain %qrysm_version% to %BEACON_CHAIN_REAL% %reason%[0m
-		for /f "delims=" %%i in ('curl --silent -o nul -w "%%{http_code}" https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch% ') do set "http=%%i" && echo %%i
+        for /f "delims=" %%i in ('curl --silent -o nul -w "%%{http_code}" https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/beacon-chain-%qrysm_version%-%system%-%arch% ') do set "http=%%i" && echo %%i
 		if "!http!"=="404" (
 			echo [35mNo qrysm beacon chain found for %qrysm_version%[0m
 			exit /b 1
 		)	
-		curl -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch% -o %BEACON_CHAIN_REAL%
-		curl --silent -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch%.sha256 -o %wrapper_dir%\beacon-chain-%qrysm_version%-%system%-%arch%.sha256
-		curl --silent -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch%.sig -o %wrapper_dir%\beacon-chain-%qrysm_version%-%system%-%arch%.sig
+		curl -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/beacon-chain-%qrysm_version%-%system%-%arch% -o %BEACON_CHAIN_REAL%
+		curl --silent -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/beacon-chain-%qrysm_version%-%system%-%arch%.sha256 -o %wrapper_dir%\beacon-chain-%qrysm_version%-%system%-%arch%.sha256
+		curl --silent -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/beacon-chain-%qrysm_version%-%system%-%arch%.sig -o %wrapper_dir%\beacon-chain-%qrysm_version%-%system%-%arch%.sig
     )
 )
 
@@ -83,14 +85,14 @@ if "%~1"=="validator" (
         echo [32mValidator is up to date.[0m
     ) else (
         echo [35mDownloading validator %qrysm_version% to %VALIDATOR_REAL% %reason%[0m
-		for /f "delims=" %%i in ('curl --silent -o nul -w "%%{http_code}" https://prysmaticlabs.com/releases/validator-%qrysm_version%-%system%-%arch% ') do set "http=%%i" && echo %%i
+		for /f "delims=" %%i in ('curl --silent -o nul -w "%%{http_code}" https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/validator-%qrysm_version%-%system%-%arch% ') do set "http=%%i" && echo %%i
 		if "!http!"=="404"  (
 			echo [35mNo qrysm validator found for %qrysm_version%[0m
 			exit /b 1
 		)
-		curl -L https://prysmaticlabs.com/releases/validator-%qrysm_version%-%system%-%arch% -o %VALIDATOR_REAL%
-        curl --silent -L https://prysmaticlabs.com/releases/validator-%qrysm_version%-%system%-%arch%.sha256 -o %wrapper_dir%\validator-%qrysm_version%-%system%-%arch%.sha256
-        curl --silent -L https://prysmaticlabs.com/releases/validator-%qrysm_version%-%system%-%arch%.sig -o %wrapper_dir%\validator-%qrysm_version%-%system%-%arch%.sig
+		curl -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/validator-%qrysm_version%-%system%-%arch% -o %VALIDATOR_REAL%
+        curl --silent -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/validator-%qrysm_version%-%system%-%arch%.sha256 -o %wrapper_dir%\validator-%qrysm_version%-%system%-%arch%.sha256
+        curl --silent -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/validator-%qrysm_version%-%system%-%arch%.sig -o %wrapper_dir%\validator-%qrysm_version%-%system%-%arch%.sig
     )
 )
 
@@ -99,14 +101,14 @@ if "%~1"=="client-stats" (
         echo [32mClient-stats is up to date.[0m
     ) else (
         echo [35mDownloading client-stats %qrysm_version% to %CLIENT_STATS_REAL% %reason%[0m
-		for /f "delims=" %%i in ('curl --silent -o nul -w "%%{http_code}" https://prysmaticlabs.com/releases/client-stats-%qrysm_version%-%system%-%arch% ') do set "http=%%i" && echo %%i
+		for /f "delims=" %%i in ('curl --silent -o nul -w "%%{http_code}" https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/client-stats-%qrysm_version%-%system%-%arch% ') do set "http=%%i" && echo %%i
 		if "!http!"=="404" (
 			echo [35mNo qrysm client stats found for %qrysm_version%[0m
 			exit /b 1
 		)
-		curl -L https://prysmaticlabs.com/releases/client-stats-%qrysm_version%-%system%-%arch% -o %CLIENT_STATS_REAL%
-        curl --silent -L https://prysmaticlabs.com/releases/client-stats-%qrysm_version%-%system%-%arch%.sha256 -o %wrapper_dir%\client-stats-%qrysm_version%-%system%-%arch%.sha256
-        curl --silent -L https://prysmaticlabs.com/releases/client-stats-%qrysm_version%-%system%-%arch%.sig -o %wrapper_dir%\client-stats-%qrysm_version%-%system%-%arch%.sig
+		curl -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/client-stats-%qrysm_version%-%system%-%arch% -o %CLIENT_STATS_REAL%
+        curl --silent -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/client-stats-%qrysm_version%-%system%-%arch%.sha256 -o %wrapper_dir%\client-stats-%qrysm_version%-%system%-%arch%.sha256
+        curl --silent -L https://github.com/theQRL/qrysm/releases/download/%qrysm_version%/client-stats-%qrysm_version%-%system%-%arch%.sig -o %wrapper_dir%\client-stats-%qrysm_version%-%system%-%arch%.sig
     )
 )
 
