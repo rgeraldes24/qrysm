@@ -24,11 +24,6 @@ echo  set USE_QRYSM_VERSION=v1.0.0-alpha3
 echo  to resume using the latest release:
 echo   set USE_QRYSM_VERSION=
 echo.
-echo To specify a non-portable version of BLST:
-echo  set USE_QRYSM_MODERN=1
-echo  to resume using the portable version:
-echo  unset USE_QRYSM_MODERN=
-echo. 
 echo To automatically restart crashed processes:
 echo  set QRYSM_AUTORESTART=true^& .\qrysm.bat beacon-chain
 echo  to stop autorestart run:
@@ -63,11 +58,7 @@ IF defined USE_QRYSM_VERSION (
 )
 echo Using qrysm version %qrysm_version%.
 
-IF defined USE_QRYSM_MODERN (
-	set BEACON_CHAIN_REAL=%wrapper_dir%\beacon-chain-%qrysm_version%-modern-%system%-%arch%
-) else (
-	set BEACON_CHAIN_REAL=%wrapper_dir%\beacon-chain-%qrysm_version%-%system%-%arch%
-)
+set BEACON_CHAIN_REAL=%wrapper_dir%\beacon-chain-%qrysm_version%-%system%-%arch%
 set VALIDATOR_REAL=%wrapper_dir%\validator-%qrysm_version%-%system%-%arch%
 set CLIENT_STATS_REAL=%wrapper_dir%\client-stats-%qrysm_version%-%system%-%arch%
 
@@ -76,25 +67,14 @@ if "%~1"=="beacon-chain" (
         echo [32mBeacon chain is up to date.[0m
     ) else (
         echo [35mDownloading beacon chain %qrysm_version% to %BEACON_CHAIN_REAL% %reason%[0m
-		if defined USE_QRYSM_MODERN (
-			for /f "delims=" %%i in ('curl --silent -o nul -w "%%{http_code}" https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-modern-%system%-%arch% ') do set "http=%%i" && echo %%i
-		) else (
-			for /f "delims=" %%i in ('curl --silent -o nul -w "%%{http_code}" https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch% ') do set "http=%%i" && echo %%i
-		)
+		for /f "delims=" %%i in ('curl --silent -o nul -w "%%{http_code}" https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch% ') do set "http=%%i" && echo %%i
 		if "!http!"=="404" (
 			echo [35mNo qrysm beacon chain found for %qrysm_version%[0m
 			exit /b 1
 		)	
-		if defined USE_QRYSM_MODERN (
-			curl -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-modern-%system%-%arch% -o %BEACON_CHAIN_REAL%
-			curl --silent -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-modern-%system%-%arch%.sha256 -o %wrapper_dir%\beacon-chain-%qrysm_version%-modern-%system%-%arch%.sha256
-			curl --silent -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-modern-%system%-%arch%.sig -o %wrapper_dir%\beacon-chain-%qrysm_version%-modern-%system%-%arch%.sig
-		) else (
-
-			curl -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch% -o %BEACON_CHAIN_REAL%
-			curl --silent -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch%.sha256 -o %wrapper_dir%\beacon-chain-%qrysm_version%-%system%-%arch%.sha256
-			curl --silent -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch%.sig -o %wrapper_dir%\beacon-chain-%qrysm_version%-%system%-%arch%.sig
-		)
+		curl -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch% -o %BEACON_CHAIN_REAL%
+		curl --silent -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch%.sha256 -o %wrapper_dir%\beacon-chain-%qrysm_version%-%system%-%arch%.sha256
+		curl --silent -L https://prysmaticlabs.com/releases/beacon-chain-%qrysm_version%-%system%-%arch%.sig -o %wrapper_dir%\beacon-chain-%qrysm_version%-%system%-%arch%.sig
     )
 )
 

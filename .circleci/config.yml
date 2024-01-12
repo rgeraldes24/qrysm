@@ -144,6 +144,7 @@ jobs:
     steps:
       - checkout
       - setup-bazel
+      - *restore_bazel_cache
       - *set_bazelrc
       - run: |
           rm -rf /tmp/bazel-cache/output-root/install
@@ -151,6 +152,8 @@ jobs:
           bin/bazel build --config=release --config=osx_arm64_docker //cmd/beacon-chain //cmd/validator
       - prepare-publish-artifacts:
           platform: "darwin-arm64"
+      - *clean_bazel_cache
+      - *save_bazel_cache
           
   publish-windows-amd64-beacon-chain-binary:
     machine:
@@ -159,6 +162,7 @@ jobs:
     steps:
       - checkout
       - setup-bazel
+      - *restore_bazel_cache
       - *set_bazelrc
       - run: |
           rm -rf /tmp/bazel-cache/output-root/install
@@ -167,11 +171,13 @@ jobs:
       - prepare-publish-artifacts:
           platform: "windows-amd64"
           file_extension: ".exe"
+      - *clean_bazel_cache
+      - *save_bazel_cache
       
 workflows:
   release:
     jobs:
-      - publish-linux-amd64-beacon-chain-binary
+      - publish-linux-amd64-beacon-chain-binary:
           filters:
             <<: *filters-release
       - publish-linux-arm64-beacon-chain-binary:

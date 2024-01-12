@@ -170,22 +170,14 @@ get_qrysm_version
 
 color "37" "Latest Qrysm version is $qrysm_version."
 
-if [ "${USE_QRYSM_MODERN:=false}" = "true" ]; then
-    BEACON_CHAIN_REAL="${wrapper_dir}/beacon-chain-${qrysm_version}-modern-${system}-${arch}"
-else
-    BEACON_CHAIN_REAL="${wrapper_dir}/beacon-chain-${qrysm_version}-${system}-${arch}"
-fi
+BEACON_CHAIN_REAL="${wrapper_dir}/beacon-chain-${qrysm_version}-${system}-${arch}"
 VALIDATOR_REAL="${wrapper_dir}/validator-${qrysm_version}-${system}-${arch}"
 CLIENT_STATS_REAL="${wrapper_dir}/client-stats-${qrysm_version}-${system}-${arch}"
 
 if [[ $1 == beacon-chain ]]; then
     if [[ ! -x $BEACON_CHAIN_REAL ]]; then
         color "34" "Downloading beacon chain@${qrysm_version} to ${BEACON_CHAIN_REAL} (${reason})"
-        if [ "${USE_QRYSM_MODERN}" = "true" ]; then
-            file=beacon-chain-${qrysm_version}-modern-${system}-${arch}
-        else
-            file=beacon-chain-${qrysm_version}-${system}-${arch}
-        fi
+        file=beacon-chain-${qrysm_version}-${system}-${arch}
         #res=$(curl -w '%{http_code}\n' -f -L "https://prysmaticlabs.com/releases/${file}"  -o "$BEACON_CHAIN_REAL" | ( grep 404 || true ) )
         res=$(curl -w '%{http_code}\n' -f -L "https://github.com/theQRL/qrysm/releases/download/{qrysm_version}/${file}"  -o "$BEACON_CHAIN_REAL" | ( grep 404 || true ) )
         if [[ $res == 404 ]];then

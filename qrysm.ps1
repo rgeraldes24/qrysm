@@ -44,8 +44,11 @@ if (Test-Path env:USE_QRYSM_VERSION) {
 }
 else {
     try {
-        $response = Invoke-WebRequest -Uri "https://prysmaticlabs.com/releases/latest";
-        $version = $response.Content.Trim();
+        # TODO(rgeraldes24)
+        #$response = Invoke-WebRequest -Uri "https://prysmaticlabs.com/releases/latest";
+        #$version = $response.Content.Trim();
+        $version = "v0.1.1";
+
 
         Write-Host "Using (latest) qrysm version: $version";
     }
@@ -66,10 +69,13 @@ if ((Test-Path $folderBin) -and (Test-Path "$folderBin.sha256") -and (Test-Path 
 else {
     try {
         Write-Host "Downloading $fileName" -ForegroundColor Green;
-
-        Invoke-WebRequest -Uri "https://prysmaticlabs.com/releases/$fileName" -OutFile "$folderBin";
-        Invoke-WebRequest -Uri "https://prysmaticlabs.com/releases/$fileName.sha256" -OutFile "$folderBin.sha256";
-        Invoke-WebRequest -Uri "https://prysmaticlabs.com/releases/$fileName.sig" -OutFile "$folderBin.sig";
+        
+        #Invoke-WebRequest -Uri "https://prysmaticlabs.com/releases/$fileName" -OutFile "$folderBin";
+        #Invoke-WebRequest -Uri "https://prysmaticlabs.com/releases/$fileName.sha256" -OutFile "$folderBin.sha256";
+        #Invoke-WebRequest -Uri "https://prysmaticlabs.com/releases/$fileName.sig" -OutFile "$folderBin.sig";
+        Invoke-WebRequest -Uri "https://github.com/theQRL/qrysm/releases/download/$version/$fileName" -OutFile "$folderBin";
+        Invoke-WebRequest -Uri "https://github.com/theQRL/qrysm/releases/download/$version/$fileName.sha256" -OutFile "$folderBin.sha256";
+        Invoke-WebRequest -Uri "https://github.com/theQRL/qrysm/releases/download/$version/$fileName.sig" -OutFile "$folderBin.sig";
 
         Write-Host "Downloading complete!" -ForegroundColor Green;
     }
