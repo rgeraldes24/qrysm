@@ -12,7 +12,7 @@ set -eu
 # Use USE_QRYSM_VERSION to specify a specific release version.
 #   Example: USE_QRYSM_VERSION=v0.3.3 ./qrysm.sh beacon-chain
 
-readonly THEQRL_SIGNING_KEY=0AE0051D647BA3C1A917AF4072E33E4DF1A5036E
+readonly THEQRL_SIGNING_KEY=C6A8251946339065ECE9B1553D2EF77E42EB27AE
 
 function color() {
     # Usage: color "31;5" "string"
@@ -110,7 +110,8 @@ function get_qrysm_version() {
     else
         # Find the latest Qrysm version available for download.
         readonly reason="automatically selected latest available version"
-        qrysm_version=$(curl -f -s https://prysmaticlabs.com/releases/latest) || (color "31" "Starting qrysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/theQRL/qrysm/releases/" && exit 1)
+        #qrysm_version=$(curl -f -s https://prysmaticlabs.com/releases/latest) || (color "31" "Starting qrysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/theQRL/qrysm/releases/" && exit 1)
+        qrysm_version=$(curl -f -s https://api.github.com/repos/theQRL/qrysm/releases/latest -s | jq .name -r) || (color "31" "Starting qrysm requires an internet connection. If you are being blocked by your antivirus, you can download the beacon chain and validator executables from our releases page on Github here https://github.com/theQRL/qrysm/releases/" && exit 1)
         readonly qrysm_version
     fi
 }
@@ -185,13 +186,16 @@ if [[ $1 == beacon-chain ]]; then
         else
             file=beacon-chain-${qrysm_version}-${system}-${arch}
         fi
-        res=$(curl -w '%{http_code}\n' -f -L "https://prysmaticlabs.com/releases/${file}"  -o "$BEACON_CHAIN_REAL" | ( grep 404 || true ) )
+        #res=$(curl -w '%{http_code}\n' -f -L "https://prysmaticlabs.com/releases/${file}"  -o "$BEACON_CHAIN_REAL" | ( grep 404 || true ) )
+        res=$(curl -w '%{http_code}\n' -f -L "https://github.com/theQRL/qrysm/releases/download/{qrysm_version}/${file}"  -o "$BEACON_CHAIN_REAL" | ( grep 404 || true ) )
         if [[ $res == 404 ]];then
             echo "No qrysm beacon chain found for ${qrysm_version},(${file}) exit"
             exit 1
         fi
-        curl --silent -L "https://prysmaticlabs.com/releases/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
-        curl --silent -L "https://prysmaticlabs.com/releases/${file}.sig" -o "${wrapper_dir}/${file}.sig"
+        #curl --silent -L "https://prysmaticlabs.com/releases/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
+        #curl --silent -L "https://prysmaticlabs.com/releases/${file}.sig" -o "${wrapper_dir}/${file}.sig"
+        curl --silent -L "https://github.com/theQRL/qrysm/releases/download/{qrysm_version}/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
+        curl --silent -L "https://github.com/theQRL/qrysm/releases/download/{qrysm_version}/${file}.sig" -o "${wrapper_dir}/${file}.sig"
         chmod +x "$BEACON_CHAIN_REAL"
     else
         color "37" "Beacon chain is up to date."
@@ -203,13 +207,16 @@ if [[ $1 == validator ]]; then
         color "34" "Downloading validator@${qrysm_version} to ${VALIDATOR_REAL} (${reason})"
 
         file=validator-${qrysm_version}-${system}-${arch}
-        res=$(curl -w '%{http_code}\n' -f -L "https://prysmaticlabs.com/releases/${file}" -o "$VALIDATOR_REAL" | ( grep 404 || true ) )
+        #res=$(curl -w '%{http_code}\n' -f -L "https://prysmaticlabs.com/releases/${file}" -o "$VALIDATOR_REAL" | ( grep 404 || true ) )
+        res=$(curl -w '%{http_code}\n' -f -L "https://github.com/theQRL/qrysm/releases/download/{qrysm_version}/${file}" -o "$VALIDATOR_REAL" | ( grep 404 || true ) )
         if [[ $res == 404 ]];then
             echo "No qrysm validator found for ${qrysm_version}, (${file}) exit"
             exit 1
         fi
-        curl --silent -L "https://prysmaticlabs.com/releases/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
-        curl --silent -L "https://prysmaticlabs.com/releases/${file}.sig" -o "${wrapper_dir}/${file}.sig"
+        #curl --silent -L "https://prysmaticlabs.com/releases/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
+        #curl --silent -L "https://prysmaticlabs.com/releases/${file}.sig" -o "${wrapper_dir}/${file}.sig"
+        curl --silent -L "https://github.com/theQRL/qrysm/releases/download/{qrysm_version}/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
+        curl --silent -L "https://github.com/theQRL/qrysm/releases/download/{qrysm_version}/${file}.sig" -o "${wrapper_dir}/${file}.sig"
         chmod +x "$VALIDATOR_REAL"
     else
         color "37" "Validator is up to date."
@@ -221,13 +228,16 @@ if [[ $1 == client-stats ]]; then
         color "34" "Downloading client-stats@${qrysm_version} to ${CLIENT_STATS_REAL} (${reason})"
 
         file=client-stats-${qrysm_version}-${system}-${arch}
-        res=$(curl -w '%{http_code}\n' -f -L "https://prysmaticlabs.com/releases/${file}" -o "$CLIENT_STATS_REAL" | ( grep 404 || true ) )
+        #res=$(curl -w '%{http_code}\n' -f -L "https://prysmaticlabs.com/releases/${file}" -o "$CLIENT_STATS_REAL" | ( grep 404 || true ) )
+        res=$(curl -w '%{http_code}\n' -f -L "https://github.com/theQRL/qrysm/releases/download/{qrysm_version}/${file}" -o "$CLIENT_STATS_REAL" | ( grep 404 || true ) )
         if [[ $res == 404 ]];then
             echo "No qrysm client stats found for ${qrysm_version},(${file}) exit"
             exit 1
         fi
-        curl --silent -L "https://prysmaticlabs.com/releases/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
-        curl --silent -L "https://prysmaticlabs.com/releases/${file}.sig" -o "${wrapper_dir}/${file}.sig"
+        #curl --silent -L "https://prysmaticlabs.com/releases/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
+        #curl --silent -L "https://prysmaticlabs.com/releases/${file}.sig" -o "${wrapper_dir}/${file}.sig"
+        curl --silent -L "https://github.com/theQRL/qrysm/releases/download/{qrysm_version}/${file}.sha256" -o "${wrapper_dir}/${file}.sha256"
+        curl --silent -L "https://github.com/theQRL/qrysm/releases/download/{qrysm_version}/${file}.sig" -o "${wrapper_dir}/${file}.sig"
         chmod +x "$CLIENT_STATS_REAL"
     else
         color "37" "Client-stats is up to date."
