@@ -74,15 +74,15 @@ commands:
           gpg -o /tmp/validator-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sig --default-key 251BB00668CCFE73369C94D49DA5CA7527E822CE --sign --detach-sig /tmp/validator-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>
           gpg -o /tmp/deposit-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sig --default-key 251BB00668CCFE73369C94D49DA5CA7527E822CE --sign --detach-sig /tmp/deposit-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>
 
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/beacon-chain-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/beacon-chain-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sha256
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/beacon-chain-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sig
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/validator-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/validator-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sha256
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/validator-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sig
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/deposit-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/deposit-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sha256
-          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=rgeraldes24 repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/deposit-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sig
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=${CIRCLE_PROJECT_USERNAME} repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/beacon-chain-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=${CIRCLE_PROJECT_USERNAME} repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/beacon-chain-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sha256
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=${CIRCLE_PROJECT_USERNAME} repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/beacon-chain-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sig
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=${CIRCLE_PROJECT_USERNAME} repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/validator-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=${CIRCLE_PROJECT_USERNAME} repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/validator-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sha256
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=${CIRCLE_PROJECT_USERNAME} repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/validator-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sig
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=${CIRCLE_PROJECT_USERNAME} repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/deposit-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=${CIRCLE_PROJECT_USERNAME} repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/deposit-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sha256
+          ./hack/upload-github-release-asset.sh github_api_token=$GITHUB_TOKEN owner=${CIRCLE_PROJECT_USERNAME} repo=qrysm tag=${CIRCLE_TAG} filename=/tmp/deposit-${CIRCLE_TAG}-<< parameters.platform >><< parameters.file_extension >>.sig
 
 jobs:
   publish-linux-amd64-binaries:
