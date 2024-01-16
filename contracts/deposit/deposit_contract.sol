@@ -131,7 +131,6 @@ contract DepositContract is IDepositContract, ERC165 {
         bytes32 node = abi.decode(out, (bytes32));
         // bytes32 node = depositroot(pubkey, withdrawal_credentials, amount, signature);
 
-
         // Verify computed and expected deposit data roots match
         require(node == deposit_data_root, "DepositContract: reconstructed DepositData does not match supplied deposit_data_root");
 

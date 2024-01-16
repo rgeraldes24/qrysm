@@ -3,6 +3,7 @@ package deposit_test
 import (
 	"context"
 	"encoding/binary"
+	"fmt"
 	"testing"
 
 	zond "github.com/theQRL/go-zond"
@@ -48,6 +49,11 @@ func TestValidatorRegister_OK(t *testing.T) {
 	require.NoError(t, err)
 	depositDataItems, depositDataRoots, err := interop.DepositDataFromKeys(privKeys, pubKeys)
 	require.NoError(t, err)
+
+	fmt.Println(pubKeys[0].Marshal())
+	fmt.Println(depositDataItems[0].WithdrawalCredentials)
+	fmt.Println(depositDataItems[0].Signature)
+	fmt.Println("OVER")
 
 	var depositDataRoot [32]byte
 	copy(depositDataRoot[:], depositDataRoots[0])
