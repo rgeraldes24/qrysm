@@ -7,14 +7,14 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/config/params"
 	validatorServiceConfig "github.com/theQRL/qrysm/v4/config/validator/service"
 	"github.com/theQRL/qrysm/v4/consensus-types/validator"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zond "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	"github.com/theQRL/qrysm/v4/validator/client"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
@@ -232,8 +232,8 @@ func (s *Server) transformDeletedKeysStatuses(
 }
 
 // Gets a map of all public keys in the database, useful for O(1) lookups.
-func (s *Server) publicKeysInDB(ctx context.Context) (map[[dilithium2.CryptoPublicKeyBytes]byte]bool, error) {
-	pubKeysInDB := make(map[[dilithium2.CryptoPublicKeyBytes]byte]bool)
+func (s *Server) publicKeysInDB(ctx context.Context) (map[[dilithium.CryptoPublicKeyBytes]byte]bool, error) {
+	pubKeysInDB := make(map[[dilithium.CryptoPublicKeyBytes]byte]bool)
 	attestedPublicKeys, err := s.valDB.AttestedPublicKeys(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("could not get attested public keys from DB: %v", err)
@@ -318,7 +318,7 @@ func (s *Server) ImportRemoteKeys(ctx context.Context, req *zondpbservice.Import
 		return &zondpbservice.ImportRemoteKeysResponse{Data: statuses}, nil
 	}
 
-	remoteKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, len(req.RemoteKeys))
+	remoteKeys := make([][dilithium.CryptoPublicKeyBytes]byte, len(req.RemoteKeys))
 	isUrlUsed := false
 	for i, obj := range req.RemoteKeys {
 		remoteKeys[i] = bytesutil.ToBytes2592(obj.Pubkey)
@@ -371,7 +371,7 @@ func (s *Server) DeleteRemoteKeys(ctx context.Context, req *zondpbservice.Delete
 		statuses := groupDeleteRemoteKeysErrors(req, "Keymanager kind cannot delete public keys for web3signer keymanager type.")
 		return &zondpbservice.DeleteRemoteKeysResponse{Data: statuses}, nil
 	}
-	remoteKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, len(req.Pubkeys))
+	remoteKeys := make([][dilithium.CryptoPublicKeyBytes]byte, len(req.Pubkeys))
 	for i, key := range req.Pubkeys {
 		remoteKeys[i] = bytesutil.ToBytes2592(key)
 	}
@@ -443,7 +443,7 @@ func (s *Server) SetGasLimit(ctx context.Context, req *zondpbservice.SetGasLimit
 		if settings.DefaultConfig == nil || settings.DefaultConfig.BuilderConfig == nil || !settings.DefaultConfig.BuilderConfig.Enabled {
 			return &empty.Empty{}, status.Errorf(codes.FailedPrecondition, "gas limit changes only apply when builder is enabled")
 		}
-		settings.ProposeConfig = make(map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorServiceConfig.ProposerOption)
+		settings.ProposeConfig = make(map[[dilithium.CryptoPublicKeyBytes]byte]*validatorServiceConfig.ProposerOption)
 		option := settings.DefaultConfig.Clone()
 		option.BuilderConfig.GasLimit = validator.Uint64(req.GasLimit)
 		settings.ProposeConfig[bytesutil.ToBytes2592(validatorKey)] = option
@@ -588,7 +588,7 @@ func (s *Server) SetFeeRecipientByPubkey(ctx context.Context, req *zondpbservice
 	switch {
 	case settings == nil:
 		settings = &validatorServiceConfig.ProposerSettings{
-			ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorServiceConfig.ProposerOption{
+			ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorServiceConfig.ProposerOption{
 				bytesutil.ToBytes2592(validatorKey): {
 					FeeRecipientConfig: &validatorServiceConfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient,
@@ -603,7 +603,7 @@ func (s *Server) SetFeeRecipientByPubkey(ctx context.Context, req *zondpbservice
 		if settings.DefaultConfig != nil && settings.DefaultConfig.BuilderConfig != nil {
 			builderConfig = settings.DefaultConfig.BuilderConfig.Clone()
 		}
-		settings.ProposeConfig = map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorServiceConfig.ProposerOption{
+		settings.ProposeConfig = map[[dilithium.CryptoPublicKeyBytes]byte]*validatorServiceConfig.ProposerOption{
 			bytesutil.ToBytes2592(validatorKey): {
 				FeeRecipientConfig: &validatorServiceConfig.FeeRecipientConfig{
 					FeeRecipient: feeRecipient,
@@ -675,9 +675,9 @@ func (s *Server) DeleteFeeRecipientByPubkey(ctx context.Context, req *zondpbserv
 }
 
 func validatePublicKey(pubkey []byte) error {
-	if len(pubkey) != dilithium2.CryptoPublicKeyBytes {
+	if len(pubkey) != dilithium.CryptoPublicKeyBytes {
 		return status.Errorf(
-			codes.InvalidArgument, "Provided public key in path is not byte length %d and not a valid bls public key", dilithium2.CryptoPublicKeyBytes)
+			codes.InvalidArgument, "Provided public key in path is not byte length %d and not a valid bls public key", dilithium.CryptoPublicKeyBytes)
 	}
 	return nil
 }

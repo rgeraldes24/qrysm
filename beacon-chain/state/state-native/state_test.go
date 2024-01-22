@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/state-native/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stateutil"
@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -26,7 +26,7 @@ func TestValidatorMap_DistinctCopy(t *testing.T) {
 	vals := make([]*zondpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &zondpb.Validator{
@@ -54,7 +54,7 @@ func TestBeaconState_NoDeadlock_Phase0(t *testing.T) {
 	vals := make([]*zondpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &zondpb.Validator{
@@ -110,7 +110,7 @@ func TestBeaconState_NoDeadlock_Altair(t *testing.T) {
 	vals := make([]*zondpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &zondpb.Validator{
@@ -166,7 +166,7 @@ func TestBeaconState_NoDeadlock_Bellatrix(t *testing.T) {
 	vals := make([]*zondpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &zondpb.Validator{
@@ -222,7 +222,7 @@ func TestBeaconState_NoDeadlock_Capella(t *testing.T) {
 	vals := make([]*zondpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &zondpb.Validator{
@@ -278,7 +278,7 @@ func TestBeaconState_NoDeadlock_Deneb(t *testing.T) {
 	vals := make([]*zondpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &zondpb.Validator{
@@ -423,7 +423,7 @@ func generateState(t *testing.T) state.BeaconState {
 	bals := make([]uint64, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &zondpb.Validator{

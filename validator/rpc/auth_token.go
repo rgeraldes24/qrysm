@@ -17,7 +17,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/io/file"
-	pb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/v4/validator/accounts/wallet"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

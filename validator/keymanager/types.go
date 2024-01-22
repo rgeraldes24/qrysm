@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	common2 "github.com/theQRL/go-qrllib/common"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/async/event"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
+	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
-	validatorpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
 )
 
 // IKeymanager defines a general keymanager interface for Prysm wallets.
@@ -31,7 +31,7 @@ type KeysFetcher interface {
 
 // PublicKeysFetcher for validating public keys.
 type PublicKeysFetcher interface {
-	FetchValidatingPublicKeys(ctx context.Context) ([][dilithium2.CryptoPublicKeyBytes]byte, error)
+	FetchValidatingPublicKeys(ctx context.Context) ([][dilithiumlib.CryptoPublicKeyBytes]byte, error)
 }
 
 // Signer allows signing messages using a validator private key.
@@ -53,7 +53,7 @@ type Deleter interface {
 
 // KeyChangeSubscriber allows subscribing to changes made to the underlying keys.
 type KeyChangeSubscriber interface {
-	SubscribeAccountChanges(pubKeysChan chan [][dilithium2.CryptoPublicKeyBytes]byte) event.Subscription
+	SubscribeAccountChanges(pubKeysChan chan [][dilithiumlib.CryptoPublicKeyBytes]byte) event.Subscription
 }
 
 // KeyStoreExtractor allows keys to be extracted from the keymanager.
@@ -63,12 +63,12 @@ type KeyStoreExtractor interface {
 
 // PublicKeyAdder allows adding public keys to the keymanager.
 type PublicKeyAdder interface {
-	AddPublicKeys(ctx context.Context, publicKeys [][dilithium2.CryptoPublicKeyBytes]byte) ([]*zondpbservice.ImportedRemoteKeysStatus, error)
+	AddPublicKeys(ctx context.Context, publicKeys [][dilithiumlib.CryptoPublicKeyBytes]byte) ([]*zondpbservice.ImportedRemoteKeysStatus, error)
 }
 
 // PublicKeyDeleter allows deleting public keys set in keymanager.
 type PublicKeyDeleter interface {
-	DeletePublicKeys(ctx context.Context, publicKeys [][dilithium2.CryptoPublicKeyBytes]byte) ([]*zondpbservice.DeletedRemoteKeysStatus, error)
+	DeletePublicKeys(ctx context.Context, publicKeys [][dilithiumlib.CryptoPublicKeyBytes]byte) ([]*zondpbservice.DeletedRemoteKeysStatus, error)
 }
 
 type ListKeymanagerAccountConfig struct {

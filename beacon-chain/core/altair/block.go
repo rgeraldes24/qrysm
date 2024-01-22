@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	p2pType "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -141,14 +141,14 @@ func VerifySyncCommitteeSig(s state.BeaconState, syncKeys []dilithium.PublicKey,
 		return err
 	}
 
-	if (len(syncKeys) != 0 && len(syncSig) != 1) && (len(syncSig) != len(syncKeys)*dilithium2.CryptoBytes) {
+	if (len(syncKeys) != 0 && len(syncSig) != 1) && (len(syncSig) != len(syncKeys)*dilithiumlib.CryptoBytes) {
 		return fmt.Errorf("syncSig and syncKeys length mismatch | syncSig len %d | syncKeys len %d",
 			len(syncSig), len(syncKeys))
 	}
 
 	for i, syncKey := range syncKeys {
-		offset := i * dilithium2.CryptoBytes
-		sig, err := dilithium.SignatureFromBytes(syncSig[offset : offset+dilithium2.CryptoBytes])
+		offset := i * dilithiumlib.CryptoBytes
+		sig, err := dilithium.SignatureFromBytes(syncSig[offset : offset+dilithiumlib.CryptoBytes])
 		if err != nil {
 			return err
 		}

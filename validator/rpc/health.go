@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	pb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	validatorpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

@@ -8,7 +8,7 @@ import (
 
 	"github.com/k0kubun/go-ansi"
 	"github.com/schollz/progressbar/v3"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 )
 
@@ -54,30 +54,30 @@ func SlotFromString(str string) (primitives.Slot, error) {
 }
 
 // PubKeyFromHex takes in a hex string, verifies its length as 48 bytes, and converts that representation.
-func PubKeyFromHex(str string) ([dilithium2.CryptoPublicKeyBytes]byte, error) {
+func PubKeyFromHex(str string) ([dilithium.CryptoPublicKeyBytes]byte, error) {
 	pubKeyBytes, err := hex.DecodeString(strings.TrimPrefix(str, "0x"))
 	if err != nil {
-		return [dilithium2.CryptoPublicKeyBytes]byte{}, err
+		return [dilithium.CryptoPublicKeyBytes]byte{}, err
 	}
 	if len(pubKeyBytes) != 48 {
-		return [dilithium2.CryptoPublicKeyBytes]byte{}, fmt.Errorf("public key is not correct, 48-byte length: %s", str)
+		return [dilithium.CryptoPublicKeyBytes]byte{}, fmt.Errorf("public key is not correct, 48-byte length: %s", str)
 	}
-	var pk [dilithium2.CryptoPublicKeyBytes]byte
-	copy(pk[:], pubKeyBytes[:dilithium2.CryptoPublicKeyBytes])
+	var pk [dilithium.CryptoPublicKeyBytes]byte
+	copy(pk[:], pubKeyBytes[:dilithium.CryptoPublicKeyBytes])
 	return pk, nil
 }
 
 // DilithiumPubKeyFromHex takes in a hex string, verifies its length as 48 bytes, and converts that representation.
-func DilithiumPubKeyFromHex(str string) ([dilithium2.CryptoPublicKeyBytes]byte, error) {
+func DilithiumPubKeyFromHex(str string) ([dilithium.CryptoPublicKeyBytes]byte, error) {
 	pubKeyBytes, err := hex.DecodeString(strings.TrimPrefix(str, "0x"))
 	if err != nil {
-		return [dilithium2.CryptoPublicKeyBytes]byte{}, err
+		return [dilithium.CryptoPublicKeyBytes]byte{}, err
 	}
-	if len(pubKeyBytes) != dilithium2.CryptoPublicKeyBytes {
-		return [dilithium2.CryptoPublicKeyBytes]byte{}, fmt.Errorf("public key is not correct, 48-byte length: %s", str)
+	if len(pubKeyBytes) != dilithium.CryptoPublicKeyBytes {
+		return [dilithium.CryptoPublicKeyBytes]byte{}, fmt.Errorf("public key is not correct, 48-byte length: %s", str)
 	}
-	var pk [dilithium2.CryptoPublicKeyBytes]byte
-	copy(pk[:], pubKeyBytes[:dilithium2.CryptoPublicKeyBytes])
+	var pk [dilithium.CryptoPublicKeyBytes]byte
+	copy(pk[:], pubKeyBytes[:dilithium.CryptoPublicKeyBytes])
 	return pk, nil
 }
 

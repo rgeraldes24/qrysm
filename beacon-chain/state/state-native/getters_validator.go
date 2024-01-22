@@ -2,13 +2,13 @@ package state_native
 
 import (
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/features"
 	consensus_types "github.com/theQRL/qrysm/v4/consensus-types"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 )
 
@@ -133,7 +133,7 @@ func (b *BeaconState) ValidatorAtIndexReadOnly(idx primitives.ValidatorIndex) (s
 }
 
 // ValidatorIndexByPubkey returns a given validator by its 2592-byte public key.
-func (b *BeaconState) ValidatorIndexByPubkey(key [dilithium2.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool) {
+func (b *BeaconState) ValidatorIndexByPubkey(key [dilithium.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool) {
 	if b == nil || b.valMapHandler == nil || b.valMapHandler.IsNil() {
 		return 0, false
 	}
@@ -156,7 +156,7 @@ func (b *BeaconState) ValidatorIndexByPubkey(key [dilithium2.CryptoPublicKeyByte
 
 // PubkeyAtIndex returns the pubkey at the given
 // validator index.
-func (b *BeaconState) PubkeyAtIndex(idx primitives.ValidatorIndex) [dilithium2.CryptoPublicKeyBytes]byte {
+func (b *BeaconState) PubkeyAtIndex(idx primitives.ValidatorIndex) [dilithium.CryptoPublicKeyBytes]byte {
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
@@ -165,17 +165,17 @@ func (b *BeaconState) PubkeyAtIndex(idx primitives.ValidatorIndex) [dilithium2.C
 		var err error
 		v, err = b.validatorsMultiValue.At(b, uint64(idx))
 		if err != nil {
-			return [dilithium2.CryptoPublicKeyBytes]byte{}
+			return [dilithium.CryptoPublicKeyBytes]byte{}
 		}
 	} else {
 		if uint64(idx) >= uint64(len(b.validators)) {
-			return [dilithium2.CryptoPublicKeyBytes]byte{}
+			return [dilithium.CryptoPublicKeyBytes]byte{}
 		}
 		v = b.validators[idx]
 	}
 
 	if v == nil {
-		return [dilithium2.CryptoPublicKeyBytes]byte{}
+		return [dilithium.CryptoPublicKeyBytes]byte{}
 	}
 	return bytesutil.ToBytes2592(v.PublicKey)
 }

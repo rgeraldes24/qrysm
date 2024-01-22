@@ -16,7 +16,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/async/event"
@@ -28,8 +28,8 @@ import (
 	blsmock "github.com/theQRL/qrysm/v4/crypto/bls/common/mock"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	validatorpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	mock2 "github.com/theQRL/qrysm/v4/testing/mock"
@@ -66,28 +66,28 @@ func genMockKeymanager(t *testing.T, numKeys int) *mockKeymanager {
 }
 
 type keypair struct {
-	pub [dilithium2.CryptoPublicKeyBytes]byte
+	pub [dilithiumlib.CryptoPublicKeyBytes]byte
 	pri dilithium.DilithiumKey
 }
 
 func randKeypair(t *testing.T) keypair {
 	pri, err := dilithium.RandKey()
 	require.NoError(t, err)
-	var pub [dilithium2.CryptoPublicKeyBytes]byte
+	var pub [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pub[:], pri.PublicKey().Marshal())
 	return keypair{pub: pub, pri: pri}
 }
 
 func newMockKeymanager(t *testing.T, pairs ...keypair) *mockKeymanager {
-	m := &mockKeymanager{keysMap: make(map[[dilithium2.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey)}
+	m := &mockKeymanager{keysMap: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey)}
 	require.NoError(t, m.add(pairs...))
 	return m
 }
 
 type mockKeymanager struct {
 	lock                sync.RWMutex
-	keysMap             map[[dilithium2.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey
-	keys                [][dilithium2.CryptoPublicKeyBytes]byte
+	keysMap             map[[dilithiumlib.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey
+	keys                [][dilithiumlib.CryptoPublicKeyBytes]byte
 	fetchNoKeys         bool
 	accountsChangedFeed *event.Feed
 }
@@ -128,18 +128,18 @@ func (m *mockKeymanager) removeOne(kp keypair) {
 	}
 }
 
-func (m *mockKeymanager) FetchValidatingPublicKeys(ctx context.Context) ([][dilithium2.CryptoPublicKeyBytes]byte, error) {
+func (m *mockKeymanager) FetchValidatingPublicKeys(ctx context.Context) ([][dilithiumlib.CryptoPublicKeyBytes]byte, error) {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 	if m.fetchNoKeys {
 		m.fetchNoKeys = false
-		return [][dilithium2.CryptoPublicKeyBytes]byte{}, nil
+		return [][dilithiumlib.CryptoPublicKeyBytes]byte{}, nil
 	}
 	return m.keys, nil
 }
 
 func (m *mockKeymanager) Sign(_ context.Context, req *validatorpb.SignRequest) (dilithium.Signature, error) {
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], req.PublicKey)
 	privKey, ok := m.keysMap[pubKey]
 	if !ok {
@@ -149,14 +149,14 @@ func (m *mockKeymanager) Sign(_ context.Context, req *validatorpb.SignRequest) (
 	return sig, nil
 }
 
-func (m *mockKeymanager) SubscribeAccountChanges(pubKeysChan chan [][dilithium2.CryptoPublicKeyBytes]byte) event.Subscription {
+func (m *mockKeymanager) SubscribeAccountChanges(pubKeysChan chan [][dilithiumlib.CryptoPublicKeyBytes]byte) event.Subscription {
 	if m.accountsChangedFeed == nil {
 		m.accountsChangedFeed = &event.Feed{}
 	}
 	return m.accountsChangedFeed.Subscribe(pubKeysChan)
 }
 
-func (m *mockKeymanager) SimulateAccountChanges(newKeys [][dilithium2.CryptoPublicKeyBytes]byte) {
+func (m *mockKeymanager) SimulateAccountChanges(newKeys [][dilithiumlib.CryptoPublicKeyBytes]byte) {
 	m.accountsChangedFeed.Send(newKeys)
 }
 
@@ -194,7 +194,7 @@ func TestWaitForChainStart_SetsGenesisInfo(t *testing.T) {
 	defer ctrl.Finish()
 	client := validatormock.NewMockValidatorClient(ctrl)
 
-	db := dbTest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
+	db := dbTest.SetupDB(t, [][dilithiumlib.CryptoPublicKeyBytes]byte{})
 	v := validator{
 		validatorClient: client,
 		db:              db,
@@ -240,7 +240,7 @@ func TestWaitForChainStart_SetsGenesisInfo_IncorrectSecondTry(t *testing.T) {
 	defer ctrl.Finish()
 	client := validatormock.NewMockValidatorClient(ctrl)
 
-	db := dbTest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
+	db := dbTest.SetupDB(t, [][dilithiumlib.CryptoPublicKeyBytes]byte{})
 	v := validator{
 		validatorClient: client,
 		db:              db,
@@ -586,7 +586,7 @@ func TestUpdateDuties_OK_FilterBlacklistedPublicKeys(t *testing.T) {
 
 	numValidators := 10
 	km := genMockKeymanager(t, numValidators)
-	blacklistedPublicKeys := make(map[[dilithium2.CryptoPublicKeyBytes]byte]bool)
+	blacklistedPublicKeys := make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]bool)
 	for _, k := range km.keys {
 		blacklistedPublicKeys[k] = true
 	}
@@ -1234,7 +1234,7 @@ func createAttestation(source, target primitives.Epoch) *zondpb.IndexedAttestati
 			},
 			BeaconBlockRoot: make([]byte, 32),
 		},
-		Signature: make([]byte, dilithium2.CryptoBytes),
+		Signature: make([]byte, dilithiumlib.CryptoBytes),
 	}
 }
 
@@ -1282,7 +1282,7 @@ func TestIsSyncCommitteeAggregator_OK(t *testing.T) {
 
 func TestValidator_WaitForKeymanagerInitialization_web3Signer(t *testing.T) {
 	ctx := context.Background()
-	db := dbTest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
+	db := dbTest.SetupDB(t, [][dilithiumlib.CryptoPublicKeyBytes]byte{})
 	root := make([]byte, 32)
 	copy(root[2:], "a")
 	err := db.SaveGenesisValidatorsRoot(ctx, root)
@@ -1290,7 +1290,7 @@ func TestValidator_WaitForKeymanagerInitialization_web3Signer(t *testing.T) {
 	w := wallet.NewWalletForWeb3Signer()
 	decodedKey, err := hexutil.Decode("0xa2b5aaad9c6efefe7bb9b1243a043404f3362937cfb6b31833929833173f476630ea2cfeb0d9ddf15f97ca8685948820")
 	require.NoError(t, err)
-	keys := [][dilithium2.CryptoPublicKeyBytes]byte{
+	keys := [][dilithiumlib.CryptoPublicKeyBytes]byte{
 		bytesutil.ToBytes2592(decodedKey),
 	}
 	v := validator{
@@ -1311,7 +1311,7 @@ func TestValidator_WaitForKeymanagerInitialization_web3Signer(t *testing.T) {
 
 func TestValidator_WaitForKeymanagerInitialization_Web(t *testing.T) {
 	ctx := context.Background()
-	db := dbTest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
+	db := dbTest.SetupDB(t, [][dilithiumlib.CryptoPublicKeyBytes]byte{})
 	root := make([]byte, 32)
 	copy(root[2:], "a")
 	err := db.SaveGenesisValidatorsRoot(ctx, root)
@@ -1341,7 +1341,7 @@ func TestValidator_WaitForKeymanagerInitialization_Web(t *testing.T) {
 
 func TestValidator_WaitForKeymanagerInitialization_Interop(t *testing.T) {
 	ctx := context.Background()
-	db := dbTest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
+	db := dbTest.SetupDB(t, [][dilithiumlib.CryptoPublicKeyBytes]byte{})
 	root := make([]byte, 32)
 	copy(root[2:], "a")
 	err := db.SaveGenesisValidatorsRoot(ctx, root)
@@ -1364,7 +1364,7 @@ func TestValidator_WaitForKeymanagerInitialization_Interop(t *testing.T) {
 func TestValidator_PushProposerSettings(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	ctx := context.Background()
-	db := dbTest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
+	db := dbTest.SetupDB(t, [][dilithiumlib.CryptoPublicKeyBytes]byte{})
 	client := validatormock.NewMockValidatorClient(ctrl)
 	nodeClient := validatormock.NewMockNodeClient(ctrl)
 	defaultFeeHex := "0x046Fb65722E7b2455043BFEBf6177F1D2e9738D9"
@@ -1395,8 +1395,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
 					useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 2,
@@ -1405,7 +1405,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1477,8 +1477,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
 					useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 2,
@@ -1487,7 +1487,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1555,8 +1555,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
 					useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 2,
@@ -1565,7 +1565,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1616,8 +1616,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
 					useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
@@ -1684,8 +1684,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
 					useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
@@ -1748,8 +1748,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
 					useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
@@ -1758,7 +1758,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1800,8 +1800,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				v := validator{
 					validatorClient:              client,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
 					useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
@@ -1810,7 +1810,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1843,8 +1843,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
 					useWeb:                       false,
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
@@ -1853,7 +1853,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1951,11 +1951,11 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 	}
 }
 
-func getPubkeyFromString(t *testing.T, stringPubkey string) [dilithium2.CryptoPublicKeyBytes]byte {
+func getPubkeyFromString(t *testing.T, stringPubkey string) [dilithiumlib.CryptoPublicKeyBytes]byte {
 	pubkeyTemp, err := hexutil.Decode(stringPubkey)
 	require.NoError(t, err)
 
-	var pubkey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubkey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubkey[:], pubkeyTemp)
 
 	return pubkey
@@ -2020,7 +2020,7 @@ func TestValidator_buildPrepProposerReqs_WithoutDefaultConfig(t *testing.T) {
 		validatorClient: client,
 		proposerSettings: &validatorserviceconfig.ProposerSettings{
 			DefaultConfig: nil,
-			ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+			ProposeConfig: map[[dilithiumlib.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 				pubkey1: {
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient1,
@@ -2038,13 +2038,13 @@ func TestValidator_buildPrepProposerReqs_WithoutDefaultConfig(t *testing.T) {
 				},
 			},
 		},
-		pubkeyToValidatorIndex: map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex{
+		pubkeyToValidatorIndex: map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex{
 			pubkey1: 1,
 			pubkey4: 4,
 		},
 	}
 
-	pubkeys := [][dilithium2.CryptoPublicKeyBytes]byte{pubkey1, pubkey2, pubkey3, pubkey4}
+	pubkeys := [][dilithiumlib.CryptoPublicKeyBytes]byte{pubkey1, pubkey2, pubkey3, pubkey4}
 
 	expected := []*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
 		{
@@ -2130,7 +2130,7 @@ func TestValidator_buildPrepProposerReqs_WithDefaultConfig(t *testing.T) {
 					FeeRecipient: defaultFeeRecipient,
 				},
 			},
-			ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+			ProposeConfig: map[[dilithiumlib.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 				pubkey1: {
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient1,
@@ -2148,13 +2148,13 @@ func TestValidator_buildPrepProposerReqs_WithDefaultConfig(t *testing.T) {
 				},
 			},
 		},
-		pubkeyToValidatorIndex: map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex{
+		pubkeyToValidatorIndex: map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex{
 			pubkey1: 1,
 			pubkey4: 4,
 		},
 	}
 
-	pubkeys := [][dilithium2.CryptoPublicKeyBytes]byte{pubkey1, pubkey2, pubkey3, pubkey4}
+	pubkeys := [][dilithiumlib.CryptoPublicKeyBytes]byte{pubkey1, pubkey2, pubkey3, pubkey4}
 
 	expected := []*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
 		{
@@ -2203,7 +2203,7 @@ func TestValidator_buildSignedRegReqs_DefaultConfigDisabled(t *testing.T) {
 	signature.EXPECT().Marshal().Return([]byte{})
 
 	v := validator{
-		signedValidatorRegistrations: map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1{},
+		signedValidatorRegistrations: map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1{},
 		validatorClient:              client,
 		proposerSettings: &validatorserviceconfig.ProposerSettings{
 			DefaultConfig: &validatorserviceconfig.ProposerOption{
@@ -2215,7 +2215,7 @@ func TestValidator_buildSignedRegReqs_DefaultConfigDisabled(t *testing.T) {
 					GasLimit: 9999,
 				},
 			},
-			ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+			ProposeConfig: map[[dilithiumlib.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 				pubkey1: {
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient1,
@@ -2243,10 +2243,10 @@ func TestValidator_buildSignedRegReqs_DefaultConfigDisabled(t *testing.T) {
 				},
 			},
 		},
-		pubkeyToValidatorIndex: make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+		pubkeyToValidatorIndex: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 	}
 
-	pubkeys := [][dilithium2.CryptoPublicKeyBytes]byte{pubkey1, pubkey2, pubkey3}
+	pubkeys := [][dilithiumlib.CryptoPublicKeyBytes]byte{pubkey1, pubkey2, pubkey3}
 
 	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (dilithium.Signature, error) {
 		return signature, nil
@@ -2289,7 +2289,7 @@ func TestValidator_buildSignedRegReqs_DefaultConfigEnabled(t *testing.T) {
 	signature.EXPECT().Marshal().Return([]byte{}).Times(2)
 
 	v := validator{
-		signedValidatorRegistrations: map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1{},
+		signedValidatorRegistrations: map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1{},
 		validatorClient:              client,
 		proposerSettings: &validatorserviceconfig.ProposerSettings{
 			DefaultConfig: &validatorserviceconfig.ProposerOption{
@@ -2301,7 +2301,7 @@ func TestValidator_buildSignedRegReqs_DefaultConfigEnabled(t *testing.T) {
 					GasLimit: 9999,
 				},
 			},
-			ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+			ProposeConfig: map[[dilithiumlib.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 				pubkey1: {
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient1,
@@ -2329,10 +2329,10 @@ func TestValidator_buildSignedRegReqs_DefaultConfigEnabled(t *testing.T) {
 				},
 			},
 		},
-		pubkeyToValidatorIndex: make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+		pubkeyToValidatorIndex: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 	}
 
-	pubkeys := [][dilithium2.CryptoPublicKeyBytes]byte{pubkey1, pubkey2, pubkey3}
+	pubkeys := [][dilithiumlib.CryptoPublicKeyBytes]byte{pubkey1, pubkey2, pubkey3}
 
 	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (dilithium.Signature, error) {
 		return signature, nil
@@ -2368,7 +2368,7 @@ func TestValidator_buildSignedRegReqs_SignerOnError(t *testing.T) {
 	client := validatormock.NewMockValidatorClient(ctrl)
 
 	v := validator{
-		signedValidatorRegistrations: map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1{},
+		signedValidatorRegistrations: map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1{},
 		validatorClient:              client,
 		proposerSettings: &validatorserviceconfig.ProposerSettings{
 			DefaultConfig: &validatorserviceconfig.ProposerOption{
@@ -2383,7 +2383,7 @@ func TestValidator_buildSignedRegReqs_SignerOnError(t *testing.T) {
 		},
 	}
 
-	pubkeys := [][dilithium2.CryptoPublicKeyBytes]byte{pubkey1}
+	pubkeys := [][dilithiumlib.CryptoPublicKeyBytes]byte{pubkey1}
 
 	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (dilithium.Signature, error) {
 		return nil, errors.New("custom error")
@@ -2413,7 +2413,7 @@ func TestValidator_buildSignedRegReqs_TimestampBeforeGenesis(t *testing.T) {
 	signature := blsmock.NewMockSignature(ctrl)
 
 	v := validator{
-		signedValidatorRegistrations: map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1{},
+		signedValidatorRegistrations: map[[dilithiumlib.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1{},
 		validatorClient:              client,
 		genesisTime:                  uint64(time.Now().UTC().Unix() + 1000),
 		proposerSettings: &validatorserviceconfig.ProposerSettings{
@@ -2426,7 +2426,7 @@ func TestValidator_buildSignedRegReqs_TimestampBeforeGenesis(t *testing.T) {
 					GasLimit: 9999,
 				},
 			},
-			ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+			ProposeConfig: map[[dilithiumlib.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 				pubkey1: {
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient1,
@@ -2438,10 +2438,10 @@ func TestValidator_buildSignedRegReqs_TimestampBeforeGenesis(t *testing.T) {
 				},
 			},
 		},
-		pubkeyToValidatorIndex: make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+		pubkeyToValidatorIndex: make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
 	}
 
-	pubkeys := [][dilithium2.CryptoPublicKeyBytes]byte{pubkey1}
+	pubkeys := [][dilithiumlib.CryptoPublicKeyBytes]byte{pubkey1}
 
 	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (dilithium.Signature, error) {
 		return signature, nil

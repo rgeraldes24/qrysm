@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -225,8 +225,8 @@ func (s *Store) migrateOptimalAttesterProtectionDown(_ context.Context) error {
 	})
 }
 
-func (s *Store) extractPubKeysForMigratingDown() ([][dilithium2.CryptoPublicKeyBytes]byte, error) {
-	pubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, 0)
+func (s *Store) extractPubKeysForMigratingDown() ([][dilithium.CryptoPublicKeyBytes]byte, error) {
+	pubKeys := make([][dilithium.CryptoPublicKeyBytes]byte, 0)
 	err := s.view(func(tx *bolt.Tx) error {
 		mb := tx.Bucket(migrationsBucket)
 		if b := mb.Get(migrationOptimalAttesterProtectionKey); b == nil {

@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/features"
 	"github.com/theQRL/qrysm/v4/io/file"
 	"github.com/theQRL/qrysm/v4/io/prompt"
-	pb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/v4/validator/accounts"
 	"github.com/theQRL/qrysm/v4/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"

@@ -8,11 +8,11 @@ import (
 	"encoding/json"
 
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // BeaconState has read and write access to beacon state methods.
@@ -107,7 +107,7 @@ type ReadOnlyValidator interface {
 	ActivationEpoch() primitives.Epoch
 	WithdrawableEpoch() primitives.Epoch
 	ExitEpoch() primitives.Epoch
-	PublicKey() [dilithium2.CryptoPublicKeyBytes]byte
+	PublicKey() [dilithium.CryptoPublicKeyBytes]byte
 	WithdrawalCredentials() []byte
 	Slashed() bool
 	IsNil() bool
@@ -118,8 +118,8 @@ type ReadOnlyValidators interface {
 	Validators() []*zondpb.Validator
 	ValidatorAtIndex(idx primitives.ValidatorIndex) (*zondpb.Validator, error)
 	ValidatorAtIndexReadOnly(idx primitives.ValidatorIndex) (ReadOnlyValidator, error)
-	ValidatorIndexByPubkey(key [dilithium2.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool)
-	PubkeyAtIndex(idx primitives.ValidatorIndex) [dilithium2.CryptoPublicKeyBytes]byte
+	ValidatorIndexByPubkey(key [dilithium.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool)
+	PubkeyAtIndex(idx primitives.ValidatorIndex) [dilithium.CryptoPublicKeyBytes]byte
 	NumValidators() int
 	ReadFromEveryValidator(f func(idx int, val ReadOnlyValidator) error) error
 }

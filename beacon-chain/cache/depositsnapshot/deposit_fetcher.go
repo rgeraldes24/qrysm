@@ -9,10 +9,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	bytesutil2 "github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/wealdtech/go-bytesutil"
 	"go.opencensus.io/trace"
 )
@@ -30,7 +30,7 @@ type Cache struct {
 	pendingDeposits   []*zondpb.DepositContainer
 	deposits          []*zondpb.DepositContainer
 	finalizedDeposits finalizedDepositsContainer
-	depositsByKey     map[[dilithium2.CryptoPublicKeyBytes]byte][]*zondpb.DepositContainer
+	depositsByKey     map[[dilithium.CryptoPublicKeyBytes]byte][]*zondpb.DepositContainer
 	depositsLock      sync.RWMutex
 }
 
@@ -50,7 +50,7 @@ func New() (*Cache, error) {
 	return &Cache{
 		pendingDeposits:   []*zondpb.DepositContainer{},
 		deposits:          []*zondpb.DepositContainer{},
-		depositsByKey:     map[[dilithium2.CryptoPublicKeyBytes]byte][]*zondpb.DepositContainer{},
+		depositsByKey:     map[[dilithium.CryptoPublicKeyBytes]byte][]*zondpb.DepositContainer{},
 		finalizedDeposits: toFinalizedDepositsContainer(finalizedDepositsTrie, -1),
 	}, nil
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/v4/api/pagination"
 	"github.com/theQRL/qrysm/v4/cmd"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
-	pb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/v4/validator/accounts"
 	"github.com/theQRL/qrysm/v4/validator/accounts/petnames"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"

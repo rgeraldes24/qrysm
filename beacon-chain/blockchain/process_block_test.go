@@ -12,7 +12,7 @@ import (
 
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	zondtypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
@@ -35,7 +35,7 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -709,7 +709,7 @@ func TestInsertFinalizedDeposits(t *testing.T) {
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {
 		root := []byte(strconv.Itoa(int(i)))
 		assert.NoError(t, depositCache.InsertDeposit(ctx, &zondpb.Deposit{Data: &zondpb.Deposit_Data{
-			PublicKey:             bytesutil.FromBytes2592([dilithium2.CryptoPublicKeyBytes]byte{}),
+			PublicKey:             bytesutil.FromBytes2592([dilithium.CryptoPublicKeyBytes]byte{}),
 			WithdrawalCredentials: params.BeaconConfig().ZeroHash[:],
 			Amount:                0,
 			Signature:             zeroSig[:],
@@ -739,13 +739,13 @@ func TestInsertFinalizedDeposits_PrunePendingDeposits(t *testing.T) {
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {
 		root := []byte(strconv.Itoa(int(i)))
 		assert.NoError(t, depositCache.InsertDeposit(ctx, &zondpb.Deposit{Data: &zondpb.Deposit_Data{
-			PublicKey:             bytesutil.FromBytes2592([dilithium2.CryptoPublicKeyBytes]byte{}),
+			PublicKey:             bytesutil.FromBytes2592([dilithium.CryptoPublicKeyBytes]byte{}),
 			WithdrawalCredentials: params.BeaconConfig().ZeroHash[:],
 			Amount:                0,
 			Signature:             zeroSig[:],
 		}, Proof: [][]byte{root}}, 100+i, int64(i), bytesutil.ToBytes32(root)))
 		depositCache.InsertPendingDeposit(ctx, &zondpb.Deposit{Data: &zondpb.Deposit_Data{
-			PublicKey:             bytesutil.FromBytes2592([dilithium2.CryptoPublicKeyBytes]byte{}),
+			PublicKey:             bytesutil.FromBytes2592([dilithium.CryptoPublicKeyBytes]byte{}),
 			WithdrawalCredentials: params.BeaconConfig().ZeroHash[:],
 			Amount:                0,
 			Signature:             zeroSig[:],
@@ -783,7 +783,7 @@ func TestInsertFinalizedDeposits_MultipleFinalizedRoutines(t *testing.T) {
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {
 		root := []byte(strconv.Itoa(int(i)))
 		assert.NoError(t, depositCache.InsertDeposit(ctx, &zondpb.Deposit{Data: &zondpb.Deposit_Data{
-			PublicKey:             bytesutil.FromBytes2592([dilithium2.CryptoPublicKeyBytes]byte{}),
+			PublicKey:             bytesutil.FromBytes2592([dilithium.CryptoPublicKeyBytes]byte{}),
 			WithdrawalCredentials: params.BeaconConfig().ZeroHash[:],
 			Amount:                0,
 			Signature:             zeroSig[:],

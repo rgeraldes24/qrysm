@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	b "github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
@@ -20,7 +20,7 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 )
 
@@ -423,7 +423,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 	switch s.Version {
 	case version.Phase0:
 		body = &zondpb.BeaconBlockBody{
-			RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+			RandaoReveal: make([]byte, dilithiumlib.CryptoBytes),
 			Eth1Data: &zondpb.Eth1Data{
 				DepositRoot: make([]byte, 32),
 				BlockHash:   make([]byte, 32),
@@ -432,7 +432,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 		}
 	case version.Altair:
 		body = &zondpb.BeaconBlockBodyAltair{
-			RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+			RandaoReveal: make([]byte, dilithiumlib.CryptoBytes),
 			Eth1Data: &zondpb.Eth1Data{
 				DepositRoot: make([]byte, 32),
 				BlockHash:   make([]byte, 32),
@@ -440,12 +440,12 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 			Graffiti: make([]byte, 32),
 			SyncAggregate: &zondpb.SyncAggregate{
 				SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-				SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+				SyncCommitteeSignature: make([]byte, dilithiumlib.CryptoBytes),
 			},
 		}
 	case version.Bellatrix:
 		body = &zondpb.BeaconBlockBodyBellatrix{
-			RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+			RandaoReveal: make([]byte, dilithiumlib.CryptoBytes),
 			Eth1Data: &zondpb.Eth1Data{
 				DepositRoot: make([]byte, 32),
 				BlockHash:   make([]byte, 32),
@@ -453,7 +453,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 			Graffiti: make([]byte, 32),
 			SyncAggregate: &zondpb.SyncAggregate{
 				SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-				SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+				SyncCommitteeSignature: make([]byte, dilithiumlib.CryptoBytes),
 			},
 			ExecutionPayload: &enginev1.ExecutionPayload{
 				ParentHash:    make([]byte, 32),
@@ -469,7 +469,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 		}
 	case version.Capella:
 		body = &zondpb.BeaconBlockBodyCapella{
-			RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+			RandaoReveal: make([]byte, dilithiumlib.CryptoBytes),
 			Eth1Data: &zondpb.Eth1Data{
 				DepositRoot: make([]byte, 32),
 				BlockHash:   make([]byte, 32),
@@ -477,7 +477,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 			Graffiti: make([]byte, 32),
 			SyncAggregate: &zondpb.SyncAggregate{
 				SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-				SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+				SyncCommitteeSignature: make([]byte, dilithiumlib.CryptoBytes),
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 				ParentHash:    make([]byte, 32),
@@ -503,7 +503,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 			Graffiti: make([]byte, 32),
 			SyncAggregate: &zondpb.SyncAggregate{
 				SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-				SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+				SyncCommitteeSignature: make([]byte, dilithiumlib.CryptoBytes),
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadDeneb{
 				ParentHash:    make([]byte, 32),

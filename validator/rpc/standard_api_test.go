@@ -14,7 +14,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/google/uuid"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
@@ -24,8 +24,8 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/validator"
 	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zond "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	validatorpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -202,7 +202,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 		password := "12345678"
 		keystores := make([]*keymanager.Keystore, numKeystores)
 		passwords := make([]string, numKeystores)
-		publicKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, numKeystores)
+		publicKeys := make([][dilithium.CryptoPublicKeyBytes]byte, numKeystores)
 		for i := 0; i < numKeystores; i++ {
 			keystores[i] = createRandomKeystore(t, password)
 			pubKey, err := hex.DecodeString(keystores[i].Pubkey)
@@ -348,7 +348,7 @@ func TestServer_DeleteKeystores(t *testing.T) {
 	})
 
 	// For ease of test setup, we'll give each public key a string identifier.
-	publicKeysWithId := map[string][dilithium2.CryptoPublicKeyBytes]byte{
+	publicKeysWithId := map[string][dilithium.CryptoPublicKeyBytes]byte{
 		"a": publicKeys[0],
 		"b": publicKeys[1],
 		"c": publicKeys[2],
@@ -560,7 +560,7 @@ func TestServer_ListRemoteKeys(t *testing.T) {
 	root[0] = 1
 	bytevalue, err := hexutil.Decode("0x93247f2209abcacf57b75a51dafae777f9dd38bc7053d1af526f220a7489a6d3a2753e5f3e8b1cfe39b56f43611df74a")
 	require.NoError(t, err)
-	pubkeys := [][dilithium2.CryptoPublicKeyBytes]byte{bytesutil.ToBytes2592(bytevalue)}
+	pubkeys := [][dilithium.CryptoPublicKeyBytes]byte{bytesutil.ToBytes2592(bytevalue)}
 	config := &remoteweb3signer.SetupConfig{
 		BaseEndpoint:          "http://example.com",
 		GenesisValidatorsRoot: root,
@@ -660,7 +660,7 @@ func TestServer_DeleteRemoteKeys(t *testing.T) {
 	root[0] = 1
 	bytevalue, err := hexutil.Decode("0x93247f2209abcacf57b75a51dafae777f9dd38bc7053d1af526f220a7489a6d3a2753e5f3e8b1cfe39b56f43611df74a")
 	require.NoError(t, err)
-	pubkeys := [][dilithium2.CryptoPublicKeyBytes]byte{bytesutil.ToBytes2592(bytevalue)}
+	pubkeys := [][dilithium.CryptoPublicKeyBytes]byte{bytesutil.ToBytes2592(bytevalue)}
 	config := &remoteweb3signer.SetupConfig{
 		BaseEndpoint:          "http://example.com",
 		GenesisValidatorsRoot: root,
@@ -721,7 +721,7 @@ func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 		{
 			name: "ProposerSettings.ProposeConfig.FeeRecipientConfig defined for pubkey (and ProposerSettings.DefaultConfig.FeeRecipientConfig defined)",
 			args: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): {
 						FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 							FeeRecipient: common.HexToAddress("0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
@@ -741,7 +741,7 @@ func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 		{
 			name: "ProposerSettings.ProposeConfig.FeeRecipientConfig NOT defined for pubkey and ProposerSettings.DefaultConfig.FeeRecipientConfig defined",
 			args: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{},
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{},
 				DefaultConfig: &validatorserviceconfig.ProposerOption{
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 						FeeRecipient: common.HexToAddress("0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
@@ -939,7 +939,7 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 			name: "ProposerSetting.ProposeConfig is defined for pubkey",
 			args: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): {},
 				},
 			},
@@ -956,7 +956,7 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 			name: "ProposerSetting.ProposeConfig not defined for pubkey",
 			args: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{},
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{},
 			},
 			want: &want{
 				valEthAddress: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
@@ -971,7 +971,7 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 			name: "ProposerSetting.ProposeConfig is nil for pubkey",
 			args: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): nil,
 				},
 			},
@@ -988,7 +988,7 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 			name: "ProposerSetting.ProposeConfig is nil for pubkey AND DefaultConfig is not nil",
 			args: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): nil,
 				},
 				DefaultConfig: &validatorserviceconfig.ProposerOption{},
@@ -1008,7 +1008,7 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 			m := &mock.MockValidator{}
 			err := m.SetProposerSettings(ctx, tt.proposerSettings)
 			require.NoError(t, err)
-			validatorDB := dbtest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
+			validatorDB := dbtest.SetupDB(t, [][dilithium.CryptoPublicKeyBytes]byte{})
 
 			// save a default here
 			vs, err := client.NewValidatorService(ctx, &client.Config{
@@ -1087,7 +1087,7 @@ func TestServer_DeleteFeeRecipientByPubkey(t *testing.T) {
 		{
 			name: "Happy Path Test",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): {
 						FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 							FeeRecipient: common.HexToAddress("0x055Fb65722E7b2455012BFEBf6177F1D2e9738D5"),
@@ -1111,7 +1111,7 @@ func TestServer_DeleteFeeRecipientByPubkey(t *testing.T) {
 			m := &mock.MockValidator{}
 			err := m.SetProposerSettings(ctx, tt.proposerSettings)
 			require.NoError(t, err)
-			validatorDB := dbtest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
+			validatorDB := dbtest.SetupDB(t, [][dilithium.CryptoPublicKeyBytes]byte{})
 			vs, err := client.NewValidatorService(ctx, &client.Config{
 				Validator: m,
 				ValDB:     validatorDB,
@@ -1162,13 +1162,13 @@ func TestServer_GetGasLimit(t *testing.T) {
 	tests := []struct {
 		name   string
 		args   *validatorserviceconfig.ProposerSettings
-		pubkey [dilithium2.CryptoPublicKeyBytes]byte
+		pubkey [dilithium.CryptoPublicKeyBytes]byte
 		want   uint64
 	}{
 		{
 			name: "ProposerSetting for specific pubkey exists",
 			args: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): {
 						BuilderConfig: &validatorserviceconfig.BuilderConfig{GasLimit: 123456789},
 					},
@@ -1183,7 +1183,7 @@ func TestServer_GetGasLimit(t *testing.T) {
 		{
 			name: "ProposerSetting for specific pubkey does not exist",
 			args: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): {
 						BuilderConfig: &validatorserviceconfig.BuilderConfig{GasLimit: 123456789},
 					},
@@ -1286,7 +1286,7 @@ func TestServer_SetGasLimit(t *testing.T) {
 			pubkey:      pubkey1,
 			newGasLimit: 9999,
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(pubkey1): {
 						BuilderConfig: nil,
 					},
@@ -1300,7 +1300,7 @@ func TestServer_SetGasLimit(t *testing.T) {
 			pubkey:      pubkey1,
 			newGasLimit: 9999,
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(pubkey1): {
 						BuilderConfig: &validatorserviceconfig.BuilderConfig{},
 					},
@@ -1314,7 +1314,7 @@ func TestServer_SetGasLimit(t *testing.T) {
 			pubkey:      pubkey2,
 			newGasLimit: 9999,
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(pubkey2): {
 						BuilderConfig: &validatorserviceconfig.BuilderConfig{
 							Enabled:  true,
@@ -1335,7 +1335,7 @@ func TestServer_SetGasLimit(t *testing.T) {
 			pubkey:      pubkey1,
 			newGasLimit: 9999,
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(pubkey2): {
 						BuilderConfig: nil,
 					},
@@ -1358,7 +1358,7 @@ func TestServer_SetGasLimit(t *testing.T) {
 			m := &mock.MockValidator{}
 			err := m.SetProposerSettings(ctx, tt.proposerSettings)
 			require.NoError(t, err)
-			validatorDB := dbtest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
+			validatorDB := dbtest.SetupDB(t, [][dilithium.CryptoPublicKeyBytes]byte{})
 			vs, err := client.NewValidatorService(ctx, &client.Config{
 				Validator: m,
 				ValDB:     validatorDB,
@@ -1446,7 +1446,7 @@ func TestServer_DeleteGasLimit(t *testing.T) {
 			name:   "delete existing gas limit with default config",
 			pubkey: pubkey1,
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(pubkey1): {
 						BuilderConfig: &validatorserviceconfig.BuilderConfig{GasLimit: validator.Uint64(987654321)},
 					},
@@ -1475,7 +1475,7 @@ func TestServer_DeleteGasLimit(t *testing.T) {
 			name:   "delete existing gas limit with no default config",
 			pubkey: pubkey1,
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(pubkey1): {
 						BuilderConfig: &validatorserviceconfig.BuilderConfig{GasLimit: validator.Uint64(987654321)},
 					},
@@ -1501,7 +1501,7 @@ func TestServer_DeleteGasLimit(t *testing.T) {
 			name:   "delete nonexist gas limit",
 			pubkey: pubkey2,
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
-				ProposeConfig: map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
+				ProposeConfig: map[[dilithium.CryptoPublicKeyBytes]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(pubkey1): {
 						BuilderConfig: &validatorserviceconfig.BuilderConfig{GasLimit: validator.Uint64(987654321)},
 					},
@@ -1528,7 +1528,7 @@ func TestServer_DeleteGasLimit(t *testing.T) {
 			m := &mock.MockValidator{}
 			err := m.SetProposerSettings(ctx, tt.proposerSettings)
 			require.NoError(t, err)
-			validatorDB := dbtest.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{})
+			validatorDB := dbtest.SetupDB(t, [][dilithium.CryptoPublicKeyBytes]byte{})
 			vs, err := client.NewValidatorService(ctx, &client.Config{
 				Validator: m,
 				ValDB:     validatorDB,

@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
@@ -23,7 +23,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // DeterministicGenesisStateAltair returns a genesis state in hard fork 1 format made using the deterministic deposits.
@@ -181,7 +181,7 @@ func buildGenesisBeaconState(genesisTime uint64, preState state.BeaconState, eth
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
 	bodyRoot, err := (&zondpb.BeaconBlockBodyAltair{
-		RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+		RandaoReveal: make([]byte, dilithium.CryptoBytes),
 		Eth1Data: &zondpb.Eth1Data{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
@@ -253,7 +253,7 @@ func NewBeaconBlockAltair() *zondpb.SignedBeaconBlockAltair {
 			ParentRoot: make([]byte, fieldparams.RootLength),
 			StateRoot:  make([]byte, fieldparams.RootLength),
 			Body: &zondpb.BeaconBlockBodyAltair{
-				RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+				RandaoReveal: make([]byte, dilithium.CryptoBytes),
 				Eth1Data: &zondpb.Eth1Data{
 					DepositRoot: make([]byte, fieldparams.RootLength),
 					BlockHash:   make([]byte, 32),

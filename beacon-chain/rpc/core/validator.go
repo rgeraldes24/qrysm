@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute"
@@ -24,7 +24,7 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	prysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -246,7 +246,7 @@ func (s *Service) SubmitSignedAggregateSelectionProof(
 		req.SignedAggregateAndProof.Message.Aggregate == nil || req.SignedAggregateAndProof.Message.Aggregate.Data == nil {
 		return &RpcError{Err: errors.New("signed aggregate request can't be nil"), Reason: BadRequest}
 	}
-	emptySig := make([]byte, dilithium2.CryptoBytes)
+	emptySig := make([]byte, dilithiumlib.CryptoBytes)
 	if bytes.Equal(req.SignedAggregateAndProof.Signature, emptySig) ||
 		bytes.Equal(req.SignedAggregateAndProof.Message.SelectionProof, emptySig) {
 		return &RpcError{Err: errors.New("signed signatures can't be zero hashes"), Reason: BadRequest}
@@ -314,7 +314,7 @@ func (s *Service) AggregatedSigAndAggregationBits(
 		sigs = append(sigs, msg.Signature)
 	}
 
-	aggregatedSig := make([]byte, dilithium2.CryptoBytes)
+	aggregatedSig := make([]byte, dilithiumlib.CryptoBytes)
 	aggregatedSig[0] = 0xC0
 	if len(sigs) != 0 {
 		uncompressedSigs, err := dilithium.MultipleSignaturesFromBytes(sigs)

@@ -7,14 +7,14 @@ import (
 	"strings"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
-	pb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	"github.com/theQRL/go-qrllib/dilithium"
+	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
 func TestSSZTagSize(t *testing.T) {
-	sigSize := dilithium2.CryptoBytes
+	sigSize := dilithium.CryptoBytes
 	pubKeySize := 48
 	rootSize := 32
 

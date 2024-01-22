@@ -4,10 +4,10 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -15,7 +15,7 @@ import (
 
 type fields struct {
 	root                        [32]byte
-	sig                         [dilithium2.CryptoBytes]byte
+	sig                         [dilithium.CryptoBytes]byte
 	deposits                    []*zond.Deposit
 	atts                        []*zond.Attestation
 	proposerSlashings           []*zond.ProposerSlashing
@@ -1436,7 +1436,7 @@ func getFields() fields {
 	b48 := make([]byte, 48)
 	b256 := make([]byte, 256)
 	var root [32]byte
-	var sig [dilithium2.CryptoBytes]byte
+	var sig [dilithium.CryptoBytes]byte
 	b20[0], b20[5], b20[10] = 'q', 'u', 'x'
 	b48[0], b48[5], b48[10] = 'b', 'a', 'r'
 	b256[0], b256[5], b256[10] = 'x', 'y', 'z'

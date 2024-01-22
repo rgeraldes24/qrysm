@@ -4,14 +4,14 @@ import (
 	"strconv"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
 	contracts "github.com/theQRL/qrysm/v4/contracts/deposit/mock"
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -96,7 +96,7 @@ func TestMarshalDepositWithProof(t *testing.T) {
 	require.Equal(t, len(proof), int(params.BeaconConfig().DepositContractTreeDepth)+1)
 	someRoot := [32]byte{1, 2, 3, 4}
 	someSig := [96]byte{1, 2, 3, 4}
-	someKey := [dilithium2.CryptoPublicKeyBytes]byte{1, 2, 3, 4}
+	someKey := [dilithium.CryptoPublicKeyBytes]byte{1, 2, 3, 4}
 	dep := &zondpb.Deposit{
 		Proof: proof,
 		Data: &zondpb.Deposit_Data{

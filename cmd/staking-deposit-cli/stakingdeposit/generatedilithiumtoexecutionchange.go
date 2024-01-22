@@ -9,14 +9,14 @@ import (
 	"path/filepath"
 	"strconv"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/cmd/staking-deposit-cli/config"
 	"github.com/theQRL/qrysm/v4/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 )
 
@@ -182,7 +182,7 @@ func ValidateDilithiumToExecutionChange(dilithiumToExecutionChange *DilithiumToE
 		panic(fmt.Errorf("failed to generate hash tree root for signingData %v", err))
 	}
 	sizedPK := misc.ToSizedDilithiumPublicKey(credential.WithdrawalPK())
-	return dilithium2.Verify(signingRoot[:], misc.ToSizedDilithiumSignature(signature.Marshal()), &sizedPK)
+	return dilithiumlib.Verify(signingRoot[:], misc.ToSizedDilithiumSignature(signature.Marshal()), &sizedPK)
 }
 
 func ValidateDilithiumWithdrawalCredentialsMatching(dilithiumWithdrawalCredential string, credential *Credential) bool {

@@ -4,11 +4,11 @@ import (
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
@@ -16,14 +16,14 @@ import (
 func TestUpdateLogAggregateStats(t *testing.T) {
 	v := &validator{
 		logValidatorBalances: true,
-		startBalances:        make(map[[dilithium2.CryptoPublicKeyBytes]byte]uint64),
-		prevBalance:          make(map[[dilithium2.CryptoPublicKeyBytes]byte]uint64),
+		startBalances:        make(map[[dilithium.CryptoPublicKeyBytes]byte]uint64),
+		prevBalance:          make(map[[dilithium.CryptoPublicKeyBytes]byte]uint64),
 		voteStats: voteStats{
 			startEpoch: 0, // this would otherwise have been previously set in LogValidatorGainsAndLosses()
 		},
 	}
 
-	pubKeyBytes := [][dilithium2.CryptoPublicKeyBytes]byte{
+	pubKeyBytes := [][dilithium.CryptoPublicKeyBytes]byte{
 		bytesutil.ToBytes2592([]byte("000000000000000000000000000000000000000012345678")),
 		bytesutil.ToBytes2592([]byte("000000000000000000000000000000000000000099999999")),
 		bytesutil.ToBytes2592([]byte("000000000000000000000000000000000000000055555555")),
@@ -90,14 +90,14 @@ func TestUpdateLogAggregateStats(t *testing.T) {
 func TestUpdateLogAltairAggregateStats(t *testing.T) {
 	v := &validator{
 		logValidatorBalances: true,
-		startBalances:        make(map[[dilithium2.CryptoPublicKeyBytes]byte]uint64),
-		prevBalance:          make(map[[dilithium2.CryptoPublicKeyBytes]byte]uint64),
+		startBalances:        make(map[[dilithium.CryptoPublicKeyBytes]byte]uint64),
+		prevBalance:          make(map[[dilithium.CryptoPublicKeyBytes]byte]uint64),
 		voteStats: voteStats{
 			startEpoch: params.BeaconConfig().AltairForkEpoch, // this would otherwise have been previously set in LogValidatorGainsAndLosses()
 		},
 	}
 
-	pubKeyBytes := [][dilithium2.CryptoPublicKeyBytes]byte{
+	pubKeyBytes := [][dilithium.CryptoPublicKeyBytes]byte{
 		bytesutil.ToBytes2592([]byte("000000000000000000000000000000000000000012345678")),
 		bytesutil.ToBytes2592([]byte("000000000000000000000000000000000000000099999999")),
 		bytesutil.ToBytes2592([]byte("000000000000000000000000000000000000000055555555")),

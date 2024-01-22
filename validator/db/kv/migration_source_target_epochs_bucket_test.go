@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	bolt "go.etcd.io/bbolt"
@@ -18,9 +18,9 @@ func TestStore_migrateSourceTargetEpochsBucketUp(t *testing.T) {
 	// numKeys should be more than batch size for testing.
 	// See: https://github.com/theQRL/qrysm/issues/8509
 	numKeys := 2*publicKeyMigrationBatchSize + 1
-	pubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, numKeys)
+	pubKeys := make([][dilithium.CryptoPublicKeyBytes]byte, numKeys)
 	for i := 0; i < numKeys; i++ {
-		var pk [dilithium2.CryptoPublicKeyBytes]byte
+		var pk [dilithium.CryptoPublicKeyBytes]byte
 		copy(pk[:], fmt.Sprintf("%d", i))
 		pubKeys[i] = pk
 	}
@@ -119,9 +119,9 @@ func TestStore_migrateSourceTargetEpochsBucketDown(t *testing.T) {
 	// numKeys should be more than batch size for testing.
 	// See: https://github.com/theQRL/qrysm/issues/8509
 	numKeys := 2*publicKeyMigrationBatchSize + 1
-	pubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, numKeys)
+	pubKeys := make([][dilithium.CryptoPublicKeyBytes]byte, numKeys)
 	for i := 0; i < numKeys; i++ {
-		var pk [dilithium2.CryptoPublicKeyBytes]byte
+		var pk [dilithium.CryptoPublicKeyBytes]byte
 		copy(pk[:], fmt.Sprintf("%d", i))
 		pubKeys[i] = pk
 	}

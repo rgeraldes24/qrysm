@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
@@ -14,10 +14,10 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/attestation"
-	"github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/attestation/aggregation"
-	attaggregation "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/attestation/aggregation/attestations"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
+	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
+	attaggregation "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/attestations"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -113,7 +113,7 @@ func TestProcessAttestationsNoVerify_OK(t *testing.T) {
 		AggregationBits: aggBits,
 	}
 
-	var zeroSig [dilithium2.CryptoBytes]byte
+	var zeroSig [dilithium.CryptoBytes]byte
 	att.Signature = zeroSig[:]
 
 	err := beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
@@ -182,7 +182,7 @@ func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 		AggregationBits: aggBits,
 	}
 
-	var zeroSig [dilithium2.CryptoBytes]byte
+	var zeroSig [dilithium.CryptoBytes]byte
 	att.Signature = zeroSig[:]
 
 	err := beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
@@ -210,7 +210,7 @@ func TestVerifyAttestationNoVerifySignature_BadAttIdx(t *testing.T) {
 		},
 		AggregationBits: aggBits,
 	}
-	var zeroSig [dilithium2.CryptoBytes]byte
+	var zeroSig [dilithium.CryptoBytes]byte
 	att.Signature = zeroSig[:]
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+params.BeaconConfig().MinAttestationInclusionDelay))
 	ckp := beaconState.CurrentJustifiedCheckpoint()
@@ -254,7 +254,7 @@ func TestConvertToIndexed_OK(t *testing.T) {
 		},
 	}
 
-	var sig [dilithium2.CryptoBytes]byte
+	var sig [dilithium.CryptoBytes]byte
 	copy(sig[:], "signed")
 	att := util.HydrateAttestation(&zondpb.Attestation{
 		Signature: sig[:],
@@ -310,7 +310,7 @@ func TestVerifyIndexedAttestation_OK(t *testing.T) {
 				Source: &zondpb.Checkpoint{},
 			}),
 			AttestingIndices: []uint64{1},
-			Signature:        make([]byte, dilithium2.CryptoBytes),
+			Signature:        make([]byte, dilithium.CryptoBytes),
 		}},
 		{attestation: &zondpb.IndexedAttestation{
 			Data: util.HydrateAttestationData(&zondpb.AttestationData{
@@ -319,7 +319,7 @@ func TestVerifyIndexedAttestation_OK(t *testing.T) {
 				},
 			}),
 			AttestingIndices: []uint64{47, 99, 101},
-			Signature:        make([]byte, dilithium2.CryptoBytes),
+			Signature:        make([]byte, dilithium.CryptoBytes),
 		}},
 		{attestation: &zondpb.IndexedAttestation{
 			Data: util.HydrateAttestationData(&zondpb.AttestationData{
@@ -328,7 +328,7 @@ func TestVerifyIndexedAttestation_OK(t *testing.T) {
 				},
 			}),
 			AttestingIndices: []uint64{21, 72},
-			Signature:        make([]byte, dilithium2.CryptoBytes),
+			Signature:        make([]byte, dilithium.CryptoBytes),
 		}},
 		{attestation: &zondpb.IndexedAttestation{
 			Data: util.HydrateAttestationData(&zondpb.AttestationData{
@@ -337,7 +337,7 @@ func TestVerifyIndexedAttestation_OK(t *testing.T) {
 				},
 			}),
 			AttestingIndices: []uint64{100, 121, 122},
-			Signature:        make([]byte, dilithium2.CryptoBytes),
+			Signature:        make([]byte, dilithium.CryptoBytes),
 		}},
 	}
 

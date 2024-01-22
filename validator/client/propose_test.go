@@ -10,7 +10,7 @@ import (
 	"github.com/golang/mock/gomock"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	common2 "github.com/theQRL/go-qrllib/common"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
@@ -21,8 +21,8 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	validatorpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -72,9 +72,9 @@ func setup(t *testing.T) (*validator, *mocks, dilithium.DilithiumKey, func()) {
 }
 
 func setupWithKey(t *testing.T, validatorKey dilithium.DilithiumKey) (*validator, *mocks, dilithium.DilithiumKey, func()) {
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
-	valDB := testing2.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{pubKey})
+	valDB := testing2.SetupDB(t, [][dilithiumlib.CryptoPublicKeyBytes]byte{pubKey})
 	ctrl := gomock.NewController(t)
 	m := &mocks{
 		validatorClient: validatormock.NewMockValidatorClient(ctrl),
@@ -101,7 +101,7 @@ func TestProposeBlock_DoesNotProposeGenesisBlock(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, _, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.ProposeBlock(context.Background(), 0, pubKey)
 
@@ -112,7 +112,7 @@ func TestProposeBlock_DomainDataFailed(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 	m.validatorClient.EXPECT().DomainData(
@@ -128,7 +128,7 @@ func TestProposeBlock_DomainDataIsNil(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 	m.validatorClient.EXPECT().DomainData(
@@ -170,7 +170,7 @@ func TestProposeBlock_RequestBlockFailed(t *testing.T) {
 			hook := logTest.NewGlobal()
 			validator, m, validatorKey, finish := setup(t)
 			defer finish()
-			var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+			var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 			copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 			m.validatorClient.EXPECT().DomainData(
@@ -225,7 +225,7 @@ func TestProposeBlock_ProposeBlockFailed(t *testing.T) {
 			hook := logTest.NewGlobal()
 			validator, m, validatorKey, finish := setup(t)
 			defer finish()
-			var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+			var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 			copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 			m.validatorClient.EXPECT().DomainData(
@@ -323,7 +323,7 @@ func TestProposeBlock_BlocksDoubleProposal(t *testing.T) {
 			hook := logTest.NewGlobal()
 			validator, m, validatorKey, finish := setup(t)
 			defer finish()
-			var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+			var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 			copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 			var dummyRoot [32]byte
@@ -369,7 +369,7 @@ func TestProposeBlock_BlocksDoubleProposal_After54KEpochs(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 	var dummyRoot [32]byte
@@ -445,7 +445,7 @@ func TestProposeBlock_AllowsPastProposals(t *testing.T) {
 			hook := logTest.NewGlobal()
 			validator, m, validatorKey, finish := setup(t)
 			defer finish()
-			var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+			var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 			copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 			// Save a dummy proposal history at slot 0.
@@ -665,7 +665,7 @@ func testProposeBlock(t *testing.T, graffiti []byte) {
 			hook := logTest.NewGlobal()
 			validator, m, validatorKey, finish := setup(t)
 			defer finish()
-			var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+			var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 			copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 			validator.graffiti = graffiti
@@ -947,7 +947,7 @@ func TestGetGraffiti_Ok(t *testing.T) {
 	m := &mocks{
 		validatorClient: validatormock.NewMockValidatorClient(ctrl),
 	}
-	pubKey := [dilithium2.CryptoPublicKeyBytes]byte{'a'}
+	pubKey := [dilithiumlib.CryptoPublicKeyBytes]byte{'a'}
 	tests := []struct {
 		name string
 		v    *validator
@@ -1024,8 +1024,8 @@ func TestGetGraffiti_Ok(t *testing.T) {
 }
 
 func TestGetGraffitiOrdered_Ok(t *testing.T) {
-	pubKey := [dilithium2.CryptoPublicKeyBytes]byte{'a'}
-	valDB := testing2.SetupDB(t, [][dilithium2.CryptoPublicKeyBytes]byte{pubKey})
+	pubKey := [dilithiumlib.CryptoPublicKeyBytes]byte{'a'}
+	valDB := testing2.SetupDB(t, [][dilithiumlib.CryptoPublicKeyBytes]byte{pubKey})
 	ctrl := gomock.NewController(t)
 	m := &mocks{
 		validatorClient: validatormock.NewMockValidatorClient(ctrl),

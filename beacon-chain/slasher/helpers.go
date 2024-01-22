@@ -5,12 +5,12 @@ import (
 	"strconv"
 
 	"github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	slashertypes "github.com/theQRL/qrysm/v4/beacon-chain/slasher/types"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/container/slice"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // Group a list of attestations into batches by validator chunk index.
@@ -112,8 +112,8 @@ func validateBlockHeaderIntegrity(header *zondpb.SignedBeaconBlockHeader) bool {
 	// If a signed block header is malformed, we drop it.
 	if header == nil ||
 		header.Header == nil ||
-		len(header.Signature) != dilithium2.CryptoBytes ||
-		bytes.Equal(header.Signature, make([]byte, dilithium2.CryptoBytes)) {
+		len(header.Signature) != dilithium.CryptoBytes ||
+		bytes.Equal(header.Signature, make([]byte, dilithium.CryptoBytes)) {
 		return false
 	}
 	return true

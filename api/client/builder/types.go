@@ -7,14 +7,14 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common/hexutil"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	types "github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/math"
 	v1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 var errInvalidUint256 = errors.New("invalid Uint256")
@@ -1055,15 +1055,15 @@ type BlobsBundle struct {
 func (b BlobsBundle) ToProto() (*v1.BlobsBundle, error) {
 	commitments := make([][]byte, len(b.Commitments))
 	for i := range b.Commitments {
-		if len(b.Commitments[i]) != dilithium2.CryptoPublicKeyBytes {
-			return nil, fmt.Errorf("commitment length %d is not %d", len(b.Commitments[i]), dilithium2.CryptoPublicKeyBytes)
+		if len(b.Commitments[i]) != dilithium.CryptoPublicKeyBytes {
+			return nil, fmt.Errorf("commitment length %d is not %d", len(b.Commitments[i]), dilithium.CryptoPublicKeyBytes)
 		}
 		commitments[i] = bytesutil.SafeCopyBytes(b.Commitments[i])
 	}
 	proofs := make([][]byte, len(b.Proofs))
 	for i := range b.Proofs {
-		if len(b.Proofs[i]) != dilithium2.CryptoPublicKeyBytes {
-			return nil, fmt.Errorf("proof length %d is not %d", len(b.Proofs[i]), dilithium2.CryptoPublicKeyBytes)
+		if len(b.Proofs[i]) != dilithium.CryptoPublicKeyBytes {
+			return nil, fmt.Errorf("proof length %d is not %d", len(b.Proofs[i]), dilithium.CryptoPublicKeyBytes)
 		}
 		proofs[i] = bytesutil.SafeCopyBytes(b.Proofs[i])
 	}

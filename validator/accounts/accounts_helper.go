@@ -10,7 +10,7 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/manifoldco/promptui"
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/cmd/validator/flags"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -21,7 +21,7 @@ import (
 )
 
 // selectAccounts Ask user to select accounts via an interactive user prompt.
-func selectAccounts(selectionPrompt string, pubKeys [][dilithium2.CryptoPublicKeyBytes]byte) (filteredPubKeys []dilithium.PublicKey, err error) {
+func selectAccounts(selectionPrompt string, pubKeys [][dilithiumlib.CryptoPublicKeyBytes]byte) (filteredPubKeys []dilithium.PublicKey, err error) {
 	pubKeyStrings := make([]string, len(pubKeys))
 	for i, pk := range pubKeys {
 		name := petnames.DeterministicName(pk[:], "-")
@@ -100,7 +100,7 @@ func selectAccounts(selectionPrompt string, pubKeys [][dilithium2.CryptoPublicKe
 func FilterPublicKeysFromUserInput(
 	cliCtx *cli.Context,
 	publicKeysFlag *cli.StringFlag,
-	validatingPublicKeys [][dilithium2.CryptoPublicKeyBytes]byte,
+	validatingPublicKeys [][dilithiumlib.CryptoPublicKeyBytes]byte,
 	selectionPrompt string,
 ) ([]dilithium.PublicKey, error) {
 	if cliCtx.IsSet(publicKeysFlag.Name) {
@@ -140,7 +140,7 @@ func filterPublicKeys(pubKeyStrings []string) ([]dilithium.PublicKey, error) {
 func FilterExitAccountsFromUserInput(
 	cliCtx *cli.Context,
 	r io.Reader,
-	validatingPublicKeys [][dilithium2.CryptoPublicKeyBytes]byte,
+	validatingPublicKeys [][dilithiumlib.CryptoPublicKeyBytes]byte,
 	forceExit bool,
 ) (rawPubKeys [][]byte, formattedPubKeys []string, err error) {
 	if !cliCtx.IsSet(flags.ExitAllFlag.Name) {

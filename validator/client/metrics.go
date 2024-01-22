@@ -7,11 +7,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -238,7 +238,7 @@ func (v *validator) LogValidatorGainsAndLosses(ctx context.Context, slot primiti
 		return nil
 	}
 
-	var pks [][dilithium2.CryptoPublicKeyBytes]byte
+	var pks [][dilithium.CryptoPublicKeyBytes]byte
 	var err error
 	pks, err = v.keyManager.FetchValidatingPublicKeys(ctx)
 	if err != nil {

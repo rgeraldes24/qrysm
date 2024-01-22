@@ -9,12 +9,12 @@ import (
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -33,7 +33,7 @@ func TestSubmitSyncCommitteeMessage_ValidatorDutiesRequestFailure(t *testing.T) 
 		Root: bytesutil.PadTo([]byte{}, 32),
 	}, nil)
 
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitSyncCommitteeMessage(context.Background(), 1, pubKey)
 	require.LogsContain(t, hook, "Could not fetch validator assignment")
@@ -65,7 +65,7 @@ func TestSubmitSyncCommitteeMessage_BadDomainData(t *testing.T) {
 		DomainData(gomock.Any(), gomock.Any()).
 		Return(nil, errors.New("uh oh"))
 
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitSyncCommitteeMessage(context.Background(), 1, pubKey)
 	require.LogsContain(t, hook, "Could not get sync committee domain data")
@@ -105,7 +105,7 @@ func TestSubmitSyncCommitteeMessage_CouldNotSubmit(t *testing.T) {
 		gomock.AssignableToTypeOf(&zondpb.SyncCommitteeMessage{}),
 	).Return(&emptypb.Empty{}, errors.New("uh oh") /* error */)
 
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitSyncCommitteeMessage(context.Background(), 1, pubKey)
 
@@ -149,7 +149,7 @@ func TestSubmitSyncCommitteeMessage_OK(t *testing.T) {
 		generatedMsg = msg
 	}).Return(&emptypb.Empty{}, nil /* error */)
 
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitSyncCommitteeMessage(context.Background(), 1, pubKey)
 
@@ -165,7 +165,7 @@ func TestSubmitSignedContributionAndProof_ValidatorDutiesRequestFailure(t *testi
 	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{}}
 	defer finish()
 
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitSignedContributionAndProof(context.Background(), 1, pubKey)
 	require.LogsContain(t, hook, "Could not fetch validator assignment")
@@ -185,7 +185,7 @@ func TestSubmitSignedContributionAndProof_GetSyncSubcommitteeIndexFailure(t *tes
 	}}
 	defer finish()
 
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -213,7 +213,7 @@ func TestSubmitSignedContributionAndProof_NothingToDo(t *testing.T) {
 	}}
 	defer finish()
 
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -241,7 +241,7 @@ func TestSubmitSignedContributionAndProof_BadDomain(t *testing.T) {
 	}}
 	defer finish()
 
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -283,7 +283,7 @@ func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) 
 	}}
 	defer finish()
 
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -333,7 +333,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	}}
 	defer finish()
 
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -361,7 +361,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 		},
 	).Return(&zondpb.SyncCommitteeContribution{
 		BlockRoot:       make([]byte, fieldparams.RootLength),
-		Signature:       make([]byte, dilithium2.CryptoBytes),
+		Signature:       make([]byte, dilithiumlib.CryptoBytes),
 		AggregationBits: aggBits,
 	}, nil)
 
@@ -379,7 +379,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 				AggregatorIndex: 7,
 				Contribution: &zondpb.SyncCommitteeContribution{
 					BlockRoot:         make([]byte, fieldparams.RootLength),
-					Signature:         make([]byte, dilithium2.CryptoBytes),
+					Signature:         make([]byte, dilithiumlib.CryptoBytes),
 					AggregationBits:   bitfield.NewBitvector128(),
 					Slot:              1,
 					SubcommitteeIndex: 1,
@@ -411,7 +411,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	}}
 	defer finish()
 
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -439,7 +439,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 		},
 	).Return(&zondpb.SyncCommitteeContribution{
 		BlockRoot:       make([]byte, fieldparams.RootLength),
-		Signature:       make([]byte, dilithium2.CryptoBytes),
+		Signature:       make([]byte, dilithiumlib.CryptoBytes),
 		AggregationBits: aggBits,
 	}, nil)
 
@@ -457,7 +457,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 				AggregatorIndex: 7,
 				Contribution: &zondpb.SyncCommitteeContribution{
 					BlockRoot:         make([]byte, 32),
-					Signature:         make([]byte, dilithium2.CryptoBytes),
+					Signature:         make([]byte, dilithiumlib.CryptoBytes),
 					AggregationBits:   bitfield.NewBitvector128(),
 					Slot:              1,
 					SubcommitteeIndex: 1,

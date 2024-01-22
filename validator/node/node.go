@@ -25,7 +25,7 @@ import (
 	"github.com/pkg/errors"
 	fastssz "github.com/prysmaticlabs/fastssz"
 	"github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/api/gateway"
@@ -43,8 +43,8 @@ import (
 	"github.com/theQRL/qrysm/v4/monitoring/backup"
 	"github.com/theQRL/qrysm/v4/monitoring/prometheus"
 	tracing2 "github.com/theQRL/qrysm/v4/monitoring/tracing"
-	pb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	validatorpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	"github.com/theQRL/qrysm/v4/runtime"
 	"github.com/theQRL/qrysm/v4/runtime/debug"
@@ -477,7 +477,7 @@ func Web3SignerConfig(cliCtx *cli.Context) (*remoteweb3signer.SetupConfig, error
 			}
 			if len(pks) > 0 {
 				pks = slice.Unique[string](pks)
-				var validatorKeys [][dilithium2.CryptoPublicKeyBytes]byte
+				var validatorKeys [][dilithium.CryptoPublicKeyBytes]byte
 				for _, key := range pks {
 					decodedKey, decodeErr := hexutil.Decode(key)
 					if decodeErr != nil {
@@ -575,13 +575,13 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 	}
 
 	if fileConfig.ProposerConfig != nil && len(fileConfig.ProposerConfig) != 0 {
-		vpSettings.ProposeConfig = make(map[[dilithium2.CryptoPublicKeyBytes]byte]*validatorServiceConfig.ProposerOption)
+		vpSettings.ProposeConfig = make(map[[dilithium.CryptoPublicKeyBytes]byte]*validatorServiceConfig.ProposerOption)
 		for key, option := range fileConfig.ProposerConfig {
 			decodedKey, err := hexutil.Decode(key)
 			if err != nil {
 				return nil, errors.Wrapf(err, "could not decode public key %s", key)
 			}
-			if len(decodedKey) != dilithium2.CryptoPublicKeyBytes {
+			if len(decodedKey) != dilithium.CryptoPublicKeyBytes {
 				return nil, fmt.Errorf("%v  is not a bls public key", key)
 			}
 			if err := verifyOption(key, option); err != nil {

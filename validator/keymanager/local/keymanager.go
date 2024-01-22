@@ -11,12 +11,12 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
 	common2 "github.com/theQRL/go-qrllib/common"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/v4/async/event"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	validatorpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/v4/runtime/interop"
 	"github.com/theQRL/qrysm/v4/validator/accounts/iface"
 	"github.com/theQRL/qrysm/v4/validator/accounts/petnames"
@@ -26,8 +26,8 @@ import (
 
 var (
 	lock               sync.RWMutex
-	orderedPublicKeys  = make([][dilithium2.CryptoPublicKeyBytes]byte, 0)
-	dilithiumKeysCache = make(map[[dilithium2.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey)
+	orderedPublicKeys  = make([][dilithiumlib.CryptoPublicKeyBytes]byte, 0)
+	dilithiumKeysCache = make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey)
 )
 
 const (
@@ -80,8 +80,8 @@ type AccountsKeystoreRepresentation struct {
 // ResetCaches for the keymanager.
 func ResetCaches() {
 	lock.Lock()
-	orderedPublicKeys = make([][dilithium2.CryptoPublicKeyBytes]byte, 0)
-	dilithiumKeysCache = make(map[[dilithium2.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey)
+	orderedPublicKeys = make([][dilithiumlib.CryptoPublicKeyBytes]byte, 0)
+	dilithiumKeysCache = make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey)
 	lock.Unlock()
 }
 
@@ -126,7 +126,7 @@ func NewInteropKeymanager(_ context.Context, offset, numValidatorKeys uint64) (*
 		return nil, errors.Wrap(err, "could not generate interop keys")
 	}
 	lock.Lock()
-	pubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, numValidatorKeys)
+	pubKeys := make([][dilithiumlib.CryptoPublicKeyBytes]byte, numValidatorKeys)
 	for i := uint64(0); i < numValidatorKeys; i++ {
 		publicKey := bytesutil.ToBytes2592(publicKeys[i].Marshal())
 		pubKeys[i] = publicKey
@@ -140,7 +140,7 @@ func NewInteropKeymanager(_ context.Context, offset, numValidatorKeys uint64) (*
 // SubscribeAccountChanges creates an event subscription for a channel
 // to listen for public key changes at runtime, such as when new validator accounts
 // are imported into the keymanager while the validator process is running.
-func (km *Keymanager) SubscribeAccountChanges(pubKeysChan chan [][dilithium2.CryptoPublicKeyBytes]byte) event.Subscription {
+func (km *Keymanager) SubscribeAccountChanges(pubKeysChan chan [][dilithiumlib.CryptoPublicKeyBytes]byte) event.Subscription {
 	return km.accountsChangedFeed.Subscribe(pubKeysChan)
 }
 
@@ -161,8 +161,8 @@ func (km *Keymanager) initializeKeysCachesFromKeystore() error {
 	lock.Lock()
 	defer lock.Unlock()
 	count := len(km.accountsStore.Seeds)
-	orderedPublicKeys = make([][dilithium2.CryptoPublicKeyBytes]byte, count)
-	dilithiumKeysCache = make(map[[dilithium2.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey, count)
+	orderedPublicKeys = make([][dilithiumlib.CryptoPublicKeyBytes]byte, count)
+	dilithiumKeysCache = make(map[[dilithiumlib.CryptoPublicKeyBytes]byte]dilithium.DilithiumKey, count)
 	for i, publicKey := range km.accountsStore.PublicKeys {
 		publicKey2592 := bytesutil.ToBytes2592(publicKey)
 		orderedPublicKeys[i] = publicKey2592
@@ -176,13 +176,13 @@ func (km *Keymanager) initializeKeysCachesFromKeystore() error {
 }
 
 // FetchValidatingPublicKeys fetches the list of active public keys from the local account keystores.
-func (_ *Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][dilithium2.CryptoPublicKeyBytes]byte, error) {
+func (_ *Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][dilithiumlib.CryptoPublicKeyBytes]byte, error) {
 	ctx, span := trace.StartSpan(ctx, "keymanager.FetchValidatingPublicKeys")
 	defer span.End()
 
 	lock.RLock()
 	keys := orderedPublicKeys
-	result := make([][dilithium2.CryptoPublicKeyBytes]byte, len(keys))
+	result := make([][dilithiumlib.CryptoPublicKeyBytes]byte, len(keys))
 	copy(result, keys)
 	lock.RUnlock()
 	return result, nil

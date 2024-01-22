@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/shared"
-	rpctesting "github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/shared/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
+	rpctesting "github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared/testing"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/validator/client/beacon-api/mock"

@@ -9,7 +9,7 @@ import (
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/async"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -19,8 +19,8 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	validatorpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	prysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -37,7 +37,7 @@ const signExitErr = "could not sign voluntary exit proposal"
 // chain node to construct the new block. The new block is then processed with
 // the state root computation, and finally signed by the validator before being
 // sent back to the beacon node for broadcasting.
-func (v *validator) ProposeBlock(ctx context.Context, slot primitives.Slot, pubKey [dilithium2.CryptoPublicKeyBytes]byte) {
+func (v *validator) ProposeBlock(ctx context.Context, slot primitives.Slot, pubKey [dilithiumlib.CryptoPublicKeyBytes]byte) {
 	if slot == 0 {
 		log.Debug("Assigned to genesis slot, skipping proposal")
 		return
@@ -307,7 +307,7 @@ func CreateSignedVoluntaryExit(
 }
 
 // Sign randao reveal with randao domain and private key.
-func (v *validator) signRandaoReveal(ctx context.Context, pubKey [dilithium2.CryptoPublicKeyBytes]byte, epoch primitives.Epoch, slot primitives.Slot) ([]byte, error) {
+func (v *validator) signRandaoReveal(ctx context.Context, pubKey [dilithiumlib.CryptoPublicKeyBytes]byte, epoch primitives.Epoch, slot primitives.Slot) ([]byte, error) {
 	domain, err := v.domainData(ctx, epoch, params.BeaconConfig().DomainRandao[:])
 	if err != nil {
 		return nil, errors.Wrap(err, domainDataErr)
@@ -337,7 +337,7 @@ func (v *validator) signRandaoReveal(ctx context.Context, pubKey [dilithium2.Cry
 
 // Sign block with proposer domain and private key.
 // Returns the signature, block signing root, and any error.
-func (v *validator) signBlock(ctx context.Context, pubKey [dilithium2.CryptoPublicKeyBytes]byte, epoch primitives.Epoch, slot primitives.Slot, b interfaces.ReadOnlyBeaconBlock) ([]byte, [32]byte, error) {
+func (v *validator) signBlock(ctx context.Context, pubKey [dilithiumlib.CryptoPublicKeyBytes]byte, epoch primitives.Epoch, slot primitives.Slot, b interfaces.ReadOnlyBeaconBlock) ([]byte, [32]byte, error) {
 	domain, err := v.domainData(ctx, epoch, params.BeaconConfig().DomainBeaconProposer[:])
 	if err != nil {
 		return nil, [32]byte{}, errors.Wrap(err, domainDataErr)
@@ -408,7 +408,7 @@ func signVoluntaryExit(
 }
 
 // Gets the graffiti from cli or file for the validator public key.
-func (v *validator) getGraffiti(ctx context.Context, pubKey [dilithium2.CryptoPublicKeyBytes]byte) ([]byte, error) {
+func (v *validator) getGraffiti(ctx context.Context, pubKey [dilithiumlib.CryptoPublicKeyBytes]byte) ([]byte, error) {
 	// When specified, default graffiti from the command line takes the first priority.
 	if len(v.graffiti) != 0 {
 		return v.graffiti, nil

@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	corehelpers "github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/encoding/ssz/detect"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	v2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/helpers"
@@ -116,7 +116,7 @@ var ValidatorsVoteWithTheMajority = e2etypes.Evaluator{
 }
 
 type mismatch struct {
-	k [dilithium2.CryptoPublicKeyBytes]byte
+	k [dilithium.CryptoPublicKeyBytes]byte
 	e uint64
 	o uint64
 }
@@ -139,7 +139,7 @@ func processesDepositsInBlocks(ec *e2etypes.EvaluationContext, conns ...*grpc.Cl
 	if err != nil {
 		return errors.Wrap(err, "failed to get blocks from beacon-chain")
 	}
-	observed := make(map[[dilithium2.CryptoPublicKeyBytes]byte]uint64)
+	observed := make(map[[dilithium.CryptoPublicKeyBytes]byte]uint64)
 	for _, blk := range blks.BlockContainers {
 		sb, err := blocks.BeaconBlockContainerToSignedBeaconBlock(blk)
 		if err != nil {

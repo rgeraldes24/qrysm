@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
-	validatorpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	mock "github.com/theQRL/qrysm/v4/validator/accounts/testing"
@@ -99,11 +99,11 @@ func TestDerivedKeymanager_FetchValidatingPublicKeys(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, numAccounts, len(publicKeys))
 
-	wantedPubKeys := make([][dilithium2.CryptoPublicKeyBytes]byte, numAccounts)
+	wantedPubKeys := make([][dilithiumlib.CryptoPublicKeyBytes]byte, numAccounts)
 	for i := 0; i < numAccounts; i++ {
 		privKey, err := util.PrivateKeyFromSeedAndPath(derivedSeed, fmt.Sprintf(ValidatingKeyDerivationPathTemplate, i))
 		require.NoError(t, err)
-		var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+		var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 		copy(pubKey[:], privKey.PublicKey().Marshal())
 		wantedPubKeys[i] = pubKey
 	}

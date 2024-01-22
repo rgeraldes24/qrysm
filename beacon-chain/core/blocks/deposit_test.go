@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/v4/container/trie"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -59,9 +59,9 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 	deposit := &zondpb.Deposit{
 		Data: &zondpb.Deposit_Data{
-			PublicKey:             bytesutil.PadTo([]byte{1, 2, 3}, dilithium2.CryptoPublicKeyBytes),
+			PublicKey:             bytesutil.PadTo([]byte{1, 2, 3}, dilithiumlib.CryptoPublicKeyBytes),
 			WithdrawalCredentials: make([]byte, 32),
-			Signature:             make([]byte, dilithium2.CryptoBytes),
+			Signature:             make([]byte, dilithiumlib.CryptoBytes),
 		},
 	}
 	leaf, err := deposit.Data.HashTreeRoot()
@@ -140,7 +140,7 @@ func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T)
 			PublicKey:             sk.PublicKey().Marshal(),
 			Amount:                1000,
 			WithdrawalCredentials: make([]byte, 32),
-			Signature:             make([]byte, dilithium2.CryptoBytes),
+			Signature:             make([]byte, dilithiumlib.CryptoBytes),
 		},
 	}
 	sr, err := signing.ComputeSigningRoot(deposit.Data, bytesutil.ToBytes(3, 32))

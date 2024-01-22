@@ -13,8 +13,8 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/theQRL/qrysm/v4/cmd/validator/flags"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	pb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/validator-client"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	validatormock "github.com/theQRL/qrysm/v4/testing/validator-mock"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/proto/zond/service"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -23,7 +23,7 @@ func TestListKeystores_JSONisEqual(t *testing.T) {
 	protoResponse := &service.ListKeystoresResponse{
 		Data: []*service.ListKeystoresResponse_Keystore{
 			{
-				ValidatingPubkey: make([]byte, dilithium2.CryptoPublicKeyBytes),
+				ValidatingPubkey: make([]byte, dilithium.CryptoPublicKeyBytes),
 				DerivationPath:   "m/44'/60'/0'/0/0",
 			},
 		},
@@ -132,7 +132,7 @@ func TestListRemoteKeys_JSONisEqual(t *testing.T) {
 	protoResponse := &service.ListRemoteKeysResponse{
 		Data: []*service.ListRemoteKeysResponse_Keystore{
 			{
-				Pubkey:   make([]byte, dilithium2.CryptoPublicKeyBytes),
+				Pubkey:   make([]byte, dilithium.CryptoPublicKeyBytes),
 				Url:      "http://localhost:8080",
 				Readonly: true,
 			},
@@ -154,7 +154,7 @@ func TestImportRemoteKeys_JSONisEqual(t *testing.T) {
 	protoImportRequest := &service.ImportRemoteKeysRequest{
 		RemoteKeys: []*service.ImportRemoteKeysRequest_Keystore{
 			{
-				Pubkey: make([]byte, dilithium2.CryptoPublicKeyBytes),
+				Pubkey: make([]byte, dilithium.CryptoPublicKeyBytes),
 				Url:    "http://localhost:8080",
 			},
 		},

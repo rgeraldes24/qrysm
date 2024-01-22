@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -14,8 +14,8 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/network/forks"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/attestation"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -50,7 +50,7 @@ func verifySignature(signedData, pub, signature, domain []byte) error {
 	if len(set.Signatures) != 1 {
 		return errors.Errorf("signature set contains %d signatures instead of 1", len(set.Signatures))
 	}
-	totalSigsLen := len(set.PublicKeys[0]) * dilithium2.CryptoBytes
+	totalSigsLen := len(set.PublicKeys[0]) * dilithiumlib.CryptoBytes
 	if totalSigsLen != len(set.Signatures[0]) {
 		return errors.Errorf("signature set length is %d instead of %d", len(set.Signatures[0]), totalSigsLen)
 	}
@@ -59,14 +59,14 @@ func verifySignature(signedData, pub, signature, domain []byte) error {
 	sigOffset := 0
 	for _, publicKey := range set.PublicKeys[0] {
 		root := set.Messages[0]
-		rSig, err := dilithium.SignatureFromBytes(sig[sigOffset : sigOffset+dilithium2.CryptoBytes])
+		rSig, err := dilithium.SignatureFromBytes(sig[sigOffset : sigOffset+dilithiumlib.CryptoBytes])
 		if err != nil {
 			return err
 		}
 		if !rSig.Verify(publicKey, root[:]) {
 			return signing.ErrSigFailedToVerify
 		}
-		sigOffset += dilithium2.CryptoBytes
+		sigOffset += dilithiumlib.CryptoBytes
 	}
 	return nil
 }

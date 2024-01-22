@@ -7,14 +7,14 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/beacon"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/validator"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/validator"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/validator/client/beacon-api/mock"

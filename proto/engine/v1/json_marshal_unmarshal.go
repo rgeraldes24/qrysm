@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	zondtypes "github.com/theQRL/go-zond/core/types"
@@ -889,14 +889,14 @@ func (e *ExecutionPayloadDenebWithValueAndBlobsBundle) UnmarshalJSON(enc []byte)
 	commitments := make([][]byte, len(dec.BlobsBundle.Commitments))
 	for i, kzg := range dec.BlobsBundle.Commitments {
 		k := kzg
-		commitments[i] = bytesutil.PadTo(k[:], dilithium2.CryptoPublicKeyBytes)
+		commitments[i] = bytesutil.PadTo(k[:], dilithium.CryptoPublicKeyBytes)
 	}
 	e.BlobsBundle.KzgCommitments = commitments
 
 	proofs := make([][]byte, len(dec.BlobsBundle.Proofs))
 	for i, proof := range dec.BlobsBundle.Proofs {
 		p := proof
-		proofs[i] = bytesutil.PadTo(p[:], dilithium2.CryptoPublicKeyBytes)
+		proofs[i] = bytesutil.PadTo(p[:], dilithium.CryptoPublicKeyBytes)
 	}
 	e.BlobsBundle.Proofs = proofs
 

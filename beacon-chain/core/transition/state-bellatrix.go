@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	b "github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // GenesisBeaconStateBellatrix gets called when MinGenesisActiveValidatorCount count of
@@ -193,7 +193,7 @@ func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.Bea
 	}
 
 	bodyRoot, err := (&zondpb.BeaconBlockBodyBellatrix{
-		RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+		RandaoReveal: make([]byte, dilithium.CryptoBytes),
 		Eth1Data: &zondpb.Eth1Data{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
@@ -201,7 +201,7 @@ func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.Bea
 		Graffiti: make([]byte, 32),
 		SyncAggregate: &zondpb.SyncAggregate{
 			SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-			SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+			SyncCommitteeSignature: make([]byte, dilithium.CryptoBytes),
 		},
 		ExecutionPayload: &enginev1.ExecutionPayload{
 			ParentHash:    make([]byte, 32),

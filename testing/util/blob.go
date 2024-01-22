@@ -1,9 +1,9 @@
 package util
 
 import (
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // HydrateBlobSidecar hydrates a blob sidecar with correct field length sizes
@@ -19,10 +19,10 @@ func HydrateBlobSidecar(b *zondpb.BlobSidecar) *zondpb.BlobSidecar {
 		b.Blob = make([]byte, fieldparams.BlobLength)
 	}
 	if b.KzgCommitment == nil {
-		b.KzgCommitment = make([]byte, dilithium2.CryptoPublicKeyBytes)
+		b.KzgCommitment = make([]byte, dilithium.CryptoPublicKeyBytes)
 	}
 	if b.KzgProof == nil {
-		b.KzgProof = make([]byte, dilithium2.CryptoPublicKeyBytes)
+		b.KzgProof = make([]byte, dilithium.CryptoPublicKeyBytes)
 	}
 	return b
 }
@@ -31,7 +31,7 @@ func HydrateBlobSidecar(b *zondpb.BlobSidecar) *zondpb.BlobSidecar {
 // to comply with SSZ marshalling and unmarshalling rules.
 func HydrateSignedBlindedBlobSidecar(b *zondpb.SignedBlindedBlobSidecar) *zondpb.SignedBlindedBlobSidecar {
 	if b.Signature == nil {
-		b.Signature = make([]byte, dilithium2.CryptoBytes)
+		b.Signature = make([]byte, dilithium.CryptoBytes)
 	}
 	b.Message = HydrateBlindedBlobSidecar(b.Message)
 	return b
@@ -47,10 +47,10 @@ func HydrateBlindedBlobSidecar(b *zondpb.BlindedBlobSidecar) *zondpb.BlindedBlob
 		b.BlockParentRoot = make([]byte, fieldparams.RootLength)
 	}
 	if b.KzgCommitment == nil {
-		b.KzgCommitment = make([]byte, dilithium2.CryptoPublicKeyBytes)
+		b.KzgCommitment = make([]byte, dilithium.CryptoPublicKeyBytes)
 	}
 	if b.KzgProof == nil {
-		b.KzgProof = make([]byte, dilithium2.CryptoPublicKeyBytes)
+		b.KzgProof = make([]byte, dilithium.CryptoPublicKeyBytes)
 	}
 	if b.BlobRoot == nil {
 		b.BlobRoot = make([]byte, fieldparams.RootLength)

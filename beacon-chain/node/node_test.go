@@ -11,7 +11,7 @@ import (
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/blockchain"
 	"github.com/theQRL/qrysm/v4/beacon-chain/builder"
 	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
@@ -22,7 +22,7 @@ import (
 	"github.com/theQRL/qrysm/v4/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/v4/config/features"
 	"github.com/theQRL/qrysm/v4/config/params"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime"
 	"github.com/theQRL/qrysm/v4/runtime/interop"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -96,7 +96,7 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 	require.NoError(t, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < 2; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [dilithium.CryptoPublicKeyBytes]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		genesisState.Validators = append(genesisState.Validators, &zondpb.Validator{

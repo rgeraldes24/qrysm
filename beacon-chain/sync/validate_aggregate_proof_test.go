@@ -10,7 +10,7 @@ import (
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	pubsubpb "github.com/libp2p/go-libp2p-pubsub/pb"
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
@@ -25,8 +25,8 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1/attestation"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -107,11 +107,11 @@ func TestValidateAggregateAndProof_NoBlock(t *testing.T) {
 	})
 
 	aggregateAndProof := &zondpb.AggregateAttestationAndProof{
-		SelectionProof:  bytesutil.PadTo([]byte{'A'}, dilithium2.CryptoBytes),
+		SelectionProof:  bytesutil.PadTo([]byte{'A'}, dilithium.CryptoBytes),
 		Aggregate:       att,
 		AggregatorIndex: 0,
 	}
-	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium2.CryptoBytes)}
+	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium.CryptoBytes)}
 
 	c := lruwrpr.New(10)
 	r := &Service{
@@ -170,14 +170,14 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		},
 		AggregationBits: aggBits,
-		Signature:       make([]byte, dilithium2.CryptoBytes),
+		Signature:       make([]byte, dilithium.CryptoBytes),
 	}
 
 	aggregateAndProof := &zondpb.AggregateAttestationAndProof{
 		Aggregate:      att,
-		SelectionProof: make([]byte, dilithium2.CryptoBytes),
+		SelectionProof: make([]byte, dilithium.CryptoBytes),
 	}
-	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium2.CryptoBytes)}
+	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium.CryptoBytes)}
 
 	require.NoError(t, beaconState.SetGenesisTime(uint64(time.Now().Unix())))
 
@@ -254,14 +254,14 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		},
 		AggregationBits: aggBits,
-		Signature:       make([]byte, dilithium2.CryptoBytes),
+		Signature:       make([]byte, dilithium.CryptoBytes),
 	}
 
 	aggregateAndProof := &zondpb.AggregateAttestationAndProof{
 		Aggregate:      att,
-		SelectionProof: make([]byte, dilithium2.CryptoBytes),
+		SelectionProof: make([]byte, dilithium.CryptoBytes),
 	}
-	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium2.CryptoBytes)}
+	signedAggregateAndProof := &zondpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, dilithium.CryptoBytes)}
 
 	require.NoError(t, beaconState.SetGenesisTime(uint64(time.Now().Unix())))
 	r := &Service{

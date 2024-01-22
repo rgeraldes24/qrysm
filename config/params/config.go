@@ -5,7 +5,7 @@ import (
 	"math"
 	"time"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -128,24 +128,24 @@ type BeaconChainConfig struct {
 	DomainBlobSidecar                 [4]byte `yaml:"DOMAIN_BLOB_SIDECAR" spec:"true"` // DomainBlobSidecar defines the BLS signature domain for blob sidecar.
 
 	// Prysm constants.
-	GweiPerEth                     uint64                       // GweiPerEth is the amount of gwei corresponding to 1 eth.
-	BLSSecretKeyLength             int                          // BLSSecretKeyLength defines the expected length of BLS secret keys in bytes.
-	BLSPubkeyLength                int                          // BLSPubkeyLength defines the expected length of BLS public keys in bytes.
-	DefaultBufferSize              int                          // DefaultBufferSize for channels across the Prysm repository.
-	ValidatorPrivkeyFileName       string                       // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
-	WithdrawalPrivkeyFileName      string                       // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
-	RPCSyncCheck                   time.Duration                // Number of seconds to query the sync service, to find out if the node is synced or not.
-	EmptySignature                 [96]byte                     // EmptySignature is used to represent a zeroed out BLS Signature.
-	EmptyDilithiumSignature        [dilithium2.CryptoBytes]byte // EmptyDilithiumSignature is used to represent a zeroed out Dilithium Signature.
-	DefaultPageSize                int                          // DefaultPageSize defines the default page size for RPC server request.
-	MaxPeersToSync                 int                          // MaxPeersToSync describes the limit for number of peers in round robin sync.
-	SlotsPerArchivedPoint          primitives.Slot              // SlotsPerArchivedPoint defines the number of slots per one archived point.
-	GenesisCountdownInterval       time.Duration                // How often to log the countdown until the genesis time is reached.
-	BeaconStateFieldCount          int                          // BeaconStateFieldCount defines how many fields are in the Phase0 beacon state.
-	BeaconStateDenebFieldCount     int                          // BeaconStateDenebFieldCount defines how many fields are in beacon state post upgrade to Deneb.
-	BeaconStateAltairFieldCount    int                          // BeaconStateAltairFieldCount defines how many fields are in the beacon state post upgrade to Altair.
-	BeaconStateBellatrixFieldCount int                          // BeaconStateBellatrixFieldCount defines how many fields are in beacon state post upgrade to Bellatrix.
-	BeaconStateCapellaFieldCount   int                          // BeaconStateCapellaFieldCount defines how many fields are in beacon state post upgrade to Capella.
+	GweiPerEth                     uint64                      // GweiPerEth is the amount of gwei corresponding to 1 eth.
+	BLSSecretKeyLength             int                         // BLSSecretKeyLength defines the expected length of BLS secret keys in bytes.
+	BLSPubkeyLength                int                         // BLSPubkeyLength defines the expected length of BLS public keys in bytes.
+	DefaultBufferSize              int                         // DefaultBufferSize for channels across the Prysm repository.
+	ValidatorPrivkeyFileName       string                      // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
+	WithdrawalPrivkeyFileName      string                      // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
+	RPCSyncCheck                   time.Duration               // Number of seconds to query the sync service, to find out if the node is synced or not.
+	EmptySignature                 [96]byte                    // EmptySignature is used to represent a zeroed out BLS Signature.
+	EmptyDilithiumSignature        [dilithium.CryptoBytes]byte // EmptyDilithiumSignature is used to represent a zeroed out Dilithium Signature.
+	DefaultPageSize                int                         // DefaultPageSize defines the default page size for RPC server request.
+	MaxPeersToSync                 int                         // MaxPeersToSync describes the limit for number of peers in round robin sync.
+	SlotsPerArchivedPoint          primitives.Slot             // SlotsPerArchivedPoint defines the number of slots per one archived point.
+	GenesisCountdownInterval       time.Duration               // How often to log the countdown until the genesis time is reached.
+	BeaconStateFieldCount          int                         // BeaconStateFieldCount defines how many fields are in the Phase0 beacon state.
+	BeaconStateDenebFieldCount     int                         // BeaconStateDenebFieldCount defines how many fields are in beacon state post upgrade to Deneb.
+	BeaconStateAltairFieldCount    int                         // BeaconStateAltairFieldCount defines how many fields are in the beacon state post upgrade to Altair.
+	BeaconStateBellatrixFieldCount int                         // BeaconStateBellatrixFieldCount defines how many fields are in beacon state post upgrade to Bellatrix.
+	BeaconStateCapellaFieldCount   int                         // BeaconStateCapellaFieldCount defines how many fields are in beacon state post upgrade to Capella.
 
 	// Slasher constants.
 	WeakSubjectivityPeriod    primitives.Epoch // WeakSubjectivityPeriod defines the time period expressed in number of epochs were proof of stake network should validate block headers and attestations for slashable events.

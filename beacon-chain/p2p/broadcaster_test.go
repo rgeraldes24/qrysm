@@ -12,7 +12,7 @@ import (
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/p2p/discover"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/peers"
@@ -21,7 +21,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/wrapper"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	testpb "github.com/theQRL/qrysm/v4/proto/testing"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -478,10 +478,10 @@ func TestService_BroadcastBlob(t *testing.T) {
 			BlockParentRoot: bytesutil.PadTo([]byte{'B'}, fieldparams.RootLength),
 			ProposerIndex:   3,
 			Blob:            bytesutil.PadTo([]byte{'C'}, fieldparams.BlobLength),
-			KzgCommitment:   bytesutil.PadTo([]byte{'D'}, dilithium2.CryptoPublicKeyBytes),
-			KzgProof:        bytesutil.PadTo([]byte{'E'}, dilithium2.CryptoPublicKeyBytes),
+			KzgCommitment:   bytesutil.PadTo([]byte{'D'}, dilithium.CryptoPublicKeyBytes),
+			KzgProof:        bytesutil.PadTo([]byte{'E'}, dilithium.CryptoPublicKeyBytes),
 		},
-		Signature: bytesutil.PadTo([]byte{'F'}, dilithium2.CryptoBytes),
+		Signature: bytesutil.PadTo([]byte{'F'}, dilithium.CryptoBytes),
 	}
 	subnet := uint64(0)
 

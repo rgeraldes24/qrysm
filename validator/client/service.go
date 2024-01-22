@@ -11,7 +11,7 @@ import (
 	grpcopentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	grpcutil "github.com/theQRL/qrysm/v4/api/grpc"
 	"github.com/theQRL/qrysm/v4/async/event"
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
@@ -19,7 +19,7 @@ import (
 	validatorserviceconfig "github.com/theQRL/qrysm/v4/config/validator/service"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/validator/accounts/wallet"
 	beaconChainClientFactory "github.com/theQRL/qrysm/v4/validator/client/beacon-chain-client-factory"
 	"github.com/theQRL/qrysm/v4/validator/client/iface"
@@ -176,7 +176,7 @@ func (v *ValidatorService) Start() {
 		log.WithError(err).Error("Could not read slashable public keys from disk")
 		return
 	}
-	slashablePublicKeys := make(map[[dilithium2.CryptoPublicKeyBytes]byte]bool)
+	slashablePublicKeys := make(map[[dilithium.CryptoPublicKeyBytes]byte]bool)
 	for _, pubKey := range sPubKeys {
 		slashablePublicKeys[pubKey] = true
 	}
@@ -198,10 +198,10 @@ func (v *ValidatorService) Start() {
 		graffiti:                       v.graffiti,
 		logValidatorBalances:           v.logValidatorBalances,
 		emitAccountMetrics:             v.emitAccountMetrics,
-		startBalances:                  make(map[[dilithium2.CryptoPublicKeyBytes]byte]uint64),
-		prevBalance:                    make(map[[dilithium2.CryptoPublicKeyBytes]byte]uint64),
-		pubkeyToValidatorIndex:         make(map[[dilithium2.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
-		signedValidatorRegistrations:   make(map[[dilithium2.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
+		startBalances:                  make(map[[dilithium.CryptoPublicKeyBytes]byte]uint64),
+		prevBalance:                    make(map[[dilithium.CryptoPublicKeyBytes]byte]uint64),
+		pubkeyToValidatorIndex:         make(map[[dilithium.CryptoPublicKeyBytes]byte]primitives.ValidatorIndex),
+		signedValidatorRegistrations:   make(map[[dilithium.CryptoPublicKeyBytes]byte]*zondpb.SignedValidatorRegistrationV1),
 		attLogs:                        make(map[[32]byte]*attSubmitted),
 		domainDataCache:                cache,
 		aggregatedSlotCommitteeIDCache: aggregatedSlotCommitteeIDCache,

@@ -2,7 +2,7 @@ package test_helpers
 
 import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 func GenerateProtoPhase0BeaconBlock() *zondpb.BeaconBlock {

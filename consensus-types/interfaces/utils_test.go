@@ -3,11 +3,11 @@ package interfaces_test
 import (
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zond "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -25,7 +25,7 @@ func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("randao"), dilithium2.CryptoBytes),
+			RandaoReveal:      bytesutil.PadTo([]byte("randao"), dilithium.CryptoBytes),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*zond.ProposerSlashing{},
 			AttesterSlashings: []*zond.AttesterSlashing{},
@@ -62,7 +62,7 @@ func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("randao"), dilithium2.CryptoBytes),
+			RandaoReveal:      bytesutil.PadTo([]byte("randao"), dilithium.CryptoBytes),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*zond.ProposerSlashing{},
 			AttesterSlashings: []*zond.AttesterSlashing{},
@@ -113,7 +113,7 @@ func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("randao"), dilithium2.CryptoBytes),
+			RandaoReveal:      bytesutil.PadTo([]byte("randao"), dilithium.CryptoBytes),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*zond.ProposerSlashing{},
 			AttesterSlashings: []*zond.AttesterSlashing{},
@@ -122,7 +122,7 @@ func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 			VoluntaryExits:    []*zond.SignedVoluntaryExit{},
 		},
 	},
-		Signature: bytesutil.PadTo([]byte("signature"), dilithium2.CryptoBytes),
+		Signature: bytesutil.PadTo([]byte("signature"), dilithium.CryptoBytes),
 	}
 	bodyRoot, err := blk.Block.Body.HashTreeRoot()
 	require.NoError(t, err)
@@ -154,7 +154,7 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("randao"), dilithium2.CryptoBytes),
+			RandaoReveal:      bytesutil.PadTo([]byte("randao"), dilithium.CryptoBytes),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*zond.ProposerSlashing{},
 			AttesterSlashings: []*zond.AttesterSlashing{},
@@ -163,7 +163,7 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 			VoluntaryExits:    []*zond.SignedVoluntaryExit{},
 		},
 	},
-		Signature: bytesutil.PadTo([]byte("signature"), dilithium2.CryptoBytes),
+		Signature: bytesutil.PadTo([]byte("signature"), dilithium.CryptoBytes),
 	}
 	bodyRoot, err := blk.Block.Body.HashTreeRoot()
 	require.NoError(t, err)
@@ -191,7 +191,7 @@ func TestSignedBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
 	},
-		Signature: bytesutil.PadTo([]byte("signature"), dilithium2.CryptoBytes),
+		Signature: bytesutil.PadTo([]byte("signature"), dilithium.CryptoBytes),
 	}
 	_, err := interfaces.SignedBeaconBlockHeaderFromBlock(blk)
 	require.ErrorContains(t, "nil block", err)

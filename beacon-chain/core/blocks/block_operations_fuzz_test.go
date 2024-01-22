@@ -2,16 +2,17 @@ package blocks
 
 import (
 	"context"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"testing"
 
+	"github.com/theQRL/qrysm/v4/config/params"
+
 	fuzz "github.com/google/gofuzz"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	v "github.com/theQRL/qrysm/v4/beacon-chain/core/validators"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
@@ -55,7 +56,7 @@ func TestFuzzProcessBlockHeader_10000(t *testing.T) {
 func TestFuzzverifyDepositDataSigningRoot_10000(_ *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	var ba []byte
-	var pubkey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubkey [dilithium.CryptoPublicKeyBytes]byte
 	var sig [96]byte
 	var domain [4]byte
 	var p []byte

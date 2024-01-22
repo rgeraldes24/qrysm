@@ -9,8 +9,8 @@ import (
 	c "github.com/patrickmn/go-cache"
 	fssz "github.com/prysmaticlabs/fastssz"
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
-	zondpb "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	"github.com/theQRL/go-qrllib/dilithium"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -67,7 +67,7 @@ func TestKV_Unaggregated_SaveUnaggregatedAttestation(t *testing.T) {
 			assert.Equal(t, 0, len(cache.unAggregatedAtt), "Invalid start pool, atts: %d", len(cache.unAggregatedAtt))
 
 			if tt.att != nil && tt.att.Signature == nil {
-				tt.att.Signature = make([]byte, dilithium2.CryptoBytes)
+				tt.att.Signature = make([]byte, dilithium.CryptoBytes)
 			}
 
 			err := cache.SaveUnaggregatedAttestation(tt.att)
