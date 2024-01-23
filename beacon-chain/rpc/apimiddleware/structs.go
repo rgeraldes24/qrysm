@@ -243,7 +243,7 @@ type BeaconBlockJson struct {
 
 type BeaconBlockBodyJson struct {
 	RandaoReveal      string                     `json:"randao_reveal" hex:"true"`
-	Eth1Data          *Eth1DataJson              `json:"eth1_data"`
+	ZondData          *ZondDataJson              `json:"zond1_data"`
 	Graffiti          string                     `json:"graffiti" hex:"true"`
 	ProposerSlashings []*ProposerSlashingJson    `json:"proposer_slashings"`
 	AttesterSlashings []*AttesterSlashingJson    `json:"attester_slashings"`
@@ -439,7 +439,7 @@ type BlindedBeaconBlockContentsDenebJson struct {
 
 type BeaconBlockBodyAltairJson struct {
 	RandaoReveal      string                     `json:"randao_reveal" hex:"true"`
-	Eth1Data          *Eth1DataJson              `json:"eth1_data"`
+	ZondData          *ZondDataJson              `json:"zond_data"`
 	Graffiti          string                     `json:"graffiti" hex:"true"`
 	ProposerSlashings []*ProposerSlashingJson    `json:"proposer_slashings"`
 	AttesterSlashings []*AttesterSlashingJson    `json:"attester_slashings"`
@@ -451,7 +451,7 @@ type BeaconBlockBodyAltairJson struct {
 
 type BeaconBlockBodyBellatrixJson struct {
 	RandaoReveal      string                     `json:"randao_reveal" hex:"true"`
-	Eth1Data          *Eth1DataJson              `json:"eth1_data"`
+	ZondData          *ZondDataJson              `json:"zond_data"`
 	Graffiti          string                     `json:"graffiti" hex:"true"`
 	ProposerSlashings []*ProposerSlashingJson    `json:"proposer_slashings"`
 	AttesterSlashings []*AttesterSlashingJson    `json:"attester_slashings"`
@@ -464,7 +464,7 @@ type BeaconBlockBodyBellatrixJson struct {
 
 type BeaconBlockBodyCapellaJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	Eth1Data                    *Eth1DataJson                           `json:"eth1_data"`
+	ZondData                    *ZondDataJson                           `json:"zond_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -478,7 +478,7 @@ type BeaconBlockBodyCapellaJson struct {
 
 type BeaconBlockBodyDenebJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	Eth1Data                    *Eth1DataJson                           `json:"eth1_data"`
+	ZondData                    *ZondDataJson                           `json:"zond_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -493,7 +493,7 @@ type BeaconBlockBodyDenebJson struct {
 
 type BlindedBeaconBlockBodyBellatrixJson struct {
 	RandaoReveal           string                      `json:"randao_reveal" hex:"true"`
-	Eth1Data               *Eth1DataJson               `json:"eth1_data"`
+	ZondData               *ZondDataJson               `json:"zond_data"`
 	Graffiti               string                      `json:"graffiti" hex:"true"`
 	ProposerSlashings      []*ProposerSlashingJson     `json:"proposer_slashings"`
 	AttesterSlashings      []*AttesterSlashingJson     `json:"attester_slashings"`
@@ -506,7 +506,7 @@ type BlindedBeaconBlockBodyBellatrixJson struct {
 
 type BlindedBeaconBlockBodyCapellaJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	Eth1Data                    *Eth1DataJson                           `json:"eth1_data"`
+	ZondData                    *ZondDataJson                           `json:"zond_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -520,7 +520,7 @@ type BlindedBeaconBlockBodyCapellaJson struct {
 
 type BlindedBeaconBlockBodyDenebJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	Eth1Data                    *Eth1DataJson                           `json:"eth1_data"`
+	ZondData                    *ZondDataJson                           `json:"zond_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -661,7 +661,7 @@ type BeaconBlockHeaderJson struct {
 	BodyRoot      string `json:"body_root" hex:"true"`
 }
 
-type Eth1DataJson struct {
+type ZondDataJson struct {
 	DepositRoot  string `json:"deposit_root" hex:"true"`
 	DepositCount string `json:"deposit_count"`
 	BlockHash    string `json:"block_hash" hex:"true"`
@@ -775,9 +775,9 @@ type BeaconStateJson struct {
 	BlockRoots                  []string                  `json:"block_roots" hex:"true"`
 	StateRoots                  []string                  `json:"state_roots" hex:"true"`
 	HistoricalRoots             []string                  `json:"historical_roots" hex:"true"`
-	Eth1Data                    *Eth1DataJson             `json:"eth1_data"`
-	Eth1DataVotes               []*Eth1DataJson           `json:"eth1_data_votes"`
-	Eth1DepositIndex            string                    `json:"eth1_deposit_index"`
+	ZondData                    *ZondDataJson             `json:"zond_data"`
+	ZondDataVotes               []*ZondDataJson           `json:"zond_data_votes"`
+	ZondDepositIndex            string                    `json:"zond_deposit_index"`
 	Validators                  []*ValidatorJson          `json:"validators"`
 	Balances                    []string                  `json:"balances"`
 	RandaoMixes                 []string                  `json:"randao_mixes" hex:"true"`
@@ -799,9 +799,9 @@ type BeaconStateAltairJson struct {
 	BlockRoots                  []string               `json:"block_roots" hex:"true"`
 	StateRoots                  []string               `json:"state_roots" hex:"true"`
 	HistoricalRoots             []string               `json:"historical_roots" hex:"true"`
-	Eth1Data                    *Eth1DataJson          `json:"eth1_data"`
-	Eth1DataVotes               []*Eth1DataJson        `json:"eth1_data_votes"`
-	Eth1DepositIndex            string                 `json:"eth1_deposit_index"`
+	ZondData                    *ZondDataJson          `json:"zond_data"`
+	ZondDataVotes               []*ZondDataJson        `json:"zond_data_votes"`
+	ZondDepositIndex            string                 `json:"zond_deposit_index"`
 	Validators                  []*ValidatorJson       `json:"validators"`
 	Balances                    []string               `json:"balances"`
 	RandaoMixes                 []string               `json:"randao_mixes" hex:"true"`
@@ -826,9 +826,9 @@ type BeaconStateBellatrixJson struct {
 	BlockRoots                   []string                    `json:"block_roots" hex:"true"`
 	StateRoots                   []string                    `json:"state_roots" hex:"true"`
 	HistoricalRoots              []string                    `json:"historical_roots" hex:"true"`
-	Eth1Data                     *Eth1DataJson               `json:"eth1_data"`
-	Eth1DataVotes                []*Eth1DataJson             `json:"eth1_data_votes"`
-	Eth1DepositIndex             string                      `json:"eth1_deposit_index"`
+	ZondData                     *ZondDataJson               `json:"zond_data"`
+	ZondDataVotes                []*ZondDataJson             `json:"zond_data_votes"`
+	ZondDepositIndex             string                      `json:"zond_deposit_index"`
 	Validators                   []*ValidatorJson            `json:"validators"`
 	Balances                     []string                    `json:"balances"`
 	RandaoMixes                  []string                    `json:"randao_mixes" hex:"true"`
@@ -854,9 +854,9 @@ type BeaconStateCapellaJson struct {
 	BlockRoots                   []string                           `json:"block_roots" hex:"true"`
 	StateRoots                   []string                           `json:"state_roots" hex:"true"`
 	HistoricalRoots              []string                           `json:"historical_roots" hex:"true"`
-	Eth1Data                     *Eth1DataJson                      `json:"eth1_data"`
-	Eth1DataVotes                []*Eth1DataJson                    `json:"eth1_data_votes"`
-	Eth1DepositIndex             string                             `json:"eth1_deposit_index"`
+	ZondData                     *ZondDataJson                      `json:"zond_data"`
+	ZondDataVotes                []*ZondDataJson                    `json:"zond_data_votes"`
+	ZondDepositIndex             string                             `json:"zond_deposit_index"`
 	Validators                   []*ValidatorJson                   `json:"validators"`
 	Balances                     []string                           `json:"balances"`
 	RandaoMixes                  []string                           `json:"randao_mixes" hex:"true"`
@@ -885,9 +885,9 @@ type BeaconStateDenebJson struct {
 	BlockRoots                   []string                         `json:"block_roots" hex:"true"`
 	StateRoots                   []string                         `json:"state_roots" hex:"true"`
 	HistoricalRoots              []string                         `json:"historical_roots" hex:"true"`
-	Eth1Data                     *Eth1DataJson                    `json:"eth1_data"`
-	Eth1DataVotes                []*Eth1DataJson                  `json:"eth1_data_votes"`
-	Eth1DepositIndex             string                           `json:"eth1_deposit_index"`
+	ZondData                     *ZondDataJson                    `json:"zond_data"`
+	ZondDataVotes                []*ZondDataJson                  `json:"zond_data_votes"`
+	ZondDepositIndex             string                           `json:"zond_deposit_index"`
 	Validators                   []*ValidatorJson                 `json:"validators"`
 	Balances                     []string                         `json:"balances"`
 	RandaoMixes                  []string                         `json:"randao_mixes" hex:"true"`

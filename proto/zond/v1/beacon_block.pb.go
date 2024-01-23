@@ -7,15 +7,14 @@
 package v1
 
 import (
-	reflect "reflect"
-	sync "sync"
-
 	_ "github.com/golang/protobuf/protoc-gen-go/descriptor"
 	github_com_theQRL_go_bitfield "github.com/theQRL/go-bitfield"
 	github_com_theQRL_qrysm_v4_consensus_types_primitives "github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	_ "github.com/theQRL/qrysm/v4/proto/zond/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	reflect "reflect"
+	sync "sync"
 )
 
 const (
@@ -165,7 +164,7 @@ type BeaconBlockBody struct {
 	unknownFields protoimpl.UnknownFields
 
 	RandaoReveal      []byte                 `protobuf:"bytes,1,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4595"`
-	Eth1Data          *Eth1Data              `protobuf:"bytes,2,opt,name=eth1_data,json=eth1Data,proto3" json:"eth1_data,omitempty"`
+	ZondData          *ZondData              `protobuf:"bytes,2,opt,name=zond_data,json=zondData,proto3" json:"zond_data,omitempty"`
 	Graffiti          []byte                 `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
 	ProposerSlashings []*ProposerSlashing    `protobuf:"bytes,4,rep,name=proposer_slashings,json=proposerSlashings,proto3" json:"proposer_slashings,omitempty" ssz-max:"16"`
 	AttesterSlashings []*AttesterSlashing    `protobuf:"bytes,5,rep,name=attester_slashings,json=attesterSlashings,proto3" json:"attester_slashings,omitempty" ssz-max:"2"`
@@ -213,9 +212,9 @@ func (x *BeaconBlockBody) GetRandaoReveal() []byte {
 	return nil
 }
 
-func (x *BeaconBlockBody) GetEth1Data() *Eth1Data {
+func (x *BeaconBlockBody) GetZondData() *ZondData {
 	if x != nil {
-		return x.Eth1Data
+		return x.ZondData
 	}
 	return nil
 }
@@ -537,7 +536,7 @@ func (x *SignedVoluntaryExit) GetSignature() []byte {
 	return nil
 }
 
-type Eth1Data struct {
+type ZondData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -547,8 +546,8 @@ type Eth1Data struct {
 	BlockHash    []byte `protobuf:"bytes,3,opt,name=block_hash,json=blockHash,proto3" json:"block_hash,omitempty" ssz-size:"32"`
 }
 
-func (x *Eth1Data) Reset() {
-	*x = Eth1Data{}
+func (x *ZondData) Reset() {
+	*x = ZondData{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_zond_v1_beacon_block_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -556,13 +555,13 @@ func (x *Eth1Data) Reset() {
 	}
 }
 
-func (x *Eth1Data) String() string {
+func (x *ZondData) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Eth1Data) ProtoMessage() {}
+func (*ZondData) ProtoMessage() {}
 
-func (x *Eth1Data) ProtoReflect() protoreflect.Message {
+func (x *ZondData) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_zond_v1_beacon_block_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -574,26 +573,26 @@ func (x *Eth1Data) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Eth1Data.ProtoReflect.Descriptor instead.
-func (*Eth1Data) Descriptor() ([]byte, []int) {
+// Deprecated: Use ZondData.ProtoReflect.Descriptor instead.
+func (*ZondData) Descriptor() ([]byte, []int) {
 	return file_proto_zond_v1_beacon_block_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *Eth1Data) GetDepositRoot() []byte {
+func (x *ZondData) GetDepositRoot() []byte {
 	if x != nil {
 		return x.DepositRoot
 	}
 	return nil
 }
 
-func (x *Eth1Data) GetDepositCount() uint64 {
+func (x *ZondData) GetDepositCount() uint64 {
 	if x != nil {
 		return x.DepositCount
 	}
 	return 0
 }
 
-func (x *Eth1Data) GetBlockHash() []byte {
+func (x *ZondData) GetBlockHash() []byte {
 	if x != nil {
 		return x.BlockHash
 	}
@@ -976,10 +975,10 @@ var file_proto_zond_v1_beacon_block_proto_rawDesc = []byte{
 	0x79, 0x12, 0x2d, 0x0a, 0x0d, 0x72, 0x61, 0x6e, 0x64, 0x61, 0x6f, 0x5f, 0x72, 0x65, 0x76, 0x65,
 	0x61, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x42, 0x08, 0x8a, 0xb5, 0x18, 0x04, 0x34, 0x35,
 	0x39, 0x35, 0x52, 0x0c, 0x72, 0x61, 0x6e, 0x64, 0x61, 0x6f, 0x52, 0x65, 0x76, 0x65, 0x61, 0x6c,
-	0x12, 0x35, 0x0a, 0x09, 0x65, 0x74, 0x68, 0x31, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20,
+	0x12, 0x35, 0x0a, 0x09, 0x7a, 0x6f, 0x6e, 0x64, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20,
 	0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e,
-	0x64, 0x2e, 0x76, 0x31, 0x2e, 0x45, 0x74, 0x68, 0x31, 0x44, 0x61, 0x74, 0x61, 0x52, 0x08, 0x65,
-	0x74, 0x68, 0x31, 0x44, 0x61, 0x74, 0x61, 0x12, 0x22, 0x0a, 0x08, 0x67, 0x72, 0x61, 0x66, 0x66,
+	0x64, 0x2e, 0x76, 0x31, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x44, 0x61, 0x74, 0x61, 0x52, 0x08, 0x7a,
+	0x6f, 0x6e, 0x64, 0x44, 0x61, 0x74, 0x61, 0x12, 0x22, 0x0a, 0x08, 0x67, 0x72, 0x61, 0x66, 0x66,
 	0x69, 0x74, 0x69, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0c, 0x42, 0x06, 0x8a, 0xb5, 0x18, 0x02, 0x33,
 	0x32, 0x52, 0x08, 0x67, 0x72, 0x61, 0x66, 0x66, 0x69, 0x74, 0x69, 0x12, 0x57, 0x0a, 0x12, 0x70,
 	0x72, 0x6f, 0x70, 0x6f, 0x73, 0x65, 0x72, 0x5f, 0x73, 0x6c, 0x61, 0x73, 0x68, 0x69, 0x6e, 0x67,
@@ -1067,7 +1066,7 @@ var file_proto_zond_v1_beacon_block_proto_rawDesc = []byte{
 	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x26, 0x0a, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74,
 	0x75, 0x72, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x42, 0x08, 0x8a, 0xb5, 0x18, 0x04, 0x34,
 	0x35, 0x39, 0x35, 0x52, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x22, 0x81,
-	0x01, 0x0a, 0x08, 0x45, 0x74, 0x68, 0x31, 0x44, 0x61, 0x74, 0x61, 0x12, 0x29, 0x0a, 0x0c, 0x64,
+	0x01, 0x0a, 0x08, 0x5a, 0x6f, 0x6e, 0x64, 0x44, 0x61, 0x74, 0x61, 0x12, 0x29, 0x0a, 0x0c, 0x64,
 	0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x5f, 0x72, 0x6f, 0x6f, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x0c, 0x42, 0x06, 0x8a, 0xb5, 0x18, 0x02, 0x33, 0x32, 0x52, 0x0b, 0x64, 0x65, 0x70, 0x6f, 0x73,
 	0x69, 0x74, 0x52, 0x6f, 0x6f, 0x74, 0x12, 0x23, 0x0a, 0x0d, 0x64, 0x65, 0x70, 0x6f, 0x73, 0x69,
@@ -1163,7 +1162,7 @@ var file_proto_zond_v1_beacon_block_proto_goTypes = []interface{}{
 	(*Deposit)(nil),                 // 5: theqrl.zond.v1.Deposit
 	(*VoluntaryExit)(nil),           // 6: theqrl.zond.v1.VoluntaryExit
 	(*SignedVoluntaryExit)(nil),     // 7: theqrl.zond.v1.SignedVoluntaryExit
-	(*Eth1Data)(nil),                // 8: theqrl.zond.v1.Eth1Data
+	(*ZondData)(nil),                // 8: theqrl.zond.v1.ZondData
 	(*BeaconBlockHeader)(nil),       // 9: theqrl.zond.v1.BeaconBlockHeader
 	(*SignedBeaconBlockHeader)(nil), // 10: theqrl.zond.v1.SignedBeaconBlockHeader
 	(*IndexedAttestation)(nil),      // 11: theqrl.zond.v1.IndexedAttestation
@@ -1175,7 +1174,7 @@ var file_proto_zond_v1_beacon_block_proto_goTypes = []interface{}{
 var file_proto_zond_v1_beacon_block_proto_depIdxs = []int32{
 	2,  // 0: theqrl.zond.v1.BeaconBlock.body:type_name -> theqrl.zond.v1.BeaconBlockBody
 	0,  // 1: theqrl.zond.v1.SignedBeaconBlock.block:type_name -> theqrl.zond.v1.BeaconBlock
-	8,  // 2: theqrl.zond.v1.BeaconBlockBody.eth1_data:type_name -> theqrl.zond.v1.Eth1Data
+	8,  // 2: theqrl.zond.v1.BeaconBlockBody.zond_data:type_name -> theqrl.zond.v1.ZondData
 	3,  // 3: theqrl.zond.v1.BeaconBlockBody.proposer_slashings:type_name -> theqrl.zond.v1.ProposerSlashing
 	4,  // 4: theqrl.zond.v1.BeaconBlockBody.attester_slashings:type_name -> theqrl.zond.v1.AttesterSlashing
 	14, // 5: theqrl.zond.v1.BeaconBlockBody.attestations:type_name -> theqrl.zond.v1.Attestation
@@ -1300,7 +1299,7 @@ func file_proto_zond_v1_beacon_block_proto_init() {
 			}
 		}
 		file_proto_zond_v1_beacon_block_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Eth1Data); i {
+			switch v := v.(*ZondData); i {
 			case 0:
 				return &v.state
 			case 1:

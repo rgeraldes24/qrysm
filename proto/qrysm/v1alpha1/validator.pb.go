@@ -2,15 +2,12 @@
 // versions:
 // 	protoc-gen-go v1.30.0
 // 	protoc        v4.23.3
-// source: proto/prysm/v1alpha1/validator.proto
+// source: proto/qrysm/v1alpha1/validator.proto
 
 package zond
 
 import (
 	context "context"
-	reflect "reflect"
-	sync "sync"
-
 	empty "github.com/golang/protobuf/ptypes/empty"
 	github_com_theQRL_qrysm_v4_consensus_types_primitives "github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	_ "github.com/theQRL/qrysm/v4/proto/zond/ext"
@@ -20,6 +17,8 @@ import (
 	status "google.golang.org/grpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	reflect "reflect"
+	sync "sync"
 )
 
 const (
@@ -80,11 +79,11 @@ func (x ValidatorStatus) String() string {
 }
 
 func (ValidatorStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_prysm_v1alpha1_validator_proto_enumTypes[0].Descriptor()
+	return file_proto_qrysm_v1alpha1_validator_proto_enumTypes[0].Descriptor()
 }
 
 func (ValidatorStatus) Type() protoreflect.EnumType {
-	return &file_proto_prysm_v1alpha1_validator_proto_enumTypes[0]
+	return &file_proto_qrysm_v1alpha1_validator_proto_enumTypes[0]
 }
 
 func (x ValidatorStatus) Number() protoreflect.EnumNumber {
@@ -93,7 +92,7 @@ func (x ValidatorStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ValidatorStatus.Descriptor instead.
 func (ValidatorStatus) EnumDescriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{0}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{0}
 }
 
 type SyncMessageBlockRootResponse struct {
@@ -107,7 +106,7 @@ type SyncMessageBlockRootResponse struct {
 func (x *SyncMessageBlockRootResponse) Reset() {
 	*x = SyncMessageBlockRootResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[0]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -120,7 +119,7 @@ func (x *SyncMessageBlockRootResponse) String() string {
 func (*SyncMessageBlockRootResponse) ProtoMessage() {}
 
 func (x *SyncMessageBlockRootResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[0]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -133,7 +132,7 @@ func (x *SyncMessageBlockRootResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncMessageBlockRootResponse.ProtoReflect.Descriptor instead.
 func (*SyncMessageBlockRootResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{0}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *SyncMessageBlockRootResponse) GetRoot() []byte {
@@ -155,7 +154,7 @@ type SyncSubcommitteeIndexRequest struct {
 func (x *SyncSubcommitteeIndexRequest) Reset() {
 	*x = SyncSubcommitteeIndexRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[1]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -168,7 +167,7 @@ func (x *SyncSubcommitteeIndexRequest) String() string {
 func (*SyncSubcommitteeIndexRequest) ProtoMessage() {}
 
 func (x *SyncSubcommitteeIndexRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[1]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -181,7 +180,7 @@ func (x *SyncSubcommitteeIndexRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncSubcommitteeIndexRequest.ProtoReflect.Descriptor instead.
 func (*SyncSubcommitteeIndexRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{1}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *SyncSubcommitteeIndexRequest) GetPublicKey() []byte {
@@ -211,7 +210,7 @@ type SyncCommitteeContributionRequest struct {
 func (x *SyncCommitteeContributionRequest) Reset() {
 	*x = SyncCommitteeContributionRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[2]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -224,7 +223,7 @@ func (x *SyncCommitteeContributionRequest) String() string {
 func (*SyncCommitteeContributionRequest) ProtoMessage() {}
 
 func (x *SyncCommitteeContributionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[2]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -237,7 +236,7 @@ func (x *SyncCommitteeContributionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncCommitteeContributionRequest.ProtoReflect.Descriptor instead.
 func (*SyncCommitteeContributionRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{2}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SyncCommitteeContributionRequest) GetSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -272,7 +271,7 @@ type SyncSubcommitteeIndexResponse struct {
 func (x *SyncSubcommitteeIndexResponse) Reset() {
 	*x = SyncSubcommitteeIndexResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[3]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -285,7 +284,7 @@ func (x *SyncSubcommitteeIndexResponse) String() string {
 func (*SyncSubcommitteeIndexResponse) ProtoMessage() {}
 
 func (x *SyncSubcommitteeIndexResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[3]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -298,7 +297,7 @@ func (x *SyncSubcommitteeIndexResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncSubcommitteeIndexResponse.ProtoReflect.Descriptor instead.
 func (*SyncSubcommitteeIndexResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{3}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SyncSubcommitteeIndexResponse) GetIndices() []github_com_theQRL_qrysm_v4_consensus_types_primitives.CommitteeIndex {
@@ -308,7 +307,7 @@ func (x *SyncSubcommitteeIndexResponse) GetIndices() []github_com_theQRL_qrysm_v
 	return []github_com_theQRL_qrysm_v4_consensus_types_primitives.CommitteeIndex(nil)
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/validator.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/validator.proto.
 type StreamBlocksResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -327,7 +326,7 @@ type StreamBlocksResponse struct {
 func (x *StreamBlocksResponse) Reset() {
 	*x = StreamBlocksResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[4]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -340,7 +339,7 @@ func (x *StreamBlocksResponse) String() string {
 func (*StreamBlocksResponse) ProtoMessage() {}
 
 func (x *StreamBlocksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[4]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -353,7 +352,7 @@ func (x *StreamBlocksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamBlocksResponse.ProtoReflect.Descriptor instead.
 func (*StreamBlocksResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{4}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{4}
 }
 
 func (m *StreamBlocksResponse) GetBlock() isStreamBlocksResponse_Block {
@@ -444,7 +443,7 @@ type DomainRequest struct {
 func (x *DomainRequest) Reset() {
 	*x = DomainRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[5]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -457,7 +456,7 @@ func (x *DomainRequest) String() string {
 func (*DomainRequest) ProtoMessage() {}
 
 func (x *DomainRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[5]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -470,7 +469,7 @@ func (x *DomainRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DomainRequest.ProtoReflect.Descriptor instead.
 func (*DomainRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{5}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *DomainRequest) GetEpoch() github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch {
@@ -498,7 +497,7 @@ type DomainResponse struct {
 func (x *DomainResponse) Reset() {
 	*x = DomainResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[6]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -511,7 +510,7 @@ func (x *DomainResponse) String() string {
 func (*DomainResponse) ProtoMessage() {}
 
 func (x *DomainResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[6]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -524,7 +523,7 @@ func (x *DomainResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DomainResponse.ProtoReflect.Descriptor instead.
 func (*DomainResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{6}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DomainResponse) GetSignatureDomain() []byte {
@@ -545,7 +544,7 @@ type ValidatorActivationRequest struct {
 func (x *ValidatorActivationRequest) Reset() {
 	*x = ValidatorActivationRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[7]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -558,7 +557,7 @@ func (x *ValidatorActivationRequest) String() string {
 func (*ValidatorActivationRequest) ProtoMessage() {}
 
 func (x *ValidatorActivationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[7]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -571,7 +570,7 @@ func (x *ValidatorActivationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorActivationRequest.ProtoReflect.Descriptor instead.
 func (*ValidatorActivationRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{7}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ValidatorActivationRequest) GetPublicKeys() [][]byte {
@@ -592,7 +591,7 @@ type ValidatorActivationResponse struct {
 func (x *ValidatorActivationResponse) Reset() {
 	*x = ValidatorActivationResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[8]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -605,7 +604,7 @@ func (x *ValidatorActivationResponse) String() string {
 func (*ValidatorActivationResponse) ProtoMessage() {}
 
 func (x *ValidatorActivationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[8]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -618,7 +617,7 @@ func (x *ValidatorActivationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorActivationResponse.ProtoReflect.Descriptor instead.
 func (*ValidatorActivationResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{8}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ValidatorActivationResponse) GetStatuses() []*ValidatorActivationResponse_Status {
@@ -641,7 +640,7 @@ type ChainStartResponse struct {
 func (x *ChainStartResponse) Reset() {
 	*x = ChainStartResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[9]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -654,7 +653,7 @@ func (x *ChainStartResponse) String() string {
 func (*ChainStartResponse) ProtoMessage() {}
 
 func (x *ChainStartResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[9]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -667,7 +666,7 @@ func (x *ChainStartResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChainStartResponse.ProtoReflect.Descriptor instead.
 func (*ChainStartResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{9}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ChainStartResponse) GetStarted() bool {
@@ -703,7 +702,7 @@ type SyncedResponse struct {
 func (x *SyncedResponse) Reset() {
 	*x = SyncedResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[10]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -716,7 +715,7 @@ func (x *SyncedResponse) String() string {
 func (*SyncedResponse) ProtoMessage() {}
 
 func (x *SyncedResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[10]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -729,7 +728,7 @@ func (x *SyncedResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncedResponse.ProtoReflect.Descriptor instead.
 func (*SyncedResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{10}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SyncedResponse) GetSynced() bool {
@@ -757,7 +756,7 @@ type ValidatorIndexRequest struct {
 func (x *ValidatorIndexRequest) Reset() {
 	*x = ValidatorIndexRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[11]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -770,7 +769,7 @@ func (x *ValidatorIndexRequest) String() string {
 func (*ValidatorIndexRequest) ProtoMessage() {}
 
 func (x *ValidatorIndexRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[11]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -783,7 +782,7 @@ func (x *ValidatorIndexRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorIndexRequest.ProtoReflect.Descriptor instead.
 func (*ValidatorIndexRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{11}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ValidatorIndexRequest) GetPublicKey() []byte {
@@ -804,7 +803,7 @@ type ValidatorIndexResponse struct {
 func (x *ValidatorIndexResponse) Reset() {
 	*x = ValidatorIndexResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[12]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -817,7 +816,7 @@ func (x *ValidatorIndexResponse) String() string {
 func (*ValidatorIndexResponse) ProtoMessage() {}
 
 func (x *ValidatorIndexResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[12]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -830,7 +829,7 @@ func (x *ValidatorIndexResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorIndexResponse.ProtoReflect.Descriptor instead.
 func (*ValidatorIndexResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{12}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ValidatorIndexResponse) GetIndex() github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex {
@@ -851,7 +850,7 @@ type ValidatorStatusRequest struct {
 func (x *ValidatorStatusRequest) Reset() {
 	*x = ValidatorStatusRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[13]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -864,7 +863,7 @@ func (x *ValidatorStatusRequest) String() string {
 func (*ValidatorStatusRequest) ProtoMessage() {}
 
 func (x *ValidatorStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[13]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -877,7 +876,7 @@ func (x *ValidatorStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorStatusRequest.ProtoReflect.Descriptor instead.
 func (*ValidatorStatusRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{13}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ValidatorStatusRequest) GetPublicKey() []byte {
@@ -893,7 +892,7 @@ type ValidatorStatusResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	Status                    ValidatorStatus                                             `protobuf:"varint,1,opt,name=status,proto3,enum=theqrl.zond.v1alpha1.ValidatorStatus" json:"status,omitempty"`
-	Eth1DepositBlockNumber    uint64                                                      `protobuf:"varint,2,opt,name=eth1_deposit_block_number,json=eth1DepositBlockNumber,proto3" json:"eth1_deposit_block_number,omitempty"`
+	ZondDepositBlockNumber    uint64                                                      `protobuf:"varint,2,opt,name=zond_deposit_block_number,json=zondDepositBlockNumber,proto3" json:"zond_deposit_block_number,omitempty"`
 	DepositInclusionSlot      github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot  `protobuf:"varint,3,opt,name=deposit_inclusion_slot,json=depositInclusionSlot,proto3" json:"deposit_inclusion_slot,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"`
 	ActivationEpoch           github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch `protobuf:"varint,4,opt,name=activation_epoch,json=activationEpoch,proto3" json:"activation_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"`
 	PositionInActivationQueue uint64                                                      `protobuf:"varint,5,opt,name=position_in_activation_queue,json=positionInActivationQueue,proto3" json:"position_in_activation_queue,omitempty"`
@@ -902,7 +901,7 @@ type ValidatorStatusResponse struct {
 func (x *ValidatorStatusResponse) Reset() {
 	*x = ValidatorStatusResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[14]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -915,7 +914,7 @@ func (x *ValidatorStatusResponse) String() string {
 func (*ValidatorStatusResponse) ProtoMessage() {}
 
 func (x *ValidatorStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[14]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -928,7 +927,7 @@ func (x *ValidatorStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorStatusResponse.ProtoReflect.Descriptor instead.
 func (*ValidatorStatusResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{14}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ValidatorStatusResponse) GetStatus() ValidatorStatus {
@@ -938,9 +937,9 @@ func (x *ValidatorStatusResponse) GetStatus() ValidatorStatus {
 	return ValidatorStatus_UNKNOWN_STATUS
 }
 
-func (x *ValidatorStatusResponse) GetEth1DepositBlockNumber() uint64 {
+func (x *ValidatorStatusResponse) GetZondDepositBlockNumber() uint64 {
 	if x != nil {
-		return x.Eth1DepositBlockNumber
+		return x.ZondDepositBlockNumber
 	}
 	return 0
 }
@@ -978,7 +977,7 @@ type MultipleValidatorStatusRequest struct {
 func (x *MultipleValidatorStatusRequest) Reset() {
 	*x = MultipleValidatorStatusRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[15]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -991,7 +990,7 @@ func (x *MultipleValidatorStatusRequest) String() string {
 func (*MultipleValidatorStatusRequest) ProtoMessage() {}
 
 func (x *MultipleValidatorStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[15]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1004,7 +1003,7 @@ func (x *MultipleValidatorStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MultipleValidatorStatusRequest.ProtoReflect.Descriptor instead.
 func (*MultipleValidatorStatusRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{15}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *MultipleValidatorStatusRequest) GetPublicKeys() [][]byte {
@@ -1034,7 +1033,7 @@ type MultipleValidatorStatusResponse struct {
 func (x *MultipleValidatorStatusResponse) Reset() {
 	*x = MultipleValidatorStatusResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[16]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1047,7 +1046,7 @@ func (x *MultipleValidatorStatusResponse) String() string {
 func (*MultipleValidatorStatusResponse) ProtoMessage() {}
 
 func (x *MultipleValidatorStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[16]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1060,7 +1059,7 @@ func (x *MultipleValidatorStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MultipleValidatorStatusResponse.ProtoReflect.Descriptor instead.
 func (*MultipleValidatorStatusResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{16}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *MultipleValidatorStatusResponse) GetPublicKeys() [][]byte {
@@ -1096,7 +1095,7 @@ type DutiesRequest struct {
 func (x *DutiesRequest) Reset() {
 	*x = DutiesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[17]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1109,7 +1108,7 @@ func (x *DutiesRequest) String() string {
 func (*DutiesRequest) ProtoMessage() {}
 
 func (x *DutiesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[17]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1122,7 +1121,7 @@ func (x *DutiesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DutiesRequest.ProtoReflect.Descriptor instead.
 func (*DutiesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{17}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *DutiesRequest) GetEpoch() github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch {
@@ -1144,7 +1143,7 @@ type DutiesResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/validator.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/validator.proto.
 	Duties             []*DutiesResponse_Duty `protobuf:"bytes,1,rep,name=duties,proto3" json:"duties,omitempty"`
 	CurrentEpochDuties []*DutiesResponse_Duty `protobuf:"bytes,2,rep,name=current_epoch_duties,json=currentEpochDuties,proto3" json:"current_epoch_duties,omitempty"`
 	NextEpochDuties    []*DutiesResponse_Duty `protobuf:"bytes,3,rep,name=next_epoch_duties,json=nextEpochDuties,proto3" json:"next_epoch_duties,omitempty"`
@@ -1153,7 +1152,7 @@ type DutiesResponse struct {
 func (x *DutiesResponse) Reset() {
 	*x = DutiesResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[18]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1166,7 +1165,7 @@ func (x *DutiesResponse) String() string {
 func (*DutiesResponse) ProtoMessage() {}
 
 func (x *DutiesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[18]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1179,10 +1178,10 @@ func (x *DutiesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DutiesResponse.ProtoReflect.Descriptor instead.
 func (*DutiesResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{18}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{18}
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/validator.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/validator.proto.
 func (x *DutiesResponse) GetDuties() []*DutiesResponse_Duty {
 	if x != nil {
 		return x.Duties
@@ -1218,7 +1217,7 @@ type BlockRequest struct {
 func (x *BlockRequest) Reset() {
 	*x = BlockRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[19]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1231,7 +1230,7 @@ func (x *BlockRequest) String() string {
 func (*BlockRequest) ProtoMessage() {}
 
 func (x *BlockRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[19]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1244,7 +1243,7 @@ func (x *BlockRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlockRequest.ProtoReflect.Descriptor instead.
 func (*BlockRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{19}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *BlockRequest) GetSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -1286,7 +1285,7 @@ type ProposeResponse struct {
 func (x *ProposeResponse) Reset() {
 	*x = ProposeResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[20]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1299,7 +1298,7 @@ func (x *ProposeResponse) String() string {
 func (*ProposeResponse) ProtoMessage() {}
 
 func (x *ProposeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[20]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1312,7 +1311,7 @@ func (x *ProposeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProposeResponse.ProtoReflect.Descriptor instead.
 func (*ProposeResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{20}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ProposeResponse) GetBlockRoot() []byte {
@@ -1333,7 +1332,7 @@ type ProposeExitResponse struct {
 func (x *ProposeExitResponse) Reset() {
 	*x = ProposeExitResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[21]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1346,7 +1345,7 @@ func (x *ProposeExitResponse) String() string {
 func (*ProposeExitResponse) ProtoMessage() {}
 
 func (x *ProposeExitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[21]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1359,7 +1358,7 @@ func (x *ProposeExitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProposeExitResponse.ProtoReflect.Descriptor instead.
 func (*ProposeExitResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{21}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ProposeExitResponse) GetExitRoot() []byte {
@@ -1381,7 +1380,7 @@ type AttestationDataRequest struct {
 func (x *AttestationDataRequest) Reset() {
 	*x = AttestationDataRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[22]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1394,7 +1393,7 @@ func (x *AttestationDataRequest) String() string {
 func (*AttestationDataRequest) ProtoMessage() {}
 
 func (x *AttestationDataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[22]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1407,7 +1406,7 @@ func (x *AttestationDataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttestationDataRequest.ProtoReflect.Descriptor instead.
 func (*AttestationDataRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{22}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *AttestationDataRequest) GetSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -1435,7 +1434,7 @@ type AttestResponse struct {
 func (x *AttestResponse) Reset() {
 	*x = AttestResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[23]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1448,7 +1447,7 @@ func (x *AttestResponse) String() string {
 func (*AttestResponse) ProtoMessage() {}
 
 func (x *AttestResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[23]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1461,7 +1460,7 @@ func (x *AttestResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttestResponse.ProtoReflect.Descriptor instead.
 func (*AttestResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{23}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *AttestResponse) GetAttestationDataRoot() []byte {
@@ -1485,7 +1484,7 @@ type AggregateSelectionRequest struct {
 func (x *AggregateSelectionRequest) Reset() {
 	*x = AggregateSelectionRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[24]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1498,7 +1497,7 @@ func (x *AggregateSelectionRequest) String() string {
 func (*AggregateSelectionRequest) ProtoMessage() {}
 
 func (x *AggregateSelectionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[24]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1511,7 +1510,7 @@ func (x *AggregateSelectionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AggregateSelectionRequest.ProtoReflect.Descriptor instead.
 func (*AggregateSelectionRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{24}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *AggregateSelectionRequest) GetSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -1553,7 +1552,7 @@ type AggregateSelectionResponse struct {
 func (x *AggregateSelectionResponse) Reset() {
 	*x = AggregateSelectionResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[25]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1566,7 +1565,7 @@ func (x *AggregateSelectionResponse) String() string {
 func (*AggregateSelectionResponse) ProtoMessage() {}
 
 func (x *AggregateSelectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[25]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1579,7 +1578,7 @@ func (x *AggregateSelectionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AggregateSelectionResponse.ProtoReflect.Descriptor instead.
 func (*AggregateSelectionResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{25}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *AggregateSelectionResponse) GetAggregateAndProof() *AggregateAttestationAndProof {
@@ -1600,7 +1599,7 @@ type SignedAggregateSubmitRequest struct {
 func (x *SignedAggregateSubmitRequest) Reset() {
 	*x = SignedAggregateSubmitRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[26]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1613,7 +1612,7 @@ func (x *SignedAggregateSubmitRequest) String() string {
 func (*SignedAggregateSubmitRequest) ProtoMessage() {}
 
 func (x *SignedAggregateSubmitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[26]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1626,7 +1625,7 @@ func (x *SignedAggregateSubmitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignedAggregateSubmitRequest.ProtoReflect.Descriptor instead.
 func (*SignedAggregateSubmitRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{26}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *SignedAggregateSubmitRequest) GetSignedAggregateAndProof() *SignedAggregateAttestationAndProof {
@@ -1647,7 +1646,7 @@ type SignedAggregateSubmitResponse struct {
 func (x *SignedAggregateSubmitResponse) Reset() {
 	*x = SignedAggregateSubmitResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[27]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1660,7 +1659,7 @@ func (x *SignedAggregateSubmitResponse) String() string {
 func (*SignedAggregateSubmitResponse) ProtoMessage() {}
 
 func (x *SignedAggregateSubmitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[27]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1673,7 +1672,7 @@ func (x *SignedAggregateSubmitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignedAggregateSubmitResponse.ProtoReflect.Descriptor instead.
 func (*SignedAggregateSubmitResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{27}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *SignedAggregateSubmitResponse) GetAttestationDataRoot() []byte {
@@ -1696,7 +1695,7 @@ type CommitteeSubnetsSubscribeRequest struct {
 func (x *CommitteeSubnetsSubscribeRequest) Reset() {
 	*x = CommitteeSubnetsSubscribeRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[28]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1709,7 +1708,7 @@ func (x *CommitteeSubnetsSubscribeRequest) String() string {
 func (*CommitteeSubnetsSubscribeRequest) ProtoMessage() {}
 
 func (x *CommitteeSubnetsSubscribeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[28]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1722,7 +1721,7 @@ func (x *CommitteeSubnetsSubscribeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommitteeSubnetsSubscribeRequest.ProtoReflect.Descriptor instead.
 func (*CommitteeSubnetsSubscribeRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{28}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *CommitteeSubnetsSubscribeRequest) GetSlots() []github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -1764,7 +1763,7 @@ type Validator struct {
 func (x *Validator) Reset() {
 	*x = Validator{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[29]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1777,7 +1776,7 @@ func (x *Validator) String() string {
 func (*Validator) ProtoMessage() {}
 
 func (x *Validator) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[29]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1790,7 +1789,7 @@ func (x *Validator) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Validator.ProtoReflect.Descriptor instead.
 func (*Validator) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{29}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *Validator) GetPublicKey() []byte {
@@ -1854,11 +1853,11 @@ type ValidatorParticipation struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/validator.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/validator.proto.
 	GlobalParticipationRate float32 `protobuf:"fixed32,1,opt,name=global_participation_rate,json=globalParticipationRate,proto3" json:"global_participation_rate,omitempty"`
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/validator.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/validator.proto.
 	VotedEther uint64 `protobuf:"varint,2,opt,name=voted_ether,json=votedEther,proto3" json:"voted_ether,omitempty"`
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/validator.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/validator.proto.
 	EligibleEther                    uint64 `protobuf:"varint,3,opt,name=eligible_ether,json=eligibleEther,proto3" json:"eligible_ether,omitempty"`
 	CurrentEpochActiveGwei           uint64 `protobuf:"varint,4,opt,name=current_epoch_active_gwei,json=currentEpochActiveGwei,proto3" json:"current_epoch_active_gwei,omitempty"`
 	CurrentEpochAttestingGwei        uint64 `protobuf:"varint,5,opt,name=current_epoch_attesting_gwei,json=currentEpochAttestingGwei,proto3" json:"current_epoch_attesting_gwei,omitempty"`
@@ -1872,7 +1871,7 @@ type ValidatorParticipation struct {
 func (x *ValidatorParticipation) Reset() {
 	*x = ValidatorParticipation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[30]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1885,7 +1884,7 @@ func (x *ValidatorParticipation) String() string {
 func (*ValidatorParticipation) ProtoMessage() {}
 
 func (x *ValidatorParticipation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[30]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1898,10 +1897,10 @@ func (x *ValidatorParticipation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorParticipation.ProtoReflect.Descriptor instead.
 func (*ValidatorParticipation) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{30}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{30}
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/validator.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/validator.proto.
 func (x *ValidatorParticipation) GetGlobalParticipationRate() float32 {
 	if x != nil {
 		return x.GlobalParticipationRate
@@ -1909,7 +1908,7 @@ func (x *ValidatorParticipation) GetGlobalParticipationRate() float32 {
 	return 0
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/validator.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/validator.proto.
 func (x *ValidatorParticipation) GetVotedEther() uint64 {
 	if x != nil {
 		return x.VotedEther
@@ -1917,7 +1916,7 @@ func (x *ValidatorParticipation) GetVotedEther() uint64 {
 	return 0
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/validator.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/validator.proto.
 func (x *ValidatorParticipation) GetEligibleEther() uint64 {
 	if x != nil {
 		return x.EligibleEther
@@ -1991,7 +1990,7 @@ type ValidatorInfo struct {
 func (x *ValidatorInfo) Reset() {
 	*x = ValidatorInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[31]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2004,7 +2003,7 @@ func (x *ValidatorInfo) String() string {
 func (*ValidatorInfo) ProtoMessage() {}
 
 func (x *ValidatorInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[31]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2017,7 +2016,7 @@ func (x *ValidatorInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorInfo.ProtoReflect.Descriptor instead.
 func (*ValidatorInfo) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{31}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ValidatorInfo) GetPublicKey() []byte {
@@ -2080,7 +2079,7 @@ type DoppelGangerRequest struct {
 func (x *DoppelGangerRequest) Reset() {
 	*x = DoppelGangerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[32]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2093,7 +2092,7 @@ func (x *DoppelGangerRequest) String() string {
 func (*DoppelGangerRequest) ProtoMessage() {}
 
 func (x *DoppelGangerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[32]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2106,7 +2105,7 @@ func (x *DoppelGangerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DoppelGangerRequest.ProtoReflect.Descriptor instead.
 func (*DoppelGangerRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{32}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *DoppelGangerRequest) GetValidatorRequests() []*DoppelGangerRequest_ValidatorRequest {
@@ -2127,7 +2126,7 @@ type DoppelGangerResponse struct {
 func (x *DoppelGangerResponse) Reset() {
 	*x = DoppelGangerResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[33]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2140,7 +2139,7 @@ func (x *DoppelGangerResponse) String() string {
 func (*DoppelGangerResponse) ProtoMessage() {}
 
 func (x *DoppelGangerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[33]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2153,7 +2152,7 @@ func (x *DoppelGangerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DoppelGangerResponse.ProtoReflect.Descriptor instead.
 func (*DoppelGangerResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{33}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *DoppelGangerResponse) GetResponses() []*DoppelGangerResponse_ValidatorResponse {
@@ -2163,7 +2162,7 @@ func (x *DoppelGangerResponse) GetResponses() []*DoppelGangerResponse_ValidatorR
 	return nil
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/validator.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/validator.proto.
 type StreamBlocksRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2175,7 +2174,7 @@ type StreamBlocksRequest struct {
 func (x *StreamBlocksRequest) Reset() {
 	*x = StreamBlocksRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[34]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2188,7 +2187,7 @@ func (x *StreamBlocksRequest) String() string {
 func (*StreamBlocksRequest) ProtoMessage() {}
 
 func (x *StreamBlocksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[34]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2201,7 +2200,7 @@ func (x *StreamBlocksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamBlocksRequest.ProtoReflect.Descriptor instead.
 func (*StreamBlocksRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{34}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *StreamBlocksRequest) GetVerifiedOnly() bool {
@@ -2222,7 +2221,7 @@ type PrepareBeaconProposerRequest struct {
 func (x *PrepareBeaconProposerRequest) Reset() {
 	*x = PrepareBeaconProposerRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[35]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2235,7 +2234,7 @@ func (x *PrepareBeaconProposerRequest) String() string {
 func (*PrepareBeaconProposerRequest) ProtoMessage() {}
 
 func (x *PrepareBeaconProposerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[35]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2248,7 +2247,7 @@ func (x *PrepareBeaconProposerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PrepareBeaconProposerRequest.ProtoReflect.Descriptor instead.
 func (*PrepareBeaconProposerRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{35}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *PrepareBeaconProposerRequest) GetRecipients() []*PrepareBeaconProposerRequest_FeeRecipientContainer {
@@ -2269,7 +2268,7 @@ type FeeRecipientByPubKeyRequest struct {
 func (x *FeeRecipientByPubKeyRequest) Reset() {
 	*x = FeeRecipientByPubKeyRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[36]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2282,7 +2281,7 @@ func (x *FeeRecipientByPubKeyRequest) String() string {
 func (*FeeRecipientByPubKeyRequest) ProtoMessage() {}
 
 func (x *FeeRecipientByPubKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[36]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2295,7 +2294,7 @@ func (x *FeeRecipientByPubKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeeRecipientByPubKeyRequest.ProtoReflect.Descriptor instead.
 func (*FeeRecipientByPubKeyRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{36}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *FeeRecipientByPubKeyRequest) GetPublicKey() []byte {
@@ -2316,7 +2315,7 @@ type FeeRecipientByPubKeyResponse struct {
 func (x *FeeRecipientByPubKeyResponse) Reset() {
 	*x = FeeRecipientByPubKeyResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[37]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[37]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2329,7 +2328,7 @@ func (x *FeeRecipientByPubKeyResponse) String() string {
 func (*FeeRecipientByPubKeyResponse) ProtoMessage() {}
 
 func (x *FeeRecipientByPubKeyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[37]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[37]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2342,7 +2341,7 @@ func (x *FeeRecipientByPubKeyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeeRecipientByPubKeyResponse.ProtoReflect.Descriptor instead.
 func (*FeeRecipientByPubKeyResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{37}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *FeeRecipientByPubKeyResponse) GetFeeRecipient() []byte {
@@ -2364,7 +2363,7 @@ type AssignValidatorToSubnetRequest struct {
 func (x *AssignValidatorToSubnetRequest) Reset() {
 	*x = AssignValidatorToSubnetRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[38]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2377,7 +2376,7 @@ func (x *AssignValidatorToSubnetRequest) String() string {
 func (*AssignValidatorToSubnetRequest) ProtoMessage() {}
 
 func (x *AssignValidatorToSubnetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[38]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2390,7 +2389,7 @@ func (x *AssignValidatorToSubnetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssignValidatorToSubnetRequest.ProtoReflect.Descriptor instead.
 func (*AssignValidatorToSubnetRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{38}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *AssignValidatorToSubnetRequest) GetPublicKey() []byte {
@@ -2421,7 +2420,7 @@ type AggregatedSigAndAggregationBitsRequest struct {
 func (x *AggregatedSigAndAggregationBitsRequest) Reset() {
 	*x = AggregatedSigAndAggregationBitsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[39]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2434,7 +2433,7 @@ func (x *AggregatedSigAndAggregationBitsRequest) String() string {
 func (*AggregatedSigAndAggregationBitsRequest) ProtoMessage() {}
 
 func (x *AggregatedSigAndAggregationBitsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[39]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2447,7 +2446,7 @@ func (x *AggregatedSigAndAggregationBitsRequest) ProtoReflect() protoreflect.Mes
 
 // Deprecated: Use AggregatedSigAndAggregationBitsRequest.ProtoReflect.Descriptor instead.
 func (*AggregatedSigAndAggregationBitsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{39}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *AggregatedSigAndAggregationBitsRequest) GetMsgs() []*SyncCommitteeMessage {
@@ -2490,7 +2489,7 @@ type AggregatedSigAndAggregationBitsResponse struct {
 func (x *AggregatedSigAndAggregationBitsResponse) Reset() {
 	*x = AggregatedSigAndAggregationBitsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[40]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2503,7 +2502,7 @@ func (x *AggregatedSigAndAggregationBitsResponse) String() string {
 func (*AggregatedSigAndAggregationBitsResponse) ProtoMessage() {}
 
 func (x *AggregatedSigAndAggregationBitsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[40]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2516,7 +2515,7 @@ func (x *AggregatedSigAndAggregationBitsResponse) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use AggregatedSigAndAggregationBitsResponse.ProtoReflect.Descriptor instead.
 func (*AggregatedSigAndAggregationBitsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{40}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *AggregatedSigAndAggregationBitsResponse) GetAggregatedSig() []byte {
@@ -2546,7 +2545,7 @@ type ValidatorActivationResponse_Status struct {
 func (x *ValidatorActivationResponse_Status) Reset() {
 	*x = ValidatorActivationResponse_Status{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[41]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2559,7 +2558,7 @@ func (x *ValidatorActivationResponse_Status) String() string {
 func (*ValidatorActivationResponse_Status) ProtoMessage() {}
 
 func (x *ValidatorActivationResponse_Status) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[41]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2572,7 +2571,7 @@ func (x *ValidatorActivationResponse_Status) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use ValidatorActivationResponse_Status.ProtoReflect.Descriptor instead.
 func (*ValidatorActivationResponse_Status) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{8, 0}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{8, 0}
 }
 
 func (x *ValidatorActivationResponse_Status) GetPublicKey() []byte {
@@ -2614,7 +2613,7 @@ type DutiesResponse_Duty struct {
 func (x *DutiesResponse_Duty) Reset() {
 	*x = DutiesResponse_Duty{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[42]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2627,7 +2626,7 @@ func (x *DutiesResponse_Duty) String() string {
 func (*DutiesResponse_Duty) ProtoMessage() {}
 
 func (x *DutiesResponse_Duty) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[42]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2640,7 +2639,7 @@ func (x *DutiesResponse_Duty) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DutiesResponse_Duty.ProtoReflect.Descriptor instead.
 func (*DutiesResponse_Duty) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{18, 0}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{18, 0}
 }
 
 func (x *DutiesResponse_Duty) GetCommittee() []github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex {
@@ -2712,7 +2711,7 @@ type DoppelGangerRequest_ValidatorRequest struct {
 func (x *DoppelGangerRequest_ValidatorRequest) Reset() {
 	*x = DoppelGangerRequest_ValidatorRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[43]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2725,7 +2724,7 @@ func (x *DoppelGangerRequest_ValidatorRequest) String() string {
 func (*DoppelGangerRequest_ValidatorRequest) ProtoMessage() {}
 
 func (x *DoppelGangerRequest_ValidatorRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[43]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2738,7 +2737,7 @@ func (x *DoppelGangerRequest_ValidatorRequest) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use DoppelGangerRequest_ValidatorRequest.ProtoReflect.Descriptor instead.
 func (*DoppelGangerRequest_ValidatorRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{32, 0}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{32, 0}
 }
 
 func (x *DoppelGangerRequest_ValidatorRequest) GetPublicKey() []byte {
@@ -2774,7 +2773,7 @@ type DoppelGangerResponse_ValidatorResponse struct {
 func (x *DoppelGangerResponse_ValidatorResponse) Reset() {
 	*x = DoppelGangerResponse_ValidatorResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[44]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2787,7 +2786,7 @@ func (x *DoppelGangerResponse_ValidatorResponse) String() string {
 func (*DoppelGangerResponse_ValidatorResponse) ProtoMessage() {}
 
 func (x *DoppelGangerResponse_ValidatorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[44]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2800,7 +2799,7 @@ func (x *DoppelGangerResponse_ValidatorResponse) ProtoReflect() protoreflect.Mes
 
 // Deprecated: Use DoppelGangerResponse_ValidatorResponse.ProtoReflect.Descriptor instead.
 func (*DoppelGangerResponse_ValidatorResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{33, 0}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{33, 0}
 }
 
 func (x *DoppelGangerResponse_ValidatorResponse) GetPublicKey() []byte {
@@ -2829,7 +2828,7 @@ type PrepareBeaconProposerRequest_FeeRecipientContainer struct {
 func (x *PrepareBeaconProposerRequest_FeeRecipientContainer) Reset() {
 	*x = PrepareBeaconProposerRequest_FeeRecipientContainer{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[45]
+		mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[45]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2842,7 +2841,7 @@ func (x *PrepareBeaconProposerRequest_FeeRecipientContainer) String() string {
 func (*PrepareBeaconProposerRequest_FeeRecipientContainer) ProtoMessage() {}
 
 func (x *PrepareBeaconProposerRequest_FeeRecipientContainer) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_validator_proto_msgTypes[45]
+	mi := &file_proto_qrysm_v1alpha1_validator_proto_msgTypes[45]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2855,7 +2854,7 @@ func (x *PrepareBeaconProposerRequest_FeeRecipientContainer) ProtoReflect() prot
 
 // Deprecated: Use PrepareBeaconProposerRequest_FeeRecipientContainer.ProtoReflect.Descriptor instead.
 func (*PrepareBeaconProposerRequest_FeeRecipientContainer) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP(), []int{35, 0}
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{35, 0}
 }
 
 func (x *PrepareBeaconProposerRequest_FeeRecipientContainer) GetFeeRecipient() []byte {
@@ -2872,10 +2871,10 @@ func (x *PrepareBeaconProposerRequest_FeeRecipientContainer) GetValidatorIndex()
 	return github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex(0)
 }
 
-var File_proto_prysm_v1alpha1_validator_proto protoreflect.FileDescriptor
+var File_proto_qrysm_v1alpha1_validator_proto protoreflect.FileDescriptor
 
-var file_proto_prysm_v1alpha1_validator_proto_rawDesc = []byte{
-	0x0a, 0x24, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
+var file_proto_qrysm_v1alpha1_validator_proto_rawDesc = []byte{
+	0x0a, 0x24, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72,
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x14, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a,
 	0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x1a, 0x1c, 0x67, 0x6f,
@@ -2884,13 +2883,13 @@ var file_proto_prysm_v1alpha1_validator_proto_rawDesc = []byte{
 	0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x65, 0x6d, 0x70, 0x74,
 	0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1c, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x7a,
 	0x6f, 0x6e, 0x64, 0x2f, 0x65, 0x78, 0x74, 0x2f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79,
 	0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x62, 0x65, 0x61, 0x63,
 	0x6f, 0x6e, 0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x29,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c,
 	0x70, 0x68, 0x61, 0x31, 0x2f, 0x73, 0x79, 0x6e, 0x63, 0x5f, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74,
 	0x74, 0x65, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x26, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f,
+	0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f,
 	0x61, 0x74, 0x74, 0x65, 0x73, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x22, 0x3a, 0x0a, 0x1c, 0x53, 0x79, 0x6e, 0x63, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
 	0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x6f, 0x6f, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
@@ -3028,9 +3027,9 @@ var file_proto_prysm_v1alpha1_validator_proto_rawDesc = []byte{
 	0x28, 0x0e, 0x32, 0x25, 0x2e, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64,
 	0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61,
 	0x74, 0x6f, 0x72, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75,
-	0x73, 0x12, 0x39, 0x0a, 0x19, 0x65, 0x74, 0x68, 0x31, 0x5f, 0x64, 0x65, 0x70, 0x6f, 0x73, 0x69,
+	0x73, 0x12, 0x39, 0x0a, 0x19, 0x7a, 0x6f, 0x6e, 0x64, 0x5f, 0x64, 0x65, 0x70, 0x6f, 0x73, 0x69,
 	0x74, 0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x04, 0x52, 0x16, 0x65, 0x74, 0x68, 0x31, 0x44, 0x65, 0x70, 0x6f, 0x73, 0x69,
+	0x20, 0x01, 0x28, 0x04, 0x52, 0x16, 0x7a, 0x6f, 0x6e, 0x64, 0x44, 0x65, 0x70, 0x6f, 0x73, 0x69,
 	0x74, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x74, 0x0a, 0x16,
 	0x64, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x5f, 0x69, 0x6e, 0x63, 0x6c, 0x75, 0x73, 0x69, 0x6f,
 	0x6e, 0x5f, 0x73, 0x6c, 0x6f, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x42, 0x3e, 0x82, 0xb5,
@@ -3755,7 +3754,7 @@ var file_proto_prysm_v1alpha1_validator_proto_rawDesc = []byte{
 	0x70, 0x68, 0x61, 0x31, 0x42, 0x0e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x50,
 	0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
 	0x6f, 0x6d, 0x2f, 0x74, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f,
-	0x76, 0x34, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76,
+	0x76, 0x34, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76,
 	0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x3b, 0x7a, 0x6f, 0x6e, 0x64, 0xaa, 0x02, 0x0e, 0x54,
 	0x68, 0x65, 0x51, 0x52, 0x4c, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x14,
 	0x54, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x5c, 0x5a, 0x6f, 0x6e, 0x64, 0x5c, 0x76, 0x31, 0x61, 0x6c,
@@ -3763,20 +3762,20 @@ var file_proto_prysm_v1alpha1_validator_proto_rawDesc = []byte{
 }
 
 var (
-	file_proto_prysm_v1alpha1_validator_proto_rawDescOnce sync.Once
-	file_proto_prysm_v1alpha1_validator_proto_rawDescData = file_proto_prysm_v1alpha1_validator_proto_rawDesc
+	file_proto_qrysm_v1alpha1_validator_proto_rawDescOnce sync.Once
+	file_proto_qrysm_v1alpha1_validator_proto_rawDescData = file_proto_qrysm_v1alpha1_validator_proto_rawDesc
 )
 
-func file_proto_prysm_v1alpha1_validator_proto_rawDescGZIP() []byte {
-	file_proto_prysm_v1alpha1_validator_proto_rawDescOnce.Do(func() {
-		file_proto_prysm_v1alpha1_validator_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_prysm_v1alpha1_validator_proto_rawDescData)
+func file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP() []byte {
+	file_proto_qrysm_v1alpha1_validator_proto_rawDescOnce.Do(func() {
+		file_proto_qrysm_v1alpha1_validator_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_qrysm_v1alpha1_validator_proto_rawDescData)
 	})
-	return file_proto_prysm_v1alpha1_validator_proto_rawDescData
+	return file_proto_qrysm_v1alpha1_validator_proto_rawDescData
 }
 
-var file_proto_prysm_v1alpha1_validator_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_prysm_v1alpha1_validator_proto_msgTypes = make([]protoimpl.MessageInfo, 46)
-var file_proto_prysm_v1alpha1_validator_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_validator_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_proto_qrysm_v1alpha1_validator_proto_msgTypes = make([]protoimpl.MessageInfo, 46)
+var file_proto_qrysm_v1alpha1_validator_proto_goTypes = []interface{}{
 	(ValidatorStatus)(0),                                       // 0: theqrl.zond.v1alpha1.ValidatorStatus
 	(*SyncMessageBlockRootResponse)(nil),                       // 1: theqrl.zond.v1alpha1.SyncMessageBlockRootResponse
 	(*SyncSubcommitteeIndexRequest)(nil),                       // 2: theqrl.zond.v1alpha1.SyncSubcommitteeIndexRequest
@@ -3842,7 +3841,7 @@ var file_proto_prysm_v1alpha1_validator_proto_goTypes = []interface{}{
 	(*AttestationData)(nil),                                    // 62: theqrl.zond.v1alpha1.AttestationData
 	(*SyncCommitteeContribution)(nil),                          // 63: theqrl.zond.v1alpha1.SyncCommitteeContribution
 }
-var file_proto_prysm_v1alpha1_validator_proto_depIdxs = []int32{
+var file_proto_qrysm_v1alpha1_validator_proto_depIdxs = []int32{
 	47, // 0: theqrl.zond.v1alpha1.StreamBlocksResponse.phase0_block:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlock
 	48, // 1: theqrl.zond.v1alpha1.StreamBlocksResponse.altair_block:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlockAltair
 	49, // 2: theqrl.zond.v1alpha1.StreamBlocksResponse.bellatrix_block:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlockBellatrix
@@ -3927,16 +3926,16 @@ var file_proto_prysm_v1alpha1_validator_proto_depIdxs = []int32{
 	0,  // [0:21] is the sub-list for field type_name
 }
 
-func init() { file_proto_prysm_v1alpha1_validator_proto_init() }
-func file_proto_prysm_v1alpha1_validator_proto_init() {
-	if File_proto_prysm_v1alpha1_validator_proto != nil {
+func init() { file_proto_qrysm_v1alpha1_validator_proto_init() }
+func file_proto_qrysm_v1alpha1_validator_proto_init() {
+	if File_proto_qrysm_v1alpha1_validator_proto != nil {
 		return
 	}
-	file_proto_prysm_v1alpha1_beacon_block_proto_init()
-	file_proto_prysm_v1alpha1_sync_committee_proto_init()
-	file_proto_prysm_v1alpha1_attestation_proto_init()
+	file_proto_qrysm_v1alpha1_beacon_block_proto_init()
+	file_proto_qrysm_v1alpha1_sync_committee_proto_init()
+	file_proto_qrysm_v1alpha1_attestation_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncMessageBlockRootResponse); i {
 			case 0:
 				return &v.state
@@ -3948,7 +3947,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncSubcommitteeIndexRequest); i {
 			case 0:
 				return &v.state
@@ -3960,7 +3959,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncCommitteeContributionRequest); i {
 			case 0:
 				return &v.state
@@ -3972,7 +3971,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncSubcommitteeIndexResponse); i {
 			case 0:
 				return &v.state
@@ -3984,7 +3983,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StreamBlocksResponse); i {
 			case 0:
 				return &v.state
@@ -3996,7 +3995,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DomainRequest); i {
 			case 0:
 				return &v.state
@@ -4008,7 +4007,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DomainResponse); i {
 			case 0:
 				return &v.state
@@ -4020,7 +4019,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorActivationRequest); i {
 			case 0:
 				return &v.state
@@ -4032,7 +4031,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorActivationResponse); i {
 			case 0:
 				return &v.state
@@ -4044,7 +4043,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ChainStartResponse); i {
 			case 0:
 				return &v.state
@@ -4056,7 +4055,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncedResponse); i {
 			case 0:
 				return &v.state
@@ -4068,7 +4067,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorIndexRequest); i {
 			case 0:
 				return &v.state
@@ -4080,7 +4079,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorIndexResponse); i {
 			case 0:
 				return &v.state
@@ -4092,7 +4091,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorStatusRequest); i {
 			case 0:
 				return &v.state
@@ -4104,7 +4103,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorStatusResponse); i {
 			case 0:
 				return &v.state
@@ -4116,7 +4115,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MultipleValidatorStatusRequest); i {
 			case 0:
 				return &v.state
@@ -4128,7 +4127,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MultipleValidatorStatusResponse); i {
 			case 0:
 				return &v.state
@@ -4140,7 +4139,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DutiesRequest); i {
 			case 0:
 				return &v.state
@@ -4152,7 +4151,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DutiesResponse); i {
 			case 0:
 				return &v.state
@@ -4164,7 +4163,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BlockRequest); i {
 			case 0:
 				return &v.state
@@ -4176,7 +4175,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ProposeResponse); i {
 			case 0:
 				return &v.state
@@ -4188,7 +4187,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ProposeExitResponse); i {
 			case 0:
 				return &v.state
@@ -4200,7 +4199,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AttestationDataRequest); i {
 			case 0:
 				return &v.state
@@ -4212,7 +4211,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AttestResponse); i {
 			case 0:
 				return &v.state
@@ -4224,7 +4223,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AggregateSelectionRequest); i {
 			case 0:
 				return &v.state
@@ -4236,7 +4235,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AggregateSelectionResponse); i {
 			case 0:
 				return &v.state
@@ -4248,7 +4247,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SignedAggregateSubmitRequest); i {
 			case 0:
 				return &v.state
@@ -4260,7 +4259,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SignedAggregateSubmitResponse); i {
 			case 0:
 				return &v.state
@@ -4272,7 +4271,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CommitteeSubnetsSubscribeRequest); i {
 			case 0:
 				return &v.state
@@ -4284,7 +4283,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Validator); i {
 			case 0:
 				return &v.state
@@ -4296,7 +4295,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorParticipation); i {
 			case 0:
 				return &v.state
@@ -4308,7 +4307,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorInfo); i {
 			case 0:
 				return &v.state
@@ -4320,7 +4319,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DoppelGangerRequest); i {
 			case 0:
 				return &v.state
@@ -4332,7 +4331,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DoppelGangerResponse); i {
 			case 0:
 				return &v.state
@@ -4344,7 +4343,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StreamBlocksRequest); i {
 			case 0:
 				return &v.state
@@ -4356,7 +4355,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PrepareBeaconProposerRequest); i {
 			case 0:
 				return &v.state
@@ -4368,7 +4367,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FeeRecipientByPubKeyRequest); i {
 			case 0:
 				return &v.state
@@ -4380,7 +4379,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FeeRecipientByPubKeyResponse); i {
 			case 0:
 				return &v.state
@@ -4392,7 +4391,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AssignValidatorToSubnetRequest); i {
 			case 0:
 				return &v.state
@@ -4404,7 +4403,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AggregatedSigAndAggregationBitsRequest); i {
 			case 0:
 				return &v.state
@@ -4416,7 +4415,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AggregatedSigAndAggregationBitsResponse); i {
 			case 0:
 				return &v.state
@@ -4428,7 +4427,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorActivationResponse_Status); i {
 			case 0:
 				return &v.state
@@ -4440,7 +4439,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DutiesResponse_Duty); i {
 			case 0:
 				return &v.state
@@ -4452,7 +4451,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DoppelGangerRequest_ValidatorRequest); i {
 			case 0:
 				return &v.state
@@ -4464,7 +4463,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DoppelGangerResponse_ValidatorResponse); i {
 			case 0:
 				return &v.state
@@ -4476,7 +4475,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_validator_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_validator_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PrepareBeaconProposerRequest_FeeRecipientContainer); i {
 			case 0:
 				return &v.state
@@ -4489,7 +4488,7 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 			}
 		}
 	}
-	file_proto_prysm_v1alpha1_validator_proto_msgTypes[4].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_validator_proto_msgTypes[4].OneofWrappers = []interface{}{
 		(*StreamBlocksResponse_Phase0Block)(nil),
 		(*StreamBlocksResponse_AltairBlock)(nil),
 		(*StreamBlocksResponse_BellatrixBlock)(nil),
@@ -4500,21 +4499,21 @@ func file_proto_prysm_v1alpha1_validator_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_prysm_v1alpha1_validator_proto_rawDesc,
+			RawDescriptor: file_proto_qrysm_v1alpha1_validator_proto_rawDesc,
 			NumEnums:      1,
 			NumMessages:   46,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_prysm_v1alpha1_validator_proto_goTypes,
-		DependencyIndexes: file_proto_prysm_v1alpha1_validator_proto_depIdxs,
-		EnumInfos:         file_proto_prysm_v1alpha1_validator_proto_enumTypes,
-		MessageInfos:      file_proto_prysm_v1alpha1_validator_proto_msgTypes,
+		GoTypes:           file_proto_qrysm_v1alpha1_validator_proto_goTypes,
+		DependencyIndexes: file_proto_qrysm_v1alpha1_validator_proto_depIdxs,
+		EnumInfos:         file_proto_qrysm_v1alpha1_validator_proto_enumTypes,
+		MessageInfos:      file_proto_qrysm_v1alpha1_validator_proto_msgTypes,
 	}.Build()
-	File_proto_prysm_v1alpha1_validator_proto = out.File
-	file_proto_prysm_v1alpha1_validator_proto_rawDesc = nil
-	file_proto_prysm_v1alpha1_validator_proto_goTypes = nil
-	file_proto_prysm_v1alpha1_validator_proto_depIdxs = nil
+	File_proto_qrysm_v1alpha1_validator_proto = out.File
+	file_proto_qrysm_v1alpha1_validator_proto_rawDesc = nil
+	file_proto_qrysm_v1alpha1_validator_proto_goTypes = nil
+	file_proto_qrysm_v1alpha1_validator_proto_depIdxs = nil
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -5684,5 +5683,5 @@ var _BeaconNodeValidator_serviceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "proto/prysm/v1alpha1/validator.proto",
+	Metadata: "proto/qrysm/v1alpha1/validator.proto",
 }

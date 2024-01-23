@@ -10,8 +10,8 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
-// ProcessEth1DataInBlock is an operation performed on each
-// beacon block to ensure the ETH1 data votes are processed
+// ProcessZondDataInBlock is an operation performed on each
+// beacon block to ensure the Zond data votes are processed
 // into the beacon state.
 //
 // Official spec definition:
@@ -20,27 +20,27 @@ import (
 //	 state.eth1_data_votes.append(body.eth1_data)
 //	 if state.eth1_data_votes.count(body.eth1_data) * 2 > EPOCHS_PER_ETH1_VOTING_PERIOD * SLOTS_PER_EPOCH:
 //	     state.eth1_data = body.eth1_data
-func ProcessEth1DataInBlock(_ context.Context, beaconState state.BeaconState, eth1Data *zondpb.Eth1Data) (state.BeaconState, error) {
+func ProcessZondDataInBlock(_ context.Context, beaconState state.BeaconState, zondData *zondpb.ZondData) (state.BeaconState, error) {
 	if beaconState == nil || beaconState.IsNil() {
 		return nil, errors.New("nil state")
 	}
-	if err := beaconState.AppendEth1DataVotes(eth1Data); err != nil {
+	if err := beaconState.AppendZondDataVotes(zondData); err != nil {
 		return nil, err
 	}
-	hasSupport, err := Eth1DataHasEnoughSupport(beaconState, eth1Data)
+	hasSupport, err := ZondDataHasEnoughSupport(beaconState, zondData)
 	if err != nil {
 		return nil, err
 	}
 	if hasSupport {
-		if err := beaconState.SetEth1Data(eth1Data); err != nil {
+		if err := beaconState.SetZondData(zondData); err != nil {
 			return nil, err
 		}
 	}
 	return beaconState, nil
 }
 
-// AreEth1DataEqual checks equality between two eth1 data objects.
-func AreEth1DataEqual(a, b *zondpb.Eth1Data) bool {
+// AreZondDataEqual checks equality between two eth1 data objects.
+func AreZondDataEqual(a, b *zondpb.ZondData) bool {
 	if a == nil && b == nil {
 		return true
 	}
@@ -52,22 +52,22 @@ func AreEth1DataEqual(a, b *zondpb.Eth1Data) bool {
 		bytes.Equal(a.DepositRoot, b.DepositRoot)
 }
 
-// Eth1DataHasEnoughSupport returns true when the given eth1data has more than 50% votes in the
+// ZondDataHasEnoughSupport returns true when the given eth1data has more than 50% votes in the
 // eth1 voting period. A vote is cast by including eth1data in a block and part of state processing
 // appends eth1data to the state in the Eth1DataVotes list. Iterating through this list checks the
 // votes to see if they match the eth1data.
-func Eth1DataHasEnoughSupport(beaconState state.ReadOnlyBeaconState, data *zondpb.Eth1Data) (bool, error) {
+func ZondDataHasEnoughSupport(beaconState state.ReadOnlyBeaconState, data *zondpb.ZondData) (bool, error) {
 	voteCount := uint64(0)
-	data = zondpb.CopyETH1Data(data)
+	data = zondpb.CopyZondData(data)
 
-	for _, vote := range beaconState.Eth1DataVotes() {
-		if AreEth1DataEqual(vote, data) {
+	for _, vote := range beaconState.ZondDataVotes() {
+		if AreZondDataEqual(vote, data) {
 			voteCount++
 		}
 	}
 
 	// If 50+% majority converged on the same eth1data, then it has enough support to update the
 	// state.
-	support := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerEth1VotingPeriod))
+	support := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerZondVotingPeriod))
 	return voteCount*2 > uint64(support), nil
 }

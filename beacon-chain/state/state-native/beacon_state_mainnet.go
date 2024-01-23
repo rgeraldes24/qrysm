@@ -32,9 +32,9 @@ type BeaconState struct {
 	stateRootsMultiValue                *MultiValueStateRoots
 	historicalRoots                     customtypes.HistoricalRoots
 	historicalSummaries                 []*zondpb.HistoricalSummary
-	eth1Data                            *zondpb.Eth1Data
-	eth1DataVotes                       []*zondpb.Eth1Data
-	eth1DepositIndex                    uint64
+	zondData                            *zondpb.ZondData
+	zondDataVotes                       []*zondpb.ZondData
+	zondDepositIndex                    uint64
 	validators                          []*zondpb.Validator
 	validatorsMultiValue                *MultiValueValidators
 	balances                            []uint64
@@ -82,9 +82,9 @@ type beaconStateMarshalable struct {
 	StateRoots                          customtypes.StateRoots                  `json:"state_roots" yaml:"state_roots"`
 	HistoricalRoots                     customtypes.HistoricalRoots             `json:"historical_roots" yaml:"historical_roots"`
 	HistoricalSummaries                 []*zondpb.HistoricalSummary             `json:"historical_summaries" yaml:"historical_summaries"`
-	Eth1Data                            *zondpb.Eth1Data                        `json:"eth_1_data" yaml:"eth_1_data"`
-	Eth1DataVotes                       []*zondpb.Eth1Data                      `json:"eth_1_data_votes" yaml:"eth_1_data_votes"`
-	Eth1DepositIndex                    uint64                                  `json:"eth_1_deposit_index" yaml:"eth_1_deposit_index"`
+	ZondData                            *zondpb.ZondData                        `json:"zond_data" yaml:"zond_data"`
+	ZondDataVotes                       []*zondpb.ZondData                      `json:"zond_data_votes" yaml:"zond_data_votes"`
+	ZondDepositIndex                    uint64                                  `json:"zond_deposit_index" yaml:"zond_deposit_index"`
 	Validators                          []*zondpb.Validator                     `json:"validators" yaml:"validators"`
 	Balances                            []uint64                                `json:"balances" yaml:"balances"`
 	RandaoMixes                         customtypes.RandaoMixes                 `json:"randao_mixes" yaml:"randao_mixes"`
@@ -141,9 +141,9 @@ func (b *BeaconState) MarshalJSON() ([]byte, error) {
 		StateRoots:                          sRoots,
 		HistoricalRoots:                     b.historicalRoots,
 		HistoricalSummaries:                 b.historicalSummaries,
-		Eth1Data:                            b.eth1Data,
-		Eth1DataVotes:                       b.eth1DataVotes,
-		Eth1DepositIndex:                    b.eth1DepositIndex,
+		ZondData:                            b.zondData,
+		ZondDataVotes:                       b.zondDataVotes,
+		ZondDepositIndex:                    b.zondDepositIndex,
 		Validators:                          vals,
 		Balances:                            balances,
 		RandaoMixes:                         mixes,

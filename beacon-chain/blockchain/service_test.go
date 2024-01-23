@@ -52,14 +52,14 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 	require.NoError(t, err)
 	mockTrie, err := trie.NewTrie(0)
 	require.NoError(t, err)
-	err = beaconDB.SaveExecutionChainData(ctx, &zondpb.ETH1ChainData{
+	err = beaconDB.SaveExecutionChainData(ctx, &zondpb.ZondChainData{
 		BeaconState: pbState,
 		Trie:        mockTrie.ToProto(),
-		CurrentEth1Data: &zondpb.LatestETH1Data{
+		CurrentZondData: &zondpb.LatestZondData{
 			BlockHash: make([]byte, 32),
 		},
 		ChainstartData: &zondpb.ChainStartData{
-			Eth1Data: &zondpb.Eth1Data{
+			ZondData: &zondpb.ZondData{
 				DepositRoot:  make([]byte, 32),
 				DepositCount: 0,
 				BlockHash:    make([]byte, 32),
@@ -196,7 +196,7 @@ func TestChainService_InitializeBeaconChain(t *testing.T) {
 	require.NoError(t, err)
 	genState, err := transition.EmptyGenesisState()
 	require.NoError(t, err)
-	err = genState.SetEth1Data(&zondpb.Eth1Data{
+	err = genState.SetZondData(&zondpb.ZondData{
 		DepositRoot:  hashTreeRoot[:],
 		DepositCount: uint64(len(deposits)),
 		BlockHash:    make([]byte, 32),
@@ -205,7 +205,7 @@ func TestChainService_InitializeBeaconChain(t *testing.T) {
 	genState, err = blocks.ProcessPreGenesisDeposits(ctx, genState, deposits)
 	require.NoError(t, err)
 
-	_, err = bc.initializeBeaconChain(ctx, time.Unix(0, 0), genState, &zondpb.Eth1Data{DepositRoot: hashTreeRoot[:], BlockHash: make([]byte, 32)})
+	_, err = bc.initializeBeaconChain(ctx, time.Unix(0, 0), genState, &zondpb.ZondData{DepositRoot: hashTreeRoot[:], BlockHash: make([]byte, 32)})
 	require.NoError(t, err)
 
 	_, err = bc.HeadState(ctx)

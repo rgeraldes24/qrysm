@@ -50,7 +50,7 @@ type CommonStats struct {
 type BeaconNodeStats struct {
 	// TODO(#8850): add support for this after slasher refactor is merged
 	SlasherActive             bool  `json:"slasher_active"`
-	SyncEth1Connected         bool  `json:"sync_eth1_connected"`
+	SyncZondConnected         bool  `json:"sync_zond_connected"`
 	SyncEth2Synced            bool  `json:"sync_eth2_synced"`
 	DiskBeaconchainBytesTotal int64 `json:"disk_beaconchain_bytes_total"`
 	// N/A -- would require significant network code changes at this time

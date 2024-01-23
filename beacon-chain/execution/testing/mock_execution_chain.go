@@ -1,4 +1,4 @@
-// Package testing provides useful mocks for an eth1 powchain
+// Package testing provides useful mocks for an zond powchain
 // service as needed by unit tests for the beacon node.
 package testing
 
@@ -30,8 +30,8 @@ type Chain struct {
 	HashesByHeight    map[int][]byte
 	TimesByHeight     map[int]uint64
 	BlockNumberByTime map[uint64]*big.Int
-	Eth1Data          *zondpb.Eth1Data
-	GenesisEth1Block  *big.Int
+	ZondData          *zondpb.ZondData
+	GenesisZondBlock  *big.Int
 	GenesisState      state.BeaconState
 	CurrEndpoint      string
 	CurrError         error
@@ -53,7 +53,7 @@ func New() *Chain {
 
 // GenesisExecutionChainInfo --
 func (m *Chain) GenesisExecutionChainInfo() (uint64, *big.Int) {
-	blk := m.GenesisEth1Block
+	blk := m.GenesisZondBlock
 	if blk == nil {
 		blk = big.NewInt(GenesisTime)
 	}
@@ -104,9 +104,9 @@ func (m *Chain) BlockByTimestamp(_ context.Context, time uint64) (*types.HeaderI
 	return &types.HeaderInfo{Number: chosenNumber, Time: chosenTime}, nil
 }
 
-// ChainStartEth1Data --
-func (m *Chain) ChainStartEth1Data() *zondpb.Eth1Data {
-	return m.Eth1Data
+// ChainStartZondData --
+func (m *Chain) ChainStartZondData() *zondpb.ZondData {
+	return m.ZondData
 }
 
 // PreGenesisState --
@@ -131,11 +131,11 @@ func (m *Chain) ExecutionClientConnectionErr() error {
 	return m.CurrError
 }
 
-func (m *Chain) ETH1Endpoints() []string {
+func (m *Chain) ZondEndpoints() []string {
 	return m.Endpoints
 }
 
-func (m *Chain) ETH1ConnectionErrors() []error {
+func (m *Chain) ZondConnectionErrors() []error {
 	return m.Errors
 }
 
@@ -260,10 +260,10 @@ func (m *Chain) InsertBlock(height int, time uint64, hash []byte) *Chain {
 
 func SetupRPCServer() (*rpc.Server, string, error) {
 	srv := rpc.NewServer()
-	if err := srv.RegisterName("eth", &testETHRPC{}); err != nil {
+	if err := srv.RegisterName("zond", &testZondRPC{}); err != nil {
 		return nil, "", err
 	}
-	if err := srv.RegisterName("net", &testETHRPC{}); err != nil {
+	if err := srv.RegisterName("net", &testZondRPC{}); err != nil {
 		return nil, "", err
 	}
 	hs := httptest.NewUnstartedServer(srv)
@@ -271,14 +271,14 @@ func SetupRPCServer() (*rpc.Server, string, error) {
 	return srv, hs.URL, nil
 }
 
-type testETHRPC struct{}
+type testZondRPC struct{}
 
-func (*testETHRPC) NoArgsRets() {}
+func (*testZondRPC) NoArgsRets() {}
 
-func (*testETHRPC) ChainId(_ context.Context) *hexutil.Big {
+func (*testZondRPC) ChainId(_ context.Context) *hexutil.Big {
 	return (*hexutil.Big)(big.NewInt(int64(params.BeaconConfig().DepositChainID)))
 }
 
-func (*testETHRPC) Version(_ context.Context) string {
+func (*testZondRPC) Version(_ context.Context) string {
 	return fmt.Sprintf("%d", params.BeaconConfig().DepositNetworkID)
 }

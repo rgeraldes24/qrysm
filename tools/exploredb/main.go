@@ -343,10 +343,10 @@ func printStates(stateC <-chan *modifiedState, doneC chan<- bool) {
 			size, count = sizeAndCountOfByteList(roots)
 			log.Infof("historical_roots              : size = %s, count = %d", humanize.Bytes(size), count)
 		}
-		log.Infof("eth1_data                     : sizeSSZ = %s", humanize.Bytes(uint64(st.Eth1Data().SizeSSZ())))
-		size, count = sizeAndCountGeneric(st.Eth1DataVotes(), nil)
-		log.Infof("eth1_data_votes               : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
-		log.Infof("eth1_deposit_index            : %d", st.Eth1DepositIndex())
+		log.Infof("zond_data                     : sizeSSZ = %s", humanize.Bytes(uint64(st.ZondData().SizeSSZ())))
+		size, count = sizeAndCountGeneric(st.ZondDataVotes(), nil)
+		log.Infof("zond_data_votes               : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
+		log.Infof("zond_deposit_index            : %d", st.ZondDepositIndex())
 		size, count = sizeAndCountGeneric(st.Validators(), nil)
 		log.Infof("validators                    : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
 		size, count = sizeAndCountOfUin64List(st.Balances())
@@ -521,7 +521,7 @@ func sizeAndCountGeneric(genericItems interface{}, err error) (uint64, uint64) {
 	}
 
 	switch items := genericItems.(type) {
-	case []*zondpb.Eth1Data:
+	case []*zondpb.ZondData:
 		for _, item := range items {
 			size += uint64(item.SizeSSZ())
 		}

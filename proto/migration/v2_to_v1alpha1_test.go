@@ -19,7 +19,7 @@ func Test_AltairToV1Alpha1SignedBlock(t *testing.T) {
 	v2Block.Message.ParentRoot = parentRoot
 	v2Block.Message.StateRoot = stateRoot
 	v2Block.Message.Body.RandaoReveal = randaoReveal
-	v2Block.Message.Body.Eth1Data = &zondpbv1.Eth1Data{
+	v2Block.Message.Body.ZondData = &zondpbv1.ZondData{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
@@ -48,7 +48,7 @@ func Test_BellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	v2Block.Message.ParentRoot = parentRoot
 	v2Block.Message.StateRoot = stateRoot
 	v2Block.Message.Body.RandaoReveal = randaoReveal
-	v2Block.Message.Body.Eth1Data = &zondpbv1.Eth1Data{
+	v2Block.Message.Body.ZondData = &zondpbv1.ZondData{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
@@ -93,7 +93,7 @@ func Test_BlindedBellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	v2Block.Message.ParentRoot = parentRoot
 	v2Block.Message.StateRoot = stateRoot
 	v2Block.Message.Body.RandaoReveal = randaoReveal
-	v2Block.Message.Body.Eth1Data = &zondpbv1.Eth1Data{
+	v2Block.Message.Body.ZondData = &zondpbv1.ZondData{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,

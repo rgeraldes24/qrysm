@@ -12,10 +12,10 @@ option java_outer_classname = "PowchainProto";
 option java_package = "org.theqrl.zond.v1alpha1";
 option php_namespace = "TheQRL\\Zond\\v1alpha1";
 
-// ETH1ChainData is a container which holds all the relevant eth1
+// ZondChainData is a container which holds all the relevant zond
 // information
-message ETH1ChainData {
-    LatestETH1Data current_eth1_data = 1 ;
+message ZondChainData {
+    LatestZondData current_zond_data = 1 ;
     ChainStartData chainstart_data = 2;
     BeaconState beacon_state = 3;
     SparseMerkleTrie trie = 4;
@@ -31,8 +31,8 @@ message DepositSnapshot {
     bytes execution_hash = 4;
     uint64 execution_depth = 5;
 }
-// LatestETH1Data contains the current state of the eth1 chain.
-message LatestETH1Data {
+// LatestZondData contains the current state of the zond chain.
+message LatestZondData {
     uint64 block_height = 2;
     uint64 block_time = 3;
     bytes block_hash = 4;
@@ -44,7 +44,7 @@ message ChainStartData {
     bool chainstarted = 1;
     uint64 genesis_time = 2;
     uint64 genesis_block = 3;
-    Eth1Data eth1_data = 4;
+    ZondData zond_data = 4;
     repeated Deposit chainstart_deposits = 5;
 }
 
@@ -65,7 +65,7 @@ message TrieLayer {
 // deposit related information for a particular deposit.
 message DepositContainer {
     int64 index = 1;
-    uint64 eth1_block_height = 2;
+    uint64 zond_block_height = 2;
     Deposit deposit = 3;
     bytes deposit_root = 4;
 }

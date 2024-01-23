@@ -24,7 +24,7 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 
 	dep, _, err := util.DeterministicDepositsAndKeysSameValidator(3)
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(dep))
+	zondData, err := util.DeterministicZondData(len(dep))
 	require.NoError(t, err)
 	b := util.NewBeaconBlock()
 	b.Block = &zondpb.BeaconBlock{
@@ -43,7 +43,7 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
-		Eth1Data:   eth1Data,
+		ZondData:   zondData,
 		Fork: &zondpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -81,7 +81,7 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 		},
 	}
 	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
-		Eth1Data: &zondpb.Eth1Data{
+		ZondData: &zondpb.ZondData{
 			DepositRoot: []byte{0},
 			BlockHash:   []byte{1},
 		},
@@ -95,7 +95,7 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {
 	dep, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(dep))
+	zondData, err := util.DeterministicZondData(len(dep))
 	require.NoError(t, err)
 
 	b := util.NewBeaconBlock()
@@ -114,7 +114,7 @@ func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {
 	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
-		Eth1Data:   eth1Data,
+		ZondData:   zondData,
 		Fork: &zondpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -178,7 +178,7 @@ func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T)
 	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
-		Eth1Data: &zondpb.Eth1Data{
+		ZondData: &zondpb.ZondData{
 			DepositRoot: root[:],
 			BlockHash:   root[:],
 		},
@@ -193,7 +193,7 @@ func TestProcessDeposit_AddsNewValidatorDeposit(t *testing.T) {
 	// Similar to TestProcessDeposits_AddsNewValidatorDeposit except that this test directly calls ProcessDeposit
 	dep, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(dep))
+	zondData, err := util.DeterministicZondData(len(dep))
 	require.NoError(t, err)
 
 	registry := []*zondpb.Validator{
@@ -206,7 +206,7 @@ func TestProcessDeposit_AddsNewValidatorDeposit(t *testing.T) {
 	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
-		Eth1Data:   eth1Data,
+		ZondData:   zondData,
 		Fork: &zondpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -236,7 +236,7 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 	require.NoError(t, err)
 	root, err := dt.HashTreeRoot()
 	require.NoError(t, err)
-	eth1Data := &zondpb.Eth1Data{
+	zondData := &zondpb.ZondData{
 		DepositRoot:  root[:],
 		DepositCount: 1,
 	}
@@ -250,7 +250,7 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
-		Eth1Data:   eth1Data,
+		ZondData:   zondData,
 		Fork: &zondpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -261,10 +261,10 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 	require.NoError(t, err, "Expected invalid block deposit to be ignored without error")
 	assert.Equal(t, false, isNewValidator, "Expected isNewValidator to be false")
 
-	if newState.Eth1DepositIndex() != 1 {
+	if newState.ZondDepositIndex() != 1 {
 		t.Errorf(
-			"Expected Eth1DepositIndex to be increased by 1 after processing an invalid deposit, received change: %v",
-			newState.Eth1DepositIndex(),
+			"Expected ZondDepositIndex to be increased by 1 after processing an invalid deposit, received change: %v",
+			newState.ZondDepositIndex(),
 		)
 	}
 	if len(newState.Validators()) != 1 {
@@ -294,7 +294,7 @@ func TestPreGenesisDeposits_SkipInvalidDeposit(t *testing.T) {
 	root, err := dt.HashTreeRoot()
 	require.NoError(t, err)
 
-	eth1Data := &zondpb.Eth1Data{
+	zondData := &zondpb.ZondData{
 		DepositRoot:  root[:],
 		DepositCount: 1,
 	}
@@ -308,7 +308,7 @@ func TestPreGenesisDeposits_SkipInvalidDeposit(t *testing.T) {
 	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
-		Eth1Data:   eth1Data,
+		ZondData:   zondData,
 		Fork: &zondpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -328,10 +328,10 @@ func TestPreGenesisDeposits_SkipInvalidDeposit(t *testing.T) {
 		require.Equal(t, primitives.Epoch(0), val.ActivationEpoch)
 		require.Equal(t, primitives.Epoch(0), val.ActivationEligibilityEpoch)
 	}
-	if newState.Eth1DepositIndex() != 100 {
+	if newState.ZondDepositIndex() != 100 {
 		t.Errorf(
-			"Expected Eth1DepositIndex to be increased by 99 after processing an invalid deposit, received change: %v",
-			newState.Eth1DepositIndex(),
+			"Expected ZondDepositIndex to be increased by 99 after processing an invalid deposit, received change: %v",
+			newState.ZondDepositIndex(),
 		)
 	}
 	if len(newState.Validators()) != 100 {
@@ -386,7 +386,7 @@ func TestProcessDeposit_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T) 
 	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
 		Validators: registry,
 		Balances:   balances,
-		Eth1Data: &zondpb.Eth1Data{
+		ZondData: &zondpb.ZondData{
 			DepositRoot: root[:],
 			BlockHash:   root[:],
 		},

@@ -60,14 +60,14 @@ import (
 //	  return state
 //
 // This method differs from the spec so as to process deposits beforehand instead of the end of the function.
-func GenesisBeaconStateBellatrix(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.Eth1Data, ep *enginev1.ExecutionPayload) (state.BeaconState, error) {
+func GenesisBeaconStateBellatrix(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, zondData *zondpb.ZondData, ep *enginev1.ExecutionPayload) (state.BeaconState, error) {
 	st, err := EmptyGenesisStateBellatrix()
 	if err != nil {
 		return nil, err
 	}
 
 	// Process initial deposits.
-	st, err = helpers.UpdateGenesisEth1Data(st, deposits, eth1Data)
+	st, err = helpers.UpdateGenesisZondData(st, deposits, zondData)
 	if err != nil {
 		return nil, err
 	}
@@ -77,29 +77,29 @@ func GenesisBeaconStateBellatrix(ctx context.Context, deposits []*zondpb.Deposit
 		return nil, errors.Wrap(err, "could not process validator deposits")
 	}
 
-	// After deposits have been processed, overwrite eth1data to what is passed in. This allows us to "pre-mine" validators
+	// After deposits have been processed, overwrite zonddata to what is passed in. This allows us to "pre-mine" validators
 	// without the deposit root and count mismatching the real deposit contract.
-	if err := st.SetEth1Data(eth1Data); err != nil {
+	if err := st.SetZondData(zondData); err != nil {
 		return nil, err
 	}
-	if err := st.SetEth1DepositIndex(eth1Data.DepositCount); err != nil {
+	if err := st.SetZondDepositIndex(zondData.DepositCount); err != nil {
 		return nil, err
 	}
 
-	return OptimizedGenesisBeaconStateBellatrix(genesisTime, st, st.Eth1Data(), ep)
+	return OptimizedGenesisBeaconStateBellatrix(genesisTime, st, st.ZondData(), ep)
 }
 
 // OptimizedGenesisBeaconStateBellatrix is used to create a state that has already processed deposits. This is to efficiently
 // create a mainnet state at chainstart.
-func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.BeaconState, eth1Data *zondpb.Eth1Data, ep *enginev1.ExecutionPayload) (state.BeaconState, error) {
-	if eth1Data == nil {
-		return nil, errors.New("no eth1data provided for genesis state")
+func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.BeaconState, zondData *zondpb.ZondData, ep *enginev1.ExecutionPayload) (state.BeaconState, error) {
+	if zondData == nil {
+		return nil, errors.New("no zonddata provided for genesis state")
 	}
 
 	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
 	for i := 0; i < len(randaoMixes); i++ {
 		h := make([]byte, 32)
-		copy(h, eth1Data.BlockHash)
+		copy(h, zondData.BlockHash)
 		randaoMixes[i] = h
 	}
 
@@ -184,17 +184,17 @@ func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.Bea
 		StateRoots:      stateRoots,
 		Slashings:       slashings,
 
-		// Eth1 data.
-		Eth1Data:                     eth1Data,
-		Eth1DataVotes:                []*zondpb.Eth1Data{},
-		Eth1DepositIndex:             preState.Eth1DepositIndex(),
+		// Zond data.
+		ZondData:                     zondData,
+		ZondDataVotes:                []*zondpb.ZondData{},
+		ZondDepositIndex:             preState.ZondDepositIndex(),
 		LatestExecutionPayloadHeader: eph,
 		InactivityScores:             scores,
 	}
 
 	bodyRoot, err := (&zondpb.BeaconBlockBodyBellatrix{
 		RandaoReveal: make([]byte, dilithium.CryptoBytes),
-		Eth1Data: &zondpb.Eth1Data{
+		ZondData: &zondpb.ZondData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},
@@ -259,10 +259,10 @@ func EmptyGenesisStateBellatrix() (state.BeaconState, error) {
 		JustificationBits: []byte{0},
 		HistoricalRoots:   [][]byte{},
 
-		// Eth1 data.
-		Eth1Data:         &zondpb.Eth1Data{},
-		Eth1DataVotes:    []*zondpb.Eth1Data{},
-		Eth1DepositIndex: 0,
+		// Zond data.
+		ZondData:         &zondpb.ZondData{},
+		ZondDataVotes:    []*zondpb.ZondData{},
+		ZondDepositIndex: 0,
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeader{
 			ParentHash:       make([]byte, 32),
 			FeeRecipient:     make([]byte, 20),

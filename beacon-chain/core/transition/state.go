@@ -58,14 +58,14 @@ import (
 //	  return state
 //
 // This method differs from the spec so as to process deposits beforehand instead of the end of the function.
-func GenesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.Eth1Data) (state.BeaconState, error) {
+func GenesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.ZondData) (state.BeaconState, error) {
 	st, err := EmptyGenesisState()
 	if err != nil {
 		return nil, err
 	}
 
 	// Process initial deposits.
-	st, err = helpers.UpdateGenesisEth1Data(st, deposits, eth1Data)
+	st, err = helpers.UpdateGenesisZondData(st, deposits, eth1Data)
 	if err != nil {
 		return nil, err
 	}
@@ -75,21 +75,21 @@ func GenesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit, genesis
 		return nil, errors.Wrap(err, "could not process validator deposits")
 	}
 
-	return OptimizedGenesisBeaconState(genesisTime, st, st.Eth1Data())
+	return OptimizedGenesisBeaconState(genesisTime, st, st.ZondData())
 }
 
 // PreminedGenesisBeaconState works almost exactly like GenesisBeaconState, except that it assumes that genesis deposits
 // are not represented in the deposit contract and are only found in the genesis state validator registry. In order
 // to ensure the deposit root and count match the empty deposit contract deployed in a testnet genesis block, the root
 // of an empty deposit trie is computed and used as Eth1Data.deposit_root, and the deposit count is set to 0.
-func PreminedGenesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.Eth1Data) (state.BeaconState, error) {
+func PreminedGenesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.ZondData) (state.BeaconState, error) {
 	st, err := EmptyGenesisState()
 	if err != nil {
 		return nil, err
 	}
 
 	// Process initial deposits.
-	st, err = helpers.UpdateGenesisEth1Data(st, deposits, eth1Data)
+	st, err = helpers.UpdateGenesisZondData(st, deposits, eth1Data)
 	if err != nil {
 		return nil, err
 	}
@@ -106,26 +106,26 @@ func PreminedGenesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit,
 	if err != nil {
 		return nil, err
 	}
-	if err := st.SetEth1Data(&zondpb.Eth1Data{DepositRoot: dr[:], BlockHash: eth1Data.BlockHash}); err != nil {
+	if err := st.SetZondData(&zondpb.ZondData{DepositRoot: dr[:], BlockHash: eth1Data.BlockHash}); err != nil {
 		return nil, err
 	}
-	if err := st.SetEth1DepositIndex(0); err != nil {
+	if err := st.SetZondDepositIndex(0); err != nil {
 		return nil, err
 	}
-	return OptimizedGenesisBeaconState(genesisTime, st, st.Eth1Data())
+	return OptimizedGenesisBeaconState(genesisTime, st, st.ZondData())
 }
 
 // OptimizedGenesisBeaconState is used to create a state that has already processed deposits. This is to efficiently
 // create a mainnet state at chainstart.
-func OptimizedGenesisBeaconState(genesisTime uint64, preState state.BeaconState, eth1Data *zondpb.Eth1Data) (state.BeaconState, error) {
-	if eth1Data == nil {
+func OptimizedGenesisBeaconState(genesisTime uint64, preState state.BeaconState, zondData *zondpb.ZondData) (state.BeaconState, error) {
+	if zondData == nil {
 		return nil, errors.New("no eth1data provided for genesis state")
 	}
 
 	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
 	for i := 0; i < len(randaoMixes); i++ {
 		h := make([]byte, 32)
-		copy(h, eth1Data.BlockHash)
+		copy(h, zondData.BlockHash)
 		randaoMixes[i] = h
 	}
 
@@ -194,15 +194,15 @@ func OptimizedGenesisBeaconState(genesisTime uint64, preState state.BeaconState,
 		CurrentEpochAttestations:  []*zondpb.PendingAttestation{},
 		PreviousEpochAttestations: []*zondpb.PendingAttestation{},
 
-		// Eth1 data.
-		Eth1Data:         eth1Data,
-		Eth1DataVotes:    []*zondpb.Eth1Data{},
-		Eth1DepositIndex: preState.Eth1DepositIndex(),
+		// Zond data.
+		ZondData:         zondData,
+		ZondDataVotes:    []*zondpb.ZondData{},
+		ZondDepositIndex: preState.ZondDepositIndex(),
 	}
 
 	bodyRoot, err := (&zondpb.BeaconBlockBody{
 		RandaoReveal: make([]byte, dilithium.CryptoBytes),
-		Eth1Data: &zondpb.Eth1Data{
+		ZondData: &zondpb.ZondData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},
@@ -255,10 +255,10 @@ func EmptyGenesisState() (state.BeaconState, error) {
 		CurrentEpochAttestations:  []*zondpb.PendingAttestation{},
 		PreviousEpochAttestations: []*zondpb.PendingAttestation{},
 
-		// Eth1 data.
-		Eth1Data:         &zondpb.Eth1Data{},
-		Eth1DataVotes:    []*zondpb.Eth1Data{},
-		Eth1DepositIndex: 0,
+		// Zond data.
+		ZondData:         &zondpb.ZondData{},
+		ZondDataVotes:    []*zondpb.ZondData{},
+		ZondDepositIndex: 0,
 	}
 	return state_native.InitializeFromProtoPhase0(st)
 }

@@ -34,9 +34,9 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 	genesisTime := uint64(99999)
 	deposits, _, err := util.DeterministicDepositsAndKeys(uint64(depositsForChainStart))
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(deposits))
+	zondData, err := util.DeterministicZondData(len(deposits))
 	require.NoError(t, err)
-	newState, err := transition.GenesisBeaconState(context.Background(), deposits, genesisTime, eth1Data)
+	newState, err := transition.GenesisBeaconState(context.Background(), deposits, genesisTime, zondData)
 	require.NoError(t, err, "Could not execute GenesisBeaconState")
 
 	// Misc fields checks.
@@ -63,7 +63,7 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 	assert.Equal(t, latestRandaoMixesLength, primitives.Epoch(len(newState.RandaoMixes())), "Length of RandaoMixes was not correctly initialized")
 	mix, err := newState.RandaoMixAtIndex(0)
 	require.NoError(t, err)
-	assert.DeepEqual(t, eth1Data.BlockHash, mix, "RandaoMixes was not correctly initialized")
+	assert.DeepEqual(t, zondData.BlockHash, mix, "RandaoMixes was not correctly initialized")
 
 	// Finality fields checks.
 	assert.Equal(t, genesisEpoch, newState.PreviousJustifiedCheckpoint().Epoch, "PreviousJustifiedCheckpoint.Epoch was not correctly initialized")
@@ -86,16 +86,16 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 	assert.DeepEqual(t, zeroHash, newState.BlockRoots()[0], "BlockRoots was not correctly initialized")
 
 	// Deposit root checks.
-	assert.DeepEqual(t, eth1Data.DepositRoot, newState.Eth1Data().DepositRoot, "Eth1Data DepositRoot was not correctly initialized")
-	assert.DeepSSZEqual(t, []*zondpb.Eth1Data{}, newState.Eth1DataVotes(), "Eth1DataVotes was not correctly initialized")
+	assert.DeepEqual(t, zondData.DepositRoot, newState.ZondData().DepositRoot, "ZondData DepositRoot was not correctly initialized")
+	assert.DeepSSZEqual(t, []*zondpb.ZondData{}, newState.ZondDataVotes(), "ZondDataVotes was not correctly initialized")
 }
 
 func TestGenesisState_HashEquality(t *testing.T) {
 	deposits, _, err := util.DeterministicDepositsAndKeys(100)
 	require.NoError(t, err)
-	state1, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zondpb.Eth1Data{BlockHash: make([]byte, 32)})
+	state1, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zondpb.ZondData{BlockHash: make([]byte, 32)})
 	require.NoError(t, err)
-	state, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zondpb.Eth1Data{BlockHash: make([]byte, 32)})
+	state, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zondpb.ZondData{BlockHash: make([]byte, 32)})
 	require.NoError(t, err)
 
 	pbState1, err := state_native.ProtobufBeaconStatePhase0(state1.ToProto())
@@ -113,7 +113,7 @@ func TestGenesisState_HashEquality(t *testing.T) {
 }
 
 func TestGenesisState_InitializesLatestBlockHashes(t *testing.T) {
-	s, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Eth1Data{})
+	s, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.ZondData{})
 	require.NoError(t, err)
 	got, want := uint64(len(s.BlockRoots())), uint64(params.BeaconConfig().SlotsPerHistoricalRoot)
 	assert.Equal(t, want, got, "Wrong number of recent block hashes")
@@ -126,7 +126,7 @@ func TestGenesisState_InitializesLatestBlockHashes(t *testing.T) {
 	}
 }
 
-func TestGenesisState_FailsWithoutEth1data(t *testing.T) {
+func TestGenesisState_FailsWithoutZonddata(t *testing.T) {
 	_, err := transition.GenesisBeaconState(context.Background(), nil, 0, nil)
-	assert.ErrorContains(t, "no eth1data provided for genesis state", err)
+	assert.ErrorContains(t, "no zonddata provided for genesis state", err)
 }

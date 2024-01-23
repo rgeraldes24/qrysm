@@ -80,7 +80,7 @@ func processDilithiumToExecutionChange(st state.BeaconState, signed *zondpb.Sign
 
 	message := signed.Message
 	newCredentials := make([]byte, executionToDilithiumPadding)
-	newCredentials[0] = params.BeaconConfig().ETH1AddressWithdrawalPrefixByte
+	newCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
 	val.WithdrawalCredentials = append(newCredentials, message.ToExecutionAddress...)
 	err = st.UpdateValidatorAtIndex(message.ValidatorIndex, val)
 	return st, err

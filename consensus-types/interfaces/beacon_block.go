@@ -61,7 +61,7 @@ type ReadOnlyBeaconBlock interface {
 // that is a beacon block body.
 type ReadOnlyBeaconBlockBody interface {
 	RandaoReveal() [dilithium.CryptoBytes]byte
-	Eth1Data() *zondpb.Eth1Data
+	ZondData() *zondpb.ZondData
 	Graffiti() [field_params.RootLength]byte
 	ProposerSlashings() []*zondpb.ProposerSlashing
 	AttesterSlashings() []*zondpb.AttesterSlashing
@@ -89,7 +89,7 @@ type SignedBeaconBlock interface {
 	SetAttesterSlashings([]*zondpb.AttesterSlashing)
 	SetProposerSlashings([]*zondpb.ProposerSlashing)
 	SetGraffiti([]byte)
-	SetEth1Data(*zondpb.Eth1Data)
+	SetZondData(*zondpb.ZondData)
 	SetRandaoReveal([]byte)
 	SetBlinded(bool)
 	SetStateRoot([]byte)

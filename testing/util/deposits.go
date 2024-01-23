@@ -238,8 +238,8 @@ func DepositTrieSubset(sparseTrie *trie.SparseMerkleTrie, size int) (*trie.Spars
 	return depositTrie, roots, nil
 }
 
-// DeterministicEth1Data takes an array of deposits and returns the eth1Data made from the deposit trie.
-func DeterministicEth1Data(size int) (*zondpb.Eth1Data, error) {
+// DeterministicZondData takes an array of deposits and returns the zondData made from the deposit trie.
+func DeterministicZondData(size int) (*zondpb.ZondData, error) {
 	depositTrie, _, err := DeterministicDepositTrie(size)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create trie")
@@ -248,12 +248,12 @@ func DeterministicEth1Data(size int) (*zondpb.Eth1Data, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to compute deposit trie root")
 	}
-	eth1Data := &zondpb.Eth1Data{
+	zondData := &zondpb.ZondData{
 		BlockHash:    root[:],
 		DepositRoot:  root[:],
 		DepositCount: uint64(size),
 	}
-	return eth1Data, nil
+	return zondData, nil
 }
 
 // DeterministicGenesisState returns a genesis state made using the deterministic deposits.
@@ -262,11 +262,11 @@ func DeterministicGenesisState(t testing.TB, numValidators uint64) (state.Beacon
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
 	}
-	eth1Data, err := DeterministicEth1Data(len(deposits))
+	zondData, err := DeterministicZondData(len(deposits))
 	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get eth1data for %d deposits", numValidators))
+		t.Fatal(errors.Wrapf(err, "failed to get zonddata for %d deposits", numValidators))
 	}
-	beaconState, err := transition.GenesisBeaconState(context.Background(), deposits, uint64(0), eth1Data)
+	beaconState, err := transition.GenesisBeaconState(context.Background(), deposits, uint64(0), zondData)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get genesis beacon state of %d validators", numValidators))
 	}

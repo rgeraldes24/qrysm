@@ -2,16 +2,15 @@
 // versions:
 // 	protoc-gen-go v1.30.0
 // 	protoc        v4.23.3
-// source: proto/prysm/v1alpha1/powchain.proto
+// source: proto/qrysm/v1alpha1/powchain.proto
 
 package zond
 
 import (
-	reflect "reflect"
-	sync "sync"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	reflect "reflect"
+	sync "sync"
 )
 
 const (
@@ -21,12 +20,12 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ETH1ChainData struct {
+type ZondChainData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CurrentEth1Data   *LatestETH1Data     `protobuf:"bytes,1,opt,name=current_eth1_data,json=currentEth1Data,proto3" json:"current_eth1_data,omitempty"`
+	CurrentZondData   *LatestZondData     `protobuf:"bytes,1,opt,name=current_zond_data,json=currentZondData,proto3" json:"current_zond_data,omitempty"`
 	ChainstartData    *ChainStartData     `protobuf:"bytes,2,opt,name=chainstart_data,json=chainstartData,proto3" json:"chainstart_data,omitempty"`
 	BeaconState       *BeaconState        `protobuf:"bytes,3,opt,name=beacon_state,json=beaconState,proto3" json:"beacon_state,omitempty"`
 	Trie              *SparseMerkleTrie   `protobuf:"bytes,4,opt,name=trie,proto3" json:"trie,omitempty"`
@@ -34,23 +33,23 @@ type ETH1ChainData struct {
 	DepositSnapshot   *DepositSnapshot    `protobuf:"bytes,6,opt,name=deposit_snapshot,json=depositSnapshot,proto3" json:"deposit_snapshot,omitempty"`
 }
 
-func (x *ETH1ChainData) Reset() {
-	*x = ETH1ChainData{}
+func (x *ZondChainData) Reset() {
+	*x = ZondChainData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[0]
+		mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *ETH1ChainData) String() string {
+func (x *ZondChainData) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ETH1ChainData) ProtoMessage() {}
+func (*ZondChainData) ProtoMessage() {}
 
-func (x *ETH1ChainData) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[0]
+func (x *ZondChainData) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,47 +60,47 @@ func (x *ETH1ChainData) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ETH1ChainData.ProtoReflect.Descriptor instead.
-func (*ETH1ChainData) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{0}
+// Deprecated: Use ZondChainData.ProtoReflect.Descriptor instead.
+func (*ZondChainData) Descriptor() ([]byte, []int) {
+	return file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ETH1ChainData) GetCurrentEth1Data() *LatestETH1Data {
+func (x *ZondChainData) GetCurrentZondData() *LatestZondData {
 	if x != nil {
-		return x.CurrentEth1Data
+		return x.CurrentZondData
 	}
 	return nil
 }
 
-func (x *ETH1ChainData) GetChainstartData() *ChainStartData {
+func (x *ZondChainData) GetChainstartData() *ChainStartData {
 	if x != nil {
 		return x.ChainstartData
 	}
 	return nil
 }
 
-func (x *ETH1ChainData) GetBeaconState() *BeaconState {
+func (x *ZondChainData) GetBeaconState() *BeaconState {
 	if x != nil {
 		return x.BeaconState
 	}
 	return nil
 }
 
-func (x *ETH1ChainData) GetTrie() *SparseMerkleTrie {
+func (x *ZondChainData) GetTrie() *SparseMerkleTrie {
 	if x != nil {
 		return x.Trie
 	}
 	return nil
 }
 
-func (x *ETH1ChainData) GetDepositContainers() []*DepositContainer {
+func (x *ZondChainData) GetDepositContainers() []*DepositContainer {
 	if x != nil {
 		return x.DepositContainers
 	}
 	return nil
 }
 
-func (x *ETH1ChainData) GetDepositSnapshot() *DepositSnapshot {
+func (x *ZondChainData) GetDepositSnapshot() *DepositSnapshot {
 	if x != nil {
 		return x.DepositSnapshot
 	}
@@ -123,7 +122,7 @@ type DepositSnapshot struct {
 func (x *DepositSnapshot) Reset() {
 	*x = DepositSnapshot{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[1]
+		mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -136,7 +135,7 @@ func (x *DepositSnapshot) String() string {
 func (*DepositSnapshot) ProtoMessage() {}
 
 func (x *DepositSnapshot) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[1]
+	mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -149,7 +148,7 @@ func (x *DepositSnapshot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DepositSnapshot.ProtoReflect.Descriptor instead.
 func (*DepositSnapshot) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{1}
+	return file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *DepositSnapshot) GetFinalized() [][]byte {
@@ -187,7 +186,7 @@ func (x *DepositSnapshot) GetExecutionDepth() uint64 {
 	return 0
 }
 
-type LatestETH1Data struct {
+type LatestZondData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -198,23 +197,23 @@ type LatestETH1Data struct {
 	LastRequestedBlock uint64 `protobuf:"varint,5,opt,name=last_requested_block,json=lastRequestedBlock,proto3" json:"last_requested_block,omitempty"`
 }
 
-func (x *LatestETH1Data) Reset() {
-	*x = LatestETH1Data{}
+func (x *LatestZondData) Reset() {
+	*x = LatestZondData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[2]
+		mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *LatestETH1Data) String() string {
+func (x *LatestZondData) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*LatestETH1Data) ProtoMessage() {}
+func (*LatestZondData) ProtoMessage() {}
 
-func (x *LatestETH1Data) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[2]
+func (x *LatestZondData) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -225,33 +224,33 @@ func (x *LatestETH1Data) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LatestETH1Data.ProtoReflect.Descriptor instead.
-func (*LatestETH1Data) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{2}
+// Deprecated: Use LatestZondData.ProtoReflect.Descriptor instead.
+func (*LatestZondData) Descriptor() ([]byte, []int) {
+	return file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *LatestETH1Data) GetBlockHeight() uint64 {
+func (x *LatestZondData) GetBlockHeight() uint64 {
 	if x != nil {
 		return x.BlockHeight
 	}
 	return 0
 }
 
-func (x *LatestETH1Data) GetBlockTime() uint64 {
+func (x *LatestZondData) GetBlockTime() uint64 {
 	if x != nil {
 		return x.BlockTime
 	}
 	return 0
 }
 
-func (x *LatestETH1Data) GetBlockHash() []byte {
+func (x *LatestZondData) GetBlockHash() []byte {
 	if x != nil {
 		return x.BlockHash
 	}
 	return nil
 }
 
-func (x *LatestETH1Data) GetLastRequestedBlock() uint64 {
+func (x *LatestZondData) GetLastRequestedBlock() uint64 {
 	if x != nil {
 		return x.LastRequestedBlock
 	}
@@ -266,14 +265,14 @@ type ChainStartData struct {
 	Chainstarted       bool       `protobuf:"varint,1,opt,name=chainstarted,proto3" json:"chainstarted,omitempty"`
 	GenesisTime        uint64     `protobuf:"varint,2,opt,name=genesis_time,json=genesisTime,proto3" json:"genesis_time,omitempty"`
 	GenesisBlock       uint64     `protobuf:"varint,3,opt,name=genesis_block,json=genesisBlock,proto3" json:"genesis_block,omitempty"`
-	Eth1Data           *Eth1Data  `protobuf:"bytes,4,opt,name=eth1_data,json=eth1Data,proto3" json:"eth1_data,omitempty"`
+	ZondData           *ZondData  `protobuf:"bytes,4,opt,name=zond_data,json=zondData,proto3" json:"zond_data,omitempty"`
 	ChainstartDeposits []*Deposit `protobuf:"bytes,5,rep,name=chainstart_deposits,json=chainstartDeposits,proto3" json:"chainstart_deposits,omitempty"`
 }
 
 func (x *ChainStartData) Reset() {
 	*x = ChainStartData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[3]
+		mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -286,7 +285,7 @@ func (x *ChainStartData) String() string {
 func (*ChainStartData) ProtoMessage() {}
 
 func (x *ChainStartData) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[3]
+	mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -299,7 +298,7 @@ func (x *ChainStartData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChainStartData.ProtoReflect.Descriptor instead.
 func (*ChainStartData) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{3}
+	return file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ChainStartData) GetChainstarted() bool {
@@ -323,9 +322,9 @@ func (x *ChainStartData) GetGenesisBlock() uint64 {
 	return 0
 }
 
-func (x *ChainStartData) GetEth1Data() *Eth1Data {
+func (x *ChainStartData) GetZondData() *ZondData {
 	if x != nil {
-		return x.Eth1Data
+		return x.ZondData
 	}
 	return nil
 }
@@ -350,7 +349,7 @@ type SparseMerkleTrie struct {
 func (x *SparseMerkleTrie) Reset() {
 	*x = SparseMerkleTrie{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[4]
+		mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -363,7 +362,7 @@ func (x *SparseMerkleTrie) String() string {
 func (*SparseMerkleTrie) ProtoMessage() {}
 
 func (x *SparseMerkleTrie) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[4]
+	mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -376,7 +375,7 @@ func (x *SparseMerkleTrie) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SparseMerkleTrie.ProtoReflect.Descriptor instead.
 func (*SparseMerkleTrie) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{4}
+	return file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *SparseMerkleTrie) GetDepth() uint64 {
@@ -411,7 +410,7 @@ type TrieLayer struct {
 func (x *TrieLayer) Reset() {
 	*x = TrieLayer{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[5]
+		mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -424,7 +423,7 @@ func (x *TrieLayer) String() string {
 func (*TrieLayer) ProtoMessage() {}
 
 func (x *TrieLayer) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[5]
+	mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -437,7 +436,7 @@ func (x *TrieLayer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrieLayer.ProtoReflect.Descriptor instead.
 func (*TrieLayer) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{5}
+	return file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *TrieLayer) GetLayer() [][]byte {
@@ -453,7 +452,7 @@ type DepositContainer struct {
 	unknownFields protoimpl.UnknownFields
 
 	Index           int64    `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`
-	Eth1BlockHeight uint64   `protobuf:"varint,2,opt,name=eth1_block_height,json=eth1BlockHeight,proto3" json:"eth1_block_height,omitempty"`
+	ZondBlockHeight uint64   `protobuf:"varint,2,opt,name=zond_block_height,json=zondBlockHeight,proto3" json:"zond_block_height,omitempty"`
 	Deposit         *Deposit `protobuf:"bytes,3,opt,name=deposit,proto3" json:"deposit,omitempty"`
 	DepositRoot     []byte   `protobuf:"bytes,4,opt,name=deposit_root,json=depositRoot,proto3" json:"deposit_root,omitempty"`
 }
@@ -461,7 +460,7 @@ type DepositContainer struct {
 func (x *DepositContainer) Reset() {
 	*x = DepositContainer{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[6]
+		mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -474,7 +473,7 @@ func (x *DepositContainer) String() string {
 func (*DepositContainer) ProtoMessage() {}
 
 func (x *DepositContainer) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_powchain_proto_msgTypes[6]
+	mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -487,7 +486,7 @@ func (x *DepositContainer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DepositContainer.ProtoReflect.Descriptor instead.
 func (*DepositContainer) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{6}
+	return file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DepositContainer) GetIndex() int64 {
@@ -497,9 +496,9 @@ func (x *DepositContainer) GetIndex() int64 {
 	return 0
 }
 
-func (x *DepositContainer) GetEth1BlockHeight() uint64 {
+func (x *DepositContainer) GetZondBlockHeight() uint64 {
 	if x != nil {
-		return x.Eth1BlockHeight
+		return x.ZondBlockHeight
 	}
 	return 0
 }
@@ -518,24 +517,24 @@ func (x *DepositContainer) GetDepositRoot() []byte {
 	return nil
 }
 
-var File_proto_prysm_v1alpha1_powchain_proto protoreflect.FileDescriptor
+var File_proto_qrysm_v1alpha1_powchain_proto protoreflect.FileDescriptor
 
-var file_proto_prysm_v1alpha1_powchain_proto_rawDesc = []byte{
-	0x0a, 0x23, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
+var file_proto_qrysm_v1alpha1_powchain_proto_rawDesc = []byte{
+	0x0a, 0x23, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x70, 0x6f, 0x77, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x14, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f,
 	0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x1a, 0x27, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61,
+	0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61,
 	0x31, 0x2f, 0x62, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73,
+	0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73,
 	0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x62, 0x65, 0x61, 0x63, 0x6f,
 	0x6e, 0x5f, 0x73, 0x74, 0x61, 0x74, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xdb, 0x03,
-	0x0a, 0x0d, 0x45, 0x54, 0x48, 0x31, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x12,
-	0x50, 0x0a, 0x11, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x5f, 0x65, 0x74, 0x68, 0x31, 0x5f,
+	0x0a, 0x0d, 0x5a, 0x6f, 0x6e, 0x64, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x12,
+	0x50, 0x0a, 0x11, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x5f, 0x7a, 0x6f, 0x6e, 0x64, 0x5f,
 	0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x74, 0x68, 0x65,
 	0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61,
-	0x31, 0x2e, 0x4c, 0x61, 0x74, 0x65, 0x73, 0x74, 0x45, 0x54, 0x48, 0x31, 0x44, 0x61, 0x74, 0x61,
-	0x52, 0x0f, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x45, 0x74, 0x68, 0x31, 0x44, 0x61, 0x74,
+	0x31, 0x2e, 0x4c, 0x61, 0x74, 0x65, 0x73, 0x74, 0x5a, 0x6f, 0x6e, 0x64, 0x44, 0x61, 0x74, 0x61,
+	0x52, 0x0f, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x5a, 0x6f, 0x6e, 0x64, 0x44, 0x61, 0x74,
 	0x61, 0x12, 0x4d, 0x0a, 0x0f, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f,
 	0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x74, 0x68, 0x65,
 	0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61,
@@ -573,7 +572,7 @@ var file_proto_prysm_v1alpha1_powchain_proto_rawDesc = []byte{
 	0x65, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x64, 0x65, 0x70, 0x74, 0x68, 0x18,
 	0x05, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0e, 0x65, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e,
 	0x44, 0x65, 0x70, 0x74, 0x68, 0x22, 0xa3, 0x01, 0x0a, 0x0e, 0x4c, 0x61, 0x74, 0x65, 0x73, 0x74,
-	0x45, 0x54, 0x48, 0x31, 0x44, 0x61, 0x74, 0x61, 0x12, 0x21, 0x0a, 0x0c, 0x62, 0x6c, 0x6f, 0x63,
+	0x5a, 0x6f, 0x6e, 0x64, 0x44, 0x61, 0x74, 0x61, 0x12, 0x21, 0x0a, 0x0c, 0x62, 0x6c, 0x6f, 0x63,
 	0x6b, 0x5f, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0b,
 	0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x62,
 	0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52,
@@ -590,11 +589,11 @@ var file_proto_prysm_v1alpha1_powchain_proto_rawDesc = []byte{
 	0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0b, 0x67, 0x65, 0x6e, 0x65, 0x73, 0x69,
 	0x73, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x23, 0x0a, 0x0d, 0x67, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73,
 	0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0c, 0x67, 0x65,
-	0x6e, 0x65, 0x73, 0x69, 0x73, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x12, 0x3b, 0x0a, 0x09, 0x65, 0x74,
-	0x68, 0x31, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e,
+	0x6e, 0x65, 0x73, 0x69, 0x73, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x12, 0x3b, 0x0a, 0x09, 0x7a, 0x6f,
+	0x6e, 0x64, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e,
 	0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c,
-	0x70, 0x68, 0x61, 0x31, 0x2e, 0x45, 0x74, 0x68, 0x31, 0x44, 0x61, 0x74, 0x61, 0x52, 0x08, 0x65,
-	0x74, 0x68, 0x31, 0x44, 0x61, 0x74, 0x61, 0x12, 0x4e, 0x0a, 0x13, 0x63, 0x68, 0x61, 0x69, 0x6e,
+	0x70, 0x68, 0x61, 0x31, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x44, 0x61, 0x74, 0x61, 0x52, 0x08, 0x7a,
+	0x6f, 0x6e, 0x64, 0x44, 0x61, 0x74, 0x61, 0x12, 0x4e, 0x0a, 0x13, 0x63, 0x68, 0x61, 0x69, 0x6e,
 	0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x64, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x73, 0x18, 0x05,
 	0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f,
 	0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2e, 0x44, 0x65, 0x70, 0x6f,
@@ -613,9 +612,9 @@ var file_proto_prysm_v1alpha1_powchain_proto_rawDesc = []byte{
 	0x6c, 0x61, 0x79, 0x65, 0x72, 0x22, 0xb0, 0x01, 0x0a, 0x10, 0x44, 0x65, 0x70, 0x6f, 0x73, 0x69,
 	0x74, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e,
 	0x64, 0x65, 0x78, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x05, 0x69, 0x6e, 0x64, 0x65, 0x78,
-	0x12, 0x2a, 0x0a, 0x11, 0x65, 0x74, 0x68, 0x31, 0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x68,
-	0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0f, 0x65, 0x74, 0x68,
-	0x31, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x12, 0x37, 0x0a, 0x07,
+	0x12, 0x2a, 0x0a, 0x11, 0x7a, 0x6f, 0x6e, 0x64, 0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x68,
+	0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0f, 0x7a, 0x6f, 0x6e,
+	0x64, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x12, 0x37, 0x0a, 0x07,
 	0x64, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e,
 	0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c,
 	0x70, 0x68, 0x61, 0x31, 0x2e, 0x44, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x52, 0x07, 0x64, 0x65,
@@ -626,7 +625,7 @@ var file_proto_prysm_v1alpha1_powchain_proto_rawDesc = []byte{
 	0x6c, 0x70, 0x68, 0x61, 0x31, 0x42, 0x0d, 0x50, 0x6f, 0x77, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x50,
 	0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
 	0x6f, 0x6d, 0x2f, 0x74, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f,
-	0x76, 0x34, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76,
+	0x76, 0x34, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76,
 	0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x3b, 0x7a, 0x6f, 0x6e, 0x64, 0xaa, 0x02, 0x14, 0x54,
 	0x68, 0x65, 0x51, 0x52, 0x4c, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0x61, 0x6c, 0x70,
 	0x68, 0x61, 0x31, 0xca, 0x02, 0x14, 0x54, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x5c, 0x5a, 0x6f, 0x6e,
@@ -635,38 +634,38 @@ var file_proto_prysm_v1alpha1_powchain_proto_rawDesc = []byte{
 }
 
 var (
-	file_proto_prysm_v1alpha1_powchain_proto_rawDescOnce sync.Once
-	file_proto_prysm_v1alpha1_powchain_proto_rawDescData = file_proto_prysm_v1alpha1_powchain_proto_rawDesc
+	file_proto_qrysm_v1alpha1_powchain_proto_rawDescOnce sync.Once
+	file_proto_qrysm_v1alpha1_powchain_proto_rawDescData = file_proto_qrysm_v1alpha1_powchain_proto_rawDesc
 )
 
-func file_proto_prysm_v1alpha1_powchain_proto_rawDescGZIP() []byte {
-	file_proto_prysm_v1alpha1_powchain_proto_rawDescOnce.Do(func() {
-		file_proto_prysm_v1alpha1_powchain_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_prysm_v1alpha1_powchain_proto_rawDescData)
+func file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP() []byte {
+	file_proto_qrysm_v1alpha1_powchain_proto_rawDescOnce.Do(func() {
+		file_proto_qrysm_v1alpha1_powchain_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_qrysm_v1alpha1_powchain_proto_rawDescData)
 	})
-	return file_proto_prysm_v1alpha1_powchain_proto_rawDescData
+	return file_proto_qrysm_v1alpha1_powchain_proto_rawDescData
 }
 
-var file_proto_prysm_v1alpha1_powchain_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_proto_prysm_v1alpha1_powchain_proto_goTypes = []interface{}{
-	(*ETH1ChainData)(nil),    // 0: theqrl.zond.v1alpha1.ETH1ChainData
+var file_proto_qrysm_v1alpha1_powchain_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_proto_qrysm_v1alpha1_powchain_proto_goTypes = []interface{}{
+	(*ZondChainData)(nil),    // 0: theqrl.zond.v1alpha1.ZondChainData
 	(*DepositSnapshot)(nil),  // 1: theqrl.zond.v1alpha1.DepositSnapshot
-	(*LatestETH1Data)(nil),   // 2: theqrl.zond.v1alpha1.LatestETH1Data
+	(*LatestZondData)(nil),   // 2: theqrl.zond.v1alpha1.LatestZondData
 	(*ChainStartData)(nil),   // 3: theqrl.zond.v1alpha1.ChainStartData
 	(*SparseMerkleTrie)(nil), // 4: theqrl.zond.v1alpha1.SparseMerkleTrie
 	(*TrieLayer)(nil),        // 5: theqrl.zond.v1alpha1.TrieLayer
 	(*DepositContainer)(nil), // 6: theqrl.zond.v1alpha1.DepositContainer
 	(*BeaconState)(nil),      // 7: theqrl.zond.v1alpha1.BeaconState
-	(*Eth1Data)(nil),         // 8: theqrl.zond.v1alpha1.Eth1Data
+	(*ZondData)(nil),         // 8: theqrl.zond.v1alpha1.ZondData
 	(*Deposit)(nil),          // 9: theqrl.zond.v1alpha1.Deposit
 }
-var file_proto_prysm_v1alpha1_powchain_proto_depIdxs = []int32{
-	2,  // 0: theqrl.zond.v1alpha1.ETH1ChainData.current_eth1_data:type_name -> theqrl.zond.v1alpha1.LatestETH1Data
-	3,  // 1: theqrl.zond.v1alpha1.ETH1ChainData.chainstart_data:type_name -> theqrl.zond.v1alpha1.ChainStartData
-	7,  // 2: theqrl.zond.v1alpha1.ETH1ChainData.beacon_state:type_name -> theqrl.zond.v1alpha1.BeaconState
-	4,  // 3: theqrl.zond.v1alpha1.ETH1ChainData.trie:type_name -> theqrl.zond.v1alpha1.SparseMerkleTrie
-	6,  // 4: theqrl.zond.v1alpha1.ETH1ChainData.deposit_containers:type_name -> theqrl.zond.v1alpha1.DepositContainer
-	1,  // 5: theqrl.zond.v1alpha1.ETH1ChainData.deposit_snapshot:type_name -> theqrl.zond.v1alpha1.DepositSnapshot
-	8,  // 6: theqrl.zond.v1alpha1.ChainStartData.eth1_data:type_name -> theqrl.zond.v1alpha1.Eth1Data
+var file_proto_qrysm_v1alpha1_powchain_proto_depIdxs = []int32{
+	2,  // 0: theqrl.zond.v1alpha1.ZondChainData.current_zond_data:type_name -> theqrl.zond.v1alpha1.LatestZondData
+	3,  // 1: theqrl.zond.v1alpha1.ZondChainData.chainstart_data:type_name -> theqrl.zond.v1alpha1.ChainStartData
+	7,  // 2: theqrl.zond.v1alpha1.ZondChainData.beacon_state:type_name -> theqrl.zond.v1alpha1.BeaconState
+	4,  // 3: theqrl.zond.v1alpha1.ZondChainData.trie:type_name -> theqrl.zond.v1alpha1.SparseMerkleTrie
+	6,  // 4: theqrl.zond.v1alpha1.ZondChainData.deposit_containers:type_name -> theqrl.zond.v1alpha1.DepositContainer
+	1,  // 5: theqrl.zond.v1alpha1.ZondChainData.deposit_snapshot:type_name -> theqrl.zond.v1alpha1.DepositSnapshot
+	8,  // 6: theqrl.zond.v1alpha1.ChainStartData.zond_data:type_name -> theqrl.zond.v1alpha1.ZondData
 	9,  // 7: theqrl.zond.v1alpha1.ChainStartData.chainstart_deposits:type_name -> theqrl.zond.v1alpha1.Deposit
 	5,  // 8: theqrl.zond.v1alpha1.SparseMerkleTrie.layers:type_name -> theqrl.zond.v1alpha1.TrieLayer
 	9,  // 9: theqrl.zond.v1alpha1.DepositContainer.deposit:type_name -> theqrl.zond.v1alpha1.Deposit
@@ -677,16 +676,16 @@ var file_proto_prysm_v1alpha1_powchain_proto_depIdxs = []int32{
 	0,  // [0:10] is the sub-list for field type_name
 }
 
-func init() { file_proto_prysm_v1alpha1_powchain_proto_init() }
-func file_proto_prysm_v1alpha1_powchain_proto_init() {
-	if File_proto_prysm_v1alpha1_powchain_proto != nil {
+func init() { file_proto_qrysm_v1alpha1_powchain_proto_init() }
+func file_proto_qrysm_v1alpha1_powchain_proto_init() {
+	if File_proto_qrysm_v1alpha1_powchain_proto != nil {
 		return
 	}
-	file_proto_prysm_v1alpha1_beacon_block_proto_init()
-	file_proto_prysm_v1alpha1_beacon_state_proto_init()
+	file_proto_qrysm_v1alpha1_beacon_block_proto_init()
+	file_proto_qrysm_v1alpha1_beacon_state_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_prysm_v1alpha1_powchain_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ETH1ChainData); i {
+		file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ZondChainData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -697,7 +696,7 @@ func file_proto_prysm_v1alpha1_powchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_powchain_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DepositSnapshot); i {
 			case 0:
 				return &v.state
@@ -709,8 +708,8 @@ func file_proto_prysm_v1alpha1_powchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_powchain_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LatestETH1Data); i {
+		file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LatestZondData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -721,7 +720,7 @@ func file_proto_prysm_v1alpha1_powchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_powchain_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ChainStartData); i {
 			case 0:
 				return &v.state
@@ -733,7 +732,7 @@ func file_proto_prysm_v1alpha1_powchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_powchain_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SparseMerkleTrie); i {
 			case 0:
 				return &v.state
@@ -745,7 +744,7 @@ func file_proto_prysm_v1alpha1_powchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_powchain_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TrieLayer); i {
 			case 0:
 				return &v.state
@@ -757,7 +756,7 @@ func file_proto_prysm_v1alpha1_powchain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_powchain_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DepositContainer); i {
 			case 0:
 				return &v.state
@@ -774,18 +773,18 @@ func file_proto_prysm_v1alpha1_powchain_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_prysm_v1alpha1_powchain_proto_rawDesc,
+			RawDescriptor: file_proto_qrysm_v1alpha1_powchain_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_proto_prysm_v1alpha1_powchain_proto_goTypes,
-		DependencyIndexes: file_proto_prysm_v1alpha1_powchain_proto_depIdxs,
-		MessageInfos:      file_proto_prysm_v1alpha1_powchain_proto_msgTypes,
+		GoTypes:           file_proto_qrysm_v1alpha1_powchain_proto_goTypes,
+		DependencyIndexes: file_proto_qrysm_v1alpha1_powchain_proto_depIdxs,
+		MessageInfos:      file_proto_qrysm_v1alpha1_powchain_proto_msgTypes,
 	}.Build()
-	File_proto_prysm_v1alpha1_powchain_proto = out.File
-	file_proto_prysm_v1alpha1_powchain_proto_rawDesc = nil
-	file_proto_prysm_v1alpha1_powchain_proto_goTypes = nil
-	file_proto_prysm_v1alpha1_powchain_proto_depIdxs = nil
+	File_proto_qrysm_v1alpha1_powchain_proto = out.File
+	file_proto_qrysm_v1alpha1_powchain_proto_rawDesc = nil
+	file_proto_qrysm_v1alpha1_powchain_proto_goTypes = nil
+	file_proto_qrysm_v1alpha1_powchain_proto_depIdxs = nil
 }

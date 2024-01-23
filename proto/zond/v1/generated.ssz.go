@@ -857,11 +857,11 @@ func (b *BeaconBlockBody) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(ZondData)
 	}
-	if dst, err = b.Eth1Data.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ZondData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -987,11 +987,11 @@ func (b *BeaconBlockBody) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:4595]...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(ZondData)
 	}
-	if err = b.Eth1Data.UnmarshalSSZ(buf[4595:4667]); err != nil {
+	if err = b.ZondData.UnmarshalSSZ(buf[4595:4667]); err != nil {
 		return err
 	}
 
@@ -1174,8 +1174,8 @@ func (b *BeaconBlockBody) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'Eth1Data'
-	if err = b.Eth1Data.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ZondData'
+	if err = b.ZondData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 
@@ -1776,13 +1776,13 @@ func (s *SignedVoluntaryExit) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	return
 }
 
-// MarshalSSZ ssz marshals the Eth1Data object
-func (e *Eth1Data) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the ZondData object
+func (e *ZondData) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(e)
 }
 
-// MarshalSSZTo ssz marshals the Eth1Data object to a target array
-func (e *Eth1Data) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the ZondData object to a target array
+func (e *ZondData) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 
 	// Field (0) 'DepositRoot'
@@ -1805,8 +1805,8 @@ func (e *Eth1Data) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the Eth1Data object
-func (e *Eth1Data) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the ZondData object
+func (e *ZondData) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size != 72 {
@@ -1831,19 +1831,19 @@ func (e *Eth1Data) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the Eth1Data object
-func (e *Eth1Data) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the ZondData object
+func (e *ZondData) SizeSSZ() (size int) {
 	size = 72
 	return
 }
 
-// HashTreeRoot ssz hashes the Eth1Data object
-func (e *Eth1Data) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the ZondData object
+func (e *ZondData) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(e)
 }
 
-// HashTreeRootWith ssz hashes the Eth1Data object with a hasher
-func (e *Eth1Data) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the ZondData object with a hasher
+func (e *ZondData) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'DepositRoot'

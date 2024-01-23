@@ -20,7 +20,7 @@ const searchThreshold = 5
 // amount of times we repeat a failed search till is satisfies the conditional.
 const repeatedSearches = 2 * searchThreshold
 
-var errBlockTimeTooLate = errors.New("provided time is later than the current eth1 head")
+var errBlockTimeTooLate = errors.New("provided time is later than the current zond head")
 
 // BlockExists returns true if the block exists, its height and any possible error encountered.
 func (s *Service) BlockExists(ctx context.Context, hash common.Hash) (bool, *big.Int, error) {
@@ -77,7 +77,7 @@ func (s *Service) BlockHashByHeight(ctx context.Context, height *big.Int) (commo
 	return header.Hash, nil
 }
 
-// BlockTimeByHeight fetches an eth1 block timestamp by its height.
+// BlockTimeByHeight fetches an zond block timestamp by its height.
 func (s *Service) BlockTimeByHeight(ctx context.Context, height *big.Int) (uint64, error) {
 	ctx, span := trace.StartSpan(ctx, "powchain.BlockTimeByHeight")
 	defer span.End()
@@ -101,21 +101,21 @@ func (s *Service) BlockByTimestamp(ctx context.Context, time uint64) (*types.Hea
 	ctx, span := trace.StartSpan(ctx, "powchain.BlockByTimestamp")
 	defer span.End()
 
-	s.latestEth1DataLock.RLock()
-	latestBlkHeight := s.latestEth1Data.BlockHeight
-	latestBlkTime := s.latestEth1Data.BlockTime
-	s.latestEth1DataLock.RUnlock()
+	s.latestZondDataLock.RLock()
+	latestBlkHeight := s.latestZondData.BlockHeight
+	latestBlkTime := s.latestZondData.BlockTime
+	s.latestZondDataLock.RUnlock()
 
 	if time > latestBlkTime {
 		return nil, errors.Wrap(errBlockTimeTooLate, fmt.Sprintf("(%d > %d)", time, latestBlkTime))
 	}
-	// Initialize a pointer to eth1 chain's history to start our search from.
+	// Initialize a pointer to zond chain's history to start our search from.
 	cursorNum := big.NewInt(0).SetUint64(latestBlkHeight)
 	cursorTime := latestBlkTime
 
 	numOfBlocks := uint64(0)
 	estimatedBlk := cursorNum.Uint64()
-	maxTimeBuffer := searchThreshold * params.BeaconConfig().SecondsPerETH1Block
+	maxTimeBuffer := searchThreshold * params.BeaconConfig().SecondsPerZondBlock
 	// Terminate if we can't find an acceptable block after
 	// repeated searches.
 	for i := 0; i < repeatedSearches; i++ {
@@ -123,7 +123,7 @@ func (s *Service) BlockByTimestamp(ctx context.Context, time uint64) (*types.Hea
 			return nil, ctx.Err()
 		}
 		if time > cursorTime+maxTimeBuffer {
-			numOfBlocks = (time - cursorTime) / params.BeaconConfig().SecondsPerETH1Block
+			numOfBlocks = (time - cursorTime) / params.BeaconConfig().SecondsPerZondBlock
 			// In the event we have an infeasible estimated block, this is a defensive
 			// check to ensure it does not exceed rational bounds.
 			if cursorNum.Uint64()+numOfBlocks > latestBlkHeight {
@@ -131,7 +131,7 @@ func (s *Service) BlockByTimestamp(ctx context.Context, time uint64) (*types.Hea
 			}
 			estimatedBlk = cursorNum.Uint64() + numOfBlocks
 		} else if time+maxTimeBuffer < cursorTime {
-			numOfBlocks = (cursorTime - time) / params.BeaconConfig().SecondsPerETH1Block
+			numOfBlocks = (cursorTime - time) / params.BeaconConfig().SecondsPerZondBlock
 			// In the event we have an infeasible number of blocks
 			// we exit early.
 			if numOfBlocks >= cursorNum.Uint64() {
@@ -156,14 +156,14 @@ func (s *Service) BlockByTimestamp(ctx context.Context, time uint64) (*types.Hea
 		return s.retrieveHeaderInfo(ctx, cursorNum.Uint64())
 	}
 	if cursorTime > time {
-		return s.findMaxTargetEth1Block(ctx, big.NewInt(0).SetUint64(estimatedBlk), time)
+		return s.findMaxTargetZondBlock(ctx, big.NewInt(0).SetUint64(estimatedBlk), time)
 	}
-	return s.findMinTargetEth1Block(ctx, big.NewInt(0).SetUint64(estimatedBlk), time)
+	return s.findMinTargetZondBlock(ctx, big.NewInt(0).SetUint64(estimatedBlk), time)
 }
 
-// Performs a search to find a target eth1 block which is earlier than or equal to the
+// Performs a search to find a target zond block which is earlier than or equal to the
 // target time. This method is used when head.time > targetTime
-func (s *Service) findMaxTargetEth1Block(ctx context.Context, upperBoundBlk *big.Int, targetTime uint64) (*types.HeaderInfo, error) {
+func (s *Service) findMaxTargetZondBlock(ctx context.Context, upperBoundBlk *big.Int, targetTime uint64) (*types.HeaderInfo, error) {
 	for bn := upperBoundBlk; ; bn = big.NewInt(0).Sub(bn, big.NewInt(1)) {
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
@@ -178,9 +178,9 @@ func (s *Service) findMaxTargetEth1Block(ctx context.Context, upperBoundBlk *big
 	}
 }
 
-// Performs a search to find a target eth1 block which is just earlier than or equal to the
+// Performs a search to find a target zond block which is just earlier than or equal to the
 // target time. This method is used when head.time < targetTime
-func (s *Service) findMinTargetEth1Block(ctx context.Context, lowerBoundBlk *big.Int, targetTime uint64) (*types.HeaderInfo, error) {
+func (s *Service) findMinTargetZondBlock(ctx context.Context, lowerBoundBlk *big.Int, targetTime uint64) (*types.HeaderInfo, error) {
 	for bn := lowerBoundBlk; ; bn = big.NewInt(0).Add(bn, big.NewInt(1)) {
 		if ctx.Err() != nil {
 			return nil, ctx.Err()

@@ -101,7 +101,7 @@ ssz_gen_marshal(
         "BeaconBlockHeader",
         "Checkpoint",
         "Deposit",
-        "Eth1Data",
+        "ZondData",
         "IndexedAttestation",
         "ProposerSlashing",
         "SignedAggregateAttestationAndProof",

@@ -68,8 +68,8 @@ type DeleteRemoteKeysResponseJson struct {
 }
 
 type FeeRecipientJson struct {
-	Pubkey     string `json:"pubkey" hex:"true"`
-	Ethaddress string `json:"ethaddress" address:"true"`
+	Pubkey      string `json:"pubkey" hex:"true"`
+	Zondaddress string `json:"zondaddress" address:"true"`
 }
 
 type GasLimitJson struct {
@@ -82,7 +82,7 @@ type GetFeeRecipientByPubkeyResponseJson struct {
 }
 
 type SetFeeRecipientByPubkeyRequestJson struct {
-	Ethaddress string `json:"ethaddress" hex:"true"`
+	Zondaddress string `json:"zondaddress" hex:"true"`
 }
 
 type DeleteFeeRecipientByPubkeyRequestJson struct {

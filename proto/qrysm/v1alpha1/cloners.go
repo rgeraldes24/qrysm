@@ -5,12 +5,12 @@ import (
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 )
 
-// CopyETH1Data copies the provided eth1data object.
-func CopyETH1Data(data *Eth1Data) *Eth1Data {
+// CopyZondData copies the provided zonddata object.
+func CopyZondData(data *ZondData) *ZondData {
 	if data == nil {
 		return nil
 	}
-	return &Eth1Data{
+	return &ZondData{
 		DepositRoot:  bytesutil.SafeCopyBytes(data.DepositRoot),
 		DepositCount: data.DepositCount,
 		BlockHash:    bytesutil.SafeCopyBytes(data.BlockHash),
@@ -114,7 +114,7 @@ func CopyBeaconBlockBody(body *BeaconBlockBody) *BeaconBlockBody {
 	}
 	return &BeaconBlockBody{
 		RandaoReveal:      bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:          CopyETH1Data(body.Eth1Data),
+		ZondData:          CopyZondData(body.ZondData),
 		Graffiti:          bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings: CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings: CopyAttesterSlashings(body.AttesterSlashings),
@@ -156,7 +156,7 @@ func CopyBeaconBlockBodyAltair(body *BeaconBlockBodyAltair) *BeaconBlockBodyAlta
 	}
 	return &BeaconBlockBodyAltair{
 		RandaoReveal:      bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:          CopyETH1Data(body.Eth1Data),
+		ZondData:          CopyZondData(body.ZondData),
 		Graffiti:          bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings: CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings: CopyAttesterSlashings(body.AttesterSlashings),
@@ -411,7 +411,7 @@ func CopyBeaconBlockBodyBellatrix(body *BeaconBlockBodyBellatrix) *BeaconBlockBo
 	}
 	return &BeaconBlockBodyBellatrix{
 		RandaoReveal:      bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:          CopyETH1Data(body.Eth1Data),
+		ZondData:          CopyZondData(body.ZondData),
 		Graffiti:          bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings: CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings: CopyAttesterSlashings(body.AttesterSlashings),
@@ -455,7 +455,7 @@ func CopyBeaconBlockBodyCapella(body *BeaconBlockBodyCapella) *BeaconBlockBodyCa
 	}
 	return &BeaconBlockBodyCapella{
 		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:                    CopyETH1Data(body.Eth1Data),
+		ZondData:                    CopyZondData(body.ZondData),
 		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),
@@ -500,7 +500,7 @@ func CopyBlindedBeaconBlockBodyCapella(body *BlindedBeaconBlockBodyCapella) *Bli
 	}
 	return &BlindedBeaconBlockBodyCapella{
 		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:                    CopyETH1Data(body.Eth1Data),
+		ZondData:                    CopyZondData(body.ZondData),
 		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),
@@ -545,7 +545,7 @@ func CopyBlindedBeaconBlockBodyDeneb(body *BlindedBeaconBlockBodyDeneb) *Blinded
 	}
 	return &BlindedBeaconBlockBodyDeneb{
 		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:                    CopyETH1Data(body.Eth1Data),
+		ZondData:                    CopyZondData(body.ZondData),
 		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),
@@ -687,7 +687,7 @@ func CopyBlindedBeaconBlockBodyBellatrix(body *BlindedBeaconBlockBodyBellatrix) 
 	}
 	return &BlindedBeaconBlockBodyBellatrix{
 		RandaoReveal:           bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:               CopyETH1Data(body.Eth1Data),
+		ZondData:               CopyZondData(body.ZondData),
 		Graffiti:               bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings:      CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings:      CopyAttesterSlashings(body.AttesterSlashings),
@@ -783,7 +783,7 @@ func CopyBeaconBlockBodyDeneb(body *BeaconBlockBodyDeneb) *BeaconBlockBodyDeneb 
 	}
 	return &BeaconBlockBodyDeneb{
 		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:                    CopyETH1Data(body.Eth1Data),
+		ZondData:                    CopyZondData(body.ZondData),
 		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),

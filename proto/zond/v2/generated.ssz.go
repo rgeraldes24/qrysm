@@ -1874,11 +1874,11 @@ func (b *BeaconBlockBodyAltair) MarshalSSZTo(buf []byte) (dst []byte, err error)
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if dst, err = b.Eth1Data.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ZondData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -2012,11 +2012,11 @@ func (b *BeaconBlockBodyAltair) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:96]...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if err = b.Eth1Data.UnmarshalSSZ(buf[96:168]); err != nil {
+	if err = b.ZondData.UnmarshalSSZ(buf[96:168]); err != nil {
 		return err
 	}
 
@@ -2207,8 +2207,8 @@ func (b *BeaconBlockBodyAltair) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'Eth1Data'
-	if err = b.Eth1Data.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ZondData'
+	if err = b.ZondData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 
@@ -2349,11 +2349,11 @@ func (b *BeaconBlockBodyBellatrix) MarshalSSZTo(buf []byte) (dst []byte, err err
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if dst, err = b.Eth1Data.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ZondData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -2499,11 +2499,11 @@ func (b *BeaconBlockBodyBellatrix) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:4595]...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if err = b.Eth1Data.UnmarshalSSZ(buf[4595:4667]); err != nil {
+	if err = b.ZondData.UnmarshalSSZ(buf[4595:4667]); err != nil {
 		return err
 	}
 
@@ -2716,8 +2716,8 @@ func (b *BeaconBlockBodyBellatrix) HashTreeRootWith(hh *ssz.Hasher) (err error) 
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'Eth1Data'
-	if err = b.Eth1Data.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ZondData'
+	if err = b.ZondData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 
@@ -2863,11 +2863,11 @@ func (b *BlindedBeaconBlockBodyBellatrix) MarshalSSZTo(buf []byte) (dst []byte, 
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if dst, err = b.Eth1Data.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ZondData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -3013,11 +3013,11 @@ func (b *BlindedBeaconBlockBodyBellatrix) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:4595]...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if err = b.Eth1Data.UnmarshalSSZ(buf[4595:4667]); err != nil {
+	if err = b.ZondData.UnmarshalSSZ(buf[4595:4667]); err != nil {
 		return err
 	}
 
@@ -3230,8 +3230,8 @@ func (b *BlindedBeaconBlockBodyBellatrix) HashTreeRootWith(hh *ssz.Hasher) (err 
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'Eth1Data'
-	if err = b.Eth1Data.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ZondData'
+	if err = b.ZondData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 
@@ -3377,11 +3377,11 @@ func (b *BeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, err error
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if dst, err = b.Eth1Data.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ZondData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -3542,11 +3542,11 @@ func (b *BeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:4595]...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if err = b.Eth1Data.UnmarshalSSZ(buf[4595:4667]); err != nil {
+	if err = b.ZondData.UnmarshalSSZ(buf[4595:4667]); err != nil {
 		return err
 	}
 
@@ -3785,8 +3785,8 @@ func (b *BeaconBlockBodyCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'Eth1Data'
-	if err = b.Eth1Data.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ZondData'
+	if err = b.ZondData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 
@@ -3952,11 +3952,11 @@ func (b *BlindedBeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, er
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if dst, err = b.Eth1Data.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ZondData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -4117,11 +4117,11 @@ func (b *BlindedBeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:4595]...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if err = b.Eth1Data.UnmarshalSSZ(buf[4595:4667]); err != nil {
+	if err = b.ZondData.UnmarshalSSZ(buf[4595:4667]); err != nil {
 		return err
 	}
 
@@ -4360,8 +4360,8 @@ func (b *BlindedBeaconBlockBodyCapella) HashTreeRootWith(hh *ssz.Hasher) (err er
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'Eth1Data'
-	if err = b.Eth1Data.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ZondData'
+	if err = b.ZondData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 
@@ -4527,11 +4527,11 @@ func (b *BlindedBeaconBlockBodyDeneb) MarshalSSZTo(buf []byte) (dst []byte, err 
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if dst, err = b.Eth1Data.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ZondData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -4709,11 +4709,11 @@ func (b *BlindedBeaconBlockBodyDeneb) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:96]...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if err = b.Eth1Data.UnmarshalSSZ(buf[96:168]); err != nil {
+	if err = b.ZondData.UnmarshalSSZ(buf[96:168]); err != nil {
 		return err
 	}
 
@@ -4976,8 +4976,8 @@ func (b *BlindedBeaconBlockBodyDeneb) HashTreeRootWith(hh *ssz.Hasher) (err erro
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'Eth1Data'
-	if err = b.Eth1Data.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ZondData'
+	if err = b.ZondData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 
@@ -5166,11 +5166,11 @@ func (b *BeaconBlockBodyDeneb) MarshalSSZTo(buf []byte) (dst []byte, err error) 
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if dst, err = b.Eth1Data.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ZondData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -5348,11 +5348,11 @@ func (b *BeaconBlockBodyDeneb) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:4595]...)
 
-	// Field (1) 'Eth1Data'
-	if b.Eth1Data == nil {
-		b.Eth1Data = new(v1.Eth1Data)
+	// Field (1) 'ZondData'
+	if b.ZondData == nil {
+		b.ZondData = new(v1.ZondData)
 	}
-	if err = b.Eth1Data.UnmarshalSSZ(buf[4595:4667]); err != nil {
+	if err = b.ZondData.UnmarshalSSZ(buf[4595:4667]); err != nil {
 		return err
 	}
 
@@ -5615,8 +5615,8 @@ func (b *BeaconBlockBodyDeneb) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'Eth1Data'
-	if err = b.Eth1Data.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ZondData'
+	if err = b.ZondData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 

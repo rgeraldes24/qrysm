@@ -419,10 +419,10 @@ func V1Alpha1BeaconBlockBellatrixToV2Blinded(v1alpha1Block *zondpbalpha.BeaconBl
 
 	resultBlockBody := &zondpbv2.BlindedBeaconBlockBodyBellatrix{
 		RandaoReveal: bytesutil.SafeCopyBytes(v1alpha1Block.Body.RandaoReveal),
-		Eth1Data: &zondpbv1.Eth1Data{
-			DepositRoot:  bytesutil.SafeCopyBytes(v1alpha1Block.Body.Eth1Data.DepositRoot),
-			DepositCount: v1alpha1Block.Body.Eth1Data.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(v1alpha1Block.Body.Eth1Data.BlockHash),
+		ZondData: &zondpbv1.ZondData{
+			DepositRoot:  bytesutil.SafeCopyBytes(v1alpha1Block.Body.ZondData.DepositRoot),
+			DepositCount: v1alpha1Block.Body.ZondData.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(v1alpha1Block.Body.ZondData.BlockHash),
 		},
 		Graffiti:          bytesutil.SafeCopyBytes(v1alpha1Block.Body.Graffiti),
 		ProposerSlashings: resultProposerSlashings,
@@ -608,10 +608,10 @@ func V1Alpha1BeaconBlockCapellaToV2Blinded(v1alpha1Block *zondpbalpha.BeaconBloc
 
 	resultBlockBody := &zondpbv2.BlindedBeaconBlockBodyCapella{
 		RandaoReveal: bytesutil.SafeCopyBytes(v1alpha1Block.Body.RandaoReveal),
-		Eth1Data: &zondpbv1.Eth1Data{
-			DepositRoot:  bytesutil.SafeCopyBytes(v1alpha1Block.Body.Eth1Data.DepositRoot),
-			DepositCount: v1alpha1Block.Body.Eth1Data.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(v1alpha1Block.Body.Eth1Data.BlockHash),
+		ZondData: &zondpbv1.ZondData{
+			DepositRoot:  bytesutil.SafeCopyBytes(v1alpha1Block.Body.ZondData.DepositRoot),
+			DepositCount: v1alpha1Block.Body.ZondData.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(v1alpha1Block.Body.ZondData.BlockHash),
 		},
 		Graffiti:          bytesutil.SafeCopyBytes(v1alpha1Block.Body.Graffiti),
 		ProposerSlashings: resultProposerSlashings,
@@ -656,17 +656,17 @@ func V1Alpha1BeaconBlockCapellaToV2Blinded(v1alpha1Block *zondpbalpha.BeaconBloc
 func BeaconStateAltairToProto(altairState state.BeaconState) (*zondpbv2.BeaconState, error) {
 	sourceFork := altairState.Fork()
 	sourceLatestBlockHeader := altairState.LatestBlockHeader()
-	sourceEth1Data := altairState.Eth1Data()
-	sourceEth1DataVotes := altairState.Eth1DataVotes()
+	sourceZondData := altairState.ZondData()
+	sourceZondDataVotes := altairState.ZondDataVotes()
 	sourceValidators := altairState.Validators()
 	sourceJustificationBits := altairState.JustificationBits()
 	sourcePrevJustifiedCheckpoint := altairState.PreviousJustifiedCheckpoint()
 	sourceCurrJustifiedCheckpoint := altairState.CurrentJustifiedCheckpoint()
 	sourceFinalizedCheckpoint := altairState.FinalizedCheckpoint()
 
-	resultEth1DataVotes := make([]*zondpbv1.Eth1Data, len(sourceEth1DataVotes))
-	for i, vote := range sourceEth1DataVotes {
-		resultEth1DataVotes[i] = &zondpbv1.Eth1Data{
+	resultZondDataVotes := make([]*zondpbv1.ZondData, len(sourceZondDataVotes))
+	for i, vote := range sourceZondDataVotes {
+		resultZondDataVotes[i] = &zondpbv1.ZondData{
 			DepositRoot:  bytesutil.SafeCopyBytes(vote.DepositRoot),
 			DepositCount: vote.DepositCount,
 			BlockHash:    bytesutil.SafeCopyBytes(vote.BlockHash),
@@ -731,13 +731,13 @@ func BeaconStateAltairToProto(altairState state.BeaconState) (*zondpbv2.BeaconSt
 		BlockRoots:      bytesutil.SafeCopy2dBytes(altairState.BlockRoots()),
 		StateRoots:      bytesutil.SafeCopy2dBytes(altairState.StateRoots()),
 		HistoricalRoots: bytesutil.SafeCopy2dBytes(hrs),
-		Eth1Data: &zondpbv1.Eth1Data{
-			DepositRoot:  bytesutil.SafeCopyBytes(sourceEth1Data.DepositRoot),
-			DepositCount: sourceEth1Data.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(sourceEth1Data.BlockHash),
+		ZondData: &zondpbv1.ZondData{
+			DepositRoot:  bytesutil.SafeCopyBytes(sourceZondData.DepositRoot),
+			DepositCount: sourceZondData.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(sourceZondData.BlockHash),
 		},
-		Eth1DataVotes:              resultEth1DataVotes,
-		Eth1DepositIndex:           altairState.Eth1DepositIndex(),
+		ZondDataVotes:              resultZondDataVotes,
+		ZondDepositIndex:           altairState.ZondDepositIndex(),
 		Validators:                 resultValidators,
 		Balances:                   altairState.Balances(),
 		RandaoMixes:                bytesutil.SafeCopy2dBytes(altairState.RandaoMixes()),
@@ -775,17 +775,17 @@ func BeaconStateAltairToProto(altairState state.BeaconState) (*zondpbv2.BeaconSt
 func BeaconStateBellatrixToProto(st state.BeaconState) (*zondpbv2.BeaconStateBellatrix, error) {
 	sourceFork := st.Fork()
 	sourceLatestBlockHeader := st.LatestBlockHeader()
-	sourceEth1Data := st.Eth1Data()
-	sourceEth1DataVotes := st.Eth1DataVotes()
+	sourceZondData := st.ZondData()
+	sourceZondDataVotes := st.ZondDataVotes()
 	sourceValidators := st.Validators()
 	sourceJustificationBits := st.JustificationBits()
 	sourcePrevJustifiedCheckpoint := st.PreviousJustifiedCheckpoint()
 	sourceCurrJustifiedCheckpoint := st.CurrentJustifiedCheckpoint()
 	sourceFinalizedCheckpoint := st.FinalizedCheckpoint()
 
-	resultEth1DataVotes := make([]*zondpbv1.Eth1Data, len(sourceEth1DataVotes))
-	for i, vote := range sourceEth1DataVotes {
-		resultEth1DataVotes[i] = &zondpbv1.Eth1Data{
+	resultZondDataVotes := make([]*zondpbv1.ZondData, len(sourceZondDataVotes))
+	for i, vote := range sourceZondDataVotes {
+		resultZondDataVotes[i] = &zondpbv1.ZondData{
 			DepositRoot:  bytesutil.SafeCopyBytes(vote.DepositRoot),
 			DepositCount: vote.DepositCount,
 			BlockHash:    bytesutil.SafeCopyBytes(vote.BlockHash),
@@ -858,13 +858,13 @@ func BeaconStateBellatrixToProto(st state.BeaconState) (*zondpbv2.BeaconStateBel
 		BlockRoots:      bytesutil.SafeCopy2dBytes(st.BlockRoots()),
 		StateRoots:      bytesutil.SafeCopy2dBytes(st.StateRoots()),
 		HistoricalRoots: bytesutil.SafeCopy2dBytes(hRoots),
-		Eth1Data: &zondpbv1.Eth1Data{
-			DepositRoot:  bytesutil.SafeCopyBytes(sourceEth1Data.DepositRoot),
-			DepositCount: sourceEth1Data.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(sourceEth1Data.BlockHash),
+		ZondData: &zondpbv1.ZondData{
+			DepositRoot:  bytesutil.SafeCopyBytes(sourceZondData.DepositRoot),
+			DepositCount: sourceZondData.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(sourceZondData.BlockHash),
 		},
-		Eth1DataVotes:              resultEth1DataVotes,
-		Eth1DepositIndex:           st.Eth1DepositIndex(),
+		ZondDataVotes:              resultZondDataVotes,
+		ZondDepositIndex:           st.ZondDepositIndex(),
 		Validators:                 resultValidators,
 		Balances:                   st.Balances(),
 		RandaoMixes:                bytesutil.SafeCopy2dBytes(st.RandaoMixes()),
@@ -918,17 +918,17 @@ func BeaconStateBellatrixToProto(st state.BeaconState) (*zondpbv2.BeaconStateBel
 func BeaconStateCapellaToProto(st state.BeaconState) (*zondpbv2.BeaconStateCapella, error) {
 	sourceFork := st.Fork()
 	sourceLatestBlockHeader := st.LatestBlockHeader()
-	sourceEth1Data := st.Eth1Data()
-	sourceEth1DataVotes := st.Eth1DataVotes()
+	sourceZondData := st.ZondData()
+	sourceZondDataVotes := st.ZondDataVotes()
 	sourceValidators := st.Validators()
 	sourceJustificationBits := st.JustificationBits()
 	sourcePrevJustifiedCheckpoint := st.PreviousJustifiedCheckpoint()
 	sourceCurrJustifiedCheckpoint := st.CurrentJustifiedCheckpoint()
 	sourceFinalizedCheckpoint := st.FinalizedCheckpoint()
 
-	resultEth1DataVotes := make([]*zondpbv1.Eth1Data, len(sourceEth1DataVotes))
-	for i, vote := range sourceEth1DataVotes {
-		resultEth1DataVotes[i] = &zondpbv1.Eth1Data{
+	resultZondDataVotes := make([]*zondpbv1.ZondData, len(sourceZondDataVotes))
+	for i, vote := range sourceZondDataVotes {
+		resultZondDataVotes[i] = &zondpbv1.ZondData{
 			DepositRoot:  bytesutil.SafeCopyBytes(vote.DepositRoot),
 			DepositCount: vote.DepositCount,
 			BlockHash:    bytesutil.SafeCopyBytes(vote.BlockHash),
@@ -1018,13 +1018,13 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*zondpbv2.BeaconStateCapel
 		},
 		BlockRoots: bytesutil.SafeCopy2dBytes(st.BlockRoots()),
 		StateRoots: bytesutil.SafeCopy2dBytes(st.StateRoots()),
-		Eth1Data: &zondpbv1.Eth1Data{
-			DepositRoot:  bytesutil.SafeCopyBytes(sourceEth1Data.DepositRoot),
-			DepositCount: sourceEth1Data.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(sourceEth1Data.BlockHash),
+		ZondData: &zondpbv1.ZondData{
+			DepositRoot:  bytesutil.SafeCopyBytes(sourceZondData.DepositRoot),
+			DepositCount: sourceZondData.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(sourceZondData.BlockHash),
 		},
-		Eth1DataVotes:              resultEth1DataVotes,
-		Eth1DepositIndex:           st.Eth1DepositIndex(),
+		ZondDataVotes:              resultZondDataVotes,
+		ZondDepositIndex:           st.ZondDepositIndex(),
 		Validators:                 resultValidators,
 		Balances:                   st.Balances(),
 		RandaoMixes:                bytesutil.SafeCopy2dBytes(st.RandaoMixes()),
@@ -1083,17 +1083,17 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*zondpbv2.BeaconStateCapel
 func BeaconStateDenebToProto(st state.BeaconState) (*zondpbv2.BeaconStateDeneb, error) {
 	sourceFork := st.Fork()
 	sourceLatestBlockHeader := st.LatestBlockHeader()
-	sourceEth1Data := st.Eth1Data()
-	sourceEth1DataVotes := st.Eth1DataVotes()
+	sourceZondData := st.ZondData()
+	sourceZondDataVotes := st.ZondDataVotes()
 	sourceValidators := st.Validators()
 	sourceJustificationBits := st.JustificationBits()
 	sourcePrevJustifiedCheckpoint := st.PreviousJustifiedCheckpoint()
 	sourceCurrJustifiedCheckpoint := st.CurrentJustifiedCheckpoint()
 	sourceFinalizedCheckpoint := st.FinalizedCheckpoint()
 
-	resultEth1DataVotes := make([]*zondpbv1.Eth1Data, len(sourceEth1DataVotes))
-	for i, vote := range sourceEth1DataVotes {
-		resultEth1DataVotes[i] = &zondpbv1.Eth1Data{
+	resultZondDataVotes := make([]*zondpbv1.ZondData, len(sourceZondDataVotes))
+	for i, vote := range sourceZondDataVotes {
+		resultZondDataVotes[i] = &zondpbv1.ZondData{
 			DepositRoot:  bytesutil.SafeCopyBytes(vote.DepositRoot),
 			DepositCount: vote.DepositCount,
 			BlockHash:    bytesutil.SafeCopyBytes(vote.BlockHash),
@@ -1185,13 +1185,13 @@ func BeaconStateDenebToProto(st state.BeaconState) (*zondpbv2.BeaconStateDeneb, 
 		BlockRoots:      bytesutil.SafeCopy2dBytes(st.BlockRoots()),
 		StateRoots:      bytesutil.SafeCopy2dBytes(st.StateRoots()),
 		HistoricalRoots: bytesutil.SafeCopy2dBytes(hr),
-		Eth1Data: &zondpbv1.Eth1Data{
-			DepositRoot:  bytesutil.SafeCopyBytes(sourceEth1Data.DepositRoot),
-			DepositCount: sourceEth1Data.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(sourceEth1Data.BlockHash),
+		ZondData: &zondpbv1.ZondData{
+			DepositRoot:  bytesutil.SafeCopyBytes(sourceZondData.DepositRoot),
+			DepositCount: sourceZondData.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(sourceZondData.BlockHash),
 		},
-		Eth1DataVotes:              resultEth1DataVotes,
-		Eth1DepositIndex:           st.Eth1DepositIndex(),
+		ZondDataVotes:              resultZondDataVotes,
+		ZondDepositIndex:           st.ZondDepositIndex(),
 		Validators:                 resultValidators,
 		Balances:                   st.Balances(),
 		RandaoMixes:                bytesutil.SafeCopy2dBytes(st.RandaoMixes()),

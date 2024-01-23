@@ -145,7 +145,7 @@ func TestStop_OK(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -153,7 +153,7 @@ func TestStop_OK(t *testing.T) {
 	testAcc.Backend.Commit()
 
 	err = web3Service.Stop()
-	require.NoError(t, err, "Unable to stop web3 ETH1.0 chain service")
+	require.NoError(t, err, "Unable to stop web3 zond chain service")
 
 	// The context should have been canceled.
 	assert.NotNil(t, web3Service.ctx.Err(), "Context wasnt canceled")
@@ -161,7 +161,7 @@ func TestStop_OK(t *testing.T) {
 	hook.Reset()
 }
 
-func TestService_Eth1Synced(t *testing.T) {
+func TestService_ZondSynced(t *testing.T) {
 	testAcc, err := mock.Setup()
 	require.NoError(t, err, "Unable to set up simulated backend")
 	beaconDB := dbutil.SetupDB(t)
@@ -175,7 +175,7 @@ func TestService_Eth1Synced(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -200,25 +200,25 @@ func TestFollowBlock_OK(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 
-	// simulated backend sets eth1 block
+	// simulated backend sets zond block
 	// time as 10 seconds
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
-	conf.SecondsPerETH1Block = 10
+	conf.SecondsPerZondBlock = 10
 	params.OverrideBeaconConfig(conf)
 
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
 	baseHeight := testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
 	// process follow_distance blocks
-	for i := 0; i < int(params.BeaconConfig().Eth1FollowDistance); i++ {
+	for i := 0; i < int(params.BeaconConfig().ZondFollowDistance); i++ {
 		testAcc.Backend.Commit()
 	}
 	// set current height
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestZondData.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestZondData.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 
 	h, err := web3Service.followedBlockHeight(context.Background())
 	require.NoError(t, err)
@@ -230,8 +230,8 @@ func TestFollowBlock_OK(t *testing.T) {
 		testAcc.Backend.Commit()
 	}
 	// set current height
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestZondData.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestZondData.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 
 	h, err = web3Service.followedBlockHeight(context.Background())
 	require.NoError(t, err)
@@ -247,8 +247,8 @@ func TestStatus(t *testing.T) {
 	testCases := map[*Service]string{
 		// "status is ok" cases
 		{}: "",
-		{isRunning: true, latestEth1Data: &zondpb.LatestETH1Data{BlockTime: afterFiveMinutesAgo}}:   "",
-		{isRunning: false, latestEth1Data: &zondpb.LatestETH1Data{BlockTime: beforeFiveMinutesAgo}}: "",
+		{isRunning: true, latestZondData: &zondpb.LatestZondData{BlockTime: afterFiveMinutesAgo}}:   "",
+		{isRunning: false, latestZondData: &zondpb.LatestZondData{BlockTime: beforeFiveMinutesAgo}}: "",
 		{isRunning: false, runError: errors.New("test runError")}:                                   "",
 		// "status is error" cases
 		{isRunning: true, runError: errors.New("test runError")}: "test runError",
@@ -277,8 +277,8 @@ func TestHandlePanic_OK(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
-	// nil eth1DataFetcher would panic if cached value not used
+	require.NoError(t, err, "unable to setup web3 zond chain service")
+	// nil zondDataFetcher would panic if cached value not used
 	web3Service.rpcClient = nil
 	web3Service.processBlockHeader(nil)
 	require.LogsContain(t, hook, "Panicked when handling data from ETH 1.0 Chain!")
@@ -294,7 +294,7 @@ func TestLogTillGenesis_OK(t *testing.T) {
 
 	params.SetupTestConfigCleanup(t)
 	cfg := params.BeaconConfig().Copy()
-	cfg.Eth1FollowDistance = 5
+	cfg.ZondFollowDistance = 5
 	params.OverrideBeaconConfig(cfg)
 
 	nCfg := params.BeaconNetworkConfig()
@@ -315,7 +315,7 @@ func TestLogTillGenesis_OK(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
 
@@ -324,7 +324,7 @@ func TestLogTillGenesis_OK(t *testing.T) {
 	for i := 0; i < 30; i++ {
 		testAcc.Backend.Commit()
 	}
-	web3Service.latestEth1Data = &zondpb.LatestETH1Data{LastRequestedBlock: 0}
+	web3Service.latestZondData = &zondpb.LatestZondData{LastRequestedBlock: 0}
 	// Spin off to a separate routine
 	go web3Service.run(web3Service.ctx.Done())
 	// Wait for 2 seconds so that the
@@ -336,9 +336,9 @@ func TestLogTillGenesis_OK(t *testing.T) {
 
 func TestInitDepositCache_OK(t *testing.T) {
 	ctrs := []*zondpb.DepositContainer{
-		{Index: 0, Eth1BlockHeight: 2, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("A")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
-		{Index: 1, Eth1BlockHeight: 4, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("B")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
-		{Index: 2, Eth1BlockHeight: 6, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("c")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
+		{Index: 0, ZondBlockHeight: 2, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("A")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
+		{Index: 1, ZondBlockHeight: 4, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("B")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
+		{Index: 2, ZondBlockHeight: 6, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("c")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
 	}
 	gs, _ := util.DeterministicGenesisState(t, 1)
 	beaconDB := dbutil.SetupDB(t)
@@ -369,7 +369,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 	ctrs := []*zondpb.DepositContainer{
 		{
 			Index:           0,
-			Eth1BlockHeight: 2,
+			ZondBlockHeight: 2,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 48),
@@ -380,7 +380,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 		},
 		{
 			Index:           1,
-			Eth1BlockHeight: 4,
+			ZondBlockHeight: 4,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 48),
@@ -391,7 +391,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 		},
 		{
 			Index:           2,
-			Eth1BlockHeight: 6,
+			ZondBlockHeight: 6,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 48),
@@ -426,7 +426,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 	require.NoError(t, s.cfg.beaconDB.SaveState(context.Background(), emptyState, headRoot))
 	require.NoError(t, stateGen.SaveState(context.Background(), headRoot, emptyState))
 	s.cfg.stateGen = stateGen
-	require.NoError(t, emptyState.SetEth1DepositIndex(3))
+	require.NoError(t, emptyState.SetZondDepositIndex(3))
 
 	ctx := context.Background()
 	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &zondpb.Checkpoint{Epoch: slots.ToEpoch(0), Root: headRoot[:]}))
@@ -454,20 +454,20 @@ func TestNewService_EarliestVotingBlock(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
-	// simulated backend sets eth1 block
+	require.NoError(t, err, "unable to setup web3 zond chain service")
+	// simulated backend sets zond block
 	// time as 10 seconds
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
-	conf.SecondsPerETH1Block = 10
-	conf.Eth1FollowDistance = 50
+	conf.SecondsPerZondBlock = 10
+	conf.ZondFollowDistance = 50
 	params.OverrideBeaconConfig(conf)
 
 	// Genesis not set
 	followBlock := uint64(2000)
 	blk, err := web3Service.determineEarliestVotingBlock(context.Background(), followBlock)
 	require.NoError(t, err)
-	assert.Equal(t, followBlock-conf.Eth1FollowDistance, blk, "unexpected earliest voting block")
+	assert.Equal(t, followBlock-conf.ZondFollowDistance, blk, "unexpected earliest voting block")
 
 	// Genesis is set.
 
@@ -483,18 +483,18 @@ func TestNewService_EarliestVotingBlock(t *testing.T) {
 	testAcc.Backend.Commit()
 
 	currTime = testAcc.Backend.Blockchain().CurrentHeader().Time
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentHeader().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentHeader().Time
+	web3Service.latestZondData.BlockHeight = testAcc.Backend.Blockchain().CurrentHeader().Number.Uint64()
+	web3Service.latestZondData.BlockTime = testAcc.Backend.Blockchain().CurrentHeader().Time
 	web3Service.chainStartData.GenesisTime = currTime
 
 	// With a current slot of zero, only request follow_blocks behind.
 	blk, err = web3Service.determineEarliestVotingBlock(context.Background(), followBlock)
 	require.NoError(t, err)
-	assert.Equal(t, followBlock-conf.Eth1FollowDistance, blk, "unexpected earliest voting block")
+	assert.Equal(t, followBlock-conf.ZondFollowDistance, blk, "unexpected earliest voting block")
 
 }
 
-func TestNewService_Eth1HeaderRequLimit(t *testing.T) {
+func TestNewService_ZondHeaderRequLimit(t *testing.T) {
 	testAcc, err := mock.Setup()
 	require.NoError(t, err, "Unable to set up simulated backend")
 	beaconDB := dbutil.SetupDB(t)
@@ -509,16 +509,16 @@ func TestNewService_Eth1HeaderRequLimit(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
-	assert.Equal(t, defaultEth1HeaderReqLimit, s1.cfg.eth1HeaderReqLimit, "default eth1 header request limit not set")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
+	assert.Equal(t, defaultZondHeaderReqLimit, s1.cfg.zondHeaderReqLimit, "default zond header request limit not set")
 	s2, err := NewService(context.Background(),
 		WithHttpEndpoint(endpoint),
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
-		WithEth1HeaderRequestLimit(uint64(150)),
+		WithZondHeaderRequestLimit(uint64(150)),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
-	assert.Equal(t, uint64(150), s2.cfg.eth1HeaderReqLimit, "unable to set eth1HeaderRequestLimit")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
+	assert.Equal(t, uint64(150), s2.cfg.zondHeaderReqLimit, "unable to set zondHeaderRequestLimit")
 }
 
 type mockBSUpdater struct {
@@ -573,11 +573,11 @@ func TestService_EnsureConsistentPowchainData(t *testing.T) {
 	require.NoError(t, s1.cfg.beaconDB.SaveGenesisData(context.Background(), genState))
 	require.NoError(t, s1.ensureValidPowchainData(context.Background()))
 
-	eth1Data, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
+	zondData, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
 	assert.NoError(t, err)
 
-	assert.NotNil(t, eth1Data)
-	assert.Equal(t, true, eth1Data.ChainstartData.Chainstarted)
+	assert.NotNil(t, zondData)
+	assert.Equal(t, true, zondData.ChainstartData.Chainstarted)
 }
 
 func TestService_InitializeCorrectly(t *testing.T) {
@@ -603,10 +603,10 @@ func TestService_InitializeCorrectly(t *testing.T) {
 	require.NoError(t, s1.cfg.beaconDB.SaveGenesisData(context.Background(), genState))
 	require.NoError(t, s1.ensureValidPowchainData(context.Background()))
 
-	eth1Data, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
+	zondData, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
 	assert.NoError(t, err)
 
-	assert.NoError(t, s1.initializeEth1Data(context.Background(), eth1Data))
+	assert.NoError(t, s1.initializeZondData(context.Background(), zondData))
 	assert.Equal(t, int64(-1), s1.lastReceivedMerkleIndex, "received incorrect last received merkle index")
 }
 
@@ -631,18 +631,18 @@ func TestService_EnsureValidPowchainData(t *testing.T) {
 
 	require.NoError(t, s1.cfg.beaconDB.SaveGenesisData(context.Background(), genState))
 
-	err = s1.cfg.beaconDB.SaveExecutionChainData(context.Background(), &zondpb.ETH1ChainData{
+	err = s1.cfg.beaconDB.SaveExecutionChainData(context.Background(), &zondpb.ZondChainData{
 		ChainstartData:    &zondpb.ChainStartData{Chainstarted: true},
 		DepositContainers: []*zondpb.DepositContainer{{Index: 1}},
 	})
 	require.NoError(t, err)
 	require.NoError(t, s1.ensureValidPowchainData(context.Background()))
 
-	eth1Data, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
+	zondData, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
 	assert.NoError(t, err)
 
-	assert.NotNil(t, eth1Data)
-	assert.Equal(t, 0, len(eth1Data.DepositContainers))
+	assert.NotNil(t, zondData)
+	assert.Equal(t, 0, len(zondData.DepositContainers))
 }
 
 func TestService_ValidateDepositContainers(t *testing.T) {
@@ -663,7 +663,7 @@ func TestService_ValidateDepositContainers(t *testing.T) {
 			ctrsFunc: func() []*zondpb.DepositContainer {
 				ctrs := make([]*zondpb.DepositContainer, 0)
 				for i := 0; i < 10; i++ {
-					ctrs = append(ctrs, &zondpb.DepositContainer{Index: int64(i), Eth1BlockHeight: uint64(i + 10)})
+					ctrs = append(ctrs, &zondpb.DepositContainer{Index: int64(i), ZondBlockHeight: uint64(i + 10)})
 				}
 				return ctrs
 			},
@@ -674,7 +674,7 @@ func TestService_ValidateDepositContainers(t *testing.T) {
 			ctrsFunc: func() []*zondpb.DepositContainer {
 				ctrs := make([]*zondpb.DepositContainer, 0)
 				for i := 1; i < 10; i++ {
-					ctrs = append(ctrs, &zondpb.DepositContainer{Index: int64(i), Eth1BlockHeight: uint64(i + 10)})
+					ctrs = append(ctrs, &zondpb.DepositContainer{Index: int64(i), ZondBlockHeight: uint64(i + 10)})
 				}
 				return ctrs
 			},
@@ -688,7 +688,7 @@ func TestService_ValidateDepositContainers(t *testing.T) {
 					if i == 5 || i == 7 {
 						continue
 					}
-					ctrs = append(ctrs, &zondpb.DepositContainer{Index: int64(i), Eth1BlockHeight: uint64(i + 10)})
+					ctrs = append(ctrs, &zondpb.DepositContainer{Index: int64(i), ZondBlockHeight: uint64(i + 10)})
 				}
 				return ctrs
 			},
@@ -701,7 +701,7 @@ func TestService_ValidateDepositContainers(t *testing.T) {
 	}
 }
 
-func TestETH1Endpoints(t *testing.T) {
+func TestZondEndpoints(t *testing.T) {
 	server, firstEndpoint, err := mockExecution.SetupRPCServer()
 	require.NoError(t, err)
 	t.Cleanup(func() {
@@ -730,7 +730,7 @@ func TestETH1Endpoints(t *testing.T) {
 func TestService_CacheBlockHeaders(t *testing.T) {
 	rClient := &slowRPCClient{limit: 1000}
 	s := &Service{
-		cfg:         &config{eth1HeaderReqLimit: 1000},
+		cfg:         &config{zondHeaderReqLimit: 1000},
 		rpcClient:   rClient,
 		headerCache: newHeaderCache(),
 	}
@@ -740,7 +740,7 @@ func TestService_CacheBlockHeaders(t *testing.T) {
 	rClient.numOfCalls = 0
 	// Increase header request limit to trigger the batch limiting
 	// code path.
-	s.cfg.eth1HeaderReqLimit = 1001
+	s.cfg.zondHeaderReqLimit = 1001
 
 	assert.NoError(t, s.cacheBlockHeaders(1000, 3000))
 	// 1000 - 2000 would be 1001 headers which is higher than our request limit, it
@@ -749,7 +749,7 @@ func TestService_CacheBlockHeaders(t *testing.T) {
 }
 
 func TestService_FollowBlock(t *testing.T) {
-	followTime := params.BeaconConfig().Eth1FollowDistance * params.BeaconConfig().SecondsPerETH1Block
+	followTime := params.BeaconConfig().ZondFollowDistance * params.BeaconConfig().SecondsPerZondBlock
 	followTime += 10000
 	bMap := make(map[uint64]*types.HeaderInfo)
 	for i := uint64(3000); i > 0; i-- {
@@ -764,10 +764,10 @@ func TestService_FollowBlock(t *testing.T) {
 		}
 	}
 	s := &Service{
-		cfg:            &config{eth1HeaderReqLimit: 1000},
+		cfg:            &config{zondHeaderReqLimit: 1000},
 		rpcClient:      &mockExecution.RPCClient{BlockNumMap: bMap},
 		headerCache:    newHeaderCache(),
-		latestEth1Data: &zondpb.LatestETH1Data{BlockTime: (3000 * 40) + followTime, BlockHeight: 3000},
+		latestZondData: &zondpb.LatestZondData{BlockTime: (3000 * 40) + followTime, BlockHeight: 3000},
 	}
 	h, err := s.followedBlockHeight(context.Background())
 	assert.NoError(t, err)
@@ -820,13 +820,13 @@ func TestService_migrateOldDepositTree(t *testing.T) {
 		WithDepositCache(cache),
 	)
 	require.NoError(t, err)
-	eth1Data := &zondpb.ETH1ChainData{
+	zondData := &zondpb.ZondChainData{
 		BeaconState: &zondpb.BeaconState{
-			Eth1Data: &zondpb.Eth1Data{
+			ZondData: &zondpb.ZondData{
 				DepositCount: 800,
 			},
 		},
-		CurrentEth1Data: &zondpb.LatestETH1Data{
+		CurrentZondData: &zondpb.LatestZondData{
 			BlockHeight: 100,
 		},
 	}
@@ -840,9 +840,9 @@ func TestService_migrateOldDepositTree(t *testing.T) {
 		err := dt.Insert(input[:], i)
 		require.NoError(t, err)
 	}
-	eth1Data.Trie = dt.ToProto()
+	zondData.Trie = dt.ToProto()
 
-	err = s.migrateOldDepositTree(eth1Data)
+	err = s.migrateOldDepositTree(zondData)
 	require.NoError(t, err)
 	oldDepositTreeRoot, err := dt.HashTreeRoot()
 	require.NoError(t, err)

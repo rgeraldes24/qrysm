@@ -359,8 +359,8 @@ func SignedBeaconBlock(block interfaces.ReadOnlySignedBeaconBlock) (*zondpbv1.Si
 func BeaconStateToProto(state state.BeaconState) (*zondpbv1.BeaconState, error) {
 	sourceFork := state.Fork()
 	sourceLatestBlockHeader := state.LatestBlockHeader()
-	sourceEth1Data := state.Eth1Data()
-	sourceEth1DataVotes := state.Eth1DataVotes()
+	sourceZondData := state.ZondData()
+	sourceZondDataVotes := state.ZondDataVotes()
 	sourceValidators := state.Validators()
 	sourcePrevEpochAtts, err := state.PreviousEpochAttestations()
 	if err != nil {
@@ -375,9 +375,9 @@ func BeaconStateToProto(state state.BeaconState) (*zondpbv1.BeaconState, error) 
 	sourceCurrJustifiedCheckpoint := state.CurrentJustifiedCheckpoint()
 	sourceFinalizedCheckpoint := state.FinalizedCheckpoint()
 
-	resultEth1DataVotes := make([]*zondpbv1.Eth1Data, len(sourceEth1DataVotes))
-	for i, vote := range sourceEth1DataVotes {
-		resultEth1DataVotes[i] = &zondpbv1.Eth1Data{
+	resultZondDataVotes := make([]*zondpbv1.ZondData, len(sourceZondDataVotes))
+	for i, vote := range sourceZondDataVotes {
+		resultZondDataVotes[i] = &zondpbv1.ZondData{
 			DepositRoot:  bytesutil.SafeCopyBytes(vote.DepositRoot),
 			DepositCount: vote.DepositCount,
 			BlockHash:    bytesutil.SafeCopyBytes(vote.BlockHash),
@@ -464,13 +464,13 @@ func BeaconStateToProto(state state.BeaconState) (*zondpbv1.BeaconState, error) 
 		BlockRoots:      bytesutil.SafeCopy2dBytes(state.BlockRoots()),
 		StateRoots:      bytesutil.SafeCopy2dBytes(state.StateRoots()),
 		HistoricalRoots: bytesutil.SafeCopy2dBytes(hRoot),
-		Eth1Data: &zondpbv1.Eth1Data{
-			DepositRoot:  bytesutil.SafeCopyBytes(sourceEth1Data.DepositRoot),
-			DepositCount: sourceEth1Data.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(sourceEth1Data.BlockHash),
+		ZondData: &zondpbv1.ZondData{
+			DepositRoot:  bytesutil.SafeCopyBytes(sourceZondData.DepositRoot),
+			DepositCount: sourceZondData.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(sourceZondData.BlockHash),
 		},
-		Eth1DataVotes:             resultEth1DataVotes,
-		Eth1DepositIndex:          state.Eth1DepositIndex(),
+		ZondDataVotes:             resultZondDataVotes,
+		ZondDepositIndex:          state.ZondDepositIndex(),
 		Validators:                resultValidators,
 		Balances:                  state.Balances(),
 		RandaoMixes:               bytesutil.SafeCopy2dBytes(state.RandaoMixes()),

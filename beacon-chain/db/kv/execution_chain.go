@@ -12,12 +12,12 @@ import (
 )
 
 // SaveExecutionChainData saves the execution chain data.
-func (s *Store) SaveExecutionChainData(ctx context.Context, data *v2.ETH1ChainData) error {
+func (s *Store) SaveExecutionChainData(ctx context.Context, data *v2.ZondChainData) error {
 	ctx, span := trace.StartSpan(ctx, "BeaconDB.SaveExecutionChainData")
 	defer span.End()
 
 	if data == nil {
-		err := errors.New("cannot save nil eth1data")
+		err := errors.New("cannot save nil zonddata")
 		tracing.AnnotateError(span, err)
 		return err
 	}
@@ -35,18 +35,18 @@ func (s *Store) SaveExecutionChainData(ctx context.Context, data *v2.ETH1ChainDa
 }
 
 // ExecutionChainData retrieves the execution chain data.
-func (s *Store) ExecutionChainData(ctx context.Context) (*v2.ETH1ChainData, error) {
+func (s *Store) ExecutionChainData(ctx context.Context) (*v2.ZondChainData, error) {
 	ctx, span := trace.StartSpan(ctx, "BeaconDB.ExecutionChainData")
 	defer span.End()
 
-	var data *v2.ETH1ChainData
+	var data *v2.ZondChainData
 	err := s.db.View(func(tx *bolt.Tx) error {
 		bkt := tx.Bucket(powchainBucket)
 		enc := bkt.Get(powchainDataKey)
 		if len(enc) == 0 {
 			return nil
 		}
-		data = &v2.ETH1ChainData{}
+		data = &v2.ZondChainData{}
 		return proto.Unmarshal(enc, data)
 	})
 	return data, err

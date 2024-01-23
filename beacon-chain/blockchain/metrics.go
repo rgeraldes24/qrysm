@@ -79,9 +79,9 @@ var (
 		Name: "validators_total_effective_balance",
 		Help: "The total effective balance of validators, in GWei",
 	}, []string{"state"})
-	currentEth1DataDepositCount = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "current_eth1_data_deposit_count",
-		Help: "The current eth1 deposit count in the last processed state eth1data field.",
+	currentZondDataDepositCount = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "current_zond_data_deposit_count",
+		Help: "The current zond deposit count in the last processed state zonddata field.",
 	})
 	processedDepositsCount = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "beacon_processed_deposits_total",
@@ -320,8 +320,8 @@ func reportEpochMetrics(ctx context.Context, postState, headState state.BeaconSt
 	// Last finalized slot
 	beaconFinalizedEpoch.Set(float64(postState.FinalizedCheckpointEpoch()))
 	beaconFinalizedRoot.Set(float64(bytesutil.ToLowInt64(postState.FinalizedCheckpoint().Root)))
-	currentEth1DataDepositCount.Set(float64(postState.Eth1Data().DepositCount))
-	processedDepositsCount.Set(float64(postState.Eth1DepositIndex() + 1))
+	currentZondDataDepositCount.Set(float64(postState.ZondData().DepositCount))
+	processedDepositsCount.Set(float64(postState.ZondDepositIndex() + 1))
 
 	var b *precompute.Balance
 	var v []*precompute.Validator

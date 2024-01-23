@@ -702,8 +702,8 @@ func TestInsertFinalizedDeposits(t *testing.T) {
 	gs, _ := util.DeterministicGenesisState(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetEth1Data(&zondpb.Eth1Data{DepositCount: 10, BlockHash: make([]byte, 32)}))
-	assert.NoError(t, gs.SetEth1DepositIndex(8))
+	assert.NoError(t, gs.SetZondData(&zondpb.ZondData{DepositCount: 10, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs.SetZondDepositIndex(8))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	var zeroSig [96]byte
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {
@@ -732,8 +732,8 @@ func TestInsertFinalizedDeposits_PrunePendingDeposits(t *testing.T) {
 	gs, _ := util.DeterministicGenesisState(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetEth1Data(&zondpb.Eth1Data{DepositCount: 10, BlockHash: make([]byte, 32)}))
-	assert.NoError(t, gs.SetEth1DepositIndex(8))
+	assert.NoError(t, gs.SetZondData(&zondpb.ZondData{DepositCount: 10, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs.SetZondDepositIndex(8))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	var zeroSig [96]byte
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {
@@ -772,12 +772,12 @@ func TestInsertFinalizedDeposits_MultipleFinalizedRoutines(t *testing.T) {
 	gs, _ := util.DeterministicGenesisState(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetEth1Data(&zondpb.Eth1Data{DepositCount: 7, BlockHash: make([]byte, 32)}))
-	assert.NoError(t, gs.SetEth1DepositIndex(6))
+	assert.NoError(t, gs.SetZondData(&zondpb.ZondData{DepositCount: 7, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs.SetZondDepositIndex(6))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	gs2 := gs.Copy()
-	assert.NoError(t, gs2.SetEth1Data(&zondpb.Eth1Data{DepositCount: 15, BlockHash: make([]byte, 32)}))
-	assert.NoError(t, gs2.SetEth1DepositIndex(13))
+	assert.NoError(t, gs2.SetZondData(&zondpb.ZondData{DepositCount: 15, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs2.SetZondDepositIndex(13))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k', '2'}, gs2))
 	var zeroSig [96]byte
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {

@@ -44,10 +44,10 @@ message BeaconState {
   repeated bytes state_roots = 2003 [(theqrl.zond.ext.ssz_size) = "state_roots.size"];
   repeated bytes historical_roots = 2004 [(theqrl.zond.ext.ssz_size) = "?,32", (theqrl.zond.ext.ssz_max)  = "16777216"];
 
-  // Eth1 [3001-4000]
-  v1.Eth1Data eth1_data = 3001;
-  repeated v1.Eth1Data eth1_data_votes = 3002 [(theqrl.zond.ext.ssz_max) = "eth1_data_votes.size"];
-  uint64 eth1_deposit_index = 3003;
+  // Zond [3001-4000]
+  v1.ZondData zond_data = 3001;
+  repeated v1.ZondData zond_data_votes = 3002 [(theqrl.zond.ext.ssz_max) = "zond_data_votes.size"];
+  uint64 zond_deposit_index = 3003;
 
   // Registry [4001-5000]
   repeated v1.Validator validators = 4001 [(theqrl.zond.ext.ssz_max) = "1099511627776"];
@@ -89,10 +89,10 @@ message BeaconStateBellatrix {
   repeated bytes state_roots = 2003 [(theqrl.zond.ext.ssz_size) = "state_roots.size"];
   repeated bytes historical_roots = 2004 [(theqrl.zond.ext.ssz_size) = "?,32", (theqrl.zond.ext.ssz_max)  = "16777216"];
 
-  // Eth1 [3001-4000]
-  v1.Eth1Data eth1_data = 3001;
-  repeated v1.Eth1Data eth1_data_votes = 3002 [(theqrl.zond.ext.ssz_max) = "eth1_data_votes.size"];
-  uint64 eth1_deposit_index = 3003;
+  // Zond [3001-4000]
+  v1.ZondData zond_data = 3001;
+  repeated v1.ZondData zond_data_votes = 3002 [(theqrl.zond.ext.ssz_max) = "zond_data_votes.size"];
+  uint64 zond_deposit_index = 3003;
 
   // Registry [4001-5000]
   repeated v1.Validator validators = 4001 [(theqrl.zond.ext.ssz_max) = "1099511627776"];
@@ -137,10 +137,10 @@ message BeaconStateCapella {
   repeated bytes state_roots = 2003 [(theqrl.zond.ext.ssz_size) = "state_roots.size"];
   repeated bytes historical_roots = 2004 [(theqrl.zond.ext.ssz_size) = "?,32", (theqrl.zond.ext.ssz_max)  = "16777216"];
 
-  // Eth1 [3001-4000]
-  v1.Eth1Data eth1_data = 3001;
-  repeated v1.Eth1Data eth1_data_votes = 3002 [(theqrl.zond.ext.ssz_max) = "eth1_data_votes.size"];
-  uint64 eth1_deposit_index = 3003;
+  // Zond [3001-4000]
+  v1.ZondData zond_data = 3001;
+  repeated v1.ZondData zond_data_votes = 3002 [(theqrl.zond.ext.ssz_max) = "zond_data_votes.size"];
+  uint64 zond_deposit_index = 3003;
 
   // Registry [4001-5000]
   repeated v1.Validator validators = 4001 [(theqrl.zond.ext.ssz_max) = "1099511627776"];
@@ -189,10 +189,10 @@ message BeaconStateDeneb {
   repeated bytes block_roots = 2002 [(theqrl.zond.ext.ssz_size) = "block_roots.size"];
   repeated bytes state_roots = 2003 [(theqrl.zond.ext.ssz_size) = "state_roots.size"];
   repeated bytes historical_roots = 2004 [(theqrl.zond.ext.ssz_size) = "?,32", (theqrl.zond.ext.ssz_max) = "16777216"];
-  // Eth1 [3001-4000]
-  v1.Eth1Data eth1_data = 3001;
-  repeated v1.Eth1Data eth1_data_votes = 3002 [(theqrl.zond.ext.ssz_max) = "eth1_data_votes.size"];
-  uint64 eth1_deposit_index = 3003;
+  // Zond [3001-4000]
+  v1.ZondData zond_data = 3001;
+  repeated v1.ZondData zond_data_votes = 3002 [(theqrl.zond.ext.ssz_max) = "zond_data_votes.size"];
+  uint64 zond_deposit_index = 3003;
   // Registry [4001-5000]
   repeated v1.Validator validators = 4001 [(theqrl.zond.ext.ssz_max) = "1099511627776"];
   repeated uint64 balances = 4002 [(theqrl.zond.ext.ssz_max) = "1099511627776"];

@@ -147,8 +147,8 @@ message BeaconBlockBody {
     // The validators RANDAO reveal 96 byte value.
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-    // A reference to the Ethereum 1.x chain.
-    Eth1Data eth1_data = 2;
+    // A reference to the Zond chain.
+    ZondData zond_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
     // is not used for anything other than a fun message.
@@ -180,8 +180,8 @@ message BeaconBlockBodyAltair {
     // The validators RANDAO reveal 96 byte value.
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-    // A reference to the Ethereum 1.x chain.
-    Eth1Data eth1_data = 2;
+    // A reference to the Zond chain.
+    ZondData zond_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
     // is not used for anything other than a fun message.
@@ -271,8 +271,8 @@ message SignedVoluntaryExit {
     bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
-// Eth1Data represents references to the Ethereum 1.x deposit contract.
-message Eth1Data {
+// ZondData represents references to the Ethereum 1.x deposit contract.
+message ZondData {
     // The 32 byte deposit tree root for the last deposit included in this
     // block.
     bytes deposit_root = 1 [(theqrl.zond.ext.ssz_size) = "32"];
@@ -364,8 +364,8 @@ message BeaconBlockBodyBellatrix {
     // The validators RANDAO reveal 96 byte value.
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-    // A reference to the Ethereum 1.x chain.
-    Eth1Data eth1_data = 2;
+    // A reference to the Zond chain.
+    ZondData zond_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
     // is not used for anything other than a fun message.
@@ -425,8 +425,8 @@ message BlindedBeaconBlockBodyBellatrix {
     // The validators RANDAO reveal 96 byte value.
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-    // A reference to the Ethereum 1.x chain.
-    Eth1Data eth1_data = 2;
+    // A reference to the Zond chain.
+    ZondData zond_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
     // is not used for anything other than a fun message.
@@ -493,8 +493,8 @@ message BeaconBlockBodyDeneb {
     // The validators RANDAO reveal 96 byte value.
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-    // A reference to the Ethereum 1.x chain.
-    Eth1Data eth1_data = 2;
+    // A reference to the Zond chain.
+    ZondData zond_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
     // is not used for anything other than a fun message.
@@ -559,8 +559,8 @@ message BeaconBlockBodyCapella {
     // The validators RANDAO reveal 96 byte value.
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-    // A reference to the Ethereum 1.x chain.
-    Eth1Data eth1_data = 2;
+    // A reference to the Zond chain.
+    ZondData zond_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
     // is not used for anything other than a fun message.
@@ -623,8 +623,8 @@ message BlindedBeaconBlockBodyCapella {
     // The validators RANDAO reveal 96 byte value.
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-    // A reference to the Ethereum 1.x chain.
-    Eth1Data eth1_data = 2;
+    // A reference to the Zond chain.
+    ZondData zond_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
     // is not used for anything other than a fun message.
@@ -694,8 +694,8 @@ message BlindedBeaconBlockBodyDeneb {
     // The validators RANDAO reveal 96 byte value.
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "96"];
 
-    // A reference to the Ethereum 1.x chain.
-    Eth1Data eth1_data = 2;
+    // A reference to the Zond chain.
+    ZondData zond_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
     // is not used for anything other than a fun message.

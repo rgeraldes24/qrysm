@@ -342,7 +342,7 @@ message NodeConnectionResponse {
     bool syncing = 3;
     // The chain genesis time.
     uint64 genesis_time = 4;
-    // Address of the validator deposit contract in the eth1 chain.
+    // Address of the validator deposit contract in the zond chain.
     bytes deposit_contract_address = 5;
 }
 
@@ -408,7 +408,7 @@ message BeaconStatusResponse {
     bool syncing = 3;
     // The chain genesis time.
     uint64 genesis_time = 4;
-    // Address of the validator deposit contract in the eth1 chain.
+    // Address of the validator deposit contract in the zond chain.
     bytes deposit_contract_address = 5;
     // The head of the chain from the beacon node.
     theqrl.zond.v1alpha1.ChainHead chain_head = 6;

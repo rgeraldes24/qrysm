@@ -164,7 +164,7 @@ func ProcessDeposit(beaconState state.BeaconState, deposit *zondpb.Deposit, veri
 		}
 		return nil, newValidator, errors.Wrapf(err, "could not verify deposit from %#x", bytesutil.Trunc(deposit.Data.PublicKey))
 	}
-	if err := beaconState.SetEth1DepositIndex(beaconState.Eth1DepositIndex() + 1); err != nil {
+	if err := beaconState.SetZondDepositIndex(beaconState.ZondDepositIndex() + 1); err != nil {
 		return nil, newValidator, err
 	}
 	pubKey := deposit.Data.PublicKey
@@ -214,12 +214,12 @@ func verifyDeposit(beaconState state.ReadOnlyBeaconState, deposit *zondpb.Deposi
 	if deposit == nil || deposit.Data == nil {
 		return errors.New("received nil deposit or nil deposit data")
 	}
-	eth1Data := beaconState.Eth1Data()
-	if eth1Data == nil {
-		return errors.New("received nil eth1data in the beacon state")
+	zondData := beaconState.ZondData()
+	if zondData == nil {
+		return errors.New("received nil zonddata in the beacon state")
 	}
 
-	receiptRoot := eth1Data.DepositRoot
+	receiptRoot := zondData.DepositRoot
 	leaf, err := deposit.Data.HashTreeRoot()
 	if err != nil {
 		return errors.Wrap(err, "could not tree hash deposit data")
@@ -227,7 +227,7 @@ func verifyDeposit(beaconState state.ReadOnlyBeaconState, deposit *zondpb.Deposi
 	if ok := trie.VerifyMerkleProofWithDepth(
 		receiptRoot,
 		leaf[:],
-		beaconState.Eth1DepositIndex(),
+		beaconState.ZondDepositIndex(),
 		deposit.Proof,
 		params.BeaconConfig().DepositContractTreeDepth,
 	); !ok {

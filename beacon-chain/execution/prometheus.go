@@ -13,7 +13,7 @@ type BeaconNodeStatsUpdater interface {
 }
 
 type PowchainCollector struct {
-	SyncEth1Connected *prometheus.Desc
+	SyncZondConnected *prometheus.Desc
 	updateChan        chan clientstats.BeaconNodeStats
 	latestStats       clientstats.BeaconNodeStats
 	sync.Mutex
@@ -35,7 +35,7 @@ func (pc *PowchainCollector) Update(update clientstats.BeaconNodeStats) {
 // a family. Describe and Collect together satisfy the
 // prometheus.Collector interface.
 func (pc *PowchainCollector) Describe(ch chan<- *prometheus.Desc) {
-	ch <- pc.SyncEth1Connected
+	ch <- pc.SyncZondConnected
 }
 
 // Collect is invoked by the prometheus collection loop.
@@ -50,14 +50,14 @@ func (pc *PowchainCollector) Describe(ch chan<- *prometheus.Desc) {
 func (pc *PowchainCollector) Collect(ch chan<- prometheus.Metric) {
 	bs := pc.getLatestStats()
 
-	var syncEth1Connected float64 = 0
-	if bs.SyncEth1Connected {
-		syncEth1Connected = 1
+	var syncZondConnected float64 = 0
+	if bs.SyncZondConnected {
+		syncZondConnected = 1
 	}
 	ch <- prometheus.MustNewConstMetric(
-		pc.SyncEth1Connected,
+		pc.SyncZondConnected,
 		prometheus.GaugeValue,
-		syncEth1Connected,
+		syncZondConnected,
 	)
 }
 
@@ -96,9 +96,9 @@ func NewPowchainCollector(ctx context.Context) (*PowchainCollector, error) {
 	namespace := "powchain"
 	updateChan := make(chan clientstats.BeaconNodeStats, 2)
 	c := &PowchainCollector{
-		SyncEth1Connected: prometheus.NewDesc(
-			prometheus.BuildFQName(namespace, "", "sync_eth1_connected"),
-			"Boolean indicating whether an eth1 endpoint is currently connected: 0=false, 1=true.",
+		SyncZondConnected: prometheus.NewDesc(
+			prometheus.BuildFQName(namespace, "", "sync_zond_connected"),
+			"Boolean indicating whether an zond endpoint is currently connected: 0=false, 1=true.",
 			nil,
 			nil,
 		),

@@ -100,7 +100,6 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Initial value constants.
 	BLSWithdrawalPrefixByte:         byte(0),
 	DilithiumWithdrawalPrefixByte:   byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
-	ETH1AddressWithdrawalPrefixByte: byte(1),
 	ZondAddressWithdrawalPrefixByte: byte(1), // TODO (cyyber): Change it to 0
 	ZeroHash:                        [32]byte{},
 
@@ -111,12 +110,12 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	SqrRootSlotsPerEpoch:             11,
 	MinSeedLookahead:                 1,
 	MaxSeedLookahead:                 4,
-	EpochsPerEth1VotingPeriod:        2,    // TODO (cyyber) : Re-evaluate the value
+	EpochsPerZondVotingPeriod:        2,    // TODO (cyyber) : Re-evaluate the value
 	SlotsPerHistoricalRoot:           1024, // TODO (cyyber) : Re-evaluate the value
 	MinValidatorWithdrawabilityDelay: 16,   // TODO (cyyber) : Re-evaluate the value
 	ShardCommitteePeriod:             16,   // TODO (cyyber) : Re-evaluate the value
 	MinEpochsToInactivityPenalty:     4,
-	Eth1FollowDistance:               0, // TODO (cyyber) : Re-evaluate the value
+	ZondFollowDistance:               0, // TODO (cyyber) : Re-evaluate the value
 
 	// Fork choice algorithm constants.
 	ProposerScoreBoost:              40,
@@ -134,13 +133,13 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	RandomSubnetsPerValidator:         1 << 0,
 	EpochsPerRandomSubnetSubscription: 1 << 8,
 
-	// While eth1 mainnet block times are closer to 13s, we must conform with other clients in
-	// order to vote on the correct eth1 blocks.
+	// While zond mainnet block times are closer to 13s, we must conform with other clients in
+	// order to vote on the correct zond blocks.
 	//
 	// Additional context: https://github.com/ethereum/consensus-specs/issues/2132
 	// Bug prompting this change: https://github.com/theQRL/qrysm/issues/7856
 	// Future optimization: https://github.com/theQRL/qrysm/issues/7739
-	SecondsPerETH1Block: 60,
+	SecondsPerZondBlock: 60,
 
 	// State list length constants.
 	EpochsPerHistoricalVector: 65536,
@@ -263,7 +262,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	TerminalBlockHashActivationEpoch: 18446744073709551615,
 	TerminalBlockHash:                [32]byte{},
 	TerminalTotalDifficulty:          "58750000000000000000000", // Estimated: Sept 15, 2022
-	EthBurnAddressHex:                "0x0000000000000000000000000000000000000000",
+	ZondBurnAddressHex:               "0x0000000000000000000000000000000000000000",
 	DefaultBuilderGasLimit:           uint64(30000000),
 
 	// Mevboost circuit breaker

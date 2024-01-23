@@ -86,8 +86,8 @@ service Node {
         };
     }
 
-    // // Retrieve the status of the ETH1 connections.
-    rpc GetETH1ConnectionStatus(google.protobuf.Empty) returns (ETH1ConnectionStatus) {
+    // // Retrieve the status of the Zond connections.
+    rpc GetZondConnectionStatus(google.protobuf.Empty) returns (ZondConnectionStatus) {
         option (google.api.http) = {
             get: "/zond/v1alpha1/node/zond1/connections"
         };
@@ -178,10 +178,10 @@ enum ConnectionState {
     CONNECTING = 3;
 }
 
-// ETH1ConnectionStatus states the current address and error of the ETH1 API
+// ZondConnectionStatus states the current address and error of the Zond API
 // endpoint. It also provides the addresses and errors for any fallback URLs. 
-message ETH1ConnectionStatus {
-    // Current ETH1 HTTP endpoint.
+message ZondConnectionStatus {
+    // Current Zond HTTP endpoint.
     string current_address = 1;
 
     // Current error (if any) of the current connection.

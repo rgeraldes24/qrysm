@@ -1,5 +1,5 @@
 // Package iface defines the actual database interface used
-// by a Prysm beacon node, also containing useful, scoped interfaces such as
+// by a Qrysm beacon node, also containing useful, scoped interfaces such as
 // a ReadOnlyDatabase.
 package iface
 
@@ -50,7 +50,7 @@ type ReadOnlyDatabase interface {
 	// Deposit contract related handlers.
 	DepositContractAddress(ctx context.Context) ([]byte, error)
 	// ExecutionChainData operations.
-	ExecutionChainData(ctx context.Context) (*zondpb.ETH1ChainData, error)
+	ExecutionChainData(ctx context.Context) (*zondpb.ZondChainData, error)
 	// Fee recipients operations.
 	FeeRecipientByValidatorID(ctx context.Context, id primitives.ValidatorIndex) (common.Address, error)
 	RegistrationByValidatorID(ctx context.Context, id primitives.ValidatorIndex) (*zondpb.ValidatorRegistrationV1, error)
@@ -87,7 +87,7 @@ type NoHeadAccessDatabase interface {
 	// Deposit contract related handlers.
 	SaveDepositContractAddress(ctx context.Context, addr common.Address) error
 	// SaveExecutionChainData operations.
-	SaveExecutionChainData(ctx context.Context, data *zondpb.ETH1ChainData) error
+	SaveExecutionChainData(ctx context.Context, data *zondpb.ZondChainData) error
 	// Run any required database migrations.
 	RunMigrations(ctx context.Context) error
 	// Fee recipients operations.

@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ethereum/go-ethereum"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
@@ -45,7 +45,7 @@ func TestProcessDepositLog_OK(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -59,7 +59,7 @@ func TestProcessDepositLog_OK(t *testing.T) {
 	require.NoError(t, err)
 	data := deposits[0].Data
 
-	testAcc.TxOpts.Value = mock.Amount32Eth()
+	testAcc.TxOpts.Value = mock.Amount40000Eth()
 	testAcc.TxOpts.GasLimit = 1000000
 	_, err = testAcc.Contract.Deposit(testAcc.TxOpts, data.PublicKey, data.WithdrawalCredentials, data.Signature, depositRoots[0])
 	require.NoError(t, err, "Could not deposit to deposit contract")
@@ -114,7 +114,7 @@ func TestProcessDepositLog_InsertsPendingDeposit(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -127,7 +127,7 @@ func TestProcessDepositLog_InsertsPendingDeposit(t *testing.T) {
 	require.NoError(t, err)
 	data := deposits[0].Data
 
-	testAcc.TxOpts.Value = mock.Amount32Eth()
+	testAcc.TxOpts.Value = mock.Amount40000Eth()
 	testAcc.TxOpts.GasLimit = 1000000
 
 	_, err = testAcc.Contract.Deposit(testAcc.TxOpts, data.PublicKey, data.WithdrawalCredentials, data.Signature, depositRoots[0])
@@ -174,7 +174,7 @@ func TestUnpackDepositLogData_OK(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -187,7 +187,7 @@ func TestUnpackDepositLogData_OK(t *testing.T) {
 	require.NoError(t, err)
 	data := deposits[0].Data
 
-	testAcc.TxOpts.Value = mock.Amount32Eth()
+	testAcc.TxOpts.Value = mock.Amount40000Eth()
 	testAcc.TxOpts.GasLimit = 1000000
 	_, err = testAcc.Contract.Deposit(testAcc.TxOpts, data.PublicKey, data.WithdrawalCredentials, data.Signature, depositRoots[0])
 	require.NoError(t, err, "Could not deposit to deposit contract")
@@ -230,7 +230,7 @@ func TestProcessETH2GenesisLog_8DuplicatePubkeys(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -249,14 +249,14 @@ func TestProcessETH2GenesisLog_8DuplicatePubkeys(t *testing.T) {
 	require.NoError(t, err)
 	data := deposits[0].Data
 
-	testAcc.TxOpts.Value = mock.Amount32Eth()
+	testAcc.TxOpts.Value = mock.Amount40000Eth()
 	testAcc.TxOpts.GasLimit = 1000000
 
 	// 64 Validators are used as size required for beacon-chain to start. This number
 	// is defined in the deposit contract as the number required for the testnet. The actual number
 	// is 2**14
 	for i := 0; i < depositsReqForChainStart; i++ {
-		testAcc.TxOpts.Value = mock.Amount32Eth()
+		testAcc.TxOpts.Value = mock.Amount40000Eth()
 		_, err = testAcc.Contract.Deposit(testAcc.TxOpts, data.PublicKey, data.WithdrawalCredentials, data.Signature, depositRoots[0])
 		require.NoError(t, err, "Could not deposit to deposit contract")
 
@@ -305,7 +305,7 @@ func TestProcessETH2GenesisLog(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
@@ -356,7 +356,7 @@ func TestProcessETH2GenesisLog(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	err = web3Service.ProcessETH1Block(context.Background(), big.NewInt(int64(logs[len(logs)-1].BlockNumber)))
+	err = web3Service.ProcessZondBlock(context.Background(), big.NewInt(int64(logs[len(logs)-1].BlockNumber)))
 	require.NoError(t, err)
 
 	cachedDeposits := web3Service.chainStartData.ChainstartDeposits
@@ -398,18 +398,18 @@ func TestProcessETH2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 		WithDatabase(kvStore),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
 	web3Service.httpLogger = testAcc.Backend
-	web3Service.latestEth1Data.LastRequestedBlock = 0
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestZondData.LastRequestedBlock = 0
+	web3Service.latestZondData.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestZondData.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 	bConfig := params.MinimalSpecConfig().Copy()
 	bConfig.MinGenesisTime = 0
-	bConfig.SecondsPerETH1Block = 10
+	bConfig.SecondsPerZondBlock = 10
 	params.OverrideBeaconConfig(bConfig)
 	nConfig := params.BeaconNetworkConfig()
 	nConfig.ContractDeploymentBlock = 0
@@ -430,7 +430,7 @@ func TestProcessETH2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 	// is 2**14
 	for i := 0; i < totalNumOfDeposits; i++ {
 		data := deposits[i].Data
-		testAcc.TxOpts.Value = mock.Amount32Eth()
+		testAcc.TxOpts.Value = mock.Amount40000Eth()
 		testAcc.TxOpts.GasLimit = 1000000
 		_, err = testAcc.Contract.Deposit(testAcc.TxOpts, data.PublicKey, data.WithdrawalCredentials, data.Signature, depositRoots[i])
 		require.NoError(t, err, "Could not deposit to deposit contract")
@@ -441,11 +441,11 @@ func TestProcessETH2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 		}
 	}
 	// Forward the chain to account for the follow distance
-	for i := uint64(0); i < params.BeaconConfig().Eth1FollowDistance; i++ {
+	for i := uint64(0); i < params.BeaconConfig().ZondFollowDistance; i++ {
 		testAcc.Backend.Commit()
 	}
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestZondData.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestZondData.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 
 	// Set up our subscriber now to listen for the chain started event.
 	stateChannel := make(chan *feed.Event, 1)
@@ -495,17 +495,17 @@ func TestProcessETH2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 		WithDatabase(kvStore),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
 	web3Service.httpLogger = testAcc.Backend
-	web3Service.latestEth1Data.LastRequestedBlock = 0
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestZondData.LastRequestedBlock = 0
+	web3Service.latestZondData.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestZondData.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 	bConfig := params.MinimalSpecConfig().Copy()
-	bConfig.SecondsPerETH1Block = 10
+	bConfig.SecondsPerZondBlock = 10
 	params.OverrideBeaconConfig(bConfig)
 	nConfig := params.BeaconNetworkConfig()
 	nConfig.ContractDeploymentBlock = 0
@@ -543,11 +543,11 @@ func TestProcessETH2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 	wantedGenesisTime := testAcc.Backend.Blockchain().CurrentBlock().Time
 
 	// Forward the chain to account for the follow distance
-	for i := uint64(0); i < params.BeaconConfig().Eth1FollowDistance; i++ {
+	for i := uint64(0); i < params.BeaconConfig().ZondFollowDistance; i++ {
 		testAcc.Backend.Commit()
 	}
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestZondData.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestZondData.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 
 	// Set the genesis time 500 blocks ahead of the last
 	// deposit log.
@@ -592,7 +592,7 @@ func TestCheckForChainstart_NoValidator(t *testing.T) {
 	require.LogsDoNotContain(t, hook, "Could not determine active validator count from pre genesis state")
 }
 
-func newPowchainService(t *testing.T, eth1Backend *mock.TestAccount, beaconDB db.Database) *Service {
+func newPowchainService(t *testing.T, zondBackend *mock.TestAccount, beaconDB db.Database) *Service {
 	depositCache, err := depositcache.New()
 	require.NoError(t, err)
 	server, endpoint, err := mockExecution.SetupRPCServer()
@@ -602,17 +602,17 @@ func newPowchainService(t *testing.T, eth1Backend *mock.TestAccount, beaconDB db
 	})
 	web3Service, err := NewService(context.Background(),
 		WithHttpEndpoint(endpoint),
-		WithDepositContractAddress(eth1Backend.ContractAddr),
+		WithDepositContractAddress(zondBackend.ContractAddr),
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 zond chain service")
 	web3Service = setDefaultMocks(web3Service)
-	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(eth1Backend.ContractAddr, eth1Backend.Backend)
+	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(zondBackend.ContractAddr, zondBackend.Backend)
 	require.NoError(t, err)
 
-	web3Service.rpcClient = &mockExecution.RPCClient{Backend: eth1Backend.Backend}
-	web3Service.httpLogger = &goodLogger{backend: eth1Backend.Backend}
+	web3Service.rpcClient = &mockExecution.RPCClient{Backend: zondBackend.Backend}
+	web3Service.httpLogger = &goodLogger{backend: zondBackend.Backend}
 	params.SetupTestConfigCleanup(t)
 	bConfig := params.MinimalSpecConfig().Copy()
 	bConfig.MinGenesisTime = 0

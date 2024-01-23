@@ -1,5 +1,5 @@
 // Package kv defines a bolt-db, key-value store implementation
-// of the Database interface defined by a Prysm beacon node.
+// of the Database interface defined by a Qrysm beacon node.
 package kv
 
 import (
@@ -81,7 +81,7 @@ var blockedBuckets = [][]byte{
 	finalizedBlockRootsIndexBucket,
 }
 
-// Store defines an implementation of the Prysm Database interface
+// Store defines an implementation of the Qrysm Database interface
 // using BoltDB as the underlying persistent kv-store for Ethereum Beacon Nodes.
 type Store struct {
 	db                  *bolt.DB

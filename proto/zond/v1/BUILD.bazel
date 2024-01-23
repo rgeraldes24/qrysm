@@ -49,7 +49,7 @@ ssz_gen_marshal(
         "Checkpoint",
         "Deposit",
         "DepositData",
-        "Eth1Data",
+        "ZondData",
         "IndexedAttestation",
         "ProposerSlashing",
         "SignedAggregateAttestationAndProof",

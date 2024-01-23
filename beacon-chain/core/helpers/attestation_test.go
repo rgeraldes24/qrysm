@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -107,14 +107,14 @@ func Test_ValidateAttestationTime(t *testing.T) {
 			name: "attestation.slot == current_slot",
 			args: args{
 				attSlot:     15,
-				genesisTime: prysmTime.Now().Add(-15 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
+				genesisTime: qrysmTime.Now().Add(-15 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
 			},
 		},
 		{
 			name: "attestation.slot == current_slot, received in middle of slot",
 			args: args{
 				attSlot: 15,
-				genesisTime: prysmTime.Now().Add(
+				genesisTime: qrysmTime.Now().Add(
 					-15 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second,
 				).Add(-(time.Duration(params.BeaconConfig().SecondsPerSlot/2) * time.Second)),
 			},
@@ -123,7 +123,7 @@ func Test_ValidateAttestationTime(t *testing.T) {
 			name: "attestation.slot == current_slot, received 200ms early",
 			args: args{
 				attSlot: 16,
-				genesisTime: prysmTime.Now().Add(
+				genesisTime: qrysmTime.Now().Add(
 					-16 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second,
 				).Add(-200 * time.Millisecond),
 			},
@@ -132,7 +132,7 @@ func Test_ValidateAttestationTime(t *testing.T) {
 			name: "attestation.slot > current_slot",
 			args: args{
 				attSlot:     16,
-				genesisTime: prysmTime.Now().Add(-15 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
+				genesisTime: qrysmTime.Now().Add(-15 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
 			},
 			wantedErr: "not within attestation propagation range",
 		},
@@ -140,7 +140,7 @@ func Test_ValidateAttestationTime(t *testing.T) {
 			name: "attestation.slot < current_slot-ATTESTATION_PROPAGATION_SLOT_RANGE",
 			args: args{
 				attSlot:     100 - params.BeaconNetworkConfig().AttestationPropagationSlotRange - 1,
-				genesisTime: prysmTime.Now().Add(-100 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
+				genesisTime: qrysmTime.Now().Add(-100 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
 			},
 			wantedErr: "not within attestation propagation range",
 		},
@@ -148,14 +148,14 @@ func Test_ValidateAttestationTime(t *testing.T) {
 			name: "attestation.slot = current_slot-ATTESTATION_PROPAGATION_SLOT_RANGE",
 			args: args{
 				attSlot:     100 - params.BeaconNetworkConfig().AttestationPropagationSlotRange,
-				genesisTime: prysmTime.Now().Add(-100 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
+				genesisTime: qrysmTime.Now().Add(-100 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
 			},
 		},
 		{
 			name: "attestation.slot = current_slot-ATTESTATION_PROPAGATION_SLOT_RANGE, received 200ms late",
 			args: args{
 				attSlot: 100 - params.BeaconNetworkConfig().AttestationPropagationSlotRange,
-				genesisTime: prysmTime.Now().Add(
+				genesisTime: qrysmTime.Now().Add(
 					-100 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second,
 				).Add(200 * time.Millisecond),
 			},
@@ -164,21 +164,21 @@ func Test_ValidateAttestationTime(t *testing.T) {
 			name: "attestation.slot < current_slot-ATTESTATION_PROPAGATION_SLOT_RANGE in deneb",
 			args: args{
 				attSlot:     300 - params.BeaconNetworkConfig().AttestationPropagationSlotRange - 1,
-				genesisTime: prysmTime.Now().Add(-300 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
+				genesisTime: qrysmTime.Now().Add(-300 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
 			},
 		},
 		{
 			name: "attestation.slot = current_slot-ATTESTATION_PROPAGATION_SLOT_RANGE in deneb",
 			args: args{
 				attSlot:     300 - params.BeaconNetworkConfig().AttestationPropagationSlotRange,
-				genesisTime: prysmTime.Now().Add(-300 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
+				genesisTime: qrysmTime.Now().Add(-300 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
 			},
 		},
 		{
 			name: "attestation.slot = current_slot-ATTESTATION_PROPAGATION_SLOT_RANGE, received 200ms late in deneb",
 			args: args{
 				attSlot: 300 - params.BeaconNetworkConfig().AttestationPropagationSlotRange,
-				genesisTime: prysmTime.Now().Add(
+				genesisTime: qrysmTime.Now().Add(
 					-300 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second,
 				).Add(200 * time.Millisecond),
 			},
@@ -187,7 +187,7 @@ func Test_ValidateAttestationTime(t *testing.T) {
 			name: "attestation.slot != current epoch or previous epoch in deneb",
 			args: args{
 				attSlot: 300 - params.BeaconNetworkConfig().AttestationPropagationSlotRange,
-				genesisTime: prysmTime.Now().Add(
+				genesisTime: qrysmTime.Now().Add(
 					-500 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second,
 				).Add(200 * time.Millisecond),
 			},
@@ -197,7 +197,7 @@ func Test_ValidateAttestationTime(t *testing.T) {
 			name: "attestation.slot is well beyond current slot",
 			args: args{
 				attSlot:     1 << 32,
-				genesisTime: prysmTime.Now().Add(-15 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
+				genesisTime: qrysmTime.Now().Add(-15 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
 			},
 			wantedErr: "which exceeds max allowed value relative to the local clock",
 		},

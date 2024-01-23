@@ -48,9 +48,9 @@ func (*FaultyExecutionChain) BlockByTimestamp(context.Context, uint64) (*types.H
 	return &types.HeaderInfo{Number: big.NewInt(0)}, nil
 }
 
-// ChainStartEth1Data --
-func (*FaultyExecutionChain) ChainStartEth1Data() *zondpb.Eth1Data {
-	return &zondpb.Eth1Data{}
+// ChainStartZondData --
+func (*FaultyExecutionChain) ChainStartZondData() *zondpb.ZondData {
+	return &zondpb.ZondData{}
 }
 
 // PreGenesisState --
@@ -67,7 +67,7 @@ func (*FaultyExecutionChain) ClearPreGenesisData() {
 	// no-op
 }
 
-// IsConnectedToETH1 --
-func (*FaultyExecutionChain) IsConnectedToETH1() bool {
+// IsConnectedToZond --
+func (*FaultyExecutionChain) IsConnectedToZond() bool {
 	return true
 }

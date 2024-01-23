@@ -24,7 +24,7 @@ var (
 	// ErrUnknownPayloadStatus when the payload status is unknown.
 	ErrUnknownPayloadStatus = errors.New("unknown payload status")
 	// ErrConfigMismatch when the execution node's terminal total difficulty or
-	// terminal block hash received via the API mismatches Prysm's configuration value.
+	// terminal block hash received via the API mismatches Qrysm's configuration value.
 	ErrConfigMismatch = errors.New("execution client configuration mismatch")
 	// ErrAcceptedSyncingPayloadStatus when the status of the payload is syncing or accepted.
 	ErrAcceptedSyncingPayloadStatus = errors.New("payload status is SYNCING or ACCEPTED")

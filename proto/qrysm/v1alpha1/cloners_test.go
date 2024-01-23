@@ -10,14 +10,14 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 )
 
-func TestCopyETH1Data(t *testing.T) {
-	data := genEth1Data()
+func TestCopyZondData(t *testing.T) {
+	data := genZondData()
 
-	got := v1alpha1.CopyETH1Data(data)
+	got := v1alpha1.CopyZondData(data)
 	if !reflect.DeepEqual(got, data) {
-		t.Errorf("CopyETH1Data() = %v, want %v", got, data)
+		t.Errorf("CopyZondData() = %v, want %v", got, data)
 	}
-	assert.NotEmpty(t, got, "Copied eth1data has empty fields")
+	assert.NotEmpty(t, got, "Copied zonddata has empty fields")
 }
 
 func TestCopyPendingAttestation(t *testing.T) {
@@ -601,8 +601,8 @@ func genCheckpoint() *v1alpha1.Checkpoint {
 	}
 }
 
-func genEth1Data() *v1alpha1.Eth1Data {
-	return &v1alpha1.Eth1Data{
+func genZondData() *v1alpha1.ZondData {
+	return &v1alpha1.ZondData{
 		DepositRoot:  bytes(32),
 		DepositCount: 4,
 		BlockHash:    bytes(32),
@@ -638,7 +638,7 @@ func genBeaconBlock() *v1alpha1.BeaconBlock {
 func genBeaconBlockBody() *v1alpha1.BeaconBlockBody {
 	return &v1alpha1.BeaconBlockBody{
 		RandaoReveal:      bytes(32),
-		Eth1Data:          genEth1Data(),
+		ZondData:          genZondData(),
 		Graffiti:          bytes(32),
 		ProposerSlashings: genProposerSlashings(5),
 		AttesterSlashings: genAttesterSlashings(5),
@@ -782,7 +782,7 @@ func genSyncAggregate() *v1alpha1.SyncAggregate {
 func genBeaconBlockBodyAltair() *v1alpha1.BeaconBlockBodyAltair {
 	return &v1alpha1.BeaconBlockBodyAltair{
 		RandaoReveal:      bytes(32),
-		Eth1Data:          genEth1Data(),
+		ZondData:          genZondData(),
 		Graffiti:          bytes(32),
 		ProposerSlashings: genProposerSlashings(5),
 		AttesterSlashings: genAttesterSlashings(5),
@@ -813,7 +813,7 @@ func genSignedBeaconBlockAltair() *v1alpha1.SignedBeaconBlockAltair {
 func genBeaconBlockBodyBellatrix() *v1alpha1.BeaconBlockBodyBellatrix {
 	return &v1alpha1.BeaconBlockBodyBellatrix{
 		RandaoReveal:      bytes(32),
-		Eth1Data:          genEth1Data(),
+		ZondData:          genZondData(),
 		Graffiti:          bytes(32),
 		ProposerSlashings: genProposerSlashings(5),
 		AttesterSlashings: genAttesterSlashings(5),
@@ -845,7 +845,7 @@ func genSignedBeaconBlockBellatrix() *v1alpha1.SignedBeaconBlockBellatrix {
 func genBeaconBlockBodyCapella() *v1alpha1.BeaconBlockBodyCapella {
 	return &v1alpha1.BeaconBlockBodyCapella{
 		RandaoReveal:                bytes(96),
-		Eth1Data:                    genEth1Data(),
+		ZondData:                    genZondData(),
 		Graffiti:                    bytes(32),
 		ProposerSlashings:           genProposerSlashings(5),
 		AttesterSlashings:           genAttesterSlashings(5),
@@ -878,7 +878,7 @@ func genSignedBeaconBlockCapella() *v1alpha1.SignedBeaconBlockCapella {
 func genBlindedBeaconBlockBodyCapella() *v1alpha1.BlindedBeaconBlockBodyCapella {
 	return &v1alpha1.BlindedBeaconBlockBodyCapella{
 		RandaoReveal:                bytes(96),
-		Eth1Data:                    genEth1Data(),
+		ZondData:                    genZondData(),
 		Graffiti:                    bytes(32),
 		ProposerSlashings:           genProposerSlashings(5),
 		AttesterSlashings:           genAttesterSlashings(5),
@@ -911,7 +911,7 @@ func genSignedBlindedBeaconBlockCapella() *v1alpha1.SignedBlindedBeaconBlockCape
 func genBeaconBlockBodyDeneb() *v1alpha1.BeaconBlockBodyDeneb {
 	return &v1alpha1.BeaconBlockBodyDeneb{
 		RandaoReveal:                bytes(96),
-		Eth1Data:                    genEth1Data(),
+		ZondData:                    genZondData(),
 		Graffiti:                    bytes(32),
 		ProposerSlashings:           genProposerSlashings(5),
 		AttesterSlashings:           genAttesterSlashings(5),
@@ -945,7 +945,7 @@ func genSignedBeaconBlockDeneb() *v1alpha1.SignedBeaconBlockDeneb {
 func genBlindedBeaconBlockBodyDeneb() *v1alpha1.BlindedBeaconBlockBodyDeneb {
 	return &v1alpha1.BlindedBeaconBlockBodyDeneb{
 		RandaoReveal:                bytes(96),
-		Eth1Data:                    genEth1Data(),
+		ZondData:                    genZondData(),
 		Graffiti:                    bytes(32),
 		ProposerSlashings:           genProposerSlashings(5),
 		AttesterSlashings:           genAttesterSlashings(5),
