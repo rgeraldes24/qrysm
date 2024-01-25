@@ -181,12 +181,6 @@ func Test_hasNetworkFlag(t *testing.T) {
 		want         bool
 	}{
 		{
-			name:         "Prater testnet",
-			networkName:  features.PraterTestnet.Name,
-			networkValue: "prater",
-			want:         true,
-		},
-		{
 			name:         "Mainnet",
 			networkName:  features.Mainnet.Name,
 			networkValue: "mainnet",
