@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	pbrpc "github.com/theQRL/qrysm/v4/proto/prysm/v1alpha1"
+	pbrpc "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
