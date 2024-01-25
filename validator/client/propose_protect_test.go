@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -18,7 +18,7 @@ func Test_slashableProposalCheck_PreventsLowerThanMinProposal(t *testing.T) {
 	validator, _, validatorKey, finish := setup(t)
 	defer finish()
 	lowestSignedSlot := primitives.Slot(10)
-	var pubKeyBytes [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKeyBytes [dilithium.CryptoPublicKeyBytes]byte
 	copy(pubKeyBytes[:], validatorKey.PublicKey().Marshal())
 
 	// We save a proposal at the lowest signed slot in the DB.
@@ -94,7 +94,7 @@ func Test_slashableProposalCheck(t *testing.T) {
 		Signature: params.BeaconConfig().EmptySignature[:],
 	})
 
-	var pubKeyBytes [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKeyBytes [dilithium.CryptoPublicKeyBytes]byte
 	copy(pubKeyBytes[:], validatorKey.PublicKey().Marshal())
 
 	// We save a proposal at slot 1 as our lowest proposal.
@@ -105,7 +105,7 @@ func Test_slashableProposalCheck(t *testing.T) {
 	dummySigningRoot := [32]byte{1}
 	err = validator.db.SaveProposalHistoryForSlot(ctx, pubKeyBytes, 10, dummySigningRoot[:])
 	require.NoError(t, err)
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithium.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	sBlock, err := blocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
@@ -142,7 +142,7 @@ func Test_slashableProposalCheck(t *testing.T) {
 func Test_slashableProposalCheck_RemoteProtection(t *testing.T) {
 	validator, _, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [dilithium2.CryptoPublicKeyBytes]byte
+	var pubKey [dilithium.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 	blk := util.NewBeaconBlock()

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.30.0
 // 	protoc        v4.23.3
-// source: proto/prysm/v1alpha1/slasher.proto
+// source: proto/qrysm/v1alpha1/slasher.proto
 
 package zond
 
@@ -36,7 +36,7 @@ type HighestAttestation struct {
 func (x *HighestAttestation) Reset() {
 	*x = HighestAttestation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_slasher_proto_msgTypes[0]
+		mi := &file_proto_qrysm_v1alpha1_slasher_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -49,7 +49,7 @@ func (x *HighestAttestation) String() string {
 func (*HighestAttestation) ProtoMessage() {}
 
 func (x *HighestAttestation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_slasher_proto_msgTypes[0]
+	mi := &file_proto_qrysm_v1alpha1_slasher_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -62,7 +62,7 @@ func (x *HighestAttestation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HighestAttestation.ProtoReflect.Descriptor instead.
 func (*HighestAttestation) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_slasher_proto_rawDescGZIP(), []int{0}
+	return file_proto_qrysm_v1alpha1_slasher_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *HighestAttestation) GetValidatorIndex() uint64 {
@@ -86,10 +86,10 @@ func (x *HighestAttestation) GetHighestTargetEpoch() github_com_theQRL_qrysm_v4_
 	return github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch(0)
 }
 
-var File_proto_prysm_v1alpha1_slasher_proto protoreflect.FileDescriptor
+var File_proto_qrysm_v1alpha1_slasher_proto protoreflect.FileDescriptor
 
-var file_proto_prysm_v1alpha1_slasher_proto_rawDesc = []byte{
-	0x0a, 0x22, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
+var file_proto_qrysm_v1alpha1_slasher_proto_rawDesc = []byte{
+	0x0a, 0x22, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x73, 0x6c, 0x61, 0x73, 0x68, 0x65, 0x72, 0x2e, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x14, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e,
 	0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x1a, 0x1c, 0x70, 0x72, 0x6f, 0x74,
@@ -117,7 +117,7 @@ var file_proto_prysm_v1alpha1_slasher_proto_rawDesc = []byte{
 	0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x42, 0x0c, 0x53, 0x6c, 0x61,
 	0x73, 0x68, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x34, 0x67, 0x69, 0x74,
 	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x74, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x2f, 0x71,
-	0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x34, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72,
+	0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x34, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72,
 	0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x3b, 0x7a, 0x6f, 0x6e,
 	0x64, 0xaa, 0x02, 0x14, 0x54, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x2e,
 	0x56, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0xca, 0x02, 0x14, 0x54, 0x68, 0x65, 0x51, 0x52,
@@ -126,22 +126,22 @@ var file_proto_prysm_v1alpha1_slasher_proto_rawDesc = []byte{
 }
 
 var (
-	file_proto_prysm_v1alpha1_slasher_proto_rawDescOnce sync.Once
-	file_proto_prysm_v1alpha1_slasher_proto_rawDescData = file_proto_prysm_v1alpha1_slasher_proto_rawDesc
+	file_proto_qrysm_v1alpha1_slasher_proto_rawDescOnce sync.Once
+	file_proto_qrysm_v1alpha1_slasher_proto_rawDescData = file_proto_qrysm_v1alpha1_slasher_proto_rawDesc
 )
 
-func file_proto_prysm_v1alpha1_slasher_proto_rawDescGZIP() []byte {
-	file_proto_prysm_v1alpha1_slasher_proto_rawDescOnce.Do(func() {
-		file_proto_prysm_v1alpha1_slasher_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_prysm_v1alpha1_slasher_proto_rawDescData)
+func file_proto_qrysm_v1alpha1_slasher_proto_rawDescGZIP() []byte {
+	file_proto_qrysm_v1alpha1_slasher_proto_rawDescOnce.Do(func() {
+		file_proto_qrysm_v1alpha1_slasher_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_qrysm_v1alpha1_slasher_proto_rawDescData)
 	})
-	return file_proto_prysm_v1alpha1_slasher_proto_rawDescData
+	return file_proto_qrysm_v1alpha1_slasher_proto_rawDescData
 }
 
-var file_proto_prysm_v1alpha1_slasher_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_proto_prysm_v1alpha1_slasher_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_slasher_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_proto_qrysm_v1alpha1_slasher_proto_goTypes = []interface{}{
 	(*HighestAttestation)(nil), // 0: theqrl.zond.v1alpha1.HighestAttestation
 }
-var file_proto_prysm_v1alpha1_slasher_proto_depIdxs = []int32{
+var file_proto_qrysm_v1alpha1_slasher_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -149,13 +149,13 @@ var file_proto_prysm_v1alpha1_slasher_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_proto_prysm_v1alpha1_slasher_proto_init() }
-func file_proto_prysm_v1alpha1_slasher_proto_init() {
-	if File_proto_prysm_v1alpha1_slasher_proto != nil {
+func init() { file_proto_qrysm_v1alpha1_slasher_proto_init() }
+func file_proto_qrysm_v1alpha1_slasher_proto_init() {
+	if File_proto_qrysm_v1alpha1_slasher_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_prysm_v1alpha1_slasher_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_slasher_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*HighestAttestation); i {
 			case 0:
 				return &v.state
@@ -172,18 +172,18 @@ func file_proto_prysm_v1alpha1_slasher_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_prysm_v1alpha1_slasher_proto_rawDesc,
+			RawDescriptor: file_proto_qrysm_v1alpha1_slasher_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_proto_prysm_v1alpha1_slasher_proto_goTypes,
-		DependencyIndexes: file_proto_prysm_v1alpha1_slasher_proto_depIdxs,
-		MessageInfos:      file_proto_prysm_v1alpha1_slasher_proto_msgTypes,
+		GoTypes:           file_proto_qrysm_v1alpha1_slasher_proto_goTypes,
+		DependencyIndexes: file_proto_qrysm_v1alpha1_slasher_proto_depIdxs,
+		MessageInfos:      file_proto_qrysm_v1alpha1_slasher_proto_msgTypes,
 	}.Build()
-	File_proto_prysm_v1alpha1_slasher_proto = out.File
-	file_proto_prysm_v1alpha1_slasher_proto_rawDesc = nil
-	file_proto_prysm_v1alpha1_slasher_proto_goTypes = nil
-	file_proto_prysm_v1alpha1_slasher_proto_depIdxs = nil
+	File_proto_qrysm_v1alpha1_slasher_proto = out.File
+	file_proto_qrysm_v1alpha1_slasher_proto_rawDesc = nil
+	file_proto_qrysm_v1alpha1_slasher_proto_goTypes = nil
+	file_proto_qrysm_v1alpha1_slasher_proto_depIdxs = nil
 }

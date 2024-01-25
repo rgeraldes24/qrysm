@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.30.0
 // 	protoc        v4.23.3
-// source: proto/prysm/v1alpha1/beacon_chain.proto
+// source: proto/qrysm/v1alpha1/beacon_chain.proto
 
 package zond
 
@@ -62,11 +62,11 @@ func (x SetAction) String() string {
 }
 
 func (SetAction) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_enumTypes[0].Descriptor()
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_enumTypes[0].Descriptor()
 }
 
 func (SetAction) Type() protoreflect.EnumType {
-	return &file_proto_prysm_v1alpha1_beacon_chain_proto_enumTypes[0]
+	return &file_proto_qrysm_v1alpha1_beacon_chain_proto_enumTypes[0]
 }
 
 func (x SetAction) Number() protoreflect.EnumNumber {
@@ -75,10 +75,10 @@ func (x SetAction) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SetAction.Descriptor instead.
 func (SetAction) EnumDescriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{0}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{0}
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 type ValidatorChangeSet struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -91,7 +91,7 @@ type ValidatorChangeSet struct {
 func (x *ValidatorChangeSet) Reset() {
 	*x = ValidatorChangeSet{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[0]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -104,7 +104,7 @@ func (x *ValidatorChangeSet) String() string {
 func (*ValidatorChangeSet) ProtoMessage() {}
 
 func (x *ValidatorChangeSet) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[0]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -117,7 +117,7 @@ func (x *ValidatorChangeSet) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorChangeSet.ProtoReflect.Descriptor instead.
 func (*ValidatorChangeSet) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{0}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ValidatorChangeSet) GetAction() SetAction {
@@ -151,7 +151,7 @@ type ListIndexedAttestationsRequest struct {
 func (x *ListIndexedAttestationsRequest) Reset() {
 	*x = ListIndexedAttestationsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[1]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -164,7 +164,7 @@ func (x *ListIndexedAttestationsRequest) String() string {
 func (*ListIndexedAttestationsRequest) ProtoMessage() {}
 
 func (x *ListIndexedAttestationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[1]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -177,7 +177,7 @@ func (x *ListIndexedAttestationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListIndexedAttestationsRequest.ProtoReflect.Descriptor instead.
 func (*ListIndexedAttestationsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{1}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{1}
 }
 
 func (m *ListIndexedAttestationsRequest) GetQueryFilter() isListIndexedAttestationsRequest_QueryFilter {
@@ -248,7 +248,7 @@ type ListAttestationsRequest struct {
 func (x *ListAttestationsRequest) Reset() {
 	*x = ListAttestationsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[2]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -261,7 +261,7 @@ func (x *ListAttestationsRequest) String() string {
 func (*ListAttestationsRequest) ProtoMessage() {}
 
 func (x *ListAttestationsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[2]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -274,7 +274,7 @@ func (x *ListAttestationsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAttestationsRequest.ProtoReflect.Descriptor instead.
 func (*ListAttestationsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{2}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{2}
 }
 
 func (m *ListAttestationsRequest) GetQueryFilter() isListAttestationsRequest_QueryFilter {
@@ -341,7 +341,7 @@ type ListAttestationsResponse struct {
 func (x *ListAttestationsResponse) Reset() {
 	*x = ListAttestationsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[3]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -354,7 +354,7 @@ func (x *ListAttestationsResponse) String() string {
 func (*ListAttestationsResponse) ProtoMessage() {}
 
 func (x *ListAttestationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[3]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -367,7 +367,7 @@ func (x *ListAttestationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAttestationsResponse.ProtoReflect.Descriptor instead.
 func (*ListAttestationsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{3}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListAttestationsResponse) GetAttestations() []*Attestation {
@@ -404,7 +404,7 @@ type ListIndexedAttestationsResponse struct {
 func (x *ListIndexedAttestationsResponse) Reset() {
 	*x = ListIndexedAttestationsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[4]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -417,7 +417,7 @@ func (x *ListIndexedAttestationsResponse) String() string {
 func (*ListIndexedAttestationsResponse) ProtoMessage() {}
 
 func (x *ListIndexedAttestationsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[4]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -430,7 +430,7 @@ func (x *ListIndexedAttestationsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListIndexedAttestationsResponse.ProtoReflect.Descriptor instead.
 func (*ListIndexedAttestationsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{4}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListIndexedAttestationsResponse) GetIndexedAttestations() []*IndexedAttestation {
@@ -473,7 +473,7 @@ type ListBlocksRequest struct {
 func (x *ListBlocksRequest) Reset() {
 	*x = ListBlocksRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[5]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -486,7 +486,7 @@ func (x *ListBlocksRequest) String() string {
 func (*ListBlocksRequest) ProtoMessage() {}
 
 func (x *ListBlocksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[5]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -499,7 +499,7 @@ func (x *ListBlocksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBlocksRequest.ProtoReflect.Descriptor instead.
 func (*ListBlocksRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{5}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{5}
 }
 
 func (m *ListBlocksRequest) GetQueryFilter() isListBlocksRequest_QueryFilter {
@@ -592,7 +592,7 @@ type ListBeaconBlocksResponse struct {
 func (x *ListBeaconBlocksResponse) Reset() {
 	*x = ListBeaconBlocksResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[6]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -605,7 +605,7 @@ func (x *ListBeaconBlocksResponse) String() string {
 func (*ListBeaconBlocksResponse) ProtoMessage() {}
 
 func (x *ListBeaconBlocksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[6]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -618,7 +618,7 @@ func (x *ListBeaconBlocksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListBeaconBlocksResponse.ProtoReflect.Descriptor instead.
 func (*ListBeaconBlocksResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{6}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ListBeaconBlocksResponse) GetBlockContainers() []*BeaconBlockContainer {
@@ -665,7 +665,7 @@ type BeaconBlockContainer struct {
 func (x *BeaconBlockContainer) Reset() {
 	*x = BeaconBlockContainer{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[7]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -678,7 +678,7 @@ func (x *BeaconBlockContainer) String() string {
 func (*BeaconBlockContainer) ProtoMessage() {}
 
 func (x *BeaconBlockContainer) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[7]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -691,7 +691,7 @@ func (x *BeaconBlockContainer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconBlockContainer.ProtoReflect.Descriptor instead.
 func (*BeaconBlockContainer) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{7}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *BeaconBlockContainer) GetBlockRoot() []byte {
@@ -846,7 +846,7 @@ type ChainHead struct {
 func (x *ChainHead) Reset() {
 	*x = ChainHead{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[8]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -859,7 +859,7 @@ func (x *ChainHead) String() string {
 func (*ChainHead) ProtoMessage() {}
 
 func (x *ChainHead) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[8]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -872,7 +872,7 @@ func (x *ChainHead) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChainHead.ProtoReflect.Descriptor instead.
 func (*ChainHead) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{8}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ChainHead) GetHeadSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -981,7 +981,7 @@ type ListCommitteesRequest struct {
 func (x *ListCommitteesRequest) Reset() {
 	*x = ListCommitteesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[9]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -994,7 +994,7 @@ func (x *ListCommitteesRequest) String() string {
 func (*ListCommitteesRequest) ProtoMessage() {}
 
 func (x *ListCommitteesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[9]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1007,7 +1007,7 @@ func (x *ListCommitteesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCommitteesRequest.ProtoReflect.Descriptor instead.
 func (*ListCommitteesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{9}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{9}
 }
 
 func (m *ListCommitteesRequest) GetQueryFilter() isListCommitteesRequest_QueryFilter {
@@ -1060,7 +1060,7 @@ type BeaconCommittees struct {
 func (x *BeaconCommittees) Reset() {
 	*x = BeaconCommittees{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[10]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1073,7 +1073,7 @@ func (x *BeaconCommittees) String() string {
 func (*BeaconCommittees) ProtoMessage() {}
 
 func (x *BeaconCommittees) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[10]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1086,7 +1086,7 @@ func (x *BeaconCommittees) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconCommittees.ProtoReflect.Descriptor instead.
 func (*BeaconCommittees) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{10}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *BeaconCommittees) GetEpoch() github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch {
@@ -1129,7 +1129,7 @@ type ListValidatorBalancesRequest struct {
 func (x *ListValidatorBalancesRequest) Reset() {
 	*x = ListValidatorBalancesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[11]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1142,7 +1142,7 @@ func (x *ListValidatorBalancesRequest) String() string {
 func (*ListValidatorBalancesRequest) ProtoMessage() {}
 
 func (x *ListValidatorBalancesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[11]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1155,7 +1155,7 @@ func (x *ListValidatorBalancesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListValidatorBalancesRequest.ProtoReflect.Descriptor instead.
 func (*ListValidatorBalancesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{11}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{11}
 }
 
 func (m *ListValidatorBalancesRequest) GetQueryFilter() isListValidatorBalancesRequest_QueryFilter {
@@ -1237,7 +1237,7 @@ type ValidatorBalances struct {
 func (x *ValidatorBalances) Reset() {
 	*x = ValidatorBalances{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[12]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1250,7 +1250,7 @@ func (x *ValidatorBalances) String() string {
 func (*ValidatorBalances) ProtoMessage() {}
 
 func (x *ValidatorBalances) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[12]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1263,7 +1263,7 @@ func (x *ValidatorBalances) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorBalances.ProtoReflect.Descriptor instead.
 func (*ValidatorBalances) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{12}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ValidatorBalances) GetEpoch() github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch {
@@ -1314,7 +1314,7 @@ type ListValidatorsRequest struct {
 func (x *ListValidatorsRequest) Reset() {
 	*x = ListValidatorsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[13]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1327,7 +1327,7 @@ func (x *ListValidatorsRequest) String() string {
 func (*ListValidatorsRequest) ProtoMessage() {}
 
 func (x *ListValidatorsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[13]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1340,7 +1340,7 @@ func (x *ListValidatorsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListValidatorsRequest.ProtoReflect.Descriptor instead.
 func (*ListValidatorsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{13}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{13}
 }
 
 func (m *ListValidatorsRequest) GetQueryFilter() isListValidatorsRequest_QueryFilter {
@@ -1430,7 +1430,7 @@ type GetValidatorRequest struct {
 func (x *GetValidatorRequest) Reset() {
 	*x = GetValidatorRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[14]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1443,7 +1443,7 @@ func (x *GetValidatorRequest) String() string {
 func (*GetValidatorRequest) ProtoMessage() {}
 
 func (x *GetValidatorRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[14]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1456,7 +1456,7 @@ func (x *GetValidatorRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetValidatorRequest.ProtoReflect.Descriptor instead.
 func (*GetValidatorRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{14}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{14}
 }
 
 func (m *GetValidatorRequest) GetQueryFilter() isGetValidatorRequest_QueryFilter {
@@ -1510,7 +1510,7 @@ type Validators struct {
 func (x *Validators) Reset() {
 	*x = Validators{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[15]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1523,7 +1523,7 @@ func (x *Validators) String() string {
 func (*Validators) ProtoMessage() {}
 
 func (x *Validators) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[15]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1536,7 +1536,7 @@ func (x *Validators) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Validators.ProtoReflect.Descriptor instead.
 func (*Validators) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{15}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *Validators) GetEpoch() github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch {
@@ -1582,7 +1582,7 @@ type GetValidatorActiveSetChangesRequest struct {
 func (x *GetValidatorActiveSetChangesRequest) Reset() {
 	*x = GetValidatorActiveSetChangesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[16]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1595,7 +1595,7 @@ func (x *GetValidatorActiveSetChangesRequest) String() string {
 func (*GetValidatorActiveSetChangesRequest) ProtoMessage() {}
 
 func (x *GetValidatorActiveSetChangesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[16]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1608,7 +1608,7 @@ func (x *GetValidatorActiveSetChangesRequest) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use GetValidatorActiveSetChangesRequest.ProtoReflect.Descriptor instead.
 func (*GetValidatorActiveSetChangesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{16}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{16}
 }
 
 func (m *GetValidatorActiveSetChangesRequest) GetQueryFilter() isGetValidatorActiveSetChangesRequest_QueryFilter {
@@ -1669,7 +1669,7 @@ type ActiveSetChanges struct {
 func (x *ActiveSetChanges) Reset() {
 	*x = ActiveSetChanges{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[17]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1682,7 +1682,7 @@ func (x *ActiveSetChanges) String() string {
 func (*ActiveSetChanges) ProtoMessage() {}
 
 func (x *ActiveSetChanges) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[17]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1695,7 +1695,7 @@ func (x *ActiveSetChanges) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ActiveSetChanges.ProtoReflect.Descriptor instead.
 func (*ActiveSetChanges) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{17}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *ActiveSetChanges) GetEpoch() github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch {
@@ -1766,7 +1766,7 @@ type ValidatorPerformanceRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 	PublicKeys [][]byte                                                               `protobuf:"bytes,1,rep,name=public_keys,json=publicKeys,proto3" json:"public_keys,omitempty"`
 	Indices    []github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex `protobuf:"varint,2,rep,packed,name=indices,proto3" json:"indices,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"`
 }
@@ -1774,7 +1774,7 @@ type ValidatorPerformanceRequest struct {
 func (x *ValidatorPerformanceRequest) Reset() {
 	*x = ValidatorPerformanceRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[18]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1787,7 +1787,7 @@ func (x *ValidatorPerformanceRequest) String() string {
 func (*ValidatorPerformanceRequest) ProtoMessage() {}
 
 func (x *ValidatorPerformanceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[18]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1800,10 +1800,10 @@ func (x *ValidatorPerformanceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorPerformanceRequest.ProtoReflect.Descriptor instead.
 func (*ValidatorPerformanceRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{18}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{18}
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 func (x *ValidatorPerformanceRequest) GetPublicKeys() [][]byte {
 	if x != nil {
 		return x.PublicKeys
@@ -1824,9 +1824,9 @@ type ValidatorPerformanceResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	CurrentEffectiveBalances []uint64 `protobuf:"varint,1,rep,packed,name=current_effective_balances,json=currentEffectiveBalances,proto3" json:"current_effective_balances,omitempty"`
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 	InclusionSlots []github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot `protobuf:"varint,2,rep,packed,name=inclusion_slots,json=inclusionSlots,proto3" json:"inclusion_slots,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"`
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 	InclusionDistances            []github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot `protobuf:"varint,3,rep,packed,name=inclusion_distances,json=inclusionDistances,proto3" json:"inclusion_distances,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"`
 	CorrectlyVotedSource          []bool                                                       `protobuf:"varint,4,rep,packed,name=correctly_voted_source,json=correctlyVotedSource,proto3" json:"correctly_voted_source,omitempty"`
 	CorrectlyVotedTarget          []bool                                                       `protobuf:"varint,5,rep,packed,name=correctly_voted_target,json=correctlyVotedTarget,proto3" json:"correctly_voted_target,omitempty"`
@@ -1842,7 +1842,7 @@ type ValidatorPerformanceResponse struct {
 func (x *ValidatorPerformanceResponse) Reset() {
 	*x = ValidatorPerformanceResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[19]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1855,7 +1855,7 @@ func (x *ValidatorPerformanceResponse) String() string {
 func (*ValidatorPerformanceResponse) ProtoMessage() {}
 
 func (x *ValidatorPerformanceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[19]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1868,7 +1868,7 @@ func (x *ValidatorPerformanceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorPerformanceResponse.ProtoReflect.Descriptor instead.
 func (*ValidatorPerformanceResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{19}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ValidatorPerformanceResponse) GetCurrentEffectiveBalances() []uint64 {
@@ -1878,7 +1878,7 @@ func (x *ValidatorPerformanceResponse) GetCurrentEffectiveBalances() []uint64 {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 func (x *ValidatorPerformanceResponse) GetInclusionSlots() []github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.InclusionSlots
@@ -1886,7 +1886,7 @@ func (x *ValidatorPerformanceResponse) GetInclusionSlots() []github_com_theQRL_q
 	return []github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot(nil)
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 func (x *ValidatorPerformanceResponse) GetInclusionDistances() []github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.InclusionDistances
@@ -1957,16 +1957,16 @@ func (x *ValidatorPerformanceResponse) GetInactivityScores() []uint64 {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 type ValidatorQueue struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	ChurnLimit uint64 `protobuf:"varint,1,opt,name=churn_limit,json=churnLimit,proto3" json:"churn_limit,omitempty"`
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 	ActivationPublicKeys [][]byte `protobuf:"bytes,2,rep,name=activation_public_keys,json=activationPublicKeys,proto3" json:"activation_public_keys,omitempty" ssz-size:"?,48"`
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 	ExitPublicKeys             [][]byte                                                               `protobuf:"bytes,3,rep,name=exit_public_keys,json=exitPublicKeys,proto3" json:"exit_public_keys,omitempty" ssz-size:"?,48"`
 	ActivationValidatorIndices []github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex `protobuf:"varint,4,rep,packed,name=activation_validator_indices,json=activationValidatorIndices,proto3" json:"activation_validator_indices,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"`
 	ExitValidatorIndices       []github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex `protobuf:"varint,5,rep,packed,name=exit_validator_indices,json=exitValidatorIndices,proto3" json:"exit_validator_indices,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"`
@@ -1975,7 +1975,7 @@ type ValidatorQueue struct {
 func (x *ValidatorQueue) Reset() {
 	*x = ValidatorQueue{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[20]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1988,7 +1988,7 @@ func (x *ValidatorQueue) String() string {
 func (*ValidatorQueue) ProtoMessage() {}
 
 func (x *ValidatorQueue) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[20]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2001,7 +2001,7 @@ func (x *ValidatorQueue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorQueue.ProtoReflect.Descriptor instead.
 func (*ValidatorQueue) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{20}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ValidatorQueue) GetChurnLimit() uint64 {
@@ -2011,7 +2011,7 @@ func (x *ValidatorQueue) GetChurnLimit() uint64 {
 	return 0
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 func (x *ValidatorQueue) GetActivationPublicKeys() [][]byte {
 	if x != nil {
 		return x.ActivationPublicKeys
@@ -2019,7 +2019,7 @@ func (x *ValidatorQueue) GetActivationPublicKeys() [][]byte {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 func (x *ValidatorQueue) GetExitPublicKeys() [][]byte {
 	if x != nil {
 		return x.ExitPublicKeys
@@ -2060,7 +2060,7 @@ type ListValidatorAssignmentsRequest struct {
 func (x *ListValidatorAssignmentsRequest) Reset() {
 	*x = ListValidatorAssignmentsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[21]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2073,7 +2073,7 @@ func (x *ListValidatorAssignmentsRequest) String() string {
 func (*ListValidatorAssignmentsRequest) ProtoMessage() {}
 
 func (x *ListValidatorAssignmentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[21]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2086,7 +2086,7 @@ func (x *ListValidatorAssignmentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListValidatorAssignmentsRequest.ProtoReflect.Descriptor instead.
 func (*ListValidatorAssignmentsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{21}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{21}
 }
 
 func (m *ListValidatorAssignmentsRequest) GetQueryFilter() isListValidatorAssignmentsRequest_QueryFilter {
@@ -2168,7 +2168,7 @@ type ValidatorAssignments struct {
 func (x *ValidatorAssignments) Reset() {
 	*x = ValidatorAssignments{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[22]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2181,7 +2181,7 @@ func (x *ValidatorAssignments) String() string {
 func (*ValidatorAssignments) ProtoMessage() {}
 
 func (x *ValidatorAssignments) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[22]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2194,7 +2194,7 @@ func (x *ValidatorAssignments) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorAssignments.ProtoReflect.Descriptor instead.
 func (*ValidatorAssignments) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{22}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ValidatorAssignments) GetEpoch() github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch {
@@ -2225,7 +2225,7 @@ func (x *ValidatorAssignments) GetTotalSize() int32 {
 	return 0
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 type GetValidatorParticipationRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2241,7 +2241,7 @@ type GetValidatorParticipationRequest struct {
 func (x *GetValidatorParticipationRequest) Reset() {
 	*x = GetValidatorParticipationRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[23]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2254,7 +2254,7 @@ func (x *GetValidatorParticipationRequest) String() string {
 func (*GetValidatorParticipationRequest) ProtoMessage() {}
 
 func (x *GetValidatorParticipationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[23]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2267,7 +2267,7 @@ func (x *GetValidatorParticipationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetValidatorParticipationRequest.ProtoReflect.Descriptor instead.
 func (*GetValidatorParticipationRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{23}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{23}
 }
 
 func (m *GetValidatorParticipationRequest) GetQueryFilter() isGetValidatorParticipationRequest_QueryFilter {
@@ -2307,7 +2307,7 @@ func (*GetValidatorParticipationRequest_Epoch) isGetValidatorParticipationReques
 
 func (*GetValidatorParticipationRequest_Genesis) isGetValidatorParticipationRequest_QueryFilter() {}
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 type ValidatorParticipationResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2321,7 +2321,7 @@ type ValidatorParticipationResponse struct {
 func (x *ValidatorParticipationResponse) Reset() {
 	*x = ValidatorParticipationResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[24]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2334,7 +2334,7 @@ func (x *ValidatorParticipationResponse) String() string {
 func (*ValidatorParticipationResponse) ProtoMessage() {}
 
 func (x *ValidatorParticipationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[24]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2347,7 +2347,7 @@ func (x *ValidatorParticipationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorParticipationResponse.ProtoReflect.Descriptor instead.
 func (*ValidatorParticipationResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{24}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ValidatorParticipationResponse) GetEpoch() github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch {
@@ -2383,7 +2383,7 @@ type AttestationPoolRequest struct {
 func (x *AttestationPoolRequest) Reset() {
 	*x = AttestationPoolRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[25]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2396,7 +2396,7 @@ func (x *AttestationPoolRequest) String() string {
 func (*AttestationPoolRequest) ProtoMessage() {}
 
 func (x *AttestationPoolRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[25]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2409,7 +2409,7 @@ func (x *AttestationPoolRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttestationPoolRequest.ProtoReflect.Descriptor instead.
 func (*AttestationPoolRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{25}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *AttestationPoolRequest) GetPageSize() int32 {
@@ -2439,7 +2439,7 @@ type AttestationPoolResponse struct {
 func (x *AttestationPoolResponse) Reset() {
 	*x = AttestationPoolResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[26]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2452,7 +2452,7 @@ func (x *AttestationPoolResponse) String() string {
 func (*AttestationPoolResponse) ProtoMessage() {}
 
 func (x *AttestationPoolResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[26]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2465,7 +2465,7 @@ func (x *AttestationPoolResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttestationPoolResponse.ProtoReflect.Descriptor instead.
 func (*AttestationPoolResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{26}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *AttestationPoolResponse) GetAttestations() []*Attestation {
@@ -2500,7 +2500,7 @@ type BeaconConfig struct {
 func (x *BeaconConfig) Reset() {
 	*x = BeaconConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[27]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2513,7 +2513,7 @@ func (x *BeaconConfig) String() string {
 func (*BeaconConfig) ProtoMessage() {}
 
 func (x *BeaconConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[27]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2526,7 +2526,7 @@ func (x *BeaconConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconConfig.ProtoReflect.Descriptor instead.
 func (*BeaconConfig) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{27}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *BeaconConfig) GetConfig() map[string]string {
@@ -2547,7 +2547,7 @@ type SubmitSlashingResponse struct {
 func (x *SubmitSlashingResponse) Reset() {
 	*x = SubmitSlashingResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[28]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2560,7 +2560,7 @@ func (x *SubmitSlashingResponse) String() string {
 func (*SubmitSlashingResponse) ProtoMessage() {}
 
 func (x *SubmitSlashingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[28]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2573,7 +2573,7 @@ func (x *SubmitSlashingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitSlashingResponse.ProtoReflect.Descriptor instead.
 func (*SubmitSlashingResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{28}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *SubmitSlashingResponse) GetSlashedIndices() []github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex {
@@ -2596,7 +2596,7 @@ type IndividualVotesRequest struct {
 func (x *IndividualVotesRequest) Reset() {
 	*x = IndividualVotesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[29]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2609,7 +2609,7 @@ func (x *IndividualVotesRequest) String() string {
 func (*IndividualVotesRequest) ProtoMessage() {}
 
 func (x *IndividualVotesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[29]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2622,7 +2622,7 @@ func (x *IndividualVotesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IndividualVotesRequest.ProtoReflect.Descriptor instead.
 func (*IndividualVotesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{29}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *IndividualVotesRequest) GetEpoch() github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch {
@@ -2657,7 +2657,7 @@ type IndividualVotesRespond struct {
 func (x *IndividualVotesRespond) Reset() {
 	*x = IndividualVotesRespond{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[30]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2670,7 +2670,7 @@ func (x *IndividualVotesRespond) String() string {
 func (*IndividualVotesRespond) ProtoMessage() {}
 
 func (x *IndividualVotesRespond) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[30]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2683,7 +2683,7 @@ func (x *IndividualVotesRespond) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IndividualVotesRespond.ProtoReflect.Descriptor instead.
 func (*IndividualVotesRespond) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{30}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *IndividualVotesRespond) GetIndividualVotes() []*IndividualVotesRespond_IndividualVote {
@@ -2704,7 +2704,7 @@ type BeaconCommittees_CommitteeItem struct {
 func (x *BeaconCommittees_CommitteeItem) Reset() {
 	*x = BeaconCommittees_CommitteeItem{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[31]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2717,7 +2717,7 @@ func (x *BeaconCommittees_CommitteeItem) String() string {
 func (*BeaconCommittees_CommitteeItem) ProtoMessage() {}
 
 func (x *BeaconCommittees_CommitteeItem) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[31]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2730,7 +2730,7 @@ func (x *BeaconCommittees_CommitteeItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconCommittees_CommitteeItem.ProtoReflect.Descriptor instead.
 func (*BeaconCommittees_CommitteeItem) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{10, 0}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{10, 0}
 }
 
 func (x *BeaconCommittees_CommitteeItem) GetValidatorIndices() []github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex {
@@ -2751,7 +2751,7 @@ type BeaconCommittees_CommitteesList struct {
 func (x *BeaconCommittees_CommitteesList) Reset() {
 	*x = BeaconCommittees_CommitteesList{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[32]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2764,7 +2764,7 @@ func (x *BeaconCommittees_CommitteesList) String() string {
 func (*BeaconCommittees_CommitteesList) ProtoMessage() {}
 
 func (x *BeaconCommittees_CommitteesList) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[32]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2777,7 +2777,7 @@ func (x *BeaconCommittees_CommitteesList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconCommittees_CommitteesList.ProtoReflect.Descriptor instead.
 func (*BeaconCommittees_CommitteesList) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{10, 1}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{10, 1}
 }
 
 func (x *BeaconCommittees_CommitteesList) GetCommittees() []*BeaconCommittees_CommitteeItem {
@@ -2801,7 +2801,7 @@ type ValidatorBalances_Balance struct {
 func (x *ValidatorBalances_Balance) Reset() {
 	*x = ValidatorBalances_Balance{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[34]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2814,7 +2814,7 @@ func (x *ValidatorBalances_Balance) String() string {
 func (*ValidatorBalances_Balance) ProtoMessage() {}
 
 func (x *ValidatorBalances_Balance) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[34]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2827,7 +2827,7 @@ func (x *ValidatorBalances_Balance) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidatorBalances_Balance.ProtoReflect.Descriptor instead.
 func (*ValidatorBalances_Balance) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{12, 0}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{12, 0}
 }
 
 func (x *ValidatorBalances_Balance) GetPublicKey() []byte {
@@ -2870,7 +2870,7 @@ type Validators_ValidatorContainer struct {
 func (x *Validators_ValidatorContainer) Reset() {
 	*x = Validators_ValidatorContainer{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[35]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2883,7 +2883,7 @@ func (x *Validators_ValidatorContainer) String() string {
 func (*Validators_ValidatorContainer) ProtoMessage() {}
 
 func (x *Validators_ValidatorContainer) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[35]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2896,7 +2896,7 @@ func (x *Validators_ValidatorContainer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Validators_ValidatorContainer.ProtoReflect.Descriptor instead.
 func (*Validators_ValidatorContainer) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{15, 0}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{15, 0}
 }
 
 func (x *Validators_ValidatorContainer) GetIndex() github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex {
@@ -2922,7 +2922,7 @@ type ValidatorAssignments_CommitteeAssignment struct {
 	CommitteeIndex   github_com_theQRL_qrysm_v4_consensus_types_primitives.CommitteeIndex   `protobuf:"varint,2,opt,name=committee_index,json=committeeIndex,proto3" json:"committee_index,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.CommitteeIndex"`
 	AttesterSlot     github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot             `protobuf:"varint,3,opt,name=attester_slot,json=attesterSlot,proto3" json:"attester_slot,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"`
 	ProposerSlots    []github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot           `protobuf:"varint,4,rep,packed,name=proposer_slots,json=proposerSlots,proto3" json:"proposer_slots,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"`
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 	PublicKey      []byte                                                               `protobuf:"bytes,5,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty" ssz-size:"2592"`
 	ValidatorIndex github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex `protobuf:"varint,6,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"`
 }
@@ -2930,7 +2930,7 @@ type ValidatorAssignments_CommitteeAssignment struct {
 func (x *ValidatorAssignments_CommitteeAssignment) Reset() {
 	*x = ValidatorAssignments_CommitteeAssignment{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[36]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2943,7 +2943,7 @@ func (x *ValidatorAssignments_CommitteeAssignment) String() string {
 func (*ValidatorAssignments_CommitteeAssignment) ProtoMessage() {}
 
 func (x *ValidatorAssignments_CommitteeAssignment) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[36]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2956,7 +2956,7 @@ func (x *ValidatorAssignments_CommitteeAssignment) ProtoReflect() protoreflect.M
 
 // Deprecated: Use ValidatorAssignments_CommitteeAssignment.ProtoReflect.Descriptor instead.
 func (*ValidatorAssignments_CommitteeAssignment) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{22, 0}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{22, 0}
 }
 
 func (x *ValidatorAssignments_CommitteeAssignment) GetBeaconCommittees() []github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex {
@@ -2987,7 +2987,7 @@ func (x *ValidatorAssignments_CommitteeAssignment) GetProposerSlots() []github_c
 	return []github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot(nil)
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 func (x *ValidatorAssignments_CommitteeAssignment) GetPublicKey() []byte {
 	if x != nil {
 		return x.PublicKey
@@ -3020,9 +3020,9 @@ type IndividualVotesRespond_IndividualVote struct {
 	IsPreviousEpochTargetAttester    bool                                                                 `protobuf:"varint,11,opt,name=is_previous_epoch_target_attester,json=isPreviousEpochTargetAttester,proto3" json:"is_previous_epoch_target_attester,omitempty"`
 	IsPreviousEpochHeadAttester      bool                                                                 `protobuf:"varint,12,opt,name=is_previous_epoch_head_attester,json=isPreviousEpochHeadAttester,proto3" json:"is_previous_epoch_head_attester,omitempty"`
 	CurrentEpochEffectiveBalanceGwei uint64                                                               `protobuf:"varint,13,opt,name=current_epoch_effective_balance_gwei,json=currentEpochEffectiveBalanceGwei,proto3" json:"current_epoch_effective_balance_gwei,omitempty"`
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 	InclusionSlot github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot `protobuf:"varint,14,opt,name=inclusion_slot,json=inclusionSlot,proto3" json:"inclusion_slot,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"`
-	// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+	// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 	InclusionDistance github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot `protobuf:"varint,15,opt,name=inclusion_distance,json=inclusionDistance,proto3" json:"inclusion_distance,omitempty" cast-type:"github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"`
 	InactivityScore   uint64                                                     `protobuf:"varint,16,opt,name=inactivity_score,json=inactivityScore,proto3" json:"inactivity_score,omitempty"`
 }
@@ -3030,7 +3030,7 @@ type IndividualVotesRespond_IndividualVote struct {
 func (x *IndividualVotesRespond_IndividualVote) Reset() {
 	*x = IndividualVotesRespond_IndividualVote{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[38]
+		mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3043,7 +3043,7 @@ func (x *IndividualVotesRespond_IndividualVote) String() string {
 func (*IndividualVotesRespond_IndividualVote) ProtoMessage() {}
 
 func (x *IndividualVotesRespond_IndividualVote) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[38]
+	mi := &file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3056,7 +3056,7 @@ func (x *IndividualVotesRespond_IndividualVote) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use IndividualVotesRespond_IndividualVote.ProtoReflect.Descriptor instead.
 func (*IndividualVotesRespond_IndividualVote) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{30, 0}
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP(), []int{30, 0}
 }
 
 func (x *IndividualVotesRespond_IndividualVote) GetEpoch() github_com_theQRL_qrysm_v4_consensus_types_primitives.Epoch {
@@ -3150,7 +3150,7 @@ func (x *IndividualVotesRespond_IndividualVote) GetCurrentEpochEffectiveBalanceG
 	return 0
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 func (x *IndividualVotesRespond_IndividualVote) GetInclusionSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.InclusionSlot
@@ -3158,7 +3158,7 @@ func (x *IndividualVotesRespond_IndividualVote) GetInclusionSlot() github_com_th
 	return github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot(0)
 }
 
-// Deprecated: Marked as deprecated in proto/prysm/v1alpha1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrysm/v1alpha1/beacon_chain.proto.
 func (x *IndividualVotesRespond_IndividualVote) GetInclusionDistance() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
 	if x != nil {
 		return x.InclusionDistance
@@ -3173,10 +3173,10 @@ func (x *IndividualVotesRespond_IndividualVote) GetInactivityScore() uint64 {
 	return 0
 }
 
-var File_proto_prysm_v1alpha1_beacon_chain_proto protoreflect.FileDescriptor
+var File_proto_qrysm_v1alpha1_beacon_chain_proto protoreflect.FileDescriptor
 
-var file_proto_prysm_v1alpha1_beacon_chain_proto_rawDesc = []byte{
-	0x0a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
+var file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDesc = []byte{
+	0x0a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x62, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x5f, 0x63, 0x68,
 	0x61, 0x69, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x14, 0x74, 0x68, 0x65, 0x71, 0x72,
 	0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x1a,
@@ -3186,12 +3186,12 @@ var file_proto_prysm_v1alpha1_beacon_chain_proto_rawDesc = []byte{
 	0x6d, 0x70, 0x74, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1c, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x2f, 0x7a, 0x6f, 0x6e, 0x64, 0x2f, 0x65, 0x78, 0x74, 0x2f, 0x6f, 0x70, 0x74, 0x69, 0x6f,
 	0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x26, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f,
-	0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x61,
+	0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x61,
 	0x74, 0x74, 0x65, 0x73, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x1a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
+	0x1a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x62, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x5f, 0x62, 0x6c,
 	0x6f, 0x63, 0x6b, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x24, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f,
+	0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f,
 	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22,
 	0x72, 0x0a, 0x12, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x43, 0x68, 0x61, 0x6e,
 	0x67, 0x65, 0x53, 0x65, 0x74, 0x12, 0x37, 0x0a, 0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x18,
@@ -4192,7 +4192,7 @@ var file_proto_prysm_v1alpha1_beacon_chain_proto_rawDesc = []byte{
 	0x42, 0x10, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x50, 0x72, 0x6f,
 	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
 	0x2f, 0x74, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x34,
-	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61,
 	0x6c, 0x70, 0x68, 0x61, 0x31, 0x3b, 0x7a, 0x6f, 0x6e, 0x64, 0xaa, 0x02, 0x14, 0x54, 0x68, 0x65,
 	0x51, 0x52, 0x4c, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61,
 	0x31, 0xca, 0x02, 0x14, 0x54, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x5c, 0x5a, 0x6f, 0x6e, 0x64, 0x5c,
@@ -4200,20 +4200,20 @@ var file_proto_prysm_v1alpha1_beacon_chain_proto_rawDesc = []byte{
 }
 
 var (
-	file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescOnce sync.Once
-	file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescData = file_proto_prysm_v1alpha1_beacon_chain_proto_rawDesc
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescOnce sync.Once
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescData = file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDesc
 )
 
-func file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescGZIP() []byte {
-	file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescOnce.Do(func() {
-		file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescData)
+func file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP() []byte {
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescOnce.Do(func() {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescData)
 	})
-	return file_proto_prysm_v1alpha1_beacon_chain_proto_rawDescData
+	return file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescData
 }
 
-var file_proto_prysm_v1alpha1_beacon_chain_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes = make([]protoimpl.MessageInfo, 39)
-var file_proto_prysm_v1alpha1_beacon_chain_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_beacon_chain_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes = make([]protoimpl.MessageInfo, 39)
+var file_proto_qrysm_v1alpha1_beacon_chain_proto_goTypes = []interface{}{
 	(SetAction)(0),                                   // 0: theqrl.zond.v1alpha1.SetAction
 	(*ValidatorChangeSet)(nil),                       // 1: theqrl.zond.v1alpha1.ValidatorChangeSet
 	(*ListIndexedAttestationsRequest)(nil),           // 2: theqrl.zond.v1alpha1.ListIndexedAttestationsRequest
@@ -4272,7 +4272,7 @@ var file_proto_prysm_v1alpha1_beacon_chain_proto_goTypes = []interface{}{
 	(*ProposerSlashing)(nil),                      // 55: theqrl.zond.v1alpha1.ProposerSlashing
 	(*ValidatorInfo)(nil),                         // 56: theqrl.zond.v1alpha1.ValidatorInfo
 }
-var file_proto_prysm_v1alpha1_beacon_chain_proto_depIdxs = []int32{
+var file_proto_qrysm_v1alpha1_beacon_chain_proto_depIdxs = []int32{
 	0,  // 0: theqrl.zond.v1alpha1.ValidatorChangeSet.action:type_name -> theqrl.zond.v1alpha1.SetAction
 	40, // 1: theqrl.zond.v1alpha1.ListAttestationsResponse.attestations:type_name -> theqrl.zond.v1alpha1.Attestation
 	41, // 2: theqrl.zond.v1alpha1.ListIndexedAttestationsResponse.indexed_attestations:type_name -> theqrl.zond.v1alpha1.IndexedAttestation
@@ -4349,16 +4349,16 @@ var file_proto_prysm_v1alpha1_beacon_chain_proto_depIdxs = []int32{
 	0,  // [0:23] is the sub-list for field type_name
 }
 
-func init() { file_proto_prysm_v1alpha1_beacon_chain_proto_init() }
-func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
-	if File_proto_prysm_v1alpha1_beacon_chain_proto != nil {
+func init() { file_proto_qrysm_v1alpha1_beacon_chain_proto_init() }
+func file_proto_qrysm_v1alpha1_beacon_chain_proto_init() {
+	if File_proto_qrysm_v1alpha1_beacon_chain_proto != nil {
 		return
 	}
-	file_proto_prysm_v1alpha1_attestation_proto_init()
-	file_proto_prysm_v1alpha1_beacon_block_proto_init()
-	file_proto_prysm_v1alpha1_validator_proto_init()
+	file_proto_qrysm_v1alpha1_attestation_proto_init()
+	file_proto_qrysm_v1alpha1_beacon_block_proto_init()
+	file_proto_qrysm_v1alpha1_validator_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorChangeSet); i {
 			case 0:
 				return &v.state
@@ -4370,7 +4370,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListIndexedAttestationsRequest); i {
 			case 0:
 				return &v.state
@@ -4382,7 +4382,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListAttestationsRequest); i {
 			case 0:
 				return &v.state
@@ -4394,7 +4394,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListAttestationsResponse); i {
 			case 0:
 				return &v.state
@@ -4406,7 +4406,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListIndexedAttestationsResponse); i {
 			case 0:
 				return &v.state
@@ -4418,7 +4418,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListBlocksRequest); i {
 			case 0:
 				return &v.state
@@ -4430,7 +4430,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListBeaconBlocksResponse); i {
 			case 0:
 				return &v.state
@@ -4442,7 +4442,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconBlockContainer); i {
 			case 0:
 				return &v.state
@@ -4454,7 +4454,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ChainHead); i {
 			case 0:
 				return &v.state
@@ -4466,7 +4466,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListCommitteesRequest); i {
 			case 0:
 				return &v.state
@@ -4478,7 +4478,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconCommittees); i {
 			case 0:
 				return &v.state
@@ -4490,7 +4490,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListValidatorBalancesRequest); i {
 			case 0:
 				return &v.state
@@ -4502,7 +4502,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorBalances); i {
 			case 0:
 				return &v.state
@@ -4514,7 +4514,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListValidatorsRequest); i {
 			case 0:
 				return &v.state
@@ -4526,7 +4526,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetValidatorRequest); i {
 			case 0:
 				return &v.state
@@ -4538,7 +4538,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Validators); i {
 			case 0:
 				return &v.state
@@ -4550,7 +4550,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetValidatorActiveSetChangesRequest); i {
 			case 0:
 				return &v.state
@@ -4562,7 +4562,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ActiveSetChanges); i {
 			case 0:
 				return &v.state
@@ -4574,7 +4574,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorPerformanceRequest); i {
 			case 0:
 				return &v.state
@@ -4586,7 +4586,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorPerformanceResponse); i {
 			case 0:
 				return &v.state
@@ -4598,7 +4598,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorQueue); i {
 			case 0:
 				return &v.state
@@ -4610,7 +4610,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListValidatorAssignmentsRequest); i {
 			case 0:
 				return &v.state
@@ -4622,7 +4622,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorAssignments); i {
 			case 0:
 				return &v.state
@@ -4634,7 +4634,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetValidatorParticipationRequest); i {
 			case 0:
 				return &v.state
@@ -4646,7 +4646,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorParticipationResponse); i {
 			case 0:
 				return &v.state
@@ -4658,7 +4658,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AttestationPoolRequest); i {
 			case 0:
 				return &v.state
@@ -4670,7 +4670,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AttestationPoolResponse); i {
 			case 0:
 				return &v.state
@@ -4682,7 +4682,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconConfig); i {
 			case 0:
 				return &v.state
@@ -4694,7 +4694,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SubmitSlashingResponse); i {
 			case 0:
 				return &v.state
@@ -4706,7 +4706,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*IndividualVotesRequest); i {
 			case 0:
 				return &v.state
@@ -4718,7 +4718,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*IndividualVotesRespond); i {
 			case 0:
 				return &v.state
@@ -4730,7 +4730,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconCommittees_CommitteeItem); i {
 			case 0:
 				return &v.state
@@ -4742,7 +4742,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconCommittees_CommitteesList); i {
 			case 0:
 				return &v.state
@@ -4754,7 +4754,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorBalances_Balance); i {
 			case 0:
 				return &v.state
@@ -4766,7 +4766,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Validators_ValidatorContainer); i {
 			case 0:
 				return &v.state
@@ -4778,7 +4778,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ValidatorAssignments_CommitteeAssignment); i {
 			case 0:
 				return &v.state
@@ -4790,7 +4790,7 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*IndividualVotesRespond_IndividualVote); i {
 			case 0:
 				return &v.state
@@ -4803,21 +4803,21 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 			}
 		}
 	}
-	file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[1].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[1].OneofWrappers = []interface{}{
 		(*ListIndexedAttestationsRequest_Epoch)(nil),
 		(*ListIndexedAttestationsRequest_GenesisEpoch)(nil),
 	}
-	file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[2].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[2].OneofWrappers = []interface{}{
 		(*ListAttestationsRequest_Epoch)(nil),
 		(*ListAttestationsRequest_GenesisEpoch)(nil),
 	}
-	file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[5].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[5].OneofWrappers = []interface{}{
 		(*ListBlocksRequest_Root)(nil),
 		(*ListBlocksRequest_Slot)(nil),
 		(*ListBlocksRequest_Epoch)(nil),
 		(*ListBlocksRequest_Genesis)(nil),
 	}
-	file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[7].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[7].OneofWrappers = []interface{}{
 		(*BeaconBlockContainer_Phase0Block)(nil),
 		(*BeaconBlockContainer_AltairBlock)(nil),
 		(*BeaconBlockContainer_BellatrixBlock)(nil),
@@ -4827,31 +4827,31 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 		(*BeaconBlockContainer_DenebBlock)(nil),
 		(*BeaconBlockContainer_BlindedDenebBlock)(nil),
 	}
-	file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[9].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[9].OneofWrappers = []interface{}{
 		(*ListCommitteesRequest_Epoch)(nil),
 		(*ListCommitteesRequest_Genesis)(nil),
 	}
-	file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[11].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[11].OneofWrappers = []interface{}{
 		(*ListValidatorBalancesRequest_Epoch)(nil),
 		(*ListValidatorBalancesRequest_Genesis)(nil),
 	}
-	file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[13].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[13].OneofWrappers = []interface{}{
 		(*ListValidatorsRequest_Epoch)(nil),
 		(*ListValidatorsRequest_Genesis)(nil),
 	}
-	file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[14].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[14].OneofWrappers = []interface{}{
 		(*GetValidatorRequest_Index)(nil),
 		(*GetValidatorRequest_PublicKey)(nil),
 	}
-	file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[16].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[16].OneofWrappers = []interface{}{
 		(*GetValidatorActiveSetChangesRequest_Epoch)(nil),
 		(*GetValidatorActiveSetChangesRequest_Genesis)(nil),
 	}
-	file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[21].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[21].OneofWrappers = []interface{}{
 		(*ListValidatorAssignmentsRequest_Epoch)(nil),
 		(*ListValidatorAssignmentsRequest_Genesis)(nil),
 	}
-	file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes[23].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes[23].OneofWrappers = []interface{}{
 		(*GetValidatorParticipationRequest_Epoch)(nil),
 		(*GetValidatorParticipationRequest_Genesis)(nil),
 	}
@@ -4859,21 +4859,21 @@ func file_proto_prysm_v1alpha1_beacon_chain_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_prysm_v1alpha1_beacon_chain_proto_rawDesc,
+			RawDescriptor: file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDesc,
 			NumEnums:      1,
 			NumMessages:   39,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_prysm_v1alpha1_beacon_chain_proto_goTypes,
-		DependencyIndexes: file_proto_prysm_v1alpha1_beacon_chain_proto_depIdxs,
-		EnumInfos:         file_proto_prysm_v1alpha1_beacon_chain_proto_enumTypes,
-		MessageInfos:      file_proto_prysm_v1alpha1_beacon_chain_proto_msgTypes,
+		GoTypes:           file_proto_qrysm_v1alpha1_beacon_chain_proto_goTypes,
+		DependencyIndexes: file_proto_qrysm_v1alpha1_beacon_chain_proto_depIdxs,
+		EnumInfos:         file_proto_qrysm_v1alpha1_beacon_chain_proto_enumTypes,
+		MessageInfos:      file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes,
 	}.Build()
-	File_proto_prysm_v1alpha1_beacon_chain_proto = out.File
-	file_proto_prysm_v1alpha1_beacon_chain_proto_rawDesc = nil
-	file_proto_prysm_v1alpha1_beacon_chain_proto_goTypes = nil
-	file_proto_prysm_v1alpha1_beacon_chain_proto_depIdxs = nil
+	File_proto_qrysm_v1alpha1_beacon_chain_proto = out.File
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDesc = nil
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_goTypes = nil
+	file_proto_qrysm_v1alpha1_beacon_chain_proto_depIdxs = nil
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -5904,5 +5904,5 @@ var _BeaconChain_serviceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "proto/prysm/v1alpha1/beacon_chain.proto",
+	Metadata: "proto/qrysm/v1alpha1/beacon_chain.proto",
 }

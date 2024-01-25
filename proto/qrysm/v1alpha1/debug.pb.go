@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.30.0
 // 	protoc        v4.23.3
-// source: proto/prysm/v1alpha1/debug.proto
+// source: proto/qrysm/v1alpha1/debug.proto
 
 package zond
 
@@ -62,11 +62,11 @@ func (x LoggingLevelRequest_Level) String() string {
 }
 
 func (LoggingLevelRequest_Level) Descriptor() protoreflect.EnumDescriptor {
-	return file_proto_prysm_v1alpha1_debug_proto_enumTypes[0].Descriptor()
+	return file_proto_qrysm_v1alpha1_debug_proto_enumTypes[0].Descriptor()
 }
 
 func (LoggingLevelRequest_Level) Type() protoreflect.EnumType {
-	return &file_proto_prysm_v1alpha1_debug_proto_enumTypes[0]
+	return &file_proto_qrysm_v1alpha1_debug_proto_enumTypes[0]
 }
 
 func (x LoggingLevelRequest_Level) Number() protoreflect.EnumNumber {
@@ -75,7 +75,7 @@ func (x LoggingLevelRequest_Level) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use LoggingLevelRequest_Level.Descriptor instead.
 func (LoggingLevelRequest_Level) EnumDescriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{5, 0}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{5, 0}
 }
 
 type InclusionSlotRequest struct {
@@ -90,7 +90,7 @@ type InclusionSlotRequest struct {
 func (x *InclusionSlotRequest) Reset() {
 	*x = InclusionSlotRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[0]
+		mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -103,7 +103,7 @@ func (x *InclusionSlotRequest) String() string {
 func (*InclusionSlotRequest) ProtoMessage() {}
 
 func (x *InclusionSlotRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[0]
+	mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -116,7 +116,7 @@ func (x *InclusionSlotRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InclusionSlotRequest.ProtoReflect.Descriptor instead.
 func (*InclusionSlotRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{0}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *InclusionSlotRequest) GetId() uint64 {
@@ -144,7 +144,7 @@ type InclusionSlotResponse struct {
 func (x *InclusionSlotResponse) Reset() {
 	*x = InclusionSlotResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[1]
+		mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -157,7 +157,7 @@ func (x *InclusionSlotResponse) String() string {
 func (*InclusionSlotResponse) ProtoMessage() {}
 
 func (x *InclusionSlotResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[1]
+	mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -170,7 +170,7 @@ func (x *InclusionSlotResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InclusionSlotResponse.ProtoReflect.Descriptor instead.
 func (*InclusionSlotResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{1}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *InclusionSlotResponse) GetSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -195,7 +195,7 @@ type BeaconStateRequest struct {
 func (x *BeaconStateRequest) Reset() {
 	*x = BeaconStateRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[2]
+		mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -208,7 +208,7 @@ func (x *BeaconStateRequest) String() string {
 func (*BeaconStateRequest) ProtoMessage() {}
 
 func (x *BeaconStateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[2]
+	mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -221,7 +221,7 @@ func (x *BeaconStateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconStateRequest.ProtoReflect.Descriptor instead.
 func (*BeaconStateRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{2}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{2}
 }
 
 func (m *BeaconStateRequest) GetQueryFilter() isBeaconStateRequest_QueryFilter {
@@ -272,7 +272,7 @@ type BlockRequestByRoot struct {
 func (x *BlockRequestByRoot) Reset() {
 	*x = BlockRequestByRoot{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[3]
+		mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -285,7 +285,7 @@ func (x *BlockRequestByRoot) String() string {
 func (*BlockRequestByRoot) ProtoMessage() {}
 
 func (x *BlockRequestByRoot) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[3]
+	mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -298,7 +298,7 @@ func (x *BlockRequestByRoot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlockRequestByRoot.ProtoReflect.Descriptor instead.
 func (*BlockRequestByRoot) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{3}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *BlockRequestByRoot) GetBlockRoot() []byte {
@@ -319,7 +319,7 @@ type SSZResponse struct {
 func (x *SSZResponse) Reset() {
 	*x = SSZResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[4]
+		mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -332,7 +332,7 @@ func (x *SSZResponse) String() string {
 func (*SSZResponse) ProtoMessage() {}
 
 func (x *SSZResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[4]
+	mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -345,7 +345,7 @@ func (x *SSZResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SSZResponse.ProtoReflect.Descriptor instead.
 func (*SSZResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{4}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *SSZResponse) GetEncoded() []byte {
@@ -366,7 +366,7 @@ type LoggingLevelRequest struct {
 func (x *LoggingLevelRequest) Reset() {
 	*x = LoggingLevelRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[5]
+		mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -379,7 +379,7 @@ func (x *LoggingLevelRequest) String() string {
 func (*LoggingLevelRequest) ProtoMessage() {}
 
 func (x *LoggingLevelRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[5]
+	mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -392,7 +392,7 @@ func (x *LoggingLevelRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoggingLevelRequest.ProtoReflect.Descriptor instead.
 func (*LoggingLevelRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{5}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *LoggingLevelRequest) GetLevel() LoggingLevelRequest_Level {
@@ -413,7 +413,7 @@ type DebugPeerResponses struct {
 func (x *DebugPeerResponses) Reset() {
 	*x = DebugPeerResponses{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[6]
+		mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -426,7 +426,7 @@ func (x *DebugPeerResponses) String() string {
 func (*DebugPeerResponses) ProtoMessage() {}
 
 func (x *DebugPeerResponses) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[6]
+	mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -439,7 +439,7 @@ func (x *DebugPeerResponses) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DebugPeerResponses.ProtoReflect.Descriptor instead.
 func (*DebugPeerResponses) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{6}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DebugPeerResponses) GetResponses() []*DebugPeerResponse {
@@ -468,7 +468,7 @@ type DebugPeerResponse struct {
 func (x *DebugPeerResponse) Reset() {
 	*x = DebugPeerResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[7]
+		mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -481,7 +481,7 @@ func (x *DebugPeerResponse) String() string {
 func (*DebugPeerResponse) ProtoMessage() {}
 
 func (x *DebugPeerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[7]
+	mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -494,7 +494,7 @@ func (x *DebugPeerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DebugPeerResponse.ProtoReflect.Descriptor instead.
 func (*DebugPeerResponse) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{7}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *DebugPeerResponse) GetListeningAddresses() []string {
@@ -577,7 +577,7 @@ type ScoreInfo struct {
 func (x *ScoreInfo) Reset() {
 	*x = ScoreInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[8]
+		mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -590,7 +590,7 @@ func (x *ScoreInfo) String() string {
 func (*ScoreInfo) ProtoMessage() {}
 
 func (x *ScoreInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[8]
+	mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -603,7 +603,7 @@ func (x *ScoreInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScoreInfo.ProtoReflect.Descriptor instead.
 func (*ScoreInfo) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{8}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ScoreInfo) GetOverallScore() float32 {
@@ -669,7 +669,7 @@ type TopicScoreSnapshot struct {
 func (x *TopicScoreSnapshot) Reset() {
 	*x = TopicScoreSnapshot{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[9]
+		mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -682,7 +682,7 @@ func (x *TopicScoreSnapshot) String() string {
 func (*TopicScoreSnapshot) ProtoMessage() {}
 
 func (x *TopicScoreSnapshot) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[9]
+	mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -695,7 +695,7 @@ func (x *TopicScoreSnapshot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TopicScoreSnapshot.ProtoReflect.Descriptor instead.
 func (*TopicScoreSnapshot) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{9}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *TopicScoreSnapshot) GetTimeInMesh() uint64 {
@@ -743,7 +743,7 @@ type DebugPeerResponse_PeerInfo struct {
 func (x *DebugPeerResponse_PeerInfo) Reset() {
 	*x = DebugPeerResponse_PeerInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[10]
+		mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -756,7 +756,7 @@ func (x *DebugPeerResponse_PeerInfo) String() string {
 func (*DebugPeerResponse_PeerInfo) ProtoMessage() {}
 
 func (x *DebugPeerResponse_PeerInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_debug_proto_msgTypes[10]
+	mi := &file_proto_qrysm_v1alpha1_debug_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -769,7 +769,7 @@ func (x *DebugPeerResponse_PeerInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DebugPeerResponse_PeerInfo.ProtoReflect.Descriptor instead.
 func (*DebugPeerResponse_PeerInfo) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP(), []int{7, 0}
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{7, 0}
 }
 
 func (x *DebugPeerResponse_PeerInfo) GetMetadataV0() *MetaDataV0 {
@@ -821,17 +821,17 @@ func (x *DebugPeerResponse_PeerInfo) GetPeerLatency() uint64 {
 	return 0
 }
 
-var File_proto_prysm_v1alpha1_debug_proto protoreflect.FileDescriptor
+var File_proto_qrysm_v1alpha1_debug_proto protoreflect.FileDescriptor
 
-var file_proto_prysm_v1alpha1_debug_proto_rawDesc = []byte{
-	0x0a, 0x20, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
+var file_proto_qrysm_v1alpha1_debug_proto_rawDesc = []byte{
+	0x0a, 0x20, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x64, 0x65, 0x62, 0x75, 0x67, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x12, 0x14, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e,
 	0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x1a, 0x1c, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f,
 	0x7a, 0x6f, 0x6e, 0x64, 0x2f, 0x65, 0x78, 0x74, 0x2f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72,
 	0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x6e, 0x6f, 0x64,
-	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71,
 	0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x70, 0x32,
 	0x70, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x1a, 0x1c, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x6e, 0x6e,
@@ -1030,7 +1030,7 @@ var file_proto_prysm_v1alpha1_debug_proto_rawDesc = []byte{
 	0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x42, 0x0a, 0x44,
 	0x65, 0x62, 0x75, 0x67, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x34, 0x67, 0x69, 0x74,
 	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x74, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x2f, 0x71,
-	0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x34, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72,
+	0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x34, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72,
 	0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x3b, 0x7a, 0x6f, 0x6e,
 	0x64, 0xaa, 0x02, 0x14, 0x54, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x2e,
 	0x56, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0xca, 0x02, 0x14, 0x54, 0x68, 0x65, 0x51, 0x52,
@@ -1039,20 +1039,20 @@ var file_proto_prysm_v1alpha1_debug_proto_rawDesc = []byte{
 }
 
 var (
-	file_proto_prysm_v1alpha1_debug_proto_rawDescOnce sync.Once
-	file_proto_prysm_v1alpha1_debug_proto_rawDescData = file_proto_prysm_v1alpha1_debug_proto_rawDesc
+	file_proto_qrysm_v1alpha1_debug_proto_rawDescOnce sync.Once
+	file_proto_qrysm_v1alpha1_debug_proto_rawDescData = file_proto_qrysm_v1alpha1_debug_proto_rawDesc
 )
 
-func file_proto_prysm_v1alpha1_debug_proto_rawDescGZIP() []byte {
-	file_proto_prysm_v1alpha1_debug_proto_rawDescOnce.Do(func() {
-		file_proto_prysm_v1alpha1_debug_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_prysm_v1alpha1_debug_proto_rawDescData)
+func file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP() []byte {
+	file_proto_qrysm_v1alpha1_debug_proto_rawDescOnce.Do(func() {
+		file_proto_qrysm_v1alpha1_debug_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_qrysm_v1alpha1_debug_proto_rawDescData)
 	})
-	return file_proto_prysm_v1alpha1_debug_proto_rawDescData
+	return file_proto_qrysm_v1alpha1_debug_proto_rawDescData
 }
 
-var file_proto_prysm_v1alpha1_debug_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_prysm_v1alpha1_debug_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
-var file_proto_prysm_v1alpha1_debug_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_debug_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_proto_qrysm_v1alpha1_debug_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_proto_qrysm_v1alpha1_debug_proto_goTypes = []interface{}{
 	(LoggingLevelRequest_Level)(0),     // 0: theqrl.zond.v1alpha1.LoggingLevelRequest.Level
 	(*InclusionSlotRequest)(nil),       // 1: theqrl.zond.v1alpha1.InclusionSlotRequest
 	(*InclusionSlotResponse)(nil),      // 2: theqrl.zond.v1alpha1.InclusionSlotResponse
@@ -1074,7 +1074,7 @@ var file_proto_prysm_v1alpha1_debug_proto_goTypes = []interface{}{
 	(*empty.Empty)(nil),                // 18: google.protobuf.Empty
 	(*PeerRequest)(nil),                // 19: theqrl.zond.v1alpha1.PeerRequest
 }
-var file_proto_prysm_v1alpha1_debug_proto_depIdxs = []int32{
+var file_proto_qrysm_v1alpha1_debug_proto_depIdxs = []int32{
 	0,  // 0: theqrl.zond.v1alpha1.LoggingLevelRequest.level:type_name -> theqrl.zond.v1alpha1.LoggingLevelRequest.Level
 	8,  // 1: theqrl.zond.v1alpha1.DebugPeerResponses.responses:type_name -> theqrl.zond.v1alpha1.DebugPeerResponse
 	13, // 2: theqrl.zond.v1alpha1.DebugPeerResponse.direction:type_name -> theqrl.zond.v1alpha1.PeerDirection
@@ -1105,15 +1105,15 @@ var file_proto_prysm_v1alpha1_debug_proto_depIdxs = []int32{
 	0,  // [0:11] is the sub-list for field type_name
 }
 
-func init() { file_proto_prysm_v1alpha1_debug_proto_init() }
-func file_proto_prysm_v1alpha1_debug_proto_init() {
-	if File_proto_prysm_v1alpha1_debug_proto != nil {
+func init() { file_proto_qrysm_v1alpha1_debug_proto_init() }
+func file_proto_qrysm_v1alpha1_debug_proto_init() {
+	if File_proto_qrysm_v1alpha1_debug_proto != nil {
 		return
 	}
-	file_proto_prysm_v1alpha1_node_proto_init()
-	file_proto_prysm_v1alpha1_p2p_messages_proto_init()
+	file_proto_qrysm_v1alpha1_node_proto_init()
+	file_proto_qrysm_v1alpha1_p2p_messages_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_prysm_v1alpha1_debug_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*InclusionSlotRequest); i {
 			case 0:
 				return &v.state
@@ -1125,7 +1125,7 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_debug_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*InclusionSlotResponse); i {
 			case 0:
 				return &v.state
@@ -1137,7 +1137,7 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_debug_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconStateRequest); i {
 			case 0:
 				return &v.state
@@ -1149,7 +1149,7 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_debug_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BlockRequestByRoot); i {
 			case 0:
 				return &v.state
@@ -1161,7 +1161,7 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_debug_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SSZResponse); i {
 			case 0:
 				return &v.state
@@ -1173,7 +1173,7 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_debug_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*LoggingLevelRequest); i {
 			case 0:
 				return &v.state
@@ -1185,7 +1185,7 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_debug_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DebugPeerResponses); i {
 			case 0:
 				return &v.state
@@ -1197,7 +1197,7 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_debug_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DebugPeerResponse); i {
 			case 0:
 				return &v.state
@@ -1209,7 +1209,7 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_debug_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ScoreInfo); i {
 			case 0:
 				return &v.state
@@ -1221,7 +1221,7 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_debug_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TopicScoreSnapshot); i {
 			case 0:
 				return &v.state
@@ -1233,7 +1233,7 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_debug_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_debug_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DebugPeerResponse_PeerInfo); i {
 			case 0:
 				return &v.state
@@ -1246,7 +1246,7 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 			}
 		}
 	}
-	file_proto_prysm_v1alpha1_debug_proto_msgTypes[2].OneofWrappers = []interface{}{
+	file_proto_qrysm_v1alpha1_debug_proto_msgTypes[2].OneofWrappers = []interface{}{
 		(*BeaconStateRequest_Slot)(nil),
 		(*BeaconStateRequest_BlockRoot)(nil),
 	}
@@ -1254,21 +1254,21 @@ func file_proto_prysm_v1alpha1_debug_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_prysm_v1alpha1_debug_proto_rawDesc,
+			RawDescriptor: file_proto_qrysm_v1alpha1_debug_proto_rawDesc,
 			NumEnums:      1,
 			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_prysm_v1alpha1_debug_proto_goTypes,
-		DependencyIndexes: file_proto_prysm_v1alpha1_debug_proto_depIdxs,
-		EnumInfos:         file_proto_prysm_v1alpha1_debug_proto_enumTypes,
-		MessageInfos:      file_proto_prysm_v1alpha1_debug_proto_msgTypes,
+		GoTypes:           file_proto_qrysm_v1alpha1_debug_proto_goTypes,
+		DependencyIndexes: file_proto_qrysm_v1alpha1_debug_proto_depIdxs,
+		EnumInfos:         file_proto_qrysm_v1alpha1_debug_proto_enumTypes,
+		MessageInfos:      file_proto_qrysm_v1alpha1_debug_proto_msgTypes,
 	}.Build()
-	File_proto_prysm_v1alpha1_debug_proto = out.File
-	file_proto_prysm_v1alpha1_debug_proto_rawDesc = nil
-	file_proto_prysm_v1alpha1_debug_proto_goTypes = nil
-	file_proto_prysm_v1alpha1_debug_proto_depIdxs = nil
+	File_proto_qrysm_v1alpha1_debug_proto = out.File
+	file_proto_qrysm_v1alpha1_debug_proto_rawDesc = nil
+	file_proto_qrysm_v1alpha1_debug_proto_goTypes = nil
+	file_proto_qrysm_v1alpha1_debug_proto_depIdxs = nil
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1531,5 +1531,5 @@ var _Debug_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/prysm/v1alpha1/debug.proto",
+	Metadata: "proto/qrysm/v1alpha1/debug.proto",
 }

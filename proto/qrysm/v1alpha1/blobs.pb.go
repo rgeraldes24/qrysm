@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.30.0
 // 	protoc        v4.23.3
-// source: proto/prysm/v1alpha1/blobs.proto
+// source: proto/qrysm/v1alpha1/blobs.proto
 
 package zond
 
@@ -34,7 +34,7 @@ type BlobSidecars struct {
 func (x *BlobSidecars) Reset() {
 	*x = BlobSidecars{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[0]
+		mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -47,7 +47,7 @@ func (x *BlobSidecars) String() string {
 func (*BlobSidecars) ProtoMessage() {}
 
 func (x *BlobSidecars) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[0]
+	mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +60,7 @@ func (x *BlobSidecars) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobSidecars.ProtoReflect.Descriptor instead.
 func (*BlobSidecars) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{0}
+	return file_proto_qrysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *BlobSidecars) GetSidecars() []*BlobSidecar {
@@ -88,7 +88,7 @@ type BlobSidecar struct {
 func (x *BlobSidecar) Reset() {
 	*x = BlobSidecar{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[1]
+		mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -101,7 +101,7 @@ func (x *BlobSidecar) String() string {
 func (*BlobSidecar) ProtoMessage() {}
 
 func (x *BlobSidecar) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[1]
+	mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -114,7 +114,7 @@ func (x *BlobSidecar) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobSidecar.ProtoReflect.Descriptor instead.
 func (*BlobSidecar) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{1}
+	return file_proto_qrysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *BlobSidecar) GetBlockRoot() []byte {
@@ -185,7 +185,7 @@ type SignedBlobSidecar struct {
 func (x *SignedBlobSidecar) Reset() {
 	*x = SignedBlobSidecar{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[2]
+		mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -198,7 +198,7 @@ func (x *SignedBlobSidecar) String() string {
 func (*SignedBlobSidecar) ProtoMessage() {}
 
 func (x *SignedBlobSidecar) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[2]
+	mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -211,7 +211,7 @@ func (x *SignedBlobSidecar) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignedBlobSidecar.ProtoReflect.Descriptor instead.
 func (*SignedBlobSidecar) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{2}
+	return file_proto_qrysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SignedBlobSidecar) GetMessage() *BlobSidecar {
@@ -239,7 +239,7 @@ type BlindedBlobSidecars struct {
 func (x *BlindedBlobSidecars) Reset() {
 	*x = BlindedBlobSidecars{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[3]
+		mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -252,7 +252,7 @@ func (x *BlindedBlobSidecars) String() string {
 func (*BlindedBlobSidecars) ProtoMessage() {}
 
 func (x *BlindedBlobSidecars) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[3]
+	mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -265,7 +265,7 @@ func (x *BlindedBlobSidecars) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlindedBlobSidecars.ProtoReflect.Descriptor instead.
 func (*BlindedBlobSidecars) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{3}
+	return file_proto_qrysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *BlindedBlobSidecars) GetSidecars() []*BlindedBlobSidecar {
@@ -293,7 +293,7 @@ type BlindedBlobSidecar struct {
 func (x *BlindedBlobSidecar) Reset() {
 	*x = BlindedBlobSidecar{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[4]
+		mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -306,7 +306,7 @@ func (x *BlindedBlobSidecar) String() string {
 func (*BlindedBlobSidecar) ProtoMessage() {}
 
 func (x *BlindedBlobSidecar) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[4]
+	mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -319,7 +319,7 @@ func (x *BlindedBlobSidecar) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlindedBlobSidecar.ProtoReflect.Descriptor instead.
 func (*BlindedBlobSidecar) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{4}
+	return file_proto_qrysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *BlindedBlobSidecar) GetBlockRoot() []byte {
@@ -390,7 +390,7 @@ type SignedBlindedBlobSidecar struct {
 func (x *SignedBlindedBlobSidecar) Reset() {
 	*x = SignedBlindedBlobSidecar{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[5]
+		mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -403,7 +403,7 @@ func (x *SignedBlindedBlobSidecar) String() string {
 func (*SignedBlindedBlobSidecar) ProtoMessage() {}
 
 func (x *SignedBlindedBlobSidecar) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[5]
+	mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -416,7 +416,7 @@ func (x *SignedBlindedBlobSidecar) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignedBlindedBlobSidecar.ProtoReflect.Descriptor instead.
 func (*SignedBlindedBlobSidecar) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{5}
+	return file_proto_qrysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SignedBlindedBlobSidecar) GetMessage() *BlindedBlobSidecar {
@@ -445,7 +445,7 @@ type BlobIdentifier struct {
 func (x *BlobIdentifier) Reset() {
 	*x = BlobIdentifier{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[6]
+		mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -458,7 +458,7 @@ func (x *BlobIdentifier) String() string {
 func (*BlobIdentifier) ProtoMessage() {}
 
 func (x *BlobIdentifier) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_blobs_proto_msgTypes[6]
+	mi := &file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -471,7 +471,7 @@ func (x *BlobIdentifier) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobIdentifier.ProtoReflect.Descriptor instead.
 func (*BlobIdentifier) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{6}
+	return file_proto_qrysm_v1alpha1_blobs_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *BlobIdentifier) GetBlockRoot() []byte {
@@ -488,10 +488,10 @@ func (x *BlobIdentifier) GetIndex() uint64 {
 	return 0
 }
 
-var File_proto_prysm_v1alpha1_blobs_proto protoreflect.FileDescriptor
+var File_proto_qrysm_v1alpha1_blobs_proto protoreflect.FileDescriptor
 
-var file_proto_prysm_v1alpha1_blobs_proto_rawDesc = []byte{
-	0x0a, 0x20, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
+var file_proto_qrysm_v1alpha1_blobs_proto_rawDesc = []byte{
+	0x0a, 0x20, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x62, 0x6c, 0x6f, 0x62, 0x73, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x12, 0x14, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e,
 	0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x1a, 0x1c, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f,
@@ -589,7 +589,7 @@ var file_proto_prysm_v1alpha1_blobs_proto_rawDesc = []byte{
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x42, 0x0a, 0x42, 0x6c, 0x6f, 0x62, 0x73, 0x50, 0x72, 0x6f,
 	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
 	0x2f, 0x74, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x34,
-	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61,
 	0x6c, 0x70, 0x68, 0x61, 0x31, 0x3b, 0x7a, 0x6f, 0x6e, 0x64, 0xaa, 0x02, 0x14, 0x54, 0x68, 0x65,
 	0x51, 0x52, 0x4c, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61,
 	0x31, 0xca, 0x02, 0x14, 0x54, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x5c, 0x5a, 0x6f, 0x6e, 0x64, 0x5c,
@@ -597,19 +597,19 @@ var file_proto_prysm_v1alpha1_blobs_proto_rawDesc = []byte{
 }
 
 var (
-	file_proto_prysm_v1alpha1_blobs_proto_rawDescOnce sync.Once
-	file_proto_prysm_v1alpha1_blobs_proto_rawDescData = file_proto_prysm_v1alpha1_blobs_proto_rawDesc
+	file_proto_qrysm_v1alpha1_blobs_proto_rawDescOnce sync.Once
+	file_proto_qrysm_v1alpha1_blobs_proto_rawDescData = file_proto_qrysm_v1alpha1_blobs_proto_rawDesc
 )
 
-func file_proto_prysm_v1alpha1_blobs_proto_rawDescGZIP() []byte {
-	file_proto_prysm_v1alpha1_blobs_proto_rawDescOnce.Do(func() {
-		file_proto_prysm_v1alpha1_blobs_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_prysm_v1alpha1_blobs_proto_rawDescData)
+func file_proto_qrysm_v1alpha1_blobs_proto_rawDescGZIP() []byte {
+	file_proto_qrysm_v1alpha1_blobs_proto_rawDescOnce.Do(func() {
+		file_proto_qrysm_v1alpha1_blobs_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_qrysm_v1alpha1_blobs_proto_rawDescData)
 	})
-	return file_proto_prysm_v1alpha1_blobs_proto_rawDescData
+	return file_proto_qrysm_v1alpha1_blobs_proto_rawDescData
 }
 
-var file_proto_prysm_v1alpha1_blobs_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_proto_prysm_v1alpha1_blobs_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_blobs_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_proto_qrysm_v1alpha1_blobs_proto_goTypes = []interface{}{
 	(*BlobSidecars)(nil),             // 0: theqrl.zond.v1alpha1.BlobSidecars
 	(*BlobSidecar)(nil),              // 1: theqrl.zond.v1alpha1.BlobSidecar
 	(*SignedBlobSidecar)(nil),        // 2: theqrl.zond.v1alpha1.SignedBlobSidecar
@@ -618,7 +618,7 @@ var file_proto_prysm_v1alpha1_blobs_proto_goTypes = []interface{}{
 	(*SignedBlindedBlobSidecar)(nil), // 5: theqrl.zond.v1alpha1.SignedBlindedBlobSidecar
 	(*BlobIdentifier)(nil),           // 6: theqrl.zond.v1alpha1.BlobIdentifier
 }
-var file_proto_prysm_v1alpha1_blobs_proto_depIdxs = []int32{
+var file_proto_qrysm_v1alpha1_blobs_proto_depIdxs = []int32{
 	1, // 0: theqrl.zond.v1alpha1.BlobSidecars.sidecars:type_name -> theqrl.zond.v1alpha1.BlobSidecar
 	1, // 1: theqrl.zond.v1alpha1.SignedBlobSidecar.message:type_name -> theqrl.zond.v1alpha1.BlobSidecar
 	4, // 2: theqrl.zond.v1alpha1.BlindedBlobSidecars.sidecars:type_name -> theqrl.zond.v1alpha1.BlindedBlobSidecar
@@ -630,13 +630,13 @@ var file_proto_prysm_v1alpha1_blobs_proto_depIdxs = []int32{
 	0, // [0:4] is the sub-list for field type_name
 }
 
-func init() { file_proto_prysm_v1alpha1_blobs_proto_init() }
-func file_proto_prysm_v1alpha1_blobs_proto_init() {
-	if File_proto_prysm_v1alpha1_blobs_proto != nil {
+func init() { file_proto_qrysm_v1alpha1_blobs_proto_init() }
+func file_proto_qrysm_v1alpha1_blobs_proto_init() {
+	if File_proto_qrysm_v1alpha1_blobs_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_prysm_v1alpha1_blobs_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BlobSidecars); i {
 			case 0:
 				return &v.state
@@ -648,7 +648,7 @@ func file_proto_prysm_v1alpha1_blobs_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_blobs_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BlobSidecar); i {
 			case 0:
 				return &v.state
@@ -660,7 +660,7 @@ func file_proto_prysm_v1alpha1_blobs_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_blobs_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SignedBlobSidecar); i {
 			case 0:
 				return &v.state
@@ -672,7 +672,7 @@ func file_proto_prysm_v1alpha1_blobs_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_blobs_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BlindedBlobSidecars); i {
 			case 0:
 				return &v.state
@@ -684,7 +684,7 @@ func file_proto_prysm_v1alpha1_blobs_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_blobs_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BlindedBlobSidecar); i {
 			case 0:
 				return &v.state
@@ -696,7 +696,7 @@ func file_proto_prysm_v1alpha1_blobs_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_blobs_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SignedBlindedBlobSidecar); i {
 			case 0:
 				return &v.state
@@ -708,7 +708,7 @@ func file_proto_prysm_v1alpha1_blobs_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_blobs_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_blobs_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BlobIdentifier); i {
 			case 0:
 				return &v.state
@@ -725,18 +725,18 @@ func file_proto_prysm_v1alpha1_blobs_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_prysm_v1alpha1_blobs_proto_rawDesc,
+			RawDescriptor: file_proto_qrysm_v1alpha1_blobs_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_proto_prysm_v1alpha1_blobs_proto_goTypes,
-		DependencyIndexes: file_proto_prysm_v1alpha1_blobs_proto_depIdxs,
-		MessageInfos:      file_proto_prysm_v1alpha1_blobs_proto_msgTypes,
+		GoTypes:           file_proto_qrysm_v1alpha1_blobs_proto_goTypes,
+		DependencyIndexes: file_proto_qrysm_v1alpha1_blobs_proto_depIdxs,
+		MessageInfos:      file_proto_qrysm_v1alpha1_blobs_proto_msgTypes,
 	}.Build()
-	File_proto_prysm_v1alpha1_blobs_proto = out.File
-	file_proto_prysm_v1alpha1_blobs_proto_rawDesc = nil
-	file_proto_prysm_v1alpha1_blobs_proto_goTypes = nil
-	file_proto_prysm_v1alpha1_blobs_proto_depIdxs = nil
+	File_proto_qrysm_v1alpha1_blobs_proto = out.File
+	file_proto_qrysm_v1alpha1_blobs_proto_rawDesc = nil
+	file_proto_qrysm_v1alpha1_blobs_proto_goTypes = nil
+	file_proto_qrysm_v1alpha1_blobs_proto_depIdxs = nil
 }

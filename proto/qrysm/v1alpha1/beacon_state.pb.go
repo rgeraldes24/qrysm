@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.30.0
 // 	protoc        v4.23.3
-// source: proto/prysm/v1alpha1/beacon_state.proto
+// source: proto/qrysm/v1alpha1/beacon_state.proto
 
 package zond
 
@@ -56,7 +56,7 @@ type BeaconState struct {
 func (x *BeaconState) Reset() {
 	*x = BeaconState{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[0]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -69,7 +69,7 @@ func (x *BeaconState) String() string {
 func (*BeaconState) ProtoMessage() {}
 
 func (x *BeaconState) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[0]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -82,7 +82,7 @@ func (x *BeaconState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconState.ProtoReflect.Descriptor instead.
 func (*BeaconState) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{0}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *BeaconState) GetGenesisTime() uint64 {
@@ -266,7 +266,7 @@ type BeaconStateAltair struct {
 func (x *BeaconStateAltair) Reset() {
 	*x = BeaconStateAltair{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[1]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -279,7 +279,7 @@ func (x *BeaconStateAltair) String() string {
 func (*BeaconStateAltair) ProtoMessage() {}
 
 func (x *BeaconStateAltair) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[1]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -292,7 +292,7 @@ func (x *BeaconStateAltair) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconStateAltair.ProtoReflect.Descriptor instead.
 func (*BeaconStateAltair) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{1}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *BeaconStateAltair) GetGenesisTime() uint64 {
@@ -476,7 +476,7 @@ type Fork struct {
 func (x *Fork) Reset() {
 	*x = Fork{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[2]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -489,7 +489,7 @@ func (x *Fork) String() string {
 func (*Fork) ProtoMessage() {}
 
 func (x *Fork) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[2]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -502,7 +502,7 @@ func (x *Fork) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Fork.ProtoReflect.Descriptor instead.
 func (*Fork) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{2}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Fork) GetPreviousVersion() []byte {
@@ -540,7 +540,7 @@ type PendingAttestation struct {
 func (x *PendingAttestation) Reset() {
 	*x = PendingAttestation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[3]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -553,7 +553,7 @@ func (x *PendingAttestation) String() string {
 func (*PendingAttestation) ProtoMessage() {}
 
 func (x *PendingAttestation) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[3]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -566,7 +566,7 @@ func (x *PendingAttestation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PendingAttestation.ProtoReflect.Descriptor instead.
 func (*PendingAttestation) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{3}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *PendingAttestation) GetAggregationBits() github_com_theQRL_go_bitfield.Bitlist {
@@ -609,7 +609,7 @@ type HistoricalBatch struct {
 func (x *HistoricalBatch) Reset() {
 	*x = HistoricalBatch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[4]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -622,7 +622,7 @@ func (x *HistoricalBatch) String() string {
 func (*HistoricalBatch) ProtoMessage() {}
 
 func (x *HistoricalBatch) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[4]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -635,7 +635,7 @@ func (x *HistoricalBatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HistoricalBatch.ProtoReflect.Descriptor instead.
 func (*HistoricalBatch) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{4}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *HistoricalBatch) GetBlockRoots() [][]byte {
@@ -664,7 +664,7 @@ type StateSummary struct {
 func (x *StateSummary) Reset() {
 	*x = StateSummary{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[5]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -677,7 +677,7 @@ func (x *StateSummary) String() string {
 func (*StateSummary) ProtoMessage() {}
 
 func (x *StateSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[5]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -690,7 +690,7 @@ func (x *StateSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StateSummary.ProtoReflect.Descriptor instead.
 func (*StateSummary) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{5}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *StateSummary) GetSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -719,7 +719,7 @@ type SigningData struct {
 func (x *SigningData) Reset() {
 	*x = SigningData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[6]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -732,7 +732,7 @@ func (x *SigningData) String() string {
 func (*SigningData) ProtoMessage() {}
 
 func (x *SigningData) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[6]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -745,7 +745,7 @@ func (x *SigningData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SigningData.ProtoReflect.Descriptor instead.
 func (*SigningData) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{6}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SigningData) GetObjectRoot() []byte {
@@ -774,7 +774,7 @@ type ForkData struct {
 func (x *ForkData) Reset() {
 	*x = ForkData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[7]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -787,7 +787,7 @@ func (x *ForkData) String() string {
 func (*ForkData) ProtoMessage() {}
 
 func (x *ForkData) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[7]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -800,7 +800,7 @@ func (x *ForkData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ForkData.ProtoReflect.Descriptor instead.
 func (*ForkData) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{7}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ForkData) GetCurrentVersion() []byte {
@@ -832,7 +832,7 @@ type CheckPtInfo struct {
 func (x *CheckPtInfo) Reset() {
 	*x = CheckPtInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[8]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -845,7 +845,7 @@ func (x *CheckPtInfo) String() string {
 func (*CheckPtInfo) ProtoMessage() {}
 
 func (x *CheckPtInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[8]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -858,7 +858,7 @@ func (x *CheckPtInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckPtInfo.ProtoReflect.Descriptor instead.
 func (*CheckPtInfo) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{8}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CheckPtInfo) GetSeed() []byte {
@@ -909,7 +909,7 @@ type DepositMessage struct {
 func (x *DepositMessage) Reset() {
 	*x = DepositMessage{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[9]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -922,7 +922,7 @@ func (x *DepositMessage) String() string {
 func (*DepositMessage) ProtoMessage() {}
 
 func (x *DepositMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[9]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -935,7 +935,7 @@ func (x *DepositMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DepositMessage.ProtoReflect.Descriptor instead.
 func (*DepositMessage) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{9}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *DepositMessage) GetPublicKey() []byte {
@@ -970,7 +970,7 @@ type SyncCommittee struct {
 func (x *SyncCommittee) Reset() {
 	*x = SyncCommittee{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[10]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -983,7 +983,7 @@ func (x *SyncCommittee) String() string {
 func (*SyncCommittee) ProtoMessage() {}
 
 func (x *SyncCommittee) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[10]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -996,7 +996,7 @@ func (x *SyncCommittee) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncCommittee.ProtoReflect.Descriptor instead.
 func (*SyncCommittee) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{10}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SyncCommittee) GetPubkeys() [][]byte {
@@ -1018,7 +1018,7 @@ type SyncAggregatorSelectionData struct {
 func (x *SyncAggregatorSelectionData) Reset() {
 	*x = SyncAggregatorSelectionData{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[11]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1031,7 +1031,7 @@ func (x *SyncAggregatorSelectionData) String() string {
 func (*SyncAggregatorSelectionData) ProtoMessage() {}
 
 func (x *SyncAggregatorSelectionData) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[11]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1044,7 +1044,7 @@ func (x *SyncAggregatorSelectionData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncAggregatorSelectionData.ProtoReflect.Descriptor instead.
 func (*SyncAggregatorSelectionData) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{11}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *SyncAggregatorSelectionData) GetSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -1096,7 +1096,7 @@ type BeaconStateBellatrix struct {
 func (x *BeaconStateBellatrix) Reset() {
 	*x = BeaconStateBellatrix{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[12]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1109,7 +1109,7 @@ func (x *BeaconStateBellatrix) String() string {
 func (*BeaconStateBellatrix) ProtoMessage() {}
 
 func (x *BeaconStateBellatrix) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[12]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1122,7 +1122,7 @@ func (x *BeaconStateBellatrix) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconStateBellatrix.ProtoReflect.Descriptor instead.
 func (*BeaconStateBellatrix) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{12}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *BeaconStateBellatrix) GetGenesisTime() uint64 {
@@ -1338,7 +1338,7 @@ type BeaconStateCapella struct {
 func (x *BeaconStateCapella) Reset() {
 	*x = BeaconStateCapella{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[13]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1351,7 +1351,7 @@ func (x *BeaconStateCapella) String() string {
 func (*BeaconStateCapella) ProtoMessage() {}
 
 func (x *BeaconStateCapella) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[13]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1364,7 +1364,7 @@ func (x *BeaconStateCapella) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconStateCapella.ProtoReflect.Descriptor instead.
 func (*BeaconStateCapella) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{13}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *BeaconStateCapella) GetGenesisTime() uint64 {
@@ -1601,7 +1601,7 @@ type BeaconStateDeneb struct {
 func (x *BeaconStateDeneb) Reset() {
 	*x = BeaconStateDeneb{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[14]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1614,7 +1614,7 @@ func (x *BeaconStateDeneb) String() string {
 func (*BeaconStateDeneb) ProtoMessage() {}
 
 func (x *BeaconStateDeneb) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[14]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1627,7 +1627,7 @@ func (x *BeaconStateDeneb) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconStateDeneb.ProtoReflect.Descriptor instead.
 func (*BeaconStateDeneb) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{14}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *BeaconStateDeneb) GetGenesisTime() uint64 {
@@ -1839,7 +1839,7 @@ type PowBlock struct {
 func (x *PowBlock) Reset() {
 	*x = PowBlock{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[15]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1852,7 +1852,7 @@ func (x *PowBlock) String() string {
 func (*PowBlock) ProtoMessage() {}
 
 func (x *PowBlock) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[15]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1865,7 +1865,7 @@ func (x *PowBlock) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PowBlock.ProtoReflect.Descriptor instead.
 func (*PowBlock) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{15}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *PowBlock) GetBlockHash() []byte {
@@ -1901,7 +1901,7 @@ type HistoricalSummary struct {
 func (x *HistoricalSummary) Reset() {
 	*x = HistoricalSummary{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[16]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1914,7 +1914,7 @@ func (x *HistoricalSummary) String() string {
 func (*HistoricalSummary) ProtoMessage() {}
 
 func (x *HistoricalSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[16]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1927,7 +1927,7 @@ func (x *HistoricalSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HistoricalSummary.ProtoReflect.Descriptor instead.
 func (*HistoricalSummary) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{16}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *HistoricalSummary) GetBlockSummaryRoot() []byte {
@@ -1944,19 +1944,19 @@ func (x *HistoricalSummary) GetStateSummaryRoot() []byte {
 	return nil
 }
 
-var File_proto_prysm_v1alpha1_beacon_state_proto protoreflect.FileDescriptor
+var File_proto_qrysm_v1alpha1_beacon_state_proto protoreflect.FileDescriptor
 
-var file_proto_prysm_v1alpha1_beacon_state_proto_rawDesc = []byte{
-	0x0a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
+var file_proto_qrysm_v1alpha1_beacon_state_proto_rawDesc = []byte{
+	0x0a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x62, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x5f, 0x73, 0x74,
 	0x61, 0x74, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x14, 0x74, 0x68, 0x65, 0x71, 0x72,
 	0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x1a,
-	0x26, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61,
+	0x26, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61,
 	0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x61, 0x74, 0x74, 0x65, 0x73, 0x74, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70,
+	0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71,
 	0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x62, 0x65,
 	0x61, 0x63, 0x6f, 0x6e, 0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x1a, 0x24, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
+	0x1a, 0x24, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72,
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x26, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x65, 0x6e,
 	0x67, 0x69, 0x6e, 0x65, 0x2f, 0x76, 0x31, 0x2f, 0x65, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f,
@@ -2672,7 +2672,7 @@ var file_proto_prysm_v1alpha1_beacon_state_proto_rawDesc = []byte{
 	0x42, 0x10, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x65, 0x50, 0x72, 0x6f,
 	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
 	0x2f, 0x74, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x34,
-	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61,
 	0x6c, 0x70, 0x68, 0x61, 0x31, 0x3b, 0x7a, 0x6f, 0x6e, 0x64, 0xaa, 0x02, 0x14, 0x54, 0x68, 0x65,
 	0x51, 0x52, 0x4c, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0x41, 0x6c, 0x70, 0x68, 0x61,
 	0x31, 0xca, 0x02, 0x14, 0x54, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x5c, 0x5a, 0x6f, 0x6e, 0x64, 0x5c,
@@ -2680,19 +2680,19 @@ var file_proto_prysm_v1alpha1_beacon_state_proto_rawDesc = []byte{
 }
 
 var (
-	file_proto_prysm_v1alpha1_beacon_state_proto_rawDescOnce sync.Once
-	file_proto_prysm_v1alpha1_beacon_state_proto_rawDescData = file_proto_prysm_v1alpha1_beacon_state_proto_rawDesc
+	file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescOnce sync.Once
+	file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescData = file_proto_qrysm_v1alpha1_beacon_state_proto_rawDesc
 )
 
-func file_proto_prysm_v1alpha1_beacon_state_proto_rawDescGZIP() []byte {
-	file_proto_prysm_v1alpha1_beacon_state_proto_rawDescOnce.Do(func() {
-		file_proto_prysm_v1alpha1_beacon_state_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_prysm_v1alpha1_beacon_state_proto_rawDescData)
+func file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP() []byte {
+	file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescOnce.Do(func() {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescData)
 	})
-	return file_proto_prysm_v1alpha1_beacon_state_proto_rawDescData
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescData
 }
 
-var file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
-var file_proto_prysm_v1alpha1_beacon_state_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_proto_qrysm_v1alpha1_beacon_state_proto_goTypes = []interface{}{
 	(*BeaconState)(nil),                      // 0: theqrl.zond.v1alpha1.BeaconState
 	(*BeaconStateAltair)(nil),                // 1: theqrl.zond.v1alpha1.BeaconStateAltair
 	(*Fork)(nil),                             // 2: theqrl.zond.v1alpha1.Fork
@@ -2719,7 +2719,7 @@ var file_proto_prysm_v1alpha1_beacon_state_proto_goTypes = []interface{}{
 	(*v1.ExecutionPayloadHeaderCapella)(nil), // 23: theqrl.engine.v1.ExecutionPayloadHeaderCapella
 	(*v1.ExecutionPayloadHeaderDeneb)(nil),   // 24: theqrl.engine.v1.ExecutionPayloadHeaderDeneb
 }
-var file_proto_prysm_v1alpha1_beacon_state_proto_depIdxs = []int32{
+var file_proto_qrysm_v1alpha1_beacon_state_proto_depIdxs = []int32{
 	2,  // 0: theqrl.zond.v1alpha1.BeaconState.fork:type_name -> theqrl.zond.v1alpha1.Fork
 	17, // 1: theqrl.zond.v1alpha1.BeaconState.latest_block_header:type_name -> theqrl.zond.v1alpha1.BeaconBlockHeader
 	18, // 2: theqrl.zond.v1alpha1.BeaconState.eth1_data:type_name -> theqrl.zond.v1alpha1.Eth1Data
@@ -2784,16 +2784,16 @@ var file_proto_prysm_v1alpha1_beacon_state_proto_depIdxs = []int32{
 	0,  // [0:57] is the sub-list for field type_name
 }
 
-func init() { file_proto_prysm_v1alpha1_beacon_state_proto_init() }
-func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
-	if File_proto_prysm_v1alpha1_beacon_state_proto != nil {
+func init() { file_proto_qrysm_v1alpha1_beacon_state_proto_init() }
+func file_proto_qrysm_v1alpha1_beacon_state_proto_init() {
+	if File_proto_qrysm_v1alpha1_beacon_state_proto != nil {
 		return
 	}
-	file_proto_prysm_v1alpha1_attestation_proto_init()
-	file_proto_prysm_v1alpha1_beacon_block_proto_init()
-	file_proto_prysm_v1alpha1_validator_proto_init()
+	file_proto_qrysm_v1alpha1_attestation_proto_init()
+	file_proto_qrysm_v1alpha1_beacon_block_proto_init()
+	file_proto_qrysm_v1alpha1_validator_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconState); i {
 			case 0:
 				return &v.state
@@ -2805,7 +2805,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconStateAltair); i {
 			case 0:
 				return &v.state
@@ -2817,7 +2817,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Fork); i {
 			case 0:
 				return &v.state
@@ -2829,7 +2829,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PendingAttestation); i {
 			case 0:
 				return &v.state
@@ -2841,7 +2841,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*HistoricalBatch); i {
 			case 0:
 				return &v.state
@@ -2853,7 +2853,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StateSummary); i {
 			case 0:
 				return &v.state
@@ -2865,7 +2865,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SigningData); i {
 			case 0:
 				return &v.state
@@ -2877,7 +2877,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ForkData); i {
 			case 0:
 				return &v.state
@@ -2889,7 +2889,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CheckPtInfo); i {
 			case 0:
 				return &v.state
@@ -2901,7 +2901,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DepositMessage); i {
 			case 0:
 				return &v.state
@@ -2913,7 +2913,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncCommittee); i {
 			case 0:
 				return &v.state
@@ -2925,7 +2925,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncAggregatorSelectionData); i {
 			case 0:
 				return &v.state
@@ -2937,7 +2937,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconStateBellatrix); i {
 			case 0:
 				return &v.state
@@ -2949,7 +2949,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconStateCapella); i {
 			case 0:
 				return &v.state
@@ -2961,7 +2961,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconStateDeneb); i {
 			case 0:
 				return &v.state
@@ -2973,7 +2973,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PowBlock); i {
 			case 0:
 				return &v.state
@@ -2985,7 +2985,7 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*HistoricalSummary); i {
 			case 0:
 				return &v.state
@@ -3002,18 +3002,18 @@ func file_proto_prysm_v1alpha1_beacon_state_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_prysm_v1alpha1_beacon_state_proto_rawDesc,
+			RawDescriptor: file_proto_qrysm_v1alpha1_beacon_state_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_proto_prysm_v1alpha1_beacon_state_proto_goTypes,
-		DependencyIndexes: file_proto_prysm_v1alpha1_beacon_state_proto_depIdxs,
-		MessageInfos:      file_proto_prysm_v1alpha1_beacon_state_proto_msgTypes,
+		GoTypes:           file_proto_qrysm_v1alpha1_beacon_state_proto_goTypes,
+		DependencyIndexes: file_proto_qrysm_v1alpha1_beacon_state_proto_depIdxs,
+		MessageInfos:      file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes,
 	}.Build()
-	File_proto_prysm_v1alpha1_beacon_state_proto = out.File
-	file_proto_prysm_v1alpha1_beacon_state_proto_rawDesc = nil
-	file_proto_prysm_v1alpha1_beacon_state_proto_goTypes = nil
-	file_proto_prysm_v1alpha1_beacon_state_proto_depIdxs = nil
+	File_proto_qrysm_v1alpha1_beacon_state_proto = out.File
+	file_proto_qrysm_v1alpha1_beacon_state_proto_rawDesc = nil
+	file_proto_qrysm_v1alpha1_beacon_state_proto_goTypes = nil
+	file_proto_qrysm_v1alpha1_beacon_state_proto_depIdxs = nil
 }

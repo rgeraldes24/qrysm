@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.30.0
 // 	protoc        v4.23.3
-// source: proto/prysm/v1alpha1/p2p_messages.proto
+// source: proto/qrysm/v1alpha1/p2p_messages.proto
 
 package zond
 
@@ -40,7 +40,7 @@ type Status struct {
 func (x *Status) Reset() {
 	*x = Status{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[0]
+		mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -53,7 +53,7 @@ func (x *Status) String() string {
 func (*Status) ProtoMessage() {}
 
 func (x *Status) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[0]
+	mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -66,7 +66,7 @@ func (x *Status) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Status.ProtoReflect.Descriptor instead.
 func (*Status) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{0}
+	return file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Status) GetForkDigest() []byte {
@@ -117,7 +117,7 @@ type BeaconBlocksByRangeRequest struct {
 func (x *BeaconBlocksByRangeRequest) Reset() {
 	*x = BeaconBlocksByRangeRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[1]
+		mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -130,7 +130,7 @@ func (x *BeaconBlocksByRangeRequest) String() string {
 func (*BeaconBlocksByRangeRequest) ProtoMessage() {}
 
 func (x *BeaconBlocksByRangeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[1]
+	mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -143,7 +143,7 @@ func (x *BeaconBlocksByRangeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BeaconBlocksByRangeRequest.ProtoReflect.Descriptor instead.
 func (*BeaconBlocksByRangeRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{1}
+	return file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *BeaconBlocksByRangeRequest) GetStartSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -180,7 +180,7 @@ type ENRForkID struct {
 func (x *ENRForkID) Reset() {
 	*x = ENRForkID{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[2]
+		mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -193,7 +193,7 @@ func (x *ENRForkID) String() string {
 func (*ENRForkID) ProtoMessage() {}
 
 func (x *ENRForkID) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[2]
+	mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -206,7 +206,7 @@ func (x *ENRForkID) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ENRForkID.ProtoReflect.Descriptor instead.
 func (*ENRForkID) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{2}
+	return file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ENRForkID) GetCurrentForkDigest() []byte {
@@ -242,7 +242,7 @@ type MetaDataV0 struct {
 func (x *MetaDataV0) Reset() {
 	*x = MetaDataV0{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[3]
+		mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -255,7 +255,7 @@ func (x *MetaDataV0) String() string {
 func (*MetaDataV0) ProtoMessage() {}
 
 func (x *MetaDataV0) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[3]
+	mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -268,7 +268,7 @@ func (x *MetaDataV0) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetaDataV0.ProtoReflect.Descriptor instead.
 func (*MetaDataV0) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{3}
+	return file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *MetaDataV0) GetSeqNumber() uint64 {
@@ -298,7 +298,7 @@ type MetaDataV1 struct {
 func (x *MetaDataV1) Reset() {
 	*x = MetaDataV1{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[4]
+		mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -311,7 +311,7 @@ func (x *MetaDataV1) String() string {
 func (*MetaDataV1) ProtoMessage() {}
 
 func (x *MetaDataV1) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[4]
+	mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -324,7 +324,7 @@ func (x *MetaDataV1) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetaDataV1.ProtoReflect.Descriptor instead.
 func (*MetaDataV1) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{4}
+	return file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *MetaDataV1) GetSeqNumber() uint64 {
@@ -360,7 +360,7 @@ type BlobSidecarsByRangeRequest struct {
 func (x *BlobSidecarsByRangeRequest) Reset() {
 	*x = BlobSidecarsByRangeRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[5]
+		mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -373,7 +373,7 @@ func (x *BlobSidecarsByRangeRequest) String() string {
 func (*BlobSidecarsByRangeRequest) ProtoMessage() {}
 
 func (x *BlobSidecarsByRangeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[5]
+	mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -386,7 +386,7 @@ func (x *BlobSidecarsByRangeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlobSidecarsByRangeRequest.ProtoReflect.Descriptor instead.
 func (*BlobSidecarsByRangeRequest) Descriptor() ([]byte, []int) {
-	return file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{5}
+	return file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *BlobSidecarsByRangeRequest) GetStartSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -403,10 +403,10 @@ func (x *BlobSidecarsByRangeRequest) GetCount() uint64 {
 	return 0
 }
 
-var File_proto_prysm_v1alpha1_p2p_messages_proto protoreflect.FileDescriptor
+var File_proto_qrysm_v1alpha1_p2p_messages_proto protoreflect.FileDescriptor
 
-var file_proto_prysm_v1alpha1_p2p_messages_proto_rawDesc = []byte{
-	0x0a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
+var file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDesc = []byte{
+	0x0a, 0x27, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31,
 	0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x70, 0x32, 0x70, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61,
 	0x67, 0x65, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x14, 0x74, 0x68, 0x65, 0x71, 0x72,
 	0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x1a,
@@ -494,7 +494,7 @@ var file_proto_prysm_v1alpha1_p2p_messages_proto_rawDesc = []byte{
 	0x32, 0x50, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
 	0x01, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x74, 0x68,
 	0x65, 0x51, 0x52, 0x4c, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x34, 0x2f, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68,
+	0x6f, 0x74, 0x6f, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68,
 	0x61, 0x31, 0x3b, 0x7a, 0x6f, 0x6e, 0x64, 0xaa, 0x02, 0x14, 0x54, 0x68, 0x65, 0x51, 0x52, 0x4c,
 	0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0xca, 0x02,
 	0x14, 0x54, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x5c, 0x5a, 0x6f, 0x6e, 0x64, 0x5c, 0x76, 0x31, 0x61,
@@ -502,19 +502,19 @@ var file_proto_prysm_v1alpha1_p2p_messages_proto_rawDesc = []byte{
 }
 
 var (
-	file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescOnce sync.Once
-	file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescData = file_proto_prysm_v1alpha1_p2p_messages_proto_rawDesc
+	file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescOnce sync.Once
+	file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescData = file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDesc
 )
 
-func file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescGZIP() []byte {
-	file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescOnce.Do(func() {
-		file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescData)
+func file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescGZIP() []byte {
+	file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescOnce.Do(func() {
+		file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescData)
 	})
-	return file_proto_prysm_v1alpha1_p2p_messages_proto_rawDescData
+	return file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescData
 }
 
-var file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_proto_prysm_v1alpha1_p2p_messages_proto_goTypes = []interface{}{
+var file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_proto_qrysm_v1alpha1_p2p_messages_proto_goTypes = []interface{}{
 	(*Status)(nil),                     // 0: theqrl.zond.v1alpha1.Status
 	(*BeaconBlocksByRangeRequest)(nil), // 1: theqrl.zond.v1alpha1.BeaconBlocksByRangeRequest
 	(*ENRForkID)(nil),                  // 2: theqrl.zond.v1alpha1.ENRForkID
@@ -522,7 +522,7 @@ var file_proto_prysm_v1alpha1_p2p_messages_proto_goTypes = []interface{}{
 	(*MetaDataV1)(nil),                 // 4: theqrl.zond.v1alpha1.MetaDataV1
 	(*BlobSidecarsByRangeRequest)(nil), // 5: theqrl.zond.v1alpha1.BlobSidecarsByRangeRequest
 }
-var file_proto_prysm_v1alpha1_p2p_messages_proto_depIdxs = []int32{
+var file_proto_qrysm_v1alpha1_p2p_messages_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -530,13 +530,13 @@ var file_proto_prysm_v1alpha1_p2p_messages_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_proto_prysm_v1alpha1_p2p_messages_proto_init() }
-func file_proto_prysm_v1alpha1_p2p_messages_proto_init() {
-	if File_proto_prysm_v1alpha1_p2p_messages_proto != nil {
+func init() { file_proto_qrysm_v1alpha1_p2p_messages_proto_init() }
+func file_proto_qrysm_v1alpha1_p2p_messages_proto_init() {
+	if File_proto_qrysm_v1alpha1_p2p_messages_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Status); i {
 			case 0:
 				return &v.state
@@ -548,7 +548,7 @@ func file_proto_prysm_v1alpha1_p2p_messages_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BeaconBlocksByRangeRequest); i {
 			case 0:
 				return &v.state
@@ -560,7 +560,7 @@ func file_proto_prysm_v1alpha1_p2p_messages_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ENRForkID); i {
 			case 0:
 				return &v.state
@@ -572,7 +572,7 @@ func file_proto_prysm_v1alpha1_p2p_messages_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MetaDataV0); i {
 			case 0:
 				return &v.state
@@ -584,7 +584,7 @@ func file_proto_prysm_v1alpha1_p2p_messages_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MetaDataV1); i {
 			case 0:
 				return &v.state
@@ -596,7 +596,7 @@ func file_proto_prysm_v1alpha1_p2p_messages_proto_init() {
 				return nil
 			}
 		}
-		file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BlobSidecarsByRangeRequest); i {
 			case 0:
 				return &v.state
@@ -613,18 +613,18 @@ func file_proto_prysm_v1alpha1_p2p_messages_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_prysm_v1alpha1_p2p_messages_proto_rawDesc,
+			RawDescriptor: file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_proto_prysm_v1alpha1_p2p_messages_proto_goTypes,
-		DependencyIndexes: file_proto_prysm_v1alpha1_p2p_messages_proto_depIdxs,
-		MessageInfos:      file_proto_prysm_v1alpha1_p2p_messages_proto_msgTypes,
+		GoTypes:           file_proto_qrysm_v1alpha1_p2p_messages_proto_goTypes,
+		DependencyIndexes: file_proto_qrysm_v1alpha1_p2p_messages_proto_depIdxs,
+		MessageInfos:      file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes,
 	}.Build()
-	File_proto_prysm_v1alpha1_p2p_messages_proto = out.File
-	file_proto_prysm_v1alpha1_p2p_messages_proto_rawDesc = nil
-	file_proto_prysm_v1alpha1_p2p_messages_proto_goTypes = nil
-	file_proto_prysm_v1alpha1_p2p_messages_proto_depIdxs = nil
+	File_proto_qrysm_v1alpha1_p2p_messages_proto = out.File
+	file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDesc = nil
+	file_proto_qrysm_v1alpha1_p2p_messages_proto_goTypes = nil
+	file_proto_qrysm_v1alpha1_p2p_messages_proto_depIdxs = nil
 }
