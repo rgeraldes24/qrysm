@@ -1,5 +1,6 @@
 package remote_web3signer
 
+/*
 import (
 	"bytes"
 	"context"
@@ -203,10 +204,10 @@ func getSignRequestJson(ctx context.Context, validator *validator.Validate, requ
 		blindedBlockCapellaSignRequestsTotal.Inc()
 		return json.Marshal(blindedBlockv2CapellaSignRequest)
 	// We do not support "DEPOSIT" type.
-	/*
-		case *validatorpb.:
-		return "DEPOSIT", nil
-	*/
+	//
+	//	case *validatorpb.:
+	//	return "DEPOSIT", nil
+	//
 
 	case *validatorpb.SignRequest_Epoch:
 		randaoRevealSignRequest, err := web3signerv1.GetRandaoRevealSignRequest(request, genesisValidatorsRoot)
@@ -400,3 +401,4 @@ func (km *Keymanager) DeletePublicKeys(ctx context.Context, pubKeys [][dilithium
 	km.accountsChangedFeed.Send(km.providedPublicKeys)
 	return deletedRemoteKeysStatuses, nil
 }
+*/

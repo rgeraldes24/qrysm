@@ -1,5 +1,6 @@
 package internal
 
+/*
 import (
 	"bytes"
 	"context"
@@ -88,7 +89,7 @@ func (client *ApiClient) Sign(ctx context.Context, pubKey string, request SignRe
 
 // GetPublicKeys is a wrapper method around the web3signer publickeys api (this may be removed in the future or moved to another location due to its usage).
 func (client *ApiClient) GetPublicKeys(ctx context.Context, url string) ([][dilithium2.CryptoPublicKeyBytes]byte, error) {
-	resp, err := client.doRequest(ctx, http.MethodGet, url, nil /* no body needed on get request */)
+	resp, err := client.doRequest(ctx, http.MethodGet, url, nil // no body needed on get request )
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +125,7 @@ func (client *ApiClient) ReloadSignerKeys(ctx context.Context) error {
 // GetServerStatus is a wrapper method around the web3signer upcheck api
 func (client *ApiClient) GetServerStatus(ctx context.Context) (string, error) {
 	const requestPath = "/upcheck"
-	resp, err := client.doRequest(ctx, http.MethodGet, client.BaseURL.String()+requestPath, nil /* no body needed on get request */)
+	resp, err := client.doRequest(ctx, http.MethodGet, client.BaseURL.String()+requestPath, nil // no body needed on get request )
 	if err != nil {
 		return "", err
 	}
@@ -221,3 +222,4 @@ func closeBody(body io.Closer) {
 		log.WithError(err).Error("could not close response body")
 	}
 }
+*/
