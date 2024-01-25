@@ -40,36 +40,13 @@ func TestProposeBeaconBlock_Error(t *testing.T) {
 		endpoint         string
 		block            *zondpb.GenericSignedBeaconBlock
 	}{
-		{
-			name:             "phase0",
-			consensusVersion: "phase0",
-			endpoint:         "/zond/v1/beacon/blocks",
-			block: &zondpb.GenericSignedBeaconBlock{
-				Block: generateSignedPhase0Block(),
-			},
-		},
-		{
-			name:             "altair",
-			consensusVersion: "altair",
-			endpoint:         "/zond/v1/beacon/blocks",
-			block: &zondpb.GenericSignedBeaconBlock{
-				Block: generateSignedAltairBlock(),
-			},
-		},
+		// TODO Capella
 		{
 			name:             "bellatrix",
 			consensusVersion: "bellatrix",
 			endpoint:         "/zond/v1/beacon/blocks",
 			block: &zondpb.GenericSignedBeaconBlock{
 				Block: generateSignedBellatrixBlock(),
-			},
-		},
-		{
-			name:             "blinded bellatrix",
-			consensusVersion: "bellatrix",
-			endpoint:         "/zond/v1/beacon/blinded_blocks",
-			block: &zondpb.GenericSignedBeaconBlock{
-				Block: generateSignedBlindedBellatrixBlock(),
 			},
 		},
 		{

@@ -98,7 +98,7 @@ func generateSignedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Capella {
 	return &zondpb.GenericSignedBeaconBlock_Capella{
 		Capella: &zondpb.SignedBeaconBlockCapella{
 			Block:     test_helpers.GenerateProtoCapellaBeaconBlock(),
-			Signature: test_helpers.FillByteSlice(96, 127),
+			Signature: test_helpers.FillByteSlice(4595, 127),
 		},
 	}
 }

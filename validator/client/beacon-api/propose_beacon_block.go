@@ -9,7 +9,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/shared"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
@@ -23,51 +22,6 @@ func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *zo
 	blinded := false
 
 	switch blockType := in.Block.(type) {
-	case *zondpb.GenericSignedBeaconBlock_Phase0:
-		consensusVersion = "phase0"
-		beaconBlockRoot, err = blockType.Phase0.Block.HashTreeRoot()
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to compute block root for phase0 beacon block")
-		}
-
-		marshalledSignedBeaconBlockJson, err = marshallBeaconBlockPhase0(blockType.Phase0)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to marshall phase0 beacon block")
-		}
-	case *zondpb.GenericSignedBeaconBlock_Altair:
-		consensusVersion = "altair"
-		beaconBlockRoot, err = blockType.Altair.Block.HashTreeRoot()
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to compute block root for altair beacon block")
-		}
-
-		marshalledSignedBeaconBlockJson, err = marshallBeaconBlockAltair(blockType.Altair)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to marshall altair beacon block")
-		}
-	case *zondpb.GenericSignedBeaconBlock_Bellatrix:
-		consensusVersion = "bellatrix"
-		beaconBlockRoot, err = blockType.Bellatrix.Block.HashTreeRoot()
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to compute block root for bellatrix beacon block")
-		}
-
-		marshalledSignedBeaconBlockJson, err = marshallBeaconBlockBellatrix(blockType.Bellatrix)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to marshall bellatrix beacon block")
-		}
-	case *zondpb.GenericSignedBeaconBlock_BlindedBellatrix:
-		blinded = true
-		consensusVersion = "bellatrix"
-		beaconBlockRoot, err = blockType.BlindedBellatrix.Block.HashTreeRoot()
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to compute block root for blinded bellatrix beacon block")
-		}
-
-		marshalledSignedBeaconBlockJson, err = marshallBeaconBlockBlindedBellatrix(blockType.BlindedBellatrix)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to marshall blinded bellatrix beacon block")
-		}
 	case *zondpb.GenericSignedBeaconBlock_Capella:
 		consensusVersion = "capella"
 		beaconBlockRoot, err = blockType.Capella.Block.HashTreeRoot()
@@ -90,35 +44,6 @@ func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *zo
 		marshalledSignedBeaconBlockJson, err = marshallBeaconBlockBlindedCapella(blockType.BlindedCapella)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to marshall blinded capella beacon block")
-		}
-	case *zondpb.GenericSignedBeaconBlock_Deneb:
-		consensusVersion = "deneb"
-		beaconBlockRoot, err = blockType.Deneb.Block.HashTreeRoot()
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to compute block root for deneb beacon block")
-		}
-		signedBlock, err := shared.SignedBeaconBlockContentsDenebFromConsensus(blockType.Deneb)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to convert deneb beacon block contents")
-		}
-		marshalledSignedBeaconBlockJson, err = json.Marshal(signedBlock)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to marshal deneb beacon block contents")
-		}
-	case *zondpb.GenericSignedBeaconBlock_BlindedDeneb:
-		blinded = true
-		consensusVersion = "deneb"
-		beaconBlockRoot, err = blockType.BlindedDeneb.SignedBlindedBlock.HashTreeRoot()
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to compute block root for blinded deneb beacon block")
-		}
-		signedBlock, err := shared.SignedBlindedBeaconBlockContentsDenebFromConsensus(blockType.BlindedDeneb)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to convert blinded deneb beacon block contents")
-		}
-		marshalledSignedBeaconBlockJson, err = json.Marshal(signedBlock)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to marshal blinded deneb beacon block contents")
 		}
 	default:
 		return nil, errors.Errorf("unsupported block type %T", in.Block)
@@ -331,6 +256,7 @@ func marshallBeaconBlockCapella(block *zondpb.SignedBeaconBlockCapella) ([]byte,
 	return json.Marshal(signedBeaconBlockCapellaJson)
 }
 
+// TODO
 func marshallBeaconBlockBlindedCapella(block *zondpb.SignedBlindedBeaconBlockCapella) ([]byte, error) {
 	signedBeaconBlockCapellaJson := &apimiddleware.SignedBlindedBeaconBlockCapellaJson{
 		Signature: hexutil.Encode(block.Signature),

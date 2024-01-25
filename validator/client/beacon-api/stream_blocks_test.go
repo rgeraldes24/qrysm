@@ -9,10 +9,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/shared"
-	rpctesting "github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/shared/testing"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -178,6 +175,7 @@ func TestStreamBlocks_Error(t *testing.T) {
 
 }
 
+/*
 func TestStreamBlocks_Phase0Valid(t *testing.T) {
 	testCases := []struct {
 		name         string
@@ -669,6 +667,7 @@ func TestStreamBlocks_BellatrixValid(t *testing.T) {
 		})
 	}
 }
+*/
 
 func TestStreamBlocks_CapellaValid(t *testing.T) {
 	testCases := []struct {
@@ -834,6 +833,7 @@ func TestStreamBlocks_CapellaValid(t *testing.T) {
 	}
 }
 
+/*
 func TestStreamBlocks_DenebValid(t *testing.T) {
 	testCases := []struct {
 		name         string
@@ -978,3 +978,4 @@ func TestStreamBlocks_DenebValid(t *testing.T) {
 		})
 	}
 }
+*/
