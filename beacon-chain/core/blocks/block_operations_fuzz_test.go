@@ -4,12 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/theQRL/qrysm/v4/config/params"
-
 	fuzz "github.com/google/gofuzz"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	v "github.com/theQRL/qrysm/v4/beacon-chain/core/validators"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
