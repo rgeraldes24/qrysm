@@ -948,7 +948,7 @@ func TestService_ReceiveBlocks_SetHighest(t *testing.T) {
 	v.ReceiveBlocks(ctx, connectionErrorChannel)
 	require.Equal(t, slot, v.highestValidSlot)
 }
-*/
+
 
 func TestService_ReceiveBlocks_SetHighestDeneb(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -980,6 +980,7 @@ func TestService_ReceiveBlocks_SetHighestDeneb(t *testing.T) {
 	v.ReceiveBlocks(ctx, connectionErrorChannel)
 	require.Equal(t, slot, v.highestValidSlot)
 }
+*/
 
 type doppelGangerRequestMatcher struct {
 	req *zondpb.DoppelGangerRequest

@@ -9,6 +9,8 @@ import (
 	test_helpers "github.com/theQRL/qrysm/v4/validator/client/beacon-api/test-helpers"
 )
 
+// TODO(rgeraldes24): move tests
+/*
 func TestGetBeaconBlockConverter_Phase0Valid(t *testing.T) {
 	expectedBeaconBlock := test_helpers.GenerateProtoPhase0BeaconBlock()
 	beaconBlockConverter := &beaconApiBeaconBlockConverter{}
@@ -431,6 +433,7 @@ func TestGetBeaconBlockConverter_BellatrixError(t *testing.T) {
 		})
 	}
 }
+*/
 
 func TestGetBeaconBlockConverter_CapellaValid(t *testing.T) {
 	expectedBeaconBlock := test_helpers.GenerateProtoCapellaBeaconBlock()

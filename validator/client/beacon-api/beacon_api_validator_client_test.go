@@ -108,7 +108,7 @@ func TestBeaconApiValidatorClient_GetFeeRecipientByPubKey(t *testing.T) {
 
 func TestBeaconApiValidatorClient_DomainDataValid(t *testing.T) {
 	const genesisValidatorRoot = "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"
-	epoch := params.BeaconConfig().AltairForkEpoch
+	epoch := primitives.Epoch(0)
 	domainType := params.BeaconConfig().DomainSyncCommittee[:]
 
 	ctrl := gomock.NewController(t)
@@ -133,7 +133,7 @@ func TestBeaconApiValidatorClient_DomainDataValid(t *testing.T) {
 }
 
 func TestBeaconApiValidatorClient_DomainDataError(t *testing.T) {
-	epoch := params.BeaconConfig().AltairForkEpoch
+	epoch := primitives.Epoch(0)
 	domainType := make([]byte, 3)
 	validatorClient := beaconApiValidatorClient{}
 	_, err := validatorClient.DomainData(context.Background(), &zondpb.DomainRequest{Epoch: epoch, Domain: domainType})
@@ -162,14 +162,14 @@ func TestBeaconApiValidatorClient_ProposeBeaconBlockValid(t *testing.T) {
 	expectedResp, expectedErr := validatorClient.proposeBeaconBlock(
 		ctx,
 		&zondpb.GenericSignedBeaconBlock{
-			Block: generateSignedPhase0Block(),
+			Block: generateSignedCapellaBlock(),
 		},
 	)
 
 	resp, err := validatorClient.ProposeBeaconBlock(
 		ctx,
 		&zondpb.GenericSignedBeaconBlock{
-			Block: generateSignedPhase0Block(),
+			Block: generateSignedCapellaBlock(),
 		},
 	)
 
@@ -199,14 +199,14 @@ func TestBeaconApiValidatorClient_ProposeBeaconBlockError(t *testing.T) {
 	expectedResp, expectedErr := validatorClient.proposeBeaconBlock(
 		ctx,
 		&zondpb.GenericSignedBeaconBlock{
-			Block: generateSignedPhase0Block(),
+			Block: generateSignedCapellaBlock(),
 		},
 	)
 
 	resp, err := validatorClient.ProposeBeaconBlock(
 		ctx,
 		&zondpb.GenericSignedBeaconBlock{
-			Block: generateSignedPhase0Block(),
+			Block: generateSignedCapellaBlock(),
 		},
 	)
 

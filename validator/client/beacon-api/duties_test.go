@@ -1011,6 +1011,7 @@ func TestGetDutiesForEpoch_Valid(t *testing.T) {
 	}
 }
 
+// TODO(rgeraldes24)
 func TestGetDuties_Valid(t *testing.T) {
 	testCases := []struct {
 		name  string

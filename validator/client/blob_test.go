@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -39,7 +39,7 @@ func Test_validator_signBlob(t *testing.T) {
 		KzgProof:        bytesutil.PadTo([]byte("kzgPRoof"), 48),
 	}
 	ctx := context.Background()
-	sig, err := v.signBlob(ctx, blob, [dilithium2.CryptoPublicKeyBytes]byte(vk.PublicKey().Marshal()))
+	sig, err := v.signBlob(ctx, blob, [dilithiumlib.CryptoPublicKeyBytes]byte(vk.PublicKey().Marshal()))
 	require.NoError(t, err)
 	pb, err := dilithium.PublicKeyFromBytes(vk.PublicKey().Marshal())
 	require.NoError(t, err)
@@ -82,7 +82,7 @@ func TestValidatorSignBlindBlob(t *testing.T) {
 	ctx := context.Background()
 
 	// Test signature creation and validation
-	signatureBytes, err := v.signBlindBlob(ctx, blobData, [dilithium2.CryptoPublicKeyBytes]byte(vk.PublicKey().Marshal()))
+	signatureBytes, err := v.signBlindBlob(ctx, blobData, [dilithiumlib.CryptoPublicKeyBytes]byte(vk.PublicKey().Marshal()))
 	require.NoError(t, err)
 
 	publicKey, err := dilithium.PublicKeyFromBytes(vk.PublicKey().Marshal())
@@ -137,7 +137,7 @@ func Test_validator_signDenebBlobs(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	signedBlobs, err := v.signDenebBlobs(ctx, blobs, [dilithium2.CryptoPublicKeyBytes]byte(vk.PublicKey().Marshal()))
+	signedBlobs, err := v.signDenebBlobs(ctx, blobs, [dilithiumlib.CryptoPublicKeyBytes]byte(vk.PublicKey().Marshal()))
 	require.NoError(t, err)
 
 	// Verify each signed blob
@@ -194,7 +194,7 @@ func Test_validator_signBlindedDenebBlobs(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	signedBlindedBlobs, err := v.signBlindedDenebBlobs(ctx, blindedBlobs, [dilithium2.CryptoPublicKeyBytes]byte(vk.PublicKey().Marshal()))
+	signedBlindedBlobs, err := v.signBlindedDenebBlobs(ctx, blindedBlobs, [dilithiumlib.CryptoPublicKeyBytes]byte(vk.PublicKey().Marshal()))
 	require.NoError(t, err)
 
 	// Verify each signed blinded blob
