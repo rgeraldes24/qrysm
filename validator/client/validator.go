@@ -166,7 +166,7 @@ func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
 		// if v.Web3SignerConfig != nil {
 		// 	v.Web3SignerConfig.GenesisValidatorsRoot = genesisRoot
 		// }
-		keyManager, err := v.wallet.InitializeKeymanager(ctx, accountsiface.InitKeymanagerConfig{ListenForChanges: true, Web3SignerConfig: v.Web3SignerConfig})
+		keyManager, err := v.wallet.InitializeKeymanager(ctx, accountsiface.InitKeymanagerConfig{ListenForChanges: true /*, Web3SignerConfig: v.Web3SignerConfig*/})
 		if err != nil {
 			return errors.Wrap(err, "could not initialize key manager")
 		}
@@ -366,8 +366,6 @@ func (v *validator) ReceiveBlocks(ctx context.Context, connectionErrorChannel ch
 		switch b := res.Block.(type) {
 		case *zondpb.StreamBlocksResponse_CapellaBlock:
 			blk, err = blocks.NewSignedBeaconBlock(b.CapellaBlock)
-			// case *zondpb.StreamBlocksResponse_DenebBlock:
-			// 	blk, err = blocks.NewSignedBeaconBlock(b.DenebBlock)
 		}
 		if err != nil {
 			log.WithError(err).Error("Failed to wrap signed block")

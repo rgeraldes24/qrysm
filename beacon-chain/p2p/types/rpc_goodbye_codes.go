@@ -13,15 +13,14 @@ const (
 	GoodbyeCodeWrongNetwork
 	GoodbyeCodeGenericError
 
-	/*
-		// Teku specific codes
-		GoodbyeCodeUnableToVerifyNetwork = RPCGoodbyeCode(128)
+	// TODO(rgeraldes24)
+	// Teku specific codes
+	GoodbyeCodeUnableToVerifyNetwork = RPCGoodbyeCode(128)
 
-		// Lighthouse specific codes
-		GoodbyeCodeTooManyPeers = RPCGoodbyeCode(129)
-		GoodbyeCodeBadScore     = RPCGoodbyeCode(250)
-		GoodbyeCodeBanned       = RPCGoodbyeCode(251)
-	*/
+	// Lighthouse specific codes
+	GoodbyeCodeTooManyPeers = RPCGoodbyeCode(129)
+	GoodbyeCodeBadScore     = RPCGoodbyeCode(250)
+	GoodbyeCodeBanned       = RPCGoodbyeCode(251)
 )
 
 // GoodbyeCodeMessages defines a mapping between goodbye codes and string messages.

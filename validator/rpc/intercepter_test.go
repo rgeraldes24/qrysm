@@ -68,7 +68,6 @@ func TestServer_JWTInterceptor_InvalidSigningType(t *testing.T) {
 	require.ErrorContains(t, "unexpected JWT signing method", err)
 }
 
-/*
 func createTokenString(jwtKey []byte) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{})
 	// Sign and get the complete encoded token as a string using the secret
@@ -78,4 +77,3 @@ func createTokenString(jwtKey []byte) (string, error) {
 	}
 	return tokenString, nil
 }
-*/

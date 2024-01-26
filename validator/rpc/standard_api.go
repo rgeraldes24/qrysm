@@ -388,6 +388,7 @@ func (s *Server) DeleteRemoteKeys(ctx context.Context, req *zondpbservice.Delete
 }
 */
 
+/*
 func groupDeleteRemoteKeysErrors(req *zondpbservice.DeleteRemoteKeysRequest, errorMessage string) []*zondpbservice.DeletedRemoteKeysStatus {
 	statuses := make([]*zondpbservice.DeletedRemoteKeysStatus, len(req.Pubkeys))
 	for i := 0; i < len(req.Pubkeys); i++ {
@@ -398,6 +399,7 @@ func groupDeleteRemoteKeysErrors(req *zondpbservice.DeleteRemoteKeysRequest, err
 	}
 	return statuses
 }
+*/
 
 func (s *Server) GetGasLimit(_ context.Context, req *zondpbservice.PubkeyRequest) (*zondpbservice.GetGasLimitResponse, error) {
 	if s.validatorService == nil {

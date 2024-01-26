@@ -22,7 +22,6 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -504,17 +503,6 @@ func testProposeBlock(t *testing.T, graffiti []byte) {
 
 			var sentBlock interfaces.ReadOnlySignedBeaconBlock
 			var err error
-
-			if tt.version == version.Deneb {
-				m.validatorClient.EXPECT().DomainData(
-					gomock.Any(), // ctx
-					gomock.Any(), // epoch
-				).Return(&zondpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil /*err*/)
-				m.validatorClient.EXPECT().DomainData(
-					gomock.Any(), // ctx
-					gomock.Any(), // epoch
-				).Return(&zondpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil /*err*/)
-			}
 
 			m.validatorClient.EXPECT().ProposeBeaconBlock(
 				gomock.Any(), // ctx

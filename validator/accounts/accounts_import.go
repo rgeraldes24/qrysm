@@ -11,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/io/file"
@@ -18,7 +19,6 @@ import (
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	"github.com/theQRL/qrysm/v4/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
-	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 )
 
 /*

@@ -180,7 +180,7 @@ var (
 	// ShowDepositDataFlag for accounts.
 	ShowDepositDataFlag = &cli.BoolFlag{
 		Name:  "show-deposit-data",
-		Usage: "Display raw eth1 tx deposit data for validator accounts",
+		Usage: "Display raw zond tx deposit data for validator accounts",
 		Value: false,
 	}
 	// ShowPrivateKeysFlag for accounts.
@@ -293,7 +293,7 @@ var (
 		// web3signer documentation can be found in Consensys' web3signer project docs
 		Web3SignerURLFlag = &cli.StringFlag{
 			Name:  "validators-external-signer-url",
-			Usage: "URL for consensys' web3signer software to use with the Prysm validator client",
+			Usage: "URL for consensys' web3signer software to use with the Qrysm validator client",
 			Value: "",
 		}
 

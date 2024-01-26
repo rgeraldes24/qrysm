@@ -13,7 +13,7 @@ import (
 
 var log = logrus.WithField("prefix", "accounts")
 
-// Commands for managing Prysm validator accounts.
+// Commands for managing Qrysm validator accounts.
 var Commands = &cli.Command{
 	Name:     "accounts",
 	Category: "accounts",

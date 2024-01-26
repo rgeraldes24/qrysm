@@ -166,22 +166,13 @@ func (v *validator) ProposeBlock(ctx context.Context, slot primitives.Slot, pubK
 	if p.GasLimit() != 0 {
 		log = log.WithField("gasUtilized", float64(p.GasUsed())/float64(p.GasLimit()))
 	}
-	if blk.Version() >= version.Capella && !blk.IsBlinded() {
+	if !blk.IsBlinded() {
 		withdrawals, err := p.Withdrawals()
 		if err != nil {
 			log.WithError(err).Error("Failed to get execution payload withdrawals")
 			return
 		}
 		log = log.WithField("withdrawalCount", len(withdrawals))
-	}
-	if blk.Version() >= version.Deneb {
-		kzgs, err := blk.Block().Body().BlobKzgCommitments()
-		if err != nil {
-			log.WithError(err).Error("Failed to get blob KZG commitments")
-			return
-		} else if len(kzgs) != 0 {
-			log = log.WithField("kzgCommitmentCount", len(kzgs))
-		}
 	}
 
 	blkRoot := fmt.Sprintf("%#x", bytesutil.Trunc(blkResp.BlockRoot))

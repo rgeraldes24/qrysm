@@ -13,6 +13,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
+	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/v4/cmd/validator/flags"
 	"github.com/theQRL/qrysm/v4/config/params"
 	types "github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -24,7 +25,6 @@ import (
 	"github.com/theQRL/qrysm/v4/validator/keymanager"
 	"github.com/theQRL/qrysm/v4/validator/keymanager/local"
 	"github.com/urfave/cli/v2"
-	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 )
 
 const (

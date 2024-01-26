@@ -42,7 +42,6 @@ import (
 	"github.com/theQRL/qrysm/v4/monitoring/backup"
 	"github.com/theQRL/qrysm/v4/monitoring/prometheus"
 	tracing2 "github.com/theQRL/qrysm/v4/monitoring/tracing"
-	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/validator-client"
 	zondpbservice "github.com/theQRL/qrysm/v4/proto/zond/service"
 	"github.com/theQRL/qrysm/v4/runtime"
@@ -708,7 +707,7 @@ func (c *ValidatorClient) registerRPCGatewayService(cliCtx *cli.Context) error {
 	}
 	maxCallSize := cliCtx.Uint64(cmd.GrpcMaxCallRecvMsgSizeFlag.Name)
 
-	registrations := []gateway.PbHandlerRegistration{,
+	registrations := []gateway.PbHandlerRegistration{
 		zondpbservice.RegisterKeyManagementHandler,
 	}
 	gwmux := gwruntime.NewServeMux(
