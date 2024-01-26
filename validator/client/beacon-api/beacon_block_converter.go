@@ -14,9 +14,6 @@ import (
 )
 
 type beaconBlockConverter interface {
-	ConvertRESTPhase0BlockToProto(block *apimiddleware.BeaconBlockJson) (*zondpb.BeaconBlock, error)
-	ConvertRESTAltairBlockToProto(block *apimiddleware.BeaconBlockAltairJson) (*zondpb.BeaconBlockAltair, error)
-	ConvertRESTBellatrixBlockToProto(block *apimiddleware.BeaconBlockBellatrixJson) (*zondpb.BeaconBlockBellatrix, error)
 	ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*zondpb.BeaconBlockCapella, error)
 }
 

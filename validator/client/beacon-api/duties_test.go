@@ -11,9 +11,9 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/beacon"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/shared"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/validator"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/beacon"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/validator"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -760,7 +760,6 @@ func TestGetDutiesForEpoch_Error(t *testing.T) {
 						{Status: zondpb.ValidatorStatus_PENDING},
 					},
 				},
-				true,
 			)
 			assert.ErrorContains(t, testCase.expectedError, err)
 		})
@@ -1005,7 +1004,6 @@ func TestGetDutiesForEpoch_Valid(t *testing.T) {
 				ctx,
 				epoch,
 				multipleValidatorStatus,
-				testCase.fetchSyncDuties,
 			)
 			require.NoError(t, err)
 			assert.DeepEqual(t, expectedDuties, duties)
@@ -1269,7 +1267,6 @@ func TestGetDuties_Valid(t *testing.T) {
 				ctx,
 				testCase.epoch,
 				multipleValidatorStatus,
-				fetchSyncDuties,
 			)
 			require.NoError(t, err)
 
@@ -1277,7 +1274,6 @@ func TestGetDuties_Valid(t *testing.T) {
 				ctx,
 				testCase.epoch+1,
 				multipleValidatorStatus,
-				fetchSyncDuties,
 			)
 			require.NoError(t, err)
 
