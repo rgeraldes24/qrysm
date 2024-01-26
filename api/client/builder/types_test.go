@@ -13,7 +13,7 @@ import (
 
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/shared"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/math"
 	v1 "github.com/theQRL/qrysm/v4/proto/engine/v1"

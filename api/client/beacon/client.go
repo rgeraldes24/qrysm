@@ -14,7 +14,7 @@ import (
 	"text/template"
 
 	"github.com/theQRL/qrysm/v4/api/client"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/eth/shared"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
 	"github.com/theQRL/qrysm/v4/network/forks"
 	v1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 

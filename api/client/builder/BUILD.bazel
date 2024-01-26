@@ -11,7 +11,7 @@ go_library(
     importpath = "github.com/theQRL/qrysm/v4/api/client/builder",
     visibility = ["//visibility:public"],
     deps = [
-        "//beacon-chain/rpc/eth/shared:go_default_library",
+        "//beacon-chain/rpc/zond/shared:go_default_library",
         "//config/fieldparams:go_default_library",
         "//consensus-types:go_default_library",
         "//consensus-types/blocks:go_default_library",
@@ -43,7 +43,7 @@ go_test(
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
     deps = [
-        "//beacon-chain/rpc/eth/shared:go_default_library",
+        "//beacon-chain/rpc/zond/shared:go_default_library",
         "//config/fieldparams:go_default_library",
         "//config/params:go_default_library",
         "//consensus-types/blocks:go_default_library",
