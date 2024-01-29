@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 )
 
 // AggregatedSignature represents aggregated signature produced by AggregateBatch()
@@ -58,8 +58,8 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 	errmsg := "some signatures are invalid. details:"
 	for i := 0; i < len(s.Signatures); i++ {
 		for j, pubKey := range s.PublicKeys[i] {
-			offset := j * dilithium2.CryptoBytes
-			sig := s.Signatures[i][offset : offset+dilithium2.CryptoBytes]
+			offset := j * dilithium.CryptoBytes
+			sig := s.Signatures[i][offset : offset+dilithium.CryptoBytes]
 			msg := s.Messages[i]
 
 			valid, err := VerifySignature(sig, msg, pubKey)
