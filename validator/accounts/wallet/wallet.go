@@ -29,9 +29,6 @@ const (
 	PasswordPromptText = "Wallet password"
 	// ConfirmPasswordPromptText for confirming a wallet password.
 	ConfirmPasswordPromptText = "Confirm password"
-	// DefaultWalletPasswordFile used to store a wallet password with appropriate permissions
-	// if a user signs up via the Qrysm web UI via RPC.
-	// DefaultWalletPasswordFile = "walletpassword.txt"
 	// CheckExistsErrMsg for when there is an error while checking for a wallet
 	CheckExistsErrMsg = "could not check if wallet exists"
 	// CheckValidityErrMsg for when there is an error while checking wallet validity
