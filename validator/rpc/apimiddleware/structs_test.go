@@ -148,7 +148,6 @@ func TestListRemoteKeys_JSONisEqual(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, resp, true)
 }
-*/
 
 func TestImportRemoteKeys_JSONisEqual(t *testing.T) {
 	importKeystoresRequest := &ImportRemoteKeysRequestJson{}
@@ -229,6 +228,7 @@ func TestDeleteRemoteKeys_JSONisEqual(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, resp, true)
 }
+*/
 
 // note: this does not do a deep comparison of the structs
 func areJsonPropertyNamesEqual(internal, proto interface{}) (bool, error) {

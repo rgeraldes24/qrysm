@@ -6,7 +6,6 @@ var (
 
 	// Validator slashing protection from double proposals.
 	historicProposalsBucket = []byte("proposal-history-bucket-interchange")
-	// deprecatedAttestationHistoryBucket = []byte("attestation-history-bucket-interchange") TODO(rgeraldes24): remove?
 
 	// Buckets for lowest signed source and target epoch for individual validator.
 	lowestSignedSourceBucket = []byte("lowest-signed-source-bucket")

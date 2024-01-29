@@ -413,7 +413,6 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 		if !cfg.ShowDepositData {
 			continue
 		}
-		// TODO(rgeraldes24)
 		fmt.Printf(
 			"%s\n",
 			au.BrightRed("If you imported your account coming from the zond launchpad, you will find your "+

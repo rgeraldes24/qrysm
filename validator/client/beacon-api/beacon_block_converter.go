@@ -59,7 +59,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 	}
 
 	if block.Body.Eth1Data == nil {
-		return nil, errors.New("zond1 data is nil")
+		return nil, errors.New("eth1 data is nil")
 	}
 
 	depositRoot, err := hexutil.Decode(block.Body.Eth1Data.DepositRoot)

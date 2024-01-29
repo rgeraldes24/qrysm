@@ -889,8 +889,6 @@ func TestCheckAndLogValidatorStatus_OK(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24)
-/*
 func TestService_ReceiveBlocks_NilBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -907,8 +905,8 @@ func TestService_ReceiveBlocks_NilBlock(t *testing.T) {
 	).Return(stream, nil)
 	stream.EXPECT().Context().Return(ctx).AnyTimes()
 	stream.EXPECT().Recv().Return(
-		&zondpb.StreamBlocksResponse{Block: &zondpb.StreamBlocksResponse_Phase0Block{
-			Phase0Block: &zondpb.SignedBeaconBlock{}}},
+		&zondpb.StreamBlocksResponse{Block: &zondpb.StreamBlocksResponse_CapellaBlock{
+			CapellaBlock: &zondpb.SignedBeaconBlockCapella{}}},
 		nil,
 	).Do(func() {
 		cancel()
@@ -918,7 +916,7 @@ func TestService_ReceiveBlocks_NilBlock(t *testing.T) {
 	require.Equal(t, primitives.Slot(0), v.highestValidSlot)
 }
 
-func TestService_ReceiveBlocks_SetHighest(t *testing.T) {
+func TestService_ReceiveBlocks_SetHighestCapella(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	client := validatormock.NewMockValidatorClient(ctrl)
@@ -937,8 +935,8 @@ func TestService_ReceiveBlocks_SetHighest(t *testing.T) {
 	slot := primitives.Slot(100)
 	stream.EXPECT().Recv().Return(
 		&zondpb.StreamBlocksResponse{
-			Block: &zondpb.StreamBlocksResponse_Phase0Block{
-				Phase0Block: &zondpb.SignedBeaconBlock{Block: &zondpb.BeaconBlock{Slot: slot, Body: &zondpb.BeaconBlockBody{}}}},
+			Block: &zondpb.StreamBlocksResponse_CapellaBlock{
+				CapellaBlock: &zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Slot: slot, Body: &zondpb.BeaconBlockBodyCapella{}}}},
 		},
 		nil,
 	).Do(func() {
@@ -948,39 +946,6 @@ func TestService_ReceiveBlocks_SetHighest(t *testing.T) {
 	v.ReceiveBlocks(ctx, connectionErrorChannel)
 	require.Equal(t, slot, v.highestValidSlot)
 }
-
-
-func TestService_ReceiveBlocks_SetHighestDeneb(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	client := validatormock.NewMockValidatorClient(ctrl)
-
-	v := validator{
-		validatorClient: client,
-		blockFeed:       new(event.Feed),
-	}
-	stream := mock2.NewMockBeaconNodeValidatorAltair_StreamBlocksClient(ctrl)
-	ctx, cancel := context.WithCancel(context.Background())
-	client.EXPECT().StreamBlocksAltair(
-		gomock.Any(),
-		&zondpb.StreamBlocksRequest{VerifiedOnly: true},
-	).Return(stream, nil)
-	stream.EXPECT().Context().Return(ctx).AnyTimes()
-	slot := primitives.Slot(100)
-	stream.EXPECT().Recv().Return(
-		&zondpb.StreamBlocksResponse{
-			Block: &zondpb.StreamBlocksResponse_DenebBlock{
-				DenebBlock: &zondpb.SignedBeaconBlockDeneb{Block: &zondpb.BeaconBlockDeneb{Slot: slot, Body: &zondpb.BeaconBlockBodyDeneb{}}}},
-		},
-		nil,
-	).Do(func() {
-		cancel()
-	})
-	connectionErrorChannel := make(chan error)
-	v.ReceiveBlocks(ctx, connectionErrorChannel)
-	require.Equal(t, slot, v.highestValidSlot)
-}
-*/
 
 type doppelGangerRequestMatcher struct {
 	req *zondpb.DoppelGangerRequest

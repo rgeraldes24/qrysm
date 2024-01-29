@@ -25,22 +25,9 @@ func (c *grpcBeaconChainClient) ListValidators(ctx context.Context, in *zondpb.L
 	return c.beaconChainClient.ListValidators(ctx, in)
 }
 
-// TODO(rgeraldes24)
-/*
-func (c *grpcBeaconChainClient) GetValidatorQueue(ctx context.Context, in *empty.Empty) (*zondpb.ValidatorQueue, error) {
-	return c.beaconChainClient.GetValidatorQueue(ctx, in)
-}
-*/
-
 func (c *grpcBeaconChainClient) GetValidatorPerformance(ctx context.Context, in *zondpb.ValidatorPerformanceRequest) (*zondpb.ValidatorPerformanceResponse, error) {
 	return c.beaconChainClient.GetValidatorPerformance(ctx, in)
 }
-
-/*
-func (c *grpcBeaconChainClient) GetValidatorParticipation(ctx context.Context, in *zondpb.GetValidatorParticipationRequest) (*zondpb.ValidatorParticipationResponse, error) {
-	return c.beaconChainClient.GetValidatorParticipation(ctx, in)
-}
-*/
 
 func NewGrpcBeaconChainClient(cc grpc.ClientConnInterface) iface.BeaconChainClient {
 	return &grpcBeaconChainClient{zondpb.NewBeaconChainClient(cc)}

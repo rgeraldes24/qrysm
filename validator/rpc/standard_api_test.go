@@ -141,7 +141,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 		// accounts.WithKeymanagerType(keymanager.Derived),
 		accounts.WithKeymanagerType(keymanager.Local),
 		accounts.WithWalletPassword(strongPass),
-		accounts.WithSkipMnemonicConfirm(true),
+		// accounts.WithSkipMnemonicConfirm(true),
 	}
 	acc, err := accounts.NewCLIManager(opts...)
 	require.NoError(t, err)
@@ -277,7 +277,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 	})
 }
 
-// TODO(rgeraldes24)
+// NOTE(rgeraldes24): re-enable once we support the remoteweb3signer
 /*
 func TestServer_ImportKeystores_WrongKeymanagerKind(t *testing.T) {
 	ctx := context.Background()
@@ -512,7 +512,7 @@ func TestServer_DeleteKeystores_FailedSlashingProtectionExport(t *testing.T) {
 	)
 }
 
-// TODO(rgeraldes24)
+// NOTE(rgeraldes24): re-enable once we support the remoteweb3signer
 /*
 func TestServer_DeleteKeystores_WrongKeymanagerKind(t *testing.T) {
 	ctx := context.Background()

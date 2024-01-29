@@ -18,7 +18,6 @@ type DoppelGangerInfo struct {
 	response       *zondpb.DoppelGangerResponse_ValidatorResponse
 }
 
-// TODO(rgeraldes24): return early if we are not past the first 2 epochs?
 func (c *beaconApiValidatorClient) checkDoppelGanger(ctx context.Context, in *zondpb.DoppelGangerRequest) (*zondpb.DoppelGangerResponse, error) {
 	// Check if there is any doppelganger validator for the last 2 epochs.
 	// - Check if the beacon node is synced
