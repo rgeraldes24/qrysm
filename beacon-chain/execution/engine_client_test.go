@@ -1422,25 +1422,28 @@ func fixtures() map[string]interface{} {
 		Transactions:  [][]byte{foo[:]},
 		Withdrawals:   []*pb.Withdrawal{},
 	}
-	executionPayloadFixtureDeneb := &pb.ExecutionPayloadDeneb{
-		ParentHash:    foo[:],
-		FeeRecipient:  bar,
-		StateRoot:     foo[:],
-		ReceiptsRoot:  foo[:],
-		LogsBloom:     baz,
-		PrevRandao:    foo[:],
-		BlockNumber:   1,
-		GasLimit:      1,
-		GasUsed:       1,
-		Timestamp:     1,
-		ExtraData:     foo[:],
-		BaseFeePerGas: bytesutil.PadTo(baseFeePerGas.Bytes(), fieldparams.RootLength),
-		BlockHash:     foo[:],
-		Transactions:  [][]byte{foo[:]},
-		Withdrawals:   []*pb.Withdrawal{},
-		BlobGasUsed:   2,
-		ExcessBlobGas: 3,
-	}
+	// TODO(rgeraldes24): declared and not used
+	/*
+		executionPayloadFixtureDeneb := &pb.ExecutionPayloadDeneb{
+			ParentHash:    foo[:],
+			FeeRecipient:  bar,
+			StateRoot:     foo[:],
+			ReceiptsRoot:  foo[:],
+			LogsBloom:     baz,
+			PrevRandao:    foo[:],
+			BlockNumber:   1,
+			GasLimit:      1,
+			GasUsed:       1,
+			Timestamp:     1,
+			ExtraData:     foo[:],
+			BaseFeePerGas: bytesutil.PadTo(baseFeePerGas.Bytes(), fieldparams.RootLength),
+			BlockHash:     foo[:],
+			Transactions:  [][]byte{foo[:]},
+			Withdrawals:   []*pb.Withdrawal{},
+			BlobGasUsed:   2,
+			ExcessBlobGas: 3,
+		}
+	*/
 	hexUint := hexutil.Uint64(1)
 	executionPayloadWithValueFixtureCapella := &pb.GetPayloadV2ResponseJson{
 		ExecutionPayload: &pb.ExecutionPayloadCapellaJSON{
@@ -1582,12 +1585,12 @@ func fixtures() map[string]interface{} {
 		LatestValidHash: foo[:],
 	}
 	return map[string]interface{}{
-		"ExecutionBlock":                    executionBlock,
-		"ExecutionPayload":                  executionPayloadFixture,
-		"ExecutionPayloadCapella":           executionPayloadFixtureCapella,
-		"ExecutionPayloadDenebWithValue":    executionPayloadWithValueFixtureDeneb,
-		"ExecutionPayloadCapellaWithValue":  executionPayloadWithValueFixtureCapella,
-		"ExecutionPayloadDenebWithValue":    executionPayloadWithValueFixtureDeneb,
+		"ExecutionBlock":                   executionBlock,
+		"ExecutionPayload":                 executionPayloadFixture,
+		"ExecutionPayloadCapella":          executionPayloadFixtureCapella,
+		"ExecutionPayloadDenebWithValue":   executionPayloadWithValueFixtureDeneb,
+		"ExecutionPayloadCapellaWithValue": executionPayloadWithValueFixtureCapella,
+		// "ExecutionPayloadDenebWithValue":    executionPayloadWithValueFixtureDeneb, TODO(rgeraldes24): duplicate
 		"ValidPayloadStatus":                validStatus,
 		"InvalidBlockHashStatus":            inValidBlockHashStatus,
 		"AcceptedStatus":                    acceptedStatus,

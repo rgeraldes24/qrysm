@@ -127,7 +127,7 @@ func (s *SignatureBatch) RemoveDuplicates() (int, *SignatureBatch, error) {
 	for i := 0; i < len(s.Signatures); i++ {
 		if sigIdx, ok := sigMap[string(s.Signatures[i])]; ok {
 			allPubKeyMatched := true
-			for j, _ := range s.PublicKeys[i] {
+			for j := range s.PublicKeys[i] {
 				if !s.PublicKeys[sigIdx][j].Equals(s.PublicKeys[i][j]) {
 					allPubKeyMatched = false
 					break
