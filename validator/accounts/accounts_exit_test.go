@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
-// NOTE(rgeraldes24): old version, current version below
+// NOTE(rgeraldes24): old version
 /*
 func TestDisplayExitInfo(t *testing.T) {
 	logHook := test.NewGlobal()
