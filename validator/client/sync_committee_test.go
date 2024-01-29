@@ -350,7 +350,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 			SignatureDomain: make([]byte, 32),
 		}, nil)
 
-	aggBits := bitfield.NewBitvector128()
+	aggBits := bitfield.NewBitvector16()
 	aggBits.SetBitAt(0, true)
 	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
 		gomock.Any(), // ctx
@@ -380,7 +380,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 				Contribution: &zondpb.SyncCommitteeContribution{
 					BlockRoot:         make([]byte, fieldparams.RootLength),
 					Signature:         make([]byte, dilithiumlib.CryptoBytes),
-					AggregationBits:   bitfield.NewBitvector128(),
+					AggregationBits:   bitfield.NewBitvector16(),
 					Slot:              1,
 					SubcommitteeIndex: 1,
 				},
@@ -428,7 +428,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 			SignatureDomain: make([]byte, 32),
 		}, nil)
 
-	aggBits := bitfield.NewBitvector128()
+	aggBits := bitfield.NewBitvector16()
 	aggBits.SetBitAt(0, true)
 	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
 		gomock.Any(), // ctx
@@ -458,7 +458,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 				Contribution: &zondpb.SyncCommitteeContribution{
 					BlockRoot:         make([]byte, 32),
 					Signature:         make([]byte, dilithiumlib.CryptoBytes),
-					AggregationBits:   bitfield.NewBitvector128(),
+					AggregationBits:   bitfield.NewBitvector16(),
 					Slot:              1,
 					SubcommitteeIndex: 1,
 				},

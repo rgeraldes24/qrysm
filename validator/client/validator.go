@@ -735,7 +735,7 @@ func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[dil
 	v.dutiesLock.RLock()
 	defer v.dutiesLock.RUnlock()
 	rolesAt := make(map[[dilithium.CryptoPublicKeyBytes]byte][]iface.ValidatorRole)
-	for validator, duty := range v.duties.Duties {
+	for validator, duty := range v.duties.CurrentEpochDuties {
 		var roles []iface.ValidatorRole
 
 		if duty == nil {

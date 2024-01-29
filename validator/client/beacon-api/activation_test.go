@@ -40,7 +40,7 @@ func TestComputeWaitElements_LastRecvTimeNotZero(t *testing.T) {
 }
 
 func TestComputeWaitElements_Longest(t *testing.T) {
-	now := time.Date(2022, 1, 1, 0, 0, 20, 0, time.UTC)
+	now := time.Date(2022, 1, 1, 0, 1, 0, 0, time.UTC)
 	lastRecvTime := time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC)
 
 	waitDuration, nextRecvTime := computeWaitElements(now, lastRecvTime)

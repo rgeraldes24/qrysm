@@ -74,7 +74,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 								Root: make([]byte, fieldparams.RootLength),
 							},
 						},
-						Signature: make([]byte, 96),
+						Signature: make([]byte, 4595),
 					},
 					SelectionProof: make([]byte, dilithium.CryptoBytes),
 				},
@@ -184,7 +184,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 										Root: make([]byte, fieldparams.RootLength),
 									},
 								},
-								Signature: make([]byte, 96),
+								Signature: make([]byte, 4595),
 							},
 						},
 						Deposits: []*zond.Deposit{
@@ -297,7 +297,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 										Root: make([]byte, fieldparams.RootLength),
 									},
 								},
-								Signature: make([]byte, 96),
+								Signature: make([]byte, 4595),
 							},
 						},
 						Deposits: []*zond.Deposit{

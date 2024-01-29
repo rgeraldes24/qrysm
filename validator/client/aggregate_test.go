@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	logTest "github.com/sirupsen/logrus/hooks/test"
@@ -16,7 +17,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	"github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -60,7 +60,7 @@ func TestSubmitAggregateAndProof_SignFails(t *testing.T) {
 			Aggregate: util.HydrateAttestation(&zondpb.Attestation{
 				AggregationBits: make([]byte, 1),
 			}),
-			SelectionProof: make([]byte, 96),
+			SelectionProof: make([]byte, 4595),
 		},
 	}, nil)
 
@@ -99,7 +99,7 @@ func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 			Aggregate: util.HydrateAttestation(&zondpb.Attestation{
 				AggregationBits: make([]byte, 1),
 			}),
-			SelectionProof: make([]byte, 96),
+			SelectionProof: make([]byte, 4595),
 		},
 	}, nil)
 
@@ -162,7 +162,7 @@ func TestAggregateAndProofSignature_CanSignValidSignature(t *testing.T) {
 		Aggregate: util.HydrateAttestation(&zondpb.Attestation{
 			AggregationBits: bitfield.NewBitlist(1),
 		}),
-		SelectionProof: make([]byte, 96),
+		SelectionProof: make([]byte, 4595),
 	}
 	sig, err := validator.aggregateAndProofSig(context.Background(), pubKey, agg, 0 /* slot */)
 	require.NoError(t, err)

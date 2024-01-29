@@ -306,7 +306,7 @@ func generateSignedBlindedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Blinde
 						},
 					},
 					SyncAggregate: &zondpb.SyncAggregate{
-						SyncCommitteeBits:      test_helpers.FillByteSlice(64, 110),
+						SyncCommitteeBits:      test_helpers.FillByteSlice(2, 110),
 						SyncCommitteeSignature: test_helpers.FillByteSlice(4595, 111),
 					},
 					ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{

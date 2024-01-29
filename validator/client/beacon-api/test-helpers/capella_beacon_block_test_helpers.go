@@ -214,7 +214,7 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 				},
 			},
 			SyncAggregate: &zondpb.SyncAggregate{
-				SyncCommitteeBits:      FillByteSlice(64, 110),
+				SyncCommitteeBits:      FillByteSlice(2, 110),
 				SyncCommitteeSignature: FillByteSlice(4595, 111),
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
@@ -265,7 +265,7 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 						FromDilithiumPubkey: FillByteSlice(2592, 140),
 						ToExecutionAddress:  FillByteSlice(20, 141),
 					},
-					Signature: FillByteSlice(2592, 142),
+					Signature: FillByteSlice(4595, 142),
 				},
 			},
 		},
@@ -479,7 +479,7 @@ func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockCapellaJson {
 				},
 			},
 			SyncAggregate: &apimiddleware.SyncAggregateJson{
-				SyncCommitteeBits:      FillEncodedByteSlice(64, 110),
+				SyncCommitteeBits:      FillEncodedByteSlice(2, 110),
 				SyncCommitteeSignature: FillEncodedByteSlice(4595, 111),
 			},
 			ExecutionPayload: &apimiddleware.ExecutionPayloadCapellaJson{

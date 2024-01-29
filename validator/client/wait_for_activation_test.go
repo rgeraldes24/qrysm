@@ -263,7 +263,6 @@ func TestWaitForActivation_AccountsChanged(t *testing.T) {
 		assert.LogsContain(t, hook, "Waiting for deposit to be observed by beacon node")
 		assert.LogsContain(t, hook, "Validator activated")
 	})
-
 	/*
 		t.Run("Derived keymanager", func(t *testing.T) {
 			seed := bip39.NewSeed(constant.TestMnemonic, "")
