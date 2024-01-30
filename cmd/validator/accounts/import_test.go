@@ -200,8 +200,6 @@ func createRandomNameKeystore(t *testing.T, path string) (*keymanager.Keystore, 
 		ID:      id.String(),
 		Pubkey:  fmt.Sprintf("%x", validatingKey.PublicKey().Marshal()),
 		Version: encryptor.Version(),
-		// TODO(rgeraldes24)
-		// Name:    encryptor.Name(),
 	}
 	encoded, err := json.MarshalIndent(keystoreFile, "", "\t")
 	require.NoError(t, err)
