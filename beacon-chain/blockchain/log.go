@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -92,8 +92,8 @@ func logBlockSyncStatus(block interfaces.ReadOnlyBeaconBlock, blockRoot [32]byte
 			"finalizedRoot":             fmt.Sprintf("0x%s...", hex.EncodeToString(finalized.Root)[:8]),
 			"parentRoot":                fmt.Sprintf("0x%s...", hex.EncodeToString(parentRoot[:])[:8]),
 			"version":                   version.String(block.Version()),
-			"sinceSlotStartTime":        prysmTime.Now().Sub(startTime),
-			"chainServiceProcessedTime": prysmTime.Now().Sub(receivedTime),
+			"sinceSlotStartTime":        qrysmTime.Now().Sub(startTime),
+			"chainServiceProcessedTime": qrysmTime.Now().Sub(receivedTime),
 			"deposits":                  len(block.Body().Deposits()),
 		}
 		log.WithFields(lf).Debug("Synced new block")

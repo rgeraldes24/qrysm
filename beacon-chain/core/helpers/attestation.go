@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -146,7 +146,7 @@ func ValidateAttestationTime(attSlot primitives.Slot, genesisTime time.Time, clo
 	// so the upper bounds is set to now + clockDisparity(SECONDS_PER_SLOT * 2).
 	// But when sending an attestation, it should not be in future slot.
 	// so the upper bounds is set to now + clockDisparity(MAXIMUM_GOSSIP_CLOCK_DISPARITY).
-	upperBounds := prysmTime.Now().Add(clockDisparity)
+	upperBounds := qrysmTime.Now().Add(clockDisparity)
 
 	// An attestation cannot be older than the current slot - attestation propagation slot range
 	// with a minor tolerance for peer clock disparity.
@@ -206,7 +206,7 @@ func ValidateAttestationTime(attSlot primitives.Slot, genesisTime time.Time, clo
 // VerifyCheckpointEpoch is within current epoch and previous epoch
 // with respect to current time. Returns true if it's within, false if it's not.
 func VerifyCheckpointEpoch(c *zondpb.Checkpoint, genesis time.Time) bool {
-	now := uint64(prysmTime.Now().Unix())
+	now := uint64(qrysmTime.Now().Unix())
 	genesisTime := uint64(genesis.Unix())
 	currentSlot := primitives.Slot((now - genesisTime) / params.BeaconConfig().SecondsPerSlot)
 	currentEpoch := slots.ToEpoch(currentSlot)

@@ -18,12 +18,12 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/network/forks"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 func (s *Service) validateBlob(ctx context.Context, pid peer.ID, msg *pubsub.Message) (pubsub.ValidationResult, error) {
-	receivedTime := prysmTime.Now()
+	receivedTime := qrysmTime.Now()
 
 	if pid == s.cfg.p2p.PeerID() {
 		return pubsub.ValidationAccept, nil
@@ -131,7 +131,7 @@ func (s *Service) validateBlob(ctx context.Context, pid peer.ID, msg *pubsub.Mes
 	fields := blobFields(blob)
 	sinceSlotStartTime := receivedTime.Sub(startTime)
 	fields["sinceSlotStartTime"] = sinceSlotStartTime
-	fields["validationTime"] = prysmTime.Now().Sub(receivedTime)
+	fields["validationTime"] = qrysmTime.Now().Sub(receivedTime)
 	log.WithFields(fields).Debug("Received blob sidecar gossip")
 	msg.ValidatorData = sBlob
 

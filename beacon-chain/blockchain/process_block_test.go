@@ -40,7 +40,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	prysmTime "github.com/theQRL/qrysm/v4/time"
+	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -378,7 +378,7 @@ func blockTree1(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][]byt
 }
 
 func TestCurrentSlot_HandlesOverflow(t *testing.T) {
-	svc := Service{genesisTime: prysmTime.Now().Add(1 * time.Hour)}
+	svc := Service{genesisTime: qrysmTime.Now().Add(1 * time.Hour)}
 
 	slot := svc.CurrentSlot()
 	require.Equal(t, primitives.Slot(0), slot, "Unexpected slot")
