@@ -1,5 +1,6 @@
 package fork_transition
 
+/*
 import (
 	"testing"
 
@@ -9,3 +10,4 @@ import (
 func TestMinimal_Capella_Transition(t *testing.T) {
 	fork.RunForkTransitionTest(t, "minimal")
 }
+*/

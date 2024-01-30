@@ -186,6 +186,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	GweiPerEth:                     1000000000,
 	BLSSecretKeyLength:             32,
 	BLSPubkeyLength:                48,
+	DilithiumPubkeyLength:          2592,
 	DefaultBufferSize:              10000,
 	WithdrawalPrivkeyFileName:      "/shardwithdrawalkey",
 	ValidatorPrivkeyFileName:       "/validatorprivatekey",
