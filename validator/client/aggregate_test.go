@@ -23,7 +23,7 @@ import (
 func TestSubmitAggregateAndProof_GetDutiesRequestFailure(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, _, validatorKey, finish := setup(t)
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{}}
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{}}
 	defer finish()
 
 	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
@@ -39,7 +39,7 @@ func TestSubmitAggregateAndProof_SignFails(t *testing.T) {
 	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.duties = &zondpb.DutiesResponse{
-		Duties: []*zondpb.DutiesResponse_Duty{
+		CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 			{
 				PublicKey: validatorKey.PublicKey().Marshal(),
 			},
@@ -78,7 +78,7 @@ func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.duties = &zondpb.DutiesResponse{
-		Duties: []*zondpb.DutiesResponse_Duty{
+		CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 			{
 				PublicKey: validatorKey.PublicKey().Marshal(),
 			},
@@ -117,6 +117,10 @@ func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 }
 
 func TestWaitForSlotTwoThird_WaitCorrectly(t *testing.T) {
+	cfg := params.BeaconConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	validator, _, _, finish := setup(t)
 	defer finish()
 	currentTime := time.Now()
@@ -132,6 +136,10 @@ func TestWaitForSlotTwoThird_WaitCorrectly(t *testing.T) {
 }
 
 func TestWaitForSlotTwoThird_DoneContext_ReturnsImmediately(t *testing.T) {
+	cfg := params.BeaconConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	validator, _, _, finish := setup(t)
 	defer finish()
 	currentTime := time.Now()

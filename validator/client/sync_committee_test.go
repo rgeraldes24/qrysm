@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/go-bitfield"
 	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
+	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -21,9 +22,13 @@ import (
 )
 
 func TestSubmitSyncCommitteeMessage_ValidatorDutiesRequestFailure(t *testing.T) {
+	cfg := params.MainnetConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	hook := logTest.NewGlobal()
 	validator, m, validatorKey, finish := setup(t)
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{}}
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{}}
 	defer finish()
 
 	m.validatorClient.EXPECT().GetSyncMessageBlockRoot(
@@ -40,12 +45,16 @@ func TestSubmitSyncCommitteeMessage_ValidatorDutiesRequestFailure(t *testing.T) 
 }
 
 func TestSubmitSyncCommitteeMessage_BadDomainData(t *testing.T) {
+	cfg := params.MainnetConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
 	hook := logTest.NewGlobal()
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -72,12 +81,16 @@ func TestSubmitSyncCommitteeMessage_BadDomainData(t *testing.T) {
 }
 
 func TestSubmitSyncCommitteeMessage_CouldNotSubmit(t *testing.T) {
+	cfg := params.MainnetConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
 	hook := logTest.NewGlobal()
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -113,12 +126,16 @@ func TestSubmitSyncCommitteeMessage_CouldNotSubmit(t *testing.T) {
 }
 
 func TestSubmitSyncCommitteeMessage_OK(t *testing.T) {
+	cfg := params.MainnetConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
 	hook := logTest.NewGlobal()
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -160,9 +177,13 @@ func TestSubmitSyncCommitteeMessage_OK(t *testing.T) {
 }
 
 func TestSubmitSignedContributionAndProof_ValidatorDutiesRequestFailure(t *testing.T) {
+	cfg := params.MainnetConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	hook := logTest.NewGlobal()
 	validator, _, validatorKey, finish := setup(t)
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{}}
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{}}
 	defer finish()
 
 	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
@@ -172,11 +193,15 @@ func TestSubmitSignedContributionAndProof_ValidatorDutiesRequestFailure(t *testi
 }
 
 func TestSubmitSignedContributionAndProof_GetSyncSubcommitteeIndexFailure(t *testing.T) {
+	cfg := params.MainnetConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	hook := logTest.NewGlobal()
 	validator, m, validatorKey, finish := setup(t)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -200,11 +225,15 @@ func TestSubmitSignedContributionAndProof_GetSyncSubcommitteeIndexFailure(t *tes
 }
 
 func TestSubmitSignedContributionAndProof_NothingToDo(t *testing.T) {
+	cfg := params.MainnetConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	hook := logTest.NewGlobal()
 	validator, m, validatorKey, finish := setup(t)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -228,11 +257,15 @@ func TestSubmitSignedContributionAndProof_NothingToDo(t *testing.T) {
 }
 
 func TestSubmitSignedContributionAndProof_BadDomain(t *testing.T) {
+	cfg := params.MainnetConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	hook := logTest.NewGlobal()
 	validator, m, validatorKey, finish := setup(t)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -264,6 +297,10 @@ func TestSubmitSignedContributionAndProof_BadDomain(t *testing.T) {
 }
 
 func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) {
+	cfg := params.MainnetConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	hook := logTest.NewGlobal()
 	// Hardcode secret key in order to have a valid aggregator signature.
 	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
@@ -274,7 +311,7 @@ func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) 
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -314,6 +351,10 @@ func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) 
 }
 
 func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.T) {
+	cfg := params.MainnetConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	hook := logTest.NewGlobal()
 	// Hardcode secret key in order to have a valid aggregator signature.
 	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
@@ -324,7 +365,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -393,6 +434,10 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 }
 
 func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
+	cfg := params.MainnetConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	// Hardcode secret key in order to have a valid aggregator signature.
 	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
 	assert.NoError(t, err)
@@ -402,7 +447,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{Duties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,

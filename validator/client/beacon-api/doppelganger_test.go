@@ -118,126 +118,123 @@ func TestCheckDoppelGanger_Nominal(t *testing.T) {
 					{
 						Header: &shared.SignedBeaconBlockHeader{
 							Message: &shared.BeaconBlockHeader{
-								Slot: "99",
+								Slot: "395",
 							},
 						},
 					},
 				},
 			},
 		},
-		// TODO(rgeraldes24)
-		/*
-			{
-				name: "some validators are recent, some not, some duplicates",
-				doppelGangerInput: &zondpb.DoppelGangerRequest{
-					ValidatorRequests: []*zondpb.DoppelGangerRequest_ValidatorRequest{
-						{PublicKey: pubKey1, Epoch: 99}, // recent
-						{PublicKey: pubKey2, Epoch: 80}, // not recent - duplicate on previous epoch
-						{PublicKey: pubKey3, Epoch: 80}, // not recent - duplicate on current epoch
-						{PublicKey: pubKey4, Epoch: 80}, // not recent - duplicate on both previous and current epoch
-						{PublicKey: pubKey5, Epoch: 80}, // non existing validator
-						{PublicKey: pubKey6, Epoch: 80}, // not recent - not duplicate
-					},
+		{
+			name: "some validators are recent, some not, some duplicates",
+			doppelGangerInput: &zondpb.DoppelGangerRequest{
+				ValidatorRequests: []*zondpb.DoppelGangerRequest_ValidatorRequest{
+					{PublicKey: pubKey1, Epoch: 99}, // recent
+					{PublicKey: pubKey2, Epoch: 80}, // not recent - duplicate on previous epoch
+					{PublicKey: pubKey3, Epoch: 80}, // not recent - duplicate on current epoch
+					{PublicKey: pubKey4, Epoch: 80}, // not recent - duplicate on both previous and current epoch
+					{PublicKey: pubKey5, Epoch: 80}, // non existing validator
+					{PublicKey: pubKey6, Epoch: 80}, // not recent - not duplicate
 				},
-				doppelGangerExpectedOutput: &zondpb.DoppelGangerResponse{
-					Responses: []*zondpb.DoppelGangerResponse_ValidatorResponse{
-						{PublicKey: pubKey1, DuplicateExists: false}, // recent
-						{PublicKey: pubKey2, DuplicateExists: true},  // not recent - duplicate on previous epoch
-						{PublicKey: pubKey3, DuplicateExists: true},  // not recent - duplicate on current epoch
-						{PublicKey: pubKey4, DuplicateExists: true},  // not recent - duplicate on both previous and current epoch
-						{PublicKey: pubKey5, DuplicateExists: false}, // non existing validator
-						{PublicKey: pubKey6, DuplicateExists: false}, // not recent - not duplicate
-					},
+			},
+			doppelGangerExpectedOutput: &zondpb.DoppelGangerResponse{
+				Responses: []*zondpb.DoppelGangerResponse_ValidatorResponse{
+					{PublicKey: pubKey1, DuplicateExists: false}, // recent
+					{PublicKey: pubKey2, DuplicateExists: true},  // not recent - duplicate on previous epoch
+					{PublicKey: pubKey3, DuplicateExists: true},  // not recent - duplicate on current epoch
+					{PublicKey: pubKey4, DuplicateExists: true},  // not recent - duplicate on both previous and current epoch
+					{PublicKey: pubKey5, DuplicateExists: false}, // non existing validator
+					{PublicKey: pubKey6, DuplicateExists: false}, // not recent - not duplicate
 				},
-				getSyncingOutput: &apimiddleware.SyncingResponseJson{
-					Data: &shared.SyncDetails{
-						IsSyncing: false,
-					},
+			},
+			getSyncingOutput: &apimiddleware.SyncingResponseJson{
+				Data: &shared.SyncDetails{
+					IsSyncing: false,
 				},
-				getHeadersOutput: &beacon.GetBlockHeadersResponse{
-					Data: []*shared.SignedBeaconBlockHeaderContainer{
-						{
-							Header: &shared.SignedBeaconBlockHeader{
-								Message: &shared.BeaconBlockHeader{
-									Slot: "3201",
-								},
-							},
-						},
-					},
-				},
-				getStateValidatorsInterface: &struct {
-					input  []string
-					output *beacon.GetValidatorsResponse
-				}{
-					input: []string{
-						// no stringPubKey1 since recent
-						stringPubKey2, // not recent - duplicate on previous epoch
-						stringPubKey3, // not recent - duplicate on current epoch
-						stringPubKey4, // not recent - duplicate on both previous and current epoch
-						stringPubKey5, // non existing validator
-						stringPubKey6, // not recent - not duplicate
-					},
-					output: &beacon.GetValidatorsResponse{
-						Data: []*beacon.ValidatorContainer{
-							// No "11111" since corresponding validator is recent
-							{Index: "22222", Validator: &beacon.Validator{Pubkey: stringPubKey2}}, // not recent - duplicate on previous epoch
-							{Index: "33333", Validator: &beacon.Validator{Pubkey: stringPubKey3}}, // not recent - duplicate on current epoch
-							{Index: "44444", Validator: &beacon.Validator{Pubkey: stringPubKey4}}, // not recent - duplicate on both previous and current epoch
-							// No "55555" sicee corresponding validator does not exist
-							{Index: "66666", Validator: &beacon.Validator{Pubkey: stringPubKey6}}, // not recent - not duplicate
-						},
-					},
-				},
-				getLivelinessInterfaces: []struct {
-					inputUrl           string
-					inputStringIndexes []string
-					output             *validator.GetLivenessResponse
-				}{
+			},
+			getHeadersOutput: &beacon.GetBlockHeadersResponse{
+				Data: []*shared.SignedBeaconBlockHeaderContainer{
 					{
-						inputUrl: "/zond/v1/validator/liveness/99", // previous epoch
-						inputStringIndexes: []string{
-							// No "11111" since corresponding validator is recent
-							"22222", // not recent - duplicate on previous epoch
-							"33333", // not recent - duplicate on current epoch
-							"44444", // not recent - duplicate on both previous and current epoch
-							// No "55555" since corresponding validator it does not exist
-							"66666", // not recent - not duplicate
-						},
-						output: &validator.GetLivenessResponse{
-							Data: []*validator.ValidatorLiveness{
-								// No "11111" since corresponding validator is recent
-								{Index: "22222", IsLive: true},  // not recent - duplicate on previous epoch
-								{Index: "33333", IsLive: false}, // not recent - duplicate on current epoch
-								{Index: "44444", IsLive: true},  // not recent - duplicate on both previous and current epoch
-								// No "55555" since corresponding validator it does not exist
-								{Index: "66666", IsLive: false}, // not recent - not duplicate
-							},
-						},
-					},
-					{
-						inputUrl: "/zond/v1/validator/liveness/100", // current epoch
-						inputStringIndexes: []string{
-							// No "11111" since corresponding validator is recent
-							"22222", // not recent - duplicate on previous epoch
-							"33333", // not recent - duplicate on current epoch
-							"44444", // not recent - duplicate on both previous and current epoch
-							// No "55555" since corresponding validator it does not exist
-							"66666", // not recent - not duplicate
-						},
-						output: &validator.GetLivenessResponse{
-							Data: []*validator.ValidatorLiveness{
-								// No "11111" since corresponding validator is recent
-								{Index: "22222", IsLive: false}, // not recent - duplicate on previous epoch
-								{Index: "33333", IsLive: true},  // not recent - duplicate on current epoch
-								{Index: "44444", IsLive: true},  // not recent - duplicate on both previous and current epoch
-								// No "55555" since corresponding validator it does not exist
-								{Index: "66666", IsLive: false}, // not recent - not duplicate
+						Header: &shared.SignedBeaconBlockHeader{
+							Message: &shared.BeaconBlockHeader{
+								Slot: "12800",
 							},
 						},
 					},
 				},
 			},
-		*/
+			getStateValidatorsInterface: &struct {
+				input  []string
+				output *beacon.GetValidatorsResponse
+			}{
+				input: []string{
+					// no stringPubKey1 since recent
+					stringPubKey2, // not recent - duplicate on previous epoch
+					stringPubKey3, // not recent - duplicate on current epoch
+					stringPubKey4, // not recent - duplicate on both previous and current epoch
+					stringPubKey5, // non existing validator
+					stringPubKey6, // not recent - not duplicate
+				},
+				output: &beacon.GetValidatorsResponse{
+					Data: []*beacon.ValidatorContainer{
+						// No "11111" since corresponding validator is recent
+						{Index: "22222", Validator: &beacon.Validator{Pubkey: stringPubKey2}}, // not recent - duplicate on previous epoch
+						{Index: "33333", Validator: &beacon.Validator{Pubkey: stringPubKey3}}, // not recent - duplicate on current epoch
+						{Index: "44444", Validator: &beacon.Validator{Pubkey: stringPubKey4}}, // not recent - duplicate on both previous and current epoch
+						// No "55555" sicee corresponding validator does not exist
+						{Index: "66666", Validator: &beacon.Validator{Pubkey: stringPubKey6}}, // not recent - not duplicate
+					},
+				},
+			},
+			getLivelinessInterfaces: []struct {
+				inputUrl           string
+				inputStringIndexes []string
+				output             *validator.GetLivenessResponse
+			}{
+				{
+					inputUrl: "/zond/v1/validator/liveness/99", // previous epoch
+					inputStringIndexes: []string{
+						// No "11111" since corresponding validator is recent
+						"22222", // not recent - duplicate on previous epoch
+						"33333", // not recent - duplicate on current epoch
+						"44444", // not recent - duplicate on both previous and current epoch
+						// No "55555" since corresponding validator it does not exist
+						"66666", // not recent - not duplicate
+					},
+					output: &validator.GetLivenessResponse{
+						Data: []*validator.ValidatorLiveness{
+							// No "11111" since corresponding validator is recent
+							{Index: "22222", IsLive: true},  // not recent - duplicate on previous epoch
+							{Index: "33333", IsLive: false}, // not recent - duplicate on current epoch
+							{Index: "44444", IsLive: true},  // not recent - duplicate on both previous and current epoch
+							// No "55555" since corresponding validator it does not exist
+							{Index: "66666", IsLive: false}, // not recent - not duplicate
+						},
+					},
+				},
+				{
+					inputUrl: "/zond/v1/validator/liveness/100", // current epoch
+					inputStringIndexes: []string{
+						// No "11111" since corresponding validator is recent
+						"22222", // not recent - duplicate on previous epoch
+						"33333", // not recent - duplicate on current epoch
+						"44444", // not recent - duplicate on both previous and current epoch
+						// No "55555" since corresponding validator it does not exist
+						"66666", // not recent - not duplicate
+					},
+					output: &validator.GetLivenessResponse{
+						Data: []*validator.ValidatorLiveness{
+							// No "11111" since corresponding validator is recent
+							{Index: "22222", IsLive: false}, // not recent - duplicate on previous epoch
+							{Index: "33333", IsLive: true},  // not recent - duplicate on current epoch
+							{Index: "44444", IsLive: true},  // not recent - duplicate on both previous and current epoch
+							// No "55555" since corresponding validator it does not exist
+							{Index: "66666", IsLive: false}, // not recent - not duplicate
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -357,32 +354,30 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 			{
 				Header: &shared.SignedBeaconBlockHeader{
 					Message: &shared.BeaconBlockHeader{
-						Slot: "1000",
+						Slot: "4000",
 					},
 				},
 			},
 		},
 	}
 
-	/*
-		standardGetStateValidatorsInterface := &struct {
-			input  []string
-			output *beacon.GetValidatorsResponse
-			err    error
-		}{
-			input: []string{stringPubKey},
-			output: &beacon.GetValidatorsResponse{
-				Data: []*beacon.ValidatorContainer{
-					{
-						Index: "42",
-						Validator: &beacon.Validator{
-							Pubkey: stringPubKey,
-						},
+	standardGetStateValidatorsInterface := &struct {
+		input  []string
+		output *beacon.GetValidatorsResponse
+		err    error
+	}{
+		input: []string{stringPubKey},
+		output: &beacon.GetValidatorsResponse{
+			Data: []*beacon.ValidatorContainer{
+				{
+					Index: "42",
+					Validator: &beacon.Validator{
+						Pubkey: stringPubKey,
 					},
 				},
 			},
-		}
-	*/
+		},
+	}
 
 	testCases := []struct {
 		name                        string
@@ -496,142 +491,140 @@ func TestCheckDoppelGanger_Errors(t *testing.T) {
 				output: &beacon.GetValidatorsResponse{Data: []*beacon.ValidatorContainer{{Validator: nil}}},
 			},
 		},
-		// TODO(rgeraldes24)
-		/*
-			{
-				name:                        "previous epoch liveness error",
-				expectedErrorMessage:        "failed to get map from validator index to liveness for previous epoch 30",
-				inputValidatorRequests:      standardInputValidatorRequests,
-				getSyncingOutput:            standardGetSyncingOutput,
-				getHeadersOutput:            standardGetHeadersOutput,
-				getStateValidatorsInterface: standardGetStateValidatorsInterface,
-				getLivenessInterfaces: []struct {
-					inputUrl           string
-					inputStringIndexes []string
-					output             *validator.GetLivenessResponse
-					err                error
-				}{
-					{
-						inputUrl:           "/zond/v1/validator/liveness/30",
-						inputStringIndexes: []string{"42"},
-						output:             &validator.GetLivenessResponse{},
-						err:                errors.New("custom error"),
+
+		{
+			name:                        "previous epoch liveness error",
+			expectedErrorMessage:        "failed to get map from validator index to liveness for previous epoch 30",
+			inputValidatorRequests:      standardInputValidatorRequests,
+			getSyncingOutput:            standardGetSyncingOutput,
+			getHeadersOutput:            standardGetHeadersOutput,
+			getStateValidatorsInterface: standardGetStateValidatorsInterface,
+			getLivenessInterfaces: []struct {
+				inputUrl           string
+				inputStringIndexes []string
+				output             *validator.GetLivenessResponse
+				err                error
+			}{
+				{
+					inputUrl:           "/zond/v1/validator/liveness/30",
+					inputStringIndexes: []string{"42"},
+					output:             &validator.GetLivenessResponse{},
+					err:                errors.New("custom error"),
+				},
+			},
+		},
+		{
+			name:                        "liveness is nil",
+			expectedErrorMessage:        "liveness is nil",
+			inputValidatorRequests:      standardInputValidatorRequests,
+			getSyncingOutput:            standardGetSyncingOutput,
+			getHeadersOutput:            standardGetHeadersOutput,
+			getStateValidatorsInterface: standardGetStateValidatorsInterface,
+			getLivenessInterfaces: []struct {
+				inputUrl           string
+				inputStringIndexes []string
+				output             *validator.GetLivenessResponse
+				err                error
+			}{
+				{
+					inputUrl:           "/zond/v1/validator/liveness/30",
+					inputStringIndexes: []string{"42"},
+					output: &validator.GetLivenessResponse{
+						Data: []*validator.ValidatorLiveness{nil},
 					},
 				},
 			},
-			{
-				name:                        "liveness is nil",
-				expectedErrorMessage:        "liveness is nil",
-				inputValidatorRequests:      standardInputValidatorRequests,
-				getSyncingOutput:            standardGetSyncingOutput,
-				getHeadersOutput:            standardGetHeadersOutput,
-				getStateValidatorsInterface: standardGetStateValidatorsInterface,
-				getLivenessInterfaces: []struct {
-					inputUrl           string
-					inputStringIndexes []string
-					output             *validator.GetLivenessResponse
-					err                error
-				}{
-					{
-						inputUrl:           "/zond/v1/validator/liveness/30",
-						inputStringIndexes: []string{"42"},
-						output: &validator.GetLivenessResponse{
-							Data: []*validator.ValidatorLiveness{nil},
-						},
+		},
+		{
+			name:                        "current epoch liveness error",
+			expectedErrorMessage:        "failed to get map from validator index to liveness for current epoch 31",
+			inputValidatorRequests:      standardInputValidatorRequests,
+			getSyncingOutput:            standardGetSyncingOutput,
+			getHeadersOutput:            standardGetHeadersOutput,
+			getStateValidatorsInterface: standardGetStateValidatorsInterface,
+			getLivenessInterfaces: []struct {
+				inputUrl           string
+				inputStringIndexes []string
+				output             *validator.GetLivenessResponse
+				err                error
+			}{
+				{
+					inputUrl:           "/zond/v1/validator/liveness/30",
+					inputStringIndexes: []string{"42"},
+					output: &validator.GetLivenessResponse{
+						Data: []*validator.ValidatorLiveness{},
+					},
+				},
+				{
+					inputUrl:           "/zond/v1/validator/liveness/31",
+					inputStringIndexes: []string{"42"},
+					output:             &validator.GetLivenessResponse{},
+					err:                errors.New("custom error"),
+				},
+			},
+		},
+		{
+			name:                        "wrong validator index for previous epoch",
+			expectedErrorMessage:        "failed to retrieve liveness for previous epoch `30` for validator index `42`",
+			inputValidatorRequests:      standardInputValidatorRequests,
+			getSyncingOutput:            standardGetSyncingOutput,
+			getHeadersOutput:            standardGetHeadersOutput,
+			getStateValidatorsInterface: standardGetStateValidatorsInterface,
+			getLivenessInterfaces: []struct {
+				inputUrl           string
+				inputStringIndexes []string
+				output             *validator.GetLivenessResponse
+				err                error
+			}{
+				{
+					inputUrl:           "/zond/v1/validator/liveness/30",
+					inputStringIndexes: []string{"42"},
+					output: &validator.GetLivenessResponse{
+						Data: []*validator.ValidatorLiveness{},
+					},
+				},
+				{
+					inputUrl:           "/zond/v1/validator/liveness/31",
+					inputStringIndexes: []string{"42"},
+					output: &validator.GetLivenessResponse{
+						Data: []*validator.ValidatorLiveness{},
 					},
 				},
 			},
-			{
-				name:                        "current epoch liveness error",
-				expectedErrorMessage:        "failed to get map from validator index to liveness for current epoch 31",
-				inputValidatorRequests:      standardInputValidatorRequests,
-				getSyncingOutput:            standardGetSyncingOutput,
-				getHeadersOutput:            standardGetHeadersOutput,
-				getStateValidatorsInterface: standardGetStateValidatorsInterface,
-				getLivenessInterfaces: []struct {
-					inputUrl           string
-					inputStringIndexes []string
-					output             *validator.GetLivenessResponse
-					err                error
-				}{
-					{
-						inputUrl:           "/zond/v1/validator/liveness/30",
-						inputStringIndexes: []string{"42"},
-						output: &validator.GetLivenessResponse{
-							Data: []*validator.ValidatorLiveness{},
-						},
-					},
-					{
-						inputUrl:           "/zond/v1/validator/liveness/31",
-						inputStringIndexes: []string{"42"},
-						output:             &validator.GetLivenessResponse{},
-						err:                errors.New("custom error"),
-					},
-				},
-			},
-			{
-				name:                        "wrong validator index for previous epoch",
-				expectedErrorMessage:        "failed to retrieve liveness for previous epoch `30` for validator index `42`",
-				inputValidatorRequests:      standardInputValidatorRequests,
-				getSyncingOutput:            standardGetSyncingOutput,
-				getHeadersOutput:            standardGetHeadersOutput,
-				getStateValidatorsInterface: standardGetStateValidatorsInterface,
-				getLivenessInterfaces: []struct {
-					inputUrl           string
-					inputStringIndexes []string
-					output             *validator.GetLivenessResponse
-					err                error
-				}{
-					{
-						inputUrl:           "/zond/v1/validator/liveness/30",
-						inputStringIndexes: []string{"42"},
-						output: &validator.GetLivenessResponse{
-							Data: []*validator.ValidatorLiveness{},
-						},
-					},
-					{
-						inputUrl:           "/zond/v1/validator/liveness/31",
-						inputStringIndexes: []string{"42"},
-						output: &validator.GetLivenessResponse{
-							Data: []*validator.ValidatorLiveness{},
-						},
-					},
-				},
-			},
-			{
-				name:                        "wrong validator index for current epoch",
-				expectedErrorMessage:        "failed to retrieve liveness for current epoch `31` for validator index `42`",
-				inputValidatorRequests:      standardInputValidatorRequests,
-				getSyncingOutput:            standardGetSyncingOutput,
-				getHeadersOutput:            standardGetHeadersOutput,
-				getStateValidatorsInterface: standardGetStateValidatorsInterface,
-				getLivenessInterfaces: []struct {
-					inputUrl           string
-					inputStringIndexes []string
-					output             *validator.GetLivenessResponse
-					err                error
-				}{
-					{
-						inputUrl:           "/zond/v1/validator/liveness/30",
-						inputStringIndexes: []string{"42"},
-						output: &validator.GetLivenessResponse{
-							Data: []*validator.ValidatorLiveness{
-								{
-									Index: "42",
-								},
+		},
+		{
+			name:                        "wrong validator index for current epoch",
+			expectedErrorMessage:        "failed to retrieve liveness for current epoch `31` for validator index `42`",
+			inputValidatorRequests:      standardInputValidatorRequests,
+			getSyncingOutput:            standardGetSyncingOutput,
+			getHeadersOutput:            standardGetHeadersOutput,
+			getStateValidatorsInterface: standardGetStateValidatorsInterface,
+			getLivenessInterfaces: []struct {
+				inputUrl           string
+				inputStringIndexes []string
+				output             *validator.GetLivenessResponse
+				err                error
+			}{
+				{
+					inputUrl:           "/zond/v1/validator/liveness/30",
+					inputStringIndexes: []string{"42"},
+					output: &validator.GetLivenessResponse{
+						Data: []*validator.ValidatorLiveness{
+							{
+								Index: "42",
 							},
 						},
 					},
-					{
-						inputUrl:           "/zond/v1/validator/liveness/31",
-						inputStringIndexes: []string{"42"},
-						output: &validator.GetLivenessResponse{
-							Data: []*validator.ValidatorLiveness{},
-						},
+				},
+				{
+					inputUrl:           "/zond/v1/validator/liveness/31",
+					inputStringIndexes: []string{"42"},
+					output: &validator.GetLivenessResponse{
+						Data: []*validator.ValidatorLiveness{},
 					},
 				},
 			},
-		*/
+		},
 	}
 
 	for _, testCase := range testCases {

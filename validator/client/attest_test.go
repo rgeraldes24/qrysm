@@ -149,6 +149,9 @@ func TestAttestToBlockHead_AttestsCorrectly(t *testing.T) {
 		},
 		AggregationBits: aggregationBitfield,
 		Signature:       make([]byte, 4595),
+		// TODO(rgeraldes24): revisit once we review the proto definitions again
+		// attest_test.go:166: modified: .SignatureValidatorIndex = []uint64{0x7}
+		SignatureValidatorIndex: []uint64{0x7},
 	}
 
 	root, err := signing.ComputeSigningRoot(expectedAttestation.Data, make([]byte, 32))
@@ -355,6 +358,10 @@ func TestAttestToBlockHead_DoesNotAttestBeforeDelay(t *testing.T) {
 }
 
 func TestAttestToBlockHead_DoesAttestAfterDelay(t *testing.T) {
+	cfg := params.BeaconConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
 
@@ -389,7 +396,7 @@ func TestAttestToBlockHead_DoesAttestAfterDelay(t *testing.T) {
 	m.validatorClient.EXPECT().DomainData(
 		gomock.Any(), // ctx
 		gomock.Any(), // epoch
-	).Times(2).Return(&zondpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil /*err*/)
+	).Times(2).Return(&zondpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil)
 
 	m.validatorClient.EXPECT().ProposeAttestation(
 		gomock.Any(), // ctx
@@ -472,6 +479,10 @@ func TestSignAttestation(t *testing.T) {
 }
 
 func TestServer_WaitToSlotOneThird_CanWait(t *testing.T) {
+	cfg := params.BeaconConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	currentTime := uint64(time.Now().Unix())
 	currentSlot := primitives.Slot(4)
 	genesisTime := currentTime - uint64(currentSlot.Mul(params.BeaconConfig().SecondsPerSlot))
@@ -509,6 +520,10 @@ func TestServer_WaitToSlotOneThird_SameReqSlot(t *testing.T) {
 }
 
 func TestServer_WaitToSlotOneThird_ReceiveBlockSlot(t *testing.T) {
+	cfg := params.BeaconConfig().Copy()
+	cfg.SecondsPerSlot = 10
+	params.OverrideBeaconConfig(cfg)
+
 	resetCfg := features.InitWithReset(&features.Flags{AttestTimely: true})
 	defer resetCfg()
 

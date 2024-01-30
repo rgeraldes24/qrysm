@@ -664,8 +664,6 @@ func TestUpdateDuties_AllValidatorsExited(t *testing.T) {
 
 }
 
-// TODO(rgeraldes24)
-/*
 func TestRolesAt_OK(t *testing.T) {
 	v, m, validatorKey, finish := setup(t)
 	defer finish()
@@ -733,7 +731,7 @@ func TestRolesAt_OK(t *testing.T) {
 		gomock.Any(), // ctx
 		&zondpb.SyncSubcommitteeIndexRequest{
 			PublicKey: validatorKey.PublicKey().Marshal(),
-			Slot:      31,
+			Slot:      127,
 		},
 	).Return(&zondpb.SyncSubcommitteeIndexResponse{}, nil)
 
@@ -741,7 +739,6 @@ func TestRolesAt_OK(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, iface.RoleSyncCommittee, roleMap[bytesutil.ToBytes2592(validatorKey.PublicKey().Marshal())][0])
 }
-*/
 
 func TestRolesAt_DoesNotAssignProposer_Slot0(t *testing.T) {
 	v, m, validatorKey, finish := setup(t)
@@ -815,7 +812,7 @@ func TestCheckAndLogValidatorStatus_OK(t *testing.T) {
 					PositionInActivationQueue: 6,
 				},
 			},
-			log:    "Waiting to be assigned activation epoch\" expectedWaitingTime=2h8m0s index=50 positionInActivationQueue=6",
+			log:    "Waiting to be assigned activation epoch\" expectedWaitingTime=21m20s index=50 positionInActivationQueue=6",
 			active: false,
 		},
 		{
