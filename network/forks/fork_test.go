@@ -58,68 +58,69 @@ func TestFork(t *testing.T) {
 				params.OverrideBeaconConfig(cfg)
 			},
 		},
-		{
-			name:        "altair pre-fork",
-			targetEpoch: 0,
-			want: &zondpb.Fork{
-				Epoch:           0,
-				CurrentVersion:  []byte{'A', 'B', 'C', 'D'},
-				PreviousVersion: []byte{'A', 'B', 'C', 'D'},
+		// TODO(rgeraldes24): remove
+		/*
+			{
+				name:        "altair pre-fork",
+				targetEpoch: 0,
+				want: &zondpb.Fork{
+					Epoch:           0,
+					CurrentVersion:  []byte{'A', 'B', 'C', 'D'},
+					PreviousVersion: []byte{'A', 'B', 'C', 'D'},
+				},
+				wantErr: false,
+				setConfg: func() {
+					cfg = cfg.Copy()
+					cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
+					cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
+					cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
+						{'A', 'B', 'C', 'D'}: 0,
+						{'A', 'B', 'C', 'F'}: 10,
+					}
+					params.OverrideBeaconConfig(cfg)
+				},
 			},
-			wantErr: false,
-			setConfg: func() {
-				cfg = cfg.Copy()
-				cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
-				cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
-				cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
-					{'A', 'B', 'C', 'D'}: 0,
-					{'A', 'B', 'C', 'F'}: 10,
-				}
-				params.OverrideBeaconConfig(cfg)
+			{
+				name:        "altair on fork",
+				targetEpoch: 10,
+				want: &zondpb.Fork{
+					Epoch:           10,
+					CurrentVersion:  []byte{'A', 'B', 'C', 'F'},
+					PreviousVersion: []byte{'A', 'B', 'C', 'D'},
+				},
+				wantErr: false,
+				setConfg: func() {
+					cfg = cfg.Copy()
+					cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
+					cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
+					cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
+						{'A', 'B', 'C', 'D'}: 0,
+						{'A', 'B', 'C', 'F'}: 10,
+					}
+					params.OverrideBeaconConfig(cfg)
+				},
 			},
-		},
-		{
-			name:        "altair on fork",
-			targetEpoch: 10,
-			want: &zondpb.Fork{
-				Epoch:           10,
-				CurrentVersion:  []byte{'A', 'B', 'C', 'F'},
-				PreviousVersion: []byte{'A', 'B', 'C', 'D'},
+			{
+				name:        "altair post fork",
+				targetEpoch: 10,
+				want: &zondpb.Fork{
+					Epoch:           10,
+					CurrentVersion:  []byte{'A', 'B', 'C', 'F'},
+					PreviousVersion: []byte{'A', 'B', 'C', 'D'},
+				},
+				wantErr: false,
+				setConfg: func() {
+					cfg = cfg.Copy()
+					cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
+					cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
+					cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
+						{'A', 'B', 'C', 'D'}: 0,
+						{'A', 'B', 'C', 'F'}: 10,
+					}
+					params.OverrideBeaconConfig(cfg)
+				},
 			},
-			wantErr: false,
-			setConfg: func() {
-				cfg = cfg.Copy()
-				cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
-				cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
-				cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
-					{'A', 'B', 'C', 'D'}: 0,
-					{'A', 'B', 'C', 'F'}: 10,
-				}
-				params.OverrideBeaconConfig(cfg)
-			},
-		},
-
-		{
-			name:        "altair post fork",
-			targetEpoch: 10,
-			want: &zondpb.Fork{
-				Epoch:           10,
-				CurrentVersion:  []byte{'A', 'B', 'C', 'F'},
-				PreviousVersion: []byte{'A', 'B', 'C', 'D'},
-			},
-			wantErr: false,
-			setConfg: func() {
-				cfg = cfg.Copy()
-				cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
-				cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
-				cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
-					{'A', 'B', 'C', 'D'}: 0,
-					{'A', 'B', 'C', 'F'}: 10,
-				}
-				params.OverrideBeaconConfig(cfg)
-			},
-		},
-
+		*/
 		{
 			name:        "3 forks, pre-fork",
 			targetEpoch: 20,

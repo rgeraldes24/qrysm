@@ -379,10 +379,6 @@ load("//:deps.bzl", "go_dependencies", "qrysm_deps")
 # gazelle:repository_macro deps.bzl%qrysm_deps
 qrysm_deps()
 
-load("@qrysm//third_party/herumi:herumi.bzl", "bls_dependencies")
-
-bls_dependencies()
-
 # NOTE(rgeraldes24): re-enable once we support the remote web signer
 #load("@qrysm//testing/endtoend:deps.bzl", "e2e_deps")
 
