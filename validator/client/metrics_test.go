@@ -81,8 +81,6 @@ func TestUpdateLogAggregateStats(t *testing.T) {
 	}
 
 	require.LogsContain(t, hook, "msg=\"Previous epoch aggregated voting summary\" attestationInclusionPct=\"67%\" "+
-		// TODO(rgeraldes24): revisit to double check
-		//"averageInactivityScore=0 correctlyVotedHeadPct=\"100%\" correctlyVotedSourcePct=\"100%\" correctlyVotedTargetPct=\"50%\" epoch=74242")
 		"averageInactivityScore=0 correctlyVotedHeadPct=\"100%\" correctlyVotedSourcePct=\"100%\" correctlyVotedTargetPct=\"50%\" epoch=2")
 	require.LogsContain(t, hook, "msg=\"Vote summary since launch\" attestationsInclusionPct=\"78%\" "+
 		"correctlyVotedHeadPct=\"86%\" correctlyVotedSourcePct=\"100%\" "+
