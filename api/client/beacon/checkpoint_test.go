@@ -9,22 +9,20 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/api/client"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
+	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	blocktest "github.com/theQRL/qrysm/v4/consensus-types/blocks/testing"
-	"github.com/theQRL/qrysm/v4/network/forks"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/testing/util"
-	"github.com/theQRL/qrysm/v4/time/slots"
-
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/ssz/detect"
+	"github.com/theQRL/qrysm/v4/network/forks"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
-
-	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/testing/require"
+	"github.com/theQRL/qrysm/v4/testing/util"
+	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 type testRT struct {
@@ -57,11 +55,11 @@ func TestMarshalToEnvelope(t *testing.T) {
 	d := struct {
 		Version string `json:"version"`
 	}{
-		Version: "Prysm/v2.0.5 (linux amd64)",
+		Version: "Qrysm/v2.0.5 (linux amd64)",
 	}
 	encoded, err := marshalToEnvelope(d)
 	require.NoError(t, err)
-	expected := `{"data":{"version":"Prysm/v2.0.5 (linux amd64)"}}`
+	expected := `{"data":{"version":"Qrysm/v2.0.5 (linux amd64)"}}`
 	require.Equal(t, expected, string(encoded))
 }
 
@@ -75,7 +73,7 @@ func TestFallbackVersionCheck(t *testing.T) {
 			d := struct {
 				Version string `json:"version"`
 			}{
-				Version: "Prysm/v2.0.5 (linux amd64)",
+				Version: "Qrysm/v2.0.5 (linux amd64)",
 			}
 			encoded, err := marshalToEnvelope(d)
 			require.NoError(t, err)
@@ -91,28 +89,28 @@ func TestFallbackVersionCheck(t *testing.T) {
 	require.NoError(t, err)
 	ctx := context.Background()
 	_, err = ComputeWeakSubjectivityCheckpoint(ctx, c)
-	require.ErrorIs(t, err, errUnsupportedPrysmCheckpointVersion)
+	require.ErrorIs(t, err, errUnsupportedQrysmCheckpointVersion)
 }
 
 func TestFname(t *testing.T) {
 	vu := &detect.VersionedUnmarshaler{
 		Config: params.MainnetConfig(),
-		Fork:   version.Phase0,
+		Fork:   version.Capella,
 	}
 	slot := primitives.Slot(23)
 	prefix := "block"
 	var root [32]byte
 	copy(root[:], []byte{0x23, 0x23, 0x23})
-	expected := "block_mainnet_phase0_23-0x2323230000000000000000000000000000000000000000000000000000000000.ssz"
+	expected := "block_mainnet_capella_23-0x2323230000000000000000000000000000000000000000000000000000000000.ssz"
 	actual := fname(prefix, vu, slot, root)
 	require.Equal(t, expected, actual)
 
 	vu.Config = params.MinimalSpecConfig()
-	vu.Fork = version.Altair
+	vu.Fork = version.Capella
 	slot = 17
 	prefix = "state"
 	copy(root[29:], []byte{0x17, 0x17, 0x17})
-	expected = "state_minimal_altair_17-0x2323230000000000000000000000000000000000000000000000000000171717.ssz"
+	expected = "state_minimal_capella_17-0x2323230000000000000000000000000000000000000000000000000000171717.ssz"
 	actual = fname(prefix, vu, slot, root)
 	require.Equal(t, expected, actual)
 }

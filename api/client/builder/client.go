@@ -14,7 +14,7 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -88,7 +88,7 @@ var _ observer = &requestLogger{}
 // BuilderClient provides a collection of helper methods for calling Builder API endpoints.
 type BuilderClient interface {
 	NodeURL() string
-	GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubkey [dilithium2.CryptoPublicKeyBytes]byte) (SignedBid, error)
+	GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubkey [dilithium.CryptoPublicKeyBytes]byte) (SignedBid, error)
 	RegisterValidator(ctx context.Context, svr []*zondpb.SignedValidatorRegistrationV1) error
 	SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlySignedBeaconBlock, blobs []*zondpb.SignedBlindedBlobSidecar) (interfaces.ExecutionData, *v1.BlobsBundle, error)
 	Status(ctx context.Context) error
@@ -191,7 +191,7 @@ func (c *Client) do(ctx context.Context, method string, path string, body io.Rea
 
 var execHeaderTemplate = template.Must(template.New("").Parse(getExecHeaderPath))
 
-func execHeaderPath(slot primitives.Slot, parentHash [32]byte, pubkey [dilithium2.CryptoPublicKeyBytes]byte) (string, error) {
+func execHeaderPath(slot primitives.Slot, parentHash [32]byte, pubkey [dilithium.CryptoPublicKeyBytes]byte) (string, error) {
 	v := struct {
 		Slot       primitives.Slot
 		ParentHash string
@@ -210,7 +210,7 @@ func execHeaderPath(slot primitives.Slot, parentHash [32]byte, pubkey [dilithium
 }
 
 // GetHeader is used by a proposing validator to request an execution payload header from the Builder node.
-func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubkey [dilithium2.CryptoPublicKeyBytes]byte) (SignedBid, error) {
+func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubkey [dilithium.CryptoPublicKeyBytes]byte) (SignedBid, error) {
 	path, err := execHeaderPath(slot, parentHash, pubkey)
 	if err != nil {
 		return nil, err
@@ -224,16 +224,6 @@ func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash
 		return nil, errors.Wrapf(err, "error unmarshaling the builder GetHeader response, using slot=%d, parentHash=%#x, pubkey=%#x", slot, parentHash, pubkey)
 	}
 	switch strings.ToLower(v.Version) {
-	case strings.ToLower(version.String(version.Deneb)):
-		hr := &ExecHeaderResponseDeneb{}
-		if err := json.Unmarshal(hb, hr); err != nil {
-			return nil, errors.Wrapf(err, "error unmarshaling the builder GetHeader response, using slot=%d, parentHash=%#x, pubkey=%#x", slot, parentHash, pubkey)
-		}
-		p, err := hr.ToProto()
-		if err != nil {
-			return nil, errors.Wrapf(err, "could not extract proto message from header")
-		}
-		return WrappedSignedBuilderBidDeneb(p)
 	case strings.ToLower(version.String(version.Capella)):
 		hr := &ExecHeaderResponseCapella{}
 		if err := json.Unmarshal(hb, hr); err != nil {
@@ -244,16 +234,6 @@ func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash
 			return nil, errors.Wrapf(err, "could not extract proto message from header")
 		}
 		return WrappedSignedBuilderBidCapella(p)
-	case strings.ToLower(version.String(version.Bellatrix)):
-		hr := &ExecHeaderResponse{}
-		if err := json.Unmarshal(hb, hr); err != nil {
-			return nil, errors.Wrapf(err, "error unmarshaling the builder GetHeader response, using slot=%d, parentHash=%#x, pubkey=%#x", slot, parentHash, pubkey)
-		}
-		p, err := hr.ToProto()
-		if err != nil {
-			return nil, errors.Wrap(err, "could not extract proto message from header")
-		}
-		return WrappedSignedBuilderBid(p)
 	default:
 		return nil, fmt.Errorf("unsupported header version %s", strings.ToLower(v.Version))
 	}
@@ -297,43 +277,6 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 		return nil, nil, errNotBlinded
 	}
 	switch sb.Version() {
-	case version.Bellatrix:
-		psb, err := sb.PbBlindedBellatrixBlock()
-		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not get protobuf block")
-		}
-		b, err := shared.SignedBlindedBeaconBlockBellatrixFromConsensus(&zondpb.SignedBlindedBeaconBlockBellatrix{Block: psb.Block, Signature: bytesutil.SafeCopyBytes(psb.Signature)})
-		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not convert SignedBlindedBeaconBlockBellatrix to json marshalable type")
-		}
-		body, err := json.Marshal(b)
-		if err != nil {
-			return nil, nil, errors.Wrap(err, "error encoding the SignedBlindedBeaconBlockBellatrix value body in SubmitBlindedBlock")
-		}
-		versionOpt := func(r *http.Request) {
-			r.Header.Add("Eth-Consensus-Version", version.String(version.Bellatrix))
-		}
-		rb, err := c.do(ctx, http.MethodPost, postBlindedBeaconBlockPath, bytes.NewBuffer(body), versionOpt)
-
-		if err != nil {
-			return nil, nil, errors.Wrap(err, "error posting the SignedBlindedBeaconBlockBellatrix to the builder api")
-		}
-		ep := &ExecPayloadResponse{}
-		if err := json.Unmarshal(rb, ep); err != nil {
-			return nil, nil, errors.Wrap(err, "error unmarshaling the builder SubmitBlindedBlock response")
-		}
-		if strings.ToLower(ep.Version) != version.String(version.Bellatrix) {
-			return nil, nil, errors.New("not a bellatrix payload")
-		}
-		p, err := ep.ToProto()
-		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not extract proto message from payload")
-		}
-		payload, err := blocks.WrappedExecutionPayload(p)
-		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not wrap execution payload in interface")
-		}
-		return payload, nil, nil
 	case version.Capella:
 		psb, err := sb.PbBlindedCapellaBlock()
 		if err != nil {
@@ -371,43 +314,6 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 			return nil, nil, errors.Wrapf(err, "could not wrap execution payload in interface")
 		}
 		return payload, nil, nil
-	case version.Deneb:
-		psb, err := sb.PbBlindedDenebBlock()
-		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not get protobuf block")
-		}
-		b, err := shared.SignedBlindedBeaconBlockContentsDenebFromConsensus(&zondpb.SignedBlindedBeaconBlockAndBlobsDeneb{SignedBlindedBlock: psb, SignedBlindedBlobSidecars: blobs})
-		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not convert SignedBlindedBeaconBlockContentsDeneb to json marshalable type")
-		}
-		body, err := json.Marshal(b)
-		if err != nil {
-			return nil, nil, errors.Wrap(err, "error encoding the SignedBlindedBeaconBlockDeneb value body in SubmitBlindedBlockDeneb")
-		}
-
-		versionOpt := func(r *http.Request) {
-			r.Header.Add("Eth-Consensus-Version", version.String(version.Deneb))
-		}
-		rb, err := c.do(ctx, http.MethodPost, postBlindedBeaconBlockPath, bytes.NewBuffer(body), versionOpt)
-		if err != nil {
-			return nil, nil, errors.Wrap(err, "error posting the SignedBlindedBeaconBlockDeneb to the builder api")
-		}
-		ep := &ExecPayloadResponseDeneb{}
-		if err := json.Unmarshal(rb, ep); err != nil {
-			return nil, nil, errors.Wrap(err, "error unmarshaling the builder SubmitBlindedBlockDeneb response")
-		}
-		if strings.ToLower(ep.Version) != version.String(version.Deneb) {
-			return nil, nil, errors.New("not a deneb payload")
-		}
-		p, blobBundle, err := ep.ToProto()
-		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not extract proto message from payload")
-		}
-		payload, err := blocks.WrappedExecutionPayloadDeneb(p, 0)
-		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not wrap execution payload in interface")
-		}
-		return payload, blobBundle, nil
 	default:
 		return nil, nil, fmt.Errorf("unsupported block version %s", version.String(sb.Version()))
 	}
