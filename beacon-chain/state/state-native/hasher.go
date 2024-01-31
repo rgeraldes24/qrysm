@@ -33,8 +33,6 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 		fieldRoots = make([][]byte, params.BeaconConfig().BeaconStateBellatrixFieldCount)
 	case version.Capella:
 		fieldRoots = make([][]byte, params.BeaconConfig().BeaconStateCapellaFieldCount) // Deneb has the same state field count as Capella.
-	case version.Deneb:
-		fieldRoots = make([][]byte, params.BeaconConfig().BeaconStateDenebFieldCount)
 	}
 
 	// Genesis time root.
@@ -235,14 +233,16 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 		fieldRoots[types.LatestExecutionPayloadHeaderCapella.RealPosition()] = executionPayloadRoot[:]
 	}
 
-	if state.version == version.Deneb {
-		// Execution payload root.
-		executionPayloadRoot, err := state.latestExecutionPayloadHeaderDeneb.HashTreeRoot()
-		if err != nil {
-			return nil, err
+	/*
+		if state.version == version.Deneb {
+			// Execution payload root.
+			executionPayloadRoot, err := state.latestExecutionPayloadHeaderDeneb.HashTreeRoot()
+			if err != nil {
+				return nil, err
+			}
+			fieldRoots[types.LatestExecutionPayloadHeaderDeneb.RealPosition()] = executionPayloadRoot[:]
 		}
-		fieldRoots[types.LatestExecutionPayloadHeaderDeneb.RealPosition()] = executionPayloadRoot[:]
-	}
+	*/
 	if state.version >= version.Capella {
 		// Next withdrawal index root.
 		nextWithdrawalIndexRoot := make([]byte, 32)

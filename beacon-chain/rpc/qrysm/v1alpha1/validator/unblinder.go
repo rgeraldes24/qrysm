@@ -203,12 +203,6 @@ func (u *unblinder) blindedProtoBlock() (proto.Message, error) {
 				Body: &zondpb.BlindedBeaconBlockBodyCapella{},
 			},
 		}, nil
-	case version.Deneb:
-		return &zondpb.SignedBlindedBeaconBlockDeneb{
-			Message: &zondpb.BlindedBeaconBlockDeneb{
-				Body: &zondpb.BlindedBeaconBlockBodyDeneb{},
-			},
-		}, nil
 	default:
 		return nil, fmt.Errorf("invalid version %s", version.String(u.b.Version()))
 	}
@@ -226,12 +220,6 @@ func (u *unblinder) protoBlock() (proto.Message, error) {
 		return &zondpb.SignedBeaconBlockCapella{
 			Block: &zondpb.BeaconBlockCapella{
 				Body: &zondpb.BeaconBlockBodyCapella{},
-			},
-		}, nil
-	case version.Deneb:
-		return &zondpb.SignedBeaconBlockDeneb{
-			Block: &zondpb.BeaconBlockDeneb{
-				Body: &zondpb.BeaconBlockBodyDeneb{},
 			},
 		}, nil
 	default:

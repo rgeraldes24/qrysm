@@ -100,17 +100,6 @@ func sendVerifiedBlocks(stream zondpb.BeaconNodeValidator_StreamBlocksAltairServ
 			return nil
 		}
 		b.Block = &zondpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: phBlk}
-	case version.Deneb:
-		pb, err := data.SignedBlock.Proto()
-		if err != nil {
-			return errors.Wrap(err, "could not get protobuf block")
-		}
-		phBlk, ok := pb.(*zondpb.SignedBeaconBlockDeneb)
-		if !ok {
-			log.Warn("Mismatch between version and block type, was expecting SignedBeaconBlockDeneb")
-			return nil
-		}
-		b.Block = &zondpb.StreamBlocksResponse_DenebBlock{DenebBlock: phBlk}
 	}
 
 	if err := stream.Send(b); err != nil {

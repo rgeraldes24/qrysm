@@ -1,9 +1,10 @@
 package events
 
 import (
+	"strings"
+
 	"github.com/theQRL/qrysm/v4/beacon-chain/blockchain"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	"strings"
 
 	gwpb "github.com/grpc-ecosystem/grpc-gateway/v2/proto/gateway"
 	"github.com/pkg/errors"
@@ -323,7 +324,7 @@ func (s *Server) streamPayloadAttributes(stream zondpbservice.Events_StreamEvent
 				},
 			},
 		})
-	case version.Capella, version.Deneb:
+	case version.Capella:
 		withdrawals, err := headState.ExpectedWithdrawals()
 		if err != nil {
 			return err

@@ -17,14 +17,12 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/features"
-	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
@@ -228,11 +226,6 @@ func (s *Service) validateBeaconBlock(ctx context.Context, blk interfaces.ReadOn
 	ctx, span := trace.StartSpan(ctx, "sync.validateBeaconBlock")
 	defer span.End()
 
-	if err := validateDenebBeaconBlock(blk.Block()); err != nil {
-		s.setBadBlock(ctx, blockRoot)
-		return err
-	}
-
 	if !s.cfg.chain.InForkchoice(blk.Block().ParentRoot()) {
 		s.setBadBlock(ctx, blockRoot)
 		return blockchain.ErrNotDescendantOfFinalized
@@ -270,22 +263,6 @@ func (s *Service) validateBeaconBlock(ctx context.Context, blk interfaces.ReadOn
 		// for other kinds of errors, set this block as a bad block.
 		s.setBadBlock(ctx, blockRoot)
 		return err
-	}
-	return nil
-}
-
-func validateDenebBeaconBlock(blk interfaces.ReadOnlyBeaconBlock) error {
-	if blk.Version() < version.Deneb {
-		return nil
-	}
-	commits, err := blk.Body().BlobKzgCommitments()
-	if err != nil {
-		return errors.New("unable to read commitments from deneb block")
-	}
-	// [REJECT] The length of KZG commitments is less than or equal to the limitation defined in Consensus Layer
-	// -- i.e. validate that len(body.signed_beacon_block.message.blob_kzg_commitments) <= MAX_BLOBS_PER_BLOCK
-	if len(commits) > fieldparams.MaxBlobsPerBlock {
-		return errors.Wrapf(errRejectCommitmentLen, "%d > %d", len(commits), fieldparams.MaxBlobsPerBlock)
 	}
 	return nil
 }

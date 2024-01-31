@@ -264,7 +264,6 @@ func ConfigForkVersions(b *BeaconChainConfig) map[[fieldparams.VersionLength]byt
 		bytesutil.ToBytes4(b.AltairForkVersion):    version.Altair,
 		bytesutil.ToBytes4(b.BellatrixForkVersion): version.Bellatrix,
 		bytesutil.ToBytes4(b.CapellaForkVersion):   version.Capella,
-		bytesutil.ToBytes4(b.DenebForkVersion):     version.Deneb,
 	}
 }
 

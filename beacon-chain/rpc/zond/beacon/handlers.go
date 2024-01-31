@@ -174,21 +174,23 @@ func (s *Server) publishBlindedBlock(ctx context.Context, w http.ResponseWriter,
 	}
 	versionHeader := r.Header.Get(api.VersionHeader)
 	var blockVersionError string
-	var denebBlockContents *shared.SignedBlindedBeaconBlockContentsDeneb
-	if err = unmarshalStrict(body, &denebBlockContents); err == nil {
-		consensusBlock, err := denebBlockContents.ToGeneric()
-		if err == nil {
-			if err = s.validateBroadcast(ctx, r, consensusBlock); err != nil {
-				http2.HandleError(w, err.Error(), http.StatusBadRequest)
+	/*
+		var denebBlockContents *shared.SignedBlindedBeaconBlockContentsDeneb
+		if err = unmarshalStrict(body, &denebBlockContents); err == nil {
+			consensusBlock, err := denebBlockContents.ToGeneric()
+			if err == nil {
+				if err = s.validateBroadcast(ctx, r, consensusBlock); err != nil {
+					http2.HandleError(w, err.Error(), http.StatusBadRequest)
+					return
+				}
+				s.proposeBlock(ctx, w, consensusBlock)
 				return
 			}
-			s.proposeBlock(ctx, w, consensusBlock)
-			return
+			if versionHeader == version.String(version.Deneb) {
+				blockVersionError = fmt.Sprintf("could not decode %s request body into consensus block: %v", version.String(version.Deneb), err.Error())
+			}
 		}
-		if versionHeader == version.String(version.Deneb) {
-			blockVersionError = fmt.Sprintf("could not decode %s request body into consensus block: %v", version.String(version.Deneb), err.Error())
-		}
-	}
+	*/
 
 	var capellaBlock *shared.SignedBlindedBeaconBlockCapella
 	if err = unmarshalStrict(body, &capellaBlock); err == nil {
@@ -389,21 +391,23 @@ func (s *Server) publishBlock(ctx context.Context, w http.ResponseWriter, r *htt
 	}
 	versionHeader := r.Header.Get(api.VersionHeader)
 	var blockVersionError string
-	var denebBlockContents *shared.SignedBeaconBlockContentsDeneb
-	if err = unmarshalStrict(body, &denebBlockContents); err == nil {
-		consensusBlock, err := denebBlockContents.ToGeneric()
-		if err == nil {
-			if err = s.validateBroadcast(ctx, r, consensusBlock); err != nil {
-				http2.HandleError(w, err.Error(), http.StatusBadRequest)
+	/*
+		var denebBlockContents *shared.SignedBeaconBlockContentsDeneb
+		if err = unmarshalStrict(body, &denebBlockContents); err == nil {
+			consensusBlock, err := denebBlockContents.ToGeneric()
+			if err == nil {
+				if err = s.validateBroadcast(ctx, r, consensusBlock); err != nil {
+					http2.HandleError(w, err.Error(), http.StatusBadRequest)
+					return
+				}
+				s.proposeBlock(ctx, w, consensusBlock)
 				return
 			}
-			s.proposeBlock(ctx, w, consensusBlock)
-			return
+			if versionHeader == version.String(version.Deneb) {
+				blockVersionError = fmt.Sprintf(": could not decode %s request body into consensus block: %v", version.String(version.Deneb), err.Error())
+			}
 		}
-		if versionHeader == version.String(version.Deneb) {
-			blockVersionError = fmt.Sprintf(": could not decode %s request body into consensus block: %v", version.String(version.Deneb), err.Error())
-		}
-	}
+	*/
 	var capellaBlock *shared.SignedBeaconBlockCapella
 	if err = unmarshalStrict(body, &capellaBlock); err == nil {
 		consensusBlock, err := capellaBlock.ToGeneric()

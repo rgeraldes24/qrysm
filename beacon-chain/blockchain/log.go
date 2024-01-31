@@ -61,14 +61,7 @@ func logStateTransitionData(b interfaces.ReadOnlyBeaconBlock) error {
 			txsPerSlotCount.Set(float64(len(txs)))
 		}
 	}
-	if b.Version() >= version.Deneb {
-		kzgs, err := b.Body().BlobKzgCommitments()
-		if err != nil {
-			log.WithError(err).Error("Failed to get blob KZG commitments")
-		} else if len(kzgs) > 0 {
-			log = log.WithField("kzgCommitmentCount", len(kzgs))
-		}
-	}
+
 	log.Info("Finished applying state transition")
 	return nil
 }

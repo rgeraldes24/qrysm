@@ -210,15 +210,6 @@ func (vs *Server) getPayloadHeaderFromBuilder(ctx context.Context, slot primitiv
 	}
 
 	var bundle *enginev1.BlindedBlobsBundle
-	if bid.Version() >= version.Deneb {
-		bundle, err = bid.BlindedBlobsBundle()
-		if err != nil {
-			return nil, nil, errors.Wrap(err, "could not get blinded blobs bundle")
-		}
-		if bundle != nil {
-			log.WithField("blindBlobCount", len(bundle.BlobRoots))
-		}
-	}
 
 	log.WithFields(logrus.Fields{
 		"value":              v.String(),

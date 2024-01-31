@@ -1,19 +1,15 @@
 package forkchoice
 
 import (
-	"context"
 	"fmt"
-	"os"
 	"path"
 	"testing"
 
 	"github.com/golang/snappy"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
-	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
-	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -81,9 +77,6 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 				case version.Capella:
 					beaconState = unmarshalCapellaState(t, preBeaconStateSSZ)
 					beaconBlock = unmarshalCapellaBlock(t, blockSSZ)
-				case version.Deneb:
-					beaconState = unmarshalDenebState(t, preBeaconStateSSZ)
-					beaconBlock = unmarshalDenebBlock(t, blockSSZ)
 				default:
 					t.Fatalf("unknown fork version: %v", fork)
 				}
@@ -109,13 +102,11 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 							beaconBlock = unmarshalSignedBellatrixBlock(t, blockSSZ)
 						case version.Capella:
 							beaconBlock = unmarshalSignedCapellaBlock(t, blockSSZ)
-						case version.Deneb:
-							beaconBlock = unmarshalSignedDenebBlock(t, blockSSZ)
 						default:
 							t.Fatalf("unknown fork version: %v", fork)
 						}
 					}
-					runBlobStep(t, step.Blobs, beaconBlock, fork, folder, testsFolderPath, step.Proofs, builder)
+					// runBlobStep(t, step.Blobs, beaconBlock, fork, folder, testsFolderPath, step.Proofs, builder)
 					if beaconBlock != nil {
 						if step.Valid != nil && !*step.Valid {
 							builder.InvalidBlock(t, beaconBlock)
@@ -272,6 +263,7 @@ func unmarshalDenebBlock(t *testing.T, raw []byte) interfaces.SignedBeaconBlock 
 	return blk
 }
 
+/*
 func unmarshalSignedDenebBlock(t *testing.T, raw []byte) interfaces.SignedBeaconBlock {
 	base := &zondpb.SignedBeaconBlockDeneb{}
 	require.NoError(t, base.UnmarshalSSZ(raw))
@@ -279,7 +271,9 @@ func unmarshalSignedDenebBlock(t *testing.T, raw []byte) interfaces.SignedBeacon
 	require.NoError(t, err)
 	return blk
 }
+*/
 
+/*
 func runBlobStep(t *testing.T,
 	blobs *string,
 	beaconBlock interfaces.ReadOnlySignedBeaconBlock,
@@ -302,7 +296,7 @@ func runBlobStep(t *testing.T,
 
 		blobsFile, err := util.BazelFileBytes(testsFolderPath, folder.Name(), fmt.Sprint(*blobs, ".ssz_snappy"))
 		require.NoError(t, err)
-		blobsSSZ, err := snappy.Decode(nil /* dst */, blobsFile)
+		blobsSSZ, err := snappy.Decode(nil, blobsFile)
 		require.NoError(t, err)
 		for index := uint64(0); index*fieldparams.BlobLength < uint64(len(blobsSSZ)); index++ {
 			var proof []byte
@@ -333,3 +327,5 @@ func runBlobStep(t *testing.T,
 		}
 	}
 }
+
+*/

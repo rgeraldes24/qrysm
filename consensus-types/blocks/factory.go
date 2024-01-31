@@ -185,19 +185,6 @@ func BuildSignedBeaconBlock(blk interfaces.ReadOnlyBeaconBlock, signature []byte
 			return nil, errIncorrectBlockVersion
 		}
 		return NewSignedBeaconBlock(&zond.SignedBeaconBlockCapella{Block: pb, Signature: signature})
-	case version.Deneb:
-		if blk.IsBlinded() {
-			pb, ok := pb.(*zond.BlindedBeaconBlockDeneb)
-			if !ok {
-				return nil, errIncorrectBlockVersion
-			}
-			return NewSignedBeaconBlock(&zond.SignedBlindedBeaconBlockDeneb{Message: pb, Signature: signature})
-		}
-		pb, ok := pb.(*zond.BeaconBlockDeneb)
-		if !ok {
-			return nil, errIncorrectBlockVersion
-		}
-		return NewSignedBeaconBlock(&zond.SignedBeaconBlockDeneb{Block: pb, Signature: signature})
 	default:
 		return nil, errUnsupportedBeaconBlock
 	}

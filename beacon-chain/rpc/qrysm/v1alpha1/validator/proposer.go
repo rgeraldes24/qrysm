@@ -28,7 +28,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
@@ -220,17 +219,12 @@ func (vs *Server) ProposeBeaconBlock(ctx context.Context, req *zondpb.GenericSig
 	}
 
 	var blindSidecars []*zondpb.SignedBlindedBlobSidecar
-	if blk.Version() >= version.Deneb && blk.IsBlinded() {
-		blindSidecars = req.GetBlindedDeneb().SignedBlindedBlobSidecars
-	}
-
 	unblinder, err := newUnblinder(blk, blindSidecars, vs.BlockBuilder)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create unblinder")
 	}
-	blinded := unblinder.b.IsBlinded() //
 
-	blk, unblindedSidecars, err := unblinder.unblindBuilderBlock(ctx)
+	blk, _, err = unblinder.unblindBuilderBlock(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not unblind builder block")
 	}
@@ -242,34 +236,6 @@ func (vs *Server) ProposeBeaconBlock(ctx context.Context, req *zondpb.GenericSig
 	}
 	if err := vs.P2P.Broadcast(ctx, blkPb); err != nil {
 		return nil, fmt.Errorf("could not broadcast block: %v", err)
-	}
-
-	var scs []*zondpb.SignedBlobSidecar
-	if blk.Version() >= version.Deneb {
-		if blinded {
-			scs = unblindedSidecars // Use sidecars from unblinder if the block was blinded.
-		} else {
-			scs, err = extraSidecars(req) // Use sidecars from the request if the block was not blinded.
-			if err != nil {
-				return nil, errors.Wrap(err, "could not extract blobs")
-			}
-		}
-		sidecars := make([]*zondpb.BlobSidecar, len(scs))
-		for i, sc := range scs {
-			log.WithFields(logrus.Fields{
-				"blockRoot": hex.EncodeToString(sc.Message.BlockRoot),
-				"index":     sc.Message.Index,
-			}).Debug("Broadcasting blob sidecar")
-			if err := vs.P2P.BroadcastBlob(ctx, sc.Message.Index, sc); err != nil {
-				log.WithError(err).Errorf("Could not broadcast blob sidecar index %d / %d", i, len(scs))
-			}
-			sidecars[i] = sc.Message
-		}
-		if len(scs) > 0 {
-			if err := vs.BeaconDB.SaveBlobSidecar(ctx, sidecars); err != nil {
-				return nil, err
-			}
-		}
 	}
 
 	root, err := blk.Block().HashTreeRoot()

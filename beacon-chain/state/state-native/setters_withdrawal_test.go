@@ -31,6 +31,7 @@ func TestSetNextWithdrawalValidatorIndex(t *testing.T) {
 	require.Equal(t, true, s.dirtyFields[types.NextWithdrawalValidatorIndex])
 }
 
+/*
 func TestSetNextWithdrawalIndex_Deneb(t *testing.T) {
 	s := BeaconState{
 		version:             version.Deneb,
@@ -52,3 +53,4 @@ func TestSetNextWithdrawalValidatorIndex_Deneb(t *testing.T) {
 	require.Equal(t, primitives.ValidatorIndex(5), s.nextWithdrawalValidatorIndex)
 	require.Equal(t, true, s.dirtyFields[types.NextWithdrawalValidatorIndex])
 }
+*/

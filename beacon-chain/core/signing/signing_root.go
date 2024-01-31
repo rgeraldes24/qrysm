@@ -11,7 +11,6 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 )
 
 // ForkVersionByteLength length of fork version byte array.
@@ -60,13 +59,15 @@ func ComputeDomainAndSign(st state.ReadOnlyBeaconState, epoch primitives.Epoch, 
 	fork := st.Fork()
 	// EIP-7044: Beginning in Deneb, fix the fork version to Capella for signed exits.
 	// This allows for signed validator exits to be valid forever.
-	if st.Version() >= version.Deneb && domain == params.BeaconConfig().DomainVoluntaryExit {
-		fork = &zondpb.Fork{
-			PreviousVersion: params.BeaconConfig().CapellaForkVersion,
-			CurrentVersion:  params.BeaconConfig().CapellaForkVersion,
-			Epoch:           params.BeaconConfig().CapellaForkEpoch,
+	/*
+		if st.Version() >= version.Deneb && domain == params.BeaconConfig().DomainVoluntaryExit {
+			fork = &zondpb.Fork{
+				PreviousVersion: params.BeaconConfig().CapellaForkVersion,
+				CurrentVersion:  params.BeaconConfig().CapellaForkVersion,
+				Epoch:           params.BeaconConfig().CapellaForkEpoch,
+			}
 		}
-	}
+	*/
 
 	d, err := Domain(fork, epoch, domain, st.GenesisValidatorsRoot())
 	if err != nil {

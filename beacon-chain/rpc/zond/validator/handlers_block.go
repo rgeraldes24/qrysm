@@ -125,16 +125,19 @@ func (s *Server) produceBlockV3(ctx context.Context, w http.ResponseWriter, r *h
 		handleProduceCapellaV3(ctx, w, isSSZ, capellaBlock, v1alpha1resp.PayloadValue)
 		return
 	}
-	blindedDenebBlockContents, ok := v1alpha1resp.Block.(*zond.GenericBeaconBlock_BlindedDeneb)
-	if ok {
-		handleProduceBlindedDenebV3(ctx, w, isSSZ, blindedDenebBlockContents, v1alpha1resp.PayloadValue)
-		return
-	}
-	denebBlockContents, ok := v1alpha1resp.Block.(*zond.GenericBeaconBlock_Deneb)
-	if ok {
-		handleProduceDenebV3(ctx, w, isSSZ, denebBlockContents, v1alpha1resp.PayloadValue)
-		return
-	}
+	// TODO(rgeraldes24)
+	/*
+		blindedDenebBlockContents, ok := v1alpha1resp.Block.(*zond.GenericBeaconBlock_BlindedDeneb)
+		if ok {
+			handleProduceBlindedDenebV3(ctx, w, isSSZ, blindedDenebBlockContents, v1alpha1resp.PayloadValue)
+			return
+		}
+		denebBlockContents, ok := v1alpha1resp.Block.(*zond.GenericBeaconBlock_Deneb)
+		if ok {
+			handleProduceDenebV3(ctx, w, isSSZ, denebBlockContents, v1alpha1resp.PayloadValue)
+			return
+		}
+	*/
 }
 
 func handleProducePhase0V3(
@@ -353,6 +356,7 @@ func handleProduceCapellaV3(
 	})
 }
 
+/*
 func handleProduceBlindedDenebV3(
 	ctx context.Context,
 	w http.ResponseWriter,
@@ -424,3 +428,4 @@ func handleProduceDenebV3(
 		Data:                    jsonBytes,
 	})
 }
+*/

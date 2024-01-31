@@ -105,16 +105,6 @@ func (e *ExecutionBlock) UnmarshalJSON(enc []byte) error {
 			}
 		}
 		e.Withdrawals = ws
-
-		edg, has := decoded["excessBlobGas"]
-		if has && edg != nil {
-			e.Version = version.Deneb
-		}
-
-		dgu, has := decoded["blobGasUsed"]
-		if has && dgu != nil {
-			e.Version = version.Deneb
-		}
 	}
 
 	rawTxList, ok := decoded["transactions"]

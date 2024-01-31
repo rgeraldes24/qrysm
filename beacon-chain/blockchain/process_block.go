@@ -7,14 +7,12 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/qrysm/v4/beacon-chain/blockchain/kzg"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
 	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	coreTime "github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
-	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/features"
@@ -265,9 +263,12 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 				return err
 			}
 		}
-		if err := s.databaseDACheck(ctx, b); err != nil {
-			return errors.Wrap(err, "could not validate blob data availability")
-		}
+		// TODO(rgeraldes24)
+		/*
+			if err := s.databaseDACheck(ctx, b); err != nil {
+				return errors.Wrap(err, "could not validate blob data availability")
+			}
+		*/
 		args := &forkchoicetypes.BlockAndCheckpoints{Block: b.Block(),
 			JustifiedCheckpoint: jCheckpoints[i],
 			FinalizedCheckpoint: fCheckpoints[i]}
@@ -333,6 +334,7 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 	return s.saveHeadNoDB(ctx, lastB, lastBR, preState, !isValidPayload)
 }
 
+/*
 func commitmentsToCheck(b consensusblocks.ROBlock, current primitives.Slot) [][]byte {
 	if b.Version() < version.Deneb {
 		return nil
@@ -359,6 +361,7 @@ func (s *Service) databaseDACheck(ctx context.Context, b consensusblocks.ROBlock
 	}
 	return kzg.IsDataAvailable(commitments, sidecars)
 }
+*/
 
 func (s *Service) updateEpochBoundaryCaches(ctx context.Context, st state.BeaconState) error {
 	e := coreTime.CurrentEpoch(st)
@@ -529,6 +532,8 @@ func (s *Service) runLateBlockTasks() {
 	}
 }
 
+// TODO(rgeraldes24)
+/*
 func (s *Service) isDataAvailable(ctx context.Context, root [32]byte, signed interfaces.ReadOnlySignedBeaconBlock) error {
 	if signed.Version() < version.Deneb {
 		return nil
@@ -603,6 +608,7 @@ func (s *Service) isDataAvailable(ctx context.Context, root [32]byte, signed int
 		}
 	}
 }
+*/
 
 // lateBlockTasks  is called 4 seconds into the slot and performs tasks
 // related to late blocks. It emits a MissedSlot state feed event.

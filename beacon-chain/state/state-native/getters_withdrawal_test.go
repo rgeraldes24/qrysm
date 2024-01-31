@@ -13,12 +13,6 @@ import (
 )
 
 func TestNextWithdrawalIndex(t *testing.T) {
-	t.Run("ok for deneb", func(t *testing.T) {
-		s := BeaconState{version: version.Deneb, nextWithdrawalIndex: 123}
-		i, err := s.NextWithdrawalIndex()
-		require.NoError(t, err)
-		assert.Equal(t, uint64(123), i)
-	})
 	t.Run("ok", func(t *testing.T) {
 		s := BeaconState{version: version.Capella, nextWithdrawalIndex: 123}
 		i, err := s.NextWithdrawalIndex()
@@ -33,12 +27,6 @@ func TestNextWithdrawalIndex(t *testing.T) {
 }
 
 func TestNextWithdrawalValidatorIndex(t *testing.T) {
-	t.Run("ok for deneb", func(t *testing.T) {
-		s := BeaconState{version: version.Deneb, nextWithdrawalValidatorIndex: 123}
-		i, err := s.NextWithdrawalValidatorIndex()
-		require.NoError(t, err)
-		assert.Equal(t, primitives.ValidatorIndex(123), i)
-	})
 	t.Run("ok", func(t *testing.T) {
 		s := BeaconState{version: version.Capella, nextWithdrawalValidatorIndex: 123}
 		i, err := s.NextWithdrawalValidatorIndex()
@@ -342,6 +330,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 	})
 }
 
+/*
 func TestExpectedWithdrawals_Deneb(t *testing.T) {
 	t.Run("no withdrawals", func(t *testing.T) {
 		s := BeaconState{
@@ -595,3 +584,4 @@ func TestExpectedWithdrawals_Deneb(t *testing.T) {
 		params.BeaconConfig().MaxValidatorsPerWithdrawalsSweep = saved
 	})
 }
+*/

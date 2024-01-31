@@ -864,8 +864,6 @@ func marshalBlockFull(
 		return nil, err
 	}
 	switch blk.Version() {
-	case version.Deneb:
-		return snappy.Encode(nil, append(denebKey, encodedBlock...)), nil
 	case version.Capella:
 		return snappy.Encode(nil, append(capellaKey, encodedBlock...)), nil
 	case version.Bellatrix:
@@ -900,8 +898,6 @@ func marshalBlockBlinded(
 		return nil, errors.Wrap(err, "could not marshal blinded block")
 	}
 	switch blk.Version() {
-	case version.Deneb:
-		return snappy.Encode(nil, append(denebBlindKey, encodedBlock...)), nil
 	case version.Capella:
 		return snappy.Encode(nil, append(capellaBlindKey, encodedBlock...)), nil
 	case version.Bellatrix:

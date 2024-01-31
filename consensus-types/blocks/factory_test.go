@@ -121,46 +121,6 @@ func Test_NewSignedBeaconBlock(t *testing.T) {
 		assert.Equal(t, version.Capella, b.Version())
 		assert.Equal(t, true, b.IsBlinded())
 	})
-	t.Run("GenericSignedBeaconBlock_Deneb", func(t *testing.T) {
-		pb := &zond.GenericSignedBeaconBlock_Deneb{
-			Deneb: &zond.SignedBeaconBlockAndBlobsDeneb{
-				Block: &zond.SignedBeaconBlockDeneb{
-					Block: &zond.BeaconBlockDeneb{
-						Body: &zond.BeaconBlockBodyDeneb{},
-					}}}}
-		b, err := NewSignedBeaconBlock(pb)
-		require.NoError(t, err)
-		assert.Equal(t, version.Deneb, b.Version())
-	})
-	t.Run("SignedBeaconBlockDeneb", func(t *testing.T) {
-		pb := &zond.SignedBeaconBlockDeneb{
-			Block: &zond.BeaconBlockDeneb{
-				Body: &zond.BeaconBlockBodyDeneb{}}}
-		b, err := NewSignedBeaconBlock(pb)
-		require.NoError(t, err)
-		assert.Equal(t, version.Deneb, b.Version())
-	})
-	t.Run("SignedBlindedBeaconBlockDeneb", func(t *testing.T) {
-		pb := &zond.SignedBlindedBeaconBlockDeneb{
-			Message: &zond.BlindedBeaconBlockDeneb{
-				Body: &zond.BlindedBeaconBlockBodyDeneb{}}}
-		b, err := NewSignedBeaconBlock(pb)
-		require.NoError(t, err)
-		assert.Equal(t, version.Deneb, b.Version())
-		assert.Equal(t, true, b.IsBlinded())
-	})
-	t.Run("GenericSignedBeaconBlock_BlindedDeneb", func(t *testing.T) {
-		pb := &zond.GenericSignedBeaconBlock_BlindedDeneb{
-			BlindedDeneb: &zond.SignedBlindedBeaconBlockAndBlobsDeneb{
-				SignedBlindedBlock: &zond.SignedBlindedBeaconBlockDeneb{
-					Message: &zond.BlindedBeaconBlockDeneb{
-						Body: &zond.BlindedBeaconBlockBodyDeneb{},
-					}}}}
-		b, err := NewSignedBeaconBlock(pb)
-		require.NoError(t, err)
-		assert.Equal(t, version.Deneb, b.Version())
-		assert.Equal(t, true, b.IsBlinded())
-	})
 	t.Run("nil", func(t *testing.T) {
 		_, err := NewSignedBeaconBlock(nil)
 		assert.ErrorContains(t, "received nil object", err)
@@ -248,34 +208,6 @@ func Test_NewBeaconBlock(t *testing.T) {
 		assert.Equal(t, version.Capella, b.Version())
 		assert.Equal(t, true, b.IsBlinded())
 	})
-	t.Run("GenericBeaconBlock_Deneb", func(t *testing.T) {
-		pb := &zond.GenericBeaconBlock_Deneb{Deneb: &zond.BeaconBlockAndBlobsDeneb{Block: &zond.BeaconBlockDeneb{
-			Body: &zond.BeaconBlockBodyDeneb{},
-		}}}
-		b, err := NewBeaconBlock(pb)
-		require.NoError(t, err)
-		assert.Equal(t, version.Deneb, b.Version())
-	})
-	t.Run("BeaconBlockDeneb", func(t *testing.T) {
-		pb := &zond.BeaconBlockDeneb{Body: &zond.BeaconBlockBodyDeneb{}}
-		b, err := NewBeaconBlock(pb)
-		require.NoError(t, err)
-		assert.Equal(t, version.Deneb, b.Version())
-	})
-	t.Run("BlindedBeaconBlockDeneb", func(t *testing.T) {
-		pb := &zond.BlindedBeaconBlockDeneb{Body: &zond.BlindedBeaconBlockBodyDeneb{}}
-		b, err := NewBeaconBlock(pb)
-		require.NoError(t, err)
-		assert.Equal(t, version.Deneb, b.Version())
-		assert.Equal(t, true, b.IsBlinded())
-	})
-	t.Run("GenericBeaconBlock_BlindedDeneb", func(t *testing.T) {
-		pb := &zond.GenericBeaconBlock_BlindedDeneb{BlindedDeneb: &zond.BlindedBeaconBlockAndBlobsDeneb{Block: &zond.BlindedBeaconBlockDeneb{Body: &zond.BlindedBeaconBlockBodyDeneb{}}}}
-		b, err := NewBeaconBlock(pb)
-		require.NoError(t, err)
-		assert.Equal(t, version.Deneb, b.Version())
-		assert.Equal(t, true, b.IsBlinded())
-	})
 	t.Run("nil", func(t *testing.T) {
 		_, err := NewBeaconBlock(nil)
 		assert.ErrorContains(t, "received nil object", err)
@@ -337,23 +269,7 @@ func Test_NewBeaconBlockBody(t *testing.T) {
 		assert.Equal(t, version.Capella, b.version)
 		assert.Equal(t, true, b.isBlinded)
 	})
-	t.Run("BeaconBlockBodyDeneb", func(t *testing.T) {
-		pb := &zond.BeaconBlockBodyDeneb{}
-		i, err := NewBeaconBlockBody(pb)
-		require.NoError(t, err)
-		b, ok := i.(*BeaconBlockBody)
-		require.Equal(t, true, ok)
-		assert.Equal(t, version.Deneb, b.version)
-	})
-	t.Run("BlindedBeaconBlockBodyDeneb", func(t *testing.T) {
-		pb := &zond.BlindedBeaconBlockBodyDeneb{}
-		i, err := NewBeaconBlockBody(pb)
-		require.NoError(t, err)
-		b, ok := i.(*BeaconBlockBody)
-		require.Equal(t, true, ok)
-		assert.Equal(t, version.Deneb, b.version)
-		assert.Equal(t, true, b.isBlinded)
-	})
+
 	t.Run("nil", func(t *testing.T) {
 		_, err := NewBeaconBlockBody(nil)
 		assert.ErrorContains(t, "received nil object", err)

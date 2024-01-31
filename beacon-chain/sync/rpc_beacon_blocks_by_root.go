@@ -11,8 +11,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
-	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 )
 
 // sendRecentBeaconBlocksRequest sends a recent beacon blocks request to a peer to get
@@ -21,7 +19,7 @@ func (s *Service) sendRecentBeaconBlocksRequest(ctx context.Context, blockRoots 
 	ctx, cancel := context.WithTimeout(ctx, respTimeout)
 	defer cancel()
 
-	blks, err := SendBeaconBlocksByRootRequest(ctx, s.cfg.clock, s.cfg.p2p, id, blockRoots, func(blk interfaces.ReadOnlySignedBeaconBlock) error {
+	_, err := SendBeaconBlocksByRootRequest(ctx, s.cfg.clock, s.cfg.p2p, id, blockRoots, func(blk interfaces.ReadOnlySignedBeaconBlock) error {
 		blkRoot, err := blk.Block().HashTreeRoot()
 		if err != nil {
 			return err
@@ -34,19 +32,21 @@ func (s *Service) sendRecentBeaconBlocksRequest(ctx context.Context, blockRoots 
 		return nil
 	})
 
-	for _, blk := range blks {
-		// Skip blocks before deneb because they have no blob.
-		if blk.Version() < version.Deneb {
-			continue
+	/*
+		for _, blk := range blks {
+			// Skip blocks before deneb because they have no blob.
+			if blk.Version() < version.Deneb {
+				continue
+			}
+			blkRoot, err := blk.Block().HashTreeRoot()
+			if err != nil {
+				return err
+			}
+			if err := s.requestPendingBlobs(ctx, blk.Block(), blkRoot[:], id); err != nil {
+				return err
+			}
 		}
-		blkRoot, err := blk.Block().HashTreeRoot()
-		if err != nil {
-			return err
-		}
-		if err := s.requestPendingBlobs(ctx, blk.Block(), blkRoot[:], id); err != nil {
-			return err
-		}
-	}
+	*/
 
 	return err
 }
@@ -114,6 +114,7 @@ func (s *Service) beaconBlocksRootRPCHandler(ctx context.Context, msg interface{
 	return nil
 }
 
+/*
 func (s *Service) requestPendingBlobs(ctx context.Context, b interfaces.ReadOnlyBeaconBlock, br []byte, id peer.ID) error {
 	// Block before deneb has no blob.
 	if b.Version() < version.Deneb {
@@ -152,3 +153,4 @@ func (s *Service) requestPendingBlobs(ctx context.Context, b interfaces.ReadOnly
 
 	return s.cfg.beaconDB.SaveBlobSidecar(ctx, blobSidecars)
 }
+*/

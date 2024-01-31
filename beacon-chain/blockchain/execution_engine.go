@@ -215,18 +215,7 @@ func (s *Service) notifyNewPayload(ctx context.Context, preStateVersion int,
 		return false, errors.Wrap(invalidBlock{error: err}, "could not get execution payload")
 	}
 
-	var lastValidHash []byte
-	if blk.Version() >= version.Deneb {
-		var versionedHashes []common.Hash
-		versionedHashes, err = kzgCommitmentsToVersionedHashes(blk.Block().Body())
-		if err != nil {
-			return false, errors.Wrap(err, "could not get versioned hashes to feed the engine")
-		}
-		pr := common.Hash(blk.Block().ParentRoot())
-		lastValidHash, err = s.cfg.ExecutionEngineCaller.NewPayload(ctx, payload, versionedHashes, &pr)
-	} else {
-		lastValidHash, err = s.cfg.ExecutionEngineCaller.NewPayload(ctx, payload, []common.Hash{}, &common.Hash{} /*empty version hashes and root before Deneb*/)
-	}
+	lastValidHash, err := s.cfg.ExecutionEngineCaller.NewPayload(ctx, payload, []common.Hash{}, &common.Hash{} /*empty version hashes and root before Deneb*/)
 	switch err {
 	case nil:
 		newPayloadValidNodeCount.Inc()
@@ -326,23 +315,6 @@ func (s *Service) getPayloadAttribute(ctx context.Context, st state.BeaconState,
 
 	var attr payloadattribute.Attributer
 	switch st.Version() {
-	case version.Deneb:
-		withdrawals, err := st.ExpectedWithdrawals()
-		if err != nil {
-			log.WithError(err).Error("Could not get expected withdrawals to get payload attribute")
-			return false, emptyAttri, 0
-		}
-		attr, err = payloadattribute.New(&enginev1.PayloadAttributesV3{
-			Timestamp:             uint64(t.Unix()),
-			PrevRandao:            prevRando,
-			SuggestedFeeRecipient: feeRecipient.Bytes(),
-			Withdrawals:           withdrawals,
-			ParentBeaconBlockRoot: headRoot,
-		})
-		if err != nil {
-			log.WithError(err).Error("Could not get payload attribute")
-			return false, emptyAttri, 0
-		}
 	case version.Capella:
 		withdrawals, err := st.ExpectedWithdrawals()
 		if err != nil {

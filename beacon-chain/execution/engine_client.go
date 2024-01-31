@@ -803,35 +803,6 @@ func fullPayloadFromExecutionBlock(
 			Transactions:  txs,
 			Withdrawals:   block.Withdrawals,
 		}, 0) // We can't get the block value and don't care about the block value for this instance
-	case version.Deneb:
-		ebg, err := header.ExcessBlobGas()
-		if err != nil {
-			return nil, errors.Wrap(err, "unable to extract ExcessBlobGas attribute from excution payload header")
-		}
-		bgu, err := header.BlobGasUsed()
-		if err != nil {
-			return nil, errors.Wrap(err, "unable to extract BlobGasUsed attribute from excution payload header")
-		}
-		return blocks.WrappedExecutionPayloadDeneb(
-			&pb.ExecutionPayloadDeneb{
-				ParentHash:    header.ParentHash(),
-				FeeRecipient:  header.FeeRecipient(),
-				StateRoot:     header.StateRoot(),
-				ReceiptsRoot:  header.ReceiptsRoot(),
-				LogsBloom:     header.LogsBloom(),
-				PrevRandao:    header.PrevRandao(),
-				BlockNumber:   header.BlockNumber(),
-				GasLimit:      header.GasLimit(),
-				GasUsed:       header.GasUsed(),
-				Timestamp:     header.Timestamp(),
-				ExtraData:     header.ExtraData(),
-				BaseFeePerGas: header.BaseFeePerGas(),
-				BlockHash:     blockHash[:],
-				Transactions:  txs,
-				Withdrawals:   block.Withdrawals,
-				ExcessBlobGas: ebg,
-				BlobGasUsed:   bgu,
-			}, 0) // We can't get the block value and don't care about the block value for this instance
 	default:
 		return nil, fmt.Errorf("unknown execution block version %d", block.Version)
 	}
@@ -880,35 +851,6 @@ func fullPayloadFromPayloadBody(
 			Transactions:  body.Transactions,
 			Withdrawals:   body.Withdrawals,
 		}, 0) // We can't get the block value and don't care about the block value for this instance
-	case version.Deneb:
-		ebg, err := header.ExcessBlobGas()
-		if err != nil {
-			return nil, errors.Wrap(err, "unable to extract ExcessBlobGas attribute from excution payload header")
-		}
-		bgu, err := header.BlobGasUsed()
-		if err != nil {
-			return nil, errors.Wrap(err, "unable to extract BlobGasUsed attribute from excution payload header")
-		}
-		return blocks.WrappedExecutionPayloadDeneb(
-			&pb.ExecutionPayloadDeneb{
-				ParentHash:    header.ParentHash(),
-				FeeRecipient:  header.FeeRecipient(),
-				StateRoot:     header.StateRoot(),
-				ReceiptsRoot:  header.ReceiptsRoot(),
-				LogsBloom:     header.LogsBloom(),
-				PrevRandao:    header.PrevRandao(),
-				BlockNumber:   header.BlockNumber(),
-				GasLimit:      header.GasLimit(),
-				GasUsed:       header.GasUsed(),
-				Timestamp:     header.Timestamp(),
-				ExtraData:     header.ExtraData(),
-				BaseFeePerGas: header.BaseFeePerGas(),
-				BlockHash:     header.BlockHash(),
-				Transactions:  body.Transactions,
-				Withdrawals:   body.Withdrawals,
-				ExcessBlobGas: ebg,
-				BlobGasUsed:   bgu,
-			}, 0) // We can't get the block value and don't care about the block value for this instance
 	default:
 		return nil, fmt.Errorf("unknown execution block version for payload %d", bVersion)
 	}
@@ -1016,20 +958,6 @@ func buildEmptyExecutionPayload(v int) (proto.Message, error) {
 		}, nil
 	case version.Capella:
 		return &pb.ExecutionPayloadCapella{
-			ParentHash:    make([]byte, fieldparams.RootLength),
-			FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
-			StateRoot:     make([]byte, fieldparams.RootLength),
-			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-			LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
-			PrevRandao:    make([]byte, fieldparams.RootLength),
-			BaseFeePerGas: make([]byte, fieldparams.RootLength),
-			BlockHash:     make([]byte, fieldparams.RootLength),
-			Transactions:  make([][]byte, 0),
-			ExtraData:     make([]byte, 0),
-			Withdrawals:   make([]*pb.Withdrawal, 0),
-		}, nil
-	case version.Deneb:
-		return &pb.ExecutionPayloadDeneb{
 			ParentHash:    make([]byte, fieldparams.RootLength),
 			FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 			StateRoot:     make([]byte, fieldparams.RootLength),

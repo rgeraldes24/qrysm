@@ -629,6 +629,7 @@ func TestProcessSlots_ThroughBellatrixEpoch(t *testing.T) {
 	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
 }
 
+/*
 func TestProcessSlots_ThroughDenebEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	params.SetupTestConfigCleanup(t)
@@ -642,6 +643,7 @@ func TestProcessSlots_ThroughDenebEpoch(t *testing.T) {
 	require.Equal(t, version.Deneb, st.Version())
 	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
 }
+*/
 
 func TestProcessSlotsUsingNextSlotCache(t *testing.T) {
 	s, _ := util.DeterministicGenesisState(t, 1)
