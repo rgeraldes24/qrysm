@@ -248,9 +248,9 @@ func NewBeaconStateBellatrix(options ...func(state *zondpb.BeaconStateBellatrix)
 
 // NewBeaconStateCapella creates a beacon state with minimum marshalable fields.
 func NewBeaconStateCapella(options ...func(state *zondpb.BeaconStateCapella) error) (state.BeaconState, error) {
-	pubkeys := make([][]byte, 512)
+	pubkeys := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	for i := range pubkeys {
-		pubkeys[i] = make([]byte, 48)
+		pubkeys[i] = make([]byte, 2592)
 	}
 
 	seed := &zondpb.BeaconStateCapella{
