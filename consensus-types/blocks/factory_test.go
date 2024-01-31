@@ -365,36 +365,7 @@ func Test_NewBeaconBlockBody(t *testing.T) {
 }
 
 func Test_BuildSignedBeaconBlock(t *testing.T) {
-	sig := bytesutil.ToBytes96([]byte("signature"))
-	t.Run("Phase0", func(t *testing.T) {
-		b := &BeaconBlock{version: version.Phase0, body: &BeaconBlockBody{version: version.Phase0}}
-		sb, err := BuildSignedBeaconBlock(b, sig[:])
-		require.NoError(t, err)
-		assert.DeepEqual(t, sig, sb.Signature())
-		assert.Equal(t, version.Phase0, sb.Version())
-	})
-	t.Run("Altair", func(t *testing.T) {
-		b := &BeaconBlock{version: version.Altair, body: &BeaconBlockBody{version: version.Altair}}
-		sb, err := BuildSignedBeaconBlock(b, sig[:])
-		require.NoError(t, err)
-		assert.DeepEqual(t, sig, sb.Signature())
-		assert.Equal(t, version.Altair, sb.Version())
-	})
-	t.Run("Bellatrix", func(t *testing.T) {
-		b := &BeaconBlock{version: version.Bellatrix, body: &BeaconBlockBody{version: version.Bellatrix}}
-		sb, err := BuildSignedBeaconBlock(b, sig[:])
-		require.NoError(t, err)
-		assert.DeepEqual(t, sig, sb.Signature())
-		assert.Equal(t, version.Bellatrix, sb.Version())
-	})
-	t.Run("BellatrixBlind", func(t *testing.T) {
-		b := &BeaconBlock{version: version.Bellatrix, body: &BeaconBlockBody{version: version.Bellatrix, isBlinded: true}}
-		sb, err := BuildSignedBeaconBlock(b, sig[:])
-		require.NoError(t, err)
-		assert.DeepEqual(t, sig, sb.Signature())
-		assert.Equal(t, version.Bellatrix, sb.Version())
-		assert.Equal(t, true, sb.IsBlinded())
-	})
+	sig := bytesutil.ToBytes4595([]byte("signature"))
 	t.Run("Capella", func(t *testing.T) {
 		b := &BeaconBlock{version: version.Capella, body: &BeaconBlockBody{version: version.Capella}}
 		sb, err := BuildSignedBeaconBlock(b, sig[:])
@@ -408,21 +379,6 @@ func Test_BuildSignedBeaconBlock(t *testing.T) {
 		require.NoError(t, err)
 		assert.DeepEqual(t, sig, sb.Signature())
 		assert.Equal(t, version.Capella, sb.Version())
-		assert.Equal(t, true, sb.IsBlinded())
-	})
-	t.Run("Deneb", func(t *testing.T) {
-		b := &BeaconBlock{version: version.Deneb, body: &BeaconBlockBody{version: version.Deneb}}
-		sb, err := BuildSignedBeaconBlock(b, sig[:])
-		require.NoError(t, err)
-		assert.DeepEqual(t, sig, sb.Signature())
-		assert.Equal(t, version.Deneb, sb.Version())
-	})
-	t.Run("DenebBlind", func(t *testing.T) {
-		b := &BeaconBlock{version: version.Deneb, body: &BeaconBlockBody{version: version.Deneb, isBlinded: true}}
-		sb, err := BuildSignedBeaconBlock(b, sig[:])
-		require.NoError(t, err)
-		assert.DeepEqual(t, sig, sb.Signature())
-		assert.Equal(t, version.Deneb, sb.Version())
 		assert.Equal(t, true, sb.IsBlinded())
 	})
 }

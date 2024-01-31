@@ -92,21 +92,21 @@ var (
 	// HTTPModules define the set of enabled HTTP APIs.
 	HTTPModules = &cli.StringFlag{
 		Name:  "http-modules",
-		Usage: "Comma-separated list of API module names. Possible values: `" + PrysmAPIModule + `,` + EthAPIModule + "`.",
-		Value: PrysmAPIModule + `,` + EthAPIModule,
+		Usage: "Comma-separated list of API module names. Possible values: `" + QrysmAPIModule + `,` + ZondAPIModule + "`.",
+		Value: QrysmAPIModule + `,` + ZondAPIModule,
 	}
 	// DisableGRPCGateway for JSON-HTTP requests to the beacon node.
 	DisableGRPCGateway = &cli.BoolFlag{
 		Name:  "disable-grpc-gateway",
 		Usage: "Disable the gRPC gateway for JSON-HTTP requests",
 	}
-	// GRPCGatewayHost specifies a gRPC gateway host for Prysm.
+	// GRPCGatewayHost specifies a gRPC gateway host for Qrysm.
 	GRPCGatewayHost = &cli.StringFlag{
 		Name:  "grpc-gateway-host",
 		Usage: "The host on which the gateway server runs on",
 		Value: "127.0.0.1",
 	}
-	// GRPCGatewayPort specifies a gRPC gateway port for Prysm.
+	// GRPCGatewayPort specifies a gRPC gateway port for Qrysm.
 	GRPCGatewayPort = &cli.IntFlag{
 		Name:  "grpc-gateway-port",
 		Usage: "The port on which the gateway server runs on",

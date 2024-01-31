@@ -197,30 +197,12 @@ func (s *Service) ForkchoiceUpdated(
 		return nil, nil, errors.New("nil payload attributer")
 	}
 	switch attrs.Version() {
-	case version.Bellatrix:
-		a, err := attrs.PbV1()
-		if err != nil {
-			return nil, nil, err
-		}
-		err = s.rpcClient.CallContext(ctx, result, ForkchoiceUpdatedMethod, state, a)
-		if err != nil {
-			return nil, nil, handleRPCError(err)
-		}
 	case version.Capella:
 		a, err := attrs.PbV2()
 		if err != nil {
 			return nil, nil, err
 		}
 		err = s.rpcClient.CallContext(ctx, result, ForkchoiceUpdatedMethodV2, state, a)
-		if err != nil {
-			return nil, nil, handleRPCError(err)
-		}
-	case version.Deneb:
-		a, err := attrs.PbV3()
-		if err != nil {
-			return nil, nil, err
-		}
-		err = s.rpcClient.CallContext(ctx, result, ForkchoiceUpdatedMethodV3, state, a)
 		if err != nil {
 			return nil, nil, handleRPCError(err)
 		}

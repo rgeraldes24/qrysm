@@ -1,4 +1,4 @@
-// Package beacon-chain defines the entire runtime of an Ethereum beacon node.
+// Package beacon-chain defines the entire runtime of a Zond beacon node.
 package main
 
 import (
@@ -251,7 +251,7 @@ func startNode(ctx *cli.Context) error {
 	if level == logrus.TraceLevel {
 		// libp2p specific logging.
 		golog.SetAllLoggers(golog.LevelDebug)
-		// Geth specific logging.
+		// Gzond specific logging.
 		glogger := zondlog.NewGlogHandler(zondlog.StreamHandler(os.Stderr, zondlog.TerminalFormat(true)))
 		glogger.Verbosity(zondlog.LvlTrace)
 		zondlog.Root().SetHandler(glogger)

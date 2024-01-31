@@ -2,7 +2,7 @@ package mock
 
 import (
 	ssz "github.com/prysmaticlabs/fastssz"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -23,7 +23,7 @@ func (m SignedBeaconBlock) Block() interfaces.ReadOnlyBeaconBlock {
 	return m.BeaconBlock
 }
 
-func (SignedBeaconBlock) Signature() [dilithium2.CryptoBytes]byte {
+func (SignedBeaconBlock) Signature() [dilithium.CryptoBytes]byte {
 	panic("implement me")
 }
 
@@ -43,35 +43,11 @@ func (SignedBeaconBlock) Proto() (proto.Message, error) {
 	panic("implement me")
 }
 
-func (SignedBeaconBlock) PbPhase0Block() (*zond.SignedBeaconBlock, error) {
-	panic("implement me")
-}
-
-func (SignedBeaconBlock) PbAltairBlock() (*zond.SignedBeaconBlockAltair, error) {
-	panic("implement me")
-}
-
-func (SignedBeaconBlock) PbBellatrixBlock() (*zond.SignedBeaconBlockBellatrix, error) {
-	panic("implement me")
-}
-
-func (SignedBeaconBlock) PbBlindedBellatrixBlock() (*zond.SignedBlindedBeaconBlockBellatrix, error) {
-	panic("implement me")
-}
-
 func (SignedBeaconBlock) PbCapellaBlock() (*zond.SignedBeaconBlockCapella, error) {
 	panic("implement me")
 }
 
 func (SignedBeaconBlock) PbBlindedCapellaBlock() (*zond.SignedBlindedBeaconBlockCapella, error) {
-	panic("implement me")
-}
-
-func (SignedBeaconBlock) PbDenebBlock() (*zond.SignedBeaconBlockDeneb, error) {
-	panic("implement me")
-}
-
-func (SignedBeaconBlock) PbBlindedDenebBlock() (*zond.SignedBlindedBeaconBlockDeneb, error) {
 	panic("implement me")
 }
 
@@ -208,7 +184,7 @@ func (BeaconBlock) Copy() (interfaces.ReadOnlyBeaconBlock, error) {
 
 type BeaconBlockBody struct{}
 
-func (BeaconBlockBody) RandaoReveal() [dilithium2.CryptoBytes]byte {
+func (BeaconBlockBody) RandaoReveal() [dilithium.CryptoBytes]byte {
 	panic("implement me")
 }
 

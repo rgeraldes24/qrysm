@@ -20,7 +20,7 @@ import (
 )
 
 // Variables defined in the placeholderFields will not be tested in `TestLoadConfigFile`.
-// These are variables that we don't use in Prysm. (i.e. future hardfork, light client... etc)
+// These are variables that we don't use in Qrysm. (i.e. future hardfork, light client... etc)
 // IMPORTANT: Use one field per line and sort these alphabetically to reduce conflicts.
 var placeholderFields = []string{
 	"ATTESTATION_PROPAGATION_SLOT_RANGE",

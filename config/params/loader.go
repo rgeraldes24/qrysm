@@ -172,7 +172,7 @@ func ReplaceHexStringWithYAMLFormat(line string) []string {
 }
 
 // ConfigToYaml takes a provided config and outputs its contents
-// in yaml. This allows prysm's custom configs to be read by other clients.
+// in yaml. This allows qrysm's custom configs to be read by other clients.
 func ConfigToYaml(cfg *BeaconChainConfig) []byte {
 	lines := []string{
 		fmt.Sprintf("PRESET_BASE: '%s'", cfg.PresetBase),

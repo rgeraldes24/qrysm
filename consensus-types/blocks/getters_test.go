@@ -45,7 +45,7 @@ func Test_BeaconBlockIsNil(t *testing.T) {
 func Test_SignedBeaconBlock_Signature(t *testing.T) {
 	sb := &SignedBeaconBlock{}
 	sb.SetSignature([]byte("signature"))
-	assert.DeepEqual(t, bytesutil.ToBytes96([]byte("signature")), sb.Signature())
+	assert.DeepEqual(t, bytesutil.ToBytes4595([]byte("signature")), sb.Signature())
 }
 
 func Test_SignedBeaconBlock_Block(t *testing.T) {
@@ -220,7 +220,7 @@ func Test_BeaconBlock_Copy(t *testing.T) {
 	require.NoError(t, err)
 	headerInterface, err := WrappedExecutionPayloadHeaderDeneb(header, 123)
 	require.NoError(t, err)
-	bb = &BeaconBlockBody{executionPayload: payloadInterface, executionPayloadHeader: headerInterface, randaoReveal: bytesutil.ToBytes96([]byte{246}), graffiti: bytesutil.ToBytes32([]byte("graffiti"))}
+	bb = &BeaconBlockBody{executionPayload: payloadInterface, executionPayloadHeader: headerInterface, randaoReveal: bytesutil.ToBytes4595([]byte{246}), graffiti: bytesutil.ToBytes32([]byte("graffiti"))}
 	b = &BeaconBlock{body: bb, slot: 123, proposerIndex: 456, parentRoot: bytesutil.ToBytes32([]byte("parentroot")), stateRoot: bytesutil.ToBytes32([]byte("stateroot"))}
 	b.version = version.Deneb
 	b.body.version = b.version
@@ -343,7 +343,7 @@ func Test_BeaconBlockBody_IsNil(t *testing.T) {
 func Test_BeaconBlockBody_RandaoReveal(t *testing.T) {
 	bb := &SignedBeaconBlock{block: &BeaconBlock{body: &BeaconBlockBody{}}}
 	bb.SetRandaoReveal([]byte("randaoreveal"))
-	assert.DeepEqual(t, bytesutil.ToBytes96([]byte("randaoreveal")), bb.Block().Body().RandaoReveal())
+	assert.DeepEqual(t, bytesutil.ToBytes4595([]byte("randaoreveal")), bb.Block().Body().RandaoReveal())
 }
 
 func Test_BeaconBlockBody_Eth1Data(t *testing.T) {
