@@ -55,8 +55,3 @@ type SyncCommitteeContributionReceivedData struct {
 type DilithiumToExecutionChangeReceivedData struct {
 	Change *zondpb.SignedDilithiumToExecutionChange
 }
-
-// BlobSidecarReceivedData is the data sent with BlobSidecarReceived events.
-type BlobSidecarReceivedData struct {
-	Blob *zondpb.SignedBlobSidecar
-}

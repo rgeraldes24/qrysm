@@ -1895,12 +1895,6 @@ def qrysm_deps():
     )
 
     go_repository(
-        name = "com_github_herumi_bls_eth_go_binary",
-        importpath = "github.com/herumi/bls-eth-go-binary",
-        sum = "h1:wCMygKUQhmcQAjlk2Gquzq6dLmyMv2kF+llRspoRgrk=",
-        version = "v0.0.0-20210917013441-d37c07cfda4e",
-    )
-    go_repository(
         name = "com_github_holiman_billy",
         importpath = "github.com/holiman/billy",
         sum = "h1:3JQNjnMRil1yD0IfZKHF9GxxWKDJGj8I0IqOUol//sw=",
@@ -4152,36 +4146,6 @@ def qrysm_deps():
         importpath = "github.com/wealdtech/go-bytesutil",
         sum = "h1:ocEg3Ke2GkZ4vQw5lp46rmO+pfqCCTgq35gqOy8JKVc=",
         version = "v1.1.1",
-    )
-
-    go_repository(
-        name = "com_github_wealdtech_go_eth2_types_v2",
-        build_directives = [
-            "gazelle:resolve go github.com/herumi/bls-eth-go-binary/bls @herumi_bls_eth_go_binary//:go_default_library",
-        ],
-        importpath = "github.com/wealdtech/go-eth2-types/v2",
-        sum = "h1:tiA6T88M6XQIbrV5Zz53l1G5HtRERcxQfmET225V4Ls=",
-        version = "v2.5.2",
-    )
-    go_repository(
-        name = "com_github_wealdtech_go_eth2_util",
-        importpath = "github.com/wealdtech/go-eth2-util",
-        sum = "h1:2INPeOR35x5LdFFpSzyw954WzTD+DFyHe3yKlJnG5As=",
-        version = "v1.6.3",
-    )
-
-    go_repository(
-        name = "com_github_wealdtech_go_eth2_wallet_encryptor_keystorev4",
-        importpath = "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4",
-        sum = "h1:SxrDVSr+oXuT1x8kZt4uWqNCvv5xXEGV9zd7cuSrZS8=",
-        version = "v1.1.3",
-    )
-
-    go_repository(
-        name = "com_github_wealdtech_go_eth2_wallet_types_v2",
-        importpath = "github.com/wealdtech/go-eth2-wallet-types/v2",
-        sum = "h1:264/meVYWt1wFw6Mtn+xwkZkXjID42gNra4rycoiDXI=",
-        version = "v2.8.2",
     )
 
     go_repository(

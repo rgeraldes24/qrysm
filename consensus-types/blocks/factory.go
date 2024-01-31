@@ -194,8 +194,6 @@ func BuildSignedBeaconBlockFromExecutionPayload(
 		wrappedPayload, wrapErr = WrappedExecutionPayload(p)
 	case *enginev1.ExecutionPayloadCapella:
 		wrappedPayload, wrapErr = WrappedExecutionPayloadCapella(p, 0)
-	case *enginev1.ExecutionPayloadDeneb:
-		wrappedPayload, wrapErr = WrappedExecutionPayloadDeneb(p, 0)
 	default:
 		return nil, fmt.Errorf("%T is not a type of execution payload", p)
 	}
@@ -295,10 +293,6 @@ func BuildSignedBeaconBlockFromExecutionPayload(
 // This is particularly useful for using the values from API calls.
 func BeaconBlockContainerToSignedBeaconBlock(obj *zond.BeaconBlockContainer) (interfaces.ReadOnlySignedBeaconBlock, error) {
 	switch obj.Block.(type) {
-	case *zond.BeaconBlockContainer_BlindedDenebBlock:
-		return NewSignedBeaconBlock(obj.GetBlindedDenebBlock())
-	case *zond.BeaconBlockContainer_DenebBlock:
-		return NewSignedBeaconBlock(obj.GetDenebBlock())
 	case *zond.BeaconBlockContainer_BlindedCapellaBlock:
 		return NewSignedBeaconBlock(obj.GetBlindedCapellaBlock())
 	case *zond.BeaconBlockContainer_CapellaBlock:
