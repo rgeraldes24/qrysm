@@ -138,8 +138,9 @@ func TestEpochStartSlot_OK(t *testing.T) {
 		{epoch: 0, startSlot: 0 * params.BeaconConfig().SlotsPerEpoch, error: false},
 		{epoch: 1, startSlot: 1 * params.BeaconConfig().SlotsPerEpoch, error: false},
 		{epoch: 10, startSlot: 10 * params.BeaconConfig().SlotsPerEpoch, error: false},
-		// TODO(rgeraldes24)
+		// NOTE(rgeraldes24): returns an error now because of the new params.BeaconConfig().SlotsPerEpoch value
 		// {epoch: 1 << 58, startSlot: 1 << 63, error: false},
+		{epoch: 1 << 58, startSlot: 1 << 63, error: true},
 		{epoch: 1 << 59, startSlot: 1 << 63, error: true},
 		{epoch: 1 << 60, startSlot: 1 << 63, error: true},
 	}
@@ -339,15 +340,13 @@ func TestVerifySlotTime(t *testing.T) {
 				slot:        3,
 			},
 		},
-		/*
-			{
-				name: "within tolerance",
-				args: args{
-					genesisTime: qrysmTime.Now().Add(-1 * 5 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second).Add(20 * time.Millisecond).Unix(),
-					slot:        5,
-				},
+		{
+			name: "within tolerance",
+			args: args{
+				genesisTime: qrysmTime.Now().Add(-1 * 5 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second).Add(20 * time.Millisecond).Unix(),
+				slot:        5,
 			},
-		*/
+		},
 		{
 			name: "future slot",
 			args: args{
@@ -356,17 +355,14 @@ func TestVerifySlotTime(t *testing.T) {
 			},
 			wantedErr: "could not process slot from the future",
 		},
-		// TODO(rgeraldes24)
-		/*
-			{
-				name: "future slot but ok given 2s tolerance",
-				args: args{
-					genesisTime:   qrysmTime.Now().Add(-1*time.Duration(params.BeaconConfig().SecondsPerSlot) - 10*time.Second).Unix(),
-					slot:          1,
-					timeTolerance: 2 * time.Second,
-				},
+		{
+			name: "future slot but ok given 2s tolerance",
+			args: args{
+				genesisTime:   qrysmTime.Now().Add(-1*time.Duration(params.BeaconConfig().SecondsPerSlot) - 58*time.Second).Unix(),
+				slot:          1,
+				timeTolerance: 2 * time.Second,
 			},
-		*/
+		},
 		{
 			name: "max future slot",
 			args: args{
