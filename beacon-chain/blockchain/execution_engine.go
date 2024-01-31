@@ -369,6 +369,8 @@ func (s *Service) removeInvalidBlockAndState(ctx context.Context, blkRoots [][32
 	return nil
 }
 
+// TODO(rgeraldes24)
+/*
 func kzgCommitmentsToVersionedHashes(body interfaces.ReadOnlyBeaconBlockBody) ([]common.Hash, error) {
 	commitments, err := body.BlobKzgCommitments()
 	if err != nil {
@@ -381,6 +383,7 @@ func kzgCommitmentsToVersionedHashes(body interfaces.ReadOnlyBeaconBlockBody) ([
 	}
 	return versionedHashes, nil
 }
+*/
 
 func ConvertKzgCommitmentToVersionedHash(commitment []byte) common.Hash {
 	versionedHash := sha256.Sum256(commitment)

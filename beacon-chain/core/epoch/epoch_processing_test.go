@@ -3,24 +3,19 @@ package epoch_test
 import (
 	"context"
 	"fmt"
-	"math"
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state/stateutil"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
-	"github.com/theQRL/qrysm/v4/testing/util"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -337,6 +332,7 @@ func TestProcessRegistryUpdates_EligibleToActivate(t *testing.T) {
 	}
 }
 
+/*
 func TestProcessRegistryUpdates_EligibleToActivate_Cancun(t *testing.T) {
 	base := &zondpb.BeaconStateDeneb{
 		Slot:                5 * params.BeaconConfig().SlotsPerEpoch,
@@ -574,3 +570,4 @@ func TestProcessHistoricalDataUpdate(t *testing.T) {
 		})
 	}
 }
+*/

@@ -535,19 +535,6 @@ func (s *Store) unmarshalState(_ context.Context, enc []byte, validatorEntries [
 	}
 
 	switch {
-	case hasDenebKey(enc):
-		protoState := &zondpb.BeaconStateDeneb{}
-		if err := protoState.UnmarshalSSZ(enc[len(denebKey):]); err != nil {
-			return nil, errors.Wrap(err, "failed to unmarshal encoding for Deneb")
-		}
-		ok, err := s.isStateValidatorMigrationOver()
-		if err != nil {
-			return nil, err
-		}
-		if ok {
-			protoState.Validators = validatorEntries
-		}
-		return statenative.InitializeFromProtoUnsafeDeneb(protoState)
 	case hasCapellaKey(enc):
 		// Marshal state bytes to capella beacon state.
 		protoState := &zondpb.BeaconStateCapella{}

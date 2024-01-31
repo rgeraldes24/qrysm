@@ -260,35 +260,6 @@ func (b *SignedBeaconBlock) ToBlinded() (interfaces.ReadOnlySignedBeaconBlock, e
 				},
 				Signature: b.signature[:],
 			})
-	case *enginev1.ExecutionPayloadDeneb:
-		header, err := PayloadToHeaderDeneb(payload)
-		if err != nil {
-			return nil, err
-		}
-		return initBlindedSignedBlockFromProtoDeneb(
-			&zond.SignedBlindedBeaconBlockDeneb{
-				Message: &zond.BlindedBeaconBlockDeneb{
-					Slot:          b.block.slot,
-					ProposerIndex: b.block.proposerIndex,
-					ParentRoot:    b.block.parentRoot[:],
-					StateRoot:     b.block.stateRoot[:],
-					Body: &zond.BlindedBeaconBlockBodyDeneb{
-						RandaoReveal:                b.block.body.randaoReveal[:],
-						Eth1Data:                    b.block.body.eth1Data,
-						Graffiti:                    b.block.body.graffiti[:],
-						ProposerSlashings:           b.block.body.proposerSlashings,
-						AttesterSlashings:           b.block.body.attesterSlashings,
-						Attestations:                b.block.body.attestations,
-						Deposits:                    b.block.body.deposits,
-						VoluntaryExits:              b.block.body.voluntaryExits,
-						SyncAggregate:               b.block.body.syncAggregate,
-						ExecutionPayloadHeader:      header,
-						DilithiumToExecutionChanges: b.block.body.dilithiumToExecutionChanges,
-						BlobKzgCommitments:          b.block.body.blobKzgCommitments,
-					},
-				},
-				Signature: b.signature[:],
-			})
 	default:
 		return nil, fmt.Errorf("%T is not an execution payload header", p)
 	}

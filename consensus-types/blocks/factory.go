@@ -56,14 +56,6 @@ func NewSignedBeaconBlock(i interface{}) (interfaces.SignedBeaconBlock, error) {
 		return initBlindedSignedBlockFromProtoCapella(b.BlindedCapella)
 	case *zond.SignedBlindedBeaconBlockCapella:
 		return initBlindedSignedBlockFromProtoCapella(b)
-	case *zond.GenericSignedBeaconBlock_Deneb:
-		return initSignedBlockFromProtoDeneb(b.Deneb.Block)
-	case *zond.SignedBeaconBlockDeneb:
-		return initSignedBlockFromProtoDeneb(b)
-	case *zond.SignedBlindedBeaconBlockDeneb:
-		return initBlindedSignedBlockFromProtoDeneb(b)
-	case *zond.GenericSignedBeaconBlock_BlindedDeneb:
-		return initBlindedSignedBlockFromProtoDeneb(b.BlindedDeneb.SignedBlindedBlock)
 	default:
 		return nil, errors.Wrapf(ErrUnsupportedSignedBeaconBlock, "unable to create block from type %T", i)
 	}
@@ -98,14 +90,6 @@ func NewBeaconBlock(i interface{}) (interfaces.ReadOnlyBeaconBlock, error) {
 		return initBlindedBlockFromProtoCapella(b.BlindedCapella)
 	case *zond.BlindedBeaconBlockCapella:
 		return initBlindedBlockFromProtoCapella(b)
-	case *zond.GenericBeaconBlock_Deneb:
-		return initBlockFromProtoDeneb(b.Deneb.Block)
-	case *zond.BeaconBlockDeneb:
-		return initBlockFromProtoDeneb(b)
-	case *zond.BlindedBeaconBlockDeneb:
-		return initBlindedBlockFromProtoDeneb(b)
-	case *zond.GenericBeaconBlock_BlindedDeneb:
-		return initBlindedBlockFromProtoDeneb(b.BlindedDeneb.Block)
 	default:
 		return nil, errors.Wrapf(errUnsupportedBeaconBlock, "unable to create block from type %T", i)
 	}
@@ -128,10 +112,6 @@ func NewBeaconBlockBody(i interface{}) (interfaces.ReadOnlyBeaconBlockBody, erro
 		return initBlockBodyFromProtoCapella(b)
 	case *zond.BlindedBeaconBlockBodyCapella:
 		return initBlindedBlockBodyFromProtoCapella(b)
-	case *zond.BeaconBlockBodyDeneb:
-		return initBlockBodyFromProtoDeneb(b)
-	case *zond.BlindedBeaconBlockBodyDeneb:
-		return initBlindedBlockBodyFromProtoDeneb(b)
 	default:
 		return nil, errors.Wrapf(errUnsupportedBeaconBlockBody, "unable to create block body from type %T", i)
 	}
@@ -300,38 +280,6 @@ func BuildSignedBeaconBlockFromExecutionPayload(
 					SyncAggregate:               syncAgg,
 					ExecutionPayload:            p,
 					DilithiumToExecutionChanges: dilithiumToExecutionChanges,
-				},
-			},
-			Signature: sig[:],
-		}
-	case *enginev1.ExecutionPayloadDeneb:
-		dilithiumToExecutionChanges, err := b.Body().DilithiumToExecutionChanges()
-		if err != nil {
-			return nil, err
-		}
-		commitments, err := b.Body().BlobKzgCommitments()
-		if err != nil {
-			return nil, err
-		}
-		fullBlock = &zond.SignedBeaconBlockDeneb{
-			Block: &zond.BeaconBlockDeneb{
-				Slot:          b.Slot(),
-				ProposerIndex: b.ProposerIndex(),
-				ParentRoot:    parentRoot[:],
-				StateRoot:     stateRoot[:],
-				Body: &zond.BeaconBlockBodyDeneb{
-					RandaoReveal:                randaoReveal[:],
-					Eth1Data:                    b.Body().Eth1Data(),
-					Graffiti:                    graffiti[:],
-					ProposerSlashings:           b.Body().ProposerSlashings(),
-					AttesterSlashings:           b.Body().AttesterSlashings(),
-					Attestations:                b.Body().Attestations(),
-					Deposits:                    b.Body().Deposits(),
-					VoluntaryExits:              b.Body().VoluntaryExits(),
-					SyncAggregate:               syncAgg,
-					ExecutionPayload:            p,
-					DilithiumToExecutionChanges: dilithiumToExecutionChanges,
-					BlobKzgCommitments:          commitments,
 				},
 			},
 			Signature: sig[:],

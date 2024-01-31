@@ -91,21 +91,6 @@ func GzondShanghaiTime(genesisTime uint64, cfg *clparams.BeaconChainConfig) *uin
 	return shanghaiTime
 }
 
-// GzondShanghaiTime calculates the absolute time of the shanghai (aka capella) fork block
-// by adding the relative time of the capella the fork epoch to the given genesis timestamp.
-func GzondCancunTime(genesisTime uint64, cfg *clparams.BeaconChainConfig) *uint64 {
-	var cancunTime *uint64
-	if cfg.DenebForkEpoch != math.MaxUint64 {
-		startSlot, err := slots.EpochStart(cfg.DenebForkEpoch)
-		if err == nil {
-			startTime := slots.StartTime(genesisTime, startSlot)
-			newTime := uint64(startTime.Unix())
-			cancunTime = &newTime
-		}
-	}
-	return cancunTime
-}
-
 // GzondTestnetGenesis creates a genesis.json for eth1 clients with a set of defaults suitable for ephemeral testnets,
 // like in an e2e test. The parameters are minimal but the full value is returned unmarshaled so that it can be
 // customized as desired.
@@ -116,7 +101,6 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 	}
 
 	shanghaiTime := GzondShanghaiTime(genesisTime, cfg)
-	cancunTime := GzondCancunTime(genesisTime, cfg)
 	cc := &params.ChainConfig{
 		ChainID:                       big.NewInt(defaultTestChainId),
 		HomesteadBlock:                bigz,
@@ -141,7 +125,7 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 			Epoch:  20000,
 		},
 		ShanghaiTime: shanghaiTime,
-		CancunTime:   cancunTime,
+		CancunTime:   nil,
 	}
 	da := defaultDepositContractAllocation(cfg.DepositContractAddress)
 	ma := minerAllocation()
