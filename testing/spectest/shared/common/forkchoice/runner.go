@@ -106,7 +106,6 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 							t.Fatalf("unknown fork version: %v", fork)
 						}
 					}
-					// runBlobStep(t, step.Blobs, beaconBlock, fork, folder, testsFolderPath, step.Proofs, builder)
 					if beaconBlock != nil {
 						if step.Valid != nil && !*step.Valid {
 							builder.InvalidBlock(t, beaconBlock)

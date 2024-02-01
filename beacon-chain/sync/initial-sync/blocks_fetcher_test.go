@@ -956,16 +956,3 @@ func TestTimeToWait(t *testing.T) {
 		})
 	}
 }
-
-/*
-func testSequenceBlockWithBlob(t *testing.T, nblocks int) ([]blocks.BlockWithVerifiedBlobs, []*zondpb.BlobSidecar) {
-	blks, blobs := util.ExtendBlocksPlusBlobs(t, []blocks.ROBlock{}, nblocks)
-	sbbs := make([]interfaces.ReadOnlySignedBeaconBlock, len(blks))
-	for i := range blks {
-		sbbs[i] = blks[i]
-	}
-	bwb, err := sortedBlockWithVerifiedBlobSlice(sbbs)
-	require.NoError(t, err)
-	return bwb, blobs
-}
-*/

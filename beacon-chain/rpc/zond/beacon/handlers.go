@@ -44,8 +44,7 @@ const (
 // beacon chain. The beacon node is not required to validate the signed BeaconBlock, and a successful response (20X)
 // only indicates that the broadcast has been successful. The beacon node is expected to integrate the new block into
 // its state, and therefore validate the block internally, however blocks which fail the validation are still broadcast
-// but a different status code is returned (202). Pre-Bellatrix, this endpoint will accept a SignedBeaconBlock. After
-// Deneb, this additionally instructs the beacon node to broadcast all given signed blobs.
+// but a different status code is returned (202). Pre-Bellatrix, this endpoint will accept a SignedBeaconBlock.
 func (s *Server) PublishBlindedBlock(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.StartSpan(r.Context(), "beacon.PublishBlindedBlock")
 	defer span.End()
@@ -68,9 +67,7 @@ func (s *Server) PublishBlindedBlock(w http.ResponseWriter, r *http.Request) {
 // successful. The beacon node is expected to integrate the new block into its state, and
 // therefore validate the block internally, however blocks which fail the validation are still
 // broadcast but a different status code is returned (202). Pre-Bellatrix, this endpoint will accept
-// a `SignedBeaconBlock`. After Deneb, this additionally instructs the beacon node to broadcast all given signed blobs.
-// The broadcast behaviour may be adjusted via the `broadcast_validation`
-// query parameter.
+// a `SignedBeaconBlock`.
 func (s *Server) PublishBlindedBlockV2(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.StartSpan(r.Context(), "beacon.PublishBlindedBlockV2")
 	defer span.End()
@@ -234,8 +231,7 @@ func (s *Server) publishBlindedBlock(ctx context.Context, w http.ResponseWriter,
 // The beacon node is also expected to integrate the block into state, but may broadcast it
 // before doing so, so as to aid timely delivery of the block. Should the block fail full
 // validation, a separate success response code (202) is used to indicate that the block was
-// successfully broadcast but failed integration. After Deneb, this additionally instructs the
-// beacon node to broadcast all given signed blobs.
+// successfully broadcast but failed integration.
 func (s *Server) PublishBlock(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.StartSpan(r.Context(), "beacon.PublishBlock")
 	defer span.End()
@@ -256,9 +252,7 @@ func (s *Server) PublishBlock(w http.ResponseWriter, r *http.Request) {
 // The beacon node is also expected to integrate the block into the state, but may broadcast it
 // before doing so, so as to aid timely delivery of the block. Should the block fail full
 // validation, a separate success response code (202) is used to indicate that the block was
-// successfully broadcast but failed integration. After Deneb, this additionally instructs the beacon node to
-// broadcast all given signed blobs. The broadcast behaviour may be adjusted via the
-// `broadcast_validation` query parameter.
+// successfully broadcast but failed integration.
 func (s *Server) PublishBlockV2(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.StartSpan(r.Context(), "beacon.PublishBlockV2")
 	defer span.End()

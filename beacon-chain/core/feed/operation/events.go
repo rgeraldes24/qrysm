@@ -22,9 +22,6 @@ const (
 
 	// DilithiumToExecutionChangeReceived is sent after a Dilithium to execution change object has been received from gossip or rpc.
 	DilithiumToExecutionChangeReceived
-
-	// BlobSidecarReceived is sent after a blob sidecar is received from gossip or rpc.
-	BlobSidecarReceived = 6
 )
 
 // UnAggregatedAttReceivedData is the data sent with UnaggregatedAttReceived events.

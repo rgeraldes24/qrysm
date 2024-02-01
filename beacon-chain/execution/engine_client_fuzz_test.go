@@ -177,7 +177,6 @@ func FuzzExecutionBlock(f *testing.F) {
 		Data:      []byte{'r', 'a', 'n', 'd', 'o', 'm'},
 
 		// Signature values
-		// TODO(rgeraldes24)
 		// V: big.NewInt(0),
 		// R: big.NewInt(math.MaxInt),
 		// S: big.NewInt(math.MaxInt),

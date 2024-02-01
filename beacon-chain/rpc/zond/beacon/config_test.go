@@ -129,9 +129,6 @@ func TestGetSpec(t *testing.T) {
 	var dam [4]byte
 	copy(dam[:], []byte{'1', '0', '0', '0'})
 	config.DomainApplicationMask = dam
-	// var dbs [4]byte
-	// copy(dam[:], []byte{'2', '0', '0', '0'})
-	// config.DomainBlobSidecar = dbs
 
 	params.OverrideBeaconConfig(config)
 
@@ -272,8 +269,6 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "51", v)
 		case "MAX_VOLUNTARY_EXITS":
 			assert.Equal(t, "52", v)
-		case "MAX_BLOBS_PER_BLOCK":
-			assert.Equal(t, "4", v)
 		case "TIMELY_HEAD_FLAG_INDEX":
 			assert.Equal(t, "0x35", v)
 		case "TIMELY_SOURCE_FLAG_INDEX":

@@ -76,7 +76,6 @@ func (s ROBlockSlice) Len() int {
 
 type BlockWithVerifiedBlobs struct {
 	Block ROBlock
-	// Blobs []*zond.BlobSidecar
 }
 
 type BlockWithVerifiedBlobsSlice []BlockWithVerifiedBlobs

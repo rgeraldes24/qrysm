@@ -162,16 +162,6 @@ func (executionPayload) WithdrawalsRoot() ([]byte, error) {
 	return nil, consensus_types.ErrUnsupportedField
 }
 
-// BlobGasUsed --
-func (e executionPayload) BlobGasUsed() (uint64, error) {
-	return 0, consensus_types.ErrUnsupportedField
-}
-
-// ExcessBlobGas --
-func (e executionPayload) ExcessBlobGas() (uint64, error) {
-	return 0, consensus_types.ErrUnsupportedField
-}
-
 // PbBellatrix --
 func (e executionPayload) PbBellatrix() (*enginev1.ExecutionPayload, error) {
 	return e.p, nil
@@ -331,16 +321,6 @@ func (executionPayloadHeader) Withdrawals() ([]*enginev1.Withdrawal, error) {
 // WithdrawalsRoot --
 func (executionPayloadHeader) WithdrawalsRoot() ([]byte, error) {
 	return nil, consensus_types.ErrUnsupportedField
-}
-
-// BlobGasUsed --
-func (e executionPayloadHeader) BlobGasUsed() (uint64, error) {
-	return 0, consensus_types.ErrUnsupportedField
-}
-
-// ExcessBlobGas --
-func (e executionPayloadHeader) ExcessBlobGas() (uint64, error) {
-	return 0, consensus_types.ErrUnsupportedField
 }
 
 // PbV2 --
@@ -533,16 +513,6 @@ func (executionPayloadCapella) WithdrawalsRoot() ([]byte, error) {
 	return nil, consensus_types.ErrUnsupportedField
 }
 
-// BlobGasUsed --
-func (e executionPayloadCapella) BlobGasUsed() (uint64, error) {
-	return 0, consensus_types.ErrUnsupportedField
-}
-
-// ExcessBlobGas --
-func (e executionPayloadCapella) ExcessBlobGas() (uint64, error) {
-	return 0, consensus_types.ErrUnsupportedField
-}
-
 // PbV2 --
 func (e executionPayloadCapella) PbCapella() (*enginev1.ExecutionPayloadCapella, error) {
 	return e.p, nil
@@ -703,16 +673,6 @@ func (executionPayloadHeaderCapella) Withdrawals() ([]*enginev1.Withdrawal, erro
 // WithdrawalsRoot --
 func (e executionPayloadHeaderCapella) WithdrawalsRoot() ([]byte, error) {
 	return e.p.WithdrawalsRoot, nil
-}
-
-// BlobGasUsed --
-func (e executionPayloadHeaderCapella) BlobGasUsed() (uint64, error) {
-	return 0, consensus_types.ErrUnsupportedField
-}
-
-// ExcessBlobGas --
-func (e executionPayloadHeaderCapella) ExcessBlobGas() (uint64, error) {
-	return 0, consensus_types.ErrUnsupportedField
 }
 
 // PbV2 --

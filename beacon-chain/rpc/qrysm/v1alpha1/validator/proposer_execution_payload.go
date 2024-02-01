@@ -42,7 +42,6 @@ var (
 )
 
 // This returns the local execution payload of a given slot. The function has full awareness of pre and post merge.
-// It also returns the blobs bundle.
 func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBeaconBlock, st state.BeaconState) (interfaces.ExecutionData, bool, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.getLocalPayload")
 	defer span.End()
@@ -217,7 +216,7 @@ func (vs *Server) getTerminalBlockHashIfExists(ctx context.Context, transitionTi
 func (vs *Server) getBuilderPayload(ctx context.Context,
 	slot primitives.Slot,
 	vIdx primitives.ValidatorIndex) (interfaces.ExecutionData, error) {
-	ctx, span := trace.StartSpan(ctx, "ProposerServer.getBuilderPayloadAndBlobs")
+	ctx, span := trace.StartSpan(ctx, "ProposerServer.getBuilderPayload")
 	defer span.End()
 
 	if slots.ToEpoch(slot) < params.BeaconConfig().BellatrixForkEpoch {
