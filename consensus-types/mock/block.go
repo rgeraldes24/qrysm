@@ -43,6 +43,22 @@ func (SignedBeaconBlock) Proto() (proto.Message, error) {
 	panic("implement me")
 }
 
+func (SignedBeaconBlock) PbPhase0Block() (*zond.SignedBeaconBlock, error) {
+	panic("implement me")
+}
+
+func (SignedBeaconBlock) PbAltairBlock() (*zond.SignedBeaconBlockAltair, error) {
+	panic("implement me")
+}
+
+func (SignedBeaconBlock) PbBellatrixBlock() (*zond.SignedBeaconBlockBellatrix, error) {
+	panic("implement me")
+}
+
+func (SignedBeaconBlock) PbBlindedBellatrixBlock() (*zond.SignedBlindedBeaconBlockBellatrix, error) {
+	panic("implement me")
+}
+
 func (SignedBeaconBlock) PbCapellaBlock() (*zond.SignedBeaconBlockCapella, error) {
 	panic("implement me")
 }

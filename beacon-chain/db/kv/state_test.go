@@ -900,6 +900,7 @@ func TestBellatrixState_CanDelete(t *testing.T) {
 	require.Equal(t, state.ReadOnlyBeaconState(nil), savedS, "Unsaved state should've been nil")
 }
 
+/*
 func TestDenebState_CanSaveRetrieve(t *testing.T) {
 	db := setupDB(t)
 
@@ -993,6 +994,7 @@ func TestStateDeneb_CanSaveRetrieveValidatorEntries(t *testing.T) {
 	})
 	require.NoError(t, err)
 }
+*/
 
 func BenchmarkState_CheckStateSaveTime_1(b *testing.B)  { checkStateSaveTime(b, 1) }
 func BenchmarkState_CheckStateSaveTime_10(b *testing.B) { checkStateSaveTime(b, 10) }

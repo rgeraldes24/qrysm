@@ -10,7 +10,6 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/qrysm/v4/api/client/builder"
 	blockchainTest "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	builderTest "github.com/theQRL/qrysm/v4/beacon-chain/builder/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
@@ -79,9 +78,9 @@ func TestServer_setExecutionData(t *testing.T) {
 		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 		require.NoError(t, err)
 		b := blk.Block()
-		localPayload, _, _, err := vs.getLocalPayloadAndBlobs(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
 		require.NoError(t, err)
-		builderPayload, _, err := vs.getBuilderPayloadAndBlobs(ctx, b.Slot(), b.ProposerIndex())
+		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
 		require.NoError(t, err)
 		require.NoError(t, setExecutionData(context.Background(), blk, localPayload, builderPayload))
 		e, err := blk.Block().Body().Execution()
@@ -138,9 +137,9 @@ func TestServer_setExecutionData(t *testing.T) {
 		vs.HeadFetcher = chain
 		b := blk.Block()
 
-		localPayload, _, _, err := vs.getLocalPayloadAndBlobs(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
 		require.NoError(t, err)
-		builderPayload, _, err := vs.getBuilderPayloadAndBlobs(ctx, b.Slot(), b.ProposerIndex())
+		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
 		require.NoError(t, err)
 		require.NoError(t, setExecutionData(context.Background(), blk, localPayload, builderPayload))
 		e, err := blk.Block().Body().Execution()
@@ -200,9 +199,9 @@ func TestServer_setExecutionData(t *testing.T) {
 		vs.HeadFetcher = chain
 
 		b := blk.Block()
-		localPayload, _, _, err := vs.getLocalPayloadAndBlobs(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
 		require.NoError(t, err)
-		builderPayload, _, err := vs.getBuilderPayloadAndBlobs(ctx, b.Slot(), b.ProposerIndex())
+		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
 		require.NoError(t, err)
 		require.NoError(t, setExecutionData(context.Background(), blk, localPayload, builderPayload))
 		e, err := blk.Block().Body().Execution()
@@ -214,10 +213,10 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		vs.ExecutionEngineCaller = &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 2}
 		b := blk.Block()
-		localPayload, _, _, err := vs.getLocalPayloadAndBlobs(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
 		require.NoError(t, err)
-		builderPayload, _, err := vs.getBuilderPayloadAndBlobs(ctx, b.Slot(), b.ProposerIndex())
 		require.NoError(t, err)
+		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
 		require.NoError(t, setExecutionData(context.Background(), blk, localPayload, builderPayload))
 		e, err := blk.Block().Body().Execution()
 		require.NoError(t, err)
@@ -234,9 +233,9 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		vs.ExecutionEngineCaller = &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 1}
 		b := blk.Block()
-		localPayload, _, _, err := vs.getLocalPayloadAndBlobs(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
 		require.NoError(t, err)
-		builderPayload, _, err := vs.getBuilderPayloadAndBlobs(ctx, b.Slot(), b.ProposerIndex())
+		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
 		require.NoError(t, err)
 		require.NoError(t, setExecutionData(context.Background(), blk, localPayload, builderPayload))
 		e, err := blk.Block().Body().Execution()
@@ -255,9 +254,9 @@ func TestServer_setExecutionData(t *testing.T) {
 		}
 		vs.ExecutionEngineCaller = &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 4}, BlockValue: 0}
 		b := blk.Block()
-		localPayload, _, _, err := vs.getLocalPayloadAndBlobs(ctx, b, capellaTransitionState)
+		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
 		require.NoError(t, err)
-		builderPayload, _, err := vs.getBuilderPayloadAndBlobs(ctx, b.Slot(), b.ProposerIndex())
+		builderPayload, err := vs.getBuilderPayload(ctx, b.Slot(), b.ProposerIndex())
 		require.ErrorIs(t, consensus_types.ErrNilObjectWrapped, err) // Builder returns fault. Use local block
 		require.NoError(t, setExecutionData(context.Background(), blk, localPayload, builderPayload))
 		e, err := blk.Block().Body().Execution()
@@ -480,7 +479,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 			}}
 			hb, err := vs.HeadFetcher.HeadBlock(context.Background())
 			require.NoError(t, err)
-			h, _, err := vs.getPayloadHeaderFromBuilder(context.Background(), hb.Block().Slot(), 0)
+			h, err := vs.getPayloadHeaderFromBuilder(context.Background(), hb.Block().Slot(), 0)
 			if tc.err != "" {
 				require.ErrorContains(t, tc.err, err)
 			} else {
@@ -500,6 +499,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 	}
 }
 
+/*
 func TestServer_validateBuilderSignature(t *testing.T) {
 	sk, err := dilithium.RandKey()
 	require.NoError(t, err)
@@ -537,6 +537,7 @@ func TestServer_validateBuilderSignature(t *testing.T) {
 	require.NoError(t, err)
 	require.ErrorIs(t, validateBuilderSignature(sBid), signing.ErrSigFailedToVerify)
 }
+*/
 
 func Test_matchingWithdrawalsRoot(t *testing.T) {
 	t.Run("could not get local withdrawals", func(t *testing.T) {

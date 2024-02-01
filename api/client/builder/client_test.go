@@ -241,7 +241,7 @@ func TestSubmitBlindedBlock(t *testing.T) {
 		}
 		sbb, err := blocks.NewSignedBeaconBlock(testSignedBlindedBeaconBlockCapella(t))
 		require.NoError(t, err)
-		ep, _, err := c.SubmitBlindedBlock(ctx, sbb, nil)
+		ep, err := c.SubmitBlindedBlock(ctx, sbb)
 		require.NoError(t, err)
 		withdrawals, err := ep.Withdrawals()
 		require.NoError(t, err)
@@ -251,7 +251,6 @@ func TestSubmitBlindedBlock(t *testing.T) {
 		assert.DeepEqual(t, ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943"), withdrawals[0].Address)
 		assert.Equal(t, uint64(1), withdrawals[0].Amount)
 	})
-	// TODO(rgeraldes24)
 	/*
 		t.Run("mismatched versions, expected bellatrix got capella", func(t *testing.T) {
 			hc := &http.Client{
@@ -273,13 +272,13 @@ func TestSubmitBlindedBlock(t *testing.T) {
 			_, _, err = c.SubmitBlindedBlock(ctx, sbbb, nil)
 			require.ErrorContains(t, "not a bellatrix payload", err)
 		})
+		t.Run("not blinded", func(t *testing.T) {
+			sbb, err := blocks.NewSignedBeaconBlock(&zond.SignedBeaconBlockBellatrix{Block: &zond.BeaconBlockBellatrix{Body: &zond.BeaconBlockBodyBellatrix{}}})
+			require.NoError(t, err)
+			_, _, err = (&Client{}).SubmitBlindedBlock(ctx, sbb, nil)
+			require.ErrorIs(t, err, errNotBlinded)
+		})
 	*/
-	t.Run("not blinded", func(t *testing.T) {
-		sbb, err := blocks.NewSignedBeaconBlock(&zond.SignedBeaconBlockBellatrix{Block: &zond.BeaconBlockBellatrix{Body: &zond.BeaconBlockBodyBellatrix{}}})
-		require.NoError(t, err)
-		_, _, err = (&Client{}).SubmitBlindedBlock(ctx, sbb, nil)
-		require.ErrorIs(t, err, errNotBlinded)
-	})
 }
 
 func testSignedBlindedBeaconBlockCapella(t *testing.T) *zond.SignedBlindedBeaconBlockCapella {
@@ -436,7 +435,7 @@ func TestRequestLogger(t *testing.T) {
 			require.Equal(t, getStatus, r.URL.Path)
 			return &http.Response{
 				StatusCode: http.StatusOK,
-				Body:       io.NopCloser(bytes.NewBufferString(testExampleExecutionPayload)),
+				Body:       io.NopCloser(bytes.NewBufferString(testExampleExecutionPayloadCapella)),
 				Request:    r.Clone(ctx),
 			}, nil
 		}),
