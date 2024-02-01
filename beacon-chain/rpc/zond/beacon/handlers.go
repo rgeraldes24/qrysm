@@ -91,20 +91,6 @@ func (s *Server) publishBlindedBlockSSZ(ctx context.Context, w http.ResponseWrit
 		http2.HandleError(w, "Could not read request body: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	denebBlockContents := &zond.SignedBlindedBeaconBlockAndBlobsDeneb{}
-	if err := denebBlockContents.UnmarshalSSZ(body); err == nil {
-		genericBlock := &zond.GenericSignedBeaconBlock{
-			Block: &zond.GenericSignedBeaconBlock_BlindedDeneb{
-				BlindedDeneb: denebBlockContents,
-			},
-		}
-		if err = s.validateBroadcast(ctx, r, genericBlock); err != nil {
-			http2.HandleError(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		s.proposeBlock(ctx, w, genericBlock)
-		return
-	}
 	capellaBlock := &zond.SignedBlindedBeaconBlockCapella{}
 	if err := capellaBlock.UnmarshalSSZ(body); err == nil {
 		genericBlock := &zond.GenericSignedBeaconBlock{
@@ -308,20 +294,6 @@ func (s *Server) publishBlockSSZ(ctx context.Context, w http.ResponseWriter, r *
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http2.HandleError(w, "Could not read request body", http.StatusInternalServerError)
-		return
-	}
-	denebBlockContents := &zond.SignedBeaconBlockAndBlobsDeneb{}
-	if err := denebBlockContents.UnmarshalSSZ(body); err == nil {
-		genericBlock := &zond.GenericSignedBeaconBlock{
-			Block: &zond.GenericSignedBeaconBlock_Deneb{
-				Deneb: denebBlockContents,
-			},
-		}
-		if err = s.validateBroadcast(ctx, r, genericBlock); err != nil {
-			http2.HandleError(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		s.proposeBlock(ctx, w, genericBlock)
 		return
 	}
 	capellaBlock := &zond.SignedBeaconBlockCapella{}

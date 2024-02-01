@@ -304,25 +304,6 @@ func (s *Store) saveStatesEfficientInternal(ctx context.Context, tx *bolt.Tx, bl
 			if err := valIdxBkt.Put(rt[:], validatorKeys[i]); err != nil {
 				return err
 			}
-		case *zondpb.BeaconStateDeneb:
-			pbState, err := getDenebPbState(rawType)
-			if err != nil {
-				return err
-			}
-			valEntries := pbState.Validators
-			pbState.Validators = make([]*zondpb.Validator, 0)
-			rawObj, err := pbState.MarshalSSZ()
-			if err != nil {
-				return err
-			}
-			encodedState := snappy.Encode(nil, append(capellaKey, rawObj...))
-			if err := bucket.Put(rt[:], encodedState); err != nil {
-				return err
-			}
-			pbState.Validators = valEntries
-			if err := valIdxBkt.Put(rt[:], validatorKeys[i]); err != nil {
-				return err
-			}
 		default:
 			return errors.New("invalid state type")
 		}
@@ -366,17 +347,6 @@ func getBellatrixPbState(rawState interface{}) (*zondpb.BeaconStateBellatrix, er
 
 func getCapellaPbState(rawState interface{}) (*zondpb.BeaconStateCapella, error) {
 	pbState, err := statenative.ProtobufBeaconStateCapella(rawState)
-	if err != nil {
-		return nil, err
-	}
-	if pbState == nil {
-		return nil, errors.New("nil state")
-	}
-	return pbState, nil
-}
-
-func getDenebPbState(rawState interface{}) (*zondpb.BeaconStateDeneb, error) {
-	pbState, err := statenative.ProtobufBeaconStateDeneb(rawState)
 	if err != nil {
 		return nil, err
 	}
@@ -642,19 +612,6 @@ func marshalState(ctx context.Context, st state.ReadOnlyBeaconState) ([]byte, er
 			return nil, err
 		}
 		return snappy.Encode(nil, append(capellaKey, rawObj...)), nil
-	case *zondpb.BeaconStateDeneb:
-		rState, ok := st.ToProtoUnsafe().(*zondpb.BeaconStateDeneb)
-		if !ok {
-			return nil, errors.New("non valid inner state")
-		}
-		if rState == nil {
-			return nil, errors.New("nil state")
-		}
-		rawObj, err := rState.MarshalSSZ()
-		if err != nil {
-			return nil, err
-		}
-		return snappy.Encode(nil, append(denebKey, rawObj...)), nil
 	default:
 		return nil, errors.New("invalid inner state")
 	}

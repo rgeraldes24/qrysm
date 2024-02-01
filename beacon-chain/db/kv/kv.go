@@ -202,9 +202,12 @@ func NewKVStore(ctx context.Context, dirPath string) (*Store, error) {
 		return nil, err
 	}
 
-	if err := checkEpochsForBlobSidecarsRequestBucket(boltDB); err != nil {
-		return nil, errors.Wrap(err, "failed to check epochs for blob sidecars request bucket")
-	}
+	// TODO(rgeraldes24): remove
+	/*
+		if err := checkEpochsForBlobSidecarsRequestBucket(boltDB); err != nil {
+			return nil, errors.Wrap(err, "failed to check epochs for blob sidecars request bucket")
+		}
+	*/
 
 	return kv, nil
 }

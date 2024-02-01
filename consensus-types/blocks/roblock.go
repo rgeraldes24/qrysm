@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
-	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 // ROBlock is a value that embeds a ReadOnlySignedBeaconBlock along with its block root ([32]byte).
@@ -77,7 +76,7 @@ func (s ROBlockSlice) Len() int {
 
 type BlockWithVerifiedBlobs struct {
 	Block ROBlock
-	Blobs []*zond.BlobSidecar
+	// Blobs []*zond.BlobSidecar
 }
 
 type BlockWithVerifiedBlobsSlice []BlockWithVerifiedBlobs

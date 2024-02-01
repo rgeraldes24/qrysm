@@ -23,7 +23,6 @@ import (
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
 	"github.com/theQRL/qrysm/v4/network"
 	"github.com/theQRL/qrysm/v4/network/authorization"
-	v1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"go.opencensus.io/trace"
@@ -90,7 +89,7 @@ type BuilderClient interface {
 	NodeURL() string
 	GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubkey [dilithium.CryptoPublicKeyBytes]byte) (SignedBid, error)
 	RegisterValidator(ctx context.Context, svr []*zondpb.SignedValidatorRegistrationV1) error
-	SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlySignedBeaconBlock, blobs []*zondpb.SignedBlindedBlobSidecar) (interfaces.ExecutionData, *v1.BlobsBundle, error)
+	SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlySignedBeaconBlock) (interfaces.ExecutionData, error)
 	Status(ctx context.Context) error
 }
 
@@ -272,23 +271,23 @@ func (c *Client) RegisterValidator(ctx context.Context, svr []*zondpb.SignedVali
 
 // SubmitBlindedBlock calls the builder API endpoint that binds the validator to the builder and submits the block.
 // The response is the full execution payload used to create the blinded block.
-func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlySignedBeaconBlock, blobs []*zondpb.SignedBlindedBlobSidecar) (interfaces.ExecutionData, *v1.BlobsBundle, error) {
+func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlySignedBeaconBlock) (interfaces.ExecutionData, error) {
 	if !sb.IsBlinded() {
-		return nil, nil, errNotBlinded
+		return nil, errNotBlinded
 	}
 	switch sb.Version() {
 	case version.Capella:
 		psb, err := sb.PbBlindedCapellaBlock()
 		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not get protobuf block")
+			return nil, errors.Wrapf(err, "could not get protobuf block")
 		}
 		b, err := shared.SignedBlindedBeaconBlockCapellaFromConsensus(&zondpb.SignedBlindedBeaconBlockCapella{Block: psb.Block, Signature: bytesutil.SafeCopyBytes(psb.Signature)})
 		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not convert SignedBlindedBeaconBlockCapella to json marshalable type")
+			return nil, errors.Wrapf(err, "could not convert SignedBlindedBeaconBlockCapella to json marshalable type")
 		}
 		body, err := json.Marshal(b)
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "error encoding the SignedBlindedBeaconBlockCapella value body in SubmitBlindedBlockCapella")
+			return nil, errors.Wrap(err, "error encoding the SignedBlindedBeaconBlockCapella value body in SubmitBlindedBlockCapella")
 		}
 		versionOpt := func(r *http.Request) {
 			r.Header.Add("Eth-Consensus-Version", version.String(version.Capella))
@@ -296,26 +295,26 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 		rb, err := c.do(ctx, http.MethodPost, postBlindedBeaconBlockPath, bytes.NewBuffer(body), versionOpt)
 
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "error posting the SignedBlindedBeaconBlockCapella to the builder api")
+			return nil, errors.Wrap(err, "error posting the SignedBlindedBeaconBlockCapella to the builder api")
 		}
 		ep := &ExecPayloadResponseCapella{}
 		if err := json.Unmarshal(rb, ep); err != nil {
-			return nil, nil, errors.Wrap(err, "error unmarshaling the builder SubmitBlindedBlockCapella response")
+			return nil, errors.Wrap(err, "error unmarshaling the builder SubmitBlindedBlockCapella response")
 		}
 		if strings.ToLower(ep.Version) != version.String(version.Capella) {
-			return nil, nil, errors.New("not a capella payload")
+			return nil, errors.New("not a capella payload")
 		}
 		p, err := ep.ToProto()
 		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not extract proto message from payload")
+			return nil, errors.Wrapf(err, "could not extract proto message from payload")
 		}
 		payload, err := blocks.WrappedExecutionPayloadCapella(p, 0)
 		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not wrap execution payload in interface")
+			return nil, errors.Wrapf(err, "could not wrap execution payload in interface")
 		}
-		return payload, nil, nil
+		return payload, nil
 	default:
-		return nil, nil, fmt.Errorf("unsupported block version %s", version.String(sb.Version()))
+		return nil, fmt.Errorf("unsupported block version %s", version.String(sb.Version()))
 	}
 }
 

@@ -1,12 +1,10 @@
 package builder
 
 import (
-	"github.com/pkg/errors"
 	ssz "github.com/prysmaticlabs/fastssz"
 	consensus_types "github.com/theQRL/qrysm/v4/consensus-types"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
-	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 )
@@ -22,7 +20,6 @@ type SignedBid interface {
 // Bid is an interface describing the method set of a builder bid.
 type Bid interface {
 	Header() (interfaces.ExecutionData, error)
-	BlindedBlobsBundle() (*enginev1.BlindedBlobsBundle, error)
 	Value() []byte
 	Pubkey() []byte
 	Version() int
@@ -81,11 +78,6 @@ func WrappedBuilderBidCapella(p *zondpb.BuilderBidCapella) (Bid, error) {
 func (b builderBidCapella) Header() (interfaces.ExecutionData, error) {
 	// We have to convert big endian to little endian because the value is coming from the execution layer.
 	return blocks.WrappedExecutionPayloadHeaderCapella(b.p.Header, blocks.PayloadValueToGwei(b.p.Value))
-}
-
-// BlindedBlobsBundle --
-func (b builderBidCapella) BlindedBlobsBundle() (*enginev1.BlindedBlobsBundle, error) {
-	return nil, errors.New("blinded blobs bundle not available before Deneb")
 }
 
 // Version --

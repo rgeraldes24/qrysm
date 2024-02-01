@@ -105,7 +105,7 @@ type EngineCaller interface {
 	ForkchoiceUpdated(
 		ctx context.Context, state *pb.ForkchoiceState, attrs payloadattribute.Attributer,
 	) (*pb.PayloadIDBytes, []byte, error)
-	GetPayload(ctx context.Context, payloadId [8]byte, slot primitives.Slot) (interfaces.ExecutionData, *pb.BlobsBundle, bool, error)
+	GetPayload(ctx context.Context, payloadId [8]byte, slot primitives.Slot) (interfaces.ExecutionData, bool, error)
 	ExchangeTransitionConfiguration(
 		ctx context.Context, cfg *pb.TransitionConfiguration,
 	) error
@@ -145,15 +145,6 @@ func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionDa
 			return nil, errors.New("execution data must be a Capella execution payload")
 		}
 		err := s.rpcClient.CallContext(ctx, result, NewPayloadMethodV2, payloadPb)
-		if err != nil {
-			return nil, handleRPCError(err)
-		}
-	case *pb.ExecutionPayloadDeneb:
-		payloadPb, ok := payload.Proto().(*pb.ExecutionPayloadDeneb)
-		if !ok {
-			return nil, errors.New("execution data must be a Deneb execution payload")
-		}
-		err := s.rpcClient.CallContext(ctx, result, NewPayloadMethodV3, payloadPb, versionedHashes, parentBlockRoot)
 		if err != nil {
 			return nil, handleRPCError(err)
 		}
@@ -231,7 +222,7 @@ func (s *Service) ForkchoiceUpdated(
 
 // GetPayload calls the engine_getPayloadVX method via JSON-RPC.
 // It returns the execution data as well as the blobs bundle.
-func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primitives.Slot) (interfaces.ExecutionData, *pb.BlobsBundle, bool, error) {
+func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primitives.Slot) (interfaces.ExecutionData, bool, error) {
 	ctx, span := trace.StartSpan(ctx, "powchain.engine-api-client.GetPayload")
 	defer span.End()
 	start := time.Now()
@@ -243,42 +234,29 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 	ctx, cancel := context.WithDeadline(ctx, d)
 	defer cancel()
 
-	if slots.ToEpoch(slot) >= params.BeaconConfig().DenebForkEpoch {
-		result := &pb.ExecutionPayloadDenebWithValueAndBlobsBundle{}
-		err := s.rpcClient.CallContext(ctx, result, GetPayloadMethodV3, pb.PayloadIDBytes(payloadId))
-		if err != nil {
-			return nil, nil, false, handleRPCError(err)
-		}
-		ed, err := blocks.WrappedExecutionPayloadDeneb(result.Payload, blocks.PayloadValueToGwei(result.Value))
-		if err != nil {
-			return nil, nil, false, err
-		}
-		return ed, result.BlobsBundle, result.ShouldOverrideBuilder, nil
-	}
-
 	if slots.ToEpoch(slot) >= params.BeaconConfig().CapellaForkEpoch {
 		result := &pb.ExecutionPayloadCapellaWithValue{}
 		err := s.rpcClient.CallContext(ctx, result, GetPayloadMethodV2, pb.PayloadIDBytes(payloadId))
 		if err != nil {
-			return nil, nil, false, handleRPCError(err)
+			return nil, false, handleRPCError(err)
 		}
 		ed, err := blocks.WrappedExecutionPayloadCapella(result.Payload, blocks.PayloadValueToGwei(result.Value))
 		if err != nil {
-			return nil, nil, false, err
+			return nil, false, err
 		}
-		return ed, nil, false, nil
+		return ed, false, nil
 	}
 
 	result := &pb.ExecutionPayload{}
 	err := s.rpcClient.CallContext(ctx, result, GetPayloadMethod, pb.PayloadIDBytes(payloadId))
 	if err != nil {
-		return nil, nil, false, handleRPCError(err)
+		return nil, false, handleRPCError(err)
 	}
 	ed, err := blocks.WrappedExecutionPayload(result)
 	if err != nil {
-		return nil, nil, false, err
+		return nil, false, err
 	}
-	return ed, nil, false, nil
+	return ed, false, nil
 }
 
 // ExchangeTransitionConfiguration calls the engine_exchangeTransitionConfigurationV1 method via JSON-RPC.

@@ -35,11 +35,6 @@ func getEmptyBlock(slot primitives.Slot) (interfaces.SignedBeaconBlock, error) {
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not initialize block for proposal: %v", err)
 		}
-	default:
-		sBlk, err = blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockDeneb{Block: &zondpb.BeaconBlockDeneb{Body: &zondpb.BeaconBlockBodyDeneb{}}})
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not initialize block for proposal: %v", err)
-		}
 	}
 	return sBlk, err
 }

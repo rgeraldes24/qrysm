@@ -202,6 +202,7 @@ func (s *Service) broadcastSyncCommittee(ctx context.Context, subnet uint64, sMs
 	}
 }
 
+/*
 // BroadcastBlob broadcasts a blob to the p2p network, the message is assumed to be
 // broadcasted to the current fork and to the input subnet.
 func (s *Service) BroadcastBlob(ctx context.Context, subnet uint64, blob *zondpb.SignedBlobSidecar) error {
@@ -222,7 +223,9 @@ func (s *Service) BroadcastBlob(ctx context.Context, subnet uint64, blob *zondpb
 
 	return nil
 }
+*/
 
+/*
 func (s *Service) broadcastBlob(ctx context.Context, subnet uint64, blobSidecar *zondpb.SignedBlobSidecar, forkDigest [4]byte) {
 	_, span := trace.StartSpan(ctx, "p2p.broadcastBlob")
 	defer span.End()
@@ -262,6 +265,7 @@ func (s *Service) broadcastBlob(ctx context.Context, subnet uint64, blobSidecar 
 		tracing.AnnotateError(span, err)
 	}
 }
+*/
 
 // method to broadcast messages to other peers in our gossip mesh.
 func (s *Service) broadcastObject(ctx context.Context, obj ssz.Marshaler, topic string) error {

@@ -149,8 +149,6 @@ func (vs *Server) sendBlocks(stream zondpb.BeaconNodeValidator_StreamBlocksAltai
 		b.Block = &zondpb.StreamBlocksResponse_BellatrixBlock{BellatrixBlock: p}
 	case *zondpb.SignedBeaconBlockCapella:
 		b.Block = &zondpb.StreamBlocksResponse_CapellaBlock{CapellaBlock: p}
-	case *zondpb.SignedBeaconBlockDeneb:
-		b.Block = &zondpb.StreamBlocksResponse_DenebBlock{DenebBlock: p}
 	default:
 		log.Errorf("Unknown block type %T", p)
 	}

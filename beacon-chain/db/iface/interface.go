@@ -96,8 +96,9 @@ type NoHeadAccessDatabase interface {
 	SaveRegistrationsByValidatorIDs(ctx context.Context, ids []primitives.ValidatorIndex, regs []*zondpb.ValidatorRegistrationV1) error
 
 	// Blob operations.
-	SaveBlobSidecar(ctx context.Context, sidecars []*zondpb.BlobSidecar) error
-	DeleteBlobSidecar(ctx context.Context, beaconBlockRoot [32]byte) error
+	// TODO(rgeraldes24)
+	// SaveBlobSidecar(ctx context.Context, sidecars []*zondpb.BlobSidecar) error
+	// DeleteBlobSidecar(ctx context.Context, beaconBlockRoot [32]byte) error
 
 	CleanUpDirtyStates(ctx context.Context, slotsPerArchivedPoint primitives.Slot) error
 }

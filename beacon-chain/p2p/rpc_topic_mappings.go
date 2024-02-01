@@ -97,10 +97,11 @@ var RPCTopicMappings = map[string]interface{}{
 	// RPC Metadata Message
 	RPCMetaDataTopicV1: new(interface{}),
 	RPCMetaDataTopicV2: new(interface{}),
+	// TODO(rgeraldes24): remove
 	// BlobSidecarsByRange v1 Message
-	RPCBlobSidecarsByRangeTopicV1: new(pb.BlobSidecarsByRangeRequest),
+	// RPCBlobSidecarsByRangeTopicV1: new(pb.BlobSidecarsByRangeRequest),
 	// BlobSidecarsByRoot v1 Message
-	RPCBlobSidecarsByRootTopicV1: new(p2ptypes.BlobSidecarsByRootReq),
+	// RPCBlobSidecarsByRootTopicV1: new(p2ptypes.BlobSidecarsByRootReq),
 }
 
 // Maps all registered protocol prefixes.

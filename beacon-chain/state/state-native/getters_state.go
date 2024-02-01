@@ -381,13 +381,3 @@ func ProtobufBeaconStateCapella(s interface{}) (*zondpb.BeaconStateCapella, erro
 	}
 	return pbState, nil
 }
-
-// ProtobufBeaconStateDeneb transforms an input into beacon state Deneb in the form of protobuf.
-// Error is returned if the input is not type protobuf beacon state.
-func ProtobufBeaconStateDeneb(s interface{}) (*zondpb.BeaconStateDeneb, error) {
-	pbState, ok := s.(*zondpb.BeaconStateDeneb)
-	if !ok {
-		return nil, errors.New("input is not type pb.ProtobufBeaconStateDeneb")
-	}
-	return pbState, nil
-}

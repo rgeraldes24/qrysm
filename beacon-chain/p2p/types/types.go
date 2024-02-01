@@ -4,13 +4,9 @@
 package types
 
 import (
-	"bytes"
-	"sort"
-
 	"github.com/pkg/errors"
 	ssz "github.com/prysmaticlabs/fastssz"
 	"github.com/theQRL/qrysm/v4/config/params"
-	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
 const rootLength = 32
@@ -125,6 +121,7 @@ func (m *ErrorMessage) UnmarshalSSZ(buf []byte) error {
 	return nil
 }
 
+/*
 // BlobSidecarsByRootReq is used to specify a list of blob targets (root+index) in a BlobSidecarsByRoot RPC request.
 type BlobSidecarsByRootReq []*zond.BlobIdentifier
 
@@ -211,3 +208,4 @@ func init() {
 	sizer := &zond.BlobIdentifier{}
 	blobIdSize = sizer.SizeSSZ()
 }
+*/

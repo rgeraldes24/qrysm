@@ -84,25 +84,15 @@ var capellaFields = append(
 	types.HistoricalSummaries,
 )
 
-var denebFields = append(
-	altairFields,
-	types.LatestExecutionPayloadHeaderDeneb,
-	types.NextWithdrawalIndex,
-	types.NextWithdrawalValidatorIndex,
-	types.HistoricalSummaries,
-)
-
 const (
 	phase0SharedFieldRefCount                     = 10
 	altairSharedFieldRefCount                     = 11
 	bellatrixSharedFieldRefCount                  = 12
 	capellaSharedFieldRefCount                    = 14
-	denebSharedFieldRefCount                      = 14
 	experimentalStatePhase0SharedFieldRefCount    = 5
 	experimentalStateAltairSharedFieldRefCount    = 5
 	experimentalStateBellatrixSharedFieldRefCount = 6
 	experimentalStateCapellaSharedFieldRefCount   = 8
-	experimentalStateDenebSharedFieldRefCount     = 8
 )
 
 // InitializeFromProtoPhase0 the beacon state from a protobuf representation.
@@ -628,7 +618,6 @@ func (b *BeaconState) Copy() state.BeaconState {
 		nextSyncCommittee:                   b.nextSyncCommitteeVal(),
 		latestExecutionPayloadHeader:        b.latestExecutionPayloadHeaderVal(),
 		latestExecutionPayloadHeaderCapella: b.latestExecutionPayloadHeaderCapellaVal(),
-		latestExecutionPayloadHeaderDeneb:   b.latestExecutionPayloadHeaderDenebVal(),
 
 		id: types.Enumerator.Inc(),
 
@@ -917,8 +906,6 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 		return b.latestExecutionPayloadHeader.HashTreeRoot()
 	case types.LatestExecutionPayloadHeaderCapella:
 		return b.latestExecutionPayloadHeaderCapella.HashTreeRoot()
-	case types.LatestExecutionPayloadHeaderDeneb:
-		return b.latestExecutionPayloadHeaderDeneb.HashTreeRoot()
 	case types.NextWithdrawalIndex:
 		return ssz.Uint64Root(b.nextWithdrawalIndex), nil
 	case types.NextWithdrawalValidatorIndex:
