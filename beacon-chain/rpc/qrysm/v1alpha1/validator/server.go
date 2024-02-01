@@ -144,22 +144,6 @@ func (vs *Server) DomainData(ctx context.Context, request *zondpb.DomainRequest)
 		return nil, err
 	}
 	headGenesisValidatorsRoot := vs.HeadFetcher.HeadGenesisValidatorsRoot()
-	isExitDomain := [4]byte(request.Domain) == params.BeaconConfig().DomainVoluntaryExit
-	if isExitDomain {
-		/*
-			hs, err := vs.HeadFetcher.HeadStateReadOnly(ctx)
-			if err != nil {
-				return nil, err
-			}
-			if hs.Version() >= version.Deneb {
-				fork = &zondpb.Fork{
-					PreviousVersion: params.BeaconConfig().CapellaForkVersion,
-					CurrentVersion:  params.BeaconConfig().CapellaForkVersion,
-					Epoch:           params.BeaconConfig().CapellaForkEpoch,
-				}
-			}
-		*/
-	}
 	dv, err := signing.Domain(fork, request.Epoch, bytesutil.ToBytes4(request.Domain), headGenesisValidatorsRoot[:])
 	if err != nil {
 		return nil, err

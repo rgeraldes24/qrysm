@@ -30,11 +30,6 @@ func NewBlindedBeaconBlockCapella() *zondpb.SignedBlindedBeaconBlockCapella {
 	return HydrateSignedBlindedBeaconBlockCapella(&zondpb.SignedBlindedBeaconBlockCapella{})
 }
 
-// NewBlindedBlobSidecar creates a signed blinded blob sidecar with minimum marshalable fields.
-func NewBlindedBlobSidecar() *zondpb.SignedBlindedBlobSidecar {
-	return HydrateSignedBlindedBlobSidecar(&zondpb.SignedBlindedBlobSidecar{})
-}
-
 // NewBlindedBeaconBlockCapellaV2 creates a blinded beacon block with minimum marshalable fields.
 func NewBlindedBeaconBlockCapellaV2() *v2.SignedBlindedBeaconBlockCapella {
 	return HydrateV2SignedBlindedBeaconBlockCapella(&v2.SignedBlindedBeaconBlockCapella{})

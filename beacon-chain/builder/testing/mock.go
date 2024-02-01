@@ -8,14 +8,12 @@ import (
 	"github.com/theQRL/qrysm/v4/api/client/builder"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	v1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 // Config defines a config struct for dependencies into the service.
@@ -28,12 +26,9 @@ type MockBuilderService struct {
 	HasConfigured         bool
 	Payload               *v1.ExecutionPayload
 	PayloadCapella        *v1.ExecutionPayloadCapella
-	PayloadDeneb          *v1.ExecutionPayloadDeneb
-	BlobBundle            *v1.BlobsBundle
 	ErrSubmitBlindedBlock error
 	Bid                   *zondpb.SignedBuilderBid
 	BidCapella            *zondpb.SignedBuilderBidCapella
-	BidDeneb              *zondpb.SignedBuilderBidDeneb
 	RegistrationCache     *cache.RegistrationCache
 	ErrGetHeader          error
 	ErrRegisterValidator  error
@@ -46,30 +41,27 @@ func (s *MockBuilderService) Configured() bool {
 }
 
 // SubmitBlindedBlock for mocking.
-func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, b interfaces.ReadOnlySignedBeaconBlock, _ []*zondpb.SignedBlindedBlobSidecar) (interfaces.ExecutionData, *v1.BlobsBundle, error) {
+func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, b interfaces.ReadOnlySignedBeaconBlock) (interfaces.ExecutionData, error) {
 	switch b.Version() {
 	case version.Bellatrix:
 		w, err := blocks.WrappedExecutionPayload(s.Payload)
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "could not wrap payload")
+			return nil, errors.Wrap(err, "could not wrap payload")
 		}
-		return w, nil, s.ErrSubmitBlindedBlock
+		return w, s.ErrSubmitBlindedBlock
 	case version.Capella:
 		w, err := blocks.WrappedExecutionPayloadCapella(s.PayloadCapella, 0)
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "could not wrap capella payload")
+			return nil, errors.Wrap(err, "could not wrap capella payload")
 		}
-		return w, nil, s.ErrSubmitBlindedBlock
+		return w, s.ErrSubmitBlindedBlock
 	default:
-		return nil, nil, errors.New("unknown block version for mocking")
+		return nil, errors.New("unknown block version for mocking")
 	}
 }
 
 // GetHeader for mocking.
 func (s *MockBuilderService) GetHeader(_ context.Context, slot primitives.Slot, _ [32]byte, _ [dilithium2.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
-	if slots.ToEpoch(slot) >= params.BeaconConfig().DenebForkEpoch || s.BidDeneb != nil {
-		return builder.WrappedSignedBuilderBidDeneb(s.BidDeneb)
-	}
 	w, err := builder.WrappedSignedBuilderBid(s.Bid)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not wrap capella bid")

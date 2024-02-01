@@ -213,39 +213,6 @@ func Test_BeaconBlock_Copy(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotEqual(t, cp, b)
 	assert.NotEqual(t, cp.Body(), bb)
-
-	/*
-		payload := &pb.ExecutionPayloadDeneb{ExcessBlobGas: 123}
-		header := &pb.ExecutionPayloadHeaderDeneb{ExcessBlobGas: 223}
-		payloadInterface, err := WrappedExecutionPayloadDeneb(payload, 123)
-		require.NoError(t, err)
-		headerInterface, err := WrappedExecutionPayloadHeaderDeneb(header, 123)
-		require.NoError(t, err)
-		bb = &BeaconBlockBody{executionPayload: payloadInterface, executionPayloadHeader: headerInterface, randaoReveal: bytesutil.ToBytes4595([]byte{246}), graffiti: bytesutil.ToBytes32([]byte("graffiti"))}
-		b = &BeaconBlock{body: bb, slot: 123, proposerIndex: 456, parentRoot: bytesutil.ToBytes32([]byte("parentroot")), stateRoot: bytesutil.ToBytes32([]byte("stateroot"))}
-		b.version = version.Deneb
-		b.body.version = b.version
-		cp, err = b.Copy()
-		require.NoError(t, err)
-		assert.NotEqual(t, cp, b)
-		assert.NotEqual(t, cp.Body(), bb)
-		e, err := cp.Body().Execution()
-		require.NoError(t, err)
-		gas, err := e.ExcessBlobGas()
-		require.NoError(t, err)
-		require.DeepEqual(t, gas, uint64(123))
-
-		b.body.isBlinded = true
-		cp, err = b.Copy()
-		require.NoError(t, err)
-		assert.NotEqual(t, cp, b)
-		assert.NotEqual(t, cp.Body(), bb)
-		e, err = cp.Body().Execution()
-		require.NoError(t, err)
-		gas, err = e.ExcessBlobGas()
-		require.NoError(t, err)
-		require.DeepEqual(t, gas, uint64(223))
-	*/
 }
 
 func Test_BeaconBlock_IsNil(t *testing.T) {

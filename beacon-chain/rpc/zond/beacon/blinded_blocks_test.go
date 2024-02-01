@@ -2,8 +2,9 @@ package beacon
 
 import (
 	"context"
-	"google.golang.org/grpc"
 	"testing"
+
+	"google.golang.org/grpc"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
@@ -100,27 +101,6 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 		require.Equal(t, true, ok)
 		assert.DeepEqual(t, expected, capellaBlock.CapellaBlock)
 		assert.Equal(t, zondpbv2.Version_CAPELLA, resp.Version)
-	})
-	t.Run("Deneb", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockDeneb()
-		blk, err := blocks.NewSignedBeaconBlock(b)
-		require.NoError(t, err)
-
-		mockChainService := &mock.ChainService{}
-		bs := &Server{
-			FinalizationFetcher:   mockChainService,
-			Blocker:               &testutil.MockBlocker{BlockToReturn: blk},
-			OptimisticModeFetcher: mockChainService,
-		}
-
-		expected, err := migration.V1Alpha1BeaconBlockBlindedDenebToV2Blinded(b.Message)
-		require.NoError(t, err)
-		resp, err := bs.GetBlindedBlock(ctx, &zondpbv1.BlockRequest{})
-		require.NoError(t, err)
-		denebBlock, ok := resp.Data.Message.(*zondpbv2.SignedBlindedBeaconBlockContainer_DenebBlock)
-		require.Equal(t, true, ok)
-		assert.DeepEqual(t, expected, denebBlock.DenebBlock)
-		assert.Equal(t, zondpbv2.Version_DENEB, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		b := util.NewBlindedBeaconBlockBellatrix()
@@ -260,26 +240,6 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 		assert.NotNil(t, resp)
 		assert.DeepEqual(t, expected, resp.Data)
 		assert.Equal(t, zondpbv2.Version_CAPELLA, resp.Version)
-	})
-	t.Run("Deneb", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockDeneb()
-		blk, err := blocks.NewSignedBeaconBlock(b)
-		require.NoError(t, err)
-
-		mockChainService := &mock.ChainService{}
-		bs := &Server{
-			FinalizationFetcher:   mockChainService,
-			Blocker:               &testutil.MockBlocker{BlockToReturn: blk},
-			OptimisticModeFetcher: mockChainService,
-		}
-
-		expected, err := blk.MarshalSSZ()
-		require.NoError(t, err)
-		resp, err := bs.GetBlindedBlockSSZ(ctx, &zondpbv1.BlockRequest{})
-		require.NoError(t, err)
-		assert.NotNil(t, resp)
-		assert.DeepEqual(t, expected, resp.Data)
-		assert.Equal(t, zondpbv2.Version_DENEB, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		b := util.NewBlindedBeaconBlockBellatrix()

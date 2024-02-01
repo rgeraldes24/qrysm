@@ -13,8 +13,6 @@ go_library(
         "block.go",
         "capella_block.go",
         "capella_state.go",
-        "deneb.go",
-        "deneb_state.go",
         "deposits.go",
         "helpers.go",
         "merge.go",

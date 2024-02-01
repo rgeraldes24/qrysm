@@ -51,8 +51,6 @@ func TestGetSpec(t *testing.T) {
 	config.BellatrixForkEpoch = 101
 	config.CapellaForkVersion = []byte("CapellaForkVersion")
 	config.CapellaForkEpoch = 103
-	config.DenebForkVersion = []byte("DenebForkVersion")
-	config.DenebForkEpoch = 105
 	config.BLSWithdrawalPrefixByte = byte('b')
 	config.ETH1AddressWithdrawalPrefixByte = byte('c')
 	config.GenesisDelay = 24
@@ -131,9 +129,9 @@ func TestGetSpec(t *testing.T) {
 	var dam [4]byte
 	copy(dam[:], []byte{'1', '0', '0', '0'})
 	config.DomainApplicationMask = dam
-	var dbs [4]byte
-	copy(dam[:], []byte{'2', '0', '0', '0'})
-	config.DomainBlobSidecar = dbs
+	// var dbs [4]byte
+	// copy(dam[:], []byte{'2', '0', '0', '0'})
+	// config.DomainBlobSidecar = dbs
 
 	params.OverrideBeaconConfig(config)
 
@@ -210,10 +208,6 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "0x"+hex.EncodeToString([]byte("CapellaForkVersion")), v)
 		case "CAPELLA_FORK_EPOCH":
 			assert.Equal(t, "103", v)
-		case "DENEB_FORK_VERSION":
-			assert.Equal(t, "0x"+hex.EncodeToString([]byte("DenebForkVersion")), v)
-		case "DENEB_FORK_EPOCH":
-			assert.Equal(t, "105", v)
 		case "MIN_ANCHOR_POW_BLOCK_DIFFICULTY":
 			assert.Equal(t, "1000", v)
 		case "BLS_WITHDRAWAL_PREFIX":
@@ -346,8 +340,6 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "0x0a000000", v)
 		case "DOMAIN_APPLICATION_BUILDER":
 			assert.Equal(t, "0x00000001", v)
-		case "DOMAIN_BLOB_SIDECAR":
-			assert.Equal(t, "0x00000000", v)
 		case "TRANSITION_TOTAL_DIFFICULTY":
 			assert.Equal(t, "0", v)
 		case "TERMINAL_BLOCK_HASH_ACTIVATION_EPOCH":

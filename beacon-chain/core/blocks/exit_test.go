@@ -238,6 +238,7 @@ func TestVerifyExitAndSignature(t *testing.T) {
 			},
 			wantErr: "signature did not verify",
 		},
+		/*
 		{
 			name: "EIP-7044: deneb exits should verify with capella fork information",
 			setup: func() (*zondpb.Validator, *zondpb.SignedVoluntaryExit, state.ReadOnlyBeaconState, error) {
@@ -275,6 +276,7 @@ func TestVerifyExitAndSignature(t *testing.T) {
 				return validator, signedExit, bs, nil
 			},
 		},
+		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

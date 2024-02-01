@@ -60,7 +60,7 @@ func createRandomKeystore(t testing.TB, password string) (*keymanager.Keystore, 
 		Pubkey:  fmt.Sprintf("%x", pubKey),
 		ID:      id.String(),
 		Version: encryptor.Version(),
-		Name:    encryptor.Name(),
+		// Name:    encryptor.Name(),
 	}, validatingKey
 }
 
