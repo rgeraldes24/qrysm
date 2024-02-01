@@ -1087,28 +1087,3 @@ func TestService_getPayloadHash(t *testing.T) {
 	require.NoError(t, err)
 	require.DeepEqual(t, [32]byte{'a'}, h)
 }
-
-func TestKZGCommitmentToVersionedHashes(t *testing.T) {
-	kzg1 := make([]byte, 96)
-	kzg1[10] = 'a'
-	kzg2 := make([]byte, 96)
-	kzg2[1] = 'b'
-	commitments := [][]byte{kzg1, kzg2}
-
-	blk := &zondpb.SignedBeaconBlockDeneb{
-		Block: &zondpb.BeaconBlockDeneb{
-			Body: &zondpb.BeaconBlockBodyDeneb{
-				BlobKzgCommitments: commitments,
-			},
-		},
-	}
-	b, err := consensusblocks.NewSignedBeaconBlock(blk)
-	require.NoError(t, err)
-	vhs, err := kzgCommitmentsToVersionedHashes(b.Block().Body())
-	require.NoError(t, err)
-	vh0 := "0x01cf2315c97658a7ed54ada181765e23b3fadb5150fab39509f631c0b9af4566"
-	vh1 := "0x01e27ce28e527eb07196b31af0f5fa1882ace701a682022ab779f816ac39d47e"
-	require.Equal(t, 2, len(vhs))
-	require.Equal(t, vhs[0].String(), vh0)
-	require.Equal(t, vhs[1].String(), vh1)
-}

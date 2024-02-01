@@ -155,38 +155,6 @@ type BlindedBeaconBlockBodyCapella struct {
 	DilithiumToExecutionChanges []*SignedDilithiumToExecutionChange `json:"dilithium_to_execution_changes" validate:"required,dive"`
 }
 
-type SignedBlindedBlobSidecar struct {
-	Message   *BlindedBlobSidecar `json:"message" validate:"required"`
-	Signature string              `json:"signature" validate:"required"`
-}
-
-type SignedBlobSidecar struct {
-	Message   *BlobSidecar `json:"message" validate:"required"`
-	Signature string       `json:"signature" validate:"required"`
-}
-
-type BlindedBlobSidecar struct {
-	BlockRoot       string `json:"block_root" validate:"required"`
-	Index           string `json:"index" validate:"required"`
-	Slot            string `json:"slot" validate:"required"`
-	BlockParentRoot string `json:"block_parent_root" validate:"required"`
-	ProposerIndex   string `json:"proposer_index" validate:"required"`
-	BlobRoot        string `json:"blob_root" validate:"required"`
-	KzgCommitment   string `json:"kzg_commitment" validate:"required"` // pattern: "^0x[a-fA-F0-9]{96}$" ssz-size:"48"
-	KzgProof        string `json:"kzg_proof" validate:"required"`      // pattern: "^0x[a-fA-F0-9]{96}$" ssz-size:"48"
-}
-
-type BlobSidecar struct {
-	BlockRoot       string `json:"block_root" validate:"required"`
-	Index           string `json:"index" validate:"required"`
-	Slot            string `json:"slot" validate:"required"`
-	BlockParentRoot string `json:"block_parent_root" validate:"required"`
-	ProposerIndex   string `json:"proposer_index" validate:"required"`
-	Blob            string `json:"blob" validate:"required"`           // pattern: "^0x[a-fA-F0-9]{262144}$"
-	KzgCommitment   string `json:"kzg_commitment" validate:"required"` // pattern: "^0x[a-fA-F0-9]{96}$" ssz-size:"48"
-	KzgProof        string `json:"kzg_proof" validate:"required"`      // pattern: "^0x[a-fA-F0-9]{96}$" ssz-size:"48"
-}
-
 type Eth1Data struct {
 	DepositRoot  string `json:"deposit_root" validate:"required"`
 	DepositCount string `json:"deposit_count" validate:"required"`

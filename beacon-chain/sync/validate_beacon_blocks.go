@@ -29,8 +29,7 @@ import (
 )
 
 var (
-	ErrOptimisticParent    = errors.New("parent of the block is optimistic")
-	errRejectCommitmentLen = errors.New("[REJECT] The length of KZG commitments is less than or equal to the limitation defined in Consensus Layer")
+	ErrOptimisticParent = errors.New("parent of the block is optimistic")
 )
 
 // validateBeaconBlockPubSub checks that the incoming block has a valid BLS signature.

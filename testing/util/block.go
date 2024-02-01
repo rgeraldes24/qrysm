@@ -78,19 +78,6 @@ func NewBeaconBlock() *zondpb.SignedBeaconBlock {
 	}
 }
 
-func NewBlobsidecar() *zondpb.SignedBlobSidecar {
-	return &zondpb.SignedBlobSidecar{
-		Message: &zondpb.BlobSidecar{
-			BlockRoot:       make([]byte, fieldparams.RootLength),
-			BlockParentRoot: make([]byte, fieldparams.RootLength),
-			Blob:            make([]byte, fieldparams.BlobLength),
-			KzgCommitment:   make([]byte, dilithium2.CryptoPublicKeyBytes),
-			KzgProof:        make([]byte, dilithium2.CryptoPublicKeyBytes),
-		},
-		Signature: make([]byte, dilithium2.CryptoBytes),
-	}
-}
-
 // GenerateFullBlock generates a fully valid block with the requested parameters.
 // Use BlockGenConfig to declare the conditions you would like the block generated under.
 func GenerateFullBlock(

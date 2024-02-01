@@ -9,7 +9,6 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	zondtypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/blockchain"
-	"github.com/theQRL/qrysm/v4/beacon-chain/blockchain/kzg"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
@@ -72,8 +71,6 @@ func startChainService(t testing.TB,
 	)
 	service, err := blockchain.NewService(context.Background(), opts...)
 	require.NoError(t, err)
-	// force start kzg context here until Deneb fork epoch is decided
-	require.NoError(t, kzg.Start())
 	require.NoError(t, service.StartFromSavedState(st))
 	return service
 }

@@ -284,11 +284,6 @@ func (b *BeaconBlockBody) SetDilithiumToExecutionChanges([]*zond.SignedDilithium
 	panic("implement me")
 }
 
-// BlobKzgCommitments returns the blob kzg commitments in the block.
-func (b *BeaconBlockBody) BlobKzgCommitments() ([][]byte, error) {
-	panic("implement me")
-}
-
 func (b *BeaconBlockBody) Attestations() []*zond.Attestation {
 	panic("implement me")
 }
