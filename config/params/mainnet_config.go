@@ -21,6 +21,7 @@ const (
 	// Genesis Fork Epoch for the mainnet config.
 	genesisForkEpoch = 0
 	// Altair Fork Epoch for mainnet config.
+	// TODO(rgeraldes24): remove
 	mainnetAltairForkEpoch = 74240 // Oct 27, 2021, 10:56:23am UTC
 	// Bellatrix Fork Epoch for mainnet config.
 	mainnetBellatrixForkEpoch = 144896 // Sept 6, 2022, 11:34:47am UTC
@@ -167,6 +168,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	GweiPerEth:                     1000000000,
 	BLSSecretKeyLength:             32,
 	BLSPubkeyLength:                48,
+	DilithiumPubkeyLength:          2592,
 	DefaultBufferSize:              10000,
 	WithdrawalPrivkeyFileName:      "/shardwithdrawalkey",
 	ValidatorPrivkeyFileName:       "/validatorprivatekey",

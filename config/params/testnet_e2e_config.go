@@ -54,7 +54,6 @@ func E2EMainnetTestConfig() *BeaconChainConfig {
 
 	// Time parameters.
 	e2eConfig.SecondsPerSlot = 6
-	e2eConfig.SqrRootSlotsPerEpoch = 5
 	e2eConfig.SecondsPerETH1Block = 2
 	e2eConfig.ShardCommitteePeriod = 4
 	e2eConfig.MinValidatorWithdrawabilityDelay = 1

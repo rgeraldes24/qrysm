@@ -4,6 +4,16 @@
 PRESET_BASE: 'minimal'
 
 
+# TODO(rgeraldes24): remove
+# Transition
+# ---------------------------------------------------------------
+# TBD, 2**256-2**10 is a placeholder, e2e is 480
+TERMINAL_TOTAL_DIFFICULTY: 480
+# By default, don't use these params
+#TERMINAL_BLOCK_HASH: 0x0000000000000000000000000000000000000000000000000000000000000000
+#TERMINAL_BLOCK_HASH_ACTIVATION_EPOCH: 18446744073709551615
+
+
 # Genesis
 # ---------------------------------------------------------------
 # [customized]
@@ -15,6 +25,18 @@ GENESIS_FORK_VERSION: 0x000000fd
 # [customized] Faster to spin up testnets, but does not give validator reasonable warning time for genesis
 GENESIS_DELAY: 10 # Override for e2e tests
 
+# TODO(rgeraldes24): remove
+# Forking
+# ---------------------------------------------------------------
+# Values provided for illustrative purposes.
+# Individual tests/testnets may set different values.
+
+# Altair
+ALTAIR_FORK_VERSION: 0x010000fd
+# Bellatrix
+BELLATRIX_FORK_VERSION: 0x020000fd
+# Capella
+CAPELLA_FORK_VERSION: 0x030000fd
 
 # Time parameters
 # ---------------------------------------------------------------
@@ -36,8 +58,9 @@ ETH1_FOLLOW_DISTANCE: 8 # Override for e2e tests
 INACTIVITY_SCORE_BIAS: 4
 # 2**4 (= 16)
 INACTIVITY_SCORE_RECOVERY_RATE: 16
+# TODO(rgeraldes24): review comment values
 # 2**4 * 10**9 (= 16,000,000,000) Gwei
-EJECTION_BALANCE: 16000000000
+EJECTION_BALANCE: 20000000000000
 # 2**1 (= 2)
 MIN_PER_EPOCH_CHURN_LIMIT: 2
 # [customized] scale queue churn at much lower validator counts for testing
@@ -71,7 +94,7 @@ PROPORTIONAL_SLASHING_MULTIPLIER_ALTAIR: 2
 # Sync committee
 # ---------------------------------------------------------------
 # [customized]
-SYNC_COMMITTEE_SIZE: 32
+SYNC_COMMITTEE_SIZE: 16
 # [customized]
 EPOCHS_PER_SYNC_COMMITTEE_PERIOD: 8
 

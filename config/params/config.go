@@ -128,6 +128,7 @@ type BeaconChainConfig struct {
 	GweiPerEth                     uint64                      // GweiPerEth is the amount of gwei corresponding to 1 eth.
 	BLSSecretKeyLength             int                         // BLSSecretKeyLength defines the expected length of BLS secret keys in bytes.
 	BLSPubkeyLength                int                         // BLSPubkeyLength defines the expected length of BLS public keys in bytes.
+	DilithiumPubkeyLength          int                         // DilithiumPubkeyLength defines the expected length of Dilithium public keys in bytes.
 	DefaultBufferSize              int                         // DefaultBufferSize for channels across the Prysm repository.
 	ValidatorPrivkeyFileName       string                      // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
 	WithdrawalPrivkeyFileName      string                      // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
