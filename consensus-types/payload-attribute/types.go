@@ -17,7 +17,7 @@ type data struct {
 	prevRandao            []byte
 	suggestedFeeRecipient []byte
 	withdrawals           []*enginev1.Withdrawal
-	parentBeaconBlockRoot []byte
+	// parentBeaconBlockRoot []byte TODO(rgeraldes24): field `parentBeaconBlockRoot` is unused
 }
 
 var (
