@@ -86,8 +86,7 @@ message SignRequest {
         theqrl.zond.v1alpha1.BeaconBlockCapella block_capella = 114;
         theqrl.zond.v1alpha1.BlindedBeaconBlockCapella blinded_block_capella = 115;
     }
-    reserved 4, 5; // Reserving old, deleted fields. // TODO(rgeraldes24)
-    uint64 signing_slot = 6 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
+    uint64 signing_slot = 4 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
 }
 
 // SignResponse returned by a RemoteSigner gRPC service.

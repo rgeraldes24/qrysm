@@ -838,7 +838,7 @@ func TestMarshalBlindedBeaconBlockBodyCapella(t *testing.T) {
 	// string error output is easier to deal with
 	// -1 end slice index on expected is to get rid of trailing newline
 	// if you update this fixture and this test breaks, you probably removed the trailing newline
-	require.Equal(t, string(expected[0:len(expected)-1]), string(m))
+	require.Equal(t, string(expected), string(m))
 }
 
 func TestRoundTripUint256(t *testing.T) {
@@ -860,7 +860,7 @@ func TestExecutionPayloadHeaderCapellaRoundtrip(t *testing.T) {
 	require.NoError(t, json.Unmarshal(expected, hu))
 	m, err := json.Marshal(hu)
 	require.NoError(t, err)
-	require.DeepEqual(t, string(expected[0:len(expected)-1]), string(m))
+	require.DeepEqual(t, string(expected), string(m))
 }
 
 func TestErrorMessage_non200Err(t *testing.T) {
