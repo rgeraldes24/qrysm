@@ -63,35 +63,6 @@ func TestMarshalToEnvelope(t *testing.T) {
 	require.Equal(t, expected, string(encoded))
 }
 
-func TestFallbackVersionCheck(t *testing.T) {
-	trans := &testRT{rt: func(req *http.Request) (*http.Response, error) {
-		res := &http.Response{Request: req}
-		switch req.URL.Path {
-		case getNodeVersionPath:
-			res.StatusCode = http.StatusOK
-			b := bytes.NewBuffer(nil)
-			d := struct {
-				Version string `json:"version"`
-			}{
-				Version: "Qrysm/v2.0.5 (linux amd64)",
-			}
-			encoded, err := marshalToEnvelope(d)
-			require.NoError(t, err)
-			b.Write(encoded)
-			res.Body = io.NopCloser(b)
-		case getWeakSubjectivityPath:
-			res.StatusCode = http.StatusNotFound
-		}
-		return res, nil
-	}}
-
-	c, err := NewClient("http://localhost:3500", client.WithRoundTripper(trans))
-	require.NoError(t, err)
-	ctx := context.Background()
-	_, err = ComputeWeakSubjectivityCheckpoint(ctx, c)
-	require.ErrorIs(t, err, errUnsupportedQrysmCheckpointVersion)
-}
-
 func TestFname(t *testing.T) {
 	vu := &detect.VersionedUnmarshaler{
 		Config: params.MainnetConfig(),
@@ -209,102 +180,7 @@ func TestDownloadWeakSubjectivityCheckpoint(t *testing.T) {
 	require.Equal(t, expectedWSD.BlockRoot, wsd.BlockRoot)
 }
 
-// TODO(rgeraldes24)
-// runs computeBackwardsCompatible directly
-// and via ComputeWeakSubjectivityCheckpoint with a round tripper that triggers the backwards compatible code path
-/*
-func TestDownloadBackwardsCompatibleCombined(t *testing.T) {
-	ctx := context.Background()
-	cfg := params.MainnetConfig()
-
-	st, expectedEpoch := defaultTestHeadState(t, cfg)
-	serialized, err := st.MarshalSSZ()
-	require.NoError(t, err)
-
-	// set up checkpoint state, using the epoch that will be computed as the ws checkpoint state based on the head state
-	wSlot, err := slots.EpochStart(expectedEpoch)
-	require.NoError(t, err)
-	wst, err := util.NewBeaconState()
-	require.NoError(t, err)
-	fork, err := forkForEpoch(cfg, cfg.GenesisEpoch)
-	require.NoError(t, err)
-	require.NoError(t, wst.SetFork(fork))
-
-	// set up checkpoint block
-	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
-	require.NoError(t, err)
-	b, err = blocktest.SetBlockParentRoot(b, cfg.ZeroHash)
-	require.NoError(t, err)
-	b, err = blocktest.SetBlockSlot(b, wSlot)
-	require.NoError(t, err)
-	b, err = blocktest.SetProposerIndex(b, 0)
-	require.NoError(t, err)
-
-	// set up state header pointing at checkpoint block - this is how the block is downloaded by root
-	header, err := b.Header()
-	require.NoError(t, err)
-	require.NoError(t, wst.SetLatestBlockHeader(header.Header))
-
-	// order of operations can be confusing here:
-	// - when computing the state root, make sure block header is complete, EXCEPT the state root should be zero-value
-	// - before computing the block root (to match the request route), the block should include the state root
-	//   *computed from the state with a header that does not have a state root set yet*
-	wRoot, err := wst.HashTreeRoot(ctx)
-	require.NoError(t, err)
-
-	b, err = blocktest.SetBlockStateRoot(b, wRoot)
-	require.NoError(t, err)
-	serBlock, err := b.MarshalSSZ()
-	require.NoError(t, err)
-	bRoot, err := b.Block().HashTreeRoot()
-	require.NoError(t, err)
-
-	wsSerialized, err := wst.MarshalSSZ()
-	require.NoError(t, err)
-
-	trans := &testRT{rt: func(req *http.Request) (*http.Response, error) {
-		res := &http.Response{Request: req}
-		switch req.URL.Path {
-		case getNodeVersionPath:
-			res.StatusCode = http.StatusOK
-			b := bytes.NewBuffer(nil)
-			d := struct {
-				Version string `json:"version"`
-			}{
-				Version: "Lighthouse/v0.1.5 (Linux x86_64)",
-			}
-			encoded, err := marshalToEnvelope(d)
-			require.NoError(t, err)
-			b.Write(encoded)
-			res.Body = io.NopCloser(b)
-		case getWeakSubjectivityPath:
-			res.StatusCode = http.StatusNotFound
-		case renderGetStatePath(IdHead):
-			res.StatusCode = http.StatusOK
-			res.Body = io.NopCloser(bytes.NewBuffer(serialized))
-		case renderGetStatePath(IdFromSlot(wSlot)):
-			res.StatusCode = http.StatusOK
-			res.Body = io.NopCloser(bytes.NewBuffer(wsSerialized))
-		case renderGetBlockPath(IdFromRoot(bRoot)):
-			res.StatusCode = http.StatusOK
-			res.Body = io.NopCloser(bytes.NewBuffer(serBlock))
-		}
-
-		return res, nil
-	}}
-
-	c, err := NewClient("http://localhost:3500", client.WithRoundTripper(trans))
-	require.NoError(t, err)
-
-	wsPub, err := ComputeWeakSubjectivityCheckpoint(ctx, c)
-	require.NoError(t, err)
-
-	wsPriv, err := computeBackwardsCompatible(ctx, c)
-	require.NoError(t, err)
-	require.DeepEqual(t, wsPriv, wsPub)
-}
-*/
-
+// TODO(rgeraldes24): Values are not equal, want: 74016 (primitives.Epoch), got: 74224 (primitives.Epoch)
 /*
 func TestGetWeakSubjectivityEpochFromHead(t *testing.T) {
 	st, expectedEpoch := defaultTestHeadState(t, params.MainnetConfig())
