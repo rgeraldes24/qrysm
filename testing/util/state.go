@@ -117,9 +117,9 @@ func NewBeaconState(options ...NewBeaconStateOption) (state.BeaconState, error) 
 
 // NewBeaconStateAltair creates a beacon state with minimum marshalable fields.
 func NewBeaconStateAltair(options ...func(state *zondpb.BeaconStateAltair) error) (state.BeaconState, error) {
-	pubkeys := make([][]byte, 512)
+	pubkeys := make([][]byte, 16)
 	for i := range pubkeys {
-		pubkeys[i] = make([]byte, 48)
+		pubkeys[i] = make([]byte, 2592)
 	}
 
 	seed := &zondpb.BeaconStateAltair{
@@ -170,9 +170,9 @@ func NewBeaconStateAltair(options ...func(state *zondpb.BeaconStateAltair) error
 
 // NewBeaconStateBellatrix creates a beacon state with minimum marshalable fields.
 func NewBeaconStateBellatrix(options ...func(state *zondpb.BeaconStateBellatrix) error) (state.BeaconState, error) {
-	pubkeys := make([][]byte, 512)
+	pubkeys := make([][]byte, 16)
 	for i := range pubkeys {
-		pubkeys[i] = make([]byte, 48)
+		pubkeys[i] = make([]byte, 2592)
 	}
 
 	seed := &zondpb.BeaconStateBellatrix{
