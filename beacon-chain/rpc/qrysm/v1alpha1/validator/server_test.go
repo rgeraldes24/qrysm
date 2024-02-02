@@ -310,6 +310,7 @@ func TestWaitForChainStart_NotStartedThenLogFired(t *testing.T) {
 	require.LogsContain(t, hook, "Sending genesis time")
 }
 
+// TODO(rgeraldes24)
 /*
 func TestServer_DomainData_Exits(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

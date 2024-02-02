@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"google.golang.org/grpc"
-
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
@@ -16,6 +14,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	"google.golang.org/grpc"
 )
 
 func TestServer_GetBlindedBlock(t *testing.T) {

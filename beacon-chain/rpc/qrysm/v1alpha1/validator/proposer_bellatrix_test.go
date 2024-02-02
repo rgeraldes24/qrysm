@@ -499,6 +499,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 	}
 }
 
+// TODO(rgeraldes24)
 /*
 func TestServer_validateBuilderSignature(t *testing.T) {
 	sk, err := dilithium.RandKey()

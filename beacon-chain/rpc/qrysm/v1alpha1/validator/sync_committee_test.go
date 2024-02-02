@@ -62,6 +62,7 @@ func TestGetSyncMessageBlockRoot_Optimistic(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// TODO(rgeraldes24)
 /*
 func TestSubmitSyncMessage_OK(t *testing.T) {
 	st, _ := util.DeterministicGenesisStateAltair(t, 10)
