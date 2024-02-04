@@ -57,6 +57,8 @@ const (
 // ComputeDomainAndSign computes the domain and signing root and sign it using the passed in private key.
 func ComputeDomainAndSign(st state.ReadOnlyBeaconState, epoch primitives.Epoch, obj fssz.HashRoot, domain [4]byte, key dilithium.DilithiumKey) ([]byte, error) {
 	fork := st.Fork()
+
+	// NOTE(rgeraldes24): important for a future fork
 	// EIP-7044: Beginning in Deneb, fix the fork version to Capella for signed exits.
 	// This allows for signed validator exits to be valid forever.
 	/*
