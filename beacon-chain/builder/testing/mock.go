@@ -62,7 +62,7 @@ func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, b interfaces.
 
 // GetHeader for mocking.
 func (s *MockBuilderService) GetHeader(_ context.Context, slot primitives.Slot, _ [32]byte, _ [dilithium2.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
-	// TODO(rgeraldes24)
+	// TODO(rgeraldes24): come back to this one once we cover the beacon chain unit tests
 	/*
 		w, err := builder.WrappedSignedBuilderBid(s.Bid)
 		if err != nil {
