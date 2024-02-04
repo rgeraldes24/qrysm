@@ -4,7 +4,7 @@
 PRESET_BASE: 'minimal'
 
 
-# TODO(rgeraldes24): remove
+# TODO(rgeraldes24): remove once we remove the old ethereum transition flow
 # Transition
 # ---------------------------------------------------------------
 # TBD, 2**256-2**10 is a placeholder, e2e is 480
@@ -25,7 +25,7 @@ GENESIS_FORK_VERSION: 0x000000fd
 # [customized] Faster to spin up testnets, but does not give validator reasonable warning time for genesis
 GENESIS_DELAY: 10 # Override for e2e tests
 
-# TODO(rgeraldes24): remove
+# TODO(rgeraldes24): remove once we remove the forks before Capella
 # Forking
 # ---------------------------------------------------------------
 # Values provided for illustrative purposes.
