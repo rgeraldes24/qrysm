@@ -125,7 +125,9 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 			Epoch:  20000,
 		},
 		ShanghaiTime: shanghaiTime,
-		CancunTime:   nil,
+		// NOTE(rgeraldes24): setting value to nil since we are not going to transition to Deneb
+		// and eventually we will review go-zond to discard this fork and review other forks.
+		CancunTime: nil,
 	}
 	da := defaultDepositContractAllocation(cfg.DepositContractAddress)
 	ma := minerAllocation()
