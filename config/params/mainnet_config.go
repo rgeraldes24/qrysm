@@ -20,8 +20,8 @@ func MainnetConfig() *BeaconChainConfig {
 const (
 	// Genesis Fork Epoch for the mainnet config.
 	genesisForkEpoch = 0
+	// TODO(rgeraldes24): remove once we remove the forks before Capella
 	// Altair Fork Epoch for mainnet config.
-	// TODO(rgeraldes24): remove
 	mainnetAltairForkEpoch = 74240 // Oct 27, 2021, 10:56:23am UTC
 	// Bellatrix Fork Epoch for mainnet config.
 	mainnetBellatrixForkEpoch = 144896 // Sept 6, 2022, 11:34:47am UTC
