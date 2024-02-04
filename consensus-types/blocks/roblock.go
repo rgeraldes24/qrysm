@@ -74,6 +74,8 @@ func (s ROBlockSlice) Len() int {
 	return len(s)
 }
 
+// TODO(rgeraldes24): remove this type and replace it with ROBlock everywhere
+// since we don't support data blobs anymore
 type BlockWithVerifiedBlobs struct {
 	Block ROBlock
 }
