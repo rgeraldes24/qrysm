@@ -499,7 +499,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24)
+// TODO(rgeraldes24): re-enable once we cover the beacon-chain unit tests
 /*
 func TestServer_validateBuilderSignature(t *testing.T) {
 	sk, err := dilithium.RandKey()
