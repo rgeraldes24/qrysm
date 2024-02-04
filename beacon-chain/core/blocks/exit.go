@@ -116,10 +116,10 @@ func VerifyExitAndSignature(
 	fork := state.Fork()
 	genesisRoot := state.GenesisValidatorsRoot()
 
+	// NOTE(rgeraldes24): important for a future fork
 	/*
 		// EIP-7044: Beginning in Deneb, fix the fork version to Capella.
 		// This allows for signed validator exits to be valid forever.
-		// TODO(rgeraldes24)
 		if state.Version() >= version.Deneb {
 			fork = &zondpb.Fork{
 				PreviousVersion: params.BeaconConfig().CapellaForkVersion,
