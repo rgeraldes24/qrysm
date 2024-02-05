@@ -31,7 +31,7 @@ go_test(
     embed = [":go_default_library"],
     deps = [
         "//config/params:go_default_library",
-        "//crypto/bls:go_default_library",
+        "//crypto/dilithium:go_default_library",
         "//testing/assert:go_default_library",
         "//testing/require:go_default_library",
         "//validator/keymanager:go_default_library",

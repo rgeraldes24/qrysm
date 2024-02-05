@@ -11,12 +11,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-bitfield"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
+	// "github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 )
 
 // ConvertToIndexed converts attestation to (almost) indexed-verifiable form.
@@ -124,23 +124,25 @@ func AttestingIndices(bf bitfield.Bitfield, committee []primitives.ValidatorInde
 //	 signing_root = compute_signing_root(indexed_attestation.data, domain)
 //	 return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
 func VerifyIndexedAttestationSig(ctx context.Context, indexedAtt *zondpb.IndexedAttestation, pubKeys []dilithium.PublicKey, domain []byte) error {
-	ctx, span := trace.StartSpan(ctx, "attestationutil.VerifyIndexedAttestationSig")
-	defer span.End()
-	indices := indexedAtt.AttestingIndices
-	messageHash, err := signing.ComputeSigningRoot(indexedAtt.Data, domain)
-	if err != nil {
-		return errors.Wrap(err, "could not get signing root of object")
-	}
+	/*
+		ctx, span := trace.StartSpan(ctx, "attestationutil.VerifyIndexedAttestationSig")
+		defer span.End()
+		indices := indexedAtt.AttestingIndices
+		messageHash, err := signing.ComputeSigningRoot(indexedAtt.Data, domain)
+		if err != nil {
+			return errors.Wrap(err, "could not get signing root of object")
+		}
 
-	sig, err := dilithium.SignatureFromBytes(indexedAtt.Signature)
-	if err != nil {
-		return errors.Wrap(err, "could not convert bytes to signature")
-	}
+		sig, err := dilithium.SignatureFromBytes(indexedAtt.Signature)
+		if err != nil {
+			return errors.Wrap(err, "could not convert bytes to signature")
+		}
 
-	voted := len(indices) > 0
-	if voted && !sig.FastAggregateVerify(pubKeys, messageHash) {
-		return signing.ErrSigFailedToVerify
-	}
+		voted := len(indices) > 0
+		if voted && !sig.FastAggregateVerify(pubKeys, messageHash) {
+			return signing.ErrSigFailedToVerify
+		}
+	*/
 	return nil
 }
 

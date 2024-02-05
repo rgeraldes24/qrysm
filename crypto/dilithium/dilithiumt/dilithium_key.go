@@ -5,7 +5,7 @@ import (
 
 	common2 "github.com/theQRL/go-qrllib/common"
 	"github.com/theQRL/go-qrllib/dilithium"
-	"github.com/theQRL/qrysm/v4/crypto/bls/common"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 )
 

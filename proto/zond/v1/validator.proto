@@ -18,7 +18,6 @@ package theqrl.zond.v1;
 import "google/protobuf/descriptor.proto";
 
 import "proto/zond/ext/options.proto";
-import "proto/zond/v1/beacon_block.proto";
 
 option csharp_namespace = "TheQRL.Zond.V1";
 option go_package = "github.com/theQRL/qrysm/v4/proto/zond/v1";
@@ -90,8 +89,4 @@ message ProduceBlockRequest {
     // 32 byte field of arbitrary data. This field may contain any data and
     // is not used for anything other than a fun message.
     optional bytes graffiti = 3 [(theqrl.zond.ext.ssz_size) = "32"];
-}
-
-message ProduceBlockResponse {
-    BeaconBlock data = 1;
 }

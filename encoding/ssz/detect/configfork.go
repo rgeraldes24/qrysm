@@ -61,12 +61,6 @@ func FromForkVersion(cv [fieldparams.VersionLength]byte) (*VersionedUnmarshaler,
 	var fork int
 	switch cv {
 	case bytesutil.ToBytes4(cfg.GenesisForkVersion):
-		fork = version.Phase0
-	case bytesutil.ToBytes4(cfg.AltairForkVersion):
-		fork = version.Altair
-	case bytesutil.ToBytes4(cfg.BellatrixForkVersion):
-		fork = version.Bellatrix
-	case bytesutil.ToBytes4(cfg.CapellaForkVersion):
 		fork = version.Capella
 	default:
 		return nil, errors.Wrapf(ErrForkNotFound, "version=%#x", cv)

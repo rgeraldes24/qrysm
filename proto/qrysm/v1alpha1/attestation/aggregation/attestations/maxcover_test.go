@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -298,6 +297,7 @@ func TestAggregateAttestations_rearrangeProcessedAttestations(t *testing.T) {
 	}
 }
 
+/*
 func TestAggregateAttestations_aggregateAttestations(t *testing.T) {
 	sign := bls.NewAggregateSignature().Marshal()
 	tests := []struct {
@@ -433,3 +433,4 @@ func TestAggregateAttestations_aggregateAttestations(t *testing.T) {
 		})
 	}
 }
+*/

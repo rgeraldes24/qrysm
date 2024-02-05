@@ -107,16 +107,6 @@ service BeaconChain {
         };
     }
 
-    // Server-side stream of all signed blocks as they are received by
-    // the beacon chain node.
-    // DEPRECATED: This endpoint is superseded by the /zond/v1/events Beacon API endpoint
-    rpc StreamBlocks(StreamBlocksRequest) returns (stream SignedBeaconBlock) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/beacon/blocks/stream"
-        };
-    }
-
     // Server-side stream of information about the head of the beacon chain
     // from the view of the beacon chain node.
     //
@@ -401,7 +391,7 @@ message ListBeaconBlocksResponse {
 
 // A container that contains both the beacon block, its corresponding root, and
 // whether or not it is canonical in the chain. This message returns a oneof field
-// representing either a phase 0 beacon block or an Altair beacon block.
+// representing either a capella block or a capella blinded beacon block.
 message BeaconBlockContainer {
     // 32 byte merkle tree root of contained beacon block.
     bytes block_root = 1;
@@ -411,23 +401,11 @@ message BeaconBlockContainer {
 
     // The desired block to be returned.
     oneof block {
-        // Representing a phase 0 block.
-        SignedBeaconBlock phase0_block = 3;
-
-        // Representing an altair block.
-        SignedBeaconBlockAltair altair_block = 4;
-
-        // Representing a bellatrix block.
-        SignedBeaconBlockBellatrix bellatrix_block = 5;
-
-        // Representing a blinded bellatrix block.
-        SignedBlindedBeaconBlockBellatrix blinded_bellatrix_block = 6;
-
         // Representing a capella block.
-        SignedBeaconBlockCapella capella_block = 7;
+        SignedBeaconBlockCapella capella_block = 3;
 
         // Representing a blinded capella block.
-        SignedBlindedBeaconBlockCapella blinded_capella_block = 8;
+        SignedBlindedBeaconBlockCapella blinded_capella_block = 4;
     }
 }
 
@@ -672,14 +650,6 @@ message ValidatorPerformanceResponse {
     // A list of validator effective balances mapped 1-to-1 with the request's
     // public keys.
     repeated uint64 current_effective_balances = 1;
-    // The slot of when validator's attestation got included in the chain at previous epoch, the slot
-    // is mapped 1-to-1 with the request's public keys.
-    // Deprecated: This field can no longer be fetched from the beacon state after the Altair hard fork.
-    repeated uint64 inclusion_slots = 2 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot", deprecated = true];
-    // The distance of when validator submitted and got included in the chain, the distance
-    // is mapped 1-to-1 with the request's public keys.
-    // Deprecated: This field can no longer be fetched from the beacon state after the Altair hard fork.
-    repeated uint64 inclusion_distances = 3 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot", deprecated = true];
     // Whether the list of validator recently correctly voted for source at previous epoch, the result
     // is mapped 1-to-1 with the request's public keys.
     repeated bool correctly_voted_source = 4;
@@ -702,7 +672,7 @@ message ValidatorPerformanceResponse {
     float average_active_validator_balance = 10;
     // The public keys in the order they are in of the response.
     repeated bytes public_keys = 11 [(theqrl.zond.ext.ssz_size) = "?,48"];
-    // The inactivity score of the validator tracks validator participation. [New in Altair]
+    // The inactivity score of the validator tracks validator participation.
     repeated uint64 inactivity_scores = 12;
 }
 
@@ -891,11 +861,7 @@ message IndividualVotesRespond {
         bool is_previous_epoch_head_attester = 12;
         // The current effective balance of the validator.
         uint64 current_epoch_effective_balance_gwei = 13;
-        // The slots of when the validator's attestation got included in the block. Only available in phase0.
-        uint64 inclusion_slot = 14 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot", deprecated = true];
-        // How many slots have passed until the validator's attestation got included in the block. Only available in phase0.
-        uint64 inclusion_distance = 15 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot", deprecated = true];
-        // The inactivity score of the validator tracks validator participation. [New in Altair]
+        // The inactivity score of the validator tracks validator participation.
         uint64 inactivity_score = 16;
     }
 

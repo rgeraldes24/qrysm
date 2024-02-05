@@ -11,7 +11,6 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	zondtypes "github.com/theQRL/go-zond/core/types"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -29,14 +28,14 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 	t.Run("payload attributes", func(t *testing.T) {
 		random := bytesutil.PadTo([]byte("random"), fieldparams.RootLength)
 		feeRecipient := bytesutil.PadTo([]byte("feeRecipient"), fieldparams.FeeRecipientLength)
-		jsonPayload := &enginev1.PayloadAttributes{
+		jsonPayload := &enginev1.PayloadAttributesV2{
 			Timestamp:             1,
 			PrevRandao:            random,
 			SuggestedFeeRecipient: feeRecipient,
 		}
 		enc, err := json.Marshal(jsonPayload)
 		require.NoError(t, err)
-		payloadPb := &enginev1.PayloadAttributes{}
+		payloadPb := &enginev1.PayloadAttributesV2{}
 		require.NoError(t, json.Unmarshal(enc, payloadPb))
 		require.DeepEqual(t, uint64(1), payloadPb.Timestamp)
 		require.DeepEqual(t, random, payloadPb.PrevRandao)
@@ -76,11 +75,8 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 	})
 	t.Run("transition configuration", func(t *testing.T) {
 		blockHash := [32]byte{'h', 'e', 'a', 'd'}
-		bInt := new(big.Int)
-		_, ok := bInt.SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
-		require.Equal(t, true, ok)
 		ttdNum := new(uint256.Int)
-		ttdNum.SetFromBig(bInt)
+		ttdNum.SetFromBig(big.NewInt(0))
 		jsonPayload := &enginev1.TransitionConfiguration{
 			TerminalBlockHash:       blockHash[:],
 			TerminalTotalDifficulty: ttdNum.Hex(),
@@ -94,51 +90,6 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 
 		require.DeepEqual(t, ttdNum.Hex(), payloadPb.TerminalTotalDifficulty)
 		require.DeepEqual(t, big.NewInt(0).Bytes(), payloadPb.TerminalBlockNumber)
-	})
-	t.Run("execution payload", func(t *testing.T) {
-		baseFeePerGas := big.NewInt(1770307273)
-		parentHash := bytesutil.PadTo([]byte("parent"), fieldparams.RootLength)
-		feeRecipient := bytesutil.PadTo([]byte("feeRecipient"), fieldparams.FeeRecipientLength)
-		stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
-		receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
-		logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-		random := bytesutil.PadTo([]byte("random"), fieldparams.RootLength)
-		extra := bytesutil.PadTo([]byte("extraData"), fieldparams.RootLength)
-		hash := bytesutil.PadTo([]byte("hash"), fieldparams.RootLength)
-		jsonPayload := &enginev1.ExecutionPayload{
-			ParentHash:    parentHash,
-			FeeRecipient:  feeRecipient,
-			StateRoot:     stateRoot,
-			ReceiptsRoot:  receiptsRoot,
-			LogsBloom:     logsBloom,
-			PrevRandao:    random,
-			BlockNumber:   1,
-			GasLimit:      2,
-			GasUsed:       3,
-			Timestamp:     4,
-			ExtraData:     extra,
-			BaseFeePerGas: baseFeePerGas.Bytes(),
-			BlockHash:     hash,
-			Transactions:  [][]byte{[]byte("hi")},
-		}
-		enc, err := json.Marshal(jsonPayload)
-		require.NoError(t, err)
-		payloadPb := &enginev1.ExecutionPayload{}
-		require.NoError(t, json.Unmarshal(enc, payloadPb))
-		require.DeepEqual(t, parentHash, payloadPb.ParentHash)
-		require.DeepEqual(t, feeRecipient, payloadPb.FeeRecipient)
-		require.DeepEqual(t, stateRoot, payloadPb.StateRoot)
-		require.DeepEqual(t, receiptsRoot, payloadPb.ReceiptsRoot)
-		require.DeepEqual(t, logsBloom, payloadPb.LogsBloom)
-		require.DeepEqual(t, random, payloadPb.PrevRandao)
-		require.DeepEqual(t, uint64(1), payloadPb.BlockNumber)
-		require.DeepEqual(t, uint64(2), payloadPb.GasLimit)
-		require.DeepEqual(t, uint64(3), payloadPb.GasUsed)
-		require.DeepEqual(t, uint64(4), payloadPb.Timestamp)
-		require.DeepEqual(t, extra, payloadPb.ExtraData)
-		require.DeepEqual(t, bytesutil.PadTo(baseFeePerGas.Bytes(), fieldparams.RootLength), payloadPb.BaseFeePerGas)
-		require.DeepEqual(t, hash, payloadPb.BlockHash)
-		require.DeepEqual(t, [][]byte{[]byte("hi")}, payloadPb.Transactions)
 	})
 	t.Run("execution payload Capella", func(t *testing.T) {
 		parentHash := common.BytesToHash([]byte("parent"))
@@ -345,14 +296,22 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		payloadItems := make(map[string]interface{})
 		require.NoError(t, json.Unmarshal(enc, &payloadItems))
 
-		tx := zondtypes.NewTransaction(
-			1,
-			common.BytesToAddress([]byte("hi")),
-			big.NewInt(0),
-			21000,
-			big.NewInt(1e6),
-			[]byte{},
-		)
+		// TODO(rgeraldes24)
+		// tx := zondtypes.NewTransaction(
+		// 	1,
+		// 	common.BytesToAddress([]byte("hi")),
+		// 	big.NewInt(0),
+		// 	21000,
+		// 	big.NewInt(1e6),
+		// 	[]byte{},
+		// )
+		toAddr := common.BytesToAddress([]byte("hi"))
+		tx := zondtypes.NewTx(&zondtypes.DynamicFeeTx{
+			Nonce: 1,
+			To:    &toAddr,
+			Value: big.NewInt(0),
+			Data:  []byte{},
+		})
 		txs := []*zondtypes.Transaction{tx}
 
 		blockHash := want.Hash()

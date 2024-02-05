@@ -21,8 +21,6 @@ type fields struct {
 	attesterSlashings           []*zond.AttesterSlashing
 	voluntaryExits              []*zond.SignedVoluntaryExit
 	syncAggregate               *zond.SyncAggregate
-	execPayload                 *enginev1.ExecutionPayload
-	execPayloadHeader           *enginev1.ExecutionPayloadHeader
 	execPayloadCapella          *enginev1.ExecutionPayloadCapella
 	execPayloadHeaderCapella    *enginev1.ExecutionPayloadHeaderCapella
 	dilithiumToExecutionChanges []*zond.SignedDilithiumToExecutionChange
@@ -511,42 +509,6 @@ func getFields() fields {
 		SyncCommitteeBits:      syncCommitteeBits,
 		SyncCommitteeSignature: sig[:],
 	}
-	execPayload := &enginev1.ExecutionPayload{
-		ParentHash:    root[:],
-		FeeRecipient:  b20,
-		StateRoot:     root[:],
-		ReceiptsRoot:  root[:],
-		LogsBloom:     b256,
-		PrevRandao:    root[:],
-		BlockNumber:   128,
-		GasLimit:      128,
-		GasUsed:       128,
-		Timestamp:     128,
-		ExtraData:     root[:],
-		BaseFeePerGas: root[:],
-		BlockHash:     root[:],
-		Transactions: [][]byte{
-			[]byte("transaction1"),
-			[]byte("transaction2"),
-			[]byte("transaction8"),
-		},
-	}
-	execPayloadHeader := &enginev1.ExecutionPayloadHeader{
-		ParentHash:       root[:],
-		FeeRecipient:     b20,
-		StateRoot:        root[:],
-		ReceiptsRoot:     root[:],
-		LogsBloom:        b256,
-		PrevRandao:       root[:],
-		BlockNumber:      128,
-		GasLimit:         128,
-		GasUsed:          128,
-		Timestamp:        128,
-		ExtraData:        root[:],
-		BaseFeePerGas:    root[:],
-		BlockHash:        root[:],
-		TransactionsRoot: root[:],
-	}
 	execPayloadCapella := &enginev1.ExecutionPayloadCapella{
 		ParentHash:    root[:],
 		FeeRecipient:  b20,
@@ -609,8 +571,6 @@ func getFields() fields {
 		attesterSlashings:           []*zond.AttesterSlashing{attesterSlashing},
 		voluntaryExits:              []*zond.SignedVoluntaryExit{voluntaryExit},
 		syncAggregate:               syncAggregate,
-		execPayload:                 execPayload,
-		execPayloadHeader:           execPayloadHeader,
 		execPayloadCapella:          execPayloadCapella,
 		execPayloadHeaderCapella:    execPayloadHeaderCapella,
 		dilithiumToExecutionChanges: dilithiumToExecutionChanges,

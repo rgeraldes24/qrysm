@@ -16,7 +16,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	attv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
@@ -49,7 +49,7 @@ func NewAttestation() *zondpb.Attestation {
 //
 // If you request 4 attestations, but there are 8 committees, you will get 4 fully aggregated attestations.
 func GenerateAttestations(
-	bState state.BeaconState, privs []bls.SecretKey, numToGen uint64, slot primitives.Slot, randomRoot bool,
+	bState state.BeaconState, privs []dilithium.DilithiumKey, numToGen uint64, slot primitives.Slot, randomRoot bool,
 ) ([]*zondpb.Attestation, error) {
 	var attestations []*zondpb.Attestation
 	generateHeadState := false
@@ -200,7 +200,7 @@ func GenerateAttestations(
 		bitsPerAtt := committeeSize / uint64(attsPerCommittee)
 		for i := uint64(0); i < committeeSize; i += bitsPerAtt {
 			aggregationBits := bitfield.NewBitlist(committeeSize)
-			var sigs []bls.Signature
+			var sigs []dilithium.Signature
 			for b := i; b < i+bitsPerAtt; b++ {
 				aggregationBits.SetBitAt(b, true)
 				sigs = append(sigs, privs[committee[b]].Sign(dataRoot[:]))
@@ -214,7 +214,8 @@ func GenerateAttestations(
 			att := &zondpb.Attestation{
 				Data:            attData,
 				AggregationBits: aggregationBits,
-				Signature:       bls.AggregateSignatures(sigs).Marshal(),
+				// TODO(rgeraldes24)
+				// Signature:       bls.AggregateSignatures(sigs).Marshal(),
 			}
 			attestations = append(attestations, att)
 		}

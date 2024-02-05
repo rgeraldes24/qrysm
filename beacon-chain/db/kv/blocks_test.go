@@ -25,50 +25,6 @@ var blockTests = []struct {
 	newBlock func(primitives.Slot, []byte) (interfaces.ReadOnlySignedBeaconBlock, error)
 }{
 	{
-		name: "phase0",
-		newBlock: func(slot primitives.Slot, root []byte) (interfaces.ReadOnlySignedBeaconBlock, error) {
-			b := util.NewBeaconBlock()
-			b.Block.Slot = slot
-			if root != nil {
-				b.Block.ParentRoot = root
-			}
-			return blocks.NewSignedBeaconBlock(b)
-		},
-	},
-	{
-		name: "altair",
-		newBlock: func(slot primitives.Slot, root []byte) (interfaces.ReadOnlySignedBeaconBlock, error) {
-			b := util.NewBeaconBlockAltair()
-			b.Block.Slot = slot
-			if root != nil {
-				b.Block.ParentRoot = root
-			}
-			return blocks.NewSignedBeaconBlock(b)
-		},
-	},
-	{
-		name: "bellatrix",
-		newBlock: func(slot primitives.Slot, root []byte) (interfaces.ReadOnlySignedBeaconBlock, error) {
-			b := util.NewBeaconBlockBellatrix()
-			b.Block.Slot = slot
-			if root != nil {
-				b.Block.ParentRoot = root
-			}
-			return blocks.NewSignedBeaconBlock(b)
-		},
-	},
-	{
-		name: "bellatrix blind",
-		newBlock: func(slot primitives.Slot, root []byte) (interfaces.ReadOnlySignedBeaconBlock, error) {
-			b := util.NewBlindedBeaconBlockBellatrix()
-			b.Block.Slot = slot
-			if root != nil {
-				b.Block.ParentRoot = root
-			}
-			return blocks.NewSignedBeaconBlock(b)
-		},
-	},
-	{
 		name: "capella",
 		newBlock: func(slot primitives.Slot, root []byte) (interfaces.ReadOnlySignedBeaconBlock, error) {
 			b := util.NewBeaconBlockCapella()

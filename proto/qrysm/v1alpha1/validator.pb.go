@@ -316,9 +316,6 @@ type StreamBlocksResponse struct {
 
 	// Types that are assignable to Block:
 	//
-	//	*StreamBlocksResponse_Phase0Block
-	//	*StreamBlocksResponse_AltairBlock
-	//	*StreamBlocksResponse_BellatrixBlock
 	//	*StreamBlocksResponse_CapellaBlock
 	Block isStreamBlocksResponse_Block `protobuf_oneof:"block"`
 }
@@ -362,27 +359,6 @@ func (m *StreamBlocksResponse) GetBlock() isStreamBlocksResponse_Block {
 	return nil
 }
 
-func (x *StreamBlocksResponse) GetPhase0Block() *SignedBeaconBlock {
-	if x, ok := x.GetBlock().(*StreamBlocksResponse_Phase0Block); ok {
-		return x.Phase0Block
-	}
-	return nil
-}
-
-func (x *StreamBlocksResponse) GetAltairBlock() *SignedBeaconBlockAltair {
-	if x, ok := x.GetBlock().(*StreamBlocksResponse_AltairBlock); ok {
-		return x.AltairBlock
-	}
-	return nil
-}
-
-func (x *StreamBlocksResponse) GetBellatrixBlock() *SignedBeaconBlockBellatrix {
-	if x, ok := x.GetBlock().(*StreamBlocksResponse_BellatrixBlock); ok {
-		return x.BellatrixBlock
-	}
-	return nil
-}
-
 func (x *StreamBlocksResponse) GetCapellaBlock() *SignedBeaconBlockCapella {
 	if x, ok := x.GetBlock().(*StreamBlocksResponse_CapellaBlock); ok {
 		return x.CapellaBlock
@@ -394,27 +370,9 @@ type isStreamBlocksResponse_Block interface {
 	isStreamBlocksResponse_Block()
 }
 
-type StreamBlocksResponse_Phase0Block struct {
-	Phase0Block *SignedBeaconBlock `protobuf:"bytes,1,opt,name=phase0_block,json=phase0Block,proto3,oneof"`
-}
-
-type StreamBlocksResponse_AltairBlock struct {
-	AltairBlock *SignedBeaconBlockAltair `protobuf:"bytes,2,opt,name=altair_block,json=altairBlock,proto3,oneof"`
-}
-
-type StreamBlocksResponse_BellatrixBlock struct {
-	BellatrixBlock *SignedBeaconBlockBellatrix `protobuf:"bytes,3,opt,name=bellatrix_block,json=bellatrixBlock,proto3,oneof"`
-}
-
 type StreamBlocksResponse_CapellaBlock struct {
-	CapellaBlock *SignedBeaconBlockCapella `protobuf:"bytes,4,opt,name=capella_block,json=capellaBlock,proto3,oneof"`
+	CapellaBlock *SignedBeaconBlockCapella `protobuf:"bytes,1,opt,name=capella_block,json=capellaBlock,proto3,oneof"`
 }
-
-func (*StreamBlocksResponse_Phase0Block) isStreamBlocksResponse_Block() {}
-
-func (*StreamBlocksResponse_AltairBlock) isStreamBlocksResponse_Block() {}
-
-func (*StreamBlocksResponse_BellatrixBlock) isStreamBlocksResponse_Block() {}
 
 func (*StreamBlocksResponse_CapellaBlock) isStreamBlocksResponse_Block() {}
 
@@ -2912,26 +2870,10 @@ var file_proto_qrysm_v1alpha1_validator_proto_rawDesc = []byte{
 	0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x34, 0x2f, 0x63, 0x6f, 0x6e, 0x73, 0x65, 0x6e, 0x73, 0x75,
 	0x73, 0x2d, 0x74, 0x79, 0x70, 0x65, 0x73, 0x2f, 0x70, 0x72, 0x69, 0x6d, 0x69, 0x74, 0x69, 0x76,
 	0x65, 0x73, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x74, 0x65, 0x65, 0x49, 0x6e, 0x64, 0x65,
-	0x78, 0x52, 0x07, 0x69, 0x6e, 0x64, 0x69, 0x63, 0x65, 0x73, 0x22, 0xf9, 0x02, 0x0a, 0x14, 0x53,
-	0x74, 0x72, 0x65, 0x61, 0x6d, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x12, 0x4c, 0x0a, 0x0c, 0x70, 0x68, 0x61, 0x73, 0x65, 0x30, 0x5f, 0x62, 0x6c,
-	0x6f, 0x63, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x74, 0x68, 0x65, 0x71,
-	0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31,
-	0x2e, 0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x42, 0x6c, 0x6f,
-	0x63, 0x6b, 0x48, 0x00, 0x52, 0x0b, 0x70, 0x68, 0x61, 0x73, 0x65, 0x30, 0x42, 0x6c, 0x6f, 0x63,
-	0x6b, 0x12, 0x52, 0x0a, 0x0c, 0x61, 0x6c, 0x74, 0x61, 0x69, 0x72, 0x5f, 0x62, 0x6c, 0x6f, 0x63,
-	0x6b, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2d, 0x2e, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c,
-	0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2e, 0x53,
-	0x69, 0x67, 0x6e, 0x65, 0x64, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x42, 0x6c, 0x6f, 0x63, 0x6b,
-	0x41, 0x6c, 0x74, 0x61, 0x69, 0x72, 0x48, 0x00, 0x52, 0x0b, 0x61, 0x6c, 0x74, 0x61, 0x69, 0x72,
-	0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x12, 0x5b, 0x0a, 0x0f, 0x62, 0x65, 0x6c, 0x6c, 0x61, 0x74, 0x72,
-	0x69, 0x78, 0x5f, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x30,
-	0x2e, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61,
-	0x6c, 0x70, 0x68, 0x61, 0x31, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x42, 0x65, 0x61, 0x63,
-	0x6f, 0x6e, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x42, 0x65, 0x6c, 0x6c, 0x61, 0x74, 0x72, 0x69, 0x78,
-	0x48, 0x00, 0x52, 0x0e, 0x62, 0x65, 0x6c, 0x6c, 0x61, 0x74, 0x72, 0x69, 0x78, 0x42, 0x6c, 0x6f,
-	0x63, 0x6b, 0x12, 0x55, 0x0a, 0x0d, 0x63, 0x61, 0x70, 0x65, 0x6c, 0x6c, 0x61, 0x5f, 0x62, 0x6c,
-	0x6f, 0x63, 0x6b, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2e, 0x2e, 0x74, 0x68, 0x65, 0x71,
+	0x78, 0x52, 0x07, 0x69, 0x6e, 0x64, 0x69, 0x63, 0x65, 0x73, 0x22, 0x7a, 0x0a, 0x14, 0x53, 0x74,
+	0x72, 0x65, 0x61, 0x6d, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x55, 0x0a, 0x0d, 0x63, 0x61, 0x70, 0x65, 0x6c, 0x6c, 0x61, 0x5f, 0x62, 0x6c,
+	0x6f, 0x63, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2e, 0x2e, 0x74, 0x68, 0x65, 0x71,
 	0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31,
 	0x2e, 0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x42, 0x65, 0x61, 0x63, 0x6f, 0x6e, 0x42, 0x6c, 0x6f,
 	0x63, 0x6b, 0x43, 0x61, 0x70, 0x65, 0x6c, 0x6c, 0x61, 0x48, 0x00, 0x52, 0x0c, 0x63, 0x61, 0x70,
@@ -3805,105 +3747,99 @@ var file_proto_qrysm_v1alpha1_validator_proto_goTypes = []interface{}{
 	(*DoppelGangerRequest_ValidatorRequest)(nil),               // 44: theqrl.zond.v1alpha1.DoppelGangerRequest.ValidatorRequest
 	(*DoppelGangerResponse_ValidatorResponse)(nil),             // 45: theqrl.zond.v1alpha1.DoppelGangerResponse.ValidatorResponse
 	(*PrepareBeaconProposerRequest_FeeRecipientContainer)(nil), // 46: theqrl.zond.v1alpha1.PrepareBeaconProposerRequest.FeeRecipientContainer
-	(*SignedBeaconBlock)(nil),                                  // 47: theqrl.zond.v1alpha1.SignedBeaconBlock
-	(*SignedBeaconBlockAltair)(nil),                            // 48: theqrl.zond.v1alpha1.SignedBeaconBlockAltair
-	(*SignedBeaconBlockBellatrix)(nil),                         // 49: theqrl.zond.v1alpha1.SignedBeaconBlockBellatrix
-	(*SignedBeaconBlockCapella)(nil),                           // 50: theqrl.zond.v1alpha1.SignedBeaconBlockCapella
-	(*AggregateAttestationAndProof)(nil),                       // 51: theqrl.zond.v1alpha1.AggregateAttestationAndProof
-	(*SignedAggregateAttestationAndProof)(nil),                 // 52: theqrl.zond.v1alpha1.SignedAggregateAttestationAndProof
-	(*SyncCommitteeMessage)(nil),                               // 53: theqrl.zond.v1alpha1.SyncCommitteeMessage
-	(*empty.Empty)(nil),                                        // 54: google.protobuf.Empty
-	(*GenericSignedBeaconBlock)(nil),                           // 55: theqrl.zond.v1alpha1.GenericSignedBeaconBlock
-	(*Attestation)(nil),                                        // 56: theqrl.zond.v1alpha1.Attestation
-	(*SignedVoluntaryExit)(nil),                                // 57: theqrl.zond.v1alpha1.SignedVoluntaryExit
-	(*SignedContributionAndProof)(nil),                         // 58: theqrl.zond.v1alpha1.SignedContributionAndProof
-	(*SignedValidatorRegistrationsV1)(nil),                     // 59: theqrl.zond.v1alpha1.SignedValidatorRegistrationsV1
-	(*GenericBeaconBlock)(nil),                                 // 60: theqrl.zond.v1alpha1.GenericBeaconBlock
-	(*AttestationData)(nil),                                    // 61: theqrl.zond.v1alpha1.AttestationData
-	(*SyncCommitteeContribution)(nil),                          // 62: theqrl.zond.v1alpha1.SyncCommitteeContribution
+	(*SignedBeaconBlockCapella)(nil),                           // 47: theqrl.zond.v1alpha1.SignedBeaconBlockCapella
+	(*AggregateAttestationAndProof)(nil),                       // 48: theqrl.zond.v1alpha1.AggregateAttestationAndProof
+	(*SignedAggregateAttestationAndProof)(nil),                 // 49: theqrl.zond.v1alpha1.SignedAggregateAttestationAndProof
+	(*SyncCommitteeMessage)(nil),                               // 50: theqrl.zond.v1alpha1.SyncCommitteeMessage
+	(*empty.Empty)(nil),                                        // 51: google.protobuf.Empty
+	(*GenericSignedBeaconBlock)(nil),                           // 52: theqrl.zond.v1alpha1.GenericSignedBeaconBlock
+	(*Attestation)(nil),                                        // 53: theqrl.zond.v1alpha1.Attestation
+	(*SignedVoluntaryExit)(nil),                                // 54: theqrl.zond.v1alpha1.SignedVoluntaryExit
+	(*SignedContributionAndProof)(nil),                         // 55: theqrl.zond.v1alpha1.SignedContributionAndProof
+	(*SignedValidatorRegistrationsV1)(nil),                     // 56: theqrl.zond.v1alpha1.SignedValidatorRegistrationsV1
+	(*GenericBeaconBlock)(nil),                                 // 57: theqrl.zond.v1alpha1.GenericBeaconBlock
+	(*AttestationData)(nil),                                    // 58: theqrl.zond.v1alpha1.AttestationData
+	(*SyncCommitteeContribution)(nil),                          // 59: theqrl.zond.v1alpha1.SyncCommitteeContribution
 }
 var file_proto_qrysm_v1alpha1_validator_proto_depIdxs = []int32{
-	47, // 0: theqrl.zond.v1alpha1.StreamBlocksResponse.phase0_block:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlock
-	48, // 1: theqrl.zond.v1alpha1.StreamBlocksResponse.altair_block:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlockAltair
-	49, // 2: theqrl.zond.v1alpha1.StreamBlocksResponse.bellatrix_block:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlockBellatrix
-	50, // 3: theqrl.zond.v1alpha1.StreamBlocksResponse.capella_block:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlockCapella
-	42, // 4: theqrl.zond.v1alpha1.ValidatorActivationResponse.statuses:type_name -> theqrl.zond.v1alpha1.ValidatorActivationResponse.Status
-	0,  // 5: theqrl.zond.v1alpha1.ValidatorStatusResponse.status:type_name -> theqrl.zond.v1alpha1.ValidatorStatus
-	15, // 6: theqrl.zond.v1alpha1.MultipleValidatorStatusResponse.statuses:type_name -> theqrl.zond.v1alpha1.ValidatorStatusResponse
-	43, // 7: theqrl.zond.v1alpha1.DutiesResponse.duties:type_name -> theqrl.zond.v1alpha1.DutiesResponse.Duty
-	43, // 8: theqrl.zond.v1alpha1.DutiesResponse.current_epoch_duties:type_name -> theqrl.zond.v1alpha1.DutiesResponse.Duty
-	43, // 9: theqrl.zond.v1alpha1.DutiesResponse.next_epoch_duties:type_name -> theqrl.zond.v1alpha1.DutiesResponse.Duty
-	51, // 10: theqrl.zond.v1alpha1.AggregateSelectionResponse.aggregate_and_proof:type_name -> theqrl.zond.v1alpha1.AggregateAttestationAndProof
-	52, // 11: theqrl.zond.v1alpha1.SignedAggregateSubmitRequest.signed_aggregate_and_proof:type_name -> theqrl.zond.v1alpha1.SignedAggregateAttestationAndProof
-	0,  // 12: theqrl.zond.v1alpha1.ValidatorInfo.status:type_name -> theqrl.zond.v1alpha1.ValidatorStatus
-	44, // 13: theqrl.zond.v1alpha1.DoppelGangerRequest.validator_requests:type_name -> theqrl.zond.v1alpha1.DoppelGangerRequest.ValidatorRequest
-	45, // 14: theqrl.zond.v1alpha1.DoppelGangerResponse.responses:type_name -> theqrl.zond.v1alpha1.DoppelGangerResponse.ValidatorResponse
-	46, // 15: theqrl.zond.v1alpha1.PrepareBeaconProposerRequest.recipients:type_name -> theqrl.zond.v1alpha1.PrepareBeaconProposerRequest.FeeRecipientContainer
-	0,  // 16: theqrl.zond.v1alpha1.AssignValidatorToSubnetRequest.status:type_name -> theqrl.zond.v1alpha1.ValidatorStatus
-	53, // 17: theqrl.zond.v1alpha1.AggregatedSigAndAggregationBitsRequest.msgs:type_name -> theqrl.zond.v1alpha1.SyncCommitteeMessage
-	15, // 18: theqrl.zond.v1alpha1.ValidatorActivationResponse.Status.status:type_name -> theqrl.zond.v1alpha1.ValidatorStatusResponse
-	0,  // 19: theqrl.zond.v1alpha1.DutiesResponse.Duty.status:type_name -> theqrl.zond.v1alpha1.ValidatorStatus
-	18, // 20: theqrl.zond.v1alpha1.BeaconNodeValidator.GetDuties:input_type -> theqrl.zond.v1alpha1.DutiesRequest
-	18, // 21: theqrl.zond.v1alpha1.BeaconNodeValidator.StreamDuties:input_type -> theqrl.zond.v1alpha1.DutiesRequest
-	6,  // 22: theqrl.zond.v1alpha1.BeaconNodeValidator.DomainData:input_type -> theqrl.zond.v1alpha1.DomainRequest
-	54, // 23: theqrl.zond.v1alpha1.BeaconNodeValidator.WaitForChainStart:input_type -> google.protobuf.Empty
-	8,  // 24: theqrl.zond.v1alpha1.BeaconNodeValidator.WaitForActivation:input_type -> theqrl.zond.v1alpha1.ValidatorActivationRequest
-	12, // 25: theqrl.zond.v1alpha1.BeaconNodeValidator.ValidatorIndex:input_type -> theqrl.zond.v1alpha1.ValidatorIndexRequest
-	14, // 26: theqrl.zond.v1alpha1.BeaconNodeValidator.ValidatorStatus:input_type -> theqrl.zond.v1alpha1.ValidatorStatusRequest
-	16, // 27: theqrl.zond.v1alpha1.BeaconNodeValidator.MultipleValidatorStatus:input_type -> theqrl.zond.v1alpha1.MultipleValidatorStatusRequest
-	20, // 28: theqrl.zond.v1alpha1.BeaconNodeValidator.GetBeaconBlock:input_type -> theqrl.zond.v1alpha1.BlockRequest
-	55, // 29: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeBeaconBlock:input_type -> theqrl.zond.v1alpha1.GenericSignedBeaconBlock
-	36, // 30: theqrl.zond.v1alpha1.BeaconNodeValidator.PrepareBeaconProposer:input_type -> theqrl.zond.v1alpha1.PrepareBeaconProposerRequest
-	37, // 31: theqrl.zond.v1alpha1.BeaconNodeValidator.GetFeeRecipientByPubKey:input_type -> theqrl.zond.v1alpha1.FeeRecipientByPubKeyRequest
-	23, // 32: theqrl.zond.v1alpha1.BeaconNodeValidator.GetAttestationData:input_type -> theqrl.zond.v1alpha1.AttestationDataRequest
-	56, // 33: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeAttestation:input_type -> theqrl.zond.v1alpha1.Attestation
-	25, // 34: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitAggregateSelectionProof:input_type -> theqrl.zond.v1alpha1.AggregateSelectionRequest
-	27, // 35: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSignedAggregateSelectionProof:input_type -> theqrl.zond.v1alpha1.SignedAggregateSubmitRequest
-	57, // 36: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeExit:input_type -> theqrl.zond.v1alpha1.SignedVoluntaryExit
-	29, // 37: theqrl.zond.v1alpha1.BeaconNodeValidator.SubscribeCommitteeSubnets:input_type -> theqrl.zond.v1alpha1.CommitteeSubnetsSubscribeRequest
-	33, // 38: theqrl.zond.v1alpha1.BeaconNodeValidator.CheckDoppelGanger:input_type -> theqrl.zond.v1alpha1.DoppelGangerRequest
-	54, // 39: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncMessageBlockRoot:input_type -> google.protobuf.Empty
-	53, // 40: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSyncMessage:input_type -> theqrl.zond.v1alpha1.SyncCommitteeMessage
-	2,  // 41: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncSubcommitteeIndex:input_type -> theqrl.zond.v1alpha1.SyncSubcommitteeIndexRequest
-	3,  // 42: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncCommitteeContribution:input_type -> theqrl.zond.v1alpha1.SyncCommitteeContributionRequest
-	58, // 43: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSignedContributionAndProof:input_type -> theqrl.zond.v1alpha1.SignedContributionAndProof
-	35, // 44: theqrl.zond.v1alpha1.BeaconNodeValidator.StreamBlocksAltair:input_type -> theqrl.zond.v1alpha1.StreamBlocksRequest
-	59, // 45: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitValidatorRegistrations:input_type -> theqrl.zond.v1alpha1.SignedValidatorRegistrationsV1
-	39, // 46: theqrl.zond.v1alpha1.BeaconNodeValidator.AssignValidatorToSubnet:input_type -> theqrl.zond.v1alpha1.AssignValidatorToSubnetRequest
-	40, // 47: theqrl.zond.v1alpha1.BeaconNodeValidator.AggregatedSigAndAggregationBits:input_type -> theqrl.zond.v1alpha1.AggregatedSigAndAggregationBitsRequest
-	19, // 48: theqrl.zond.v1alpha1.BeaconNodeValidator.GetDuties:output_type -> theqrl.zond.v1alpha1.DutiesResponse
-	19, // 49: theqrl.zond.v1alpha1.BeaconNodeValidator.StreamDuties:output_type -> theqrl.zond.v1alpha1.DutiesResponse
-	7,  // 50: theqrl.zond.v1alpha1.BeaconNodeValidator.DomainData:output_type -> theqrl.zond.v1alpha1.DomainResponse
-	10, // 51: theqrl.zond.v1alpha1.BeaconNodeValidator.WaitForChainStart:output_type -> theqrl.zond.v1alpha1.ChainStartResponse
-	9,  // 52: theqrl.zond.v1alpha1.BeaconNodeValidator.WaitForActivation:output_type -> theqrl.zond.v1alpha1.ValidatorActivationResponse
-	13, // 53: theqrl.zond.v1alpha1.BeaconNodeValidator.ValidatorIndex:output_type -> theqrl.zond.v1alpha1.ValidatorIndexResponse
-	15, // 54: theqrl.zond.v1alpha1.BeaconNodeValidator.ValidatorStatus:output_type -> theqrl.zond.v1alpha1.ValidatorStatusResponse
-	17, // 55: theqrl.zond.v1alpha1.BeaconNodeValidator.MultipleValidatorStatus:output_type -> theqrl.zond.v1alpha1.MultipleValidatorStatusResponse
-	60, // 56: theqrl.zond.v1alpha1.BeaconNodeValidator.GetBeaconBlock:output_type -> theqrl.zond.v1alpha1.GenericBeaconBlock
-	21, // 57: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeBeaconBlock:output_type -> theqrl.zond.v1alpha1.ProposeResponse
-	54, // 58: theqrl.zond.v1alpha1.BeaconNodeValidator.PrepareBeaconProposer:output_type -> google.protobuf.Empty
-	38, // 59: theqrl.zond.v1alpha1.BeaconNodeValidator.GetFeeRecipientByPubKey:output_type -> theqrl.zond.v1alpha1.FeeRecipientByPubKeyResponse
-	61, // 60: theqrl.zond.v1alpha1.BeaconNodeValidator.GetAttestationData:output_type -> theqrl.zond.v1alpha1.AttestationData
-	24, // 61: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeAttestation:output_type -> theqrl.zond.v1alpha1.AttestResponse
-	26, // 62: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitAggregateSelectionProof:output_type -> theqrl.zond.v1alpha1.AggregateSelectionResponse
-	28, // 63: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSignedAggregateSelectionProof:output_type -> theqrl.zond.v1alpha1.SignedAggregateSubmitResponse
-	22, // 64: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeExit:output_type -> theqrl.zond.v1alpha1.ProposeExitResponse
-	54, // 65: theqrl.zond.v1alpha1.BeaconNodeValidator.SubscribeCommitteeSubnets:output_type -> google.protobuf.Empty
-	34, // 66: theqrl.zond.v1alpha1.BeaconNodeValidator.CheckDoppelGanger:output_type -> theqrl.zond.v1alpha1.DoppelGangerResponse
-	1,  // 67: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncMessageBlockRoot:output_type -> theqrl.zond.v1alpha1.SyncMessageBlockRootResponse
-	54, // 68: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSyncMessage:output_type -> google.protobuf.Empty
-	4,  // 69: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncSubcommitteeIndex:output_type -> theqrl.zond.v1alpha1.SyncSubcommitteeIndexResponse
-	62, // 70: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncCommitteeContribution:output_type -> theqrl.zond.v1alpha1.SyncCommitteeContribution
-	54, // 71: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSignedContributionAndProof:output_type -> google.protobuf.Empty
-	5,  // 72: theqrl.zond.v1alpha1.BeaconNodeValidator.StreamBlocksAltair:output_type -> theqrl.zond.v1alpha1.StreamBlocksResponse
-	54, // 73: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitValidatorRegistrations:output_type -> google.protobuf.Empty
-	54, // 74: theqrl.zond.v1alpha1.BeaconNodeValidator.AssignValidatorToSubnet:output_type -> google.protobuf.Empty
-	41, // 75: theqrl.zond.v1alpha1.BeaconNodeValidator.AggregatedSigAndAggregationBits:output_type -> theqrl.zond.v1alpha1.AggregatedSigAndAggregationBitsResponse
-	48, // [48:76] is the sub-list for method output_type
-	20, // [20:48] is the sub-list for method input_type
-	20, // [20:20] is the sub-list for extension type_name
-	20, // [20:20] is the sub-list for extension extendee
-	0,  // [0:20] is the sub-list for field type_name
+	47, // 0: theqrl.zond.v1alpha1.StreamBlocksResponse.capella_block:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlockCapella
+	42, // 1: theqrl.zond.v1alpha1.ValidatorActivationResponse.statuses:type_name -> theqrl.zond.v1alpha1.ValidatorActivationResponse.Status
+	0,  // 2: theqrl.zond.v1alpha1.ValidatorStatusResponse.status:type_name -> theqrl.zond.v1alpha1.ValidatorStatus
+	15, // 3: theqrl.zond.v1alpha1.MultipleValidatorStatusResponse.statuses:type_name -> theqrl.zond.v1alpha1.ValidatorStatusResponse
+	43, // 4: theqrl.zond.v1alpha1.DutiesResponse.duties:type_name -> theqrl.zond.v1alpha1.DutiesResponse.Duty
+	43, // 5: theqrl.zond.v1alpha1.DutiesResponse.current_epoch_duties:type_name -> theqrl.zond.v1alpha1.DutiesResponse.Duty
+	43, // 6: theqrl.zond.v1alpha1.DutiesResponse.next_epoch_duties:type_name -> theqrl.zond.v1alpha1.DutiesResponse.Duty
+	48, // 7: theqrl.zond.v1alpha1.AggregateSelectionResponse.aggregate_and_proof:type_name -> theqrl.zond.v1alpha1.AggregateAttestationAndProof
+	49, // 8: theqrl.zond.v1alpha1.SignedAggregateSubmitRequest.signed_aggregate_and_proof:type_name -> theqrl.zond.v1alpha1.SignedAggregateAttestationAndProof
+	0,  // 9: theqrl.zond.v1alpha1.ValidatorInfo.status:type_name -> theqrl.zond.v1alpha1.ValidatorStatus
+	44, // 10: theqrl.zond.v1alpha1.DoppelGangerRequest.validator_requests:type_name -> theqrl.zond.v1alpha1.DoppelGangerRequest.ValidatorRequest
+	45, // 11: theqrl.zond.v1alpha1.DoppelGangerResponse.responses:type_name -> theqrl.zond.v1alpha1.DoppelGangerResponse.ValidatorResponse
+	46, // 12: theqrl.zond.v1alpha1.PrepareBeaconProposerRequest.recipients:type_name -> theqrl.zond.v1alpha1.PrepareBeaconProposerRequest.FeeRecipientContainer
+	0,  // 13: theqrl.zond.v1alpha1.AssignValidatorToSubnetRequest.status:type_name -> theqrl.zond.v1alpha1.ValidatorStatus
+	50, // 14: theqrl.zond.v1alpha1.AggregatedSigAndAggregationBitsRequest.msgs:type_name -> theqrl.zond.v1alpha1.SyncCommitteeMessage
+	15, // 15: theqrl.zond.v1alpha1.ValidatorActivationResponse.Status.status:type_name -> theqrl.zond.v1alpha1.ValidatorStatusResponse
+	0,  // 16: theqrl.zond.v1alpha1.DutiesResponse.Duty.status:type_name -> theqrl.zond.v1alpha1.ValidatorStatus
+	18, // 17: theqrl.zond.v1alpha1.BeaconNodeValidator.GetDuties:input_type -> theqrl.zond.v1alpha1.DutiesRequest
+	18, // 18: theqrl.zond.v1alpha1.BeaconNodeValidator.StreamDuties:input_type -> theqrl.zond.v1alpha1.DutiesRequest
+	6,  // 19: theqrl.zond.v1alpha1.BeaconNodeValidator.DomainData:input_type -> theqrl.zond.v1alpha1.DomainRequest
+	51, // 20: theqrl.zond.v1alpha1.BeaconNodeValidator.WaitForChainStart:input_type -> google.protobuf.Empty
+	8,  // 21: theqrl.zond.v1alpha1.BeaconNodeValidator.WaitForActivation:input_type -> theqrl.zond.v1alpha1.ValidatorActivationRequest
+	12, // 22: theqrl.zond.v1alpha1.BeaconNodeValidator.ValidatorIndex:input_type -> theqrl.zond.v1alpha1.ValidatorIndexRequest
+	14, // 23: theqrl.zond.v1alpha1.BeaconNodeValidator.ValidatorStatus:input_type -> theqrl.zond.v1alpha1.ValidatorStatusRequest
+	16, // 24: theqrl.zond.v1alpha1.BeaconNodeValidator.MultipleValidatorStatus:input_type -> theqrl.zond.v1alpha1.MultipleValidatorStatusRequest
+	20, // 25: theqrl.zond.v1alpha1.BeaconNodeValidator.GetBeaconBlock:input_type -> theqrl.zond.v1alpha1.BlockRequest
+	52, // 26: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeBeaconBlock:input_type -> theqrl.zond.v1alpha1.GenericSignedBeaconBlock
+	36, // 27: theqrl.zond.v1alpha1.BeaconNodeValidator.PrepareBeaconProposer:input_type -> theqrl.zond.v1alpha1.PrepareBeaconProposerRequest
+	37, // 28: theqrl.zond.v1alpha1.BeaconNodeValidator.GetFeeRecipientByPubKey:input_type -> theqrl.zond.v1alpha1.FeeRecipientByPubKeyRequest
+	23, // 29: theqrl.zond.v1alpha1.BeaconNodeValidator.GetAttestationData:input_type -> theqrl.zond.v1alpha1.AttestationDataRequest
+	53, // 30: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeAttestation:input_type -> theqrl.zond.v1alpha1.Attestation
+	25, // 31: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitAggregateSelectionProof:input_type -> theqrl.zond.v1alpha1.AggregateSelectionRequest
+	27, // 32: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSignedAggregateSelectionProof:input_type -> theqrl.zond.v1alpha1.SignedAggregateSubmitRequest
+	54, // 33: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeExit:input_type -> theqrl.zond.v1alpha1.SignedVoluntaryExit
+	29, // 34: theqrl.zond.v1alpha1.BeaconNodeValidator.SubscribeCommitteeSubnets:input_type -> theqrl.zond.v1alpha1.CommitteeSubnetsSubscribeRequest
+	33, // 35: theqrl.zond.v1alpha1.BeaconNodeValidator.CheckDoppelGanger:input_type -> theqrl.zond.v1alpha1.DoppelGangerRequest
+	51, // 36: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncMessageBlockRoot:input_type -> google.protobuf.Empty
+	50, // 37: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSyncMessage:input_type -> theqrl.zond.v1alpha1.SyncCommitteeMessage
+	2,  // 38: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncSubcommitteeIndex:input_type -> theqrl.zond.v1alpha1.SyncSubcommitteeIndexRequest
+	3,  // 39: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncCommitteeContribution:input_type -> theqrl.zond.v1alpha1.SyncCommitteeContributionRequest
+	55, // 40: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSignedContributionAndProof:input_type -> theqrl.zond.v1alpha1.SignedContributionAndProof
+	35, // 41: theqrl.zond.v1alpha1.BeaconNodeValidator.StreamBlocksAltair:input_type -> theqrl.zond.v1alpha1.StreamBlocksRequest
+	56, // 42: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitValidatorRegistrations:input_type -> theqrl.zond.v1alpha1.SignedValidatorRegistrationsV1
+	39, // 43: theqrl.zond.v1alpha1.BeaconNodeValidator.AssignValidatorToSubnet:input_type -> theqrl.zond.v1alpha1.AssignValidatorToSubnetRequest
+	40, // 44: theqrl.zond.v1alpha1.BeaconNodeValidator.AggregatedSigAndAggregationBits:input_type -> theqrl.zond.v1alpha1.AggregatedSigAndAggregationBitsRequest
+	19, // 45: theqrl.zond.v1alpha1.BeaconNodeValidator.GetDuties:output_type -> theqrl.zond.v1alpha1.DutiesResponse
+	19, // 46: theqrl.zond.v1alpha1.BeaconNodeValidator.StreamDuties:output_type -> theqrl.zond.v1alpha1.DutiesResponse
+	7,  // 47: theqrl.zond.v1alpha1.BeaconNodeValidator.DomainData:output_type -> theqrl.zond.v1alpha1.DomainResponse
+	10, // 48: theqrl.zond.v1alpha1.BeaconNodeValidator.WaitForChainStart:output_type -> theqrl.zond.v1alpha1.ChainStartResponse
+	9,  // 49: theqrl.zond.v1alpha1.BeaconNodeValidator.WaitForActivation:output_type -> theqrl.zond.v1alpha1.ValidatorActivationResponse
+	13, // 50: theqrl.zond.v1alpha1.BeaconNodeValidator.ValidatorIndex:output_type -> theqrl.zond.v1alpha1.ValidatorIndexResponse
+	15, // 51: theqrl.zond.v1alpha1.BeaconNodeValidator.ValidatorStatus:output_type -> theqrl.zond.v1alpha1.ValidatorStatusResponse
+	17, // 52: theqrl.zond.v1alpha1.BeaconNodeValidator.MultipleValidatorStatus:output_type -> theqrl.zond.v1alpha1.MultipleValidatorStatusResponse
+	57, // 53: theqrl.zond.v1alpha1.BeaconNodeValidator.GetBeaconBlock:output_type -> theqrl.zond.v1alpha1.GenericBeaconBlock
+	21, // 54: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeBeaconBlock:output_type -> theqrl.zond.v1alpha1.ProposeResponse
+	51, // 55: theqrl.zond.v1alpha1.BeaconNodeValidator.PrepareBeaconProposer:output_type -> google.protobuf.Empty
+	38, // 56: theqrl.zond.v1alpha1.BeaconNodeValidator.GetFeeRecipientByPubKey:output_type -> theqrl.zond.v1alpha1.FeeRecipientByPubKeyResponse
+	58, // 57: theqrl.zond.v1alpha1.BeaconNodeValidator.GetAttestationData:output_type -> theqrl.zond.v1alpha1.AttestationData
+	24, // 58: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeAttestation:output_type -> theqrl.zond.v1alpha1.AttestResponse
+	26, // 59: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitAggregateSelectionProof:output_type -> theqrl.zond.v1alpha1.AggregateSelectionResponse
+	28, // 60: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSignedAggregateSelectionProof:output_type -> theqrl.zond.v1alpha1.SignedAggregateSubmitResponse
+	22, // 61: theqrl.zond.v1alpha1.BeaconNodeValidator.ProposeExit:output_type -> theqrl.zond.v1alpha1.ProposeExitResponse
+	51, // 62: theqrl.zond.v1alpha1.BeaconNodeValidator.SubscribeCommitteeSubnets:output_type -> google.protobuf.Empty
+	34, // 63: theqrl.zond.v1alpha1.BeaconNodeValidator.CheckDoppelGanger:output_type -> theqrl.zond.v1alpha1.DoppelGangerResponse
+	1,  // 64: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncMessageBlockRoot:output_type -> theqrl.zond.v1alpha1.SyncMessageBlockRootResponse
+	51, // 65: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSyncMessage:output_type -> google.protobuf.Empty
+	4,  // 66: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncSubcommitteeIndex:output_type -> theqrl.zond.v1alpha1.SyncSubcommitteeIndexResponse
+	59, // 67: theqrl.zond.v1alpha1.BeaconNodeValidator.GetSyncCommitteeContribution:output_type -> theqrl.zond.v1alpha1.SyncCommitteeContribution
+	51, // 68: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitSignedContributionAndProof:output_type -> google.protobuf.Empty
+	5,  // 69: theqrl.zond.v1alpha1.BeaconNodeValidator.StreamBlocksAltair:output_type -> theqrl.zond.v1alpha1.StreamBlocksResponse
+	51, // 70: theqrl.zond.v1alpha1.BeaconNodeValidator.SubmitValidatorRegistrations:output_type -> google.protobuf.Empty
+	51, // 71: theqrl.zond.v1alpha1.BeaconNodeValidator.AssignValidatorToSubnet:output_type -> google.protobuf.Empty
+	41, // 72: theqrl.zond.v1alpha1.BeaconNodeValidator.AggregatedSigAndAggregationBits:output_type -> theqrl.zond.v1alpha1.AggregatedSigAndAggregationBitsResponse
+	45, // [45:73] is the sub-list for method output_type
+	17, // [17:45] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_proto_qrysm_v1alpha1_validator_proto_init() }
@@ -4469,9 +4405,6 @@ func file_proto_qrysm_v1alpha1_validator_proto_init() {
 		}
 	}
 	file_proto_qrysm_v1alpha1_validator_proto_msgTypes[4].OneofWrappers = []interface{}{
-		(*StreamBlocksResponse_Phase0Block)(nil),
-		(*StreamBlocksResponse_AltairBlock)(nil),
-		(*StreamBlocksResponse_BellatrixBlock)(nil),
 		(*StreamBlocksResponse_CapellaBlock)(nil),
 	}
 	type x struct{}

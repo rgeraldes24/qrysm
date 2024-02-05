@@ -2,6 +2,7 @@ package util
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
 
 	"github.com/pkg/errors"
@@ -14,7 +15,8 @@ import (
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
+	"github.com/theQRL/qrysm/v4/crypto/hash"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	v1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -27,7 +29,7 @@ import (
 
 func GenerateFullBlockCapella(
 	bState state.BeaconState,
-	privs []bls.SecretKey,
+	privs []dilithium.DilithiumKey,
 	conf *BlockGenConfig,
 	slot primitives.Slot,
 ) (*zondpb.SignedBeaconBlockCapella, error) {
@@ -209,7 +211,7 @@ func GenerateFullBlockCapella(
 }
 
 // GenerateDilithiumToExecutionChange generates a valid dilithium to exec changes for validator `val` and its private key `priv` with the given beacon state `st`.
-func GenerateDilithiumToExecutionChange(st state.BeaconState, priv bls.SecretKey, val primitives.ValidatorIndex) (*zondpb.SignedDilithiumToExecutionChange, error) {
+func GenerateDilithiumToExecutionChange(st state.BeaconState, priv dilithium.DilithiumKey, val primitives.ValidatorIndex) (*zondpb.SignedDilithiumToExecutionChange, error) {
 	cred := indexToHash(uint64(val))
 	pubkey := priv.PublicKey().Marshal()
 	message := &zondpb.DilithiumToExecutionChange{
@@ -231,4 +233,10 @@ func GenerateDilithiumToExecutionChange(st state.BeaconState, priv bls.SecretKey
 		Message:   message,
 		Signature: signature,
 	}, nil
+}
+
+func indexToHash(i uint64) [32]byte {
+	var b [8]byte
+	binary.LittleEndian.PutUint64(b[:], i)
+	return hash.Hash(b[:])
 }

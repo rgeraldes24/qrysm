@@ -62,19 +62,8 @@ message BlockRequest {
     bytes block_id = 1;
 }
 
-message BlockResponse {
-    BeaconBlockContainer data = 1;
-}
-
 message BlockSSZResponse {
     bytes data = 1;
-}
-
-message BeaconBlockContainer {
-    BeaconBlock message = 1;
-
-    // 96 byte BLS signature from the validator that produced this block.
-    bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "96"];
 }
 
 // Beacon Pool related API service.

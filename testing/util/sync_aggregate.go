@@ -7,13 +7,13 @@ import (
 	p2pType "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-func generateSyncAggregate(st state.BeaconState, privs []bls.SecretKey, parentRoot [32]byte) (*zondpb.SyncAggregate, error) {
+func generateSyncAggregate(st state.BeaconState, privs []dilithium.DilithiumKey, parentRoot [32]byte) (*zondpb.SyncAggregate, error) {
 	nextSlotEpoch := slots.ToEpoch(st.Slot() + 1)
 	currEpoch := slots.ToEpoch(st.Slot())
 
@@ -30,7 +30,7 @@ func generateSyncAggregate(st state.BeaconState, privs []bls.SecretKey, parentRo
 			return nil, err
 		}
 	}
-	sigs := make([]bls.Signature, 0, len(syncCommittee.Pubkeys))
+	sigs := make([]dilithium.Signature, 0, len(syncCommittee.Pubkeys))
 	var bVector []byte
 	currSize := new(zondpb.SyncAggregate).SyncCommitteeBits.Len()
 	switch currSize {
@@ -68,6 +68,6 @@ func generateSyncAggregate(st state.BeaconState, privs []bls.SecretKey, parentRo
 		fakeSig := [96]byte{0xC0}
 		return &zondpb.SyncAggregate{SyncCommitteeSignature: fakeSig[:], SyncCommitteeBits: bVector}, nil
 	}
-	aggSig := bls.AggregateSignatures(sigs)
+	aggSig := dilithium.AggregateSignatures(sigs)
 	return &zondpb.SyncAggregate{SyncCommitteeSignature: aggSig.Marshal(), SyncCommitteeBits: bVector}, nil
 }

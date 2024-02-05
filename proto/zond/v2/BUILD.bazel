@@ -39,9 +39,6 @@ ssz_gen_marshal(
     ],
     objs = [
         "DilithiumToExecutionChange",
-        "SignedBeaconBlockAltair",
-        "SignedBeaconBlockBellatrix",
-        "SignedBlindedBeaconBlockBellatrix",
         "SignedBeaconBlockCapella",
         "SignedBlindedBeaconBlockCapella",
         "DilithiumToExecutionChange",

@@ -360,17 +360,8 @@ message SyncSubcommitteeIndexResponse {
 message StreamBlocksResponse {
     option deprecated = true;
     oneof block {
-        // Representing a phase 0 block.
-        SignedBeaconBlock phase0_block = 1 ;
-
-        // Representing an altair block.
-        SignedBeaconBlockAltair altair_block = 2;
-
-        // Representing a bellatrix block.
-        SignedBeaconBlockBellatrix bellatrix_block = 3;
-
         // Representing a capella block.
-        SignedBeaconBlockCapella capella_block = 4;
+        SignedBeaconBlockCapella capella_block = 1;
     }
 }
 

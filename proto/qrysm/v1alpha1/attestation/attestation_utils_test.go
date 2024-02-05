@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -75,7 +75,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signature: make([]byte, dilithium.CryptoBytes),
 			},
 			wantedErr: "nil or missing indexed attestation data",
 		},
@@ -86,7 +86,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signature: make([]byte, dilithium.CryptoBytes),
 			},
 			wantedErr: "expected non-empty",
 		},
@@ -97,7 +97,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signature: make([]byte, dilithium.CryptoBytes),
 			},
 			wantedErr: "indices count exceeds",
 		},
@@ -108,7 +108,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signature: make([]byte, dilithium.CryptoBytes),
 			},
 			wantedErr: "not uniquely sorted",
 		},
@@ -119,7 +119,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signature: make([]byte, dilithium.CryptoBytes),
 			},
 		},
 		{
@@ -129,7 +129,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signature: make([]byte, dilithium.CryptoBytes),
 			},
 		},
 		{
@@ -139,7 +139,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signature: make([]byte, dilithium.CryptoBytes),
 			},
 		},
 	}
@@ -176,7 +176,7 @@ func BenchmarkIsValidAttestationIndices(b *testing.B) {
 		Data: &zond.AttestationData{
 			Target: &zond.Checkpoint{},
 		},
-		Signature: make([]byte, dilithium2.CryptoBytes),
+		Signature: make([]byte, dilithium.CryptoBytes),
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

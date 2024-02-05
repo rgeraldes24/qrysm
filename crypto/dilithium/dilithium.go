@@ -1,7 +1,7 @@
 package dilithium
 
 import (
-	"github.com/theQRL/qrysm/v4/crypto/bls/common"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium/dilithiumt"
 )
 

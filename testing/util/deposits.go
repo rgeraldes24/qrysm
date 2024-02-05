@@ -11,7 +11,6 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/hash"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -23,7 +22,7 @@ var lock sync.Mutex
 
 // Caches
 var cachedDeposits []*zondpb.Deposit
-var privKeys []bls.SecretKey
+var privKeys []dilithium.DilithiumKey
 var t *trie.SparseMerkleTrie
 
 // DeterministicDepositsAndKeys returns the entered amount of deposits and secret keys.
@@ -106,8 +105,8 @@ func DepositsWithBalance(balances []uint64) ([]*zondpb.Deposit, *trie.SparseMerk
 	numExisting := uint64(len(cachedDeposits))
 	numRequired := numDeposits - uint64(len(cachedDeposits))
 
-	var secretKeys []bls.SecretKey
-	var publicKeys []bls.PublicKey
+	var secretKeys []dilithium.DilithiumKey
+	var publicKeys []dilithium.PublicKey
 	if numExisting >= numDeposits+1 {
 		secretKeys = append(secretKeys, privKeys[:numDeposits+1]...)
 		publicKeys = publicKeysFromSecrets(secretKeys)
@@ -164,13 +163,13 @@ func DepositsWithBalance(balances []uint64) ([]*zondpb.Deposit, *trie.SparseMerk
 }
 
 func signedDeposit(
-	secretKey bls.SecretKey,
+	secretKey dilithium.DilithiumKey,
 	publicKey,
 	withdrawalKey []byte,
 	balance uint64,
 ) (*zondpb.Deposit, error) {
 	withdrawalCreds := hash.Hash(withdrawalKey)
-	withdrawalCreds[0] = params.BeaconConfig().BLSWithdrawalPrefixByte
+	withdrawalCreds[0] = params.BeaconConfig().DilithiumWithdrawalPrefixByte
 	depositMessage := &zondpb.DepositMessage{
 		PublicKey:             publicKey,
 		Amount:                balance,
@@ -256,7 +255,7 @@ func DeterministicEth1Data(size int) (*zondpb.Eth1Data, error) {
 }
 
 // DeterministicGenesisState returns a genesis state made using the deterministic deposits.
-func DeterministicGenesisState(t testing.TB, numValidators uint64) (state.BeaconState, []bls.SecretKey) {
+func DeterministicGenesisState(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.DilithiumKey) {
 	deposits, privKeys, err := DeterministicDepositsAndKeys(numValidators)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
@@ -299,14 +298,14 @@ func resetCache() {
 	lock.Lock()
 	defer lock.Unlock()
 	t = nil
-	privKeys = []bls.SecretKey{}
+	privKeys = []dilithium.DilithiumKey{}
 	cachedDeposits = []*zondpb.Deposit{}
 }
 
 // DeterministicDepositsAndKeysSameValidator returns the entered amount of deposits and secret keys
 // of the same validator. This is for negative test cases such as same deposits from same validators in a block don't
 // result in duplicated validator indices.
-func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*zondpb.Deposit, []bls.SecretKey, error) {
+func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*zondpb.Deposit, []dilithium.DilithiumKey, error) {
 	resetCache()
 	lock.Lock()
 	defer lock.Unlock()
@@ -334,7 +333,7 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*zondpb.De
 		// Create the new deposits and add them to the trie. Always use the first validator to create deposit
 		for i := uint64(0); i < numRequired; i++ {
 			withdrawalCreds := hash.Hash(publicKeys[1].Marshal())
-			withdrawalCreds[0] = params.BeaconConfig().BLSWithdrawalPrefixByte
+			withdrawalCreds[0] = params.BeaconConfig().DilithiumWithdrawalPrefixByte
 
 			depositMessage := &zondpb.DepositMessage{
 				PublicKey:             publicKeys[1].Marshal(),
@@ -394,8 +393,8 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*zondpb.De
 	return requestedDeposits, privKeys[0:numDeposits], nil
 }
 
-func publicKeysFromSecrets(secretKeys []bls.SecretKey) []bls.PublicKey {
-	publicKeys := make([]bls.PublicKey, len(secretKeys))
+func publicKeysFromSecrets(secretKeys []dilithium.DilithiumKey) []dilithium.PublicKey {
+	publicKeys := make([]dilithium.PublicKey, len(secretKeys))
 	for i, secretKey := range secretKeys {
 		publicKeys[i] = secretKey.PublicKey()
 	}

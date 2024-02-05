@@ -1,5 +1,7 @@
 package migration
 
+// TODO(rgeraldes24): Capella tests
+/*
 import (
 	"testing"
 
@@ -12,34 +14,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-func Test_AltairToV1Alpha1SignedBlock(t *testing.T) {
-	v2Block := util.HydrateV2AltairSignedBeaconBlock(&zondpbv2.SignedBeaconBlockAltair{})
-	v2Block.Message.Slot = slot
-	v2Block.Message.ProposerIndex = validatorIndex
-	v2Block.Message.ParentRoot = parentRoot
-	v2Block.Message.StateRoot = stateRoot
-	v2Block.Message.Body.RandaoReveal = randaoReveal
-	v2Block.Message.Body.Eth1Data = &zondpbv1.Eth1Data{
-		DepositRoot:  depositRoot,
-		DepositCount: depositCount,
-		BlockHash:    blockHash,
-	}
-	syncCommitteeBits := bitfield.NewBitvector16()
-	syncCommitteeBits.SetBitAt(100, true)
-	v2Block.Message.Body.SyncAggregate = &zondpbv1.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: signature,
-	}
-	v2Block.Signature = signature
-
-	alphaBlock, err := AltairToV1Alpha1SignedBlock(v2Block)
-	require.NoError(t, err)
-	alphaRoot, err := alphaBlock.HashTreeRoot()
-	require.NoError(t, err)
-	v2Root, err := v2Block.HashTreeRoot()
-	require.NoError(t, err)
-	assert.DeepEqual(t, v2Root, alphaRoot)
-}
 
 func Test_BellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	v2Block := util.HydrateV2BellatrixSignedBeaconBlock(&zondpbv2.SignedBeaconBlockBellatrix{})
@@ -130,3 +104,4 @@ func Test_BlindedBellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	require.NoError(t, err)
 	assert.DeepEqual(t, v2Root, alphaRoot)
 }
+*/

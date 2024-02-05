@@ -24,7 +24,7 @@ option go_package = "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1;zond";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
-        title: "Zond Serenity APIs";
+        title: "Zond APIs";
         version: "v1alpha1";
         license: {
             name: "Licenced under Apache 2.0";

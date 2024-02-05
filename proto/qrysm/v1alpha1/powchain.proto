@@ -17,7 +17,8 @@ option php_namespace = "TheQRL\\Zond\\v1alpha1";
 message ETH1ChainData {
     LatestETH1Data current_eth1_data = 1 ;
     ChainStartData chainstart_data = 2;
-    BeaconState beacon_state = 3;
+    // TODO(rgeraldes24)
+    // BeaconState beacon_state = 3;
     SparseMerkleTrie trie = 4;
     repeated DepositContainer deposit_containers = 5;
     DepositSnapshot deposit_snapshot = 6;

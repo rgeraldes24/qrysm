@@ -15,6 +15,7 @@ import (
 	"time"
 
 	gMux "github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/beacon/engine"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
@@ -27,9 +28,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
-
-	"github.com/sirupsen/logrus"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/math"
 	"github.com/theQRL/qrysm/v4/network"
@@ -285,7 +284,7 @@ func (p *Builder) handleHeaderRequestCapella(w http.ResponseWriter) {
 		return
 	}
 
-	secKey, err := bls.RandKey()
+	secKey, err := dilithium.RandKey()
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not retrieve secret key")
 		http.Error(w, err.Error(), http.StatusInternalServerError)

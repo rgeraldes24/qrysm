@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Ethereum Serenity APIs",
+    "title": "Zond APIs",
     "description": "{{ index . description }}",
     "version": "v1alpha1",
     "license": {

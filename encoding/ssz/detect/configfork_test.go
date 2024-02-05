@@ -47,12 +47,6 @@ func TestSlotFromBlock(t *testing.T) {
 
 func TestByState(t *testing.T) {
 	bc := params.BeaconConfig()
-	altairSlot, err := slots.EpochStart(bc.AltairForkEpoch)
-	require.NoError(t, err)
-	bellaSlot, err := slots.EpochStart(bc.BellatrixForkEpoch)
-	require.NoError(t, err)
-	capellaSlot, err := slots.EpochStart(bc.CapellaForkEpoch)
-	require.NoError(t, err)
 	cases := []struct {
 		name        string
 		version     int
@@ -61,27 +55,9 @@ func TestByState(t *testing.T) {
 	}{
 		{
 			name:        "genesis",
-			version:     version.Phase0,
+			version:     version.Capella,
 			slot:        0,
 			forkversion: bytesutil.ToBytes4(bc.GenesisForkVersion),
-		},
-		{
-			name:        "altair",
-			version:     version.Altair,
-			slot:        altairSlot,
-			forkversion: bytesutil.ToBytes4(bc.AltairForkVersion),
-		},
-		{
-			name:        "bellatrix",
-			version:     version.Bellatrix,
-			slot:        bellaSlot,
-			forkversion: bytesutil.ToBytes4(bc.BellatrixForkVersion),
-		},
-		{
-			name:        "capella",
-			version:     version.Capella,
-			slot:        capellaSlot,
-			forkversion: bytesutil.ToBytes4(bc.CapellaForkVersion),
 		},
 	}
 	for _, c := range cases {
@@ -105,12 +81,6 @@ func TestByState(t *testing.T) {
 
 func stateForVersion(v int) (state.BeaconState, error) {
 	switch v {
-	case version.Phase0:
-		return util.NewBeaconState()
-	case version.Altair:
-		return util.NewBeaconStateAltair()
-	case version.Bellatrix:
-		return util.NewBeaconStateBellatrix()
 	case version.Capella:
 		return util.NewBeaconStateCapella()
 	default:
@@ -373,38 +343,6 @@ func TestUnmarshalBlindedBlock(t *testing.T) {
 			require.Equal(t, expected, actual)
 		})
 	}
-}
-
-func signedTestBlockGenesis(t *testing.T, slot primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-	b := util.NewBeaconBlock()
-	b.Block.Slot = slot
-	s, err := blocks.NewSignedBeaconBlock(b)
-	require.NoError(t, err)
-	return s
-}
-
-func signedTestBlockAltair(t *testing.T, slot primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-	b := util.NewBeaconBlockAltair()
-	b.Block.Slot = slot
-	s, err := blocks.NewSignedBeaconBlock(b)
-	require.NoError(t, err)
-	return s
-}
-
-func signedTestBlockBellatrix(t *testing.T, slot primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-	b := util.NewBeaconBlockBellatrix()
-	b.Block.Slot = slot
-	s, err := blocks.NewSignedBeaconBlock(b)
-	require.NoError(t, err)
-	return s
-}
-
-func signedTestBlindedBlockBellatrix(t *testing.T, slot primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-	b := util.NewBlindedBeaconBlockBellatrix()
-	b.Block.Slot = slot
-	s, err := blocks.NewSignedBeaconBlock(b)
-	require.NoError(t, err)
-	return s
 }
 
 func signedTestBlockCapella(t *testing.T, slot primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {

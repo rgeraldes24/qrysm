@@ -8,7 +8,7 @@ import (
 
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
-	"github.com/theQRL/qrysm/v4/crypto/bls/common"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 )
 
 var maxKeys = 2_000_000

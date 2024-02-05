@@ -165,26 +165,23 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	DomainDilithiumToExecutionChange:  bytesutil.Uint32ToBytes4(0x0A000000),
 
 	// Qrysm constants.
-	GweiPerEth:                     1000000000,
-	BLSSecretKeyLength:             32,
-	BLSPubkeyLength:                48,
-	DilithiumPubkeyLength:          2592,
-	DefaultBufferSize:              10000,
-	WithdrawalPrivkeyFileName:      "/shardwithdrawalkey",
-	ValidatorPrivkeyFileName:       "/validatorprivatekey",
-	RPCSyncCheck:                   1,
-	EmptySignature:                 [96]byte{},
-	EmptyDilithiumSignature:        [dilithium.CryptoBytes]byte{},
-	DefaultPageSize:                250,
-	MaxPeersToSync:                 15,
-	SlotsPerArchivedPoint:          2048,
-	GenesisCountdownInterval:       time.Minute,
-	ConfigName:                     MainnetName,
-	PresetBase:                     "mainnet",
-	BeaconStateFieldCount:          21,
-	BeaconStateAltairFieldCount:    24,
-	BeaconStateBellatrixFieldCount: 25,
-	BeaconStateCapellaFieldCount:   28,
+	GweiPerEth:                   1000000000,
+	BLSSecretKeyLength:           32,
+	BLSPubkeyLength:              48,
+	DilithiumPubkeyLength:        2592,
+	DefaultBufferSize:            10000,
+	WithdrawalPrivkeyFileName:    "/shardwithdrawalkey",
+	ValidatorPrivkeyFileName:     "/validatorprivatekey",
+	RPCSyncCheck:                 1,
+	EmptySignature:               [96]byte{},
+	EmptyDilithiumSignature:      [dilithium.CryptoBytes]byte{},
+	DefaultPageSize:              250,
+	MaxPeersToSync:               15,
+	SlotsPerArchivedPoint:        2048,
+	GenesisCountdownInterval:     time.Minute,
+	ConfigName:                   MainnetName,
+	PresetBase:                   "mainnet",
+	BeaconStateCapellaFieldCount: 28,
 
 	// Slasher related values.
 	WeakSubjectivityPeriod:          54000,
@@ -195,14 +192,8 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	SafetyDecay: 10,
 
 	// Fork related values.
-	GenesisEpoch:         genesisForkEpoch,
-	GenesisForkVersion:   []byte{0, 0, 0, 0},
-	AltairForkVersion:    []byte{1, 0, 0, 0},
-	AltairForkEpoch:      mainnetAltairForkEpoch,
-	BellatrixForkVersion: []byte{2, 0, 0, 0},
-	BellatrixForkEpoch:   mainnetBellatrixForkEpoch,
-	CapellaForkVersion:   []byte{3, 0, 0, 0},
-	CapellaForkEpoch:     194048,
+	GenesisEpoch:       genesisForkEpoch,
+	GenesisForkVersion: []byte{0, 0, 0, 0},
 
 	// New values introduced in Altair hard fork 1.
 	// Participation flag indices.
@@ -269,17 +260,6 @@ func MainnetTestConfig() *BeaconChainConfig {
 // byte argument as the high byte (common across forks).
 func FillTestVersions(c *BeaconChainConfig, b byte) {
 	c.GenesisForkVersion = make([]byte, fieldparams.VersionLength)
-	c.AltairForkVersion = make([]byte, fieldparams.VersionLength)
-	c.BellatrixForkVersion = make([]byte, fieldparams.VersionLength)
-	c.CapellaForkVersion = make([]byte, fieldparams.VersionLength)
-
 	c.GenesisForkVersion[fieldparams.VersionLength-1] = b
-	c.AltairForkVersion[fieldparams.VersionLength-1] = b
-	c.BellatrixForkVersion[fieldparams.VersionLength-1] = b
-	c.CapellaForkVersion[fieldparams.VersionLength-1] = b
-
 	c.GenesisForkVersion[0] = 0
-	c.AltairForkVersion[0] = 1
-	c.BellatrixForkVersion[0] = 2
-	c.CapellaForkVersion[0] = 3
 }

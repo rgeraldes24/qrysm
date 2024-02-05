@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -109,7 +110,7 @@ func (s *Simulator) generateAttestationsForSlot(
 
 func (s *Simulator) aggregateSigForAttestation(
 	beaconState state.ReadOnlyBeaconState, att *zondpb.IndexedAttestation,
-) (bls.Signature, error) {
+) (dilithium.Signature, error) {
 	domain, err := signing.Domain(
 		beaconState.Fork(),
 		att.Data.Target.Epoch,
@@ -123,7 +124,7 @@ func (s *Simulator) aggregateSigForAttestation(
 	if err != nil {
 		return nil, err
 	}
-	sigs := make([]bls.Signature, len(att.AttestingIndices))
+	sigs := make([]dilithium.Signature, len(att.AttestingIndices))
 	for i, validatorIndex := range att.AttestingIndices {
 		privKey := s.srvConfig.PrivateKeysByValidatorIndex[primitives.ValidatorIndex(validatorIndex)]
 		sigs[i] = privKey.Sign(signingRoot[:])
