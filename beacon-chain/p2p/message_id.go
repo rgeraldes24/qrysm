@@ -77,11 +77,13 @@ func postAltairMsgID(pmsg *pubsubpb.Message, fEpoch primitives.Epoch) string {
 	topicLen := len(topic)
 	topicLenBytes := bytesutil.Uint64ToBytesLittleEndian(uint64(topicLen)) // topicLen cannot be negative
 
-	// beyond Bellatrix epoch, allow 10 Mib gossip data size
-	gossipPubSubSize := params.BeaconNetworkConfig().GossipMaxSize
-	if fEpoch >= params.BeaconConfig().BellatrixForkEpoch {
-		gossipPubSubSize = params.BeaconNetworkConfig().GossipMaxSizeBellatrix
-	}
+	// TODO(rgeraldes24)
+	// // beyond Bellatrix epoch, allow 10 Mib gossip data size
+	// gossipPubSubSize := params.BeaconNetworkConfig().GossipMaxSize
+	// if fEpoch >= params.BeaconConfig().BellatrixForkEpoch {
+	// 	gossipPubSubSize = params.BeaconNetworkConfig().GossipMaxSizeBellatrix
+	// }
+	gossipPubSubSize := params.BeaconNetworkConfig().GossipMaxSizeBellatrix
 
 	decodedData, err := encoder.DecodeSnappy(pmsg.Data, gossipPubSubSize)
 	if err != nil {

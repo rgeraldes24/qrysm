@@ -52,45 +52,6 @@ func (ds *Server) GetBeaconStateV2(ctx context.Context, req *zondpbv2.BeaconStat
 	isFinalized := ds.FinalizationFetcher.IsFinalized(ctx, blockRoot)
 
 	switch beaconSt.Version() {
-	case version.Phase0:
-		protoSt, err := migration.BeaconStateToProto(beaconSt)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not convert state to proto: %v", err)
-		}
-		return &zondpbv2.BeaconStateResponseV2{
-			Version: zondpbv2.Version_PHASE0,
-			Data: &zondpbv2.BeaconStateContainer{
-				State: &zondpbv2.BeaconStateContainer_Phase0State{Phase0State: protoSt},
-			},
-			ExecutionOptimistic: isOptimistic,
-			Finalized:           isFinalized,
-		}, nil
-	case version.Altair:
-		protoState, err := migration.BeaconStateAltairToProto(beaconSt)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not convert state to proto: %v", err)
-		}
-		return &zondpbv2.BeaconStateResponseV2{
-			Version: zondpbv2.Version_ALTAIR,
-			Data: &zondpbv2.BeaconStateContainer{
-				State: &zondpbv2.BeaconStateContainer_AltairState{AltairState: protoState},
-			},
-			ExecutionOptimistic: isOptimistic,
-			Finalized:           isFinalized,
-		}, nil
-	case version.Bellatrix:
-		protoState, err := migration.BeaconStateBellatrixToProto(beaconSt)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not convert state to proto: %v", err)
-		}
-		return &zondpbv2.BeaconStateResponseV2{
-			Version: zondpbv2.Version_BELLATRIX,
-			Data: &zondpbv2.BeaconStateContainer{
-				State: &zondpbv2.BeaconStateContainer_BellatrixState{BellatrixState: protoState},
-			},
-			ExecutionOptimistic: isOptimistic,
-			Finalized:           isFinalized,
-		}, nil
 	case version.Capella:
 		protoState, err := migration.BeaconStateCapellaToProto(beaconSt)
 		if err != nil {
@@ -125,12 +86,6 @@ func (ds *Server) GetBeaconStateSSZV2(ctx context.Context, req *zondpbv2.BeaconS
 	}
 	var ver zondpbv2.Version
 	switch st.Version() {
-	case version.Phase0:
-		ver = zondpbv2.Version_PHASE0
-	case version.Altair:
-		ver = zondpbv2.Version_ALTAIR
-	case version.Bellatrix:
-		ver = zondpbv2.Version_BELLATRIX
 	case version.Capella:
 		ver = zondpbv2.Version_CAPELLA
 	default:

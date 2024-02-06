@@ -868,8 +868,6 @@ func marshalBlockBlinded(
 	switch blk.Version() {
 	case version.Capella:
 		return snappy.Encode(nil, append(capellaBlindKey, encodedBlock...)), nil
-	case version.Bellatrix:
-		return snappy.Encode(nil, append(bellatrixBlindKey, encodedBlock...)), nil
 	default:
 		return nil, fmt.Errorf("unsupported block version: %v", blk.Version())
 	}

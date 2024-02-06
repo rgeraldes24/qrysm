@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -58,69 +57,6 @@ func TestFork(t *testing.T) {
 				params.OverrideBeaconConfig(cfg)
 			},
 		},
-
-		{
-			name:        "altair pre-fork",
-			targetEpoch: 0,
-			want: &zondpb.Fork{
-				Epoch:           0,
-				CurrentVersion:  []byte{'A', 'B', 'C', 'D'},
-				PreviousVersion: []byte{'A', 'B', 'C', 'D'},
-			},
-			wantErr: false,
-			setConfg: func() {
-				cfg = cfg.Copy()
-				cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
-				cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
-				cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
-					{'A', 'B', 'C', 'D'}: 0,
-					{'A', 'B', 'C', 'F'}: 10,
-				}
-				params.OverrideBeaconConfig(cfg)
-			},
-		},
-		{
-			name:        "altair on fork",
-			targetEpoch: 10,
-			want: &zondpb.Fork{
-				Epoch:           10,
-				CurrentVersion:  []byte{'A', 'B', 'C', 'F'},
-				PreviousVersion: []byte{'A', 'B', 'C', 'D'},
-			},
-			wantErr: false,
-			setConfg: func() {
-				cfg = cfg.Copy()
-				cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
-				cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
-				cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
-					{'A', 'B', 'C', 'D'}: 0,
-					{'A', 'B', 'C', 'F'}: 10,
-				}
-				params.OverrideBeaconConfig(cfg)
-			},
-		},
-
-		{
-			name:        "altair post fork",
-			targetEpoch: 10,
-			want: &zondpb.Fork{
-				Epoch:           10,
-				CurrentVersion:  []byte{'A', 'B', 'C', 'F'},
-				PreviousVersion: []byte{'A', 'B', 'C', 'D'},
-			},
-			wantErr: false,
-			setConfg: func() {
-				cfg = cfg.Copy()
-				cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
-				cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
-				cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
-					{'A', 'B', 'C', 'D'}: 0,
-					{'A', 'B', 'C', 'F'}: 10,
-				}
-				params.OverrideBeaconConfig(cfg)
-			},
-		},
-
 		{
 			name:        "3 forks, pre-fork",
 			targetEpoch: 20,
@@ -177,6 +113,8 @@ func TestFork(t *testing.T) {
 	}
 }
 
+// NOTE(rgeraldes24): test not valid at the moment since we just have one fork
+/*
 func TestRetrieveForkDataFromDigest(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	cfg := params.BeaconConfig().Copy()
@@ -205,6 +143,7 @@ func TestRetrieveForkDataFromDigest(t *testing.T) {
 	assert.Equal(t, [4]byte{'A', 'B', 'C', 'Z'}, version)
 	assert.Equal(t, epoch, primitives.Epoch(100))
 }
+*/
 
 func TestIsForkNextEpoch(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
@@ -273,56 +212,6 @@ func TestNextForkData(t *testing.T) {
 				params.OverrideBeaconConfig(cfg)
 			},
 		},
-		{
-			name:              "altair pre-fork",
-			currEpoch:         5,
-			wantedForkVerison: [4]byte{'A', 'B', 'C', 'F'},
-			wantedEpoch:       10,
-			setConfg: func() {
-				cfg = cfg.Copy()
-				cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
-				cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
-				cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
-					{'A', 'B', 'C', 'D'}: 0,
-					{'A', 'B', 'C', 'F'}: 10,
-				}
-				params.OverrideBeaconConfig(cfg)
-			},
-		},
-		{
-			name:              "altair on fork",
-			currEpoch:         10,
-			wantedForkVerison: [4]byte{'A', 'B', 'C', 'F'},
-			wantedEpoch:       math.MaxUint64,
-			setConfg: func() {
-				cfg = cfg.Copy()
-				cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
-				cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
-				cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
-					{'A', 'B', 'C', 'D'}: 0,
-					{'A', 'B', 'C', 'F'}: 10,
-				}
-				params.OverrideBeaconConfig(cfg)
-			},
-		},
-
-		{
-			name:              "altair post fork",
-			currEpoch:         20,
-			wantedForkVerison: [4]byte{'A', 'B', 'C', 'F'},
-			wantedEpoch:       math.MaxUint64,
-			setConfg: func() {
-				cfg = cfg.Copy()
-				cfg.GenesisForkVersion = []byte{'A', 'B', 'C', 'D'}
-				cfg.AltairForkVersion = []byte{'A', 'B', 'C', 'F'}
-				cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
-					{'A', 'B', 'C', 'D'}: 0,
-					{'A', 'B', 'C', 'F'}: 10,
-				}
-				params.OverrideBeaconConfig(cfg)
-			},
-		},
-
 		{
 			name:              "3 forks, pre-fork, 1st fork",
 			currEpoch:         5,

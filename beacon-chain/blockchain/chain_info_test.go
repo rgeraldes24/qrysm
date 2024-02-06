@@ -427,6 +427,8 @@ func TestService_IsOptimistic(t *testing.T) {
 	require.Equal(t, true, opt)
 }
 
+// TODO(rgeraldes24)
+/*
 func TestService_IsOptimisticBeforeBellatrix(t *testing.T) {
 	ctx := context.Background()
 	c := &Service{genesisTime: time.Now()}
@@ -434,6 +436,7 @@ func TestService_IsOptimisticBeforeBellatrix(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, false, opt)
 }
+*/
 
 func TestService_IsOptimisticForRoot(t *testing.T) {
 	ctx := context.Background()

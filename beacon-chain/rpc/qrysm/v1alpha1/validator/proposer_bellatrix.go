@@ -45,11 +45,6 @@ func setExecutionData(ctx context.Context, blk interfaces.SignedBeaconBlock, loc
 	_, span := trace.StartSpan(ctx, "ProposerServer.setExecutionData")
 	defer span.End()
 
-	slot := blk.Block().Slot()
-	if slots.ToEpoch(slot) < params.BeaconConfig().BellatrixForkEpoch {
-		return nil
-	}
-
 	if localPayload == nil {
 		return errors.New("local payload is nil")
 	}
@@ -60,6 +55,7 @@ func setExecutionData(ctx context.Context, blk interfaces.SignedBeaconBlock, loc
 	}
 
 	switch {
+	// TODO(rgeraldes24)
 	case blk.Version() >= version.Capella:
 		// Compare payload values between local and builder. Default to the local value if it is higher.
 		localValueGwei, err := localPayload.ValueInGwei()
@@ -126,10 +122,6 @@ func setExecutionData(ctx context.Context, blk interfaces.SignedBeaconBlock, loc
 func (vs *Server) getPayloadHeaderFromBuilder(ctx context.Context, slot primitives.Slot, idx primitives.ValidatorIndex) (interfaces.ExecutionData, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.getPayloadHeaderFromBuilder")
 	defer span.End()
-
-	if slots.ToEpoch(slot) < params.BeaconConfig().BellatrixForkEpoch {
-		return nil, errors.New("can't get payload header from builder before bellatrix epoch")
-	}
 
 	b, err := vs.HeadFetcher.HeadBlock(ctx)
 	if err != nil {

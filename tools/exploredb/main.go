@@ -8,6 +8,8 @@
 
 package main
 
+// TODO(rgeraldes24)
+/*
 import (
 	"bytes"
 	"context"
@@ -542,3 +544,4 @@ func sizeAndCountGeneric(genericItems interface{}, err error) (uint64, uint64) {
 
 	return size, count
 }
+*/

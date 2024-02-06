@@ -204,7 +204,6 @@ const (
 	InactivityScores
 	CurrentSyncCommittee
 	NextSyncCommittee
-	LatestExecutionPayloadHeader
 	LatestExecutionPayloadHeaderCapella
 	NextWithdrawalIndex
 	NextWithdrawalValidatorIndex

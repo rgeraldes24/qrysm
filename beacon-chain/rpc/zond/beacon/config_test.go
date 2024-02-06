@@ -45,12 +45,6 @@ func TestGetSpec(t *testing.T) {
 	config.EjectionBalance = 22
 	config.EffectiveBalanceIncrement = 23
 	config.GenesisForkVersion = []byte("GenesisForkVersion")
-	config.AltairForkVersion = []byte("AltairForkVersion")
-	config.AltairForkEpoch = 100
-	config.BellatrixForkVersion = []byte("BellatrixForkVersion")
-	config.BellatrixForkEpoch = 101
-	config.CapellaForkVersion = []byte("CapellaForkVersion")
-	config.CapellaForkEpoch = 103
 	config.BLSWithdrawalPrefixByte = byte('b')
 	config.ETH1AddressWithdrawalPrefixByte = byte('c')
 	config.GenesisDelay = 24
@@ -71,9 +65,6 @@ func TestGetSpec(t *testing.T) {
 	config.BaseRewardFactor = 39
 	config.WhistleBlowerRewardQuotient = 40
 	config.ProposerRewardQuotient = 41
-	config.InactivityPenaltyQuotient = 42
-	config.MinSlashingPenaltyQuotient = 44
-	config.ProportionalSlashingMultiplier = 46
 	config.MaxProposerSlashings = 48
 	config.MaxAttesterSlashings = 49
 	config.MaxAttestations = 50
@@ -92,9 +83,6 @@ func TestGetSpec(t *testing.T) {
 	config.SyncCommitteeSize = 63
 	config.InactivityScoreBias = 65
 	config.EpochsPerSyncCommitteePeriod = 66
-	config.InactivityPenaltyQuotientAltair = 67
-	config.MinSlashingPenaltyQuotientAltair = 68
-	config.ProportionalSlashingMultiplierAltair = 69
 	config.InactivityScoreRecoveryRate = 70
 	config.MinSyncCommitteeParticipants = 71
 	config.TerminalBlockHash = common.HexToHash("TerminalBlockHash")
@@ -193,18 +181,6 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "23", v)
 		case "GENESIS_FORK_VERSION":
 			assert.Equal(t, "0x"+hex.EncodeToString([]byte("GenesisForkVersion")), v)
-		case "ALTAIR_FORK_VERSION":
-			assert.Equal(t, "0x"+hex.EncodeToString([]byte("AltairForkVersion")), v)
-		case "ALTAIR_FORK_EPOCH":
-			assert.Equal(t, "100", v)
-		case "BELLATRIX_FORK_VERSION":
-			assert.Equal(t, "0x"+hex.EncodeToString([]byte("BellatrixForkVersion")), v)
-		case "BELLATRIX_FORK_EPOCH":
-			assert.Equal(t, "101", v)
-		case "CAPELLA_FORK_VERSION":
-			assert.Equal(t, "0x"+hex.EncodeToString([]byte("CapellaForkVersion")), v)
-		case "CAPELLA_FORK_EPOCH":
-			assert.Equal(t, "103", v)
 		case "MIN_ANCHOR_POW_BLOCK_DIFFICULTY":
 			assert.Equal(t, "1000", v)
 		case "BLS_WITHDRAWAL_PREFIX":

@@ -62,8 +62,8 @@ func emptyGenesisStateCapella() (state.BeaconState, error) {
 		// Misc fields.
 		Slot: 0,
 		Fork: &zondpb.Fork{
-			PreviousVersion: params.BeaconConfig().BellatrixForkVersion,
-			CurrentVersion:  params.BeaconConfig().CapellaForkVersion,
+			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
+			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			Epoch:           0,
 		},
 		// Validator registry fields.

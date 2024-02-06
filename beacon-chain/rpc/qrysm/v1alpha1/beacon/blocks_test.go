@@ -509,40 +509,6 @@ func TestServer_ListBeaconBlocks_NoResults(t *testing.T) {
 }
 
 func TestServer_ListBeaconBlocks_Genesis(t *testing.T) {
-	t.Run("phase 0 block", func(t *testing.T) {
-		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
-		blk.Block.ParentRoot = parentRoot[:]
-		blkContainer := &zondpb.BeaconBlockContainer{
-			Block: &zondpb.BeaconBlockContainer_Phase0Block{Phase0Block: blk}}
-		wrappedB, err := blocks.NewSignedBeaconBlock(blk)
-		assert.NoError(t, err)
-		runListBlocksGenesis(t, wrappedB, blkContainer)
-	})
-	t.Run("altair block", func(t *testing.T) {
-		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockAltair()
-		blk.Block.ParentRoot = parentRoot[:]
-		wrapped, err := blocks.NewSignedBeaconBlock(blk)
-		assert.NoError(t, err)
-		blkContainer := &zondpb.BeaconBlockContainer{
-			Block: &zondpb.BeaconBlockContainer_AltairBlock{AltairBlock: blk}}
-		runListBlocksGenesis(t, wrapped, blkContainer)
-	})
-	t.Run("bellatrix block", func(t *testing.T) {
-		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlockBellatrix()
-		blk.Block.ParentRoot = parentRoot[:]
-		wrapped, err := blocks.NewSignedBeaconBlock(blk)
-		assert.NoError(t, err)
-		blinded, err := wrapped.ToBlinded()
-		assert.NoError(t, err)
-		blindedProto, err := blinded.PbBlindedBellatrixBlock()
-		assert.NoError(t, err)
-		blkContainer := &zondpb.BeaconBlockContainer{
-			Block: &zondpb.BeaconBlockContainer_BlindedBellatrixBlock{BlindedBellatrixBlock: blindedProto}}
-		runListBlocksGenesis(t, wrapped, blkContainer)
-	})
 	t.Run("capella block", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
 		blk := util.NewBeaconBlockCapella()
@@ -599,51 +565,6 @@ func runListBlocksGenesis(t *testing.T, blk interfaces.ReadOnlySignedBeaconBlock
 }
 
 func TestServer_ListBeaconBlocks_Genesis_MultiBlocks(t *testing.T) {
-	t.Run("phase 0 block", func(t *testing.T) {
-		parentRoot := [32]byte{1, 2, 3}
-		blk := util.NewBeaconBlock()
-		blk.Block.ParentRoot = parentRoot[:]
-		blockCreator := func(i primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-			b := util.NewBeaconBlock()
-			b.Block.Slot = i
-			wrappedB, err := blocks.NewSignedBeaconBlock(b)
-			assert.NoError(t, err)
-			return wrappedB
-		}
-		genB, err := blocks.NewSignedBeaconBlock(blk)
-		assert.NoError(t, err)
-		runListBeaconBlocksGenesisMultiBlocks(t, genB, blockCreator)
-	})
-	t.Run("altair block", func(t *testing.T) {
-		parentRoot := [32]byte{1, 2, 3}
-		blk := util.NewBeaconBlockAltair()
-		blk.Block.ParentRoot = parentRoot[:]
-		blockCreator := func(i primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-			b := util.NewBeaconBlockAltair()
-			b.Block.Slot = i
-			wrappedB, err := blocks.NewSignedBeaconBlock(b)
-			assert.NoError(t, err)
-			return wrappedB
-		}
-		gBlock, err := blocks.NewSignedBeaconBlock(blk)
-		assert.NoError(t, err)
-		runListBeaconBlocksGenesisMultiBlocks(t, gBlock, blockCreator)
-	})
-	t.Run("bellatrix block", func(t *testing.T) {
-		parentRoot := [32]byte{1, 2, 3}
-		blk := util.NewBeaconBlockBellatrix()
-		blk.Block.ParentRoot = parentRoot[:]
-		blockCreator := func(i primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-			b := util.NewBeaconBlockBellatrix()
-			b.Block.Slot = i
-			wrappedB, err := blocks.NewSignedBeaconBlock(b)
-			assert.NoError(t, err)
-			return wrappedB
-		}
-		gBlock, err := blocks.NewSignedBeaconBlock(blk)
-		assert.NoError(t, err)
-		runListBeaconBlocksGenesisMultiBlocks(t, gBlock, blockCreator)
-	})
 	t.Run("capella block", func(t *testing.T) {
 		parentRoot := [32]byte{1, 2, 3}
 		blk := util.NewBeaconBlockCapella()
@@ -694,82 +615,6 @@ func runListBeaconBlocksGenesisMultiBlocks(t *testing.T, genBlock interfaces.Rea
 func TestServer_ListBeaconBlocks_Pagination(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
-	t.Run("phase 0 block", func(t *testing.T) {
-		blk := util.NewBeaconBlock()
-		blk.Block.Slot = 300
-		blockCreator := func(i primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-			b := util.NewBeaconBlock()
-			b.Block.Slot = i
-			wrappedB, err := blocks.NewSignedBeaconBlock(b)
-			assert.NoError(t, err)
-			return wrappedB
-		}
-		containerCreator := func(i primitives.Slot, root []byte, canonical bool) *zondpb.BeaconBlockContainer {
-			b := util.NewBeaconBlock()
-			b.Block.Slot = i
-			ctr := &zondpb.BeaconBlockContainer{
-				Block: &zondpb.BeaconBlockContainer_Phase0Block{
-					Phase0Block: util.HydrateSignedBeaconBlock(b)},
-				BlockRoot: root,
-				Canonical: canonical}
-			return ctr
-		}
-		wrappedB, err := blocks.NewSignedBeaconBlock(blk)
-		assert.NoError(t, err)
-		runListBeaconBlocksPagination(t, wrappedB, blockCreator, containerCreator)
-	})
-	t.Run("altair block", func(t *testing.T) {
-		blk := util.NewBeaconBlockAltair()
-		blk.Block.Slot = 300
-		blockCreator := func(i primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-			b := util.NewBeaconBlockAltair()
-			b.Block.Slot = i
-			wrappedB, err := blocks.NewSignedBeaconBlock(b)
-			assert.NoError(t, err)
-			return wrappedB
-		}
-		containerCreator := func(i primitives.Slot, root []byte, canonical bool) *zondpb.BeaconBlockContainer {
-			b := util.NewBeaconBlockAltair()
-			b.Block.Slot = i
-			ctr := &zondpb.BeaconBlockContainer{
-				Block: &zondpb.BeaconBlockContainer_AltairBlock{
-					AltairBlock: util.HydrateSignedBeaconBlockAltair(b)},
-				BlockRoot: root,
-				Canonical: canonical}
-			return ctr
-		}
-		orphanedB, err := blocks.NewSignedBeaconBlock(blk)
-		assert.NoError(t, err)
-		runListBeaconBlocksPagination(t, orphanedB, blockCreator, containerCreator)
-	})
-	t.Run("bellatrix block", func(t *testing.T) {
-		resetFn := features.InitWithReset(&features.Flags{
-			SaveFullExecutionPayloads: true,
-		})
-		defer resetFn()
-		blk := util.NewBeaconBlockBellatrix()
-		blk.Block.Slot = 300
-		blockCreator := func(i primitives.Slot) interfaces.ReadOnlySignedBeaconBlock {
-			b := util.NewBeaconBlockBellatrix()
-			b.Block.Slot = i
-			wrappedB, err := blocks.NewSignedBeaconBlock(b)
-			assert.NoError(t, err)
-			return wrappedB
-		}
-		containerCreator := func(i primitives.Slot, root []byte, canonical bool) *zondpb.BeaconBlockContainer {
-			b := util.NewBeaconBlockBellatrix()
-			b.Block.Slot = i
-			ctr := &zondpb.BeaconBlockContainer{
-				Block: &zondpb.BeaconBlockContainer_BellatrixBlock{
-					BellatrixBlock: util.HydrateSignedBeaconBlockBellatrix(b)},
-				BlockRoot: root,
-				Canonical: canonical}
-			return ctr
-		}
-		orphanedB, err := blocks.NewSignedBeaconBlock(blk)
-		assert.NoError(t, err)
-		runListBeaconBlocksPagination(t, orphanedB, blockCreator, containerCreator)
-	})
 	t.Run("capella block", func(t *testing.T) {
 		resetFn := features.InitWithReset(&features.Flags{
 			SaveFullExecutionPayloads: true,

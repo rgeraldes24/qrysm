@@ -17,20 +17,11 @@ func MainnetConfig() *BeaconChainConfig {
 	return mainnetBeaconConfig
 }
 
-const (
-	// Genesis Fork Epoch for the mainnet config.
-	genesisForkEpoch = 0
-	// TODO(rgeraldes24): remove once we remove the forks before Capella
-	// Altair Fork Epoch for mainnet config.
-	mainnetAltairForkEpoch = 74240 // Oct 27, 2021, 10:56:23am UTC
-	// Bellatrix Fork Epoch for mainnet config.
-	mainnetBellatrixForkEpoch = 144896 // Sept 6, 2022, 11:34:47am UTC
-)
+// Genesis Fork Epoch for the mainnet config.
+const genesisForkEpoch = 0
 
 var mainnetNetworkConfig = &NetworkConfig{
-	GossipMaxSize:                   1 << 23,      // 8 MiB
 	GossipMaxSizeBellatrix:          10 * 1 << 20, // 10 MiB
-	MaxChunkSize:                    1 << 20,      // 1 MiB
 	MaxChunkSizeBellatrix:           10 * 1 << 20, // 10 MiB
 	AttestationSubnetCount:          64,
 	AttestationPropagationSlotRange: 32,
@@ -132,12 +123,13 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	ValidatorRegistryLimit:    1099511627776,
 
 	// Reward and penalty quotients constants.
-	BaseRewardFactor:               64,
-	WhistleBlowerRewardQuotient:    512,
-	ProposerRewardQuotient:         8,
-	InactivityPenaltyQuotient:      67108864,
-	MinSlashingPenaltyQuotient:     128,
-	ProportionalSlashingMultiplier: 1,
+	BaseRewardFactor:            64,
+	WhistleBlowerRewardQuotient: 512,
+	ProposerRewardQuotient:      8,
+	// TODO(rgeraldes24)
+	// InactivityPenaltyQuotient:      67108864,
+	// MinSlashingPenaltyQuotient:     128,
+	// ProportionalSlashingMultiplier: 1,
 
 	// Max operations per block constants.
 	MaxProposerSlashings:             16,
@@ -219,10 +211,11 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	InactivityScoreRecoveryRate:  16,
 	EpochsPerSyncCommitteePeriod: 8, // TODO: (cyyber) finalize EpochsPerSyncCommitteePeriod, original value was 512
 
+	// TODO(rgeraldes24)
 	// Updated penalty values.
-	InactivityPenaltyQuotientAltair:         3 * 1 << 24, //50331648
-	MinSlashingPenaltyQuotientAltair:        64,
-	ProportionalSlashingMultiplierAltair:    2,
+	// InactivityPenaltyQuotientAltair:         3 * 1 << 24, //50331648
+	// MinSlashingPenaltyQuotientAltair:        64,
+	// ProportionalSlashingMultiplierAltair:    2,
 	MinSlashingPenaltyQuotientBellatrix:     32,
 	ProportionalSlashingMultiplierBellatrix: 3,
 	InactivityPenaltyQuotientBellatrix:      1 << 24,

@@ -1,5 +1,7 @@
 package main
 
+// TODO(rgeraldes24)
+/*
 import (
 	"bufio"
 	"context"
@@ -302,3 +304,4 @@ func benchmarkHash(sszPath string, sszType string) {
 		log.Fatal("Invalid type")
 	}
 }
+*/

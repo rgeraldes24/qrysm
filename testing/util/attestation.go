@@ -68,36 +68,6 @@ func GenerateAttestations(
 	if generateHeadState || slot == bState.Slot() {
 		var headState state.BeaconState
 		switch bState.Version() {
-		case version.Phase0:
-			pbState, err := state_native.ProtobufBeaconStatePhase0(bState.ToProto())
-			if err != nil {
-				return nil, err
-			}
-			genState, err := state_native.InitializeFromProtoUnsafePhase0(pbState)
-			if err != nil {
-				return nil, err
-			}
-			headState = genState
-		case version.Altair:
-			pbState, err := state_native.ProtobufBeaconStateAltair(bState.ToProto())
-			if err != nil {
-				return nil, err
-			}
-			genState, err := state_native.InitializeFromProtoUnsafeAltair(pbState)
-			if err != nil {
-				return nil, err
-			}
-			headState = genState
-		case version.Bellatrix:
-			pbState, err := state_native.ProtobufBeaconStateBellatrix(bState.ToProto())
-			if err != nil {
-				return nil, err
-			}
-			genState, err := state_native.InitializeFromProtoUnsafeBellatrix(pbState)
-			if err != nil {
-				return nil, err
-			}
-			headState = genState
 		case version.Capella:
 			pbState, err := state_native.ProtobufBeaconStateCapella(bState.ToProto())
 			if err != nil {

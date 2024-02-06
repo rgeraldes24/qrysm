@@ -746,23 +746,6 @@ func fullPayloadFromExecutionBlock(
 	}
 
 	switch blockVersion {
-	case version.Bellatrix:
-		return blocks.WrappedExecutionPayload(&pb.ExecutionPayload{
-			ParentHash:    header.ParentHash(),
-			FeeRecipient:  header.FeeRecipient(),
-			StateRoot:     header.StateRoot(),
-			ReceiptsRoot:  header.ReceiptsRoot(),
-			LogsBloom:     header.LogsBloom(),
-			PrevRandao:    header.PrevRandao(),
-			BlockNumber:   header.BlockNumber(),
-			GasLimit:      header.GasLimit(),
-			GasUsed:       header.GasUsed(),
-			Timestamp:     header.Timestamp(),
-			ExtraData:     header.ExtraData(),
-			BaseFeePerGas: header.BaseFeePerGas(),
-			BlockHash:     blockHash[:],
-			Transactions:  txs,
-		})
 	case version.Capella:
 		return blocks.WrappedExecutionPayloadCapella(&pb.ExecutionPayloadCapella{
 			ParentHash:    header.ParentHash(),
@@ -794,23 +777,6 @@ func fullPayloadFromPayloadBody(
 	}
 
 	switch bVersion {
-	case version.Bellatrix:
-		return blocks.WrappedExecutionPayload(&pb.ExecutionPayload{
-			ParentHash:    header.ParentHash(),
-			FeeRecipient:  header.FeeRecipient(),
-			StateRoot:     header.StateRoot(),
-			ReceiptsRoot:  header.ReceiptsRoot(),
-			LogsBloom:     header.LogsBloom(),
-			PrevRandao:    header.PrevRandao(),
-			BlockNumber:   header.BlockNumber(),
-			GasLimit:      header.GasLimit(),
-			GasUsed:       header.GasUsed(),
-			Timestamp:     header.Timestamp(),
-			ExtraData:     header.ExtraData(),
-			BaseFeePerGas: header.BaseFeePerGas(),
-			BlockHash:     header.BlockHash(),
-			Transactions:  body.Transactions,
-		})
 	case version.Capella:
 		return blocks.WrappedExecutionPayloadCapella(&pb.ExecutionPayloadCapella{
 			ParentHash:    header.ParentHash(),
@@ -921,19 +887,6 @@ func tDStringToUint256(td string) (*uint256.Int, error) {
 
 func buildEmptyExecutionPayload(v int) (proto.Message, error) {
 	switch v {
-	case version.Bellatrix:
-		return &pb.ExecutionPayload{
-			ParentHash:    make([]byte, fieldparams.RootLength),
-			FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
-			StateRoot:     make([]byte, fieldparams.RootLength),
-			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-			LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
-			PrevRandao:    make([]byte, fieldparams.RootLength),
-			BaseFeePerGas: make([]byte, fieldparams.RootLength),
-			BlockHash:     make([]byte, fieldparams.RootLength),
-			Transactions:  make([][]byte, 0),
-			ExtraData:     make([]byte, 0),
-		}, nil
 	case version.Capella:
 		return &pb.ExecutionPayloadCapella{
 			ParentHash:    make([]byte, fieldparams.RootLength),

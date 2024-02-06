@@ -25,24 +25,6 @@ func Test_getEmptyBlock(t *testing.T) {
 		want func() interfaces.ReadOnlySignedBeaconBlock
 	}{
 		{
-			name: "altair",
-			slot: primitives.Slot(params.BeaconConfig().AltairForkEpoch) * params.BeaconConfig().SlotsPerEpoch,
-			want: func() interfaces.ReadOnlySignedBeaconBlock {
-				b, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockAltair{Block: &zondpb.BeaconBlockAltair{Body: &zondpb.BeaconBlockBodyAltair{}}})
-				require.NoError(t, err)
-				return b
-			},
-		},
-		{
-			name: "bellatrix",
-			slot: primitives.Slot(params.BeaconConfig().BellatrixForkEpoch) * params.BeaconConfig().SlotsPerEpoch,
-			want: func() interfaces.ReadOnlySignedBeaconBlock {
-				b, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockBellatrix{Block: &zondpb.BeaconBlockBellatrix{Body: &zondpb.BeaconBlockBodyBellatrix{}}})
-				require.NoError(t, err)
-				return b
-			},
-		},
-		{
 			name: "capella",
 			slot: primitives.Slot(params.BeaconConfig().CapellaForkEpoch) * params.BeaconConfig().SlotsPerEpoch,
 			want: func() interfaces.ReadOnlySignedBeaconBlock {

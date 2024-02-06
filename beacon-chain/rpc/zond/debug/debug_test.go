@@ -24,61 +24,6 @@ func TestGetBeaconStateV2(t *testing.T) {
 	ctx := context.Background()
 	db := dbTest.SetupDB(t)
 
-	t.Run("Phase 0", func(t *testing.T) {
-		fakeState, err := util.NewBeaconState()
-		require.NoError(t, err)
-		server := &Server{
-			Stater: &testutil.MockStater{
-				BeaconState: fakeState,
-			},
-			HeadFetcher:           &blockchainmock.ChainService{},
-			OptimisticModeFetcher: &blockchainmock.ChainService{},
-			FinalizationFetcher:   &blockchainmock.ChainService{},
-			BeaconDB:              db,
-		}
-		resp, err := server.GetBeaconStateV2(context.Background(), &zondpbv2.BeaconStateRequestV2{
-			StateId: []byte("head"),
-		})
-		require.NoError(t, err)
-		assert.NotNil(t, resp)
-		assert.Equal(t, zondpbv2.Version_PHASE0, resp.Version)
-	})
-	t.Run("Altair", func(t *testing.T) {
-		fakeState, _ := util.DeterministicGenesisStateAltair(t, 1)
-		server := &Server{
-			Stater: &testutil.MockStater{
-				BeaconState: fakeState,
-			},
-			HeadFetcher:           &blockchainmock.ChainService{},
-			OptimisticModeFetcher: &blockchainmock.ChainService{},
-			FinalizationFetcher:   &blockchainmock.ChainService{},
-			BeaconDB:              db,
-		}
-		resp, err := server.GetBeaconStateV2(context.Background(), &zondpbv2.BeaconStateRequestV2{
-			StateId: []byte("head"),
-		})
-		require.NoError(t, err)
-		assert.NotNil(t, resp)
-		assert.Equal(t, zondpbv2.Version_ALTAIR, resp.Version)
-	})
-	t.Run("Bellatrix", func(t *testing.T) {
-		fakeState, _ := util.DeterministicGenesisStateBellatrix(t, 1)
-		server := &Server{
-			Stater: &testutil.MockStater{
-				BeaconState: fakeState,
-			},
-			HeadFetcher:           &blockchainmock.ChainService{},
-			OptimisticModeFetcher: &blockchainmock.ChainService{},
-			FinalizationFetcher:   &blockchainmock.ChainService{},
-			BeaconDB:              db,
-		}
-		resp, err := server.GetBeaconStateV2(context.Background(), &zondpbv2.BeaconStateRequestV2{
-			StateId: []byte("head"),
-		})
-		require.NoError(t, err)
-		assert.NotNil(t, resp)
-		assert.Equal(t, zondpbv2.Version_BELLATRIX, resp.Version)
-	})
 	t.Run("Capella", func(t *testing.T) {
 		fakeState, _ := util.DeterministicGenesisStateCapella(t, 1)
 		server := &Server{
@@ -179,64 +124,6 @@ func TestGetBeaconStateSSZ(t *testing.T) {
 }
 
 func TestGetBeaconStateSSZV2(t *testing.T) {
-	t.Run("Phase 0", func(t *testing.T) {
-		fakeState, err := util.NewBeaconState()
-		require.NoError(t, err)
-		sszState, err := fakeState.MarshalSSZ()
-		require.NoError(t, err)
-
-		server := &Server{
-			Stater: &testutil.MockStater{
-				BeaconState: fakeState,
-			},
-		}
-		resp, err := server.GetBeaconStateSSZV2(context.Background(), &zondpbv2.BeaconStateRequestV2{
-			StateId: make([]byte, 0),
-		})
-		require.NoError(t, err)
-		assert.NotNil(t, resp)
-
-		assert.DeepEqual(t, sszState, resp.Data)
-		assert.Equal(t, zondpbv2.Version_PHASE0, resp.Version)
-	})
-	t.Run("Altair", func(t *testing.T) {
-		fakeState, _ := util.DeterministicGenesisStateAltair(t, 1)
-		sszState, err := fakeState.MarshalSSZ()
-		require.NoError(t, err)
-
-		server := &Server{
-			Stater: &testutil.MockStater{
-				BeaconState: fakeState,
-			},
-		}
-		resp, err := server.GetBeaconStateSSZV2(context.Background(), &zondpbv2.BeaconStateRequestV2{
-			StateId: make([]byte, 0),
-		})
-		require.NoError(t, err)
-		assert.NotNil(t, resp)
-
-		assert.DeepEqual(t, sszState, resp.Data)
-		assert.Equal(t, zondpbv2.Version_ALTAIR, resp.Version)
-	})
-	t.Run("Bellatrix", func(t *testing.T) {
-		fakeState, _ := util.DeterministicGenesisStateBellatrix(t, 1)
-		sszState, err := fakeState.MarshalSSZ()
-		require.NoError(t, err)
-
-		server := &Server{
-			Stater: &testutil.MockStater{
-				BeaconState: fakeState,
-			},
-		}
-		resp, err := server.GetBeaconStateSSZV2(context.Background(), &zondpbv2.BeaconStateRequestV2{
-			StateId: make([]byte, 0),
-		})
-		require.NoError(t, err)
-		assert.NotNil(t, resp)
-
-		assert.DeepEqual(t, sszState, resp.Data)
-		assert.Equal(t, zondpbv2.Version_BELLATRIX, resp.Version)
-	})
 	t.Run("Capella", func(t *testing.T) {
 		fakeState, _ := util.DeterministicGenesisStateCapella(t, 1)
 		sszState, err := fakeState.MarshalSSZ()

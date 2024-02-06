@@ -23,31 +23,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var phase0Fields = []types.FieldIndex{
-	types.GenesisTime,
-	types.GenesisValidatorsRoot,
-	types.Slot,
-	types.Fork,
-	types.LatestBlockHeader,
-	types.BlockRoots,
-	types.StateRoots,
-	types.HistoricalRoots,
-	types.Eth1Data,
-	types.Eth1DataVotes,
-	types.Eth1DepositIndex,
-	types.Validators,
-	types.Balances,
-	types.RandaoMixes,
-	types.Slashings,
-	types.PreviousEpochAttestations,
-	types.CurrentEpochAttestations,
-	types.JustificationBits,
-	types.PreviousJustifiedCheckpoint,
-	types.CurrentJustifiedCheckpoint,
-	types.FinalizedCheckpoint,
-}
-
-var altairFields = []types.FieldIndex{
+var capellaFields = []types.FieldIndex{
 	types.GenesisTime,
 	types.GenesisValidatorsRoot,
 	types.Slot,
@@ -72,27 +48,15 @@ var altairFields = []types.FieldIndex{
 	types.InactivityScores,
 	types.CurrentSyncCommittee,
 	types.NextSyncCommittee,
-}
-
-var bellatrixFields = append(altairFields, types.LatestExecutionPayloadHeader)
-
-var capellaFields = append(
-	altairFields,
 	types.LatestExecutionPayloadHeaderCapella,
 	types.NextWithdrawalIndex,
 	types.NextWithdrawalValidatorIndex,
 	types.HistoricalSummaries,
-)
+}
 
 const (
-	phase0SharedFieldRefCount                     = 10
-	altairSharedFieldRefCount                     = 11
-	bellatrixSharedFieldRefCount                  = 12
-	capellaSharedFieldRefCount                    = 14
-	experimentalStatePhase0SharedFieldRefCount    = 5
-	experimentalStateAltairSharedFieldRefCount    = 5
-	experimentalStateBellatrixSharedFieldRefCount = 6
-	experimentalStateCapellaSharedFieldRefCount   = 8
+	capellaSharedFieldRefCount                  = 14
+	experimentalStateCapellaSharedFieldRefCount = 8
 )
 
 // InitializeFromProtoCapella the beacon state from a protobuf representation.
@@ -297,23 +261,11 @@ func (b *BeaconState) Copy() state.BeaconState {
 
 	if features.Get().EnableExperimentalState {
 		switch b.version {
-		case version.Phase0:
-			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, experimentalStatePhase0SharedFieldRefCount)
-		case version.Altair:
-			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, experimentalStateAltairSharedFieldRefCount)
-		case version.Bellatrix:
-			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, experimentalStateBellatrixSharedFieldRefCount)
 		case version.Capella:
 			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, experimentalStateCapellaSharedFieldRefCount)
 		}
 	} else {
 		switch b.version {
-		case version.Phase0:
-			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, phase0SharedFieldRefCount)
-		case version.Altair:
-			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, altairSharedFieldRefCount)
-		case version.Bellatrix:
-			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, bellatrixSharedFieldRefCount)
 		case version.Capella:
 			dst.sharedFieldReferences = make(map[types.FieldIndex]*stateutil.Reference, capellaSharedFieldRefCount)
 		}

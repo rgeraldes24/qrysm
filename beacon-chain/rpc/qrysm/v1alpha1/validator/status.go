@@ -258,9 +258,6 @@ func (vs *Server) activationStatus(
 // Spec:
 // https://github.com/ethereum/consensus-specs/blob/dev/sync/optimistic.md
 func (vs *Server) optimisticStatus(ctx context.Context) error {
-	if slots.ToEpoch(vs.TimeFetcher.CurrentSlot()) < params.BeaconConfig().BellatrixForkEpoch {
-		return nil
-	}
 	optimistic, err := vs.OptimisticModeFetcher.IsOptimistic(ctx)
 	if err != nil {
 		return status.Errorf(codes.Internal, "Could not determine if the node is a optimistic node: %v", err)

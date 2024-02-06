@@ -7,17 +7,12 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	_ "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 )
 
 // SetLatestExecutionPayloadHeader for the beacon state.
 func (b *BeaconState) SetLatestExecutionPayloadHeader(val interfaces.ExecutionData) error {
 	b.lock.Lock()
 	defer b.lock.Unlock()
-
-	if b.version < version.Bellatrix {
-		return errNotSupported("SetLatestExecutionPayloadHeader", b.version)
-	}
 
 	switch header := val.Proto().(type) {
 	case *enginev1.ExecutionPayloadCapella:

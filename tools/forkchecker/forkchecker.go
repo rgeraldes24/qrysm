@@ -9,6 +9,8 @@
  */
 package main
 
+// TODO(rgeraldes24)
+/*
 import (
 	"context"
 	"encoding/hex"
@@ -147,3 +149,4 @@ func randomEndpt(clients map[string]pb.BeaconChainClient) string {
 	}
 	return ""
 }
+*/

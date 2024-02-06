@@ -38,28 +38,24 @@ func logStateTransitionData(b interfaces.ReadOnlyBeaconBlock) error {
 	if len(b.Body().VoluntaryExits()) > 0 {
 		log = log.WithField("voluntaryExits", len(b.Body().VoluntaryExits()))
 	}
-	if b.Version() >= version.Altair {
-		agg, err := b.Body().SyncAggregate()
-		if err != nil {
-			return err
-		}
-		log = log.WithField("syncBitsCount", agg.SyncCommitteeBits.Count())
+	agg, err := b.Body().SyncAggregate()
+	if err != nil {
+		return err
 	}
-	if b.Version() >= version.Bellatrix {
-		p, err := b.Body().Execution()
-		if err != nil {
-			return err
-		}
-		log = log.WithField("payloadHash", fmt.Sprintf("%#x", bytesutil.Trunc(p.BlockHash())))
-		txs, err := p.Transactions()
-		switch {
-		case errors.Is(err, consensus_types.ErrUnsupportedField):
-		case err != nil:
-			return err
-		default:
-			log = log.WithField("txCount", len(txs))
-			txsPerSlotCount.Set(float64(len(txs)))
-		}
+	log = log.WithField("syncBitsCount", agg.SyncCommitteeBits.Count())
+	p, err := b.Body().Execution()
+	if err != nil {
+		return err
+	}
+	log = log.WithField("payloadHash", fmt.Sprintf("%#x", bytesutil.Trunc(p.BlockHash())))
+	txs, err := p.Transactions()
+	switch {
+	case errors.Is(err, consensus_types.ErrUnsupportedField):
+	case err != nil:
+		return err
+	default:
+		log = log.WithField("txCount", len(txs))
+		txsPerSlotCount.Set(float64(len(txs)))
 	}
 
 	log.Info("Finished applying state transition")

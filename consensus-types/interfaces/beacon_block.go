@@ -92,7 +92,7 @@ type SignedBeaconBlock interface {
 }
 
 // ExecutionData represents execution layer information that is contained
-// within post-Bellatrix beacon block bodies.
+// within beacon block bodies.
 type ExecutionData interface {
 	ssz.Marshaler
 	ssz.Unmarshaler

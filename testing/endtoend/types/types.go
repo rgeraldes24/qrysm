@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/theQRL/go-qrllib/dilithium"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"google.golang.org/grpc"
@@ -73,17 +72,7 @@ type E2EConfig struct {
 }
 
 func GenesisFork() int {
-	cfg := params.BeaconConfig()
-	if cfg.CapellaForkEpoch == 0 {
-		return version.Capella
-	}
-	if cfg.BellatrixForkEpoch == 0 {
-		return version.Bellatrix
-	}
-	if cfg.AltairForkEpoch == 0 {
-		return version.Altair
-	}
-	return version.Phase0
+	return version.Capella
 }
 
 // Evaluator defines the structure of the evaluators used to

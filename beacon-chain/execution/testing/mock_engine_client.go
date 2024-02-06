@@ -16,7 +16,6 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/math"
 	pb "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 // EngineClient --
@@ -24,7 +23,6 @@ type EngineClient struct {
 	NewPayloadResp              []byte
 	PayloadIDBytes              *pb.PayloadIDBytes
 	ForkChoiceUpdatedResp       []byte
-	ExecutionPayload            *pb.ExecutionPayload
 	ExecutionPayloadCapella     *pb.ExecutionPayloadCapella
 	ExecutionBlock              *pb.ExecutionBlock
 	Err                         error
@@ -60,18 +58,11 @@ func (e *EngineClient) ForkchoiceUpdated(
 
 // GetPayload --
 func (e *EngineClient) GetPayload(_ context.Context, _ [8]byte, s primitives.Slot) (interfaces.ExecutionData, bool, error) {
-	if slots.ToEpoch(s) >= params.BeaconConfig().CapellaForkEpoch {
-		ed, err := blocks.WrappedExecutionPayloadCapella(e.ExecutionPayloadCapella, math.Gwei(e.BlockValue))
-		if err != nil {
-			return nil, false, err
-		}
-		return ed, e.BuilderOverride, nil
-	}
-	p, err := blocks.WrappedExecutionPayload(e.ExecutionPayload)
+	ed, err := blocks.WrappedExecutionPayloadCapella(e.ExecutionPayloadCapella, math.Gwei(e.BlockValue))
 	if err != nil {
 		return nil, false, err
 	}
-	return p, e.BuilderOverride, e.ErrGetPayload
+	return ed, e.BuilderOverride, nil
 }
 
 // ExchangeTransitionConfiguration --

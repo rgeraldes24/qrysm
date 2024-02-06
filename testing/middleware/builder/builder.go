@@ -387,30 +387,6 @@ func (p *Builder) handleBlindedBlock(w http.ResponseWriter, req *http.Request) {
 	return
 }
 
-func (p *Builder) retrievePendingBlock() (*v1.ExecutionPayload, error) {
-	result := &engine.ExecutableData{}
-	if p.currId == nil {
-		return nil, errors.New("no payload id is cached")
-	}
-	err := p.execClient.CallContext(context.Background(), result, GetPayloadMethod, *p.currId)
-	if err != nil {
-		return nil, err
-	}
-	payloadEnv, err := modifyExecutionPayload(*result, big.NewInt(0))
-	if err != nil {
-		return nil, err
-	}
-	marshalledOutput, err := payloadEnv.ExecutionPayload.MarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-	bellatrixPayload := &v1.ExecutionPayload{}
-	if err = json.Unmarshal(marshalledOutput, bellatrixPayload); err != nil {
-		return nil, err
-	}
-	return bellatrixPayload, nil
-}
-
 func (p *Builder) retrievePendingBlockCapella() (*v1.ExecutionPayloadCapellaWithValue, error) {
 	result := &engine.ExecutionPayloadEnvelope{}
 	if p.currId == nil {

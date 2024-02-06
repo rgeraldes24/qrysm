@@ -282,22 +282,6 @@ func (s *Server) streamPayloadAttributes(stream zondpbservice.Events_StreamEvent
 	}
 
 	switch headState.Version() {
-	case version.Bellatrix:
-		return streamData(stream, PayloadAttributesTopic, &zondpb.EventPayloadAttributeV1{
-			Version: version.String(headState.Version()),
-			Data: &zondpb.EventPayloadAttributeV1_BasePayloadAttribute{
-				ProposerIndex:     proposerIndex,
-				ProposalSlot:      headState.Slot(),
-				ParentBlockNumber: headPayload.BlockNumber(),
-				ParentBlockRoot:   headRoot,
-				ParentBlockHash:   headPayload.BlockHash(),
-				PayloadAttributes: &enginev1.PayloadAttributes{
-					Timestamp:             uint64(t.Unix()),
-					PrevRandao:            prevRando,
-					SuggestedFeeRecipient: headPayload.FeeRecipient(),
-				},
-			},
-		})
 	case version.Capella:
 		withdrawals, err := headState.ExpectedWithdrawals()
 		if err != nil {

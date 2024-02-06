@@ -107,7 +107,7 @@ message EventFinalizedCheckpoint {
 }
 
 message EventPayloadAttributeV2 {
-  // the identifier of the beacon hard fork at `proposal_slot`, e.g.`"bellatrix"`.
+  // the identifier of the beacon hard fork at `proposal_slot`, e.g.`"capella"`.
   string version = 1;
   BasePayloadAttribute data = 2;
   message BasePayloadAttribute {

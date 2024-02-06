@@ -71,7 +71,6 @@ service BeaconValidator {
   // Metadata in the response indicates the type of block produced, and the supported types of block
   // will be added to as forks progress.
   //
-  // Pre-Bellatrix, this endpoint will return a regular block.
   // HTTP response usage:
   //  - 200: Successful response
   //  - 400: Invalid block production request
@@ -91,7 +90,6 @@ service BeaconValidator {
   // Metadata in the response indicates the type of block produced, and the supported types of block
   // will be added to as forks progress.
   //
-  // Pre-Bellatrix, this endpoint will return a regular block.
   // HTTP response usage:
   //  - 200: Successful response
   //  - 400: Invalid block production request

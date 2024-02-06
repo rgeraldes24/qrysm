@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	b "github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
@@ -68,7 +68,7 @@ func NewPreminedGenesis(ctx context.Context, t, nvals, pCreds uint64, version in
 
 func (s *PremineGenesisConfig) prepare(ctx context.Context) (state.BeaconState, error) {
 	switch s.Version {
-	case version.Phase0, version.Altair, version.Bellatrix, version.Capella:
+	case version.Capella:
 	default:
 		return nil, errors.Wrapf(errUnsupportedVersion, "version=%s", version.String(s.Version))
 	}
@@ -285,14 +285,8 @@ func (s *PremineGenesisConfig) setGenesisValidatorsRoot(g state.BeaconState) err
 func (s *PremineGenesisConfig) setFork(g state.BeaconState) error {
 	var pv, cv []byte
 	switch s.Version {
-	case version.Phase0:
-		pv, cv = params.BeaconConfig().GenesisForkVersion, params.BeaconConfig().GenesisForkVersion
-	case version.Altair:
-		pv, cv = params.BeaconConfig().GenesisForkVersion, params.BeaconConfig().AltairForkVersion
-	case version.Bellatrix:
-		pv, cv = params.BeaconConfig().AltairForkVersion, params.BeaconConfig().BellatrixForkVersion
 	case version.Capella:
-		pv, cv = params.BeaconConfig().BellatrixForkVersion, params.BeaconConfig().CapellaForkVersion
+		pv, cv = params.BeaconConfig().GenesisForkVersion, params.BeaconConfig().GenesisForkVersion
 	default:
 		return errUnsupportedVersion
 	}
@@ -381,7 +375,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 	switch s.Version {
 	case version.Capella:
 		body = &zondpb.BeaconBlockBodyCapella{
-			RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+			RandaoReveal: make([]byte, dilithiumlib.CryptoBytes),
 			Eth1Data: &zondpb.Eth1Data{
 				DepositRoot: make([]byte, 32),
 				BlockHash:   make([]byte, 32),
@@ -389,7 +383,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 			Graffiti: make([]byte, 32),
 			SyncAggregate: &zondpb.SyncAggregate{
 				SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-				SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+				SyncCommitteeSignature: make([]byte, dilithiumlib.CryptoBytes),
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 				ParentHash:    make([]byte, 32),
@@ -422,10 +416,6 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 }
 
 func (s *PremineGenesisConfig) setExecutionPayload(g state.BeaconState) error {
-	if s.Version < version.Bellatrix {
-		return nil
-	}
-
 	gb := s.GB
 
 	var ed interfaces.ExecutionData

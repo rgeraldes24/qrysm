@@ -34,9 +34,9 @@ type BlockGenConfig struct {
 	NumAttestations      uint64
 	NumDeposits          uint64
 	NumVoluntaryExits    uint64
-	NumTransactions      uint64 // Only for post Bellatrix blocks
+	NumTransactions      uint64
 	FullSyncAggregate    bool
-	NumDilithiumChanges  uint64 // Only for post Capella blocks
+	NumDilithiumChanges  uint64
 }
 
 // DefaultBlockGenConfig returns the block config that utilizes the
