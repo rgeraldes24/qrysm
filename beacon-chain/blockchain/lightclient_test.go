@@ -32,7 +32,7 @@ func newTestLc(t *testing.T) *testlc {
 func (l *testlc) setupTest() *testlc {
 	ctx := context.Background()
 
-	slot := primitives.Slot(params.BeaconConfig().AltairForkEpoch * primitives.Epoch(params.BeaconConfig().SlotsPerEpoch)).Add(1)
+	slot := primitives.Slot(0)
 
 	attestedState, err := util.NewBeaconStateCapella()
 	require.NoError(l.t, err)

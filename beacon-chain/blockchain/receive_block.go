@@ -424,10 +424,6 @@ func (s *Service) validateExecutionOnBlock(ctx context.Context, ver int, header 
 	if err != nil {
 		return false, s.handleInvalidExecutionError(ctx, err, blockRoot, signed.Block().ParentRoot())
 	}
-	if signed.Version() < version.Capella && isValidPayload {
-		if err := s.validateMergeTransitionBlock(ctx, ver, header, signed); err != nil {
-			return isValidPayload, err
-		}
-	}
+
 	return isValidPayload, nil
 }

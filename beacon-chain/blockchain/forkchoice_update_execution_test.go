@@ -48,7 +48,7 @@ func TestService_getHeadStateAndBlock(t *testing.T) {
 	_, _, err := service.getStateAndBlock(context.Background(), [32]byte{})
 	require.ErrorContains(t, "block does not exist", err)
 
-	blk, err := blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlock(&zondpb.SignedBeaconBlock{Signature: []byte{1}}))
+	blk, err := blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{Signature: []byte{1}}))
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.BeaconDB.SaveBlock(context.Background(), blk))
 
@@ -80,7 +80,7 @@ func TestService_forkchoiceUpdateWithExecution_exceptionalCases(t *testing.T) {
 	invalidStateErr := "could not get state summary: could not find block in DB"
 	require.LogsDoNotContain(t, hook, invalidStateErr)
 	require.LogsDoNotContain(t, hook, hookErr)
-	gb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+	gb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 	require.NoError(t, service.saveInitSyncBlock(ctx, [32]byte{'a'}, gb))
 	_, err = service.forkchoiceUpdateWithExecution(ctx, [32]byte{'a'}, service.CurrentSlot()+1)
@@ -94,7 +94,7 @@ func TestService_forkchoiceUpdateWithExecution_exceptionalCases(t *testing.T) {
 	}
 
 	// Block in Cache
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	b.Block.Slot = 2
 	wsb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -114,7 +114,7 @@ func TestService_forkchoiceUpdateWithExecution_exceptionalCases(t *testing.T) {
 	require.LogsDoNotContain(t, hook, hookErr)
 
 	// Block in DB
-	b = util.NewBeaconBlock()
+	b = util.NewBeaconBlockCapella()
 	b.Block.Slot = 3
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b)
 	r1, err = b.Block.HashTreeRoot()

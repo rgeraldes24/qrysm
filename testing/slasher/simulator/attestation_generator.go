@@ -10,7 +10,6 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -129,7 +128,10 @@ func (s *Simulator) aggregateSigForAttestation(
 		privKey := s.srvConfig.PrivateKeysByValidatorIndex[primitives.ValidatorIndex(validatorIndex)]
 		sigs[i] = privKey.Sign(signingRoot[:])
 	}
-	return bls.AggregateSignatures(sigs), nil
+
+	// TODO(rgeraldes24)
+	// return bls.AggregateSignatures(sigs), nil
+	return sigs[0], nil
 }
 
 func makeSlashableFromAtt(att *zondpb.IndexedAttestation, indices []uint64) *zondpb.IndexedAttestation {

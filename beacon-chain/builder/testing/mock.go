@@ -24,10 +24,8 @@ type Config struct {
 // MockBuilderService to mock builder.
 type MockBuilderService struct {
 	HasConfigured         bool
-	Payload               *v1.ExecutionPayload
 	PayloadCapella        *v1.ExecutionPayloadCapella
 	ErrSubmitBlindedBlock error
-	Bid                   *zondpb.SignedBuilderBid
 	BidCapella            *zondpb.SignedBuilderBidCapella
 	RegistrationCache     *cache.RegistrationCache
 	ErrGetHeader          error
@@ -43,12 +41,6 @@ func (s *MockBuilderService) Configured() bool {
 // SubmitBlindedBlock for mocking.
 func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, b interfaces.ReadOnlySignedBeaconBlock) (interfaces.ExecutionData, error) {
 	switch b.Version() {
-	case version.Bellatrix:
-		w, err := blocks.WrappedExecutionPayload(s.Payload)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not wrap payload")
-		}
-		return w, s.ErrSubmitBlindedBlock
 	case version.Capella:
 		w, err := blocks.WrappedExecutionPayloadCapella(s.PayloadCapella, 0)
 		if err != nil {

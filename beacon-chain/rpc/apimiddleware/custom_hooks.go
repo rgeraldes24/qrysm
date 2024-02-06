@@ -6,15 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
-	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 // https://ethereum.github.io/beacon-APIs/?urls.primaryName=dev#/Beacon/submitPoolBLSToExecutionChange
@@ -108,20 +104,22 @@ func setInitialPublishBlockPostRequest(endpoint *apimiddleware.Endpoint,
 	} else {
 		return false, &apimiddleware.DefaultErrorJson{Message: "could not parse slot from request", Code: http.StatusInternalServerError}
 	}
-	slot, err := strconv.ParseUint(s.Slot, 10, 64)
-	if err != nil {
-		return false, apimiddleware.InternalServerErrorWithMessage(err, "slot is not an unsigned integer")
-	}
-	currentEpoch := slots.ToEpoch(primitives.Slot(slot))
-	if currentEpoch < params.BeaconConfig().AltairForkEpoch {
-		endpoint.PostRequest = &SignedBeaconBlockJson{}
-	} else if currentEpoch < params.BeaconConfig().BellatrixForkEpoch {
-		endpoint.PostRequest = &SignedBeaconBlockAltairJson{}
-	} else if currentEpoch < params.BeaconConfig().CapellaForkEpoch {
-		endpoint.PostRequest = &SignedBeaconBlockBellatrixJson{}
-	} else {
-		endpoint.PostRequest = &SignedBeaconBlockCapellaJson{}
-	}
+	// slot, err := strconv.ParseUint(s.Slot, 10, 64)
+	// if err != nil {
+	// 	return false, apimiddleware.InternalServerErrorWithMessage(err, "slot is not an unsigned integer")
+	// }
+	// currentEpoch := slots.ToEpoch(primitives.Slot(slot))
+	// if currentEpoch < params.BeaconConfig().AltairForkEpoch {
+	// 	endpoint.PostRequest = &SignedBeaconBlockJson{}
+	// } else if currentEpoch < params.BeaconConfig().BellatrixForkEpoch {
+	// 	endpoint.PostRequest = &SignedBeaconBlockAltairJson{}
+	// } else if currentEpoch < params.BeaconConfig().CapellaForkEpoch {
+	// 	endpoint.PostRequest = &SignedBeaconBlockBellatrixJson{}
+	// } else {
+	// 	endpoint.PostRequest = &SignedBeaconBlockCapellaJson{}
+	// }
+	endpoint.PostRequest = &SignedBeaconBlockCapellaJson{}
+
 	req.Body = io.NopCloser(bytes.NewBuffer(buf))
 	return true, nil
 }
@@ -204,20 +202,22 @@ func setInitialPublishBlindedBlockPostRequest(endpoint *apimiddleware.Endpoint,
 	} else {
 		return false, &apimiddleware.DefaultErrorJson{Message: "could not parse slot from request", Code: http.StatusInternalServerError}
 	}
-	slot, err := strconv.ParseUint(s.Slot, 10, 64)
-	if err != nil {
-		return false, apimiddleware.InternalServerErrorWithMessage(err, "slot is not an unsigned integer")
-	}
-	currentEpoch := slots.ToEpoch(primitives.Slot(slot))
-	if currentEpoch < params.BeaconConfig().AltairForkEpoch {
-		endpoint.PostRequest = &SignedBeaconBlockJson{}
-	} else if currentEpoch < params.BeaconConfig().BellatrixForkEpoch {
-		endpoint.PostRequest = &SignedBeaconBlockAltairJson{}
-	} else if currentEpoch < params.BeaconConfig().CapellaForkEpoch {
-		endpoint.PostRequest = &SignedBlindedBeaconBlockBellatrixJson{}
-	} else {
-		endpoint.PostRequest = &SignedBlindedBeaconBlockCapellaJson{}
-	}
+	// slot, err := strconv.ParseUint(s.Slot, 10, 64)
+	// if err != nil {
+	// 	return false, apimiddleware.InternalServerErrorWithMessage(err, "slot is not an unsigned integer")
+	// }
+	// currentEpoch := slots.ToEpoch(primitives.Slot(slot))
+	// if currentEpoch < params.BeaconConfig().AltairForkEpoch {
+	// 	endpoint.PostRequest = &SignedBeaconBlockJson{}
+	// } else if currentEpoch < params.BeaconConfig().BellatrixForkEpoch {
+	// 	endpoint.PostRequest = &SignedBeaconBlockAltairJson{}
+	// } else if currentEpoch < params.BeaconConfig().CapellaForkEpoch {
+	// 	endpoint.PostRequest = &SignedBlindedBeaconBlockBellatrixJson{}
+	// } else {
+	// 	endpoint.PostRequest = &SignedBlindedBeaconBlockCapellaJson{}
+	// }
+	endpoint.PostRequest = &SignedBlindedBeaconBlockCapellaJson{}
+
 	req.Body = io.NopCloser(bytes.NewBuffer(buf))
 	return true, nil
 }

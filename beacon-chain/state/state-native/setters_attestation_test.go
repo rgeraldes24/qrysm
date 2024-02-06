@@ -13,7 +13,7 @@ import (
 )
 
 func TestBeaconState_RotateAttestations(t *testing.T) {
-	st, err := InitializeFromProtoPhase0(&zondpb.BeaconState{
+	st, err := InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Slot:                      1,
 		CurrentEpochAttestations:  []*zondpb.PendingAttestation{{Data: &zondpb.AttestationData{Slot: 456}}},
 		PreviousEpochAttestations: []*zondpb.PendingAttestation{{Data: &zondpb.AttestationData{Slot: 123}}},
@@ -42,7 +42,7 @@ func TestAppendBeyondIndicesLimit(t *testing.T) {
 	for i := 0; i < len(mockrandaoMixes); i++ {
 		mockrandaoMixes[i] = zeroHash[:]
 	}
-	st, err := InitializeFromProtoPhase0(&zondpb.BeaconState{
+	st, err := InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Slot:                      1,
 		CurrentEpochAttestations:  []*zondpb.PendingAttestation{{Data: &zondpb.AttestationData{Slot: 456}}},
 		PreviousEpochAttestations: []*zondpb.PendingAttestation{{Data: &zondpb.AttestationData{Slot: 123}}},
@@ -76,7 +76,7 @@ func TestAppendBeyondIndicesLimit(t *testing.T) {
 }
 
 func BenchmarkAppendPreviousEpochAttestations(b *testing.B) {
-	st, err := InitializeFromProtoPhase0(&zondpb.BeaconState{})
+	st, err := InitializeFromProtoCapella(&zondpb.BeaconStateCapella{})
 	require.NoError(b, err)
 
 	max := uint64(params.BeaconConfig().PreviousEpochAttestationsLength())

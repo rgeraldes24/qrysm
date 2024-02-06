@@ -1,5 +1,6 @@
 package blocks_test
 
+/*
 import (
 	"context"
 	"os"
@@ -77,3 +78,4 @@ func TestVerifyAttestationNoVerifySignature_IncorrectSourceEpoch(t *testing.T) {
 	err = blocks.VerifyAttestationNoVerifySignature(context.TODO(), beaconState, att)
 	assert.NotEqual(t, nil, err)
 }
+*/

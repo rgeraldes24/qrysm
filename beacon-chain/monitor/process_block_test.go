@@ -19,13 +19,13 @@ import (
 func TestProcessSlashings(t *testing.T) {
 	tests := []struct {
 		name      string
-		block     *zondpb.BeaconBlock
+		block     *zondpb.BeaconBlockCapella
 		wantedErr string
 	}{
 		{
 			name: "Proposer slashing a tracked index",
-			block: &zondpb.BeaconBlock{
-				Body: &zondpb.BeaconBlockBody{
+			block: &zondpb.BeaconBlockCapella{
+				Body: &zondpb.BeaconBlockBodyCapella{
 					ProposerSlashings: []*zondpb.ProposerSlashing{
 						{
 							Header_1: &zondpb.SignedBeaconBlockHeader{
@@ -48,8 +48,8 @@ func TestProcessSlashings(t *testing.T) {
 		},
 		{
 			name: "Proposer slashing an untracked index",
-			block: &zondpb.BeaconBlock{
-				Body: &zondpb.BeaconBlockBody{
+			block: &zondpb.BeaconBlockCapella{
+				Body: &zondpb.BeaconBlockBodyCapella{
 					ProposerSlashings: []*zondpb.ProposerSlashing{
 						{
 							Header_1: &zondpb.SignedBeaconBlockHeader{
@@ -72,8 +72,8 @@ func TestProcessSlashings(t *testing.T) {
 		},
 		{
 			name: "Attester slashing a tracked index",
-			block: &zondpb.BeaconBlock{
-				Body: &zondpb.BeaconBlockBody{
+			block: &zondpb.BeaconBlockCapella{
+				Body: &zondpb.BeaconBlockBodyCapella{
 					AttesterSlashings: []*zondpb.AttesterSlashing{
 						{
 							Attestation_1: util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
@@ -94,8 +94,8 @@ func TestProcessSlashings(t *testing.T) {
 		},
 		{
 			name: "Attester slashing untracked index",
-			block: &zondpb.BeaconBlock{
-				Body: &zondpb.BeaconBlockBody{
+			block: &zondpb.BeaconBlockCapella{
+				Body: &zondpb.BeaconBlockBodyCapella{
 					AttesterSlashings: []*zondpb.AttesterSlashing{
 						{
 							Attestation_1: util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
@@ -138,28 +138,28 @@ func TestProcessSlashings(t *testing.T) {
 func TestProcessProposedBlock(t *testing.T) {
 	tests := []struct {
 		name      string
-		block     *zondpb.BeaconBlock
+		block     *zondpb.BeaconBlockCapella
 		wantedErr string
 	}{
 		{
 			name: "Block proposed by tracked validator",
-			block: &zondpb.BeaconBlock{
+			block: &zondpb.BeaconBlockCapella{
 				Slot:          6,
 				ProposerIndex: 12,
 				ParentRoot:    bytesutil.PadTo([]byte("hello-world"), 32),
 				StateRoot:     bytesutil.PadTo([]byte("state-world"), 32),
-				Body:          &zondpb.BeaconBlockBody{},
+				Body:          &zondpb.BeaconBlockBodyCapella{},
 			},
 			wantedErr: "\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=0x68656c6c6f2d NewBalance=32000000000 ParentRoot=0x68656c6c6f2d ProposerIndex=12 Slot=6 Version=0 prefix=monitor",
 		},
 		{
 			name: "Block proposed by untracked validator",
-			block: &zondpb.BeaconBlock{
+			block: &zondpb.BeaconBlockCapella{
 				Slot:          6,
 				ProposerIndex: 13,
 				ParentRoot:    bytesutil.PadTo([]byte("hello-world"), 32),
 				StateRoot:     bytesutil.PadTo([]byte("state-world"), 32),
-				Body:          &zondpb.BeaconBlockBody{},
+				Body:          &zondpb.BeaconBlockBodyCapella{},
 			},
 		},
 	}
@@ -188,7 +188,7 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
 
-	genesis, keys := util.DeterministicGenesisStateAltair(t, 64)
+	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
 	c, err := altair.NextSyncCommittee(ctx, genesis)
 	require.NoError(t, err)
 	require.NoError(t, genesis.SetCurrentSyncCommittee(c))
@@ -196,7 +196,7 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	genConfig := util.DefaultBlockGenConfig()
 	genConfig.NumProposerSlashings = 1
 	genConfig.FullSyncAggregate = true
-	b, err := util.GenerateFullBlockAltair(genesis, keys, genConfig, 1)
+	b, err := util.GenerateFullBlockCapella(genesis, keys, genConfig, 1)
 	require.NoError(t, err)
 	s := setupService(t)
 

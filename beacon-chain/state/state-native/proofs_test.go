@@ -1,5 +1,7 @@
 package state_native_test
 
+// TODO(rgeraldes24): capella
+/*
 import (
 	"context"
 	"testing"
@@ -164,3 +166,4 @@ func TestBeaconStateMerkleProofs_bellatrix(t *testing.T) {
 		require.Equal(t, true, valid)
 	})
 }
+*/

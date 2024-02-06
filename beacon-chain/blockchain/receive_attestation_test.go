@@ -40,12 +40,12 @@ func TestVerifyLMDFFGConsistent_NotOK(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	b32 := util.NewBeaconBlock()
+	b32 := util.NewBeaconBlockCapella()
 	b32.Block.Slot = 32
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b32)
 	r32, err := b32.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b33 := util.NewBeaconBlock()
+	b33 := util.NewBeaconBlockCapella()
 	b33.Block.Slot = 33
 	b33.Block.ParentRoot = r32[:]
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b33)
@@ -64,12 +64,12 @@ func TestVerifyLMDFFGConsistent_OK(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	b32 := util.NewBeaconBlock()
+	b32 := util.NewBeaconBlockCapella()
 	b32.Block.Slot = 32
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b32)
 	r32, err := b32.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b33 := util.NewBeaconBlock()
+	b33 := util.NewBeaconBlockCapella()
 	b33.Block.Slot = 33
 	b33.Block.ParentRoot = r32[:]
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b33)
@@ -122,7 +122,7 @@ func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	require.NoError(t, fcs.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 0, Root: service.originBlockRoot}))
 	copied := genesisState.Copy()
 	// Generate a new block for attesters to attest
-	blk, err := util.GenerateFullBlock(copied, pks, util.DefaultBlockGenConfig(), 1)
+	blk, err := util.GenerateFullBlockCapella(copied, pks, util.DefaultBlockGenConfig(), 1)
 	require.NoError(t, err)
 	tRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -150,7 +150,7 @@ func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	require.Equal(t, true, fcs.HasNode(service.originBlockRoot))
 
 	// Insert a new block to forkchoice
-	b, err := util.GenerateFullBlock(genesisState, pks, util.DefaultBlockGenConfig(), 2)
+	b, err := util.GenerateFullBlockCapella(genesisState, pks, util.DefaultBlockGenConfig(), 2)
 	require.NoError(t, err)
 	b.Block.ParentRoot = service.originBlockRoot[:]
 	r, err := b.Block.HashTreeRoot()
@@ -178,7 +178,7 @@ func TestService_UpdateHead_NoAtts(t *testing.T) {
 	require.NoError(t, fcs.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 0, Root: service.originBlockRoot}))
 	copied := genesisState.Copy()
 	// Generate a new block
-	blk, err := util.GenerateFullBlock(copied, pks, util.DefaultBlockGenConfig(), 1)
+	blk, err := util.GenerateFullBlockCapella(copied, pks, util.DefaultBlockGenConfig(), 1)
 	require.NoError(t, err)
 	tRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -197,7 +197,7 @@ func TestService_UpdateHead_NoAtts(t *testing.T) {
 
 	// Insert a new block to forkchoice
 	ojc := &zondpb.Checkpoint{Epoch: 0, Root: params.BeaconConfig().ZeroHash[:]}
-	b, err := util.GenerateFullBlock(genesisState, pks, util.DefaultBlockGenConfig(), 2)
+	b, err := util.GenerateFullBlockCapella(genesisState, pks, util.DefaultBlockGenConfig(), 2)
 	require.NoError(t, err)
 	b.Block.ParentRoot = service.originBlockRoot[:]
 	r, err := b.Block.HashTreeRoot()

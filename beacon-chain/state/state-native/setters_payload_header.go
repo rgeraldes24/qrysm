@@ -20,14 +20,6 @@ func (b *BeaconState) SetLatestExecutionPayloadHeader(val interfaces.ExecutionDa
 	}
 
 	switch header := val.Proto().(type) {
-	case *enginev1.ExecutionPayload:
-		latest, err := consensusblocks.PayloadToHeader(val)
-		if err != nil {
-			return errors.Wrap(err, "could not convert payload to header")
-		}
-		b.latestExecutionPayloadHeader = latest
-		b.markFieldAsDirty(types.LatestExecutionPayloadHeader)
-		return nil
 	case *enginev1.ExecutionPayloadCapella:
 		latest, err := consensusblocks.PayloadToHeaderCapella(val)
 		if err != nil {
@@ -35,10 +27,6 @@ func (b *BeaconState) SetLatestExecutionPayloadHeader(val interfaces.ExecutionDa
 		}
 		b.latestExecutionPayloadHeaderCapella = latest
 		b.markFieldAsDirty(types.LatestExecutionPayloadHeaderCapella)
-		return nil
-	case *enginev1.ExecutionPayloadHeader:
-		b.latestExecutionPayloadHeader = header
-		b.markFieldAsDirty(types.LatestExecutionPayloadHeader)
 		return nil
 	case *enginev1.ExecutionPayloadHeaderCapella:
 		b.latestExecutionPayloadHeaderCapella = header

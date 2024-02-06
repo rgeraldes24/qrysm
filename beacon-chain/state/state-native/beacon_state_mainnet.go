@@ -54,7 +54,6 @@ type BeaconState struct {
 	inactivityScoresMultiValue          *MultiValueInactivityScores
 	currentSyncCommittee                *zondpb.SyncCommittee
 	nextSyncCommittee                   *zondpb.SyncCommittee
-	latestExecutionPayloadHeader        *enginev1.ExecutionPayloadHeader
 	latestExecutionPayloadHeaderCapella *enginev1.ExecutionPayloadHeaderCapella
 	nextWithdrawalIndex                 uint64
 	nextWithdrawalValidatorIndex        primitives.ValidatorIndex
@@ -99,7 +98,6 @@ type beaconStateMarshalable struct {
 	InactivityScores                    []uint64                                `json:"inactivity_scores" yaml:"inactivity_scores"`
 	CurrentSyncCommittee                *zondpb.SyncCommittee                   `json:"current_sync_committee" yaml:"current_sync_committee"`
 	NextSyncCommittee                   *zondpb.SyncCommittee                   `json:"next_sync_committee" yaml:"next_sync_committee"`
-	LatestExecutionPayloadHeader        *enginev1.ExecutionPayloadHeader        `json:"latest_execution_payload_header" yaml:"latest_execution_payload_header"`
 	LatestExecutionPayloadHeaderCapella *enginev1.ExecutionPayloadHeaderCapella `json:"latest_execution_payload_header_capella" yaml:"latest_execution_payload_header_capella"`
 	NextWithdrawalIndex                 uint64                                  `json:"next_withdrawal_index" yaml:"next_withdrawal_index"`
 	NextWithdrawalValidatorIndex        primitives.ValidatorIndex               `json:"next_withdrawal_validator_index" yaml:"next_withdrawal_validator_index"`
@@ -158,7 +156,6 @@ func (b *BeaconState) MarshalJSON() ([]byte, error) {
 		InactivityScores:                    inactivityScores,
 		CurrentSyncCommittee:                b.currentSyncCommittee,
 		NextSyncCommittee:                   b.nextSyncCommittee,
-		LatestExecutionPayloadHeader:        b.latestExecutionPayloadHeader,
 		LatestExecutionPayloadHeaderCapella: b.latestExecutionPayloadHeaderCapella,
 		NextWithdrawalIndex:                 b.nextWithdrawalIndex,
 		NextWithdrawalValidatorIndex:        b.nextWithdrawalValidatorIndex,

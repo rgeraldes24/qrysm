@@ -11,7 +11,7 @@ import (
 )
 
 func BenchmarkAppendHistoricalRoots(b *testing.B) {
-	st, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{})
+	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{})
 	require.NoError(b, err)
 
 	max := params.BeaconConfig().HistoricalRootsLimit

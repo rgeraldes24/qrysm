@@ -13,10 +13,10 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 func TestWrapDilithiumChangesArray(t *testing.T) {
@@ -61,10 +61,6 @@ func TestWrapDilithiumChangesArray(t *testing.T) {
 
 func TestSetInitialPublishBlockPostRequest(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.BellatrixForkEpoch = params.BeaconConfig().AltairForkEpoch + 1
-	cfg.CapellaForkEpoch = params.BeaconConfig().BellatrixForkEpoch + 1
-	params.OverrideBeaconConfig(cfg)
 
 	endpoint := &apimiddleware.Endpoint{}
 	s := struct {
@@ -72,57 +68,10 @@ func TestSetInitialPublishBlockPostRequest(t *testing.T) {
 			Slot string
 		} `json:"message"`
 	}{}
-	t.Run("Phase 0", func(t *testing.T) {
-		s.Message = struct{ Slot string }{Slot: "0"}
-		j, err := json.Marshal(s)
-		require.NoError(t, err)
-		var body bytes.Buffer
-		_, err = body.Write(j)
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-		runDefault, errJson := setInitialPublishBlockPostRequest(endpoint, nil, request)
-		require.Equal(t, true, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeOf(SignedBeaconBlockJson{}).Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
-	})
-	t.Run("Altair", func(t *testing.T) {
-		slot, err := slots.EpochStart(params.BeaconConfig().AltairForkEpoch)
-		require.NoError(t, err)
-		s.Message = struct{ Slot string }{Slot: strconv.FormatUint(uint64(slot), 10)}
-		j, err := json.Marshal(s)
-		require.NoError(t, err)
-		var body bytes.Buffer
-		_, err = body.Write(j)
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-		runDefault, errJson := setInitialPublishBlockPostRequest(endpoint, nil, request)
-		require.Equal(t, true, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeOf(SignedBeaconBlockAltairJson{}).Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
-	})
-	t.Run("Bellatrix", func(t *testing.T) {
-		slot, err := slots.EpochStart(params.BeaconConfig().BellatrixForkEpoch)
-		require.NoError(t, err)
-		s.Message = struct{ Slot string }{Slot: strconv.FormatUint(uint64(slot), 10)}
-		j, err := json.Marshal(s)
-		require.NoError(t, err)
-		var body bytes.Buffer
-		_, err = body.Write(j)
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-		runDefault, errJson := setInitialPublishBlockPostRequest(endpoint, nil, request)
-		require.Equal(t, true, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeOf(SignedBeaconBlockBellatrixJson{}).Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
-	})
 	t.Run("Capella", func(t *testing.T) {
 		params.SetupTestConfigCleanup(t)
-		cfg := params.BeaconConfig()
-		cfg.CapellaForkEpoch = cfg.BellatrixForkEpoch.Add(2)
-		params.OverrideBeaconConfig(cfg)
 
-		slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-		require.NoError(t, err)
+		slot := primitives.Slot(0)
 		s.Message = struct{ Slot string }{Slot: strconv.FormatUint(uint64(slot), 10)}
 		j, err := json.Marshal(s)
 		require.NoError(t, err)
@@ -188,10 +137,6 @@ func TestPreparePublishedBlock(t *testing.T) {
 
 func TestSetInitialPublishBlindedBlockPostRequest(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.BellatrixForkEpoch = params.BeaconConfig().AltairForkEpoch + 1
-	cfg.CapellaForkEpoch = params.BeaconConfig().BellatrixForkEpoch + 1
-	params.OverrideBeaconConfig(cfg)
 
 	endpoint := &apimiddleware.Endpoint{}
 	s := struct {
@@ -199,52 +144,8 @@ func TestSetInitialPublishBlindedBlockPostRequest(t *testing.T) {
 			Slot string
 		} `json:"message"`
 	}{}
-	t.Run("Phase 0", func(t *testing.T) {
-		s.Message = struct{ Slot string }{Slot: "0"}
-		j, err := json.Marshal(s)
-		require.NoError(t, err)
-		var body bytes.Buffer
-		_, err = body.Write(j)
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-		runDefault, errJson := setInitialPublishBlindedBlockPostRequest(endpoint, nil, request)
-		require.Equal(t, true, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeOf(SignedBeaconBlockJson{}).Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
-	})
-	t.Run("Altair", func(t *testing.T) {
-		slot, err := slots.EpochStart(params.BeaconConfig().AltairForkEpoch)
-		require.NoError(t, err)
-		s.Message = struct{ Slot string }{Slot: strconv.FormatUint(uint64(slot), 10)}
-		j, err := json.Marshal(s)
-		require.NoError(t, err)
-		var body bytes.Buffer
-		_, err = body.Write(j)
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-		runDefault, errJson := setInitialPublishBlindedBlockPostRequest(endpoint, nil, request)
-		require.Equal(t, true, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeOf(SignedBeaconBlockAltairJson{}).Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
-	})
-	t.Run("Bellatrix", func(t *testing.T) {
-		slot, err := slots.EpochStart(params.BeaconConfig().BellatrixForkEpoch)
-		require.NoError(t, err)
-		s.Message = struct{ Slot string }{Slot: strconv.FormatUint(uint64(slot), 10)}
-		j, err := json.Marshal(s)
-		require.NoError(t, err)
-		var body bytes.Buffer
-		_, err = body.Write(j)
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-		runDefault, errJson := setInitialPublishBlindedBlockPostRequest(endpoint, nil, request)
-		require.Equal(t, true, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		assert.Equal(t, reflect.TypeOf(SignedBlindedBeaconBlockBellatrixJson{}).Name(), reflect.Indirect(reflect.ValueOf(endpoint.PostRequest)).Type().Name())
-	})
 	t.Run("Capella", func(t *testing.T) {
-		slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-		require.NoError(t, err)
+		slot := primitives.Slot(0)
 		s.Message = struct{ Slot string }{Slot: strconv.FormatUint(uint64(slot), 10)}
 		j, err := json.Marshal(s)
 		require.NoError(t, err)

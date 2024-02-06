@@ -12,30 +12,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-func TestBeaconState_ValidatorAtIndexReadOnly_HandlesNilSlice_Phase0(t *testing.T) {
-	testtmpl.VerifyBeaconStateValidatorAtIndexReadOnlyHandlesNilSlice(t, func() (state.BeaconState, error) {
-		return statenative.InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{
-			Validators: nil,
-		})
-	})
-}
-
-func TestBeaconState_ValidatorAtIndexReadOnly_HandlesNilSlice_Altair(t *testing.T) {
-	testtmpl.VerifyBeaconStateValidatorAtIndexReadOnlyHandlesNilSlice(t, func() (state.BeaconState, error) {
-		return statenative.InitializeFromProtoUnsafeAltair(&zondpb.BeaconStateAltair{
-			Validators: nil,
-		})
-	})
-}
-
-func TestBeaconState_ValidatorAtIndexReadOnly_HandlesNilSlice_Bellatrix(t *testing.T) {
-	testtmpl.VerifyBeaconStateValidatorAtIndexReadOnlyHandlesNilSlice(t, func() (state.BeaconState, error) {
-		return statenative.InitializeFromProtoUnsafeBellatrix(&zondpb.BeaconStateBellatrix{
-			Validators: nil,
-		})
-	})
-}
-
 func TestBeaconState_ValidatorAtIndexReadOnly_HandlesNilSlice_Capella(t *testing.T) {
 	testtmpl.VerifyBeaconStateValidatorAtIndexReadOnlyHandlesNilSlice(t, func() (state.BeaconState, error) {
 		return statenative.InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{

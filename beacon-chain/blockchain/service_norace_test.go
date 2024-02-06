@@ -22,7 +22,7 @@ func TestChainService_SaveHead_DataRace(t *testing.T) {
 	s := &Service{
 		cfg: &config{BeaconDB: beaconDB},
 	}
-	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	st, _ := util.DeterministicGenesisState(t, 1)
 	require.NoError(t, err)
 	go func() {

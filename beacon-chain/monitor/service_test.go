@@ -211,13 +211,13 @@ func TestMonitorRoutine(t *testing.T) {
 		wg.Done()
 	}()
 
-	genesis, keys := util.DeterministicGenesisStateAltair(t, 64)
+	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
 	c, err := altair.NextSyncCommittee(ctx, genesis)
 	require.NoError(t, err)
 	require.NoError(t, genesis.SetCurrentSyncCommittee(c))
 
 	genConfig := util.DefaultBlockGenConfig()
-	block, err := util.GenerateFullBlockAltair(genesis, keys, genConfig, 1)
+	block, err := util.GenerateFullBlockCapella(genesis, keys, genConfig, 1)
 	require.NoError(t, err)
 	root, err := block.GetBlock().HashTreeRoot()
 	require.NoError(t, err)

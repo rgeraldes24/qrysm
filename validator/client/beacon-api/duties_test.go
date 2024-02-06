@@ -1012,10 +1012,13 @@ func TestGetDuties_Valid(t *testing.T) {
 			name:  "genesis epoch",
 			epoch: params.BeaconConfig().GenesisEpoch,
 		},
-		{
-			name:  "altair epoch",
-			epoch: params.BeaconConfig().AltairForkEpoch,
-		},
+		// TODO(rgeraldes24)
+		/*
+			{
+				name:  "altair epoch",
+				epoch: params.BeaconConfig().AltairForkEpoch,
+			},
+		*/
 	}
 
 	for _, testCase := range testCases {
@@ -1265,7 +1268,6 @@ func TestGetDuties_Valid(t *testing.T) {
 			require.NoError(t, err)
 
 			expectedDuties := &zondpb.DutiesResponse{
-				Duties:             expectedCurrentEpochDuties,
 				CurrentEpochDuties: expectedCurrentEpochDuties,
 				NextEpochDuties:    expectedNextEpochDuties,
 			}

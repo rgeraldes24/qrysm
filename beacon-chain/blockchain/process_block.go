@@ -257,12 +257,6 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		if err != nil {
 			return s.handleInvalidExecutionError(ctx, err, root, b.Block().ParentRoot())
 		}
-		if isValidPayload {
-			if err := s.validateMergeTransitionBlock(ctx, preVersionAndHeaders[i].version,
-				preVersionAndHeaders[i].header, b); err != nil {
-				return err
-			}
-		}
 
 		args := &forkchoicetypes.BlockAndCheckpoints{Block: b.Block(),
 			JustifiedCheckpoint: jCheckpoints[i],
@@ -437,44 +431,6 @@ func (s *Service) pruneAttsFromPool(headBlock interfaces.ReadOnlySignedBeaconBlo
 		}
 	}
 	return nil
-}
-
-// validateMergeTransitionBlock validates the merge transition block.
-func (s *Service) validateMergeTransitionBlock(ctx context.Context, stateVersion int, stateHeader interfaces.ExecutionData, blk interfaces.ReadOnlySignedBeaconBlock) error {
-	// Skip validation if block is older than Bellatrix.
-	if blocks.IsPreBellatrixVersion(blk.Block().Version()) {
-		return nil
-	}
-
-	// Skip validation if block has an empty payload.
-	payload, err := blk.Block().Body().Execution()
-	if err != nil {
-		return invalidBlock{error: err}
-	}
-	isEmpty, err := consensusblocks.IsEmptyExecutionData(payload)
-	if err != nil {
-		return err
-	}
-	if isEmpty {
-		return nil
-	}
-
-	// Handle case where pre-state is Altair but block contains payload.
-	// To reach here, the block must have contained a valid payload.
-	if blocks.IsPreBellatrixVersion(stateVersion) {
-		return s.validateMergeBlock(ctx, blk)
-	}
-
-	// Skip validation if the block is not a merge transition block.
-	// To reach here. The payload must be non-empty. If the state header is empty then it's at transition.
-	empty, err := consensusblocks.IsEmptyExecutionData(stateHeader)
-	if err != nil {
-		return err
-	}
-	if !empty {
-		return nil
-	}
-	return s.validateMergeBlock(ctx, blk)
 }
 
 // This routine checks if there is a cached proposer payload ID available for the next slot proposer.

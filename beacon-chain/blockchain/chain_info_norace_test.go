@@ -19,7 +19,7 @@ func TestHeadSlot_DataRace(t *testing.T) {
 	s := &Service{
 		cfg: &config{BeaconDB: beaconDB},
 	}
-	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 	st, _ := util.DeterministicGenesisState(t, 1)
 	wait := make(chan struct{})
@@ -37,7 +37,7 @@ func TestHeadRoot_DataRace(t *testing.T) {
 		cfg:  &config{BeaconDB: beaconDB, StateGen: stategen.New(beaconDB, doublylinkedtree.New())},
 		head: &head{root: [32]byte{'A'}},
 	}
-	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 	wait := make(chan struct{})
 	st, _ := util.DeterministicGenesisState(t, 1)
@@ -53,13 +53,13 @@ func TestHeadRoot_DataRace(t *testing.T) {
 
 func TestHeadBlock_DataRace(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
-	wsb, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlock{Block: &zondpb.BeaconBlock{Body: &zondpb.BeaconBlockBody{}}})
+	wsb, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{}}})
 	require.NoError(t, err)
 	s := &Service{
 		cfg:  &config{BeaconDB: beaconDB, StateGen: stategen.New(beaconDB, doublylinkedtree.New())},
 		head: &head{block: wsb},
 	}
-	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 	wait := make(chan struct{})
 	st, _ := util.DeterministicGenesisState(t, 1)
@@ -78,7 +78,7 @@ func TestHeadState_DataRace(t *testing.T) {
 	s := &Service{
 		cfg: &config{BeaconDB: beaconDB, StateGen: stategen.New(beaconDB, doublylinkedtree.New())},
 	}
-	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 	wait := make(chan struct{})
 	st, _ := util.DeterministicGenesisState(t, 1)

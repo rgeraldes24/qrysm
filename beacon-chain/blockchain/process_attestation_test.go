@@ -24,7 +24,7 @@ func TestStore_OnAttestation_ErrorConditions(t *testing.T) {
 	_, err := blockTree1(t, beaconDB, []byte{'g'})
 	require.NoError(t, err)
 
-	blkWithoutState := util.NewBeaconBlock()
+	blkWithoutState := util.NewBeaconBlockCapella()
 	blkWithoutState.Block.Slot = 0
 	util.SaveBlock(t, ctx, beaconDB, blkWithoutState)
 
@@ -33,7 +33,7 @@ func TestStore_OnAttestation_ErrorConditions(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, st, blkRoot))
 
-	blkWithStateBadAtt := util.NewBeaconBlock()
+	blkWithStateBadAtt := util.NewBeaconBlockCapella()
 	blkWithStateBadAtt.Block.Slot = 1
 	r, err := blkWithStateBadAtt.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -45,18 +45,18 @@ func TestStore_OnAttestation_ErrorConditions(t *testing.T) {
 	BlkWithStateBadAttRoot, err := blkWithStateBadAtt.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, s.SetSlot(100*params.BeaconConfig().SlotsPerEpoch))
 	require.NoError(t, service.cfg.BeaconDB.SaveState(ctx, s, BlkWithStateBadAttRoot))
 
-	blkWithValidState := util.NewBeaconBlock()
+	blkWithValidState := util.NewBeaconBlockCapella()
 	blkWithValidState.Block.Slot = 32
 	util.SaveBlock(t, ctx, beaconDB, blkWithValidState)
 
 	blkWithValidStateRoot, err := blkWithValidState.Block.HashTreeRoot()
 	require.NoError(t, err)
-	s, err = util.NewBeaconState()
+	s, err = util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	err = s.SetFork(&zondpb.Fork{
 		Epoch:           0,
@@ -149,7 +149,7 @@ func TestStore_SaveCheckpointState(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	err = s.SetFinalizedCheckpoint(&zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{'A'}, fieldparams.RootLength)})
 	require.NoError(t, err)
@@ -222,7 +222,7 @@ func TestStore_UpdateCheckpointState(t *testing.T) {
 	baseState, _ := util.DeterministicGenesisState(t, 1)
 
 	epoch := primitives.Epoch(1)
-	blk := util.NewBeaconBlock()
+	blk := util.NewBeaconBlockCapella()
 	r1, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	checkpoint := &zondpb.Checkpoint{Epoch: epoch, Root: r1[:]}
@@ -240,7 +240,7 @@ func TestStore_UpdateCheckpointState(t *testing.T) {
 	assert.Equal(t, returned.Slot(), cached.Slot(), "State should have been cached")
 
 	epoch = 2
-	blk = util.NewBeaconBlock()
+	blk = util.NewBeaconBlockCapella()
 	blk.Block.Slot = 64
 	r2, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -302,7 +302,7 @@ func TestVerifyBeaconBlock_futureBlock(t *testing.T) {
 	service, err := NewService(ctx, opts...)
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	b.Block.Slot = 2
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b)
 	r, err := b.Block.HashTreeRoot()
@@ -319,7 +319,7 @@ func TestVerifyBeaconBlock_OK(t *testing.T) {
 	service, err := NewService(ctx, opts...)
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	b.Block.Slot = 2
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b)
 	r, err := b.Block.HashTreeRoot()
@@ -335,7 +335,7 @@ func TestGetAttPreState_HeadState(t *testing.T) {
 	baseState, _ := util.DeterministicGenesisState(t, 1)
 
 	epoch := primitives.Epoch(1)
-	blk := util.NewBeaconBlock()
+	blk := util.NewBeaconBlockCapella()
 	r1, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	checkpoint := &zondpb.Checkpoint{Epoch: epoch, Root: r1[:]}

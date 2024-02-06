@@ -10,9 +10,9 @@ import (
 )
 
 func TestReportEpochMetrics_BadHeadState(t *testing.T) {
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
-	h, err := util.NewBeaconState()
+	h, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, h.SetValidators(nil))
 	err = reportEpochMetrics(context.Background(), s, h)
@@ -20,9 +20,9 @@ func TestReportEpochMetrics_BadHeadState(t *testing.T) {
 }
 
 func TestReportEpochMetrics_BadAttestation(t *testing.T) {
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
-	h, err := util.NewBeaconState()
+	h, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, h.AppendCurrentEpochAttestations(&zond.PendingAttestation{InclusionDelay: 0}))
 	err = reportEpochMetrics(context.Background(), s, h)

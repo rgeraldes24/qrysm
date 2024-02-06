@@ -12,10 +12,10 @@ import (
 )
 
 func Test_logStateTransitionData(t *testing.T) {
-	payloadBlk := &zondpb.BeaconBlockBellatrix{
-		Body: &zondpb.BeaconBlockBodyBellatrix{
+	payloadBlk := &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			SyncAggregate: &zondpb.SyncAggregate{},
-			ExecutionPayload: &enginev1.ExecutionPayload{
+			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 				BlockHash:    []byte{1, 2, 3},
 				Transactions: [][]byte{{}, {}},
 			},
@@ -30,7 +30,7 @@ func Test_logStateTransitionData(t *testing.T) {
 	}{
 		{name: "empty block body",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlock{Body: &zondpb.BeaconBlockBody{}})
+				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{}})
 				require.NoError(t, err)
 				return wb
 			},
@@ -38,7 +38,7 @@ func Test_logStateTransitionData(t *testing.T) {
 		},
 		{name: "has attestation",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlock{Body: &zondpb.BeaconBlockBody{Attestations: []*zondpb.Attestation{{}}}})
+				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{Attestations: []*zondpb.Attestation{{}}}})
 				require.NoError(t, err)
 				return wb
 			},
@@ -47,7 +47,7 @@ func Test_logStateTransitionData(t *testing.T) {
 		{name: "has deposit",
 			b: func() interfaces.ReadOnlyBeaconBlock {
 				wb, err := blocks.NewBeaconBlock(
-					&zondpb.BeaconBlock{Body: &zondpb.BeaconBlockBody{
+					&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{
 						Attestations: []*zondpb.Attestation{{}},
 						Deposits:     []*zondpb.Deposit{{}}}})
 				require.NoError(t, err)
@@ -57,7 +57,7 @@ func Test_logStateTransitionData(t *testing.T) {
 		},
 		{name: "has attester slashing",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlock{Body: &zondpb.BeaconBlockBody{
+				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{
 					AttesterSlashings: []*zondpb.AttesterSlashing{{}}}})
 				require.NoError(t, err)
 				return wb
@@ -66,7 +66,7 @@ func Test_logStateTransitionData(t *testing.T) {
 		},
 		{name: "has proposer slashing",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlock{Body: &zondpb.BeaconBlockBody{
+				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{
 					ProposerSlashings: []*zondpb.ProposerSlashing{{}}}})
 				require.NoError(t, err)
 				return wb
@@ -75,7 +75,7 @@ func Test_logStateTransitionData(t *testing.T) {
 		},
 		{name: "has exit",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlock{Body: &zondpb.BeaconBlockBody{
+				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{
 					VoluntaryExits: []*zondpb.SignedVoluntaryExit{{}}}})
 				require.NoError(t, err)
 				return wb
@@ -84,7 +84,7 @@ func Test_logStateTransitionData(t *testing.T) {
 		},
 		{name: "has everything",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlock{Body: &zondpb.BeaconBlockBody{
+				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{
 					Attestations:      []*zondpb.Attestation{{}},
 					Deposits:          []*zondpb.Deposit{{}},
 					AttesterSlashings: []*zondpb.AttesterSlashing{{}},

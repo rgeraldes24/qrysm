@@ -65,15 +65,6 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 				var beaconState state.BeaconState
 				var beaconBlock interfaces.ReadOnlySignedBeaconBlock
 				switch fork {
-				case version.Phase0:
-					beaconState = unmarshalPhase0State(t, preBeaconStateSSZ)
-					beaconBlock = unmarshalPhase0Block(t, blockSSZ)
-				case version.Altair:
-					beaconState = unmarshalAltairState(t, preBeaconStateSSZ)
-					beaconBlock = unmarshalAltairBlock(t, blockSSZ)
-				case version.Bellatrix:
-					beaconState = unmarshalBellatrixState(t, preBeaconStateSSZ)
-					beaconBlock = unmarshalBellatrixBlock(t, blockSSZ)
 				case version.Capella:
 					beaconState = unmarshalCapellaState(t, preBeaconStateSSZ)
 					beaconBlock = unmarshalCapellaBlock(t, blockSSZ)
@@ -94,12 +85,6 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 						blockSSZ, err := snappy.Decode(nil /* dst */, blockFile)
 						require.NoError(t, err)
 						switch fork {
-						case version.Phase0:
-							beaconBlock = unmarshalSignedPhase0Block(t, blockSSZ)
-						case version.Altair:
-							beaconBlock = unmarshalSignedAltairBlock(t, blockSSZ)
-						case version.Bellatrix:
-							beaconBlock = unmarshalSignedBellatrixBlock(t, blockSSZ)
 						case version.Capella:
 							beaconBlock = unmarshalSignedCapellaBlock(t, blockSSZ)
 						default:
@@ -148,78 +133,6 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 			})
 		}
 	}
-}
-
-func unmarshalPhase0State(t *testing.T, raw []byte) state.BeaconState {
-	base := &zondpb.BeaconState{}
-	require.NoError(t, base.UnmarshalSSZ(raw))
-	st, err := state_native.InitializeFromProtoPhase0(base)
-	require.NoError(t, err)
-	return st
-}
-
-func unmarshalPhase0Block(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
-	base := &zondpb.BeaconBlock{}
-	require.NoError(t, base.UnmarshalSSZ(raw))
-	blk, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlock{Block: base, Signature: make([]byte, dilithium2.CryptoBytes)})
-	require.NoError(t, err)
-	return blk
-}
-
-func unmarshalSignedPhase0Block(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
-	base := &zondpb.SignedBeaconBlock{}
-	require.NoError(t, base.UnmarshalSSZ(raw))
-	blk, err := blocks.NewSignedBeaconBlock(base)
-	require.NoError(t, err)
-	return blk
-}
-
-func unmarshalAltairState(t *testing.T, raw []byte) state.BeaconState {
-	base := &zondpb.BeaconStateAltair{}
-	require.NoError(t, base.UnmarshalSSZ(raw))
-	st, err := state_native.InitializeFromProtoAltair(base)
-	require.NoError(t, err)
-	return st
-}
-
-func unmarshalAltairBlock(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
-	base := &zondpb.BeaconBlockAltair{}
-	require.NoError(t, base.UnmarshalSSZ(raw))
-	blk, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockAltair{Block: base, Signature: make([]byte, dilithium2.CryptoBytes)})
-	require.NoError(t, err)
-	return blk
-}
-
-func unmarshalSignedAltairBlock(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
-	base := &zondpb.SignedBeaconBlockAltair{}
-	require.NoError(t, base.UnmarshalSSZ(raw))
-	blk, err := blocks.NewSignedBeaconBlock(base)
-	require.NoError(t, err)
-	return blk
-}
-
-func unmarshalBellatrixState(t *testing.T, raw []byte) state.BeaconState {
-	base := &zondpb.BeaconStateBellatrix{}
-	require.NoError(t, base.UnmarshalSSZ(raw))
-	st, err := state_native.InitializeFromProtoBellatrix(base)
-	require.NoError(t, err)
-	return st
-}
-
-func unmarshalBellatrixBlock(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
-	base := &zondpb.BeaconBlockBellatrix{}
-	require.NoError(t, base.UnmarshalSSZ(raw))
-	blk, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockBellatrix{Block: base, Signature: make([]byte, dilithium2.CryptoBytes)})
-	require.NoError(t, err)
-	return blk
-}
-
-func unmarshalSignedBellatrixBlock(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
-	base := &zondpb.SignedBeaconBlockBellatrix{}
-	require.NoError(t, base.UnmarshalSSZ(raw))
-	blk, err := blocks.NewSignedBeaconBlock(base)
-	require.NoError(t, err)
-	return blk
 }
 
 func unmarshalCapellaState(t *testing.T, raw []byte) state.BeaconState {

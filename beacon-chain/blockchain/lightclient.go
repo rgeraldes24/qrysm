@@ -8,12 +8,10 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
-	types "github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/proto/migration"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 const (
@@ -61,11 +59,6 @@ func NewLightClientOptimisticUpdateFromBeaconState(
 	state state.BeaconState,
 	block interfaces.ReadOnlySignedBeaconBlock,
 	attestedState state.BeaconState) (*zondpbv2.LightClientUpdate, error) {
-	// assert compute_epoch_at_slot(attested_state.slot) >= ALTAIR_FORK_EPOCH
-	attestedEpoch := slots.ToEpoch(attestedState.Slot())
-	if attestedEpoch < types.Epoch(params.BeaconConfig().AltairForkEpoch) {
-		return nil, fmt.Errorf("invalid attested epoch %d", attestedEpoch)
-	}
 
 	// assert sum(block.message.body.sync_aggregate.sync_committee_bits) >= MIN_SYNC_COMMITTEE_PARTICIPANTS
 	syncAggregate, err := block.Block().Body().SyncAggregate()

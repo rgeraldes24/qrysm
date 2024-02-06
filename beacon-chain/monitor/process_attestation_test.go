@@ -230,9 +230,9 @@ func TestProcessAttestations(t *testing.T) {
 		AggregationBits: bitfield.Bitlist{0b11, 0b1},
 	}
 
-	block := &zondpb.BeaconBlockAltair{
+	block := &zondpb.BeaconBlockCapella{
 		Slot: 2,
-		Body: &zondpb.BeaconBlockBodyAltair{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			Attestations: []*zondpb.Attestation{att},
 		},
 	}

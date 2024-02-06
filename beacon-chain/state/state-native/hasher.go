@@ -25,12 +25,6 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 	}
 	var fieldRoots [][]byte
 	switch state.version {
-	case version.Phase0:
-		fieldRoots = make([][]byte, params.BeaconConfig().BeaconStateFieldCount)
-	case version.Altair:
-		fieldRoots = make([][]byte, params.BeaconConfig().BeaconStateAltairFieldCount)
-	case version.Bellatrix:
-		fieldRoots = make([][]byte, params.BeaconConfig().BeaconStateBellatrixFieldCount)
 	case version.Capella:
 		fieldRoots = make([][]byte, params.BeaconConfig().BeaconStateCapellaFieldCount)
 	}
@@ -192,6 +186,7 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 	}
 	fieldRoots[types.FinalizedCheckpoint.RealPosition()] = finalRoot[:]
 
+	// TODO(rgeraldes24)
 	if state.version >= version.Altair {
 		// Inactivity scores root.
 		inactivityScoresRoot, err := stateutil.Uint64ListRootWithRegistryLimit(state.inactivityScoresVal())
@@ -213,15 +208,6 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 			return nil, errors.Wrap(err, "could not compute sync committee merkleization")
 		}
 		fieldRoots[types.NextSyncCommittee.RealPosition()] = nextSyncCommitteeRoot[:]
-	}
-
-	if state.version == version.Bellatrix {
-		// Execution payload root.
-		executionPayloadRoot, err := state.latestExecutionPayloadHeader.HashTreeRoot()
-		if err != nil {
-			return nil, err
-		}
-		fieldRoots[types.LatestExecutionPayloadHeader.RealPosition()] = executionPayloadRoot[:]
 	}
 
 	if state.version == version.Capella {
