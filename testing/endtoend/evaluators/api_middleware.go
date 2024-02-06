@@ -17,8 +17,7 @@ import (
 // APIMiddlewareVerifyIntegrity tests our API Middleware for the official Ethereum API.
 // This ensures our API Middleware returns good data compared to gRPC.
 var APIMiddlewareVerifyIntegrity = e2etypes.Evaluator{
-	Name: "api_middleware_verify_integrity_epoch_%d",
-	// Policy:     policies.OnEpoch(helpers.AltairE2EForkEpoch),
+	Name:       "api_middleware_verify_integrity_epoch_%d",
 	Policy:     policies.OnEpoch(6),
 	Evaluation: apiMiddlewareVerify,
 }

@@ -1012,13 +1012,6 @@ func TestGetDuties_Valid(t *testing.T) {
 			name:  "genesis epoch",
 			epoch: params.BeaconConfig().GenesisEpoch,
 		},
-		// TODO(rgeraldes24)
-		/*
-			{
-				name:  "altair epoch",
-				epoch: params.BeaconConfig().AltairForkEpoch,
-			},
-		*/
 	}
 
 	for _, testCase := range testCases {

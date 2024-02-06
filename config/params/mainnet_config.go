@@ -187,7 +187,6 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	GenesisEpoch:       genesisForkEpoch,
 	GenesisForkVersion: []byte{0, 0, 0, 0},
 
-	// New values introduced in Altair hard fork 1.
 	// Participation flag indices.
 	TimelySourceFlagIndex: 0,
 	TimelyTargetFlagIndex: 1,
@@ -211,11 +210,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	InactivityScoreRecoveryRate:  16,
 	EpochsPerSyncCommitteePeriod: 8, // TODO: (cyyber) finalize EpochsPerSyncCommitteePeriod, original value was 512
 
-	// TODO(rgeraldes24)
 	// Updated penalty values.
-	// InactivityPenaltyQuotientAltair:         3 * 1 << 24, //50331648
-	// MinSlashingPenaltyQuotientAltair:        64,
-	// ProportionalSlashingMultiplierAltair:    2,
 	MinSlashingPenaltyQuotientBellatrix:     32,
 	ProportionalSlashingMultiplierBellatrix: 3,
 	InactivityPenaltyQuotientBellatrix:      1 << 24,

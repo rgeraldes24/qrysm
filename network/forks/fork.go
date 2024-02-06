@@ -16,6 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
+/*
 // IsForkNextEpoch checks if an allotted fork is in the following epoch.
 func IsForkNextEpoch(genesisTime time.Time, genesisValidatorsRoot []byte) (bool, error) {
 	if genesisTime.IsZero() {
@@ -38,6 +39,7 @@ func IsForkNextEpoch(genesisTime time.Time, genesisValidatorsRoot []byte) (bool,
 	}
 	return isForkEpoch, nil
 }
+*/
 
 // ForkDigestFromEpoch retrieves the fork digest from the current schedule determined
 // by the provided epoch.

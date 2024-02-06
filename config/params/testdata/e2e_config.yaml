@@ -58,16 +58,6 @@ DEPOSIT_NETWORK_ID: 1337 # Override for e2e tests
 # Configured on a per testnet basis
 DEPOSIT_CONTRACT_ADDRESS: 0x4242424242424242424242424242424242424242
 
-# Updated penalty values
-# ---------------------------------------------------------------
-# 3 * 2**24 (= 50,331,648)
-INACTIVITY_PENALTY_QUOTIENT_ALTAIR: 50331648
-# 2**6 (= 64)
-MIN_SLASHING_PENALTY_QUOTIENT_ALTAIR: 64
-# 2
-PROPORTIONAL_SLASHING_MULTIPLIER_ALTAIR: 2
-
-
 # Sync committee
 # ---------------------------------------------------------------
 # [customized]

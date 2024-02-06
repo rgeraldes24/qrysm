@@ -231,7 +231,7 @@ message BeaconBlockBodyCapella {
     // At most MAX_VOLUNTARY_EXITS.
     repeated SignedVoluntaryExit voluntary_exits = 8 [(theqrl.zond.ext.ssz_max) = "16"];
 
-    // Sync aggregate object for the beacon chain to track sync committee votes. New in Altair network upgrade.
+    // Sync aggregate object for the beacon chain to track sync committee votes.
     SyncAggregate sync_aggregate = 9;
 
     // Execution payload from the execution chain.
@@ -292,7 +292,7 @@ message BlindedBeaconBlockBodyCapella {
     // At most MAX_VOLUNTARY_EXITS.
     repeated SignedVoluntaryExit voluntary_exits = 8 [(theqrl.zond.ext.ssz_max) = "16"];
 
-    // Sync aggregate object for the beacon chain to track sync committee votes. New in Altair network upgrade.
+    // Sync aggregate object for the beacon chain to track sync committee votes.
     SyncAggregate sync_aggregate = 9;
 
     // Execution payload header from the execution chain.

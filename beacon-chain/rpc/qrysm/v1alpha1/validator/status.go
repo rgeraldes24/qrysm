@@ -15,7 +15,6 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
@@ -113,23 +112,6 @@ func (vs *Server) CheckDoppelGanger(ctx context.Context, req *zondpb.DoppelGange
 	headState, err := vs.HeadFetcher.HeadStateReadOnly(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Could not get head state")
-	}
-
-	// Return early if we are in phase0.
-	if headState.Version() == version.Phase0 {
-		log.Info("Skipping doppelganger check for Phase 0")
-
-		resp := &zondpb.DoppelGangerResponse{
-			Responses: []*zondpb.DoppelGangerResponse_ValidatorResponse{},
-		}
-		for _, v := range req.ValidatorRequests {
-			resp.Responses = append(resp.Responses,
-				&zondpb.DoppelGangerResponse_ValidatorResponse{
-					PublicKey:       v.PublicKey,
-					DuplicateExists: false,
-				})
-		}
-		return resp, nil
 	}
 
 	headSlot := headState.Slot()

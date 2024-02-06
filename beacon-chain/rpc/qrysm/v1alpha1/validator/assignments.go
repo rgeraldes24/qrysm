@@ -199,7 +199,7 @@ func (vs *Server) duties(ctx context.Context, req *zondpb.DutiesRequest) (*zondp
 		}
 
 		// Are the validators in current or next epoch sync committee.
-		if ok && coreTime.HigherEqualThanAltairVersionAndEpoch(s, req.Epoch) {
+		if ok {
 			assignment.IsSyncCommittee, err = helpers.IsCurrentPeriodSyncCommittee(s, idx)
 			if err != nil {
 				return nil, status.Errorf(codes.Internal, "Could not determine current epoch sync committee: %v", err)
@@ -239,7 +239,6 @@ func (vs *Server) duties(ctx context.Context, req *zondpb.DutiesRequest) (*zondp
 	vs.ProposerSlotIndexCache.PrunePayloadIDs(epochStartSlot)
 
 	return &zondpb.DutiesResponse{
-		Duties:             validatorAssignments,
 		CurrentEpochDuties: validatorAssignments,
 		NextEpochDuties:    nextValidatorAssignments,
 	}, nil

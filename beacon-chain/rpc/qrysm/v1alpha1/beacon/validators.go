@@ -520,16 +520,7 @@ func (bs *Server) GetValidatorParticipation(
 	var v []*precompute.Validator
 	var b *precompute.Balance
 
-	if beaconState.Version() == version.Phase0 {
-		v, b, err = precompute.New(ctx, beaconState)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not set up pre compute instance: %v", err)
-		}
-		_, b, err = precompute.ProcessAttestations(ctx, beaconState, v, b)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not pre compute attestations: %v", err)
-		}
-	} else if beaconState.Version() >= version.Altair {
+	if beaconState.Version() == version.Capella {
 		v, b, err = altair.InitializePrecomputeValidators(ctx, beaconState)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not set up altair pre compute instance: %v", err)
@@ -547,10 +538,6 @@ func (bs *Server) GetValidatorParticipation(
 		Epoch:     requestedEpoch,
 		Finalized: requestedEpoch <= cp.Epoch,
 		Participation: &zondpb.ValidatorParticipation{
-			// TODO(7130): Remove these three deprecated fields.
-			GlobalParticipationRate:          float32(b.PrevEpochTargetAttested) / float32(b.ActivePrevEpoch),
-			VotedEther:                       b.PrevEpochTargetAttested,
-			EligibleEther:                    b.ActivePrevEpoch,
 			CurrentEpochActiveGwei:           b.ActiveCurrentEpoch,
 			CurrentEpochAttestingGwei:        b.CurrentEpochAttested,
 			CurrentEpochTargetAttestingGwei:  b.CurrentEpochTargetAttested,
@@ -714,16 +701,7 @@ func (bs *Server) GetIndividualVotes(
 
 	var v []*precompute.Validator
 	var bal *precompute.Balance
-	if st.Version() == version.Phase0 {
-		v, bal, err = precompute.New(ctx, st)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not set up pre compute instance: %v", err)
-		}
-		v, _, err = precompute.ProcessAttestations(ctx, st, v, bal)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Could not pre compute attestations: %v", err)
-		}
-	} else if st.Version() >= version.Altair {
+	if st.Version() == version.Capella {
 		v, bal, err = altair.InitializePrecomputeValidators(ctx, st)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "Could not set up altair pre compute instance: %v", err)
@@ -760,8 +738,6 @@ func (bs *Server) GetIndividualVotes(
 			IsPreviousEpochTargetAttester:    v[index].IsPrevEpochTargetAttester,
 			IsPreviousEpochHeadAttester:      v[index].IsPrevEpochHeadAttester,
 			CurrentEpochEffectiveBalanceGwei: v[index].CurrentEpochEffectiveBalance,
-			InclusionSlot:                    v[index].InclusionSlot,
-			InclusionDistance:                v[index].InclusionDistance,
 			InactivityScore:                  v[index].InactivityScore,
 		})
 	}

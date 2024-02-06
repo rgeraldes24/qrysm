@@ -18,7 +18,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	bytesutil2 "github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/v4/network/http"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"github.com/wealdtech/go-bytesutil"
 )
@@ -30,10 +29,6 @@ func (s *Server) BlockRewards(w http.ResponseWriter, r *http.Request) {
 
 	blk, err := s.Blocker.Block(r.Context(), []byte(blockId))
 	if !shared.WriteBlockFetchError(w, blk, err) {
-		return
-	}
-	if blk.Version() == version.Phase0 {
-		http2.HandleError(w, "Block rewards are not supported for Phase 0 blocks", http.StatusBadRequest)
 		return
 	}
 
@@ -173,10 +168,7 @@ func (s *Server) SyncCommitteeRewards(w http.ResponseWriter, r *http.Request) {
 	if !shared.WriteBlockFetchError(w, blk, err) {
 		return
 	}
-	if blk.Version() == version.Phase0 {
-		http2.HandleError(w, "Sync committee rewards are not supported for Phase 0", http.StatusBadRequest)
-		return
-	}
+
 	st, err := s.ReplayerBuilder.ReplayerForSlot(blk.Block().Slot()-1).ReplayToSlot(r.Context(), blk.Block().Slot())
 	if err != nil {
 		http2.HandleError(w, "Could not get state: "+err.Error(), http.StatusInternalServerError)
@@ -252,10 +244,6 @@ func (s *Server) attRewardsState(w http.ResponseWriter, r *http.Request) (state.
 	requestedEpoch, err := strconv.ParseUint(segments[len(segments)-1], 10, 64)
 	if err != nil {
 		http2.HandleError(w, "Could not decode epoch: "+err.Error(), http.StatusBadRequest)
-		return nil, false
-	}
-	if primitives.Epoch(requestedEpoch) < params.BeaconConfig().AltairForkEpoch {
-		http2.HandleError(w, "Attestation rewards are not supported for Phase 0", http.StatusNotFound)
 		return nil, false
 	}
 	currentEpoch := uint64(slots.ToEpoch(s.TimeFetcher.CurrentSlot()))

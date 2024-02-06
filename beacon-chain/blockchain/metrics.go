@@ -327,16 +327,7 @@ func reportEpochMetrics(ctx context.Context, postState, headState state.BeaconSt
 	var v []*precompute.Validator
 	var err error
 
-	if headState.Version() == version.Phase0 {
-		v, b, err = precompute.New(ctx, headState)
-		if err != nil {
-			return err
-		}
-		_, b, err = precompute.ProcessAttestations(ctx, headState, v, b)
-		if err != nil {
-			return err
-		}
-	} else if headState.Version() >= version.Altair {
+	if headState.Version() == version.Capella {
 		v, b, err = altair.InitializePrecomputeValidators(ctx, headState)
 		if err != nil {
 			return err

@@ -251,11 +251,6 @@ func ProcessOperationsNoVerifyAttsSigs(
 
 	var err error
 	switch signedBeaconBlock.Version() {
-	case version.Phase0:
-		state, err = phase0Operations(ctx, state, signedBeaconBlock)
-		if err != nil {
-			return nil, err
-		}
 	case version.Capella:
 		state, err = altairOperations(ctx, state, signedBeaconBlock)
 		if err != nil {
@@ -341,10 +336,6 @@ func ProcessBlockForStateRoot(
 	if err != nil {
 		tracing.AnnotateError(span, err)
 		return nil, errors.Wrap(err, "could not process block operation")
-	}
-
-	if signed.Block().Version() == version.Phase0 {
-		return state, nil
 	}
 
 	sa, err := signed.Block().Body().SyncAggregate()

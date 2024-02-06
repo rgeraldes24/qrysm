@@ -178,20 +178,6 @@ func Test_BeaconBlock_Copy(t *testing.T) {
 	assert.NotEqual(t, cp, b)
 	assert.NotEqual(t, cp.Body(), bb)
 
-	b.version = version.Altair
-	b.body.version = b.version
-	cp, err = b.Copy()
-	require.NoError(t, err)
-	assert.NotEqual(t, cp, b)
-	assert.NotEqual(t, cp.Body(), bb)
-
-	b.version = version.Bellatrix
-	b.body.version = b.version
-	cp, err = b.Copy()
-	require.NoError(t, err)
-	assert.NotEqual(t, cp, b)
-	assert.NotEqual(t, cp.Body(), bb)
-
 	b.version = version.Capella
 	b.body.version = b.version
 	cp, err = b.Copy()
@@ -199,16 +185,7 @@ func Test_BeaconBlock_Copy(t *testing.T) {
 	assert.NotEqual(t, cp, b)
 	assert.NotEqual(t, cp.Body(), bb)
 
-	b.version = version.Bellatrix
-	b.body.version = b.version
 	b.body.isBlinded = true
-	cp, err = b.Copy()
-	require.NoError(t, err)
-	assert.NotEqual(t, cp, b)
-	assert.NotEqual(t, cp.Body(), bb)
-
-	b.version = version.Capella
-	b.body.version = b.version
 	cp, err = b.Copy()
 	require.NoError(t, err)
 	assert.NotEqual(t, cp, b)

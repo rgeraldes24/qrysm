@@ -37,34 +37,7 @@ func (bs *Server) GetBlindedBlock(ctx context.Context, req *zondpbv1.BlockReques
 		return nil, status.Errorf(codes.Internal, "Could not set "+api.VersionHeader+" header: %v", err)
 	}
 
-	result, err := getBlindedBlockPhase0(blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get blinded block: %v", err)
-	}
-	result, err = getBlindedBlockAltair(blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get blinded block: %v", err)
-	}
-	result, err = bs.getBlindedBlockBellatrix(ctx, blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get blinded block: %v", err)
-	}
-	result, err = bs.getBlindedBlockCapella(ctx, blk)
+	result, err := bs.getBlindedBlockCapella(ctx, blk)
 	if result != nil {
 		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
 		return result, nil
@@ -92,34 +65,7 @@ func (bs *Server) GetBlindedBlockSSZ(ctx context.Context, req *zondpbv1.BlockReq
 		return nil, errors.Wrapf(err, "could not get block root")
 	}
 
-	result, err := getSSZBlockPhase0(blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get signed beacon block: %v", err)
-	}
-	result, err = getSSZBlockAltair(blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get signed beacon block: %v", err)
-	}
-	result, err = bs.getBlindedSSZBlockBellatrix(ctx, blk)
-	if result != nil {
-		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
-		return result, nil
-	}
-	// ErrUnsupportedField means that we have another block type
-	if !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return nil, status.Errorf(codes.Internal, "Could not get signed beacon block: %v", err)
-	}
-	result, err = bs.getBlindedSSZBlockCapella(ctx, blk)
+	result, err := bs.getBlindedSSZBlockCapella(ctx, blk)
 	if result != nil {
 		result.Finalized = bs.FinalizationFetcher.IsFinalized(ctx, blkRoot)
 		return result, nil
@@ -130,121 +76,6 @@ func (bs *Server) GetBlindedBlockSSZ(ctx context.Context, req *zondpbv1.BlockReq
 	}
 
 	return nil, status.Errorf(codes.Internal, "Unknown block type %T", blk)
-}
-
-func getBlindedBlockPhase0(blk interfaces.ReadOnlySignedBeaconBlock) (*zondpbv2.BlindedBlockResponse, error) {
-	phase0Blk, err := blk.PbPhase0Block()
-	if err != nil {
-		return nil, err
-	}
-	if phase0Blk == nil {
-		return nil, errNilBlock
-	}
-	v1Blk, err := migration.SignedBeaconBlock(blk)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not get signed beacon block")
-	}
-	return &zondpbv2.BlindedBlockResponse{
-		Version: zondpbv2.Version_PHASE0,
-		Data: &zondpbv2.SignedBlindedBeaconBlockContainer{
-			Message:   &zondpbv2.SignedBlindedBeaconBlockContainer_Phase0Block{Phase0Block: v1Blk.Block},
-			Signature: v1Blk.Signature,
-		},
-		ExecutionOptimistic: false,
-	}, nil
-}
-
-func getBlindedBlockAltair(blk interfaces.ReadOnlySignedBeaconBlock) (*zondpbv2.BlindedBlockResponse, error) {
-	altairBlk, err := blk.PbAltairBlock()
-	if err != nil {
-		return nil, err
-	}
-	if altairBlk == nil {
-		return nil, errNilBlock
-	}
-	v2Blk, err := migration.V1Alpha1BeaconBlockAltairToV2(altairBlk.Block)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not get signed beacon block")
-	}
-	sig := blk.Signature()
-	return &zondpbv2.BlindedBlockResponse{
-		Version: zondpbv2.Version_ALTAIR,
-		Data: &zondpbv2.SignedBlindedBeaconBlockContainer{
-			Message:   &zondpbv2.SignedBlindedBeaconBlockContainer_AltairBlock{AltairBlock: v2Blk},
-			Signature: sig[:],
-		},
-		ExecutionOptimistic: false,
-	}, nil
-}
-
-func (bs *Server) getBlindedBlockBellatrix(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*zondpbv2.BlindedBlockResponse, error) {
-	bellatrixBlk, err := blk.PbBellatrixBlock()
-	if err != nil {
-		// ErrUnsupportedField means that we have another block type
-		if errors.Is(err, consensus_types.ErrUnsupportedField) {
-			if blindedBellatrixBlk, err := blk.PbBlindedBellatrixBlock(); err == nil {
-				if blindedBellatrixBlk == nil {
-					return nil, errNilBlock
-				}
-				v2Blk, err := migration.V1Alpha1BeaconBlockBlindedBellatrixToV2Blinded(blindedBellatrixBlk.Block)
-				if err != nil {
-					return nil, errors.Wrapf(err, "could not convert beacon block")
-				}
-				root, err := blk.Block().HashTreeRoot()
-				if err != nil {
-					return nil, errors.Wrapf(err, "could not get block root")
-				}
-				isOptimistic, err := bs.OptimisticModeFetcher.IsOptimisticForRoot(ctx, root)
-				if err != nil {
-					return nil, errors.Wrapf(err, "could not check if block is optimistic")
-				}
-				sig := blk.Signature()
-				return &zondpbv2.BlindedBlockResponse{
-					Version: zondpbv2.Version_BELLATRIX,
-					Data: &zondpbv2.SignedBlindedBeaconBlockContainer{
-						Message:   &zondpbv2.SignedBlindedBeaconBlockContainer_BellatrixBlock{BellatrixBlock: v2Blk},
-						Signature: sig[:],
-					},
-					ExecutionOptimistic: isOptimistic,
-				}, nil
-			}
-			return nil, err
-		}
-		return nil, err
-	}
-
-	if bellatrixBlk == nil {
-		return nil, errNilBlock
-	}
-	blindedBlkInterface, err := blk.ToBlinded()
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not convert block to blinded block")
-	}
-	blindedBellatrixBlock, err := blindedBlkInterface.PbBlindedBellatrixBlock()
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not get signed beacon block")
-	}
-	v2Blk, err := migration.V1Alpha1BeaconBlockBlindedBellatrixToV2Blinded(blindedBellatrixBlock.Block)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not convert beacon block")
-	}
-	root, err := blk.Block().HashTreeRoot()
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not get block root")
-	}
-	isOptimistic, err := bs.OptimisticModeFetcher.IsOptimisticForRoot(ctx, root)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not check if block is optimistic")
-	}
-	sig := blk.Signature()
-	return &zondpbv2.BlindedBlockResponse{
-		Version: zondpbv2.Version_BELLATRIX,
-		Data: &zondpbv2.SignedBlindedBeaconBlockContainer{
-			Message:   &zondpbv2.SignedBlindedBeaconBlockContainer_BellatrixBlock{BellatrixBlock: v2Blk},
-			Signature: sig[:],
-		},
-		ExecutionOptimistic: isOptimistic,
-	}, nil
 }
 
 func (bs *Server) getBlindedBlockCapella(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*zondpbv2.BlindedBlockResponse, error) {
@@ -315,81 +146,6 @@ func (bs *Server) getBlindedBlockCapella(ctx context.Context, blk interfaces.Rea
 		},
 		ExecutionOptimistic: isOptimistic,
 	}, nil
-}
-
-func (bs *Server) getBlindedSSZBlockBellatrix(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*zondpbv2.SSZContainer, error) {
-	bellatrixBlk, err := blk.PbBellatrixBlock()
-	if err != nil {
-		// ErrUnsupportedField means that we have another block type
-		if errors.Is(err, consensus_types.ErrUnsupportedField) {
-			if blindedBellatrixBlk, err := blk.PbBlindedBellatrixBlock(); err == nil {
-				if blindedBellatrixBlk == nil {
-					return nil, errNilBlock
-				}
-				v2Blk, err := migration.V1Alpha1BeaconBlockBlindedBellatrixToV2Blinded(blindedBellatrixBlk.Block)
-				if err != nil {
-					return nil, errors.Wrapf(err, "could not get signed beacon block")
-				}
-				root, err := blk.Block().HashTreeRoot()
-				if err != nil {
-					return nil, errors.Wrapf(err, "could not get block root")
-				}
-				isOptimistic, err := bs.OptimisticModeFetcher.IsOptimisticForRoot(ctx, root)
-				if err != nil {
-					return nil, errors.Wrapf(err, "could not check if block is optimistic")
-				}
-				sig := blk.Signature()
-				data := &zondpbv2.SignedBlindedBeaconBlockBellatrix{
-					Message:   v2Blk,
-					Signature: sig[:],
-				}
-				sszData, err := data.MarshalSSZ()
-				if err != nil {
-					return nil, errors.Wrapf(err, "could not marshal block into SSZ")
-				}
-				return &zondpbv2.SSZContainer{
-					Version:             zondpbv2.Version_BELLATRIX,
-					ExecutionOptimistic: isOptimistic,
-					Data:                sszData,
-				}, nil
-			}
-			return nil, err
-		}
-	}
-
-	if bellatrixBlk == nil {
-		return nil, errNilBlock
-	}
-	blindedBlkInterface, err := blk.ToBlinded()
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not convert block to blinded block")
-	}
-	blindedBellatrixBlock, err := blindedBlkInterface.PbBlindedBellatrixBlock()
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not get signed beacon block")
-	}
-	v2Blk, err := migration.V1Alpha1BeaconBlockBlindedBellatrixToV2Blinded(blindedBellatrixBlock.Block)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not get signed beacon block")
-	}
-	root, err := blk.Block().HashTreeRoot()
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not get block root")
-	}
-	isOptimistic, err := bs.OptimisticModeFetcher.IsOptimisticForRoot(ctx, root)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not check if block is optimistic")
-	}
-	sig := blk.Signature()
-	data := &zondpbv2.SignedBlindedBeaconBlockBellatrix{
-		Message:   v2Blk,
-		Signature: sig[:],
-	}
-	sszData, err := data.MarshalSSZ()
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not marshal block into SSZ")
-	}
-	return &zondpbv2.SSZContainer{Version: zondpbv2.Version_BELLATRIX, ExecutionOptimistic: isOptimistic, Data: sszData}, nil
 }
 
 func (bs *Server) getBlindedSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*zondpbv2.SSZContainer, error) {

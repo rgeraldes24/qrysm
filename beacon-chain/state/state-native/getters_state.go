@@ -81,10 +81,7 @@ func (b *BeaconState) ToProto() interface{} {
 	sr := b.stateRootsVal().Slice()
 	rm := b.randaoMixesVal().Slice()
 
-	var inactivityScores []uint64
-	if b.version > version.Phase0 {
-		inactivityScores = b.inactivityScoresVal()
-	}
+	inactivityScores := b.inactivityScoresVal()
 
 	switch b.version {
 	case version.Capella:

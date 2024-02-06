@@ -92,12 +92,7 @@ func TestUnmarshalState(t *testing.T) {
 	ctx := context.Background()
 
 	bc := params.BeaconConfig()
-	altairSlot, err := slots.EpochStart(bc.AltairForkEpoch)
-	require.NoError(t, err)
-	bellaSlot, err := slots.EpochStart(bc.BellatrixForkEpoch)
-	require.NoError(t, err)
-	capellaSlot, err := slots.EpochStart(bc.CapellaForkEpoch)
-	require.NoError(t, err)
+
 	cases := []struct {
 		name        string
 		version     int
@@ -106,27 +101,9 @@ func TestUnmarshalState(t *testing.T) {
 	}{
 		{
 			name:        "genesis",
-			version:     version.Phase0,
+			version:     version.Capella,
 			slot:        0,
 			forkversion: bytesutil.ToBytes4(bc.GenesisForkVersion),
-		},
-		{
-			name:        "altair",
-			version:     version.Altair,
-			slot:        altairSlot,
-			forkversion: bytesutil.ToBytes4(bc.AltairForkVersion),
-		},
-		{
-			name:        "bellatrix",
-			version:     version.Bellatrix,
-			slot:        bellaSlot,
-			forkversion: bytesutil.ToBytes4(bc.BellatrixForkVersion),
-		},
-		{
-			name:        "capella",
-			version:     version.Capella,
-			slot:        capellaSlot,
-			forkversion: bytesutil.ToBytes4(bc.CapellaForkVersion),
 		},
 	}
 	for _, c := range cases {
@@ -154,16 +131,7 @@ func TestUnmarshalState(t *testing.T) {
 
 func TestUnmarshalBlock(t *testing.T) {
 	genv := bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion)
-	altairv := bytesutil.ToBytes4(params.BeaconConfig().AltairForkVersion)
-	bellav := bytesutil.ToBytes4(params.BeaconConfig().BellatrixForkVersion)
-	capellaV := bytesutil.ToBytes4(params.BeaconConfig().CapellaForkVersion)
 
-	altairS, err := slots.EpochStart(params.BeaconConfig().AltairForkEpoch)
-	require.NoError(t, err)
-	bellaS, err := slots.EpochStart(params.BeaconConfig().BellatrixForkEpoch)
-	require.NoError(t, err)
-	capellaS, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
 	cases := []struct {
 		b       func(*testing.T, primitives.Slot) interfaces.ReadOnlySignedBeaconBlock
 		name    string

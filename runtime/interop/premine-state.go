@@ -299,10 +299,6 @@ func (s *PremineGenesisConfig) setFork(g state.BeaconState) error {
 }
 
 func (s *PremineGenesisConfig) setInactivityScores(g state.BeaconState) error {
-	if s.Version < version.Altair {
-		return nil
-	}
-
 	scores, err := g.InactivityScores()
 	if err != nil {
 		return err
@@ -317,10 +313,6 @@ func (s *PremineGenesisConfig) setInactivityScores(g state.BeaconState) error {
 }
 
 func (s *PremineGenesisConfig) setCurrentEpochParticipation(g state.BeaconState) error {
-	if s.Version < version.Altair {
-		return nil
-	}
-
 	p, err := g.CurrentEpochParticipation()
 	if err != nil {
 		return err
@@ -335,10 +327,6 @@ func (s *PremineGenesisConfig) setCurrentEpochParticipation(g state.BeaconState)
 }
 
 func (s *PremineGenesisConfig) setPrevEpochParticipation(g state.BeaconState) error {
-	if s.Version < version.Altair {
-		return nil
-	}
-
 	p, err := g.PreviousEpochParticipation()
 	if err != nil {
 		return err
@@ -353,9 +341,6 @@ func (s *PremineGenesisConfig) setPrevEpochParticipation(g state.BeaconState) er
 }
 
 func (s *PremineGenesisConfig) setSyncCommittees(g state.BeaconState) error {
-	if s.Version < version.Altair {
-		return nil
-	}
 	sc, err := altair.NextSyncCommittee(context.Background(), g)
 	if err != nil {
 		return err

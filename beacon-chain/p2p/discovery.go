@@ -15,7 +15,6 @@ import (
 	"github.com/theQRL/go-zond/p2p/enode"
 	"github.com/theQRL/go-zond/p2p/enr"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
-	"github.com/theQRL/qrysm/v4/config/params"
 	ecdsaprysm "github.com/theQRL/qrysm/v4/crypto/ecdsa"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
@@ -54,10 +53,8 @@ func (s *Service) RefreshENR() {
 	}
 	// Compare current epoch with our fork epochs
 	currEpoch := slots.ToEpoch(slots.CurrentSlot(uint64(s.genesisTime.Unix())))
-	altairForkEpoch := params.BeaconConfig().AltairForkEpoch
 	switch {
-	// Altair Behaviour
-	case currEpoch >= altairForkEpoch:
+	default:
 		// Retrieve sync subnets from application level
 		// cache.
 		bitS := bitfield.Bitvector4{byte(0x00)}
@@ -76,13 +73,6 @@ func (s *Service) RefreshENR() {
 			return
 		}
 		s.updateSubnetRecordWithMetadataV2(bitV, bitS)
-	default:
-		// Phase 0 behaviour.
-		if bytes.Equal(bitV, currentBitV) {
-			// return early if bitfield hasn't changed
-			return
-		}
-		s.updateSubnetRecordWithMetadata(bitV)
 	}
 	// ping all peers to inform them of new metadata
 	s.pingPeers()

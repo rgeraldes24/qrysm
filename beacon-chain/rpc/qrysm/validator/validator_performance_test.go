@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/theQRL/go-bitfield"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
@@ -21,7 +20,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
@@ -299,20 +297,6 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 func setHeadState(t *testing.T, headState state.BeaconState, publicKeys [][48]byte) state.BeaconState {
 	epoch := primitives.Epoch(1)
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
-	if headState.Version() < version.Altair {
-		atts := make([]*zondpb.PendingAttestation, 3)
-		for i := 0; i < len(atts); i++ {
-			atts[i] = &zondpb.PendingAttestation{
-				Data: &zondpb.AttestationData{
-					Target: &zondpb.Checkpoint{Root: make([]byte, 32)},
-					Source: &zondpb.Checkpoint{Root: make([]byte, 32)},
-				},
-				AggregationBits: bitfield.Bitlist{},
-				InclusionDelay:  1,
-			}
-			require.NoError(t, headState.AppendPreviousEpochAttestations(atts[i]))
-		}
-	}
 
 	defaultBal := params.BeaconConfig().MaxEffectiveBalance
 	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GweiPerEth

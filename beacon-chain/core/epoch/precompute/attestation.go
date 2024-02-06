@@ -13,7 +13,6 @@ import (
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"go.opencensus.io/trace"
 )
 
@@ -65,7 +64,7 @@ func ProcessAttestations(
 		vp = UpdateValidator(vp, v, indices, a, a.Data.Slot)
 	}
 
-	pBal = UpdateBalance(vp, pBal, state.Version())
+	pBal = UpdateBalance(vp, pBal)
 
 	return vp, pBal, nil
 }
@@ -171,7 +170,7 @@ func UpdateValidator(vp []*Validator, record *Validator, indices []uint64, a *zo
 }
 
 // UpdateBalance updates pre computed balance store.
-func UpdateBalance(vp []*Validator, bBal *Balance, stateVersion int) *Balance {
+func UpdateBalance(vp []*Validator, bBal *Balance) *Balance {
 	for _, v := range vp {
 		if !v.IsSlashed {
 			if v.IsCurrentEpochAttester {
@@ -180,10 +179,7 @@ func UpdateBalance(vp []*Validator, bBal *Balance, stateVersion int) *Balance {
 			if v.IsCurrentEpochTargetAttester {
 				bBal.CurrentEpochTargetAttested += v.CurrentEpochEffectiveBalance
 			}
-			if stateVersion == version.Phase0 && v.IsPrevEpochAttester {
-				bBal.PrevEpochAttested += v.CurrentEpochEffectiveBalance
-			}
-			if stateVersion >= version.Altair && v.IsPrevEpochSourceAttester {
+			if v.IsPrevEpochSourceAttester {
 				bBal.PrevEpochAttested += v.CurrentEpochEffectiveBalance
 			}
 			if v.IsPrevEpochTargetAttester {

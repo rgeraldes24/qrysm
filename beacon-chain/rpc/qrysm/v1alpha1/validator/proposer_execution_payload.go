@@ -108,13 +108,8 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 		return nil, false, err
 	}
 
-	finalizedBlockHash := [32]byte{}
-	justifiedBlockHash := [32]byte{}
-
-	if st.Version() >= version.Altair {
-		finalizedBlockHash = vs.FinalizationFetcher.FinalizedBlockHash()
-		justifiedBlockHash = vs.FinalizationFetcher.UnrealizedJustifiedPayloadBlockHash()
-	}
+	finalizedBlockHash := vs.FinalizationFetcher.FinalizedBlockHash()
+	justifiedBlockHash := vs.FinalizationFetcher.UnrealizedJustifiedPayloadBlockHash()
 
 	f := &enginev1.ForkchoiceState{
 		HeadBlockHash:      parentHash,

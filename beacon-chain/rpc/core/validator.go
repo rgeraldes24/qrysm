@@ -75,21 +75,7 @@ func (s *Service) ComputeValidatorPerformance(
 		}
 	}
 	var validatorSummary []*precompute.Validator
-	if headState.Version() == version.Phase0 {
-		vp, bp, err := precompute.New(ctx, headState)
-		if err != nil {
-			return nil, &RpcError{Err: err, Reason: Internal}
-		}
-		vp, bp, err = precompute.ProcessAttestations(ctx, headState, vp, bp)
-		if err != nil {
-			return nil, &RpcError{Err: err, Reason: Internal}
-		}
-		headState, err = precompute.ProcessRewardsAndPenaltiesPrecompute(headState, bp, vp, precompute.AttestationsDelta, precompute.ProposersDelta)
-		if err != nil {
-			return nil, &RpcError{Err: err, Reason: Internal}
-		}
-		validatorSummary = vp
-	} else if headState.Version() >= version.Altair {
+	if headState.Version() == version.Capella {
 		vp, bp, err := altair.InitializePrecomputeValidators(ctx, headState)
 		if err != nil {
 			return nil, &RpcError{Err: err, Reason: Internal}
@@ -183,12 +169,8 @@ func (s *Service) ComputeValidatorPerformance(
 		correctlyVotedTarget = append(correctlyVotedTarget, summary.IsPrevEpochTargetAttester)
 		correctlyVotedHead = append(correctlyVotedHead, summary.IsPrevEpochHeadAttester)
 
-		if headState.Version() == version.Phase0 {
-			correctlyVotedSource = append(correctlyVotedSource, summary.IsPrevEpochAttester)
-		} else {
-			correctlyVotedSource = append(correctlyVotedSource, summary.IsPrevEpochSourceAttester)
-			inactivityScores = append(inactivityScores, summary.InactivityScore)
-		}
+		correctlyVotedSource = append(correctlyVotedSource, summary.IsPrevEpochSourceAttester)
+		inactivityScores = append(inactivityScores, summary.InactivityScore)
 	}
 
 	return &zondpb.ValidatorPerformanceResponse{

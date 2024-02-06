@@ -2,7 +2,6 @@ package util
 
 import (
 	"context"
-	"testing"
 
 	"github.com/pkg/errors"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
@@ -14,28 +13,9 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stateutil"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
-
-// DeterministicGenesisStateAltair returns a genesis state in hard fork 1 format made using the deterministic deposits.
-func DeterministicGenesisStateAltair(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.DilithiumKey) {
-	deposits, privKeys, err := DeterministicDepositsAndKeys(numValidators)
-	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
-	}
-	eth1Data, err := DeterministicEth1Data(len(deposits))
-	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get eth1data for %d deposits", numValidators))
-	}
-	beaconState, err := GenesisBeaconState(context.Background(), deposits, uint64(0), eth1Data)
-	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get genesis beacon state of %d validators", numValidators))
-	}
-	resetCache()
-	return beaconState, privKeys
-}
 
 // GenesisBeaconState returns the genesis beacon state.
 func GenesisBeaconState(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.Eth1Data) (state.BeaconState, error) {

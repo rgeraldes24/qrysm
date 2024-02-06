@@ -140,7 +140,6 @@ func (cf *VersionedUnmarshaler) UnmarshalBeaconBlock(marshaled []byte) (interfac
 
 // UnmarshalBlindedBeaconBlock uses internal knowledge in the VersionedUnmarshaler to pick the right concrete blinded ReadOnlySignedBeaconBlock type,
 // then Unmarshal()s the type and returns an instance of block.ReadOnlySignedBeaconBlock if successful.
-// For Phase0 and Altair it works exactly line UnmarshalBeaconBlock.
 func (cf *VersionedUnmarshaler) UnmarshalBlindedBeaconBlock(marshaled []byte) (interfaces.ReadOnlySignedBeaconBlock, error) {
 	slot, err := slotFromBlock(marshaled)
 	if err != nil {

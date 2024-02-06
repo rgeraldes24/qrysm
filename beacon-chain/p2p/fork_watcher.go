@@ -1,7 +1,6 @@
 package p2p
 
 import (
-	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/encoder"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
@@ -15,6 +14,7 @@ func (s *Service) forkWatcher() {
 		select {
 		case currSlot := <-slotTicker.C():
 			currEpoch := slots.ToEpoch(currSlot)
+			// TODO(rgeraldes24)
 			if currEpoch == params.BeaconConfig().AltairForkEpoch ||
 				currEpoch == params.BeaconConfig().BellatrixForkEpoch ||
 				currEpoch == params.BeaconConfig().CapellaForkEpoch {
@@ -27,12 +27,6 @@ func (s *Service) forkWatcher() {
 					if err != nil {
 						log.WithError(err).Error("Could not add fork entry")
 					}
-				}
-
-				// from Bellatrix Epoch, the MaxGossipSize and the MaxChunkSize is changed to 10Mb.
-				if currEpoch == params.BeaconConfig().BellatrixForkEpoch {
-					encoder.SetMaxGossipSizeForBellatrix()
-					encoder.SetMaxChunkSizeForBellatrix()
 				}
 			}
 		case <-s.ctx.Done():
