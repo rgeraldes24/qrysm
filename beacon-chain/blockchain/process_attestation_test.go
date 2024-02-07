@@ -154,7 +154,7 @@ func TestStore_SaveCheckpointState(t *testing.T) {
 	err = s.SetFinalizedCheckpoint(&zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{'A'}, fieldparams.RootLength)})
 	require.NoError(t, err)
 	val := &zondpb.Validator{
-		PublicKey:             bytesutil.PadTo([]byte("foo"), 48),
+		PublicKey:             bytesutil.PadTo([]byte("foo"), 2592),
 		WithdrawalCredentials: bytesutil.PadTo([]byte("bar"), fieldparams.RootLength),
 	}
 	err = s.SetValidators([]*zondpb.Validator{val})

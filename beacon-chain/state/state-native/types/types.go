@@ -80,8 +80,6 @@ func (f FieldIndex) String() string {
 		return "currentSyncCommittee"
 	case NextSyncCommittee:
 		return "nextSyncCommittee"
-	case LatestExecutionPayloadHeader:
-		return "latestExecutionPayloadHeader"
 	case LatestExecutionPayloadHeaderCapella:
 		return "LatestExecutionPayloadHeaderCapella"
 	case NextWithdrawalIndex:
@@ -147,7 +145,7 @@ func (f FieldIndex) RealPosition() int {
 		return 22
 	case NextSyncCommittee:
 		return 23
-	case LatestExecutionPayloadHeader, LatestExecutionPayloadHeaderCapella:
+	case LatestExecutionPayloadHeaderCapella:
 		return 24
 	case NextWithdrawalIndex:
 		return 25

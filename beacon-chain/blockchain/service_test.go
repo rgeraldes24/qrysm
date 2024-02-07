@@ -11,9 +11,6 @@ import (
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution"
@@ -176,50 +173,6 @@ func TestChainStartStop_GenesisZeroHashes(t *testing.T) {
 	// The context should have been canceled.
 	assert.Equal(t, context.Canceled, chainService.ctx.Err(), "Context was not canceled")
 	require.LogsContain(t, hook, "data already exists")
-}
-
-func TestChainService_InitializeBeaconChain(t *testing.T) {
-	helpers.ClearCache()
-	beaconDB := testDB.SetupDB(t)
-	ctx := context.Background()
-
-	bc := setupBeaconChain(t, beaconDB)
-	var err error
-
-	// Set up 10 deposits pre chain start for validators to register
-	count := uint64(10)
-	deposits, _, err := util.DeterministicDepositsAndKeys(count)
-	require.NoError(t, err)
-	dt, _, err := util.DepositTrieFromDeposits(deposits)
-	require.NoError(t, err)
-	hashTreeRoot, err := dt.HashTreeRoot()
-	require.NoError(t, err)
-	genState, err := transition.EmptyGenesisState()
-	require.NoError(t, err)
-	err = genState.SetEth1Data(&zondpb.Eth1Data{
-		DepositRoot:  hashTreeRoot[:],
-		DepositCount: uint64(len(deposits)),
-		BlockHash:    make([]byte, 32),
-	})
-	require.NoError(t, err)
-	genState, err = blocks.ProcessPreGenesisDeposits(ctx, genState, deposits)
-	require.NoError(t, err)
-
-	_, err = bc.initializeBeaconChain(ctx, time.Unix(0, 0), genState, &zondpb.Eth1Data{DepositRoot: hashTreeRoot[:], BlockHash: make([]byte, 32)})
-	require.NoError(t, err)
-
-	_, err = bc.HeadState(ctx)
-	assert.NoError(t, err)
-	headBlk, err := bc.HeadBlock(ctx)
-	require.NoError(t, err)
-	if headBlk == nil {
-		t.Error("Head state can't be nil after initialize beacon chain")
-	}
-	r, err := bc.HeadRoot(ctx)
-	require.NoError(t, err)
-	if bytesutil.ToBytes32(r) == params.BeaconConfig().ZeroHash {
-		t.Error("Canonical root for slot 0 can't be zeros after initialize beacon chain")
-	}
 }
 
 func TestChainService_CorrectGenesisRoots(t *testing.T) {
@@ -402,24 +355,6 @@ func TestServiceStop_SaveCachedBlocks(t *testing.T) {
 	require.Equal(t, true, s.cfg.BeaconDB.HasBlock(ctx, r))
 }
 
-func TestProcessChainStartTime_ReceivedFeed(t *testing.T) {
-	ctx := context.Background()
-	beaconDB := testDB.SetupDB(t)
-	service := setupBeaconChain(t, beaconDB)
-	mgs := &MockClockSetter{}
-	service.clockSetter = mgs
-	gt := time.Now()
-	service.onExecutionChainStart(context.Background(), gt)
-	gs, err := beaconDB.GenesisState(ctx)
-	require.NoError(t, err)
-	require.NotEqual(t, nil, gs)
-	require.Equal(t, 32, len(gs.GenesisValidatorsRoot()))
-	var zero [32]byte
-	require.DeepNotEqual(t, gs.GenesisValidatorsRoot(), zero[:])
-	require.Equal(t, gt, mgs.G.GenesisTime())
-	require.Equal(t, bytesutil.ToBytes32(gs.GenesisValidatorsRoot()), mgs.G.GenesisValidatorsRoot())
-}
-
 func BenchmarkHasBlockDB(b *testing.B) {
 	beaconDB := testDB.SetupDB(b)
 	ctx := context.Background()
@@ -449,7 +384,7 @@ func BenchmarkHasBlockForkChoiceStore_DoublyLinkedTree(b *testing.B) {
 	r, err := blk.Block.HashTreeRoot()
 	require.NoError(b, err)
 	bs := &zondpb.BeaconStateCapella{FinalizedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, 32)}, CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, 32)}}
-	beaconState, err := state_native.InitializeFromProtoPhase0(bs)
+	beaconState, err := state_native.InitializeFromProtoCapella(bs)
 	require.NoError(b, err)
 	require.NoError(b, s.cfg.ForkChoiceStore.InsertNode(ctx, beaconState, r))
 

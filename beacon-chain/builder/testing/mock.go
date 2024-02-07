@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/api/client/builder"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
@@ -28,9 +28,9 @@ type MockBuilderService struct {
 	ErrSubmitBlindedBlock error
 	BidCapella            *zondpb.SignedBuilderBidCapella
 	RegistrationCache     *cache.RegistrationCache
-	ErrGetHeader          error
-	ErrRegisterValidator  error
-	Cfg                   *Config
+	// ErrGetHeader          error // TODO(rgeraldes24) not used anymore with Capella
+	ErrRegisterValidator error
+	Cfg                  *Config
 }
 
 // Configured for mocking.
@@ -53,17 +53,8 @@ func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, b interfaces.
 }
 
 // GetHeader for mocking.
-func (s *MockBuilderService) GetHeader(_ context.Context, slot primitives.Slot, _ [32]byte, _ [dilithium2.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
-	// TODO(rgeraldes24): come back to this one once we cover the beacon chain unit tests
-	/*
-		w, err := builder.WrappedSignedBuilderBid(s.Bid)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not wrap capella bid")
-		}
-		return w, s.ErrGetHeader
-	*/
-
-	return nil, nil
+func (s *MockBuilderService) GetHeader(_ context.Context, slot primitives.Slot, _ [32]byte, _ [dilithium.CryptoPublicKeyBytes]byte) (builder.SignedBid, error) {
+	return builder.WrappedSignedBuilderBidCapella(s.BidCapella)
 }
 
 // RegistrationByValidatorID returns either the values from the cache or db.

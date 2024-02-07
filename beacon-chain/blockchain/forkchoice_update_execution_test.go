@@ -146,10 +146,10 @@ func TestService_forkchoiceUpdateWithExecution_SameHeadRootNewProposer(t *testin
 	service, tr := minimalTestService(t)
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
 
-	altairBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockAltair())
+	altairBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
 	altairBlkRoot, err := altairBlk.Block().HashTreeRoot()
 	require.NoError(t, err)
-	bellatrixBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockBellatrix())
+	bellatrixBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
 	bellatrixBlkRoot, err := bellatrixBlk.Block().HashTreeRoot()
 	require.NoError(t, err)
 	st, _ := util.DeterministicGenesisState(t, 10)
@@ -172,7 +172,7 @@ func TestService_forkchoiceUpdateWithExecution_SameHeadRootNewProposer(t *testin
 	service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{}
 	require.NoError(t, beaconDB.SaveState(ctx, st, bellatrixBlkRoot))
 	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, bellatrixBlkRoot))
-	sb, err := blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockBellatrix(&zondpb.SignedBeaconBlockBellatrix{}))
+	sb, err := blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{}))
 	require.NoError(t, err)
 	require.NoError(t, beaconDB.SaveBlock(ctx, sb))
 	r, err := sb.Block().HashTreeRoot()

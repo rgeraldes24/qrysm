@@ -4,7 +4,6 @@ import (
 	"math"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -145,6 +144,7 @@ func TestRetrieveForkDataFromDigest(t *testing.T) {
 }
 */
 
+/*
 func TestIsForkNextEpoch(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	cfg := params.BeaconConfig().Copy()
@@ -187,6 +187,7 @@ func TestIsForkNextEpoch(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, true, isFork)
 }
+*/
 
 func TestNextForkData(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

@@ -176,7 +176,7 @@ func TestHeadRoot_UseDB(t *testing.T) {
 func TestHeadBlock_CanRetrieve(t *testing.T) {
 	b := util.NewBeaconBlockCapella()
 	b.Block.Slot = 1
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconStateCapella{})
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{})
 	require.NoError(t, err)
 	wsb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)

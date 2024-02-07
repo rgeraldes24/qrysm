@@ -15,11 +15,10 @@ import (
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 func TestSlotFromBlock(t *testing.T) {
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	var slot primitives.Slot = 3
 	b.Block.Slot = slot
 	bb, err := b.MarshalSSZ()
@@ -27,22 +26,6 @@ func TestSlotFromBlock(t *testing.T) {
 	sfb, err := slotFromBlock(bb)
 	require.NoError(t, err)
 	require.Equal(t, slot, sfb)
-
-	ba := util.NewBeaconBlockAltair()
-	ba.Block.Slot = slot
-	bab, err := ba.MarshalSSZ()
-	require.NoError(t, err)
-	sfba, err := slotFromBlock(bab)
-	require.NoError(t, err)
-	require.Equal(t, slot, sfba)
-
-	bm := util.NewBeaconBlockBellatrix()
-	bm.Block.Slot = slot
-	bmb, err := ba.MarshalSSZ()
-	require.NoError(t, err)
-	sfbm, err := slotFromBlock(bmb)
-	require.NoError(t, err)
-	require.Equal(t, slot, sfbm)
 }
 
 func TestByState(t *testing.T) {
@@ -141,58 +124,8 @@ func TestUnmarshalBlock(t *testing.T) {
 	}{
 		{
 			name:    "genesis - slot 0",
-			b:       signedTestBlockGenesis,
-			version: genv,
-		},
-		{
-			name:    "last slot of phase 0",
-			b:       signedTestBlockGenesis,
-			version: genv,
-			slot:    altairS - 1,
-		},
-		{
-			name:    "first slot of altair",
-			b:       signedTestBlockAltair,
-			version: altairv,
-			slot:    altairS,
-		},
-		{
-			name:    "last slot of altair",
-			b:       signedTestBlockAltair,
-			version: altairv,
-			slot:    bellaS - 1,
-		},
-		{
-			name:    "first slot of bellatrix",
-			b:       signedTestBlockBellatrix,
-			version: bellav,
-			slot:    bellaS,
-		},
-		{
-			name:    "first slot of capella",
 			b:       signedTestBlockCapella,
-			version: capellaV,
-			slot:    capellaS,
-		},
-		{
-			name:    "bellatrix block in altair slot",
-			b:       signedTestBlockBellatrix,
-			version: bellav,
-			slot:    bellaS - 1,
-			err:     errBlockForkMismatch,
-		},
-		{
-			name:    "genesis block in altair slot",
-			b:       signedTestBlockGenesis,
 			version: genv,
-			slot:    bellaS - 1,
-			err:     errBlockForkMismatch,
-		},
-		{
-			name:    "altair block in genesis slot",
-			b:       signedTestBlockAltair,
-			version: altairv,
-			err:     errBlockForkMismatch,
 		},
 	}
 	for _, c := range cases {
@@ -219,15 +152,6 @@ func TestUnmarshalBlock(t *testing.T) {
 
 func TestUnmarshalBlindedBlock(t *testing.T) {
 	genv := bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion)
-	altairv := bytesutil.ToBytes4(params.BeaconConfig().AltairForkVersion)
-	bellav := bytesutil.ToBytes4(params.BeaconConfig().BellatrixForkVersion)
-	capellaV := bytesutil.ToBytes4(params.BeaconConfig().CapellaForkVersion)
-	altairS, err := slots.EpochStart(params.BeaconConfig().AltairForkEpoch)
-	require.NoError(t, err)
-	bellaS, err := slots.EpochStart(params.BeaconConfig().BellatrixForkEpoch)
-	require.NoError(t, err)
-	capellaS, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
 	cases := []struct {
 		b       func(*testing.T, primitives.Slot) interfaces.ReadOnlySignedBeaconBlock
 		name    string
@@ -237,58 +161,8 @@ func TestUnmarshalBlindedBlock(t *testing.T) {
 	}{
 		{
 			name:    "genesis - slot 0",
-			b:       signedTestBlockGenesis,
+			b:       signedTestBlockCapella,
 			version: genv,
-		},
-		{
-			name:    "last slot of phase 0",
-			b:       signedTestBlockGenesis,
-			version: genv,
-			slot:    altairS - 1,
-		},
-		{
-			name:    "first slot of altair",
-			b:       signedTestBlockAltair,
-			version: altairv,
-			slot:    altairS,
-		},
-		{
-			name:    "last slot of altair",
-			b:       signedTestBlockAltair,
-			version: altairv,
-			slot:    bellaS - 1,
-		},
-		{
-			name:    "first slot of bellatrix",
-			b:       signedTestBlindedBlockBellatrix,
-			version: bellav,
-			slot:    bellaS,
-		},
-		{
-			name:    "bellatrix block in altair slot",
-			b:       signedTestBlindedBlockBellatrix,
-			version: bellav,
-			slot:    bellaS - 1,
-			err:     errBlockForkMismatch,
-		},
-		{
-			name:    "first slot of capella",
-			b:       signedTestBlindedBlockCapella,
-			version: capellaV,
-			slot:    capellaS,
-		},
-		{
-			name:    "genesis block in altair slot",
-			b:       signedTestBlockGenesis,
-			version: genv,
-			slot:    bellaS - 1,
-			err:     errBlockForkMismatch,
-		},
-		{
-			name:    "altair block in genesis slot",
-			b:       signedTestBlockAltair,
-			version: altairv,
-			err:     errBlockForkMismatch,
 		},
 	}
 	for _, c := range cases {
