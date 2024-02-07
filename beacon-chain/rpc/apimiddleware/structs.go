@@ -361,8 +361,8 @@ type ExecutionPayloadHeaderCapellaJson struct {
 }
 
 type SyncAggregateJson struct {
-	SyncCommitteeBits      string `json:"sync_committee_bits" hex:"true"`
-	SyncCommitteeSignature string `json:"sync_committee_signature" hex:"true"`
+	SyncCommitteeBits       string   `json:"sync_committee_bits" hex:"true"`
+	SyncCommitteeSignatures []string `json:"sync_committee_signatures" hex:"true"`
 }
 
 type SignedBeaconBlockHeaderJson struct {
@@ -397,13 +397,13 @@ type AttesterSlashingJson struct {
 type IndexedAttestationJson struct {
 	AttestingIndices []string             `json:"attesting_indices"`
 	Data             *AttestationDataJson `json:"data"`
-	Signature        string               `json:"signature" hex:"true"`
+	Signatures       []string             `json:"signature" hex:"true"`
 }
 
 type AttestationJson struct {
 	AggregationBits string               `json:"aggregation_bits" hex:"true"`
 	Data            *AttestationDataJson `json:"data"`
-	Signature       string               `json:"signature" hex:"true"`
+	Signatures      []string             `json:"signatures" hex:"true"`
 }
 
 type AttestationDataJson struct {
@@ -590,11 +590,11 @@ type ContributionAndProofJson struct {
 }
 
 type SyncCommitteeContributionJson struct {
-	Slot              string `json:"slot"`
-	BeaconBlockRoot   string `json:"beacon_block_root" hex:"true"`
-	SubcommitteeIndex string `json:"subcommittee_index"`
-	AggregationBits   string `json:"aggregation_bits" hex:"true"`
-	Signature         string `json:"signature" hex:"true"`
+	Slot              string   `json:"slot"`
+	BeaconBlockRoot   string   `json:"beacon_block_root" hex:"true"`
+	SubcommitteeIndex string   `json:"subcommittee_index"`
+	AggregationBits   string   `json:"aggregation_bits" hex:"true"`
+	Signatures        []string `json:"signatures" hex:"true"`
 }
 
 type ForkChoiceNodeJson struct {

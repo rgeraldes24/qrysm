@@ -69,7 +69,7 @@ message ExecutionPayloadHeaderCapella {
 	bytes base_fee_per_gas  = 12 [(theqrl.zond.ext.ssz_size) = "32"];
 	bytes block_hash        = 13 [(theqrl.zond.ext.ssz_size) = "32"];
 	bytes transactions_root = 14 [(theqrl.zond.ext.ssz_size) = "32"];
-	bytes withdrawals_root  = 15 [(theqrl.zond.ext.ssz_size) = "32"]; // New in Capella.
+	bytes withdrawals_root  = 15 [(theqrl.zond.ext.ssz_size) = "32"];
 }
 
 message TransitionConfiguration {
@@ -82,7 +82,7 @@ message PayloadAttributesV2 {
 	uint64 timestamp                = 1;
 	bytes prev_randao               = 2 [(theqrl.zond.ext.ssz_size) = "32"];
 	bytes suggested_fee_recipient   = 3 [(theqrl.zond.ext.ssz_size) = "20"];
-	repeated Withdrawal withdrawals = 4 [(theqrl.zond.ext.ssz_max) = "withdrawal.size"]; // New in Capella.
+	repeated Withdrawal withdrawals = 4 [(theqrl.zond.ext.ssz_max) = "withdrawal.size"];
 }
 
 message PayloadStatus {

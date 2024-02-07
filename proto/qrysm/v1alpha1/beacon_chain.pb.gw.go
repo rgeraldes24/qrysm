@@ -109,40 +109,6 @@ func local_request_BeaconChain_ListIndexedAttestations_0(ctx context.Context, ma
 
 }
 
-func request_BeaconChain_StreamAttestations_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconChainClient, req *http.Request, pathParams map[string]string) (BeaconChain_StreamAttestationsClient, runtime.ServerMetadata, error) {
-	var protoReq emptypb.Empty
-	var metadata runtime.ServerMetadata
-
-	stream, err := client.StreamAttestations(ctx, &protoReq)
-	if err != nil {
-		return nil, metadata, err
-	}
-	header, err := stream.Header()
-	if err != nil {
-		return nil, metadata, err
-	}
-	metadata.HeaderMD = header
-	return stream, metadata, nil
-
-}
-
-func request_BeaconChain_StreamIndexedAttestations_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconChainClient, req *http.Request, pathParams map[string]string) (BeaconChain_StreamIndexedAttestationsClient, runtime.ServerMetadata, error) {
-	var protoReq emptypb.Empty
-	var metadata runtime.ServerMetadata
-
-	stream, err := client.StreamIndexedAttestations(ctx, &protoReq)
-	if err != nil {
-		return nil, metadata, err
-	}
-	header, err := stream.Header()
-	if err != nil {
-		return nil, metadata, err
-	}
-	metadata.HeaderMD = header
-	return stream, metadata, nil
-
-}
-
 var (
 	filter_BeaconChain_AttestationPool_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
@@ -430,24 +396,6 @@ func local_request_BeaconChain_GetValidatorActiveSetChanges_0(ctx context.Contex
 
 }
 
-func request_BeaconChain_GetValidatorQueue_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconChainClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq emptypb.Empty
-	var metadata runtime.ServerMetadata
-
-	msg, err := client.GetValidatorQueue(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func local_request_BeaconChain_GetValidatorQueue_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconChainServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq emptypb.Empty
-	var metadata runtime.ServerMetadata
-
-	msg, err := server.GetValidatorQueue(ctx, &protoReq)
-	return msg, metadata, err
-
-}
-
 var (
 	filter_BeaconChain_GetValidatorPerformance_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
@@ -572,58 +520,6 @@ func local_request_BeaconChain_GetBeaconConfig_0(ctx context.Context, marshaler 
 	msg, err := server.GetBeaconConfig(ctx, &protoReq)
 	return msg, metadata, err
 
-}
-
-func request_BeaconChain_StreamValidatorsInfo_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconChainClient, req *http.Request, pathParams map[string]string) (BeaconChain_StreamValidatorsInfoClient, runtime.ServerMetadata, error) {
-	var metadata runtime.ServerMetadata
-	stream, err := client.StreamValidatorsInfo(ctx)
-	if err != nil {
-		grpclog.Infof("Failed to start streaming: %v", err)
-		return nil, metadata, err
-	}
-	dec := marshaler.NewDecoder(req.Body)
-	handleSend := func() error {
-		var protoReq ValidatorChangeSet
-		err := dec.Decode(&protoReq)
-		if err == io.EOF {
-			return err
-		}
-		if err != nil {
-			grpclog.Infof("Failed to decode request: %v", err)
-			return err
-		}
-		if err := stream.Send(&protoReq); err != nil {
-			grpclog.Infof("Failed to send request: %v", err)
-			return err
-		}
-		return nil
-	}
-	if err := handleSend(); err != nil {
-		if cerr := stream.CloseSend(); cerr != nil {
-			grpclog.Infof("Failed to terminate client stream: %v", cerr)
-		}
-		if err == io.EOF {
-			return stream, metadata, nil
-		}
-		return nil, metadata, err
-	}
-	go func() {
-		for {
-			if err := handleSend(); err != nil {
-				break
-			}
-		}
-		if err := stream.CloseSend(); err != nil {
-			grpclog.Infof("Failed to terminate client stream: %v", err)
-		}
-	}()
-	header, err := stream.Header()
-	if err != nil {
-		grpclog.Infof("Failed to get header from client: %v", err)
-		return nil, metadata, err
-	}
-	metadata.HeaderMD = header
-	return stream, metadata, nil
 }
 
 var (
@@ -784,20 +680,6 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 
 		forward_BeaconChain_ListIndexedAttestations_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
-	})
-
-	mux.Handle("GET", pattern_BeaconChain_StreamAttestations_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
-		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-		return
-	})
-
-	mux.Handle("GET", pattern_BeaconChain_StreamIndexedAttestations_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
-		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-		return
 	})
 
 	mux.Handle("GET", pattern_BeaconChain_AttestationPool_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
@@ -991,29 +873,6 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("GET", pattern_BeaconChain_GetValidatorQueue_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorQueue")
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_BeaconChain_GetValidatorQueue_0(rctx, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_BeaconChain_GetValidatorQueue_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("GET", pattern_BeaconChain_GetValidatorPerformance_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1104,13 +963,6 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 
 		forward_BeaconChain_GetBeaconConfig_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
-	})
-
-	mux.Handle("GET", pattern_BeaconChain_StreamValidatorsInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
-		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-		return
 	})
 
 	mux.Handle("GET", pattern_BeaconChain_SubmitAttesterSlashing_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
@@ -1260,46 +1112,6 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		}
 
 		forward_BeaconChain_ListIndexedAttestations_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_BeaconChain_StreamAttestations_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/StreamAttestations")
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_BeaconChain_StreamAttestations_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_BeaconChain_StreamAttestations_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_BeaconChain_StreamIndexedAttestations_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/StreamIndexedAttestations")
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_BeaconChain_StreamIndexedAttestations_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_BeaconChain_StreamIndexedAttestations_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1483,26 +1295,6 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("GET", pattern_BeaconChain_GetValidatorQueue_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorQueue")
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_BeaconChain_GetValidatorQueue_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_BeaconChain_GetValidatorQueue_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("GET", pattern_BeaconChain_GetValidatorPerformance_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1583,26 +1375,6 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("GET", pattern_BeaconChain_StreamValidatorsInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/StreamValidatorsInfo")
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_BeaconChain_StreamValidatorsInfo_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_BeaconChain_StreamValidatorsInfo_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("GET", pattern_BeaconChain_SubmitAttesterSlashing_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1671,10 +1443,6 @@ var (
 
 	pattern_BeaconChain_ListIndexedAttestations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"zond", "v1alpha1", "beacon", "attestations", "indexed"}, ""))
 
-	pattern_BeaconChain_StreamAttestations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"zond", "v1alpha1", "beacon", "attestations", "stream"}, ""))
-
-	pattern_BeaconChain_StreamIndexedAttestations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"zond", "v1alpha1", "beacon", "attestations", "indexed", "stream"}, ""))
-
 	pattern_BeaconChain_AttestationPool_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"zond", "v1alpha1", "beacon", "attestations", "pool"}, ""))
 
 	pattern_BeaconChain_ListBeaconBlocks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha2", "beacon", "blocks"}, ""))
@@ -1693,8 +1461,6 @@ var (
 
 	pattern_BeaconChain_GetValidatorActiveSetChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "validators", "activesetchanges"}, ""))
 
-	pattern_BeaconChain_GetValidatorQueue_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "validators", "queue"}, ""))
-
 	pattern_BeaconChain_GetValidatorPerformance_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "validators", "performance"}, ""))
 
 	pattern_BeaconChain_ListValidatorAssignments_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "validators", "assignments"}, ""))
@@ -1702,8 +1468,6 @@ var (
 	pattern_BeaconChain_GetValidatorParticipation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "validators", "participation"}, ""))
 
 	pattern_BeaconChain_GetBeaconConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "beacon", "config"}, ""))
-
-	pattern_BeaconChain_StreamValidatorsInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"zond", "v1alpha1", "beacon", "validators", "info", "stream"}, ""))
 
 	pattern_BeaconChain_SubmitAttesterSlashing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"zond", "v1alpha1", "beacon", "slashings", "attester", "submit"}, ""))
 
@@ -1716,10 +1480,6 @@ var (
 	forward_BeaconChain_ListAttestations_0 = runtime.ForwardResponseMessage
 
 	forward_BeaconChain_ListIndexedAttestations_0 = runtime.ForwardResponseMessage
-
-	forward_BeaconChain_StreamAttestations_0 = runtime.ForwardResponseStream
-
-	forward_BeaconChain_StreamIndexedAttestations_0 = runtime.ForwardResponseStream
 
 	forward_BeaconChain_AttestationPool_0 = runtime.ForwardResponseMessage
 
@@ -1739,8 +1499,6 @@ var (
 
 	forward_BeaconChain_GetValidatorActiveSetChanges_0 = runtime.ForwardResponseMessage
 
-	forward_BeaconChain_GetValidatorQueue_0 = runtime.ForwardResponseMessage
-
 	forward_BeaconChain_GetValidatorPerformance_0 = runtime.ForwardResponseMessage
 
 	forward_BeaconChain_ListValidatorAssignments_0 = runtime.ForwardResponseMessage
@@ -1748,8 +1506,6 @@ var (
 	forward_BeaconChain_GetValidatorParticipation_0 = runtime.ForwardResponseMessage
 
 	forward_BeaconChain_GetBeaconConfig_0 = runtime.ForwardResponseMessage
-
-	forward_BeaconChain_StreamValidatorsInfo_0 = runtime.ForwardResponseStream
 
 	forward_BeaconChain_SubmitAttesterSlashing_0 = runtime.ForwardResponseMessage
 

@@ -197,9 +197,6 @@ func ConfigToYaml(cfg *BeaconChainConfig) []byte {
 		fmt.Sprintf("DEPOSIT_NETWORK_ID: %d", cfg.DepositNetworkID),
 		fmt.Sprintf("INACTIVITY_SCORE_BIAS: %d", cfg.InactivityScoreBias),
 		fmt.Sprintf("INACTIVITY_SCORE_RECOVERY_RATE: %d", cfg.InactivityScoreRecoveryRate),
-		fmt.Sprintf("TERMINAL_TOTAL_DIFFICULTY: %s", cfg.TerminalTotalDifficulty),
-		fmt.Sprintf("TERMINAL_BLOCK_HASH: %#x", cfg.TerminalBlockHash),
-		fmt.Sprintf("TERMINAL_BLOCK_HASH_ACTIVATION_EPOCH: %d", cfg.TerminalBlockHashActivationEpoch),
 		fmt.Sprintf("DEPOSIT_CONTRACT_ADDRESS: %s", cfg.DepositContractAddress),
 	}
 

@@ -241,7 +241,7 @@ service KeyManagement {
 message ListKeystoresResponse {
   message Keystore {
     bytes validating_pubkey = 1;
-    string derivation_path = 2;
+    // string derivation_path = 2;
   }
   repeated Keystore data = 1;
 }

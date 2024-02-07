@@ -180,7 +180,7 @@ service BeaconChain {
     };
   }
 
-  // ListDilithiumToExecutionChanges retrieves BLS to execution changes known by the node but not necessarily incorporated into any block
+  // ListDilithiumToExecutionChanges retrieves Dilithium to execution changes known by the node but not necessarily incorporated into any block
   //
   // Spec: https://ethereum.github.io/beacon-APIs/?urls.primaryName=dev#/Beacon/getPoolBLSToExecutionChanges
   rpc ListDilithiumToExecutionChanges(google.protobuf.Empty) returns (v2.DilithiumToExecutionChangesPoolResponse) {

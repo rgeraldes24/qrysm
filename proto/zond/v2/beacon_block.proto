@@ -60,8 +60,8 @@ message SignedBeaconBlockContainer {
     BeaconBlockCapella capella_block = 1;
   }
 
-  // 96 byte Dilithium signature from the validator that produced this block.
-  bytes signature = 6 [(theqrl.zond.ext.ssz_size) = "4595"];
+  // 4595 byte Dilithium signature from the validator that produced this block.
+  bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
 message SignedBeaconBlockContentsContainer {
@@ -83,8 +83,8 @@ message SignedBlindedBeaconBlockContainer {
     BlindedBeaconBlockCapella capella_block = 1;
   }
 
-  // 96 byte Dilithium signature from the validator that produced this block.
-  bytes signature = 6 [(theqrl.zond.ext.ssz_size) = "4595"];
+  // 4595 byte Dilithium signature from the validator that produced this block.
+  bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
 message SignedBlindedBeaconBlockContentsContainer {
@@ -96,18 +96,18 @@ message SignedBlindedBeaconBlockContentsContainer {
 message SignedBeaconBlockCapella {
   BeaconBlockCapella message = 1;
 
-  // 96 byte Dilithium signature from the validator that produced this block.
+  // 4595 byte Dilithium signature from the validator that produced this block.
   bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
 message SignedBlindedBeaconBlockCapella {
   BlindedBeaconBlockCapella message = 1;
 
-  // 96 byte Dilithium signature from the validator that produced this block.
+  // 4595 byte Dilithium signature from the validator that produced this block.
   bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
-// The Ethereum consensus beacon block. The message does not contain a validator signature.
+// The Zond consensus beacon block. The message does not contain a validator signature.
 message BeaconBlockCapella {
   // Beacon chain slot that this block represents.
   uint64 slot = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
@@ -125,7 +125,7 @@ message BeaconBlockCapella {
   BeaconBlockBodyCapella body = 5;
 }
 
-// The Ethereum consensus beacon block. The message does not contain a validator signature.
+// The Zond consensus beacon block. The message does not contain a validator signature.
 message BlindedBeaconBlockCapella {
   // Beacon chain slot that this block represents.
   uint64 slot = 1 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
@@ -144,10 +144,10 @@ message BlindedBeaconBlockCapella {
 }
 
 message BeaconBlockBodyCapella {
-  // The validators RANDAO reveal 96 byte value.
+  // The validators RANDAO reveal 45954595 byte value.
   bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-  // A reference to the Ethereum 1.x chain.
+  // A reference to the zond execution chain.
   v1.Eth1Data eth1_data = 2;
 
   // 32 byte field of arbitrary data. This field may contain any data and
@@ -183,10 +183,10 @@ message BeaconBlockBodyCapella {
 }
 
 message BlindedBeaconBlockBodyCapella {
-  // The validators RANDAO reveal 96 byte value.
+  // The validators RANDAO reveal 4595 byte value.
   bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-  // A reference to the Ethereum 1.x chain.
+  // A reference to the Zond execution chain.
   v1.Eth1Data eth1_data = 2;
 
   // 32 byte field of arbitrary data. This field may contain any data and

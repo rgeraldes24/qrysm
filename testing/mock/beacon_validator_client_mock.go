@@ -38,24 +38,24 @@ func (m *MockBeaconNodeValidatorClient) EXPECT() *MockBeaconNodeValidatorClientM
 	return m.recorder
 }
 
-// AggregatedSigAndAggregationBits mocks base method.
-func (m *MockBeaconNodeValidatorClient) AggregatedSigAndAggregationBits(arg0 context.Context, arg1 *zond.AggregatedSigAndAggregationBitsRequest, arg2 ...grpc.CallOption) (*zond.AggregatedSigAndAggregationBitsResponse, error) {
+// SignaturesAndAggregationBits mocks base method.
+func (m *MockBeaconNodeValidatorClient) SignaturesAndAggregationBits(arg0 context.Context, arg1 *zond.SignaturesAndAggregationBitsRequest, arg2 ...grpc.CallOption) (*zond.SignaturesAndAggregationBitsResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "AggregatedSigAndAggregationBits", varargs...)
-	ret0, _ := ret[0].(*zond.AggregatedSigAndAggregationBitsResponse)
+	ret := m.ctrl.Call(m, "SignaturesAndAggregationBits", varargs...)
+	ret0, _ := ret[0].(*zond.SignaturesAndAggregationBitsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// AggregatedSigAndAggregationBits indicates an expected call of AggregatedSigAndAggregationBits.
-func (mr *MockBeaconNodeValidatorClientMockRecorder) AggregatedSigAndAggregationBits(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// SignaturesAndAggregationBits indicates an expected call of SignaturesAndAggregationBits.
+func (mr *MockBeaconNodeValidatorClientMockRecorder) SignaturesAndAggregationBits(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AggregatedSigAndAggregationBits", reflect.TypeOf((*MockBeaconNodeValidatorClient)(nil).AggregatedSigAndAggregationBits), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignaturesAndAggregationBits", reflect.TypeOf((*MockBeaconNodeValidatorClient)(nil).SignaturesAndAggregationBits), varargs...)
 }
 
 // AssignValidatorToSubnet mocks base method.
@@ -378,25 +378,6 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) StreamBlocksAltair(arg0, ar
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamBlocksAltair", reflect.TypeOf((*MockBeaconNodeValidatorClient)(nil).StreamBlocksAltair), varargs...)
 }
 
-// StreamDuties mocks base method.
-func (m *MockBeaconNodeValidatorClient) StreamDuties(arg0 context.Context, arg1 *zond.DutiesRequest, arg2 ...grpc.CallOption) (zond.BeaconNodeValidator_StreamDutiesClient, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "StreamDuties", varargs...)
-	ret0, _ := ret[0].(zond.BeaconNodeValidator_StreamDutiesClient)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// StreamDuties indicates an expected call of StreamDuties.
-func (mr *MockBeaconNodeValidatorClientMockRecorder) StreamDuties(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamDuties", reflect.TypeOf((*MockBeaconNodeValidatorClient)(nil).StreamDuties), varargs...)
-}
 
 // SubmitAggregateSelectionProof mocks base method.
 func (m *MockBeaconNodeValidatorClient) SubmitAggregateSelectionProof(arg0 context.Context, arg1 *zond.AggregateSelectionRequest, arg2 ...grpc.CallOption) (*zond.AggregateSelectionResponse, error) {

@@ -133,10 +133,15 @@ func jsonifyIndexedAttestation(indexedAttestation *zondpb.IndexedAttestation) *a
 		attestingIndices[index] = attestingIndex
 	}
 
+	signatures := make([]string, len(indexedAttestation.Signatures))
+	for i, sig := range indexedAttestation.Signatures {
+		signatures[i] = hexutil.Encode(sig)
+	}
+
 	return &apimiddleware.IndexedAttestationJson{
 		AttestingIndices: attestingIndices,
 		Data:             jsonifyAttestationData(indexedAttestation.Data),
-		Signature:        hexutil.Encode(indexedAttestation.Signature),
+		Signatures:       signatures,
 	}
 }
 
@@ -157,10 +162,15 @@ func jsonifyAttestationData(attestationData *zondpb.AttestationData) *apimiddlew
 }
 
 func jsonifyAttestation(attestation *zondpb.Attestation) *apimiddleware.AttestationJson {
+	signatures := make([]string, len(attestation.Signatures))
+	for i, sig := range attestation.Signatures {
+		signatures[i] = hexutil.Encode(sig)
+	}
+
 	return &apimiddleware.AttestationJson{
 		AggregationBits: hexutil.Encode(attestation.AggregationBits),
 		Data:            jsonifyAttestationData(attestation.Data),
-		Signature:       hexutil.Encode(attestation.Signature),
+		Signatures:      signatures,
 	}
 }
 

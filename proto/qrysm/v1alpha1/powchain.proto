@@ -34,10 +34,10 @@ message DepositSnapshot {
 }
 // LatestETH1Data contains the current state of the eth1 chain.
 message LatestETH1Data {
-    uint64 block_height = 2;
-    uint64 block_time = 3;
-    bytes block_hash = 4;
-    uint64 last_requested_block = 5;
+    uint64 block_height = 1;
+    uint64 block_time = 2;
+    bytes block_hash = 3;
+    uint64 last_requested_block = 4;
 }
 
 // ChainStartData contains all the information related to chainstart.

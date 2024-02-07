@@ -219,11 +219,8 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	MinSyncCommitteeParticipants: 1,
 
 	// Bellatrix
-	TerminalBlockHashActivationEpoch: 18446744073709551615,
-	TerminalBlockHash:                [32]byte{},
-	TerminalTotalDifficulty:          "58750000000000000000000", // Estimated: Sept 15, 2022
-	EthBurnAddressHex:                "0x0000000000000000000000000000000000000000",
-	DefaultBuilderGasLimit:           uint64(30000000),
+	EthBurnAddressHex:      "0x0000000000000000000000000000000000000000",
+	DefaultBuilderGasLimit: uint64(30000000),
 
 	// Mevboost circuit breaker
 	MaxBuilderConsecutiveMissedSlots: 3,

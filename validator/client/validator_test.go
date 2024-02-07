@@ -1201,7 +1201,7 @@ func createAttestation(source, target primitives.Epoch) *zondpb.IndexedAttestati
 			},
 			BeaconBlockRoot: make([]byte, 32),
 		},
-		Signature: make([]byte, dilithiumlib.CryptoBytes),
+		Signatures: [][]byte{},
 	}
 }
 

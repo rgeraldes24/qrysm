@@ -329,7 +329,7 @@ type ForkData struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CurrentVersion        []byte `protobuf:"bytes,4,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty" ssz-size:"4"`
+	CurrentVersion        []byte `protobuf:"bytes,1,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty" ssz-size:"4"`
 	GenesisValidatorsRoot []byte `protobuf:"bytes,2,opt,name=genesis_validators_root,json=genesisValidatorsRoot,proto3" json:"genesis_validators_root,omitempty" ssz-size:"32"`
 }
 
@@ -886,69 +886,6 @@ func (x *BeaconStateCapella) GetHistoricalSummaries() []*HistoricalSummary {
 	return nil
 }
 
-type PowBlock struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	BlockHash       []byte `protobuf:"bytes,1,opt,name=block_hash,json=blockHash,proto3" json:"block_hash,omitempty" ssz-size:"32"`
-	ParentHash      []byte `protobuf:"bytes,2,opt,name=parent_hash,json=parentHash,proto3" json:"parent_hash,omitempty" ssz-size:"32"`
-	TotalDifficulty []byte `protobuf:"bytes,3,opt,name=total_difficulty,json=totalDifficulty,proto3" json:"total_difficulty,omitempty" ssz-size:"32"`
-}
-
-func (x *PowBlock) Reset() {
-	*x = PowBlock{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[11]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *PowBlock) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PowBlock) ProtoMessage() {}
-
-func (x *PowBlock) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[11]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PowBlock.ProtoReflect.Descriptor instead.
-func (*PowBlock) Descriptor() ([]byte, []int) {
-	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *PowBlock) GetBlockHash() []byte {
-	if x != nil {
-		return x.BlockHash
-	}
-	return nil
-}
-
-func (x *PowBlock) GetParentHash() []byte {
-	if x != nil {
-		return x.ParentHash
-	}
-	return nil
-}
-
-func (x *PowBlock) GetTotalDifficulty() []byte {
-	if x != nil {
-		return x.TotalDifficulty
-	}
-	return nil
-}
-
 type HistoricalSummary struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -961,7 +898,7 @@ type HistoricalSummary struct {
 func (x *HistoricalSummary) Reset() {
 	*x = HistoricalSummary{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[12]
+		mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -974,7 +911,7 @@ func (x *HistoricalSummary) String() string {
 func (*HistoricalSummary) ProtoMessage() {}
 
 func (x *HistoricalSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[12]
+	mi := &file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -987,7 +924,7 @@ func (x *HistoricalSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HistoricalSummary.ProtoReflect.Descriptor instead.
 func (*HistoricalSummary) Descriptor() ([]byte, []int) {
-	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{12}
+	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *HistoricalSummary) GetBlockSummaryRoot() []byte {
@@ -1081,7 +1018,7 @@ var file_proto_qrysm_v1alpha1_beacon_state_proto_rawDesc = []byte{
 	0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x42, 0x06, 0x8a, 0xb5, 0x18, 0x02, 0x33, 0x32, 0x52,
 	0x06, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x22, 0x7a, 0x0a, 0x08, 0x46, 0x6f, 0x72, 0x6b, 0x44,
 	0x61, 0x74, 0x61, 0x12, 0x2e, 0x0a, 0x0f, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x5f, 0x76,
-	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0c, 0x42, 0x05, 0x8a, 0xb5,
+	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x42, 0x05, 0x8a, 0xb5,
 	0x18, 0x01, 0x34, 0x52, 0x0e, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73,
 	0x69, 0x6f, 0x6e, 0x12, 0x3e, 0x0a, 0x17, 0x67, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x5f, 0x76,
 	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x5f, 0x72, 0x6f, 0x6f, 0x74, 0x18, 0x02,
@@ -1256,16 +1193,7 @@ var file_proto_qrysm_v1alpha1_beacon_state_proto_rawDesc = []byte{
 	0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2e, 0x48, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x69,
 	0x63, 0x61, 0x6c, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x42, 0x0c, 0x92, 0xb5, 0x18, 0x08,
 	0x31, 0x36, 0x37, 0x37, 0x37, 0x32, 0x31, 0x36, 0x52, 0x13, 0x68, 0x69, 0x73, 0x74, 0x6f, 0x72,
-	0x69, 0x63, 0x61, 0x6c, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x69, 0x65, 0x73, 0x22, 0x8d, 0x01,
-	0x0a, 0x08, 0x50, 0x6f, 0x77, 0x42, 0x6c, 0x6f, 0x63, 0x6b, 0x12, 0x25, 0x0a, 0x0a, 0x62, 0x6c,
-	0x6f, 0x63, 0x6b, 0x5f, 0x68, 0x61, 0x73, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x42, 0x06,
-	0x8a, 0xb5, 0x18, 0x02, 0x33, 0x32, 0x52, 0x09, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x48, 0x61, 0x73,
-	0x68, 0x12, 0x27, 0x0a, 0x0b, 0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x5f, 0x68, 0x61, 0x73, 0x68,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x42, 0x06, 0x8a, 0xb5, 0x18, 0x02, 0x33, 0x32, 0x52, 0x0a,
-	0x70, 0x61, 0x72, 0x65, 0x6e, 0x74, 0x48, 0x61, 0x73, 0x68, 0x12, 0x31, 0x0a, 0x10, 0x74, 0x6f,
-	0x74, 0x61, 0x6c, 0x5f, 0x64, 0x69, 0x66, 0x66, 0x69, 0x63, 0x75, 0x6c, 0x74, 0x79, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x0c, 0x42, 0x06, 0x8a, 0xb5, 0x18, 0x02, 0x33, 0x32, 0x52, 0x0f, 0x74, 0x6f,
-	0x74, 0x61, 0x6c, 0x44, 0x69, 0x66, 0x66, 0x69, 0x63, 0x75, 0x6c, 0x74, 0x79, 0x22, 0x7f, 0x0a,
+	0x69, 0x63, 0x61, 0x6c, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x69, 0x65, 0x73, 0x22, 0x7f, 0x0a,
 	0x11, 0x48, 0x69, 0x73, 0x74, 0x6f, 0x72, 0x69, 0x63, 0x61, 0x6c, 0x53, 0x75, 0x6d, 0x6d, 0x61,
 	0x72, 0x79, 0x12, 0x34, 0x0a, 0x12, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x73, 0x75, 0x6d, 0x6d,
 	0x61, 0x72, 0x79, 0x5f, 0x72, 0x6f, 0x6f, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x42, 0x06,
@@ -1298,7 +1226,7 @@ func file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP() []byte {
 	return file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescData
 }
 
-var file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_proto_qrysm_v1alpha1_beacon_state_proto_goTypes = []interface{}{
 	(*Fork)(nil),                             // 0: theqrl.zond.v1alpha1.Fork
 	(*PendingAttestation)(nil),               // 1: theqrl.zond.v1alpha1.PendingAttestation
@@ -1311,30 +1239,29 @@ var file_proto_qrysm_v1alpha1_beacon_state_proto_goTypes = []interface{}{
 	(*SyncCommittee)(nil),                    // 8: theqrl.zond.v1alpha1.SyncCommittee
 	(*SyncAggregatorSelectionData)(nil),      // 9: theqrl.zond.v1alpha1.SyncAggregatorSelectionData
 	(*BeaconStateCapella)(nil),               // 10: theqrl.zond.v1alpha1.BeaconStateCapella
-	(*PowBlock)(nil),                         // 11: theqrl.zond.v1alpha1.PowBlock
-	(*HistoricalSummary)(nil),                // 12: theqrl.zond.v1alpha1.HistoricalSummary
-	(*AttestationData)(nil),                  // 13: theqrl.zond.v1alpha1.AttestationData
-	(*BeaconBlockHeader)(nil),                // 14: theqrl.zond.v1alpha1.BeaconBlockHeader
-	(*Eth1Data)(nil),                         // 15: theqrl.zond.v1alpha1.Eth1Data
-	(*Validator)(nil),                        // 16: theqrl.zond.v1alpha1.Validator
-	(*Checkpoint)(nil),                       // 17: theqrl.zond.v1alpha1.Checkpoint
-	(*v1.ExecutionPayloadHeaderCapella)(nil), // 18: theqrl.engine.v1.ExecutionPayloadHeaderCapella
+	(*HistoricalSummary)(nil),                // 11: theqrl.zond.v1alpha1.HistoricalSummary
+	(*AttestationData)(nil),                  // 12: theqrl.zond.v1alpha1.AttestationData
+	(*BeaconBlockHeader)(nil),                // 13: theqrl.zond.v1alpha1.BeaconBlockHeader
+	(*Eth1Data)(nil),                         // 14: theqrl.zond.v1alpha1.Eth1Data
+	(*Validator)(nil),                        // 15: theqrl.zond.v1alpha1.Validator
+	(*Checkpoint)(nil),                       // 16: theqrl.zond.v1alpha1.Checkpoint
+	(*v1.ExecutionPayloadHeaderCapella)(nil), // 17: theqrl.engine.v1.ExecutionPayloadHeaderCapella
 }
 var file_proto_qrysm_v1alpha1_beacon_state_proto_depIdxs = []int32{
-	13, // 0: theqrl.zond.v1alpha1.PendingAttestation.data:type_name -> theqrl.zond.v1alpha1.AttestationData
+	12, // 0: theqrl.zond.v1alpha1.PendingAttestation.data:type_name -> theqrl.zond.v1alpha1.AttestationData
 	0,  // 1: theqrl.zond.v1alpha1.CheckPtInfo.fork:type_name -> theqrl.zond.v1alpha1.Fork
 	0,  // 2: theqrl.zond.v1alpha1.BeaconStateCapella.fork:type_name -> theqrl.zond.v1alpha1.Fork
-	14, // 3: theqrl.zond.v1alpha1.BeaconStateCapella.latest_block_header:type_name -> theqrl.zond.v1alpha1.BeaconBlockHeader
-	15, // 4: theqrl.zond.v1alpha1.BeaconStateCapella.eth1_data:type_name -> theqrl.zond.v1alpha1.Eth1Data
-	15, // 5: theqrl.zond.v1alpha1.BeaconStateCapella.eth1_data_votes:type_name -> theqrl.zond.v1alpha1.Eth1Data
-	16, // 6: theqrl.zond.v1alpha1.BeaconStateCapella.validators:type_name -> theqrl.zond.v1alpha1.Validator
-	17, // 7: theqrl.zond.v1alpha1.BeaconStateCapella.previous_justified_checkpoint:type_name -> theqrl.zond.v1alpha1.Checkpoint
-	17, // 8: theqrl.zond.v1alpha1.BeaconStateCapella.current_justified_checkpoint:type_name -> theqrl.zond.v1alpha1.Checkpoint
-	17, // 9: theqrl.zond.v1alpha1.BeaconStateCapella.finalized_checkpoint:type_name -> theqrl.zond.v1alpha1.Checkpoint
+	13, // 3: theqrl.zond.v1alpha1.BeaconStateCapella.latest_block_header:type_name -> theqrl.zond.v1alpha1.BeaconBlockHeader
+	14, // 4: theqrl.zond.v1alpha1.BeaconStateCapella.eth1_data:type_name -> theqrl.zond.v1alpha1.Eth1Data
+	14, // 5: theqrl.zond.v1alpha1.BeaconStateCapella.eth1_data_votes:type_name -> theqrl.zond.v1alpha1.Eth1Data
+	15, // 6: theqrl.zond.v1alpha1.BeaconStateCapella.validators:type_name -> theqrl.zond.v1alpha1.Validator
+	16, // 7: theqrl.zond.v1alpha1.BeaconStateCapella.previous_justified_checkpoint:type_name -> theqrl.zond.v1alpha1.Checkpoint
+	16, // 8: theqrl.zond.v1alpha1.BeaconStateCapella.current_justified_checkpoint:type_name -> theqrl.zond.v1alpha1.Checkpoint
+	16, // 9: theqrl.zond.v1alpha1.BeaconStateCapella.finalized_checkpoint:type_name -> theqrl.zond.v1alpha1.Checkpoint
 	8,  // 10: theqrl.zond.v1alpha1.BeaconStateCapella.current_sync_committee:type_name -> theqrl.zond.v1alpha1.SyncCommittee
 	8,  // 11: theqrl.zond.v1alpha1.BeaconStateCapella.next_sync_committee:type_name -> theqrl.zond.v1alpha1.SyncCommittee
-	18, // 12: theqrl.zond.v1alpha1.BeaconStateCapella.latest_execution_payload_header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
-	12, // 13: theqrl.zond.v1alpha1.BeaconStateCapella.historical_summaries:type_name -> theqrl.zond.v1alpha1.HistoricalSummary
+	17, // 12: theqrl.zond.v1alpha1.BeaconStateCapella.latest_execution_payload_header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
+	11, // 13: theqrl.zond.v1alpha1.BeaconStateCapella.historical_summaries:type_name -> theqrl.zond.v1alpha1.HistoricalSummary
 	14, // [14:14] is the sub-list for method output_type
 	14, // [14:14] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name
@@ -1484,18 +1411,6 @@ func file_proto_qrysm_v1alpha1_beacon_state_proto_init() {
 			}
 		}
 		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*PowBlock); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*HistoricalSummary); i {
 			case 0:
 				return &v.state
@@ -1514,7 +1429,7 @@ func file_proto_qrysm_v1alpha1_beacon_state_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_qrysm_v1alpha1_beacon_state_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -49,11 +49,16 @@ func CopyAttestation(att *Attestation) *Attestation {
 	if att == nil {
 		return nil
 	}
+
+	signatures := make([][]byte, len(att.Signatures))
+	for i, sig := range att.Signatures {
+		signatures[i] = bytesutil.SafeCopyBytes(sig)
+	}
+
 	return &Attestation{
-		AggregationBits:         bytesutil.SafeCopyBytes(att.AggregationBits),
-		Data:                    CopyAttestationData(att.Data),
-		Signature:               bytesutil.SafeCopyBytes(att.Signature),
-		SignatureValidatorIndex: bytesutil.SafeCopyUint64Array(att.SignatureValidatorIndex),
+		AggregationBits: bytesutil.SafeCopyBytes(att.AggregationBits),
+		Data:            CopyAttestationData(att.Data),
+		Signatures:      signatures,
 	}
 }
 
@@ -150,17 +155,24 @@ func CopyAttesterSlashings(slashings []*AttesterSlashing) []*AttesterSlashing {
 
 // CopyIndexedAttestation copies the provided IndexedAttestation.
 func CopyIndexedAttestation(indexedAtt *IndexedAttestation) *IndexedAttestation {
-	var indices []uint64
+	var (
+		indices    []uint64
+		signatures [][]byte
+	)
 	if indexedAtt == nil {
 		return nil
 	} else if indexedAtt.AttestingIndices != nil {
 		indices = make([]uint64, len(indexedAtt.AttestingIndices))
 		copy(indices, indexedAtt.AttestingIndices)
+		signatures = make([][]byte, len(indexedAtt.Signatures))
+		for i, sig := range indexedAtt.Signatures {
+			signatures[i] = bytesutil.SafeCopyBytes(sig)
+		}
 	}
 	return &IndexedAttestation{
 		AttestingIndices: indices,
 		Data:             CopyAttestationData(indexedAtt.Data),
-		Signature:        bytesutil.SafeCopyBytes(indexedAtt.Signature),
+		Signatures:       signatures,
 	}
 }
 
@@ -274,12 +286,18 @@ func CopySyncCommitteeContribution(c *SyncCommitteeContribution) *SyncCommitteeC
 	if c == nil {
 		return nil
 	}
+
+	signatures := make([][]byte, len(c.Signatures))
+	for i, sig := range c.Signatures {
+		signatures[i] = bytesutil.SafeCopyBytes(sig)
+	}
+
 	return &SyncCommitteeContribution{
 		Slot:              c.Slot,
 		BlockRoot:         bytesutil.SafeCopyBytes(c.BlockRoot),
 		SubcommitteeIndex: c.SubcommitteeIndex,
 		AggregationBits:   bytesutil.SafeCopyBytes(c.AggregationBits),
-		Signature:         bytesutil.SafeCopyBytes(c.Signature),
+		Signatures:        signatures,
 	}
 }
 
@@ -288,9 +306,15 @@ func CopySyncAggregate(a *SyncAggregate) *SyncAggregate {
 	if a == nil {
 		return nil
 	}
+
+	signatures := make([][]byte, len(a.SyncCommitteeSignatures))
+	for i, sig := range a.SyncCommitteeSignatures {
+		signatures[i] = bytesutil.SafeCopyBytes(sig)
+	}
+
 	return &SyncAggregate{
-		SyncCommitteeBits:      bytesutil.SafeCopyBytes(a.SyncCommitteeBits),
-		SyncCommitteeSignature: bytesutil.SafeCopyBytes(a.SyncCommitteeSignature),
+		SyncCommitteeBits:       bytesutil.SafeCopyBytes(a.SyncCommitteeBits),
+		SyncCommitteeSignatures: signatures,
 	}
 }
 

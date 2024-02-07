@@ -361,7 +361,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 		},
 	).Return(&zondpb.SyncCommitteeContribution{
 		BlockRoot:       make([]byte, fieldparams.RootLength),
-		Signature:       make([]byte, dilithiumlib.CryptoBytes),
+		Signatures:      [][]byte{},
 		AggregationBits: aggBits,
 	}, nil)
 
@@ -379,7 +379,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 				AggregatorIndex: 7,
 				Contribution: &zondpb.SyncCommitteeContribution{
 					BlockRoot:         make([]byte, fieldparams.RootLength),
-					Signature:         make([]byte, dilithiumlib.CryptoBytes),
+					Signatures:        [][]byte{},
 					AggregationBits:   bitfield.NewBitvector16(),
 					Slot:              1,
 					SubcommitteeIndex: 1,
@@ -439,7 +439,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 		},
 	).Return(&zondpb.SyncCommitteeContribution{
 		BlockRoot:       make([]byte, fieldparams.RootLength),
-		Signature:       make([]byte, dilithiumlib.CryptoBytes),
+		Signatures:      [][]byte{},
 		AggregationBits: aggBits,
 	}, nil)
 
@@ -457,7 +457,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 				AggregatorIndex: 7,
 				Contribution: &zondpb.SyncCommitteeContribution{
 					BlockRoot:         make([]byte, 32),
-					Signature:         make([]byte, dilithiumlib.CryptoBytes),
+					Signatures:        [][]byte{},
 					AggregationBits:   bitfield.NewBitvector16(),
 					Slot:              1,
 					SubcommitteeIndex: 1,

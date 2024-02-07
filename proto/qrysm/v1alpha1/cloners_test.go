@@ -372,7 +372,7 @@ func genAttestation() *v1alpha1.Attestation {
 	return &v1alpha1.Attestation{
 		AggregationBits: bytes(32),
 		Data:            genAttData(),
-		Signature:       bytes(32),
+		Signatures:      [][]byte{bytes(4595)},
 	}
 }
 
@@ -444,7 +444,7 @@ func genIndexedAttestation() *v1alpha1.IndexedAttestation {
 	return &v1alpha1.IndexedAttestation{
 		AttestingIndices: []uint64{1, 2, 3},
 		Data:             genAttData(),
-		Signature:        bytes(32),
+		Signatures:       [][]byte{bytes(4595)},
 	}
 }
 
@@ -538,14 +538,14 @@ func genSyncCommitteeContribution() *v1alpha1.SyncCommitteeContribution {
 		BlockRoot:         bytes(32),
 		SubcommitteeIndex: 4444,
 		AggregationBits:   bytes(32),
-		Signature:         bytes(32),
+		Signatures:        [][]byte{bytes(4595), bytes(4595)},
 	}
 }
 
 func genSyncAggregate() *v1alpha1.SyncAggregate {
 	return &v1alpha1.SyncAggregate{
-		SyncCommitteeBits:      bytes(32),
-		SyncCommitteeSignature: bytes(32),
+		SyncCommitteeBits:       bytes(32),
+		SyncCommitteeSignatures: [][]byte{bytes(4595)},
 	}
 }
 

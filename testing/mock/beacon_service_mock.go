@@ -198,26 +198,6 @@ func (mr *MockBeaconChainClientMockRecorder) GetValidatorPerformance(arg0, arg1 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValidatorPerformance", reflect.TypeOf((*MockBeaconChainClient)(nil).GetValidatorPerformance), varargs...)
 }
 
-// GetValidatorQueue mocks base method.
-func (m *MockBeaconChainClient) GetValidatorQueue(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.ValidatorQueue, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetValidatorQueue", varargs...)
-	ret0, _ := ret[0].(*zond.ValidatorQueue)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetValidatorQueue indicates an expected call of GetValidatorQueue.
-func (mr *MockBeaconChainClientMockRecorder) GetValidatorQueue(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValidatorQueue", reflect.TypeOf((*MockBeaconChainClient)(nil).GetValidatorQueue), varargs...)
-}
-
 // ListAttestations mocks base method.
 func (m *MockBeaconChainClient) ListAttestations(arg0 context.Context, arg1 *zond.ListAttestationsRequest, arg2 ...grpc.CallOption) (*zond.ListAttestationsResponse, error) {
 	m.ctrl.T.Helper()
@@ -358,46 +338,6 @@ func (mr *MockBeaconChainClientMockRecorder) ListValidators(arg0, arg1 interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListValidators", reflect.TypeOf((*MockBeaconChainClient)(nil).ListValidators), varargs...)
 }
 
-// StreamAttestations mocks base method.
-func (m *MockBeaconChainClient) StreamAttestations(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (zond.BeaconChain_StreamAttestationsClient, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "StreamAttestations", varargs...)
-	ret0, _ := ret[0].(zond.BeaconChain_StreamAttestationsClient)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// StreamAttestations indicates an expected call of StreamAttestations.
-func (mr *MockBeaconChainClientMockRecorder) StreamAttestations(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamAttestations", reflect.TypeOf((*MockBeaconChainClient)(nil).StreamAttestations), varargs...)
-}
-
-// StreamBlocks mocks base method.
-func (m *MockBeaconChainClient) StreamBlocks(arg0 context.Context, arg1 *zond.StreamBlocksRequest, arg2 ...grpc.CallOption) (zond.BeaconChain_StreamBlocksClient, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "StreamBlocks", varargs...)
-	ret0, _ := ret[0].(zond.BeaconChain_StreamBlocksClient)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// StreamBlocks indicates an expected call of StreamBlocks.
-func (mr *MockBeaconChainClientMockRecorder) StreamBlocks(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamBlocks", reflect.TypeOf((*MockBeaconChainClient)(nil).StreamBlocks), varargs...)
-}
-
 // StreamChainHead mocks base method.
 func (m *MockBeaconChainClient) StreamChainHead(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (zond.BeaconChain_StreamChainHeadClient, error) {
 	m.ctrl.T.Helper()
@@ -409,53 +349,6 @@ func (m *MockBeaconChainClient) StreamChainHead(arg0 context.Context, arg1 *empt
 	ret0, _ := ret[0].(zond.BeaconChain_StreamChainHeadClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
-}
-
-// StreamChainHead indicates an expected call of StreamChainHead.
-func (mr *MockBeaconChainClientMockRecorder) StreamChainHead(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamChainHead", reflect.TypeOf((*MockBeaconChainClient)(nil).StreamChainHead), varargs...)
-}
-
-// StreamIndexedAttestations mocks base method.
-func (m *MockBeaconChainClient) StreamIndexedAttestations(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (zond.BeaconChain_StreamIndexedAttestationsClient, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "StreamIndexedAttestations", varargs...)
-	ret0, _ := ret[0].(zond.BeaconChain_StreamIndexedAttestationsClient)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// StreamIndexedAttestations indicates an expected call of StreamIndexedAttestations.
-func (mr *MockBeaconChainClientMockRecorder) StreamIndexedAttestations(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamIndexedAttestations", reflect.TypeOf((*MockBeaconChainClient)(nil).StreamIndexedAttestations), varargs...)
-}
-
-// StreamValidatorsInfo mocks base method.
-func (m *MockBeaconChainClient) StreamValidatorsInfo(arg0 context.Context, arg1 ...grpc.CallOption) (zond.BeaconChain_StreamValidatorsInfoClient, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0}
-	for _, a := range arg1 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "StreamValidatorsInfo", varargs...)
-	ret0, _ := ret[0].(zond.BeaconChain_StreamValidatorsInfoClient)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// StreamValidatorsInfo indicates an expected call of StreamValidatorsInfo.
-func (mr *MockBeaconChainClientMockRecorder) StreamValidatorsInfo(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamValidatorsInfo", reflect.TypeOf((*MockBeaconChainClient)(nil).StreamValidatorsInfo), varargs...)
 }
 
 // SubmitAttesterSlashing mocks base method.
@@ -810,21 +703,6 @@ func (mr *MockBeaconChain_StreamBlocksClientMockRecorder) Header() *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Header", reflect.TypeOf((*MockBeaconChain_StreamBlocksClient)(nil).Header))
 }
 
-// Recv mocks base method.
-func (m *MockBeaconChain_StreamBlocksClient) Recv() (*zond.SignedBeaconBlock, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Recv")
-	ret0, _ := ret[0].(*zond.SignedBeaconBlock)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Recv indicates an expected call of Recv.
-func (mr *MockBeaconChain_StreamBlocksClientMockRecorder) Recv() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Recv", reflect.TypeOf((*MockBeaconChain_StreamBlocksClient)(nil).Recv))
-}
-
 // RecvMsg mocks base method.
 func (m *MockBeaconChain_StreamBlocksClient) RecvMsg(arg0 interface{}) error {
 	m.ctrl.T.Helper()
@@ -962,19 +840,6 @@ func (mr *MockBeaconChain_StreamValidatorsInfoClientMockRecorder) RecvMsg(arg0 i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockBeaconChain_StreamValidatorsInfoClient)(nil).RecvMsg), arg0)
 }
 
-// Send mocks base method.
-func (m *MockBeaconChain_StreamValidatorsInfoClient) Send(arg0 *zond.ValidatorChangeSet) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Send", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Send indicates an expected call of Send.
-func (mr *MockBeaconChain_StreamValidatorsInfoClientMockRecorder) Send(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockBeaconChain_StreamValidatorsInfoClient)(nil).Send), arg0)
-}
 
 // SendMsg mocks base method.
 func (m *MockBeaconChain_StreamValidatorsInfoClient) SendMsg(arg0 interface{}) error {

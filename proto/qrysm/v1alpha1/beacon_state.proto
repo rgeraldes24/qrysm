@@ -58,7 +58,7 @@ message SigningData {
 
 message ForkData {
   // The current version of the fork.
-  bytes current_version = 4 [(theqrl.zond.ext.ssz_size) = "4"];
+  bytes current_version = 1 [(theqrl.zond.ext.ssz_size) = "4"];
   // The genesis validators root of the fork.
   bytes genesis_validators_root = 2 [(theqrl.zond.ext.ssz_size) = "32"];
 }
@@ -78,7 +78,7 @@ message CheckPtInfo {
 
 // DepositMessage serves as a subset of deposit data in order to derive the signing root.
 message DepositMessage {
-  // 48 byte BLS public key of the validator.
+  // 2592 byte Dilithium public key of the validator.
   bytes public_key = 1 [(theqrl.zond.ext.ssz_size) = "2592", (theqrl.zond.ext.spec_name) = "pubkey"];
 
   // A 32 byte hash of the withdrawal address public key.
@@ -140,30 +140,18 @@ message BeaconStateCapella {
   Checkpoint current_justified_checkpoint = 8003;
   Checkpoint finalized_checkpoint = 8004;
 
-  // Altair fields [9001-10000]
+  // Sync fields [9001-10000]
   repeated uint64 inactivity_scores = 9001 [(theqrl.zond.ext.ssz_max) = "1099511627776"];
   SyncCommittee current_sync_committee = 9002;
   SyncCommittee next_sync_committee = 9003;
 
-  // Bellatrix fields [10001-11000]
+  // Execution fields [10001-11000]
   theqrl.engine.v1.ExecutionPayloadHeaderCapella latest_execution_payload_header = 10001;
 
   // Capella fields [11001-12000]
-  uint64 next_withdrawal_index = 11001; // [New in Capella]
-  uint64 next_withdrawal_validator_index = 11002 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"]; // [New in Capella]
-  repeated HistoricalSummary historical_summaries = 11003 [(theqrl.zond.ext.ssz_max) = "16777216"]; // [New in Capella]
-}
-
-// PowBlock is a definition from Bellatrix fork choice spec to represent a block with total difficulty in the PoW chain.
-// Spec:
-// class PowBlock(Container):
-//    block_hash: Hash32
-//    parent_hash: Hash32
-//    total_difficulty: uint256
-message PowBlock {
-  bytes block_hash = 1 [(theqrl.zond.ext.ssz_size) = "32"];
-  bytes parent_hash = 2 [(theqrl.zond.ext.ssz_size) = "32"];
-  bytes total_difficulty = 3 [(theqrl.zond.ext.ssz_size) = "32"];
+  uint64 next_withdrawal_index = 11001;
+  uint64 next_withdrawal_validator_index = 11002 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.ValidatorIndex"];
+  repeated HistoricalSummary historical_summaries = 11003 [(theqrl.zond.ext.ssz_max) = "16777216"];
 }
 
 // HistoricalSummary matches the components of the phase0 `HistoricalBatch` making the two hash_tree_root-compatible.
