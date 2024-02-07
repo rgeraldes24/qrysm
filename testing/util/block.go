@@ -137,11 +137,11 @@ func GenerateAttesterSlashingForValidator(
 		},
 		AttestingIndices: []uint64{uint64(idx)},
 	}
-	var err error
-	att1.Signature, err = signing.ComputeDomainAndSign(bState, currentEpoch, att1.Data, params.BeaconConfig().DomainBeaconAttester, priv)
+	sig, err := signing.ComputeDomainAndSign(bState, currentEpoch, att1.Data, params.BeaconConfig().DomainBeaconAttester, priv)
 	if err != nil {
 		return nil, err
 	}
+	att1.Signatures = [][]byte{sig}
 
 	att2 := &zondpb.IndexedAttestation{
 		Data: &zondpb.AttestationData{
@@ -159,10 +159,11 @@ func GenerateAttesterSlashingForValidator(
 		},
 		AttestingIndices: []uint64{uint64(idx)},
 	}
-	att2.Signature, err = signing.ComputeDomainAndSign(bState, currentEpoch, att2.Data, params.BeaconConfig().DomainBeaconAttester, priv)
+	sig2, err := signing.ComputeDomainAndSign(bState, currentEpoch, att2.Data, params.BeaconConfig().DomainBeaconAttester, priv)
 	if err != nil {
 		return nil, err
 	}
+	att2.Signatures = [][]byte{sig2}
 
 	return &zondpb.AttesterSlashing{
 		Attestation_1: att1,
@@ -347,8 +348,8 @@ func HydrateBeaconBlockBodyCapella(b *zondpb.BeaconBlockBodyCapella) *zondpb.Bea
 	}
 	if b.SyncAggregate == nil {
 		b.SyncAggregate = &zondpb.SyncAggregate{
-			SyncCommitteeBits:      make([]byte, fieldparams.SyncAggregateSyncCommitteeBytesLength),
-			SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+			SyncCommitteeBits:       make([]byte, fieldparams.SyncAggregateSyncCommitteeBytesLength),
+			SyncCommitteeSignatures: [][]byte{},
 		}
 	}
 	if b.ExecutionPayload == nil {
@@ -414,8 +415,8 @@ func HydrateBlindedBeaconBlockBodyCapella(b *zondpb.BlindedBeaconBlockBodyCapell
 	}
 	if b.SyncAggregate == nil {
 		b.SyncAggregate = &zondpb.SyncAggregate{
-			SyncCommitteeBits:      make([]byte, fieldparams.SyncAggregateSyncCommitteeBytesLength),
-			SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+			SyncCommitteeBits:       make([]byte, fieldparams.SyncAggregateSyncCommitteeBytesLength),
+			SyncCommitteeSignatures: [][]byte{},
 		}
 	}
 	if b.ExecutionPayloadHeader == nil {
@@ -482,8 +483,8 @@ func HydrateV2BlindedBeaconBlockBodyCapella(b *v2.BlindedBeaconBlockBodyCapella)
 	}
 	if b.SyncAggregate == nil {
 		b.SyncAggregate = &v1.SyncAggregate{
-			SyncCommitteeBits:      make([]byte, 64),
-			SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+			SyncCommitteeBits:       make([]byte, 64),
+			SyncCommitteeSignatures: [][]byte{},
 		}
 	}
 	if b.ExecutionPayloadHeader == nil {

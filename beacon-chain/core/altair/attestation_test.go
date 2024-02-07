@@ -17,7 +17,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/math"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
@@ -217,15 +216,13 @@ func TestProcessAttestations_OK(t *testing.T) {
 	require.NoError(t, err)
 	attestingIndices, err := attestation.AttestingIndices(att.AggregationBits, committee)
 	require.NoError(t, err)
-	sigs := make([]bls.Signature, len(attestingIndices))
+	sigs := make([][]byte, len(attestingIndices))
 	for i, indice := range attestingIndices {
 		sb, err := signing.ComputeDomainAndSign(beaconState, 0, att.Data, params.BeaconConfig().DomainBeaconAttester, privKeys[indice])
 		require.NoError(t, err)
-		sig, err := bls.SignatureFromBytes(sb)
-		require.NoError(t, err)
-		sigs[i] = sig
+		sigs[i] = sb
 	}
-	att.Signature = bls.AggregateSignatures(sigs).Marshal()
+	att.Signatures = sigs
 
 	block := util.NewBeaconBlockCapella()
 	block.Block.Body.Attestations = []*zondpb.Attestation{att}
@@ -257,7 +254,7 @@ func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
 		AggregationBits: aggBits,
 	}
 	var zeroSig [96]byte
-	att.Signature = zeroSig[:]
+	att.Signatures = [][]byte{zeroSig[:]}
 
 	ckp := beaconState.CurrentJustifiedCheckpoint()
 	copy(ckp.Root, make([]byte, fieldparams.RootLength))

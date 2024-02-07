@@ -36,7 +36,7 @@ func TestComputeCommittee_WithoutCache(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		Slot:        200,
 		BlockRoots:  make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot),
@@ -93,7 +93,7 @@ func TestCommitteeAssignments_CannotRetrieveFutureEpoch(t *testing.T) {
 	ClearCache()
 	defer ClearCache()
 	epoch := primitives.Epoch(1)
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Slot: 0, // Epoch 0.
 	})
 	require.NoError(t, err)
@@ -115,7 +115,7 @@ func TestCommitteeAssignments_NoProposerForSlot0(t *testing.T) {
 			ExitEpoch:       params.BeaconConfig().FarFutureEpoch,
 		}
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		Slot:        2 * params.BeaconConfig().SlotsPerEpoch, // epoch 2
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -145,7 +145,7 @@ func TestCommitteeAssignments_CanRetrieve(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		Slot:        2 * params.BeaconConfig().SlotsPerEpoch, // epoch 2
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -223,7 +223,7 @@ func TestCommitteeAssignments_CannotRetrieveFuture(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		Slot:        2 * params.BeaconConfig().SlotsPerEpoch, // epoch 2
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -247,7 +247,7 @@ func TestCommitteeAssignments_CannotRetrieveOlderThanSlotsPerHistoricalRoot(t *t
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		Slot:        params.BeaconConfig().SlotsPerHistoricalRoot + 1,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -268,7 +268,7 @@ func TestCommitteeAssignments_EverySlotHasMin1Proposer(t *testing.T) {
 			ExitEpoch:       params.BeaconConfig().FarFutureEpoch,
 		}
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		Slot:        2 * params.BeaconConfig().SlotsPerEpoch, // epoch 2
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -304,7 +304,7 @@ func TestVerifyAttestationBitfieldLengths_OK(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		RandaoMixes: activeRoots,
 	})
@@ -406,7 +406,7 @@ func TestUpdateCommitteeCache_CanUpdate(t *testing.T) {
 		}
 		indices[i] = i
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
@@ -436,7 +436,7 @@ func TestUpdateCommitteeCache_CanUpdateAcrossEpochs(t *testing.T) {
 		}
 		indices[i] = i
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
@@ -464,7 +464,7 @@ func BenchmarkComputeCommittee300000_WithPreCache(b *testing.B) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
@@ -498,7 +498,7 @@ func BenchmarkComputeCommittee3000000_WithPreCache(b *testing.B) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
@@ -532,7 +532,7 @@ func BenchmarkComputeCommittee128000_WithOutPreCache(b *testing.B) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
@@ -567,7 +567,7 @@ func BenchmarkComputeCommittee1000000_WithOutCache(b *testing.B) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
@@ -602,7 +602,7 @@ func BenchmarkComputeCommittee4000000_WithOutCache(b *testing.B) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
@@ -639,7 +639,7 @@ func TestBeaconCommitteeFromState_UpdateCacheForPreviousEpoch(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Slot:        params.BeaconConfig().SlotsPerEpoch,
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -664,7 +664,7 @@ func TestPrecomputeProposerIndices_Ok(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})

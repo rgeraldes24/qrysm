@@ -24,7 +24,7 @@ import (
 )
 
 func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -39,19 +39,16 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 	ps := slots.PrevSlot(beaconState.Slot())
 	pbr, err := helpers.BlockRootAtSlot(beaconState, ps)
 	require.NoError(t, err)
-	sigs := make([]bls.Signature, len(indices))
+	sigs := make([][]byte, len(indices))
 	for i, indice := range indices {
 		b := p2pType.SSZBytes(pbr)
 		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
 		require.NoError(t, err)
-		sig, err := bls.SignatureFromBytes(sb)
-		require.NoError(t, err)
-		sigs[i] = sig
+		sigs[i] = sb
 	}
-	aggregatedSig := bls.AggregateSignatures(sigs).Marshal()
 	syncAggregate := &zondpb.SyncAggregate{
-		SyncCommitteeBits:      syncBits,
-		SyncCommitteeSignature: aggregatedSig,
+		SyncCommitteeBits:       syncBits,
+		SyncCommitteeSignatures: sigs,
 	}
 
 	var reward uint64
@@ -100,7 +97,7 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 }
 
 func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -115,19 +112,16 @@ func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
 	ps := slots.PrevSlot(beaconState.Slot())
 	pbr, err := helpers.BlockRootAtSlot(beaconState, ps)
 	require.NoError(t, err)
-	sigs := make([]bls.Signature, len(indices))
+	sigs := make([][]byte, len(indices))
 	for i, indice := range indices {
 		b := p2pType.SSZBytes(pbr)
 		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
 		require.NoError(t, err)
-		sig, err := bls.SignatureFromBytes(sb)
-		require.NoError(t, err)
-		sigs[i] = sig
+		sigs[i] = sb
 	}
-	aggregatedSig := bls.AggregateSignatures(sigs).Marshal()
 	syncAggregate := &zondpb.SyncAggregate{
-		SyncCommitteeBits:      syncBits,
-		SyncCommitteeSignature: aggregatedSig,
+		SyncCommitteeBits:       syncBits,
+		SyncCommitteeSignatures: sigs,
 	}
 
 	_, _, err = altair.ProcessSyncAggregate(context.Background(), beaconState, syncAggregate)
@@ -135,7 +129,7 @@ func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
 }
 
 func TestProcessSyncCommittee_MixParticipation_GoodSignature(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -150,21 +144,18 @@ func TestProcessSyncCommittee_MixParticipation_GoodSignature(t *testing.T) {
 	ps := slots.PrevSlot(beaconState.Slot())
 	pbr, err := helpers.BlockRootAtSlot(beaconState, ps)
 	require.NoError(t, err)
-	sigs := make([]bls.Signature, 0, len(indices))
+	sigs := make([][]byte, 0, len(indices))
 	for i, indice := range indices {
 		if syncBits.BitAt(uint64(i)) {
 			b := p2pType.SSZBytes(pbr)
 			sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
 			require.NoError(t, err)
-			sig, err := bls.SignatureFromBytes(sb)
-			require.NoError(t, err)
-			sigs = append(sigs, sig)
+			sigs = append(sigs, sb)
 		}
 	}
-	aggregatedSig := bls.AggregateSignatures(sigs).Marshal()
 	syncAggregate := &zondpb.SyncAggregate{
-		SyncCommitteeBits:      syncBits,
-		SyncCommitteeSignature: aggregatedSig,
+		SyncCommitteeBits:       syncBits,
+		SyncCommitteeSignatures: sigs,
 	}
 
 	_, _, err = altair.ProcessSyncAggregate(context.Background(), beaconState, syncAggregate)
@@ -173,7 +164,7 @@ func TestProcessSyncCommittee_MixParticipation_GoodSignature(t *testing.T) {
 
 // This is a regression test #11696
 func TestProcessSyncCommittee_DontPrecompute(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -201,7 +192,7 @@ func TestProcessSyncCommittee_DontPrecompute(t *testing.T) {
 }
 
 func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -252,7 +243,7 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 }
 
 func Test_VerifySyncCommitteeSig(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)

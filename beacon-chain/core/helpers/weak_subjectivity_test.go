@@ -261,7 +261,7 @@ func TestWeakSubjectivity_ParseWeakSubjectivityInputString(t *testing.T) {
 }
 
 func genState(t *testing.T, valCount, avgBalance uint64) state.BeaconState {
-	beaconState, err := util.NewBeaconState()
+	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
 	validators := make([]*zondpb.Validator, valCount)

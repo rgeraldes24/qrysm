@@ -113,6 +113,19 @@ func JsonifySignedVoluntaryExits(voluntaryExits []*zondpb.SignedVoluntaryExit) [
 	return jsonSignedVoluntaryExits
 }
 
+// JsonifySignedSyncAggregate converts a sync aggregate struct to a JSON hex string compatible format.
+func JsonifySignedSyncAggregate(syncAggregate *zondpb.SyncAggregate) *apimiddleware.SyncAggregateJson {
+	syncCommitteeSigs := make([]string, len(syncAggregate.SyncCommitteeSignatures))
+	for i, sig := range syncAggregate.SyncCommitteeSignatures {
+		syncCommitteeSigs[i] = hexutil.Encode(sig)
+	}
+
+	return &apimiddleware.SyncAggregateJson{
+		SyncCommitteeBits:       hexutil.Encode(syncAggregate.SyncCommitteeBits),
+		SyncCommitteeSignatures: syncCommitteeSigs,
+	}
+}
+
 func jsonifySignedBeaconBlockHeader(signedBeaconBlockHeader *zondpb.SignedBeaconBlockHeader) *apimiddleware.SignedBeaconBlockHeaderJson {
 	return &apimiddleware.SignedBeaconBlockHeaderJson{
 		Header: &apimiddleware.BeaconBlockHeaderJson{

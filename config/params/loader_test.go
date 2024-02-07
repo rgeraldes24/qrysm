@@ -148,7 +148,6 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 	assert.Equal(t, expected.DomainVoluntaryExit, actual.DomainVoluntaryExit, "%s: DomainVoluntaryExit", name)
 	assert.Equal(t, expected.DomainSelectionProof, actual.DomainSelectionProof, "%s: DomainSelectionProof", name)
 	assert.Equal(t, expected.DomainAggregateAndProof, actual.DomainAggregateAndProof, "%s: DomainAggregateAndProof", name)
-	assert.Equal(t, expected.TerminalTotalDifficulty, actual.TerminalTotalDifficulty, "%s: TerminalTotalDifficulty", name)
 	assert.Equal(t, expected.SqrRootSlotsPerEpoch, actual.SqrRootSlotsPerEpoch, "%s: SqrRootSlotsPerEpoch", name)
 	assert.DeepEqual(t, expected.GenesisForkVersion, actual.GenesisForkVersion, "%s: GenesisForkVersion", name)
 
@@ -158,7 +157,6 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 func TestModifiedE2E(t *testing.T) {
 	c := params.E2ETestConfig().Copy()
 	c.DepositContractAddress = "0x4242424242424242424242424242424242424242"
-	c.TerminalTotalDifficulty = "0"
 	y := params.ConfigToYaml(c)
 	cfg, err := params.UnmarshalConfig(y, nil)
 	require.NoError(t, err)

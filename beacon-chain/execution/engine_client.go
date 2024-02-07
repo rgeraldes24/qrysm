@@ -110,7 +110,6 @@ type EngineCaller interface {
 		ctx context.Context, cfg *pb.TransitionConfiguration,
 	) error
 	ExecutionBlockByHash(ctx context.Context, hash common.Hash, withTxs bool) (*pb.ExecutionBlock, error)
-	GetTerminalBlockHash(ctx context.Context, transitionTime uint64) ([]byte, bool, error)
 }
 
 var EmptyBlockHash = errors.New("Block hash is empty 0x0000...")

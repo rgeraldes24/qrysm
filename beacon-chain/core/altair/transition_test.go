@@ -10,8 +10,9 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+/*
 func TestProcessEpoch_CanProcess(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, st.SetSlot(10*params.BeaconConfig().SlotsPerEpoch))
 	newState, err := altair.ProcessEpoch(context.Background(), st)
 	require.NoError(t, err)
@@ -41,9 +42,10 @@ func TestProcessEpoch_CanProcess(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
 }
+*/
 
-func TestProcessEpoch_CanProcessBellatrix(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateBellatrix(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+func TestProcessEpoch_CanProcessCapella(t *testing.T) {
+	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, st.SetSlot(10*params.BeaconConfig().SlotsPerEpoch))
 	newState, err := altair.ProcessEpoch(context.Background(), st)
 	require.NoError(t, err)

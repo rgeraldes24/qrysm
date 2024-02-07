@@ -26,7 +26,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -875,20 +874,18 @@ func TestService_insertSlashingsToForkChoiceStore(t *testing.T) {
 	require.NoError(t, err)
 	signingRoot, err := signing.ComputeSigningRoot(att1.Data, domain)
 	assert.NoError(t, err, "Could not get signing root of beacon block header")
-	sig0 := privKeys[0].Sign(signingRoot[:])
-	sig1 := privKeys[1].Sign(signingRoot[:])
-	aggregateSig := bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att1.Signature = aggregateSig.Marshal()
+	sig0 := privKeys[0].Sign(signingRoot[:]).Marshal()
+	sig1 := privKeys[1].Sign(signingRoot[:]).Marshal()
+	att1.Signatures = [][]byte{sig0, sig1}
 
 	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
 		AttestingIndices: []uint64{0, 1},
 	})
 	signingRoot, err = signing.ComputeSigningRoot(att2.Data, domain)
 	assert.NoError(t, err, "Could not get signing root of beacon block header")
-	sig0 = privKeys[0].Sign(signingRoot[:])
-	sig1 = privKeys[1].Sign(signingRoot[:])
-	aggregateSig = bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att2.Signature = aggregateSig.Marshal()
+	sig0 = privKeys[0].Sign(signingRoot[:]).Marshal()
+	sig1 = privKeys[1].Sign(signingRoot[:]).Marshal()
+	att2.Signatures = [][]byte{sig0, sig1}
 	slashings := []*zondpb.AttesterSlashing{
 		{
 			Attestation_1: att1,

@@ -17,7 +17,7 @@ import (
 
 func TestTranslateParticipation(t *testing.T) {
 	ctx := context.Background()
-	s, _ := util.DeterministicGenesisStateAltair(t, 64)
+	s, _ := util.DeterministicGenesisStateCapella(t, 64)
 	require.NoError(t, s.SetSlot(s.Slot()+params.BeaconConfig().MinAttestationInclusionDelay))
 
 	var err error

@@ -23,19 +23,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-func TestServer_activationEpochNotReached(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-	require.Equal(t, false, activationEpochNotReached(0))
-
-	cfg := params.BeaconConfig().Copy()
-	cfg.TerminalBlockHash = common.BytesToHash(bytesutil.PadTo([]byte{0x01}, 32))
-	cfg.TerminalBlockHashActivationEpoch = 1
-	params.OverrideBeaconConfig(cfg)
-
-	require.Equal(t, true, activationEpochNotReached(0))
-	require.Equal(t, false, activationEpochNotReached(params.BeaconConfig().SlotsPerEpoch+1))
-}
-
 func TestServer_getExecutionPayload(t *testing.T) {
 	beaconDB := dbTest.SetupDB(t)
 	nonTransitionSt, _ := util.DeterministicGenesisStateBellatrix(t, 1)

@@ -145,8 +145,8 @@ func GenerateFullBlockCapella(
 		return nil, errors.New("invalid bit vector size")
 	}
 	newSyncAggregate := &zondpb.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: append([]byte{0xC0}, make([]byte, 95)...),
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{append([]byte{0xC0}, make([]byte, 95)...)},
 	}
 
 	newHeader := bState.LatestBlockHeader()

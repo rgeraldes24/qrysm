@@ -59,7 +59,7 @@ func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators:  validators,
 		Slot:        200,
 		BlockRoots:  make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot),
@@ -76,7 +76,7 @@ func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {
 			Source:          nil,
 			Target:          nil,
 		},
-		Signature: []byte{'B'},
+		Signatures: [][]byte{[]byte{'B'}},
 	}
 	valCount, err := helpers.ActiveValidatorCount(context.Background(), state, slots.ToEpoch(att.Data.Slot))
 	require.NoError(t, err)

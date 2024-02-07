@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -93,7 +93,6 @@ type WriteOnlyBeaconState interface {
 	SetHistoricalRoots(val [][]byte) error
 	SetSlashings(val []uint64) error
 	UpdateSlashingsAtIndex(idx, val uint64) error
-	AppendHistoricalRoots(root [32]byte) error
 	AppendHistoricalSummaries(*zondpb.HistoricalSummary) error
 	SetLatestExecutionPayloadHeader(payload interfaces.ExecutionData) error
 	SetNextWithdrawalIndex(i uint64) error
@@ -107,7 +106,7 @@ type ReadOnlyValidator interface {
 	ActivationEpoch() primitives.Epoch
 	WithdrawableEpoch() primitives.Epoch
 	ExitEpoch() primitives.Epoch
-	PublicKey() [dilithium2.CryptoPublicKeyBytes]byte
+	PublicKey() [dilithium.CryptoPublicKeyBytes]byte
 	WithdrawalCredentials() []byte
 	Slashed() bool
 	IsNil() bool
@@ -118,8 +117,8 @@ type ReadOnlyValidators interface {
 	Validators() []*zondpb.Validator
 	ValidatorAtIndex(idx primitives.ValidatorIndex) (*zondpb.Validator, error)
 	ValidatorAtIndexReadOnly(idx primitives.ValidatorIndex) (ReadOnlyValidator, error)
-	ValidatorIndexByPubkey(key [dilithium2.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool)
-	PubkeyAtIndex(idx primitives.ValidatorIndex) [dilithium2.CryptoPublicKeyBytes]byte
+	ValidatorIndexByPubkey(key [dilithium.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool)
+	PubkeyAtIndex(idx primitives.ValidatorIndex) [dilithium.CryptoPublicKeyBytes]byte
 	NumValidators() int
 	ReadFromEveryValidator(f func(idx int, val ReadOnlyValidator) error) error
 }
@@ -171,8 +170,7 @@ type ReadOnlyEth1Data interface {
 
 // ReadOnlyAttestations defines a struct which only has read access to attestations methods.
 type ReadOnlyAttestations interface {
-	PreviousEpochAttestations() ([]*zondpb.PendingAttestation, error)
-	CurrentEpochAttestations() ([]*zondpb.PendingAttestation, error)
+	// TODO(rgeraldes24)
 }
 
 // ReadOnlyWithdrawals defines a struct which only has read access to withdrawal methods.
@@ -250,11 +248,7 @@ type WriteOnlyCheckpoint interface {
 
 // WriteOnlyAttestations defines a struct which only has write access to attestations methods.
 type WriteOnlyAttestations interface {
-	AppendCurrentEpochAttestations(val *zondpb.PendingAttestation) error
-	AppendPreviousEpochAttestations(val *zondpb.PendingAttestation) error
-	SetPreviousEpochAttestations([]*zondpb.PendingAttestation) error
-	SetCurrentEpochAttestations([]*zondpb.PendingAttestation) error
-	RotateAttestations() error
+	// TODO(rgeraldes24)
 }
 
 // WriteOnlyParticipation defines a struct which only has write access to participation methods.

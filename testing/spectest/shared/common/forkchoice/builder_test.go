@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
@@ -29,6 +28,8 @@ func TestBuilderInvalidBlock(t *testing.T) {
 	builder.InvalidBlock(t, blk)
 }
 
+// TODO(rgeraldes24)
+/*
 func TestPoWBlock(t *testing.T) {
 	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
@@ -39,3 +40,4 @@ func TestPoWBlock(t *testing.T) {
 
 	require.Equal(t, 1, len(builder.execMock.powBlocks))
 }
+*/

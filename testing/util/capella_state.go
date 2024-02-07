@@ -6,6 +6,8 @@ import (
 
 	"github.com/pkg/errors"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
@@ -191,8 +193,8 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 		},
 		Graffiti: make([]byte, 32),
 		SyncAggregate: &zondpb.SyncAggregate{
-			SyncCommitteeBits:      scBits[:],
-			SyncCommitteeSignature: make([]byte, 96),
+			SyncCommitteeBits:       scBits[:],
+			SyncCommitteeSignatures: [][]byte{},
 		},
 		ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 			ParentHash:    make([]byte, 32),
@@ -243,4 +245,22 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 	}
 
 	return state_native.InitializeFromProtoCapella(st)
+}
+
+// processPreGenesisDeposits processes a deposit for the beacon state Altair before chain start.
+func processPreGenesisDeposits(
+	ctx context.Context,
+	beaconState state.BeaconState,
+	deposits []*zondpb.Deposit,
+) (state.BeaconState, error) {
+	var err error
+	beaconState, err = altair.ProcessDeposits(ctx, beaconState, deposits)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not process deposit")
+	}
+	beaconState, err = blocks.ActivateValidatorWithEffectiveBalance(beaconState, deposits)
+	if err != nil {
+		return nil, err
+	}
+	return beaconState, nil
 }

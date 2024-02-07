@@ -63,7 +63,7 @@ func V1Alpha1IndexedAttToV1(v1alpha1Att *zondpbalpha.IndexedAttestation) *zondpb
 	return &zondpbv1.IndexedAttestation{
 		AttestingIndices: v1alpha1Att.AttestingIndices,
 		Data:             V1Alpha1AttDataToV1(v1alpha1Att.Data),
-		Signature:        v1alpha1Att.Signature,
+		Signatures:       v1alpha1Att.Signatures,
 	}
 }
 
@@ -75,7 +75,7 @@ func V1Alpha1AttestationToV1(v1alpha1Att *zondpbalpha.Attestation) *zondpbv1.Att
 	return &zondpbv1.Attestation{
 		AggregationBits: v1alpha1Att.AggregationBits,
 		Data:            V1Alpha1AttDataToV1(v1alpha1Att.Data),
-		Signature:       v1alpha1Att.Signature,
+		Signatures:      v1alpha1Att.Signatures,
 	}
 }
 
@@ -87,7 +87,7 @@ func V1AttestationToV1Alpha1(v1Att *zondpbv1.Attestation) *zondpbalpha.Attestati
 	return &zondpbalpha.Attestation{
 		AggregationBits: v1Att.AggregationBits,
 		Data:            V1AttDataToV1Alpha1(v1Att.Data),
-		Signature:       v1Att.Signature,
+		Signatures:      v1Att.Signatures,
 	}
 }
 
@@ -203,7 +203,7 @@ func V1AttToV1Alpha1(v1Att *zondpbv1.Attestation) *zondpbalpha.Attestation {
 	return &zondpbalpha.Attestation{
 		AggregationBits: v1Att.AggregationBits,
 		Data:            V1AttDataToV1Alpha1(v1Att.Data),
-		Signature:       v1Att.Signature,
+		Signatures:      v1Att.Signatures,
 	}
 }
 
@@ -215,7 +215,7 @@ func V1IndexedAttToV1Alpha1(v1Att *zondpbv1.IndexedAttestation) *zondpbalpha.Ind
 	return &zondpbalpha.IndexedAttestation{
 		AttestingIndices: v1Att.AttestingIndices,
 		Data:             V1AttDataToV1Alpha1(v1Att.Data),
-		Signature:        v1Att.Signature,
+		Signatures:       v1Att.Signatures,
 	}
 }
 

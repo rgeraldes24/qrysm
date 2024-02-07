@@ -22,7 +22,7 @@ import (
 )
 
 func TestSigningRoot_ComputeSigningRoot(t *testing.T) {
-	emptyBlock := util.NewBeaconBlock()
+	emptyBlock := util.NewBeaconBlockCapella()
 	_, err := signing.ComputeSigningRoot(emptyBlock, bytesutil.PadTo([]byte{'T', 'E', 'S', 'T'}, 32))
 	assert.NoError(t, err, "Could not compute signing root of block")
 }
@@ -52,7 +52,7 @@ func TestSigningRoot_ComputeDomainAndSign(t *testing.T) {
 	tests := []struct {
 		name       string
 		genState   func(t *testing.T) (state.BeaconState, []dilithium.DilithiumKey)
-		genBlock   func(t *testing.T, st state.BeaconState, keys []dilithium.DilithiumKey) *zondpb.SignedBeaconBlock
+		genBlock   func(t *testing.T, st state.BeaconState, keys []dilithium.DilithiumKey) *zondpb.SignedBeaconBlockCapella
 		domainType [4]byte
 		want       []byte
 	}{
@@ -63,8 +63,8 @@ func TestSigningRoot_ComputeDomainAndSign(t *testing.T) {
 				require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 				return beaconState, privKeys
 			},
-			genBlock: func(t *testing.T, st state.BeaconState, keys []dilithium.DilithiumKey) *zondpb.SignedBeaconBlock {
-				block, err := util.GenerateFullBlock(st, keys, nil, 1)
+			genBlock: func(t *testing.T, st state.BeaconState, keys []dilithium.DilithiumKey) *zondpb.SignedBeaconBlockCapella {
+				block, err := util.GenerateFullBlockCapella(st, keys, nil, 1)
 				require.NoError(t, err)
 				return block
 			},
@@ -113,7 +113,7 @@ func TestSigningRoot_ComputeForkDigest(t *testing.T) {
 
 func TestFuzzverifySigningRoot_10000(_ *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
-	st := &zondpb.BeaconState{}
+	st := &zondpb.BeaconStateCapella{}
 	var pubkey [dilithium2.CryptoPublicKeyBytes]byte
 	var sig [96]byte
 	var domain [4]byte
@@ -170,7 +170,7 @@ func TestBlockSignatureBatch_NoSigVerification(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		block := util.NewBeaconBlock()
+		block := util.NewBeaconBlockCapella()
 		got, err := signing.BlockSignatureBatch(tt.pubkey, tt.mockSignature, tt.domain, block.Block.HashTreeRoot)
 		require.NoError(t, err)
 		for i, message := range got.Messages {

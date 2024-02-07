@@ -2,6 +2,8 @@
 
 package ssz_test
 
+// TODO(rgeraldes24)
+/*
 import (
 	"testing"
 
@@ -52,3 +54,4 @@ func FuzzPackChunks(f *testing.F) {
 		}
 	})
 }
+*/

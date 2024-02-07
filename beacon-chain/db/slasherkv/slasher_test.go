@@ -548,7 +548,7 @@ func createAttestationWrapper(source, target primitives.Epoch, indices []uint64,
 		IndexedAttestation: &zondpb.IndexedAttestation{
 			AttestingIndices: indices,
 			Data:             data,
-			Signature:        params.BeaconConfig().EmptySignature[:],
+			Signatures:       [][]byte{params.BeaconConfig().EmptySignature[:]},
 		},
 		SigningRoot: signRoot,
 	}

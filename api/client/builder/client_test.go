@@ -338,7 +338,7 @@ func testSignedBlindedBeaconBlockCapella(t *testing.T) *zond.SignedBlindedBeacon
 									Root:  ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
 								},
 							},
-							Signature: ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"),
+							Signatures: [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
 						},
 						Attestation_2: &zond.IndexedAttestation{
 							AttestingIndices: []uint64{1},
@@ -355,7 +355,7 @@ func testSignedBlindedBeaconBlockCapella(t *testing.T) *zond.SignedBlindedBeacon
 									Root:  ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
 								},
 							},
-							Signature: ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"),
+							Signatures: [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
 						},
 					},
 				},
@@ -375,7 +375,7 @@ func testSignedBlindedBeaconBlockCapella(t *testing.T) *zond.SignedBlindedBeacon
 								Root:  ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
 							},
 						},
-						Signature: ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"),
+						Signatures: [][]byte{ezDecode(t, "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505")},
 					},
 				},
 				Deposits: []*zond.Deposit{
@@ -399,8 +399,8 @@ func testSignedBlindedBeaconBlockCapella(t *testing.T) *zond.SignedBlindedBeacon
 					},
 				},
 				SyncAggregate: &zond.SyncAggregate{
-					SyncCommitteeSignature: make([]byte, 48),
-					SyncCommitteeBits:      bitfield.Bitvector16{0x01},
+					SyncCommitteeSignatures: [][]byte{},
+					SyncCommitteeBits:       bitfield.Bitvector16{0x01},
 				},
 				ExecutionPayloadHeader: &v1.ExecutionPayloadHeaderCapella{
 					ParentHash:       ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),

@@ -132,8 +132,8 @@ func NewLightClientOptimisticUpdateFromBeaconState(
 	}
 
 	syncAggregateResult := &zondpbv1.SyncAggregate{
-		SyncCommitteeBits:      syncAggregate.SyncCommitteeBits,
-		SyncCommitteeSignature: syncAggregate.SyncCommitteeSignature,
+		SyncCommitteeBits:       syncAggregate.SyncCommitteeBits,
+		SyncCommitteeSignatures: syncAggregate.SyncCommitteeSignatures,
 	}
 
 	result := &zondpbv2.LightClientUpdate{

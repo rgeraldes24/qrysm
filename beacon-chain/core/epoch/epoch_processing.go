@@ -21,7 +21,6 @@ import (
 	"github.com/theQRL/qrysm/v4/math"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 )
 
 // sortableIndices implements the Sort interface to sort newly activated validator indices
@@ -361,36 +360,24 @@ func ProcessHistoricalDataUpdate(state state.BeaconState) (state.BeaconState, er
 	// Set historical root accumulator.
 	epochsPerHistoricalRoot := params.BeaconConfig().SlotsPerHistoricalRoot.DivSlot(params.BeaconConfig().SlotsPerEpoch)
 	if nextEpoch.Mod(uint64(epochsPerHistoricalRoot)) == 0 {
-		if state.Version() >= version.Capella {
-			br, err := stateutil.ArraysRoot(state.BlockRoots(), fieldparams.BlockRootsLength)
-			if err != nil {
-				return nil, err
-			}
-			sr, err := stateutil.ArraysRoot(state.StateRoots(), fieldparams.StateRootsLength)
-			if err != nil {
-				return nil, err
-			}
-			if err := state.AppendHistoricalSummaries(&zondpb.HistoricalSummary{BlockSummaryRoot: br[:], StateSummaryRoot: sr[:]}); err != nil {
-				return nil, err
-			}
-		} else {
-			historicalBatch := &zondpb.HistoricalBatch{
-				BlockRoots: state.BlockRoots(),
-				StateRoots: state.StateRoots(),
-			}
-			batchRoot, err := historicalBatch.HashTreeRoot()
-			if err != nil {
-				return nil, errors.Wrap(err, "could not hash historical batch")
-			}
-			if err := state.AppendHistoricalRoots(batchRoot); err != nil {
-				return nil, err
-			}
+		br, err := stateutil.ArraysRoot(state.BlockRoots(), fieldparams.BlockRootsLength)
+		if err != nil {
+			return nil, err
+		}
+		sr, err := stateutil.ArraysRoot(state.StateRoots(), fieldparams.StateRootsLength)
+		if err != nil {
+			return nil, err
+		}
+		if err := state.AppendHistoricalSummaries(&zondpb.HistoricalSummary{BlockSummaryRoot: br[:], StateSummaryRoot: sr[:]}); err != nil {
+			return nil, err
 		}
 	}
 
 	return state, nil
 }
 
+// TODO(rgeraldes24): remove
+/*
 // ProcessParticipationRecordUpdates rotates current/previous epoch attestations during epoch processing.
 //
 // nolint:dupword
@@ -449,6 +436,7 @@ func ProcessFinalUpdates(state state.BeaconState) (state.BeaconState, error) {
 
 	return state, nil
 }
+*/
 
 // UnslashedAttestingIndices returns all the attesting indices from a list of attestations,
 // it sorts the indices and filters out the slashed ones.

@@ -93,7 +93,7 @@ func V1Alpha1BeaconBlockCapellaToV2Blinded(v1alpha1Block *zondpbalpha.BeaconBloc
 						Root:  bytesutil.SafeCopyBytes(s.Attestation_1.Data.Target.Root),
 					},
 				},
-				Signature: bytesutil.SafeCopyBytes(s.Attestation_1.Signature),
+				Signatures: bytesutil.SafeCopyBytes(s.Attestation_1.Signature),
 			},
 			Attestation_2: &zondpbv1.IndexedAttestation{
 				AttestingIndices: att2Indices,
@@ -110,7 +110,7 @@ func V1Alpha1BeaconBlockCapellaToV2Blinded(v1alpha1Block *zondpbalpha.BeaconBloc
 						Root:  bytesutil.SafeCopyBytes(s.Attestation_2.Data.Target.Root),
 					},
 				},
-				Signature: bytesutil.SafeCopyBytes(s.Attestation_2.Signature),
+				Signatures: bytesutil.SafeCopyBytes(s.Attestation_2.Signature),
 			},
 		}
 	}
@@ -199,8 +199,8 @@ func V1Alpha1BeaconBlockCapellaToV2Blinded(v1alpha1Block *zondpbalpha.BeaconBloc
 		Deposits:          resultDeposits,
 		VoluntaryExits:    resultExits,
 		SyncAggregate: &zondpbv1.SyncAggregate{
-			SyncCommitteeBits:      bytesutil.SafeCopyBytes(v1alpha1Block.Body.SyncAggregate.SyncCommitteeBits),
-			SyncCommitteeSignature: bytesutil.SafeCopyBytes(v1alpha1Block.Body.SyncAggregate.SyncCommitteeSignature),
+			SyncCommitteeBits:       bytesutil.SafeCopyBytes(v1alpha1Block.Body.SyncAggregate.SyncCommitteeBits),
+			SyncCommitteeSignatures: bytesutil.SafeCopyBytes(v1alpha1Block.Body.SyncAggregate.SyncCommitteeSignature),
 		},
 		ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
 			ParentHash:       bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionPayload.ParentHash),

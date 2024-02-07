@@ -105,7 +105,7 @@ func TestStore_OnAttestation_ErrorConditions(t *testing.T) {
 					Source:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				},
 				AggregationBits: make([]byte, 1),
-				Signature:       make([]byte, 96),
+				Signatures:      [][]byte{},
 			},
 			wantedErr: "attestation's target can't be nil",
 		},

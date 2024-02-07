@@ -420,7 +420,7 @@ func getFields() fields {
 	atts := make([]*zond.Attestation, 128)
 	for i := range atts {
 		atts[i] = &zond.Attestation{}
-		atts[i].Signature = sig[:]
+		atts[i].Signatures = [][]byte{sig[:]}
 		atts[i].AggregationBits = bitfield.NewBitlist(1)
 		atts[i].Data = &zond.AttestationData{
 			Slot:            128,
@@ -474,7 +474,7 @@ func getFields() fields {
 					Root:  root[:],
 				},
 			},
-			Signature: sig[:],
+			Signatures: [][]byte{sig[:]},
 		},
 		Attestation_2: &zond.IndexedAttestation{
 			AttestingIndices: []uint64{1, 2, 8},
@@ -491,7 +491,7 @@ func getFields() fields {
 					Root:  root[:],
 				},
 			},
-			Signature: sig[:],
+			Signatures: [][]byte{sig[:]},
 		},
 	}
 	voluntaryExit := &zond.SignedVoluntaryExit{
@@ -506,8 +506,8 @@ func getFields() fields {
 	syncCommitteeBits.SetBitAt(2, true)
 	syncCommitteeBits.SetBitAt(8, true)
 	syncAggregate := &zond.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: sig[:],
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{sig[:]},
 	}
 	execPayloadCapella := &enginev1.ExecutionPayloadCapella{
 		ParentHash:    root[:],

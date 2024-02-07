@@ -19,7 +19,7 @@ import (
 
 func TestBlockSignature(t *testing.T) {
 	beaconState, privKeys := DeterministicGenesisState(t, 100)
-	block, err := GenerateFullBlock(beaconState, privKeys, nil, 0)
+	block, err := GenerateFullBlockCapella(beaconState, privKeys, nil, 0)
 	require.NoError(t, err)
 
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))

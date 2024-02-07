@@ -22,7 +22,7 @@ func TestV1Alpha1SignedContributionAndProofToV2(t *testing.T) {
 				BlockRoot:         blockHash,
 				SubcommitteeIndex: 1,
 				AggregationBits:   bitfield.NewBitvector16(),
-				Signature:         signature,
+				Signatures:        [][]byte{signature},
 			},
 			SelectionProof: signature,
 		},
@@ -59,8 +59,8 @@ func Test_V1Alpha1BeaconBlockCapellaToV2Blinded(t *testing.T) {
 	syncCommitteeBits := bitfield.NewBitvector16()
 	syncCommitteeBits.SetBitAt(100, true)
 	alphaBlock.Body.SyncAggregate = &zondpbalpha.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: signature,
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{signature},
 	}
 	alphaBlock.Body.ExecutionPayload.Transactions = [][]byte{[]byte("transaction1"), []byte("transaction2")}
 

@@ -81,7 +81,7 @@ func Test_V1Alpha1AttSlashingToV1(t *testing.T) {
 				Root:  targetRoot,
 			},
 		},
-		Signature: signature,
+		Signatures: [][]byte{signature},
 	}
 	alphaSlashing := &zondpbalpha.AttesterSlashing{
 		Attestation_1: alphaAttestation,
@@ -167,7 +167,7 @@ func Test_V1AttSlashingToV1Alpha1(t *testing.T) {
 				Root:  targetRoot,
 			},
 		},
-		Signature: signature,
+		Signatures: [][]byte{signature},
 	}
 	v1Slashing := &zondpbv1.AttesterSlashing{
 		Attestation_1: v1Attestation,
@@ -222,7 +222,7 @@ func Test_V1Alpha1AttToV1(t *testing.T) {
 				Root:  targetRoot,
 			},
 		},
-		Signature: signature,
+		Signatures: [][]byte{signature},
 	}
 
 	v1Att := V1Alpha1AttestationToV1(alphaAtt)
@@ -249,7 +249,7 @@ func Test_V1AttToV1Alpha1(t *testing.T) {
 				Root:  targetRoot,
 			},
 		},
-		Signature: signature,
+		Signatures: [][]byte{signature},
 	}
 
 	alphaAtt := V1AttToV1Alpha1(v1Att)

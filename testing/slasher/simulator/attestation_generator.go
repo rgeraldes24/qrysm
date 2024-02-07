@@ -65,7 +65,7 @@ func (s *Simulator) generateAttestationsForSlot(
 			att := &zondpb.IndexedAttestation{
 				AttestingIndices: indices,
 				Data:             attData,
-				Signature:        params.BeaconConfig().EmptyDilithiumSignature[:],
+				Signatures:       [][]byte{},
 			}
 			beaconState, err := s.srvConfig.AttestationStateFetcher.AttestationTargetState(ctx, att.Data.Target)
 			if err != nil {
@@ -154,7 +154,7 @@ func makeSlashableFromAtt(att *zondpb.IndexedAttestation, indices []uint64) *zon
 	return &zondpb.IndexedAttestation{
 		AttestingIndices: indices,
 		Data:             attData,
-		Signature:        params.BeaconConfig().EmptyDilithiumSignature[:],
+		Signatures:       [][]byte{params.BeaconConfig().EmptyDilithiumSignature[:]},
 	}
 }
 
@@ -175,6 +175,6 @@ func makeDoubleVoteFromAtt(att *zondpb.IndexedAttestation, indices []uint64) *zo
 	return &zondpb.IndexedAttestation{
 		AttestingIndices: indices,
 		Data:             attData,
-		Signature:        params.BeaconConfig().EmptyDilithiumSignature[:],
+		Signatures:       [][]byte{params.BeaconConfig().EmptyDilithiumSignature[:]},
 	}
 }

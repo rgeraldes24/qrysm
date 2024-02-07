@@ -81,21 +81,6 @@ func (mr *MockBeaconChainClientMockRecorder) GetValidatorPerformance(arg0, arg1 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValidatorPerformance", reflect.TypeOf((*MockBeaconChainClient)(nil).GetValidatorPerformance), arg0, arg1)
 }
 
-// GetValidatorQueue mocks base method.
-func (m *MockBeaconChainClient) GetValidatorQueue(arg0 context.Context, arg1 *emptypb.Empty) (*zond.ValidatorQueue, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetValidatorQueue", arg0, arg1)
-	ret0, _ := ret[0].(*zond.ValidatorQueue)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetValidatorQueue indicates an expected call of GetValidatorQueue.
-func (mr *MockBeaconChainClientMockRecorder) GetValidatorQueue(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValidatorQueue", reflect.TypeOf((*MockBeaconChainClient)(nil).GetValidatorQueue), arg0, arg1)
-}
-
 // ListValidatorBalances mocks base method.
 func (m *MockBeaconChainClient) ListValidatorBalances(arg0 context.Context, arg1 *zond.ListValidatorBalancesRequest) (*zond.ValidatorBalances, error) {
 	m.ctrl.T.Helper()

@@ -80,13 +80,11 @@ const DefaultCliqueSigner = "0x0000000000000000000000000000000000000000000000000
 // by adding the relative time of the capella the fork epoch to the given genesis timestamp.
 func GzondShanghaiTime(genesisTime uint64, cfg *clparams.BeaconChainConfig) *uint64 {
 	var shanghaiTime *uint64
-	if cfg.CapellaForkEpoch != math.MaxUint64 {
-		startSlot, err := slots.EpochStart(cfg.CapellaForkEpoch)
-		if err == nil {
-			startTime := slots.StartTime(genesisTime, startSlot)
-			newTime := uint64(startTime.Unix())
-			shanghaiTime = &newTime
-		}
+	startSlot, err := slots.EpochStart(0)
+	if err == nil {
+		startTime := slots.StartTime(genesisTime, startSlot)
+		newTime := uint64(startTime.Unix())
+		shanghaiTime = &newTime
 	}
 	return shanghaiTime
 }
@@ -95,11 +93,6 @@ func GzondShanghaiTime(genesisTime uint64, cfg *clparams.BeaconChainConfig) *uin
 // like in an e2e test. The parameters are minimal but the full value is returned unmarshaled so that it can be
 // customized as desired.
 func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *core.Genesis {
-	ttd, ok := big.NewInt(0).SetString(clparams.BeaconConfig().TerminalTotalDifficulty, 10)
-	if !ok {
-		panic(fmt.Sprintf("unable to parse TerminalTotalDifficulty as an integer = %s", clparams.BeaconConfig().TerminalTotalDifficulty))
-	}
-
 	shanghaiTime := GzondShanghaiTime(genesisTime, cfg)
 	cc := &params.ChainConfig{
 		ChainID:                       big.NewInt(defaultTestChainId),
@@ -118,16 +111,9 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 		ArrowGlacierBlock:             bigz,
 		GrayGlacierBlock:              bigz,
 		MergeNetsplitBlock:            bigz,
-		TerminalTotalDifficulty:       ttd,
+		TerminalTotalDifficulty:       big.NewInt(0),
 		TerminalTotalDifficultyPassed: true,
-		Clique: &params.CliqueConfig{
-			Period: cfg.SecondsPerETH1Block,
-			Epoch:  20000,
-		},
-		ShanghaiTime: shanghaiTime,
-		// NOTE(rgeraldes24): setting value to nil since we are not going to transition to Deneb
-		// and eventually we will review go-zond to discard this fork and review other forks.
-		CancunTime: nil,
+		ShanghaiTime:                  shanghaiTime,
 	}
 	da := defaultDepositContractAllocation(cfg.DepositContractAddress)
 	ma := minerAllocation()

@@ -117,15 +117,18 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 					if step.PayloadStatus != nil {
 						require.NoError(t, builder.SetPayloadStatus(step.PayloadStatus))
 					}
-					if step.PowBlock != nil {
-						powBlockFile, err := util.BazelFileBytes(testsFolderPath, folder.Name(), fmt.Sprint(*step.PowBlock, ".ssz_snappy"))
-						require.NoError(t, err)
-						p, err := snappy.Decode(nil /* dst */, powBlockFile)
-						require.NoError(t, err)
-						pb := &zondpb.PowBlock{}
-						require.NoError(t, pb.UnmarshalSSZ(p), "Failed to unmarshal")
-						builder.PoWBlock(pb)
-					}
+					// TODO(rgeraldes24)
+					/*
+						if step.PowBlock != nil {
+							powBlockFile, err := util.BazelFileBytes(testsFolderPath, folder.Name(), fmt.Sprint(*step.PowBlock, ".ssz_snappy"))
+							require.NoError(t, err)
+							p, err := snappy.Decode(nil, powBlockFile)
+							require.NoError(t, err)
+							pb := &zondpb.PowBlock{}
+							require.NoError(t, pb.UnmarshalSSZ(p), "Failed to unmarshal")
+							builder.PoWBlock(pb)
+						}
+					*/
 					builder.Check(t, step.Check)
 				}
 			})

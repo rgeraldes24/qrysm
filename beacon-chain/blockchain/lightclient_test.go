@@ -115,7 +115,7 @@ func (l *testlc) checkSyncAggregate(update *zondpbv2.LightClientUpdate) {
 	syncAggregate, err := l.block.Block().Body().SyncAggregate()
 	require.NoError(l.t, err)
 	require.DeepSSZEqual(l.t, syncAggregate.SyncCommitteeBits, update.SyncAggregate.SyncCommitteeBits, "SyncAggregate bits is not equal")
-	require.DeepSSZEqual(l.t, syncAggregate.SyncCommitteeSignature, update.SyncAggregate.SyncCommitteeSignature, "SyncAggregate signature is not equal")
+	require.DeepSSZEqual(l.t, syncAggregate.SyncCommitteeSignatures, update.SyncAggregate.SyncCommitteeSignatures, "SyncAggregate signature is not equal")
 }
 
 func TestLightClient_NewLightClientOptimisticUpdateFromBeaconState(t *testing.T) {

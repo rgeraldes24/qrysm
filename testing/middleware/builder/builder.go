@@ -78,11 +78,6 @@ type ForkchoiceUpdatedResponse struct {
 	} `json:"result"`
 }
 
-type ExecPayloadResponse struct {
-	Version string               `json:"version"`
-	Data    *v1.ExecutionPayload `json:"data"`
-}
-
 type ExecHeaderResponseCapella struct {
 	Version string `json:"version"`
 	Data    struct {
