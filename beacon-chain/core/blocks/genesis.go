@@ -18,19 +18,32 @@ import (
 )
 
 // NewGenesisBlock returns the canonical, genesis block for the beacon chain protocol.
-func NewGenesisBlock(stateRoot []byte) *zondpb.SignedBeaconBlock {
+func NewGenesisBlock(stateRoot []byte) *zondpb.SignedBeaconBlockCapella {
 	zeroHash := params.BeaconConfig().ZeroHash[:]
-	block := &zondpb.SignedBeaconBlock{
-		Block: &zondpb.BeaconBlock{
+	block := &zondpb.SignedBeaconBlockCapella{
+		Block: &zondpb.BeaconBlockCapella{
 			ParentRoot: zeroHash,
 			StateRoot:  bytesutil.PadTo(stateRoot, 32),
-			Body: &zondpb.BeaconBlockBody{
+			Body: &zondpb.BeaconBlockBodyCapella{
 				RandaoReveal: make([]byte, dilithium2.CryptoBytes),
 				Eth1Data: &zondpb.Eth1Data{
 					DepositRoot: make([]byte, 32),
 					BlockHash:   make([]byte, 32),
 				},
 				Graffiti: make([]byte, 32),
+				SyncAggregate: &zondpb.SyncAggregate{
+					SyncCommitteeBits: make([]byte, fieldparams.SyncCommitteeLength/8),
+				},
+				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+					ParentHash:    make([]byte, 32),
+					FeeRecipient:  make([]byte, 20),
+					StateRoot:     make([]byte, 32),
+					ReceiptsRoot:  make([]byte, 32),
+					LogsBloom:     make([]byte, 256),
+					PrevRandao:    make([]byte, 32),
+					BaseFeePerGas: make([]byte, 32),
+					BlockHash:     make([]byte, 32),
+				},
 			},
 		},
 		Signature: params.BeaconConfig().EmptyDilithiumSignature[:],

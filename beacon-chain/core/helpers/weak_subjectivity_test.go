@@ -268,7 +268,7 @@ func genState(t *testing.T, valCount, avgBalance uint64) state.BeaconState {
 	balances := make([]uint64, len(validators))
 	for i := uint64(0); i < valCount; i++ {
 		validators[i] = &zondpb.Validator{
-			PublicKey:             make([]byte, params.BeaconConfig().BLSPubkeyLength),
+			PublicKey:             make([]byte, params.BeaconConfig().DilithiumPubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			EffectiveBalance:      avgBalance * 1e9,
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,

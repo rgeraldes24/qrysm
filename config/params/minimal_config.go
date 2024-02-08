@@ -29,9 +29,7 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.EffectiveBalanceIncrement = 1e9
 
 	// Initial values
-	minimalConfig.BLSWithdrawalPrefixByte = byte(0)
-	minimalConfig.DilithiumWithdrawalPrefixByte = byte(0) // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
-	minimalConfig.ETH1AddressWithdrawalPrefixByte = byte(1)
+	minimalConfig.DilithiumWithdrawalPrefixByte = byte(0)   // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
 	minimalConfig.ZondAddressWithdrawalPrefixByte = byte(1) // TODO (cyyber): Change it to 0
 
 	// Time parameters

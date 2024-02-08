@@ -25,7 +25,7 @@ import (
 
 func setupService(t *testing.T) *Service {
 	beaconDB := testDB.SetupDB(t)
-	state, _ := util.DeterministicGenesisStateAltair(t, 256)
+	state, _ := util.DeterministicGenesisStateCapella(t, 256)
 
 	pubKeys := make([][]byte, 3)
 	pubKeys[0] = state.Validators()[0].PublicKey
@@ -119,7 +119,7 @@ func TestTrackedIndex(t *testing.T) {
 func TestUpdateSyncCommitteeTrackedVals(t *testing.T) {
 	hook := logTest.NewGlobal()
 	s := setupService(t)
-	state, _ := util.DeterministicGenesisStateAltair(t, 1024)
+	state, _ := util.DeterministicGenesisStateCapella(t, 1024)
 
 	s.updateSyncCommitteeTrackedVals(state)
 	require.LogsDoNotContain(t, hook, "Sync committee assignments will not be reported")

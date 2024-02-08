@@ -166,7 +166,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 					BlockRoot:         []byte("root"),
 					SubcommitteeIndex: 1,
 					AggregationBits:   bitfield.NewBitvector16(),
-					Signature:         []byte("sig"),
+					Signatures:        []byte("sig"),
 				},
 				SelectionProof: []byte("proof"),
 			},
@@ -308,7 +308,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 					RandaoReveal:  genesis.Block.Body.RandaoReveal,
 					Graffiti:      genesis.Block.Body.Graffiti,
 					Eth1Data:      genesis.Block.Body.Eth1Data,
-					SyncAggregate: &zond.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignature: make([]byte, 96)},
+					SyncAggregate: &zond.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: make([]byte, 96)},
 					ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 						BlockNumber:   1,
 						ParentHash:    make([]byte, fieldparams.RootLength),

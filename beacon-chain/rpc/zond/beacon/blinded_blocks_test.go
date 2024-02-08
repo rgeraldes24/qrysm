@@ -43,7 +43,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 		assert.Equal(t, zondpbv2.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockBellatrix()
+		b := util.NewBlindedBeaconBlockCapella()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := blk.Block().HashTreeRoot()
@@ -63,7 +63,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		b := util.NewBeaconBlock()
+		b := util.NewBeaconBlockCapella()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		root, err := blk.Block().HashTreeRoot()
@@ -82,7 +82,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 		assert.Equal(t, true, resp.Finalized)
 	})
 	t.Run("not finalized", func(t *testing.T) {
-		b := util.NewBeaconBlock()
+		b := util.NewBeaconBlockCapella()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		root, err := blk.Block().HashTreeRoot()
@@ -126,7 +126,7 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 		assert.Equal(t, zondpbv2.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		b := util.NewBlindedBeaconBlockBellatrix()
+		b := util.NewBlindedBeaconBlockCapella()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		r, err := blk.Block().HashTreeRoot()
@@ -146,7 +146,7 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		b := util.NewBeaconBlock()
+		b := util.NewBeaconBlockCapella()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		root, err := blk.Block().HashTreeRoot()
@@ -165,7 +165,7 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 		assert.Equal(t, true, resp.Finalized)
 	})
 	t.Run("not finalized", func(t *testing.T) {
-		b := util.NewBeaconBlock()
+		b := util.NewBeaconBlockCapella()
 		blk, err := blocks.NewSignedBeaconBlock(b)
 		require.NoError(t, err)
 		root, err := blk.Block().HashTreeRoot()

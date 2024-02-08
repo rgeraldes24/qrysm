@@ -219,7 +219,7 @@ func TestReceiveEvents_AggregatedAtt(t *testing.T) {
 					Source:          nil,
 					Target:          nil,
 				},
-				Signature: base64Val,
+				Signatures: []string{base64Val},
 			},
 		}
 		bData, err := json.Marshal(data)

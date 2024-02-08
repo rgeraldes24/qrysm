@@ -6,15 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/execution"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
-	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
@@ -25,9 +22,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
-	"github.com/theQRL/qrysm/v4/testing/mock"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
@@ -40,7 +35,7 @@ func pubKey(i uint64) []byte {
 }
 
 func TestGetDuties_OK(t *testing.T) {
-	genesis := util.NewBeaconBlock()
+	genesis := util.NewBeaconBlockCapella()
 	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(t, err)
@@ -105,11 +100,8 @@ func TestGetDuties_OK(t *testing.T) {
 
 func TestGetAltairDuties_SyncCommitteeOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.AltairForkEpoch = primitives.Epoch(0)
-	params.OverrideBeaconConfig(cfg)
 
-	genesis := util.NewBeaconBlock()
+	genesis := util.NewBeaconBlockCapella()
 	deposits, _, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().SyncCommitteeSize)
 	require.NoError(t, err)
 	eth1Data, err := util.DeterministicEth1Data(len(deposits))
@@ -207,12 +199,8 @@ func TestGetAltairDuties_SyncCommitteeOK(t *testing.T) {
 
 func TestGetBellatrixDuties_SyncCommitteeOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.AltairForkEpoch = primitives.Epoch(0)
-	cfg.BellatrixForkEpoch = primitives.Epoch(1)
-	params.OverrideBeaconConfig(cfg)
 
-	genesis := util.NewBeaconBlock()
+	genesis := util.NewBeaconBlockCapella()
 	deposits, _, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().SyncCommitteeSize)
 	require.NoError(t, err)
 	eth1Data, err := util.DeterministicEth1Data(len(deposits))
@@ -313,11 +301,8 @@ func TestGetBellatrixDuties_SyncCommitteeOK(t *testing.T) {
 
 func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.AltairForkEpoch = primitives.Epoch(0)
-	params.OverrideBeaconConfig(cfg)
 
-	genesis := util.NewBeaconBlock()
+	genesis := util.NewBeaconBlockCapella()
 	deposits, _, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().SyncCommitteeSize)
 	require.NoError(t, err)
 	eth1Data, err := util.DeterministicEth1Data(len(deposits))
@@ -378,7 +363,7 @@ func TestGetDuties_SlotOutOfUpperBound(t *testing.T) {
 }
 
 func TestGetDuties_CurrentEpoch_ShouldNotFail(t *testing.T) {
-	genesis := util.NewBeaconBlock()
+	genesis := util.NewBeaconBlockCapella()
 	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(t, err)
@@ -419,7 +404,7 @@ func TestGetDuties_CurrentEpoch_ShouldNotFail(t *testing.T) {
 }
 
 func TestGetDuties_MultipleKeys_OK(t *testing.T) {
-	genesis := util.NewBeaconBlock()
+	genesis := util.NewBeaconBlockCapella()
 	depChainStart := uint64(64)
 
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
@@ -470,141 +455,6 @@ func TestGetDuties_SyncNotReady(t *testing.T) {
 	assert.ErrorContains(t, "Syncing to latest head", err)
 }
 
-func TestStreamDuties_SyncNotReady(t *testing.T) {
-	vs := &Server{
-		SyncChecker: &mockSync.Sync{IsSyncing: true},
-	}
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	mockStream := mock.NewMockBeaconNodeValidator_StreamDutiesServer(ctrl)
-	assert.ErrorContains(t, "Syncing to latest head", vs.StreamDuties(&zondpb.DutiesRequest{}, mockStream))
-}
-
-func TestStreamDuties_OK(t *testing.T) {
-	genesis := util.NewBeaconBlock()
-	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
-	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
-	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(deposits))
-	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
-	require.NoError(t, err, "Could not setup genesis bs")
-	genesisRoot, err := genesis.Block.HashTreeRoot()
-	require.NoError(t, err, "Could not get signing root")
-
-	pubKeys := make([][]byte, len(deposits))
-	indices := make([]uint64, len(deposits))
-	for i := 0; i < len(deposits); i++ {
-		pubKeys[i] = deposits[i].Data.PublicKey
-		indices[i] = uint64(i)
-	}
-
-	pubkeysAs48ByteType := make([][dilithium2.CryptoPublicKeyBytes]byte, len(pubKeys))
-	for i, pk := range pubKeys {
-		pubkeysAs48ByteType[i] = bytesutil.ToBytes2592(pk)
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	c := &mockChain.ChainService{
-		Genesis: time.Now(),
-	}
-	vs := &Server{
-		Ctx:                    ctx,
-		HeadFetcher:            &mockChain.ChainService{State: bs, Root: genesisRoot[:]},
-		SyncChecker:            &mockSync.Sync{IsSyncing: false},
-		TimeFetcher:            c,
-		StateNotifier:          &mockChain.MockStateNotifier{},
-		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
-	}
-
-	// Test the first validator in registry.
-	req := &zondpb.DutiesRequest{
-		PublicKeys: [][]byte{deposits[0].Data.PublicKey},
-	}
-	wantedRes, err := vs.duties(ctx, req)
-	require.NoError(t, err)
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	exitRoutine := make(chan bool)
-	mockStream := mock.NewMockBeaconNodeValidator_StreamDutiesServer(ctrl)
-	mockStream.EXPECT().Send(wantedRes).Do(func(arg0 interface{}) {
-		exitRoutine <- true
-	})
-	mockStream.EXPECT().Context().Return(ctx).AnyTimes()
-	go func(tt *testing.T) {
-		assert.ErrorContains(t, "context canceled", vs.StreamDuties(req, mockStream))
-	}(t)
-	<-exitRoutine
-	cancel()
-}
-
-func TestStreamDuties_OK_ChainReorg(t *testing.T) {
-	genesis := util.NewBeaconBlock()
-	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
-	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
-	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(deposits))
-	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
-	require.NoError(t, err, "Could not setup genesis bs")
-	genesisRoot, err := genesis.Block.HashTreeRoot()
-	require.NoError(t, err, "Could not get signing root")
-
-	pubKeys := make([][]byte, len(deposits))
-	indices := make([]uint64, len(deposits))
-	for i := 0; i < len(deposits); i++ {
-		pubKeys[i] = deposits[i].Data.PublicKey
-		indices[i] = uint64(i)
-	}
-
-	pubkeysAs48ByteType := make([][dilithium2.CryptoPublicKeyBytes]byte, len(pubKeys))
-	for i, pk := range pubKeys {
-		pubkeysAs48ByteType[i] = bytesutil.ToBytes2592(pk)
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	c := &mockChain.ChainService{
-		Genesis: time.Now(),
-	}
-	vs := &Server{
-		Ctx:                    ctx,
-		HeadFetcher:            &mockChain.ChainService{State: bs, Root: genesisRoot[:]},
-		SyncChecker:            &mockSync.Sync{IsSyncing: false},
-		TimeFetcher:            c,
-		StateNotifier:          &mockChain.MockStateNotifier{},
-		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
-	}
-
-	// Test the first validator in registry.
-	req := &zondpb.DutiesRequest{
-		PublicKeys: [][]byte{deposits[0].Data.PublicKey},
-	}
-	wantedRes, err := vs.duties(ctx, req)
-	require.NoError(t, err)
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	exitRoutine := make(chan bool)
-	mockStream := mock.NewMockBeaconNodeValidator_StreamDutiesServer(ctrl)
-	mockStream.EXPECT().Send(wantedRes).Return(nil)
-	mockStream.EXPECT().Send(wantedRes).Do(func(arg0 interface{}) {
-		exitRoutine <- true
-	})
-	mockStream.EXPECT().Context().Return(ctx).AnyTimes()
-	go func(tt *testing.T) {
-		assert.ErrorContains(t, "context canceled", vs.StreamDuties(req, mockStream))
-	}(t)
-	// Fire a reorg event. This needs to trigger
-	// a recomputation and resending of duties over the stream.
-	for sent := 0; sent == 0; {
-		sent = vs.StateNotifier.StateFeed().Send(&feed.Event{
-			Type: statefeed.Reorg,
-			Data: &zondpbv1.EventChainReorg{Depth: uint64(params.BeaconConfig().SlotsPerEpoch), Slot: 0},
-		})
-	}
-	<-exitRoutine
-	cancel()
-}
-
 func TestAssignValidatorToSubnet(t *testing.T) {
 	k := pubKey(3)
 
@@ -644,7 +494,7 @@ func TestAssignValidatorToSyncSubnet(t *testing.T) {
 
 func BenchmarkCommitteeAssignment(b *testing.B) {
 
-	genesis := util.NewBeaconBlock()
+	genesis := util.NewBeaconBlockCapella()
 	depChainStart := uint64(8192 * 2)
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(b, err)

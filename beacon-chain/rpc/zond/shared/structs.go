@@ -16,7 +16,7 @@ import (
 type Attestation struct {
 	AggregationBits string           `json:"aggregation_bits"`
 	Data            *AttestationData `json:"data"`
-	Signature       string           `json:"signature"`
+	Signatures      []string         `json:"signatures"`
 }
 
 type AttestationData struct {
@@ -50,11 +50,11 @@ type ContributionAndProof struct {
 }
 
 type SyncCommitteeContribution struct {
-	Slot              string `json:"slot"`
-	BeaconBlockRoot   string `json:"beacon_block_root"`
-	SubcommitteeIndex string `json:"subcommittee_index"`
-	AggregationBits   string `json:"aggregation_bits"`
-	Signature         string `json:"signature"`
+	Slot              string   `json:"slot"`
+	BeaconBlockRoot   string   `json:"beacon_block_root"`
+	SubcommitteeIndex string   `json:"subcommittee_index"`
+	AggregationBits   string   `json:"aggregation_bits"`
+	Signatures        []string `json:"signatures"`
 }
 
 type SignedAggregateAttestationAndProof struct {

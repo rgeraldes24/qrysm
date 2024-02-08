@@ -24,7 +24,7 @@ import (
 )
 
 func Test_currentCommitteeIndicesFromState(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().SyncCommitteeSize)
+	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
 	wantedCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	wantedIndices := make([]primitives.ValidatorIndex, len(wantedCommittee))
@@ -53,7 +53,7 @@ func Test_currentCommitteeIndicesFromState(t *testing.T) {
 }
 
 func Test_nextCommitteeIndicesFromState(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().SyncCommitteeSize)
+	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
 	wantedCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	wantedIndices := make([]primitives.ValidatorIndex, len(wantedCommittee))
@@ -82,7 +82,7 @@ func Test_nextCommitteeIndicesFromState(t *testing.T) {
 }
 
 func Test_extractSyncSubcommittees(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().SyncCommitteeSize)
+	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
 	syncCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	for i := 0; i < len(syncCommittee); i++ {
@@ -133,7 +133,7 @@ func Test_extractSyncSubcommittees(t *testing.T) {
 
 func TestListSyncCommittees(t *testing.T) {
 	ctx := context.Background()
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().SyncCommitteeSize)
+	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
 	for i := 0; i < len(syncCommittee); i++ {
@@ -185,7 +185,7 @@ func TestListSyncCommittees(t *testing.T) {
 
 	t.Run("execution optimistic", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -214,7 +214,7 @@ func TestListSyncCommittees(t *testing.T) {
 
 	t.Run("finalized", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -277,7 +277,7 @@ func (m *futureSyncMockFetcher) StateBySlot(context.Context, primitives.Slot) (s
 
 func TestListSyncCommitteesFuture(t *testing.T) {
 	ctx := context.Background()
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().SyncCommitteeSize)
+	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	vals := st.Validators()
 	for i := 0; i < len(syncCommittee); i++ {

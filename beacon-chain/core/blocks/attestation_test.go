@@ -40,7 +40,8 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 	cfc := beaconState.CurrentJustifiedCheckpoint()
 	cfc.Root = bytesutil.PadTo([]byte("hello-world"), 32)
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cfc))
-	require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
+	// TODO(rgeraldes24)
+	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att1.Data.Slot, att1.Data.CommitteeIndex)
 	require.NoError(t, err)

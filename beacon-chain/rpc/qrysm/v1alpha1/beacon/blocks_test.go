@@ -9,7 +9,6 @@ import (
 	"github.com/golang/mock/gomock"
 	chainMock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
-	blockfeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/block"
 	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
@@ -35,11 +34,11 @@ import (
 func TestServer_GetChainHead_NoGenesis(t *testing.T) {
 	db := dbTest.SetupDB(t)
 
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, s.SetSlot(1))
 
-	genBlock := util.NewBeaconBlock()
+	genBlock := util.NewBeaconBlockCapella()
 	genBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'G'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, genBlock)
 	gRoot, err := genBlock.Block.HashTreeRoot()
@@ -91,14 +90,14 @@ func TestServer_GetChainHead_NoGenesis(t *testing.T) {
 func TestServer_GetChainHead_NoFinalizedBlock(t *testing.T) {
 	db := dbTest.SetupDB(t)
 
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, s.SetSlot(1))
 	require.NoError(t, s.SetPreviousJustifiedCheckpoint(&zondpb.Checkpoint{Epoch: 3, Root: bytesutil.PadTo([]byte{'A'}, fieldparams.RootLength)}))
 	require.NoError(t, s.SetCurrentJustifiedCheckpoint(&zondpb.Checkpoint{Epoch: 2, Root: bytesutil.PadTo([]byte{'B'}, fieldparams.RootLength)}))
 	require.NoError(t, s.SetFinalizedCheckpoint(&zondpb.Checkpoint{Epoch: 1, Root: bytesutil.PadTo([]byte{'C'}, fieldparams.RootLength)}))
 
-	genBlock := util.NewBeaconBlock()
+	genBlock := util.NewBeaconBlockCapella()
 	genBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'G'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, genBlock)
 	gRoot, err := genBlock.Block.HashTreeRoot()
@@ -136,35 +135,35 @@ func TestServer_GetChainHead(t *testing.T) {
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 
 	db := dbTest.SetupDB(t)
-	genBlock := util.NewBeaconBlock()
+	genBlock := util.NewBeaconBlockCapella()
 	genBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'G'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, genBlock)
 	gRoot, err := genBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, db.SaveGenesisBlockRoot(context.Background(), gRoot))
 
-	finalizedBlock := util.NewBeaconBlock()
+	finalizedBlock := util.NewBeaconBlockCapella()
 	finalizedBlock.Block.Slot = 1
 	finalizedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'A'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, finalizedBlock)
 	fRoot, err := finalizedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	justifiedBlock := util.NewBeaconBlock()
+	justifiedBlock := util.NewBeaconBlockCapella()
 	justifiedBlock.Block.Slot = 2
 	justifiedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'B'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, justifiedBlock)
 	jRoot, err := justifiedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	prevJustifiedBlock := util.NewBeaconBlock()
+	prevJustifiedBlock := util.NewBeaconBlockCapella()
 	prevJustifiedBlock.Block.Slot = 3
 	prevJustifiedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'C'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, prevJustifiedBlock)
 	pjRoot, err := prevJustifiedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Slot:                        1,
 		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{Epoch: 3, Root: pjRoot[:]},
 		CurrentJustifiedCheckpoint:  &zondpb.Checkpoint{Epoch: 2, Root: jRoot[:]},
@@ -172,7 +171,7 @@ func TestServer_GetChainHead(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	b.Block.Slot, err = slots.EpochStart(s.PreviousJustifiedCheckpoint().Epoch)
 	require.NoError(t, err)
 	b.Block.Slot++
@@ -231,35 +230,35 @@ func TestServer_StreamChainHead_OnHeadUpdated(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MainnetConfig())
 	db := dbTest.SetupDB(t)
-	genBlock := util.NewBeaconBlock()
+	genBlock := util.NewBeaconBlockCapella()
 	genBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'G'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, genBlock)
 	gRoot, err := genBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, db.SaveGenesisBlockRoot(context.Background(), gRoot))
 
-	finalizedBlock := util.NewBeaconBlock()
+	finalizedBlock := util.NewBeaconBlockCapella()
 	finalizedBlock.Block.Slot = 32
 	finalizedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'A'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, finalizedBlock)
 	fRoot, err := finalizedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	justifiedBlock := util.NewBeaconBlock()
+	justifiedBlock := util.NewBeaconBlockCapella()
 	justifiedBlock.Block.Slot = 64
 	justifiedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'B'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, justifiedBlock)
 	jRoot, err := justifiedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	prevJustifiedBlock := util.NewBeaconBlock()
+	prevJustifiedBlock := util.NewBeaconBlockCapella()
 	prevJustifiedBlock.Block.Slot = 96
 	prevJustifiedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'C'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, prevJustifiedBlock)
 	pjRoot, err := prevJustifiedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	s, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Slot:                        1,
 		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{Epoch: 3, Root: pjRoot[:]},
 		CurrentJustifiedCheckpoint:  &zondpb.Checkpoint{Epoch: 2, Root: jRoot[:]},
@@ -267,7 +266,7 @@ func TestServer_StreamChainHead_OnHeadUpdated(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	b.Block.Slot, err = slots.EpochStart(s.PreviousJustifiedCheckpoint().Epoch)
 	require.NoError(t, err)
 
@@ -323,145 +322,6 @@ func TestServer_StreamChainHead_OnHeadUpdated(t *testing.T) {
 		sent = server.StateNotifier.StateFeed().Send(&feed.Event{
 			Type: statefeed.BlockProcessed,
 			Data: &statefeed.BlockProcessedData{},
-		})
-	}
-	<-exitRoutine
-}
-
-func TestServer_StreamBlocksVerified_ContextCanceled(t *testing.T) {
-	db := dbTest.SetupDB(t)
-	ctx := context.Background()
-
-	chainService := &chainMock.ChainService{}
-	ctx, cancel := context.WithCancel(ctx)
-	server := &Server{
-		Ctx:           ctx,
-		StateNotifier: chainService.StateNotifier(),
-		HeadFetcher:   chainService,
-		BeaconDB:      db,
-	}
-
-	exitRoutine := make(chan bool)
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	mockStream := mock.NewMockBeaconChain_StreamBlocksServer(ctrl)
-	mockStream.EXPECT().Context().Return(ctx)
-	go func(tt *testing.T) {
-		assert.ErrorContains(tt, "Context canceled", server.StreamBlocks(&zondpb.StreamBlocksRequest{
-			VerifiedOnly: true,
-		}, mockStream))
-		<-exitRoutine
-	}(t)
-	cancel()
-	exitRoutine <- true
-}
-
-func TestServer_StreamBlocks_ContextCanceled(t *testing.T) {
-	db := dbTest.SetupDB(t)
-	ctx := context.Background()
-
-	chainService := &chainMock.ChainService{}
-	ctx, cancel := context.WithCancel(ctx)
-	server := &Server{
-		Ctx:           ctx,
-		BlockNotifier: chainService.BlockNotifier(),
-		HeadFetcher:   chainService,
-		BeaconDB:      db,
-	}
-
-	exitRoutine := make(chan bool)
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	mockStream := mock.NewMockBeaconChain_StreamBlocksServer(ctrl)
-	mockStream.EXPECT().Context().Return(ctx)
-	go func(tt *testing.T) {
-		assert.ErrorContains(tt, "Context canceled", server.StreamBlocks(&zondpb.StreamBlocksRequest{}, mockStream))
-		<-exitRoutine
-	}(t)
-	cancel()
-	exitRoutine <- true
-}
-
-func TestServer_StreamBlocks_OnHeadUpdated(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-	params.OverrideBeaconConfig(params.BeaconConfig())
-
-	ctx := context.Background()
-	beaconState, privs := util.DeterministicGenesisState(t, 32)
-	b, err := util.GenerateFullBlock(beaconState, privs, util.DefaultBlockGenConfig(), 1)
-	require.NoError(t, err)
-	chainService := &chainMock.ChainService{State: beaconState}
-	server := &Server{
-		Ctx:           ctx,
-		BlockNotifier: chainService.BlockNotifier(),
-		HeadFetcher:   chainService,
-	}
-	exitRoutine := make(chan bool)
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	mockStream := mock.NewMockBeaconChain_StreamBlocksServer(ctrl)
-	mockStream.EXPECT().Send(b).Do(func(arg0 interface{}) {
-		exitRoutine <- true
-	})
-	mockStream.EXPECT().Context().Return(ctx).AnyTimes()
-
-	go func(tt *testing.T) {
-		assert.NoError(tt, server.StreamBlocks(&zondpb.StreamBlocksRequest{}, mockStream), "Could not call RPC method")
-	}(t)
-
-	// Send in a loop to ensure it is delivered (busy wait for the service to subscribe to the state feed).
-	for sent := 0; sent == 0; {
-		wsb, err := blocks.NewSignedBeaconBlock(b)
-		require.NoError(t, err)
-		sent = server.BlockNotifier.BlockFeed().Send(&feed.Event{
-			Type: blockfeed.ReceivedBlock,
-			Data: &blockfeed.ReceivedBlockData{SignedBlock: wsb},
-		})
-	}
-	<-exitRoutine
-}
-
-func TestServer_StreamBlocksVerified_OnHeadUpdated(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-	params.OverrideBeaconConfig(params.BeaconConfig())
-
-	db := dbTest.SetupDB(t)
-	ctx := context.Background()
-	beaconState, privs := util.DeterministicGenesisState(t, 32)
-	b, err := util.GenerateFullBlock(beaconState, privs, util.DefaultBlockGenConfig(), 1)
-	require.NoError(t, err)
-	r, err := b.Block.HashTreeRoot()
-	require.NoError(t, err)
-	util.SaveBlock(t, ctx, db, b)
-	chainService := &chainMock.ChainService{State: beaconState}
-	server := &Server{
-		Ctx:           ctx,
-		StateNotifier: chainService.StateNotifier(),
-		HeadFetcher:   chainService,
-		BeaconDB:      db,
-	}
-	exitRoutine := make(chan bool)
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	mockStream := mock.NewMockBeaconChain_StreamBlocksServer(ctrl)
-	mockStream.EXPECT().Send(b).Do(func(arg0 interface{}) {
-		exitRoutine <- true
-	})
-	mockStream.EXPECT().Context().Return(ctx).AnyTimes()
-
-	go func(tt *testing.T) {
-		assert.NoError(tt, server.StreamBlocks(&zondpb.StreamBlocksRequest{
-			VerifiedOnly: true,
-		}, mockStream), "Could not call RPC method")
-	}(t)
-
-	// Send in a loop to ensure it is delivered (busy wait for the service to subscribe to the state feed).
-	for sent := 0; sent == 0; {
-		wsb, err := blocks.NewSignedBeaconBlock(b)
-		require.NoError(t, err)
-		sent = server.StateNotifier.StateFeed().Send(&feed.Event{
-			Type: statefeed.BlockProcessed,
-			Data: &statefeed.BlockProcessedData{Slot: b.Block.Slot, BlockRoot: r, SignedBlock: wsb},
 		})
 	}
 	<-exitRoutine

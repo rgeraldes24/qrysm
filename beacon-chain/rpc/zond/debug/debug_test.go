@@ -44,14 +44,14 @@ func TestGetBeaconStateV2(t *testing.T) {
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		util.SaveBlock(t, ctx, db, blk)
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
-		fakeState, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+		fakeState, _ := util.DeterministicGenesisStateCapella(t, 1)
 		server := &Server{
 			Stater: &testutil.MockStater{
 				BeaconState: fakeState,
@@ -70,14 +70,14 @@ func TestGetBeaconStateV2(t *testing.T) {
 	})
 	t.Run("finalized", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		util.SaveBlock(t, ctx, db, blk)
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
 
-		fakeState, _ := util.DeterministicGenesisStateBellatrix(t, 1)
+		fakeState, _ := util.DeterministicGenesisStateCapella(t, 1)
 		headerRoot, err := fakeState.LatestBlockHeader().HashTreeRoot()
 		require.NoError(t, err)
 		chainService := &blockchainmock.ChainService{
@@ -104,7 +104,7 @@ func TestGetBeaconStateV2(t *testing.T) {
 }
 
 func TestGetBeaconStateSSZ(t *testing.T) {
-	fakeState, err := util.NewBeaconState()
+	fakeState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	sszState, err := fakeState.MarshalSSZ()
 	require.NoError(t, err)

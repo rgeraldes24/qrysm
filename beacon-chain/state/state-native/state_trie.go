@@ -253,9 +253,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 		b.stateRootsMultiValue.Copy(b, dst)
 		b.randaoMixesMultiValue.Copy(b, dst)
 		b.balancesMultiValue.Copy(b, dst)
-		if b.version > version.Phase0 {
-			b.inactivityScoresMultiValue.Copy(b, dst)
-		}
+		b.inactivityScoresMultiValue.Copy(b, dst)
 		b.validatorsMultiValue.Copy(b, dst)
 	}
 

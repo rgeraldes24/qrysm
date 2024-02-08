@@ -45,7 +45,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
-		Signature: bytesutil.PadTo([]byte("signature1"), 96),
+		Signatures: bytesutil.PadTo([]byte("signature1"), 96),
 	}
 	att2 := &zondpbv1alpha1.Attestation{
 		AggregationBits: []byte{1, 10},
@@ -62,7 +62,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signature: bytesutil.PadTo([]byte("signature2"), 96),
+		Signatures: bytesutil.PadTo([]byte("signature2"), 96),
 	}
 	att3 := &zondpbv1alpha1.Attestation{
 		AggregationBits: bitfield.NewBitlist(8),
@@ -79,7 +79,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot3"), 32),
 			},
 		},
-		Signature: bytesutil.PadTo([]byte("signature3"), 96),
+		Signatures: bytesutil.PadTo([]byte("signature3"), 96),
 	}
 	att4 := &zondpbv1alpha1.Attestation{
 		AggregationBits: bitfield.NewBitlist(8),
@@ -96,7 +96,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot4"), 32),
 			},
 		},
-		Signature: bytesutil.PadTo([]byte("signature4"), 96),
+		Signatures: bytesutil.PadTo([]byte("signature4"), 96),
 	}
 	s := &Server{
 		AttestationsPool: attestations.NewPool(),
@@ -190,7 +190,7 @@ func TestSubmitAttestations(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		},
 	}
-	bs, err := util.NewBeaconState(func(state *zondpbv1alpha1.BeaconState) error {
+	bs, err := util.NewBeaconStateCapella(func(state *zondpbv1alpha1.BeaconStateCapella) error {
 		state.Validators = validators
 		state.Slot = 1
 		state.PreviousJustifiedCheckpoint = &zondpbv1alpha1.Checkpoint{
@@ -350,7 +350,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 			PublicKey: keys[0].PublicKey().Marshal(),
 		}
-		bs, err := util.NewBeaconState(func(state *zondpbv1alpha1.BeaconState) error {
+		bs, err := util.NewBeaconStateCapella(func(state *zondpbv1alpha1.BeaconStateCapella) error {
 			state.Validators = []*zondpbv1alpha1.Validator{validator}
 			// Satisfy activity time required before exiting.
 			state.Slot = params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod))
@@ -465,7 +465,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 			PublicKey: keys[0].PublicKey().Marshal(),
 		}
-		bs, err := util.NewBeaconState(func(state *zondpbv1alpha1.BeaconState) error {
+		bs, err := util.NewBeaconStateCapella(func(state *zondpbv1alpha1.BeaconStateCapella) error {
 			state.Validators = []*zondpbv1alpha1.Validator{validator}
 			return nil
 		})
@@ -490,7 +490,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 }
 
 func TestSubmitSyncCommitteeSignatures(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, 10)
+	st, _ := util.DeterministicGenesisStateCapella(t, 10)
 
 	t.Run("single", func(t *testing.T) {
 		broadcaster := &p2pMock.MockBroadcaster{}

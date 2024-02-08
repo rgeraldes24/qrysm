@@ -12,8 +12,8 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
-func TestGenerateGenesisStateBellatrix(t *testing.T) {
-	ep := &enginev1.ExecutionPayload{
+func TestGenerateGenesisStateCapella(t *testing.T) {
+	ep := &enginev1.ExecutionPayloadCapella{
 		ParentHash:    make([]byte, 32),
 		FeeRecipient:  make([]byte, 20),
 		StateRoot:     make([]byte, 32),
@@ -34,7 +34,7 @@ func TestGenerateGenesisStateBellatrix(t *testing.T) {
 		DepositCount: 0,
 		BlockHash:    make([]byte, 32),
 	}
-	g, _, err := GenerateGenesisStateBellatrix(context.Background(), 0, params.BeaconConfig().MinGenesisActiveValidatorCount, ep, e1d)
+	g, _, err := GenerateGenesisStateCapella(context.Background(), 0, params.BeaconConfig().MinGenesisActiveValidatorCount, ep, e1d)
 	require.NoError(t, err)
 
 	tr, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
@@ -43,7 +43,7 @@ func TestGenerateGenesisStateBellatrix(t *testing.T) {
 	require.NoError(t, err)
 	g.Eth1Data.DepositRoot = dr[:]
 	g.Eth1Data.BlockHash = make([]byte, 32)
-	st, err := state_native.InitializeFromProtoUnsafeBellatrix(g)
+	st, err := state_native.InitializeFromProtoUnsafeCapella(g)
 	require.NoError(t, err)
 	_, err = st.MarshalSSZ()
 	require.NoError(t, err)

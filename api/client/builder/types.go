@@ -413,6 +413,12 @@ func (a *IndexedAttestation) MarshalJSON() ([]byte, error) {
 	for i := range a.IndexedAttestation.AttestingIndices {
 		indices[i] = fmt.Sprintf("%d", a.AttestingIndices[i])
 	}
+	// TODO(rgeraldes24)
+	signatures := make([]hexutil.Bytes, len(a.IndexedAttestation.Signatures))
+	for i, sig := range a.IndexedAttestation.Signatures {
+		signatures[i] = sig
+	}
+
 	return json.Marshal(struct {
 		AttestingIndices []string         `json:"attesting_indices"`
 		Data             *AttestationData `json:"data"`
@@ -420,7 +426,7 @@ func (a *IndexedAttestation) MarshalJSON() ([]byte, error) {
 	}{
 		AttestingIndices: indices,
 		Data:             &AttestationData{a.IndexedAttestation.Data},
-		Signatures:       a.IndexedAttestation.Signatures,
+		Signatures:       signatures,
 	})
 }
 
@@ -485,6 +491,11 @@ type Attestation struct {
 
 // MarshalJSON returns a JSON byte array representation of Attestation.
 func (a *Attestation) MarshalJSON() ([]byte, error) {
+	signatures := make([]hexutil.Bytes, len(a.Attestation.Signatures))
+	for i, sig := range a.Attestation.Signatures {
+		signatures[i] = sig
+	}
+
 	return json.Marshal(struct {
 		AggregationBits hexutil.Bytes    `json:"aggregation_bits"`
 		Data            *AttestationData `json:"data"`
@@ -492,7 +503,7 @@ func (a *Attestation) MarshalJSON() ([]byte, error) {
 	}{
 		AggregationBits: hexutil.Bytes(a.Attestation.AggregationBits),
 		Data:            &AttestationData{a.Attestation.Data},
-		Signatures:      a.Attestation.Signatures,
+		Signatures:      signatures,
 	})
 }
 
@@ -575,12 +586,17 @@ type SyncAggregate struct {
 
 // MarshalJSON returns a JSON byte array representation of SyncAggregate.
 func (s *SyncAggregate) MarshalJSON() ([]byte, error) {
+	signatures := make([]hexutil.Bytes, len(s.SyncAggregate.SyncCommitteeSignatures))
+	for i, sig := range s.SyncAggregate.SyncCommitteeSignatures {
+		signatures[i] = sig
+	}
+
 	return json.Marshal(struct {
-		SyncCommitteeBits       hexutil.Bytes `json:"sync_committee_bits"`
-		SyncCommitteeSignatures hexutil.Bytes `json:"sync_committee_signatures"`
+		SyncCommitteeBits       hexutil.Bytes   `json:"sync_committee_bits"`
+		SyncCommitteeSignatures []hexutil.Bytes `json:"sync_committee_signatures"`
 	}{
 		SyncCommitteeBits:       hexutil.Bytes(s.SyncAggregate.SyncCommitteeBits),
-		SyncCommitteeSignatures: s.SyncAggregate.SyncCommitteeSignatures,
+		SyncCommitteeSignatures: signatures,
 	})
 }
 

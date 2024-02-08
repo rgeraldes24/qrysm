@@ -34,7 +34,7 @@ func TestGetAttestingIndices(t *testing.T) {
 func TestProcessIncludedAttestationTwoTracked(t *testing.T) {
 	hook := logTest.NewGlobal()
 	s := setupService(t)
-	state, _ := util.DeterministicGenesisStateAltair(t, 256)
+	state, _ := util.DeterministicGenesisStateCapella(t, 256)
 	require.NoError(t, state.SetSlot(2))
 	require.NoError(t, state.SetCurrentParticipationBits(bytes.Repeat([]byte{0xff}, 13)))
 
@@ -67,7 +67,7 @@ func TestProcessUnaggregatedAttestationStateNotCached(t *testing.T) {
 	ctx := context.Background()
 
 	s := setupService(t)
-	state, _ := util.DeterministicGenesisStateAltair(t, 256)
+	state, _ := util.DeterministicGenesisStateCapella(t, 256)
 	require.NoError(t, state.SetSlot(2))
 	header := state.LatestBlockHeader()
 	participation := []byte{0xff, 0xff, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -99,7 +99,7 @@ func TestProcessUnaggregatedAttestationStateCached(t *testing.T) {
 	hook := logTest.NewGlobal()
 
 	s := setupService(t)
-	state, _ := util.DeterministicGenesisStateAltair(t, 256)
+	state, _ := util.DeterministicGenesisStateCapella(t, 256)
 	participation := []byte{0xff, 0xff, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	require.NoError(t, state.SetCurrentParticipationBits(participation))
 
@@ -136,7 +136,7 @@ func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 	ctx := context.Background()
 
 	s := setupService(t)
-	state, _ := util.DeterministicGenesisStateAltair(t, 256)
+	state, _ := util.DeterministicGenesisStateCapella(t, 256)
 	require.NoError(t, state.SetSlot(2))
 	header := state.LatestBlockHeader()
 	participation := []byte{0xff, 0xff, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -171,7 +171,7 @@ func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
 	s := setupService(t)
-	state, _ := util.DeterministicGenesisStateAltair(t, 256)
+	state, _ := util.DeterministicGenesisStateCapella(t, 256)
 	participation := []byte{0xff, 0xff, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	require.NoError(t, state.SetCurrentParticipationBits(participation))
 
@@ -209,7 +209,7 @@ func TestProcessAttestations(t *testing.T) {
 	hook := logTest.NewGlobal()
 	s := setupService(t)
 	ctx := context.Background()
-	state, _ := util.DeterministicGenesisStateAltair(t, 256)
+	state, _ := util.DeterministicGenesisStateCapella(t, 256)
 	require.NoError(t, state.SetSlot(2))
 	require.NoError(t, state.SetCurrentParticipationBits(bytes.Repeat([]byte{0xff}, 13)))
 

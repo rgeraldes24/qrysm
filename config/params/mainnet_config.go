@@ -72,9 +72,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EffectiveBalanceIncrement: 1 * 1e9,
 
 	// Initial value constants.
-	BLSWithdrawalPrefixByte:         byte(0),
 	DilithiumWithdrawalPrefixByte:   byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
-	ETH1AddressWithdrawalPrefixByte: byte(1),
 	ZondAddressWithdrawalPrefixByte: byte(1), // TODO (cyyber): Change it to 0
 	ZeroHash:                        [32]byte{},
 
@@ -158,14 +156,11 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 
 	// Qrysm constants.
 	GweiPerEth:                   1000000000,
-	BLSSecretKeyLength:           32,
-	BLSPubkeyLength:              48,
 	DilithiumPubkeyLength:        2592,
 	DefaultBufferSize:            10000,
 	WithdrawalPrivkeyFileName:    "/shardwithdrawalkey",
 	ValidatorPrivkeyFileName:     "/validatorprivatekey",
 	RPCSyncCheck:                 1,
-	EmptySignature:               [96]byte{},
 	EmptyDilithiumSignature:      [dilithium.CryptoBytes]byte{},
 	DefaultPageSize:              250,
 	MaxPeersToSync:               15,

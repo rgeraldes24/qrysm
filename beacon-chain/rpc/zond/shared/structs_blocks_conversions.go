@@ -244,8 +244,8 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 			Deposits:          deposits,
 			VoluntaryExits:    exits,
 			SyncAggregate: &zond.SyncAggregate{
-				SyncCommitteeBits:      syncCommitteeBits,
-				SyncCommitteeSignature: syncCommitteeSig,
+				SyncCommitteeBits:       syncCommitteeBits,
+				SyncCommitteeSignatures: syncCommitteeSig,
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 				ParentHash:    payloadParentHash,
@@ -462,8 +462,8 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 			Deposits:          deposits,
 			VoluntaryExits:    exits,
 			SyncAggregate: &zond.SyncAggregate{
-				SyncCommitteeBits:      syncCommitteeBits,
-				SyncCommitteeSignature: syncCommitteeSig,
+				SyncCommitteeBits:       syncCommitteeBits,
+				SyncCommitteeSignatures: syncCommitteeSig,
 			},
 			ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
 				ParentHash:       payloadParentHash,

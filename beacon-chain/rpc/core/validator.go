@@ -254,11 +254,11 @@ func (s *Service) SubmitSignedAggregateSelectionProof(
 	return nil
 }
 
-// AggregatedSigAndAggregationBits returns the aggregated signature and aggregation bits
+// SignaturesAndAggregationBits returns the signatures and aggregation bits
 // associated with a particular set of sync committee messages.
-func (s *Service) AggregatedSigAndAggregationBits(
+func (s *Service) SignaturesAndAggregationBits(
 	ctx context.Context,
-	req *zondpb.AggregatedSigAndAggregationBitsRequest) ([]byte, []byte, error) {
+	req *zondpb.SignaturesAndAggregationBitsRequest) ([]byte, []byte, error) {
 	subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
 	sigs := make([][]byte, 0, subCommitteeSize)
 	bits := zondpb.NewSyncCommitteeAggregationBits()

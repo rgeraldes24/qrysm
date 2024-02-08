@@ -12,7 +12,7 @@ import (
 )
 
 func TestServer_SetSyncAggregate_EmptyCase(t *testing.T) {
-	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockAltair())
+	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 	s := &Server{} // Sever is not initialized with sync committee pool.
 	s.setSyncAggregate(context.Background(), b)
@@ -21,8 +21,8 @@ func TestServer_SetSyncAggregate_EmptyCase(t *testing.T) {
 
 	emptySig := [96]byte{0xC0}
 	want := &zondpb.SyncAggregate{
-		SyncCommitteeBits:      make([]byte, params.BeaconConfig().SyncCommitteeSize/8),
-		SyncCommitteeSignature: emptySig[:],
+		SyncCommitteeBits:       make([]byte, params.BeaconConfig().SyncCommitteeSize/8),
+		SyncCommitteeSignatures: [][]byte{emptySig[:]},
 	}
 	require.DeepEqual(t, want, agg)
 }

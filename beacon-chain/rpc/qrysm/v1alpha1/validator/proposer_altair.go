@@ -21,8 +21,8 @@ func (vs *Server) setSyncAggregate(ctx context.Context, blk interfaces.SignedBea
 		log.WithError(err).Error("Could not get sync aggregate")
 		emptySig := [dilithium2.CryptoBytes]byte{0xC0}
 		emptyAggregate := &zondpb.SyncAggregate{
-			SyncCommitteeBits:      make([]byte, params.BeaconConfig().SyncCommitteeSize/8),
-			SyncCommitteeSignature: emptySig[:],
+			SyncCommitteeBits:       make([]byte, params.BeaconConfig().SyncCommitteeSize/8),
+			SyncCommitteeSignatures: [][]byte{emptySig[:]},
 		}
 		if err := blk.SetSyncAggregate(emptyAggregate); err != nil {
 			log.WithError(err).Error("Could not set sync aggregate")
@@ -36,6 +36,7 @@ func (vs *Server) setSyncAggregate(ctx context.Context, blk interfaces.SignedBea
 	}
 }
 
+// TODO(rgeraldes24)
 // getSyncAggregate retrieves the sync contributions from the pool to construct the sync aggregate object.
 // The contributions are filtered based on matching of the input root and slot then profitability.
 func (vs *Server) getSyncAggregate(ctx context.Context, slot primitives.Slot, root [32]byte) (*zondpb.SyncAggregate, error) {

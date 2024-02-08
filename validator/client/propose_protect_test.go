@@ -34,7 +34,7 @@ func Test_slashableProposalCheck_PreventsLowerThanMinProposal(t *testing.T) {
 			ProposerIndex: 0,
 			Body:          &zondpb.BeaconBlockBodyCapella{},
 		},
-		Signature: params.BeaconConfig().EmptySignature[:],
+		Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
 	}
 	wsb, err := blocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
@@ -49,7 +49,7 @@ func Test_slashableProposalCheck_PreventsLowerThanMinProposal(t *testing.T) {
 			ProposerIndex: 0,
 			Body:          &zondpb.BeaconBlockBodyCapella{},
 		},
-		Signature: params.BeaconConfig().EmptySignature[:],
+		Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
 	}
 	wsb, err = blocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
@@ -71,7 +71,7 @@ func Test_slashableProposalCheck_PreventsLowerThanMinProposal(t *testing.T) {
 			ProposerIndex: 0,
 			Body:          &zondpb.BeaconBlockBodyCapella{},
 		},
-		Signature: params.BeaconConfig().EmptySignature[:],
+		Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
 	}
 
 	wsb, err = blocks.NewSignedBeaconBlock(blk)
@@ -91,7 +91,7 @@ func Test_slashableProposalCheck(t *testing.T) {
 			ProposerIndex: 0,
 			Body:          &zondpb.BeaconBlockBodyCapella{},
 		},
-		Signature: params.BeaconConfig().EmptySignature[:],
+		Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
 	})
 
 	var pubKeyBytes [dilithium.CryptoPublicKeyBytes]byte

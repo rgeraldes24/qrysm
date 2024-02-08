@@ -7,7 +7,6 @@ import (
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-zond/common"
-	zondtypes "github.com/theQRL/go-zond/core/types"
 	chainMock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
@@ -25,8 +24,8 @@ import (
 
 func TestServer_getExecutionPayload(t *testing.T) {
 	beaconDB := dbTest.SetupDB(t)
-	nonTransitionSt, _ := util.DeterministicGenesisStateBellatrix(t, 1)
-	b1pb := util.NewBeaconBlock()
+	nonTransitionSt, _ := util.DeterministicGenesisStateCapella(t, 1)
+	b1pb := util.NewBeaconBlockCapella()
 	b1r, err := b1pb.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b1pb)
@@ -34,11 +33,11 @@ func TestServer_getExecutionPayload(t *testing.T) {
 		Root: b1r[:],
 	}))
 
-	transitionSt, _ := util.DeterministicGenesisStateBellatrix(t, 1)
-	wrappedHeader, err := blocks.WrappedExecutionPayloadHeader(&pb.ExecutionPayloadHeader{BlockNumber: 1})
+	transitionSt, _ := util.DeterministicGenesisStateCapella(t, 1)
+	wrappedHeader, err := blocks.WrappedExecutionPayloadHeaderCapella(&pb.ExecutionPayloadHeaderCapella{BlockNumber: 1}, 0)
 	require.NoError(t, err)
 	require.NoError(t, transitionSt.SetLatestExecutionPayloadHeader(wrappedHeader))
-	b2pb := util.NewBeaconBlockBellatrix()
+	b2pb := util.NewBeaconBlockCapella()
 	b2r, err := b2pb.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b2pb)
@@ -127,19 +126,17 @@ func TestServer_getExecutionPayload(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := params.BeaconConfig().Copy()
-			cfg.TerminalBlockHash = tt.terminalBlockHash
-			cfg.TerminalBlockHashActivationEpoch = tt.activationEpoch
 			params.OverrideBeaconConfig(cfg)
 
 			vs := &Server{
-				ExecutionEngineCaller:  &powtesting.EngineClient{PayloadIDBytes: tt.payloadID, ErrForkchoiceUpdated: tt.forkchoiceErr, ExecutionPayload: &pb.ExecutionPayload{}, BuilderOverride: tt.override},
+				ExecutionEngineCaller:  &powtesting.EngineClient{PayloadIDBytes: tt.payloadID, ErrForkchoiceUpdated: tt.forkchoiceErr, ExecutionPayload: &pb.ExecutionPayloadCapella{}, BuilderOverride: tt.override},
 				HeadFetcher:            &chainMock.ChainService{State: tt.st},
 				FinalizationFetcher:    &chainMock.ChainService{},
 				BeaconDB:               beaconDB,
 				ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 			}
 			vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(tt.st.Slot(), 100, [8]byte{100}, [32]byte{'a'})
-			blk := util.NewBeaconBlockBellatrix()
+			blk := util.NewBeaconBlockCapella()
 			blk.Block.Slot = tt.st.Slot()
 			blk.Block.ProposerIndex = tt.validatorIndx
 			blk.Block.ParentRoot = bytesutil.PadTo([]byte{'a'}, 32)
@@ -159,8 +156,8 @@ func TestServer_getExecutionPayload(t *testing.T) {
 
 func TestServer_getExecutionPayloadContextTimeout(t *testing.T) {
 	beaconDB := dbTest.SetupDB(t)
-	nonTransitionSt, _ := util.DeterministicGenesisStateBellatrix(t, 1)
-	b1pb := util.NewBeaconBlock()
+	nonTransitionSt, _ := util.DeterministicGenesisStateCapella(t, 1)
+	b1pb := util.NewBeaconBlockCapella()
 	b1r, err := b1pb.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b1pb)
@@ -170,11 +167,6 @@ func TestServer_getExecutionPayloadContextTimeout(t *testing.T) {
 
 	require.NoError(t, beaconDB.SaveFeeRecipientsByValidatorIDs(context.Background(), []primitives.ValidatorIndex{0}, []common.Address{{}}))
 
-	cfg := params.BeaconConfig().Copy()
-	cfg.TerminalBlockHash = common.Hash{'a'}
-	cfg.TerminalBlockHashActivationEpoch = 1
-	params.OverrideBeaconConfig(cfg)
-
 	vs := &Server{
 		ExecutionEngineCaller:  &powtesting.EngineClient{PayloadIDBytes: &pb.PayloadIDBytes{}, ErrGetPayload: context.DeadlineExceeded, ExecutionPayload: &pb.ExecutionPayload{}},
 		HeadFetcher:            &chainMock.ChainService{State: nonTransitionSt},
@@ -183,7 +175,7 @@ func TestServer_getExecutionPayloadContextTimeout(t *testing.T) {
 	}
 	vs.ProposerSlotIndexCache.SetProposerAndPayloadIDs(nonTransitionSt.Slot(), 100, [8]byte{100}, [32]byte{'a'})
 
-	blk := util.NewBeaconBlockBellatrix()
+	blk := util.NewBeaconBlockCapella()
 	blk.Block.Slot = nonTransitionSt.Slot()
 	blk.Block.ProposerIndex = 100
 	blk.Block.ParentRoot = bytesutil.PadTo([]byte{'a'}, 32)
@@ -196,8 +188,8 @@ func TestServer_getExecutionPayloadContextTimeout(t *testing.T) {
 func TestServer_getExecutionPayload_UnexpectedFeeRecipient(t *testing.T) {
 	hook := logTest.NewGlobal()
 	beaconDB := dbTest.SetupDB(t)
-	nonTransitionSt, _ := util.DeterministicGenesisStateBellatrix(t, 1)
-	b1pb := util.NewBeaconBlock()
+	nonTransitionSt, _ := util.DeterministicGenesisStateCapella(t, 1)
+	b1pb := util.NewBeaconBlockCapella()
 	b1r, err := b1pb.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b1pb)
@@ -205,11 +197,11 @@ func TestServer_getExecutionPayload_UnexpectedFeeRecipient(t *testing.T) {
 		Root: b1r[:],
 	}))
 
-	transitionSt, _ := util.DeterministicGenesisStateBellatrix(t, 1)
-	wrappedHeader, err := blocks.WrappedExecutionPayloadHeader(&pb.ExecutionPayloadHeader{BlockNumber: 1})
+	transitionSt, _ := util.DeterministicGenesisStateCapella(t, 1)
+	wrappedHeader, err := blocks.WrappedExecutionPayloadHeaderCapella(&pb.ExecutionPayloadHeaderCapella{BlockNumber: 1})
 	require.NoError(t, err)
 	require.NoError(t, transitionSt.SetLatestExecutionPayloadHeader(wrappedHeader))
-	b2pb := util.NewBeaconBlockBellatrix()
+	b2pb := util.NewBeaconBlockCapella()
 	b2r, err := b2pb.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, b2pb)
@@ -223,12 +215,12 @@ func TestServer_getExecutionPayload_UnexpectedFeeRecipient(t *testing.T) {
 	}))
 
 	payloadID := &pb.PayloadIDBytes{0x1}
-	payload := emptyPayload()
+	payload := emptyPayloadCapella()
 	payload.FeeRecipient = feeRecipient[:]
 	vs := &Server{
 		ExecutionEngineCaller: &powtesting.EngineClient{
-			PayloadIDBytes:   payloadID,
-			ExecutionPayload: payload,
+			PayloadIDBytes:          payloadID,
+			ExecutionPayloadCapella: payload,
 		},
 		HeadFetcher:            &chainMock.ChainService{State: transitionSt},
 		FinalizationFetcher:    &chainMock.ChainService{},
@@ -236,7 +228,7 @@ func TestServer_getExecutionPayload_UnexpectedFeeRecipient(t *testing.T) {
 		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 	}
 
-	blk := util.NewBeaconBlockBellatrix()
+	blk := util.NewBeaconBlockCapella()
 	blk.Block.Slot = transitionSt.Slot()
 	blk.Block.ParentRoot = bytesutil.PadTo([]byte{}, 32)
 	b, err := blocks.NewSignedBeaconBlock(blk)
@@ -259,103 +251,4 @@ func TestServer_getExecutionPayload_UnexpectedFeeRecipient(t *testing.T) {
 
 	// Users should be warned.
 	require.LogsContain(t, hook, "Fee recipient address from execution client is not what was expected")
-}
-
-func TestServer_getTerminalBlockHashIfExists(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-	tests := []struct {
-		name                  string
-		paramsTerminalHash    []byte
-		paramsTd              string
-		currentPowBlock       *pb.ExecutionBlock
-		parentPowBlock        *pb.ExecutionBlock
-		wantTerminalBlockHash []byte
-		wantExists            bool
-		errString             string
-	}{
-		{
-			name:               "use terminal block hash, doesn't exist",
-			paramsTerminalHash: common.BytesToHash([]byte("a")).Bytes(),
-			errString:          "could not fetch height for hash",
-		},
-		{
-			name: "use terminal block hash, exists",
-			paramsTerminalHash: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			wantExists: true,
-			wantTerminalBlockHash: []byte{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-		},
-		{
-			name:     "use terminal total difficulty",
-			paramsTd: "2",
-			currentPowBlock: &pb.ExecutionBlock{
-				Hash: common.BytesToHash([]byte("a")),
-				Header: zondtypes.Header{
-					ParentHash: common.BytesToHash([]byte("b")),
-				},
-				TotalDifficulty: "0x3",
-			},
-			parentPowBlock: &pb.ExecutionBlock{
-				Hash: common.BytesToHash([]byte("b")),
-				Header: zondtypes.Header{
-					ParentHash: common.BytesToHash([]byte("c")),
-				},
-				TotalDifficulty: "0x1",
-			},
-			wantExists:            true,
-			wantTerminalBlockHash: common.BytesToHash([]byte("a")).Bytes(),
-		},
-		{
-			name:     "use terminal total difficulty but fails timestamp",
-			paramsTd: "2",
-			currentPowBlock: &pb.ExecutionBlock{
-				Hash: common.BytesToHash([]byte("a")),
-				Header: zondtypes.Header{
-					ParentHash: common.BytesToHash([]byte("b")),
-					Time:       1,
-				},
-				TotalDifficulty: "0x3",
-			},
-			parentPowBlock: &pb.ExecutionBlock{
-				Hash: common.BytesToHash([]byte("b")),
-				Header: zondtypes.Header{
-					ParentHash: common.BytesToHash([]byte("c")),
-				},
-				TotalDifficulty: "0x1",
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cfg := params.BeaconConfig().Copy()
-			cfg.TerminalTotalDifficulty = tt.paramsTd
-			cfg.TerminalBlockHash = common.BytesToHash(tt.paramsTerminalHash)
-			params.OverrideBeaconConfig(cfg)
-			var m map[[32]byte]*pb.ExecutionBlock
-			if tt.parentPowBlock != nil {
-				m = map[[32]byte]*pb.ExecutionBlock{
-					tt.parentPowBlock.Hash: tt.parentPowBlock,
-				}
-			}
-			c := powtesting.New()
-			c.HashesByHeight[0] = tt.wantTerminalBlockHash
-			vs := &Server{
-				Eth1BlockFetcher: c,
-				ExecutionEngineCaller: &powtesting.EngineClient{
-					ExecutionBlock: tt.currentPowBlock,
-					BlockByHashMap: m,
-				},
-			}
-			b, e, err := vs.getTerminalBlockHashIfExists(context.Background(), 1)
-			if tt.errString != "" {
-				require.ErrorContains(t, tt.errString, err)
-				require.DeepEqual(t, tt.wantExists, e)
-			} else {
-				require.NoError(t, err)
-				require.DeepEqual(t, tt.wantExists, e)
-				require.DeepEqual(t, tt.wantTerminalBlockHash, b)
-			}
-		})
-	}
 }

@@ -15,9 +15,9 @@ import (
 	"github.com/theQRL/qrysm/v4/time"
 )
 
-// GenerateGenesisStateBellatrix deterministically given a genesis time and number of validators.
+// GenerateGenesisStateCapella deterministically given a genesis time and number of validators.
 // If a genesis time of 0 is supplied it is set to the current time.
-func GenerateGenesisStateBellatrix(ctx context.Context, genesisTime, numValidators uint64, ep *enginev1.ExecutionPayload, ed *zondpb.Eth1Data) (*zondpb.BeaconStateBellatrix, []*zondpb.Deposit, error) {
+func GenerateGenesisStateCapella(ctx context.Context, genesisTime, numValidators uint64, ep *enginev1.ExecutionPayloadCapella, ed *zondpb.Eth1Data) (*zondpb.BeaconStateCapella, []*zondpb.Deposit, error) {
 	privKeys, pubKeys, err := DeterministicallyGenerateKeys(0 /*startIndex*/, numValidators)
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "could not deterministically generate keys for %d validators", numValidators)
@@ -26,14 +26,14 @@ func GenerateGenesisStateBellatrix(ctx context.Context, genesisTime, numValidato
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not generate deposit data from keys")
 	}
-	return GenerateGenesisStateBellatrixFromDepositData(ctx, genesisTime, depositDataItems, depositDataRoots, ep, ed)
+	return GenerateGenesisStateCapellaFromDepositData(ctx, genesisTime, depositDataItems, depositDataRoots, ep, ed)
 }
 
-// GenerateGenesisStateBellatrixFromDepositData creates a genesis state given a list of
+// GenerateGenesisStateCapellaFromDepositData creates a genesis state given a list of
 // deposit data items and their corresponding roots.
-func GenerateGenesisStateBellatrixFromDepositData(
-	ctx context.Context, genesisTime uint64, depositData []*zondpb.Deposit_Data, depositDataRoots [][]byte, ep *enginev1.ExecutionPayload, e1d *zondpb.Eth1Data,
-) (*zondpb.BeaconStateBellatrix, []*zondpb.Deposit, error) {
+func GenerateGenesisStateCapellaFromDepositData(
+	ctx context.Context, genesisTime uint64, depositData []*zondpb.Deposit_Data, depositDataRoots [][]byte, ep *enginev1.ExecutionPayloadCapella, e1d *zondpb.Eth1Data,
+) (*zondpb.BeaconStateCapella, []*zondpb.Deposit, error) {
 	t, err := trie.GenerateTrieFromItems(depositDataRoots, params.BeaconConfig().DepositContractTreeDepth)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not generate Merkle trie for deposit proofs")
@@ -45,16 +45,16 @@ func GenerateGenesisStateBellatrixFromDepositData(
 	if genesisTime == 0 {
 		genesisTime = uint64(time.Now().Unix())
 	}
-	beaconState, err := coreState.GenesisBeaconStateBellatrix(ctx, deposits, genesisTime, e1d, ep)
+	beaconState, err := coreState.GenesisBeaconStateCapella(ctx, deposits, genesisTime, e1d, ep)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not generate genesis state")
 	}
 	bsi := beaconState.ToProtoUnsafe()
-	pbb, ok := bsi.(*zondpb.BeaconStateBellatrix)
+	pbc, ok := bsi.(*zondpb.BeaconStateCapella)
 	if !ok {
 		return nil, nil, errors.New("unexpected BeaconState version")
 	}
-	pbState, err := statenative.ProtobufBeaconStateBellatrix(pbb)
+	pbState, err := statenative.ProtobufBeaconStateCapella(pbc)
 	if err != nil {
 		return nil, nil, err
 	}

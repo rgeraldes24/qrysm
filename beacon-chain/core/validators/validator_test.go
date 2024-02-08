@@ -142,7 +142,7 @@ func TestSlashValidator_OK(t *testing.T) {
 	proposerBal, err := state.BalanceAtIndex(proposer)
 	require.NoError(t, err)
 	cfg := params.BeaconConfig()
-	slashedState, err := SlashValidator(context.Background(), state, slashedIdx, cfg.MinSlashingPenaltyQuotient, cfg.ProposerRewardQuotient)
+	slashedState, err := SlashValidator(context.Background(), state, slashedIdx, cfg.MinSlashingPenaltyQuotientBellatrix, cfg.ProposerRewardQuotient)
 	require.NoError(t, err, "Could not slash validator")
 	require.Equal(t, true, slashedState.Version() == version.Phase0)
 
@@ -164,7 +164,7 @@ func TestSlashValidator_OK(t *testing.T) {
 	require.NoError(t, err)
 	v, err = state.ValidatorAtIndex(slashedIdx)
 	require.NoError(t, err)
-	assert.Equal(t, maxBalance-(v.EffectiveBalance/params.BeaconConfig().MinSlashingPenaltyQuotient), bal, "Did not get expected balance for slashed validator")
+	assert.Equal(t, maxBalance-(v.EffectiveBalance/params.BeaconConfig().MinSlashingPenaltyQuotientBellatrix), bal, "Did not get expected balance for slashed validator")
 }
 
 func TestActivatedValidatorIndices(t *testing.T) {

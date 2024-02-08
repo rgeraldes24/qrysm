@@ -45,8 +45,6 @@ func TestGetSpec(t *testing.T) {
 	config.EjectionBalance = 22
 	config.EffectiveBalanceIncrement = 23
 	config.GenesisForkVersion = []byte("GenesisForkVersion")
-	config.BLSWithdrawalPrefixByte = byte('b')
-	config.ETH1AddressWithdrawalPrefixByte = byte('c')
 	config.GenesisDelay = 24
 	config.SecondsPerSlot = 25
 	config.MinAttestationInclusionDelay = 26
@@ -85,9 +83,6 @@ func TestGetSpec(t *testing.T) {
 	config.EpochsPerSyncCommitteePeriod = 66
 	config.InactivityScoreRecoveryRate = 70
 	config.MinSyncCommitteeParticipants = 71
-	config.TerminalBlockHash = common.HexToHash("TerminalBlockHash")
-	config.TerminalBlockHashActivationEpoch = 72
-	config.TerminalTotalDifficulty = "73"
 	config.DefaultFeeRecipient = common.HexToAddress("DefaultFeeRecipient")
 	config.MaxWithdrawalsPerPayload = 74
 	config.MaxDilithiumToExecutionChanges = 75

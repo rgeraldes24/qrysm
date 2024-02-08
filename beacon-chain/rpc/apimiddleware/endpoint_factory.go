@@ -109,9 +109,10 @@ func (_ *BeaconEndpointFactory) Create(path string) (*apimiddleware.Endpoint, er
 		endpoint.GetResponse = &VersionResponseJson{}
 	case "/zond/v1/node/health":
 		// Use default endpoint
-	case "/zond/v1/debug/beacon/states/{state_id}":
-		endpoint.GetResponse = &BeaconStateResponseJson{}
-		endpoint.CustomHandlers = []apimiddleware.CustomHandler{handleGetBeaconStateSSZ}
+	// TODO(rgeraldes24)
+	// case "/zond/v1/debug/beacon/states/{state_id}":
+	// 	endpoint.GetResponse = &BeaconStateResponseJson{}
+	// 	endpoint.CustomHandlers = []apimiddleware.CustomHandler{handleGetBeaconStateSSZ}
 	case "/zond/v2/debug/beacon/states/{state_id}":
 		endpoint.GetResponse = &BeaconStateV2ResponseJson{}
 		endpoint.Hooks = apimiddleware.HookCollection{

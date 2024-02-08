@@ -735,7 +735,7 @@ func TestLastActivatedValidatorIndex_OK(t *testing.T) {
 	balances := make([]uint64, len(validators))
 	for i := uint64(0); i < 4; i++ {
 		validators[i] = &zondpb.Validator{
-			PublicKey:             make([]byte, params.BeaconConfig().BLSPubkeyLength),
+			PublicKey:             make([]byte, params.BeaconConfig().DilithiumPubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			EffectiveBalance:      32 * 1e9,
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,

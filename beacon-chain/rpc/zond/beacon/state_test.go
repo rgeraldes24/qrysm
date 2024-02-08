@@ -19,7 +19,7 @@ import (
 
 func TestGetStateRoot(t *testing.T) {
 	ctx := context.Background()
-	fakeState, err := util.NewBeaconState()
+	fakeState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	stateRoot, err := fakeState.HashTreeRoot(ctx)
 	require.NoError(t, err)
@@ -46,7 +46,7 @@ func TestGetStateRoot(t *testing.T) {
 
 	t.Run("execution optimistic", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -74,7 +74,7 @@ func TestGetStateRoot(t *testing.T) {
 
 	t.Run("finalized", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -114,7 +114,7 @@ func TestGetRandao(t *testing.T) {
 	epochOld := 100000 - params.BeaconConfig().EpochsPerHistoricalVector + 1
 
 	ctx := context.Background()
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	// Set slot to epoch 100000
 	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*100000))
@@ -122,7 +122,7 @@ func TestGetRandao(t *testing.T) {
 	require.NoError(t, st.UpdateRandaoMixesAtIndex(uint64(epochOld%params.BeaconConfig().EpochsPerHistoricalVector), mixOld))
 
 	headEpoch := primitives.Epoch(1)
-	headSt, err := util.NewBeaconState()
+	headSt, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, headSt.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 	headRandao := bytesutil.ToBytes32([]byte("head"))
@@ -175,7 +175,7 @@ func TestGetRandao(t *testing.T) {
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -201,7 +201,7 @@ func TestGetRandao(t *testing.T) {
 	})
 	t.Run("finalized", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)

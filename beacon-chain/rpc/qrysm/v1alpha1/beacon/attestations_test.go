@@ -44,7 +44,7 @@ func TestServer_ListAttestations_NoResults(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
 
-	st, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Slot: 0,
 	})
 	require.NoError(t, err)
@@ -72,7 +72,7 @@ func TestServer_ListAttestations_Genesis(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
 
-	st, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Slot: 0,
 	})
 	require.NoError(t, err)
@@ -92,7 +92,7 @@ func TestServer_ListAttestations_Genesis(t *testing.T) {
 	})
 
 	parentRoot := [32]byte{1, 2, 3}
-	signedBlock := util.NewBeaconBlock()
+	signedBlock := util.NewBeaconBlockCapella()
 	signedBlock.Block.ParentRoot = bytesutil.PadTo(parentRoot[:], 32)
 	signedBlock.Block.Body.Attestations = []*zondpb.Attestation{att}
 	root, err := signedBlock.Block.HashTreeRoot()
@@ -121,10 +121,10 @@ func TestServer_ListAttestations_NoPagination(t *testing.T) {
 	count := primitives.Slot(8)
 	atts := make([]*zondpb.Attestation, 0, count)
 	for i := primitives.Slot(0); i < count; i++ {
-		blockExample := util.NewBeaconBlock()
+		blockExample := util.NewBeaconBlockCapella()
 		blockExample.Block.Body.Attestations = []*zondpb.Attestation{
 			{
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signatures: make([]byte, dilithium2.CryptoBytes),
 				Data: &zondpb.AttestationData{
 					Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
 					Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
@@ -161,12 +161,12 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 	targetRoot := [32]byte{7, 8, 9}
 	targetEpoch := primitives.Epoch(7)
 
-	unwrappedBlocks := []*zondpb.SignedBeaconBlock{
-		util.HydrateSignedBeaconBlock(
-			&zondpb.SignedBeaconBlock{
-				Block: &zondpb.BeaconBlock{
+	unwrappedBlocks := []*zondpb.SignedBeaconBlockCapella{
+		util.HydrateSignedBeaconBlockCapella(
+			&zondpb.SignedBeaconBlockCapella{
+				Block: &zondpb.BeaconBlockCapella{
 					Slot: 4,
-					Body: &zondpb.BeaconBlockBody{
+					Body: &zondpb.BeaconBlockBodyCapella{
 						Attestations: []*zondpb.Attestation{
 							{
 								Data: &zondpb.AttestationData{
@@ -182,16 +182,16 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 									Slot: 3,
 								},
 								AggregationBits: bitfield.Bitlist{0b11},
-								Signature:       bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes),
+								Signatures:      bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes),
 							},
 						},
 					},
 				},
 			}),
-		util.HydrateSignedBeaconBlock(&zondpb.SignedBeaconBlock{
-			Block: &zondpb.BeaconBlock{
+		util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{
+			Block: &zondpb.BeaconBlockCapella{
 				Slot: 5 + params.BeaconConfig().SlotsPerEpoch,
-				Body: &zondpb.BeaconBlockBody{
+				Body: &zondpb.BeaconBlockBodyCapella{
 					Attestations: []*zondpb.Attestation{
 						{
 							Data: &zondpb.AttestationData{
@@ -207,17 +207,17 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 								Slot: 4 + params.BeaconConfig().SlotsPerEpoch,
 							},
 							AggregationBits: bitfield.Bitlist{0b11},
-							Signature:       bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes),
+							Signatures:      bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes),
 						},
 					},
 				},
 			},
 		}),
-		util.HydrateSignedBeaconBlock(
-			&zondpb.SignedBeaconBlock{
-				Block: &zondpb.BeaconBlock{
+		util.HydrateSignedBeaconBlockCapella(
+			&zondpb.SignedBeaconBlockCapella{
+				Block: &zondpb.BeaconBlockCapella{
 					Slot: 5,
-					Body: &zondpb.BeaconBlockBody{
+					Body: &zondpb.BeaconBlockBodyCapella{
 						Attestations: []*zondpb.Attestation{
 							{
 								Data: &zondpb.AttestationData{
@@ -233,7 +233,7 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 									Slot: 4,
 								},
 								AggregationBits: bitfield.Bitlist{0b11},
-								Signature:       bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes),
+								Signatures:      bytesutil.PadTo([]byte("sig"), dilithium2.CryptoBytes),
 							},
 						},
 					},
@@ -274,7 +274,7 @@ func TestServer_ListAttestations_Pagination_CustomPageParameters(t *testing.T) {
 	atts := make([]*zondpb.Attestation, 0, count)
 	for i := primitives.Slot(0); i < params.BeaconConfig().SlotsPerEpoch; i++ {
 		for s := primitives.CommitteeIndex(0); s < 4; s++ {
-			blockExample := util.NewBeaconBlock()
+			blockExample := util.NewBeaconBlockCapella()
 			blockExample.Block.Slot = i
 			blockExample.Block.Body.Attestations = []*zondpb.Attestation{
 				util.HydrateAttestation(&zondpb.Attestation{
@@ -372,13 +372,13 @@ func TestServer_ListAttestations_Pagination_CustomPageParameters(t *testing.T) {
 func TestServer_ListAttestations_Pagination_OutOfRange(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
-	util.NewBeaconBlock()
+	util.NewBeaconBlockCapella()
 	count := primitives.Slot(1)
 	atts := make([]*zondpb.Attestation, 0, count)
 	for i := primitives.Slot(0); i < count; i++ {
-		blockExample := util.HydrateSignedBeaconBlock(&zondpb.SignedBeaconBlock{
-			Block: &zondpb.BeaconBlock{
-				Body: &zondpb.BeaconBlockBody{
+		blockExample := util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{
+			Block: &zondpb.BeaconBlockCapella{
+				Body: &zondpb.BeaconBlockBodyCapella{
 					Attestations: []*zondpb.Attestation{
 						{
 							Data: &zondpb.AttestationData{
@@ -388,7 +388,7 @@ func TestServer_ListAttestations_Pagination_OutOfRange(t *testing.T) {
 								Slot:            i,
 							},
 							AggregationBits: bitfield.Bitlist{0b11},
-							Signature:       make([]byte, dilithium2.CryptoBytes),
+							Signatures:      make([]byte, dilithium2.CryptoBytes),
 						},
 					},
 				},
@@ -432,7 +432,7 @@ func TestServer_ListAttestations_Pagination_DefaultPageSize(t *testing.T) {
 	count := primitives.Slot(params.BeaconConfig().DefaultPageSize)
 	atts := make([]*zondpb.Attestation, 0, count)
 	for i := primitives.Slot(0); i < count; i++ {
-		blockExample := util.NewBeaconBlock()
+		blockExample := util.NewBeaconBlockCapella()
 		blockExample.Block.Body.Attestations = []*zondpb.Attestation{
 			{
 				Data: &zondpb.AttestationData{
@@ -441,7 +441,7 @@ func TestServer_ListAttestations_Pagination_DefaultPageSize(t *testing.T) {
 					Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
 					Slot:            i,
 				},
-				Signature:       bytesutil.PadTo([]byte("root"), dilithium2.CryptoBytes),
+				Signatures:      bytesutil.PadTo([]byte("root"), dilithium2.CryptoBytes),
 				AggregationBits: bitfield.Bitlist{0b11},
 			},
 		}
@@ -517,10 +517,10 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 		} else {
 			targetRoot = targetRoot2
 		}
-		blockExample := util.NewBeaconBlock()
+		blockExample := util.NewBeaconBlockCapella()
 		blockExample.Block.Body.Attestations = []*zondpb.Attestation{
 			{
-				Signature: make([]byte, dilithium2.CryptoBytes),
+				Signatures: make([]byte, dilithium2.CryptoBytes),
 				Data: &zondpb.AttestationData{
 					BeaconBlockRoot: make([]byte, fieldparams.RootLength),
 					Target: &zondpb.Checkpoint{
@@ -620,9 +620,9 @@ func TestServer_ListIndexedAttestations_OldEpoch(t *testing.T) {
 	require.NoError(t, err)
 
 	for i := startSlot; i < count; i++ {
-		blockExample := &zondpb.SignedBeaconBlock{
-			Block: &zondpb.BeaconBlock{
-				Body: &zondpb.BeaconBlockBody{
+		blockExample := &zondpb.SignedBeaconBlockCapella{
+			Block: &zondpb.BeaconBlockCapella{
+				Body: &zondpb.BeaconBlockBodyCapella{
 					Attestations: []*zondpb.Attestation{
 						{
 							Data: &zondpb.AttestationData{
@@ -714,7 +714,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{1}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
-			Signature:       bytesutil.PadTo([]byte{1}, dilithium2.CryptoBytes),
+			Signatures:      bytesutil.PadTo([]byte{1}, dilithium2.CryptoBytes),
 		},
 		{
 			Data: &zondpb.AttestationData{
@@ -724,7 +724,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{2}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
-			Signature:       bytesutil.PadTo([]byte{2}, dilithium2.CryptoBytes),
+			Signatures:      bytesutil.PadTo([]byte{2}, dilithium2.CryptoBytes),
 		},
 		{
 			Data: &zondpb.AttestationData{
@@ -734,7 +734,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{3}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
-			Signature:       bytesutil.PadTo([]byte{3}, dilithium2.CryptoBytes),
+			Signatures:      bytesutil.PadTo([]byte{3}, dilithium2.CryptoBytes),
 		},
 	}
 	require.NoError(t, bs.AttestationsPool.SaveAggregatedAttestations(atts))
@@ -863,7 +863,7 @@ func TestServer_StreamIndexedAttestations_OK(t *testing.T) {
 
 	numValidators := 64
 	headState, privKeys := util.DeterministicGenesisState(t, uint64(numValidators))
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, ctx, db, b)
 	gRoot, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -921,7 +921,7 @@ func TestServer_StreamIndexedAttestations_OK(t *testing.T) {
 			encoded, err := signing.ComputeSigningRoot(attExample.Data, domain)
 			require.NoError(t, err)
 			sig := privKeys[j].Sign(encoded[:])
-			attExample.Signature = sig.Marshal()
+			attExample.Signatures = sig.Marshal()
 			attExample.Data.CommitteeIndex = committeeIndex
 			aggregationBitfield := bitfield.NewBitlist(uint64(committeeLength))
 			aggregationBitfield.SetBitAt(indexInCommittee, true)

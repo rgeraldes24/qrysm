@@ -145,14 +145,6 @@ func (s *PremineGenesisConfig) empty() (state.BeaconState, error) {
 	if err = e.SetEth1DataVotes([]*zondpb.Eth1Data{}); err != nil {
 		return nil, err
 	}
-	if s.Version == version.Phase0 {
-		if err = e.SetCurrentEpochAttestations([]*zondpb.PendingAttestation{}); err != nil {
-			return nil, err
-		}
-		if err = e.SetPreviousEpochAttestations([]*zondpb.PendingAttestation{}); err != nil {
-			return nil, err
-		}
-	}
 	return e.Copy(), nil
 }
 
@@ -367,8 +359,8 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 			},
 			Graffiti: make([]byte, 32),
 			SyncAggregate: &zondpb.SyncAggregate{
-				SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-				SyncCommitteeSignature: make([]byte, dilithiumlib.CryptoBytes),
+				SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
+				SyncCommitteeSignatures: make([]byte, dilithiumlib.CryptoBytes),
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 				ParentHash:    make([]byte, 32),

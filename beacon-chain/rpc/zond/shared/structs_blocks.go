@@ -104,12 +104,12 @@ type BeaconBlockHeader struct {
 type IndexedAttestation struct {
 	AttestingIndices []string         `json:"attesting_indices" validate:"required,dive"`
 	Data             *AttestationData `json:"data" validate:"required"`
-	Signature        string           `json:"signature" validate:"required"`
+	Signatures       []string         `json:"signatures" validate:"required"`
 }
 
 type SyncAggregate struct {
-	SyncCommitteeBits      string `json:"sync_committee_bits" validate:"required"`
-	SyncCommitteeSignature string `json:"sync_committee_signature" validate:"required"`
+	SyncCommitteeBits       string   `json:"sync_committee_bits" validate:"required"`
+	SyncCommitteeSignatures []string `json:"sync_committee_signatures" validate:"required"`
 }
 
 type ExecutionPayload struct {

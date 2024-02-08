@@ -615,7 +615,7 @@ func TestStore_CleanUpDirtyStates_DontDeleteNonFinalized(t *testing.T) {
 func validators(limit int) []*zondpb.Validator {
 	var vals []*zondpb.Validator
 	for i := 0; i < limit; i++ {
-		pubKey := make([]byte, params.BeaconConfig().BLSPubkeyLength)
+		pubKey := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, rand.Uint64())
 		val := &zondpb.Validator{
 			PublicKey:                  pubKey,

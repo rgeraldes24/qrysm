@@ -95,11 +95,11 @@ func (s *Service) Start() {
 		if err != nil {
 			log.WithError(err).Fatal("Could not read pre-loaded state")
 		}
-		genesisState := &zondpb.BeaconState{}
+		genesisState := &zondpb.BeaconStateCapella{}
 		if err := genesisState.UnmarshalSSZ(data); err != nil {
 			log.WithError(err).Fatal("Could not unmarshal pre-loaded state")
 		}
-		genesisTrie, err := state_native.InitializeFromProtoPhase0(genesisState)
+		genesisTrie, err := state_native.InitializeFromProtoCapella(genesisState)
 		if err != nil {
 			log.WithError(err).Fatal("Could not get state trie")
 		}
@@ -114,7 +114,7 @@ func (s *Service) Start() {
 	if err != nil {
 		log.WithError(err).Fatal("Could not generate interop genesis state")
 	}
-	genesisTrie, err := state_native.InitializeFromProtoPhase0(genesisState)
+	genesisTrie, err := state_native.InitializeFromProtoCapella(genesisState)
 	if err != nil {
 		log.WithError(err).Fatal("Could not get state trie")
 	}

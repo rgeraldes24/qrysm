@@ -50,7 +50,7 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 			bytesutil.ToBytes48([]byte{2}),
 			bytesutil.ToBytes48([]byte{3}),
 		}
-		headState, err := util.NewBeaconState()
+		headState, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
 		headState = setHeadState(t, headState, publicKeys)
 		require.NoError(t, headState.SetBalances([]uint64{100, 101, 102}))
@@ -107,7 +107,7 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 			bytesutil.ToBytes48([]byte{2}),
 			bytesutil.ToBytes48([]byte{3}),
 		}
-		headState, err := util.NewBeaconState()
+		headState, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
 		headState = setHeadState(t, headState, publicKeys)
 
@@ -172,7 +172,7 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 			bytesutil.ToBytes48([]byte{2}),
 			bytesutil.ToBytes48([]byte{3}),
 		}
-		headState, err := util.NewBeaconState()
+		headState, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
 		headState = setHeadState(t, headState, publicKeys)
 

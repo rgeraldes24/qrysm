@@ -25,7 +25,7 @@ func TestCorrect_ActiveValidatorsCount(t *testing.T) {
 		ctx: context.Background(),
 		cfg: &Config{DB: db},
 	}
-	bState, err := util.NewBeaconState(func(state *zondpb.BeaconState) error {
+	bState, err := util.NewBeaconStateCapella(func(state *zondpb.BeaconStateCapella) error {
 		validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 		for i := 0; i < len(validators); i++ {
 			validators[i] = &zondpb.Validator{

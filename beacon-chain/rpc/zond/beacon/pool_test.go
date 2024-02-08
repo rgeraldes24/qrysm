@@ -34,7 +34,7 @@ import (
 )
 
 func TestListPoolAttesterSlashings(t *testing.T) {
-	bs, err := util.NewBeaconState()
+	bs, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	slashing1 := &zondpbv1alpha1.AttesterSlashing{
 		Attestation_1: &zondpbv1alpha1.IndexedAttestation{
@@ -52,7 +52,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 				},
 			},
-			Signature: bytesutil.PadTo([]byte("signature1"), 96),
+			Signatures: bytesutil.PadTo([]byte("signature1"), 96),
 		},
 		Attestation_2: &zondpbv1alpha1.IndexedAttestation{
 			AttestingIndices: []uint64{2, 20},
@@ -69,7 +69,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signature: bytesutil.PadTo([]byte("signature2"), 96),
+			Signatures: bytesutil.PadTo([]byte("signature2"), 96),
 		},
 	}
 	slashing2 := &zondpbv1alpha1.AttesterSlashing{
@@ -88,7 +88,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot3"), 32),
 				},
 			},
-			Signature: bytesutil.PadTo([]byte("signature3"), 96),
+			Signatures: bytesutil.PadTo([]byte("signature3"), 96),
 		},
 		Attestation_2: &zondpbv1alpha1.IndexedAttestation{
 			AttestingIndices: []uint64{4, 40},
@@ -105,7 +105,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot4"), 32),
 				},
 			},
-			Signature: bytesutil.PadTo([]byte("signature4"), 96),
+			Signatures: bytesutil.PadTo([]byte("signature4"), 96),
 		},
 	}
 
@@ -192,7 +192,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 	validator := &zondpbv1alpha1.Validator{
 		PublicKey: keys[0].PublicKey().Marshal(),
 	}
-	bs, err := util.NewBeaconState(func(state *zondpbv1alpha1.BeaconState) error {
+	bs, err := util.NewBeaconStateCapella(func(state *zondpbv1alpha1.BeaconStateCapella) error {
 		state.Validators = []*zondpbv1alpha1.Validator{validator}
 		return nil
 	})
@@ -214,7 +214,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 				},
 			},
-			Signature: make([]byte, 96),
+			Signatures: make([]byte, 96),
 		},
 		Attestation_2: &zondpbv1.IndexedAttestation{
 			AttestingIndices: []uint64{0},
@@ -231,7 +231,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signature: make([]byte, 96),
+			Signatures: make([]byte, 96),
 		},
 	}
 
@@ -240,7 +240,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 		require.NoError(t, err)
 		sig, err := dilithium.SignatureFromBytes(sb)
 		require.NoError(t, err)
-		att.Signature = sig.Marshal()
+		att.Signatures = sig.Marshal()
 	}
 
 	broadcaster := &p2pMock.MockBroadcaster{}
@@ -307,7 +307,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signature: make([]byte, 96),
+			Signatures: make([]byte, 96),
 		},
 	}
 
@@ -320,7 +320,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 		require.NoError(t, err)
 		sig, err := dilithium.SignatureFromBytes(sb)
 		require.NoError(t, err)
-		att.Signature = sig.Marshal()
+		att.Signatures = sig.Marshal()
 	}
 
 	broadcaster := &p2pMock.MockBroadcaster{}
@@ -347,7 +347,7 @@ func TestSubmitAttesterSlashing_InvalidSlashing(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
 
-	bs, err := util.NewBeaconState()
+	bs, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
 	attestation := &zondpbv1.IndexedAttestation{
@@ -365,7 +365,7 @@ func TestSubmitAttesterSlashing_InvalidSlashing(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
-		Signature: make([]byte, 96),
+		Signatures: make([]byte, 96),
 	}
 
 	slashing := &zondpbv1.AttesterSlashing{
@@ -397,7 +397,7 @@ func TestSubmitProposerSlashing_Ok(t *testing.T) {
 		PublicKey:         keys[0].PublicKey().Marshal(),
 		WithdrawableEpoch: primitives.Epoch(1),
 	}
-	bs, err := util.NewBeaconState(func(state *zondpbv1alpha1.BeaconState) error {
+	bs, err := util.NewBeaconStateCapella(func(state *zondpbv1alpha1.BeaconStateCapella) error {
 		state.Validators = []*zondpbv1alpha1.Validator{validator}
 		return nil
 	})
@@ -536,7 +536,7 @@ func TestSubmitProposerSlashing_InvalidSlashing(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
 
-	bs, err := util.NewBeaconState()
+	bs, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
 	header := &zondpbv1.SignedBeaconBlockHeader{

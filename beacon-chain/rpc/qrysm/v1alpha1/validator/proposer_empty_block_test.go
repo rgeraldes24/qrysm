@@ -13,11 +13,6 @@ import (
 
 func Test_getEmptyBlock(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	config := params.BeaconConfig()
-	config.AltairForkEpoch = 1
-	config.BellatrixForkEpoch = 2
-	config.CapellaForkEpoch = 3
-	params.OverrideBeaconConfig(config)
 
 	tests := []struct {
 		name string
@@ -26,7 +21,7 @@ func Test_getEmptyBlock(t *testing.T) {
 	}{
 		{
 			name: "capella",
-			slot: primitives.Slot(params.BeaconConfig().CapellaForkEpoch) * params.BeaconConfig().SlotsPerEpoch,
+			slot: primitives.Slot(0),
 			want: func() interfaces.ReadOnlySignedBeaconBlock {
 				b, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{}}})
 				require.NoError(t, err)

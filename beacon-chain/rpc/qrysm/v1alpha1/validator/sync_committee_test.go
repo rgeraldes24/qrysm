@@ -38,9 +38,6 @@ func TestGetSyncMessageBlockRoot_OK(t *testing.T) {
 
 func TestGetSyncMessageBlockRoot_Optimistic(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.BellatrixForkEpoch = 0
-	params.OverrideBeaconConfig(cfg)
 
 	server := &Server{
 		HeadFetcher:           &mock.ChainService{},
@@ -106,7 +103,7 @@ func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 }
 
 func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, 10)
+	st, _ := util.DeterministicGenesisStateCapella(t, 10)
 	syncCommitteePool := synccommittee.NewStore()
 	headFetcher := &mock.ChainService{
 		State:                st,

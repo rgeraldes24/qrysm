@@ -4,7 +4,7 @@ go_library(
     name = "go_default_library",
     srcs = [
         "generate_genesis_state.go",
-        "generate_genesis_state_bellatrix.go",
+        "generate_genesis_state_capella.go",
         "generate_keys.go",
         "genesis.go",
         "premine-state.go",
@@ -48,7 +48,7 @@ go_library(
 go_test(
     name = "go_default_test",
     srcs = [
-        "generate_genesis_state_bellatrix_test.go",
+        "generate_genesis_state_capella_test.go",
         "generate_genesis_state_test.go",
         "generate_keys_test.go",
     ],
