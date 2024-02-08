@@ -130,7 +130,7 @@ func TestBeaconState_AppendBalanceWithTrie(t *testing.T) {
 }
 
 func TestBeaconState_ModifyPreviousParticipationBits(t *testing.T) {
-	st, err := InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	st, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{})
 	assert.NoError(t, err)
 	assert.ErrorContains(t, "ModifyPreviousParticipationBits is not supported", st.ModifyPreviousParticipationBits(func(val []byte) ([]byte, error) {
 		return nil, nil
@@ -138,7 +138,7 @@ func TestBeaconState_ModifyPreviousParticipationBits(t *testing.T) {
 }
 
 func TestBeaconState_ModifyCurrentParticipationBits(t *testing.T) {
-	st, err := InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	st, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{})
 	assert.NoError(t, err)
 	assert.ErrorContains(t, "ModifyCurrentParticipationBits is not supported", st.ModifyCurrentParticipationBits(func(val []byte) ([]byte, error) {
 		return nil, nil
@@ -228,7 +228,7 @@ func generateState(t *testing.T) state.BeaconState {
 	for i := 0; i < len(mockrandaoMixes); i++ {
 		mockrandaoMixes[i] = zeroHash[:]
 	}
-	newState, err := InitializeFromProtoPhase0(&zondpb.BeaconState{
+	newState, err := InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Slot:                  1,
 		GenesisValidatorsRoot: make([]byte, 32),
 		Fork: &zondpb.Fork{

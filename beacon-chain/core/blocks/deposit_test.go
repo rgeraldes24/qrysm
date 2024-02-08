@@ -26,9 +26,9 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 	require.NoError(t, err)
 	eth1Data, err := util.DeterministicEth1Data(len(dep))
 	require.NoError(t, err)
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			// 3 deposits from the same validator
 			Deposits: []*zondpb.Deposit{dep[0], dep[1], dep[2]},
 		},
@@ -40,7 +40,7 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Balances:   balances,
 		Eth1Data:   eth1Data,
@@ -74,13 +74,13 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 	require.NoError(t, err, "Could not generate proof")
 
 	deposit.Proof = proof
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			Deposits: []*zondpb.Deposit{deposit},
 		},
 	}
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Eth1Data: &zondpb.Eth1Data{
 			DepositRoot: []byte{0},
 			BlockHash:   []byte{1},
@@ -98,9 +98,9 @@ func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {
 	eth1Data, err := util.DeterministicEth1Data(len(dep))
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			Deposits: []*zondpb.Deposit{dep[0]},
 		},
 	}
@@ -111,7 +111,7 @@ func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Balances:   balances,
 		Eth1Data:   eth1Data,
@@ -157,9 +157,9 @@ func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T)
 	require.NoError(t, err, "Could not generate proof")
 
 	deposit.Proof = proof
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			Deposits: []*zondpb.Deposit{deposit},
 		},
 	}
@@ -175,7 +175,7 @@ func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T)
 	balances := []uint64{0, 50}
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Balances:   balances,
 		Eth1Data: &zondpb.Eth1Data{
@@ -203,7 +203,7 @@ func TestProcessDeposit_AddsNewValidatorDeposit(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Balances:   balances,
 		Eth1Data:   eth1Data,
@@ -247,7 +247,7 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Balances:   balances,
 		Eth1Data:   eth1Data,
@@ -305,7 +305,7 @@ func TestPreGenesisDeposits_SkipInvalidDeposit(t *testing.T) {
 		},
 	}
 	balances := []uint64{0}
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Balances:   balances,
 		Eth1Data:   eth1Data,
@@ -383,7 +383,7 @@ func TestProcessDeposit_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T) 
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Balances:   balances,
 		Eth1Data: &zondpb.Eth1Data{

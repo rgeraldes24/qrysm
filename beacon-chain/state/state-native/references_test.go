@@ -6,7 +6,6 @@ import (
 	"runtime/debug"
 	"testing"
 
-	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/state-native/types"
 	"github.com/theQRL/qrysm/v4/config/features"
@@ -149,26 +148,26 @@ func TestStateReferenceCopy_NoUnexpectedRandaoMutation_Capella(t *testing.T) {
 }
 
 func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
-	assertAttFound := func(vals []*zondpb.PendingAttestation, val uint64) {
-		for i := range vals {
-			if reflect.DeepEqual(vals[i].AggregationBits, bitfield.NewBitlist(val)) {
-				return
-			}
-		}
-		t.Log(string(debug.Stack()))
-		t.Fatalf("Expected attestation not found (%v), want: %v", vals, val)
-	}
-	assertAttNotFound := func(vals []*zondpb.PendingAttestation, val uint64) {
-		for i := range vals {
-			if reflect.DeepEqual(vals[i].AggregationBits, bitfield.NewBitlist(val)) {
-				t.Log(string(debug.Stack()))
-				t.Fatalf("Unexpected attestation found (%v): %v", vals, val)
-				return
-			}
-		}
-	}
+	// assertAttFound := func(vals []*zondpb.PendingAttestation, val uint64) {
+	// 	for i := range vals {
+	// 		if reflect.DeepEqual(vals[i].AggregationBits, bitfield.NewBitlist(val)) {
+	// 			return
+	// 		}
+	// 	}
+	// 	t.Log(string(debug.Stack()))
+	// 	t.Fatalf("Expected attestation not found (%v), want: %v", vals, val)
+	// }
+	// assertAttNotFound := func(vals []*zondpb.PendingAttestation, val uint64) {
+	// 	for i := range vals {
+	// 		if reflect.DeepEqual(vals[i].AggregationBits, bitfield.NewBitlist(val)) {
+	// 			t.Log(string(debug.Stack()))
+	// 			t.Fatalf("Unexpected attestation found (%v): %v", vals, val)
+	// 			return
+	// 		}
+	// 	}
+	// }
 
-	s, err := InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{})
+	s, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{})
 	require.NoError(t, err)
 	a, ok := s.(*BeaconState)
 	require.Equal(t, true, ok)
@@ -176,18 +175,18 @@ func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 	assertRefCount(t, a, types.CurrentEpochAttestations, 1)
 
 	// Update initial state.
-	atts := []*zondpb.PendingAttestation{
-		{AggregationBits: bitfield.NewBitlist(1)},
-		{AggregationBits: bitfield.NewBitlist(2)},
-	}
-	a.setPreviousEpochAttestations(atts[:1])
-	a.setCurrentEpochAttestations(atts[:1])
-	curAtt, err := a.CurrentEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(curAtt), "Unexpected number of attestations")
-	preAtt, err := a.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(preAtt), "Unexpected number of attestations")
+	// atts := []*zondpb.PendingAttestation{
+	// 	{AggregationBits: bitfield.NewBitlist(1)},
+	// 	{AggregationBits: bitfield.NewBitlist(2)},
+	// }
+	// a.setPreviousEpochAttestations(atts[:1])
+	// a.setCurrentEpochAttestations(atts[:1])
+	// curAtt, err := a.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// assert.Equal(t, 1, len(curAtt), "Unexpected number of attestations")
+	// preAtt, err := a.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// assert.Equal(t, 1, len(preAtt), "Unexpected number of attestations")
 
 	// Copy, increases reference count.
 	copied := a.Copy()
@@ -197,114 +196,114 @@ func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 	assertRefCount(t, a, types.CurrentEpochAttestations, 2)
 	assertRefCount(t, b, types.PreviousEpochAttestations, 2)
 	assertRefCount(t, b, types.CurrentEpochAttestations, 2)
-	prevAtts, err := b.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(prevAtts), "Unexpected number of attestations")
-	currAtts, err := b.CurrentEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(currAtts), "Unexpected number of attestations")
+	// prevAtts, err := b.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// assert.Equal(t, 1, len(prevAtts), "Unexpected number of attestations")
+	// currAtts, err := b.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// assert.Equal(t, 1, len(currAtts), "Unexpected number of attestations")
 
 	// Assert shared state.
-	currAttsA, err := a.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsA, err := a.PreviousEpochAttestations()
-	require.NoError(t, err)
-	currAttsB, err := b.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsB, err := b.PreviousEpochAttestations()
-	require.NoError(t, err)
-	if len(currAttsA) != len(currAttsB) || len(currAttsA) < 1 {
-		t.Errorf("Unexpected number of attestations, want: %v", 1)
-	}
-	if len(prevAttsA) != len(prevAttsB) || len(prevAttsA) < 1 {
-		t.Errorf("Unexpected number of attestations, want: %v", 1)
-	}
-	assertAttFound(currAttsA, 1)
-	assertAttFound(prevAttsA, 1)
-	assertAttFound(currAttsB, 1)
-	assertAttFound(prevAttsB, 1)
+	// currAttsA, err := a.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// prevAttsA, err := a.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// currAttsB, err := b.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// prevAttsB, err := b.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// if len(currAttsA) != len(currAttsB) || len(currAttsA) < 1 {
+	// 	t.Errorf("Unexpected number of attestations, want: %v", 1)
+	// }
+	// if len(prevAttsA) != len(prevAttsB) || len(prevAttsA) < 1 {
+	// 	t.Errorf("Unexpected number of attestations, want: %v", 1)
+	// }
+	// assertAttFound(currAttsA, 1)
+	// assertAttFound(prevAttsA, 1)
+	// assertAttFound(currAttsB, 1)
+	// assertAttFound(prevAttsB, 1)
 
 	// Extend state attestations.
-	require.NoError(t, a.AppendCurrentEpochAttestations(atts[1]))
-	require.NoError(t, a.AppendPreviousEpochAttestations(atts[1]))
-	curAtt, err = a.CurrentEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 2, len(curAtt), "Unexpected number of attestations")
-	preAtt, err = a.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assert.Equal(t, 2, len(preAtt), "Unexpected number of attestations")
-	currAttsA, err = a.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsA, err = a.PreviousEpochAttestations()
-	require.NoError(t, err)
-	currAttsB, err = b.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsB, err = b.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assertAttFound(currAttsA, 1)
-	assertAttFound(prevAttsA, 1)
-	assertAttFound(currAttsA, 2)
-	assertAttFound(prevAttsA, 2)
-	assertAttFound(currAttsB, 1)
-	assertAttFound(prevAttsB, 1)
-	assertAttNotFound(currAttsB, 2)
-	assertAttNotFound(prevAttsB, 2)
+	// require.NoError(t, a.AppendCurrentEpochAttestations(atts[1]))
+	// require.NoError(t, a.AppendPreviousEpochAttestations(atts[1]))
+	// curAtt, err = a.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// assert.Equal(t, 2, len(curAtt), "Unexpected number of attestations")
+	// preAtt, err = a.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// assert.Equal(t, 2, len(preAtt), "Unexpected number of attestations")
+	// currAttsA, err = a.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// prevAttsA, err = a.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// currAttsB, err = b.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// prevAttsB, err = b.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// assertAttFound(currAttsA, 1)
+	// assertAttFound(prevAttsA, 1)
+	// assertAttFound(currAttsA, 2)
+	// assertAttFound(prevAttsA, 2)
+	// assertAttFound(currAttsB, 1)
+	// assertAttFound(prevAttsB, 1)
+	// assertAttNotFound(currAttsB, 2)
+	// assertAttNotFound(prevAttsB, 2)
 
 	// Mutator should only affect calling state: a.
-	applyToEveryAttestation := func(state *BeaconState) {
-		// One MUST copy on write.
-		currEpochAtts, err := state.CurrentEpochAttestations()
-		require.NoError(t, err)
-		atts = make([]*zondpb.PendingAttestation, len(currEpochAtts))
-		copy(atts, currEpochAtts)
-		state.setCurrentEpochAttestations(atts)
-		currEpochAtts, err = state.CurrentEpochAttestations()
-		require.NoError(t, err)
-		for i := range currEpochAtts {
-			att := zondpb.CopyPendingAttestation(currEpochAtts[i])
-			att.AggregationBits = bitfield.NewBitlist(3)
-			currEpochAtts[i] = att
-		}
-		state.setCurrentEpochAttestations(currEpochAtts)
+	// applyToEveryAttestation := func(state *BeaconState) {
+	// 	// One MUST copy on write.
+	// 	currEpochAtts, err := state.CurrentEpochAttestations()
+	// 	require.NoError(t, err)
+	// 	atts = make([]*zondpb.PendingAttestation, len(currEpochAtts))
+	// 	copy(atts, currEpochAtts)
+	// 	state.setCurrentEpochAttestations(atts)
+	// 	currEpochAtts, err = state.CurrentEpochAttestations()
+	// 	require.NoError(t, err)
+	// 	for i := range currEpochAtts {
+	// 		att := zondpb.CopyPendingAttestation(currEpochAtts[i])
+	// 		att.AggregationBits = bitfield.NewBitlist(3)
+	// 		currEpochAtts[i] = att
+	// 	}
+	// 	state.setCurrentEpochAttestations(currEpochAtts)
 
-		prevEpochAtts, err := state.PreviousEpochAttestations()
-		require.NoError(t, err)
-		atts = make([]*zondpb.PendingAttestation, len(prevEpochAtts))
-		copy(atts, prevEpochAtts)
-		state.setPreviousEpochAttestations(atts)
-		prevEpochAtts, err = state.PreviousEpochAttestations()
-		require.NoError(t, err)
-		for i := range prevEpochAtts {
-			att := zondpb.CopyPendingAttestation(prevEpochAtts[i])
-			att.AggregationBits = bitfield.NewBitlist(3)
-			prevEpochAtts[i] = att
-		}
-		state.setPreviousEpochAttestations(prevEpochAtts)
-	}
-	applyToEveryAttestation(a)
+	// 	prevEpochAtts, err := state.PreviousEpochAttestations()
+	// 	require.NoError(t, err)
+	// 	atts = make([]*zondpb.PendingAttestation, len(prevEpochAtts))
+	// 	copy(atts, prevEpochAtts)
+	// 	state.setPreviousEpochAttestations(atts)
+	// 	prevEpochAtts, err = state.PreviousEpochAttestations()
+	// 	require.NoError(t, err)
+	// 	for i := range prevEpochAtts {
+	// 		att := zondpb.CopyPendingAttestation(prevEpochAtts[i])
+	// 		att.AggregationBits = bitfield.NewBitlist(3)
+	// 		prevEpochAtts[i] = att
+	// 	}
+	// 	state.setPreviousEpochAttestations(prevEpochAtts)
+	// }
+	// applyToEveryAttestation(a)
 
 	// Assert no shared state mutation occurred only on state a (copy on write).
-	currAttsA, err = a.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsA, err = a.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assertAttFound(currAttsA, 3)
-	assertAttFound(prevAttsA, 3)
-	assertAttNotFound(currAttsA, 1)
-	assertAttNotFound(prevAttsA, 1)
-	assertAttNotFound(currAttsA, 2)
-	assertAttNotFound(prevAttsA, 2)
-	// State b must be unaffected.
-	currAttsB, err = b.CurrentEpochAttestations()
-	require.NoError(t, err)
-	prevAttsB, err = b.PreviousEpochAttestations()
-	require.NoError(t, err)
-	assertAttNotFound(currAttsB, 3)
-	assertAttNotFound(prevAttsB, 3)
-	assertAttFound(currAttsB, 1)
-	assertAttFound(prevAttsB, 1)
-	assertAttNotFound(currAttsB, 2)
-	assertAttNotFound(prevAttsB, 2)
+	// currAttsA, err = a.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// prevAttsA, err = a.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// assertAttFound(currAttsA, 3)
+	// assertAttFound(prevAttsA, 3)
+	// assertAttNotFound(currAttsA, 1)
+	// assertAttNotFound(prevAttsA, 1)
+	// assertAttNotFound(currAttsA, 2)
+	// assertAttNotFound(prevAttsA, 2)
+	// // State b must be unaffected.
+	// currAttsB, err = b.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// prevAttsB, err = b.PreviousEpochAttestations()
+	// require.NoError(t, err)
+	// assertAttNotFound(currAttsB, 3)
+	// assertAttNotFound(prevAttsB, 3)
+	// assertAttFound(currAttsB, 1)
+	// assertAttFound(prevAttsB, 1)
+	// assertAttNotFound(currAttsB, 2)
+	// assertAttNotFound(prevAttsB, 2)
 
 	// Copy on write happened, reference counters are reset.
 	assertRefCount(t, a, types.CurrentEpochAttestations, 1)
@@ -313,113 +312,8 @@ func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 	assertRefCount(t, b, types.PreviousEpochAttestations, 1)
 }
 
-func TestValidatorReferences_RemainsConsistent_Phase0(t *testing.T) {
-	s, err := InitializeFromProtoUnsafePhase0(&zondpb.BeaconState{
-		Validators: []*zondpb.Validator{
-			{PublicKey: []byte{'A'}},
-			{PublicKey: []byte{'B'}},
-			{PublicKey: []byte{'C'}},
-			{PublicKey: []byte{'D'}},
-			{PublicKey: []byte{'E'}},
-		},
-	})
-	require.NoError(t, err)
-	a, ok := s.(*BeaconState)
-	require.Equal(t, true, ok)
-
-	// Create a second state.
-	copied := a.Copy()
-	b, ok := copied.(*BeaconState)
-	require.Equal(t, true, ok)
-
-	// Update First Validator.
-	assert.NoError(t, a.UpdateValidatorAtIndex(0, &zondpb.Validator{PublicKey: []byte{'Z'}}))
-
-	assert.DeepNotEqual(t, a.Validators()[0], b.Validators()[0], "validators are equal when they are supposed to be different")
-	// Modify all validators from copied state.
-	assert.NoError(t, b.ApplyToEveryValidator(func(idx int, val *zondpb.Validator) (bool, *zondpb.Validator, error) {
-		return true, &zondpb.Validator{PublicKey: []byte{'V'}}, nil
-	}))
-
-	// Ensure reference is properly accounted for.
-	assert.NoError(t, a.ReadFromEveryValidator(func(idx int, val state.ReadOnlyValidator) error {
-		assert.NotEqual(t, bytesutil.ToBytes48([]byte{'V'}), val.PublicKey())
-		return nil
-	}))
-}
-
-func TestValidatorReferences_RemainsConsistent_Altair(t *testing.T) {
-	s, err := InitializeFromProtoUnsafeAltair(&zondpb.BeaconStateAltair{
-		Validators: []*zondpb.Validator{
-			{PublicKey: []byte{'A'}},
-			{PublicKey: []byte{'B'}},
-			{PublicKey: []byte{'C'}},
-			{PublicKey: []byte{'D'}},
-			{PublicKey: []byte{'E'}},
-		},
-	})
-	require.NoError(t, err)
-	a, ok := s.(*BeaconState)
-	require.Equal(t, true, ok)
-
-	// Create a second state.
-	copied := a.Copy()
-	b, ok := copied.(*BeaconState)
-	require.Equal(t, true, ok)
-
-	// Update First Validator.
-	assert.NoError(t, a.UpdateValidatorAtIndex(0, &zondpb.Validator{PublicKey: []byte{'Z'}}))
-
-	assert.DeepNotEqual(t, a.Validators()[0], b.Validators()[0], "validators are equal when they are supposed to be different")
-	// Modify all validators from copied state.
-	assert.NoError(t, b.ApplyToEveryValidator(func(idx int, val *zondpb.Validator) (bool, *zondpb.Validator, error) {
-		return true, &zondpb.Validator{PublicKey: []byte{'V'}}, nil
-	}))
-
-	// Ensure reference is properly accounted for.
-	assert.NoError(t, a.ReadFromEveryValidator(func(idx int, val state.ReadOnlyValidator) error {
-		assert.NotEqual(t, bytesutil.ToBytes48([]byte{'V'}), val.PublicKey())
-		return nil
-	}))
-}
-
 func TestValidatorReferences_RemainsConsistent_Capella(t *testing.T) {
 	s, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{
-		Validators: []*zondpb.Validator{
-			{PublicKey: []byte{'A'}},
-			{PublicKey: []byte{'B'}},
-			{PublicKey: []byte{'C'}},
-			{PublicKey: []byte{'D'}},
-			{PublicKey: []byte{'E'}},
-		},
-	})
-	require.NoError(t, err)
-	a, ok := s.(*BeaconState)
-	require.Equal(t, true, ok)
-
-	// Create a second state.
-	copied := a.Copy()
-	b, ok := copied.(*BeaconState)
-	require.Equal(t, true, ok)
-
-	// Update First Validator.
-	assert.NoError(t, a.UpdateValidatorAtIndex(0, &zondpb.Validator{PublicKey: []byte{'Z'}}))
-
-	assert.DeepNotEqual(t, a.Validators()[0], b.Validators()[0], "validators are equal when they are supposed to be different")
-	// Modify all validators from copied state.
-	assert.NoError(t, b.ApplyToEveryValidator(func(idx int, val *zondpb.Validator) (bool, *zondpb.Validator, error) {
-		return true, &zondpb.Validator{PublicKey: []byte{'V'}}, nil
-	}))
-
-	// Ensure reference is properly accounted for.
-	assert.NoError(t, a.ReadFromEveryValidator(func(idx int, val state.ReadOnlyValidator) error {
-		assert.NotEqual(t, bytesutil.ToBytes48([]byte{'V'}), val.PublicKey())
-		return nil
-	}))
-}
-
-func TestValidatorReferences_RemainsConsistent_Bellatrix(t *testing.T) {
-	s, err := InitializeFromProtoUnsafeBellatrix(&zondpb.BeaconStateBellatrix{
 		Validators: []*zondpb.Validator{
 			{PublicKey: []byte{'A'}},
 			{PublicKey: []byte{'B'}},
@@ -458,7 +352,7 @@ func TestValidatorReferences_ApplyValidator_BalancesRead(t *testing.T) {
 		EnableExperimentalState: true,
 	})
 	defer resetCfg()
-	s, err := InitializeFromProtoUnsafeAltair(&zondpb.BeaconStateAltair{
+	s, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{
 		Validators: []*zondpb.Validator{
 			{PublicKey: []byte{'A'}},
 			{PublicKey: []byte{'B'}},

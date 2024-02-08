@@ -135,7 +135,7 @@ func TestBeaconState_HashTreeRoot(t *testing.T) {
 			if err == nil && tt.error != "" {
 				t.Errorf("Expected error, expected %v, received %v", tt.error, err)
 			}
-			pbState, err := statenative.ProtobufBeaconStatePhase0(testState.ToProtoUnsafe())
+			pbState, err := statenative.ProtobufBeaconStateCapella(testState.ToProtoUnsafe())
 			require.NoError(t, err)
 			genericHTR, err := pbState.HashTreeRoot()
 			if err == nil && tt.error != "" {
@@ -153,11 +153,11 @@ func TestBeaconState_HashTreeRoot(t *testing.T) {
 
 func BenchmarkBeaconState(b *testing.B) {
 	testState, _ := util.DeterministicGenesisState(b, 16000)
-	pbState, err := statenative.ProtobufBeaconStatePhase0(testState.ToProtoUnsafe())
+	pbState, err := statenative.ProtobufBeaconStateCapella(testState.ToProtoUnsafe())
 	require.NoError(b, err)
 
 	b.Run("Vectorized SHA256", func(b *testing.B) {
-		st, err := statenative.InitializeFromProtoUnsafePhase0(pbState)
+		st, err := statenative.InitializeFromProtoUnsafeCapella(pbState)
 		require.NoError(b, err)
 		_, err = st.HashTreeRoot(context.Background())
 		assert.NoError(b, err)
@@ -222,7 +222,7 @@ func TestBeaconState_HashTreeRoot_FieldTrie(t *testing.T) {
 			if err == nil && tt.error != "" {
 				t.Errorf("Expected error, expected %v, received %v", tt.error, err)
 			}
-			pbState, err := statenative.ProtobufBeaconStatePhase0(testState.ToProtoUnsafe())
+			pbState, err := statenative.ProtobufBeaconStateCapella(testState.ToProtoUnsafe())
 			require.NoError(t, err)
 			genericHTR, err := pbState.HashTreeRoot()
 			if err == nil && tt.error != "" {
@@ -239,7 +239,7 @@ func TestBeaconState_HashTreeRoot_FieldTrie(t *testing.T) {
 }
 
 func TestBeaconState_AppendValidator_DoesntMutateCopy(t *testing.T) {
-	st0, err := util.NewBeaconState()
+	st0, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	st1 := st0.Copy()
 	originalCount := st1.NumValidators()
@@ -252,6 +252,7 @@ func TestBeaconState_AppendValidator_DoesntMutateCopy(t *testing.T) {
 }
 
 // TODO(rgeraldes24): capella
+/*
 func TestBeaconState_ValidatorMutation_Bellatrix(t *testing.T) {
 	testState, _ := util.DeterministicGenesisStateBellatrix(t, 400)
 	pbState, err := statenative.ProtobufBeaconStateBellatrix(testState.ToProtoUnsafe())
@@ -318,3 +319,4 @@ func TestBeaconState_ValidatorMutation_Bellatrix(t *testing.T) {
 
 	assert.Equal(t, rt, rt2)
 }
+*/

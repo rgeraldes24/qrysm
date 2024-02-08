@@ -12,7 +12,7 @@ import (
 	slashingsmock "github.com/theQRL/qrysm/v4/beacon-chain/operations/slashings/mock"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -27,7 +27,7 @@ func TestService_processAttesterSlashings(t *testing.T) {
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
-	privKey, err := bls.RandKey()
+	privKey, err := dilithium.RandKey()
 	require.NoError(t, err)
 	validators := make([]*zondpb.Validator, 1)
 	validators[0] = &zondpb.Validator{
@@ -72,8 +72,8 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		hook := logTest.NewGlobal()
 		// Use valid signature for the first att, but bad one for the second.
 		signature := privKey.Sign(signingRoot[:])
-		firstAtt.Signatures = signature.Marshal()
-		secondAtt.Signatures = make([]byte, 96)
+		firstAtt.Signatures = [][]byte{signature.Marshal()}
+		secondAtt.Signatures = [][]byte{}
 
 		slashings := []*zondpb.AttesterSlashing{
 			{
@@ -91,8 +91,8 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		hook := logTest.NewGlobal()
 		// Use invalid signature for the first att, but valid for the second.
 		signature := privKey.Sign(signingRoot[:])
-		firstAtt.Signatures = make([]byte, 96)
-		secondAtt.Signatures = signature.Marshal()
+		firstAtt.Signatures = [][]byte{}
+		secondAtt.Signatures = [][]byte{signature.Marshal()}
 
 		slashings := []*zondpb.AttesterSlashing{
 			{
@@ -110,8 +110,8 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		hook := logTest.NewGlobal()
 		// Use valid signatures.
 		signature := privKey.Sign(signingRoot[:])
-		firstAtt.Signatures = signature.Marshal()
-		secondAtt.Signatures = signature.Marshal()
+		firstAtt.Signatures = [][]byte{signature.Marshal()}
+		secondAtt.Signatures = [][]byte{signature.Marshal()}
 
 		slashings := []*zondpb.AttesterSlashing{
 			{
@@ -134,7 +134,7 @@ func TestService_processProposerSlashings(t *testing.T) {
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
-	privKey, err := bls.RandKey()
+	privKey, err := dilithium.RandKey()
 	require.NoError(t, err)
 	validators := make([]*zondpb.Validator, 1)
 	validators[0] = &zondpb.Validator{

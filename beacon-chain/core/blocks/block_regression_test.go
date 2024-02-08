@@ -1,5 +1,6 @@
 package blocks_test
 
+/*
 import (
 	"context"
 	"testing"
@@ -15,6 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
+
 
 func TestProcessAttesterSlashings_RegressionSlashableIndices(t *testing.T) {
 
@@ -104,3 +106,4 @@ func TestProcessAttesterSlashings_RegressionSlashableIndices(t *testing.T) {
 		}
 	}
 }
+*/

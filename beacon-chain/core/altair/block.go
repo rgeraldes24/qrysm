@@ -53,7 +53,7 @@ func ProcessSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb
 		return nil, 0, errors.Wrap(err, "could not filter sync committee votes")
 	}
 
-	if err := VerifySyncCommitteeSig(s, votedKeys, sync.SyncCommitteeSignature); err != nil {
+	if err := VerifySyncCommitteeSigs(s, votedKeys, sync.SyncCommitteeSignatures); err != nil {
 		return nil, 0, errors.Wrap(err, "could not verify sync committee signature")
 	}
 	return s, reward, nil
@@ -124,8 +124,8 @@ func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb
 	return s, votedKeys, earnedProposerReward, err
 }
 
-// VerifySyncCommitteeSig verifies sync committee signature `syncSig` is valid with respect to public keys `syncKeys`.
-func VerifySyncCommitteeSig(s state.BeaconState, syncKeys []dilithium.PublicKey, syncSig []byte) error {
+// VerifySyncCommitteeSigs verifies sync committee signatures `syncSigs` is valid with respect to public keys `syncKeys`.
+func VerifySyncCommitteeSigs(s state.BeaconState, syncKeys []dilithium.PublicKey, syncSigs [][]byte) error {
 	ps := slots.PrevSlot(s.Slot())
 	d, err := signing.Domain(s.Fork(), slots.ToEpoch(ps), params.BeaconConfig().DomainSyncCommittee, s.GenesisValidatorsRoot())
 	if err != nil {

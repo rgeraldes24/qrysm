@@ -22,16 +22,16 @@ func TestBeaconState_ProtoBeaconStateCompatibility(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	ctx := context.Background()
 	genesis := setupGenesisState(t, 64)
-	customState, err := statenative.InitializeFromProtoPhase0(genesis)
+	customState, err := statenative.InitializeFromProtoCapella(genesis)
 	require.NoError(t, err)
-	cloned, ok := proto.Clone(genesis).(*zondpb.BeaconState)
+	cloned, ok := proto.Clone(genesis).(*zondpb.BeaconStateCapella)
 	assert.Equal(t, true, ok, "Object is not of type *zondpb.BeaconState")
 	custom := customState.ToProto()
 	assert.DeepSSZEqual(t, cloned, custom)
 
 	r1, err := customState.HashTreeRoot(ctx)
 	require.NoError(t, err)
-	beaconState, err := statenative.InitializeFromProtoPhase0(genesis)
+	beaconState, err := statenative.InitializeFromProtoCapella(genesis)
 	require.NoError(t, err)
 	r2, err := beaconState.HashTreeRoot(context.Background())
 	require.NoError(t, err)
@@ -44,15 +44,15 @@ func TestBeaconState_ProtoBeaconStateCompatibility(t *testing.T) {
 	r1, err = customState.HashTreeRoot(ctx)
 	require.NoError(t, err)
 	genesis.Balances = balances
-	beaconState, err = statenative.InitializeFromProtoPhase0(genesis)
+	beaconState, err = statenative.InitializeFromProtoCapella(genesis)
 	require.NoError(t, err)
 	r2, err = beaconState.HashTreeRoot(context.Background())
 	require.NoError(t, err)
 	assert.Equal(t, r1, r2, "Mismatched roots")
 }
 
-func setupGenesisState(tb testing.TB, count uint64) *zondpb.BeaconState {
-	genesisState, _, err := interop.GenerateGenesisState(context.Background(), 0, count)
+func setupGenesisState(tb testing.TB, count uint64) *zondpb.BeaconStateCapella {
+	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, count)
 	require.NoError(tb, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
@@ -127,7 +127,7 @@ func BenchmarkStateClone_Proto(b *testing.B) {
 	genesis := setupGenesisState(b, 64)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		_, ok := proto.Clone(genesis).(*zondpb.BeaconState)
+		_, ok := proto.Clone(genesis).(*zondpb.BeaconStateCapella)
 		assert.Equal(b, true, ok, "Entity is not of type *zondpb.BeaconState")
 	}
 }
@@ -137,7 +137,7 @@ func BenchmarkStateClone_Manual(b *testing.B) {
 	params.SetupTestConfigCleanup(b)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	genesis := setupGenesisState(b, 64)
-	st, err := statenative.InitializeFromProtoPhase0(genesis)
+	st, err := statenative.InitializeFromProtoCapella(genesis)
 	require.NoError(b, err)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -179,7 +179,7 @@ func TestBeaconState_ImmutabilityWithSharedResources(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	genesis := setupGenesisState(t, 64)
-	a, err := statenative.InitializeFromProtoPhase0(genesis)
+	a, err := statenative.InitializeFromProtoCapella(genesis)
 	require.NoError(t, err)
 	b := a.Copy()
 
@@ -216,7 +216,7 @@ func TestForkManualCopy_OK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	genesis := setupGenesisState(t, 64)
-	a, err := statenative.InitializeFromProtoPhase0(genesis)
+	a, err := statenative.InitializeFromProtoCapella(genesis)
 	require.NoError(t, err)
 	wantedFork := &zondpb.Fork{
 		PreviousVersion: []byte{'a', 'b', 'c'},
@@ -225,7 +225,7 @@ func TestForkManualCopy_OK(t *testing.T) {
 	}
 	require.NoError(t, a.SetFork(wantedFork))
 
-	pbState, err := statenative.ProtobufBeaconStatePhase0(a.ToProtoUnsafe())
+	pbState, err := statenative.ProtobufBeaconStateCapella(a.ToProtoUnsafe())
 	require.NoError(t, err)
 	require.DeepEqual(t, pbState.Fork, wantedFork)
 }

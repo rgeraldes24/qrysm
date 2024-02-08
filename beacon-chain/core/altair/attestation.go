@@ -54,7 +54,7 @@ func ProcessAttestationNoVerifySignature(
 	ctx, span := trace.StartSpan(ctx, "altair.ProcessAttestationNoVerifySignature")
 	defer span.End()
 
-	if err := blocks.VerifyAttestationNoVerifySignature(ctx, beaconState, att); err != nil {
+	if err := blocks.VerifyAttestationNoVerifySignatures(ctx, beaconState, att); err != nil {
 		return nil, err
 	}
 

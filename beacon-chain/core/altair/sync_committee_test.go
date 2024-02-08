@@ -11,7 +11,7 @@ import (
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -123,12 +123,12 @@ func TestSyncCommittee_CanGet(t *testing.T) {
 	getState := func(t *testing.T, count uint64) state.BeaconState {
 		validators := make([]*zondpb.Validator, count)
 		for i := 0; i < len(validators); i++ {
-			blsKey, err := bls.RandKey()
+			dilithiumKey, err := dilithium.RandKey()
 			require.NoError(t, err)
 			validators[i] = &zondpb.Validator{
 				ExitEpoch:        params.BeaconConfig().FarFutureEpoch,
 				EffectiveBalance: params.BeaconConfig().MinDepositAmount,
-				PublicKey:        blsKey.PublicKey().Marshal(),
+				PublicKey:        dilithiumKey.PublicKey().Marshal(),
 			}
 		}
 		st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
@@ -369,12 +369,12 @@ func Test_ValidateSyncMessageTime(t *testing.T) {
 func getState(t *testing.T, count uint64) state.BeaconState {
 	validators := make([]*zondpb.Validator, count)
 	for i := 0; i < len(validators); i++ {
-		blsKey, err := bls.RandKey()
+		dilithiumKey, err := dilithium.RandKey()
 		require.NoError(t, err)
 		validators[i] = &zondpb.Validator{
 			ExitEpoch:        params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance: params.BeaconConfig().MinDepositAmount,
-			PublicKey:        blsKey.PublicKey().Marshal(),
+			PublicKey:        dilithiumKey.PublicKey().Marshal(),
 		}
 	}
 	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{

@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -34,9 +34,9 @@ func Test_processQueuedBlocks_DetectsDoubleProposals(t *testing.T) {
 	// Initialize validators in the state.
 	numVals := params.BeaconConfig().MinGenesisActiveValidatorCount
 	validators := make([]*zondpb.Validator, numVals)
-	privKeys := make([]bls.SecretKey, numVals)
+	privKeys := make([]dilithium.DilithiumKey, numVals)
 	for i := range validators {
-		privKey, err := bls.RandKey()
+		privKey, err := dilithium.RandKey()
 		require.NoError(t, err)
 		privKeys[i] = privKey
 		validators[i] = &zondpb.Validator{

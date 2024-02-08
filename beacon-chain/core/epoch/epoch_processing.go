@@ -376,68 +376,6 @@ func ProcessHistoricalDataUpdate(state state.BeaconState) (state.BeaconState, er
 	return state, nil
 }
 
-// TODO(rgeraldes24): remove
-/*
-// ProcessParticipationRecordUpdates rotates current/previous epoch attestations during epoch processing.
-//
-// nolint:dupword
-// Spec pseudocode definition:
-//
-//	def process_participation_record_updates(state: BeaconState) -> None:
-//	  # Rotate current/previous epoch attestations
-//	  state.previous_epoch_attestations = state.current_epoch_attestations
-//	  state.current_epoch_attestations = []
-func ProcessParticipationRecordUpdates(state state.BeaconState) (state.BeaconState, error) {
-	if err := state.RotateAttestations(); err != nil {
-		return nil, err
-	}
-	return state, nil
-}
-
-// ProcessFinalUpdates processes the final updates during epoch processing.
-func ProcessFinalUpdates(state state.BeaconState) (state.BeaconState, error) {
-	var err error
-
-	// Reset ETH1 data votes.
-	state, err = ProcessEth1DataReset(state)
-	if err != nil {
-		return nil, err
-	}
-
-	// Update effective balances with hysteresis.
-	state, err = ProcessEffectiveBalanceUpdates(state)
-	if err != nil {
-		return nil, err
-	}
-
-	// Set total slashed balances.
-	state, err = ProcessSlashingsReset(state)
-	if err != nil {
-		return nil, err
-	}
-
-	// Set RANDAO mix.
-	state, err = ProcessRandaoMixesReset(state)
-	if err != nil {
-		return nil, err
-	}
-
-	// Set historical root accumulator.
-	state, err = ProcessHistoricalDataUpdate(state)
-	if err != nil {
-		return nil, err
-	}
-
-	// Rotate current and previous epoch attestations.
-	state, err = ProcessParticipationRecordUpdates(state)
-	if err != nil {
-		return nil, err
-	}
-
-	return state, nil
-}
-*/
-
 // UnslashedAttestingIndices returns all the attesting indices from a list of attestations,
 // it sorts the indices and filters out the slashed ones.
 //

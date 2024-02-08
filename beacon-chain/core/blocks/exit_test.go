@@ -33,14 +33,14 @@ func TestProcessVoluntaryExits_NotActiveLongEnoughToExit(t *testing.T) {
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		},
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Slot:       10,
 	})
 	require.NoError(t, err)
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			VoluntaryExits: exits,
 		},
 	}
@@ -63,14 +63,14 @@ func TestProcessVoluntaryExits_ExitAlreadySubmitted(t *testing.T) {
 			ExitEpoch: 10,
 		},
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Slot:       0,
 	})
 	require.NoError(t, err)
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			VoluntaryExits: exits,
 		},
 	}
@@ -95,7 +95,7 @@ func TestProcessVoluntaryExits_AppliesCorrectStatus(t *testing.T) {
 			ActivationEpoch: 0,
 		},
 	}
-	state, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Fork: &zondpb.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -117,9 +117,9 @@ func TestProcessVoluntaryExits_AppliesCorrectStatus(t *testing.T) {
 	exits[0].Signature, err = signing.ComputeDomainAndSign(state, time.CurrentEpoch(state), exits[0].Exit, params.BeaconConfig().DomainVoluntaryExit, priv)
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			VoluntaryExits: exits,
 		},
 	}
@@ -153,13 +153,13 @@ func TestVerifyExitAndSignature(t *testing.T) {
 				}
 				genesisRoot := [32]byte{'a'}
 
-				st := &zondpb.BeaconState{
+				st := &zondpb.BeaconStateCapella{
 					Slot:                  0,
 					Fork:                  fork,
 					GenesisValidatorsRoot: genesisRoot[:],
 				}
 
-				s, err := state_native.InitializeFromProtoUnsafePhase0(st)
+				s, err := state_native.InitializeFromProtoUnsafeCapella(st)
 				if err != nil {
 					return nil, nil, nil, err
 				}

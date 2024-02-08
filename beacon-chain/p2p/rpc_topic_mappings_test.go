@@ -7,7 +7,6 @@ import (
 
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -83,11 +82,7 @@ func TestTopicDeconstructor(t *testing.T) {
 
 func TestTopicFromMessage_CorrectType(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	bCfg := params.BeaconConfig().Copy()
 	forkEpoch := primitives.Epoch(100)
-	bCfg.AltairForkEpoch = forkEpoch
-	bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.AltairForkVersion)] = primitives.Epoch(100)
-	params.OverrideBeaconConfig(bCfg)
 
 	// Garbage Message
 	badMsg := "wljdjska"

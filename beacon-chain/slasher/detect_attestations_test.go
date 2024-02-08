@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -200,9 +200,9 @@ func Test_processQueuedAttestations(t *testing.T) {
 			// Initialize validators in the state.
 			numVals := params.BeaconConfig().MinGenesisActiveValidatorCount
 			validators := make([]*zondpb.Validator, numVals)
-			privKeys := make([]bls.SecretKey, numVals)
+			privKeys := make([]dilithium.DilithiumKey, numVals)
 			for i := range validators {
-				privKey, err := bls.RandKey()
+				privKey, err := dilithium.RandKey()
 				require.NoError(t, err)
 				privKeys[i] = privKey
 				validators[i] = &zondpb.Validator{
@@ -225,12 +225,12 @@ func Test_processQueuedAttestations(t *testing.T) {
 				signingRoot, err := signing.ComputeSigningRoot(attestationWrapper.IndexedAttestation.Data, domain)
 				require.NoError(t, err)
 				attestingIndices := attestationWrapper.IndexedAttestation.AttestingIndices
-				sigs := make([]bls.Signature, len(attestingIndices))
+				sigs := make([][]byte, len(attestingIndices))
 				for i, validatorIndex := range attestingIndices {
 					privKey := privKeys[validatorIndex]
-					sigs[i] = privKey.Sign(signingRoot[:])
+					sigs[i] = privKey.Sign(signingRoot[:]).Marshal()
 				}
-				attestationWrapper.IndexedAttestation.Signatures = bls.AggregateSignatures(sigs).Marshal()
+				attestationWrapper.IndexedAttestation.Signatures = sigs
 			}
 
 			s, err := New(context.Background(),
@@ -910,7 +910,7 @@ func createAttestationWrapper(t testing.TB, source, target primitives.Epoch, ind
 		IndexedAttestation: &zondpb.IndexedAttestation{
 			AttestingIndices: indices,
 			Data:             data,
-			Signatures:       params.BeaconConfig().EmptyDilithiumSignature[:],
+			Signatures:       [][]byte{params.BeaconConfig().EmptyDilithiumSignature[:]},
 		},
 		SigningRoot: signRoot,
 	}

@@ -36,11 +36,10 @@ func TestMsgID_HashesCorrectly(t *testing.T) {
 	assert.Equal(t, msgID, p2p.MsgID(genesisValidatorsRoot, nMsg), "Got incorrect msg id")
 }
 
-// TODO(rgeraldes24): Capella version
 func TestMessageIDFunction_HashesCorrectlyBellatrix(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	genesisValidatorsRoot := bytesutil.PadTo([]byte{'A'}, 32)
-	d, err := signing.ComputeForkDigest(params.BeaconConfig().BellatrixForkVersion, genesisValidatorsRoot)
+	d, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot)
 	assert.NoError(t, err)
 	tpc := fmt.Sprintf(p2p.BlockSubnetTopicFormat, d)
 	topicLen := uint64(len(tpc))
