@@ -3,26 +3,21 @@ package execution
 import (
 	"context"
 	"errors"
-	"math"
 	"math/big"
 	"time"
 
 	"github.com/holiman/uint256"
-	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
 	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
-	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/network"
 	pb "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 var (
 	checkTransitionPollingInterval = time.Second * 10
 	logTtdInterval                 = time.Minute
-	configMismatchLog              = "Configuration mismatch between your execution client and Prysm. " +
+	configMismatchLog              = "Configuration mismatch between your execution client and Qrysm. " +
 		"Please check your execution client and restart it with the proper configuration. If this is not done, " +
 		"your node will not be able to complete the proof-of-stake transition"
 	needsEnginePortLog = "Could not check execution client configuration. " +
@@ -33,25 +28,21 @@ var (
 		"https://docs.prylabs.network/docs/execution-node/authentication"
 )
 
-// Checks the transition configuration between Prysm and the connected execution node to ensure
+// Checks the transition configuration between Qrysm and the connected execution node to ensure
 // there are no differences in terminal block difficulty and block hash.
 // If there are any discrepancies, we must log errors to ensure users can resolve
 // the problem and be ready for the merge transition.
 func (s *Service) checkTransitionConfiguration(
 	ctx context.Context, blockNotifications chan *feed.Event,
 ) {
-	// If Bellatrix fork epoch is not set, we do not run this check.
-	if params.BeaconConfig().BellatrixForkEpoch == math.MaxUint64 {
-		return
-	}
-	i := new(big.Int)
-	i.SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
+	zeroBig := big.NewInt(0)
 	ttd := new(uint256.Int)
-	ttd.SetFromBig(i)
+	ttd.SetFromBig(zeroBig)
+	blockHash := [32]byte{}
 	cfg := &pb.TransitionConfiguration{
 		TerminalTotalDifficulty: ttd.Hex(),
-		TerminalBlockHash:       params.BeaconConfig().TerminalBlockHash[:],
-		TerminalBlockNumber:     big.NewInt(0).Bytes(), // A value of 0 is recommended in the request.
+		TerminalBlockHash:       blockHash[:],
+		TerminalBlockNumber:     zeroBig.Bytes(), // A value of 0 is recommended in the request.
 	}
 	err := s.ExchangeTransitionConfiguration(ctx, cfg)
 	if err != nil {
@@ -70,7 +61,6 @@ func (s *Service) checkTransitionConfiguration(
 	// Bellatrix hard-fork transition.
 	ticker := time.NewTicker(checkTransitionPollingInterval)
 	logTtdTicker := time.NewTicker(logTtdInterval)
-	hasTtdReached := false
 	defer ticker.Stop()
 	defer logTtdTicker.Stop()
 	sub := s.cfg.stateNotifier.StateFeed().Subscribe(blockNotifications)
@@ -100,20 +90,12 @@ func (s *Service) checkTransitionConfiguration(
 			err = s.ExchangeTransitionConfiguration(ctx, cfg)
 			s.handleExchangeConfigurationError(err)
 			cancel()
-		case <-logTtdTicker.C:
-			currentEpoch := slots.ToEpoch(slots.CurrentSlot(s.chainStartData.GetGenesisTime()))
-			if currentEpoch >= params.BeaconConfig().BellatrixForkEpoch && !hasTtdReached {
-				hasTtdReached, err = s.logTtdStatus(ctx, ttd)
-				if err != nil {
-					log.WithError(err).Error("Could not log ttd status")
-				}
-			}
 		}
 	}
 }
 
 // We check if there is a configuration mismatch error between the execution client
-// and the Prysm beacon node. If so, we need to log errors in the node as it cannot successfully
+// and the Qrysm beacon node. If so, we need to log errors in the node as it cannot successfully
 // complete the merge transition for the Bellatrix hard fork.
 func (s *Service) handleExchangeConfigurationError(err error) {
 	if err == nil {
@@ -134,35 +116,4 @@ func (s *Service) handleExchangeConfigurationError(err error) {
 		return
 	}
 	log.WithError(err).Error("Could not check configuration values between execution and consensus client")
-}
-
-// Logs the terminal total difficulty status.
-func (s *Service) logTtdStatus(ctx context.Context, ttd *uint256.Int) (bool, error) {
-	latest, err := s.LatestExecutionBlock(ctx)
-	switch {
-	case errors.Is(err, hexutil.ErrEmptyString):
-		return false, nil
-	case err != nil:
-		return false, err
-	case latest == nil:
-		return false, errors.New("latest block is nil")
-	case latest.TotalDifficulty == "":
-		return false, nil
-	default:
-	}
-	latestTtd, err := hexutil.DecodeBig(latest.TotalDifficulty)
-	if err != nil {
-		return false, err
-	}
-	if latestTtd.Cmp(ttd.ToBig()) >= 0 {
-		return true, nil
-	}
-	log.WithFields(logrus.Fields{
-		"latestDifficulty":   latestTtd.String(),
-		"terminalDifficulty": ttd.ToBig().String(),
-		"network":            params.BeaconConfig().ConfigName,
-	}).Info("Ready for The Merge")
-
-	totalTerminalDifficulty.Set(float64(latestTtd.Uint64()))
-	return false, nil
 }

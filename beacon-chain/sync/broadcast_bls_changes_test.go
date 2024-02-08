@@ -21,14 +21,11 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 func TestBroadcastDilithiumChanges(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	c := params.BeaconConfig()
-	c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
-	params.OverrideBeaconConfig(c)
+
 	chainService := &mockChain.ChainService{
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{'A'},
@@ -50,17 +47,14 @@ func TestBroadcastDilithiumChanges(t *testing.T) {
 		Signature: emptySig[:],
 	})
 
-	capellaStart, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
+	capellaStart := primitives.Slot(0)
 	s.broadcastDilithiumChanges(capellaStart + 1)
 }
 
 func TestRateDilithiumChanges(t *testing.T) {
 	logHook := logTest.NewGlobal()
 	params.SetupTestConfigCleanup(t)
-	c := params.BeaconConfig()
-	c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
-	params.OverrideBeaconConfig(c)
+
 	chainService := &mockChain.ChainService{
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{'A'},
@@ -90,7 +84,7 @@ func TestRateDilithiumChanges(t *testing.T) {
 			FromDilithiumPubkey: keys[i+1].PublicKey().Marshal(),
 			ToExecutionAddress:  bytesutil.PadTo([]byte("address"), 20),
 		}
-		epoch := params.BeaconConfig().CapellaForkEpoch + 1
+		epoch := primitives.Epoch(0) + 1
 		domain, err := signing.Domain(st.Fork(), epoch, params.BeaconConfig().DomainDilithiumToExecutionChange, st.GenesisValidatorsRoot())
 		assert.NoError(t, err)
 		htr, err := signing.SigningData(message.HashTreeRoot, domain)
@@ -104,8 +98,7 @@ func TestRateDilithiumChanges(t *testing.T) {
 	}
 
 	require.Equal(t, false, p1.BroadcastCalled)
-	slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
+	slot := primitives.Slot(0)
 	s.broadcastDilithiumChanges(slot)
 	time.Sleep(100 * time.Millisecond) // Need a sleep for the go routine to be ready
 	require.Equal(t, true, p1.BroadcastCalled)

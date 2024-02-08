@@ -356,7 +356,7 @@ func TestInitDepositCache_OK(t *testing.T) {
 
 	blockRootA := [32]byte{'a'}
 
-	emptyState, err := util.NewBeaconState()
+	emptyState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, s.cfg.beaconDB.SaveGenesisBlockRoot(context.Background(), blockRootA))
 	require.NoError(t, s.cfg.beaconDB.SaveState(context.Background(), emptyState, blockRootA))
@@ -415,12 +415,12 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 
 	require.Equal(t, 0, len(s.cfg.depositCache.PendingContainers(context.Background(), nil)))
 
-	headBlock := util.NewBeaconBlock()
+	headBlock := util.NewBeaconBlockCapella()
 	headRoot, err := headBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 	stateGen := stategen.New(beaconDB, doublylinkedtree.New())
 
-	emptyState, err := util.NewBeaconState()
+	emptyState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, s.cfg.beaconDB.SaveGenesisBlockRoot(context.Background(), headRoot))
 	require.NoError(t, s.cfg.beaconDB.SaveState(context.Background(), emptyState, headRoot))
@@ -566,7 +566,7 @@ func TestService_EnsureConsistentPowchainData(t *testing.T) {
 		WithDepositCache(cache),
 	)
 	require.NoError(t, err)
-	genState, err := util.NewBeaconState()
+	genState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	assert.NoError(t, genState.SetSlot(1000))
 
@@ -596,7 +596,7 @@ func TestService_InitializeCorrectly(t *testing.T) {
 		WithDepositCache(cache),
 	)
 	require.NoError(t, err)
-	genState, err := util.NewBeaconState()
+	genState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	assert.NoError(t, genState.SetSlot(1000))
 
@@ -625,7 +625,7 @@ func TestService_EnsureValidPowchainData(t *testing.T) {
 		WithDepositCache(cache),
 	)
 	require.NoError(t, err)
-	genState, err := util.NewBeaconState()
+	genState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	assert.NoError(t, genState.SetSlot(1000))
 

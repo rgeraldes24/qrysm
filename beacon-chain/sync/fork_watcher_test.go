@@ -67,9 +67,6 @@ func TestService_CheckForNextEpochFork(t *testing.T) {
 					Genesis:        gt,
 					ValidatorsRoot: vr,
 				}
-				bCfg := params.BeaconConfig().Copy()
-				bCfg.AltairForkEpoch = 5
-				params.OverrideBeaconConfig(bCfg)
 				params.BeaconConfig().InitializeForkSchedule()
 				ctx, cancel := context.WithCancel(context.Background())
 				r := &Service{
@@ -110,9 +107,6 @@ func TestService_CheckForNextEpochFork(t *testing.T) {
 					Genesis:        time.Now().Add(-4 * oneEpoch()),
 					ValidatorsRoot: [32]byte{'A'},
 				}
-				bCfg := params.BeaconConfig().Copy()
-				bCfg.AltairForkEpoch = 3
-				bCfg.BellatrixForkEpoch = 5
 				params.OverrideBeaconConfig(bCfg)
 				params.BeaconConfig().InitializeForkSchedule()
 				ctx, cancel := context.WithCancel(context.Background())
@@ -200,9 +194,6 @@ func TestService_CheckForPreviousEpochFork(t *testing.T) {
 				assert.Equal(t, true, pMap[p2p.RPCGoodByeTopicV1+s.cfg.p2p.Encoding().ProtocolSuffix()])
 				assert.Equal(t, true, pMap[p2p.RPCStatusTopicV1+s.cfg.p2p.Encoding().ProtocolSuffix()])
 				assert.Equal(t, true, pMap[p2p.RPCPingTopicV1+s.cfg.p2p.Encoding().ProtocolSuffix()])
-				assert.Equal(t, true, pMap[p2p.RPCMetaDataTopicV1+s.cfg.p2p.Encoding().ProtocolSuffix()])
-				assert.Equal(t, true, pMap[p2p.RPCBlocksByRangeTopicV1+s.cfg.p2p.Encoding().ProtocolSuffix()])
-				assert.Equal(t, true, pMap[p2p.RPCBlocksByRootTopicV1+s.cfg.p2p.Encoding().ProtocolSuffix()])
 			},
 		},
 		{
@@ -214,9 +205,6 @@ func TestService_CheckForPreviousEpochFork(t *testing.T) {
 					ValidatorsRoot: [32]byte{'A'},
 				}
 				clock := startup.NewClock(chainService.Genesis, chainService.ValidatorsRoot)
-				bCfg := params.BeaconConfig().Copy()
-				bCfg.AltairForkEpoch = 3
-				params.OverrideBeaconConfig(bCfg)
 				params.BeaconConfig().InitializeForkSchedule()
 				ctx, cancel := context.WithCancel(context.Background())
 				r := &Service{
@@ -274,10 +262,6 @@ func TestService_CheckForPreviousEpochFork(t *testing.T) {
 				assert.Equal(t, true, pMap[p2p.RPCMetaDataTopicV2+s.cfg.p2p.Encoding().ProtocolSuffix()])
 				assert.Equal(t, true, pMap[p2p.RPCBlocksByRangeTopicV2+s.cfg.p2p.Encoding().ProtocolSuffix()])
 				assert.Equal(t, true, pMap[p2p.RPCBlocksByRootTopicV2+s.cfg.p2p.Encoding().ProtocolSuffix()])
-
-				assert.Equal(t, false, pMap[p2p.RPCMetaDataTopicV1+s.cfg.p2p.Encoding().ProtocolSuffix()])
-				assert.Equal(t, false, pMap[p2p.RPCBlocksByRangeTopicV1+s.cfg.p2p.Encoding().ProtocolSuffix()])
-				assert.Equal(t, false, pMap[p2p.RPCBlocksByRootTopicV1+s.cfg.p2p.Encoding().ProtocolSuffix()])
 			},
 		},
 		{
@@ -289,10 +273,6 @@ func TestService_CheckForPreviousEpochFork(t *testing.T) {
 					ValidatorsRoot: [32]byte{'A'},
 				}
 				clock := startup.NewClock(chainService.Genesis, chainService.ValidatorsRoot)
-				bCfg := params.BeaconConfig().Copy()
-				bCfg.AltairForkEpoch = 1
-				bCfg.BellatrixForkEpoch = 3
-				params.OverrideBeaconConfig(bCfg)
 				params.BeaconConfig().InitializeForkSchedule()
 				ctx, cancel := context.WithCancel(context.Background())
 				r := &Service{

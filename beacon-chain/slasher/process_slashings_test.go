@@ -24,7 +24,7 @@ func TestService_processAttesterSlashings(t *testing.T) {
 	slasherDB := dbtest.SetupSlasherDB(t)
 	beaconDB := dbtest.SetupDB(t)
 
-	beaconState, err := util.NewBeaconState()
+	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
 	privKey, err := bls.RandKey()
@@ -72,8 +72,8 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		hook := logTest.NewGlobal()
 		// Use valid signature for the first att, but bad one for the second.
 		signature := privKey.Sign(signingRoot[:])
-		firstAtt.Signature = signature.Marshal()
-		secondAtt.Signature = make([]byte, 96)
+		firstAtt.Signatures = signature.Marshal()
+		secondAtt.Signatures = make([]byte, 96)
 
 		slashings := []*zondpb.AttesterSlashing{
 			{
@@ -91,8 +91,8 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		hook := logTest.NewGlobal()
 		// Use invalid signature for the first att, but valid for the second.
 		signature := privKey.Sign(signingRoot[:])
-		firstAtt.Signature = make([]byte, 96)
-		secondAtt.Signature = signature.Marshal()
+		firstAtt.Signatures = make([]byte, 96)
+		secondAtt.Signatures = signature.Marshal()
 
 		slashings := []*zondpb.AttesterSlashing{
 			{
@@ -110,8 +110,8 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		hook := logTest.NewGlobal()
 		// Use valid signatures.
 		signature := privKey.Sign(signingRoot[:])
-		firstAtt.Signature = signature.Marshal()
-		secondAtt.Signature = signature.Marshal()
+		firstAtt.Signatures = signature.Marshal()
+		secondAtt.Signatures = signature.Marshal()
 
 		slashings := []*zondpb.AttesterSlashing{
 			{
@@ -131,7 +131,7 @@ func TestService_processProposerSlashings(t *testing.T) {
 	slasherDB := dbtest.SetupSlasherDB(t)
 	beaconDB := dbtest.SetupDB(t)
 
-	beaconState, err := util.NewBeaconState()
+	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
 	privKey, err := bls.RandKey()

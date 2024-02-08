@@ -31,6 +31,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+/*
 func FuzzValidateBeaconBlockPubSub_Phase0(f *testing.F) {
 	db := dbtest.SetupDB(f)
 	p := p2ptest.NewFuzzTestP2P()
@@ -112,7 +113,9 @@ func FuzzValidateBeaconBlockPubSub_Phase0(f *testing.F) {
 		_ = err
 	})
 }
+*/
 
+// TODO(rgeraldes24): capella
 func FuzzValidateBeaconBlockPubSub_Altair(f *testing.F) {
 	db := dbtest.SetupDB(f)
 	p := p2ptest.NewFuzzTestP2P()

@@ -173,12 +173,12 @@ func TestStatusRPCHandler_ReturnsHelloMessage(t *testing.T) {
 	db := testingDB.SetupDB(t)
 
 	// Set up a head state with data we expect.
-	head := util.NewBeaconBlock()
+	head := util.NewBeaconBlockCapella()
 	head.Block.Slot = 111
 	headRoot, err := head.Block.HashTreeRoot()
 	require.NoError(t, err)
 	blkSlot := 3 * params.BeaconConfig().SlotsPerEpoch
-	finalized := util.NewBeaconBlock()
+	finalized := util.NewBeaconBlockCapella()
 	finalized.Block.Slot = blkSlot
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -280,11 +280,11 @@ func TestHandshakeHandlers_Roundtrip(t *testing.T) {
 		Attnets:   bytesutil.PadTo([]byte{'C', 'D'}, 8),
 	})
 
-	st, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Slot: 5,
 	})
 	require.NoError(t, err)
-	blk := util.NewBeaconBlock()
+	blk := util.NewBeaconBlockCapella()
 	blk.Block.Slot = 0
 	util.SaveBlock(t, ctx, db, blk)
 	finalizedRoot, err := blk.Block.HashTreeRoot()
@@ -419,11 +419,11 @@ func TestStatusRPCRequest_RequestSent(t *testing.T) {
 	p2 := p2ptest.NewTestP2P(t)
 
 	// Set up a head state with data we expect.
-	head := util.NewBeaconBlock()
+	head := util.NewBeaconBlockCapella()
 	head.Block.Slot = 111
 	headRoot, err := head.Block.HashTreeRoot()
 	require.NoError(t, err)
-	finalized := util.NewBeaconBlock()
+	finalized := util.NewBeaconBlockCapella()
 	finalized.Block.Slot = 40
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -497,12 +497,12 @@ func TestStatusRPCRequest_FinalizedBlockExists(t *testing.T) {
 	db := testingDB.SetupDB(t)
 
 	// Set up a head state with data we expect.
-	head := util.NewBeaconBlock()
+	head := util.NewBeaconBlockCapella()
 	head.Block.Slot = 111
 	headRoot, err := head.Block.HashTreeRoot()
 	require.NoError(t, err)
 	blkSlot := 3 * params.BeaconConfig().SlotsPerEpoch
-	finalized := util.NewBeaconBlock()
+	finalized := util.NewBeaconBlockCapella()
 	finalized.Block.Slot = blkSlot
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -510,7 +510,7 @@ func TestStatusRPCRequest_FinalizedBlockExists(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), headRoot))
-	blk := util.NewBeaconBlock()
+	blk := util.NewBeaconBlockCapella()
 	blk.Block.Slot = blkSlot
 	util.SaveBlock(t, context.Background(), db, blk)
 	require.NoError(t, db.SaveGenesisBlockRoot(context.Background(), finalizedRoot))
@@ -597,7 +597,7 @@ func TestStatusRPCRequest_FinalizedBlockSkippedSlots(t *testing.T) {
 	bState, err := transition.GenesisBeaconState(context.Background(), nil, 0, &zondpb.Eth1Data{DepositRoot: make([]byte, 32), BlockHash: make([]byte, 32)})
 	require.NoError(t, err)
 
-	blk := util.NewBeaconBlock()
+	blk := util.NewBeaconBlockCapella()
 	blk.Block.Slot = 0
 	genRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -791,11 +791,11 @@ func TestStatusRPCRequest_BadPeerHandshake(t *testing.T) {
 	p2 := p2ptest.NewTestP2P(t)
 
 	// Set up a head state with data we expect.
-	head := util.NewBeaconBlock()
+	head := util.NewBeaconBlockCapella()
 	head.Block.Slot = 111
 	headRoot, err := head.Block.HashTreeRoot()
 	require.NoError(t, err)
-	finalized := util.NewBeaconBlock()
+	finalized := util.NewBeaconBlockCapella()
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
 	genesisState, err := transition.GenesisBeaconState(ctx, nil, 0, &zondpb.Eth1Data{})
@@ -876,12 +876,12 @@ func TestStatusRPCRequest_BadPeerHandshake(t *testing.T) {
 
 func TestStatusRPC_ValidGenesisMessage(t *testing.T) {
 	// Set up a head state with data we expect.
-	head := util.NewBeaconBlock()
+	head := util.NewBeaconBlockCapella()
 	head.Block.Slot = 111
 	headRoot, err := head.Block.HashTreeRoot()
 	require.NoError(t, err)
 	blkSlot := 3 * params.BeaconConfig().SlotsPerEpoch
-	finalized := util.NewBeaconBlock()
+	finalized := util.NewBeaconBlockCapella()
 	finalized.Block.Slot = blkSlot
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -998,12 +998,12 @@ func TestShouldResync(t *testing.T) {
 }
 
 func makeBlocks(t *testing.T, i, n uint64, previousRoot [32]byte) []interfaces.ReadOnlySignedBeaconBlock {
-	blocks := make([]*zondpb.SignedBeaconBlock, n)
+	blocks := make([]*zondpb.SignedBeaconBlockCapella, n)
 	ifaceBlocks := make([]interfaces.ReadOnlySignedBeaconBlock, n)
 	for j := i; j < n+i; j++ {
 		parentRoot := make([]byte, 32)
 		copy(parentRoot, previousRoot[:])
-		blocks[j-i] = util.NewBeaconBlock()
+		blocks[j-i] = util.NewBeaconBlockCapella()
 		blocks[j-i].Block.Slot = primitives.Slot(j + 1)
 		blocks[j-i].Block.ParentRoot = parentRoot
 		var err error

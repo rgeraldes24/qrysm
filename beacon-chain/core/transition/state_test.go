@@ -73,12 +73,12 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 
 	// Recent state checks.
 	assert.DeepEqual(t, make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector), newState.Slashings(), "Slashings was not correctly initialized")
-	currAtt, err := newState.CurrentEpochAttestations()
-	require.NoError(t, err)
-	assert.DeepSSZEqual(t, []*zondpb.PendingAttestation{}, currAtt, "CurrentEpochAttestations was not correctly initialized")
-	prevAtt, err := newState.CurrentEpochAttestations()
-	require.NoError(t, err)
-	assert.DeepSSZEqual(t, []*zondpb.PendingAttestation{}, prevAtt, "PreviousEpochAttestations was not correctly initialized")
+	// currAtt, err := newState.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// assert.DeepSSZEqual(t, []*zondpb.PendingAttestation{}, currAtt, "CurrentEpochAttestations was not correctly initialized")
+	// prevAtt, err := newState.CurrentEpochAttestations()
+	// require.NoError(t, err)
+	// assert.DeepSSZEqual(t, []*zondpb.PendingAttestation{}, prevAtt, "PreviousEpochAttestations was not correctly initialized")
 
 	zeroHash := params.BeaconConfig().ZeroHash[:]
 	// History root checks.
@@ -98,9 +98,9 @@ func TestGenesisState_HashEquality(t *testing.T) {
 	state, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zondpb.Eth1Data{BlockHash: make([]byte, 32)})
 	require.NoError(t, err)
 
-	pbState1, err := state_native.ProtobufBeaconStatePhase0(state1.ToProto())
+	pbState1, err := state_native.ProtobufBeaconStateCapella(state1.ToProto())
 	require.NoError(t, err)
-	pbstate, err := state_native.ProtobufBeaconStatePhase0(state.ToProto())
+	pbstate, err := state_native.ProtobufBeaconStateCapella(state.ToProto())
 	require.NoError(t, err)
 
 	root1, err1 := hash.HashProto(pbState1)

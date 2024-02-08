@@ -618,10 +618,6 @@ func TestSubscribeWithSyncSubnets_DynamicOK(t *testing.T) {
 func TestSubscribeWithSyncSubnets_StaticSwitchFork(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig()
-	cfg.AltairForkEpoch = 1
-	cfg.SecondsPerSlot = 1
-	params.OverrideBeaconConfig(cfg)
 	params.BeaconConfig().InitializeForkSchedule()
 	ctx, cancel := context.WithCancel(context.Background())
 	currSlot := primitives.Slot(100)
@@ -658,11 +654,6 @@ func TestSubscribeWithSyncSubnets_StaticSwitchFork(t *testing.T) {
 func TestSubscribeWithSyncSubnets_DynamicSwitchFork(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	p := p2ptest.NewTestP2P(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.AltairForkEpoch = 1
-	cfg.SecondsPerSlot = 1
-	cfg.SlotsPerEpoch = 4
-	params.OverrideBeaconConfig(cfg)
 	params.BeaconConfig().InitializeForkSchedule()
 	ctx, cancel := context.WithCancel(context.Background())
 	currSlot := primitives.Slot(100)

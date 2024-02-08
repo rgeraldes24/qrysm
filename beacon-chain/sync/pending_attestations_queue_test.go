@@ -64,7 +64,7 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 
 	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
 
-	sb := util.NewBeaconBlock()
+	sb := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, sb)
 	root, err := sb.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -89,7 +89,7 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	hashTreeRoot, err := signing.ComputeSigningRoot(att.Data, attesterDomain)
 	assert.NoError(t, err)
 	for _, i := range attestingIndices {
-		att.Signature = privKeys[i].Sign(hashTreeRoot[:]).Marshal()
+		att.Signatures = privKeys[i].Sign(hashTreeRoot[:]).Marshal()
 	}
 
 	// Arbitrary aggregator index for testing purposes.
@@ -130,7 +130,7 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	}
 	go r.verifierRoutine()
 
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, r.cfg.beaconDB.SaveState(context.Background(), s, root))
 
@@ -169,14 +169,14 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	require.NoError(t, err)
 	a := &zondpb.AggregateAttestationAndProof{
 		Aggregate: &zondpb.Attestation{
-			Signature:       priv.Sign([]byte("foo")).Marshal(),
+			Signatures:      priv.Sign([]byte("foo")).Marshal(),
 			AggregationBits: bitfield.Bitlist{0x02},
 			Data:            util.HydrateAttestationData(&zondpb.AttestationData{}),
 		},
 		SelectionProof: make([]byte, dilithium2.CryptoBytes),
 	}
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	r32, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b)
@@ -212,7 +212,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	hashTreeRoot, err := signing.ComputeSigningRoot(att.Data, attesterDomain)
 	assert.NoError(t, err)
 	for _, i := range attestingIndices {
-		att.Signature = privKeys[i].Sign(hashTreeRoot[:]).Marshal()
+		att.Signatures = privKeys[i].Sign(hashTreeRoot[:]).Marshal()
 	}
 
 	// Arbitrary aggregator index for testing purposes.
@@ -266,7 +266,7 @@ func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 
 	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
 
-	sb := util.NewBeaconBlock()
+	sb := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, sb)
 	root, err := sb.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -296,7 +296,7 @@ func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 		sig := privKeys[indice].Sign(hashTreeRoot[:])
 		sigs[i] = sig
 	}
-	att.Signature = bls.AggregateSignatures(sigs).Marshal()
+	att.Signatures = bls.AggregateSignatures(sigs).Marshal()
 
 	// Arbitrary aggregator index for testing purposes.
 	aggregatorIndex := committee[0]
@@ -335,7 +335,7 @@ func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 		signatureChan:                  make(chan *signatureVerifier, verifierLimit),
 	}
 	go r.verifierRoutine()
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, r.cfg.beaconDB.SaveState(context.Background(), s, root))
 

@@ -152,11 +152,11 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 	validators := uint64(256)
 	beaconState, _ := util.DeterministicGenesisState(t, validators)
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, b)
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(context.Background(), s, root))
 
@@ -170,7 +170,7 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		},
 		AggregationBits: aggBits,
-		Signature:       make([]byte, dilithium2.CryptoBytes),
+		Signatures:      make([]byte, dilithium2.CryptoBytes),
 	}
 
 	aggregateAndProof := &zondpb.AggregateAttestationAndProof{
@@ -239,7 +239,7 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 	validators := uint64(256)
 	beaconState, _ := util.DeterministicGenesisState(t, validators)
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, b)
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -254,7 +254,7 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		},
 		AggregationBits: aggBits,
-		Signature:       make([]byte, dilithium2.CryptoBytes),
+		Signatures:      make([]byte, dilithium2.CryptoBytes),
 	}
 
 	aggregateAndProof := &zondpb.AggregateAttestationAndProof{
@@ -305,11 +305,11 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	validators := uint64(256)
 	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, b)
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(context.Background(), s, root))
 
@@ -339,7 +339,7 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 		sig := privKeys[indice].Sign(hashTreeRoot[:])
 		sigs[i] = sig
 	}
-	att.Signature = bls.AggregateSignatures(sigs).Marshal()
+	att.Signatures = bls.AggregateSignatures(sigs).Marshal()
 	ai := committee[0]
 	sszUint := primitives.SSZUint64(att.Data.Slot)
 	sig, err := signing.ComputeDomainAndSign(beaconState, 0, &sszUint, params.BeaconConfig().DomainSelectionProof, privKeys[ai])
@@ -409,11 +409,11 @@ func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 	validators := uint64(256)
 	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, b)
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(context.Background(), s, root))
 
@@ -442,7 +442,7 @@ func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 		sig := privKeys[indice].Sign(hashTreeRoot[:])
 		sigs[i] = sig
 	}
-	att.Signature = bls.AggregateSignatures(sigs).Marshal()
+	att.Signatures = bls.AggregateSignatures(sigs).Marshal()
 	ai := committee[0]
 	sszUint := primitives.SSZUint64(att.Data.Slot)
 	sig, err := signing.ComputeDomainAndSign(beaconState, 0, &sszUint, params.BeaconConfig().DomainSelectionProof, privKeys[ai])
@@ -530,10 +530,10 @@ func TestValidateAggregateAndProof_BadBlock(t *testing.T) {
 	validators := uint64(256)
 	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(context.Background(), s, root))
 
@@ -562,7 +562,7 @@ func TestValidateAggregateAndProof_BadBlock(t *testing.T) {
 		sig := privKeys[indice].Sign(hashTreeRoot[:])
 		sigs[i] = sig
 	}
-	att.Signature = bls.AggregateSignatures(sigs).Marshal()
+	att.Signatures = bls.AggregateSignatures(sigs).Marshal()
 	ai := committee[0]
 	sszUint := primitives.SSZUint64(att.Data.Slot)
 	sig, err := signing.ComputeDomainAndSign(beaconState, 0, &sszUint, params.BeaconConfig().DomainSelectionProof, privKeys[ai])
@@ -620,11 +620,11 @@ func TestValidateAggregateAndProof_RejectWhenAttEpochDoesntEqualTargetEpoch(t *t
 	validators := uint64(256)
 	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, b)
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	s, err := util.NewBeaconState()
+	s, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(context.Background(), s, root))
 
@@ -653,7 +653,7 @@ func TestValidateAggregateAndProof_RejectWhenAttEpochDoesntEqualTargetEpoch(t *t
 		sig := privKeys[indice].Sign(hashTreeRoot[:])
 		sigs[i] = sig
 	}
-	att.Signature = bls.AggregateSignatures(sigs).Marshal()
+	att.Signatures = bls.AggregateSignatures(sigs).Marshal()
 	ai := committee[0]
 	sszUint := primitives.SSZUint64(att.Data.Slot)
 	sig, err := signing.ComputeDomainAndSign(beaconState, 0, &sszUint, params.BeaconConfig().DomainSelectionProof, privKeys[ai])

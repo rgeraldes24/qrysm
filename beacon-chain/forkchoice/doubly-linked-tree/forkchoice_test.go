@@ -36,7 +36,7 @@ func prepareForkchoiceState(
 		ParentRoot: parentRoot[:],
 	}
 
-	executionHeader := &enginev1.ExecutionPayloadHeader{
+	executionHeader := &enginev1.ExecutionPayloadHeaderCapella{
 		BlockHash: payloadHash[:],
 	}
 
@@ -48,7 +48,7 @@ func prepareForkchoiceState(
 		Epoch: finalizedEpoch,
 	}
 
-	base := &zondpb.BeaconStateBellatrix{
+	base := &zondpb.BeaconStateCapella{
 		Slot:                         slot,
 		RandaoMixes:                  make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		CurrentJustifiedCheckpoint:   justifiedCheckpoint,
@@ -57,7 +57,7 @@ func prepareForkchoiceState(
 		LatestBlockHeader:            blockHeader,
 	}
 
-	st, err := state_native.InitializeFromProtoBellatrix(base)
+	st, err := state_native.InitializeFromProtoCapella(base)
 	return st, blockRoot, err
 }
 
@@ -581,7 +581,7 @@ func TestStore_CommonAncestor(t *testing.T) {
 func TestStore_InsertChain(t *testing.T) {
 	f := setup(1, 1)
 	blks := make([]*forkchoicetypes.BlockAndCheckpoints, 0)
-	blk := util.NewBeaconBlock()
+	blk := util.NewBeaconBlockCapella()
 	blk.Block.Slot = 1
 	var pr [32]byte
 	blk.Block.ParentRoot = pr[:]
@@ -594,7 +594,7 @@ func TestStore_InsertChain(t *testing.T) {
 		FinalizedCheckpoint: &zondpb.Checkpoint{Epoch: 1, Root: params.BeaconConfig().ZeroHash[:]},
 	})
 	for i := uint64(2); i < 11; i++ {
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.Slot = primitives.Slot(i)
 		copiedRoot := root
 		blk.Block.ParentRoot = copiedRoot[:]

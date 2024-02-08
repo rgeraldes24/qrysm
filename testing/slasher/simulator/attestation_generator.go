@@ -77,7 +77,7 @@ func (s *Simulator) generateAttestationsForSlot(
 			if err != nil {
 				return nil, nil, err
 			}
-			att.Signature = aggSig.Marshal()
+			att.Signatures = aggSig.Marshal()
 
 			attestations = append(attestations, att)
 			if rand.NewGenerator().Float64() < s.srvConfig.Params.AttesterSlashingProbab {
@@ -86,7 +86,7 @@ func (s *Simulator) generateAttestationsForSlot(
 				if err != nil {
 					return nil, nil, err
 				}
-				slashableAtt.Signature = aggSig.Marshal()
+				slashableAtt.Signatures = aggSig.Marshal()
 				slashedIndices = append(slashedIndices, slashableAtt.AttestingIndices...)
 				slashings = append(slashings, &zondpb.AttesterSlashing{
 					Attestation_1: att,

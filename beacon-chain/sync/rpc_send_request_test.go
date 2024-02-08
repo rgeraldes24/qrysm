@@ -26,7 +26,7 @@ import (
 func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRangeTopicV1)
+	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRangeTopicV2)
 
 	t.Run("stream error", func(t *testing.T) {
 		p1 := p2ptest.NewTestP2P(t)
@@ -39,13 +39,13 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 		assert.ErrorContains(t, "protocols not supported", err)
 	})
 
-	knownBlocks := make([]*zondpb.SignedBeaconBlock, 0)
-	genesisBlk := util.NewBeaconBlock()
+	knownBlocks := make([]*zondpb.SignedBeaconBlockCapella, 0)
+	genesisBlk := util.NewBeaconBlockCapella()
 	genesisBlkRoot, err := genesisBlk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	parentRoot := genesisBlkRoot
 	for i := 0; i < 255; i++ {
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.Slot = primitives.Slot(i)
 		blk.Block.ParentRoot = parentRoot[:]
 		knownBlocks = append(knownBlocks, blk)
@@ -298,12 +298,12 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRootTopicV1)
+	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRootTopicV2)
 
-	knownBlocks := make(map[[32]byte]*zondpb.SignedBeaconBlock)
+	knownBlocks := make(map[[32]byte]*zondpb.SignedBeaconBlockCapella)
 	knownRoots := make([][32]byte, 0)
 	for i := 0; i < 5; i++ {
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blkRoot, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		knownRoots = append(knownRoots, blkRoot)

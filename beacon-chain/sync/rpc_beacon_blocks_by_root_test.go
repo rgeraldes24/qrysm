@@ -43,7 +43,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks(t *testing.T) {
 	var blkRoots p2pTypes.BeaconBlockByRootsReq
 	// Populate the database with blocks that would match the request.
 	for i := primitives.Slot(1); i < 11; i++ {
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.Slot = i
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -53,7 +53,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks(t *testing.T) {
 
 	r := &Service{cfg: &config{p2p: p1, beaconDB: d, clock: startup.NewClock(time.Unix(0, 0), [32]byte{})}, rateLimiter: newRateLimiter(p1)}
 	r.cfg.chain = &mock.ChainService{ValidatorsRoot: [32]byte{}}
-	pcl := protocol.ID(p2p.RPCBlocksByRootTopicV1)
+	pcl := protocol.ID(p2p.RPCBlocksByRootTopicV2)
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(10000, 10000, time.Second, false)
 
@@ -63,7 +63,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks(t *testing.T) {
 		defer wg.Done()
 		for i := range blkRoots {
 			expectSuccess(t, stream)
-			res := util.NewBeaconBlock()
+			res := util.NewBeaconBlockCapella()
 			assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 			if uint64(res.Block.Slot) != uint64(i+1) {
 				t.Errorf("Received unexpected block slot %d but wanted %d", res.Block.Slot, i+1)
@@ -105,7 +105,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 	require.NoError(t, err)
 	blockHash := bytesutil.ToBytes32([]byte("foo"))
-	payload := &enginev1.ExecutionPayload{
+	payload := &enginev1.ExecutionPayloadCapella{
 		ParentHash:    parent,
 		FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
 		StateRoot:     stateRoot,
@@ -121,15 +121,15 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 		BaseFeePerGas: bytesutil.PadTo([]byte("baseFeePerGas"), fieldparams.RootLength),
 		Transactions:  encodedBinaryTxs,
 	}
-	wrappedPayload, err := blocks.WrappedExecutionPayload(payload)
+	wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
 	require.NoError(t, err)
-	header, err := blocks.PayloadToHeader(wrappedPayload)
+	header, err := blocks.PayloadToHeaderCapella(wrappedPayload)
 	require.NoError(t, err)
 
 	var blkRoots p2pTypes.BeaconBlockByRootsReq
 	// Populate the database with blocks that would match the request.
 	for i := primitives.Slot(1); i < 11; i++ {
-		blk := util.NewBlindedBeaconBlockBellatrix()
+		blk := util.NewBlindedBeaconBlockCapella()
 		blk.Block.Body.ExecutionPayloadHeader = header
 		blk.Block.Slot = i
 		root, err := blk.Block.HashTreeRoot()
@@ -141,7 +141,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 	}
 
 	mockEngine := &mockExecution.EngineClient{
-		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayload{
+		ExecutionPayloadByBlockHash: map[[32]byte]*enginev1.ExecutionPayloadCapella{
 			blockHash: payload,
 		},
 	}
@@ -152,7 +152,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 		chain:                         &mock.ChainService{ValidatorsRoot: [32]byte{}},
 		clock:                         startup.NewClock(time.Unix(0, 0), [32]byte{}),
 	}, rateLimiter: newRateLimiter(p1)}
-	pcl := protocol.ID(p2p.RPCBlocksByRootTopicV1)
+	pcl := protocol.ID(p2p.RPCBlocksByRootTopicV2)
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(10000, 10000, time.Second, false)
 
@@ -162,7 +162,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 		defer wg.Done()
 		for i := range blkRoots {
 			expectSuccess(t, stream)
-			res := util.NewBeaconBlockBellatrix()
+			res := util.NewBeaconBlockCapella()
 			assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 			if uint64(res.Block.Slot) != uint64(i+1) {
 				t.Errorf("Received unexpected block slot %d but wanted %d", res.Block.Slot, i+1)
@@ -186,9 +186,9 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 	p2 := p2ptest.NewTestP2P(t)
 	p1.DelaySend = true
 
-	blockA := util.NewBeaconBlock()
+	blockA := util.NewBeaconBlockCapella()
 	blockA.Block.Slot = 111
-	blockB := util.NewBeaconBlock()
+	blockB := util.NewBeaconBlockCapella()
 	blockB.Block.Slot = 40
 	// Set up a head state with data we expect.
 	blockARoot, err := blockA.Block.HashTreeRoot()
@@ -237,7 +237,7 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 		out := new(p2pTypes.BeaconBlockByRootsReq)
 		assert.NoError(t, p2.Encoding().DecodeWithMaxLength(stream, out))
 		assert.DeepEqual(t, &expectedRoots, out, "Did not receive expected message")
-		response := []*zondpb.SignedBeaconBlock{blockB, blockA}
+		response := []*zondpb.SignedBeaconBlockCapella{blockB, blockA}
 		for _, blk := range response {
 			_, err := stream.Write([]byte{responseCodeSuccess})
 			assert.NoError(t, err, "Could not write to stream")
@@ -263,7 +263,7 @@ func TestRecentBeaconBlocksRPCHandler_HandleZeroBlocks(t *testing.T) {
 	d := db.SetupDB(t)
 
 	r := &Service{cfg: &config{p2p: p1, beaconDB: d}, rateLimiter: newRateLimiter(p1)}
-	pcl := protocol.ID(p2p.RPCBlocksByRootTopicV1)
+	pcl := protocol.ID(p2p.RPCBlocksByRootTopicV2)
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 

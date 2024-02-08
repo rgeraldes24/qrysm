@@ -530,7 +530,7 @@ func TestBlocksQueue_onDataReceivedEvent(t *testing.T) {
 			chain:               mc,
 			highestExpectedSlot: primitives.Slot(blockBatchLimit),
 		})
-		wsb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+		wsb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 		require.NoError(t, err)
 		handlerFn := queue.onDataReceivedEvent(ctx)
 		wsbCopy, err := wsb.Copy()
@@ -629,7 +629,7 @@ func TestBlocksQueue_onReadyToSendEvent(t *testing.T) {
 			chain:               mc,
 			highestExpectedSlot: primitives.Slot(blockBatchLimit),
 		})
-		wsb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+		wsb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 		require.NoError(t, err)
 		queue.smm.addStateMachine(256)
 		queue.smm.addStateMachine(320)
@@ -658,7 +658,7 @@ func TestBlocksQueue_onReadyToSendEvent(t *testing.T) {
 			chain:               mc,
 			highestExpectedSlot: primitives.Slot(blockBatchLimit),
 		})
-		wsb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+		wsb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 		require.NoError(t, err)
 		queue.smm.addStateMachine(128)
 		queue.smm.machines[128].state = stateNew
@@ -693,7 +693,7 @@ func TestBlocksQueue_onReadyToSendEvent(t *testing.T) {
 			chain:               mc,
 			highestExpectedSlot: primitives.Slot(blockBatchLimit),
 		})
-		wsb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+		wsb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 		require.NoError(t, err)
 		queue.smm.addStateMachine(256)
 		queue.smm.machines[256].state = stateSkipped
@@ -1055,7 +1055,7 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 
 	// The chain1 contains 250 blocks and is a dead end.
 	// The chain2 contains 296 blocks, with fork started at slot 128 of chain1.
-	chain1 := extendBlockSequence(t, []*zond.SignedBeaconBlock{}, 250)
+	chain1 := extendBlockSequence(t, []*zond.SignedBeaconBlockCapella{}, 250)
 	forkedSlot := primitives.Slot(201)
 	chain2 := extendBlockSequence(t, chain1[:forkedSlot], 100)
 	finalizedSlot := primitives.Slot(63)
@@ -1066,7 +1066,7 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 	genesisRoot, err := genesisBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	mc := &mock.ChainService{
 		State: st,

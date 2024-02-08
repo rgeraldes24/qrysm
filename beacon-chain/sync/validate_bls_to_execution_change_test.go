@@ -157,7 +157,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
-				st, keys := util.DeterministicGenesisStateBellatrix(t, 128)
+				st, keys := util.DeterministicGenesisStateCapella(t, 128)
 				s.cfg.chain = &mockChain.ChainService{
 					State: st,
 				}
@@ -277,7 +277,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				st, keys := util.DeterministicGenesisStateCapella(t, 128)
 				assert.NoError(t, st.ApplyToEveryValidator(func(idx int, val *zondpb.Validator) (bool, *zondpb.Validator, error) {
 					newCreds := make([]byte, 32)
-					newCreds[0] = params.BeaconConfig().ETH1AddressWithdrawalPrefixByte
+					newCreds[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
 					copy(newCreds[12:], wantedExecAddress)
 					val.WithdrawalCredentials = newCreds
 					return true, val, nil

@@ -23,7 +23,7 @@ import (
 )
 
 func TestService_StatusZeroEpoch(t *testing.T) {
-	bState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{Slot: 0})
+	bState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{Slot: 0})
 	require.NoError(t, err)
 	chain := &mockChain.ChainService{
 		Genesis: time.Now(),
@@ -73,7 +73,7 @@ func TestSyncHandlers_WaitToSync(t *testing.T) {
 	sk, err := bls.SecretKeyFromBytes(b32[:])
 	require.NoError(t, err)
 
-	msg := util.NewBeaconBlock()
+	msg := util.NewBeaconBlockCapella()
 	msg.Block.ParentRoot = util.Random32Bytes(t)
 	msg.Signature = sk.Sign([]byte("data")).Marshal()
 	p2p.ReceivePubSub(topic, msg)
@@ -152,7 +152,7 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	b32 := bytesutil.ToBytes32(b)
 	sk, err := bls.SecretKeyFromBytes(b32[:])
 	require.NoError(t, err)
-	msg := util.NewBeaconBlock()
+	msg := util.NewBeaconBlockCapella()
 	msg.Block.ParentRoot = util.Random32Bytes(t)
 	msg.Signature = sk.Sign([]byte("data")).Marshal()
 	p2p.Digest, err = r.currentForkDigest()

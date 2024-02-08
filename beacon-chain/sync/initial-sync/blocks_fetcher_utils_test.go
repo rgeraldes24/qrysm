@@ -160,7 +160,7 @@ func TestBlocksFetcher_findFork(t *testing.T) {
 	p2p := p2pt.NewTestP2P(t)
 
 	// Chain contains blocks from 8 epochs (from 0 to 7, 256 is the start slot of epoch8).
-	chain1 := extendBlockSequence(t, []*zondpb.SignedBeaconBlock{}, 250)
+	chain1 := extendBlockSequence(t, []*zondpb.SignedBeaconBlockCapella{}, 250)
 	finalizedSlot := primitives.Slot(63)
 	finalizedEpoch := slots.ToEpoch(finalizedSlot)
 
@@ -169,7 +169,7 @@ func TestBlocksFetcher_findFork(t *testing.T) {
 	genesisRoot, err := genesisBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	mc := &mock.ChainService{
 		State: st,
@@ -245,7 +245,7 @@ func TestBlocksFetcher_findFork(t *testing.T) {
 
 	// Add peer that has blocks after 250, but those blocks are orphaned i.e. they do not have common
 	// ancestor with what we already have. So, error is expected.
-	chain1a := extendBlockSequence(t, []*zondpb.SignedBeaconBlock{}, 265)
+	chain1a := extendBlockSequence(t, []*zondpb.SignedBeaconBlockCapella{}, 265)
 	connectPeerHavingBlocks(t, p2p, chain1a, finalizedSlot, p2p.Peers())
 	fork, err = fetcher.findFork(ctx, 251)
 	require.ErrorContains(t, errNoPeersWithAltBlocks.Error(), err)
@@ -335,13 +335,13 @@ func TestBlocksFetcher_findForkWithPeer(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
 	p1 := p2pt.NewTestP2P(t)
 
-	knownBlocks := extendBlockSequence(t, []*zondpb.SignedBeaconBlock{}, 128)
+	knownBlocks := extendBlockSequence(t, []*zondpb.SignedBeaconBlockCapella{}, 128)
 	genesisBlock := knownBlocks[0]
 	util.SaveBlock(t, context.Background(), beaconDB, genesisBlock)
 	genesisRoot, err := genesisBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	mc := &mock.ChainService{
 		State:          st,
@@ -420,7 +420,7 @@ func TestBlocksFetcher_findForkWithPeer(t *testing.T) {
 	})
 
 	t.Run("first block is diverging - no common ancestor", func(t *testing.T) {
-		altBlocks := extendBlockSequence(t, []*zondpb.SignedBeaconBlock{}, 128)
+		altBlocks := extendBlockSequence(t, []*zondpb.SignedBeaconBlockCapella{}, 128)
 		p2 := connectPeerHavingBlocks(t, p1, altBlocks, 128, p1.Peers())
 		time.Sleep(100 * time.Millisecond)
 		defer func() {
@@ -470,7 +470,7 @@ func TestBlocksFetcher_findAncestor(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
 	p2p := p2pt.NewTestP2P(t)
 
-	knownBlocks := extendBlockSequence(t, []*zondpb.SignedBeaconBlock{}, 128)
+	knownBlocks := extendBlockSequence(t, []*zondpb.SignedBeaconBlockCapella{}, 128)
 	finalizedSlot := primitives.Slot(63)
 	finalizedEpoch := slots.ToEpoch(finalizedSlot)
 
@@ -479,7 +479,7 @@ func TestBlocksFetcher_findAncestor(t *testing.T) {
 	genesisRoot, err := genesisBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	mc := &mock.ChainService{
 		State: st,
@@ -504,7 +504,7 @@ func TestBlocksFetcher_findAncestor(t *testing.T) {
 		},
 	)
 	fetcher.rateLimiter = leakybucket.NewCollector(6400, 6400, 1*time.Second, false)
-	pcl := fmt.Sprintf("%s/ssz_snappy", p2pm.RPCBlocksByRootTopicV1)
+	pcl := fmt.Sprintf("%s/ssz_snappy", p2pm.RPCBlocksByRootTopicV2)
 
 	t.Run("error on request", func(t *testing.T) {
 		p2 := p2pt.NewTestP2P(t)

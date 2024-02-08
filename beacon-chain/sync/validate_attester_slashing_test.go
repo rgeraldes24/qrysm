@@ -48,7 +48,7 @@ func setupValidAttesterSlashing(t *testing.T) (*zondpb.AttesterSlashing, state.B
 	sig0 := privKeys[0].Sign(hashTreeRoot[:])
 	sig1 := privKeys[1].Sign(hashTreeRoot[:])
 	aggregateSig := bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att1.Signature = aggregateSig.Marshal()
+	att1.Signatures = aggregateSig.Marshal()
 
 	att2 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
 		AttestingIndices: []uint64{0, 1},
@@ -58,7 +58,7 @@ func setupValidAttesterSlashing(t *testing.T) (*zondpb.AttesterSlashing, state.B
 	sig0 = privKeys[0].Sign(hashTreeRoot[:])
 	sig1 = privKeys[1].Sign(hashTreeRoot[:])
 	aggregateSig = bls.AggregateSignatures([]bls.Signature{sig0, sig1})
-	att2.Signature = aggregateSig.Marshal()
+	att2.Signatures = aggregateSig.Marshal()
 
 	slashing := &zondpb.AttesterSlashing{
 		Attestation_1: att1,

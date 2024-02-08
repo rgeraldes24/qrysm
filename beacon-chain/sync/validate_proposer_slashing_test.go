@@ -46,7 +46,7 @@ func setupValidProposerSlashing(t *testing.T) (*zondpb.ProposerSlashing, state.B
 	}
 
 	currentSlot := primitives.Slot(0)
-	st, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: validators,
 		Slot:       currentSlot,
 		Balances:   validatorBalances,

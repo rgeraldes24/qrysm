@@ -14,12 +14,12 @@ import (
 
 func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 	hashLen := 32
-	blk := &zond.BeaconBlock{
+	blk := &zond.BeaconBlockCapella{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
-		Body: &zond.BeaconBlockBody{
+		Body: &zond.BeaconBlockBodyCapella{
 			Eth1Data: &zond.Eth1Data{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
@@ -51,12 +51,12 @@ func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 
 func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 	hashLen := 32
-	blk := &zond.BeaconBlock{
+	blk := &zond.BeaconBlockCapella{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
-		Body: &zond.BeaconBlockBody{
+		Body: &zond.BeaconBlockBodyCapella{
 			Eth1Data: &zond.Eth1Data{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
@@ -90,7 +90,7 @@ func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 
 func TestBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 	hashLen := 32
-	blk := &zond.BeaconBlock{
+	blk := &zond.BeaconBlockCapella{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
@@ -102,12 +102,12 @@ func TestBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 
 func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 	hashLen := 32
-	blk := &zond.SignedBeaconBlock{Block: &zond.BeaconBlock{
+	blk := &zond.SignedBeaconBlockCapella{Block: &zond.BeaconBlockCapella{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
-		Body: &zond.BeaconBlockBody{
+		Body: &zond.BeaconBlockBodyCapella{
 			Eth1Data: &zond.Eth1Data{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
@@ -143,12 +143,12 @@ func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 
 func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 	hashLen := 32
-	blk := &zond.SignedBeaconBlock{Block: &zond.BeaconBlock{
+	blk := &zond.SignedBeaconBlockCapella{Block: &zond.BeaconBlockCapella{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
-		Body: &zond.BeaconBlockBody{
+		Body: &zond.BeaconBlockBodyCapella{
 			Eth1Data: &zond.Eth1Data{
 				BlockHash:    bytesutil.PadTo([]byte("block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
@@ -185,7 +185,7 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 
 func TestSignedBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 	hashLen := 32
-	blk := &zond.SignedBeaconBlock{Block: &zond.BeaconBlock{
+	blk := &zond.SignedBeaconBlockCapella{Block: &zond.BeaconBlockCapella{
 		Slot:          200,
 		ProposerIndex: 2,
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),

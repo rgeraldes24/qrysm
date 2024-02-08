@@ -289,9 +289,9 @@ func TestService_roundRobinSync(t *testing.T) {
 			genesisRoot := cache.rootCache[0]
 			cache.RUnlock()
 
-			util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlock())
+			util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlockCapella())
 
-			st, err := util.NewBeaconState()
+			st, err := util.NewBeaconStateCapella()
 			require.NoError(t, err)
 			gt := time.Now()
 			vr := [32]byte{}
@@ -332,11 +332,11 @@ func TestService_roundRobinSync(t *testing.T) {
 
 func TestService_processBlock(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
-	genesisBlk := util.NewBeaconBlock()
+	genesisBlk := util.NewBeaconBlockCapella()
 	genesisBlkRoot, err := genesisBlk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, genesisBlk)
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	s := NewService(context.Background(), &Config{
 		P2P: p2pt.NewTestP2P(t),
@@ -357,12 +357,12 @@ func TestService_processBlock(t *testing.T) {
 	genesis := makeGenesisTime(32)
 
 	t.Run("process duplicate block", func(t *testing.T) {
-		blk1 := util.NewBeaconBlock()
+		blk1 := util.NewBeaconBlockCapella()
 		blk1.Block.Slot = 1
 		blk1.Block.ParentRoot = genesisBlkRoot[:]
 		blk1Root, err := blk1.Block.HashTreeRoot()
 		require.NoError(t, err)
-		blk2 := util.NewBeaconBlock()
+		blk2 := util.NewBeaconBlockCapella()
 		blk2.Block.Slot = 2
 		blk2.Block.ParentRoot = blk1Root[:]
 
@@ -406,11 +406,11 @@ func TestService_processBlock(t *testing.T) {
 
 func TestService_processBlockBatch(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
-	genesisBlk := util.NewBeaconBlock()
+	genesisBlk := util.NewBeaconBlockCapella()
 	genesisBlkRoot, err := genesisBlk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, genesisBlk)
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	s := NewService(context.Background(), &Config{
 		P2P: p2pt.NewTestP2P(t),
@@ -433,7 +433,7 @@ func TestService_processBlockBatch(t *testing.T) {
 		currBlockRoot := genesisBlkRoot
 		for i := primitives.Slot(1); i < 10; i++ {
 			parentRoot := currBlockRoot
-			blk1 := util.NewBeaconBlock()
+			blk1 := util.NewBeaconBlockCapella()
 			blk1.Block.Slot = i
 			blk1.Block.ParentRoot = parentRoot[:]
 			blk1Root, err := blk1.Block.HashTreeRoot()
@@ -450,7 +450,7 @@ func TestService_processBlockBatch(t *testing.T) {
 		var batch2 []blocks.BlockWithVerifiedBlobs
 		for i := primitives.Slot(10); i < 20; i++ {
 			parentRoot := currBlockRoot
-			blk1 := util.NewBeaconBlock()
+			blk1 := util.NewBeaconBlockCapella()
 			blk1.Block.Slot = i
 			blk1.Block.ParentRoot = parentRoot[:]
 			blk1Root, err := blk1.Block.HashTreeRoot()
@@ -541,9 +541,9 @@ func TestService_blockProviderScoring(t *testing.T) {
 	genesisRoot := cache.rootCache[0]
 	cache.RUnlock()
 
-	util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlock())
+	util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlockCapella())
 
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, err)
 	gt := time.Now()
@@ -610,9 +610,9 @@ func TestService_syncToFinalizedEpoch(t *testing.T) {
 	genesisRoot := cache.rootCache[0]
 	cache.RUnlock()
 
-	util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlock())
+	util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlockCapella())
 
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	gt := time.Now()
 	vr := [32]byte{}
@@ -670,7 +670,7 @@ func TestService_syncToFinalizedEpoch(t *testing.T) {
 
 func TestService_ValidUnprocessed(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
-	genesisBlk := util.NewBeaconBlock()
+	genesisBlk := util.NewBeaconBlockCapella()
 	genesisBlkRoot, err := genesisBlk.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, context.Background(), beaconDB, genesisBlk)
@@ -679,7 +679,7 @@ func TestService_ValidUnprocessed(t *testing.T) {
 	currBlockRoot := genesisBlkRoot
 	for i := primitives.Slot(1); i < 10; i++ {
 		parentRoot := currBlockRoot
-		blk1 := util.NewBeaconBlock()
+		blk1 := util.NewBeaconBlockCapella()
 		blk1.Block.Slot = i
 		blk1.Block.ParentRoot = parentRoot[:]
 		blk1Root, err := blk1.Block.HashTreeRoot()
