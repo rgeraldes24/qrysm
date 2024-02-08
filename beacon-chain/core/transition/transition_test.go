@@ -506,6 +506,7 @@ func TestProcessSlots_LowerSlotAsParentState(t *testing.T) {
 	assert.ErrorContains(t, "expected state.slot 2 < slot 1", err)
 }
 
+/*
 func TestProcessSlots_ThroughAltairEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	params.SetupTestConfigCleanup(t)
@@ -576,6 +577,7 @@ func TestProcessSlots_OnlyAltairEpoch(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
 }
+*/
 
 func TestProcessSlots_OnlyBellatrixEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()

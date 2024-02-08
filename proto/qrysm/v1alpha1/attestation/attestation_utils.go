@@ -6,18 +6,40 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"runtime"
 	"sort"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
+	"golang.org/x/sync/errgroup"
 	// "github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 )
+
+type signatureSlices struct {
+	attestingIndices []uint64
+	signatures       [][]byte
+}
+
+type sortByValidatorIdx signatureSlices
+
+func (s sortByValidatorIdx) Len() int {
+	return len(s.signatures)
+}
+
+func (s sortByValidatorIdx) Swap(i, j int) {
+	s.attestingIndices[i], s.attestingIndices[j] = s.attestingIndices[j], s.attestingIndices[i]
+	s.signatures[i], s.signatures[j] = s.signatures[j], s.signatures[i]
+}
+
+func (s sortByValidatorIdx) Less(i, j int) bool {
+	return s.attestingIndices[i] < s.attestingIndices[j]
+}
 
 // ConvertToIndexed converts attestation to (almost) indexed-verifiable form.
 //
@@ -44,37 +66,24 @@ func ConvertToIndexed(ctx context.Context, attestation *zondpb.Attestation, comm
 		return nil, err
 	}
 
-	sort.Slice(attIndices, func(i, j int) bool {
-		return attIndices[i] < attIndices[j]
-	})
-
-	signatureValidatorIndex := make([]uint64, len(attestation.SignatureValidatorIndex))
-	copy(signatureValidatorIndex, attestation.SignatureValidatorIndex)
-	sigsMap := make(map[uint64][]byte)
-	for i, validatorIndex := range signatureValidatorIndex {
-		offset := i * dilithium2.CryptoBytes
-		sigsMap[validatorIndex] = attestation.Signature[offset : offset+dilithium2.CryptoBytes]
-	}
-	signatures := make([]byte, 0, len(attestation.Signature))
-
-	sort.Slice(signatureValidatorIndex, func(i, j int) bool {
-		return signatureValidatorIndex[i] < signatureValidatorIndex[j]
-	})
-	for _, validatorIndex := range signatureValidatorIndex {
-		sig, ok := sigsMap[validatorIndex]
-		if !ok {
-			return nil, errors.Errorf("ConvertToIndexed unkown validatorIndex in sigMap %d", validatorIndex)
-		}
-		signatures = append(signatures, sig...)
+	if len(attestation.Signatures) != len(committee) {
+		return nil, fmt.Errorf("signatures length %d is not equal to committee length %d", len(attestation.Signatures), len(committee))
 	}
 
-	inAtt := &zondpb.IndexedAttestation{
-		Data:                    attestation.Data,
-		Signature:               signatures,
-		SignatureValidatorIndex: signatureValidatorIndex,
-		AttestingIndices:        attIndices,
+	sigsCopy := make([][]byte, len(attestation.Signatures))
+	copy(sigsCopy, attestation.Signatures)
+
+	sigSlices := signatureSlices{
+		attestingIndices: attIndices,
+		signatures:       sigsCopy,
 	}
-	return inAtt, err
+	sort.Sort(sortByValidatorIdx(sigSlices))
+
+	return &zondpb.IndexedAttestation{
+		Data:             attestation.Data,
+		Signatures:       sigSlices.signatures,
+		AttestingIndices: sigSlices.attestingIndices,
+	}, nil
 }
 
 // AttestingIndices returns the attesting participants indices from the attestation data. The
@@ -123,26 +132,42 @@ func AttestingIndices(bf bitfield.Bitfield, committee []primitives.ValidatorInde
 //	 domain = get_domain(state, DOMAIN_BEACON_ATTESTER, indexed_attestation.data.target.epoch)
 //	 signing_root = compute_signing_root(indexed_attestation.data, domain)
 //	 return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
-func VerifyIndexedAttestationSig(ctx context.Context, indexedAtt *zondpb.IndexedAttestation, pubKeys []dilithium.PublicKey, domain []byte) error {
-	/*
-		ctx, span := trace.StartSpan(ctx, "attestationutil.VerifyIndexedAttestationSig")
-		defer span.End()
-		indices := indexedAtt.AttestingIndices
-		messageHash, err := signing.ComputeSigningRoot(indexedAtt.Data, domain)
-		if err != nil {
-			return errors.Wrap(err, "could not get signing root of object")
-		}
+func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *zondpb.IndexedAttestation, pubKeys []dilithium.PublicKey, domain []byte) error {
+	ctx, span := trace.StartSpan(ctx, "attestationutil.VerifyIndexedAttestationSigs")
+	defer span.End()
 
-		sig, err := dilithium.SignatureFromBytes(indexedAtt.Signature)
+	if len(indexedAtt.Signatures) != len(pubKeys) {
+		return fmt.Errorf("signatures length %d is not equal to pub keys length %d", len(indexedAtt.Signatures), len(pubKeys))
+	}
+
+	messageHash, err := signing.ComputeSigningRoot(indexedAtt.Data, domain)
+	if err != nil {
+		return errors.Wrap(err, "could not get signing root of object")
+	}
+
+	n := runtime.GOMAXPROCS(0) - 1
+	grp := errgroup.Group{}
+	grp.SetLimit(n)
+	for i, s := range indexedAtt.Signatures {
+		sig, err := dilithium.SignatureFromBytes(s)
 		if err != nil {
 			return errors.Wrap(err, "could not convert bytes to signature")
 		}
+		pubKey := pubKeys[i]
 
-		voted := len(indices) > 0
-		if voted && !sig.FastAggregateVerify(pubKeys, messageHash) {
-			return signing.ErrSigFailedToVerify
-		}
-	*/
+		grp.Go(func() error {
+			if !sig.Verify(pubKey, messageHash[:]) {
+				return signing.ErrSigFailedToVerify
+			}
+
+			return nil
+		})
+	}
+
+	if err := grp.Wait(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -222,4 +247,41 @@ func CheckPointIsEqual(checkPt1, checkPt2 *zondpb.Checkpoint) bool {
 		return false
 	}
 	return true
+}
+
+func SearchInsertIdxWithOffset(arr []int, initialIdx int, target int) (int, error) {
+	arrLen := len(arr)
+
+	if arrLen == 0 {
+		return 0, nil
+	}
+
+	if initialIdx > (arrLen - 1) {
+		return 0, fmt.Errorf("Invalid initial index %d for slice length %d", initialIdx, arrLen)
+	}
+
+	if target <= arr[initialIdx] {
+		return initialIdx, nil
+	}
+
+	if target > arr[arrLen-1] {
+		return arrLen, nil
+	}
+
+	low := initialIdx
+	high := arrLen - 1
+
+	for low <= high {
+		mid := (low + high) / 2
+		if arr[mid] == target {
+			return mid + 1, nil
+		}
+		if arr[mid] > target {
+			high = mid - 1
+		} else {
+			low = mid + 1
+		}
+	}
+
+	return low, nil
 }

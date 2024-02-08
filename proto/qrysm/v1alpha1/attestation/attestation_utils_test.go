@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -75,7 +74,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium.CryptoBytes),
+				Signatures: [][]byte{},
 			},
 			wantedErr: "nil or missing indexed attestation data",
 		},
@@ -86,7 +85,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium.CryptoBytes),
+				Signatures: [][]byte{},
 			},
 			wantedErr: "expected non-empty",
 		},
@@ -97,7 +96,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium.CryptoBytes),
+				Signatures: [][]byte{},
 			},
 			wantedErr: "indices count exceeds",
 		},
@@ -108,7 +107,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium.CryptoBytes),
+				Signatures: [][]byte{},
 			},
 			wantedErr: "not uniquely sorted",
 		},
@@ -119,7 +118,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium.CryptoBytes),
+				Signatures: [][]byte{},
 			},
 		},
 		{
@@ -129,7 +128,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium.CryptoBytes),
+				Signatures: [][]byte{},
 			},
 		},
 		{
@@ -139,7 +138,7 @@ func TestIsValidAttestationIndices(t *testing.T) {
 				Data: &zond.AttestationData{
 					Target: &zond.Checkpoint{},
 				},
-				Signature: make([]byte, dilithium.CryptoBytes),
+				Signatures: [][]byte{},
 			},
 		},
 	}
@@ -176,7 +175,7 @@ func BenchmarkIsValidAttestationIndices(b *testing.B) {
 		Data: &zond.AttestationData{
 			Target: &zond.Checkpoint{},
 		},
-		Signature: make([]byte, dilithium.CryptoBytes),
+		Signatures: [][]byte{},
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -412,4 +411,108 @@ func BenchmarkAttDataIsEqual(b *testing.B) {
 			assert.Equal(b, true, attestation.AttDataIsEqual(attData1, attData2))
 		}
 	})
+}
+
+func TestSearchInsertIdxWithOffset(t *testing.T) {
+	type args struct {
+		slc        []int
+		initialIdx int
+		target     int
+	}
+	tests := []struct {
+		name string
+		args args
+		err  string
+		want int
+	}{
+		{
+			args: args{
+				slc:        []int{},
+				initialIdx: 0,
+			},
+			want: 0,
+		},
+		{
+			args: args{
+				slc:        []int{0, 10, 12, 26},
+				initialIdx: 4,
+			},
+			err: "Invalid initial index",
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 0,
+				target:     4,
+			},
+			want: 0,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 2,
+				target:     4,
+			},
+			want: 2,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 0,
+				target:     28,
+			},
+			want: 4,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 0,
+				target:     13,
+			},
+			want: 3,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 2,
+				target:     13,
+			},
+			want: 3,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 3,
+				target:     13,
+			},
+			want: 3,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 12, 26},
+				initialIdx: 2,
+				target:     11,
+			},
+			want: 2,
+		},
+		{
+			args: args{
+				slc:        []int{5, 10, 11, 12, 26},
+				initialIdx: 3,
+				target:     13,
+			},
+			want: 4,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := attestation.SearchInsertIdxWithOffset(tt.args.slc, tt.args.initialIdx, tt.args.target)
+			if tt.err == "" {
+				require.NoError(t, err)
+				assert.DeepEqual(t, tt.want, got)
+			} else {
+				require.ErrorContains(t, tt.err, err)
+			}
+		})
+	}
 }

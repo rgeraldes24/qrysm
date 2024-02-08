@@ -13,6 +13,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
+// TODO(rgeraldes24): file
 /*
 func TestAggregateAttestations_aggregate(t *testing.T) {
 	tests := []struct {

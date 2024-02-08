@@ -22,7 +22,7 @@ func TestV1Alpha1SignedContributionAndProofToV2(t *testing.T) {
 				BlockRoot:         blockHash,
 				SubcommitteeIndex: 1,
 				AggregationBits:   bitfield.NewBitvector16(),
-				Signatures:        [][]byte{signature},
+				Signatures:        signatures,
 			},
 			SelectionProof: signature,
 		},
@@ -41,7 +41,7 @@ func TestV1Alpha1SignedContributionAndProofToV2(t *testing.T) {
 	assert.DeepEqual(t, blockHash, contrib.BeaconBlockRoot)
 	assert.Equal(t, uint64(1), contrib.SubcommitteeIndex)
 	assert.DeepEqual(t, bitfield.NewBitvector128(), contrib.AggregationBits)
-	assert.DeepEqual(t, signature, contrib.Signature)
+	assert.DeepEqual(t, signatures, contrib.Signatures)
 }
 
 func Test_V1Alpha1BeaconBlockCapellaToV2Blinded(t *testing.T) {

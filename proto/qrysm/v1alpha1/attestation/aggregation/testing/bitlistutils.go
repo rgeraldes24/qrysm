@@ -6,7 +6,6 @@ import (
 
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time"
 )
@@ -86,7 +85,7 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*zondpb.Attestation {
 				Slot:           42,
 				CommitteeIndex: 1,
 			},
-			Signature: dilithium.NewAggregateSignature().Marshal(),
+			Signatures: [][]byte{},
 		}
 	}
 	return atts
@@ -100,7 +99,7 @@ func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector16) []*zondpb.Syn
 			Slot:              primitives.Slot(1),
 			SubcommitteeIndex: 2,
 			AggregationBits:   b,
-			Signature:         dilithium.NewAggregateSignature().Marshal(),
+			Signatures:        [][]byte{},
 		}
 	}
 	return c
