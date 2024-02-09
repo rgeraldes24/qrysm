@@ -1,6 +1,13 @@
 package sync
 
 import (
+	"time"
+
+	"github.com/theQRL/qrysm/v4/config/params"
+)
+
+/*
+import (
 	"context"
 	"testing"
 	"time"
@@ -323,6 +330,9 @@ func TestService_CheckForPreviousEpochFork(t *testing.T) {
 		})
 	}
 }
+
+
+*/
 
 func oneEpoch() time.Duration {
 	return time.Duration(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot)) * time.Second

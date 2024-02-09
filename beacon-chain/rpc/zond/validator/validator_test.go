@@ -53,7 +53,7 @@ func TestProduceBlockV2(t *testing.T) {
 		assert.ErrorContains(t, "Prepared Capella beacon block is blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Bellatrix{Bellatrix: &zondpbalpha.BeaconBlockBellatrix{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -115,7 +115,7 @@ func TestProduceBlockV2SSZ(t *testing.T) {
 		assert.ErrorContains(t, "Prepared Capella beacon block is blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Bellatrix{Bellatrix: &zondpbalpha.BeaconBlockBellatrix{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -179,7 +179,7 @@ func TestProduceBlindedBlock(t *testing.T) {
 		assert.ErrorContains(t, "Prepared beacon block is not blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedBellatrix{BlindedBellatrix: &zondpbalpha.BlindedBeaconBlockBellatrix{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -251,7 +251,7 @@ func TestProduceBlindedBlockSSZ(t *testing.T) {
 		assert.ErrorContains(t, "Prepared Capella beacon block is not blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedBellatrix{BlindedBellatrix: &zondpbalpha.BlindedBeaconBlockBellatrix{Slot: 123}}}
+		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{

@@ -45,7 +45,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
-		Signatures: bytesutil.PadTo([]byte("signature1"), 96),
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), 96)},
 	}
 	att2 := &zondpbv1alpha1.Attestation{
 		AggregationBits: []byte{1, 10},
@@ -62,7 +62,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signatures: bytesutil.PadTo([]byte("signature2"), 96),
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), 96)},
 	}
 	att3 := &zondpbv1alpha1.Attestation{
 		AggregationBits: bitfield.NewBitlist(8),
@@ -79,7 +79,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot3"), 32),
 			},
 		},
-		Signatures: bytesutil.PadTo([]byte("signature3"), 96),
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature3"), 96)},
 	}
 	att4 := &zondpbv1alpha1.Attestation{
 		AggregationBits: bitfield.NewBitlist(8),
@@ -96,7 +96,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot4"), 32),
 			},
 		},
-		Signatures: bytesutil.PadTo([]byte("signature4"), 96),
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature4"), 96)},
 	}
 	s := &Server{
 		AttestationsPool: attestations.NewPool(),
@@ -227,7 +227,8 @@ func TestSubmitAttestations(t *testing.T) {
 		assert.Equal(t, true, broadcaster.BroadcastCalled)
 		assert.Equal(t, 1, len(broadcaster.BroadcastAttestations))
 		assert.Equal(t, "0x03", hexutil.Encode(broadcaster.BroadcastAttestations[0].AggregationBits))
-		assert.Equal(t, "0x8146f4397bfd8fd057ebbcd6a67327bdc7ed5fb650533edcb6377b650dea0b6da64c14ecd60846d5c0a0cd43893d6972092500f82c9d8a955e2b58c5ed3cbe885d84008ace6bd86ba9e23652f58e2ec207cec494c916063257abf285b9b15b15", hexutil.Encode(broadcaster.BroadcastAttestations[0].Signature))
+		// TODO(rgeraldes24)
+		assert.Equal(t, "0x8146f4397bfd8fd057ebbcd6a67327bdc7ed5fb650533edcb6377b650dea0b6da64c14ecd60846d5c0a0cd43893d6972092500f82c9d8a955e2b58c5ed3cbe885d84008ace6bd86ba9e23652f58e2ec207cec494c916063257abf285b9b15b15", hexutil.Encode(broadcaster.BroadcastAttestations[0].Signatures[0]))
 		assert.Equal(t, primitives.Slot(0), broadcaster.BroadcastAttestations[0].Data.Slot)
 		assert.Equal(t, primitives.CommitteeIndex(0), broadcaster.BroadcastAttestations[0].Data.CommitteeIndex)
 		assert.Equal(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2", hexutil.Encode(broadcaster.BroadcastAttestations[0].Data.BeaconBlockRoot))
@@ -382,9 +383,6 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 	})
 	t.Run("across fork", func(t *testing.T) {
 		params.SetupTestConfigCleanup(t)
-		config := params.BeaconConfig()
-		config.AltairForkEpoch = params.BeaconConfig().ShardCommitteePeriod + 1
-		params.OverrideBeaconConfig(config)
 
 		bs, _ := util.DeterministicGenesisState(t, 1)
 		// Satisfy activity time required before exiting.

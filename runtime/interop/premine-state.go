@@ -360,7 +360,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 			Graffiti: make([]byte, 32),
 			SyncAggregate: &zondpb.SyncAggregate{
 				SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
-				SyncCommitteeSignatures: make([]byte, dilithiumlib.CryptoBytes),
+				SyncCommitteeSignatures: [][]byte{},
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 				ParentHash:    make([]byte, 32),

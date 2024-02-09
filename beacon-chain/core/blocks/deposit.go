@@ -248,8 +248,8 @@ func verifyDepositDataWithDomain(ctx context.Context, deps []*zondpb.Deposit, do
 	if len(deps) == 0 {
 		return nil
 	}
-	pks := make([]dilithium.PublicKey, len(deps))
-	sigs := make([][]byte, len(deps))
+	pks := make([][]dilithium.PublicKey, len(deps))
+	sigs := make([][][]byte, len(deps))
 	msgs := make([][32]byte, len(deps))
 	for i, dep := range deps {
 		if ctx.Err() != nil {
@@ -262,8 +262,8 @@ func verifyDepositDataWithDomain(ctx context.Context, deps []*zondpb.Deposit, do
 		if err != nil {
 			return err
 		}
-		pks[i] = dpk
-		sigs[i] = dep.Data.Signature
+		pks[i] = []dilithium.PublicKey{dpk}
+		sigs[i] = [][]byte{dep.Data.Signature}
 		depositMessage := &zondpb.DepositMessage{
 			PublicKey:             dep.Data.PublicKey,
 			WithdrawalCredentials: dep.Data.WithdrawalCredentials,

@@ -47,7 +47,7 @@ func TestStoreRandomKey(t *testing.T) {
 func TestNewKeyFromDilithium(t *testing.T) {
 	b := []byte("hi")
 	b48 := bytesutil.ToBytes48(b)
-	dilithiumkey, err := dilithium.SecretKeyFromBytes(b48[:])
+	dilithiumkey, err := dilithium.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
 	key, err := NewKeyFromDilithium(dilithiumkey)
 	require.NoError(t, err)

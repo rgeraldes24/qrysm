@@ -40,7 +40,7 @@ func TestReplayBlocks_AllSkipSlots(t *testing.T) {
 	copy(mockRoot[:], "hello-world")
 	cp.Root = mockRoot[:]
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
+	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	service := New(beaconDB, doublylinkedtree.New())
 	targetSlot := params.BeaconConfig().SlotsPerEpoch - 1
@@ -69,7 +69,7 @@ func TestReplayBlocks_SameSlot(t *testing.T) {
 	copy(mockRoot[:], "hello-world")
 	cp.Root = mockRoot[:]
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
+	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	service := New(beaconDB, doublylinkedtree.New())
 	targetSlot := beaconState.Slot()
@@ -99,11 +99,11 @@ func TestReplayBlocks_LowerSlotBlock(t *testing.T) {
 	copy(mockRoot[:], "hello-world")
 	cp.Root = mockRoot[:]
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
+	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	service := New(beaconDB, doublylinkedtree.New())
 	targetSlot := beaconState.Slot()
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	b.Block.Slot = beaconState.Slot() - 1
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -114,10 +114,6 @@ func TestReplayBlocks_LowerSlotBlock(t *testing.T) {
 
 func TestReplayBlocks_ThroughForkBoundary(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	bCfg := params.BeaconConfig().Copy()
-	bCfg.AltairForkEpoch = 1
-	bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.AltairForkVersion)] = 1
-	params.OverrideBeaconConfig(bCfg)
 
 	beaconState, _ := util.DeterministicGenesisState(t, 32)
 	genesisBlock := blocks.NewGenesisBlock([]byte{})
@@ -142,14 +138,6 @@ func TestReplayBlocks_ThroughForkBoundary(t *testing.T) {
 
 func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	bCfg := params.BeaconConfig().Copy()
-	bCfg.AltairForkEpoch = 1
-	bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.AltairForkVersion)] = 1
-	bCfg.BellatrixForkEpoch = 2
-	bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.BellatrixForkVersion)] = 2
-	bCfg.CapellaForkEpoch = 3
-	bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.CapellaForkVersion)] = 3
-	params.OverrideBeaconConfig(bCfg)
 
 	beaconState, _ := util.DeterministicGenesisState(t, 32)
 	genesisBlock := blocks.NewGenesisBlock([]byte{})
@@ -192,7 +180,7 @@ func TestLoadBlocks_FirstBranch(t *testing.T) {
 	filteredBlocks, err := s.loadBlocks(ctx, 0, 8, roots[len(roots)-1])
 	require.NoError(t, err)
 
-	wanted := []*zondpb.SignedBeaconBlock{
+	wanted := []*zondpb.SignedBeaconBlockCapella{
 		savedBlocks[8],
 		savedBlocks[6],
 		savedBlocks[4],
@@ -223,7 +211,7 @@ func TestLoadBlocks_SecondBranch(t *testing.T) {
 	filteredBlocks, err := s.loadBlocks(ctx, 0, 5, roots[5])
 	require.NoError(t, err)
 
-	wanted := []*zondpb.SignedBeaconBlock{
+	wanted := []*zondpb.SignedBeaconBlockCapella{
 		savedBlocks[5],
 		savedBlocks[3],
 		savedBlocks[1],
@@ -252,7 +240,7 @@ func TestLoadBlocks_ThirdBranch(t *testing.T) {
 	filteredBlocks, err := s.loadBlocks(ctx, 0, 7, roots[7])
 	require.NoError(t, err)
 
-	wanted := []*zondpb.SignedBeaconBlock{
+	wanted := []*zondpb.SignedBeaconBlockCapella{
 		savedBlocks[7],
 		savedBlocks[6],
 		savedBlocks[4],
@@ -283,7 +271,7 @@ func TestLoadBlocks_SameSlots(t *testing.T) {
 	filteredBlocks, err := s.loadBlocks(ctx, 0, 3, roots[6])
 	require.NoError(t, err)
 
-	wanted := []*zondpb.SignedBeaconBlock{
+	wanted := []*zondpb.SignedBeaconBlockCapella{
 		savedBlocks[6],
 		savedBlocks[5],
 		savedBlocks[1],
@@ -312,7 +300,7 @@ func TestLoadBlocks_SameEndSlots(t *testing.T) {
 	filteredBlocks, err := s.loadBlocks(ctx, 0, 2, roots[2])
 	require.NoError(t, err)
 
-	wanted := []*zondpb.SignedBeaconBlock{
+	wanted := []*zondpb.SignedBeaconBlockCapella{
 		savedBlocks[2],
 		savedBlocks[1],
 		savedBlocks[0],
@@ -340,7 +328,7 @@ func TestLoadBlocks_SameEndSlotsWith2blocks(t *testing.T) {
 	filteredBlocks, err := s.loadBlocks(ctx, 0, 2, roots[1])
 	require.NoError(t, err)
 
-	wanted := []*zondpb.SignedBeaconBlock{
+	wanted := []*zondpb.SignedBeaconBlockCapella{
 		savedBlocks[1],
 		savedBlocks[0],
 	}
@@ -372,76 +360,76 @@ func TestLoadBlocks_BadStart(t *testing.T) {
 //
 //	\- B2 -- B4 -- B6 ----- B8
 //	                 \- B7
-func tree1(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, []*zondpb.SignedBeaconBlock, error) {
-	b0 := util.NewBeaconBlock()
+func tree1(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, []*zondpb.SignedBeaconBlockCapella, error) {
+	b0 := util.NewBeaconBlockCapella()
 	b0.Block.Slot = 0
 	b0.Block.ParentRoot = genesisRoot
 	r0, err := b0.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b1 := util.NewBeaconBlock()
+	b1 := util.NewBeaconBlockCapella()
 	b1.Block.Slot = 1
 	b1.Block.ParentRoot = r0[:]
 	r1, err := b1.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b2 := util.NewBeaconBlock()
+	b2 := util.NewBeaconBlockCapella()
 	b2.Block.Slot = 2
 	b2.Block.ParentRoot = r1[:]
 	r2, err := b2.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b3 := util.NewBeaconBlock()
+	b3 := util.NewBeaconBlockCapella()
 	b3.Block.Slot = 3
 	b3.Block.ParentRoot = r1[:]
 	r3, err := b3.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b4 := util.NewBeaconBlock()
+	b4 := util.NewBeaconBlockCapella()
 	b4.Block.Slot = 4
 	b4.Block.ParentRoot = r2[:]
 	r4, err := b4.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b5 := util.NewBeaconBlock()
+	b5 := util.NewBeaconBlockCapella()
 	b5.Block.Slot = 5
 	b5.Block.ParentRoot = r3[:]
 	r5, err := b5.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b6 := util.NewBeaconBlock()
+	b6 := util.NewBeaconBlockCapella()
 	b6.Block.Slot = 6
 	b6.Block.ParentRoot = r4[:]
 	r6, err := b6.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b7 := util.NewBeaconBlock()
+	b7 := util.NewBeaconBlockCapella()
 	b7.Block.Slot = 7
 	b7.Block.ParentRoot = r6[:]
 	r7, err := b7.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b8 := util.NewBeaconBlock()
+	b8 := util.NewBeaconBlockCapella()
 	b8.Block.Slot = 8
 	b8.Block.ParentRoot = r6[:]
 	r8, err := b8.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
-	returnedBlocks := make([]*zondpb.SignedBeaconBlock, 0)
-	for _, b := range []*zondpb.SignedBeaconBlock{b0, b1, b2, b3, b4, b5, b6, b7, b8} {
-		beaconBlock := util.NewBeaconBlock()
+	returnedBlocks := make([]*zondpb.SignedBeaconBlockCapella, 0)
+	for _, b := range []*zondpb.SignedBeaconBlockCapella{b0, b1, b2, b3, b4, b5, b6, b7, b8} {
+		beaconBlock := util.NewBeaconBlockCapella()
 		beaconBlock.Block.Slot = b.Block.Slot
 		beaconBlock.Block.ParentRoot = bytesutil.PadTo(b.Block.ParentRoot, 32)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(beaconBlock)
@@ -464,22 +452,22 @@ func tree1(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 //	\- B2
 //	\- B2
 //	\- B2 -- B3
-func tree2(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, []*zondpb.SignedBeaconBlock, error) {
-	b0 := util.NewBeaconBlock()
+func tree2(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, []*zondpb.SignedBeaconBlockCapella, error) {
+	b0 := util.NewBeaconBlockCapella()
 	b0.Block.Slot = 0
 	b0.Block.ParentRoot = genesisRoot
 	r0, err := b0.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b1 := util.NewBeaconBlock()
+	b1 := util.NewBeaconBlockCapella()
 	b1.Block.Slot = 1
 	b1.Block.ParentRoot = r0[:]
 	r1, err := b1.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b21 := util.NewBeaconBlock()
+	b21 := util.NewBeaconBlockCapella()
 	b21.Block.Slot = 2
 	b21.Block.ParentRoot = r1[:]
 	b21.Block.StateRoot = bytesutil.PadTo([]byte{'A'}, 32)
@@ -487,7 +475,7 @@ func tree2(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	b22 := util.NewBeaconBlock()
+	b22 := util.NewBeaconBlockCapella()
 	b22.Block.Slot = 2
 	b22.Block.ParentRoot = r1[:]
 	b22.Block.StateRoot = bytesutil.PadTo([]byte{'B'}, 32)
@@ -495,7 +483,7 @@ func tree2(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	b23 := util.NewBeaconBlock()
+	b23 := util.NewBeaconBlockCapella()
 	b23.Block.Slot = 2
 	b23.Block.ParentRoot = r1[:]
 	b23.Block.StateRoot = bytesutil.PadTo([]byte{'C'}, 32)
@@ -503,7 +491,7 @@ func tree2(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	b24 := util.NewBeaconBlock()
+	b24 := util.NewBeaconBlockCapella()
 	b24.Block.Slot = 2
 	b24.Block.ParentRoot = r1[:]
 	b24.Block.StateRoot = bytesutil.PadTo([]byte{'D'}, 32)
@@ -511,19 +499,19 @@ func tree2(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	b3 := util.NewBeaconBlock()
+	b3 := util.NewBeaconBlockCapella()
 	b3.Block.Slot = 3
 	b3.Block.ParentRoot = r24[:]
 	r3, err := b3.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
-	returnedBlocks := make([]*zondpb.SignedBeaconBlock, 0)
-	for _, b := range []*zondpb.SignedBeaconBlock{b0, b1, b21, b22, b23, b24, b3} {
-		beaconBlock := util.NewBeaconBlock()
+	returnedBlocks := make([]*zondpb.SignedBeaconBlockCapella, 0)
+	for _, b := range []*zondpb.SignedBeaconBlockCapella{b0, b1, b21, b22, b23, b24, b3} {
+		beaconBlock := util.NewBeaconBlockCapella()
 		beaconBlock.Block.Slot = b.Block.Slot
 		beaconBlock.Block.ParentRoot = bytesutil.PadTo(b.Block.ParentRoot, 32)
 		beaconBlock.Block.StateRoot = bytesutil.PadTo(b.Block.StateRoot, 32)
@@ -547,22 +535,22 @@ func tree2(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 //	\- B2
 //	\- B2
 //	\- B2
-func tree3(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, []*zondpb.SignedBeaconBlock, error) {
-	b0 := util.NewBeaconBlock()
+func tree3(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, []*zondpb.SignedBeaconBlockCapella, error) {
+	b0 := util.NewBeaconBlockCapella()
 	b0.Block.Slot = 0
 	b0.Block.ParentRoot = genesisRoot
 	r0, err := b0.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b1 := util.NewBeaconBlock()
+	b1 := util.NewBeaconBlockCapella()
 	b1.Block.Slot = 1
 	b1.Block.ParentRoot = r0[:]
 	r1, err := b1.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b21 := util.NewBeaconBlock()
+	b21 := util.NewBeaconBlockCapella()
 	b21.Block.Slot = 2
 	b21.Block.ParentRoot = r1[:]
 	b21.Block.StateRoot = bytesutil.PadTo([]byte{'A'}, 32)
@@ -570,7 +558,7 @@ func tree3(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	b22 := util.NewBeaconBlock()
+	b22 := util.NewBeaconBlockCapella()
 	b22.Block.Slot = 2
 	b22.Block.ParentRoot = r1[:]
 	b22.Block.StateRoot = bytesutil.PadTo([]byte{'B'}, 32)
@@ -578,7 +566,7 @@ func tree3(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	b23 := util.NewBeaconBlock()
+	b23 := util.NewBeaconBlockCapella()
 	b23.Block.Slot = 2
 	b23.Block.ParentRoot = r1[:]
 	b23.Block.StateRoot = bytesutil.PadTo([]byte{'C'}, 32)
@@ -586,7 +574,7 @@ func tree3(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	b24 := util.NewBeaconBlock()
+	b24 := util.NewBeaconBlockCapella()
 	b24.Block.Slot = 2
 	b24.Block.ParentRoot = r1[:]
 	b24.Block.StateRoot = bytesutil.PadTo([]byte{'D'}, 32)
@@ -594,12 +582,12 @@ func tree3(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
-	returnedBlocks := make([]*zondpb.SignedBeaconBlock, 0)
-	for _, b := range []*zondpb.SignedBeaconBlock{b0, b1, b21, b22, b23, b24} {
-		beaconBlock := util.NewBeaconBlock()
+	returnedBlocks := make([]*zondpb.SignedBeaconBlockCapella, 0)
+	for _, b := range []*zondpb.SignedBeaconBlockCapella{b0, b1, b21, b22, b23, b24} {
+		beaconBlock := util.NewBeaconBlockCapella()
 		beaconBlock.Block.Slot = b.Block.Slot
 		beaconBlock.Block.ParentRoot = bytesutil.PadTo(b.Block.ParentRoot, 32)
 		beaconBlock.Block.StateRoot = bytesutil.PadTo(b.Block.StateRoot, 32)
@@ -624,15 +612,15 @@ func tree3(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 //	\- B2
 //	\- B2
 //	\- B2
-func tree4(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, []*zondpb.SignedBeaconBlock, error) {
-	b0 := util.NewBeaconBlock()
+func tree4(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, []*zondpb.SignedBeaconBlockCapella, error) {
+	b0 := util.NewBeaconBlockCapella()
 	b0.Block.Slot = 0
 	b0.Block.ParentRoot = genesisRoot
 	r0, err := b0.Block.HashTreeRoot()
 	if err != nil {
 		return nil, nil, err
 	}
-	b21 := util.NewBeaconBlock()
+	b21 := util.NewBeaconBlockCapella()
 	b21.Block.Slot = 2
 	b21.Block.ParentRoot = r0[:]
 	b21.Block.StateRoot = bytesutil.PadTo([]byte{'A'}, 32)
@@ -640,7 +628,7 @@ func tree4(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	b22 := util.NewBeaconBlock()
+	b22 := util.NewBeaconBlockCapella()
 	b22.Block.Slot = 2
 	b22.Block.ParentRoot = r0[:]
 	b22.Block.StateRoot = bytesutil.PadTo([]byte{'B'}, 32)
@@ -648,7 +636,7 @@ func tree4(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	b23 := util.NewBeaconBlock()
+	b23 := util.NewBeaconBlockCapella()
 	b23.Block.Slot = 2
 	b23.Block.ParentRoot = r0[:]
 	b23.Block.StateRoot = bytesutil.PadTo([]byte{'C'}, 32)
@@ -656,7 +644,7 @@ func tree4(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	b24 := util.NewBeaconBlock()
+	b24 := util.NewBeaconBlockCapella()
 	b24.Block.Slot = 2
 	b24.Block.ParentRoot = r0[:]
 	b24.Block.StateRoot = bytesutil.PadTo([]byte{'D'}, 32)
@@ -664,12 +652,12 @@ func tree4(t *testing.T, beaconDB db.Database, genesisRoot []byte) ([][32]byte, 
 	if err != nil {
 		return nil, nil, err
 	}
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
-	returnedBlocks := make([]*zondpb.SignedBeaconBlock, 0)
-	for _, b := range []*zondpb.SignedBeaconBlock{b0, b21, b22, b23, b24} {
-		beaconBlock := util.NewBeaconBlock()
+	returnedBlocks := make([]*zondpb.SignedBeaconBlockCapella, 0)
+	for _, b := range []*zondpb.SignedBeaconBlockCapella{b0, b21, b22, b23, b24} {
+		beaconBlock := util.NewBeaconBlockCapella()
 		beaconBlock.Block.Slot = b.Block.Slot
 		beaconBlock.Block.ParentRoot = bytesutil.PadTo(b.Block.ParentRoot, 32)
 		beaconBlock.Block.StateRoot = bytesutil.PadTo(b.Block.StateRoot, 32)
@@ -693,7 +681,7 @@ func TestLoadFinalizedBlocks(t *testing.T) {
 	s := &State{
 		beaconDB: beaconDB,
 	}
-	gBlock := util.NewBeaconBlock()
+	gBlock := util.NewBeaconBlockCapella()
 	gRoot, err := gBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, ctx, beaconDB, gBlock)

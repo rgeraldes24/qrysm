@@ -750,16 +750,20 @@ func isDigestValid(digest [4]byte, genesis time.Time, genValRoot [32]byte) (bool
 	if err != nil {
 		return false, err
 	}
-	isNextEpoch, err := forks.IsForkNextEpoch(genesis, genValRoot[:])
-	if err != nil {
-		return false, err
-	}
-	// In the event there is a fork the next epoch,
-	// we skip the check, as we subscribe subnets an
-	// epoch in advance.
-	if isNextEpoch {
-		return true, nil
-	}
+
+	/*
+		isNextEpoch, err := forks.IsForkNextEpoch(genesis, genValRoot[:])
+		if err != nil {
+			return false, err
+		}
+		// In the event there is a fork the next epoch,
+		// we skip the check, as we subscribe subnets an
+		// epoch in advance.
+		if isNextEpoch {
+			return true, nil
+		}
+	*/
+
 	return retDigest == digest, nil
 }
 

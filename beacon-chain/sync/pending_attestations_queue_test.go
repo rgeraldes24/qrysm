@@ -8,7 +8,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/p2p/enr"
 	"github.com/theQRL/qrysm/v4/async/abool"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
@@ -22,7 +22,7 @@ import (
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
@@ -89,7 +89,7 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	hashTreeRoot, err := signing.ComputeSigningRoot(att.Data, attesterDomain)
 	assert.NoError(t, err)
 	for _, i := range attestingIndices {
-		att.Signatures = privKeys[i].Sign(hashTreeRoot[:]).Marshal()
+		att.Signatures = [][]byte{privKeys[i].Sign(hashTreeRoot[:]).Marshal()}
 	}
 
 	// Arbitrary aggregator index for testing purposes.
@@ -165,15 +165,15 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 		blkRootToPendingAtts: make(map[[32]byte][]*zondpb.SignedAggregateAttestationAndProof),
 	}
 
-	priv, err := bls.RandKey()
+	priv, err := dilithium.RandKey()
 	require.NoError(t, err)
 	a := &zondpb.AggregateAttestationAndProof{
 		Aggregate: &zondpb.Attestation{
-			Signatures:      priv.Sign([]byte("foo")).Marshal(),
+			Signatures:      [][]byte{priv.Sign([]byte("foo")).Marshal()},
 			AggregationBits: bitfield.Bitlist{0x02},
 			Data:            util.HydrateAttestationData(&zondpb.AttestationData{}),
 		},
-		SelectionProof: make([]byte, dilithium2.CryptoBytes),
+		SelectionProof: make([]byte, dilithiumlib.CryptoBytes),
 	}
 
 	b := util.NewBeaconBlockCapella()
@@ -182,7 +182,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b)
 	require.NoError(t, r.cfg.beaconDB.SaveState(context.Background(), s, r32))
 
-	r.blkRootToPendingAtts[r32] = []*zondpb.SignedAggregateAttestationAndProof{{Message: a, Signature: make([]byte, dilithium2.CryptoBytes)}}
+	r.blkRootToPendingAtts[r32] = []*zondpb.SignedAggregateAttestationAndProof{{Message: a, Signature: make([]byte, dilithiumlib.CryptoBytes)}}
 	require.NoError(t, r.processPendingAtts(context.Background()))
 
 	assert.Equal(t, false, p1.BroadcastCalled, "Broadcasted bad aggregate")
@@ -212,7 +212,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	hashTreeRoot, err := signing.ComputeSigningRoot(att.Data, attesterDomain)
 	assert.NoError(t, err)
 	for _, i := range attestingIndices {
-		att.Signatures = privKeys[i].Sign(hashTreeRoot[:]).Marshal()
+		att.Signatures = [][]byte{privKeys[i].Sign(hashTreeRoot[:]).Marshal()}
 	}
 
 	// Arbitrary aggregator index for testing purposes.
@@ -291,12 +291,12 @@ func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 	require.NoError(t, err)
 	hashTreeRoot, err := signing.ComputeSigningRoot(att.Data, attesterDomain)
 	assert.NoError(t, err)
-	sigs := make([]bls.Signature, len(attestingIndices))
+	sigs := make([][]byte, len(attestingIndices))
 	for i, indice := range attestingIndices {
-		sig := privKeys[indice].Sign(hashTreeRoot[:])
+		sig := privKeys[indice].Sign(hashTreeRoot[:]).Marshal()
 		sigs[i] = sig
 	}
-	att.Signatures = bls.AggregateSignatures(sigs).Marshal()
+	att.Signatures = sigs
 
 	// Arbitrary aggregator index for testing purposes.
 	aggregatorIndex := committee[0]

@@ -235,8 +235,6 @@ func TestExtractMetaDataType(t *testing.T) {
 	// Precompute digests
 	genDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, params.BeaconConfig().ZeroHash[:])
 	require.NoError(t, err)
-	altairDigest, err := signing.ComputeForkDigest(params.BeaconConfig().AltairForkVersion, params.BeaconConfig().ZeroHash[:])
-	require.NoError(t, err)
 
 	type args struct {
 		digest []byte
@@ -282,15 +280,6 @@ func TestExtractMetaDataType(t *testing.T) {
 				clock:  startup.NewClock(time.Now(), [32]byte{}),
 			},
 			want:    wrapper.WrappedMetadataV0(&pb.MetaDataV0{}),
-			wantErr: false,
-		},
-		{
-			name: "altair fork version",
-			args: args{
-				digest: altairDigest[:],
-				clock:  startup.NewClock(time.Now(), [32]byte{}),
-			},
-			want:    wrapper.WrappedMetadataV1(&pb.MetaDataV1{}),
 			wantErr: false,
 		},
 	}

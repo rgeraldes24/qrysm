@@ -52,7 +52,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 				},
 			},
-			Signatures: bytesutil.PadTo([]byte("signature1"), 96),
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), 96)},
 		},
 		Attestation_2: &zondpbv1alpha1.IndexedAttestation{
 			AttestingIndices: []uint64{2, 20},
@@ -69,7 +69,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signatures: bytesutil.PadTo([]byte("signature2"), 96),
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), 96)},
 		},
 	}
 	slashing2 := &zondpbv1alpha1.AttesterSlashing{
@@ -88,7 +88,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot3"), 32),
 				},
 			},
-			Signatures: bytesutil.PadTo([]byte("signature3"), 96),
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature3"), 96)},
 		},
 		Attestation_2: &zondpbv1alpha1.IndexedAttestation{
 			AttestingIndices: []uint64{4, 40},
@@ -105,7 +105,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot4"), 32),
 				},
 			},
-			Signatures: bytesutil.PadTo([]byte("signature4"), 96),
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature4"), 96)},
 		},
 	}
 
@@ -122,7 +122,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 }
 
 func TestListPoolProposerSlashings(t *testing.T) {
-	bs, err := util.NewBeaconState()
+	bs, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	slashing1 := &zondpbv1alpha1.ProposerSlashing{
 		Header_1: &zondpbv1alpha1.SignedBeaconBlockHeader{
@@ -214,7 +214,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 				},
 			},
-			Signatures: make([]byte, 96),
+			Signatures: [][]byte{},
 		},
 		Attestation_2: &zondpbv1.IndexedAttestation{
 			AttestingIndices: []uint64{0},
@@ -231,7 +231,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signatures: make([]byte, 96),
+			Signatures: [][]byte{},
 		},
 	}
 
@@ -240,7 +240,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 		require.NoError(t, err)
 		sig, err := dilithium.SignatureFromBytes(sb)
 		require.NoError(t, err)
-		att.Signatures = sig.Marshal()
+		att.Signatures = [][]byte{sig.Marshal()}
 	}
 
 	broadcaster := &p2pMock.MockBroadcaster{}
@@ -268,9 +268,6 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 	defer transition.SkipSlotCache.Enable()
 
 	params.SetupTestConfigCleanup(t)
-	config := params.BeaconConfig()
-	config.AltairForkEpoch = 1
-	params.OverrideBeaconConfig(config)
 
 	bs, keys := util.DeterministicGenesisState(t, 1)
 
@@ -290,7 +287,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 				},
 			},
-			Signature: make([]byte, 96),
+			Signatures: [][]byte{make([]byte, 96)},
 		},
 		Attestation_2: &zondpbv1.IndexedAttestation{
 			AttestingIndices: []uint64{0},
@@ -307,7 +304,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signatures: make([]byte, 96),
+			Signatures: [][]byte{},
 		},
 	}
 
@@ -320,7 +317,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 		require.NoError(t, err)
 		sig, err := dilithium.SignatureFromBytes(sb)
 		require.NoError(t, err)
-		att.Signatures = sig.Marshal()
+		att.Signatures = [][]byte{sig.Marshal()}
 	}
 
 	broadcaster := &p2pMock.MockBroadcaster{}
@@ -365,7 +362,7 @@ func TestSubmitAttesterSlashing_InvalidSlashing(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
-		Signatures: make([]byte, 96),
+		Signatures: [][]byte{},
 	}
 
 	slashing := &zondpbv1.AttesterSlashing{
@@ -465,9 +462,6 @@ func TestSubmitProposerSlashing_AcrossFork(t *testing.T) {
 	defer transition.SkipSlotCache.Enable()
 
 	params.SetupTestConfigCleanup(t)
-	config := params.BeaconConfig()
-	config.AltairForkEpoch = 1
-	params.OverrideBeaconConfig(config)
 
 	bs, keys := util.DeterministicGenesisState(t, 1)
 
@@ -603,10 +597,6 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 	defer transition.SkipSlotCache.Enable()
 
 	params.SetupTestConfigCleanup(t)
-	c := params.BeaconConfig().Copy()
-	// Required for correct committee size calculation.
-	c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
-	params.OverrideBeaconConfig(c)
 
 	spb := &zondpbv1alpha1.BeaconStateCapella{
 		Fork: &zondpbv1alpha1.Fork{
@@ -700,10 +690,6 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 	defer transition.SkipSlotCache.Enable()
 
 	params.SetupTestConfigCleanup(t)
-	c := params.BeaconConfig().Copy()
-	// Required for correct committee size calculation.
-	c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
-	params.OverrideBeaconConfig(c)
 
 	spb := &zondpbv1alpha1.BeaconStateBellatrix{
 		Fork: &zondpbv1alpha1.Fork{
@@ -812,10 +798,6 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 	defer transition.SkipSlotCache.Enable()
 
 	params.SetupTestConfigCleanup(t)
-	c := params.BeaconConfig().Copy()
-	// Required for correct committee size calculation.
-	c.CapellaForkEpoch = c.BellatrixForkEpoch.Add(2)
-	params.OverrideBeaconConfig(c)
 
 	spb := &zondpbv1alpha1.BeaconStateCapella{
 		Fork: &zondpbv1alpha1.Fork{

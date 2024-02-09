@@ -821,7 +821,7 @@ func TestService_migrateOldDepositTree(t *testing.T) {
 	)
 	require.NoError(t, err)
 	eth1Data := &zondpb.ETH1ChainData{
-		BeaconState: &zondpb.BeaconState{
+		BeaconState: &zondpb.BeaconStateCapella{
 			Eth1Data: &zondpb.Eth1Data{
 				DepositCount: 800,
 			},

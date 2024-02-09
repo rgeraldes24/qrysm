@@ -124,10 +124,16 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeBits")
 	}
-	syncCommitteeSig, err := DecodeHexWithLength(b.Body.SyncAggregate.SyncCommitteeSignature, dilithium2.CryptoBytes)
-	if err != nil {
-		return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeSignature")
+
+	syncCommitteeSigs := make([][]byte, len(b.Body.SyncAggregate.SyncCommitteeSignatures))
+	for i := range syncCommitteeSigs {
+		syncCommitteeSig, err := DecodeHexWithLength(b.Body.SyncAggregate.SyncCommitteeSignatures[i], dilithium2.CryptoBytes)
+		if err != nil {
+			return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeSignatures")
+		}
+		syncCommitteeSigs[i] = syncCommitteeSig
 	}
+
 	payloadParentHash, err := DecodeHexWithLength(b.Body.ExecutionPayload.ParentHash, common.HashLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.ExecutionPayload.ParentHash")
@@ -245,7 +251,7 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 			VoluntaryExits:    exits,
 			SyncAggregate: &zond.SyncAggregate{
 				SyncCommitteeBits:       syncCommitteeBits,
-				SyncCommitteeSignatures: syncCommitteeSig,
+				SyncCommitteeSignatures: syncCommitteeSigs,
 			},
 			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 				ParentHash:    payloadParentHash,
@@ -374,10 +380,16 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeBits")
 	}
-	syncCommitteeSig, err := DecodeHexWithLength(b.Body.SyncAggregate.SyncCommitteeSignature, dilithium2.CryptoBytes)
-	if err != nil {
-		return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeSignature")
+
+	syncCommitteeSigs := make([][]byte, len(b.Body.SyncAggregate.SyncCommitteeSignatures))
+	for i := range syncCommitteeSigs {
+		syncCommitteeSig, err := DecodeHexWithLength(b.Body.SyncAggregate.SyncCommitteeSignatures[i], dilithium2.CryptoBytes)
+		if err != nil {
+			return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeSignature")
+		}
+		syncCommitteeSigs[i] = syncCommitteeSig
 	}
+
 	payloadParentHash, err := DecodeHexWithLength(b.Body.ExecutionPayloadHeader.ParentHash, common.HashLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.ExecutionPayloadHeader.ParentHash")
@@ -463,7 +475,7 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 			VoluntaryExits:    exits,
 			SyncAggregate: &zond.SyncAggregate{
 				SyncCommitteeBits:       syncCommitteeBits,
-				SyncCommitteeSignatures: syncCommitteeSig,
+				SyncCommitteeSignatures: syncCommitteeSigs,
 			},
 			ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
 				ParentHash:       payloadParentHash,
@@ -546,8 +558,8 @@ func BlindedBeaconBlockCapellaFromConsensus(b *zond.BlindedBeaconBlockCapella) (
 			Deposits:          deposits,
 			VoluntaryExits:    exits,
 			SyncAggregate: &SyncAggregate{
-				SyncCommitteeBits:      hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeBits),
-				SyncCommitteeSignature: hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeSignature),
+				SyncCommitteeBits:       hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeBits),
+				SyncCommitteeSignatures: hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeSignature),
 			},
 			ExecutionPayloadHeader: &ExecutionPayloadHeaderCapella{
 				ParentHash:       hexutil.Encode(b.Body.ExecutionPayloadHeader.ParentHash),
@@ -643,8 +655,8 @@ func BeaconBlockCapellaFromConsensus(b *zond.BeaconBlockCapella) (*BeaconBlockCa
 			Deposits:          deposits,
 			VoluntaryExits:    exits,
 			SyncAggregate: &SyncAggregate{
-				SyncCommitteeBits:      hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeBits),
-				SyncCommitteeSignature: hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeSignature),
+				SyncCommitteeBits:       hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeBits),
+				SyncCommitteeSignatures: hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeSignature),
 			},
 			ExecutionPayload: &ExecutionPayloadCapella{
 				ParentHash:    hexutil.Encode(b.Body.ExecutionPayload.ParentHash),
@@ -862,12 +874,12 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*zond.AttesterSlas
 			Attestation_1: &zond.IndexedAttestation{
 				AttestingIndices: a1AttestingIndices,
 				Data:             a1Data,
-				Signature:        a1Sig,
+				Signatures:       a1Sig,
 			},
 			Attestation_2: &zond.IndexedAttestation{
 				AttestingIndices: a2AttestingIndices,
 				Data:             a2Data,
-				Signature:        a2Sig,
+				Signatures:       a2Sig,
 			},
 		}
 	}
@@ -901,7 +913,7 @@ func AttesterSlashingsFromConsensus(src []*zond.AttesterSlashing) ([]*AttesterSl
 						Root:  hexutil.Encode(s.Attestation_1.Data.Target.Root),
 					},
 				},
-				Signature: hexutil.Encode(s.Attestation_1.Signature),
+				Signatures: hexutil.Encode(s.Attestation_1.Signature),
 			},
 			Attestation2: &IndexedAttestation{
 				AttestingIndices: a2AttestingIndices,
@@ -918,7 +930,7 @@ func AttesterSlashingsFromConsensus(src []*zond.AttesterSlashing) ([]*AttesterSl
 						Root:  hexutil.Encode(s.Attestation_2.Data.Target.Root),
 					},
 				},
-				Signature: hexutil.Encode(s.Attestation_2.Signature),
+				Signatures: hexutil.Encode(s.Attestation_2.Signature),
 			},
 		}
 	}

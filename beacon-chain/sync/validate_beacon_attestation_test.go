@@ -271,12 +271,12 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 				require.NoError(t, err)
 				for i := 0; ; i++ {
 					if tt.msg.AggregationBits.BitAt(uint64(i)) {
-						tt.msg.Signatures = keys[com[i]].Sign(attRoot[:]).Marshal()
+						tt.msg.Signatures = [][]byte{keys[com[i]].Sign(attRoot[:]).Marshal()}
 						break
 					}
 				}
 			} else {
-				tt.msg.Signatures = make([]byte, 96)
+				tt.msg.Signatures = [][]byte{}
 			}
 			buf := new(bytes.Buffer)
 			_, err := p.Encoding().EncodeGossip(buf, tt.msg)

@@ -231,13 +231,13 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, (*pb.PayloadIDBytes)(nil), payloadID)
 		require.DeepEqual(t, []byte(nil), validHash)
 	})
-	t.Run(ForkchoiceUpdatedMethod+" INVALID status", func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV2+" INVALID status", func(t *testing.T) {
 		forkChoiceState := &pb.ForkchoiceState{
 			HeadBlockHash:      []byte("head"),
 			SafeBlockHash:      []byte("safe"),
 			FinalizedBlockHash: []byte("finalized"),
 		}
-		payloadAttributes := &pb.PayloadAttributes{
+		payloadAttributes := &pb.PayloadAttributesV2{
 			Timestamp:             1,
 			PrevRandao:            []byte("random"),
 			SuggestedFeeRecipient: []byte("suggestedFeeRecipient"),
@@ -246,7 +246,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		want, ok := fix["ForkchoiceUpdatedInvalidResponse"].(*ForkchoiceUpdatedResponse)
 		require.Equal(t, true, ok)
-		client := forkchoiceUpdateSetup(t, forkChoiceState, payloadAttributes, want)
+		client := forkchoiceUpdateSetupV2(t, forkChoiceState, payloadAttributes, want)
 
 		// We call the RPC method via HTTP and expect a proper result.
 		payloadID, validHash, err := client.ForkchoiceUpdated(ctx, forkChoiceState, p)
@@ -254,13 +254,13 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, (*pb.PayloadIDBytes)(nil), payloadID)
 		require.DeepEqual(t, want.Status.LatestValidHash, validHash)
 	})
-	t.Run(ForkchoiceUpdatedMethod+" UNKNOWN status", func(t *testing.T) {
+	t.Run(ForkchoiceUpdatedMethodV2+" UNKNOWN status", func(t *testing.T) {
 		forkChoiceState := &pb.ForkchoiceState{
 			HeadBlockHash:      []byte("head"),
 			SafeBlockHash:      []byte("safe"),
 			FinalizedBlockHash: []byte("finalized"),
 		}
-		payloadAttributes := &pb.PayloadAttributes{
+		payloadAttributes := &pb.PayloadAttributesV2{
 			Timestamp:             1,
 			PrevRandao:            []byte("random"),
 			SuggestedFeeRecipient: []byte("suggestedFeeRecipient"),
@@ -269,7 +269,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.NoError(t, err)
 		want, ok := fix["ForkchoiceUpdatedAcceptedResponse"].(*ForkchoiceUpdatedResponse)
 		require.Equal(t, true, ok)
-		client := forkchoiceUpdateSetup(t, forkChoiceState, payloadAttributes, want)
+		client := forkchoiceUpdateSetupV2(t, forkChoiceState, payloadAttributes, want)
 
 		// We call the RPC method via HTTP and expect a proper result.
 		payloadID, validHash, err := client.ForkchoiceUpdated(ctx, forkChoiceState, p)
@@ -333,15 +333,15 @@ func TestClient_HTTP(t *testing.T) {
 		require.ErrorIs(t, ErrInvalidPayloadStatus, err)
 		require.DeepEqual(t, want.LatestValidHash, resp)
 	})
-	t.Run(NewPayloadMethod+" UNKNOWN status", func(t *testing.T) {
-		execPayload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
+	t.Run(NewPayloadMethodV2+" UNKNOWN status", func(t *testing.T) {
+		execPayload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayloadCapella)
 		require.Equal(t, true, ok)
 		want, ok := fix["UnknownStatus"].(*pb.PayloadStatus)
 		require.Equal(t, true, ok)
-		client := newPayloadSetup(t, want, execPayload)
+		client := newPayloadV2Setup(t, want, execPayload)
 
 		// We call the RPC method via HTTP and expect a proper result.
-		wrappedPayload, err := blocks.WrappedExecutionPayload(execPayload)
+		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(execPayload, 0)
 		require.NoError(t, err)
 		resp, err := client.NewPayload(ctx, wrappedPayload, []common.Hash{}, &common.Hash{})
 		require.ErrorIs(t, ErrUnknownPayloadStatus, err)
@@ -466,7 +466,7 @@ func TestReconstructFullBellatrixBlock(t *testing.T) {
 	t.Run("only blinded block", func(t *testing.T) {
 		want := "can only reconstruct block from blinded block format"
 		service := &Service{}
-		bellatrixBlock := util.NewBeaconBlockBellatrix()
+		bellatrixBlock := util.NewBeaconBlockCapella()
 		wrapped, err := blocks.NewSignedBeaconBlock(bellatrixBlock)
 		require.NoError(t, err)
 		_, err = service.ReconstructFullBlock(ctx, wrapped)
@@ -474,8 +474,8 @@ func TestReconstructFullBellatrixBlock(t *testing.T) {
 	})
 	t.Run("pre-merge execution payload", func(t *testing.T) {
 		service := &Service{}
-		bellatrixBlock := util.NewBlindedBeaconBlockBellatrix()
-		wanted := util.NewBeaconBlockBellatrix()
+		bellatrixBlock := util.NewBlindedBeaconBlockCapella()
+		wanted := util.NewBeaconBlockCapella()
 		wanted.Block.Slot = 1
 		// Make sure block hash is the zero hash.
 		bellatrixBlock.Block.Body.ExecutionPayloadHeader.BlockHash = make([]byte, 32)
@@ -490,7 +490,7 @@ func TestReconstructFullBellatrixBlock(t *testing.T) {
 	})
 	t.Run("properly reconstructs block with correct payload", func(t *testing.T) {
 		fix := fixtures()
-		payload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
+		payload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayloadCapella)
 		require.Equal(t, true, ok)
 
 		jsonPayload := make(map[string]interface{})
@@ -527,9 +527,9 @@ func TestReconstructFullBellatrixBlock(t *testing.T) {
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
 
-		wrappedPayload, err := blocks.WrappedExecutionPayload(payload)
+		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
 		require.NoError(t, err)
-		header, err := blocks.PayloadToHeader(wrappedPayload)
+		header, err := blocks.PayloadToHeaderCapella(wrappedPayload)
 		require.NoError(t, err)
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -552,7 +552,7 @@ func TestReconstructFullBellatrixBlock(t *testing.T) {
 
 		service := &Service{}
 		service.rpcClient = rpcClient
-		blindedBlock := util.NewBlindedBeaconBlockBellatrix()
+		blindedBlock := util.NewBlindedBeaconBlockCapella()
 
 		blindedBlock.Block.Body.ExecutionPayloadHeader = header
 		wrapped, err := blocks.NewSignedBeaconBlock(blindedBlock)
@@ -577,7 +577,7 @@ func TestReconstructFullBellatrixBlockBatch(t *testing.T) {
 	t.Run("only blinded block", func(t *testing.T) {
 		want := "can only reconstruct block from blinded block format"
 		service := &Service{}
-		bellatrixBlock := util.NewBeaconBlockBellatrix()
+		bellatrixBlock := util.NewBeaconBlockCapella()
 		wrapped, err := blocks.NewSignedBeaconBlock(bellatrixBlock)
 		require.NoError(t, err)
 		_, err = service.ReconstructFullBellatrixBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrapped})
@@ -585,8 +585,8 @@ func TestReconstructFullBellatrixBlockBatch(t *testing.T) {
 	})
 	t.Run("pre-merge execution payload", func(t *testing.T) {
 		service := &Service{}
-		bellatrixBlock := util.NewBlindedBeaconBlockBellatrix()
-		wanted := util.NewBeaconBlockBellatrix()
+		bellatrixBlock := util.NewBlindedBeaconBlockCapella()
+		wanted := util.NewBeaconBlockCapella()
 		wanted.Block.Slot = 1
 		// Make sure block hash is the zero hash.
 		bellatrixBlock.Block.Body.ExecutionPayloadHeader.BlockHash = make([]byte, 32)
@@ -601,7 +601,7 @@ func TestReconstructFullBellatrixBlockBatch(t *testing.T) {
 	})
 	t.Run("properly reconstructs block batch with correct payload", func(t *testing.T) {
 		fix := fixtures()
-		payload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayload)
+		payload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
 		require.Equal(t, true, ok)
 
 		jsonPayload := make(map[string]interface{})
@@ -638,13 +638,13 @@ func TestReconstructFullBellatrixBlockBatch(t *testing.T) {
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
 
-		wrappedPayload, err := blocks.WrappedExecutionPayload(payload)
+		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
 		require.NoError(t, err)
-		header, err := blocks.PayloadToHeader(wrappedPayload)
+		header, err := blocks.PayloadToHeaderCapella(wrappedPayload)
 		require.NoError(t, err)
 
-		bellatrixBlock := util.NewBlindedBeaconBlockBellatrix()
-		wanted := util.NewBeaconBlockBellatrix()
+		bellatrixBlock := util.NewBlindedBeaconBlockCapella()
+		wanted := util.NewBeaconBlockCapella()
 		wanted.Block.Slot = 1
 		// Make sure block hash is the zero hash.
 		bellatrixBlock.Block.Body.ExecutionPayloadHeader.BlockHash = make([]byte, 32)
@@ -684,7 +684,7 @@ func TestReconstructFullBellatrixBlockBatch(t *testing.T) {
 
 		service := &Service{}
 		service.rpcClient = rpcClient
-		blindedBlock := util.NewBlindedBeaconBlockBellatrix()
+		blindedBlock := util.NewBlindedBeaconBlockCapella()
 
 		blindedBlock.Block.Body.ExecutionPayloadHeader = header
 		wrapped, err := blocks.NewSignedBeaconBlock(blindedBlock)
@@ -1024,10 +1024,10 @@ func fixtures() map[string]interface{} {
 		},
 		PayloadId: &id,
 	}
-	b, _ := new(big.Int).SetString(params.BeaconConfig().TerminalTotalDifficulty, 10)
-	ttd, _ := uint256.FromBig(b)
+	ttd, _ := uint256.FromBig(big.NewInt(0))
+	tbh := [32]byte{}
 	transitionCfg := &pb.TransitionConfiguration{
-		TerminalBlockHash:       params.BeaconConfig().TerminalBlockHash[:],
+		TerminalBlockHash:       tbh[:],
 		TerminalTotalDifficulty: ttd.Hex(),
 		TerminalBlockNumber:     big.NewInt(0).Bytes(),
 	}
@@ -1076,7 +1076,7 @@ func fixtures() map[string]interface{} {
 
 func Test_fullPayloadFromExecutionBlock(t *testing.T) {
 	type args struct {
-		header  *pb.ExecutionPayloadHeader
+		header  *pb.ExecutionPayloadHeaderCapella
 		block   *pb.ExecutionBlock
 		version int
 	}
@@ -1090,7 +1090,7 @@ func Test_fullPayloadFromExecutionBlock(t *testing.T) {
 		{
 			name: "block hash field in header and block hash mismatch",
 			args: args{
-				header: &pb.ExecutionPayloadHeader{
+				header: &pb.ExecutionPayloadHeaderCapella{
 					BlockHash: []byte("foo"),
 				},
 				block: &pb.ExecutionBlock{
@@ -1103,7 +1103,7 @@ func Test_fullPayloadFromExecutionBlock(t *testing.T) {
 		{
 			name: "ok",
 			args: args{
-				header: &pb.ExecutionPayloadHeader{
+				header: &pb.ExecutionPayloadHeaderCapella{
 					BlockHash: wantedHash[:],
 				},
 				block: &pb.ExecutionBlock{
@@ -1112,10 +1112,10 @@ func Test_fullPayloadFromExecutionBlock(t *testing.T) {
 				version: version.Bellatrix,
 			},
 			want: func() interfaces.ExecutionData {
-				p, err := blocks.WrappedExecutionPayload(&pb.ExecutionPayload{
+				p, err := blocks.WrappedExecutionPayloadCapella(&pb.ExecutionPayloadCapella{
 					BlockHash:    wantedHash[:],
 					Transactions: [][]byte{},
-				})
+				}, 0)
 				require.NoError(t, err)
 				return p
 			},
@@ -1123,7 +1123,7 @@ func Test_fullPayloadFromExecutionBlock(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			wrapped, err := blocks.WrappedExecutionPayloadHeader(tt.args.header)
+			wrapped, err := blocks.WrappedExecutionPayloadHeaderCapella(tt.args.header, 0)
 			require.NoError(t, err)
 			got, err := fullPayloadFromExecutionBlock(tt.args.version, wrapped, tt.args.block)
 			if err != nil {
@@ -1317,7 +1317,7 @@ func (*testEngineService) ExchangeTransitionConfigurationV1(
 }
 
 func (*testEngineService) ForkchoiceUpdatedV2(
-	_ context.Context, _ *pb.ForkchoiceState, _ *pb.PayloadAttributes,
+	_ context.Context, _ *pb.ForkchoiceState, _ *pb.PayloadAttributesV2,
 ) *ForkchoiceUpdatedResponse {
 	fix := fixtures()
 	item, ok := fix["ForkchoiceUpdatedResponse"].(*ForkchoiceUpdatedResponse)

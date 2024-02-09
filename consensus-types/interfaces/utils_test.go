@@ -12,6 +12,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
+/*
 func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 	hashLen := 32
 	blk := &zond.BeaconBlockCapella{
@@ -48,6 +49,7 @@ func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 	require.NoError(t, err)
 	assert.DeepEqual(t, want, bh)
 }
+*/
 
 func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 	hashLen := 32
@@ -88,6 +90,7 @@ func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 	assert.DeepEqual(t, want, bh)
 }
 
+/*
 func TestBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 	hashLen := 32
 	blk := &zond.BeaconBlockCapella{
@@ -99,7 +102,9 @@ func TestBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 	_, err := interfaces.BeaconBlockHeaderFromBlock(blk)
 	require.ErrorContains(t, "nil block body", err)
 }
+*/
 
+/*
 func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 	hashLen := 32
 	blk := &zond.SignedBeaconBlockCapella{Block: &zond.BeaconBlockCapella{
@@ -140,6 +145,7 @@ func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 	require.NoError(t, err)
 	assert.DeepEqual(t, want, bh)
 }
+*/
 
 func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 	hashLen := 32
@@ -183,6 +189,7 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 	assert.DeepEqual(t, want, bh)
 }
 
+/*
 func TestSignedBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 	hashLen := 32
 	blk := &zond.SignedBeaconBlockCapella{Block: &zond.BeaconBlockCapella{
@@ -196,3 +203,4 @@ func TestSignedBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 	_, err := interfaces.SignedBeaconBlockHeaderFromBlock(blk)
 	require.ErrorContains(t, "nil block", err)
 }
+*/

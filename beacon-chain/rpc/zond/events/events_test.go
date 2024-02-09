@@ -166,7 +166,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 					BlockRoot:         []byte("root"),
 					SubcommitteeIndex: 1,
 					AggregationBits:   bitfield.NewBitvector16(),
-					Signatures:        []byte("sig"),
+					Signatures:        [][]byte{[]byte("sig")},
 				},
 				SelectionProof: []byte("proof"),
 			},
@@ -308,7 +308,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 					RandaoReveal:  genesis.Block.Body.RandaoReveal,
 					Graffiti:      genesis.Block.Body.Graffiti,
 					Eth1Data:      genesis.Block.Body.Eth1Data,
-					SyncAggregate: &zond.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: make([]byte, 96)},
+					SyncAggregate: &zond.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
 					ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 						BlockNumber:   1,
 						ParentHash:    make([]byte, fieldparams.RootLength),
@@ -450,8 +450,8 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
 
-		blk := util.HydrateSignedBeaconBlock(&zond.SignedBeaconBlock{
-			Block: &zond.BeaconBlock{
+		blk := util.HydrateSignedBeaconBlockCapella(&zond.SignedBeaconBlockCapella{
+			Block: &zond.BeaconBlockCapella{
 				Slot: 8,
 			},
 		})

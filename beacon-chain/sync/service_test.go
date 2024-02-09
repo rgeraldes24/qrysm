@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -69,8 +69,8 @@ func TestSyncHandlers_WaitToSync(t *testing.T) {
 	var vr [32]byte
 	require.NoError(t, gs.SetClock(startup.NewClock(time.Now(), vr)))
 	b := []byte("sk")
-	b32 := bytesutil.ToBytes32(b)
-	sk, err := bls.SecretKeyFromBytes(b32[:])
+	b48 := bytesutil.ToBytes48(b)
+	sk, err := dilithium.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
 
 	msg := util.NewBeaconBlockCapella()
@@ -149,8 +149,8 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	defer sub.Unsubscribe()
 
 	b := []byte("sk")
-	b32 := bytesutil.ToBytes32(b)
-	sk, err := bls.SecretKeyFromBytes(b32[:])
+	b48 := bytesutil.ToBytes48(b)
+	sk, err := dilithium.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
 	msg := util.NewBeaconBlockCapella()
 	msg.Block.ParentRoot = util.Random32Bytes(t)

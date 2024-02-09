@@ -57,7 +57,7 @@ func TestEncryptDecryptKey(t *testing.T) {
 	b32 := bytesutil.ToBytes32(b)
 	password := "test"
 
-	pk, err := dilithium.SecretKeyFromBytes(b32[:])
+	pk, err := dilithium.SecretKeyFromSeed(b32[:])
 	require.NoError(t, err)
 	key := &Key{
 		ID:        newID,

@@ -77,7 +77,7 @@ func VerifyDepositDataJSON(fileFolder string, credentials []*Credential) bool {
 
 func validateDeposit(depositData *DepositData, credential *Credential) bool {
 	signingSeed := misc.StrSeedToBinSeed(credential.signingSeed)
-	depositKey, err := dilithium.SecretKeyFromBytes(signingSeed[:])
+	depositKey, err := dilithium.SecretKeyFromSeed(signingSeed[:])
 	if err != nil {
 		panic(fmt.Errorf("failed to derive dilithium depositKey from signingSeed | reason %v", err))
 	}

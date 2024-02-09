@@ -73,7 +73,7 @@ func TestPublishBlock(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedBellatrixBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlock(writer, request)
@@ -146,7 +146,7 @@ func TestPublishBlockSSZ(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedBellatrixBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlock(writer, request)
@@ -185,7 +185,7 @@ func TestPublishBlindedBlock(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BellatrixBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.CapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlindedBlock(writer, request)
@@ -198,7 +198,7 @@ func TestPublishBlindedBlock(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BadBlindedBellatrixBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
 		request.Header.Set(api.VersionHeader, version.String(version.Bellatrix))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -258,7 +258,7 @@ func TestPublishBlindedBlockSSZ(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BellatrixBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.CapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlindedBlock(writer, request)
@@ -298,7 +298,7 @@ func TestPublishBlockV2(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedBellatrixBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlockV2(writer, request)
@@ -371,7 +371,7 @@ func TestPublishBlockV2SSZ(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedBellatrixBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlockV2(writer, request)
@@ -410,7 +410,7 @@ func TestPublishBlindedBlockV2(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BellatrixBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.CapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlindedBlockV2(writer, request)
@@ -483,7 +483,7 @@ func TestPublishBlindedBlockV2SSZ(t *testing.T) {
 			SyncChecker: &mockSync.Sync{IsSyncing: false},
 		}
 
-		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BellatrixBlock)))
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.CapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		server.PublishBlindedBlockV2(writer, request)
@@ -496,13 +496,13 @@ func TestValidateConsensus(t *testing.T) {
 	ctx := context.Background()
 
 	parentState, privs := util.DeterministicGenesisState(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
-	parentBlock, err := util.GenerateFullBlock(parentState, privs, util.DefaultBlockGenConfig(), parentState.Slot())
+	parentBlock, err := util.GenerateFullBlockCapella(parentState, privs, util.DefaultBlockGenConfig(), parentState.Slot())
 	require.NoError(t, err)
 	parentSbb, err := blocks.NewSignedBeaconBlock(parentBlock)
 	require.NoError(t, err)
 	st, err := transition.ExecuteStateTransition(ctx, parentState, parentSbb)
 	require.NoError(t, err)
-	block, err := util.GenerateFullBlock(st, privs, util.DefaultBlockGenConfig(), st.Slot())
+	block, err := util.GenerateFullBlockCapella(st, privs, util.DefaultBlockGenConfig(), st.Slot())
 	require.NoError(t, err)
 	sbb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -518,7 +518,7 @@ func TestValidateConsensus(t *testing.T) {
 
 func TestValidateEquivocation(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
-		st, err := util.NewBeaconState()
+		st, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
 		require.NoError(t, st.SetSlot(10))
 		fc := doublylinkedtree.New()
@@ -526,14 +526,14 @@ func TestValidateEquivocation(t *testing.T) {
 		server := &Server{
 			ForkchoiceFetcher: &chainMock.ChainService{ForkChoiceStore: fc},
 		}
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 		require.NoError(t, err)
 		blk.SetSlot(st.Slot() + 1)
 
 		require.NoError(t, server.validateEquivocation(blk.Block()))
 	})
 	t.Run("block already exists", func(t *testing.T) {
-		st, err := util.NewBeaconState()
+		st, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
 		require.NoError(t, st.SetSlot(10))
 		fc := doublylinkedtree.New()
@@ -541,7 +541,7 @@ func TestValidateEquivocation(t *testing.T) {
 		server := &Server{
 			ForkchoiceFetcher: &chainMock.ChainService{ForkChoiceStore: fc},
 		}
-		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 		require.NoError(t, err)
 		blk.SetSlot(st.Slot())
 
@@ -557,7 +557,7 @@ func TestServer_GetBlockRoot(t *testing.T) {
 	genBlk, blkContainers := fillDBTestBlocks(ctx, t, beaconDB)
 	headBlock := blkContainers[len(blkContainers)-1]
 	t.Run("get root", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 
 		mockChainFetcher := &chainMock.ChainService{
@@ -676,7 +676,7 @@ func TestServer_GetBlockRoot(t *testing.T) {
 		}
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 
 		mockChainFetcher := &chainMock.ChainService{
@@ -711,7 +711,7 @@ func TestServer_GetBlockRoot(t *testing.T) {
 		require.DeepEqual(t, resp.ExecutionOptimistic, true)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 
 		mockChainFetcher := &chainMock.ChainService{
@@ -768,7 +768,7 @@ func TestGetStateFork(t *testing.T) {
 	writer := httptest.NewRecorder()
 	writer.Body = &bytes.Buffer{}
 
-	fillFork := func(state *zond.BeaconState) error {
+	fillFork := func(state *zond.BeaconStateCapella) error {
 		state.Fork = &zond.Fork{
 			PreviousVersion: []byte("prev"),
 			CurrentVersion:  []byte("curr"),
@@ -776,7 +776,7 @@ func TestGetStateFork(t *testing.T) {
 		}
 		return nil
 	}
-	fakeState, err := util.NewBeaconState(fillFork)
+	fakeState, err := util.NewBeaconStateCapella(fillFork)
 	require.NoError(t, err)
 	db := dbTest.SetupDB(t)
 
@@ -807,7 +807,7 @@ func TestGetStateFork(t *testing.T) {
 		writer = httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -838,7 +838,7 @@ func TestGetStateFork(t *testing.T) {
 		writer = httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -1005,7 +1005,7 @@ func TestGetCommittees(t *testing.T) {
 	})
 	t.Run("Execution optimistic", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -1036,7 +1036,7 @@ func TestGetCommittees(t *testing.T) {
 	})
 	t.Run("Finalized", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
-		blk := util.NewBeaconBlock()
+		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -1081,19 +1081,19 @@ func TestGetBlockHeaders(t *testing.T) {
 	_, blkContainers := fillDBTestBlocks(ctx, t, beaconDB)
 	headBlock := blkContainers[len(blkContainers)-1]
 
-	b1 := util.NewBeaconBlock()
+	b1 := util.NewBeaconBlockCapella()
 	b1.Block.Slot = 30
 	b1.Block.ParentRoot = bytesutil.PadTo([]byte{1}, 32)
 	util.SaveBlock(t, ctx, beaconDB, b1)
-	b2 := util.NewBeaconBlock()
+	b2 := util.NewBeaconBlockCapella()
 	b2.Block.Slot = 30
 	b2.Block.ParentRoot = bytesutil.PadTo([]byte{4}, 32)
 	util.SaveBlock(t, ctx, beaconDB, b2)
-	b3 := util.NewBeaconBlock()
+	b3 := util.NewBeaconBlockCapella()
 	b3.Block.Slot = 31
 	b3.Block.ParentRoot = bytesutil.PadTo([]byte{1}, 32)
 	util.SaveBlock(t, ctx, beaconDB, b3)
-	b4 := util.NewBeaconBlock()
+	b4 := util.NewBeaconBlockCapella()
 	b4.Block.Slot = 28
 	b4.Block.ParentRoot = bytesutil.PadTo([]byte{1}, 32)
 	util.SaveBlock(t, ctx, beaconDB, b4)
@@ -1101,7 +1101,7 @@ func TestGetBlockHeaders(t *testing.T) {
 	url := "http://example.com/zond/v1/beacon/headers"
 
 	t.Run("list headers", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 		mockChainFetcher := &chainMock.ChainService{
 			DB:                  beaconDB,
@@ -1121,15 +1121,15 @@ func TestGetBlockHeaders(t *testing.T) {
 			name       string
 			slot       primitives.Slot
 			parentRoot string
-			want       []*zond.SignedBeaconBlock
+			want       []*zond.SignedBeaconBlockCapella
 			wantErr    bool
 		}{
 			{
 				name:       "slot",
 				slot:       primitives.Slot(30),
 				parentRoot: "",
-				want: []*zond.SignedBeaconBlock{
-					blkContainers[30].Block.(*zond.BeaconBlockContainer_Phase0Block).Phase0Block,
+				want: []*zond.SignedBeaconBlockCapella{
+					blkContainers[30].Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock,
 					b1,
 					b2,
 				},
@@ -1137,8 +1137,8 @@ func TestGetBlockHeaders(t *testing.T) {
 			{
 				name:       "parent root",
 				parentRoot: hexutil.Encode(b1.Block.ParentRoot),
-				want: []*zond.SignedBeaconBlock{
-					blkContainers[1].Block.(*zond.BeaconBlockContainer_Phase0Block).Phase0Block,
+				want: []*zond.SignedBeaconBlockCapella{
+					blkContainers[1].Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock,
 					b1,
 					b3,
 					b4,
@@ -1178,7 +1178,7 @@ func TestGetBlockHeaders(t *testing.T) {
 	})
 
 	t.Run("execution optimistic", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 		mockChainFetcher := &chainMock.ChainService{
 			DB:                  beaconDB,
@@ -1211,13 +1211,13 @@ func TestGetBlockHeaders(t *testing.T) {
 	})
 
 	t.Run("finalized", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_Phase0Block).Phase0Block)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
-		child1 := util.NewBeaconBlock()
+		child1 := util.NewBeaconBlockCapella()
 		child1.Block.ParentRoot = bytesutil.PadTo([]byte("parent"), 32)
 		child1.Block.Slot = 999
 		util.SaveBlock(t, ctx, beaconDB, child1)
-		child2 := util.NewBeaconBlock()
+		child2 := util.NewBeaconBlockCapella()
 		child2.Block.ParentRoot = bytesutil.PadTo([]byte("parent"), 32)
 		child2.Block.Slot = 1000
 		util.SaveBlock(t, ctx, beaconDB, child2)
@@ -1281,7 +1281,7 @@ func TestGetBlockHeaders(t *testing.T) {
 }
 
 func TestServer_GetBlockHeader(t *testing.T) {
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	b.Block.Slot = 123
 	b.Block.ProposerIndex = 123
 	b.Block.StateRoot = bytesutil.PadTo([]byte("stateroot"), 32)
@@ -1406,7 +1406,7 @@ func TestServer_GetBlockHeader(t *testing.T) {
 }
 
 func TestGetFinalityCheckpoints(t *testing.T) {
-	fillCheckpoints := func(state *zond.BeaconState) error {
+	fillCheckpoints := func(state *zond.BeaconStateCapella) error {
 		state.PreviousJustifiedCheckpoint = &zond.Checkpoint{
 			Root:  bytesutil.PadTo([]byte("previous"), 32),
 			Epoch: 113,
@@ -1421,7 +1421,7 @@ func TestGetFinalityCheckpoints(t *testing.T) {
 		}
 		return nil
 	}
-	fakeState, err := util.NewBeaconState(fillCheckpoints)
+	fakeState, err := util.NewBeaconStateCapella(fillCheckpoints)
 	require.NoError(t, err)
 
 	chainService := &chainMock.ChainService{}

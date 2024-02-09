@@ -99,7 +99,7 @@ func (s *Server) GetAggregateAttestation(w http.ResponseWriter, r *http.Request)
 					Root:  hexutil.Encode(bestMatchingAtt.Data.Target.Root),
 				},
 			},
-			Signature: hexutil.Encode(bestMatchingAtt.Signature),
+			Signatures: hexutil.Encode(bestMatchingAtt.Signature),
 		}}
 	http2.WriteJson(w, response)
 }
@@ -494,9 +494,9 @@ func (s *Server) produceSyncCommitteeContribution(
 		http2.HandleError(w, "No subcommittee messages found", http.StatusNotFound)
 		return nil, false
 	}
-	sig, aggregatedBits, err := s.CoreService.AggregatedSigAndAggregationBits(
+	sig, aggregatedBits, err := s.CoreService.SignaturesAndAggregationBits(
 		ctx,
-		&zondpbalpha.AggregatedSigAndAggregationBitsRequest{
+		&zondpbalpha.SignaturesAndAggregationBitsRequest{
 			Msgs:      msgs,
 			Slot:      slot,
 			SubnetId:  index,
@@ -513,7 +513,7 @@ func (s *Server) produceSyncCommitteeContribution(
 		BeaconBlockRoot:   hexutil.Encode(blockRoot),
 		SubcommitteeIndex: strconv.FormatUint(index, 10),
 		AggregationBits:   hexutil.Encode(aggregatedBits),
-		Signature:         hexutil.Encode(sig),
+		Signatures:        hexutil.Encode(sig),
 	}, true
 }
 
@@ -889,10 +889,7 @@ func (s *Server) GetSyncCommitteeDuties(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	requestedEpoch := primitives.Epoch(requestedEpochUint)
-	if requestedEpoch < params.BeaconConfig().AltairForkEpoch {
-		http2.HandleError(w, "Sync committees are not supported for Phase0", http.StatusBadRequest)
-		return
-	}
+
 	var indices []string
 	err := json.NewDecoder(r.Body).Decode(&indices)
 	switch {

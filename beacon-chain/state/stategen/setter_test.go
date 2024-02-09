@@ -123,7 +123,7 @@ func TestSaveState_NoSaveNotEpochBoundary(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisState(t, 32)
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
 	r := [32]byte{'A'}
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, ctx, beaconDB, b)
 	gRoot, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -149,7 +149,7 @@ func TestSaveState_RecoverForEpochBoundary(t *testing.T) {
 	boundaryRoot := [32]byte{'B'}
 	require.NoError(t, beaconState.UpdateBlockRootAtIndex(0, boundaryRoot))
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, ctx, beaconDB, b)
 	gRoot, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -211,7 +211,7 @@ func TestEnableSaveHotStateToDB_Disabled(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	service := New(beaconDB, doublylinkedtree.New())
 	service.saveHotStateDB.enabled = true
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, ctx, beaconDB, b)
 	r, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)

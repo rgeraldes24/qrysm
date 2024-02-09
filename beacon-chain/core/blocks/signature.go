@@ -34,19 +34,21 @@ func signatureBatch(signedData, pub, signature, domain []byte, desc string) (*di
 		return nil, errors.Wrap(err, "could not hash container")
 	}
 	return &dilithium.SignatureBatch{
-		Signatures:   [][]byte{signature},
+		Signatures:   [][][]byte{{signature}},
 		PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
 		Messages:     [][32]byte{root},
 		Descriptions: []string{desc},
 	}, nil
 }
 
+// TODO(rgeraldes24)
 // verifies the signature from the raw data, public key and domain provided.
 func verifySignature(signedData, pub, signature, domain []byte) error {
 	set, err := signatureBatch(signedData, pub, signature, domain, signing.UnknownSignature)
 	if err != nil {
 		return err
 	}
+
 	if len(set.Signatures) != 1 {
 		return errors.Errorf("signature set contains %d signatures instead of 1", len(set.Signatures))
 	}

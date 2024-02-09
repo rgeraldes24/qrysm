@@ -18,7 +18,7 @@ func TestResume(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 
 	service := New(beaconDB, doublylinkedtree.New())
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, ctx, service.beaconDB, b)
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)

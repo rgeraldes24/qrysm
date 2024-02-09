@@ -40,7 +40,7 @@ func (c *Credential) ZondWithdrawalAddress() common.Address {
 
 func (c *Credential) WithdrawalPK() []byte {
 	binWithdrawalSeed := misc.StrSeedToBinSeed(c.withdrawalSeed)
-	withdrawalKey, err := dilithium.SecretKeyFromBytes(binWithdrawalSeed[:])
+	withdrawalKey, err := dilithium.SecretKeyFromSeed(binWithdrawalSeed[:])
 	if err != nil {
 		panic(fmt.Errorf("failed to generate dilithium key from withdrawalSeed %s", c.withdrawalSeed))
 	}
@@ -115,7 +115,7 @@ func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *zondp
 	}
 
 	binWithdrawalSeed := misc.DecodeHex(c.withdrawalSeed)
-	d, err := dilithium.SecretKeyFromBytes(binWithdrawalSeed)
+	d, err := dilithium.SecretKeyFromSeed(binWithdrawalSeed)
 	if err != nil {
 		panic(fmt.Errorf("failed to generate secret Key from withdrawal seed %v", err))
 	}

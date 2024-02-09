@@ -12,7 +12,6 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
@@ -25,8 +24,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
-	"github.com/theQRL/qrysm/v4/crypto/bls/blst"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/v4/network/http"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -45,13 +43,13 @@ func TestBlockRewards(t *testing.T) {
 	require.NoError(t, err)
 	validators := make([]*zond.Validator, 0, valCount)
 	balances := make([]uint64, 0, valCount)
-	secretKeys := make([]bls.SecretKey, 0, valCount)
+	secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
 	for i := 0; i < valCount; i++ {
-		blsKey, err := bls.RandKey()
+		dilithiumKey, err := dilithium.RandKey()
 		require.NoError(t, err)
-		secretKeys = append(secretKeys, blsKey)
+		secretKeys = append(secretKeys, dilithiumKey)
 		validators = append(validators, &zond.Validator{
-			PublicKey:         blsKey.PublicKey().Marshal(),
+			PublicKey:         dilithiumKey.PublicKey().Marshal(),
 			ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance,
@@ -77,12 +75,12 @@ func TestBlockRewards(t *testing.T) {
 		{
 			AggregationBits: bitfield.Bitlist{0b00000111},
 			Data:            util.HydrateAttestationData(&zond.AttestationData{}),
-			Signatures:      make([]byte, dilithium2.CryptoBytes),
+			Signatures:      [][]byte{},
 		},
 		{
 			AggregationBits: bitfield.Bitlist{0b00000111},
 			Data:            util.HydrateAttestationData(&zond.AttestationData{}),
-			Signatures:      make([]byte, dilithium2.CryptoBytes),
+			Signatures:      [][]byte{},
 		},
 	}
 	attData1 := util.HydrateAttestationData(&zond.AttestationData{BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32)})
@@ -98,12 +96,12 @@ func TestBlockRewards(t *testing.T) {
 			Attestation_1: &zond.IndexedAttestation{
 				AttestingIndices: []uint64{0},
 				Data:             attData1,
-				Signature:        secretKeys[0].Sign(sigRoot1[:]).Marshal(),
+				Signatures:       [][]byte{secretKeys[0].Sign(sigRoot1[:]).Marshal()},
 			},
 			Attestation_2: &zond.IndexedAttestation{
 				AttestingIndices: []uint64{0},
 				Data:             attData2,
-				Signature:        secretKeys[0].Sign(sigRoot2[:]).Marshal(),
+				Signatures:       [][]byte{secretKeys[0].Sign(sigRoot2[:]).Marshal()},
 			},
 		},
 	}
@@ -149,16 +147,13 @@ func TestBlockRewards(t *testing.T) {
 	require.NoError(t, err)
 	// Bits set in sync committee bits determine which validators will be treated as participating in sync committee.
 	// These validators have to sign the message.
-	sig1, err := blst.SignatureFromBytes(secretKeys[47].Sign(r[:]).Marshal())
-	require.NoError(t, err)
-	sig2, err := blst.SignatureFromBytes(secretKeys[19].Sign(r[:]).Marshal())
-	require.NoError(t, err)
-	aggSig := bls.AggregateSignatures([]bls.Signature{sig1, sig2}).Marshal()
-	b.Block.Body.SyncAggregate = &zond.SyncAggregate{SyncCommitteeBits: scBits, SyncCommitteeSignature: aggSig}
+	sig1 := secretKeys[47].Sign(r[:]).Marshal()
+	sig2 := secretKeys[19].Sign(r[:]).Marshal()
+	b.Block.Body.SyncAggregate = &zond.SyncAggregate{SyncCommitteeBits: scBits, SyncCommitteeSignatures: [][]byte{sig1, sig2}}
 
 	sbb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
-	phase0block, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+	phase0block, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 	mockChainService := &mock.ChainService{Optimistic: true}
 	s := &Server{
@@ -207,9 +202,6 @@ func TestBlockRewards(t *testing.T) {
 
 func TestAttestationRewards(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig()
-	cfg.AltairForkEpoch = 1
-	params.OverrideBeaconConfig(cfg)
 	helpers.ClearCache()
 
 	valCount := 64
@@ -219,13 +211,13 @@ func TestAttestationRewards(t *testing.T) {
 	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*3-1))
 	validators := make([]*zond.Validator, 0, valCount)
 	balances := make([]uint64, 0, valCount)
-	secretKeys := make([]bls.SecretKey, 0, valCount)
+	secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
 	for i := 0; i < valCount; i++ {
-		blsKey, err := bls.RandKey()
+		dilithiumKey, err := dilithium.RandKey()
 		require.NoError(t, err)
-		secretKeys = append(secretKeys, blsKey)
+		secretKeys = append(secretKeys, dilithiumKey)
 		validators = append(validators, &zond.Validator{
-			PublicKey:         blsKey.PublicKey().Marshal(),
+			PublicKey:         dilithiumKey.PublicKey().Marshal(),
 			ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance / 64 * uint64(i+1),
@@ -334,13 +326,13 @@ func TestAttestationRewards(t *testing.T) {
 		require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*3-1))
 		validators := make([]*zond.Validator, 0, valCount)
 		balances := make([]uint64, 0, valCount)
-		secretKeys := make([]bls.SecretKey, 0, valCount)
+		secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
 		for i := 0; i < valCount; i++ {
-			blsKey, err := bls.RandKey()
+			dilithiumKey, err := dilithium.RandKey()
 			require.NoError(t, err)
-			secretKeys = append(secretKeys, blsKey)
+			secretKeys = append(secretKeys, dilithiumKey)
 			validators = append(validators, &zond.Validator{
-				PublicKey:         blsKey.PublicKey().Marshal(),
+				PublicKey:         dilithiumKey.PublicKey().Marshal(),
 				ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 				WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 				EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance / 64 * uint64(i),
@@ -408,7 +400,7 @@ func TestAttestationRewards(t *testing.T) {
 	t.Run("unknown validator pubkey", func(t *testing.T) {
 		url := "http://only.the.epoch.number.at.the.end.is.important/1"
 		var body bytes.Buffer
-		privkey, err := bls.RandKey()
+		privkey, err := dilithium.RandKey()
 		require.NoError(t, err)
 		pubkey := fmt.Sprintf("%#x", privkey.PublicKey().Marshal())
 		valIds, err := json.Marshal([]string{"10", pubkey})
@@ -487,9 +479,6 @@ func TestAttestationRewards(t *testing.T) {
 
 func TestSyncCommiteeRewards(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig()
-	cfg.AltairForkEpoch = 1
-	params.OverrideBeaconConfig(cfg)
 	helpers.ClearCache()
 
 	const valCount = 1024
@@ -500,13 +489,13 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
 	validators := make([]*zond.Validator, 0, valCount)
-	secretKeys := make([]bls.SecretKey, 0, valCount)
+	secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
 	for i := 0; i < valCount; i++ {
-		blsKey, err := bls.RandKey()
+		dilithiumKey, err := dilithium.RandKey()
 		require.NoError(t, err)
-		secretKeys = append(secretKeys, blsKey)
+		secretKeys = append(secretKeys, dilithiumKey)
 		validators = append(validators, &zond.Validator{
-			PublicKey:         blsKey.PublicKey().Marshal(),
+			PublicKey:         dilithiumKey.PublicKey().Marshal(),
 			ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance,
@@ -538,16 +527,14 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	require.NoError(t, err)
 	// Bits set in sync committee bits determine which validators will be treated as participating in sync committee.
 	// These validators have to sign the message.
-	sigs := make([]bls.Signature, fieldparams.SyncCommitteeLength-10)
+	sigs := make([][]byte, fieldparams.SyncCommitteeLength-10)
 	for i := range sigs {
-		sigs[i], err = blst.SignatureFromBytes(secretKeys[i].Sign(r[:]).Marshal())
-		require.NoError(t, err)
+		sigs[i] = secretKeys[i].Sign(r[:]).Marshal()
 	}
-	aggSig := bls.AggregateSignatures(sigs).Marshal()
-	b.Block.Body.SyncAggregate = &zond.SyncAggregate{SyncCommitteeBits: scBits, SyncCommitteeSignature: aggSig}
+	b.Block.Body.SyncAggregate = &zond.SyncAggregate{SyncCommitteeBits: scBits, SyncCommitteeSignatures: sigs}
 	sbb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
-	phase0block, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlock())
+	phase0block, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 
 	currentSlot := params.BeaconConfig().SlotsPerEpoch
@@ -715,7 +702,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 
 		url := "http://only.the.slot.number.at.the.end.is.important/32"
 		var body bytes.Buffer
-		privkey, err := bls.RandKey()
+		privkey, err := dilithium.RandKey()
 		require.NoError(t, err)
 		pubkey := fmt.Sprintf("%#x", privkey.PublicKey().Marshal())
 		valIds, err := json.Marshal([]string{"10", pubkey})
