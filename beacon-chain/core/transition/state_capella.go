@@ -18,7 +18,7 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
-// GenesisBeaconStateBellatrix gets called when MinGenesisActiveValidatorCount count of
+// GenesisBeaconStateCapella gets called when MinGenesisActiveValidatorCount count of
 // full deposits were made to the deposit contract and the ChainStart log gets emitted.
 //
 // Spec pseudocode definition:
@@ -60,8 +60,8 @@ import (
 //	  return state
 //
 // This method differs from the spec so as to process deposits beforehand instead of the end of the function.
-func GenesisBeaconStateBellatrix(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.Eth1Data, ep *enginev1.ExecutionPayload) (state.BeaconState, error) {
-	st, err := EmptyGenesisStateBellatrix()
+func GenesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.Eth1Data, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
+	st, err := EmptyGenesisStateCapella()
 	if err != nil {
 		return nil, err
 	}
@@ -86,12 +86,12 @@ func GenesisBeaconStateBellatrix(ctx context.Context, deposits []*zondpb.Deposit
 		return nil, err
 	}
 
-	return OptimizedGenesisBeaconStateBellatrix(genesisTime, st, st.Eth1Data(), ep)
+	return OptimizedGenesisBeaconStateCapella(genesisTime, st, st.Eth1Data(), ep)
 }
 
-// OptimizedGenesisBeaconStateBellatrix is used to create a state that has already processed deposits. This is to efficiently
+// OptimizedGenesisBeaconStateCapella is used to create a state that has already processed deposits. This is to efficiently
 // create a mainnet state at chainstart.
-func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.BeaconState, eth1Data *zondpb.Eth1Data, ep *enginev1.ExecutionPayload) (state.BeaconState, error) {
+func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, eth1Data *zondpb.Eth1Data, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
 	if eth1Data == nil {
 		return nil, errors.New("no eth1data provided for genesis state")
 	}
@@ -137,23 +137,23 @@ func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.Bea
 			scores = append(scores, 0)
 		}
 	}
-	wep, err := blocks.WrappedExecutionPayload(ep)
+	wep, err := blocks.WrappedExecutionPayloadCapella(ep, 0)
 	if err != nil {
 		return nil, err
 	}
-	eph, err := blocks.PayloadToHeader(wep)
+	eph, err := blocks.PayloadToHeaderCapella(wep)
 	if err != nil {
 		return nil, err
 	}
-	st := &zondpb.BeaconStateBellatrix{
+	st := &zondpb.BeaconStateCapella{
 		// Misc fields.
 		Slot:                  0,
 		GenesisTime:           genesisTime,
 		GenesisValidatorsRoot: genesisValidatorsRoot[:],
 
 		Fork: &zondpb.Fork{
-			PreviousVersion: params.BeaconConfig().AltairForkVersion,
-			CurrentVersion:  params.BeaconConfig().BellatrixForkVersion,
+			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
+			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			Epoch:           0,
 		},
 
@@ -192,7 +192,7 @@ func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.Bea
 		InactivityScores:             scores,
 	}
 
-	bodyRoot, err := (&zondpb.BeaconBlockBodyBellatrix{
+	bodyRoot, err := (&zondpb.BeaconBlockBodyCapella{
 		RandaoReveal: make([]byte, dilithium2.CryptoBytes),
 		Eth1Data: &zondpb.Eth1Data{
 			DepositRoot: make([]byte, 32),
@@ -200,10 +200,10 @@ func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.Bea
 		},
 		Graffiti: make([]byte, 32),
 		SyncAggregate: &zondpb.SyncAggregate{
-			SyncCommitteeBits:      make([]byte, fieldparams.SyncCommitteeLength/8),
-			SyncCommitteeSignature: make([]byte, dilithium2.CryptoBytes),
+			SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
+			SyncCommitteeSignatures: [][]byte{},
 		},
-		ExecutionPayload: &enginev1.ExecutionPayload{
+		ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 			ParentHash:    make([]byte, 32),
 			FeeRecipient:  make([]byte, 20),
 			StateRoot:     make([]byte, 32),
@@ -225,7 +225,7 @@ func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.Bea
 		BodyRoot:   bodyRoot[:],
 	}
 
-	ist, err := state_native.InitializeFromProtoBellatrix(st)
+	ist, err := state_native.InitializeFromProtoCapella(st)
 	if err != nil {
 		return nil, err
 	}
@@ -242,14 +242,14 @@ func OptimizedGenesisBeaconStateBellatrix(genesisTime uint64, preState state.Bea
 	return ist, nil
 }
 
-// EmptyGenesisStateBellatrix returns an empty beacon state object.
-func EmptyGenesisStateBellatrix() (state.BeaconState, error) {
-	st := &zondpb.BeaconStateBellatrix{
+// EmptyGenesisStateCapella returns an empty beacon state object.
+func EmptyGenesisStateCapella() (state.BeaconState, error) {
+	st := &zondpb.BeaconStateCapella{
 		// Misc fields.
 		Slot: 0,
 		Fork: &zondpb.Fork{
-			PreviousVersion: params.BeaconConfig().AltairForkVersion,
-			CurrentVersion:  params.BeaconConfig().BellatrixForkVersion,
+			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
+			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			Epoch:           0,
 		},
 		// Validator registry fields.
@@ -263,7 +263,7 @@ func EmptyGenesisStateBellatrix() (state.BeaconState, error) {
 		Eth1Data:         &zondpb.Eth1Data{},
 		Eth1DataVotes:    []*zondpb.Eth1Data{},
 		Eth1DepositIndex: 0,
-		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeader{
+		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
 			ParentHash:       make([]byte, 32),
 			FeeRecipient:     make([]byte, 20),
 			StateRoot:        make([]byte, 32),
@@ -276,5 +276,5 @@ func EmptyGenesisStateBellatrix() (state.BeaconState, error) {
 		},
 	}
 
-	return state_native.InitializeFromProtoBellatrix(st)
+	return state_native.InitializeFromProtoCapella(st)
 }

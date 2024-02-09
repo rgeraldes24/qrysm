@@ -19,7 +19,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	contracts "github.com/theQRL/qrysm/v4/contracts/deposit"
 	"github.com/theQRL/qrysm/v4/contracts/deposit/mock"
-	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
@@ -146,8 +145,6 @@ func TestProcessDepositLog_InsertsPendingDeposit(t *testing.T) {
 
 	logs, err := testAcc.Backend.FilterLogs(web3Service.ctx, query)
 	require.NoError(t, err, "Unable to retrieve logs")
-
-	web3Service.chainStartData.Chainstarted = true
 
 	err = web3Service.ProcessDepositLog(context.Background(), &logs[0])
 	require.NoError(t, err)
@@ -276,7 +273,7 @@ func TestProcessETH2GenesisLog_8DuplicatePubkeys(t *testing.T) {
 		err = web3Service.ProcessLog(context.Background(), &logs[i])
 		require.NoError(t, err)
 	}
-	assert.Equal(t, false, web3Service.chainStartData.Chainstarted, "Genesis has been triggered despite being 8 duplicate keys")
+	// assert.Equal(t, false, web3Service.chainStartData.Chainstarted, "Genesis has been triggered despite being 8 duplicate keys")
 
 	require.LogsDoNotContain(t, hook, "Minimum number of validators reached for beacon-chain to start")
 	hook.Reset()
@@ -359,8 +356,7 @@ func TestProcessETH2GenesisLog(t *testing.T) {
 	err = web3Service.ProcessETH1Block(context.Background(), big.NewInt(int64(logs[len(logs)-1].BlockNumber)))
 	require.NoError(t, err)
 
-	cachedDeposits := web3Service.chainStartData.ChainstartDeposits
-	require.Equal(t, depositsReqForChainStart, len(cachedDeposits))
+	// require.Equal(t, depositsReqForChainStart, len(cachedDeposits))
 
 	// Receive the chain started event.
 	for started := false; !started; {
@@ -455,9 +451,9 @@ func TestProcessETH2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 	err = web3Service.processPastLogs(context.Background())
 	require.NoError(t, err)
 
-	cachedDeposits := web3Service.chainStartData.ChainstartDeposits
-	requiredDepsForChainstart := depositsReqForChainStart + depositOffset
-	require.Equal(t, requiredDepsForChainstart, len(cachedDeposits), "Did not cache the chain start deposits correctly")
+	// cachedDeposits := web3Service.chainStartData.ChainstartDeposits
+	// requiredDepsForChainstart := depositsReqForChainStart + depositOffset
+	// require.Equal(t, requiredDepsForChainstart, len(cachedDeposits), "Did not cache the chain start deposits correctly")
 
 	// Receive the chain started event.
 	for started := false; !started; {
@@ -563,8 +559,8 @@ func TestProcessETH2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 	err = web3Service.processPastLogs(context.Background())
 	require.NoError(t, err)
 
-	cachedDeposits := web3Service.chainStartData.ChainstartDeposits
-	require.Equal(t, totalNumOfDeposits, len(cachedDeposits), "Did not cache the chain start deposits correctly")
+	// cachedDeposits := web3Service.chainStartData.ChainstartDeposits
+	// require.Equal(t, totalNumOfDeposits, len(cachedDeposits), "Did not cache the chain start deposits correctly")
 
 	// Receive the chain started event.
 	for started := false; !started; {
@@ -580,16 +576,6 @@ func TestProcessETH2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 	require.LogsContain(t, hook, "Minimum number of validators reached for beacon-chain to start")
 
 	hook.Reset()
-}
-
-func TestCheckForChainstart_NoValidator(t *testing.T) {
-	hook := logTest.NewGlobal()
-	testAcc, err := mock.Setup()
-	require.NoError(t, err, "Unable to set up simulated backend")
-	beaconDB := testDB.SetupDB(t)
-	s := newPowchainService(t, testAcc, beaconDB)
-	s.processChainStartIfReady(context.Background(), [32]byte{}, nil, 0)
-	require.LogsDoNotContain(t, hook, "Could not determine active validator count from pre genesis state")
 }
 
 func newPowchainService(t *testing.T, eth1Backend *mock.TestAccount, beaconDB db.Database) *Service {

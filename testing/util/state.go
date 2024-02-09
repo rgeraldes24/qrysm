@@ -1,22 +1,16 @@
 package util
 
 import (
-	"context"
 	"fmt"
-	"testing"
 
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-zond/common/hexutil"
-	b "github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
-	"github.com/theQRL/qrysm/v4/beacon-chain/db/iface"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
 // FillRootsNaturalOptCapella is meant to be used as an option when calling NewBeaconStateCapella.
@@ -125,28 +119,4 @@ func PrepareRoots(size int) ([][]byte, error) {
 		roots[j] = h
 	}
 	return roots, nil
-}
-
-// DeterministicGenesisStateWithGenesisBlock creates a genesis state, saves the genesis block,
-// genesis state and head block root. It returns the genesis state, genesis block's root and
-// validator private keys.
-func DeterministicGenesisStateWithGenesisBlock(
-	t *testing.T,
-	ctx context.Context,
-	db iface.HeadAccessDatabase,
-	numValidators uint64,
-) (state.BeaconState, [32]byte, []dilithium.DilithiumKey) {
-	genesisState, privateKeys := DeterministicGenesisState(t, numValidators)
-	stateRoot, err := genesisState.HashTreeRoot(ctx)
-	require.NoError(t, err, "Could not hash genesis state")
-
-	genesis := b.NewGenesisBlock(stateRoot[:])
-	SaveBlock(t, ctx, db, genesis)
-
-	parentRoot, err := genesis.Block.HashTreeRoot()
-	require.NoError(t, err, "Could not get signing root")
-	require.NoError(t, db.SaveState(ctx, genesisState, parentRoot), "Could not save genesis state")
-	require.NoError(t, db.SaveHeadBlockRoot(ctx, parentRoot), "Could not save genesis state")
-
-	return genesisState, parentRoot, privateKeys
 }

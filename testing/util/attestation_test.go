@@ -54,7 +54,7 @@ func TestHydrateIndexedAttestation(t *testing.T) {
 }
 
 func TestGenerateAttestations_EpochBoundary(t *testing.T) {
-	gs, pk := DeterministicGenesisState(t, 32)
+	gs, pk := DeterministicGenesisStateCapella(t, 32)
 	_, err := GenerateAttestations(gs, pk, 1, params.BeaconConfig().SlotsPerEpoch, false)
 	require.NoError(t, err)
 }

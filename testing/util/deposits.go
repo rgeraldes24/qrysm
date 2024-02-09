@@ -1,14 +1,10 @@
 package util
 
 import (
-	"context"
 	"sync"
-	"testing"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
@@ -252,24 +248,6 @@ func DeterministicEth1Data(size int) (*zondpb.Eth1Data, error) {
 		DepositCount: uint64(size),
 	}
 	return eth1Data, nil
-}
-
-// DeterministicGenesisState returns a genesis state made using the deterministic deposits.
-func DeterministicGenesisState(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.DilithiumKey) {
-	deposits, privKeys, err := DeterministicDepositsAndKeys(numValidators)
-	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
-	}
-	eth1Data, err := DeterministicEth1Data(len(deposits))
-	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get eth1data for %d deposits", numValidators))
-	}
-	beaconState, err := transition.GenesisBeaconState(context.Background(), deposits, uint64(0), eth1Data)
-	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get genesis beacon state of %d validators", numValidators))
-	}
-
-	return beaconState, privKeys
 }
 
 // DepositTrieFromDeposits takes an array of deposits and returns the deposit trie.

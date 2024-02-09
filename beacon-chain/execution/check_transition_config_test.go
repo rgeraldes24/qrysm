@@ -1,85 +1,20 @@
 package execution
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/rpc"
-	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
-	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
-	mocks "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
-	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	pb "github.com/theQRL/qrysm/v4/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"google.golang.org/protobuf/proto"
 )
-
-func Test_checkTransitionConfiguration(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-	hook := logTest.NewGlobal()
-
-	t.Run("context canceled", func(t *testing.T) {
-		ctx := context.Background()
-		m := &mocks.EngineClient{}
-		m.Err = errors.New("something went wrong")
-
-		srv := setupTransitionConfigTest(t)
-		srv.cfg.stateNotifier = &mockChain.MockStateNotifier{}
-		checkTransitionPollingInterval = time.Millisecond
-		ctx, cancel := context.WithCancel(ctx)
-		go srv.checkTransitionConfiguration(ctx, make(chan *feed.Event, 1))
-		<-time.After(100 * time.Millisecond)
-		cancel()
-		require.LogsContain(t, hook, "Could not check configuration values")
-	})
-
-	t.Run("block containing execution payload exits routine", func(t *testing.T) {
-		ctx := context.Background()
-		m := &mocks.EngineClient{}
-		m.Err = errors.New("something went wrong")
-		srv := setupTransitionConfigTest(t)
-		srv.cfg.stateNotifier = &mockChain.MockStateNotifier{}
-
-		checkTransitionPollingInterval = time.Millisecond
-		ctx, cancel := context.WithCancel(ctx)
-		exit := make(chan bool)
-		notification := make(chan *feed.Event)
-		go func() {
-			srv.checkTransitionConfiguration(ctx, notification)
-			exit <- true
-		}()
-		payload := emptyPayload()
-		payload.GasUsed = 21000
-		wrappedBlock, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockCapella{
-			Block: &zondpb.BeaconBlockCapella{
-				Body: &zondpb.BeaconBlockBodyCapella{
-					ExecutionPayload: payload,
-				},
-			}},
-		)
-		require.NoError(t, err)
-		notification <- &feed.Event{
-			Data: &statefeed.BlockProcessedData{
-				SignedBlock: wrappedBlock,
-			},
-			Type: statefeed.BlockProcessed,
-		}
-		<-exit
-		cancel()
-		require.LogsContain(t, hook, "PoS transition is complete, no longer checking")
-	})
-}
 
 func TestService_handleExchangeConfigurationError(t *testing.T) {
 	hook := logTest.NewGlobal()

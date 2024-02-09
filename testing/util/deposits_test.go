@@ -2,11 +2,9 @@ package util
 
 import (
 	"bytes"
-	"context"
 	"encoding/hex"
 	"testing"
 
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"google.golang.org/protobuf/proto"
@@ -249,21 +247,6 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 	require.NoError(t, err)
 	if !bytes.Equal(deposits[1023].Data.Signature, sigAt1023B) {
 		t.Fatalf("incorrect signature, wanted %#x but received %#x", sigAt1023B, deposits[1023].Data.Signature)
-	}
-}
-
-func TestDeterministicGenesisState_100Validators(t *testing.T) {
-	validatorCount := uint64(100)
-	beaconState, privKeys := DeterministicGenesisState(t, validatorCount)
-	activeValidators, err := helpers.ActiveValidatorCount(context.Background(), beaconState, 0)
-	require.NoError(t, err)
-
-	// lint:ignore uintcast -- test code
-	if len(privKeys) != int(validatorCount) {
-		t.Fatalf("expected amount of private keys %d to match requested amount of validators %d", len(privKeys), validatorCount)
-	}
-	if activeValidators != validatorCount {
-		t.Fatalf("expected validators in state %d to match requested amount %d", activeValidators, validatorCount)
 	}
 }
 

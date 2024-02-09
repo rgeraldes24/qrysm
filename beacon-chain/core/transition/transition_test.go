@@ -368,29 +368,6 @@ func createFullBlockWithOperations(t *testing.T) (state.BeaconState,
 	return beaconState, block, []*zondpb.Attestation{blockAtt}, proposerSlashings, []*zondpb.SignedVoluntaryExit{exit}
 }
 
-func TestProcessEpochPrecompute_CanProcess(t *testing.T) {
-	epoch := primitives.Epoch(1)
-
-	atts := []*zondpb.PendingAttestation{{Data: &zondpb.AttestationData{Target: &zondpb.Checkpoint{Root: make([]byte, 32)}}, InclusionDelay: 1}}
-	slashing := make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector)
-	base := &zondpb.BeaconState{
-		Slot:                       params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch)) + 1,
-		BlockRoots:                 make([][]byte, 128),
-		Slashings:                  slashing,
-		RandaoMixes:                make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
-		CurrentEpochAttestations:   atts,
-		FinalizedCheckpoint:        &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		JustificationBits:          bitfield.Bitvector4{0x00},
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-	}
-	s, err := state_native.InitializeFromProtoPhase0(base)
-	require.NoError(t, err)
-	require.NoError(t, s.SetValidators([]*zondpb.Validator{}))
-	newState, err := transition.ProcessEpochPrecompute(context.Background(), s)
-	require.NoError(t, err)
-	assert.Equal(t, uint64(0), newState.Slashings()[2], "Unexpected slashed balance")
-}
-
 func TestProcessBlock_OverMaxProposerSlashings(t *testing.T) {
 	maxSlashings := params.BeaconConfig().MaxProposerSlashings
 	b := &zondpb.SignedBeaconBlock{

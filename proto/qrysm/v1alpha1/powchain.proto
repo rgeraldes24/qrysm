@@ -41,11 +41,9 @@ message LatestETH1Data {
 
 // ChainStartData contains all the information related to chainstart.
 message ChainStartData {
-    bool chainstarted = 1;
     uint64 genesis_time = 2;
     uint64 genesis_block = 3;
     Eth1Data eth1_data = 4;
-    repeated Deposit chainstart_deposits = 5;
 }
 
 // SparseMerkleTrie is used to describe the model of our deposit trie.

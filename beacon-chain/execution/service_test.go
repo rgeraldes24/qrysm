@@ -284,56 +284,6 @@ func TestHandlePanic_OK(t *testing.T) {
 	require.LogsContain(t, hook, "Panicked when handling data from ETH 1.0 Chain!")
 }
 
-func TestLogTillGenesis_OK(t *testing.T) {
-	// Reset the var at the end of the test.
-	currPeriod := logPeriod
-	logPeriod = 1 * time.Second
-	defer func() {
-		logPeriod = currPeriod
-	}()
-
-	params.SetupTestConfigCleanup(t)
-	cfg := params.BeaconConfig().Copy()
-	cfg.Eth1FollowDistance = 5
-	params.OverrideBeaconConfig(cfg)
-
-	nCfg := params.BeaconNetworkConfig()
-	nCfg.ContractDeploymentBlock = 0
-	params.OverrideBeaconNetworkConfig(nCfg)
-
-	hook := logTest.NewGlobal()
-	testAcc, err := mock.Setup()
-	require.NoError(t, err, "Unable to set up simulated backend")
-	beaconDB := dbutil.SetupDB(t)
-	server, endpoint, err := mockExecution.SetupRPCServer()
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		server.Stop()
-	})
-	web3Service, err := NewService(context.Background(),
-		WithHttpEndpoint(endpoint),
-		WithDepositContractAddress(testAcc.ContractAddr),
-		WithDatabase(beaconDB),
-	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
-	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
-	require.NoError(t, err)
-
-	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
-	web3Service.httpLogger = testAcc.Backend
-	for i := 0; i < 30; i++ {
-		testAcc.Backend.Commit()
-	}
-	web3Service.latestEth1Data = &zondpb.LatestETH1Data{LastRequestedBlock: 0}
-	// Spin off to a separate routine
-	go web3Service.run(web3Service.ctx.Done())
-	// Wait for 2 seconds so that the
-	// info is logged.
-	time.Sleep(2 * time.Second)
-	web3Service.cancel()
-	assert.LogsContain(t, hook, "Currently waiting for chainstart")
-}
-
 func TestInitDepositCache_OK(t *testing.T) {
 	ctrs := []*zondpb.DepositContainer{
 		{Index: 0, Eth1BlockHeight: 2, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("A")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
@@ -343,7 +293,7 @@ func TestInitDepositCache_OK(t *testing.T) {
 	gs, _ := util.DeterministicGenesisState(t, 1)
 	beaconDB := dbutil.SetupDB(t)
 	s := &Service{
-		chainStartData:  &zondpb.ChainStartData{Chainstarted: false},
+		chainStartData:  &zondpb.ChainStartData{},
 		preGenesisState: gs,
 		cfg:             &config{beaconDB: beaconDB},
 	}
@@ -360,7 +310,6 @@ func TestInitDepositCache_OK(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, s.cfg.beaconDB.SaveGenesisBlockRoot(context.Background(), blockRootA))
 	require.NoError(t, s.cfg.beaconDB.SaveState(context.Background(), emptyState, blockRootA))
-	s.chainStartData.Chainstarted = true
 	require.NoError(t, s.initDepositCaches(context.Background(), ctrs))
 	require.Equal(t, 3, len(s.cfg.depositCache.PendingContainers(context.Background(), nil)))
 }
@@ -404,7 +353,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 	gs, _ := util.DeterministicGenesisState(t, 1)
 	beaconDB := dbutil.SetupDB(t)
 	s := &Service{
-		chainStartData:  &zondpb.ChainStartData{Chainstarted: false},
+		chainStartData:  &zondpb.ChainStartData{},
 		preGenesisState: gs,
 		cfg:             &config{beaconDB: beaconDB},
 	}
@@ -432,7 +381,6 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &zondpb.Checkpoint{Epoch: slots.ToEpoch(0), Root: headRoot[:]}))
 	s.cfg.finalizedStateAtStartup = emptyState
 
-	s.chainStartData.Chainstarted = true
 	require.NoError(t, s.initDepositCaches(context.Background(), ctrs))
 	fDeposits, err := s.cfg.depositCache.FinalizedDeposits(ctx)
 	require.NoError(t, err)
@@ -531,13 +479,6 @@ func (mbs *mockBSUpdater) Update(bs clientstats.BeaconNodeStats) {
 
 var _ BeaconNodeStatsUpdater = &mockBSUpdater{}
 
-func TestDedupEndpoints(t *testing.T) {
-	assert.DeepEqual(t, []string{"A"}, dedupEndpoints([]string{"A"}), "did not dedup correctly")
-	assert.DeepEqual(t, []string{"A", "B"}, dedupEndpoints([]string{"A", "B"}), "did not dedup correctly")
-	assert.DeepEqual(t, []string{"A", "B"}, dedupEndpoints([]string{"A", "A", "A", "B"}), "did not dedup correctly")
-	assert.DeepEqual(t, []string{"A", "B"}, dedupEndpoints([]string{"A", "A", "A", "B", "B"}), "did not dedup correctly")
-}
-
 func Test_batchRequestHeaders_UnderflowChecks(t *testing.T) {
 	srv := &Service{}
 	start := uint64(101)
@@ -577,7 +518,6 @@ func TestService_EnsureConsistentPowchainData(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.NotNil(t, eth1Data)
-	assert.Equal(t, true, eth1Data.ChainstartData.Chainstarted)
 }
 
 func TestService_InitializeCorrectly(t *testing.T) {
@@ -632,7 +572,7 @@ func TestService_EnsureValidPowchainData(t *testing.T) {
 	require.NoError(t, s1.cfg.beaconDB.SaveGenesisData(context.Background(), genState))
 
 	err = s1.cfg.beaconDB.SaveExecutionChainData(context.Background(), &zondpb.ETH1ChainData{
-		ChainstartData:    &zondpb.ChainStartData{Chainstarted: true},
+		ChainstartData:    &zondpb.ChainStartData{},
 		DepositContainers: []*zondpb.DepositContainer{{Index: 1}},
 	})
 	require.NoError(t, err)

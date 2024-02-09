@@ -16,7 +16,6 @@ import (
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -25,8 +24,8 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-func TestExecuteBellatrixStateTransitionNoVerify_FullProcess(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateBellatrix(t, 100)
+func TestExecuteCapellaStateTransitionNoVerify_FullProcess(t *testing.T) {
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 
 	syncCommittee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -58,7 +57,7 @@ func TestExecuteBellatrixStateTransitionNoVerify_FullProcess(t *testing.T) {
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), nextSlotState)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockBellatrix()
+	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
@@ -77,19 +76,16 @@ func TestExecuteBellatrixStateTransitionNoVerify_FullProcess(t *testing.T) {
 	h.StateRoot = prevStateRoot[:]
 	pbr, err := h.HashTreeRoot()
 	require.NoError(t, err)
-	syncSigs := make([]bls.Signature, len(indices))
+	syncSigs := make([][]byte, len(indices))
 	for i, indice := range indices {
 		b := p2pType.SSZBytes(pbr[:])
 		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
 		require.NoError(t, err)
-		sig, err := bls.SignatureFromBytes(sb)
-		require.NoError(t, err)
-		syncSigs[i] = sig
+		syncSigs[i] = sb
 	}
-	aggregatedSig := bls.AggregateSignatures(syncSigs).Marshal()
 	syncAggregate := &zondpb.SyncAggregate{
-		SyncCommitteeBits:      syncBits,
-		SyncCommitteeSignature: aggregatedSig,
+		SyncCommitteeBits:       syncBits,
+		SyncCommitteeSignatures: syncSigs,
 	}
 	block.Block.Body.SyncAggregate = syncAggregate
 	wsb, err := blocks.NewSignedBeaconBlock(block)
@@ -113,7 +109,7 @@ func TestExecuteBellatrixStateTransitionNoVerify_FullProcess(t *testing.T) {
 }
 
 func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateBellatrix(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 
 	syncCommittee, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -145,7 +141,7 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), nextSlotState)
 	require.NoError(t, err)
-	block := util.NewBeaconBlockBellatrix()
+	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
@@ -164,19 +160,16 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 	h.StateRoot = prevStateRoot[:]
 	pbr, err := h.HashTreeRoot()
 	require.NoError(t, err)
-	syncSigs := make([]bls.Signature, len(indices))
+	syncSigs := make([][]byte, len(indices))
 	for i, indice := range indices {
 		b := p2pType.SSZBytes(pbr[:])
 		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
 		require.NoError(t, err)
-		sig, err := bls.SignatureFromBytes(sb)
-		require.NoError(t, err)
-		syncSigs[i] = sig
+		syncSigs[i] = sb
 	}
-	aggregatedSig := bls.AggregateSignatures(syncSigs).Marshal()
 	syncAggregate := &zondpb.SyncAggregate{
-		SyncCommitteeBits:      syncBits,
-		SyncCommitteeSignature: aggregatedSig,
+		SyncCommitteeBits:       syncBits,
+		SyncCommitteeSignatures: syncSigs,
 	}
 	block.Block.Body.SyncAggregate = syncAggregate
 
@@ -198,8 +191,8 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 	require.ErrorContains(t, "could not validate state root", err)
 }
 
-func TestProcessEpoch_BadBalanceBellatrix(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateBellatrix(t, 100)
+func TestProcessEpoch_BadBalanceCapella(t *testing.T) {
+	s, _ := util.DeterministicGenesisStateCapella(t, 100)
 	assert.NoError(t, s.SetSlot(63))
 	assert.NoError(t, s.UpdateBalancesAtIndex(0, math.MaxUint64))
 	participation := byte(0)

@@ -49,7 +49,6 @@ go_test(
     name = "go_default_test",
     srcs = [
         "generate_genesis_state_capella_test.go",
-        "generate_genesis_state_test.go",
         "generate_keys_test.go",
     ],
     data = [

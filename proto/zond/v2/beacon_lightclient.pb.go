@@ -7,13 +7,14 @@
 package zond
 
 import (
-	_ "github.com/theQRL/qrysm/v4/proto/zond/ext"
+	reflect "reflect"
+	sync "sync"
+
 	github_com_theQRL_qrysm_v4_consensus_types_primitives "github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	_ "github.com/theQRL/qrysm/v4/proto/zond/ext"
 	v1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
 )
 
 const (

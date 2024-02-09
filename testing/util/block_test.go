@@ -247,7 +247,7 @@ func TestGenerateVoluntaryExits(t *testing.T) {
 	config.ShardCommitteePeriod = 0
 	params.OverrideBeaconConfig(config)
 
-	beaconState, privKeys := DeterministicGenesisState(t, 256)
+	beaconState, privKeys := DeterministicGenesisStateCapella(t, 256)
 	exit, err := GenerateVoluntaryExits(beaconState, privKeys[0], 0)
 	require.NoError(t, err)
 	val, err := beaconState.ValidatorAtIndexReadOnly(0)

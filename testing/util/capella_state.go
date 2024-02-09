@@ -8,7 +8,9 @@ import (
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
+	b "github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
+	"github.com/theQRL/qrysm/v4/beacon-chain/db/iface"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stateutil"
@@ -17,7 +19,32 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/testing/require"
 )
+
+// DeterministicGenesisStateCapellaWithGenesisBlock creates a genesis state, saves the genesis block,
+// genesis state and head block root. It returns the genesis state, genesis block's root and
+// validator private keys.
+func DeterministicGenesisStateCapellaWithGenesisBlock(
+	t *testing.T,
+	ctx context.Context,
+	db iface.HeadAccessDatabase,
+	numValidators uint64,
+) (state.BeaconState, [32]byte, []dilithium.DilithiumKey) {
+	genesisState, privateKeys := DeterministicGenesisStateCapella(t, numValidators)
+	stateRoot, err := genesisState.HashTreeRoot(ctx)
+	require.NoError(t, err, "Could not hash genesis state")
+
+	genesis := b.NewGenesisBlock(stateRoot[:])
+	SaveBlock(t, ctx, db, genesis)
+
+	parentRoot, err := genesis.Block.HashTreeRoot()
+	require.NoError(t, err, "Could not get signing root")
+	require.NoError(t, db.SaveState(ctx, genesisState, parentRoot), "Could not save genesis state")
+	require.NoError(t, db.SaveHeadBlockRoot(ctx, parentRoot), "Could not save genesis state")
+
+	return genesisState, parentRoot, privateKeys
+}
 
 // DeterministicGenesisStateCapella returns a genesis state in Capella format made using the deterministic deposits.
 func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.DilithiumKey) {

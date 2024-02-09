@@ -1,12 +1,17 @@
 package dilithiumt
 
 import (
+	"errors"
 	"fmt"
+	"runtime"
 
-	"github.com/pkg/errors"
+	pkgerrors "github.com/pkg/errors"
 	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
+	"golang.org/x/sync/errgroup"
 )
+
+var ErrSignatureVerificationFailed = errors.New("signature verification failed")
 
 // Signature used in the BLS signature scheme.
 type Signature struct {
@@ -44,20 +49,6 @@ func (s *Signature) Verify(pubKey common.PublicKey, msg []byte) bool {
 	return dilithium.Verify(msg, *s.s, pubKey.(*PublicKey).p)
 }
 
-func UnaggregatedSignatures(sigs []common.Signature) []byte {
-	if len(sigs) == 0 {
-		return nil
-	}
-
-	unaggregatedSigns := make([]byte, dilithium.CryptoBytes*len(sigs))
-	offset := 0
-	for i := 0; i < len(sigs); i++ {
-		copy(unaggregatedSigns[offset:offset+dilithium.CryptoBytes], sigs[i].Marshal())
-		offset += dilithium.CryptoBytes
-	}
-	return unaggregatedSigns
-}
-
 func VerifySignature(sig []byte, msg [32]byte, pubKey common.PublicKey) (bool, error) {
 	rSig, err := SignatureFromBytes(sig)
 	if err != nil {
@@ -66,26 +57,57 @@ func VerifySignature(sig []byte, msg [32]byte, pubKey common.PublicKey) (bool, e
 	return rSig.Verify(pubKey, msg[:]), nil
 }
 
-// VerifyMultipleSignatures TODO: (cyyber) make multiple parallel verification using go routine
-func VerifyMultipleSignatures(sigs [][][]byte, msgs [][32]byte, pubKeys [][]common.PublicKey) (bool, error) {
-	if len(sigs) == 0 || len(pubKeys) == 0 {
+func VerifyMultipleSignatures(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBatches [][]common.PublicKey) (bool, error) {
+	var (
+		lenSigsBatches    = len(sigsBatches)
+		lenPubKeysBatches = len(pubKeysBatches)
+	)
+
+	if len(sigsBatches) == 0 || len(pubKeysBatches) == 0 {
 		return false, nil
 	}
 
-	length := len(sigs)
-	if length != len(pubKeys) || length != len(msgs) {
-		return false, errors.Errorf("provided signatures, pubkeys and messages have differing lengths. S: %d, P: %d,M %d",
-			length, len(pubKeys), len(msgs))
+	lenMsgsBatches := len(msgs)
+	if lenSigsBatches != lenPubKeysBatches || lenSigsBatches != lenMsgsBatches {
+		return false, pkgerrors.Errorf("provided signatures batches, pubkeys batches and messages have differing lengths. SB: %d, PB: %d, M: %d",
+			lenSigsBatches, lenPubKeysBatches, lenMsgsBatches)
 	}
 
-	for i := range sigs {
-		for pubKeyIndex, pubKey := range pubKeys[i] {
-			offset := pubKeyIndex * dilithium.CryptoBytes
-			sig := sigs[i][offset : offset+dilithium.CryptoBytes]
-			if ok, err := VerifySignature(sig, msgs[i], pubKey); !ok {
-				return ok, err
-			}
+	n := runtime.GOMAXPROCS(0) - 1
+	grp := errgroup.Group{}
+	grp.SetLimit(n)
+
+	for i := 0; i < lenMsgsBatches; i++ {
+		if len(sigsBatches[i]) != len(pubKeysBatches[i]) {
+			return false, pkgerrors.Errorf("provided signatures, pubkeys have differing lengths. S: %d, P: %d, Batch: %d",
+				len(sigsBatches[i]), len(pubKeysBatches[i]), i)
 		}
+
+		for j, sig := range sigsBatches[i] {
+			sigCopy := make([]byte, len(sig))
+			copy(sigCopy, sig)
+			ic := i
+			jc := j
+
+			grp.Go(func() error {
+				ok, err := VerifySignature(sigCopy, msgs[ic], pubKeysBatches[ic][jc])
+				if err != nil {
+					return err
+				}
+				if !ok {
+					return ErrSignatureVerificationFailed
+				}
+
+				return nil
+			})
+		}
+	}
+
+	if err := grp.Wait(); err != nil {
+		if !pkgerrors.Is(err, ErrSignatureVerificationFailed) {
+			return false, nil
+		}
+		return false, err
 	}
 
 	return true, nil

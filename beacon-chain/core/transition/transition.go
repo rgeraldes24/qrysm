@@ -11,8 +11,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
-	e "github.com/theQRL/qrysm/v4/beacon-chain/core/epoch"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/features"
@@ -321,51 +319,5 @@ func VerifyOperationLengths(_ context.Context, state state.BeaconState, b interf
 			maxDeposits, len(body.Deposits()))
 	}
 
-	return state, nil
-}
-
-// ProcessEpochPrecompute describes the per epoch operations that are performed on the beacon state.
-// It's optimized by pre computing validator attested info and epoch total/attested balances upfront.
-func ProcessEpochPrecompute(ctx context.Context, state state.BeaconState) (state.BeaconState, error) {
-	ctx, span := trace.StartSpan(ctx, "core.state.ProcessEpochPrecompute")
-	defer span.End()
-	span.AddAttributes(trace.Int64Attribute("epoch", int64(time.CurrentEpoch(state)))) // lint:ignore uintcast -- This is OK for tracing.
-
-	if state == nil || state.IsNil() {
-		return nil, errors.New("nil state")
-	}
-	vp, bp, err := precompute.New(ctx, state)
-	if err != nil {
-		return nil, err
-	}
-	vp, bp, err = precompute.ProcessAttestations(ctx, state, vp, bp)
-	if err != nil {
-		return nil, err
-	}
-
-	state, err = precompute.ProcessJustificationAndFinalizationPreCompute(state, bp)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not process justification")
-	}
-
-	state, err = precompute.ProcessRewardsAndPenaltiesPrecompute(state, bp, vp, precompute.AttestationsDelta, precompute.ProposersDelta)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not process rewards and penalties")
-	}
-
-	state, err = e.ProcessRegistryUpdates(ctx, state)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not process registry updates")
-	}
-
-	err = precompute.ProcessSlashingsPrecompute(state, bp)
-	if err != nil {
-		return nil, err
-	}
-
-	state, err = e.ProcessFinalUpdates(state)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not process final updates")
-	}
 	return state, nil
 }
