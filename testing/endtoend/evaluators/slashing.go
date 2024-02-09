@@ -106,7 +106,7 @@ func validatorsLoseBalance(_ *e2eTypes.EvaluationContext, conns ...*grpc.ClientC
 			return err
 		}
 
-		slashedPenalty := params.BeaconConfig().MaxEffectiveBalance / params.BeaconConfig().MinSlashingPenaltyQuotient
+		slashedPenalty := params.BeaconConfig().MaxEffectiveBalance / params.BeaconConfig().MinSlashingPenaltyQuotientBellatrix
 		slashedBal := params.BeaconConfig().MaxEffectiveBalance - slashedPenalty + params.BeaconConfig().EffectiveBalanceIncrement/10
 		if valResp.EffectiveBalance >= slashedBal {
 			return fmt.Errorf(
@@ -149,7 +149,7 @@ func insertDoubleAttestationIntoPool(_ *e2eTypes.EvaluationContext, conns ...*gr
 
 	var committeeIndex primitives.CommitteeIndex
 	var committee []primitives.ValidatorIndex
-	for _, duty := range duties.Duties {
+	for _, duty := range duties.CurrentEpochDuties {
 		if duty.AttesterSlot == chainHead.HeadSlot-1 {
 			committeeIndex = duty.CommitteeIndex
 			committee = duty.Committee
@@ -195,7 +195,7 @@ func insertDoubleAttestationIntoPool(_ *e2eTypes.EvaluationContext, conns ...*gr
 		att := &zond.Attestation{
 			AggregationBits: attBitfield,
 			Data:            attData,
-			Signature:       privKeys[committee[i]].Sign(signingRoot[:]).Marshal(),
+			Signatures:      [][]byte{privKeys[committee[i]].Sign(signingRoot[:]).Marshal()},
 		}
 		// We only broadcast to conns[0] here since we can trust that at least 1 node will be online.
 		// Only broadcasting the attestation to one node also helps test slashing propagation.
@@ -285,12 +285,12 @@ func generateSignedBeaconBlock(
 	ctx := context.Background()
 
 	hashLen := 32
-	blk := &zond.BeaconBlock{
+	blk := &zond.BeaconBlockCapella{
 		Slot:          chainHead.HeadSlot - 1,
 		ParentRoot:    chainHead.HeadBlockRoot,
 		StateRoot:     bytesutil.PadTo([]byte(stateRoot), hashLen),
 		ProposerIndex: proposerIndex,
-		Body: &zond.BeaconBlockBody{
+		Body: &zond.BeaconBlockBodyCapella{
 			Eth1Data: &zond.Eth1Data{
 				BlockHash:    bytesutil.PadTo([]byte("bad block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("bad deposit root"), hashLen),
@@ -319,7 +319,7 @@ func generateSignedBeaconBlock(
 		return nil, errors.Wrap(err, "could not compute signing root")
 	}
 	sig := privKeys[proposerIndex].Sign(signingRoot[:]).Marshal()
-	signedBlk := &zond.SignedBeaconBlock{
+	signedBlk := &zond.SignedBeaconBlockCapella{
 		Block:     blk,
 		Signature: sig,
 	}

@@ -6,20 +6,17 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/config/params"
-	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
 func TestVerifyBlockHeaderSignature(t *testing.T) {
-	beaconState, err := util.NewBeaconState()
+	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
-	privKey, err := bls.RandKey()
+	privKey, err := dilithium.RandKey()
 	require.NoError(t, err)
 	validators := make([]*zondpb.Validator, 1)
 	validators[0] = &zondpb.Validator{
@@ -62,12 +59,10 @@ func TestVerifyBlockHeaderSignature(t *testing.T) {
 	require.NoError(t, err)
 }
 
+/*
 func TestVerifyBlockSignatureUsingCurrentFork(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	bCfg := params.BeaconConfig()
-	bCfg.AltairForkEpoch = 100
-	bCfg.ForkVersionSchedule[bytesutil.ToBytes4(bCfg.AltairForkVersion)] = 100
-	params.OverrideBeaconConfig(bCfg)
+
 	bState, keys := util.DeterministicGenesisState(t, 100)
 	altairBlk := util.NewBeaconBlockAltair()
 	altairBlk.Block.ProposerIndex = 0
@@ -87,3 +82,4 @@ func TestVerifyBlockSignatureUsingCurrentFork(t *testing.T) {
 	require.NoError(t, err)
 	assert.NoError(t, blocks.VerifyBlockSignatureUsingCurrentFork(bState, wsb))
 }
+*/

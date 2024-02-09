@@ -192,7 +192,7 @@ func createAttestationSignatureBatch(
 		return nil, nil
 	}
 
-	sigs := make([][]byte, len(atts))
+	sigs := make([][][]byte, len(atts))
 	pks := make([][]dilithium.PublicKey, len(atts))
 	msgs := make([][32]byte, len(atts))
 	descs := make([]string, len(atts))
@@ -208,7 +208,7 @@ func createAttestationSignatureBatch(
 		if err := attestation.IsValidAttestationIndices(ctx, ia); err != nil {
 			return nil, err
 		}
-		sigs[i] = ia.Signature
+		sigs[i] = ia.Signatures
 		indices := ia.AttestingIndices
 		pubkeys := make([][]byte, len(indices))
 		for j := 0; j < len(indices); j++ {

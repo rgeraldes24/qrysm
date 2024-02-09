@@ -6,6 +6,5 @@ import (
 
 func StartAt(v int, c *params.BeaconChainConfig) *params.BeaconChainConfig {
 	c = c.Copy()
-	c.TerminalTotalDifficulty = "0"
 	return c
 }

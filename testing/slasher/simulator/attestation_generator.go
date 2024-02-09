@@ -10,7 +10,6 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -73,20 +72,20 @@ func (s *Simulator) generateAttestationsForSlot(
 			}
 
 			// Sign the attestation with a valid signature.
-			aggSig, err := s.aggregateSigForAttestation(beaconState, att)
+			sigs, err := s.sigsForAttestation(beaconState, att)
 			if err != nil {
 				return nil, nil, err
 			}
-			att.Signatures = aggSig.Marshal()
+			att.Signatures = sigs
 
 			attestations = append(attestations, att)
 			if rand.NewGenerator().Float64() < s.srvConfig.Params.AttesterSlashingProbab {
 				slashableAtt := makeSlashableFromAtt(att, []uint64{indices[0]})
-				aggSig, err := s.aggregateSigForAttestation(beaconState, slashableAtt)
+				sigs, err := s.sigsForAttestation(beaconState, slashableAtt)
 				if err != nil {
 					return nil, nil, err
 				}
-				slashableAtt.Signatures = aggSig.Marshal()
+				slashableAtt.Signatures = sigs
 				slashedIndices = append(slashedIndices, slashableAtt.AttestingIndices...)
 				slashings = append(slashings, &zondpb.AttesterSlashing{
 					Attestation_1: att,
@@ -107,9 +106,9 @@ func (s *Simulator) generateAttestationsForSlot(
 	return attestations, slashings, nil
 }
 
-func (s *Simulator) aggregateSigForAttestation(
+func (s *Simulator) sigsForAttestation(
 	beaconState state.ReadOnlyBeaconState, att *zondpb.IndexedAttestation,
-) (dilithium.Signature, error) {
+) ([][]byte, error) {
 	domain, err := signing.Domain(
 		beaconState.Fork(),
 		att.Data.Target.Epoch,
@@ -123,15 +122,13 @@ func (s *Simulator) aggregateSigForAttestation(
 	if err != nil {
 		return nil, err
 	}
-	sigs := make([]dilithium.Signature, len(att.AttestingIndices))
+	sigs := make([][]byte, len(att.AttestingIndices))
 	for i, validatorIndex := range att.AttestingIndices {
 		privKey := s.srvConfig.PrivateKeysByValidatorIndex[primitives.ValidatorIndex(validatorIndex)]
-		sigs[i] = privKey.Sign(signingRoot[:])
+		sigs[i] = privKey.Sign(signingRoot[:]).Marshal()
 	}
 
-	// TODO(rgeraldes24)
-	// return bls.AggregateSignatures(sigs), nil
-	return sigs[0], nil
+	return sigs, nil
 }
 
 func makeSlashableFromAtt(att *zondpb.IndexedAttestation, indices []uint64) *zondpb.IndexedAttestation {

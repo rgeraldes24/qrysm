@@ -26,7 +26,7 @@ func RandKey() (common.SecretKey, error) {
 	return &dilithiumKey{d: d}, nil
 }
 
-func SecretKeyFromBytes(seed []byte) (common.SecretKey, error) {
+func SecretKeyFromSeed(seed []byte) (common.SecretKey, error) {
 	if len(seed) != common2.SeedSize {
 		return nil, fmt.Errorf("secret key must be %d bytes", common2.SeedSize)
 	}

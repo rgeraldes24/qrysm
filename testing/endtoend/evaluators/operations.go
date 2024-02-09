@@ -365,7 +365,7 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 	}
 	execIndices := []int{}
 	err = st.ReadFromEveryValidator(func(idx int, val state.ReadOnlyValidator) error {
-		if val.WithdrawalCredentials()[0] == params.BeaconConfig().ETH1AddressWithdrawalPrefixByte {
+		if val.WithdrawalCredentials()[0] == params.BeaconConfig().ZondAddressWithdrawalPrefixByte {
 			execIndices = append(execIndices, idx)
 		}
 		return nil
@@ -576,7 +576,7 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 		if err != nil {
 			return err
 		}
-		if val.WithdrawalCredentials[0] == params.BeaconConfig().ETH1AddressWithdrawalPrefixByte {
+		if val.WithdrawalCredentials[0] == params.BeaconConfig().ZondAddressWithdrawalPrefixByte {
 			continue
 		}
 		if !bytes.Equal(val.PublicKey, privKeys[idx].PublicKey().Marshal()) {

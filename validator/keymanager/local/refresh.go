@@ -109,7 +109,7 @@ func (km *Keymanager) reloadAccountsFromKeystore(keystore *AccountsKeystoreRepre
 	}
 	pubKeys := make([][dilithiumlib.CryptoPublicKeyBytes]byte, len(newAccountsStore.PublicKeys))
 	for i := 0; i < len(newAccountsStore.Seeds); i++ {
-		privKey, err := dilithium.SecretKeyFromBytes(newAccountsStore.Seeds[i])
+		privKey, err := dilithium.SecretKeyFromSeed(newAccountsStore.Seeds[i])
 		if err != nil {
 			return errors.Wrap(err, "could not initialize private key")
 		}

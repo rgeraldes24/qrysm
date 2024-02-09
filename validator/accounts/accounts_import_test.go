@@ -138,7 +138,7 @@ func Test_importPrivateKeyAsAccount(t *testing.T) {
 		t,
 		os.WriteFile(privKeyFileName, []byte(seedHex), params.BeaconIoConfig().ReadWritePermissions),
 	)
-	privKey, err := dilithium.SecretKeyFromBytes(seed[:])
+	privKey, err := dilithium.SecretKeyFromSeed(seed[:])
 	require.NoError(t, err)
 
 	// We instantiate a new wallet from a cli context.

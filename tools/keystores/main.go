@@ -182,7 +182,7 @@ func encrypt(cliCtx *cli.Context) error {
 	if err != nil {
 		return errors.Wrapf(err, "could not decode as hex string: %s", privateKeyString)
 	}
-	privKey, err := dilithium.SecretKeyFromBytes(bytesValue)
+	privKey, err := dilithium.SecretKeyFromSeed(bytesValue)
 	if err != nil {
 		return errors.Wrap(err, "not a valid BLS12-381 private key")
 	}
@@ -251,7 +251,7 @@ func readAndDecryptKeystore(fullPath, password string) error {
 			return errors.Wrap(err, "could not decode pubkey from keystore")
 		}
 	} else {
-		privKey, err := dilithium.SecretKeyFromBytes(privKeyBytes)
+		privKey, err := dilithium.SecretKeyFromSeed(privKeyBytes)
 		if err != nil {
 			return errors.Wrap(err, "could not initialize private key from bytes")
 		}

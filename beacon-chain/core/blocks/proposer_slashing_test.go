@@ -13,7 +13,7 @@ import (
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -44,9 +44,9 @@ func TestProcessProposerSlashings_UnmatchedHeaderSlots(t *testing.T) {
 	}
 	require.NoError(t, beaconState.SetSlot(currentSlot))
 
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			ProposerSlashings: slashings,
 		},
 	}
@@ -77,9 +77,9 @@ func TestProcessProposerSlashings_SameHeaders(t *testing.T) {
 	}
 
 	require.NoError(t, beaconState.SetSlot(currentSlot))
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			ProposerSlashings: slashings,
 		},
 	}
@@ -119,14 +119,14 @@ func TestProcessProposerSlashings_ValidatorNotSlashable(t *testing.T) {
 		},
 	}
 
-	beaconState, err := state_native.InitializeFromProtoPhase0(&zondpb.BeaconState{
+	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Slot:       currentSlot,
 	})
 	require.NoError(t, err)
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			ProposerSlashings: slashings,
 		},
 	}
@@ -170,7 +170,7 @@ func TestProcessProposerSlashings_AppliesCorrectStatusCapella(t *testing.T) {
 		},
 	}
 
-	block := util.NewBeaconBlock()
+	block := util.NewBeaconBlockCapella()
 	block.Block.Body.ProposerSlashings = slashings
 
 	newState, err := blocks.ProcessProposerSlashings(context.Background(), beaconState, block.Block.Body.ProposerSlashings, v.SlashValidator)
@@ -195,11 +195,11 @@ func TestVerifyProposerSlashing(t *testing.T) {
 	beaconState, sks := util.DeterministicGenesisState(t, 2)
 	currentSlot := primitives.Slot(0)
 	require.NoError(t, beaconState.SetSlot(currentSlot))
-	rand1, err := bls.RandKey()
+	rand1, err := dilithium.RandKey()
 	require.NoError(t, err)
 	sig1 := rand1.Sign([]byte("foo")).Marshal()
 
-	rand2, err := bls.RandKey()
+	rand2, err := dilithium.RandKey()
 	require.NoError(t, err)
 	sig2 := rand2.Sign([]byte("bar")).Marshal()
 

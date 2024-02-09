@@ -52,7 +52,7 @@ func deterministicallyGenerateKeys(startIndex, numKeys uint64) ([]dilithium.Dili
 		h := hash.Hash(enc)
 		var seed [common.SeedSize]uint8
 		copy(seed[:], h[:])
-		d, err := dilithium.SecretKeyFromBytes(seed[:])
+		d, err := dilithium.SecretKeyFromSeed(seed[:])
 		if err != nil {
 			return nil, nil, err
 		}

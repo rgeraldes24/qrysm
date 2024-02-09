@@ -13,11 +13,6 @@ import (
 // attList represents list of attestations, defined for easier en masse operations (filtering, sorting).
 type attList []*zondpb.Attestation
 
-// BLS aggregate signature aliases for testing / benchmark substitution. These methods are
-// significantly more expensive than the inner logic of AggregateAttestations so they must be
-// substituted for benchmarks which analyze AggregateAttestations.
-var aggregateSignatures = dilithium.AggregateSignatures
-var unaggregatedSignatures = dilithium.UnaggregatedSignatures
 var signatureFromBytes = dilithium.SignatureFromBytes
 
 var _ = logrus.WithField("prefix", "aggregation.attestations")

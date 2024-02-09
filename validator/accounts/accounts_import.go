@@ -227,7 +227,7 @@ func importPrivateKeyAsAccount(ctx context.Context, wallet *wallet.Wallet, impor
 			err, "could not decode file as hex string, does the file contain a valid hex string?",
 		)
 	}
-	privKey, err := dilithium.SecretKeyFromBytes(privKeyBytes)
+	privKey, err := dilithium.SecretKeyFromSeed(privKeyBytes)
 	if err != nil {
 		return errors.Wrap(err, "not a valid Dilithium private key")
 	}

@@ -1638,7 +1638,7 @@ func TestServer_SetVoluntaryExit(t *testing.T) {
 	require.NoError(t, err)
 	seed, err := hex.DecodeString(mocks.TestHexSeed)
 	require.NoError(t, err)
-	validatingKey, err := dilithium.SecretKeyFromBytes(seed)
+	validatingKey, err := dilithium.SecretKeyFromSeed(seed)
 	require.NoError(t, err)
 	pubKey := validatingKey.PublicKey().Marshal()
 	cryptoFields, err := encryptor.Encrypt(validatingKey.Marshal(), password)

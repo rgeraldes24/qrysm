@@ -268,7 +268,7 @@ func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) 
 	// Hardcode secret key in order to have a valid aggregator signature.
 	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
 	assert.NoError(t, err)
-	validatorKey, err := dilithium.SecretKeyFromBytes(rawKey)
+	validatorKey, err := dilithium.SecretKeyFromSeed(rawKey)
 	assert.NoError(t, err)
 
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
@@ -318,7 +318,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	// Hardcode secret key in order to have a valid aggregator signature.
 	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
 	assert.NoError(t, err)
-	validatorKey, err := dilithium.SecretKeyFromBytes(rawKey)
+	validatorKey, err := dilithium.SecretKeyFromSeed(rawKey)
 	assert.NoError(t, err)
 
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
@@ -396,7 +396,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	// Hardcode secret key in order to have a valid aggregator signature.
 	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
 	assert.NoError(t, err)
-	validatorKey, err := dilithium.SecretKeyFromBytes(rawKey)
+	validatorKey, err := dilithium.SecretKeyFromSeed(rawKey)
 	assert.NoError(t, err)
 
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)

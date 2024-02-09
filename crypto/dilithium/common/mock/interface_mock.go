@@ -141,19 +141,6 @@ func (mr *MockPublicKeyMockRecorder) Equals(p2 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Equals", reflect.TypeOf((*MockPublicKey)(nil).Equals), p2)
 }
 
-// IsInfinite mocks base method.
-func (m *MockPublicKey) IsInfinite() bool {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsInfinite")
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// IsInfinite indicates an expected call of IsInfinite.
-func (mr *MockPublicKeyMockRecorder) IsInfinite() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsInfinite", reflect.TypeOf((*MockPublicKey)(nil).IsInfinite))
-}
 
 // Marshal mocks base method.
 func (m *MockPublicKey) Marshal() []byte {

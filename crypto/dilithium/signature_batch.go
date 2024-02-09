@@ -15,7 +15,7 @@ const AggregatedSignature = "dilithium aggregated signature"
 // signatures and its respective public keys and
 // messages required to verify it.
 type SignatureBatch struct {
-	Signatures   [][]byte
+	Signatures   [][][]byte
 	PublicKeys   [][]PublicKey
 	Messages     [][32]byte
 	Descriptions []string
@@ -24,7 +24,7 @@ type SignatureBatch struct {
 // NewSet constructs an empty signature batch object.
 func NewSet() *SignatureBatch {
 	return &SignatureBatch{
-		Signatures:   [][]byte{},
+		Signatures:   [][][]byte{},
 		PublicKeys:   [][]PublicKey{},
 		Messages:     [][32]byte{},
 		Descriptions: []string{},

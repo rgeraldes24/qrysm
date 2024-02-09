@@ -57,7 +57,7 @@ func (m mockSignature) Copy() dilithium.Signature {
 }
 
 func testKeyFromBytes(t *testing.T, b []byte) keypair {
-	pri, err := dilithium.SecretKeyFromBytes(bytesutil.PadTo(b, common.SeedSize))
+	pri, err := dilithium.SecretKeyFromSeed(bytesutil.PadTo(b, common.SeedSize))
 	require.NoError(t, err, "Failed to generate key from bytes")
 	return keypair{pub: bytesutil.ToBytes2592(pri.PublicKey().Marshal()), pri: pri}
 }

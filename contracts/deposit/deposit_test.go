@@ -19,12 +19,12 @@ func TestDepositInput_GeneratesPb(t *testing.T) {
 	var seed [common.SeedSize]uint8
 	_, err := rand.Read(seed[:])
 	require.NoError(t, err)
-	k1, err := dilithium.SecretKeyFromBytes(seed[:])
+	k1, err := dilithium.SecretKeyFromSeed(seed[:])
 	require.NoError(t, err)
 
 	_, err = rand.Read(seed[:])
 	require.NoError(t, err)
-	k2, err := dilithium.SecretKeyFromBytes(seed[:])
+	k2, err := dilithium.SecretKeyFromSeed(seed[:])
 	require.NoError(t, err)
 
 	result, _, err := deposit.DepositInput(k1, k2, 0, nil)

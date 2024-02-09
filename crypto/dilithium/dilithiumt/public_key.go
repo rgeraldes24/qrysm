@@ -46,28 +46,11 @@ func publicKeyFromBytes(pubKey []byte, cacheCopy bool) (common.PublicKey, error)
 	return pubKeyObj, nil
 }
 
-func AggregatePublicKeys(pubs [][]byte) (common.PublicKey, error) {
-	panic("AggregatePublicKeys not supported for dilithium")
-}
-
 func (p *PublicKey) Copy() common.PublicKey {
 	np := *p.p
 	return &PublicKey{p: &np}
 }
 
-func (p *PublicKey) IsInfinite() bool {
-	var zeroKey [dilithium2.CryptoPublicKeyBytes]uint8
-	return reflect.DeepEqual(p.p, zeroKey)
-}
-
 func (p *PublicKey) Equals(p2 common.PublicKey) bool {
 	return reflect.DeepEqual(p.p, p2.(*PublicKey).p)
-}
-
-func (p *PublicKey) Aggregate(p2 common.PublicKey) common.PublicKey {
-	panic("Aggregate not supported for dilithium")
-}
-
-func AggregateMultiplePubkeys(pubkeys []common.PublicKey) common.PublicKey {
-	panic("AggregateMultiplePubkeys not supported for dilithium")
 }

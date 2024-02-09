@@ -166,7 +166,7 @@ func (km *Keymanager) initializeKeysCachesFromKeystore() error {
 	for i, publicKey := range km.accountsStore.PublicKeys {
 		publicKey2592 := bytesutil.ToBytes2592(publicKey)
 		orderedPublicKeys[i] = publicKey2592
-		secretKey, err := dilithium.SecretKeyFromBytes(km.accountsStore.Seeds[i])
+		secretKey, err := dilithium.SecretKeyFromSeed(km.accountsStore.Seeds[i])
 		if err != nil {
 			return errors.Wrap(err, "failed to initialize keys caches from account keystore")
 		}

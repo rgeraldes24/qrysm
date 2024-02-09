@@ -32,9 +32,9 @@ func TestProcessRandao_IncorrectProposerFailsVerification(t *testing.T) {
 	require.NoError(t, err)
 	// We make the previous validator's index sign the message instead of the proposer.
 	epochSignature := privKeys[proposerIdx-1].Sign(root[:])
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			RandaoReveal: epochSignature.Marshal(),
 		},
 	}
@@ -53,9 +53,9 @@ func TestProcessRandao_SignatureVerifiesAndUpdatesLatestStateMixes(t *testing.T)
 	epochSignature, err := util.RandaoReveal(beaconState, epoch, privKeys)
 	require.NoError(t, err)
 
-	b := util.NewBeaconBlock()
-	b.Block = &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	b := util.NewBeaconBlockCapella()
+	b.Block = &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			RandaoReveal: epochSignature,
 		},
 	}
@@ -79,8 +79,8 @@ func TestRandaoSignatureSet_OK(t *testing.T) {
 	epochSignature, err := util.RandaoReveal(beaconState, epoch, privKeys)
 	require.NoError(t, err)
 
-	block := &zondpb.BeaconBlock{
-		Body: &zondpb.BeaconBlockBody{
+	block := &zondpb.BeaconBlockCapella{
+		Body: &zondpb.BeaconBlockBodyCapella{
 			RandaoReveal: epochSignature,
 		},
 	}

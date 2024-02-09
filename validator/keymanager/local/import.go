@@ -152,7 +152,7 @@ func (_ *Keymanager) attemptDecryptKeystore(
 			return nil, nil, "", errors.Wrap(err, "could not decode pubkey from keystore")
 		}
 	} else {
-		privKey, err := dilithium.SecretKeyFromBytes(privKeyBytes)
+		privKey, err := dilithium.SecretKeyFromSeed(privKeyBytes)
 		if err != nil {
 			return nil, nil, "", errors.Wrap(err, "could not initialize private key from bytes")
 		}
