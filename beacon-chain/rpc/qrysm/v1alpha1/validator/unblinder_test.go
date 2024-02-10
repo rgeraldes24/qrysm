@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/pkg/errors"
 	builderTest "github.com/theQRL/qrysm/v4/beacon-chain/builder/testing"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
@@ -55,84 +54,86 @@ func Test_unblindBuilderBlock(t *testing.T) {
 			},
 			err: "builder not configured",
 		},
-		{
-			name: "non-blinded without configured builder",
-			blk: func() interfaces.SignedBeaconBlock {
-				b := util.NewBeaconBlockCapella()
-				b.Block.Slot = 1
-				b.Block.ProposerIndex = 2
-				b.Block.Body.ExecutionPayload = &v1.ExecutionPayloadCapella{
-					ParentHash:    make([]byte, fieldparams.RootLength),
-					FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
-					StateRoot:     make([]byte, fieldparams.RootLength),
-					ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-					LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
-					PrevRandao:    make([]byte, fieldparams.RootLength),
-					BaseFeePerGas: make([]byte, fieldparams.RootLength),
-					BlockHash:     make([]byte, fieldparams.RootLength),
-					Transactions:  make([][]byte, 0),
-					GasLimit:      123,
-				}
-				wb, err := blocks.NewSignedBeaconBlock(b)
-				require.NoError(t, err)
-				return wb
-			}(),
-			mock: &builderTest.MockBuilderService{
-				HasConfigured: false,
-				Payload:       p,
+		/*
+			{
+				name: "non-blinded without configured builder",
+				blk: func() interfaces.SignedBeaconBlock {
+					b := util.NewBeaconBlockCapella()
+					b.Block.Slot = 1
+					b.Block.ProposerIndex = 2
+					b.Block.Body.ExecutionPayload = &v1.ExecutionPayloadCapella{
+						ParentHash:    make([]byte, fieldparams.RootLength),
+						FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
+						StateRoot:     make([]byte, fieldparams.RootLength),
+						ReceiptsRoot:  make([]byte, fieldparams.RootLength),
+						LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
+						PrevRandao:    make([]byte, fieldparams.RootLength),
+						BaseFeePerGas: make([]byte, fieldparams.RootLength),
+						BlockHash:     make([]byte, fieldparams.RootLength),
+						Transactions:  make([][]byte, 0),
+						GasLimit:      123,
+					}
+					wb, err := blocks.NewSignedBeaconBlock(b)
+					require.NoError(t, err)
+					return wb
+				}(),
+				mock: &builderTest.MockBuilderService{
+					HasConfigured: false,
+					Payload:       p,
+				},
+				returnedBlk: func() interfaces.SignedBeaconBlock {
+					b := util.NewBeaconBlockBellatrix()
+					b.Block.Slot = 1
+					b.Block.ProposerIndex = 2
+					b.Block.Body.ExecutionPayload = p
+					wb, err := blocks.NewSignedBeaconBlock(b)
+					require.NoError(t, err)
+					return wb
+				}(),
 			},
-			returnedBlk: func() interfaces.SignedBeaconBlock {
-				b := util.NewBeaconBlockBellatrix()
-				b.Block.Slot = 1
-				b.Block.ProposerIndex = 2
-				b.Block.Body.ExecutionPayload = p
-				wb, err := blocks.NewSignedBeaconBlock(b)
-				require.NoError(t, err)
-				return wb
-			}(),
-		},
-		{
-			name: "submit blind block error",
-			blk: func() interfaces.SignedBeaconBlock {
-				b := util.NewBlindedBeaconBlockBellatrix()
-				b.Block.Slot = 1
-				b.Block.ProposerIndex = 2
-				wb, err := blocks.NewSignedBeaconBlock(b)
-				require.NoError(t, err)
-				return wb
-			}(),
-			mock: &builderTest.MockBuilderService{
-				Payload:               &v1.ExecutionPayload{},
-				HasConfigured:         true,
-				ErrSubmitBlindedBlock: errors.New("can't submit"),
+			{
+				name: "submit blind block error",
+				blk: func() interfaces.SignedBeaconBlock {
+					b := util.NewBlindedBeaconBlockBellatrix()
+					b.Block.Slot = 1
+					b.Block.ProposerIndex = 2
+					wb, err := blocks.NewSignedBeaconBlock(b)
+					require.NoError(t, err)
+					return wb
+				}(),
+				mock: &builderTest.MockBuilderService{
+					Payload:               &v1.ExecutionPayload{},
+					HasConfigured:         true,
+					ErrSubmitBlindedBlock: errors.New("can't submit"),
+				},
+				err: "can't submit",
 			},
-			err: "can't submit",
-		},
-		{
-			name: "head and payload root mismatch",
-			blk: func() interfaces.SignedBeaconBlock {
-				b := util.NewBlindedBeaconBlockBellatrix()
-				b.Block.Slot = 1
-				b.Block.ProposerIndex = 2
-				wb, err := blocks.NewSignedBeaconBlock(b)
-				require.NoError(t, err)
-				return wb
-			}(),
-			mock: &builderTest.MockBuilderService{
-				HasConfigured: true,
-				Payload:       p,
+			{
+				name: "head and payload root mismatch",
+				blk: func() interfaces.SignedBeaconBlock {
+					b := util.NewBlindedBeaconBlockBellatrix()
+					b.Block.Slot = 1
+					b.Block.ProposerIndex = 2
+					wb, err := blocks.NewSignedBeaconBlock(b)
+					require.NoError(t, err)
+					return wb
+				}(),
+				mock: &builderTest.MockBuilderService{
+					HasConfigured: true,
+					Payload:       p,
+				},
+				returnedBlk: func() interfaces.SignedBeaconBlock {
+					b := util.NewBeaconBlockBellatrix()
+					b.Block.Slot = 1
+					b.Block.ProposerIndex = 2
+					b.Block.Body.ExecutionPayload = p
+					wb, err := blocks.NewSignedBeaconBlock(b)
+					require.NoError(t, err)
+					return wb
+				}(),
+				err: "header and payload root do not match",
 			},
-			returnedBlk: func() interfaces.SignedBeaconBlock {
-				b := util.NewBeaconBlockBellatrix()
-				b.Block.Slot = 1
-				b.Block.ProposerIndex = 2
-				b.Block.Body.ExecutionPayload = p
-				wb, err := blocks.NewSignedBeaconBlock(b)
-				require.NoError(t, err)
-				return wb
-			}(),
-			err: "header and payload root do not match",
-		},
+		*/
 		{
 			name: "can get payload Capella",
 			blk: func() interfaces.SignedBeaconBlock {

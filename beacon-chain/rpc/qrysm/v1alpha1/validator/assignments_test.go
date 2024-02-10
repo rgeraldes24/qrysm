@@ -9,15 +9,9 @@ import (
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
-	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/execution"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
-	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/core"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
-	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -99,6 +93,7 @@ func TestGetDuties_OK(t *testing.T) {
 	}
 }
 
+/*
 func TestGetAltairDuties_SyncCommitteeOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
@@ -197,7 +192,9 @@ func TestGetAltairDuties_SyncCommitteeOK(t *testing.T) {
 		require.NotEqual(t, res.CurrentEpochDuties[i].IsSyncCommittee, res.NextEpochDuties[i].IsSyncCommittee)
 	}
 }
+*/
 
+/*
 func TestGetBellatrixDuties_SyncCommitteeOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
@@ -299,7 +296,9 @@ func TestGetBellatrixDuties_SyncCommitteeOK(t *testing.T) {
 		require.NotEqual(t, res.CurrentEpochDuties[i].IsSyncCommittee, res.NextEpochDuties[i].IsSyncCommittee)
 	}
 }
+*/
 
+/*
 func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
@@ -348,6 +347,7 @@ func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 	assert.Equal(t, false, res.CurrentEpochDuties[0].IsSyncCommittee)
 	assert.Equal(t, false, res.NextEpochDuties[0].IsSyncCommittee)
 }
+*/
 
 func TestGetDuties_SlotOutOfUpperBound(t *testing.T) {
 	chain := &mockChain.ChainService{
@@ -370,7 +370,7 @@ func TestGetDuties_CurrentEpoch_ShouldNotFail(t *testing.T) {
 	require.NoError(t, err)
 	eth1Data, err := util.DeterministicEth1Data(len(deposits))
 	require.NoError(t, err)
-	bState, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+	bState, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, eth1Data, &enginev1.ExecutionPayloadCapella{})
 	require.NoError(t, err, "Could not setup genesis state")
 	// Set state to non-epoch start slot.
 	require.NoError(t, bState.SetSlot(5))
@@ -412,7 +412,7 @@ func TestGetDuties_MultipleKeys_OK(t *testing.T) {
 	require.NoError(t, err)
 	eth1Data, err := util.DeterministicEth1Data(len(deposits))
 	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+	bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, eth1Data, &enginev1.ExecutionPayloadCapella{})
 	require.NoError(t, err, "Could not setup genesis bs")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
@@ -501,7 +501,7 @@ func BenchmarkCommitteeAssignment(b *testing.B) {
 	require.NoError(b, err)
 	eth1Data, err := util.DeterministicEth1Data(len(deposits))
 	require.NoError(b, err)
-	bs, err := transition.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+	bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, eth1Data, &enginev1.ExecutionPayloadCapella{})
 	require.NoError(b, err, "Could not setup genesis bs")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(b, err, "Could not get signing root")

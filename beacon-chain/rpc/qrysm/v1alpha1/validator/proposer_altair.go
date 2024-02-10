@@ -2,17 +2,13 @@ package validator
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/theQRL/go-bitfield"
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	synccontribution "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/sync_contribution"
-	"go.opencensus.io/trace"
 )
 
 func (vs *Server) setSyncAggregate(ctx context.Context, blk interfaces.SignedBeaconBlock) {
@@ -40,75 +36,81 @@ func (vs *Server) setSyncAggregate(ctx context.Context, blk interfaces.SignedBea
 // getSyncAggregate retrieves the sync contributions from the pool to construct the sync aggregate object.
 // The contributions are filtered based on matching of the input root and slot then profitability.
 func (vs *Server) getSyncAggregate(ctx context.Context, slot primitives.Slot, root [32]byte) (*zondpb.SyncAggregate, error) {
-	ctx, span := trace.StartSpan(ctx, "ProposerServer.getSyncAggregate")
-	defer span.End()
+	/*
+		ctx, span := trace.StartSpan(ctx, "ProposerServer.getSyncAggregate")
+		defer span.End()
 
-	if vs.SyncCommitteePool == nil {
-		return nil, errors.New("sync committee pool is nil")
-	}
-	// Contributions have to match the input root
-	contributions, err := vs.SyncCommitteePool.SyncCommitteeContributions(slot)
-	if err != nil {
-		return nil, err
-	}
-	proposerContributions := proposerSyncContributions(contributions).filterByBlockRoot(root)
-
-	// Each sync subcommittee is 128 bits and the sync committee is 512 bits for mainnet.
-	var bitsHolder [][]byte
-	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSubnetCount; i++ {
-		bitsHolder = append(bitsHolder, zondpb.NewSyncCommitteeAggregationBits())
-	}
-	sigsHolder := make([]dilithium.Signature, 0, params.BeaconConfig().SyncCommitteeSize/params.BeaconConfig().SyncCommitteeSubnetCount)
-
-	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSubnetCount; i++ {
-		cs := proposerContributions.filterBySubIndex(i)
-		aggregates, err := synccontribution.Aggregate(cs)
+		if vs.SyncCommitteePool == nil {
+			return nil, errors.New("sync committee pool is nil")
+		}
+		// Contributions have to match the input root
+		contributions, err := vs.SyncCommitteePool.SyncCommitteeContributions(slot)
 		if err != nil {
 			return nil, err
 		}
+		proposerContributions := proposerSyncContributions(contributions).filterByBlockRoot(root)
 
-		// Retrieve the most profitable contribution
-		deduped, err := proposerSyncContributions(aggregates).dedup()
-		if err != nil {
-			return nil, err
+		// Each sync subcommittee is 128 bits and the sync committee is 512 bits for mainnet.
+		var bitsHolder [][]byte
+		for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSubnetCount; i++ {
+			bitsHolder = append(bitsHolder, zondpb.NewSyncCommitteeAggregationBits())
 		}
-		c := deduped.mostProfitable()
-		if c == nil {
-			continue
-		}
-		bitsHolder[i] = c.AggregationBits
-		if len(c.Signature)%dilithium2.CryptoBytes != 0 {
-			return nil, fmt.Errorf(
-				"combined Signature length is %d is not in the multiple of %d",
-				len(c.Signature), dilithium2.CryptoBytes)
-		}
-		for i := 0; i < len(c.Signature)/dilithium2.CryptoBytes; i++ {
-			offset := i * dilithium2.CryptoBytes
-			signature := c.Signature[offset : offset+dilithium2.CryptoBytes]
-			sig, err := dilithium.SignatureFromBytes(signature)
+		sigsHolder := make([]dilithium.Signature, 0, params.BeaconConfig().SyncCommitteeSize/params.BeaconConfig().SyncCommitteeSubnetCount)
+
+		for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSubnetCount; i++ {
+			cs := proposerContributions.filterBySubIndex(i)
+			aggregates, err := synccontribution.Aggregate(cs)
 			if err != nil {
 				return nil, err
 			}
-			sigsHolder = append(sigsHolder, sig)
+
+			// Retrieve the most profitable contribution
+			deduped, err := proposerSyncContributions(aggregates).dedup()
+			if err != nil {
+				return nil, err
+			}
+			c := deduped.mostProfitable()
+			if c == nil {
+				continue
+			}
+			bitsHolder[i] = c.AggregationBits
+			if len(c.Signature)%dilithium2.CryptoBytes != 0 {
+				return nil, fmt.Errorf(
+					"combined Signature length is %d is not in the multiple of %d",
+					len(c.Signature), dilithium2.CryptoBytes)
+			}
+			for i := 0; i < len(c.Signature)/dilithium2.CryptoBytes; i++ {
+				offset := i * dilithium2.CryptoBytes
+				signature := c.Signature[offset : offset+dilithium2.CryptoBytes]
+				sig, err := dilithium.SignatureFromBytes(signature)
+				if err != nil {
+					return nil, err
+				}
+				sigsHolder = append(sigsHolder, sig)
+			}
 		}
-	}
 
-	// Aggregate all the contribution bits and signatures.
-	var syncBits []byte
-	for _, b := range bitsHolder {
-		syncBits = append(syncBits, b...)
-	}
-	syncSig := dilithium.UnaggregatedSignatures(sigsHolder)
-	var syncSigBytes []byte
-	if syncSig == nil {
-		var infSig = [dilithium2.CryptoBytes]byte{0xC0} // Infinity signature if itself is nil.
-		syncSigBytes = infSig[:]
-	} else {
-		syncSigBytes = syncSig
-	}
+		// Aggregate all the contribution bits and signatures.
+		var syncBits []byte
+		for _, b := range bitsHolder {
+			syncBits = append(syncBits, b...)
+		}
+		syncSig := dilithium.UnaggregatedSignatures(sigsHolder)
+		var syncSigBytes []byte
+		if syncSig == nil {
+			var infSig = [dilithium2.CryptoBytes]byte{0xC0} // Infinity signature if itself is nil.
+			syncSigBytes = infSig[:]
+		} else {
+			syncSigBytes = syncSig
+		}
 
+		return &zondpb.SyncAggregate{
+			SyncCommitteeBits:      syncBits,
+			SyncCommitteeSignature: syncSigBytes,
+		}, nil
+	*/
 	return &zondpb.SyncAggregate{
-		SyncCommitteeBits:      syncBits,
-		SyncCommitteeSignature: syncSigBytes,
+		SyncCommitteeBits:       bitfield.NewBitvector16(),
+		SyncCommitteeSignatures: [][]byte{},
 	}, nil
 }

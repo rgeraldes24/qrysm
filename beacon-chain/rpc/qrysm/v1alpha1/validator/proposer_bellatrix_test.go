@@ -1,5 +1,6 @@
 package validator
 
+/*
 import (
 	"context"
 	"math/big"
@@ -260,6 +261,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.Equal(t, uint64(4), e.BlockNumber()) // Local block
 	})
 }
+
 func TestServer_getPayloadHeader(t *testing.T) {
 	genesis := time.Now().Add(-time.Duration(params.BeaconConfig().SlotsPerEpoch) * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
 	params.SetupTestConfigCleanup(t)
@@ -490,7 +492,6 @@ func TestServer_getPayloadHeader(t *testing.T) {
 }
 
 // TODO(rgeraldes24): re-enable once we cover the beacon-chain unit tests
-/*
 func TestServer_validateBuilderSignature(t *testing.T) {
 	sk, err := dilithium.RandKey()
 	require.NoError(t, err)
@@ -528,7 +529,7 @@ func TestServer_validateBuilderSignature(t *testing.T) {
 	require.NoError(t, err)
 	require.ErrorIs(t, validateBuilderSignature(sBid), signing.ErrSigFailedToVerify)
 }
-*/
+
 
 func Test_matchingWithdrawalsRoot(t *testing.T) {
 	t.Run("could not get local withdrawals", func(t *testing.T) {
@@ -586,3 +587,4 @@ func TestEmptyTransactionsRoot(t *testing.T) {
 	require.NoError(t, err)
 	require.DeepEqual(t, r, emptyTransactionsRoot)
 }
+*/

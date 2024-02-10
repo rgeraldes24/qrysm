@@ -17,6 +17,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -28,7 +29,7 @@ func TestProposeExit_Notification(t *testing.T) {
 
 	deposits, keys, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().MinGenesisActiveValidatorCount)
 	require.NoError(t, err)
-	beaconState, err := transition.GenesisBeaconState(ctx, deposits, 0, &zondpb.Eth1Data{BlockHash: make([]byte, 32)})
+	beaconState, err := transition.GenesisBeaconStateCapella(ctx, deposits, 0, &zondpb.Eth1Data{BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayloadCapella{})
 	require.NoError(t, err)
 	epoch := primitives.Epoch(2048)
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch))))
@@ -95,7 +96,7 @@ func TestProposeExit_NoPanic(t *testing.T) {
 
 	deposits, keys, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().MinGenesisActiveValidatorCount)
 	require.NoError(t, err)
-	beaconState, err := transition.GenesisBeaconState(ctx, deposits, 0, &zondpb.Eth1Data{BlockHash: make([]byte, 32)})
+	beaconState, err := transition.GenesisBeaconStateCapella(ctx, deposits, 0, &zondpb.Eth1Data{BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayloadCapella{})
 	require.NoError(t, err)
 	epoch := primitives.Epoch(2048)
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch))))

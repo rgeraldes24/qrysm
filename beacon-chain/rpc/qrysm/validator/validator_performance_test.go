@@ -11,7 +11,7 @@ import (
 	"time"
 
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -123,11 +123,13 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 			},
 		}
 		c := headState.Copy()
-		vp, bp, err := precompute.New(ctx, c)
+		vp, bp, err := altair.InitializePrecomputeValidators(ctx, c)
 		require.NoError(t, err)
-		vp, bp, err = precompute.ProcessAttestations(ctx, c, vp, bp)
+		vp, bp, err = altair.ProcessEpochParticipation(ctx, c, bp, vp)
 		require.NoError(t, err)
-		_, err = precompute.ProcessRewardsAndPenaltiesPrecompute(c, bp, vp, precompute.AttestationsDelta, precompute.ProposersDelta)
+		c, vp, err = altair.ProcessInactivityScores(ctx, c, vp)
+		require.NoError(t, err)
+		_, err = altair.ProcessRewardsAndPenaltiesPrecompute(c, bp, vp)
 		require.NoError(t, err)
 		extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GweiPerEth
 
@@ -188,11 +190,13 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 			},
 		}
 		c := headState.Copy()
-		vp, bp, err := precompute.New(ctx, c)
+		vp, bp, err := altair.InitializePrecomputeValidators(ctx, c)
 		require.NoError(t, err)
-		vp, bp, err = precompute.ProcessAttestations(ctx, c, vp, bp)
+		vp, bp, err = altair.ProcessEpochParticipation(ctx, c, bp, vp)
 		require.NoError(t, err)
-		_, err = precompute.ProcessRewardsAndPenaltiesPrecompute(c, bp, vp, precompute.AttestationsDelta, precompute.ProposersDelta)
+		c, vp, err = altair.ProcessInactivityScores(ctx, c, vp)
+		require.NoError(t, err)
+		_, err = altair.ProcessRewardsAndPenaltiesPrecompute(c, bp, vp)
 		require.NoError(t, err)
 		extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GweiPerEth
 

@@ -21,7 +21,6 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/consensus-types/validator"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -254,58 +253,63 @@ func (s *Service) SubmitSignedAggregateSelectionProof(
 	return nil
 }
 
+// TODO(rgeraldes24)
 // SignaturesAndAggregationBits returns the signatures and aggregation bits
 // associated with a particular set of sync committee messages.
 func (s *Service) SignaturesAndAggregationBits(
 	ctx context.Context,
 	req *zondpb.SignaturesAndAggregationBitsRequest) ([][]byte, []byte, error) {
-	subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
-	sigs := make([][]byte, 0, subCommitteeSize)
-	bits := zondpb.NewSyncCommitteeAggregationBits()
-	syncCommitteeIndicesSigMap := make(map[primitives.CommitteeIndex]*zondpb.SyncCommitteeMessage)
-	appendedSyncCommitteeIndices := make([]primitives.CommitteeIndex, 0)
-	for _, msg := range req.Msgs {
-		if bytes.Equal(req.BlockRoot, msg.BlockRoot) {
-			headSyncCommitteeIndices, err := s.HeadFetcher.HeadSyncCommitteeIndices(ctx, msg.ValidatorIndex, req.Slot)
-			if err != nil {
-				return nil, nil, errors.Wrapf(err, "could not get sync subcommittee index")
-			}
-			for _, index := range headSyncCommitteeIndices {
-				i := uint64(index)
-				subnetIndex := i / subCommitteeSize
-				indexMod := i % subCommitteeSize
-				if subnetIndex == req.SubnetId && !bits.BitAt(indexMod) {
-					bits.SetBitAt(indexMod, true)
-					syncCommitteeIndicesSigMap[index] = msg
-					appendedSyncCommitteeIndices = append(appendedSyncCommitteeIndices, index)
+
+	/*
+		subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
+		sigs := make([][]byte, 0, subCommitteeSize)
+		bits := zondpb.NewSyncCommitteeAggregationBits()
+		syncCommitteeIndicesSigMap := make(map[primitives.CommitteeIndex]*zondpb.SyncCommitteeMessage)
+		appendedSyncCommitteeIndices := make([]primitives.CommitteeIndex, 0)
+		for _, msg := range req.Msgs {
+			if bytes.Equal(req.BlockRoot, msg.BlockRoot) {
+				headSyncCommitteeIndices, err := s.HeadFetcher.HeadSyncCommitteeIndices(ctx, msg.ValidatorIndex, req.Slot)
+				if err != nil {
+					return nil, nil, errors.Wrapf(err, "could not get sync subcommittee index")
+				}
+				for _, index := range headSyncCommitteeIndices {
+					i := uint64(index)
+					subnetIndex := i / subCommitteeSize
+					indexMod := i % subCommitteeSize
+					if subnetIndex == req.SubnetId && !bits.BitAt(indexMod) {
+						bits.SetBitAt(indexMod, true)
+						syncCommitteeIndicesSigMap[index] = msg
+						appendedSyncCommitteeIndices = append(appendedSyncCommitteeIndices, index)
+					}
 				}
 			}
 		}
-	}
 
-	sort.Slice(appendedSyncCommitteeIndices, func(i, j int) bool {
-		return appendedSyncCommitteeIndices[i] < appendedSyncCommitteeIndices[j]
-	})
+		sort.Slice(appendedSyncCommitteeIndices, func(i, j int) bool {
+			return appendedSyncCommitteeIndices[i] < appendedSyncCommitteeIndices[j]
+		})
 
-	for _, syncCommitteeIndex := range appendedSyncCommitteeIndices {
-		msg, ok := syncCommitteeIndicesSigMap[syncCommitteeIndex]
-		if !ok {
-			return []byte{}, nil, errors.Errorf("could not get sync subcommittee index %d "+
-				"in syncCommitteeIndicesSigMap", syncCommitteeIndex)
+		for _, syncCommitteeIndex := range appendedSyncCommitteeIndices {
+			msg, ok := syncCommitteeIndicesSigMap[syncCommitteeIndex]
+			if !ok {
+				return []byte{}, nil, errors.Errorf("could not get sync subcommittee index %d "+
+					"in syncCommitteeIndicesSigMap", syncCommitteeIndex)
+			}
+			sigs = append(sigs, msg.Signature)
 		}
-		sigs = append(sigs, msg.Signature)
-	}
 
-	aggregatedSig := make([]byte, dilithium2.CryptoBytes)
-	aggregatedSig[0] = 0xC0
-	if len(sigs) != 0 {
-		uncompressedSigs, err := dilithium.MultipleSignaturesFromBytes(sigs)
-		if err != nil {
-			return nil, nil, errors.Wrapf(err, "could not decompress signatures")
+		aggregatedSig := make([]byte, dilithium2.CryptoBytes)
+		aggregatedSig[0] = 0xC0
+		if len(sigs) != 0 {
+			uncompressedSigs, err := dilithium.MultipleSignaturesFromBytes(sigs)
+			if err != nil {
+				return nil, nil, errors.Wrapf(err, "could not decompress signatures")
+			}
+			aggregatedSig = dilithium.UnaggregatedSignatures(uncompressedSigs)
 		}
-		aggregatedSig = dilithium.UnaggregatedSignatures(uncompressedSigs)
-	}
-	return aggregatedSig, bits, nil
+		return aggregatedSig, bits, nil
+	*/
+	return nil, nil, nil
 }
 
 // AssignValidatorToSubnet checks the status and pubkey of a particular validator

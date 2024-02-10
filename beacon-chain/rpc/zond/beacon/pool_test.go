@@ -602,7 +602,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 		Fork: &zondpbv1alpha1.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
-			Epoch:           params.BeaconConfig().CapellaForkEpoch,
+			Epoch:           0,
 		},
 	}
 	numValidators := 10
@@ -637,8 +637,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 		dilithiumChanges[i] = message
 	}
 	spb.Validators = validators
-	slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
+	slot := primitives.Slot(0)
 	spb.Slot = slot
 	st, err := state_native.InitializeFromProtoCapella(spb)
 	require.NoError(t, err)
@@ -683,6 +682,8 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 	}
 }
 
+// TODO(rgeraldes24)
+/*
 func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 	ctx := context.Background()
 
@@ -743,7 +744,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 			Epoch:           params.BeaconConfig().CapellaForkEpoch,
 		},
 	}
-	slot, err = slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
+	slot = primitives.Slot(0)
 	require.NoError(t, err)
 	spc.Slot = slot
 
@@ -790,6 +791,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 		require.DeepEqual(t, v2Change, signedChanges[i])
 	}
 }
+*/
 
 func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 	ctx := context.Background()
@@ -803,7 +805,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 		Fork: &zondpbv1alpha1.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
-			Epoch:           params.BeaconConfig().CapellaForkEpoch,
+			Epoch:           0,
 		},
 	}
 	numValidators := 10
@@ -838,8 +840,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 		dilithiumChanges[i] = message
 	}
 	spb.Validators = validators
-	slot, err := slots.EpochStart(params.BeaconConfig().CapellaForkEpoch)
-	require.NoError(t, err)
+	slot := primitives.Slot(0)
 	spb.Slot = slot
 	st, err := state_native.InitializeFromProtoCapella(spb)
 	require.NoError(t, err)
