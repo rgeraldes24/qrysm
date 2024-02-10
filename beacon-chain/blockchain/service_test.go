@@ -44,7 +44,7 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 	t.Cleanup(func() {
 		srv.Stop()
 	})
-	bState, _ := util.DeterministicGenesisState(t, 10)
+	bState, _ := util.DeterministicGenesisStateCapella(t, 10)
 	// pbState, err := state_native.ProtobufBeaconStateCapella(bState.ToProtoUnsafe())
 	require.NoError(t, err)
 	mockTrie, err := trie.NewTrie(0)

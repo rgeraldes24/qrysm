@@ -32,7 +32,7 @@ func TestSaveHead_Same(t *testing.T) {
 	service.head = &head{root: r}
 	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
-	st, _ := util.DeterministicGenesisState(t, 1)
+	st, _ := util.DeterministicGenesisStateCapella(t, 1)
 	require.NoError(t, service.saveHead(context.Background(), r, b, st))
 	assert.Equal(t, primitives.Slot(0), service.headSlot(), "Head did not stay the same")
 	assert.Equal(t, r, service.headRoot(), "Head did not stay the same")
@@ -152,7 +152,7 @@ func TestSaveHead_Different_Reorg(t *testing.T) {
 
 func Test_notifyNewHeadEvent(t *testing.T) {
 	t.Run("genesis_state_root", func(t *testing.T) {
-		bState, _ := util.DeterministicGenesisState(t, 10)
+		bState, _ := util.DeterministicGenesisStateCapella(t, 10)
 		notifier := &mock.MockStateNotifier{RecordEvents: true}
 		srv := &Service{
 			cfg: &config{
@@ -180,7 +180,7 @@ func Test_notifyNewHeadEvent(t *testing.T) {
 		require.DeepSSZEqual(t, wanted, eventHead)
 	})
 	t.Run("non_genesis_values", func(t *testing.T) {
-		bState, _ := util.DeterministicGenesisState(t, 10)
+		bState, _ := util.DeterministicGenesisStateCapella(t, 10)
 		notifier := &mock.MockStateNotifier{RecordEvents: true}
 		genesisRoot := [32]byte{1}
 		srv := &Service{
@@ -267,7 +267,7 @@ func TestSaveOrphanedAtts(t *testing.T) {
 	// Chain setup
 	// 0 -- 1 -- 2 -- 3
 	//  \-4
-	st, keys := util.DeterministicGenesisState(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 64)
 	blkG, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 0)
 	assert.NoError(t, err)
 
@@ -338,7 +338,7 @@ func TestSaveOrphanedOps(t *testing.T) {
 	// Chain setup
 	// 0 -- 1 -- 2 -- 3
 	//  \-4
-	st, keys := util.DeterministicGenesisState(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 64)
 	service.head = &head{state: st}
 	blkG, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 0)
 	assert.NoError(t, err)
@@ -473,7 +473,7 @@ func TestSaveOrphanedAtts_DoublyLinkedTrie(t *testing.T) {
 	// Chain setup
 	// 0 -- 1 -- 2 -- 3
 	//  \-4
-	st, keys := util.DeterministicGenesisState(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 64)
 	blkG, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 0)
 	assert.NoError(t, err)
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, blkG)
@@ -538,7 +538,7 @@ func TestSaveOrphanedAtts_CanFilter_DoublyLinkedTrie(t *testing.T) {
 	// Chain setup
 	// 0 -- 1 -- 2
 	//  \-4
-	st, keys := util.DeterministicGenesisState(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 64)
 	blkG, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 0)
 	assert.NoError(t, err)
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, blkG)

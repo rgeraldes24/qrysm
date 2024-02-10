@@ -20,7 +20,7 @@ import (
 
 func TestAttestation_IsAggregator(t *testing.T) {
 	t.Run("aggregator", func(t *testing.T) {
-		beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+		beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
 		require.NoError(t, err)
 		sig := privKeys[0].Sign([]byte{'A'})
@@ -32,7 +32,7 @@ func TestAttestation_IsAggregator(t *testing.T) {
 	t.Run("not aggregator", func(t *testing.T) {
 		params.SetupTestConfigCleanup(t)
 		params.OverrideBeaconConfig(params.MinimalSpecConfig())
-		beaconState, privKeys := util.DeterministicGenesisState(t, 2048)
+		beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 2048)
 
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
 		require.NoError(t, err)

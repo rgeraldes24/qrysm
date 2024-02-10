@@ -495,7 +495,7 @@ func TestPublishBlindedBlockV2SSZ(t *testing.T) {
 func TestValidateConsensus(t *testing.T) {
 	ctx := context.Background()
 
-	parentState, privs := util.DeterministicGenesisState(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
+	parentState, privs := util.DeterministicGenesisStateCapella(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
 	parentBlock, err := util.GenerateFullBlockCapella(parentState, privs, util.DefaultBlockGenConfig(), parentState.Slot())
 	require.NoError(t, err)
 	parentSbb, err := blocks.NewSignedBeaconBlock(parentBlock)
@@ -875,7 +875,7 @@ func TestGetCommittees(t *testing.T) {
 	url := "http://example.com/zond/v1/beacon/states/{state_id}/committees"
 
 	var st state.BeaconState
-	st, _ = util.DeterministicGenesisState(t, 8192)
+	st, _ = util.DeterministicGenesisStateCapella(t, 8192)
 	epoch := slots.ToEpoch(st.Slot())
 
 	chainService := &chainMock.ChainService{}

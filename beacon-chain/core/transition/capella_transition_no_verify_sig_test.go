@@ -212,64 +212,33 @@ func TestProcessEpoch_BadBalanceCapella(t *testing.T) {
 	assert.ErrorContains(t, "addition overflows", err)
 }
 
-func createFullBellatrixBlockWithOperations(t *testing.T) (state.BeaconState,
-	*zondpb.SignedBeaconBlockBellatrix) {
-	_, altairBlk := createFullAltairBlockWithOperations(t)
-	blk := &zondpb.SignedBeaconBlockBellatrix{
-		Block: &zondpb.BeaconBlockBellatrix{
-			Slot:          altairBlk.Block.Slot,
-			ProposerIndex: altairBlk.Block.ProposerIndex,
-			ParentRoot:    altairBlk.Block.ParentRoot,
-			StateRoot:     altairBlk.Block.StateRoot,
-			Body: &zondpb.BeaconBlockBodyBellatrix{
-				RandaoReveal:      altairBlk.Block.Body.RandaoReveal,
-				Eth1Data:          altairBlk.Block.Body.Eth1Data,
-				Graffiti:          altairBlk.Block.Body.Graffiti,
-				ProposerSlashings: altairBlk.Block.Body.ProposerSlashings,
-				AttesterSlashings: altairBlk.Block.Body.AttesterSlashings,
-				Attestations:      altairBlk.Block.Body.Attestations,
-				Deposits:          altairBlk.Block.Body.Deposits,
-				VoluntaryExits:    altairBlk.Block.Body.VoluntaryExits,
-				SyncAggregate:     altairBlk.Block.Body.SyncAggregate,
-				ExecutionPayload: &enginev1.ExecutionPayload{
-					ParentHash:    make([]byte, fieldparams.RootLength),
-					FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
-					StateRoot:     make([]byte, fieldparams.RootLength),
-					ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-					LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
-					PrevRandao:    make([]byte, fieldparams.RootLength),
-					BaseFeePerGas: bytesutil.PadTo([]byte{1, 2, 3, 4}, fieldparams.RootLength),
-					BlockHash:     make([]byte, fieldparams.RootLength),
-					Transactions:  make([][]byte, 0),
-					ExtraData:     make([]byte, 0),
-				},
-			},
-		},
-		Signature: nil,
-	}
-	beaconState, _ := util.DeterministicGenesisStateBellatrix(t, 32)
-	return beaconState, blk
-}
-
 func createFullCapellaBlockWithOperations(t *testing.T) (state.BeaconState,
 	*zondpb.SignedBeaconBlockCapella) {
-	_, bellatrixBlk := createFullBellatrixBlockWithOperations(t)
-	blk := &zondpb.SignedBeaconBlockCapella{
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 32)
+	sCom, err := altair.NextSyncCommittee(context.Background(), beaconState)
+	assert.NoError(t, err)
+	assert.NoError(t, beaconState.SetCurrentSyncCommittee(sCom))
+	tState := beaconState.Copy()
+	blk, err := util.GenerateFullBlockCapella(tState, privKeys,
+		&util.BlockGenConfig{NumAttestations: 1, NumVoluntaryExits: 0, NumDeposits: 0}, 1)
+	require.NoError(t, err)
+
+	blkCapella := &zondpb.SignedBeaconBlockCapella{
 		Block: &zondpb.BeaconBlockCapella{
-			Slot:          bellatrixBlk.Block.Slot,
-			ProposerIndex: bellatrixBlk.Block.ProposerIndex,
-			ParentRoot:    bellatrixBlk.Block.ParentRoot,
-			StateRoot:     bellatrixBlk.Block.StateRoot,
+			Slot:          blk.Block.Slot,
+			ProposerIndex: blk.Block.ProposerIndex,
+			ParentRoot:    blk.Block.ParentRoot,
+			StateRoot:     blk.Block.StateRoot,
 			Body: &zondpb.BeaconBlockBodyCapella{
-				RandaoReveal:      bellatrixBlk.Block.Body.RandaoReveal,
-				Eth1Data:          bellatrixBlk.Block.Body.Eth1Data,
-				Graffiti:          bellatrixBlk.Block.Body.Graffiti,
-				ProposerSlashings: bellatrixBlk.Block.Body.ProposerSlashings,
-				AttesterSlashings: bellatrixBlk.Block.Body.AttesterSlashings,
-				Attestations:      bellatrixBlk.Block.Body.Attestations,
-				Deposits:          bellatrixBlk.Block.Body.Deposits,
-				VoluntaryExits:    bellatrixBlk.Block.Body.VoluntaryExits,
-				SyncAggregate:     bellatrixBlk.Block.Body.SyncAggregate,
+				RandaoReveal:      blk.Block.Body.RandaoReveal,
+				Eth1Data:          blk.Block.Body.Eth1Data,
+				Graffiti:          blk.Block.Body.Graffiti,
+				ProposerSlashings: blk.Block.Body.ProposerSlashings,
+				AttesterSlashings: blk.Block.Body.AttesterSlashings,
+				Attestations:      blk.Block.Body.Attestations,
+				Deposits:          blk.Block.Body.Deposits,
+				VoluntaryExits:    blk.Block.Body.VoluntaryExits,
+				SyncAggregate:     blk.Block.Body.SyncAggregate,
 				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 					ParentHash:    make([]byte, fieldparams.RootLength),
 					FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
@@ -287,6 +256,6 @@ func createFullCapellaBlockWithOperations(t *testing.T) (state.BeaconState,
 		},
 		Signature: nil,
 	}
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
-	return beaconState, blk
+	beaconStateCapella, _ := util.DeterministicGenesisStateCapella(t, 32)
+	return beaconStateCapella, blkCapella
 }

@@ -181,7 +181,7 @@ func TestVerifyExitAndSignature(t *testing.T) {
 						ValidatorIndex: 0,
 					},
 				}
-				bs, keys := util.DeterministicGenesisState(t, 1)
+				bs, keys := util.DeterministicGenesisStateCapella(t, 1)
 				validator := bs.Validators()[0]
 				validator.ActivationEpoch = 1
 				err := bs.UpdateValidatorAtIndex(0, validator)
@@ -214,7 +214,7 @@ func TestVerifyExitAndSignature(t *testing.T) {
 						ValidatorIndex: 0,
 					},
 				}
-				bs, keys := util.DeterministicGenesisState(t, 1)
+				bs, keys := util.DeterministicGenesisStateCapella(t, 1)
 				validator := bs.Validators()[0]
 				validator.ActivationEpoch = 1
 

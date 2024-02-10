@@ -37,10 +37,6 @@ func TestServer_setExecutionData(t *testing.T) {
 	hook := logTest.NewGlobal()
 
 	ctx := context.Background()
-	cfg := params.BeaconConfig().Copy()
-	cfg.BellatrixForkEpoch = 0
-	cfg.CapellaForkEpoch = 0
-	params.OverrideBeaconConfig(cfg)
 	params.SetupTestConfigCleanup(t)
 
 	beaconDB := dbTest.SetupDB(t)
@@ -128,7 +124,7 @@ func TestServer_setExecutionData(t *testing.T) {
 			HasConfigured: true,
 			Cfg:           &builderTest.Config{BeaconDB: beaconDB},
 		}
-		wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockBellatrix())
+		wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 		require.NoError(t, err)
 		chain := &blockchainTest.ChainService{ForkChoiceStore: doublylinkedtree.New(), Genesis: time.Now(), Block: wb}
 		vs.ForkchoiceFetcher = chain
@@ -351,7 +347,6 @@ func TestServer_getPayloadHeader(t *testing.T) {
 		mock                  *builderTest.MockBuilderService
 		fetcher               *blockchainTest.ChainService
 		err                   string
-		returnedHeader        *v1.ExecutionPayloadHeader
 		returnedHeaderCapella *v1.ExecutionPayloadHeaderCapella
 	}{
 		{
@@ -429,13 +424,13 @@ func TestServer_getPayloadHeader(t *testing.T) {
 		{
 			name: "can get header",
 			mock: &builderTest.MockBuilderService{
-				Bid: sBid,
+				BidCapella: sBid,
 			},
 			fetcher: &blockchainTest.ChainService{
 				Block: func() interfaces.ReadOnlySignedBeaconBlock {
-					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockBellatrix())
+					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 					require.NoError(t, err)
-					wb.SetSlot(primitives.Slot(params.BeaconConfig().BellatrixForkEpoch) * params.BeaconConfig().SlotsPerEpoch)
+					// wb.SetSlot(primitives.Slot(params.BeaconConfig().BellatrixForkEpoch) * params.BeaconConfig().SlotsPerEpoch)
 					return wb
 				}(),
 			},
@@ -448,9 +443,9 @@ func TestServer_getPayloadHeader(t *testing.T) {
 			},
 			fetcher: &blockchainTest.ChainService{
 				Block: func() interfaces.ReadOnlySignedBeaconBlock {
-					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockBellatrix())
+					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 					require.NoError(t, err)
-					wb.SetSlot(primitives.Slot(params.BeaconConfig().BellatrixForkEpoch) * params.BeaconConfig().SlotsPerEpoch)
+					// wb.SetSlot(primitives.Slot(params.BeaconConfig().BellatrixForkEpoch) * params.BeaconConfig().SlotsPerEpoch)
 					return wb
 				}(),
 			},
@@ -463,7 +458,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 			},
 			fetcher: &blockchainTest.ChainService{
 				Block: func() interfaces.ReadOnlySignedBeaconBlock {
-					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockBellatrix())
+					wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 					require.NoError(t, err)
 					wb.SetSlot(primitives.Slot(fakeCapellaEpoch) * params.BeaconConfig().SlotsPerEpoch)
 					return wb
@@ -484,11 +479,6 @@ func TestServer_getPayloadHeader(t *testing.T) {
 				require.ErrorContains(t, tc.err, err)
 			} else {
 				require.NoError(t, err)
-				if tc.returnedHeader != nil {
-					want, err := blocks.WrappedExecutionPayloadHeader(tc.returnedHeader)
-					require.NoError(t, err)
-					require.DeepEqual(t, want, h)
-				}
 				if tc.returnedHeaderCapella != nil {
 					want, err := blocks.WrappedExecutionPayloadHeaderCapella(tc.returnedHeaderCapella, 0) // value is a mock
 					require.NoError(t, err)
@@ -542,8 +532,8 @@ func TestServer_validateBuilderSignature(t *testing.T) {
 
 func Test_matchingWithdrawalsRoot(t *testing.T) {
 	t.Run("could not get local withdrawals", func(t *testing.T) {
-		local := &v1.ExecutionPayload{}
-		p, err := blocks.WrappedExecutionPayload(local)
+		local := &v1.ExecutionPayloadCapella{}
+		p, err := blocks.WrappedExecutionPayloadCapella(local, 0)
 		require.NoError(t, err)
 		_, err = matchingWithdrawalsRoot(p, p)
 		require.ErrorContains(t, "could not get local withdrawals", err)
@@ -552,8 +542,8 @@ func Test_matchingWithdrawalsRoot(t *testing.T) {
 		local := &v1.ExecutionPayloadCapella{}
 		p, err := blocks.WrappedExecutionPayloadCapella(local, 0)
 		require.NoError(t, err)
-		header := &v1.ExecutionPayloadHeader{}
-		h, err := blocks.WrappedExecutionPayloadHeader(header)
+		header := &v1.ExecutionPayloadHeaderCapella{}
+		h, err := blocks.WrappedExecutionPayloadHeaderCapella(header, 0)
 		require.NoError(t, err)
 		_, err = matchingWithdrawalsRoot(p, h)
 		require.ErrorContains(t, "could not get builder withdrawals root", err)

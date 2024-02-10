@@ -19,7 +19,7 @@ import (
 )
 
 func TestProcessRandao_IncorrectProposerFailsVerification(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 	// We fetch the proposer's index as that is whom the RANDAO will be verified against.
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), beaconState)
 	require.NoError(t, err)
@@ -47,7 +47,7 @@ func TestProcessRandao_IncorrectProposerFailsVerification(t *testing.T) {
 }
 
 func TestProcessRandao_SignatureVerifiesAndUpdatesLatestStateMixes(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 
 	epoch := time.CurrentEpoch(beaconState)
 	epochSignature, err := util.RandaoReveal(beaconState, epoch, privKeys)
@@ -73,7 +73,7 @@ func TestProcessRandao_SignatureVerifiesAndUpdatesLatestStateMixes(t *testing.T)
 }
 
 func TestRandaoSignatureSet_OK(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 
 	epoch := time.CurrentEpoch(beaconState)
 	epochSignature, err := util.RandaoReveal(beaconState, epoch, privKeys)

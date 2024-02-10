@@ -538,6 +538,10 @@ func BlindedBeaconBlockCapellaFromConsensus(b *zond.BlindedBeaconBlockCapella) (
 	if err != nil {
 		return nil, err
 	}
+	syncCommitteeSignatures := make([]string, len(b.Body.SyncAggregate.SyncCommitteeSignatures))
+	for i, sig := range b.Body.SyncAggregate.SyncCommitteeSignatures {
+		syncCommitteeSignatures[i] = hexutil.Encode(sig)
+	}
 
 	return &BlindedBeaconBlockCapella{
 		Slot:          fmt.Sprintf("%d", b.Slot),
@@ -559,7 +563,7 @@ func BlindedBeaconBlockCapellaFromConsensus(b *zond.BlindedBeaconBlockCapella) (
 			VoluntaryExits:    exits,
 			SyncAggregate: &SyncAggregate{
 				SyncCommitteeBits:       hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeBits),
-				SyncCommitteeSignatures: hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeSignature),
+				SyncCommitteeSignatures: syncCommitteeSignatures,
 			},
 			ExecutionPayloadHeader: &ExecutionPayloadHeaderCapella{
 				ParentHash:       hexutil.Encode(b.Body.ExecutionPayloadHeader.ParentHash),
@@ -636,6 +640,11 @@ func BeaconBlockCapellaFromConsensus(b *zond.BeaconBlockCapella) (*BeaconBlockCa
 	if err != nil {
 		return nil, err
 	}
+	syncCommitteeSignatures := make([]string, len(b.Body.SyncAggregate.SyncCommitteeSignatures))
+	for i, sig := range b.Body.SyncAggregate.SyncCommitteeSignatures {
+		syncCommitteeSignatures[i] = hexutil.Encode(sig)
+	}
+
 	return &BeaconBlockCapella{
 		Slot:          fmt.Sprintf("%d", b.Slot),
 		ProposerIndex: fmt.Sprintf("%d", b.ProposerIndex),
@@ -656,7 +665,7 @@ func BeaconBlockCapellaFromConsensus(b *zond.BeaconBlockCapella) (*BeaconBlockCa
 			VoluntaryExits:    exits,
 			SyncAggregate: &SyncAggregate{
 				SyncCommitteeBits:       hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeBits),
-				SyncCommitteeSignatures: hexutil.Encode(b.Body.SyncAggregate.SyncCommitteeSignature),
+				SyncCommitteeSignatures: syncCommitteeSignatures,
 			},
 			ExecutionPayload: &ExecutionPayloadCapella{
 				ParentHash:    hexutil.Encode(b.Body.ExecutionPayload.ParentHash),
@@ -830,10 +839,15 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*zond.AttesterSlas
 			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d].Attestation2", i))
 		}
 
-		a1Sig, err := DecodeHexWithLength(s.Attestation1.Signature, dilithium2.CryptoBytes)
-		if err != nil {
-			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation1.Signature", i))
+		a1Sigs := make([][]byte, len(s.Attestation1.Signatures))
+		for j, sig := range s.Attestation1.Signatures {
+			a1Sig, err := DecodeHexWithLength(sig, dilithium2.CryptoBytes)
+			if err != nil {
+				return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation1.Signatures[%d]", i, j))
+			}
+			a1Sigs[j] = a1Sig
 		}
+
 		err = VerifyMaxLength(s.Attestation1.AttestingIndices, 2048)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation1.AttestingIndices", i))
@@ -850,10 +864,16 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*zond.AttesterSlas
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation1.Data", i))
 		}
-		a2Sig, err := DecodeHexWithLength(s.Attestation2.Signature, dilithium2.CryptoBytes)
-		if err != nil {
-			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation2.Signature", i))
+
+		a2Sigs := make([][]byte, len(s.Attestation2.Signatures))
+		for j, sig := range s.Attestation2.Signatures {
+			a2Sig, err := DecodeHexWithLength(sig, dilithium2.CryptoBytes)
+			if err != nil {
+				return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation2.Signatures[%d]", i, j))
+			}
+			a2Sigs[j] = a2Sig
 		}
+
 		err = VerifyMaxLength(s.Attestation2.AttestingIndices, 2048)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation2.AttestingIndices", i))
@@ -874,12 +894,12 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*zond.AttesterSlas
 			Attestation_1: &zond.IndexedAttestation{
 				AttestingIndices: a1AttestingIndices,
 				Data:             a1Data,
-				Signatures:       a1Sig,
+				Signatures:       a1Sigs,
 			},
 			Attestation_2: &zond.IndexedAttestation{
 				AttestingIndices: a2AttestingIndices,
 				Data:             a2Data,
-				Signatures:       a2Sig,
+				Signatures:       a2Sigs,
 			},
 		}
 	}
@@ -889,6 +909,16 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*zond.AttesterSlas
 func AttesterSlashingsFromConsensus(src []*zond.AttesterSlashing) ([]*AttesterSlashing, error) {
 	attesterSlashings := make([]*AttesterSlashing, len(src))
 	for i, s := range src {
+		a1Sigs := make([]string, len(s.Attestation_1.Signatures))
+		for i, sig := range s.Attestation_1.Signatures {
+			a1Sigs[i] = hexutil.Encode(sig)
+		}
+
+		a2Sigs := make([]string, len(s.Attestation_2.Signatures))
+		for i, sig := range s.Attestation_2.Signatures {
+			a2Sigs[i] = hexutil.Encode(sig)
+		}
+
 		a1AttestingIndices := make([]string, len(s.Attestation_1.AttestingIndices))
 		for j, ix := range s.Attestation_1.AttestingIndices {
 			a1AttestingIndices[j] = fmt.Sprintf("%d", ix)
@@ -913,7 +943,7 @@ func AttesterSlashingsFromConsensus(src []*zond.AttesterSlashing) ([]*AttesterSl
 						Root:  hexutil.Encode(s.Attestation_1.Data.Target.Root),
 					},
 				},
-				Signatures: hexutil.Encode(s.Attestation_1.Signature),
+				Signatures: a1Sigs,
 			},
 			Attestation2: &IndexedAttestation{
 				AttestingIndices: a2AttestingIndices,
@@ -930,7 +960,7 @@ func AttesterSlashingsFromConsensus(src []*zond.AttesterSlashing) ([]*AttesterSl
 						Root:  hexutil.Encode(s.Attestation_2.Data.Target.Root),
 					},
 				},
-				Signatures: hexutil.Encode(s.Attestation_2.Signature),
+				Signatures: a2Sigs,
 			},
 		}
 	}

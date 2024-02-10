@@ -12,7 +12,7 @@ import (
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -27,9 +27,9 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	params.OverrideBeaconConfig(params.MainnetConfig().Copy())
 	ctx := context.Background()
 
-	priv1, err := bls.RandKey()
+	priv1, err := dilithium.RandKey()
 	require.NoError(t, err)
-	priv2, err := bls.RandKey()
+	priv2, err := dilithium.RandKey()
 	require.NoError(t, err)
 
 	pubKey1 := priv1.PublicKey().Marshal()

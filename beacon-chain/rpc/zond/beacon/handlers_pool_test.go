@@ -384,7 +384,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 	t.Run("across fork", func(t *testing.T) {
 		params.SetupTestConfigCleanup(t)
 
-		bs, _ := util.DeterministicGenesisState(t, 1)
+		bs, _ := util.DeterministicGenesisStateCapella(t, 1)
 		// Satisfy activity time required before exiting.
 		require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod))))
 
@@ -439,7 +439,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, e.Code)
 	})
 	t.Run("wrong signature", func(t *testing.T) {
-		bs, _ := util.DeterministicGenesisState(t, 1)
+		bs, _ := util.DeterministicGenesisStateCapella(t, 1)
 		s := &Server{ChainInfoFetcher: &blockchainmock.ChainService{State: bs}}
 
 		var body bytes.Buffer

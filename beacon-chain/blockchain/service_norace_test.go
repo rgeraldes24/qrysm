@@ -23,7 +23,7 @@ func TestChainService_SaveHead_DataRace(t *testing.T) {
 		cfg: &config{BeaconDB: beaconDB},
 	}
 	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
-	st, _ := util.DeterministicGenesisState(t, 1)
+	st, _ := util.DeterministicGenesisStateCapella(t, 1)
 	require.NoError(t, err)
 	go func() {
 		require.NoError(t, s.saveHead(context.Background(), [32]byte{}, b, st))

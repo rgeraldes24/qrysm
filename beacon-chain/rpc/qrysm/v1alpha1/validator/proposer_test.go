@@ -42,7 +42,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/container/trie"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/encoding/ssz"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -64,7 +64,7 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 
 	params.SetupTestConfigCleanup(t)
-	beaconState, privKeys := util.DeterministicGenesisState(t, 64)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
 
 	stateRoot, err := beaconState.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
@@ -89,7 +89,7 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 				RandaoReveal:  genesis.Block.Body.RandaoReveal,
 				Graffiti:      genesis.Block.Body.Graffiti,
 				Eth1Data:      genesis.Block.Body.Eth1Data,
-				SyncAggregate: &zondpb.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignature: make([]byte, 96)},
+				SyncAggregate: &zondpb.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
 				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 					ParentHash:    make([]byte, fieldparams.RootLength),
 					FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
@@ -213,7 +213,7 @@ func getProposerServer(db db.HeadAccessDatabase, headState state.BeaconState, he
 	}
 }
 
-func injectSlashings(t *testing.T, st state.BeaconState, keys []bls.SecretKey, server *Server) ([]*zondpb.ProposerSlashing, []*zondpb.AttesterSlashing) {
+func injectSlashings(t *testing.T, st state.BeaconState, keys []dilithium.DilithiumKey, server *Server) ([]*zondpb.ProposerSlashing, []*zondpb.AttesterSlashing) {
 	proposerSlashings := make([]*zondpb.ProposerSlashing, params.BeaconConfig().MaxProposerSlashings)
 	for i := primitives.ValidatorIndex(0); uint64(i) < params.BeaconConfig().MaxProposerSlashings; i++ {
 		proposerSlashing, err := util.GenerateProposerSlashingForValidator(st, keys[i], i /* validator index */)
@@ -272,10 +272,10 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 		{
 			name: "bellatrix",
 			block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
-				blockToPropose := util.NewBeaconBlockBellatrix()
+				blockToPropose := util.NewBeaconBlockCapella()
 				blockToPropose.Block.Slot = 5
 				blockToPropose.Block.ParentRoot = parent[:]
-				blk := &zondpb.GenericSignedBeaconBlock_Bellatrix{Bellatrix: blockToPropose}
+				blk := &zondpb.GenericSignedBeaconBlock_Capella{Capella: blockToPropose}
 				return &zondpb.GenericSignedBeaconBlock{Block: blk}
 			},
 		},
@@ -320,7 +320,7 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 			ctx := context.Background()
 
 			numDeposits := uint64(64)
-			beaconState, _ := util.DeterministicGenesisState(t, numDeposits)
+			beaconState, _ := util.DeterministicGenesisStateCapella(t, numDeposits)
 			bsRoot, err := beaconState.HashTreeRoot(ctx)
 			require.NoError(t, err)
 
@@ -351,7 +351,7 @@ func TestProposer_ComputeStateRoot_OK(t *testing.T) {
 	db := dbutil.SetupDB(t)
 	ctx := context.Background()
 
-	beaconState, parentRoot, privKeys := util.DeterministicGenesisStateWithGenesisBlock(t, ctx, db, 100)
+	beaconState, parentRoot, privKeys := util.DeterministicGenesisStateCapellaWithGenesisBlock(t, ctx, db, 100)
 
 	proposerServer := &Server{
 		ChainStartFetcher: &mockExecution.Chain{},
@@ -1916,7 +1916,7 @@ func TestProposer_FilterAttestation(t *testing.T) {
 	genesis := util.NewBeaconBlockCapella()
 
 	numValidators := uint64(64)
-	st, privKeys := util.DeterministicGenesisState(t, numValidators)
+	st, privKeys := util.DeterministicGenesisStateCapella(t, numValidators)
 	require.NoError(t, st.SetGenesisValidatorsRoot(params.BeaconConfig().ZeroHash[:]))
 	assert.NoError(t, st.SetSlot(1))
 
@@ -1974,14 +1974,14 @@ func TestProposer_FilterAttestation(t *testing.T) {
 					assert.NoError(t, err)
 					domain, err := signing.Domain(st.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, params.BeaconConfig().ZeroHash[:])
 					require.NoError(t, err)
-					sigs := make([]bls.Signature, len(attestingIndices))
+					sigs := make([][]byte, len(attestingIndices))
 					var zeroSig [96]byte
 					atts[i].Signatures = [][]byte{zeroSig[:]}
 
 					for i, indice := range attestingIndices {
 						hashTreeRoot, err := signing.ComputeSigningRoot(atts[i].Data, domain)
 						require.NoError(t, err)
-						sig := privKeys[indice].Sign(hashTreeRoot[:])
+						sig := privKeys[indice].Sign(hashTreeRoot[:]).Marshal()
 						sigs[i] = sig
 					}
 					atts[i].Signatures = sigs
@@ -2116,7 +2116,7 @@ func TestProposer_DeleteAttsInPool_Aggregated(t *testing.T) {
 	s := &Server{
 		AttPool: attestations.NewPool(),
 	}
-	priv, err := bls.RandKey()
+	priv, err := dilithium.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte("foo")).Marshal()
 	aggregatedAtts := []*zondpb.Attestation{
@@ -2146,22 +2146,22 @@ func TestProposer_GetSyncAggregate_OK(t *testing.T) {
 
 	r := params.BeaconConfig().ZeroHash
 	conts := []*zondpb.SyncCommitteeContribution{
-		{Slot: 1, SubcommitteeIndex: 0, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 0, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 0, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 1, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 1, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 1, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 2, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 2, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 2, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 3, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 3, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
-		{Slot: 1, SubcommitteeIndex: 3, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
-		{Slot: 2, SubcommitteeIndex: 0, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
-		{Slot: 2, SubcommitteeIndex: 1, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
-		{Slot: 2, SubcommitteeIndex: 2, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
-		{Slot: 2, SubcommitteeIndex: 3, Signatures: bls.NewAggregateSignature().Marshal(), AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{}, AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{}, AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{}, AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{}, AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{}, AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{}, AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{}, AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{}, AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{}, AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{}, AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{}, AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
+		{Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{}, AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
+		{Slot: 2, SubcommitteeIndex: 0, Signatures: [][]byte{}, AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
+		{Slot: 2, SubcommitteeIndex: 1, Signatures: [][]byte{}, AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
+		{Slot: 2, SubcommitteeIndex: 2, Signatures: [][]byte{}, AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
+		{Slot: 2, SubcommitteeIndex: 3, Signatures: [][]byte{}, AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
 	}
 
 	for _, cont := range conts {
@@ -2346,7 +2346,7 @@ func TestProposer_GetFeeRecipientByPubKey(t *testing.T) {
 	db := dbutil.SetupDB(t)
 	ctx := context.Background()
 	numDeposits := uint64(64)
-	beaconState, _ := util.DeterministicGenesisState(t, numDeposits)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, numDeposits)
 	bsRoot, err := beaconState.HashTreeRoot(ctx)
 	require.NoError(t, err)
 	proposerServer := &Server{

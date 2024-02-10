@@ -8,6 +8,7 @@ import (
 
 	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/config/params"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/interop"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -60,7 +61,7 @@ func BenchmarkHashTreeRoot_Generic_300000(b *testing.B) {
 }
 
 func setupGenesisState(tb testing.TB, count uint64) *zondpb.BeaconStateCapella {
-	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, 1)
+	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, 1, &enginev1.ExecutionPayloadCapella{}, &zondpb.Eth1Data{})
 	require.NoError(tb, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte

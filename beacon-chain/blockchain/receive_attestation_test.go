@@ -90,7 +90,7 @@ func TestProcessAttestations_Ok(t *testing.T) {
 	ctx := tr.ctx
 
 	service.genesisTime = qrysmTime.Now().Add(-1 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
-	genesisState, pks := util.DeterministicGenesisState(t, 64)
+	genesisState, pks := util.DeterministicGenesisStateCapella(t, 64)
 	require.NoError(t, genesisState.SetGenesisTime(uint64(qrysmTime.Now().Unix())-params.BeaconConfig().SecondsPerSlot))
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
 	atts, err := util.GenerateAttestations(genesisState, pks, 1, 0, false)
@@ -116,7 +116,7 @@ func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	ctx, fcs := tr.ctx, tr.fcs
 
 	service.genesisTime = qrysmTime.Now().Add(-2 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
-	genesisState, pks := util.DeterministicGenesisState(t, 64)
+	genesisState, pks := util.DeterministicGenesisStateCapella(t, 64)
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
 	ojc := &zondpb.Checkpoint{Epoch: 0, Root: service.originBlockRoot[:]}
 	require.NoError(t, fcs.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 0, Root: service.originBlockRoot}))
@@ -173,7 +173,7 @@ func TestService_UpdateHead_NoAtts(t *testing.T) {
 	ctx, fcs := tr.ctx, tr.fcs
 
 	service.genesisTime = qrysmTime.Now().Add(-2 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
-	genesisState, pks := util.DeterministicGenesisState(t, 64)
+	genesisState, pks := util.DeterministicGenesisStateCapella(t, 64)
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
 	require.NoError(t, fcs.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 0, Root: service.originBlockRoot}))
 	copied := genesisState.Copy()

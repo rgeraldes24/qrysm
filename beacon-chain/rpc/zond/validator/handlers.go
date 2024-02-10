@@ -83,6 +83,11 @@ func (s *Server) GetAggregateAttestation(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	sigs := make([]string, len(bestMatchingAtt.Signatures))
+	for i, sig := range bestMatchingAtt.Signatures {
+		sigs[i] = hexutil.Encode(sig)
+	}
+
 	response := &AggregateAttestationResponse{
 		Data: &shared.Attestation{
 			AggregationBits: hexutil.Encode(bestMatchingAtt.AggregationBits),
@@ -99,7 +104,7 @@ func (s *Server) GetAggregateAttestation(w http.ResponseWriter, r *http.Request)
 					Root:  hexutil.Encode(bestMatchingAtt.Data.Target.Root),
 				},
 			},
-			Signatures: hexutil.Encode(bestMatchingAtt.Signature),
+			Signatures: sigs,
 		}}
 	http2.WriteJson(w, response)
 }
@@ -494,7 +499,7 @@ func (s *Server) produceSyncCommitteeContribution(
 		http2.HandleError(w, "No subcommittee messages found", http.StatusNotFound)
 		return nil, false
 	}
-	sig, aggregatedBits, err := s.CoreService.SignaturesAndAggregationBits(
+	sigs, aggregatedBits, err := s.CoreService.SignaturesAndAggregationBits(
 		ctx,
 		&zondpbalpha.SignaturesAndAggregationBitsRequest{
 			Msgs:      msgs,
@@ -508,12 +513,17 @@ func (s *Server) produceSyncCommitteeContribution(
 		return nil, false
 	}
 
+	hexSigs := make([]string, len(sigs))
+	for i, sig := range sigs {
+		hexSigs[i] = hexutil.Encode(sig)
+	}
+
 	return &shared.SyncCommitteeContribution{
 		Slot:              strconv.FormatUint(uint64(slot), 10),
 		BeaconBlockRoot:   hexutil.Encode(blockRoot),
 		SubcommitteeIndex: strconv.FormatUint(index, 10),
 		AggregationBits:   hexutil.Encode(aggregatedBits),
-		Signatures:        hexutil.Encode(sig),
+		Signatures:        hexSigs,
 	}, true
 }
 

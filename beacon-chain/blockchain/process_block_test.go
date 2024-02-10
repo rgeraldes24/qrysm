@@ -40,7 +40,7 @@ func TestStore_OnBlockBatch(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	st, keys := util.DeterministicGenesisState(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 64)
 	require.NoError(t, service.saveGenesisData(ctx, st))
 	bState := st.Copy()
 
@@ -73,7 +73,7 @@ func TestStore_OnBlockBatch_NotifyNewPayload(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	st, keys := util.DeterministicGenesisState(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 64)
 	require.NoError(t, service.saveGenesisData(ctx, st))
 	bState := st.Copy()
 
@@ -98,7 +98,7 @@ func TestCachedPreState_CanGetFromStateSummary(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, beaconDB := tr.ctx, tr.db
 
-	st, keys := util.DeterministicGenesisState(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 64)
 	require.NoError(t, service.saveGenesisData(ctx, st))
 	b, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), primitives.Slot(1))
 	require.NoError(t, err)
@@ -117,12 +117,12 @@ func TestFillForkChoiceMissingBlocks_CanSave(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, beaconDB := tr.ctx, tr.db
 
-	st, _ := util.DeterministicGenesisState(t, 64)
+	st, _ := util.DeterministicGenesisStateCapella(t, 64)
 	require.NoError(t, service.saveGenesisData(ctx, st))
 
 	roots, err := blockTree1(t, beaconDB, service.originBlockRoot[:])
 	require.NoError(t, err)
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	blk := util.NewBeaconBlockCapella()
 	blk.Block.Slot = 9
 	blk.Block.ParentRoot = roots[8]
@@ -158,13 +158,13 @@ func TestFillForkChoiceMissingBlocks_RootsMatch(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, beaconDB := tr.ctx, tr.db
 
-	st, _ := util.DeterministicGenesisState(t, 64)
+	st, _ := util.DeterministicGenesisStateCapella(t, 64)
 	require.NoError(t, service.saveGenesisData(ctx, st))
 
 	roots, err := blockTree1(t, beaconDB, service.originBlockRoot[:])
 	require.NoError(t, err)
 
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	blk := util.NewBeaconBlockCapella()
 	blk.Block.Slot = 9
 	blk.Block.ParentRoot = roots[8]
@@ -234,7 +234,7 @@ func TestFillForkChoiceMissingBlocks_FilterFinalized(t *testing.T) {
 	b66.Block.ParentRoot = r65[:]
 	wsb := util.SaveBlock(t, ctx, service.cfg.BeaconDB, b66)
 
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 
 	// Set finalized epoch to 2.
 	require.NoError(t, service.cfg.ForkChoiceStore.UpdateFinalizedCheckpoint(&forkchoicetypes.Checkpoint{Epoch: 2, Root: r64}))
@@ -263,7 +263,7 @@ func TestFillForkChoiceMissingBlocks_FinalizedSibling(t *testing.T) {
 	roots, err := blockTree1(t, beaconDB, validGenesisRoot[:])
 	require.NoError(t, err)
 
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	blk := util.NewBeaconBlockCapella()
 	blk.Block.Slot = 9
 	blk.Block.ParentRoot = roots[8]
@@ -527,7 +527,7 @@ func TestHandleEpochBoundary_UpdateFirstSlot(t *testing.T) {
 	service, err := NewService(ctx, opts...)
 	require.NoError(t, err)
 
-	s, _ := util.DeterministicGenesisState(t, 1024)
+	s, _ := util.DeterministicGenesisStateCapella(t, 1024)
 	service.head = &head{state: s}
 	require.NoError(t, s.SetSlot(2*params.BeaconConfig().SlotsPerEpoch))
 	require.NoError(t, service.handleEpochBoundary(ctx, s.Slot(), s, []byte{}))
@@ -537,7 +537,7 @@ func TestOnBlock_CanFinalize_WithOnTick(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, fcs := tr.ctx, tr.fcs
 
-	gs, keys := util.DeterministicGenesisState(t, 32)
+	gs, keys := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	require.NoError(t, fcs.UpdateFinalizedCheckpoint(&forkchoicetypes.Checkpoint{Root: service.originBlockRoot}))
 
@@ -587,7 +587,7 @@ func TestOnBlock_CanFinalize(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	gs, keys := util.DeterministicGenesisState(t, 32)
+	gs, keys := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 
 	testState := gs.Copy()
@@ -641,7 +641,7 @@ func TestOnBlock_InvalidSignature(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	gs, keys := util.DeterministicGenesisState(t, 32)
+	gs, keys := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 
 	blk, err := util.GenerateFullBlockCapella(gs, keys, util.DefaultBlockGenConfig(), 1)
@@ -661,7 +661,7 @@ func TestOnBlock_CallNewPayloadAndForkchoiceUpdated(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	gs, keys := util.DeterministicGenesisState(t, 32)
+	gs, keys := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	testState := gs.Copy()
 	for i := primitives.Slot(1); i < params.BeaconConfig().SlotsPerEpoch; i++ {
@@ -687,7 +687,7 @@ func TestInsertFinalizedDeposits(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, depositCache := tr.ctx, tr.dc
 
-	gs, _ := util.DeterministicGenesisState(t, 32)
+	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
 	assert.NoError(t, gs.SetEth1Data(&zondpb.Eth1Data{DepositCount: 10, BlockHash: make([]byte, 32)}))
@@ -717,7 +717,7 @@ func TestInsertFinalizedDeposits_PrunePendingDeposits(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, depositCache := tr.ctx, tr.dc
 
-	gs, _ := util.DeterministicGenesisState(t, 32)
+	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
 	assert.NoError(t, gs.SetEth1Data(&zondpb.Eth1Data{DepositCount: 10, BlockHash: make([]byte, 32)}))
@@ -757,7 +757,7 @@ func TestInsertFinalizedDeposits_MultipleFinalizedRoutines(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, depositCache := tr.ctx, tr.dc
 
-	gs, _ := util.DeterministicGenesisState(t, 32)
+	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
 	assert.NoError(t, gs.SetEth1Data(&zondpb.Eth1Data{DepositCount: 7, BlockHash: make([]byte, 32)}))
@@ -801,7 +801,7 @@ func TestInsertFinalizedDeposits_MultipleFinalizedRoutines(t *testing.T) {
 }
 
 func TestRemoveBlockAttestationsInPool(t *testing.T) {
-	genesis, keys := util.DeterministicGenesisState(t, 64)
+	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
 	b, err := util.GenerateFullBlockCapella(genesis, keys, util.DefaultBlockGenConfig(), 1)
 	assert.NoError(t, err)
 	r, err := b.Block.HashTreeRoot()
@@ -863,7 +863,7 @@ func TestService_insertSlashingsToForkChoiceStore(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 	att1 := util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
 		Data: &zondpb.AttestationData{
 			Source: &zondpb.Checkpoint{Epoch: 1},
@@ -903,7 +903,7 @@ func TestOnBlock_ProcessBlocksParallel(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	gs, keys := util.DeterministicGenesisState(t, 32)
+	gs, keys := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 
 	blk1, err := util.GenerateFullBlockCapella(gs, keys, util.DefaultBlockGenConfig(), 1)
@@ -1008,7 +1008,7 @@ func TestStore_NoViableHead_FCU(t *testing.T) {
 	service, tr := minimalTestService(t, WithExecutionEngineCaller(mockEngine))
 	ctx := tr.ctx
 
-	st, keys := util.DeterministicGenesisState(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 64)
 	stateRoot, err := st.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
 
@@ -1185,7 +1185,7 @@ func TestStore_NoViableHead_NewPayload(t *testing.T) {
 	service, tr := minimalTestService(t, WithExecutionEngineCaller(mockEngine))
 	ctx := tr.ctx
 
-	st, keys := util.DeterministicGenesisState(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 64)
 	stateRoot, err := st.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
 
@@ -1362,7 +1362,7 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 	service, tr := minimalTestService(t, WithExecutionEngineCaller(mockEngine))
 	ctx := tr.ctx
 
-	st, keys := util.DeterministicGenesisState(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 64)
 	stateRoot, err := st.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
 
@@ -1598,7 +1598,7 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	service, tr := minimalTestService(t, WithExecutionEngineCaller(mockEngine))
 	ctx := tr.ctx
 
-	genesisState, keys := util.DeterministicGenesisState(t, 64)
+	genesisState, keys := util.DeterministicGenesisStateCapella(t, 64)
 	stateRoot, err := genesisState.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
 	genesis := blocks.NewGenesisBlock(stateRoot[:])
@@ -1780,7 +1780,7 @@ func TestOnBlock_HandleBlockAttestations(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	st, keys := util.DeterministicGenesisState(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 64)
 	stateRoot, err := st.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
 

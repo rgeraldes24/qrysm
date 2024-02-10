@@ -269,7 +269,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 
 	params.SetupTestConfigCleanup(t)
 
-	bs, keys := util.DeterministicGenesisState(t, 1)
+	bs, keys := util.DeterministicGenesisStateCapella(t, 1)
 
 	slashing := &zondpbv1.AttesterSlashing{
 		Attestation_1: &zondpbv1.IndexedAttestation{
@@ -463,7 +463,7 @@ func TestSubmitProposerSlashing_AcrossFork(t *testing.T) {
 
 	params.SetupTestConfigCleanup(t)
 
-	bs, keys := util.DeterministicGenesisState(t, 1)
+	bs, keys := util.DeterministicGenesisStateCapella(t, 1)
 
 	slashing := &zondpbv1.ProposerSlashing{
 		SignedHeader_1: &zondpbv1.SignedBeaconBlockHeader{

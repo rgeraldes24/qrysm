@@ -19,7 +19,7 @@ import (
 func TestSkipSlotCache_OK(t *testing.T) {
 	transition.SkipSlotCache.Enable()
 	defer transition.SkipSlotCache.Disable()
-	bState, privs := util.DeterministicGenesisState(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
+	bState, privs := util.DeterministicGenesisStateCapella(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
 	pbState, err := state_native.ProtobufBeaconStateCapella(bState.ToProto())
 	require.NoError(t, err)
 	originalState, err := state_native.InitializeFromProtoCapella(pbState)
@@ -46,7 +46,7 @@ func TestSkipSlotCache_OK(t *testing.T) {
 }
 
 func TestSkipSlotCache_ConcurrentMixup(t *testing.T) {
-	bState, privs := util.DeterministicGenesisState(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
+	bState, privs := util.DeterministicGenesisStateCapella(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
 	pbState, err := state_native.ProtobufBeaconStateCapella(bState.ToProto())
 	require.NoError(t, err)
 	originalState, err := state_native.InitializeFromProtoCapella(pbState)

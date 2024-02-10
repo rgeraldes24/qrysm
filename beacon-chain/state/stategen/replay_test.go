@@ -23,7 +23,7 @@ import (
 func TestReplayBlocks_AllSkipSlots(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	genesisBlock := blocks.NewGenesisBlock([]byte{})
 	bodyRoot, err := genesisBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -52,7 +52,7 @@ func TestReplayBlocks_AllSkipSlots(t *testing.T) {
 func TestReplayBlocks_SameSlot(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	genesisBlock := blocks.NewGenesisBlock([]byte{})
 	bodyRoot, err := genesisBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -81,7 +81,7 @@ func TestReplayBlocks_SameSlot(t *testing.T) {
 func TestReplayBlocks_LowerSlotBlock(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, beaconState.SetSlot(1))
 	genesisBlock := blocks.NewGenesisBlock([]byte{})
 	bodyRoot, err := genesisBlock.Block.HashTreeRoot()
@@ -115,7 +115,7 @@ func TestReplayBlocks_LowerSlotBlock(t *testing.T) {
 func TestReplayBlocks_ThroughForkBoundary(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	genesisBlock := blocks.NewGenesisBlock([]byte{})
 	bodyRoot, err := genesisBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -139,7 +139,7 @@ func TestReplayBlocks_ThroughForkBoundary(t *testing.T) {
 func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	genesisBlock := blocks.NewGenesisBlock([]byte{})
 	bodyRoot, err := genesisBlock.Block.HashTreeRoot()
 	require.NoError(t, err)

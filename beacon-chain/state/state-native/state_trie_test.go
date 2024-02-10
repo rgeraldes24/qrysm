@@ -83,7 +83,7 @@ func TestInitializeFromProtoUnsafe_Capella(t *testing.T) {
 }
 
 func TestBeaconState_HashTreeRoot(t *testing.T) {
-	testState, _ := util.DeterministicGenesisState(t, 64)
+	testState, _ := util.DeterministicGenesisStateCapella(t, 64)
 
 	type test struct {
 		name        string
@@ -152,7 +152,7 @@ func TestBeaconState_HashTreeRoot(t *testing.T) {
 }
 
 func BenchmarkBeaconState(b *testing.B) {
-	testState, _ := util.DeterministicGenesisState(b, 16000)
+	testState, _ := util.DeterministicGenesisStateCapella(b, 16000)
 	pbState, err := statenative.ProtobufBeaconStateCapella(testState.ToProtoUnsafe())
 	require.NoError(b, err)
 
@@ -170,7 +170,7 @@ func BenchmarkBeaconState(b *testing.B) {
 }
 
 func TestBeaconState_HashTreeRoot_FieldTrie(t *testing.T) {
-	testState, _ := util.DeterministicGenesisState(t, 64)
+	testState, _ := util.DeterministicGenesisStateCapella(t, 64)
 
 	type test struct {
 		name        string

@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"runtime"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	p2pType "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
@@ -16,6 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time/slots"
+	"golang.org/x/sync/errgroup"
 )
 
 // ProcessSyncAggregate verifies sync committee aggregate signature signing over the previous slot block root.
@@ -141,22 +142,31 @@ func VerifySyncCommitteeSigs(s state.BeaconState, syncKeys []dilithium.PublicKey
 		return err
 	}
 
-	if (len(syncKeys) != 0 && len(syncSig) != 1) && (len(syncSig) != len(syncKeys)*dilithium2.CryptoBytes) {
-		return fmt.Errorf("syncSig and syncKeys length mismatch | syncSig len %d | syncKeys len %d",
-			len(syncSig), len(syncKeys))
+	n := runtime.GOMAXPROCS(0) - 1
+	grp := errgroup.Group{}
+	grp.SetLimit(n)
+
+	for i := range syncSigs {
+		index := i
+		grp.Go(func() error {
+			sig, err := dilithium.SignatureFromBytes(syncSigs[index])
+			if err != nil {
+				return err
+			}
+
+			if !sig.Verify(syncKeys[index], r[:]) {
+				return fmt.Errorf("invalid sync committee signature at index %d %s %s",
+					index, hex.EncodeToString(syncKeys[index].Marshal()), hex.EncodeToString(sig.Marshal()))
+			}
+
+			return nil
+		})
 	}
 
-	for i, syncKey := range syncKeys {
-		offset := i * dilithium2.CryptoBytes
-		sig, err := dilithium.SignatureFromBytes(syncSig[offset : offset+dilithium2.CryptoBytes])
-		if err != nil {
-			return err
-		}
-		if !sig.Verify(syncKey, r[:]) {
-			return fmt.Errorf("invalid sync committee signature at %d %s %s",
-				i, hex.EncodeToString(syncKey.Marshal()), hex.EncodeToString(sig.Marshal()))
-		}
+	if err := grp.Wait(); err != nil {
+		return err
 	}
+
 	return nil
 }
 

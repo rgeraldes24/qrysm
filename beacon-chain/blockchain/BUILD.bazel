@@ -14,7 +14,6 @@ go_library(
         "init_sync_process_block.go",
         "lightclient.go",
         "log.go",
-        "merge_ascii_art.go",
         "metrics.go",
         "options.go",
         "process_attestation.go",

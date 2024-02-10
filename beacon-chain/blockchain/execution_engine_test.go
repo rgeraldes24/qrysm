@@ -41,7 +41,7 @@ func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	capellaBlkRoot, err := capellaBlk.Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	st, _ := util.DeterministicGenesisState(t, 10)
+	st, _ := util.DeterministicGenesisStateCapella(t, 10)
 	service.head = &head{
 		state: st,
 	}
@@ -67,7 +67,7 @@ func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 
 	pid := &v1.PayloadIDBytes{1}
 	service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{PayloadIDBytes: pid}
-	st, _ = util.DeterministicGenesisState(t, 1)
+	st, _ = util.DeterministicGenesisStateCapella(t, 1)
 	require.NoError(t, beaconDB.SaveState(ctx, st, capellaBlkRoot))
 	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, capellaBlkRoot))
 
@@ -96,7 +96,7 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 	capellaBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
 	capellaBlkRoot, err := capellaBlk.Block().HashTreeRoot()
 	require.NoError(t, err)
-	st, _ := util.DeterministicGenesisState(t, 10)
+	st, _ := util.DeterministicGenesisStateCapella(t, 10)
 	service.head = &head{
 		state: st,
 	}
@@ -216,7 +216,7 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{ErrForkchoiceUpdated: tt.newForkchoiceErr}
-			st, _ := util.DeterministicGenesisState(t, 1)
+			st, _ := util.DeterministicGenesisStateCapella(t, 1)
 			require.NoError(t, beaconDB.SaveState(ctx, st, tt.finalizedRoot))
 			require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, tt.finalizedRoot))
 			arg := &notifyForkchoiceUpdateArg{
@@ -291,7 +291,7 @@ func Test_NotifyForkchoiceUpdate_NIlLVH(t *testing.T) {
 
 	// Prepare Engine Mock to return invalid LVH =  nil
 	service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{ErrForkchoiceUpdated: execution.ErrInvalidPayloadStatus, OverrideValidHash: [32]byte{'C'}}
-	st, _ := util.DeterministicGenesisState(t, 1)
+	st, _ := util.DeterministicGenesisStateCapella(t, 1)
 	service.head = &head{
 		state: st,
 		block: wba,
@@ -390,7 +390,7 @@ func Test_NotifyForkchoiceUpdateRecursive_DoublyLinkedTree(t *testing.T) {
 	state, blkRoot, err := prepareForkchoiceState(ctx, 1, bra, [32]byte{}, [32]byte{'A'}, ojc, ofc)
 	require.NoError(t, err)
 
-	bState, _ := util.DeterministicGenesisState(t, 10)
+	bState, _ := util.DeterministicGenesisStateCapella(t, 10)
 	require.NoError(t, beaconDB.SaveState(ctx, bState, bra))
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
 	state, blkRoot, err = prepareForkchoiceState(ctx, 2, brb, bra, [32]byte{'B'}, ojc, ofc)
@@ -428,7 +428,7 @@ func Test_NotifyForkchoiceUpdateRecursive_DoublyLinkedTree(t *testing.T) {
 
 	// Prepare Engine Mock to return invalid unless head is D, LVH =  E
 	service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{ErrForkchoiceUpdated: execution.ErrInvalidPayloadStatus, ForkChoiceUpdatedResp: pe[:], OverrideValidHash: [32]byte{'D'}}
-	st, _ := util.DeterministicGenesisState(t, 1)
+	st, _ := util.DeterministicGenesisStateCapella(t, 1)
 	service.head = &head{
 		state: st,
 		block: wba,
@@ -460,7 +460,7 @@ func Test_NotifyNewPayload(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, fcs := tr.ctx, tr.fcs
 
-	capellaState, _ := util.DeterministicGenesisState(t, 1)
+	capellaState, _ := util.DeterministicGenesisStateCapella(t, 1)
 
 	blk := &zondpb.SignedBeaconBlockCapella{
 		Block: &zondpb.BeaconBlockCapella{

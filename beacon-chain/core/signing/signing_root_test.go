@@ -59,7 +59,7 @@ func TestSigningRoot_ComputeDomainAndSign(t *testing.T) {
 		{
 			name: "block proposer",
 			genState: func(t *testing.T) (state.BeaconState, []dilithium.DilithiumKey) {
-				beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+				beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 				require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 				return beaconState, privKeys
 			},

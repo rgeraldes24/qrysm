@@ -161,7 +161,7 @@ func TestSubscribe_ReceivesAttesterSlashing(t *testing.T) {
 		wg.Done()
 		return nil
 	}, p2pService.Digest)
-	beaconState, privKeys := util.DeterministicGenesisState(t, 64)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
 	chainService.State = beaconState
 	r.markForChainStart()
 	attesterSlashing, err := util.GenerateAttesterSlashingForValidator(
@@ -216,7 +216,7 @@ func TestSubscribe_ReceivesProposerSlashing(t *testing.T) {
 		wg.Done()
 		return nil
 	}, p2pService.Digest)
-	beaconState, privKeys := util.DeterministicGenesisState(t, 64)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
 	chainService.State = beaconState
 	r.markForChainStart()
 	proposerSlashing, err := util.GenerateProposerSlashingForValidator(

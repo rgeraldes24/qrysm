@@ -37,7 +37,7 @@ func TestVerifyIndexInCommittee_CanVerify(t *testing.T) {
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 
 	validators := uint64(32)
-	s, _ := util.DeterministicGenesisState(t, validators)
+	s, _ := util.DeterministicGenesisStateCapella(t, validators)
 	require.NoError(t, s.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 
 	bf := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
@@ -62,7 +62,7 @@ func TestVerifyIndexInCommittee_ExistsInBeaconCommittee(t *testing.T) {
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 
 	validators := uint64(64)
-	s, _ := util.DeterministicGenesisState(t, validators)
+	s, _ := util.DeterministicGenesisStateCapella(t, validators)
 	require.NoError(t, s.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 
 	bf := []byte{0xff}
@@ -84,7 +84,7 @@ func TestVerifySelection_NotAnAggregator(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	validators := uint64(2048)
-	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, validators)
 
 	sig := privKeys[0].Sign([]byte{'A'})
 	data := util.HydrateAttestationData(&zondpb.AttestationData{})
@@ -149,7 +149,7 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
 
 	validators := uint64(256)
-	beaconState, _ := util.DeterministicGenesisState(t, validators)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, validators)
 
 	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, b)
@@ -236,7 +236,7 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
 
 	validators := uint64(256)
-	beaconState, _ := util.DeterministicGenesisState(t, validators)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, validators)
 
 	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, b)
@@ -302,7 +302,7 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
 
 	validators := uint64(256)
-	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, validators)
 
 	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, b)
@@ -406,7 +406,7 @@ func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
 
 	validators := uint64(256)
-	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, validators)
 
 	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, b)
@@ -527,7 +527,7 @@ func TestValidateAggregateAndProof_BadBlock(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
 
 	validators := uint64(256)
-	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, validators)
 
 	b := util.NewBeaconBlockCapella()
 	root, err := b.Block.HashTreeRoot()
@@ -617,7 +617,7 @@ func TestValidateAggregateAndProof_RejectWhenAttEpochDoesntEqualTargetEpoch(t *t
 	p := p2ptest.NewTestP2P(t)
 
 	validators := uint64(256)
-	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, validators)
 
 	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, b)

@@ -27,7 +27,7 @@ import (
 )
 
 func setupValidAttesterSlashing(t *testing.T) (*zondpb.AttesterSlashing, state.BeaconState) {
-	s, privKeys := util.DeterministicGenesisState(t, 5)
+	s, privKeys := util.DeterministicGenesisStateCapella(t, 5)
 	vals := s.Validators()
 	for _, vv := range vals {
 		vv.WithdrawableEpoch = primitives.Epoch(1 * params.BeaconConfig().SlotsPerEpoch)

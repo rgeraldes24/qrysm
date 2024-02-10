@@ -30,7 +30,7 @@ func TestReportEpochMetrics_BadAttestation(t *testing.T) {
 }
 
 func TestReportEpochMetrics_SlashedValidatorOutOfBound(t *testing.T) {
-	h, _ := util.DeterministicGenesisState(t, 1)
+	h, _ := util.DeterministicGenesisStateCapella(t, 1)
 	v, err := h.ValidatorAtIndex(0)
 	require.NoError(t, err)
 	v.Slashed = true

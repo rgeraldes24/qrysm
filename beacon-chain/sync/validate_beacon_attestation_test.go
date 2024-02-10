@@ -75,7 +75,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 	}
 
 	validators := uint64(64)
-	savedState, keys := util.DeterministicGenesisState(t, validators)
+	savedState, keys := util.DeterministicGenesisStateCapella(t, validators)
 	require.NoError(t, savedState.SetSlot(1))
 	require.NoError(t, db.SaveState(context.Background(), savedState, validBlockRoot))
 	chain.State = savedState

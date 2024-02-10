@@ -27,7 +27,7 @@ import (
 
 func TestGetValidators(t *testing.T) {
 	var st state.BeaconState
-	st, _ = util.DeterministicGenesisState(t, 8192)
+	st, _ = util.DeterministicGenesisStateCapella(t, 8192)
 
 	t.Run("get all", func(t *testing.T) {
 		chainService := &chainMock.ChainService{}
@@ -279,7 +279,7 @@ func TestGetValidators(t *testing.T) {
 
 func TestListValidators_FilterByStatus(t *testing.T) {
 	var st state.BeaconState
-	st, _ = util.DeterministicGenesisState(t, 8192)
+	st, _ = util.DeterministicGenesisStateCapella(t, 8192)
 
 	farFutureEpoch := params.BeaconConfig().FarFutureEpoch
 	validators := []*zond.Validator{
@@ -506,7 +506,7 @@ func TestListValidators_FilterByStatus(t *testing.T) {
 
 func TestGetValidator(t *testing.T) {
 	var st state.BeaconState
-	st, _ = util.DeterministicGenesisState(t, 8192)
+	st, _ = util.DeterministicGenesisStateCapella(t, 8192)
 
 	t.Run("get by index", func(t *testing.T) {
 		chainService := &chainMock.ChainService{}
@@ -700,7 +700,7 @@ func TestGetValidator(t *testing.T) {
 func TestGetValidatorBalances(t *testing.T) {
 	var st state.BeaconState
 	count := uint64(8192)
-	st, _ = util.DeterministicGenesisState(t, count)
+	st, _ = util.DeterministicGenesisStateCapella(t, count)
 	balances := make([]uint64, count)
 	for i := uint64(0); i < count; i++ {
 		balances[i] = i

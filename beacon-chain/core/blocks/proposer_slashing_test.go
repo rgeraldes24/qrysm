@@ -24,7 +24,7 @@ import (
 
 func TestProcessProposerSlashings_UnmatchedHeaderSlots(t *testing.T) {
 
-	beaconState, _ := util.DeterministicGenesisState(t, 20)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 20)
 	currentSlot := primitives.Slot(0)
 	slashings := []*zondpb.ProposerSlashing{
 		{
@@ -57,7 +57,7 @@ func TestProcessProposerSlashings_UnmatchedHeaderSlots(t *testing.T) {
 
 func TestProcessProposerSlashings_SameHeaders(t *testing.T) {
 
-	beaconState, _ := util.DeterministicGenesisState(t, 2)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 2)
 	currentSlot := primitives.Slot(0)
 	slashings := []*zondpb.ProposerSlashing{
 		{
@@ -192,7 +192,7 @@ func TestVerifyProposerSlashing(t *testing.T) {
 		slashing    *zondpb.ProposerSlashing
 	}
 
-	beaconState, sks := util.DeterministicGenesisState(t, 2)
+	beaconState, sks := util.DeterministicGenesisStateCapella(t, 2)
 	currentSlot := primitives.Slot(0)
 	require.NoError(t, beaconState.SetSlot(currentSlot))
 	rand1, err := dilithium.RandKey()

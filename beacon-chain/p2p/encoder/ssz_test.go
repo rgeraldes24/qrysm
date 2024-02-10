@@ -107,7 +107,7 @@ func TestSszNetworkEncoder_DecodeWithMaxLength(t *testing.T) {
 
 func TestSszNetworkEncoder_DecodeWithMultipleFrames(t *testing.T) {
 	buf := new(bytes.Buffer)
-	st, _ := util.DeterministicGenesisState(t, 100)
+	st, _ := util.DeterministicGenesisStateCapella(t, 100)
 	e := &encoder.SszNetworkEncoder{}
 	params.SetupTestConfigCleanup(t)
 	c := params.BeaconNetworkConfig()

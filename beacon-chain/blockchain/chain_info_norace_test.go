@@ -21,7 +21,7 @@ func TestHeadSlot_DataRace(t *testing.T) {
 	}
 	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
-	st, _ := util.DeterministicGenesisState(t, 1)
+	st, _ := util.DeterministicGenesisStateCapella(t, 1)
 	wait := make(chan struct{})
 	go func() {
 		defer close(wait)
@@ -40,7 +40,7 @@ func TestHeadRoot_DataRace(t *testing.T) {
 	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 	wait := make(chan struct{})
-	st, _ := util.DeterministicGenesisState(t, 1)
+	st, _ := util.DeterministicGenesisStateCapella(t, 1)
 	go func() {
 		defer close(wait)
 		require.NoError(t, s.saveHead(context.Background(), [32]byte{}, b, st))
@@ -62,7 +62,7 @@ func TestHeadBlock_DataRace(t *testing.T) {
 	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 	wait := make(chan struct{})
-	st, _ := util.DeterministicGenesisState(t, 1)
+	st, _ := util.DeterministicGenesisStateCapella(t, 1)
 	go func() {
 		defer close(wait)
 		require.NoError(t, s.saveHead(context.Background(), [32]byte{}, b, st))
@@ -81,7 +81,7 @@ func TestHeadState_DataRace(t *testing.T) {
 	b, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 	wait := make(chan struct{})
-	st, _ := util.DeterministicGenesisState(t, 1)
+	st, _ := util.DeterministicGenesisStateCapella(t, 1)
 	root := bytesutil.ToBytes32(bytesutil.PadTo([]byte{'s'}, 32))
 	require.NoError(t, beaconDB.SaveGenesisBlockRoot(context.Background(), root))
 	require.NoError(t, beaconDB.SaveState(context.Background(), st, root))

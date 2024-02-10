@@ -22,7 +22,7 @@ func TestResume(t *testing.T) {
 	util.SaveBlock(t, ctx, service.beaconDB, b)
 	root, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch))
 	require.NoError(t, service.beaconDB.SaveState(ctx, beaconState, root))
 	require.NoError(t, service.beaconDB.SaveGenesisBlockRoot(ctx, root))

@@ -208,7 +208,7 @@ func newMockHistory(t *testing.T, hist []mockHistorySpec, current primitives.Slo
 	}
 
 	// genesis state for history
-	gs, _ := util.DeterministicGenesisState(t, 32)
+	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	gsr, err := gs.HashTreeRoot(ctx)
 	require.NoError(t, err)
 

@@ -110,9 +110,9 @@ func (vs *Server) SubmitSignedContributionAndProof(
 	return &emptypb.Empty{}, nil
 }
 
-// AggregatedSigAndAggregationBits returns the aggregated signature and aggregation bits
+// SignaturesAndAggregationBits returns the aggregated signature and aggregation bits
 // associated with a particular set of sync committee messages.
-func (vs *Server) AggregatedSigAndAggregationBits(
+func (vs *Server) SignaturesAndAggregationBits(
 	ctx context.Context,
 	req *zondpb.SignaturesAndAggregationBitsRequest,
 ) (*zondpb.SignaturesAndAggregationBitsResponse, error) {

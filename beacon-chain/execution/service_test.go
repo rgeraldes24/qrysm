@@ -290,7 +290,7 @@ func TestInitDepositCache_OK(t *testing.T) {
 		{Index: 1, Eth1BlockHeight: 4, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("B")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
 		{Index: 2, Eth1BlockHeight: 6, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("c")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
 	}
-	gs, _ := util.DeterministicGenesisState(t, 1)
+	gs, _ := util.DeterministicGenesisStateCapella(t, 1)
 	beaconDB := dbutil.SetupDB(t)
 	s := &Service{
 		chainStartData:  &zondpb.ChainStartData{},
@@ -350,7 +350,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 			},
 		},
 	}
-	gs, _ := util.DeterministicGenesisState(t, 1)
+	gs, _ := util.DeterministicGenesisStateCapella(t, 1)
 	beaconDB := dbutil.SetupDB(t)
 	s := &Service{
 		chainStartData:  &zondpb.ChainStartData{},

@@ -127,7 +127,7 @@ func TestStore_OnAttestation_Ok_DoublyLinkedTree(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	genesisState, pks := util.DeterministicGenesisState(t, 64)
+	genesisState, pks := util.DeterministicGenesisStateCapella(t, 64)
 	service.SetGenesisTime(time.Unix(time.Now().Unix()-int64(params.BeaconConfig().SecondsPerSlot), 0))
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
 	att, err := util.GenerateAttestations(genesisState, pks, 1, 0, false)
@@ -219,7 +219,7 @@ func TestStore_SaveCheckpointState(t *testing.T) {
 func TestStore_UpdateCheckpointState(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
-	baseState, _ := util.DeterministicGenesisState(t, 1)
+	baseState, _ := util.DeterministicGenesisStateCapella(t, 1)
 
 	epoch := primitives.Epoch(1)
 	blk := util.NewBeaconBlockCapella()
@@ -332,7 +332,7 @@ func TestVerifyBeaconBlock_OK(t *testing.T) {
 func TestGetAttPreState_HeadState(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
-	baseState, _ := util.DeterministicGenesisState(t, 1)
+	baseState, _ := util.DeterministicGenesisStateCapella(t, 1)
 
 	epoch := primitives.Epoch(1)
 	blk := util.NewBeaconBlockCapella()

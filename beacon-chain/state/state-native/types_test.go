@@ -11,6 +11,7 @@ import (
 	statenative "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/interop"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -52,7 +53,7 @@ func TestBeaconState_ProtoBeaconStateCompatibility(t *testing.T) {
 }
 
 func setupGenesisState(tb testing.TB, count uint64) *zondpb.BeaconStateCapella {
-	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, count)
+	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, count, &enginev1.ExecutionPayloadCapella{}, &zondpb.Eth1Data{})
 	require.NoError(tb, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte

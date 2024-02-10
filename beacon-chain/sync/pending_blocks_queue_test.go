@@ -730,7 +730,7 @@ func TestService_ProcessPendingBlockOnCorrectSlot(t *testing.T) {
 	}
 	r.initCaches()
 
-	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 	parentBlock := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()
@@ -808,7 +808,7 @@ func TestService_ProcessBadPendingBlocks(t *testing.T) {
 	}
 	r.initCaches()
 
-	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 	parentBlock := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, ctx, db, parentBlock)
 	bRoot, err := parentBlock.Block.HashTreeRoot()

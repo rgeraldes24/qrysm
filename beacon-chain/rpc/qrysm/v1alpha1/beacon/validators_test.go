@@ -12,16 +12,13 @@ import (
 	"github.com/theQRL/go-bitfield"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
-	coreTime "github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
-	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	mockstategen "github.com/theQRL/qrysm/v4/beacon-chain/state/stategen/mock"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
@@ -40,7 +37,6 @@ import (
 	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 const (
@@ -1040,7 +1036,7 @@ func TestServer_ListValidators_FromOldEpoch(t *testing.T) {
 	r, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	st, _ := util.DeterministicGenesisState(t, numVals)
+	st, _ := util.DeterministicGenesisStateCapella(t, numVals)
 	require.NoError(t, st.SetSlot(slot))
 	require.Equal(t, int(numVals), len(st.Validators()))
 
@@ -1326,153 +1322,6 @@ func TestServer_GetValidatorActiveSetChanges(t *testing.T) {
 	if !proto.Equal(wanted, res) {
 		t.Errorf("Wanted \n%v, received \n%v", wanted, res)
 	}
-}
-
-func TestServer_GetValidatorQueue_PendingActivation(t *testing.T) {
-	headState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
-		Validators: []*zondpb.Validator{
-			{
-				ActivationEpoch:            helpers.ActivationExitEpoch(0),
-				ActivationEligibilityEpoch: 3,
-				PublicKey:                  pubKey(3),
-				WithdrawalCredentials:      make([]byte, 32),
-			},
-			{
-				ActivationEpoch:            helpers.ActivationExitEpoch(0),
-				ActivationEligibilityEpoch: 2,
-				PublicKey:                  pubKey(2),
-				WithdrawalCredentials:      make([]byte, 32),
-			},
-			{
-				ActivationEpoch:            helpers.ActivationExitEpoch(0),
-				ActivationEligibilityEpoch: 1,
-				PublicKey:                  pubKey(1),
-				WithdrawalCredentials:      make([]byte, 32),
-			},
-		},
-		FinalizedCheckpoint: &zondpb.Checkpoint{
-			Epoch: 0,
-		},
-	})
-	require.NoError(t, err)
-	bs := &Server{
-		HeadFetcher: &mock.ChainService{
-			State: headState,
-		},
-	}
-	res, err := bs.GetValidatorQueue(context.Background(), &emptypb.Empty{})
-	require.NoError(t, err)
-	// We verify the keys are properly sorted by the validators' activation eligibility epoch.
-	wanted := [][]byte{
-		pubKey(1),
-		pubKey(2),
-		pubKey(3),
-	}
-	activeValidatorCount, err := helpers.ActiveValidatorCount(context.Background(), headState, coreTime.CurrentEpoch(headState))
-	require.NoError(t, err)
-	wantChurn := helpers.ValidatorActivationChurnLimit(activeValidatorCount)
-	assert.Equal(t, wantChurn, res.ChurnLimit)
-	assert.DeepEqual(t, wanted, res.ActivationPublicKeys)
-	wantedActiveIndices := []primitives.ValidatorIndex{2, 1, 0}
-	assert.DeepEqual(t, wantedActiveIndices, res.ActivationValidatorIndices)
-}
-
-func TestServer_GetValidatorQueue_ExitedValidatorLeavesQueue(t *testing.T) {
-	validators := []*zondpb.Validator{
-		{
-			ActivationEpoch:   0,
-			ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
-			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
-			PublicKey:         bytesutil.PadTo([]byte("1"), 48),
-		},
-		{
-			ActivationEpoch:   0,
-			ExitEpoch:         4,
-			WithdrawableEpoch: 6,
-			PublicKey:         bytesutil.PadTo([]byte("2"), 48),
-		},
-	}
-
-	headState, err := util.NewBeaconStateCapella()
-	require.NoError(t, err)
-	require.NoError(t, headState.SetValidators(validators))
-	require.NoError(t, headState.SetFinalizedCheckpoint(&zondpb.Checkpoint{Epoch: 0, Root: make([]byte, 32)}))
-	bs := &Server{
-		HeadFetcher: &mock.ChainService{
-			State: headState,
-		},
-	}
-
-	// First we check if validator with index 1 is in the exit queue.
-	res, err := bs.GetValidatorQueue(context.Background(), &emptypb.Empty{})
-	require.NoError(t, err)
-	wanted := [][]byte{
-		bytesutil.PadTo([]byte("2"), 48),
-	}
-	activeValidatorCount, err := helpers.ActiveValidatorCount(context.Background(), headState, coreTime.CurrentEpoch(headState))
-	require.NoError(t, err)
-	wantChurn := helpers.ValidatorExitChurnLimit(activeValidatorCount)
-	assert.Equal(t, wantChurn, res.ChurnLimit)
-	assert.DeepEqual(t, wanted, res.ExitPublicKeys)
-	wantedExitIndices := []primitives.ValidatorIndex{1}
-	assert.DeepEqual(t, wantedExitIndices, res.ExitValidatorIndices)
-
-	// Now, we move the state.slot past the exit epoch of the validator, and now
-	// the validator should no longer exist in the queue.
-	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(validators[1].ExitEpoch+1))))
-	res, err = bs.GetValidatorQueue(context.Background(), &emptypb.Empty{})
-	require.NoError(t, err)
-	assert.Equal(t, 0, len(res.ExitPublicKeys))
-}
-
-func TestServer_GetValidatorQueue_PendingExit(t *testing.T) {
-	headState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
-		Validators: []*zondpb.Validator{
-			{
-				ActivationEpoch:       0,
-				ExitEpoch:             4,
-				WithdrawableEpoch:     3,
-				PublicKey:             pubKey(3),
-				WithdrawalCredentials: make([]byte, 32),
-			},
-			{
-				ActivationEpoch:       0,
-				ExitEpoch:             4,
-				WithdrawableEpoch:     2,
-				PublicKey:             pubKey(2),
-				WithdrawalCredentials: make([]byte, 32),
-			},
-			{
-				ActivationEpoch:       0,
-				ExitEpoch:             4,
-				WithdrawableEpoch:     1,
-				PublicKey:             pubKey(1),
-				WithdrawalCredentials: make([]byte, 32),
-			},
-		},
-		FinalizedCheckpoint: &zondpb.Checkpoint{
-			Epoch: 0,
-		},
-	})
-	require.NoError(t, err)
-	bs := &Server{
-		HeadFetcher: &mock.ChainService{
-			State: headState,
-		},
-	}
-	res, err := bs.GetValidatorQueue(context.Background(), &emptypb.Empty{})
-	require.NoError(t, err)
-	// We verify the keys are properly sorted by the validators' withdrawable epoch.
-	wanted := [][]byte{
-		pubKey(1),
-		pubKey(2),
-		pubKey(3),
-	}
-	activeValidatorCount, err := helpers.ActiveValidatorCount(context.Background(), headState, coreTime.CurrentEpoch(headState))
-	require.NoError(t, err)
-	wantChurn := helpers.ValidatorExitChurnLimit(activeValidatorCount)
-	assert.Equal(t, wantChurn, res.ChurnLimit)
-	assert.DeepEqual(t, wanted, res.ExitPublicKeys)
 }
 
 func TestServer_GetValidatorParticipation_CannotRequestFutureEpoch(t *testing.T) {
@@ -1895,12 +1744,15 @@ func TestGetValidatorPerformance_Indices(t *testing.T) {
 		},
 	}
 	c := headState.Copy()
-	vp, bp, err := precompute.New(ctx, c)
+	vp, bp, err := altair.InitializePrecomputeValidators(ctx, c)
 	require.NoError(t, err)
-	vp, bp, err = precompute.ProcessAttestations(ctx, c, vp, bp)
+	vp, bp, err = altair.ProcessEpochParticipation(ctx, c, bp, vp)
 	require.NoError(t, err)
-	_, err = precompute.ProcessRewardsAndPenaltiesPrecompute(c, bp, vp, precompute.AttestationsDelta, precompute.ProposersDelta)
+	c, vp, err = altair.ProcessInactivityScores(ctx, c, vp)
 	require.NoError(t, err)
+	_, err = altair.ProcessRewardsAndPenaltiesPrecompute(c, bp, vp)
+	require.NoError(t, err)
+
 	want := &zondpb.ValidatorPerformanceResponse{
 		PublicKeys:                    [][]byte{publicKey2[:], publicKey3[:]},
 		CurrentEffectiveBalances:      []uint64{params.BeaconConfig().MaxEffectiveBalance, params.BeaconConfig().MaxEffectiveBalance},
@@ -1967,12 +1819,15 @@ func TestGetValidatorPerformance_IndicesPubkeys(t *testing.T) {
 		},
 	}
 	c := headState.Copy()
-	vp, bp, err := precompute.New(ctx, c)
+	vp, bp, err := altair.InitializePrecomputeValidators(ctx, c)
 	require.NoError(t, err)
-	vp, bp, err = precompute.ProcessAttestations(ctx, c, vp, bp)
+	vp, bp, err = altair.ProcessEpochParticipation(ctx, c, bp, vp)
 	require.NoError(t, err)
-	_, err = precompute.ProcessRewardsAndPenaltiesPrecompute(c, bp, vp, precompute.AttestationsDelta, precompute.ProposersDelta)
+	c, vp, err = altair.ProcessInactivityScores(ctx, c, vp)
 	require.NoError(t, err)
+	_, err = altair.ProcessRewardsAndPenaltiesPrecompute(c, bp, vp)
+	require.NoError(t, err)
+
 	want := &zondpb.ValidatorPerformanceResponse{
 		PublicKeys:                    [][]byte{publicKey2[:], publicKey3[:]},
 		CurrentEffectiveBalances:      []uint64{params.BeaconConfig().MaxEffectiveBalance, params.BeaconConfig().MaxEffectiveBalance},
@@ -2123,7 +1978,7 @@ func TestServer_GetIndividualVotes_ValidatorsDontExist(t *testing.T) {
 
 	var slot primitives.Slot = 0
 	validators := uint64(64)
-	stateWithValidators, _ := util.DeterministicGenesisState(t, validators)
+	stateWithValidators, _ := util.DeterministicGenesisStateCapella(t, validators)
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetValidators(stateWithValidators.Validators()))
@@ -2197,7 +2052,7 @@ func TestServer_GetIndividualVotes_Working(t *testing.T) {
 	ctx := context.Background()
 
 	validators := uint64(32)
-	stateWithValidators, _ := util.DeterministicGenesisState(t, validators)
+	stateWithValidators, _ := util.DeterministicGenesisStateCapella(t, validators)
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetValidators(stateWithValidators.Validators()))
@@ -2435,12 +2290,12 @@ func TestServer_GetIndividualVotes_BellatrixEndOfEpoch(t *testing.T) {
 	ctx := context.Background()
 
 	validators := uint64(32)
-	beaconState, _ := util.DeterministicGenesisStateBellatrix(t, validators)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, validators)
 	startSlot, err := slots.EpochStart(1)
 	assert.NoError(t, err)
 	require.NoError(t, beaconState.SetSlot(startSlot))
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	b.Block.Slot = startSlot
 	util.SaveBlock(t, ctx, beaconDB, b)
 	gRoot, err := b.Block.HashTreeRoot()
@@ -2453,7 +2308,7 @@ func TestServer_GetIndividualVotes_BellatrixEndOfEpoch(t *testing.T) {
 	endSlot, err := slots.EpochEnd(1)
 	assert.NoError(t, err)
 
-	beaconState, _ = util.DeterministicGenesisStateBellatrix(t, validators)
+	beaconState, _ = util.DeterministicGenesisStateCapella(t, validators)
 	require.NoError(t, beaconState.SetSlot(endSlot))
 
 	pb, err := beaconState.CurrentEpochParticipation()
@@ -2528,7 +2383,7 @@ func TestServer_GetIndividualVotes_CapellaEndOfEpoch(t *testing.T) {
 	assert.NoError(t, err)
 	require.NoError(t, beaconState.SetSlot(startSlot))
 
-	b := util.NewBeaconBlock()
+	b := util.NewBeaconBlockCapella()
 	b.Block.Slot = startSlot
 	util.SaveBlock(t, ctx, beaconDB, b)
 	gRoot, err := b.Block.HashTreeRoot()

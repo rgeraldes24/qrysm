@@ -271,9 +271,15 @@ func (s *SyncCommitteeContribution) ToConsensus() (*zond.SyncCommitteeContributi
 	if err != nil {
 		return nil, NewDecodeError(err, "AggregationBits")
 	}
-	sig, err := hexutil.Decode(s.Signature)
-	if err != nil {
-		return nil, NewDecodeError(err, "Signature")
+
+	sigs := make([][]byte, len(s.Signatures))
+	for i, hexSig := range s.Signatures {
+		sig, err := hexutil.Decode(hexSig)
+		if err != nil {
+			// TODO(rgeraldes24)
+			return nil, NewDecodeError(err, "Signatures")
+		}
+		sigs[i] = sig
 	}
 
 	return &zond.SyncCommitteeContribution{
@@ -281,7 +287,7 @@ func (s *SyncCommitteeContribution) ToConsensus() (*zond.SyncCommitteeContributi
 		BlockRoot:         bbRoot,
 		SubcommitteeIndex: subcommitteeIndex,
 		AggregationBits:   aggBits,
-		Signature:         sig,
+		Signatures:        sigs,
 	}, nil
 }
 
@@ -330,23 +336,34 @@ func (a *Attestation) ToConsensus() (*zond.Attestation, error) {
 	if err != nil {
 		return nil, NewDecodeError(err, "Data")
 	}
-	sig, err := hexutil.Decode(a.Signature)
-	if err != nil {
-		return nil, NewDecodeError(err, "Signature")
+
+	sigs := make([][]byte, len(a.Signatures))
+	for i, hexSig := range a.Signatures {
+		sig, err := hexutil.Decode(hexSig)
+		if err != nil {
+			// TODO(rgeraldes24)
+			return nil, NewDecodeError(err, "Signatures")
+		}
+		sigs[i] = sig
 	}
 
 	return &zond.Attestation{
 		AggregationBits: aggBits,
 		Data:            data,
-		Signature:       sig,
+		Signatures:      sigs,
 	}, nil
 }
 
 func AttestationFromConsensus(a *zond.Attestation) *Attestation {
+	sigs := make([]string, len(a.Signatures))
+	for i, sig := range a.Signatures {
+		sigs[i] = hexutil.Encode(sig)
+	}
+
 	return &Attestation{
 		AggregationBits: hexutil.Encode(a.AggregationBits),
 		Data:            AttestationDataFromConsensus(a.Data),
-		Signature:       hexutil.Encode(a.Signature),
+		Signatures:      sigs,
 	}
 }
 

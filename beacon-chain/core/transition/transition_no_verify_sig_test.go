@@ -17,7 +17,7 @@ import (
 )
 
 func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 
 	eth1Data := &zondpb.Eth1Data{
 		DepositCount: 100,
@@ -45,7 +45,7 @@ func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), nextSlotState)
 	require.NoError(t, err)
-	block := util.NewBeaconBlock()
+	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
@@ -73,7 +73,7 @@ func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 }
 
 func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 
 	eth1Data := &zondpb.Eth1Data{
 		DepositCount: 100,
@@ -101,7 +101,7 @@ func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *test
 	require.NoError(t, err)
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), nextSlotState)
 	require.NoError(t, err)
-	block := util.NewBeaconBlock()
+	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
@@ -139,7 +139,7 @@ func TestProcessBlockNoVerify_PassesProcessingConditions(t *testing.T) {
 }
 
 func TestProcessBlockNoVerifyAnySigAltair_OK(t *testing.T) {
-	beaconState, block := createFullAltairBlockWithOperations(t)
+	beaconState, block := createFullCapellaBlockWithOperations(t)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	beaconState, err = transition.ProcessSlots(context.Background(), beaconState, wsb.Block().Slot())
@@ -164,7 +164,7 @@ func TestProcessBlockNoVerify_SigSetContainsDescriptions(t *testing.T) {
 }
 
 func TestProcessOperationsNoVerifyAttsSigs_OK(t *testing.T) {
-	beaconState, block := createFullAltairBlockWithOperations(t)
+	beaconState, block := createFullCapellaBlockWithOperations(t)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	beaconState, err = transition.ProcessSlots(context.Background(), beaconState, wsb.Block().Slot())
@@ -184,7 +184,7 @@ func TestProcessOperationsNoVerifyAttsSigsCapella_OK(t *testing.T) {
 }
 
 func TestCalculateStateRootAltair_OK(t *testing.T) {
-	beaconState, block := createFullAltairBlockWithOperations(t)
+	beaconState, block := createFullCapellaBlockWithOperations(t)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	r, err := transition.CalculateStateRoot(context.Background(), beaconState, wsb)
@@ -193,8 +193,8 @@ func TestCalculateStateRootAltair_OK(t *testing.T) {
 }
 
 func TestProcessBlockDifferentVersion(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisState(t, 64) // Phase 0 state
-	_, block := createFullAltairBlockWithOperations(t)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 64) // Phase 0 state
+	_, block := createFullCapellaBlockWithOperations(t)
 	wsb, err := blocks.NewSignedBeaconBlock(block) // Altair block
 	require.NoError(t, err)
 	_, _, err = transition.ProcessBlockNoVerifyAnySig(context.Background(), beaconState, wsb)

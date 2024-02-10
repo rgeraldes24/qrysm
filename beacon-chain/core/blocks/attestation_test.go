@@ -23,7 +23,7 @@ import (
 )
 
 func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisState(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 	data := util.HydrateAttestationData(&zondpb.AttestationData{
 		Source: &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 		Target: &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
@@ -79,7 +79,7 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 }
 
 func TestVerifyAttestationNoVerifySignature_IncorrectSlotTargetEpoch(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisState(t, 1)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 1)
 
 	att := util.HydrateAttestation(&zondpb.Attestation{
 		Data: &zondpb.AttestationData{
@@ -105,7 +105,7 @@ func TestProcessAttestationsNoVerify_OlderThanSlotsPerEpoch(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("attestation older than slots per epoch", func(t *testing.T) {
-		beaconState, _ := util.DeterministicGenesisState(t, 100)
+		beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
 
 		err := beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().SlotsPerEpoch + 1)
 		require.NoError(t, err)
@@ -121,7 +121,7 @@ func TestProcessAttestationsNoVerify_OlderThanSlotsPerEpoch(t *testing.T) {
 func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 	// Attestation with an empty signature
 
-	beaconState, _ := util.DeterministicGenesisState(t, 100)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
 
 	aggBits := bitfield.NewBitlist(3)
 	aggBits.SetBitAt(1, true)
@@ -150,7 +150,7 @@ func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 }
 
 func TestVerifyAttestationNoVerifySignature_BadAttIdx(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisState(t, 100)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
 	aggBits := bitfield.NewBitlist(3)
 	aggBits.SetBitAt(1, true)
 	var mockRoot [32]byte
@@ -327,7 +327,7 @@ func TestValidateIndexedAttestation_AboveMaxLength(t *testing.T) {
 }
 
 func TestValidateIndexedAttestation_BadAttestationsSignatureSet(t *testing.T) {
-	beaconState, keys := util.DeterministicGenesisState(t, 128)
+	beaconState, keys := util.DeterministicGenesisStateCapella(t, 128)
 
 	sig := keys[0].Sign([]byte{'t', 'e', 's', 't'})
 	list := bitfield.Bitlist{0b11111}

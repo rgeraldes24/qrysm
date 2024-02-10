@@ -74,7 +74,7 @@ func TestFinalizedCheckpt_GenesisRootOk(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, fcs := tr.ctx, tr.fcs
 
-	gs, _ := util.DeterministicGenesisState(t, 32)
+	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	cp := service.FinalizedCheckpt()
 	assert.DeepEqual(t, [32]byte{}, bytesutil.ToBytes32(cp.Root))
@@ -93,7 +93,7 @@ func TestCurrentJustifiedCheckpt_CanRetrieve(t *testing.T) {
 
 	jroot := [32]byte{'j'}
 	cp := &forkchoicetypes.Checkpoint{Epoch: 6, Root: jroot}
-	bState, _ := util.DeterministicGenesisState(t, 10)
+	bState, _ := util.DeterministicGenesisStateCapella(t, 10)
 	require.NoError(t, beaconDB.SaveState(ctx, bState, jroot))
 
 	require.NoError(t, fcs.UpdateJustifiedCheckpoint(ctx, cp))
@@ -108,7 +108,7 @@ func TestFinalizedBlockHash(t *testing.T) {
 
 	r := [32]byte{'f'}
 	cp := &forkchoicetypes.Checkpoint{Epoch: 6, Root: r}
-	bState, _ := util.DeterministicGenesisState(t, 10)
+	bState, _ := util.DeterministicGenesisStateCapella(t, 10)
 	require.NoError(t, beaconDB.SaveState(ctx, bState, r))
 
 	require.NoError(t, fcs.UpdateFinalizedCheckpoint(cp))
@@ -147,7 +147,7 @@ func TestHeadSlot_CanRetrieve(t *testing.T) {
 func TestHeadRoot_CanRetrieve(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
-	gs, _ := util.DeterministicGenesisState(t, 32)
+	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 
 	r, err := service.HeadRoot(ctx)
@@ -277,7 +277,7 @@ func TestIsCanonical_Ok(t *testing.T) {
 }
 
 func TestService_HeadValidatorsIndices(t *testing.T) {
-	s, _ := util.DeterministicGenesisState(t, 10)
+	s, _ := util.DeterministicGenesisStateCapella(t, 10)
 	c := &Service{}
 
 	c.head = &head{}
@@ -292,7 +292,7 @@ func TestService_HeadValidatorsIndices(t *testing.T) {
 }
 
 func TestService_HeadGenesisValidatorsRoot(t *testing.T) {
-	s, _ := util.DeterministicGenesisState(t, 1)
+	s, _ := util.DeterministicGenesisStateCapella(t, 1)
 	c := &Service{}
 
 	c.head = &head{}
@@ -345,7 +345,7 @@ func TestService_ChainHeads(t *testing.T) {
 }
 
 func TestService_HeadPublicKeyToValidatorIndex(t *testing.T) {
-	s, _ := util.DeterministicGenesisState(t, 10)
+	s, _ := util.DeterministicGenesisStateCapella(t, 10)
 	c := &Service{}
 	c.head = &head{state: s}
 
@@ -375,7 +375,7 @@ func TestService_HeadPublicKeyToValidatorIndexNil(t *testing.T) {
 }
 
 func TestService_HeadValidatorIndexToPublicKey(t *testing.T) {
-	s, _ := util.DeterministicGenesisState(t, 10)
+	s, _ := util.DeterministicGenesisStateCapella(t, 10)
 	c := &Service{}
 	c.head = &head{state: s}
 

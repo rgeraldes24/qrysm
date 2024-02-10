@@ -62,7 +62,7 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	validators := uint64(256)
 
-	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, validators)
 
 	sb := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, sb)
@@ -150,7 +150,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p1 := p2ptest.NewTestP2P(t)
 
-	s, _ := util.DeterministicGenesisState(t, 256)
+	s, _ := util.DeterministicGenesisStateCapella(t, 256)
 	chain := &mock.ChainService{
 		State:   s,
 		Genesis: qrysmTime.Now(), FinalizedCheckPoint: &zondpb.Checkpoint{Root: make([]byte, 32)}}
@@ -192,7 +192,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 
 	validators := uint64(256)
 
-	_, privKeys := util.DeterministicGenesisState(t, validators)
+	_, privKeys := util.DeterministicGenesisStateCapella(t, validators)
 	aggBits := bitfield.NewBitlist(8)
 	aggBits.SetBitAt(1, true)
 	att := &zondpb.Attestation{
@@ -264,7 +264,7 @@ func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
 	validators := uint64(256)
 
-	beaconState, privKeys := util.DeterministicGenesisState(t, validators)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, validators)
 
 	sb := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), db, sb)

@@ -1,11 +1,7 @@
 package dilithium
 
 import (
-	"encoding/hex"
-	"fmt"
-
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-qrllib/dilithium"
 )
 
 // AggregatedSignature represents aggregated signature produced by AggregateBatch()
@@ -56,29 +52,33 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 	// if signature batch is invalid, we then verify signatures one by one.
 
 	errmsg := "some signatures are invalid. details:"
-	for i := 0; i < len(s.Signatures); i++ {
-		for j, pubKey := range s.PublicKeys[i] {
-			offset := j * dilithium.CryptoBytes
-			sig := s.Signatures[i][offset : offset+dilithium.CryptoBytes]
-			msg := s.Messages[i]
 
-			valid, err := VerifySignature(sig, msg, pubKey)
-			if !valid {
-				desc := s.Descriptions[i]
-				if err != nil {
-					errmsg += fmt.Sprintf("\nsignature '%s' is invalid."+
-						" signature: 0x%s, public key: 0x%s, message: 0x%v, error: %v",
-						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
-						hex.EncodeToString(msg[:]), err)
-				} else {
-					errmsg += fmt.Sprintf("\nsignature '%s' is invalid."+
-						" signature: 0x%s, public key: 0x%s, message: 0x%v",
-						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
-						hex.EncodeToString(msg[:]))
+	// TODO(rgeraldes24)
+	/*
+		for i := 0; i < len(s.Signatures); i++ {
+			for j, pubKey := range s.PublicKeys[i] {
+				offset := j * dilithium.CryptoBytes
+				sig := s.Signatures[i][offset : offset+dilithium.CryptoBytes]
+				msg := s.Messages[i]
+
+				valid, err := VerifySignature(sig, msg, pubKey)
+				if !valid {
+					desc := s.Descriptions[i]
+					if err != nil {
+						errmsg += fmt.Sprintf("\nsignature '%s' is invalid."+
+							" signature: 0x%s, public key: 0x%s, message: 0x%v, error: %v",
+							desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
+							hex.EncodeToString(msg[:]), err)
+					} else {
+						errmsg += fmt.Sprintf("\nsignature '%s' is invalid."+
+							" signature: 0x%s, public key: 0x%s, message: 0x%v",
+							desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
+							hex.EncodeToString(msg[:]))
+					}
 				}
 			}
 		}
-	}
+	*/
 
 	return false, errors.Errorf(errmsg)
 }
@@ -86,14 +86,15 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 // Copy the attached signature batch and return it
 // to the caller.
 func (s *SignatureBatch) Copy() *SignatureBatch {
-	signatures := make([][]byte, len(s.Signatures))
+	signatures := make([][][]byte, len(s.Signatures))
 	pubkeys := make([][]PublicKey, len(s.PublicKeys))
 	messages := make([][32]byte, len(s.Messages))
 	descriptions := make([]string, len(s.Descriptions))
 	for i := range s.Signatures {
-		sig := make([]byte, len(s.Signatures[i]))
-		copy(sig, s.Signatures[i])
-		signatures[i] = sig
+		signatures[i] = make([][]byte, len(s.Signatures[i]))
+		for j, sig := range s.Signatures[i] {
+			copy(signatures[i][j], sig)
+		}
 	}
 	for i := range s.PublicKeys {
 		pubkeys[i] = make([]PublicKey, len(s.PublicKeys[i]))
@@ -113,109 +114,118 @@ func (s *SignatureBatch) Copy() *SignatureBatch {
 	}
 }
 
+// TODO(rgeraldes24)
 // RemoveDuplicates removes duplicate signature sets from the signature batch.
 func (s *SignatureBatch) RemoveDuplicates() (int, *SignatureBatch, error) {
-	if len(s.Signatures) == 0 || len(s.PublicKeys) == 0 || len(s.Messages) == 0 {
-		return 0, s, nil
-	}
-	if len(s.Signatures) != len(s.PublicKeys) || len(s.Signatures) != len(s.Messages) {
-		return 0, s, errors.Errorf("mismatch number of signatures, publickeys and messages in signature batch. "+
-			"Signatures %d, Public Keys %d , Messages %d", s.Signatures, s.PublicKeys, s.Messages)
-	}
-	sigMap := make(map[string]int)
-	duplicateSet := make(map[int]bool)
-	for i := 0; i < len(s.Signatures); i++ {
-		if sigIdx, ok := sigMap[string(s.Signatures[i])]; ok {
-			allPubKeyMatched := true
-			for j := range s.PublicKeys[i] {
-				if !s.PublicKeys[sigIdx][j].Equals(s.PublicKeys[i][j]) {
-					allPubKeyMatched = false
-					break
+	/*
+		if len(s.Signatures) == 0 || len(s.PublicKeys) == 0 || len(s.Messages) == 0 {
+			return 0, s, nil
+		}
+		if len(s.Signatures) != len(s.PublicKeys) || len(s.Signatures) != len(s.Messages) {
+			return 0, s, errors.Errorf("mismatch number of signatures, publickeys and messages in signature batch. "+
+				"Signatures %d, Public Keys %d , Messages %d", s.Signatures, s.PublicKeys, s.Messages)
+		}
+		sigMap := make(map[string]int)
+		duplicateSet := make(map[int]bool)
+		for i := 0; i < len(s.Signatures); i++ {
+			if sigIdx, ok := sigMap[string(s.Signatures[i])]; ok {
+				allPubKeyMatched := true
+				for j := range s.PublicKeys[i] {
+					if !s.PublicKeys[sigIdx][j].Equals(s.PublicKeys[i][j]) {
+						allPubKeyMatched = false
+						break
+					}
+				}
+				//if s.PublicKeys[sigIdx].Equals(s.PublicKeys[i]) &&
+				//	s.Messages[sigIdx] == s.Messages[i] {
+				//	duplicateSet[i] = true
+				//	continue
+				//}
+				if allPubKeyMatched && s.Messages[sigIdx] == s.Messages[i] {
+					duplicateSet[i] = true
+					continue
 				}
 			}
-			//if s.PublicKeys[sigIdx].Equals(s.PublicKeys[i]) &&
-			//	s.Messages[sigIdx] == s.Messages[i] {
-			//	duplicateSet[i] = true
-			//	continue
-			//}
-			if allPubKeyMatched && s.Messages[sigIdx] == s.Messages[i] {
-				duplicateSet[i] = true
+			sigMap[string(s.Signatures[i])] = i
+		}
+
+		sigs := s.Signatures[:0]
+		pubs := s.PublicKeys[:0]
+		msgs := s.Messages[:0]
+		descs := s.Descriptions[:0]
+
+		for i := 0; i < len(s.Signatures); i++ {
+			if duplicateSet[i] {
 				continue
 			}
+			sigs = append(sigs, s.Signatures[i])
+			pubs = append(pubs, s.PublicKeys[i])
+			msgs = append(msgs, s.Messages[i])
+			descs = append(descs, s.Descriptions[i])
 		}
-		sigMap[string(s.Signatures[i])] = i
-	}
 
-	sigs := s.Signatures[:0]
-	pubs := s.PublicKeys[:0]
-	msgs := s.Messages[:0]
-	descs := s.Descriptions[:0]
+		s.Signatures = sigs
+		s.PublicKeys = pubs
+		s.Messages = msgs
+		s.Descriptions = descs
 
-	for i := 0; i < len(s.Signatures); i++ {
-		if duplicateSet[i] {
-			continue
-		}
-		sigs = append(sigs, s.Signatures[i])
-		pubs = append(pubs, s.PublicKeys[i])
-		msgs = append(msgs, s.Messages[i])
-		descs = append(descs, s.Descriptions[i])
-	}
+		return len(duplicateSet), s, nil
+	*/
 
-	s.Signatures = sigs
-	s.PublicKeys = pubs
-	s.Messages = msgs
-	s.Descriptions = descs
-
-	return len(duplicateSet), s, nil
+	return 0, s, nil
 }
 
+// TODO(rgeraldes24)
 // AggregateBatch aggregates common messages in the provided batch to
 // reduce the number of pairings required when we finally verify the
 // whole batch.
 func (s *SignatureBatch) AggregateBatch() (*SignatureBatch, error) {
-	if len(s.Signatures) != len(s.PublicKeys) || len(s.Signatures) != len(s.Messages) || len(s.Signatures) != len(s.Descriptions) {
-		return s, errors.Errorf("mismatch number of signatures, publickeys, messages and descriptions in signature batch. "+
-			"Signatures %d, Public Keys %d , Messages %d, Descriptions %d", len(s.Signatures), len(s.PublicKeys), len(s.Messages), len(s.Descriptions))
-	}
-	if len(s.Signatures) == 0 {
-		return s, nil
-	}
-	msgMap := make(map[[32]byte]*SignatureBatch)
+	/*
+		if len(s.Signatures) != len(s.PublicKeys) || len(s.Signatures) != len(s.Messages) || len(s.Signatures) != len(s.Descriptions) {
+			return s, errors.Errorf("mismatch number of signatures, publickeys, messages and descriptions in signature batch. "+
+				"Signatures %d, Public Keys %d , Messages %d, Descriptions %d", len(s.Signatures), len(s.PublicKeys), len(s.Messages), len(s.Descriptions))
+		}
+		if len(s.Signatures) == 0 {
+			return s, nil
+		}
+		msgMap := make(map[[32]byte]*SignatureBatch)
 
-	for i := 0; i < len(s.Messages); i++ {
-		currMsg := s.Messages[i]
-		currBatch, ok := msgMap[currMsg]
-		if ok {
-			currBatch.Signatures = append(currBatch.Signatures, s.Signatures[i])
-			currBatch.Messages = append(currBatch.Messages, s.Messages[i])
-			currBatch.PublicKeys = append(currBatch.PublicKeys, s.PublicKeys[i])
-			currBatch.Descriptions = append(currBatch.Descriptions, s.Descriptions[i])
-			continue
+		for i := 0; i < len(s.Messages); i++ {
+			currMsg := s.Messages[i]
+			currBatch, ok := msgMap[currMsg]
+			if ok {
+				currBatch.Signatures = append(currBatch.Signatures, s.Signatures[i])
+				currBatch.Messages = append(currBatch.Messages, s.Messages[i])
+				currBatch.PublicKeys = append(currBatch.PublicKeys, s.PublicKeys[i])
+				currBatch.Descriptions = append(currBatch.Descriptions, s.Descriptions[i])
+				continue
+			}
+			currBatch = &SignatureBatch{
+				Signatures:   [][]byte{s.Signatures[i]},
+				Messages:     [][32]byte{s.Messages[i]},
+				PublicKeys:   [][]PublicKey{s.PublicKeys[i]},
+				Descriptions: []string{s.Descriptions[i]},
+			}
+			msgMap[currMsg] = currBatch
 		}
-		currBatch = &SignatureBatch{
-			Signatures:   [][]byte{s.Signatures[i]},
-			Messages:     [][32]byte{s.Messages[i]},
-			PublicKeys:   [][]PublicKey{s.PublicKeys[i]},
-			Descriptions: []string{s.Descriptions[i]},
+		newSt := NewSet()
+		for rt, b := range msgMap {
+			if len(b.PublicKeys) > 1 {
+				//aggPub := AggregateMultiplePubkeys(b.PublicKeys)
+				//aggSig, err := AggregateCompressedSignatures(b.Signatures)
+				//if err != nil {
+				//	return nil, err
+				//}
+				copiedRt := rt
+				//b.PublicKeys = [][]PublicKey{aggPub}
+				//b.Signatures = [][]byte{aggSig.Marshal()}
+				b.Messages = [][32]byte{copiedRt}
+				b.Descriptions = []string{AggregatedSignature}
+			}
+			newObj := *b
+			newSt = newSt.Join(&newObj)
 		}
-		msgMap[currMsg] = currBatch
-	}
-	newSt := NewSet()
-	for rt, b := range msgMap {
-		if len(b.PublicKeys) > 1 {
-			//aggPub := AggregateMultiplePubkeys(b.PublicKeys)
-			//aggSig, err := AggregateCompressedSignatures(b.Signatures)
-			//if err != nil {
-			//	return nil, err
-			//}
-			copiedRt := rt
-			//b.PublicKeys = [][]PublicKey{aggPub}
-			//b.Signatures = [][]byte{aggSig.Marshal()}
-			b.Messages = [][32]byte{copiedRt}
-			b.Descriptions = []string{AggregatedSignature}
-		}
-		newObj := *b
-		newSt = newSt.Join(&newObj)
-	}
-	return newSt, nil
+		return newSt, nil
+	*/
+	return s, nil
 }

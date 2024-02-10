@@ -21,7 +21,7 @@ func TestBeaconState_ValidatorAtIndexReadOnly_HandlesNilSlice_Capella(t *testing
 }
 
 func TestValidatorIndexes(t *testing.T) {
-	dState, _ := util.DeterministicGenesisState(t, 10)
+	dState, _ := util.DeterministicGenesisStateCapella(t, 10)
 	byteValue := dState.PubkeyAtIndex(1)
 	t.Run("ValidatorIndexByPubkey", func(t *testing.T) {
 		require.Equal(t, hexutil.Encode(byteValue[:]), "0xb89bebc699769726a318c8e9971bd3171297c61aea4a6578a7a4f94b547dcba5bac16a89108b6b6a1fe3695d1a874a0b")

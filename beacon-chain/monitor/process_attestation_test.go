@@ -17,7 +17,7 @@ import (
 
 func TestGetAttestingIndices(t *testing.T) {
 	ctx := context.Background()
-	beaconState, _ := util.DeterministicGenesisState(t, 256)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 256)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
 			Slot:           1,

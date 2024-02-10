@@ -168,7 +168,7 @@ func TestProcessProposedBlock(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			hook := logTest.NewGlobal()
 			s := setupService(t)
-			beaconState, _ := util.DeterministicGenesisState(t, 256)
+			beaconState, _ := util.DeterministicGenesisStateCapella(t, 256)
 			var root [32]byte
 			copy(root[:], "hello-world")
 			wb, err := blocks.NewBeaconBlock(tt.block)

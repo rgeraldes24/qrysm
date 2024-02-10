@@ -52,7 +52,7 @@ func TestService_getHeadStateAndBlock(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.BeaconDB.SaveBlock(context.Background(), blk))
 
-	st, _ := util.DeterministicGenesisState(t, 1)
+	st, _ := util.DeterministicGenesisStateCapella(t, 1)
 	r, err := blk.Block().HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.BeaconDB.SaveState(context.Background(), st, r))
@@ -101,7 +101,7 @@ func TestService_forkchoiceUpdateWithExecution_exceptionalCases(t *testing.T) {
 	r1, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, service.saveInitSyncBlock(ctx, r1, wsb))
-	st, _ := util.DeterministicGenesisState(t, 1)
+	st, _ := util.DeterministicGenesisStateCapella(t, 1)
 	service.head = &head{
 		root:  r1,
 		block: wsb,
@@ -119,7 +119,7 @@ func TestService_forkchoiceUpdateWithExecution_exceptionalCases(t *testing.T) {
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b)
 	r1, err = b.Block.HashTreeRoot()
 	require.NoError(t, err)
-	st, _ = util.DeterministicGenesisState(t, 1)
+	st, _ = util.DeterministicGenesisStateCapella(t, 1)
 	service.head = &head{
 		root:  r1,
 		block: wsb,
@@ -152,7 +152,7 @@ func TestService_forkchoiceUpdateWithExecution_SameHeadRootNewProposer(t *testin
 	bellatrixBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
 	bellatrixBlkRoot, err := bellatrixBlk.Block().HashTreeRoot()
 	require.NoError(t, err)
-	st, _ := util.DeterministicGenesisState(t, 10)
+	st, _ := util.DeterministicGenesisStateCapella(t, 10)
 	service.head = &head{
 		state: st,
 	}

@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/container/trie"
-	"github.com/theQRL/qrysm/v4/crypto/bls"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -1261,7 +1261,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 }
 
 func createStateSetupCapella(t *testing.T, head primitives.Epoch) (state.BeaconState,
-	state.BeaconState, []bls.SecretKey) {
+	state.BeaconState, []dilithium.DilithiumKey) {
 	gs, keys := util.DeterministicGenesisStateCapella(t, 64)
 	hs := gs.Copy()
 

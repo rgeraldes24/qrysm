@@ -20,7 +20,7 @@ func TestMigrateToCold_CanSaveFinalizedInfo(t *testing.T) {
 	ctx := context.Background()
 	beaconDB := testDB.SetupDB(t)
 	service := New(beaconDB, doublylinkedtree.New())
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	b := util.NewBeaconBlockCapella()
 	b.Block.Slot = 1
 	br, err := b.Block.HashTreeRoot()
@@ -46,7 +46,7 @@ func TestMigrateToCold_HappyPath(t *testing.T) {
 
 	service := New(beaconDB, doublylinkedtree.New())
 	service.slotsPerArchivedPoint = 1
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	stateSlot := primitives.Slot(1)
 	require.NoError(t, beaconState.SetSlot(stateSlot))
 	b := util.NewBeaconBlockCapella()
@@ -76,7 +76,7 @@ func TestMigrateToCold_RegeneratePath(t *testing.T) {
 
 	service := New(beaconDB, doublylinkedtree.New())
 	service.slotsPerArchivedPoint = 1
-	beaconState, pks := util.DeterministicGenesisState(t, 32)
+	beaconState, pks := util.DeterministicGenesisStateCapella(t, 32)
 	genesisStateRoot, err := beaconState.HashTreeRoot(ctx)
 	require.NoError(t, err)
 	genesis := blocks.NewGenesisBlock(genesisStateRoot[:])
@@ -126,7 +126,7 @@ func TestMigrateToCold_StateExistsInDB(t *testing.T) {
 
 	service := New(beaconDB, doublylinkedtree.New())
 	service.slotsPerArchivedPoint = 1
-	beaconState, _ := util.DeterministicGenesisState(t, 32)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 	stateSlot := primitives.Slot(1)
 	require.NoError(t, beaconState.SetSlot(stateSlot))
 	b := util.NewBeaconBlockCapella()
@@ -150,7 +150,7 @@ func TestMigrateToCold_ParallelCalls(t *testing.T) {
 
 	service := New(beaconDB, doublylinkedtree.New())
 	service.slotsPerArchivedPoint = 1
-	beaconState, pks := util.DeterministicGenesisState(t, 32)
+	beaconState, pks := util.DeterministicGenesisStateCapella(t, 32)
 	genState := beaconState.Copy()
 	genesisStateRoot, err := beaconState.HashTreeRoot(ctx)
 	require.NoError(t, err)

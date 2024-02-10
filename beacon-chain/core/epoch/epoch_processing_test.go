@@ -428,7 +428,7 @@ func TestProcessHistoricalDataUpdate(t *testing.T) {
 		{
 			name: "no change",
 			st: func() state.BeaconState {
-				st, _ := util.DeterministicGenesisState(t, 1)
+				st, _ := util.DeterministicGenesisStateCapella(t, 1)
 				return st
 			},
 			verifier: func(st state.BeaconState) {
@@ -440,7 +440,7 @@ func TestProcessHistoricalDataUpdate(t *testing.T) {
 		{
 			name: "before capella can process and get historical root",
 			st: func() state.BeaconState {
-				st, _ := util.DeterministicGenesisState(t, 1)
+				st, _ := util.DeterministicGenesisStateCapella(t, 1)
 				st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerHistoricalRoot-1)
 				require.NoError(t, err)
 				return st
