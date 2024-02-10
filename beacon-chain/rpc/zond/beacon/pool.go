@@ -15,7 +15,6 @@ import (
 	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -172,9 +171,7 @@ func (bs *Server) SubmitSignedDilithiumToExecutionChanges(ctx context.Context, r
 			},
 		})
 		bs.DilithiumChangesPool.InsertDilithiumToExecChange(alphaChange)
-		if st.Version() >= version.Capella {
-			toBroadcast = append(toBroadcast, alphaChange)
-		}
+		toBroadcast = append(toBroadcast, alphaChange)
 	}
 	go bs.broadcastDilithiumChanges(ctx, toBroadcast)
 	if len(failures) > 0 {

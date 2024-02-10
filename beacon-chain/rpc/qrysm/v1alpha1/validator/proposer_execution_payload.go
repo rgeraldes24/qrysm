@@ -43,10 +43,6 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.getLocalPayload")
 	defer span.End()
 
-	if blk.Version() < version.Bellatrix {
-		return nil, false, nil
-	}
-
 	slot := blk.Slot()
 	vIdx := blk.ProposerIndex()
 	headRoot := blk.ParentRoot()

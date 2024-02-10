@@ -121,18 +121,16 @@ func logPayload(block interfaces.ReadOnlyBeaconBlock) error {
 		"blockNumber": payload.BlockNumber(),
 		"gasUtilized": fmt.Sprintf("%.2f", gasUtilized),
 	}
-	if block.Version() >= version.Capella {
-		withdrawals, err := payload.Withdrawals()
-		if err != nil {
-			return errors.Wrap(err, "could not get withdrawals")
-		}
-		fields["withdrawals"] = len(withdrawals)
-		changes, err := block.Body().DilithiumToExecutionChanges()
-		if err != nil {
-			return errors.Wrap(err, "could not get DilithiumToExecutionChanges")
-		}
-		fields["dilithiumToExecutionChanges"] = len(changes)
+	withdrawals, err := payload.Withdrawals()
+	if err != nil {
+		return errors.Wrap(err, "could not get withdrawals")
 	}
+	fields["withdrawals"] = len(withdrawals)
+	changes, err := block.Body().DilithiumToExecutionChanges()
+	if err != nil {
+		return errors.Wrap(err, "could not get DilithiumToExecutionChanges")
+	}
+	fields["dilithiumToExecutionChanges"] = len(changes)
 	log.WithFields(fields).Debug("Synced new payload")
 	return nil
 }

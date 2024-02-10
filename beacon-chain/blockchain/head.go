@@ -20,7 +20,6 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/math"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
 )
@@ -428,14 +427,12 @@ func (s *Service) saveOrphanedOperations(ctx context.Context, orphanedRoot [32]b
 		for _, v := range orphanedBlk.Block().Body().VoluntaryExits() {
 			s.cfg.ExitPool.InsertVoluntaryExit(v)
 		}
-		if orphanedBlk.Version() >= version.Capella {
-			changes, err := orphanedBlk.Block().Body().DilithiumToExecutionChanges()
-			if err != nil {
-				return errors.Wrap(err, "could not get DilithiumToExecutionChanges")
-			}
-			for _, c := range changes {
-				s.cfg.DilithiumToExecPool.InsertDilithiumToExecChange(c)
-			}
+		changes, err := orphanedBlk.Block().Body().DilithiumToExecutionChanges()
+		if err != nil {
+			return errors.Wrap(err, "could not get DilithiumToExecutionChanges")
+		}
+		for _, c := range changes {
+			s.cfg.DilithiumToExecPool.InsertDilithiumToExecChange(c)
 		}
 		parentRoot := orphanedBlk.Block().ParentRoot()
 		orphanedRoot = bytesutil.ToBytes32(parentRoot[:])

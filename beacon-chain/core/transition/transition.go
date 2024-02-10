@@ -20,7 +20,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/math"
 	"github.com/theQRL/qrysm/v4/monitoring/tracing"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"go.opencensus.io/trace"
 )
 
@@ -244,14 +243,10 @@ func ProcessSlots(ctx context.Context, state state.BeaconState, slot primitives.
 			return nil, errors.Wrap(err, "could not process slot")
 		}
 		if time.CanProcessEpoch(state) {
-			if state.Version() == version.Capella {
-				state, err = altair.ProcessEpoch(ctx, state)
-				if err != nil {
-					tracing.AnnotateError(span, err)
-					return nil, errors.Wrap(err, "could not process epoch")
-				}
-			} else {
-				return nil, errors.New("beacon state should have a version")
+			state, err = altair.ProcessEpoch(ctx, state)
+			if err != nil {
+				tracing.AnnotateError(span, err)
+				return nil, errors.Wrap(err, "could not process epoch")
 			}
 		}
 		if err := state.SetSlot(state.Slot() + 1); err != nil {

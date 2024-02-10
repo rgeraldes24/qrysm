@@ -88,7 +88,7 @@ func (b *SignedBeaconBlock) PbGenericBlock() (*zond.GenericSignedBeaconBlock, er
 
 // PbCapellaBlock returns the underlying protobuf object.
 func (b *SignedBeaconBlock) PbCapellaBlock() (*zond.SignedBeaconBlockCapella, error) {
-	if b.version != version.Capella || b.IsBlinded() {
+	if b.IsBlinded() {
 		return nil, consensus_types.ErrNotSupported("PbCapellaBlock", b.version)
 	}
 	pb, err := b.Proto()
@@ -100,7 +100,7 @@ func (b *SignedBeaconBlock) PbCapellaBlock() (*zond.SignedBeaconBlockCapella, er
 
 // PbBlindedCapellaBlock returns the underlying protobuf object.
 func (b *SignedBeaconBlock) PbBlindedCapellaBlock() (*zond.SignedBlindedBeaconBlockCapella, error) {
-	if b.version != version.Capella || !b.IsBlinded() {
+	if !b.IsBlinded() {
 		return nil, consensus_types.ErrNotSupported("PbBlindedCapellaBlock", b.version)
 	}
 	pb, err := b.Proto()
@@ -578,9 +578,6 @@ func (b *BeaconBlockBody) Execution() (interfaces.ExecutionData, error) {
 }
 
 func (b *BeaconBlockBody) DilithiumToExecutionChanges() ([]*zond.SignedDilithiumToExecutionChange, error) {
-	if b.version < version.Capella {
-		return nil, consensus_types.ErrNotSupported("DilithiumToExecutionChanges", b.version)
-	}
 	return b.dilithiumToExecutionChanges, nil
 }
 

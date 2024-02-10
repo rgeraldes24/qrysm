@@ -21,7 +21,6 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"go.opencensus.io/trace"
 	"golang.org/x/sync/errgroup"
@@ -290,9 +289,6 @@ func (s *Service) prunePostBlockOperationPools(ctx context.Context, blk interfac
 }
 
 func (s *Service) markIncludedBlockDilithiumToExecChanges(headBlock interfaces.ReadOnlyBeaconBlock) error {
-	if headBlock.Version() < version.Capella {
-		return nil
-	}
 	changes, err := headBlock.Body().DilithiumToExecutionChanges()
 	if err != nil {
 		return errors.Wrap(err, "could not get DilithiumToExecutionChanges")

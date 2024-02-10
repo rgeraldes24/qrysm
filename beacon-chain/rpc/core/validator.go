@@ -24,7 +24,6 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"golang.org/x/sync/errgroup"
@@ -74,27 +73,23 @@ func (s *Service) ComputeValidatorPerformance(
 		}
 	}
 	var validatorSummary []*precompute.Validator
-	if headState.Version() == version.Capella {
-		vp, bp, err := altair.InitializePrecomputeValidators(ctx, headState)
-		if err != nil {
-			return nil, &RpcError{Err: err, Reason: Internal}
-		}
-		vp, bp, err = altair.ProcessEpochParticipation(ctx, headState, bp, vp)
-		if err != nil {
-			return nil, &RpcError{Err: err, Reason: Internal}
-		}
-		headState, vp, err = altair.ProcessInactivityScores(ctx, headState, vp)
-		if err != nil {
-			return nil, &RpcError{Err: err, Reason: Internal}
-		}
-		headState, err = altair.ProcessRewardsAndPenaltiesPrecompute(headState, bp, vp)
-		if err != nil {
-			return nil, &RpcError{Err: err, Reason: Internal}
-		}
-		validatorSummary = vp
-	} else {
-		return nil, &RpcError{Err: errors.Wrapf(err, "head state version %d not supported", headState.Version()), Reason: Internal}
+	vp, bp, err := altair.InitializePrecomputeValidators(ctx, headState)
+	if err != nil {
+		return nil, &RpcError{Err: err, Reason: Internal}
 	}
+	vp, bp, err = altair.ProcessEpochParticipation(ctx, headState, bp, vp)
+	if err != nil {
+		return nil, &RpcError{Err: err, Reason: Internal}
+	}
+	headState, vp, err = altair.ProcessInactivityScores(ctx, headState, vp)
+	if err != nil {
+		return nil, &RpcError{Err: err, Reason: Internal}
+	}
+	headState, err = altair.ProcessRewardsAndPenaltiesPrecompute(headState, bp, vp)
+	if err != nil {
+		return nil, &RpcError{Err: err, Reason: Internal}
+	}
+	validatorSummary = vp
 
 	responseCap := len(req.Indices) + len(req.PublicKeys)
 	validatorIndices := make([]primitives.ValidatorIndex, 0, responseCap)

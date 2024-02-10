@@ -19,6 +19,7 @@ func TestNextWithdrawalIndex(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, uint64(123), i)
 	})
+	// TODO(rgeraldes24)
 	t.Run("version before Capella not supported", func(t *testing.T) {
 		s := BeaconState{version: version.Bellatrix}
 		_, err := s.NextWithdrawalIndex()
@@ -33,6 +34,7 @@ func TestNextWithdrawalValidatorIndex(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, primitives.ValidatorIndex(123), i)
 	})
+	// TODO(rgeraldes24)
 	t.Run("version before Capella not supported", func(t *testing.T) {
 		s := BeaconState{version: version.Bellatrix}
 		_, err := s.NextWithdrawalValidatorIndex()

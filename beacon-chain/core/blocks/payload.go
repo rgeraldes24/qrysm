@@ -11,7 +11,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -141,11 +140,10 @@ func ValidatePayload(st state.BeaconState, payload interfaces.ExecutionData) err
 //	)
 func ProcessPayload(st state.BeaconState, payload interfaces.ExecutionData) (state.BeaconState, error) {
 	var err error
-	if st.Version() >= version.Capella {
-		st, err = ProcessWithdrawals(st, payload)
-		if err != nil {
-			return nil, errors.Wrap(err, "could not process withdrawals")
-		}
+
+	st, err = ProcessWithdrawals(st, payload)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not process withdrawals")
 	}
 	if err := ValidatePayload(st, payload); err != nil {
 		return nil, err
