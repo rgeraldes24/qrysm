@@ -2,7 +2,6 @@ package mock
 
 import (
 	ssz "github.com/prysmaticlabs/fastssz"
-	"github.com/theQRL/go-qrllib/dilithium"
 	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -23,7 +22,7 @@ func (m SignedBeaconBlock) Block() interfaces.ReadOnlyBeaconBlock {
 	return m.BeaconBlock
 }
 
-func (SignedBeaconBlock) Signature() [dilithium.CryptoBytes]byte {
+func (SignedBeaconBlock) Signature() [field_params.DilithiumSignatureLength]byte {
 	panic("implement me")
 }
 
@@ -184,7 +183,7 @@ func (BeaconBlock) Copy() (interfaces.ReadOnlyBeaconBlock, error) {
 
 type BeaconBlockBody struct{}
 
-func (BeaconBlockBody) RandaoReveal() [dilithium.CryptoBytes]byte {
+func (BeaconBlockBody) RandaoReveal() [field_params.DilithiumSignatureLength]byte {
 	panic("implement me")
 }
 

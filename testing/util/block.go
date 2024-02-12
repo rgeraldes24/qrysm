@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
@@ -278,7 +277,7 @@ func randValIndex(bState state.BeaconState) (primitives.ValidatorIndex, error) {
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateSignedBeaconHeader(h *zondpb.SignedBeaconBlockHeader) *zondpb.SignedBeaconBlockHeader {
 	if h.Signature == nil {
-		h.Signature = make([]byte, dilithium2.CryptoBytes)
+		h.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
 	}
 	h.Header = HydrateBeaconHeader(h.Header)
 	return h
@@ -306,7 +305,7 @@ func HydrateBeaconHeader(h *zondpb.BeaconBlockHeader) *zondpb.BeaconBlockHeader 
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateSignedBeaconBlockCapella(b *zondpb.SignedBeaconBlockCapella) *zondpb.SignedBeaconBlockCapella {
 	if b.Signature == nil {
-		b.Signature = make([]byte, dilithium2.CryptoBytes)
+		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
 	}
 	b.Block = HydrateBeaconBlockCapella(b.Block)
 	return b
@@ -335,7 +334,7 @@ func HydrateBeaconBlockBodyCapella(b *zondpb.BeaconBlockBodyCapella) *zondpb.Bea
 		b = &zondpb.BeaconBlockBodyCapella{}
 	}
 	if b.RandaoReveal == nil {
-		b.RandaoReveal = make([]byte, dilithium2.CryptoBytes)
+		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)
 	}
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
@@ -373,7 +372,7 @@ func HydrateBeaconBlockBodyCapella(b *zondpb.BeaconBlockBodyCapella) *zondpb.Bea
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateSignedBlindedBeaconBlockCapella(b *zondpb.SignedBlindedBeaconBlockCapella) *zondpb.SignedBlindedBeaconBlockCapella {
 	if b.Signature == nil {
-		b.Signature = make([]byte, dilithium2.CryptoBytes)
+		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
 	}
 	b.Block = HydrateBlindedBeaconBlockCapella(b.Block)
 	return b
@@ -402,7 +401,7 @@ func HydrateBlindedBeaconBlockBodyCapella(b *zondpb.BlindedBeaconBlockBodyCapell
 		b = &zondpb.BlindedBeaconBlockBodyCapella{}
 	}
 	if b.RandaoReveal == nil {
-		b.RandaoReveal = make([]byte, dilithium2.CryptoBytes)
+		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)
 	}
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)
@@ -441,7 +440,7 @@ func HydrateBlindedBeaconBlockBodyCapella(b *zondpb.BlindedBeaconBlockBodyCapell
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateV2SignedBlindedBeaconBlockCapella(b *v2.SignedBlindedBeaconBlockCapella) *v2.SignedBlindedBeaconBlockCapella {
 	if b.Signature == nil {
-		b.Signature = make([]byte, dilithium2.CryptoBytes)
+		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
 	}
 	b.Message = HydrateV2BlindedBeaconBlockCapella(b.Message)
 	return b
@@ -470,7 +469,7 @@ func HydrateV2BlindedBeaconBlockBodyCapella(b *v2.BlindedBeaconBlockBodyCapella)
 		b = &v2.BlindedBeaconBlockBodyCapella{}
 	}
 	if b.RandaoReveal == nil {
-		b.RandaoReveal = make([]byte, dilithium2.CryptoBytes)
+		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)
 	}
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)

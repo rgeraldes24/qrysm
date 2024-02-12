@@ -532,11 +532,12 @@ func sizeAndCountGeneric(genericItems interface{}, err error) (uint64, uint64) {
 			size += uint64(item.SizeSSZ())
 		}
 		count = uint64(len(items))
-	case []*zondpb.PendingAttestation:
-		for _, item := range items {
-			size += uint64(item.SizeSSZ())
-		}
-		count = uint64(len(items))
+	// TODO(rgeraldes24)
+	// case []*zondpb.PendingAttestation:
+	// 	for _, item := range items {
+	// 		size += uint64(item.SizeSSZ())
+	// 	}
+	// 	count = uint64(len(items))
 	default:
 		return 0, 0
 	}

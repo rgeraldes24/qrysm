@@ -3,8 +3,8 @@ package dilithiumt
 import (
 	"fmt"
 
-	common2 "github.com/theQRL/go-qrllib/common"
 	"github.com/theQRL/go-qrllib/dilithium"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 )
@@ -14,7 +14,7 @@ type dilithiumKey struct {
 }
 
 func RandKey() (common.SecretKey, error) {
-	var seed [common2.SeedSize]uint8
+	var seed [field_params.DilithiumSeedLength]uint8
 	_, err := rand.NewGenerator().Read(seed[:])
 	if err != nil {
 		return nil, err
@@ -27,10 +27,10 @@ func RandKey() (common.SecretKey, error) {
 }
 
 func SecretKeyFromSeed(seed []byte) (common.SecretKey, error) {
-	if len(seed) != common2.SeedSize {
-		return nil, fmt.Errorf("secret key must be %d bytes", common2.SeedSize)
+	if len(seed) != field_params.DilithiumSeedLength {
+		return nil, fmt.Errorf("secret key must be %d bytes", field_params.DilithiumSeedLength)
 	}
-	var sizedSeed [common2.SeedSize]uint8
+	var sizedSeed [field_params.DilithiumSeedLength]uint8
 	copy(sizedSeed[:], seed)
 
 	d, err := dilithium.NewDilithiumFromSeed(sizedSeed)

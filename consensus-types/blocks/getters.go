@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	ssz "github.com/prysmaticlabs/fastssz"
 	log "github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	consensus_types "github.com/theQRL/qrysm/v4/consensus-types"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -28,7 +27,7 @@ func BeaconBlockIsNil(b interfaces.ReadOnlySignedBeaconBlock) error {
 }
 
 // Signature returns the respective block signature.
-func (b *SignedBeaconBlock) Signature() [dilithium2.CryptoBytes]byte {
+func (b *SignedBeaconBlock) Signature() [field_params.DilithiumSignatureLength]byte {
 	return b.signature
 }
 
@@ -504,7 +503,7 @@ func (b *BeaconBlockBody) IsNil() bool {
 }
 
 // RandaoReveal returns the randao reveal from the block body.
-func (b *BeaconBlockBody) RandaoReveal() [dilithium2.CryptoBytes]byte {
+func (b *BeaconBlockBody) RandaoReveal() [field_params.DilithiumSignatureLength]byte {
 	return b.randaoReveal
 }
 

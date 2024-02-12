@@ -7,6 +7,7 @@ import (
 
 	pkgerrors "github.com/pkg/errors"
 	"github.com/theQRL/go-qrllib/dilithium"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 	"golang.org/x/sync/errgroup"
 )
@@ -15,14 +16,14 @@ var ErrSignatureVerificationFailed = errors.New("signature verification failed")
 
 // Signature used in the Dilithium signature scheme.
 type Signature struct {
-	s *[dilithium.CryptoBytes]uint8
+	s *[field_params.DilithiumSignatureLength]uint8
 }
 
 func SignatureFromBytes(sig []byte) (common.Signature, error) {
-	if len(sig) != dilithium.CryptoBytes {
-		return nil, fmt.Errorf("signature must be %d bytes", dilithium.CryptoBytes)
+	if len(sig) != field_params.DilithiumSignatureLength {
+		return nil, fmt.Errorf("signature must be %d bytes", field_params.DilithiumSignatureLength)
 	}
-	var signature [dilithium.CryptoBytes]uint8
+	var signature [field_params.DilithiumSignatureLength]uint8
 	copy(signature[:], sig)
 	return &Signature{s: &signature}, nil
 }
@@ -32,13 +33,13 @@ func MultipleSignaturesFromBytes(multiSigs [][]byte) ([]common.Signature, error)
 		return nil, fmt.Errorf("0 signatures provided to the method")
 	}
 	for _, s := range multiSigs {
-		if len(s) != dilithium.CryptoBytes {
-			return nil, fmt.Errorf("signature must be %d bytes", dilithium.CryptoBytes)
+		if len(s) != field_params.DilithiumSignatureLength {
+			return nil, fmt.Errorf("signature must be %d bytes", field_params.DilithiumSignatureLength)
 		}
 	}
 	wrappedSigs := make([]common.Signature, len(multiSigs))
 	for i, signature := range multiSigs {
-		var copiedSig [dilithium.CryptoBytes]uint8
+		var copiedSig [field_params.DilithiumSignatureLength]uint8
 		copy(copiedSig[:], signature)
 		wrappedSigs[i] = &Signature{s: &copiedSig}
 	}

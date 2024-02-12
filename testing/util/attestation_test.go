@@ -15,7 +15,7 @@ func TestHydrateAttestation(t *testing.T) {
 	_, err := a.HashTreeRoot()
 	require.NoError(t, err)
 	// TODO(rgeraldes24)
-	// require.DeepEqual(t, a.Signature, make([]byte, dilithium2.CryptoBytes))
+	// require.DeepEqual(t, a.Signature, make([]byte, fieldparams.DilithiumSignatureLength))
 }
 
 func TestHydrateAttestationData(t *testing.T) {
@@ -32,7 +32,7 @@ func TestHydrateV1Attestation(t *testing.T) {
 	_, err := a.HashTreeRoot()
 	require.NoError(t, err)
 	// TODO(rgeraldes24)
-	// require.DeepEqual(t, a.Signature, make([]byte, dilithium2.CryptoBytes))
+	// require.DeepEqual(t, a.Signature, make([]byte, fieldparams.DilithiumSignatureLength))
 }
 
 func TestHydrateV1AttestationData(t *testing.T) {

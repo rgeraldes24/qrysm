@@ -35,8 +35,6 @@ go_library(
         "//time:go_default_library",
         "//time/slots:go_default_library",
         "@com_github_pkg_errors//:go_default_library",
-        "@com_github_theqrl_go_qrllib//common:go_default_library",
-        "@com_github_theqrl_go_qrllib//dilithium:go_default_library",
         "@com_github_theqrl_go_zond//common:go_default_library",
         "@com_github_theqrl_go_zond//common/hexutil:go_default_library",
         "@com_github_theqrl_go_zond//core:go_default_library",

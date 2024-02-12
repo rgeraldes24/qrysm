@@ -18,7 +18,7 @@ import (
 
 // executionPayloadCapella is a convenience wrapper around a beacon block body's execution payload data structure
 // This wrapper allows us to conform to a common interface so that beacon
-// blocks for future forks can also be applied across Prysm without issues.
+// blocks for future forks can also be applied across Qrysm without issues.
 type executionPayloadCapella struct {
 	p     *enginev1.ExecutionPayloadCapella
 	value uint64
@@ -175,7 +175,7 @@ func (e executionPayloadCapella) ValueInGwei() (uint64, error) {
 
 // executionPayloadHeaderCapella is a convenience wrapper around a blinded beacon block body's execution header data structure
 // This wrapper allows us to conform to a common interface so that beacon
-// blocks for future forks can also be applied across Prysm without issues.
+// blocks for future forks can also be applied across Qrysm without issues.
 type executionPayloadHeaderCapella struct {
 	p     *enginev1.ExecutionPayloadHeaderCapella
 	value uint64

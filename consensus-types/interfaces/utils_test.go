@@ -3,10 +3,11 @@ package interfaces_test
 import (
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -64,13 +65,31 @@ func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("randao"), dilithium2.CryptoBytes),
+			RandaoReveal:      bytesutil.PadTo([]byte("randao"), field_params.DilithiumSignatureLength),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*zond.ProposerSlashing{},
 			AttesterSlashings: []*zond.AttesterSlashing{},
 			Attestations:      []*zond.Attestation{},
 			Deposits:          []*zond.Deposit{},
 			VoluntaryExits:    []*zond.SignedVoluntaryExit{},
+			SyncAggregate: &zond.SyncAggregate{
+				SyncCommitteeBits:       []byte("sb"),
+				SyncCommitteeSignatures: [][]byte{},
+			},
+			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+				ParentHash:    bytesutil.PadTo([]byte("parent root"), hashLen),
+				FeeRecipient:  bytesutil.PadTo([]byte("fee recipient"), 20),
+				StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
+				ReceiptsRoot:  bytesutil.PadTo([]byte("receipts root"), hashLen),
+				LogsBloom:     bytesutil.PadTo([]byte("state root"), 256),
+				PrevRandao:    bytesutil.PadTo([]byte("prev randao"), hashLen),
+				ExtraData:     bytesutil.PadTo([]byte("extra data"), hashLen),
+				BaseFeePerGas: bytesutil.PadTo([]byte("base fee per gas"), hashLen),
+				BlockHash:     bytesutil.PadTo([]byte("block hash"), hashLen),
+				Transactions:  make([][]byte, 0),
+				Withdrawals:   make([]*enginev1.Withdrawal, 0),
+			},
+			DilithiumToExecutionChanges: []*zond.SignedDilithiumToExecutionChange{},
 		},
 	}
 	bodyRoot, err := blk.Body.HashTreeRoot()
@@ -160,16 +179,34 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("randao"), dilithium2.CryptoBytes),
+			RandaoReveal:      bytesutil.PadTo([]byte("randao"), field_params.DilithiumSignatureLength),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*zond.ProposerSlashing{},
 			AttesterSlashings: []*zond.AttesterSlashing{},
 			Attestations:      []*zond.Attestation{},
 			Deposits:          []*zond.Deposit{},
 			VoluntaryExits:    []*zond.SignedVoluntaryExit{},
+			SyncAggregate: &zond.SyncAggregate{
+				SyncCommitteeBits:       []byte("sb"),
+				SyncCommitteeSignatures: [][]byte{},
+			},
+			ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+				ParentHash:    bytesutil.PadTo([]byte("parent root"), hashLen),
+				FeeRecipient:  bytesutil.PadTo([]byte("fee recipient"), 20),
+				StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
+				ReceiptsRoot:  bytesutil.PadTo([]byte("receipts root"), hashLen),
+				LogsBloom:     bytesutil.PadTo([]byte("state root"), 256),
+				PrevRandao:    bytesutil.PadTo([]byte("prev randao"), hashLen),
+				ExtraData:     bytesutil.PadTo([]byte("extra data"), hashLen),
+				BaseFeePerGas: bytesutil.PadTo([]byte("base fee per gas"), hashLen),
+				BlockHash:     bytesutil.PadTo([]byte("block hash"), hashLen),
+				Transactions:  make([][]byte, 0),
+				Withdrawals:   make([]*enginev1.Withdrawal, 0),
+			},
+			DilithiumToExecutionChanges: []*zond.SignedDilithiumToExecutionChange{},
 		},
 	},
-		Signature: bytesutil.PadTo([]byte("signature"), dilithium2.CryptoBytes),
+		Signature: bytesutil.PadTo([]byte("signature"), field_params.DilithiumSignatureLength),
 	}
 	bodyRoot, err := blk.Block.Body.HashTreeRoot()
 	require.NoError(t, err)

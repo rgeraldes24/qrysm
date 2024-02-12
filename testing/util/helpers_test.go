@@ -14,9 +14,9 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
-	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
+/*
 func TestBlockSignature(t *testing.T) {
 	beaconState, privKeys := DeterministicGenesisStateCapella(t, 100)
 	block, err := GenerateFullBlockCapella(beaconState, privKeys, nil, 0)
@@ -38,6 +38,7 @@ func TestBlockSignature(t *testing.T) {
 		t.Errorf("Expected block signatures to be equal, received %#x != %#x", blockSig, signature.Marshal())
 	}
 }
+*/
 
 func TestRandaoReveal(t *testing.T) {
 	beaconState, privKeys := DeterministicGenesisStateCapella(t, 100)

@@ -504,7 +504,7 @@ func executableDataToBlock(params engine.ExecutableData) (*zondTypes.Block, erro
 		GasUsed:         params.GasUsed,
 		Time:            params.Timestamp,
 		BaseFee:         params.BaseFeePerGas,
-		Extra:           []byte("prysm-builder"), // add in extra data
+		Extra:           []byte("qrysm-builder"), // add in extra data
 		MixDigest:       params.Random,
 		WithdrawalsHash: withdrawalsRoot,
 	}
