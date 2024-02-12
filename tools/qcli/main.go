@@ -38,7 +38,7 @@ func main() {
 	customFormatter.FullTimestamp = true
 	log.SetFormatter(customFormatter)
 	app := cli.App{}
-	app.Name = "pcli"
+	app.Name = "qcli"
 	app.Usage = "A command line utility to run Zond consensus specific commands"
 	app.Version = version.Version()
 	app.Commands = []*cli.Command{

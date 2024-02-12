@@ -1,14 +1,14 @@
-## Pcli (Prysm CLI)
+## Qcli (Qrysm CLI)
 
 This is a utility to help users perform Ethereum consensus specific commands.
 
 ### Usage
 
 *Name:*  
-   **pcli** - A command line utility to run Ethereum consensus specific commands
+   **qcli** - A command line utility to run Ethereum consensus specific commands
 
 *Usage:*  
-   pcli [global options] command [command options] [arguments...]
+   qcli [global options] command [command options] [arguments...]
 
 *Commands:*
      help, h  Shows a list of commands or help for one command
@@ -21,10 +21,10 @@ This is a utility to help users perform Ethereum consensus specific commands.
    --version, -v  print the version (default: false)
 
 *State Transition Subcommand:*
-   pcli state-transition - Subcommand to run manual state transitions
+   qcli state-transition - Subcommand to run manual state transitions
 
 *State Transition Usage:*:
-   pcli state-transition [command options] [arguments...]
+   qcli state-transition [command options] [arguments...]
 
 
 *State Transition Flags:*
@@ -37,9 +37,9 @@ This is a utility to help users perform Ethereum consensus specific commands.
 
 ### Example
 
-To use pcli manual state transition:
+To use qcli manual state transition:
 
 ```
-bazel run //tools/pcli:pcli -- state-transition --block-path /path/to/block.ssz --pre-state-path /path/to/state.ssz
+bazel run //tools/qcli:qcli -- state-transition --block-path /path/to/block.ssz --pre-state-path /path/to/state.ssz
 ```
 

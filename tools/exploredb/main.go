@@ -8,8 +8,6 @@
 
 package main
 
-// TODO(rgeraldes24)
-/*
 import (
 	"bytes"
 	"context"
@@ -357,10 +355,11 @@ func printStates(stateC <-chan *modifiedState, doneC chan<- bool) {
 		log.Infof("randao_mixes                  : size = %s, count = %d", humanize.Bytes(size), count)
 		size, count = sizeAndCountOfUin64List(st.Slashings())
 		log.Infof("slashings                     : size = %s, count = %d", humanize.Bytes(size), count)
-		size, count = sizeAndCountGeneric(st.PreviousEpochAttestations())
-		log.Infof("previous_epoch_attestations   : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
-		size, count = sizeAndCountGeneric(st.CurrentEpochAttestations())
-		log.Infof("current_epoch_attestations    : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
+		// TODO(rgeraldes24)
+		// size, count = sizeAndCountGeneric(st.PreviousEpochAttestations())
+		// log.Infof("previous_epoch_attestations   : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
+		// size, count = sizeAndCountGeneric(st.CurrentEpochAttestations())
+		// log.Infof("current_epoch_attestations    : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
 		justificationBits := st.JustificationBits()
 		log.Infof("justification_bits            : size =  %s, count = %d", humanize.Bytes(justificationBits.Len()), justificationBits.Count())
 		log.Infof("previous_justified_checkpoint : sizeSSZ = %s", humanize.Bytes(uint64(st.PreviousJustifiedCheckpoint().SizeSSZ())))
@@ -544,4 +543,3 @@ func sizeAndCountGeneric(genericItems interface{}, err error) (uint64, uint64) {
 
 	return size, count
 }
-*/

@@ -7,7 +7,7 @@ load("@io_bazel_rules_docker//contrib:push-all.bzl", "docker_push")
 go_library(
     name = "go_default_library",
     srcs = ["main.go"],
-    importpath = "github.com/theQRL/qrysm/v4/tools/pcli",
+    importpath = "github.com/theQRL/qrysm/v4/tools/qcli",
     visibility = ["//visibility:private"],
     deps = [
         "//beacon-chain/core/transition:go_default_library",
@@ -28,13 +28,13 @@ go_library(
 go_image(
     name = "image",
     base = "//tools:cc_image",
-    binary = ":pcli",
+    binary = ":qcli",
     tags = ["manual"],
     visibility = ["//visibility:private"],
 )
 
 go_binary(
-    name = "pcli",
+    name = "qcli",
     embed = [":go_default_library"],
     visibility = ["//visibility:public"],
 )
@@ -42,8 +42,8 @@ go_binary(
 container_bundle(
     name = "image_bundle",
     images = {
-        "gcr.io/prysmaticlabs/prysm/pcli:latest": ":image",
-        "gcr.io/prysmaticlabs/prysm/pcli:{DOCKER_TAG}": ":image",
+        "gcr.io/prysmaticlabs/prysm/qcli:latest": ":image",
+        "gcr.io/prysmaticlabs/prysm/qcli:{DOCKER_TAG}": ":image",
     },
     tags = ["manual"],
 )
