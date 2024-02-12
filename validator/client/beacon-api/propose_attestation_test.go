@@ -92,7 +92,7 @@ func TestProposeAttestation(t *testing.T) {
 			expectedErrorMessage: "attestation aggregation bits is empty",
 		},
 		{
-			name: "nil signature",
+			name: "nil signatures",
 			attestation: &zondpb.Attestation{
 				AggregationBits: test_helpers.FillByteSlice(4, 74),
 				Data: &zondpb.AttestationData{
@@ -100,7 +100,7 @@ func TestProposeAttestation(t *testing.T) {
 					Target: &zondpb.Checkpoint{},
 				},
 			},
-			expectedErrorMessage: "attestation signature is empty",
+			expectedErrorMessage: "attestation signatures is empty",
 		},
 		{
 			name:                 "bad request",

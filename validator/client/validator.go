@@ -123,37 +123,6 @@ func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
 	// 	return errors.Wrap(err, "unable to retrieve valid genesis validators root while initializing key manager")
 	// }
 
-	/*
-		if v.useWeb && v.wallet == nil {
-			log.Info("Waiting for keymanager to initialize validator client with web UI")
-			// if wallet is not set, wait for it to be set through the UI
-			km, err := waitForWebWalletInitialization(ctx, v.walletInitializedFeed, v.walletInitializedChannel)
-			if err != nil {
-				return err
-			}
-			v.keyManager = km
-		} else {
-			if v.interopKeysConfig != nil {
-				keyManager, err := local.NewInteropKeymanager(ctx, v.interopKeysConfig.Offset, v.interopKeysConfig.NumValidatorKeys)
-				if err != nil {
-					return errors.Wrap(err, "could not generate interop keys for key manager")
-				}
-				v.keyManager = keyManager
-			} else if v.wallet == nil {
-				return errors.New("wallet not set")
-			} else {
-				if v.Web3SignerConfig != nil {
-					v.Web3SignerConfig.GenesisValidatorsRoot = genesisRoot
-				}
-				keyManager, err := v.wallet.InitializeKeymanager(ctx, accountsiface.InitKeymanagerConfig{ListenForChanges: true, Web3SignerConfig: v.Web3SignerConfig})
-				if err != nil {
-					return errors.Wrap(err, "could not initialize key manager")
-				}
-				v.keyManager = keyManager
-			}
-		}
-	*/
-
 	if v.interopKeysConfig != nil {
 		keyManager, err := local.NewInteropKeymanager(ctx, v.interopKeysConfig.Offset, v.interopKeysConfig.NumValidatorKeys)
 		if err != nil {
@@ -176,33 +145,6 @@ func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
 	recheckKeys(ctx, v.db, v.keyManager)
 	return nil
 }
-
-/*
-// subscribe to channel for when the wallet is initialized
-func waitForWebWalletInitialization(
-	ctx context.Context,
-	walletInitializedEvent *event.Feed,
-	walletChan chan *wallet.Wallet,
-) (keymanager.IKeymanager, error) {
-	sub := walletInitializedEvent.Subscribe(walletChan)
-	defer sub.Unsubscribe()
-	for {
-		select {
-		case w := <-walletChan:
-			keyManager, err := w.InitializeKeymanager(ctx, accountsiface.InitKeymanagerConfig{ListenForChanges: true})
-			if err != nil {
-				return nil, errors.Wrap(err, "could not read keymanager")
-			}
-			return keyManager, nil
-		case <-ctx.Done():
-			return nil, errors.New("context canceled")
-		case <-sub.Err():
-			log.Error("Subscriber closed, exiting goroutine")
-			return nil, nil
-		}
-	}
-}
-*/
 
 // recheckKeys checks if the validator has any keys that need to be rechecked.
 // the keymanager implements a subscription to push these updates to the validator.
