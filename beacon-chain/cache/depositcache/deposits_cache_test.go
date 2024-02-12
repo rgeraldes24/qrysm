@@ -9,6 +9,7 @@ import (
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -378,9 +379,9 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 0,
@@ -388,9 +389,9 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 1,
@@ -398,9 +399,9 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{2}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 2,
@@ -409,9 +410,9 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 	dc.deposits = append(finalizedDeposits, &zondpb.DepositContainer{
 		Deposit: &zondpb.Deposit{
 			Data: &zondpb.Deposit_Data{
-				PublicKey:             bytesutil.PadTo([]byte{3}, 48),
+				PublicKey:             bytesutil.PadTo([]byte{3}, field_params.DilithiumPubkeyLength),
 				WithdrawalCredentials: make([]byte, 32),
-				Signature:             make([]byte, 96),
+				Signature:             make([]byte, field_params.DilithiumSignatureLength),
 			},
 		},
 		Index: 3,

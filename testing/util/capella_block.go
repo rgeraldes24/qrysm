@@ -26,7 +26,6 @@ import (
 // GenerateFullBlockCapella generates a fully valid Capella block with the requested parameters.
 // Use BlockGenConfig to declare the conditions you would like the block generated under.
 // This function modifies the passed state as follows:
-
 func GenerateFullBlockCapella(
 	bState state.BeaconState,
 	privs []dilithium.DilithiumKey,
@@ -141,12 +140,14 @@ func GenerateFullBlockCapella(
 		syncCommitteeBits = bitfield.NewBitvector512()
 	case 32:
 		syncCommitteeBits = bitfield.NewBitvector32()
+	case 16:
+		syncCommitteeBits = bitfield.NewBitvector16()
 	default:
 		return nil, errors.New("invalid bit vector size")
 	}
 	newSyncAggregate := &zondpb.SyncAggregate{
 		SyncCommitteeBits:       syncCommitteeBits,
-		SyncCommitteeSignatures: [][]byte{append([]byte{0xC0}, make([]byte, 95)...)},
+		SyncCommitteeSignatures: [][]byte{},
 	}
 
 	newHeader := bState.LatestBlockHeader()

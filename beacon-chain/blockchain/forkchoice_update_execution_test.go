@@ -63,7 +63,10 @@ func TestService_getHeadStateAndBlock(t *testing.T) {
 
 	gotBlk, err := service.cfg.BeaconDB.Block(context.Background(), r)
 	require.NoError(t, err)
-	require.DeepEqual(t, blk, gotBlk)
+
+	blindedBlk, err := blk.ToBlinded()
+	require.NoError(t, err)
+	require.DeepEqual(t, blindedBlk, gotBlk)
 }
 
 func TestService_forkchoiceUpdateWithExecution_exceptionalCases(t *testing.T) {

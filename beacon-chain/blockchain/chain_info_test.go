@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -349,7 +349,7 @@ func TestService_HeadPublicKeyToValidatorIndex(t *testing.T) {
 	c := &Service{}
 	c.head = &head{state: s}
 
-	_, e := c.HeadPublicKeyToValidatorIndex([dilithium2.CryptoPublicKeyBytes]byte{})
+	_, e := c.HeadPublicKeyToValidatorIndex([field_params.DilithiumPubkeyLength]byte{})
 	require.Equal(t, false, e)
 
 	v, err := s.ValidatorAtIndex(0)
@@ -364,12 +364,12 @@ func TestService_HeadPublicKeyToValidatorIndexNil(t *testing.T) {
 	c := &Service{}
 	c.head = nil
 
-	idx, e := c.HeadPublicKeyToValidatorIndex([dilithium2.CryptoPublicKeyBytes]byte{})
+	idx, e := c.HeadPublicKeyToValidatorIndex([field_params.DilithiumPubkeyLength]byte{})
 	require.Equal(t, false, e)
 	require.Equal(t, primitives.ValidatorIndex(0), idx)
 
 	c.head = &head{state: nil}
-	i, e := c.HeadPublicKeyToValidatorIndex([dilithium2.CryptoPublicKeyBytes]byte{})
+	i, e := c.HeadPublicKeyToValidatorIndex([field_params.DilithiumPubkeyLength]byte{})
 	require.Equal(t, false, e)
 	require.Equal(t, primitives.ValidatorIndex(0), i)
 }
@@ -385,7 +385,7 @@ func TestService_HeadValidatorIndexToPublicKey(t *testing.T) {
 	v, err := s.ValidatorAtIndex(0)
 	require.NoError(t, err)
 
-	require.Equal(t, bytesutil.ToBytes48(v.PublicKey), p)
+	require.Equal(t, bytesutil.ToBytes2592(v.PublicKey), p)
 }
 
 func TestService_HeadValidatorIndexToPublicKeyNil(t *testing.T) {
@@ -394,12 +394,12 @@ func TestService_HeadValidatorIndexToPublicKeyNil(t *testing.T) {
 
 	p, err := c.HeadValidatorIndexToPublicKey(context.Background(), 0)
 	require.NoError(t, err)
-	require.Equal(t, [dilithium2.CryptoPublicKeyBytes]byte{}, p)
+	require.Equal(t, [field_params.DilithiumPubkeyLength]byte{}, p)
 
 	c.head = &head{state: nil}
 	p, err = c.HeadValidatorIndexToPublicKey(context.Background(), 0)
 	require.NoError(t, err)
-	require.Equal(t, [dilithium2.CryptoPublicKeyBytes]byte{}, p)
+	require.Equal(t, [field_params.DilithiumPubkeyLength]byte{}, p)
 }
 
 func TestService_IsOptimistic(t *testing.T) {
@@ -426,17 +426,6 @@ func TestService_IsOptimistic(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, true, opt)
 }
-
-// TODO(rgeraldes24)
-/*
-func TestService_IsOptimisticBeforeBellatrix(t *testing.T) {
-	ctx := context.Background()
-	c := &Service{genesisTime: time.Now()}
-	opt, err := c.IsOptimistic(ctx)
-	require.NoError(t, err)
-	require.Equal(t, false, opt)
-}
-*/
 
 func TestService_IsOptimisticForRoot(t *testing.T) {
 	ctx := context.Background()

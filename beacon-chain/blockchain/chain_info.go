@@ -336,6 +336,11 @@ func (s *Service) HeadValidatorIndexToPublicKey(_ context.Context, index primiti
 // IsOptimistic returns true if the current head is optimistic.
 func (s *Service) IsOptimistic(_ context.Context) (bool, error) {
 	s.headLock.RLock()
+	if s.head == nil {
+		s.headLock.RUnlock()
+		return false, nil
+	}
+
 	headRoot := s.head.root
 	headSlot := s.head.slot
 	headOptimistic := s.head.optimistic
