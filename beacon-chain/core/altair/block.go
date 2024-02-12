@@ -61,7 +61,7 @@ func ProcessSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb
 }
 
 // processSyncAggregate applies all the logic in the spec function `process_sync_aggregate` except
-// verifying the BLS signatures. It returns the modified beacons state, the list of validators'
+// verifying the Dilithium signatures. It returns the modified beacons state, the list of validators'
 // public keys that voted (for future signature verification) and the proposer reward for including
 // sync aggregate messages.
 func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb.SyncAggregate) (

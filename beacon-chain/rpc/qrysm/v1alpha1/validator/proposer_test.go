@@ -27,7 +27,7 @@ import (
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/voluntaryexits"
@@ -208,7 +208,7 @@ func getProposerServer(db db.HeadAccessDatabase, headState state.BeaconState, he
 		},
 		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 		BeaconDB:               db,
-		DilithiumChangesPool:   blstoexec.NewPool(),
+		DilithiumChangesPool:   dilithiumtoexec.NewPool(),
 		BlockBuilder:           &builderTest.MockBuilderService{HasConfigured: true},
 	}
 }

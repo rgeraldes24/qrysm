@@ -827,7 +827,7 @@ func (v *validator) isAggregator(ctx context.Context, committee []primitives.Val
 // it uses a modulo calculated by validator count in committee and samples randomness around it.
 //
 // Spec code:
-// def is_sync_committee_aggregator(signature: BLSSignature) -> bool:
+// def is_sync_committee_aggregator(signature: DilithiumSignature) -> bool:
 //
 //	modulo = max(1, SYNC_COMMITTEE_SIZE // SYNC_COMMITTEE_SUBNET_COUNT // TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE)
 //	return bytes_to_uint64(hash(signature)[0:8]) % modulo == 0

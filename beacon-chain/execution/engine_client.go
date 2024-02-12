@@ -16,7 +16,6 @@ import (
 	zondRPC "github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution/types"
 	"github.com/theQRL/qrysm/v4/config/features"
-	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -25,7 +24,6 @@ import (
 	pb "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"go.opencensus.io/trace"
-	"google.golang.org/protobuf/proto"
 )
 
 var (
@@ -733,27 +731,6 @@ func tDStringToUint256(td string) (*uint256.Int, error) {
 		return nil, errors.New("total difficulty overflowed")
 	}
 	return i, nil
-}
-
-func buildEmptyExecutionPayload(v int) (proto.Message, error) {
-	switch v {
-	case version.Capella:
-		return &pb.ExecutionPayloadCapella{
-			ParentHash:    make([]byte, fieldparams.RootLength),
-			FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
-			StateRoot:     make([]byte, fieldparams.RootLength),
-			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-			LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
-			PrevRandao:    make([]byte, fieldparams.RootLength),
-			BaseFeePerGas: make([]byte, fieldparams.RootLength),
-			BlockHash:     make([]byte, fieldparams.RootLength),
-			Transactions:  make([][]byte, 0),
-			ExtraData:     make([]byte, 0),
-			Withdrawals:   make([]*pb.Withdrawal, 0),
-		}, nil
-	default:
-		return nil, errors.Wrapf(ErrUnsupportedVersion, "version=%s", version.String(v))
-	}
 }
 
 func toBlockNumArg(number *big.Int) string {

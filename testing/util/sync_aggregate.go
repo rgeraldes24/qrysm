@@ -1,5 +1,7 @@
 package util
 
+// TODO(rgeraldes24): remove? unused
+/*
 import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-bitfield"
@@ -12,6 +14,7 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
+
 
 func generateSyncAggregate(st state.BeaconState, privs []dilithium.DilithiumKey, parentRoot [32]byte) (*zondpb.SyncAggregate, error) {
 	nextSlotEpoch := slots.ToEpoch(st.Slot() + 1)
@@ -70,3 +73,4 @@ func generateSyncAggregate(st state.BeaconState, privs []dilithium.DilithiumKey,
 	}
 	return &zondpb.SyncAggregate{SyncCommitteeSignatures: sigs, SyncCommitteeBits: bVector}, nil
 }
+*/

@@ -19,7 +19,7 @@ import (
 	f "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice"
 	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/voluntaryexits"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
@@ -67,7 +67,7 @@ type config struct {
 	AttPool                 attestations.Pool
 	ExitPool                voluntaryexits.PoolManager
 	SlashingPool            slashings.PoolManager
-	DilithiumToExecPool     blstoexec.PoolManager
+	DilithiumToExecPool     dilithiumtoexec.PoolManager
 	P2p                     p2p.Broadcaster
 	MaxRoutines             int
 	StateNotifier           statefeed.Notifier

@@ -1,4 +1,4 @@
 package primitives
 
-// TODO(rgeraldes24): remove in the future(bls)
+// TODO(rgeraldes24)
 var PointAtInfinity = append([]byte{0xC0}, make([]byte, 95)...)

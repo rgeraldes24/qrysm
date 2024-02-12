@@ -24,7 +24,7 @@ func TestBeaconBlockJsonHelpers_JsonifyTransactions(t *testing.T) {
 	assert.DeepEqual(t, expectedResult, result)
 }
 
-func TestBeaconBlockJsonHelpers_JsonifyBlsToExecutionChanges(t *testing.T) {
+func TestBeaconBlockJsonHelpers_JsonifyDilithiumToExecutionChanges(t *testing.T) {
 	input := []*zondpb.SignedDilithiumToExecutionChange{
 		{
 			Message: &zondpb.DilithiumToExecutionChange{

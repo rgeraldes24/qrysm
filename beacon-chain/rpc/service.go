@@ -26,7 +26,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/voluntaryexits"
@@ -108,7 +108,7 @@ type Config struct {
 	SlashingsPool                 slashings.PoolManager
 	SlashingChecker               slasherservice.SlashingChecker
 	SyncCommitteeObjectPool       synccommittee.Pool
-	DilithiumChangesPool          blstoexec.PoolManager
+	DilithiumChangesPool          dilithiumtoexec.PoolManager
 	SyncService                   chainSync.Checker
 	Broadcaster                   p2p.Broadcaster
 	PeersFetcher                  p2p.PeersProvider

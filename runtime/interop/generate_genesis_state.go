@@ -57,7 +57,7 @@ func generateDepositsFromData(depositDataItems []*zondpb.Deposit_Data, offset in
 	return deposits, nil
 }
 
-// DepositDataFromKeys generates a list of deposit data items from a set of BLS validator keys.
+// DepositDataFromKeys generates a list of deposit data items from a set of Dilithium validator keys.
 func DepositDataFromKeys(privKeys []dilithium.DilithiumKey, pubKeys []dilithium.PublicKey) ([]*zondpb.Deposit_Data, [][]byte, error) {
 	type depositData struct {
 		items []*zondpb.Deposit_Data
@@ -83,7 +83,7 @@ func DepositDataFromKeys(privKeys []dilithium.DilithiumKey, pubKeys []dilithium.
 	return depositDataItems, depositDataRoots, nil
 }
 
-// DepositDataFromKeysWithExecCreds generates a list of deposit data items from a set of BLS validator keys.
+// DepositDataFromKeysWithExecCreds generates a list of deposit data items from a set of Dilithium validator keys.
 func DepositDataFromKeysWithExecCreds(privKeys []dilithium.DilithiumKey, pubKeys []dilithium.PublicKey, numOfCreds uint64) ([]*zondpb.Deposit_Data, [][]byte, error) {
 	return depositDataFromKeys(privKeys, pubKeys, numOfCreds)
 }
@@ -107,7 +107,7 @@ func depositDataFromKeys(privKeys []dilithium.DilithiumKey, pubKeys []dilithium.
 	return depositDataItems, dataRoots, nil
 }
 
-// Generates a deposit data item from BLS keys and signs the hash tree root of the data.
+// Generates a deposit data item from Dilithium keys and signs the hash tree root of the data.
 func createDepositData(privKey dilithium.DilithiumKey, pubKey dilithium.PublicKey, withExecCreds bool) (*zondpb.Deposit_Data, error) {
 	depositMessage := &zondpb.DepositMessage{
 		PublicKey:             pubKey.Marshal(),
@@ -146,7 +146,7 @@ func createDepositData(privKey dilithium.DilithiumKey, pubKey dilithium.PublicKe
 //
 // The specification is as follows:
 //
-//	withdrawal_credentials[:1] == BLS_WITHDRAWAL_PREFIX_BYTE
+//	withdrawal_credentials[:1] == DILITHIUM_WITHDRAWAL_PREFIX_BYTE
 //	withdrawal_credentials[1:] == hash(withdrawal_pubkey)[1:]
 //
 // where withdrawal_credentials is of type bytes32.

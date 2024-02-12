@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	testingdb "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
-	"github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/encoder"
 	mockp2p "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
@@ -113,7 +113,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithInitialSync(&mockSync.Sync{IsSyncing: false}),
 				WithChainService(chainService),
 				WithOperationNotifier(chainService.OperationNotifier()),
-				WithDilithiumToExecPool(blstoexec.NewPool()),
+				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
@@ -150,7 +150,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithInitialSync(&mockSync.Sync{IsSyncing: false}),
 				WithChainService(chainService),
 				WithOperationNotifier(chainService.OperationNotifier()),
-				WithDilithiumToExecPool(blstoexec.NewPool()),
+				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot*10)), [32]byte{'A'}),
 			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
@@ -194,7 +194,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithInitialSync(&mockSync.Sync{IsSyncing: false}),
 				WithChainService(chainService),
 				WithOperationNotifier(chainService.OperationNotifier()),
-				WithDilithiumToExecPool(blstoexec.NewPool()),
+				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Duration(10)), [32]byte{'A'}),
 			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
@@ -229,7 +229,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithInitialSync(&mockSync.Sync{IsSyncing: false}),
 				WithChainService(chainService),
 				WithOperationNotifier(chainService.OperationNotifier()),
-				WithDilithiumToExecPool(blstoexec.NewPool()),
+				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Duration(10)), [32]byte{'A'}),
 			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
@@ -267,7 +267,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithInitialSync(&mockSync.Sync{IsSyncing: false}),
 				WithChainService(chainService),
 				WithOperationNotifier(chainService.OperationNotifier()),
-				WithDilithiumToExecPool(blstoexec.NewPool()),
+				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Duration(10)), [32]byte{'A'}),
 			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
@@ -312,7 +312,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithInitialSync(&mockSync.Sync{IsSyncing: false}),
 				WithChainService(chainService),
 				WithOperationNotifier(chainService.OperationNotifier()),
-				WithDilithiumToExecPool(blstoexec.NewPool()),
+				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Duration(10)), [32]byte{'A'}),
 			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
@@ -353,7 +353,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithInitialSync(&mockSync.Sync{IsSyncing: false}),
 				WithChainService(chainService),
 				WithOperationNotifier(chainService.OperationNotifier()),
-				WithDilithiumToExecPool(blstoexec.NewPool()),
+				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Duration(10)), [32]byte{'A'}),
 			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {

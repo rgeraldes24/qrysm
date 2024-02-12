@@ -7,7 +7,7 @@ import (
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
-// Domain returns the domain version for BLS private key to sign and verify.
+// Domain returns the domain version for Dilithium private key to sign and verify.
 //
 // Spec pseudocode definition:
 //

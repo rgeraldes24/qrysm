@@ -25,7 +25,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/voluntaryexits"
@@ -77,7 +77,7 @@ type config struct {
 	exitPool                      voluntaryexits.PoolManager
 	slashingPool                  slashings.PoolManager
 	syncCommsPool                 synccommittee.Pool
-	dilithiumToExecPool           blstoexec.PoolManager
+	dilithiumToExecPool           dilithiumtoexec.PoolManager
 	chain                         blockchainService
 	initialSync                   Checker
 	blockNotifier                 blockfeed.Notifier

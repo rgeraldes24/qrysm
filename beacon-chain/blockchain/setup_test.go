@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/forkchoice"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
@@ -66,7 +66,7 @@ type testServiceRequirements struct {
 	cs            *startup.ClockSynchronizer
 	attPool       attestations.Pool
 	attSrv        *attestations.Service
-	dilithiumPool *blstoexec.Pool
+	dilithiumPool *dilithiumtoexec.Pool
 	dc            *depositcache.DepositCache
 }
 
@@ -81,7 +81,7 @@ func minimalTestService(t *testing.T, opts ...Option) (*Service, *testServiceReq
 	attPool := attestations.NewPool()
 	attSrv, err := attestations.NewService(ctx, &attestations.Config{Pool: attPool})
 	require.NoError(t, err)
-	dilithiumPool := blstoexec.NewPool()
+	dilithiumPool := dilithiumtoexec.NewPool()
 	dc, err := depositcache.New()
 	require.NoError(t, err)
 	req := &testServiceRequirements{

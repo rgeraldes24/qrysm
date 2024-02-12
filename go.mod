@@ -10,7 +10,7 @@ require (
 	github.com/crate-crypto/go-kzg-4844 v0.3.0 // indirect
 	github.com/d4l3k/messagediff v1.2.1
 	github.com/dgraph-io/ristretto v0.0.4-0.20210318174700-74754f61e018
-	github.com/dustin/go-humanize v1.0.0
+	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/emicklei/dot v0.11.0
 	github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5
 	github.com/fsnotify/fsnotify v1.6.0
@@ -62,9 +62,9 @@ require (
 	github.com/rs/cors v1.7.0
 	github.com/schollz/progressbar/v3 v3.3.4
 	github.com/sirupsen/logrus v1.9.0
-	github.com/status-im/keycard-go v0.2.0
+	github.com/status-im/keycard-go v0.2.0 // indirect
 	github.com/stretchr/testify v1.8.4
-	github.com/supranational/blst v0.3.11
+	github.com/supranational/blst v0.3.11 // indirect
 	github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63
 	github.com/theQRL/go-qrllib v0.0.0-20230406170304-b7eb19c367e1
 	github.com/theQRL/go-zond v0.0.0-20240121131316-e347fd2f1f3d

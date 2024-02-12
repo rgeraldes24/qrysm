@@ -13,7 +13,7 @@ import (
 
 var ErrSignatureVerificationFailed = errors.New("signature verification failed")
 
-// Signature used in the BLS signature scheme.
+// Signature used in the Dilithium signature scheme.
 type Signature struct {
 	s *[dilithium.CryptoBytes]uint8
 }

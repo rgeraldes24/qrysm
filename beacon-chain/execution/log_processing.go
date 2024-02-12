@@ -14,7 +14,6 @@ import (
 	"github.com/theQRL/go-zond/common"
 	gzondtypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositsnapshot"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution/types"
 	statenative "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/features"
@@ -183,12 +182,6 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gzondtypes.
 	}
 
 	return nil
-}
-
-// createGenesisTime adds in the genesis delay to the eth1 block time
-// on which it was triggered.
-func createGenesisTime(timeStamp uint64) uint64 {
-	return timeStamp + params.BeaconConfig().GenesisDelay
 }
 
 // processPastLogs processes all the past logs from the deposit contract and
@@ -365,35 +358,6 @@ func (s *Service) requestBatchedHeadersAndLogs(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-func (s *Service) retrieveBlockHashAndTime(ctx context.Context, blkNum *big.Int) ([32]byte, uint64, error) {
-	bHash, err := s.BlockHashByHeight(ctx, blkNum)
-	if err != nil {
-		return [32]byte{}, 0, errors.Wrap(err, "could not get eth1 block hash")
-	}
-	if bHash == [32]byte{} {
-		return [32]byte{}, 0, errors.Wrap(err, "got empty block hash")
-	}
-	timeStamp, err := s.BlockTimeByHeight(ctx, blkNum)
-	if err != nil {
-		return [32]byte{}, 0, errors.Wrap(err, "could not get block timestamp")
-	}
-	return bHash, timeStamp, nil
-}
-
-// retrieves the current active validator count and genesis time from
-// the provided block time.
-func (s *Service) currentCountAndTime(ctx context.Context, blockTime uint64) (uint64, uint64) {
-	if s.preGenesisState.NumValidators() == 0 {
-		return 0, 0
-	}
-	valCount, err := helpers.ActiveValidatorCount(ctx, s.preGenesisState, 0)
-	if err != nil {
-		log.WithError(err).Error("Could not determine active validator count from pre genesis state")
-		return 0, 0
-	}
-	return valCount, createGenesisTime(blockTime)
 }
 
 // savePowchainData saves all powchain related metadata to disk.

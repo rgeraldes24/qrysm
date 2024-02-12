@@ -1,4 +1,4 @@
-package blstoexec
+package dilithiumtoexec
 
 import (
 	"testing"

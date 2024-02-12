@@ -139,7 +139,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	MaxDilithiumToExecutionChanges:   16,
 	MaxValidatorsPerWithdrawalsSweep: 16384,
 
-	// BLS domain values.
+	// Dilithium domain values.
 	DomainBeaconProposer:              bytesutil.Uint32ToBytes4(0x00000000),
 	DomainBeaconAttester:              bytesutil.Uint32ToBytes4(0x01000000),
 	DomainRandao:                      bytesutil.Uint32ToBytes4(0x02000000),

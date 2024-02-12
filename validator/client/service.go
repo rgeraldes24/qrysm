@@ -294,6 +294,7 @@ func ConstructDialOptions(
 		}
 		transportSecurity = grpc.WithTransportCredentials(creds)
 	} else {
+		// TODO(rgeraldes24): link
 		transportSecurity = grpc.WithInsecure()
 		log.Warn("You are using an insecure gRPC connection. If you are running your beacon node and " +
 			"validator on the same machines, you can ignore this message. If you want to know " +

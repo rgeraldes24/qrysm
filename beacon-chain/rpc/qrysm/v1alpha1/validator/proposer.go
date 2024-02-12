@@ -157,7 +157,7 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 		// Set sync aggregate.
 		vs.setSyncAggregate(ctx, sBlk)
 
-		// Set bls to execution change.
+		// Set dilithium to execution change.
 		vs.setDilithiumToExecData(sBlk, head)
 	}()
 

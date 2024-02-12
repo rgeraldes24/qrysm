@@ -40,7 +40,7 @@ func SecretKeyFromSeed(seed []byte) (common.SecretKey, error) {
 	return &dilithiumKey{d: d}, nil
 }
 
-// PublicKey obtains the public key corresponding to the BLS secret key.
+// PublicKey obtains the public key corresponding to the Dilithium secret key.
 func (d *dilithiumKey) PublicKey() common.PublicKey {
 	p := d.d.GetPK()
 	return &PublicKey{p: &p}

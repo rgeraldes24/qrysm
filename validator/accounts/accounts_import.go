@@ -204,7 +204,7 @@ func ImportAccounts(ctx context.Context, cfg *ImportAccountsConfig) ([]*zondpbse
 }
 
 // Imports a one-off file containing a private key as a hex string into
-// the Prysm validator's accounts.
+// the Qrysm validator's accounts.
 func importPrivateKeyAsAccount(ctx context.Context, wallet *wallet.Wallet, importer keymanager.Importer, privKeyFile string) error {
 	fullPath, err := file.ExpandPath(privKeyFile)
 	if err != nil {

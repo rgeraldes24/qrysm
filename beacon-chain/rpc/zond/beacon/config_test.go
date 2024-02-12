@@ -178,7 +178,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "0x"+hex.EncodeToString([]byte("GenesisForkVersion")), v)
 		case "MIN_ANCHOR_POW_BLOCK_DIFFICULTY":
 			assert.Equal(t, "1000", v)
-		case "BLS_WITHDRAWAL_PREFIX":
+		case "DILITHIUM_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x62", v)
 		case "ETH1_ADDRESS_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x63", v)
@@ -302,7 +302,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "0x08000000", v)
 		case "DOMAIN_CONTRIBUTION_AND_PROOF":
 			assert.Equal(t, "0x09000000", v)
-		case "DOMAIN_BLS_TO_EXECUTION_CHANGE":
+		case "DOMAIN_DILITHIUM_TO_EXECUTION_CHANGE":
 			assert.Equal(t, "0x0a000000", v)
 		case "DOMAIN_APPLICATION_BUILDER":
 			assert.Equal(t, "0x00000001", v)
@@ -328,7 +328,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "3", v)
 		case "MAX_WITHDRAWALS_PER_PAYLOAD":
 			assert.Equal(t, "74", v)
-		case "MAX_BLS_TO_EXECUTION_CHANGES":
+		case "MAX_DILITHIUM_TO_EXECUTION_CHANGES":
 			assert.Equal(t, "75", v)
 		case "MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP":
 			assert.Equal(t, "76", v)

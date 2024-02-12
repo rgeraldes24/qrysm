@@ -208,7 +208,7 @@ func BlockSignatureBatch(pub, signature, domain []byte, rootFunc func() ([32]byt
 	}, nil
 }
 
-// ComputeDomain returns the domain version for BLS private key to sign and verify with a zeroed 4-byte
+// ComputeDomain returns the domain version for Dilithium private key to sign and verify with a zeroed 4-byte
 // array as the fork version.
 //
 // def compute_domain(domain_type: DomainType, fork_version: Version=None, genesis_validators_root: Root=None) -> Domain:
@@ -240,7 +240,7 @@ func ComputeDomain(domainType [DomainByteLength]byte, forkVersion, genesisValida
 	return domain(domainType, forkDataRoot[:]), nil
 }
 
-// This returns the bls domain given by the domain type and fork data root.
+// This returns the dilithium domain given by the domain type and fork data root.
 func domain(domainType [DomainByteLength]byte, forkDataRoot []byte) []byte {
 	var b []byte
 	b = append(b, domainType[:4]...)

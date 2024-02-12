@@ -10,8 +10,8 @@ import (
 	prysmtime "github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec"
-	blstoexecmock "github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec/mock"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
+	dilithiumtoexecmock "github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec/mock"
 	slashingsmock "github.com/theQRL/qrysm/v4/beacon-chain/operations/slashings/mock"
 	p2pMock "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
@@ -580,7 +580,7 @@ func TestListDilithiumToExecutionChanges(t *testing.T) {
 	}
 
 	s := &Server{
-		DilithiumChangesPool: &blstoexecmock.PoolMock{Changes: []*zondpbv1alpha1.SignedDilithiumToExecutionChange{change1, change2}},
+		DilithiumChangesPool: &dilithiumtoexecmock.PoolMock{Changes: []*zondpbv1alpha1.SignedDilithiumToExecutionChange{change1, change2}},
 	}
 
 	resp, err := s.ListDilithiumToExecutionChanges(context.Background(), &emptypb.Empty{})
@@ -662,7 +662,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 		AttestationsPool:     attestations.NewPool(),
 		Broadcaster:          broadcaster,
 		OperationNotifier:    &blockchainmock.MockOperationNotifier{},
-		DilithiumChangesPool: blstoexec.NewPool(),
+		DilithiumChangesPool: dilithiumtoexec.NewPool(),
 	}
 
 	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv2.SubmitDilithiumToExecutionChangesRequest{
@@ -771,7 +771,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 		AttestationsPool:     attestations.NewPool(),
 		Broadcaster:          broadcaster,
 		OperationNotifier:    &blockchainmock.MockOperationNotifier{},
-		DilithiumChangesPool: blstoexec.NewPool(),
+		DilithiumChangesPool: dilithiumtoexec.NewPool(),
 	}
 
 	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv2.SubmitDilithiumToExecutionChangesRequest{
@@ -866,7 +866,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 		AttestationsPool:     attestations.NewPool(),
 		Broadcaster:          broadcaster,
 		OperationNotifier:    &blockchainmock.MockOperationNotifier{},
-		DilithiumChangesPool: blstoexec.NewPool(),
+		DilithiumChangesPool: dilithiumtoexec.NewPool(),
 	}
 
 	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv2.SubmitDilithiumToExecutionChangesRequest{

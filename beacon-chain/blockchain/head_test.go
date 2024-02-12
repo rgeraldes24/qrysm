@@ -11,7 +11,7 @@ import (
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
-	"github.com/theQRL/qrysm/v4/beacon-chain/operations/blstoexec"
+	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -410,7 +410,7 @@ func TestSaveOrphanedAtts_CanFilter(t *testing.T) {
 	ctx := context.Background()
 	beaconDB := testDB.SetupDB(t)
 	service := setupBeaconChain(t, beaconDB)
-	service.cfg.DilithiumToExecPool = blstoexec.NewPool()
+	service.cfg.DilithiumToExecPool = dilithiumtoexec.NewPool()
 	service.genesisTime = time.Now().Add(time.Duration(-1*int64(params.BeaconConfig().SlotsPerEpoch+2)*int64(params.BeaconConfig().SecondsPerSlot)) * time.Second)
 
 	// Chain setup
