@@ -315,7 +315,7 @@ func TestMapBeaconBlockAltair(t *testing.T) {
 							{
 								Proof: [][]byte{[]byte("A")},
 								Data: &zondpb.Deposit_Data{
-									PublicKey:             make([]byte, dilithium.CryptoPublicKeyBytes),
+									PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
 									WithdrawalCredentials: make([]byte, 32),
 									Amount:                0,
 									Signature:             make([]byte, dilithium.CryptoBytes),
@@ -450,7 +450,7 @@ func TestMapBeaconBlockBody(t *testing.T) {
 						{
 							Proof: [][]byte{[]byte("A")},
 							Data: &zondpb.Deposit_Data{
-								PublicKey:             make([]byte, dilithium.CryptoPublicKeyBytes),
+								PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
 								WithdrawalCredentials: make([]byte, 32),
 								Amount:                0,
 								Signature:             make([]byte, dilithium.CryptoBytes),

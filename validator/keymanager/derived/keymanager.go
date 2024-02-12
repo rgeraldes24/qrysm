@@ -102,7 +102,7 @@ func (km *Keymanager) Sign(ctx context.Context, req *validatorpb.SignRequest) (d
 }
 
 // FetchValidatingPublicKeys fetches the list of validating public keys from the keymanager.
-func (km *Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][dilithiumlib.CryptoPublicKeyBytes]byte, error) {
+func (km *Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_params.DilithiumPubkeyLength]byte, error) {
 	return km.localKM.FetchValidatingPublicKeys(ctx)
 }
 
@@ -128,7 +128,7 @@ func (km *Keymanager) DeleteKeystores(
 // SubscribeAccountChanges creates an event subscription for a channel
 // to listen for public key changes at runtime, such as when new validator accounts
 // are imported into the keymanager while the validator process is running.
-func (km *Keymanager) SubscribeAccountChanges(pubKeysChan chan [][dilithiumlib.CryptoPublicKeyBytes]byte) event.Subscription {
+func (km *Keymanager) SubscribeAccountChanges(pubKeysChan chan [][field_params.DilithiumPubkeyLength]byte) event.Subscription {
 	return km.localKM.SubscribeAccountChanges(pubKeysChan)
 }
 

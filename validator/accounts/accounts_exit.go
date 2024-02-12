@@ -9,9 +9,9 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/io/file"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -140,7 +140,7 @@ func PerformVoluntaryExit(
 	return rawExitedKeys, formattedExitedKeys, nil
 }
 
-func prepareAllKeys(validatingKeys [][dilithium.CryptoPublicKeyBytes]byte) (raw [][]byte, formatted []string) {
+func prepareAllKeys(validatingKeys [][field_params.DilithiumPubkeyLength]byte) (raw [][]byte, formatted []string) {
 	raw = make([][]byte, len(validatingKeys))
 	formatted = make([]string, len(validatingKeys))
 	for i, pk := range validatingKeys {

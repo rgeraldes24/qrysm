@@ -9,7 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-bitfield"
-	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
@@ -26,7 +26,7 @@ func TestSubmitAggregateAndProof_GetDutiesRequestFailure(t *testing.T) {
 	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{}}
 	defer finish()
 
-	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
+	var pubKey [field_params.DilithiumPubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitAggregateAndProof(context.Background(), 0, pubKey)
 
@@ -36,7 +36,7 @@ func TestSubmitAggregateAndProof_GetDutiesRequestFailure(t *testing.T) {
 func TestSubmitAggregateAndProof_SignFails(t *testing.T) {
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
+	var pubKey [field_params.DilithiumPubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.duties = &zondpb.DutiesResponse{
 		CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
@@ -75,7 +75,7 @@ func TestSubmitAggregateAndProof_SignFails(t *testing.T) {
 func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
+	var pubKey [field_params.DilithiumPubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.duties = &zondpb.DutiesResponse{
 		CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
@@ -158,7 +158,7 @@ func TestAggregateAndProofSignature_CanSignValidSignature(t *testing.T) {
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
 
-	var pubKey [dilithiumlib.CryptoPublicKeyBytes]byte
+	var pubKey [field_params.DilithiumPubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().DomainData(
 		gomock.Any(), // ctx
