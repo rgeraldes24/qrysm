@@ -173,9 +173,9 @@ func compareConfigs(t *testing.T, expected, actual *BeaconChainConfig) {
 	require.DeepEqual(t, expected.InactivityScoreBias, actual.InactivityScoreBias)
 	require.DeepEqual(t, expected.InactivityScoreRecoveryRate, actual.InactivityScoreRecoveryRate)
 	require.DeepEqual(t, expected.EpochsPerSyncCommitteePeriod, actual.EpochsPerSyncCommitteePeriod)
-	require.DeepEqual(t, expected.MinSlashingPenaltyQuotientBellatrix, actual.MinSlashingPenaltyQuotientBellatrix)
-	require.DeepEqual(t, expected.ProportionalSlashingMultiplierBellatrix, actual.ProportionalSlashingMultiplierBellatrix)
-	require.DeepEqual(t, expected.InactivityPenaltyQuotientBellatrix, actual.InactivityPenaltyQuotientBellatrix)
+	require.DeepEqual(t, expected.MinSlashingPenaltyQuotientCapella, actual.MinSlashingPenaltyQuotientCapella)
+	require.DeepEqual(t, expected.ProportionalSlashingMultiplierCapella, actual.ProportionalSlashingMultiplierCapella)
+	require.DeepEqual(t, expected.InactivityPenaltyQuotientCapella, actual.InactivityPenaltyQuotientCapella)
 	require.DeepEqual(t, expected.MinSyncCommitteeParticipants, actual.MinSyncCommitteeParticipants)
 	require.DeepEqual(t, expected.DefaultFeeRecipient, actual.DefaultFeeRecipient)
 }

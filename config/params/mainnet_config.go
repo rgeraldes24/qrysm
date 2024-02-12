@@ -124,10 +124,6 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	BaseRewardFactor:            64,
 	WhistleBlowerRewardQuotient: 512,
 	ProposerRewardQuotient:      8,
-	// TODO(rgeraldes24)
-	// InactivityPenaltyQuotient:      67108864,
-	// MinSlashingPenaltyQuotient:     128,
-	// ProportionalSlashingMultiplier: 1,
 
 	// Max operations per block constants.
 	MaxProposerSlashings:             16,
@@ -206,9 +202,9 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EpochsPerSyncCommitteePeriod: 8, // TODO: (cyyber) finalize EpochsPerSyncCommitteePeriod, original value was 512
 
 	// Updated penalty values.
-	MinSlashingPenaltyQuotientBellatrix:     32,
-	ProportionalSlashingMultiplierBellatrix: 3,
-	InactivityPenaltyQuotientBellatrix:      1 << 24,
+	MinSlashingPenaltyQuotientCapella:     32,
+	ProportionalSlashingMultiplierCapella: 3,
+	InactivityPenaltyQuotientCapella:      1 << 24,
 
 	// Light client
 	MinSyncCommitteeParticipants: 1,

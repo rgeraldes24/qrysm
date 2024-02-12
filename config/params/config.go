@@ -119,7 +119,7 @@ type BeaconChainConfig struct {
 	DomainApplicationBuilder          [4]byte // DomainApplicationBuilder defines the Dilithium signature domain for application builder.
 	DomainDilithiumToExecutionChange  [4]byte // DomainDilithiumToExecutionChange defines the Dilithium signature domain to change withdrawal addresses to Zond prefix
 
-	// Prysm constants.
+	// Qrysm constants.
 	GweiPerEth                   uint64                      // GweiPerEth is the amount of gwei corresponding to 1 eth.
 	DilithiumPubkeyLength        int                         // DilithiumPubkeyLength defines the expected length of Dilithium public keys in bytes.
 	DefaultBufferSize            int                         // DefaultBufferSize for channels across the Prysm repository.
@@ -174,9 +174,9 @@ type BeaconChainConfig struct {
 
 	// Updated penalty values. This moves penalty parameters toward their final, maximum security values.
 	// Note: We do not override previous configuration values but instead creates new values and replaces usage throughout.
-	MinSlashingPenaltyQuotientBellatrix     uint64 `yaml:"MIN_SLASHING_PENALTY_QUOTIENT_BELLATRIX" spec:"true"`    // MinSlashingPenaltyQuotientBellatrix for slashing penalties post Bellatrix hard fork.
-	ProportionalSlashingMultiplierBellatrix uint64 `yaml:"PROPORTIONAL_SLASHING_MULTIPLIER_BELLATRIX" spec:"true"` // ProportionalSlashingMultiplierBellatrix for slashing penalties' multiplier post Bellatrix hard fork.
-	InactivityPenaltyQuotientBellatrix      uint64 `yaml:"INACTIVITY_PENALTY_QUOTIENT_BELLATRIX" spec:"true"`      // InactivityPenaltyQuotientBellatrix for penalties during inactivity post Bellatrix hard fork.
+	MinSlashingPenaltyQuotientCapella     uint64 `yaml:"MIN_SLASHING_PENALTY_QUOTIENT_CAPELLA" spec:"true"`    // MinSlashingPenaltyQuotientCapella for slashing penalties post Capella hard fork.
+	ProportionalSlashingMultiplierCapella uint64 `yaml:"PROPORTIONAL_SLASHING_MULTIPLIER_CAPELLA" spec:"true"` // ProportionalSlashingMultiplierCapella for slashing penalties' multiplier post Capella hard fork.
+	InactivityPenaltyQuotientCapella      uint64 `yaml:"INACTIVITY_PENALTY_QUOTIENT_CAPELLA" spec:"true"`      // InactivityPenaltyQuotientCapella for penalties during inactivity post Capella hard fork.
 
 	// Light client
 	MinSyncCommitteeParticipants uint64 `yaml:"MIN_SYNC_COMMITTEE_PARTICIPANTS" spec:"true"` // MinSyncCommitteeParticipants defines the minimum amount of sync committee participants for which the light client acknowledges the signature.

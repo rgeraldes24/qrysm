@@ -158,7 +158,7 @@ func TestProcessSlashings_NotSlashed(t *testing.T) {
 	}
 	s, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
-	newState, err := epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplierBellatrix)
+	newState, err := epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplierCapella)
 	require.NoError(t, err)
 	wanted := params.BeaconConfig().MaxEffectiveBalance
 	assert.Equal(t, wanted, newState.Balances()[0], "Unexpected slashed balance")
@@ -237,7 +237,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			s, err := state_native.InitializeFromProtoCapella(tt.state)
 			require.NoError(t, err)
 			helpers.ClearCache()
-			newState, err := epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplierBellatrix)
+			newState, err := epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplierCapella)
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, newState.Balances()[0], "ProcessSlashings({%v}) = newState; newState.Balances[0] = %d", original, newState.Balances()[0])
 		})
@@ -415,7 +415,7 @@ func TestProcessSlashings_BadValue(t *testing.T) {
 	}
 	s, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
-	_, err = epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplierBellatrix)
+	_, err = epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplierCapella)
 	require.ErrorContains(t, "addition overflows", err)
 }
 
