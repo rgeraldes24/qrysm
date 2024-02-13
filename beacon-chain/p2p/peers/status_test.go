@@ -1048,7 +1048,7 @@ func TestStatus_BestNonFinalized(t *testing.T) {
 		},
 	})
 
-	peerSlots := []primitives.Slot{32, 32, 32, 32, 235, 233, 258, 268, 270}
+	peerSlots := []primitives.Slot{128, 128, 128, 128, 939, 931, 1031, 1071, 1079}
 	for i, headSlot := range peerSlots {
 		p.Add(new(enr.Record), peer.ID(rune(i)), nil, network.DirOutbound)
 		p.SetConnectionState(peer.ID(rune(i)), peers.PeerConnected)

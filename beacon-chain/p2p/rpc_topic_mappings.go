@@ -227,12 +227,15 @@ func (r RPCTopic) Version() string {
 
 // TopicFromMessage constructs the rpc topic from the provided message
 // type and epoch.
-func TopicFromMessage(msg string, epoch primitives.Epoch) (string, error) {
+func TopicFromMessage(msg string) (string, error) {
 	if !messageMapping[msg] {
 		return "", errors.Errorf("%s: %s", invalidRPCMessageType, msg)
 	}
+	version := SchemaVersionV1
 
-	version := SchemaVersionV2
+	if altairMapping[msg] {
+		version = SchemaVersionV2
+	}
 
 	return protocolPrefix + msg + version, nil
 }
