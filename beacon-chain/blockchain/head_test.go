@@ -258,6 +258,7 @@ func TestRetrieveHead_ReadOnly(t *testing.T) {
 	assert.Equal(t, rOnlyState, service.head.state, "Head is not the same object")
 }
 
+// TODO(rgeraldes24): block numbers and GenerateFullBlockCapella
 func TestSaveOrphanedAtts(t *testing.T) {
 	ctx := context.Background()
 	beaconDB := testDB.SetupDB(t)
@@ -268,33 +269,33 @@ func TestSaveOrphanedAtts(t *testing.T) {
 	// 0 -- 1 -- 2 -- 3
 	//  \-4
 	st, keys := util.DeterministicGenesisStateCapella(t, 64)
-	blkG, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 0)
+	blkG, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 1)
 	assert.NoError(t, err)
 
 	util.SaveBlock(t, ctx, service.cfg.BeaconDB, blkG)
 	rG, err := blkG.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk1, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 1)
+	blk1, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 2)
 	assert.NoError(t, err)
 	blk1.Block.ParentRoot = rG[:]
 	r1, err := blk1.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk2, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 2)
+	blk2, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 3)
 	assert.NoError(t, err)
 	blk2.Block.ParentRoot = r1[:]
 	r2, err := blk2.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	blk3, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 3)
+	blk3, err := util.GenerateFullBlockCapella(st, keys, util.DefaultBlockGenConfig(), 4)
 	assert.NoError(t, err)
 	blk3.Block.ParentRoot = r2[:]
 	r3, err := blk3.Block.HashTreeRoot()
 	require.NoError(t, err)
 
 	blk4 := util.NewBeaconBlockCapella()
-	blk4.Block.Slot = 4
+	blk4.Block.Slot = 5
 	blk4.Block.ParentRoot = rG[:]
 	r4, err := blk4.Block.HashTreeRoot()
 	require.NoError(t, err)

@@ -1353,6 +1353,8 @@ func TestServer_GetValidatorParticipation_CannotRequestFutureEpoch(t *testing.T)
 	assert.ErrorContains(t, wanted, err)
 }
 
+// NOTE(rgeraldes24): this test can be removed since we have the new version with bits bellow
+/*
 func TestServer_GetValidatorParticipation_CurrentAndPrevEpoch(t *testing.T) {
 	helpers.ClearCache()
 	beaconDB := dbTest.SetupDB(t)
@@ -1433,6 +1435,7 @@ func TestServer_GetValidatorParticipation_CurrentAndPrevEpoch(t *testing.T) {
 	assert.DeepEqual(t, true, res.Finalized, "Incorrect validator participation respond")
 	assert.DeepEqual(t, wanted, res.Participation, "Incorrect validator participation respond")
 }
+*/
 
 func TestServer_GetValidatorParticipation_OrphanedUntilGenesis(t *testing.T) {
 	helpers.ClearCache()
@@ -1467,6 +1470,7 @@ func TestServer_GetValidatorParticipation_OrphanedUntilGenesis(t *testing.T) {
 	require.NoError(t, headState.SetBalances(balances))
 	// require.NoError(t, headState.AppendCurrentEpochAttestations(atts[0]))
 	// require.NoError(t, headState.AppendPreviousEpochAttestations(atts[0]))
+	require.NoError(t, headState.SetInactivityScores(make([]uint64, len(headState.Validators()))))
 
 	b := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, ctx, beaconDB, b)
@@ -1734,6 +1738,7 @@ func TestGetValidatorPerformance_Indices(t *testing.T) {
 		},
 	}
 	require.NoError(t, headState.SetValidators(validators))
+	require.NoError(t, headState.SetInactivityScores([]uint64{0, 0, 0}))
 	offset := int64(headState.Slot().Mul(params.BeaconConfig().SecondsPerSlot))
 	bs := &Server{
 		CoreService: &core.Service{
@@ -1764,6 +1769,7 @@ func TestGetValidatorPerformance_Indices(t *testing.T) {
 		BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GweiPerEth},
 		BalancesAfterEpochTransition:  []uint64{vp[1].AfterEpochTransitionBalance, vp[2].AfterEpochTransitionBalance},
 		MissingValidators:             [][]byte{publicKey1[:]},
+		InactivityScores:              []uint64{0, 0}, // TODO (rgeraldes24) workaround for now
 	}
 
 	res, err := bs.GetValidatorPerformance(ctx, &zondpb.ValidatorPerformanceRequest{
@@ -1808,6 +1814,7 @@ func TestGetValidatorPerformance_IndicesPubkeys(t *testing.T) {
 		},
 	}
 	require.NoError(t, headState.SetValidators(validators))
+	require.NoError(t, headState.SetInactivityScores([]uint64{0, 0, 0}))
 
 	offset := int64(headState.Slot().Mul(params.BeaconConfig().SecondsPerSlot))
 	bs := &Server{
@@ -1839,6 +1846,7 @@ func TestGetValidatorPerformance_IndicesPubkeys(t *testing.T) {
 		BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GweiPerEth},
 		BalancesAfterEpochTransition:  []uint64{vp[1].AfterEpochTransitionBalance, vp[2].AfterEpochTransitionBalance},
 		MissingValidators:             [][]byte{publicKey1[:]},
+		InactivityScores:              []uint64{0, 0},
 	}
 	// Index 2 and publicKey3 points to the same validator.
 	// Should not return duplicates.
@@ -1984,6 +1992,7 @@ func TestServer_GetIndividualVotes_ValidatorsDontExist(t *testing.T) {
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetValidators(stateWithValidators.Validators()))
+	require.NoError(t, beaconState.SetInactivityScores(make([]uint64, len(stateWithValidators.Validators()))))
 	require.NoError(t, beaconState.SetSlot(slot))
 
 	b := util.NewBeaconBlockCapella()
@@ -2058,6 +2067,7 @@ func TestServer_GetIndividualVotes_Working(t *testing.T) {
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetValidators(stateWithValidators.Validators()))
+	require.NoError(t, beaconState.SetInactivityScores(make([]uint64, len(stateWithValidators.Validators()))))
 
 	bf := bitfield.NewBitlist(validators / uint64(params.BeaconConfig().SlotsPerEpoch))
 	att1 := util.NewAttestation()

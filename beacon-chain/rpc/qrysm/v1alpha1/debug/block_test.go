@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
+	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -27,7 +28,13 @@ func TestServer_GetBlock(t *testing.T) {
 		BlockRoot: blockRoot[:],
 	})
 	require.NoError(t, err)
-	wanted, err := b.MarshalSSZ()
+
+	wsb, err := blocks.NewSignedBeaconBlock(b)
+	require.NoError(t, err)
+	wsbBlinded, err := wsb.ToBlinded()
+	require.NoError(t, err)
+
+	wanted, err := wsbBlinded.MarshalSSZ()
 	require.NoError(t, err)
 	assert.DeepEqual(t, wanted, res.Encoded)
 

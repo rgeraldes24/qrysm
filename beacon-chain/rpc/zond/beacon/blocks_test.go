@@ -9,6 +9,7 @@ import (
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -246,7 +247,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root1"), 32),
 					},
 				},
-				Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), 96)},
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), field_params.DilithiumSignatureLength)},
 			},
 			{
 				AggregationBits: bitfield.Bitlist{0x01},
@@ -263,7 +264,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root2"), 32),
 					},
 				},
-				Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), 96)},
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), field_params.DilithiumSignatureLength)},
 			},
 		}
 		sb, err := blocks.NewSignedBeaconBlock(b)

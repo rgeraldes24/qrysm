@@ -69,7 +69,7 @@ func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	root, err := sb.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	aggBits := bitfield.NewBitlist(8)
+	aggBits := bitfield.NewBitlist(2)
 	aggBits.SetBitAt(1, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
@@ -193,7 +193,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	validators := uint64(256)
 
 	_, privKeys := util.DeterministicGenesisStateCapella(t, validators)
-	aggBits := bitfield.NewBitlist(8)
+	aggBits := bitfield.NewBitlist(2)
 	aggBits.SetBitAt(1, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{

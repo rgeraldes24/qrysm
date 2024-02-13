@@ -27,6 +27,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/rand"
+	"github.com/theQRL/qrysm/v4/network/forks"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -650,7 +651,7 @@ func TestService_BatchRootRequest(t *testing.T) {
 	sentRoots := p2ptypes.BeaconBlockByRootsReq{b2Root, b2Root, b3Root, b3Root, b4Root, b5Root}
 	expectedRoots := p2ptypes.BeaconBlockByRootsReq{b2Root, b3Root, b4Root, b5Root}
 
-	pcl := protocol.ID("/eth2/beacon_chain/req/beacon_blocks_by_root/1/ssz_snappy")
+	pcl := protocol.ID("/eth2/beacon_chain/req/beacon_blocks_by_root/2/ssz_snappy")
 	var wg sync.WaitGroup
 	wg.Add(1)
 	p2.BHost.SetStreamHandler(pcl, func(stream network.Stream) {
@@ -662,6 +663,10 @@ func TestService_BatchRootRequest(t *testing.T) {
 		for _, blk := range response {
 			_, err := stream.Write([]byte{responseCodeSuccess})
 			assert.NoError(t, err, "Could not write to stream")
+			vRoot := r.cfg.clock.GenesisValidatorsRoot()
+			digest, err := forks.ForkDigestFromEpoch(params.BeaconConfig().GenesisEpoch, vRoot[:])
+			assert.NoError(t, err)
+			assert.NoError(t, writeContextToStream(digest[:], stream))
 			_, err = p2.Encoding().EncodeWithMaxLength(stream, blk)
 			assert.NoError(t, err, "Could not send response back")
 		}

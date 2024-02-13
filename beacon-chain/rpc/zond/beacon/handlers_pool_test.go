@@ -19,6 +19,7 @@ import (
 	p2pMock "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/core"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -45,7 +46,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
-		Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), 96)},
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), field_params.DilithiumSignatureLength)},
 	}
 	att2 := &zondpbv1alpha1.Attestation{
 		AggregationBits: []byte{1, 10},
@@ -62,7 +63,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), 96)},
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), field_params.DilithiumSignatureLength)},
 	}
 	att3 := &zondpbv1alpha1.Attestation{
 		AggregationBits: bitfield.NewBitlist(8),
@@ -79,7 +80,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot3"), 32),
 			},
 		},
-		Signatures: [][]byte{bytesutil.PadTo([]byte("signature3"), 96)},
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature3"), field_params.DilithiumSignatureLength)},
 	}
 	att4 := &zondpbv1alpha1.Attestation{
 		AggregationBits: bitfield.NewBitlist(8),
@@ -96,7 +97,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot4"), 32),
 			},
 		},
-		Signatures: [][]byte{bytesutil.PadTo([]byte("signature4"), 96)},
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature4"), field_params.DilithiumSignatureLength)},
 	}
 	s := &Server{
 		AttestationsPool: attestations.NewPool(),
@@ -307,14 +308,14 @@ func TestListVoluntaryExits(t *testing.T) {
 			Epoch:          1,
 			ValidatorIndex: 1,
 		},
-		Signature: bytesutil.PadTo([]byte("signature1"), 96),
+		Signature: bytesutil.PadTo([]byte("signature1"), field_params.DilithiumSignatureLength),
 	}
 	exit2 := &zondpbv1alpha1.SignedVoluntaryExit{
 		Exit: &zondpbv1alpha1.VoluntaryExit{
 			Epoch:          2,
 			ValidatorIndex: 2,
 		},
-		Signature: bytesutil.PadTo([]byte("signature2"), 96),
+		Signature: bytesutil.PadTo([]byte("signature2"), field_params.DilithiumSignatureLength),
 	}
 
 	s := &Server{

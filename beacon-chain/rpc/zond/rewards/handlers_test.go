@@ -153,12 +153,10 @@ func TestBlockRewards(t *testing.T) {
 
 	sbb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
-	phase0block, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 	mockChainService := &mock.ChainService{Optimistic: true}
 	s := &Server{
 		Blocker: &testutil.MockBlocker{SlotBlockMap: map[primitives.Slot]interfaces.ReadOnlySignedBeaconBlock{
-			0: phase0block,
 			2: sbb,
 		}},
 		OptimisticModeFetcher: mockChainService,
@@ -184,19 +182,6 @@ func TestBlockRewards(t *testing.T) {
 		assert.Equal(t, "62500000", resp.Data.ProposerSlashings)
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 		assert.Equal(t, false, resp.Finalized)
-	})
-	t.Run("phase 0", func(t *testing.T) {
-		url := "http://only.the.slot.number.at.the.end.is.important/0"
-		request := httptest.NewRequest("GET", url, nil)
-		writer := httptest.NewRecorder()
-		writer.Body = &bytes.Buffer{}
-
-		s.BlockRewards(writer, request)
-		assert.Equal(t, http.StatusBadRequest, writer.Code)
-		e := &http2.DefaultErrorJson{}
-		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), e))
-		assert.Equal(t, http.StatusBadRequest, e.Code)
-		assert.Equal(t, "Block rewards are not supported for Phase 0 blocks", e.Message)
 	})
 }
 
@@ -436,19 +421,6 @@ func TestAttestationRewards(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, e.Code)
 		assert.Equal(t, "Validator index 999 is too large. Maximum allowed index is 63", e.Message)
 	})
-	t.Run("phase 0", func(t *testing.T) {
-		url := "http://only.the.epoch.number.at.the.end.is.important/0"
-		request := httptest.NewRequest("POST", url, nil)
-		writer := httptest.NewRecorder()
-		writer.Body = &bytes.Buffer{}
-
-		s.AttestationRewards(writer, request)
-		assert.Equal(t, http.StatusNotFound, writer.Code)
-		e := &http2.DefaultErrorJson{}
-		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), e))
-		assert.Equal(t, http.StatusNotFound, e.Code)
-		assert.Equal(t, "Attestation rewards are not supported for Phase 0", e.Message)
-	})
 	t.Run("invalid epoch", func(t *testing.T) {
 		url := "http://only.the.epoch.number.at.the.end.is.important/foo"
 		request := httptest.NewRequest("POST", url, nil)
@@ -513,7 +485,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	}))
 
 	b := util.HydrateSignedBeaconBlockCapella(util.NewBeaconBlockCapella())
-	b.Block.Slot = 32
+	b.Block.Slot = 128
 	b.Block.ProposerIndex = proposerIndex
 	scBits := bitfield.NewBitvector16()
 	// last 10 sync committee members didn't perform their duty
@@ -534,15 +506,13 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	b.Block.Body.SyncAggregate = &zond.SyncAggregate{SyncCommitteeBits: scBits, SyncCommitteeSignatures: sigs}
 	sbb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
-	phase0block, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 	require.NoError(t, err)
 
 	currentSlot := params.BeaconConfig().SlotsPerEpoch
 	mockChainService := &mock.ChainService{Optimistic: true, Slot: &currentSlot}
 	s := &Server{
 		Blocker: &testutil.MockBlocker{SlotBlockMap: map[primitives.Slot]interfaces.ReadOnlySignedBeaconBlock{
-			0:  phase0block,
-			32: sbb,
+			128: sbb,
 		}},
 		OptimisticModeFetcher: mockChainService,
 		FinalizationFetcher:   mockChainService,
@@ -556,7 +526,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		}
 		require.NoError(t, st.SetBalances(balances))
 
-		url := "http://only.the.slot.number.at.the.end.is.important/32"
+		url := "http://only.the.slot.number.at.the.end.is.important/128"
 		var body bytes.Buffer
 		pubkey := fmt.Sprintf("%#x", secretKeys[10].PublicKey().Marshal())
 		valIds, err := json.Marshal([]string{"20", pubkey})
@@ -589,7 +559,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		}
 		require.NoError(t, st.SetBalances(balances))
 
-		url := "http://only.the.slot.number.at.the.end.is.important/32"
+		url := "http://only.the.slot.number.at.the.end.is.important/128"
 		request := httptest.NewRequest("POST", url, nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -614,7 +584,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		}
 		require.NoError(t, st.SetBalances(balances))
 
-		url := "http://only.the.slot.number.at.the.end.is.important/32"
+		url := "http://only.the.slot.number.at.the.end.is.important/128"
 		var body bytes.Buffer
 		pubkey := fmt.Sprintf("%#x", secretKeys[10].PublicKey().Marshal())
 		valIds, err := json.Marshal([]string{"20", "999", pubkey})
@@ -645,7 +615,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		}
 		require.NoError(t, st.SetBalances(balances))
 
-		url := "http://only.the.slot.number.at.the.end.is.important/32"
+		url := "http://only.the.slot.number.at.the.end.is.important/128"
 		var body bytes.Buffer
 		pubkey := fmt.Sprintf("%#x", secretKeys[10].PublicKey().Marshal())
 		valIds, err := json.Marshal([]string{"20", "84", pubkey})
@@ -676,7 +646,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		}
 		require.NoError(t, st.SetBalances(balances))
 
-		url := "http://only.the.slot.number.at.the.end.is.important/32"
+		url := "http://only.the.slot.number.at.the.end.is.important/128"
 		var body bytes.Buffer
 		valIds, err := json.Marshal([]string{"10", "foo"})
 		require.NoError(t, err)
@@ -700,7 +670,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		}
 		require.NoError(t, st.SetBalances(balances))
 
-		url := "http://only.the.slot.number.at.the.end.is.important/32"
+		url := "http://only.the.slot.number.at.the.end.is.important/128"
 		var body bytes.Buffer
 		privkey, err := dilithium.RandKey()
 		require.NoError(t, err)
@@ -727,7 +697,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		}
 		require.NoError(t, st.SetBalances(balances))
 
-		url := "http://only.the.slot.number.at.the.end.is.important/32"
+		url := "http://only.the.slot.number.at.the.end.is.important/128"
 		var body bytes.Buffer
 		valIds, err := json.Marshal([]string{"10", "9999"})
 		require.NoError(t, err)
@@ -743,24 +713,5 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), e))
 		assert.Equal(t, http.StatusBadRequest, e.Code)
 		assert.Equal(t, "Validator index 9999 is too large. Maximum allowed index is 1023", e.Message)
-	})
-	t.Run("phase 0", func(t *testing.T) {
-		balances := make([]uint64, 0, valCount)
-		for i := 0; i < valCount; i++ {
-			balances = append(balances, params.BeaconConfig().MaxEffectiveBalance)
-		}
-		require.NoError(t, st.SetBalances(balances))
-
-		url := "http://only.the.slot.number.at.the.end.is.important/0"
-		request := httptest.NewRequest("POST", url, nil)
-		writer := httptest.NewRecorder()
-		writer.Body = &bytes.Buffer{}
-
-		s.SyncCommitteeRewards(writer, request)
-		assert.Equal(t, http.StatusBadRequest, writer.Code)
-		e := &http2.DefaultErrorJson{}
-		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), e))
-		assert.Equal(t, http.StatusBadRequest, e.Code)
-		assert.Equal(t, "Sync committee rewards are not supported for Phase 0", e.Message)
 	})
 }

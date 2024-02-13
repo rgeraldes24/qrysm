@@ -482,7 +482,7 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	var mockSig [96]byte
+	var mockSig [field_params.DilithiumSignatureLength]byte
 	var mockCreds [32]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
@@ -492,7 +492,7 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 			Eth1BlockHeight: 2,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -502,7 +502,7 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 			Eth1BlockHeight: 8,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -515,7 +515,7 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 			Eth1BlockHeight: 400,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -525,7 +525,7 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 			Eth1BlockHeight: 600,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -621,7 +621,7 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
 
-	var mockSig [96]byte
+	var mockSig [field_params.DilithiumSignatureLength]byte
 	var mockCreds [32]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
@@ -631,7 +631,7 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 			Eth1BlockHeight: 8,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -641,7 +641,7 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 			Eth1BlockHeight: 14,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -654,7 +654,7 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 			Eth1BlockHeight: 5000,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -664,7 +664,7 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 			Eth1BlockHeight: 6000,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -737,7 +737,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateEth1DepositIndex(t *testin
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
 
-	var mockSig [96]byte
+	var mockSig [field_params.DilithiumSignatureLength]byte
 	var mockCreds [32]byte
 
 	readyDeposits := []*zondpb.DepositContainer{
@@ -745,7 +745,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateEth1DepositIndex(t *testin
 			Index: 0,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -754,7 +754,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateEth1DepositIndex(t *testin
 			Index: 1,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -767,7 +767,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateEth1DepositIndex(t *testin
 			Index: i,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -837,7 +837,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 	blk.Block.Slot = beaconState.Slot()
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
-	var mockSig [96]byte
+	var mockSig [field_params.DilithiumSignatureLength]byte
 	var mockCreds [32]byte
 
 	readyDeposits := []*zondpb.DepositContainer{
@@ -845,7 +845,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 			Index: 0,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -854,7 +854,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 			Index: 1,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -867,7 +867,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 			Index: i,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -935,7 +935,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 	blk.Block.Slot = beaconState.Slot()
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
-	var mockSig [96]byte
+	var mockSig [field_params.DilithiumSignatureLength]byte
 	var mockCreds [32]byte
 
 	readyDeposits := []*zondpb.DepositContainer{
@@ -943,7 +943,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 			Index: 0,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -952,7 +952,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 			Index: 1,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -965,7 +965,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 			Index: i,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1035,7 +1035,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 	blkRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	var mockSig [96]byte
+	var mockSig [field_params.DilithiumSignatureLength]byte
 	var mockCreds [32]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
@@ -1045,7 +1045,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			Eth1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1055,7 +1055,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			Eth1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1068,7 +1068,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			Eth1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1078,7 +1078,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			Eth1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1151,7 +1151,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 	blkRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	var mockSig [96]byte
+	var mockSig [field_params.DilithiumSignatureLength]byte
 	var mockCreds [32]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
@@ -1161,7 +1161,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			Eth1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1171,7 +1171,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			Eth1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1184,7 +1184,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			Eth1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1194,7 +1194,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			Eth1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1376,8 +1376,8 @@ func TestProposer_Eth1Data_MajorityVote(t *testing.T) {
 		Eth1BlockHeight: 0,
 		Deposit: &zondpb.Deposit{
 			Data: &zondpb.Deposit_Data{
-				PublicKey:             bytesutil.PadTo([]byte("a"), 48),
-				Signature:             make([]byte, 96),
+				PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
+				Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				WithdrawalCredentials: make([]byte, 32),
 			}},
 	}
@@ -1977,7 +1977,7 @@ func TestProposer_FilterAttestation(t *testing.T) {
 					domain, err := signing.Domain(st.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, params.BeaconConfig().ZeroHash[:])
 					require.NoError(t, err)
 					sigs := make([][]byte, len(attestingIndices))
-					var zeroSig [96]byte
+					var zeroSig [field_params.DilithiumSignatureLength]byte
 					atts[i].Signatures = [][]byte{zeroSig[:]}
 
 					for i, indice := range attestingIndices {

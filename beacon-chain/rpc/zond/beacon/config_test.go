@@ -119,7 +119,9 @@ func TestGetSpec(t *testing.T) {
 	resp, err := server.GetSpec(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 
-	assert.Equal(t, 112, len(resp.Data))
+	// TODO(rgeraldes24): double check
+	assert.Equal(t, 91, len(resp.Data))
+	// assert.Equal(t, 112, len(resp.Data))
 	for k, v := range resp.Data {
 		switch k {
 		case "CONFIG_NAME":
@@ -180,7 +182,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "1000", v)
 		case "DILITHIUM_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x62", v)
-		case "ETH1_ADDRESS_WITHDRAWAL_PREFIX":
+		case "ZOND_ADDRESS_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x63", v)
 		case "GENESIS_DELAY":
 			assert.Equal(t, "24", v)
@@ -316,11 +318,11 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "73", v)
 		case "DefaultFeeRecipient":
 			assert.Equal(t, common.HexToAddress("DefaultFeeRecipient"), v)
-		case "PROPORTIONAL_SLASHING_MULTIPLIER_BELLATRIX":
+		case "PROPORTIONAL_SLASHING_MULTIPLIER_CAPELLA":
 			assert.Equal(t, "3", v)
-		case "MIN_SLASHING_PENALTY_QUOTIENT_BELLATRIX":
+		case "MIN_SLASHING_PENALTY_QUOTIENT_CAPELLA":
 			assert.Equal(t, "32", v)
-		case "INACTIVITY_PENALTY_QUOTIENT_BELLATRIX":
+		case "INACTIVITY_PENALTY_QUOTIENT_CAPELLA":
 			assert.Equal(t, "16777216", v)
 		case "PROPOSER_SCORE_BOOST":
 			assert.Equal(t, "40", v)

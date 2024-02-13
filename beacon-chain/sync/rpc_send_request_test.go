@@ -334,9 +334,9 @@ func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 			}
 			for _, root := range *req {
 				if blk, ok := knownBlocks[root]; ok {
+					wsb, err := blocks.NewSignedBeaconBlock(blk)
+					require.NoError(t, err)
 					if processor != nil {
-						wsb, err := blocks.NewSignedBeaconBlock(blk)
-						require.NoError(t, err)
 						if processorErr := processor(wsb); processorErr != nil {
 							if errors.Is(processorErr, io.EOF) {
 								// Close stream, w/o any errors written.
@@ -350,10 +350,11 @@ func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 							return
 						}
 					}
-					_, err := stream.Write([]byte{0x00})
-					assert.NoError(t, err, "Could not write to stream")
-					_, err = p2pProvider.Encoding().EncodeWithMaxLength(stream, blk)
-					assert.NoError(t, err, "Could not send response back")
+
+					err = WriteBlockChunk(stream, startup.NewClock(time.Now(), [32]byte{}), p2pProvider.Encoding(), wsb)
+					if err != nil && err.Error() != network.ErrReset.Error() {
+						require.NoError(t, err)
+					}
 				}
 			}
 		}

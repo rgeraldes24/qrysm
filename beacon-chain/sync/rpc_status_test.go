@@ -799,8 +799,7 @@ func TestStatusRPCRequest_BadPeerHandshake(t *testing.T) {
 	finalized := util.NewBeaconBlockCapella()
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconStateCapella(ctx, nil, 0, &zondpb.Eth1Data{}, &enginev1.ExecutionPayloadCapella{})
-	require.NoError(t, err)
+	genesisState, _ := util.DeterministicGenesisStateCapella(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), headRoot))
 	finalizedCheckpt := &zondpb.Checkpoint{
