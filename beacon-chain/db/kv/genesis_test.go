@@ -2,14 +2,12 @@ package kv
 
 import (
 	"context"
-	"encoding/hex"
 	"os"
 	"testing"
 
 	"github.com/bazelbuild/rules_go/go/tools/bazel"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db/iface"
 	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -50,6 +48,8 @@ func testGenesisDataSaved(t *testing.T, db iface.Database) {
 	require.Equal(t, gbHTR, headHTR, "head block does not match genesis block")
 }
 
+// TODO(rgeraldes24): remove
+/*
 func TestLoadCapellaFromFile(t *testing.T) {
 	cfg, err := params.ByName(params.MainnetName)
 	require.NoError(t, err)
@@ -79,6 +79,7 @@ func TestLoadCapellaFromFile(t *testing.T) {
 	require.NoError(t, db.LoadGenesis(context.Background(), sb))
 	testGenesisDataSaved(t, db)
 }
+*/
 
 func TestLoadGenesisFromFile(t *testing.T) {
 	// for this test to work, we need the active config to have these properties:

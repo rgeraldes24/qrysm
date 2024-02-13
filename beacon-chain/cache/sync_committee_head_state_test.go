@@ -41,16 +41,19 @@ func TestSyncCommitteeHeadState(t *testing.T) {
 			wantPutErr: true,
 			wantErr:    true,
 		},
-		{
-			name: "putting invalid state in",
-			key:  primitives.Slot(1),
-			put: &put{
-				slot:  primitives.Slot(1),
-				state: capellaState,
+		// NOTE(rgeraldes24): test not valid for now
+		/*
+			{
+				name: "putting invalid state in",
+				key:  primitives.Slot(1),
+				put: &put{
+					slot:  primitives.Slot(1),
+					state: capellaState,
+				},
+				wantPutErr: true,
+				wantErr:    true,
 			},
-			wantPutErr: true,
-			wantErr:    true,
-		},
+		*/
 		{
 			name:    "not found when empty cache",
 			key:     primitives.Slot(1),

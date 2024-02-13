@@ -448,9 +448,9 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 0,
@@ -458,9 +458,9 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 1,
@@ -469,9 +469,9 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 	newFinalizedDeposit := &zondpb.DepositContainer{
 		Deposit: &zondpb.Deposit{
 			Data: &zondpb.Deposit_Data{
-				PublicKey:             bytesutil.PadTo([]byte{2}, 48),
+				PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
 				WithdrawalCredentials: make([]byte, 32),
-				Signature:             make([]byte, 96),
+				Signature:             make([]byte, field_params.DilithiumSignatureLength),
 			},
 		},
 		Index: 2,
@@ -523,9 +523,9 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 0,
@@ -533,9 +533,9 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 1,
@@ -543,9 +543,9 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{2}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 2,
@@ -569,9 +569,9 @@ func TestFinalizedDeposits_HandleLowerEth1DepositIndex(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 0,
@@ -579,9 +579,9 @@ func TestFinalizedDeposits_HandleLowerEth1DepositIndex(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 1,
@@ -589,9 +589,9 @@ func TestFinalizedDeposits_HandleLowerEth1DepositIndex(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{2}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 2,
@@ -599,9 +599,9 @@ func TestFinalizedDeposits_HandleLowerEth1DepositIndex(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{3}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 3,
@@ -609,9 +609,9 @@ func TestFinalizedDeposits_HandleLowerEth1DepositIndex(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{4}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{4}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 4,
@@ -619,9 +619,9 @@ func TestFinalizedDeposits_HandleLowerEth1DepositIndex(t *testing.T) {
 		{
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{5}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{5}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 5,
@@ -659,9 +659,9 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Eth1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 0,
@@ -670,9 +670,9 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Eth1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 1,
@@ -683,9 +683,9 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Eth1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{2}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 2,
@@ -694,9 +694,9 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Eth1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{3}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 3,
@@ -716,9 +716,9 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Eth1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 0,
@@ -727,9 +727,9 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Eth1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 1,
@@ -740,9 +740,9 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Eth1BlockHeight: 10,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{2}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 2,
@@ -751,9 +751,9 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Eth1BlockHeight: 11,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{3}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: 3,
@@ -773,9 +773,9 @@ func TestFinalizedDeposits_ReturnsTrieCorrectly(t *testing.T) {
 			Eth1BlockHeight: height,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{uint8(index)}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{uint8(index)}, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			Index: index,

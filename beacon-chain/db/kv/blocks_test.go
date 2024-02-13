@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db/filters"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -285,7 +286,11 @@ func TestStore_GenesisBlock(t *testing.T) {
 	require.NoError(t, err)
 	retrievedBlockPb, err := retrievedBlock.Proto()
 	require.NoError(t, err)
-	assert.Equal(t, true, proto.Equal(genesisBlock, retrievedBlockPb), "Wanted: %v, received: %v", genesisBlock, retrievedBlock)
+	wanted, err := wsb.ToBlinded()
+	require.NoError(t, err)
+	wantedPb, err := wanted.Proto()
+	require.NoError(t, err)
+	assert.Equal(t, true, proto.Equal(wantedPb, retrievedBlockPb), "Wanted: %v, received: %v", genesisBlock, retrievedBlock)
 }
 
 func TestStore_BlocksCRUD_NoCache(t *testing.T) {
@@ -869,7 +874,7 @@ func TestStore_FeeRecipientByValidatorID(t *testing.T) {
 			FeeRecipient: bytesutil.PadTo([]byte("a"), 20),
 			GasLimit:     1,
 			Timestamp:    2,
-			Pubkey:       bytesutil.PadTo([]byte("b"), 48),
+			Pubkey:       bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
 		}}
 	require.NoError(t, db.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{3}, regs))
 	f, err = db.FeeRecipientByValidatorID(ctx, 3)
@@ -894,19 +899,19 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 			FeeRecipient: bytesutil.PadTo([]byte("a"), 20),
 			GasLimit:     1,
 			Timestamp:    uint64(timestamp),
-			Pubkey:       bytesutil.PadTo([]byte("b"), 48),
+			Pubkey:       bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
 		},
 		{
 			FeeRecipient: bytesutil.PadTo([]byte("c"), 20),
 			GasLimit:     3,
 			Timestamp:    uint64(timestamp),
-			Pubkey:       bytesutil.PadTo([]byte("d"), 48),
+			Pubkey:       bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
 		},
 		{
 			FeeRecipient: bytesutil.PadTo([]byte("e"), 20),
 			GasLimit:     5,
 			Timestamp:    uint64(timestamp),
-			Pubkey:       bytesutil.PadTo([]byte("f"), 48),
+			Pubkey:       bytesutil.PadTo([]byte("f"), field_params.DilithiumPubkeyLength),
 		},
 	}
 	require.NoError(t, db.SaveRegistrationsByValidatorIDs(ctx, ids, regs))
@@ -916,7 +921,7 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 		FeeRecipient: bytesutil.PadTo([]byte("a"), 20),
 		GasLimit:     1,
 		Timestamp:    uint64(timestamp),
-		Pubkey:       bytesutil.PadTo([]byte("b"), 48),
+		Pubkey:       bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
 	}, f)
 	f, err = db.RegistrationByValidatorID(ctx, 1)
 	require.NoError(t, err)
@@ -924,7 +929,7 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 		FeeRecipient: bytesutil.PadTo([]byte("c"), 20),
 		GasLimit:     3,
 		Timestamp:    uint64(timestamp),
-		Pubkey:       bytesutil.PadTo([]byte("d"), 48),
+		Pubkey:       bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
 	}, f)
 	f, err = db.RegistrationByValidatorID(ctx, 2)
 	require.NoError(t, err)
@@ -932,7 +937,7 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 		FeeRecipient: bytesutil.PadTo([]byte("e"), 20),
 		GasLimit:     5,
 		Timestamp:    uint64(timestamp),
-		Pubkey:       bytesutil.PadTo([]byte("f"), 48),
+		Pubkey:       bytesutil.PadTo([]byte("f"), field_params.DilithiumPubkeyLength),
 	}, f)
 	_, err = db.RegistrationByValidatorID(ctx, 3)
 	want := errors.Wrap(ErrNotFoundFeeRecipient, "validator id 3")

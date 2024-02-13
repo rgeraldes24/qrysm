@@ -59,7 +59,6 @@ func TestBlockCache_byHash(t *testing.T) {
 	assert.Equal(t, true, exists, "Expected headerInfo to exist")
 	assert.Equal(t, 0, fetchedInfo.Number.Cmp(header.Number), "Expected fetched info number to be equal")
 	assert.Equal(t, header.Hash, fetchedInfo.Hash, "Expected hash to be equal")
-
 }
 
 func TestBlockCache_byHeight(t *testing.T) {
