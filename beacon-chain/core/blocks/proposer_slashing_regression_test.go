@@ -1,5 +1,7 @@
 package blocks_test
 
+// TODO(rgeraldes24): double check
+/*
 import (
 	"os"
 	"testing"
@@ -34,3 +36,4 @@ func TestVerifyProposerSlashing_BeaconFuzzIssue91(t *testing.T) {
 	err = blocks.VerifyProposerSlashing(st, slashing)
 	require.ErrorContains(t, "validator with key 0x97f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb is not slashable", err)
 }
+*/

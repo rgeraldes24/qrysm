@@ -8,6 +8,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/container/trie"
@@ -231,7 +232,7 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 	// Same test settings as in TestProcessDeposit_AddsNewValidatorDeposit, except that we use an invalid signature
 	dep, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	dep[0].Data.Signature = make([]byte, 96)
+	dep[0].Data.Signature = make([]byte, field_params.DilithiumSignatureLength)
 	dt, _, err := util.DepositTrieFromDeposits(dep)
 	require.NoError(t, err)
 	root, err := dt.HashTreeRoot()
@@ -282,7 +283,7 @@ func TestPreGenesisDeposits_SkipInvalidDeposit(t *testing.T) {
 
 	dep, _, err := util.DeterministicDepositsAndKeys(100)
 	require.NoError(t, err)
-	dep[0].Data.Signature = make([]byte, 96)
+	dep[0].Data.Signature = make([]byte, field_params.DilithiumSignatureLength)
 	dt, _, err := util.DepositTrieFromDeposits(dep)
 	require.NoError(t, err)
 
@@ -353,7 +354,7 @@ func TestProcessDeposit_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T) 
 			PublicKey:             sk.PublicKey().Marshal(),
 			Amount:                1000,
 			WithdrawalCredentials: make([]byte, 32),
-			Signature:             make([]byte, 96),
+			Signature:             make([]byte, field_params.DilithiumSignatureLength),
 		},
 	}
 	sr, err := signing.ComputeSigningRoot(deposit.Data, bytesutil.ToBytes(3, 32))

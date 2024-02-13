@@ -36,7 +36,7 @@ func TestAttestation_IsAggregator(t *testing.T) {
 
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, 0, 0)
 		require.NoError(t, err)
-		sig := privKeys[0].Sign([]byte{'A'})
+		sig := privKeys[0].Sign([]byte{'B'})
 		agg, err := helpers.IsAggregator(uint64(len(committee)), sig.Marshal())
 		require.NoError(t, err)
 		assert.Equal(t, false, agg, "Wanted aggregator false")

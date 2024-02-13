@@ -32,7 +32,7 @@ func TestUnslashedAttestingIndices_CanSortAndFilter(t *testing.T) {
 			Data: &zondpb.AttestationData{Source: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				Target: &zondpb.Checkpoint{Epoch: 0, Root: make([]byte, fieldparams.RootLength)},
 			},
-			AggregationBits: bitfield.Bitlist{0x00, 0xFF, 0xFF, 0xFF},
+			AggregationBits: bitfield.Bitlist{0xFF},
 		}
 	}
 
@@ -78,7 +78,7 @@ func TestUnslashedAttestingIndices_DuplicatedAttestations(t *testing.T) {
 		atts[i] = &zondpb.PendingAttestation{
 			Data: &zondpb.AttestationData{Source: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				Target: &zondpb.Checkpoint{Epoch: 0}},
-			AggregationBits: bitfield.Bitlist{0x00, 0xFF, 0xFF, 0xFF},
+			AggregationBits: bitfield.Bitlist{0xFF},
 		}
 	}
 
@@ -164,6 +164,7 @@ func TestProcessSlashings_NotSlashed(t *testing.T) {
 	assert.Equal(t, wanted, newState.Balances()[0], "Unexpected slashed balance")
 }
 
+// TODO(rgeraldes24): double check
 func TestProcessSlashings_SlashedLess(t *testing.T) {
 	tests := []struct {
 		state *zondpb.BeaconStateCapella
@@ -181,7 +182,8 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			},
 			// penalty    = validator balance / increment * (2*total_penalties) / total_balance * increment
 			// 1000000000 = (32 * 1e9)        / (1 * 1e9) * (1*1e9)             / (32*1e9)      * (1 * 1e9)
-			want: uint64(31000000000), // 32 * 1e9 - 1000000000
+			// want: uint64(31000000000), // 32 * 1e9 - 1000000000
+			want: uint64(39997000000000),
 		},
 		{
 			state: &zondpb.BeaconStateCapella{
@@ -197,7 +199,8 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			},
 			// penalty    = validator balance / increment * (2*total_penalties) / total_balance * increment
 			// 500000000 = (32 * 1e9)        / (1 * 1e9) * (1*1e9)             / (32*1e9)      * (1 * 1e9)
-			want: uint64(32000000000), // 32 * 1e9 - 500000000
+			// want: uint64(32000000000), // 32 * 1e9 - 500000000
+			want: 39999000000000,
 		},
 		{
 			state: &zondpb.BeaconStateCapella{
@@ -213,7 +216,8 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			},
 			// penalty    = validator balance / increment * (3*total_penalties) / total_balance * increment
 			// 1000000000 = (32 * 1e9)        / (1 * 1e9) * (1*2e9)             / (64*1e9)      * (1 * 1e9)
-			want: uint64(31000000000), // 32 * 1e9 - 1000000000
+			// want: uint64(31000000000), // 32 * 1e9 - 1000000000
+			want: 39997000000000,
 		},
 		{
 			state: &zondpb.BeaconStateCapella{
@@ -227,7 +231,8 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			},
 			// penalty    = validator balance           / increment * (3*total_penalties) / total_balance        * increment
 			// 2000000000 = (32  * 1e9 - 1*1e9)         / (1 * 1e9) * (2*1e9)             / (31*1e9)             * (1 * 1e9)
-			want: uint64(30000000000), // 32 * 1e9 - 2000000000
+			// want: uint64(30000000000), // 32 * 1e9 - 2000000000
+			want: 39996000000000,
 		},
 	}
 

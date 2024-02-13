@@ -19,10 +19,10 @@ func TestSlotToEpoch_OK(t *testing.T) {
 		epoch primitives.Epoch
 	}{
 		{slot: 0, epoch: 0},
-		{slot: 50, epoch: 1},
-		{slot: 64, epoch: 2},
-		{slot: 128, epoch: 4},
-		{slot: 200, epoch: 6},
+		{slot: 199, epoch: 1},
+		{slot: 256, epoch: 2},
+		{slot: 512, epoch: 4},
+		{slot: 768, epoch: 6},
 	}
 	for _, tt := range tests {
 		assert.Equal(t, tt.epoch, slots.ToEpoch(tt.slot), "ToEpoch(%d)", tt.slot)
@@ -35,10 +35,10 @@ func TestCurrentEpoch_OK(t *testing.T) {
 		epoch primitives.Epoch
 	}{
 		{slot: 0, epoch: 0},
-		{slot: 50, epoch: 1},
-		{slot: 64, epoch: 2},
-		{slot: 128, epoch: 4},
-		{slot: 200, epoch: 6},
+		{slot: 199, epoch: 1},
+		{slot: 256, epoch: 2},
+		{slot: 512, epoch: 4},
+		{slot: 768, epoch: 6},
 	}
 	for _, tt := range tests {
 		st, err := state_native.InitializeFromProtoCapella(&zond.BeaconStateCapella{Slot: tt.slot})
@@ -69,10 +69,10 @@ func TestNextEpoch_OK(t *testing.T) {
 		epoch primitives.Epoch
 	}{
 		{slot: 0, epoch: primitives.Epoch(0/params.BeaconConfig().SlotsPerEpoch + 1)},
-		{slot: 50, epoch: primitives.Epoch(0/params.BeaconConfig().SlotsPerEpoch + 2)},
-		{slot: 64, epoch: primitives.Epoch(64/params.BeaconConfig().SlotsPerEpoch + 1)},
-		{slot: 128, epoch: primitives.Epoch(128/params.BeaconConfig().SlotsPerEpoch + 1)},
-		{slot: 200, epoch: primitives.Epoch(200/params.BeaconConfig().SlotsPerEpoch + 1)},
+		{slot: 199, epoch: primitives.Epoch(0/params.BeaconConfig().SlotsPerEpoch + 2)},
+		{slot: 256, epoch: primitives.Epoch(256/params.BeaconConfig().SlotsPerEpoch + 1)},
+		{slot: 512, epoch: primitives.Epoch(512/params.BeaconConfig().SlotsPerEpoch + 1)},
+		{slot: 768, epoch: primitives.Epoch(768/params.BeaconConfig().SlotsPerEpoch + 1)},
 	}
 	for _, tt := range tests {
 		st, err := state_native.InitializeFromProtoCapella(&zond.BeaconStateCapella{Slot: tt.slot})
@@ -90,17 +90,17 @@ func TestCanProcessEpoch_TrueOnEpochsLastSlot(t *testing.T) {
 			slot:            1,
 			canProcessEpoch: false,
 		}, {
-			slot:            63,
+			slot:            255,
 			canProcessEpoch: true,
 		},
 		{
-			slot:            64,
+			slot:            256,
 			canProcessEpoch: false,
 		}, {
-			slot:            127,
+			slot:            511,
 			canProcessEpoch: true,
 		}, {
-			slot:            1000000000,
+			slot:            4000000000,
 			canProcessEpoch: false,
 		},
 	}

@@ -169,7 +169,7 @@ func TestDecreaseBalance_OK(t *testing.T) {
 }
 
 func TestFinalityDelay(t *testing.T) {
-	base := buildState(params.BeaconConfig().SlotsPerEpoch*10, 1)
+	base := buildState(params.BeaconConfig().SlotsPerEpoch*6, 1)
 	base.FinalizedCheckpoint = &zondpb.Checkpoint{Epoch: 3}
 	beaconState, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
@@ -199,7 +199,7 @@ func TestFinalityDelay(t *testing.T) {
 }
 
 func TestIsInInactivityLeak(t *testing.T) {
-	base := buildState(params.BeaconConfig().SlotsPerEpoch*10, 1)
+	base := buildState(params.BeaconConfig().SlotsPerEpoch*6, 1)
 	base.FinalizedCheckpoint = &zondpb.Checkpoint{Epoch: 3}
 	beaconState, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
@@ -252,7 +252,7 @@ func buildState(slot primitives.Slot, validatorCount uint64) *zondpb.BeaconState
 		Validators:                  validators,
 		RandaoMixes:                 make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		Slashings:                   make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector),
-		BlockRoots:                  make([][]byte, params.BeaconConfig().SlotsPerEpoch*10),
+		BlockRoots:                  make([][]byte, params.BeaconConfig().SlotsPerEpoch*6),
 		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, 32)},
 		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, 32)},
 		CurrentJustifiedCheckpoint:  &zondpb.Checkpoint{Root: make([]byte, 32)},

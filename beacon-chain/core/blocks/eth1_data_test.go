@@ -179,7 +179,7 @@ func TestProcessEth1Data_SetsCorrectly(t *testing.T) {
 	for i := uint64(0); i < period; i++ {
 		processedState, err := blocks.ProcessEth1DataInBlock(context.Background(), beaconState, b.Block.Body.Eth1Data)
 		require.NoError(t, err)
-		require.Equal(t, true, processedState.Version() == version.Phase0)
+		require.Equal(t, true, processedState.Version() == version.Capella)
 	}
 
 	newETH1DataVotes := beaconState.Eth1DataVotes()

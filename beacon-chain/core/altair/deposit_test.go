@@ -7,6 +7,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
@@ -200,7 +201,7 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 	// Same test settings as in TestProcessDeposit_AddsNewValidatorDeposit, except that we use an invalid signature
 	dep, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	dep[0].Data.Signature = make([]byte, 96)
+	dep[0].Data.Signature = make([]byte, field_params.DilithiumSignatureLength)
 	dt, _, err := util.DepositTrieFromDeposits(dep)
 	require.NoError(t, err)
 	root, err := dt.HashTreeRoot()

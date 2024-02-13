@@ -93,7 +93,17 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 	set.Uint64(flags.InteropNumValidatorsFlag.Name, numValidators, "")
 	set.String("suggested-fee-recipient", "0x6e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
 	require.NoError(t, set.Set("suggested-fee-recipient", "0x6e35733c5af9B61374A128e6F85f553aF09ff89A"))
-	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, numValidators, &enginev1.ExecutionPayloadCapella{}, &zondpb.Eth1Data{})
+	ee := &enginev1.ExecutionPayloadCapella{
+		ParentHash:    make([]byte, 32),
+		FeeRecipient:  make([]byte, 20),
+		StateRoot:     make([]byte, 32),
+		ReceiptsRoot:  make([]byte, 32),
+		LogsBloom:     make([]byte, 256),
+		PrevRandao:    make([]byte, 32),
+		BaseFeePerGas: make([]byte, 32),
+		BlockHash:     make([]byte, 32),
+	}
+	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, numValidators, ee, &zondpb.Eth1Data{BlockHash: make([]byte, 32)})
 	require.NoError(t, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < 2; i++ {
 		var someRoot [32]byte

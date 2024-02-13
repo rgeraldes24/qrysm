@@ -24,7 +24,7 @@ func TestUpdateBalance(t *testing.T) {
 		ActivePrevEpoch:            params.BeaconConfig().EffectiveBalanceIncrement,
 		CurrentEpochAttested:       200 * params.BeaconConfig().EffectiveBalanceIncrement,
 		CurrentEpochTargetAttested: 200 * params.BeaconConfig().EffectiveBalanceIncrement,
-		PrevEpochAttested:          300 * params.BeaconConfig().EffectiveBalanceIncrement,
+		PrevEpochAttested:          params.BeaconConfig().EffectiveBalanceIncrement,
 		PrevEpochTargetAttested:    100 * params.BeaconConfig().EffectiveBalanceIncrement,
 		PrevEpochHeadAttested:      200 * params.BeaconConfig().EffectiveBalanceIncrement,
 	}

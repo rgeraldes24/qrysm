@@ -144,7 +144,7 @@ func TestSlashValidator_OK(t *testing.T) {
 	cfg := params.BeaconConfig()
 	slashedState, err := SlashValidator(context.Background(), state, slashedIdx, cfg.MinSlashingPenaltyQuotientCapella, cfg.ProposerRewardQuotient)
 	require.NoError(t, err, "Could not slash validator")
-	require.Equal(t, true, slashedState.Version() == version.Phase0)
+	require.Equal(t, true, slashedState.Version() == version.Capella)
 
 	v, err := state.ValidatorAtIndex(slashedIdx)
 	require.NoError(t, err)

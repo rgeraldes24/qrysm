@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	p2ptypes "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
@@ -56,7 +57,7 @@ func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
 	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = pID
 	block.Block.Slot = 10
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, 96)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
 	block.Block.ParentRoot = latestBlockSignedRoot[:]
 	block.Signature, err = signing.ComputeDomainAndSign(state, currentEpoch, block.Block, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
@@ -91,7 +92,7 @@ func TestProcessBlockHeader_WrongProposerSig(t *testing.T) {
 	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = 10
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, 96)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
 	block.Block.ParentRoot = lbhdr[:]
 	block.Signature, err = signing.ComputeDomainAndSign(beaconState, 0, block.Block, params.BeaconConfig().DomainBeaconProposer, privKeys[proposerIdx+1])
 	require.NoError(t, err)
@@ -262,7 +263,7 @@ func TestProcessBlockHeader_OK(t *testing.T) {
 	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = pID
 	block.Block.Slot = 10
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, 96)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
 	block.Block.ParentRoot = latestBlockSignedRoot[:]
 	block.Signature, err = signing.ComputeDomainAndSign(state, currentEpoch, block.Block, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
@@ -323,7 +324,7 @@ func TestBlockSignatureSet_OK(t *testing.T) {
 	block := util.NewBeaconBlockCapella()
 	block.Block.Slot = 10
 	block.Block.ProposerIndex = pID
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, 96)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
 	block.Block.ParentRoot = latestBlockSignedRoot[:]
 	block.Signature, err = signing.ComputeDomainAndSign(state, currentEpoch, block.Block, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)

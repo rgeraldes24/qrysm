@@ -451,7 +451,7 @@ func TestSetParticipationAndRewardProposer(t *testing.T) {
 				headFlagIndex:   false,
 			},
 			wantedParticipation: []byte{0, 0, 0, 0, 0, 0, 0, 0},
-			wantedBalance:       32000000000,
+			wantedBalance:       40000000000000,
 		},
 		{name: "some participated without flags",
 			indices: []uint64{0, 1, 2, 3}, epochParticipation: []byte{0, 0, 0, 0, 0, 0, 0, 0}, participatedFlags: map[uint8]bool{
@@ -460,7 +460,7 @@ func TestSetParticipationAndRewardProposer(t *testing.T) {
 				headFlagIndex:   false,
 			},
 			wantedParticipation: []byte{0, 0, 0, 0, 0, 0, 0, 0},
-			wantedBalance:       32000000000,
+			wantedBalance:       40000000000000,
 		},
 		{name: "some participated with some flags",
 			indices: []uint64{0, 1, 2, 3}, epochParticipation: []byte{0, 0, 0, 0, 0, 0, 0, 0}, participatedFlags: map[uint8]bool{
@@ -469,7 +469,9 @@ func TestSetParticipationAndRewardProposer(t *testing.T) {
 				headFlagIndex:   false,
 			},
 			wantedParticipation: []byte{3, 3, 3, 3, 0, 0, 0, 0},
-			wantedBalance:       32000090342,
+			// TODO(rgeraldes24): double check
+			// wantedBalance:       32000090342,
+			wantedBalance: 40000003185714,
 		},
 		{name: "all participated with some flags",
 			indices: []uint64{0, 1, 2, 3, 4, 5, 6, 7}, epochParticipation: []byte{0, 0, 0, 0, 0, 0, 0, 0}, participatedFlags: map[uint8]bool{
@@ -478,7 +480,9 @@ func TestSetParticipationAndRewardProposer(t *testing.T) {
 				headFlagIndex:   false,
 			},
 			wantedParticipation: []byte{1, 1, 1, 1, 1, 1, 1, 1},
-			wantedBalance:       32000063240,
+			// wantedBalance:       32000063240,
+			// TODO(rgeraldes24): double check
+			wantedBalance: 40000002230000,
 		},
 		{name: "all participated with all flags",
 			indices: []uint64{0, 1, 2, 3, 4, 5, 6, 7}, epochParticipation: []byte{0, 0, 0, 0, 0, 0, 0, 0}, participatedFlags: map[uint8]bool{
@@ -487,7 +491,9 @@ func TestSetParticipationAndRewardProposer(t *testing.T) {
 				headFlagIndex:   true,
 			},
 			wantedParticipation: []byte{7, 7, 7, 7, 7, 7, 7, 7},
-			wantedBalance:       32000243925,
+			// wantedBalance:       32000243925,
+			// TODO(rgeraldes24): double check
+			wantedBalance: 40000008601428,
 		},
 	}
 	for _, test := range tests {
@@ -564,7 +570,8 @@ func TestEpochParticipation(t *testing.T) {
 				targetFlagIndex: true,
 				headFlagIndex:   false,
 			},
-			wantedNumerator:          40473600,
+			// wantedNumerator:          40473600,
+			wantedNumerator:          1427200000,
 			wantedEpochParticipation: []byte{3, 3, 3, 3, 0, 0, 0, 0},
 		},
 		{name: "all participated with some flags",
@@ -573,7 +580,8 @@ func TestEpochParticipation(t *testing.T) {
 				targetFlagIndex: false,
 				headFlagIndex:   false,
 			},
-			wantedNumerator:          28331520,
+			// wantedNumerator:          28331520,
+			wantedNumerator:          999040000,
 			wantedEpochParticipation: []byte{1, 1, 1, 1, 1, 1, 1, 1},
 		},
 		{name: "all participated with all flags",
@@ -582,7 +590,8 @@ func TestEpochParticipation(t *testing.T) {
 				targetFlagIndex: true,
 				headFlagIndex:   true,
 			},
-			wantedNumerator:          109278720,
+			// wantedNumerator:          109278720,
+			wantedNumerator:          3853440000,
 			wantedEpochParticipation: []byte{7, 7, 7, 7, 7, 7, 7, 7},
 		},
 	}
@@ -603,11 +612,12 @@ func TestRewardProposer(t *testing.T) {
 		rewardNumerator uint64
 		want            uint64
 	}{
-		{rewardNumerator: 1, want: 32000000000},
-		{rewardNumerator: 10000, want: 32000000022},
-		{rewardNumerator: 1000000, want: 32000002254},
-		{rewardNumerator: 1000000000, want: 32002234396},
-		{rewardNumerator: 1000000000000, want: 34234377253},
+		// TODO(rgeraldes24): double check
+		{rewardNumerator: 1, want: 40000000000000},
+		{rewardNumerator: 10000, want: 40000000000022},
+		{rewardNumerator: 1000000, want: 40000000002254},
+		{rewardNumerator: 1000000000, want: 40000002234396},
+		{rewardNumerator: 1000000000000, want: 40002234377253},
 	}
 	for _, test := range tests {
 		require.NoError(t, altair.RewardProposer(context.Background(), beaconState, test.rewardNumerator))

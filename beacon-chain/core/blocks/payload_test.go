@@ -1,6 +1,7 @@
 package blocks_test
 
 import (
+	"encoding/hex"
 	"testing"
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
@@ -360,6 +361,11 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 	require.NoError(t, err)
 	ts, err := slots.ToTime(st.GenesisTime(), st.Slot())
 	require.NoError(t, err)
+	wrappedHeader, err := consensusblocks.WrappedExecutionPayloadHeaderCapella(&enginev1.ExecutionPayloadHeaderCapella{BlockHash: []byte{'a'}}, 0)
+	require.NoError(t, err)
+	require.NoError(t, st.SetLatestExecutionPayloadHeader(wrappedHeader))
+	wdRoot, err := hex.DecodeString("792930bbd5baac43bcc798ee49aa8185ef76bb3b44ba62b91d86ae569e4bb535")
+	require.NoError(t, err)
 	tests := []struct {
 		name   string
 		header interfaces.ExecutionData
@@ -372,8 +378,10 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 				require.NoError(t, err)
 				p, ok := h.Proto().(*enginev1.ExecutionPayloadHeaderCapella)
 				require.Equal(t, true, ok)
+				p.ParentHash = []byte{'a'}
 				p.PrevRandao = random
 				p.Timestamp = uint64(ts.Unix())
+				p.WithdrawalsRoot = wdRoot
 				return h
 			}(), err: nil,
 		},
@@ -382,6 +390,9 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 			header: func() interfaces.ExecutionData {
 				h, err := emptyPayloadHeaderCapella()
 				require.NoError(t, err)
+				p, ok := h.Proto().(*enginev1.ExecutionPayloadHeaderCapella)
+				require.Equal(t, true, ok)
+				p.WithdrawalsRoot = wdRoot
 				return h
 			}(),
 			err: blocks.ErrInvalidPayloadPrevRandao,
@@ -395,6 +406,7 @@ func Test_ProcessPayloadHeader(t *testing.T) {
 				require.Equal(t, true, ok)
 				p.PrevRandao = random
 				p.Timestamp = 1
+				p.WithdrawalsRoot = wdRoot
 				return h
 			}(),
 			err: blocks.ErrInvalidPayloadTimeStamp,
