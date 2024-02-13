@@ -3,7 +3,6 @@ package lookup
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/theQRL/go-zond/common/hexutil"
@@ -11,11 +10,13 @@ import (
 	dbtesting "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
+	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestGetBlock(t *testing.T) {
@@ -140,11 +141,23 @@ func TestGetBlock(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			pbBlock, err := result.PbCapellaBlock()
+
+			wsb, err := blocks.NewSignedBeaconBlock(tt.want)
 			require.NoError(t, err)
-			if !reflect.DeepEqual(pbBlock, tt.want) {
-				t.Error("Expected blocks to equal")
+
+			// NOTE(rgeraldes) head block is cached (not blinded)
+			var wanted interfaces.ReadOnlySignedBeaconBlock = wsb
+			if tt.name != "head" {
+				wanted, err = wsb.ToBlinded()
+				require.NoError(t, err)
 			}
+			wantedPb, err := wanted.Proto()
+			require.NoError(t, err)
+
+			resultPb, err := result.Proto()
+			require.NoError(t, err)
+
+			require.Equal(t, true, proto.Equal(wantedPb, resultPb), "Wanted: %v, received: %v", tt.want, result)
 		})
 	}
 }

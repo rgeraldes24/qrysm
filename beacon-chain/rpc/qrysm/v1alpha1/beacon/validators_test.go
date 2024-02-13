@@ -23,6 +23,7 @@ import (
 	mockstategen "github.com/theQRL/qrysm/v4/beacon-chain/state/stategen/mock"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
 	"github.com/theQRL/qrysm/v4/cmd"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
@@ -1097,7 +1098,7 @@ func TestServer_ListValidators_ProcessHeadStateSlots(t *testing.T) {
 	for i := uint64(0); i < numValidators; i++ {
 		validators[i] = &zondpb.Validator{
 			ActivationEpoch:       0,
-			PublicKey:             make([]byte, 48),
+			PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 		}
@@ -1363,7 +1364,7 @@ func TestServer_GetValidatorParticipation_CurrentAndPrevEpoch(t *testing.T) {
 	balances := make([]uint64, validatorCount)
 	for i := 0; i < len(validators); i++ {
 		validators[i] = &zondpb.Validator{
-			PublicKey:             bytesutil.ToBytes(uint64(i), 48),
+			PublicKey:             bytesutil.ToBytes(uint64(i), field_params.DilithiumPubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
@@ -1446,7 +1447,7 @@ func TestServer_GetValidatorParticipation_OrphanedUntilGenesis(t *testing.T) {
 	balances := make([]uint64, validatorCount)
 	for i := 0; i < len(validators); i++ {
 		validators[i] = &zondpb.Validator{
-			PublicKey:             bytesutil.ToBytes(uint64(i), 48),
+			PublicKey:             bytesutil.ToBytes(uint64(i), field_params.DilithiumPubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
@@ -1645,9 +1646,9 @@ func TestGetValidatorPerformance_OK(t *testing.T) {
 	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GweiPerEth
 	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GweiPerEth}
 	require.NoError(t, headState.SetBalances(balances))
-	publicKey1 := bytesutil.ToBytes48([]byte{1})
-	publicKey2 := bytesutil.ToBytes48([]byte{2})
-	publicKey3 := bytesutil.ToBytes48([]byte{3})
+	publicKey1 := bytesutil.ToBytes2592([]byte{1})
+	publicKey2 := bytesutil.ToBytes2592([]byte{2})
+	publicKey3 := bytesutil.ToBytes2592([]byte{3})
 	validators := []*zondpb.Validator{
 		{
 			PublicKey:       publicKey1[:],
@@ -1668,6 +1669,7 @@ func TestGetValidatorPerformance_OK(t *testing.T) {
 		},
 	}
 	require.NoError(t, headState.SetValidators(validators))
+	require.NoError(t, headState.SetInactivityScores([]uint64{0, 0, 0}))
 	require.NoError(t, headState.SetBalances([]uint64{100, 101, 102}))
 	offset := int64(headState.Slot().Mul(params.BeaconConfig().SecondsPerSlot))
 	bs := &Server{
@@ -1709,9 +1711,9 @@ func TestGetValidatorPerformance_Indices(t *testing.T) {
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
 	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GweiPerEth}
 	require.NoError(t, headState.SetBalances(balances))
-	publicKey1 := bytesutil.ToBytes48([]byte{1})
-	publicKey2 := bytesutil.ToBytes48([]byte{2})
-	publicKey3 := bytesutil.ToBytes48([]byte{3})
+	publicKey1 := bytesutil.ToBytes2592([]byte{1})
+	publicKey2 := bytesutil.ToBytes2592([]byte{2})
+	publicKey3 := bytesutil.ToBytes2592([]byte{3})
 	validators := []*zondpb.Validator{
 		{
 			PublicKey:       publicKey1[:],
@@ -1783,9 +1785,9 @@ func TestGetValidatorPerformance_IndicesPubkeys(t *testing.T) {
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
 	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GweiPerEth}
 	require.NoError(t, headState.SetBalances(balances))
-	publicKey1 := bytesutil.ToBytes48([]byte{1})
-	publicKey2 := bytesutil.ToBytes48([]byte{2})
-	publicKey3 := bytesutil.ToBytes48([]byte{3})
+	publicKey1 := bytesutil.ToBytes2592([]byte{1})
+	publicKey2 := bytesutil.ToBytes2592([]byte{2})
+	publicKey3 := bytesutil.ToBytes2592([]byte{3})
 	validators := []*zondpb.Validator{
 		{
 			PublicKey:       publicKey1[:],
@@ -1863,9 +1865,9 @@ func TestGetValidatorPerformanceCapella_OK(t *testing.T) {
 	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GweiPerEth
 	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GweiPerEth}
 	require.NoError(t, headState.SetBalances(balances))
-	publicKey1 := bytesutil.ToBytes48([]byte{1})
-	publicKey2 := bytesutil.ToBytes48([]byte{2})
-	publicKey3 := bytesutil.ToBytes48([]byte{3})
+	publicKey1 := bytesutil.ToBytes2592([]byte{1})
+	publicKey2 := bytesutil.ToBytes2592([]byte{2})
+	publicKey3 := bytesutil.ToBytes2592([]byte{3})
 	validators := []*zondpb.Validator{
 		{
 			PublicKey:       publicKey1[:],

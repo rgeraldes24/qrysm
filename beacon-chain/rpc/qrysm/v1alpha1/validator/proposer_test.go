@@ -37,6 +37,7 @@ import (
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
@@ -77,7 +78,8 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	require.NoError(t, db.SaveState(ctx, beaconState, parentRoot), "Could not save genesis state")
 	require.NoError(t, db.SaveHeadBlockRoot(ctx, parentRoot), "Could not save genesis state")
 
-	capellaSlot := primitives.Slot(0)
+	// NOTE(rgeraldes24) the slot must be > fieldparams.SlotsPerEpoch
+	capellaSlot := primitives.Slot(fieldparams.SlotsPerEpoch + 1)
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
 	blk := &zondpb.SignedBeaconBlockCapella{
@@ -2038,7 +2040,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestEth1DataEqGenesisEth1Block(t
 	blkRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	var mockSig [96]byte
+	var mockSig [field_params.DilithiumSignatureLength]byte
 	var mockCreds [32]byte
 
 	readyDeposits := []*zondpb.DepositContainer{
@@ -2046,7 +2048,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestEth1DataEqGenesisEth1Block(t
 			Index: 0,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -2055,7 +2057,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestEth1DataEqGenesisEth1Block(t
 			Index: 1,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), 48),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -2068,7 +2070,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestEth1DataEqGenesisEth1Block(t
 			Index: i,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.DilithiumPubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},

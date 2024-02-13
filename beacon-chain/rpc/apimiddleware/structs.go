@@ -716,7 +716,7 @@ type AggregatedAttReceivedDataJson struct {
 type UnaggregatedAttReceivedDataJson struct {
 	AggregationBits string               `json:"aggregation_bits" hex:"true"`
 	Data            *AttestationDataJson `json:"data"`
-	Signature       string               `json:"signature" hex:"true"`
+	Signatures      []string             `json:"signatures" hex:"true"`
 }
 
 type EventFinalizedCheckpointJson struct {

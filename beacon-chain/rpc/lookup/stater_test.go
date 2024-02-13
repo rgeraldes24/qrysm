@@ -7,15 +7,14 @@ import (
 	"testing"
 	"time"
 
-	statenative "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
-	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
-
 	"github.com/theQRL/go-zond/common/hexutil"
 	chainMock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
+	statenative "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	mockstategen "github.com/theQRL/qrysm/v4/beacon-chain/state/stategen/mock"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -184,7 +183,7 @@ func TestGetState(t *testing.T) {
 		stateId, err := hexutil.Decode("0x" + strings.Repeat("f", 64))
 		require.NoError(t, err)
 		_, err = p.State(ctx, stateId)
-		require.ErrorContains(t, "state not found in the last 8192 state roots", err)
+		require.ErrorContains(t, "state not found in the last 1024 state roots", err)
 	})
 
 	t.Run("slot", func(t *testing.T) {
@@ -354,7 +353,7 @@ func TestGetStateRoot(t *testing.T) {
 		stateId, err := hexutil.Decode("0x" + strings.Repeat("f", 64))
 		require.NoError(t, err)
 		_, err = p.StateRoot(ctx, stateId)
-		require.ErrorContains(t, "state root not found in the last 8192 state roots", err)
+		require.ErrorContains(t, "state root not found in the last 1024 state roots", err)
 	})
 
 	t.Run("slot", func(t *testing.T) {

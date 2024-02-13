@@ -10,6 +10,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
@@ -52,7 +53,7 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	depData := &zondpb.Deposit_Data{
 		PublicKey:             pubKey1,
 		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
-		Signature:             make([]byte, 96),
+		Signature:             make([]byte, field_params.DilithiumSignatureLength),
 	}
 	domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)
 	require.NoError(t, err)

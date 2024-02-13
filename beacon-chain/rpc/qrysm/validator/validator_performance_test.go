@@ -16,6 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -40,72 +41,12 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, http.StatusServiceUnavailable, rawResp.StatusCode)
 	})
-	t.Run("OK", func(t *testing.T) {
-		helpers.ClearCache()
-		params.SetupTestConfigCleanup(t)
-		params.OverrideBeaconConfig(params.MinimalSpecConfig())
-
-		publicKeys := [][48]byte{
-			bytesutil.ToBytes48([]byte{1}),
-			bytesutil.ToBytes48([]byte{2}),
-			bytesutil.ToBytes48([]byte{3}),
-		}
-		headState, err := util.NewBeaconStateCapella()
-		require.NoError(t, err)
-		headState = setHeadState(t, headState, publicKeys)
-		require.NoError(t, headState.SetBalances([]uint64{100, 101, 102}))
-
-		offset := int64(headState.Slot().Mul(params.BeaconConfig().SecondsPerSlot))
-		vs := &Server{
-			CoreService: &core.Service{
-				HeadFetcher: &mock.ChainService{
-					State: headState,
-				},
-				GenesisTimeFetcher: &mock.ChainService{Genesis: time.Now().Add(time.Duration(-1*offset) * time.Second)},
-				SyncChecker:        &mockSync.Sync{IsSyncing: false},
-			},
-		}
-		want := &ValidatorPerformanceResponse{
-			PublicKeys:                    [][]byte{publicKeys[1][:], publicKeys[2][:]},
-			CurrentEffectiveBalances:      []uint64{params.BeaconConfig().MaxEffectiveBalance, params.BeaconConfig().MaxEffectiveBalance},
-			CorrectlyVotedSource:          []bool{false, false},
-			CorrectlyVotedTarget:          []bool{false, false},
-			CorrectlyVotedHead:            []bool{false, false},
-			BalancesBeforeEpochTransition: []uint64{101, 102},
-			BalancesAfterEpochTransition:  []uint64{0, 0},
-			MissingValidators:             [][]byte{publicKeys[0][:]},
-		}
-
-		request := &ValidatorPerformanceRequest{
-			PublicKeys: [][]byte{publicKeys[0][:], publicKeys[2][:], publicKeys[1][:]},
-		}
-		var buf bytes.Buffer
-		err = json.NewEncoder(&buf).Encode(request)
-		require.NoError(t, err)
-
-		srv := httptest.NewServer(http.HandlerFunc(vs.GetValidatorPerformance))
-		req := httptest.NewRequest("POST", "/foo", &buf)
-		client := &http.Client{}
-		rawResp, err := client.Post(srv.URL, "application/json", req.Body)
-		require.NoError(t, err)
-		defer func() {
-			if err := rawResp.Body.Close(); err != nil {
-				t.Fatal(err)
-			}
-		}()
-		body, err := io.ReadAll(rawResp.Body)
-		require.NoError(t, err)
-
-		response := &ValidatorPerformanceResponse{}
-		require.NoError(t, json.Unmarshal(body, response))
-		require.DeepEqual(t, want, response)
-	})
 	t.Run("Indices", func(t *testing.T) {
 		ctx := context.Background()
-		publicKeys := [][48]byte{
-			bytesutil.ToBytes48([]byte{1}),
-			bytesutil.ToBytes48([]byte{2}),
-			bytesutil.ToBytes48([]byte{3}),
+		publicKeys := [][field_params.DilithiumPubkeyLength]byte{
+			bytesutil.ToBytes2592([]byte{1}),
+			bytesutil.ToBytes2592([]byte{2}),
+			bytesutil.ToBytes2592([]byte{3}),
 		}
 		headState, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
@@ -142,6 +83,7 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 			BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GweiPerEth},
 			BalancesAfterEpochTransition:  []uint64{vp[1].AfterEpochTransitionBalance, vp[2].AfterEpochTransitionBalance},
 			MissingValidators:             [][]byte{publicKeys[0][:]},
+			InactivityScores:              []uint64{0, 0},
 		}
 		request := &ValidatorPerformanceRequest{
 			Indices: []primitives.ValidatorIndex{2, 1, 0},
@@ -169,10 +111,10 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 	})
 	t.Run("Indices Pubkeys", func(t *testing.T) {
 		ctx := context.Background()
-		publicKeys := [][48]byte{
-			bytesutil.ToBytes48([]byte{1}),
-			bytesutil.ToBytes48([]byte{2}),
-			bytesutil.ToBytes48([]byte{3}),
+		publicKeys := [][field_params.DilithiumPubkeyLength]byte{
+			bytesutil.ToBytes2592([]byte{1}),
+			bytesutil.ToBytes2592([]byte{2}),
+			bytesutil.ToBytes2592([]byte{3}),
 		}
 		headState, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
@@ -209,6 +151,7 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 			BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GweiPerEth},
 			BalancesAfterEpochTransition:  []uint64{vp[1].AfterEpochTransitionBalance, vp[2].AfterEpochTransitionBalance},
 			MissingValidators:             [][]byte{publicKeys[0][:]},
+			InactivityScores:              []uint64{0, 0},
 		}
 		request := &ValidatorPerformanceRequest{
 			PublicKeys: [][]byte{publicKeys[0][:], publicKeys[2][:]}, Indices: []primitives.ValidatorIndex{1, 2},
@@ -234,19 +177,17 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 		require.NoError(t, json.Unmarshal(body, response))
 		require.DeepEqual(t, want, response)
 	})
-	t.Run("Capella OK", func(t *testing.T) {
+	t.Run("OK", func(t *testing.T) {
 		helpers.ClearCache()
 		params.SetupTestConfigCleanup(t)
 		params.OverrideBeaconConfig(params.MinimalSpecConfig())
 
-		publicKeys := [][48]byte{
-			bytesutil.ToBytes48([]byte{1}),
-			bytesutil.ToBytes48([]byte{2}),
-			bytesutil.ToBytes48([]byte{3}),
+		publicKeys := [][field_params.DilithiumPubkeyLength]byte{
+			bytesutil.ToBytes2592([]byte{1}),
+			bytesutil.ToBytes2592([]byte{2}),
+			bytesutil.ToBytes2592([]byte{3}),
 		}
-		epoch := primitives.Epoch(1)
 		headState, _ := util.DeterministicGenesisStateCapella(t, 32)
-		require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
 		headState = setHeadState(t, headState, publicKeys)
 
 		require.NoError(t, headState.SetInactivityScores([]uint64{0, 0, 0}))
@@ -298,7 +239,7 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 	})
 }
 
-func setHeadState(t *testing.T, headState state.BeaconState, publicKeys [][48]byte) state.BeaconState {
+func setHeadState(t *testing.T, headState state.BeaconState, publicKeys [][field_params.DilithiumPubkeyLength]byte) state.BeaconState {
 	epoch := primitives.Epoch(1)
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
 
@@ -306,6 +247,7 @@ func setHeadState(t *testing.T, headState state.BeaconState, publicKeys [][48]by
 	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GweiPerEth
 	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GweiPerEth}
 	require.NoError(t, headState.SetBalances(balances))
+	require.NoError(t, headState.SetInactivityScores([]uint64{0, 0, 0}))
 
 	validators := []*zondpb.Validator{
 		{
