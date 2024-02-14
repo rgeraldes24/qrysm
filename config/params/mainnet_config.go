@@ -24,7 +24,7 @@ var mainnetNetworkConfig = &NetworkConfig{
 	GossipMaxSizeBellatrix:          10 * 1 << 20, // 10 MiB
 	MaxChunkSizeBellatrix:           10 * 1 << 20, // 10 MiB
 	AttestationSubnetCount:          64,
-	AttestationPropagationSlotRange: 32,
+	AttestationPropagationSlotRange: 32,      // TODO(rgeraldes24)
 	MaxRequestBlocks:                1 << 10, // 1024
 	TtfbTimeout:                     35 * time.Second,
 	RespTimeout:                     50 * time.Second,

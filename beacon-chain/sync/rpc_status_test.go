@@ -183,8 +183,7 @@ func TestStatusRPCHandler_ReturnsHelloMessage(t *testing.T) {
 	finalized.Block.Slot = blkSlot
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconStateCapella(context.Background(), nil, 0, &zondpb.Eth1Data{}, &enginev1.ExecutionPayloadCapella{})
-	require.NoError(t, err)
+	genesisState, _ := util.DeterministicGenesisStateCapella(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), headRoot))
 	util.SaveBlock(t, context.Background(), db, finalized)
@@ -507,8 +506,7 @@ func TestStatusRPCRequest_FinalizedBlockExists(t *testing.T) {
 	finalized.Block.Slot = blkSlot
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconStateCapella(context.Background(), nil, 0, &zondpb.Eth1Data{DepositRoot: make([]byte, 32), BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayloadCapella{})
-	require.NoError(t, err)
+	genesisState, _ := util.DeterministicGenesisStateCapella(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), headRoot))
 	blk := util.NewBeaconBlockCapella()
@@ -595,8 +593,7 @@ func TestStatusRPCRequest_FinalizedBlockExists(t *testing.T) {
 func TestStatusRPCRequest_FinalizedBlockSkippedSlots(t *testing.T) {
 	db, err := kv.NewKVStore(context.Background(), t.TempDir())
 	require.NoError(t, err)
-	bState, err := transition.GenesisBeaconStateCapella(context.Background(), nil, 0, &zondpb.Eth1Data{DepositRoot: make([]byte, 32), BlockHash: make([]byte, 32)}, &enginev1.ExecutionPayloadCapella{})
-	require.NoError(t, err)
+	bState, _ := util.DeterministicGenesisStateCapella(t, 1)
 
 	blk := util.NewBeaconBlockCapella()
 	blk.Block.Slot = 0
@@ -939,7 +936,7 @@ func TestShouldResync(t *testing.T) {
 		{
 			name: "genesis epoch should not resync when syncing is true",
 			args: args{
-				headSlot: 31,
+				headSlot: 127,
 				genesis:  qrysmTime.Now(),
 				syncing:  true,
 			},
@@ -948,7 +945,7 @@ func TestShouldResync(t *testing.T) {
 		{
 			name: "genesis epoch should not resync when syncing is false",
 			args: args{
-				headSlot: 31,
+				headSlot: 127,
 				genesis:  qrysmTime.Now(),
 				syncing:  false,
 			},
@@ -957,8 +954,8 @@ func TestShouldResync(t *testing.T) {
 		{
 			name: "two epochs behind, resync ok",
 			args: args{
-				headSlot: 31,
-				genesis:  qrysmTime.Now().Add(-1 * 96 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
+				headSlot: 127,
+				genesis:  qrysmTime.Now().Add(-1 * 384 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
 				syncing:  false,
 			},
 			want: true,
@@ -967,15 +964,14 @@ func TestShouldResync(t *testing.T) {
 			name: "two epochs behind, already syncing",
 			args: args{
 				headSlot: 31,
-				genesis:  qrysmTime.Now().Add(-1 * 96 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
+				genesis:  qrysmTime.Now().Add(-1 * 384 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second),
 				syncing:  true,
 			},
 			want: false,
 		},
 	}
 	for _, tt := range tests {
-		headState, err := transition.GenesisBeaconStateCapella(context.Background(), nil, 0, &zondpb.Eth1Data{}, &enginev1.ExecutionPayloadCapella{})
-		require.NoError(t, err)
+		headState, _ := util.DeterministicGenesisStateCapella(t, 1)
 		require.NoError(t, headState.SetSlot(tt.args.headSlot))
 		chain := &mock.ChainService{
 			State:   headState,

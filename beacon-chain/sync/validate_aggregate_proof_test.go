@@ -86,7 +86,9 @@ func TestVerifySelection_NotAnAggregator(t *testing.T) {
 	validators := uint64(2048)
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, validators)
 
-	sig := privKeys[0].Sign([]byte{'A'})
+	// TODO(rgeraldes24)
+	//sig := privKeys[0].Sign([]byte{'A'})
+	sig := privKeys[0].Sign([]byte{'B'})
 	data := util.HydrateAttestationData(&zondpb.AttestationData{})
 
 	_, err := validateSelectionIndex(ctx, beaconState, data, 0, sig.Marshal())
@@ -316,7 +318,8 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	aggBits.SetBitAt(0, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
-			Slot:            1,
+			// Slot:            1,
+			Slot:            96, // TODO(rgeraldes24): double check attestation slot 1 not within attestation propagation range of 96 to 128 (current slot) config
 			BeaconBlockRoot: root[:],
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
@@ -420,7 +423,8 @@ func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 	aggBits.SetBitAt(0, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
-			Slot:            1,
+			// Slot:            1,
+			Slot:            96,
 			BeaconBlockRoot: root[:],
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},

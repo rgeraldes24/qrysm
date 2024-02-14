@@ -383,14 +383,14 @@ func TestValidatePendingAtts_CanPruneOldAtts(t *testing.T) {
 	assert.Equal(t, 100, len(s.blkRootToPendingAtts[r2]), "Did not save pending atts")
 	assert.Equal(t, 100, len(s.blkRootToPendingAtts[r3]), "Did not save pending atts")
 
-	// Set current slot to 50, it should prune 19 attestations. (50 - 31)
-	s.validatePendingAtts(context.Background(), 50)
+	// Set current slot to 146, it should prune 19 attestations. (146 - 127)
+	s.validatePendingAtts(context.Background(), 146)
 	assert.Equal(t, 81, len(s.blkRootToPendingAtts[r1]), "Did not delete pending atts")
 	assert.Equal(t, 81, len(s.blkRootToPendingAtts[r2]), "Did not delete pending atts")
 	assert.Equal(t, 81, len(s.blkRootToPendingAtts[r3]), "Did not delete pending atts")
 
-	// Set current slot to 100 + slot_duration, it should prune all the attestations.
-	s.validatePendingAtts(context.Background(), 100+params.BeaconConfig().SlotsPerEpoch)
+	// Set current slot to 387 + slot_duration, it should prune all the attestations.
+	s.validatePendingAtts(context.Background(), 387+params.BeaconConfig().SlotsPerEpoch)
 	assert.Equal(t, 0, len(s.blkRootToPendingAtts[r1]), "Did not delete pending atts")
 	assert.Equal(t, 0, len(s.blkRootToPendingAtts[r2]), "Did not delete pending atts")
 	assert.Equal(t, 0, len(s.blkRootToPendingAtts[r3]), "Did not delete pending atts")

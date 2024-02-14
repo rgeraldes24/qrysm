@@ -21,6 +21,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -38,7 +39,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{'A'},
 	}
-	var emptySig [96]byte
+	var emptySig [field_params.DilithiumSignatureLength]byte
 	type args struct {
 		pid   peer.ID
 		msg   *zondpb.SignedDilithiumToExecutionChange
@@ -72,7 +73,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -99,7 +100,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -122,7 +123,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				s.cfg.dilithiumToExecPool.InsertDilithiumToExecChange(&zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      10,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -135,7 +136,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      10,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -180,7 +181,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -215,7 +216,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -253,7 +254,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -298,7 +299,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -328,7 +329,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				// Provide invalid withdrawal key for validator
 				msg.Message.FromDilithiumPubkey = keys[51].PublicKey().Marshal()
 				msg.Message.ToExecutionAddress = wantedExecAddress
-				badSig := make([]byte, 96)
+				badSig := make([]byte, field_params.DilithiumSignatureLength)
 				copy(badSig, []byte{'j', 'u', 'n', 'k'})
 				msg.Signature = badSig
 				return s, topic
@@ -339,7 +340,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],
@@ -383,7 +384,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				msg: &zondpb.SignedDilithiumToExecutionChange{
 					Message: &zondpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
-						FromDilithiumPubkey: make([]byte, 48),
+						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
 					},
 					Signature: emptySig[:],

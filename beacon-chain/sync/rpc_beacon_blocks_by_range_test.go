@@ -358,6 +358,8 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 		defer wg.Done()
 		for i := newReq.StartSlot; i < newReq.StartSlot.Add(newReq.Count*newReq.Step); i += primitives.Slot(newReq.Step) {
 			expectSuccess(t, stream)
+			_, err := readContextFromStream(stream)
+			assert.NoError(t, err)
 			res := util.NewBeaconBlockCapella()
 			assert.NoError(t, r.cfg.p2p.Encoding().DecodeWithMaxLength(stream, res))
 			if res.Block.Slot.SubSlot(newReq.StartSlot).Mod(newReq.Step) != 0 {
@@ -365,7 +367,7 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 			}
 			// Expect EOF
 			b := make([]byte, 1)
-			_, err := stream.Read(b)
+			_, err = stream.Read(b)
 			require.ErrorContains(t, io.EOF.Error(), err)
 		}
 		require.Equal(t, uint64(1), mockEngine.NumReconstructedPayloads)

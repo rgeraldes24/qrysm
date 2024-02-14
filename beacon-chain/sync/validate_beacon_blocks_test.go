@@ -1240,6 +1240,8 @@ func TestValidateBeaconBlockPubSub_InvalidPayloadTimestamp(t *testing.T) {
 	assert.Equal(t, true, result)
 }
 
+// NOTE(rgeraldes24): this test is not valid atm since the block and state just have one version
+/*
 func Test_validateBellatrixBeaconBlock(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
@@ -1270,6 +1272,7 @@ func Test_validateBellatrixBeaconBlock(t *testing.T) {
 	require.NoError(t, err)
 	require.ErrorContains(t, "block and state are not the same version", r.validateBellatrixBeaconBlock(ctx, st, blk.Block()))
 }
+*/
 
 func Test_validateBellatrixBeaconBlockParentValidation(t *testing.T) {
 	db := dbtest.SetupDB(t)

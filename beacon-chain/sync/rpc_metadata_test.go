@@ -145,7 +145,6 @@ func TestMetadataRPCHandler_SendsMetadata(t *testing.T) {
 
 func TestMetadataRPCHandler_SendsMetadataAltair(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
-	// params.BeaconConfig().InitializeForkSchedule()
 
 	p1 := p2ptest.NewTestP2P(t)
 	p2 := p2ptest.NewTestP2P(t)
@@ -253,7 +252,7 @@ func TestExtractMetaDataType(t *testing.T) {
 				digest: []byte{},
 				clock:  startup.NewClock(time.Now(), [32]byte{}),
 			},
-			want:    wrapper.WrappedMetadataV0(&pb.MetaDataV0{}),
+			want:    wrapper.WrappedMetadataV1(&pb.MetaDataV1{}),
 			wantErr: false,
 		},
 		{
@@ -280,7 +279,7 @@ func TestExtractMetaDataType(t *testing.T) {
 				digest: genDigest[:],
 				clock:  startup.NewClock(time.Now(), [32]byte{}),
 			},
-			want:    wrapper.WrappedMetadataV0(&pb.MetaDataV0{}),
+			want:    wrapper.WrappedMetadataV1(&pb.MetaDataV1{}),
 			wantErr: false,
 		},
 	}
