@@ -8,6 +8,7 @@ import (
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -50,7 +51,7 @@ func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {
 	validators := make([]*zondpb.Validator, validatorCount)
 
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, field_params.DilithiumPubkeyLength)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey:             k,
@@ -70,13 +71,13 @@ func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {
 	att := &zondpb.Attestation{
 		AggregationBits: []byte{'A'},
 		Data: &zondpb.AttestationData{
-			Slot:            34,
+			Slot:            130,
 			CommitteeIndex:  4,
 			BeaconBlockRoot: []byte{'C'},
 			Source:          nil,
 			Target:          nil,
 		},
-		Signatures: [][]byte{[]byte{'B'}},
+		Signatures: [][]byte{{'B'}},
 	}
 	valCount, err := helpers.ActiveValidatorCount(context.Background(), state, slots.ToEpoch(att.Data.Slot))
 	require.NoError(t, err)

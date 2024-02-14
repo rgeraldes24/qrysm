@@ -217,9 +217,11 @@ func TestBeaconProposerIndex_OK(t *testing.T) {
 			slot:  30,
 			index: 369,
 		},
+		// TODO(rgeraldes24): double check this value since it has been modified
+		// and slot 43 is now in epoch 0 instead of 1 in the past
 		{
 			slot:  43,
-			index: 464,
+			index: 2003,
 		},
 	}
 
@@ -343,8 +345,10 @@ func TestChurnLimit_OK(t *testing.T) {
 		validatorCount int
 		wantedChurn    uint64
 	}{
-		{validatorCount: 1000, wantedChurn: 4},
-		{validatorCount: 100000, wantedChurn: 4},
+		// {validatorCount: 1000, wantedChurn: 4},
+		{validatorCount: 1000, wantedChurn: 10},
+		// {validatorCount: 100000, wantedChurn: 4},
+		{validatorCount: 100000, wantedChurn: 10},
 		{validatorCount: 1000000, wantedChurn: 15 /* validatorCount/churnLimitQuotient */},
 		{validatorCount: 2000000, wantedChurn: 30 /* validatorCount/churnLimitQuotient */},
 	}

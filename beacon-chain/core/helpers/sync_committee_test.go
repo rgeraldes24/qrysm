@@ -8,6 +8,7 @@ import (
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -373,18 +374,19 @@ func TestUpdateSyncCommitteeCache_BadRoot(t *testing.T) {
 	require.ErrorContains(t, "zero hash state root can't be used to update cache", err)
 }
 
+// NOTE(rgeraldes24): modified test to take the new value of SyncCommitteeSize(16) into account
 func TestIsCurrentEpochSyncCommittee_SameBlockRoot(t *testing.T) {
 	ClearCache()
 	defer ClearCache()
 	validators := make([]*zondpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &zondpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, 48)
+		k := make([]byte, field_params.DilithiumPubkeyLength)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &zondpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, 48))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, field_params.DilithiumPubkeyLength))
 	}
 
 	blockRoots := make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot)
@@ -399,7 +401,7 @@ func TestIsCurrentEpochSyncCommittee_SameBlockRoot(t *testing.T) {
 	require.NoError(t, state.SetCurrentSyncCommittee(syncCommittee))
 	require.NoError(t, state.SetNextSyncCommittee(syncCommittee))
 
-	comIdxs, err := CurrentPeriodSyncSubcommitteeIndices(state, 200)
+	comIdxs, err := CurrentPeriodSyncSubcommitteeIndices(state, 10)
 	require.NoError(t, err)
 
 	wantedSlot := params.BeaconConfig().EpochsPerSyncCommitteePeriod.Mul(uint64(params.BeaconConfig().SlotsPerEpoch))
@@ -410,7 +412,7 @@ func TestIsCurrentEpochSyncCommittee_SameBlockRoot(t *testing.T) {
 		syncCommittee.Pubkeys[i], syncCommittee.Pubkeys[j] = syncCommittee.Pubkeys[j], syncCommittee.Pubkeys[i]
 	})
 	require.NoError(t, state.SetCurrentSyncCommittee(syncCommittee))
-	newIdxs, err := CurrentPeriodSyncSubcommitteeIndices(state, 200)
+	newIdxs, err := CurrentPeriodSyncSubcommitteeIndices(state, 10)
 	require.NoError(t, err)
 	require.DeepNotEqual(t, comIdxs, newIdxs)
 }

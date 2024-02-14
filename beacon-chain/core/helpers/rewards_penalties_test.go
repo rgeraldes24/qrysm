@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
@@ -199,7 +200,7 @@ func TestFinalityDelay(t *testing.T) {
 }
 
 func TestIsInInactivityLeak(t *testing.T) {
-	base := buildState(params.BeaconConfig().SlotsPerEpoch*6, 1)
+	base := buildState(params.BeaconConfig().SlotsPerEpoch*10, 1)
 	base.FinalizedCheckpoint = &zondpb.Checkpoint{Epoch: 3}
 	beaconState, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
@@ -211,6 +212,8 @@ func TestIsInInactivityLeak(t *testing.T) {
 		finalizedEpoch = beaconState.FinalizedCheckpointEpoch()
 	}
 	setVal()
+	fmt.Println(prevEpoch)
+	fmt.Println(finalizedEpoch)
 	assert.Equal(t, true, IsInInactivityLeak(prevEpoch, finalizedEpoch), "Wanted inactivity leak true")
 	require.NoError(t, beaconState.SetFinalizedCheckpoint(&zondpb.Checkpoint{Epoch: 4}))
 	setVal()

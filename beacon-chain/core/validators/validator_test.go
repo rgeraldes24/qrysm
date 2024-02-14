@@ -75,10 +75,17 @@ func TestInitiateValidatorExit_ProperExit(t *testing.T) {
 	assert.Equal(t, exitedEpoch+2, v.ExitEpoch, "Exit epoch was not the highest")
 }
 
+// NOTE(rgeraldes24): test has been modified to use the new MinPerEpochChurnLimit value(10)
 func TestInitiateValidatorExit_ChurnOverflow(t *testing.T) {
 	exitedEpoch := primitives.Epoch(100)
-	idx := primitives.ValidatorIndex(4)
+	idx := primitives.ValidatorIndex(10)
 	base := &zondpb.BeaconStateCapella{Validators: []*zondpb.Validator{
+		{ExitEpoch: exitedEpoch + 2},
+		{ExitEpoch: exitedEpoch + 2},
+		{ExitEpoch: exitedEpoch + 2},
+		{ExitEpoch: exitedEpoch + 2},
+		{ExitEpoch: exitedEpoch + 2},
+		{ExitEpoch: exitedEpoch + 2},
 		{ExitEpoch: exitedEpoch + 2},
 		{ExitEpoch: exitedEpoch + 2},
 		{ExitEpoch: exitedEpoch + 2},
@@ -87,7 +94,7 @@ func TestInitiateValidatorExit_ChurnOverflow(t *testing.T) {
 	}}
 	state, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
-	newState, epoch, err := InitiateValidatorExit(context.Background(), state, idx, exitedEpoch+2, 4)
+	newState, epoch, err := InitiateValidatorExit(context.Background(), state, idx, exitedEpoch+2, 10)
 	require.NoError(t, err)
 	require.Equal(t, exitedEpoch+3, epoch)
 

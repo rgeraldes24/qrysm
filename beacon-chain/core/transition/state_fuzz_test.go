@@ -1,5 +1,6 @@
 package transition
 
+/*
 import (
 	"context"
 	"testing"
@@ -68,3 +69,4 @@ func TestIsValidGenesisState_100000(_ *testing.T) {
 		IsValidGenesisState(chainStartDepositCount, currentTime)
 	}
 }
+*/

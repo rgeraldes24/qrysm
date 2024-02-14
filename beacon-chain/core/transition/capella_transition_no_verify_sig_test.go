@@ -193,7 +193,7 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 
 func TestProcessEpoch_BadBalanceCapella(t *testing.T) {
 	s, _ := util.DeterministicGenesisStateCapella(t, 100)
-	assert.NoError(t, s.SetSlot(63))
+	assert.NoError(t, s.SetSlot(255))
 	assert.NoError(t, s.UpdateBalancesAtIndex(0, math.MaxUint64))
 	participation := byte(0)
 	participation, err := altair.AddValidatorFlag(participation, params.BeaconConfig().TimelyHeadFlagIndex)

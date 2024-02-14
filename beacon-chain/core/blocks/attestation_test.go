@@ -114,7 +114,7 @@ func TestProcessAttestationsNoVerify_OlderThanSlotsPerEpoch(t *testing.T) {
 		require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(ckp))
 		// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
-		require.ErrorContains(t, "state slot 33 > attestation slot 0 + SLOTS_PER_EPOCH 32", blocks.VerifyAttestationNoVerifySignatures(ctx, beaconState, att))
+		require.ErrorContains(t, "state slot 129 > attestation slot 0 + SLOTS_PER_EPOCH 128", blocks.VerifyAttestationNoVerifySignatures(ctx, beaconState, att))
 	})
 }
 
