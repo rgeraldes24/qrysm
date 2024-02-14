@@ -13,7 +13,6 @@ import (
 	"github.com/theQRL/go-zond/common"
 	gzondTypes "github.com/theQRL/go-zond/core/types"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	db "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
@@ -26,6 +25,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	"github.com/theQRL/qrysm/v4/network/forks"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -241,8 +241,7 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 	require.NoError(t, err)
 	blockBRoot, err := blockB.Block.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconStateCapella(context.Background(), nil, 0, &zondpb.Eth1Data{}, &enginev1.ExecutionPayloadCapella{})
-	require.NoError(t, err)
+	genesisState, _ := util.DeterministicGenesisStateCapella(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), blockARoot))
 	finalizedCheckpt := &zondpb.Checkpoint{
@@ -287,6 +286,10 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 		for _, blk := range response {
 			_, err := stream.Write([]byte{responseCodeSuccess})
 			assert.NoError(t, err, "Could not write to stream")
+			vRoot := r.cfg.clock.GenesisValidatorsRoot()
+			digest, err := forks.ForkDigestFromEpoch(params.BeaconConfig().GenesisEpoch, vRoot[:])
+			assert.NoError(t, err)
+			assert.NoError(t, writeContextToStream(digest[:], stream))
 			_, err = p2.Encoding().EncodeWithMaxLength(stream, blk)
 			assert.NoError(t, err, "Could not send response back")
 		}

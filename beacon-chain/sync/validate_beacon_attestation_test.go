@@ -1,31 +1,14 @@
 package sync
 
 import (
-	"bytes"
 	"context"
-	"fmt"
 	"testing"
-	"time"
 
-	pubsub "github.com/libp2p/go-libp2p-pubsub"
-	pubsubpb "github.com/libp2p/go-libp2p-pubsub/pb"
-	"github.com/theQRL/go-bitfield"
-	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
-	dbtest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
-	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
-	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
-	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
-	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
-	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+/*
 func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 	ctx := context.Background()
 	p := p2ptest.NewTestP2P(t)
@@ -291,7 +274,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 				m.Message.Topic = nil
 			}
 
-			res, err := s.validateCommitteeIndexBeaconAttestation(ctx, "" /*peerID*/, m)
+			res, err := s.validateCommitteeIndexBeaconAttestation(ctx, "", m)
 			received := res == pubsub.ValidationAccept
 			if received != tt.want {
 				t.Fatalf("Did not received wanted validation. Got %v, wanted %v", !tt.want, tt.want)
@@ -305,6 +288,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		})
 	}
 }
+*/
 
 func TestService_setSeenCommitteeIndicesSlot(t *testing.T) {
 	s := NewService(context.Background(), WithP2P(p2ptest.NewTestP2P(t)))

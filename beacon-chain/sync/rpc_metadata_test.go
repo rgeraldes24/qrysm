@@ -86,9 +86,10 @@ func TestMetadataRPCHandler_SendsMetadata(t *testing.T) {
 	p1.Connect(p2)
 	assert.Equal(t, 1, len(p1.BHost.Network().Peers()), "Expected peers to be connected")
 	bitfield := [8]byte{'A', 'B'}
-	p2.LocalMetadata = wrapper.WrappedMetadataV0(&pb.MetaDataV0{
+	p2.LocalMetadata = wrapper.WrappedMetadataV1(&pb.MetaDataV1{
 		SeqNumber: 2,
 		Attnets:   bitfield[:],
+		Syncnets:  []byte{'A'},
 	})
 
 	// Set up a head state in the database with data we expect.
@@ -130,7 +131,7 @@ func TestMetadataRPCHandler_SendsMetadata(t *testing.T) {
 	assert.NoError(t, err)
 
 	if !equality.DeepEqual(md.InnerObject(), p2.LocalMetadata.InnerObject()) {
-		t.Fatalf("MetadataV0 unequal, received %v but wanted %v", md, p2.LocalMetadata)
+		t.Fatalf("MetadataV1 unequal, received %v but wanted %v", md, p2.LocalMetadata)
 	}
 
 	if util.WaitTimeout(&wg, 1*time.Second) {

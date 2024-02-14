@@ -11,7 +11,6 @@ import (
 	"github.com/theQRL/go-zond/p2p/enr"
 	"github.com/theQRL/qrysm/v4/async/abool"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db/kv"
 	testingDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
@@ -28,7 +27,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/wrapper"
 	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -427,8 +425,7 @@ func TestStatusRPCRequest_RequestSent(t *testing.T) {
 	finalized.Block.Slot = 40
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconStateCapella(context.Background(), nil, 0, &zondpb.Eth1Data{}, &enginev1.ExecutionPayloadCapella{})
-	require.NoError(t, err)
+	genesisState, _ := util.DeterministicGenesisStateCapella(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), headRoot))
 	finalizedCheckpt := &zondpb.Checkpoint{
@@ -882,8 +879,7 @@ func TestStatusRPC_ValidGenesisMessage(t *testing.T) {
 	finalized.Block.Slot = blkSlot
 	finalizedRoot, err := finalized.Block.HashTreeRoot()
 	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconStateCapella(context.Background(), nil, 0, &zondpb.Eth1Data{}, &enginev1.ExecutionPayloadCapella{})
-	require.NoError(t, err)
+	genesisState, _ := util.DeterministicGenesisStateCapella(t, 1)
 	require.NoError(t, genesisState.SetSlot(111))
 	require.NoError(t, genesisState.UpdateBlockRootAtIndex(111%uint64(params.BeaconConfig().SlotsPerHistoricalRoot), headRoot))
 	finalizedCheckpt := &zondpb.Checkpoint{
