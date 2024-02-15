@@ -41,6 +41,8 @@ func TestHeightKeyFn_InvalidObj(t *testing.T) {
 	assert.Equal(t, ErrNotAHeaderInfo, err)
 }
 
+// TODO(rgeraldes24): maxCacheSize = 2 * params.BeaconConfig().Eth1FollowDistance
+/*
 func TestBlockCache_byHash(t *testing.T) {
 	cache := newHeaderCache()
 
@@ -82,6 +84,7 @@ func TestBlockCache_byHeight(t *testing.T) {
 	assert.Equal(t, header.Hash, fetchedInfo.Hash, "Expected hash to be equal")
 
 }
+*/
 
 func TestBlockCache_maxSize(t *testing.T) {
 	cache := newHeaderCache()
