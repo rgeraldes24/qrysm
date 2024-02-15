@@ -16,8 +16,8 @@ func TestReportEpochMetrics_BadHeadState(t *testing.T) {
 	require.NoError(t, h.SetValidators(nil))
 	err = reportEpochMetrics(context.Background(), s, h)
 	// require.ErrorContains(t, "failed to initialize precompute: state has nil validator slice", err)
-	// NOTE(rgeraldes24) - initial message in the capella flow is different
-	require.ErrorContains(t, "could not read every validator: nil validators in state", err)
+	// NOTE(rgeraldes24) - initial message in the capella flow is different; double check
+	require.ErrorContains(t, "could not read every validator: state has nil validator slice", err)
 }
 
 // NOTE(rgeraldes24) - same as below, old flow

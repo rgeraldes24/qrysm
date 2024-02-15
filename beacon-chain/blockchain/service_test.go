@@ -24,6 +24,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/v4/config/features"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/container/trie"
@@ -33,6 +34,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 	"github.com/theQRL/qrysm/v4/time/slots"
+	"google.golang.org/protobuf/proto"
 )
 
 func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
@@ -240,7 +242,13 @@ func TestChainService_InitializeChainInfo(t *testing.T) {
 	require.NoError(t, err)
 	pb, err := headBlk.Proto()
 	require.NoError(t, err)
-	assert.DeepEqual(t, headBlock, pb, "Head block incorrect")
+	wsb, err := blocks.NewSignedBeaconBlock(headBlock)
+	require.NoError(t, err)
+	wanted, err := wsb.ToBlinded()
+	require.NoError(t, err)
+	wantedPb, err := wanted.Proto()
+	require.NoError(t, err)
+	assert.Equal(t, proto.Equal(wantedPb, pb), true)
 	s, err := c.HeadState(ctx)
 	require.NoError(t, err)
 	assert.DeepSSZEqual(t, headState.ToProtoUnsafe(), s.ToProtoUnsafe(), "Head state incorrect")
@@ -291,7 +299,13 @@ func TestChainService_InitializeChainInfo_SetHeadAtGenesis(t *testing.T) {
 	assert.Equal(t, genesisRoot, c.originBlockRoot, "Genesis block root incorrect")
 	pb, err := c.head.block.Proto()
 	require.NoError(t, err)
-	assert.DeepEqual(t, headBlock, pb)
+	wsb, err := blocks.NewSignedBeaconBlock(headBlock)
+	require.NoError(t, err)
+	wanted, err := wsb.ToBlinded()
+	require.NoError(t, err)
+	wantedPb, err := wanted.Proto()
+	require.NoError(t, err)
+	assert.Equal(t, proto.Equal(wantedPb, pb), true)
 }
 
 func TestChainService_SaveHeadNoDB(t *testing.T) {

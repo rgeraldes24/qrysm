@@ -6,6 +6,7 @@ import (
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -16,9 +17,9 @@ import (
 
 // NOTE(rgeraldes24): cache is not empty when running tests like TestService_HeadSyncCommitteeIndices
 // along with the other package tests - without filtering(--test_filter) the specific test via bazel.
-// func init() {
-// 	transition.SkipSlotCache.Disable()
-// }
+func init() {
+	transition.SkipSlotCache.Disable()
+}
 
 func TestService_HeadSyncCommitteeIndices(t *testing.T) {
 	// TODO(rgeraldes24)
