@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/time"
@@ -79,7 +80,7 @@ func Bitlists64WithMultipleBitSet(t testing.TB, n, length, count uint64) []*bitf
 func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*zondpb.Attestation {
 	atts := make([]*zondpb.Attestation, len(bl))
 	for i, b := range bl {
-		atts[i] = &zondpb.Attestation{
+		att := &zondpb.Attestation{
 			AggregationBits: b,
 			Data: &zondpb.AttestationData{
 				Slot:           42,
@@ -87,6 +88,11 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*zondpb.Attestation {
 			},
 			Signatures: [][]byte{},
 		}
+		for i := 0; i < len(b.BitIndices()); i++ {
+			att.Signatures = append(att.Signatures, make([]byte, field_params.DilithiumSignatureLength))
+		}
+
+		atts[i] = att
 	}
 	return atts
 }

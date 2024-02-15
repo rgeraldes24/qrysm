@@ -535,3 +535,69 @@ func SaveBlock(tb assertions.AssertionTestingTB, ctx context.Context, db iface.N
 	require.NoError(tb, db.SaveBlock(ctx, wsb))
 	return wsb
 }
+
+// HydrateV2BellatrixSignedBeaconBlock hydrates a signed beacon block with correct field length sizes
+// to comply with fssz marshalling and unmarshalling rules.
+func HydrateV2CapellaSignedBeaconBlock(b *v2.SignedBeaconBlockCapella) *v2.SignedBeaconBlockCapella {
+	if b.Signature == nil {
+		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
+	}
+	b.Message = HydrateV2CapellaBeaconBlock(b.Message)
+	return b
+}
+
+// HydrateV2CapellaBeaconBlock hydrates a beacon block with correct field length sizes
+// to comply with fssz marshalling and unmarshalling rules.
+func HydrateV2CapellaBeaconBlock(b *v2.BeaconBlockCapella) *v2.BeaconBlockCapella {
+	if b == nil {
+		b = &v2.BeaconBlockCapella{}
+	}
+	if b.ParentRoot == nil {
+		b.ParentRoot = make([]byte, fieldparams.RootLength)
+	}
+	if b.StateRoot == nil {
+		b.StateRoot = make([]byte, fieldparams.RootLength)
+	}
+	b.Body = HydrateV2CapellaBeaconBlockBody(b.Body)
+	return b
+}
+
+// HydrateV2CapellaBeaconBlockBody hydrates a beacon block body with correct field length sizes
+// to comply with fssz marshalling and unmarshalling rules.
+func HydrateV2CapellaBeaconBlockBody(b *v2.BeaconBlockBodyCapella) *v2.BeaconBlockBodyCapella {
+	if b == nil {
+		b = &v2.BeaconBlockBodyCapella{}
+	}
+	if b.RandaoReveal == nil {
+		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)
+	}
+	if b.Graffiti == nil {
+		b.Graffiti = make([]byte, fieldparams.RootLength)
+	}
+	if b.Eth1Data == nil {
+		b.Eth1Data = &v1.Eth1Data{
+			DepositRoot: make([]byte, fieldparams.RootLength),
+			BlockHash:   make([]byte, fieldparams.RootLength),
+		}
+	}
+	if b.SyncAggregate == nil {
+		b.SyncAggregate = &v1.SyncAggregate{
+			SyncCommitteeBits:       make([]byte, 64),
+			SyncCommitteeSignatures: [][]byte{},
+		}
+	}
+	if b.ExecutionPayload == nil {
+		b.ExecutionPayload = &enginev1.ExecutionPayloadCapella{
+			ParentHash:    make([]byte, fieldparams.RootLength),
+			FeeRecipient:  make([]byte, 20),
+			StateRoot:     make([]byte, fieldparams.RootLength),
+			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
+			LogsBloom:     make([]byte, 256),
+			PrevRandao:    make([]byte, fieldparams.RootLength),
+			ExtraData:     make([]byte, fieldparams.RootLength),
+			BaseFeePerGas: make([]byte, fieldparams.RootLength),
+			BlockHash:     make([]byte, fieldparams.RootLength),
+		}
+	}
+	return b
+}

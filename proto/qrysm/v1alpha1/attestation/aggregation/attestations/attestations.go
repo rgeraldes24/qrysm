@@ -1,9 +1,10 @@
 package attestations
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
@@ -13,7 +14,8 @@ import (
 // attList represents list of attestations, defined for easier en masse operations (filtering, sorting).
 type attList []*zondpb.Attestation
 
-var signatureFromBytes = dilithium.SignatureFromBytes
+// TODO(rgeraldes24): remove?
+// var signatureFromBytes = dilithium.SignatureFromBytes
 
 var _ = logrus.WithField("prefix", "aggregation.attestations")
 
@@ -40,6 +42,12 @@ func AggregateDisjointOneBitAtts(atts []*zondpb.Attestation) (*zondpb.Attestatio
 	if len(atts) == 0 {
 		return nil, nil
 	}
+	for i, att := range atts {
+		if len(att.Signatures) != len(att.AggregationBits.BitIndices()) {
+			return nil, fmt.Errorf("signatures length %d is not equal to the attesting participants indices length %d for attestation with index %d", len(att.Signatures), len(att.AggregationBits.BitIndices()), i)
+		}
+	}
+
 	if len(atts) == 1 {
 		return atts[0], nil
 	}
@@ -73,6 +81,13 @@ func AggregateDisjointOneBitAtts(atts []*zondpb.Attestation) (*zondpb.Attestatio
 
 // AggregatePair aggregates pair of attestations a1 and a2 together.
 func AggregatePair(a1, a2 *zondpb.Attestation) (*zondpb.Attestation, error) {
+	if len(a1.AggregationBits.BitIndices()) != len(a1.Signatures) {
+		return nil, fmt.Errorf("att1: signatures length %d is not equal to the attesting participants indices length %d", len(a1.Signatures), len(a1.AggregationBits.BitIndices()))
+	}
+	if len(a2.AggregationBits.BitIndices()) != len(a2.Signatures) {
+		return nil, fmt.Errorf("att2: signatures length %d is not equal to the attesting participants indices length %d", len(a2.Signatures), len(a2.AggregationBits.BitIndices()))
+	}
+
 	o, err := a1.AggregationBits.Overlaps(a2.AggregationBits)
 	if err != nil {
 		return nil, err

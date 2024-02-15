@@ -40,7 +40,7 @@ func TestV1Alpha1SignedContributionAndProofToV2(t *testing.T) {
 	assert.Equal(t, slot, contrib.Slot)
 	assert.DeepEqual(t, blockHash, contrib.BeaconBlockRoot)
 	assert.Equal(t, uint64(1), contrib.SubcommitteeIndex)
-	assert.DeepEqual(t, bitfield.NewBitvector128(), contrib.AggregationBits)
+	assert.DeepEqual(t, bitfield.NewBitvector16(), contrib.AggregationBits)
 	assert.DeepEqual(t, signatures, contrib.Signatures)
 }
 

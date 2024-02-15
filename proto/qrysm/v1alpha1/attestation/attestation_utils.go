@@ -66,8 +66,8 @@ func ConvertToIndexed(ctx context.Context, attestation *zondpb.Attestation, comm
 		return nil, err
 	}
 
-	if len(attestation.Signatures) != len(committee) {
-		return nil, fmt.Errorf("signatures length %d is not equal to committee length %d", len(attestation.Signatures), len(committee))
+	if len(attestation.Signatures) != len(attIndices) {
+		return nil, fmt.Errorf("signatures length %d is not equal to the attesting participants indices length %d", len(attestation.Signatures), len(attIndices))
 	}
 
 	sigsCopy := make([][]byte, len(attestation.Signatures))
@@ -133,7 +133,7 @@ func AttestingIndices(bf bitfield.Bitfield, committee []primitives.ValidatorInde
 //	 signing_root = compute_signing_root(indexed_attestation.data, domain)
 //	 return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
 func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *zondpb.IndexedAttestation, pubKeys []dilithium.PublicKey, domain []byte) error {
-	ctx, span := trace.StartSpan(ctx, "attestationutil.VerifyIndexedAttestationSigs")
+	_, span := trace.StartSpan(ctx, "attestationutil.VerifyIndexedAttestationSigs")
 	defer span.End()
 
 	if len(indexedAtt.Signatures) != len(pubKeys) {
@@ -191,7 +191,7 @@ func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *zondpb.Indexe
 //	  signing_root = compute_signing_root(indexed_attestation.data, domain)
 //	  return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
 func IsValidAttestationIndices(ctx context.Context, indexedAttestation *zondpb.IndexedAttestation) error {
-	ctx, span := trace.StartSpan(ctx, "attestationutil.IsValidAttestationIndices")
+	_, span := trace.StartSpan(ctx, "attestationutil.IsValidAttestationIndices")
 	defer span.End()
 
 	if indexedAttestation == nil || indexedAttestation.Data == nil || indexedAttestation.Data.Target == nil || indexedAttestation.AttestingIndices == nil {
@@ -257,7 +257,7 @@ func SearchInsertIdxWithOffset(arr []int, initialIdx int, target int) (int, erro
 	}
 
 	if initialIdx > (arrLen - 1) {
-		return 0, fmt.Errorf("Invalid initial index %d for slice length %d", initialIdx, arrLen)
+		return 0, fmt.Errorf("invalid initial index %d for slice length %d", initialIdx, arrLen)
 	}
 
 	if target <= arr[initialIdx] {

@@ -1,7 +1,5 @@
 package migration
 
-// TODO(rgeraldes24): Capella tests
-/*
 import (
 	"testing"
 
@@ -14,9 +12,8 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-
 func Test_BellatrixToV1Alpha1SignedBlock(t *testing.T) {
-	v2Block := util.HydrateV2BellatrixSignedBeaconBlock(&zondpbv2.SignedBeaconBlockBellatrix{})
+	v2Block := util.HydrateV2CapellaSignedBeaconBlock(&zondpbv2.SignedBeaconBlockCapella{})
 	v2Block.Message.Slot = slot
 	v2Block.Message.ProposerIndex = validatorIndex
 	v2Block.Message.ParentRoot = parentRoot
@@ -30,10 +27,10 @@ func Test_BellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	syncCommitteeBits := bitfield.NewBitvector16()
 	syncCommitteeBits.SetBitAt(100, true)
 	v2Block.Message.Body.SyncAggregate = &zondpbv1.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: signature,
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{signature},
 	}
-	v2Block.Message.Body.ExecutionPayload = &enginev1.ExecutionPayload{
+	v2Block.Message.Body.ExecutionPayload = &enginev1.ExecutionPayloadCapella{
 		ParentHash:    parentHash,
 		FeeRecipient:  feeRecipient,
 		StateRoot:     stateRoot,
@@ -48,10 +45,11 @@ func Test_BellatrixToV1Alpha1SignedBlock(t *testing.T) {
 		BaseFeePerGas: baseFeePerGas,
 		BlockHash:     blockHash,
 		Transactions:  [][]byte{[]byte("transaction1"), []byte("transaction2")},
+		// TODO(rgeraldes24): withdrawals
 	}
 	v2Block.Signature = signature
 
-	alphaBlock, err := BellatrixToV1Alpha1SignedBlock(v2Block)
+	alphaBlock, err := CapellaToV1Alpha1SignedBlock(v2Block)
 	require.NoError(t, err)
 	alphaRoot, err := alphaBlock.HashTreeRoot()
 	require.NoError(t, err)
@@ -60,8 +58,8 @@ func Test_BellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	assert.DeepEqual(t, v2Root, alphaRoot)
 }
 
-func Test_BlindedBellatrixToV1Alpha1SignedBlock(t *testing.T) {
-	v2Block := util.HydrateV2SignedBlindedBeaconBlockBellatrix(&zondpbv2.SignedBlindedBeaconBlockBellatrix{})
+func Test_BlindedCapellaToV1Alpha1SignedBlock(t *testing.T) {
+	v2Block := util.HydrateV2SignedBlindedBeaconBlockCapella(&zondpbv2.SignedBlindedBeaconBlockCapella{})
 	v2Block.Message.Slot = slot
 	v2Block.Message.ProposerIndex = validatorIndex
 	v2Block.Message.ParentRoot = parentRoot
@@ -75,10 +73,10 @@ func Test_BlindedBellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	syncCommitteeBits := bitfield.NewBitvector16()
 	syncCommitteeBits.SetBitAt(100, true)
 	v2Block.Message.Body.SyncAggregate = &zondpbv1.SyncAggregate{
-		SyncCommitteeBits:      syncCommitteeBits,
-		SyncCommitteeSignature: signature,
+		SyncCommitteeBits:       syncCommitteeBits,
+		SyncCommitteeSignatures: [][]byte{signature},
 	}
-	v2Block.Message.Body.ExecutionPayloadHeader = &enginev1.ExecutionPayloadHeader{
+	v2Block.Message.Body.ExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderCapella{
 		ParentHash:       parentHash,
 		FeeRecipient:     feeRecipient,
 		StateRoot:        stateRoot,
@@ -93,10 +91,11 @@ func Test_BlindedBellatrixToV1Alpha1SignedBlock(t *testing.T) {
 		BaseFeePerGas:    baseFeePerGas,
 		BlockHash:        blockHash,
 		TransactionsRoot: transactionsRoot,
+		WithdrawalsRoot:  withdrawalsRoot,
 	}
 	v2Block.Signature = signature
 
-	alphaBlock, err := BlindedBellatrixToV1Alpha1SignedBlock(v2Block)
+	alphaBlock, err := BlindedCapellaToV1Alpha1SignedBlock(v2Block)
 	require.NoError(t, err)
 	alphaRoot, err := alphaBlock.HashTreeRoot()
 	require.NoError(t, err)
@@ -104,4 +103,3 @@ func Test_BlindedBellatrixToV1Alpha1SignedBlock(t *testing.T) {
 	require.NoError(t, err)
 	assert.DeepEqual(t, v2Root, alphaRoot)
 }
-*/

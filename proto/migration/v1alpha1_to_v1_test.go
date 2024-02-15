@@ -45,6 +45,7 @@ var (
 	extraData        = bytesutil.PadTo([]byte("extradata"), 32)
 	baseFeePerGas    = bytesutil.PadTo([]byte("basefeepergas"), 32)
 	transactionsRoot = bytesutil.PadTo([]byte("transactions"), 32)
+	withdrawalsRoot  = bytesutil.PadTo([]byte("withdrawals"), 32)
 	aggregationBits  = bitfield.Bitlist{0x01}
 )
 

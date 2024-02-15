@@ -1,6 +1,7 @@
 package attestations
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -16,6 +17,11 @@ import (
 // are overlapping).
 // See https://hackmd.io/@farazdagi/in-place-attagg for design and rationale.
 func MaxCoverAttestationAggregation(atts []*zondpb.Attestation) ([]*zondpb.Attestation, error) {
+	for i, att := range atts {
+		if len(att.Signatures) != len(att.AggregationBits.BitIndices()) {
+			return nil, fmt.Errorf("signatures length %d is not equal to the attesting participants indices length %d for attestation with index %d", len(att.Signatures), len(att.AggregationBits.BitIndices()), i)
+		}
+	}
 	if len(atts) < 2 {
 		return atts, nil
 	}

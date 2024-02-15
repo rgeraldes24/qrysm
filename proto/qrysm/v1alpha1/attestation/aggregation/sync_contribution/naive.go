@@ -1,6 +1,8 @@
 package sync_contribution
 
 import (
+	"fmt"
+
 	v2 "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
@@ -10,6 +12,12 @@ import (
 // naiveSyncContributionAggregation aggregates naively, without any complex algorithms or optimizations.
 // Note: this is currently a naive implementation to the order of O(mn^2).
 func naiveSyncContributionAggregation(contributions []*v2.SyncCommitteeContribution) ([]*v2.SyncCommitteeContribution, error) {
+	for i, c := range contributions {
+		if len(c.Signatures) != len(c.AggregationBits.BitIndices()) {
+			return nil, fmt.Errorf("signatures length %d is not equal to the attesting participants indices length %d for contribution with index %d", len(c.Signatures), len(c.AggregationBits.BitIndices()), i)
+		}
+	}
+
 	if len(contributions) <= 1 {
 		return contributions, nil
 	}
