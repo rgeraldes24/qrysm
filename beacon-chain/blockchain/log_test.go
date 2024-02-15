@@ -28,59 +28,80 @@ func Test_logStateTransitionData(t *testing.T) {
 		b    func() interfaces.ReadOnlyBeaconBlock
 		want string
 	}{
-		{name: "empty block body",
-			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{}})
-				require.NoError(t, err)
-				return wb
+		// TODO(rgeraldes24): test not valid in Capella - remove?
+		/*
+			{name: "empty block body",
+				b: func() interfaces.ReadOnlyBeaconBlock {
+					wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{}})
+					require.NoError(t, err)
+					return wb
+				},
+				want: "\"Finished applying state transition\" prefix=blockchain slot=0",
 			},
-			want: "\"Finished applying state transition\" prefix=blockchain slot=0",
-		},
+		*/
 		{name: "has attestation",
 			b: func() interfaces.ReadOnlyBeaconBlock {
-				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{Attestations: []*zondpb.Attestation{{}}}})
+				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{
+					Body: &zondpb.BeaconBlockBodyCapella{
+						Attestations:     []*zondpb.Attestation{{}},
+						SyncAggregate:    &zondpb.SyncAggregate{},
+						ExecutionPayload: &enginev1.ExecutionPayloadCapella{},
+					}},
+				)
 				require.NoError(t, err)
 				return wb
 			},
-			want: "\"Finished applying state transition\" attestations=1 prefix=blockchain slot=0",
+			want: "\"Finished applying state transition\" attestations=1 payloadHash= prefix=blockchain slot=0 syncBitsCount=0 txCount=0",
 		},
 		{name: "has deposit",
 			b: func() interfaces.ReadOnlyBeaconBlock {
 				wb, err := blocks.NewBeaconBlock(
 					&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{
-						Attestations: []*zondpb.Attestation{{}},
-						Deposits:     []*zondpb.Deposit{{}}}})
+						Attestations:     []*zondpb.Attestation{{}},
+						Deposits:         []*zondpb.Deposit{{}},
+						SyncAggregate:    &zondpb.SyncAggregate{},
+						ExecutionPayload: &enginev1.ExecutionPayloadCapella{},
+					}})
 				require.NoError(t, err)
 				return wb
 			},
-			want: "\"Finished applying state transition\" attestations=1 deposits=1 prefix=blockchain slot=0",
+			want: "\"Finished applying state transition\" attestations=1 deposits=1 payloadHash= prefix=blockchain slot=0 syncBitsCount=0 txCount=0",
 		},
 		{name: "has attester slashing",
 			b: func() interfaces.ReadOnlyBeaconBlock {
 				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{
-					AttesterSlashings: []*zondpb.AttesterSlashing{{}}}})
+					AttesterSlashings: []*zondpb.AttesterSlashing{{}},
+					SyncAggregate:     &zondpb.SyncAggregate{},
+					ExecutionPayload:  &enginev1.ExecutionPayloadCapella{},
+				}})
 				require.NoError(t, err)
 				return wb
 			},
-			want: "\"Finished applying state transition\" attesterSlashings=1 prefix=blockchain slot=0",
+			want: "\"Finished applying state transition\" attesterSlashings=1 payloadHash= prefix=blockchain slot=0 syncBitsCount=0 txCount=0",
 		},
 		{name: "has proposer slashing",
 			b: func() interfaces.ReadOnlyBeaconBlock {
 				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{
-					ProposerSlashings: []*zondpb.ProposerSlashing{{}}}})
+					ProposerSlashings: []*zondpb.ProposerSlashing{{}},
+					SyncAggregate:     &zondpb.SyncAggregate{},
+					ExecutionPayload:  &enginev1.ExecutionPayloadCapella{},
+				}})
 				require.NoError(t, err)
 				return wb
 			},
-			want: "\"Finished applying state transition\" prefix=blockchain proposerSlashings=1 slot=0",
+			want: "\"Finished applying state transition\" payloadHash= prefix=blockchain proposerSlashings=1 slot=0 syncBitsCount=0 txCount=0",
 		},
 		{name: "has exit",
 			b: func() interfaces.ReadOnlyBeaconBlock {
 				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{
-					VoluntaryExits: []*zondpb.SignedVoluntaryExit{{}}}})
+					VoluntaryExits:   []*zondpb.SignedVoluntaryExit{{}},
+					SyncAggregate:    &zondpb.SyncAggregate{},
+					ExecutionPayload: &enginev1.ExecutionPayloadCapella{},
+				}})
 				require.NoError(t, err)
 				return wb
 			},
-			want: "\"Finished applying state transition\" prefix=blockchain slot=0 voluntaryExits=1",
+			want: "\"Finished applying state transition\" payloadHash= prefix=blockchain slot=0 syncBitsCount=0 txCount=0 voluntaryExits=1",
 		},
 		{name: "has everything",
 			b: func() interfaces.ReadOnlyBeaconBlock {
@@ -89,11 +110,17 @@ func Test_logStateTransitionData(t *testing.T) {
 					Deposits:          []*zondpb.Deposit{{}},
 					AttesterSlashings: []*zondpb.AttesterSlashing{{}},
 					ProposerSlashings: []*zondpb.ProposerSlashing{{}},
-					VoluntaryExits:    []*zondpb.SignedVoluntaryExit{{}}}})
+					VoluntaryExits:    []*zondpb.SignedVoluntaryExit{{}},
+					SyncAggregate:     &zondpb.SyncAggregate{},
+					ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+						BlockHash:    []byte{1, 2, 3},
+						Transactions: [][]byte{{}, {}},
+					},
+				}})
 				require.NoError(t, err)
 				return wb
 			},
-			want: "\"Finished applying state transition\" attestations=1 attesterSlashings=1 deposits=1 prefix=blockchain proposerSlashings=1 slot=0 voluntaryExits=1",
+			want: "\"Finished applying state transition\" attestations=1 attesterSlashings=1 deposits=1 payloadHash=0x010203 prefix=blockchain proposerSlashings=1 slot=0 syncBitsCount=0 txCount=2 voluntaryExits=1",
 		},
 		{name: "has payload",
 			b:    func() interfaces.ReadOnlyBeaconBlock { return wrappedPayloadBlk },

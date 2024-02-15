@@ -209,18 +209,22 @@ func TestShouldOverrideFCU(t *testing.T) {
 
 	require.Equal(t, primitives.Slot(2), service.CurrentSlot())
 	require.Equal(t, true, service.shouldOverrideFCU(headRoot, 2))
-	require.LogsDoNotContain(t, hook, "12 seconds")
+	require.LogsDoNotContain(t, hook, "60 seconds")
 	require.Equal(t, false, service.shouldOverrideFCU(parentRoot, 2))
-	require.LogsContain(t, hook, "12 seconds")
+	require.LogsContain(t, hook, "60 seconds")
 
 	head, err := fcs.Head(ctx)
 	require.NoError(t, err)
 	require.Equal(t, headRoot, head)
 
-	fcs.SetGenesisTime(uint64(time.Now().Unix()) - 29)
+	// TODO(rgeraldes24): review 125
+	// fcs.SetGenesisTime(uint64(time.Now().Unix()) - 29)
+	fcs.SetGenesisTime(uint64(time.Now().Unix()) - 125)
 	require.Equal(t, true, service.shouldOverrideFCU(parentRoot, 3))
 	require.LogsDoNotContain(t, hook, "10 seconds")
-	fcs.SetGenesisTime(uint64(time.Now().Unix()) - 24)
+	// TODO(rgeraldes24): review 120
+	// fcs.SetGenesisTime(uint64(time.Now().Unix()) - 24)
+	fcs.SetGenesisTime(uint64(time.Now().Unix()) - 120)
 	service.SetGenesisTime(time.Now().Add(-time.Duration(2*params.BeaconConfig().SecondsPerSlot+10) * time.Second))
 	require.Equal(t, false, service.shouldOverrideFCU(parentRoot, 3))
 	require.LogsContain(t, hook, "10 seconds")

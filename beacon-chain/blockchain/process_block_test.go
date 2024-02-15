@@ -45,7 +45,10 @@ func TestStore_OnBlockBatch(t *testing.T) {
 	bState := st.Copy()
 
 	var blks []consensusblocks.ROBlock
-	for i := 0; i < 97; i++ {
+	// TODO(rgeraldes24)
+	// for i := 0; i < 97; i++ {
+	// for i := 1; i < 98; i++ {
+	for i := 1; i < 386; i++ {
 		b, err := util.GenerateFullBlockCapella(bState, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
 		wsb, err := consensusblocks.NewSignedBeaconBlock(b)
@@ -63,9 +66,10 @@ func TestStore_OnBlockBatch(t *testing.T) {
 	}
 	err := service.onBlockBatch(ctx, blks)
 	require.NoError(t, err)
+	// TODO(rgeraldes24)
 	jcp := service.CurrentJustifiedCheckpt()
 	jroot := bytesutil.ToBytes32(jcp.Root)
-	require.Equal(t, blks[63].Root(), jroot)
+	require.Equal(t, blks[255].Root(), jroot)
 	require.Equal(t, primitives.Epoch(2), service.cfg.ForkChoiceStore.JustifiedCheckpoint().Epoch)
 }
 

@@ -29,11 +29,11 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+// TODO(rgeraldes24)
 func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
 
-	// TODO(rgeraldes24)
 	altairBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
 	altairBlkRoot, err := altairBlk.Block().HashTreeRoot()
 	require.NoError(t, err)
@@ -526,6 +526,7 @@ func Test_NotifyNewPayload(t *testing.T) {
 			isValidPayload: false,
 			invalidBlock:   true,
 		},
+		// TODO(rgeraldes24)
 		/*
 			{
 				name:      "not at merge transition",

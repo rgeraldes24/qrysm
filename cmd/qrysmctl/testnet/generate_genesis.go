@@ -17,7 +17,6 @@ import (
 	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
-	"github.com/theQRL/qrysm/v4/cmd/flags"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
 	"github.com/theQRL/qrysm/v4/io/file"
@@ -127,13 +126,13 @@ var (
 				Usage:       "Endpoint to preferred execution client. If unset, defaults to Gzond",
 				Value:       "http://localhost:8545",
 			},
-			flags.EnumValue{
-				Name:        "fork",
-				Usage:       fmt.Sprintf("Name of the BeaconState schema to use in output encoding [%s]", strings.Join(versionNames(), ",")),
-				Enum:        versionNames(),
-				Value:       versionNames()[0],
-				Destination: &generateGenesisStateFlags.ForkName,
-			}.GenericFlag(),
+			// flags.EnumValue{
+			// 	Name:        "fork",
+			// 	Usage:       fmt.Sprintf("Name of the BeaconState schema to use in output encoding [%s]", strings.Join(versionNames(), ",")),
+			// 	Enum:        versionNames(),
+			// 	Value:       versionNames()[0],
+			// 	Destination: &generateGenesisStateFlags.ForkName,
+			// }.GenericFlag(),
 			outputSSZFlag,
 			outputYamlFlag,
 			outputJsonFlag,
@@ -233,10 +232,12 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 	f.GenesisTime += f.GenesisTimeDelay
 	log.Infof("Genesis is now %v", f.GenesisTime)
 
-	v, err := version.FromString(f.ForkName)
-	if err != nil {
-		return nil, err
-	}
+	// v, err := version.FromString(f.ForkName)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	v := version.Capella
+
 	opts := make([]interop.PremineGenesisOpt, 0)
 	nv := f.NumValidators
 	if f.DepositJsonFile != "" {

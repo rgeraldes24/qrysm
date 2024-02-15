@@ -170,22 +170,21 @@ func GenerateAttestations(
 		bitsPerAtt := committeeSize / uint64(attsPerCommittee)
 		for i := uint64(0); i < committeeSize; i += bitsPerAtt {
 			aggregationBits := bitfield.NewBitlist(committeeSize)
-			var sigs []dilithium.Signature
+			sigs := make([][]byte, 0)
 			for b := i; b < i+bitsPerAtt; b++ {
 				aggregationBits.SetBitAt(b, true)
-				sigs = append(sigs, privs[committee[b]].Sign(dataRoot[:]))
+				sigs = append(sigs, privs[committee[b]].Sign(dataRoot[:]).Marshal())
 			}
 
 			// bls.AggregateSignatures will return nil if sigs is 0.
-			if len(sigs) == 0 {
-				continue
-			}
+			// if len(sigs) == 0 {
+			// 	continue
+			// }
 
 			att := &zondpb.Attestation{
 				Data:            attData,
 				AggregationBits: aggregationBits,
-				// TODO(rgeraldes24)
-				// Signature:       bls.AggregateSignatures(sigs).Marshal(),
+				Signatures:      sigs,
 			}
 			attestations = append(attestations, att)
 		}

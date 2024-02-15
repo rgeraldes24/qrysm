@@ -13,10 +13,12 @@ import (
 
 // orphanLateBlockFirstThreshold is the number of seconds after which we
 // consider a block to be late, and thus a candidate to being reorged.
+// TODO(rgeraldes24): review
 const orphanLateBlockFirstThreshold = 4
 
 // ProcessAttestationsThreshold  is the number of seconds after which we
 // process attestations for the current slot
+// TODO(rgeraldes24): review
 const ProcessAttestationsThreshold = 10
 
 // applyWeightChanges recomputes the weight of the node passed as an argument and all of its descendants,
