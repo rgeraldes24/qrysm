@@ -19,10 +19,9 @@ func TestServer_SetSyncAggregate_EmptyCase(t *testing.T) {
 	agg, err := b.Block().Body().SyncAggregate()
 	require.NoError(t, err)
 
-	emptySig := [96]byte{0xC0}
 	want := &zondpb.SyncAggregate{
 		SyncCommitteeBits:       make([]byte, params.BeaconConfig().SyncCommitteeSize/8),
-		SyncCommitteeSignatures: [][]byte{emptySig[:]},
+		SyncCommitteeSignatures: [][]byte{},
 	}
 	require.DeepEqual(t, want, agg)
 }

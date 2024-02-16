@@ -491,9 +491,12 @@ func TestKV_Aggregated_HasAggregatedAttestation(t *testing.T) {
 
 func TestKV_Aggregated_DuplicateAggregatedAttestations(t *testing.T) {
 	cache := NewAttCaches()
+	priv, err := dilithium.RandKey()
+	require.NoError(t, err)
+	sig := priv.Sign([]byte{'a'}).Marshal()
 
-	att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b1101}})
-	att2 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b1111}})
+	att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b1101}, Signatures: [][]byte{sig, sig}})
+	att2 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b1111}, Signatures: [][]byte{sig, sig, sig}})
 	atts := []*zondpb.Attestation{att1, att2}
 
 	for _, att := range atts {

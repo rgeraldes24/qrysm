@@ -13,6 +13,7 @@ import (
 	slashertypes "github.com/theQRL/qrysm/v4/beacon-chain/slasher/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
@@ -162,7 +163,7 @@ func createProposalWrapper(t *testing.T, slot primitives.Slot, proposerIndex pri
 	}
 	signRoot, err := header.HashTreeRoot()
 	require.NoError(t, err)
-	fakeSig := make([]byte, 96)
+	fakeSig := make([]byte, field_params.DilithiumSignatureLength)
 	copy(fakeSig, "hello")
 	return &slashertypes.SignedBlockHeaderWrapper{
 		SignedBeaconBlockHeader: &zondpb.SignedBeaconBlockHeader{

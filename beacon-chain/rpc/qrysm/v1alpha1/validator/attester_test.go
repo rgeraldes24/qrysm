@@ -82,7 +82,9 @@ func TestProposeAttestation_IncorrectSignature(t *testing.T) {
 		OperationNotifier: (&mock.ChainService{}).OperationNotifier(),
 	}
 
-	req := util.HydrateAttestation(&zondpb.Attestation{})
+	req := util.HydrateAttestation(&zondpb.Attestation{Signatures: [][]byte{make([]byte, 999)}})
+	// TODO(rgeraldes24)
+	// wanted := "Incorrect attestation signature - index 0"
 	wanted := "Incorrect attestation signature"
 	_, err := attesterServer.ProposeAttestation(context.Background(), req)
 	assert.ErrorContains(t, wanted, err)

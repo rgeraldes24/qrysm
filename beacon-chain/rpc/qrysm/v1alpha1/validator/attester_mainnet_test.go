@@ -35,10 +35,10 @@ func TestAttestationDataAtSlot_HandlesFarAwayJustifiedEpoch(t *testing.T) {
 	params.OverrideBeaconConfig(cfg)
 
 	block := util.NewBeaconBlockCapella()
-	block.Block.Slot = 10000
+	block.Block.Slot = 40000
 	epochBoundaryBlock := util.NewBeaconBlockCapella()
 	var err error
-	epochBoundaryBlock.Block.Slot, err = slots.EpochStart(slots.ToEpoch(10000))
+	epochBoundaryBlock.Block.Slot, err = slots.EpochStart(slots.ToEpoch(40000))
 	require.NoError(t, err)
 	justifiedBlock := util.NewBeaconBlockCapella()
 	justifiedBlock.Block.Slot, err = slots.EpochStart(slots.ToEpoch(1500))
@@ -50,7 +50,7 @@ func TestAttestationDataAtSlot_HandlesFarAwayJustifiedEpoch(t *testing.T) {
 	require.NoError(t, err, "Could not hash justified block")
 	epochBoundaryRoot, err := epochBoundaryBlock.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not hash justified block")
-	slot := primitives.Slot(10000)
+	slot := primitives.Slot(40000)
 
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
@@ -79,7 +79,7 @@ func TestAttestationDataAtSlot_HandlesFarAwayJustifiedEpoch(t *testing.T) {
 
 	req := &zondpb.AttestationDataRequest{
 		CommitteeIndex: 0,
-		Slot:           10000,
+		Slot:           40000,
 	}
 	res, err := attesterServer.GetAttestationData(context.Background(), req)
 	require.NoError(t, err, "Could not get attestation info at slot")

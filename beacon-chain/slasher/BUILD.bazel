@@ -78,6 +78,7 @@ go_test(
         "//beacon-chain/startup:go_default_library",
         "//beacon-chain/state/stategen:go_default_library",
         "//beacon-chain/sync/initial-sync/testing:go_default_library",
+        "//config/fieldparams:go_default_library",
         "//config/params:go_default_library",
         "//consensus-types/primitives:go_default_library",
         "//crypto/dilithium:go_default_library",
