@@ -307,7 +307,9 @@ func TestIsOptimistic(t *testing.T) {
 			require.NoError(t, db.SaveStateSummary(ctx, &zond.StateSummary{Slot: fieldparams.SlotsPerEpoch, Root: []byte("root")}))
 			require.NoError(t, db.SaveLastValidatedCheckpoint(ctx, &zond.Checkpoint{Epoch: 1, Root: []byte("root")}))
 			cs := &chainmock.ChainService{Optimistic: true, FinalizedCheckPoint: &zond.Checkpoint{Epoch: 2}}
-			o, err := IsOptimistic(ctx, []byte("33"), cs, nil, cs, db)
+			// TODO(rgeraldes24)
+			// o, err := IsOptimistic(ctx, []byte("33"), cs, nil, cs, db)
+			o, err := IsOptimistic(ctx, []byte("129"), cs, nil, cs, db)
 			require.NoError(t, err)
 			assert.Equal(t, true, o)
 		})

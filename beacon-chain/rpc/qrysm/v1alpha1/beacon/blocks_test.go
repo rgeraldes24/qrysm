@@ -238,21 +238,21 @@ func TestServer_StreamChainHead_OnHeadUpdated(t *testing.T) {
 	require.NoError(t, db.SaveGenesisBlockRoot(context.Background(), gRoot))
 
 	finalizedBlock := util.NewBeaconBlockCapella()
-	finalizedBlock.Block.Slot = 32
+	finalizedBlock.Block.Slot = 128
 	finalizedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'A'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, finalizedBlock)
 	fRoot, err := finalizedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
 	justifiedBlock := util.NewBeaconBlockCapella()
-	justifiedBlock.Block.Slot = 64
+	justifiedBlock.Block.Slot = 256
 	justifiedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'B'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, justifiedBlock)
 	jRoot, err := justifiedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
 	prevJustifiedBlock := util.NewBeaconBlockCapella()
-	prevJustifiedBlock.Block.Slot = 96
+	prevJustifiedBlock.Block.Slot = 384
 	prevJustifiedBlock.Block.ParentRoot = bytesutil.PadTo([]byte{'C'}, fieldparams.RootLength)
 	util.SaveBlock(t, context.Background(), db, prevJustifiedBlock)
 	pjRoot, err := prevJustifiedBlock.Block.HashTreeRoot()
@@ -298,13 +298,13 @@ func TestServer_StreamChainHead_OnHeadUpdated(t *testing.T) {
 			HeadSlot:                   b.Block.Slot,
 			HeadEpoch:                  slots.ToEpoch(b.Block.Slot),
 			HeadBlockRoot:              hRoot[:],
-			FinalizedSlot:              32,
+			FinalizedSlot:              128,
 			FinalizedEpoch:             1,
 			FinalizedBlockRoot:         fRoot[:],
-			JustifiedSlot:              64,
+			JustifiedSlot:              256,
 			JustifiedEpoch:             2,
 			JustifiedBlockRoot:         jRoot[:],
-			PreviousJustifiedSlot:      96,
+			PreviousJustifiedSlot:      384,
 			PreviousJustifiedEpoch:     3,
 			PreviousJustifiedBlockRoot: pjRoot[:],
 		},

@@ -280,7 +280,7 @@ func (b *SignedBlindedBeaconBlockCapella) ToGeneric() (*zond.GenericSignedBeacon
 		return nil, errNilValue
 	}
 
-	sig, err := DecodeHexWithLength(b.Signature, dilithium2.CryptoBytes)
+	sig, err := DecodeHexWithLength(b.Signature, fieldparams.DilithiumSignatureLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Signature")
 	}
