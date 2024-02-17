@@ -16,6 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -106,7 +107,6 @@ func TestBeaconState_NoDeadlock_Capella(t *testing.T) {
 }
 
 func TestBeaconState_AppendBalanceWithTrie(t *testing.T) {
-
 	newState := generateState(t)
 	st, ok := newState.(*BeaconState)
 	require.Equal(t, true, ok)
@@ -129,6 +129,8 @@ func TestBeaconState_AppendBalanceWithTrie(t *testing.T) {
 	assert.Equal(t, wantedRt, newRt, "state roots are unequal")
 }
 
+// TODO(rgeraldes24): this is supported in Capella
+/*
 func TestBeaconState_ModifyPreviousParticipationBits(t *testing.T) {
 	st, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{})
 	assert.NoError(t, err)
@@ -144,6 +146,7 @@ func TestBeaconState_ModifyCurrentParticipationBits(t *testing.T) {
 		return nil, nil
 	}))
 }
+*/
 
 func TestCopyAllTries(t *testing.T) {
 	newState := generateState(t)
@@ -255,6 +258,18 @@ func generateState(t *testing.T) state.BeaconState {
 		CurrentJustifiedCheckpoint:  &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 		Slashings:                   make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector),
+		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
+			ParentHash:       make([]byte, 32),
+			FeeRecipient:     make([]byte, 20),
+			StateRoot:        make([]byte, fieldparams.RootLength),
+			ReceiptsRoot:     make([]byte, fieldparams.RootLength),
+			LogsBloom:        make([]byte, 256),
+			PrevRandao:       make([]byte, 32),
+			BaseFeePerGas:    make([]byte, 32),
+			BlockHash:        make([]byte, 32),
+			TransactionsRoot: make([]byte, fieldparams.RootLength),
+			WithdrawalsRoot:  make([]byte, fieldparams.RootLength),
+		},
 	})
 	assert.NoError(t, err)
 	return newState

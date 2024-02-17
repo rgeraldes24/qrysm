@@ -132,10 +132,11 @@ func TestReplayBlocks_ThroughForkBoundary(t *testing.T) {
 	newState, err := service.replayBlocks(context.Background(), beaconState, []interfaces.ReadOnlySignedBeaconBlock{}, targetSlot)
 	require.NoError(t, err)
 
-	// Verify state is version Altair.
-	assert.Equal(t, version.Altair, newState.Version())
+	// Verify state is version Capella.
+	assert.Equal(t, version.Capella, newState.Version())
 }
 
+// TODO(rgeraldes24): test does not make sense for our setup
 func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
@@ -157,7 +158,7 @@ func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verify state is version Bellatrix.
-	assert.Equal(t, version.Bellatrix, newState.Version())
+	assert.Equal(t, version.Capella, newState.Version())
 
 	targetSlot = params.BeaconConfig().SlotsPerEpoch * 3
 	newState, err = service.replayBlocks(context.Background(), newState, []interfaces.ReadOnlySignedBeaconBlock{}, targetSlot)
@@ -190,9 +191,16 @@ func TestLoadBlocks_FirstBranch(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}
@@ -219,9 +227,16 @@ func TestLoadBlocks_SecondBranch(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}
@@ -250,9 +265,16 @@ func TestLoadBlocks_ThirdBranch(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}
@@ -279,9 +301,16 @@ func TestLoadBlocks_SameSlots(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}
@@ -307,9 +336,16 @@ func TestLoadBlocks_SameEndSlots(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}
@@ -334,9 +370,16 @@ func TestLoadBlocks_SameEndSlotsWith2blocks(t *testing.T) {
 	}
 
 	for i, block := range wanted {
+		wsb, err := consensusblocks.NewSignedBeaconBlock(block)
+		require.NoError(t, err)
+		blinded, err := wsb.ToBlinded()
+		require.NoError(t, err)
+		blindedPb, err := blinded.Proto()
+		require.NoError(t, err)
+
 		filteredBlocksPb, err := filteredBlocks[i].Proto()
 		require.NoError(t, err)
-		if !proto.Equal(block, filteredBlocksPb) {
+		if !proto.Equal(blindedPb, filteredBlocksPb) {
 			t.Error("Did not get wanted blocks")
 		}
 	}

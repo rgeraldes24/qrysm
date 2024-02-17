@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -65,7 +65,7 @@ func setupGenesisState(tb testing.TB, count uint64) *zondpb.BeaconStateCapella {
 	require.NoError(tb, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [field_params.DilithiumPubkeyLength]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		genesisState.Validators = append(genesisState.Validators, &zondpb.Validator{
