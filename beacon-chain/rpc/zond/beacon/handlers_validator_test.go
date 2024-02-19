@@ -27,7 +27,7 @@ import (
 
 func TestGetValidators(t *testing.T) {
 	var st state.BeaconState
-	// TODO(rgeraldes24): 8192 validators takes a while
+	// NOTE(rgeraldes24): 8192 validators takes a while
 	st, _ = util.DeterministicGenesisStateCapella(t, 8192)
 
 	t.Run("get all", func(t *testing.T) {

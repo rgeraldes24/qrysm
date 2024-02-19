@@ -129,25 +129,6 @@ func TestBeaconState_AppendBalanceWithTrie(t *testing.T) {
 	assert.Equal(t, wantedRt, newRt, "state roots are unequal")
 }
 
-// TODO(rgeraldes24): this is supported in Capella
-/*
-func TestBeaconState_ModifyPreviousParticipationBits(t *testing.T) {
-	st, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{})
-	assert.NoError(t, err)
-	assert.ErrorContains(t, "ModifyPreviousParticipationBits is not supported", st.ModifyPreviousParticipationBits(func(val []byte) ([]byte, error) {
-		return nil, nil
-	}))
-}
-
-func TestBeaconState_ModifyCurrentParticipationBits(t *testing.T) {
-	st, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{})
-	assert.NoError(t, err)
-	assert.ErrorContains(t, "ModifyCurrentParticipationBits is not supported", st.ModifyCurrentParticipationBits(func(val []byte) ([]byte, error) {
-		return nil, nil
-	}))
-}
-*/
-
 func TestCopyAllTries(t *testing.T) {
 	newState := generateState(t)
 	_, err := newState.HashTreeRoot(context.Background())

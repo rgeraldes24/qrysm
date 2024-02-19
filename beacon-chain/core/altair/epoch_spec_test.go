@@ -105,9 +105,7 @@ func TestProcessSlashings_NotSlashed(t *testing.T) {
 	}
 	s, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
-	// TODO(rgeraldes24)
 	newState, err := epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplierCapella)
-	// newState, err := epoch.ProcessSlashings(s, params.BeaconConfig().ProportionalSlashingMultiplierAltair)
 	require.NoError(t, err)
 	wanted := params.BeaconConfig().MaxEffectiveBalance
 	assert.Equal(t, wanted, newState.Balances()[0], "Unexpected slashed balance")

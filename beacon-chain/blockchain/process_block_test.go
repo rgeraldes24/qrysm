@@ -45,9 +45,6 @@ func TestStore_OnBlockBatch(t *testing.T) {
 	bState := st.Copy()
 
 	var blks []consensusblocks.ROBlock
-	// TODO(rgeraldes24)
-	// for i := 0; i < 97; i++ {
-	// for i := 1; i < 98; i++ {
 	for i := 1; i < 386; i++ {
 		b, err := util.GenerateFullBlockCapella(bState, keys, util.DefaultBlockGenConfig(), primitives.Slot(i))
 		require.NoError(t, err)
@@ -66,7 +63,6 @@ func TestStore_OnBlockBatch(t *testing.T) {
 	}
 	err := service.onBlockBatch(ctx, blks)
 	require.NoError(t, err)
-	// TODO(rgeraldes24)
 	jcp := service.CurrentJustifiedCheckpt()
 	jroot := bytesutil.ToBytes32(jcp.Root)
 	require.Equal(t, blks[255].Root(), jroot)
@@ -202,7 +198,6 @@ func TestFillForkChoiceMissingBlocks_RootsMatch(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix var names
 func TestFillForkChoiceMissingBlocks_FilterFinalized(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, beaconDB := tr.ctx, tr.db
@@ -219,32 +214,32 @@ func TestFillForkChoiceMissingBlocks_FilterFinalized(t *testing.T) {
 
 	// Define a tree branch, slot 63 <- 64 <- 65
 	// Define a tree branch, slot 255 <- 256 <- 257
-	b63 := util.NewBeaconBlockCapella()
-	b63.Block.Slot = 255
-	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b63)
-	r63, err := b63.Block.HashTreeRoot()
+	b255 := util.NewBeaconBlockCapella()
+	b255.Block.Slot = 255
+	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b255)
+	r255, err := b255.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b64 := util.NewBeaconBlockCapella()
-	b64.Block.Slot = 256
-	b64.Block.ParentRoot = r63[:]
-	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b64)
-	r64, err := b64.Block.HashTreeRoot()
+	b256 := util.NewBeaconBlockCapella()
+	b256.Block.Slot = 256
+	b256.Block.ParentRoot = r255[:]
+	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b256)
+	r256, err := b256.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b65 := util.NewBeaconBlockCapella()
-	b65.Block.Slot = 257
-	b65.Block.ParentRoot = r64[:]
-	r65, err := b65.Block.HashTreeRoot()
+	b257 := util.NewBeaconBlockCapella()
+	b257.Block.Slot = 257
+	b257.Block.ParentRoot = r256[:]
+	r257, err := b257.Block.HashTreeRoot()
 	require.NoError(t, err)
-	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b65)
-	b66 := util.NewBeaconBlockCapella()
-	b66.Block.Slot = 258
-	b66.Block.ParentRoot = r65[:]
-	wsb := util.SaveBlock(t, ctx, service.cfg.BeaconDB, b66)
+	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b257)
+	b258 := util.NewBeaconBlockCapella()
+	b258.Block.Slot = 258
+	b258.Block.ParentRoot = r257[:]
+	wsb := util.SaveBlock(t, ctx, service.cfg.BeaconDB, b258)
 
 	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
 
 	// Set finalized epoch to 2.
-	require.NoError(t, service.cfg.ForkChoiceStore.UpdateFinalizedCheckpoint(&forkchoicetypes.Checkpoint{Epoch: 2, Root: r64}))
+	require.NoError(t, service.cfg.ForkChoiceStore.UpdateFinalizedCheckpoint(&forkchoicetypes.Checkpoint{Epoch: 2, Root: r256}))
 	err = service.fillInForkChoiceMissingBlocks(
 		context.Background(), wsb.Block(), beaconState.FinalizedCheckpoint(), beaconState.CurrentJustifiedCheckpoint())
 	require.NoError(t, err)
@@ -252,7 +247,7 @@ func TestFillForkChoiceMissingBlocks_FilterFinalized(t *testing.T) {
 	// There should be 1 node: block 65
 	// There should be 1 node: block 257
 	assert.Equal(t, 1, service.cfg.ForkChoiceStore.NodeCount(), "Miss match nodes")
-	assert.Equal(t, true, service.cfg.ForkChoiceStore.HasNode(r65), "Didn't save node")
+	assert.Equal(t, true, service.cfg.ForkChoiceStore.HasNode(r257), "Didn't save node")
 }
 
 func TestFillForkChoiceMissingBlocks_FinalizedSibling(t *testing.T) {
