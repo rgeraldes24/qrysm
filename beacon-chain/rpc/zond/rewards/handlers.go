@@ -49,6 +49,7 @@ func (s *Server) BlockRewards(w http.ResponseWriter, r *http.Request) {
 	}
 	st, err = altair.ProcessAttestationsNoVerifySignature(r.Context(), st, blk)
 	if err != nil {
+		fmt.Println(err)
 		http2.HandleError(w, "Could not get attestation rewards"+err.Error(), http.StatusInternalServerError)
 		return
 	}

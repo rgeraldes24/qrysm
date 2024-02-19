@@ -134,10 +134,6 @@ func TestProcessVoluntaryExits_AppliesCorrectStatus(t *testing.T) {
 }
 
 func TestVerifyExitAndSignature(t *testing.T) {
-	type args struct {
-		currentSlot primitives.Slot
-	}
-
 	tests := []struct {
 		name    string
 		setup   func() (*zondpb.Validator, *zondpb.SignedVoluntaryExit, state.ReadOnlyBeaconState, error)
@@ -238,6 +234,7 @@ func TestVerifyExitAndSignature(t *testing.T) {
 			},
 			wantErr: "signature did not verify",
 		},
+		// NOTE(rgeraldes24): not valid for now
 		/*
 			{
 				name: "EIP-7044: deneb exits should verify with capella fork information",

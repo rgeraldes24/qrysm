@@ -13,7 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestGetSpec(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

@@ -536,7 +536,7 @@ func TestHandleEpochBoundary_UpdateFirstSlot(t *testing.T) {
 	require.NoError(t, service.handleEpochBoundary(ctx, s.Slot(), s, []byte{}))
 }
 
-// TODO(rgeraldes24): fix: slot 129 > 128 which exceeds max allowed value relative to the local clock
+// TODO(rgeraldes24): fix unit test: slot 129 > 128 which exceeds max allowed value relative to the local clock
 /*
 func TestOnBlock_CanFinalize_WithOnTick(t *testing.T) {
 	service, tr := minimalTestService(t)
@@ -1782,8 +1782,8 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	require.Equal(t, false, optimistic)
 }
 
+// TODO(rgeraldes24): fix unit test
 /*
-TODO(rgeraldes24)
 func TestOnBlock_HandleBlockAttestations(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx

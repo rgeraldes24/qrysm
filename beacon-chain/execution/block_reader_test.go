@@ -22,7 +22,7 @@ func setDefaultMocks(service *Service) *Service {
 	return service
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestLatestMainchainInfo_OK(t *testing.T) {
 	testAcc, err := mock.Setup()

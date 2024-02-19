@@ -424,6 +424,7 @@ func Test_SyncSubnets(t *testing.T) {
 			want:    []uint64{0},
 			wantErr: false,
 		},
+		// TODO(rgeraldes24): fix unit test
 		// NOTE(rgeraldes24): this tests are no longer valid because of the
 		// params.BeaconConfig().SyncCommitteeSubnetCount new value
 		/*

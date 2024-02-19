@@ -58,7 +58,7 @@ func TestGetSyncMessageBlockRoot_Optimistic(t *testing.T) {
 	require.NoError(t, err)
 }
 
-// TODO(rgeraldes24)
+// TODO(rgeraldes24): fix unit test
 /*
 func TestSubmitSyncMessage_OK(t *testing.T) {
 	st, _ := util.DeterministicGenesisStateAltair(t, 10)
@@ -101,7 +101,7 @@ func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 	require.DeepEqual(t, []primitives.CommitteeIndex{0}, res.Indices)
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 	st, _ := util.DeterministicGenesisStateCapella(t, 10)

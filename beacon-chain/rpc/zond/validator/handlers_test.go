@@ -485,7 +485,7 @@ func TestSubmitAggregateAndProofs(t *testing.T) {
 	})
 }
 
-// TODO(rgeraldes24)
+// TODO(rgeraldes24): fix unit test
 /*
 func TestSubmitSyncCommitteeSubscription(t *testing.T) {
 	genesis := util.NewBeaconBlockCapella()

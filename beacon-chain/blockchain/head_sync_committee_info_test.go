@@ -63,7 +63,7 @@ func TestService_headCurrentSyncCommitteeIndices(t *testing.T) {
 	require.Equal(t, 1, len(indices))
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestService_headNextSyncCommitteeIndices(t *testing.T) {
 	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().TargetCommitteeSize)

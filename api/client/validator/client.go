@@ -37,6 +37,7 @@ func (c *Client) GetValidatorPubKeys(ctx context.Context) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	// NOTE(rgeraldes24): re-enable once we support the web3signer
 	/*
 		jsonremote, err := c.GetRemoteValidatorKeys(ctx)
 		if err != nil {

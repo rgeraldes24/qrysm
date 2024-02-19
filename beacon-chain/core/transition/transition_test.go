@@ -305,6 +305,7 @@ func TestProcessSlots_LowerSlotAsParentState(t *testing.T) {
 	assert.ErrorContains(t, "expected state.slot 2 < slot 1", err)
 }
 
+// TODO(rgeraldes24): fix unit test
 // TODO(rgeraldes24): review
 /*
 func TestProcessSlots_ThroughAltairEpoch(t *testing.T) {

@@ -122,7 +122,8 @@ func TestStore_OnAttestation_ErrorConditions(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test: util.GenerateAttestations(genesisState, pks, 1, 0, false)
+// returns 0 attestations
 /*
 func TestStore_OnAttestation_Ok_DoublyLinkedTree(t *testing.T) {
 	service, tr := minimalTestService(t)

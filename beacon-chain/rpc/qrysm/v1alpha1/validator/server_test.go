@@ -11,10 +11,12 @@ import (
 	"github.com/theQRL/qrysm/v4/async/event"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -310,26 +312,21 @@ func TestWaitForChainStart_NotStartedThenLogFired(t *testing.T) {
 	require.LogsContain(t, hook, "Sending genesis time")
 }
 
-// TODO(rgeraldes24)
-/*
 func TestServer_DomainData_Exits(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	cfg := params.BeaconConfig().Copy()
 	cfg.ForkVersionSchedule = map[[4]byte]primitives.Epoch{
-		[4]byte(cfg.GenesisForkVersion):   primitives.Epoch(0),
-		[4]byte(cfg.AltairForkVersion):    primitives.Epoch(5),
-		[4]byte(cfg.BellatrixForkVersion): primitives.Epoch(10),
-		[4]byte(cfg.CapellaForkVersion):   primitives.Epoch(15),
-		[4]byte(cfg.DenebForkVersion):     primitives.Epoch(20),
+		[4]byte(cfg.GenesisForkVersion): primitives.Epoch(0),
 	}
+
 	params.OverrideBeaconConfig(cfg)
-	beaconState := &zondpb.BeaconStateBellatrix{
+	beaconState := &zondpb.BeaconStateCapella{
 		Slot: 4000,
 	}
-	block := util.NewBeaconBlock()
+	block := util.NewBeaconBlockCapella()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
-	s, err := state_native.InitializeFromProtoUnsafeBellatrix(beaconState)
+	s, err := state_native.InitializeFromProtoUnsafeCapella(beaconState)
 	require.NoError(t, err)
 	vs := &Server{
 		Ctx:               context.Background(),
@@ -342,14 +339,14 @@ func TestServer_DomainData_Exits(t *testing.T) {
 		Domain: params.BeaconConfig().DomainDeposit[:],
 	})
 	assert.NoError(t, err)
-	wantedDomain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, params.BeaconConfig().DenebForkVersion, make([]byte, 32))
+	wantedDomain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, params.BeaconConfig().GenesisForkVersion, make([]byte, 32))
 	assert.NoError(t, err)
 	assert.DeepEqual(t, reqDomain.SignatureDomain, wantedDomain)
 
-	beaconStateNew := &zondpb.BeaconStateDeneb{
+	beaconStateNew := &zondpb.BeaconStateCapella{
 		Slot: 4000,
 	}
-	s, err = state_native.InitializeFromProtoUnsafeDeneb(beaconStateNew)
+	s, err = state_native.InitializeFromProtoUnsafeCapella(beaconStateNew)
 	require.NoError(t, err)
 	vs.HeadFetcher = &mockChain.ChainService{State: s, Root: genesisRoot[:]}
 
@@ -359,9 +356,8 @@ func TestServer_DomainData_Exits(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	wantedDomain, err = signing.ComputeDomain(params.BeaconConfig().DomainVoluntaryExit, params.BeaconConfig().CapellaForkVersion, make([]byte, 32))
+	wantedDomain, err = signing.ComputeDomain(params.BeaconConfig().DomainVoluntaryExit, params.BeaconConfig().GenesisForkVersion, make([]byte, 32))
 	require.NoError(t, err)
 
 	assert.DeepEqual(t, reqDomain.SignatureDomain, wantedDomain)
 }
-*/

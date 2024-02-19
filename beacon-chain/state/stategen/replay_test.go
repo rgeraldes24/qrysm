@@ -136,8 +136,7 @@ func TestReplayBlocks_ThroughForkBoundary(t *testing.T) {
 	assert.Equal(t, version.Capella, newState.Version())
 }
 
-// TODO(rgeraldes24): test does not make sense for our setup
-/*
+// NOTE(rgeraldes24): similar to test above?
 func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
@@ -168,7 +167,6 @@ func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	// Verify state is version Capella.
 	assert.Equal(t, version.Capella, newState.Version())
 }
-*/
 
 func TestLoadBlocks_FirstBranch(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)

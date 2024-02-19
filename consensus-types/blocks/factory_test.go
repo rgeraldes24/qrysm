@@ -2,9 +2,12 @@ package blocks
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
+	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -148,75 +151,74 @@ func TestBuildSignedBeaconBlockFromExecutionPayload(t *testing.T) {
 		_, err := BuildSignedBeaconBlockFromExecutionPayload(nil, nil)
 		require.ErrorIs(t, ErrNilSignedBeaconBlock, err)
 	})
-	/*
-		t.Run("not blinded payload", func(t *testing.T) {
-			altairBlock := &zond.SignedBeaconBlockAltair{
-				Block: &zond.BeaconBlockAltair{
-					Body: &zond.BeaconBlockBodyAltair{}}}
-			blk, err := NewSignedBeaconBlock(altairBlock)
-			require.NoError(t, err)
-			_, err = BuildSignedBeaconBlockFromExecutionPayload(blk, nil)
-			require.Equal(t, true, errors.Is(err, errNonBlindedSignedBeaconBlock))
-		})
-		t.Run("payload header root and payload root mismatch", func(t *testing.T) {
-			blockHash := bytesutil.Bytes32(1)
-			payload := &enginev1.ExecutionPayload{
-				ParentHash:    make([]byte, fieldparams.RootLength),
-				FeeRecipient:  make([]byte, 20),
-				StateRoot:     make([]byte, fieldparams.RootLength),
-				ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-				LogsBloom:     make([]byte, 256),
-				PrevRandao:    make([]byte, fieldparams.RootLength),
-				BaseFeePerGas: make([]byte, fieldparams.RootLength),
-				BlockHash:     blockHash,
-				Transactions:  make([][]byte, 0),
-			}
-			wrapped, err := WrappedExecutionPayload(payload)
-			require.NoError(t, err)
-			header, err := PayloadToHeader(wrapped)
-			require.NoError(t, err)
-			blindedBlock := &zond.SignedBlindedBeaconBlockBellatrix{
-				Block: &zond.BlindedBeaconBlockBellatrix{
-					Body: &zond.BlindedBeaconBlockBodyBellatrix{}}}
 
-			// Modify the header.
-			header.GasUsed += 1
-			blindedBlock.Block.Body.ExecutionPayloadHeader = header
+	t.Run("not blinded payload", func(t *testing.T) {
+		capellaBlock := &zond.SignedBeaconBlockCapella{
+			Block: &zond.BeaconBlockCapella{
+				Body: &zond.BeaconBlockBodyCapella{}}}
+		blk, err := NewSignedBeaconBlock(capellaBlock)
+		require.NoError(t, err)
+		_, err = BuildSignedBeaconBlockFromExecutionPayload(blk, nil)
+		require.Equal(t, true, errors.Is(err, errNonBlindedSignedBeaconBlock))
+	})
+	t.Run("payload header root and payload root mismatch", func(t *testing.T) {
+		blockHash := bytesutil.Bytes32(1)
+		payload := &enginev1.ExecutionPayloadCapella{
+			ParentHash:    make([]byte, fieldparams.RootLength),
+			FeeRecipient:  make([]byte, 20),
+			StateRoot:     make([]byte, fieldparams.RootLength),
+			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
+			LogsBloom:     make([]byte, 256),
+			PrevRandao:    make([]byte, fieldparams.RootLength),
+			BaseFeePerGas: make([]byte, fieldparams.RootLength),
+			BlockHash:     blockHash,
+			Transactions:  make([][]byte, 0),
+		}
+		wrapped, err := WrappedExecutionPayloadCapella(payload, 0)
+		require.NoError(t, err)
+		header, err := PayloadToHeaderCapella(wrapped)
+		require.NoError(t, err)
+		blindedBlock := &zond.SignedBlindedBeaconBlockCapella{
+			Block: &zond.BlindedBeaconBlockCapella{
+				Body: &zond.BlindedBeaconBlockBodyCapella{}}}
 
-			blk, err := NewSignedBeaconBlock(blindedBlock)
-			require.NoError(t, err)
-			_, err = BuildSignedBeaconBlockFromExecutionPayload(blk, payload)
-			require.ErrorContains(t, "roots do not match", err)
-		})
-		t.Run("ok", func(t *testing.T) {
-			payload := &enginev1.ExecutionPayload{
-				ParentHash:    make([]byte, fieldparams.RootLength),
-				FeeRecipient:  make([]byte, 20),
-				StateRoot:     make([]byte, fieldparams.RootLength),
-				ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-				LogsBloom:     make([]byte, 256),
-				PrevRandao:    make([]byte, fieldparams.RootLength),
-				BaseFeePerGas: make([]byte, fieldparams.RootLength),
-				BlockHash:     make([]byte, fieldparams.RootLength),
-				Transactions:  make([][]byte, 0),
-			}
-			wrapped, err := WrappedExecutionPayload(payload)
-			require.NoError(t, err)
-			header, err := PayloadToHeader(wrapped)
-			require.NoError(t, err)
-			blindedBlock := &zond.SignedBlindedBeaconBlockBellatrix{
-				Block: &zond.BlindedBeaconBlockBellatrix{
-					Body: &zond.BlindedBeaconBlockBodyBellatrix{}}}
-			blindedBlock.Block.Body.ExecutionPayloadHeader = header
+		// Modify the header.
+		header.GasUsed += 1
+		blindedBlock.Block.Body.ExecutionPayloadHeader = header
 
-			blk, err := NewSignedBeaconBlock(blindedBlock)
-			require.NoError(t, err)
-			builtBlock, err := BuildSignedBeaconBlockFromExecutionPayload(blk, payload)
-			require.NoError(t, err)
+		blk, err := NewSignedBeaconBlock(blindedBlock)
+		require.NoError(t, err)
+		_, err = BuildSignedBeaconBlockFromExecutionPayload(blk, payload)
+		require.ErrorContains(t, "roots do not match", err)
+	})
+	t.Run("ok", func(t *testing.T) {
+		payload := &enginev1.ExecutionPayloadCapella{
+			ParentHash:    make([]byte, fieldparams.RootLength),
+			FeeRecipient:  make([]byte, 20),
+			StateRoot:     make([]byte, fieldparams.RootLength),
+			ReceiptsRoot:  make([]byte, fieldparams.RootLength),
+			LogsBloom:     make([]byte, 256),
+			PrevRandao:    make([]byte, fieldparams.RootLength),
+			BaseFeePerGas: make([]byte, fieldparams.RootLength),
+			BlockHash:     make([]byte, fieldparams.RootLength),
+			Transactions:  make([][]byte, 0),
+		}
+		wrapped, err := WrappedExecutionPayloadCapella(payload, 0)
+		require.NoError(t, err)
+		header, err := PayloadToHeaderCapella(wrapped)
+		require.NoError(t, err)
+		blindedBlock := &zond.SignedBlindedBeaconBlockCapella{
+			Block: &zond.BlindedBeaconBlockCapella{
+				Body: &zond.BlindedBeaconBlockBodyCapella{}}}
+		blindedBlock.Block.Body.ExecutionPayloadHeader = header
 
-			got, err := builtBlock.Block().Body().Execution()
-			require.NoError(t, err)
-			require.DeepEqual(t, payload, got.Proto())
-		})
-	*/
+		blk, err := NewSignedBeaconBlock(blindedBlock)
+		require.NoError(t, err)
+		builtBlock, err := BuildSignedBeaconBlockFromExecutionPayload(blk, payload)
+		require.NoError(t, err)
+
+		got, err := builtBlock.Block().Body().Execution()
+		require.NoError(t, err)
+		require.DeepEqual(t, payload, got.Proto())
+	})
 }

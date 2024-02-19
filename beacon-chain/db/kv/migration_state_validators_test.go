@@ -17,6 +17,7 @@ import (
 	"go.etcd.io/bbolt"
 )
 
+// TODO(rgeraldes24): fix unit test
 /*
 func Test_migrateStateValidators(t *testing.T) {
 	tests := []struct {

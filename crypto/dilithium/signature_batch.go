@@ -53,7 +53,7 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 
 	errmsg := "some signatures are invalid. details:"
 
-	// TODO(rgeraldes24)
+	// TODO(rgeraldes24): fix
 	/*
 		for i := 0; i < len(s.Signatures); i++ {
 			for j, pubKey := range s.PublicKeys[i] {

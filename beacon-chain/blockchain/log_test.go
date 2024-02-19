@@ -28,17 +28,6 @@ func Test_logStateTransitionData(t *testing.T) {
 		b    func() interfaces.ReadOnlyBeaconBlock
 		want string
 	}{
-		// TODO(rgeraldes24): test not valid in Capella - remove? check if we still need to do any nill checks
-		/*
-			{name: "empty block body",
-				b: func() interfaces.ReadOnlyBeaconBlock {
-					wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{}})
-					require.NoError(t, err)
-					return wb
-				},
-				want: "\"Finished applying state transition\" prefix=blockchain slot=0",
-			},
-		*/
 		{name: "has attestation",
 			b: func() interfaces.ReadOnlyBeaconBlock {
 				wb, err := blocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{

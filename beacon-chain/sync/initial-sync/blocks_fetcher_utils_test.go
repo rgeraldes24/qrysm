@@ -145,7 +145,7 @@ func TestBlocksFetcher_nonSkippedSlotAfter(t *testing.T) {
 	})
 }
 
-// FIX(rgeraldes24)
+// TODO(rgeraldes24): fix unit test
 /*
 func TestBlocksFetcher_findFork(t *testing.T) {
 	// Chain graph:

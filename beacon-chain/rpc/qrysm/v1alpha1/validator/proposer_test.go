@@ -1321,7 +1321,7 @@ func TestProposer_Eth1Data_MajorityVote_SpansGenesis(t *testing.T) {
 	assert.DeepEqual(t, headBlockHash, majorityVoteEth1Data.BlockHash)
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestProposer_Eth1Data_MajorityVote(t *testing.T) {
 	followDistanceSecs := params.BeaconConfig().Eth1FollowDistance * params.BeaconConfig().SecondsPerETH1Block
@@ -2099,6 +2099,7 @@ func TestProposer_DeleteAttsInPool_Aggregated(t *testing.T) {
 	assert.Equal(t, 0, len(atts), "Did not delete unaggregated attestation")
 }
 
+// TODO(rgeraldes24): fix unit test
 // TODO(rgeraldes24): fix getSyncAggregate
 /*
 func TestProposer_GetSyncAggregate_OK(t *testing.T) {

@@ -1,6 +1,6 @@
 package blocks_test
 
-// TODO(rgeraldes24): double check
+// TODO(rgeraldes24): fix unit test
 /*
 import (
 	"os"

@@ -264,7 +264,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 	})
 
 	/*
-		TODO(rgeraldes24): fix
+		// TODO(rgeraldes24): fix unit test
 		t.Run(PayloadAttributesTopic+"_capella", func(t *testing.T) {
 			ctx := context.Background()
 			beaconState, _ := util.DeterministicGenesisStateCapella(t, 1)

@@ -16,7 +16,7 @@ func driftGenesisTime(f *ForkChoice, slot primitives.Slot, delay uint64) {
 	f.SetGenesisTime(uint64(time.Now().Unix()) - uint64(slot)*params.BeaconConfig().SecondsPerSlot - delay)
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 // Simple, ex-ante attack mitigation using proposer boost.
 // In a nutshell, an adversarial block proposer in slot n+1 keeps its proposal hidden.

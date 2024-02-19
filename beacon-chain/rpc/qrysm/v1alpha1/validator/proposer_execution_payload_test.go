@@ -81,6 +81,7 @@ func TestServer_getExecutionPayload(t *testing.T) {
 			st:        transitionSt,
 			payloadID: &pb.PayloadIDBytes{0x1},
 		},
+		// TODO(rgeraldes24): fix unit test
 		/*
 			{
 				name:          "transition completed, happy case (doesn't have fee recipient in Db)",
@@ -106,6 +107,7 @@ func TestServer_getExecutionPayload(t *testing.T) {
 			forkchoiceErr: errors.New("fork choice error"),
 			errString:     "could not prepare payload",
 		},
+		// TODO(rgeraldes24): fix unit test
 		/*
 			{
 				name:      "transition not-completed, latest exec block is nil",

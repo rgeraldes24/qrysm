@@ -6,6 +6,7 @@ import (
 	"github.com/theQRL/qrysm/v4/config/params"
 )
 
+// NOTE(rgeraldes24): tests are not valid for now
 /*
 import (
 	"context"
@@ -330,8 +331,6 @@ func TestService_CheckForPreviousEpochFork(t *testing.T) {
 		})
 	}
 }
-
-
 */
 
 func oneEpoch() time.Duration {

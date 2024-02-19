@@ -48,39 +48,6 @@ func testGenesisDataSaved(t *testing.T, db iface.Database) {
 	require.Equal(t, gbHTR, headHTR, "head block does not match genesis block")
 }
 
-// TODO(rgeraldes24): remove
-/*
-func TestLoadCapellaFromFile(t *testing.T) {
-	cfg, err := params.ByName(params.MainnetName)
-	require.NoError(t, err)
-	// This state fixture is from a hive testnet, `0a` is the suffix they are using in their fork versions.
-	suffix, err := hex.DecodeString("0a")
-	require.NoError(t, err)
-	require.Equal(t, 1, len(suffix))
-	reversioned := cfg.Copy()
-	params.FillTestVersions(reversioned, suffix[0])
-	require.Equal(t, [4]byte{3, 0, 0, 10}, bytesutil.ToBytes4(reversioned.GenesisForkVersion))
-	reversioned.ConfigName = "capella-genesis-test"
-	undo, err := params.SetActiveWithUndo(reversioned)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, undo())
-	}()
-
-	fp := "testdata/capella_genesis.ssz"
-	rfp, err := bazel.Runfile(fp)
-	if err == nil {
-		fp = rfp
-	}
-	sb, err := os.ReadFile(fp)
-	require.NoError(t, err)
-
-	db := setupDB(t)
-	require.NoError(t, db.LoadGenesis(context.Background(), sb))
-	testGenesisDataSaved(t, db)
-}
-*/
-
 func TestLoadGenesisFromFile(t *testing.T) {
 	// for this test to work, we need the active config to have these properties:
 	// - fork version schedule that matches mainnnet.genesis.ssz

@@ -108,7 +108,7 @@ func TestSyncHandlers_WaitForChainStart(t *testing.T) {
 	require.Equal(t, true, r.chainStarted.IsSet(), "Did not receive chain start event.")
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	p2p := p2ptest.NewTestP2P(t)

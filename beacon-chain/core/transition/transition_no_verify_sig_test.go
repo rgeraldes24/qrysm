@@ -126,6 +126,7 @@ func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *test
 	require.ErrorContains(t, "could not validate state root", err)
 }
 
+// TODO(rgeraldes24): fix unit test: error has to do with capella's generate full block for slot 0
 // TODO(rgeraldes24): check if these tests are still valid
 /*
 func TestProcessBlockNoVerify_PassesProcessingConditions(t *testing.T) {

@@ -12,9 +12,11 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
+	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
+	http2 "github.com/theQRL/qrysm/v4/network/http"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -22,7 +24,6 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-/*
 func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 	st, err := util.NewBeaconStateCapella()
 	slotsAhead := 5000
@@ -63,12 +64,12 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 			errorMessage: "proposal slot must be bigger than state slot",
 		},
 		{
-			name: "Proposal slot >= 128 slots ahead of state slot",
+			name: "Proposal slot >= 512 slots ahead of state slot",
 			path: "/zond/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot=" +
-				strconv.FormatUint(uint64(currentSlot+128), 10),
+				strconv.FormatUint(uint64(currentSlot+512), 10),
 			urlParams:    map[string]string{"state_id": "head"},
 			state:        st,
-			errorMessage: "proposal slot cannot be >= 128 slots ahead of state slot",
+			errorMessage: "proposal slot cannot be >= 512 slots ahead of state slot",
 		},
 	}
 
@@ -93,9 +94,8 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 		})
 	}
 }
-*/
 
-// TODO(rgeraldes24)
+// TODO(rgeraldes24): double check
 func TestExpectedWithdrawals(t *testing.T) {
 	st, err := util.NewBeaconStateCapella()
 	slotsAhead := 5000

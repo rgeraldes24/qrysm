@@ -1,5 +1,6 @@
 package blocks_test
 
+// NOTE(rgeraldes24): artifacts are not compatible with our version
 /*
 import (
 	"context"

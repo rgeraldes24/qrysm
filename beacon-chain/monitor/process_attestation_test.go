@@ -131,7 +131,7 @@ func TestProcessUnaggregatedAttestationStateCached(t *testing.T) {
 	require.LogsContain(t, hook, wanted2)
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
@@ -171,7 +171,7 @@ func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 }
 */
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 	hook := logTest.NewGlobal()

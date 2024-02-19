@@ -5,6 +5,28 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 )
 
+// SignedBeaconBlockHeaderFromBlock function to retrieve signed block header from block.
+func SignedBeaconBlockHeaderFromBlock(block *zondpb.SignedBeaconBlockCapella) (*zondpb.SignedBeaconBlockHeader, error) {
+	if block.Block == nil || block.Block.Body == nil {
+		return nil, errors.New("nil block")
+	}
+
+	bodyRoot, err := block.Block.Body.HashTreeRoot()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get body root of block")
+	}
+	return &zondpb.SignedBeaconBlockHeader{
+		Header: &zondpb.BeaconBlockHeader{
+			Slot:          block.Block.Slot,
+			ProposerIndex: block.Block.ProposerIndex,
+			ParentRoot:    block.Block.ParentRoot,
+			StateRoot:     block.Block.StateRoot,
+			BodyRoot:      bodyRoot[:],
+		},
+		Signature: block.Signature,
+	}, nil
+}
+
 // SignedBeaconBlockHeaderFromBlockInterface function to retrieve signed block header from block.
 func SignedBeaconBlockHeaderFromBlockInterface(sb ReadOnlySignedBeaconBlock) (*zondpb.SignedBeaconBlockHeader, error) {
 	b := sb.Block()
@@ -20,6 +42,25 @@ func SignedBeaconBlockHeaderFromBlockInterface(sb ReadOnlySignedBeaconBlock) (*z
 	return &zondpb.SignedBeaconBlockHeader{
 		Header:    h,
 		Signature: sig[:],
+	}, nil
+}
+
+// BeaconBlockHeaderFromBlock function to retrieve block header from block.
+func BeaconBlockHeaderFromBlock(block *zondpb.BeaconBlockCapella) (*zondpb.BeaconBlockHeader, error) {
+	if block.Body == nil {
+		return nil, errors.New("nil block body")
+	}
+
+	bodyRoot, err := block.Body.HashTreeRoot()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get body root of block")
+	}
+	return &zondpb.BeaconBlockHeader{
+		Slot:          block.Slot,
+		ProposerIndex: block.ProposerIndex,
+		ParentRoot:    block.ParentRoot,
+		StateRoot:     block.StateRoot,
+		BodyRoot:      bodyRoot[:],
 	}, nil
 }
 

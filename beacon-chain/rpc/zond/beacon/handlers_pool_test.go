@@ -346,6 +346,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	defer transition.SkipSlotCache.Enable()
 
+	// TODO(rgeraldes24): fix unit test
 	// TODO(rgeraldes24): fix voluntary exits signatures
 	/*
 		t.Run("ok", func(t *testing.T) {

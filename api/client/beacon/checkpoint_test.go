@@ -11,6 +11,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/api/client"
+	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	blocktest "github.com/theQRL/qrysm/v4/consensus-types/blocks/testing"
@@ -179,8 +180,6 @@ func TestDownloadWeakSubjectivityCheckpoint(t *testing.T) {
 	require.Equal(t, expectedWSD.BlockRoot, wsd.BlockRoot)
 }
 
-// TODO(rgeraldes24): Values are not equal, want: 74016 (primitives.Epoch), got: 74224 (primitives.Epoch)
-/*
 func TestGetWeakSubjectivityEpochFromHead(t *testing.T) {
 	st, expectedEpoch := defaultTestHeadState(t, params.MainnetConfig())
 	serialized, err := st.MarshalSSZ()
@@ -197,9 +196,9 @@ func TestGetWeakSubjectivityEpochFromHead(t *testing.T) {
 	require.NoError(t, err)
 	actualEpoch, err := getWeakSubjectivityEpochFromHead(context.Background(), c)
 	require.NoError(t, err)
+	// TODO(rgeraldes24): Values are not equal
 	require.Equal(t, expectedEpoch, actualEpoch)
 }
-*/
 
 func forkForEpoch(cfg *params.BeaconChainConfig, epoch primitives.Epoch) (*zondpb.Fork, error) {
 	os := forks.NewOrderedSchedule(cfg)
@@ -223,29 +222,22 @@ func forkForEpoch(cfg *params.BeaconChainConfig, epoch primitives.Epoch) (*zondp
 	}, nil
 }
 
-// TODO(rgeraldes24)
-/*
 func defaultTestHeadState(t *testing.T, cfg *params.BeaconChainConfig) (state.BeaconState, primitives.Epoch) {
-	st, err := util.NewBeaconStateAltair()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
-	fork, err := forkForEpoch(cfg, cfg.AltairForkEpoch)
-	require.NoError(t, err)
-	require.NoError(t, st.SetFork(fork))
-
-	slot, err := slots.EpochStart(cfg.AltairForkEpoch)
+	epoch := primitives.Epoch(500)
+	slot, err := slots.EpochStart(epoch)
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(slot))
 
 	var validatorCount, avgBalance uint64 = 100, 35
 	require.NoError(t, populateValidators(cfg, st, validatorCount, avgBalance))
 	require.NoError(t, st.SetFinalizedCheckpoint(&zondpb.Checkpoint{
-		Epoch: fork.Epoch - 10,
+		Epoch: epoch - 10,
 		Root:  make([]byte, 32),
 	}))
-	// to see the math for this, look at helpers.LatestWeakSubjectivityEpoch
-	// and for the values use mainnet config values, the validatorCount and avgBalance above, and altair fork epoch
-	expectedEpoch := slots.ToEpoch(st.Slot()) - 224
+	expectedEpoch := slots.ToEpoch(st.Slot()) - 20
 	return st, expectedEpoch
 }
 
@@ -268,7 +260,6 @@ func populateValidators(cfg *params.BeaconChainConfig, st state.BeaconState, val
 	}
 	return st.SetBalances(balances)
 }
-*/
 
 func TestDownloadFinalizedData(t *testing.T) {
 	ctx := context.Background()

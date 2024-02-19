@@ -682,7 +682,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24)
+// TODO(rgeraldes24): fix unit test
 /*
 func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 	ctx := context.Background()

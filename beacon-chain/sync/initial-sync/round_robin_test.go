@@ -22,6 +22,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+// TODO(rgeraldes24): fix unit test
 // TODO(rgeraldes24): taking too long (same problem as resync test?)
 /*
 func TestService_roundRobinSync(t *testing.T) {

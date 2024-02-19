@@ -1,6 +1,6 @@
 package rewards
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 import (
 	"bytes"

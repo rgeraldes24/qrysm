@@ -248,7 +248,7 @@ func (s *Service) SubmitSignedAggregateSelectionProof(
 	return nil
 }
 
-// TODO(rgeraldes24)
+// TODO(rgeraldes24): fix
 // SignaturesAndAggregationBits returns the signatures and aggregation bits
 // associated with a particular set of sync committee messages.
 func (s *Service) SignaturesAndAggregationBits(

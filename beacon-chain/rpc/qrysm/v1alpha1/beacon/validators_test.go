@@ -1019,6 +1019,7 @@ func TestServer_ListValidators_DefaultPageSize(t *testing.T) {
 	assert.DeepEqual(t, want[i:j], res.ValidatorList, "Incorrect respond of validators")
 }
 
+// TODO(rgeraldes24): fix unit test
 // TODO(rgeraldes24): fix -  diff: modified: [0].Validator.EffectiveBalance = 0x2460fe2fb6
 /*
 func TestServer_ListValidators_FromOldEpoch(t *testing.T) {

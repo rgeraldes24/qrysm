@@ -6,8 +6,10 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/config/params"
+	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
@@ -59,27 +61,25 @@ func TestVerifyBlockHeaderSignature(t *testing.T) {
 	require.NoError(t, err)
 }
 
-/*
 func TestVerifyBlockSignatureUsingCurrentFork(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
-	bState, keys := util.DeterministicGenesisState(t, 100)
-	altairBlk := util.NewBeaconBlockAltair()
-	altairBlk.Block.ProposerIndex = 0
-	altairBlk.Block.Slot = params.BeaconConfig().SlotsPerEpoch * 100
+	bState, keys := util.DeterministicGenesisStateCapella(t, 100)
+	blk := util.NewBeaconBlockCapella()
+	blk.Block.ProposerIndex = 0
+	blk.Block.Slot = params.BeaconConfig().SlotsPerEpoch * 100
 	fData := &zondpb.Fork{
 		Epoch:           100,
-		CurrentVersion:  params.BeaconConfig().AltairForkVersion,
+		CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 		PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 	}
 	domain, err := signing.Domain(fData, 100, params.BeaconConfig().DomainBeaconProposer, bState.GenesisValidatorsRoot())
 	assert.NoError(t, err)
-	rt, err := signing.ComputeSigningRoot(altairBlk.Block, domain)
+	rt, err := signing.ComputeSigningRoot(blk.Block, domain)
 	assert.NoError(t, err)
 	sig := keys[0].Sign(rt[:]).Marshal()
-	altairBlk.Signature = sig
-	wsb, err := consensusblocks.NewSignedBeaconBlock(altairBlk)
+	blk.Signature = sig
+	wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
 	assert.NoError(t, blocks.VerifyBlockSignatureUsingCurrentFork(bState, wsb))
 }
-*/

@@ -41,6 +41,10 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
+// TODO(rgeraldes24): we need to expand these unit tests to take into account the error message
+// because the some of the validations are being rejected in the wrong stage even thought the
+// final result is fine(rejection). We might have to set SubcommitteeIndex: 0 because of the new
+// value of the params.BeaconConfig().SyncCommitteeSubnetCount
 func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 	database := testingdb.SetupDB(t)
 	headRoot, keys := fillUpBlocksAndState(context.Background(), t, database)
@@ -164,47 +168,46 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 				}},
 			want: pubsub.ValidationIgnore,
 		},
-		/*
-			{
-				name: "Already Seen Message",
-				svcopts: []Option{
-					WithP2P(mockp2p.NewTestP2P(t)),
-					WithInitialSync(&mockSync.Sync{IsSyncing: false}),
-					WithChainService(chainService),
-					WithOperationNotifier(chainService.OperationNotifier()),
-				},
-				setupSvc: func(s *Service, msg *zondpb.SignedContributionAndProof) (*Service, *startup.Clock) {
-					s.cfg.stateGen = stategen.New(database, doublylinkedtree.New())
-					s.cfg.beaconDB = database
-					s.initCaches()
-					s.cfg.chain = &mockChain.ChainService{}
-					msg.Message.Contribution.BlockRoot = headRoot[:]
-					msg.Message.Contribution.AggregationBits.SetBitAt(1, true)
 
-					s.setSyncContributionIndexSlotSeen(1, 1, 1)
-					gt := time.Now().Add(-time.Second * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Duration(msg.Message.Contribution.Slot))
-					return s, startup.NewClock(gt, [32]byte{'A'})
-				},
-				args: args{
-					pid:   "random",
-					topic: defaultTopic,
-					msg: &zondpb.SignedContributionAndProof{
-						Message: &zondpb.ContributionAndProof{
-							AggregatorIndex: 1,
-							Contribution: &zondpb.SyncCommitteeContribution{
-								Slot:              1,
-								SubcommitteeIndex: 1,
-								BlockRoot:         params.BeaconConfig().ZeroHash[:],
-								AggregationBits:   bitfield.NewBitvector16(),
-								Signatures:        [][]byte{emptySig[:]},
-							},
-							SelectionProof: emptySig[:],
-						},
-						Signature: emptySig[:],
-					}},
-				want: pubsub.ValidationIgnore,
+		{
+			name: "Already Seen Message",
+			svcopts: []Option{
+				WithP2P(mockp2p.NewTestP2P(t)),
+				WithInitialSync(&mockSync.Sync{IsSyncing: false}),
+				WithChainService(chainService),
+				WithOperationNotifier(chainService.OperationNotifier()),
 			},
-		*/
+			setupSvc: func(s *Service, msg *zondpb.SignedContributionAndProof) (*Service, *startup.Clock) {
+				s.cfg.stateGen = stategen.New(database, doublylinkedtree.New())
+				s.cfg.beaconDB = database
+				s.initCaches()
+				s.cfg.chain = &mockChain.ChainService{}
+				msg.Message.Contribution.BlockRoot = headRoot[:]
+				msg.Message.Contribution.AggregationBits.SetBitAt(1, true)
+
+				s.setSyncContributionIndexSlotSeen(1, 1, 0)
+				gt := time.Now().Add(-time.Second * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Duration(msg.Message.Contribution.Slot))
+				return s, startup.NewClock(gt, [32]byte{'A'})
+			},
+			args: args{
+				pid:   "random",
+				topic: defaultTopic,
+				msg: &zondpb.SignedContributionAndProof{
+					Message: &zondpb.ContributionAndProof{
+						AggregatorIndex: 1,
+						Contribution: &zondpb.SyncCommitteeContribution{
+							Slot:              1,
+							SubcommitteeIndex: 0,
+							BlockRoot:         params.BeaconConfig().ZeroHash[:],
+							AggregationBits:   bitfield.NewBitvector16(),
+							Signatures:        [][]byte{emptySig[:]},
+						},
+						SelectionProof: emptySig[:],
+					},
+					Signature: emptySig[:],
+				}},
+			want: pubsub.ValidationIgnore,
+		},
 		{
 			name: "Invalid Subcommittee Index",
 			svcopts: []Option{

@@ -189,7 +189,7 @@ func TestPublishBlindedBlock(t *testing.T) {
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "please add the api header"))
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Body does not represent a valid block type"))
 	})
-	// TODO(rgeraldes24): fix
+	// TODO(rgeraldes24): fix unit test
 	/*
 		t.Run("invalid block with version header", func(t *testing.T) {
 			server := &Server{

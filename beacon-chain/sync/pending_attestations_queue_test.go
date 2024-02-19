@@ -54,7 +54,7 @@ func TestProcessPendingAtts_NoBlockRequestBlock(t *testing.T) {
 	require.LogsContain(t, hook, "Requesting block for pending attestation")
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	hook := logTest.NewGlobal()

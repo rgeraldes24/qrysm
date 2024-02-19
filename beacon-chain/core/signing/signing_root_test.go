@@ -42,6 +42,7 @@ func TestSigningRoot_ComputeDomain(t *testing.T) {
 	}
 }
 
+// TODO(rgeraldes24): fix unit test
 /*
 func TestSigningRoot_ComputeDomainAndSign(t *testing.T) {
 	tests := []struct {

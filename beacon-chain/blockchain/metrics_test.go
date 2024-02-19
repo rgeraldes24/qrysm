@@ -20,7 +20,7 @@ func TestReportEpochMetrics_BadHeadState(t *testing.T) {
 	require.ErrorContains(t, "could not read every validator: state has nil validator slice", err)
 }
 
-// NOTE(rgeraldes24) - same as below, old flow
+// TODO(rgeraldes24) - same as below, old flow, replace with new tests?
 /*
 func TestReportEpochMetrics_BadAttestation(t *testing.T) {
 	s, err := util.NewBeaconStateCapella()

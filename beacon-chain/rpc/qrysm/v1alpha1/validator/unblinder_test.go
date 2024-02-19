@@ -26,7 +26,7 @@ func Test_unblindBuilderBlock(t *testing.T) {
 		err         string
 		returnedBlk interfaces.SignedBeaconBlock
 	}{
-		// TODO(rgeraldes24)
+		// TODO(rgeraldes24): fix unit test
 		/*
 			{
 				name: "old block version",

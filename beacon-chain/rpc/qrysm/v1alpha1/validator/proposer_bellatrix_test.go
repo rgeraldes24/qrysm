@@ -1,5 +1,6 @@
 package validator
 
+// TODO(rgeraldes24): fix unit test
 /*
 import (
 	"context"

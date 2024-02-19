@@ -19,6 +19,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
+// TODO(rgeraldes24): fix unit test
 /*
 func TestService_ReceiveBlock(t *testing.T) {
 	ctx := context.Background()

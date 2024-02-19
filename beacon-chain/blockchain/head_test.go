@@ -254,7 +254,7 @@ func TestRetrieveHead_ReadOnly(t *testing.T) {
 	assert.Equal(t, rOnlyState, service.head.state, "Head is not the same object")
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestSaveOrphanedAtts(t *testing.T) {
 	ctx := context.Background()

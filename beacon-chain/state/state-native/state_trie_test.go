@@ -79,7 +79,7 @@ func TestInitializeFromProtoUnsafe_Capella(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestBeaconState_HashTreeRoot(t *testing.T) {
 	testState, _ := util.DeterministicGenesisStateCapella(t, 64)

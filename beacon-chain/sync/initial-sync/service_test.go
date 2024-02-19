@@ -318,6 +318,7 @@ func TestService_markSynced(t *testing.T) {
 	assert.Equal(t, false, s.Syncing())
 }
 
+// TODO(rgeraldes24): fix unit test
 // TODO(rgeraldes24): test taking too long
 /*
 func TestService_Resync(t *testing.T) {

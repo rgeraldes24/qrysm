@@ -29,7 +29,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// TODO(rgeraldes24): review block names
 func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs

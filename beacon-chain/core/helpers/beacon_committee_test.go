@@ -129,7 +129,7 @@ func TestCommitteeAssignments_NoProposerForSlot0(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestCommitteeAssignments_CanRetrieve(t *testing.T) {
 	// Initialize test with 256 validators, each slot and each index gets 4 validators.

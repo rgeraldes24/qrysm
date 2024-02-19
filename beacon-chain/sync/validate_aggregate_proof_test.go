@@ -18,6 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/attestations"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
 	p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -296,8 +297,6 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix
-/*
 func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
@@ -402,9 +401,7 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	assert.Equal(t, pubsub.ValidationAccept, res, "Validated status is false")
 	assert.NotNil(t, msg.ValidatorData, "Did not set validator data")
 }
-*/
 
-/*
 func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
@@ -525,7 +522,6 @@ func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 		t.Fatal("Validated status is true")
 	}
 }
-*/
 
 func TestValidateAggregateAndProof_BadBlock(t *testing.T) {
 	db := dbtest.SetupDB(t)
