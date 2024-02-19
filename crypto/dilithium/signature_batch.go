@@ -57,8 +57,8 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 	/*
 		for i := 0; i < len(s.Signatures); i++ {
 			for j, pubKey := range s.PublicKeys[i] {
-				offset := j * dilithium.CryptoBytes
-				sig := s.Signatures[i][offset : offset+dilithium.CryptoBytes]
+				offset := j * field_params.DilithiumSignatureLength
+				sig := s.Signatures[i][offset : offset+field_params.DilithiumSignatureLength]
 				msg := s.Messages[i]
 
 				valid, err := VerifySignature(sig, msg, pubKey)

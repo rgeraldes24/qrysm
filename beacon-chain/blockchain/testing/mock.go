@@ -10,7 +10,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/async/event"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
@@ -22,6 +21,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/forkchoice"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -40,7 +40,7 @@ type ChainService struct {
 	Optimistic                  bool
 	ValidAttestation            bool
 	ValidatorsRoot              [32]byte
-	PublicKey                   [dilithium.CryptoPublicKeyBytes]byte
+	PublicKey                   [field_params.DilithiumPubkeyLength]byte
 	FinalizedCheckPoint         *zondpb.Checkpoint
 	CurrentJustifiedCheckPoint  *zondpb.Checkpoint
 	PreviousJustifiedCheckPoint *zondpb.Checkpoint
@@ -420,12 +420,12 @@ func (_ *ChainService) ChainHeads() ([][32]byte, []primitives.Slot) {
 }
 
 // HeadPublicKeyToValidatorIndex mocks HeadPublicKeyToValidatorIndex and always return 0 and true.
-func (_ *ChainService) HeadPublicKeyToValidatorIndex(_ [dilithium.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool) {
+func (_ *ChainService) HeadPublicKeyToValidatorIndex(_ [field_params.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool) {
 	return 0, true
 }
 
 // HeadValidatorIndexToPublicKey mocks HeadValidatorIndexToPublicKey and always return empty and nil.
-func (s *ChainService) HeadValidatorIndexToPublicKey(_ context.Context, _ primitives.ValidatorIndex) ([dilithium.CryptoPublicKeyBytes]byte, error) {
+func (s *ChainService) HeadValidatorIndexToPublicKey(_ context.Context, _ primitives.ValidatorIndex) ([field_params.DilithiumPubkeyLength]byte, error) {
 	return s.PublicKey, nil
 }
 

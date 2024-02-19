@@ -76,7 +76,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 						},
 						Signature: make([]byte, 4595),
 					},
-					SelectionProof: make([]byte, dilithium.CryptoBytes),
+					SelectionProof: make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			SigningSlot: 0,
@@ -128,7 +128,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 										StateRoot:     make([]byte, fieldparams.RootLength),
 										BodyRoot:      make([]byte, fieldparams.RootLength),
 									},
-									Signature: make([]byte, dilithium.CryptoBytes),
+									Signature: make([]byte, field_params.DilithiumSignatureLength),
 								},
 								Header_2: &zond.SignedBeaconBlockHeader{
 									Header: &zond.BeaconBlockHeader{
@@ -138,7 +138,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 										StateRoot:     make([]byte, fieldparams.RootLength),
 										BodyRoot:      make([]byte, fieldparams.RootLength),
 									},
-									Signature: make([]byte, dilithium.CryptoBytes),
+									Signature: make([]byte, field_params.DilithiumSignatureLength),
 								},
 							},
 						},
@@ -155,7 +155,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 											Root: make([]byte, fieldparams.RootLength),
 										},
 									},
-									Signature: make([]byte, dilithium.CryptoBytes),
+									Signature: make([]byte, field_params.DilithiumSignatureLength),
 								},
 								Attestation_2: &zond.IndexedAttestation{
 									AttestingIndices: []uint64{0, 1, 2},
@@ -168,7 +168,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 											Root: make([]byte, fieldparams.RootLength),
 										},
 									},
-									Signature: make([]byte, dilithium.CryptoBytes),
+									Signature: make([]byte, field_params.DilithiumSignatureLength),
 								},
 							},
 						},
@@ -194,7 +194,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 									PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
 									WithdrawalCredentials: make([]byte, 32),
 									Amount:                0,
-									Signature:             make([]byte, dilithium.CryptoBytes),
+									Signature:             make([]byte, field_params.DilithiumSignatureLength),
 								},
 							},
 						},
@@ -204,7 +204,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 									Epoch:          0,
 									ValidatorIndex: 0,
 								},
-								Signature: make([]byte, dilithium.CryptoBytes),
+								Signature: make([]byte, field_params.DilithiumSignatureLength),
 							},
 						},
 					},
@@ -241,7 +241,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 										StateRoot:     make([]byte, fieldparams.RootLength),
 										BodyRoot:      make([]byte, fieldparams.RootLength),
 									},
-									Signature: make([]byte, dilithium.CryptoBytes),
+									Signature: make([]byte, field_params.DilithiumSignatureLength),
 								},
 								Header_2: &zond.SignedBeaconBlockHeader{
 									Header: &zond.BeaconBlockHeader{
@@ -251,7 +251,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 										StateRoot:     make([]byte, fieldparams.RootLength),
 										BodyRoot:      make([]byte, fieldparams.RootLength),
 									},
-									Signature: make([]byte, dilithium.CryptoBytes),
+									Signature: make([]byte, field_params.DilithiumSignatureLength),
 								},
 							},
 						},
@@ -268,7 +268,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 											Root: make([]byte, fieldparams.RootLength),
 										},
 									},
-									Signature: make([]byte, dilithium.CryptoBytes),
+									Signature: make([]byte, field_params.DilithiumSignatureLength),
 								},
 								Attestation_2: &zond.IndexedAttestation{
 									AttestingIndices: []uint64{0, 1, 2},
@@ -281,7 +281,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 											Root: make([]byte, fieldparams.RootLength),
 										},
 									},
-									Signature: make([]byte, dilithium.CryptoBytes),
+									Signature: make([]byte, field_params.DilithiumSignatureLength),
 								},
 							},
 						},
@@ -307,7 +307,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 									PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
 									WithdrawalCredentials: make([]byte, 32),
 									Amount:                0,
-									Signature:             make([]byte, dilithium.CryptoBytes),
+									Signature:             make([]byte, field_params.DilithiumSignatureLength),
 								},
 							},
 						},
@@ -317,11 +317,11 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 									Epoch:          0,
 									ValidatorIndex: 0,
 								},
-								Signature: make([]byte, dilithium.CryptoBytes),
+								Signature: make([]byte, field_params.DilithiumSignatureLength),
 							},
 						},
 						SyncAggregate: &zond.SyncAggregate{
-							SyncCommitteeSignature: make([]byte, dilithium.CryptoBytes),
+							SyncCommitteeSignature: make([]byte, field_params.DilithiumSignatureLength),
 							SyncCommitteeBits:      MockSyncComitteeBits(),
 						},
 					},
@@ -388,9 +388,9 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 						BlockRoot:         make([]byte, fieldparams.RootLength),
 						SubcommitteeIndex: 0,
 						AggregationBits:   MockAggregationBits(),
-						Signature:         make([]byte, dilithium.CryptoBytes),
+						Signature:         make([]byte, field_params.DilithiumSignatureLength),
 					},
-					SelectionProof: make([]byte, dilithium.CryptoBytes),
+					SelectionProof: make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			SigningSlot: 0,
@@ -441,7 +441,7 @@ func GetMockSignRequest(t string) *validatorpb.SignRequest {
 					FeeRecipient: make([]byte, fieldparams.FeeRecipientLength),
 					GasLimit:     uint64(0),
 					Timestamp:    uint64(0),
-					Pubkey:       make([]byte, dilithium.CryptoBytes),
+					Pubkey:       make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			SigningSlot: 0,
@@ -471,7 +471,7 @@ func MockAggregateAndProofSignRequest() *v1.AggregateAndProofSignRequest {
 		AggregateAndProof: &v1.AggregateAndProof{
 			AggregatorIndex: "0",
 			Aggregate:       MockAttestation(),
-			SelectionProof:  make([]byte, dilithium.CryptoBytes),
+			SelectionProof:  make([]byte, field_params.DilithiumSignatureLength),
 		},
 	}
 }
@@ -603,7 +603,7 @@ func MockValidatorRegistrationSignRequest() *v1.ValidatorRegistrationSignRequest
 			FeeRecipient: make([]byte, fieldparams.FeeRecipientLength),
 			GasLimit:     fmt.Sprint(0),
 			Timestamp:    fmt.Sprint(0),
-			Pubkey:       make([]byte, dilithium.CryptoBytes),
+			Pubkey:       make([]byte, field_params.DilithiumSignatureLength),
 		},
 	}
 }
@@ -641,7 +641,7 @@ func MockAttestation() *v1.Attestation {
 				Root:  hexutil.Encode(make([]byte, fieldparams.RootLength)),
 			},
 		},
-		Signature: make([]byte, dilithium.CryptoBytes),
+		Signature: make([]byte, field_params.DilithiumSignatureLength),
 	}
 }
 
@@ -661,7 +661,7 @@ func MockIndexedAttestation() *v1.IndexedAttestation {
 				Root:  hexutil.Encode(make([]byte, fieldparams.RootLength)),
 			},
 		},
-		Signature: make([]byte, dilithium.CryptoBytes),
+		Signature: make([]byte, field_params.DilithiumSignatureLength),
 	}
 }
 
@@ -689,7 +689,7 @@ func MockBeaconBlockAltair() *v1.BeaconBlockAltair {
 							StateRoot:     make([]byte, fieldparams.RootLength),
 							BodyRoot:      make([]byte, fieldparams.RootLength),
 						},
-						Signature: make([]byte, dilithium.CryptoBytes),
+						Signature: make([]byte, field_params.DilithiumSignatureLength),
 					},
 					Signedheader2: &v1.SignedBeaconBlockHeader{
 						Message: &v1.BeaconBlockHeader{
@@ -699,7 +699,7 @@ func MockBeaconBlockAltair() *v1.BeaconBlockAltair {
 							StateRoot:     make([]byte, fieldparams.RootLength),
 							BodyRoot:      make([]byte, fieldparams.RootLength),
 						},
-						Signature: make([]byte, dilithium.CryptoBytes),
+						Signature: make([]byte, field_params.DilithiumSignatureLength),
 					},
 				},
 			},
@@ -719,7 +719,7 @@ func MockBeaconBlockAltair() *v1.BeaconBlockAltair {
 						PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
 						WithdrawalCredentials: make([]byte, 32),
 						Amount:                "0",
-						Signature:             make([]byte, dilithium.CryptoBytes),
+						Signature:             make([]byte, field_params.DilithiumSignatureLength),
 					},
 				},
 			},
@@ -729,11 +729,11 @@ func MockBeaconBlockAltair() *v1.BeaconBlockAltair {
 						Epoch:          "0",
 						ValidatorIndex: "0",
 					},
-					Signature: make([]byte, dilithium.CryptoBytes),
+					Signature: make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 			SyncAggregate: &v1.SyncAggregate{
-				SyncCommitteeSignature: make([]byte, dilithium.CryptoBytes),
+				SyncCommitteeSignature: make([]byte, field_params.DilithiumSignatureLength),
 				SyncCommitteeBits:      MockSyncComitteeBits(),
 			},
 		},
@@ -759,7 +759,7 @@ func MockBeaconBlockBody() *v1.BeaconBlockBody {
 						StateRoot:     make([]byte, fieldparams.RootLength),
 						BodyRoot:      make([]byte, fieldparams.RootLength),
 					},
-					Signature: make([]byte, dilithium.CryptoBytes),
+					Signature: make([]byte, field_params.DilithiumSignatureLength),
 				},
 				Signedheader2: &v1.SignedBeaconBlockHeader{
 					Message: &v1.BeaconBlockHeader{
@@ -769,7 +769,7 @@ func MockBeaconBlockBody() *v1.BeaconBlockBody {
 						StateRoot:     make([]byte, fieldparams.RootLength),
 						BodyRoot:      make([]byte, fieldparams.RootLength),
 					},
-					Signature: make([]byte, dilithium.CryptoBytes),
+					Signature: make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 		},
@@ -789,7 +789,7 @@ func MockBeaconBlockBody() *v1.BeaconBlockBody {
 					PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
 					Amount:                "0",
-					Signature:             make([]byte, dilithium.CryptoBytes),
+					Signature:             make([]byte, field_params.DilithiumSignatureLength),
 				},
 			},
 		},
@@ -799,7 +799,7 @@ func MockBeaconBlockBody() *v1.BeaconBlockBody {
 					Epoch:          "0",
 					ValidatorIndex: "0",
 				},
-				Signature: make([]byte, dilithium.CryptoBytes),
+				Signature: make([]byte, field_params.DilithiumSignatureLength),
 			},
 		},
 	}
@@ -813,9 +813,9 @@ func MockContributionAndProof() *v1.ContributionAndProof {
 			BeaconBlockRoot:   make([]byte, fieldparams.RootLength),
 			SubcommitteeIndex: "0",
 			AggregationBits:   MockAggregationBits(),
-			Signature:         make([]byte, dilithium.CryptoBytes),
+			Signature:         make([]byte, field_params.DilithiumSignatureLength),
 		},
-		SelectionProof: make([]byte, dilithium.CryptoBytes),
+		SelectionProof: make([]byte, field_params.DilithiumSignatureLength),
 	}
 }
 */

@@ -4,7 +4,6 @@ package params
 import (
 	"time"
 
-	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -120,18 +119,18 @@ type BeaconChainConfig struct {
 	DomainDilithiumToExecutionChange  [4]byte // DomainDilithiumToExecutionChange defines the Dilithium signature domain to change withdrawal addresses to Zond prefix
 
 	// Qrysm constants.
-	GweiPerEth                   uint64                      // GweiPerEth is the amount of gwei corresponding to 1 eth.
-	DilithiumPubkeyLength        int                         // DilithiumPubkeyLength defines the expected length of Dilithium public keys in bytes.
-	DefaultBufferSize            int                         // DefaultBufferSize for channels across the Prysm repository.
-	ValidatorPrivkeyFileName     string                      // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
-	WithdrawalPrivkeyFileName    string                      // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
-	RPCSyncCheck                 time.Duration               // Number of seconds to query the sync service, to find out if the node is synced or not.
-	EmptyDilithiumSignature      [dilithium.CryptoBytes]byte // EmptyDilithiumSignature is used to represent a zeroed out Dilithium Signature.
-	DefaultPageSize              int                         // DefaultPageSize defines the default page size for RPC server request.
-	MaxPeersToSync               int                         // MaxPeersToSync describes the limit for number of peers in round robin sync.
-	SlotsPerArchivedPoint        primitives.Slot             // SlotsPerArchivedPoint defines the number of slots per one archived point.
-	GenesisCountdownInterval     time.Duration               // How often to log the countdown until the genesis time is reached.
-	BeaconStateCapellaFieldCount int                         // BeaconStateCapellaFieldCount defines how many fields are in beacon state post upgrade to Capella.
+	GweiPerEth                   uint64                                     // GweiPerEth is the amount of gwei corresponding to 1 eth.
+	DilithiumPubkeyLength        int                                        // DilithiumPubkeyLength defines the expected length of Dilithium public keys in bytes.
+	DefaultBufferSize            int                                        // DefaultBufferSize for channels across the Prysm repository.
+	ValidatorPrivkeyFileName     string                                     // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
+	WithdrawalPrivkeyFileName    string                                     // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
+	RPCSyncCheck                 time.Duration                              // Number of seconds to query the sync service, to find out if the node is synced or not.
+	EmptyDilithiumSignature      [fieldparams.DilithiumSignatureLength]byte // EmptyDilithiumSignature is used to represent a zeroed out Dilithium Signature.
+	DefaultPageSize              int                                        // DefaultPageSize defines the default page size for RPC server request.
+	MaxPeersToSync               int                                        // MaxPeersToSync describes the limit for number of peers in round robin sync.
+	SlotsPerArchivedPoint        primitives.Slot                            // SlotsPerArchivedPoint defines the number of slots per one archived point.
+	GenesisCountdownInterval     time.Duration                              // How often to log the countdown until the genesis time is reached.
+	BeaconStateCapellaFieldCount int                                        // BeaconStateCapellaFieldCount defines how many fields are in beacon state post upgrade to Capella.
 
 	// Slasher constants.
 	WeakSubjectivityPeriod    primitives.Epoch // WeakSubjectivityPeriod defines the time period expressed in number of epochs were proof of stake network should validate block headers and attestations for slashable events.

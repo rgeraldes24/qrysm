@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/go-qrllib/dilithium"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -106,7 +106,7 @@ type ReadOnlyValidator interface {
 	ActivationEpoch() primitives.Epoch
 	WithdrawableEpoch() primitives.Epoch
 	ExitEpoch() primitives.Epoch
-	PublicKey() [dilithium.CryptoPublicKeyBytes]byte
+	PublicKey() [field_params.DilithiumPubkeyLength]byte
 	WithdrawalCredentials() []byte
 	Slashed() bool
 	IsNil() bool
@@ -117,8 +117,8 @@ type ReadOnlyValidators interface {
 	Validators() []*zondpb.Validator
 	ValidatorAtIndex(idx primitives.ValidatorIndex) (*zondpb.Validator, error)
 	ValidatorAtIndexReadOnly(idx primitives.ValidatorIndex) (ReadOnlyValidator, error)
-	ValidatorIndexByPubkey(key [dilithium.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool)
-	PubkeyAtIndex(idx primitives.ValidatorIndex) [dilithium.CryptoPublicKeyBytes]byte
+	ValidatorIndexByPubkey(key [field_params.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool)
+	PubkeyAtIndex(idx primitives.ValidatorIndex) [field_params.DilithiumPubkeyLength]byte
 	NumValidators() int
 	ReadFromEveryValidator(f func(idx int, val ReadOnlyValidator) error) error
 }

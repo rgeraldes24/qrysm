@@ -150,7 +150,7 @@ func TestEIP3076SpecTests(t *testing.T) {
 							Target:          &zondpb.Checkpoint{Epoch: target, Root: make([]byte, 32)},
 							Source:          &zondpb.Checkpoint{Epoch: source, Root: make([]byte, 32)},
 						},
-						Signature: make([]byte, dilithium.CryptoBytes),
+						Signature: make([]byte, field_params.DilithiumSignatureLength),
 					}
 
 					var signingRoot [32]byte

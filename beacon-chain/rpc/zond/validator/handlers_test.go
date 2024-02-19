@@ -16,7 +16,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
@@ -49,7 +48,7 @@ import (
 
 func TestGetAggregateAttestation(t *testing.T) {
 	root1 := bytesutil.PadTo([]byte("root1"), 32)
-	sig1 := bytesutil.PadTo([]byte("sig1"), dilithium.CryptoBytes)
+	sig1 := bytesutil.PadTo([]byte("sig1"), fieldparams.DilithiumSignatureLength)
 	attSlot1 := &zondpbalpha.Attestation{
 		AggregationBits: []byte{0, 1},
 		Data: &zondpbalpha.AttestationData{
@@ -68,7 +67,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 		Signatures: [][]byte{sig1},
 	}
 	root21 := bytesutil.PadTo([]byte("root2_1"), 32)
-	sig21 := bytesutil.PadTo([]byte("sig2_1"), dilithium.CryptoBytes)
+	sig21 := bytesutil.PadTo([]byte("sig2_1"), fieldparams.DilithiumSignatureLength)
 	attslot21 := &zondpbalpha.Attestation{
 		AggregationBits: []byte{0, 1, 1},
 		Data: &zondpbalpha.AttestationData{
@@ -87,7 +86,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 		Signatures: [][]byte{sig21},
 	}
 	root22 := bytesutil.PadTo([]byte("root2_2"), 32)
-	sig22 := bytesutil.PadTo([]byte("sig2_2"), dilithium.CryptoBytes)
+	sig22 := bytesutil.PadTo([]byte("sig2_2"), fieldparams.DilithiumSignatureLength)
 	attslot22 := &zondpbalpha.Attestation{
 		AggregationBits: []byte{0, 1, 1, 1},
 		Data: &zondpbalpha.AttestationData{
@@ -106,7 +105,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 		Signatures: [][]byte{sig22},
 	}
 	root33 := bytesutil.PadTo([]byte("root3_3"), 32)
-	sig33 := bytesutil.PadTo([]byte("sig3_3"), dilithium.CryptoBytes)
+	sig33 := bytesutil.PadTo([]byte("sig3_3"), fieldparams.DilithiumSignatureLength)
 	attslot33 := &zondpbalpha.Attestation{
 		AggregationBits: []byte{1, 0, 0, 1},
 		Data: &zondpbalpha.AttestationData{
@@ -254,7 +253,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 
 func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *testing.T) {
 	root := bytesutil.PadTo([]byte("root"), 32)
-	sig := bytesutil.PadTo([]byte("sig"), dilithium.CryptoBytes)
+	sig := bytesutil.PadTo([]byte("sig"), fieldparams.DilithiumSignatureLength)
 	att1 := &zondpbalpha.Attestation{
 		AggregationBits: []byte{3, 0, 0, 1},
 		Data: &zondpbalpha.AttestationData{
