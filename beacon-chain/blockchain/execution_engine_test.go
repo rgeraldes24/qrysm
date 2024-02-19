@@ -29,7 +29,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// TODO(rgeraldes24)
+// TODO(rgeraldes24): review block names
 func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
@@ -526,35 +526,32 @@ func Test_NotifyNewPayload(t *testing.T) {
 			isValidPayload: false,
 			invalidBlock:   true,
 		},
-		// TODO(rgeraldes24)
-		/*
-			{
-				name:      "not at merge transition",
-				postState: bellatrixState,
-				blk: func() interfaces.ReadOnlySignedBeaconBlock {
-					blk := &zondpb.SignedBeaconBlockBellatrix{
-						Block: &zondpb.BeaconBlockBellatrix{
-							Body: &zondpb.BeaconBlockBodyBellatrix{
-								ExecutionPayload: &v1.ExecutionPayload{
-									ParentHash:    make([]byte, fieldparams.RootLength),
-									FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
-									StateRoot:     make([]byte, fieldparams.RootLength),
-									ReceiptsRoot:  make([]byte, fieldparams.RootLength),
-									LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
-									PrevRandao:    make([]byte, fieldparams.RootLength),
-									BaseFeePerGas: make([]byte, fieldparams.RootLength),
-									BlockHash:     make([]byte, fieldparams.RootLength),
-								},
+		{
+			name:      "not at merge transition",
+			postState: capellaState,
+			blk: func() interfaces.ReadOnlySignedBeaconBlock {
+				blk := &zondpb.SignedBeaconBlockCapella{
+					Block: &zondpb.BeaconBlockCapella{
+						Body: &zondpb.BeaconBlockBodyCapella{
+							ExecutionPayload: &v1.ExecutionPayloadCapella{
+								ParentHash:    make([]byte, fieldparams.RootLength),
+								FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
+								StateRoot:     make([]byte, fieldparams.RootLength),
+								ReceiptsRoot:  make([]byte, fieldparams.RootLength),
+								LogsBloom:     make([]byte, fieldparams.LogsBloomLength),
+								PrevRandao:    make([]byte, fieldparams.RootLength),
+								BaseFeePerGas: make([]byte, fieldparams.RootLength),
+								BlockHash:     make([]byte, fieldparams.RootLength),
 							},
 						},
-					}
-					b, err := consensusblocks.NewSignedBeaconBlock(blk)
-					require.NoError(t, err)
-					return b
-				}(),
-				isValidPayload: true,
-			},
-		*/
+					},
+				}
+				b, err := consensusblocks.NewSignedBeaconBlock(blk)
+				require.NoError(t, err)
+				return b
+			}(),
+			isValidPayload: true,
+		},
 		{
 			name:      "happy case",
 			postState: capellaState,

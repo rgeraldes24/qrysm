@@ -139,16 +139,10 @@ func Test_executionPayloadCapella_Pb(t *testing.T) {
 	pb, err := payload.PbCapella()
 	require.NoError(t, err)
 	assert.DeepEqual(t, payload.Proto(), pb)
-
-	// _, err = payload.PbBellatrix()
-	// require.ErrorIs(t, err, consensus_types.ErrUnsupportedField)
 }
 
 func Test_executionPayloadHeaderCapella_Pb(t *testing.T) {
 	payload := createWrappedPayloadHeaderCapella(t)
-	// TODO(rgeraldes24): remove
-	// _, err := payload.PbBellatrix()
-	// require.ErrorIs(t, err, consensus_types.ErrUnsupportedField)
 
 	_, err := payload.PbCapella()
 	require.ErrorIs(t, err, consensus_types.ErrUnsupportedField)

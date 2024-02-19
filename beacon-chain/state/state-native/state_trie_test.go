@@ -254,13 +254,11 @@ func TestBeaconState_AppendValidator_DoesntMutateCopy(t *testing.T) {
 	assert.Equal(t, false, ok, "Expected no validator index to be present in st1 for the newly inserted pubkey")
 }
 
-// TODO(rgeraldes24): capella
-/*
-func TestBeaconState_ValidatorMutation_Bellatrix(t *testing.T) {
-	testState, _ := util.DeterministicGenesisStateBellatrix(t, 400)
-	pbState, err := statenative.ProtobufBeaconStateBellatrix(testState.ToProtoUnsafe())
+func TestBeaconState_ValidatorMutation_Capella(t *testing.T) {
+	testState, _ := util.DeterministicGenesisStateCapella(t, 400)
+	pbState, err := statenative.ProtobufBeaconStateCapella(testState.ToProtoUnsafe())
 	require.NoError(t, err)
-	testState, err = statenative.InitializeFromProtoBellatrix(pbState)
+	testState, err = statenative.InitializeFromProtoCapella(pbState)
 	require.NoError(t, err)
 
 	_, err = testState.HashTreeRoot(context.Background())
@@ -287,10 +285,10 @@ func TestBeaconState_ValidatorMutation_Bellatrix(t *testing.T) {
 
 	rt, err := testState.HashTreeRoot(context.Background())
 	require.NoError(t, err)
-	pbState, err = statenative.ProtobufBeaconStateBellatrix(testState.ToProtoUnsafe())
+	pbState, err = statenative.ProtobufBeaconStateCapella(testState.ToProtoUnsafe())
 	require.NoError(t, err)
 
-	copiedTestState, err := statenative.InitializeFromProtoBellatrix(pbState)
+	copiedTestState, err := statenative.InitializeFromProtoCapella(pbState)
 	require.NoError(t, err)
 
 	rt2, err := copiedTestState.HashTreeRoot(context.Background())
@@ -311,10 +309,10 @@ func TestBeaconState_ValidatorMutation_Bellatrix(t *testing.T) {
 
 	rt, err = newState1.HashTreeRoot(context.Background())
 	require.NoError(t, err)
-	pbState, err = statenative.ProtobufBeaconStateBellatrix(newState1.ToProtoUnsafe())
+	pbState, err = statenative.ProtobufBeaconStateCapella(newState1.ToProtoUnsafe())
 	require.NoError(t, err)
 
-	copiedTestState, err = statenative.InitializeFromProtoBellatrix(pbState)
+	copiedTestState, err = statenative.InitializeFromProtoCapella(pbState)
 	require.NoError(t, err)
 
 	rt2, err = copiedTestState.HashTreeRoot(context.Background())
@@ -322,4 +320,3 @@ func TestBeaconState_ValidatorMutation_Bellatrix(t *testing.T) {
 
 	assert.Equal(t, rt, rt2)
 }
-*/

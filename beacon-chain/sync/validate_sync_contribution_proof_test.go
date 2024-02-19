@@ -2,19 +2,38 @@ package sync
 
 import (
 	"context"
+	"fmt"
 	"testing"
+	"time"
 
+	"github.com/golang/snappy"
+	pubsub "github.com/libp2p/go-libp2p-pubsub"
+	pubsubpb "github.com/libp2p/go-libp2p-pubsub/pb"
+	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/theQRL/go-bitfield"
+	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
+	opfeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/operation"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db"
+	testingdb "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
+	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
+	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
+	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/encoder"
 	mockp2p "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
+	p2ptypes "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
+	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
+	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
+	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -22,19 +41,15 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-// TODO(rgeraldes24): fix
-/*
 func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 	database := testingdb.SetupDB(t)
 	headRoot, keys := fillUpBlocksAndState(context.Background(), t, database)
-	defaultTopic := p2p.SyncContributionAndProofSubnetTopicFormat
-	defaultTopic = fmt.Sprintf(defaultTopic, []byte{0xAB, 0x00, 0xCC, 0x9E})
-	defaultTopic = defaultTopic + "/" + encoder.ProtocolSuffixSSZSnappy
+	defaultTopic := fmt.Sprintf(p2p.SyncContributionAndProofSubnetTopicFormat, []byte{0xAB, 0x00, 0xCC, 0x9E}) + "/" + encoder.ProtocolSuffixSSZSnappy
 	chainService := &mockChain.ChainService{
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{'A'},
 	}
-	var emptySig [96]byte
+	var emptySig [field_params.DilithiumSignatureLength]byte
 	type args struct {
 		pid   peer.ID
 		msg   *zondpb.SignedContributionAndProof
@@ -149,45 +164,47 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 				}},
 			want: pubsub.ValidationIgnore,
 		},
-		{
-			name: "Already Seen Message",
-			svcopts: []Option{
-				WithP2P(mockp2p.NewTestP2P(t)),
-				WithInitialSync(&mockSync.Sync{IsSyncing: false}),
-				WithChainService(chainService),
-				WithOperationNotifier(chainService.OperationNotifier()),
-			},
-			setupSvc: func(s *Service, msg *zondpb.SignedContributionAndProof) (*Service, *startup.Clock) {
-				s.cfg.stateGen = stategen.New(database, doublylinkedtree.New())
-				s.cfg.beaconDB = database
-				s.initCaches()
-				s.cfg.chain = &mockChain.ChainService{}
-				msg.Message.Contribution.BlockRoot = headRoot[:]
-				msg.Message.Contribution.AggregationBits.SetBitAt(1, true)
+		/*
+			{
+				name: "Already Seen Message",
+				svcopts: []Option{
+					WithP2P(mockp2p.NewTestP2P(t)),
+					WithInitialSync(&mockSync.Sync{IsSyncing: false}),
+					WithChainService(chainService),
+					WithOperationNotifier(chainService.OperationNotifier()),
+				},
+				setupSvc: func(s *Service, msg *zondpb.SignedContributionAndProof) (*Service, *startup.Clock) {
+					s.cfg.stateGen = stategen.New(database, doublylinkedtree.New())
+					s.cfg.beaconDB = database
+					s.initCaches()
+					s.cfg.chain = &mockChain.ChainService{}
+					msg.Message.Contribution.BlockRoot = headRoot[:]
+					msg.Message.Contribution.AggregationBits.SetBitAt(1, true)
 
-				s.setSyncContributionIndexSlotSeen(1, 1, 1)
-				gt := time.Now().Add(-time.Second * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Duration(msg.Message.Contribution.Slot))
-				return s, startup.NewClock(gt, [32]byte{'A'})
-			},
-			args: args{
-				pid:   "random",
-				topic: defaultTopic,
-				msg: &zondpb.SignedContributionAndProof{
-					Message: &zondpb.ContributionAndProof{
-						AggregatorIndex: 1,
-						Contribution: &zondpb.SyncCommitteeContribution{
-							Slot:              1,
-							SubcommitteeIndex: 1,
-							BlockRoot:         params.BeaconConfig().ZeroHash[:],
-							AggregationBits:   bitfield.NewBitvector16(),
-							Signatures:        [][]byte{emptySig[:]},
+					s.setSyncContributionIndexSlotSeen(1, 1, 1)
+					gt := time.Now().Add(-time.Second * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Duration(msg.Message.Contribution.Slot))
+					return s, startup.NewClock(gt, [32]byte{'A'})
+				},
+				args: args{
+					pid:   "random",
+					topic: defaultTopic,
+					msg: &zondpb.SignedContributionAndProof{
+						Message: &zondpb.ContributionAndProof{
+							AggregatorIndex: 1,
+							Contribution: &zondpb.SyncCommitteeContribution{
+								Slot:              1,
+								SubcommitteeIndex: 1,
+								BlockRoot:         params.BeaconConfig().ZeroHash[:],
+								AggregationBits:   bitfield.NewBitvector16(),
+								Signatures:        [][]byte{emptySig[:]},
+							},
+							SelectionProof: emptySig[:],
 						},
-						SelectionProof: emptySig[:],
-					},
-					Signature: emptySig[:],
-				}},
-			want: pubsub.ValidationIgnore,
-		},
+						Signature: emptySig[:],
+					}},
+				want: pubsub.ValidationIgnore,
+			},
+		*/
 		{
 			name: "Invalid Subcommittee Index",
 			svcopts: []Option{
@@ -241,7 +258,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 				s.initCaches()
 				s.cfg.chain = &mockChain.ChainService{}
 				msg.Message.Contribution.BlockRoot = headRoot[:]
-				incorrectProof := [96]byte{0xBB}
+				incorrectProof := [field_params.DilithiumSignatureLength]byte{0xBB}
 				msg.Message.SelectionProof = incorrectProof[:]
 				msg.Message.Contribution.AggregationBits.SetBitAt(1, true)
 
@@ -387,6 +404,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 				}},
 			want: pubsub.ValidationReject,
 		},
+
 		{
 			name: "Invalid Proof Signature",
 			svcopts: []Option{
@@ -417,7 +435,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 						isAggregator, err := altair.IsSyncCommitteeAggregator(sig.Marshal())
 						require.NoError(t, err)
 						if isAggregator {
-							infiniteSig := [96]byte{0xC0}
+							infiniteSig := [field_params.DilithiumSignatureLength]byte{0xC0}
 							pubkey = keys[idx].PublicKey().Marshal()
 							msg.Message.AggregatorIndex = idx
 							msg.Message.SelectionProof = sig.Marshal()
@@ -573,7 +591,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 						isAggregator, err := altair.IsSyncCommitteeAggregator(sig.Marshal())
 						require.NoError(t, err)
 						if isAggregator {
-							infiniteSig := [96]byte{0xC0}
+							infiniteSig := [field_params.DilithiumSignatureLength]byte{0xC0}
 							msg.Message.AggregatorIndex = idx
 							msg.Message.SelectionProof = sig.Marshal()
 							msg.Message.Contribution.Slot = slots.PrevSlot(hState.Slot())
@@ -853,7 +871,6 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 	}
 }
 
-
 func TestValidateSyncContributionAndProof(t *testing.T) {
 	ctx := context.Background()
 	database := testingdb.SetupDB(t)
@@ -991,7 +1008,6 @@ func TestValidateSyncContributionAndProof(t *testing.T) {
 		}
 	}
 }
-*/
 
 func fillUpBlocksAndState(ctx context.Context, t *testing.T, beaconDB db.Database) ([32]byte, []dilithium.DilithiumKey) {
 	gs, keys := util.DeterministicGenesisStateCapella(t, 64)

@@ -126,29 +126,6 @@ func NewMaxCover(atts []*zondpb.Attestation) *aggregation.MaxCoverProblem {
 	return &aggregation.MaxCoverProblem{Candidates: candidates}
 }
 
-// TODO(rgeraldes24): method not used?
-/*
-// aggregate returns list as an aggregated attestation.
-func (al attList) aggregate(coverage bitfield.Bitlist) (*zondpb.Attestation, error) {
-	if len(al) < 2 {
-		return nil, errors.Wrap(ErrInvalidAttestationCount, "cannot aggregate")
-	}
-	signs := make([]dilithium.Signature, len(al))
-	for i := 0; i < len(al); i++ {
-		sig, err := signatureFromBytes(al[i].Signature)
-		if err != nil {
-			return nil, err
-		}
-		signs[i] = sig
-	}
-	return &zondpb.Attestation{
-		AggregationBits: coverage,
-		Data:            zondpb.CopyAttestationData(al[0].Data),
-		Signature:       aggregateSignatures(signs).Marshal(),
-	}, nil
-}
-*/
-
 // padSelectedKeys adds additional value to every key.
 func padSelectedKeys(keys []int, pad int) []int {
 	for i, key := range keys {

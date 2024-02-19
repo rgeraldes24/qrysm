@@ -318,7 +318,7 @@ func TestService_markSynced(t *testing.T) {
 	assert.Equal(t, false, s.Syncing())
 }
 
-// TODO(rgeraldes24): taking too long
+// TODO(rgeraldes24): test taking too long
 /*
 func TestService_Resync(t *testing.T) {
 	p := p2pt.NewTestP2P(t)

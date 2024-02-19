@@ -413,7 +413,6 @@ func (a *IndexedAttestation) MarshalJSON() ([]byte, error) {
 	for i := range a.IndexedAttestation.AttestingIndices {
 		indices[i] = fmt.Sprintf("%d", a.AttestingIndices[i])
 	}
-	// TODO(rgeraldes24)
 	signatures := make([]hexutil.Bytes, len(a.IndexedAttestation.Signatures))
 	for i, sig := range a.IndexedAttestation.Signatures {
 		signatures[i] = sig

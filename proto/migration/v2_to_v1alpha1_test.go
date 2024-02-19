@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-func Test_BellatrixToV1Alpha1SignedBlock(t *testing.T) {
+func Test_CapellaToV1Alpha1SignedBlock(t *testing.T) {
 	v2Block := util.HydrateV2CapellaSignedBeaconBlock(&zondpbv2.SignedBeaconBlockCapella{})
 	v2Block.Message.Slot = slot
 	v2Block.Message.ProposerIndex = validatorIndex
@@ -45,7 +45,12 @@ func Test_BellatrixToV1Alpha1SignedBlock(t *testing.T) {
 		BaseFeePerGas: baseFeePerGas,
 		BlockHash:     blockHash,
 		Transactions:  [][]byte{[]byte("transaction1"), []byte("transaction2")},
-		// TODO(rgeraldes24): withdrawals
+		Withdrawals: []*enginev1.Withdrawal{{
+			Index:          uint64(validatorIndex),
+			ValidatorIndex: validatorIndex,
+			Address:        feeRecipient,
+			Amount:         10,
+		}},
 	}
 	v2Block.Signature = signature
 

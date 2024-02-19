@@ -140,14 +140,14 @@ var (
 	}
 )
 
-func versionNames() []string {
-	enum := version.All()
-	names := make([]string, len(enum))
-	for i := range enum {
-		names[i] = version.String(enum[i])
-	}
-	return names
-}
+// func versionNames() []string {
+// 	enum := version.All()
+// 	names := make([]string, len(enum))
+// 	for i := range enum {
+// 		names[i] = version.String(enum[i])
+// 	}
+// 	return names
+// }
 
 // Represents a json object of hex string and uint64 values for
 // validators on Ethereum. This file can be generated using the official staking-deposit-cli.

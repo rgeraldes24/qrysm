@@ -94,8 +94,7 @@ func BenchmarkHashProto(b *testing.B) {
 			Source:          nil,
 			Target:          nil,
 		},
-		// TODO(rgeraldes24)
-		// Signatures: bls.NewAggregateSignature().Marshal(),
+		Signatures: nil,
 	}
 
 	for i := 0; i < b.N; i++ {

@@ -85,8 +85,6 @@ func TestVerifySelection_NotAnAggregator(t *testing.T) {
 	validators := uint64(2048)
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, validators)
 
-	// TODO(rgeraldes24)
-	//sig := privKeys[0].Sign([]byte{'A'})
 	sig := privKeys[0].Sign([]byte{'B'})
 	data := util.HydrateAttestationData(&zondpb.AttestationData{})
 
@@ -404,7 +402,9 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	assert.Equal(t, pubsub.ValidationAccept, res, "Validated status is false")
 	assert.NotNil(t, msg.ValidatorData, "Did not set validator data")
 }
+*/
 
+/*
 func TestVerifyIndexInCommittee_SeenAggregatorEpoch(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)

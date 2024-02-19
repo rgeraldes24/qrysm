@@ -87,22 +87,19 @@ func TestSetInitialPublishBlockPostRequest(t *testing.T) {
 }
 
 func TestPreparePublishedBlock(t *testing.T) {
-	// TODO(rgeraldes24): Capella test
-	/*
-		t.Run("Bellatrix", func(t *testing.T) {
-			endpoint := &apimiddleware.Endpoint{
-				PostRequest: &SignedBeaconBlockBellatrixJson{
-					Message: &BeaconBlockBellatrixJson{
-						Body: &BeaconBlockBodyBellatrixJson{},
-					},
+	t.Run("Capella", func(t *testing.T) {
+		endpoint := &apimiddleware.Endpoint{
+			PostRequest: &SignedBeaconBlockCapellaJson{
+				Message: &BeaconBlockCapellaJson{
+					Body: &BeaconBlockBodyCapellaJson{},
 				},
-			}
-			errJson := preparePublishedBlock(endpoint, nil, nil)
-			require.Equal(t, true, errJson == nil)
-			_, ok := endpoint.PostRequest.(*bellatrixPublishBlockRequestJson)
-			assert.Equal(t, true, ok)
-		})
-	*/
+			},
+		}
+		errJson := preparePublishedBlock(endpoint, nil, nil)
+		require.Equal(t, true, errJson == nil)
+		_, ok := endpoint.PostRequest.(*capellaPublishBlockRequestJson)
+		assert.Equal(t, true, ok)
+	})
 
 	t.Run("unsupported block type", func(t *testing.T) {
 		errJson := preparePublishedBlock(&apimiddleware.Endpoint{}, nil, nil)
@@ -181,7 +178,6 @@ func TestPrepareValidatorAggregates(t *testing.T) {
 }
 
 func TestSerializeV2Block(t *testing.T) {
-	// TODO(rgeraldes24): capella test
 	t.Run("incorrect response type", func(t *testing.T) {
 		response := &types.Empty{}
 		runDefault, j, errJson := serializeV2Block(response)

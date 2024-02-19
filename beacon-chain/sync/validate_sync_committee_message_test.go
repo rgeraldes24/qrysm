@@ -7,30 +7,42 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/snappy"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
+	pubsubpb "github.com/libp2p/go-libp2p-pubsub/pb"
+	"github.com/libp2p/go-libp2p/core/peer"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
+	testingdb "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
+	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/v4/beacon-chain/p2p"
+	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/encoder"
+	mockp2p "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
+	p2ptypes "github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
+	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
+	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	"github.com/theQRL/qrysm/v4/network/forks"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
+	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-// TODO(rgeraldes24): fix
-/*
 func TestService_ValidateSyncCommitteeMessage(t *testing.T) {
 	beaconDB := testingdb.SetupDB(t)
 	headRoot, keys := fillUpBlocksAndState(context.Background(), t, beaconDB)
-	defaultTopic := p2p.SyncCommitteeSubnetTopicFormat
 	fakeDigest := []byte{0xAB, 0x00, 0xCC, 0x9E}
-	defaultTopic = defaultTopic + "/" + encoder.ProtocolSuffixSSZSnappy
+	defaultTopic := p2p.SyncCommitteeSubnetTopicFormat + "/" + encoder.ProtocolSuffixSSZSnappy
 	chainService := &mockChain.ChainService{
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{'A'},
 	}
-	var emptySig [96]byte
+	var emptySig [field_params.DilithiumSignatureLength]byte
 	type args struct {
 		pid   peer.ID
 		msg   *zondpb.SyncCommitteeMessage
@@ -120,6 +132,7 @@ func TestService_ValidateSyncCommitteeMessage(t *testing.T) {
 				}},
 			want: pubsub.ValidationIgnore,
 		},
+
 		{
 			name: "Already Seen Message",
 			svcopts: []Option{
@@ -420,7 +433,6 @@ func TestService_ValidateSyncCommitteeMessage(t *testing.T) {
 		})
 	}
 }
-*/
 
 func TestService_ignoreHasSeenSyncMsg(t *testing.T) {
 	tests := []struct {

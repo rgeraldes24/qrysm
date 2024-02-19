@@ -328,15 +328,6 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		payloadItems := make(map[string]interface{})
 		require.NoError(t, json.Unmarshal(enc, &payloadItems))
 
-		// TODO(rgeraldes24)
-		// tx := zondtypes.NewTransaction(
-		// 	1,
-		// 	common.BytesToAddress([]byte("hi")),
-		// 	big.NewInt(0),
-		// 	21000,
-		// 	big.NewInt(1e6),
-		// 	[]byte{},
-		// )
 		toAddr := common.BytesToAddress([]byte("hi"))
 		tx := zondtypes.NewTx(&zondtypes.DynamicFeeTx{
 			Nonce: 1,

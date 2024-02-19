@@ -161,7 +161,7 @@ func TestUnmarshalBlindedBlock(t *testing.T) {
 	}{
 		{
 			name:    "genesis - slot 0",
-			b:       signedTestBlockCapella,
+			b:       signedTestBlindedBlockCapella,
 			version: genv,
 		},
 	}

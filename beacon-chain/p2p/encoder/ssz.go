@@ -15,10 +15,9 @@ import (
 
 var _ NetworkEncoding = (*SszNetworkEncoder)(nil)
 
-// TODO(rgeraldes24): naming
 // MaxGossipSize allowed for gossip messages.
-var MaxGossipSize = params.BeaconNetworkConfig().GossipMaxSizeBellatrix
-var MaxChunkSize = params.BeaconNetworkConfig().MaxChunkSizeBellatrix
+var MaxGossipSize = params.BeaconNetworkConfig().GossipMaxSizeCapella
+var MaxChunkSize = params.BeaconNetworkConfig().MaxChunkSizeCapella
 
 // This pool defines the sync pool for our buffered snappy writers, so that they
 // can be constantly reused.

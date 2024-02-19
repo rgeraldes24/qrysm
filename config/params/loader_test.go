@@ -123,13 +123,9 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 	assert.Equal(t, expected.BaseRewardFactor, actual.BaseRewardFactor, "%s: BaseRewardFactor", name)
 	assert.Equal(t, expected.WhistleBlowerRewardQuotient, actual.WhistleBlowerRewardQuotient, "%s: WhistleBlowerRewardQuotient", name)
 	assert.Equal(t, expected.ProposerRewardQuotient, actual.ProposerRewardQuotient, "%s: ProposerRewardQuotient", name)
-	// TODO(rgeraldes24): add bellatrix fields
-	// assert.Equal(t, expected.InactivityPenaltyQuotient, actual.InactivityPenaltyQuotient, "%s: InactivityPenaltyQuotient", name)
-	// assert.Equal(t, expected.InactivityPenaltyQuotientAltair, actual.InactivityPenaltyQuotientAltair, "%s: InactivityPenaltyQuotientAltair", name)
-	// assert.Equal(t, expected.MinSlashingPenaltyQuotient, actual.MinSlashingPenaltyQuotient, "%s: MinSlashingPenaltyQuotient", name)
-	// assert.Equal(t, expected.MinSlashingPenaltyQuotientAltair, actual.MinSlashingPenaltyQuotientAltair, "%s: MinSlashingPenaltyQuotientAltair", name)
-	// assert.Equal(t, expected.ProportionalSlashingMultiplier, actual.ProportionalSlashingMultiplier, "%s: ProportionalSlashingMultiplier", name)
-	// assert.Equal(t, expected.ProportionalSlashingMultiplierAltair, actual.ProportionalSlashingMultiplierAltair, "%s: ProportionalSlashingMultiplierAltair", name)
+	assert.Equal(t, expected.InactivityPenaltyQuotientCapella, actual.InactivityPenaltyQuotientCapella, "%s: InactivityPenaltyQuotientCapella", name)
+	assert.Equal(t, expected.MinSlashingPenaltyQuotientCapella, actual.MinSlashingPenaltyQuotientCapella, "%s: MinSlashingPenaltyQuotientCapella", name)
+	assert.Equal(t, expected.ProportionalSlashingMultiplierCapella, actual.ProportionalSlashingMultiplierCapella, "%s: ProportionalSlashingMultiplierCapella", name)
 
 	// Max operations per block.
 	assert.Equal(t, expected.MaxProposerSlashings, actual.MaxProposerSlashings, "%s: MaxProposerSlashings", name)

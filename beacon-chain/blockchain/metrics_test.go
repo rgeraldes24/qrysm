@@ -39,7 +39,6 @@ func TestReportEpochMetrics_BadAttestation(t *testing.T) {
 // The Capella flow includes the participation bits to identify the ones that attested
 // and that func (AttestedCurrentEpoch) is no longer necessary.
 /*
-func Te
 func TestReportEpochMetrics_SlashedValidatorOutOfBound(t *testing.T) {
 	h, _ := util.DeterministicGenesisStateCapella(t, 1)
 	v, err := h.ValidatorAtIndex(0)

@@ -242,19 +242,7 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 		block func([32]byte) *zondpb.GenericSignedBeaconBlock
 		err   string
 	}{
-		// TODO(rgeraldes24)
-		/*
-			{
-				name: "bellatrix",
-				block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
-					blockToPropose := util.NewBeaconBlockBellatrix()
-					blockToPropose.Block.Slot = 5
-					blockToPropose.Block.ParentRoot = parent[:]
-					blk := &zondpb.GenericSignedBeaconBlock_Bellatrix{Bellatrix: blockToPropose}
-					return &zondpb.GenericSignedBeaconBlock{Block: blk}
-				},
-			},
-		*/
+
 		{
 			name: "blind capella",
 			block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
@@ -272,7 +260,7 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 			},
 		},
 		{
-			name: "bellatrix",
+			name: "capella",
 			block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
 				blockToPropose := util.NewBeaconBlockCapella()
 				blockToPropose.Block.Slot = 5
@@ -281,40 +269,6 @@ func TestProposer_ProposeBlock_OK(t *testing.T) {
 				return &zondpb.GenericSignedBeaconBlock{Block: blk}
 			},
 		},
-		/*
-			{
-				name: "blind capella",
-				block: func(parent [32]byte) *zondpb.GenericSignedBeaconBlock {
-					blockToPropose := util.NewBlindedBeaconBlockDeneb()
-					blockToPropose.Message.Slot = 5
-					blockToPropose.Message.ParentRoot = parent[:]
-					txRoot, err := ssz.TransactionsRoot([][]byte{})
-					require.NoError(t, err)
-					withdrawalsRoot, err := ssz.WithdrawalSliceRoot([]*enginev1.Withdrawal{}, fieldparams.MaxWithdrawalsPerPayload)
-					require.NoError(t, err)
-					blockToPropose.Message.Body.ExecutionPayloadHeader.TransactionsRoot = txRoot[:]
-					blockToPropose.Message.Body.ExecutionPayloadHeader.WithdrawalsRoot = withdrawalsRoot[:]
-					blk := &zondpb.GenericSignedBeaconBlock_BlindedDeneb{BlindedDeneb: &zondpb.SignedBlindedBeaconBlockAndBlobsDeneb{
-						SignedBlindedBlock: blockToPropose,
-						SignedBlindedBlobSidecars: []*zondpb.SignedBlindedBlobSidecar{
-							{
-								Message: &zondpb.BlindedBlobSidecar{
-									BlockRoot:       []byte{0x01},
-									Slot:            2,
-									BlockParentRoot: []byte{0x03},
-									ProposerIndex:   3,
-									BlobRoot:        []byte{0x04},
-									KzgCommitment:   []byte{0x05},
-									KzgProof:        []byte{0x06},
-								},
-								Signature: []byte{0x07},
-							},
-						},
-					}}
-					return &zondpb.GenericSignedBeaconBlock{Block: blk}
-				},
-			},
-		*/
 	}
 
 	for _, tt := range tests {

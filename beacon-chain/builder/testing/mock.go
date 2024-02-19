@@ -28,9 +28,8 @@ type MockBuilderService struct {
 	ErrSubmitBlindedBlock error
 	BidCapella            *zondpb.SignedBuilderBidCapella
 	RegistrationCache     *cache.RegistrationCache
-	// ErrGetHeader          error // TODO(rgeraldes24) not used anymore with Capella
-	ErrRegisterValidator error
-	Cfg                  *Config
+	ErrRegisterValidator  error
+	Cfg                   *Config
 }
 
 // Configured for mocking.

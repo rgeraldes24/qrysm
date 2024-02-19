@@ -1,6 +1,7 @@
 package util
 
-// TODO(rgeraldes24): remove? unused
+// TODO(rgeraldes24) - used for the altair full block generation; double
+// check if needs to be included for the capella full block generation
 /*
 import (
 	"github.com/pkg/errors"

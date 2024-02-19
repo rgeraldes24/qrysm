@@ -80,8 +80,7 @@ type ExecutionPayloadReconstructor interface {
 	ReconstructFullBlock(
 		ctx context.Context, blindedBlock interfaces.ReadOnlySignedBeaconBlock,
 	) (interfaces.SignedBeaconBlock, error)
-	// TODO(rgeraldes24): remove?
-	ReconstructFullBellatrixBlockBatch(
+	ReconstructFullBlockBatch(
 		ctx context.Context, blindedBlocks []interfaces.ReadOnlySignedBeaconBlock,
 	) ([]interfaces.SignedBeaconBlock, error)
 }
@@ -441,9 +440,9 @@ func (s *Service) ReconstructFullBlock(
 	return fullBlock, nil
 }
 
-// ReconstructFullBellatrixBlockBatch takes in a batch of blinded beacon blocks and reconstructs
+// ReconstructFullBlockBatch takes in a batch of blinded beacon blocks and reconstructs
 // them with a full execution payload for each block via the engine API.
-func (s *Service) ReconstructFullBellatrixBlockBatch(
+func (s *Service) ReconstructFullBlockBatch(
 	ctx context.Context, blindedBlocks []interfaces.ReadOnlySignedBeaconBlock,
 ) ([]interfaces.SignedBeaconBlock, error) {
 	if len(blindedBlocks) == 0 {

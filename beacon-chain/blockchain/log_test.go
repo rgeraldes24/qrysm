@@ -28,7 +28,7 @@ func Test_logStateTransitionData(t *testing.T) {
 		b    func() interfaces.ReadOnlyBeaconBlock
 		want string
 	}{
-		// TODO(rgeraldes24): test not valid in Capella - remove?
+		// TODO(rgeraldes24): test not valid in Capella - remove? check if we still need to do any nill checks
 		/*
 			{name: "empty block body",
 				b: func() interfaces.ReadOnlyBeaconBlock {

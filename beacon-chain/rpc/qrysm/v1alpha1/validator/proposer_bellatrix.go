@@ -106,14 +106,17 @@ func setExecutionData(ctx context.Context, blk interfaces.SignedBeaconBlock, loc
 		)
 		return blk.SetExecution(localPayload)
 	default: // Bellatrix case.
-		blk.SetBlinded(true)
-		if err := blk.SetExecution(builderPayload); err != nil {
-			log.WithError(err).Warn("Proposer: failed to set builder payload")
-			blk.SetBlinded(false)
-			return blk.SetExecution(localPayload)
-		} else {
-			return nil
-		}
+		/*
+			blk.SetBlinded(true)
+			if err := blk.SetExecution(builderPayload); err != nil {
+				log.WithError(err).Warn("Proposer: failed to set builder payload")
+				blk.SetBlinded(false)
+				return blk.SetExecution(localPayload)
+			} else {
+				return nil
+			}
+		*/
+		return nil
 	}
 }
 

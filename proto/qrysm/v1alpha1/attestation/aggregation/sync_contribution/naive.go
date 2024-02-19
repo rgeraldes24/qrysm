@@ -6,7 +6,7 @@ import (
 	v2 "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
-	"golang.org/x/exp/slices" // TODO(rgeraldes24) replace with stdlib with go 1.21
+	"golang.org/x/exp/slices"
 )
 
 // naiveSyncContributionAggregation aggregates naively, without any complex algorithms or optimizations.

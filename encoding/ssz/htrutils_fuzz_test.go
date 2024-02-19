@@ -2,8 +2,6 @@
 
 package ssz_test
 
-// TODO(rgeraldes24)
-/*
 import (
 	"testing"
 
@@ -23,7 +21,7 @@ func FuzzUint64Root(f *testing.F) {
 func FuzzForkRoot(f *testing.F) {
 	frk := &pb.Fork{
 		PreviousVersion: params.BeaconConfig().GenesisForkVersion,
-		CurrentVersion:  params.BeaconConfig().AltairForkVersion,
+		CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 		Epoch:           100,
 	}
 	example, err := frk.MarshalSSZ()
@@ -54,4 +52,3 @@ func FuzzPackChunks(f *testing.F) {
 		}
 	})
 }
-*/

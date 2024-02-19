@@ -21,8 +21,8 @@ func MainnetConfig() *BeaconChainConfig {
 const genesisForkEpoch = 0
 
 var mainnetNetworkConfig = &NetworkConfig{
-	GossipMaxSizeBellatrix:          10 * 1 << 20, // 10 MiB
-	MaxChunkSizeBellatrix:           10 * 1 << 20, // 10 MiB
+	GossipMaxSizeCapella:            10 * 1 << 20, // 10 MiB
+	MaxChunkSizeCapella:             10 * 1 << 20, // 10 MiB
 	AttestationSubnetCount:          64,
 	AttestationPropagationSlotRange: 32,      // TODO(rgeraldes24)
 	MaxRequestBlocks:                1 << 10, // 1024

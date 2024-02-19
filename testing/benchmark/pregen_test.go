@@ -1,6 +1,7 @@
 package benchmark
 
-// TODO(rgeraldes24)
+// NOTE(rgeraldes24): these benchmarks are not valid at the moment since we
+// will have to generate new test artifacts to match Capella.
 /*
 import (
 	"testing"

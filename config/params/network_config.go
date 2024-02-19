@@ -9,8 +9,8 @@ import (
 
 // NetworkConfig defines the spec based network parameters.
 type NetworkConfig struct {
-	GossipMaxSizeBellatrix          uint64          `yaml:"GOSSIP_MAX_SIZE_BELLATRIX"`          // GossipMaxSizeBellatrix is the maximum allowed size of uncompressed gossip messages after the bellatrix epoch.
-	MaxChunkSizeBellatrix           uint64          `yaml:"MAX_CHUNK_SIZE_BELLATRIX"`           // MaxChunkSizeBellatrix is the maximum allowed size of uncompressed req/resp chunked responses after the bellatrix epoch.
+	GossipMaxSizeCapella            uint64          `yaml:"GOSSIP_MAX_SIZE_BELLATRIX"`          // GossipMaxSizeBellatrix is the maximum allowed size of uncompressed gossip messages after the bellatrix epoch.
+	MaxChunkSizeCapella             uint64          `yaml:"MAX_CHUNK_SIZE_BELLATRIX"`           // MaxChunkSizeBellatrix is the maximum allowed size of uncompressed req/resp chunked responses after the bellatrix epoch.
 	AttestationSubnetCount          uint64          `yaml:"ATTESTATION_SUBNET_COUNT"`           // AttestationSubnetCount is the number of attestation subnets used in the gossipsub protocol.
 	AttestationPropagationSlotRange primitives.Slot `yaml:"ATTESTATION_PROPAGATION_SLOT_RANGE"` // AttestationPropagationSlotRange is the maximum number of slots during which an attestation can be propagated.
 	MaxRequestBlocks                uint64          `yaml:"MAX_REQUEST_BLOCKS"`                 // MaxRequestBlocks is the maximum number of blocks in a single request.

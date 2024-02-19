@@ -262,8 +262,9 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 			feed: srv.StateNotifier.StateFeed(),
 		})
 	})
-	// TODO(rgeraldes24)
+
 	/*
+		TODO(rgeraldes24): fix
 		t.Run(PayloadAttributesTopic+"_capella", func(t *testing.T) {
 			ctx := context.Background()
 			beaconState, _ := util.DeterministicGenesisStateCapella(t, 1)
@@ -278,7 +279,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 			require.NoError(t, err, "Count not set slot")
 			err = beaconState.SetNextWithdrawalValidatorIndex(0)
 			require.NoError(t, err, "Could not set withdrawal index")
-			err = beaconState.SetBalances([]uint64{33000000000})
+			err = beaconState.SetBalances([]uint64{41000000000000})
 			require.NoError(t, err, "Could not set validator balance")
 			stateRoot, err := beaconState.HashTreeRoot(ctx)
 			require.NoError(t, err, "Could not hash genesis state")

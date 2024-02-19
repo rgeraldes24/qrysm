@@ -8,14 +8,11 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
-	"golang.org/x/exp/slices" // TODO(rgeraldes24) replace with stdlib with go 1.21
+	"golang.org/x/exp/slices"
 )
 
 // attList represents list of attestations, defined for easier en masse operations (filtering, sorting).
 type attList []*zondpb.Attestation
-
-// TODO(rgeraldes24): remove?
-// var signatureFromBytes = dilithium.SignatureFromBytes
 
 var _ = logrus.WithField("prefix", "aggregation.attestations")
 

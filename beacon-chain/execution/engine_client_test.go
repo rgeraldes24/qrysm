@@ -566,12 +566,12 @@ func TestReconstructFullBellatrixBlock(t *testing.T) {
 	})
 }
 
-func TestReconstructFullBellatrixBlockBatch(t *testing.T) {
+func TestReconstructFullBlockBatch(t *testing.T) {
 	ctx := context.Background()
 	t.Run("nil block", func(t *testing.T) {
 		service := &Service{}
 
-		_, err := service.ReconstructFullBellatrixBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{nil})
+		_, err := service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{nil})
 		require.ErrorContains(t, "nil data", err)
 	})
 	t.Run("only blinded block", func(t *testing.T) {
@@ -580,7 +580,7 @@ func TestReconstructFullBellatrixBlockBatch(t *testing.T) {
 		bellatrixBlock := util.NewBeaconBlockCapella()
 		wrapped, err := blocks.NewSignedBeaconBlock(bellatrixBlock)
 		require.NoError(t, err)
-		_, err = service.ReconstructFullBellatrixBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrapped})
+		_, err = service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrapped})
 		require.ErrorContains(t, want, err)
 	})
 	t.Run("pre-merge execution payload", func(t *testing.T) {
@@ -595,7 +595,7 @@ func TestReconstructFullBellatrixBlockBatch(t *testing.T) {
 		require.NoError(t, err)
 		wantedWrapped, err := blocks.NewSignedBeaconBlock(wanted)
 		require.NoError(t, err)
-		reconstructed, err := service.ReconstructFullBellatrixBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrapped})
+		reconstructed, err := service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrapped})
 		require.NoError(t, err)
 		require.DeepEqual(t, []interfaces.SignedBeaconBlock{wantedWrapped}, reconstructed)
 	})
@@ -692,7 +692,7 @@ func TestReconstructFullBellatrixBlockBatch(t *testing.T) {
 		copiedWrapped, err := wrapped.Copy()
 		require.NoError(t, err)
 
-		reconstructed, err := service.ReconstructFullBellatrixBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrappedEmpty, wrapped, copiedWrapped})
+		reconstructed, err := service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrappedEmpty, wrapped, copiedWrapped})
 		require.NoError(t, err)
 
 		// Make sure empty blocks are handled correctly
