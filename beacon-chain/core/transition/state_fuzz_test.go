@@ -1,7 +1,5 @@
 package transition
 
-// TODO(rgeraldes24): fix unit test
-/*
 import (
 	"context"
 	"testing"
@@ -70,4 +68,3 @@ func TestIsValidGenesisState_100000(_ *testing.T) {
 		IsValidGenesisState(chainStartDepositCount, currentTime)
 	}
 }
-*/

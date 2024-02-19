@@ -18,6 +18,7 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
+	"github.com/theQRL/qrysm/v4/testing/util"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -58,10 +59,8 @@ func TestGetSyncMessageBlockRoot_Optimistic(t *testing.T) {
 	require.NoError(t, err)
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestSubmitSyncMessage_OK(t *testing.T) {
-	st, _ := util.DeterministicGenesisStateAltair(t, 10)
+	st, _ := util.DeterministicGenesisStateCapella(t, 10)
 	server := &Server{
 		CoreService: &core.Service{
 			SyncCommitteePool: synccommittee.NewStore(),
@@ -77,11 +76,10 @@ func TestSubmitSyncMessage_OK(t *testing.T) {
 	}
 	_, err := server.SubmitSyncMessage(context.Background(), msg)
 	require.NoError(t, err)
-	savedMsgs, err := server.CoreService.SyncCommitteeMessages(1)
+	savedMsgs, err := server.CoreService.SyncCommitteePool.SyncCommitteeMessages(1)
 	require.NoError(t, err)
 	require.DeepEqual(t, []*zondpb.SyncCommitteeMessage{msg}, savedMsgs)
 }
-*/
 
 func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 	transition.SkipSlotCache.Disable()
@@ -102,6 +100,7 @@ func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 }
 
 // TODO(rgeraldes24): fix unit test
+// Fix SignaturesAndAggregationBits
 /*
 func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 	st, _ := util.DeterministicGenesisStateCapella(t, 10)

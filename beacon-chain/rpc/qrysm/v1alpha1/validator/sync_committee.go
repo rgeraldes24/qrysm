@@ -76,7 +76,7 @@ func (vs *Server) GetSyncCommitteeContribution(
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not get head root: %v", err)
 	}
-	sig, aggregatedBits, err := vs.CoreService.SignaturesAndAggregationBits(
+	signatures, aggregatedBits, err := vs.CoreService.SignaturesAndAggregationBits(
 		ctx,
 		&zondpb.SignaturesAndAggregationBitsRequest{
 			Msgs:      msgs,
@@ -92,7 +92,7 @@ func (vs *Server) GetSyncCommitteeContribution(
 		BlockRoot:         headRoot,
 		SubcommitteeIndex: req.SubnetId,
 		AggregationBits:   aggregatedBits,
-		Signatures:        sig,
+		Signatures:        signatures,
 	}
 
 	return contribution, nil

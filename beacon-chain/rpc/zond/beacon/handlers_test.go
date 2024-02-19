@@ -189,24 +189,21 @@ func TestPublishBlindedBlock(t *testing.T) {
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "please add the api header"))
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Body does not represent a valid block type"))
 	})
-	// TODO(rgeraldes24): fix unit test
-	/*
-		t.Run("invalid block with version header", func(t *testing.T) {
-			server := &Server{
-				SyncChecker: &mockSync.Sync{IsSyncing: false},
-			}
+	t.Run("invalid block with version header", func(t *testing.T) {
+		server := &Server{
+			SyncChecker: &mockSync.Sync{IsSyncing: false},
+		}
 
-			request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
-			request.Header.Set(api.VersionHeader, version.String(version.Bellatrix))
-			writer := httptest.NewRecorder()
-			writer.Body = &bytes.Buffer{}
-			server.PublishBlindedBlock(writer, request)
-			assert.Equal(t, http.StatusBadRequest, writer.Code)
-			body := writer.Body.String()
-			assert.Equal(t, true, strings.Contains(body, "Body does not represent a valid block type"))
-			assert.Equal(t, true, strings.Contains(body, fmt.Sprintf("could not decode %s request body into consensus block:", version.String(version.Bellatrix))))
-		})
-	*/
+		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BadBlindedCapellaBlock)))
+		request.Header.Set(api.VersionHeader, version.String(version.Capella))
+		writer := httptest.NewRecorder()
+		writer.Body = &bytes.Buffer{}
+		server.PublishBlindedBlock(writer, request)
+		assert.Equal(t, http.StatusBadRequest, writer.Code)
+		body := writer.Body.String()
+		assert.Equal(t, true, strings.Contains(body, "Body does not represent a valid block type"))
+		assert.Equal(t, true, strings.Contains(body, fmt.Sprintf("could not decode %s request body into consensus block:", version.String(version.Capella))))
+	})
 	t.Run("syncing", func(t *testing.T) {
 		chainService := &chainMock.ChainService{}
 		server := &Server{

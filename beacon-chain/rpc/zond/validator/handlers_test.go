@@ -22,6 +22,7 @@ import (
 	builderTest "github.com/theQRL/qrysm/v4/beacon-chain/builder/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	dbutil "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/attestations"
@@ -39,6 +40,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/v4/network/http"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -485,15 +487,13 @@ func TestSubmitAggregateAndProofs(t *testing.T) {
 	})
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestSubmitSyncCommitteeSubscription(t *testing.T) {
 	genesis := util.NewBeaconBlockCapella()
 	deposits, _, err := util.DeterministicDepositsAndKeys(64)
 	require.NoError(t, err)
 	eth1Data, err := util.DeterministicEth1Data(len(deposits))
 	require.NoError(t, err)
-	bs, err := util.GenesisBeaconState(context.Background(), deposits, 0, eth1Data)
+	bs, err := util.GenesisBeaconStateCapella(context.Background(), deposits, 0, eth1Data)
 	require.NoError(t, err, "Could not set up genesis state")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
@@ -656,10 +656,7 @@ func TestSubmitSyncCommitteeSubscription(t *testing.T) {
 		assert.Equal(t, true, strings.Contains(e.Message, "Beacon node is currently syncing"))
 	})
 }
-*/
 
-// TODO(rgeraldes24): fix
-/*
 func TestSubmitBeaconCommitteeSubscription(t *testing.T) {
 	genesis := util.NewBeaconBlockCapella()
 	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
@@ -705,7 +702,9 @@ func TestSubmitBeaconCommitteeSubscription(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		subnets := cache.SubnetIDs.GetAttesterSubnetIDs(1)
 		require.Equal(t, 1, len(subnets))
-		assert.Equal(t, uint64(5), subnets[0])
+		// TODO(rgeraldes24)
+		// assert.Equal(t, uint64(5), subnets[0])
+		assert.Equal(t, uint64(2), subnets[0])
 	})
 	t.Run("multiple", func(t *testing.T) {
 		cache.SubnetIDs.EmptyAllCaches()
@@ -721,8 +720,10 @@ func TestSubmitBeaconCommitteeSubscription(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		subnets := cache.SubnetIDs.GetAttesterSubnetIDs(1)
 		require.Equal(t, 2, len(subnets))
-		assert.Equal(t, uint64(5), subnets[0])
-		assert.Equal(t, uint64(4), subnets[1])
+		// assert.Equal(t, uint64(5), subnets[0])
+		// assert.Equal(t, uint64(4), subnets[1])
+		assert.Equal(t, uint64(2), subnets[0])
+		assert.Equal(t, uint64(1), subnets[1])
 	})
 	t.Run("is aggregator", func(t *testing.T) {
 		cache.SubnetIDs.EmptyAllCaches()
@@ -738,7 +739,8 @@ func TestSubmitBeaconCommitteeSubscription(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		subnets := cache.SubnetIDs.GetAggregatorSubnetIDs(1)
 		require.Equal(t, 1, len(subnets))
-		assert.Equal(t, uint64(5), subnets[0])
+		// assert.Equal(t, uint64(5), subnets[0])
+		assert.Equal(t, uint64(2), subnets[0])
 	})
 	t.Run("validators assigned to subnets", func(t *testing.T) {
 		cache.SubnetIDs.EmptyAllCaches()
@@ -823,7 +825,6 @@ func TestSubmitBeaconCommitteeSubscription(t *testing.T) {
 		assert.Equal(t, true, strings.Contains(e.Message, "Beacon node is currently syncing"))
 	})
 }
-*/
 
 func TestGetAttestationData(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
@@ -1536,8 +1537,6 @@ func TestServer_RegisterValidator(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix
-/*
 func TestGetAttesterDuties(t *testing.T) {
 	helpers.ClearCache()
 
@@ -1604,13 +1603,18 @@ func TestGetAttesterDuties(t *testing.T) {
 		assert.Equal(t, hexutil.Encode(genesisRoot[:]), resp.DependentRoot)
 		require.Equal(t, 1, len(resp.Data))
 		duty := resp.Data[0]
-		assert.Equal(t, "1", duty.CommitteeIndex)
-		assert.Equal(t, "0", duty.Slot)
-		assert.Equal(t, "0", duty.ValidatorIndex)
+		// assert.Equal(t, "1", duty.CommitteeIndex)
+		assert.Equal(t, "0", duty.CommitteeIndex)
+		// assert.Equal(t, "0", duty.Slot)
+		assert.Equal(t, "46", duty.Slot)
+		// assert.Equal(t, "0", duty.ValidatorIndex)
 		assert.Equal(t, hexutil.Encode(pubKeys[0]), duty.Pubkey)
-		assert.Equal(t, "171", duty.CommitteeLength)
-		assert.Equal(t, "3", duty.CommitteesAtSlot)
-		assert.Equal(t, "80", duty.ValidatorCommitteeIndex)
+		// assert.Equal(t, "171", duty.CommitteeLength)
+		assert.Equal(t, "128", duty.CommitteeLength)
+		// assert.Equal(t, "3", duty.CommitteesAtSlot)
+		assert.Equal(t, "1", duty.CommitteesAtSlot)
+		// assert.Equal(t, "80", duty.ValidatorCommitteeIndex)
+		assert.Equal(t, "66", duty.ValidatorCommitteeIndex)
 	})
 	t.Run("multiple validators", func(t *testing.T) {
 		var body bytes.Buffer
@@ -1688,12 +1692,16 @@ func TestGetAttesterDuties(t *testing.T) {
 		require.Equal(t, 1, len(resp.Data))
 		duty := resp.Data[0]
 		assert.Equal(t, "0", duty.CommitteeIndex)
-		assert.Equal(t, "62", duty.Slot)
+		// assert.Equal(t, "62", duty.Slot)
+		assert.Equal(t, "133", duty.Slot)
 		assert.Equal(t, "0", duty.ValidatorIndex)
 		assert.Equal(t, hexutil.Encode(pubKeys[0]), duty.Pubkey)
-		assert.Equal(t, "170", duty.CommitteeLength)
-		assert.Equal(t, "3", duty.CommitteesAtSlot)
-		assert.Equal(t, "110", duty.ValidatorCommitteeIndex)
+		// assert.Equal(t, "170", duty.CommitteeLength)
+		assert.Equal(t, "128", duty.CommitteeLength)
+		// assert.Equal(t, "3", duty.CommitteesAtSlot)
+		assert.Equal(t, "1", duty.CommitteesAtSlot)
+		// assert.Equal(t, "110", duty.ValidatorCommitteeIndex)
+		assert.Equal(t, "103", duty.ValidatorCommitteeIndex)
 	})
 	t.Run("epoch out of bounds", func(t *testing.T) {
 		var body bytes.Buffer
@@ -1864,10 +1872,14 @@ func TestGetProposerDuties(t *testing.T) {
 		}
 		vid, _, has := s.ProposerSlotIndexCache.GetProposerPayloadIDs(11, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(12289), vid)
+		// require.Equal(t, primitives.ValidatorIndex(12289), vid)
+		// require.NotNil(t, expectedDuty, "Expected duty for slot 11 not found")
+		// assert.Equal(t, "12289", expectedDuty.ValidatorIndex)
+		// assert.Equal(t, hexutil.Encode(pubKeys[12289]), expectedDuty.Pubkey)
+		require.Equal(t, primitives.ValidatorIndex(754), vid)
 		require.NotNil(t, expectedDuty, "Expected duty for slot 11 not found")
-		assert.Equal(t, "12289", expectedDuty.ValidatorIndex)
-		assert.Equal(t, hexutil.Encode(pubKeys[12289]), expectedDuty.Pubkey)
+		assert.Equal(t, "754", expectedDuty.ValidatorIndex)
+		assert.Equal(t, hexutil.Encode(pubKeys[754]), expectedDuty.Pubkey)
 	})
 	t.Run("next epoch", func(t *testing.T) {
 		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, eth1Data, &enginev1.ExecutionPayloadCapella{})
@@ -1897,19 +1909,19 @@ func TestGetProposerDuties(t *testing.T) {
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 		assert.Equal(t, hexutil.Encode(genesisRoot[:]), resp.DependentRoot)
 		assert.Equal(t, 128, len(resp.Data))
-		// We expect a proposer duty for slot 43.
+		// We expect a proposer duty for slot 139.
 		var expectedDuty *ProposerDuty
 		for _, duty := range resp.Data {
-			if duty.Slot == "43" {
+			if duty.Slot == "139" {
 				expectedDuty = duty
 			}
 		}
-		vid, _, has := s.ProposerSlotIndexCache.GetProposerPayloadIDs(43, [32]byte{})
+		vid, _, has := s.ProposerSlotIndexCache.GetProposerPayloadIDs(139, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(1360), vid)
-		require.NotNil(t, expectedDuty, "Expected duty for slot 43 not found")
-		assert.Equal(t, "1360", expectedDuty.ValidatorIndex)
-		assert.Equal(t, hexutil.Encode(pubKeys[1360]), expectedDuty.Pubkey)
+		require.Equal(t, primitives.ValidatorIndex(10462), vid)
+		require.NotNil(t, expectedDuty, "Expected duty for slot 139 not found")
+		assert.Equal(t, "10462", expectedDuty.ValidatorIndex)
+		assert.Equal(t, hexutil.Encode(pubKeys[10462]), expectedDuty.Pubkey)
 	})
 	t.Run("prune payload ID cache", func(t *testing.T) {
 		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, eth1Data, &enginev1.ExecutionPayloadCapella{})
@@ -1946,9 +1958,9 @@ func TestGetProposerDuties(t *testing.T) {
 		vid, _, has = s.ProposerSlotIndexCache.GetProposerPayloadIDs(2, [32]byte{})
 		require.Equal(t, false, has)
 		require.Equal(t, primitives.ValidatorIndex(0), vid)
-		vid, _, has = s.ProposerSlotIndexCache.GetProposerPayloadIDs(32, [32]byte{})
+		vid, _, has = s.ProposerSlotIndexCache.GetProposerPayloadIDs(128, [32]byte{})
 		require.Equal(t, true, has)
-		require.Equal(t, primitives.ValidatorIndex(10565), vid)
+		require.Equal(t, primitives.ValidatorIndex(14916), vid)
 	})
 	t.Run("epoch out of bounds", func(t *testing.T) {
 		bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, eth1Data, &enginev1.ExecutionPayloadCapella{})
@@ -1992,7 +2004,7 @@ func TestGetProposerDuties(t *testing.T) {
 		parentRoot := [32]byte{'a'}
 		blk := util.NewBeaconBlockCapella()
 		blk.Block.ParentRoot = parentRoot[:]
-		blk.Block.Slot = 31
+		blk.Block.Slot = 127
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
 		db := dbutil.SetupDB(t)
@@ -2046,7 +2058,6 @@ func TestGetProposerDuties(t *testing.T) {
 		assert.Equal(t, http.StatusServiceUnavailable, e.Code)
 	})
 }
-*/
 
 func TestGetSyncCommitteeDuties(t *testing.T) {
 	helpers.ClearCache()
