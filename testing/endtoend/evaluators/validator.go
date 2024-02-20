@@ -201,6 +201,12 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 		if err != nil {
 			return err
 		}
+
+		// NOTE(rgeraldes24): make sure that the number of signatures matches the number of participants
+		if len(syncAgg.SyncCommitteeBits.BitIndices()) != len(syncAgg.SyncCommitteeSignatures) {
+			return errors.Errorf("In block of slot %d ,the aggregate bitvector with %d participants only got %d signatures", b.Block().Slot(), len(syncAgg.SyncCommitteeBits.BitIndices()), len(syncAgg.SyncCommitteeSignatures))
+		}
+
 		threshold := uint64(float64(syncAgg.SyncCommitteeBits.Len()) * expectedParticipation)
 		if syncAgg.SyncCommitteeBits.Count() < threshold {
 			return errors.Errorf("In block of slot %d ,the aggregate bitvector with length of %d only got a count of %d", b.Block().Slot(), threshold, syncAgg.SyncCommitteeBits.Count())
