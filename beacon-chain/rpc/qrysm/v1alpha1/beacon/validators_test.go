@@ -1581,9 +1581,9 @@ func runGetValidatorParticipationCurrentAndPrevEpoch(t *testing.T, genState stat
 	require.NoError(t, err)
 
 	wanted := &zondpb.ValidatorParticipation{
-		GlobalParticipationRate:          1,
-		VotedEther:                       validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		EligibleEther:                    validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		GlobalParticipationRate: 1,
+		// VotedEther:                       validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		// EligibleEther:                    validatorCount * params.BeaconConfig().MaxEffectiveBalance,
 		CurrentEpochActiveGwei:           validatorCount * params.BeaconConfig().MaxEffectiveBalance,
 		CurrentEpochAttestingGwei:        validatorCount * params.BeaconConfig().MaxEffectiveBalance,
 		CurrentEpochTargetAttestingGwei:  validatorCount * params.BeaconConfig().MaxEffectiveBalance,

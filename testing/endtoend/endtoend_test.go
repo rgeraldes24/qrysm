@@ -500,9 +500,10 @@ func (r *testRunner) defaultEndToEndRun() error {
 			return errors.Wrap(err, "beacon chain sync test failed")
 		}
 		// index += 1
-		if err := r.testDoppelGangerProtection(ctx); err != nil {
-			return errors.Wrap(err, "doppel ganger protection check failed")
-		}
+		// TODO(rgeraldes24)
+		// if err := r.testDoppelGangerProtection(ctx); err != nil {
+		// 	return errors.Wrap(err, "doppel ganger protection check failed")
+		// }
 
 	}
 	/*

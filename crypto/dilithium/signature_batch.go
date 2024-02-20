@@ -1,9 +1,5 @@
 package dilithium
 
-import (
-	"github.com/pkg/errors"
-)
-
 // AggregatedSignature represents aggregated signature produced by AggregateBatch()
 const AggregatedSignature = "dilithium aggregated signature"
 
@@ -41,6 +37,8 @@ func (s *SignatureBatch) Verify() (bool, error) {
 	return VerifyMultipleSignatures(s.Signatures, s.Messages, s.PublicKeys)
 }
 
+// TODO(rgeraldes24)
+/*
 // VerifyVerbosely verifies signatures as a whole at first, if fails, fallback
 // to verify each single signature to identify invalid ones.
 func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
@@ -53,35 +51,33 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 
 	errmsg := "some signatures are invalid. details:"
 
-	// TODO(rgeraldes24): fix
-	/*
-		for i := 0; i < len(s.Signatures); i++ {
-			for j, pubKey := range s.PublicKeys[i] {
-				offset := j * field_params.DilithiumSignatureLength
-				sig := s.Signatures[i][offset : offset+field_params.DilithiumSignatureLength]
-				msg := s.Messages[i]
+	for i := 0; i < len(s.Signatures); i++ {
+		for j, pubKey := range s.PublicKeys[i] {
+			offset := j * field_params.DilithiumSignatureLength
+			sig := s.Signatures[i][offset : offset+field_params.DilithiumSignatureLength]
+			msg := s.Messages[i]
 
-				valid, err := VerifySignature(sig, msg, pubKey)
-				if !valid {
-					desc := s.Descriptions[i]
-					if err != nil {
-						errmsg += fmt.Sprintf("\nsignature '%s' is invalid."+
-							" signature: 0x%s, public key: 0x%s, message: 0x%v, error: %v",
-							desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
-							hex.EncodeToString(msg[:]), err)
-					} else {
-						errmsg += fmt.Sprintf("\nsignature '%s' is invalid."+
-							" signature: 0x%s, public key: 0x%s, message: 0x%v",
-							desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
-							hex.EncodeToString(msg[:]))
-					}
+			valid, err := VerifySignature(sig, msg, pubKey)
+			if !valid {
+				desc := s.Descriptions[i]
+				if err != nil {
+					errmsg += fmt.Sprintf("\nsignature '%s' is invalid."+
+						" signature: 0x%s, public key: 0x%s, message: 0x%v, error: %v",
+						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
+						hex.EncodeToString(msg[:]), err)
+				} else {
+					errmsg += fmt.Sprintf("\nsignature '%s' is invalid."+
+						" signature: 0x%s, public key: 0x%s, message: 0x%v",
+						desc, hex.EncodeToString(sig), hex.EncodeToString(pubKey.Marshal()),
+						hex.EncodeToString(msg[:]))
 				}
 			}
 		}
-	*/
+	}
 
 	return false, errors.Errorf(errmsg)
 }
+*/
 
 // Copy the attached signature batch and return it
 // to the caller.

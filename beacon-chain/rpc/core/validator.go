@@ -24,8 +24,10 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
+	"golang.org/x/exp/slices"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -253,57 +255,36 @@ func (s *Service) SubmitSignedAggregateSelectionProof(
 func (s *Service) SignaturesAndAggregationBits(
 	ctx context.Context,
 	req *zondpb.SignaturesAndAggregationBitsRequest) ([][]byte, []byte, error) {
+	subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
+	sigs := make([][]byte, 0, subCommitteeSize)
+	bits := zondpb.NewSyncCommitteeAggregationBits()
 
-	/*
-		subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
-		sigs := make([][]byte, 0, subCommitteeSize)
-		bits := zondpb.NewSyncCommitteeAggregationBits()
-		syncCommitteeIndicesSigMap := make(map[primitives.CommitteeIndex]*zondpb.SyncCommitteeMessage)
-		appendedSyncCommitteeIndices := make([]primitives.CommitteeIndex, 0)
-		for _, msg := range req.Msgs {
-			if bytes.Equal(req.BlockRoot, msg.BlockRoot) {
-				headSyncCommitteeIndices, err := s.HeadFetcher.HeadSyncCommitteeIndices(ctx, msg.ValidatorIndex, req.Slot)
-				if err != nil {
-					return nil, nil, errors.Wrapf(err, "could not get sync subcommittee index")
-				}
-				for _, index := range headSyncCommitteeIndices {
-					i := uint64(index)
-					subnetIndex := i / subCommitteeSize
-					indexMod := i % subCommitteeSize
-					if subnetIndex == req.SubnetId && !bits.BitAt(indexMod) {
-						bits.SetBitAt(indexMod, true)
-						syncCommitteeIndicesSigMap[index] = msg
-						appendedSyncCommitteeIndices = append(appendedSyncCommitteeIndices, index)
-					}
-				}
-			}
-		}
-
-		sort.Slice(appendedSyncCommitteeIndices, func(i, j int) bool {
-			return appendedSyncCommitteeIndices[i] < appendedSyncCommitteeIndices[j]
-		})
-
-		for _, syncCommitteeIndex := range appendedSyncCommitteeIndices {
-			msg, ok := syncCommitteeIndicesSigMap[syncCommitteeIndex]
-			if !ok {
-				return []byte{}, nil, errors.Errorf("could not get sync subcommittee index %d "+
-					"in syncCommitteeIndicesSigMap", syncCommitteeIndex)
-			}
-			sigs = append(sigs, msg.Signature)
-		}
-
-		aggregatedSig := make([]byte, dilithium2.CryptoBytes)
-		aggregatedSig[0] = 0xC0
-		if len(sigs) != 0 {
-			uncompressedSigs, err := dilithium.MultipleSignaturesFromBytes(sigs)
+	for _, msg := range req.Msgs {
+		if bytes.Equal(req.BlockRoot, msg.BlockRoot) {
+			headSyncCommitteeIndices, err := s.HeadFetcher.HeadSyncCommitteeIndices(ctx, msg.ValidatorIndex, req.Slot)
 			if err != nil {
-				return nil, nil, errors.Wrapf(err, "could not decompress signatures")
+				return nil, nil, errors.Wrapf(err, "could not get sync subcommittee index")
 			}
-			aggregatedSig = dilithium.UnaggregatedSignatures(uncompressedSigs)
+			for _, index := range headSyncCommitteeIndices {
+				i := uint64(index)
+				subnetIndex := i / subCommitteeSize
+				indexMod := i % subCommitteeSize
+				if subnetIndex == req.SubnetId && !bits.BitAt(indexMod) {
+					// TODO(rgeraldes24): double check if there is other way to approach this from the source
+					// Added nogo exception for now
+					insertIdx, err := attestation.SearchInsertIdxWithOffset(bits.BitIndices(), 0, int(indexMod))
+					if err != nil {
+						return nil, nil, errors.Wrapf(err, "could not get signature insert index")
+					}
+
+					bits.SetBitAt(indexMod, true)
+					sigs = slices.Insert(sigs, insertIdx, msg.Signature)
+				}
+			}
 		}
-		return aggregatedSig, bits, nil
-	*/
-	return nil, nil, nil
+	}
+
+	return sigs, bits, nil
 }
 
 // AssignValidatorToSubnet checks the status and pubkey of a particular validator

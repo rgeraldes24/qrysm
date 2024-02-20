@@ -13,7 +13,6 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
-	"github.com/theQRL/qrysm/v4/config/features"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -63,12 +62,13 @@ func ExecuteStateTransition(
 		return nil, errors.Wrap(err, "could not execute state transition")
 	}
 
-	var valid bool
-	if features.Get().EnableVerboseSigVerification {
-		valid, err = set.VerifyVerbosely()
-	} else {
-		valid, err = set.Verify()
-	}
+	// var valid bool
+	// if features.Get().EnableVerboseSigVerification {
+	// 	valid, err = set.VerifyVerbosely()
+	// } else {
+	// 	valid, err = set.Verify()
+	// }
+	valid, err := set.Verify()
 	if err != nil {
 		return nil, errors.Wrap(err, "could not batch verify signature")
 	}
