@@ -99,8 +99,7 @@ func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 	require.DeepEqual(t, []primitives.CommitteeIndex{0}, res.Indices)
 }
 
-// TODO(rgeraldes24): fix unit test
-// Fix SignaturesAndAggregationBits
+// TODO(rgeraldes24): fix unit test: fix SignaturesAndAggregationBits
 /*
 func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 	st, _ := util.DeterministicGenesisStateCapella(t, 10)

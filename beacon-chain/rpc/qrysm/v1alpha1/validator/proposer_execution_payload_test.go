@@ -81,15 +81,12 @@ func TestServer_getExecutionPayload(t *testing.T) {
 			st:        transitionSt,
 			payloadID: &pb.PayloadIDBytes{0x1},
 		},
-		// TODO(rgeraldes24): fix unit test
-		/*
-			{
-				name:          "transition completed, happy case (doesn't have fee recipient in Db)",
-				st:            transitionSt,
-				payloadID:     &pb.PayloadIDBytes{0x1},
-				validatorIndx: 1,
-			},
-		*/
+		{
+			name:          "transition completed, happy case (doesn't have fee recipient in Db)",
+			st:            transitionSt,
+			payloadID:     &pb.PayloadIDBytes{0x1},
+			validatorIndx: 1,
+		},
 		{
 			name:          "transition completed, capella, happy case (doesn't have fee recipient in Db)",
 			st:            capellaTransitionState,
@@ -107,20 +104,6 @@ func TestServer_getExecutionPayload(t *testing.T) {
 			forkchoiceErr: errors.New("fork choice error"),
 			errString:     "could not prepare payload",
 		},
-		// TODO(rgeraldes24): fix unit test
-		/*
-			{
-				name:      "transition not-completed, latest exec block is nil",
-				st:        nonTransitionSt,
-				errString: "latest execution block is nil",
-			},
-			{
-				name:              "transition not-completed, activation epoch not reached",
-				st:                nonTransitionSt,
-				terminalBlockHash: [32]byte{0x1},
-				activationEpoch:   1,
-			},
-		*/
 		{
 			name:           "local client override",
 			st:             transitionSt,

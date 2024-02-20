@@ -8,6 +8,8 @@ import (
 	gcache "github.com/patrickmn/go-cache"
 	"github.com/theQRL/qrysm/v4/async/abool"
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
+	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/operations/dilithiumtoexec"
 	p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
@@ -108,8 +110,6 @@ func TestSyncHandlers_WaitForChainStart(t *testing.T) {
 	require.Equal(t, true, r.chainStarted.IsSet(), "Did not receive chain start event.")
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	p2p := p2ptest.NewTestP2P(t)
 	chainService := &mockChain.ChainService{
@@ -166,10 +166,8 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	topic := "/eth2/%x/beacon_block"
 	p2p.ReceivePubSub(topic, msg)
 	assert.Equal(t, 0, len(blockChan), "block was received by sync service despite not being fully synced")
-
 	close(r.initialSyncComplete)
 	<-syncCompleteCh
-
 	p2p.ReceivePubSub(topic, msg)
 
 	select {
@@ -178,7 +176,6 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	}
 	assert.NoError(t, ctx.Err())
 }
-*/
 
 func TestSyncService_StopCleanly(t *testing.T) {
 	p2p := p2ptest.NewTestP2P(t)

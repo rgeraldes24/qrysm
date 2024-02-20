@@ -3,7 +3,6 @@ package sync
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -56,7 +55,6 @@ func (s *Service) validateSyncContributionAndProof(ctx context.Context, pid peer
 	m, err := s.readSyncContributionMessage(msg)
 	if err != nil {
 		tracing.AnnotateError(span, err)
-		fmt.Println(err)
 		return pubsub.ValidationReject, err
 	}
 

@@ -1,6 +1,6 @@
 package blocks_test
 
-// TODO(rgeraldes24): fix unit test
+// TODO(rgeraldes24): re-enable once we fix the testdata
 /*
 import (
 	"os"

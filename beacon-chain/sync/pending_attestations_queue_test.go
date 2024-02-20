@@ -19,8 +19,10 @@ import (
 	p2ptest "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
@@ -54,8 +56,6 @@ func TestProcessPendingAtts_NoBlockRequestBlock(t *testing.T) {
 	require.LogsContain(t, hook, "Requesting block for pending attestation")
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestProcessPendingAtts_HasBlockSaveUnAggregatedAtt(t *testing.T) {
 	hook := logTest.NewGlobal()
 	db := dbtest.SetupDB(t)
@@ -173,7 +173,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 			AggregationBits: bitfield.Bitlist{0x02},
 			Data:            util.HydrateAttestationData(&zondpb.AttestationData{}),
 		},
-		SelectionProof: make([]byte, dilithiumlib.CryptoBytes),
+		SelectionProof: make([]byte, field_params.DilithiumSignatureLength),
 	}
 
 	b := util.NewBeaconBlockCapella()
@@ -182,7 +182,7 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b)
 	require.NoError(t, r.cfg.beaconDB.SaveState(context.Background(), s, r32))
 
-	r.blkRootToPendingAtts[r32] = []*zondpb.SignedAggregateAttestationAndProof{{Message: a, Signature: make([]byte, dilithiumlib.CryptoBytes)}}
+	r.blkRootToPendingAtts[r32] = []*zondpb.SignedAggregateAttestationAndProof{{Message: a, Signature: make([]byte, field_params.DilithiumSignatureLength)}}
 	require.NoError(t, r.processPendingAtts(context.Background()))
 
 	assert.Equal(t, false, p1.BroadcastCalled, "Broadcasted bad aggregate")
@@ -257,7 +257,6 @@ func TestProcessPendingAtts_NoBroadcastWithBadSignature(t *testing.T) {
 	assert.Equal(t, true, p1.BroadcastCalled, "Could not broadcast the good aggregate")
 	cancel()
 }
-*/
 
 func TestProcessPendingAtts_HasBlockSaveAggregatedAtt(t *testing.T) {
 	hook := logTest.NewGlobal()

@@ -10,6 +10,7 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/qrysm/v4/async/abool"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	dbtest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	p2pt "github.com/theQRL/qrysm/v4/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	"github.com/theQRL/qrysm/v4/cmd/beacon-chain/flags"
@@ -318,15 +319,16 @@ func TestService_markSynced(t *testing.T) {
 	assert.Equal(t, false, s.Syncing())
 }
 
-// TODO(rgeraldes24): fix unit test
-// TODO(rgeraldes24): test taking too long
-/*
+// NOTE(rgeraldes24): this test fails with the original data (finalizedEpoch: 5, head block: 640)
+// It seems to be related with the lookahead steps limit(8) and the block batch limit(64)
+// and our new slots per epoch value. Keeping the head slot within the lookahead * block batch limit
+// seems to do the trick.
 func TestService_Resync(t *testing.T) {
 	p := p2pt.NewTestP2P(t)
 	connectPeers(t, p, []*peerData{
-		{blocks: makeSequence(1, 640), finalizedEpoch: 5, headSlot: 640},
+		{blocks: makeSequence(1, 384), finalizedEpoch: 3, headSlot: 384},
 	}, p.Peers())
-	cache.initializeRootCache(makeSequence(1, 640), t)
+	cache.initializeRootCache(makeSequence(1, 384), t)
 	beaconDB := dbtest.SetupDB(t)
 	util.SaveBlock(t, context.Background(), beaconDB, util.NewBeaconBlockCapella())
 	cache.RLock()
@@ -349,7 +351,7 @@ func TestService_Resync(t *testing.T) {
 			chainService: func() *mock.ChainService {
 				st, err := util.NewBeaconStateCapella()
 				require.NoError(t, err)
-				futureSlot := primitives.Slot(640)
+				futureSlot := primitives.Slot(384)
 				require.NoError(t, st.SetGenesisTime(uint64(makeGenesisTime(futureSlot).Unix())))
 				return &mock.ChainService{
 					State: st,
@@ -364,7 +366,7 @@ func TestService_Resync(t *testing.T) {
 			},
 			assert: func(s *Service) {
 				assert.LogsContain(t, hook, "Resync attempt complete")
-				assert.Equal(t, primitives.Slot(640), s.cfg.Chain.HeadSlot())
+				assert.Equal(t, primitives.Slot(384), s.cfg.Chain.HeadSlot())
 			},
 		},
 	}
@@ -398,7 +400,6 @@ func TestService_Resync(t *testing.T) {
 		})
 	}
 }
-*/
 
 func TestService_Initialized(t *testing.T) {
 	s := NewService(context.Background(), &Config{

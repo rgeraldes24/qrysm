@@ -682,8 +682,6 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 	ctx := context.Background()
 
@@ -692,11 +690,11 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 
 	params.SetupTestConfigCleanup(t)
 
-	spb := &zondpbv1alpha1.BeaconStateBellatrix{
+	spb := &zondpbv1alpha1.BeaconStateCapella{
 		Fork: &zondpbv1alpha1.Fork{
-			CurrentVersion:  params.BeaconConfig().BellatrixForkVersion,
-			PreviousVersion: params.BeaconConfig().AltairForkVersion,
-			Epoch:           params.BeaconConfig().BellatrixForkEpoch,
+			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
+			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
+			Epoch:           0,
 		},
 	}
 	numValidators := 10
@@ -731,17 +729,16 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 		dilithiumChanges[i] = message
 	}
 	spb.Validators = validators
-	slot, err := slots.EpochStart(params.BeaconConfig().BellatrixForkEpoch)
-	require.NoError(t, err)
+	slot := primitives.Slot(0)
 	spb.Slot = slot
-	st, err := state_native.InitializeFromProtoBellatrix(spb)
+	st, err := state_native.InitializeFromProtoCapella(spb)
 	require.NoError(t, err)
 
 	spc := &zondpbv1alpha1.BeaconStateCapella{
 		Fork: &zondpbv1alpha1.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
-			Epoch:           params.BeaconConfig().CapellaForkEpoch,
+			Epoch:           0,
 		},
 	}
 	slot = primitives.Slot(0)
@@ -791,7 +788,6 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 		require.DeepEqual(t, v2Change, signedChanges[i])
 	}
 }
-*/
 
 func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 	ctx := context.Background()

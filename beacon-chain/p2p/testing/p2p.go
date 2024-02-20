@@ -149,6 +149,8 @@ func (p *TestP2P) ReceivePubSub(topic string, msg proto.Message) {
 	if err != nil {
 		p.t.Fatal(err)
 	}
+	fmt.Println("msg digest")
+	fmt.Println(digest)
 	topicHandle, err := ps.Join(fmt.Sprintf(topic, digest) + p.Encoding().ProtocolSuffix())
 	if err != nil {
 		p.t.Fatal(err)

@@ -22,9 +22,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// TODO(rgeraldes24): fix unit test
-// TODO(rgeraldes24): taking too long (same problem as resync test?)
-/*
 func TestService_roundRobinSync(t *testing.T) {
 	currentPeriod := blockLimiterPeriod
 	blockLimiterPeriod = 1 * time.Second
@@ -41,7 +38,7 @@ func TestService_roundRobinSync(t *testing.T) {
 		{
 			name:                "Single peer with no finalized blocks",
 			currentSlot:         2,
-			availableBlockSlots: makeSequence(1, 32),
+			availableBlockSlots: makeSequence(1, 128),
 			expectedBlockSlots:  makeSequence(1, 2),
 			peers: []*peerData{
 				{
@@ -54,7 +51,7 @@ func TestService_roundRobinSync(t *testing.T) {
 		{
 			name:                "Multiple peers with no finalized blocks",
 			currentSlot:         2,
-			availableBlockSlots: makeSequence(1, 32),
+			availableBlockSlots: makeSequence(1, 128),
 			expectedBlockSlots:  makeSequence(1, 2),
 			peers: []*peerData{
 				{
@@ -76,202 +73,205 @@ func TestService_roundRobinSync(t *testing.T) {
 		},
 		{
 			name:                "Single peer with all blocks",
-			currentSlot:         131,
-			availableBlockSlots: makeSequence(1, 192),
-			expectedBlockSlots:  makeSequence(1, 131),
+			currentSlot:         524,
+			availableBlockSlots: makeSequence(1, 768),
+			expectedBlockSlots:  makeSequence(1, 524),
 			peers: []*peerData{
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 1,
-					headSlot:       131,
+					headSlot:       524,
 				},
 			},
 		},
 		{
 			name:                "Multiple peers with all blocks",
-			currentSlot:         131,
-			availableBlockSlots: makeSequence(1, 192),
-			expectedBlockSlots:  makeSequence(1, 131),
+			currentSlot:         524,
+			availableBlockSlots: makeSequence(1, 768),
+			expectedBlockSlots:  makeSequence(1, 524),
 			peers: []*peerData{
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 1,
-					headSlot:       131,
+					headSlot:       524,
 				},
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 1,
-					headSlot:       131,
+					headSlot:       524,
 				},
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 1,
-					headSlot:       131,
+					headSlot:       524,
 				},
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 1,
-					headSlot:       131,
+					headSlot:       524,
 				},
 			},
 		},
 		{
 			name:                "Multiple peers with failures",
-			currentSlot:         320, // 10 epochs
-			availableBlockSlots: makeSequence(1, 384),
-			expectedBlockSlots:  makeSequence(1, 320),
+			currentSlot:         1280, // 10 epochs
+			availableBlockSlots: makeSequence(1, 1536),
+			expectedBlockSlots:  makeSequence(1, 1280),
 			peers: []*peerData{
 				{
-					blocks:         makeSequence(1, 384),
+					blocks:         makeSequence(1, 1536),
 					finalizedEpoch: 8,
-					headSlot:       320,
-				},
-				{
-					blocks:         makeSequence(1, 384),
-					finalizedEpoch: 8,
-					headSlot:       320,
-					failureSlots:   makeSequence(1, 32), // first epoch
-				},
-				{
-					blocks:         makeSequence(1, 384),
-					finalizedEpoch: 8,
-					headSlot:       320,
-				},
-				{
-					blocks:         makeSequence(1, 384),
-					finalizedEpoch: 8,
-					headSlot:       320,
-				},
-			},
-		},
-		{
-			name:                "Multiple peers with many skipped slots",
-			currentSlot:         1280,
-			availableBlockSlots: append(makeSequence(1, 64), makeSequence(1000, 1300)...),
-			expectedBlockSlots:  append(makeSequence(1, 64), makeSequence(1000, 1280)...),
-			peers: []*peerData{
-				{
-					blocks:         append(makeSequence(1, 64), makeSequence(1000, 1300)...),
-					finalizedEpoch: 36,
 					headSlot:       1280,
 				},
 				{
-					blocks:         append(makeSequence(1, 64), makeSequence(1000, 1300)...),
-					finalizedEpoch: 36,
+					blocks:         makeSequence(1, 1536),
+					finalizedEpoch: 8,
+					headSlot:       1280,
+					failureSlots:   makeSequence(1, 128), // first epoch
+				},
+				{
+					blocks:         makeSequence(1, 1536),
+					finalizedEpoch: 8,
 					headSlot:       1280,
 				},
 				{
-					blocks:         append(makeSequence(1, 64), makeSequence(1000, 1300)...),
-					finalizedEpoch: 36,
+					blocks:         makeSequence(1, 1536),
+					finalizedEpoch: 8,
 					headSlot:       1280,
 				},
 			},
 		},
+		// TODO(rgeraldes24): very slow(#epochs)
+		/*
+			{
+				name:                "Multiple peers with many skipped slots",
+				currentSlot:         5120,
+				availableBlockSlots: append(makeSequence(1, 256), makeSequence(1000, 5200)...),
+				expectedBlockSlots:  append(makeSequence(1, 256), makeSequence(1000, 5120)...),
+				peers: []*peerData{
+					{
+						blocks:         append(makeSequence(1, 64), makeSequence(1000, 5200)...),
+						finalizedEpoch: 36,
+						headSlot:       5120,
+					},
+					{
+						blocks:         append(makeSequence(1, 64), makeSequence(1000, 5200)...),
+						finalizedEpoch: 36,
+						headSlot:       5120,
+					},
+					{
+						blocks:         append(makeSequence(1, 64), makeSequence(1000, 5200)...),
+						finalizedEpoch: 36,
+						headSlot:       5120,
+					},
+				},
+			},
+		*/
 		{
 			name:                "Multiple peers with multiple failures",
-			currentSlot:         320, // 10 epochs
-			availableBlockSlots: makeSequence(1, 384),
-			expectedBlockSlots:  makeSequence(1, 320),
+			currentSlot:         1280, // 10 epochs
+			availableBlockSlots: makeSequence(1, 1536),
+			expectedBlockSlots:  makeSequence(1, 1280),
 			peers: []*peerData{
 				{
-					blocks:         makeSequence(1, 384),
+					blocks:         makeSequence(1, 1536),
 					finalizedEpoch: 9,
-					headSlot:       384,
+					headSlot:       1536,
 				},
 				{
-					blocks:         makeSequence(1, 320),
+					blocks:         makeSequence(1, 1280),
 					finalizedEpoch: 9,
-					headSlot:       384,
-					failureSlots:   makeSequence(1, 320),
+					headSlot:       1536,
+					failureSlots:   makeSequence(1, 1280),
 				},
 				{
-					blocks:         makeSequence(1, 320),
+					blocks:         makeSequence(1, 1280),
 					finalizedEpoch: 9,
-					headSlot:       384,
-					failureSlots:   makeSequence(1, 320),
+					headSlot:       1536,
+					failureSlots:   makeSequence(1, 1280),
 				},
 				{
-					blocks:         makeSequence(1, 320),
+					blocks:         makeSequence(1, 1280),
 					finalizedEpoch: 9,
-					headSlot:       384,
-					failureSlots:   makeSequence(1, 320),
+					headSlot:       1536,
+					failureSlots:   makeSequence(1, 1280),
 				},
 			},
 		},
 		{
 			name:                "Multiple peers with different finalized epoch",
-			currentSlot:         320, // 10 epochs
-			availableBlockSlots: makeSequence(1, 384),
-			expectedBlockSlots:  makeSequence(1, 320),
+			currentSlot:         1280, // 10 epochs
+			availableBlockSlots: makeSequence(1, 1536),
+			expectedBlockSlots:  makeSequence(1, 1280),
 			peers: []*peerData{
 				{
-					blocks:         makeSequence(1, 384),
+					blocks:         makeSequence(1, 1536),
 					finalizedEpoch: 10,
-					headSlot:       384,
+					headSlot:       1536,
 				},
 				{
-					blocks:         makeSequence(1, 384),
+					blocks:         makeSequence(1, 1536),
 					finalizedEpoch: 10,
-					headSlot:       384,
+					headSlot:       1536,
 				},
 				{
-					blocks:         makeSequence(1, 256),
+					blocks:         makeSequence(1, 1024),
 					finalizedEpoch: 5,
-					headSlot:       256,
+					headSlot:       1024,
 				},
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 2,
-					headSlot:       192,
+					headSlot:       768,
 				},
 			},
 		},
 		{
 			name:                "Multiple peers with missing parent blocks",
-			currentSlot:         160, // 5 epochs
-			availableBlockSlots: makeSequence(1, 192),
-			expectedBlockSlots:  makeSequence(1, 160),
+			currentSlot:         640, // 5 epochs
+			availableBlockSlots: makeSequence(1, 768),
+			expectedBlockSlots:  makeSequence(1, 640),
 			peers: []*peerData{
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 4,
-					headSlot:       160,
+					headSlot:       640,
 				},
 				{
-					blocks:         append(makeSequence(1, 6), makeSequence(161, 165)...),
+					blocks:         append(makeSequence(1, 24), makeSequence(644, 660)...),
 					finalizedEpoch: 4,
-					headSlot:       160,
+					headSlot:       640,
 					forkedPeer:     true,
 				},
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 4,
-					headSlot:       160,
+					headSlot:       640,
 				},
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 4,
-					headSlot:       160,
+					headSlot:       640,
 				},
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 4,
-					headSlot:       160,
+					headSlot:       640,
 				},
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 4,
-					headSlot:       160,
+					headSlot:       640,
 				},
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 4,
-					headSlot:       160,
+					headSlot:       640,
 				},
 				{
-					blocks:         makeSequence(1, 192),
+					blocks:         makeSequence(1, 768),
 					finalizedEpoch: 4,
-					headSlot:       160,
+					headSlot:       640,
 				},
 			},
 		},
@@ -332,7 +332,6 @@ func TestService_roundRobinSync(t *testing.T) {
 		})
 	}
 }
-*/
 
 func TestService_processBlock(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
