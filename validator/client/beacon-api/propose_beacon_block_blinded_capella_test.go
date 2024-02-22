@@ -44,7 +44,7 @@ func TestProposeBeaconBlock_BlindedCapella(t *testing.T) {
 				ProposerSlashings: jsonifyProposerSlashings(blindedCapellaBlock.BlindedCapella.Block.Body.ProposerSlashings),
 				RandaoReveal:      hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.RandaoReveal),
 				VoluntaryExits:    JsonifySignedVoluntaryExits(blindedCapellaBlock.BlindedCapella.Block.Body.VoluntaryExits),
-				SyncAggregate:     JsonifySignedSyncAggregate(blindedCapellaBlock.BlindedCapella.Block.Body.SyncAggregate),
+				SyncAggregate:     JsonifySyncAggregate(blindedCapellaBlock.BlindedCapella.Block.Body.SyncAggregate),
 				ExecutionPayloadHeader: &apimiddleware.ExecutionPayloadHeaderCapellaJson{
 					BaseFeePerGas:    bytesutil.LittleEndianBytesToBigInt(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.BaseFeePerGas).String(),
 					BlockHash:        hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.BlockHash),
