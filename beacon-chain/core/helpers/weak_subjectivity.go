@@ -159,7 +159,6 @@ func LatestWeakSubjectivityEpoch(ctx context.Context, st state.ReadOnlyBeaconSta
 		return 0, err
 	}
 
-	fmt.Println(wsPeriod)
 	finalizedEpoch := st.FinalizedCheckpointEpoch()
 	return finalizedEpoch - (finalizedEpoch % wsPeriod), nil
 }

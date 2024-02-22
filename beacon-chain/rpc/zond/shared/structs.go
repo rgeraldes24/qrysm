@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common/hexutil"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -151,8 +150,8 @@ func (s *SignedValidatorRegistration) ToConsensus() (*zond.SignedValidatorRegist
 	if err != nil {
 		return nil, NewDecodeError(err, "Signature")
 	}
-	if len(sig) != dilithium2.CryptoBytes {
-		return nil, fmt.Errorf("Signature length was %d when expecting length %d", len(sig), dilithium2.CryptoBytes)
+	if len(sig) != fieldparams.DilithiumSignatureLength {
+		return nil, fmt.Errorf("Signature length was %d when expecting length %d", len(sig), fieldparams.DilithiumSignatureLength)
 	}
 	return &zond.SignedValidatorRegistrationV1{
 		Message:   msg,
@@ -172,8 +171,8 @@ func (s *ValidatorRegistration) ToConsensus() (*zond.ValidatorRegistrationV1, er
 	if err != nil {
 		return nil, NewDecodeError(err, "FeeRecipient")
 	}
-	if len(pubKey) != dilithium2.CryptoPublicKeyBytes {
-		return nil, fmt.Errorf("FeeRecipient length was %d when expecting length %d", len(pubKey), dilithium2.CryptoPublicKeyBytes)
+	if len(pubKey) != fieldparams.DilithiumPubkeyLength {
+		return nil, fmt.Errorf("FeeRecipient length was %d when expecting length %d", len(pubKey), fieldparams.DilithiumPubkeyLength)
 	}
 	gasLimit, err := strconv.ParseUint(s.GasLimit, 10, 64)
 	if err != nil {
@@ -534,7 +533,7 @@ func (m *SyncCommitteeMessage) ToConsensus() (*zond.SyncCommitteeMessage, error)
 	if err != nil {
 		return nil, NewDecodeError(err, "ValidatorIndex")
 	}
-	sig, err := DecodeHexWithLength(m.Signature, dilithium2.CryptoBytes)
+	sig, err := DecodeHexWithLength(m.Signature, fieldparams.DilithiumSignatureLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Signature")
 	}

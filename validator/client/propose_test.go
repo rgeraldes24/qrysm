@@ -39,15 +39,6 @@ type mockSignature struct{}
 func (mockSignature) Verify(dilithium.PublicKey, []byte) bool {
 	return true
 }
-func (mockSignature) AggregateVerify([]dilithium.PublicKey, [][32]byte) bool {
-	return true
-}
-func (mockSignature) FastAggregateVerify([]dilithium.PublicKey, [32]byte) bool {
-	return true
-}
-func (mockSignature) Eth2FastAggregateVerify([]dilithium.PublicKey, [32]byte) bool {
-	return true
-}
 func (mockSignature) Marshal() []byte {
 	return make([]byte, 32)
 }

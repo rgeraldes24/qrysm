@@ -14,7 +14,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/builder"
@@ -705,7 +704,7 @@ func (s *Server) GetAttesterDuties(w http.ResponseWriter, r *http.Request) {
 	duties := make([]*AttesterDuty, 0, len(requestedValIndices))
 	for _, index := range requestedValIndices {
 		pubkey := st.PubkeyAtIndex(index)
-		var zeroPubkey [dilithium2.CryptoPublicKeyBytes]byte
+		var zeroPubkey [fieldparams.DilithiumPubkeyLength]byte
 		if bytes.Equal(pubkey[:], zeroPubkey[:]) {
 			http2.HandleError(w, fmt.Sprintf("Invalid validator index %d", index), http.StatusBadRequest)
 			return
@@ -965,7 +964,7 @@ func (s *Server) GetSyncCommitteeDuties(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 	}
-	committeePubkeys := make(map[[dilithium2.CryptoPublicKeyBytes]byte][]string)
+	committeePubkeys := make(map[[fieldparams.DilithiumPubkeyLength]byte][]string)
 	for j, pubkey := range committee.Pubkeys {
 		pubkey2592 := bytesutil.ToBytes2592(pubkey)
 		committeePubkeys[pubkey2592] = append(committeePubkeys[pubkey2592], strconv.FormatUint(uint64(j), 10))
@@ -1145,7 +1144,7 @@ func syncCommitteeDutiesLastValidEpoch(currentEpoch primitives.Epoch) primitives
 func syncCommitteeDuties(
 	valIndices []primitives.ValidatorIndex,
 	st state.BeaconState,
-	committeePubkeys map[[dilithium2.CryptoPublicKeyBytes]byte][]string,
+	committeePubkeys map[[fieldparams.DilithiumPubkeyLength]byte][]string,
 ) ([]*SyncCommitteeDuty, error) {
 	duties := make([]*SyncCommitteeDuty, 0)
 	for _, index := range valIndices {
@@ -1153,7 +1152,7 @@ func syncCommitteeDuties(
 			ValidatorIndex: strconv.FormatUint(uint64(index), 10),
 		}
 		valPubkey := st.PubkeyAtIndex(index)
-		var zeroPubkey [dilithium2.CryptoPublicKeyBytes]byte
+		var zeroPubkey [fieldparams.DilithiumPubkeyLength]byte
 		if bytes.Equal(valPubkey[:], zeroPubkey[:]) {
 			return nil, errors.Errorf("Invalid validator index %d", index)
 		}

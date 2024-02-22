@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	log "github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	statenative "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
@@ -57,7 +57,7 @@ func setupGenesisState(tb testing.TB, count uint64) *zondpb.BeaconStateCapella {
 	require.NoError(tb, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [dilithium2.CryptoPublicKeyBytes]byte
+		var someKey [field_params.DilithiumPubkeyLength]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		genesisState.Validators = append(genesisState.Validators, &zondpb.Validator{
@@ -90,7 +90,7 @@ func setupGenesisState(tb testing.TB, count uint64) *zondpb.BeaconStateCapella {
 func BenchmarkCloneValidators_Proto(b *testing.B) {
 	b.StopTimer()
 	validators := make([]*zondpb.Validator, 16384)
-	somePubKey := [dilithium2.CryptoPublicKeyBytes]byte{1, 2, 3}
+	somePubKey := [field_params.DilithiumPubkeyLength]byte{1, 2, 3}
 	someRoot := [32]byte{3, 4, 5}
 	for i := 0; i < len(validators); i++ {
 		validators[i] = &zondpb.Validator{
@@ -113,7 +113,7 @@ func BenchmarkCloneValidators_Proto(b *testing.B) {
 func BenchmarkCloneValidators_Manual(b *testing.B) {
 	b.StopTimer()
 	validators := make([]*zondpb.Validator, 16384)
-	somePubKey := [dilithium2.CryptoPublicKeyBytes]byte{1, 2, 3}
+	somePubKey := [field_params.DilithiumPubkeyLength]byte{1, 2, 3}
 	someRoot := [32]byte{3, 4, 5}
 	for i := 0; i < len(validators); i++ {
 		validators[i] = &zondpb.Validator{

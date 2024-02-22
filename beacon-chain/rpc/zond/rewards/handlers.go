@@ -7,13 +7,13 @@ import (
 	"strconv"
 	"strings"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	coreblocks "github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch/precompute"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/validators"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	bytesutil2 "github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -49,7 +49,6 @@ func (s *Server) BlockRewards(w http.ResponseWriter, r *http.Request) {
 	}
 	st, err = altair.ProcessAttestationsNoVerifySignature(r.Context(), st, blk)
 	if err != nil {
-		fmt.Println(err)
 		http2.HandleError(w, "Could not get attestation rewards"+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -439,7 +438,7 @@ func requestedValIndices(w http.ResponseWriter, r *http.Request, st state.Beacon
 		index, err := strconv.ParseUint(v, 10, 64)
 		if err != nil {
 			pubkey, err := bytesutil.FromHexString(v)
-			if err != nil || len(pubkey) != dilithium2.CryptoPublicKeyBytes {
+			if err != nil || len(pubkey) != field_params.DilithiumPubkeyLength {
 				http2.HandleError(w, fmt.Sprintf("%s is not a validator index or pubkey", v), http.StatusBadRequest)
 				return nil, false
 			}

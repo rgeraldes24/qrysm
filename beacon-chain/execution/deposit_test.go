@@ -6,11 +6,11 @@ import (
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	testing2 "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/container/trie"
@@ -169,7 +169,7 @@ func TestProcessDeposit_InvalidSignature(t *testing.T) {
 
 	deposits, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	var fakeSig [dilithium2.CryptoBytes]byte
+	var fakeSig [field_params.DilithiumSignatureLength]byte
 	copy(fakeSig[:], []byte{'F', 'A', 'K', 'E'})
 	deposits[0].Data.Signature = fakeSig[:]
 
@@ -252,7 +252,7 @@ func TestProcessDeposit_IncompleteDeposit(t *testing.T) {
 		Data: &zondpb.Deposit_Data{
 			Amount:                params.BeaconConfig().EffectiveBalanceIncrement, // incomplete deposit
 			WithdrawalCredentials: bytesutil.PadTo([]byte("testing"), 32),
-			Signature:             bytesutil.PadTo([]byte("test"), dilithium2.CryptoBytes),
+			Signature:             bytesutil.PadTo([]byte("test"), field_params.DilithiumSignatureLength),
 		},
 	}
 

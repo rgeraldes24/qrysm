@@ -12,17 +12,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gorilla/mux"
+	chainMock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/lookup"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/lookup"
 	http2 "github.com/theQRL/qrysm/v4/network/http"
-
-	"github.com/gorilla/mux"
-	chainMock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
-	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )

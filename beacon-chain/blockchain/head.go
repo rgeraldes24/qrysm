@@ -7,12 +7,12 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
 	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/forkchoice"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -307,7 +307,7 @@ func (s *Service) headValidatorAtIndex(index primitives.ValidatorIndex) (state.R
 // This returns the validator index referenced by the provided pubkey in
 // the head state.
 // This is a lock free version.
-func (s *Service) headValidatorIndexAtPubkey(pubKey [dilithium2.CryptoPublicKeyBytes]byte) (primitives.ValidatorIndex, bool) {
+func (s *Service) headValidatorIndexAtPubkey(pubKey [field_params.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool) {
 	return s.head.state.ValidatorIndexByPubkey(pubKey)
 }
 

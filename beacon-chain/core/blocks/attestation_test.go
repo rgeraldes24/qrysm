@@ -5,11 +5,11 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -135,7 +135,7 @@ func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 		AggregationBits: aggBits,
 	}
 
-	var zeroSig [dilithium2.CryptoBytes]byte
+	var zeroSig [field_params.DilithiumSignatureLength]byte
 	att.Signatures = [][]byte{zeroSig[:]}
 
 	err := beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
@@ -163,7 +163,7 @@ func TestVerifyAttestationNoVerifySignature_BadAttIdx(t *testing.T) {
 		},
 		AggregationBits: aggBits,
 	}
-	var zeroSig [dilithium2.CryptoBytes]byte
+	var zeroSig [field_params.DilithiumSignatureLength]byte
 	att.Signatures = [][]byte{zeroSig[:]}
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+params.BeaconConfig().MinAttestationInclusionDelay))
 	ckp := beaconState.CurrentJustifiedCheckpoint()
@@ -207,7 +207,7 @@ func TestConvertToIndexed_OK(t *testing.T) {
 		},
 	}
 
-	var sig [dilithium2.CryptoBytes]byte
+	var sig [field_params.DilithiumSignatureLength]byte
 	copy(sig[:], "signed")
 	att := util.HydrateAttestation(&zondpb.Attestation{
 		Signatures: [][]byte{sig[:]},

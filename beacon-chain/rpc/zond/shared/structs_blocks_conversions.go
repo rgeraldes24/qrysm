@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
@@ -24,7 +23,7 @@ func (b *SignedBeaconBlockCapella) ToGeneric() (*zond.GenericSignedBeaconBlock, 
 		return nil, errNilValue
 	}
 
-	sig, err := DecodeHexWithLength(b.Signature, dilithium2.CryptoBytes)
+	sig, err := DecodeHexWithLength(b.Signature, fieldparams.DilithiumSignatureLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Signature")
 	}
@@ -80,7 +79,7 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 	if err != nil {
 		return nil, NewDecodeError(err, "StateRoot")
 	}
-	randaoReveal, err := DecodeHexWithLength(b.Body.RandaoReveal, dilithium2.CryptoBytes)
+	randaoReveal, err := DecodeHexWithLength(b.Body.RandaoReveal, fieldparams.DilithiumSignatureLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.RandaoReveal")
 	}
@@ -127,7 +126,7 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 
 	syncCommitteeSigs := make([][]byte, len(b.Body.SyncAggregate.SyncCommitteeSignatures))
 	for i := range syncCommitteeSigs {
-		syncCommitteeSig, err := DecodeHexWithLength(b.Body.SyncAggregate.SyncCommitteeSignatures[i], dilithium2.CryptoBytes)
+		syncCommitteeSig, err := DecodeHexWithLength(b.Body.SyncAggregate.SyncCommitteeSignatures[i], fieldparams.DilithiumSignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeSignatures")
 		}
@@ -336,7 +335,7 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 	if err != nil {
 		return nil, NewDecodeError(err, "StateRoot")
 	}
-	randaoReveal, err := DecodeHexWithLength(b.Body.RandaoReveal, dilithium2.CryptoBytes)
+	randaoReveal, err := DecodeHexWithLength(b.Body.RandaoReveal, fieldparams.DilithiumSignatureLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.RandaoReveal")
 	}
@@ -383,7 +382,7 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 
 	syncCommitteeSigs := make([][]byte, len(b.Body.SyncAggregate.SyncCommitteeSignatures))
 	for i := range syncCommitteeSigs {
-		syncCommitteeSig, err := DecodeHexWithLength(b.Body.SyncAggregate.SyncCommitteeSignatures[i], dilithium2.CryptoBytes)
+		syncCommitteeSig, err := DecodeHexWithLength(b.Body.SyncAggregate.SyncCommitteeSignatures[i], fieldparams.DilithiumSignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeSignature")
 		}
@@ -715,7 +714,7 @@ func ProposerSlashingsToConsensus(src []*ProposerSlashing) ([]*zond.ProposerSlas
 			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d].SignedHeader2.Message", i))
 		}
 
-		h1Sig, err := DecodeHexWithLength(s.SignedHeader1.Signature, dilithium2.CryptoBytes)
+		h1Sig, err := DecodeHexWithLength(s.SignedHeader1.Signature, fieldparams.DilithiumSignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].SignedHeader1.Signature", i))
 		}
@@ -739,7 +738,7 @@ func ProposerSlashingsToConsensus(src []*ProposerSlashing) ([]*zond.ProposerSlas
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].SignedHeader1.Message.BodyRoot", i))
 		}
-		h2Sig, err := DecodeHexWithLength(s.SignedHeader2.Signature, dilithium2.CryptoBytes)
+		h2Sig, err := DecodeHexWithLength(s.SignedHeader2.Signature, fieldparams.DilithiumSignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].SignedHeader2.Signature", i))
 		}
@@ -841,7 +840,7 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*zond.AttesterSlas
 
 		a1Sigs := make([][]byte, len(s.Attestation1.Signatures))
 		for j, sig := range s.Attestation1.Signatures {
-			a1Sig, err := DecodeHexWithLength(sig, dilithium2.CryptoBytes)
+			a1Sig, err := DecodeHexWithLength(sig, fieldparams.DilithiumSignatureLength)
 			if err != nil {
 				return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation1.Signatures[%d]", i, j))
 			}
@@ -867,7 +866,7 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*zond.AttesterSlas
 
 		a2Sigs := make([][]byte, len(s.Attestation2.Signatures))
 		for j, sig := range s.Attestation2.Signatures {
-			a2Sig, err := DecodeHexWithLength(sig, dilithium2.CryptoBytes)
+			a2Sig, err := DecodeHexWithLength(sig, fieldparams.DilithiumSignatureLength)
 			if err != nil {
 				return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation2.Signatures[%d]", i, j))
 			}
@@ -1021,7 +1020,7 @@ func DepositsToConsensus(src []*Deposit) ([]*zond.Deposit, error) {
 				return nil, NewDecodeError(err, fmt.Sprintf("[%d].Proof[%d]", i, j))
 			}
 		}
-		pubkey, err := DecodeHexWithLength(d.Data.Pubkey, dilithium2.CryptoPublicKeyBytes)
+		pubkey, err := DecodeHexWithLength(d.Data.Pubkey, fieldparams.DilithiumPubkeyLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Pubkey", i))
 		}
@@ -1033,7 +1032,7 @@ func DepositsToConsensus(src []*Deposit) ([]*zond.Deposit, error) {
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Amount", i))
 		}
-		sig, err := DecodeHexWithLength(d.Data.Signature, dilithium2.CryptoBytes)
+		sig, err := DecodeHexWithLength(d.Data.Signature, fieldparams.DilithiumSignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Signature", i))
 		}
@@ -1118,7 +1117,7 @@ func DilithiumChangesToConsensus(src []*SignedDilithiumToExecutionChange) ([]*zo
 			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d]", i))
 		}
 
-		sig, err := DecodeHexWithLength(ch.Signature, dilithium2.CryptoBytes)
+		sig, err := DecodeHexWithLength(ch.Signature, fieldparams.DilithiumSignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Signature", i))
 		}
@@ -1126,7 +1125,7 @@ func DilithiumChangesToConsensus(src []*SignedDilithiumToExecutionChange) ([]*zo
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Message.ValidatorIndex", i))
 		}
-		pubkey, err := DecodeHexWithLength(ch.Message.FromDilithiumPubkey, dilithium2.CryptoPublicKeyBytes)
+		pubkey, err := DecodeHexWithLength(ch.Message.FromDilithiumPubkey, fieldparams.DilithiumPubkeyLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Message.FromDilithiumPubkey", i))
 		}

@@ -6,7 +6,6 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -25,7 +24,7 @@ func NewGenesisBlock(stateRoot []byte) *zondpb.SignedBeaconBlockCapella {
 			ParentRoot: zeroHash,
 			StateRoot:  bytesutil.PadTo(stateRoot, 32),
 			Body: &zondpb.BeaconBlockBodyCapella{
-				RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+				RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
 				Eth1Data: &zondpb.Eth1Data{
 					DepositRoot: make([]byte, 32),
 					BlockHash:   make([]byte, 32),
@@ -66,7 +65,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 				ParentRoot: params.BeaconConfig().ZeroHash[:],
 				StateRoot:  root[:],
 				Body: &zondpb.BeaconBlockBodyCapella{
-					RandaoReveal: make([]byte, dilithium2.CryptoBytes),
+					RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
 					Eth1Data: &zondpb.Eth1Data{
 						DepositRoot: make([]byte, 32),
 						BlockHash:   make([]byte, 32),

@@ -129,7 +129,7 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	bs, err = execution.UpgradeToBellatrix(bs)
 	require.NoError(t, err)
 
-	pubkeysAs48ByteType := make([][dilithium2.CryptoPublicKeyBytes]byte, len(pubKeys))
+	pubkeysAs48ByteType := make([][field_params.DilithiumPubkeyLength]byte, len(pubKeys))
 	for i, pk := range pubKeys {
 		pubkeysAs48ByteType[i] = bytesutil.ToBytes2592(pk)
 	}

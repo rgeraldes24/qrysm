@@ -3,9 +3,9 @@ package stateutils_test
 import (
 	"testing"
 
-	dilithium2 "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition/stateutils"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -28,7 +28,7 @@ func TestValidatorIndexMap_OK(t *testing.T) {
 	require.NoError(t, err)
 
 	tests := []struct {
-		key [dilithium2.CryptoPublicKeyBytes]byte
+		key [field_params.DilithiumPubkeyLength]byte
 		val primitives.ValidatorIndex
 		ok  bool
 	}{
