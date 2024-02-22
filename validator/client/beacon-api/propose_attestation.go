@@ -50,7 +50,7 @@ func checkNilAttestation(attestation *zondpb.Attestation) error {
 	}
 
 	if len(attestation.Signatures) == 0 {
-		return errors.New("attestation signatures is empty")
+		return errors.New("attestation signatures slice is empty")
 	}
 
 	return nil

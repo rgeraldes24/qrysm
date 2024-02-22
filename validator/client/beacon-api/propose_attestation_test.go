@@ -100,7 +100,7 @@ func TestProposeAttestation(t *testing.T) {
 					Target: &zondpb.Checkpoint{},
 				},
 			},
-			expectedErrorMessage: "attestation signatures is empty",
+			expectedErrorMessage: "attestation signatures slice is empty",
 		},
 		{
 			name:                 "bad request",
