@@ -132,12 +132,12 @@ func convertIndexedAttestationToProto(jsonAttestation *apimiddleware.IndexedAtte
 		attestingIndices[index] = attestingIndex
 	}
 
-	signatures := make([][]byte, len(jsonAttestation.Signatures))
 	var err error
+	signatures := make([][]byte, len(jsonAttestation.Signatures))
 	for i, sig := range jsonAttestation.Signatures {
 		signatures[i], err = hexutil.Decode(sig)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to decode attestation signature `%s`", jsonAttestation.Signatures[i])
+			return nil, errors.Wrapf(err, "failed to decode attestation signature `%s`", sig)
 		}
 	}
 
