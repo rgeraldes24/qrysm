@@ -335,7 +335,7 @@ func (s *selIdentList) isEqual(s2 *selIdentList, offset int) bool {
 // reference the same underlying object. If they do we check
 // if the provided list is referencing a non-equal but related
 // lock. Ex: Lock - RLock, RLock - Lock
-// : Use a generalizable method here instead of hardcoding
+// TODO: Use a generalizable method here instead of hardcoding
 // the lock definitions here.
 func (s *selIdentList) isRelated(s2 *selIdentList, offset int) bool {
 	if s2 == nil || (s.length != s2.length) {
