@@ -1,7 +1,5 @@
 # Specs checker tool
 
-// TODO(rgeraldes24)
-
 This simple tool helps downloading and parsing [Ethereum specs](https://github.com/ethereum/consensus-specs/tree/dev/specs), 
 to be later used for making sure that our reference comments match specs definitions precisely.
 
