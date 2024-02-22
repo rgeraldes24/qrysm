@@ -151,14 +151,13 @@ func convertSyncContributionJsonToProto(contribution *apimiddleware.SyncCommitte
 		return nil, errors.Wrapf(err, "failed to decode aggregation bits `%s`", contribution.AggregationBits)
 	}
 
-	var signatures [][]byte
-	for _, sig := range contribution.Signatures {
+	signatures := make([][]byte, len(contribution.Signatures))
+	for i, sig := range contribution.Signatures {
 		decodedSig, err := hexutil.Decode(sig)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to decode contribution signature `%s`", sig)
 		}
-
-		signatures = append(signatures, decodedSig)
+		signatures[i] = decodedSig
 	}
 
 	return &zondpb.SyncCommitteeContribution{
