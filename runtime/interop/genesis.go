@@ -64,7 +64,7 @@ var DefaultDepositContractStorage = map[string]string{
 }
 
 var bigz = big.NewInt(0)
-var minerBalance = big.NewInt(0)
+var testAccountBalance = big.NewInt(0)
 
 // GzondShanghaiTime calculates the absolute time of the shanghai (aka capella) fork block
 // by adding the relative time of the capella the fork epoch to the given genesis timestamp.
@@ -98,7 +98,7 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 		ArrowGlacierBlock:             bigz,
 		GrayGlacierBlock:              bigz,
 		MergeNetsplitBlock:            bigz,
-		TerminalTotalDifficulty:       big.NewInt(0),
+		TerminalTotalDifficulty:       bigz,
 		TerminalTotalDifficultyPassed: true,
 		ShanghaiTime:                  shanghaiTime,
 	}
@@ -132,7 +132,7 @@ func minerAllocation() depositAllocation {
 	return depositAllocation{
 		Address: common.HexToAddress(defaultTestAccountAddress),
 		Account: core.GenesisAccount{
-			Balance: minerBalance,
+			Balance: testAccountBalance,
 		},
 	}
 }
@@ -162,7 +162,7 @@ func deterministicNonce(i uint64) uint64 {
 }
 
 func init() {
-	err := minerBalance.UnmarshalText([]byte(defaultTestAccountBalance))
+	err := testAccountBalance.UnmarshalText([]byte(defaultTestAccountBalance))
 	if err != nil {
 		panic(err)
 	}
