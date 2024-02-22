@@ -115,7 +115,7 @@ func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 	validator.SubmitAggregateAndProof(context.Background(), 0, pubKey)
 }
 
-// TODO(rgeraldes24): fix test - fails sometimes due to the timestamp comparisons
+// TODO(rgeraldes24): fix test - fails sometimes
 /*
 func TestWaitForSlotTwoThird_WaitCorrectly(t *testing.T) {
 	cfg := params.BeaconConfig().Copy()
