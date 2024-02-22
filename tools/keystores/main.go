@@ -24,7 +24,6 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// TODO(rgeraldes24)
 var (
 	keystoresFlag = &cli.StringFlag{
 		Name:     "keystores",
@@ -179,6 +178,7 @@ func encrypt(cliCtx *cli.Context) error {
 	if len(privateKeyString) > 2 && strings.Contains(privateKeyString, "0x") {
 		privateKeyString = privateKeyString[2:] // Strip the 0x prefix, if any.
 	}
+	// TODO(rgeraldes24)
 	bytesValue, err := hex.DecodeString(privateKeyString)
 	if err != nil {
 		return errors.Wrapf(err, "could not decode as hex string: %s", privateKeyString)
