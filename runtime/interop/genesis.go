@@ -9,6 +9,7 @@ import (
 	"github.com/theQRL/go-zond/core"
 	"github.com/theQRL/go-zond/params"
 	clparams "github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
@@ -67,14 +68,11 @@ var minerBalance = big.NewInt(0)
 
 // GzondShanghaiTime calculates the absolute time of the shanghai (aka capella) fork block
 // by adding the relative time of the capella the fork epoch to the given genesis timestamp.
-func GzondShanghaiTime(genesisTime uint64, cfg *clparams.BeaconChainConfig) *uint64 {
-	var shanghaiTime *uint64
-	startSlot, err := slots.EpochStart(0)
-	if err == nil {
-		startTime := slots.StartTime(genesisTime, startSlot)
-		newTime := uint64(startTime.Unix())
-		shanghaiTime = &newTime
-	}
+func GzondShanghaiTime(genesisTime uint64) *uint64 {
+	startSlot := primitives.Slot(0)
+	startTime := slots.StartTime(genesisTime, startSlot)
+	newTime := uint64(startTime.Unix())
+	shanghaiTime := &newTime
 	return shanghaiTime
 }
 
@@ -82,7 +80,7 @@ func GzondShanghaiTime(genesisTime uint64, cfg *clparams.BeaconChainConfig) *uin
 // like in an e2e test. The parameters are minimal but the full value is returned unmarshaled so that it can be
 // customized as desired.
 func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *core.Genesis {
-	shanghaiTime := GzondShanghaiTime(genesisTime, cfg)
+	shanghaiTime := GzondShanghaiTime(genesisTime)
 	cc := &params.ChainConfig{
 		ChainID:                       big.NewInt(defaultTestChainId),
 		HomesteadBlock:                bigz,
