@@ -445,8 +445,6 @@ func (s *Service) Start() {
 
 	zondpbv1alpha1.RegisterNodeServer(s.grpcServer, nodeServer)
 	zondpbservice.RegisterBeaconNodeServer(s.grpcServer, nodeServerZond)
-	// TODO(rgeraldes24)
-	// zondpbv1alpha1.RegisterHealthServer(s.grpcServer, nodeServer)
 	zondpbv1alpha1.RegisterBeaconChainServer(s.grpcServer, beaconChainServer)
 	zondpbservice.RegisterBeaconChainServer(s.grpcServer, beaconChainServerV1)
 	zondpbservice.RegisterEventsServer(s.grpcServer, &events.Server{

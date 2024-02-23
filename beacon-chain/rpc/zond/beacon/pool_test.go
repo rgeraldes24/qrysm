@@ -52,7 +52,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 				},
 			},
-			Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), 96)},
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), 4595)},
 		},
 		Attestation_2: &zondpbv1alpha1.IndexedAttestation{
 			AttestingIndices: []uint64{2, 20},
@@ -69,7 +69,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), 96)},
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), 4595)},
 		},
 	}
 	slashing2 := &zondpbv1alpha1.AttesterSlashing{
@@ -88,7 +88,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot3"), 32),
 				},
 			},
-			Signatures: [][]byte{bytesutil.PadTo([]byte("signature3"), 96)},
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature3"), 4595)},
 		},
 		Attestation_2: &zondpbv1alpha1.IndexedAttestation{
 			AttestingIndices: []uint64{4, 40},
@@ -105,7 +105,7 @@ func TestListPoolAttesterSlashings(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot4"), 32),
 				},
 			},
-			Signatures: [][]byte{bytesutil.PadTo([]byte("signature4"), 96)},
+			Signatures: [][]byte{bytesutil.PadTo([]byte("signature4"), 4595)},
 		},
 	}
 
@@ -214,7 +214,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 				},
 			},
-			Signatures: [][]byte{},
+			Signatures: [][]byte{make([]byte, 4595)},
 		},
 		Attestation_2: &zondpbv1.IndexedAttestation{
 			AttestingIndices: []uint64{0},
@@ -231,7 +231,7 @@ func TestSubmitAttesterSlashing_Ok(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signatures: [][]byte{},
+			Signatures: [][]byte{make([]byte, 4595)},
 		},
 	}
 
@@ -304,7 +304,7 @@ func TestSubmitAttesterSlashing_AcrossFork(t *testing.T) {
 					Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 				},
 			},
-			Signatures: [][]byte{},
+			Signatures: [][]byte{make([]byte, 4595)},
 		},
 	}
 
@@ -362,7 +362,7 @@ func TestSubmitAttesterSlashing_InvalidSlashing(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
-		Signatures: [][]byte{},
+		Signatures: [][]byte{make([]byte, 96)},
 	}
 
 	slashing := &zondpbv1.AttesterSlashing{
