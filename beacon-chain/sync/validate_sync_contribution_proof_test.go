@@ -513,7 +513,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 						isAggregator, err := altair.IsSyncCommitteeAggregator(sig.Marshal())
 						require.NoError(t, err)
 						if isAggregator {
-							infiniteSig := [96]byte{0xC0}
+							infiniteSig := [4595]byte{0xC0}
 							junkRoot := [32]byte{'A'}
 							badSig := keys[idx].Sign(junkRoot[:])
 							msg.Message.AggregatorIndex = idx

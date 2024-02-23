@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -17,10 +16,9 @@ func (vs *Server) setSyncAggregate(ctx context.Context, blk interfaces.SignedBea
 	syncAggregate, err := vs.getSyncAggregate(ctx, blk.Block().Slot()-1, blk.Block().ParentRoot())
 	if err != nil {
 		log.WithError(err).Error("Could not get sync aggregate")
-		emptySig := [field_params.DilithiumSignatureLength]byte{0xC0}
 		emptyAggregate := &zondpb.SyncAggregate{
 			SyncCommitteeBits:       make([]byte, params.BeaconConfig().SyncCommitteeSize/8),
-			SyncCommitteeSignatures: [][]byte{emptySig[:]},
+			SyncCommitteeSignatures: [][]byte{},
 		}
 		if err := blk.SetSyncAggregate(emptyAggregate); err != nil {
 			log.WithError(err).Error("Could not set sync aggregate")
