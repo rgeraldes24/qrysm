@@ -28,24 +28,6 @@ func SignatureFromBytes(sig []byte) (common.Signature, error) {
 	return &Signature{s: &signature}, nil
 }
 
-func MultipleSignaturesFromBytes(multiSigs [][]byte) ([]common.Signature, error) {
-	if len(multiSigs) == 0 {
-		return nil, fmt.Errorf("0 signatures provided to the method")
-	}
-	for _, s := range multiSigs {
-		if len(s) != field_params.DilithiumSignatureLength {
-			return nil, fmt.Errorf("signature must be %d bytes", field_params.DilithiumSignatureLength)
-		}
-	}
-	wrappedSigs := make([]common.Signature, len(multiSigs))
-	for i, signature := range multiSigs {
-		var copiedSig [field_params.DilithiumSignatureLength]uint8
-		copy(copiedSig[:], signature)
-		wrappedSigs[i] = &Signature{s: &copiedSig}
-	}
-	return wrappedSigs, nil
-}
-
 func (s *Signature) Verify(pubKey common.PublicKey, msg []byte) bool {
 	return dilithium.Verify(msg, *s.s, pubKey.(*PublicKey).p)
 }

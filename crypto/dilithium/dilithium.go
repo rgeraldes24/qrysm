@@ -17,10 +17,6 @@ func SignatureFromBytes(sig []byte) (Signature, error) {
 	return dilithiumt.SignatureFromBytes(sig)
 }
 
-func MultipleSignaturesFromBytes(sigs [][]byte) ([]Signature, error) {
-	return dilithiumt.MultipleSignaturesFromBytes(sigs)
-}
-
 func VerifySignature(sig []byte, msg [32]byte, pubKey common.PublicKey) (bool, error) {
 	return dilithiumt.VerifySignature(sig, msg, pubKey)
 }

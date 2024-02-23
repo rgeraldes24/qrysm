@@ -67,7 +67,7 @@ func postAltairMsgID(pmsg *pubsubpb.Message, fEpoch primitives.Epoch) string {
 	topicLen := len(topic)
 	topicLenBytes := bytesutil.Uint64ToBytesLittleEndian(uint64(topicLen)) // topicLen cannot be negative
 
-	gossipPubSubSize := params.BeaconNetworkConfig().GossipMaxSizeCapella
+	gossipPubSubSize := params.BeaconNetworkConfig().GossipMaxSize
 
 	decodedData, err := encoder.DecodeSnappy(pmsg.Data, gossipPubSubSize)
 	if err != nil {

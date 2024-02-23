@@ -9,8 +9,8 @@ import (
 
 // NetworkConfig defines the spec based network parameters.
 type NetworkConfig struct {
-	GossipMaxSizeCapella            uint64          `yaml:"GOSSIP_MAX_SIZE_CAPELLA"`            // GossipMaxSizeCapella is the maximum allowed size of uncompressed gossip messages after the capella epoch.
-	MaxChunkSizeCapella             uint64          `yaml:"MAX_CHUNK_SIZE_CAPELLA"`             // MaxChunkSizeCapella is the maximum allowed size of uncompressed req/resp chunked responses after the capella epoch.
+	GossipMaxSize                   uint64          `yaml:"GOSSIP_MAX_SIZE"`                    // GossipMaxSize is the maximum allowed size of uncompressed gossip messages.
+	MaxChunkSize                    uint64          `yaml:"MAX_CHUNK_SIZE"`                     // MaxChunkSize is the maximum allowed size of uncompressed req/resp chunked responses.
 	AttestationSubnetCount          uint64          `yaml:"ATTESTATION_SUBNET_COUNT"`           // AttestationSubnetCount is the number of attestation subnets used in the gossipsub protocol.
 	AttestationPropagationSlotRange primitives.Slot `yaml:"ATTESTATION_PROPAGATION_SLOT_RANGE"` // AttestationPropagationSlotRange is the maximum number of slots during which an attestation can be propagated.
 	MaxRequestBlocks                uint64          `yaml:"MAX_REQUEST_BLOCKS"`                 // MaxRequestBlocks is the maximum number of blocks in a single request.
