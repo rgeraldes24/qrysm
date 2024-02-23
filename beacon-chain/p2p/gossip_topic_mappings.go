@@ -45,7 +45,4 @@ func init() {
 	for k, v := range gossipTopicMappings {
 		GossipTypeMapping[reflect.TypeOf(v)] = k
 	}
-
-	// Specially handle Capella objects.
-	GossipTypeMapping[reflect.TypeOf(&zondpb.SignedBeaconBlockCapella{})] = BlockSubnetTopicFormat
 }
