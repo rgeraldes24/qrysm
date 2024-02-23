@@ -751,6 +751,7 @@ func isDigestValid(digest [4]byte, genesis time.Time, genValRoot [32]byte) (bool
 		return false, err
 	}
 
+	// TODO(rgeraldes24): re-enable once we have more forks
 	/*
 		isNextEpoch, err := forks.IsForkNextEpoch(genesis, genValRoot[:])
 		if err != nil {
