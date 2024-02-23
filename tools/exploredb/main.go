@@ -355,7 +355,7 @@ func printStates(stateC <-chan *modifiedState, doneC chan<- bool) {
 		log.Infof("randao_mixes                  : size = %s, count = %d", humanize.Bytes(size), count)
 		size, count = sizeAndCountOfUin64List(st.Slashings())
 		log.Infof("slashings                     : size = %s, count = %d", humanize.Bytes(size), count)
-		// TODO(rgeraldes24)
+		// TODO(rgeraldes24): fields have been replace with the bit fields
 		// size, count = sizeAndCountGeneric(st.PreviousEpochAttestations())
 		// log.Infof("previous_epoch_attestations   : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
 		// size, count = sizeAndCountGeneric(st.CurrentEpochAttestations())
@@ -532,7 +532,7 @@ func sizeAndCountGeneric(genericItems interface{}, err error) (uint64, uint64) {
 			size += uint64(item.SizeSSZ())
 		}
 		count = uint64(len(items))
-	// TODO(rgeraldes24)
+	// TODO(rgeraldes24): PendingAttestation does not have SizeSSZ available
 	// case []*zondpb.PendingAttestation:
 	// 	for _, item := range items {
 	// 		size += uint64(item.SizeSSZ())
