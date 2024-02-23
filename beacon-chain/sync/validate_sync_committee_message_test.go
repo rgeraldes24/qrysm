@@ -132,7 +132,6 @@ func TestService_ValidateSyncCommitteeMessage(t *testing.T) {
 				}},
 			want: pubsub.ValidationIgnore,
 		},
-
 		{
 			name: "Already Seen Message",
 			svcopts: []Option{

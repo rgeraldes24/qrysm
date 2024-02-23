@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/theQRL/qrysm/v4/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/v4/config/params"
 	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -16,11 +17,10 @@ func TestVerifyRPCMappings(t *testing.T) {
 	assert.NoError(t, VerifyTopicMapping(RPCStatusTopicV1, &pb.Status{}), "Failed to verify status rpc topic")
 	assert.NotNil(t, VerifyTopicMapping(RPCStatusTopicV1, new([]byte)), "Incorrect message type verified for status rpc topic")
 
-	// TODO(rgeraldes24)
-	// assert.NoError(t, VerifyTopicMapping(RPCMetaDataTopicV1, new(interface{})), "Failed to verify metadata rpc topic")
+	assert.NoError(t, VerifyTopicMapping(RPCMetaDataTopicV2, new(interface{})), "Failed to verify metadata rpc topic")
 	assert.NotNil(t, VerifyTopicMapping(RPCStatusTopicV1, new([]byte)), "Incorrect message type verified for metadata rpc topic")
 
-	// assert.NoError(t, VerifyTopicMapping(RPCBlocksByRootTopicV1, new(types.BeaconBlockByRootsReq)), "Failed to verify blocks by root rpc topic")
+	assert.NoError(t, VerifyTopicMapping(RPCBlocksByRootTopicV2, new(types.BeaconBlockByRootsReq)), "Failed to verify blocks by root rpc topic")
 }
 
 func TestTopicDeconstructor(t *testing.T) {
