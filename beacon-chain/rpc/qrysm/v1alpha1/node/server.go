@@ -32,7 +32,6 @@ import (
 // version information, and services the node implements and runs.
 type Server struct {
 	LogsStreamer         logs.Streamer
-	StreamLogsBufferSize int
 	SyncChecker          sync.Checker
 	Server               *grpc.Server
 	BeaconDB             db.ReadOnlyDatabase

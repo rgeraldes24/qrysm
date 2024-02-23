@@ -317,7 +317,6 @@ func (s *Service) Start() {
 
 	nodeServer := &nodev1alpha1.Server{
 		LogsStreamer:         logs.NewStreamServer(),
-		StreamLogsBufferSize: 1000, // Enough to handle bursts of beacon node logs for gRPC streaming.
 		BeaconDB:             s.cfg.BeaconDB,
 		Server:               s.grpcServer,
 		SyncChecker:          s.cfg.SyncService,
