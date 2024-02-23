@@ -234,7 +234,7 @@ func TestCallWithdrawalEndpoint_Errors(t *testing.T) {
 					Data: &shared.Fork{
 						PreviousVersion: hexutil.Encode(params.BeaconConfig().GenesisForkVersion),
 						CurrentVersion:  hexutil.Encode(params.BeaconConfig().GenesisForkVersion),
-						Epoch:           fmt.Sprintf("%d", params.BeaconConfig().GenesisForkVersion),
+						Epoch:           "0",
 					},
 					ExecutionOptimistic: false,
 					Finalized:           true,

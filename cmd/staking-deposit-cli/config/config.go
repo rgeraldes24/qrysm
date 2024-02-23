@@ -34,8 +34,9 @@ func GetConfig() *Config {
 				GenesisValidatorsRoot: ToHex("0x8e0aea32a97da3012c2c158bae29794fd08a098144dfee4ed016272035e0d6da"),
 			},
 			MAINNET: {
-				Name:                  MAINNET,
-				GenesisForkVersion:    ToHex("0x00000000"),
+				Name:               MAINNET,
+				GenesisForkVersion: ToHex("0x00000000"),
+				// TODO(rgeraldes24)
 				GenesisValidatorsRoot: ToHex("0x8e0aea32a97da3012c2c158bae29794fd08a098144dfee4ed016272035e0d6da"),
 			},
 		},
