@@ -18,11 +18,6 @@ func TestSSZTagSize(t *testing.T) {
 	pubKeySize := field_params.DilithiumPubkeyLength
 	rootSize := 32
 
-	// TODO(rgeraldes24)
-	// sizes, err := sszTagSizes(pb.Attestation{}, "Signature")
-	// require.NoError(t, err)
-	// assert.Equal(t, sigSize, sizes[0], "Unexpected signature size")
-
 	sizes, err := sszTagSizes(pb.SignedBeaconBlockCapella{}, "Signature")
 	require.NoError(t, err)
 	assert.Equal(t, sigSize, sizes[0], "Unexpected signature size")
