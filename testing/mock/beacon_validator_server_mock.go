@@ -37,21 +37,6 @@ func (m *MockBeaconNodeValidatorServer) EXPECT() *MockBeaconNodeValidatorServerM
 	return m.recorder
 }
 
-// SignaturesAndAggregationBits mocks base method.
-func (m *MockBeaconNodeValidatorServer) SignaturesAndAggregationBits(arg0 context.Context, arg1 *zond.SignaturesAndAggregationBitsRequest) (*zond.SignaturesAndAggregationBitsResponse, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SignaturesAndAggregationBits", arg0, arg1)
-	ret0, _ := ret[0].(*zond.SignaturesAndAggregationBitsResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SignaturesAndAggregationBits indicates an expected call of SignaturesAndAggregationBits.
-func (mr *MockBeaconNodeValidatorServerMockRecorder) SignaturesAndAggregationBits(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignaturesAndAggregationBits", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).SignaturesAndAggregationBits), arg0, arg1)
-}
-
 // AssignValidatorToSubnet mocks base method.
 func (m *MockBeaconNodeValidatorServer) AssignValidatorToSubnet(arg0 context.Context, arg1 *zond.AssignValidatorToSubnetRequest) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -275,6 +260,21 @@ func (m *MockBeaconNodeValidatorServer) ProposeExit(arg0 context.Context, arg1 *
 func (mr *MockBeaconNodeValidatorServerMockRecorder) ProposeExit(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProposeExit", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).ProposeExit), arg0, arg1)
+}
+
+// SignaturesAndAggregationBits mocks base method.
+func (m *MockBeaconNodeValidatorServer) SignaturesAndAggregationBits(arg0 context.Context, arg1 *zond.SignaturesAndAggregationBitsRequest) (*zond.SignaturesAndAggregationBitsResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SignaturesAndAggregationBits", arg0, arg1)
+	ret0, _ := ret[0].(*zond.SignaturesAndAggregationBitsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SignaturesAndAggregationBits indicates an expected call of SignaturesAndAggregationBits.
+func (mr *MockBeaconNodeValidatorServerMockRecorder) SignaturesAndAggregationBits(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignaturesAndAggregationBits", reflect.TypeOf((*MockBeaconNodeValidatorServer)(nil).SignaturesAndAggregationBits), arg0, arg1)
 }
 
 // StreamBlocksAltair mocks base method.

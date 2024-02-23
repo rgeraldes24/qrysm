@@ -38,26 +38,6 @@ func (m *MockBeaconNodeValidatorClient) EXPECT() *MockBeaconNodeValidatorClientM
 	return m.recorder
 }
 
-// SignaturesAndAggregationBits mocks base method.
-func (m *MockBeaconNodeValidatorClient) SignaturesAndAggregationBits(arg0 context.Context, arg1 *zond.SignaturesAndAggregationBitsRequest, arg2 ...grpc.CallOption) (*zond.SignaturesAndAggregationBitsResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "SignaturesAndAggregationBits", varargs...)
-	ret0, _ := ret[0].(*zond.SignaturesAndAggregationBitsResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// SignaturesAndAggregationBits indicates an expected call of SignaturesAndAggregationBits.
-func (mr *MockBeaconNodeValidatorClientMockRecorder) SignaturesAndAggregationBits(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignaturesAndAggregationBits", reflect.TypeOf((*MockBeaconNodeValidatorClient)(nil).SignaturesAndAggregationBits), varargs...)
-}
-
 // AssignValidatorToSubnet mocks base method.
 func (m *MockBeaconNodeValidatorClient) AssignValidatorToSubnet(arg0 context.Context, arg1 *zond.AssignValidatorToSubnetRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
@@ -358,6 +338,26 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) ProposeExit(arg0, arg1 inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProposeExit", reflect.TypeOf((*MockBeaconNodeValidatorClient)(nil).ProposeExit), varargs...)
 }
 
+// SignaturesAndAggregationBits mocks base method.
+func (m *MockBeaconNodeValidatorClient) SignaturesAndAggregationBits(arg0 context.Context, arg1 *zond.SignaturesAndAggregationBitsRequest, arg2 ...grpc.CallOption) (*zond.SignaturesAndAggregationBitsResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "SignaturesAndAggregationBits", varargs...)
+	ret0, _ := ret[0].(*zond.SignaturesAndAggregationBitsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SignaturesAndAggregationBits indicates an expected call of SignaturesAndAggregationBits.
+func (mr *MockBeaconNodeValidatorClientMockRecorder) SignaturesAndAggregationBits(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignaturesAndAggregationBits", reflect.TypeOf((*MockBeaconNodeValidatorClient)(nil).SignaturesAndAggregationBits), varargs...)
+}
+
 // StreamBlocksAltair mocks base method.
 func (m *MockBeaconNodeValidatorClient) StreamBlocksAltair(arg0 context.Context, arg1 *zond.StreamBlocksRequest, arg2 ...grpc.CallOption) (zond.BeaconNodeValidator_StreamBlocksAltairClient, error) {
 	m.ctrl.T.Helper()
@@ -377,7 +377,6 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) StreamBlocksAltair(arg0, ar
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamBlocksAltair", reflect.TypeOf((*MockBeaconNodeValidatorClient)(nil).StreamBlocksAltair), varargs...)
 }
-
 
 // SubmitAggregateSelectionProof mocks base method.
 func (m *MockBeaconNodeValidatorClient) SubmitAggregateSelectionProof(arg0 context.Context, arg1 *zond.AggregateSelectionRequest, arg2 ...grpc.CallOption) (*zond.AggregateSelectionResponse, error) {

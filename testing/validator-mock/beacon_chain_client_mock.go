@@ -51,21 +51,6 @@ func (mr *MockBeaconChainClientMockRecorder) GetChainHead(arg0, arg1 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChainHead", reflect.TypeOf((*MockBeaconChainClient)(nil).GetChainHead), arg0, arg1)
 }
 
-// GetValidatorParticipation mocks base method.
-func (m *MockBeaconChainClient) GetValidatorParticipation(arg0 context.Context, arg1 *zond.GetValidatorParticipationRequest) (*zond.ValidatorParticipationResponse, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetValidatorParticipation", arg0, arg1)
-	ret0, _ := ret[0].(*zond.ValidatorParticipationResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetValidatorParticipation indicates an expected call of GetValidatorParticipation.
-func (mr *MockBeaconChainClientMockRecorder) GetValidatorParticipation(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValidatorParticipation", reflect.TypeOf((*MockBeaconChainClient)(nil).GetValidatorParticipation), arg0, arg1)
-}
-
 // GetValidatorPerformance mocks base method.
 func (m *MockBeaconChainClient) GetValidatorPerformance(arg0 context.Context, arg1 *zond.ValidatorPerformanceRequest) (*zond.ValidatorPerformanceResponse, error) {
 	m.ctrl.T.Helper()

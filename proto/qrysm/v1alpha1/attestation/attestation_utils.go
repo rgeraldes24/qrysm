@@ -18,7 +18,6 @@ import (
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
 	"golang.org/x/sync/errgroup"
-	// "github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 )
 
 type signatureSlices struct {

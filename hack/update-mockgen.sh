@@ -9,11 +9,9 @@ iface_mock_path="testing/validator-mock"
 # github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1
 # ------------------------------------------------------
 proto_mocks_v1alpha1=(
-      "$mock_path/beacon_service_mock.go BeaconChainClient,BeaconChain_StreamBlocksClient"
-      "$mock_path/beacon_chain_service_mock.go BeaconChain_StreamBlocksServer"
+      "$mock_path/beacon_service_mock.go BeaconChainClient"
       "$mock_path/beacon_validator_server_mock.go BeaconNodeValidatorServer,BeaconNodeValidator_WaitForActivationServer,BeaconNodeValidator_WaitForChainStartServer"
       "$mock_path/beacon_validator_client_mock.go BeaconNodeValidatorClient,BeaconNodeValidator_WaitForChainStartClient,BeaconNodeValidator_WaitForActivationClient"
-      "$mock_path/slasher_client_mock.go SlasherClient"
       "$mock_path/node_service_mock.go NodeClient"
 )
 
@@ -58,7 +56,6 @@ done
 iface_mocks=(
       "$iface_mock_path/beacon_chain_client_mock.go BeaconChainClient"
       "$iface_mock_path/node_client_mock.go NodeClient"
-      "$iface_mock_path/slasher_client_mock.go SlasherClient"
       "$iface_mock_path/validator_client_mock.go ValidatorClient"
 )
 

@@ -99,20 +99,6 @@ func (m *MockPublicKey) EXPECT() *MockPublicKeyMockRecorder {
 	return m.recorder
 }
 
-// Aggregate mocks base method.
-func (m *MockPublicKey) Aggregate(p2 common.PublicKey) common.PublicKey {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Aggregate", p2)
-	ret0, _ := ret[0].(common.PublicKey)
-	return ret0
-}
-
-// Aggregate indicates an expected call of Aggregate.
-func (mr *MockPublicKeyMockRecorder) Aggregate(p2 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Aggregate", reflect.TypeOf((*MockPublicKey)(nil).Aggregate), p2)
-}
-
 // Copy mocks base method.
 func (m *MockPublicKey) Copy() common.PublicKey {
 	m.ctrl.T.Helper()
@@ -140,7 +126,6 @@ func (mr *MockPublicKeyMockRecorder) Equals(p2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Equals", reflect.TypeOf((*MockPublicKey)(nil).Equals), p2)
 }
-
 
 // Marshal mocks base method.
 func (m *MockPublicKey) Marshal() []byte {
