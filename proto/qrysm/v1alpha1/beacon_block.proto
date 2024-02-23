@@ -200,10 +200,10 @@ message BeaconBlockCapella {
 }
 
 message BeaconBlockBodyCapella {
-    // The validators RANDAO reveal 96 byte value.
+    // The validators RANDAO reveal 4595 byte value.
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
-    // A reference to the Ethereum 1.x chain.
+    // A reference to the Zond execution chain.
     Eth1Data eth1_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
