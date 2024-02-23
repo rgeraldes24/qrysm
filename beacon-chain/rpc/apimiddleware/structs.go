@@ -397,7 +397,7 @@ type AttesterSlashingJson struct {
 type IndexedAttestationJson struct {
 	AttestingIndices []string             `json:"attesting_indices"`
 	Data             *AttestationDataJson `json:"data"`
-	Signatures       []string             `json:"signature" hex:"true"`
+	Signatures       []string             `json:"signatures" hex:"true"`
 }
 
 type AttestationJson struct {
