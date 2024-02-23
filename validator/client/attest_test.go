@@ -148,7 +148,7 @@ func TestAttestToBlockHead_AttestsCorrectly(t *testing.T) {
 			Source:          &zondpb.Checkpoint{Root: sourceRoot[:], Epoch: 3},
 		},
 		AggregationBits: aggregationBitfield,
-		Signatures:      [][]byte{},
+		Signatures:      [][]byte{make([]byte, 4595)},
 	}
 
 	root, err := signing.ComputeSigningRoot(expectedAttestation.Data, make([]byte, 32))
