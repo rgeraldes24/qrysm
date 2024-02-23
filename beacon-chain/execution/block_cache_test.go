@@ -41,8 +41,7 @@ func TestHeightKeyFn_InvalidObj(t *testing.T) {
 	assert.Equal(t, ErrNotAHeaderInfo, err)
 }
 
-// TODO(rgeraldes24): fix unit test
-// TODO(rgeraldes24): maxCacheSize = 2 * params.BeaconConfig().Eth1FollowDistance
+// TODO(rgeraldes24): fix unit test: params.BeaconConfig().Eth1FollowDistance = 0 > maxCacheSize = 0
 /*
 func TestBlockCache_byHash(t *testing.T) {
 	cache := newHeaderCache()
