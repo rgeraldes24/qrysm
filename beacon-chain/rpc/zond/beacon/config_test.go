@@ -310,14 +310,6 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "0x0a000000", v)
 		case "DOMAIN_APPLICATION_BUILDER":
 			assert.Equal(t, "0x00000001", v)
-		case "TRANSITION_TOTAL_DIFFICULTY":
-			assert.Equal(t, "0", v)
-		case "TERMINAL_BLOCK_HASH_ACTIVATION_EPOCH":
-			assert.Equal(t, "72", v)
-		case "TERMINAL_BLOCK_HASH":
-			assert.Equal(t, common.HexToHash("TerminalBlockHash"), common.HexToHash(v))
-		case "TERMINAL_TOTAL_DIFFICULTY":
-			assert.Equal(t, "73", v)
 		case "DefaultFeeRecipient":
 			assert.Equal(t, common.HexToAddress("DefaultFeeRecipient"), v)
 		case "PROPORTIONAL_SLASHING_MULTIPLIER_CAPELLA":
