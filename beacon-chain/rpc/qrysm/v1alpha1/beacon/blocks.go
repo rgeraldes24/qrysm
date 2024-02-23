@@ -6,8 +6,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/api/pagination"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
-	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
 	"github.com/theQRL/qrysm/v4/beacon-chain/db/filters"
 	"github.com/theQRL/qrysm/v4/cmd"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -240,41 +238,6 @@ func (bs *Server) listBlocksForGenesis(ctx context.Context, _ *zondpb.ListBlocks
 // DEPRECATED: This endpoint is superseded by the /zond/v1/beacon API endpoint
 func (bs *Server) GetChainHead(ctx context.Context, _ *emptypb.Empty) (*zondpb.ChainHead, error) {
 	return bs.chainHeadRetrieval(ctx)
-}
-
-// StreamChainHead to clients every single time the head block and state of the chain change.
-// DEPRECATED: This endpoint is superseded by the /zond/v1/events Beacon API endpoint
-func (bs *Server) StreamChainHead(_ *emptypb.Empty, stream zondpb.BeaconChain_StreamChainHeadServer) error {
-	stateChannel := make(chan *feed.Event, 4)
-	stateSub := bs.StateNotifier.StateFeed().Subscribe(stateChannel)
-	defer stateSub.Unsubscribe()
-	for {
-		select {
-		case stateEvent := <-stateChannel:
-			// In the event our node is in sync mode
-			// we do not send the chainhead to the caller
-			// due to the possibility of deadlocks when retrieving
-			// all the chain related data.
-			if bs.SyncChecker.Syncing() {
-				continue
-			}
-			if stateEvent.Type == statefeed.BlockProcessed {
-				res, err := bs.chainHeadRetrieval(stream.Context())
-				if err != nil {
-					return status.Errorf(codes.Internal, "Could not retrieve chain head: %v", err)
-				}
-				if err := stream.Send(res); err != nil {
-					return status.Errorf(codes.Unavailable, "Could not send over stream: %v", err)
-				}
-			}
-		case <-stateSub.Err():
-			return status.Error(codes.Aborted, "Subscriber closed, exiting goroutine")
-		case <-bs.Ctx.Done():
-			return status.Error(codes.Canceled, "Context canceled")
-		case <-stream.Context().Done():
-			return status.Error(codes.Canceled, "Context canceled")
-		}
-	}
 }
 
 // Retrieve chain head information from the DB and the current beacon state.

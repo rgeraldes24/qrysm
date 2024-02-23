@@ -87,19 +87,6 @@ service BeaconChain {
         };
     }
 
-    // Server-side stream of information about the head of the beacon chain
-    // from the view of the beacon chain node.
-    //
-    // This includes the head block slot and root as well as information about
-    // the most recent finalized and justified slots.
-    // DEPRECATED: This endpoint is superseded by the /zond/v1/events Beacon API endpoint
-    rpc StreamChainHead(google.protobuf.Empty) returns (stream ChainHead) {
-        option deprecated = true;
-        option (google.api.http) = {
-            get: "/zond/v1alpha1/beacon/chainhead/stream"
-        };
-    }
-
     // Retrieve information about the head of the beacon chain from the view of
     // the beacon chain node.
     //

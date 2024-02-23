@@ -181,23 +181,6 @@ func local_request_BeaconChain_ListBeaconBlocks_0(ctx context.Context, marshaler
 
 }
 
-func request_BeaconChain_StreamChainHead_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconChainClient, req *http.Request, pathParams map[string]string) (BeaconChain_StreamChainHeadClient, runtime.ServerMetadata, error) {
-	var protoReq emptypb.Empty
-	var metadata runtime.ServerMetadata
-
-	stream, err := client.StreamChainHead(ctx, &protoReq)
-	if err != nil {
-		return nil, metadata, err
-	}
-	header, err := stream.Header()
-	if err != nil {
-		return nil, metadata, err
-	}
-	metadata.HeaderMD = header
-	return stream, metadata, nil
-
-}
-
 func request_BeaconChain_GetChainHead_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconChainClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
@@ -728,13 +711,6 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("GET", pattern_BeaconChain_StreamChainHead_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
-		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-		return
-	})
-
 	mux.Handle("GET", pattern_BeaconChain_GetChainHead_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1155,26 +1131,6 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("GET", pattern_BeaconChain_StreamChainHead_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/StreamChainHead")
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_BeaconChain_StreamChainHead_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_BeaconChain_StreamChainHead_0(ctx, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("GET", pattern_BeaconChain_GetChainHead_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1447,8 +1403,6 @@ var (
 
 	pattern_BeaconChain_ListBeaconBlocks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha2", "beacon", "blocks"}, ""))
 
-	pattern_BeaconChain_StreamChainHead_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"zond", "v1alpha1", "beacon", "chainhead", "stream"}, ""))
-
 	pattern_BeaconChain_GetChainHead_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "beacon", "chainhead"}, ""))
 
 	pattern_BeaconChain_ListBeaconCommittees_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "beacon", "committees"}, ""))
@@ -1484,8 +1438,6 @@ var (
 	forward_BeaconChain_AttestationPool_0 = runtime.ForwardResponseMessage
 
 	forward_BeaconChain_ListBeaconBlocks_0 = runtime.ForwardResponseMessage
-
-	forward_BeaconChain_StreamChainHead_0 = runtime.ForwardResponseStream
 
 	forward_BeaconChain_GetChainHead_0 = runtime.ForwardResponseMessage
 
