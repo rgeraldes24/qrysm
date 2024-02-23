@@ -3,7 +3,6 @@ package p2p
 import (
 	"reflect"
 
-	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"google.golang.org/protobuf/proto"
 )
@@ -24,7 +23,7 @@ var gossipTopicMappings = map[string]proto.Message{
 
 // GossipTopicMappings is a function to return the assigned data type
 // versioned by epoch.
-func GossipTopicMappings(topic string, epoch primitives.Epoch) proto.Message {
+func GossipTopicMappings(topic string) proto.Message {
 	return gossipTopicMappings[topic]
 }
 

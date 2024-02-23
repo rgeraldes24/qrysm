@@ -24,7 +24,7 @@ func TestGossipTopicMappings_CorrectBlockType(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
 	// Capella Fork
-	pMessage := GossipTopicMappings(BlockSubnetTopicFormat, 0)
+	pMessage := GossipTopicMappings(BlockSubnetTopicFormat)
 	_, ok := pMessage.(*zondpb.SignedBeaconBlockCapella)
 	assert.Equal(t, true, ok)
 }

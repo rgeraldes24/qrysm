@@ -39,7 +39,7 @@ func (s *Service) decodePubsubMessage(msg *pubsub.Message) (ssz.Unmarshaler, err
 		topic = p2p.GossipTypeMapping[reflect.TypeOf(&zondpb.SyncCommitteeMessage{})]
 	}
 
-	base := p2p.GossipTopicMappings(topic, 0)
+	base := p2p.GossipTopicMappings(topic)
 	if base == nil {
 		return nil, p2p.ErrMessageNotMapped
 	}
