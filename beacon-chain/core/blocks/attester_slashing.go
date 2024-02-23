@@ -81,7 +81,7 @@ func ProcessAttesterSlashing(
 			var slashingQuotient uint64
 			switch {
 			case beaconState.Version() == version.Capella:
-				slashingQuotient = cfg.MinSlashingPenaltyQuotientCapella
+				slashingQuotient = cfg.MinSlashingPenaltyQuotient
 			default:
 				return nil, errors.New("unknown state version")
 			}

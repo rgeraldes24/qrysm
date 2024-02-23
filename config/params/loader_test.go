@@ -123,9 +123,9 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 	assert.Equal(t, expected.BaseRewardFactor, actual.BaseRewardFactor, "%s: BaseRewardFactor", name)
 	assert.Equal(t, expected.WhistleBlowerRewardQuotient, actual.WhistleBlowerRewardQuotient, "%s: WhistleBlowerRewardQuotient", name)
 	assert.Equal(t, expected.ProposerRewardQuotient, actual.ProposerRewardQuotient, "%s: ProposerRewardQuotient", name)
-	assert.Equal(t, expected.InactivityPenaltyQuotientCapella, actual.InactivityPenaltyQuotientCapella, "%s: InactivityPenaltyQuotientCapella", name)
-	assert.Equal(t, expected.MinSlashingPenaltyQuotientCapella, actual.MinSlashingPenaltyQuotientCapella, "%s: MinSlashingPenaltyQuotientCapella", name)
-	assert.Equal(t, expected.ProportionalSlashingMultiplierCapella, actual.ProportionalSlashingMultiplierCapella, "%s: ProportionalSlashingMultiplierCapella", name)
+	assert.Equal(t, expected.InactivityPenaltyQuotient, actual.InactivityPenaltyQuotient, "%s: InactivityPenaltyQuotientCapella", name)
+	assert.Equal(t, expected.MinSlashingPenaltyQuotient, actual.MinSlashingPenaltyQuotient, "%s: MinSlashingPenaltyQuotientCapella", name)
+	assert.Equal(t, expected.ProportionalSlashingMultiplier, actual.ProportionalSlashingMultiplier, "%s: ProportionalSlashingMultiplierCapella", name)
 
 	// Max operations per block.
 	assert.Equal(t, expected.MaxProposerSlashings, actual.MaxProposerSlashings, "%s: MaxProposerSlashings", name)

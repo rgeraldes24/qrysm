@@ -201,9 +201,9 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EpochsPerSyncCommitteePeriod: 8, // TODO: (cyyber) finalize EpochsPerSyncCommitteePeriod, original value was 512
 
 	// Updated penalty values.
-	MinSlashingPenaltyQuotientCapella:     32,
-	ProportionalSlashingMultiplierCapella: 3,
-	InactivityPenaltyQuotientCapella:      1 << 24,
+	MinSlashingPenaltyQuotient:     32,
+	ProportionalSlashingMultiplier: 3,
+	InactivityPenaltyQuotient:      1 << 24,
 
 	// Light client
 	MinSyncCommitteeParticipants: 1,

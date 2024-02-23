@@ -171,11 +171,9 @@ type BeaconChainConfig struct {
 	InactivityScoreRecoveryRate  uint64           `yaml:"INACTIVITY_SCORE_RECOVERY_RATE" spec:"true"`   // InactivityScoreRecoveryRate for recovering score bias penalties during inactivity.
 	EpochsPerSyncCommitteePeriod primitives.Epoch `yaml:"EPOCHS_PER_SYNC_COMMITTEE_PERIOD" spec:"true"` // EpochsPerSyncCommitteePeriod defines how many epochs per sync committee period.
 
-	// Updated penalty values. This moves penalty parameters toward their final, maximum security values.
-	// Note: We do not override previous configuration values but instead creates new values and replaces usage throughout.
-	MinSlashingPenaltyQuotientCapella     uint64 `yaml:"MIN_SLASHING_PENALTY_QUOTIENT_CAPELLA" spec:"true"`    // MinSlashingPenaltyQuotientCapella for slashing penalties post Capella hard fork.
-	ProportionalSlashingMultiplierCapella uint64 `yaml:"PROPORTIONAL_SLASHING_MULTIPLIER_CAPELLA" spec:"true"` // ProportionalSlashingMultiplierCapella for slashing penalties' multiplier post Capella hard fork.
-	InactivityPenaltyQuotientCapella      uint64 `yaml:"INACTIVITY_PENALTY_QUOTIENT_CAPELLA" spec:"true"`      // InactivityPenaltyQuotientCapella for penalties during inactivity post Capella hard fork.
+	MinSlashingPenaltyQuotient     uint64 `yaml:"MIN_SLASHING_PENALTY_QUOTIENT" spec:"true"`    // MinSlashingPenaltyQuotientCapella for slashing penalties post Capella hard fork.
+	ProportionalSlashingMultiplier uint64 `yaml:"PROPORTIONAL_SLASHING_MULTIPLIER" spec:"true"` // ProportionalSlashingMultiplierCapella for slashing penalties' multiplier post Capella hard fork.
+	InactivityPenaltyQuotient      uint64 `yaml:"INACTIVITY_PENALTY_QUOTIENT" spec:"true"`      // InactivityPenaltyQuotientCapella for penalties during inactivity post Capella hard fork.
 
 	// Light client
 	MinSyncCommitteeParticipants uint64 `yaml:"MIN_SYNC_COMMITTEE_PARTICIPANTS" spec:"true"` // MinSyncCommitteeParticipants defines the minimum amount of sync committee participants for which the light client acknowledges the signature.
