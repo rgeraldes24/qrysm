@@ -1153,9 +1153,9 @@ func TestValidateBeaconBlockPubSub_ValidExecutionPayload(t *testing.T) {
 	require.NoError(t, err)
 	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
 	genesisValidatorsRoot := r.cfg.clock.GenesisValidatorsRoot()
-	BellatrixDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
+	capellaDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
 	require.NoError(t, err)
-	topic = r.addDigestToTopic(topic, BellatrixDigest)
+	topic = r.addDigestToTopic(topic, capellaDigest)
 	m := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -1225,9 +1225,9 @@ func TestValidateBeaconBlockPubSub_InvalidPayloadTimestamp(t *testing.T) {
 	require.NoError(t, err)
 	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
 	genesisValidatorsRoot := r.cfg.clock.GenesisValidatorsRoot()
-	BellatrixDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
+	capellaDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
 	assert.NoError(t, err)
-	topic = r.addDigestToTopic(topic, BellatrixDigest)
+	topic = r.addDigestToTopic(topic, capellaDigest)
 	m := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
@@ -1240,7 +1240,8 @@ func TestValidateBeaconBlockPubSub_InvalidPayloadTimestamp(t *testing.T) {
 	assert.Equal(t, true, result)
 }
 
-/* NOTE(rgeraldes24): test is not valid at the moment
+// NOTE(rgeraldes24): test is not valid at the moment
+/*
 func Test_validateBellatrixBeaconBlock(t *testing.T) {
 	db := dbtest.SetupDB(t)
 	p := p2ptest.NewTestP2P(t)
@@ -1387,9 +1388,9 @@ func Test_validateBeaconBlockProcessingWhenParentIsOptimistic(t *testing.T) {
 	require.NoError(t, err)
 	topic := p2p.GossipTypeMapping[reflect.TypeOf(msg)]
 	genesisValidatorsRoot := r.cfg.clock.GenesisValidatorsRoot()
-	BellatrixDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
+	capellaDigest, err := signing.ComputeForkDigest(params.BeaconConfig().GenesisForkVersion, genesisValidatorsRoot[:])
 	require.NoError(t, err)
-	topic = r.addDigestToTopic(topic, BellatrixDigest)
+	topic = r.addDigestToTopic(topic, capellaDigest)
 	m := &pubsub.Message{
 		Message: &pubsubpb.Message{
 			Data:  buf.Bytes(),
