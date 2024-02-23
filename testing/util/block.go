@@ -554,14 +554,7 @@ func HydrateV2BlindedBeaconBlockBodyCapella(b *v2.BlindedBeaconBlockBodyCapella)
 	return b
 }
 
-func SaveBlock(tb assertions.AssertionTestingTB, ctx context.Context, db iface.NoHeadAccessDatabase, b interface{}) interfaces.SignedBeaconBlock {
-	wsb, err := blocks.NewSignedBeaconBlock(b)
-	require.NoError(tb, err)
-	require.NoError(tb, db.SaveBlock(ctx, wsb))
-	return wsb
-}
-
-// HydrateV2BellatrixSignedBeaconBlock hydrates a signed beacon block with correct field length sizes
+// HydrateV2CapellaSignedBeaconBlock hydrates a signed beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateV2CapellaSignedBeaconBlock(b *v2.SignedBeaconBlockCapella) *v2.SignedBeaconBlockCapella {
 	if b.Signature == nil {
@@ -625,4 +618,11 @@ func HydrateV2CapellaBeaconBlockBody(b *v2.BeaconBlockBodyCapella) *v2.BeaconBlo
 		}
 	}
 	return b
+}
+
+func SaveBlock(tb assertions.AssertionTestingTB, ctx context.Context, db iface.NoHeadAccessDatabase, b interface{}) interfaces.SignedBeaconBlock {
+	wsb, err := blocks.NewSignedBeaconBlock(b)
+	require.NoError(tb, err)
+	require.NoError(tb, db.SaveBlock(ctx, wsb))
+	return wsb
 }
