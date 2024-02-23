@@ -913,8 +913,8 @@ func (b *BeaconNode) registerGRPCGateway(router *mux.Router) error {
 	if gatewayConfig.V1AlphaPbMux != nil {
 		muxs = append(muxs, gatewayConfig.V1AlphaPbMux)
 	}
-	if gatewayConfig.EthPbMux != nil {
-		muxs = append(muxs, gatewayConfig.EthPbMux)
+	if gatewayConfig.ZondPbMux != nil {
+		muxs = append(muxs, gatewayConfig.ZondPbMux)
 	}
 
 	opts := []apigateway.Option{

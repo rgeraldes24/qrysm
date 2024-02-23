@@ -12,13 +12,13 @@ import (
 // MuxConfig contains configuration that should be used when registering the beacon node in the gateway.
 type MuxConfig struct {
 	Handler      gateway.MuxHandler
-	EthPbMux     *gateway.PbMux
+	ZondPbMux    *gateway.PbMux
 	V1AlphaPbMux *gateway.PbMux
 }
 
 // DefaultConfig returns a fully configured MuxConfig with standard gateway behavior.
 func DefaultConfig(enableDebugRPCEndpoints bool, httpModules string) MuxConfig {
-	var v1AlphaPbHandler, ethPbHandler *gateway.PbMux
+	var v1AlphaPbHandler, zondPbHandler *gateway.PbMux
 	if flags.EnableHTTPQrysmAPI(httpModules) {
 		v1AlphaRegistrations := []gateway.PbHandlerRegistration{
 			zondpbalpha.RegisterNodeHandler,
@@ -73,7 +73,7 @@ func DefaultConfig(enableDebugRPCEndpoints bool, httpModules string) MuxConfig {
 				},
 			}),
 		)
-		ethPbHandler = &gateway.PbMux{
+		zondPbHandler = &gateway.PbMux{
 			Registrations: ethRegistrations,
 			Patterns:      []string{"/internal/zond/v1/", "/internal/zond/v2/"},
 			Mux:           ethMux,
@@ -81,7 +81,7 @@ func DefaultConfig(enableDebugRPCEndpoints bool, httpModules string) MuxConfig {
 	}
 
 	return MuxConfig{
-		EthPbMux:     ethPbHandler,
+		ZondPbMux:    zondPbHandler,
 		V1AlphaPbMux: v1AlphaPbHandler,
 	}
 }
