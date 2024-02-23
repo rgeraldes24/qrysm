@@ -84,7 +84,7 @@ func TestRateDilithiumChanges(t *testing.T) {
 			FromDilithiumPubkey: keys[i+1].PublicKey().Marshal(),
 			ToExecutionAddress:  bytesutil.PadTo([]byte("address"), 20),
 		}
-		epoch := primitives.Epoch(0) + 1
+		epoch := primitives.Epoch(1)
 		domain, err := signing.Domain(st.Fork(), epoch, params.BeaconConfig().DomainDilithiumToExecutionChange, st.GenesisValidatorsRoot())
 		assert.NoError(t, err)
 		htr, err := signing.SigningData(message.HashTreeRoot, domain)

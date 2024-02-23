@@ -248,7 +248,7 @@ type WriteOnlyCheckpoint interface {
 
 // WriteOnlyAttestations defines a struct which only has write access to attestations methods.
 type WriteOnlyAttestations interface {
-	// TODO(rgeraldes24): remove?
+	// TODO(rgeraldes24)
 }
 
 // WriteOnlyParticipation defines a struct which only has write access to participation methods.
