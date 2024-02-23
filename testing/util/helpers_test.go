@@ -16,6 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
+// TODO(rgeraldes): fix test
 /*
 func TestBlockSignature(t *testing.T) {
 	beaconState, privKeys := DeterministicGenesisStateCapella(t, 100)
