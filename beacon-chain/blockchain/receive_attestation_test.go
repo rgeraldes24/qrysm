@@ -82,7 +82,7 @@ func TestVerifyLMDFFGConsistent_OK(t *testing.T) {
 	require.NoError(t, err, "Could not verify LMD and FFG votes to be consistent")
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestProcessAttestations_Ok(t *testing.T) {
 	service, tr := minimalTestService(t)
