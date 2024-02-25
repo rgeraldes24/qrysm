@@ -121,7 +121,7 @@ func (s *Service) Start() {
 			log.Fatal(err)
 		}
 	} else {
-		log.Fatal("start from execution chain deprecated, please provide a genesis file")
+		log.Fatal("Start from execution chain deprecated, please provide a genesis file")
 	}
 	s.spawnProcessAttestationsRoutine()
 	go s.runLateBlockTasks()
