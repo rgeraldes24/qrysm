@@ -374,7 +374,6 @@ func TestUpdateSyncCommitteeCache_BadRoot(t *testing.T) {
 	require.ErrorContains(t, "zero hash state root can't be used to update cache", err)
 }
 
-// NOTE(rgeraldes24): modified test to take the new value of SyncCommitteeSize(16) into account
 func TestIsCurrentEpochSyncCommittee_SameBlockRoot(t *testing.T) {
 	ClearCache()
 	defer ClearCache()
