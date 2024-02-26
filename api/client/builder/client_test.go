@@ -257,7 +257,7 @@ func TestSubmitBlindedBlock(t *testing.T) {
 				require.Equal(t, postBlindedBeaconBlockPath, r.URL.Path)
 				return &http.Response{
 					StatusCode: http.StatusOK,
-					Body:       io.NopCloser(bytes.NewBufferString(testExampleExecutionPayloadBellatrix)), // send a Capella payload
+					Body:       io.NopCloser(bytes.NewBufferString(testExampleExecutionPayloadBellatrix)), // send a Bellatrix payload
 					Request:    r.Clone(ctx),
 				}, nil
 			}),
