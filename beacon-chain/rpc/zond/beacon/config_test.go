@@ -65,6 +65,9 @@ func TestGetSpec(t *testing.T) {
 	config.BaseRewardFactor = 39
 	config.WhistleBlowerRewardQuotient = 40
 	config.ProposerRewardQuotient = 41
+	config.InactivityPenaltyQuotient = 42
+	config.MinSlashingPenaltyQuotient = 44
+	config.ProportionalSlashingMultiplier = 46
 	config.MaxProposerSlashings = 48
 	config.MaxAttesterSlashings = 49
 	config.MaxAttestations = 50
@@ -121,9 +124,7 @@ func TestGetSpec(t *testing.T) {
 	resp, err := server.GetSpec(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 
-	// TODO(rgeraldes24): double check
 	assert.Equal(t, 91, len(resp.Data))
-	// assert.Equal(t, 112, len(resp.Data))
 	for k, v := range resp.Data {
 		switch k {
 		case "CONFIG_NAME":
@@ -226,12 +227,8 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "42", v)
 		case "HF1_INACTIVITY_PENALTY_QUOTIENT":
 			assert.Equal(t, "43", v)
-		case "MIN_SLASHING_PENALTY_QUOTIENT":
-			assert.Equal(t, "44", v)
 		case "HF1_MIN_SLASHING_PENALTY_QUOTIENT":
 			assert.Equal(t, "45", v)
-		case "PROPORTIONAL_SLASHING_MULTIPLIER":
-			assert.Equal(t, "46", v)
 		case "HF1_PROPORTIONAL_SLASHING_MULTIPLIER":
 			assert.Equal(t, "47", v)
 		case "MAX_PROPOSER_SLASHINGS":
@@ -272,12 +269,6 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "65", v)
 		case "EPOCHS_PER_SYNC_COMMITTEE_PERIOD":
 			assert.Equal(t, "66", v)
-		case "INACTIVITY_PENALTY_QUOTIENT_ALTAIR":
-			assert.Equal(t, "67", v)
-		case "MIN_SLASHING_PENALTY_QUOTIENT_ALTAIR":
-			assert.Equal(t, "68", v)
-		case "PROPORTIONAL_SLASHING_MULTIPLIER_ALTAIR":
-			assert.Equal(t, "69", v)
 		case "INACTIVITY_SCORE_RECOVERY_RATE":
 			assert.Equal(t, "70", v)
 		case "MIN_SYNC_COMMITTEE_PARTICIPANTS":
@@ -312,11 +303,11 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "0x00000001", v)
 		case "DefaultFeeRecipient":
 			assert.Equal(t, common.HexToAddress("DefaultFeeRecipient"), v)
-		case "PROPORTIONAL_SLASHING_MULTIPLIER_CAPELLA":
-			assert.Equal(t, "3", v)
-		case "MIN_SLASHING_PENALTY_QUOTIENT_CAPELLA":
-			assert.Equal(t, "32", v)
-		case "INACTIVITY_PENALTY_QUOTIENT_CAPELLA":
+		case "PROPORTIONAL_SLASHING_MULTIPLIER":
+			assert.Equal(t, "46", v)
+		case "MIN_SLASHING_PENALTY_QUOTIENT":
+			assert.Equal(t, "44", v)
+		case "INACTIVITY_PENALTY_QUOTIENT_":
 			assert.Equal(t, "16777216", v)
 		case "PROPOSER_SCORE_BOOST":
 			assert.Equal(t, "40", v)
