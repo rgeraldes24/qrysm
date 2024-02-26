@@ -20,7 +20,7 @@ func TestReportEpochMetrics_BadHeadState(t *testing.T) {
 	require.ErrorContains(t, "could not read every validator: state has nil validator slice", err)
 }
 
-// TODO(rgeraldes24) - same as below, old flow, replace with new tests?
+// TODO(rgeraldes24): same as below, old flow, replace with new tests?
 /*
 func TestReportEpochMetrics_BadAttestation(t *testing.T) {
 	s, err := util.NewBeaconStateCapella()
@@ -34,7 +34,7 @@ func TestReportEpochMetrics_BadAttestation(t *testing.T) {
 }
 */
 
-// NOTE(rgeraldes24) This test is no longer valid since it uses the phase0 flow
+// NOTE(rgeraldes24): This test is no longer valid since it uses the phase0 flow
 // that uses the AttestedCurrentEpoch func which throws this error.
 // The Capella flow includes the participation bits to identify the ones that attested
 // and that func (AttestedCurrentEpoch) is no longer necessary.
