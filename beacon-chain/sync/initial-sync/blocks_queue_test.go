@@ -843,7 +843,7 @@ func TestBlocksQueue_onProcessSkippedEvent(t *testing.T) {
 		assert.Equal(t, stateSkipped, updatedState)
 	})
 
-	// TODO(rgeraldes24): fix - relies on block batch limit = 64
+	// TODO(rgeraldes24): fix unit test: relies on block batch limit = 64
 	/*
 		t.Run("ready to update machines - non-skipped slot not found", func(t *testing.T) {
 			p := p2pt.NewTestP2P(t)
@@ -1174,7 +1174,7 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 		assert.LogsContain(t, hook, "Searching for alternative blocks")
 		assert.LogsContain(t, hook, "No alternative blocks found for peer")
 	})
-
+	// TODO(rgeraldes24): fix unit test
 	/*
 		t.Run("unfavourable fork and alternative branches exist", func(t *testing.T) {
 			defer hook.Reset()
@@ -1260,6 +1260,7 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 	*/
 }
 
+// TODO(rgeraldes24): fix unit test
 /*
 func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
