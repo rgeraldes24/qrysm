@@ -62,6 +62,10 @@ func ExecuteStateTransition(
 		return nil, errors.Wrap(err, "could not execute state transition")
 	}
 
+	// NOTE(rgeraldes24): this is probably going to be deprecated since we verify each
+	// sig separately in our model instead of the the aggregated sig and thus know
+	// which verification failed without the need for the verbose version.
+	//
 	// var valid bool
 	// if features.Get().EnableVerboseSigVerification {
 	// 	valid, err = set.VerifyVerbosely()
