@@ -158,8 +158,6 @@ func TestProcessAttesterSlashings_AppliesCorrectStatusCapella(t *testing.T) {
 		)
 	}
 
-	// TODO(rgeraldes24): double check
-	// require.Equal(t, uint64(31000000000), newState.Balances()[1])
 	require.Equal(t, uint64(38750000000000), newState.Balances()[1])
 	require.Equal(t, uint64(40000000000000), newState.Balances()[2])
 }
