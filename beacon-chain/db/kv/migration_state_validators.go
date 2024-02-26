@@ -166,12 +166,7 @@ func performValidatorStateMigration(ctx context.Context, bar *progressbar.Progre
 			if err != nil {
 				return err
 			}
-			var stateBytes []byte
-			switch {
-			case hasCapellaKey(enc):
-				stateBytes = snappy.Encode(nil, append(capellaKey, rawObj...))
-			default:
-			}
+			stateBytes := snappy.Encode(nil, append(capellaKey, rawObj...))
 			if stateErr := stateBkt.Put(keys[index], stateBytes); stateErr != nil {
 				return stateErr
 			}

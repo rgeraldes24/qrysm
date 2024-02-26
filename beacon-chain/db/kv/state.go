@@ -413,36 +413,19 @@ func (s *Store) unmarshalState(_ context.Context, enc []byte, validatorEntries [
 		return nil, err
 	}
 
-	switch {
-	// case hasCapellaKey(enc):
-	// 	// Marshal state bytes to capella beacon state.
-	// 	protoState := &zondpb.BeaconStateCapella{}
-	// 	if err := protoState.UnmarshalSSZ(enc[len(capellaKey):]); err != nil {
-	// 		return nil, errors.Wrap(err, "failed to unmarshal encoding for capella")
-	// 	}
-	// 	ok, err := s.isStateValidatorMigrationOver()
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	if ok {
-	// 		protoState.Validators = validatorEntries
-	// 	}
-	// 	return statenative.InitializeFromProtoUnsafeCapella(protoState)
-	default:
-		// Marshal state bytes to capella beacon state.
-		protoState := &zondpb.BeaconStateCapella{}
-		if err := protoState.UnmarshalSSZ(enc[len(capellaKey):]); err != nil {
-			return nil, errors.Wrap(err, "failed to unmarshal encoding for capella")
-		}
-		ok, err := s.isStateValidatorMigrationOver()
-		if err != nil {
-			return nil, err
-		}
-		if ok {
-			protoState.Validators = validatorEntries
-		}
-		return statenative.InitializeFromProtoUnsafeCapella(protoState)
+	// Marshal state bytes to capella beacon state.
+	protoState := &zondpb.BeaconStateCapella{}
+	if err := protoState.UnmarshalSSZ(enc[len(capellaKey):]); err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal encoding for capella")
 	}
+	ok, err := s.isStateValidatorMigrationOver()
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		protoState.Validators = validatorEntries
+	}
+	return statenative.InitializeFromProtoUnsafeCapella(protoState)
 }
 
 // marshal versioned state from struct type down to bytes.
