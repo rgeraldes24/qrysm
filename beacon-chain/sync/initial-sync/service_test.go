@@ -319,10 +319,6 @@ func TestService_markSynced(t *testing.T) {
 	assert.Equal(t, false, s.Syncing())
 }
 
-// NOTE(rgeraldes24): this test fails with the original data (finalizedEpoch: 5, head block: 640)
-// It seems to be related with the lookahead steps limit(8) and the block batch limit(64)
-// and our new slots per epoch value. Keeping the head slot within the lookahead * block batch limit
-// seems to do the trick.
 func TestService_Resync(t *testing.T) {
 	p := p2pt.NewTestP2P(t)
 	connectPeers(t, p, []*peerData{
