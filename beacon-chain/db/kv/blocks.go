@@ -803,11 +803,6 @@ func unmarshalBlock(_ context.Context, enc []byte) (interfaces.ReadOnlySignedBea
 			return nil, errors.Wrap(err, "could not unmarshal blinded Capella block")
 		}
 	default:
-		// // Marshal block bytes to phase 0 beacon block.
-		// rawBlock = &zondpb.SignedBeaconBlock{}
-		// if err := rawBlock.UnmarshalSSZ(enc); err != nil {
-		// 	return nil, errors.Wrap(err, "could not unmarshal Phase0 block")
-		// }
 	}
 	return blocks.NewSignedBeaconBlock(rawBlock)
 }
