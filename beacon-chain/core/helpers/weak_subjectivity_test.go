@@ -15,36 +15,14 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// TODO(rgeraldes24): double check
 func TestWeakSubjectivity_ComputeWeakSubjectivityPeriod(t *testing.T) {
 	tests := []struct {
 		valCount   uint64
 		avgBalance uint64
 		want       primitives.Epoch
 	}{
-		// NOTE(rgeraldes24): old values
 		// Asserting that we get the same numbers as defined in the reference table:
 		// https://github.com/ethereum/consensus-specs/blob/master/specs/phase0/weak-subjectivity.md#calculating-the-weak-subjectivity-period
-		// {valCount: 32768, avgBalance: 28, want: 504},
-		// {valCount: 65536, avgBalance: 28, want: 752},
-		// {valCount: 131072, avgBalance: 28, want: 1248},
-		// {valCount: 262144, avgBalance: 28, want: 2241},
-		// {valCount: 524288, avgBalance: 28, want: 2241},
-		// {valCount: 1048576, avgBalance: 28, want: 2241},
-		// {valCount: 32768, avgBalance: 40, want: 665},
-		// {valCount: 65536, avgBalance: 40, want: 1075},
-		// {valCount: 131072, avgBalance: 40, want: 1894},
-		// {valCount: 262144, avgBalance: 40, want: 3532},
-		// {valCount: 524288, avgBalance: 40, want: 3532},
-		// {valCount: 1048576, avgBalance: 40, want: 3532},
-		// Additional test vectors, to check case when T*(200+3*D) >= t*(200+12*D)
-		// {valCount: 32768, avgBalance: 22, want: 277},
-		// {valCount: 65536, avgBalance: 22, want: 298},
-		// {valCount: 131072, avgBalance: 22, want: 340},
-		// {valCount: 262144, avgBalance: 22, want: 424},
-		// {valCount: 524288, avgBalance: 22, want: 593},
-		// {valCount: 1048576, avgBalance: 22, want: 931},
-
 		{valCount: 32768, avgBalance: 35, want: 115},
 		{valCount: 65536, avgBalance: 35, want: 214},
 		{valCount: 131072, avgBalance: 35, want: 413},
