@@ -38,23 +38,23 @@ func TestVerifyLMDFFGConsistent_NotOK(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	b32 := util.NewBeaconBlockCapella()
-	b32.Block.Slot = 32
-	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b32)
-	r32, err := b32.Block.HashTreeRoot()
+	b128 := util.NewBeaconBlockCapella()
+	b128.Block.Slot = 128
+	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b128)
+	r128, err := b128.Block.HashTreeRoot()
 	require.NoError(t, err)
-	b33 := util.NewBeaconBlockCapella()
-	b33.Block.Slot = 33
-	b33.Block.ParentRoot = r32[:]
-	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b33)
-	r33, err := b33.Block.HashTreeRoot()
+	b129 := util.NewBeaconBlockCapella()
+	b129.Block.Slot = 129
+	b129.Block.ParentRoot = r128[:]
+	util.SaveBlock(t, ctx, service.cfg.BeaconDB, b129)
+	r129, err := b129.Block.HashTreeRoot()
 	require.NoError(t, err)
 
 	wanted := "FFG and LMD votes are not consistent"
 	a := util.NewAttestation()
 	a.Data.Target.Epoch = 1
 	a.Data.Target.Root = []byte{'a'}
-	a.Data.BeaconBlockRoot = r33[:]
+	a.Data.BeaconBlockRoot = r129[:]
 	require.ErrorContains(t, wanted, service.VerifyLmdFfgConsistency(context.Background(), a))
 }
 
