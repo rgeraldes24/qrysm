@@ -76,7 +76,7 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 	assert.ErrorContains(t, aggregation.ErrBitsOverlap.Error(), err)
 }
 
-func TestVerifyAttestationNoVerifySignature_IncorrectSlotTargetEpoch(t *testing.T) {
+func TestVerifyAttestationNoVerifySignatures_IncorrectSlotTargetEpoch(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisStateCapella(t, 1)
 
 	att := util.HydrateAttestation(&zondpb.Attestation{
@@ -115,7 +115,7 @@ func TestProcessAttestationsNoVerify_OlderThanSlotsPerEpoch(t *testing.T) {
 	})
 }
 
-func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
+func TestVerifyAttestationNoVerifySignatures_OK(t *testing.T) {
 	// Attestation with an empty signature
 
 	beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
@@ -145,7 +145,7 @@ func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestVerifyAttestationNoVerifySignature_BadAttIdx(t *testing.T) {
+func TestVerifyAttestationNoVerifySignatures_BadAttIdx(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
 	aggBits := bitfield.NewBitlist(3)
 	aggBits.SetBitAt(1, true)
