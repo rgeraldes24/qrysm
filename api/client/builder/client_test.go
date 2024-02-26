@@ -397,7 +397,7 @@ func testSignedBlindedBeaconBlockCapella(t *testing.T) *zond.SignedBlindedBeacon
 					},
 				},
 				SyncAggregate: &zond.SyncAggregate{
-					SyncCommitteeSignatures: [][]byte{},
+					SyncCommitteeSignatures: [][]byte{make([]byte, 48)},
 					SyncCommitteeBits:       bitfield.Bitvector16{0x01},
 				},
 				ExecutionPayloadHeader: &v1.ExecutionPayloadHeaderCapella{
