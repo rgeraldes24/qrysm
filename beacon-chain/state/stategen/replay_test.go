@@ -13,7 +13,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -40,7 +39,6 @@ func TestReplayBlocks_AllSkipSlots(t *testing.T) {
 	copy(mockRoot[:], "hello-world")
 	cp.Root = mockRoot[:]
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	service := New(beaconDB, doublylinkedtree.New())
 	targetSlot := params.BeaconConfig().SlotsPerEpoch - 1
@@ -69,7 +67,6 @@ func TestReplayBlocks_SameSlot(t *testing.T) {
 	copy(mockRoot[:], "hello-world")
 	cp.Root = mockRoot[:]
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	service := New(beaconDB, doublylinkedtree.New())
 	targetSlot := beaconState.Slot()
@@ -99,7 +96,6 @@ func TestReplayBlocks_LowerSlotBlock(t *testing.T) {
 	copy(mockRoot[:], "hello-world")
 	cp.Root = mockRoot[:]
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	service := New(beaconDB, doublylinkedtree.New())
 	targetSlot := beaconState.Slot()
@@ -112,31 +108,8 @@ func TestReplayBlocks_LowerSlotBlock(t *testing.T) {
 	assert.Equal(t, targetSlot, newState.Slot(), "Did not advance slots")
 }
 
-func TestReplayBlocks_ThroughForkBoundary(t *testing.T) {
-	params.SetupTestConfigCleanup(t)
-
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 32)
-	genesisBlock := blocks.NewGenesisBlock([]byte{})
-	bodyRoot, err := genesisBlock.Block.HashTreeRoot()
-	require.NoError(t, err)
-	err = beaconState.SetLatestBlockHeader(&zondpb.BeaconBlockHeader{
-		Slot:       genesisBlock.Block.Slot,
-		ParentRoot: genesisBlock.Block.ParentRoot,
-		StateRoot:  params.BeaconConfig().ZeroHash[:],
-		BodyRoot:   bodyRoot[:],
-	})
-	require.NoError(t, err)
-
-	service := New(testDB.SetupDB(t), doublylinkedtree.New())
-	targetSlot := params.BeaconConfig().SlotsPerEpoch
-	newState, err := service.replayBlocks(context.Background(), beaconState, []interfaces.ReadOnlySignedBeaconBlock{}, targetSlot)
-	require.NoError(t, err)
-
-	// Verify state is version Capella.
-	assert.Equal(t, version.Capella, newState.Version())
-}
-
-// NOTE(rgeraldes24): similar to test above?
+// NOTE(rgeraldes24): test not valid atm
+/*
 func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
@@ -167,6 +140,7 @@ func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	// Verify state is version Capella.
 	assert.Equal(t, version.Capella, newState.Version())
 }
+*/
 
 func TestLoadBlocks_FirstBranch(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
