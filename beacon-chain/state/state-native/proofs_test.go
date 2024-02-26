@@ -17,14 +17,6 @@ func TestBeaconStateMerkleProofs_capella(t *testing.T) {
 	require.NoError(t, err)
 	htr, err := capella.HashTreeRoot(ctx)
 	require.NoError(t, err)
-	// NOTE(rgeraldes24): bellatrix results; double check
-	// results := []string{
-	// 	"0x173669ae8794c057def63b20372114a628abb029354a2ef50d7a1aaa9a3dab4a",
-	// 	"0xe8facaa9be1c488207092f135ca6159f7998f313459b4198f46a9433f8b346e6",
-	// 	"0x0a7910590f2a08faa740a5c40e919722b80a786d18d146318309926a6b2ab95e",
-	// 	"0xa83dc5a6222b6e5d5f11115ec4ba4035512c060e74908c56ebc25ad74dd25c18",
-	// 	"0x4616e1d9312a92eb228e8cd5483fa1fca64d99781d62129bc53718d194b98c45",
-	// }
 	results := []string{
 		"0x6cf04127db05441cd833107a52be852868890e4317e6a02ab47683aa75964220",
 		"0xe8facaa9be1c488207092f135ca6159f7998f313459b4198f46a9433f8b346e6",
