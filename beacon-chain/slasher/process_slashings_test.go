@@ -73,7 +73,7 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		// Use valid signature for the first att, but bad one for the second.
 		signature := privKey.Sign(signingRoot[:])
 		firstAtt.Signatures = [][]byte{signature.Marshal()}
-		secondAtt.Signatures = [][]byte{}
+		secondAtt.Signatures = [][]byte{make([]byte, 4595)}
 
 		slashings := []*zondpb.AttesterSlashing{
 			{
@@ -91,7 +91,7 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		hook := logTest.NewGlobal()
 		// Use invalid signature for the first att, but valid for the second.
 		signature := privKey.Sign(signingRoot[:])
-		firstAtt.Signatures = [][]byte{}
+		firstAtt.Signatures = [][]byte{make([]byte, 4595)}
 		secondAtt.Signatures = [][]byte{signature.Marshal()}
 
 		slashings := []*zondpb.AttesterSlashing{
