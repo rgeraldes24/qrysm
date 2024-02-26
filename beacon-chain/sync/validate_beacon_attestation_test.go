@@ -280,7 +280,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 					}
 				}
 			} else {
-				tt.msg.Signatures = [][]byte{}
+				tt.msg.Signatures = [][]byte{make([]byte, 4595)}
 			}
 			buf := new(bytes.Buffer)
 			_, err := p.Encoding().EncodeGossip(buf, tt.msg)
@@ -295,7 +295,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 				m.Message.Topic = nil
 			}
 
-			res, err := s.validateCommitteeIndexBeaconAttestation(ctx, "", m)
+			res, err := s.validateCommitteeIndexBeaconAttestation(ctx, "" /*peerID*/, m)
 			received := res == pubsub.ValidationAccept
 			if received != tt.want {
 				t.Fatalf("Did not received wanted validation. Got %v, wanted %v", !tt.want, tt.want)
