@@ -9,6 +9,7 @@ import (
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/features"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
@@ -615,7 +616,7 @@ func TestStore_CleanUpDirtyStates_DontDeleteNonFinalized(t *testing.T) {
 func validators(limit int) []*zondpb.Validator {
 	var vals []*zondpb.Validator
 	for i := 0; i < limit; i++ {
-		pubKey := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
+		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, rand.Uint64())
 		val := &zondpb.Validator{
 			PublicKey:                  pubKey,

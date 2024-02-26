@@ -233,7 +233,7 @@ func TestServer_ListValidatorBalances_ExceedsMaxPageSize(t *testing.T) {
 }
 
 func pubKey(i uint64) []byte {
-	pubKey := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
+	pubKey := make([]byte, field_params.DilithiumPubkeyLength)
 	binary.LittleEndian.PutUint64(pubKey, i)
 	return pubKey
 }

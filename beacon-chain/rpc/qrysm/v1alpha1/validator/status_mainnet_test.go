@@ -11,6 +11,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -96,7 +97,7 @@ func TestValidatorStatus_Active(t *testing.T) {
 
 // pubKey is a helper to generate a well-formed public key.
 func generatePubkey(i uint64) []byte {
-	pubKey := make([]byte, params.BeaconConfig().DilithiumPubkeyLength)
+	pubKey := make([]byte, field_params.DilithiumPubkeyLength)
 	binary.LittleEndian.PutUint64(pubKey, i)
 	return pubKey
 }

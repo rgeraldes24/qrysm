@@ -7,6 +7,7 @@ import (
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -270,7 +271,7 @@ func genState(t *testing.T, valCount, avgBalance uint64) state.BeaconState {
 	balances := make([]uint64, len(validators))
 	for i := uint64(0); i < valCount; i++ {
 		validators[i] = &zondpb.Validator{
-			PublicKey:             make([]byte, params.BeaconConfig().DilithiumPubkeyLength),
+			PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			EffectiveBalance:      avgBalance * 1e12,
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
