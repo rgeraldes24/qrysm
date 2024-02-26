@@ -125,8 +125,8 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 	}
 
 	syncCommitteeSigs := make([][]byte, len(b.Body.SyncAggregate.SyncCommitteeSignatures))
-	for i := range syncCommitteeSigs {
-		syncCommitteeSig, err := DecodeHexWithLength(b.Body.SyncAggregate.SyncCommitteeSignatures[i], fieldparams.DilithiumSignatureLength)
+	for i, sig := range b.Body.SyncAggregate.SyncCommitteeSignatures {
+		syncCommitteeSig, err := DecodeHexWithLength(sig, fieldparams.DilithiumSignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeSignatures")
 		}
@@ -381,8 +381,8 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 	}
 
 	syncCommitteeSigs := make([][]byte, len(b.Body.SyncAggregate.SyncCommitteeSignatures))
-	for i := range syncCommitteeSigs {
-		syncCommitteeSig, err := DecodeHexWithLength(b.Body.SyncAggregate.SyncCommitteeSignatures[i], fieldparams.DilithiumSignatureLength)
+	for i, sig := range b.Body.SyncAggregate.SyncCommitteeSignatures {
+		syncCommitteeSig, err := DecodeHexWithLength(sig, fieldparams.DilithiumSignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeSignature")
 		}
