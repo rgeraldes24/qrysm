@@ -169,7 +169,7 @@ func BenchmarkBeaconState(b *testing.B) {
 	})
 }
 
-// TODO(rgeraldes24): fix
+// TODO(rgeraldes24): fix unit test
 /*
 func TestBeaconState_HashTreeRoot_FieldTrie(t *testing.T) {
 	testState, _ := util.DeterministicGenesisStateCapella(t, 64)
