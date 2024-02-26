@@ -1019,8 +1019,7 @@ func TestServer_ListValidators_DefaultPageSize(t *testing.T) {
 	assert.DeepEqual(t, want[i:j], res.ValidatorList, "Incorrect respond of validators")
 }
 
-// TODO(rgeraldes24): fix unit test
-// TODO(rgeraldes24): fix -  diff: modified: [0].Validator.EffectiveBalance = 0x2460fe2fb6
+// TODO(rgeraldes24): fix unit test: diff: modified: [0].Validator.EffectiveBalance = 0x2460fe2fb6
 /*
 func TestServer_ListValidators_FromOldEpoch(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
@@ -1357,86 +1356,6 @@ func TestServer_GetValidatorParticipation_CannotRequestFutureEpoch(t *testing.T)
 	assert.ErrorContains(t, wanted, err)
 }
 
-// NOTE(rgeraldes24): this test can be removed since we have the new version with bits bellow
-/*
-func TestServer_GetValidatorParticipation_CurrentAndPrevEpoch(t *testing.T) {
-	helpers.ClearCache()
-	beaconDB := dbTest.SetupDB(t)
-
-	ctx := context.Background()
-	validatorCount := uint64(32)
-
-	validators := make([]*zondpb.Validator, validatorCount)
-	balances := make([]uint64, validatorCount)
-	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
-			PublicKey:             bytesutil.ToBytes(uint64(i), field_params.DilithiumPubkeyLength),
-			WithdrawalCredentials: make([]byte, 32),
-			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
-			EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
-		}
-		balances[i] = params.BeaconConfig().MaxEffectiveBalance
-	}
-
-	// atts := []*zondpb.PendingAttestation{{
-	// 	Data:            util.HydrateAttestationData(&zondpb.AttestationData{}),
-	// 	InclusionDelay:  1,
-	// 	AggregationBits: bitfield.NewBitlist(validatorCount / uint64(params.BeaconConfig().SlotsPerEpoch)),
-	// }}
-	headState, err := util.NewBeaconStateCapella()
-	require.NoError(t, err)
-	require.NoError(t, headState.SetSlot(8))
-	require.NoError(t, headState.SetValidators(validators))
-	require.NoError(t, headState.SetBalances(balances))
-	// require.NoError(t, headState.AppendCurrentEpochAttestations(atts[0]))
-	// require.NoError(t, headState.AppendPreviousEpochAttestations(atts[0]))
-
-	b := util.NewBeaconBlockCapella()
-	b.Block.Slot = 8
-	util.SaveBlock(t, ctx, beaconDB, b)
-	bRoot, err := b.Block.HashTreeRoot()
-	require.NoError(t, beaconDB.SaveStateSummary(ctx, &zondpb.StateSummary{Root: bRoot[:]}))
-	require.NoError(t, beaconDB.SaveStateSummary(ctx, &zondpb.StateSummary{Root: params.BeaconConfig().ZeroHash[:]}))
-	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, bRoot))
-	require.NoError(t, err)
-	require.NoError(t, beaconDB.SaveState(ctx, headState, bRoot))
-	require.NoError(t, beaconDB.SaveState(ctx, headState, params.BeaconConfig().ZeroHash))
-
-	m := &mock.ChainService{State: headState}
-	offset := int64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot))
-	bs := &Server{
-		BeaconDB:    beaconDB,
-		HeadFetcher: m,
-		StateGen:    stategen.New(beaconDB, doublylinkedtree.New()),
-		GenesisTimeFetcher: &mock.ChainService{
-			Genesis: qrysmTime.Now().Add(time.Duration(-1*offset) * time.Second),
-		},
-		CanonicalFetcher: &mock.ChainService{
-			CanonicalRoots: map[[32]byte]bool{
-				bRoot: true,
-			},
-		},
-		FinalizationFetcher: &mock.ChainService{FinalizedCheckPoint: &zondpb.Checkpoint{Epoch: 100}},
-	}
-	addDefaultReplayerBuilder(bs, beaconDB)
-
-	res, err := bs.GetValidatorParticipation(ctx, &zondpb.GetValidatorParticipationRequest{QueryFilter: &zondpb.GetValidatorParticipationRequest_Epoch{Epoch: 1}})
-	require.NoError(t, err)
-
-	wanted := &zondpb.ValidatorParticipation{
-		CurrentEpochActiveGwei:           validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		CurrentEpochAttestingGwei:        params.BeaconConfig().EffectiveBalanceIncrement,
-		CurrentEpochTargetAttestingGwei:  params.BeaconConfig().EffectiveBalanceIncrement,
-		PreviousEpochActiveGwei:          validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		PreviousEpochAttestingGwei:       params.BeaconConfig().EffectiveBalanceIncrement,
-		PreviousEpochTargetAttestingGwei: params.BeaconConfig().EffectiveBalanceIncrement,
-		PreviousEpochHeadAttestingGwei:   params.BeaconConfig().EffectiveBalanceIncrement,
-	}
-	assert.DeepEqual(t, true, res.Finalized, "Incorrect validator participation respond")
-	assert.DeepEqual(t, wanted, res.Participation, "Incorrect validator participation respond")
-}
-*/
-
 func TestServer_GetValidatorParticipation_OrphanedUntilGenesis(t *testing.T) {
 	helpers.ClearCache()
 	params.SetupTestConfigCleanup(t)
@@ -1458,18 +1377,11 @@ func TestServer_GetValidatorParticipation_OrphanedUntilGenesis(t *testing.T) {
 		balances[i] = params.BeaconConfig().MaxEffectiveBalance
 	}
 
-	// atts := []*zondpb.PendingAttestation{{
-	// 	Data:            util.HydrateAttestationData(&zondpb.AttestationData{}),
-	// 	InclusionDelay:  1,
-	// 	AggregationBits: bitfield.NewBitlist((validatorCount / 3) / uint64(params.BeaconConfig().SlotsPerEpoch)),
-	// }}
 	headState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(0))
 	require.NoError(t, headState.SetValidators(validators))
 	require.NoError(t, headState.SetBalances(balances))
-	// require.NoError(t, headState.AppendCurrentEpochAttestations(atts[0]))
-	// require.NoError(t, headState.AppendPreviousEpochAttestations(atts[0]))
 	require.NoError(t, headState.SetInactivityScores(make([]uint64, len(headState.Validators()))))
 
 	b := util.NewBeaconBlockCapella()
@@ -1625,21 +1537,7 @@ func TestGetValidatorPerformance_OK(t *testing.T) {
 	headState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
-	// TODO(rgeraldes24) - remove? I think this logic belongs to < version.Altair
-	/*
-		atts := make([]*zondpb.PendingAttestation, 3)
-		for i := 0; i < len(atts); i++ {
-			atts[i] = &zondpb.PendingAttestation{
-				Data: &zondpb.AttestationData{
-					Target: &zondpb.Checkpoint{Root: make([]byte, 32)},
-					Source: &zondpb.Checkpoint{Root: make([]byte, 32)},
-				},
-				AggregationBits: bitfield.Bitlist{},
-				InclusionDelay:  1,
-			}
-			// require.NoError(t, headState.AppendPreviousEpochAttestations(atts[i]))
-		}
-	*/
+
 	defaultBal := params.BeaconConfig().MaxEffectiveBalance
 	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GweiPerEth
 	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GweiPerEth}
@@ -1764,7 +1662,7 @@ func TestGetValidatorPerformance_Indices(t *testing.T) {
 		BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GweiPerEth},
 		BalancesAfterEpochTransition:  []uint64{vp[1].AfterEpochTransitionBalance, vp[2].AfterEpochTransitionBalance},
 		MissingValidators:             [][]byte{publicKey1[:]},
-		InactivityScores:              []uint64{0, 0}, // TODO (rgeraldes24) workaround for now
+		InactivityScores:              []uint64{0, 0},
 	}
 
 	res, err := bs.GetValidatorPerformance(ctx, &zondpb.ValidatorPerformanceRequest{
@@ -2078,14 +1976,6 @@ func TestServer_GetIndividualVotes_Working(t *testing.T) {
 	require.NoError(t, beaconState.SetBlockRoots(br))
 	att2.Data.Target.Root = rt[:]
 	att2.Data.BeaconBlockRoot = newRt[:]
-	// err = beaconState.AppendPreviousEpochAttestations(&zondpb.PendingAttestation{
-	// 	Data: att1.Data, AggregationBits: bf, InclusionDelay: 1,
-	// })
-	// require.NoError(t, err)
-	// err = beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{
-	// 	Data: att2.Data, AggregationBits: bf, InclusionDelay: 1,
-	// })
-	// require.NoError(t, err)
 
 	b := util.NewBeaconBlockCapella()
 	b.Block.Slot = 0
@@ -2115,8 +2005,6 @@ func TestServer_GetIndividualVotes_Working(t *testing.T) {
 				IsActiveInCurrentEpoch:           true,
 				IsActiveInPreviousEpoch:          true,
 				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
-				// InclusionSlot:                    params.BeaconConfig().FarFutureSlot,
-				// InclusionDistance:                params.BeaconConfig().FarFutureSlot,
 			},
 			{
 				ValidatorIndex:                   1,
@@ -2124,8 +2012,6 @@ func TestServer_GetIndividualVotes_Working(t *testing.T) {
 				IsActiveInCurrentEpoch:           true,
 				IsActiveInPreviousEpoch:          true,
 				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
-				// InclusionSlot:                    params.BeaconConfig().FarFutureSlot,
-				// InclusionDistance:                params.BeaconConfig().FarFutureSlot,
 			},
 		},
 	}
