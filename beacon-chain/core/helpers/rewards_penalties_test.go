@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"fmt"
 	"math"
 	"testing"
 
@@ -212,8 +211,6 @@ func TestIsInInactivityLeak(t *testing.T) {
 		finalizedEpoch = beaconState.FinalizedCheckpointEpoch()
 	}
 	setVal()
-	fmt.Println(prevEpoch)
-	fmt.Println(finalizedEpoch)
 	assert.Equal(t, true, IsInInactivityLeak(prevEpoch, finalizedEpoch), "Wanted inactivity leak true")
 	require.NoError(t, beaconState.SetFinalizedCheckpoint(&zondpb.Checkpoint{Epoch: 4}))
 	setVal()
