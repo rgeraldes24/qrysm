@@ -91,7 +91,6 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*zondpb.Attestation {
 		for i := 0; i < len(b.BitIndices()); i++ {
 			att.Signatures = append(att.Signatures, make([]byte, field_params.DilithiumSignatureLength))
 		}
-
 		atts[i] = att
 	}
 	return atts
@@ -101,12 +100,16 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*zondpb.Attestation {
 func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector16) []*zondpb.SyncCommitteeContribution {
 	c := make([]*zondpb.SyncCommitteeContribution, len(bl))
 	for i, b := range bl {
-		c[i] = &zondpb.SyncCommitteeContribution{
+		ct := &zondpb.SyncCommitteeContribution{
 			Slot:              primitives.Slot(1),
 			SubcommitteeIndex: 2,
 			AggregationBits:   b,
 			Signatures:        [][]byte{},
 		}
+		for i := 0; i < len(b.BitIndices()); i++ {
+			ct.Signatures = append(ct.Signatures, make([]byte, field_params.DilithiumSignatureLength))
+		}
+		c[i] = ct
 	}
 	return c
 }
