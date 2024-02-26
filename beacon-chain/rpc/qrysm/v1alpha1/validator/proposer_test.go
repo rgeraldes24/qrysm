@@ -316,8 +316,6 @@ func TestProposer_ComputeStateRoot_OK(t *testing.T) {
 		StateGen:          stategen.New(db, doublylinkedtree.New()),
 	}
 	req := util.NewBeaconBlockCapella()
-	// TODO(rgeraldes24) - double check
-	//req.Block.ProposerIndex = 84
 	req.Block.ProposerIndex = 18
 	req.Block.ParentRoot = parentRoot[:]
 	req.Block.Slot = 1
