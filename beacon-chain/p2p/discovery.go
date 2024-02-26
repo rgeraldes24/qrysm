@@ -53,27 +53,26 @@ func (s *Service) RefreshENR() {
 	}
 	// Compare current epoch with our fork epochs
 	currEpoch := slots.ToEpoch(slots.CurrentSlot(uint64(s.genesisTime.Unix())))
-	switch {
-	default:
-		// Retrieve sync subnets from application level
-		// cache.
-		bitS := bitfield.Bitvector4{byte(0x00)}
-		committees = cache.SyncSubnetIDs.GetAllSubnets(currEpoch)
-		for _, idx := range committees {
-			bitS.SetBitAt(idx, true)
-		}
-		currentBitS, err := syncBitvector(s.dv5Listener.Self().Record())
-		if err != nil {
-			log.WithError(err).Error("Could not retrieve sync bitfield")
-			return
-		}
-		if bytes.Equal(bitV, currentBitV) && bytes.Equal(bitS, currentBitS) &&
-			s.Metadata().Version() == version.Altair {
-			// return early if bitfields haven't changed
-			return
-		}
-		s.updateSubnetRecordWithMetadataV2(bitV, bitS)
+
+	// Retrieve sync subnets from application level
+	// cache.
+	bitS := bitfield.Bitvector4{byte(0x00)}
+	committees = cache.SyncSubnetIDs.GetAllSubnets(currEpoch)
+	for _, idx := range committees {
+		bitS.SetBitAt(idx, true)
 	}
+	currentBitS, err := syncBitvector(s.dv5Listener.Self().Record())
+	if err != nil {
+		log.WithError(err).Error("Could not retrieve sync bitfield")
+		return
+	}
+	if bytes.Equal(bitV, currentBitV) && bytes.Equal(bitS, currentBitS) &&
+		s.Metadata().Version() == version.Altair {
+		// return early if bitfields haven't changed
+		return
+	}
+	s.updateSubnetRecordWithMetadataV2(bitV, bitS)
+
 	// ping all peers to inform them of new metadata
 	s.pingPeers()
 }
