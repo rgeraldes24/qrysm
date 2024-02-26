@@ -93,6 +93,7 @@ func (s *Server) SubmitAttestations(w http.ResponseWriter, r *http.Request) {
 
 	var validAttestations []*ethpbalpha.Attestation
 	var attFailures []*shared.IndexedVerificationFailure
+outer:
 	for i, sourceAtt := range req.Data {
 		att, err := sourceAtt.ToConsensus()
 		if err != nil {
@@ -109,7 +110,7 @@ func (s *Server) SubmitAttestations(w http.ResponseWriter, r *http.Request) {
 					Index:   i,
 					Message: "Incorrect attestation signature: " + err.Error(),
 				})
-				continue
+				continue outer
 			}
 		}
 
