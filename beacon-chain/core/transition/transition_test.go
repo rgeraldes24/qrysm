@@ -132,12 +132,12 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 			Attestation_1: &zondpb.IndexedAttestation{
 				Data:             util.HydrateAttestationData(&zondpb.AttestationData{}),
 				AttestingIndices: []uint64{0, 1},
-				Signatures:       [][]byte{},
+				Signatures:       [][]byte{make([]byte, 4595), make([]byte, 4595)},
 			},
 			Attestation_2: &zondpb.IndexedAttestation{
 				Data:             util.HydrateAttestationData(&zondpb.AttestationData{}),
 				AttestingIndices: []uint64{0, 1},
-				Signatures:       [][]byte{},
+				Signatures:       [][]byte{make([]byte, 4595), make([]byte, 4595)},
 			},
 		},
 	}
@@ -182,7 +182,6 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 	cp := beaconState.CurrentJustifiedCheckpoint()
 	cp.Root = []byte("hello-world")
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cp))
-	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 	wsb, err := consensusblocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
 	_, err = transition.VerifyOperationLengths(context.Background(), beaconState, wsb)
@@ -306,7 +305,6 @@ func TestProcessSlots_LowerSlotAsParentState(t *testing.T) {
 }
 
 // TODO(rgeraldes24): fix unit test
-// TODO(rgeraldes24): review
 /*
 func TestProcessSlots_ThroughAltairEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()
