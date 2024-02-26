@@ -47,13 +47,13 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 		srv.Stop()
 	})
 	bState, _ := util.DeterministicGenesisStateCapella(t, 10)
-	// pbState, err := state_native.ProtobufBeaconStateCapella(bState.ToProtoUnsafe())
+	pbState, err := state_native.ProtobufBeaconStateCapella(bState.ToProtoUnsafe())
 	require.NoError(t, err)
 	mockTrie, err := trie.NewTrie(0)
 	require.NoError(t, err)
 	err = beaconDB.SaveExecutionChainData(ctx, &zondpb.ETH1ChainData{
-		// BeaconState: pbState, // TODO(rgeraldes24)
-		Trie: mockTrie.ToProto(),
+		BeaconState: pbState,
+		Trie:        mockTrie.ToProto(),
 		CurrentEth1Data: &zondpb.LatestETH1Data{
 			BlockHash: make([]byte, 32),
 		},
