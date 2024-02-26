@@ -99,6 +99,8 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 
 	// Initial values.
 	assert.DeepEqual(t, expected.GenesisForkVersion, actual.GenesisForkVersion, "%s: GenesisForkVersion", name)
+	assert.DeepEqual(t, expected.DilithiumWithdrawalPrefixByte, actual.DilithiumWithdrawalPrefixByte, "%s: DilithiumWithdrawalPrefixByte", name)
+	assert.DeepEqual(t, expected.ZondAddressWithdrawalPrefixByte, actual.ZondAddressWithdrawalPrefixByte, "%s: ZondAddressWithdrawalPrefixByte", name)
 
 	// Time parameters.
 	assert.Equal(t, expected.GenesisDelay, actual.GenesisDelay, "%s: GenesisDelay", name)
