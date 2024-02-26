@@ -120,7 +120,6 @@ type BeaconChainConfig struct {
 
 	// Qrysm constants.
 	GweiPerEth                   uint64                                     // GweiPerEth is the amount of gwei corresponding to 1 eth.
-	DilithiumPubkeyLength        int                                        // DilithiumPubkeyLength defines the expected length of Dilithium public keys in bytes.
 	DefaultBufferSize            int                                        // DefaultBufferSize for channels across the Prysm repository.
 	ValidatorPrivkeyFileName     string                                     // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
 	WithdrawalPrivkeyFileName    string                                     // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
