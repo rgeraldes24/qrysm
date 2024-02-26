@@ -424,8 +424,8 @@ func Test_SyncSubnets(t *testing.T) {
 			want:    []uint64{0},
 			wantErr: false,
 		},
-		// NOTE(rgeraldes24): this tests are no longer valid because of the
-		// params.BeaconConfig().SyncCommitteeSubnetCount new value
+		// NOTE(rgeraldes24): these tests are no longer valid because of the
+		// params.BeaconConfig().SyncCommitteeSubnetCount new value(1)
 		/*
 			{
 				name: "multiple subnets",
