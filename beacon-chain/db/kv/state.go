@@ -292,7 +292,7 @@ func (s *Store) storeValidatorEntriesSeparately(ctx context.Context, tx *bolt.Tx
 
 // HasState checks if a state by root exists in the db.
 func (s *Store) HasState(ctx context.Context, blockRoot [32]byte) bool {
-	ctx, span := trace.StartSpan(ctx, "BeaconDB.HasState")
+	_, span := trace.StartSpan(ctx, "BeaconDB.HasState")
 	defer span.End()
 	hasState := false
 	err := s.db.View(func(tx *bolt.Tx) error {
@@ -519,7 +519,7 @@ func (s *Store) validatorEntries(ctx context.Context, blockRoot [32]byte) ([]*zo
 
 // retrieves and assembles the state information from multiple buckets.
 func (s *Store) stateBytes(ctx context.Context, blockRoot [32]byte) ([]byte, error) {
-	ctx, span := trace.StartSpan(ctx, "BeaconDB.stateBytes")
+	_, span := trace.StartSpan(ctx, "BeaconDB.stateBytes")
 	defer span.End()
 	var dst []byte
 	err := s.db.View(func(tx *bolt.Tx) error {
@@ -570,22 +570,6 @@ func (s *Store) slotByBlockRoot(ctx context.Context, tx *bolt.Tx, blockRoot []by
 			return s.Slot(), nil
 		}
 
-		// TODO(rgeraldes24)
-		/*
-			b := &zondpb.SignedBeaconBlock{}
-			err := decode(ctx, enc, b)
-			if err != nil {
-				return 0, err
-			}
-			wsb, err := blocks.NewSignedBeaconBlock(b)
-			if err != nil {
-				return 0, err
-			}
-			if err := blocks.BeaconBlockIsNil(wsb); err != nil {
-				return 0, err
-			}
-			return b.Block.Slot, nil
-		*/
 		return primitives.Slot(0), nil
 	}
 	stateSummary := &zondpb.StateSummary{}
@@ -647,7 +631,7 @@ func (s *Store) HighestSlotStatesBelow(ctx context.Context, slot primitives.Slot
 // a map of bolt DB index buckets corresponding to each particular key for indices for
 // data, such as (shard indices bucket -> shard 5).
 func createStateIndicesFromStateSlot(ctx context.Context, slot primitives.Slot) map[string][]byte {
-	ctx, span := trace.StartSpan(ctx, "BeaconDB.createStateIndicesFromState")
+	_, span := trace.StartSpan(ctx, "BeaconDB.createStateIndicesFromState")
 	defer span.End()
 	indicesByBucket := make(map[string][]byte)
 	// Every index has a unique bucket for fast, binary-search
