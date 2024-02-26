@@ -75,7 +75,6 @@ func TestInitiateValidatorExit_ProperExit(t *testing.T) {
 	assert.Equal(t, exitedEpoch+2, v.ExitEpoch, "Exit epoch was not the highest")
 }
 
-// NOTE(rgeraldes24): test has been modified to use the new MinPerEpochChurnLimit value(10)
 func TestInitiateValidatorExit_ChurnOverflow(t *testing.T) {
 	exitedEpoch := primitives.Epoch(100)
 	idx := primitives.ValidatorIndex(10)
