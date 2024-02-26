@@ -39,8 +39,6 @@ func TestProcessAggregatedAttestation_OverlappingBits(t *testing.T) {
 	cfc := beaconState.CurrentJustifiedCheckpoint()
 	cfc.Root = bytesutil.PadTo([]byte("hello-world"), 32)
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cfc))
-	// TODO(rgeraldes24)
-	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), beaconState, att1.Data.Slot, att1.Data.CommitteeIndex)
 	require.NoError(t, err)
@@ -112,7 +110,6 @@ func TestProcessAttestationsNoVerify_OlderThanSlotsPerEpoch(t *testing.T) {
 		ckp := beaconState.CurrentJustifiedCheckpoint()
 		copy(ckp.Root, "hello-world")
 		require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(ckp))
-		// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 		require.ErrorContains(t, "state slot 129 > attestation slot 0 + SLOTS_PER_EPOCH 128", blocks.VerifyAttestationNoVerifySignatures(ctx, beaconState, att))
 	})
@@ -143,7 +140,6 @@ func TestVerifyAttestationNoVerifySignature_OK(t *testing.T) {
 	ckp := beaconState.CurrentJustifiedCheckpoint()
 	copy(ckp.Root, "hello-world")
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(ckp))
-	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	err = blocks.VerifyAttestationNoVerifySignatures(context.TODO(), beaconState, att)
 	assert.NoError(t, err)
@@ -169,7 +165,6 @@ func TestVerifyAttestationNoVerifySignature_BadAttIdx(t *testing.T) {
 	ckp := beaconState.CurrentJustifiedCheckpoint()
 	copy(ckp.Root, "hello-world")
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(ckp))
-	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 	err := blocks.VerifyAttestationNoVerifySignatures(context.TODO(), beaconState, att)
 	require.ErrorContains(t, "committee index 100 >= committee count 1", err)
 }
