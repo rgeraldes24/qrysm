@@ -953,6 +953,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 		wantErr bool
 		svSetup func(t *testing.T) (*Server, *zondpb.DoppelGangerRequest, *zondpb.DoppelGangerResponse)
 	}{
+		// TODO(rgeraldes24): fix unit test
 		/*
 			{
 				name:    "normal doppelganger request",
