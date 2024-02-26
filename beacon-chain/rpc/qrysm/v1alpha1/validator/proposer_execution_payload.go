@@ -84,15 +84,7 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 	}
 
 	parentHash, err := vs.getParentBlockHash(ctx, st, slot)
-	switch {
-	// TODO(rgeraldes24)
-	// case errors.Is(err, errActivationNotReached) || errors.Is(err, errNoTerminalBlockHash):
-	// 	p, err := consensusblocks.WrappedExecutionPayload(emptyPayload())
-	// 	if err != nil {
-	// 		return nil, false, err
-	// 	}
-	// 	return p, false, nil
-	case err != nil:
+	if err != nil {
 		return nil, false, err
 	}
 	payloadIDCacheMiss.Inc()
@@ -179,9 +171,6 @@ func (vs *Server) getBuilderPayload(ctx context.Context,
 
 	return vs.getPayloadHeaderFromBuilder(ctx, slot, vIdx)
 }
-
-var errActivationNotReached = errors.New("activation epoch not reached")
-var errNoTerminalBlockHash = errors.New("no terminal block hash")
 
 // getParentBlockHash retrieves the parent block hash of the block at the given slot.
 // The function's behavior varies depending on the state version and whether the merge has been completed.
