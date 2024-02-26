@@ -316,8 +316,8 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	aggBits.SetBitAt(0, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
-			// Slot:            1,
-			Slot:            96, // TODO(rgeraldes24): double check attestation slot 1 not within attestation propagation range of 96 to 128 (current slot) config
+			// Slot:            1, // TODO(rgeraldes24): double check: attestation slot 1 not within attestation propagation range of 96 to 128
+			Slot:            96,
 			BeaconBlockRoot: root[:],
 			Source:          &zondpb.Checkpoint{Epoch: 0, Root: bytesutil.PadTo([]byte("hello-world"), 32)},
 			Target:          &zondpb.Checkpoint{Epoch: 0, Root: root[:]},
