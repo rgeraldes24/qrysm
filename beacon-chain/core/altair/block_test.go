@@ -54,8 +54,6 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 	var reward uint64
 	beaconState, reward, err = altair.ProcessSyncAggregate(context.Background(), beaconState, syncAggregate)
 	require.NoError(t, err)
-	// TODO(rgeraldes24): double check
-	// assert.Equal(t, uint64(72192), reward)
 	assert.Equal(t, uint64(637136), reward)
 
 	// Use a non-sync committee index to compare profitability.
@@ -244,7 +242,7 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 	require.Equal(t, uint64(32000035108), balances[proposerIndex])
 }
 
-func Test_VerifySyncCommitteeSig(t *testing.T) {
+func Test_VerifySyncCommitteeSigs(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
 	committee, err := altair.NextSyncCommittee(context.Background(), beaconState)
