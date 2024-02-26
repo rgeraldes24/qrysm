@@ -15,6 +15,7 @@ import (
 	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -99,8 +100,6 @@ func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 	require.DeepEqual(t, []primitives.CommitteeIndex{0}, res.Indices)
 }
 
-// TODO(rgeraldes24): fix unit test: fix SignaturesAndAggregationBits
-/*
 func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 	st, _ := util.DeterministicGenesisStateCapella(t, 10)
 	syncCommitteePool := synccommittee.NewStore()
@@ -140,11 +139,10 @@ func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 		&zondpb.SyncCommitteeContributionRequest{
 			Slot:      1,
 			PublicKey: val.PublicKey,
-			SubnetId:  1})
+			SubnetId:  0})
 	require.NoError(t, err)
 	assert.DeepEqual(t, sig, contr.Signatures[0])
 }
-*/
 
 func TestSubmitSignedContributionAndProof_OK(t *testing.T) {
 	server := &Server{
