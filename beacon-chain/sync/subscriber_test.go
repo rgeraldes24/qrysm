@@ -713,14 +713,6 @@ func TestIsDigestValid(t *testing.T) {
 	valid, err := isDigestValid(digest, time.Now().Add(-100*time.Second), genRoot)
 	assert.NoError(t, err)
 	assert.Equal(t, true, valid)
-
-	// Compute future fork digest that will be invalid currently.
-	// TODO(rgeraldes24)
-	// digest, err = signing.ComputeForkDigest(params.BeaconConfig().AltairForkVersion, genRoot[:])
-	// assert.NoError(t, err)
-	// valid, err = isDigestValid(digest, time.Now().Add(-100*time.Second), genRoot)
-	// assert.NoError(t, err)
-	// assert.Equal(t, false, valid)
 }
 
 // Create peer and register them to provided topics.
