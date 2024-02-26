@@ -38,10 +38,9 @@ const (
 	RandaoSignature = "randao signature"
 	// SelectionProof represents selection proof
 	SelectionProof = "selection proof"
-	// TODO(rgeraldes24)
 	// AggregatorSignature represents aggregator's signature
 	AggregatorSignature = "aggregator signature"
-	// AttestationSignature represents aggregated attestation signature
+	// AttestationSignature represents attestation signature
 	AttestationSignature = "attestation signature"
 	// DilithiumChangeSignature represents signature to DilithiumToExecutionChange
 	DilithiumChangeSignature = "dilithiumchange signature"
