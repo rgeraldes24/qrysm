@@ -253,7 +253,7 @@ func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
 		},
 		AggregationBits: aggBits,
 	}
-	var zeroSig [96]byte
+	var zeroSig [4595]byte
 	att.Signatures = [][]byte{zeroSig[:]}
 
 	ckp := beaconState.CurrentJustifiedCheckpoint()
@@ -469,9 +469,7 @@ func TestSetParticipationAndRewardProposer(t *testing.T) {
 				headFlagIndex:   false,
 			},
 			wantedParticipation: []byte{3, 3, 3, 3, 0, 0, 0, 0},
-			// TODO(rgeraldes24): double check
-			// wantedBalance:       32000090342,
-			wantedBalance: 40000003185714,
+			wantedBalance:       40000003185714,
 		},
 		{name: "all participated with some flags",
 			indices: []uint64{0, 1, 2, 3, 4, 5, 6, 7}, epochParticipation: []byte{0, 0, 0, 0, 0, 0, 0, 0}, participatedFlags: map[uint8]bool{
@@ -480,9 +478,7 @@ func TestSetParticipationAndRewardProposer(t *testing.T) {
 				headFlagIndex:   false,
 			},
 			wantedParticipation: []byte{1, 1, 1, 1, 1, 1, 1, 1},
-			// wantedBalance:       32000063240,
-			// TODO(rgeraldes24): double check
-			wantedBalance: 40000002230000,
+			wantedBalance:       40000002230000,
 		},
 		{name: "all participated with all flags",
 			indices: []uint64{0, 1, 2, 3, 4, 5, 6, 7}, epochParticipation: []byte{0, 0, 0, 0, 0, 0, 0, 0}, participatedFlags: map[uint8]bool{
@@ -491,9 +487,7 @@ func TestSetParticipationAndRewardProposer(t *testing.T) {
 				headFlagIndex:   true,
 			},
 			wantedParticipation: []byte{7, 7, 7, 7, 7, 7, 7, 7},
-			// wantedBalance:       32000243925,
-			// TODO(rgeraldes24): double check
-			wantedBalance: 40000008601428,
+			wantedBalance:       40000008601428,
 		},
 	}
 	for _, test := range tests {
@@ -612,7 +606,6 @@ func TestRewardProposer(t *testing.T) {
 		rewardNumerator uint64
 		want            uint64
 	}{
-		// TODO(rgeraldes24): double check
 		{rewardNumerator: 1, want: 40000000000000},
 		{rewardNumerator: 10000, want: 40000000000022},
 		{rewardNumerator: 1000000, want: 40000000002254},
