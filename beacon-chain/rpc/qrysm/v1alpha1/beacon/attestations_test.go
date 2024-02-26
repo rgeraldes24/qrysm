@@ -17,6 +17,7 @@ import (
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/v4/cmd"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	consensusblocks "github.com/theQRL/qrysm/v4/consensus-types/blocks"
@@ -116,7 +117,7 @@ func TestServer_ListAttestations_NoPagination(t *testing.T) {
 		blockExample := util.NewBeaconBlockCapella()
 		blockExample.Block.Body.Attestations = []*zondpb.Attestation{
 			{
-				Signatures: [][]byte{},
+				Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength)},
 				Data: &zondpb.AttestationData{
 					Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
 					Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
@@ -706,7 +707,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{1}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
-			Signatures:      [][]byte{bytesutil.PadTo([]byte{1}, fieldparams.DilithiumSignatureLength)},
+			Signatures:      [][]byte{bytesutil.PadTo([]byte{1}, fieldparams.DilithiumSignatureLength), bytesutil.PadTo([]byte{1}, fieldparams.DilithiumSignatureLength)},
 		},
 		{
 			Data: &zondpb.AttestationData{
@@ -716,7 +717,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{2}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
-			Signatures:      [][]byte{bytesutil.PadTo([]byte{2}, fieldparams.DilithiumSignatureLength)},
+			Signatures:      [][]byte{bytesutil.PadTo([]byte{2}, fieldparams.DilithiumSignatureLength), bytesutil.PadTo([]byte{2}, fieldparams.DilithiumSignatureLength)},
 		},
 		{
 			Data: &zondpb.AttestationData{
@@ -726,7 +727,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{3}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
-			Signatures:      [][]byte{bytesutil.PadTo([]byte{3}, fieldparams.DilithiumSignatureLength)},
+			Signatures:      [][]byte{bytesutil.PadTo([]byte{3}, fieldparams.DilithiumSignatureLength), bytesutil.PadTo([]byte{3}, fieldparams.DilithiumSignatureLength)},
 		},
 	}
 	require.NoError(t, bs.AttestationsPool.SaveAggregatedAttestations(atts))
