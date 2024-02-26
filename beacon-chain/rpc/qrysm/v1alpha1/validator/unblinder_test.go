@@ -27,7 +27,6 @@ func Test_unblindBuilderBlock(t *testing.T) {
 		err         string
 		returnedBlk interfaces.SignedBeaconBlock
 	}{
-		// TODO(rgeraldes24) - old version not valid anymore?
 		{
 			name: "old block version",
 			blk: func() interfaces.SignedBeaconBlock {
