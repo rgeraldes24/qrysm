@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	types "github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -397,7 +398,7 @@ func testSignedBlindedBeaconBlockCapella(t *testing.T) *zond.SignedBlindedBeacon
 					},
 				},
 				SyncAggregate: &zond.SyncAggregate{
-					SyncCommitteeSignatures: [][]byte{make([]byte, 48)},
+					SyncCommitteeSignatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength)},
 					SyncCommitteeBits:       bitfield.Bitvector16{0x01},
 				},
 				ExecutionPayloadHeader: &v1.ExecutionPayloadHeaderCapella{
