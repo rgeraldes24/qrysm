@@ -24,6 +24,7 @@ import (
 	"github.com/theQRL/qrysm/v4/crypto/rand"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	qrysmTime "github.com/theQRL/qrysm/v4/time"
 	"github.com/theQRL/qrysm/v4/time/slots"
 	"golang.org/x/exp/slices"
@@ -269,15 +270,11 @@ func (s *Service) SignaturesAndAggregationBits(
 				subnetIndex := i / subCommitteeSize
 				indexMod := i % subCommitteeSize
 				if subnetIndex == req.SubnetId && !bits.BitAt(indexMod) {
-					// TODO(rgeraldes24): double check if there is other way to approach this from the source
-					// Added nogo exception for now
-					// insertIdx, err := attestation.SearchInsertIdxWithOffset(bits.BitIndices(), 0, int(indexMod))
-					// if err != nil {
-					// 	return nil, nil, errors.Wrapf(err, "could not get signature insert index")
-					// }
-					insertIdx := 0
-
 					bits.SetBitAt(indexMod, true)
+					insertIdx, err := attestation.SearchInsertIdxWithOffset(bits.BitIndices(), 0, int(indexMod))
+					if err != nil {
+						return nil, nil, errors.Wrapf(err, "could not get signature insert index")
+					}
 					sigs = slices.Insert(sigs, insertIdx, msg.Signature)
 				}
 			}
