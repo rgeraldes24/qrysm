@@ -238,7 +238,7 @@ func generateAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilit
 	}
 
 	sigs := make([][]byte, len(attestingIndices))
-	var zeroSig [96]byte
+	var zeroSig [4595]byte
 	att.Signatures = [][]byte{zeroSig[:]}
 
 	for i, indice := range attestingIndices {
@@ -277,7 +277,7 @@ func generateUnaggregatedAtt(state state.ReadOnlyBeaconState, index uint64, priv
 	}
 
 	sigs := make([][]byte, len(attestingIndices))
-	var zeroSig [96]byte
+	var zeroSig [4595]byte
 	att.Signatures = [][]byte{zeroSig[:]}
 
 	for i, indice := range attestingIndices {
