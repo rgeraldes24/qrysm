@@ -13,7 +13,6 @@ go_library(
         "helpers.go",
         "merge.go",
         "state.go",
-        "sync_aggregate.go",
         "sync_committee.go",
         "wait_timeout.go",
     ],
