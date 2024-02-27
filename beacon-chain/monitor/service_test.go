@@ -124,8 +124,7 @@ func TestTrackedIndex(t *testing.T) {
 	require.Equal(t, s.trackedIndex(primitives.ValidatorIndex(3)), false)
 }
 
-// TODO(rgeraldes24): fix unit test
-// TODO(rgeraldes24): different results if filter test
+// TODO(rgeraldes24): fix unit test: different results when using --test_filter
 /*
 func TestUpdateSyncCommitteeTrackedVals(t *testing.T) {
 	hook := logTest.NewGlobal()
