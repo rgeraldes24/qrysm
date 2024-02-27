@@ -275,8 +275,7 @@ func (s *SyncCommitteeContribution) ToConsensus() (*zond.SyncCommitteeContributi
 	for i, hexSig := range s.Signatures {
 		sig, err := hexutil.Decode(hexSig)
 		if err != nil {
-			// TODO(rgeraldes24)
-			return nil, NewDecodeError(err, "Signatures")
+			return nil, NewDecodeError(err, fmt.Sprintf("Signatures[%d]", i))
 		}
 		sigs[i] = sig
 	}
@@ -340,8 +339,7 @@ func (a *Attestation) ToConsensus() (*zond.Attestation, error) {
 	for i, hexSig := range a.Signatures {
 		sig, err := hexutil.Decode(hexSig)
 		if err != nil {
-			// TODO(rgeraldes24)
-			return nil, NewDecodeError(err, "Signatures")
+			return nil, NewDecodeError(err, fmt.Sprintf("Signatures[%d]", i))
 		}
 		sigs[i] = sig
 	}
