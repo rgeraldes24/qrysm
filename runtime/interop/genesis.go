@@ -106,11 +106,11 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 	ma := minerAllocation()
 	return &core.Genesis{
 		Config:    cc,
-		Nonce:     0, // overridden for authorized signer votes in clique, so we should leave it empty?
+		Nonce:     0,
 		Timestamp: genesisTime,
 		// NOTE(rgeraldes24): required by the genesis generation on the beacon node side
-		// for the end to end tests
-		ExtraData:  make([]byte, 32),
+		// for the e2e tests
+		ExtraData:  make([]byte, 0),
 		GasLimit:   math.MaxUint64 >> 1, // shift 1 back from the max, just in case
 		Difficulty: common.HexToHash(defaultDifficulty).Big(),
 		Mixhash:    common.HexToHash(defaultMixhash),
