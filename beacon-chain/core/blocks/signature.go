@@ -40,7 +40,6 @@ func signatureBatch(signedData, pub, signature, domain []byte, desc string) (*di
 	}, nil
 }
 
-// TODO(rgeraldes24)
 // verifies the signature from the raw data, public key and domain provided.
 func verifySignature(signedData, pub, signature, domain []byte) error {
 	set, err := signatureBatch(signedData, pub, signature, domain, signing.UnknownSignature)
