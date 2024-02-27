@@ -188,7 +188,7 @@ func TestProcessOperationsNoVerifyAttsSigsCapella_OK(t *testing.T) {
 	require.NoError(t, err)
 }
 
-// TODO(rgeraldes24): fix if necessary
+// TODO(rgeraldes24): fix unit test
 /*
 func TestCalculateStateRootAltair_OK(t *testing.T) {
 	beaconState, block := createFullCapellaBlockWithOperations(t)
@@ -200,7 +200,7 @@ func TestCalculateStateRootAltair_OK(t *testing.T) {
 }
 */
 
-// not valid for now since we dont have different version
+// NOTE(rgeraldes24): not valid for now
 /*
 func TestProcessBlockDifferentVersion(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisStateCapella(t, 64) // Phase 0 state
