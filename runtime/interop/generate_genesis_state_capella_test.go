@@ -49,7 +49,7 @@ func TestGenerateGenesisStateCapella(t *testing.T) {
 	require.NoError(t, err)
 }
 
-// PHASE0 version
+// TODO(rgeraldes24): migrate missing parts to the Capella test
 /*
 func TestGenerateGenesisState(t *testing.T) {
 	numValidators := uint64(64)
