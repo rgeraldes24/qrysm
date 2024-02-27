@@ -2,7 +2,6 @@ package altair
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"runtime"
 
@@ -155,8 +154,7 @@ func VerifySyncCommitteeSigs(s state.BeaconState, syncKeys []dilithium.PublicKey
 			}
 
 			if !sig.Verify(syncKeys[index], r[:]) {
-				return fmt.Errorf("invalid sync committee signature at index %d %s %s",
-					index, hex.EncodeToString(syncKeys[index].Marshal()), hex.EncodeToString(sig.Marshal()))
+				return fmt.Errorf("invalid sync committee signature[%d]", index)
 			}
 
 			return nil
