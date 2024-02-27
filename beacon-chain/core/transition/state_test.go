@@ -30,9 +30,7 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 	assert.Equal(t, uint64(16777216), params.BeaconConfig().HistoricalRootsLimit, "HistoricalRootsLimit should be 16777216 for these tests to pass")
 
 	depositsForChainStart := 100
-	// TODO(rgeraldes24): review
-	assert.Equal(t, primitives.Epoch(1024), params.BeaconConfig().EpochsPerSlashingsVector, "EpochsPerSlashingsVector should be 8192 for these tests to pass")
-	// assert.Equal(t, primitives.Epoch(8192), params.BeaconConfig().EpochsPerSlashingsVector, "EpochsPerSlashingsVector should be 8192 for these tests to pass")
+	assert.Equal(t, primitives.Epoch(1024), params.BeaconConfig().EpochsPerSlashingsVector, "EpochsPerSlashingsVector should be 1024 for these tests to pass")
 
 	genesisTime := uint64(99999)
 	deposits, _, err := util.DeterministicDepositsAndKeys(uint64(depositsForChainStart))
@@ -76,12 +74,6 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 
 	// Recent state checks.
 	assert.DeepEqual(t, make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector), newState.Slashings(), "Slashings was not correctly initialized")
-	// currAtt, err := newState.CurrentEpochAttestations()
-	// require.NoError(t, err)
-	// assert.DeepSSZEqual(t, []*zondpb.PendingAttestation{}, currAtt, "CurrentEpochAttestations was not correctly initialized")
-	// prevAtt, err := newState.CurrentEpochAttestations()
-	// require.NoError(t, err)
-	// assert.DeepSSZEqual(t, []*zondpb.PendingAttestation{}, prevAtt, "PreviousEpochAttestations was not correctly initialized")
 
 	zeroHash := params.BeaconConfig().ZeroHash[:]
 	// History root checks.
