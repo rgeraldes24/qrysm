@@ -176,6 +176,7 @@ func GenerateAttestations(
 				sigs = append(sigs, privs[committee[b]].Sign(dataRoot[:]).Marshal())
 			}
 
+			// NOTE(rgeraldes24): remove?
 			// bls.AggregateSignatures will return nil if sigs is 0.
 			// if len(sigs) == 0 {
 			// 	continue
