@@ -111,7 +111,7 @@ func performBatchAggregation(aggSet *dilithium.SignatureBatch) (*dilithium.Signa
 		return nil, err
 	}
 	duplicatesRemovedCounter.Add(float64(num))
-	// NOTE(rgeraldes24): the original batch aggregation operationAggregateBatch() is
+	// NOTE(rgeraldes24): the original batch aggregation operation(AggregateBatch) is
 	// not of much use to us because we don't have the aggregation operations available
 	// with Dilithium
 	// Aggregate batches in the provided signature batch.
