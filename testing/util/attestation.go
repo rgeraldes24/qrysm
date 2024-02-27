@@ -13,6 +13,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
@@ -37,7 +38,7 @@ func NewAttestation() *zondpb.Attestation {
 				Root: make([]byte, fieldparams.RootLength),
 			},
 		},
-		Signatures: [][]byte{},
+		Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength)},
 	}
 }
 
