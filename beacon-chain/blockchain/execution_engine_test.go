@@ -89,11 +89,11 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
 
-	altairBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
-	altairBlkRoot, err := altairBlk.Block().HashTreeRoot()
+	capellaBlk1 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
+	capellaBlk1Root, err := capellaBlk1.Block().HashTreeRoot()
 	require.NoError(t, err)
-	capellaBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
-	capellaBlkRoot, err := capellaBlk.Block().HashTreeRoot()
+	capellaBlk2 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
+	capellaBlk2Root, err := capellaBlk2.Block().HashTreeRoot()
 	require.NoError(t, err)
 	st, _ := util.DeterministicGenesisStateCapella(t, 10)
 	service.head = &head{
@@ -105,10 +105,10 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 	state, blkRoot, err := prepareForkchoiceState(ctx, 0, [32]byte{}, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
-	state, blkRoot, err = prepareForkchoiceState(ctx, 1, altairBlkRoot, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 1, capellaBlk1Root, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
-	state, blkRoot, err = prepareForkchoiceState(ctx, 2, capellaBlkRoot, altairBlkRoot, params.BeaconConfig().ZeroHash, ojc, ofc)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 2, capellaBlk2Root, capellaBlk1Root, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
 
@@ -122,7 +122,7 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 		errString        string
 	}{
 		{
-			name: "altair block",
+			name: "capella block",
 			blk: func() interfaces.ReadOnlyBeaconBlock {
 				b, err := consensusblocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{Body: &zondpb.BeaconBlockBodyCapella{}})
 				require.NoError(t, err)
@@ -151,7 +151,7 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 			}(),
 		},
 		{
-			name: "happy case: finalized root is altair block",
+			name: "happy case: finalized root is capella block",
 			blk: func() interfaces.ReadOnlyBeaconBlock {
 				b, err := consensusblocks.NewBeaconBlock(&zondpb.BeaconBlockCapella{
 					Body: &zondpb.BeaconBlockBodyCapella{
@@ -161,8 +161,8 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 				require.NoError(t, err)
 				return b
 			}(),
-			finalizedRoot: altairBlkRoot,
-			justifiedRoot: altairBlkRoot,
+			finalizedRoot: capellaBlk1Root,
+			justifiedRoot: capellaBlk1Root,
 		},
 		{
 			name: "happy case: finalized root is bellatrix block",
@@ -175,8 +175,8 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 				require.NoError(t, err)
 				return b
 			}(),
-			finalizedRoot: capellaBlkRoot,
-			justifiedRoot: capellaBlkRoot,
+			finalizedRoot: capellaBlk2Root,
+			justifiedRoot: capellaBlk2Root,
 		},
 		{
 			name: "forkchoice updated with optimistic block",
@@ -190,8 +190,8 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 				return b
 			}(),
 			newForkchoiceErr: execution.ErrAcceptedSyncingPayloadStatus,
-			finalizedRoot:    capellaBlkRoot,
-			justifiedRoot:    capellaBlkRoot,
+			finalizedRoot:    capellaBlk2Root,
+			justifiedRoot:    capellaBlk2Root,
 		},
 		{
 			name: "forkchoice updated with invalid block",
@@ -205,8 +205,8 @@ func Test_NotifyForkchoiceUpdate(t *testing.T) {
 				return b
 			}(),
 			newForkchoiceErr: execution.ErrInvalidPayloadStatus,
-			finalizedRoot:    capellaBlkRoot,
-			justifiedRoot:    capellaBlkRoot,
+			finalizedRoot:    capellaBlk2Root,
+			justifiedRoot:    capellaBlk2Root,
 			headRoot:         [32]byte{'a'},
 			errString:        ErrInvalidPayload.Error(),
 		},
