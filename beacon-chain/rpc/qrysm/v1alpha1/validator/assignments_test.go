@@ -196,9 +196,7 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 		require.NotEqual(t, res.CurrentEpochDuties[i].IsSyncCommittee, res.NextEpochDuties[i].IsSyncCommittee)
 	}
 }
-*/
 
-/*
 func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
@@ -344,11 +342,8 @@ func TestGetDuties_MultipleKeys_OK(t *testing.T) {
 	res, err := vs.GetDuties(context.Background(), req)
 	require.NoError(t, err, "Could not call epoch committee assignment")
 	assert.Equal(t, 2, len(res.CurrentEpochDuties))
-	// TODO(rgeraldes24) double check values
 	assert.Equal(t, primitives.Slot(0), res.CurrentEpochDuties[0].AttesterSlot)
 	assert.Equal(t, primitives.Slot(2), res.CurrentEpochDuties[1].AttesterSlot)
-	// assert.Equal(t, primitives.Slot(4), res.CurrentEpochDuties[0].AttesterSlot)
-	// assert.Equal(t, primitives.Slot(4), res.CurrentEpochDuties[1].AttesterSlot)
 }
 
 func TestGetDuties_SyncNotReady(t *testing.T) {
