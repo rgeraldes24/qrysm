@@ -270,11 +270,11 @@ func (s *Service) SignaturesAndAggregationBits(
 				subnetIndex := i / subCommitteeSize
 				indexMod := i % subCommitteeSize
 				if subnetIndex == req.SubnetId && !bits.BitAt(indexMod) {
-					bits.SetBitAt(indexMod, true)
 					insertIdx, err := attestation.SearchInsertIdxWithOffset(bits.BitIndices(), 0, int(indexMod))
 					if err != nil {
 						return nil, nil, errors.Wrapf(err, "could not get signature insert index")
 					}
+					bits.SetBitAt(indexMod, true)
 					sigs = slices.Insert(sigs, insertIdx, msg.Signature)
 				}
 			}
