@@ -33,11 +33,11 @@ func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	service, tr := minimalTestService(t, WithProposerIdsCache(cache.NewProposerPayloadIDsCache()))
 	ctx, beaconDB, fcs := tr.ctx, tr.db, tr.fcs
 
-	altairBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
-	altairBlkRoot, err := altairBlk.Block().HashTreeRoot()
+	capellaBlk1 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
+	capellaBlk1Root, err := capellaBlk1.Block().HashTreeRoot()
 	require.NoError(t, err)
-	capellaBlk := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
-	capellaBlkRoot, err := capellaBlk.Block().HashTreeRoot()
+	capellaBlk2 := util.SaveBlock(t, ctx, beaconDB, util.NewBeaconBlockCapella())
+	capellaBlk2Root, err := capellaBlk2.Block().HashTreeRoot()
 	require.NoError(t, err)
 
 	st, _ := util.DeterministicGenesisStateCapella(t, 10)
@@ -50,10 +50,10 @@ func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	state, blkRoot, err := prepareForkchoiceState(ctx, 0, [32]byte{}, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
-	state, blkRoot, err = prepareForkchoiceState(ctx, 1, altairBlkRoot, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 1, capellaBlk1Root, [32]byte{}, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
-	state, blkRoot, err = prepareForkchoiceState(ctx, 2, capellaBlkRoot, altairBlkRoot, params.BeaconConfig().ZeroHash, ojc, ofc)
+	state, blkRoot, err = prepareForkchoiceState(ctx, 2, capellaBlk2Root, capellaBlk1Root, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, fcs.InsertNode(ctx, state, blkRoot))
 
@@ -67,8 +67,8 @@ func Test_NotifyForkchoiceUpdate_GetPayloadAttrErrorCanContinue(t *testing.T) {
 	pid := &v1.PayloadIDBytes{1}
 	service.cfg.ExecutionEngineCaller = &mockExecution.EngineClient{PayloadIDBytes: pid}
 	st, _ = util.DeterministicGenesisStateCapella(t, 1)
-	require.NoError(t, beaconDB.SaveState(ctx, st, capellaBlkRoot))
-	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, capellaBlkRoot))
+	require.NoError(t, beaconDB.SaveState(ctx, st, capellaBlk2Root))
+	require.NoError(t, beaconDB.SaveGenesisBlockRoot(ctx, capellaBlk2Root))
 
 	// Intentionally generate a bad state such that `hash_tree_root` fails during `process_slot`
 	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{})
