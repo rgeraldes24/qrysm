@@ -14,8 +14,7 @@ func TestHydrateAttestation(t *testing.T) {
 	a := HydrateAttestation(&zondpb.Attestation{})
 	_, err := a.HashTreeRoot()
 	require.NoError(t, err)
-	// TODO(rgeraldes24)
-	// require.DeepEqual(t, a.Signature, make([]byte, fieldparams.DilithiumSignatureLength))
+	require.DeepEqual(t, a.Signatures[0], make([]byte, fieldparams.DilithiumSignatureLength))
 }
 
 func TestHydrateAttestationData(t *testing.T) {
@@ -31,8 +30,7 @@ func TestHydrateV1Attestation(t *testing.T) {
 	a := HydrateV1Attestation(&v1.Attestation{})
 	_, err := a.HashTreeRoot()
 	require.NoError(t, err)
-	// TODO(rgeraldes24)
-	// require.DeepEqual(t, a.Signature, make([]byte, fieldparams.DilithiumSignatureLength))
+	require.DeepEqual(t, a.Signatures[0], make([]byte, fieldparams.DilithiumSignatureLength))
 }
 
 func TestHydrateV1AttestationData(t *testing.T) {
