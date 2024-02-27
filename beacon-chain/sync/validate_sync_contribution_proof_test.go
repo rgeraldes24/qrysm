@@ -42,7 +42,7 @@ import (
 )
 
 // TODO(rgeraldes24): we need to expand these unit tests to take into account the error message
-// because the some of the validations are being rejected in the wrong stage even thought the
+// because the some of the validations are being rejected in the wrong stage even though the
 // final result is fine(rejection). We might have to set SubcommitteeIndex: 0 because of the new
 // value of the params.BeaconConfig().SyncCommitteeSubnetCount
 func TestService_ValidateSyncContributionAndProof(t *testing.T) {
