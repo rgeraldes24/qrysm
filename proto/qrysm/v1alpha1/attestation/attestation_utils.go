@@ -147,15 +147,15 @@ func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *zondpb.Indexe
 	n := runtime.GOMAXPROCS(0) - 1
 	grp := errgroup.Group{}
 	grp.SetLimit(n)
-	for i, s := range indexedAtt.Signatures {
-		sig, err := dilithium.SignatureFromBytes(s)
-		if err != nil {
-			return errors.Wrap(err, "could not convert bytes to signature")
-		}
-		pubKey := pubKeys[i]
-
+	for i := range indexedAtt.Signatures {
+		index := i
 		grp.Go(func() error {
-			if !sig.Verify(pubKey, messageHash[:]) {
+			sig, err := dilithium.SignatureFromBytes(indexedAtt.Signatures[index])
+			if err != nil {
+				return errors.Wrap(err, "could not convert bytes to signature")
+			}
+
+			if !sig.Verify(pubKeys[index], messageHash[:]) {
 				return signing.ErrSigFailedToVerify
 			}
 
