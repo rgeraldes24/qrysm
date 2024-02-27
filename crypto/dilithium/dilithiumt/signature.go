@@ -56,28 +56,27 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBa
 			lenSigsBatches, lenPubKeysBatches, lenMsgsBatches)
 	}
 
-	n := runtime.GOMAXPROCS(0) - 1
+	maxProcs := runtime.GOMAXPROCS(0) - 1
 	grp := errgroup.Group{}
-	grp.SetLimit(n)
+	grp.SetLimit(maxProcs)
 
 	for i := 0; i < lenMsgsBatches; i++ {
 		if len(sigsBatches[i]) != len(pubKeysBatches[i]) {
 			return false, pkgerrors.Errorf("provided signatures, pubkeys have differing lengths. S: %d, P: %d, Batch: %d",
 				len(sigsBatches[i]), len(pubKeysBatches[i]), i)
 		}
+		index := i
 
-		for j, sig := range sigsBatches[i] {
-			sigCopy := make([]byte, len(sig))
-			copy(sigCopy, sig)
-			ic := i
-			jc := j
+		for j := range sigsBatches[index] {
+			jCopy := j
 
 			grp.Go(func() error {
-				ok, err := VerifySignature(sigCopy, msgs[ic], pubKeysBatches[ic][jc])
+				ok, err := VerifySignature(sigsBatches[index][jCopy], msgs[index], pubKeysBatches[index][jCopy])
 				if err != nil {
 					return err
 				}
 				if !ok {
+					// TODO(rgeraldes24): expand to identify the sig
 					return ErrSignatureVerificationFailed
 				}
 
@@ -87,7 +86,7 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBa
 	}
 
 	if err := grp.Wait(); err != nil {
-		if !pkgerrors.Is(err, ErrSignatureVerificationFailed) {
+		if pkgerrors.Is(err, ErrSignatureVerificationFailed) {
 			return false, nil
 		}
 		return false, err

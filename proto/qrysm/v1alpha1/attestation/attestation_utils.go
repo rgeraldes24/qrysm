@@ -144,9 +144,9 @@ func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *zondpb.Indexe
 		return errors.Wrap(err, "could not get signing root of object")
 	}
 
-	n := runtime.GOMAXPROCS(0) - 1
+	maxProcs := runtime.GOMAXPROCS(0) - 1
 	grp := errgroup.Group{}
-	grp.SetLimit(n)
+	grp.SetLimit(maxProcs)
 	for i := range indexedAtt.Signatures {
 		index := i
 		grp.Go(func() error {

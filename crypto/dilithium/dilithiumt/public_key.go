@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"reflect"
 
-	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
+	"github.com/theQRL/qrysm/v4/cache/nonblocking"
 	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 )
 
 var maxKeys = 2_000_000
-var pubkeyCache = lruwrpr.New(maxKeys)
+var pubkeyCache *nonblocking.LRU[[field_params.DilithiumPubkeyLength]byte, common.PublicKey]
 
 type PublicKey struct {
 	p *[field_params.DilithiumPubkeyLength]uint8

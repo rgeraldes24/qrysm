@@ -141,9 +141,9 @@ func VerifySyncCommitteeSigs(s state.BeaconState, syncKeys []dilithium.PublicKey
 		return err
 	}
 
-	n := runtime.GOMAXPROCS(0) - 1
+	maxProcs := runtime.GOMAXPROCS(0) - 1
 	grp := errgroup.Group{}
-	grp.SetLimit(n)
+	grp.SetLimit(maxProcs)
 
 	for i := range syncSigs {
 		index := i
