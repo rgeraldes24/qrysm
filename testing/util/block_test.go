@@ -9,6 +9,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
+// TODO(rgeraldes24): fix unit tests
 /*
 func TestGenerateFullBlock_PassesStateTransition(t *testing.T) {
 	beaconState, privs := DeterministicGenesisState(t, 128)
