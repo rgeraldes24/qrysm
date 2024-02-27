@@ -84,8 +84,8 @@ func (e *ExecutionBlock) UnmarshalJSON(enc []byte) error {
 		return errors.New("expected `totalDifficulty` field in JSON response")
 	}
 
-	_, ok = decoded["withdrawals"]
-	if !ok {
+	rawWithdrawals, ok := decoded["withdrawals"]
+	if !ok || rawWithdrawals == nil {
 		return errors.New("expected `withdrawals` field in JSON response")
 	}
 	e.Version = version.Capella
