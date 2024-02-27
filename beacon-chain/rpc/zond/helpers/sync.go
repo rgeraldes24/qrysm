@@ -102,7 +102,7 @@ func IsOptimistic(
 				return false, err
 			}
 			return isStateRootOptimistic(ctx, id, optimisticModeFetcher, stateFetcher, chainInfo, database)
-			// TODO(rgeraldes24): review
+			// TODO(rgeraldes24): review 32
 		} else if len(stateId) == 32 {
 			return isStateRootOptimistic(ctx, stateId, optimisticModeFetcher, stateFetcher, chainInfo, database)
 		} else {
