@@ -346,9 +346,7 @@ func TestChurnLimit_OK(t *testing.T) {
 		validatorCount int
 		wantedChurn    uint64
 	}{
-		// {validatorCount: 1000, wantedChurn: 4},
 		{validatorCount: 1000, wantedChurn: 10},
-		// {validatorCount: 100000, wantedChurn: 4},
 		{validatorCount: 100000, wantedChurn: 10},
 		{validatorCount: 1000000, wantedChurn: 15 /* validatorCount/churnLimitQuotient */},
 		{validatorCount: 2000000, wantedChurn: 30 /* validatorCount/churnLimitQuotient */},
