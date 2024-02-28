@@ -48,9 +48,9 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 	deposit := &zondpb.Deposit{
 		Data: &zondpb.Deposit_Data{
-			PublicKey:             bytesutil.PadTo([]byte{1, 2, 3}, 48),
+			PublicKey:             bytesutil.PadTo([]byte{1, 2, 3}, 2592),
 			WithdrawalCredentials: make([]byte, 32),
-			Signature:             make([]byte, 96),
+			Signature:             make([]byte, 4595),
 		},
 	}
 	leaf, err := deposit.Data.HashTreeRoot()
@@ -117,7 +117,7 @@ func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T)
 			PublicKey:             sk.PublicKey().Marshal(),
 			Amount:                1000,
 			WithdrawalCredentials: make([]byte, 32),
-			Signature:             make([]byte, 96),
+			Signature:             make([]byte, 4595),
 		},
 	}
 	sr, err := signing.ComputeSigningRoot(deposit.Data, bytesutil.ToBytes(3, 32))

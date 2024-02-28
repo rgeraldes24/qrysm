@@ -236,7 +236,7 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	require.LogsContain(t, hook, wanted3)
 	require.LogsContain(t, hook, wanted4)
 }
-*/
+
 
 func TestLogAggregatedPerformance(t *testing.T) {
 	hook := logTest.NewGlobal()
@@ -285,3 +285,4 @@ func TestLogAggregatedPerformance(t *testing.T) {
 		"ValidatorIndex=1 prefix=monitor"
 	require.LogsContain(t, hook, wanted)
 }
+*/

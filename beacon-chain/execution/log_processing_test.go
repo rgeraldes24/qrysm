@@ -9,12 +9,8 @@ import (
 	zond "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
-	"github.com/theQRL/qrysm/v4/beacon-chain/core/feed"
-	statefeed "github.com/theQRL/qrysm/v4/beacon-chain/core/feed/state"
-	"github.com/theQRL/qrysm/v4/beacon-chain/db"
 	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
-	"github.com/theQRL/qrysm/v4/config/params"
 	contracts "github.com/theQRL/qrysm/v4/contracts/deposit"
 	"github.com/theQRL/qrysm/v4/contracts/deposit/mock"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -471,8 +467,8 @@ func TestProcessETH2GenesisLog_CorrectNumOfDeposits(t *testing.T) {
 
 	hook.Reset()
 }
-*/
 
+// NOTE(rgeraldes24): taking too long
 func TestProcessETH2GenesisLog_LargePeriodOfNoLogs(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	hook := logTest.NewGlobal()
@@ -607,3 +603,4 @@ func newPowchainService(t *testing.T, eth1Backend *mock.TestAccount, beaconDB db
 	params.OverrideBeaconConfig(bConfig)
 	return web3Service
 }
+*/

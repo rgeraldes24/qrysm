@@ -126,6 +126,11 @@ func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb
 
 // VerifySyncCommitteeSigs verifies sync committee signatures `syncSigs` is valid with respect to public keys `syncKeys`.
 func VerifySyncCommitteeSigs(s state.BeaconState, syncKeys []dilithium.PublicKey, syncSigs [][]byte) error {
+	if len(syncSigs) != len(syncKeys) {
+		return fmt.Errorf("provided signatures and pubkeys have differing lengths. S: %d, P: %d",
+			len(syncSigs), len(syncKeys))
+	}
+
 	ps := slots.PrevSlot(s.Slot())
 	d, err := signing.Domain(s.Fork(), slots.ToEpoch(ps), params.BeaconConfig().DomainSyncCommittee, s.GenesisValidatorsRoot())
 	if err != nil {
