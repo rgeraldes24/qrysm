@@ -2,11 +2,13 @@ package altair_test
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"testing"
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/epoch"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/v4/config/params"
@@ -16,6 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestProcessSyncCommitteeUpdates_CanRotate(t *testing.T) {
@@ -108,8 +111,6 @@ func TestProcessSlashings_NotSlashed(t *testing.T) {
 	assert.Equal(t, wanted, newState.Balances()[0], "Unexpected slashed balance")
 }
 
-// TODO(rgeraldes24): fix unit tests
-/*
 func TestProcessSlashings_SlashedLess(t *testing.T) {
 	tests := []struct {
 		state *zondpb.BeaconStateCapella
@@ -125,7 +126,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 				Balances:  []uint64{params.BeaconConfig().MaxEffectiveBalance, params.BeaconConfig().MaxEffectiveBalance},
 				Slashings: []uint64{0, 1e9},
 			},
-			want: uint64(30000000000),
+			want: uint64(39997000000000),
 		},
 		{
 			state: &zondpb.BeaconStateCapella{
@@ -139,7 +140,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 				Balances:  []uint64{params.BeaconConfig().MaxEffectiveBalance, params.BeaconConfig().MaxEffectiveBalance},
 				Slashings: []uint64{0, 1e9},
 			},
-			want: uint64(31000000000),
+			want: uint64(39999000000000),
 		},
 		{
 			state: &zondpb.BeaconStateCapella{
@@ -153,7 +154,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 				Balances:  []uint64{params.BeaconConfig().MaxEffectiveBalance, params.BeaconConfig().MaxEffectiveBalance},
 				Slashings: []uint64{0, 2 * 1e9},
 			},
-			want: uint64(30000000000),
+			want: uint64(39997000000000),
 		},
 		{
 			state: &zondpb.BeaconStateCapella{
@@ -165,7 +166,7 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 				Balances:  []uint64{params.BeaconConfig().MaxEffectiveBalance - params.BeaconConfig().EffectiveBalanceIncrement, params.BeaconConfig().MaxEffectiveBalance - params.BeaconConfig().EffectiveBalanceIncrement},
 				Slashings: []uint64{0, 1e9},
 			},
-			want: uint64(29000000000),
+			want: uint64(39996000000000),
 		},
 	}
 
@@ -181,7 +182,6 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 		})
 	}
 }
-*/
 
 func TestProcessSlashings_BadValue(t *testing.T) {
 	base := &zondpb.BeaconStateCapella{

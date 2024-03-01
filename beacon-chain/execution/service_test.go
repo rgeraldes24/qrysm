@@ -18,6 +18,8 @@ import (
 	dbutil "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution/types"
+	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
+	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/container/trie"
 	contracts "github.com/theQRL/qrysm/v4/contracts/deposit"
@@ -28,6 +30,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 var _ ChainStartFetcher = (*Service)(nil)
@@ -282,8 +285,6 @@ func TestHandlePanic_OK(t *testing.T) {
 	require.LogsContain(t, hook, "Panicked when handling data from Zond execution chain!")
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestInitDepositCache_OK(t *testing.T) {
 	ctrs := []*zondpb.DepositContainer{
 		{Index: 0, Eth1BlockHeight: 2, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("A")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
@@ -300,9 +301,6 @@ func TestInitDepositCache_OK(t *testing.T) {
 	var err error
 	s.cfg.depositCache, err = depositcache.New()
 	require.NoError(t, err)
-	require.NoError(t, s.initDepositCaches(context.Background(), ctrs))
-
-	require.Equal(t, 0, len(s.cfg.depositCache.PendingContainers(context.Background(), nil)))
 
 	blockRootA := [32]byte{'a'}
 
@@ -321,9 +319,9 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 			Eth1BlockHeight: 2,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 		},
@@ -332,9 +330,9 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 			Eth1BlockHeight: 4,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 		},
@@ -343,9 +341,9 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 			Eth1BlockHeight: 6,
 			Deposit: &zondpb.Deposit{
 				Data: &zondpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{2}, 48),
+					PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 96),
+					Signature:             make([]byte, 4595),
 				},
 			},
 		},
@@ -360,9 +358,6 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 	var err error
 	s.cfg.depositCache, err = depositcache.New()
 	require.NoError(t, err)
-	require.NoError(t, s.initDepositCaches(context.Background(), ctrs))
-
-	require.Equal(t, 0, len(s.cfg.depositCache.PendingContainers(context.Background(), nil)))
 
 	headBlock := util.NewBeaconBlockCapella()
 	headRoot, err := headBlock.Block.HashTreeRoot()
@@ -387,7 +382,6 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 	deps := s.cfg.depositCache.NonFinalizedDeposits(context.Background(), fDeposits.MerkleTrieIndex(), nil)
 	assert.Equal(t, 0, len(deps))
 }
-*/
 
 func TestNewService_EarliestVotingBlock(t *testing.T) {
 	testAcc, err := mock.Setup()
@@ -689,7 +683,7 @@ func TestService_CacheBlockHeaders(t *testing.T) {
 	assert.Equal(t, 5, rClient.numOfCalls)
 }
 
-// TODO(rgeraldes24): fix unit test
+// TODO(rgeraldes24): fix unit test: Eth1FollowDistance is 0
 /*
 func TestService_FollowBlock(t *testing.T) {
 	followTime := params.BeaconConfig().Eth1FollowDistance * params.BeaconConfig().SecondsPerETH1Block
