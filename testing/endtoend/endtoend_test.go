@@ -402,7 +402,7 @@ func (r *testRunner) testDoppelGangerProtection(ctx context.Context) error {
 	valIndex := beaconNodeNum + 1
 
 	// Replicate starting up validator client 0 to test doppleganger protection.
-	valNode := components.NewValidatorNode(r.config, validatorsPerNode, valIndex, validatorsPerNode*0)
+	valNode := components.NewValidatorNode(r.config, validatorsPerNode, valIndex, 0)
 	g.Go(func() error {
 		return valNode.Start(ctx)
 	})
@@ -500,10 +500,9 @@ func (r *testRunner) defaultEndToEndRun() error {
 			return errors.Wrap(err, "beacon chain sync test failed")
 		}
 		// index += 1
-		// TODO(rgeraldes24)
-		// if err := r.testDoppelGangerProtection(ctx); err != nil {
-		// 	return errors.Wrap(err, "doppel ganger protection check failed")
-		// }
+		if err := r.testDoppelGangerProtection(ctx); err != nil {
+			return errors.Wrap(err, "doppel ganger protection check failed")
+		}
 
 	}
 	/*

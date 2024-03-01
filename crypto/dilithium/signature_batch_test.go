@@ -98,7 +98,7 @@ func TestVerifyVerbosely_VerificationThrowsError(t *testing.T) {
 }
 */
 
-// TODO(rgeraldes24): fix unit test
+// TODO(rgeraldes24): fix unit test: RemoveDuplicates not ready yet
 /*
 func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 	var keys []DilithiumKey

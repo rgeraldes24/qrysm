@@ -25,7 +25,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// TODO(rgeraldes24): fix unit tests
+// TODO(rgeraldes24): fix unit tests: committee size is 1 instead of 2
 func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 	ctx := context.Background()
 	p := p2ptest.NewTestP2P(t)

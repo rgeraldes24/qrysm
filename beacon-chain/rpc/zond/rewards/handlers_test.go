@@ -6,11 +6,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
@@ -19,7 +16,6 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
-	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	mockstategen "github.com/theQRL/qrysm/v4/beacon-chain/state/stategen/mock"
 	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
@@ -29,7 +25,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	http2 "github.com/theQRL/qrysm/v4/network/http"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -78,7 +73,7 @@ func TestBlockRewards(t *testing.T) {
 		{
 			AggregationBits: bitfield.Bitlist{0b00000111},
 			Data:            util.HydrateAttestationData(&zond.AttestationData{}),
-			Signatures:      [][]byte{make([]byte, field_params.DilithiumSignatureLength), },
+			Signatures:      [][]byte{make([]byte, field_params.DilithiumSignatureLength)},
 		},
 		{
 			AggregationBits: bitfield.Bitlist{0b00000111},

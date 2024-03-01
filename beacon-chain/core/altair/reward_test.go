@@ -1,15 +1,16 @@
 package altair_test
 
-// TODO(rgeraldes24): fix unit test
-/*
 import (
 	"math"
 	"testing"
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
+	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/testing/require"
+	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
 func Test_BaseReward(t *testing.T) {
@@ -36,21 +37,21 @@ func Test_BaseReward(t *testing.T) {
 			name:      "active balance is 40000eth",
 			valIdx:    0,
 			st:        genState(1),
-			want:      11448672,
+			want:      404760000,
 			errString: "",
 		},
 		{
 			name:      "active balance is 40000eth * target committee size",
 			valIdx:    0,
 			st:        genState(params.BeaconConfig().TargetCommitteeSize),
-			want:      1011904,
+			want:      35760000,
 			errString: "",
 		},
 		{
 			name:      "active balance is 40000eth * max validator per  committee size",
 			valIdx:    0,
 			st:        genState(params.BeaconConfig().MaxValidatorsPerCommittee),
-			want:      252960,
+			want:      8920000,
 			errString: "",
 		},
 	}
@@ -94,35 +95,35 @@ func Test_BaseRewardWithTotalBalance(t *testing.T) {
 			name:          "active balance is 1",
 			valIdx:        0,
 			activeBalance: 1,
-			want:          2048000000000,
+			want:          2560000000000000,
 			errString:     "",
 		},
 		{
 			name:          "active balance is 1eth",
 			valIdx:        0,
 			activeBalance: params.BeaconConfig().EffectiveBalanceIncrement,
-			want:          64765024,
+			want:          80956280000,
 			errString:     "",
 		},
 		{
-			name:          "active balance is 32eth",
+			name:          "active balance is 40000eth",
 			valIdx:        0,
 			activeBalance: params.BeaconConfig().MaxEffectiveBalance,
-			want:          11448672,
+			want:          404760000,
 			errString:     "",
 		},
 		{
-			name:          "active balance is 32eth * 1m validators",
+			name:          "active balance is 40000eth * 1m validators",
 			valIdx:        0,
 			activeBalance: params.BeaconConfig().MaxEffectiveBalance * 1e9,
-			want:          544,
+			want:          920000,
 			errString:     "",
 		},
 		{
 			name:          "active balance is max uint64",
 			valIdx:        0,
 			activeBalance: math.MaxUint64,
-			want:          448,
+			want:          560000,
 			errString:     "",
 		},
 	}
@@ -137,7 +138,6 @@ func Test_BaseRewardWithTotalBalance(t *testing.T) {
 		})
 	}
 }
-
 
 func Test_BaseRewardPerIncrement(t *testing.T) {
 	helpers.ClearCache()
@@ -166,15 +166,15 @@ func Test_BaseRewardPerIncrement(t *testing.T) {
 			errString:     "",
 		},
 		{
-			name:          "active balance is 32eth",
+			name:          "active balance is 40000eth",
 			activeBalance: params.BeaconConfig().MaxEffectiveBalance,
-			want:          357771,
+			want:          10119,
 			errString:     "",
 		},
 		{
-			name:          "active balance is 32eth * 1m validators",
+			name:          "active balance is 40000eth * 1m validators",
 			activeBalance: params.BeaconConfig().MaxEffectiveBalance * 1e9,
-			want:          17,
+			want:          23,
 			errString:     "",
 		},
 		{
@@ -195,4 +195,3 @@ func Test_BaseRewardPerIncrement(t *testing.T) {
 		})
 	}
 }
-*/

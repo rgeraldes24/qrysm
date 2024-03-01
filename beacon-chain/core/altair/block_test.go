@@ -2,6 +2,7 @@ package altair_test
 
 import (
 	"context"
+	"math"
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
@@ -13,6 +14,7 @@ import (
 	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -243,8 +245,6 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 	require.Equal(t, uint64(40000000318568), balances[proposerIndex])
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func Test_VerifySyncCommitteeSigs(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
@@ -273,14 +273,13 @@ func Test_VerifySyncCommitteeSigs(t *testing.T) {
 
 	dilithiumKey, err := dilithium.RandKey()
 	require.NoError(t, err)
-	require.ErrorContains(t, "invalid sync committee signature", altair.VerifySyncCommitteeSigs(beaconState, pks, [][]byte{dilithiumKey.Sign([]byte{'m', 'e', 'o', 'w'}).Marshal()}))
+	require.ErrorContains(t, "provided signatures and pubkeys have differing lengths", altair.VerifySyncCommitteeSigs(beaconState, pks, [][]byte{dilithiumKey.Sign([]byte{'m', 'e', 'o', 'w'}).Marshal()}))
+	// TODO(rgeraldes24): add test for this error invalid sync committee signature[%d]
+	// require.ErrorContains(t, "invalid sync committee signature", altair.VerifySyncCommitteeSigs(beaconState, pks, [][]byte{dilithiumKey.Sign([]byte{'m', 'e', 'o', 'w'}).Marshal()}))
 
 	require.NoError(t, altair.VerifySyncCommitteeSigs(beaconState, pks, sigs))
 }
-*/
 
-// TODO(rgeraldes24): fix unit test
-/*
 func Test_SyncRewards(t *testing.T) {
 	tests := []struct {
 		name                  string
@@ -306,29 +305,29 @@ func Test_SyncRewards(t *testing.T) {
 		{
 			name:                  "active balance is 1eth",
 			activeBalance:         params.BeaconConfig().EffectiveBalanceIncrement,
-			wantProposerReward:    0,
-			wantParticipantReward: 3,
+			wantProposerReward:    4,
+			wantParticipantReward: 30,
 			errString:             "",
 		},
 		{
 			name:                  "active balance is 40000eth",
 			activeBalance:         params.BeaconConfig().MaxEffectiveBalance,
-			wantProposerReward:    3,
-			wantParticipantReward: 21,
+			wantProposerReward:    882,
+			wantParticipantReward: 6176,
 			errString:             "",
 		},
 		{
 			name:                  "active balance is 40000eth * 1m validators",
 			activeBalance:         params.BeaconConfig().MaxEffectiveBalance * 1e9,
-			wantProposerReward:    62780,
-			wantParticipantReward: 439463,
+			wantProposerReward:    373956,
+			wantParticipantReward: 2617698,
 			errString:             "",
 		},
 		{
 			name:                  "active balance is max uint64",
 			activeBalance:         math.MaxUint64,
-			wantProposerReward:    70368,
-			wantParticipantReward: 492581,
+			wantProposerReward:    562949,
+			wantParticipantReward: 3940649,
 			errString:             "",
 		},
 	}
@@ -344,4 +343,3 @@ func Test_SyncRewards(t *testing.T) {
 		})
 	}
 }
-*/

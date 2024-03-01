@@ -10,6 +10,7 @@ import (
 	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -58,7 +59,6 @@ func TestWeakSubjectivity_ComputeWeakSubjectivityPeriod(t *testing.T) {
 type mockWsCheckpoint func() (stateRoot [32]byte, blockRoot [32]byte, e primitives.Epoch)
 
 // TODO(rgeraldes24): fix unit test
-/*
 func TestWeakSubjectivity_IsWithinWeakSubjectivityPeriod(t *testing.T) {
 	tests := []struct {
 		name            string
@@ -156,26 +156,29 @@ func TestWeakSubjectivity_IsWithinWeakSubjectivityPeriod(t *testing.T) {
 			},
 			want: false,
 		},
-		{
-			name:  "within weak subjectivity period",
-			epoch: 299,
-			genWsState: func() state.ReadOnlyBeaconState {
-				beaconState := genState(t, 128, 40)
-				require.NoError(t, beaconState.SetSlot(42*params.BeaconConfig().SlotsPerEpoch))
-				err := beaconState.SetLatestBlockHeader(&zondpb.BeaconBlockHeader{
-					Slot:      42 * params.BeaconConfig().SlotsPerEpoch,
-					StateRoot: bytesutil.PadTo([]byte("stateroot"), 32),
-				})
-				require.NoError(t, err)
-				return beaconState
+		// TODO(rgeraldes24): fix unit test
+		/*
+			{
+				name:  "within weak subjectivity period",
+				epoch: 299,
+				genWsState: func() state.ReadOnlyBeaconState {
+					beaconState := genState(t, 128, 40)
+					require.NoError(t, beaconState.SetSlot(42*params.BeaconConfig().SlotsPerEpoch))
+					err := beaconState.SetLatestBlockHeader(&zondpb.BeaconBlockHeader{
+						Slot:      42 * params.BeaconConfig().SlotsPerEpoch,
+						StateRoot: bytesutil.PadTo([]byte("stateroot"), 32),
+					})
+					require.NoError(t, err)
+					return beaconState
+				},
+				genWsCheckpoint: func() ([32]byte, [32]byte, primitives.Epoch) {
+					var sr [32]byte
+					copy(sr[:], bytesutil.PadTo([]byte("stateroot"), 32))
+					return sr, [32]byte{}, 42
+				},
+				want: true,
 			},
-			genWsCheckpoint: func() ([32]byte, [32]byte, primitives.Epoch) {
-				var sr [32]byte
-				copy(sr[:], bytesutil.PadTo([]byte("stateroot"), 32))
-				return sr, [32]byte{}, 42
-			},
-			want: true,
-		},
+		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -191,7 +194,6 @@ func TestWeakSubjectivity_IsWithinWeakSubjectivityPeriod(t *testing.T) {
 		})
 	}
 }
-*/
 
 func TestWeakSubjectivity_ParseWeakSubjectivityInputString(t *testing.T) {
 	tests := []struct {
