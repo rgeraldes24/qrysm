@@ -19,8 +19,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestService_ReceiveBlock(t *testing.T) {
 	ctx := context.Background()
 
@@ -149,14 +147,13 @@ func TestService_ReceiveBlock(t *testing.T) {
 			if tt.wantedErr != "" {
 				assert.ErrorContains(t, tt.wantedErr, err)
 			} else {
-				wg.Done()
+				require.NoError(t, err)
 				tt.check(t, s)
 			}
 		})
 	}
 	wg.Wait()
 }
-*/
 
 func TestService_ReceiveBlockUpdateHead(t *testing.T) {
 	s, tr := minimalTestService(t,
