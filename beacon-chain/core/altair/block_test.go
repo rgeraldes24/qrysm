@@ -96,8 +96,6 @@ func TestProcessSyncCommittee_PerfectParticipation(t *testing.T) {
 	require.Equal(t, params.BeaconConfig().SyncCommitteeSize+1, increased)
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	require.NoError(t, beaconState.SetSlot(1))
@@ -114,12 +112,16 @@ func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
 	ps := slots.PrevSlot(beaconState.Slot())
 	pbr, err := helpers.BlockRootAtSlot(beaconState, ps)
 	require.NoError(t, err)
-	sigs := make([][]byte, len(indices))
+	sigs := make([][]byte, 0)
 	for i, indice := range indices {
-		b := p2pType.SSZBytes(pbr)
-		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
-		require.NoError(t, err)
-		sigs[i] = sb
+		if syncBits.BitAt(uint64(i)) {
+			b := p2pType.SSZBytes(pbr)
+			// sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
+			// NOTE(rgeraldes24): used incorrect domain to generate invalid signatures
+			sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainDeposit, privKeys[indice])
+			require.NoError(t, err)
+			sigs = append(sigs, sb)
+		}
 	}
 	syncAggregate := &zondpb.SyncAggregate{
 		SyncCommitteeBits:       syncBits,
@@ -129,7 +131,6 @@ func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
 	_, _, err = altair.ProcessSyncAggregate(context.Background(), beaconState, syncAggregate)
 	require.ErrorContains(t, "invalid sync committee signature", err)
 }
-*/
 
 func TestProcessSyncCommittee_MixParticipation_GoodSignature(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
