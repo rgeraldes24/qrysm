@@ -110,7 +110,8 @@ func TestProcessDeposit_InvalidMerkleBranch(t *testing.T) {
 	assert.ErrorContains(t, want, err)
 }
 
-// TODO(rgeraldes24): fix unit test
+// NOTE(rgeraldes24): the following tests are not valid with dilithium because
+// we don't do the point validation that happens with BLS
 /*
 func TestProcessDeposit_InvalidPublicKey(t *testing.T) {
 	hook := logTest.NewGlobal()
