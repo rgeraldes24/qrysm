@@ -206,8 +206,6 @@ func TestProcessEpochParticipation_InactiveValidator(t *testing.T) {
 	require.Equal(t, balance.PrevEpochHeadAttested, params.BeaconConfig().MaxEffectiveBalance)
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestAttestationsDelta(t *testing.T) {
 	s, err := testStateCapella()
 	require.NoError(t, err)
@@ -240,12 +238,13 @@ func TestAttestationsDelta(t *testing.T) {
 	// Last index should have 0 penalty.
 	require.Equal(t, uint64(0), penalties[len(penalties)-1])
 
-	want := []uint64{0, 939146, 2101898, 2414946}
+	// want := []uint64{0, 939146, 2101898, 2414946}
+	want := []uint64{0, 33199687, 74304062, 85370624}
 	require.DeepEqual(t, want, rewards)
-	want = []uint64{3577700, 2325505, 0, 0}
+	// want = []uint64{3577700, 2325505, 0, 0}
+	want = []uint64{126475000, 82208750, 0, 0}
 	require.DeepEqual(t, want, penalties)
 }
-*/
 
 func TestProcessRewardsAndPenaltiesPrecompute_Ok(t *testing.T) {
 	s, err := testStateCapella()

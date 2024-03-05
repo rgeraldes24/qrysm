@@ -73,8 +73,6 @@ func fieldConverters(field types.FieldIndex, indices []uint64, elements interfac
 		return convertEth1DataVotes(indices, elements, convertAll)
 	case types.Validators:
 		return convertValidators(indices, elements, convertAll)
-	case types.PreviousEpochAttestations, types.CurrentEpochAttestations:
-		return convertAttestations(indices, elements, convertAll)
 	case types.Balances:
 		return convertBalances(indices, elements, convertAll)
 	default:

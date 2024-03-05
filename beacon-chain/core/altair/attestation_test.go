@@ -9,6 +9,7 @@ import (
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/v4/beacon-chain/state/state-native"
@@ -18,6 +19,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/math"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
@@ -159,10 +161,8 @@ func TestProcessAttestations_PrevEpochFFGDataMismatches(t *testing.T) {
 	require.ErrorContains(t, want, err)
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestProcessAttestations_InvalidAggregationBitsLength(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 256)
 
 	aggBits := bitfield.NewBitlist(4)
 	att := &zondpb.Attestation{
@@ -186,7 +186,7 @@ func TestProcessAttestations_InvalidAggregationBitsLength(t *testing.T) {
 	cfc.Root = []byte("hello-world")
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(cfc))
 
-	expected := "failed to verify aggregation bitfield: wanted participants bitfield length 3, got: 4"
+	expected := "failed to verify aggregation bitfield: wanted participants bitfield length 2, got: 4"
 	wsb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
 	_, err = altair.ProcessAttestationsNoVerifySignature(context.Background(), beaconState, wsb)
@@ -194,9 +194,9 @@ func TestProcessAttestations_InvalidAggregationBitsLength(t *testing.T) {
 }
 
 func TestProcessAttestations_OK(t *testing.T) {
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 256)
 
-	aggBits := bitfield.NewBitlist(3)
+	aggBits := bitfield.NewBitlist(2)
 	aggBits.SetBitAt(0, true)
 	var mockRoot [32]byte
 	copy(mockRoot[:], "hello-world")
@@ -236,7 +236,7 @@ func TestProcessAttestations_OK(t *testing.T) {
 }
 
 func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 64)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 256)
 	err := beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
 	require.NoError(t, err)
 
@@ -254,7 +254,7 @@ func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
 		AggregationBits: aggBits,
 	}
 	var zeroSig [4595]byte
-	att.Signatures = [][]byte{zeroSig[:]}
+	att.Signatures = [][]byte{zeroSig[:], zeroSig[:]}
 
 	ckp := beaconState.CurrentJustifiedCheckpoint()
 	copy(ckp.Root, make([]byte, fieldparams.RootLength))
@@ -284,7 +284,6 @@ func TestProcessAttestationNoVerify_SourceTargetHead(t *testing.T) {
 		require.Equal(t, true, has)
 	}
 }
-*/
 
 func TestValidatorFlag_Has(t *testing.T) {
 	tests := []struct {

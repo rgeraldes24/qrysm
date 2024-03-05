@@ -5,7 +5,9 @@ import (
 	"testing"
 	"time"
 
+	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
@@ -82,15 +84,13 @@ func TestVerifyLMDFFGConsistent_OK(t *testing.T) {
 	require.NoError(t, err, "Could not verify LMD and FFG votes to be consistent")
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestProcessAttestations_Ok(t *testing.T) {
 	service, tr := minimalTestService(t)
 	hook := logTest.NewGlobal()
 	ctx := tr.ctx
 
 	service.genesisTime = qrysmTime.Now().Add(-1 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
-	genesisState, pks := util.DeterministicGenesisStateCapella(t, 64)
+	genesisState, pks := util.DeterministicGenesisStateCapella(t, 256)
 	require.NoError(t, genesisState.SetGenesisTime(uint64(qrysmTime.Now().Unix())-params.BeaconConfig().SecondsPerSlot))
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
 	atts, err := util.GenerateAttestations(genesisState, pks, 1, 0, false)
@@ -110,7 +110,6 @@ func TestProcessAttestations_Ok(t *testing.T) {
 	require.Equal(t, 0, len(service.cfg.AttPool.ForkchoiceAttestations()))
 	require.LogsDoNotContain(t, hook, "Could not process attestation for fork choice")
 }
-*/
 
 func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	service, tr := minimalTestService(t)

@@ -184,6 +184,7 @@ func (s *Server) SyncCommitteeRewards(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
+
 	preProcessBals := make([]uint64, len(vals))
 	for i, valIdx := range valIndices {
 		preProcessBals[i], err = st.BalanceAtIndex(valIdx)

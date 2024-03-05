@@ -20,7 +20,7 @@ import (
 )
 
 // ProcessAttestationsNoVerifySignature applies processing operations to a block's inner attestation
-// records. The only difference would be that the attestation signature would not be verified.
+// records. The only difference would be that the attestation signatures would not be verified.
 func ProcessAttestationsNoVerifySignature(
 	ctx context.Context,
 	beaconState state.BeaconState,

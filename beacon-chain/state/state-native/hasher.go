@@ -17,7 +17,7 @@ import (
 
 // ComputeFieldRootsWithHasher hashes the provided state and returns its respective field roots.
 func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]byte, error) {
-	ctx, span := trace.StartSpan(ctx, "ComputeFieldRootsWithHasher")
+	_, span := trace.StartSpan(ctx, "ComputeFieldRootsWithHasher")
 	defer span.End()
 
 	if state == nil {

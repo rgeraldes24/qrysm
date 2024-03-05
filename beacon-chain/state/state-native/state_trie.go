@@ -201,16 +201,14 @@ func (b *BeaconState) Copy() state.BeaconState {
 		nextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 
 		// Large arrays, infrequently changed, constant size.
-		blockRoots:                b.blockRoots,
-		blockRootsMultiValue:      b.blockRootsMultiValue,
-		stateRoots:                b.stateRoots,
-		stateRootsMultiValue:      b.stateRootsMultiValue,
-		randaoMixes:               b.randaoMixes,
-		randaoMixesMultiValue:     b.randaoMixesMultiValue,
-		previousEpochAttestations: b.previousEpochAttestations,
-		currentEpochAttestations:  b.currentEpochAttestations,
-		eth1DataVotes:             b.eth1DataVotes,
-		slashings:                 b.slashings,
+		blockRoots:            b.blockRoots,
+		blockRootsMultiValue:  b.blockRootsMultiValue,
+		stateRoots:            b.stateRoots,
+		stateRootsMultiValue:  b.stateRootsMultiValue,
+		randaoMixes:           b.randaoMixes,
+		randaoMixesMultiValue: b.randaoMixesMultiValue,
+		eth1DataVotes:         b.eth1DataVotes,
+		slashings:             b.slashings,
 
 		// Large arrays, increases over time.
 		balances:                   b.balances,
@@ -399,7 +397,7 @@ func (b *BeaconState) IsNil() bool {
 }
 
 func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) ([32]byte, error) {
-	ctx, span := trace.StartSpan(ctx, "beaconState.rootSelector")
+	_, span := trace.StartSpan(ctx, "beaconState.rootSelector")
 	defer span.End()
 	span.AddAttributes(trace.StringAttribute("field", field.String()))
 
@@ -450,34 +448,6 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 		return b.randaoMixesRootSelector(field)
 	case types.Slashings:
 		return ssz.SlashingsRoot(b.slashings)
-	case types.PreviousEpochAttestations:
-		if b.rebuildTrie[field] {
-			err := b.resetFieldTrie(
-				field,
-				b.previousEpochAttestations,
-				params.BeaconConfig().PreviousEpochAttestationsLength(),
-			)
-			if err != nil {
-				return [32]byte{}, err
-			}
-			delete(b.rebuildTrie, field)
-			return b.stateFieldLeaves[field].TrieRoot()
-		}
-		return b.recomputeFieldTrie(field, b.previousEpochAttestations)
-	case types.CurrentEpochAttestations:
-		if b.rebuildTrie[field] {
-			err := b.resetFieldTrie(
-				field,
-				b.currentEpochAttestations,
-				params.BeaconConfig().CurrentEpochAttestationsLength(),
-			)
-			if err != nil {
-				return [32]byte{}, err
-			}
-			delete(b.rebuildTrie, field)
-			return b.stateFieldLeaves[field].TrieRoot()
-		}
-		return b.recomputeFieldTrie(field, b.currentEpochAttestations)
 	case types.PreviousEpochParticipationBits:
 		return stateutil.ParticipationBitsRoot(b.previousEpochParticipation)
 	case types.CurrentEpochParticipationBits:

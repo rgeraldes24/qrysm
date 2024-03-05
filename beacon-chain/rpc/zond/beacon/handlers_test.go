@@ -19,6 +19,7 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/v4/api"
 	chainMock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
@@ -28,6 +29,7 @@ import (
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
+	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/v4/network/http"
@@ -265,19 +267,17 @@ func TestPublishBlindedBlockV2SSZ(t *testing.T) {
 	})
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestValidateConsensus(t *testing.T) {
 	ctx := context.Background()
 
 	parentState, privs := util.DeterministicGenesisStateCapella(t, params.MinimalSpecConfig().MinGenesisActiveValidatorCount)
-	parentBlock, err := util.GenerateFullBlockCapella(parentState, privs, util.DefaultBlockGenConfig(), parentState.Slot())
+	parentBlock, err := util.GenerateFullBlockCapella(parentState, privs, util.DefaultBlockGenConfig(), parentState.Slot()+1)
 	require.NoError(t, err)
 	parentSbb, err := blocks.NewSignedBeaconBlock(parentBlock)
 	require.NoError(t, err)
 	st, err := transition.ExecuteStateTransition(ctx, parentState, parentSbb)
 	require.NoError(t, err)
-	block, err := util.GenerateFullBlockCapella(st, privs, util.DefaultBlockGenConfig(), st.Slot())
+	block, err := util.GenerateFullBlockCapella(st, privs, util.DefaultBlockGenConfig(), st.Slot()+1)
 	require.NoError(t, err)
 	sbb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -290,7 +290,6 @@ func TestValidateConsensus(t *testing.T) {
 
 	require.NoError(t, server.validateConsensus(ctx, sbb))
 }
-*/
 
 func TestValidateEquivocation(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {

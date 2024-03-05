@@ -58,10 +58,6 @@ func (f FieldIndex) String() string {
 		return "randaoMixes"
 	case Slashings:
 		return "slashings"
-	case PreviousEpochAttestations:
-		return "previousEpochAttestations"
-	case CurrentEpochAttestations:
-		return "currentEpochAttestations"
 	case PreviousEpochParticipationBits:
 		return "previousEpochParticipationBits"
 	case CurrentEpochParticipationBits:
@@ -127,9 +123,9 @@ func (f FieldIndex) RealPosition() int {
 		return 13
 	case Slashings:
 		return 14
-	case PreviousEpochAttestations, PreviousEpochParticipationBits:
+	case PreviousEpochParticipationBits:
 		return 15
-	case CurrentEpochAttestations, CurrentEpochParticipationBits:
+	case CurrentEpochParticipationBits:
 		return 16
 	case JustificationBits:
 		return 17
@@ -191,8 +187,6 @@ const (
 	Balances
 	RandaoMixes
 	Slashings
-	PreviousEpochAttestations
-	CurrentEpochAttestations
 	PreviousEpochParticipationBits
 	CurrentEpochParticipationBits
 	JustificationBits

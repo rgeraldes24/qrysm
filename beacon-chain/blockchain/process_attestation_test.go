@@ -3,6 +3,7 @@ package blockchain
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
@@ -122,14 +123,11 @@ func TestStore_OnAttestation_ErrorConditions(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix unit test: util.GenerateAttestations(genesisState, pks, 1, 0, false)
-// returns 0 attestations
-/*
 func TestStore_OnAttestation_Ok_DoublyLinkedTree(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	genesisState, pks := util.DeterministicGenesisStateCapella(t, 64)
+	genesisState, pks := util.DeterministicGenesisStateCapella(t, 256)
 	service.SetGenesisTime(time.Unix(time.Now().Unix()-int64(params.BeaconConfig().SecondsPerSlot), 0))
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
 	att, err := util.GenerateAttestations(genesisState, pks, 1, 0, false)
@@ -146,7 +144,6 @@ func TestStore_OnAttestation_Ok_DoublyLinkedTree(t *testing.T) {
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, state, blkRoot))
 	require.NoError(t, service.OnAttestation(ctx, att[0], 0))
 }
-*/
 
 func TestStore_SaveCheckpointState(t *testing.T) {
 	service, tr := minimalTestService(t)

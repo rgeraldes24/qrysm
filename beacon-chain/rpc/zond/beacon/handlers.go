@@ -157,8 +157,6 @@ func (s *Server) publishBlockSSZ(ctx context.Context, w http.ResponseWriter, r *
 		s.proposeBlock(ctx, w, genericBlock)
 		return
 	}
-	err = capellaBlock.UnmarshalSSZ(body)
-	fmt.Println(err.Error())
 
 	http2.HandleError(w, "Body does not represent a valid block type", http.StatusBadRequest)
 }

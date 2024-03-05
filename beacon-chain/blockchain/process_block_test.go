@@ -1782,13 +1782,11 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	require.Equal(t, false, optimistic)
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestOnBlock_HandleBlockAttestations(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx
 
-	st, keys := util.DeterministicGenesisStateCapella(t, 64)
+	st, keys := util.DeterministicGenesisStateCapella(t, 256)
 	stateRoot, err := st.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
 
@@ -1848,7 +1846,6 @@ func TestOnBlock_HandleBlockAttestations(t *testing.T) {
 	require.NoError(t, service.handleBlockAttestations(ctx, wsb3.Block(), st3)) // fine to use the same committee as st
 	require.Equal(t, 1, len(service.cfg.AttPool.BlockAttestations()))
 }
-*/
 
 func TestFillMissingBlockPayloadId_DiffSlotExitEarly(t *testing.T) {
 	logHook := logTest.NewGlobal()

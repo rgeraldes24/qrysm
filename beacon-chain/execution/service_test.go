@@ -2,6 +2,7 @@ package execution
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -80,8 +81,6 @@ func (g *goodNotifier) StateFeed() *event.Feed {
 
 var depositsReqForChainStart = 64
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestStart_OK(t *testing.T) {
 	hook := logTest.NewGlobal()
 	beaconDB := dbutil.SetupDB(t)
@@ -115,7 +114,6 @@ func TestStart_OK(t *testing.T) {
 	hook.Reset()
 	web3Service.cancel()
 }
-*/
 
 func TestStart_NoHttpEndpointDefinedFails_WithoutChainStarted(t *testing.T) {
 	hook := logTest.NewGlobal()

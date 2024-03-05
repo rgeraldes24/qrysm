@@ -42,8 +42,6 @@ type BeaconState struct {
 	randaoMixes                         customtypes.RandaoMixes
 	randaoMixesMultiValue               *MultiValueRandaoMixes
 	slashings                           []uint64
-	previousEpochAttestations           []*zondpb.PendingAttestation
-	currentEpochAttestations            []*zondpb.PendingAttestation
 	previousEpochParticipation          []byte
 	currentEpochParticipation           []byte
 	justificationBits                   bitfield.Bitvector4
@@ -87,8 +85,6 @@ type beaconStateMarshalable struct {
 	Balances                            []uint64                                `json:"balances" yaml:"balances"`
 	RandaoMixes                         customtypes.RandaoMixes                 `json:"randao_mixes" yaml:"randao_mixes"`
 	Slashings                           []uint64                                `json:"slashings" yaml:"slashings"`
-	PreviousEpochAttestations           []*zondpb.PendingAttestation            `json:"previous_epoch_attestations" yaml:"previous_epoch_attestations"`
-	CurrentEpochAttestations            []*zondpb.PendingAttestation            `json:"current_epoch_attestations" yaml:"current_epoch_attestations"`
 	PreviousEpochParticipation          []byte                                  `json:"previous_epoch_participation" yaml:"previous_epoch_participation"`
 	CurrentEpochParticipation           []byte                                  `json:"current_epoch_participation" yaml:"current_epoch_participation"`
 	JustificationBits                   bitfield.Bitvector4                     `json:"justification_bits" yaml:"justification_bits"`
@@ -145,8 +141,6 @@ func (b *BeaconState) MarshalJSON() ([]byte, error) {
 		Balances:                            balances,
 		RandaoMixes:                         mixes,
 		Slashings:                           b.slashings,
-		PreviousEpochAttestations:           b.previousEpochAttestations,
-		CurrentEpochAttestations:            b.currentEpochAttestations,
 		PreviousEpochParticipation:          b.previousEpochParticipation,
 		CurrentEpochParticipation:           b.currentEpochParticipation,
 		JustificationBits:                   b.justificationBits,

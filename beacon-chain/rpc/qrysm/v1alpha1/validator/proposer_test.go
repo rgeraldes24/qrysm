@@ -1319,12 +1319,10 @@ func TestProposer_Eth1Data_MajorityVote_SpansGenesis(t *testing.T) {
 	assert.DeepEqual(t, headBlockHash, majorityVoteEth1Data.BlockHash)
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestProposer_Eth1Data_MajorityVote(t *testing.T) {
 	followDistanceSecs := params.BeaconConfig().Eth1FollowDistance * params.BeaconConfig().SecondsPerETH1Block
 	followSlots := followDistanceSecs / params.BeaconConfig().SecondsPerSlot
-	slot := primitives.Slot(64 + followSlots)
+	slot := primitives.Slot(256 + followSlots)
 	earliestValidTime, latestValidTime := majorityVoteBoundaryTime(slot)
 
 	dc := zondpb.DepositContainer{
@@ -1869,7 +1867,6 @@ func TestProposer_Eth1Data_MajorityVote(t *testing.T) {
 		assert.DeepEqual(t, expectedHash, hash)
 	})
 }
-*/
 
 func TestProposer_FilterAttestation(t *testing.T) {
 	genesis := util.NewBeaconBlockCapella()

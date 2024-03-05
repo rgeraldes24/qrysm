@@ -1,7 +1,5 @@
 package blocks_test
 
-// TODO(rgeraldes24): fix unit test
-/*
 import (
 	"context"
 	"testing"
@@ -19,7 +17,7 @@ import (
 func TestVerifyAttestationNoVerifySignature_IncorrectSourceEpoch(t *testing.T) {
 	// Attestation with an empty signature
 
-	beaconState, _ := util.DeterministicGenesisState(t, 100)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
 
 	aggBits := bitfield.NewBitlist(3)
 	aggBits.SetBitAt(1, true)
@@ -33,17 +31,17 @@ func TestVerifyAttestationNoVerifySignature_IncorrectSourceEpoch(t *testing.T) {
 		AggregationBits: aggBits,
 	}
 
-	var zeroSig [96]byte
-	att.Signature = zeroSig[:]
+	var zeroSig [4595]byte
+	att.Signatures = [][]byte{zeroSig[:]}
 
 	err := beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
 	require.NoError(t, err)
 	ckp := beaconState.CurrentJustifiedCheckpoint()
 	copy(ckp.Root, "hello-world")
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(ckp))
-	require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
+	// TODO(rgeraldes24): remove
+	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	err = blocks.VerifyAttestationNoVerifySignatures(context.TODO(), beaconState, att)
 	assert.NotEqual(t, nil, err)
 }
-*/

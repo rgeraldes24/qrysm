@@ -127,10 +127,10 @@ func TestGenesisState_HashEquality(t *testing.T) {
 	require.DeepEqual(t, root1, root2, "Tree hash of two genesis states should be equal, received %#x == %#x", root1, root2)
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestGenesisState_InitializesLatestBlockHashes(t *testing.T) {
-	s, err := transition.GenesisBeaconStateCapella(context.Background(), nil, 0, &zondpb.Eth1Data{}, &enginev1.ExecutionPayloadCapella{})
+	deposits, _, err := util.DeterministicDepositsAndKeys(100)
+	require.NoError(t, err)
+	s, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, &zondpb.Eth1Data{}, &enginev1.ExecutionPayloadCapella{})
 	require.NoError(t, err)
 	got, want := uint64(len(s.BlockRoots())), uint64(params.BeaconConfig().SlotsPerHistoricalRoot)
 	assert.Equal(t, want, got, "Wrong number of recent block hashes")
@@ -147,4 +147,3 @@ func TestGenesisState_FailsWithoutEth1data(t *testing.T) {
 	_, err := transition.GenesisBeaconStateCapella(context.Background(), nil, 0, nil, &enginev1.ExecutionPayloadCapella{})
 	assert.ErrorContains(t, "no eth1data provided for genesis state", err)
 }
-*/
