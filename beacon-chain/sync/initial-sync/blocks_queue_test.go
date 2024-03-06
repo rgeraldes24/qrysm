@@ -1260,8 +1260,6 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 	*/
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -1269,7 +1267,7 @@ func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
 	p2p := p2pt.NewTestP2P(t)
 
-	chain := extendBlockSequence(t, []*zond.SignedBeaconBlock{}, 128)
+	chain := extendBlockSequence(t, []*zond.SignedBeaconBlockCapella{}, 128)
 	finalizedSlot := primitives.Slot(82)
 	finalizedEpoch := slots.ToEpoch(finalizedSlot)
 
@@ -1278,7 +1276,7 @@ func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 	genesisRoot, err := genesisBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	st, err := util.NewBeaconState()
+	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	mc := &mock.ChainService{
 		State: st,
@@ -1306,7 +1304,7 @@ func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 
 	// Set head to slot 85, while we do not have block with slot 84 in DB, so block is orphaned.
 	// Moreover, block with slot 85 is a forked block and should be replaced, with block from peer.
-	orphanedBlock := util.NewBeaconBlock()
+	orphanedBlock := util.NewBeaconBlockCapella()
 	orphanedBlock.Block.Slot = 85
 	orphanedBlock.Block.StateRoot = util.Random32Bytes(t)
 	util.SaveBlock(t, ctx, beaconDB, orphanedBlock)
@@ -1357,6 +1355,7 @@ func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 	case data := <-queue.fetchedData:
 		for _, b := range data.bwb {
 			blk := b.Block
+			blkRoot, err := blk.Block().HashTreeRoot()
 			require.NoError(t, err)
 			if isProcessedBlock(ctx, blk, blkRoot) {
 				log.Errorf("slot: %d , root %#x: %v", blk.Block().Slot(), blkRoot, errBlockAlreadyProcessed)
@@ -1383,4 +1382,3 @@ func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 		require.Equal(t, true, beaconDB.HasBlock(ctx, blkRoot) || mc.HasBlock(ctx, blkRoot), "slot %d", blk.Block.Slot)
 	}
 }
-*/

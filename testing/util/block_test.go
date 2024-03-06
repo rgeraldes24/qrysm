@@ -1,22 +1,26 @@
 package util
 
 import (
+	"context"
 	"testing"
 
 	coreBlock "github.com/theQRL/qrysm/v4/beacon-chain/core/blocks"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition/stateutils"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
+	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
-// TODO(rgeraldes24): fix unit tests
-/*
 func TestGenerateFullBlock_PassesStateTransition(t *testing.T) {
-	beaconState, privs := DeterministicGenesisState(t, 128)
+	beaconState, privs := DeterministicGenesisStateCapella(t, 128)
 	conf := &BlockGenConfig{
 		NumAttestations: 1,
 	}
-	block, err := GenerateFullBlockCapella(beaconState, privs, conf, beaconState.Slot())
+	block, err := GenerateFullBlockCapella(beaconState, privs, conf, beaconState.Slot()+1)
 	require.NoError(t, err)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -27,11 +31,11 @@ func TestGenerateFullBlock_PassesStateTransition(t *testing.T) {
 func TestGenerateFullBlock_ThousandValidators(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MainnetConfig().Copy())
-	beaconState, privs := DeterministicGenesisState(t, 1024)
+	beaconState, privs := DeterministicGenesisStateCapella(t, 1024)
 	conf := &BlockGenConfig{
 		NumAttestations: 4,
 	}
-	block, err := GenerateFullBlockCapella(beaconState, privs, conf, beaconState.Slot())
+	block, err := GenerateFullBlockCapella(beaconState, privs, conf, beaconState.Slot()+1)
 	require.NoError(t, err)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -39,6 +43,8 @@ func TestGenerateFullBlock_ThousandValidators(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// TODO(rgeraldes24): fix unit test
+/*
 func TestGenerateFullBlock_Passes4Epochs(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MainnetConfig().Copy())
@@ -69,11 +75,12 @@ func TestGenerateFullBlock_Passes4Epochs(t *testing.T) {
 		t.Fatalf("expected finalized epoch to change to 2, received %d", beaconState.FinalizedCheckpointEpoch())
 	}
 }
+*/
 
 func TestGenerateFullBlock_ValidProposerSlashings(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MainnetConfig().Copy())
-	beaconState, privs := DeterministicGenesisState(t, 32)
+	beaconState, privs := DeterministicGenesisStateCapella(t, 32)
 	conf := &BlockGenConfig{
 		NumProposerSlashings: 1,
 	}
@@ -94,11 +101,11 @@ func TestGenerateFullBlock_ValidProposerSlashings(t *testing.T) {
 func TestGenerateFullBlock_ValidAttesterSlashings(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MainnetConfig().Copy())
-	beaconState, privs := DeterministicGenesisState(t, 256)
+	beaconState, privs := DeterministicGenesisStateCapella(t, 256)
 	conf := &BlockGenConfig{
 		NumAttesterSlashings: 1,
 	}
-	block, err := GenerateFullBlockCapella(beaconState, privs, conf, beaconState.Slot())
+	block, err := GenerateFullBlockCapella(beaconState, privs, conf, beaconState.Slot()+1)
 	require.NoError(t, err)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -112,11 +119,13 @@ func TestGenerateFullBlock_ValidAttesterSlashings(t *testing.T) {
 	}
 }
 
+// TODO(rgeraldes24): fix unit test
+/*
 func TestGenerateFullBlock_ValidAttestations(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MainnetConfig().Copy())
 
-	beaconState, privs := DeterministicGenesisState(t, 256)
+	beaconState, privs := DeterministicGenesisStateCapella(t, 256)
 	conf := &BlockGenConfig{
 		NumAttestations: 4,
 	}
@@ -132,9 +141,10 @@ func TestGenerateFullBlock_ValidAttestations(t *testing.T) {
 		t.Fatal("expected 4 attestations to be saved to the beacon state")
 	}
 }
+*/
 
 func TestGenerateFullBlock_ValidDeposits(t *testing.T) {
-	beaconState, privs := DeterministicGenesisState(t, 256)
+	beaconState, privs := DeterministicGenesisStateCapella(t, 256)
 	deposits, _, err := DeterministicDepositsAndKeys(257)
 	require.NoError(t, err)
 	eth1Data, err := DeterministicEth1Data(len(deposits))
@@ -143,7 +153,7 @@ func TestGenerateFullBlock_ValidDeposits(t *testing.T) {
 	conf := &BlockGenConfig{
 		NumDeposits: 1,
 	}
-	block, err := GenerateFullBlock(beaconState, privs, conf, beaconState.Slot())
+	block, err := GenerateFullBlockCapella(beaconState, privs, conf, beaconState.Slot()+1)
 	require.NoError(t, err)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -164,14 +174,14 @@ func TestGenerateFullBlock_ValidDeposits(t *testing.T) {
 }
 
 func TestGenerateFullBlock_ValidVoluntaryExits(t *testing.T) {
-	beaconState, privs := DeterministicGenesisState(t, 256)
+	beaconState, privs := DeterministicGenesisStateCapella(t, 256)
 	// Moving the state 2048 epochs forward due to PERSISTENT_COMMITTEE_PERIOD.
 	err := beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod)).Add(3))
 	require.NoError(t, err)
 	conf := &BlockGenConfig{
 		NumVoluntaryExits: 1,
 	}
-	block, err := GenerateFullBlock(beaconState, privs, conf, beaconState.Slot())
+	block, err := GenerateFullBlockCapella(beaconState, privs, conf, beaconState.Slot()+1)
 	require.NoError(t, err)
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -186,7 +196,6 @@ func TestGenerateFullBlock_ValidVoluntaryExits(t *testing.T) {
 		t.Fatal("expected exiting validator index to be marked as exiting")
 	}
 }
-*/
 
 func TestHydrateSignedBeaconBlockCapella_NoError(t *testing.T) {
 	b := &zondpbalpha.SignedBeaconBlockCapella{}

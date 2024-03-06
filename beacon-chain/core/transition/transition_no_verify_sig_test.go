@@ -200,7 +200,7 @@ func TestCalculateStateRootAltair_OK(t *testing.T) {
 }
 */
 
-// NOTE(rgeraldes24): not valid for now
+// NOTE(rgeraldes24): test not valid atm
 /*
 func TestProcessBlockDifferentVersion(t *testing.T) {
 	beaconState, _ := util.DeterministicGenesisStateCapella(t, 64) // Phase 0 state

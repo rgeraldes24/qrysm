@@ -147,7 +147,7 @@ func TestStateReferenceCopy_NoUnexpectedRandaoMutation_Capella(t *testing.T) {
 	assertRefCount(t, b, types.RandaoMixes, 1)
 }
 
-// TODO(rgeraldes24): fix unit test: some funcs have been deprecated
+// TODO(rgeraldes24): these state funcs have been deprecated: replace with participation fields?
 /*
 func TestStateReferenceCopy_NoUnexpectedAttestationsMutation(t *testing.T) {
 	assertAttFound := func(vals []*zondpb.PendingAttestation, val uint64) {

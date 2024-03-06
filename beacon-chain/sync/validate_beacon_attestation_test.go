@@ -20,12 +20,12 @@ import (
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// TODO(rgeraldes24): fix unit tests: committee size is 1 instead of 2
 func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 	ctx := context.Background()
 	p := p2ptest.NewTestP2P(t)
@@ -74,7 +74,7 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		Epoch: 0,
 	}
 
-	validators := uint64(64)
+	validators := uint64(256)
 	savedState, keys := util.DeterministicGenesisStateCapella(t, validators)
 	require.NoError(t, savedState.SetSlot(1))
 	require.NoError(t, db.SaveState(context.Background(), savedState, validBlockRoot))
@@ -87,27 +87,25 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 		validAttestationSignature bool
 		want                      bool
 	}{
-		/*
-			{
-				name: "valid attestation signature",
-				msg: &zondpb.Attestation{
-					AggregationBits: bitfield.Bitlist{0b101},
-					Data: &zondpb.AttestationData{
-						BeaconBlockRoot: validBlockRoot[:],
-						CommitteeIndex:  0,
-						Slot:            1,
-						Target: &zondpb.Checkpoint{
-							Epoch: 0,
-							Root:  validBlockRoot[:],
-						},
-						Source: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+		{
+			name: "valid attestation signature",
+			msg: &zondpb.Attestation{
+				AggregationBits: bitfield.Bitlist{0b101},
+				Data: &zondpb.AttestationData{
+					BeaconBlockRoot: validBlockRoot[:],
+					CommitteeIndex:  0,
+					Slot:            1,
+					Target: &zondpb.Checkpoint{
+						Epoch: 0,
+						Root:  validBlockRoot[:],
 					},
+					Source: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				},
-				topic:                     fmt.Sprintf("/eth2/%x/beacon_attestation_1", digest),
-				validAttestationSignature: true,
-				want:                      true,
 			},
-		*/
+			topic:                     fmt.Sprintf("/eth2/%x/beacon_attestation_1", digest),
+			validAttestationSignature: true,
+			want:                      true,
+		},
 		{
 			name: "valid attestation signature with nil topic",
 			msg: &zondpb.Attestation{
@@ -210,40 +208,38 @@ func TestService_validateCommitteeIndexBeaconAttestation(t *testing.T) {
 			validAttestationSignature: true,
 			want:                      false,
 		},
-		/*
-			{
-				name: "already aggregated",
-				msg: &zondpb.Attestation{
-					AggregationBits: bitfield.Bitlist{0b1011},
-					Data: &zondpb.AttestationData{
-						BeaconBlockRoot: validBlockRoot[:],
-						CommitteeIndex:  1,
-						Slot:            1,
-						Target:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-						Source:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-					},
+		{
+			name: "already aggregated",
+			msg: &zondpb.Attestation{
+				AggregationBits: bitfield.Bitlist{0b1011},
+				Data: &zondpb.AttestationData{
+					BeaconBlockRoot: validBlockRoot[:],
+					CommitteeIndex:  1,
+					Slot:            1,
+					Target:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+					Source:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				},
-				topic:                     fmt.Sprintf("/eth2/%x/beacon_attestation_1", digest),
-				validAttestationSignature: true,
-				want:                      false,
 			},
-			{
-				name: "missing block",
-				msg: &zondpb.Attestation{
-					AggregationBits: bitfield.Bitlist{0b101},
-					Data: &zondpb.AttestationData{
-						BeaconBlockRoot: bytesutil.PadTo([]byte("missing"), fieldparams.RootLength),
-						CommitteeIndex:  1,
-						Slot:            1,
-						Target:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-						Source:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-					},
+			topic:                     fmt.Sprintf("/eth2/%x/beacon_attestation_1", digest),
+			validAttestationSignature: true,
+			want:                      false,
+		},
+		{
+			name: "missing block",
+			msg: &zondpb.Attestation{
+				AggregationBits: bitfield.Bitlist{0b101},
+				Data: &zondpb.AttestationData{
+					BeaconBlockRoot: bytesutil.PadTo([]byte("missing"), fieldparams.RootLength),
+					CommitteeIndex:  1,
+					Slot:            1,
+					Target:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+					Source:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 				},
-				topic:                     fmt.Sprintf("/eth2/%x/beacon_attestation_1", digest),
-				validAttestationSignature: true,
-				want:                      false,
 			},
-		*/
+			topic:                     fmt.Sprintf("/eth2/%x/beacon_attestation_1", digest),
+			validAttestationSignature: true,
+			want:                      false,
+		},
 		{
 			name: "invalid attestation",
 			msg: &zondpb.Attestation{
