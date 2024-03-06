@@ -6,9 +6,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
 	dbutil "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
+	contracts "github.com/theQRL/qrysm/v4/contracts/deposit"
 	"github.com/theQRL/qrysm/v4/contracts/deposit/mock"
+	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
@@ -18,22 +23,24 @@ func setDefaultMocks(service *Service) *Service {
 	return service
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestLatestMainchainInfo_OK(t *testing.T) {
 	testAcc, err := mock.Setup()
 	require.NoError(t, err, "Unable to set up simulated backend")
 
 	beaconDB := dbutil.SetupDB(t)
+	depositCache, err := depositcache.New()
+	require.NoError(t, err)
 	server, endpoint, err := mockExecution.SetupRPCServer()
 	require.NoError(t, err)
 	t.Cleanup(func() {
 		server.Stop()
 	})
+
 	web3Service, err := NewService(context.Background(),
 		WithHttpEndpoint(endpoint),
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
+		WithDepositCache(depositCache),
 	)
 	require.NoError(t, err, "Unable to setup web3 ETH1.0 chain service")
 
@@ -65,7 +72,8 @@ func TestLatestMainchainInfo_OK(t *testing.T) {
 	assert.Equal(t, web3Service.latestEth1Data.BlockTime, header.Time)
 }
 
-
+// TODO(rgeraldes24): test fails because Eth1FollowDistance = 0
+/*
 func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
@@ -121,7 +129,7 @@ func TestBlockHashByHeight_ReturnsError_WhenNoEth1Client(t *testing.T) {
 	require.ErrorContains(t, "nil rpc client", err)
 }
 
-// TODO(rgeraldes24): fix unit test
+// TODO(rgeraldes24): test fails because Eth1FollowDistance = 0
 /*
 func TestBlockExists_ValidHash(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
@@ -156,8 +164,6 @@ func TestBlockExists_ValidHash(t *testing.T) {
 }
 */
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestBlockExists_InvalidHash(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
@@ -177,7 +183,8 @@ func TestBlockExists_InvalidHash(t *testing.T) {
 	require.NotNil(t, err, "Expected BlockExists to error with invalid hash")
 }
 
-
+// TODO(rgeraldes24): test fails because Eth1FollowDistance = 0
+/*
 func TestBlockExists_UsesCachedBlockInfo(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
