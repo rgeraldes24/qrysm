@@ -1,7 +1,5 @@
 package transition_test
 
-// TODO(rgeraldes24): fix unit tests
-/*
 import (
 	"context"
 	"sync"
@@ -38,7 +36,7 @@ func TestSkipSlotCache_OK(t *testing.T) {
 	require.NoError(t, err)
 	executedState, err := transition.ExecuteStateTransition(context.Background(), originalState, wsb)
 	require.NoError(t, err, "Could not run state transition")
-	require.Equal(t, true, executedState.Version() == version.Phase0)
+	require.Equal(t, true, executedState.Version() == version.Capella)
 	wsb, err = blocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
 	bState, err = transition.ExecuteStateTransition(context.Background(), bState, wsb)
@@ -67,7 +65,7 @@ func TestSkipSlotCache_ConcurrentMixup(t *testing.T) {
 	require.NoError(t, err)
 	executedState, err := transition.ExecuteStateTransition(context.Background(), originalState, wsb)
 	require.NoError(t, err, "Could not run state transition")
-	require.Equal(t, true, executedState.Version() == version.Phase0)
+	require.Equal(t, true, executedState.Version() == version.Capella)
 
 	// Create two shallow but different forks
 	var s1, s0 state.BeaconState
@@ -169,4 +167,3 @@ func TestSkipSlotCache_ConcurrentMixup(t *testing.T) {
 	// Wait for all transitions to finish
 	wg.Wait()
 }
-*/
