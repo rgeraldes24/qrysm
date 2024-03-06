@@ -124,8 +124,6 @@ func TestTrackedIndex(t *testing.T) {
 	require.Equal(t, s.trackedIndex(primitives.ValidatorIndex(3)), false)
 }
 
-// TODO(rgeraldes24): fix unit test: different results when using --test_filter
-/*
 func TestUpdateSyncCommitteeTrackedVals(t *testing.T) {
 	hook := logTest.NewGlobal()
 	s := setupService(t)
@@ -134,14 +132,11 @@ func TestUpdateSyncCommitteeTrackedVals(t *testing.T) {
 	s.updateSyncCommitteeTrackedVals(state)
 	require.LogsDoNotContain(t, hook, "Sync committee assignments will not be reported")
 	newTrackedSyncIndices := map[primitives.ValidatorIndex][]primitives.CommitteeIndex{
-		// 1: {1, 3, 4},
-		// 2: {2},
 		1:  {1},
 		15: {15},
 	}
 	require.DeepEqual(t, s.trackedSyncCommitteeIndices, newTrackedSyncIndices)
 }
-*/
 
 func TestNewService(t *testing.T) {
 	config := &ValidatorMonitorConfig{}

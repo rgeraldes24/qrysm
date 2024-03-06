@@ -4,11 +4,17 @@ import (
 	"bytes"
 	"context"
 	"testing"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-bitfield"
+	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
+	testDB "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
+	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
+	"github.com/theQRL/qrysm/v4/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
+	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -131,22 +137,58 @@ func TestProcessUnaggregatedAttestationStateCached(t *testing.T) {
 	require.LogsContain(t, hook, wanted2)
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
 
-	s := setupService(t)
 	state, _ := util.DeterministicGenesisStateCapella(t, 256)
+	beaconDB := testDB.SetupDB(t)
+
+	chainService := &mock.ChainService{
+		Genesis:        time.Now(),
+		DB:             beaconDB,
+		State:          state,
+		Root:           []byte("hello-world"),
+		ValidatorsRoot: [32]byte{},
+	}
+	aggregatedPerformance := map[primitives.ValidatorIndex]ValidatorAggregatedPerformance{
+		86: {},
+	}
+	trackedVals := map[primitives.ValidatorIndex]bool{
+		86: true,
+	}
+	latestPerformance := map[primitives.ValidatorIndex]ValidatorLatestPerformance{
+		86: {
+			balance:      39999900000000,
+			timelyHead:   true,
+			timelySource: true,
+			timelyTarget: true,
+		},
+	}
+
+	svc := &Service{
+		config: &ValidatorMonitorConfig{
+			StateGen:            stategen.New(beaconDB, doublylinkedtree.New()),
+			StateNotifier:       chainService.StateNotifier(),
+			HeadFetcher:         chainService,
+			AttestationNotifier: chainService.OperationNotifier(),
+			InitialSyncComplete: make(chan struct{}),
+		},
+		ctx:                   context.Background(),
+		TrackedValidators:     trackedVals,
+		latestPerformance:     latestPerformance,
+		aggregatedPerformance: aggregatedPerformance,
+		lastSyncedEpoch:       0,
+	}
+
 	require.NoError(t, state.SetSlot(2))
 	header := state.LatestBlockHeader()
 	participation := []byte{0xff, 0xff, 0x01}
 	require.NoError(t, state.SetCurrentParticipationBits(participation))
 
 	att := &zondpb.AggregateAttestationAndProof{
-		AggregatorIndex: 2,
+		AggregatorIndex: 86,
 		Aggregate: &zondpb.Attestation{
 			Data: &zondpb.AttestationData{
 				Slot:            1,
@@ -164,20 +206,56 @@ func TestProcessAggregatedAttestationStateNotCached(t *testing.T) {
 			AggregationBits: bitfield.Bitlist{0b111},
 		},
 	}
-	s.processAggregatedAttestation(ctx, att)
-	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=2 BeaconBlockRoot=0x000000000000 Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
+	svc.processAggregatedAttestation(ctx, att)
+	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=86 BeaconBlockRoot=0x000000000000 Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
 	require.LogsContain(t, hook, "Skipping aggregated attestation due to state not found in cache")
 	logrus.SetLevel(logrus.InfoLevel)
 }
-*/
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 	hook := logTest.NewGlobal()
 	ctx := context.Background()
-	s := setupService(t)
+
+	beaconDB := testDB.SetupDB(t)
 	state, _ := util.DeterministicGenesisStateCapella(t, 256)
+
+	chainService := &mock.ChainService{
+		Genesis:        time.Now(),
+		DB:             beaconDB,
+		State:          state,
+		Root:           []byte("hello-world"),
+		ValidatorsRoot: [32]byte{},
+	}
+	aggregatedPerformance := map[primitives.ValidatorIndex]ValidatorAggregatedPerformance{
+		86: {},
+	}
+	trackedVals := map[primitives.ValidatorIndex]bool{
+		86: true,
+	}
+	latestPerformance := map[primitives.ValidatorIndex]ValidatorLatestPerformance{
+		86: {
+			balance:      39999900000000,
+			timelyHead:   true,
+			timelySource: true,
+			timelyTarget: true,
+		},
+	}
+
+	svc := &Service{
+		config: &ValidatorMonitorConfig{
+			StateGen:            stategen.New(beaconDB, doublylinkedtree.New()),
+			StateNotifier:       chainService.StateNotifier(),
+			HeadFetcher:         chainService,
+			AttestationNotifier: chainService.OperationNotifier(),
+			InitialSyncComplete: make(chan struct{}),
+		},
+		ctx:                   context.Background(),
+		TrackedValidators:     trackedVals,
+		latestPerformance:     latestPerformance,
+		aggregatedPerformance: aggregatedPerformance,
+		lastSyncedEpoch:       0,
+	}
+
 	participation := []byte{0xff, 0xff, 0x01}
 	require.NoError(t, state.SetCurrentParticipationBits(participation))
 
@@ -185,7 +263,7 @@ func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 	copy(root[:], "hello-world")
 
 	att := &zondpb.AggregateAttestationAndProof{
-		AggregatorIndex: 107,
+		AggregatorIndex: 86,
 		Aggregate: &zondpb.Attestation{
 			Data: &zondpb.AttestationData{
 				Slot:            1,
@@ -204,13 +282,12 @@ func TestProcessAggregatedAttestationStateCached(t *testing.T) {
 		},
 	}
 
-	require.NoError(t, s.config.StateGen.SaveState(ctx, root, state))
-	s.processAggregatedAttestation(ctx, att)
-	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=107 BeaconBlockRoot=0x68656c6c6f2d Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
-	require.LogsContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=107 prefix=monitor")
-	require.LogsDoNotContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=86 prefix=monitor")
+	require.NoError(t, svc.config.StateGen.SaveState(ctx, root, state))
+	svc.processAggregatedAttestation(ctx, att)
+	require.LogsContain(t, hook, "\"Processed attestation aggregation\" AggregatorIndex=86 BeaconBlockRoot=0x68656c6c6f2d Slot=1 SourceRoot=0x68656c6c6f2d TargetRoot=0x68656c6c6f2d prefix=monitor")
+	require.LogsContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=86 prefix=monitor")
+	require.LogsDoNotContain(t, hook, "\"Processed aggregated attestation\" Head=0x68656c6c6f2d Slot=1 Source=0x68656c6c6f2d Target=0x68656c6c6f2d ValidatorIndex=107 prefix=monitor")
 }
-*/
 
 func TestProcessAttestations(t *testing.T) {
 	hook := logTest.NewGlobal()
