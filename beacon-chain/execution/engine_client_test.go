@@ -333,23 +333,20 @@ func TestClient_HTTP(t *testing.T) {
 		require.ErrorIs(t, ErrInvalidPayloadStatus, err)
 		require.DeepEqual(t, want.LatestValidHash, resp)
 	})
-	// TODO(rgeraldes24): check if its still valid
-	/*
-		t.Run(NewPayloadMethodV2+" UNKNOWN status", func(t *testing.T) {
-			execPayload, ok := fix["ExecutionPayload"].(*pb.ExecutionPayloadCapella)
-			require.Equal(t, true, ok)
-			want, ok := fix["UnknownStatus"].(*pb.PayloadStatus)
-			require.Equal(t, true, ok)
-			client := newPayloadV2Setup(t, want, execPayload)
+	t.Run(NewPayloadMethodV2+" UNKNOWN status", func(t *testing.T) {
+		execPayload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
+		require.Equal(t, true, ok)
+		want, ok := fix["UnknownStatus"].(*pb.PayloadStatus)
+		require.Equal(t, true, ok)
+		client := newPayloadV2Setup(t, want, execPayload)
 
-			// We call the RPC method via HTTP and expect a proper result.
-			wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(execPayload, 0)
-			require.NoError(t, err)
-			resp, err := client.NewPayload(ctx, wrappedPayload, []common.Hash{}, &common.Hash{})
-			require.ErrorIs(t, ErrUnknownPayloadStatus, err)
-			require.DeepEqual(t, []uint8(nil), resp)
-		})
-	*/
+		// We call the RPC method via HTTP and expect a proper result.
+		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(execPayload, 0)
+		require.NoError(t, err)
+		resp, err := client.NewPayload(ctx, wrappedPayload, []common.Hash{}, &common.Hash{})
+		require.ErrorIs(t, ErrUnknownPayloadStatus, err)
+		require.DeepEqual(t, []uint8(nil), resp)
+	})
 	t.Run(ExecutionBlockByNumberMethod, func(t *testing.T) {
 		want, ok := fix["ExecutionBlock"].(*pb.ExecutionBlock)
 		require.Equal(t, true, ok)
