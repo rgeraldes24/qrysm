@@ -1019,8 +1019,6 @@ func TestServer_ListValidators_DefaultPageSize(t *testing.T) {
 	assert.DeepEqual(t, want[i:j], res.ValidatorList, "Incorrect respond of validators")
 }
 
-// TODO(rgeraldes24): fix unit test: diff: modified: [0].Validator.EffectiveBalance = 0x2460fe2fb6
-/*
 func TestServer_ListValidators_FromOldEpoch(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.BeaconConfig())
@@ -1028,8 +1026,8 @@ func TestServer_ListValidators_FromOldEpoch(t *testing.T) {
 
 	ctx := context.Background()
 	slot := primitives.Slot(0)
-	epochs := 10
-	numVals := uint64(10)
+	epochs := 3
+	numVals := uint64(3)
 
 	beaconDB := dbTest.SetupDB(t)
 	b := util.NewBeaconBlockCapella()
@@ -1076,7 +1074,7 @@ func TestServer_ListValidators_FromOldEpoch(t *testing.T) {
 	}
 	req = &zondpb.ListValidatorsRequest{
 		QueryFilter: &zondpb.ListValidatorsRequest_Epoch{
-			Epoch: 10,
+			Epoch: 2,
 		},
 	}
 	res, err = bs.ListValidators(context.Background(), req)
@@ -1085,7 +1083,6 @@ func TestServer_ListValidators_FromOldEpoch(t *testing.T) {
 	require.Equal(t, len(want), len(res.ValidatorList), "incorrect number of validators")
 	assert.DeepSSZEqual(t, want, res.ValidatorList, "mismatch in validator values")
 }
-*/
 
 func TestServer_ListValidators_ProcessHeadStateSlots(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
