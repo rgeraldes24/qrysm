@@ -9,6 +9,7 @@ import (
 	mockChain "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
@@ -97,8 +98,6 @@ func TestGetDuties_OK(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
@@ -108,19 +107,27 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	eth1Data, err := util.DeterministicEth1Data(len(deposits))
 	require.NoError(t, err)
 	bs, err := util.GenesisBeaconStateCapella(context.Background(), deposits, 0, eth1Data)
+	require.NoError(t, err, "Could not setup genesis bs")
 	h := &zondpb.BeaconBlockHeader{
 		StateRoot:  bytesutil.PadTo([]byte{'a'}, fieldparams.RootLength),
 		ParentRoot: bytesutil.PadTo([]byte{'b'}, fieldparams.RootLength),
 		BodyRoot:   bytesutil.PadTo([]byte{'c'}, fieldparams.RootLength),
 	}
 	require.NoError(t, bs.SetLatestBlockHeader(h))
-	require.NoError(t, err, "Could not setup genesis bs")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 
 	syncCommittee, err := altair.NextSyncCommittee(context.Background(), bs)
 	require.NoError(t, err)
 	require.NoError(t, bs.SetCurrentSyncCommittee(syncCommittee))
+
+	var nextSyncCommitteePubKeys [][]byte
+	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
+		nextSyncCommitteePubKeys = append(nextSyncCommitteePubKeys, bytesutil.PadTo([]byte{}, field_params.DilithiumPubkeyLength))
+	}
+	nextSyncCommittee := &zondpb.SyncCommittee{Pubkeys: nextSyncCommitteePubKeys}
+
+	require.NoError(t, bs.SetNextSyncCommittee(nextSyncCommittee))
 	pubKeys := make([][]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
 	for i := 0; i < len(deposits); i++ {
@@ -129,14 +136,6 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	}
 	require.NoError(t, bs.SetSlot(params.BeaconConfig().SlotsPerEpoch*primitives.Slot(params.BeaconConfig().EpochsPerSyncCommitteePeriod)-1))
 	require.NoError(t, helpers.UpdateSyncCommitteeCache(bs))
-
-	// bs, err = execution.UpgradeToBellatrix(bs)
-	// require.NoError(t, err)
-
-	pubkeysAs48ByteType := make([][field_params.DilithiumPubkeyLength]byte, len(pubKeys))
-	for i, pk := range pubKeys {
-		pubkeysAs48ByteType[i] = bytesutil.ToBytes2592(pk)
-	}
 
 	slot := uint64(params.BeaconConfig().SlotsPerEpoch) * uint64(params.BeaconConfig().EpochsPerSyncCommitteePeriod) * params.BeaconConfig().SecondsPerSlot
 	chain := &mockChain.ChainService{
@@ -183,6 +182,7 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	for i := 0; i < len(res.CurrentEpochDuties); i++ {
 		assert.Equal(t, primitives.ValidatorIndex(i), res.CurrentEpochDuties[i].ValidatorIndex)
 	}
+
 	for i := 0; i < len(res.CurrentEpochDuties); i++ {
 		assert.Equal(t, true, res.CurrentEpochDuties[i].IsSyncCommittee)
 		// Current epoch and next epoch duties should be equal before the sync period epoch boundary.
@@ -200,7 +200,6 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 		require.NotEqual(t, res.CurrentEpochDuties[i].IsSyncCommittee, res.NextEpochDuties[i].IsSyncCommittee)
 	}
 }
-*/
 
 func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
