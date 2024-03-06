@@ -16,6 +16,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -304,7 +305,7 @@ func TestProcessSlots_LowerSlotAsParentState(t *testing.T) {
 	assert.ErrorContains(t, "expected state.slot 2 < slot 1", err)
 }
 
-// TODO(rgeraldes24): fix unit test
+// NOTE(rgeraldes24): test not valid atm
 /*
 func TestProcessSlots_ThroughAltairEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()
@@ -341,81 +342,14 @@ func TestProcessSlots_ThroughAltairEpoch(t *testing.T) {
 	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
 }
 
-func TestProcessSlots_OnlyAltairEpoch(t *testing.T) {
-	transition.SkipSlotCache.Disable()
-	params.SetupTestConfigCleanup(t)
-	conf := params.BeaconConfig()
-	conf.AltairForkEpoch = 5
-	params.OverrideBeaconConfig(conf)
-
-	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
-	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*6))
-	st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerEpoch*10)
-	require.NoError(t, err)
-	require.Equal(t, version.Altair, st.Version())
-
-	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
-
-	s, err := st.InactivityScores()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(s)))
-
-	p, err := st.PreviousEpochParticipation()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
-
-	p, err = st.CurrentEpochParticipation()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
-
-	sc, err := st.CurrentSyncCommittee()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
-
-	sc, err = st.NextSyncCommittee()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
-}
-
-func TestProcessSlots_OnlyBellatrixEpoch(t *testing.T) {
-	transition.SkipSlotCache.Disable()
-	params.SetupTestConfigCleanup(t)
-
-	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
-	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*6))
-	require.Equal(t, version.Bellatrix, st.Version())
-	st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerEpoch*10)
-	require.NoError(t, err)
-	require.Equal(t, version.Bellatrix, st.Version())
-
-	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
-
-	s, err := st.InactivityScores()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(s)))
-
-	p, err := st.PreviousEpochParticipation()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
-
-	p, err = st.CurrentEpochParticipation()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
-
-	sc, err := st.CurrentSyncCommittee()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
-
-	sc, err = st.NextSyncCommittee()
-	require.NoError(t, err)
-	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
-}
-
 func TestProcessSlots_ThroughBellatrixEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 	params.SetupTestConfigCleanup(t)
+	conf := params.BeaconConfig()
+	conf.BellatrixForkEpoch = 5
+	params.OverrideBeaconConfig(conf)
 
-	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	st, _ := util.DeterministicGenesisStateAltair(t, params.BeaconConfig().MaxValidatorsPerCommittee)
 	st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerEpoch*10)
 	require.NoError(t, err)
 	require.Equal(t, version.Bellatrix, st.Version())
@@ -423,6 +357,40 @@ func TestProcessSlots_ThroughBellatrixEpoch(t *testing.T) {
 	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
 }
 */
+
+func TestProcessSlots_OnlyCapellaEpoch(t *testing.T) {
+	transition.SkipSlotCache.Disable()
+	params.SetupTestConfigCleanup(t)
+
+	st, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
+	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*6))
+	require.Equal(t, version.Capella, st.Version())
+	st, err := transition.ProcessSlots(context.Background(), st, params.BeaconConfig().SlotsPerEpoch*10)
+	require.NoError(t, err)
+	require.Equal(t, version.Capella, st.Version())
+
+	require.Equal(t, params.BeaconConfig().SlotsPerEpoch*10, st.Slot())
+
+	s, err := st.InactivityScores()
+	require.NoError(t, err)
+	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(s)))
+
+	p, err := st.PreviousEpochParticipation()
+	require.NoError(t, err)
+	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
+
+	p, err = st.CurrentEpochParticipation()
+	require.NoError(t, err)
+	require.Equal(t, params.BeaconConfig().MaxValidatorsPerCommittee, uint64(len(p)))
+
+	sc, err := st.CurrentSyncCommittee()
+	require.NoError(t, err)
+	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
+
+	sc, err = st.NextSyncCommittee()
+	require.NoError(t, err)
+	require.Equal(t, params.BeaconConfig().SyncCommitteeSize, uint64(len(sc.Pubkeys)))
+}
 
 func TestProcessSlotsUsingNextSlotCache(t *testing.T) {
 	s, _ := util.DeterministicGenesisStateCapella(t, 1)
