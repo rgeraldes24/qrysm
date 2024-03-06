@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"testing"
 
@@ -129,8 +130,6 @@ func TestCommitteeAssignments_NoProposerForSlot0(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestCommitteeAssignments_CanRetrieve(t *testing.T) {
 	// Initialize test with 256 validators, each slot and each index gets 4 validators.
 	validators := make([]*zondpb.Validator, 4*params.BeaconConfig().SlotsPerEpoch)
@@ -161,31 +160,34 @@ func TestCommitteeAssignments_CanRetrieve(t *testing.T) {
 		isProposer     bool
 		proposerSlot   primitives.Slot
 	}{
+
 		{
 			index:          0,
-			slot:           78,
-			committee:      []primitives.ValidatorIndex{0, 38},
+			slot:           304,
+			committee:      []primitives.ValidatorIndex{0, 235},
 			committeeIndex: 0,
 			isProposer:     false,
 		},
+
 		{
 			index:          1,
-			slot:           71,
-			committee:      []primitives.ValidatorIndex{1, 4},
+			slot:           347,
+			committee:      []primitives.ValidatorIndex{1, 65},
 			committeeIndex: 0,
 			isProposer:     true,
-			proposerSlot:   79,
+			proposerSlot:   357,
 		},
 		{
 			index:          11,
-			slot:           90,
-			committee:      []primitives.ValidatorIndex{31, 11},
+			slot:           334,
+			committee:      []primitives.ValidatorIndex{219, 11},
 			committeeIndex: 0,
 			isProposer:     false,
-		}, {
+		},
+		{
 			index:          2,
-			slot:           127, // 3rd epoch has more active validators
-			committee:      []primitives.ValidatorIndex{89, 2, 81, 5},
+			slot:           384, // 3rd epoch has more active validators
+			committee:      []primitives.ValidatorIndex{412, 2, 280, 187},
 			committeeIndex: 0,
 			isProposer:     false,
 		},
@@ -208,7 +210,6 @@ func TestCommitteeAssignments_CanRetrieve(t *testing.T) {
 		})
 	}
 }
-*/
 
 func TestCommitteeAssignments_CannotRetrieveFuture(t *testing.T) {
 	// Initialize test with 256 validators, each slot and each index gets 4 validators.
