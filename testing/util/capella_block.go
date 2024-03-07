@@ -133,22 +133,6 @@ func GenerateFullBlockCapella(
 		Transactions:  newTransactions,
 		Withdrawals:   newWithdrawals,
 	}
-	var syncCommitteeBits []byte
-	currSize := new(zondpb.SyncAggregate).SyncCommitteeBits.Len()
-	switch currSize {
-	case 512:
-		syncCommitteeBits = bitfield.NewBitvector512()
-	case 32:
-		syncCommitteeBits = bitfield.NewBitvector32()
-	case 16:
-		syncCommitteeBits = bitfield.NewBitvector16()
-	default:
-		return nil, errors.New("invalid bit vector size")
-	}
-	newSyncAggregate := &zondpb.SyncAggregate{
-		SyncCommitteeBits:       syncCommitteeBits,
-		SyncCommitteeSignatures: [][]byte{},
-	}
 
 	newHeader := bState.LatestBlockHeader()
 	prevStateRoot, err := bState.HashTreeRoot(ctx)
@@ -159,6 +143,32 @@ func GenerateFullBlockCapella(
 	parentRoot, err := newHeader.HashTreeRoot()
 	if err != nil {
 		return nil, errors.Wrap(err, "could not hash the new header")
+	}
+
+	var newSyncAggregate *zondpb.SyncAggregate
+	if conf.FullSyncAggregate {
+		newSyncAggregate, err = generateSyncAggregate(bState, privs, parentRoot)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed generating syncAggregate")
+		}
+	} else {
+
+		var syncCommitteeBits []byte
+		currSize := new(zondpb.SyncAggregate).SyncCommitteeBits.Len()
+		switch currSize {
+		case 512:
+			syncCommitteeBits = bitfield.NewBitvector512()
+		case 32:
+			syncCommitteeBits = bitfield.NewBitvector32()
+		case 16:
+			syncCommitteeBits = bitfield.NewBitvector16()
+		default:
+			return nil, errors.New("invalid bit vector size")
+		}
+		newSyncAggregate = &zondpb.SyncAggregate{
+			SyncCommitteeBits:       syncCommitteeBits,
+			SyncCommitteeSignatures: [][]byte{},
+		}
 	}
 
 	if slot == currentSlot {
