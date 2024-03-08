@@ -842,7 +842,6 @@ func TestBlocksQueue_onProcessSkippedEvent(t *testing.T) {
 		assert.ErrorContains(t, errNoRequiredPeers.Error(), err)
 		assert.Equal(t, stateSkipped, updatedState)
 	})
-
 	// TODO(rgeraldes24): fix unit test: relies on block batch limit = 64
 	/*
 		t.Run("ready to update machines - non-skipped slot not found", func(t *testing.T) {
@@ -872,7 +871,6 @@ func TestBlocksQueue_onProcessSkippedEvent(t *testing.T) {
 			assert.Equal(t, stateSkipped, updatedState)
 		})
 	*/
-
 	/*
 		t.Run("ready to update machines - constrained mode", func(t *testing.T) {
 			p := p2pt.NewTestP2P(t)

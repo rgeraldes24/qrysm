@@ -6,26 +6,23 @@ import (
 
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/core/transition"
 	dbTest "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
+	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-// NOTE(rgeraldes24): cache is not empty when running tests like TestService_HeadSyncCommitteeIndices
-// along with the other package tests - without filtering(--test_filter) the specific test via bazel.
-// func init() {
-// 	transition.SkipSlotCache.Disable()
-// }
-
-// TODO(rgeraldes24): fix unit test
-/*
 func TestService_HeadSyncCommitteeIndices(t *testing.T) {
-	// TODO(rgeraldes24)
-	// s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().TargetCommitteeSize)
-	s, _ := util.DeterministicGenesisStateCapella(t, 16)
+	transition.SkipSlotCache.Disable()
+	defer transition.SkipSlotCache.Enable()
+
+	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
 	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
 	c.head = &head{state: s}
 
@@ -47,10 +44,21 @@ func TestService_HeadSyncCommitteeIndices(t *testing.T) {
 	require.DeepNotEqual(t, a, b)
 }
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestService_headCurrentSyncCommitteeIndices(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().TargetCommitteeSize)
+	transition.SkipSlotCache.Disable()
+	defer transition.SkipSlotCache.Enable()
+
+	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
+	var pubKeys [][]byte
+	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
+		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, field_params.DilithiumPubkeyLength))
+	}
+	syncCommittee := &zondpb.SyncCommittee{
+		Pubkeys: pubKeys,
+	}
+	require.NoError(t, s.SetCurrentSyncCommittee(syncCommittee))
+	require.NoError(t, s.SetNextSyncCommittee(syncCommittee))
+
 	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
 	c.head = &head{state: s}
 
@@ -60,17 +68,25 @@ func TestService_headCurrentSyncCommitteeIndices(t *testing.T) {
 	require.NoError(t, err)
 
 	// NextSyncCommittee becomes CurrentSyncCommittee so it should be empty by default.
-	// NextSyncCommittee becomes CurrentSyncCommittee so it should be 1 by default.
-	// require.Equal(t, 0, len(indices))
-	require.Equal(t, 1, len(indices))
+	require.Equal(t, 0, len(indices))
 }
-*/
 
-// TODO(rgeraldes24): fix unit test
-/*
 func TestService_headNextSyncCommitteeIndices(t *testing.T) {
-	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().TargetCommitteeSize)
-	c := &Service{}
+	transition.SkipSlotCache.Disable()
+	defer transition.SkipSlotCache.Enable()
+
+	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
+	var pubKeys [][]byte
+	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
+		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, field_params.DilithiumPubkeyLength))
+	}
+	syncCommittee := &zondpb.SyncCommittee{
+		Pubkeys: pubKeys,
+	}
+	require.NoError(t, s.SetCurrentSyncCommittee(syncCommittee))
+	require.NoError(t, s.SetNextSyncCommittee(syncCommittee))
+
+	c := &Service{cfg: &config{BeaconDB: dbTest.SetupDB(t)}}
 	c.head = &head{state: s}
 
 	// Process slot up to `EpochsPerSyncCommitteePeriod` so it can `ProcessSyncCommitteeUpdates`.
@@ -81,7 +97,6 @@ func TestService_headNextSyncCommitteeIndices(t *testing.T) {
 	// NextSyncCommittee should be be empty after `ProcessSyncCommitteeUpdates`. Validator should get indices.
 	require.NotEqual(t, 0, len(indices))
 }
-*/
 
 func TestService_HeadSyncCommitteePubKeys(t *testing.T) {
 	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().TargetCommitteeSize)
