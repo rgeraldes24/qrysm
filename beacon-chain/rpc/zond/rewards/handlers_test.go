@@ -4,8 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/theQRL/go-bitfield"
@@ -14,6 +17,7 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/testutil"
+	"github.com/theQRL/qrysm/v4/beacon-chain/state"
 	mockstategen "github.com/theQRL/qrysm/v4/beacon-chain/state/stategen/mock"
 	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
@@ -23,6 +27,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/crypto/dilithium"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	http2 "github.com/theQRL/qrysm/v4/network/http"
 	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
@@ -187,8 +192,6 @@ func TestBlockRewards(t *testing.T) {
 	})
 }
 
-// TODO(rgeraldes24): fix unit tests
-/*
 func TestAttestationRewards(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	helpers.ClearCache()
@@ -244,7 +247,10 @@ func TestAttestationRewards(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		resp := &AttestationRewardsResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
-		require.Equal(t, 16, len(resp.Data.IdealRewards))
+		// NOTE(rgeraldes24): number of validators over the ejection balance is now 32
+		// with the new values
+		// require.Equal(t, 16, len(resp.Data.IdealRewards))
+		require.Equal(t, 32, len(resp.Data.IdealRewards))
 		sum := uint64(0)
 		for _, r := range resp.Data.IdealRewards {
 			hr, err := strconv.ParseUint(r.Head, 10, 64)
@@ -255,8 +261,10 @@ func TestAttestationRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += hr + sr + tr
 		}
-		assert.Equal(t, uint64(20756849), sum)
+		// assert.Equal(t, uint64(20756849), sum)
+		assert.Equal(t, uint64(1452726516), sum)
 	})
+
 	t.Run("ok - filtered vals", func(t *testing.T) {
 		url := "http://only.the.epoch.number.at.the.end.is.important/1"
 		var body bytes.Buffer
@@ -463,7 +471,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 
 	const valCount = 1024
 	// we have to set the proposer index to the value that will be randomly chosen (fortunately it's deterministic)
-	const proposerIndex = 84
+	const proposerIndex = 7
 
 	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
@@ -497,7 +505,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	b.Block.ProposerIndex = proposerIndex
 	scBits := bitfield.NewBitvector16()
 	// last 10 sync committee members didn't perform their duty
-	for i := uint64(0); i < fieldparams.SyncCommitteeLength-10; i++ {
+	for i := uint64(0); i < fieldparams.SyncCommitteeLength-2; i++ {
 		scBits.SetBitAt(i, true)
 	}
 	domain, err := signing.Domain(st.Fork(), 0, params.BeaconConfig().DomainSyncCommittee, st.GenesisValidatorsRoot())
@@ -507,7 +515,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	require.NoError(t, err)
 	// Bits set in sync committee bits determine which validators will be treated as participating in sync committee.
 	// These validators have to sign the message.
-	sigs := make([][]byte, fieldparams.SyncCommitteeLength-10)
+	sigs := make([][]byte, fieldparams.SyncCommitteeLength-2)
 	for i := range sigs {
 		sigs[i] = secretKeys[i].Sign(r[:]).Marshal()
 	}
@@ -556,7 +564,8 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		assert.Equal(t, uint64(1396), sum)
+		// assert.Equal(t, uint64(1396), sum)
+		assert.Equal(t, uint64(395000), sum)
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 		assert.Equal(t, false, resp.Finalized)
 	})
@@ -576,7 +585,6 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		resp := &SyncCommitteeRewardsResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
-		// require.Equal(t, 512, len(resp.Data))
 		require.Equal(t, 16, len(resp.Data))
 		sum := 0
 		for _, scReward := range resp.Data {
@@ -584,7 +592,8 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		assert.Equal(t, 343416, sum)
+		// assert.Equal(t, 343416, sum)
+		assert.Equal(t, 1975004, sum)
 	})
 	t.Run("ok - validator outside sync committee is ignored", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
@@ -596,7 +605,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		url := "http://only.the.slot.number.at.the.end.is.important/128"
 		var body bytes.Buffer
 		pubkey := fmt.Sprintf("%#x", secretKeys[10].PublicKey().Marshal())
-		valIds, err := json.Marshal([]string{"20", "999", pubkey})
+		valIds, err := json.Marshal([]string{"12", "999", pubkey})
 		require.NoError(t, err)
 		_, err = body.Write(valIds)
 		require.NoError(t, err)
@@ -615,8 +624,10 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		assert.Equal(t, 1396, sum)
+		// assert.Equal(t, 1396, sum)
+		assert.Equal(t, 395000, sum)
 	})
+
 	t.Run("ok - proposer reward is deducted", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
 		for i := 0; i < valCount; i++ {
@@ -627,7 +638,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		url := "http://only.the.slot.number.at.the.end.is.important/128"
 		var body bytes.Buffer
 		pubkey := fmt.Sprintf("%#x", secretKeys[10].PublicKey().Marshal())
-		valIds, err := json.Marshal([]string{"20", "84", pubkey})
+		valIds, err := json.Marshal([]string{"5", "7", pubkey})
 		require.NoError(t, err)
 		_, err = body.Write(valIds)
 		require.NoError(t, err)
@@ -646,7 +657,8 @@ func TestSyncCommiteeRewards(t *testing.T) {
 			require.NoError(t, err)
 			sum += r
 		}
-		assert.Equal(t, 2094, sum)
+		// assert.Equal(t, 2094, sum)
+		assert.Equal(t, 197504, sum)
 	})
 	t.Run("invalid validator index/pubkey", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
@@ -672,6 +684,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, e.Code)
 		assert.Equal(t, "foo is not a validator index or pubkey", e.Message)
 	})
+
 	t.Run("unknown validator pubkey", func(t *testing.T) {
 		balances := make([]uint64, 0, valCount)
 		for i := 0; i < valCount; i++ {
@@ -724,4 +737,3 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		assert.Equal(t, "Validator index 9999 is too large. Maximum allowed index is 1023", e.Message)
 	})
 }
-*/

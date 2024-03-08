@@ -310,10 +310,9 @@ func connectPeerHavingBlocks(
 			for _, blk := range blks {
 				if root, err := blk.Block.HashTreeRoot(); err == nil && expectedRoot == root {
 					log.Printf("Found blocks_by_root: %#x for slot: %v", root, blk.Block.Slot)
-					_, err := stream.Write([]byte{0x00})
-					assert.NoError(t, err, "Failed to write to stream")
-					_, err = p.Encoding().EncodeWithMaxLength(stream, blk)
-					assert.NoError(t, err, "Could not send response back")
+					wsb, err := blocks.NewSignedBeaconBlock(blk)
+					require.NoError(t, err)
+					require.NoError(t, beaconsync.WriteBlockChunk(stream, startup.NewClock(time.Now(), [32]byte{}), p.Encoding(), wsb))
 				}
 			}
 		}
