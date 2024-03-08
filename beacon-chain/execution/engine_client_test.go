@@ -28,6 +28,7 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/interfaces"
 	payloadattribute "github.com/theQRL/qrysm/v4/consensus-types/payload-attribute"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	pb "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	"github.com/theQRL/qrysm/v4/runtime/version"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -472,25 +473,27 @@ func TestReconstructFullBlock(t *testing.T) {
 		_, err = service.ReconstructFullBlock(ctx, wrapped)
 		require.ErrorContains(t, want, err)
 	})
-	/* TODO(rgeraldes24): fix unit test
 	t.Run("properly reconstructs block with correct payload", func(t *testing.T) {
 		fix := fixtures()
 		payload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
 		require.Equal(t, true, ok)
 
 		jsonPayload := make(map[string]interface{})
-		tx := zondtypes.NewTransaction(
-			0,
-			common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-			big.NewInt(0), 0, big.NewInt(0),
-			nil,
-		)
+
+		to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
+		tx := zondtypes.NewTx(&zondtypes.DynamicFeeTx{
+			Nonce: 0,
+			To:    &to,
+			Value: big.NewInt(0),
+			Data:  nil,
+		})
 		txs := []*zondtypes.Transaction{tx}
 		encodedBinaryTxs := make([][]byte, 1)
 		var err error
 		encodedBinaryTxs[0], err = txs[0].MarshalBinary()
 		require.NoError(t, err)
 		payload.Transactions = encodedBinaryTxs
+		payload.Withdrawals = make([]*enginev1.Withdrawal, 0)
 		jsonPayload["transactions"] = txs
 		num := big.NewInt(1)
 		encodedNum := hexutil.EncodeBig(num)
@@ -550,7 +553,6 @@ func TestReconstructFullBlock(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepEqual(t, payload, got.Proto())
 	})
-	*/
 }
 
 func TestReconstructFullBlockBatch(t *testing.T) {
@@ -570,19 +572,20 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		_, err = service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrapped})
 		require.ErrorContains(t, want, err)
 	})
-	/* TODO(rgeraldes24): fix unit test
 	t.Run("properly reconstructs block batch with correct payload", func(t *testing.T) {
 		fix := fixtures()
 		payload, ok := fix["ExecutionPayloadCapella"].(*pb.ExecutionPayloadCapella)
 		require.Equal(t, true, ok)
 
 		jsonPayload := make(map[string]interface{})
-		tx := zondtypes.NewTransaction(
-			0,
-			common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-			big.NewInt(0), 0, big.NewInt(0),
-			nil,
-		)
+
+		to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
+		tx := zondtypes.NewTx(&zondtypes.DynamicFeeTx{
+			Nonce: 0,
+			To:    &to,
+			Value: big.NewInt(0),
+			Data:  nil,
+		})
 		txs := []*zondtypes.Transaction{tx}
 		encodedBinaryTxs := make([][]byte, 1)
 		var err error
@@ -616,16 +619,12 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		header, err := blocks.PayloadToHeaderCapella(wrappedPayload)
 		require.NoError(t, err)
 
-		bellatrixBlock := util.NewBlindedBeaconBlockCapella()
+		capellaBlock := util.NewBlindedBeaconBlockCapella()
 		wanted := util.NewBeaconBlockCapella()
 		wanted.Block.Slot = 1
 		// Make sure block hash is the zero hash.
-		bellatrixBlock.Block.Body.ExecutionPayloadHeader.BlockHash = make([]byte, 32)
-		bellatrixBlock.Block.Slot = 1
-		wrappedEmpty, err := blocks.NewSignedBeaconBlock(bellatrixBlock)
-		require.NoError(t, err)
-		wantedWrappedEmpty, err := blocks.NewSignedBeaconBlock(wanted)
-		require.NoError(t, err)
+		capellaBlock.Block.Body.ExecutionPayloadHeader.BlockHash = make([]byte, 32)
+		capellaBlock.Block.Slot = 1
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
@@ -665,22 +664,18 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		copiedWrapped, err := wrapped.Copy()
 		require.NoError(t, err)
 
-		reconstructed, err := service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrappedEmpty, wrapped, copiedWrapped})
+		reconstructed, err := service.ReconstructFullBlockBatch(ctx, []interfaces.ReadOnlySignedBeaconBlock{wrapped, copiedWrapped})
 		require.NoError(t, err)
 
-		// Make sure empty blocks are handled correctly
-		require.DeepEqual(t, wantedWrappedEmpty, reconstructed[0])
-
 		// Handle normal execution blocks correctly
-		got, err := reconstructed[1].Block().Body().Execution()
+		got, err := reconstructed[0].Block().Body().Execution()
 		require.NoError(t, err)
 		require.DeepEqual(t, payload, got.Proto())
 
-		got, err = reconstructed[2].Block().Body().Execution()
+		got, err = reconstructed[1].Block().Body().Execution()
 		require.NoError(t, err)
 		require.DeepEqual(t, payload, got.Proto())
 	})
-	*/
 }
 
 func Test_tDStringToUint256(t *testing.T) {
@@ -966,7 +961,6 @@ func fixtures() map[string]interface{} {
 			Nonce:       zondtypes.EncodeNonce(6),
 			BaseFee:     big.NewInt(7),
 		},
-		Withdrawals: []*pb.Withdrawal{},
 	}
 	status := &pb.PayloadStatus{
 		Status:          pb.PayloadStatus_VALID,

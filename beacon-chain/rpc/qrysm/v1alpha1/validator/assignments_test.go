@@ -99,6 +99,7 @@ func TestGetDuties_OK(t *testing.T) {
 }
 
 func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
+	helpers.ClearCache()
 	params.SetupTestConfigCleanup(t)
 
 	genesis := util.NewBeaconBlockCapella()

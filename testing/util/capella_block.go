@@ -102,6 +102,10 @@ func GenerateFullBlockCapella(
 		return nil, errors.Wrap(err, "could not process randao mix")
 	}
 
+	if slot == currentSlot {
+		slot = currentSlot + 1
+	}
+
 	timestamp, err := slots.ToTime(bState.GenesisTime(), slot)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get current timestamp")
@@ -169,10 +173,6 @@ func GenerateFullBlockCapella(
 			SyncCommitteeBits:       syncCommitteeBits,
 			SyncCommitteeSignatures: [][]byte{},
 		}
-	}
-
-	if slot == currentSlot {
-		slot = currentSlot + 1
 	}
 
 	reveal, err := RandaoReveal(stCopy, time.CurrentEpoch(stCopy), privs)

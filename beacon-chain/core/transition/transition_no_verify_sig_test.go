@@ -127,7 +127,6 @@ func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *test
 }
 
 // TODO(rgeraldes24): fix unit test: error has to do with capella's generate full block for slot 0
-// TODO(rgeraldes24): check if these tests are still valid
 /*
 func TestProcessBlockNoVerify_PassesProcessingConditions(t *testing.T) {
 	beaconState, block := createFullCapellaBlockWithOperations(t)
@@ -140,7 +139,6 @@ func TestProcessBlockNoVerify_PassesProcessingConditions(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, true, verified, "Could not verify signature set.")
 }
-
 
 func TestProcessBlockNoVerifyAnySigAltair_OK(t *testing.T) {
 	beaconState, block := createFullCapellaBlockWithOperations(t)

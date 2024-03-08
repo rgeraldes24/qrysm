@@ -2,6 +2,7 @@ package execution
 
 import (
 	"context"
+	"math/big"
 	"strings"
 	"testing"
 	"time"
@@ -681,9 +682,15 @@ func TestService_CacheBlockHeaders(t *testing.T) {
 	assert.Equal(t, 5, rClient.numOfCalls)
 }
 
-// TODO(rgeraldes24): fix unit test: Eth1FollowDistance is 0
-/*
 func TestService_FollowBlock(t *testing.T) {
+	// TODO(rgeraldes24): fix for current config
+	// NOTE(rgeraldes24): workaround because of Eth1FollowDistance = 0
+	params.SetupTestConfigCleanup(t)
+	conf := params.BeaconConfig().Copy()
+	conf.Eth1FollowDistance = 2048
+	conf.SecondsPerETH1Block = 14
+	params.OverrideBeaconConfig(conf)
+
 	followTime := params.BeaconConfig().Eth1FollowDistance * params.BeaconConfig().SecondsPerETH1Block
 	followTime += 10000
 	bMap := make(map[uint64]*types.HeaderInfo)
@@ -709,7 +716,6 @@ func TestService_FollowBlock(t *testing.T) {
 	// With a much higher blocktime, the follow height is respectively shortened.
 	assert.Equal(t, uint64(2283), h)
 }
-*/
 
 type slowRPCClient struct {
 	limit      int
