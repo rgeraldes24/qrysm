@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.30.0
 // 	protoc        v4.23.3
-// source: proto/zond/v2/sync_committee.proto
+// source: proto/zond/v1/sync_committee.proto
 
-package zond
+package v1
 
 import (
 	reflect "reflect"
@@ -34,7 +34,7 @@ type SubmitSyncCommitteeSignaturesRequest struct {
 func (x *SubmitSyncCommitteeSignaturesRequest) Reset() {
 	*x = SubmitSyncCommitteeSignaturesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[0]
+		mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -47,7 +47,7 @@ func (x *SubmitSyncCommitteeSignaturesRequest) String() string {
 func (*SubmitSyncCommitteeSignaturesRequest) ProtoMessage() {}
 
 func (x *SubmitSyncCommitteeSignaturesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[0]
+	mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +60,7 @@ func (x *SubmitSyncCommitteeSignaturesRequest) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use SubmitSyncCommitteeSignaturesRequest.ProtoReflect.Descriptor instead.
 func (*SubmitSyncCommitteeSignaturesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_zond_v2_sync_committee_proto_rawDescGZIP(), []int{0}
+	return file_proto_zond_v1_sync_committee_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *SubmitSyncCommitteeSignaturesRequest) GetData() []*SyncCommitteeMessage {
@@ -81,7 +81,7 @@ type SyncCommittee struct {
 func (x *SyncCommittee) Reset() {
 	*x = SyncCommittee{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[1]
+		mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -94,7 +94,7 @@ func (x *SyncCommittee) String() string {
 func (*SyncCommittee) ProtoMessage() {}
 
 func (x *SyncCommittee) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[1]
+	mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,7 +107,7 @@ func (x *SyncCommittee) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncCommittee.ProtoReflect.Descriptor instead.
 func (*SyncCommittee) Descriptor() ([]byte, []int) {
-	return file_proto_zond_v2_sync_committee_proto_rawDescGZIP(), []int{1}
+	return file_proto_zond_v1_sync_committee_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *SyncCommittee) GetPubkeys() [][]byte {
@@ -131,7 +131,7 @@ type SyncCommitteeMessage struct {
 func (x *SyncCommitteeMessage) Reset() {
 	*x = SyncCommitteeMessage{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[2]
+		mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -144,7 +144,7 @@ func (x *SyncCommitteeMessage) String() string {
 func (*SyncCommitteeMessage) ProtoMessage() {}
 
 func (x *SyncCommitteeMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[2]
+	mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -157,7 +157,7 @@ func (x *SyncCommitteeMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncCommitteeMessage.ProtoReflect.Descriptor instead.
 func (*SyncCommitteeMessage) Descriptor() ([]byte, []int) {
-	return file_proto_zond_v2_sync_committee_proto_rawDescGZIP(), []int{2}
+	return file_proto_zond_v1_sync_committee_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SyncCommitteeMessage) GetSlot() github_com_theQRL_qrysm_v4_consensus_types_primitives.Slot {
@@ -200,7 +200,7 @@ type StateSyncCommitteesRequest struct {
 func (x *StateSyncCommitteesRequest) Reset() {
 	*x = StateSyncCommitteesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[3]
+		mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -213,7 +213,7 @@ func (x *StateSyncCommitteesRequest) String() string {
 func (*StateSyncCommitteesRequest) ProtoMessage() {}
 
 func (x *StateSyncCommitteesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[3]
+	mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -226,7 +226,7 @@ func (x *StateSyncCommitteesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StateSyncCommitteesRequest.ProtoReflect.Descriptor instead.
 func (*StateSyncCommitteesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_zond_v2_sync_committee_proto_rawDescGZIP(), []int{3}
+	return file_proto_zond_v1_sync_committee_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *StateSyncCommitteesRequest) GetStateId() []byte {
@@ -256,7 +256,7 @@ type StateSyncCommitteesResponse struct {
 func (x *StateSyncCommitteesResponse) Reset() {
 	*x = StateSyncCommitteesResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[4]
+		mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -269,7 +269,7 @@ func (x *StateSyncCommitteesResponse) String() string {
 func (*StateSyncCommitteesResponse) ProtoMessage() {}
 
 func (x *StateSyncCommitteesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[4]
+	mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -282,7 +282,7 @@ func (x *StateSyncCommitteesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StateSyncCommitteesResponse.ProtoReflect.Descriptor instead.
 func (*StateSyncCommitteesResponse) Descriptor() ([]byte, []int) {
-	return file_proto_zond_v2_sync_committee_proto_rawDescGZIP(), []int{4}
+	return file_proto_zond_v1_sync_committee_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *StateSyncCommitteesResponse) GetData() *SyncCommitteeValidators {
@@ -318,7 +318,7 @@ type SyncCommitteeValidators struct {
 func (x *SyncCommitteeValidators) Reset() {
 	*x = SyncCommitteeValidators{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[5]
+		mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -331,7 +331,7 @@ func (x *SyncCommitteeValidators) String() string {
 func (*SyncCommitteeValidators) ProtoMessage() {}
 
 func (x *SyncCommitteeValidators) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[5]
+	mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -344,7 +344,7 @@ func (x *SyncCommitteeValidators) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncCommitteeValidators.ProtoReflect.Descriptor instead.
 func (*SyncCommitteeValidators) Descriptor() ([]byte, []int) {
-	return file_proto_zond_v2_sync_committee_proto_rawDescGZIP(), []int{5}
+	return file_proto_zond_v1_sync_committee_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SyncCommitteeValidators) GetValidators() []github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex {
@@ -372,7 +372,7 @@ type SyncSubcommitteeValidators struct {
 func (x *SyncSubcommitteeValidators) Reset() {
 	*x = SyncSubcommitteeValidators{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[6]
+		mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -385,7 +385,7 @@ func (x *SyncSubcommitteeValidators) String() string {
 func (*SyncSubcommitteeValidators) ProtoMessage() {}
 
 func (x *SyncSubcommitteeValidators) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_zond_v2_sync_committee_proto_msgTypes[6]
+	mi := &file_proto_zond_v1_sync_committee_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -398,7 +398,7 @@ func (x *SyncSubcommitteeValidators) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncSubcommitteeValidators.ProtoReflect.Descriptor instead.
 func (*SyncSubcommitteeValidators) Descriptor() ([]byte, []int) {
-	return file_proto_zond_v2_sync_committee_proto_rawDescGZIP(), []int{6}
+	return file_proto_zond_v1_sync_committee_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SyncSubcommitteeValidators) GetValidators() []github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex {
@@ -408,19 +408,19 @@ func (x *SyncSubcommitteeValidators) GetValidators() []github_com_theQRL_qrysm_v
 	return []github_com_theQRL_qrysm_v4_consensus_types_primitives.ValidatorIndex(nil)
 }
 
-var File_proto_zond_v2_sync_committee_proto protoreflect.FileDescriptor
+var File_proto_zond_v1_sync_committee_proto protoreflect.FileDescriptor
 
-var file_proto_zond_v2_sync_committee_proto_rawDesc = []byte{
-	0x0a, 0x22, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x7a, 0x6f, 0x6e, 0x64, 0x2f, 0x76, 0x32, 0x2f,
+var file_proto_zond_v1_sync_committee_proto_rawDesc = []byte{
+	0x0a, 0x22, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x7a, 0x6f, 0x6e, 0x64, 0x2f, 0x76, 0x31, 0x2f,
 	0x73, 0x79, 0x6e, 0x63, 0x5f, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x74, 0x65, 0x65, 0x2e, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0e, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e,
-	0x64, 0x2e, 0x76, 0x32, 0x1a, 0x1c, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x7a, 0x6f, 0x6e, 0x64,
+	0x64, 0x2e, 0x76, 0x31, 0x1a, 0x1c, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x7a, 0x6f, 0x6e, 0x64,
 	0x2f, 0x65, 0x78, 0x74, 0x2f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x22, 0x60, 0x0a, 0x24, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x53, 0x79, 0x6e, 0x63,
 	0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x74, 0x65, 0x65, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75,
 	0x72, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x38, 0x0a, 0x04, 0x64, 0x61,
 	0x74, 0x61, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x74, 0x68, 0x65, 0x71, 0x72,
-	0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x53, 0x79, 0x6e, 0x63, 0x43, 0x6f,
+	0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x79, 0x6e, 0x63, 0x43, 0x6f,
 	0x6d, 0x6d, 0x69, 0x74, 0x74, 0x65, 0x65, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x52, 0x04,
 	0x64, 0x61, 0x74, 0x61, 0x22, 0x36, 0x0a, 0x0d, 0x53, 0x79, 0x6e, 0x63, 0x43, 0x6f, 0x6d, 0x6d,
 	0x69, 0x74, 0x74, 0x65, 0x65, 0x12, 0x25, 0x0a, 0x07, 0x70, 0x75, 0x62, 0x6b, 0x65, 0x79, 0x73,
@@ -459,7 +459,7 @@ var file_proto_zond_v2_sync_committee_proto_rawDesc = []byte{
 	0x74, 0x65, 0x53, 0x79, 0x6e, 0x63, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x74, 0x65, 0x65, 0x73,
 	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3b, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x74, 0x68, 0x65, 0x71, 0x72, 0x6c, 0x2e,
-	0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x53, 0x79, 0x6e, 0x63, 0x43, 0x6f, 0x6d, 0x6d,
+	0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x79, 0x6e, 0x63, 0x43, 0x6f, 0x6d, 0x6d,
 	0x69, 0x74, 0x74, 0x65, 0x65, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52,
 	0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x31, 0x0a, 0x14, 0x65, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69,
 	0x6f, 0x6e, 0x5f, 0x6f, 0x70, 0x74, 0x69, 0x6d, 0x69, 0x73, 0x74, 0x69, 0x63, 0x18, 0x02, 0x20,
@@ -477,7 +477,7 @@ var file_proto_zond_v2_sync_committee_proto_rawDesc = []byte{
 	0x52, 0x0a, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x12, 0x5d, 0x0a, 0x14,
 	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x67, 0x67, 0x72, 0x65, 0x67,
 	0x61, 0x74, 0x65, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x2a, 0x2e, 0x74, 0x68, 0x65,
-	0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x32, 0x2e, 0x53, 0x79, 0x6e, 0x63,
+	0x71, 0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x79, 0x6e, 0x63,
 	0x53, 0x75, 0x62, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x74, 0x65, 0x65, 0x56, 0x61, 0x6c, 0x69,
 	0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x52, 0x13, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
 	0x72, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x73, 0x22, 0x86, 0x01, 0x0a, 0x1a,
@@ -489,43 +489,43 @@ var file_proto_zond_v2_sync_committee_proto_rawDesc = []byte{
 	0x6f, 0x6e, 0x73, 0x65, 0x6e, 0x73, 0x75, 0x73, 0x2d, 0x74, 0x79, 0x70, 0x65, 0x73, 0x2f, 0x70,
 	0x72, 0x69, 0x6d, 0x69, 0x74, 0x69, 0x76, 0x65, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61,
 	0x74, 0x6f, 0x72, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x52, 0x0a, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61,
-	0x74, 0x6f, 0x72, 0x73, 0x42, 0x7b, 0x0a, 0x12, 0x6f, 0x72, 0x67, 0x2e, 0x74, 0x68, 0x65, 0x71,
-	0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x32, 0x42, 0x12, 0x53, 0x79, 0x6e, 0x63,
+	0x74, 0x6f, 0x72, 0x73, 0x42, 0x76, 0x0a, 0x12, 0x6f, 0x72, 0x67, 0x2e, 0x74, 0x68, 0x65, 0x71,
+	0x72, 0x6c, 0x2e, 0x7a, 0x6f, 0x6e, 0x64, 0x2e, 0x76, 0x31, 0x42, 0x12, 0x53, 0x79, 0x6e, 0x63,
 	0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x74, 0x65, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
-	0x5a, 0x2d, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x74, 0x68, 0x65,
+	0x5a, 0x28, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x74, 0x68, 0x65,
 	0x51, 0x52, 0x4c, 0x2f, 0x71, 0x72, 0x79, 0x73, 0x6d, 0x2f, 0x76, 0x34, 0x2f, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x2f, 0x7a, 0x6f, 0x6e, 0x64, 0x2f, 0x76, 0x32, 0x3b, 0x7a, 0x6f, 0x6e, 0x64, 0xaa,
-	0x02, 0x0e, 0x54, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x2e, 0x56, 0x32,
-	0xca, 0x02, 0x0e, 0x54, 0x68, 0x65, 0x51, 0x52, 0x4c, 0x5c, 0x5a, 0x6f, 0x6e, 0x64, 0x5c, 0x76,
-	0x32, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x6f, 0x2f, 0x7a, 0x6f, 0x6e, 0x64, 0x2f, 0x76, 0x31, 0xaa, 0x02, 0x0e, 0x54, 0x68, 0x65,
+	0x51, 0x52, 0x4c, 0x2e, 0x5a, 0x6f, 0x6e, 0x64, 0x2e, 0x56, 0x31, 0xca, 0x02, 0x0e, 0x54, 0x68,
+	0x65, 0x51, 0x52, 0x4c, 0x5c, 0x5a, 0x6f, 0x6e, 0x64, 0x5c, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_proto_zond_v2_sync_committee_proto_rawDescOnce sync.Once
-	file_proto_zond_v2_sync_committee_proto_rawDescData = file_proto_zond_v2_sync_committee_proto_rawDesc
+	file_proto_zond_v1_sync_committee_proto_rawDescOnce sync.Once
+	file_proto_zond_v1_sync_committee_proto_rawDescData = file_proto_zond_v1_sync_committee_proto_rawDesc
 )
 
-func file_proto_zond_v2_sync_committee_proto_rawDescGZIP() []byte {
-	file_proto_zond_v2_sync_committee_proto_rawDescOnce.Do(func() {
-		file_proto_zond_v2_sync_committee_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_zond_v2_sync_committee_proto_rawDescData)
+func file_proto_zond_v1_sync_committee_proto_rawDescGZIP() []byte {
+	file_proto_zond_v1_sync_committee_proto_rawDescOnce.Do(func() {
+		file_proto_zond_v1_sync_committee_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_zond_v1_sync_committee_proto_rawDescData)
 	})
-	return file_proto_zond_v2_sync_committee_proto_rawDescData
+	return file_proto_zond_v1_sync_committee_proto_rawDescData
 }
 
-var file_proto_zond_v2_sync_committee_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_proto_zond_v2_sync_committee_proto_goTypes = []interface{}{
-	(*SubmitSyncCommitteeSignaturesRequest)(nil), // 0: theqrl.zond.v2.SubmitSyncCommitteeSignaturesRequest
-	(*SyncCommittee)(nil),                        // 1: theqrl.zond.v2.SyncCommittee
-	(*SyncCommitteeMessage)(nil),                 // 2: theqrl.zond.v2.SyncCommitteeMessage
-	(*StateSyncCommitteesRequest)(nil),           // 3: theqrl.zond.v2.StateSyncCommitteesRequest
-	(*StateSyncCommitteesResponse)(nil),          // 4: theqrl.zond.v2.StateSyncCommitteesResponse
-	(*SyncCommitteeValidators)(nil),              // 5: theqrl.zond.v2.SyncCommitteeValidators
-	(*SyncSubcommitteeValidators)(nil),           // 6: theqrl.zond.v2.SyncSubcommitteeValidators
+var file_proto_zond_v1_sync_committee_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_proto_zond_v1_sync_committee_proto_goTypes = []interface{}{
+	(*SubmitSyncCommitteeSignaturesRequest)(nil), // 0: theqrl.zond.v1.SubmitSyncCommitteeSignaturesRequest
+	(*SyncCommittee)(nil),                        // 1: theqrl.zond.v1.SyncCommittee
+	(*SyncCommitteeMessage)(nil),                 // 2: theqrl.zond.v1.SyncCommitteeMessage
+	(*StateSyncCommitteesRequest)(nil),           // 3: theqrl.zond.v1.StateSyncCommitteesRequest
+	(*StateSyncCommitteesResponse)(nil),          // 4: theqrl.zond.v1.StateSyncCommitteesResponse
+	(*SyncCommitteeValidators)(nil),              // 5: theqrl.zond.v1.SyncCommitteeValidators
+	(*SyncSubcommitteeValidators)(nil),           // 6: theqrl.zond.v1.SyncSubcommitteeValidators
 }
-var file_proto_zond_v2_sync_committee_proto_depIdxs = []int32{
-	2, // 0: theqrl.zond.v2.SubmitSyncCommitteeSignaturesRequest.data:type_name -> theqrl.zond.v2.SyncCommitteeMessage
-	5, // 1: theqrl.zond.v2.StateSyncCommitteesResponse.data:type_name -> theqrl.zond.v2.SyncCommitteeValidators
-	6, // 2: theqrl.zond.v2.SyncCommitteeValidators.validator_aggregates:type_name -> theqrl.zond.v2.SyncSubcommitteeValidators
+var file_proto_zond_v1_sync_committee_proto_depIdxs = []int32{
+	2, // 0: theqrl.zond.v1.SubmitSyncCommitteeSignaturesRequest.data:type_name -> theqrl.zond.v1.SyncCommitteeMessage
+	5, // 1: theqrl.zond.v1.StateSyncCommitteesResponse.data:type_name -> theqrl.zond.v1.SyncCommitteeValidators
+	6, // 2: theqrl.zond.v1.SyncCommitteeValidators.validator_aggregates:type_name -> theqrl.zond.v1.SyncSubcommitteeValidators
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -533,13 +533,13 @@ var file_proto_zond_v2_sync_committee_proto_depIdxs = []int32{
 	0, // [0:3] is the sub-list for field type_name
 }
 
-func init() { file_proto_zond_v2_sync_committee_proto_init() }
-func file_proto_zond_v2_sync_committee_proto_init() {
-	if File_proto_zond_v2_sync_committee_proto != nil {
+func init() { file_proto_zond_v1_sync_committee_proto_init() }
+func file_proto_zond_v1_sync_committee_proto_init() {
+	if File_proto_zond_v1_sync_committee_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_zond_v2_sync_committee_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_zond_v1_sync_committee_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SubmitSyncCommitteeSignaturesRequest); i {
 			case 0:
 				return &v.state
@@ -551,7 +551,7 @@ func file_proto_zond_v2_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_zond_v2_sync_committee_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_zond_v1_sync_committee_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncCommittee); i {
 			case 0:
 				return &v.state
@@ -563,7 +563,7 @@ func file_proto_zond_v2_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_zond_v2_sync_committee_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_zond_v1_sync_committee_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncCommitteeMessage); i {
 			case 0:
 				return &v.state
@@ -575,7 +575,7 @@ func file_proto_zond_v2_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_zond_v2_sync_committee_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_zond_v1_sync_committee_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StateSyncCommitteesRequest); i {
 			case 0:
 				return &v.state
@@ -587,7 +587,7 @@ func file_proto_zond_v2_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_zond_v2_sync_committee_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_zond_v1_sync_committee_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StateSyncCommitteesResponse); i {
 			case 0:
 				return &v.state
@@ -599,7 +599,7 @@ func file_proto_zond_v2_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_zond_v2_sync_committee_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_zond_v1_sync_committee_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncCommitteeValidators); i {
 			case 0:
 				return &v.state
@@ -611,7 +611,7 @@ func file_proto_zond_v2_sync_committee_proto_init() {
 				return nil
 			}
 		}
-		file_proto_zond_v2_sync_committee_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_zond_v1_sync_committee_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SyncSubcommitteeValidators); i {
 			case 0:
 				return &v.state
@@ -624,23 +624,23 @@ func file_proto_zond_v2_sync_committee_proto_init() {
 			}
 		}
 	}
-	file_proto_zond_v2_sync_committee_proto_msgTypes[3].OneofWrappers = []interface{}{}
+	file_proto_zond_v1_sync_committee_proto_msgTypes[3].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_zond_v2_sync_committee_proto_rawDesc,
+			RawDescriptor: file_proto_zond_v1_sync_committee_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_proto_zond_v2_sync_committee_proto_goTypes,
-		DependencyIndexes: file_proto_zond_v2_sync_committee_proto_depIdxs,
-		MessageInfos:      file_proto_zond_v2_sync_committee_proto_msgTypes,
+		GoTypes:           file_proto_zond_v1_sync_committee_proto_goTypes,
+		DependencyIndexes: file_proto_zond_v1_sync_committee_proto_depIdxs,
+		MessageInfos:      file_proto_zond_v1_sync_committee_proto_msgTypes,
 	}.Build()
-	File_proto_zond_v2_sync_committee_proto = out.File
-	file_proto_zond_v2_sync_committee_proto_rawDesc = nil
-	file_proto_zond_v2_sync_committee_proto_goTypes = nil
-	file_proto_zond_v2_sync_committee_proto_depIdxs = nil
+	File_proto_zond_v1_sync_committee_proto = out.File
+	file_proto_zond_v1_sync_committee_proto_rawDesc = nil
+	file_proto_zond_v1_sync_committee_proto_goTypes = nil
+	file_proto_zond_v1_sync_committee_proto_depIdxs = nil
 }

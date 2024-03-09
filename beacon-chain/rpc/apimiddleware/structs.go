@@ -5,7 +5,7 @@ import (
 
 	"github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/shared"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
+	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 )
 
 //----------------
@@ -46,14 +46,10 @@ type RandaoResponseJson struct {
 }
 
 type BlockResponseJson struct {
-	Data *SignedBeaconBlockJson `json:"data"`
-}
-
-type BlockV2ResponseJson struct {
-	Version             string                            `json:"version" enum:"true"`
-	Data                *SignedBeaconBlockContainerV2Json `json:"data"`
-	ExecutionOptimistic bool                              `json:"execution_optimistic"`
-	Finalized           bool                              `json:"finalized"`
+	Version             string                          `json:"version" enum:"true"`
+	Data                *SignedBeaconBlockContainerJson `json:"data"`
+	ExecutionOptimistic bool                            `json:"execution_optimistic"`
+	Finalized           bool                            `json:"finalized"`
 }
 
 type BlindedBlockResponseJson struct {
@@ -118,19 +114,15 @@ type SyncingResponseJson struct {
 	Data *shared.SyncDetails `json:"data"`
 }
 
-type BeaconStateV2ResponseJson struct {
-	Version             string                      `json:"version" enum:"true"`
-	Data                *BeaconStateContainerV2Json `json:"data"`
-	ExecutionOptimistic bool                        `json:"execution_optimistic"`
-	Finalized           bool                        `json:"finalized"`
+type BeaconStateResponseJson struct {
+	Version             string                    `json:"version" enum:"true"`
+	Data                *BeaconStateContainerJson `json:"data"`
+	ExecutionOptimistic bool                      `json:"execution_optimistic"`
+	Finalized           bool                      `json:"finalized"`
 }
 
 type ForkChoiceHeadsResponseJson struct {
 	Data []*ForkChoiceHeadJson `json:"data"`
-}
-
-type V2ForkChoiceHeadsResponseJson struct {
-	Data []*V2ForkChoiceHeadJson `json:"data"`
 }
 
 type ForkScheduleResponseJson struct {
@@ -146,12 +138,8 @@ type SpecResponseJson struct {
 }
 
 type ProduceBlockResponseJson struct {
-	Data *BeaconBlockJson `json:"data"`
-}
-
-type ProduceBlockResponseV2Json struct {
-	Version string                      `json:"version" enum:"true"`
-	Data    *BeaconBlockContainerV2Json `json:"data"`
+	Version string                    `json:"version" enum:"true"`
+	Data    *BeaconBlockContainerJson `json:"data"`
 }
 
 type ProduceBlindedBlockResponseJson struct {
@@ -248,7 +236,7 @@ type BeaconBlockBodyJson struct {
 	VoluntaryExits    []*SignedVoluntaryExitJson `json:"voluntary_exits"`
 }
 
-type SignedBeaconBlockContainerV2Json struct {
+type SignedBeaconBlockContainerJson struct {
 	CapellaBlock *BeaconBlockCapellaJson `json:"capella_block"`
 	Signature    string                  `json:"signature" hex:"true"`
 }
@@ -262,7 +250,7 @@ type SignedBlindedBeaconBlockContentsContainerJson struct {
 	CapellaBlock *SignedBlindedBeaconBlockCapellaJson `json:"capella_block"`
 }
 
-type BeaconBlockContainerV2Json struct {
+type BeaconBlockContainerJson struct {
 	CapellaBlock *BeaconBlockCapellaJson `json:"capella_block"`
 }
 
@@ -514,7 +502,7 @@ type BeaconStateCapellaJson struct {
 	HistoricalSummaries          []*HistoricalSummaryJson           `json:"historical_summaries"`
 }
 
-type BeaconStateContainerV2Json struct {
+type BeaconStateContainerJson struct {
 	CapellaState *BeaconStateCapellaJson `json:"capella_state"`
 }
 
@@ -552,11 +540,6 @@ type PendingAttestationJson struct {
 }
 
 type ForkChoiceHeadJson struct {
-	Root string `json:"root" hex:"true"`
-	Slot string `json:"slot"`
-}
-
-type V2ForkChoiceHeadJson struct {
 	Root                string `json:"root" hex:"true"`
 	Slot                string `json:"slot"`
 	ExecutionOptimistic bool   `json:"execution_optimistic"`
@@ -655,7 +638,7 @@ func (ssz *SszResponseJson) SSZData() string {
 }
 
 func (*SszResponseJson) SSZVersion() string {
-	return strings.ToLower(zondpbv2.Version_PHASE0.String())
+	return strings.ToLower(zondpbv1.Version_PHASE0.String())
 }
 
 func (*SszResponseJson) SSZOptimistic() bool {

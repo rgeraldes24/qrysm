@@ -3,7 +3,7 @@ package sync_contribution
 import (
 	"fmt"
 
-	v2 "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+	v1alpha1 "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation"
 	"golang.org/x/exp/slices"
@@ -11,7 +11,7 @@ import (
 
 // naiveSyncContributionAggregation aggregates naively, without any complex algorithms or optimizations.
 // Note: this is currently a naive implementation to the order of O(mn^2).
-func naiveSyncContributionAggregation(contributions []*v2.SyncCommitteeContribution) ([]*v2.SyncCommitteeContribution, error) {
+func naiveSyncContributionAggregation(contributions []*v1alpha1.SyncCommitteeContribution) ([]*v1alpha1.SyncCommitteeContribution, error) {
 	for i, c := range contributions {
 		if len(c.Signatures) != len(c.AggregationBits.BitIndices()) {
 			return nil, fmt.Errorf("signatures length %d is not equal to the attesting participants indices length %d for contribution with index %d", len(c.Signatures), len(c.AggregationBits.BitIndices()), i)
@@ -74,7 +74,7 @@ func naiveSyncContributionAggregation(contributions []*v2.SyncCommitteeContribut
 }
 
 // aggregates pair of sync contributions c1 and c2 together.
-func aggregate(c1, c2 *v2.SyncCommitteeContribution) (*v2.SyncCommitteeContribution, error) {
+func aggregate(c1, c2 *v1alpha1.SyncCommitteeContribution) (*v1alpha1.SyncCommitteeContribution, error) {
 	o, err := c1.AggregationBits.Overlaps(c2.AggregationBits)
 	if err != nil {
 		return nil, err
@@ -83,8 +83,8 @@ func aggregate(c1, c2 *v2.SyncCommitteeContribution) (*v2.SyncCommitteeContribut
 		return nil, aggregation.ErrBitsOverlap
 	}
 
-	baseContribution := v2.CopySyncCommitteeContribution(c1)
-	newContribution := v2.CopySyncCommitteeContribution(c2)
+	baseContribution := v1alpha1.CopySyncCommitteeContribution(c1)
+	newContribution := v1alpha1.CopySyncCommitteeContribution(c2)
 	if newContribution.AggregationBits.Count() > baseContribution.AggregationBits.Count() {
 		baseContribution, newContribution = newContribution, baseContribution
 	}

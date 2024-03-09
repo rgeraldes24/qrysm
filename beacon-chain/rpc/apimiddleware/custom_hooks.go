@@ -10,7 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
+	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 )
 
 // https://ethereum.github.io/beacon-APIs/?urls.primaryName=dev#/Beacon/submitPoolBLSToExecutionChange
@@ -226,15 +226,15 @@ type capellaBlindedBlockResponseJson struct {
 	Finalized           bool                                 `json:"finalized"`
 }
 
-func serializeV2Block(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
-	respContainer, ok := response.(*BlockV2ResponseJson)
+func serializeBlock(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
+	respContainer, ok := response.(*BlockResponseJson)
 	if !ok {
 		return false, nil, apimiddleware.InternalServerError(errors.New("container is not of the correct type"))
 	}
 
 	var actualRespContainer interface{}
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv2.Version_CAPELLA.String())):
+	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv1.Version_CAPELLA.String())):
 		actualRespContainer = &capellaBlockResponseJson{
 			Version: respContainer.Version,
 			Data: &SignedBeaconBlockCapellaJson{
@@ -263,7 +263,7 @@ func serializeBlindedBlock(response interface{}) (apimiddleware.RunDefault, []by
 
 	var actualRespContainer interface{}
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv2.Version_CAPELLA.String())):
+	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv1.Version_CAPELLA.String())):
 		actualRespContainer = &capellaBlindedBlockResponseJson{
 			Version: respContainer.Version,
 			Data: &SignedBlindedBeaconBlockCapellaJson{
@@ -289,15 +289,15 @@ type capellaStateResponseJson struct {
 	Data    *BeaconStateCapellaJson `json:"data"`
 }
 
-func serializeV2State(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
-	respContainer, ok := response.(*BeaconStateV2ResponseJson)
+func serializeState(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
+	respContainer, ok := response.(*BeaconStateResponseJson)
 	if !ok {
 		return false, nil, apimiddleware.InternalServerError(errors.New("container is not of the correct type"))
 	}
 
 	var actualRespContainer interface{}
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv2.Version_CAPELLA.String())):
+	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv1.Version_CAPELLA.String())):
 		actualRespContainer = &capellaStateResponseJson{
 			Version: respContainer.Version,
 			Data:    respContainer.Data.CapellaState,
@@ -323,15 +323,15 @@ type capellaProduceBlindedBlockResponseJson struct {
 	Data    *BlindedBeaconBlockCapellaJson `json:"data"`
 }
 
-func serializeProducedV2Block(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
-	respContainer, ok := response.(*ProduceBlockResponseV2Json)
+func serializeProducedBlock(response interface{}) (apimiddleware.RunDefault, []byte, apimiddleware.ErrorJson) {
+	respContainer, ok := response.(*ProduceBlockResponseJson)
 	if !ok {
 		return false, nil, apimiddleware.InternalServerError(errors.New("container is not of the correct type"))
 	}
 
 	var actualRespContainer interface{}
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv2.Version_CAPELLA.String())):
+	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv1.Version_CAPELLA.String())):
 		actualRespContainer = &capellaProduceBlockResponseJson{
 			Version: respContainer.Version,
 			Data:    respContainer.Data.CapellaBlock,
@@ -355,7 +355,7 @@ func serializeProducedBlindedBlock(response interface{}) (apimiddleware.RunDefau
 
 	var actualRespContainer interface{}
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv2.Version_CAPELLA.String())):
+	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv1.Version_CAPELLA.String())):
 		actualRespContainer = &capellaProduceBlindedBlockResponseJson{
 			Version: respContainer.Version,
 			Data:    respContainer.Data.CapellaBlock,

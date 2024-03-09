@@ -424,9 +424,8 @@ func (s *Service) Start() {
 	s.cfg.Router.HandleFunc("/zond/v1/beacon/states/{state_id}/validator_count", httpServer.GetValidatorCount).Methods(http.MethodGet)
 	s.cfg.Router.HandleFunc("/zond/v1/beacon/states/{state_id}/committees", beaconChainServerV1.GetCommittees).Methods(http.MethodGet)
 	s.cfg.Router.HandleFunc("/zond/v1/beacon/states/{state_id}/fork", beaconChainServerV1.GetStateFork).Methods(http.MethodGet)
-	// TODO(rgeraldes24): move to v1; removed the old v1 implementations
-	s.cfg.Router.HandleFunc("/zond/v2/beacon/blocks", beaconChainServerV1.PublishBlockV2).Methods(http.MethodPost)
-	s.cfg.Router.HandleFunc("/zond/v2/beacon/blinded_blocks", beaconChainServerV1.PublishBlindedBlockV2).Methods(http.MethodPost)
+	s.cfg.Router.HandleFunc("/zond/v1/beacon/blocks", beaconChainServerV1.PublishBlock).Methods(http.MethodPost)
+	s.cfg.Router.HandleFunc("/zond/v1/beacon/blinded_blocks", beaconChainServerV1.PublishBlindedBlock).Methods(http.MethodPost)
 	s.cfg.Router.HandleFunc("/zond/v1/beacon/blocks/{block_id}/root", beaconChainServerV1.GetBlockRoot).Methods(http.MethodGet)
 	s.cfg.Router.HandleFunc("/zond/v1/beacon/pool/attestations", beaconChainServerV1.ListAttestations).Methods(http.MethodGet)
 	s.cfg.Router.HandleFunc("/zond/v1/beacon/pool/attestations", beaconChainServerV1.SubmitAttestations).Methods(http.MethodPost)

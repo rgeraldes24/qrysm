@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/v4/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/v4/config/params"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
+	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -177,10 +177,10 @@ func TestPrepareValidatorAggregates(t *testing.T) {
 	require.DeepEqual(t, [][]string{{"3", "4"}, {"5"}}, container.Data.ValidatorAggregates)
 }
 
-func TestSerializeV2Block(t *testing.T) {
+func TestSerializeBlock(t *testing.T) {
 	t.Run("incorrect response type", func(t *testing.T) {
 		response := &types.Empty{}
-		runDefault, j, errJson := serializeV2Block(response)
+		runDefault, j, errJson := serializeBlock(response)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.Equal(t, 0, len(j))
 		require.NotNil(t, errJson)
@@ -188,10 +188,10 @@ func TestSerializeV2Block(t *testing.T) {
 	})
 
 	t.Run("unsupported block version", func(t *testing.T) {
-		response := &BlockV2ResponseJson{
+		response := &BlockResponseJson{
 			Version: "unsupported",
 		}
-		runDefault, j, errJson := serializeV2Block(response)
+		runDefault, j, errJson := serializeBlock(response)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.Equal(t, 0, len(j))
 		require.NotNil(t, errJson)
@@ -202,7 +202,7 @@ func TestSerializeV2Block(t *testing.T) {
 func TestSerializeBlindedBlock(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		response := &BlindedBlockResponseJson{
-			Version: zondpbv2.Version_CAPELLA.String(),
+			Version: zondpbv1.Version_CAPELLA.String(),
 			Data: &SignedBlindedBeaconBlockContainerJson{
 				CapellaBlock: &BlindedBeaconBlockCapellaJson{
 					Slot:          "1",
@@ -289,15 +289,15 @@ func TestSerializeBlindedBlock(t *testing.T) {
 	})
 }
 
-func TestSerializeV2State(t *testing.T) {
+func TestSerializeState(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
-		response := &BeaconStateV2ResponseJson{
-			Version: zondpbv2.Version_CAPELLA.String(),
-			Data: &BeaconStateContainerV2Json{
+		response := &BeaconStateResponseJson{
+			Version: zondpbv1.Version_CAPELLA.String(),
+			Data: &BeaconStateContainerJson{
 				CapellaState: &BeaconStateCapellaJson{},
 			},
 		}
-		runDefault, j, errJson := serializeV2State(response)
+		runDefault, j, errJson := serializeState(response)
 		require.Equal(t, nil, errJson)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.NotNil(t, j)
@@ -305,7 +305,7 @@ func TestSerializeV2State(t *testing.T) {
 	})
 
 	t.Run("incorrect response type", func(t *testing.T) {
-		runDefault, j, errJson := serializeV2State(&types.Empty{})
+		runDefault, j, errJson := serializeState(&types.Empty{})
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.Equal(t, 0, len(j))
 		require.NotNil(t, errJson)
@@ -313,10 +313,10 @@ func TestSerializeV2State(t *testing.T) {
 	})
 
 	t.Run("unsupported state version", func(t *testing.T) {
-		response := &BeaconStateV2ResponseJson{
+		response := &BeaconStateResponseJson{
 			Version: "unsupported",
 		}
-		runDefault, j, errJson := serializeV2State(response)
+		runDefault, j, errJson := serializeState(response)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.Equal(t, 0, len(j))
 		require.NotNil(t, errJson)
@@ -324,11 +324,11 @@ func TestSerializeV2State(t *testing.T) {
 	})
 }
 
-func TestSerializeProducedV2Block(t *testing.T) {
+func TestSerializeProducedBlock(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
-		response := &ProduceBlockResponseV2Json{
-			Version: zondpbv2.Version_CAPELLA.String(),
-			Data: &BeaconBlockContainerV2Json{
+		response := &ProduceBlockResponseJson{
+			Version: zondpbv1.Version_CAPELLA.String(),
+			Data: &BeaconBlockContainerJson{
 				CapellaBlock: &BeaconBlockCapellaJson{
 					Slot:          "1",
 					ProposerIndex: "1",
@@ -338,7 +338,7 @@ func TestSerializeProducedV2Block(t *testing.T) {
 				},
 			},
 		}
-		runDefault, j, errJson := serializeProducedV2Block(response)
+		runDefault, j, errJson := serializeProducedBlock(response)
 		require.Equal(t, nil, errJson)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.NotNil(t, j)
@@ -355,7 +355,7 @@ func TestSerializeProducedV2Block(t *testing.T) {
 	})
 	t.Run("incorrect response type", func(t *testing.T) {
 		response := &types.Empty{}
-		runDefault, j, errJson := serializeProducedV2Block(response)
+		runDefault, j, errJson := serializeProducedBlock(response)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.Equal(t, 0, len(j))
 		require.NotNil(t, errJson)
@@ -363,10 +363,10 @@ func TestSerializeProducedV2Block(t *testing.T) {
 	})
 
 	t.Run("unsupported block version", func(t *testing.T) {
-		response := &ProduceBlockResponseV2Json{
+		response := &ProduceBlockResponseJson{
 			Version: "unsupported",
 		}
-		runDefault, j, errJson := serializeProducedV2Block(response)
+		runDefault, j, errJson := serializeProducedBlock(response)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.Equal(t, 0, len(j))
 		require.NotNil(t, errJson)
@@ -377,7 +377,7 @@ func TestSerializeProducedV2Block(t *testing.T) {
 func TestSerializeProduceBlindedBlock(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		response := &ProduceBlindedBlockResponseJson{
-			Version: zondpbv2.Version_CAPELLA.String(),
+			Version: zondpbv1.Version_CAPELLA.String(),
 			Data: &BlindedBeaconBlockContainerJson{
 				CapellaBlock: &BlindedBeaconBlockCapellaJson{
 					Slot:          "1",
@@ -405,7 +405,7 @@ func TestSerializeProduceBlindedBlock(t *testing.T) {
 
 	t.Run("incorrect response type", func(t *testing.T) {
 		response := &types.Empty{}
-		runDefault, j, errJson := serializeProducedV2Block(response)
+		runDefault, j, errJson := serializeProducedBlock(response)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.Equal(t, 0, len(j))
 		require.NotNil(t, errJson)
@@ -413,10 +413,10 @@ func TestSerializeProduceBlindedBlock(t *testing.T) {
 	})
 
 	t.Run("unsupported block version", func(t *testing.T) {
-		response := &ProduceBlockResponseV2Json{
+		response := &ProduceBlockResponseJson{
 			Version: "unsupported",
 		}
-		runDefault, j, errJson := serializeProducedV2Block(response)
+		runDefault, j, errJson := serializeProducedBlock(response)
 		require.Equal(t, apimiddleware.RunDefault(false), runDefault)
 		require.Equal(t, 0, len(j))
 		require.NotNil(t, errJson)

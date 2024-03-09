@@ -10,7 +10,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/blocks"
 	"github.com/theQRL/qrysm/v4/proto/migration"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -33,14 +32,14 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 			OptimisticModeFetcher: mockChainService,
 		}
 
-		expected, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV2Blinded(b.Block)
+		expected, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV1Blinded(b.Block)
 		require.NoError(t, err)
 		resp, err := bs.GetBlindedBlock(ctx, &zondpbv1.BlockRequest{})
 		require.NoError(t, err)
-		capellaBlock, ok := resp.Data.Message.(*zondpbv2.SignedBlindedBeaconBlockContainer_CapellaBlock)
+		capellaBlock, ok := resp.Data.Message.(*zondpbv1.SignedBlindedBeaconBlockContainer_CapellaBlock)
 		require.Equal(t, true, ok)
 		assert.DeepEqual(t, expected, capellaBlock.CapellaBlock)
-		assert.Equal(t, zondpbv2.Version_CAPELLA, resp.Version)
+		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		b := util.NewBlindedBeaconBlockCapella()
@@ -125,7 +124,7 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotNil(t, resp)
 		assert.DeepEqual(t, expected, resp.Data)
-		assert.Equal(t, zondpbv2.Version_CAPELLA, resp.Version)
+		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		b := util.NewBlindedBeaconBlockCapella()

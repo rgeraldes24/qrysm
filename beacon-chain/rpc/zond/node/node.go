@@ -253,7 +253,7 @@ func (_ *Server) GetVersion(ctx context.Context, _ *emptypb.Empty) (*zondpb.Vers
 
 	v := fmt.Sprintf("Prysm/%s (%s %s)", version.SemanticVersion(), runtime.GOOS, runtime.GOARCH)
 	return &zondpb.VersionResponse{
-		Data: &zondpb.Version{
+		Data: &zondpb.NodeVersion{
 			Version: v,
 		},
 	}, nil

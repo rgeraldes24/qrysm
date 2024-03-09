@@ -17,7 +17,6 @@ import (
 	"github.com/theQRL/qrysm/v4/proto/migration"
 	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -60,7 +59,7 @@ func fillDBTestBlocks(ctx context.Context, t *testing.T, beaconDB db.Database) (
 	return genBlk, blkContainers
 }
 
-func TestServer_GetBlockV2(t *testing.T) {
+func TestServer_GetBlock(t *testing.T) {
 	stream := &runtime.ServerTransportStream{}
 	ctx := grpc.NewContextWithServerTransportStream(context.Background(), stream)
 	t.Run("Capella", func(t *testing.T) {
@@ -78,15 +77,15 @@ func TestServer_GetBlockV2(t *testing.T) {
 			Blocker:               mockBlockFetcher,
 		}
 
-		blk, err := bs.GetBlockV2(ctx, &zondpbv2.BlockRequestV2{})
+		blk, err := bs.GetBlock(ctx, &zondpbv1.BlockRequest{})
 		require.NoError(t, err)
 
-		v1Block, err := migration.V1Alpha1BeaconBlockCapellaToV2(b.Block)
+		v1Block, err := migration.V1Alpha1BeaconBlockCapellaToV1(b.Block)
 		require.NoError(t, err)
-		bellatrixBlock, ok := blk.Data.Message.(*zondpbv2.SignedBeaconBlockContainer_CapellaBlock)
+		bellatrixBlock, ok := blk.Data.Message.(*zondpbv1.SignedBeaconBlockContainer_CapellaBlock)
 		require.Equal(t, true, ok)
 		assert.DeepEqual(t, v1Block, bellatrixBlock.CapellaBlock)
-		assert.Equal(t, zondpbv2.Version_CAPELLA, blk.Version)
+		assert.Equal(t, zondpbv1.Version_CAPELLA, blk.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		b := util.NewBeaconBlockCapella()
@@ -105,7 +104,7 @@ func TestServer_GetBlockV2(t *testing.T) {
 			Blocker:               mockBlockFetcher,
 		}
 
-		blk, err := bs.GetBlockV2(ctx, &zondpbv2.BlockRequestV2{})
+		blk, err := bs.GetBlock(ctx, &zondpbv1.BlockRequest{})
 		require.NoError(t, err)
 		assert.Equal(t, true, blk.ExecutionOptimistic)
 	})
@@ -125,7 +124,7 @@ func TestServer_GetBlockV2(t *testing.T) {
 				Blocker:               mockBlockFetcher,
 			}
 
-			header, err := bs.GetBlockV2(ctx, &zondpbv2.BlockRequestV2{BlockId: r[:]})
+			header, err := bs.GetBlock(ctx, &zondpbv1.BlockRequest{BlockId: r[:]})
 			require.NoError(t, err)
 			assert.Equal(t, true, header.Finalized)
 		})
@@ -137,14 +136,14 @@ func TestServer_GetBlockV2(t *testing.T) {
 				Blocker:               mockBlockFetcher,
 			}
 
-			resp, err := bs.GetBlockV2(ctx, &zondpbv2.BlockRequestV2{BlockId: r[:]})
+			resp, err := bs.GetBlock(ctx, &zondpbv1.BlockRequest{BlockId: r[:]})
 			require.NoError(t, err)
 			assert.Equal(t, false, resp.Finalized)
 		})
 	})
 }
 
-func TestServer_GetBlockSSZV2(t *testing.T) {
+func TestServer_GetBlockSSZ(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("Capella", func(t *testing.T) {
@@ -162,13 +161,13 @@ func TestServer_GetBlockSSZV2(t *testing.T) {
 			Blocker:               &testutil.MockBlocker{BlockToReturn: sb},
 		}
 
-		resp, err := bs.GetBlockSSZV2(ctx, &zondpbv2.BlockRequestV2{})
+		resp, err := bs.GetBlockSSZ(ctx, &zondpbv1.BlockRequest{})
 		require.NoError(t, err)
 		assert.NotNil(t, resp)
 		sszBlock, err := b.MarshalSSZ()
 		require.NoError(t, err)
 		assert.DeepEqual(t, sszBlock, resp.Data)
-		assert.Equal(t, zondpbv2.Version_CAPELLA, resp.Version)
+		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		b := util.NewBeaconBlockCapella()
@@ -187,7 +186,7 @@ func TestServer_GetBlockSSZV2(t *testing.T) {
 			Blocker:               &testutil.MockBlocker{BlockToReturn: sb},
 		}
 
-		resp, err := bs.GetBlockSSZV2(ctx, &zondpbv2.BlockRequestV2{})
+		resp, err := bs.GetBlockSSZ(ctx, &zondpbv1.BlockRequest{})
 		require.NoError(t, err)
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
@@ -207,7 +206,7 @@ func TestServer_GetBlockSSZV2(t *testing.T) {
 				Blocker:               mockBlockFetcher,
 			}
 
-			header, err := bs.GetBlockSSZV2(ctx, &zondpbv2.BlockRequestV2{BlockId: r[:]})
+			header, err := bs.GetBlockSSZ(ctx, &zondpbv1.BlockRequest{BlockId: r[:]})
 			require.NoError(t, err)
 			assert.Equal(t, true, header.Finalized)
 		})
@@ -219,7 +218,7 @@ func TestServer_GetBlockSSZV2(t *testing.T) {
 				Blocker:               mockBlockFetcher,
 			}
 
-			resp, err := bs.GetBlockSSZV2(ctx, &zondpbv2.BlockRequestV2{BlockId: r[:]})
+			resp, err := bs.GetBlockSSZ(ctx, &zondpbv1.BlockRequest{BlockId: r[:]})
 			require.NoError(t, err)
 			assert.Equal(t, false, resp.Finalized)
 		})
@@ -282,7 +281,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 		resp, err := bs.ListBlockAttestations(ctx, &zondpbv1.BlockRequest{})
 		require.NoError(t, err)
 
-		v1Block, err := migration.V1Alpha1BeaconBlockCapellaToV2(b.Block)
+		v1Block, err := migration.V1Alpha1BeaconBlockCapellaToV1(b.Block)
 		require.NoError(t, err)
 		assert.DeepEqual(t, v1Block.Body.Attestations, resp.Data)
 	})

@@ -105,6 +105,8 @@ func convertValidators(indices []uint64, elements interface{}, convertAll bool) 
 	return handleValidatorSlice(val, indices, convertAll)
 }
 
+// TODO(rgeraldes24): remove: unused
+/*
 func convertAttestations(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
 	val, ok := elements.([]*zondpb.PendingAttestation)
 	if !ok {
@@ -112,6 +114,7 @@ func convertAttestations(indices []uint64, elements interface{}, convertAll bool
 	}
 	return handlePendingAttestationSlice(val, indices, convertAll)
 }
+*/
 
 func convertBalances(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
 	val, ok := elements.([]uint64)

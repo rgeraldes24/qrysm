@@ -1209,7 +1209,7 @@ func TestDilithiumChangesSignatureBatch(t *testing.T) {
 	require.Equal(t, true, verify)
 
 	// Verify a single change
-	change := migration.V1Alpha1SignedDilithiumToExecChangeToV2(signedChanges[0])
+	change := migration.V1Alpha1SignedDilithiumToExecChangeToV1(signedChanges[0])
 	require.NoError(t, blocks.VerifyDilithiumChangeSignature(st, change))
 }
 
@@ -1276,7 +1276,7 @@ func TestDilithiumChangesSignatureBatchWrongFork(t *testing.T) {
 	require.Equal(t, false, verify)
 
 	// Verify a single change
-	change := migration.V1Alpha1SignedDilithiumToExecChangeToV2(signedChanges[0])
+	change := migration.V1Alpha1SignedDilithiumToExecChangeToV1(signedChanges[0])
 	require.ErrorIs(t, signing.ErrSigFailedToVerify, blocks.VerifyDilithiumChangeSignature(st, change))
 }
 */

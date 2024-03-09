@@ -13,14 +13,13 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func TestGetBeaconStateV2(t *testing.T) {
+func TestGetBeaconState(t *testing.T) {
 	ctx := context.Background()
 	db := dbTest.SetupDB(t)
 
@@ -35,12 +34,12 @@ func TestGetBeaconStateV2(t *testing.T) {
 			FinalizationFetcher:   &blockchainmock.ChainService{},
 			BeaconDB:              db,
 		}
-		resp, err := server.GetBeaconStateV2(context.Background(), &zondpbv2.BeaconStateRequestV2{
+		resp, err := server.GetBeaconState(context.Background(), &zondpbv1.BeaconStateRequest{
 			StateId: []byte("head"),
 		})
 		require.NoError(t, err)
 		assert.NotNil(t, resp)
-		assert.Equal(t, zondpbv2.Version_CAPELLA, resp.Version)
+		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
@@ -61,7 +60,7 @@ func TestGetBeaconStateV2(t *testing.T) {
 			FinalizationFetcher:   &blockchainmock.ChainService{},
 			BeaconDB:              db,
 		}
-		resp, err := server.GetBeaconStateV2(context.Background(), &zondpbv2.BeaconStateRequestV2{
+		resp, err := server.GetBeaconState(context.Background(), &zondpbv1.BeaconStateRequest{
 			StateId: []byte("head"),
 		})
 		require.NoError(t, err)
@@ -94,7 +93,7 @@ func TestGetBeaconStateV2(t *testing.T) {
 			FinalizationFetcher:   chainService,
 			BeaconDB:              db,
 		}
-		resp, err := server.GetBeaconStateV2(context.Background(), &zondpbv2.BeaconStateRequestV2{
+		resp, err := server.GetBeaconState(context.Background(), &zondpbv1.BeaconStateRequest{
 			StateId: []byte("head"),
 		})
 		require.NoError(t, err)
@@ -104,26 +103,6 @@ func TestGetBeaconStateV2(t *testing.T) {
 }
 
 func TestGetBeaconStateSSZ(t *testing.T) {
-	fakeState, err := util.NewBeaconStateCapella()
-	require.NoError(t, err)
-	sszState, err := fakeState.MarshalSSZ()
-	require.NoError(t, err)
-
-	server := &Server{
-		Stater: &testutil.MockStater{
-			BeaconState: fakeState,
-		},
-	}
-	resp, err := server.GetBeaconStateSSZ(context.Background(), &zondpbv1.StateRequest{
-		StateId: make([]byte, 0),
-	})
-	require.NoError(t, err)
-	assert.NotNil(t, resp)
-
-	assert.DeepEqual(t, sszState, resp.Data)
-}
-
-func TestGetBeaconStateSSZV2(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		fakeState, _ := util.DeterministicGenesisStateCapella(t, 1)
 		sszState, err := fakeState.MarshalSSZ()
@@ -134,18 +113,18 @@ func TestGetBeaconStateSSZV2(t *testing.T) {
 				BeaconState: fakeState,
 			},
 		}
-		resp, err := server.GetBeaconStateSSZV2(context.Background(), &zondpbv2.BeaconStateRequestV2{
+		resp, err := server.GetBeaconStateSSZ(context.Background(), &zondpbv1.BeaconStateRequest{
 			StateId: make([]byte, 0),
 		})
 		require.NoError(t, err)
 		assert.NotNil(t, resp)
 
 		assert.DeepEqual(t, sszState, resp.Data)
-		assert.Equal(t, zondpbv2.Version_CAPELLA, resp.Version)
+		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
 	})
 }
 
-func TestListForkChoiceHeadsV2(t *testing.T) {
+func TestListForkChoiceHeads(t *testing.T) {
 	ctx := context.Background()
 
 	expectedSlotsAndRoots := []struct {
@@ -164,7 +143,7 @@ func TestListForkChoiceHeadsV2(t *testing.T) {
 		HeadFetcher:           chainService,
 		OptimisticModeFetcher: chainService,
 	}
-	resp, err := server.ListForkChoiceHeadsV2(ctx, &emptypb.Empty{})
+	resp, err := server.ListForkChoiceHeads(ctx, &emptypb.Empty{})
 	require.NoError(t, err)
 	assert.Equal(t, 2, len(resp.Data))
 	for _, sr := range expectedSlotsAndRoots {
@@ -191,7 +170,7 @@ func TestListForkChoiceHeadsV2(t *testing.T) {
 			HeadFetcher:           chainService,
 			OptimisticModeFetcher: chainService,
 		}
-		resp, err := server.ListForkChoiceHeadsV2(ctx, &emptypb.Empty{})
+		resp, err := server.ListForkChoiceHeads(ctx, &emptypb.Empty{})
 		require.NoError(t, err)
 		assert.Equal(t, 2, len(resp.Data))
 		for _, sr := range expectedSlotsAndRoots {

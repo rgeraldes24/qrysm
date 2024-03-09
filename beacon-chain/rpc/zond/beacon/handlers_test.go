@@ -42,7 +42,7 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-func TestPublishBlockV2(t *testing.T) {
+func TestPublishBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
 	t.Run("Capella", func(t *testing.T) {
@@ -65,7 +65,7 @@ func TestPublishBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.CapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("invalid block", func(t *testing.T) {
@@ -76,7 +76,7 @@ func TestPublishBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "please add the api header"))
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Body does not represent a valid block type"))
@@ -90,7 +90,7 @@ func TestPublishBlockV2(t *testing.T) {
 		request.Header.Set(api.VersionHeader, version.String(version.Capella))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		body := writer.Body.String()
 		assert.Equal(t, true, strings.Contains(body, "Body does not represent a valid block type"))
@@ -108,13 +108,13 @@ func TestPublishBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte("foo")))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusServiceUnavailable, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Beacon node is currently syncing and not serving request on that endpoint"))
 	})
 }
 
-func TestPublishBlockV2SSZ(t *testing.T) {
+func TestPublishBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	t.Run("Capella", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
@@ -138,7 +138,7 @@ func TestPublishBlockV2SSZ(t *testing.T) {
 		request.Header.Set("Accept", "application/octet-stream")
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("invalid block", func(t *testing.T) {
@@ -149,13 +149,13 @@ func TestPublishBlockV2SSZ(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlockV2(writer, request)
+		server.PublishBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Body does not represent a valid block type"))
 	})
 }
 
-func TestPublishBlindedBlockV2(t *testing.T) {
+func TestPublishBlindedBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	t.Run("Blinded Capella", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
@@ -177,7 +177,7 @@ func TestPublishBlindedBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.BlindedCapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("invalid block", func(t *testing.T) {
@@ -188,7 +188,7 @@ func TestPublishBlindedBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.CapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "please add the api header"))
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Body does not represent a valid block type"))
@@ -202,7 +202,7 @@ func TestPublishBlindedBlockV2(t *testing.T) {
 		request.Header.Set(api.VersionHeader, version.String(version.Capella))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		body := writer.Body.String()
 		assert.Equal(t, true, strings.Contains(body, "Body does not represent a valid block type"))
@@ -220,13 +220,13 @@ func TestPublishBlindedBlockV2(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte("foo")))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusServiceUnavailable, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Beacon node is currently syncing and not serving request on that endpoint"))
 	})
 }
 
-func TestPublishBlindedBlockV2SSZ(t *testing.T) {
+func TestPublishBlindedBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	t.Run("Capella", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
@@ -250,7 +250,7 @@ func TestPublishBlindedBlockV2SSZ(t *testing.T) {
 		request.Header.Set("Accept", "application/octet-stream")
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusOK, writer.Code)
 	})
 	t.Run("invalid block", func(t *testing.T) {
@@ -261,7 +261,7 @@ func TestPublishBlindedBlockV2SSZ(t *testing.T) {
 		request := httptest.NewRequest(http.MethodPost, "http://foo.example", bytes.NewReader([]byte(rpctesting.CapellaBlock)))
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
-		server.PublishBlindedBlockV2(writer, request)
+		server.PublishBlindedBlock(writer, request)
 		assert.Equal(t, http.StatusBadRequest, writer.Code)
 		assert.Equal(t, true, strings.Contains(writer.Body.String(), "Body does not represent a valid block type"))
 	})

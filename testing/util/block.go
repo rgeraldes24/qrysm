@@ -20,7 +20,6 @@ import (
 	enginev1 "github.com/theQRL/qrysm/v4/proto/engine/v1"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	v1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	v2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 	"github.com/theQRL/qrysm/v4/testing/assertions"
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
@@ -487,21 +486,21 @@ func HydrateBlindedBeaconBlockBodyCapella(b *zondpb.BlindedBeaconBlockBodyCapell
 	return b
 }
 
-// HydrateV2SignedBlindedBeaconBlockCapella hydrates a signed blinded beacon block with correct field length sizes
+// HydrateV1SignedBlindedBeaconBlockCapella hydrates a signed blinded beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV2SignedBlindedBeaconBlockCapella(b *v2.SignedBlindedBeaconBlockCapella) *v2.SignedBlindedBeaconBlockCapella {
+func HydrateV1SignedBlindedBeaconBlockCapella(b *v1.SignedBlindedBeaconBlockCapella) *v1.SignedBlindedBeaconBlockCapella {
 	if b.Signature == nil {
 		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
 	}
-	b.Message = HydrateV2BlindedBeaconBlockCapella(b.Message)
+	b.Message = HydrateV1BlindedBeaconBlockCapella(b.Message)
 	return b
 }
 
-// HydrateV2BlindedBeaconBlockCapella hydrates a blinded beacon block with correct field length sizes
+// HydrateV1BlindedBeaconBlockCapella hydrates a blinded beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV2BlindedBeaconBlockCapella(b *v2.BlindedBeaconBlockCapella) *v2.BlindedBeaconBlockCapella {
+func HydrateV1BlindedBeaconBlockCapella(b *v1.BlindedBeaconBlockCapella) *v1.BlindedBeaconBlockCapella {
 	if b == nil {
-		b = &v2.BlindedBeaconBlockCapella{}
+		b = &v1.BlindedBeaconBlockCapella{}
 	}
 	if b.ParentRoot == nil {
 		b.ParentRoot = make([]byte, fieldparams.RootLength)
@@ -509,15 +508,15 @@ func HydrateV2BlindedBeaconBlockCapella(b *v2.BlindedBeaconBlockCapella) *v2.Bli
 	if b.StateRoot == nil {
 		b.StateRoot = make([]byte, fieldparams.RootLength)
 	}
-	b.Body = HydrateV2BlindedBeaconBlockBodyCapella(b.Body)
+	b.Body = HydrateV1BlindedBeaconBlockBodyCapella(b.Body)
 	return b
 }
 
-// HydrateV2BlindedBeaconBlockBodyCapella hydrates a blinded beacon block body with correct field length sizes
+// HydrateV1BlindedBeaconBlockBodyCapella hydrates a blinded beacon block body with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV2BlindedBeaconBlockBodyCapella(b *v2.BlindedBeaconBlockBodyCapella) *v2.BlindedBeaconBlockBodyCapella {
+func HydrateV1BlindedBeaconBlockBodyCapella(b *v1.BlindedBeaconBlockBodyCapella) *v1.BlindedBeaconBlockBodyCapella {
 	if b == nil {
-		b = &v2.BlindedBeaconBlockBodyCapella{}
+		b = &v1.BlindedBeaconBlockBodyCapella{}
 	}
 	if b.RandaoReveal == nil {
 		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)
@@ -554,21 +553,21 @@ func HydrateV2BlindedBeaconBlockBodyCapella(b *v2.BlindedBeaconBlockBodyCapella)
 	return b
 }
 
-// HydrateV2CapellaSignedBeaconBlock hydrates a signed beacon block with correct field length sizes
+// HydrateV1CapellaSignedBeaconBlock hydrates a signed beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV2CapellaSignedBeaconBlock(b *v2.SignedBeaconBlockCapella) *v2.SignedBeaconBlockCapella {
+func HydrateV1CapellaSignedBeaconBlock(b *v1.SignedBeaconBlockCapella) *v1.SignedBeaconBlockCapella {
 	if b.Signature == nil {
 		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
 	}
-	b.Message = HydrateV2CapellaBeaconBlock(b.Message)
+	b.Message = HydrateV1CapellaBeaconBlock(b.Message)
 	return b
 }
 
-// HydrateV2CapellaBeaconBlock hydrates a beacon block with correct field length sizes
+// HydrateV1CapellaBeaconBlock hydrates a beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV2CapellaBeaconBlock(b *v2.BeaconBlockCapella) *v2.BeaconBlockCapella {
+func HydrateV1CapellaBeaconBlock(b *v1.BeaconBlockCapella) *v1.BeaconBlockCapella {
 	if b == nil {
-		b = &v2.BeaconBlockCapella{}
+		b = &v1.BeaconBlockCapella{}
 	}
 	if b.ParentRoot == nil {
 		b.ParentRoot = make([]byte, fieldparams.RootLength)
@@ -576,15 +575,15 @@ func HydrateV2CapellaBeaconBlock(b *v2.BeaconBlockCapella) *v2.BeaconBlockCapell
 	if b.StateRoot == nil {
 		b.StateRoot = make([]byte, fieldparams.RootLength)
 	}
-	b.Body = HydrateV2CapellaBeaconBlockBody(b.Body)
+	b.Body = HydrateV1CapellaBeaconBlockBody(b.Body)
 	return b
 }
 
-// HydrateV2CapellaBeaconBlockBody hydrates a beacon block body with correct field length sizes
+// HydrateV1CapellaBeaconBlockBody hydrates a beacon block body with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV2CapellaBeaconBlockBody(b *v2.BeaconBlockBodyCapella) *v2.BeaconBlockBodyCapella {
+func HydrateV1CapellaBeaconBlockBody(b *v1.BeaconBlockBodyCapella) *v1.BeaconBlockBodyCapella {
 	if b == nil {
-		b = &v2.BeaconBlockBodyCapella{}
+		b = &v1.BeaconBlockBodyCapella{}
 	}
 	if b.RandaoReveal == nil {
 		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)

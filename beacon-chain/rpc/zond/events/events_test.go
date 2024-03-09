@@ -172,7 +172,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 			},
 			Signature: []byte("sig"),
 		}
-		wantedContribution := migration.V1Alpha1SignedContributionAndProofToV2(wantedContributionV1alpha1)
+		wantedContribution := migration.V1Alpha1SignedContributionAndProofToV1(wantedContributionV1alpha1)
 		genericResponse, err := anypb.New(wantedContribution)
 		require.NoError(t, err)
 
@@ -209,7 +209,7 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 			},
 			Signature: make([]byte, 96),
 		}
-		wantedChange := migration.V1Alpha1SignedDilithiumToExecChangeToV2(wantedChangeV1alpha1)
+		wantedChange := migration.V1Alpha1SignedDilithiumToExecChangeToV1(wantedChangeV1alpha1)
 		genericResponse, err := anypb.New(wantedChange)
 		require.NoError(t, err)
 

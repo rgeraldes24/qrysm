@@ -961,6 +961,7 @@ func fixtures() map[string]interface{} {
 			Nonce:       zondtypes.EncodeNonce(6),
 			BaseFee:     big.NewInt(7),
 		},
+		Withdrawals: []*pb.Withdrawal{},
 	}
 	status := &pb.PayloadStatus{
 		Status:          pb.PayloadStatus_VALID,

@@ -11,14 +11,13 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	zondpbalpha "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/mock"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-func TestProduceBlockV2(t *testing.T) {
+func TestProduceBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	ctx := context.Background()
 
@@ -32,10 +31,10 @@ func TestProduceBlockV2(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		resp, err := server.ProduceBlockV2(ctx, &zondpbv1.ProduceBlockRequest{})
+		resp, err := server.ProduceBlock(ctx, &zondpbv1.ProduceBlockRequest{})
 		require.NoError(t, err)
-		assert.Equal(t, zondpbv2.Version_CAPELLA, resp.Version)
-		containerBlock, ok := resp.Data.Block.(*zondpbv2.BeaconBlockContainerV2_CapellaBlock)
+		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
+		containerBlock, ok := resp.Data.Block.(*zondpbv1.BeaconBlockContainer_CapellaBlock)
 		require.Equal(t, true, ok)
 		assert.Equal(t, primitives.Slot(123), containerBlock.CapellaBlock.Slot)
 	})
@@ -49,7 +48,7 @@ func TestProduceBlockV2(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		_, err := server.ProduceBlockV2(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlock(ctx, &zondpbv1.ProduceBlockRequest{})
 		assert.ErrorContains(t, "Prepared Capella beacon block is blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
@@ -63,7 +62,7 @@ func TestProduceBlockV2(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: true},
 		}
 
-		_, err := server.ProduceBlockV2(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlock(ctx, &zondpbv1.ProduceBlockRequest{})
 		require.ErrorContains(t, "The node is currently optimistic and cannot serve validators", err)
 	})
 	t.Run("sync not ready", func(t *testing.T) {
@@ -74,12 +73,12 @@ func TestProduceBlockV2(t *testing.T) {
 			TimeFetcher:           chainService,
 			OptimisticModeFetcher: chainService,
 		}
-		_, err := v1Server.ProduceBlockV2(context.Background(), nil)
+		_, err := v1Server.ProduceBlock(context.Background(), nil)
 		require.ErrorContains(t, "Syncing to latest head", err)
 	})
 }
 
-func TestProduceBlockV2SSZ(t *testing.T) {
+func TestProduceBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	ctx := context.Background()
 
@@ -95,7 +94,7 @@ func TestProduceBlockV2SSZ(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		resp, err := server.ProduceBlockV2SSZ(ctx, &zondpbv1.ProduceBlockRequest{})
+		resp, err := server.ProduceBlockSSZ(ctx, &zondpbv1.ProduceBlockRequest{})
 		require.NoError(t, err)
 		expectedData, err := b.MarshalSSZ()
 		assert.NoError(t, err)
@@ -111,7 +110,7 @@ func TestProduceBlockV2SSZ(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		_, err := server.ProduceBlockV2SSZ(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlockSSZ(ctx, &zondpbv1.ProduceBlockRequest{})
 		assert.ErrorContains(t, "Prepared Capella beacon block is blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
@@ -125,7 +124,7 @@ func TestProduceBlockV2SSZ(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: true},
 		}
 
-		_, err := server.ProduceBlockV2SSZ(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlockSSZ(ctx, &zondpbv1.ProduceBlockRequest{})
 		require.ErrorContains(t, "The node is currently optimistic and cannot serve validators", err)
 	})
 	t.Run("sync not ready", func(t *testing.T) {
@@ -136,7 +135,7 @@ func TestProduceBlockV2SSZ(t *testing.T) {
 			TimeFetcher:           chainService,
 			OptimisticModeFetcher: chainService,
 		}
-		_, err := v1Server.ProduceBlockV2SSZ(context.Background(), nil)
+		_, err := v1Server.ProduceBlockSSZ(context.Background(), nil)
 		require.ErrorContains(t, "Syncing to latest head", err)
 	})
 }
@@ -159,8 +158,8 @@ func TestProduceBlindedBlock(t *testing.T) {
 		resp, err := server.ProduceBlindedBlock(ctx, &zondpbv1.ProduceBlockRequest{})
 		require.NoError(t, err)
 
-		assert.Equal(t, zondpbv2.Version_CAPELLA, resp.Version)
-		containerBlock, ok := resp.Data.Block.(*zondpbv2.BlindedBeaconBlockContainer_CapellaBlock)
+		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
+		containerBlock, ok := resp.Data.Block.(*zondpbv1.BlindedBeaconBlockContainer_CapellaBlock)
 		require.Equal(t, true, ok)
 		assert.Equal(t, primitives.Slot(123), containerBlock.CapellaBlock.Slot)
 	})

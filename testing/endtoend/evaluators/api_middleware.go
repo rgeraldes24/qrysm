@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/theQRL/qrysm/v4/proto/zond/service"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
+	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/params"
 	"github.com/theQRL/qrysm/v4/testing/endtoend/policies"
 	e2etypes "github.com/theQRL/qrysm/v4/testing/endtoend/types"
@@ -49,7 +49,7 @@ func withCompareSyncCommittee(beaconNodeIdx int, conn *grpc.ClientConn) error {
 	}
 	ctx := context.Background()
 	beaconClient := service.NewBeaconChainClient(conn)
-	resp, err := beaconClient.ListSyncCommittees(ctx, &zondpbv2.StateSyncCommitteesRequest{
+	resp, err := beaconClient.ListSyncCommittees(ctx, &zondpbv1.StateSyncCommitteesRequest{
 		StateId: []byte("head"),
 	})
 	if err != nil {

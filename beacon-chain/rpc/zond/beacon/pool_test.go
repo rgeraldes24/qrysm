@@ -25,7 +25,6 @@ import (
 	"github.com/theQRL/qrysm/v4/proto/migration"
 	zondpbv1alpha1 "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	zondpbv1 "github.com/theQRL/qrysm/v4/proto/zond/v1"
-	zondpbv2 "github.com/theQRL/qrysm/v4/proto/zond/v2"
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
@@ -586,8 +585,8 @@ func TestListDilithiumToExecutionChanges(t *testing.T) {
 	resp, err := s.ListDilithiumToExecutionChanges(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 	require.Equal(t, 2, len(resp.Data))
-	assert.DeepEqual(t, migration.V1Alpha1SignedDilithiumToExecChangeToV2(change1), resp.Data[0])
-	assert.DeepEqual(t, migration.V1Alpha1SignedDilithiumToExecChangeToV2(change2), resp.Data[1])
+	assert.DeepEqual(t, migration.V1Alpha1SignedDilithiumToExecChangeToV1(change1), resp.Data[0])
+	assert.DeepEqual(t, migration.V1Alpha1SignedDilithiumToExecChangeToV1(change2), resp.Data[1])
 }
 
 func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
@@ -607,7 +606,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 	}
 	numValidators := 10
 	validators := make([]*zondpbv1alpha1.Validator, numValidators)
-	dilithiumChanges := make([]*zondpbv2.DilithiumToExecutionChange, numValidators)
+	dilithiumChanges := make([]*zondpbv1.DilithiumToExecutionChange, numValidators)
 	spb.Balances = make([]uint64, numValidators)
 	privKeys := make([]common.SecretKey, numValidators)
 	maxEffectiveBalance := params.BeaconConfig().MaxEffectiveBalance
@@ -623,7 +622,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 		privKeys[i] = priv
 		pubkey := priv.PublicKey().Marshal()
 
-		message := &zondpbv2.DilithiumToExecutionChange{
+		message := &zondpbv1.DilithiumToExecutionChange{
 			ToExecutionAddress:  executionAddress,
 			ValidatorIndex:      primitives.ValidatorIndex(i),
 			FromDilithiumPubkey: pubkey,
@@ -642,12 +641,12 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 	st, err := state_native.InitializeFromProtoCapella(spb)
 	require.NoError(t, err)
 
-	signedChanges := make([]*zondpbv2.SignedDilithiumToExecutionChange, numValidators)
+	signedChanges := make([]*zondpbv1.SignedDilithiumToExecutionChange, numValidators)
 	for i, message := range dilithiumChanges {
 		signature, err := signing.ComputeDomainAndSign(st, prysmtime.CurrentEpoch(st), message, params.BeaconConfig().DomainDilithiumToExecutionChange, privKeys[i])
 		require.NoError(t, err)
 
-		signed := &zondpbv2.SignedDilithiumToExecutionChange{
+		signed := &zondpbv1.SignedDilithiumToExecutionChange{
 			Message:   message,
 			Signature: signature,
 		}
@@ -665,7 +664,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 		DilithiumChangesPool: dilithiumtoexec.NewPool(),
 	}
 
-	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv2.SubmitDilithiumToExecutionChangesRequest{
+	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv1.SubmitDilithiumToExecutionChangesRequest{
 		Changes: signedChanges,
 	})
 	require.NoError(t, err)
@@ -677,7 +676,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Ok(t *testing.T) {
 	require.Equal(t, len(poolChanges), len(signedChanges))
 	require.NoError(t, err)
 	for i, v1alphaChange := range poolChanges {
-		v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV2(v1alphaChange)
+		v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV1(v1alphaChange)
 		require.DeepEqual(t, v2Change, signedChanges[i])
 	}
 }
@@ -699,7 +698,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 	}
 	numValidators := 10
 	validators := make([]*zondpbv1alpha1.Validator, numValidators)
-	dilithiumChanges := make([]*zondpbv2.DilithiumToExecutionChange, numValidators)
+	dilithiumChanges := make([]*zondpbv1.DilithiumToExecutionChange, numValidators)
 	spb.Balances = make([]uint64, numValidators)
 	privKeys := make([]common.SecretKey, numValidators)
 	maxEffectiveBalance := params.BeaconConfig().MaxEffectiveBalance
@@ -715,7 +714,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 		privKeys[i] = priv
 		pubkey := priv.PublicKey().Marshal()
 
-		message := &zondpbv2.DilithiumToExecutionChange{
+		message := &zondpbv1.DilithiumToExecutionChange{
 			ToExecutionAddress:  executionAddress,
 			ValidatorIndex:      primitives.ValidatorIndex(i),
 			FromDilithiumPubkey: pubkey,
@@ -748,12 +747,12 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 	stc, err := state_native.InitializeFromProtoCapella(spc)
 	require.NoError(t, err)
 
-	signedChanges := make([]*zondpbv2.SignedDilithiumToExecutionChange, numValidators)
+	signedChanges := make([]*zondpbv1.SignedDilithiumToExecutionChange, numValidators)
 	for i, message := range dilithiumChanges {
 		signature, err := signing.ComputeDomainAndSign(stc, prysmtime.CurrentEpoch(stc), message, params.BeaconConfig().DomainDilithiumToExecutionChange, privKeys[i])
 		require.NoError(t, err)
 
-		signed := &zondpbv2.SignedDilithiumToExecutionChange{
+		signed := &zondpbv1.SignedDilithiumToExecutionChange{
 			Message:   message,
 			Signature: signature,
 		}
@@ -771,7 +770,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 		DilithiumChangesPool: dilithiumtoexec.NewPool(),
 	}
 
-	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv2.SubmitDilithiumToExecutionChangesRequest{
+	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv1.SubmitDilithiumToExecutionChangesRequest{
 		Changes: signedChanges,
 	})
 	require.NoError(t, err)
@@ -784,7 +783,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Bellatrix(t *testing.T) {
 	require.Equal(t, len(poolChanges), len(signedChanges))
 	require.NoError(t, err)
 	for i, v1alphaChange := range poolChanges {
-		v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV2(v1alphaChange)
+		v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV1(v1alphaChange)
 		require.DeepEqual(t, v2Change, signedChanges[i])
 	}
 }
@@ -806,7 +805,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 	}
 	numValidators := 10
 	validators := make([]*zondpbv1alpha1.Validator, numValidators)
-	dilithiumChanges := make([]*zondpbv2.DilithiumToExecutionChange, numValidators)
+	dilithiumChanges := make([]*zondpbv1.DilithiumToExecutionChange, numValidators)
 	spb.Balances = make([]uint64, numValidators)
 	privKeys := make([]common.SecretKey, numValidators)
 	maxEffectiveBalance := params.BeaconConfig().MaxEffectiveBalance
@@ -822,7 +821,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 		privKeys[i] = priv
 		pubkey := priv.PublicKey().Marshal()
 
-		message := &zondpbv2.DilithiumToExecutionChange{
+		message := &zondpbv1.DilithiumToExecutionChange{
 			ToExecutionAddress:  executionAddress,
 			ValidatorIndex:      primitives.ValidatorIndex(i),
 			FromDilithiumPubkey: pubkey,
@@ -841,12 +840,12 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 	st, err := state_native.InitializeFromProtoCapella(spb)
 	require.NoError(t, err)
 
-	signedChanges := make([]*zondpbv2.SignedDilithiumToExecutionChange, numValidators)
+	signedChanges := make([]*zondpbv1.SignedDilithiumToExecutionChange, numValidators)
 	for i, message := range dilithiumChanges {
 		signature, err := signing.ComputeDomainAndSign(st, prysmtime.CurrentEpoch(st), message, params.BeaconConfig().DomainDilithiumToExecutionChange, privKeys[i])
 		require.NoError(t, err)
 
-		signed := &zondpbv2.SignedDilithiumToExecutionChange{
+		signed := &zondpbv1.SignedDilithiumToExecutionChange{
 			Message:   message,
 			Signature: signature,
 		}
@@ -865,7 +864,7 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 		DilithiumChangesPool: dilithiumtoexec.NewPool(),
 	}
 
-	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv2.SubmitDilithiumToExecutionChangesRequest{
+	_, err = s.SubmitSignedDilithiumToExecutionChanges(ctx, &zondpbv1.SubmitDilithiumToExecutionChangesRequest{
 		Changes: signedChanges,
 	})
 	time.Sleep(10 * time.Millisecond) // Delay to allow the routine to start
@@ -877,10 +876,10 @@ func TestSubmitSignedDilithiumToExecutionChanges_Failures(t *testing.T) {
 	require.Equal(t, len(poolChanges)+1, len(signedChanges))
 	require.NoError(t, err)
 
-	v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV2(poolChanges[0])
+	v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV1(poolChanges[0])
 	require.DeepEqual(t, v2Change, signedChanges[0])
 	for i := 2; i < numValidators; i++ {
-		v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV2(poolChanges[i-1])
+		v2Change := migration.V1Alpha1SignedDilithiumToExecChangeToV1(poolChanges[i-1])
 		require.DeepEqual(t, v2Change, signedChanges[i])
 	}
 }

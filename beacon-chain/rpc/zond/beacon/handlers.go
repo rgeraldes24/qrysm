@@ -38,7 +38,7 @@ const (
 	broadcastValidationConsensusAndEquivocation = "consensus_and_equivocation"
 )
 
-// PublishBlindedBlockV2 instructs the beacon node to use the components of the `SignedBlindedBeaconBlock` to construct and publish a
+// PublishBlindedBlock instructs the beacon node to use the components of the `SignedBlindedBeaconBlock` to construct and publish a
 // `SignedBeaconBlock` by swapping out the `transactions_root` for the corresponding full list of `transactions`.
 // The beacon node should broadcast a newly constructed `SignedBeaconBlock` to the beacon network,
 // to be included in the beacon chain. The beacon node is not required to validate the signed
@@ -47,8 +47,8 @@ const (
 // therefore validate the block internally, however blocks which fail the validation are still
 // broadcast but a different status code is returned (202). Pre-Bellatrix, this endpoint will accept
 // a `SignedBeaconBlock`.
-func (s *Server) PublishBlindedBlockV2(w http.ResponseWriter, r *http.Request) {
-	ctx, span := trace.StartSpan(r.Context(), "beacon.PublishBlindedBlockV2")
+func (s *Server) PublishBlindedBlock(w http.ResponseWriter, r *http.Request) {
+	ctx, span := trace.StartSpan(r.Context(), "beacon.PublishBlindedBlock")
 	defer span.End()
 	if shared.IsSyncing(r.Context(), w, s.SyncChecker, s.HeadFetcher, s.TimeFetcher, s.OptimisticModeFetcher) {
 		return
@@ -116,15 +116,15 @@ func (s *Server) publishBlindedBlock(ctx context.Context, w http.ResponseWriter,
 	http2.HandleError(w, "Body does not represent a valid block type: "+blockVersionError, http.StatusBadRequest)
 }
 
-// PublishBlockV2 instructs the beacon node to broadcast a newly signed beacon block to the beacon network,
+// PublishBlock instructs the beacon node to broadcast a newly signed beacon block to the beacon network,
 // to be included in the beacon chain. A success response (20x) indicates that the block
 // passed gossip validation and was successfully broadcast onto the network.
 // The beacon node is also expected to integrate the block into the state, but may broadcast it
 // before doing so, so as to aid timely delivery of the block. Should the block fail full
 // validation, a separate success response code (202) is used to indicate that the block was
 // successfully broadcast but failed integration.
-func (s *Server) PublishBlockV2(w http.ResponseWriter, r *http.Request) {
-	ctx, span := trace.StartSpan(r.Context(), "beacon.PublishBlockV2")
+func (s *Server) PublishBlock(w http.ResponseWriter, r *http.Request) {
+	ctx, span := trace.StartSpan(r.Context(), "beacon.PublishBlock")
 	defer span.End()
 	if shared.IsSyncing(r.Context(), w, s.SyncChecker, s.HeadFetcher, s.TimeFetcher, s.OptimisticModeFetcher) {
 		return

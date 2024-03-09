@@ -74,7 +74,7 @@ func DefaultConfig(enableDebugRPCEndpoints bool, httpModules string) MuxConfig {
 		)
 		zondPbHandler = &gateway.PbMux{
 			Registrations: ethRegistrations,
-			Patterns:      []string{"/internal/zond/v1/", "/internal/zond/v2/"},
+			Patterns:      []string{"/internal/zond/v1/"},
 			Mux:           ethMux,
 		}
 	}
