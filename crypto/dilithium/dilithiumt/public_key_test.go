@@ -63,12 +63,6 @@ func TestPublicKey_Copy(t *testing.T) {
 	pubkeyBytes := pubkeyA.Marshal()
 
 	pubkeyB := pubkeyA.Copy()
-	// TODO(rgeraldes24): remove
-	// pubkeyB := pubkeyA.Copy()
-	// priv2, err := dilithiumt.RandKey()
-	// require.NoError(t, err)
-	// pubkeyB.Aggregate(priv2.PublicKey())
-
 	require.DeepEqual(t, pubkeyA.Marshal(), pubkeyBytes, "Pubkey was mutated after copy")
 	require.DeepEqual(t, pubkeyA, pubkeyB)
 }

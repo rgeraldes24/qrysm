@@ -43,8 +43,7 @@ func TestHeightKeyFn_InvalidObj(t *testing.T) {
 }
 
 func TestBlockCache_byHash(t *testing.T) {
-	// TODO(rgeraldes24): fix for current config and review functionality: Eth1FollowDistance = 0 > maxCacheSize = 0
-	// NOTE(rgeraldes24): workaround because of Eth1FollowDistance = 0
+	// TODO(theQRL/qrysm/issues/66)
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
 	conf.Eth1FollowDistance = 2048

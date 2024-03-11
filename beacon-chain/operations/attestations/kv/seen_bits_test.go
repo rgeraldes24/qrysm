@@ -2,6 +2,7 @@ package kv
 
 import (
 	"testing"
+	"time"
 
 	"github.com/theQRL/go-bitfield"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -36,8 +37,6 @@ func TestAttCaches_hasSeenBit(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix unit test: bazel test //...
-/*
 func TestAttCaches_insertSeenBitDuplicates(t *testing.T) {
 	c := NewAttCaches()
 	att1 := util.HydrateAttestation(&zondpb.Attestation{AggregationBits: bitfield.Bitlist{0b10000011}})
@@ -49,6 +48,9 @@ func TestAttCaches_insertSeenBitDuplicates(t *testing.T) {
 	_, expirationTime1, ok := c.seenAtt.GetWithExpiration(string(r[:]))
 	require.Equal(t, true, ok)
 
+	// NOTE(rgeraldes24): required to create a time gap otherwise the last check fails sometimes
+	time.Sleep(2 * time.Second)
+
 	// Make sure that duplicates are not inserted, but expiration time gets updated.
 	require.NoError(t, c.insertSeenBit(att1))
 	require.Equal(t, 1, c.seenAtt.ItemCount())
@@ -56,4 +58,3 @@ func TestAttCaches_insertSeenBitDuplicates(t *testing.T) {
 	require.Equal(t, true, ok)
 	require.Equal(t, true, expirationqrysmTime.After(expirationTime1), "Expiration time is not updated")
 }
-*/

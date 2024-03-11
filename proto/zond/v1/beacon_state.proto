@@ -56,16 +56,6 @@ message Fork {
   uint64 epoch = 3 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Epoch"];
 }
 
-// TOOD(rgeraldes24): remove v1 version
-//message ForkChoiceHeadsResponse {
-//  repeated ForkChoiceHead data = 1;
-//}
-
-//message ForkChoiceHead {
-//  bytes root = 1 [(theqrl.zond.ext.ssz_size) = "32"];
-//  uint64 slot = 2 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/v4/consensus-types/primitives.Slot"];
-//}
-
 message BeaconStateCapella {
   // Versioning [1001-2000]
   uint64 genesis_time = 1001;

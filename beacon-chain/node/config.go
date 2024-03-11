@@ -148,6 +148,7 @@ func configureInteropConfig(cliCtx *cli.Context) error {
 }
 
 func configureExecutionSetting(cliCtx *cli.Context) error {
+	// TODO(theQRL/qrysm/issues/67)
 	if !cliCtx.IsSet(flags.SuggestedFeeRecipient.Name) {
 		log.Warnf("In order to receive transaction fees from proposing blocks, " +
 			"you must provide flag --" + flags.SuggestedFeeRecipient.Name + " with a valid zond address when starting your beacon node. " +

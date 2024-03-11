@@ -24,8 +24,10 @@ import (
 	"github.com/theQRL/qrysm/v4/beacon-chain/startup"
 	mockSync "github.com/theQRL/qrysm/v4/beacon-chain/sync/initial-sync/testing"
 	lruwrpr "github.com/theQRL/qrysm/v4/cache/lru"
+	"github.com/theQRL/qrysm/v4/cmd/beacon-chain/flags"
 	field_params "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/config/params"
+	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	"github.com/theQRL/qrysm/v4/network/forks"
 	pb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
@@ -455,8 +457,6 @@ func Test_wrapAndReportValidation(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): fix unit test: bazel test //...
-/*
 func TestFilterSubnetPeers(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	cfg := params.MainnetConfig().Copy()
@@ -538,7 +538,6 @@ func TestFilterSubnetPeers(t *testing.T) {
 	recPeers = r.filterNeededPeers(wantedPeers)
 	assert.Equal(t, 1, len(recPeers), "expected at least 1 suitable peer to prune")
 }
-*/
 
 func TestSubscribeWithSyncSubnets_StaticOK(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

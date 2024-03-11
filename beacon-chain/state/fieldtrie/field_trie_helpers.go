@@ -105,17 +105,6 @@ func convertValidators(indices []uint64, elements interface{}, convertAll bool) 
 	return handleValidatorSlice(val, indices, convertAll)
 }
 
-// TODO(rgeraldes24): remove: unused
-/*
-func convertAttestations(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
-	val, ok := elements.([]*zondpb.PendingAttestation)
-	if !ok {
-		return nil, errors.Errorf("Wanted type of %T but got %T", []*zondpb.PendingAttestation{}, elements)
-	}
-	return handlePendingAttestationSlice(val, indices, convertAll)
-}
-*/
-
 func convertBalances(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
 	val, ok := elements.([]uint64)
 	if !ok {

@@ -16,7 +16,6 @@ import (
 // Regression introduced in https://github.com/theQRL/qrysm/pull/8566.
 func TestVerifyAttestationNoVerifySignature_IncorrectSourceEpoch(t *testing.T) {
 	// Attestation with an empty signature
-
 	beaconState, _ := util.DeterministicGenesisStateCapella(t, 100)
 
 	aggBits := bitfield.NewBitlist(3)
@@ -39,8 +38,6 @@ func TestVerifyAttestationNoVerifySignature_IncorrectSourceEpoch(t *testing.T) {
 	ckp := beaconState.CurrentJustifiedCheckpoint()
 	copy(ckp.Root, "hello-world")
 	require.NoError(t, beaconState.SetCurrentJustifiedCheckpoint(ckp))
-	// TODO(rgeraldes24): remove
-	// require.NoError(t, beaconState.AppendCurrentEpochAttestations(&zondpb.PendingAttestation{}))
 
 	err = blocks.VerifyAttestationNoVerifySignatures(context.TODO(), beaconState, att)
 	assert.NotEqual(t, nil, err)

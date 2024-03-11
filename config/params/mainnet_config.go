@@ -87,7 +87,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	MinValidatorWithdrawabilityDelay: 16,   // TODO (cyyber) : Re-evaluate the value
 	ShardCommitteePeriod:             16,   // TODO (cyyber) : Re-evaluate the value
 	MinEpochsToInactivityPenalty:     4,
-	Eth1FollowDistance:               0, // TODO (cyyber) : Re-evaluate the value
+	Eth1FollowDistance:               0, // TODO(theQRL/qrysm/issues/66)
 
 	// Fork choice algorithm constants.
 	ProposerScoreBoost:              40,

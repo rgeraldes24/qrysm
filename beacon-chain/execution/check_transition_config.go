@@ -8,6 +8,7 @@ var (
 	configMismatchLog = "Configuration mismatch between your execution client and Qrysm. " +
 		"Please check your execution client and restart it with the proper configuration. If this is not done, " +
 		"your node will not be able to complete the proof-of-stake transition"
+	// TODO(theQRL/qrysm/issues/67)
 	needsEnginePortLog = "Could not check execution client configuration. " +
 		"You are probably connecting to your execution client on the wrong port. For the Zond " +
 		"merge, you will need to connect to your " +

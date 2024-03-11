@@ -36,6 +36,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         url: "https://github.com/ethereum/consensus-specs";
         description: "Ethereum Consensus Specification on Github";
     };
+    // TODO(theQRL/qrysm/issues/67)
     host: "api.prylabs.net",
     schemes: HTTPS;
     schemes: WSS;

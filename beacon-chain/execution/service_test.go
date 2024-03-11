@@ -683,10 +683,9 @@ func TestService_CacheBlockHeaders(t *testing.T) {
 }
 
 func TestService_FollowBlock(t *testing.T) {
-	// TODO(rgeraldes24): fix for current config
-	// NOTE(rgeraldes24): workaround because of Eth1FollowDistance = 0
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
+	// TODO(theQRL/qrysm/issues/66)
 	conf.Eth1FollowDistance = 2048
 	conf.SecondsPerETH1Block = 14
 	params.OverrideBeaconConfig(conf)

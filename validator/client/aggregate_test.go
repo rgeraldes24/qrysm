@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
+	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
 func TestSubmitAggregateAndProof_GetDutiesRequestFailure(t *testing.T) {
@@ -115,11 +117,10 @@ func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 	validator.SubmitAggregateAndProof(context.Background(), 0, pubKey)
 }
 
-// TODO(rgeraldes24): fix test - fails sometimes
-/*
 func TestWaitForSlotTwoThird_WaitCorrectly(t *testing.T) {
 	cfg := params.BeaconConfig().Copy()
-	cfg.SecondsPerSlot = 10
+	fmt.Println(cfg.SecondsPerSlot)
+	cfg.SecondsPerSlot = 12
 	params.OverrideBeaconConfig(cfg)
 
 	validator, _, _, finish := setup(t)
@@ -127,15 +128,16 @@ func TestWaitForSlotTwoThird_WaitCorrectly(t *testing.T) {
 	currentTime := time.Now()
 	numOfSlots := primitives.Slot(4)
 	validator.genesisTime = uint64(currentTime.Unix()) - uint64(numOfSlots.Mul(params.BeaconConfig().SecondsPerSlot))
-	oneThird := slots.DivideSlotBy(3 // one third of slot duration )
+	oneThird := slots.DivideSlotBy(3 /* one third of slot duration */)
 	timeToSleep := oneThird + oneThird
 
 	twoThirdTime := currentTime.Add(timeToSleep)
 	validator.waitToSlotTwoThirds(context.Background(), numOfSlots)
 	currentTime = time.Now()
-	assert.Equal(t, twoThirdTime.Unix(), currentTime.Unix())
+	fmt.Println(twoThirdTime.Unix())
+	fmt.Println(currentTime.Unix())
+	assert.Equal(t, twoThirdTime.Unix(), time.Now().Unix())
 }
-*/
 
 func TestWaitForSlotTwoThird_DoneContext_ReturnsImmediately(t *testing.T) {
 	cfg := params.BeaconConfig().Copy()

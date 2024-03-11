@@ -124,22 +124,61 @@ func TestTrackedIndex(t *testing.T) {
 	require.Equal(t, s.trackedIndex(primitives.ValidatorIndex(3)), false)
 }
 
-// TODO(rgeraldes24): fix unit test: works with --test_filter
-/*
 func TestUpdateSyncCommitteeTrackedVals(t *testing.T) {
 	hook := logTest.NewGlobal()
-	s := setupService(t)
+
+	beaconDB := testDB.SetupDB(t)
 	state, _ := util.DeterministicGenesisStateCapella(t, 1024)
 
-	s.updateSyncCommitteeTrackedVals(state)
+	pubKeys := make([][]byte, 3)
+	pubKeys[0] = state.Validators()[0].PublicKey
+	pubKeys[1] = state.Validators()[1].PublicKey
+	pubKeys[2] = state.Validators()[2].PublicKey
+
+	currentSyncCommittee := util.ConvertToCommittee([][]byte{
+		pubKeys[0], pubKeys[1], pubKeys[2], pubKeys[1], pubKeys[1],
+	})
+	require.NoError(t, state.SetCurrentSyncCommittee(currentSyncCommittee))
+
+	chainService := &mock.ChainService{
+		Genesis:        time.Now(),
+		DB:             beaconDB,
+		State:          state,
+		Root:           []byte("hello-world"),
+		ValidatorsRoot: [32]byte{},
+	}
+
+	trackedVals := map[primitives.ValidatorIndex]bool{
+		1:  true,
+		15: true,
+	}
+
+	trackedSyncCommitteeIndices := map[primitives.ValidatorIndex][]primitives.CommitteeIndex{}
+
+	svc := &Service{
+		config: &ValidatorMonitorConfig{
+			StateGen:            stategen.New(beaconDB, doublylinkedtree.New()),
+			StateNotifier:       chainService.StateNotifier(),
+			HeadFetcher:         chainService,
+			AttestationNotifier: chainService.OperationNotifier(),
+			InitialSyncComplete: make(chan struct{}),
+		},
+
+		ctx:                         context.Background(),
+		TrackedValidators:           trackedVals,
+		latestPerformance:           nil,
+		aggregatedPerformance:       nil,
+		trackedSyncCommitteeIndices: trackedSyncCommitteeIndices,
+		lastSyncedEpoch:             0,
+	}
+
+	svc.updateSyncCommitteeTrackedVals(state)
 	require.LogsDoNotContain(t, hook, "Sync committee assignments will not be reported")
 	newTrackedSyncIndices := map[primitives.ValidatorIndex][]primitives.CommitteeIndex{
-		1:  {1},
-		15: {15},
+		1: {1, 3, 4},
 	}
-	require.DeepEqual(t, s.trackedSyncCommitteeIndices, newTrackedSyncIndices)
+	require.DeepEqual(t, svc.trackedSyncCommitteeIndices, newTrackedSyncIndices)
 }
-*/
 
 func TestNewService(t *testing.T) {
 	config := &ValidatorMonitorConfig{}

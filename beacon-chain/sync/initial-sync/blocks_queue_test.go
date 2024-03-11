@@ -842,40 +842,63 @@ func TestBlocksQueue_onProcessSkippedEvent(t *testing.T) {
 		assert.ErrorContains(t, errNoRequiredPeers.Error(), err)
 		assert.Equal(t, stateSkipped, updatedState)
 	})
-	// TODO(rgeraldes24): fix unit test: relies on block batch limit = 64
-	/*
-		t.Run("ready to update machines - non-skipped slot not found", func(t *testing.T) {
-			p := p2pt.NewTestP2P(t)
-			connectPeers(t, p, []*peerData{
-				{blocks: makeSequence(1, 640), finalizedEpoch: 5, headSlot: 512},
-			}, p.Peers())
-			fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
-				chain: mc,
-				p2p:   p,
-			})
-			queue := newBlocksQueue(ctx, &blocksQueueConfig{
-				blocksFetcher:       fetcher,
-				chain:               mc,
-				highestExpectedSlot: primitives.Slot(blockBatchLimit),
-			})
 
-			startSlot := queue.chain.HeadSlot()
-			blocksPerRequest := queue.blocksFetcher.blocksPerPeriod
-			for i := startSlot; i < startSlot.Add(blocksPerRequest*lookaheadSteps); i += primitives.Slot(blocksPerRequest) {
-				queue.smm.addStateMachine(i).setState(stateSkipped)
-			}
-
-			handlerFn := queue.onProcessSkippedEvent(ctx)
-			updatedState, err := handlerFn(queue.smm.machines[primitives.Slot(blocksPerRequest*(lookaheadSteps-1))], nil)
-			assert.ErrorContains(t, "invalid range for non-skipped slot", err)
-			assert.Equal(t, stateSkipped, updatedState)
+	t.Run("ready to update machines - non-skipped slot not found", func(t *testing.T) {
+		// TODO(rgeraldes24): workaround: relies on block batch limit = 64
+		resetFlags := flags.Get()
+		flags.Init(&flags.GlobalFlags{
+			BlockBatchLimit:            256,
+			BlockBatchLimitBurstFactor: 10,
 		})
-	*/
+		defer func() {
+			flags.Init(resetFlags)
+		}()
+		blockBatchLimit := flags.Get().BlockBatchLimit
+		// END
+
+		p := p2pt.NewTestP2P(t)
+		connectPeers(t, p, []*peerData{
+			{blocks: makeSequence(1, 640), finalizedEpoch: 5, headSlot: 512},
+		}, p.Peers())
+		fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
+			chain: mc,
+			p2p:   p,
+		})
+		queue := newBlocksQueue(ctx, &blocksQueueConfig{
+			blocksFetcher:       fetcher,
+			chain:               mc,
+			highestExpectedSlot: primitives.Slot(blockBatchLimit),
+		})
+
+		startSlot := queue.chain.HeadSlot()
+		blocksPerRequest := queue.blocksFetcher.blocksPerPeriod
+		for i := startSlot; i < startSlot.Add(blocksPerRequest*lookaheadSteps); i += primitives.Slot(blocksPerRequest) {
+			queue.smm.addStateMachine(i).setState(stateSkipped)
+		}
+
+		handlerFn := queue.onProcessSkippedEvent(ctx)
+		updatedState, err := handlerFn(queue.smm.machines[primitives.Slot(blocksPerRequest*(lookaheadSteps-1))], nil)
+		assert.ErrorContains(t, "invalid range for non-skipped slot", err)
+		assert.Equal(t, stateSkipped, updatedState)
+	})
+	// TODO(rgeraldes24): fix unit tests
 	/*
 		t.Run("ready to update machines - constrained mode", func(t *testing.T) {
+			// TODO(rgeraldes24): workaround: relies on block batch limit = 64
+			resetFlags := flags.Get()
+			flags.Init(&flags.GlobalFlags{
+				BlockBatchLimit:            256,
+				BlockBatchLimitBurstFactor: 10,
+			})
+			defer func() {
+				flags.Init(resetFlags)
+			}()
+			blockBatchLimit := flags.Get().BlockBatchLimit
+			// END
+
 			p := p2pt.NewTestP2P(t)
 			connectPeers(t, p, []*peerData{
-				{blocks: makeSequence(500, 628), finalizedEpoch: 16, headSlot: 600},
+				{blocks: makeSequence(800, 1280), finalizedEpoch: 8, headSlot: 1200},
 			}, p.Peers())
 			fetcher := newBlocksFetcher(ctx, &blocksFetcherConfig{
 				chain: mc,
@@ -901,7 +924,7 @@ func TestBlocksQueue_onProcessSkippedEvent(t *testing.T) {
 			}
 			// Update head slot, so that machines are re-arranged starting from the next slot i.e.
 			// there's no point to reset machines for some slot that has already been processed.
-			updatedSlot := primitives.Slot(100)
+			updatedSlot := primitives.Slot(400)
 			defer func() {
 				require.NoError(t, mc.State.SetSlot(0))
 			}()
@@ -921,7 +944,8 @@ func TestBlocksQueue_onProcessSkippedEvent(t *testing.T) {
 			// Assert highest expected slot is extended.
 			assert.Equal(t, primitives.Slot(blocksPerRequest*lookaheadSteps), queue.highestExpectedSlot)
 		})
-
+	*/
+	/*
 		t.Run("ready to update machines - unconstrained mode", func(t *testing.T) {
 			p := p2pt.NewTestP2P(t)
 			connectPeers(t, p, []*peerData{

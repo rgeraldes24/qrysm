@@ -8,9 +8,12 @@ import (
 
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
+	zondTypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
 	dbutil "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
+	"github.com/theQRL/qrysm/v4/beacon-chain/execution/types"
+	"github.com/theQRL/qrysm/v4/config/params"
 	contracts "github.com/theQRL/qrysm/v4/contracts/deposit"
 	"github.com/theQRL/qrysm/v4/contracts/deposit/mock"
 	"github.com/theQRL/qrysm/v4/testing/assert"
@@ -72,9 +75,14 @@ func TestLatestMainchainInfo_OK(t *testing.T) {
 	assert.Equal(t, web3Service.latestEth1Data.BlockTime, header.Time)
 }
 
-// TODO(rgeraldes24): test fails because Eth1FollowDistance = 0
-/*
 func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
+	// TODO(theQRL/qrysm/issues/66)
+	params.SetupTestConfigCleanup(t)
+	conf := params.BeaconConfig().Copy()
+	conf.Eth1FollowDistance = 2048
+	params.OverrideBeaconConfig(conf)
+	maxCacheSize = 2 * params.BeaconConfig().Eth1FollowDistance
+
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
 	require.NoError(t, err)
@@ -106,7 +114,6 @@ func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, true, exists, "Expected block info to be cached")
 }
-*/
 
 func TestBlockHashByHeight_ReturnsError_WhenNoEth1Client(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
@@ -129,9 +136,14 @@ func TestBlockHashByHeight_ReturnsError_WhenNoEth1Client(t *testing.T) {
 	require.ErrorContains(t, "nil rpc client", err)
 }
 
-// TODO(rgeraldes24): test fails because Eth1FollowDistance = 0
-/*
 func TestBlockExists_ValidHash(t *testing.T) {
+	// TODO(theQRL/qrysm/issues/66)
+	params.SetupTestConfigCleanup(t)
+	conf := params.BeaconConfig().Copy()
+	conf.Eth1FollowDistance = 2048
+	params.OverrideBeaconConfig(conf)
+	maxCacheSize = 2 * params.BeaconConfig().Eth1FollowDistance
+
 	beaconDB := dbutil.SetupDB(t)
 	testAcc, err := mock.Setup()
 	require.NoError(t, err, "Unable to set up simulated backend")
@@ -162,7 +174,6 @@ func TestBlockExists_ValidHash(t *testing.T) {
 	require.Equal(t, true, exists, "Expected block to be cached")
 
 }
-*/
 
 func TestBlockExists_InvalidHash(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
@@ -183,9 +194,14 @@ func TestBlockExists_InvalidHash(t *testing.T) {
 	require.NotNil(t, err, "Expected BlockExists to error with invalid hash")
 }
 
-// TODO(rgeraldes24): test fails because Eth1FollowDistance = 0
-/*
 func TestBlockExists_UsesCachedBlockInfo(t *testing.T) {
+	// TODO(theQRL/qrysm/issues/66)
+	params.SetupTestConfigCleanup(t)
+	conf := params.BeaconConfig().Copy()
+	conf.Eth1FollowDistance = 2048
+	params.OverrideBeaconConfig(conf)
+	maxCacheSize = 2 * params.BeaconConfig().Eth1FollowDistance
+
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
 	require.NoError(t, err)
@@ -210,7 +226,6 @@ func TestBlockExists_UsesCachedBlockInfo(t *testing.T) {
 	require.Equal(t, true, exists)
 	require.Equal(t, 0, height.Cmp(header.Number))
 }
-*/
 
 func TestService_BlockNumberByTimestamp(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
