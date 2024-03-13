@@ -884,7 +884,7 @@ func TestBlocksQueue_onProcessSkippedEvent(t *testing.T) {
 	// TODO(rgeraldes24): fix unit test
 	/*
 		t.Run("ready to update machines - constrained mode", func(t *testing.T) {
-			// TODO(rgeraldes24): workaround: relies on block batch limit = 64
+			// NOTE(rgeraldes24): workaround: relies on block batch limit = 64
 			resetFlags := flags.Get()
 			flags.Init(&flags.GlobalFlags{
 				BlockBatchLimit:            256,

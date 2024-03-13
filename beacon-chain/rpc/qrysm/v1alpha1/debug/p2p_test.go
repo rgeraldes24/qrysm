@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
-// TODO(rgeraldes24): fails sometimes
+// TODO(rgeraldes24): fix unit test: fails sometimes
 /*
 func TestDebugServer_GetPeer(t *testing.T) {
 	peersProvider := &mockP2p.MockPeersProvider{}

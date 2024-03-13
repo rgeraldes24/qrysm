@@ -674,8 +674,6 @@ func TestGetCommittees(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		resp := &GetCommitteesResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
-		// TODO(rgeraldes24): double check values: only one committee per slot vs 2
-		// assert.Equal(t, int(params.BeaconConfig().SlotsPerEpoch)*2, len(resp.Data))
 		assert.Equal(t, int(params.BeaconConfig().SlotsPerEpoch), len(resp.Data))
 		for _, datum := range resp.Data {
 			index, err := strconv.ParseUint(datum.Index, 10, 32)
@@ -714,8 +712,6 @@ func TestGetCommittees(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		resp := &GetCommitteesResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
-		// TODO(rgeraldes24): double check values: only one committee per slot vs 2
-		// assert.Equal(t, 2, len(resp.Data))
 		assert.Equal(t, 1, len(resp.Data))
 
 		exSlot := uint64(4)
@@ -731,35 +727,6 @@ func TestGetCommittees(t *testing.T) {
 			exIndex++
 		}
 	})
-	// NOTE(rgeraldes24): test replaced by the one below: remove?
-	/*
-		t.Run("Head all committees of index 1", func(t *testing.T) {
-			query := url + "?index=1"
-			request := httptest.NewRequest(http.MethodGet, query, nil)
-			request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
-			writer := httptest.NewRecorder()
-
-			writer.Body = &bytes.Buffer{}
-			s.GetCommittees(writer, request)
-			assert.Equal(t, http.StatusOK, writer.Code)
-			resp := &GetCommitteesResponse{}
-			require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
-			assert.Equal(t, int(params.BeaconConfig().SlotsPerEpoch), len(resp.Data))
-
-			exSlot := uint64(0)
-			exIndex := uint64(1)
-			for _, datum := range resp.Data {
-				slot, err := strconv.ParseUint(datum.Slot, 10, 32)
-				require.NoError(t, err)
-				index, err := strconv.ParseUint(datum.Index, 10, 32)
-				require.NoError(t, err)
-				assert.Equal(t, epoch, slots.ToEpoch(primitives.Slot(slot)))
-				assert.Equal(t, exSlot, slot)
-				assert.Equal(t, exIndex, index)
-				exSlot++
-			}
-		})
-	*/
 	t.Run("Head all committees of index 0", func(t *testing.T) {
 		query := url + "?index=0"
 		request := httptest.NewRequest(http.MethodGet, query, nil)
@@ -786,34 +753,6 @@ func TestGetCommittees(t *testing.T) {
 			exSlot++
 		}
 	})
-	// NOTE(rgeraldes24): test replaced by the one below: remove?
-	/*
-		t.Run("Head all committees of slot 2, index 1", func(t *testing.T) {
-			query := url + "?slot=2&index=1"
-			request := httptest.NewRequest(http.MethodGet, query, nil)
-			request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
-			writer := httptest.NewRecorder()
-
-			writer.Body = &bytes.Buffer{}
-			s.GetCommittees(writer, request)
-			assert.Equal(t, http.StatusOK, writer.Code)
-			resp := &GetCommitteesResponse{}
-			require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
-			assert.Equal(t, 1, len(resp.Data))
-
-			exIndex := uint64(1)
-			exSlot := uint64(2)
-			for _, datum := range resp.Data {
-				index, err := strconv.ParseUint(datum.Index, 10, 32)
-				require.NoError(t, err)
-				slot, err := strconv.ParseUint(datum.Slot, 10, 32)
-				require.NoError(t, err)
-				assert.Equal(t, epoch, slots.ToEpoch(primitives.Slot(slot)))
-				assert.Equal(t, exSlot, slot)
-				assert.Equal(t, exIndex, index)
-			}
-		})
-	*/
 	t.Run("Head all committees of slot 2, index 0", func(t *testing.T) {
 		query := url + "?slot=2&index=0"
 		request := httptest.NewRequest(http.MethodGet, query, nil)
