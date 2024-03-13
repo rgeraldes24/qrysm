@@ -58,14 +58,12 @@ func setupService(t *testing.T) *Service {
 		15: {
 			balance: 39999900000000,
 		},
-		// 12
 		86: {
 			balance:      39999900000000,
 			timelyHead:   true,
 			timelySource: true,
 			timelyTarget: true,
 		},
-		// 2
 		107: {
 			balance:      40000000000000,
 			timelyHead:   true,
@@ -249,15 +247,61 @@ func TestInitializePerformanceStructures(t *testing.T) {
 func TestMonitorRoutine(t *testing.T) {
 	ctx := context.Background()
 	hook := logTest.NewGlobal()
-	s := setupService(t)
+
+	beaconDB := testDB.SetupDB(t)
+	state, _ := util.DeterministicGenesisStateCapella(t, 256)
+
+	pubKeys := make([][]byte, 3)
+	pubKeys[0] = state.Validators()[0].PublicKey
+	pubKeys[1] = state.Validators()[1].PublicKey
+	pubKeys[2] = state.Validators()[2].PublicKey
+
+	currentSyncCommittee := util.ConvertToCommittee([][]byte{
+		pubKeys[0], pubKeys[1], pubKeys[2], pubKeys[1], pubKeys[1],
+	})
+	require.NoError(t, state.SetCurrentSyncCommittee(currentSyncCommittee))
+
+	chainService := &mock.ChainService{
+		Genesis:        time.Now(),
+		DB:             beaconDB,
+		State:          state,
+		Root:           []byte("hello-world"),
+		ValidatorsRoot: [32]byte{},
+	}
+
+	trackedVals := map[primitives.ValidatorIndex]bool{
+		1: true,
+	}
+	latestPerformance := map[primitives.ValidatorIndex]ValidatorLatestPerformance{
+		1: {
+			balance: 39999900000000,
+		},
+	}
+	svc := &Service{
+		config: &ValidatorMonitorConfig{
+			StateGen:            stategen.New(beaconDB, doublylinkedtree.New()),
+			StateNotifier:       chainService.StateNotifier(),
+			HeadFetcher:         chainService,
+			AttestationNotifier: chainService.OperationNotifier(),
+			InitialSyncComplete: make(chan struct{}),
+		},
+
+		ctx:                         context.Background(),
+		TrackedValidators:           trackedVals,
+		latestPerformance:           latestPerformance,
+		aggregatedPerformance:       map[primitives.ValidatorIndex]ValidatorAggregatedPerformance{},
+		trackedSyncCommitteeIndices: map[primitives.ValidatorIndex][]primitives.CommitteeIndex{},
+		lastSyncedEpoch:             0,
+	}
+
 	stateChannel := make(chan *feed.Event, 1)
-	stateSub := s.config.StateNotifier.StateFeed().Subscribe(stateChannel)
+	stateSub := svc.config.StateNotifier.StateFeed().Subscribe(stateChannel)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 
 	go func() {
-		s.monitorRoutine(stateChannel, stateSub)
+		svc.monitorRoutine(stateChannel, stateSub)
 		wg.Done()
 	}()
 
@@ -271,7 +315,7 @@ func TestMonitorRoutine(t *testing.T) {
 	require.NoError(t, err)
 	root, err := block.GetBlock().HashTreeRoot()
 	require.NoError(t, err)
-	require.NoError(t, s.config.StateGen.SaveState(ctx, root, genesis))
+	require.NoError(t, svc.config.StateGen.SaveState(ctx, root, genesis))
 
 	wrapped, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -285,11 +329,9 @@ func TestMonitorRoutine(t *testing.T) {
 		},
 	}
 
-	// Wait for Logrus
+	// wait for Logrus
 	time.Sleep(1000 * time.Millisecond)
-	// TODO(rgeraldes24): double check
-	// wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=32000000000 ParentRoot=0xf732eaeb7fae ProposerIndex=15 Slot=1 Version=1 prefix=monitor", bytesutil.Trunc(root[:]))
-	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=0 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=0x7e1ac7288839 ProposerIndex=1 Slot=1 Version=3 prefix=monitor", bytesutil.Trunc(root[:]))
+	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=0x7e1ac7288839 ProposerIndex=1 Slot=1 Version=3 prefix=monitor", bytesutil.Trunc(root[:]))
 	require.LogsContain(t, hook, wanted1)
 
 }
