@@ -1213,7 +1213,7 @@ func TestDilithiumChangesSignatureBatch(t *testing.T) {
 	require.NoError(t, blocks.VerifyDilithiumChangeSignature(st, change))
 }
 
-// NOTE(rgeraldes24): this test is not valid atm
+// NOTE(rgeraldes24): test is not valid atm
 /*
 func TestDilithiumChangesSignatureBatchWrongFork(t *testing.T) {
 	spb := &zondpb.BeaconStateCapella{

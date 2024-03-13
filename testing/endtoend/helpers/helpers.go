@@ -109,28 +109,7 @@ func WaitForTextInFile(src *os.File, match string) error {
 					return
 				}
 
-				// NOTE(rgeraldes24): Failed to carry out doppelganger check correctly:
-				// received error: bufio.Scanner: token too long
-				/*
-					lineScanner := bufio.NewScanner(f)
-					// Scan will return true until it hits EOF or another error.
-					// If .Close is called on the underlying file, Scan will return false, causing this goroutine to exit.
-					for lineScanner.Scan() {
-						line := lineScanner.Text()
-						if strings.Contains(line, match) {
-							// closing foundChan causes the <-foundChan case in the outer select to execute,
-							// ending the function with a nil return (success result).
-							close(foundChan)
-							return
-						}
-					}
-					// If Scan returned false for an error (except EOF), Err will return it.
-					if err = lineScanner.Err(); err != nil {
-						// Bubble the error back up to the parent goroutine.
-						errChan <- err
-					}
-				*/
-
+				// NOTE(rgeraldes24): replaced the bufio scanner with Read string due to the token too long error
 				rd := bufio.NewReader(f)
 				for {
 					line, err := rd.ReadString('\n')

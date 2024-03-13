@@ -263,21 +263,21 @@ func Test_VerifySyncCommitteeSigs(t *testing.T) {
 	pbr, err := helpers.BlockRootAtSlot(beaconState, ps)
 	require.NoError(t, err)
 	sigs := make([][]byte, len(indices))
+	sigsBad := make([][]byte, len(indices))
 	pks := make([]dilithium.PublicKey, len(indices))
 	for i, indice := range indices {
 		b := p2pType.SSZBytes(pbr)
 		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
 		require.NoError(t, err)
 		sigs[i] = sb
+		sigsBad[i] = make([]byte, field_params.DilithiumSignatureLength)
 		pks[i] = privKeys[indice].PublicKey()
 	}
 
 	dilithiumKey, err := dilithium.RandKey()
 	require.NoError(t, err)
 	require.ErrorContains(t, "provided signatures and pubkeys have differing lengths", altair.VerifySyncCommitteeSigs(beaconState, pks, [][]byte{dilithiumKey.Sign([]byte{'m', 'e', 'o', 'w'}).Marshal()}))
-	// TODO(rgeraldes24): add test for this error invalid sync committee signature[%d]
-	// require.ErrorContains(t, "invalid sync committee signature", altair.VerifySyncCommitteeSigs(beaconState, pks, [][]byte{dilithiumKey.Sign([]byte{'m', 'e', 'o', 'w'}).Marshal()}))
-
+	require.ErrorContains(t, "invalid sync committee signature", altair.VerifySyncCommitteeSigs(beaconState, pks, sigsBad))
 	require.NoError(t, altair.VerifySyncCommitteeSigs(beaconState, pks, sigs))
 }
 

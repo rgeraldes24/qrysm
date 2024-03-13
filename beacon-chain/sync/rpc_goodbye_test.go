@@ -20,7 +20,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// TODO(rgeraldes24): fix unit test
+// TODO(rgeraldes24): fix unit test: fails since moving to go1.21
 /*
 func TestGoodByeRPCHandler_Disconnects_With_Peer(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

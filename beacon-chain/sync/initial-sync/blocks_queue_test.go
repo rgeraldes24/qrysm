@@ -881,7 +881,7 @@ func TestBlocksQueue_onProcessSkippedEvent(t *testing.T) {
 		assert.ErrorContains(t, "invalid range for non-skipped slot", err)
 		assert.Equal(t, stateSkipped, updatedState)
 	})
-	// TODO(rgeraldes24): fix unit tests
+	// TODO(rgeraldes24): fix unit test
 	/*
 		t.Run("ready to update machines - constrained mode", func(t *testing.T) {
 			// TODO(rgeraldes24): workaround: relies on block batch limit = 64
@@ -1256,7 +1256,7 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 		require.Equal(t, true, ok)
 		require.Equal(t, stateDataParsed, firstFSM.state)
 		require.Equal(t, forkedPeer, firstFSM.pid)
-		// TODO(rgeraldes24): values are not equal, want: 93 (int), got: 221 (int): difference of 128
+		// NOTE(rgeraldes24): values are not equal, want: 93 (int), got: 221 (int): difference of 128
 		// reqEnd := testForkStartSlot(t, 804) + primitives.Slot(findForkReqRangeSize())
 		// require.Equal(t, int(reqEnd-forkedSlot), len(firstFSM.bwb))
 		require.Equal(t, forkedSlot, firstFSM.bwb[0].Block.Block().Slot())
@@ -1274,7 +1274,7 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 
 		// Assert that machines are in the expected state.
 		startSlot = forkedEpochStartSlot.Add(1 + blocksPerRequest)
-		// TODO(rgeraldes24): values are not equal, want: 29 (int), got: 221 (int): difference of 128
+		// NOTE(rgeraldes24): values are not equal, want: 29 (int), got: 221 (int): difference of 128
 		// require.Equal(t, int(blocksPerRequest)-int(forkedSlot-(forkedEpochStartSlot+1)), len(firstFSM.bwb))
 		// for i := startSlot; i < startSlot.Add(blocksPerRequest*(lookaheadSteps-1)); i += primitives.Slot(blocksPerRequest) {
 		// 	fsm, ok := queue.smm.findStateMachine(i)

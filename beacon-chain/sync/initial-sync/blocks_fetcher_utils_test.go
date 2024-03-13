@@ -278,7 +278,7 @@ func TestBlocksFetcher_findFork(t *testing.T) {
 		require.Equal(t, false, beaconDB.HasBlock(ctx, blkRoot) || mc.HasBlock(ctx, blkRoot))
 	}
 
-	// TODO(rgeraldes24): works only with backtrackingMaxHops = 512
+	// NOTE(rgeraldes24): works only with backtrackingMaxHops = 512
 	// Search for alternative paths (add single peer having alternative path).
 	// alternativePeer := connectPeerHavingBlocks(t, p2p, chain2, finalizedSlot, p2p.Peers())
 	// fork, err = fetcher.findFork(ctx, 1001)

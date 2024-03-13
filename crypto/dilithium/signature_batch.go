@@ -111,7 +111,7 @@ func (s *SignatureBatch) Copy() *SignatureBatch {
 	}
 }
 
-// TODO(rgeraldes24): complete: speeds up the verification but not urgent for now
+// TODO(rgeraldes24): complete func: speeds up the verification but not urgent for now
 // RemoveDuplicates removes duplicate signature sets from the signature batch.
 func (s *SignatureBatch) RemoveDuplicates() (int, *SignatureBatch, error) {
 	/*

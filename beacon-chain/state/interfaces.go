@@ -50,7 +50,6 @@ type ReadOnlyBeaconState interface {
 	ReadOnlyValidators
 	ReadOnlyBalances
 	ReadOnlyCheckpoint
-	ReadOnlyAttestations
 	ReadOnlyWithdrawals
 	ReadOnlyParticipation
 	ReadOnlyInactivity
@@ -81,7 +80,6 @@ type WriteOnlyBeaconState interface {
 	WriteOnlyValidators
 	WriteOnlyBalances
 	WriteOnlyCheckpoint
-	WriteOnlyAttestations
 	WriteOnlyParticipation
 	WriteOnlyInactivity
 	WriteOnlySyncCommittee
@@ -168,11 +166,6 @@ type ReadOnlyEth1Data interface {
 	Eth1DepositIndex() uint64
 }
 
-// ReadOnlyAttestations defines a struct which only has read access to attestations methods.
-type ReadOnlyAttestations interface {
-	// TODO(rgeraldes24)
-}
-
 // ReadOnlyWithdrawals defines a struct which only has read access to withdrawal methods.
 type ReadOnlyWithdrawals interface {
 	ExpectedWithdrawals() ([]*enginev1.Withdrawal, error)
@@ -244,11 +237,6 @@ type WriteOnlyCheckpoint interface {
 	SetPreviousJustifiedCheckpoint(val *zondpb.Checkpoint) error
 	SetCurrentJustifiedCheckpoint(val *zondpb.Checkpoint) error
 	SetJustificationBits(val bitfield.Bitvector4) error
-}
-
-// WriteOnlyAttestations defines a struct which only has write access to attestations methods.
-type WriteOnlyAttestations interface {
-	// TODO(rgeraldes24)
 }
 
 // WriteOnlyParticipation defines a struct which only has write access to participation methods.

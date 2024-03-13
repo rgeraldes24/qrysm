@@ -320,7 +320,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 		err                   string
 		returnedHeaderCapella *v1.ExecutionPayloadHeaderCapella
 	}{
-		// NOTE(rgeraldes24): test not valid atm
+		// NOTE(rgeraldes24): test is not valid atm
 		/*
 			{
 				name: "get header failed",
@@ -398,7 +398,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 			},
 			returnedHeaderCapella: bidCapella.Header,
 		},
-		// NOTE(rgeraldes24): test not valid atm
+		// NOTE(rgeraldes24): test is not valid atm
 		/*
 			{
 				name: "wrong bid version",

@@ -41,7 +41,7 @@ func TestSyncCommitteeHeadState(t *testing.T) {
 			wantPutErr: true,
 			wantErr:    true,
 		},
-		// NOTE(rgeraldes24): test not valid for now
+		// NOTE(rgeraldes24): test is not valid for now
 		/*
 			{
 				name: "putting invalid state in",

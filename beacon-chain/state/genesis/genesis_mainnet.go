@@ -10,8 +10,7 @@ import (
 )
 
 var (
-	// TODO(rgeraldes24): add final mainnet genesis
-	// deposit new-seed --num-validators=64 --chain-name=mainnet
+	// TODO(theQRL/qrysm/issues/81)
 	//go:embed mainnet.ssz.snappy
 	mainnetRawSSZCompressed []byte
 )

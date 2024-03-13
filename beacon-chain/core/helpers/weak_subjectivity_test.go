@@ -156,8 +156,7 @@ func TestWeakSubjectivity_IsWithinWeakSubjectivityPeriod(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "within weak subjectivity period",
-			// epoch: 299, // TODO(rgeraldes24): double check weak subjectivity tests
+			name:  "within weak subjectivity period",
 			epoch: 57,
 			genWsState: func() state.ReadOnlyBeaconState {
 				beaconState := genState(t, 128, 40)

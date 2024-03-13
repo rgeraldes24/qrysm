@@ -237,7 +237,6 @@ func defaultTestHeadState(t *testing.T, cfg *params.BeaconChainConfig) (state.Be
 		Epoch: epoch - 10,
 		Root:  make([]byte, 32),
 	}))
-	// TODO(rgeraldes24): double check values vs the old version
 	expectedEpoch := slots.ToEpoch(st.Slot()) - 20
 	return st, expectedEpoch
 }
