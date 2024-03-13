@@ -176,16 +176,10 @@ func TestBlockRewards(t *testing.T) {
 		resp := &BlockRewardsResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
 		assert.Equal(t, "12", resp.Data.ProposerIndex)
-		// TODO(rgeraldes24): double check values
-		// assert.Equal(t, "125089490", resp.Data.Total)
 		assert.Equal(t, "28214", resp.Data.Total)
-		// assert.Equal(t, "89442", resp.Data.Attestations)
 		assert.Equal(t, "0", resp.Data.Attestations)
-		// assert.Equal(t, "48", resp.Data.SyncAggregate)
 		assert.Equal(t, "28214", resp.Data.SyncAggregate)
-		// assert.Equal(t, "62500000", resp.Data.AttesterSlashings)
 		assert.Equal(t, "0", resp.Data.AttesterSlashings)
-		// assert.Equal(t, "62500000", resp.Data.ProposerSlashings)
 		assert.Equal(t, "0", resp.Data.ProposerSlashings)
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 		assert.Equal(t, false, resp.Finalized)

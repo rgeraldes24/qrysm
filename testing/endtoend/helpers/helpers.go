@@ -109,7 +109,7 @@ func WaitForTextInFile(src *os.File, match string) error {
 					return
 				}
 
-				// NOTE(rgeraldes24): replaced the bufio scanner with Read string due to the token too long error
+				// NOTE(rgeraldes24): replaced the bufio scanner with ReadString due to the token too long error
 				rd := bufio.NewReader(f)
 				for {
 					line, err := rd.ReadString('\n')

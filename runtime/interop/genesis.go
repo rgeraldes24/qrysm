@@ -109,7 +109,7 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 		Nonce:     0,
 		Timestamp: genesisTime,
 		// NOTE(rgeraldes24): required by the genesis generation on the beacon node side
-		// for the e2e tests
+		// during the e2e tests
 		ExtraData:  make([]byte, 32),
 		GasLimit:   math.MaxUint64 >> 1, // shift 1 back from the max, just in case
 		Difficulty: common.HexToHash(defaultDifficulty).Big(),

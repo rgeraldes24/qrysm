@@ -45,9 +45,8 @@ func TestProcessJustificationAndFinalizationPreCompute_ConsecutiveEpochs(t *test
 	b := &precompute.Balance{PrevEpochTargetAttested: attestedBalance}
 	newState, err := precompute.ProcessJustificationAndFinalizationPreCompute(state, b)
 	require.NoError(t, err)
-	// TODO(rgeraldes24): fix
-	// rt := [32]byte{byte(64)}
-	// assert.DeepEqual(t, rt[:], newState.CurrentJustifiedCheckpoint().Root, "Unexpected justified root")
+	rt := [32]byte{}
+	assert.DeepEqual(t, rt[:], newState.CurrentJustifiedCheckpoint().Root, "Unexpected justified root")
 	assert.Equal(t, primitives.Epoch(2), newState.CurrentJustifiedCheckpoint().Epoch, "Unexpected justified epoch")
 	assert.Equal(t, primitives.Epoch(0), newState.PreviousJustifiedCheckpoint().Epoch, "Unexpected previous justified epoch")
 	assert.DeepEqual(t, params.BeaconConfig().ZeroHash[:], newState.FinalizedCheckpoint().Root, "Unexpected finalized root")
@@ -83,9 +82,8 @@ func TestProcessJustificationAndFinalizationPreCompute_JustifyCurrentEpoch(t *te
 	b := &precompute.Balance{PrevEpochTargetAttested: attestedBalance}
 	newState, err := precompute.ProcessJustificationAndFinalizationPreCompute(state, b)
 	require.NoError(t, err)
-	// TODO(rgeraldes24): fix
-	// rt := [32]byte{byte(64)}
-	// assert.DeepEqual(t, rt[:], newState.CurrentJustifiedCheckpoint().Root, "Unexpected current justified root")
+	rt := [32]byte{}
+	assert.DeepEqual(t, rt[:], newState.CurrentJustifiedCheckpoint().Root, "Unexpected current justified root")
 	assert.Equal(t, primitives.Epoch(2), newState.CurrentJustifiedCheckpoint().Epoch, "Unexpected justified epoch")
 	assert.Equal(t, primitives.Epoch(0), newState.PreviousJustifiedCheckpoint().Epoch, "Unexpected previous justified epoch")
 	assert.DeepEqual(t, params.BeaconConfig().ZeroHash[:], newState.FinalizedCheckpoint().Root)
@@ -120,9 +118,8 @@ func TestProcessJustificationAndFinalizationPreCompute_JustifyPrevEpoch(t *testi
 	b := &precompute.Balance{PrevEpochTargetAttested: attestedBalance}
 	newState, err := precompute.ProcessJustificationAndFinalizationPreCompute(state, b)
 	require.NoError(t, err)
-	// TODO(rgeraldes24): fix
-	// rt := [32]byte{byte(64)}
-	// assert.DeepEqual(t, rt[:], newState.CurrentJustifiedCheckpoint().Root, "Unexpected current justified root")
+	rt := [32]byte{}
+	assert.DeepEqual(t, rt[:], newState.CurrentJustifiedCheckpoint().Root, "Unexpected current justified root")
 	assert.Equal(t, primitives.Epoch(0), newState.PreviousJustifiedCheckpoint().Epoch, "Unexpected previous justified epoch")
 	assert.Equal(t, primitives.Epoch(2), newState.CurrentJustifiedCheckpoint().Epoch, "Unexpected justified epoch")
 	assert.DeepEqual(t, params.BeaconConfig().ZeroHash[:], newState.FinalizedCheckpoint().Root)

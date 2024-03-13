@@ -164,10 +164,6 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 		lowestBound = currEpoch - 1
 	}
 
-	// if lowestBound < helpers.AltairE2EForkEpoch {
-	// 	lowestBound = helpers.AltairE2EForkEpoch
-	// }
-
 	blockCtrs, err := altairClient.ListBeaconBlocks(context.Background(), &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: lowestBound}})
 	if err != nil {
 		return errors.Wrap(err, "failed to get validator participation")
@@ -202,7 +198,7 @@ func validatorsSyncParticipation(_ *types.EvaluationContext, conns ...*grpc.Clie
 			return err
 		}
 
-		// NOTE(rgeraldes24): make sure that the number of signatures matches the number of participants
+		// make sure that the number of signatures matches the number of participants
 		if len(syncAgg.SyncCommitteeBits.BitIndices()) != len(syncAgg.SyncCommitteeSignatures) {
 			return errors.Errorf("In block of slot %d ,the aggregate bitvector with %d participants only got %d signatures", b.Block().Slot(), len(syncAgg.SyncCommitteeBits.BitIndices()), len(syncAgg.SyncCommitteeSignatures))
 		}

@@ -116,8 +116,7 @@ func TestProcessSyncCommittee_MixParticipation_BadSignature(t *testing.T) {
 	for i, indice := range indices {
 		if syncBits.BitAt(uint64(i)) {
 			b := p2pType.SSZBytes(pbr)
-			// NOTE(rgeraldes24): used incorrect domain to generate invalid signatures
-			sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainDeposit, privKeys[indice])
+			sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainDeposit /* incorrect domain */, privKeys[indice])
 			require.NoError(t, err)
 			sigs = append(sigs, sb)
 		}

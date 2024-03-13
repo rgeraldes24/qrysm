@@ -250,19 +250,6 @@ func TestSyncSubCommitteePubkeys_CanGet(t *testing.T) {
 	subCommSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
 	require.Equal(t, int(subCommSize), len(sub))
 	require.DeepSSZEqual(t, com.Pubkeys[0:subCommSize], sub)
-
-	// NOTE(rgeraldes24): the following checks are not valid since SyncCommitteeSubnetCount = 1
-	// sub, err = altair.SyncSubCommitteePubkeys(com, 1)
-	// require.NoError(t, err)
-	// require.DeepSSZEqual(t, com.Pubkeys[subCommSize:2*subCommSize], sub)
-
-	// sub, err = altair.SyncSubCommitteePubkeys(com, 2)
-	// require.NoError(t, err)
-	// require.DeepSSZEqual(t, com.Pubkeys[2*subCommSize:3*subCommSize], sub)
-
-	// sub, err = altair.SyncSubCommitteePubkeys(com, 3)
-	// require.NoError(t, err)
-	// require.DeepSSZEqual(t, com.Pubkeys[3*subCommSize:], sub)
 }
 
 func Test_ValidateSyncMessageTime(t *testing.T) {

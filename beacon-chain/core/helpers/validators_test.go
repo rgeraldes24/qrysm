@@ -218,8 +218,6 @@ func TestBeaconProposerIndex_OK(t *testing.T) {
 			slot:  30,
 			index: 369,
 		},
-		// TODO(rgeraldes24): double check this value since it has been modified
-		// and slot 43 is now in epoch 0 instead of 1 in the past
 		{
 			slot:  43,
 			index: 2003,
