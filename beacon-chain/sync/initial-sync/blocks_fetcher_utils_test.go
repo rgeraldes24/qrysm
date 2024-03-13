@@ -413,8 +413,6 @@ func TestBlocksFetcher_findForkWithPeer(t *testing.T) {
 		}()
 		fork, err := fetcher.findForkWithPeer(ctx, p2, 256)
 		require.NoError(t, err)
-		// TODO(rgeraldes24): double check
-		// require.Equal(t, 10, len(fork.bwb))
 		require.Equal(t, 34, len(fork.bwb))
 		assert.Equal(t, forkedSlot, fork.bwb[0].Block.Block().Slot(), "Expected slot %d to be ancestor", forkedSlot)
 	})

@@ -214,8 +214,6 @@ func TestStaticPeering_PeersAreAdded(t *testing.T) {
 	exitRoutine <- true
 }
 
-// TODO(rgeraldes24): this test depends on the machine
-/*
 func TestHostIsResolved(t *testing.T) {
 	// As defined in RFC 2606 , example.org is a
 	// reserved example domain name.
@@ -236,7 +234,6 @@ func TestHostIsResolved(t *testing.T) {
 	newIP := list.Self().IP()
 	assert.Equal(t, exampleIP, newIP.String(), "Did not resolve to expected IP")
 }
-*/
 
 func TestInboundPeerLimit(t *testing.T) {
 	fakePeer := testp2p.NewTestP2P(t)

@@ -95,7 +95,6 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): double check
 func TestExpectedWithdrawals(t *testing.T) {
 	st, err := util.NewBeaconStateCapella()
 	slotsAhead := 5000
@@ -178,7 +177,6 @@ func TestExpectedWithdrawals(t *testing.T) {
 			ValidatorIndex: strconv.FormatUint(5, 10),
 			Address:        hexutil.Encode(validators[5].WithdrawalCredentials[12:]),
 			// Decreased due to epoch processing when state advanced forward
-			// Amount: strconv.FormatUint(31998257885, 10),
 			Amount: strconv.FormatUint(39999930305350, 10),
 		}
 		expectedWithdrawal2 := &ExpectedWithdrawal{
@@ -186,7 +184,6 @@ func TestExpectedWithdrawals(t *testing.T) {
 			ValidatorIndex: strconv.FormatUint(14, 10),
 			Address:        hexutil.Encode(validators[14].WithdrawalCredentials[12:]),
 			// MaxEffectiveBalance + MinDepositAmount + decrease after epoch processing
-			// Amount: strconv.FormatUint(32998257885, 10),
 			Amount: strconv.FormatUint(40000930305350, 10),
 		}
 		expectedWithdrawal3 := &ExpectedWithdrawal{
@@ -194,7 +191,6 @@ func TestExpectedWithdrawals(t *testing.T) {
 			ValidatorIndex: strconv.FormatUint(15, 10),
 			Address:        hexutil.Encode(validators[15].WithdrawalCredentials[12:]),
 			// MinDepositAmount + decrease after epoch processing
-			// Amount: strconv.FormatUint(998257885, 10),
 			Amount: strconv.FormatUint(930305350, 10),
 		}
 		require.DeepEqual(t, expectedWithdrawal1, resp.Data[0])
