@@ -219,8 +219,6 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, uint64(3), e.BlockNumber()) // Local block
 
-		// TODO(rgeraldes24): double check
-		// require.LogsContain(t, hook, "builderGweiValue=1000000000 localBoostPercentage=100 localGweiValue=2000000000")
 		require.LogsContain(t, hook, "builderGweiValue=1 localBoostPercentage=0 localGweiValue=2")
 	})
 	t.Run("Builder configured. Local block and boost has higher value", func(t *testing.T) {

@@ -1,6 +1,6 @@
 package evaluators
 
-// NOTE(rgeraldes24): re-enable once we have more forkss
+// NOTE(rgeraldes24): re-enable once we have more forks
 /*
 import (
 	"context"
