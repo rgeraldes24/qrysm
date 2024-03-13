@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
-// TODO(rgeraldes24): re-enable once we add the required repos
+// TODO(theQRL/qrysm/issues/78)
 /*
 func testnetConfigFilePath(t *testing.T, network string) string {
 	fPath, err := bazel.Runfile("external/zond_networks")

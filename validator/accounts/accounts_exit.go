@@ -153,7 +153,7 @@ func prepareAllKeys(validatingKeys [][field_params.DilithiumPubkeyLength]byte) (
 
 func displayExitInfo(rawExitedKeys [][]byte, trimmedExitedKeys []string) {
 	if len(rawExitedKeys) > 0 {
-		// TODO(rgeraldes24): include our explorer url when available
+		// TODO(theQRL/qrysm/issues/67): include our explorer url when available
 		// urlFormattedPubKeys := make([]string, len(rawExitedKeys))
 		// for i, key := range rawExitedKeys {
 		// 	var baseUrl string

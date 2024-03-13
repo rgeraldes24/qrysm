@@ -1,6 +1,6 @@
 package depositsnapshot
 
-// TODO(rgeraldes24): re-enable once we fix the spec tests
+// TODO(theQRL/qrysm/issues/69)
 /*
 import (
 	"encoding/hex"

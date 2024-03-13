@@ -160,7 +160,7 @@ func TestModifiedE2E(t *testing.T) {
 }
 
 func TestLoadConfigFile(t *testing.T) {
-	// NOTE(rgeraldes24): re-enable once we fix the spec tests
+	// NOTE(theQRL/qrysm/issues/69)
 	/*
 		t.Run("mainnet", func(t *testing.T) {
 			mn := params.MainnetConfig().Copy()

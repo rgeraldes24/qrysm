@@ -536,8 +536,7 @@ func TestHandleEpochBoundary_UpdateFirstSlot(t *testing.T) {
 	require.NoError(t, service.handleEpochBoundary(ctx, s.Slot(), s, []byte{}))
 }
 
-// TODO(rgeraldes24): check if it makes sense to increase the MaxSlotBuffer value and remove comments
-// NOTE(rgeraldes24): this test will work if MaxSlotBuffer is 512 instead of the current 128
+// TODO(theQRL/qrysm/issues/79)
 func TestOnBlock_CanFinalize_WithOnTick(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, fcs := tr.ctx, tr.fcs
@@ -589,8 +588,7 @@ func TestOnBlock_CanFinalize_WithOnTick(t *testing.T) {
 	require.Equal(t, f.Epoch, cp.Epoch)
 }
 
-// TODO(rgeraldes24): check if it makes sense to increase the MaxSlotBuffer value and remove comments
-// NOTE(rgeraldes24): this test will work if MaxSlotBuffer is 512 instead of the current 128
+// TODO(theQRL/qrysm/issues/79)
 func TestOnBlock_CanFinalize(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx

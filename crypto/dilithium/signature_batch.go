@@ -1,5 +1,12 @@
 package dilithium
 
+import (
+	"encoding/hex"
+	"fmt"
+
+	"github.com/pkg/errors"
+)
+
 // SignatureBatch refers to the defined set of
 // signatures and its respective public keys and
 // messages required to verify it.
@@ -34,11 +41,6 @@ func (s *SignatureBatch) Verify() (bool, error) {
 	return VerifyMultipleSignatures(s.Signatures, s.Messages, s.PublicKeys)
 }
 
-// TODO(rgeraldes24): remove once we expand the error to identify the sig
-// that is invalid in the main verify method. This is going to be done in
-// the main method because we verify all the signatures there anyway since
-// we don't have aggregated signatures
-/*
 // VerifyVerbosely verifies signatures as a whole at first, if fails, fallback
 // to verify each single signature to identify invalid ones.
 func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
@@ -51,11 +53,9 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 
 	errmsg := "some signatures are invalid. details:"
 
-	for i := 0; i < len(s.Signatures); i++ {
-		for j, pubKey := range s.PublicKeys[i] {
-			offset := j * field_params.DilithiumSignatureLength
-			sig := s.Signatures[i][offset : offset+field_params.DilithiumSignatureLength]
-			msg := s.Messages[i]
+	for i, msg := range s.Messages {
+		for j, sig := range s.Signatures[i] {
+			pubKey := s.PublicKeys[i][j]
 
 			valid, err := VerifySignature(sig, msg, pubKey)
 			if !valid {
@@ -77,7 +77,6 @@ func (s *SignatureBatch) VerifyVerbosely() (bool, error) {
 
 	return false, errors.Errorf(errmsg)
 }
-*/
 
 // Copy the attached signature batch and return it
 // to the caller.

@@ -114,7 +114,7 @@ func Test_fromSnapshotParts(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): re-enable once we fix the spec tests
+// TODO(theQRL/qrysm/issues/69)
 /*
 func Test_generateProof(t *testing.T) {
 	tests := []struct {

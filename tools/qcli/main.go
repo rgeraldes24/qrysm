@@ -1,6 +1,6 @@
 package main
 
-// TODO(rgeraldes24)
+// TODO(theQRL/qrysm/issues/75)
 /*
 import (
 	"bufio"

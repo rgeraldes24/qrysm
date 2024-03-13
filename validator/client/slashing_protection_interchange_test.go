@@ -1,6 +1,6 @@
 package client
 
-// NOTE(rgeraldes24): re-enable once we cover the spec tests
+// NOTE(theQRL/qrysm/issues/69)
 /*
 import (
 	"bytes"

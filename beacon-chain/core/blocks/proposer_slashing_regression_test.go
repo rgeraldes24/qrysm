@@ -1,6 +1,6 @@
 package blocks_test
 
-// TODO(rgeraldes24): re-enable once we fix the testdata
+// TODO(theQRL/qrysm/issues/69)
 /*
 import (
 	"os"

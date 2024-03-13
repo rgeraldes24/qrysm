@@ -277,7 +277,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 	})
 }
 
-// NOTE(rgeraldes24): re-enable once we support the remoteweb3signer
+// TODO(theQRL/qrysm/issues/70)
 /*
 func TestServer_ImportKeystores_WrongKeymanagerKind(t *testing.T) {
 	ctx := context.Background()
@@ -512,7 +512,7 @@ func TestServer_DeleteKeystores_FailedSlashingProtectionExport(t *testing.T) {
 	)
 }
 
-// NOTE(rgeraldes24): re-enable once we support the remoteweb3signer
+// TODO(theQRL/qrysm/issues/70)
 /*
 func TestServer_DeleteKeystores_WrongKeymanagerKind(t *testing.T) {
 	ctx := context.Background()

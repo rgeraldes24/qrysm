@@ -126,7 +126,7 @@ var (
 				Usage:       "Endpoint to preferred execution client. If unset, defaults to Gzond",
 				Value:       "http://localhost:8545",
 			},
-			// TODO(rgeraldes24): re-enable once we have more forks
+			// NOTE(rgeraldes24): re-enable once we have more forks
 			// flags.EnumValue{
 			// 	Name:        "fork",
 			// 	Usage:       fmt.Sprintf("Name of the BeaconState schema to use in output encoding [%s]", strings.Join(versionNames(), ",")),

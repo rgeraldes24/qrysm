@@ -47,6 +47,7 @@ func (s *Server) ProduceBlockV3(w http.ResponseWriter, r *http.Request) {
 
 	var randaoReveal []byte
 	if rawSkipRandaoVerification == "true" {
+		// TODO(theQRL/qrysm/issues/74)
 		randaoReveal = primitives.PointAtInfinity
 	} else {
 		rr, err := shared.DecodeHexWithLength(rawRandaoReveal, field_params.DilithiumSignatureLength)

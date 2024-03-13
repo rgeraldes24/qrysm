@@ -1,9 +1,12 @@
 package dilithium
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
 	"github.com/theQRL/qrysm/v4/testing/assert"
+	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
 const TestSignature = "test signature"
@@ -62,9 +65,6 @@ func createDescriptions(length int, text ...string) []string {
 	return desc
 }
 
-// TODO(rgeraldes24): remove as soon as we deprecate VerifyVerbosely
-/*
-
 func TestVerifyVerbosely_AllSignaturesValid(t *testing.T) {
 	set := NewValidSignatureSet(t, "good", 3)
 	valid, err := set.VerifyVerbosely()
@@ -90,13 +90,13 @@ func TestVerifyVerbosely_VerificationThrowsError(t *testing.T) {
 	goodSet := NewValidSignatureSet(t, "good", 1)
 	badSet := NewInvalidSignatureSet(t, "bad", 1, true)
 	set := NewSet().Join(goodSet).Join(badSet)
+	fmt.Println(set)
 	valid, err := set.VerifyVerbosely()
 	assert.Equal(t, false, valid, "SignatureSet is expected to be invalid")
+	fmt.Println(err)
 	assert.StringContains(t, "signature 'signature of bad0' is invalid", err.Error())
-	assert.StringContains(t, "could not unmarshal bytes into signature", err.Error())
 	assert.StringNotContains(t, "signature 'signature of good0' is invalid", err.Error())
 }
-*/
 
 // TODO(rgeraldes24): fix unit test: RemoveDuplicates not ready
 /*
@@ -389,3 +389,65 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 	}
 }
 */
+
+func NewValidSignatureSet(t *testing.T, msgBody string, num int) *SignatureBatch {
+	set := &SignatureBatch{
+		Signatures:   make([][][]byte, num),
+		PublicKeys:   make([][]common.PublicKey, num),
+		Messages:     make([][32]byte, num),
+		Descriptions: make([]string, num),
+	}
+
+	for i := 0; i < num; i++ {
+		priv, err := RandKey()
+		require.NoError(t, err)
+		pubkey := priv.PublicKey()
+		msg := messageBytes(fmt.Sprintf("%s%d", msgBody, i))
+		sig := priv.Sign(msg[:]).Marshal()
+		desc := fmt.Sprintf("signature of %s%d", msgBody, i)
+
+		set.Signatures[i] = [][]byte{sig}
+		set.PublicKeys[i] = []common.PublicKey{pubkey}
+		set.Messages[i] = msg
+		set.Descriptions[i] = desc
+	}
+
+	return set
+}
+
+func NewInvalidSignatureSet(t *testing.T, msgBody string, num int, throwErr bool) *SignatureBatch {
+	set := &SignatureBatch{
+		Signatures:   make([][][]byte, num),
+		PublicKeys:   make([][]common.PublicKey, num),
+		Messages:     make([][32]byte, num),
+		Descriptions: make([]string, num),
+	}
+
+	for i := 0; i < num; i++ {
+		priv, err := RandKey()
+		require.NoError(t, err)
+		pubkey := priv.PublicKey()
+		msg := messageBytes(fmt.Sprintf("%s%d", msgBody, i))
+		var sig []byte
+		if throwErr {
+			sig = make([]byte, 4595)
+		} else {
+			badMsg := messageBytes("badmsg")
+			sig = priv.Sign(badMsg[:]).Marshal()
+		}
+		desc := fmt.Sprintf("signature of %s%d", msgBody, i)
+
+		set.Signatures[i] = [][]byte{sig}
+		set.PublicKeys[i] = []common.PublicKey{pubkey}
+		set.Messages[i] = msg
+		set.Descriptions[i] = desc
+	}
+
+	return set
+}
+
+func messageBytes(message string) [32]byte {
+	var bytes [32]byte
+	copy(bytes[:], []byte(message))
+	return bytes
+}

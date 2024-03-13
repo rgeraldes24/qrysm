@@ -28,7 +28,6 @@ func TestBuilderInvalidBlock(t *testing.T) {
 	builder.InvalidBlock(t, blk)
 }
 
-// TODO(rgeraldes24)
 /*
 func TestPoWBlock(t *testing.T) {
 	st, err := util.NewBeaconStateCapella()

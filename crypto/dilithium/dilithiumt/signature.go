@@ -12,7 +12,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-var ErrSignatureVerificationFailed = errors.New("signature verification failed")
+var errSignatureVerificationFailed = errors.New("signature verification failed")
 
 // Signature used in the Dilithium signature scheme.
 type Signature struct {
@@ -76,8 +76,7 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBa
 					return err
 				}
 				if !ok {
-					// TODO(rgeraldes24): expand to identify the sig
-					return ErrSignatureVerificationFailed
+					return errSignatureVerificationFailed
 				}
 
 				return nil
@@ -86,7 +85,7 @@ func VerifyMultipleSignatures(sigsBatches [][][]byte, msgs [][32]byte, pubKeysBa
 	}
 
 	if err := grp.Wait(); err != nil {
-		if pkgerrors.Is(err, ErrSignatureVerificationFailed) {
+		if pkgerrors.Is(err, errSignatureVerificationFailed) {
 			return false, nil
 		}
 		return false, err

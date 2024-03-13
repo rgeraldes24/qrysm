@@ -228,18 +228,12 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 		sigSet.Join(set)
 	}
 
-	// NOTE(rgeraldes24): this is probably going to be deprecated since we verify each
-	// sig separately in our model instead of the the aggregated sig and thus know
-	// which verification failed without the need for the verbose version.
-	//
-	// var verify bool
-	// if features.Get().EnableVerboseSigVerification {
-	// 	verify, err = sigSet.VerifyVerbosely()
-	// } else {
-	// 	verify, err = sigSet.Verify()
-	// }
-
-	verify, err := sigSet.Verify()
+	var verify bool
+	if features.Get().EnableVerboseSigVerification {
+		verify, err = sigSet.VerifyVerbosely()
+	} else {
+		verify, err = sigSet.Verify()
+	}
 	if err != nil {
 		return invalidBlock{error: err}
 	}

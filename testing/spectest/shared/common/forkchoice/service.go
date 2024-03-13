@@ -53,7 +53,6 @@ func startChainService(t testing.TB,
 
 	fc := doublylinkedtree.New()
 	opts := append([]blockchain.Option{},
-		// TODO(rgeraldes24)
 		// blockchain.WithExecutionEngineCaller(engineMock),
 		blockchain.WithFinalizedStateAtStartUp(st),
 		blockchain.WithDatabase(db),

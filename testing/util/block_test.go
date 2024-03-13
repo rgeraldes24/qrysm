@@ -117,7 +117,7 @@ func TestGenerateFullBlock_ValidAttesterSlashings(t *testing.T) {
 	}
 }
 
-// TODO(rgeraldes24): test not valid atm
+// TODO(theQRL/qrysm/issues/75)
 /*
 func TestGenerateFullBlock_ValidAttestations(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

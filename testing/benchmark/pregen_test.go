@@ -1,6 +1,6 @@
 package benchmark
 
-// TODO(rgeraldes24): generate new benchmark files for the capella version
+// TODO(theQRL/qrysm/issues/77)
 /*
 import (
 	"testing"

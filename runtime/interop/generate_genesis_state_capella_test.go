@@ -48,28 +48,3 @@ func TestGenerateGenesisStateCapella(t *testing.T) {
 	_, err = st.MarshalSSZ()
 	require.NoError(t, err)
 }
-
-// TODO(rgeraldes24): migrate missing parts to the Capella test
-/*
-func TestGenerateGenesisState(t *testing.T) {
-	numValidators := uint64(64)
-	privKeys, pubKeys, err := interop.DeterministicallyGenerateKeys(0, numValidators)
-	require.NoError(t, err)
-	depositDataItems, depositDataRoots, err := interop.DepositDataFromKeys(privKeys, pubKeys)
-	require.NoError(t, err)
-	tr, err := trie.GenerateTrieFromItems(depositDataRoots, params.BeaconConfig().DepositContractTreeDepth)
-	require.NoError(t, err)
-	deposits, err := interop.GenerateDepositsFromData(depositDataItems, tr)
-	require.NoError(t, err)
-	root, err := tr.HashTreeRoot()
-	require.NoError(t, err)
-	genesisState, err := transition.GenesisBeaconState(context.Background(), deposits, 0, &zond.Eth1Data{
-		DepositRoot:  root[:],
-		DepositCount: uint64(len(deposits)),
-	})
-	require.NoError(t, err)
-	want := int(numValidators)
-	assert.Equal(t, want, genesisState.NumValidators())
-	assert.Equal(t, uint64(0), genesisState.GenesisTime())
-}
-*/

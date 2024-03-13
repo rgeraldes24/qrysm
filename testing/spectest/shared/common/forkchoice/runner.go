@@ -117,7 +117,6 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 					if step.PayloadStatus != nil {
 						require.NoError(t, builder.SetPayloadStatus(step.PayloadStatus))
 					}
-					// TODO(rgeraldes24)
 					/*
 						if step.PowBlock != nil {
 							powBlockFile, err := util.BazelFileBytes(testsFolderPath, folder.Name(), fmt.Sprint(*step.PowBlock, ".ssz_snappy"))

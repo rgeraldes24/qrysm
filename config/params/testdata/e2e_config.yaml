@@ -35,7 +35,6 @@ ETH1_FOLLOW_DISTANCE: 8 # Override for e2e tests
 INACTIVITY_SCORE_BIAS: 4
 # 2**4 (= 16)
 INACTIVITY_SCORE_RECOVERY_RATE: 16
-# TODO(rgeraldes24): review comment values
 # 2**4 * 10**9 (= 16,000,000,000) Gwei
 EJECTION_BALANCE: 20000000000000
 # 2**1 (= 2)

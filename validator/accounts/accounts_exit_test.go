@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
-// NOTE(rgeraldes24): old version - re-enable once we have the explorer ready
+// TODO(theQRL/qrysm/issues/67): remove test below when ready
 /*
 func TestDisplayExitInfo(t *testing.T) {
 	logHook := test.NewGlobal()
