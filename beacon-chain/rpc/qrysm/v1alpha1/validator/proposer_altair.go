@@ -53,8 +53,7 @@ func (vs *Server) getSyncAggregate(ctx context.Context, slot primitives.Slot, ro
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSubnetCount; i++ {
 		bitsHolder = append(bitsHolder, zondpb.NewSyncCommitteeAggregationBits())
 	}
-	// NOTE(rgeraldes24): max number of sigs is the committee size now instead of one sig per sub-committee
-	sigsHolder := make([][]byte, 0, params.BeaconConfig().SyncCommitteeSize)
+	sigsHolder := make([][]byte, 0, params.BeaconConfig().SyncCommitteeSize/params.BeaconConfig().SyncCommitteeSubnetCount)
 
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSubnetCount; i++ {
 		cs := proposerContributions.filterBySubIndex(i)
