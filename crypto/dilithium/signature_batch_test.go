@@ -2,6 +2,7 @@ package dilithium
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/theQRL/qrysm/v4/crypto/dilithium/common"
@@ -98,8 +99,6 @@ func TestVerifyVerbosely_VerificationThrowsError(t *testing.T) {
 	assert.StringNotContains(t, "signature 'signature of good0' is invalid", err.Error())
 }
 
-// TODO(rgeraldes24): fix unit test: RemoveDuplicates not ready
-/*
 func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 	var keys []DilithiumKey
 	for i := 0; i < 100; i++ {
@@ -125,14 +124,14 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 				chosenKeys := keys[:20]
 
 				msg := [32]byte{'r', 'a', 'n', 'd', 'o', 'm'}
-				var signatures [][]byte
+				var signatures [][][]byte
+				var pubs [][]PublicKey
 				var messages [][32]byte
-				var pubs []PublicKey
 				for _, k := range chosenKeys {
 					s := k.Sign(msg[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				allSigs := append(signatures, signatures...)
 				allPubs := append(pubs, pubs...)
@@ -159,26 +158,26 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 				msg := [32]byte{'r', 'a', 'n', 'd', 'o', 'm'}
 				msg1 := [32]byte{'r', 'a', 'n', 'd', 'o', 'm', '1'}
 				msg2 := [32]byte{'r', 'a', 'n', 'd', 'o', 'm', '2'}
-				var signatures [][]byte
+				var signatures [][][]byte
 				var messages [][32]byte
-				var pubs []PublicKey
+				var pubs [][]PublicKey
 				for _, k := range chosenKeys[:10] {
 					s := k.Sign(msg[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				for _, k := range chosenKeys[10:20] {
 					s := k.Sign(msg1[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg1)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				for _, k := range chosenKeys[20:30] {
 					s := k.Sign(msg2[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg2)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				allSigs := append(signatures, signatures...)
 				allPubs := append(pubs, pubs...)
@@ -205,26 +204,26 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 				msg := [32]byte{'r', 'a', 'n', 'd', 'o', 'm'}
 				msg1 := [32]byte{'r', 'a', 'n', 'd', 'o', 'm', '1'}
 				msg2 := [32]byte{'r', 'a', 'n', 'd', 'o', 'm', '2'}
-				var signatures [][]byte
+				var signatures [][][]byte
 				var messages [][32]byte
-				var pubs []PublicKey
+				var pubs [][]PublicKey
 				for _, k := range chosenKeys[:10] {
 					s := k.Sign(msg[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				for _, k := range chosenKeys[10:20] {
 					s := k.Sign(msg1[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg1)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				for _, k := range chosenKeys[20:30] {
 					s := k.Sign(msg2[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg2)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				return &SignatureBatch{
 						Signatures:   signatures,
@@ -248,30 +247,30 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 				msg := [32]byte{'r', 'a', 'n', 'd', 'o', 'm'}
 				msg1 := [32]byte{'r', 'a', 'n', 'd', 'o', 'm', '1'}
 				msg2 := [32]byte{'r', 'a', 'n', 'd', 'o', 'm', '2'}
-				var signatures [][]byte
+				var signatures [][][]byte
 				var messages [][32]byte
-				var pubs []PublicKey
+				var pubs [][]PublicKey
 				for _, k := range chosenKeys[:10] {
 					s := k.Sign(msg[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				for _, k := range chosenKeys[10:20] {
 					s := k.Sign(msg1[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg1)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				for _, k := range chosenKeys[20:30] {
 					s := k.Sign(msg2[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg2)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				allSigs := append(signatures, signatures...)
 				// Make it a non-unique entry
-				allSigs[10] = make([]byte, 96)
+				allSigs[10] = [][]byte{make([]byte, 4595)}
 				allPubs := append(pubs, pubs...)
 				allMsgs := append(messages, messages...)
 				// Insert it back at the end
@@ -279,7 +278,7 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 				pubs = append(pubs, pubs[10])
 				messages = append(messages, messages[10])
 				// Zero out to expected result
-				signatures[10] = make([]byte, 96)
+				signatures[10] = [][]byte{make([]byte, 4595)}
 				return &SignatureBatch{
 						Signatures:   allSigs,
 						PublicKeys:   allPubs,
@@ -294,6 +293,7 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 			},
 			want: 29,
 		},
+
 		{
 			name: "valid duplicates and invalid duplicates with signature,pubkey,message in batch with multiple messages",
 			batchCreator: func() (*SignatureBatch, *SignatureBatch) {
@@ -302,33 +302,33 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 				msg := [32]byte{'r', 'a', 'n', 'd', 'o', 'm'}
 				msg1 := [32]byte{'r', 'a', 'n', 'd', 'o', 'm', '1'}
 				msg2 := [32]byte{'r', 'a', 'n', 'd', 'o', 'm', '2'}
-				var signatures [][]byte
+				var signatures [][][]byte
 				var messages [][32]byte
-				var pubs []PublicKey
+				var pubs [][]PublicKey
 				for _, k := range chosenKeys[:10] {
 					s := k.Sign(msg[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				for _, k := range chosenKeys[10:20] {
 					s := k.Sign(msg1[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg1)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				for _, k := range chosenKeys[20:30] {
 					s := k.Sign(msg2[:])
-					signatures = append(signatures, s.Marshal())
+					signatures = append(signatures, [][]byte{s.Marshal()})
 					messages = append(messages, msg2)
-					pubs = append(pubs, k.PublicKey())
+					pubs = append(pubs, []PublicKey{k.PublicKey()})
 				}
 				allSigs := append(signatures, signatures...)
 				// Make it a non-unique entry
-				allSigs[10] = make([]byte, 96)
+				allSigs[10] = [][]byte{make([]byte, 4595)}
 
 				allPubs := append(pubs, pubs...)
-				allPubs[20] = keys[len(keys)-1].PublicKey()
+				allPubs[20] = []PublicKey{keys[len(keys)-1].PublicKey()}
 
 				allMsgs := append(messages, messages...)
 				allMsgs[29] = [32]byte{'j', 'u', 'n', 'k'}
@@ -338,14 +338,14 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 				pubs = append(pubs, pubs[10])
 				messages = append(messages, messages[10])
 				// Zero out to expected result
-				signatures[10] = make([]byte, 96)
+				signatures[10] = [][]byte{make([]byte, 4595)}
 
 				// Insert it back at the end
 				signatures = append(signatures, signatures[20])
 				pubs = append(pubs, pubs[20])
 				messages = append(messages, messages[20])
 				// Zero out to expected result
-				pubs[20] = keys[len(keys)-1].PublicKey()
+				pubs[20] = []PublicKey{keys[len(keys)-1].PublicKey()}
 
 				// Insert it back at the end
 				signatures = append(signatures, signatures[29])
@@ -388,7 +388,6 @@ func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 		})
 	}
 }
-*/
 
 func NewValidSignatureSet(t *testing.T, msgBody string, num int) *SignatureBatch {
 	set := &SignatureBatch{

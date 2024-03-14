@@ -1,6 +1,7 @@
 package dilithium
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 
@@ -111,63 +112,69 @@ func (s *SignatureBatch) Copy() *SignatureBatch {
 	}
 }
 
-// TODO(rgeraldes24): complete func: speeds up the verification but not urgent for now
-// RemoveDuplicates removes duplicate signature sets from the signature batch.
 func (s *SignatureBatch) RemoveDuplicates() (int, *SignatureBatch, error) {
-	/*
-		if len(s.Signatures) == 0 || len(s.PublicKeys) == 0 || len(s.Messages) == 0 {
-			return 0, s, nil
+	if len(s.Signatures) == 0 || len(s.PublicKeys) == 0 || len(s.Messages) == 0 {
+		return 0, s, nil
+	}
+
+	if len(s.Signatures) != len(s.PublicKeys) || len(s.Signatures) != len(s.Messages) {
+		return 0, s, errors.Errorf("mismatch number of signatures batches, publickeys batches and messages in signature batch. "+
+			"Signatures Batches %d, Public Keys Batches %d , Messages %d", s.Signatures, s.PublicKeys, s.Messages)
+	}
+
+	msgMap := make(map[string][]int)
+	duplicateSet := make(map[int]bool)
+
+loop:
+	for i := 0; i < len(s.Messages); i++ {
+		if len(s.Signatures[i]) != len(s.PublicKeys[i]) {
+			return 0, s, errors.Errorf("mismatch number of signatures and publickeys in signature batch[%d]. "+
+				"Signatures %d, Public Keys %d", i, len(s.Signatures[i]), len(s.PublicKeys[i]))
 		}
-		if len(s.Signatures) != len(s.PublicKeys) || len(s.Signatures) != len(s.Messages) {
-			return 0, s, errors.Errorf("mismatch number of signatures, publickeys and messages in signature batch. "+
-				"Signatures %d, Public Keys %d , Messages %d", s.Signatures, s.PublicKeys, s.Messages)
-		}
-		sigMap := make(map[string]int)
-		duplicateSet := make(map[int]bool)
-		for i := 0; i < len(s.Signatures); i++ {
-			if sigIdx, ok := sigMap[string(s.Signatures[i])]; ok {
-				allPubKeyMatched := true
-				for j := range s.PublicKeys[i] {
-					if !s.PublicKeys[sigIdx][j].Equals(s.PublicKeys[i][j]) {
-						allPubKeyMatched = false
-						break
+
+		if indices, ok := msgMap[string(s.Messages[i][:])]; ok {
+		loop2:
+			for _, msgIdx := range indices {
+				if len(s.PublicKeys[msgIdx]) != len(s.PublicKeys[i]) {
+					continue loop2
+				}
+
+				for j := 0; j < len(s.PublicKeys[msgIdx]); j++ {
+					if !s.PublicKeys[msgIdx][j].Equals(s.PublicKeys[i][j]) {
+						continue loop2
+					}
+
+					if !bytes.Equal(s.Signatures[msgIdx][j], s.Signatures[i][j]) {
+						continue loop2
 					}
 				}
-				//if s.PublicKeys[sigIdx].Equals(s.PublicKeys[i]) &&
-				//	s.Messages[sigIdx] == s.Messages[i] {
-				//	duplicateSet[i] = true
-				//	continue
-				//}
-				if allPubKeyMatched && s.Messages[sigIdx] == s.Messages[i] {
-					duplicateSet[i] = true
-					continue
-				}
+
+				duplicateSet[i] = true
+				continue loop
 			}
-			sigMap[string(s.Signatures[i])] = i
 		}
+		msgMap[string(s.Messages[i][:])] = append(msgMap[string(s.Messages[i][:])], i)
+	}
 
-		sigs := s.Signatures[:0]
-		pubs := s.PublicKeys[:0]
-		msgs := s.Messages[:0]
-		descs := s.Descriptions[:0]
+	sigs := s.Signatures[:0]
+	pubs := s.PublicKeys[:0]
+	msgs := s.Messages[:0]
+	descs := s.Descriptions[:0]
 
-		for i := 0; i < len(s.Signatures); i++ {
-			if duplicateSet[i] {
-				continue
-			}
-			sigs = append(sigs, s.Signatures[i])
-			pubs = append(pubs, s.PublicKeys[i])
-			msgs = append(msgs, s.Messages[i])
-			descs = append(descs, s.Descriptions[i])
+	for i := 0; i < len(s.Signatures); i++ {
+		if duplicateSet[i] {
+			continue
 		}
+		sigs = append(sigs, s.Signatures[i])
+		pubs = append(pubs, s.PublicKeys[i])
+		msgs = append(msgs, s.Messages[i])
+		descs = append(descs, s.Descriptions[i])
+	}
 
-		s.Signatures = sigs
-		s.PublicKeys = pubs
-		s.Messages = msgs
-		s.Descriptions = descs
+	s.Signatures = sigs
+	s.PublicKeys = pubs
+	s.Messages = msgs
+	s.Descriptions = descs
 
-		return len(duplicateSet), s, nil
-	*/
-
-	return 0, s, nil
+	return len(duplicateSet), s, nil
 }
