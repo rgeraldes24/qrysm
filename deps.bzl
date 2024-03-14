@@ -218,8 +218,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_aws_aws_sdk_go_v2",
         importpath = "github.com/aws/aws-sdk-go-v2",
-        sum = "h1:qZ+woO4SamnH/eEbjM2IDLhRNwIwND/RQyVlBLp3Jqg=",
-        version = "v0.18.0",
+        sum = "h1:BS+UYpbsElC82gB+2E2jiCBg36i8HlubTB/dO/moQ9c=",
+        version = "v1.2.0",
     )
     go_repository(
         name = "com_github_aws_aws_sdk_go_v2_config",
@@ -5857,9 +5857,9 @@ def go_dependencies():
         patches = [
             "//third_party:com_github_theqrl_go_zond_secp256k1.patch",
         ],
-        replace = "github.com/rgeraldes24/go-zond",
-        sum = "h1:k+lz00RUTE/biClQYx42GvfRwaAmbjSaBT6K+HQlhPk=",
-        version = "v0.0.0-20240312152442-50b00a871c65",
+        replace = "github.com/cyyber/go-zond",
+        sum = "h1:wBewjMd/NQN7XYm+kiIxT061e4ygoFz/loaekDCByaQ=",
+        version = "v0.0.0-20240314155430-7b0d80927014",
     )
     go_repository(
         name = "com_github_theqrl_go_zond_types",
