@@ -15,7 +15,7 @@ func (s *Service) forkWatcher() {
 		// topics during/after the fork epoch. This routine is to ensure correct
 		// subscriptions for nodes running before a fork epoch.
 		case currSlot := <-slotTicker.C():
-			// NOTE(rgeraldes24): not necessary for now
+			// NOTE(rgeraldes24): re-enable once we have more forks + need to subscribe/unsubscribe topics
 			/*
 				currEpoch := slots.ToEpoch(currSlot)
 				if err := s.registerForUpcomingFork(currEpoch); err != nil {

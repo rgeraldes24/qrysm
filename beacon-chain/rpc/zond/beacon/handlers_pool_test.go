@@ -382,7 +382,7 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 		assert.Equal(t, true, broadcaster.BroadcastCalled)
 	})
 
-	// NOTE(rgeraldes24): test is not valid atm
+	// NOTE(rgeraldes24): test is not valid atm: re-enable once we have more forks
 	/*
 		t.Run("across fork", func(t *testing.T) {
 			params.SetupTestConfigCleanup(t)

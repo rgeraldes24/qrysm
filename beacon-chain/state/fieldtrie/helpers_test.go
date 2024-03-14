@@ -260,40 +260,6 @@ func TestFieldTrie_NativeState_fieldConvertersNative(t *testing.T) {
 			wantHex: nil,
 			errMsg:  fmt.Sprintf("Wanted type of %T", []*zondpb.Validator{}),
 		},
-		// NOTE(rgeraldes24): these tests are no longer valid: current/prev epoch attestations fields have been deprecated
-		/*
-			{
-				name: "Attestations",
-				args: &args{
-					field:   types.FieldIndex(15),
-					indices: []uint64{},
-					elements: []*zondpb.PendingAttestation{
-						{
-							ProposerIndex: 1,
-						},
-					},
-					convertAll: true,
-				},
-				wantHex: []string{"0x7d7696e7f12593934afcd87a0d38e1a981bee63cb4cf0568ba36a6e0596eeccb"},
-			},
-			{
-				name: "Attestations convertAll false",
-				args: &args{
-					field:   types.FieldIndex(15),
-					indices: []uint64{1},
-					elements: []*zondpb.PendingAttestation{
-						{
-							ProposerIndex: 0,
-						},
-						{
-							ProposerIndex: 1,
-						},
-					},
-					convertAll: false,
-				},
-				wantHex: []string{"0x7d7696e7f12593934afcd87a0d38e1a981bee63cb4cf0568ba36a6e0596eeccb"},
-			},
-		*/
 		{
 			name: "Type not found",
 			args: &args{

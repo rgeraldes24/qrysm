@@ -145,7 +145,6 @@ func TestGetBlock(t *testing.T) {
 			wsb, err := blocks.NewSignedBeaconBlock(tt.want)
 			require.NoError(t, err)
 
-			// NOTE(rgeraldes24) head block is cached (not blinded)
 			var wanted interfaces.ReadOnlySignedBeaconBlock = wsb
 			if tt.name != "head" {
 				wanted, err = wsb.ToBlinded()

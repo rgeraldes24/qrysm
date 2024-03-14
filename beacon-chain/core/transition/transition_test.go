@@ -305,7 +305,7 @@ func TestProcessSlots_LowerSlotAsParentState(t *testing.T) {
 	assert.ErrorContains(t, "expected state.slot 2 < slot 1", err)
 }
 
-// NOTE(rgeraldes24): test is not valid atm
+// NOTE(rgeraldes24): test is not valid atm: re-enable once we have more forks
 /*
 func TestProcessSlots_ThroughAltairEpoch(t *testing.T) {
 	transition.SkipSlotCache.Disable()

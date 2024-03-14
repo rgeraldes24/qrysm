@@ -79,7 +79,7 @@ func TestInitializeFromProtoUnsafe_Capella(t *testing.T) {
 	}
 }
 
-// NOTE(rgeraldes24): this test is also failing in the original repo once we
+// TODO(rgeraldes24): this test is also failing in the original repo once we
 // switch the state to a version > phase0. From debugging, it seems that the
 // root of the prevParticipationRoot(and current) is different in both states.
 /*

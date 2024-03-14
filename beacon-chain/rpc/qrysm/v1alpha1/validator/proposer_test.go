@@ -2109,24 +2109,12 @@ func TestProposer_GetSyncAggregate_OK(t *testing.T) {
 	}
 
 	r := params.BeaconConfig().ZeroHash
-	// NOTE(rgeraldes24): we need to take into account the new value of params.BeaconConfig().SyncCommitteeSubnetCount(1)
+
 	conts := []*zondpb.SyncCommitteeContribution{
 		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[0]}, AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
 		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[0], sigs[3]}, AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
 		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[1], sigs[2], sigs[3]}, AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
-		// {Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{sigs[0]}, AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
-		// {Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{sigs[0], sigs[3]}, AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
-		// {Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{sigs[1], sigs[2], sigs[3]}, AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
-		// {Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{sigs[0]}, AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
-		// {Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{sigs[0], sigs[3]}, AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
-		// {Slot: 1, SubcommitteeIndex: 2, Signatures: [][]byte{sigs[1], sigs[2], sigs[3]}, AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
-		// {Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{sigs[0]}, AggregationBits: []byte{0b0001}, BlockRoot: r[:]},
-		// {Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{sigs[0], sigs[3]}, AggregationBits: []byte{0b1001}, BlockRoot: r[:]},
-		// {Slot: 1, SubcommitteeIndex: 3, Signatures: [][]byte{sigs[1], sigs[2], sigs[3]}, AggregationBits: []byte{0b1110}, BlockRoot: r[:]},
 		{Slot: 2, SubcommitteeIndex: 0, Signatures: [][]byte{sigs[1], sigs[3], sigs[5], sigs[7]}, AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
-		// {Slot: 2, SubcommitteeIndex: 1, Signatures: [][]byte{sigs[1], sigs[3], sigs[5], sigs[7]}, AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
-		// {Slot: 2, SubcommitteeIndex: 2, Signatures: [][]byte{sigs[1], sigs[3], sigs[5], sigs[7]}, AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
-		// {Slot: 2, SubcommitteeIndex: 3, Signatures: [][]byte{sigs[1], sigs[3], sigs[5], sigs[7]}, AggregationBits: []byte{0b10101010}, BlockRoot: r[:]},
 	}
 
 	for _, cont := range conts {

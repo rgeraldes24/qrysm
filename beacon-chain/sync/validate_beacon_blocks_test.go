@@ -1240,7 +1240,7 @@ func TestValidateBeaconBlockPubSub_InvalidPayloadTimestamp(t *testing.T) {
 	assert.Equal(t, true, result)
 }
 
-// NOTE(rgeraldes24): test is not valid at the moment
+// NOTE(rgeraldes24): test is not valid at the moment: re-enable once we have more block versions
 /*
 func Test_validateBellatrixBeaconBlock(t *testing.T) {
 	db := dbtest.SetupDB(t)

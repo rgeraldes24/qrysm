@@ -318,25 +318,6 @@ func TestServer_getPayloadHeader(t *testing.T) {
 		err                   string
 		returnedHeaderCapella *v1.ExecutionPayloadHeaderCapella
 	}{
-		// NOTE(rgeraldes24): test is not valid atm
-		/*
-			{
-				name: "get header failed",
-				mock: &builderTest.MockBuilderService{
-					// ErrGetHeader: errors.New("can't get header"),
-					BidCapella:   sBid,
-				},
-				fetcher: &blockchainTest.ChainService{
-					Block: func() interfaces.ReadOnlySignedBeaconBlock {
-						wb, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
-						require.NoError(t, err)
-						wb.SetSlot(0)
-						return wb
-					}(),
-				},
-				err: "can't get header",
-			},
-		*/
 		{
 			name: "0 bid",
 			mock: &builderTest.MockBuilderService{
@@ -396,7 +377,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 			},
 			returnedHeaderCapella: bidCapella.Header,
 		},
-		// NOTE(rgeraldes24): test is not valid atm
+		// NOTE(rgeraldes24): test is not valid atm: re-enable once we have more versions
 		/*
 			{
 				name: "wrong bid version",

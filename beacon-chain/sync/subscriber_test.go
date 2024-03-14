@@ -615,7 +615,7 @@ func TestSubscribeWithSyncSubnets_DynamicOK(t *testing.T) {
 	cancel()
 }
 
-// NOTE(rgeraldes24): test is not valid at the moment
+// NOTE(rgeraldes24): tests are not valid at the moment
 /*
 func TestSubscribeWithSyncSubnets_StaticSwitchFork(t *testing.T) {
 	p := p2ptest.NewTestP2P(t)
@@ -652,10 +652,7 @@ func TestSubscribeWithSyncSubnets_StaticSwitchFork(t *testing.T) {
 
 	cancel()
 }
-*/
 
-// NOTE(rgeraldes24): test is not valid at the moment
-/*
 func TestSubscribeWithSyncSubnets_DynamicSwitchFork(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	p := p2ptest.NewTestP2P(t)

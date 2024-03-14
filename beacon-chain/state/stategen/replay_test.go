@@ -108,7 +108,7 @@ func TestReplayBlocks_LowerSlotBlock(t *testing.T) {
 	assert.Equal(t, targetSlot, newState.Slot(), "Did not advance slots")
 }
 
-// NOTE(rgeraldes24): test is not valid atm
+// NOTE(rgeraldes24): test is not valid atm: re-enable once we have a fork boundary
 /*
 func TestReplayBlocks_ThroughCapellaForkBoundary(t *testing.T) {
 	params.SetupTestConfigCleanup(t)

@@ -241,9 +241,6 @@ func TestAttestationRewards(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		resp := &AttestationRewardsResponse{}
 		require.NoError(t, json.Unmarshal(writer.Body.Bytes(), resp))
-		// NOTE(rgeraldes24): number of validators over the ejection balance is now 32
-		// with the new values
-		// require.Equal(t, 16, len(resp.Data.IdealRewards))
 		require.Equal(t, 32, len(resp.Data.IdealRewards))
 		sum := uint64(0)
 		for _, r := range resp.Data.IdealRewards {
