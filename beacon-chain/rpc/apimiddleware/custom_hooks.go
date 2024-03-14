@@ -36,11 +36,6 @@ func wrapDilithiumChangesArray(
 	return true, nil
 }
 
-type v1alpha1SignedPhase0Block struct {
-	Block     *BeaconBlockJson `json:"block"` // tech debt on phase 0 called this block instead of "message"
-	Signature string           `json:"signature" hex:"true"`
-}
-
 type capellaPublishBlockRequestJson struct {
 	CapellaBlock *SignedBeaconBlockCapellaJson `json:"capella_block"`
 }

@@ -44,8 +44,6 @@ func (s *Service) registerRPCHandlers() {
 		s.pingHandler,
 	)
 	s.registerRPCHandlersAltair()
-
-	return
 }
 
 // registerRPCHandlers for altair.

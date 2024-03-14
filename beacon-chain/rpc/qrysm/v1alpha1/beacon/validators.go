@@ -653,27 +653,6 @@ func (bs *Server) GetIndividualVotes(
 	}, nil
 }
 
-// Determines whether a validator has already exited.
-func validatorHasExited(validator *zondpb.Validator, currentEpoch primitives.Epoch) bool {
-	farFutureEpoch := params.BeaconConfig().FarFutureEpoch
-	if currentEpoch < validator.ActivationEligibilityEpoch {
-		return false
-	}
-	if currentEpoch < validator.ActivationEpoch {
-		return false
-	}
-	if validator.ExitEpoch == farFutureEpoch {
-		return false
-	}
-	if currentEpoch < validator.ExitEpoch {
-		if validator.Slashed {
-			return false
-		}
-		return false
-	}
-	return true
-}
-
 func validatorStatus(validator *zondpb.Validator, epoch primitives.Epoch) zondpb.ValidatorStatus {
 	farFutureEpoch := params.BeaconConfig().FarFutureEpoch
 	if validator == nil {

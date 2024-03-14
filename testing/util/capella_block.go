@@ -156,7 +156,6 @@ func GenerateFullBlockCapella(
 			return nil, errors.Wrap(err, "failed generating syncAggregate")
 		}
 	} else {
-
 		var syncCommitteeBits []byte
 		currSize := new(zondpb.SyncAggregate).SyncCommitteeBits.Len()
 		switch currSize {

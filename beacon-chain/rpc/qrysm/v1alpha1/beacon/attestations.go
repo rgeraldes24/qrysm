@@ -15,8 +15,6 @@ import (
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation"
-	attaggregation "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1/attestation/aggregation/attestations"
-	"github.com/theQRL/qrysm/v4/time/slots"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -193,47 +191,6 @@ func (bs *Server) ListIndexedAttestations(
 		TotalSize:           int32(len(indexedAtts)),
 		NextPageToken:       nextPageToken,
 	}, nil
-}
-
-// already being done by the attestation pool in the operations service.
-func (bs *Server) collectReceivedAttestations(ctx context.Context) {
-	attsByRoot := make(map[[32]byte][]*zondpb.Attestation)
-	twoThirdsASlot := 2 * slots.DivideSlotBy(3) /* 2/3 slot duration */
-	ticker := slots.NewSlotTickerWithOffset(bs.GenesisTimeFetcher.GenesisTime(), twoThirdsASlot, params.BeaconConfig().SecondsPerSlot)
-	for {
-		select {
-		case <-ticker.C():
-			aggregatedAttsByTarget := make(map[[32]byte][]*zondpb.Attestation)
-			for root, atts := range attsByRoot {
-				// We aggregate the received attestations, we know they all have the same data root.
-				aggAtts, err := attaggregation.Aggregate(atts)
-				if err != nil {
-					log.WithError(err).Error("Could not aggregate attestations")
-					continue
-				}
-				if len(aggAtts) == 0 {
-					continue
-				}
-				targetRoot := bytesutil.ToBytes32(atts[0].Data.Target.Root)
-				aggregatedAttsByTarget[targetRoot] = append(aggregatedAttsByTarget[targetRoot], aggAtts...)
-				attsByRoot[root] = make([]*zondpb.Attestation, 0)
-			}
-			for _, atts := range aggregatedAttsByTarget {
-				bs.CollectedAttestationsBuffer <- atts
-			}
-		case att := <-bs.ReceivedAttestationsBuffer:
-			attDataRoot, err := att.Data.HashTreeRoot()
-			if err != nil {
-				log.WithError(err).Error("Could not hash tree root attestation data")
-				continue
-			}
-			attsByRoot[attDataRoot] = append(attsByRoot[attDataRoot], att)
-		case <-ctx.Done():
-			return
-		case <-bs.Ctx.Done():
-			return
-		}
-	}
 }
 
 // AttestationPool retrieves pending attestations.

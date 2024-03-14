@@ -1197,7 +1197,6 @@ type voteStats struct {
 	startEpoch          primitives.Epoch
 	totalAttestedCount  uint64
 	totalRequestedCount uint64
-	totalDistance       primitives.Slot
 	totalCorrectSource  uint64
 	totalCorrectTarget  uint64
 	totalCorrectHead    uint64

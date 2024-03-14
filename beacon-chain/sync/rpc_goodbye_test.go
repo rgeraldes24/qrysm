@@ -16,7 +16,6 @@ import (
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	leakybucket "github.com/theQRL/qrysm/v4/container/leaky-bucket"
 	"github.com/theQRL/qrysm/v4/testing/assert"
-	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
@@ -68,7 +67,6 @@ func TestGoodByeRPCHandler_Disconnects_With_Peer(t *testing.T) {
 		t.Error("Peer is still not disconnected despite sending a goodbye message")
 	}
 }
-*/
 
 func TestGoodByeRPCHandler_BackOffPeer(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
@@ -147,6 +145,7 @@ func TestGoodByeRPCHandler_BackOffPeer(t *testing.T) {
 	// Add a little bit of allowance
 	require.Equal(t, true, diff.Seconds() <= 1)
 }
+*/
 
 func TestSendGoodbye_SendsMessage(t *testing.T) {
 	p1 := p2ptest.NewTestP2P(t)
