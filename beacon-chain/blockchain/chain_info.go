@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
-	f "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice"
+	"github.com/theQRL/qrysm/v4/beacon-chain/forkchoice"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -335,7 +335,7 @@ func (s *Service) HeadValidatorIndexToPublicKey(_ context.Context, index primiti
 }
 
 // ForkChoicer returns the forkchoice interface.
-func (s *Service) ForkChoicer() f.ForkChoicer {
+func (s *Service) ForkChoicer() forkchoice.ForkChoicer {
 	return s.cfg.ForkChoiceStore
 }
 

@@ -113,19 +113,7 @@ func (s *Store) getSafetyThreshold() uint64 {
 }
 
 // computeForkVersion implements compute_fork_version from the spec.
-func (s *Store) computeForkVersion(epoch types.Epoch) []byte {
-	if epoch >= s.Config.DenebForkEpoch {
-		return s.Config.DenebForkVersion
-	}
-	if epoch >= s.Config.CapellaForkEpoch {
-		return s.Config.CapellaForkVersion
-	}
-	if epoch >= s.Config.BellatrixForkEpoch {
-		return s.Config.BellatrixForkVersion
-	}
-	if epoch >= s.Config.AltairForkEpoch {
-		return s.Config.AltairForkVersion
-	}
+func (s *Store) computeForkVersion(types.Epoch) []byte {
 	return s.Config.GenesisForkVersion
 }
 

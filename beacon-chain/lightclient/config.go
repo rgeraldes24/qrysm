@@ -12,14 +12,6 @@ import (
 
 // ConfigJSON is the JSON representation of the light client config.
 type ConfigJSON struct {
-	DenebForkEpoch               string `json:"deneb_fork_epoch"`
-	DenebForkVersion             string `json:"deneb_fork_version"               hex:"true"`
-	CapellaForkEpoch             string `json:"capella_fork_epoch"`
-	CapellaForkVersion           string `json:"capella_fork_version"             hex:"true"`
-	BellatrixForkEpoch           string `json:"bellatrix_fork_epoch"`
-	BellatrixForkVersion         string `json:"bellatrix_fork_version"           hex:"true"`
-	AltairForkEpoch              string `json:"altair_fork_epoch"`
-	AltairForkVersion            string `json:"altair_fork_version"              hex:"true"`
 	GenesisForkVersion           string `json:"genesis_fork_version"             hex:"true"`
 	MinSyncCommitteeParticipants string `json:"min_sync_committee_participants"`
 	GenesisSlot                  string `json:"genesis_slot"`
@@ -32,14 +24,6 @@ type ConfigJSON struct {
 // Config is the light client configuration. It consists of the subset of the beacon chain configuration relevant to the
 // light client. Unlike the beacon chain configuration it is serializable to JSON, hence it's a separate object.
 type Config struct {
-	DenebForkEpoch               types.Epoch
-	DenebForkVersion             []byte
-	CapellaForkEpoch             types.Epoch
-	CapellaForkVersion           []byte
-	BellatrixForkEpoch           types.Epoch
-	BellatrixForkVersion         []byte
-	AltairForkEpoch              types.Epoch
-	AltairForkVersion            []byte
 	GenesisForkVersion           []byte
 	MinSyncCommitteeParticipants uint64
 	GenesisSlot                  types.Slot
@@ -64,14 +48,6 @@ func NewConfig(chainConfig *params.BeaconChainConfig) *Config {
 
 func (c *Config) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&ConfigJSON{
-		DenebForkEpoch:               strconv.FormatUint(uint64(c.DenebForkEpoch), 10),
-		DenebForkVersion:             hexutil.Encode(c.DenebForkVersion),
-		CapellaForkEpoch:             strconv.FormatUint(uint64(c.CapellaForkEpoch), 10),
-		CapellaForkVersion:           hexutil.Encode(c.CapellaForkVersion),
-		BellatrixForkEpoch:           strconv.FormatUint(uint64(c.BellatrixForkEpoch), 10),
-		BellatrixForkVersion:         hexutil.Encode(c.BellatrixForkVersion),
-		AltairForkEpoch:              strconv.FormatUint(uint64(c.AltairForkEpoch), 10),
-		AltairForkVersion:            hexutil.Encode(c.AltairForkVersion),
 		GenesisForkVersion:           hexutil.Encode(c.GenesisForkVersion),
 		MinSyncCommitteeParticipants: strconv.FormatUint(c.MinSyncCommitteeParticipants, 10),
 		GenesisSlot:                  strconv.FormatUint(uint64(c.GenesisSlot), 10),
@@ -88,39 +64,8 @@ func (c *Config) UnmarshalJSON(input []byte) error {
 		return err
 	}
 	var config Config
+	var err error
 
-	denebForkEpoch, err := strconv.ParseUint(configJSON.DenebForkEpoch, 10, 64)
-	if err != nil {
-		return err
-	}
-	config.DenebForkEpoch = types.Epoch(denebForkEpoch)
-	if config.DenebForkVersion, err = hexutil.Decode(configJSON.DenebForkVersion); err != nil {
-		return err
-	}
-	capellaForkEpoch, err := strconv.ParseUint(configJSON.CapellaForkEpoch, 10, 64)
-	if err != nil {
-		return err
-	}
-	config.CapellaForkEpoch = types.Epoch(capellaForkEpoch)
-	if config.CapellaForkVersion, err = hexutil.Decode(configJSON.CapellaForkVersion); err != nil {
-		return err
-	}
-	bellatrixForkEpoch, err := strconv.ParseUint(configJSON.BellatrixForkEpoch, 10, 64)
-	if err != nil {
-		return err
-	}
-	config.BellatrixForkEpoch = types.Epoch(bellatrixForkEpoch)
-	if config.BellatrixForkVersion, err = hexutil.Decode(configJSON.BellatrixForkVersion); err != nil {
-		return err
-	}
-	altairForkEpoch, err := strconv.ParseUint(configJSON.AltairForkEpoch, 10, 64)
-	if err != nil {
-		return err
-	}
-	config.AltairForkEpoch = types.Epoch(altairForkEpoch)
-	if config.AltairForkVersion, err = hexutil.Decode(configJSON.AltairForkVersion); err != nil {
-		return err
-	}
 	if config.GenesisForkVersion, err = hexutil.Decode(configJSON.GenesisForkVersion); err != nil {
 		return err
 	}

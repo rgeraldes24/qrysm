@@ -42,7 +42,6 @@ var initialSyncBlockCacheSize = uint64(2 * params.BeaconConfig().SlotsPerEpoch)
 // sendLightClientFinalityUpdate sends a light client finality update notification of  to the state feed.
 func (s *Service) sendLightClientFinalityUpdate(ctx context.Context, signed interfaces.ReadOnlySignedBeaconBlock,
 	postState state.BeaconState) (int, error) {
-
 	// Get attested state
 	attestedRoot := signed.Block().ParentRoot()
 	attestedState, err := s.cfg.StateGen.StateByRoot(ctx, attestedRoot)
@@ -89,7 +88,6 @@ func (s *Service) sendLightClientFinalityUpdate(ctx context.Context, signed inte
 // sendLightClientOptimisticUpdate sends a light client optimistic update notification of  to the state feed.
 func (s *Service) sendLightClientOptimisticUpdate(ctx context.Context, signed interfaces.ReadOnlySignedBeaconBlock,
 	postState state.BeaconState) (int, error) {
-
 	// Get attested state
 	attestedRoot := signed.Block().ParentRoot()
 	attestedState, err := s.cfg.StateGen.StateByRoot(ctx, attestedRoot)
