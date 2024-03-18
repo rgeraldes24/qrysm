@@ -1,5 +1,13 @@
 package shared
 
+import (
+	"strconv"
+
+	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
+	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
+	zond "github.com/theQRL/qrysm/v4/proto/qrysm/v1alpha1"
+)
+
 type SignedBeaconBlockCapella struct {
 	Message   *BeaconBlockCapella `json:"message" validate:"required"`
 	Signature string              `json:"signature" validate:"required"`
@@ -99,6 +107,37 @@ type BeaconBlockHeader struct {
 	ParentRoot    string `json:"parent_root" validate:"required"`
 	StateRoot     string `json:"state_root" validate:"required"`
 	BodyRoot      string `json:"body_root" validate:"required"`
+}
+
+func (h *BeaconBlockHeader) ToConsensus() (*zond.BeaconBlockHeader, error) {
+	s, err := strconv.ParseUint(h.Slot, 10, 64)
+	if err != nil {
+		return nil, NewDecodeError(err, "Slot")
+	}
+	pi, err := strconv.ParseUint(h.ProposerIndex, 10, 64)
+	if err != nil {
+		return nil, NewDecodeError(err, "ProposerIndex")
+	}
+	pr, err := DecodeHexWithLength(h.ParentRoot, fieldparams.RootLength)
+	if err != nil {
+		return nil, NewDecodeError(err, "ParentRoot")
+	}
+	sr, err := DecodeHexWithLength(h.StateRoot, fieldparams.RootLength)
+	if err != nil {
+		return nil, NewDecodeError(err, "StateRoot")
+	}
+	br, err := DecodeHexWithLength(h.BodyRoot, fieldparams.RootLength)
+	if err != nil {
+		return nil, NewDecodeError(err, "BodyRoot")
+	}
+
+	return &zond.BeaconBlockHeader{
+		Slot:          primitives.Slot(s),
+		ProposerIndex: primitives.ValidatorIndex(pi),
+		ParentRoot:    pr,
+		StateRoot:     sr,
+		BodyRoot:      br,
+	}, nil
 }
 
 type IndexedAttestation struct {

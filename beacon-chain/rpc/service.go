@@ -43,6 +43,7 @@ import (
 	rpcBuilder "github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/builder"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/debug"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/events"
+	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/lightclient"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/node"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/rewards"
 	"github.com/theQRL/qrysm/v4/beacon-chain/rpc/zond/validator"
@@ -441,6 +442,16 @@ func (s *Service) Start() {
 	s.cfg.Router.HandleFunc("/zond/v1/beacon/states/{state_id}/validators", beaconChainServerV1.GetValidators).Methods(http.MethodGet)
 	s.cfg.Router.HandleFunc("/zond/v1/beacon/states/{state_id}/validators/{validator_id}", beaconChainServerV1.GetValidator).Methods(http.MethodGet)
 	s.cfg.Router.HandleFunc("/zond/v1/beacon/states/{state_id}/validator_balances", beaconChainServerV1.GetValidatorBalances).Methods(http.MethodGet)
+
+	lightClientServer := &lightclient.Server{
+		Blocker:     blocker,
+		Stater:      stater,
+		HeadFetcher: s.cfg.HeadFetcher,
+	}
+	s.cfg.Router.HandleFunc("/zond/v1/beacon/light_client/bootstrap/{block_root}", lightClientServer.GetLightClientBootstrap).Methods(http.MethodGet)
+	s.cfg.Router.HandleFunc("/zond/v1/beacon/light_client/updates", lightClientServer.GetLightClientUpdatesByRange).Methods(http.MethodGet)
+	s.cfg.Router.HandleFunc("/zond/v1/beacon/light_client/finality_update", lightClientServer.GetLightClientFinalityUpdate).Methods(http.MethodGet)
+	s.cfg.Router.HandleFunc("/zond/v1/beacon/light_client/optimistic_update", lightClientServer.GetLightClientOptimisticUpdate).Methods(http.MethodGet)
 
 	zondpbv1alpha1.RegisterNodeServer(s.grpcServer, nodeServer)
 	zondpbservice.RegisterBeaconNodeServer(s.grpcServer, nodeServerZond)

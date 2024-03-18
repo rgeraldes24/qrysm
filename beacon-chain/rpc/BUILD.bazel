@@ -29,6 +29,7 @@ go_library(
         "//beacon-chain/rpc/zond/builder:go_default_library",
         "//beacon-chain/rpc/zond/debug:go_default_library",
         "//beacon-chain/rpc/zond/events:go_default_library",
+        "//beacon-chain/rpc/zond/lightclient:go_default_library",
         "//beacon-chain/rpc/zond/node:go_default_library",
         "//beacon-chain/rpc/zond/rewards:go_default_library",
         "//beacon-chain/rpc/zond/validator:go_default_library",

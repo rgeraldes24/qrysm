@@ -206,6 +206,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 
 	// Light client
 	MinSyncCommitteeParticipants: 1,
+	MaxRequestLightClientUpdates: 128,
 
 	// Bellatrix
 	EthBurnAddressHex:      "0x0000000000000000000000000000000000000000",

@@ -134,14 +134,23 @@ func V1Alpha1SignedHeaderToV1(v1alpha1Hdr *zondpbalpha.SignedBeaconBlockHeader) 
 		return &zondpbv1.SignedBeaconBlockHeader{}
 	}
 	return &zondpbv1.SignedBeaconBlockHeader{
-		Message: &zondpbv1.BeaconBlockHeader{
-			Slot:          v1alpha1Hdr.Header.Slot,
-			ProposerIndex: v1alpha1Hdr.Header.ProposerIndex,
-			ParentRoot:    v1alpha1Hdr.Header.ParentRoot,
-			StateRoot:     v1alpha1Hdr.Header.StateRoot,
-			BodyRoot:      v1alpha1Hdr.Header.BodyRoot,
-		},
+		Message:   V1Alpha1HeaderToV1(v1alpha1Hdr.Header),
 		Signature: v1alpha1Hdr.Signature,
+	}
+}
+
+// V1Alpha1HeaderToV1 converts a v1alpha1 beacon block header to v1.
+func V1Alpha1HeaderToV1(v1alpha1Hdr *zondpbalpha.BeaconBlockHeader) *zondpbv1.BeaconBlockHeader {
+	if v1alpha1Hdr == nil {
+		return &zondpbv1.BeaconBlockHeader{}
+	}
+
+	return &zondpbv1.BeaconBlockHeader{
+		Slot:          v1alpha1Hdr.Slot,
+		ProposerIndex: v1alpha1Hdr.ProposerIndex,
+		ParentRoot:    v1alpha1Hdr.ParentRoot,
+		StateRoot:     v1alpha1Hdr.StateRoot,
+		BodyRoot:      v1alpha1Hdr.BodyRoot,
 	}
 }
 
@@ -159,6 +168,20 @@ func V1SignedHeaderToV1Alpha1(v1Header *zondpbv1.SignedBeaconBlockHeader) *zondp
 			BodyRoot:      v1Header.Message.BodyRoot,
 		},
 		Signature: v1Header.Signature,
+	}
+}
+
+// V1HeaderToV1Alpha1 converts a v1 beacon block header to v1alpha1.
+func V1HeaderToV1Alpha1(v1Header *zondpbv1.BeaconBlockHeader) *zondpbalpha.BeaconBlockHeader {
+	if v1Header == nil {
+		return &zondpbalpha.BeaconBlockHeader{}
+	}
+	return &zondpbalpha.BeaconBlockHeader{
+		Slot:          v1Header.Slot,
+		ProposerIndex: v1Header.ProposerIndex,
+		ParentRoot:    v1Header.ParentRoot,
+		StateRoot:     v1Header.StateRoot,
+		BodyRoot:      v1Header.BodyRoot,
 	}
 }
 
@@ -741,6 +764,27 @@ func V1Alpha1SignedDilithiumToExecChangeToV1(alphaChange *zondpbalpha.SignedDili
 			ToExecutionAddress:  bytesutil.SafeCopyBytes(alphaChange.Message.ToExecutionAddress),
 		},
 		Signature: bytesutil.SafeCopyBytes(alphaChange.Signature),
+	}
+	return result
+}
+
+// V1Alpha1SyncCommitteeToV1 converts a v1alpha1 SyncCommittee object to its v1 equivalent.
+func V1Alpha1SyncCommitteeToV1(alphaCommittee *zondpbalpha.SyncCommittee) *zondpbv1.SyncCommittee {
+	if alphaCommittee == nil {
+		return nil
+	}
+	result := &zondpbv1.SyncCommittee{
+		Pubkeys: bytesutil.SafeCopy2dBytes(alphaCommittee.Pubkeys),
+	}
+	return result
+}
+
+func V1SyncCommitteeToV1Alpha1(committee *zondpbv1.SyncCommittee) *zondpbalpha.SyncCommittee {
+	if committee == nil {
+		return nil
+	}
+	result := &zondpbalpha.SyncCommittee{
+		Pubkeys: bytesutil.SafeCopy2dBytes(committee.Pubkeys),
 	}
 	return result
 }

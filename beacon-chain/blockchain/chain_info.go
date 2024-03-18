@@ -7,6 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/v4/beacon-chain/core/helpers"
+	f "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice"
 	doublylinkedtree "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/doubly-linked-tree"
 	forkchoicetypes "github.com/theQRL/qrysm/v4/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/state"
@@ -331,6 +332,11 @@ func (s *Service) HeadValidatorIndexToPublicKey(_ context.Context, index primiti
 		return [field_params.DilithiumPubkeyLength]byte{}, err
 	}
 	return v.PublicKey(), nil
+}
+
+// ForkChoicer returns the forkchoice interface.
+func (s *Service) ForkChoicer() f.ForkChoicer {
+	return s.cfg.ForkChoiceStore
 }
 
 // IsOptimistic returns true if the current head is optimistic.

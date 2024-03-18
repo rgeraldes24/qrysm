@@ -127,6 +127,10 @@ var (
 		Name:  "enable-eip-4881",
 		Usage: "Enables the deposit tree specified in EIP4881",
 	}
+	EnableLightClient = &cli.BoolFlag{
+		Name:  "enable-lightclient",
+		Usage: "Enables the light client support in the beacon node",
+	}
 	disableResourceManager = &cli.BoolFlag{
 		Name:  "disable-resource-manager",
 		Usage: "Disables running the libp2p resource manager",
@@ -190,6 +194,7 @@ var BeaconChainFlags = append(deprecatedBeaconFlags, append(deprecatedFlags, []c
 	enableEIP4881,
 	disableResourceManager,
 	DisableRegistrationCache,
+	EnableLightClient,
 	disableAggregateParallel,
 }...)...)
 

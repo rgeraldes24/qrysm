@@ -141,6 +141,10 @@ type SyncCommitteeMessage struct {
 	Signature       string `json:"signature"`
 }
 
+type SyncCommittee struct {
+	Pubkeys []string `json:"pubkeys"`
+}
+
 func (s *SignedValidatorRegistration) ToConsensus() (*zond.SignedValidatorRegistrationV1, error) {
 	msg, err := s.Message.ToConsensus()
 	if err != nil {
@@ -541,6 +545,31 @@ func (m *SyncCommitteeMessage) ToConsensus() (*zond.SyncCommitteeMessage, error)
 		BlockRoot:      root,
 		ValidatorIndex: primitives.ValidatorIndex(valIndex),
 		Signature:      sig,
+	}, nil
+}
+
+func SyncCommitteeFromConsensus(sc *zond.SyncCommittee) *SyncCommittee {
+	var sPubKeys []string
+	for _, p := range sc.Pubkeys {
+		sPubKeys = append(sPubKeys, hexutil.Encode(p))
+	}
+
+	return &SyncCommittee{
+		Pubkeys: sPubKeys,
+	}
+}
+
+func (sc *SyncCommittee) ToConsensus() (*zond.SyncCommittee, error) {
+	var pubKeys [][]byte
+	for _, p := range sc.Pubkeys {
+		pubKey, err := hexutil.Decode(p)
+		if err != nil {
+			return nil, NewDecodeError(err, "Pubkeys")
+		}
+		pubKeys = append(pubKeys, pubKey)
+	}
+	return &zond.SyncCommittee{
+		Pubkeys: pubKeys,
 	}, nil
 }
 
