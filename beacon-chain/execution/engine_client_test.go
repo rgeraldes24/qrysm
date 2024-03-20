@@ -34,7 +34,6 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/assert"
 	"github.com/theQRL/qrysm/v4/testing/require"
 	"github.com/theQRL/qrysm/v4/testing/util"
-	"google.golang.org/protobuf/proto"
 )
 
 var (
@@ -100,12 +99,6 @@ func TestClient_IPC(t *testing.T) {
 		latestValidHash, err := srv.NewPayload(ctx, wrappedPayload, []common.Hash{}, &common.Hash{})
 		require.NoError(t, err)
 		require.DeepEqual(t, bytesutil.ToBytes32(want.LatestValidHash), bytesutil.ToBytes32(latestValidHash))
-	})
-	t.Run(ExchangeTransitionConfigurationMethod, func(t *testing.T) {
-		want, ok := fix["TransitionConfiguration"].(*pb.TransitionConfiguration)
-		require.Equal(t, true, ok)
-		err := srv.ExchangeTransitionConfiguration(ctx, want)
-		require.NoError(t, err)
 	})
 	t.Run(ExecutionBlockByNumberMethod, func(t *testing.T) {
 		want, ok := fix["ExecutionBlock"].(*pb.ExecutionBlock)
@@ -377,44 +370,6 @@ func TestClient_HTTP(t *testing.T) {
 		resp, err := service.LatestExecutionBlock(ctx)
 		require.NoError(t, err)
 		require.DeepEqual(t, want, resp)
-	})
-	t.Run(ExchangeTransitionConfigurationMethod, func(t *testing.T) {
-		want, ok := fix["TransitionConfiguration"].(*pb.TransitionConfiguration)
-		require.Equal(t, true, ok)
-		encodedReq, err := json.Marshal(want)
-		require.NoError(t, err)
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			defer func() {
-				require.NoError(t, r.Body.Close())
-			}()
-			enc, err := io.ReadAll(r.Body)
-			require.NoError(t, err)
-			jsonRequestString := string(enc)
-			// We expect the JSON string RPC request contains the right arguments.
-			require.Equal(t, true, strings.Contains(
-				jsonRequestString, string(encodedReq),
-			))
-			resp := map[string]interface{}{
-				"jsonrpc": "2.0",
-				"id":      1,
-				"result":  want,
-			}
-			err = json.NewEncoder(w).Encode(resp)
-			require.NoError(t, err)
-		}))
-		defer srv.Close()
-
-		rpcClient, err := rpc.DialHTTP(srv.URL)
-		require.NoError(t, err)
-		defer rpcClient.Close()
-
-		client := &Service{}
-		client.rpcClient = rpcClient
-
-		// We call the RPC method via HTTP and expect a proper result.
-		err = client.ExchangeTransitionConfiguration(ctx, want)
-		require.NoError(t, err)
 	})
 	t.Run(ExecutionBlockByHashMethod, func(t *testing.T) {
 		arg := common.BytesToHash([]byte("foo"))
@@ -698,78 +653,6 @@ func Test_tDStringToUint256(t *testing.T) {
 	require.ErrorContains(t, "hex number > 256 bits", err)
 }
 
-func TestExchangeTransitionConfiguration(t *testing.T) {
-	fix := fixtures()
-	ctx := context.Background()
-	t.Run("wrong terminal block hash", func(t *testing.T) {
-		request, ok := fix["TransitionConfiguration"].(*pb.TransitionConfiguration)
-		require.Equal(t, true, ok)
-		resp, ok := proto.Clone(request).(*pb.TransitionConfiguration)
-		require.Equal(t, true, ok)
-
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			defer func() {
-				require.NoError(t, r.Body.Close())
-			}()
-
-			// Change the terminal block hash.
-			h := common.BytesToHash([]byte("foo"))
-			resp.TerminalBlockHash = h[:]
-			respJSON := map[string]interface{}{
-				"jsonrpc": "2.0",
-				"id":      1,
-				"result":  resp,
-			}
-			require.NoError(t, json.NewEncoder(w).Encode(respJSON))
-		}))
-		defer srv.Close()
-
-		rpcClient, err := rpc.DialHTTP(srv.URL)
-		require.NoError(t, err)
-		defer rpcClient.Close()
-
-		service := &Service{}
-		service.rpcClient = rpcClient
-
-		err = service.ExchangeTransitionConfiguration(ctx, request)
-		require.Equal(t, true, errors.Is(err, ErrConfigMismatch))
-	})
-	t.Run("wrong terminal total difficulty", func(t *testing.T) {
-		request, ok := fix["TransitionConfiguration"].(*pb.TransitionConfiguration)
-		require.Equal(t, true, ok)
-		resp, ok := proto.Clone(request).(*pb.TransitionConfiguration)
-		require.Equal(t, true, ok)
-
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			defer func() {
-				require.NoError(t, r.Body.Close())
-			}()
-
-			// Change the terminal block hash.
-			resp.TerminalTotalDifficulty = "0x1"
-			respJSON := map[string]interface{}{
-				"jsonrpc": "2.0",
-				"id":      1,
-				"result":  resp,
-			}
-			require.NoError(t, json.NewEncoder(w).Encode(respJSON))
-		}))
-		defer srv.Close()
-
-		rpcClient, err := rpc.DialHTTP(srv.URL)
-		require.NoError(t, err)
-		defer rpcClient.Close()
-
-		service := &Service{}
-		service.rpcClient = rpcClient
-
-		err = service.ExchangeTransitionConfiguration(ctx, request)
-		require.Equal(t, true, errors.Is(err, ErrConfigMismatch))
-	})
-}
-
 type customError struct {
 	code    int
 	timeout bool
@@ -994,13 +877,6 @@ func fixtures() map[string]interface{} {
 		},
 		PayloadId: &id,
 	}
-	ttd, _ := uint256.FromBig(big.NewInt(0))
-	tbh := [32]byte{}
-	transitionCfg := &pb.TransitionConfiguration{
-		TerminalBlockHash:       tbh[:],
-		TerminalTotalDifficulty: ttd.Hex(),
-		TerminalBlockNumber:     big.NewInt(0).Bytes(),
-	}
 	validStatus := &pb.PayloadStatus{
 		Status:          pb.PayloadStatus_VALID,
 		LatestValidHash: foo[:],
@@ -1040,7 +916,6 @@ func fixtures() map[string]interface{} {
 		"ForkchoiceUpdatedSyncingResponse":  forkChoiceSyncingResp,
 		"ForkchoiceUpdatedAcceptedResponse": forkChoiceAcceptedResp,
 		"ForkchoiceUpdatedInvalidResponse":  forkChoiceInvalidResp,
-		"TransitionConfiguration":           transitionCfg,
 	}
 }
 
@@ -1208,17 +1083,6 @@ func (*testEngineService) GetPayloadV2(
 ) *pb.ExecutionPayloadCapellaWithValue {
 	fix := fixtures()
 	item, ok := fix["ExecutionPayloadCapellaWithValue"].(*pb.ExecutionPayloadCapellaWithValue)
-	if !ok {
-		panic("not found")
-	}
-	return item
-}
-
-func (*testEngineService) ExchangeTransitionConfigurationV1(
-	_ context.Context, _ *pb.TransitionConfiguration,
-) *pb.TransitionConfiguration {
-	fix := fixtures()
-	item, ok := fix["TransitionConfiguration"].(*pb.TransitionConfiguration)
 	if !ok {
 		panic("not found")
 	}
