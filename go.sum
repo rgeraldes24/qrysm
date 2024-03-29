@@ -572,8 +572,6 @@ github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxv
 github.com/konsorten/go-windows-terminal-sequences v1.0.3/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/koron/go-ssdp v0.0.4 h1:1IDwrghSKYM7yLf7XCzbByg2sJ/JcNOZRXS2jczTwz0=
 github.com/koron/go-ssdp v0.0.4/go.mod h1:oDXq+E5IL5q0U8uSBcoAXzTzInwy5lEgC91HoKtbmZk=
-github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d h1:7CfsXfFpCG1wrUpuyOzG8+vpL1ZqH2goz23wZ9pboGE=
-github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d/go.mod h1:3NeYeWwAOTnDChps1fD7YGD/uWzp+tqmShgjhhMIHDM=
 github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFBFZlji/RkVcI2GknAs/DXo4wKdlNEc=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pretty v0.2.0/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfnI=
@@ -904,14 +902,10 @@ github.com/raulk/go-watchdog v1.3.0 h1:oUmdlHxdkXRJlwfG0O9omj8ukerm8MEQavSiDTEtB
 github.com/raulk/go-watchdog v1.3.0/go.mod h1:fIvOnLbF0b0ZwkB9YU4mOW9Did//4vPZtDqv66NfsMU=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
-github.com/rgeraldes24/FuzzyVM v0.0.0-20240329103432-674a7cc3237c h1:PHfWjSjhDUEtY+jbm1jBbPNF7PfFwf56o3AMIVeeWRg=
-github.com/rgeraldes24/FuzzyVM v0.0.0-20240329103432-674a7cc3237c/go.mod h1:GFn6Sq30AGQlop3xZPD8pCoInpOMY0dJadclV2xPwOg=
 github.com/rgeraldes24/FuzzyVM v0.0.0-20240329104152-c935d14fc37f h1:Nk22o+V/3g9idUY/W+z93BARsrROZrhhKRkuC8F/Wi0=
 github.com/rgeraldes24/FuzzyVM v0.0.0-20240329104152-c935d14fc37f/go.mod h1:GOIbe38xge8riMc2h37nMTtwvFlXCMY7/nXRsdy3Tv0=
 github.com/rgeraldes24/go-zond v0.0.0-20240329100529-616c74c8ae60 h1:NUXo/w/kVD0LMKTJT9EW+Zfmf5E/Poc1c1NVqQs8GnQ=
 github.com/rgeraldes24/go-zond v0.0.0-20240329100529-616c74c8ae60/go.mod h1:Sg4N09L6oSx0nLf6gWJ56cFXj/MAhZduicnVMQjYVVM=
-github.com/rgeraldes24/goevmlab v0.0.0-20240329103124-d69381381b95 h1:OTQ/2qMNaD6VcdEzwT/BU0wGi6GDaQHcR1+Ixx+LZ9M=
-github.com/rgeraldes24/goevmlab v0.0.0-20240329103124-d69381381b95/go.mod h1:Xr1IpR09F6wx1qIrAFE6eQjE75PkEdxCxeTWSkZJtoc=
 github.com/rgeraldes24/goevmlab v0.0.0-20240329104006-e8a53465b1fb h1:AMKpOyP4c8zR7+FPxr8CWBvq+hk/MCbPo7YCherr12o=
 github.com/rgeraldes24/goevmlab v0.0.0-20240329104006-e8a53465b1fb/go.mod h1:Xr1IpR09F6wx1qIrAFE6eQjE75PkEdxCxeTWSkZJtoc=
 github.com/rgeraldes24/grpc-gateway/v2 v2.0.0-20240312105758-7a0b890ded11 h1:hYWoTF0G//Jd1BG75WdO93mdzvch2L8r6FYe7ZPq5Eg=
