@@ -97,7 +97,7 @@ require (
 
 require (
 	github.com/libp2p/go-libp2p-mplex v0.9.0
-	github.com/rgeraldes24/FuzzyVM v0.0.0-20240329103432-674a7cc3237c
+	github.com/rgeraldes24/FuzzyVM v0.0.0-20240329104152-c935d14fc37f
 	github.com/rgeraldes24/tx-fuzz v0.0.0-20240312135745-3e62fcca6c4e
 )
 
@@ -158,6 +158,7 @@ require (
 	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/koron/go-ssdp v0.0.4 // indirect
+	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
 	github.com/libp2p/go-cidranger v1.1.0 // indirect
@@ -208,7 +209,7 @@ require (
 	github.com/quic-go/quic-go v0.39.3 // indirect
 	github.com/quic-go/webtransport-go v0.6.0 // indirect
 	github.com/raulk/go-watchdog v1.3.0 // indirect
-	github.com/rgeraldes24/goevmlab v0.0.0-20240329103124-d69381381b95 // indirect
+	github.com/rgeraldes24/goevmlab v0.0.0-20240329104006-e8a53465b1fb // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
