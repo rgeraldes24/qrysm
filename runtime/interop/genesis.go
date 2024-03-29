@@ -18,7 +18,6 @@ import (
 const defaultTestAccountAddress = "0x205547bA6232eEc096770f7161d57dEA54FD13D0"
 const defaultTestChainId int64 = 1337
 const defaultCoinbase = "0x0000000000000000000000000000000000000000"
-const defaultDifficulty = "0"
 const defaultMixhash = "0x0000000000000000000000000000000000000000000000000000000000000000"
 const defaultParenthash = "0x0000000000000000000000000000000000000000000000000000000000000000"
 const defaultTestAccountBalance = "100000000000000000000000000000"
@@ -82,39 +81,20 @@ func GzondShanghaiTime(genesisTime uint64) *uint64 {
 func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *core.Genesis {
 	shanghaiTime := GzondShanghaiTime(genesisTime)
 	cc := &params.ChainConfig{
-		ChainID:                       big.NewInt(defaultTestChainId),
-		HomesteadBlock:                bigz,
-		DAOForkBlock:                  bigz,
-		EIP150Block:                   bigz,
-		EIP155Block:                   bigz,
-		EIP158Block:                   bigz,
-		ByzantiumBlock:                bigz,
-		ConstantinopleBlock:           bigz,
-		PetersburgBlock:               bigz,
-		IstanbulBlock:                 bigz,
-		MuirGlacierBlock:              bigz,
-		BerlinBlock:                   bigz,
-		LondonBlock:                   bigz,
-		ArrowGlacierBlock:             bigz,
-		GrayGlacierBlock:              bigz,
-		MergeNetsplitBlock:            bigz,
-		TerminalTotalDifficulty:       bigz,
-		TerminalTotalDifficultyPassed: true,
-		ShanghaiTime:                  shanghaiTime,
+		ChainID:      big.NewInt(defaultTestChainId),
+		ShanghaiTime: shanghaiTime,
 	}
 	da := defaultDepositContractAllocation(cfg.DepositContractAddress)
 	ma := minerAllocation()
 	return &core.Genesis{
 		Config:    cc,
-		Nonce:     0,
 		Timestamp: genesisTime,
 		// NOTE(rgeraldes24): required by the genesis generation on the beacon node side
 		// during the e2e tests
-		ExtraData:  make([]byte, 32),
-		GasLimit:   math.MaxUint64 >> 1, // shift 1 back from the max, just in case
-		Difficulty: common.HexToHash(defaultDifficulty).Big(),
-		Mixhash:    common.HexToHash(defaultMixhash),
-		Coinbase:   common.HexToAddress(defaultCoinbase),
+		ExtraData: make([]byte, 32),
+		GasLimit:  math.MaxUint64 >> 1, // shift 1 back from the max, just in case
+		Mixhash:   common.HexToHash(defaultMixhash),
+		Coinbase:  common.HexToAddress(defaultCoinbase),
 		Alloc: core.GenesisAlloc{
 			da.Address: da.Account,
 			ma.Address: ma.Account,

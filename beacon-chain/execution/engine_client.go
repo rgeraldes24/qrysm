@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/holiman/uint256"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
@@ -668,18 +667,6 @@ type httpTimeoutError interface {
 func isTimeout(e error) bool {
 	t, ok := e.(httpTimeoutError)
 	return ok && t.Timeout()
-}
-
-func tDStringToUint256(td string) (*uint256.Int, error) {
-	b, err := hexutil.DecodeBig(td)
-	if err != nil {
-		return nil, err
-	}
-	i, overflows := uint256.FromBig(b)
-	if overflows {
-		return nil, errors.New("total difficulty overflowed")
-	}
-	return i, nil
 }
 
 func toBlockNumArg(number *big.Int) string {

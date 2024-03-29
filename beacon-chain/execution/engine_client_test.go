@@ -11,7 +11,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/holiman/uint256"
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	zond "github.com/theQRL/go-zond"
@@ -454,7 +453,6 @@ func TestReconstructFullBlock(t *testing.T) {
 		encodedNum := hexutil.EncodeBig(num)
 		jsonPayload["hash"] = hexutil.Encode(payload.BlockHash)
 		jsonPayload["parentHash"] = common.BytesToHash([]byte("parent"))
-		jsonPayload["sha3Uncles"] = common.BytesToHash([]byte("uncles"))
 		jsonPayload["miner"] = common.BytesToAddress([]byte("miner"))
 		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
 		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
@@ -465,8 +463,6 @@ func TestReconstructFullBlock(t *testing.T) {
 		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
 		jsonPayload["number"] = encodedNum
 		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
-		jsonPayload["totalDifficulty"] = "0x123456"
-		jsonPayload["difficulty"] = encodedNum
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
 		jsonPayload["withdrawals"] = []*zondtypes.Withdrawal{}
@@ -552,7 +548,6 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		encodedNum := hexutil.EncodeBig(num)
 		jsonPayload["hash"] = hexutil.Encode(payload.BlockHash)
 		jsonPayload["parentHash"] = common.BytesToHash([]byte("parent"))
-		jsonPayload["sha3Uncles"] = common.BytesToHash([]byte("uncles"))
 		jsonPayload["miner"] = common.BytesToAddress([]byte("miner"))
 		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
 		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
@@ -563,8 +558,6 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
 		jsonPayload["number"] = encodedNum
 		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
-		jsonPayload["totalDifficulty"] = "0x123456"
-		jsonPayload["difficulty"] = encodedNum
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
 		jsonPayload["withdrawals"] = []*zondtypes.Withdrawal{}
@@ -631,26 +624,6 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		require.NoError(t, err)
 		require.DeepEqual(t, payload, got.Proto())
 	})
-}
-
-func Test_tDStringToUint256(t *testing.T) {
-	i, err := tDStringToUint256("0x0")
-	require.NoError(t, err)
-	require.DeepEqual(t, uint256.NewInt(0), i)
-
-	i, err = tDStringToUint256("0x10000")
-	require.NoError(t, err)
-	require.DeepEqual(t, uint256.NewInt(65536), i)
-
-	_, err = tDStringToUint256("100")
-	require.ErrorContains(t, "hex string without 0x prefix", err)
-
-	_, err = tDStringToUint256("0xzzzzzz")
-	require.ErrorContains(t, "invalid hex string", err)
-
-	_, err = tDStringToUint256("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" +
-		"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
-	require.ErrorContains(t, "hex number > 256 bits", err)
 }
 
 type customError struct {
@@ -818,7 +791,6 @@ func fixtures() map[string]interface{} {
 		BlockValue: "0x11fffffffff",
 	}
 	parent := bytesutil.PadTo([]byte("parentHash"), fieldparams.RootLength)
-	sha3Uncles := bytesutil.PadTo([]byte("sha3Uncles"), fieldparams.RootLength)
 	miner := bytesutil.PadTo([]byte("miner"), fieldparams.FeeRecipientLength)
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	transactionsRoot := bytesutil.PadTo([]byte("transactionsRoot"), fieldparams.RootLength)
@@ -828,20 +800,17 @@ func fixtures() map[string]interface{} {
 		Version: version.Capella,
 		Header: zondtypes.Header{
 			ParentHash:  common.BytesToHash(parent),
-			UncleHash:   common.BytesToHash(sha3Uncles),
 			Coinbase:    common.BytesToAddress(miner),
 			Root:        common.BytesToHash(stateRoot),
 			TxHash:      common.BytesToHash(transactionsRoot),
 			ReceiptHash: common.BytesToHash(receiptsRoot),
 			Bloom:       zondtypes.BytesToBloom(logsBloom),
-			Difficulty:  big.NewInt(1),
 			Number:      big.NewInt(2),
 			GasLimit:    3,
 			GasUsed:     4,
 			Time:        5,
 			Extra:       []byte("extra"),
 			MixDigest:   common.BytesToHash([]byte("mix")),
-			Nonce:       zondtypes.EncodeNonce(6),
 			BaseFee:     big.NewInt(7),
 		},
 		Withdrawals: []*pb.Withdrawal{},

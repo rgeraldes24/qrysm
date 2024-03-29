@@ -106,13 +106,10 @@ func (m *engineMock) ExecutionBlockByHash(_ context.Context, hash common.Hash, _
 		return nil, nil
 	}
 
-	td := new(big.Int).SetBytes(bytesutil.ReverseByteOrder(b.TotalDifficulty))
-	tdHex := hexutil.EncodeBig(td)
 	return &pb.ExecutionBlock{
 		Header: zondtypes.Header{
 			ParentHash: common.BytesToHash(b.ParentHash),
 		},
-		TotalDifficulty: tdHex,
 		Hash:            common.BytesToHash(b.BlockHash),
 	}, nil
 }
