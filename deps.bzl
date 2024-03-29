@@ -5830,14 +5830,14 @@ def go_dependencies():
     go_repository(
         name = "com_github_rgeraldes24_fuzzyvm",
         importpath = "github.com/rgeraldes24/FuzzyVM",
-        sum = "h1:Nk22o+V/3g9idUY/W+z93BARsrROZrhhKRkuC8F/Wi0=",
-        version = "v0.0.0-20240329104152-c935d14fc37f",
+        sum = "h1:MDINcoLroy/h+31Fh4ZFnT2cVCmNvEGODXQa5+QVEBk=",
+        version = "v0.0.0-20240329154436-5ad32f67513e",
     )
     go_repository(
         name = "com_github_rgeraldes24_goevmlab",
         importpath = "github.com/rgeraldes24/goevmlab",
-        sum = "h1:AMKpOyP4c8zR7+FPxr8CWBvq+hk/MCbPo7YCherr12o=",
-        version = "v0.0.0-20240329104006-e8a53465b1fb",
+        sum = "h1:kNx/tCkBNim6H6icD85du5yy1d2k6x3MlIE2zivQlvk=",
+        version = "v0.0.0-20240329154018-4b7621d993d1",
     )
 
     go_repository(

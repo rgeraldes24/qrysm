@@ -902,12 +902,12 @@ github.com/raulk/go-watchdog v1.3.0 h1:oUmdlHxdkXRJlwfG0O9omj8ukerm8MEQavSiDTEtB
 github.com/raulk/go-watchdog v1.3.0/go.mod h1:fIvOnLbF0b0ZwkB9YU4mOW9Did//4vPZtDqv66NfsMU=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
-github.com/rgeraldes24/FuzzyVM v0.0.0-20240329104152-c935d14fc37f h1:Nk22o+V/3g9idUY/W+z93BARsrROZrhhKRkuC8F/Wi0=
-github.com/rgeraldes24/FuzzyVM v0.0.0-20240329104152-c935d14fc37f/go.mod h1:GOIbe38xge8riMc2h37nMTtwvFlXCMY7/nXRsdy3Tv0=
+github.com/rgeraldes24/FuzzyVM v0.0.0-20240329154436-5ad32f67513e h1:MDINcoLroy/h+31Fh4ZFnT2cVCmNvEGODXQa5+QVEBk=
+github.com/rgeraldes24/FuzzyVM v0.0.0-20240329154436-5ad32f67513e/go.mod h1:qJFcBaFYVfaWwb0eIBV29Vh+9LJSLZ8JI2SxbGHYbks=
 github.com/rgeraldes24/go-zond v0.0.0-20240329100529-616c74c8ae60 h1:NUXo/w/kVD0LMKTJT9EW+Zfmf5E/Poc1c1NVqQs8GnQ=
 github.com/rgeraldes24/go-zond v0.0.0-20240329100529-616c74c8ae60/go.mod h1:Sg4N09L6oSx0nLf6gWJ56cFXj/MAhZduicnVMQjYVVM=
-github.com/rgeraldes24/goevmlab v0.0.0-20240329104006-e8a53465b1fb h1:AMKpOyP4c8zR7+FPxr8CWBvq+hk/MCbPo7YCherr12o=
-github.com/rgeraldes24/goevmlab v0.0.0-20240329104006-e8a53465b1fb/go.mod h1:Xr1IpR09F6wx1qIrAFE6eQjE75PkEdxCxeTWSkZJtoc=
+github.com/rgeraldes24/goevmlab v0.0.0-20240329154018-4b7621d993d1 h1:kNx/tCkBNim6H6icD85du5yy1d2k6x3MlIE2zivQlvk=
+github.com/rgeraldes24/goevmlab v0.0.0-20240329154018-4b7621d993d1/go.mod h1:sxJ2wWhiRg3YMVlg/Q4bm2q2oH6uMtMdLA3aebyeG84=
 github.com/rgeraldes24/grpc-gateway/v2 v2.0.0-20240312105758-7a0b890ded11 h1:hYWoTF0G//Jd1BG75WdO93mdzvch2L8r6FYe7ZPq5Eg=
 github.com/rgeraldes24/grpc-gateway/v2 v2.0.0-20240312105758-7a0b890ded11/go.mod h1:WcZYCAhI9m1Iyj8Qw/i6Ntt7pSkyK+Z+h9e+euPrFrw=
 github.com/rgeraldes24/tx-fuzz v0.0.0-20240312135745-3e62fcca6c4e h1:utlgNdI4k5aQl0W3XN0GiWKyFL4DleUHGO2RovULWWA=
