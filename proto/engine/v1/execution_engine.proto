@@ -113,7 +113,3 @@ message Withdrawal {
 	// The withdrawn amount in Gwei
 	uint64 amount = 4;
 }
-
-message ExchangeCapabilities {
-	repeated string supported_methods = 1;
-}

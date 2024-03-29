@@ -50,8 +50,6 @@ const (
 	GetPayloadBodiesByHashV1 = "engine_getPayloadBodiesByHashV1"
 	// GetPayloadBodiesByRangeV1 v1 request string for JSON-RPC.
 	GetPayloadBodiesByRangeV1 = "engine_getPayloadBodiesByRangeV1"
-	// ExchangeCapabilities request string for JSON-RPC.
-	ExchangeCapabilities = "engine_exchangeCapabilities"
 	// Defines the seconds before timing out engine endpoints with non-block execution semantics.
 	defaultEngineTimeout = time.Second
 )
@@ -209,32 +207,6 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 		return nil, false, err
 	}
 	return ed, false, nil
-}
-
-func (s *Service) ExchangeCapabilities(ctx context.Context) ([]string, error) {
-	ctx, span := trace.StartSpan(ctx, "powchain.engine-api-client.ExchangeCapabilities")
-	defer span.End()
-
-	result := &pb.ExchangeCapabilities{}
-	err := s.rpcClient.CallContext(ctx, &result, ExchangeCapabilities, supportedEngineEndpoints)
-
-	var unsupported []string
-	for _, s1 := range supportedEngineEndpoints {
-		supported := false
-		for _, s2 := range result.SupportedMethods {
-			if s1 == s2 {
-				supported = true
-				break
-			}
-		}
-		if !supported {
-			unsupported = append(unsupported, s1)
-		}
-	}
-	if len(unsupported) != 0 {
-		log.Warnf("Please update client, detected the following unsupported engine methods: %s", unsupported)
-	}
-	return result.SupportedMethods, handleRPCError(err)
 }
 
 // LatestExecutionBlock fetches the latest execution engine block by calling
