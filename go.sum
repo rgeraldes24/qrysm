@@ -551,8 +551,6 @@ github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7V
 github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=
 github.com/k0kubun/go-ansi v0.0.0-20180517002512-3bf9e2903213 h1:qGQQKEcAR99REcMpsXCp3lJ03zYT1PkRd3kQGPn9GVg=
 github.com/k0kubun/go-ansi v0.0.0-20180517002512-3bf9e2903213/go.mod h1:vNUNkEQ1e29fT/6vq2aBdFsgNPmy8qMdSay1npru+Sw=
-github.com/karalabe/usb v0.0.3-0.20230711191512-61db3e06439c h1:AqsttAyEyIEsNz5WLRwuRwjiT5CMDUfLk6cFJDVPebs=
-github.com/karalabe/usb v0.0.3-0.20230711191512-61db3e06439c/go.mod h1:Od972xHfMJowv7NGVDiWVxk2zxnWgjLlJzE+F4F7AGU=
 github.com/kisielk/errcheck v1.1.0/go.mod h1:EZBBE59ingxPouuu3KfxchcWSUPOHkagtvWXihfKN4Q=
 github.com/kisielk/errcheck v1.2.0/go.mod h1:/BMXB+zMLi60iA8Vv6Ksmxu/1UDYcXs4uQLJ+jE2L00=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
@@ -904,8 +902,8 @@ github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqn
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rgeraldes24/FuzzyVM v0.0.0-20240329154436-5ad32f67513e h1:MDINcoLroy/h+31Fh4ZFnT2cVCmNvEGODXQa5+QVEBk=
 github.com/rgeraldes24/FuzzyVM v0.0.0-20240329154436-5ad32f67513e/go.mod h1:qJFcBaFYVfaWwb0eIBV29Vh+9LJSLZ8JI2SxbGHYbks=
-github.com/rgeraldes24/go-zond v0.0.0-20240329100529-616c74c8ae60 h1:NUXo/w/kVD0LMKTJT9EW+Zfmf5E/Poc1c1NVqQs8GnQ=
-github.com/rgeraldes24/go-zond v0.0.0-20240329100529-616c74c8ae60/go.mod h1:Sg4N09L6oSx0nLf6gWJ56cFXj/MAhZduicnVMQjYVVM=
+github.com/rgeraldes24/go-zond v0.0.0-20240405150831-9831d39dfb2e h1:ZgGkl2TdOA1Oao64g4IOBt24lCuuoJIAOEzHqjxDj4A=
+github.com/rgeraldes24/go-zond v0.0.0-20240405150831-9831d39dfb2e/go.mod h1:DA7+xNTlyDSL0t8FJXvg3tZLec10ZAdzo9ZH0nuJkfw=
 github.com/rgeraldes24/goevmlab v0.0.0-20240329154018-4b7621d993d1 h1:kNx/tCkBNim6H6icD85du5yy1d2k6x3MlIE2zivQlvk=
 github.com/rgeraldes24/goevmlab v0.0.0-20240329154018-4b7621d993d1/go.mod h1:sxJ2wWhiRg3YMVlg/Q4bm2q2oH6uMtMdLA3aebyeG84=
 github.com/rgeraldes24/grpc-gateway/v2 v2.0.0-20240312105758-7a0b890ded11 h1:hYWoTF0G//Jd1BG75WdO93mdzvch2L8r6FYe7ZPq5Eg=
@@ -1045,8 +1043,6 @@ github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1
 github.com/trailofbits/go-mutexasserts v0.0.0-20230328101604-8cdbc5f3d279 h1:+LynomhWB+14Plp/bOONEAZCtvCZk4leRbTvNzNVkL0=
 github.com/trailofbits/go-mutexasserts v0.0.0-20230328101604-8cdbc5f3d279/go.mod h1:GA3+Mq3kt3tYAfM0WZCu7ofy+GW9PuGysHfhr+6JX7s=
 github.com/twitchtv/twirp v7.1.0+incompatible/go.mod h1:RRJoFSAmTEh2weEqWtpPE3vFK5YBhA6bqp2l1kfCC5A=
-github.com/tyler-smith/go-bip39 v1.1.0 h1:5eUemwrMargf3BSLRRCalXT93Ns6pQJIjYQN2nyfOP8=
-github.com/tyler-smith/go-bip39 v1.1.0/go.mod h1:gUYDtqQw1JS3ZJ8UWVcGTGqqr6YIN3CWg+kkNaLt55U=
 github.com/uber/jaeger-client-go v2.25.0+incompatible h1:IxcNZ7WRY1Y3G4poYlx24szfsn/3LvK9QHCq9oQw8+U=
 github.com/uber/jaeger-client-go v2.25.0+incompatible/go.mod h1:WVhlPFC8FDjOFMMWRy2pZqQJSXxYSwNYOkTr/Z6d3Kk=
 github.com/urfave/cli v1.20.0/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijbERA=
