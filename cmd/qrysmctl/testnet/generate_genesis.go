@@ -271,13 +271,8 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if err := json.Unmarshal(gbytes, gen); err != nil {
 			return nil, err
 		}
-		// set timestamps for genesis and shanghai fork
+		// set timestamps for genesis
 		gen.Timestamp = f.GenesisTime
-		gen.Config.ShanghaiTime = interop.GzondShanghaiTime(f.GenesisTime)
-
-		if gen.Config.ShanghaiTime != nil {
-			log.WithField("shanghai", fmt.Sprintf("%d", *gen.Config.ShanghaiTime))
-		}
 	} else {
 		gen = interop.GzondTestnetGenesis(f.GenesisTime, params.BeaconConfig())
 	}
