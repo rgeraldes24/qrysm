@@ -32,7 +32,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.0.1
 	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d
-	github.com/holiman/uint256 v1.2.4
+	github.com/holiman/uint256 v1.2.4 // indirect
 	github.com/ianlancetaylor/cgosymbolizer v0.0.0-20200424224625-be1b05b0b279
 	github.com/ipfs/go-log/v2 v2.5.1
 	github.com/joonix/log v0.0.0-20200409080653-9c1d2ceb5f1d
@@ -265,4 +265,4 @@ replace github.com/json-iterator/go => github.com/prestonvanloon/go v1.1.7-0.201
 // See https://github.com/prysmaticlabs/grpc-gateway/issues/2
 replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/rgeraldes24/grpc-gateway/v2 v2.0.0-20240312105758-7a0b890ded11
 
-replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20240408115436-4637a7d6c1ff
+replace github.com/theQRL/go-zond => github.com/cyyber/go-zond v0.0.0-20240408174218-ac6fe3f686e0
