@@ -120,7 +120,7 @@ type BeaconChainConfig struct {
 
 	// Qrysm constants.
 	GweiPerEth                   uint64                                     // GweiPerEth is the amount of gwei corresponding to 1 eth.
-	DefaultBufferSize            int                                        // DefaultBufferSize for channels across the Prysm repository.
+	DefaultBufferSize            int                                        // DefaultBufferSize for channels across the Qrysm repository.
 	ValidatorPrivkeyFileName     string                                     // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
 	WithdrawalPrivkeyFileName    string                                     // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
 	RPCSyncCheck                 time.Duration                              // Number of seconds to query the sync service, to find out if the node is synced or not.
