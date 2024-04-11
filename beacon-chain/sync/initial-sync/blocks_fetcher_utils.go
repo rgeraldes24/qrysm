@@ -291,14 +291,14 @@ func (f *blocksFetcher) findAncestor(ctx context.Context, pid peer.ID, b interfa
 		parentRoot := outBlocks[len(outBlocks)-1].Block().ParentRoot()
 		if f.chain.HasBlock(ctx, parentRoot) {
 			// Common ancestor found, forward blocks back to processor.
-			bwb, err := sortedROBlockSlice(outBlocks)
+			blks, err := sortedROBlockSlice(outBlocks)
 			if err != nil {
 				return nil, errors.Wrap(err, "received invalid blocks in findAncestor")
 			}
 
 			return &forkData{
 				peer: pid,
-				blks: bwb,
+				blks: blks,
 			}, nil
 		}
 		// Request block's parent.
