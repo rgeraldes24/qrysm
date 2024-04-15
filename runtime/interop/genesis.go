@@ -84,7 +84,6 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 	cc := &params.ChainConfig{
 		ChainID:                       big.NewInt(defaultTestChainId),
 		HomesteadBlock:                bigz,
-		DAOForkBlock:                  bigz,
 		EIP150Block:                   bigz,
 		EIP155Block:                   bigz,
 		EIP158Block:                   bigz,
