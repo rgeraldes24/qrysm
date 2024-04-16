@@ -83,8 +83,6 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 	shanghaiTime := GzondShanghaiTime(genesisTime)
 	cc := &params.ChainConfig{
 		ChainID:                       big.NewInt(defaultTestChainId),
-		GrayGlacierBlock:              bigz,
-		MergeNetsplitBlock:            bigz,
 		TerminalTotalDifficulty:       bigz,
 		TerminalTotalDifficultyPassed: true,
 		ShanghaiTime:                  shanghaiTime,
