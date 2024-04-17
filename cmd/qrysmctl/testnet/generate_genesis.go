@@ -275,8 +275,6 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		gen.Timestamp = f.GenesisTime
 
 		log.Info("setting fork zond times")
-		// set ttd to zero so EL goes post-merge immediately
-		gen.Config.TerminalTotalDifficulty = big.NewInt(0)
 	} else {
 		gen = interop.GzondTestnetGenesis(f.GenesisTime, params.BeaconConfig())
 	}
