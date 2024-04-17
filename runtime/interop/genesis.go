@@ -69,9 +69,8 @@ var testAccountBalance = big.NewInt(0)
 // customized as desired.
 func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *core.Genesis {
 	cc := &params.ChainConfig{
-		ChainID:                       big.NewInt(defaultTestChainId),
-		TerminalTotalDifficulty:       bigz,
-		TerminalTotalDifficultyPassed: true,
+		ChainID:                 big.NewInt(defaultTestChainId),
+		TerminalTotalDifficulty: bigz,
 	}
 	da := defaultDepositContractAllocation(cfg.DepositContractAddress)
 	ma := minerAllocation()
