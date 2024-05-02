@@ -483,13 +483,11 @@ func executableDataToBlock(params engine.ExecutableData) (*zondTypes.Block, erro
 	}
 	header := &zondTypes.Header{
 		ParentHash:      params.ParentHash,
-		UncleHash:       zondTypes.EmptyUncleHash,
 		Coinbase:        params.FeeRecipient,
 		Root:            params.StateRoot,
 		TxHash:          zondTypes.DeriveSha(zondTypes.Transactions(txs), trie.NewStackTrie(nil)),
 		ReceiptHash:     params.ReceiptsRoot,
 		Bloom:           zondTypes.BytesToBloom(params.LogsBloom),
-		Difficulty:      common.Big0,
 		Number:          new(big.Int).SetUint64(params.Number),
 		GasLimit:        params.GasLimit,
 		GasUsed:         params.GasUsed,
@@ -499,7 +497,7 @@ func executableDataToBlock(params engine.ExecutableData) (*zondTypes.Block, erro
 		MixDigest:       params.Random,
 		WithdrawalsHash: withdrawalsRoot,
 	}
-	block := zondTypes.NewBlockWithHeader(header).WithBody(txs, nil /* uncles */).WithWithdrawals(params.Withdrawals)
+	block := zondTypes.NewBlockWithHeader(header).WithBody(txs).WithWithdrawals(params.Withdrawals)
 	return block, nil
 }
 
