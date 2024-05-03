@@ -815,7 +815,7 @@ func fixtures() map[string]interface{} {
 			GasUsed:     4,
 			Time:        5,
 			Extra:       []byte("extra"),
-			MixDigest:   common.BytesToHash([]byte("mix")),
+			Random:      common.BytesToHash([]byte("random")),
 			BaseFee:     big.NewInt(7),
 		},
 		Withdrawals: []*pb.Withdrawal{},

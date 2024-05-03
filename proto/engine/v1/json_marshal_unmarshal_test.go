@@ -155,7 +155,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 			Time:        5,
 			BaseFee:     baseFeePerGas,
 			Extra:       []byte("extraData"),
-			MixDigest:   common.BytesToHash([]byte("mix")),
+			Random:      common.BytesToHash([]byte("random")),
 		}
 		enc, err := json.Marshal(want)
 		require.NoError(t, err)
@@ -199,7 +199,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		require.DeepEqual(t, want.Time, payloadPb.Time)
 		require.DeepEqual(t, want.BaseFee, payloadPb.BaseFee)
 		require.DeepEqual(t, want.Extra, payloadPb.Extra)
-		require.DeepEqual(t, want.MixDigest, payloadPb.MixDigest)
+		require.DeepEqual(t, want.Random, payloadPb.Random)
 	})
 
 	t.Run("execution block with txs as hashes", func(t *testing.T) {
@@ -217,7 +217,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 			Time:        5,
 			BaseFee:     baseFeePerGas,
 			Extra:       []byte("extraData"),
-			MixDigest:   common.BytesToHash([]byte("mix")),
+			Random:      common.BytesToHash([]byte("random")),
 		}
 		enc, err := json.Marshal(want)
 		require.NoError(t, err)
@@ -261,7 +261,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		require.DeepEqual(t, want.Time, payloadPb.Time)
 		require.DeepEqual(t, want.BaseFee, payloadPb.BaseFee)
 		require.DeepEqual(t, want.Extra, payloadPb.Extra)
-		require.DeepEqual(t, want.MixDigest, payloadPb.MixDigest)
+		require.DeepEqual(t, want.Random, payloadPb.Random)
 
 		// Expect no transaction objects in the unmarshaled data.
 		require.Equal(t, 0, len(payloadPb.Transactions))
@@ -282,7 +282,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 			Time:        5,
 			BaseFee:     baseFeePerGas,
 			Extra:       []byte("extraData"),
-			MixDigest:   common.BytesToHash([]byte("mix")),
+			Random:      common.BytesToHash([]byte("random")),
 		}
 		enc, err := json.Marshal(want)
 		require.NoError(t, err)
@@ -336,7 +336,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		require.DeepEqual(t, want.Time, payloadPb.Time)
 		require.DeepEqual(t, want.BaseFee, payloadPb.BaseFee)
 		require.DeepEqual(t, want.Extra, payloadPb.Extra)
-		require.DeepEqual(t, want.MixDigest, payloadPb.MixDigest)
+		require.DeepEqual(t, want.Random, payloadPb.Random)
 		require.Equal(t, 1, len(payloadPb.Transactions))
 		require.DeepEqual(t, txs[0].Hash(), payloadPb.Transactions[0].Hash())
 	})
@@ -356,7 +356,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 			Time:        5,
 			BaseFee:     baseFeePerGas,
 			Extra:       []byte("extraData"),
-			MixDigest:   common.BytesToHash([]byte("mix")),
+			Random:      common.BytesToHash([]byte("random")),
 		}
 		enc, err := json.Marshal(want)
 		require.NoError(t, err)
@@ -410,7 +410,7 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		require.DeepEqual(t, want.Time, payloadPb.Time)
 		require.DeepEqual(t, want.BaseFee, payloadPb.BaseFee)
 		require.DeepEqual(t, want.Extra, payloadPb.Extra)
-		require.DeepEqual(t, want.MixDigest, payloadPb.MixDigest)
+		require.DeepEqual(t, want.Random, payloadPb.Random)
 		require.Equal(t, 2, len(payloadPb.Withdrawals))
 		require.Equal(t, uint64(1), payloadPb.Withdrawals[0].Index)
 		require.Equal(t, primitives.ValidatorIndex(1), payloadPb.Withdrawals[0].ValidatorIndex)
