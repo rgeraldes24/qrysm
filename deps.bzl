@@ -218,8 +218,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_aws_aws_sdk_go_v2",
         importpath = "github.com/aws/aws-sdk-go-v2",
-        sum = "h1:qZ+woO4SamnH/eEbjM2IDLhRNwIwND/RQyVlBLp3Jqg=",
-        version = "v0.18.0",
+        sum = "h1:BS+UYpbsElC82gB+2E2jiCBg36i8HlubTB/dO/moQ9c=",
+        version = "v1.2.0",
     )
     go_repository(
         name = "com_github_aws_aws_sdk_go_v2_config",
@@ -638,8 +638,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_consensys_gnark_crypto",
         importpath = "github.com/consensys/gnark-crypto",
-        sum = "h1:lHH39WuuFgVHONRl3J0LRBtuYdQTumFSDtJF7HpyG8M=",
-        version = "v0.12.1",
+        sum = "h1:zRh22SR7o4K35SoNqouS9J/TKHTyU2QWaj5ldehyXtA=",
+        version = "v0.10.0",
     )
 
     go_repository(
@@ -1020,8 +1020,8 @@ def qrysm_deps():
         patches = [
             "//third_party:com_github_ethereum_go_ethereum_secp256k1.patch",
         ],
-        sum = "h1:Jr/Ox4AOr4AggfZqYDm6v9LbakrOZe0PDAjNovFtwyI=",
-        version = "v1.13.5-0.20231022140504-a6a0ae45b69a",
+        sum = "h1:i/7d9RBBwiXCEuyduBQzJw/mKmnvzsN14jqBmytw72s=",
+        version = "v1.10.26",
     )
 
     go_repository(
@@ -5632,8 +5632,8 @@ def go_dependencies():
     go_repository(
         name = "com_github_bits_and_blooms_bitset",
         importpath = "github.com/bits-and-blooms/bitset",
-        sum = "h1:RMyy2mBBShArUAhfVRZJ2xyBO58KCBCtZFShw3umo6k=",
-        version = "v1.11.0",
+        sum = "h1:NpE8frKRLGHIcEzkR+gZhiioW1+WbYV6fKwD6ZIpQT8=",
+        version = "v1.5.0",
     )
     go_repository(
         name = "com_github_chromedp_cdproto",
@@ -5830,21 +5830,21 @@ def go_dependencies():
     go_repository(
         name = "com_github_rgeraldes24_fuzzyvm",
         importpath = "github.com/rgeraldes24/FuzzyVM",
-        sum = "h1:lMatejndxKUPXShISAb4GpvrCviTc5aMBQvn5raG7Ck=",
-        version = "v0.0.0-20240409132327-bdda31292e1d",
+        sum = "h1:MJkWGA0EPdrv4OpMjzpeMNyG9gGImqB4xZG9iom2O3Q=",
+        version = "v0.0.0-20240814164600-5f611699efbc",
     )
     go_repository(
         name = "com_github_rgeraldes24_goevmlab",
         importpath = "github.com/rgeraldes24/goevmlab",
-        sum = "h1:TDgYW0opYEw2El+dlO7RRhgD7IBaukIGRUeSI9ajszg=",
-        version = "v0.0.0-20240405152946-c986fe335e98",
+        sum = "h1:3YzQ0V7kLCXEd6katIKPyHEXJW4d1EmfdiycZfRU3OM=",
+        version = "v0.0.0-20240814164028-e72145bd7218",
     )
 
     go_repository(
         name = "com_github_rgeraldes24_tx_fuzz",
         importpath = "github.com/rgeraldes24/tx-fuzz",
-        sum = "h1:dEatz1is/arQi9MTHW55j3ylrOIx08u+OJV3TUCTrok=",
-        version = "v0.0.0-20240409132431-850c1cc8b2af",
+        sum = "h1:5yYoxmZm/c5ATXq3lyO3fNxvWvOxz52/lI/YGWbILTU=",
+        version = "v0.0.0-20240815074056-31ca2bb2b6b2",
     )
 
     go_repository(
@@ -5858,8 +5858,8 @@ def go_dependencies():
             "//third_party:com_github_theqrl_go_zond_secp256k1.patch",
         ],
         replace = "github.com/rgeraldes24/go-zond",
-        sum = "h1:ULFeyQZrLxl7vDZ3Dl0cFUOcf+CcF6rrgzw3thdjvDI=",
-        version = "v0.0.0-20240814125945-0291ddb8dcb4",
+        sum = "h1:COieWqurfq6hiUeVYk8V82fZd/LdhD65FJgd0/hPIfE=",
+        version = "v0.0.0-20240814163510-4a969197d73d",
     )
     go_repository(
         name = "com_github_theqrl_go_zond_types",

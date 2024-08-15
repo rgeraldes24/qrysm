@@ -54,12 +54,16 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	tx := zondTypes.NewTransaction(
-		0,
-		common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-		big.NewInt(0), 0, big.NewInt(0),
-		nil,
-	)
+	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+		Nonce:     0,
+		To:        &to,
+		Value:     big.NewInt(0),
+		Gas:       0,
+		GasFeeCap: big.NewInt(0),
+		GasTipCap: big.NewInt(0),
+		Data:      nil,
+	})
 	txs := []*zondTypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
@@ -164,12 +168,16 @@ func TestRPCBeaconBlocksByRange_ReturnCorrectNumberBack(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	tx := zondTypes.NewTransaction(
-		0,
-		common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-		big.NewInt(0), 0, big.NewInt(0),
-		nil,
-	)
+	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+		Nonce:     0,
+		To:        &to,
+		Value:     big.NewInt(0),
+		Gas:       0,
+		GasFeeCap: big.NewInt(0),
+		GasTipCap: big.NewInt(0),
+		Data:      nil,
+	})
 	txs := []*zondTypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
@@ -280,12 +288,16 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	tx := zondTypes.NewTransaction(
-		0,
-		common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-		big.NewInt(0), 0, big.NewInt(0),
-		nil,
-	)
+	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+		Nonce:     0,
+		To:        &to,
+		Value:     big.NewInt(0),
+		Gas:       0,
+		GasFeeCap: big.NewInt(0),
+		GasTipCap: big.NewInt(0),
+		Data:      nil,
+	})
 	txs := []*zondTypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
@@ -401,12 +413,16 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsSortedBlocks(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	tx := zondTypes.NewTransaction(
-		0,
-		common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-		big.NewInt(0), 0, big.NewInt(0),
-		nil,
-	)
+	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+		Nonce:     0,
+		To:        &to,
+		Value:     big.NewInt(0),
+		Gas:       0,
+		GasFeeCap: big.NewInt(0),
+		GasTipCap: big.NewInt(0),
+		Data:      nil,
+	})
 	txs := []*zondTypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
@@ -517,12 +533,16 @@ func TestRPCBeaconBlocksByRange_ReturnsGenesisBlock(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	tx := zondTypes.NewTransaction(
-		0,
-		common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-		big.NewInt(0), 0, big.NewInt(0),
-		nil,
-	)
+	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+		Nonce:     0,
+		To:        &to,
+		Value:     big.NewInt(0),
+		Gas:       0,
+		GasFeeCap: big.NewInt(0),
+		GasTipCap: big.NewInt(0),
+		Data:      nil,
+	})
 	txs := []*zondTypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
@@ -620,12 +640,16 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	tx := zondTypes.NewTransaction(
-		0,
-		common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-		big.NewInt(0), 0, big.NewInt(0),
-		nil,
-	)
+	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+		Nonce:     0,
+		To:        &to,
+		Value:     big.NewInt(0),
+		Gas:       0,
+		GasFeeCap: big.NewInt(0),
+		GasTipCap: big.NewInt(0),
+		Data:      nil,
+	})
 	txs := []*zondTypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
@@ -949,12 +973,16 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	tx := zondTypes.NewTransaction(
-		0,
-		common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-		big.NewInt(0), 0, big.NewInt(0),
-		nil,
-	)
+	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+		Nonce:     0,
+		To:        &to,
+		Value:     big.NewInt(0),
+		Gas:       0,
+		GasFeeCap: big.NewInt(0),
+		GasTipCap: big.NewInt(0),
+		Data:      nil,
+	})
 	txs := []*zondTypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
@@ -1075,12 +1103,16 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 	stateRoot := bytesutil.PadTo([]byte("stateRoot"), fieldparams.RootLength)
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
-	tx := zondTypes.NewTransaction(
-		0,
-		common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87"),
-		big.NewInt(0), 0, big.NewInt(0),
-		nil,
-	)
+	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+		Nonce:     0,
+		To:        &to,
+		Value:     big.NewInt(0),
+		Gas:       0,
+		GasFeeCap: big.NewInt(0),
+		GasTipCap: big.NewInt(0),
+		Data:      nil,
+	})
 	txs := []*zondTypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error

@@ -497,7 +497,7 @@ func executableDataToBlock(params engine.ExecutableData) (*zondTypes.Block, erro
 		Random:          params.Random,
 		WithdrawalsHash: withdrawalsRoot,
 	}
-	block := zondTypes.NewBlockWithHeader(header).WithBody(txs).WithWithdrawals(params.Withdrawals)
+	block := zondTypes.NewBlockWithHeader(header).WithBody(zondTypes.Body{Transactions: txs, Withdrawals: params.Withdrawals})
 	return block, nil
 }
 
