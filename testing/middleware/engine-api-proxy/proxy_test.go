@@ -163,7 +163,7 @@ func TestProxy_CustomInterceptors(t *testing.T) {
 		}()
 		time.Sleep(time.Millisecond * 100)
 
-		method := "engine_newPayloadV1"
+		method := "engine_newPayloadV2"
 
 		// RPC method to intercept.
 		wantInterceptedResponse := func() interface{} {
@@ -231,7 +231,7 @@ func TestProxy_CustomInterceptors(t *testing.T) {
 		}()
 		time.Sleep(time.Millisecond * 100)
 
-		method := "engine_newPayloadV1"
+		method := "engine_newPayloadV2"
 
 		// RPC method to intercept.
 		wantInterceptedResponse := func() interface{} {
@@ -273,7 +273,7 @@ func Test_isEngineAPICall(t *testing.T) {
 		{
 			name: "engine method",
 			args: &jsonRPCObject{
-				Method: "engine_newPayloadV1",
+				Method: "engine_newPayloadV2",
 				ID:     1,
 				Result: 5,
 			},

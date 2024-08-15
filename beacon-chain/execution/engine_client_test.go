@@ -452,7 +452,6 @@ func TestReconstructFullBlock(t *testing.T) {
 		encodedNum := hexutil.EncodeBig(num)
 		jsonPayload["hash"] = hexutil.Encode(payload.BlockHash)
 		jsonPayload["parentHash"] = common.BytesToHash([]byte("parent"))
-		jsonPayload["sha3Uncles"] = common.BytesToHash([]byte("uncles"))
 		jsonPayload["miner"] = common.BytesToAddress([]byte("miner"))
 		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
 		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
@@ -463,8 +462,6 @@ func TestReconstructFullBlock(t *testing.T) {
 		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
 		jsonPayload["number"] = encodedNum
 		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
-		jsonPayload["totalDifficulty"] = "0x123456"
-		jsonPayload["difficulty"] = encodedNum
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
 		jsonPayload["withdrawals"] = []*zondtypes.Withdrawal{}
@@ -550,7 +547,6 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		encodedNum := hexutil.EncodeBig(num)
 		jsonPayload["hash"] = hexutil.Encode(payload.BlockHash)
 		jsonPayload["parentHash"] = common.BytesToHash([]byte("parent"))
-		jsonPayload["sha3Uncles"] = common.BytesToHash([]byte("uncles"))
 		jsonPayload["miner"] = common.BytesToAddress([]byte("miner"))
 		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
 		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
@@ -561,8 +557,6 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
 		jsonPayload["number"] = encodedNum
 		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
-		jsonPayload["totalDifficulty"] = "0x123456"
-		jsonPayload["difficulty"] = encodedNum
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
 		jsonPayload["withdrawals"] = []*zondtypes.Withdrawal{}

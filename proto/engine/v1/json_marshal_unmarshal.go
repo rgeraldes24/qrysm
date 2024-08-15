@@ -416,12 +416,6 @@ func (p *PayloadStatus) UnmarshalJSON(enc []byte) error {
 	return nil
 }
 
-type transitionConfigurationJSON struct {
-	TerminalTotalDifficulty *hexutil.Big   `json:"terminalTotalDifficulty"`
-	TerminalBlockHash       common.Hash    `json:"terminalBlockHash"`
-	TerminalBlockNumber     hexutil.Uint64 `json:"terminalBlockNumber"`
-}
-
 type forkchoiceStateJSON struct {
 	HeadBlockHash      hexutil.Bytes `json:"headBlockHash"`
 	SafeBlockHash      hexutil.Bytes `json:"safeBlockHash"`

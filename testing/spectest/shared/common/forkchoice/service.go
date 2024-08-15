@@ -99,6 +99,7 @@ func (m *engineMock) LatestExecutionBlock(context.Context) (*pb.ExecutionBlock, 
 	return nil, nil
 }
 
+// TODO(rgeraldes24)
 /*
 func (m *engineMock) ExecutionBlockByHash(_ context.Context, hash common.Hash, _ bool) (*pb.ExecutionBlock, error) {
 	b, ok := m.powBlocks[bytesutil.ToBytes32(hash.Bytes())]
@@ -106,13 +107,10 @@ func (m *engineMock) ExecutionBlockByHash(_ context.Context, hash common.Hash, _
 		return nil, nil
 	}
 
-	td := new(big.Int).SetBytes(bytesutil.ReverseByteOrder(b.TotalDifficulty))
-	tdHex := hexutil.EncodeBig(td)
 	return &pb.ExecutionBlock{
 		Header: zondtypes.Header{
 			ParentHash: common.BytesToHash(b.ParentHash),
 		},
-		TotalDifficulty: tdHex,
 		Hash:            common.BytesToHash(b.BlockHash),
 	}, nil
 }
