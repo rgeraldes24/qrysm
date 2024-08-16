@@ -99,7 +99,6 @@ func (m *engineMock) LatestExecutionBlock(context.Context) (*pb.ExecutionBlock, 
 	return nil, nil
 }
 
-// TODO(rgeraldes24)
 /*
 func (m *engineMock) ExecutionBlockByHash(_ context.Context, hash common.Hash, _ bool) (*pb.ExecutionBlock, error) {
 	b, ok := m.powBlocks[bytesutil.ToBytes32(hash.Bytes())]
