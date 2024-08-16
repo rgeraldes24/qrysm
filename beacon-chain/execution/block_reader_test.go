@@ -8,7 +8,7 @@ import (
 
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
-	zondTypes "github.com/theQRL/go-zond/core/types"
+	gzondtypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
 	dbutil "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
@@ -99,7 +99,7 @@ func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
 	web3Service.rpcClient = &mockExecution.RPCClient{}
 	ctx := context.Background()
 
-	header := &zondTypes.Header{
+	header := &gzondtypes.Header{
 		Number: big.NewInt(15),
 		Time:   150,
 	}

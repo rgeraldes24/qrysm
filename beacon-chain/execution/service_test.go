@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/go-zond/accounts/abi/bind/backends"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
-	zondTypes "github.com/theQRL/go-zond/core/types"
+	gzondtypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/qrysm/v4/async/event"
 	"github.com/theQRL/qrysm/v4/beacon-chain/cache/depositcache"
@@ -46,16 +46,16 @@ type goodLogger struct {
 
 func (_ *goodLogger) Close() {}
 
-func (g *goodLogger) SubscribeFilterLogs(ctx context.Context, q zond.FilterQuery, ch chan<- zondTypes.Log) (zond.Subscription, error) {
+func (g *goodLogger) SubscribeFilterLogs(ctx context.Context, q zond.FilterQuery, ch chan<- gzondtypes.Log) (zond.Subscription, error) {
 	if g.backend == nil {
 		return new(event.Feed).Subscribe(ch), nil
 	}
 	return g.backend.SubscribeFilterLogs(ctx, q, ch)
 }
 
-func (g *goodLogger) FilterLogs(ctx context.Context, q zond.FilterQuery) ([]zondTypes.Log, error) {
+func (g *goodLogger) FilterLogs(ctx context.Context, q zond.FilterQuery) ([]gzondtypes.Log, error) {
 	if g.backend == nil {
-		logs := make([]zondTypes.Log, 3)
+		logs := make([]gzondtypes.Log, 3)
 		for i := 0; i < len(logs); i++ {
 			logs[i].Address = common.Address{}
 			logs[i].Topics = make([]common.Hash, 5)
@@ -694,7 +694,7 @@ func TestService_FollowBlock(t *testing.T) {
 	followTime += 10000
 	bMap := make(map[uint64]*types.HeaderInfo)
 	for i := uint64(3000); i > 0; i-- {
-		h := &zondTypes.Header{
+		h := &gzondtypes.Header{
 			Number: big.NewInt(int64(i)),
 			Time:   followTime + (i * 40),
 		}
@@ -735,7 +735,7 @@ func (s *slowRPCClient) BatchCall(b []rpc.BatchElem) error {
 		if err != nil {
 			return err
 		}
-		h := &zondTypes.Header{Number: num}
+		h := &gzondtypes.Header{Number: num}
 		*e.Result.(*types.HeaderInfo) = types.HeaderInfo{Number: h.Number, Hash: h.Hash()}
 	}
 	return nil

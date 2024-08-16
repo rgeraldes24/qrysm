@@ -12,7 +12,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/protocol"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-zond/common"
-	zondTypes "github.com/theQRL/go-zond/core/types"
+	gzondtypes "github.com/theQRL/go-zond/core/types"
 	chainMock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	db2 "github.com/theQRL/qrysm/v4/beacon-chain/db"
 	db "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
@@ -55,7 +55,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -64,7 +64,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsBlocks(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*zondTypes.Transaction{tx}
+	txs := []*gzondtypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
@@ -169,7 +169,7 @@ func TestRPCBeaconBlocksByRange_ReturnCorrectNumberBack(t *testing.T) {
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -178,7 +178,7 @@ func TestRPCBeaconBlocksByRange_ReturnCorrectNumberBack(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*zondTypes.Transaction{tx}
+	txs := []*gzondtypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
@@ -289,7 +289,7 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -298,7 +298,7 @@ func TestRPCBeaconBlocksByRange_ReconstructsPayloads(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*zondTypes.Transaction{tx}
+	txs := []*gzondtypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
@@ -414,7 +414,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsSortedBlocks(t *testing.T) {
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -423,7 +423,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerReturnsSortedBlocks(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*zondTypes.Transaction{tx}
+	txs := []*gzondtypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
@@ -534,7 +534,7 @@ func TestRPCBeaconBlocksByRange_ReturnsGenesisBlock(t *testing.T) {
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -543,7 +543,7 @@ func TestRPCBeaconBlocksByRange_ReturnsGenesisBlock(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*zondTypes.Transaction{tx}
+	txs := []*gzondtypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
@@ -641,7 +641,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -650,7 +650,7 @@ func TestRPCBeaconBlocksByRange_RPCHandlerRateLimitOverflow(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*zondTypes.Transaction{tx}
+	txs := []*gzondtypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
@@ -974,7 +974,7 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -983,7 +983,7 @@ func TestRPCBeaconBlocksByRange_EnforceResponseInvariants(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*zondTypes.Transaction{tx}
+	txs := []*gzondtypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()
@@ -1104,7 +1104,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+	tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -1113,7 +1113,7 @@ func TestRPCBeaconBlocksByRange_FilterBlocks(t *testing.T) {
 		GasTipCap: big.NewInt(0),
 		Data:      nil,
 	})
-	txs := []*zondTypes.Transaction{tx}
+	txs := []*gzondtypes.Transaction{tx}
 	encodedBinaryTxs := make([][]byte, 1)
 	var err error
 	encodedBinaryTxs[0], err = txs[0].MarshalBinary()

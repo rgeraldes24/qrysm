@@ -7,7 +7,7 @@ import (
 
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
-	zondtypes "github.com/theQRL/go-zond/core/types"
+	gzondtypes "github.com/theQRL/go-zond/core/types"
 	fieldparams "github.com/theQRL/qrysm/v4/config/fieldparams"
 	"github.com/theQRL/qrysm/v4/consensus-types/primitives"
 	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
@@ -142,14 +142,14 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 
 	t.Run("execution block", func(t *testing.T) {
 		baseFeePerGas := big.NewInt(1770307273)
-		want := &zondtypes.Header{
+		want := &gzondtypes.Header{
 			Number:      big.NewInt(1),
 			ParentHash:  common.BytesToHash([]byte("parent")),
 			Coinbase:    common.BytesToAddress([]byte("coinbase")),
 			Root:        common.BytesToHash([]byte("root")),
 			TxHash:      common.BytesToHash([]byte("txHash")),
 			ReceiptHash: common.BytesToHash([]byte("receiptHash")),
-			Bloom:       zondtypes.BytesToBloom([]byte("bloom")),
+			Bloom:       gzondtypes.BytesToBloom([]byte("bloom")),
 			GasLimit:    3,
 			GasUsed:     4,
 			Time:        5,
@@ -203,14 +203,14 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 
 	t.Run("execution block with txs as hashes", func(t *testing.T) {
 		baseFeePerGas := big.NewInt(1770307273)
-		want := &zondtypes.Header{
+		want := &gzondtypes.Header{
 			Number:      big.NewInt(1),
 			ParentHash:  common.BytesToHash([]byte("parent")),
 			Coinbase:    common.BytesToAddress([]byte("coinbase")),
 			Root:        common.BytesToHash([]byte("root")),
 			TxHash:      common.BytesToHash([]byte("txHash")),
 			ReceiptHash: common.BytesToHash([]byte("receiptHash")),
-			Bloom:       zondtypes.BytesToBloom([]byte("bloom")),
+			Bloom:       gzondtypes.BytesToBloom([]byte("bloom")),
 			GasLimit:    3,
 			GasUsed:     4,
 			Time:        5,
@@ -267,14 +267,14 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 
 	t.Run("execution block with full transaction data", func(t *testing.T) {
 		baseFeePerGas := big.NewInt(1770307273)
-		want := &zondtypes.Header{
+		want := &gzondtypes.Header{
 			Number:      big.NewInt(1),
 			ParentHash:  common.BytesToHash([]byte("parent")),
 			Coinbase:    common.BytesToAddress([]byte("coinbase")),
 			Root:        common.BytesToHash([]byte("root")),
 			TxHash:      common.BytesToHash([]byte("txHash")),
 			ReceiptHash: common.BytesToHash([]byte("receiptHash")),
-			Bloom:       zondtypes.BytesToBloom([]byte("bloom")),
+			Bloom:       gzondtypes.BytesToBloom([]byte("bloom")),
 			GasLimit:    3,
 			GasUsed:     4,
 			Time:        5,
@@ -289,13 +289,13 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 		require.NoError(t, json.Unmarshal(enc, &payloadItems))
 
 		toAddr := common.BytesToAddress([]byte("hi"))
-		tx := zondtypes.NewTx(&zondtypes.DynamicFeeTx{
+		tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 			Nonce: 1,
 			To:    &toAddr,
 			Value: big.NewInt(0),
 			Data:  []byte{},
 		})
-		txs := []*zondtypes.Transaction{tx}
+		txs := []*gzondtypes.Transaction{tx}
 
 		blockHash := want.Hash()
 		payloadItems["hash"] = blockHash.String()
@@ -340,14 +340,14 @@ func TestJsonMarshalUnmarshal(t *testing.T) {
 
 	t.Run("execution block with withdrawals", func(t *testing.T) {
 		baseFeePerGas := big.NewInt(1770307273)
-		want := &zondtypes.Header{
+		want := &gzondtypes.Header{
 			Number:      big.NewInt(1),
 			ParentHash:  common.BytesToHash([]byte("parent")),
 			Coinbase:    common.BytesToAddress([]byte("coinbase")),
 			Root:        common.BytesToHash([]byte("root")),
 			TxHash:      common.BytesToHash([]byte("txHash")),
 			ReceiptHash: common.BytesToHash([]byte("receiptHash")),
-			Bloom:       zondtypes.BytesToBloom([]byte("bloom")),
+			Bloom:       gzondtypes.BytesToBloom([]byte("bloom")),
 			GasLimit:    3,
 			GasUsed:     4,
 			Time:        5,

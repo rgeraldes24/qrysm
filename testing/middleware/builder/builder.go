@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/go-zond/beacon/engine"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
-	zondTypes "github.com/theQRL/go-zond/core/types"
+	gzondtypes "github.com/theQRL/go-zond/core/types"
 	zondRPC "github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/go-zond/trie"
 	builderAPI "github.com/theQRL/qrysm/v4/api/client/builder"
@@ -468,7 +468,7 @@ func modifyExecutionPayload(execPayload engine.ExecutableData, fees *big.Int) (*
 }
 
 // This modifies the provided payload to imprint the builder's extra data
-func executableDataToBlock(params engine.ExecutableData) (*zondTypes.Block, error) {
+func executableDataToBlock(params engine.ExecutableData) (*gzondtypes.Block, error) {
 	txs, err := decodeTransactions(params.Transactions)
 	if err != nil {
 		return nil, err
@@ -478,16 +478,16 @@ func executableDataToBlock(params engine.ExecutableData) (*zondTypes.Block, erro
 	// Withdrawals as the json null value.
 	var withdrawalsRoot *common.Hash
 	if params.Withdrawals != nil {
-		h := zondTypes.DeriveSha(zondTypes.Withdrawals(params.Withdrawals), trie.NewStackTrie(nil))
+		h := gzondtypes.DeriveSha(gzondtypes.Withdrawals(params.Withdrawals), trie.NewStackTrie(nil))
 		withdrawalsRoot = &h
 	}
-	header := &zondTypes.Header{
+	header := &gzondtypes.Header{
 		ParentHash:      params.ParentHash,
 		Coinbase:        params.FeeRecipient,
 		Root:            params.StateRoot,
-		TxHash:          zondTypes.DeriveSha(zondTypes.Transactions(txs), trie.NewStackTrie(nil)),
+		TxHash:          gzondtypes.DeriveSha(gzondtypes.Transactions(txs), trie.NewStackTrie(nil)),
 		ReceiptHash:     params.ReceiptsRoot,
-		Bloom:           zondTypes.BytesToBloom(params.LogsBloom),
+		Bloom:           gzondtypes.BytesToBloom(params.LogsBloom),
 		Number:          new(big.Int).SetUint64(params.Number),
 		GasLimit:        params.GasLimit,
 		GasUsed:         params.GasUsed,
@@ -497,14 +497,14 @@ func executableDataToBlock(params engine.ExecutableData) (*zondTypes.Block, erro
 		Random:          params.Random,
 		WithdrawalsHash: withdrawalsRoot,
 	}
-	block := zondTypes.NewBlockWithHeader(header).WithBody(zondTypes.Body{Transactions: txs, Withdrawals: params.Withdrawals})
+	block := gzondtypes.NewBlockWithHeader(header).WithBody(gzondtypes.Body{Transactions: txs, Withdrawals: params.Withdrawals})
 	return block, nil
 }
 
-func decodeTransactions(enc [][]byte) ([]*zondTypes.Transaction, error) {
-	var txs = make([]*zondTypes.Transaction, len(enc))
+func decodeTransactions(enc [][]byte) ([]*gzondtypes.Transaction, error) {
+	var txs = make([]*gzondtypes.Transaction, len(enc))
 	for i, encTx := range enc {
-		var tx zondTypes.Transaction
+		var tx gzondtypes.Transaction
 		if err := tx.UnmarshalBinary(encTx); err != nil {
 			return nil, fmt.Errorf("invalid transaction %d: %v", i, err)
 		}

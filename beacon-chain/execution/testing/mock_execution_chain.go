@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/go-zond/accounts/abi/bind/backends"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
-	zondTypes "github.com/theQRL/go-zond/core/types"
+	gzondtypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/qrysm/v4/async/event"
 	"github.com/theQRL/qrysm/v4/beacon-chain/execution/types"
@@ -166,7 +166,7 @@ func (r *RPCClient) CallContext(ctx context.Context, obj interface{}, methodName
 		return nil
 	}
 	if r.Backend == nil && methodName == "zond_getBlockByNumber" {
-		h := &zondTypes.Header{
+		h := &gzondtypes.Header{
 			Number: big.NewInt(15),
 			Time:   150,
 		}

@@ -15,7 +15,7 @@ import (
 	zond "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
-	zondtypes "github.com/theQRL/go-zond/core/types"
+	gzondtypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/go-zond/rpc"
 	zondRPC "github.com/theQRL/go-zond/rpc"
 	mocks "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
@@ -434,13 +434,13 @@ func TestReconstructFullBlock(t *testing.T) {
 		jsonPayload := make(map[string]interface{})
 
 		to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-		tx := zondtypes.NewTx(&zondtypes.DynamicFeeTx{
+		tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 			Nonce: 0,
 			To:    &to,
 			Value: big.NewInt(0),
 			Data:  nil,
 		})
-		txs := []*zondtypes.Transaction{tx}
+		txs := []*gzondtypes.Transaction{tx}
 		encodedBinaryTxs := make([][]byte, 1)
 		var err error
 		encodedBinaryTxs[0], err = txs[0].MarshalBinary()
@@ -456,7 +456,7 @@ func TestReconstructFullBlock(t *testing.T) {
 		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
 		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
 		jsonPayload["receiptsRoot"] = common.BytesToHash([]byte("receipts"))
-		jsonPayload["logsBloom"] = zondtypes.BytesToBloom([]byte("bloom"))
+		jsonPayload["logsBloom"] = gzondtypes.BytesToBloom([]byte("bloom"))
 		jsonPayload["gasLimit"] = hexutil.EncodeUint64(1)
 		jsonPayload["gasUsed"] = hexutil.EncodeUint64(2)
 		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
@@ -464,7 +464,7 @@ func TestReconstructFullBlock(t *testing.T) {
 		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
-		jsonPayload["withdrawals"] = []*zondtypes.Withdrawal{}
+		jsonPayload["withdrawals"] = []*gzondtypes.Withdrawal{}
 
 		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
 		require.NoError(t, err)
@@ -530,13 +530,13 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		jsonPayload := make(map[string]interface{})
 
 		to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-		tx := zondtypes.NewTx(&zondtypes.DynamicFeeTx{
+		tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 			Nonce: 0,
 			To:    &to,
 			Value: big.NewInt(0),
 			Data:  nil,
 		})
-		txs := []*zondtypes.Transaction{tx}
+		txs := []*gzondtypes.Transaction{tx}
 		encodedBinaryTxs := make([][]byte, 1)
 		var err error
 		encodedBinaryTxs[0], err = txs[0].MarshalBinary()
@@ -551,7 +551,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		jsonPayload["stateRoot"] = common.BytesToHash([]byte("state"))
 		jsonPayload["transactionsRoot"] = common.BytesToHash([]byte("txs"))
 		jsonPayload["receiptsRoot"] = common.BytesToHash([]byte("receipts"))
-		jsonPayload["logsBloom"] = zondtypes.BytesToBloom([]byte("bloom"))
+		jsonPayload["logsBloom"] = gzondtypes.BytesToBloom([]byte("bloom"))
 		jsonPayload["gasLimit"] = hexutil.EncodeUint64(1)
 		jsonPayload["gasUsed"] = hexutil.EncodeUint64(2)
 		jsonPayload["timestamp"] = hexutil.EncodeUint64(3)
@@ -559,7 +559,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 		jsonPayload["extraData"] = common.BytesToHash([]byte("extra"))
 		jsonPayload["size"] = encodedNum
 		jsonPayload["baseFeePerGas"] = encodedNum
-		jsonPayload["withdrawals"] = []*zondtypes.Withdrawal{}
+		jsonPayload["withdrawals"] = []*gzondtypes.Withdrawal{}
 
 		wrappedPayload, err := blocks.WrappedExecutionPayloadCapella(payload, 0)
 		require.NoError(t, err)
@@ -797,13 +797,13 @@ func fixtures() map[string]interface{} {
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	executionBlock := &pb.ExecutionBlock{
 		Version: version.Capella,
-		Header: zondtypes.Header{
+		Header: gzondtypes.Header{
 			ParentHash:  common.BytesToHash(parent),
 			Coinbase:    common.BytesToAddress(miner),
 			Root:        common.BytesToHash(stateRoot),
 			TxHash:      common.BytesToHash(transactionsRoot),
 			ReceiptHash: common.BytesToHash(receiptsRoot),
-			Bloom:       zondtypes.BytesToBloom(logsBloom),
+			Bloom:       gzondtypes.BytesToBloom(logsBloom),
 			Number:      big.NewInt(2),
 			GasLimit:    3,
 			GasUsed:     4,

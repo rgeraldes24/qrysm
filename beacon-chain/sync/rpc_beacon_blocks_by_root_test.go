@@ -12,7 +12,6 @@ import (
 	gcache "github.com/patrickmn/go-cache"
 	"github.com/theQRL/go-zond/common"
 	gzondTypes "github.com/theQRL/go-zond/core/types"
-	zondTypes "github.com/theQRL/go-zond/core/types"
 	mock "github.com/theQRL/qrysm/v4/beacon-chain/blockchain/testing"
 	db "github.com/theQRL/qrysm/v4/beacon-chain/db/testing"
 	mockExecution "github.com/theQRL/qrysm/v4/beacon-chain/execution/testing"
@@ -47,7 +46,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks(t *testing.T) {
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+	tx := gzondTypes.NewTx(&gzondTypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
@@ -143,7 +142,7 @@ func TestRecentBeaconBlocksRPCHandler_ReturnsBlocks_ReconstructsPayload(t *testi
 	receiptsRoot := bytesutil.PadTo([]byte("receiptsRoot"), fieldparams.RootLength)
 	logsBloom := bytesutil.PadTo([]byte("logs"), fieldparams.LogsBloomLength)
 	to := common.HexToAddress("095e7baea6a6c7c4c2dfeb977efac326af552d87")
-	tx := zondTypes.NewTx(&zondTypes.DynamicFeeTx{
+	tx := gzondTypes.NewTx(&gzondTypes.DynamicFeeTx{
 		Nonce:     0,
 		To:        &to,
 		Value:     big.NewInt(0),
