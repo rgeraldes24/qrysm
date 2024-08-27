@@ -1751,8 +1751,8 @@ def qrysm_deps():
         importpath = "github.com/grpc-ecosystem/grpc-gateway/v2",
         replace = "github.com/rgeraldes24/grpc-gateway/v2",
         repo_mapping = {"@go_googleapis": "@googleapis"},
-        sum = "h1:hYWoTF0G//Jd1BG75WdO93mdzvch2L8r6FYe7ZPq5Eg=",
-        version = "v2.0.0-20240312105758-7a0b890ded11",
+        sum = "h1:yNQlamaNqD9YmBG3q6MpnF0LuYTzoqkHDraL5PX1AIM=",
+        version = "v2.0.0-20240827090357-c5e344dc174c",
     )
 
     go_repository(
@@ -5845,6 +5845,12 @@ def go_dependencies():
         importpath = "github.com/rgeraldes24/goevmlab",
         sum = "h1:3YzQ0V7kLCXEd6katIKPyHEXJW4d1EmfdiycZfRU3OM=",
         version = "v0.0.0-20240814164028-e72145bd7218",
+    )
+    go_repository(
+        name = "com_github_rgeraldes24_grpc_gateway_v2",
+        importpath = "github.com/rgeraldes24/grpc-gateway/v2",
+        sum = "h1:yNQlamaNqD9YmBG3q6MpnF0LuYTzoqkHDraL5PX1AIM=",
+        version = "v2.0.0-20240827090357-c5e344dc174c",
     )
 
     go_repository(

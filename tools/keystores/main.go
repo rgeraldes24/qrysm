@@ -17,10 +17,10 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
 	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
-	"github.com/theQRL/qrysm/v4/crypto/dilithium"
-	"github.com/theQRL/qrysm/v4/io/file"
-	"github.com/theQRL/qrysm/v4/io/prompt"
-	"github.com/theQRL/qrysm/v4/validator/keymanager"
+	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/io/file"
+	"github.com/theQRL/qrysm/io/prompt"
+	"github.com/theQRL/qrysm/validator/keymanager"
 	"github.com/urfave/cli/v2"
 )
 

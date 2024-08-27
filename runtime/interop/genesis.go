@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/go-zond/core"
 	"github.com/theQRL/go-zond/params"
-	clparams "github.com/theQRL/qrysm/v4/config/params"
+	clparams "github.com/theQRL/qrysm/config/params"
 )
 
 // defaultMinerAddress is used to send deposits and test transactions in the e2e test.

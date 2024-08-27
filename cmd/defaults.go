@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/theQRL/qrysm/v4/io/file"
+	"github.com/theQRL/qrysm/io/file"
 )
 
 // DefaultDataDir is the default data directory to use for the databases and other

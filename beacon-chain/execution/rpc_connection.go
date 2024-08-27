@@ -10,11 +10,11 @@ import (
 	"github.com/pkg/errors"
 	zondRPC "github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/go-zond/zondclient"
-	"github.com/theQRL/qrysm/v4/config/params"
-	contracts "github.com/theQRL/qrysm/v4/contracts/deposit"
-	"github.com/theQRL/qrysm/v4/io/logs"
-	"github.com/theQRL/qrysm/v4/network"
-	"github.com/theQRL/qrysm/v4/network/authorization"
+	"github.com/theQRL/qrysm/config/params"
+	contracts "github.com/theQRL/qrysm/contracts/deposit"
+	"github.com/theQRL/qrysm/io/logs"
+	"github.com/theQRL/qrysm/network"
+	"github.com/theQRL/qrysm/network/authorization"
 )
 
 func (s *Service) setupExecutionClientConnections(ctx context.Context, currEndpoint network.Endpoint) error {

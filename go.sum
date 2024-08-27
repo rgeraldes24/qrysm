@@ -906,8 +906,8 @@ github.com/rgeraldes24/go-zond v0.0.0-20240826151421-4bc3f6ac4ddf h1:VoN7xVDYwDP
 github.com/rgeraldes24/go-zond v0.0.0-20240826151421-4bc3f6ac4ddf/go.mod h1:N8aSiLnp1znLhurd3uf0j2tNFG8KgkKBWcTuEUS98n4=
 github.com/rgeraldes24/goevmlab v0.0.0-20240814164028-e72145bd7218 h1:3YzQ0V7kLCXEd6katIKPyHEXJW4d1EmfdiycZfRU3OM=
 github.com/rgeraldes24/goevmlab v0.0.0-20240814164028-e72145bd7218/go.mod h1:6LvhbNK80JDku+7sovmVx4dDAUNVXpQ8eohHlHMYBsE=
-github.com/rgeraldes24/grpc-gateway/v2 v2.0.0-20240312105758-7a0b890ded11 h1:hYWoTF0G//Jd1BG75WdO93mdzvch2L8r6FYe7ZPq5Eg=
-github.com/rgeraldes24/grpc-gateway/v2 v2.0.0-20240312105758-7a0b890ded11/go.mod h1:WcZYCAhI9m1Iyj8Qw/i6Ntt7pSkyK+Z+h9e+euPrFrw=
+github.com/rgeraldes24/grpc-gateway/v2 v2.0.0-20240827090357-c5e344dc174c h1:yNQlamaNqD9YmBG3q6MpnF0LuYTzoqkHDraL5PX1AIM=
+github.com/rgeraldes24/grpc-gateway/v2 v2.0.0-20240827090357-c5e344dc174c/go.mod h1:WcZYCAhI9m1Iyj8Qw/i6Ntt7pSkyK+Z+h9e+euPrFrw=
 github.com/rgeraldes24/tx-fuzz v0.0.0-20240815074056-31ca2bb2b6b2 h1:5yYoxmZm/c5ATXq3lyO3fNxvWvOxz52/lI/YGWbILTU=
 github.com/rgeraldes24/tx-fuzz v0.0.0-20240815074056-31ca2bb2b6b2/go.mod h1:1OFFMFmnz50c0mEa/g8c3uQ3VfGGT5BlrNm6JEoWZ3w=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=

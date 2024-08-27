@@ -16,11 +16,11 @@ import (
 	"github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/go-zond/zondclient"
-	"github.com/theQRL/qrysm/v4/config/params"
-	"github.com/theQRL/qrysm/v4/crypto/keystore"
-	"github.com/theQRL/qrysm/v4/crypto/rand"
-	"github.com/theQRL/qrysm/v4/encoding/bytesutil"
-	e2e "github.com/theQRL/qrysm/v4/testing/endtoend/params"
+	"github.com/theQRL/qrysm/config/params"
+	"github.com/theQRL/qrysm/crypto/keystore"
+	"github.com/theQRL/qrysm/crypto/rand"
+	"github.com/theQRL/qrysm/encoding/bytesutil"
+	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	"golang.org/x/sync/errgroup"
 )
 

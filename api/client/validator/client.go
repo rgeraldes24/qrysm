@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/v4/api/client"
-	"github.com/theQRL/qrysm/v4/validator/rpc/apimiddleware"
+	"github.com/theQRL/qrysm/api/client"
+	"github.com/theQRL/qrysm/validator/rpc/apimiddleware"
 )
 
 const (

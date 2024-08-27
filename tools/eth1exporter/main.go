@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/params"
 	"github.com/theQRL/go-zond/zondclient"
-	_ "github.com/theQRL/qrysm/v4/runtime/maxprocs"
+	_ "github.com/theQRL/qrysm/runtime/maxprocs"
 )
 
 var (
