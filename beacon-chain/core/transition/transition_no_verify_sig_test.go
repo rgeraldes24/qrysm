@@ -126,7 +126,7 @@ func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *test
 	require.ErrorContains(t, "could not validate state root", err)
 }
 
-// TODO(rgeraldes24): fix unit test: the createFullCapellaBlockWithOperations func works in a different way
+// TODO(now.youtrack.cloud/issue/TQ-18): the createFullCapellaBlockWithOperations func works in a different way
 // for the block slot. We need to emulate the old version.
 /*
 func TestProcessBlockNoVerify_PassesProcessingConditions(t *testing.T) {
@@ -187,7 +187,7 @@ func TestProcessOperationsNoVerifyAttsSigsCapella_OK(t *testing.T) {
 	require.NoError(t, err)
 }
 
-// TODO(rgeraldes24): fix unit test
+// TODO(now.youtrack.cloud/issue/TQ-18)
 /*
 func TestCalculateStateRootAltair_OK(t *testing.T) {
 	beaconState, block := createFullCapellaBlockWithOperations(t)

@@ -713,7 +713,7 @@ func TestBlocksQueue_onReadyToSendEvent(t *testing.T) {
 	})
 }
 
-// TODO(rgeraldes24): fix unit test: the current value of block batch limit(64) causes some of the problems
+// TODO(now.youtrack.cloud/issue/TQ-18): the current value of block batch limit(64) causes some of the problems
 /*
 func TestBlocksQueue_onProcessSkippedEvent(t *testing.T) {
 	blockBatchLimit := flags.Get().BlockBatchLimit
@@ -1049,7 +1049,7 @@ func TestBlocksQueue_onCheckStaleEvent(t *testing.T) {
 	})
 }
 
-// TODO(rgeraldes24): fix unit test
+// TODO(now.youtrack.cloud/issue/TQ-18)
 /*
 func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
