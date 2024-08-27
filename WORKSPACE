@@ -331,7 +331,7 @@ http_archive(
 #     url = "https://github.com/ethereum/consensus-specs/archive/refs/tags/%s.tar.gz" % consensus_spec_version,
 # )
 
-# TODO(theQRL/qrysm/issues/78)
+# TODO(now.youtrack.cloud/issue/TQ-17)
 #http_archive(
 #    name = "zond_networks",
 #    build_file_content = """

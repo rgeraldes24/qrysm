@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	// TODO(theQRL/qrysm/issues/81)
+	// TODO(now.youtrack.cloud/issue/TQ-11)
 	//go:embed mainnet.ssz.snappy
 	mainnetRawSSZCompressed []byte
 )

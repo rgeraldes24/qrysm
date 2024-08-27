@@ -41,7 +41,7 @@ import (
 	"github.com/theQRL/qrysm/v4/time/slots"
 )
 
-// TODO(theQRL/qrysm/issues/82)
+// TODO(now.youtrack.cloud/issue/TQ-14)
 func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 	database := testingdb.SetupDB(t)
 	headRoot, keys := fillUpBlocksAndState(context.Background(), t, database)

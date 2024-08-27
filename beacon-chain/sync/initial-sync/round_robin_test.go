@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/util"
 )
 
-// TODO(theQRL/qrysm/issues/76)
+// TODO(now.youtrack.cloud/issue/TQ-15)
 /*
 func TestService_roundRobinSync(t *testing.T) {
 	currentPeriod := blockLimiterPeriod
@@ -499,7 +499,7 @@ func TestService_processBlockBatch(t *testing.T) {
 	})
 }
 
-// TODO(theQRL/qrysm/issues/76)
+// TODO(now.youtrack.cloud/issue/TQ-15)
 /*
 func TestService_blockProviderScoring(t *testing.T) {
 	currentPeriod := blockLimiterPeriod

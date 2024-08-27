@@ -316,7 +316,7 @@ func TestValidateAggregateAndProof_CanValidate(t *testing.T) {
 	aggBits.SetBitAt(0, true)
 	att := &zondpb.Attestation{
 		Data: &zondpb.AttestationData{
-			// TODO(theQRL/qrysm/issues/80)
+			// TODO(now.youtrack.cloud/issue/TQ-12)
 			// Slot:            1,
 			Slot:            96,
 			BeaconBlockRoot: root[:],
