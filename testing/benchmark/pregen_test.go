@@ -1,6 +1,6 @@
 package benchmark
 
-// TODO(theQRL/qrysm/issues/77)
+// TODO(now.youtrack.cloud/issue/TQ-8)
 /*
 import (
 	"testing"

@@ -178,7 +178,7 @@ func encrypt(cliCtx *cli.Context) error {
 	if len(privateKeyString) > 2 && strings.Contains(privateKeyString, "0x") {
 		privateKeyString = privateKeyString[2:] // Strip the 0x prefix, if any.
 	}
-	// TODO(theQRL/qrysm/issues/75)
+	// TODO(now.youtrack.cloud/issue/TQ-7)
 	bytesValue, err := hex.DecodeString(privateKeyString)
 	if err != nil {
 		return errors.Wrapf(err, "could not decode as hex string: %s", privateKeyString)

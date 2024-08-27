@@ -205,7 +205,7 @@ func FilterExitAccountsFromUserInput(
 	promptHeader := au.Red("===============IMPORTANT===============")
 	promptDescription := "Please navigate to the following website and make sure you understand the current implications " +
 		"of a voluntary exit before making the final decision:"
-	// TODO(theQRL/qrysm/issues/57)
+	// TODO(now.youtrack.cloud/issue/TQ-6)
 	// TODO(now.youtrack.cloud/issue/TQ-1)
 	promptURL := au.Blue("https://docs.prylabs.network/docs/wallet/exiting-a-validator")
 	promptQuestion := "If you still want to continue with the voluntary exit, please input a phrase found at the above URL"

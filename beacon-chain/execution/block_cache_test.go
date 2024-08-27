@@ -43,7 +43,7 @@ func TestHeightKeyFn_InvalidObj(t *testing.T) {
 }
 
 func TestBlockCache_byHash(t *testing.T) {
-	// TODO(theQRL/qrysm/issues/66)
+	// TODO(now.youtrack.cloud/issue/TQ-5)
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
 	conf.Eth1FollowDistance = 2048

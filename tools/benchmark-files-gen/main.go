@@ -1,6 +1,6 @@
 package main
 
-// TODO(theQRL/qrysm/issues/75)
+// TODO(now.youtrack.cloud/issue/TQ-7)
 /*
 import (
 	"context"

@@ -76,7 +76,7 @@ func TestLatestMainchainInfo_OK(t *testing.T) {
 }
 
 func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
-	// TODO(theQRL/qrysm/issues/66)
+	// TODO(now.youtrack.cloud/issue/TQ-5)
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
 	conf.Eth1FollowDistance = 2048
@@ -137,7 +137,7 @@ func TestBlockHashByHeight_ReturnsError_WhenNoEth1Client(t *testing.T) {
 }
 
 func TestBlockExists_ValidHash(t *testing.T) {
-	// TODO(theQRL/qrysm/issues/66)
+	// TODO(now.youtrack.cloud/issue/TQ-5)
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
 	conf.Eth1FollowDistance = 2048
@@ -195,7 +195,7 @@ func TestBlockExists_InvalidHash(t *testing.T) {
 }
 
 func TestBlockExists_UsesCachedBlockInfo(t *testing.T) {
-	// TODO(theQRL/qrysm/issues/66)
+	// TODO(now.youtrack.cloud/issue/TQ-5)
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
 	conf.Eth1FollowDistance = 2048

@@ -117,7 +117,7 @@ func TestGenerateFullBlock_ValidAttesterSlashings(t *testing.T) {
 	}
 }
 
-// TODO(theQRL/qrysm/issues/75)
+// TODO(now.youtrack.cloud/issue/TQ-7)
 /*
 func TestGenerateFullBlock_ValidAttestations(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
