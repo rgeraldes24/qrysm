@@ -1,8 +1,8 @@
 module github.com/theQRL/qrysm/v4
 
-go 1.21
+go 1.22
 
-toolchain go1.21.6
+toolchain go1.22.4
 
 require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
@@ -256,4 +256,4 @@ replace github.com/json-iterator/go => github.com/prestonvanloon/go v1.1.7-0.201
 // See https://github.com/prysmaticlabs/grpc-gateway/issues/2
 replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/rgeraldes24/grpc-gateway/v2 v2.0.0-20240312105758-7a0b890ded11
 
-replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20240815153524-0f1e7428c433
+replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20240826151421-4bc3f6ac4ddf

@@ -5803,6 +5803,13 @@ def go_dependencies():
         version = "v2.2.1",
     )
     go_repository(
+        name = "com_github_pion_transport_v3",
+        importpath = "github.com/pion/transport/v3",
+        sum = "h1:r+40RJR25S9w3jbA6/5uEPTzcdn7ncyU44RWCbHkLg4=",
+        version = "v3.0.2",
+    )
+
+    go_repository(
         name = "com_github_pion_turn_v2",
         importpath = "github.com/pion/turn/v2",
         sum = "h1:5wGHSgGhJhP/RpabkUb/T9PdsAjkGLS6toYz5HNzoSI=",
@@ -5846,6 +5853,12 @@ def go_dependencies():
         sum = "h1:5yYoxmZm/c5ATXq3lyO3fNxvWvOxz52/lI/YGWbILTU=",
         version = "v0.0.0-20240815074056-31ca2bb2b6b2",
     )
+    go_repository(
+        name = "com_github_sclevine_agouti",
+        importpath = "github.com/sclevine/agouti",
+        sum = "h1:8IBJS6PWz3uTlMP3YBIR5f+KAldcGuOeFkFbUWfBgK4=",
+        version = "v3.0.0+incompatible",
+    )
 
     go_repository(
         name = "com_github_theqrl_go_zond",
@@ -5858,8 +5871,8 @@ def go_dependencies():
             "//third_party:com_github_theqrl_go_zond_secp256k1.patch",
         ],
         replace = "github.com/rgeraldes24/go-zond",
-        sum = "h1:ykTDLL3681x+C3fLUZDt71PfFCPz3XWBioaIhlCoovI=",
-        version = "v0.0.0-20240815153524-0f1e7428c433",
+        sum = "h1:VoN7xVDYwDPJOL+f93Bh4gQFgjRE5xZx4rXqTS92i8Y=",
+        version = "v0.0.0-20240826151421-4bc3f6ac4ddf",
     )
     go_repository(
         name = "com_github_theqrl_go_zond_types",
@@ -5904,6 +5917,13 @@ def go_dependencies():
         sum = "h1:1Lc07Kr7qY4U2YPouBjpCLxpiyxIVoxqXgkXLknAOE8=",
         version = "v2.0.0",
     )
+    go_repository(
+        name = "org_golang_x_telemetry",
+        importpath = "golang.org/x/telemetry",
+        sum = "h1:IRJeR9r1pYWsHKTRe/IInb7lYvbBVIqOgsX/u0mbOWY=",
+        version = "v0.0.0-20240228155512-f48c80bd79b2",
+    )
+
     go_repository(
         name = "org_uber_go_mock",
         importpath = "go.uber.org/mock",
