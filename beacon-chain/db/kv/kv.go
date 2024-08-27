@@ -274,7 +274,7 @@ func (s *Store) setupBlockStorageType(ctx context.Context) error {
 	// If the user wants to save full execution payloads but their database is saving blinded blocks only,
 	// we then throw an error as the node should not start.
 	if saveFull && saveBlinded {
-		// TODO(theQRL/qrysm/issues/67)
+		// TODO(now.youtrack.cloud/issue/TQ-1)
 		return fmt.Errorf(
 			"cannot use the %s flag with this existing database, as it has already been initialized to only store "+
 				"execution payload headers (aka blinded beacon blocks). If you want to use this flag, you must re-sync your node with a fresh "+

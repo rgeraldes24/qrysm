@@ -277,7 +277,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 	})
 }
 
-// TODO(theQRL/qrysm/issues/70)
+// TODO(now.youtrack.cloud/issue/TQ-2)
 /*
 func TestServer_ImportKeystores_WrongKeymanagerKind(t *testing.T) {
 	ctx := context.Background()
@@ -512,7 +512,7 @@ func TestServer_DeleteKeystores_FailedSlashingProtectionExport(t *testing.T) {
 	)
 }
 
-// TODO(theQRL/qrysm/issues/70)
+// TODO(now.youtrack.cloud/issue/TQ-2)
 /*
 func TestServer_DeleteKeystores_WrongKeymanagerKind(t *testing.T) {
 	ctx := context.Background()

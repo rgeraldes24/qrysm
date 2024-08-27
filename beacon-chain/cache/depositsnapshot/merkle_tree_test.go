@@ -114,7 +114,7 @@ func Test_fromSnapshotParts(t *testing.T) {
 	}
 }
 
-// TODO(theQRL/qrysm/issues/69)
+// TODO(now.youtrack.cloud/issue/TQ-4)
 /*
 func Test_generateProof(t *testing.T) {
 	tests := []struct {

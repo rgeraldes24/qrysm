@@ -1,6 +1,6 @@
 package depositsnapshot
 
-// TODO(theQRL/qrysm/issues/69)
+// TODO(now.youtrack.cloud/issue/TQ-4)
 /*
 import (
 	"encoding/hex"

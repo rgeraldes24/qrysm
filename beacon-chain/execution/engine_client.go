@@ -567,7 +567,7 @@ func handleRPCError(err error) error {
 	}
 	e, ok := err.(zondRPC.Error)
 	if !ok {
-		// TODO(theQRL/qrysm/issues/67)
+		// TODO(now.youtrack.cloud/issue/TQ-1)
 		if strings.Contains(err.Error(), "401 Unauthorized") {
 			log.Error("HTTP authentication to your execution client is not working. Please ensure " +
 				"you are setting a correct value for the --jwt-secret flag in Qrysm, or use an IPC connection if on " +

@@ -1,6 +1,6 @@
 package client
 
-// NOTE(theQRL/qrysm/issues/69)
+// NOTE(now.youtrack.cloud/issue/TQ-4)
 /*
 import (
 	"bytes"

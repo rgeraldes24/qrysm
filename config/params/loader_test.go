@@ -160,7 +160,7 @@ func TestModifiedE2E(t *testing.T) {
 }
 
 func TestLoadConfigFile(t *testing.T) {
-	// NOTE(theQRL/qrysm/issues/69)
+	// NOTE(now.youtrack.cloud/issue/TQ-4)
 	/*
 		t.Run("mainnet", func(t *testing.T) {
 			mn := params.MainnetConfig().Copy()

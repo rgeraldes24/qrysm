@@ -536,7 +536,7 @@ func TestHandleEpochBoundary_UpdateFirstSlot(t *testing.T) {
 	require.NoError(t, service.handleEpochBoundary(ctx, s.Slot(), s, []byte{}))
 }
 
-// TODO(theQRL/qrysm/issues/79)
+// TODO(now.youtrack.cloud/issue/TQ-3)
 func TestOnBlock_CanFinalize_WithOnTick(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx, fcs := tr.ctx, tr.fcs
@@ -588,7 +588,7 @@ func TestOnBlock_CanFinalize_WithOnTick(t *testing.T) {
 	require.Equal(t, f.Epoch, cp.Epoch)
 }
 
-// TODO(theQRL/qrysm/issues/79)
+// TODO(now.youtrack.cloud/issue/TQ-3)
 func TestOnBlock_CanFinalize(t *testing.T) {
 	service, tr := minimalTestService(t)
 	ctx := tr.ctx

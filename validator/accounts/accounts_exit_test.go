@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/v4/testing/require"
 )
 
-// TODO(theQRL/qrysm/issues/67): remove test below when ready
+// TODO(now.youtrack.cloud/issue/TQ-1): remove test below when ready
 /*
 func TestDisplayExitInfo(t *testing.T) {
 	logHook := test.NewGlobal()
