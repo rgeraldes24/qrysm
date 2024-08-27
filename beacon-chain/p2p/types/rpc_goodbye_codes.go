@@ -13,7 +13,7 @@ const (
 	GoodbyeCodeWrongNetwork
 	GoodbyeCodeGenericError
 
-	// TODO(theQRL/qrysm/issues/62)
+	// TODO(now.youtrack.cloud/issue/TQ-9)
 	// Teku specific codes
 	GoodbyeCodeUnableToVerifyNetwork = RPCGoodbyeCode(128)
 
