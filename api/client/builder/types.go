@@ -641,9 +641,9 @@ type DilithiumToExecutionChange struct {
 // MarshalJSON returns a JSON byte array representation of DilithiumToExecutionChange.
 func (ch *DilithiumToExecutionChange) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		ValidatorIndex      string        `json:"validator_index"`
-		FromDilithiumPubkey hexutil.Bytes `json:"from_dilithium_pubkey"`
-		ToExecutionAddress  hexutil.Bytes `json:"to_execution_address"`
+		ValidatorIndex      string               `json:"validator_index"`
+		FromDilithiumPubkey hexutil.Bytes        `json:"from_dilithium_pubkey"`
+		ToExecutionAddress  hexutil.AddressBytes `json:"to_execution_address"`
 	}{
 		ValidatorIndex:      fmt.Sprintf("%d", ch.ValidatorIndex),
 		FromDilithiumPubkey: ch.FromDilithiumPubkey,

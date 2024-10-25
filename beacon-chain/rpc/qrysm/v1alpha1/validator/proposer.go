@@ -268,7 +268,7 @@ func (vs *Server) PrepareBeaconProposer(
 	}
 
 	for _, recipientContainer := range newRecipients {
-		recipient := hexutil.Encode(recipientContainer.FeeRecipient)
+		recipient := hexutil.EncodeAddress(recipientContainer.FeeRecipient)
 		if !common.IsHexAddress(recipient) {
 			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("Invalid fee recipient address: %v", recipient))
 		}

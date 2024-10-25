@@ -45,12 +45,12 @@ func Test_Proposer_Setting_Cloning(t *testing.T) {
 		require.DeepEqual(t, settings, clone)
 		option, ok := settings.ProposeConfig[bytesutil.ToBytes2592(key1)]
 		require.Equal(t, true, ok)
-		newFeeRecipient := "0x44455530FCE8a85ec7055A5F8b2bE214B3DaeFd3"
+		newFeeRecipient := "Z44455530FCE8a85ec7055A5F8b2bE214B3DaeFd3"
 		option.FeeRecipientConfig.FeeRecipient = common.HexToAddress(newFeeRecipient)
 		coption, k := clone.ProposeConfig[bytesutil.ToBytes2592(key1)]
 		require.Equal(t, true, k)
 		require.NotEqual(t, option.FeeRecipientConfig.FeeRecipient.Hex(), coption.FeeRecipientConfig.FeeRecipient.Hex())
-		require.Equal(t, "0x50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3", coption.FeeRecipientConfig.FeeRecipient.Hex())
+		require.Equal(t, "Z50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3", coption.FeeRecipientConfig.FeeRecipient.Hex())
 	})
 	t.Run("Happy Path Cloning Builder config", func(t *testing.T) {
 		clone := settings.DefaultConfig.BuilderConfig.Clone()

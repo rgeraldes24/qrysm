@@ -156,6 +156,19 @@ func DecodeHexWithLength(s string, length int) ([]byte, error) {
 	return bytes, nil
 }
 
+// DecodeAddressHexWithLength takes a string and a length in bytes,
+// and validates whether the string is a hex and has the correct length.
+func DecodeAddressHexWithLength(s string, length int) ([]byte, error) {
+	bytes, err := hexutil.DecodeAddress(s)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("%s is not a valid hex", s))
+	}
+	if len(bytes) != length {
+		return nil, fmt.Errorf("%s is not length %d bytes", s, length)
+	}
+	return bytes, nil
+}
+
 // DecodeHexWithMaxLength takes a string and a length in bytes,
 // and validates whether the string is a hex and has the correct length.
 func DecodeHexWithMaxLength(s string, maxLength int) ([]byte, error) {

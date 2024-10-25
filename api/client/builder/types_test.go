@@ -156,7 +156,7 @@ func TestExecutionHeaderResponseCapellaUnmarshal(t *testing.T) {
 		},
 		{
 			expected: "Zabcf8e0d4e9587369b2301d0790347320302cc09",
-			actual:   hexutil.Encode(hr.Data.Message.Header.FeeRecipient),
+			actual:   hexutil.EncodeAddress(hr.Data.Message.Header.FeeRecipient),
 			name:     "ExecHeaderResponse.ExecutionPayloadHeader.FeeRecipient",
 		},
 		{
@@ -365,8 +365,8 @@ func TestExecutionPayloadResponseCapellaUnmarshal(t *testing.T) {
 			name:     "ExecPayloadResponse.ExecutionPayload.ParentHash",
 		},
 		{
-			expected: "0xabcf8e0d4e9587369b2301d0790347320302cc09",
-			actual:   hexutil.Encode(epr.Data.FeeRecipient),
+			expected: "Zabcf8e0d4e9587369b2301d0790347320302cc09",
+			actual:   hexutil.EncodeAddress(epr.Data.FeeRecipient),
 			name:     "ExecPayloadResponse.ExecutionPayload.FeeRecipient",
 		},
 		{

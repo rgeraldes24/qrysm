@@ -2439,7 +2439,7 @@ func TestPrepareBeaconProposer(t *testing.T) {
 				require.NoError(t, err)
 				address, err := server.BeaconDB.FeeRecipientByValidatorID(ctx, 1)
 				require.NoError(t, err)
-				feebytes, err := hexutil.Decode(tt.request[0].FeeRecipient)
+				feebytes, err := hexutil.DecodeAddress(tt.request[0].FeeRecipient)
 				require.NoError(t, err)
 				require.Equal(t, common.BytesToAddress(feebytes), address)
 			}

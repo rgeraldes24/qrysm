@@ -405,7 +405,7 @@ func TestProposerSettings(t *testing.T) {
 				proposerSettingsFlagValues: &proposerSettingsFlag{
 					dir:        "",
 					url:        "",
-					defaultfee: "0x6e35733c5af9B61374A128e6F85f553aF09ff89A",
+					defaultfee: "Z6e35733c5af9B61374A128e6F85f553aF09ff89A",
 				},
 			},
 			want: func() *validatorserviceconfig.ProposerSettings {
@@ -426,7 +426,7 @@ func TestProposerSettings(t *testing.T) {
 				proposerSettingsFlagValues: &proposerSettingsFlag{
 					dir:        "",
 					url:        "",
-					defaultfee: "0x6e35733c5af9B61374A128e6F85f553aF09ff89A",
+					defaultfee: "Z6e35733c5af9B61374A128e6F85f553aF09ff89A",
 				},
 			},
 			want: func() *validatorserviceconfig.ProposerSettings {
@@ -452,7 +452,7 @@ func TestProposerSettings(t *testing.T) {
 				proposerSettingsFlagValues: &proposerSettingsFlag{
 					dir:        "",
 					url:        "",
-					defaultfee: "0x6e35733c5af9B61374A128e6F85f553aF09ff89A",
+					defaultfee: "Z6e35733c5af9B61374A128e6F85f553aF09ff89A",
 					defaultgas: "50000000",
 				},
 			},
@@ -479,7 +479,7 @@ func TestProposerSettings(t *testing.T) {
 				proposerSettingsFlagValues: &proposerSettingsFlag{
 					dir:        "./testdata/good-prepare-beacon-proposer-config.json",
 					url:        "",
-					defaultfee: "0x6e35733c5af9B61374A128e6F85f553aF09ff89B",
+					defaultfee: "Z6e35733c5af9B61374A128e6F85f553aF09ff89B",
 				},
 			},
 			want: func() *validatorserviceconfig.ProposerSettings {
@@ -508,7 +508,7 @@ func TestProposerSettings(t *testing.T) {
 				proposerSettingsFlagValues: &proposerSettingsFlag{
 					dir:        "./testdata/good-prepare-beacon-proposer-config.json",
 					url:        "",
-					defaultfee: "0x6e35733c5af9B61374A128e6F85f553aF09ff89B",
+					defaultfee: "Z6e35733c5af9B61374A128e6F85f553aF09ff89B",
 				},
 			},
 			want: func() *validatorserviceconfig.ProposerSettings {
