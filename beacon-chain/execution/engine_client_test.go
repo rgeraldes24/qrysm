@@ -1239,10 +1239,8 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					// TODO(rgeraldes24): fix
-					// Address:        hexutil.MustDecode("0xcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Address: hexutil.MustDecode("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Amount:  1,
+					Address:        hexutil.MustDecodeAddress("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Amount:         1,
 				}},
 			}
 
@@ -1282,10 +1280,8 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					// TODO(rgeraldes24): fix
-					// Address:        hexutil.MustDecode("0xcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Address: hexutil.MustDecode("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Amount:  1,
+					Address:        hexutil.MustDecodeAddress("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Amount:         1,
 				}},
 			}
 
@@ -1325,10 +1321,8 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					// TODO(rgeraldes24): fix
-					// Address:        hexutil.MustDecode("0xcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Address: hexutil.MustDecode("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Amount:  1,
+					Address:        hexutil.MustDecodeAddress("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Amount:         1,
 				}},
 			}
 			executionPayloadBodies[1] = &pb.ExecutionPayloadBodyV1{
@@ -1336,10 +1330,8 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          2,
 					ValidatorIndex: 1,
-					// TODO(rgeraldes24): fix
-					// Address:        hexutil.MustDecode("0xcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Address: hexutil.MustDecode("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Amount:  1,
+					Address:        hexutil.MustDecodeAddress("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Amount:         1,
 				}},
 			}
 
@@ -1498,10 +1490,8 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					// TODO(rgeraldes24): fix
-					// Address:        hexutil.MustDecode("0xcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Address: hexutil.MustDecode("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Amount:  1,
+					Address:        hexutil.MustDecodeAddress("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Amount:         1,
 				}},
 			}
 
@@ -1541,10 +1531,8 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					// TODO(rgeraldes24)
-					// Address:        hexutil.MustDecode("0xcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Address: hexutil.MustDecode("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Amount:  1,
+					Address:        hexutil.MustDecodeAddress("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Amount:         1,
 				}},
 			}
 
@@ -1584,10 +1572,8 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					// TODO(rgeraldes24): fix
-					// Address:        hexutil.MustDecode("0xcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Address: hexutil.MustDecode("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Amount:  1,
+					Address:        hexutil.MustDecodeAddress("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Amount:         1,
 				}},
 			}
 			executionPayloadBodies[1] = &pb.ExecutionPayloadBodyV1{
@@ -1595,10 +1581,8 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          2,
 					ValidatorIndex: 1,
-					// TODO(rgeraldes24): fix
-					// Address:        hexutil.MustDecode("0xcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Address: hexutil.MustDecode("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
-					Amount:  1,
+					Address:        hexutil.MustDecodeAddress("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Amount:         1,
 				}},
 			}
 

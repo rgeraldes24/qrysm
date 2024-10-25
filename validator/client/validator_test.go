@@ -1336,8 +1336,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 	client := validatormock.NewMockValidatorClient(ctrl)
 	nodeClient := validatormock.NewMockNodeClient(ctrl)
 	defaultFeeHex := "Z046Fb65722E7b2455043BFEBf6177F1D2e9738D9"
-	// TODO(rgeraldes24)
-	byteValueAddress, err := hexutil.Decode("Z046Fb65722E7b2455043BFEBf6177F1D2e9738D9")
+	byteValueAddress, err := hexutil.DecodeAddress("Z046Fb65722E7b2455043BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
 
 	type ExpectedValidatorRegistration struct {

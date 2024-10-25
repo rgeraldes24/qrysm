@@ -1085,7 +1085,6 @@ func (v *validator) buildPrepProposerReqs(ctx context.Context, pubkeys [][field_
 				FeeRecipient:   feeRecipient[:],
 			})
 
-			// TODO(rgeraldes24): fix
 			if hexutil.Encode(feeRecipient.Bytes()) == params.BeaconConfig().ZondBurnAddressHex {
 				log.WithFields(logrus.Fields{
 					"validatorIndex": validatorIndex,
@@ -1164,7 +1163,6 @@ func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][field_par
 
 		signedValRegRegs = append(signedValRegRegs, signedReq)
 
-		// TODO(rgeraldes24): fix
 		if hexutil.Encode(feeRecipient.Bytes()) == params.BeaconConfig().ZondBurnAddressHex {
 			log.WithFields(logrus.Fields{
 				"pubkey":       fmt.Sprintf("%#x", req.Pubkey),

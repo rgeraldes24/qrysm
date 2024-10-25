@@ -104,9 +104,8 @@ func getProposerSettings(c *cli.Context, r io.Reader) error {
 	return nil
 }
 
-// TODO(rgeraldes24): fix
 func validateIsExecutionAddress(input string) error {
-	if !bytesutil.IsHex([]byte(input)) || !(len(input) == common.AddressLength*2+2) {
+	if !bytesutil.IsAddressHex([]byte(input)) || !(len(input) == common.AddressLength*2+1) {
 		return errors.New("no default address entered")
 	}
 	return nil
