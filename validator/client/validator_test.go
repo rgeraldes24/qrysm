@@ -1876,12 +1876,12 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				signedRegisterValidatorRequests, err := v.buildSignedRegReqs(ctx, pubkeys, km.Sign)
 				require.NoError(t, err)
 				for _, recipient := range feeRecipients {
-					require.Equal(t, strings.ToLower(tt.feeRecipientMap[recipient.ValidatorIndex]), strings.ToLower(hexutil.Encode(recipient.FeeRecipient)))
+					require.Equal(t, strings.ToLower(tt.feeRecipientMap[recipient.ValidatorIndex]), strings.ToLower(hexutil.EncodeAddress(recipient.FeeRecipient)))
 				}
 				require.Equal(t, len(tt.feeRecipientMap), len(feeRecipients))
 				for i, request := range tt.mockExpectedRequests {
 					require.Equal(t, tt.mockExpectedRequests[i].GasLimit, request.GasLimit)
-					require.Equal(t, hexutil.Encode(tt.mockExpectedRequests[i].FeeRecipient), hexutil.Encode(request.FeeRecipient))
+					require.Equal(t, hexutil.EncodeAddress(tt.mockExpectedRequests[i].FeeRecipient), hexutil.EncodeAddress(request.FeeRecipient))
 				}
 				// check if Pubkeys are always unique
 				var unique = make(map[string]bool)

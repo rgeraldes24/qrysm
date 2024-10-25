@@ -74,6 +74,7 @@ func processField(s interface{}, processors []fieldProcessor) error {
 	return nil
 }
 
+// TODO(rgeraldes24): fix
 func hexToBase64Processor(v reflect.Value) error {
 	if v.String() == "0x" {
 		v.SetString("")

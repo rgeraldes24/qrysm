@@ -590,7 +590,7 @@ func (s *Server) PrepareBeaconProposer(w http.ResponseWriter, r *http.Request) {
 		if !valid {
 			return
 		}
-		feeRecipientBytes, valid := shared.ValidateHex(w, "Fee Recipient", r.FeeRecipient, fieldparams.FeeRecipientLength)
+		feeRecipientBytes, valid := shared.ValidateHexZ(w, "Fee Recipient", r.FeeRecipient, fieldparams.FeeRecipientLength)
 		if !valid {
 			return
 		}

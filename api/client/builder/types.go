@@ -342,10 +342,10 @@ func (p *ExecutionPayloadCapella) ToProto() (*v1.ExecutionPayloadCapella, error)
 
 // Withdrawal is a field of ExecutionPayloadCapella.
 type Withdrawal struct {
-	Index          Uint256       `json:"index"`
-	ValidatorIndex Uint256       `json:"validator_index"`
-	Address        hexutil.Bytes `json:"address"`
-	Amount         Uint256       `json:"amount"`
+	Index          Uint256              `json:"index"`
+	ValidatorIndex Uint256              `json:"validator_index"`
+	Address        hexutil.AddressBytes `json:"address"`
+	Amount         Uint256              `json:"amount"`
 }
 
 // ProposerSlashing is a field in BlindedBeaconBlockBodyCapella.

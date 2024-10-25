@@ -82,7 +82,7 @@ func TestGetProposerSettings(t *testing.T) {
 	srv.Start()
 	defer srv.Close()
 	hook := logtest.NewGlobal()
-	defaultfeerecipient := "0xb698D697092822185bF0311052215d5B5e1F3944"
+	defaultfeerecipient := "Zb698D697092822185bF0311052215d5B5e1F3944"
 	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.VXjrSItV_Kmwg_XilpscyPm2SPIsstytYLtr_AuJI8I"
 	app := cli.App{}
 	set := flag.NewFlagSet("test", 0)

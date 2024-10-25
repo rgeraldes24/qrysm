@@ -249,7 +249,7 @@ func TestSubmitBlindedBlock(t *testing.T) {
 		require.Equal(t, 1, len(withdrawals))
 		assert.Equal(t, uint64(1), withdrawals[0].Index)
 		assert.Equal(t, types.ValidatorIndex(1), withdrawals[0].ValidatorIndex)
-		assert.DeepEqual(t, ezDecode(t, "Zcf8e0d4e9587369b2301d0790347320302cc0943"), withdrawals[0].Address)
+		assert.DeepEqual(t, ezDecodeAddress(t, "Zcf8e0d4e9587369b2301d0790347320302cc0943"), withdrawals[0].Address)
 		assert.Equal(t, uint64(1), withdrawals[0].Amount)
 	})
 	t.Run("mismatched versions, expected capella got other", func(t *testing.T) {
