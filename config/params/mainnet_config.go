@@ -99,7 +99,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Zond execution layer parameters.
 	DepositChainID:         1, // Chain ID of eth1 mainnet.
 	DepositNetworkID:       1, // Network ID of eth1 mainnet.
-	DepositContractAddress: "0x00000000219ab540356cBB839Cbe05303d7705Fa",
+	DepositContractAddress: "Z00000000219ab540356cBB839Cbe05303d7705Fa",
 
 	// Validator params.
 	RandomSubnetsPerValidator:         1 << 0,
@@ -207,8 +207,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Light client
 	MinSyncCommitteeParticipants: 1,
 
-	// Bellatrix
-	EthBurnAddressHex:      "0x0000000000000000000000000000000000000000",
+	ZondBurnAddressHex:     "Z0000000000000000000000000000000000000000",
 	DefaultBuilderGasLimit: uint64(30000000),
 
 	// Mevboost circuit breaker

@@ -81,10 +81,10 @@ func TestConfigureExecutionSetting(t *testing.T) {
 	set := flag.NewFlagSet("test", 0)
 	set.String(flags.SuggestedFeeRecipient.Name, "", "")
 
-	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "0xB"))
+	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "ZB"))
 	cliCtx := cli.NewContext(&app, set, nil)
 	err := configureExecutionSetting(cliCtx)
-	assert.LogsContain(t, hook, "0xB is not a valid fee recipient address")
+	assert.LogsContain(t, hook, "ZB is not a valid fee recipient address")
 	require.NoError(t, err)
 
 	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
@@ -96,11 +96,11 @@ func TestConfigureExecutionSetting(t *testing.T) {
 	assert.LogsContain(t, hook,
 		"is not a checksum Zond address",
 	)
-	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "0xaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa"))
+	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "ZaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa"))
 	cliCtx = cli.NewContext(&app, set, nil)
 	err = configureExecutionSetting(cliCtx)
 	require.NoError(t, err)
-	assert.Equal(t, common.HexToAddress("0xaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa"), params.BeaconConfig().DefaultFeeRecipient)
+	assert.Equal(t, common.HexToAddress("ZaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa"), params.BeaconConfig().DefaultFeeRecipient)
 }
 
 func TestConfigureNetwork(t *testing.T) {

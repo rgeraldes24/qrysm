@@ -228,7 +228,7 @@ func TestUpdateProposerSettingsAt_EpochStart(t *testing.T) {
 	err := v.SetProposerSettings(context.Background(), &validatorserviceconfig.ProposerSettings{
 		DefaultConfig: &validatorserviceconfig.ProposerOption{
 			FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-				FeeRecipient: common.HexToAddress("0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
+				FeeRecipient: common.HexToAddress("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
 			},
 		},
 	})
@@ -253,7 +253,7 @@ func TestUpdateProposerSettingsAt_EpochEndOk(t *testing.T) {
 	err := v.SetProposerSettings(context.Background(), &validatorserviceconfig.ProposerSettings{
 		DefaultConfig: &validatorserviceconfig.ProposerOption{
 			FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-				FeeRecipient: common.HexToAddress("0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
+				FeeRecipient: common.HexToAddress("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
 			},
 		},
 	})
@@ -282,7 +282,7 @@ func TestUpdateProposerSettings_ContinuesAfterValidatorRegistrationFails(t *test
 	err := v.SetProposerSettings(context.Background(), &validatorserviceconfig.ProposerSettings{
 		DefaultConfig: &validatorserviceconfig.ProposerOption{
 			FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-				FeeRecipient: common.HexToAddress("0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
+				FeeRecipient: common.HexToAddress("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
 			},
 		},
 	})

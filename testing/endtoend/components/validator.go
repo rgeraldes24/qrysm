@@ -28,7 +28,7 @@ import (
 	e2etypes "github.com/theQRL/qrysm/testing/endtoend/types"
 )
 
-const DefaultFeeRecipientAddress = "0x099FB65722e7b2455043bfebF6177f1D2E9738d9"
+const DefaultFeeRecipientAddress = "Z099FB65722e7b2455043bfebF6177f1D2E9738d9"
 
 var _ e2etypes.ComponentRunner = (*ValidatorNode)(nil)
 var _ e2etypes.ComponentRunner = (*ValidatorNodeSet)(nil)
@@ -378,6 +378,7 @@ func createProposerSettingsPath(pubkeys []string, nodeIdx int) (string, error) {
 	return configPath, nil
 }
 
+// TODO(rgeraldes24): fix
 // FeeRecipientFromPubkey slices, from the beginning of the hex-encoded pubkey string, the 2 character 0x preamble
 // plus enough hex chars to fill out the fee_recipient byte value.
 func FeeRecipientFromPubkey(key string) string {

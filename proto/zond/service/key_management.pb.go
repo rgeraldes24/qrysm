@@ -953,6 +953,7 @@ type GetFeeRecipientByPubkeyResponse_FeeRecipient struct {
 	unknownFields protoimpl.UnknownFields
 
 	Pubkey     []byte `protobuf:"bytes,1,opt,name=pubkey,proto3" json:"pubkey,omitempty"`
+	// TODO(rgeraldes24)
 	Ethaddress []byte `protobuf:"bytes,2,opt,name=ethaddress,proto3" json:"ethaddress,omitempty"`
 }
 

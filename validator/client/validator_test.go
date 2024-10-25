@@ -1335,8 +1335,9 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 	db := dbTest.SetupDB(t, [][field_params.DilithiumPubkeyLength]byte{})
 	client := validatormock.NewMockValidatorClient(ctrl)
 	nodeClient := validatormock.NewMockNodeClient(ctrl)
-	defaultFeeHex := "0x046Fb65722E7b2455043BFEBf6177F1D2e9738D9"
-	byteValueAddress, err := hexutil.Decode("0x046Fb65722E7b2455043BFEBf6177F1D2e9738D9")
+	defaultFeeHex := "Z046Fb65722E7b2455043BFEBf6177F1D2e9738D9"
+	// TODO(rgeraldes24)
+	byteValueAddress, err := hexutil.Decode("Z046Fb65722E7b2455043BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
 
 	type ExpectedValidatorRegistration struct {
@@ -1388,13 +1389,13 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					}, nil)
 				client.EXPECT().PrepareBeaconProposer(gomock.Any(), &zondpb.PrepareBeaconProposerRequest{
 					Recipients: []*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
-						{FeeRecipient: common.HexToAddress("0x055Fb65722E7b2455043BFEBf6177F1D2e9738D9").Bytes(), ValidatorIndex: 1},
+						{FeeRecipient: common.HexToAddress("Z055Fb65722E7b2455043BFEBf6177F1D2e9738D9").Bytes(), ValidatorIndex: 1},
 						{FeeRecipient: common.HexToAddress(defaultFeeHex).Bytes(), ValidatorIndex: 2},
 					},
 				}).Return(nil, nil)
 				config[keys[0]] = &validatorserviceconfig.ProposerOption{
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-						FeeRecipient: common.HexToAddress("0x055Fb65722E7b2455043BFEBf6177F1D2e9738D9"),
+						FeeRecipient: common.HexToAddress("Z055Fb65722E7b2455043BFEBf6177F1D2e9738D9"),
 					},
 					BuilderConfig: &validatorserviceconfig.BuilderConfig{
 						Enabled:  true,
@@ -1427,7 +1428,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 			mockExpectedRequests: []ExpectedValidatorRegistration{
 
 				{
-					FeeRecipient: common.HexToAddress("0x055Fb65722E7b2455043BFEBf6177F1D2e9738D9").Bytes(),
+					FeeRecipient: common.HexToAddress("Z055Fb65722E7b2455043BFEBf6177F1D2e9738D9").Bytes(),
 					GasLimit:     40000000,
 				},
 				{
@@ -1469,13 +1470,13 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					}, nil)
 				client.EXPECT().PrepareBeaconProposer(gomock.Any(), &zondpb.PrepareBeaconProposerRequest{
 					Recipients: []*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
-						{FeeRecipient: common.HexToAddress("0x055Fb65722E7b2455043BFEBf6177F1D2e9738D9").Bytes(), ValidatorIndex: 1},
+						{FeeRecipient: common.HexToAddress("Z055Fb65722E7b2455043BFEBf6177F1D2e9738D9").Bytes(), ValidatorIndex: 1},
 						{FeeRecipient: common.HexToAddress(defaultFeeHex).Bytes(), ValidatorIndex: 2},
 					},
 				}).Return(nil, nil)
 				config[keys[0]] = &validatorserviceconfig.ProposerOption{
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-						FeeRecipient: common.HexToAddress("0x055Fb65722E7b2455043BFEBf6177F1D2e9738D9"),
+						FeeRecipient: common.HexToAddress("Z055Fb65722E7b2455043BFEBf6177F1D2e9738D9"),
 					},
 					BuilderConfig: &validatorserviceconfig.BuilderConfig{
 						Enabled:  true,
@@ -1508,7 +1509,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 			mockExpectedRequests: []ExpectedValidatorRegistration{
 
 				{
-					FeeRecipient: common.HexToAddress("0x055Fb65722E7b2455043BFEBf6177F1D2e9738D9").Bytes(),
+					FeeRecipient: common.HexToAddress("Z055Fb65722E7b2455043BFEBf6177F1D2e9738D9").Bytes(),
 					GasLimit:     uint64(40000000),
 				},
 			},
@@ -1546,13 +1547,13 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					}, nil)
 				client.EXPECT().PrepareBeaconProposer(gomock.Any(), &zondpb.PrepareBeaconProposerRequest{
 					Recipients: []*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
-						{FeeRecipient: common.HexToAddress("0x055Fb65722E7b2455043BFEBf6177F1D2e9738D9").Bytes(), ValidatorIndex: 1},
+						{FeeRecipient: common.HexToAddress("Z055Fb65722E7b2455043BFEBf6177F1D2e9738D9").Bytes(), ValidatorIndex: 1},
 						{FeeRecipient: common.HexToAddress(defaultFeeHex).Bytes(), ValidatorIndex: 2},
 					},
 				}).Return(nil, nil)
 				config[keys[0]] = &validatorserviceconfig.ProposerOption{
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-						FeeRecipient: common.HexToAddress("0x055Fb65722E7b2455043BFEBf6177F1D2e9738D9"),
+						FeeRecipient: common.HexToAddress("Z055Fb65722E7b2455043BFEBf6177F1D2e9738D9"),
 					},
 				}
 				err = v.SetProposerSettings(context.Background(), &validatorserviceconfig.ProposerSettings{
@@ -1734,7 +1735,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					}, nil)
 				client.EXPECT().PrepareBeaconProposer(gomock.Any(), &zondpb.PrepareBeaconProposerRequest{
 					Recipients: []*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
-						{FeeRecipient: common.HexToAddress("0x0").Bytes(), ValidatorIndex: 1},
+						{FeeRecipient: common.HexToAddress("Z0").Bytes(), ValidatorIndex: 1},
 					},
 				}).Return(nil, nil)
 				config[keys[0]] = &validatorserviceconfig.ProposerOption{
@@ -1781,7 +1782,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				).Return(nil, errors.New("could not find validator index for public key"))
 				config[keys[0]] = &validatorserviceconfig.ProposerOption{
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-						FeeRecipient: common.HexToAddress("0x046Fb65722E7b2455043BFEBf6177F1D2e9738D9"),
+						FeeRecipient: common.HexToAddress("Z046Fb65722E7b2455043BFEBf6177F1D2e9738D9"),
 					},
 				}
 				err = v.SetProposerSettings(context.Background(), &validatorserviceconfig.ProposerSettings{
@@ -1850,7 +1851,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				require.NoError(t, err)
 				client.EXPECT().PrepareBeaconProposer(gomock.Any(), &zondpb.PrepareBeaconProposerRequest{
 					Recipients: []*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
-						{FeeRecipient: common.HexToAddress("0x0").Bytes(), ValidatorIndex: 1},
+						{FeeRecipient: common.HexToAddress("Z0").Bytes(), ValidatorIndex: 1},
 					},
 				}).Return(nil, nil)
 				client.EXPECT().SubmitValidatorRegistrations(

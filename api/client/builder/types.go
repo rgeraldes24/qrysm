@@ -218,21 +218,21 @@ type BuilderBidCapella struct {
 
 // ExecutionPayloadHeaderCapella is a field in BuilderBidCapella.
 type ExecutionPayloadHeaderCapella struct {
-	ParentHash       hexutil.Bytes `json:"parent_hash"`
-	FeeRecipient     hexutil.Bytes `json:"fee_recipient"`
-	StateRoot        hexutil.Bytes `json:"state_root"`
-	ReceiptsRoot     hexutil.Bytes `json:"receipts_root"`
-	LogsBloom        hexutil.Bytes `json:"logs_bloom"`
-	PrevRandao       hexutil.Bytes `json:"prev_randao"`
-	BlockNumber      Uint64String  `json:"block_number"`
-	GasLimit         Uint64String  `json:"gas_limit"`
-	GasUsed          Uint64String  `json:"gas_used"`
-	Timestamp        Uint64String  `json:"timestamp"`
-	ExtraData        hexutil.Bytes `json:"extra_data"`
-	BaseFeePerGas    Uint256       `json:"base_fee_per_gas"`
-	BlockHash        hexutil.Bytes `json:"block_hash"`
-	TransactionsRoot hexutil.Bytes `json:"transactions_root"`
-	WithdrawalsRoot  hexutil.Bytes `json:"withdrawals_root"`
+	ParentHash       hexutil.Bytes        `json:"parent_hash"`
+	FeeRecipient     hexutil.AddressBytes `json:"fee_recipient"`
+	StateRoot        hexutil.Bytes        `json:"state_root"`
+	ReceiptsRoot     hexutil.Bytes        `json:"receipts_root"`
+	LogsBloom        hexutil.Bytes        `json:"logs_bloom"`
+	PrevRandao       hexutil.Bytes        `json:"prev_randao"`
+	BlockNumber      Uint64String         `json:"block_number"`
+	GasLimit         Uint64String         `json:"gas_limit"`
+	GasUsed          Uint64String         `json:"gas_used"`
+	Timestamp        Uint64String         `json:"timestamp"`
+	ExtraData        hexutil.Bytes        `json:"extra_data"`
+	BaseFeePerGas    Uint256              `json:"base_fee_per_gas"`
+	BlockHash        hexutil.Bytes        `json:"block_hash"`
+	TransactionsRoot hexutil.Bytes        `json:"transactions_root"`
+	WithdrawalsRoot  hexutil.Bytes        `json:"withdrawals_root"`
 	*v1.ExecutionPayloadHeaderCapella
 }
 
@@ -284,21 +284,21 @@ type ExecPayloadResponseCapella struct {
 
 // ExecutionPayloadCapella is a field of ExecPayloadResponseCapella.
 type ExecutionPayloadCapella struct {
-	ParentHash    hexutil.Bytes   `json:"parent_hash"`
-	FeeRecipient  hexutil.Bytes   `json:"fee_recipient"`
-	StateRoot     hexutil.Bytes   `json:"state_root"`
-	ReceiptsRoot  hexutil.Bytes   `json:"receipts_root"`
-	LogsBloom     hexutil.Bytes   `json:"logs_bloom"`
-	PrevRandao    hexutil.Bytes   `json:"prev_randao"`
-	BlockNumber   Uint64String    `json:"block_number"`
-	GasLimit      Uint64String    `json:"gas_limit"`
-	GasUsed       Uint64String    `json:"gas_used"`
-	Timestamp     Uint64String    `json:"timestamp"`
-	ExtraData     hexutil.Bytes   `json:"extra_data"`
-	BaseFeePerGas Uint256         `json:"base_fee_per_gas"`
-	BlockHash     hexutil.Bytes   `json:"block_hash"`
-	Transactions  []hexutil.Bytes `json:"transactions"`
-	Withdrawals   []Withdrawal    `json:"withdrawals"`
+	ParentHash    hexutil.Bytes        `json:"parent_hash"`
+	FeeRecipient  hexutil.AddressBytes `json:"fee_recipient"`
+	StateRoot     hexutil.Bytes        `json:"state_root"`
+	ReceiptsRoot  hexutil.Bytes        `json:"receipts_root"`
+	LogsBloom     hexutil.Bytes        `json:"logs_bloom"`
+	PrevRandao    hexutil.Bytes        `json:"prev_randao"`
+	BlockNumber   Uint64String         `json:"block_number"`
+	GasLimit      Uint64String         `json:"gas_limit"`
+	GasUsed       Uint64String         `json:"gas_used"`
+	Timestamp     Uint64String         `json:"timestamp"`
+	ExtraData     hexutil.Bytes        `json:"extra_data"`
+	BaseFeePerGas Uint256              `json:"base_fee_per_gas"`
+	BlockHash     hexutil.Bytes        `json:"block_hash"`
+	Transactions  []hexutil.Bytes      `json:"transactions"`
+	Withdrawals   []Withdrawal         `json:"withdrawals"`
 }
 
 // ToProto returns a ExecutionPayloadCapella Proto.

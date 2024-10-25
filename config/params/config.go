@@ -179,7 +179,7 @@ type BeaconChainConfig struct {
 
 	// Bellatrix
 	DefaultFeeRecipient    common.Address // DefaultFeeRecipient where the transaction fee goes to.
-	EthBurnAddressHex      string         // EthBurnAddressHex is the constant zond address written in hex format to burn fees in that network. the default is 0x0
+	ZondBurnAddressHex     string         // EthBurnAddressHex is the constant zond address written in hex format to burn fees in that network. the default is Z0
 	DefaultBuilderGasLimit uint64         // DefaultBuilderGasLimit is the default used to set the gaslimit for the Builder APIs, typically at around 30M wei.
 
 	// Mev-boost circuit breaker

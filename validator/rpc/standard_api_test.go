@@ -758,7 +758,7 @@ func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 	require.NoError(t, err)
 
 	type want struct {
-		EthAddress string
+		ZondAddress string
 	}
 
 	tests := []struct {
@@ -773,18 +773,19 @@ func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): {
 						FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-							FeeRecipient: common.HexToAddress("0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
+							FeeRecipient: common.HexToAddress("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
 						},
 					},
 				},
 				DefaultConfig: &validatorserviceconfig.ProposerOption{
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-						FeeRecipient: common.HexToAddress("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"),
+						// TODO(rgeraldes24): fix
+						FeeRecipient: common.HexToAddress("ZFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"),
 					},
 				},
 			},
 			want: &want{
-				EthAddress: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				ZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 		},
 		{
@@ -793,22 +794,22 @@ func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{},
 				DefaultConfig: &validatorserviceconfig.ProposerOption{
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-						FeeRecipient: common.HexToAddress("0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
+						FeeRecipient: common.HexToAddress("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
 					},
 				},
 			},
 			want: &want{
-				EthAddress: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				ZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 		},
 		{
 			name: "ProposerSettings is nil and beacon node response is correct",
 			args: nil,
 			want: &want{
-				EthAddress: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				ZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			cached: &zond.FeeRecipientByPubKeyResponse{
-				FeeRecipient: common.HexToAddress("0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9").Bytes(),
+				FeeRecipient: common.HexToAddress("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9").Bytes(),
 			},
 		},
 	}
@@ -838,7 +839,7 @@ func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 			got, err := s.ListFeeRecipientByPubkey(ctx, &zondpbservice.PubkeyRequest{Pubkey: byteval})
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.want.EthAddress, common.BytesToAddress(got.Data.Ethaddress).Hex())
+			assert.Equal(t, tt.want.ZondAddress, common.BytesToAddress(got.Data.Ethaddress).Hex())
 		})
 	}
 }
@@ -942,10 +943,10 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 	}{
 		{
 			name:             "ProposerSetting is nil",
-			args:             "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args:             "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: nil,
 			want: &want{
-				valZondAddress: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -955,12 +956,12 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig is nil",
-			args: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: nil,
 			},
 			want: &want{
-				valZondAddress: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -970,13 +971,13 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig is nil AND ProposerSetting.Defaultconfig is defined",
-			args: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: nil,
 				DefaultConfig: &validatorserviceconfig.ProposerOption{},
 			},
 			want: &want{
-				valZondAddress: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -986,14 +987,14 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig is defined for pubkey",
-			args: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): {},
 				},
 			},
 			want: &want{
-				valZondAddress: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -1003,12 +1004,12 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig not defined for pubkey",
-			args: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{},
 			},
 			want: &want{
-				valZondAddress: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -1018,14 +1019,14 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig is nil for pubkey",
-			args: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): nil,
 				},
 			},
 			want: &want{
-				valZondAddress: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -1035,7 +1036,7 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig is nil for pubkey AND DefaultConfig is not nil",
-			args: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): nil,
@@ -1043,7 +1044,7 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 				DefaultConfig: &validatorserviceconfig.ProposerOption{},
 			},
 			want: &want{
-				valZondAddress: "0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -1139,18 +1140,18 @@ func TestServer_DeleteFeeRecipientByPubkey(t *testing.T) {
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): {
 						FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-							FeeRecipient: common.HexToAddress("0x055Fb65722E7b2455012BFEBf6177F1D2e9738D5"),
+							FeeRecipient: common.HexToAddress("Z055Fb65722E7b2455012BFEBf6177F1D2e9738D5"),
 						},
 					},
 				},
 				DefaultConfig: &validatorserviceconfig.ProposerOption{
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
-						FeeRecipient: common.HexToAddress("0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
+						FeeRecipient: common.HexToAddress("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9"),
 					},
 				},
 			},
 			want: &want{
-				EthAddress: common.HexToAddress("0x046Fb65722E7b2455012BFEBf6177F1D2e9738D9").Hex(),
+				EthAddress: common.HexToAddress("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9").Hex(),
 			},
 			wantErr: false,
 		},

@@ -20,7 +20,7 @@ func Test_Proposer_Setting_Cloning(t *testing.T) {
 		ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*ProposerOption{
 			bytesutil.ToBytes2592(key1): {
 				FeeRecipientConfig: &FeeRecipientConfig{
-					FeeRecipient: common.HexToAddress("0x50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
+					FeeRecipient: common.HexToAddress("Z50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
 				},
 				BuilderConfig: &BuilderConfig{
 					Enabled:  true,
@@ -31,7 +31,7 @@ func Test_Proposer_Setting_Cloning(t *testing.T) {
 		},
 		DefaultConfig: &ProposerOption{
 			FeeRecipientConfig: &FeeRecipientConfig{
-				FeeRecipient: common.HexToAddress("0x6e35733c5af9B61374A128e6F85f553aF09ff89A"),
+				FeeRecipient: common.HexToAddress("Z6e35733c5af9B61374A128e6F85f553aF09ff89A"),
 			},
 			BuilderConfig: &BuilderConfig{
 				Enabled:  false,
@@ -118,7 +118,7 @@ func TestProposerSettings_ShouldBeSaved(t *testing.T) {
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*ProposerOption{
 					bytesutil.ToBytes2592(key1): {
 						FeeRecipientConfig: &FeeRecipientConfig{
-							FeeRecipient: common.HexToAddress("0x50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
+							FeeRecipient: common.HexToAddress("Z50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
 						},
 						BuilderConfig: &BuilderConfig{
 							Enabled:  true,
@@ -137,7 +137,7 @@ func TestProposerSettings_ShouldBeSaved(t *testing.T) {
 				ProposeConfig: nil,
 				DefaultConfig: &ProposerOption{
 					FeeRecipientConfig: &FeeRecipientConfig{
-						FeeRecipient: common.HexToAddress("0x50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
+						FeeRecipient: common.HexToAddress("Z50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
 					},
 					BuilderConfig: &BuilderConfig{
 						Enabled:  true,
@@ -154,7 +154,7 @@ func TestProposerSettings_ShouldBeSaved(t *testing.T) {
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*ProposerOption{
 					bytesutil.ToBytes2592(key1): {
 						FeeRecipientConfig: &FeeRecipientConfig{
-							FeeRecipient: common.HexToAddress("0x50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
+							FeeRecipient: common.HexToAddress("Z50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
 						},
 						BuilderConfig: &BuilderConfig{
 							Enabled:  true,
@@ -165,7 +165,7 @@ func TestProposerSettings_ShouldBeSaved(t *testing.T) {
 				},
 				DefaultConfig: &ProposerOption{
 					FeeRecipientConfig: &FeeRecipientConfig{
-						FeeRecipient: common.HexToAddress("0x50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
+						FeeRecipient: common.HexToAddress("Z50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3"),
 					},
 					BuilderConfig: &BuilderConfig{
 						Enabled:  true,
