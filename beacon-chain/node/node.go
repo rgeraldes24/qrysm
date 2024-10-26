@@ -453,12 +453,12 @@ func (b *BeaconNode) startDB(cliCtx *cli.Context, depositAddress string) error {
 		}
 	}
 	if len(knownContract) > 0 && !bytes.Equal(addr.Bytes(), knownContract) {
-		return fmt.Errorf("database contract is %#x but tried to run with %#x. This likely means "+
+		return fmt.Errorf("database contract is Z%x but tried to run with %#x. This likely means "+
 			"you are trying to run on a different network than what the database contains. You can run once with "+
 			"'--clear-db' to wipe the old database or use an alternative data directory with '--datadir'",
-			knownContract, addr.Bytes())
+			knownContract, addr)
 	}
-	log.Infof("Deposit contract: %#x", addr.Bytes())
+	log.Infof("Deposit contract: %#x", addr)
 	return nil
 }
 
