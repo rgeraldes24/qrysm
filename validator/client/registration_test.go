@@ -91,6 +91,8 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 	_, m, validatorKey, finish := setup(t)
 	defer finish()
 	ctx := context.Background()
+	// TODO(rgeraldes24)
+	// byteval, err := hexutil.Decode("0x878705ba3f8bc32fcf7f4caa1a35e72af65cf766")
 	byteval, err := hexutil.Decode("0x878705ba3f8bc32fcf7f4caa1a35e72af65cf766")
 	require.NoError(t, err)
 	tests := []struct {

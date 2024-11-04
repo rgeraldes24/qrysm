@@ -15,7 +15,7 @@ import (
 // This account is given a large initial balance in the genesis block in test setups.
 const defaultTestAccountAddress = "Z205547bA6232eEc096770f7161d57dEA54FD13D0"
 const defaultTestChainId int64 = 1337
-const defaultCoinbase = "0x0000000000000000000000000000000000000000"
+const defaultCoinbase = "Z0000000000000000000000000000000000000000"
 const defaultMixhash = "0x0000000000000000000000000000000000000000000000000000000000000000"
 const defaultParenthash = "0x0000000000000000000000000000000000000000000000000000000000000000"
 const defaultTestAccountBalance = "100000000000000000000000000000"
