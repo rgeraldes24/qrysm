@@ -158,7 +158,7 @@ func configureExecutionSetting(cliCtx *cli.Context) error {
 
 	c := params.BeaconConfig().Copy()
 	ha := cliCtx.String(flags.SuggestedFeeRecipient.Name)
-	if !common.IsHexAddress(ha) {
+	if !common.IsAddress(ha) {
 		log.Warnf("%s is not a valid fee recipient address, setting suggested-fee-recipient failed", ha)
 		return nil
 	}
@@ -167,7 +167,8 @@ func configureExecutionSetting(cliCtx *cli.Context) error {
 		log.WithError(err).Error(fmt.Sprintf("Could not decode fee recipient %s, setting suggested-fee-recipient failed", ha))
 		return nil
 	}
-	checksumAddress := common.HexToAddress(ha)
+	// TODO(rgeraldes24)
+	checksumAddress, _ := common.NewAddressFromString(ha)
 	if !mixedcaseAddress.ValidChecksum() {
 		log.Warnf("Fee recipient %s is not a checksum Zond address. "+
 			"The checksummed address is %s and will be used as the fee recipient. "+

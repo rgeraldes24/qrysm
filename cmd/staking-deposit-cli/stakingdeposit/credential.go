@@ -35,7 +35,9 @@ func (c *Credential) ZondWithdrawalAddress() common.Address {
 	if len(c.hexZondWithdrawalAddress) == 0 {
 		return common.Address{}
 	}
-	return common.HexToAddress(c.hexZondWithdrawalAddress)
+	// TODO(rgeraldes24): err
+	withdrawalAddress, _ := common.NewAddressFromString(c.hexZondWithdrawalAddress)
+	return withdrawalAddress
 }
 
 func (c *Credential) WithdrawalPK() []byte {

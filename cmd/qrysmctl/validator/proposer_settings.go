@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"regexp"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/common"
@@ -12,7 +13,6 @@ import (
 	"github.com/theQRL/qrysm/cmd/validator/flags"
 	"github.com/theQRL/qrysm/config/params"
 	validatorType "github.com/theQRL/qrysm/consensus-types/validator"
-	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/io/prompt"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
@@ -105,8 +105,19 @@ func getProposerSettings(c *cli.Context, r io.Reader) error {
 }
 
 func validateIsExecutionAddress(input string) error {
-	if !bytesutil.IsHex([]byte(input)) || !(len(input) == common.AddressLength*2+2) {
+	if !IsAddress([]byte(input)) || !(len(input) == common.AddressLength*2+1) {
 		return errors.New("no default address entered")
 	}
 	return nil
+}
+
+// TODO(rgeraldes24): address size + place this in byteutils?
+var addressHexRegex = regexp.MustCompile("^Z[0-9a-fA-F]+$")
+
+// IsAddress checks whether the byte array is a hex number prefixed with 'Z'.
+func IsAddress(b []byte) bool {
+	if b == nil {
+		return false
+	}
+	return addressHexRegex.Match(b)
 }
