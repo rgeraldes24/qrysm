@@ -5837,14 +5837,14 @@ def go_dependencies():
     go_repository(
         name = "com_github_rgeraldes24_fuzzyvm",
         importpath = "github.com/rgeraldes24/FuzzyVM",
-        sum = "h1:MJkWGA0EPdrv4OpMjzpeMNyG9gGImqB4xZG9iom2O3Q=",
-        version = "v0.0.0-20240814164600-5f611699efbc",
+        sum = "h1:WsFZmhRrdvDlSCbHySr6CA7gvYwkfulVBC/X1OyXRc8=",
+        version = "v0.0.0-20241118080648-66efa6055064",
     )
     go_repository(
         name = "com_github_rgeraldes24_goevmlab",
         importpath = "github.com/rgeraldes24/goevmlab",
-        sum = "h1:3YzQ0V7kLCXEd6katIKPyHEXJW4d1EmfdiycZfRU3OM=",
-        version = "v0.0.0-20240814164028-e72145bd7218",
+        sum = "h1:/VhpPdr1BWTQc1H2SGDcx3C68p8vDYMLGOzvKJ6rLQw=",
+        version = "v0.0.0-20241118075001-b9908d7d2e54",
     )
     go_repository(
         name = "com_github_rgeraldes24_grpc_gateway_v2",
@@ -5856,8 +5856,8 @@ def go_dependencies():
     go_repository(
         name = "com_github_rgeraldes24_tx_fuzz",
         importpath = "github.com/rgeraldes24/tx-fuzz",
-        sum = "h1:5yYoxmZm/c5ATXq3lyO3fNxvWvOxz52/lI/YGWbILTU=",
-        version = "v0.0.0-20240815074056-31ca2bb2b6b2",
+        sum = "h1:f+4lVZi5kqPDwM9McRRe5jzG9NGeRh7wpP2AGf82Mno=",
+        version = "v0.0.0-20241118080837-8c2407dd8040",
     )
     go_repository(
         name = "com_github_sclevine_agouti",
@@ -5877,8 +5877,8 @@ def go_dependencies():
             "//third_party:com_github_theqrl_go_zond_secp256k1.patch",
         ],
         replace = "github.com/rgeraldes24/go-zond",
-        sum = "h1:wqdjKrgbVkynr4xjlT5WTpVkmV++g6WZrY2sS85zRPI=",
-        version = "v0.0.0-20241115091522-028c515efa02",
+        sum = "h1:eONvqXk+o1PJCkuZj2ytb+Hgy3uJeZ1Wu61vDrKZR1Q=",
+        version = "v0.0.0-20241117145719-5b35e450b184",
     )
     go_repository(
         name = "com_github_theqrl_go_zond_types",

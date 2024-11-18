@@ -20,6 +20,8 @@ import (
 	"go.opencensus.io/trace"
 )
 
+var addressRegex = regexp.MustCompile("^Z[0-9a-fA-F]{40}$")
+
 func getProposerSettings(c *cli.Context, r io.Reader) error {
 	ctx, span := trace.StartSpan(c.Context, "qrysmctl.getProposerSettings")
 	defer span.End()
@@ -111,13 +113,10 @@ func validateIsExecutionAddress(input string) error {
 	return nil
 }
 
-// TODO(rgeraldes24): address size + place this in byteutils?
-var addressHexRegex = regexp.MustCompile("^Z[0-9a-fA-F]+$")
-
 // IsAddress checks whether the byte array is a hex number prefixed with 'Z'.
 func IsAddress(b []byte) bool {
 	if b == nil {
 		return false
 	}
-	return addressHexRegex.Match(b)
+	return addressRegex.Match(b)
 }

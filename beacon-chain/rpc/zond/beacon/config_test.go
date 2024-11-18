@@ -18,7 +18,8 @@ import (
 func TestGetSpec(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig().Copy()
-	defaultFeeRecipient, _ := common.NewAddressFromString("Z0000000000000000000000000000000000000001")
+	defaultFeeRecipient, err := common.NewAddressFromString("Z0000000000000000000000000000000000000001")
+	require.NoError(t, err)
 
 	config.ConfigName = "ConfigName"
 	config.PresetBase = "PresetBase"

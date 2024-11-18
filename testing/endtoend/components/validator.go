@@ -378,12 +378,9 @@ func createProposerSettingsPath(pubkeys []string, nodeIdx int) (string, error) {
 	return configPath, nil
 }
 
-// TODO(rgeraldes24): add tests
 // FeeRecipientFromPubkey slices, from the beginning of the hex-encoded pubkey string, the 1 character Z preamble
 // plus enough hex chars to fill out the fee_recipient byte value.
 func FeeRecipientFromPubkey(key string) string {
 	// pubkey[:(2+fieldparams.FeeRecipientLength*2)] slicing 2 (for the 0x preamble) + 2 hex chars for each byte
-	feeRecipientStr := strings.Replace(key[:(1+fieldparams.FeeRecipientLength*2)], "0x", "Z", 1)
-	feeRecipient, _ := common.NewAddressFromString(feeRecipientStr)
-	return feeRecipient.Hex()
+	return common.BytesToAddress(common.FromHex(key[:(2 + fieldparams.FeeRecipientLength*2)])).Hex()
 }

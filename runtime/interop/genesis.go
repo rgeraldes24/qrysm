@@ -13,12 +13,13 @@ import (
 
 // defaultMinerAddress is used to send deposits and test transactions in the e2e test.
 // This account is given a large initial balance in the genesis block in test setups.
-const defaultTestAccountAddress = "Z205547bA6232eEc096770f7161d57dEA54FD13D0"
 const defaultTestChainId int64 = 1337
-const defaultCoinbase = "Z0000000000000000000000000000000000000000"
 const defaultMixhash = "0x0000000000000000000000000000000000000000000000000000000000000000"
 const defaultParenthash = "0x0000000000000000000000000000000000000000000000000000000000000000"
 const defaultTestAccountBalance = "100000000000000000000000000000"
+
+var defaultTestAccountAddress, _ = common.NewAddressFromString("Z205547bA6232eEc096770f7161d57dEA54FD13D0")
+var defaultCoinbase, _ = common.NewAddressFromString("Z0000000000000000000000000000000000000000")
 
 // DepositContractCode is the compiled deposit contract code, via https://github.com/protolambda/merge-genesis-tools
 // This is embedded into genesis so that we can start the chain at a merge block.
@@ -72,7 +73,7 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 	}
 	da := defaultDepositContractAllocation(cfg.DepositContractAddress)
 	ma := minerAllocation()
-	coinbase, _ := common.NewAddressFromString(defaultCoinbase)
+
 	return &core.Genesis{
 		Config:    cc,
 		Timestamp: genesisTime,
@@ -81,7 +82,7 @@ func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *c
 		ExtraData: make([]byte, 32),
 		GasLimit:  math.MaxUint64 >> 1, // shift 1 back from the max, just in case
 		Mixhash:   common.HexToHash(defaultMixhash),
-		Coinbase:  coinbase,
+		Coinbase:  defaultCoinbase,
 		Alloc: core.GenesisAlloc{
 			da.Address: da.Account,
 			ma.Address: ma.Account,
@@ -96,9 +97,8 @@ type depositAllocation struct {
 }
 
 func minerAllocation() depositAllocation {
-	addr, _ := common.NewAddressFromString(defaultTestAccountAddress)
 	return depositAllocation{
-		Address: addr,
+		Address: defaultTestAccountAddress,
 		Account: core.GenesisAccount{
 			Balance: testAccountBalance,
 		},

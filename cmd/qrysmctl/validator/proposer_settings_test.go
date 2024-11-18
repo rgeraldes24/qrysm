@@ -122,6 +122,6 @@ func TestValidateValidateIsExecutionAddress(t *testing.T) {
 	})
 	t.Run("Prefix missing", func(t *testing.T) {
 		err := validateIsExecutionAddress("b698D697092822185bF0311052215d5B5e1F3933")
-		require.NoError(t, err)
+		require.ErrorContains(t, "no default address entered", err)
 	})
 }
