@@ -460,7 +460,8 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 	if fileConfig.DefaultConfig == nil {
 		return nil, errors.New("default fileConfig is required, proposer settings file is either empty or an incorrect format")
 	}
-	if !common.IsAddress(fileConfig.DefaultConfig.FeeRecipient) {
+	recipient, err := common.NewAddressFromString(fileConfig.DefaultConfig.FeeRecipient)
+	if err != nil {
 		return nil, errors.New("default fileConfig fee recipient is not a valid zond address")
 	}
 	psExists, err := db.ProposerSettingsExists(cliCtx.Context)
@@ -468,10 +469,6 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 		return nil, err
 	}
 	if err := warnNonChecksummedAddress(fileConfig.DefaultConfig.FeeRecipient); err != nil {
-		return nil, err
-	}
-	recipient, err := common.NewAddressFromString(fileConfig.DefaultConfig.FeeRecipient)
-	if err != nil {
 		return nil, err
 	}
 	vpSettings.DefaultConfig = &validatorServiceConfig.ProposerOption{
