@@ -61,7 +61,7 @@ func ValidateAddress(w http.ResponseWriter, name string, s string, length int) (
 		http2.WriteError(w, errJson)
 		return nil, false
 	}
-	hexBytes, err := hexutil.DecodeAddress(s)
+	hexBytes, err := hexutil.DecodeZ(s)
 	if err != nil {
 		errJson := &http2.DefaultErrorJson{
 			Message: name + " is invalid: " + err.Error(),
@@ -207,7 +207,7 @@ func VerifyMaxLength[T any](v []T, max int) error {
 // DecodeAddressWithLength takes a string and a length in bytes,
 // and validates whether the string is an address and has the correct length.
 func DecodeAddressWithLength(s string, length int) ([]byte, error) {
-	bytes, err := hexutil.DecodeAddress(s)
+	bytes, err := hexutil.DecodeZ(s)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("%s is not a valid address", s))
 	}

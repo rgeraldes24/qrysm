@@ -78,11 +78,11 @@ func TestRegistration_Valid(t *testing.T) {
 		nil,
 	).Times(1)
 
-	decodedFeeRecipient1, err := hexutil.DecodeAddress(feeRecipient1)
+	decodedFeeRecipient1, err := hexutil.DecodeZ(feeRecipient1)
 	require.NoError(t, err)
-	decodedFeeRecipient2, err := hexutil.DecodeAddress(feeRecipient2)
+	decodedFeeRecipient2, err := hexutil.DecodeZ(feeRecipient2)
 	require.NoError(t, err)
-	decodedFeeRecipient3, err := hexutil.DecodeAddress(feeRecipient3)
+	decodedFeeRecipient3, err := hexutil.DecodeZ(feeRecipient3)
 	require.NoError(t, err)
 
 	decodedPubkey1, err := hexutil.Decode(pubKey1)

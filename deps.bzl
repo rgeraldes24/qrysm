@@ -5877,8 +5877,8 @@ def go_dependencies():
             "//third_party:com_github_theqrl_go_zond_secp256k1.patch",
         ],
         replace = "github.com/rgeraldes24/go-zond",
-        sum = "h1:eONvqXk+o1PJCkuZj2ytb+Hgy3uJeZ1Wu61vDrKZR1Q=",
-        version = "v0.0.0-20241117145719-5b35e450b184",
+        sum = "h1:LkDQHtFYV1em5L82RdjW5R3w+0e8oijt51q9VB0cIZc=",
+        version = "v0.0.0-20241119070712-b74b98d939c3",
     )
     go_repository(
         name = "com_github_theqrl_go_zond_types",

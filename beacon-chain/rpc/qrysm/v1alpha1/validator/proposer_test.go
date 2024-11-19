@@ -2313,7 +2313,7 @@ func TestProposer_GetFeeRecipientByPubKey(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	require.Equal(t, params.BeaconConfig().DefaultFeeRecipient.Hex(), hexutil.EncodeAddress(resp.FeeRecipient))
+	require.Equal(t, params.BeaconConfig().DefaultFeeRecipient.Hex(), hexutil.EncodeZ(resp.FeeRecipient))
 	defaultFeeRecipient, err := common.NewAddressFromString("Z046Fb65722E7b2455012BFEBf6177F1D2e9728D9")
 	require.NoError(t, err)
 	params.BeaconConfig().DefaultFeeRecipient = defaultFeeRecipient

@@ -2439,7 +2439,7 @@ func TestPrepareBeaconProposer(t *testing.T) {
 				require.NoError(t, err)
 				address, err := server.BeaconDB.FeeRecipientByValidatorID(ctx, 1)
 				require.NoError(t, err)
-				feebytes, err := hexutil.DecodeAddress(tt.request[0].FeeRecipient)
+				feebytes, err := hexutil.DecodeZ(tt.request[0].FeeRecipient)
 				require.NoError(t, err)
 				require.Equal(t, common.BytesToAddress(feebytes), address)
 			}
@@ -2454,7 +2454,7 @@ func TestProposer_PrepareBeaconProposerOverlapping(t *testing.T) {
 	// New validator
 	proposerServer := &Server{BeaconDB: db}
 	req := []*shared.FeeRecipient{{
-		FeeRecipient:   hexutil.EncodeAddress(bytesutil.PadTo([]byte{0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF}, fieldparams.FeeRecipientLength)),
+		FeeRecipient:   hexutil.EncodeZ(bytesutil.PadTo([]byte{0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF}, fieldparams.FeeRecipientLength)),
 		ValidatorIndex: "1",
 	}}
 	b, err := json.Marshal(req)
@@ -2483,7 +2483,7 @@ func TestProposer_PrepareBeaconProposerOverlapping(t *testing.T) {
 	// Same validator with different fee recipient
 	hook.Reset()
 	req = []*shared.FeeRecipient{{
-		FeeRecipient:   hexutil.EncodeAddress(bytesutil.PadTo([]byte{0x01, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF}, fieldparams.FeeRecipientLength)),
+		FeeRecipient:   hexutil.EncodeZ(bytesutil.PadTo([]byte{0x01, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF}, fieldparams.FeeRecipientLength)),
 		ValidatorIndex: "1",
 	}}
 	b, err = json.Marshal(req)
@@ -2500,11 +2500,11 @@ func TestProposer_PrepareBeaconProposerOverlapping(t *testing.T) {
 	hook.Reset()
 	req = []*shared.FeeRecipient{
 		{
-			FeeRecipient:   hexutil.EncodeAddress(bytesutil.PadTo([]byte{0x01, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF}, fieldparams.FeeRecipientLength)),
+			FeeRecipient:   hexutil.EncodeZ(bytesutil.PadTo([]byte{0x01, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF}, fieldparams.FeeRecipientLength)),
 			ValidatorIndex: "1",
 		},
 		{
-			FeeRecipient:   hexutil.EncodeAddress(bytesutil.PadTo([]byte{0x01, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF}, fieldparams.FeeRecipientLength)),
+			FeeRecipient:   hexutil.EncodeZ(bytesutil.PadTo([]byte{0x01, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF}, fieldparams.FeeRecipientLength)),
 			ValidatorIndex: "2",
 		},
 	}
@@ -2538,7 +2538,7 @@ func BenchmarkServer_PrepareBeaconProposer(b *testing.B) {
 	f := bytesutil.PadTo([]byte{0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF, 0x01, 0xFF}, fieldparams.FeeRecipientLength)
 	recipients := make([]*shared.FeeRecipient, 0)
 	for i := 0; i < 10000; i++ {
-		recipients = append(recipients, &shared.FeeRecipient{FeeRecipient: hexutil.EncodeAddress(f), ValidatorIndex: fmt.Sprint(i)})
+		recipients = append(recipients, &shared.FeeRecipient{FeeRecipient: hexutil.EncodeZ(f), ValidatorIndex: fmt.Sprint(i)})
 	}
 	byt, err := json.Marshal(recipients)
 	require.NoError(b, err)

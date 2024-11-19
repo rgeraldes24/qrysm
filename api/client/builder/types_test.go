@@ -29,7 +29,7 @@ func ezDecode(t *testing.T, s string) []byte {
 }
 
 func ezDecodeAddress(t *testing.T, s string) []byte {
-	v, err := hexutil.DecodeAddress(s)
+	v, err := hexutil.DecodeZ(s)
 	require.NoError(t, err)
 	return v
 }
@@ -156,7 +156,7 @@ func TestExecutionHeaderResponseCapellaUnmarshal(t *testing.T) {
 		},
 		{
 			expected: "Zabcf8e0d4e9587369b2301d0790347320302cc09",
-			actual:   hexutil.EncodeAddress(hr.Data.Message.Header.FeeRecipient),
+			actual:   hexutil.EncodeZ(hr.Data.Message.Header.FeeRecipient),
 			name:     "ExecHeaderResponse.ExecutionPayloadHeader.FeeRecipient",
 		},
 		{
@@ -245,7 +245,7 @@ func TestExecutionHeaderResponseCapellaToProto(t *testing.T) {
 	require.NoError(t, err)
 	parentHash, err := hexutil.Decode("0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2")
 	require.NoError(t, err)
-	feeRecipient, err := hexutil.DecodeAddress("Zabcf8e0d4e9587369b2301d0790347320302cc09")
+	feeRecipient, err := hexutil.DecodeZ("Zabcf8e0d4e9587369b2301d0790347320302cc09")
 	require.NoError(t, err)
 	stateRoot, err := hexutil.Decode("0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2")
 	require.NoError(t, err)
@@ -366,7 +366,7 @@ func TestExecutionPayloadResponseCapellaUnmarshal(t *testing.T) {
 		},
 		{
 			expected: "Zabcf8e0d4e9587369b2301d0790347320302cc09",
-			actual:   hexutil.EncodeAddress(epr.Data.FeeRecipient),
+			actual:   hexutil.EncodeZ(epr.Data.FeeRecipient),
 			name:     "ExecPayloadResponse.ExecutionPayload.FeeRecipient",
 		},
 		{
@@ -448,7 +448,7 @@ func TestExecutionPayloadResponseCapellaToProto(t *testing.T) {
 
 	parentHash, err := hexutil.Decode("0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2")
 	require.NoError(t, err)
-	feeRecipient, err := hexutil.DecodeAddress("Zabcf8e0d4e9587369b2301d0790347320302cc09")
+	feeRecipient, err := hexutil.DecodeZ("Zabcf8e0d4e9587369b2301d0790347320302cc09")
 	require.NoError(t, err)
 	stateRoot, err := hexutil.Decode("0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2")
 	require.NoError(t, err)
@@ -466,7 +466,7 @@ func TestExecutionPayloadResponseCapellaToProto(t *testing.T) {
 	tx, err := hexutil.Decode("0x02f878831469668303f51d843b9ac9f9843b9aca0082520894c93269b73096998db66be0441e836d873535cb9c8894a19041886f000080c001a031cc29234036afbf9a1fb9476b463367cb1f957ac0b919b69bbc798436e604aaa018c4e9c3914eb27aadd0b91e10b18655739fcf8c1fc398763a9f1beecb8ddc86")
 	require.NoError(t, err)
 	txList := [][]byte{tx}
-	address, err := hexutil.DecodeAddress("Zcf8e0d4e9587369b2301d0790347320302cc0943")
+	address, err := hexutil.DecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943")
 	require.NoError(t, err)
 
 	bfpg, err := stringToUint256("452312848583266388373324160190187140051835877600158453279131187530910662656")

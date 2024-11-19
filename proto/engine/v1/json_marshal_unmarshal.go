@@ -341,10 +341,10 @@ func (e *ExecutionPayloadCapellaWithValue) UnmarshalJSON(enc []byte) error {
 }
 
 type payloadAttributesV2JSON struct {
-	Timestamp             hexutil.Uint64  `json:"timestamp"`
-	PrevRandao            hexutil.Bytes   `json:"prevRandao"`
-	SuggestedFeeRecipient hexutil.Address `json:"suggestedFeeRecipient"`
-	Withdrawals           []*Withdrawal   `json:"withdrawals"`
+	Timestamp             hexutil.Uint64 `json:"timestamp"`
+	PrevRandao            hexutil.Bytes  `json:"prevRandao"`
+	SuggestedFeeRecipient hexutil.BytesZ `json:"suggestedFeeRecipient"`
+	Withdrawals           []*Withdrawal  `json:"withdrawals"`
 }
 
 // MarshalJSON --

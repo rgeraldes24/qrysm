@@ -566,7 +566,7 @@ func BlindedBeaconBlockCapellaFromConsensus(b *zond.BlindedBeaconBlockCapella) (
 			},
 			ExecutionPayloadHeader: &ExecutionPayloadHeaderCapella{
 				ParentHash:       hexutil.Encode(b.Body.ExecutionPayloadHeader.ParentHash),
-				FeeRecipient:     hexutil.EncodeAddress(b.Body.ExecutionPayloadHeader.FeeRecipient),
+				FeeRecipient:     hexutil.EncodeZ(b.Body.ExecutionPayloadHeader.FeeRecipient),
 				StateRoot:        hexutil.Encode(b.Body.ExecutionPayloadHeader.StateRoot),
 				ReceiptsRoot:     hexutil.Encode(b.Body.ExecutionPayloadHeader.ReceiptsRoot),
 				LogsBloom:        hexutil.Encode(b.Body.ExecutionPayloadHeader.LogsBloom),
@@ -631,7 +631,7 @@ func BeaconBlockCapellaFromConsensus(b *zond.BeaconBlockCapella) (*BeaconBlockCa
 		withdrawals[i] = &Withdrawal{
 			WithdrawalIndex:  fmt.Sprintf("%d", w.Index),
 			ValidatorIndex:   fmt.Sprintf("%d", w.ValidatorIndex),
-			ExecutionAddress: hexutil.EncodeAddress(w.Address),
+			ExecutionAddress: hexutil.EncodeZ(w.Address),
 			Amount:           fmt.Sprintf("%d", w.Amount),
 		}
 	}
@@ -668,7 +668,7 @@ func BeaconBlockCapellaFromConsensus(b *zond.BeaconBlockCapella) (*BeaconBlockCa
 			},
 			ExecutionPayload: &ExecutionPayloadCapella{
 				ParentHash:    hexutil.Encode(b.Body.ExecutionPayload.ParentHash),
-				FeeRecipient:  hexutil.EncodeAddress(b.Body.ExecutionPayload.FeeRecipient),
+				FeeRecipient:  hexutil.EncodeZ(b.Body.ExecutionPayload.FeeRecipient),
 				StateRoot:     hexutil.Encode(b.Body.ExecutionPayload.StateRoot),
 				ReceiptsRoot:  hexutil.Encode(b.Body.ExecutionPayload.ReceiptsRoot),
 				LogsBloom:     hexutil.Encode(b.Body.ExecutionPayload.LogsBloom),
@@ -1152,7 +1152,7 @@ func DilithiumChangesFromConsensus(src []*zond.SignedDilithiumToExecutionChange)
 			Message: &DilithiumToExecutionChange{
 				ValidatorIndex:      fmt.Sprintf("%d", ch.Message.ValidatorIndex),
 				FromDilithiumPubkey: hexutil.Encode(ch.Message.FromDilithiumPubkey),
-				ToExecutionAddress:  hexutil.EncodeAddress(ch.Message.ToExecutionAddress),
+				ToExecutionAddress:  hexutil.EncodeZ(ch.Message.ToExecutionAddress),
 			},
 			Signature: hexutil.Encode(ch.Signature),
 		}

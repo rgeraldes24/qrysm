@@ -1338,7 +1338,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 	defaultFeeStr := "Z046Fb65722E7b2455043BFEBf6177F1D2e9738D9"
 	defaultFeeAddr, err := common.NewAddressFromString(defaultFeeStr)
 	require.NoError(t, err)
-	byteValueAddress, err := hexutil.DecodeAddress("Z046Fb65722E7b2455043BFEBf6177F1D2e9738D9")
+	byteValueAddress, err := hexutil.DecodeZ("Z046Fb65722E7b2455043BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
 	recipient0, err := common.NewAddressFromString("Z055Fb65722E7b2455043BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
@@ -1882,12 +1882,12 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				signedRegisterValidatorRequests, err := v.buildSignedRegReqs(ctx, pubkeys, km.Sign)
 				require.NoError(t, err)
 				for _, recipient := range feeRecipients {
-					require.Equal(t, strings.ToLower(tt.feeRecipientMap[recipient.ValidatorIndex]), strings.ToLower(hexutil.EncodeAddress(recipient.FeeRecipient)))
+					require.Equal(t, strings.ToLower(tt.feeRecipientMap[recipient.ValidatorIndex]), strings.ToLower(hexutil.EncodeZ(recipient.FeeRecipient)))
 				}
 				require.Equal(t, len(tt.feeRecipientMap), len(feeRecipients))
 				for i, request := range tt.mockExpectedRequests {
 					require.Equal(t, tt.mockExpectedRequests[i].GasLimit, request.GasLimit)
-					require.Equal(t, hexutil.EncodeAddress(tt.mockExpectedRequests[i].FeeRecipient), hexutil.EncodeAddress(request.FeeRecipient))
+					require.Equal(t, hexutil.EncodeZ(tt.mockExpectedRequests[i].FeeRecipient), hexutil.EncodeZ(request.FeeRecipient))
 				}
 				// check if Pubkeys are always unique
 				var unique = make(map[string]bool)
@@ -1927,7 +1927,7 @@ func getPubkeyFromString(t *testing.T, stringPubkey string) [field_params.Dilith
 }
 
 func getFeeRecipientFromString(t *testing.T, stringFeeRecipient string) common.Address {
-	feeRecipientTemp, err := hexutil.DecodeAddress(stringFeeRecipient)
+	feeRecipientTemp, err := hexutil.DecodeZ(stringFeeRecipient)
 	require.NoError(t, err)
 
 	var feeRecipient common.Address

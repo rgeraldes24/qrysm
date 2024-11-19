@@ -583,7 +583,7 @@ func (s *Server) SetFeeRecipientByPubkey(ctx context.Context, req *zondpbservice
 		return nil, status.Error(codes.FailedPrecondition, err.Error())
 	}
 
-	encoded := hexutil.EncodeAddress(req.Zondaddress)
+	encoded := hexutil.EncodeZ(req.Zondaddress)
 
 	if !common.IsAddress(encoded) {
 		return nil, status.Error(
