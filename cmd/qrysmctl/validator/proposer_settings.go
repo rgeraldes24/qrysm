@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"regexp"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/common"
@@ -19,8 +18,6 @@ import (
 	"github.com/urfave/cli/v2"
 	"go.opencensus.io/trace"
 )
-
-var addressRegex = regexp.MustCompile("^Z[0-9a-fA-F]{40}$")
 
 func getProposerSettings(c *cli.Context, r io.Reader) error {
 	ctx, span := trace.StartSpan(c.Context, "qrysmctl.getProposerSettings")
@@ -107,16 +104,8 @@ func getProposerSettings(c *cli.Context, r io.Reader) error {
 }
 
 func validateIsExecutionAddress(input string) error {
-	if !IsAddress([]byte(input)) || !(len(input) == common.AddressLength*2+1) {
+	if !common.IsAddress(input) {
 		return errors.New("no default address entered")
 	}
 	return nil
-}
-
-// IsAddress checks whether the byte array is a hex number prefixed with 'Z'.
-func IsAddress(b []byte) bool {
-	if b == nil {
-		return false
-	}
-	return addressRegex.Match(b)
 }
