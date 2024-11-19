@@ -253,7 +253,7 @@ func TestProcessMiddlewareResponseFields(t *testing.T) {
 		assert.Equal(t, "0x666f6f", container.TestHex)
 		assert.Equal(t, "0x", container.TestEmptyHex)
 		assert.Equal(t, "Z0000000000000000000000000000000000666F6f", container.TestAddress)
-		assert.Equal(t, "Z0000000000000000000000000000000000000000", container.TestEmptyAddress)
+		assert.Equal(t, "Z", container.TestEmptyAddress)
 		assert.Equal(t, "4196", container.TestUint256)
 		assert.Equal(t, "test enum", container.TestEnum)
 		assert.Equal(t, "1136214245", container.TestTime)
