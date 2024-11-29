@@ -8,7 +8,7 @@
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┗┛━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 // SPDX-License-Identifier: CC0-1.0
-
+// TODO(now.youtrack.cloud/issue/TQ-34)
 pragma hyperion ^0.8.22;
 
 // This interface is designed to be compatible with the Vyper version.
