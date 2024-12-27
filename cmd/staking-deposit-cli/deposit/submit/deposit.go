@@ -98,7 +98,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	txOpts.GasLimit = 500000
+	txOpts.GasLimit = 4000000
 	txOpts.GasFeeCap = nil
 	txOpts.GasTipCap = gasTip
 
