@@ -15,11 +15,27 @@ import (
 
 func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 	params.SetupTestConfigCleanup(t)
-	require.NoError(t, params.SetActive(types.StartAt(v, params.E2ETestConfig())))
-	require.NoError(t, e2eParams.Init(t, e2eParams.StandardBeaconCount))
+	e2eConfig := params.E2ETestConfig()
+
+	validatorCountStr, present := os.LookupEnv("E2E_GENESIS_VALIDATOR_COUNT")
+	if present {
+		validatorCount, err := strconv.Atoi(validatorCountStr)
+		require.NoError(t, err)
+		e2eConfig.MinGenesisActiveValidatorCount = uint64(validatorCount)
+	}
+	require.NoError(t, params.SetActive(types.StartAt(v, e2eConfig)))
+
+	var err error
+	beaconNodeCount := e2eParams.StandardBeaconCount
+	beaconNodeCountStr, present := os.LookupEnv("E2E_BEACON_NODE_COUNT")
+	if present {
+		beaconNodeCount, err = strconv.Atoi(beaconNodeCountStr)
+		require.NoError(t, err)
+	}
+
+	require.NoError(t, e2eParams.Init(t, beaconNodeCount))
 
 	// Run for 12 epochs if not in long-running to confirm long-running has no issues.
-	var err error
 	epochsToRun := 12
 	epochStr, longRunning := os.LookupEnv("E2E_EPOCHS")
 	if longRunning {
