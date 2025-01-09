@@ -54,17 +54,13 @@ func validatorsAreActive(ec *types.EvaluationContext, conns ...*grpc.ClientConn)
 	conn := conns[0]
 	client := zondpb.NewBeaconChainClient(conn)
 	// Balances actually fluctuate but we just want to check initial balance.
-	validatorRequest := &zondpb.ListValidatorsRequest{
-		PageSize: int32(params.BeaconConfig().MinGenesisActiveValidatorCount),
-		Active:   true,
-	}
-	validators, err := client.ListValidators(context.Background(), validatorRequest)
+	vals, err := getAllActiveValidators(client)
 	if err != nil {
-		return errors.Wrap(err, "failed to get validators")
+		return errors.Wrap(err, "error retrieving active validator list from API")
 	}
 
 	expectedCount := params.BeaconConfig().MinGenesisActiveValidatorCount
-	receivedCount := uint64(len(validators.ValidatorList))
+	receivedCount := uint64(len(vals))
 	if expectedCount != receivedCount {
 		return fmt.Errorf("expected validator count to be %d, received %d", expectedCount, receivedCount)
 	}
@@ -72,17 +68,17 @@ func validatorsAreActive(ec *types.EvaluationContext, conns ...*grpc.ClientConn)
 	effBalanceLowCount := 0
 	exitEpochWrongCount := 0
 	withdrawEpochWrongCount := 0
-	for _, item := range validators.ValidatorList {
-		if ec.ExitedVals[bytesutil.ToBytes2592(item.Validator.PublicKey)] {
+	for _, v := range vals {
+		if ec.ExitedVals[bytesutil.ToBytes2592(v.PublicKey)] {
 			continue
 		}
-		if item.Validator.EffectiveBalance < params.BeaconConfig().MaxEffectiveBalance {
+		if v.EffectiveBalance < params.BeaconConfig().MaxEffectiveBalance {
 			effBalanceLowCount++
 		}
-		if item.Validator.ExitEpoch != params.BeaconConfig().FarFutureEpoch {
+		if v.ExitEpoch != params.BeaconConfig().FarFutureEpoch {
 			exitEpochWrongCount++
 		}
-		if item.Validator.WithdrawableEpoch != params.BeaconConfig().FarFutureEpoch {
+		if v.WithdrawableEpoch != params.BeaconConfig().FarFutureEpoch {
 			withdrawEpochWrongCount++
 		}
 	}
@@ -293,4 +289,25 @@ func findMissingValidators(participation []byte) ([]uint64, []uint64, []uint64, 
 		}
 	}
 	return missingSourceValidators, missingTargetValidators, missingHeadValidators, nil
+}
+
+func getAllActiveValidators(c zondpb.BeaconChainClient) ([]*zondpb.Validator, error) {
+	vals := make([]*zondpb.Validator, 0)
+	pageToken := "0"
+	for pageToken != "" {
+		validatorRequest := &zondpb.ListValidatorsRequest{
+			PageSize:  100,
+			PageToken: pageToken,
+			Active:    true,
+		}
+		validators, err := c.ListValidators(context.Background(), validatorRequest)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get validators")
+		}
+		for _, v := range validators.ValidatorList {
+			vals = append(vals, v.Validator)
+		}
+		pageToken = validators.NextPageToken
+	}
+	return vals, nil
 }
