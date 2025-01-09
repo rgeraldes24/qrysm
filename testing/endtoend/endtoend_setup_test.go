@@ -32,7 +32,6 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 		beaconNodeCount, err = strconv.Atoi(beaconNodeCountStr)
 		require.NoError(t, err)
 	}
-
 	require.NoError(t, e2eParams.Init(t, beaconNodeCount))
 
 	// Run for 12 epochs if not in long-running to confirm long-running has no issues.
