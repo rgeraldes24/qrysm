@@ -180,12 +180,19 @@ func verifyGraffitiInBlocks(_ *e2etypes.EvaluationContext, conns ...*grpc.Client
 	if begin > 0 {
 		begin = begin.Sub(1)
 	}
-	req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
-	blks, err := client.ListBeaconBlocks(context.Background(), req)
+	// TODO(rgeraldes24): remove
+	/*
+		req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
+		blks, err := client.ListBeaconBlocks(context.Background(), req)
+		if err != nil {
+			return errors.Wrap(err, "failed to get blocks from beacon-chain")
+		}
+	*/
+	blks, err := getEpochBlocks(client, begin)
 	if err != nil {
-		return errors.Wrap(err, "failed to get blocks from beacon-chain")
+		return errors.Wrap(err, "error retrieving blocks list from API")
 	}
-	for _, ctr := range blks.BlockContainers {
+	for _, ctr := range blks {
 		blk, err := blocks.BeaconBlockContainerToSignedBeaconBlock(ctr)
 		if err != nil {
 			return err
@@ -468,14 +475,21 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 	if begin > 0 {
 		begin = begin.Sub(1)
 	}
-	req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
-	blks, err := client.ListBeaconBlocks(context.Background(), req)
+	// TODO(rgeraldes24): remove
+	/*
+		req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
+		blks, err := client.ListBeaconBlocks(context.Background(), req)
+		if err != nil {
+			return errors.Wrap(err, "failed to get blocks from beacon-chain")
+		}
+	*/
+	blks, err := getEpochBlocks(client, begin)
 	if err != nil {
-		return errors.Wrap(err, "failed to get blocks from beacon-chain")
+		return errors.Wrap(err, "error retrieving blocks list from API")
 	}
 
 	slotsPerVotingPeriod := params.E2ETestConfig().SlotsPerEpoch.Mul(uint64(params.E2ETestConfig().EpochsPerEth1VotingPeriod))
-	for _, blk := range blks.BlockContainers {
+	for _, blk := range blks {
 		var slot primitives.Slot
 		var vote []byte
 		switch blk.Block.(type) {
@@ -646,4 +660,24 @@ func validatorsAreWithdrawn(ec *e2etypes.EvaluationContext, conns ...*grpc.Clien
 		}
 	}
 	return nil
+}
+
+func getEpochBlocks(c zondpb.BeaconChainClient, epoch primitives.Epoch) ([]*zondpb.BeaconBlockContainer, error) {
+	blocks := make([]*zondpb.BeaconBlockContainer, 0)
+	pageToken := "0"
+	for pageToken != "" {
+		req := &zondpb.ListBlocksRequest{
+			QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: epoch},
+			// NOTE(rgeraldes24): fails with 2 blocks
+			PageSize:  1,
+			PageToken: pageToken,
+		}
+		blks, err := c.ListBeaconBlocks(context.Background(), req)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get blocks")
+		}
+		blocks = append(blocks, blks.BlockContainers...)
+		pageToken = blks.NextPageToken
+	}
+	return blocks, nil
 }

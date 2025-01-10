@@ -296,7 +296,7 @@ func getAllActiveValidators(c zondpb.BeaconChainClient) ([]*zondpb.Validator, er
 	pageToken := "0"
 	for pageToken != "" {
 		validatorRequest := &zondpb.ListValidatorsRequest{
-			PageSize:  100,
+			PageSize:  256,
 			PageToken: pageToken,
 			Active:    true,
 		}

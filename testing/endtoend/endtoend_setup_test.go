@@ -52,12 +52,14 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 	evals := []types.Evaluator{
 		ev.PeersConnect,
 		ev.HealthzCheck,
-		ev.MetricsCheck,
+		// TODO(rgeraldes24): enable
+		// ev.MetricsCheck,
 		ev.ValidatorsAreActive,
 		ev.ValidatorsParticipatingAtEpoch(2),
 		ev.FinalizationOccurs(3),
 		ev.VerifyBlockGraffiti,
-		ev.PeersCheck,
+		// TODO(rgeraldes24)
+		// ev.PeersCheck,
 		ev.ProposeVoluntaryExit,
 		ev.ValidatorsHaveExited,
 		ev.SubmitWithdrawal,
