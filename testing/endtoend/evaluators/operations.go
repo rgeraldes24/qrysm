@@ -98,12 +98,14 @@ var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 		// Determine the withdrawal epoch by using the max seed lookahead. This value
 		// differs for our minimal and mainnet config which is why we calculate it
 		// each time the policy is executed.
-		validWithdrawnEpoch := exitSubmissionEpoch + 1 + params.BeaconConfig().MaxSeedLookahead
-		// Only run this for minimal setups after capella
-		if params.BeaconConfig().ConfigName == params.EndToEndName {
-			// validWithdrawnEpoch = helpers.CapellaE2EForkEpoch + 1
-			validWithdrawnEpoch = 11
-		}
+		// TODO(rgeraldes24)
+		// validWithdrawnEpoch := exitSubmissionEpoch + 1 + params.BeaconConfig().MaxSeedLookahead
+		// // Only run this for minimal setups after capella
+		// if params.BeaconConfig().ConfigName == params.EndToEndName {
+		// 	// validWithdrawnEpoch = helpers.CapellaE2EForkEpoch + 1
+		// 	validWithdrawnEpoch = 11
+		// }
+		validWithdrawnEpoch := primitives.Epoch(13)
 		requiredPolicy := policies.OnEpoch(validWithdrawnEpoch)
 		return requiredPolicy(currentEpoch)
 	},
@@ -415,6 +417,8 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 
 	// Send exits for keys which already contain execution credentials.
 	for _, idx := range execIndices {
+		fmt.Println("Send exits for keys which already contain execution credentials.")
+		fmt.Println(primitives.ValidatorIndex(idx))
 		if err := sendExit(primitives.ValidatorIndex(idx)); err != nil {
 			return err
 		}
@@ -422,7 +426,10 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 
 	// Send an exit for a non-exited validator.
 	for i := 0; i < numOfExits; {
-		randIndex := primitives.ValidatorIndex(rand.Uint64() % params.BeaconConfig().MinGenesisActiveValidatorCount)
+		valIdx := rand.Uint64() % params.BeaconConfig().MinGenesisActiveValidatorCount
+		fmt.Println("Send an exit for a non-exited validator.")
+		fmt.Println(primitives.ValidatorIndex(valIdx))
+		randIndex := primitives.ValidatorIndex(valIdx)
 		if ec.ExitedVals[bytesutil.ToBytes2592(privKeys[randIndex].PublicKey().Marshal())] {
 			continue
 		}
@@ -552,7 +559,9 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 	exitedIndices := make([]primitives.ValidatorIndex, 0)
 
 	for key := range ec.ExitedVals {
+		fmt.Println("Submit withdrawal.")
 		valIdx, ok := st.ValidatorIndexByPubkey(key)
+		fmt.Println(valIdx)
 		if !ok {
 			return errors.Errorf("pubkey %#x does not exist in our state", key)
 		}
@@ -577,6 +586,8 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 			return err
 		}
 		if val.WithdrawalCredentials[0] == params.BeaconConfig().ZondAddressWithdrawalPrefixByte {
+			fmt.Println("val.WithdrawalCredentials[0] == params.BeaconConfig().ZondAddressWithdrawalPrefixByte")
+			fmt.Println(idx)
 			continue
 		}
 		if !bytes.Equal(val.PublicKey, privKeys[idx].PublicKey().Marshal()) {
@@ -635,6 +646,8 @@ func validatorsAreWithdrawn(ec *e2etypes.EvaluationContext, conns ...*grpc.Clien
 		if !ok {
 			return errors.Errorf("pubkey %#x does not exist in our state", key)
 		}
+		fmt.Println("Have withdrawn.")
+		fmt.Println(valIdx)
 		bal, err := st.BalanceAtIndex(valIdx)
 		if err != nil {
 			return err

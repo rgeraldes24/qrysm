@@ -108,7 +108,7 @@ var BeaconNodeLogFileName = "beacon-%d.log"
 var ValidatorLogFileName = "vals-%d.log"
 
 // StandardBeaconCount is a global constant for the count of beacon nodes of standard E2E tests.
-var StandardBeaconCount = 2
+var StandardBeaconCount = 4
 
 // DepositCount is the number of deposits the E2E runner should make to evaluate post-genesis deposit processing.
 var DepositCount = uint64(64)
