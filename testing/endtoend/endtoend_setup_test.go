@@ -25,6 +25,13 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 	}
 	require.NoError(t, params.SetActive(types.StartAt(v, e2eConfig)))
 
+	secondsPerSlotStr, present := os.LookupEnv("E2E_SECONDS_PER_SLOT")
+	if present {
+		secondsPerSlot, err := strconv.Atoi(secondsPerSlotStr)
+		require.NoError(t, err)
+		e2eConfig.SecondsPerSlot = uint64(secondsPerSlot)
+	}
+
 	var err error
 	beaconNodeCount := e2eParams.StandardBeaconCount
 	beaconNodeCountStr, present := os.LookupEnv("E2E_BEACON_NODE_COUNT")
@@ -52,14 +59,12 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 	evals := []types.Evaluator{
 		ev.PeersConnect,
 		ev.HealthzCheck,
-		// TODO(rgeraldes24): enable
-		// ev.MetricsCheck,
+		ev.MetricsCheck,
 		ev.ValidatorsAreActive,
 		ev.ValidatorsParticipatingAtEpoch(2),
 		ev.FinalizationOccurs(3),
 		ev.VerifyBlockGraffiti,
-		// TODO(rgeraldes24)
-		// ev.PeersCheck,
+		ev.PeersCheck,
 		ev.ProposeVoluntaryExit,
 		ev.ValidatorsHaveExited,
 		ev.SubmitWithdrawal,

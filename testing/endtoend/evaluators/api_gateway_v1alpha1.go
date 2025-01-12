@@ -38,10 +38,9 @@ func apiGatewayV1Alpha1Verify(_ *e2etypes.EvaluationContext, conns ...*grpc.Clie
 		if err := runAPIComparisonFunctions(
 			beaconNodeIdx,
 			conn,
-			// TODO(rgeraldes24): fix
-			// withComparePeers,
-			// withCompareListAttestations,
-			// withCompareValidators,
+			withComparePeers,
+			withCompareListAttestations,
+			withCompareValidators,
 			withCompareChainHead,
 		); err != nil {
 			return err

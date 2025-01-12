@@ -40,6 +40,7 @@ var depositsInBlockStart = params.E2ETestConfig().EpochsPerEth1VotingPeriod * 2
 var depositActivationStartEpoch = depositsInBlockStart + 2 + params.E2ETestConfig().MaxSeedLookahead
 var depositEndEpoch = depositActivationStartEpoch + primitives.Epoch(math.Ceil(float64(depositValCount)/float64(params.E2ETestConfig().MinPerEpochChurnLimit)))
 var exitSubmissionEpoch = primitives.Epoch(7)
+var withdrawalSubmissionEpoch = primitives.Epoch(9)
 
 // ProcessesDepositsInBlocks ensures the expected amount of deposits are accepted into blocks.
 var ProcessesDepositsInBlocks = e2etypes.Evaluator{
@@ -85,9 +86,8 @@ var ValidatorsHaveExited = e2etypes.Evaluator{
 
 // SubmitWithdrawal sends a withdrawal from a previously exited validator.
 var SubmitWithdrawal = e2etypes.Evaluator{
-	Name: "submit_withdrawal_epoch_%d",
-	// Policy:     policies.BetweenEpochs(helpers.CapellaE2EForkEpoch-2, helpers.CapellaE2EForkEpoch+1),
-	Policy:     policies.BetweenEpochs(8, 11),
+	Name:       "submit_withdrawal_epoch_%d",
+	Policy:     policies.OnEpoch(withdrawalSubmissionEpoch),
 	Evaluation: submitWithdrawal,
 }
 
@@ -98,12 +98,7 @@ var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 		// Determine the withdrawal epoch by using the max seed lookahead. This value
 		// differs for our minimal and mainnet config which is why we calculate it
 		// each time the policy is executed.
-		validWithdrawnEpoch := exitSubmissionEpoch + 1 + params.BeaconConfig().MaxSeedLookahead
-		// Only run this for minimal setups after capella
-		if params.BeaconConfig().ConfigName == params.EndToEndName {
-			// validWithdrawnEpoch = helpers.CapellaE2EForkEpoch + 1
-			validWithdrawnEpoch = 11
-		}
+		validWithdrawnEpoch := withdrawalSubmissionEpoch + 1 + params.BeaconConfig().MaxSeedLookahead
 		requiredPolicy := policies.OnEpoch(validWithdrawnEpoch)
 		return requiredPolicy(currentEpoch)
 	},
@@ -180,19 +175,12 @@ func verifyGraffitiInBlocks(_ *e2etypes.EvaluationContext, conns ...*grpc.Client
 	if begin > 0 {
 		begin = begin.Sub(1)
 	}
-	// TODO(rgeraldes24): remove
-	/*
-		req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
-		blks, err := client.ListBeaconBlocks(context.Background(), req)
-		if err != nil {
-			return errors.Wrap(err, "failed to get blocks from beacon-chain")
-		}
-	*/
-	blks, err := getEpochBlocks(client, begin)
+	req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
+	blks, err := client.ListBeaconBlocks(context.Background(), req)
 	if err != nil {
-		return errors.Wrap(err, "error retrieving blocks list from API")
+		return errors.Wrap(err, "failed to get blocks from beacon-chain")
 	}
-	for _, ctr := range blks {
+	for _, ctr := range blks.BlockContainers {
 		blk, err := blocks.BeaconBlockContainerToSignedBeaconBlock(ctr)
 		if err != nil {
 			return err
@@ -475,21 +463,14 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 	if begin > 0 {
 		begin = begin.Sub(1)
 	}
-	// TODO(rgeraldes24): remove
-	/*
-		req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
-		blks, err := client.ListBeaconBlocks(context.Background(), req)
-		if err != nil {
-			return errors.Wrap(err, "failed to get blocks from beacon-chain")
-		}
-	*/
-	blks, err := getEpochBlocks(client, begin)
+	req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
+	blks, err := client.ListBeaconBlocks(context.Background(), req)
 	if err != nil {
-		return errors.Wrap(err, "error retrieving blocks list from API")
+		return errors.Wrap(err, "failed to get blocks from beacon-chain")
 	}
 
 	slotsPerVotingPeriod := params.E2ETestConfig().SlotsPerEpoch.Mul(uint64(params.E2ETestConfig().EpochsPerEth1VotingPeriod))
-	for _, blk := range blks {
+	for _, blk := range blks.BlockContainers {
 		var slot primitives.Slot
 		var vote []byte
 		switch blk.Block.(type) {
@@ -580,12 +561,7 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 	changes := make([]*v1.SignedDilithiumToExecutionChange, 0)
 	// Only send half the number of changes each time, to allow us to test
 	// at the fork boundary.
-	wantedChanges := numOfExits / 2
 	for _, idx := range exitedIndices {
-		// Exit sending more change messages.
-		if len(changes) >= wantedChanges {
-			break
-		}
 		val, err := st.ValidatorAtIndex(idx)
 		if err != nil {
 			return err
@@ -660,24 +636,4 @@ func validatorsAreWithdrawn(ec *e2etypes.EvaluationContext, conns ...*grpc.Clien
 		}
 	}
 	return nil
-}
-
-func getEpochBlocks(c zondpb.BeaconChainClient, epoch primitives.Epoch) ([]*zondpb.BeaconBlockContainer, error) {
-	blocks := make([]*zondpb.BeaconBlockContainer, 0)
-	pageToken := "0"
-	for pageToken != "" {
-		req := &zondpb.ListBlocksRequest{
-			QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: epoch},
-			// NOTE(rgeraldes24): fails with 2 blocks
-			PageSize:  1,
-			PageToken: pageToken,
-		}
-		blks, err := c.ListBeaconBlocks(context.Background(), req)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to get blocks")
-		}
-		blocks = append(blocks, blks.BlockContainers...)
-		pageToken = blks.NextPageToken
-	}
-	return blocks, nil
 }

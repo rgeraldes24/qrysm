@@ -293,8 +293,7 @@ func NewLocalConnection(ctx context.Context, port int) (*grpc.ClientConn, error)
 	dialOpts := []grpc.DialOption{
 		grpc.WithInsecure(),
 		grpc.WithDefaultCallOptions(
-			grpc.MaxCallRecvMsgSize(math.MaxInt64),
-			grpc.MaxCallSendMsgSize(math.MaxInt64),
+			grpc.MaxCallRecvMsgSize(math.MaxInt32),
 		),
 	}
 	conn, err := grpc.DialContext(ctx, endpoint, dialOpts...)
