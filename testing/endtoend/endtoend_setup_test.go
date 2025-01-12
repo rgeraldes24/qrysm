@@ -23,14 +23,13 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 		require.NoError(t, err)
 		e2eConfig.MinGenesisActiveValidatorCount = uint64(validatorCount)
 	}
-	require.NoError(t, params.SetActive(types.StartAt(v, e2eConfig)))
-
 	secondsPerSlotStr, present := os.LookupEnv("E2E_SECONDS_PER_SLOT")
 	if present {
 		secondsPerSlot, err := strconv.Atoi(secondsPerSlotStr)
 		require.NoError(t, err)
 		e2eConfig.SecondsPerSlot = uint64(secondsPerSlot)
 	}
+	require.NoError(t, params.SetActive(types.StartAt(v, e2eConfig)))
 
 	var err error
 	beaconNodeCount := e2eParams.StandardBeaconCount
