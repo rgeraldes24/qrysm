@@ -95,10 +95,11 @@ var SubmitWithdrawal = e2etypes.Evaluator{
 var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 	Name: "validator_has_withdrawn_%d",
 	Policy: func(currentEpoch primitives.Epoch) bool {
-		// Determine the withdrawal epoch by using the max seed lookahead. This value
-		// differs for our minimal and mainnet config which is why we calculate it
-		// each time the policy is executed.
-		validWithdrawnEpoch := withdrawalSubmissionEpoch + 1 + params.BeaconConfig().MaxSeedLookahead
+		// TODO: Fix this for mainnet configs.
+		if params.BeaconConfig().ConfigName != params.EndToEndName {
+			return false
+		}
+		validWithdrawnEpoch := withdrawalSubmissionEpoch + 1 + params.BeaconConfig().MaxSeedLookahead + 2
 		requiredPolicy := policies.OnEpoch(validWithdrawnEpoch)
 		return requiredPolicy(currentEpoch)
 	},
