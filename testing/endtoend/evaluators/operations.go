@@ -559,8 +559,6 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 		return err
 	}
 	changes := make([]*v1.SignedDilithiumToExecutionChange, 0)
-	// Only send half the number of changes each time, to allow us to test
-	// at the fork boundary.
 	for _, idx := range exitedIndices {
 		val, err := st.ValidatorAtIndex(idx)
 		if err != nil {
