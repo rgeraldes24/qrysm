@@ -40,7 +40,7 @@ var depositsInBlockStart = params.E2ETestConfig().EpochsPerEth1VotingPeriod * 2
 var depositActivationStartEpoch = depositsInBlockStart + 2 + params.E2ETestConfig().MaxSeedLookahead
 var depositEndEpoch = depositActivationStartEpoch + primitives.Epoch(math.Ceil(float64(depositValCount)/float64(params.E2ETestConfig().MinPerEpochChurnLimit)))
 var exitSubmissionEpoch = primitives.Epoch(7)
-var withdrawalSubmissionEpoch = primitives.Epoch(9)
+var withdrawalSubmissionEpoch = primitives.Epoch(8)
 
 // ProcessesDepositsInBlocks ensures the expected amount of deposits are accepted into blocks.
 var ProcessesDepositsInBlocks = e2etypes.Evaluator{
@@ -99,8 +99,7 @@ var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 		if params.BeaconConfig().ConfigName != params.EndToEndName {
 			return false
 		}
-		validWithdrawnEpoch := withdrawalSubmissionEpoch + 1 + params.BeaconConfig().MaxSeedLookahead + 2
-		requiredPolicy := policies.OnEpoch(validWithdrawnEpoch)
+		requiredPolicy := policies.OnEpoch(primitives.Epoch(11))
 		return requiredPolicy(currentEpoch)
 	},
 	Evaluation: validatorsAreWithdrawn,

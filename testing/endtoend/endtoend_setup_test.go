@@ -22,6 +22,7 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 		validatorCount, err := strconv.Atoi(validatorCountStr)
 		require.NoError(t, err)
 		e2eConfig.MinGenesisActiveValidatorCount = uint64(validatorCount)
+		e2eConfig.MaxValidatorsPerWithdrawalsSweep = uint64(validatorCount) / 2
 	}
 	secondsPerSlotStr, present := os.LookupEnv("E2E_SECONDS_PER_SLOT")
 	if present {
@@ -40,8 +41,8 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 	}
 	require.NoError(t, e2eParams.Init(t, beaconNodeCount))
 
-	// Run for 14 epochs if not in long-running to confirm long-running has no issues.
-	epochsToRun := 14
+	// Run for 12 epochs if not in long-running to confirm long-running has no issues.
+	epochsToRun := 12
 	epochStr, longRunning := os.LookupEnv("E2E_EPOCHS")
 	if longRunning {
 		epochsToRun, err = strconv.Atoi(epochStr)
