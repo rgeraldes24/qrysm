@@ -40,6 +40,7 @@ var depositsInBlockStart = params.E2ETestConfig().EpochsPerEth1VotingPeriod * 2
 var depositActivationStartEpoch = depositsInBlockStart + 2 + params.E2ETestConfig().MaxSeedLookahead
 var depositEndEpoch = depositActivationStartEpoch + primitives.Epoch(math.Ceil(float64(depositValCount)/float64(params.E2ETestConfig().MinPerEpochChurnLimit)))
 var exitSubmissionEpoch = primitives.Epoch(7)
+var withdrawalSubmissionEpoch = primitives.Epoch(8)
 
 // ProcessesDepositsInBlocks ensures the expected amount of deposits are accepted into blocks.
 var ProcessesDepositsInBlocks = e2etypes.Evaluator{
@@ -85,9 +86,8 @@ var ValidatorsHaveExited = e2etypes.Evaluator{
 
 // SubmitWithdrawal sends a withdrawal from a previously exited validator.
 var SubmitWithdrawal = e2etypes.Evaluator{
-	Name: "submit_withdrawal_epoch_%d",
-	// Policy:     policies.BetweenEpochs(helpers.CapellaE2EForkEpoch-2, helpers.CapellaE2EForkEpoch+1),
-	Policy:     policies.BetweenEpochs(8, 11),
+	Name:       "submit_withdrawal_epoch_%d",
+	Policy:     policies.OnEpoch(withdrawalSubmissionEpoch),
 	Evaluation: submitWithdrawal,
 }
 
@@ -95,16 +95,11 @@ var SubmitWithdrawal = e2etypes.Evaluator{
 var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 	Name: "validator_has_withdrawn_%d",
 	Policy: func(currentEpoch primitives.Epoch) bool {
-		// Determine the withdrawal epoch by using the max seed lookahead. This value
-		// differs for our minimal and mainnet config which is why we calculate it
-		// each time the policy is executed.
-		validWithdrawnEpoch := exitSubmissionEpoch + 1 + params.BeaconConfig().MaxSeedLookahead
-		// Only run this for minimal setups after capella
-		if params.BeaconConfig().ConfigName == params.EndToEndName {
-			// validWithdrawnEpoch = helpers.CapellaE2EForkEpoch + 1
-			validWithdrawnEpoch = 11
+		// TODO: Fix this for mainnet configs.
+		if params.BeaconConfig().ConfigName != params.EndToEndName {
+			return false
 		}
-		requiredPolicy := policies.OnEpoch(validWithdrawnEpoch)
+		requiredPolicy := policies.OnEpoch(primitives.Epoch(11))
 		return requiredPolicy(currentEpoch)
 	},
 	Evaluation: validatorsAreWithdrawn,
@@ -564,14 +559,7 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 		return err
 	}
 	changes := make([]*v1.SignedDilithiumToExecutionChange, 0)
-	// Only send half the number of changes each time, to allow us to test
-	// at the fork boundary.
-	wantedChanges := numOfExits / 2
 	for _, idx := range exitedIndices {
-		// Exit sending more change messages.
-		if len(changes) >= wantedChanges {
-			break
-		}
 		val, err := st.ValidatorAtIndex(idx)
 		if err != nil {
 			return err

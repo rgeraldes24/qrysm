@@ -32,6 +32,13 @@ var ValidatorsAreActive = types.Evaluator{
 	Evaluation: validatorsAreActive,
 }
 
+// AllValidatorsParticipating ensures that all the validators are participating at all times.
+var AllValidatorsParticipating = types.Evaluator{
+	Name:       "all_validators_participating_epoch_%d",
+	Policy:     policies.AllEpochs,
+	Evaluation: allValidatorsParticipating,
+}
+
 // ValidatorsParticipatingAtEpoch ensures the expected amount of validators are participating.
 var ValidatorsParticipatingAtEpoch = func(epoch primitives.Epoch) types.Evaluator {
 	return types.Evaluator{
@@ -99,6 +106,51 @@ func validatorsAreActive(ec *types.EvaluationContext, conns ...*grpc.ClientConn)
 		return fmt.Errorf("%d validators did not have genesis validator withdrawable epoch of far future epoch", withdrawEpochWrongCount)
 	}
 
+	return nil
+}
+
+// allValidatorsParticipating ensures thaat validators have 100% participation rate.
+func allValidatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.ClientConn) error {
+	conn := conns[0]
+	client := zondpb.NewBeaconChainClient(conn)
+	debugClient := zondpbservice.NewBeaconDebugClient(conn)
+	validatorRequest := &zondpb.GetValidatorParticipationRequest{}
+	participation, err := client.GetValidatorParticipation(context.Background(), validatorRequest)
+	if err != nil {
+		return errors.Wrap(err, "failed to get validator participation")
+	}
+
+	partRate := float32(participation.Participation.PreviousEpochTargetAttestingGwei) / float32(participation.Participation.PreviousEpochActiveGwei)
+	expected := float32(expectedParticipation)
+
+	if partRate < expected {
+		st, err := debugClient.GetBeaconState(context.Background(), &v1.BeaconStateRequest{StateId: []byte("head")})
+		if err != nil {
+			return errors.Wrap(err, "failed to get beacon state")
+		}
+		var missSrcVals []uint64
+		var missTgtVals []uint64
+		var missHeadVals []uint64
+		switch obj := st.Data.State.(type) {
+		case *v1.BeaconStateContainer_CapellaState:
+			missSrcVals, missTgtVals, missHeadVals, err = findMissingValidators(obj.CapellaState.PreviousEpochParticipation)
+			if err != nil {
+				return errors.Wrap(err, "failed to get missing validators")
+			}
+		default:
+			return fmt.Errorf("unrecognized version: %v", st.Version)
+		}
+		return fmt.Errorf(
+			"validator participation was below for epoch %d, expected %f, received: %f."+
+				" Missing Source,Target and Head validators are %v, %v, %v",
+			participation.Epoch,
+			expected,
+			partRate,
+			missSrcVals,
+			missTgtVals,
+			missHeadVals,
+		)
+	}
 	return nil
 }
 

@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math"
 	"net"
 	"net/http"
 	"os"
@@ -291,6 +292,9 @@ func NewLocalConnection(ctx context.Context, port int) (*grpc.ClientConn, error)
 	endpoint := fmt.Sprintf("127.0.0.1:%d", port)
 	dialOpts := []grpc.DialOption{
 		grpc.WithInsecure(),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(math.MaxInt32),
+		),
 	}
 	conn, err := grpc.DialContext(ctx, endpoint, dialOpts...)
 	if err != nil {
