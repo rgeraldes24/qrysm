@@ -60,6 +60,7 @@ type E2EConfig struct {
 	UseFixedPeerIDs     bool
 	UseBeaconRestApi    bool
 	UseBuilder          bool
+	RunMetrics          bool
 	EpochsToRun         uint64
 	Seed                int64
 	TracingSinkEndpoint string

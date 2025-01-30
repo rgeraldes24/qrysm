@@ -2259,8 +2259,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_jung_kurt_gofpdf",
         importpath = "github.com/jung-kurt/gofpdf",
-        sum = "h1:PJr+ZMXIecYc1Ey2zucXdR73SMBtgjPgwa31099IMv0=",
-        version = "v1.0.3-0.20190309125859-24315acbbda5",
+        sum = "h1:jgbatWHfRlPYiK85qgevsZTHviWXKwB1TTiKdz5PtRc=",
+        version = "v1.16.2",
     )
     go_repository(
         name = "com_github_jwilder_encoding",
@@ -5435,8 +5435,8 @@ def qrysm_deps():
     go_repository(
         name = "org_golang_x_image",
         importpath = "golang.org/x/image",
-        sum = "h1:+qEpEAPhDZ1o0x3tHzZTQDArnOixOzGD9HUJfcg0mb4=",
-        version = "v0.0.0-20190802002840-cff245a6509b",
+        sum = "h1:gHevYm0pO4QUbwy8Dmdr01R5r1BuKtfYqRqF0h/Cbh0=",
+        version = "v0.0.0-20190910094157-69e4b8554b2a",
     )
 
     go_repository(
@@ -5636,6 +5636,13 @@ def go_dependencies():
         version = "v1.5.0",
     )
     go_repository(
+        name = "com_github_boombuler_barcode",
+        importpath = "github.com/boombuler/barcode",
+        sum = "h1:s1TvRnXwL2xJRaccrdcBQMZxq6X7DvsMogtmJeHDdrc=",
+        version = "v1.0.0",
+    )
+
+    go_repository(
         name = "com_github_chromedp_cdproto",
         importpath = "github.com/chromedp/cdproto",
         sum = "h1:aPflPkRFkVwbW6dmcVqfgwp1i+UWGFH6VgR1Jim5Ygc=",
@@ -5718,6 +5725,13 @@ def go_dependencies():
         sum = "h1:jWpvCLoY8Z/e3VKvlsiIGKtc+UG6U5vzxaoagmhXfyg=",
         version = "v2.0.0",
     )
+    go_repository(
+        name = "com_github_phpdave11_gofpdi",
+        importpath = "github.com/phpdave11/gofpdi",
+        sum = "h1:k2oy4yhkQopCK+qW8KjCla0iU2RpDow+QUDmH9DDt44=",
+        version = "v1.0.7",
+    )
+
     go_repository(
         name = "com_github_pion_datachannel",
         importpath = "github.com/pion/datachannel",
@@ -5859,6 +5873,13 @@ def go_dependencies():
         sum = "h1:f+4lVZi5kqPDwM9McRRe5jzG9NGeRh7wpP2AGf82Mno=",
         version = "v0.0.0-20241118080837-8c2407dd8040",
     )
+    go_repository(
+        name = "com_github_ruudk_golang_pdf417",
+        importpath = "github.com/ruudk/golang-pdf417",
+        sum = "h1:nlG4Wa5+minh3S9LVFtNoY+GVRiudA2e3EVfcCi3RCA=",
+        version = "v0.0.0-20181029194003-1af4ab5afa58",
+    )
+
     go_repository(
         name = "com_github_sclevine_agouti",
         importpath = "github.com/sclevine/agouti",

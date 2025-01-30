@@ -95,6 +95,7 @@ require (
 )
 
 require (
+	github.com/jung-kurt/gofpdf v1.16.2
 	github.com/libp2p/go-libp2p-mplex v0.9.0
 	github.com/rgeraldes24/FuzzyVM v0.0.0-20241118080648-66efa6055064
 	github.com/rgeraldes24/tx-fuzz v0.0.0-20241118080837-8c2407dd8040

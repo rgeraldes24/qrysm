@@ -33,10 +33,12 @@ var ValidatorsAreActive = types.Evaluator{
 }
 
 // AllValidatorsParticipating ensures that all the validators are participating at all times.
-var AllValidatorsParticipating = types.Evaluator{
-	Name:       "all_validators_participating_epoch_%d",
-	Policy:     policies.AllEpochs,
-	Evaluation: allValidatorsParticipating,
+var AllValidatorsParticipating = func(epoch primitives.Epoch) types.Evaluator {
+	return types.Evaluator{
+		Name:       "all_validators_participating_epoch_%d",
+		Policy:     policies.AfterNthEpoch(epoch),
+		Evaluation: allValidatorsParticipating,
+	}
 }
 
 // ValidatorsParticipatingAtEpoch ensures the expected amount of validators are participating.
@@ -109,7 +111,8 @@ func validatorsAreActive(ec *types.EvaluationContext, conns ...*grpc.ClientConn)
 	return nil
 }
 
-// allValidatorsParticipating ensures thaat validators have 100% participation rate.
+// TODO(rgeraldes24): refactor
+// allValidatorsParticipating ensures that validators have 100% participation rate.
 func allValidatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
 	client := zondpb.NewBeaconChainClient(conn)
@@ -121,7 +124,7 @@ func allValidatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.Clien
 	}
 
 	partRate := float32(participation.Participation.PreviousEpochTargetAttestingGwei) / float32(participation.Participation.PreviousEpochActiveGwei)
-	expected := float32(expectedParticipation)
+	expected := float32(1)
 
 	if partRate < expected {
 		st, err := debugClient.GetBeaconState(context.Background(), &v1.BeaconStateRequest{StateId: []byte("head")})

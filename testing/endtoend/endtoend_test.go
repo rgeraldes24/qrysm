@@ -23,6 +23,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/endtoend/components"
 	ev "github.com/theQRL/qrysm/testing/endtoend/evaluators"
@@ -30,6 +31,7 @@ import (
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	e2etypes "github.com/theQRL/qrysm/testing/endtoend/types"
 	"github.com/theQRL/qrysm/testing/require"
+	"github.com/theQRL/qrysm/time/slots"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -168,6 +170,7 @@ func (r *testRunner) waitForChainStart() {
 func (r *testRunner) runEvaluators(ec *e2etypes.EvaluationContext, conns []*grpc.ClientConn, tickingStartTime time.Time) error {
 	t, config := r.t, r.config
 	secondsPerEpoch := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot))
+
 	ticker := helpers.NewEpochTicker(tickingStartTime, secondsPerEpoch)
 	for currentEpoch := range ticker.C() {
 		if config.EvalInterceptor(ec, currentEpoch, conns) {
@@ -183,6 +186,43 @@ func (r *testRunner) runEvaluators(ec *e2etypes.EvaluationContext, conns []*grpc
 			break
 		}
 	}
+	return nil
+}
+
+func (r *testRunner) runMetrics(conns []*grpc.ClientConn, genesisTime time.Time) error {
+	t, config := r.t, r.config
+
+	beaconClient := zondpb.NewBeaconChainClient(conns[0])
+	rewardHistory := newRewardHistory(beaconClient)
+	ticker := slots.NewSlotTicker(genesisTime, params.BeaconConfig().SecondsPerSlot)
+	for currentSlot := range ticker.C() {
+		currentEpoch := uint64(slots.ToEpoch(currentSlot))
+
+		deadline := SlotDeadline(currentSlot, genesisTime)
+		slotCtx, cancel := context.WithDeadline(context.TODO(), deadline)
+
+		// indices := []primitives.ValidatorIndex{0, 1, 2, 3, 4} // TODO(rgeraldes24)
+		indices := []primitives.ValidatorIndex{1, 2}
+		if err := rewardHistory.LogValidatorGainsAndLosses(slotCtx, currentSlot, indices); err != nil {
+			cancel()
+			return err
+		}
+		cancel()
+
+		if t.Failed() || currentEpoch >= config.EpochsToRun-1 {
+			ticker.Done()
+			if t.Failed() {
+				return errors.New("test failed")
+			}
+			break
+		}
+
+	}
+
+	if err := GeneratePdfReport(*rewardHistory, ""); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -489,9 +529,26 @@ func (r *testRunner) defaultEndToEndRun() error {
 	tickingStartTime := helpers.EpochTickerStartTime(genesis)
 
 	ec := e2etypes.NewEvaluationContext(r.depositor.History())
-	// Run assigned evaluators.
-	if err := r.runEvaluators(ec, conns, tickingStartTime); err != nil {
-		return errors.Wrap(err, "one or more evaluators failed")
+
+	eg, _ := errgroup.WithContext(ctx)
+	eg.Go(func() error {
+		// Run assigned evaluators.
+		if err := r.runEvaluators(ec, conns, tickingStartTime); err != nil {
+			return errors.Wrap(err, "one or more evaluators failed")
+		}
+		return nil
+	})
+	if r.config.RunMetrics {
+		eg.Go(func() error {
+			// Run metrics.
+			if err := r.runMetrics(conns, time.Unix(genesis.GenesisTime.Seconds, 0)); err != nil {
+				return errors.Wrap(err, "metrics failed")
+			}
+			return nil
+		})
+	}
+	if err := eg.Wait(); err != nil {
+		return err
 	}
 
 	// index := e2e.TestParams.BeaconNodeCount
