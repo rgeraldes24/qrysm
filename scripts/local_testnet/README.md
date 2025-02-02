@@ -1,6 +1,6 @@
 # Simple Local Testnet
 
-These scripts allow for running a small local testnet with a default of 4 beacon nodes, 4 validator clients and 4 geth execution clients using Kurtosis.
+These scripts allow for running a small local testnet with a default of 4 beacon nodes, 4 validator clients and 4 gzond execution clients using Kurtosis.
 This setup can be useful for testing and development.
 
 ## Installation

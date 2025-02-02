@@ -81,6 +81,7 @@ if [ "$KEEP_ENCLAVE" = false ]; then
   kurtosis enclave rm -f $ENCLAVE_NAME 2>/dev/null || true
 fi
 
-kurtosis run --enclave $ENCLAVE_NAME github.com/theQRL/zond-package@$ZOND_PKG_VERSION --args-file $NETWORK_PARAMS_FILE
+# TODO(rgeraldes24): package repo: theQRL
+kurtosis run --enclave $ENCLAVE_NAME github.com/rgeraldes24/zond-package@$ZOND_PKG_VERSION --args-file $NETWORK_PARAMS_FILE
 
 echo "Started!"
