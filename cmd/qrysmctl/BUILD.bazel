@@ -44,8 +44,8 @@ container_image(
 container_bundle(
     name = "image_bundle",
     images = {
-        "gcr.io/prysmaticlabs/prysm/cmd/qrysmctl:latest": ":image_with_creation_time",
-        "gcr.io/prysmaticlabs/prysm/cmd/qrysmctl:{DOCKER_TAG}": ":image_with_creation_time",
+        "index.docker.io/theqrl/qrysm-qrysmctl:latest": ":image_with_creation_time",
+        "index.docker.io/theqrl/qrysm-qrysmctl:{DOCKER_TAG}": ":image_with_creation_time",
     },
     tags = ["manual"],
     visibility = ["//cmd/qrysmctl:__pkg__"],
@@ -61,8 +61,8 @@ go_image_debug(
 container_bundle(
     name = "image_bundle_debug",
     images = {
-        "gcr.io/prysmaticlabs/prysm/cmd/qrysmctl:latest-debug": ":image_debug",
-        "gcr.io/prysmaticlabs/prysm/cmd/qrysmctl:{DOCKER_TAG}-debug": ":image_debug",
+        "index.docker.io/theqrl/qrysm-qrysmctl:latest-debug": ":image_debug",
+        "index.docker.io/theqrl/qrysm-qrysmctl:{DOCKER_TAG}-debug": ":image_debug",
     },
     tags = ["manual"],
     visibility = ["//cmd/qrysmctl:__pkg__"],
@@ -93,7 +93,7 @@ qrysm_image_upload(
     name = "push_oci_image",
     binary = ":qrysmctl",
     entrypoint = ["/qrysmctl"],
-    repository = "gcr.io/prylabs-dev/prysm/prysmctl",
+    repository = "index.docker.io/theqrl-dev/qrysm-qrysmctl",
     symlinks = {
         # Backwards compatiability for images that depended on the old filepath.
         "/app/cmd/qrysmctl/qrysmctl": "/qrysmctl",

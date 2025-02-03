@@ -37,8 +37,8 @@ go_image(
 container_bundle(
     name = "image_bundle",
     images = {
-        "gcr.io/prysmaticlabs/prysm/enr-calculator:latest": ":image",
-        "gcr.io/prysmaticlabs/prysm/enr-calculator:{DOCKER_TAG}": ":image",
+        "index.docker.io/theqrl/qrysm-enr-calculator:latest": ":image",
+        "index.docker.io/theqrl/qrysm-enr-calculator:{DOCKER_TAG}": ":image",
     },
     tags = ["manual"],
 )

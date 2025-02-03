@@ -66,10 +66,8 @@ container_image(
 container_bundle(
     name = "image_bundle",
     images = {
-        "gcr.io/prysmaticlabs/prysm/beacon-chain:latest": ":image_with_creation_time",
-        "gcr.io/prysmaticlabs/prysm/beacon-chain:{DOCKER_TAG}": ":image_with_creation_time",
-        "index.docker.io/prysmaticlabs/prysm-beacon-chain:latest": ":image_with_creation_time",
-        "index.docker.io/prysmaticlabs/prysm-beacon-chain:{DOCKER_TAG}": ":image_with_creation_time",
+        "index.docker.io/theqrl/qrysm-beacon-chain:latest": ":image_with_creation_time",
+        "index.docker.io/theqrl/qrysm-beacon-chain:{DOCKER_TAG}": ":image_with_creation_time",
     },
     tags = ["manual"],
     visibility = ["//beacon-chain:__pkg__"],
@@ -85,10 +83,8 @@ go_image_debug(
 container_bundle(
     name = "image_bundle_debug",
     images = {
-        "gcr.io/prysmaticlabs/prysm/beacon-chain:latest-debug": ":image_debug",
-        "gcr.io/prysmaticlabs/prysm/beacon-chain:{DOCKER_TAG}-debug": ":image_debug",
-        "index.docker.io/prysmaticlabs/prysm-beacon-chain:latest-debug": ":image_debug",
-        "index.docker.io/prysmaticlabs/prysm-beacon-chain:{DOCKER_TAG}-debug": ":image_debug",
+        "index.docker.io/theqrl/qrysm-beacon-chain:latest-debug": ":image_debug",
+        "index.docker.io/theqrl/qrysm-beacon-chain:{DOCKER_TAG}-debug": ":image_debug",
     },
     tags = ["manual"],
     visibility = ["//beacon-chain:__pkg__"],
@@ -133,7 +129,7 @@ qrysm_image_upload(
     name = "push_oci_image",
     binary = ":beacon-chain",
     entrypoint = ["/beacon-chain"],
-    repository = "gcr.io/prylabs-dev/prysm/beacon-chain",
+    repository = "index.docker.io/theqrl-dev/qrysm-beacon-chain",
     symlinks = {
         # Backwards compatiability for images that depended on the old filepath.
         "/app/cmd/beacon-chain/beacon-chain": "/beacon-chain",
