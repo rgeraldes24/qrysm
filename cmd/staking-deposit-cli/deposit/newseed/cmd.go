@@ -1,15 +1,16 @@
 package newseed
 
 import (
-	"crypto/rand"
+	"crypto/sha512"
 	"fmt"
 	"syscall"
 
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
-	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/urfave/cli/v2"
+	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/term"
 )
 
@@ -20,8 +21,16 @@ var (
 		Folder              string
 		ChainName           string
 		ExecutionAddress    string
+		Mnemonic            string
 	}{}
 	log = logrus.WithField("prefix", "deposit")
+
+	// KeystorePassword specifies the keystore password.
+	KeystorePassword = &cli.StringFlag{
+		Name:  "keystore-password",
+		Usage: "The keystore password.",
+		Value: "",
+	}
 )
 var Commands = []*cli.Command{
 	{
@@ -65,36 +74,40 @@ var Commands = []*cli.Command{
 				Destination: &newSeedFlags.ExecutionAddress,
 				Value:       "",
 			},
+			&cli.StringFlag{
+				Name:        "mnemonic",
+				Usage:       "",
+				Destination: &newSeedFlags.Mnemonic,
+				Value:       "",
+			},
 		},
 	},
 }
 
 func cliActionNewSeed(cliCtx *cli.Context) error {
-	// TODO: (cyyber) Replace seed by mnemonic
-	var seed [field_params.DilithiumSeedLength]uint8
+	var keystorePassword string
+	if cliCtx.IsSet(KeystorePassword.Name) {
+		keystorePassword = cliCtx.String(KeystorePassword.Name)
+	} else {
+		fmt.Println("Create a password that secures your validator keystore(s). " +
+			"You will need to re-enter this to decrypt them when you setup your Zond validators.")
+		keystorePassword, err := term.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			return err
+		}
 
-	_, err := rand.Read(seed[:])
-	if err != nil {
-		return fmt.Errorf("failed to generate random seed for Dilithium address: %v", err)
+		fmt.Println("Re-enter password ")
+		reEnterKeystorePassword, err := term.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			return err
+		}
+
+		if string(keystorePassword) != string(reEnterKeystorePassword) {
+			return fmt.Errorf("password mismatch")
+		}
 	}
 
-	fmt.Println("Create a password that secures your validator keystore(s). " +
-		"You will need to re-enter this to decrypt them when you setup your Zond validators.")
-	keystorePassword, err := term.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("Re-enter password ")
-	reEnterKeystorePassword, err := term.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		return err
-	}
-
-	if string(keystorePassword) != string(reEnterKeystorePassword) {
-		return fmt.Errorf("password mismatch")
-	}
-
+	seed := bytesutil.ToBytes48(pbkdf2.Key([]byte(newSeedFlags.Mnemonic), []byte("mnemonic"), 2048, 48, sha512.New))
 	stakingdeposit.GenerateKeys(newSeedFlags.ValidatorStartIndex,
 		newSeedFlags.NumValidators, misc.EncodeHex(seed[:]), newSeedFlags.Folder,
 		newSeedFlags.ChainName, string(keystorePassword), newSeedFlags.ExecutionAddress)
