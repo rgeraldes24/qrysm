@@ -14,13 +14,13 @@ This setup can be useful for testing and development.
 ## Starting the testnet
 
 To start a testnet, from the Qrysm root repository:
-
 ```bash
+
 cd ./scripts/local_testnet
 ./start_local_testnet.sh
 ```
 
-It will build a Qrysm docker image from the root of the directory and will take an approximately 12 minutes to complete. Once built, the testing will be started automatically. You will see a list of services running and "Started!" at the end. 
+You will see a list of services running and "Started!" at the end. 
 You can also select your own Qrysm docker image to use by specifying it in `network_params.yml` under the `cl_image` key.
 Full configuration reference for kurtosis is specified [here](https://github.com/theQRL/zond-package?tab=readme-ov-file#configuration).
 

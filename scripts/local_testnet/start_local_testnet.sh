@@ -7,7 +7,8 @@ set -Eeuo pipefail
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 ENCLAVE_NAME=local-testnet
 NETWORK_PARAMS_FILE=$SCRIPT_DIR/network_params.yaml
-ZOND_PKG_VERSION=main
+#ZOND_PKG_VERSION=main
+ZOND_PKG_VERSION=1d0e1550228b8fc8ce5486c14d744c5db7fda9fe
 
 BUILD_IMAGE=true
 BUILDER_PROPOSALS=false
@@ -41,8 +42,6 @@ while getopts "e:b:n:phck" flag; do
   esac
 done
 
-LH_IMAGE_NAME=$(yq eval ".participants[0].cl_image" $NETWORK_PARAMS_FILE)
-
 if ! command -v docker &> /dev/null; then
     echo "Docker is not installed. Please install Docker and try again."
     exit 1
@@ -69,11 +68,16 @@ if [ "$CI" = true ]; then
 fi
 
 if [ "$BUILD_IMAGE" = true ]; then
-    echo "Building Qrysm Docker image."
+    echo "Building Qrysm Docker images."
     ROOT_DIR="$SCRIPT_DIR/../.."
-    docker build --build-arg FEATURES=portable -f $ROOT_DIR/Dockerfile -t $LH_IMAGE_NAME $ROOT_DIR
+    bazel build //cmd/beacon-chain:oci_image_tarball --config=release
+    bazel build //cmd/validator:oci_image_tarball --config=release
+    bazel build //cmd/staking-deposit-cli/deposit:oci_image_tarball --config=release
+    docker load -i $ROOT_DIR/bazel-bin/cmd/beacon-chain/oci_image_tarball/tarball.tar
+    docker load -i $ROOT_DIR/bazel-bin/cmd/validator/oci_image_tarball/tarball.tar
+    docker load -i $ROOT_DIR/bazel-bin/cmd/staking-deposit-cli/deposit/oci_image_tarball/tarball.tar
 else
-    echo "Not rebuilding Qrysm Docker image."
+    echo "Not rebuilding Qrysm Docker images."
 fi
 
 if [ "$KEEP_ENCLAVE" = false ]; then
