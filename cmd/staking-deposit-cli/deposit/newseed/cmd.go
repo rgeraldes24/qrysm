@@ -80,6 +80,7 @@ var Commands = []*cli.Command{
 				Destination: &newSeedFlags.Mnemonic,
 				Value:       "",
 			},
+			KeystorePassword,
 		},
 	},
 }
