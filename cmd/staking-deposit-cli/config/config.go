@@ -41,7 +41,7 @@ func GetConfig() *Config {
 			},
 			DEV: {
 				Name:                  DEV,
-				GenesisForkVersion:    ToHex("0x10000000"),
+				GenesisForkVersion:    ToHex("0x10000038"),
 				GenesisValidatorsRoot: ToHex("0x8e0aea32a97da3012c2c158bae29794fd08a098144dfee4ed016272035e0d6da"),
 			},
 		},

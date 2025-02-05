@@ -8,7 +8,7 @@ SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ENCLAVE_NAME=local-testnet
 NETWORK_PARAMS_FILE=$SCRIPT_DIR/network_params.yaml
 #ZOND_PKG_VERSION=main
-ZOND_PKG_VERSION=1d0e1550228b8fc8ce5486c14d744c5db7fda9fe
+ZOND_PKG_VERSION=b87f1a10d3a7b3af96de5a612a520b3acbd77529
 
 BUILD_IMAGE=true
 BUILDER_PROPOSALS=false
