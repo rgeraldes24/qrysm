@@ -4,8 +4,6 @@ participants:
     el_image: theqrl/gzond:latest
     cl_type: qrysm
     cl_image: theqrl-dev/qrysm-beacon-chain:latest
-    cl_extra_params:
-      - --target-peers=3
     vc_type: qrysm
     vc_image: theqrl-dev/qrysm-validator:latest
     count: 4

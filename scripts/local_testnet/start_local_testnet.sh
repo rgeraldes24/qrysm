@@ -8,7 +8,7 @@ SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ENCLAVE_NAME=local-testnet
 NETWORK_PARAMS_FILE=$SCRIPT_DIR/network_params.yaml
 #ZOND_PKG_VERSION=main
-ZOND_PKG_VERSION=b87f1a10d3a7b3af96de5a612a520b3acbd77529
+ZOND_PKG_VERSION=3321534e26f39a8c686841cb07718fb7650f1792
 
 BUILD_IMAGE=true
 BUILDER_PROPOSALS=false
@@ -70,12 +70,22 @@ fi
 if [ "$BUILD_IMAGE" = true ]; then
     echo "Building Qrysm Docker images."
     ROOT_DIR="$SCRIPT_DIR/../.."
-    bazel build //cmd/beacon-chain:oci_image_tarball --config=release
-    bazel build //cmd/validator:oci_image_tarball --config=release
-    bazel build //cmd/staking-deposit-cli/deposit:oci_image_tarball --config=release
-    docker load -i $ROOT_DIR/bazel-bin/cmd/beacon-chain/oci_image_tarball/tarball.tar
-    docker load -i $ROOT_DIR/bazel-bin/cmd/validator/oci_image_tarball/tarball.tar
-    docker load -i $ROOT_DIR/bazel-bin/cmd/staking-deposit-cli/deposit/oci_image_tarball/tarball.tar
+    ARCH="$(uname -m)"
+    if [ "$ARCH" = "arm64" ]; then
+        # Beacon node
+        bazel build //cmd/beacon-chain:oci_image_tarball --platforms=@io_bazel_rules_go//go/toolchain:linux_arm64_cgo --config=release
+        docker load -i $ROOT_DIR/bazel-bin/cmd/beacon-chain/oci_image_tarball/tarball.tar
+        # Validator client
+        bazel build //cmd/validator:oci_image_tarball  --platforms=@io_bazel_rules_go//go/toolchain:linux_arm64_cgo --config=release
+        docker load -i $ROOT_DIR/bazel-bin/cmd/validator/oci_image_tarball/tarball.tar
+    else
+        # Beacon node
+        bazel build //cmd/beacon-chain:oci_image_tarball --config=release
+        docker load -i $ROOT_DIR/bazel-bin/cmd/beacon-chain/oci_image_tarball/tarball.tar
+        # Validator client
+        bazel build //cmd/validator:oci_image_tarball --config=release
+        docker load -i $ROOT_DIR/bazel-bin/cmd/validator/oci_image_tarball/tarball.tar
+    fi
 else
     echo "Not rebuilding Qrysm Docker images."
 fi

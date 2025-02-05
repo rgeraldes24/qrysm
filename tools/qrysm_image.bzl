@@ -14,6 +14,7 @@ def qrysm_image_upload(
         srcs = [binary],
         symlinks = symlinks,
         tags = tags,
+        extension = "tar.gz",
     )
 
     oci_image(
@@ -22,10 +23,31 @@ def qrysm_image_upload(
         entrypoint = entrypoint,
         tars = [
             "//tools:passwd_tar",
-            #"//tools:libtinfo6_tar",
-            #"//tools:bash_tar",
+        ] + select({
+          "@platforms//cpu:x86_64": [
+            "@amd64_debian11_bash",
+            "@amd64_debian11_libtinfo6",
+            "@amd64_debian11_coreutils",
+            "@amd64_debian11_libacl1",
+            "@amd64_debian11_libattr1",
+            "@amd64_debian11_libselinux",
+            "@amd64_debian11_libpcre2",
+          ],
+          "@platforms//cpu:arm64": [
+            "@arm64_debian11_bash",
+            "@arm64_debian11_libtinfo6",
+            "@arm64_debian11_coreutils",
+            "@arm64_debian11_libacl1",
+            "@arm64_debian11_libattr1",
+            "@arm64_debian11_libselinux",
+            "@arm64_debian11_libpcre2",
+          ],
+        }) + [
             ":binary_tar",
         ],
+        labels = {
+          "org.opencontainers.image.source": "https://github.com/theQRL/qrysm",
+        },
         tags = tags,
     )
 

@@ -11,6 +11,24 @@ This setup can be useful for testing and development.
 
 1. Install [yq](https://github.com/mikefarah/yq). If you are on Ubuntu, you can install `yq` by running `snap install yq`.
 
+### Apple M1/M2/M3
+
+While doing the docker load step on the latest versions of docker, you might run into this error:
+
+```
+lsetxattr com.apple.provenance /manifest.json: operation not supported
+```
+
+Follow the steps in the link below:
+
+https://github.com/moby/moby/issues/47517#issuecomment-2536322079
+
+and create an alias for gnu-tar:
+
+```
+alias tar="/opt/homebrew/opt/gnu-tar/libexec/gnubin/tar"
+```
+
 ## Starting the testnet
 
 To start a testnet, from the Qrysm root repository:
