@@ -3,12 +3,15 @@ package newseed
 import (
 	"crypto/sha512"
 	"fmt"
+	"strings"
 	"syscall"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	"github.com/theQRL/qrysm/io/file"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/term"
@@ -25,11 +28,10 @@ var (
 	}{}
 	log = logrus.WithField("prefix", "deposit")
 
-	// KeystorePassword specifies the keystore password.
-	KeystorePassword = &cli.StringFlag{
-		Name:  "keystore-password",
+	// KeystorePasswordFile is the path to a file containing the keystore password.
+	KeystorePasswordFile = &cli.StringFlag{
+		Name:  "keystore-password-file",
 		Usage: "The keystore password.",
-		Value: "",
 	}
 )
 var Commands = []*cli.Command{
@@ -80,15 +82,20 @@ var Commands = []*cli.Command{
 				Destination: &newSeedFlags.Mnemonic,
 				Value:       "",
 			},
-			KeystorePassword,
+			KeystorePasswordFile,
 		},
 	},
 }
 
 func cliActionNewSeed(cliCtx *cli.Context) error {
 	var keystorePassword string
-	if cliCtx.IsSet(KeystorePassword.Name) {
-		keystorePassword = cliCtx.String(KeystorePassword.Name)
+	if cliCtx.IsSet(KeystorePasswordFile.Name) {
+		passwordFilePathInput := cliCtx.String(KeystorePasswordFile.Name)
+		data, err := file.ReadFileAsBytes(passwordFilePathInput)
+		if err != nil {
+			return errors.Wrap(err, "could not read file as bytes")
+		}
+		keystorePassword = strings.TrimRight(string(data), "\r\n")
 	} else {
 		fmt.Println("Create a password that secures your validator keystore(s). " +
 			"You will need to re-enter this to decrypt them when you setup your Zond validators.")
