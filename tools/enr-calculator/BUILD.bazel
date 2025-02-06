@@ -28,7 +28,7 @@ qrysm_image_upload(
     name = "push_images",
     binary = ":enr-calculator",
     entrypoint = ["/enr-calculator"],
-    repository = "gcr.io/theqrl/qrysm/enr-calculator",
+    repository = "index.docker.io/theqrl/qrysm-enr-calculator",
     symlinks = {
         # Backwards compatibility for images that depended on the old filepath.
         "/app/tools/enr-calculator/enr-calculator": "/enr-calculator",
