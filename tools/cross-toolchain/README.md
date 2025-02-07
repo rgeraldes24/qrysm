@@ -20,6 +20,8 @@ docker build -t index.docker.io/theqrl/rbe-worker:latest tools/cross-toolchain/.
 docker push index.docker.io/theqrl/rbe-worker:latest 
 ```
 
+Note: You must configured your gcr access credentials to push to gcr.io/prysmaticlabs. Run `gcloud auth configure-docker` or contact SRE team for push access.
+
 2) Note the docker image sha256 digest from the recently pushed image or use the latest one available.
 
 3) Download and run [rbe_configs_gen](https://github.com/bazelbuild/bazel-toolchains#rbe_configs_gen---cli-tool-to-generate-configs) CLI tool.
@@ -35,7 +37,7 @@ rbe_configs_gen \
   --generate_cpp_configs=true \
   --generate_java_configs=true \
   --cpp_env_json=tools/cross-toolchain/cpp_env_clang.json \
-  --toolchain_container=index.docker.io/theqrl/rbe-worker@sha256:90d490709a0fb0c817569f37408823a0490e5502cbecc36415caabfc36a0c2e8 # The sha256 digest from step 2.
+  --toolchain_container=gcr.io/prysmaticlabs/rbe-worker@sha256:90d490709a0fb0c817569f37408823a0490e5502cbecc36415caabfc36a0c2e8e8 # The sha256 digest from step 2.
 ```
 
 4) Test the builds work locally for all supported platforms.
