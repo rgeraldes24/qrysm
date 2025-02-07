@@ -1,5 +1,6 @@
 load("@rules_pkg//pkg:pkg.bzl", "pkg_tar")
 load("@io_bazel_rules_docker//contrib:passwd.bzl", "passwd_entry", "passwd_file")
+# TODO(now.youtrack.cloud/issue/TQ-36)
 #load("@rules_distroless//distroless:defs.bzl", "passwd")
 
 #passwd(
