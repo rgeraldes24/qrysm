@@ -50,7 +50,6 @@ passwd_file(
     tags = ["manual"],
 )
 
-
 # Create a tar file containing the created passwd file
 pkg_tar(
     name = "passwd_tar",
