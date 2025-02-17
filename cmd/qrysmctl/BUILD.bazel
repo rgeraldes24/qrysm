@@ -30,10 +30,10 @@ qrysm_image_upload(
     name = "push_oci_image",
     binary = ":qrysmctl",
     entrypoint = ["/qrysmctl"],
-    repository = "index.docker.io/theqrl-dev/qrysm-qrysmctl",
+    repository = "index.docker.io/qrledger/qrysm",
     symlinks = {
         # Backwards compatiability for images that depended on the old filepath.
         "/app/cmd/qrysmctl/qrysmctl": "/qrysmctl",
     },
-    tags = ["manual"],
+    tags = ["qrysmctl-manual"],
 )
