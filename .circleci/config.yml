@@ -195,6 +195,10 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y libssl-dev libgmp-dev libtinfo5 cmake
       - run:
+          name: Docker Login
+          command: |
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - run:
           name: Build and Upload Docker Images
           command: |
             export PATH="$(pwd)/bin:$PATH"
