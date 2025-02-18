@@ -8,8 +8,7 @@ SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ENCLAVE_NAME=local-testnet
 NETWORK_PARAMS_FILE=$SCRIPT_DIR/network_params.yaml
 # TODO(now.youtrack.cloud/issue/TQ-35)
-# ZOND_PKG_VERSION=main
-ZOND_PKG_VERSION=630ba876d69fc58b812553b1400ccf62259090f3
+ZOND_PKG_VERSION=main
 
 BUILD_IMAGE=true
 BUILDER_PROPOSALS=false
