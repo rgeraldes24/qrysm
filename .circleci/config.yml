@@ -123,7 +123,7 @@ jobs:
   publish-darwin-amd64-binaries:
     macos:
       xcode: 14.2.0
-    resource_class: macos.x86.medium.gen2
+    resource_class: macos.m1.medium.gen1
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
