@@ -159,7 +159,7 @@ jobs:
           platform: "darwin-arm64"
       - *clean_bazel_cache
       - *save_bazel_cache
-          
+
   publish-windows-amd64-binaries:
     machine:
       image: ubuntu-2004:current
@@ -178,7 +178,35 @@ jobs:
           file_extension: ".exe"
       - *clean_bazel_cache
       - *save_bazel_cache
-      
+
+  publish-docker-images:
+    machine:
+      image: ubuntu-2004:current
+    resource_class: medium
+    steps:
+      - checkout
+      - setup-bazel:
+          platform: "linux-amd64"
+      - *restore_bazel_cache
+      - *set_bazelrc
+      - run:
+          name: Install dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libssl-dev libgmp-dev libtinfo5 cmake
+      - run:
+          name: Docker Login
+          command: |
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - run:
+          name: Build and Upload Docker Images
+          command: |
+            export PATH="$(pwd)/bin:$PATH"
+            chmod +x ./hack/build_and_upload_docker.sh
+            ./hack/build_and_upload_docker.sh ${CIRCLE_TAG}
+      - *clean_bazel_cache
+      - *save_bazel_cache
+
 workflows:
   release:
     jobs:
@@ -197,4 +225,6 @@ workflows:
       - publish-windows-amd64-binaries:
           filters: 
             <<: *filters-release
-            
+      - publish-docker-images:
+          filters:
+            <<: *filters-release
