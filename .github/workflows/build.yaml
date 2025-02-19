@@ -58,7 +58,7 @@ jobs:
         run: |
           curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/bazelisk-linux-amd64"
           mkdir -p bin
-          mv bazelisk-linux-arm64 bin/bazel
+          mv bazelisk-linux-amd64 bin/bazel
           chmod +x bin/bazel
       - name: Docker Login
         run: |
