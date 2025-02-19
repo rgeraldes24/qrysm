@@ -225,6 +225,3 @@ workflows:
       - publish-windows-amd64-binaries:
           filters: 
             <<: *filters-release
-      - publish-docker-images:
-          filters:
-            <<: *filters-release
