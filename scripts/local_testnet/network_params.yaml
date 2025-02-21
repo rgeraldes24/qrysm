@@ -6,7 +6,7 @@ participants:
     cl_image: qrledger/qrysm:beacon-chain-latest
     vc_type: qrysm
     vc_image: qrledger/qrysm:validator-latest
-    count: 4
+    count: 2
     # use_remote_signer: true
     # remote_signer_type: clef
 network_params:
