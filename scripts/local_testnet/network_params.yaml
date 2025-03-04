@@ -18,7 +18,6 @@ additional_services:
  - full_beaconchain_explorer
 #  - tx_spammer
 
-
 # tx_spammer_params:
 #   image: theqrl/zond-tx-spammer:latest
 #   scenario: eoatx
