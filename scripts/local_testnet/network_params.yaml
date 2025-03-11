@@ -20,7 +20,7 @@ additional_services:
 #  - tx_spammer
 
 # tx_spammer_params:
-#   image: theqrl/zond-tx-spammer:latest
+#   image: qrledger/zond-tx-spammer:latest
 #   scenario: eoatx
 #   throughput: 100
 #   max_pending: 100
