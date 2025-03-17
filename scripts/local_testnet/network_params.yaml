@@ -19,7 +19,7 @@ network_params:
 
 # global_log_level: debug
 
-additional_services:
+# additional_services:
 #  - full_beaconchain_explorer
 #  - tx_spammer
 
