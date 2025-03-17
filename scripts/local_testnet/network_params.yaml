@@ -4,8 +4,12 @@ participants:
     el_image: qrledger/go-zond:stable
     cl_type: qrysm
     cl_image: qrledger/qrysm:beacon-chain-latest
+    # local build
+    # cl_image: theqrl-dev/qrysm-beacon-chain:latest
     vc_type: qrysm
     vc_image: qrledger/qrysm:validator-latest
+    # local build
+    # vc_image: theqrl-dev/qrysm-validator:latest
     count: 2
     # use_remote_signer: true
     # remote_signer_type: clef
