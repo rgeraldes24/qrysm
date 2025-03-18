@@ -7,7 +7,6 @@ set -Eeuo pipefail
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 ENCLAVE_NAME=local-testnet
 NETWORK_PARAMS_FILE=$SCRIPT_DIR/network_params.yaml
-# TODO(now.youtrack.cloud/issue/TQ-35)
 ZOND_PKG_VERSION=main
 
 BUILD_IMAGE=true
@@ -95,7 +94,6 @@ if [ "$KEEP_ENCLAVE" = false ]; then
   kurtosis enclave rm -f $ENCLAVE_NAME 2>/dev/null || true
 fi
 
-# TODO(now.youtrack.cloud/issue/TQ-35)
 kurtosis run --enclave $ENCLAVE_NAME github.com/theQRL/zond-package@$ZOND_PKG_VERSION --args-file $NETWORK_PARAMS_FILE
 
 echo "Started!"
