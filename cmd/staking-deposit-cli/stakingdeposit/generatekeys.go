@@ -7,6 +7,7 @@ import (
 	"os"
 	"reflect"
 
+	goqrllib_misc "github.com/theQRL/go-qrllib/misc"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
@@ -54,6 +55,7 @@ func GenerateKeys(validatorStartIndex, numValidators uint64,
 	}
 
 	fmt.Println("Please note down your Dilithium seed: ", seed)
+	fmt.Println("Mnemonic: ", goqrllib_misc.SeedBinToMnemonic(misc.StrSeedToBinSeed(seed)))
 }
 
 func VerifyDepositDataJSON(fileFolder string, credentials []*Credential) bool {

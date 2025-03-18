@@ -136,8 +136,8 @@ func (*Keymanager) attemptDecryptKeystore(
 	doesNotDecrypt := err != nil && strings.Contains(err.Error(), keymanager.IncorrectPasswordErrMsg)
 	if doesNotDecrypt {
 		return nil, nil, "", fmt.Errorf(
-			"incorrect password for key 0x%s",
-			keystore.Pubkey,
+			"incorrect password for key %s %v",
+			keystore.Pubkey[:12], err,
 		)
 	}
 	if err != nil && !strings.Contains(err.Error(), keymanager.IncorrectPasswordErrMsg) {
