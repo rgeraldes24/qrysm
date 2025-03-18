@@ -9,5 +9,4 @@ go_test(
         #"@consensus_spec_tests_mainnet//:test_data",
     ],
     tags = ["spectest"],
-    deps = ["//testing/spectest/shared/capella/sanity:go_default_library"],
 )

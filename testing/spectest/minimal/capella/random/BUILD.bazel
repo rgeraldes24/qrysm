@@ -7,7 +7,6 @@ go_test(
     data = glob(["*.yaml"]) + [
         #"@consensus_spec_tests_minimal//:test_data",
     ],
-    zond_network = "minimal",
     tags = ["spectest"],
-    deps = ["//testing/spectest/shared/capella/sanity:go_default_library"],
+    zond_network = "minimal",
 )

@@ -44,6 +44,5 @@ go_test(
         "//runtime/version:go_default_library",
         "//testing/require:go_default_library",
         "//testing/util:go_default_library",
-        "//time/slots:go_default_library",
     ],
 )

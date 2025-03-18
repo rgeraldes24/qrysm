@@ -19,6 +19,7 @@ go_test(
     srcs = ["status_test.go"],
     embed = [":go_default_library"],
     deps = [
+        "//beacon-chain/db:go_default_library",
         "//config/params:go_default_library",
         "//consensus-types/blocks:go_default_library",
         "//consensus-types/blocks/testing:go_default_library",

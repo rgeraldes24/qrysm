@@ -27,8 +27,8 @@ go_test(
     data = glob(["testdata/**"]),
     deps = [
         ":go_default_library",
-        "//config/params:go_default_library",
         "//config/fieldparams:go_default_library",
+        "//config/params:go_default_library",
         "//contracts/deposit/mock:go_default_library",
         "//crypto/hash:go_default_library",
         "//encoding/bytesutil:go_default_library",

@@ -20,5 +20,4 @@ go_test(
     ],
     shard_count = 4,
     tags = ["spectest"],
-    deps = ["//testing/spectest/shared/capella/operations:go_default_library"],
 )

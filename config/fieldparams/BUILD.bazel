@@ -29,8 +29,8 @@ go_test(
         "common_test.go",
         "minimal_test.go",
     ],
-    zond_network = "minimal",
     tags = ["minimal"],
+    zond_network = "minimal",
     deps = [
         ":go_default_library",
         "//config/params:go_default_library",
