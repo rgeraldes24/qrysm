@@ -10,6 +10,7 @@ import (
 	dilithium_misc "github.com/theQRL/go-qrllib/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
+	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/term"
@@ -113,7 +114,12 @@ func cliActionNewSeed(cliCtx *cli.Context) error {
 		}
 	}
 
-	seed := dilithium_misc.MnemonicToSeedBin(newSeedFlags.Mnemonic)
+	mnemonic := newSeedFlags.Mnemonic
+	if len(mnemonic) == 0 {
+		mnemonic = keyderivation.GetRandomMnemonic()
+	}
+
+	seed := dilithium_misc.MnemonicToSeedBin(mnemonic)
 	stakingdeposit.GenerateKeys(newSeedFlags.ValidatorStartIndex,
 		newSeedFlags.NumValidators, misc.EncodeHex(seed[:]), newSeedFlags.Folder,
 		newSeedFlags.ChainName, string(keystorePassword), newSeedFlags.ExecutionAddress)
