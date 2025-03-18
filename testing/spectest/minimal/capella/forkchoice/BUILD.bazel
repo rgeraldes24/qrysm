@@ -8,13 +8,9 @@ go_test(
     data = [
         #"@consensus_spec_tests_minimal//:test_data",
     ],
-    zond_network = "minimal",
     tags = [
         "minimal",
         "spectest",
     ],
-    deps = [
-        "//runtime/version:go_default_library",
-        "//testing/spectest/shared/common/forkchoice:go_default_library",
-    ],
+    zond_network = "minimal",
 )

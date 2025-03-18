@@ -18,7 +18,6 @@ go_library(
         "//consensus-types/primitives:go_default_library",
         "//network/http:go_default_library",
         "//proto/engine/v1:go_default_library",
-        "//time/slots:go_default_library",
         "@com_github_gorilla_mux//:go_default_library",
         "@com_github_pkg_errors//:go_default_library",
         "@com_github_theqrl_go_zond//common/hexutil:go_default_library",

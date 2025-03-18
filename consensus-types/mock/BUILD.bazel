@@ -12,7 +12,6 @@ go_library(
         "//proto/qrysm/v1alpha1:go_default_library",
         "//proto/qrysm/v1alpha1/validator-client:go_default_library",
         "@com_github_prysmaticlabs_fastssz//:go_default_library",
-        "@com_github_theqrl_go_qrllib//dilithium:go_default_library",
         "@org_golang_google_protobuf//proto:go_default_library",
     ],
 )

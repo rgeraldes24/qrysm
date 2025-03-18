@@ -9,7 +9,6 @@ go_library(
     importpath = "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation/aggregation/sync_contribution",
     visibility = ["//visibility:public"],
     deps = [
-        "//crypto/dilithium:go_default_library",
         "//proto/qrysm/v1alpha1:go_default_library",
         "//proto/qrysm/v1alpha1/attestation:go_default_library",
         "//proto/qrysm/v1alpha1/attestation/aggregation:go_default_library",
@@ -24,10 +23,8 @@ go_test(
     srcs = ["naive_test.go"],
     embed = [":go_default_library"],
     deps = [
-        "//crypto/dilithium:go_default_library",
         "//proto/qrysm/v1alpha1:go_default_library",
         "//proto/qrysm/v1alpha1/attestation/aggregation:go_default_library",
-        "//proto/qrysm/v1alpha1/attestation/aggregation/testing:go_default_library",
         "//testing/assert:go_default_library",
         "//testing/require:go_default_library",
         "@com_github_theqrl_go_bitfield//:go_default_library",

@@ -10,7 +10,6 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//beacon-chain/state:go_default_library",
-        "//cmd/flags:go_default_library",
         "//config/params:go_default_library",
         "//container/trie:go_default_library",
         "//io/file:go_default_library",
@@ -36,6 +35,5 @@ go_test(
         "//runtime/interop:go_default_library",
         "//testing/assert:go_default_library",
         "//testing/require:go_default_library",
-        "@com_github_theqrl_go_qrllib//common:go_default_library",
     ],
 )

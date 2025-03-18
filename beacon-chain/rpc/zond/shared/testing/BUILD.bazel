@@ -6,5 +6,4 @@ go_library(
     srcs = ["json.go"],
     importpath = "github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared/testing",
     visibility = ["//visibility:public"],
-    deps = ["@com_github_theqrl_go_zond//common/hexutil:go_default_library"],
 )

@@ -13,7 +13,6 @@ go_library(
         "//proto/qrysm/v1alpha1:go_default_library",
         "@com_github_pkg_errors//:go_default_library",
         "@com_github_theqrl_go_bitfield//:go_default_library",
-        "@com_github_theqrl_go_qrllib//dilithium:go_default_library",
         "@io_opencensus_go//trace:go_default_library",
         "@org_golang_x_sync//errgroup:go_default_library",
     ],
@@ -32,6 +31,5 @@ go_test(
         "//testing/assert:go_default_library",
         "//testing/require:go_default_library",
         "@com_github_theqrl_go_bitfield//:go_default_library",
-        "@com_github_theqrl_go_qrllib//dilithium:go_default_library",
     ],
 )

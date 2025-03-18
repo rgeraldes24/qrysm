@@ -14,15 +14,12 @@ go_library(
         "//crypto/dilithium/common:go_default_library",
         "//crypto/dilithium/dilithiumt:go_default_library",
         "@com_github_pkg_errors//:go_default_library",
-        "@com_github_theqrl_go_qrllib//dilithium:go_default_library",
     ],
 )
 
 go_test(
     name = "go_default_test",
-    srcs = [
-        "signature_batch_test.go",
-    ],
+    srcs = ["signature_batch_test.go"],
     embed = [":go_default_library"],
     deps = [
         "//crypto/dilithium/common:go_default_library",

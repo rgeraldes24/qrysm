@@ -9,8 +9,4 @@ go_test(
         #"@consensus_spec_tests_mainnet//:test_data",
     ],
     tags = ["spectest"],
-    deps = [
-        "//runtime/version:go_default_library",
-        "//testing/spectest/shared/common/forkchoice:go_default_library",
-    ],
 )
