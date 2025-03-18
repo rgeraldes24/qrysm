@@ -1,9 +1,9 @@
 name: Publish docker images for both AMD64 & ARM64
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types:
+      - published  # Triggers only when a release is published
 
 jobs:
   publish-docker:
@@ -28,6 +28,7 @@ jobs:
           mkdir -p bin
           mv bazelisk-linux-amd64 bin/bazel
           chmod +x bin/bazel
+
       - name: Docker Login
         run: |
           echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
