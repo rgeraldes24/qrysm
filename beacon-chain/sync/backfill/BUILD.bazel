@@ -3,7 +3,7 @@ load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
 go_library(
     name = "go_default_library",
     srcs = ["status.go"],
-    importpath = "github.com/theQRL/qrysm/v4/beacon-chain/sync/backfill",
+    importpath = "github.com/theQRL/qrysm/beacon-chain/sync/backfill",
     visibility = ["//visibility:public"],
     deps = [
         "//beacon-chain/db:go_default_library",
@@ -19,6 +19,7 @@ go_test(
     srcs = ["status_test.go"],
     embed = [":go_default_library"],
     deps = [
+        "//beacon-chain/db:go_default_library",
         "//config/params:go_default_library",
         "//consensus-types/blocks:go_default_library",
         "//consensus-types/blocks/testing:go_default_library",

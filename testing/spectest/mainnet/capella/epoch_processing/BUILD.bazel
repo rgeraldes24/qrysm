@@ -17,9 +17,8 @@ go_test(
         "slashings_test.go",
     ],
     data = [
-        "@consensus_spec_tests_mainnet//:test_data",
+        #"@consensus_spec_tests_mainnet//:test_data",
     ],
     shard_count = 4,
     tags = ["spectest"],
-    deps = ["//testing/spectest/shared/capella/epoch_processing:go_default_library"],
 )

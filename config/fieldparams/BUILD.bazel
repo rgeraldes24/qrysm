@@ -6,7 +6,7 @@ go_library(
         "//config:mainnet": ["mainnet.go"],
         "//config:minimal": ["minimal.go"],
     }),
-    importpath = "github.com/theQRL/qrysm/v4/config/fieldparams",
+    importpath = "github.com/theQRL/qrysm/config/fieldparams",
     visibility = ["//visibility:public"],
 )
 
@@ -29,8 +29,8 @@ go_test(
         "common_test.go",
         "minimal_test.go",
     ],
-    eth_network = "minimal",
     tags = ["minimal"],
+    zond_network = "minimal",
     deps = [
         ":go_default_library",
         "//config/params:go_default_library",

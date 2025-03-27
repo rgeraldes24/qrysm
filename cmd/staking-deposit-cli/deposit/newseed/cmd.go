@@ -1,14 +1,17 @@
 package newseed
 
 import (
-	"crypto/rand"
 	"fmt"
+	"strings"
 	"syscall"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-qrllib/common"
-	"github.com/theQRL/qrysm/v4/cmd/staking-deposit-cli/misc"
-	"github.com/theQRL/qrysm/v4/cmd/staking-deposit-cli/stakingdeposit"
+	goqrllib_misc "github.com/theQRL/go-qrllib/misc"
+	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
+	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
+	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"
+	"github.com/theQRL/qrysm/io/file"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/term"
 )
@@ -20,13 +23,20 @@ var (
 		Folder              string
 		ChainName           string
 		ExecutionAddress    string
+		Mnemonic            string
 	}{}
 	log = logrus.WithField("prefix", "deposit")
+
+	// KeystorePasswordFile is the path to a file containing the keystore password.
+	KeystorePasswordFile = &cli.StringFlag{
+		Name:  "keystore-password-file",
+		Usage: "The keystore password.",
+	}
 )
 var Commands = []*cli.Command{
 	{
 		Name:    "new-seed",
-		Aliases: []string{"new-seed"},
+		Aliases: []string{"ns"},
 		Usage:   "",
 		Action: func(cliCtx *cli.Context) error {
 			if err := cliActionNewSeed(cliCtx); err != nil {
@@ -57,7 +67,7 @@ var Commands = []*cli.Command{
 				Name:        "chain-name",
 				Usage:       "",
 				Destination: &newSeedFlags.ChainName,
-				Value:       "betanet",
+				Value:       "testnet",
 			},
 			&cli.StringFlag{
 				Name:        "execution-address",
@@ -65,39 +75,55 @@ var Commands = []*cli.Command{
 				Destination: &newSeedFlags.ExecutionAddress,
 				Value:       "",
 			},
+			&cli.StringFlag{
+				Name:        "mnemonic",
+				Usage:       "",
+				Destination: &newSeedFlags.Mnemonic,
+				Value:       "",
+			},
+			KeystorePasswordFile,
 		},
 	},
 }
 
 func cliActionNewSeed(cliCtx *cli.Context) error {
-	// TODO: (cyyber) Replace seed by mnemonic
-	var seed [common.SeedSize]uint8
+	var keystorePassword string
+	if cliCtx.IsSet(KeystorePasswordFile.Name) {
+		passwordFilePathInput := cliCtx.String(KeystorePasswordFile.Name)
+		data, err := file.ReadFileAsBytes(passwordFilePathInput)
+		if err != nil {
+			return errors.Wrap(err, "could not read file as bytes")
+		}
+		keystorePassword = strings.TrimRight(string(data), "\r\n")
+	} else {
+		fmt.Println("Create a password that secures your validator keystore(s). " +
+			"You will need to re-enter this to decrypt them when you setup your Zond validators.")
+		password, err := term.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			return err
+		}
 
-	_, err := rand.Read(seed[:])
-	if err != nil {
-		return fmt.Errorf("failed to generate random seed for Dilithium address: %v", err)
+		fmt.Println("Re-enter password ")
+		reEnterKeystorePassword, err := term.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			return err
+		}
+
+		if string(password) != string(reEnterKeystorePassword) {
+			return fmt.Errorf("password mismatch")
+		}
+		keystorePassword = string(password)
 	}
 
-	fmt.Println("Create a password that secures your validator keystore(s). " +
-		"You will need to re-enter this to decrypt them when you setup your Zond validators.")
-	keystorePassword, err := term.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		return err
+	mnemonic := newSeedFlags.Mnemonic
+	if len(mnemonic) == 0 {
+		mnemonic = keyderivation.GetRandomMnemonic()
 	}
 
-	fmt.Println("Re-enter password ")
-	reEnterKeystorePassword, err := term.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		return err
-	}
-
-	if string(keystorePassword) != string(reEnterKeystorePassword) {
-		return fmt.Errorf("password mismatch")
-	}
-
+	seed := goqrllib_misc.MnemonicToSeedBin(mnemonic)
 	stakingdeposit.GenerateKeys(newSeedFlags.ValidatorStartIndex,
 		newSeedFlags.NumValidators, misc.EncodeHex(seed[:]), newSeedFlags.Folder,
-		newSeedFlags.ChainName, string(keystorePassword), newSeedFlags.ExecutionAddress)
+		newSeedFlags.ChainName, keystorePassword, newSeedFlags.ExecutionAddress)
 
 	return nil
 }

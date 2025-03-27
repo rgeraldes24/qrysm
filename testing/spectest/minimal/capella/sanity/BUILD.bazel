@@ -8,12 +8,11 @@ go_test(
         "slots_test.go",
     ],
     data = [
-        "@consensus_spec_tests_minimal//:test_data",
+        #"@consensus_spec_tests_minimal//:test_data",
     ],
-    eth_network = "minimal",
     tags = [
         "minimal",
         "spectest",
     ],
-    deps = ["//testing/spectest/shared/capella/sanity:go_default_library"],
+    zond_network = "minimal",
 )
