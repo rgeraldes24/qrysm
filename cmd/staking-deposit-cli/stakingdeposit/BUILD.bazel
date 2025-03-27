@@ -28,6 +28,7 @@ go_library(
         "//proto/qrysm/v1alpha1:go_default_library",
         "//proto/zond/v1:go_default_library",
         "@com_github_theqrl_go_qrllib//dilithium:go_default_library",
+        "@com_github_theqrl_go_qrllib//misc:go_default_library",
         "@com_github_theqrl_go_zond//common:go_default_library",
     ],
 )
