@@ -161,7 +161,7 @@ func (acm *AccountsCLIManager) Import(ctx context.Context) error {
 		case zondpbservice.ImportedKeystoreStatus_DUPLICATE:
 			log.Warnf("Duplicate key %s found in import request, skipped", keystoresImported[i].Pubkey)
 		case zondpbservice.ImportedKeystoreStatus_ERROR:
-			log.Warnf("Could not import keystore for %s: %s", keystoresImported[i].Pubkey, status.Message)
+			log.Warnf("Could not import keystore for %s: %s", keystoresImported[i].Pubkey[:12], status.Message)
 		}
 	}
 	if len(successfullyImportedAccounts) == 0 {

@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	dilithium_misc "github.com/theQRL/go-qrllib/misc"
+	goqrllib_misc "github.com/theQRL/go-qrllib/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"
@@ -67,7 +67,7 @@ var Commands = []*cli.Command{
 				Name:        "chain-name",
 				Usage:       "",
 				Destination: &newSeedFlags.ChainName,
-				Value:       "betanet",
+				Value:       "testnet",
 			},
 			&cli.StringFlag{
 				Name:        "execution-address",
@@ -98,7 +98,7 @@ func cliActionNewSeed(cliCtx *cli.Context) error {
 	} else {
 		fmt.Println("Create a password that secures your validator keystore(s). " +
 			"You will need to re-enter this to decrypt them when you setup your Zond validators.")
-		keystorePassword, err := term.ReadPassword(int(syscall.Stdin))
+		password, err := term.ReadPassword(int(syscall.Stdin))
 		if err != nil {
 			return err
 		}
@@ -109,9 +109,10 @@ func cliActionNewSeed(cliCtx *cli.Context) error {
 			return err
 		}
 
-		if string(keystorePassword) != string(reEnterKeystorePassword) {
+		if string(password) != string(reEnterKeystorePassword) {
 			return fmt.Errorf("password mismatch")
 		}
+		keystorePassword = string(password)
 	}
 
 	mnemonic := newSeedFlags.Mnemonic
@@ -119,10 +120,10 @@ func cliActionNewSeed(cliCtx *cli.Context) error {
 		mnemonic = keyderivation.GetRandomMnemonic()
 	}
 
-	seed := dilithium_misc.MnemonicToSeedBin(mnemonic)
+	seed := goqrllib_misc.MnemonicToSeedBin(mnemonic)
 	stakingdeposit.GenerateKeys(newSeedFlags.ValidatorStartIndex,
 		newSeedFlags.NumValidators, misc.EncodeHex(seed[:]), newSeedFlags.Folder,
-		newSeedFlags.ChainName, string(keystorePassword), newSeedFlags.ExecutionAddress)
+		newSeedFlags.ChainName, keystorePassword, newSeedFlags.ExecutionAddress)
 
 	return nil
 }

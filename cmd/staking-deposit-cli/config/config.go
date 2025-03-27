@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	TESTNET = "testnet"
 	BETANET = "betanet"
 	MAINNET = "mainnet"
 	DEV     = "dev"
@@ -29,6 +30,11 @@ func ToHex(data string) []byte {
 func GetConfig() *Config {
 	c := &Config{
 		ChainSettings: map[string]*ChainSetting{
+			TESTNET: {
+				Name:                  TESTNET,
+				GenesisForkVersion:    ToHex("0x20000089"),
+				GenesisValidatorsRoot: ToHex("0xf30b2eaa9efee57061c64cbeed17d76fc83f3e48b33788080c75f007526fb542"),
+			},
 			BETANET: {
 				Name:                  BETANET,
 				GenesisForkVersion:    ToHex("0x20000089"),
