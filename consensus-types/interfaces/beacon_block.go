@@ -26,7 +26,7 @@ type ReadOnlySignedBeaconBlock interface {
 	ssz.Unmarshaler
 	Version() int
 	IsBlinded() bool
-	ValueInGwei() uint64
+	ValueInGplanck() uint64
 	Header() (*zondpb.SignedBeaconBlockHeader, error)
 }
 
@@ -117,5 +117,5 @@ type ExecutionData interface {
 	Withdrawals() ([]*enginev1.Withdrawal, error)
 	WithdrawalsRoot() ([]byte, error)
 	PbCapella() (*enginev1.ExecutionPayloadCapella, error)
-	ValueInGwei() (uint64, error)
+	ValueInGplanck() (uint64, error)
 }

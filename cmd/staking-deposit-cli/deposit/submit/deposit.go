@@ -39,7 +39,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 
 	contractAddrStr := cliCtx.String(flags.DepositContractAddressFlag.Name)
 	if !cliCtx.Bool(flags.SkipDepositConfirmationFlag.Name) {
-		qrlDepositTotal := uint64(len(depositDataList)) * params.BeaconConfig().MaxEffectiveBalance / params.BeaconConfig().GweiPerEth
+		qrlDepositTotal := uint64(len(depositDataList)) * params.BeaconConfig().MaxEffectiveBalance / params.BeaconConfig().GplanckPerZND
 		actionText := "This will submit the deposits stored in your deposit data directory. " +
 			fmt.Sprintf("A total of %d QRL will be sent to contract address %s for %d validator accounts. ", qrlDepositTotal, contractAddrStr, len(depositDataList)) +
 			"Do you want to proceed? (Y/N)"
@@ -106,7 +106,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 	depositDelay := time.Duration(depositDelaySeconds) * time.Second
 	bar := initializeProgressBar(len(depositDataList), "Sending deposit transactions...")
 	for i, depositData := range depositDataList {
-		txOpts.Value = new(big.Int).Mul(new(big.Int).SetUint64(depositData.Amount), big.NewInt(1e9)) // value in wei
+		txOpts.Value = new(big.Int).Mul(new(big.Int).SetUint64(depositData.Amount), big.NewInt(1e9)) // value in planck
 
 		if err := sendDepositTx(contract, depositData, txOpts); err != nil {
 			log.WithError(err).Errorf("Unable to send transaction to contract: deposit data index: %d", i)

@@ -32,7 +32,7 @@ func TestRegister_Below1ETH(t *testing.T) {
 
 	var depositDataRoot [32]byte
 	copy(depositDataRoot[:], depositDataRoots[0])
-	testAccount.TxOpts.Value = mock.LessThan1Eth()
+	testAccount.TxOpts.Value = mock.LessThan1ZND()
 	_, err = testAccount.Contract.Deposit(testAccount.TxOpts, pubKeys[0].Marshal(), depositDataItems[0].WithdrawalCredentials, depositDataItems[0].Signature, depositDataRoot)
 	assert.ErrorContains(t, "execution reverted", err, "Validator registration should have failed with insufficient deposit")
 }
@@ -41,7 +41,7 @@ func TestRegister_Below1ETH(t *testing.T) {
 func TestValidatorRegister_OK(t *testing.T) {
 	testAccount, err := mock.Setup()
 	require.NoError(t, err)
-	testAccount.TxOpts.Value = mock.Amount40000Eth()
+	testAccount.TxOpts.Value = mock.Amount40000ZND()
 
 	// Generate deposit data
 	privKeys, pubKeys, err := interop.DeterministicallyGenerateKeys(0 /*startIndex*/, 1)

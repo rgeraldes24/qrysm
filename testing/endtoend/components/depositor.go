@@ -24,11 +24,11 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
-var gweiPerEth = big.NewInt(int64(params.BeaconConfig().GweiPerEth))
+var gplanckPerZND = big.NewInt(int64(params.BeaconConfig().GplanckPerZND))
 
-func amtInGwei(deposit *zond.Deposit) *big.Int {
+func amtInGplanck(deposit *zond.Deposit) *big.Int {
 	amt := big.NewInt(0).SetUint64(deposit.Data.Amount)
-	return amt.Mul(amt, gweiPerEth)
+	return amt.Mul(amt, gplanckPerZND)
 }
 
 // computeDeposits uses the deterministic validator generator to generate deposits for `nvals` (number of validators).
@@ -183,7 +183,7 @@ func (d *Depositor) SendDeposit(dep *zond.Deposit, txo *bind.TransactOpts, batch
 	if err != nil {
 		return err
 	}
-	txo.Value = amtInGwei(dep)
+	txo.Value = amtInGplanck(dep)
 	root, err := dep.Data.HashTreeRoot()
 	if err != nil {
 		return err

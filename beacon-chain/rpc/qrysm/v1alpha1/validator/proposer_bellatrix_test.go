@@ -219,7 +219,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, uint64(3), e.BlockNumber()) // Local block
 
-		require.LogsContain(t, hook, "builderGweiValue=1 localBoostPercentage=0 localGweiValue=2")
+		require.LogsContain(t, hook, "builderGplanckValue=1 localBoostPercentage=0 localGplanckValue=2")
 	})
 	t.Run("Builder configured. Local block and boost has higher value", func(t *testing.T) {
 		cfg := params.BeaconConfig().Copy()
@@ -239,7 +239,7 @@ func TestServer_setExecutionData(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, uint64(3), e.BlockNumber()) // Local block
 
-		require.LogsContain(t, hook, "builderGweiValue=1 localBoostPercentage=1 localGweiValue=1")
+		require.LogsContain(t, hook, "builderGplanckValue=1 localBoostPercentage=1 localGplanckValue=1")
 	})
 	t.Run("Builder configured. Builder returns fault. Use local block", func(t *testing.T) {
 		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())

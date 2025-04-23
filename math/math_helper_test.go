@@ -551,10 +551,10 @@ func TestAddInt(t *testing.T) {
 	}
 }
 
-func TestWeiToGwei(t *testing.T) {
+func TestPlanckToGplanck(t *testing.T) {
 	tests := []struct {
 		v    *big.Int
-		want math.Gwei
+		want math.Gplanck
 	}{
 		{big.NewInt(1e9 - 1), 0},
 		{big.NewInt(1e9), 1},
@@ -562,16 +562,16 @@ func TestWeiToGwei(t *testing.T) {
 		{big.NewInt(239489233849348394), 239489233},
 	}
 	for _, tt := range tests {
-		if got := math.WeiToGwei(tt.v); got != tt.want {
-			t.Errorf("WeiToGwei() = %v, want %v", got, tt.want)
+		if got := math.PlanckToGplanck(tt.v); got != tt.want {
+			t.Errorf("PlanckToGplanck() = %v, want %v", got, tt.want)
 		}
 	}
 }
 
-func TestWeiToGwei_CopyOk(t *testing.T) {
+func TestPlanckToGplanck_CopyOk(t *testing.T) {
 	v := big.NewInt(1e9)
-	got := math.WeiToGwei(v)
+	got := math.PlanckToGplanck(v)
 
-	require.Equal(t, math.Gwei(1), got)
+	require.Equal(t, math.Gplanck(1), got)
 	require.Equal(t, big.NewInt(1e9).Uint64(), v.Uint64())
 }

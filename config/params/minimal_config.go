@@ -22,7 +22,7 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.GenesisDelay = 300 // 5 minutes
 	minimalConfig.TargetAggregatorsPerCommittee = 16
 
-	// Gwei values
+	// Gplanck values
 	minimalConfig.MinDepositAmount = 1e9
 	minimalConfig.MaxEffectiveBalance = 40000e9
 	minimalConfig.EjectionBalance = 20000e9

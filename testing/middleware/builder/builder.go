@@ -282,10 +282,10 @@ func (p *Builder) handleHeaderRequestCapella(w http.ResponseWriter) {
 	// we set the payload value as twice its actual one so that it always chooses builder payloads vs local payloads
 	v = v.Mul(v, big.NewInt(2))
 	// Is used as the helper modifies the big.Int
-	weiVal := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(b.Value))
+	planckVal := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(b.Value))
 	// we set the payload value as twice its actual one so that it always chooses builder payloads vs local payloads
-	weiVal = weiVal.Mul(weiVal, big.NewInt(2))
-	wObj, err := blocks.WrappedExecutionPayloadCapella(b.Payload, math.WeiToGwei(weiVal))
+	planckVal = planckVal.Mul(planckVal, big.NewInt(2))
+	wObj, err := blocks.WrappedExecutionPayloadCapella(b.Payload, math.PlanckToGplanck(planckVal))
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not wrap execution payload")
 		http.Error(w, err.Error(), http.StatusInternalServerError)

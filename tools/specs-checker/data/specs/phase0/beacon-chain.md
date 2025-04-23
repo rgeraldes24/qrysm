@@ -311,19 +311,19 @@ def get_beacon_proposer_index(state: BeaconState) -> ValidatorIndex:
     return compute_proposer_index(state, indices, seed)
 ```
 ```python
-def get_total_balance(state: BeaconState, indices: Set[ValidatorIndex]) -> Gwei:
+def get_total_balance(state: BeaconState, indices: Set[ValidatorIndex]) -> Gplanck:
     """
     Return the combined effective balance of the ``indices``.
-    ``EFFECTIVE_BALANCE_INCREMENT`` Gwei minimum to avoid divisions by zero.
+    ``EFFECTIVE_BALANCE_INCREMENT`` Gplanck minimum to avoid divisions by zero.
     Math safe up to ~10B ETH, afterwhich this overflows uint64.
     """
-    return Gwei(max(EFFECTIVE_BALANCE_INCREMENT, sum([state.validators[index].effective_balance for index in indices])))
+    return Gplanck(max(EFFECTIVE_BALANCE_INCREMENT, sum([state.validators[index].effective_balance for index in indices])))
 ```
 ```python
-def get_total_active_balance(state: BeaconState) -> Gwei:
+def get_total_active_balance(state: BeaconState) -> Gplanck:
     """
     Return the combined effective balance of the active validators.
-    Note: ``get_total_balance`` returns ``EFFECTIVE_BALANCE_INCREMENT`` Gwei minimum to avoid divisions by zero.
+    Note: ``get_total_balance`` returns ``EFFECTIVE_BALANCE_INCREMENT`` Gplanck minimum to avoid divisions by zero.
     """
     return get_total_balance(state, set(get_active_validator_indices(state, get_current_epoch(state))))
 ```
@@ -360,14 +360,14 @@ def get_attesting_indices(state: BeaconState,
     return set(index for i, index in enumerate(committee) if bits[i])
 ```
 ```python
-def increase_balance(state: BeaconState, index: ValidatorIndex, delta: Gwei) -> None:
+def increase_balance(state: BeaconState, index: ValidatorIndex, delta: Gplanck) -> None:
     """
     Increase the validator balance at index ``index`` by ``delta``.
     """
     state.balances[index] += delta
 ```
 ```python
-def decrease_balance(state: BeaconState, index: ValidatorIndex, delta: Gwei) -> None:
+def decrease_balance(state: BeaconState, index: ValidatorIndex, delta: Gplanck) -> None:
     """
     Decrease the validator balance at index ``index`` by ``delta``, with underflow protection.
     """
@@ -413,10 +413,10 @@ def slash_validator(state: BeaconState,
     proposer_index = get_beacon_proposer_index(state)
     if whistleblower_index is None:
         whistleblower_index = proposer_index
-    whistleblower_reward = Gwei(validator.effective_balance // WHISTLEBLOWER_REWARD_QUOTIENT)
-    proposer_reward = Gwei(whistleblower_reward // PROPOSER_REWARD_QUOTIENT)
+    whistleblower_reward = Gplanck(validator.effective_balance // WHISTLEBLOWER_REWARD_QUOTIENT)
+    proposer_reward = Gplanck(whistleblower_reward // PROPOSER_REWARD_QUOTIENT)
     increase_balance(state, proposer_index, proposer_reward)
-    increase_balance(state, whistleblower_index, Gwei(whistleblower_reward - proposer_reward))
+    increase_balance(state, whistleblower_index, Gplanck(whistleblower_reward - proposer_reward))
 ```
 ```python
 def initialize_beacon_state_from_eth1(eth1_block_hash: Bytes32,
@@ -546,10 +546,10 @@ def get_unslashed_attesting_indices(state: BeaconState,
     return set(filter(lambda index: not state.validators[index].slashed, output))
 ```
 ```python
-def get_attesting_balance(state: BeaconState, attestations: Sequence[PendingAttestation]) -> Gwei:
+def get_attesting_balance(state: BeaconState, attestations: Sequence[PendingAttestation]) -> Gplanck:
     """
     Return the combined effective balance of the set of unslashed validators participating in ``attestations``.
-    Note: ``get_total_balance`` returns ``EFFECTIVE_BALANCE_INCREMENT`` Gwei minimum to avoid divisions by zero.
+    Note: ``get_total_balance`` returns ``EFFECTIVE_BALANCE_INCREMENT`` Gplanck minimum to avoid divisions by zero.
     """
     return get_total_balance(state, get_unslashed_attesting_indices(state, attestations))
 ```
@@ -568,9 +568,9 @@ def process_justification_and_finalization(state: BeaconState) -> None:
 ```
 ```python
 def weigh_justification_and_finalization(state: BeaconState,
-                                         total_active_balance: Gwei,
-                                         previous_epoch_target_balance: Gwei,
-                                         current_epoch_target_balance: Gwei) -> None:
+                                         total_active_balance: Gplanck,
+                                         previous_epoch_target_balance: Gplanck ,
+                                         current_epoch_target_balance: Gplanck) -> None:
     previous_epoch = get_previous_epoch(state)
     current_epoch = get_current_epoch(state)
     old_previous_justified_checkpoint = state.previous_justified_checkpoint
@@ -605,14 +605,14 @@ def weigh_justification_and_finalization(state: BeaconState,
         state.finalized_checkpoint = old_current_justified_checkpoint
 ```
 ```python
-def get_base_reward(state: BeaconState, index: ValidatorIndex) -> Gwei:
+def get_base_reward(state: BeaconState, index: ValidatorIndex) -> Gplanck:
     total_balance = get_total_active_balance(state)
     effective_balance = state.validators[index].effective_balance
-    return Gwei(effective_balance * BASE_REWARD_FACTOR // integer_squareroot(total_balance) // BASE_REWARDS_PER_EPOCH)
+    return Gplanck(effective_balance * BASE_REWARD_FACTOR // integer_squareroot(total_balance) // BASE_REWARDS_PER_EPOCH)
 ```
 ```python
-def get_proposer_reward(state: BeaconState, attesting_index: ValidatorIndex) -> Gwei:
-    return Gwei(get_base_reward(state, attesting_index) // PROPOSER_REWARD_QUOTIENT)
+def get_proposer_reward(state: BeaconState, attesting_index: ValidatorIndex) -> Gplanck:
+    return Gplanck(get_base_reward(state, attesting_index) // PROPOSER_REWARD_QUOTIENT)
 ```
 ```python
 def get_finality_delay(state: BeaconState) -> uint64:
@@ -633,12 +633,12 @@ def get_eligible_validator_indices(state: BeaconState) -> Sequence[ValidatorInde
 ```python
 def get_attestation_component_deltas(state: BeaconState,
                                      attestations: Sequence[PendingAttestation]
-                                     ) -> Tuple[Sequence[Gwei], Sequence[Gwei]]:
+                                     ) -> Tuple[Sequence[Gplanck], Sequence[Gplanck]]:
     """
     Helper with shared logic for use by get source, target, and head deltas functions
     """
-    rewards = [Gwei(0)] * len(state.validators)
-    penalties = [Gwei(0)] * len(state.validators)
+    rewards = [Gplancki(0)] * len(state.validators)
+    penalties = [Gplanck(0)] * len(state.validators)
     total_balance = get_total_active_balance(state)
     unslashed_attesting_indices = get_unslashed_attesting_indices(state, attestations)
     attesting_balance = get_total_balance(state, unslashed_attesting_indices)
@@ -657,7 +657,7 @@ def get_attestation_component_deltas(state: BeaconState,
     return rewards, penalties
 ```
 ```python
-def get_source_deltas(state: BeaconState) -> Tuple[Sequence[Gwei], Sequence[Gwei]]:
+def get_source_deltas(state: BeaconState) -> Tuple[Sequence[Gplanck], Sequence[Gplanck]]:
     """
     Return attester micro-rewards/penalties for source-vote for each validator.
     """
@@ -665,7 +665,7 @@ def get_source_deltas(state: BeaconState) -> Tuple[Sequence[Gwei], Sequence[Gwei
     return get_attestation_component_deltas(state, matching_source_attestations)
 ```
 ```python
-def get_target_deltas(state: BeaconState) -> Tuple[Sequence[Gwei], Sequence[Gwei]]:
+def get_target_deltas(state: BeaconState) -> Tuple[Sequence[Gplanck], Sequence[Gplanck]]:
     """
     Return attester micro-rewards/penalties for target-vote for each validator.
     """
@@ -673,7 +673,7 @@ def get_target_deltas(state: BeaconState) -> Tuple[Sequence[Gwei], Sequence[Gwei
     return get_attestation_component_deltas(state, matching_target_attestations)
 ```
 ```python
-def get_head_deltas(state: BeaconState) -> Tuple[Sequence[Gwei], Sequence[Gwei]]:
+def get_head_deltas(state: BeaconState) -> Tuple[Sequence[Gplanck], Sequence[Gplanck]]:
     """
     Return attester micro-rewards/penalties for head-vote for each validator.
     """
@@ -681,11 +681,11 @@ def get_head_deltas(state: BeaconState) -> Tuple[Sequence[Gwei], Sequence[Gwei]]
     return get_attestation_component_deltas(state, matching_head_attestations)
 ```
 ```python
-def get_inclusion_delay_deltas(state: BeaconState) -> Tuple[Sequence[Gwei], Sequence[Gwei]]:
+def get_inclusion_delay_deltas(state: BeaconState) -> Tuple[Sequence[Gplanck], Sequence[Gplanck]]:
     """
     Return proposer and inclusion delay micro-rewards/penalties for each validator.
     """
-    rewards = [Gwei(0) for _ in range(len(state.validators))]
+    rewards = [Gplanck(0) for _ in range(len(state.validators))]
     matching_source_attestations = get_matching_source_attestations(state, get_previous_epoch(state))
     for index in get_unslashed_attesting_indices(state, matching_source_attestations):
         attestation = min([
@@ -693,36 +693,36 @@ def get_inclusion_delay_deltas(state: BeaconState) -> Tuple[Sequence[Gwei], Sequ
             if index in get_attesting_indices(state, a.data, a.aggregation_bits)
         ], key=lambda a: a.inclusion_delay)
         rewards[attestation.proposer_index] += get_proposer_reward(state, index)
-        max_attester_reward = Gwei(get_base_reward(state, index) - get_proposer_reward(state, index))
-        rewards[index] += Gwei(max_attester_reward // attestation.inclusion_delay)
+        max_attester_reward = Gplanck(get_base_reward(state, index) - get_proposer_reward(state, index))
+        rewards[index] += Gplanck(max_attester_reward // attestation.inclusion_delay)
 
     # No penalties associated with inclusion delay
-    penalties = [Gwei(0) for _ in range(len(state.validators))]
+    penalties = [Gplanck(0) for _ in range(len(state.validators))]
     return rewards, penalties
 ```
 ```python
-def get_inactivity_penalty_deltas(state: BeaconState) -> Tuple[Sequence[Gwei], Sequence[Gwei]]:
+def get_inactivity_penalty_deltas(state: BeaconState) -> Tuple[Sequence[Gplanck], Sequence[Gplanck]]:
     """
     Return inactivity reward/penalty deltas for each validator.
     """
-    penalties = [Gwei(0) for _ in range(len(state.validators))]
+    penalties = [Gplanck(0) for _ in range(len(state.validators))]
     if is_in_inactivity_leak(state):
         matching_target_attestations = get_matching_target_attestations(state, get_previous_epoch(state))
         matching_target_attesting_indices = get_unslashed_attesting_indices(state, matching_target_attestations)
         for index in get_eligible_validator_indices(state):
             # If validator is performing optimally this cancels all rewards for a neutral balance
             base_reward = get_base_reward(state, index)
-            penalties[index] += Gwei(BASE_REWARDS_PER_EPOCH * base_reward - get_proposer_reward(state, index))
+            penalties[index] += Gplanck(BASE_REWARDS_PER_EPOCH * base_reward - get_proposer_reward(state, index))
             if index not in matching_target_attesting_indices:
                 effective_balance = state.validators[index].effective_balance
-                penalties[index] += Gwei(effective_balance * get_finality_delay(state) // INACTIVITY_PENALTY_QUOTIENT)
+                penalties[index] += Gplanck(effective_balance * get_finality_delay(state) // INACTIVITY_PENALTY_QUOTIENT)
 
     # No rewards associated with inactivity penalties
-    rewards = [Gwei(0) for _ in range(len(state.validators))]
+    rewards = [Gplanck(0) for _ in range(len(state.validators))]
     return rewards, penalties
 ```
 ```python
-def get_attestation_deltas(state: BeaconState) -> Tuple[Sequence[Gwei], Sequence[Gwei]]:
+def get_attestation_deltas(state: BeaconState) -> Tuple[Sequence[Gplanck], Sequence[Gplanck]]:
     """
     Return attestation reward/penalty deltas for each validator.
     """
@@ -813,7 +813,7 @@ def process_effective_balance_updates(state: BeaconState) -> None:
 def process_slashings_reset(state: BeaconState) -> None:
     next_epoch = Epoch(get_current_epoch(state) + 1)
     # Reset slashings
-    state.slashings[next_epoch % EPOCHS_PER_SLASHINGS_VECTOR] = Gwei(0)
+    state.slashings[next_epoch % EPOCHS_PER_SLASHINGS_VECTOR] = Gplanck(0)
 ```
 ```python
 def process_randao_mixes_reset(state: BeaconState) -> None:

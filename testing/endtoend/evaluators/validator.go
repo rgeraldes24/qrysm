@@ -113,7 +113,7 @@ func validatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.ClientCo
 		return errors.Wrap(err, "failed to get validator participation")
 	}
 
-	partRate := float32(participation.Participation.PreviousEpochTargetAttestingGwei) / float32(participation.Participation.PreviousEpochActiveGwei)
+	partRate := float32(participation.Participation.PreviousEpochTargetAttestingGplanck) / float32(participation.Participation.PreviousEpochActiveGplanck)
 	expected := float32(expectedParticipation)
 
 	if partRate < expected {
