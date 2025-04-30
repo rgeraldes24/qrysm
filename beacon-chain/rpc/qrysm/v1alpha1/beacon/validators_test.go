@@ -1536,8 +1536,8 @@ func TestGetValidatorPerformance_OK(t *testing.T) {
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
 
 	defaultBal := params.BeaconConfig().MaxEffectiveBalance
-	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZND
-	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZND}
+	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZond
+	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZond}
 	require.NoError(t, headState.SetBalances(balances))
 	publicKey1 := bytesutil.ToBytes2592([]byte{1})
 	publicKey2 := bytesutil.ToBytes2592([]byte{2})
@@ -1599,11 +1599,11 @@ func TestGetValidatorPerformance_Indices(t *testing.T) {
 	ctx := context.Background()
 	epoch := primitives.Epoch(1)
 	defaultBal := params.BeaconConfig().MaxEffectiveBalance
-	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZND
+	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZond
 	headState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
-	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZND}
+	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZond}
 	require.NoError(t, headState.SetBalances(balances))
 	publicKey1 := bytesutil.ToBytes2592([]byte{1})
 	publicKey2 := bytesutil.ToBytes2592([]byte{2})
@@ -1656,7 +1656,7 @@ func TestGetValidatorPerformance_Indices(t *testing.T) {
 		CorrectlyVotedSource:          []bool{false, false},
 		CorrectlyVotedTarget:          []bool{false, false},
 		CorrectlyVotedHead:            []bool{false, false},
-		BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GplanckPerZND},
+		BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GplanckPerZond},
 		BalancesAfterEpochTransition:  []uint64{vp[1].AfterEpochTransitionBalance, vp[2].AfterEpochTransitionBalance},
 		MissingValidators:             [][]byte{publicKey1[:]},
 		InactivityScores:              []uint64{0, 0},
@@ -1675,11 +1675,11 @@ func TestGetValidatorPerformance_IndicesPubkeys(t *testing.T) {
 	ctx := context.Background()
 	epoch := primitives.Epoch(1)
 	defaultBal := params.BeaconConfig().MaxEffectiveBalance
-	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZND
+	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZond
 	headState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
-	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZND}
+	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZond}
 	require.NoError(t, headState.SetBalances(balances))
 	publicKey1 := bytesutil.ToBytes2592([]byte{1})
 	publicKey2 := bytesutil.ToBytes2592([]byte{2})
@@ -1733,7 +1733,7 @@ func TestGetValidatorPerformance_IndicesPubkeys(t *testing.T) {
 		CorrectlyVotedSource:          []bool{false, false},
 		CorrectlyVotedTarget:          []bool{false, false},
 		CorrectlyVotedHead:            []bool{false, false},
-		BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GplanckPerZND},
+		BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GplanckPerZond},
 		BalancesAfterEpochTransition:  []uint64{vp[1].AfterEpochTransitionBalance, vp[2].AfterEpochTransitionBalance},
 		MissingValidators:             [][]byte{publicKey1[:]},
 		InactivityScores:              []uint64{0, 0},
@@ -1760,8 +1760,8 @@ func TestGetValidatorPerformanceCapella_OK(t *testing.T) {
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
 
 	defaultBal := params.BeaconConfig().MaxEffectiveBalance
-	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZND
-	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZND}
+	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZond
+	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZond}
 	require.NoError(t, headState.SetBalances(balances))
 	publicKey1 := bytesutil.ToBytes2592([]byte{1})
 	publicKey2 := bytesutil.ToBytes2592([]byte{2})
