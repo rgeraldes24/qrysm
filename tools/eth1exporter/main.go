@@ -109,7 +109,7 @@ func EthBalance(address string) *big.Float {
 	if err != nil {
 		fmt.Printf("Error fetching Zond Balance for address: %v\n", address)
 	}
-	return ToZND(balance)
+	return ToZond(balance)
 }
 
 // CurrentBlock in ETH1.
@@ -122,8 +122,8 @@ func CurrentBlock() uint64 {
 	return block.NumberU64()
 }
 
-// ToZND from Planck.
-func ToZND(o *big.Int) *big.Float {
+// ToZond from Planck.
+func ToZond(o *big.Int) *big.Float {
 	planck := big.NewFloat(0)
 	planck.SetInt(o)
 	return new(big.Float).Quo(planck, big.NewFloat(params.Zond))

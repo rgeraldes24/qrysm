@@ -637,7 +637,7 @@ def get_attestation_component_deltas(state: BeaconState,
     """
     Helper with shared logic for use by get source, target, and head deltas functions
     """
-    rewards = [Gplancki(0)] * len(state.validators)
+    rewards = [Gplanck(0)] * len(state.validators)
     penalties = [Gplanck(0)] * len(state.validators)
     total_balance = get_total_active_balance(state)
     unslashed_attesting_indices = get_unslashed_attesting_indices(state, attestations)
