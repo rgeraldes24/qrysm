@@ -110,7 +110,7 @@ contract DepositContract is IDepositContract, ERC165 {
         require(signature.length == 4595, "DepositContract: invalid signature length");
 
         // Check deposit amount
-        require(msg.value >= 1 znd, "DepositContract: deposit value too low");
+        require(msg.value >= 1 zond, "DepositContract: deposit value too low");
         require(msg.value % 1 gplanck == 0, "DepositContract: deposit value not multiple of gplanck");
         uint deposit_amount = msg.value / 1 gplanck;
         require(deposit_amount <= type(uint64).max, "DepositContract: deposit value too high");
