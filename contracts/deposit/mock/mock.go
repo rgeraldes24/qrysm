@@ -62,8 +62,8 @@ func Setup() (*TestAccount, error) {
 	return &TestAccount{addr, contractAddr, contract, backend, txOpts}, nil
 }
 
-// Amount40000ZND returns 40000ZND(in planck) in terms of the big.Int type.
-func Amount40000ZND() *big.Int {
+// Amount40000Zond returns 40000Zond(in planck) in terms of the big.Int type.
+func Amount40000Zond() *big.Int {
 	amount, _ := new(big.Int).SetString(amount40000ZND, 10)
 	return amount
 }
