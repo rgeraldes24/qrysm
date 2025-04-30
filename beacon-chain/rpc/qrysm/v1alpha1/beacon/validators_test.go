@@ -1411,13 +1411,13 @@ func TestServer_GetValidatorParticipation_OrphanedUntilGenesis(t *testing.T) {
 	require.NoError(t, err)
 
 	wanted := &zondpb.ValidatorParticipation{
-		CurrentEpochActiveGwei:           validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		CurrentEpochAttestingGwei:        params.BeaconConfig().EffectiveBalanceIncrement,
-		CurrentEpochTargetAttestingGwei:  params.BeaconConfig().EffectiveBalanceIncrement,
-		PreviousEpochActiveGwei:          validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		PreviousEpochAttestingGwei:       params.BeaconConfig().EffectiveBalanceIncrement,
-		PreviousEpochTargetAttestingGwei: params.BeaconConfig().EffectiveBalanceIncrement,
-		PreviousEpochHeadAttestingGwei:   params.BeaconConfig().EffectiveBalanceIncrement,
+		CurrentEpochActiveGplanck:           validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		CurrentEpochAttestingGplanck:        params.BeaconConfig().EffectiveBalanceIncrement,
+		CurrentEpochTargetAttestingGplanck:  params.BeaconConfig().EffectiveBalanceIncrement,
+		PreviousEpochActiveGplanck:          validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		PreviousEpochAttestingGplanck:       params.BeaconConfig().EffectiveBalanceIncrement,
+		PreviousEpochTargetAttestingGplanck: params.BeaconConfig().EffectiveBalanceIncrement,
+		PreviousEpochHeadAttestingGplanck:   params.BeaconConfig().EffectiveBalanceIncrement,
 	}
 	assert.DeepEqual(t, true, res.Finalized, "Incorrect validator participation respond")
 	assert.DeepEqual(t, wanted, res.Participation, "Incorrect validator participation respond")
@@ -1483,13 +1483,13 @@ func runGetValidatorParticipationCurrentAndPrevEpoch(t *testing.T, genState stat
 	require.NoError(t, err)
 
 	wanted := &zondpb.ValidatorParticipation{
-		CurrentEpochActiveGwei:           validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		CurrentEpochAttestingGwei:        validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		CurrentEpochTargetAttestingGwei:  validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		PreviousEpochActiveGwei:          validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		PreviousEpochAttestingGwei:       validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		PreviousEpochTargetAttestingGwei: validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		PreviousEpochHeadAttestingGwei:   validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		CurrentEpochActiveGplanck:           validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		CurrentEpochAttestingGplanck:        validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		CurrentEpochTargetAttestingGplanck:  validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		PreviousEpochActiveGplanck:          validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		PreviousEpochAttestingGplanck:       validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		PreviousEpochTargetAttestingGplanck: validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		PreviousEpochHeadAttestingGplanck:   validatorCount * params.BeaconConfig().MaxEffectiveBalance,
 	}
 	assert.DeepEqual(t, true, res.Finalized, "Incorrect validator participation respond")
 	assert.DeepEqual(t, wanted, res.Participation, "Incorrect validator participation respond")
@@ -1498,13 +1498,13 @@ func runGetValidatorParticipationCurrentAndPrevEpoch(t *testing.T, genState stat
 	require.NoError(t, err)
 
 	wanted = &zondpb.ValidatorParticipation{
-		CurrentEpochActiveGwei:           validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		CurrentEpochAttestingGwei:        params.BeaconConfig().EffectiveBalanceIncrement, // Empty because after one epoch, current participation rotates to previous
-		CurrentEpochTargetAttestingGwei:  params.BeaconConfig().EffectiveBalanceIncrement,
-		PreviousEpochActiveGwei:          validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		PreviousEpochAttestingGwei:       validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		PreviousEpochTargetAttestingGwei: validatorCount * params.BeaconConfig().MaxEffectiveBalance,
-		PreviousEpochHeadAttestingGwei:   validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		CurrentEpochActiveGplanck:           validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		CurrentEpochAttestingGplanck:        params.BeaconConfig().EffectiveBalanceIncrement, // Empty because after one epoch, current participation rotates to previous
+		CurrentEpochTargetAttestingGplanck:  params.BeaconConfig().EffectiveBalanceIncrement,
+		PreviousEpochActiveGplanck:          validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		PreviousEpochAttestingGplanck:       validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		PreviousEpochTargetAttestingGplanck: validatorCount * params.BeaconConfig().MaxEffectiveBalance,
+		PreviousEpochHeadAttestingGplanck:   validatorCount * params.BeaconConfig().MaxEffectiveBalance,
 	}
 	assert.DeepEqual(t, true, res.Finalized, "Incorrect validator participation respond")
 	assert.DeepEqual(t, wanted, res.Participation, "Incorrect validator participation respond")
@@ -1536,8 +1536,8 @@ func TestGetValidatorPerformance_OK(t *testing.T) {
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
 
 	defaultBal := params.BeaconConfig().MaxEffectiveBalance
-	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GweiPerEth
-	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GweiPerEth}
+	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZond
+	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZond}
 	require.NoError(t, headState.SetBalances(balances))
 	publicKey1 := bytesutil.ToBytes2592([]byte{1})
 	publicKey2 := bytesutil.ToBytes2592([]byte{2})
@@ -1599,11 +1599,11 @@ func TestGetValidatorPerformance_Indices(t *testing.T) {
 	ctx := context.Background()
 	epoch := primitives.Epoch(1)
 	defaultBal := params.BeaconConfig().MaxEffectiveBalance
-	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GweiPerEth
+	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZond
 	headState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
-	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GweiPerEth}
+	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZond}
 	require.NoError(t, headState.SetBalances(balances))
 	publicKey1 := bytesutil.ToBytes2592([]byte{1})
 	publicKey2 := bytesutil.ToBytes2592([]byte{2})
@@ -1656,7 +1656,7 @@ func TestGetValidatorPerformance_Indices(t *testing.T) {
 		CorrectlyVotedSource:          []bool{false, false},
 		CorrectlyVotedTarget:          []bool{false, false},
 		CorrectlyVotedHead:            []bool{false, false},
-		BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GweiPerEth},
+		BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GplanckPerZond},
 		BalancesAfterEpochTransition:  []uint64{vp[1].AfterEpochTransitionBalance, vp[2].AfterEpochTransitionBalance},
 		MissingValidators:             [][]byte{publicKey1[:]},
 		InactivityScores:              []uint64{0, 0},
@@ -1675,11 +1675,11 @@ func TestGetValidatorPerformance_IndicesPubkeys(t *testing.T) {
 	ctx := context.Background()
 	epoch := primitives.Epoch(1)
 	defaultBal := params.BeaconConfig().MaxEffectiveBalance
-	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GweiPerEth
+	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZond
 	headState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
-	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GweiPerEth}
+	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZond}
 	require.NoError(t, headState.SetBalances(balances))
 	publicKey1 := bytesutil.ToBytes2592([]byte{1})
 	publicKey2 := bytesutil.ToBytes2592([]byte{2})
@@ -1733,7 +1733,7 @@ func TestGetValidatorPerformance_IndicesPubkeys(t *testing.T) {
 		CorrectlyVotedSource:          []bool{false, false},
 		CorrectlyVotedTarget:          []bool{false, false},
 		CorrectlyVotedHead:            []bool{false, false},
-		BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GweiPerEth},
+		BalancesBeforeEpochTransition: []uint64{extraBal, extraBal + params.BeaconConfig().GplanckPerZond},
 		BalancesAfterEpochTransition:  []uint64{vp[1].AfterEpochTransitionBalance, vp[2].AfterEpochTransitionBalance},
 		MissingValidators:             [][]byte{publicKey1[:]},
 		InactivityScores:              []uint64{0, 0},
@@ -1760,8 +1760,8 @@ func TestGetValidatorPerformanceCapella_OK(t *testing.T) {
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
 
 	defaultBal := params.BeaconConfig().MaxEffectiveBalance
-	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GweiPerEth
-	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GweiPerEth}
+	extraBal := params.BeaconConfig().MaxEffectiveBalance + params.BeaconConfig().GplanckPerZond
+	balances := []uint64{defaultBal, extraBal, extraBal + params.BeaconConfig().GplanckPerZond}
 	require.NoError(t, headState.SetBalances(balances))
 	publicKey1 := bytesutil.ToBytes2592([]byte{1})
 	publicKey2 := bytesutil.ToBytes2592([]byte{2})
@@ -1997,18 +1997,18 @@ func TestServer_GetIndividualVotes_Working(t *testing.T) {
 	wanted := &zondpb.IndividualVotesRespond{
 		IndividualVotes: []*zondpb.IndividualVotesRespond_IndividualVote{
 			{
-				ValidatorIndex:                   0,
-				PublicKey:                        beaconState.Validators()[0].PublicKey,
-				IsActiveInCurrentEpoch:           true,
-				IsActiveInPreviousEpoch:          true,
-				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
+				ValidatorIndex:                      0,
+				PublicKey:                           beaconState.Validators()[0].PublicKey,
+				IsActiveInCurrentEpoch:              true,
+				IsActiveInPreviousEpoch:             true,
+				CurrentEpochEffectiveBalanceGplanck: params.BeaconConfig().MaxEffectiveBalance,
 			},
 			{
-				ValidatorIndex:                   1,
-				PublicKey:                        beaconState.Validators()[1].PublicKey,
-				IsActiveInCurrentEpoch:           true,
-				IsActiveInPreviousEpoch:          true,
-				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
+				ValidatorIndex:                      1,
+				PublicKey:                           beaconState.Validators()[1].PublicKey,
+				IsActiveInCurrentEpoch:              true,
+				IsActiveInPreviousEpoch:             true,
+				CurrentEpochEffectiveBalanceGplanck: params.BeaconConfig().MaxEffectiveBalance,
 			},
 		},
 	}
@@ -2056,28 +2056,28 @@ func TestServer_GetIndividualVotes_WorkingAltair(t *testing.T) {
 	wanted := &zondpb.IndividualVotesRespond{
 		IndividualVotes: []*zondpb.IndividualVotesRespond_IndividualVote{
 			{
-				ValidatorIndex:                   0,
-				PublicKey:                        beaconState.Validators()[0].PublicKey,
-				IsActiveInCurrentEpoch:           true,
-				IsActiveInPreviousEpoch:          true,
-				IsCurrentEpochTargetAttester:     true,
-				IsCurrentEpochAttester:           true,
-				IsPreviousEpochAttester:          true,
-				IsPreviousEpochHeadAttester:      true,
-				IsPreviousEpochTargetAttester:    true,
-				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
+				ValidatorIndex:                      0,
+				PublicKey:                           beaconState.Validators()[0].PublicKey,
+				IsActiveInCurrentEpoch:              true,
+				IsActiveInPreviousEpoch:             true,
+				IsCurrentEpochTargetAttester:        true,
+				IsCurrentEpochAttester:              true,
+				IsPreviousEpochAttester:             true,
+				IsPreviousEpochHeadAttester:         true,
+				IsPreviousEpochTargetAttester:       true,
+				CurrentEpochEffectiveBalanceGplanck: params.BeaconConfig().MaxEffectiveBalance,
 			},
 			{
-				ValidatorIndex:                   1,
-				PublicKey:                        beaconState.Validators()[1].PublicKey,
-				IsActiveInCurrentEpoch:           true,
-				IsActiveInPreviousEpoch:          true,
-				IsCurrentEpochTargetAttester:     true,
-				IsCurrentEpochAttester:           true,
-				IsPreviousEpochAttester:          true,
-				IsPreviousEpochHeadAttester:      true,
-				IsPreviousEpochTargetAttester:    true,
-				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
+				ValidatorIndex:                      1,
+				PublicKey:                           beaconState.Validators()[1].PublicKey,
+				IsActiveInCurrentEpoch:              true,
+				IsActiveInPreviousEpoch:             true,
+				IsCurrentEpochTargetAttester:        true,
+				IsCurrentEpochAttester:              true,
+				IsPreviousEpochAttester:             true,
+				IsPreviousEpochHeadAttester:         true,
+				IsPreviousEpochTargetAttester:       true,
+				CurrentEpochEffectiveBalanceGplanck: params.BeaconConfig().MaxEffectiveBalance,
 			},
 		},
 	}
@@ -2142,30 +2142,30 @@ func TestServer_GetIndividualVotes_AltairEndOfEpoch(t *testing.T) {
 	wanted := &zondpb.IndividualVotesRespond{
 		IndividualVotes: []*zondpb.IndividualVotesRespond_IndividualVote{
 			{
-				ValidatorIndex:                   0,
-				PublicKey:                        beaconState.Validators()[0].PublicKey,
-				IsActiveInCurrentEpoch:           true,
-				IsActiveInPreviousEpoch:          true,
-				IsCurrentEpochTargetAttester:     true,
-				IsCurrentEpochAttester:           true,
-				IsPreviousEpochAttester:          true,
-				IsPreviousEpochHeadAttester:      true,
-				IsPreviousEpochTargetAttester:    true,
-				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
-				Epoch:                            1,
+				ValidatorIndex:                      0,
+				PublicKey:                           beaconState.Validators()[0].PublicKey,
+				IsActiveInCurrentEpoch:              true,
+				IsActiveInPreviousEpoch:             true,
+				IsCurrentEpochTargetAttester:        true,
+				IsCurrentEpochAttester:              true,
+				IsPreviousEpochAttester:             true,
+				IsPreviousEpochHeadAttester:         true,
+				IsPreviousEpochTargetAttester:       true,
+				CurrentEpochEffectiveBalanceGplanck: params.BeaconConfig().MaxEffectiveBalance,
+				Epoch:                               1,
 			},
 			{
-				ValidatorIndex:                   1,
-				PublicKey:                        beaconState.Validators()[1].PublicKey,
-				IsActiveInCurrentEpoch:           true,
-				IsActiveInPreviousEpoch:          true,
-				IsCurrentEpochTargetAttester:     true,
-				IsCurrentEpochAttester:           true,
-				IsPreviousEpochAttester:          true,
-				IsPreviousEpochHeadAttester:      true,
-				IsPreviousEpochTargetAttester:    true,
-				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
-				Epoch:                            1,
+				ValidatorIndex:                      1,
+				PublicKey:                           beaconState.Validators()[1].PublicKey,
+				IsActiveInCurrentEpoch:              true,
+				IsActiveInPreviousEpoch:             true,
+				IsCurrentEpochTargetAttester:        true,
+				IsCurrentEpochAttester:              true,
+				IsPreviousEpochAttester:             true,
+				IsPreviousEpochHeadAttester:         true,
+				IsPreviousEpochTargetAttester:       true,
+				CurrentEpochEffectiveBalanceGplanck: params.BeaconConfig().MaxEffectiveBalance,
+				Epoch:                               1,
 			},
 		},
 	}
@@ -2230,30 +2230,30 @@ func TestServer_GetIndividualVotes_BellatrixEndOfEpoch(t *testing.T) {
 	wanted := &zondpb.IndividualVotesRespond{
 		IndividualVotes: []*zondpb.IndividualVotesRespond_IndividualVote{
 			{
-				ValidatorIndex:                   0,
-				PublicKey:                        beaconState.Validators()[0].PublicKey,
-				IsActiveInCurrentEpoch:           true,
-				IsActiveInPreviousEpoch:          true,
-				IsCurrentEpochTargetAttester:     true,
-				IsCurrentEpochAttester:           true,
-				IsPreviousEpochAttester:          true,
-				IsPreviousEpochHeadAttester:      true,
-				IsPreviousEpochTargetAttester:    true,
-				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
-				Epoch:                            1,
+				ValidatorIndex:                      0,
+				PublicKey:                           beaconState.Validators()[0].PublicKey,
+				IsActiveInCurrentEpoch:              true,
+				IsActiveInPreviousEpoch:             true,
+				IsCurrentEpochTargetAttester:        true,
+				IsCurrentEpochAttester:              true,
+				IsPreviousEpochAttester:             true,
+				IsPreviousEpochHeadAttester:         true,
+				IsPreviousEpochTargetAttester:       true,
+				CurrentEpochEffectiveBalanceGplanck: params.BeaconConfig().MaxEffectiveBalance,
+				Epoch:                               1,
 			},
 			{
-				ValidatorIndex:                   1,
-				PublicKey:                        beaconState.Validators()[1].PublicKey,
-				IsActiveInCurrentEpoch:           true,
-				IsActiveInPreviousEpoch:          true,
-				IsCurrentEpochTargetAttester:     true,
-				IsCurrentEpochAttester:           true,
-				IsPreviousEpochAttester:          true,
-				IsPreviousEpochHeadAttester:      true,
-				IsPreviousEpochTargetAttester:    true,
-				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
-				Epoch:                            1,
+				ValidatorIndex:                      1,
+				PublicKey:                           beaconState.Validators()[1].PublicKey,
+				IsActiveInCurrentEpoch:              true,
+				IsActiveInPreviousEpoch:             true,
+				IsCurrentEpochTargetAttester:        true,
+				IsCurrentEpochAttester:              true,
+				IsPreviousEpochAttester:             true,
+				IsPreviousEpochHeadAttester:         true,
+				IsPreviousEpochTargetAttester:       true,
+				CurrentEpochEffectiveBalanceGplanck: params.BeaconConfig().MaxEffectiveBalance,
+				Epoch:                               1,
 			},
 		},
 	}
@@ -2318,30 +2318,30 @@ func TestServer_GetIndividualVotes_CapellaEndOfEpoch(t *testing.T) {
 	wanted := &zondpb.IndividualVotesRespond{
 		IndividualVotes: []*zondpb.IndividualVotesRespond_IndividualVote{
 			{
-				ValidatorIndex:                   0,
-				PublicKey:                        beaconState.Validators()[0].PublicKey,
-				IsActiveInCurrentEpoch:           true,
-				IsActiveInPreviousEpoch:          true,
-				IsCurrentEpochTargetAttester:     true,
-				IsCurrentEpochAttester:           true,
-				IsPreviousEpochAttester:          true,
-				IsPreviousEpochHeadAttester:      true,
-				IsPreviousEpochTargetAttester:    true,
-				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
-				Epoch:                            1,
+				ValidatorIndex:                      0,
+				PublicKey:                           beaconState.Validators()[0].PublicKey,
+				IsActiveInCurrentEpoch:              true,
+				IsActiveInPreviousEpoch:             true,
+				IsCurrentEpochTargetAttester:        true,
+				IsCurrentEpochAttester:              true,
+				IsPreviousEpochAttester:             true,
+				IsPreviousEpochHeadAttester:         true,
+				IsPreviousEpochTargetAttester:       true,
+				CurrentEpochEffectiveBalanceGplanck: params.BeaconConfig().MaxEffectiveBalance,
+				Epoch:                               1,
 			},
 			{
-				ValidatorIndex:                   1,
-				PublicKey:                        beaconState.Validators()[1].PublicKey,
-				IsActiveInCurrentEpoch:           true,
-				IsActiveInPreviousEpoch:          true,
-				IsCurrentEpochTargetAttester:     true,
-				IsCurrentEpochAttester:           true,
-				IsPreviousEpochAttester:          true,
-				IsPreviousEpochHeadAttester:      true,
-				IsPreviousEpochTargetAttester:    true,
-				CurrentEpochEffectiveBalanceGwei: params.BeaconConfig().MaxEffectiveBalance,
-				Epoch:                            1,
+				ValidatorIndex:                      1,
+				PublicKey:                           beaconState.Validators()[1].PublicKey,
+				IsActiveInCurrentEpoch:              true,
+				IsActiveInPreviousEpoch:             true,
+				IsCurrentEpochTargetAttester:        true,
+				IsCurrentEpochAttester:              true,
+				IsPreviousEpochAttester:             true,
+				IsPreviousEpochHeadAttester:         true,
+				IsPreviousEpochTargetAttester:       true,
+				CurrentEpochEffectiveBalanceGplanck: params.BeaconConfig().MaxEffectiveBalance,
+				Epoch:                               1,
 			},
 		},
 	}

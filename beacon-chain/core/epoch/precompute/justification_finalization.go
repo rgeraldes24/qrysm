@@ -115,9 +115,9 @@ func weighJustificationAndFinalization(state state.BeaconState, newBits bitfield
 // Spec pseudocode definition:
 // def weigh_justification_and_finalization(state: BeaconState,
 //
-//	                                     total_active_balance: Gwei,
-//	                                     previous_epoch_target_balance: Gwei,
-//	                                     current_epoch_target_balance: Gwei) -> None:
+//	                                     total_active_balance: Gplanck,
+//	                                     previous_epoch_target_balance: Gplanck,
+//	                                     current_epoch_target_balance: Gplanck) -> None:
 //	previous_epoch = get_previous_epoch(state)
 //	current_epoch = get_current_epoch(state)
 //	old_previous_justified_checkpoint = state.previous_justified_checkpoint

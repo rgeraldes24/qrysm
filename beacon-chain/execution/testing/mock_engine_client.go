@@ -54,7 +54,7 @@ func (e *EngineClient) ForkchoiceUpdated(
 
 // GetPayload --
 func (e *EngineClient) GetPayload(_ context.Context, _ [8]byte, s primitives.Slot) (interfaces.ExecutionData, bool, error) {
-	ed, err := blocks.WrappedExecutionPayloadCapella(e.ExecutionPayloadCapella, math.Gwei(e.BlockValue))
+	ed, err := blocks.WrappedExecutionPayloadCapella(e.ExecutionPayloadCapella, math.Gplanck(e.BlockValue))
 	if err != nil {
 		return nil, false, err
 	}

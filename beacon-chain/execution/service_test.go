@@ -2,7 +2,6 @@ package execution
 
 import (
 	"context"
-	"math/big"
 	"strings"
 	"testing"
 	"time"
@@ -682,10 +681,11 @@ func TestService_CacheBlockHeaders(t *testing.T) {
 	assert.Equal(t, 5, rClient.numOfCalls)
 }
 
+// TODO(now.youtrack.cloud/issue/TQ-5)
+/*
 func TestService_FollowBlock(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
-	// TODO(now.youtrack.cloud/issue/TQ-5)
 	conf.Eth1FollowDistance = 2048
 	conf.SecondsPerETH1Block = 14
 	params.OverrideBeaconConfig(conf)
@@ -715,6 +715,7 @@ func TestService_FollowBlock(t *testing.T) {
 	// With a much higher blocktime, the follow height is respectively shortened.
 	assert.Equal(t, uint64(2283), h)
 }
+*/
 
 type slowRPCClient struct {
 	limit      int

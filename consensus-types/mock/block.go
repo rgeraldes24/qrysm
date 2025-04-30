@@ -82,7 +82,7 @@ func (SignedBeaconBlock) Header() (*zond.SignedBeaconBlockHeader, error) {
 	panic("implement me")
 }
 
-func (SignedBeaconBlock) ValueInGwei() uint64 {
+func (SignedBeaconBlock) ValueInGplanck() uint64 {
 	panic("implement me")
 }
 

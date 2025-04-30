@@ -71,11 +71,11 @@ var (
 	}, []string{"state"})
 	validatorsBalance = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "validators_total_balance",
-		Help: "The total balance of validators, in GWei",
+		Help: "The total balance of validators, in GPlanck",
 	}, []string{"state"})
 	validatorsEffectiveBalance = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "validators_total_effective_balance",
-		Help: "The total effective balance of validators, in GWei",
+		Help: "The total effective balance of validators, in GPlanck",
 	}, []string{"state"})
 	currentEth1DataDepositCount = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "current_eth1_data_deposit_count",
@@ -90,20 +90,20 @@ var (
 		Help: "The number of states a particular field is shared with.",
 	}, []string{"state"})
 	prevEpochActiveBalances = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "beacon_prev_epoch_active_gwei",
-		Help: "The total amount of ether, in gwei, that was active for voting of previous epoch",
+		Name: "beacon_prev_epoch_active_gplanck",
+		Help: "The total amount of zond, in gplanck, that was active for voting of previous epoch",
 	})
 	prevEpochSourceBalances = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "beacon_prev_epoch_source_gwei",
-		Help: "The total amount of ether, in gwei, that has been used in voting attestation source of previous epoch",
+		Name: "beacon_prev_epoch_source_gplanck",
+		Help: "The total amount of zond, in gplanck, that has been used in voting attestation source of previous epoch",
 	})
 	prevEpochTargetBalances = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "beacon_prev_epoch_target_gwei",
-		Help: "The total amount of ether, in gwei, that has been used in voting attestation target of previous epoch",
+		Name: "beacon_prev_epoch_target_gplanck",
+		Help: "The total amount of zond, in gplanck, that has been used in voting attestation target of previous epoch",
 	})
 	prevEpochHeadBalances = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "beacon_prev_epoch_head_gwei",
-		Help: "The total amount of ether, in gwei, that has been used in voting attestation head of previous epoch",
+		Name: "beacon_prev_epoch_head_gplanck",
+		Help: "The total amount of zond, in gplanck, that has been used in voting attestation head of previous epoch",
 	})
 	reorgCount = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "beacon_reorgs_total",

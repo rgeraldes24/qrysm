@@ -642,9 +642,9 @@ func validatorsAreWithdrawn(ec *e2etypes.EvaluationContext, conns ...*grpc.Clien
 		if err != nil {
 			return err
 		}
-		// Only return an error if the validator has more than 1 eth
+		// Only return an error if the validator has more than 1 zond
 		// in its balance.
-		if bal > 1*params.BeaconConfig().GweiPerEth {
+		if bal > 1*params.BeaconConfig().GplanckPerZond {
 			return errors.Errorf("Validator index %d with key %#x hasn't withdrawn. Their balance is %d.", valIdx, key, bal)
 		}
 	}

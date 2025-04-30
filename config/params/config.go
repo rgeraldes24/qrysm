@@ -38,10 +38,10 @@ type BeaconChainConfig struct {
 	HysteresisDownwardMultiplier   uint64 `yaml:"HYSTERESIS_DOWNWARD_MULTIPLIER" spec:"true"`     // HysteresisDownwardMultiplier defines the hysteresis downward multiplier for effective balance calculations.
 	HysteresisUpwardMultiplier     uint64 `yaml:"HYSTERESIS_UPWARD_MULTIPLIER" spec:"true"`       // HysteresisUpwardMultiplier defines the hysteresis upward multiplier for effective balance calculations.
 
-	// Gwei value constants.
-	MinDepositAmount          uint64 `yaml:"MIN_DEPOSIT_AMOUNT" spec:"true"`          // MinDepositAmount is the minimum amount of Gwei a validator can send to the deposit contract at once (lower amounts will be reverted).
-	MaxEffectiveBalance       uint64 `yaml:"MAX_EFFECTIVE_BALANCE" spec:"true"`       // MaxEffectiveBalance is the maximal amount of Gwei that is effective for staking.
-	EjectionBalance           uint64 `yaml:"EJECTION_BALANCE" spec:"true"`            // EjectionBalance is the minimal GWei a validator needs to have before ejected.
+	// Gplanck value constants.
+	MinDepositAmount          uint64 `yaml:"MIN_DEPOSIT_AMOUNT" spec:"true"`          // MinDepositAmount is the minimum amount of Gplanck a validator can send to the deposit contract at once (lower amounts will be reverted).
+	MaxEffectiveBalance       uint64 `yaml:"MAX_EFFECTIVE_BALANCE" spec:"true"`       // MaxEffectiveBalance is the maximal amount of Gplanck that is effective for staking.
+	EjectionBalance           uint64 `yaml:"EJECTION_BALANCE" spec:"true"`            // EjectionBalance is the minimal Gplanck a validator needs to have before ejected.
 	EffectiveBalanceIncrement uint64 `yaml:"EFFECTIVE_BALANCE_INCREMENT" spec:"true"` // EffectiveBalanceIncrement is used for converting the high balance into the low balance for validators.
 
 	// Initial value constants.
@@ -119,7 +119,7 @@ type BeaconChainConfig struct {
 	DomainDilithiumToExecutionChange  [4]byte // DomainDilithiumToExecutionChange defines the Dilithium signature domain to change withdrawal addresses to Zond prefix
 
 	// Qrysm constants.
-	GweiPerEth                   uint64                                     // GweiPerEth is the amount of gwei corresponding to 1 eth.
+	GplanckPerZond               uint64                                     // GplanckPerZond is the amount of gplanck corresponding to 1 zond.
 	DefaultBufferSize            int                                        // DefaultBufferSize for channels across the Qrysm repository.
 	ValidatorPrivkeyFileName     string                                     // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
 	WithdrawalPrivkeyFileName    string                                     // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
@@ -180,7 +180,7 @@ type BeaconChainConfig struct {
 	// Bellatrix
 	DefaultFeeRecipient    common.Address // DefaultFeeRecipient where the transaction fee goes to.
 	ZondBurnAddress        string         // ZondBurnAddress is the constant zond address to burn fees in that network. the default is Z0000000000000000000000000000000000000000
-	DefaultBuilderGasLimit uint64         // DefaultBuilderGasLimit is the default used to set the gaslimit for the Builder APIs, typically at around 30M wei.
+	DefaultBuilderGasLimit uint64         // DefaultBuilderGasLimit is the default used to set the gaslimit for the Builder APIs, typically at around 30M planck.
 
 	// Mev-boost circuit breaker
 	MaxBuilderConsecutiveMissedSlots primitives.Slot // MaxBuilderConsecutiveMissedSlots defines the number of consecutive skip slot to fallback from using relay/builder to local execution engine for block construction.

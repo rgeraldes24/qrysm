@@ -290,7 +290,7 @@ func (z *ZeroNode) GetRoot() [32]byte {
 	return trie.ZeroHashes[z.depth]
 }
 
-// IsFull returns wh   ether there is space left for deposits.
+// IsFull returns whether there is space left for deposits.
 // A ZeroNode will always return false as a ZeroNode is an empty node
 // that gets replaced by a deposit.
 func (_ *ZeroNode) IsFull() bool {

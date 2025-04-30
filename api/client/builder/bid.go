@@ -77,7 +77,7 @@ func WrappedBuilderBidCapella(p *zondpb.BuilderBidCapella) (Bid, error) {
 // Header returns the execution data interface.
 func (b builderBidCapella) Header() (interfaces.ExecutionData, error) {
 	// We have to convert big endian to little endian because the value is coming from the execution layer.
-	return blocks.WrappedExecutionPayloadHeaderCapella(b.p.Header, blocks.PayloadValueToGwei(b.p.Value))
+	return blocks.WrappedExecutionPayloadHeaderCapella(b.p.Header, blocks.PayloadValueToGplanck(b.p.Value))
 }
 
 // Version --

@@ -98,7 +98,7 @@ func ProcessAttestationNoVerifySignature(
 //
 //	# Reward proposer
 //	proposer_reward_denominator = (WEIGHT_DENOMINATOR - PROPOSER_WEIGHT) * WEIGHT_DENOMINATOR // PROPOSER_WEIGHT
-//	proposer_reward = Gwei(proposer_reward_numerator // proposer_reward_denominator)
+//	proposer_reward = Gplanck(proposer_reward_numerator // proposer_reward_denominator)
 //	increase_balance(state, get_beacon_proposer_index(state), proposer_reward)
 func SetParticipationAndRewardProposer(
 	ctx context.Context,
@@ -222,7 +222,7 @@ func EpochParticipation(beaconState state.BeaconState, indices []uint64, epochPa
 // Spec code:
 //
 //	proposer_reward_denominator = (WEIGHT_DENOMINATOR - PROPOSER_WEIGHT) * WEIGHT_DENOMINATOR // PROPOSER_WEIGHT
-//	proposer_reward = Gwei(proposer_reward_numerator // proposer_reward_denominator)
+//	proposer_reward = Gplanck(proposer_reward_numerator // proposer_reward_denominator)
 //	increase_balance(state, get_beacon_proposer_index(state), proposer_reward)
 func RewardProposer(ctx context.Context, beaconState state.BeaconState, proposerRewardNumerator uint64) error {
 	cfg := params.BeaconConfig()

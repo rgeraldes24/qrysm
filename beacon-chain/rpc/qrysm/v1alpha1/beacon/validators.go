@@ -533,13 +533,13 @@ func (bs *Server) GetValidatorParticipation(
 		Epoch:     requestedEpoch,
 		Finalized: requestedEpoch <= cp.Epoch,
 		Participation: &zondpb.ValidatorParticipation{
-			CurrentEpochActiveGwei:           b.ActiveCurrentEpoch,
-			CurrentEpochAttestingGwei:        b.CurrentEpochAttested,
-			CurrentEpochTargetAttestingGwei:  b.CurrentEpochTargetAttested,
-			PreviousEpochActiveGwei:          b.ActivePrevEpoch,
-			PreviousEpochAttestingGwei:       b.PrevEpochAttested,
-			PreviousEpochTargetAttestingGwei: b.PrevEpochTargetAttested,
-			PreviousEpochHeadAttestingGwei:   b.PrevEpochHeadAttested,
+			CurrentEpochActiveGplanck:           b.ActiveCurrentEpoch,
+			CurrentEpochAttestingGplanck:        b.CurrentEpochAttested,
+			CurrentEpochTargetAttestingGplanck:  b.CurrentEpochTargetAttested,
+			PreviousEpochActiveGplanck:          b.ActivePrevEpoch,
+			PreviousEpochAttestingGplanck:       b.PrevEpochAttested,
+			PreviousEpochTargetAttestingGplanck: b.PrevEpochTargetAttested,
+			PreviousEpochHeadAttestingGplanck:   b.PrevEpochHeadAttested,
 		},
 	}
 
@@ -631,20 +631,20 @@ func (bs *Server) GetIndividualVotes(
 		}
 		pb := val.PublicKey()
 		votes = append(votes, &zondpb.IndividualVotesRespond_IndividualVote{
-			Epoch:                            req.Epoch,
-			PublicKey:                        pb[:],
-			ValidatorIndex:                   index,
-			IsSlashed:                        v[index].IsSlashed,
-			IsWithdrawableInCurrentEpoch:     v[index].IsWithdrawableCurrentEpoch,
-			IsActiveInCurrentEpoch:           v[index].IsActiveCurrentEpoch,
-			IsActiveInPreviousEpoch:          v[index].IsActivePrevEpoch,
-			IsCurrentEpochAttester:           v[index].IsCurrentEpochAttester,
-			IsCurrentEpochTargetAttester:     v[index].IsCurrentEpochTargetAttester,
-			IsPreviousEpochAttester:          v[index].IsPrevEpochAttester,
-			IsPreviousEpochTargetAttester:    v[index].IsPrevEpochTargetAttester,
-			IsPreviousEpochHeadAttester:      v[index].IsPrevEpochHeadAttester,
-			CurrentEpochEffectiveBalanceGwei: v[index].CurrentEpochEffectiveBalance,
-			InactivityScore:                  v[index].InactivityScore,
+			Epoch:                               req.Epoch,
+			PublicKey:                           pb[:],
+			ValidatorIndex:                      index,
+			IsSlashed:                           v[index].IsSlashed,
+			IsWithdrawableInCurrentEpoch:        v[index].IsWithdrawableCurrentEpoch,
+			IsActiveInCurrentEpoch:              v[index].IsActiveCurrentEpoch,
+			IsActiveInPreviousEpoch:             v[index].IsActivePrevEpoch,
+			IsCurrentEpochAttester:              v[index].IsCurrentEpochAttester,
+			IsCurrentEpochTargetAttester:        v[index].IsCurrentEpochTargetAttester,
+			IsPreviousEpochAttester:             v[index].IsPrevEpochAttester,
+			IsPreviousEpochTargetAttester:       v[index].IsPrevEpochTargetAttester,
+			IsPreviousEpochHeadAttester:         v[index].IsPrevEpochHeadAttester,
+			CurrentEpochEffectiveBalanceGplanck: v[index].CurrentEpochEffectiveBalance,
+			InactivityScore:                     v[index].InactivityScore,
 		})
 	}
 

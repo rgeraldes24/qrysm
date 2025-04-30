@@ -109,7 +109,7 @@ func EthBalance(address string) *big.Float {
 	if err != nil {
 		fmt.Printf("Error fetching Zond Balance for address: %v\n", address)
 	}
-	return ToEther(balance)
+	return ToZond(balance)
 }
 
 // CurrentBlock in ETH1.
@@ -122,11 +122,11 @@ func CurrentBlock() uint64 {
 	return block.NumberU64()
 }
 
-// ToEther from Wei.
-func ToEther(o *big.Int) *big.Float {
-	wei := big.NewFloat(0)
-	wei.SetInt(o)
-	return new(big.Float).Quo(wei, big.NewFloat(params.Ether))
+// ToZond from Planck.
+func ToZond(o *big.Int) *big.Float {
+	planck := big.NewFloat(0)
+	planck.SetInt(o)
+	return new(big.Float).Quo(planck, big.NewFloat(params.Zond))
 }
 
 // MetricsHTTP - HTTP response handler for /metrics.

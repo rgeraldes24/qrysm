@@ -64,7 +64,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	HysteresisDownwardMultiplier:   1,
 	HysteresisUpwardMultiplier:     5,
 
-	// Gwei value constants.
+	// Gplanck value constants.
 	MinDepositAmount:          1 * 1e9,
 	MaxEffectiveBalance:       40000 * 1e9,
 	EjectionBalance:           20000 * 1e9,
@@ -150,7 +150,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	DomainDilithiumToExecutionChange:  bytesutil.Uint32ToBytes4(0x0A000000),
 
 	// Qrysm constants.
-	GweiPerEth:                   1000000000,
+	GplanckPerZond:               1000000000,
 	DefaultBufferSize:            10000,
 	WithdrawalPrivkeyFileName:    "/shardwithdrawalkey",
 	ValidatorPrivkeyFileName:     "/validatorprivatekey",

@@ -594,7 +594,7 @@ message Validator {
     // 32 byte hash of the withdrawal destination public key.
     bytes withdrawal_credentials = 2 [(theqrl.zond.ext.ssz_size) = "32"];
 
-    // The validators current effective balance in gwei.
+    // The validators current effective balance in gplanck.
     uint64 effective_balance = 3;
 
     // Whether or not the validator has been slashed.
@@ -625,21 +625,21 @@ message Validator {
 
 // ValidatorParticipation stores participation metrics during a given epoch.
 message ValidatorParticipation {
-    // Total staked gwei that was active (i.e. eligible to vote) during the current epoch.
-    uint64 current_epoch_active_gwei = 1;
-    // Total staked gwei that had attestations included in a block during the current epoch,
+    // Total staked gplanck that was active (i.e. eligible to vote) during the current epoch.
+    uint64 current_epoch_active_gplanck = 1;
+    // Total staked gplanck that had attestations included in a block during the current epoch,
     // attestations by the same validator do not increase this figure.
-    uint64 current_epoch_attesting_gwei = 2;
-    // Total staked gwei that attested to the majority-elected Casper FFG target epoch during the current epoch.
-    uint64 current_epoch_target_attesting_gwei = 3;
-    // Same as current_epoch_active_gwei but for previous epoch.
-    uint64 previous_epoch_active_gwei = 4;
-    // Same as current_epoch_attesting_gwei but for previous epoch.
-    uint64 previous_epoch_attesting_gwei = 5;
-    // Same as current_epoch_target_attesting_gwei but for previous epoch.
-    uint64 previous_epoch_target_attesting_gwei = 6;
-    // Total staked gwei that attested to a head beacon block that is in the canonical chain.
-    uint64 previous_epoch_head_attesting_gwei = 7;
+    uint64 current_epoch_attesting_gplanck = 2;
+    // Total staked gplanck that attested to the majority-elected Casper FFG target epoch during the current epoch.
+    uint64 current_epoch_target_attesting_gplanck = 3;
+    // Same as current_epoch_active_gplanck but for previous epoch.
+    uint64 previous_epoch_active_gplanck = 4;
+    // Same as current_epoch_attesting_gplanck but for previous epoch.
+    uint64 previous_epoch_attesting_gplanck = 5;
+    // Same as current_epoch_target_attesting_gplanck but for previous epoch.
+    uint64 previous_epoch_target_attesting_gplanck = 6;
+    // Total staked gplanck that attested to a head beacon block that is in the canonical chain.
+    uint64 previous_epoch_head_attesting_gplanck = 7;
 }
 
 // ValidatorInfo gives information about the state of a validator at a certain epoch.
@@ -667,10 +667,10 @@ message ValidatorInfo {
     // - state == EXITED: time at which validator funds will be withdrawable.
     uint64 transition_timestamp = 5;
 
-    // The validator's current balance in GWei.
+    // The validator's current balance in GPlanck.
     uint64 balance = 6;
 
-    // The validator's current effective balance in GWei.
+    // The validator's current effective balance in GPlanck.
     // Only valid for states ACTIVE, EXITING, SLASHING.
     uint64 effective_balance = 7;
 }

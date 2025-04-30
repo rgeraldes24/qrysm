@@ -171,7 +171,7 @@ func TestClient_HTTP(t *testing.T) {
 		require.DeepEqual(t, want.ExecutionPayload.PrevRandao.Bytes(), pb.PrevRandao)
 		require.DeepEqual(t, want.ExecutionPayload.ParentHash.Bytes(), pb.ParentHash)
 
-		v, err := resp.ValueInGwei()
+		v, err := resp.ValueInGplanck()
 		require.NoError(t, err)
 		require.Equal(t, uint64(1236), v)
 	})

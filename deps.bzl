@@ -5858,9 +5858,9 @@ def go_dependencies():
         patches = [
             "//third_party:com_github_theqrl_go_zond_secp256k1.patch",
         ],
-        replace = "github.com/theQRL/go-zond",
-        sum = "h1:xRrRObM2DhE7//OzYJ+dTVgnbqXxW4AhWkJHAVV8j0Q=",
-        version = "v0.0.0-20250214175148-2939fb6f666c",
+        replace = "github.com/cyyber/go-zond",
+        sum = "h1:yIuRt1qZCuhUFgZf5Xq6AYT56MR7yVU3IpViNnEzof0=",
+        version = "v0.2.1-0.20250430092150-d9b1e2ea3867",
     )
     go_repository(
         name = "com_github_theqrl_go_zond_types",
@@ -5896,8 +5896,9 @@ def go_dependencies():
     go_repository(
         name = "com_github_theqrl_tx_fuzz",
         importpath = "github.com/theQRL/tx-fuzz",
-        sum = "h1:s40UmRSsaVQJiapfSNpXXKWyz8rksXisM7DqdvJPUzU=",
-        version = "v0.0.0-20250214181555-d52542df59d6",
+        replace = "github.com/rgeraldes24/tx-fuzz",
+        sum = "h1:SeFEaFH/08Qk8arysi7AcCyLbJElZmz1EFt7UktBwJI=",
+        version = "v0.0.0-20250430111120-47f2ef4cdb94",
     )
 
     go_repository(

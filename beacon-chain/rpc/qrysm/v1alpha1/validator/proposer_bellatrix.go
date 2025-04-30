@@ -55,11 +55,11 @@ func setExecutionData(ctx context.Context, blk interfaces.SignedBeaconBlock, loc
 	}
 
 	// Compare payload values between local and builder. Default to the local value if it is higher.
-	localValueGwei, err := localPayload.ValueInGwei()
+	localValueGplanck, err := localPayload.ValueInGplanck()
 	if err != nil {
 		return errors.Wrap(err, "failed to get local payload value")
 	}
-	builderValueGwei, err := builderPayload.ValueInGwei()
+	builderValueGplanck, err := builderPayload.ValueInGplanck()
 	if err != nil {
 		log.WithError(err).Warn("Proposer: failed to get builder payload value") // Default to local if can't get builder value.
 		return blk.SetExecution(localPayload)
@@ -75,7 +75,7 @@ func setExecutionData(ctx context.Context, blk interfaces.SignedBeaconBlock, loc
 	// Use builder payload if the following in true:
 	// builder_bid_value * 100 > local_block_value * (local-block-value-boost + 100)
 	boost := params.BeaconConfig().LocalBlockValueBoost
-	higherValueBuilder := builderValueGwei*100 > localValueGwei*(100+boost)
+	higherValueBuilder := builderValueGplanck*100 > localValueGplanck*(100+boost)
 
 	// If we can't get the builder value, just use local block.
 	if higherValueBuilder && withdrawalsMatched { // Builder value is higher and withdrawals match.
@@ -90,16 +90,16 @@ func setExecutionData(ctx context.Context, blk interfaces.SignedBeaconBlock, loc
 	}
 	if !higherValueBuilder {
 		log.WithFields(logrus.Fields{
-			"localGweiValue":       localValueGwei,
+			"localGplanckValue":    localValueGplanck,
 			"localBoostPercentage": boost,
-			"builderGweiValue":     builderValueGwei,
+			"builderGplanckValue":  builderValueGplanck,
 		}).Warn("Proposer: using local execution payload because higher value")
 	}
 	span.AddAttributes(
 		trace.BoolAttribute("higherValueBuilder", higherValueBuilder),
-		trace.Int64Attribute("localGweiValue", int64(localValueGwei)),     // lint:ignore uintcast -- This is OK for tracing.
-		trace.Int64Attribute("localBoostPercentage", int64(boost)),        // lint:ignore uintcast -- This is OK for tracing.
-		trace.Int64Attribute("builderGweiValue", int64(builderValueGwei)), // lint:ignore uintcast -- This is OK for tracing.
+		trace.Int64Attribute("localGplanckValue", int64(localValueGplanck)),     // lint:ignore uintcast -- This is OK for tracing.
+		trace.Int64Attribute("localBoostPercentage", int64(boost)),              // lint:ignore uintcast -- This is OK for tracing.
+		trace.Int64Attribute("builderGplanckValue", int64(builderValueGplanck)), // lint:ignore uintcast -- This is OK for tracing.
 	)
 	return blk.SetExecution(localPayload)
 }

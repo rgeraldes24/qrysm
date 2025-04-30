@@ -213,22 +213,22 @@ func AddInt(i ...int) (int, error) {
 	return sum, nil
 }
 
-// Wei is the smallest unit of Ether, represented as a pointer to a bigInt.
-type Wei *big.Int
+// Planck is the smallest unit of Zond, represented as a pointer to a bigInt.
+type Planck *big.Int
 
-// Gwei is a denomination of 1e9 Wei represented as an uint64.
-type Gwei uint64
+// Gplanck is a denomination of 1e9 Planck represented as an uint64.
+type Gplanck uint64
 
-// WeiToGwei converts big int wei to uint64 gwei.
+// PlanckToGplanck converts big int planck to uint64 gplanck.
 // The input `v` is copied before being modified.
-func WeiToGwei(v Wei) Gwei {
+func PlanckToGplanck(v Planck) Gplanck {
 	if v == nil {
 		return 0
 	}
-	gweiPerEth := big.NewInt(1e9)
+	gplanckPerZond := big.NewInt(1e9)
 	copied := big.NewInt(0).Set(v)
-	copied.Div(copied, gweiPerEth)
-	return Gwei(copied.Uint64())
+	copied.Div(copied, gplanckPerZond)
+	return Gplanck(copied.Uint64())
 }
 
 // IsValidUint256 given a bigint checks if the value is a valid Uint256
