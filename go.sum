@@ -189,6 +189,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46t
 github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
+github.com/cyyber/go-zond v0.2.1-0.20250430092150-d9b1e2ea3867 h1:yIuRt1qZCuhUFgZf5Xq6AYT56MR7yVU3IpViNnEzof0=
+github.com/cyyber/go-zond v0.2.1-0.20250430092150-d9b1e2ea3867/go.mod h1:tVPKU1GQiE2ZDjPBbjPIkll4ULSi7KVWAmUKamd7/zs=
 github.com/d4l3k/messagediff v1.2.1 h1:ZcAIMYsUg0EAp9X+tt8/enBE/Q8Yd5kzPynLyKptt9U=
 github.com/d4l3k/messagediff v1.2.1/go.mod h1:Oozbb1TVXFac9FtSIxHBMnBCq2qeH/2KkEQxENCrlLo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -900,6 +902,8 @@ github.com/raulk/go-watchdog v1.3.0 h1:oUmdlHxdkXRJlwfG0O9omj8ukerm8MEQavSiDTEtB
 github.com/raulk/go-watchdog v1.3.0/go.mod h1:fIvOnLbF0b0ZwkB9YU4mOW9Did//4vPZtDqv66NfsMU=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
+github.com/rgeraldes24/tx-fuzz v0.0.0-20250430111120-47f2ef4cdb94 h1:SeFEaFH/08Qk8arysi7AcCyLbJElZmz1EFt7UktBwJI=
+github.com/rgeraldes24/tx-fuzz v0.0.0-20250430111120-47f2ef4cdb94/go.mod h1:BBvBxaQu/ghijFGojnV0/H3yIlGupcqmItaJCiSc7YA=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.4.4 h1:8TfxU8dW6PdqD27gjM8MVNuicgxIjxpm4K7x4jp8sis=
 github.com/rivo/uniseg v0.4.4/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
@@ -1017,8 +1021,6 @@ github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63 h1:cU1QlEDDZ3zI
 github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63/go.mod h1:Xm3tb2axH6IT4miFd3hKIeD877Y6aA9Hxf2jOYtfTIk=
 github.com/theQRL/go-qrllib v0.0.0-20230406170304-b7eb19c367e1 h1:YvUxImh18qCxX1rjvYF9wqAAL236s2FqrjzTRqg5Alg=
 github.com/theQRL/go-qrllib v0.0.0-20230406170304-b7eb19c367e1/go.mod h1:IspDEOeIlmm6GujPeTNygL3T72MUluDDyUa20AisjaQ=
-github.com/theQRL/go-zond v0.0.0-20250214175148-2939fb6f666c h1:xRrRObM2DhE7//OzYJ+dTVgnbqXxW4AhWkJHAVV8j0Q=
-github.com/theQRL/go-zond v0.0.0-20250214175148-2939fb6f666c/go.mod h1:N8aSiLnp1znLhurd3uf0j2tNFG8KgkKBWcTuEUS98n4=
 github.com/theQRL/go-zond-types v0.0.0-20230824233758-ea0b707a1e23 h1:9ifrMzlO0V61aT0nThIPFaEu83VAImLhAWGg5ppDf9A=
 github.com/theQRL/go-zond-types v0.0.0-20230824233758-ea0b707a1e23/go.mod h1:gjp3SOqgnqxyj/n+RQcZcylby03rtJiZefeQysj39NI=
 github.com/theQRL/go-zond-wallet-encryptor-keystore v0.0.0-20231020114450-f6f12b82ea8b h1:tX4WpoKWAXMyHFLMTQugNISJlPzP+V64y81RClFbufU=
@@ -1029,8 +1031,6 @@ github.com/theQRL/gozvmlab v0.0.0-20250214180526-fa0574ea7bf7 h1:BRa8KGZX1OJ0eRv
 github.com/theQRL/gozvmlab v0.0.0-20250214180526-fa0574ea7bf7/go.mod h1:dc9E60jJDyFIg8U3dbI/oIIkmeyGzsATvVsFmQ7H0hk=
 github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f h1:hEgl/ykBvqXdxoQc3mFuh59ju8ylNMVwDyAaiRHdLBY=
 github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f/go.mod h1:IOyTYjcIO0rkmnGBfJTL0NJ11exy/Tc2QEuv7hCXp24=
-github.com/theQRL/tx-fuzz v0.0.0-20250214181555-d52542df59d6 h1:s40UmRSsaVQJiapfSNpXXKWyz8rksXisM7DqdvJPUzU=
-github.com/theQRL/tx-fuzz v0.0.0-20250214181555-d52542df59d6/go.mod h1:8edV3iKduwiemOehSEqC+gIE5LGr3uL5ISBFaBrFRnw=
 github.com/thomaso-mirodin/intmath v0.0.0-20160323211736-5dc6d854e46e h1:cR8/SYRgyQCt5cNCMniB/ZScMkhI9nk8U5C7SbISXjo=
 github.com/thomaso-mirodin/intmath v0.0.0-20160323211736-5dc6d854e46e/go.mod h1:Tu4lItkATkonrYuvtVjG0/rhy15qrNGNTjPdaphtZ/8=
 github.com/tjfoc/gmsm v1.3.0/go.mod h1:HaUcFuY0auTiaHB9MHFGCPx5IaLhTUd2atbCFBQXn9w=

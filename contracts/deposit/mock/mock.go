@@ -51,7 +51,7 @@ func Setup() (*TestAccount, error) {
 	}
 	startingBalance, _ := new(big.Int).SetString("100000000000000000000000000000000000000", 10)
 	genesis[addr] = core.GenesisAccount{Balance: startingBalance}
-	backend := backends.NewSimulatedBackend(genesis, 210000000000)
+	backend := backends.NewSimulatedBackend(genesis, 20000000)
 
 	contractAddr, _, contract, err := DeployDepositContract(txOpts, backend)
 	if err != nil {

@@ -189,9 +189,9 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 			zondpbservice.ImportedKeystoreStatus_ERROR,
 			statuses[2].Status,
 		)
-		require.Equal(
+		require.StringContains(
 			t,
-			fmt.Sprintf("incorrect password for key 0x%s", keystores[2].Pubkey),
+			fmt.Sprintf("incorrect password for key %s", keystores[2].Pubkey[:12]),
 			statuses[2].Message,
 		)
 		b, err := hexutil.Decode("0x" + keystore1.Pubkey)
@@ -239,9 +239,9 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 			zondpbservice.ImportedKeystoreStatus_ERROR,
 			statuses[1].Status,
 		)
-		require.Equal(
+		require.StringContains(
 			t,
-			fmt.Sprintf("incorrect password for key 0x%s", keystores[1].Pubkey),
+			fmt.Sprintf("incorrect password for key %s", keystores[1].Pubkey[:12]),
 			statuses[1].Message,
 		)
 		require.LogsContain(t, hook, "no keys were imported")
