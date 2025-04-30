@@ -126,7 +126,7 @@ func CurrentBlock() uint64 {
 func ToZND(o *big.Int) *big.Float {
 	planck := big.NewFloat(0)
 	planck.SetInt(o)
-	return new(big.Float).Quo(planck, big.NewFloat(params.ZND))
+	return new(big.Float).Quo(planck, big.NewFloat(params.Zond))
 }
 
 // MetricsHTTP - HTTP response handler for /metrics.

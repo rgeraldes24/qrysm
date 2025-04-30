@@ -39,7 +39,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 
 	contractAddrStr := cliCtx.String(flags.DepositContractAddressFlag.Name)
 	if !cliCtx.Bool(flags.SkipDepositConfirmationFlag.Name) {
-		qrlDepositTotal := uint64(len(depositDataList)) * params.BeaconConfig().MaxEffectiveBalance / params.BeaconConfig().GplanckPerZND
+		qrlDepositTotal := uint64(len(depositDataList)) * params.BeaconConfig().MaxEffectiveBalance / params.BeaconConfig().GplanckPerZond
 		actionText := "This will submit the deposits stored in your deposit data directory. " +
 			fmt.Sprintf("A total of %d QRL will be sent to contract address %s for %d validator accounts. ", qrlDepositTotal, contractAddrStr, len(depositDataList)) +
 			"Do you want to proceed? (Y/N)"

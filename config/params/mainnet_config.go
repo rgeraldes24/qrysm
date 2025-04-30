@@ -150,7 +150,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	DomainDilithiumToExecutionChange:  bytesutil.Uint32ToBytes4(0x0A000000),
 
 	// Qrysm constants.
-	GplanckPerZND:                1000000000,
+	GplanckPerZond:               1000000000,
 	DefaultBufferSize:            10000,
 	WithdrawalPrivkeyFileName:    "/shardwithdrawalkey",
 	ValidatorPrivkeyFileName:     "/validatorprivatekey",

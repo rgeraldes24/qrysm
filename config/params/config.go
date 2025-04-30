@@ -119,7 +119,7 @@ type BeaconChainConfig struct {
 	DomainDilithiumToExecutionChange  [4]byte // DomainDilithiumToExecutionChange defines the Dilithium signature domain to change withdrawal addresses to Zond prefix
 
 	// Qrysm constants.
-	GplanckPerZND                uint64                                     // GplanckPerZND is the amount of gplanck corresponding to 1 znd.
+	GplanckPerZond               uint64                                     // GplanckPerZond is the amount of gplanck corresponding to 1 zond.
 	DefaultBufferSize            int                                        // DefaultBufferSize for channels across the Qrysm repository.
 	ValidatorPrivkeyFileName     string                                     // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
 	WithdrawalPrivkeyFileName    string                                     // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
