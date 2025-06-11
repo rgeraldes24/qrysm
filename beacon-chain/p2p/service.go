@@ -432,16 +432,22 @@ func (s *Service) connectWithPeer(ctx context.Context, info peer.AddrInfo) error
 	ctx, span := trace.StartSpan(ctx, "p2p.connectWithPeer")
 	defer span.End()
 
-	if info.ID == s.host.ID() {
+	pid := info.ID
+	if pid == s.host.ID() {
 		return nil
 	}
-	if s.Peers().IsBad(info.ID) {
+	if s.Peers().IsBad(pid) {
 		return errors.New("refused to connect to bad peer")
 	}
 	ctx, cancel := context.WithTimeout(ctx, maxDialTimeout)
 	defer cancel()
 	if err := s.host.Connect(ctx, info); err != nil {
-		s.Peers().Scorers().BadResponsesScorer().Increment(info.ID)
+		log.WithFields(logrus.Fields{
+			"pid":                     pid,
+			"bad_responses":           s.Peers().Scorers().BadResponsesScorer().Increment(pid),
+			"bad_responses_threshold": s.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+		}).Debug("Peer is penalized for connection error")
+
 		return err
 	}
 	return nil

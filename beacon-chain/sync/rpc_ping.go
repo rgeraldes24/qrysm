@@ -8,6 +8,7 @@ import (
 
 	libp2pcore "github.com/libp2p/go-libp2p/core"
 	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	p2ptypes "github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
@@ -26,11 +27,16 @@ func (s *Service) pingHandler(_ context.Context, msg interface{}, stream libp2pc
 		return err
 	}
 	s.rateLimiter.add(stream, 1)
-	valid, err := s.validateSequenceNum(*m, stream.Conn().RemotePeer())
+	pid := stream.Conn().RemotePeer()
+	valid, err := s.validateSequenceNum(*m, pid)
 	if err != nil {
 		// Descore peer for giving us a bad sequence number.
 		if errors.Is(err, p2ptypes.ErrInvalidSequenceNum) {
-			s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(stream.Conn().RemotePeer())
+			log.WithFields(logrus.Fields{
+				"pid":                     pid,
+				"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
+				"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+			}).Debug("Peer is penalized for returning a bad sequence number for ping")
 			s.writeErrorResponseToStream(responseCodeInvalidRequest, p2ptypes.ErrInvalidSequenceNum.Error(), stream)
 		}
 		return err
@@ -55,18 +61,18 @@ func (s *Service) pingHandler(_ context.Context, msg interface{}, stream libp2pc
 		// New context so the calling function doesn't cancel on us.
 		ctx, cancel := context.WithTimeout(context.Background(), ttfbTimeout)
 		defer cancel()
-		md, err := s.sendMetaDataRequest(ctx, stream.Conn().RemotePeer())
+		md, err := s.sendMetaDataRequest(ctx, pid)
 		if err != nil {
 			// We cannot compare errors directly as the stream muxer error
 			// type isn't compatible with the error we have, so a direct
 			// equality checks fails.
 			if !strings.Contains(err.Error(), p2ptypes.ErrIODeadline.Error()) {
-				log.WithField("peer", stream.Conn().RemotePeer()).WithError(err).Debug("Could not send metadata request")
+				log.WithField("peer", pid).WithError(err).Debug("Could not send metadata request")
 			}
 			return
 		}
 		// update metadata if there is no error
-		s.cfg.p2p.Peers().SetMetadata(stream.Conn().RemotePeer(), md)
+		s.cfg.p2p.Peers().SetMetadata(pid, md)
 	}()
 
 	return nil
@@ -94,33 +100,41 @@ func (s *Service) sendPingRequest(ctx context.Context, id peer.ID) error {
 	}
 	// Records the latency of the ping request for that peer.
 	s.cfg.p2p.Host().Peerstore().RecordLatency(id, time.Now().Sub(currentTime))
-
+	pid := stream.Conn().RemotePeer()
 	if code != 0 {
-		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(stream.Conn().RemotePeer())
+		log.WithFields(logrus.Fields{
+			"pid":                     pid,
+			"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
+			"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+		}).Debug("Peer is penalized for a unsuccessful status code while sending a ping request")
 		return errors.New(errMsg)
 	}
 	msg := new(primitives.SSZUint64)
 	if err := s.cfg.p2p.Encoding().DecodeWithMaxLength(stream, msg); err != nil {
 		return err
 	}
-	valid, err := s.validateSequenceNum(*msg, stream.Conn().RemotePeer())
+	valid, err := s.validateSequenceNum(*msg, pid)
 	if err != nil {
 		// Descore peer for giving us a bad sequence number.
 		if errors.Is(err, p2ptypes.ErrInvalidSequenceNum) {
-			s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(stream.Conn().RemotePeer())
+			log.WithFields(logrus.Fields{
+				"pid":                     pid,
+				"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
+				"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+			}).Debug("Peer is penalized for a bad sequence number")
 		}
 		return err
 	}
 	if valid {
 		return nil
 	}
-	md, err := s.sendMetaDataRequest(ctx, stream.Conn().RemotePeer())
+	md, err := s.sendMetaDataRequest(ctx, pid)
 	if err != nil {
 		// do not increment bad responses, as its
 		// already done in the request method.
 		return err
 	}
-	s.cfg.p2p.Peers().SetMetadata(stream.Conn().RemotePeer(), md)
+	s.cfg.p2p.Peers().SetMetadata(pid, md)
 	return nil
 }
 

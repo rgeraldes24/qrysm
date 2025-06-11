@@ -6,6 +6,7 @@ import (
 
 	libp2pcore "github.com/libp2p/go-libp2p/core"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	p2ptypes "github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/config/params"
@@ -30,10 +31,15 @@ func (s *Service) beaconBlocksByRangeRPCHandler(ctx context.Context, msg interfa
 		return errors.New("message is not type *pb.BeaconBlockByRangeRequest")
 	}
 	log.WithField("start-slot", m.StartSlot).WithField("count", m.Count).Debug("BeaconBlocksByRangeRequest")
+	pid := stream.Conn().RemotePeer()
 	rp, err := validateRangeRequest(m, s.cfg.clock.CurrentSlot())
 	if err != nil {
 		s.writeErrorResponseToStream(responseCodeInvalidRequest, err.Error(), stream)
-		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(stream.Conn().RemotePeer())
+		log.WithFields(logrus.Fields{
+			"pid":                     pid,
+			"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
+			"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+		}).Debug("Peer is penalized for invalid blocks by range request")
 		tracing.AnnotateError(span, err)
 		return err
 	}
@@ -42,12 +48,12 @@ func (s *Service) beaconBlocksByRangeRPCHandler(ctx context.Context, msg interfa
 	if err != nil {
 		return err
 	}
-	remainingBucketCapacity := blockLimiter.Remaining(stream.Conn().RemotePeer().String())
+	remainingBucketCapacity := blockLimiter.Remaining(pid.String())
 	span.AddAttributes(
 		trace.Int64Attribute("start", int64(rp.start)), // lint:ignore uintcast -- This conversion is OK for tracing.
 		trace.Int64Attribute("end", int64(rp.end)),     // lint:ignore uintcast -- This conversion is OK for tracing.
 		trace.Int64Attribute("count", int64(m.Count)),
-		trace.StringAttribute("peer", stream.Conn().RemotePeer().String()),
+		trace.StringAttribute("peer", pid.String()),
 		trace.Int64Attribute("remaining_capacity", remainingBucketCapacity),
 	)
 

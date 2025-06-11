@@ -6,6 +6,7 @@ import (
 	libp2pcore "github.com/libp2p/go-libp2p/core"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
@@ -98,13 +99,22 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 		return nil, err
 	}
 	defer closeStream(stream, log)
+	pid := stream.Conn().RemotePeer()
 	code, errMsg, err := ReadStatusCode(stream, s.cfg.p2p.Encoding())
 	if err != nil {
-		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(stream.Conn().RemotePeer())
+		log.WithFields(logrus.Fields{
+			"pid":                     pid,
+			"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
+			"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+		}).Debug("Peer is penalized for error while reading the status code")
 		return nil, err
 	}
 	if code != 0 {
-		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(stream.Conn().RemotePeer())
+		log.WithFields(logrus.Fields{
+			"pid":                     pid,
+			"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
+			"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+		}).Debug("Peer is penalized for unsuccessful status")
 		return nil, errors.New(errMsg)
 	}
 	valRoot := s.cfg.clock.GenesisValidatorsRoot()
@@ -128,7 +138,12 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 		return nil, err
 	}
 	if err := s.cfg.p2p.Encoding().DecodeWithMaxLength(stream, msg); err != nil {
-		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(stream.Conn().RemotePeer())
+		log.WithFields(logrus.Fields{
+			"pid":                     pid,
+			"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
+			"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+		}).Debug("Peer is penalized for error while decoding metadata message")
+
 		return nil, err
 	}
 	return msg, nil
