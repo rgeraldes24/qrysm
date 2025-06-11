@@ -35,11 +35,11 @@ func (s *Service) beaconBlocksByRangeRPCHandler(ctx context.Context, msg interfa
 	rp, err := validateRangeRequest(m, s.cfg.clock.CurrentSlot())
 	if err != nil {
 		s.writeErrorResponseToStream(responseCodeInvalidRequest, err.Error(), stream)
+		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
 		log.WithFields(logrus.Fields{
-			"pid":                     pid,
-			"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
-			"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
-		}).Debug("Peer is penalized for invalid blocks by range request")
+			"pid":   pid,
+			"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
+		}).Debug("Peer is penalized for invalid request")
 		tracing.AnnotateError(span, err)
 		return err
 	}

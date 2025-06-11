@@ -61,10 +61,10 @@ func (s *Service) beaconBlocksRootRPCHandler(ctx context.Context, msg interface{
 
 	if uint64(len(blockRoots)) > params.BeaconNetworkConfig().MaxRequestBlocks {
 		pid := stream.Conn().RemotePeer()
+		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
 		log.WithFields(logrus.Fields{
-			"pid":                     pid,
-			"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
-			"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+			"pid":   pid,
+			"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
 		}).Debug("Peer is penalized for requesting more block roots than the max block limit")
 		s.writeErrorResponseToStream(responseCodeInvalidRequest, "requested more than the max block limit", stream)
 		return errors.New("requested more than the max block limit")

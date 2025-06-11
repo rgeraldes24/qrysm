@@ -32,11 +32,11 @@ func (s *Service) pingHandler(_ context.Context, msg interface{}, stream libp2pc
 	if err != nil {
 		// Descore peer for giving us a bad sequence number.
 		if errors.Is(err, p2ptypes.ErrInvalidSequenceNum) {
+			s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
 			log.WithFields(logrus.Fields{
-				"pid":                     pid,
-				"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
-				"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
-			}).Debug("Peer is penalized for returning a bad sequence number for ping")
+				"pid":   pid,
+				"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
+			}).Debug("Peer is penalized for providing a bad sequence number")
 			s.writeErrorResponseToStream(responseCodeInvalidRequest, p2ptypes.ErrInvalidSequenceNum.Error(), stream)
 		}
 		return err
@@ -102,11 +102,11 @@ func (s *Service) sendPingRequest(ctx context.Context, id peer.ID) error {
 	s.cfg.p2p.Host().Peerstore().RecordLatency(id, time.Now().Sub(currentTime))
 	pid := stream.Conn().RemotePeer()
 	if code != 0 {
+		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
 		log.WithFields(logrus.Fields{
-			"pid":                     pid,
-			"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
-			"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
-		}).Debug("Peer is penalized for a unsuccessful status code while sending a ping request")
+			"pid":   pid,
+			"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
+		}).Debug("Peer is penalized for unsuccessful status code")
 		return errors.New(errMsg)
 	}
 	msg := new(primitives.SSZUint64)
@@ -117,11 +117,11 @@ func (s *Service) sendPingRequest(ctx context.Context, id peer.ID) error {
 	if err != nil {
 		// Descore peer for giving us a bad sequence number.
 		if errors.Is(err, p2ptypes.ErrInvalidSequenceNum) {
+			s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
 			log.WithFields(logrus.Fields{
-				"pid":                     pid,
-				"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
-				"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
-			}).Debug("Peer is penalized for a bad sequence number")
+				"pid":   pid,
+				"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
+			}).Debug("Peer is penalized for providing a bad sequence number")
 		}
 		return err
 	}

@@ -153,11 +153,11 @@ func (s *Service) registerRPC(baseTopic string, handle rpcHandler) {
 			if err := s.cfg.p2p.Encoding().DecodeWithMaxLength(stream, msg); err != nil {
 				log.WithError(err).WithField("topic", topic).Debug("Could not decode stream message")
 				tracing.AnnotateError(span, err)
+				s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
 				log.WithFields(logrus.Fields{
-					"pid":                     pid,
-					"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
-					"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
-				}).Debug("Peer is penalized for error while decoding stream message")
+					"pid":   pid,
+					"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
+				}).Debug("Peer is penalized for decoding error")
 				return
 			}
 			if err := handle(ctx, msg, stream); err != nil {
@@ -177,11 +177,11 @@ func (s *Service) registerRPC(baseTopic string, handle rpcHandler) {
 			if err := s.cfg.p2p.Encoding().DecodeWithMaxLength(stream, msg); err != nil {
 				log.WithError(err).WithField("topic", topic).Debug("Could not decode stream message")
 				tracing.AnnotateError(span, err)
+				s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
 				log.WithFields(logrus.Fields{
-					"pid":                     pid,
-					"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
-					"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
-				}).Debug("Peer is penalized for error while decoding stream message")
+					"pid":   pid,
+					"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
+				}).Debug("Peer is penalized for decoding error")
 				return
 			}
 			if err := handle(ctx, nTyp.Elem().Interface(), stream); err != nil {

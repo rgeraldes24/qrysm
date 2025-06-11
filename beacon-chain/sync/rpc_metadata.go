@@ -102,18 +102,18 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 	pid := stream.Conn().RemotePeer()
 	code, errMsg, err := ReadStatusCode(stream, s.cfg.p2p.Encoding())
 	if err != nil {
+		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
 		log.WithFields(logrus.Fields{
-			"pid":                     pid,
-			"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
-			"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+			"pid":   pid,
+			"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
 		}).Debug("Peer is penalized for error while reading the status code")
 		return nil, err
 	}
 	if code != 0 {
+		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
 		log.WithFields(logrus.Fields{
-			"pid":                     pid,
-			"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
-			"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+			"pid":   pid,
+			"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
 		}).Debug("Peer is penalized for unsuccessful status")
 		return nil, errors.New(errMsg)
 	}
@@ -138,11 +138,11 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 		return nil, err
 	}
 	if err := s.cfg.p2p.Encoding().DecodeWithMaxLength(stream, msg); err != nil {
+		s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
 		log.WithFields(logrus.Fields{
-			"pid":                     pid,
-			"bad_responses":           s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid),
-			"bad_responses_threshold": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Params().Threshold,
-		}).Debug("Peer is penalized for error while decoding metadata message")
+			"pid":   pid,
+			"score": s.cfg.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
+		}).Debug("Peer is penalized for decoding error")
 
 		return nil, err
 	}

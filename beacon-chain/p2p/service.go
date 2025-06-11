@@ -442,10 +442,10 @@ func (s *Service) connectWithPeer(ctx context.Context, info peer.AddrInfo) error
 	ctx, cancel := context.WithTimeout(ctx, maxDialTimeout)
 	defer cancel()
 	if err := s.host.Connect(ctx, info); err != nil {
+		s.Peers().Scorers().BadResponsesScorer().Increment(pid)
 		log.WithFields(logrus.Fields{
-			"pid":                     pid,
-			"bad_responses":           s.Peers().Scorers().BadResponsesScorer().Increment(pid),
-			"bad_responses_threshold": s.Peers().Scorers().BadResponsesScorer().Params().Threshold,
+			"pid":   pid,
+			"score": s.Peers().Scorers().BadResponsesScorer().Score(pid),
 		}).Debug("Peer is penalized for connection error")
 
 		return err
