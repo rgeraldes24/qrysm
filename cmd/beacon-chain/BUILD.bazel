@@ -65,7 +65,7 @@ qrysm_image_upload(
     name = "push_oci_image",
     binary = ":beacon-chain",
     entrypoint = ["/beacon-chain"],
-    repository = "index.docker.io/qrledger/qrysm",
+    repository = "index.docker.io/qrledger/qrysm-beacon-chain",
     symlinks = {
         # Backwards compatiability for images that depended on the old filepath.
         "/app/cmd/beacon-chain/beacon-chain": "/beacon-chain",

@@ -109,6 +109,7 @@ func (s *BadResponsesScorer) Increment(pid peer.ID) {
 		s.store.SetPeerData(pid, &peerdata.PeerData{
 			BadResponses: 1,
 		})
+		return
 	}
 	peerData.BadResponses++
 }
