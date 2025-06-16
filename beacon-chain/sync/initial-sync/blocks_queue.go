@@ -333,9 +333,9 @@ func (q *blocksQueue) onDataReceivedEvent(ctx context.Context) eventHandlerFn {
 				// Peer returned invalid data, penalize.
 				q.blocksFetcher.p2p.Peers().Scorers().BadResponsesScorer().Increment(m.pid)
 				log.WithFields(logrus.Fields{
-					"pid":   m.pid,
+					"pid":   response.pid,
 					"score": q.blocksFetcher.p2p.Peers().Scorers().BadResponsesScorer().Score(m.pid),
-				}).Debug("Peer is penalized for invalid data")
+				}).Debug("Peer is penalized for invalid blocks")
 			}
 			return m.state, response.err
 		}

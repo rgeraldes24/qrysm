@@ -521,7 +521,7 @@ func TestBlocksQueue_onDataReceivedEvent(t *testing.T) {
 		})
 		assert.ErrorContains(t, beaconsync.ErrInvalidFetchedData.Error(), err)
 		assert.Equal(t, stateScheduled, updatedState)
-		assert.LogsContain(t, hook, "msg=\"Peer is penalized for invalid blocks\" pid=ZiCa")
+		assert.LogsContain(t, hook, "msg=\"Peer is penalized for invalid blocks\" pid=ZiCa prefix=initial-sync score=-2")
 	})
 
 	t.Run("transition ok", func(t *testing.T) {
