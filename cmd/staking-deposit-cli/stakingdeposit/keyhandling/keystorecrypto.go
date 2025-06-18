@@ -28,7 +28,7 @@ func NewKeystoreCrypto(salt, aesIV, cipherText, partialDecryptionKey []uint8) *K
 			Params:   map[string]interface{}{"salt": misc.EncodeHex(salt)},
 		},
 		Cipher: &KeystoreModule{
-			Function: "aes-128-ctr",
+			Function: "aes-256-gcm",
 			Params:   map[string]interface{}{"iv": misc.EncodeHex(aesIV)},
 			Message:  misc.EncodeHex(cipherText),
 		},

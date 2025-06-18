@@ -19,8 +19,6 @@
 package keystore
 
 import (
-	"bytes"
-	"crypto/aes"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -38,11 +36,6 @@ import (
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/crypto/scrypt"
-)
-
-var (
-	// ErrDecrypt is the standard error message when decryption is a failure.
-	ErrDecrypt = errors.New("could not decrypt key with given passphrase")
 )
 
 // Keystore defines a keystore with a directory path and scrypt values.
@@ -138,20 +131,17 @@ func EncryptKey(key *Key, password string, scryptN, scryptP int) ([]byte, error)
 		return nil, err
 	}
 
-	encryptKey := derivedKey[:16]
 	keyBytes := key.SecretKey.Marshal()
 
-	iv := make([]byte, aes.BlockSize) // 16
+	iv := make([]byte, GCMNonceSize)
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return nil, errors.New("reading from crypto/rand failed: " + err.Error())
 	}
 
-	cipherText, err := aesCTRXOR(encryptKey, keyBytes, iv)
+	cipherText, err := encryptGCM(nil, derivedKey, iv, keyBytes, nil)
 	if err != nil {
 		return nil, err
 	}
-
-	mac := Keccak256(derivedKey[16:32], cipherText)
 
 	scryptParamsJSON := make(map[string]interface{}, 5)
 	scryptParamsJSON["n"] = scryptN
@@ -165,12 +155,11 @@ func EncryptKey(key *Key, password string, scryptN, scryptP int) ([]byte, error)
 	}
 
 	cryptoStruct := cryptoJSON{
-		Cipher:       "aes-128-ctr",
+		Cipher:       "aes-256-gcm",
 		CipherText:   hex.EncodeToString(cipherText),
 		CipherParams: cipherParamsJSON,
 		KDF:          keyHeaderKDF,
 		KDFParams:    scryptParamsJSON,
-		MAC:          hex.EncodeToString(mac),
 	}
 	encryptedJSON := encryptedKeyJSON{
 		hex.EncodeToString(key.PublicKey.Marshal()),
@@ -210,13 +199,8 @@ func DecryptKey(keyJSON []byte, password string) (*Key, error) {
 
 func decryptKeyJSON(keyProtected *encryptedKeyJSON, auth string) (keyBytes, keyID []byte, err error) {
 	keyID = uuid.Parse(keyProtected.ID)
-	if keyProtected.Crypto.Cipher != "aes-128-ctr" {
+	if keyProtected.Crypto.Cipher != "aes-256-gcm" {
 		return nil, nil, fmt.Errorf("cipher not supported: %v", keyProtected.Crypto.Cipher)
-	}
-
-	mac, err := hex.DecodeString(keyProtected.Crypto.MAC)
-	if err != nil {
-		return nil, nil, err
 	}
 
 	iv, err := hex.DecodeString(keyProtected.Crypto.CipherParams.IV)
@@ -234,15 +218,11 @@ func decryptKeyJSON(keyProtected *encryptedKeyJSON, auth string) (keyBytes, keyI
 		return nil, nil, err
 	}
 
-	calculatedMAC := Keccak256(derivedKey[16:32], cipherText)
-	if !bytes.Equal(calculatedMAC, mac) {
-		return nil, nil, ErrDecrypt
-	}
-
-	plainText, err := aesCTRXOR(derivedKey[:16], cipherText, iv)
+	plainText, err := decryptGCM(derivedKey, iv, cipherText, nil)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	return plainText, keyID, nil
 }
 
