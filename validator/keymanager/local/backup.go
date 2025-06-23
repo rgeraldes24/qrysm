@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/validator/keymanager"
@@ -20,7 +20,7 @@ func (*Keymanager) ExtractKeystores(
 ) ([]*keymanager.Keystore, error) {
 	lock.Lock()
 	defer lock.Unlock()
-	encryptor := keystorev4.New()
+	encryptor := keystorev1.New()
 	keystores := make([]*keymanager.Keystore, len(publicKeys))
 	for i, pk := range publicKeys {
 		pubKeyBytes := pk.Marshal()

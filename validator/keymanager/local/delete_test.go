@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
@@ -83,7 +83,7 @@ func TestLocalKeymanager_DeleteKeystores(t *testing.T) {
 		require.NoError(t, json.Unmarshal(encodedKeystore, keystoreFile))
 
 		// We extract the accounts from the keystore.
-		decryptor := keystorev4.New()
+		decryptor := keystorev1.New()
 		encodedAccounts, err := decryptor.Decrypt(keystoreFile.Crypto, password)
 		require.NoError(t, err, "Could not decrypt validator accounts")
 		store := &accountStore{}
@@ -128,7 +128,7 @@ func TestLocalKeymanager_DeleteKeystores(t *testing.T) {
 		require.NoError(t, json.Unmarshal(encodedKeystore, keystoreFile))
 
 		// We extract the accounts from the keystore.
-		decryptor := keystorev4.New()
+		decryptor := keystorev1.New()
 		encodedAccounts, err := decryptor.Decrypt(keystoreFile.Crypto, password)
 		require.NoError(t, err, "Could not decrypt validator accounts")
 		store := &accountStore{}

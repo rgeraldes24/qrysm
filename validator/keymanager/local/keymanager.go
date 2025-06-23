@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/async/event"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/crypto/dilithium"
@@ -237,7 +237,7 @@ func (km *Keymanager) initializeAccountKeystore(ctx context.Context) error {
 	// by utilizing the password and initialize a new Dilithium secret key from
 	// its raw bytes.
 	password := km.wallet.Password()
-	decryptor := keystorev4.New()
+	decryptor := keystorev1.New()
 	enc, err := decryptor.Decrypt(keystoreFile.Crypto, password)
 	if err != nil && strings.Contains(err.Error(), keymanager.IncorrectPasswordErrMsg) {
 		return errors.Wrap(err, "wrong password for wallet entered")
@@ -303,7 +303,7 @@ func CreateAccountsKeystoreRepresentation(
 	store *accountStore,
 	walletPW string,
 ) (*AccountsKeystoreRepresentation, error) {
-	encryptor := keystorev4.New()
+	encryptor := keystorev1.New()
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err

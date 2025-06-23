@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -22,7 +22,7 @@ import (
 const password = "secretPassw0rd$1999"
 
 func createRandomKeystore(t testing.TB, password string) *keymanager.Keystore {
-	encryptor := keystorev4.New()
+	encryptor := keystorev1.New()
 	id, err := uuid.NewRandom()
 	require.NoError(t, err)
 	validatingKey, err := dilithium.RandKey()

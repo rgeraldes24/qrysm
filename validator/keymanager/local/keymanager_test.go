@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -117,7 +117,7 @@ func TestLocalKeymanager_Sign(t *testing.T) {
 	// We extract the validator signing private key from the keystore
 	// by utilizing the password and initialize a new Dilithium secret key from
 	// its raw bytes.
-	decryptor := keystorev4.New()
+	decryptor := keystorev1.New()
 	enc, err := decryptor.Decrypt(keystoreFile.Crypto, dr.wallet.Password())
 	require.NoError(t, err)
 	store := &accountStore{}

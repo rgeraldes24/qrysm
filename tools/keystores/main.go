@@ -16,7 +16,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/io/prompt"
@@ -188,7 +188,7 @@ func encrypt(cliCtx *cli.Context) error {
 		return errors.Wrap(err, "not a valid BLS12-381 private key")
 	}
 	pubKey := fmt.Sprintf("%x", privKey.PublicKey().Marshal())
-	encryptor := keystorev4.New()
+	encryptor := keystorev1.New()
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return errors.Wrap(err, "could not generate new random uuid")
@@ -228,7 +228,7 @@ func readAndDecryptKeystore(fullPath, password string) error {
 	if err != nil {
 		return errors.Wrapf(err, "could not read file at path: %s", fullPath)
 	}
-	decryptor := keystorev4.New()
+	decryptor := keystorev1.New()
 	keystoreFile := &keymanager.Keystore{}
 	if err := json.Unmarshal(f, keystoreFile); err != nil {
 		return errors.Wrap(err, "could not JSON unmarshal keystore file")

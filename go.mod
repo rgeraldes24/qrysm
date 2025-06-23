@@ -256,6 +256,8 @@ replace github.com/json-iterator/go => github.com/prestonvanloon/go v1.1.7-0.201
 // See https://github.com/prysmaticlabs/grpc-gateway/issues/2
 replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f
 
-replace github.com/theQRL/go-zond => github.com/cyyber/go-zond v0.2.1-0.20250430092150-d9b1e2ea3867
+replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20250618122226-6ee70ec687b3
 
 replace github.com/theQRL/tx-fuzz => github.com/rgeraldes24/tx-fuzz v0.0.0-20250430111120-47f2ef4cdb94
+
+replace github.com/theQRL/go-zond-wallet-encryptor-keystore => github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250623161248-5e9a41edd005

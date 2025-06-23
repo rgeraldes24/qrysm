@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/schollz/progressbar/v3"
 	"github.com/sirupsen/logrus"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
 	"github.com/theQRL/qrysm/validator/keymanager"
@@ -33,7 +33,7 @@ func (km *Keymanager) ImportKeystores(
 	if len(passwords) != len(keystores) {
 		return nil, ErrMismatchedNumPasswords
 	}
-	enc := keystorev4.New()
+	enc := keystorev1.New()
 	bar := initializeProgressBar(len(keystores), "Importing accounts...")
 	keys := map[string]string{}
 	statuses := make([]*zondpbservice.ImportedKeystoreStatus, len(keystores))
@@ -127,7 +127,7 @@ func (km *Keymanager) ImportKeypairs(ctx context.Context, privKeys, pubKeys [][]
 // by decrypting using a specified password. If the password fails,
 // it prompts the user for the correct password until it confirms.
 func (*Keymanager) attemptDecryptKeystore(
-	enc *keystorev4.Encryptor, keystore *keymanager.Keystore, password string,
+	enc *keystorev1.Encryptor, keystore *keymanager.Keystore, password string,
 ) ([]byte, []byte, string, error) {
 	// Attempt to decrypt the keystore with the specifies password.
 	var privKeyBytes []byte

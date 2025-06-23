@@ -18,7 +18,7 @@ const NetworkId = 1337
 
 const timeGapPerMiningTX = 250 * time.Millisecond
 
-const KeystorePassword = ""
+const KeystorePassword = "1234567890"
 
 var _ e2etypes.ComponentRunner = (*BeaconNodeSet)(nil)
 var _ e2etypes.MultipleComponentRunners = (*BeaconNodeSet)(nil)
