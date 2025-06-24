@@ -902,8 +902,8 @@ github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqn
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rgeraldes24/go-zond v0.0.0-20250618122226-6ee70ec687b3 h1:WKNUakrNS56vhXaqGNCUFZXxteDxZf/6l6n/XbvUeW8=
 github.com/rgeraldes24/go-zond v0.0.0-20250618122226-6ee70ec687b3/go.mod h1:7LdYdNTiPW2m/pHqlA+4+66RSyMPCCknFcP8UMdcoGE=
-github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250623161248-5e9a41edd005 h1:Xj/6K44OGSNtIUPzg0nUw0gfMVN3XEy9fo0q4mJ6P4k=
-github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250623161248-5e9a41edd005/go.mod h1:I5bUryQPoIVh1OJ1rEsrzCiX7Z9UNThZv5Z39vhU9aE=
+github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250624081856-1ba46cc67710 h1:PRW0IILWwu7/xFtUbCPdZFEz/4OaDd/yNebPWiHWVxw=
+github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250624081856-1ba46cc67710/go.mod h1:I5bUryQPoIVh1OJ1rEsrzCiX7Z9UNThZv5Z39vhU9aE=
 github.com/rgeraldes24/tx-fuzz v0.0.0-20250430111120-47f2ef4cdb94 h1:SeFEaFH/08Qk8arysi7AcCyLbJElZmz1EFt7UktBwJI=
 github.com/rgeraldes24/tx-fuzz v0.0.0-20250430111120-47f2ef4cdb94/go.mod h1:BBvBxaQu/ghijFGojnV0/H3yIlGupcqmItaJCiSc7YA=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=

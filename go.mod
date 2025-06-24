@@ -260,4 +260,4 @@ replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20250
 
 replace github.com/theQRL/tx-fuzz => github.com/rgeraldes24/tx-fuzz v0.0.0-20250430111120-47f2ef4cdb94
 
-replace github.com/theQRL/go-zond-wallet-encryptor-keystore => github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250623161248-5e9a41edd005
+replace github.com/theQRL/go-zond-wallet-encryptor-keystore => github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250624081856-1ba46cc67710

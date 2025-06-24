@@ -75,12 +75,7 @@ func (k *Keystore) Decrypt(password string) [field_params.DilithiumSeedLength]by
 		panic(fmt.Errorf("aes.NewCipher failed | reason %v", err))
 	}
 
-	var seed [field_params.DilithiumSeedLength]uint8
 	cipherText := misc.DecodeHex(k.Crypto.Cipher.Message)
-	if len(cipherText) != len(seed) {
-		panic(fmt.Errorf("invalid cipher text length | expected length %d | actual length %d",
-			len(seed), len(cipherText)))
-	}
 	aesIV, ok := k.Crypto.Cipher.Params["iv"]
 	if !ok {
 		panic(fmt.Errorf("aesIV not found in Cipher Params"))
@@ -89,13 +84,14 @@ func (k *Keystore) Decrypt(password string) [field_params.DilithiumSeedLength]by
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		panic(fmt.Errorf("TBD"))
+		panic(err)
 	}
-	if _, err := aesgcm.Open(seed[:], binAESIV, cipherText, nil); err != nil {
-		panic(fmt.Errorf("TBD"))
+	plainText, err := aesgcm.Open(nil, binAESIV, cipherText, nil)
+	if err != nil {
+		panic(err)
 	}
 
-	return seed
+	return [field_params.DilithiumSeedLength]byte(plainText)
 }
 
 func NewKeystoreFromJSON(data []uint8) *Keystore {
@@ -145,13 +141,11 @@ func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string
 		return nil, err
 	}
 
-	cipherText := make([]byte, len(seed))
-
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil, err
 	}
-	aesgcm.Seal(cipherText, aesIV, seed[:], nil)
+	cipherText := aesgcm.Seal(nil, aesIV, seed[:], nil)
 
 	d, err := dilithium.NewDilithiumFromSeed(seed)
 	if err != nil {

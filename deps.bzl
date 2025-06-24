@@ -5872,8 +5872,8 @@ def go_dependencies():
         name = "com_github_theqrl_go_zond_wallet_encryptor_keystore",
         importpath = "github.com/theQRL/go-zond-wallet-encryptor-keystore",
         replace = "github.com/rgeraldes24/go-zond-wallet-encryptor-keystore",
-        sum = "h1:Xj/6K44OGSNtIUPzg0nUw0gfMVN3XEy9fo0q4mJ6P4k=",
-        version = "v0.0.0-20250623161248-5e9a41edd005",
+        sum = "h1:PRW0IILWwu7/xFtUbCPdZFEz/4OaDd/yNebPWiHWVxw=",
+        version = "v0.0.0-20250624081856-1ba46cc67710",
     )
     go_repository(
         name = "com_github_theqrl_go_zond_wallet_types",
