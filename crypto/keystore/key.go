@@ -30,18 +30,21 @@ import (
 )
 
 const (
-	keyHeaderKDF = "scrypt"
+	keyHeaderKDF = "argon2id"
 
-	// LightScryptN is the N parameter of Scrypt encryption algorithm, using 4MB
+	// LightArgon2idT is the time parameter of Argon2id encryption algorithm, using 4MB
 	// memory and taking approximately 100ms CPU time on a modern processor.
-	LightScryptN = 1 << 12
+	LightArgon2idT = 8
 
-	// LightScryptP is the P parameter of Scrypt encryption algorithm, using 4MB
+	// LightArgon2idM is the time parameter of Argon2id encryption algorithm, using 4MB
 	// memory and taking approximately 100ms CPU time on a modern processor.
-	LightScryptP = 6
+	LightArgon2idM = 1 << 12
 
-	scryptR     = 8
-	scryptDKLen = 32
+	// LightArgon2idT is the time parameter of Argon2id encryption algorithm, using 4MB
+	// memory and taking approximately 100ms CPU time on a modern processor.
+	LightArgon2idP = 1
+
+	argon2idDKLen = 32
 )
 
 // Key is the object that stores all the user data related to their public/secret keys.

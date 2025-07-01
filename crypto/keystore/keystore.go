@@ -30,19 +30,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/minio/sha256-simd"
 	"github.com/pborman/uuid"
 	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/crypto/dilithium"
-	"golang.org/x/crypto/pbkdf2"
-	"golang.org/x/crypto/scrypt"
+	"golang.org/x/crypto/argon2"
 )
 
-// Keystore defines a keystore with a directory path and scrypt values.
+// Keystore defines a keystore with a directory path and argon2id values.
 type Keystore struct {
-	keysDirPath string
-	scryptN     int
-	scryptP     int
+	keysDirPath          string
+	argon2idT, argon2idM uint32
+	argon2idP            uint8
 }
 
 // GetKey from file using the filename path and a decryption password.
@@ -102,7 +100,7 @@ func (_ Keystore) GetKeys(directory, filePrefix, password string, warnOnFail boo
 
 // StoreKey in filepath and encrypt it with a password.
 func (ks Keystore) StoreKey(filename string, key *Key, auth string) error {
-	keyJSON, err := EncryptKey(key, auth, ks.scryptN, ks.scryptP)
+	keyJSON, err := EncryptKey(key, auth, ks.argon2idT, ks.argon2idM, ks.argon2idP)
 	if err != nil {
 		return err
 	}
@@ -117,19 +115,16 @@ func (ks Keystore) JoinPath(filename string) string {
 	return filepath.Join(ks.keysDirPath, filename)
 }
 
-// EncryptKey encrypts a key using the specified scrypt parameters into a JSON
+// EncryptKey encrypts a key using the specified argon2id parameters into a JSON
 // blob that can be decrypted later on.
-func EncryptKey(key *Key, password string, scryptN, scryptP int) ([]byte, error) {
+func EncryptKey(key *Key, password string, argon2idT, argon2idM uint32, argon2idP uint8) ([]byte, error) {
 	authArray := []byte(password)
 	salt := make([]byte, 32)
 	if _, err := io.ReadFull(rand.Reader, salt); err != nil {
 		panic("reading from crypto/rand failed: " + err.Error())
 	}
 
-	derivedKey, err := scrypt.Key(authArray, salt, scryptN, scryptR, scryptP, scryptDKLen)
-	if err != nil {
-		return nil, err
-	}
+	derivedKey := argon2.IDKey(authArray, salt, argon2idT, argon2idM, argon2idP, argon2idDKLen)
 
 	keyBytes := key.SecretKey.Marshal()
 
@@ -143,12 +138,12 @@ func EncryptKey(key *Key, password string, scryptN, scryptP int) ([]byte, error)
 		return nil, err
 	}
 
-	scryptParamsJSON := make(map[string]interface{}, 5)
-	scryptParamsJSON["n"] = scryptN
-	scryptParamsJSON["r"] = scryptR
-	scryptParamsJSON["p"] = scryptP
-	scryptParamsJSON["dklen"] = scryptDKLen
-	scryptParamsJSON["salt"] = hex.EncodeToString(salt)
+	argon2idParamsJSON := make(map[string]interface{}, 5)
+	argon2idParamsJSON["t"] = argon2idT
+	argon2idParamsJSON["m"] = argon2idM
+	argon2idParamsJSON["p"] = argon2idP
+	argon2idParamsJSON["dklen"] = argon2idDKLen
+	argon2idParamsJSON["salt"] = hex.EncodeToString(salt)
 
 	cipherParamsJSON := cipherparamsJSON{
 		IV: hex.EncodeToString(iv),
@@ -159,7 +154,7 @@ func EncryptKey(key *Key, password string, scryptN, scryptP int) ([]byte, error)
 		CipherText:   hex.EncodeToString(cipherText),
 		CipherParams: cipherParamsJSON,
 		KDF:          keyHeaderKDF,
-		KDFParams:    scryptParamsJSON,
+		KDFParams:    argon2idParamsJSON,
 	}
 	encryptedJSON := encryptedKeyJSON{
 		hex.EncodeToString(key.PublicKey.Marshal()),
@@ -232,24 +227,13 @@ func kdfKey(cryptoJSON cryptoJSON, auth string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	dkLen := ensureInt(cryptoJSON.KDFParams["dklen"])
+	dkLen := uint32(ensureInt(cryptoJSON.KDFParams["dklen"]))
 
 	if cryptoJSON.KDF == keyHeaderKDF {
-		n := ensureInt(cryptoJSON.KDFParams["n"])
-		r := ensureInt(cryptoJSON.KDFParams["r"])
-		p := ensureInt(cryptoJSON.KDFParams["p"])
-		return scrypt.Key(authArray, salt, n, r, p, dkLen)
-	} else if cryptoJSON.KDF == "pbkdf2" {
-		c := ensureInt(cryptoJSON.KDFParams["c"])
-		prf, ok := cryptoJSON.KDFParams["prf"].(string)
-		if !ok {
-			return nil, errors.New("KDFParams are not type string")
-		}
-		if prf != "hmac-sha256" {
-			return nil, fmt.Errorf("unsupported PBKDF2 PRF: %s", prf)
-		}
-		key := pbkdf2.Key(authArray, salt, c, dkLen, sha256.New)
-		return key, nil
+		t := uint32(ensureInt(cryptoJSON.KDFParams["t"]))
+		m := uint32(ensureInt(cryptoJSON.KDFParams["m"]))
+		p := uint8(ensureInt(cryptoJSON.KDFParams["p"]))
+		return argon2.IDKey(authArray, salt, t, m, p, dkLen), nil
 	}
 
 	return nil, fmt.Errorf("unsupported KDF: %s", cryptoJSON.KDF)

@@ -38,8 +38,9 @@ func TestMarshalAndUnmarshal(t *testing.T) {
 func TestStoreRandomKey(t *testing.T) {
 	ks := &Keystore{
 		keysDirPath: path.Join(t.TempDir(), "keystore"),
-		scryptN:     LightScryptN,
-		scryptP:     LightScryptP,
+		argon2idT:   LightArgon2idT,
+		argon2idM:   LightArgon2idM,
+		argon2idP:   LightArgon2idP,
 	}
 	require.NoError(t, storeNewRandomKey(ks, "password"))
 }

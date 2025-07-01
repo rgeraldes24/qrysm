@@ -17,8 +17,9 @@ func TestStoreAndGetKey(t *testing.T) {
 	tempDir := path.Join(t.TempDir(), "keystore", "file")
 	ks := &Keystore{
 		keysDirPath: tempDir,
-		scryptN:     LightScryptN,
-		scryptP:     LightScryptP,
+		argon2idT:   LightArgon2idT,
+		argon2idM:   LightArgon2idM,
+		argon2idP:   LightArgon2idP,
 	}
 
 	key, err := NewKey()
@@ -34,8 +35,9 @@ func TestStoreAndGetKeys(t *testing.T) {
 	tempDir := path.Join(t.TempDir(), "keystore")
 	ks := &Keystore{
 		keysDirPath: tempDir,
-		scryptN:     LightScryptN,
-		scryptP:     LightScryptP,
+		argon2idT:   LightArgon2idT,
+		argon2idM:   LightArgon2idM,
+		argon2idP:   LightArgon2idP,
 	}
 
 	key, err := NewKey()
@@ -65,7 +67,7 @@ func TestEncryptDecryptKey(t *testing.T) {
 		PublicKey: pk.PublicKey(),
 	}
 
-	keyJSON, err := EncryptKey(key, password, LightScryptN, LightScryptP)
+	keyJSON, err := EncryptKey(key, password, LightArgon2idT, LightArgon2idM, LightArgon2idP)
 	require.NoError(t, err)
 
 	decryptedKey, err := DecryptKey(keyJSON, password)
@@ -78,8 +80,9 @@ func TestEncryptDecryptKey(t *testing.T) {
 func TestGetSymlinkedKeys(t *testing.T) {
 	tempDir := path.Join(t.TempDir(), "keystore")
 	ks := &Keystore{
-		scryptN: LightScryptN,
-		scryptP: LightScryptP,
+		argon2idT: LightArgon2idT,
+		argon2idM: LightArgon2idM,
+		argon2idP: LightArgon2idP,
 	}
 
 	key, err := NewKey()
