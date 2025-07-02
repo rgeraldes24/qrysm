@@ -104,6 +104,7 @@ const (
 	// Web3Signer
 )
 
+// TODO(rgeraldes24)
 // @NOTE(rgeraldes24):
 // QRL Version - https://github.com/theQRL/go-zond-wallet-encryptor-keystore/blob/main/decrypt.go#L87
 // Eth Version - https://github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4/blob/master/decrypt.go#L168
