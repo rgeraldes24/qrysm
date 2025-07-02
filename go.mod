@@ -51,7 +51,6 @@ require (
 	github.com/onsi/gomega v1.27.10
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/paulbellamy/ratecounter v0.2.0
-	github.com/pborman/uuid v1.2.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.17.0
 	github.com/prometheus/client_model v0.5.0
@@ -256,8 +255,8 @@ replace github.com/json-iterator/go => github.com/prestonvanloon/go v1.1.7-0.201
 // See https://github.com/prysmaticlabs/grpc-gateway/issues/2
 replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f
 
-replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20250618122226-6ee70ec687b3
+replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20250702085205-533e12910026
 
 replace github.com/theQRL/tx-fuzz => github.com/rgeraldes24/tx-fuzz v0.0.0-20250430111120-47f2ef4cdb94
 
-replace github.com/theQRL/go-zond-wallet-encryptor-keystore => github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250701100252-2620f0ca4eeb
+replace github.com/theQRL/go-zond-wallet-encryptor-keystore => github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250702080128-b3082ce292d8

@@ -806,8 +806,6 @@ github.com/paulbellamy/ratecounter v0.2.0/go.mod h1:Hfx1hDpSGoqxkVVpBi/IlYD7kChl
 github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 h1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=
 github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58/go.mod h1:DXv8WO4yhMYhSNPKjeNKa5WY9YCIEBRbNzFFPJbWO6Y=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
-github.com/pborman/uuid v1.2.1 h1:+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw=
-github.com/pborman/uuid v1.2.1/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=
 github.com/pelletier/go-toml v1.0.1-0.20170904195809-1d6b12b7cb29/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/performancecopilot/speed v3.0.0+incompatible/go.mod h1:/CLtqpZ5gBg1M9iaPbIdPPGyKcA8hKdoy6hAWba7Yac=
@@ -900,10 +898,10 @@ github.com/raulk/go-watchdog v1.3.0 h1:oUmdlHxdkXRJlwfG0O9omj8ukerm8MEQavSiDTEtB
 github.com/raulk/go-watchdog v1.3.0/go.mod h1:fIvOnLbF0b0ZwkB9YU4mOW9Did//4vPZtDqv66NfsMU=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
-github.com/rgeraldes24/go-zond v0.0.0-20250618122226-6ee70ec687b3 h1:WKNUakrNS56vhXaqGNCUFZXxteDxZf/6l6n/XbvUeW8=
-github.com/rgeraldes24/go-zond v0.0.0-20250618122226-6ee70ec687b3/go.mod h1:7LdYdNTiPW2m/pHqlA+4+66RSyMPCCknFcP8UMdcoGE=
-github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250701100252-2620f0ca4eeb h1:VuyIaQ2DnFT3W/sRUW6AA67KZ+YOL4XYcXIS6jQwows=
-github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250701100252-2620f0ca4eeb/go.mod h1:Olsh1FZZHY7SI9PUBHllXI/h/wYDYtEL9gJM/ahMZsw=
+github.com/rgeraldes24/go-zond v0.0.0-20250702085205-533e12910026 h1:y4YPiVLiqaGzWHLTc58Z6ySipxukw0iqDJjOkaxIILI=
+github.com/rgeraldes24/go-zond v0.0.0-20250702085205-533e12910026/go.mod h1:7LdYdNTiPW2m/pHqlA+4+66RSyMPCCknFcP8UMdcoGE=
+github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250702080128-b3082ce292d8 h1:r1XOO0tZ1L15nPqVQEgbZDTj+NQjAm+RxObDf1TKZgM=
+github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250702080128-b3082ce292d8/go.mod h1:Olsh1FZZHY7SI9PUBHllXI/h/wYDYtEL9gJM/ahMZsw=
 github.com/rgeraldes24/tx-fuzz v0.0.0-20250430111120-47f2ef4cdb94 h1:SeFEaFH/08Qk8arysi7AcCyLbJElZmz1EFt7UktBwJI=
 github.com/rgeraldes24/tx-fuzz v0.0.0-20250430111120-47f2ef4cdb94/go.mod h1:BBvBxaQu/ghijFGojnV0/H3yIlGupcqmItaJCiSc7YA=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=

@@ -59,12 +59,14 @@ func (k *Keystore) Save(fileFolder string) error {
 	return nil
 }
 
+// TODO(rgeraldes24)
 func (k *Keystore) Decrypt(password string) [field_params.DilithiumSeedLength]byte {
 	salt, ok := k.Crypto.KDF.Params["salt"]
 	if !ok {
 		panic("salt not found in KDF Params")
 	}
 	binSalt := misc.DecodeHex(salt.(string))
+
 	decryptionKey, err := passwordToDecryptionKey(password, binSalt)
 	if err != nil {
 		panic(fmt.Errorf("passwordToDecryptionKey | reason %v", err))
@@ -160,6 +162,7 @@ func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string
 	}, nil
 }
 
+// TODO(rgeraldes24): remove
 func passwordToDecryptionKey(password string, salt []byte) ([32]byte, error) {
 	h := sha3.NewShake256()
 	if _, err := h.Write([]byte(password)); err != nil {
