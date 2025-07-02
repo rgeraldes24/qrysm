@@ -106,7 +106,7 @@ const (
 
 // @NOTE(rgeraldes24):
 // QRL Version - https://github.com/theQRL/go-zond-wallet-encryptor-keystore/blob/main/decrypt.go#L87
-// Eth Version - https://github.com/wealdtech/go-eth2-wallet-encryptor-keystorev1/blob/master/decrypt.go#L168
+// Eth Version - https://github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4/blob/master/decrypt.go#L168
 // IncorrectPasswordErrMsg defines a common error string representing an EIP-2335
 // keystore password was incorrect.
 // const IncorrectPasswordErrMsg = "invalid checksum"
