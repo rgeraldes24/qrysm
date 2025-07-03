@@ -110,8 +110,7 @@ const (
 // Eth Version - https://github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4/blob/master/decrypt.go#L168
 // IncorrectPasswordErrMsg defines a common error string representing an EIP-2335
 // keystore password was incorrect.
-// const IncorrectPasswordErrMsg = "invalid checksum"
-const IncorrectPasswordErrMsg = "checksum mismatch"
+const IncorrectPasswordErrMsg = "failed to decrypt and authenticate ciphertext: cipher: message authentication failed"
 
 // String marshals a keymanager kind to a string value.
 func (k Kind) String() string {

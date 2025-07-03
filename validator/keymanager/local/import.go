@@ -46,9 +46,9 @@ func (km *Keymanager) ImportKeystores(
 		existingPubKeys[string(storeCopy.PublicKeys[i])] = true
 	}
 	for i := 0; i < len(keystores); i++ {
-		var privKeyBytes []byte
+		var seedBytes []byte
 		var pubKeyBytes []byte
-		privKeyBytes, pubKeyBytes, _, err = km.attemptDecryptKeystore(enc, keystores[i], passwords[i])
+		seedBytes, pubKeyBytes, _, err = km.attemptDecryptKeystore(enc, keystores[i], passwords[i])
 		if err != nil {
 			statuses[i] = &zondpbservice.ImportedKeystoreStatus{
 				Status:  zondpbservice.ImportedKeystoreStatus_ERROR,
@@ -70,7 +70,7 @@ func (km *Keymanager) ImportKeystores(
 			continue
 		}
 
-		keys[string(pubKeyBytes)] = string(privKeyBytes)
+		keys[string(pubKeyBytes)] = string(seedBytes)
 		importedKeys = append(importedKeys, pubKeyBytes)
 		statuses[i] = &zondpbservice.ImportedKeystoreStatus{
 			Status: zondpbservice.ImportedKeystoreStatus_IMPORTED,
@@ -130,9 +130,9 @@ func (*Keymanager) attemptDecryptKeystore(
 	enc *keystorev1.Encryptor, keystore *keymanager.Keystore, password string,
 ) ([]byte, []byte, string, error) {
 	// Attempt to decrypt the keystore with the specifies password.
-	var privKeyBytes []byte
+	var seedBytes []byte
 	var err error
-	privKeyBytes, err = enc.Decrypt(keystore.Crypto, password)
+	seedBytes, err = enc.Decrypt(keystore.Crypto, password)
 	doesNotDecrypt := err != nil && strings.Contains(err.Error(), keymanager.IncorrectPasswordErrMsg)
 	if doesNotDecrypt {
 		return nil, nil, "", fmt.Errorf(
@@ -152,13 +152,13 @@ func (*Keymanager) attemptDecryptKeystore(
 			return nil, nil, "", errors.Wrap(err, "could not decode pubkey from keystore")
 		}
 	} else {
-		privKey, err := dilithium.SecretKeyFromSeed(privKeyBytes)
+		privKey, err := dilithium.SecretKeyFromSeed(seedBytes)
 		if err != nil {
 			return nil, nil, "", errors.Wrap(err, "could not initialize private key from bytes")
 		}
 		pubKeyBytes = privKey.PublicKey().Marshal()
 	}
-	return privKeyBytes, pubKeyBytes, password, nil
+	return seedBytes, pubKeyBytes, password, nil
 }
 
 func initializeProgressBar(numItems int, msg string) *progressbar.ProgressBar {

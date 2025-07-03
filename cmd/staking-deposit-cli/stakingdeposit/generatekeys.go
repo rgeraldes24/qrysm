@@ -7,6 +7,8 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/k0kubun/go-ansi"
+	"github.com/schollz/progressbar/v3"
 	goqrllib_misc "github.com/theQRL/go-qrllib/misc"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
@@ -35,6 +37,7 @@ func GenerateKeys(validatorStartIndex, numValidators uint64,
 		amounts[i] = params.BeaconConfig().MaxEffectiveBalance
 	}
 
+	fmt.Println("Generation keystores, this may take a while...")
 	credentials, err := NewCredentialsFromSeed(seed, numValidators, amounts, chainSettings, validatorStartIndex, executionAddress)
 	if err != nil {
 		panic(fmt.Errorf("new credentials from mnemonic failed. reason: %v", err))
@@ -170,4 +173,22 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 	}
 
 	return true
+}
+
+func initializeProgressBar(numItems int, msg string) *progressbar.ProgressBar {
+	return progressbar.NewOptions(
+		numItems,
+		progressbar.OptionFullWidth(),
+		progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
+		progressbar.OptionEnableColorCodes(true),
+		progressbar.OptionSetTheme(progressbar.Theme{
+			Saucer:        "[green]=[reset]",
+			SaucerHead:    "[green]>[reset]",
+			SaucerPadding: " ",
+			BarStart:      "[",
+			BarEnd:        "]",
+		}),
+		progressbar.OptionOnCompletion(func() { fmt.Println() }),
+		progressbar.OptionSetDescription(msg),
+	)
 }

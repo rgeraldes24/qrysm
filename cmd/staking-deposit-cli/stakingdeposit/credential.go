@@ -103,10 +103,10 @@ func (c *Credential) WithdrawalCredentials() ([32]byte, error) {
 
 func (c *Credential) signingKeystore(password string) (*keyhandling.Keystore, error) {
 	seed := misc.StrSeedToBinSeed(c.signingSeed)
-	return keyhandling.Encrypt(seed, password, c.signingKeyPath)
+	return keyhandling.Encrypt(seed, password, c.signingKeyPath, nil, nil)
 }
 
-func (c *Credential) SaveSigningKeystore(password, folder string) (string, error) {
+func (c *Credential) SaveSigningKeystore(password string, folder string) (string, error) {
 	keystore, err := c.signingKeystore(password)
 	if err != nil {
 		return "", err

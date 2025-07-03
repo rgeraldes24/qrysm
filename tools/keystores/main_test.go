@@ -25,7 +25,7 @@ const password = "secretPassw0rd$1999"
 type cliConfig struct {
 	keystoresPath string
 	password      string
-	privateKey    string
+	seed          string
 	outputPath    string
 }
 
@@ -37,11 +37,11 @@ func setupCliContext(
 	set := flag.NewFlagSet("test", 0)
 	set.String(keystoresFlag.Name, conf.keystoresPath, "")
 	set.String(passwordFlag.Name, conf.password, "")
-	set.String(privateKeyFlag.Name, conf.privateKey, "")
+	set.String(seedFlag.Name, conf.seed, "")
 	set.String(outputPathFlag.Name, conf.outputPath, "")
 	assert.NoError(tb, set.Set(keystoresFlag.Name, conf.keystoresPath))
 	assert.NoError(tb, set.Set(passwordFlag.Name, conf.password))
-	assert.NoError(tb, set.Set(privateKeyFlag.Name, conf.privateKey))
+	assert.NoError(tb, set.Set(seedFlag.Name, conf.seed))
 	assert.NoError(tb, set.Set(outputPathFlag.Name, conf.outputPath))
 	return cli.NewContext(&app, set, nil)
 }
@@ -117,7 +117,7 @@ func TestEncrypt(t *testing.T) {
 	cliCtx := setupCliContext(t, &cliConfig{
 		outputPath: keystoreFilePath,
 		password:   password,
-		privateKey: fmt.Sprintf("%#x", privKey.Marshal()),
+		seed:       fmt.Sprintf("%#x", privKey.Marshal()),
 	})
 
 	rescueStdout := os.Stdout

@@ -1,27 +1,44 @@
 package keyhandling
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"runtime"
 
 	"github.com/google/uuid"
 	"github.com/theQRL/go-qrllib/dilithium"
-	"github.com/theQRL/go-zond/accounts/keystore"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	"golang.org/x/crypto/argon2"
+)
+
+const (
+	// Argon2id parameters.
+	argon2idT      = 8
+	argon2idM      = 1 << 18
+	argon2idP      = 1
+	argon2idKeyLen = 32
+
+	// Misc constants.
+	saltSize = 32
+	ivSize   = 12
 )
 
 type Keystore struct {
-	Crypto      keystore.CryptoJSON `json:"crypto"`
-	Description string              `json:"description"`
-	PubKey      string              `json:"pubkey"`
-	Path        string              `json:"path"`
-	UUID        string              `json:"uuid"`
-	Version     uint64              `json:"version"`
+	Crypto      *KeystoreCrypto `json:"crypto"`
+	Description string          `json:"description"`
+	PubKey      string          `json:"pubkey"`
+	Path        string          `json:"path"`
+	UUID        string          `json:"uuid"`
+	Version     uint64          `json:"version"`
 }
 
 func (k *Keystore) ToJSON() []byte {
@@ -57,11 +74,44 @@ func (k *Keystore) Save(fileFolder string) error {
 }
 
 func (k *Keystore) Decrypt(password string) [field_params.DilithiumSeedLength]byte {
-	seed, err := keystore.DecryptDataV1(k.Crypto, password)
+	iv, err := hex.DecodeString(k.Crypto.Cipher.Params["iv"].(string))
 	if err != nil {
-		panic(fmt.Errorf("keystore.DecryptDataV1 failed | reason %v", err))
+		panic(fmt.Errorf("iv hex.DecodeString failed | reason %v", err))
 	}
-	return bytesutil.ToBytes48(seed)
+
+	salt, err := hex.DecodeString(k.Crypto.KDF.Params["salt"].(string))
+	if err != nil {
+		panic(fmt.Errorf("salt hex.DecodeString failed | reason %v", err))
+	}
+
+	ciphertext, err := hex.DecodeString(k.Crypto.Cipher.Message)
+	if err != nil {
+		panic(fmt.Errorf("salt hex.DecodeString failed | reason %v", err))
+	}
+
+	dkLen := uint32(ensureInt(k.Crypto.KDF.Params["dklen"]))
+
+	t := uint32(ensureInt(k.Crypto.KDF.Params["t"]))
+	m := uint32(ensureInt(k.Crypto.KDF.Params["m"]))
+	p := uint8(ensureInt(k.Crypto.KDF.Params["p"]))
+
+	derivedKey := argon2.IDKey([]byte(password), salt, t, m, p, dkLen)
+	block, err := aes.NewCipher(derivedKey)
+	if err != nil {
+		panic(fmt.Errorf("aes.NewCipher failed | reason %v", err))
+	}
+
+	gcmBlock, err := cipher.NewGCM(block)
+	if err != nil {
+		panic(fmt.Errorf("cipher.NewGCM failed | reason %v", err))
+	}
+
+	plaintext, err := gcmBlock.Open(nil, iv, ciphertext, nil)
+	if err != nil {
+		panic(fmt.Errorf("gcmBlock.Open failed | reason %v", err))
+	}
+
+	return bytesutil.ToBytes48(plaintext)
 }
 
 func NewKeystoreFromJSON(data []uint8) *Keystore {
@@ -81,23 +131,39 @@ func NewKeystoreFromFile(path string) *Keystore {
 	return NewKeystoreFromJSON(data)
 }
 
-func NewEmptyCryptoJSON() keystore.CryptoJSON {
-	return keystore.CryptoJSON{
-		KDFParams: map[string]interface{}{},
-	}
-}
-
 func NewEmptyKeystore() *Keystore {
 	k := &Keystore{}
-	k.Crypto = NewEmptyCryptoJSON()
+	k.Crypto = NewEmptyKeystoreCrypto()
 	return k
 }
 
-func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string) (*Keystore, error) {
-	cjson, err := keystore.EncryptDataV1(seed[:], []byte(password), keystore.StandardArgon2idT, keystore.StandardArgon2idM, keystore.StandardArgon2idP)
+func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string, salt, aesIV []byte) (*Keystore, error) {
+	if salt == nil {
+		salt = make([]uint8, saltSize)
+		if _, err := io.ReadFull(rand.Reader, salt); err != nil {
+			return nil, err
+		}
+	}
+	if aesIV == nil {
+		aesIV = make([]uint8, ivSize)
+		if _, err := io.ReadFull(rand.Reader, aesIV); err != nil {
+			return nil, err
+		}
+	}
+
+	derivedKey := argon2.IDKey([]byte(password), salt, argon2idT, argon2idM, argon2idP, argon2idKeyLen)
+
+	block, err := aes.NewCipher(derivedKey)
 	if err != nil {
 		return nil, err
 	}
+
+	gcmBlock, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	ciphertext := gcmBlock.Seal(nil, aesIV, seed[:], nil)
 
 	d, err := dilithium.NewDilithiumFromSeed(seed)
 	if err != nil {
@@ -106,8 +172,19 @@ func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string
 	pk := d.GetPK()
 	return &Keystore{
 		UUID:   uuid.New().String(),
-		Crypto: cjson,
+		Crypto: NewKeystoreCrypto(salt, aesIV, ciphertext, argon2idT, argon2idM, argon2idP, argon2idKeyLen),
 		PubKey: misc.EncodeHex(pk[:]),
 		Path:   path,
 	}, nil
+}
+
+// TODO: can we do without this when unmarshalling dynamic JSON?
+// why do integers in KDF params end up as float64 and not int after
+// unmarshal?
+func ensureInt(x interface{}) int {
+	res, ok := x.(int)
+	if !ok {
+		res = int(x.(float64))
+	}
+	return res
 }
