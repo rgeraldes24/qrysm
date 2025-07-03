@@ -11,8 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/k0kubun/go-ansi"
-	"github.com/schollz/progressbar/v3"
 	"github.com/sirupsen/logrus"
 	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
@@ -25,6 +23,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/contracts/deposit"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	"github.com/theQRL/qrysm/monitoring/progress"
 	"github.com/urfave/cli/v2"
 )
 
@@ -104,7 +103,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 
 	depositDelaySeconds := cliCtx.Int(flags.DepositDelaySecondsFlag.Name)
 	depositDelay := time.Duration(depositDelaySeconds) * time.Second
-	bar := initializeProgressBar(len(depositDataList), "Sending deposit transactions...")
+	bar := progress.InitializeProgressBar(len(depositDataList), "Sending deposit transactions...")
 	for i, depositData := range depositDataList {
 		txOpts.Value = new(big.Int).Mul(new(big.Int).SetUint64(depositData.Amount), big.NewInt(1e9)) // value in planck
 
@@ -195,22 +194,4 @@ func importDepositDataJSON(folder string) ([]*stakingdeposit.DepositData, error)
 	}
 
 	return depositDataList, nil
-}
-
-func initializeProgressBar(numItems int, msg string) *progressbar.ProgressBar {
-	return progressbar.NewOptions(
-		numItems,
-		progressbar.OptionFullWidth(),
-		progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
-		progressbar.OptionEnableColorCodes(true),
-		progressbar.OptionSetTheme(progressbar.Theme{
-			Saucer:        "[green]=[reset]",
-			SaucerHead:    "[green]>[reset]",
-			SaucerPadding: " ",
-			BarStart:      "[",
-			BarEnd:        "]",
-		}),
-		progressbar.OptionOnCompletion(func() { fmt.Println() }),
-		progressbar.OptionSetDescription(msg),
-	)
 }

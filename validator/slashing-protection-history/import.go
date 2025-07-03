@@ -11,6 +11,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	"github.com/theQRL/qrysm/monitoring/progress"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/slashings"
 	"github.com/theQRL/qrysm/validator/db"
@@ -102,7 +103,7 @@ func ImportStandardProtectionJSON(ctx context.Context, validatorDB db.Database, 
 	// until after we successfully parse all data from the JSON file. If there is any error
 	// in parsing the JSON proposal and attesting histories, we will not reach this point.
 	for pubKey, proposalHistory := range proposalHistoryByPubKey {
-		bar := initializeProgressBar(
+		bar := progress.InitializeProgressBar(
 			len(proposalHistory.Proposals),
 			fmt.Sprintf("Importing proposals for validator public key %#x", bytesutil.Trunc(pubKey[:])),
 		)
@@ -115,7 +116,7 @@ func ImportStandardProtectionJSON(ctx context.Context, validatorDB db.Database, 
 			}
 		}
 	}
-	bar := initializeProgressBar(
+	bar := progress.InitializeProgressBar(
 		len(attestingHistoryByPubKey),
 		"Importing attesting history for validator public keys",
 	)

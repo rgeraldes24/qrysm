@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/k0kubun/go-ansi"
 	"github.com/pkg/errors"
-	"github.com/schollz/progressbar/v3"
 	"github.com/sirupsen/logrus"
 	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/monitoring/progress"
 	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
 	"github.com/theQRL/qrysm/validator/keymanager"
 )
@@ -34,7 +33,7 @@ func (km *Keymanager) ImportKeystores(
 		return nil, ErrMismatchedNumPasswords
 	}
 	enc := keystorev1.New()
-	bar := initializeProgressBar(len(keystores), "Importing accounts...")
+	bar := progress.InitializeProgressBar(len(keystores), "Importing accounts...")
 	keys := map[string]string{}
 	statuses := make([]*zondpbservice.ImportedKeystoreStatus, len(keystores))
 	var err error
@@ -159,22 +158,4 @@ func (*Keymanager) attemptDecryptKeystore(
 		pubKeyBytes = privKey.PublicKey().Marshal()
 	}
 	return seedBytes, pubKeyBytes, password, nil
-}
-
-func initializeProgressBar(numItems int, msg string) *progressbar.ProgressBar {
-	return progressbar.NewOptions(
-		numItems,
-		progressbar.OptionFullWidth(),
-		progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
-		progressbar.OptionEnableColorCodes(true),
-		progressbar.OptionSetTheme(progressbar.Theme{
-			Saucer:        "[green]=[reset]",
-			SaucerHead:    "[green]>[reset]",
-			SaucerPadding: " ",
-			BarStart:      "[",
-			BarEnd:        "]",
-		}),
-		progressbar.OptionOnCompletion(func() { fmt.Println() }),
-		progressbar.OptionSetDescription(msg),
-	)
 }
