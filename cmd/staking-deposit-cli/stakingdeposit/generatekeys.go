@@ -35,6 +35,7 @@ func GenerateKeys(validatorStartIndex, numValidators uint64,
 		amounts[i] = params.BeaconConfig().MaxEffectiveBalance
 	}
 
+	fmt.Println("Generation keystores, this may take a while...")
 	credentials, err := NewCredentialsFromSeed(seed, numValidators, amounts, chainSettings, validatorStartIndex, executionAddress)
 	if err != nil {
 		panic(fmt.Errorf("new credentials from mnemonic failed. reason: %v", err))

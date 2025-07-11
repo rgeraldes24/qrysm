@@ -3218,8 +3218,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_pborman_uuid",
         importpath = "github.com/pborman/uuid",
-        sum = "h1:+ZZIw58t/ozdjRaXh/3awHfmWRbzYxJoAdNJxe/3pvw=",
-        version = "v1.2.1",
+        sum = "h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=",
+        version = "v1.2.0",
     )
     go_repository(
         name = "com_github_pelletier_go_toml",
@@ -5858,9 +5858,9 @@ def go_dependencies():
         patches = [
             "//third_party:com_github_theqrl_go_zond_secp256k1.patch",
         ],
-        replace = "github.com/cyyber/go-zond",
-        sum = "h1:yIuRt1qZCuhUFgZf5Xq6AYT56MR7yVU3IpViNnEzof0=",
-        version = "v0.2.1-0.20250430092150-d9b1e2ea3867",
+        replace = "github.com/rgeraldes24/go-zond",
+        sum = "h1:2eJNLfmgc/vn/pF+TvgACr7MYMjtQKYBgM2Y6pNvknI=",
+        version = "v0.0.0-20250702122349-f5ff923bd00d",
     )
     go_repository(
         name = "com_github_theqrl_go_zond_types",
@@ -5871,8 +5871,9 @@ def go_dependencies():
     go_repository(
         name = "com_github_theqrl_go_zond_wallet_encryptor_keystore",
         importpath = "github.com/theQRL/go-zond-wallet-encryptor-keystore",
-        sum = "h1:tX4WpoKWAXMyHFLMTQugNISJlPzP+V64y81RClFbufU=",
-        version = "v0.0.0-20231020114450-f6f12b82ea8b",
+        replace = "github.com/rgeraldes24/go-zond-wallet-encryptor-keystore",
+        sum = "h1:r1XOO0tZ1L15nPqVQEgbZDTj+NQjAm+RxObDf1TKZgM=",
+        version = "v0.0.0-20250702080128-b3082ce292d8",
     )
     go_repository(
         name = "com_github_theqrl_go_zond_wallet_types",

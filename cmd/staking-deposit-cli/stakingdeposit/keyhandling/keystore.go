@@ -4,19 +4,32 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"os"
-	"reflect"
 	"runtime"
 
 	"github.com/google/uuid"
 	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	"golang.org/x/crypto/sha3"
+	"github.com/theQRL/qrysm/encoding/bytesutil"
+	"golang.org/x/crypto/argon2"
+)
+
+const (
+	// Argon2id parameters.
+	argon2idT      = 8
+	argon2idM      = 1 << 18
+	argon2idP      = 1
+	argon2idKeyLen = 32
+
+	// Misc constants.
+	saltSize = 32
+	ivSize   = 12
 )
 
 type Keystore struct {
@@ -61,46 +74,44 @@ func (k *Keystore) Save(fileFolder string) error {
 }
 
 func (k *Keystore) Decrypt(password string) [field_params.DilithiumSeedLength]byte {
-	salt, ok := k.Crypto.KDF.Params["salt"]
-	if !ok {
-		panic("salt not found in KDF Params")
-	}
-	binSalt := misc.DecodeHex(salt.(string))
-	decryptionKey, err := passwordToDecryptionKey(password, binSalt)
+	iv, err := hex.DecodeString(k.Crypto.Cipher.Params["iv"].(string))
 	if err != nil {
-		panic(fmt.Errorf("passwordToDecryptionKey | reason %v", err))
+		panic(fmt.Errorf("iv hex.DecodeString failed | reason %v", err))
 	}
 
-	binCipherMessage := misc.DecodeHex(k.Crypto.Cipher.Message)
-
-	checksum := CheckSumDecryptionKeyAndMessage(decryptionKey[16:32], binCipherMessage)
-	strChecksum := misc.EncodeHex(checksum[:])
-	if !reflect.DeepEqual(strChecksum, k.Crypto.Checksum.Message) {
-		panic(fmt.Errorf("checksum check failed | expected %s | found %s",
-			strChecksum, k.Crypto.Checksum.Message))
+	salt, err := hex.DecodeString(k.Crypto.KDF.Params["salt"].(string))
+	if err != nil {
+		panic(fmt.Errorf("salt hex.DecodeString failed | reason %v", err))
 	}
 
-	block, err := aes.NewCipher(decryptionKey[:16])
+	ciphertext, err := hex.DecodeString(k.Crypto.Cipher.Message)
+	if err != nil {
+		panic(fmt.Errorf("salt hex.DecodeString failed | reason %v", err))
+	}
+
+	dkLen := uint32(ensureInt(k.Crypto.KDF.Params["dklen"]))
+
+	t := uint32(ensureInt(k.Crypto.KDF.Params["t"]))
+	m := uint32(ensureInt(k.Crypto.KDF.Params["m"]))
+	p := uint8(ensureInt(k.Crypto.KDF.Params["p"]))
+
+	derivedKey := argon2.IDKey([]byte(password), salt, t, m, p, dkLen)
+	block, err := aes.NewCipher(derivedKey)
 	if err != nil {
 		panic(fmt.Errorf("aes.NewCipher failed | reason %v", err))
 	}
 
-	var seed [field_params.DilithiumSeedLength]uint8
-	cipherText := misc.DecodeHex(k.Crypto.Cipher.Message)
-	if len(cipherText) != len(seed) {
-		panic(fmt.Errorf("invalid cipher text length | expected length %d | actual length %d",
-			len(seed), len(cipherText)))
+	gcmBlock, err := cipher.NewGCM(block)
+	if err != nil {
+		panic(fmt.Errorf("cipher.NewGCM failed | reason %v", err))
 	}
-	aesIV, ok := k.Crypto.Cipher.Params["iv"]
-	if !ok {
-		panic(fmt.Errorf("aesIV not found in Cipher Params"))
+
+	plaintext, err := gcmBlock.Open(nil, iv, ciphertext, nil)
+	if err != nil {
+		panic(fmt.Errorf("gcmBlock.Open failed | reason %v", err))
 	}
-	binAESIV := misc.DecodeHex(aesIV.(string))
 
-	stream := cipher.NewCTR(block, binAESIV)
-	stream.XORKeyStream(seed[:], cipherText)
-
-	return seed
+	return bytesutil.ToBytes48(plaintext)
 }
 
 func NewKeystoreFromJSON(data []uint8) *Keystore {
@@ -128,31 +139,31 @@ func NewEmptyKeystore() *Keystore {
 
 func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string, salt, aesIV []byte) (*Keystore, error) {
 	if salt == nil {
-		salt = make([]uint8, 32)
+		salt = make([]uint8, saltSize)
 		if _, err := io.ReadFull(rand.Reader, salt); err != nil {
 			return nil, err
 		}
 	}
 	if aesIV == nil {
-		aesIV = make([]uint8, 16)
+		aesIV = make([]uint8, ivSize)
 		if _, err := io.ReadFull(rand.Reader, aesIV); err != nil {
 			return nil, err
 		}
 	}
 
-	decryptionKey, err := passwordToDecryptionKey(password, salt)
+	derivedKey := argon2.IDKey([]byte(password), salt, argon2idT, argon2idM, argon2idP, argon2idKeyLen)
+
+	block, err := aes.NewCipher(derivedKey)
 	if err != nil {
 		return nil, err
 	}
 
-	block, err := aes.NewCipher(decryptionKey[:16])
+	gcmBlock, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil, err
 	}
 
-	cipherText := make([]byte, len(seed))
-	stream := cipher.NewCTR(block, aesIV)
-	stream.XORKeyStream(cipherText, seed[:])
+	ciphertext := gcmBlock.Seal(nil, aesIV, seed[:], nil)
 
 	d, err := dilithium.NewDilithiumFromSeed(seed)
 	if err != nil {
@@ -161,23 +172,19 @@ func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string
 	pk := d.GetPK()
 	return &Keystore{
 		UUID:   uuid.New().String(),
-		Crypto: NewKeystoreCrypto(salt, aesIV, cipherText, decryptionKey[16:]),
+		Crypto: NewKeystoreCrypto(salt, aesIV, ciphertext, argon2idT, argon2idM, argon2idP, argon2idKeyLen),
 		PubKey: misc.EncodeHex(pk[:]),
 		Path:   path,
 	}, nil
 }
 
-func passwordToDecryptionKey(password string, salt []byte) ([32]byte, error) {
-	h := sha3.NewShake256()
-	if _, err := h.Write([]byte(password)); err != nil {
-		return [32]byte{}, fmt.Errorf("shake256 hash write failed %v", err)
+// TODO: can we do without this when unmarshalling dynamic JSON?
+// why do integers in KDF params end up as float64 and not int after
+// unmarshal?
+func ensureInt(x interface{}) int {
+	res, ok := x.(int)
+	if !ok {
+		res = int(x.(float64))
 	}
-
-	if _, err := h.Write(salt); err != nil {
-		return [32]byte{}, fmt.Errorf("shake256 hash write failed %v", err)
-	}
-
-	var decryptionKey [32]uint8
-	_, err := h.Read(decryptionKey[:])
-	return decryptionKey, err
+	return res
 }

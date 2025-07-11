@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/io/file"
@@ -283,7 +283,7 @@ func readKeystoreFile(_ context.Context, keystoreFilePath string) (*keymanager.K
 }
 
 func createKeystoreFromPrivateKey(dilithiumKey dilithium.DilithiumKey, walletPassword string) (*keymanager.Keystore, error) {
-	encryptor := keystorev4.New()
+	encryptor := keystorev1.New()
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err

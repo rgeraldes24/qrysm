@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/k0kubun/go-ansi"
 	"github.com/pkg/errors"
-	"github.com/schollz/progressbar/v3"
 	"github.com/sirupsen/logrus"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/monitoring/progress"
 	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
 	"github.com/theQRL/qrysm/validator/keymanager"
 )
@@ -33,8 +32,8 @@ func (km *Keymanager) ImportKeystores(
 	if len(passwords) != len(keystores) {
 		return nil, ErrMismatchedNumPasswords
 	}
-	enc := keystorev4.New()
-	bar := initializeProgressBar(len(keystores), "Importing accounts...")
+	enc := keystorev1.New()
+	bar := progress.InitializeProgressBar(len(keystores), "Importing accounts...")
 	keys := map[string]string{}
 	statuses := make([]*zondpbservice.ImportedKeystoreStatus, len(keystores))
 	var err error
@@ -46,9 +45,9 @@ func (km *Keymanager) ImportKeystores(
 		existingPubKeys[string(storeCopy.PublicKeys[i])] = true
 	}
 	for i := 0; i < len(keystores); i++ {
-		var privKeyBytes []byte
+		var seedBytes []byte
 		var pubKeyBytes []byte
-		privKeyBytes, pubKeyBytes, _, err = km.attemptDecryptKeystore(enc, keystores[i], passwords[i])
+		seedBytes, pubKeyBytes, _, err = km.attemptDecryptKeystore(enc, keystores[i], passwords[i])
 		if err != nil {
 			statuses[i] = &zondpbservice.ImportedKeystoreStatus{
 				Status:  zondpbservice.ImportedKeystoreStatus_ERROR,
@@ -70,7 +69,7 @@ func (km *Keymanager) ImportKeystores(
 			continue
 		}
 
-		keys[string(pubKeyBytes)] = string(privKeyBytes)
+		keys[string(pubKeyBytes)] = string(seedBytes)
 		importedKeys = append(importedKeys, pubKeyBytes)
 		statuses[i] = &zondpbservice.ImportedKeystoreStatus{
 			Status: zondpbservice.ImportedKeystoreStatus_IMPORTED,
@@ -127,12 +126,12 @@ func (km *Keymanager) ImportKeypairs(ctx context.Context, privKeys, pubKeys [][]
 // by decrypting using a specified password. If the password fails,
 // it prompts the user for the correct password until it confirms.
 func (*Keymanager) attemptDecryptKeystore(
-	enc *keystorev4.Encryptor, keystore *keymanager.Keystore, password string,
+	enc *keystorev1.Encryptor, keystore *keymanager.Keystore, password string,
 ) ([]byte, []byte, string, error) {
 	// Attempt to decrypt the keystore with the specifies password.
-	var privKeyBytes []byte
+	var seedBytes []byte
 	var err error
-	privKeyBytes, err = enc.Decrypt(keystore.Crypto, password)
+	seedBytes, err = enc.Decrypt(keystore.Crypto, password)
 	doesNotDecrypt := err != nil && strings.Contains(err.Error(), keymanager.IncorrectPasswordErrMsg)
 	if doesNotDecrypt {
 		return nil, nil, "", fmt.Errorf(
@@ -152,29 +151,11 @@ func (*Keymanager) attemptDecryptKeystore(
 			return nil, nil, "", errors.Wrap(err, "could not decode pubkey from keystore")
 		}
 	} else {
-		privKey, err := dilithium.SecretKeyFromSeed(privKeyBytes)
+		privKey, err := dilithium.SecretKeyFromSeed(seedBytes)
 		if err != nil {
 			return nil, nil, "", errors.Wrap(err, "could not initialize private key from bytes")
 		}
 		pubKeyBytes = privKey.PublicKey().Marshal()
 	}
-	return privKeyBytes, pubKeyBytes, password, nil
-}
-
-func initializeProgressBar(numItems int, msg string) *progressbar.ProgressBar {
-	return progressbar.NewOptions(
-		numItems,
-		progressbar.OptionFullWidth(),
-		progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
-		progressbar.OptionEnableColorCodes(true),
-		progressbar.OptionSetTheme(progressbar.Theme{
-			Saucer:        "[green]=[reset]",
-			SaucerHead:    "[green]>[reset]",
-			SaucerPadding: " ",
-			BarStart:      "[",
-			BarEnd:        "]",
-		}),
-		progressbar.OptionOnCompletion(func() { fmt.Println() }),
-		progressbar.OptionSetDescription(msg),
-	)
+	return seedBytes, pubKeyBytes, password, nil
 }

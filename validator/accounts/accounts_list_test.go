@@ -13,7 +13,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/cmd/validator/flags"
 	"github.com/theQRL/qrysm/config/params"
 	types "github.com/theQRL/qrysm/consensus-types/primitives"
@@ -106,7 +106,7 @@ func setupWalletAndPasswordsDir(t testing.TB) (string, string, string) {
 }
 
 func createRandomKeystore(t testing.TB, password string) *keymanager.Keystore {
-	encryptor := keystorev4.New()
+	encryptor := keystorev1.New()
 	id, err := uuid.NewRandom()
 	require.NoError(t, err)
 	validatingKey, err := dilithium.RandKey()

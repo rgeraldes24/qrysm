@@ -25,6 +25,7 @@ go_library(
         "//contracts/deposit:go_default_library",
         "//crypto/dilithium:go_default_library",
         "//crypto/hash:go_default_library",
+        "//monitoring/progress:go_default_library",
         "//proto/qrysm/v1alpha1:go_default_library",
         "//proto/zond/v1:go_default_library",
         "@com_github_theqrl_go_qrllib//dilithium:go_default_library",

@@ -8,7 +8,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/pkg/errors"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/async"
 	"github.com/theQRL/qrysm/config/features"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
@@ -95,7 +95,7 @@ func (km *Keymanager) listenForAccountChanges(ctx context.Context) {
 // Replaces the accounts store struct in the local keymanager with
 // the contents of a keystore file by decrypting it with the accounts password.
 func (km *Keymanager) reloadAccountsFromKeystore(keystore *AccountsKeystoreRepresentation) error {
-	decryptor := keystorev4.New()
+	decryptor := keystorev1.New()
 	encodedAccounts, err := decryptor.Decrypt(keystore.Crypto, km.wallet.Password())
 	if err != nil {
 		return errors.Wrap(err, "could not decrypt keystore file")

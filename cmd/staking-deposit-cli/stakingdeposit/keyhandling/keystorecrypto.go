@@ -1,9 +1,15 @@
 package keyhandling
 
 import (
-	"crypto/sha256"
+	"encoding/hex"
+)
 
-	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
+const (
+	// Algorithms.
+	algoArgon2id = "argon2id"
+
+	// Ciphers.
+	cipherAes256Gcm = "aes-256-gcm"
 )
 
 type KeystoreCrypto struct {
@@ -12,30 +18,22 @@ type KeystoreCrypto struct {
 	Cipher   *KeystoreModule `json:"cipher"`
 }
 
-func CheckSumDecryptionKeyAndMessage(partialDecryptionKey, cipherText []uint8) [32]byte {
-	var keyAndCipherText []byte
-	keyAndCipherText = append(keyAndCipherText, partialDecryptionKey...)
-	keyAndCipherText = append(keyAndCipherText, cipherText...)
-	return sha256.Sum256(keyAndCipherText)
-}
-
-func NewKeystoreCrypto(salt, aesIV, cipherText, partialDecryptionKey []uint8) *KeystoreCrypto {
-	checksum := CheckSumDecryptionKeyAndMessage(partialDecryptionKey, cipherText)
-
+func NewKeystoreCrypto(salt, aesIV, cipherText []uint8, argon2idT, argon2idM uint32, argon2idP uint8, dklen uint32) *KeystoreCrypto {
 	return &KeystoreCrypto{
 		KDF: &KeystoreModule{
-			Function: "custom",
-			Params:   map[string]interface{}{"salt": misc.EncodeHex(salt)},
+			Function: algoArgon2id,
+			Params: map[string]interface{}{
+				"dklen": dklen,
+				"m":     argon2idM,
+				"p":     argon2idP,
+				"salt":  hex.EncodeToString(salt),
+				"t":     argon2idT,
+			},
 		},
 		Cipher: &KeystoreModule{
-			Function: "aes-128-ctr",
-			Params:   map[string]interface{}{"iv": misc.EncodeHex(aesIV)},
-			Message:  misc.EncodeHex(cipherText),
-		},
-		Checksum: &KeystoreModule{
-			Function: "sha256",
-			Params:   map[string]interface{}{},
-			Message:  misc.EncodeHex(checksum[:]),
+			Function: cipherAes256Gcm,
+			Params:   map[string]interface{}{"iv": hex.EncodeToString(aesIV)},
+			Message:  hex.EncodeToString(cipherText),
 		},
 	}
 }

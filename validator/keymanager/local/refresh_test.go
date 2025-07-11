@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/async/event"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -31,7 +31,7 @@ func TestLocalKeymanager_reloadAccountsFromKeystore_MismatchedNumKeys(t *testing
 	}
 	encodedStore, err := json.MarshalIndent(accountsStore, "", "\t")
 	require.NoError(t, err)
-	encryptor := keystorev4.New()
+	encryptor := keystorev1.New()
 	cryptoFields, err := encryptor.Encrypt(encodedStore, dr.wallet.Password())
 	require.NoError(t, err)
 	id, err := uuid.NewRandom()

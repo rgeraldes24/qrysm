@@ -11,14 +11,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/FuzzyVM/filler"
 	"github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-zond/accounts/keystore"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/keystore"
 	"github.com/theQRL/qrysm/crypto/rand"
-	"github.com/theQRL/qrysm/encoding/bytesutil"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	txfuzz "github.com/theQRL/tx-fuzz"
 	"golang.org/x/sync/errgroup"
@@ -75,10 +74,7 @@ func (t *TransactionGenerator) Start(ctx context.Context) error {
 	ticker := time.NewTicker(txPeriod)
 	gasFeeCap := big.NewInt(1e11)
 	gasTipCap := big.NewInt(3e7)
-	key, err := dilithium.NewDilithiumFromSeed(bytesutil.ToBytes48(testKey.SecretKey.Marshal()))
-	if err != nil {
-		return fmt.Errorf("failed to generate the deposit key from the signing seed. reason: %v", err)
-	}
+	key := testKey.Dilithium
 	addr := common.Address(key.GetAddress())
 
 	for {

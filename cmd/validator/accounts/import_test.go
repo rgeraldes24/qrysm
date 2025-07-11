@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -190,7 +190,7 @@ func TestImport_Noninteractive_RandomName(t *testing.T) {
 func createRandomNameKeystore(t *testing.T, path string) (*keymanager.Keystore, string) {
 	validatingKey, err := dilithium.RandKey()
 	require.NoError(t, err)
-	encryptor := keystorev4.New()
+	encryptor := keystorev1.New()
 	cryptoFields, err := encryptor.Encrypt(validatingKey.Marshal(), password)
 	require.NoError(t, err)
 	id, err := uuid.NewRandom()

@@ -16,7 +16,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/google/uuid"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	keystorev4 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
+	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/cmd/validator/flags"
@@ -577,7 +577,7 @@ func setupServerWithWallet(t testing.TB) *Server {
 }
 
 func createRandomKeystore(t testing.TB, password string) *keymanager.Keystore {
-	encryptor := keystorev4.New()
+	encryptor := keystorev1.New()
 	id, err := uuid.NewRandom()
 	require.NoError(t, err)
 	validatingKey, err := dilithium.RandKey()
@@ -1643,7 +1643,7 @@ func TestServer_SetVoluntaryExit(t *testing.T) {
 	require.Equal(t, true, ok)
 	// err = dr.RecoverAccountsFromMnemonic(ctx, mocks.TestMnemonic, derived.DefaultMnemonicLanguage, "", 1)
 	password := "test"
-	encryptor := keystorev4.New()
+	encryptor := keystorev1.New()
 	id, err := uuid.NewRandom()
 	require.NoError(t, err)
 	seed, err := hex.DecodeString(mocks.TestHexSeed)

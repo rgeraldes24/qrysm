@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
+	"github.com/theQRL/qrysm/monitoring/progress"
 )
 
 type Credentials struct {
@@ -17,6 +18,7 @@ type Credentials struct {
 }
 
 func (c *Credentials) ExportKeystores(password, folder string) ([]string, error) {
+	bar := progress.InitializeProgressBar(len(c.credentials), "Generating keystores...")
 	var filesAbsolutePath []string
 	for _, credential := range c.credentials {
 		fileAbsolutePath, err := credential.SaveSigningKeystore(password, folder)
@@ -24,6 +26,9 @@ func (c *Credentials) ExportKeystores(password, folder string) ([]string, error)
 			return nil, err
 		}
 		filesAbsolutePath = append(filesAbsolutePath, fileAbsolutePath)
+		if err := bar.Add(1); err != nil {
+			return nil, err
+		}
 	}
 	return filesAbsolutePath, nil
 }
@@ -69,8 +74,12 @@ func (c *Credentials) ExportDepositDataJSON(folder string) (string, error) {
 }
 
 func (c *Credentials) VerifyKeystores(keystoreFileFolders []string, password string) bool {
+	bar := progress.InitializeProgressBar(len(c.credentials), "Verifying keystores...")
 	for i, credential := range c.credentials {
 		if !credential.VerifyKeystore(keystoreFileFolders[i], password) {
+			return false
+		}
+		if err := bar.Add(1); err != nil {
 			return false
 		}
 	}
