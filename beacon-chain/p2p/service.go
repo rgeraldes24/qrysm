@@ -406,7 +406,7 @@ func (s *Service) connectWithAllTrustedPeers(multiAddrs []multiaddr.Multiaddr) {
 		// make each dial non-blocking
 		go func(info peer.AddrInfo) {
 			if err := s.connectWithPeer(s.ctx, info); err != nil {
-				log.WithError(err).Tracef("Could not connect with peer %s", info.String())
+				log.WithError(err).Debugf("Could not connect with trusted peer %s", info.String())
 			}
 		}(info)
 	}
@@ -422,7 +422,7 @@ func (s *Service) connectWithAllPeers(multiAddrs []multiaddr.Multiaddr) {
 		// make each dial non-blocking
 		go func(info peer.AddrInfo) {
 			if err := s.connectWithPeer(s.ctx, info); err != nil {
-				log.WithError(err).Tracef("Could not connect with peer %s", info.String())
+				log.WithError(err).Debugf("Could not connect with peer %s", info.String())
 			}
 		}(info)
 	}
@@ -432,16 +432,22 @@ func (s *Service) connectWithPeer(ctx context.Context, info peer.AddrInfo) error
 	ctx, span := trace.StartSpan(ctx, "p2p.connectWithPeer")
 	defer span.End()
 
-	if info.ID == s.host.ID() {
+	pid := info.ID
+	if pid == s.host.ID() {
 		return nil
 	}
-	if s.Peers().IsBad(info.ID) {
+	if s.Peers().IsBad(pid) {
 		return errors.New("refused to connect to bad peer")
 	}
 	ctx, cancel := context.WithTimeout(ctx, maxDialTimeout)
 	defer cancel()
 	if err := s.host.Connect(ctx, info); err != nil {
-		s.Peers().Scorers().BadResponsesScorer().Increment(info.ID)
+		s.Peers().Scorers().BadResponsesScorer().Increment(pid)
+		log.WithFields(logrus.Fields{
+			"pid":   pid,
+			"score": s.Peers().Scorers().BadResponsesScorer().Score(pid),
+		}).Debug("Peer is penalized for connection error")
+
 		return err
 	}
 	return nil

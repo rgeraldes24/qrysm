@@ -86,14 +86,19 @@ func (l *limiter) validateRequest(stream network.Stream, amt uint64) error {
 	if err != nil {
 		return err
 	}
-	key := stream.Conn().RemotePeer().String()
-	remaining := collector.Remaining(key)
+	pid := stream.Conn().RemotePeer()
+	remaining := collector.Remaining(pid.String())
 	// Treat each request as a minimum of 1.
 	if amt == 0 {
 		amt = 1
 	}
 	if amt > uint64(remaining) {
-		l.p2p.Peers().Scorers().BadResponsesScorer().Increment(stream.Conn().RemotePeer())
+		l.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
+		log.WithFields(logrus.Fields{
+			"pid":   pid,
+			"score": l.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
+		}).Debug("Peer is penalized for being rate limited")
+
 		writeErrorResponseToStream(responseCodeInvalidRequest, p2ptypes.ErrRateLimited.Error(), stream, l.p2p)
 		return p2ptypes.ErrRateLimited
 	}
@@ -111,12 +116,17 @@ func (l *limiter) validateRawRpcRequest(stream network.Stream) error {
 	if err != nil {
 		return err
 	}
-	key := stream.Conn().RemotePeer().String()
-	remaining := collector.Remaining(key)
+	pid := stream.Conn().RemotePeer()
+	remaining := collector.Remaining(pid.String())
 	// Treat each request as a minimum of 1.
 	amt := int64(1)
 	if amt > remaining {
-		l.p2p.Peers().Scorers().BadResponsesScorer().Increment(stream.Conn().RemotePeer())
+		l.p2p.Peers().Scorers().BadResponsesScorer().Increment(pid)
+		log.WithFields(logrus.Fields{
+			"pid":   pid,
+			"score": l.p2p.Peers().Scorers().BadResponsesScorer().Score(pid),
+		}).Debug("Peer is penalized for being rate limited")
+
 		writeErrorResponseToStream(responseCodeInvalidRequest, p2ptypes.ErrRateLimited.Error(), stream, l.p2p)
 		return p2ptypes.ErrRateLimited
 	}
