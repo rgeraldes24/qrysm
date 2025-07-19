@@ -31,8 +31,6 @@ import (
 	gcrypto "github.com/theQRL/go-zond/crypto"
 	gzondlog "github.com/theQRL/go-zond/log"
 	"github.com/theQRL/go-zond/p2p/discover"
-	"github.com/theQRL/go-zond/p2p/enode"
-	"github.com/theQRL/go-zond/p2p/enr"
 	"github.com/theQRL/qrysm/async"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
@@ -93,11 +91,11 @@ func main() {
 	}
 	if *seedNode != "" {
 		log.Debugf("Adding seed node %s", *seedNode)
-		node, err := enode.Parse(enode.ValidSchemes, *seedNode)
+		node, err := qnode.Parse(qnode.ValidSchemes, *seedNode)
 		if err != nil {
 			log.Fatal(err)
 		}
-		cfg.Bootnodes = []*enode.Node{node}
+		cfg.Bootnodes = []*qnode.Node{node}
 	}
 	ipAddr, err := network.ExternalIP()
 	if err != nil {
@@ -189,8 +187,8 @@ func (h *handler) httpHandler(w http.ResponseWriter, _ *http.Request) {
 	}
 }
 
-func createLocalNode(privKey *ecdsa.PrivateKey, ipAddr net.IP, port int) (*enode.LocalNode, error) {
-	db, err := enode.OpenDB("")
+func createLocalNode(privKey *ecdsa.PrivateKey, ipAddr net.IP, port int) (*qnode.LocalNode, error) {
+	db, err := qnode.OpenDB("")
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not open node's peer database")
 	}
@@ -224,7 +222,7 @@ func createLocalNode(privKey *ecdsa.PrivateKey, ipAddr net.IP, port int) (*enode
 		return nil, errors.Wrap(err, "Could not compute fork digest")
 	}
 
-	forkID := &pb.ENRForkID{
+	forkID := &pb.QNRForkID{
 		CurrentForkDigest: digest[:],
 		NextForkVersion:   fVersion,
 		NextForkEpoch:     params.BeaconConfig().FarFutureEpoch,
@@ -234,9 +232,9 @@ func createLocalNode(privKey *ecdsa.PrivateKey, ipAddr net.IP, port int) (*enode
 		return nil, errors.Wrap(err, "Could not marshal fork id")
 	}
 
-	localNode := enode.NewLocalNode(db, privKey)
-	localNode.Set(enr.WithEntry("eth2", forkEntry))
-	localNode.Set(enr.WithEntry("attnets", bitfield.NewBitvector64()))
+	localNode := qnode.NewLocalNode(db, privKey)
+	localNode.Set(qnr.WithEntry("eth2", forkEntry))
+	localNode.Set(qnr.WithEntry("attnets", bitfield.NewBitvector64()))
 	localNode.SetFallbackIP(external)
 	localNode.SetFallbackUDP(port)
 

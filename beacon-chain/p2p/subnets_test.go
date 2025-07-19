@@ -10,8 +10,8 @@ import (
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/go-zond/p2p/discover"
-	"github.com/theQRL/go-zond/p2p/enode"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnode"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
@@ -73,7 +73,7 @@ func TestStartDiscV5_DiscoverPeersWithSubnets(t *testing.T) {
 		bitV := bitfield.NewBitvector64()
 		bitV.SetBitAt(uint64(i), true)
 
-		entry := enr.WithEntry(attSubnetEnrKey, &bitV)
+		entry := qnr.WithEntry(attSubnetQnrKey, &bitV)
 		listener.LocalNode().Set(entry)
 		listeners = append(listeners, listener)
 	}
@@ -122,7 +122,7 @@ func TestStartDiscV5_DiscoverPeersWithSubnets(t *testing.T) {
 		t.Fatal("Peer with subnet doesn't exist")
 	}
 
-	// Update ENR of a peer.
+	// Update QNR of a peer.
 	testService := &Service{
 		dv5Listener: listeners[0],
 		metaData: wrapper.WrappedMetadataV0(&pb.MetaDataV0{
@@ -130,7 +130,7 @@ func TestStartDiscV5_DiscoverPeersWithSubnets(t *testing.T) {
 		}),
 	}
 	cache.SubnetIDs.AddAttesterSubnetID(0, 10)
-	testService.RefreshENR()
+	testService.RefreshQNR()
 	time.Sleep(2 * time.Second)
 
 	exists, err = s.FindPeersWithSubnet(ctx, "", 2, flags.Get().MinimumPeersPerSubnet)
@@ -145,21 +145,21 @@ func Test_AttSubnets(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	tests := []struct {
 		name        string
-		record      func(t *testing.T) *enr.Record
+		record      func(t *testing.T) *qnr.Record
 		want        []uint64
 		wantErr     bool
 		errContains string
 	}{
 		{
 			name: "valid record",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
+				localNode := qnode.NewLocalNode(db, convertedKey)
 				localNode = initializeAttSubnets(localNode)
 				return localNode.Node().Record()
 			},
@@ -168,15 +168,15 @@ func Test_AttSubnets(t *testing.T) {
 		},
 		{
 			name: "too small subnet",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
-				entry := enr.WithEntry(attSubnetEnrKey, []byte{})
+				localNode := qnode.NewLocalNode(db, convertedKey)
+				entry := qnr.WithEntry(attSubnetQnrKey, []byte{})
 				localNode.Set(entry)
 				return localNode.Node().Record()
 			},
@@ -186,15 +186,15 @@ func Test_AttSubnets(t *testing.T) {
 		},
 		{
 			name: "half sized subnet",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
-				entry := enr.WithEntry(attSubnetEnrKey, make([]byte, 4))
+				localNode := qnode.NewLocalNode(db, convertedKey)
+				entry := qnr.WithEntry(attSubnetQnrKey, make([]byte, 4))
 				localNode.Set(entry)
 				return localNode.Node().Record()
 			},
@@ -204,15 +204,15 @@ func Test_AttSubnets(t *testing.T) {
 		},
 		{
 			name: "too large subnet",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
-				entry := enr.WithEntry(attSubnetEnrKey, make([]byte, byteCount(int(attestationSubnetCount))+1))
+				localNode := qnode.NewLocalNode(db, convertedKey)
+				entry := qnr.WithEntry(attSubnetQnrKey, make([]byte, byteCount(int(attestationSubnetCount))+1))
 				localNode.Set(entry)
 				return localNode.Node().Record()
 			},
@@ -222,15 +222,15 @@ func Test_AttSubnets(t *testing.T) {
 		},
 		{
 			name: "very large subnet",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
-				entry := enr.WithEntry(attSubnetEnrKey, make([]byte, byteCount(int(attestationSubnetCount))+100))
+				localNode := qnode.NewLocalNode(db, convertedKey)
+				entry := qnr.WithEntry(attSubnetQnrKey, make([]byte, byteCount(int(attestationSubnetCount))+100))
 				localNode.Set(entry)
 				return localNode.Node().Record()
 			},
@@ -240,17 +240,17 @@ func Test_AttSubnets(t *testing.T) {
 		},
 		{
 			name: "single subnet",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
+				localNode := qnode.NewLocalNode(db, convertedKey)
 				bitV := bitfield.NewBitvector64()
 				bitV.SetBitAt(0, true)
-				entry := enr.WithEntry(attSubnetEnrKey, bitV.Bytes())
+				entry := qnr.WithEntry(attSubnetQnrKey, bitV.Bytes())
 				localNode.Set(entry)
 				return localNode.Node().Record()
 			},
@@ -259,14 +259,14 @@ func Test_AttSubnets(t *testing.T) {
 		},
 		{
 			name: "multiple subnets",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
+				localNode := qnode.NewLocalNode(db, convertedKey)
 				bitV := bitfield.NewBitvector64()
 				for i := uint64(0); i < bitV.Len(); i++ {
 					// skip 2 subnets
@@ -276,7 +276,7 @@ func Test_AttSubnets(t *testing.T) {
 					bitV.SetBitAt(i, true)
 				}
 				bitV.SetBitAt(0, true)
-				entry := enr.WithEntry(attSubnetEnrKey, bitV.Bytes())
+				entry := qnr.WithEntry(attSubnetQnrKey, bitV.Bytes())
 				localNode.Set(entry)
 				return localNode.Node().Record()
 			},
@@ -287,19 +287,19 @@ func Test_AttSubnets(t *testing.T) {
 		},
 		{
 			name: "all subnets",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
+				localNode := qnode.NewLocalNode(db, convertedKey)
 				bitV := bitfield.NewBitvector64()
 				for i := uint64(0); i < bitV.Len(); i++ {
 					bitV.SetBitAt(i, true)
 				}
-				entry := enr.WithEntry(attSubnetEnrKey, bitV.Bytes())
+				entry := qnr.WithEntry(attSubnetQnrKey, bitV.Bytes())
 				localNode.Set(entry)
 				return localNode.Node().Record()
 			},
@@ -330,21 +330,21 @@ func Test_SyncSubnets(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	tests := []struct {
 		name        string
-		record      func(t *testing.T) *enr.Record
+		record      func(t *testing.T) *qnr.Record
 		want        []uint64
 		wantErr     bool
 		errContains string
 	}{
 		{
 			name: "valid record",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
+				localNode := qnode.NewLocalNode(db, convertedKey)
 				localNode = initializeSyncCommSubnets(localNode)
 				return localNode.Node().Record()
 			},
@@ -353,15 +353,15 @@ func Test_SyncSubnets(t *testing.T) {
 		},
 		{
 			name: "too small subnet",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
-				entry := enr.WithEntry(syncCommsSubnetEnrKey, []byte{})
+				localNode := qnode.NewLocalNode(db, convertedKey)
+				entry := qnr.WithEntry(syncCommsSubnetQnrKey, []byte{})
 				localNode.Set(entry)
 				return localNode.Node().Record()
 			},
@@ -371,15 +371,15 @@ func Test_SyncSubnets(t *testing.T) {
 		},
 		{
 			name: "too large subnet",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
-				entry := enr.WithEntry(syncCommsSubnetEnrKey, make([]byte, byteCount(int(syncCommsSubnetCount))+1))
+				localNode := qnode.NewLocalNode(db, convertedKey)
+				entry := qnr.WithEntry(syncCommsSubnetQnrKey, make([]byte, byteCount(int(syncCommsSubnetCount))+1))
 				localNode.Set(entry)
 				return localNode.Node().Record()
 			},
@@ -389,15 +389,15 @@ func Test_SyncSubnets(t *testing.T) {
 		},
 		{
 			name: "very large subnet",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
-				entry := enr.WithEntry(syncCommsSubnetEnrKey, make([]byte, byteCount(int(syncCommsSubnetCount))+100))
+				localNode := qnode.NewLocalNode(db, convertedKey)
+				entry := qnr.WithEntry(syncCommsSubnetQnrKey, make([]byte, byteCount(int(syncCommsSubnetCount))+100))
 				localNode.Set(entry)
 				return localNode.Node().Record()
 			},
@@ -407,17 +407,17 @@ func Test_SyncSubnets(t *testing.T) {
 		},
 		{
 			name: "single subnet",
-			record: func(t *testing.T) *enr.Record {
-				db, err := enode.OpenDB("")
+			record: func(t *testing.T) *qnr.Record {
+				db, err := qnode.OpenDB("")
 				assert.NoError(t, err)
 				priv, _, err := crypto.GenerateSecp256k1Key(rand.Reader)
 				assert.NoError(t, err)
 				convertedKey, err := ecdsaprysm.ConvertFromInterfacePrivKey(priv)
 				assert.NoError(t, err)
-				localNode := enode.NewLocalNode(db, convertedKey)
+				localNode := qnode.NewLocalNode(db, convertedKey)
 				bitV := bitfield.Bitvector4{byte(0x00)}
 				bitV.SetBitAt(0, true)
-				entry := enr.WithEntry(syncCommsSubnetEnrKey, bitV.Bytes())
+				entry := qnr.WithEntry(syncCommsSubnetQnrKey, bitV.Bytes())
 				localNode.Set(entry)
 				return localNode.Node().Record()
 			},

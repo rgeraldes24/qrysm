@@ -42,11 +42,11 @@ func (ns *Server) GetIdentity(ctx context.Context, _ *emptypb.Empty) (*zondpb.Id
 
 	peerId := ns.PeerManager.PeerID().String()
 
-	serializedEnr, err := p2p.SerializeENR(ns.PeerManager.ENR())
+	serializedQnr, err := p2p.SerializeQNR(ns.PeerManager.QNR())
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not obtain enr: %v", err)
+		return nil, status.Errorf(codes.Internal, "Could not obtain qnr: %v", err)
 	}
-	enr := "enr:" + serializedEnr
+	qnr := "qnr:" + serializedQnr
 
 	sourcep2p := ns.PeerManager.Host().Addrs()
 	p2pAddresses := make([]string, len(sourcep2p))
@@ -71,7 +71,7 @@ func (ns *Server) GetIdentity(ctx context.Context, _ *emptypb.Empty) (*zondpb.Id
 	return &zondpb.IdentityResponse{
 		Data: &zondpb.Identity{
 			PeerId:             peerId,
-			Enr:                enr,
+			Qnr:                qnr,
 			P2PAddresses:       p2pAddresses,
 			DiscoveryAddresses: discoveryAddresses,
 			Metadata:           meta,
@@ -89,16 +89,16 @@ func (ns *Server) GetPeer(ctx context.Context, req *zondpb.PeerRequest) (*zondpb
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid peer ID: %v", err)
 	}
-	enr, err := peerStatus.ENR(id)
+	qnr, err := peerStatus.QNR(id)
 	if err != nil {
 		if errors.Is(err, peerdata.ErrPeerUnknown) {
 			return nil, status.Error(codes.NotFound, "Peer not found")
 		}
-		return nil, status.Errorf(codes.Internal, "Could not obtain ENR: %v", err)
+		return nil, status.Errorf(codes.Internal, "Could not obtain QNR: %v", err)
 	}
-	serializedEnr, err := p2p.SerializeENR(enr)
+	serializedQnr, err := p2p.SerializeQNR(qnr)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not obtain ENR: %v", err)
+		return nil, status.Errorf(codes.Internal, "Could not obtain QNR: %v", err)
 	}
 	p2pAddress, err := peerStatus.Address(id)
 	if err != nil {
@@ -124,7 +124,7 @@ func (ns *Server) GetPeer(ctx context.Context, req *zondpb.PeerRequest) (*zondpb
 	return &zondpb.PeerResponse{
 		Data: &zondpb.Peer{
 			PeerId:             req.PeerId,
-			Enr:                "enr:" + serializedEnr,
+			Qnr:                "qnr:" + serializedQnr,
 			LastSeenP2PAddress: p2pAddress.String(),
 			State:              v1ConnState,
 			Direction:          v1PeerDirection,
@@ -312,18 +312,18 @@ func handleEmptyFilters(req *zondpb.PeersRequest) (emptyState, emptyDirection bo
 }
 
 func peerInfo(peerStatus *peers.Status, id peer.ID) (*zondpb.Peer, error) {
-	enr, err := peerStatus.ENR(id)
+	qnr, err := peerStatus.QNR(id)
 	if err != nil {
 		if errors.Is(err, peerdata.ErrPeerUnknown) {
 			return nil, nil
 		}
-		return nil, errors.Wrap(err, "could not obtain ENR")
+		return nil, errors.Wrap(err, "could not obtain QNR")
 	}
-	var serializedEnr string
-	if enr != nil {
-		serializedEnr, err = p2p.SerializeENR(enr)
+	var serializedQnr string
+	if qnr != nil {
+		serializedQnr, err = p2p.SerializeQNR(qnr)
 		if err != nil {
-			return nil, errors.Wrap(err, "could not serialize ENR")
+			return nil, errors.Wrap(err, "could not serialize QNR")
 		}
 	}
 	address, err := peerStatus.Address(id)
@@ -363,8 +363,8 @@ func peerInfo(peerStatus *peers.Status, id peer.ID) (*zondpb.Peer, error) {
 	if address != nil {
 		p.LastSeenP2PAddress = address.String()
 	}
-	if serializedEnr != "" {
-		p.Enr = "enr:" + serializedEnr
+	if serializedQnr != "" {
+		p.Qnr = "qnr:" + serializedQnr
 	}
 
 	return &p, nil

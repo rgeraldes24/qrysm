@@ -9,8 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
-	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/config/params"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/interop"
@@ -122,7 +122,7 @@ func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 }
 
 func checkRecipientBalance(c *rpc.Client, block, parent common.Hash, account common.Address) error {
-	web3 := zondclient.NewClient(c)
+	web3 := qrlclient.NewClient(c)
 	ctx := context.Background()
 	b, err := web3.BlockByHash(ctx, block)
 	if err != nil {

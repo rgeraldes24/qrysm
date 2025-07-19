@@ -18,8 +18,8 @@ import (
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/p2p/enode"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnode"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	"github.com/theQRL/qrysm/async"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/encoder"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
@@ -42,7 +42,7 @@ var _ runtime.Service = (*Service)(nil)
 // defined below.
 var pollingPeriod = 6 * time.Second
 
-// Refresh rate of ENR set at twice per slot.
+// Refresh rate of QNR set at twice per slot.
 var refreshRate = slots.DivideSlotBy(2)
 
 // maxBadResponses is the maximum number of bad responses from a peer before we stop talking to it.
@@ -217,7 +217,7 @@ func (s *Service) Start() {
 	}
 	// Initialize metadata according to the
 	// current epoch.
-	s.RefreshENR()
+	s.RefreshQNR()
 
 	// Periodic functions.
 	async.RunEvery(s.ctx, params.BeaconNetworkConfig().TtfbTimeout, func() {
@@ -225,7 +225,7 @@ func (s *Service) Start() {
 	})
 	async.RunEvery(s.ctx, 30*time.Minute, s.Peers().Prune)
 	async.RunEvery(s.ctx, params.BeaconNetworkConfig().RespTimeout, s.updateMetrics)
-	async.RunEvery(s.ctx, refreshRate, s.RefreshENR)
+	async.RunEvery(s.ctx, refreshRate, s.RefreshQNR)
 	async.RunEvery(s.ctx, 1*time.Minute, func() {
 		log.WithFields(logrus.Fields{
 			"inbound":     len(s.peers.InboundConnected()),
@@ -327,15 +327,15 @@ func (s *Service) Peers() *peers.Status {
 	return s.peers
 }
 
-// ENR returns the local node's current ENR.
-func (s *Service) ENR() *enr.Record {
+// QNR returns the local node's current QNR.
+func (s *Service) QNR() *qnr.Record {
 	if s.dv5Listener == nil {
 		return nil
 	}
 	return s.dv5Listener.Self().Record()
 }
 
-// DiscoveryAddresses represents our enr addresses as multiaddresses.
+// DiscoveryAddresses represents our qnr addresses as multiaddresses.
 func (s *Service) DiscoveryAddresses() ([]multiaddr.Multiaddr, error) {
 	if s.dv5Listener == nil {
 		return nil, nil
@@ -354,7 +354,7 @@ func (s *Service) MetadataSeq() uint64 {
 }
 
 // AddPingMethod adds the metadata ping rpc method to the p2p service, so that it can
-// be used to refresh ENR.
+// be used to refresh QNR.
 func (s *Service) AddPingMethod(reqFunc func(ctx context.Context, id peer.ID) error) {
 	s.pingMethod = reqFunc
 }
@@ -454,15 +454,15 @@ func (s *Service) connectWithPeer(ctx context.Context, info peer.AddrInfo) error
 }
 
 func (s *Service) connectToBootnodes() error {
-	nodes := make([]*enode.Node, 0, len(s.cfg.Discv5BootStrapAddr))
+	nodes := make([]*qnode.Node, 0, len(s.cfg.Discv5BootStrapAddr))
 	for _, addr := range s.cfg.Discv5BootStrapAddr {
-		bootNode, err := enode.Parse(enode.ValidSchemes, addr)
+		bootNode, err := qnode.Parse(qnode.ValidSchemes, addr)
 		if err != nil {
 			return err
 		}
 		// do not dial bootnodes with their tcp ports not set
-		if err := bootNode.Record().Load(enr.WithEntry("tcp", new(enr.TCP))); err != nil {
-			if !enr.IsNotFound(err) {
+		if err := bootNode.Record().Load(qnr.WithEntry("tcp", new(qnr.TCP))); err != nil {
+			if !qnr.IsNotFound(err) {
 				log.WithError(err).Error("Could not retrieve tcp port")
 			}
 			continue

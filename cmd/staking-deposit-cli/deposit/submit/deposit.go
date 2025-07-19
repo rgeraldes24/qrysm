@@ -15,8 +15,8 @@ import (
 	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
-	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/cmd"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/deposit/flags"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
@@ -57,8 +57,8 @@ func submitDeposits(cliCtx *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to connect to the zond provider. reason: %v", err)
 	}
-	zondCli := zondclient.NewClient(rpcClient)
-	chainID, err := zondCli.ChainID(cliCtx.Context)
+	qrlCli := qrlclient.NewClient(rpcClient)
+	chainID, err := qrlCli.ChainID(cliCtx.Context)
 	if err != nil {
 		return fmt.Errorf("failed to retrieve the chain ID. reason: %v", err)
 	}
@@ -66,7 +66,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	contract, err := deposit.NewDepositContract(contractAddr, zondCli)
+	contract, err := deposit.NewDepositContract(contractAddr, qrlCli)
 	if err != nil {
 		return fmt.Errorf("failed to create a new instance of the deposit contract. reason: %v", err)
 	}
@@ -88,7 +88,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 		return fmt.Errorf("failed to generate the deposit key from the signing seed. reason: %v", err)
 	}
 
-	gasTip, err := zondCli.SuggestGasTipCap(cliCtx.Context)
+	gasTip, err := qrlCli.SuggestGasTipCap(cliCtx.Context)
 	if err != nil {
 		return fmt.Errorf("failed to get gas tip suggestion. reason: %v", err)
 	}

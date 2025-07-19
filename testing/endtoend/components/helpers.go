@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond/zondclient"
+	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/qrysm/io/file"
 	e2etypes "github.com/theQRL/qrysm/testing/endtoend/types"
 )
 
-// NetworkId is the ID of the Zond chain.
+// NetworkId is the ID of the QRL chain.
 const NetworkId = 1337
 
 const timeGapPerMiningTX = 250 * time.Millisecond
@@ -28,7 +28,7 @@ var _ e2etypes.MultipleComponentRunners = (*ProxySet)(nil)
 var _ e2etypes.EngineProxy = (*Proxy)(nil)
 
 // WaitForBlocks waits for a certain amount of blocks to be included before returning.
-func WaitForBlocks(web3 *zondclient.Client, blocksToWait uint64) error {
+func WaitForBlocks(web3 *qrlclient.Client, blocksToWait uint64) error {
 	block, err := web3.BlockByNumber(context.Background(), nil)
 	if err != nil {
 		return err

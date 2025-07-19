@@ -161,6 +161,6 @@ type EngineProxy interface {
 // of a group of beacon nodes.
 type BeaconNodeSet interface {
 	ComponentRunner
-	// SetENR provides the relevant bootnode's enr to the beacon nodes.
-	SetENR(enr string)
+	// SetQNR provides the relevant bootnode's qnr to the beacon nodes.
+	SetQNR(qnr string)
 }

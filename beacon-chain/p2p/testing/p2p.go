@@ -21,7 +21,7 @@ import (
 	"github.com/multiformats/go-multiaddr"
 	ssz "github.com/prysmaticlabs/fastssz"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/encoder"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/scorers"
@@ -251,9 +251,9 @@ func (p *TestP2P) Host() host.Host {
 	return p.BHost
 }
 
-// ENR returns the enr of the local peer.
-func (_ *TestP2P) ENR() *enr.Record {
-	return new(enr.Record)
+// QNR returns the qnr of the local peer.
+func (_ *TestP2P) QNR() *qnr.Record {
+	return new(qnr.Record)
 }
 
 // DiscoveryAddresses --
@@ -267,7 +267,7 @@ func (p *TestP2P) AddConnectionHandler(f, _ func(ctx context.Context, id peer.ID
 		ConnectedF: func(net network.Network, conn network.Conn) {
 			// Must be handled in a goroutine as this callback cannot be blocking.
 			go func() {
-				p.peers.Add(new(enr.Record), conn.RemotePeer(), conn.RemoteMultiaddr(), conn.Stat().Direction)
+				p.peers.Add(new(qnr.Record), conn.RemotePeer(), conn.RemoteMultiaddr(), conn.Stat().Direction)
 				ctx := context.Background()
 
 				p.peers.SetConnectionState(conn.RemotePeer(), peers.PeerConnecting)
@@ -353,8 +353,8 @@ func (_ *TestP2P) FindPeersWithSubnet(_ context.Context, _ string, _ uint64, _ i
 	return false, nil
 }
 
-// RefreshENR mocks the p2p func.
-func (_ *TestP2P) RefreshENR() {}
+// RefreshQNR mocks the p2p func.
+func (_ *TestP2P) RefreshQNR() {}
 
 // ForkDigest mocks the p2p func.
 func (p *TestP2P) ForkDigest() ([4]byte, error) {

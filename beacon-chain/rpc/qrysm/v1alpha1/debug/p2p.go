@@ -58,15 +58,15 @@ func (ds *Server) getPeer(pid peer.ID) (*zondpb.DebugPeerResponse, error) {
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Requested peer does not exist: %v", err)
 	}
-	record, err := peers.ENR(pid)
+	record, err := peers.QNR(pid)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Requested peer does not exist: %v", err)
 	}
-	enr := ""
+	qnr := ""
 	if record != nil {
-		enr, err = p2p.SerializeENR(record)
+		qnr, err = p2p.SerializeQNR(record)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Unable to serialize enr: %v", err)
+			return nil, status.Errorf(codes.Internal, "Unable to serialize qnr: %v", err)
 		}
 	}
 	metadata, err := peers.Metadata(pid)
@@ -151,7 +151,7 @@ func (ds *Server) getPeer(pid peer.ID) (*zondpb.DebugPeerResponse, error) {
 		Direction:          pbDirection,
 		ConnectionState:    zondpb.ConnectionState(connState),
 		PeerId:             pid.String(),
-		Enr:                enr,
+		Qnr:                qnr,
 		PeerInfo:           peerInfo,
 		PeerStatus:         pStatus,
 		LastUpdated:        unixTime,

@@ -1,5 +1,5 @@
 // This binary is a simple rest API endpoint to calculate
-// the ENR value of a node given its private key,ip address and port.
+// the QNR value of a node given its private key,ip address and port.
 package main
 
 import (
@@ -9,19 +9,19 @@ import (
 
 	"github.com/libp2p/go-libp2p/core/crypto"
 	log "github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/p2p/enode"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnode"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	ecdsaqrysm "github.com/theQRL/qrysm/crypto/ecdsa"
 	"github.com/theQRL/qrysm/io/file"
 	_ "github.com/theQRL/qrysm/runtime/maxprocs"
 )
 
 var (
-	privateKey = flag.String("private", "", "Hex encoded Private key to use for calculation of ENR")
-	udpPort    = flag.Int("udp-port", 0, "UDP Port to use for calculation of ENR")
-	tcpPort    = flag.Int("tcp-port", 0, "TCP Port to use for calculation of ENR")
-	ipAddr     = flag.String("ipAddress", "", "IP to use in calculation of ENR")
-	outfile    = flag.String("out", "", "Filepath to write ENR")
+	privateKey = flag.String("private", "", "Hex encoded Private key to use for calculation of QNR")
+	udpPort    = flag.Int("udp-port", 0, "UDP Port to use for calculation of QNR")
+	tcpPort    = flag.Int("tcp-port", 0, "TCP Port to use for calculation of QNR")
+	ipAddr     = flag.String("ipAddress", "", "IP to use in calculation of QNR")
+	outfile    = flag.String("out", "", "Filepath to write QNR")
 )
 
 func main() {
@@ -52,20 +52,20 @@ func main() {
 		return
 	}
 
-	db, err := enode.OpenDB("")
+	db, err := qnode.OpenDB("")
 	if err != nil {
 		log.WithError(err).Fatal("Could not open node's peer database")
 		return
 	}
 	defer db.Close()
 
-	localNode := enode.NewLocalNode(db, ecdsaPrivKey)
-	ipEntry := enr.IP(net.ParseIP(*ipAddr))
-	udpEntry := enr.UDP(*udpPort)
+	localNode := qnode.NewLocalNode(db, ecdsaPrivKey)
+	ipEntry := qnr.IP(net.ParseIP(*ipAddr))
+	udpEntry := qnr.UDP(*udpPort)
 	localNode.Set(ipEntry)
 	localNode.Set(udpEntry)
 	if *tcpPort != 0 {
-		tcpEntry := enr.TCP(*tcpPort)
+		tcpEntry := qnr.TCP(*tcpPort)
 		localNode.Set(tcpEntry)
 	}
 	log.Info(localNode.Node().String())

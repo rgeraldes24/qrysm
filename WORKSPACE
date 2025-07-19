@@ -317,7 +317,7 @@ http_archive(
 
 # TODO(now.youtrack.cloud/issue/TQ-17)
 #http_archive(
-#    name = "zond_networks",
+#    name = "qrl_networks",
 #    build_file_content = """
 #filegroup(
 #    name = "configs",

@@ -112,8 +112,8 @@ message DebugPeerResponse {
     theqrl.zond.v1alpha1.ConnectionState connection_state = 3;
     // Peer ID of peer.
     string peer_id = 4;
-    // ENR of peer at the current moment.
-    string enr = 5;
+    // QNR of peer at the current moment.
+    string qnr = 5;
     // Peer Info of the peer containing all relevant metadata.
     PeerInfo peer_info = 6;
     // Peer Status of the peer.

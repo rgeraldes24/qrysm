@@ -175,7 +175,7 @@ type Identity struct {
 	unknownFields protoimpl.UnknownFields
 
 	PeerId             string    `protobuf:"bytes,1,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
-	Enr                string    `protobuf:"bytes,2,opt,name=enr,proto3" json:"enr,omitempty"`
+	Qnr                string    `protobuf:"bytes,2,opt,name=qnr,proto3" json:"qnr,omitempty"`
 	P2PAddresses       []string  `protobuf:"bytes,3,rep,name=p2p_addresses,json=p2pAddresses,proto3" json:"p2p_addresses,omitempty"`
 	DiscoveryAddresses []string  `protobuf:"bytes,4,rep,name=discovery_addresses,json=discoveryAddresses,proto3" json:"discovery_addresses,omitempty"`
 	Metadata           *Metadata `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
@@ -220,9 +220,9 @@ func (x *Identity) GetPeerId() string {
 	return ""
 }
 
-func (x *Identity) GetEnr() string {
+func (x *Identity) GetQnr() string {
 	if x != nil {
-		return x.Enr
+		return x.Qnr
 	}
 	return ""
 }
@@ -560,7 +560,7 @@ type Peer struct {
 	unknownFields protoimpl.UnknownFields
 
 	PeerId             string          `protobuf:"bytes,1,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
-	Enr                string          `protobuf:"bytes,2,opt,name=enr,proto3" json:"enr,omitempty"`
+	Qnr                string          `protobuf:"bytes,2,opt,name=qnr,proto3" json:"qnr,omitempty"`
 	LastSeenP2PAddress string          `protobuf:"bytes,3,opt,name=last_seen_p2p_address,json=lastSeenP2pAddress,proto3" json:"last_seen_p2p_address,omitempty"`
 	State              ConnectionState `protobuf:"varint,4,opt,name=state,proto3,enum=theqrl.zond.v1.ConnectionState" json:"state,omitempty"`
 	Direction          PeerDirection   `protobuf:"varint,5,opt,name=direction,proto3,enum=theqrl.zond.v1.PeerDirection" json:"direction,omitempty"`
@@ -605,9 +605,9 @@ func (x *Peer) GetPeerId() string {
 	return ""
 }
 
-func (x *Peer) GetEnr() string {
+func (x *Peer) GetQnr() string {
 	if x != nil {
-		return x.Enr
+		return x.Qnr
 	}
 	return ""
 }

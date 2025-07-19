@@ -11,7 +11,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/protocol"
 	gcache "github.com/patrickmn/go-cache"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
@@ -406,7 +406,7 @@ func TestRegularSyncBeaconBlockSubscriber_ProcessPendingBlocks_2Chains(t *testin
 	}
 	r.initCaches()
 
-	p1.Peers().Add(new(enr.Record), p2.PeerID(), nil, network.DirOutbound)
+	p1.Peers().Add(new(qnr.Record), p2.PeerID(), nil, network.DirOutbound)
 	p1.Peers().SetConnectionState(p2.PeerID(), peers.PeerConnected)
 	p1.Peers().SetChainState(p2.PeerID(), &zondpb.Status{})
 
@@ -505,7 +505,7 @@ func TestRegularSyncBeaconBlockSubscriber_PruneOldPendingBlocks(t *testing.T) {
 	}
 	r.initCaches()
 
-	p1.Peers().Add(new(enr.Record), p1.PeerID(), nil, network.DirOutbound)
+	p1.Peers().Add(new(qnr.Record), p1.PeerID(), nil, network.DirOutbound)
 	p1.Peers().SetConnectionState(p1.PeerID(), peers.PeerConnected)
 	p1.Peers().SetChainState(p1.PeerID(), &zondpb.Status{})
 
@@ -611,7 +611,7 @@ func TestService_BatchRootRequest(t *testing.T) {
 	}
 	r.initCaches()
 
-	p1.Peers().Add(new(enr.Record), p2.PeerID(), nil, network.DirOutbound)
+	p1.Peers().Add(new(qnr.Record), p2.PeerID(), nil, network.DirOutbound)
 	p1.Peers().SetConnectionState(p2.PeerID(), peers.PeerConnected)
 	p1.Peers().SetChainState(p2.PeerID(), &zondpb.Status{FinalizedEpoch: 2})
 

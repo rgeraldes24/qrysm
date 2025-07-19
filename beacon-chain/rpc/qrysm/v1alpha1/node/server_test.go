@@ -8,7 +8,7 @@ import (
 
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/crypto"
-	"github.com/theQRL/go-zond/p2p/enode"
+	"github.com/theQRL/go-zond/p2p/qnode"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	dbutil "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
@@ -99,14 +99,14 @@ func TestNodeServer_GetHost(t *testing.T) {
 	mP2P := mockP2p.NewTestP2P(t)
 	key, err := crypto.GenerateKey()
 	require.NoError(t, err)
-	db, err := enode.OpenDB("")
+	db, err := qnode.OpenDB("")
 	require.NoError(t, err)
-	lNode := enode.NewLocalNode(db, key)
+	lNode := qnode.NewLocalNode(db, key)
 	record := lNode.Node().Record()
-	stringENR, err := p2p.SerializeENR(record)
+	stringQNR, err := p2p.SerializeQNR(record)
 	require.NoError(t, err)
 	ns := &Server{
-		PeerManager:  &mockP2p.MockPeerManager{BHost: mP2P.BHost, Enr: record, PID: mP2P.BHost.ID()},
+		PeerManager:  &mockP2p.MockPeerManager{BHost: mP2P.BHost, Qnr: record, PID: mP2P.BHost.ID()},
 		PeersFetcher: peersProvider,
 	}
 	zondpb.RegisterNodeServer(server, ns)
@@ -114,7 +114,7 @@ func TestNodeServer_GetHost(t *testing.T) {
 	h, err := ns.GetHost(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 	assert.Equal(t, mP2P.PeerID().String(), h.PeerId)
-	assert.Equal(t, stringENR, h.Enr)
+	assert.Equal(t, stringQNR, h.Qnr)
 }
 
 func TestNodeServer_GetPeer(t *testing.T) {

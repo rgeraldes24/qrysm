@@ -26,7 +26,7 @@ message BeaconBlocksByRangeRequest {
   uint64 step = 3;
 }
 
-message ENRForkID {
+message QNRForkID {
   bytes current_fork_digest = 1 [(theqrl.zond.ext.ssz_size) = "4"];
   bytes next_fork_version = 2 [(theqrl.zond.ext.ssz_size) = "4"];
   uint64 next_fork_epoch = 3 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Epoch"];

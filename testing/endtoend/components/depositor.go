@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/go-zond/accounts/keystore"
 	"github.com/theQRL/go-zond/common"
 	gzondtypes "github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/go-zond/zondclient"
+	"github.com/theQRL/go-zond/qrlclient"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	contracts "github.com/theQRL/qrysm/contracts/deposit"
@@ -72,7 +72,7 @@ type Depositor struct {
 	// This allows other components or e2e set up code to block until its Start method has been called.
 	types.EmptyComponent
 	Key       *keystore.Key
-	Client    *zondclient.Client
+	Client    *qrlclient.Client
 	ChainID   *big.Int
 	NetworkId *big.Int
 	cd        *contracts.DepositContract

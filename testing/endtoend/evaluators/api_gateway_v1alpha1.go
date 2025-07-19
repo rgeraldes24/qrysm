@@ -55,7 +55,7 @@ func withComparePeers(beaconNodeIdx int, conn *grpc.ClientConn) error {
 		Direction       string `json:"direction"`
 		ConnectionState string `json:"connectionState"`
 		PeerId          string `json:"peerId"`
-		Enr             string `json:"enr"`
+		Qnr             string `json:"qnr"`
 	}
 	type peersResponseJSON struct {
 		Peers []*peerJSON `json:"peers"`
@@ -126,12 +126,12 @@ func withComparePeers(beaconNodeIdx int, conn *grpc.ClientConn) error {
 				grpcPeer.PeerId,
 			)
 		}
-		if peer.Enr != grpcPeer.Enr {
+		if peer.Qnr != grpcPeer.Qnr {
 			return fmt.Errorf(
-				"HTTP gateway peer %s with enr %s does not match gRPC %s",
+				"HTTP gateway peer %s with qnr %s does not match gRPC %s",
 				id,
-				peer.Enr,
-				grpcPeer.Enr,
+				peer.Qnr,
+				grpcPeer.Qnr,
 			)
 		}
 	}

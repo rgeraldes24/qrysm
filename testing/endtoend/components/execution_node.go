@@ -13,8 +13,8 @@ import (
 
 	"github.com/bazelbuild/rules_go/go/tools/bazel"
 	"github.com/pkg/errors"
+	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
-	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/runtime/interop"
@@ -127,7 +127,7 @@ type ExecutionNode struct {
 	e2etypes.ComponentRunner
 	started chan struct{}
 	index   int
-	enr     string
+	qnr     string
 	cmd     *exec.Cmd
 }
 
@@ -193,7 +193,7 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 		fmt.Sprintf("--http.port=%d", e2e.TestParams.Ports.GzondExecutionNodeRPCPort+node.index),
 		fmt.Sprintf("--ws.port=%d", e2e.TestParams.Ports.GzondExecutionNodeWSPort+node.index),
 		fmt.Sprintf("--authrpc.port=%d", e2e.TestParams.Ports.GzondExecutionNodeAuthRPCPort+node.index),
-		fmt.Sprintf("--bootnodes=%s", node.enr),
+		fmt.Sprintf("--bootnodes=%s", node.qnr),
 		fmt.Sprintf("--port=%d", e2e.TestParams.Ports.GzondExecutionNodePort+node.index),
 		fmt.Sprintf("--networkid=%d", NetworkId),
 		"--http",
@@ -242,7 +242,7 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 				return fmt.Errorf("failed to connect to ipc: %w", err)
 			}
 
-			web3 := zondclient.NewClient(client)
+			web3 := qrlclient.NewClient(client)
 			block, err := web3.BlockByNumber(ctx, nil)
 			if err != nil {
 				return err
@@ -263,7 +263,7 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 	return node.cmd.Wait()
 }
 
-// Started checks whether zond node is started and ready to be queried.
+// Started checks whether qrl execution node is started and ready to be queried.
 func (node *ExecutionNode) Started() <-chan struct{} {
 	return node.started
 }

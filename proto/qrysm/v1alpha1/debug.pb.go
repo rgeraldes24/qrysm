@@ -356,7 +356,7 @@ type DebugPeerResponse struct {
 	Direction          PeerDirection               `protobuf:"varint,2,opt,name=direction,proto3,enum=theqrl.zond.v1alpha1.PeerDirection" json:"direction,omitempty"`
 	ConnectionState    ConnectionState             `protobuf:"varint,3,opt,name=connection_state,json=connectionState,proto3,enum=theqrl.zond.v1alpha1.ConnectionState" json:"connection_state,omitempty"`
 	PeerId             string                      `protobuf:"bytes,4,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
-	Enr                string                      `protobuf:"bytes,5,opt,name=enr,proto3" json:"enr,omitempty"`
+	Qnr                string                      `protobuf:"bytes,5,opt,name=qnr,proto3" json:"qnr,omitempty"`
 	PeerInfo           *DebugPeerResponse_PeerInfo `protobuf:"bytes,6,opt,name=peer_info,json=peerInfo,proto3" json:"peer_info,omitempty"`
 	PeerStatus         *Status                     `protobuf:"bytes,7,opt,name=peer_status,json=peerStatus,proto3" json:"peer_status,omitempty"`
 	LastUpdated        uint64                      `protobuf:"varint,8,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
@@ -423,9 +423,9 @@ func (x *DebugPeerResponse) GetPeerId() string {
 	return ""
 }
 
-func (x *DebugPeerResponse) GetEnr() string {
+func (x *DebugPeerResponse) GetQnr() string {
 	if x != nil {
-		return x.Enr
+		return x.Qnr
 	}
 	return ""
 }

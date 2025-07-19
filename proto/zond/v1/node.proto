@@ -33,8 +33,8 @@ message IdentityResponse {
 message Identity {
   // The peer id of the node.
   string peer_id = 1;
-  // The latest ENR of the node.
-  string enr = 2;
+  // The latest QNR of the node.
+  string qnr = 2;
   // All the p2p multiaddresses of the peer, specified as a full multiaddr.
   repeated string p2p_addresses = 3;
   // All the discv5 multiaddresses of the peer, specified as a full multiaddr.
@@ -95,8 +95,8 @@ message PeerCountResponse {
 message Peer {
   // The peer id of the peer.
   string peer_id = 1;
-  // The latest ENR of the peer that's in the record.
-  string enr = 2;
+  // The latest QNR of the peer that's in the record.
+  string qnr = 2;
   // The address of the peer, as a full multiaddr, for example:
   // /ip4/37.221.192.134/tcp/13000/p2p/16Uiu2HAm8maLMjag1TAUM52zPfmLbVMGFdwUAWgoHu1HDQLR6e17
   string last_seen_p2p_address = 3;

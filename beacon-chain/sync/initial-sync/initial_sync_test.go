@@ -11,7 +11,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	dbtest "github.com/theQRL/qrysm/beacon-chain/db/testing"
@@ -226,7 +226,7 @@ func connectPeer(t *testing.T, host *p2pt.TestP2P, datum *peerData, peerStatus *
 
 	p.Connect(host)
 
-	peerStatus.Add(new(enr.Record), p.PeerID(), nil, network.DirOutbound)
+	peerStatus.Add(new(qnr.Record), p.PeerID(), nil, network.DirOutbound)
 	peerStatus.SetConnectionState(p.PeerID(), peers.PeerConnected)
 	peerStatus.SetChainState(p.PeerID(), &zondpb.Status{
 		ForkDigest:     params.BeaconConfig().GenesisForkVersion,
@@ -324,7 +324,7 @@ func connectPeerHavingBlocks(
 	headRoot, err := blks[len(blks)-1].Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	peerStatus.Add(new(enr.Record), p.PeerID(), nil, network.DirOutbound)
+	peerStatus.Add(new(qnr.Record), p.PeerID(), nil, network.DirOutbound)
 	peerStatus.SetConnectionState(p.PeerID(), peers.PeerConnected)
 	peerStatus.SetChainState(p.PeerID(), &zondpb.Status{
 		ForkDigest:     params.BeaconConfig().GenesisForkVersion,

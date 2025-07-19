@@ -5786,13 +5786,13 @@ func (b *BeaconBlocksByRangeRequest) HashTreeRootWith(hh *ssz.Hasher) (err error
 	return
 }
 
-// MarshalSSZ ssz marshals the ENRForkID object
-func (e *ENRForkID) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the QNRForkID object
+func (e *QNRForkID) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(e)
 }
 
-// MarshalSSZTo ssz marshals the ENRForkID object to a target array
-func (e *ENRForkID) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the QNRForkID object to a target array
+func (e *QNRForkID) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 
 	// Field (0) 'CurrentForkDigest'
@@ -5815,8 +5815,8 @@ func (e *ENRForkID) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the ENRForkID object
-func (e *ENRForkID) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the QNRForkID object
+func (e *QNRForkID) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size != 16 {
@@ -5841,19 +5841,19 @@ func (e *ENRForkID) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the ENRForkID object
-func (e *ENRForkID) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the QNRForkID object
+func (e *QNRForkID) SizeSSZ() (size int) {
 	size = 16
 	return
 }
 
-// HashTreeRoot ssz hashes the ENRForkID object
-func (e *ENRForkID) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the QNRForkID object
+func (e *QNRForkID) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(e)
 }
 
-// HashTreeRootWith ssz hashes the ENRForkID object with a hasher
-func (e *ENRForkID) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the QNRForkID object with a hasher
+func (e *QNRForkID) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'CurrentForkDigest'

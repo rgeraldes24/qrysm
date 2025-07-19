@@ -167,7 +167,7 @@ func (x *BeaconBlocksByRangeRequest) GetStep() uint64 {
 	return 0
 }
 
-type ENRForkID struct {
+type QNRForkID struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -177,8 +177,8 @@ type ENRForkID struct {
 	NextForkEpoch     github_com_theQRL_qrysm_consensus_types_primitives.Epoch `protobuf:"varint,3,opt,name=next_fork_epoch,json=nextForkEpoch,proto3" json:"next_fork_epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
 }
 
-func (x *ENRForkID) Reset() {
-	*x = ENRForkID{}
+func (x *QNRForkID) Reset() {
+	*x = QNRForkID{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -186,13 +186,13 @@ func (x *ENRForkID) Reset() {
 	}
 }
 
-func (x *ENRForkID) String() string {
+func (x *QNRForkID) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ENRForkID) ProtoMessage() {}
+func (*QNRForkID) ProtoMessage() {}
 
-func (x *ENRForkID) ProtoReflect() protoreflect.Message {
+func (x *QNRForkID) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -204,26 +204,26 @@ func (x *ENRForkID) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ENRForkID.ProtoReflect.Descriptor instead.
-func (*ENRForkID) Descriptor() ([]byte, []int) {
+// Deprecated: Use QNRForkID.ProtoReflect.Descriptor instead.
+func (*QNRForkID) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ENRForkID) GetCurrentForkDigest() []byte {
+func (x *QNRForkID) GetCurrentForkDigest() []byte {
 	if x != nil {
 		return x.CurrentForkDigest
 	}
 	return nil
 }
 
-func (x *ENRForkID) GetNextForkVersion() []byte {
+func (x *QNRForkID) GetNextForkVersion() []byte {
 	if x != nil {
 		return x.NextForkVersion
 	}
 	return nil
 }
 
-func (x *ENRForkID) GetNextForkEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
+func (x *QNRForkID) GetNextForkEpoch() github_com_theQRL_qrysm_consensus_types_primitives.Epoch {
 	if x != nil {
 		return x.NextForkEpoch
 	}
@@ -452,7 +452,7 @@ var file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes = make([]protoimpl.Mes
 var file_proto_qrysm_v1alpha1_p2p_messages_proto_goTypes = []interface{}{
 	(*Status)(nil),                     // 0: theqrl.zond.v1alpha1.Status
 	(*BeaconBlocksByRangeRequest)(nil), // 1: theqrl.zond.v1alpha1.BeaconBlocksByRangeRequest
-	(*ENRForkID)(nil),                  // 2: theqrl.zond.v1alpha1.ENRForkID
+	(*QNRForkID)(nil),                  // 2: theqrl.zond.v1alpha1.QNRForkID
 	(*MetaDataV0)(nil),                 // 3: theqrl.zond.v1alpha1.MetaDataV0
 	(*MetaDataV1)(nil),                 // 4: theqrl.zond.v1alpha1.MetaDataV1
 }
@@ -495,7 +495,7 @@ func file_proto_qrysm_v1alpha1_p2p_messages_proto_init() {
 			}
 		}
 		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ENRForkID); i {
+			switch v := v.(*QNRForkID); i {
 			case 0:
 				return &v.state
 			case 1:

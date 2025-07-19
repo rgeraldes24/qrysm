@@ -11,7 +11,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/peer"
 	ma "github.com/multiformats/go-multiaddr"
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/peerdata"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/scorers"
@@ -55,7 +55,7 @@ func TestPeerExplicitAdd(t *testing.T) {
 	address, err := ma.NewMultiaddr("/ip4/213.202.254.180/tcp/13000")
 	require.NoError(t, err, "Failed to create address")
 	direction := network.DirInbound
-	p.Add(new(enr.Record), id, address, direction)
+	p.Add(new(qnr.Record), id, address, direction)
 
 	resAddress, err := p.Address(id)
 	require.NoError(t, err)
@@ -69,7 +69,7 @@ func TestPeerExplicitAdd(t *testing.T) {
 	address2, err := ma.NewMultiaddr("/ip4/52.23.23.253/tcp/30000/ipfs/QmfAgkmjiZNZhr2wFN9TwaRgHouMTBT6HELyzE5A3BT2wK/p2p-circuit")
 	require.NoError(t, err)
 	direction2 := network.DirOutbound
-	p.Add(new(enr.Record), id, address2, direction2)
+	p.Add(new(qnr.Record), id, address2, direction2)
 
 	resAddress2, err := p.Address(id)
 	require.NoError(t, err)
@@ -80,7 +80,7 @@ func TestPeerExplicitAdd(t *testing.T) {
 	assert.Equal(t, direction2, resDirection2, "Unexpected direction")
 }
 
-func TestPeerNoENR(t *testing.T) {
+func TestPeerNoQNR(t *testing.T) {
 	maxBadResponses := 2
 	p := peers.NewStatus(context.Background(), &peers.StatusConfig{
 		PeerLimit: 30,
@@ -98,13 +98,13 @@ func TestPeerNoENR(t *testing.T) {
 	direction := network.DirInbound
 	p.Add(nil, id, address, direction)
 
-	retrievedENR, err := p.ENR(id)
+	retrievedQNR, err := p.QNR(id)
 	require.NoError(t, err, "Could not retrieve chainstate")
-	var nilENR *enr.Record
-	assert.Equal(t, nilENR, retrievedENR, "Wanted a nil enr to be saved")
+	var nilQNR *qnr.Record
+	assert.Equal(t, nilQNR, retrievedQNR, "Wanted a nil qnr to be saved")
 }
 
-func TestPeerNoOverwriteENR(t *testing.T) {
+func TestPeerNoOverwriteQNR(t *testing.T) {
 	maxBadResponses := 2
 	p := peers.NewStatus(context.Background(), &peers.StatusConfig{
 		PeerLimit: 30,
@@ -120,15 +120,15 @@ func TestPeerNoOverwriteENR(t *testing.T) {
 	address, err := ma.NewMultiaddr("/ip4/213.202.254.180/tcp/13000")
 	require.NoError(t, err, "Failed to create address")
 	direction := network.DirInbound
-	record := new(enr.Record)
-	record.Set(enr.WithEntry("test", []byte{'a'}))
+	record := new(qnr.Record)
+	record.Set(qnr.WithEntry("test", []byte{'a'}))
 	p.Add(record, id, address, direction)
 	// try to overwrite
 	p.Add(nil, id, address, direction)
 
-	retrievedENR, err := p.ENR(id)
+	retrievedQNR, err := p.QNR(id)
 	require.NoError(t, err, "Could not retrieve chainstate")
-	require.NotNil(t, retrievedENR, "Wanted a non-nil enr")
+	require.NotNil(t, retrievedQNR, "Wanted a non-nil qnr")
 }
 
 func TestErrUnknownPeer(t *testing.T) {
@@ -180,8 +180,8 @@ func TestPeerCommitteeIndices(t *testing.T) {
 	address, err := ma.NewMultiaddr("/ip4/213.202.254.180/tcp/13000")
 	require.NoError(t, err, "Failed to create address")
 	direction := network.DirInbound
-	record := new(enr.Record)
-	record.Set(enr.WithEntry("test", []byte{'a'}))
+	record := new(qnr.Record)
+	record.Set(qnr.WithEntry("test", []byte{'a'}))
 	p.Add(record, id, address, direction)
 	bitV := bitfield.NewBitvector64()
 	for i := 0; i < 64; i++ {
@@ -284,7 +284,7 @@ func TestPeerChainState(t *testing.T) {
 	address, err := ma.NewMultiaddr("/ip4/213.202.254.180/tcp/13000")
 	require.NoError(t, err, "Failed to create address")
 	direction := network.DirInbound
-	p.Add(new(enr.Record), id, address, direction)
+	p.Add(new(qnr.Record), id, address, direction)
 
 	oldChainStartLastUpdated, err := p.ChainStateLastUpdated(id)
 	require.NoError(t, err)
@@ -319,7 +319,7 @@ func TestPeerWithNilChainState(t *testing.T) {
 	address, err := ma.NewMultiaddr("/ip4/213.202.254.180/tcp/13000")
 	require.NoError(t, err, "Failed to create address")
 	direction := network.DirInbound
-	p.Add(new(enr.Record), id, address, direction)
+	p.Add(new(qnr.Record), id, address, direction)
 
 	p.SetChainState(id, nil)
 
@@ -352,7 +352,7 @@ func TestPeerBadResponses(t *testing.T) {
 	address, err := ma.NewMultiaddr("/ip4/213.202.254.180/tcp/13000")
 	require.NoError(t, err, "Failed to create address")
 	direction := network.DirInbound
-	p.Add(new(enr.Record), id, address, direction)
+	p.Add(new(qnr.Record), id, address, direction)
 
 	scorer := p.Scorers().BadResponsesScorer()
 	resBadResponses, err := scorer.Count(id)
@@ -1027,7 +1027,7 @@ func TestBestFinalized_returnsMaxValue(t *testing.T) {
 	})
 
 	for i := 0; i <= maxPeers+100; i++ {
-		p.Add(new(enr.Record), peer.ID(rune(i)), nil, network.DirOutbound)
+		p.Add(new(qnr.Record), peer.ID(rune(i)), nil, network.DirOutbound)
 		p.SetConnectionState(peer.ID(rune(i)), peers.PeerConnected)
 		p.SetChainState(peer.ID(rune(i)), &pb.Status{
 			FinalizedEpoch: 10,
@@ -1050,7 +1050,7 @@ func TestStatus_BestNonFinalized(t *testing.T) {
 
 	peerSlots := []primitives.Slot{128, 128, 128, 128, 939, 931, 1031, 1071, 1079}
 	for i, headSlot := range peerSlots {
-		p.Add(new(enr.Record), peer.ID(rune(i)), nil, network.DirOutbound)
+		p.Add(new(qnr.Record), peer.ID(rune(i)), nil, network.DirOutbound)
 		p.SetConnectionState(peer.ID(rune(i)), peers.PeerConnected)
 		p.SetChainState(peer.ID(rune(i)), &pb.Status{
 			HeadSlot: headSlot,
@@ -1140,7 +1140,7 @@ func addPeer(t *testing.T, p *peers.Status, state peerdata.PeerConnectionState) 
 	mhBytes = append(mhBytes, idBytes...)
 	id, err := peer.IDFromBytes(mhBytes)
 	require.NoError(t, err)
-	p.Add(new(enr.Record), id, nil, network.DirUnknown)
+	p.Add(new(qnr.Record), id, nil, network.DirUnknown)
 	p.SetConnectionState(id, state)
 	p.SetMetadata(id, wrapper.WrappedMetadataV0(&pb.MetaDataV0{
 		SeqNumber: 0,
@@ -1158,7 +1158,7 @@ func createPeer(t *testing.T, p *peers.Status, addr ma.Multiaddr,
 	mhBytes = append(mhBytes, idBytes...)
 	id, err := peer.IDFromBytes(mhBytes)
 	require.NoError(t, err)
-	p.Add(new(enr.Record), id, addr, dir)
+	p.Add(new(qnr.Record), id, addr, dir)
 	p.SetConnectionState(id, state)
 	return id
 }

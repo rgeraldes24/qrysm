@@ -9,7 +9,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multiaddr"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/encoder"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -79,9 +79,9 @@ type PeerManager interface {
 	Disconnect(peer.ID) error
 	PeerID() peer.ID
 	Host() host.Host
-	ENR() *enr.Record
+	QNR() *qnr.Record
 	DiscoveryAddresses() ([]multiaddr.Multiaddr, error)
-	RefreshENR()
+	RefreshQNR()
 	FindPeersWithSubnet(ctx context.Context, topic string, subIndex uint64, threshold int) (bool, error)
 	AddPingMethod(reqFunc func(ctx context.Context, id peer.ID) error)
 }

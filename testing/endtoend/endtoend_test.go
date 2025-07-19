@@ -264,9 +264,9 @@ func (r *testRunner) waitForMatchingHead(ctx context.Context, timeout time.Durat
 }
 
 /*
-func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, i int, conns []*grpc.ClientConn, bnAPI, enr, minerEnr string) error {
+func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, i int, conns []*grpc.ClientConn, bnAPI, qnr, minerQnr string) error {
 	matchTimeout := 3 * time.Minute
-	zondNode := zondcomp.NewNode(i, minerEnr)
+	zondNode := zondcomp.NewNode(i, minerQnr)
 	g.Go(func() error {
 		return zondNode.Start(ctx)
 	})
@@ -302,7 +302,7 @@ func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, 
 	cfgcp := new(e2etypes.E2EConfig)
 	*cfgcp = *r.config
 	cfgcp.BeaconFlags = flags
-	cpsyncer := components.NewBeaconNode(cfgcp, i, enr)
+	cpsyncer := components.NewBeaconNode(cfgcp, i, qnr)
 	g.Go(func() error {
 		return cpsyncer.Start(ctx)
 	})
@@ -331,7 +331,7 @@ func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, 
 
 // testBeaconChainSync creates another beacon node, and tests whether it can sync to head using previous nodes.
 func (r *testRunner) testBeaconChainSync(ctx context.Context, g *errgroup.Group,
-	conns []*grpc.ClientConn, tickingStartTime time.Time, bootnodeEnr string) error {
+	conns []*grpc.ClientConn, tickingStartTime time.Time, bootnodeQnr string) error {
 	t, config := r.t, r.config
 	index := e2e.TestParams.BeaconNodeCount
 	executionNode := components.NewExecutionNode(index)
@@ -348,7 +348,7 @@ func (r *testRunner) testBeaconChainSync(ctx context.Context, g *errgroup.Group,
 	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{proxyNode}); err != nil {
 		return fmt.Errorf("sync beacon node not ready: %w", err)
 	}
-	syncBeaconNode := components.NewBeaconNode(config, index, bootnodeEnr)
+	syncBeaconNode := components.NewBeaconNode(config, index, bootnodeQnr)
 	g.Go(func() error {
 		return syncBeaconNode.Start(ctx)
 	})
@@ -496,7 +496,7 @@ func (r *testRunner) defaultEndToEndRun() error {
 
 	// index := e2e.TestParams.BeaconNodeCount
 	if config.TestSync {
-		if err := r.testBeaconChainSync(ctx, g, conns, tickingStartTime, bootNode.ENR() /*, zondMiner.ENR()*/); err != nil {
+		if err := r.testBeaconChainSync(ctx, g, conns, tickingStartTime, bootNode.QNR() /*, zondMiner.QNR()*/); err != nil {
 			return errors.Wrap(err, "beacon chain sync test failed")
 		}
 		// index += 1
@@ -508,9 +508,9 @@ func (r *testRunner) defaultEndToEndRun() error {
 	/*
 		if config.TestCheckpointSync {
 			httpEndpoints := helpers.BeaconAPIHostnames(e2e.TestParams.BeaconNodeCount)
-			menr := zondMiner.ENR()
-			benr := bootNode.ENR()
-			if err := r.testCheckpointSync(ctx, g, index, conns, httpEndpoints[0], benr, menr); err != nil {
+			mqnr := zondMiner.QNR()
+			bqnr := bootNode.QNR()
+			if err := r.testCheckpointSync(ctx, g, index, conns, httpEndpoints[0], bqnr, mqnr); err != nil {
 				return errors.Wrap(err, "checkpoint sync test failed")
 			}
 		}

@@ -8,7 +8,7 @@ import (
 
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/protocol"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	db "github.com/theQRL/qrysm/beacon-chain/db/testing"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
@@ -49,7 +49,7 @@ func TestPingRPCHandler_ReceivesPing(t *testing.T) {
 		rateLimiter: newRateLimiter(p1),
 	}
 
-	p1.Peers().Add(new(enr.Record), p2.BHost.ID(), p2.BHost.Addrs()[0], network.DirUnknown)
+	p1.Peers().Add(new(qnr.Record), p2.BHost.ID(), p2.BHost.Addrs()[0], network.DirUnknown)
 	p1.Peers().SetMetadata(p2.BHost.ID(), p2.LocalMetadata)
 
 	// Setup streams
@@ -109,10 +109,10 @@ func TestPingRPCHandler_SendsPing(t *testing.T) {
 		rateLimiter: newRateLimiter(p1),
 	}
 
-	p1.Peers().Add(new(enr.Record), p2.BHost.ID(), p2.BHost.Addrs()[0], network.DirUnknown)
+	p1.Peers().Add(new(qnr.Record), p2.BHost.ID(), p2.BHost.Addrs()[0], network.DirUnknown)
 	p1.Peers().SetMetadata(p2.BHost.ID(), p2.LocalMetadata)
 
-	p2.Peers().Add(new(enr.Record), p1.BHost.ID(), p1.BHost.Addrs()[0], network.DirUnknown)
+	p2.Peers().Add(new(qnr.Record), p1.BHost.ID(), p1.BHost.Addrs()[0], network.DirUnknown)
 	p2.Peers().SetMetadata(p1.BHost.ID(), p1.LocalMetadata)
 
 	chain2 := &mock.ChainService{ValidatorsRoot: [32]byte{}, Genesis: time.Now()}
@@ -182,7 +182,7 @@ func TestPingRPCHandler_BadSequenceNumber(t *testing.T) {
 		Attnets:   []byte{'E', 'F'},
 	}
 
-	p1.Peers().Add(new(enr.Record), p2.BHost.ID(), p2.BHost.Addrs()[0], network.DirUnknown)
+	p1.Peers().Add(new(qnr.Record), p2.BHost.ID(), p2.BHost.Addrs()[0], network.DirUnknown)
 	p1.Peers().SetMetadata(p2.BHost.ID(), wrapper.WrappedMetadataV0(badMetadata))
 
 	// Setup streams

@@ -8,7 +8,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	"github.com/theQRL/qrysm/async/abool"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
@@ -39,7 +39,7 @@ func TestProcessPendingAtts_NoBlockRequestBlock(t *testing.T) {
 	p2 := p2ptest.NewTestP2P(t)
 	p1.Connect(p2)
 	assert.Equal(t, 1, len(p1.BHost.Network().Peers()), "Expected peers to be connected")
-	p1.Peers().Add(new(enr.Record), p2.PeerID(), nil, network.DirOutbound)
+	p1.Peers().Add(new(qnr.Record), p2.PeerID(), nil, network.DirOutbound)
 	p1.Peers().SetConnectionState(p2.PeerID(), peers.PeerConnected)
 	p1.Peers().SetChainState(p2.PeerID(), &zondpb.Status{})
 

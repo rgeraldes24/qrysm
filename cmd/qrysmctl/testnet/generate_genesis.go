@@ -14,8 +14,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/core"
+	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
-	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
@@ -306,7 +306,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 				"could not dial %s please make sure you are running your execution client",
 				generateGenesisStateFlags.ExecutionEndpoint)
 		}
-		client := zondclient.NewClient(conn)
+		client := qrlclient.NewClient(conn)
 		header, err := client.HeaderByNumber(ctx, big.NewInt(0))
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get header by number")

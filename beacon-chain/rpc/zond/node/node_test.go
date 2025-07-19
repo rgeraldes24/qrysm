@@ -15,8 +15,8 @@ import (
 	libp2ptest "github.com/libp2p/go-libp2p/p2p/host/peerstore/test"
 	ma "github.com/multiformats/go-multiaddr"
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/go-zond/p2p/enode"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnode"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	grpcutil "github.com/theQRL/qrysm/api/grpc"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
@@ -32,10 +32,10 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-type dummyIdentity enode.ID
+type dummyIdentity qnode.ID
 
-func (_ dummyIdentity) Verify(_ *enr.Record, _ []byte) error { return nil }
-func (id dummyIdentity) NodeAddr(_ *enr.Record) []byte       { return id[:] }
+func (_ dummyIdentity) Verify(_ *qnr.Record, _ []byte) error { return nil }
+func (id dummyIdentity) NodeAddr(_ *qnr.Record) []byte       { return id[:] }
 
 func TestGetVersion(t *testing.T) {
 	semVer := version.SemanticVersion()
@@ -77,11 +77,11 @@ func TestGetIdentity(t *testing.T) {
 	require.NoError(t, err)
 	discAddr2, err := ma.NewMultiaddr("/ip6/1:2:3:4:5:6:7:8/udp/20202/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N")
 	require.NoError(t, err)
-	enrRecord := &enr.Record{}
-	err = enrRecord.SetSig(dummyIdentity{1}, []byte{42})
+	qnrRecord := &qnr.Record{}
+	err = qnrRecord.SetSig(dummyIdentity{1}, []byte{42})
 	require.NoError(t, err)
-	enrRecord.Set(enr.IPv4{7, 7, 7, 7})
-	err = enrRecord.SetSig(dummyIdentity{}, []byte{})
+	qnrRecord.Set(qnr.IPv4{7, 7, 7, 7})
+	err = qnrRecord.SetSig(dummyIdentity{}, []byte{})
 	require.NoError(t, err)
 	attnets := bitfield.NewBitvector64()
 	attnets.SetBitAt(1, true)
@@ -89,7 +89,7 @@ func TestGetIdentity(t *testing.T) {
 
 	t.Run("OK", func(t *testing.T) {
 		peerManager := &mockp2p.MockPeerManager{
-			Enr:           enrRecord,
+			Qnr:           qnrRecord,
 			PID:           "foo",
 			BHost:         &mockp2p.MockHost{Addresses: []ma.Multiaddr{p2pAddr}},
 			DiscoveryAddr: []ma.Multiaddr{discAddr1, discAddr2},
@@ -103,9 +103,9 @@ func TestGetIdentity(t *testing.T) {
 		require.NoError(t, err)
 		expectedID := peer.ID("foo").String()
 		assert.Equal(t, expectedID, resp.Data.PeerId)
-		expectedEnr, err := p2p.SerializeENR(enrRecord)
+		expectedQnr, err := p2p.SerializeQNR(qnrRecord)
 		require.NoError(t, err)
-		assert.Equal(t, fmt.Sprint("enr:", expectedEnr), resp.Data.Enr)
+		assert.Equal(t, fmt.Sprint("qnr:", expectedQnr), resp.Data.Qnr)
 		require.Equal(t, 1, len(resp.Data.P2PAddresses))
 		assert.Equal(t, p2pAddr.String()+"/p2p/"+expectedID, resp.Data.P2PAddresses[0])
 		require.Equal(t, 2, len(resp.Data.DiscoveryAddresses))
@@ -123,9 +123,9 @@ func TestGetIdentity(t *testing.T) {
 		assert.Equal(t, discAddr2.String(), resp.Data.DiscoveryAddresses[1])
 	})
 
-	t.Run("ENR failure", func(t *testing.T) {
+	t.Run("QNR failure", func(t *testing.T) {
 		peerManager := &mockp2p.MockPeerManager{
-			Enr:           &enr.Record{},
+			Qnr:           &qnr.Record{},
 			PID:           "foo",
 			BHost:         &mockp2p.MockHost{Addresses: []ma.Multiaddr{p2pAddr}},
 			DiscoveryAddr: []ma.Multiaddr{discAddr1, discAddr2},
@@ -136,12 +136,12 @@ func TestGetIdentity(t *testing.T) {
 		}
 
 		_, err = s.GetIdentity(ctx, &emptypb.Empty{})
-		assert.ErrorContains(t, "Could not obtain enr", err)
+		assert.ErrorContains(t, "Could not obtain qnr", err)
 	})
 
 	t.Run("Discovery addresses failure", func(t *testing.T) {
 		peerManager := &mockp2p.MockPeerManager{
-			Enr:               enrRecord,
+			Qnr:               qnrRecord,
 			PID:               "foo",
 			BHost:             &mockp2p.MockHost{Addresses: []ma.Multiaddr{p2pAddr}},
 			DiscoveryAddr:     []ma.Multiaddr{discAddr1, discAddr2},
@@ -162,25 +162,25 @@ func TestGetPeer(t *testing.T) {
 	ctx := context.Background()
 	decodedId, err := peer.Decode(rawId)
 	require.NoError(t, err)
-	enrRecord := &enr.Record{}
-	err = enrRecord.SetSig(dummyIdentity{1}, []byte{42})
+	qnrRecord := &qnr.Record{}
+	err = qnrRecord.SetSig(dummyIdentity{1}, []byte{42})
 	require.NoError(t, err)
-	enrRecord.Set(enr.IPv4{7, 7, 7, 7})
-	err = enrRecord.SetSig(dummyIdentity{}, []byte{})
+	qnrRecord.Set(qnr.IPv4{7, 7, 7, 7})
+	err = qnrRecord.SetSig(dummyIdentity{}, []byte{})
 	require.NoError(t, err)
 	const p2pAddr = "/ip4/7.7.7.7/udp/30303/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N"
 	p2pMultiAddr, err := ma.NewMultiaddr(p2pAddr)
 	require.NoError(t, err)
 	peerFetcher := &mockp2p.MockPeersProvider{}
 	s := Server{PeersFetcher: peerFetcher}
-	peerFetcher.Peers().Add(enrRecord, decodedId, p2pMultiAddr, network.DirInbound)
+	peerFetcher.Peers().Add(qnrRecord, decodedId, p2pMultiAddr, network.DirInbound)
 
 	t.Run("OK", func(t *testing.T) {
 		resp, err := s.GetPeer(ctx, &zondpb.PeerRequest{PeerId: rawId})
 		require.NoError(t, err)
 		assert.Equal(t, rawId, resp.Data.PeerId)
 		assert.Equal(t, p2pAddr, resp.Data.LastSeenP2PAddress)
-		assert.Equal(t, "enr:yoABgmlwhAcHBwc", resp.Data.Enr)
+		assert.Equal(t, "qnr:yoABgmlwhAcHBwc", resp.Data.Qnr)
 		assert.Equal(t, zondpb.ConnectionState_DISCONNECTED, resp.Data.State)
 		assert.Equal(t, zondpb.PeerDirection_INBOUND, resp.Data.Direction)
 	})
@@ -208,11 +208,11 @@ func TestListPeers(t *testing.T) {
 		if i == len(ids)-1 {
 			peerStatus.Add(nil, id, nil, network.DirUnknown)
 		} else {
-			enrRecord := &enr.Record{}
-			err := enrRecord.SetSig(dummyIdentity{1}, []byte{42})
+			qnrRecord := &qnr.Record{}
+			err := qnrRecord.SetSig(dummyIdentity{1}, []byte{42})
 			require.NoError(t, err)
-			enrRecord.Set(enr.IPv4{127, 0, 0, byte(i)})
-			err = enrRecord.SetSig(dummyIdentity{}, []byte{})
+			qnrRecord.Set(qnr.IPv4{127, 0, 0, byte(i)})
+			err = qnrRecord.SetSig(dummyIdentity{}, []byte{})
 			require.NoError(t, err)
 			var p2pAddr = "/ip4/127.0.0." + strconv.Itoa(i) + "/udp/30303/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N"
 			p2pMultiAddr, err := ma.NewMultiaddr(p2pAddr)
@@ -224,7 +224,7 @@ func TestListPeers(t *testing.T) {
 			} else {
 				direction = network.DirOutbound
 			}
-			peerStatus.Add(enrRecord, id, p2pMultiAddr, direction)
+			peerStatus.Add(qnrRecord, id, p2pMultiAddr, direction)
 
 			switch i {
 			case 0, 1:
@@ -255,11 +255,11 @@ func TestListPeers(t *testing.T) {
 		require.Equal(t, 1, len(resp.Data))
 		returnedPeer := resp.Data[0]
 		assert.Equal(t, expectedId.String(), returnedPeer.PeerId)
-		expectedEnr, err := peerStatus.ENR(expectedId)
+		expectedQnr, err := peerStatus.QNR(expectedId)
 		require.NoError(t, err)
-		serializedEnr, err := p2p.SerializeENR(expectedEnr)
+		serializedQnr, err := p2p.SerializeQNR(expectedQnr)
 		require.NoError(t, err)
-		assert.Equal(t, "enr:"+serializedEnr, returnedPeer.Enr)
+		assert.Equal(t, "qnr:"+serializedQnr, returnedPeer.Qnr)
 		expectedP2PAddr, err := peerStatus.Address(expectedId)
 		require.NoError(t, err)
 		assert.Equal(t, expectedP2PAddr.String(), returnedPeer.LastSeenP2PAddress)
@@ -361,11 +361,11 @@ func TestPeerCount(t *testing.T) {
 	peerStatus := peerFetcher.Peers()
 
 	for i, id := range ids {
-		enrRecord := &enr.Record{}
-		err := enrRecord.SetSig(dummyIdentity{1}, []byte{42})
+		qnrRecord := &qnr.Record{}
+		err := qnrRecord.SetSig(dummyIdentity{1}, []byte{42})
 		require.NoError(t, err)
-		enrRecord.Set(enr.IPv4{127, 0, 0, byte(i)})
-		err = enrRecord.SetSig(dummyIdentity{}, []byte{})
+		qnrRecord.Set(qnr.IPv4{127, 0, 0, byte(i)})
+		err = qnrRecord.SetSig(dummyIdentity{}, []byte{})
 		require.NoError(t, err)
 		var p2pAddr = "/ip4/127.0.0." + strconv.Itoa(i) + "/udp/30303/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N"
 		p2pMultiAddr, err := ma.NewMultiaddr(p2pAddr)
@@ -377,7 +377,7 @@ func TestPeerCount(t *testing.T) {
 		} else {
 			direction = network.DirOutbound
 		}
-		peerStatus.Add(enrRecord, id, p2pMultiAddr, direction)
+		peerStatus.Add(qnrRecord, id, p2pMultiAddr, direction)
 
 		switch i {
 		case 0:
@@ -408,16 +408,16 @@ func BenchmarkListPeers(b *testing.B) {
 	peerFetcher := &mockp2p.MockPeersProvider{}
 
 	for _, id := range ids {
-		enrRecord := &enr.Record{}
-		err := enrRecord.SetSig(dummyIdentity{1}, []byte{42})
+		qnrRecord := &qnr.Record{}
+		err := qnrRecord.SetSig(dummyIdentity{1}, []byte{42})
 		require.NoError(b, err)
-		enrRecord.Set(enr.IPv4{7, 7, 7, 7})
-		err = enrRecord.SetSig(dummyIdentity{}, []byte{})
+		qnrRecord.Set(qnr.IPv4{7, 7, 7, 7})
+		err = qnrRecord.SetSig(dummyIdentity{}, []byte{})
 		require.NoError(b, err)
 		const p2pAddr = "/ip4/7.7.7.7/udp/30303/p2p/QmYyQSo1c1Ym7orWxLYvCrM2EmxFTANf8wXmmE7DWjhx5N"
 		p2pMultiAddr, err := ma.NewMultiaddr(p2pAddr)
 		require.NoError(b, err)
-		peerFetcher.Peers().Add(enrRecord, id, p2pMultiAddr, network.DirInbound)
+		peerFetcher.Peers().Add(qnrRecord, id, p2pMultiAddr, network.DirInbound)
 	}
 
 	s := Server{PeersFetcher: peerFetcher}

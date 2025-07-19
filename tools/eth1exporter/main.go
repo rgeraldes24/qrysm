@@ -17,7 +17,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/params"
-	"github.com/theQRL/go-zond/zondclient"
+	"github.com/theQRL/go-zond/qrlclient"
 	_ "github.com/theQRL/qrysm/runtime/maxprocs"
 )
 
@@ -25,7 +25,7 @@ var (
 	allWatching []*Watching
 	loadSeconds float64
 	totalLoaded int64
-	eth         *zondclient.Client
+	eth         *qrlclient.Client
 )
 
 var (
@@ -94,7 +94,7 @@ type Watching struct {
 // ConnectionToGzond - Connect to remote server.
 func ConnectionToGzond(url string) error {
 	var err error
-	eth, err = zondclient.Dial(url)
+	eth, err = qrlclient.Dial(url)
 	return err
 }
 

@@ -51,7 +51,7 @@ func (ns *Server) GetSyncStatus(_ context.Context, _ *empty.Empty) (*zondpb.Sync
 	}, nil
 }
 
-// GetGenesis fetches genesis chain information of Ethereum. Returns unix timestamp 0
+// GetGenesis fetches genesis chain information of QRL. Returns unix timestamp 0
 // if a genesis time has yet to be determined.
 func (ns *Server) GetGenesis(ctx context.Context, _ *empty.Empty) (*zondpb.Genesis, error) {
 	contractAddr, err := ns.BeaconDB.DepositContractAddress(ctx)
@@ -105,20 +105,20 @@ func (ns *Server) GetHost(_ context.Context, _ *empty.Empty) (*zondpb.HostData, 
 	for _, addr := range ns.PeerManager.Host().Addrs() {
 		stringAddr = append(stringAddr, addr.String())
 	}
-	record := ns.PeerManager.ENR()
-	enr := ""
+	record := ns.PeerManager.QNR()
+	qnr := ""
 	var err error
 	if record != nil {
-		enr, err = p2p.SerializeENR(record)
+		qnr, err = p2p.SerializeQNR(record)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Unable to serialize enr: %v", err)
+			return nil, status.Errorf(codes.Internal, "Unable to serialize qnr: %v", err)
 		}
 	}
 
 	return &zondpb.HostData{
 		Addresses: stringAddr,
 		PeerId:    ns.PeerManager.PeerID().String(),
-		Enr:       enr,
+		Qnr:       qnr,
 	}, nil
 }
 
@@ -147,15 +147,15 @@ func (ns *Server) GetPeer(_ context.Context, peerReq *zondpb.PeerRequest) (*zond
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Requested peer does not exist: %v", err)
 	}
-	record, err := ns.PeersFetcher.Peers().ENR(pid)
+	record, err := ns.PeersFetcher.Peers().QNR(pid)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Requested peer does not exist: %v", err)
 	}
-	enr := ""
+	qnr := ""
 	if record != nil {
-		enr, err = p2p.SerializeENR(record)
+		qnr, err = p2p.SerializeQNR(record)
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "Unable to serialize enr: %v", err)
+			return nil, status.Errorf(codes.Internal, "Unable to serialize qnr: %v", err)
 		}
 	}
 	return &zondpb.Peer{
@@ -163,7 +163,7 @@ func (ns *Server) GetPeer(_ context.Context, peerReq *zondpb.PeerRequest) (*zond
 		Direction:       pbDirection,
 		ConnectionState: zondpb.ConnectionState(connState),
 		PeerId:          peerReq.PeerId,
-		Enr:             enr,
+		Qnr:             qnr,
 	}, nil
 }
 
@@ -183,13 +183,13 @@ func (ns *Server) ListPeers(ctx context.Context, _ *empty.Empty) (*zondpb.Peers,
 		if err != nil {
 			continue
 		}
-		record, err := ns.PeersFetcher.Peers().ENR(pid)
+		record, err := ns.PeersFetcher.Peers().QNR(pid)
 		if err != nil {
 			continue
 		}
-		enr := ""
+		qnr := ""
 		if record != nil {
-			enr, err = p2p.SerializeENR(record)
+			qnr, err = p2p.SerializeQNR(record)
 			if err != nil {
 				continue
 			}
@@ -211,7 +211,7 @@ func (ns *Server) ListPeers(ctx context.Context, _ *empty.Empty) (*zondpb.Peers,
 			Direction:       pbDirection,
 			ConnectionState: zondpb.ConnectionState_CONNECTED,
 			PeerId:          pid.String(),
-			Enr:             enr,
+			Qnr:             qnr,
 		})
 	}
 
@@ -220,14 +220,14 @@ func (ns *Server) ListPeers(ctx context.Context, _ *empty.Empty) (*zondpb.Peers,
 	}, nil
 }
 
-// GetETH1ConnectionStatus gets data about the ETH1 endpoints.
-func (ns *Server) GetETH1ConnectionStatus(_ context.Context, _ *empty.Empty) (*zondpb.ETH1ConnectionStatus, error) {
+// GetQRL1ConnectionStatus gets data about the QRL1 endpoints.
+func (ns *Server) GetQRL1ConnectionStatus(_ context.Context, _ *empty.Empty) (*zondpb.ETH1ConnectionStatus, error) {
 	var currErr string
 	err := ns.POWChainInfoFetcher.ExecutionClientConnectionErr()
 	if err != nil {
 		currErr = err.Error()
 	}
-	return &zondpb.ETH1ConnectionStatus{
+	return &zondpb.QRL1ConnectionStatus{
 		CurrentAddress:         ns.POWChainInfoFetcher.ExecutionClientEndpoint(),
 		CurrentConnectionError: currErr,
 		Addresses:              []string{ns.POWChainInfoFetcher.ExecutionClientEndpoint()},

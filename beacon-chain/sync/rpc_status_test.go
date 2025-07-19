@@ -8,7 +8,7 @@ import (
 
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/protocol"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	"github.com/theQRL/qrysm/async/abool"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/db/kv"
@@ -378,10 +378,10 @@ func TestHandshakeHandlers_Roundtrip(t *testing.T) {
 	require.NoError(t, cw.SetClock(startup.NewClock(chain.Genesis, chain.ValidatorsRoot)))
 	p1.Connect(p2)
 
-	p1.Peers().Add(new(enr.Record), p2.BHost.ID(), p2.BHost.Addrs()[0], network.DirUnknown)
+	p1.Peers().Add(new(qnr.Record), p2.BHost.ID(), p2.BHost.Addrs()[0], network.DirUnknown)
 	p1.Peers().SetMetadata(p2.BHost.ID(), p2.LocalMetadata)
 
-	p2.Peers().Add(new(enr.Record), p1.BHost.ID(), p1.BHost.Addrs()[0], network.DirUnknown)
+	p2.Peers().Add(new(qnr.Record), p1.BHost.ID(), p1.BHost.Addrs()[0], network.DirUnknown)
 	p2.Peers().SetMetadata(p1.BHost.ID(), p1.LocalMetadata)
 
 	if util.WaitTimeout(&wg, 1*time.Second) {
