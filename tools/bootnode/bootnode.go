@@ -31,6 +31,8 @@ import (
 	gcrypto "github.com/theQRL/go-zond/crypto"
 	gzondlog "github.com/theQRL/go-zond/log"
 	"github.com/theQRL/go-zond/p2p/discover"
+	"github.com/theQRL/go-zond/p2p/qnode"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	"github.com/theQRL/qrysm/async"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"

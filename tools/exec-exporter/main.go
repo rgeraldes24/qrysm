@@ -1,4 +1,4 @@
-// Prometheus exporter for Zond address balances.
+// Prometheus exporter for QRL address balances.
 // Forked from https://github.com/hunterlong/ethexporter
 package main
 
@@ -61,7 +61,7 @@ func main() {
 			t1 := time.Now()
 			fmt.Printf("Checking %v wallets...\n", len(allWatching))
 			for _, v := range allWatching {
-				v.Balance = EthBalance(v.Address).String()
+				v.Balance = QRLBalance(v.Address).String()
 				totalLoaded++
 			}
 			t2 := time.Now()
@@ -98,18 +98,18 @@ func ConnectionToGzond(url string) error {
 	return err
 }
 
-// EthBalance from remote server.
-func EthBalance(address string) *big.Float {
+// QRLBalance from remote server.
+func QRLBalance(address string) *big.Float {
 	addr, err := common.NewAddressFromString(address)
 	if err != nil {
-		fmt.Printf("Error fetching Zond Balance for address: %v\n", address)
+		fmt.Printf("Error fetching QRL Balance for address: %v\n", address)
 		return nil
 	}
 	balance, err := eth.BalanceAt(context.TODO(), addr, nil)
 	if err != nil {
-		fmt.Printf("Error fetching Zond Balance for address: %v\n", address)
+		fmt.Printf("Error fetching QRL Balance for address: %v\n", address)
 	}
-	return ToZond(balance)
+	return ToQuanta(balance)
 }
 
 // CurrentBlock in ETH1.
@@ -122,11 +122,11 @@ func CurrentBlock() uint64 {
 	return block.NumberU64()
 }
 
-// ToZond from Planck.
-func ToZond(o *big.Int) *big.Float {
+// ToQuanta from Planck.
+func ToQuanta(o *big.Int) *big.Float {
 	planck := big.NewFloat(0)
 	planck.SetInt(o)
-	return new(big.Float).Quo(planck, big.NewFloat(params.Zond))
+	return new(big.Float).Quo(planck, big.NewFloat(params.Quanta))
 }
 
 // MetricsHTTP - HTTP response handler for /metrics.

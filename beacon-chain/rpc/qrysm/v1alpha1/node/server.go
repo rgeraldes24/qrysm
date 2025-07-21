@@ -220,14 +220,14 @@ func (ns *Server) ListPeers(ctx context.Context, _ *empty.Empty) (*zondpb.Peers,
 	}, nil
 }
 
-// GetQRL1ConnectionStatus gets data about the QRL1 endpoints.
-func (ns *Server) GetQRL1ConnectionStatus(_ context.Context, _ *empty.Empty) (*zondpb.ETH1ConnectionStatus, error) {
+// GetExecutionNodeConnectionStatus gets data about the QRL1 endpoints.
+func (ns *Server) GetExecutionNodeConnectionStatus(_ context.Context, _ *empty.Empty) (*zondpb.ETH1ConnectionStatus, error) {
 	var currErr string
 	err := ns.POWChainInfoFetcher.ExecutionClientConnectionErr()
 	if err != nil {
 		currErr = err.Error()
 	}
-	return &zondpb.QRL1ConnectionStatus{
+	return &zondpb.ExecutionNodeConnectionStatus{
 		CurrentAddress:         ns.POWChainInfoFetcher.ExecutionClientEndpoint(),
 		CurrentConnectionError: currErr,
 		Addresses:              []string{ns.POWChainInfoFetcher.ExecutionClientEndpoint()},

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond"
+	qrl "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	zondRPC "github.com/theQRL/go-zond/rpc"
@@ -265,7 +265,7 @@ func (s *Service) HeaderByHash(ctx context.Context, hash common.Hash) (*types.He
 	var hdr *types.HeaderInfo
 	err := s.rpcClient.CallContext(ctx, &hdr, ExecutionBlockByHashMethod, hash, false /* no transactions */)
 	if err == nil && hdr == nil {
-		err = zond.NotFound
+		err = qrl.NotFound
 	}
 	return hdr, err
 }
@@ -275,7 +275,7 @@ func (s *Service) HeaderByNumber(ctx context.Context, number *big.Int) (*types.H
 	var hdr *types.HeaderInfo
 	err := s.rpcClient.CallContext(ctx, &hdr, ExecutionBlockByNumberMethod, toBlockNumArg(number), false /* no transactions */)
 	if err == nil && hdr == nil {
-		err = zond.NotFound
+		err = qrl.NotFound
 	}
 	return hdr, err
 }

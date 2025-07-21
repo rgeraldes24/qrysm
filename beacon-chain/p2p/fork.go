@@ -17,7 +17,7 @@ import (
 )
 
 // QNR key used for QRL consensus-related fork data.
-var qrl2QNRKey = params.BeaconNetworkConfig().ETH2Key
+var qrl2QNRKey = params.BeaconNetworkConfig().QRL2Key
 
 // ForkDigest returns the current fork digest of
 // the node according to the local clock.

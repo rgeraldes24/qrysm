@@ -99,7 +99,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Zond execution layer parameters.
 	DepositChainID:         1, // Chain ID of qrl1 mainnet.
 	DepositNetworkID:       1, // Network ID of qrl11 mainnet.
-	DepositContractAddress: "Z00000000219ab540356cBB839Cbe05303d7705Fa",
+	DepositContractAddress: "Q00000000219ab540356cBB839Cbe05303d7705Fa",
 
 	// Validator params.
 	RandomSubnetsPerValidator:         1 << 0,
@@ -208,7 +208,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	MinSyncCommitteeParticipants: 1,
 
 	// Bellatrix
-	ZondBurnAddress:        "Z0000000000000000000000000000000000000000",
+	ZondBurnAddress:        "Q0000000000000000000000000000000000000000",
 	DefaultBuilderGasLimit: uint64(30000000),
 
 	// Mevboost circuit breaker

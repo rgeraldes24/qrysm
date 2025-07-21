@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond"
+	qrl "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/common"
 	gzondtypes "github.com/theQRL/go-zond/core/types"
@@ -56,7 +56,7 @@ func (s *Service) GenesisExecutionChainInfo() (uint64, *big.Int) {
 
 // ProcessETH1Block processes logs from the provided eth1 block.
 func (s *Service) ProcessETH1Block(ctx context.Context, blkNum *big.Int) error {
-	query := zond.FilterQuery{
+	query := qrl.FilterQuery{
 		Addresses: []common.Address{
 			s.cfg.depositContractAddr,
 		},
@@ -261,7 +261,7 @@ func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint6
 	if end > latestFollowHeight {
 		end = latestFollowHeight
 	}
-	query := zond.FilterQuery{
+	query := qrl.FilterQuery{
 		Addresses: []common.Address{
 			s.cfg.depositContractAddr,
 		},

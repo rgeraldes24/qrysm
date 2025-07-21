@@ -96,7 +96,6 @@ require (
 require (
 	github.com/libp2p/go-libp2p-mplex v0.9.0
 	github.com/theQRL/FuzzyVM v0.0.0-20250214181305-992e8723ac88
-	github.com/theQRL/tx-fuzz v0.0.0-20250214181555-d52542df59d6
 )
 
 require (
@@ -212,7 +211,6 @@ require (
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
-	github.com/theQRL/gozvmlab v0.0.0-20250214180526-fa0574ea7bf7 // indirect
 	github.com/tklauser/go-sysconf v0.3.13 // indirect
 	github.com/tklauser/numcpus v0.7.0 // indirect
 	github.com/uber/jaeger-client-go v2.25.0+incompatible // indirect

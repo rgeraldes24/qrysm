@@ -15,11 +15,11 @@ import (
 )
 
 func TestStore_ProposerSettings_ReadAndWrite(t *testing.T) {
-	recipient0, err := common.NewAddressFromString("Z50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3")
+	recipient0, err := common.NewAddressFromString("Q50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3")
 	require.NoError(t, err)
-	recipient1, err := common.NewAddressFromString("Z6e35733c5af9B61374A128e6F85f553aF09ff89A")
+	recipient1, err := common.NewAddressFromString("Q6e35733c5af9B61374A128e6F85f553aF09ff89A")
 	require.NoError(t, err)
-	recipient2, err := common.NewAddressFromString("Z9995733c5af9B61374A128e6F85f553aF09ff89B")
+	recipient2, err := common.NewAddressFromString("Q9995733c5af9B61374A128e6F85f553aF09ff89B")
 	require.NoError(t, err)
 	t.Run("save to db in full", func(t *testing.T) {
 		ctx := context.Background()

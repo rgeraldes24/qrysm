@@ -754,7 +754,7 @@ func Test_GetPayloadAttributeV2(t *testing.T) {
 	require.Equal(t, 0, len(a))
 
 	// Cache hit, advance state, has fee recipient
-	suggestedAddr, err := common.NewAddressFromString("Z0000000000000000000000000000000000000123")
+	suggestedAddr, err := common.NewAddressFromString("Q0000000000000000000000000000000000000123")
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.BeaconDB.SaveFeeRecipientsByValidatorIDs(ctx, []primitives.ValidatorIndex{suggestedVid}, []common.Address{suggestedAddr}))
 	service.cfg.ProposerSlotIndexCache.SetProposerAndPayloadIDs(slot, suggestedVid, [8]byte{}, [32]byte{})

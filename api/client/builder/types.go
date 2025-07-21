@@ -219,7 +219,7 @@ type BuilderBidCapella struct {
 // ExecutionPayloadHeaderCapella is a field in BuilderBidCapella.
 type ExecutionPayloadHeaderCapella struct {
 	ParentHash       hexutil.Bytes  `json:"parent_hash"`
-	FeeRecipient     hexutil.BytesZ `json:"fee_recipient"`
+	FeeRecipient     hexutil.BytesQ `json:"fee_recipient"`
 	StateRoot        hexutil.Bytes  `json:"state_root"`
 	ReceiptsRoot     hexutil.Bytes  `json:"receipts_root"`
 	LogsBloom        hexutil.Bytes  `json:"logs_bloom"`
@@ -285,7 +285,7 @@ type ExecPayloadResponseCapella struct {
 // ExecutionPayloadCapella is a field of ExecPayloadResponseCapella.
 type ExecutionPayloadCapella struct {
 	ParentHash    hexutil.Bytes   `json:"parent_hash"`
-	FeeRecipient  hexutil.BytesZ  `json:"fee_recipient"`
+	FeeRecipient  hexutil.BytesQ  `json:"fee_recipient"`
 	StateRoot     hexutil.Bytes   `json:"state_root"`
 	ReceiptsRoot  hexutil.Bytes   `json:"receipts_root"`
 	LogsBloom     hexutil.Bytes   `json:"logs_bloom"`
@@ -344,7 +344,7 @@ func (p *ExecutionPayloadCapella) ToProto() (*v1.ExecutionPayloadCapella, error)
 type Withdrawal struct {
 	Index          Uint256        `json:"index"`
 	ValidatorIndex Uint256        `json:"validator_index"`
-	Address        hexutil.BytesZ `json:"address"`
+	Address        hexutil.BytesQ `json:"address"`
 	Amount         Uint256        `json:"amount"`
 }
 
@@ -643,7 +643,7 @@ func (ch *DilithiumToExecutionChange) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		ValidatorIndex      string         `json:"validator_index"`
 		FromDilithiumPubkey hexutil.Bytes  `json:"from_dilithium_pubkey"`
-		ToExecutionAddress  hexutil.BytesZ `json:"to_execution_address"`
+		ToExecutionAddress  hexutil.BytesQ `json:"to_execution_address"`
 	}{
 		ValidatorIndex:      fmt.Sprintf("%d", ch.ValidatorIndex),
 		FromDilithiumPubkey: ch.FromDilithiumPubkey,

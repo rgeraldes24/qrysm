@@ -1,7 +1,7 @@
 filegroup(
     name = "zonddata",
     srcs = [
-        "UTC--2024-01-04T08-08-35.961423000Z--Z2048e31ab4568fd6281c62f55a7705edbf51513f",
+        "UTC--2024-01-04T08-08-35.961423000Z--Q2048e31ab4568fd6281c62f55a7705edbf51513f",
     ],
     visibility = ["//testing/endtoend:__subpackages__"],
 )

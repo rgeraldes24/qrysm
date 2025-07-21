@@ -18,8 +18,8 @@ const defaultMixhash = "0x000000000000000000000000000000000000000000000000000000
 const defaultParenthash = "0x0000000000000000000000000000000000000000000000000000000000000000"
 const defaultTestAccountBalance = "100000000000000000000000000000"
 
-var defaultTestAccountAddress, _ = common.NewAddressFromString("Z2048e31ab4568fd6281c62f55a7705edbf51513f")
-var defaultCoinbase, _ = common.NewAddressFromString("Z0000000000000000000000000000000000000000")
+var defaultTestAccountAddress, _ = common.NewAddressFromString("Q2048e31ab4568fd6281c62f55a7705edbf51513f")
+var defaultCoinbase, _ = common.NewAddressFromString("Q0000000000000000000000000000000000000000")
 
 // DepositContractCode is the compiled deposit contract code, via https://github.com/protolambda/merge-genesis-tools
 // This is embedded into genesis so that we can start the chain at a merge block.
