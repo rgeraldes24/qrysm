@@ -28,7 +28,7 @@ import (
 	"github.com/theQRL/qrysm/container/slice"
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -92,7 +92,7 @@ func initializeTestServices(t *testing.T, slots []primitives.Slot, peers []*peer
 		State: st,
 		Root:  genesisRoot[:],
 		DB:    beaconDB,
-		FinalizedCheckPoint: &zondpb.Checkpoint{
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 		},
 		Genesis:        time.Now(),
@@ -173,7 +173,7 @@ func connectPeer(t *testing.T, host *p2pt.TestP2P, datum *peerData, peerStatus *
 			assert.NoError(t, stream.Close())
 		}()
 
-		req := &zondpb.BeaconBlocksByRangeRequest{}
+		req := &qrysmpb.BeaconBlocksByRangeRequest{}
 		assert.NoError(t, p.Encoding().DecodeWithMaxLength(stream, req))
 
 		requestedBlocks := makeSequence(req.StartSlot, req.StartSlot.Add((req.Count-1)*req.Step))
@@ -191,7 +191,7 @@ func connectPeer(t *testing.T, host *p2pt.TestP2P, datum *peerData, peerStatus *
 		// Determine the correct subset of blocks to return as dictated by the test scenario.
 		ss := slice.IntersectionSlot(datum.blocks, requestedBlocks)
 
-		ret := make([]*zondpb.SignedBeaconBlockCapella, 0)
+		ret := make([]*qrysmpb.SignedBeaconBlockCapella, 0)
 		for _, slot := range ss {
 			if (slot - req.StartSlot).Mod(req.Step) != 0 {
 				continue
@@ -228,7 +228,7 @@ func connectPeer(t *testing.T, host *p2pt.TestP2P, datum *peerData, peerStatus *
 
 	peerStatus.Add(new(qnr.Record), p.PeerID(), nil, network.DirOutbound)
 	peerStatus.SetConnectionState(p.PeerID(), peers.PeerConnected)
-	peerStatus.SetChainState(p.PeerID(), &zondpb.Status{
+	peerStatus.SetChainState(p.PeerID(), &qrysmpb.Status{
 		ForkDigest:     params.BeaconConfig().GenesisForkVersion,
 		FinalizedRoot:  []byte(fmt.Sprintf("finalized_root %d", datum.finalizedEpoch)),
 		FinalizedEpoch: datum.finalizedEpoch,
@@ -240,9 +240,9 @@ func connectPeer(t *testing.T, host *p2pt.TestP2P, datum *peerData, peerStatus *
 }
 
 // extendBlockSequence extends block chain sequentially (creating genesis block, if necessary).
-func extendBlockSequence(t *testing.T, inSeq []*zondpb.SignedBeaconBlockCapella, size int) []*zondpb.SignedBeaconBlockCapella {
+func extendBlockSequence(t *testing.T, inSeq []*qrysmpb.SignedBeaconBlockCapella, size int) []*qrysmpb.SignedBeaconBlockCapella {
 	// Start from the original sequence.
-	outSeq := make([]*zondpb.SignedBeaconBlockCapella, len(inSeq)+size)
+	outSeq := make([]*qrysmpb.SignedBeaconBlockCapella, len(inSeq)+size)
 	copy(outSeq, inSeq)
 
 	// See if genesis block needs to be created.
@@ -271,7 +271,7 @@ func extendBlockSequence(t *testing.T, inSeq []*zondpb.SignedBeaconBlockCapella,
 
 // connectPeerHavingBlocks connect host with a peer having provided blocks.
 func connectPeerHavingBlocks(
-	t *testing.T, host *p2pt.TestP2P, blks []*zondpb.SignedBeaconBlockCapella, finalizedSlot primitives.Slot,
+	t *testing.T, host *p2pt.TestP2P, blks []*qrysmpb.SignedBeaconBlockCapella, finalizedSlot primitives.Slot,
 	peerStatus *peers.Status,
 ) peer.ID {
 	p := p2pt.NewTestP2P(t)
@@ -282,7 +282,7 @@ func connectPeerHavingBlocks(
 			_ = _err
 		}()
 
-		req := &zondpb.BeaconBlocksByRangeRequest{}
+		req := &qrysmpb.BeaconBlocksByRangeRequest{}
 		assert.NoError(t, p.Encoding().DecodeWithMaxLength(stream, req))
 
 		for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step); i += primitives.Slot(req.Step) {
@@ -326,7 +326,7 @@ func connectPeerHavingBlocks(
 
 	peerStatus.Add(new(qnr.Record), p.PeerID(), nil, network.DirOutbound)
 	peerStatus.SetConnectionState(p.PeerID(), peers.PeerConnected)
-	peerStatus.SetChainState(p.PeerID(), &zondpb.Status{
+	peerStatus.SetChainState(p.PeerID(), &qrysmpb.Status{
 		ForkDigest:     params.BeaconConfig().GenesisForkVersion,
 		FinalizedRoot:  []byte(fmt.Sprintf("finalized_root %d", finalizedEpoch)),
 		FinalizedEpoch: finalizedEpoch,

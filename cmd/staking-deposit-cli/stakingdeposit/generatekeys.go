@@ -14,7 +14,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/dilithium"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 func GenerateKeys(validatorStartIndex, numValidators uint64,
@@ -132,7 +132,7 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 		return false
 	}
 
-	depositMessage := &zondpb.DepositMessage{
+	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             depositKey.PublicKey().Marshal(),
 		WithdrawalCredentials: withdrawalCredentials,
 		Amount:                depositData.Amount,
@@ -149,7 +149,7 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 	if err != nil {
 		panic(fmt.Errorf("failed to compute domain | reason %v", err))
 	}
-	signingData := &zondpb.SigningData{
+	signingData := &qrysmpb.SigningData{
 		ObjectRoot: root[:],
 		Domain:     domain,
 	}

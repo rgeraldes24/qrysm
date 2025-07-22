@@ -17,20 +17,20 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
 func TestValidatorMap_DistinctCopy(t *testing.T) {
 	count := uint64(100)
-	vals := make([]*zondpb.Validator, 0, count)
+	vals := make([]*qrysmpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
 		var someKey [field_params.DilithiumPubkeyLength]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
-		vals = append(vals, &zondpb.Validator{
+		vals = append(vals, &qrysmpb.Validator{
 			PublicKey:                  someKey[:],
 			WithdrawalCredentials:      someRoot[:],
 			EffectiveBalance:           params.BeaconConfig().MaxEffectiveBalance,
@@ -52,13 +52,13 @@ func TestValidatorMap_DistinctCopy(t *testing.T) {
 
 func TestBeaconState_NoDeadlock_Capella(t *testing.T) {
 	count := uint64(100)
-	vals := make([]*zondpb.Validator, 0, count)
+	vals := make([]*qrysmpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
 		var someKey [field_params.DilithiumPubkeyLength]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
-		vals = append(vals, &zondpb.Validator{
+		vals = append(vals, &qrysmpb.Validator{
 			PublicKey:                  someKey[:],
 			WithdrawalCredentials:      someRoot[:],
 			EffectiveBalance:           params.BeaconConfig().MaxEffectiveBalance,
@@ -69,7 +69,7 @@ func TestBeaconState_NoDeadlock_Capella(t *testing.T) {
 			WithdrawableEpoch:          1,
 		})
 	}
-	st, err := InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{
+	st, err := InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
 		Validators: vals,
 	})
 	assert.NoError(t, err)
@@ -179,14 +179,14 @@ func TestCopyAllTries(t *testing.T) {
 
 func generateState(t *testing.T) state.BeaconState {
 	count := uint64(100)
-	vals := make([]*zondpb.Validator, 0, count)
+	vals := make([]*qrysmpb.Validator, 0, count)
 	bals := make([]uint64, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
 		var someKey [field_params.DilithiumPubkeyLength]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
-		vals = append(vals, &zondpb.Validator{
+		vals = append(vals, &qrysmpb.Validator{
 			PublicKey:                  someKey[:],
 			WithdrawalCredentials:      someRoot[:],
 			EffectiveBalance:           params.BeaconConfig().MaxEffectiveBalance,
@@ -212,22 +212,22 @@ func generateState(t *testing.T) state.BeaconState {
 	for i := 0; i < len(mockrandaoMixes); i++ {
 		mockrandaoMixes[i] = zeroHash[:]
 	}
-	newState, err := InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	newState, err := InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Slot:                  1,
 		GenesisValidatorsRoot: make([]byte, 32),
-		Fork: &zondpb.Fork{
+		Fork: &qrysmpb.Fork{
 			PreviousVersion: make([]byte, 4),
 			CurrentVersion:  make([]byte, 4),
 			Epoch:           0,
 		},
-		LatestBlockHeader: &zondpb.BeaconBlockHeader{
+		LatestBlockHeader: &qrysmpb.BeaconBlockHeader{
 			ParentRoot: make([]byte, fieldparams.RootLength),
 			StateRoot:  make([]byte, fieldparams.RootLength),
 			BodyRoot:   make([]byte, fieldparams.RootLength),
 		},
 		Validators: vals,
 		Balances:   bals,
-		ExecutionNodeData: &zondpb.ExecutionNodeData{
+		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},
@@ -235,9 +235,9 @@ func generateState(t *testing.T) state.BeaconState {
 		StateRoots:                  mockstateRoots,
 		RandaoMixes:                 mockrandaoMixes,
 		JustificationBits:           bitfield.NewBitvector4(),
-		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		CurrentJustifiedCheckpoint:  &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+		PreviousJustifiedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+		CurrentJustifiedCheckpoint:  &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+		FinalizedCheckpoint:         &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 		Slashings:                   make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector),
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
 			ParentHash:       make([]byte, 32),

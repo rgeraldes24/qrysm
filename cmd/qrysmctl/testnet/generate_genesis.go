@@ -20,7 +20,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/io/file"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/interop"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/urfave/cli/v2"
@@ -320,7 +320,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get hash tree root")
 		}
-		e1d := &zondpb.ExecutionNodeData{
+		e1d := &qrysmpb.ExecutionNodeData{
 			DepositRoot:  depositRoot[:],
 			DepositCount: 0,
 			BlockHash:    header.Hash().Bytes(),
@@ -336,12 +336,12 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 	return genesisState, err
 }
 
-func depositEntriesFromJSON(enc []byte) ([][]byte, []*zondpb.Deposit_Data, error) {
+func depositEntriesFromJSON(enc []byte) ([][]byte, []*qrysmpb.Deposit_Data, error) {
 	var depositJSON []*depositDataJSON
 	if err := json.Unmarshal(enc, &depositJSON); err != nil {
 		return nil, nil, err
 	}
-	dds := make([]*zondpb.Deposit_Data, len(depositJSON))
+	dds := make([]*qrysmpb.Deposit_Data, len(depositJSON))
 	roots := make([][]byte, len(depositJSON))
 	for i, val := range depositJSON {
 		root, data, err := depositJSONToDepositData(val)
@@ -354,7 +354,7 @@ func depositEntriesFromJSON(enc []byte) ([][]byte, []*zondpb.Deposit_Data, error
 	return roots, dds, nil
 }
 
-func depositJSONToDepositData(input *depositDataJSON) ([]byte, *zondpb.Deposit_Data, error) {
+func depositJSONToDepositData(input *depositDataJSON) ([]byte, *qrysmpb.Deposit_Data, error) {
 	root, err := hex.DecodeString(strings.TrimPrefix(input.DepositDataRoot, "0x"))
 	if err != nil {
 		return nil, nil, err
@@ -371,7 +371,7 @@ func depositJSONToDepositData(input *depositDataJSON) ([]byte, *zondpb.Deposit_D
 	if err != nil {
 		return nil, nil, err
 	}
-	return root, &zondpb.Deposit_Data{
+	return root, &qrysmpb.Deposit_Data{
 		PublicKey:             pk,
 		WithdrawalCredentials: creds,
 		Amount:                input.Amount,

@@ -18,8 +18,8 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/hash"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 type Credential struct {
@@ -123,7 +123,7 @@ func (c *Credential) VerifyKeystore(keystoreFileFolder, password string) bool {
 	return c.signingSeed == misc.EncodeHex(seedBytes[:])
 }
 
-func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *zondpbv1.SignedDilithiumToExecutionChange {
+func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *qrysmpbv1.SignedDilithiumToExecutionChange {
 	if len(c.hexZondWithdrawalAddress) == 0 {
 		panic("the execution address should not be empty")
 	}
@@ -139,7 +139,7 @@ func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *zondp
 		panic(fmt.Errorf("failed to read withdrawal address %v", err))
 	}
 
-	message := &zondpbv1.DilithiumToExecutionChange{
+	message := &qrysmpbv1.DilithiumToExecutionChange{
 		ValidatorIndex:      primitives.ValidatorIndex(validatorIndex),
 		FromDilithiumPubkey: c.WithdrawalPK(),
 		ToExecutionAddress:  execAddr.Bytes()}
@@ -157,7 +157,7 @@ func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *zondp
 		panic(fmt.Errorf("failed to compute domain %v", err))
 	}
 
-	signingData := &zondpb.SigningData{
+	signingData := &qrysmpb.SigningData{
 		ObjectRoot: root[:],
 		Domain:     domain,
 	}
@@ -168,7 +168,7 @@ func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *zondp
 	}
 	signature := d.Sign(signingRoot[:])
 
-	return &zondpbv1.SignedDilithiumToExecutionChange{
+	return &qrysmpbv1.SignedDilithiumToExecutionChange{
 		Message:   message,
 		Signature: signature.Marshal(),
 	}

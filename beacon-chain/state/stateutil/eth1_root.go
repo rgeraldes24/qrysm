@@ -8,11 +8,11 @@ import (
 	params "github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // ExecutionNodeDataRootWithHasher returns the hash tree root of input `executionNodeData`.
-func ExecutionNodeDataRootWithHasher(executionNodeData *zondpb.ExecutionNodeData) ([32]byte, error) {
+func ExecutionNodeDataRootWithHasher(executionNodeData *qrysmpb.ExecutionNodeData) ([32]byte, error) {
 	if executionNodeData == nil {
 		return [32]byte{}, errors.New("nil eth1 data")
 	}
@@ -40,7 +40,7 @@ func ExecutionNodeDataRootWithHasher(executionNodeData *zondpb.ExecutionNodeData
 }
 
 // ExecutionNodeDatasRoot returns the hash tree root of input `executionNodeDatas`.
-func ExecutionNodeDatasRoot(executionNodeDatas []*zondpb.ExecutionNodeData) ([32]byte, error) {
+func ExecutionNodeDatasRoot(executionNodeDatas []*qrysmpb.ExecutionNodeData) ([32]byte, error) {
 	eth1VotesRoots := make([][32]byte, 0, len(executionNodeDatas))
 	for i := 0; i < len(executionNodeDatas); i++ {
 		eth1, err := ExecutionNodeDataRootWithHasher(executionNodeDatas[i])

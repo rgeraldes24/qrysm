@@ -25,7 +25,7 @@ import (
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
 	lruwrpr "github.com/theQRL/qrysm/cache/lru"
 	"github.com/theQRL/qrysm/config/params"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -41,7 +41,7 @@ func FuzzValidateBeaconBlockPubSub_Capella(f *testing.F) {
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(f, err)
 	require.NoError(f, db.SaveState(ctx, beaconState, bRoot))
-	require.NoError(f, db.SaveStateSummary(ctx, &zondpb.StateSummary{Root: bRoot[:]}))
+	require.NoError(f, db.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: bRoot[:]}))
 	copied := beaconState.Copy()
 	require.NoError(f, copied.SetSlot(1))
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
@@ -56,7 +56,7 @@ func FuzzValidateBeaconBlockPubSub_Capella(f *testing.F) {
 	stateGen := stategen.New(db, doublylinkedtree.New())
 	chainService := &mock.ChainService{Genesis: time.Unix(time.Now().Unix()-int64(params.BeaconConfig().SecondsPerSlot), 0),
 		State: beaconState,
-		FinalizedCheckPoint: &zondpb.Checkpoint{
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  make([]byte, 32),
 		},
@@ -92,7 +92,7 @@ func FuzzValidateBeaconBlockPubSub_Capella(f *testing.F) {
 		cService := &mock.ChainService{
 			Genesis: time.Unix(time.Now().Unix()-int64(params.BeaconConfig().SecondsPerSlot*10000000), 0),
 			State:   beaconState,
-			FinalizedCheckPoint: &zondpb.Checkpoint{
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{
 				Epoch: 0,
 				Root:  make([]byte, 32),
 			},

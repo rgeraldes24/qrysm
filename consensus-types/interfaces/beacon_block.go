@@ -5,7 +5,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"google.golang.org/protobuf/proto"
 )
@@ -18,16 +18,16 @@ type ReadOnlySignedBeaconBlock interface {
 	IsNil() bool
 	Copy() (ReadOnlySignedBeaconBlock, error)
 	Proto() (proto.Message, error)
-	PbGenericBlock() (*zondpb.GenericSignedBeaconBlock, error)
+	PbGenericBlock() (*qrysmpb.GenericSignedBeaconBlock, error)
 	ToBlinded() (ReadOnlySignedBeaconBlock, error)
-	PbCapellaBlock() (*zondpb.SignedBeaconBlockCapella, error)
-	PbBlindedCapellaBlock() (*zondpb.SignedBlindedBeaconBlockCapella, error)
+	PbCapellaBlock() (*qrysmpb.SignedBeaconBlockCapella, error)
+	PbBlindedCapellaBlock() (*qrysmpb.SignedBlindedBeaconBlockCapella, error)
 	ssz.Marshaler
 	ssz.Unmarshaler
 	Version() int
 	IsBlinded() bool
 	ValueInGplanck() uint64
-	Header() (*zondpb.SignedBeaconBlockHeader, error)
+	Header() (*qrysmpb.SignedBeaconBlockHeader, error)
 }
 
 // ReadOnlyBeaconBlock describes an interface which states the methods
@@ -54,33 +54,33 @@ type ReadOnlyBeaconBlock interface {
 // that is a beacon block body.
 type ReadOnlyBeaconBlockBody interface {
 	RandaoReveal() [field_params.DilithiumSignatureLength]byte
-	ExecutionNodeData() *zondpb.ExecutionNodeData
+	ExecutionNodeData() *qrysmpb.ExecutionNodeData
 	Graffiti() [field_params.RootLength]byte
-	ProposerSlashings() []*zondpb.ProposerSlashing
-	AttesterSlashings() []*zondpb.AttesterSlashing
-	Attestations() []*zondpb.Attestation
-	Deposits() []*zondpb.Deposit
-	VoluntaryExits() []*zondpb.SignedVoluntaryExit
-	SyncAggregate() (*zondpb.SyncAggregate, error)
+	ProposerSlashings() []*qrysmpb.ProposerSlashing
+	AttesterSlashings() []*qrysmpb.AttesterSlashing
+	Attestations() []*qrysmpb.Attestation
+	Deposits() []*qrysmpb.Deposit
+	VoluntaryExits() []*qrysmpb.SignedVoluntaryExit
+	SyncAggregate() (*qrysmpb.SyncAggregate, error)
 	IsNil() bool
 	HashTreeRoot() ([field_params.RootLength]byte, error)
 	Proto() (proto.Message, error)
 	Execution() (ExecutionData, error)
-	DilithiumToExecutionChanges() ([]*zondpb.SignedDilithiumToExecutionChange, error)
+	DilithiumToExecutionChanges() ([]*qrysmpb.SignedDilithiumToExecutionChange, error)
 }
 
 type SignedBeaconBlock interface {
 	ReadOnlySignedBeaconBlock
 	SetExecution(ExecutionData) error
-	SetDilithiumToExecutionChanges([]*zondpb.SignedDilithiumToExecutionChange) error
-	SetSyncAggregate(*zondpb.SyncAggregate) error
-	SetVoluntaryExits([]*zondpb.SignedVoluntaryExit)
-	SetDeposits([]*zondpb.Deposit)
-	SetAttestations([]*zondpb.Attestation)
-	SetAttesterSlashings([]*zondpb.AttesterSlashing)
-	SetProposerSlashings([]*zondpb.ProposerSlashing)
+	SetDilithiumToExecutionChanges([]*qrysmpb.SignedDilithiumToExecutionChange) error
+	SetSyncAggregate(*qrysmpb.SyncAggregate) error
+	SetVoluntaryExits([]*qrysmpb.SignedVoluntaryExit)
+	SetDeposits([]*qrysmpb.Deposit)
+	SetAttestations([]*qrysmpb.Attestation)
+	SetAttesterSlashings([]*qrysmpb.AttesterSlashing)
+	SetProposerSlashings([]*qrysmpb.ProposerSlashing)
 	SetGraffiti([]byte)
-	SetExecutionNodeData(*zondpb.ExecutionNodeData)
+	SetExecutionNodeData(*qrysmpb.ExecutionNodeData)
 	SetRandaoReveal([]byte)
 	SetBlinded(bool)
 	SetStateRoot([]byte)

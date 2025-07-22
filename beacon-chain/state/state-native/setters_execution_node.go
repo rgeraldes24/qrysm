@@ -3,11 +3,11 @@ package state_native
 import (
 	"github.com/theQRL/qrysm/beacon-chain/state/state-native/types"
 	"github.com/theQRL/qrysm/beacon-chain/state/stateutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // SetExecutionNodeData for the beacon state.
-func (b *BeaconState) SetExecutionNodeData(val *zondpb.ExecutionNodeData) error {
+func (b *BeaconState) SetExecutionNodeData(val *qrysmpb.ExecutionNodeData) error {
 	b.lock.Lock()
 	defer b.lock.Unlock()
 
@@ -18,7 +18,7 @@ func (b *BeaconState) SetExecutionNodeData(val *zondpb.ExecutionNodeData) error 
 
 // SetExecutionNodeDataVotes for the beacon state. Updates the entire
 // list to a new value by overwriting the previous one.
-func (b *BeaconState) SetExecutionNodeDataVotes(val []*zondpb.ExecutionNodeData) error {
+func (b *BeaconState) SetExecutionNodeDataVotes(val []*qrysmpb.ExecutionNodeData) error {
 	b.lock.Lock()
 	defer b.lock.Unlock()
 
@@ -43,14 +43,14 @@ func (b *BeaconState) SetEth1DepositIndex(val uint64) error {
 
 // AppendExecutionNodeDataVotes for the beacon state. Appends the new value
 // to the end of list.
-func (b *BeaconState) AppendExecutionNodeDataVotes(val *zondpb.ExecutionNodeData) error {
+func (b *BeaconState) AppendExecutionNodeDataVotes(val *qrysmpb.ExecutionNodeData) error {
 	b.lock.Lock()
 	defer b.lock.Unlock()
 
 	votes := b.executionNodeDataVotes
 	if b.sharedFieldReferences[types.ExecutionNodeDataVotes].Refs() > 1 {
 		// Copy elements in underlying array by reference.
-		votes = make([]*zondpb.ExecutionNodeData, 0, len(b.executionNodeDataVotes)+1)
+		votes = make([]*qrysmpb.ExecutionNodeData, 0, len(b.executionNodeDataVotes)+1)
 		votes = append(votes, b.executionNodeDataVotes...)
 		b.sharedFieldReferences[types.ExecutionNodeDataVotes].MinusRef()
 		b.sharedFieldReferences[types.ExecutionNodeDataVotes] = stateutil.NewRef(1)

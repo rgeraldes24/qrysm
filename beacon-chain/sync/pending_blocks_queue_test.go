@@ -28,7 +28,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/network/forks"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -50,7 +50,7 @@ func TestRegularSyncBeaconBlockSubscriber_ProcessPendingBlocks1(t *testing.T) {
 			p2p:      p1,
 			beaconDB: db,
 			chain: &mock.ChainService{
-				FinalizedCheckPoint: &zondpb.Checkpoint{
+				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
 				},
 			},
@@ -123,7 +123,7 @@ func TestRegularSyncBeaconBlockSubscriber_OptimisticStatus(t *testing.T) {
 			beaconDB: db,
 			chain: &mock.ChainService{
 				Optimistic: true,
-				FinalizedCheckPoint: &zondpb.Checkpoint{
+				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
 				},
 			},
@@ -196,7 +196,7 @@ func TestRegularSyncBeaconBlockSubscriber_ExecutionEngineTimesOut(t *testing.T) 
 			p2p:      p1,
 			beaconDB: db,
 			chain: &mock.ChainService{
-				FinalizedCheckPoint: &zondpb.Checkpoint{
+				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
 				},
 				ReceiveBlockMockErr: execution.ErrHTTPTimeout,
@@ -271,7 +271,7 @@ func TestRegularSync_InsertDuplicateBlocks(t *testing.T) {
 			p2p:      p1,
 			beaconDB: db,
 			chain: &mock.ChainService{
-				FinalizedCheckPoint: &zondpb.Checkpoint{
+				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
 					Root:  make([]byte, 32),
 				},
@@ -325,7 +325,7 @@ func TestRegularSyncBeaconBlockSubscriber_DoNotReprocessBlock(t *testing.T) {
 			p2p:      p1,
 			beaconDB: db,
 			chain: &mock.ChainService{
-				FinalizedCheckPoint: &zondpb.Checkpoint{
+				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
 				},
 			},
@@ -393,7 +393,7 @@ func TestRegularSyncBeaconBlockSubscriber_ProcessPendingBlocks_2Chains(t *testin
 			p2p:      p1,
 			beaconDB: db,
 			chain: &mock.ChainService{
-				FinalizedCheckPoint: &zondpb.Checkpoint{
+				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 0,
 					Root:  make([]byte, 32),
 				},
@@ -408,7 +408,7 @@ func TestRegularSyncBeaconBlockSubscriber_ProcessPendingBlocks_2Chains(t *testin
 
 	p1.Peers().Add(new(qnr.Record), p2.PeerID(), nil, network.DirOutbound)
 	p1.Peers().SetConnectionState(p2.PeerID(), peers.PeerConnected)
-	p1.Peers().SetChainState(p2.PeerID(), &zondpb.Status{})
+	p1.Peers().SetChainState(p2.PeerID(), &qrysmpb.Status{})
 
 	b0 := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b0)
@@ -494,7 +494,7 @@ func TestRegularSyncBeaconBlockSubscriber_PruneOldPendingBlocks(t *testing.T) {
 			p2p:      p1,
 			beaconDB: db,
 			chain: &mock.ChainService{
-				FinalizedCheckPoint: &zondpb.Checkpoint{
+				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Epoch: 1,
 					Root:  make([]byte, 32),
 				},
@@ -507,7 +507,7 @@ func TestRegularSyncBeaconBlockSubscriber_PruneOldPendingBlocks(t *testing.T) {
 
 	p1.Peers().Add(new(qnr.Record), p1.PeerID(), nil, network.DirOutbound)
 	p1.Peers().SetConnectionState(p1.PeerID(), peers.PeerConnected)
-	p1.Peers().SetChainState(p1.PeerID(), &zondpb.Status{})
+	p1.Peers().SetChainState(p1.PeerID(), &qrysmpb.Status{})
 
 	b0 := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b0)
@@ -567,16 +567,16 @@ func TestService_sortedPendingSlots(t *testing.T) {
 	}
 
 	var lastSlot primitives.Slot = math.MaxUint64
-	wsb, err := blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Slot: lastSlot}}))
+	wsb, err := blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: lastSlot}}))
 	require.NoError(t, err)
 	require.NoError(t, r.insertBlockToPendingQueue(lastSlot, wsb, [32]byte{1}))
-	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Slot: lastSlot - 3}}))
+	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: lastSlot - 3}}))
 	require.NoError(t, err)
 	require.NoError(t, r.insertBlockToPendingQueue(lastSlot-3, wsb, [32]byte{2}))
-	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Slot: lastSlot - 5}}))
+	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: lastSlot - 5}}))
 	require.NoError(t, err)
 	require.NoError(t, r.insertBlockToPendingQueue(lastSlot-5, wsb, [32]byte{3}))
-	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Slot: lastSlot - 2}}))
+	wsb, err = blocks.NewSignedBeaconBlock(util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: lastSlot - 2}}))
 	require.NoError(t, err)
 	require.NoError(t, r.insertBlockToPendingQueue(lastSlot-2, wsb, [32]byte{4}))
 
@@ -592,7 +592,7 @@ func TestService_BatchRootRequest(t *testing.T) {
 	assert.Equal(t, 1, len(p1.BHost.Network().Peers()), "Expected peers to be connected")
 
 	chain := &mock.ChainService{
-		FinalizedCheckPoint: &zondpb.Checkpoint{
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: 1,
 			Root:  make([]byte, 32),
 		},
@@ -613,7 +613,7 @@ func TestService_BatchRootRequest(t *testing.T) {
 
 	p1.Peers().Add(new(qnr.Record), p2.PeerID(), nil, network.DirOutbound)
 	p1.Peers().SetConnectionState(p2.PeerID(), peers.PeerConnected)
-	p1.Peers().SetChainState(p2.PeerID(), &zondpb.Status{FinalizedEpoch: 2})
+	p1.Peers().SetChainState(p2.PeerID(), &qrysmpb.Status{FinalizedEpoch: 2})
 
 	b0 := util.NewBeaconBlockCapella()
 	util.SaveBlock(t, context.Background(), r.cfg.beaconDB, b0)
@@ -659,7 +659,7 @@ func TestService_BatchRootRequest(t *testing.T) {
 		var out p2ptypes.BeaconBlockByRootsReq
 		assert.NoError(t, p2.Encoding().DecodeWithMaxLength(stream, &out))
 		assert.DeepEqual(t, expectedRoots, out, "Did not receive expected message")
-		response := []*zondpb.SignedBeaconBlockCapella{b2, b3, b4, b5}
+		response := []*qrysmpb.SignedBeaconBlockCapella{b2, b3, b4, b5}
 		for _, blk := range response {
 			_, err := stream.Write([]byte{responseCodeSuccess})
 			assert.NoError(t, err, "Could not write to stream")
@@ -689,9 +689,9 @@ func TestService_AddPendingBlockToQueueOverMax(t *testing.T) {
 	}
 
 	b := util.NewBeaconBlockCapella()
-	b1 := zondpb.CopySignedBeaconBlockCapella(b)
+	b1 := qrysmpb.CopySignedBeaconBlockCapella(b)
 	b1.Block.StateRoot = []byte{'a'}
-	b2 := zondpb.CopySignedBeaconBlockCapella(b)
+	b2 := qrysmpb.CopySignedBeaconBlockCapella(b)
 	b2.Block.StateRoot = []byte{'b'}
 	wsb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -703,7 +703,7 @@ func TestService_AddPendingBlockToQueueOverMax(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, r.insertBlockToPendingQueue(0, wsb, [32]byte{2}))
 
-	b3 := zondpb.CopySignedBeaconBlockCapella(b)
+	b3 := qrysmpb.CopySignedBeaconBlockCapella(b)
 	b3.Block.StateRoot = []byte{'c'}
 	wsb, err = blocks.NewSignedBeaconBlock(b2)
 	require.NoError(t, err)
@@ -719,7 +719,7 @@ func TestService_ProcessPendingBlockOnCorrectSlot(t *testing.T) {
 	fcs := doublylinkedtree.New()
 	mockChain := mock.ChainService{
 		Genesis: time.Unix(time.Now().Unix()-int64(params.BeaconConfig().SecondsPerSlot), 0),
-		FinalizedCheckPoint: &zondpb.Checkpoint{
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 		}}
 	r := &Service{
@@ -741,7 +741,7 @@ func TestService_ProcessPendingBlockOnCorrectSlot(t *testing.T) {
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(ctx, beaconState, bRoot))
-	require.NoError(t, db.SaveStateSummary(ctx, &zondpb.StateSummary{Root: bRoot[:]}))
+	require.NoError(t, db.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: bRoot[:]}))
 	copied := beaconState.Copy()
 	require.NoError(t, copied.SetSlot(1))
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
@@ -798,7 +798,7 @@ func TestService_ProcessBadPendingBlocks(t *testing.T) {
 
 	p1 := p2ptest.NewTestP2P(t)
 	mockChain := mock.ChainService{Genesis: time.Unix(time.Now().Unix()-int64(params.BeaconConfig().SecondsPerSlot), 0),
-		FinalizedCheckPoint: &zondpb.Checkpoint{
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 		}}
 	r := &Service{
@@ -819,7 +819,7 @@ func TestService_ProcessBadPendingBlocks(t *testing.T) {
 	bRoot, err := parentBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(ctx, beaconState, bRoot))
-	require.NoError(t, db.SaveStateSummary(ctx, &zondpb.StateSummary{Root: bRoot[:]}))
+	require.NoError(t, db.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: bRoot[:]}))
 	copied := beaconState.Copy()
 	require.NoError(t, copied.SetSlot(1))
 	proposerIdx, err := helpers.BeaconProposerIndex(ctx, copied)
@@ -859,7 +859,7 @@ func TestAlreadySyncingBlock(t *testing.T) {
 	hook := logTest.NewGlobal()
 
 	mockChain := &mock.ChainService{
-		FinalizedCheckPoint: &zondpb.Checkpoint{
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 		},
 	}

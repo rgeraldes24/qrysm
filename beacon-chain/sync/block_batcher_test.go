@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -21,7 +21,7 @@ func TestSortedObj_SortBlocksRoots(t *testing.T) {
 	var blks []blocks.ROBlock
 	for i := 0; i < 10; i++ {
 		slot := primitives.Slot(randFunc())
-		newBlk, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Slot: slot, Body: &zondpb.BeaconBlockBodyCapella{}}})
+		newBlk, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: slot, Body: &qrysmpb.BeaconBlockBodyCapella{}}})
 		require.NoError(t, err)
 		root := bytesutil.ToBytes32(bytesutil.Bytes32(uint64(slot)))
 		b, err := blocks.NewROBlockWithRoot(newBlk, root)
@@ -49,7 +49,7 @@ func TestSortedObj_NoDuplicates(t *testing.T) {
 
 	for i := 0; i < 10; i++ {
 		slot := primitives.Slot(randFunc())
-		newBlk := &zondpb.SignedBeaconBlockCapella{Block: &zondpb.BeaconBlockCapella{Slot: slot, Body: &zondpb.BeaconBlockBodyCapella{}}}
+		newBlk := &qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: slot, Body: &qrysmpb.BeaconBlockBodyCapella{}}}
 		// append twice
 		wsb, err := blocks.NewSignedBeaconBlock(newBlk)
 		require.NoError(t, err)

@@ -23,7 +23,7 @@ import (
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -42,13 +42,13 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 	var emptySig [field_params.DilithiumSignatureLength]byte
 	type args struct {
 		pid   peer.ID
-		msg   *zondpb.SignedDilithiumToExecutionChange
+		msg   *qrysmpb.SignedDilithiumToExecutionChange
 		topic string
 	}
 	tests := []struct {
 		name     string
 		svcopts  []Option
-		setupSvc func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string)
+		setupSvc func(s *Service, msg *qrysmpb.SignedDilithiumToExecutionChange, topic string) (*Service, string)
 		clock    *startup.Clock
 		args     args
 		want     pubsub.ValidationResult
@@ -61,7 +61,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithChainService(chainService),
 				WithOperationNotifier(chainService.OperationNotifier()),
 			},
-			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
+			setupSvc: func(s *Service, msg *qrysmpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
@@ -70,8 +70,8 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 			args: args{
 				pid:   "random",
 				topic: "junk",
-				msg: &zondpb.SignedDilithiumToExecutionChange{
-					Message: &zondpb.DilithiumToExecutionChange{
+				msg: &qrysmpb.SignedDilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
 						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
@@ -88,7 +88,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithChainService(chainService),
 				WithOperationNotifier(chainService.OperationNotifier()),
 			},
-			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
+			setupSvc: func(s *Service, msg *qrysmpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
@@ -97,8 +97,8 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 			args: args{
 				pid:   "random",
 				topic: "junk",
-				msg: &zondpb.SignedDilithiumToExecutionChange{
-					Message: &zondpb.DilithiumToExecutionChange{
+				msg: &qrysmpb.SignedDilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
 						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
@@ -116,12 +116,12 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithOperationNotifier(chainService.OperationNotifier()),
 				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
-			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
+			setupSvc: func(s *Service, msg *qrysmpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
-				s.cfg.dilithiumToExecPool.InsertDilithiumToExecChange(&zondpb.SignedDilithiumToExecutionChange{
-					Message: &zondpb.DilithiumToExecutionChange{
+				s.cfg.dilithiumToExecPool.InsertDilithiumToExecChange(&qrysmpb.SignedDilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      10,
 						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
@@ -133,8 +133,8 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 			args: args{
 				pid:   "random",
 				topic: fmt.Sprintf(defaultTopic, fakeDigest),
-				msg: &zondpb.SignedDilithiumToExecutionChange{
-					Message: &zondpb.DilithiumToExecutionChange{
+				msg: &qrysmpb.SignedDilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      10,
 						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
@@ -154,7 +154,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot*10)), [32]byte{'A'}),
-			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
+			setupSvc: func(s *Service, msg *qrysmpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
@@ -178,8 +178,8 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 			args: args{
 				pid:   "random",
 				topic: fmt.Sprintf(defaultTopic, fakeDigest),
-				msg: &zondpb.SignedDilithiumToExecutionChange{
-					Message: &zondpb.DilithiumToExecutionChange{
+				msg: &qrysmpb.SignedDilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
 						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
@@ -198,7 +198,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Duration(10)), [32]byte{'A'}),
-			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
+			setupSvc: func(s *Service, msg *qrysmpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
@@ -213,8 +213,8 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 			args: args{
 				pid:   "random",
 				topic: fmt.Sprintf(defaultTopic, fakeDigest),
-				msg: &zondpb.SignedDilithiumToExecutionChange{
-					Message: &zondpb.DilithiumToExecutionChange{
+				msg: &qrysmpb.SignedDilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
 						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
@@ -233,7 +233,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Duration(10)), [32]byte{'A'}),
-			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
+			setupSvc: func(s *Service, msg *qrysmpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
@@ -251,8 +251,8 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 			args: args{
 				pid:   "random",
 				topic: fmt.Sprintf(defaultTopic, fakeDigest),
-				msg: &zondpb.SignedDilithiumToExecutionChange{
-					Message: &zondpb.DilithiumToExecutionChange{
+				msg: &qrysmpb.SignedDilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
 						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
@@ -271,12 +271,12 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Duration(10)), [32]byte{'A'}),
-			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
+			setupSvc: func(s *Service, msg *qrysmpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
 				st, keys := util.DeterministicGenesisStateCapella(t, 128)
-				assert.NoError(t, st.ApplyToEveryValidator(func(idx int, val *zondpb.Validator) (bool, *zondpb.Validator, error) {
+				assert.NoError(t, st.ApplyToEveryValidator(func(idx int, val *qrysmpb.Validator) (bool, *qrysmpb.Validator, error) {
 					newCreds := make([]byte, 32)
 					newCreds[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
 					copy(newCreds[12:], wantedExecAddress)
@@ -296,8 +296,8 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 			args: args{
 				pid:   "random",
 				topic: fmt.Sprintf(defaultTopic, fakeDigest),
-				msg: &zondpb.SignedDilithiumToExecutionChange{
-					Message: &zondpb.DilithiumToExecutionChange{
+				msg: &qrysmpb.SignedDilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
 						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
@@ -316,7 +316,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Duration(10)), [32]byte{'A'}),
-			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
+			setupSvc: func(s *Service, msg *qrysmpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
@@ -337,8 +337,8 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 			args: args{
 				pid:   "random",
 				topic: fmt.Sprintf(defaultTopic, fakeDigest),
-				msg: &zondpb.SignedDilithiumToExecutionChange{
-					Message: &zondpb.DilithiumToExecutionChange{
+				msg: &qrysmpb.SignedDilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
 						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),
@@ -357,7 +357,7 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 				WithDilithiumToExecPool(dilithiumtoexec.NewPool()),
 			},
 			clock: startup.NewClock(time.Now().Add(-time.Second*time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Duration(10)), [32]byte{'A'}),
-			setupSvc: func(s *Service, msg *zondpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
+			setupSvc: func(s *Service, msg *qrysmpb.SignedDilithiumToExecutionChange, topic string) (*Service, string) {
 				s.cfg.stateGen = stategen.New(beaconDB, doublylinkedtree.New())
 				s.cfg.beaconDB = beaconDB
 				s.initCaches()
@@ -381,8 +381,8 @@ func TestService_ValidateDilithiumToExecutionChange(t *testing.T) {
 			args: args{
 				pid:   "random",
 				topic: fmt.Sprintf(defaultTopic, fakeDigest),
-				msg: &zondpb.SignedDilithiumToExecutionChange{
-					Message: &zondpb.DilithiumToExecutionChange{
+				msg: &qrysmpb.SignedDilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      0,
 						FromDilithiumPubkey: make([]byte, field_params.DilithiumPubkeyLength),
 						ToExecutionAddress:  make([]byte, 20),

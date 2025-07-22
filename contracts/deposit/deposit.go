@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/hash"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // DepositInput for a given key. This input data can be used to when making a
@@ -26,8 +26,8 @@ import (
 //	- Send a transaction on the Zond execution layer to DEPOSIT_CONTRACT_ADDRESS executing `deposit(pubkey: bytes[48], withdrawal_credentials: bytes[32], signature: bytes[96])` along with a deposit of amount Gplanck.
 //
 // See: https://github.com/ethereum/consensus-specs/blob/master/specs/validator/0_beacon-chain-validator.md#submit-deposit
-func DepositInput(depositKey, withdrawalKey dilithium.DilithiumKey, amountInGplanck uint64, forkVersion []byte) (*zondpb.Deposit_Data, [32]byte, error) {
-	depositMessage := &zondpb.DepositMessage{
+func DepositInput(depositKey, withdrawalKey dilithium.DilithiumKey, amountInGplanck uint64, forkVersion []byte) (*qrysmpb.Deposit_Data, [32]byte, error) {
+	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             depositKey.PublicKey().Marshal(),
 		WithdrawalCredentials: WithdrawalCredentialsHash(withdrawalKey),
 		Amount:                amountInGplanck,
@@ -46,11 +46,11 @@ func DepositInput(depositKey, withdrawalKey dilithium.DilithiumKey, amountInGpla
 	if err != nil {
 		return nil, [32]byte{}, err
 	}
-	root, err := (&zondpb.SigningData{ObjectRoot: sr[:], Domain: domain}).HashTreeRoot()
+	root, err := (&qrysmpb.SigningData{ObjectRoot: sr[:], Domain: domain}).HashTreeRoot()
 	if err != nil {
 		return nil, [32]byte{}, err
 	}
-	di := &zondpb.Deposit_Data{
+	di := &qrysmpb.Deposit_Data{
 		PublicKey:             depositMessage.PublicKey,
 		WithdrawalCredentials: depositMessage.WithdrawalCredentials,
 		Amount:                depositMessage.Amount,
@@ -80,8 +80,8 @@ func WithdrawalCredentialsHash(withdrawalKey dilithium.DilithiumKey) []byte {
 }
 
 // VerifyDepositSignature verifies the correctness of Eth1 deposit BLS signature
-func VerifyDepositSignature(dd *zondpb.Deposit_Data, domain []byte) error {
-	ddCopy := zondpb.CopyDepositData(dd)
+func VerifyDepositSignature(dd *qrysmpb.Deposit_Data, domain []byte) error {
+	ddCopy := qrysmpb.CopyDepositData(dd)
 	publicKey, err := dilithium.PublicKeyFromBytes(ddCopy.PublicKey)
 	if err != nil {
 		return errors.Wrap(err, "could not convert bytes to public key")
@@ -90,7 +90,7 @@ func VerifyDepositSignature(dd *zondpb.Deposit_Data, domain []byte) error {
 	if err != nil {
 		return errors.Wrap(err, "could not convert bytes to signature")
 	}
-	di := &zondpb.DepositMessage{
+	di := &qrysmpb.DepositMessage{
 		PublicKey:             ddCopy.PublicKey,
 		WithdrawalCredentials: ddCopy.WithdrawalCredentials,
 		Amount:                ddCopy.Amount,
@@ -99,7 +99,7 @@ func VerifyDepositSignature(dd *zondpb.Deposit_Data, domain []byte) error {
 	if err != nil {
 		return errors.Wrap(err, "could not get signing root")
 	}
-	signingData := &zondpb.SigningData{
+	signingData := &qrysmpb.SigningData{
 		ObjectRoot: root[:],
 		Domain:     domain,
 	}

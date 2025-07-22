@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -60,7 +60,7 @@ func TestService_decodePubsubMessage(t *testing.T) {
 		},
 		{
 			name:  "valid message -- beacon block",
-			topic: fmt.Sprintf(p2p.GossipTypeMapping[reflect.TypeOf(&zondpb.SignedBeaconBlockCapella{})], digest),
+			topic: fmt.Sprintf(p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.SignedBeaconBlockCapella{})], digest),
 			input: &pubsub.Message{
 				Message: &pb.Message{
 					Data: func() []byte {

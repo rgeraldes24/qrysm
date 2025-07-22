@@ -2,21 +2,21 @@ package migration
 
 import (
 	"github.com/pkg/errors"
-	zondpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-func V1Alpha1ConnectionStateToV1(connState zond.ConnectionState) zondpb.ConnectionState {
+func V1Alpha1ConnectionStateToV1(connState zond.ConnectionState) qrysmpb.ConnectionState {
 	alphaString := connState.String()
-	v1Value := zondpb.ConnectionState_value[alphaString]
-	return zondpb.ConnectionState(v1Value)
+	v1Value := qrysmpb.ConnectionState_value[alphaString]
+	return qrysmpb.ConnectionState(v1Value)
 }
 
-func V1Alpha1PeerDirectionToV1(peerDirection zond.PeerDirection) (zondpb.PeerDirection, error) {
+func V1Alpha1PeerDirectionToV1(peerDirection zond.PeerDirection) (qrysmpb.PeerDirection, error) {
 	alphaString := peerDirection.String()
 	if alphaString == zond.PeerDirection_UNKNOWN.String() {
 		return 0, errors.New("peer direction unknown")
 	}
-	v1Value := zondpb.PeerDirection_value[alphaString]
-	return zondpb.PeerDirection(v1Value), nil
+	v1Value := qrysmpb.PeerDirection_value[alphaString]
+	return qrysmpb.PeerDirection(v1Value), nil
 }

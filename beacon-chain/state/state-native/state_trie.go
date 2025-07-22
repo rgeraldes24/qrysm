@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/container/slice"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"go.opencensus.io/trace"
 	"google.golang.org/protobuf/proto"
@@ -60,13 +60,13 @@ const (
 )
 
 // InitializeFromProtoCapella the beacon state from a protobuf representation.
-func InitializeFromProtoCapella(st *zondpb.BeaconStateCapella) (state.BeaconState, error) {
-	return InitializeFromProtoUnsafeCapella(proto.Clone(st).(*zondpb.BeaconStateCapella))
+func InitializeFromProtoCapella(st *qrysmpb.BeaconStateCapella) (state.BeaconState, error) {
+	return InitializeFromProtoUnsafeCapella(proto.Clone(st).(*qrysmpb.BeaconStateCapella))
 }
 
 // InitializeFromProtoUnsafeCapella directly uses the beacon state protobuf fields
 // and sets them as fields of the BeaconState type.
-func InitializeFromProtoUnsafeCapella(st *zondpb.BeaconStateCapella) (state.BeaconState, error) {
+func InitializeFromProtoUnsafeCapella(st *qrysmpb.BeaconStateCapella) (state.BeaconState, error) {
 	if st == nil {
 		return nil, errors.New("received nil state")
 	}
