@@ -329,7 +329,7 @@ func addPeer(t *testing.T, p *peers.Status, state peerdata.PeerConnectionState) 
 	require.NoError(t, err)
 	p.Add(new(qnr.Record), id, nil, network.DirInbound)
 	p.SetConnectionState(id, state)
-	p.SetMetadata(id, wrapper.WrappedMetadataV0(&zondpb.MetaDataV0{
+	p.SetMetadata(id, wrapper.WrappedMetadataV1(&zondpb.MetaDataV1{
 		SeqNumber: 0,
 		Attnets:   bitfield.NewBitvector64(),
 	}))
@@ -359,8 +359,8 @@ func TestRefreshQNR_ForkBoundaries(t *testing.T) {
 				listener, err := s.createListener(ipAddr, pkey)
 				assert.NoError(t, err)
 				s.dv5Listener = listener
-				s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+				s.metaData = wrapper.WrappedMetadataV1(new(zondpb.MetaDataV1))
+				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{})
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
@@ -380,8 +380,8 @@ func TestRefreshQNR_ForkBoundaries(t *testing.T) {
 				listener, err := s.createListener(ipAddr, pkey)
 				assert.NoError(t, err)
 				s.dv5Listener = listener
-				s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01})
+				s.metaData = wrapper.WrappedMetadataV1(new(zondpb.MetaDataV1))
+				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}, []byte{})
 				cache.SubnetIDs.AddPersistentCommittee([]byte{'A'}, []uint64{1, 2, 3, 23}, 0)
 				return s
 			},
@@ -406,13 +406,13 @@ func TestRefreshQNR_ForkBoundaries(t *testing.T) {
 				params.BeaconConfig().InitializeForkSchedule()
 
 				s.dv5Listener = listener
-				s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01})
+				s.metaData = wrapper.WrappedMetadataV1(new(zondpb.MetaDataV1))
+				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}, []byte{})
 				cache.SubnetIDs.AddPersistentCommittee([]byte{'A'}, []uint64{1, 2, 3, 23}, 0)
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
-				assert.Equal(t, version.Altair, s.metaData.Version())
+				assert.Equal(t, version.Capella, s.metaData.Version())
 				assert.DeepEqual(t, bitfield.Bitvector4{0x00}, s.metaData.MetadataObjV1().Syncnets)
 				assert.DeepEqual(t, bitfield.Bitvector64{0xe, 0x0, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0}, s.metaData.AttnetsBitfield())
 			},
@@ -434,12 +434,12 @@ func TestRefreshQNR_ForkBoundaries(t *testing.T) {
 				params.BeaconConfig().InitializeForkSchedule()
 
 				s.dv5Listener = listener
-				s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+				s.metaData = wrapper.WrappedMetadataV1(new(zondpb.MetaDataV1))
+				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{})
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
-				assert.Equal(t, version.Altair, s.metaData.Version())
+				assert.Equal(t, version.Capella, s.metaData.Version())
 				assert.DeepEqual(t, bitfield.Bitvector4{0x00}, s.metaData.MetadataObjV1().Syncnets)
 				assert.DeepEqual(t, bitfield.Bitvector64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}, s.metaData.AttnetsBitfield())
 			},
@@ -461,14 +461,14 @@ func TestRefreshQNR_ForkBoundaries(t *testing.T) {
 				params.BeaconConfig().InitializeForkSchedule()
 
 				s.dv5Listener = listener
-				s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
-				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00})
+				s.metaData = wrapper.WrappedMetadataV1(new(zondpb.MetaDataV1))
+				s.updateSubnetRecordWithMetadata([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, []byte{})
 				cache.SubnetIDs.AddPersistentCommittee([]byte{'A'}, []uint64{1, 2, 3, 23}, 0)
 				cache.SyncSubnetIDs.AddSyncCommitteeSubnets([]byte{'A'}, 0, []uint64{0, 1}, 0)
 				return s
 			},
 			postValidation: func(t *testing.T, s *Service) {
-				assert.Equal(t, version.Altair, s.metaData.Version())
+				assert.Equal(t, version.Capella, s.metaData.Version())
 				assert.DeepEqual(t, bitfield.Bitvector4{0x03}, s.metaData.MetadataObjV1().Syncnets)
 				assert.DeepEqual(t, bitfield.Bitvector64{0xe, 0x0, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0}, s.metaData.AttnetsBitfield())
 			},

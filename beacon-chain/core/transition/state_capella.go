@@ -33,7 +33,7 @@ import (
 //	  state = BeaconState(
 //	      genesis_time=eth1_timestamp + GENESIS_DELAY,
 //	      fork=fork,
-//	      eth1_data=Eth1Data(block_hash=eth1_block_hash, deposit_count=uint64(len(deposits))),
+//	      eth1_data=ExecutionNodeData(block_hash=eth1_block_hash, deposit_count=uint64(len(deposits))),
 //	      latest_block_header=BeaconBlockHeader(body_root=hash_tree_root(BeaconBlockBody())),
 //	      randao_mixes=[eth1_block_hash] * EPOCHS_PER_HISTORICAL_VECTOR,  # Seed RANDAO with Eth1 entropy
 //	  )
@@ -59,14 +59,14 @@ import (
 //	  return state
 //
 // This method differs from the spec so as to process deposits beforehand instead of the end of the function.
-func GenesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.Eth1Data, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
+func GenesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, executionNodeData *zondpb.ExecutionNodeData, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
 	st, err := EmptyGenesisStateCapella()
 	if err != nil {
 		return nil, err
 	}
 
 	// Process initial deposits.
-	st, err = helpers.UpdateGenesisEth1Data(st, deposits, eth1Data)
+	st, err = helpers.UpdateGenesisExecutionNodeData(st, deposits, executionNodeData)
 	if err != nil {
 		return nil, err
 	}
@@ -76,29 +76,29 @@ func GenesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, 
 		return nil, errors.Wrap(err, "could not process validator deposits")
 	}
 
-	// After deposits have been processed, overwrite eth1data to what is passed in. This allows us to "pre-mine" validators
+	// After deposits have been processed, overwrite executionNodeData to what is passed in. This allows us to "pre-mine" validators
 	// without the deposit root and count mismatching the real deposit contract.
-	if err := st.SetEth1Data(eth1Data); err != nil {
+	if err := st.SetExecutionNodeData(executionNodeData); err != nil {
 		return nil, err
 	}
-	if err := st.SetEth1DepositIndex(eth1Data.DepositCount); err != nil {
+	if err := st.SetEth1DepositIndex(executionNodeData.DepositCount); err != nil {
 		return nil, err
 	}
 
-	return OptimizedGenesisBeaconStateCapella(genesisTime, st, st.Eth1Data(), ep)
+	return OptimizedGenesisBeaconStateCapella(genesisTime, st, st.ExecutionNodeData(), ep)
 }
 
 // OptimizedGenesisBeaconStateCapella is used to create a state that has already processed deposits. This is to efficiently
 // create a mainnet state at chainstart.
-func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, eth1Data *zondpb.Eth1Data, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
-	if eth1Data == nil {
-		return nil, errors.New("no eth1data provided for genesis state")
+func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, executionNodeData *zondpb.ExecutionNodeData, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
+	if executionNodeData == nil {
+		return nil, errors.New("no executionNodeData provided for genesis state")
 	}
 
 	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
 	for i := 0; i < len(randaoMixes); i++ {
 		h := make([]byte, 32)
-		copy(h, eth1Data.BlockHash)
+		copy(h, executionNodeData.BlockHash)
 		randaoMixes[i] = h
 	}
 
@@ -184,8 +184,8 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 		Slashings:       slashings,
 
 		// Eth1 data.
-		Eth1Data:                     eth1Data,
-		Eth1DataVotes:                []*zondpb.Eth1Data{},
+		ExecutionNodeData:            executionNodeData,
+		ExecutionNodeDataVotes:       []*zondpb.ExecutionNodeData{},
 		Eth1DepositIndex:             preState.Eth1DepositIndex(),
 		LatestExecutionPayloadHeader: eph,
 		InactivityScores:             scores,
@@ -193,7 +193,7 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 
 	bodyRoot, err := (&zondpb.BeaconBlockBodyCapella{
 		RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
-		Eth1Data: &zondpb.Eth1Data{
+		ExecutionNodeData: &zondpb.ExecutionNodeData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},
@@ -259,9 +259,9 @@ func EmptyGenesisStateCapella() (state.BeaconState, error) {
 		HistoricalRoots:   [][]byte{},
 
 		// Eth1 data.
-		Eth1Data:         &zondpb.Eth1Data{},
-		Eth1DataVotes:    []*zondpb.Eth1Data{},
-		Eth1DepositIndex: 0,
+		ExecutionNodeData:      &zondpb.ExecutionNodeData{},
+		ExecutionNodeDataVotes: []*zondpb.ExecutionNodeData{},
+		Eth1DepositIndex:       0,
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
 			ParentHash:       make([]byte, 32),
 			FeeRecipient:     make([]byte, 20),

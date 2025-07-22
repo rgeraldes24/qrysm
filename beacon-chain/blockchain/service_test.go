@@ -55,11 +55,11 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 	err = beaconDB.SaveExecutionChainData(ctx, &zondpb.ETH1ChainData{
 		BeaconState: pbState,
 		Trie:        mockTrie.ToProto(),
-		CurrentEth1Data: &zondpb.LatestETH1Data{
+		CurrentExecutionNodeData: &zondpb.LatestExecutionNodeData{
 			BlockHash: make([]byte, 32),
 		},
 		ChainstartData: &zondpb.ChainStartData{
-			Eth1Data: &zondpb.Eth1Data{
+			ExecutionNodeData: &zondpb.ExecutionNodeData{
 				DepositRoot:  make([]byte, 32),
 				DepositCount: 0,
 				BlockHash:    make([]byte, 32),

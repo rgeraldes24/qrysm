@@ -15,7 +15,7 @@ syntax = "proto3";
 
 package theqrl.zond.v1alpha1;
 
-import "proto/zond/ext/options.proto";
+import "proto/qrl/ext/options.proto";
 
 option csharp_namespace = "TheQRL.Zond.v1alpha1";
 option go_package = "github.com/theQRL/qrysm/proto/qrysm/v1alpha1;zond";

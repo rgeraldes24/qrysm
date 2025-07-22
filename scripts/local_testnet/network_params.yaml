@@ -1,4 +1,4 @@
-# Full configuration reference [here](https://github.com/theQRL/zond-package?tab=readme-ov-file#configuration).
+# Full configuration reference [here](https://github.com/theQRL/qrl-package?tab=readme-ov-file#configuration).
 participants:
   - el_type: gzond
     el_image: qrledger/go-zond:stable
@@ -24,7 +24,7 @@ network_params:
 #  - tx_spammer
 
 # tx_spammer_params:
-#   image: qrledger/zond-tx-spammer:latest
+#   image: qrledger/qrl-tx-spammer:latest
 #   scenario: eoatx
 #   throughput: 100
 #   max_pending: 100

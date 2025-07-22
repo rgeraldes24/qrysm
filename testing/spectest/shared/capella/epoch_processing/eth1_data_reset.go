@@ -10,8 +10,8 @@ import (
 	"github.com/theQRL/qrysm/testing/spectest/utils"
 )
 
-// RunEth1DataResetTests executes "epoch_processing/eth1_data_reset" tests.
-func RunEth1DataResetTests(t *testing.T, config string) {
+// RunExecutionNodeDataResetTests executes "epoch_processing/eth1_data_reset" tests.
+func RunExecutionNodeDataResetTests(t *testing.T, config string) {
 	require.NoError(t, utils.SetConfig(t, config))
 
 	testFolders, testsFolderPath := utils.TestFolders(t, config, "capella", "epoch_processing/eth1_data_reset/pyspec_tests")
@@ -21,13 +21,13 @@ func RunEth1DataResetTests(t *testing.T, config string) {
 	for _, folder := range testFolders {
 		t.Run(folder.Name(), func(t *testing.T) {
 			folderPath := path.Join(testsFolderPath, folder.Name())
-			RunEpochOperationTest(t, folderPath, processEth1DataResetWrapper)
+			RunEpochOperationTest(t, folderPath, processExecutionNodeDataResetWrapper)
 		})
 	}
 }
 
-func processEth1DataResetWrapper(t *testing.T, st state.BeaconState) (state.BeaconState, error) {
-	st, err := epoch.ProcessEth1DataReset(st)
+func processExecutionNodeDataResetWrapper(t *testing.T, st state.BeaconState) (state.BeaconState, error) {
+	st, err := epoch.ProcessExecutionNodeDataReset(st)
 	require.NoError(t, err, "Could not process final updates")
 	return st, nil
 }

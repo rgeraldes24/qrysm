@@ -91,7 +91,6 @@ message DebugPeerResponse {
     message PeerInfo {
         // Metadata of the peer, containing their bitfield
         // and sequence number.
-        MetaDataV0 metadataV0 = 1;
         MetaDataV1 metadataV1 = 2;
         // List of protocols the peer supports.
         repeated string protocols = 3;

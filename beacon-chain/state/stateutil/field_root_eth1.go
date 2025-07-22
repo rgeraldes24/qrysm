@@ -8,16 +8,16 @@ import (
 // Eth1Root computes the HashTreeRoot Merkleization of
 // a BeaconBlockHeader struct according to the eth2
 // Simple Serialize specification.
-func Eth1Root(eth1Data *zondpb.Eth1Data) ([32]byte, error) {
-	if eth1Data == nil {
+func Eth1Root(executionNodeData *zondpb.ExecutionNodeData) ([32]byte, error) {
+	if executionNodeData == nil {
 		return [32]byte{}, errors.New("nil eth1 data")
 	}
-	return Eth1DataRootWithHasher(eth1Data)
+	return ExecutionNodeDataRootWithHasher(executionNodeData)
 }
 
-// Eth1DataVotesRoot computes the HashTreeRoot Merkleization of
-// a list of Eth1Data structs according to the eth2
+// ExecutionNodeDataVotesRoot computes the HashTreeRoot Merkleization of
+// a list of ExecutionNodeData structs according to the eth2
 // Simple Serialize specification.
-func Eth1DataVotesRoot(eth1DataVotes []*zondpb.Eth1Data) ([32]byte, error) {
-	return Eth1DatasRoot(eth1DataVotes)
+func ExecutionNodeDataVotesRoot(executionNodeDataVotes []*zondpb.ExecutionNodeData) ([32]byte, error) {
+	return ExecutionNodeDatasRoot(executionNodeDataVotes)
 }

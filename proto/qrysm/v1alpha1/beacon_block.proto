@@ -113,8 +113,8 @@ message SignedVoluntaryExit {
     bytes signature = 2 [(theqrl.zond.ext.ssz_size) = "4595"];
 }
 
-// Eth1Data represents references to the Zond deposit contract.
-message Eth1Data {
+// ExecutionNodeData represents references to the Zond deposit contract.
+message ExecutionNodeData {
     // The 32 byte deposit tree root for the last deposit included in this
     // block.
     bytes deposit_root = 1 [(theqrl.zond.ext.ssz_size) = "32"];
@@ -204,7 +204,7 @@ message BeaconBlockBodyCapella {
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
     // A reference to the Zond execution chain.
-    Eth1Data eth1_data = 2;
+    ExecutionNodeData eth1_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
     // is not used for anything other than a fun message.
@@ -268,7 +268,7 @@ message BlindedBeaconBlockBodyCapella {
     bytes randao_reveal = 1 [(theqrl.zond.ext.ssz_size) = "4595"];
 
     // A reference to the Zond execution client.
-    Eth1Data eth1_data = 2;
+    ExecutionNodeData eth1_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
     // is not used for anything other than a fun message.

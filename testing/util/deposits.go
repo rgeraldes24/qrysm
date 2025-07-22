@@ -232,8 +232,8 @@ func DepositTrieSubset(sparseTrie *trie.SparseMerkleTrie, size int) (*trie.Spars
 	return depositTrie, roots, nil
 }
 
-// DeterministicEth1Data takes an array of deposits and returns the eth1Data made from the deposit trie.
-func DeterministicEth1Data(size int) (*zondpb.Eth1Data, error) {
+// DeterministicExecutionNodeData takes an array of deposits and returns the executionNodeData made from the deposit trie.
+func DeterministicExecutionNodeData(size int) (*zondpb.ExecutionNodeData, error) {
 	depositTrie, _, err := DeterministicDepositTrie(size)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create trie")
@@ -242,12 +242,12 @@ func DeterministicEth1Data(size int) (*zondpb.Eth1Data, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to compute deposit trie root")
 	}
-	eth1Data := &zondpb.Eth1Data{
+	executionNodeData := &zondpb.ExecutionNodeData{
 		BlockHash:    root[:],
 		DepositRoot:  root[:],
 		DepositCount: uint64(size),
 	}
-	return eth1Data, nil
+	return executionNodeData, nil
 }
 
 // DepositTrieFromDeposits takes an array of deposits and returns the deposit trie.

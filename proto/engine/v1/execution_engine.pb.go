@@ -11,7 +11,7 @@ import (
 	sync "sync"
 
 	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
-	_ "github.com/theQRL/qrysm/proto/zond/ext"
+	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )

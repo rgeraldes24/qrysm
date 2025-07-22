@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/io/prompt"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
+	zondpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 )
 
 // Delete the accounts that the user requests to be deleted from the wallet.

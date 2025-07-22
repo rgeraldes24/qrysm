@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/math"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
+	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 )

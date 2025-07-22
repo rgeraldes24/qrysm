@@ -8,14 +8,14 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/helpers"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/helpers"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	statenative "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/consensus-types/validator"
 	http2 "github.com/theQRL/qrysm/network/http"
+	zondpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpb "github.com/theQRL/qrysm/proto/zond/v1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 )

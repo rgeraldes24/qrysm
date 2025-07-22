@@ -12,7 +12,7 @@ import (
 	sync "sync"
 
 	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
-	_ "github.com/theQRL/qrysm/proto/zond/ext"
+	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -629,7 +629,6 @@ type DebugPeerResponse_PeerInfo struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	MetadataV0      *MetaDataV0 `protobuf:"bytes,1,opt,name=metadataV0,proto3" json:"metadataV0,omitempty"`
 	MetadataV1      *MetaDataV1 `protobuf:"bytes,2,opt,name=metadataV1,proto3" json:"metadataV1,omitempty"`
 	Protocols       []string    `protobuf:"bytes,3,rep,name=protocols,proto3" json:"protocols,omitempty"`
 	FaultCount      uint64      `protobuf:"varint,4,opt,name=fault_count,json=faultCount,proto3" json:"fault_count,omitempty"`
@@ -668,13 +667,6 @@ func (x *DebugPeerResponse_PeerInfo) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DebugPeerResponse_PeerInfo.ProtoReflect.Descriptor instead.
 func (*DebugPeerResponse_PeerInfo) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP(), []int{5, 0}
-}
-
-func (x *DebugPeerResponse_PeerInfo) GetMetadataV0() *MetaDataV0 {
-	if x != nil {
-		return x.MetadataV0
-	}
-	return nil
 }
 
 func (x *DebugPeerResponse_PeerInfo) GetMetadataV1() *MetaDataV1 {
@@ -940,7 +932,6 @@ var file_proto_qrysm_v1alpha1_debug_proto_goTypes = []interface{}{
 	(PeerDirection)(0),                 // 11: theqrl.zond.v1alpha1.PeerDirection
 	(ConnectionState)(0),               // 12: theqrl.zond.v1alpha1.ConnectionState
 	(*Status)(nil),                     // 13: theqrl.zond.v1alpha1.Status
-	(*MetaDataV0)(nil),                 // 14: theqrl.zond.v1alpha1.MetaDataV0
 	(*MetaDataV1)(nil),                 // 15: theqrl.zond.v1alpha1.MetaDataV1
 	(*emptypb.Empty)(nil),              // 16: google.protobuf.Empty
 	(*PeerRequest)(nil),                // 17: theqrl.zond.v1alpha1.PeerRequest

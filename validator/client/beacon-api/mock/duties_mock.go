@@ -9,8 +9,8 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	shared "github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
-	validator "github.com/theQRL/qrysm/beacon-chain/rpc/zond/validator"
+	shared "github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
+	validator "github.com/theQRL/qrysm/beacon-chain/rpc/qrl/validator"
 	primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 )
 

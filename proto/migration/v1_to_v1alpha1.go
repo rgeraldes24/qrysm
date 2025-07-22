@@ -2,8 +2,8 @@ package migration
 
 import (
 	"github.com/pkg/errors"
+	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
 	"google.golang.org/protobuf/proto"
 )
 

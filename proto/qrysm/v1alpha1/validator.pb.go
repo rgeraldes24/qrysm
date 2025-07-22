@@ -12,7 +12,7 @@ import (
 	sync "sync"
 
 	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
-	_ "github.com/theQRL/qrysm/proto/zond/ext"
+	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"

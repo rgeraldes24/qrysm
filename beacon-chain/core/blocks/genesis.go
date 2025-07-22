@@ -25,7 +25,7 @@ func NewGenesisBlock(stateRoot []byte) *zondpb.SignedBeaconBlockCapella {
 			StateRoot:  bytesutil.PadTo(stateRoot, 32),
 			Body: &zondpb.BeaconBlockBodyCapella{
 				RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
-				Eth1Data: &zondpb.Eth1Data{
+				ExecutionNodeData: &zondpb.ExecutionNodeData{
 					DepositRoot: make([]byte, 32),
 					BlockHash:   make([]byte, 32),
 				},
@@ -66,7 +66,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 				StateRoot:  root[:],
 				Body: &zondpb.BeaconBlockBodyCapella{
 					RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
-					Eth1Data: &zondpb.Eth1Data{
+					ExecutionNodeData: &zondpb.ExecutionNodeData{
 						DepositRoot: make([]byte, 32),
 						BlockHash:   make([]byte, 32),
 					},

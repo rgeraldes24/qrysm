@@ -101,8 +101,6 @@ func (ds *Server) getPeer(pid peer.ID) (*zondpb.DebugPeerResponse, error) {
 	}
 	if metadata != nil && !metadata.IsNil() {
 		switch {
-		case metadata.MetadataObjV0() != nil:
-			peerInfo.MetadataV0 = metadata.MetadataObjV0()
 		case metadata.MetadataObjV1() != nil:
 			peerInfo.MetadataV1 = metadata.MetadataObjV1()
 		}

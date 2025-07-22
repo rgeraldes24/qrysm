@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	mock "github.com/theQRL/qrysm/validator/accounts/testing"
@@ -125,7 +125,7 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, numKeystores, len(statuses))
 		for _, status := range statuses {
-			require.Equal(t, zondpbservice.ImportedKeystoreStatus_IMPORTED, status.Status)
+			require.Equal(t, qrlpbservice.ImportedKeystoreStatus_IMPORTED, status.Status)
 		}
 		require.LogsContain(t, hook, "Successfully imported validator key(s)")
 	})
@@ -146,7 +146,7 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, numKeystores, len(statuses))
 		for _, status := range statuses {
-			require.Equal(t, zondpbservice.ImportedKeystoreStatus_IMPORTED, status.Status)
+			require.Equal(t, qrlpbservice.ImportedKeystoreStatus_IMPORTED, status.Status)
 		}
 	})
 	t.Run("some succeed, some fail to decrypt, some duplicated", func(t *testing.T) {
@@ -176,17 +176,17 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 		require.Equal(t, len(keystores), len(statuses))
 		require.Equal(
 			t,
-			zondpbservice.ImportedKeystoreStatus_IMPORTED,
+			qrlpbservice.ImportedKeystoreStatus_IMPORTED,
 			statuses[0].Status,
 		)
 		require.Equal(
 			t,
-			zondpbservice.ImportedKeystoreStatus_DUPLICATE,
+			qrlpbservice.ImportedKeystoreStatus_DUPLICATE,
 			statuses[1].Status,
 		)
 		require.Equal(
 			t,
-			zondpbservice.ImportedKeystoreStatus_ERROR,
+			qrlpbservice.ImportedKeystoreStatus_ERROR,
 			statuses[2].Status,
 		)
 		require.StringContains(
@@ -231,12 +231,12 @@ func TestLocalKeymanager_ImportKeystores(t *testing.T) {
 		require.Equal(t, len(keystores), len(statuses))
 		require.Equal(
 			t,
-			zondpbservice.ImportedKeystoreStatus_DUPLICATE,
+			qrlpbservice.ImportedKeystoreStatus_DUPLICATE,
 			statuses[0].Status,
 		)
 		require.Equal(
 			t,
-			zondpbservice.ImportedKeystoreStatus_ERROR,
+			qrlpbservice.ImportedKeystoreStatus_ERROR,
 			statuses[1].Status,
 		)
 		require.StringContains(

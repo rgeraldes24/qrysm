@@ -10,10 +10,10 @@ import (
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-// UpdateGenesisEth1Data updates eth1 data for genesis state.
-func UpdateGenesisEth1Data(state state.BeaconState, deposits []*zondpb.Deposit, eth1Data *zondpb.Eth1Data) (state.BeaconState, error) {
-	if eth1Data == nil {
-		return nil, errors.New("no eth1data provided for genesis state")
+// UpdateGenesisExecutionNodeData updates eth1 data for genesis state.
+func UpdateGenesisExecutionNodeData(state state.BeaconState, deposits []*zondpb.Deposit, executionNodeData *zondpb.ExecutionNodeData) (state.BeaconState, error) {
+	if executionNodeData == nil {
+		return nil, errors.New("no executionNodeData provided for genesis state")
 	}
 
 	leaves := make([][]byte, 0, len(deposits))
@@ -45,8 +45,8 @@ func UpdateGenesisEth1Data(state state.BeaconState, deposits []*zondpb.Deposit, 
 	if err != nil {
 		return nil, err
 	}
-	eth1Data.DepositRoot = depositRoot[:]
-	err = state.SetEth1Data(eth1Data)
+	executionNodeData.DepositRoot = depositRoot[:]
+	err = state.SetExecutionNodeData(executionNodeData)
 	if err != nil {
 		return nil, err
 	}

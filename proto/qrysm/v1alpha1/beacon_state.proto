@@ -115,8 +115,8 @@ message BeaconStateCapella {
   repeated bytes historical_roots = 2004 [(theqrl.zond.ext.ssz_size) = "?,32", (theqrl.zond.ext.ssz_max)  = "16777216"];
 
   // Eth1 [3001-4000]
-  Eth1Data eth1_data = 3001;
-  repeated Eth1Data eth1_data_votes = 3002 [(theqrl.zond.ext.ssz_max) = "eth1_data_votes.size"];
+  ExecutionNodeData eth1_data = 3001;
+  repeated ExecutionNodeData eth1_data_votes = 3002 [(theqrl.zond.ext.ssz_max) = "eth1_data_votes.size"];
   uint64 eth1_deposit_index = 3003;
 
   // Registry [4001-5000]

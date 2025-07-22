@@ -301,7 +301,7 @@ func TestWriteMiddlewareResponseHeadersAndBody(t *testing.T) {
 		require.Equal(t, true, ok, "header not found")
 		require.Equal(t, 1, len(v), "wrong number of header values")
 		assert.Equal(t, "224", v[0])
-		v, ok = writer.Header()["Eth-Consensus-Version"]
+		v, ok = writer.Header()["QRL-Consensus-Version"]
 		require.Equal(t, true, ok, "header not found")
 		assert.Equal(t, "capella", v[0])
 		assert.Equal(t, 204, writer.Code)
@@ -325,7 +325,7 @@ func TestWriteMiddlewareResponseHeadersAndBody(t *testing.T) {
 
 	t.Run("GET_invalid_status_code", func(t *testing.T) {
 		response := &http.Response{
-			Header: http.Header{"Grpc-Metadata-Eth-Consensus-Version": []string{"capella"}},
+			Header: http.Header{"Grpc-Metadata-QRL-Consensus-Version": []string{"capella"}},
 		}
 
 		// Set invalid status code.

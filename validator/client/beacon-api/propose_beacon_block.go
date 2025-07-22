@@ -10,10 +10,10 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *zondpb.GenericSignedBeaconBlock) (*zondpb.ProposeResponse, error) {
+func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *qrysmpb.GenericSignedBeaconBlock) (*qrysmpb.ProposeResponse, error) {
 	var consensusVersion string
 	var beaconBlockRoot [32]byte
 
@@ -22,7 +22,7 @@ func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *zo
 	blinded := false
 
 	switch blockType := in.Block.(type) {
-	case *zondpb.GenericSignedBeaconBlock_Capella:
+	case *qrysmpb.GenericSignedBeaconBlock_Capella:
 		consensusVersion = "capella"
 		beaconBlockRoot, err = blockType.Capella.Block.HashTreeRoot()
 		if err != nil {
@@ -33,7 +33,7 @@ func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *zo
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to marshall capella beacon block")
 		}
-	case *zondpb.GenericSignedBeaconBlock_BlindedCapella:
+	case *qrysmpb.GenericSignedBeaconBlock_BlindedCapella:
 		blinded = true
 		consensusVersion = "capella"
 		beaconBlockRoot, err = blockType.BlindedCapella.Block.HashTreeRoot()
@@ -52,12 +52,12 @@ func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *zo
 	var endpoint string
 
 	if blinded {
-		endpoint = "/zond/v1/beacon/blinded_blocks"
+		endpoint = "/qrl/v1/beacon/blinded_blocks"
 	} else {
-		endpoint = "/zond/v1/beacon/blocks"
+		endpoint = "/qrl/v1/beacon/blocks"
 	}
 
-	headers := map[string]string{"Eth-Consensus-Version": consensusVersion}
+	headers := map[string]string{"QRL-Consensus-Version": consensusVersion}
 	if httpError, err := c.jsonRestHandler.PostRestJson(ctx, endpoint, headers, bytes.NewBuffer(marshalledSignedBeaconBlockJson), nil); err != nil {
 		if httpError != nil && httpError.Code == http.StatusAccepted {
 			// Error 202 means that the block was successfully broadcasted, but validation failed
@@ -67,10 +67,10 @@ func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *zo
 		return nil, errors.Wrap(err, "failed to send POST data to REST endpoint")
 	}
 
-	return &zondpb.ProposeResponse{BlockRoot: beaconBlockRoot[:]}, nil
+	return &qrysmpb.ProposeResponse{BlockRoot: beaconBlockRoot[:]}, nil
 }
 
-func marshallBeaconBlockCapella(block *zondpb.SignedBeaconBlockCapella) ([]byte, error) {
+func marshallBeaconBlockCapella(block *qrysmpb.SignedBeaconBlockCapella) ([]byte, error) {
 	signedBeaconBlockCapellaJson := &apimiddleware.SignedBeaconBlockCapellaJson{
 		Signature: hexutil.Encode(block.Signature),
 		Message: &apimiddleware.BeaconBlockCapellaJson{
@@ -82,7 +82,7 @@ func marshallBeaconBlockCapella(block *zondpb.SignedBeaconBlockCapella) ([]byte,
 				Attestations:      jsonifyAttestations(block.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(block.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(block.Block.Body.Deposits),
-				Eth1Data:          jsonifyEth1Data(block.Block.Body.Eth1Data),
+				ExecutionNodeData: jsonifyExecutionNodeData(block.Block.Body.ExecutionNodeData),
 				Graffiti:          hexutil.Encode(block.Block.Body.Graffiti),
 				ProposerSlashings: jsonifyProposerSlashings(block.Block.Body.ProposerSlashings),
 				RandaoReveal:      hexutil.Encode(block.Block.Body.RandaoReveal),
@@ -113,7 +113,7 @@ func marshallBeaconBlockCapella(block *zondpb.SignedBeaconBlockCapella) ([]byte,
 	return json.Marshal(signedBeaconBlockCapellaJson)
 }
 
-func marshallBeaconBlockBlindedCapella(block *zondpb.SignedBlindedBeaconBlockCapella) ([]byte, error) {
+func marshallBeaconBlockBlindedCapella(block *qrysmpb.SignedBlindedBeaconBlockCapella) ([]byte, error) {
 	signedBeaconBlockCapellaJson := &apimiddleware.SignedBlindedBeaconBlockCapellaJson{
 		Signature: hexutil.Encode(block.Signature),
 		Message: &apimiddleware.BlindedBeaconBlockCapellaJson{
@@ -125,7 +125,7 @@ func marshallBeaconBlockBlindedCapella(block *zondpb.SignedBlindedBeaconBlockCap
 				Attestations:      jsonifyAttestations(block.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(block.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(block.Block.Body.Deposits),
-				Eth1Data:          jsonifyEth1Data(block.Block.Body.Eth1Data),
+				ExecutionNodeData: jsonifyExecutionNodeData(block.Block.Body.ExecutionNodeData),
 				Graffiti:          hexutil.Encode(block.Block.Body.Graffiti),
 				ProposerSlashings: jsonifyProposerSlashings(block.Block.Body.ProposerSlashings),
 				RandaoReveal:      hexutil.Encode(block.Block.Body.RandaoReveal),

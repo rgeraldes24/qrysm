@@ -33,19 +33,19 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/lookup"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
+	rpcBuilder "github.com/theQRL/qrysm/beacon-chain/rpc/qrl/builder"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/debug"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/events"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/node"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/rewards"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/validator"
 	nodeqrysm "github.com/theQRL/qrysm/beacon-chain/rpc/qrysm/node"
 	beaconv1alpha1 "github.com/theQRL/qrysm/beacon-chain/rpc/qrysm/v1alpha1/beacon"
 	debugv1alpha1 "github.com/theQRL/qrysm/beacon-chain/rpc/qrysm/v1alpha1/debug"
 	nodev1alpha1 "github.com/theQRL/qrysm/beacon-chain/rpc/qrysm/v1alpha1/node"
 	validatorv1alpha1 "github.com/theQRL/qrysm/beacon-chain/rpc/qrysm/v1alpha1/validator"
 	httpserver "github.com/theQRL/qrysm/beacon-chain/rpc/qrysm/validator"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
-	rpcBuilder "github.com/theQRL/qrysm/beacon-chain/rpc/zond/builder"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/debug"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/events"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/node"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/rewards"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/validator"
 	slasherservice "github.com/theQRL/qrysm/beacon-chain/slasher"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
@@ -54,8 +54,8 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/io/logs"
 	"github.com/theQRL/qrysm/monitoring/tracing"
+	zondpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	zondpbv1alpha1 "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
 	"go.opencensus.io/plugin/ocgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -102,7 +102,7 @@ type Config struct {
 	GenesisTimeFetcher            blockchain.TimeFetcher
 	GenesisFetcher                blockchain.GenesisFetcher
 	EnableDebugRPCEndpoints       bool
-	MockEth1Votes                 bool
+	MockExecutionNodeVotes        bool
 	AttestationsPool              attestations.Pool
 	ExitPool                      voluntaryexits.PoolManager
 	SlashingsPool                 slashings.PoolManager
@@ -246,40 +246,40 @@ func (s *Service) Start() {
 	}
 
 	validatorServer := &validatorv1alpha1.Server{
-		Ctx:                    s.ctx,
-		AttPool:                s.cfg.AttestationsPool,
-		ExitPool:               s.cfg.ExitPool,
-		HeadFetcher:            s.cfg.HeadFetcher,
-		ForkFetcher:            s.cfg.ForkFetcher,
-		ForkchoiceFetcher:      s.cfg.ForkchoiceFetcher,
-		GenesisFetcher:         s.cfg.GenesisFetcher,
-		FinalizationFetcher:    s.cfg.FinalizationFetcher,
-		TimeFetcher:            s.cfg.GenesisTimeFetcher,
-		BlockFetcher:           s.cfg.ExecutionChainService,
-		DepositFetcher:         s.cfg.DepositFetcher,
-		ChainStartFetcher:      s.cfg.ChainStartFetcher,
-		Eth1InfoFetcher:        s.cfg.ExecutionChainService,
-		OptimisticModeFetcher:  s.cfg.OptimisticModeFetcher,
-		SyncChecker:            s.cfg.SyncService,
-		StateNotifier:          s.cfg.StateNotifier,
-		BlockNotifier:          s.cfg.BlockNotifier,
-		OperationNotifier:      s.cfg.OperationNotifier,
-		P2P:                    s.cfg.Broadcaster,
-		BlockReceiver:          s.cfg.BlockReceiver,
-		MockEth1Votes:          s.cfg.MockEth1Votes,
-		Eth1BlockFetcher:       s.cfg.ExecutionChainService,
-		PendingDepositsFetcher: s.cfg.PendingDepositFetcher,
-		SlashingsPool:          s.cfg.SlashingsPool,
-		StateGen:               s.cfg.StateGen,
-		SyncCommitteePool:      s.cfg.SyncCommitteeObjectPool,
-		ReplayerBuilder:        ch,
-		ExecutionEngineCaller:  s.cfg.ExecutionEngineCaller,
-		BeaconDB:               s.cfg.BeaconDB,
-		ProposerSlotIndexCache: s.cfg.ProposerIdsCache,
-		BlockBuilder:           s.cfg.BlockBuilder,
-		DilithiumChangesPool:   s.cfg.DilithiumChangesPool,
-		ClockWaiter:            s.cfg.ClockWaiter,
-		CoreService:            coreService,
+		Ctx:                       s.ctx,
+		AttPool:                   s.cfg.AttestationsPool,
+		ExitPool:                  s.cfg.ExitPool,
+		HeadFetcher:               s.cfg.HeadFetcher,
+		ForkFetcher:               s.cfg.ForkFetcher,
+		ForkchoiceFetcher:         s.cfg.ForkchoiceFetcher,
+		GenesisFetcher:            s.cfg.GenesisFetcher,
+		FinalizationFetcher:       s.cfg.FinalizationFetcher,
+		TimeFetcher:               s.cfg.GenesisTimeFetcher,
+		BlockFetcher:              s.cfg.ExecutionChainService,
+		DepositFetcher:            s.cfg.DepositFetcher,
+		ChainStartFetcher:         s.cfg.ChainStartFetcher,
+		ExecutionNodeInfoFetcher:  s.cfg.ExecutionChainService,
+		OptimisticModeFetcher:     s.cfg.OptimisticModeFetcher,
+		SyncChecker:               s.cfg.SyncService,
+		StateNotifier:             s.cfg.StateNotifier,
+		BlockNotifier:             s.cfg.BlockNotifier,
+		OperationNotifier:         s.cfg.OperationNotifier,
+		P2P:                       s.cfg.Broadcaster,
+		BlockReceiver:             s.cfg.BlockReceiver,
+		MockExecutionNodeVotes:    s.cfg.MockExecutionNodeVotes,
+		ExecutionNodeBlockFetcher: s.cfg.ExecutionChainService,
+		PendingDepositsFetcher:    s.cfg.PendingDepositFetcher,
+		SlashingsPool:             s.cfg.SlashingsPool,
+		StateGen:                  s.cfg.StateGen,
+		SyncCommitteePool:         s.cfg.SyncCommitteeObjectPool,
+		ReplayerBuilder:           ch,
+		ExecutionEngineCaller:     s.cfg.ExecutionEngineCaller,
+		BeaconDB:                  s.cfg.BeaconDB,
+		ProposerSlotIndexCache:    s.cfg.ProposerIdsCache,
+		BlockBuilder:              s.cfg.BlockBuilder,
+		DilithiumChangesPool:      s.cfg.DilithiumChangesPool,
+		ClockWaiter:               s.cfg.ClockWaiter,
+		CoreService:               coreService,
 	}
 	validatorServerV1 := &validator.Server{
 		HeadFetcher:            s.cfg.HeadFetcher,

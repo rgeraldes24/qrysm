@@ -24,7 +24,7 @@ import (
 	"github.com/theQRL/go-zond/trie"
 	builderAPI "github.com/theQRL/qrysm/api/client/builder"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
@@ -38,10 +38,10 @@ import (
 )
 
 const (
-	statusPath   = "/zond/v1/builder/status"
-	registerPath = "/zond/v1/builder/validators"
-	headerPath   = "/zond/v1/builder/header/{slot:[0-9]+}/{parent_hash:0x[a-fA-F0-9]+}/{pubkey:0x[a-fA-F0-9]+}"
-	blindedPath  = "/zond/v1/builder/blinded_blocks"
+	statusPath   = "/qrl/v1/builder/status"
+	registerPath = "/qrl/v1/builder/validators"
+	headerPath   = "/qrl/v1/builder/header/{slot:[0-9]+}/{parent_hash:0x[a-fA-F0-9]+}/{pubkey:0x[a-fA-F0-9]+}"
+	blindedPath  = "/qrl/v1/builder/blinded_blocks"
 
 	// ForkchoiceUpdatedMethodV2 v2 request string for JSON-RPC.
 	ForkchoiceUpdatedMethodV2 = "engine_forkchoiceUpdatedV2"
@@ -227,7 +227,7 @@ func (p *Builder) handleEngineCalls(req, resp []byte) {
 }
 
 func (p *Builder) isBuilderCall(req *http.Request) bool {
-	return strings.Contains(req.URL.Path, "/zond/v1/builder/")
+	return strings.Contains(req.URL.Path, "/qrl/v1/builder/")
 }
 
 func (p *Builder) registerValidators(w http.ResponseWriter, req *http.Request) {

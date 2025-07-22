@@ -697,7 +697,7 @@ func TestInsertFinalizedDeposits(t *testing.T) {
 	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetEth1Data(&zondpb.Eth1Data{DepositCount: 10, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs.SetExecutionNodeData(&zondpb.ExecutionNodeData{DepositCount: 10, BlockHash: make([]byte, 32)}))
 	assert.NoError(t, gs.SetEth1DepositIndex(8))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	var zeroSig [4595]byte
@@ -727,7 +727,7 @@ func TestInsertFinalizedDeposits_PrunePendingDeposits(t *testing.T) {
 	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetEth1Data(&zondpb.Eth1Data{DepositCount: 10, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs.SetExecutionNodeData(&zondpb.ExecutionNodeData{DepositCount: 10, BlockHash: make([]byte, 32)}))
 	assert.NoError(t, gs.SetEth1DepositIndex(8))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	var zeroSig [4595]byte
@@ -767,11 +767,11 @@ func TestInsertFinalizedDeposits_MultipleFinalizedRoutines(t *testing.T) {
 	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetEth1Data(&zondpb.Eth1Data{DepositCount: 7, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs.SetExecutionNodeData(&zondpb.ExecutionNodeData{DepositCount: 7, BlockHash: make([]byte, 32)}))
 	assert.NoError(t, gs.SetEth1DepositIndex(6))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	gs2 := gs.Copy()
-	assert.NoError(t, gs2.SetEth1Data(&zondpb.Eth1Data{DepositCount: 15, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs2.SetExecutionNodeData(&zondpb.ExecutionNodeData{DepositCount: 15, BlockHash: make([]byte, 32)}))
 	assert.NoError(t, gs2.SetEth1DepositIndex(13))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k', '2'}, gs2))
 	var zeroSig [4595]byte

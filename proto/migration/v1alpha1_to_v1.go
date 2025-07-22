@@ -8,8 +8,8 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
+	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -494,10 +494,10 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *zondpbalpha.BeaconBloc
 
 	resultBlockBody := &zondpbv1.BlindedBeaconBlockBodyCapella{
 		RandaoReveal: bytesutil.SafeCopyBytes(v1alpha1Block.Body.RandaoReveal),
-		Eth1Data: &zondpbv1.Eth1Data{
-			DepositRoot:  bytesutil.SafeCopyBytes(v1alpha1Block.Body.Eth1Data.DepositRoot),
-			DepositCount: v1alpha1Block.Body.Eth1Data.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(v1alpha1Block.Body.Eth1Data.BlockHash),
+		ExecutionNodeData: &zondpbv1.ExecutionNodeData{
+			DepositRoot:  bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionNodeData.DepositRoot),
+			DepositCount: v1alpha1Block.Body.ExecutionNodeData.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionNodeData.BlockHash),
 		},
 		Graffiti:          bytesutil.SafeCopyBytes(v1alpha1Block.Body.Graffiti),
 		ProposerSlashings: resultProposerSlashings,
@@ -542,17 +542,17 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *zondpbalpha.BeaconBloc
 func BeaconStateCapellaToProto(st state.BeaconState) (*zondpbv1.BeaconStateCapella, error) {
 	sourceFork := st.Fork()
 	sourceLatestBlockHeader := st.LatestBlockHeader()
-	sourceEth1Data := st.Eth1Data()
-	sourceEth1DataVotes := st.Eth1DataVotes()
+	sourceExecutionNodeData := st.ExecutionNodeData()
+	sourceExecutionNodeDataVotes := st.ExecutionNodeDataVotes()
 	sourceValidators := st.Validators()
 	sourceJustificationBits := st.JustificationBits()
 	sourcePrevJustifiedCheckpoint := st.PreviousJustifiedCheckpoint()
 	sourceCurrJustifiedCheckpoint := st.CurrentJustifiedCheckpoint()
 	sourceFinalizedCheckpoint := st.FinalizedCheckpoint()
 
-	resultEth1DataVotes := make([]*zondpbv1.Eth1Data, len(sourceEth1DataVotes))
-	for i, vote := range sourceEth1DataVotes {
-		resultEth1DataVotes[i] = &zondpbv1.Eth1Data{
+	resultExecutionNodeDataVotes := make([]*zondpbv1.ExecutionNodeData, len(sourceExecutionNodeDataVotes))
+	for i, vote := range sourceExecutionNodeDataVotes {
+		resultExecutionNodeDataVotes[i] = &zondpbv1.ExecutionNodeData{
 			DepositRoot:  bytesutil.SafeCopyBytes(vote.DepositRoot),
 			DepositCount: vote.DepositCount,
 			BlockHash:    bytesutil.SafeCopyBytes(vote.BlockHash),
@@ -642,12 +642,12 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*zondpbv1.BeaconStateCapel
 		},
 		BlockRoots: bytesutil.SafeCopy2dBytes(st.BlockRoots()),
 		StateRoots: bytesutil.SafeCopy2dBytes(st.StateRoots()),
-		Eth1Data: &zondpbv1.Eth1Data{
-			DepositRoot:  bytesutil.SafeCopyBytes(sourceEth1Data.DepositRoot),
-			DepositCount: sourceEth1Data.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(sourceEth1Data.BlockHash),
+		ExecutionNodeData: &zondpbv1.ExecutionNodeData{
+			DepositRoot:  bytesutil.SafeCopyBytes(sourceExecutionNodeData.DepositRoot),
+			DepositCount: sourceExecutionNodeData.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(sourceExecutionNodeData.BlockHash),
 		},
-		Eth1DataVotes:              resultEth1DataVotes,
+		ExecutionNodeDataVotes:     resultExecutionNodeDataVotes,
 		Eth1DepositIndex:           st.Eth1DepositIndex(),
 		Validators:                 resultValidators,
 		Balances:                   st.Balances(),

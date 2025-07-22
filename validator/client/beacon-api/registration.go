@@ -7,12 +7,12 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-func (c *beaconApiValidatorClient) submitValidatorRegistrations(ctx context.Context, registrations []*zondpb.SignedValidatorRegistrationV1) error {
-	const endpoint = "/zond/v1/validator/register_validator"
+func (c *beaconApiValidatorClient) submitValidatorRegistrations(ctx context.Context, registrations []*qrysmpb.SignedValidatorRegistrationV1) error {
+	const endpoint = "/qrl/v1/validator/register_validator"
 
 	jsonRegistration := make([]*shared.SignedValidatorRegistration, len(registrations))
 

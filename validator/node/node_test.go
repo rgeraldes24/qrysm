@@ -291,7 +291,7 @@ func TestProposerSettings(t *testing.T) {
 				}
 			},
 			wantErr: "",
-			wantLog: "is not a checksum Zond address",
+			wantLog: "is not a checksum QRL address",
 		},
 		{
 			name: "Happy Path Config file File multiple fee recipients",

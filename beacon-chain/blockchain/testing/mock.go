@@ -28,8 +28,8 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
+	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
 )
 
 var ErrNilState = errors.New("nil state")
@@ -48,7 +48,7 @@ type ChainService struct {
 	Balance                     *precompute.Balance
 	CanonicalRoots              map[[32]byte]bool
 	Fork                        *zondpb.Fork
-	ETH1Data                    *zondpb.Eth1Data
+	ExecutionNodeData           *zondpb.ExecutionNodeData
 	InitSyncBlockRoots          map[[32]byte]bool
 	DB                          db.Database
 	State                       state.BeaconState
@@ -335,9 +335,9 @@ func (s *ChainService) HeadValidatorsIndices(ctx context.Context, epoch primitiv
 	return helpers.ActiveValidatorIndices(ctx, s.State, epoch)
 }
 
-// HeadETH1Data provides the current ETH1Data of the head state.
-func (s *ChainService) HeadETH1Data() *zondpb.Eth1Data {
-	return s.ETH1Data
+// HeadExecutionNodeData provides the current ExecutionNodeData of the head state.
+func (s *ChainService) HeadExecutionNodeData() *zondpb.ExecutionNodeData {
+	return s.ExecutionNodeData
 }
 
 // GenesisTime mocks the same method in the chain service.

@@ -10,8 +10,8 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/client/beacon-api/mock"
@@ -69,7 +69,7 @@ func TestRegistration_Valid(t *testing.T) {
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 	jsonRestHandler.EXPECT().PostRestJson(
 		context.Background(),
-		"/zond/v1/validator/register_validator",
+		"/qrl/v1/validator/register_validator",
 		nil,
 		bytes.NewBuffer(marshalledJsonRegistrations),
 		nil,
@@ -99,10 +99,10 @@ func TestRegistration_Valid(t *testing.T) {
 	decodedSignature3, err := hexutil.Decode(signature3)
 	require.NoError(t, err)
 
-	protoRegistrations := zondpb.SignedValidatorRegistrationsV1{
-		Messages: []*zondpb.SignedValidatorRegistrationV1{
+	protoRegistrations := qrysmpb.SignedValidatorRegistrationsV1{
+		Messages: []*qrysmpb.SignedValidatorRegistrationV1{
 			{
-				Message: &zondpb.ValidatorRegistrationV1{
+				Message: &qrysmpb.ValidatorRegistrationV1{
 					FeeRecipient: decodedFeeRecipient1,
 					GasLimit:     100,
 					Timestamp:    1000,
@@ -111,7 +111,7 @@ func TestRegistration_Valid(t *testing.T) {
 				Signature: decodedSignature1,
 			},
 			{
-				Message: &zondpb.ValidatorRegistrationV1{
+				Message: &qrysmpb.ValidatorRegistrationV1{
 					FeeRecipient: decodedFeeRecipient2,
 					GasLimit:     200,
 					Timestamp:    2000,
@@ -120,7 +120,7 @@ func TestRegistration_Valid(t *testing.T) {
 				Signature: decodedSignature2,
 			},
 			{
-				Message: &zondpb.ValidatorRegistrationV1{
+				Message: &qrysmpb.ValidatorRegistrationV1{
 					FeeRecipient: decodedFeeRecipient3,
 					GasLimit:     300,
 					Timestamp:    3000,
@@ -145,7 +145,7 @@ func TestRegistration_BadRequest(t *testing.T) {
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 	jsonRestHandler.EXPECT().PostRestJson(
 		context.Background(),
-		"/zond/v1/validator/register_validator",
+		"/qrl/v1/validator/register_validator",
 		nil,
 		gomock.Any(),
 		nil,
@@ -155,7 +155,7 @@ func TestRegistration_BadRequest(t *testing.T) {
 	).Times(1)
 
 	validatorClient := &beaconApiValidatorClient{jsonRestHandler: jsonRestHandler}
-	_, err := validatorClient.SubmitValidatorRegistrations(context.Background(), &zondpb.SignedValidatorRegistrationsV1{})
-	assert.ErrorContains(t, "failed to send POST data to `/zond/v1/validator/register_validator` REST endpoint", err)
+	_, err := validatorClient.SubmitValidatorRegistrations(context.Background(), &qrysmpb.SignedValidatorRegistrationsV1{})
+	assert.ErrorContains(t, "failed to send POST data to `/qrl/v1/validator/register_validator` REST endpoint", err)
 	assert.ErrorContains(t, "foo error", err)
 }

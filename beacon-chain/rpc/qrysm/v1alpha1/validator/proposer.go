@@ -32,13 +32,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// eth1DataNotification is a latch to stop flooding logs with the same warning.
-var eth1DataNotification bool
+// executionNodeDataNotification is a latch to stop flooding logs with the same warning.
+var executionNodeDataNotification bool
 
 const (
 	// CouldNotDecodeBlock means that a signed beacon block couldn't be created from the block present in the request.
-	CouldNotDecodeBlock = "Could not decode block"
-	eth1dataTimeout     = 2 * time.Second
+	CouldNotDecodeBlock      = "Could not decode block"
+	executionNodeDataTimeout = 2 * time.Second
 )
 
 // GetBeaconBlock is called by a proposer during its assigned slot to request a block to sign
@@ -128,15 +128,15 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 		defer wg.Done()
 
 		// Set eth1 data.
-		eth1Data, err := vs.eth1DataMajorityVote(ctx, head)
+		executionNodeData, err := vs.executionNodeDataMajorityVote(ctx, head)
 		if err != nil {
-			eth1Data = &zondpb.Eth1Data{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
-			log.WithError(err).Error("Could not get eth1data")
+			executionNodeData = &zondpb.ExecutionNodeData{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
+			log.WithError(err).Error("Could not get executionNodeData")
 		}
-		sBlk.SetEth1Data(eth1Data)
+		sBlk.SetExecutionNodeData(executionNodeData)
 
 		// Set deposit and attestation.
-		deposits, atts, err := vs.packDepositsAndAttestations(ctx, head, eth1Data) // TODO: split attestations and deposits
+		deposits, atts, err := vs.packDepositsAndAttestations(ctx, head, executionNodeData) // TODO: split attestations and deposits
 		if err != nil {
 			sBlk.SetDeposits([]*zondpb.Deposit{})
 			sBlk.SetAttestations([]*zondpb.Attestation{})
@@ -268,7 +268,7 @@ func (vs *Server) PrepareBeaconProposer(
 	}
 
 	for _, recipientContainer := range newRecipients {
-		recipient := hexutil.EncodeZ(recipientContainer.FeeRecipient)
+		recipient := hexutil.EncodeQ(recipientContainer.FeeRecipient)
 		if !common.IsAddress(recipient) {
 			return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("Invalid fee recipient address: %v", recipient))
 		}

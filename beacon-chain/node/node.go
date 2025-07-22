@@ -817,7 +817,7 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 	beaconMonitoringPort := b.cliCtx.Int(flags.MonitoringPortFlag.Name)
 	cert := b.cliCtx.String(flags.CertFlag.Name)
 	key := b.cliCtx.String(flags.KeyFlag.Name)
-	mockEth1DataVotes := b.cliCtx.Bool(flags.InteropMockEth1DataVotesFlag.Name)
+	mockExecutionNodeDataVotes := b.cliCtx.Bool(flags.InteropMockExecutionNodeDataVotesFlag.Name)
 
 	maxMsgSize := b.cliCtx.Int(cmd.GrpcMaxCallRecvMsgSizeFlag.Name)
 	enableDebugRPCEndpoints := b.cliCtx.Bool(flags.EnableDebugRPCEndpoints.Name)
@@ -857,7 +857,7 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 		ExecutionChainService:         web3Service,
 		ExecutionChainInfoFetcher:     web3Service,
 		ChainStartFetcher:             chainStartFetcher,
-		MockEth1Votes:                 mockEth1DataVotes,
+		MockExecutionNodeVotes:        mockExecutionNodeDataVotes,
 		SyncService:                   syncService,
 		DepositFetcher:                depositFetcher,
 		PendingDepositFetcher:         b.depositCache,

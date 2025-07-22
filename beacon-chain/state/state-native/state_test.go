@@ -227,7 +227,7 @@ func generateState(t *testing.T) state.BeaconState {
 		},
 		Validators: vals,
 		Balances:   bals,
-		Eth1Data: &zondpb.Eth1Data{
+		ExecutionNodeData: &zondpb.ExecutionNodeData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},

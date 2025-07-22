@@ -15,7 +15,7 @@ option php_namespace = "TheQRL\\Zond\\v1alpha1";
 // ETH1ChainData is a container which holds all the relevant eth1
 // information
 message ETH1ChainData {
-    LatestETH1Data current_eth1_data = 1 ;
+    LatestExecutionNodeData current_eth1_data = 1 ;
     ChainStartData chainstart_data = 2;
     BeaconStateCapella beacon_state = 3;
     SparseMerkleTrie trie = 4;
@@ -31,8 +31,8 @@ message DepositSnapshot {
     bytes execution_hash = 4;
     uint64 execution_depth = 5;
 }
-// LatestETH1Data contains the current state of the eth1 chain.
-message LatestETH1Data {
+// LatestExecutionNodeData contains the current state of the eth1 chain.
+message LatestExecutionNodeData {
     uint64 block_height = 1;
     uint64 block_time = 2;
     bytes block_hash = 3;
@@ -43,7 +43,7 @@ message LatestETH1Data {
 message ChainStartData {
     uint64 genesis_time = 2;
     uint64 genesis_block = 3;
-    Eth1Data eth1_data = 4;
+    ExecutionNodeData eth1_data = 4;
 }
 
 // SparseMerkleTrie is used to describe the model of our deposit trie.

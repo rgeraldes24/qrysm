@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
+	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )

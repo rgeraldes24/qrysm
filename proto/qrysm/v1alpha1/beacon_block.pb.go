@@ -13,7 +13,7 @@ import (
 	github_com_theQRL_go_bitfield "github.com/theQRL/go-bitfield"
 	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
-	_ "github.com/theQRL/qrysm/proto/zond/ext"
+	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -494,7 +494,7 @@ func (x *SignedVoluntaryExit) GetSignature() []byte {
 	return nil
 }
 
-type Eth1Data struct {
+type ExecutionNodeData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -504,8 +504,8 @@ type Eth1Data struct {
 	BlockHash    []byte `protobuf:"bytes,3,opt,name=block_hash,json=blockHash,proto3" json:"block_hash,omitempty" ssz-size:"32"`
 }
 
-func (x *Eth1Data) Reset() {
-	*x = Eth1Data{}
+func (x *ExecutionNodeData) Reset() {
+	*x = ExecutionNodeData{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -513,13 +513,13 @@ func (x *Eth1Data) Reset() {
 	}
 }
 
-func (x *Eth1Data) String() string {
+func (x *ExecutionNodeData) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Eth1Data) ProtoMessage() {}
+func (*ExecutionNodeData) ProtoMessage() {}
 
-func (x *Eth1Data) ProtoReflect() protoreflect.Message {
+func (x *ExecutionNodeData) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -531,26 +531,26 @@ func (x *Eth1Data) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Eth1Data.ProtoReflect.Descriptor instead.
-func (*Eth1Data) Descriptor() ([]byte, []int) {
+// Deprecated: Use ExecutionNodeData.ProtoReflect.Descriptor instead.
+func (*ExecutionNodeData) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *Eth1Data) GetDepositRoot() []byte {
+func (x *ExecutionNodeData) GetDepositRoot() []byte {
 	if x != nil {
 		return x.DepositRoot
 	}
 	return nil
 }
 
-func (x *Eth1Data) GetDepositCount() uint64 {
+func (x *ExecutionNodeData) GetDepositCount() uint64 {
 	if x != nil {
 		return x.DepositCount
 	}
 	return 0
 }
 
-func (x *Eth1Data) GetBlockHash() []byte {
+func (x *ExecutionNodeData) GetBlockHash() []byte {
 	if x != nil {
 		return x.BlockHash
 	}
@@ -949,7 +949,7 @@ type BeaconBlockBodyCapella struct {
 	unknownFields protoimpl.UnknownFields
 
 	RandaoReveal                []byte                              `protobuf:"bytes,1,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4595"`
-	Eth1Data                    *Eth1Data                           `protobuf:"bytes,2,opt,name=eth1_data,json=eth1Data,proto3" json:"eth1_data,omitempty"`
+	ExecutionNodeData           *ExecutionNodeData                  `protobuf:"bytes,2,opt,name=eth1_data,json=executionNodeData,proto3" json:"eth1_data,omitempty"`
 	Graffiti                    []byte                              `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
 	ProposerSlashings           []*ProposerSlashing                 `protobuf:"bytes,4,rep,name=proposer_slashings,json=proposerSlashings,proto3" json:"proposer_slashings,omitempty" ssz-max:"16"`
 	AttesterSlashings           []*AttesterSlashing                 `protobuf:"bytes,5,rep,name=attester_slashings,json=attesterSlashings,proto3" json:"attester_slashings,omitempty" ssz-max:"2"`
@@ -1000,9 +1000,9 @@ func (x *BeaconBlockBodyCapella) GetRandaoReveal() []byte {
 	return nil
 }
 
-func (x *BeaconBlockBodyCapella) GetEth1Data() *Eth1Data {
+func (x *BeaconBlockBodyCapella) GetExecutionNodeData() *ExecutionNodeData {
 	if x != nil {
-		return x.Eth1Data
+		return x.ExecutionNodeData
 	}
 	return nil
 }
@@ -1210,7 +1210,7 @@ type BlindedBeaconBlockBodyCapella struct {
 	unknownFields protoimpl.UnknownFields
 
 	RandaoReveal                []byte                              `protobuf:"bytes,1,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4595"`
-	Eth1Data                    *Eth1Data                           `protobuf:"bytes,2,opt,name=eth1_data,json=eth1Data,proto3" json:"eth1_data,omitempty"`
+	ExecutionNodeData           *ExecutionNodeData                  `protobuf:"bytes,2,opt,name=eth1_data,json=executionNodeData,proto3" json:"eth1_data,omitempty"`
 	Graffiti                    []byte                              `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
 	ProposerSlashings           []*ProposerSlashing                 `protobuf:"bytes,4,rep,name=proposer_slashings,json=proposerSlashings,proto3" json:"proposer_slashings,omitempty" ssz-max:"16"`
 	AttesterSlashings           []*AttesterSlashing                 `protobuf:"bytes,5,rep,name=attester_slashings,json=attesterSlashings,proto3" json:"attester_slashings,omitempty" ssz-max:"2"`
@@ -1261,9 +1261,9 @@ func (x *BlindedBeaconBlockBodyCapella) GetRandaoReveal() []byte {
 	return nil
 }
 
-func (x *BlindedBeaconBlockBodyCapella) GetEth1Data() *Eth1Data {
+func (x *BlindedBeaconBlockBodyCapella) GetExecutionNodeData() *ExecutionNodeData {
 	if x != nil {
-		return x.Eth1Data
+		return x.ExecutionNodeData
 	}
 	return nil
 }
@@ -2120,7 +2120,7 @@ var file_proto_qrysm_v1alpha1_beacon_block_proto_goTypes = []interface{}{
 	(*Deposit)(nil),                          // 4: theqrl.zond.v1alpha1.Deposit
 	(*VoluntaryExit)(nil),                    // 5: theqrl.zond.v1alpha1.VoluntaryExit
 	(*SignedVoluntaryExit)(nil),              // 6: theqrl.zond.v1alpha1.SignedVoluntaryExit
-	(*Eth1Data)(nil),                         // 7: theqrl.zond.v1alpha1.Eth1Data
+	(*ExecutionNodeData)(nil),                // 7: theqrl.zond.v1alpha1.ExecutionNodeData
 	(*BeaconBlockHeader)(nil),                // 8: theqrl.zond.v1alpha1.BeaconBlockHeader
 	(*SignedBeaconBlockHeader)(nil),          // 9: theqrl.zond.v1alpha1.SignedBeaconBlockHeader
 	(*IndexedAttestation)(nil),               // 10: theqrl.zond.v1alpha1.IndexedAttestation
@@ -2158,7 +2158,7 @@ var file_proto_qrysm_v1alpha1_beacon_block_proto_depIdxs = []int32{
 	24, // 11: theqrl.zond.v1alpha1.IndexedAttestation.data:type_name -> theqrl.zond.v1alpha1.AttestationData
 	13, // 12: theqrl.zond.v1alpha1.SignedBeaconBlockCapella.block:type_name -> theqrl.zond.v1alpha1.BeaconBlockCapella
 	14, // 13: theqrl.zond.v1alpha1.BeaconBlockCapella.body:type_name -> theqrl.zond.v1alpha1.BeaconBlockBodyCapella
-	7,  // 14: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.eth1_data:type_name -> theqrl.zond.v1alpha1.Eth1Data
+	7,  // 14: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.eth1_data:type_name -> theqrl.zond.v1alpha1.ExecutionNodeData
 	2,  // 15: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.proposer_slashings:type_name -> theqrl.zond.v1alpha1.ProposerSlashing
 	3,  // 16: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.attester_slashings:type_name -> theqrl.zond.v1alpha1.AttesterSlashing
 	25, // 17: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.attestations:type_name -> theqrl.zond.v1alpha1.Attestation
@@ -2169,7 +2169,7 @@ var file_proto_qrysm_v1alpha1_beacon_block_proto_depIdxs = []int32{
 	27, // 22: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.dilithium_to_execution_changes:type_name -> theqrl.zond.v1alpha1.SignedDilithiumToExecutionChange
 	16, // 23: theqrl.zond.v1alpha1.SignedBlindedBeaconBlockCapella.block:type_name -> theqrl.zond.v1alpha1.BlindedBeaconBlockCapella
 	17, // 24: theqrl.zond.v1alpha1.BlindedBeaconBlockCapella.body:type_name -> theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella
-	7,  // 25: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.eth1_data:type_name -> theqrl.zond.v1alpha1.Eth1Data
+	7,  // 25: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.eth1_data:type_name -> theqrl.zond.v1alpha1.ExecutionNodeData
 	2,  // 26: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.proposer_slashings:type_name -> theqrl.zond.v1alpha1.ProposerSlashing
 	3,  // 27: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.attester_slashings:type_name -> theqrl.zond.v1alpha1.AttesterSlashing
 	25, // 28: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.attestations:type_name -> theqrl.zond.v1alpha1.Attestation
@@ -2282,7 +2282,7 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_init() {
 			}
 		}
 		file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Eth1Data); i {
+			switch v := v.(*ExecutionNodeData); i {
 			case 0:
 				return &v.state
 			case 1:

@@ -9,7 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
 	"github.com/theQRL/qrysm/config/params"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -63,7 +63,7 @@ func TestActivation_Nominal(t *testing.T) {
 	pubKeys := make([][]byte, len(stringPubKeys))
 
 	url := strings.Join([]string{
-		"/zond/v1/beacon/states/head/validators?",
+		"/qrl/v1/beacon/states/head/validators?",
 		"id=0x8000091c2ae64ee414a54c1cc1fc67dec663408bc636cb86756e0200e41a75c8f86603f104f02c856983d2783116be13&",
 		"id=0x80000e851c0f53c3246ff726d7ff7766661ca5e12a07c45c114d208d54f0f8233d4380b2e9aff759d69795d1df905526&",
 		"id=0x424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242424242&",

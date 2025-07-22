@@ -103,7 +103,7 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 		BaseFeePerGas: make([]byte, 32),
 		BlockHash:     make([]byte, 32),
 	}
-	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, numValidators, ee, &zondpb.Eth1Data{BlockHash: make([]byte, 32)})
+	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, numValidators, ee, &zondpb.ExecutionNodeData{BlockHash: make([]byte, 32)})
 	require.NoError(t, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < 2; i++ {
 		var someRoot [32]byte

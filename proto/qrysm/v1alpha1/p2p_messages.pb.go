@@ -12,7 +12,7 @@ import (
 
 	github_com_theQRL_go_bitfield "github.com/theQRL/go-bitfield"
 	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
-	_ "github.com/theQRL/qrysm/proto/zond/ext"
+	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	_ "google.golang.org/protobuf/types/descriptorpb"
@@ -230,61 +230,6 @@ func (x *QNRForkID) GetNextForkEpoch() github_com_theQRL_qrysm_consensus_types_p
 	return github_com_theQRL_qrysm_consensus_types_primitives.Epoch(0)
 }
 
-type MetaDataV0 struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	SeqNumber uint64                                    `protobuf:"varint,1,opt,name=seq_number,json=seqNumber,proto3" json:"seq_number,omitempty"`
-	Attnets   github_com_theQRL_go_bitfield.Bitvector64 `protobuf:"bytes,2,opt,name=attnets,proto3" json:"attnets,omitempty" cast-type:"github.com/theQRL/go-bitfield.Bitvector64" ssz-size:"8"`
-}
-
-func (x *MetaDataV0) Reset() {
-	*x = MetaDataV0{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *MetaDataV0) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*MetaDataV0) ProtoMessage() {}
-
-func (x *MetaDataV0) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use MetaDataV0.ProtoReflect.Descriptor instead.
-func (*MetaDataV0) Descriptor() ([]byte, []int) {
-	return file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *MetaDataV0) GetSeqNumber() uint64 {
-	if x != nil {
-		return x.SeqNumber
-	}
-	return 0
-}
-
-func (x *MetaDataV0) GetAttnets() github_com_theQRL_go_bitfield.Bitvector64 {
-	if x != nil {
-		return x.Attnets
-	}
-	return github_com_theQRL_go_bitfield.Bitvector64(nil)
-}
-
 type MetaDataV1 struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -453,7 +398,6 @@ var file_proto_qrysm_v1alpha1_p2p_messages_proto_goTypes = []interface{}{
 	(*Status)(nil),                     // 0: theqrl.zond.v1alpha1.Status
 	(*BeaconBlocksByRangeRequest)(nil), // 1: theqrl.zond.v1alpha1.BeaconBlocksByRangeRequest
 	(*QNRForkID)(nil),                  // 2: theqrl.zond.v1alpha1.QNRForkID
-	(*MetaDataV0)(nil),                 // 3: theqrl.zond.v1alpha1.MetaDataV0
 	(*MetaDataV1)(nil),                 // 4: theqrl.zond.v1alpha1.MetaDataV1
 }
 var file_proto_qrysm_v1alpha1_p2p_messages_proto_depIdxs = []int32{
@@ -496,18 +440,6 @@ func file_proto_qrysm_v1alpha1_p2p_messages_proto_init() {
 		}
 		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*QNRForkID); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_qrysm_v1alpha1_p2p_messages_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MetaDataV0); i {
 			case 0:
 				return &v.state
 			case 1:

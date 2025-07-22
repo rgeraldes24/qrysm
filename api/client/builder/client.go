@@ -14,7 +14,7 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
@@ -23,16 +23,16 @@ import (
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	"github.com/theQRL/qrysm/network"
 	"github.com/theQRL/qrysm/network/authorization"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"go.opencensus.io/trace"
 )
 
 const (
-	getExecHeaderPath          = "/zond/v1/builder/header/{{.Slot}}/{{.ParentHash}}/{{.Pubkey}}"
-	getStatus                  = "/zond/v1/builder/status"
-	postBlindedBeaconBlockPath = "/zond/v1/builder/blinded_blocks"
-	postRegisterValidatorPath  = "/zond/v1/builder/validators"
+	getExecHeaderPath          = "/qrl/v1/builder/header/{{.Slot}}/{{.ParentHash}}/{{.Pubkey}}"
+	getStatus                  = "/qrl/v1/builder/status"
+	postBlindedBeaconBlockPath = "/qrl/v1/builder/blinded_blocks"
+	postRegisterValidatorPath  = "/qrl/v1/builder/validators"
 )
 
 var errMalformedHostname = errors.New("hostname must include port, separated by one colon, like example.com:3500")
@@ -88,7 +88,7 @@ var _ observer = &requestLogger{}
 type BuilderClient interface {
 	NodeURL() string
 	GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubkey [field_params.DilithiumPubkeyLength]byte) (SignedBid, error)
-	RegisterValidator(ctx context.Context, svr []*zondpb.SignedValidatorRegistrationV1) error
+	RegisterValidator(ctx context.Context, svr []*qrysmpb.SignedValidatorRegistrationV1) error
 	SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlySignedBeaconBlock) (interfaces.ExecutionData, error)
 	Status(ctx context.Context) error
 }
@@ -240,7 +240,7 @@ func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash
 
 // RegisterValidator encodes the SignedValidatorRegistrationV1 message to json (including hex-encoding the byte
 // fields with 0x prefixes) and posts to the builder validator registration endpoint.
-func (c *Client) RegisterValidator(ctx context.Context, svr []*zondpb.SignedValidatorRegistrationV1) error {
+func (c *Client) RegisterValidator(ctx context.Context, svr []*qrysmpb.SignedValidatorRegistrationV1) error {
 	ctx, span := trace.StartSpan(ctx, "builder.client.RegisterValidator")
 	defer span.End()
 	span.AddAttributes(trace.Int64Attribute("num_reqs", int64(len(svr))))
@@ -281,7 +281,7 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not get protobuf block")
 		}
-		b, err := shared.SignedBlindedBeaconBlockCapellaFromConsensus(&zondpb.SignedBlindedBeaconBlockCapella{Block: psb.Block, Signature: bytesutil.SafeCopyBytes(psb.Signature)})
+		b, err := shared.SignedBlindedBeaconBlockCapellaFromConsensus(&qrysmpb.SignedBlindedBeaconBlockCapella{Block: psb.Block, Signature: bytesutil.SafeCopyBytes(psb.Signature)})
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not convert SignedBlindedBeaconBlockCapella to json marshalable type")
 		}
@@ -290,7 +290,7 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 			return nil, errors.Wrap(err, "error encoding the SignedBlindedBeaconBlockCapella value body in SubmitBlindedBlockCapella")
 		}
 		versionOpt := func(r *http.Request) {
-			r.Header.Add("Eth-Consensus-Version", version.String(version.Capella))
+			r.Header.Add("QRL-Consensus-Version", version.String(version.Capella))
 		}
 		rb, err := c.do(ctx, http.MethodPost, postBlindedBeaconBlockPath, bytes.NewBuffer(body), versionOpt)
 

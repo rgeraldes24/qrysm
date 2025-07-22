@@ -933,14 +933,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/debug/beacon/states/{state_id}",
+					"raw": "http://localhost:3500/qrl/v1/debug/beacon/states/{state_id}",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"debug",
 						"beacon",
@@ -968,14 +968,14 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/debug/beacon/states/{state_id}",
+					"raw": "http://localhost:3500/qrl/v1/debug/beacon/states/{state_id}",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"debug",
 						"beacon",
@@ -992,14 +992,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/debug/beacon/heads",
+					"raw": "http://localhost:3500/qrl/v1/debug/beacon/heads",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"debug",
 						"beacon",
@@ -1015,14 +1015,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/node/identity",
+					"raw": "http://localhost:3500/qrl/v1/node/identity",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"node",
 						"identity"
@@ -1037,14 +1037,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/node/peers",
+					"raw": "http://localhost:3500/qrl/v1/node/peers",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"node",
 						"peers"
@@ -1071,14 +1071,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/node/peers/{peer_id}",
+					"raw": "http://localhost:3500/qrl/v1/node/peers/{peer_id}",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"node",
 						"peers",
@@ -1094,14 +1094,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/node/peer_count",
+					"raw": "http://localhost:3500/qrl/v1/node/peer_count",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"node",
 						"peer_count"
@@ -1116,14 +1116,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/node/version",
+					"raw": "http://localhost:3500/qrl/v1/node/version",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"node",
 						"version"
@@ -1138,14 +1138,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/node/syncing",
+					"raw": "http://localhost:3500/qrl/v1/node/syncing",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"node",
 						"syncing"
@@ -1160,14 +1160,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/node/health",
+					"raw": "http://localhost:3500/qrl/v1/node/health",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"node",
 						"health"
@@ -1182,14 +1182,14 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/duties/attester/{epoch}",
+					"raw": "http://localhost:3500/qrl/v1/validator/duties/attester/{epoch}",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"validator",
 						"duties",
@@ -1206,14 +1206,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/duties/proposer/{epoch}",
+					"raw": "http://localhost:3500/qrl/v1/validator/duties/proposer/{epoch}",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3500",
 					"path": [
-						"zond",
+						"qrl",
 						"v1",
 						"validator",
 						"duties",

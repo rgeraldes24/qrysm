@@ -11,9 +11,9 @@ import (
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-// Eth1DataRootWithHasher returns the hash tree root of input `eth1Data`.
-func Eth1DataRootWithHasher(eth1Data *zondpb.Eth1Data) ([32]byte, error) {
-	if eth1Data == nil {
+// ExecutionNodeDataRootWithHasher returns the hash tree root of input `executionNodeData`.
+func ExecutionNodeDataRootWithHasher(executionNodeData *zondpb.ExecutionNodeData) ([32]byte, error) {
+	if executionNodeData == nil {
 		return [32]byte{}, errors.New("nil eth1 data")
 	}
 
@@ -22,15 +22,15 @@ func Eth1DataRootWithHasher(eth1Data *zondpb.Eth1Data) ([32]byte, error) {
 		fieldRoots[i] = [32]byte{}
 	}
 
-	if len(eth1Data.DepositRoot) > 0 {
-		fieldRoots[0] = bytesutil.ToBytes32(eth1Data.DepositRoot)
+	if len(executionNodeData.DepositRoot) > 0 {
+		fieldRoots[0] = bytesutil.ToBytes32(executionNodeData.DepositRoot)
 	}
 
-	eth1DataCountBuf := make([]byte, 8)
-	binary.LittleEndian.PutUint64(eth1DataCountBuf, eth1Data.DepositCount)
-	fieldRoots[1] = bytesutil.ToBytes32(eth1DataCountBuf)
-	if len(eth1Data.BlockHash) > 0 {
-		fieldRoots[2] = bytesutil.ToBytes32(eth1Data.BlockHash)
+	executionNodeDataCountBuf := make([]byte, 8)
+	binary.LittleEndian.PutUint64(executionNodeDataCountBuf, executionNodeData.DepositCount)
+	fieldRoots[1] = bytesutil.ToBytes32(executionNodeDataCountBuf)
+	if len(executionNodeData.BlockHash) > 0 {
+		fieldRoots[2] = bytesutil.ToBytes32(executionNodeData.BlockHash)
 	}
 	root, err := ssz.BitwiseMerkleize(fieldRoots, uint64(len(fieldRoots)), uint64(len(fieldRoots)))
 	if err != nil {
@@ -39,24 +39,24 @@ func Eth1DataRootWithHasher(eth1Data *zondpb.Eth1Data) ([32]byte, error) {
 	return root, nil
 }
 
-// Eth1DatasRoot returns the hash tree root of input `eth1Datas`.
-func Eth1DatasRoot(eth1Datas []*zondpb.Eth1Data) ([32]byte, error) {
-	eth1VotesRoots := make([][32]byte, 0, len(eth1Datas))
-	for i := 0; i < len(eth1Datas); i++ {
-		eth1, err := Eth1DataRootWithHasher(eth1Datas[i])
+// ExecutionNodeDatasRoot returns the hash tree root of input `executionNodeDatas`.
+func ExecutionNodeDatasRoot(executionNodeDatas []*zondpb.ExecutionNodeData) ([32]byte, error) {
+	eth1VotesRoots := make([][32]byte, 0, len(executionNodeDatas))
+	for i := 0; i < len(executionNodeDatas); i++ {
+		eth1, err := ExecutionNodeDataRootWithHasher(executionNodeDatas[i])
 		if err != nil {
-			return [32]byte{}, errors.Wrap(err, "could not compute eth1data merkleization")
+			return [32]byte{}, errors.Wrap(err, "could not compute executionNodeData merkleization")
 		}
 		eth1VotesRoots = append(eth1VotesRoots, eth1)
 	}
 
-	eth1VotesRootsRoot, err := ssz.BitwiseMerkleize(eth1VotesRoots, uint64(len(eth1VotesRoots)), params.BeaconConfig().Eth1DataVotesLength())
+	eth1VotesRootsRoot, err := ssz.BitwiseMerkleize(eth1VotesRoots, uint64(len(eth1VotesRoots)), params.BeaconConfig().ExecutionNodeDataVotesLength())
 	if err != nil {
-		return [32]byte{}, errors.Wrap(err, "could not compute eth1data votes merkleization")
+		return [32]byte{}, errors.Wrap(err, "could not compute executionNodeData votes merkleization")
 	}
 	eth1VotesRootBuf := new(bytes.Buffer)
-	if err := binary.Write(eth1VotesRootBuf, binary.LittleEndian, uint64(len(eth1Datas))); err != nil {
-		return [32]byte{}, errors.Wrap(err, "could not marshal eth1data votes length")
+	if err := binary.Write(eth1VotesRootBuf, binary.LittleEndian, uint64(len(executionNodeDatas))); err != nil {
+		return [32]byte{}, errors.Wrap(err, "could not marshal executionNodeData votes length")
 	}
 	// We need to mix in the length of the slice.
 	eth1VotesRootBufRoot := make([]byte, 32)

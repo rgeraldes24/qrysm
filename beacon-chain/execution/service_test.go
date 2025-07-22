@@ -216,8 +216,8 @@ func TestFollowBlock_OK(t *testing.T) {
 		testAcc.Backend.Commit()
 	}
 	// set current height
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestExecutionNodeData.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestExecutionNodeData.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 
 	h, err := web3Service.followedBlockHeight(context.Background())
 	require.NoError(t, err)
@@ -229,8 +229,8 @@ func TestFollowBlock_OK(t *testing.T) {
 		testAcc.Backend.Commit()
 	}
 	// set current height
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
+	web3Service.latestExecutionNodeData.BlockHeight = testAcc.Backend.Blockchain().CurrentBlock().Number.Uint64()
+	web3Service.latestExecutionNodeData.BlockTime = testAcc.Backend.Blockchain().CurrentBlock().Time
 
 	h, err = web3Service.followedBlockHeight(context.Background())
 	require.NoError(t, err)
@@ -246,9 +246,9 @@ func TestStatus(t *testing.T) {
 	testCases := map[*Service]string{
 		// "status is ok" cases
 		{}: "",
-		{isRunning: true, latestEth1Data: &zondpb.LatestETH1Data{BlockTime: afterFiveMinutesAgo}}:   "",
-		{isRunning: false, latestEth1Data: &zondpb.LatestETH1Data{BlockTime: beforeFiveMinutesAgo}}: "",
-		{isRunning: false, runError: errors.New("test runError")}:                                   "",
+		{isRunning: true, latestExecutionNodeData: &zondpb.LatestExecutionNodeData{BlockTime: afterFiveMinutesAgo}}:   "",
+		{isRunning: false, latestExecutionNodeData: &zondpb.LatestExecutionNodeData{BlockTime: beforeFiveMinutesAgo}}: "",
+		{isRunning: false, runError: errors.New("test runError")}:                                                     "",
 		// "status is error" cases
 		{isRunning: true, runError: errors.New("test runError")}: "test runError",
 	}
@@ -277,7 +277,7 @@ func TestHandlePanic_OK(t *testing.T) {
 		WithDatabase(beaconDB),
 	)
 	require.NoError(t, err, "unable to setup web3 Zond execution chain service")
-	// nil eth1DataFetcher would panic if cached value not used
+	// nil executionNodeDataFetcher would panic if cached value not used
 	web3Service.rpcClient = nil
 	web3Service.processBlockHeader(nil)
 	require.LogsContain(t, hook, "Panicked when handling data from Zond execution chain!")
@@ -424,8 +424,8 @@ func TestNewService_EarliestVotingBlock(t *testing.T) {
 	testAcc.Backend.Commit()
 
 	currTime = testAcc.Backend.Blockchain().CurrentHeader().Time
-	web3Service.latestEth1Data.BlockHeight = testAcc.Backend.Blockchain().CurrentHeader().Number.Uint64()
-	web3Service.latestEth1Data.BlockTime = testAcc.Backend.Blockchain().CurrentHeader().Time
+	web3Service.latestExecutionNodeData.BlockHeight = testAcc.Backend.Blockchain().CurrentHeader().Number.Uint64()
+	web3Service.latestExecutionNodeData.BlockTime = testAcc.Backend.Blockchain().CurrentHeader().Time
 	web3Service.chainStartData.GenesisTime = currTime
 
 	// With a current slot of zero, only request follow_blocks behind.
@@ -507,10 +507,10 @@ func TestService_EnsureConsistentPowchainData(t *testing.T) {
 	require.NoError(t, s1.cfg.beaconDB.SaveGenesisData(context.Background(), genState))
 	require.NoError(t, s1.ensureValidPowchainData(context.Background()))
 
-	eth1Data, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
+	executionNodeData, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
 	assert.NoError(t, err)
 
-	assert.NotNil(t, eth1Data)
+	assert.NotNil(t, executionNodeData)
 }
 
 func TestService_InitializeCorrectly(t *testing.T) {
@@ -536,10 +536,10 @@ func TestService_InitializeCorrectly(t *testing.T) {
 	require.NoError(t, s1.cfg.beaconDB.SaveGenesisData(context.Background(), genState))
 	require.NoError(t, s1.ensureValidPowchainData(context.Background()))
 
-	eth1Data, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
+	executionNodeData, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
 	assert.NoError(t, err)
 
-	assert.NoError(t, s1.initializeEth1Data(context.Background(), eth1Data))
+	assert.NoError(t, s1.initializeExecutionNodeData(context.Background(), executionNodeData))
 	assert.Equal(t, int64(-1), s1.lastReceivedMerkleIndex, "received incorrect last received merkle index")
 }
 
@@ -571,11 +571,11 @@ func TestService_EnsureValidPowchainData(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, s1.ensureValidPowchainData(context.Background()))
 
-	eth1Data, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
+	executionNodeData, err := s1.cfg.beaconDB.ExecutionChainData(context.Background())
 	assert.NoError(t, err)
 
-	assert.NotNil(t, eth1Data)
-	assert.Equal(t, 0, len(eth1Data.DepositContainers))
+	assert.NotNil(t, executionNodeData)
+	assert.Equal(t, 0, len(executionNodeData.DepositContainers))
 }
 
 func TestService_ValidateDepositContainers(t *testing.T) {
@@ -708,7 +708,7 @@ func TestService_FollowBlock(t *testing.T) {
 		cfg:            &config{eth1HeaderReqLimit: 1000},
 		rpcClient:      &mockExecution.RPCClient{BlockNumMap: bMap},
 		headerCache:    newHeaderCache(),
-		latestEth1Data: &zondpb.LatestETH1Data{BlockTime: (3000 * 40) + followTime, BlockHeight: 3000},
+		latestExecutionNodeData: &zondpb.LatestExecutionNodeData{BlockTime: (3000 * 40) + followTime, BlockHeight: 3000},
 	}
 	h, err := s.followedBlockHeight(context.Background())
 	assert.NoError(t, err)
@@ -762,13 +762,13 @@ func TestService_migrateOldDepositTree(t *testing.T) {
 		WithDepositCache(cache),
 	)
 	require.NoError(t, err)
-	eth1Data := &zondpb.ETH1ChainData{
+	executionNodeData := &zondpb.ETH1ChainData{
 		BeaconState: &zondpb.BeaconStateCapella{
-			Eth1Data: &zondpb.Eth1Data{
+			ExecutionNodeData: &zondpb.ExecutionNodeData{
 				DepositCount: 800,
 			},
 		},
-		CurrentEth1Data: &zondpb.LatestETH1Data{
+		CurrentExecutionNodeData: &zondpb.LatestExecutionNodeData{
 			BlockHeight: 100,
 		},
 	}
@@ -782,9 +782,9 @@ func TestService_migrateOldDepositTree(t *testing.T) {
 		err := dt.Insert(input[:], i)
 		require.NoError(t, err)
 	}
-	eth1Data.Trie = dt.ToProto()
+	executionNodeData.Trie = dt.ToProto()
 
-	err = s.migrateOldDepositTree(eth1Data)
+	err = s.migrateOldDepositTree(executionNodeData)
 	require.NoError(t, err)
 	oldDepositTreeRoot, err := dt.HashTreeRoot()
 	require.NoError(t, err)

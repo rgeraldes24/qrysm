@@ -32,8 +32,8 @@ type BeaconState struct {
 	stateRootsMultiValue                *MultiValueStateRoots
 	historicalRoots                     customtypes.HistoricalRoots
 	historicalSummaries                 []*zondpb.HistoricalSummary
-	eth1Data                            *zondpb.Eth1Data
-	eth1DataVotes                       []*zondpb.Eth1Data
+	executionNodeData                   *zondpb.ExecutionNodeData
+	executionNodeDataVotes              []*zondpb.ExecutionNodeData
 	eth1DepositIndex                    uint64
 	validators                          []*zondpb.Validator
 	validatorsMultiValue                *MultiValueValidators
@@ -78,8 +78,8 @@ type beaconStateMarshalable struct {
 	StateRoots                          customtypes.StateRoots                  `json:"state_roots" yaml:"state_roots"`
 	HistoricalRoots                     customtypes.HistoricalRoots             `json:"historical_roots" yaml:"historical_roots"`
 	HistoricalSummaries                 []*zondpb.HistoricalSummary             `json:"historical_summaries" yaml:"historical_summaries"`
-	Eth1Data                            *zondpb.Eth1Data                        `json:"eth_1_data" yaml:"eth_1_data"`
-	Eth1DataVotes                       []*zondpb.Eth1Data                      `json:"eth_1_data_votes" yaml:"eth_1_data_votes"`
+	ExecutionNodeData                   *zondpb.ExecutionNodeData               `json:"eth_1_data" yaml:"eth_1_data"`
+	ExecutionNodeDataVotes              []*zondpb.ExecutionNodeData             `json:"eth_1_data_votes" yaml:"eth_1_data_votes"`
 	Eth1DepositIndex                    uint64                                  `json:"eth_1_deposit_index" yaml:"eth_1_deposit_index"`
 	Validators                          []*zondpb.Validator                     `json:"validators" yaml:"validators"`
 	Balances                            []uint64                                `json:"balances" yaml:"balances"`
@@ -134,8 +134,8 @@ func (b *BeaconState) MarshalJSON() ([]byte, error) {
 		StateRoots:                          sRoots,
 		HistoricalRoots:                     b.historicalRoots,
 		HistoricalSummaries:                 b.historicalSummaries,
-		Eth1Data:                            b.eth1Data,
-		Eth1DataVotes:                       b.eth1DataVotes,
+		ExecutionNodeData:                   b.executionNodeData,
+		ExecutionNodeDataVotes:              b.executionNodeDataVotes,
 		Eth1DepositIndex:                    b.eth1DepositIndex,
 		Validators:                          vals,
 		Balances:                            balances,

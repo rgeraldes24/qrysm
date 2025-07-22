@@ -32,8 +32,8 @@ var capellaFields = []types.FieldIndex{
 	types.BlockRoots,
 	types.StateRoots,
 	types.HistoricalRoots,
-	types.Eth1Data,
-	types.Eth1DataVotes,
+	types.ExecutionNodeData,
+	types.ExecutionNodeDataVotes,
 	types.Eth1DepositIndex,
 	types.Validators,
 	types.Balances,
@@ -85,8 +85,8 @@ func InitializeFromProtoUnsafeCapella(st *zondpb.BeaconStateCapella) (state.Beac
 		fork:                                st.Fork,
 		latestBlockHeader:                   st.LatestBlockHeader,
 		historicalRoots:                     hRoots,
-		eth1Data:                            st.Eth1Data,
-		eth1DataVotes:                       st.Eth1DataVotes,
+		executionNodeData:                   st.ExecutionNodeData,
+		executionNodeDataVotes:              st.ExecutionNodeDataVotes,
 		eth1DepositIndex:                    st.Eth1DepositIndex,
 		slashings:                           st.Slashings,
 		previousEpochParticipation:          st.PreviousEpochParticipation,
@@ -158,7 +158,7 @@ func InitializeFromProtoUnsafeCapella(st *zondpb.BeaconStateCapella) (state.Beac
 
 	// Initialize field reference tracking for shared data.
 	b.sharedFieldReferences[types.HistoricalRoots] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.Eth1DataVotes] = stateutil.NewRef(1)
+	b.sharedFieldReferences[types.ExecutionNodeDataVotes] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.Slashings] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.PreviousEpochParticipationBits] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.CurrentEpochParticipationBits] = stateutil.NewRef(1)
@@ -201,14 +201,14 @@ func (b *BeaconState) Copy() state.BeaconState {
 		nextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 
 		// Large arrays, infrequently changed, constant size.
-		blockRoots:            b.blockRoots,
-		blockRootsMultiValue:  b.blockRootsMultiValue,
-		stateRoots:            b.stateRoots,
-		stateRootsMultiValue:  b.stateRootsMultiValue,
-		randaoMixes:           b.randaoMixes,
-		randaoMixesMultiValue: b.randaoMixesMultiValue,
-		eth1DataVotes:         b.eth1DataVotes,
-		slashings:             b.slashings,
+		blockRoots:             b.blockRoots,
+		blockRootsMultiValue:   b.blockRootsMultiValue,
+		stateRoots:             b.stateRoots,
+		stateRootsMultiValue:   b.stateRootsMultiValue,
+		randaoMixes:            b.randaoMixes,
+		randaoMixesMultiValue:  b.randaoMixesMultiValue,
+		executionNodeDataVotes: b.executionNodeDataVotes,
+		slashings:              b.slashings,
 
 		// Large arrays, increases over time.
 		balances:                   b.balances,
@@ -227,7 +227,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 		justificationBits:                   b.justificationBitsVal(),
 		fork:                                b.forkVal(),
 		latestBlockHeader:                   b.latestBlockHeaderVal(),
-		eth1Data:                            b.eth1DataVal(),
+		executionNodeData:                   b.executionNodeDataVal(),
 		previousJustifiedCheckpoint:         b.previousJustifiedCheckpointVal(),
 		currentJustifiedCheckpoint:          b.currentJustifiedCheckpointVal(),
 		finalizedCheckpoint:                 b.finalizedCheckpointVal(),
@@ -424,14 +424,14 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 			hRoots[i] = b.historicalRoots[i][:]
 		}
 		return ssz.ByteArrayRootWithLimit(hRoots, fieldparams.HistoricalRootsLength)
-	case types.Eth1Data:
-		return stateutil.Eth1Root(b.eth1Data)
-	case types.Eth1DataVotes:
+	case types.ExecutionNodeData:
+		return stateutil.Eth1Root(b.executionNodeData)
+	case types.ExecutionNodeDataVotes:
 		if b.rebuildTrie[field] {
 			err := b.resetFieldTrie(
 				field,
-				b.eth1DataVotes,
-				params.BeaconConfig().Eth1DataVotesLength(),
+				b.executionNodeDataVotes,
+				params.BeaconConfig().ExecutionNodeDataVotesLength(),
 			)
 			if err != nil {
 				return [32]byte{}, err
@@ -439,7 +439,7 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 			delete(b.rebuildTrie, field)
 			return b.stateFieldLeaves[field].TrieRoot()
 		}
-		return b.recomputeFieldTrie(field, b.eth1DataVotes)
+		return b.recomputeFieldTrie(field, b.executionNodeDataVotes)
 	case types.Validators:
 		return b.validatorsRootSelector(field)
 	case types.Balances:

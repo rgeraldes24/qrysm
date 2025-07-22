@@ -12,8 +12,8 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrysm/validator"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
@@ -30,7 +30,7 @@ const getValidatorPerformanceEndpoint = "/qrysm/validators/performance"
 
 func (c beaconApiBeaconChainClient) getHeadBlockHeaders(ctx context.Context) (*beacon.GetBlockHeaderResponse, error) {
 	blockHeader := beacon.GetBlockHeaderResponse{}
-	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/zond/v1/beacon/headers/head", &blockHeader); err != nil {
+	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/qrl/v1/beacon/headers/head", &blockHeader); err != nil {
 		return nil, errors.Wrap(err, "failed to get head block header")
 	}
 
@@ -46,7 +46,7 @@ func (c beaconApiBeaconChainClient) getHeadBlockHeaders(ctx context.Context) (*b
 }
 
 func (c beaconApiBeaconChainClient) GetChainHead(ctx context.Context, _ *empty.Empty) (*zondpb.ChainHead, error) {
-	const endpoint = "/zond/v1/beacon/states/head/finality_checkpoints"
+	const endpoint = "/qrl/v1/beacon/states/head/finality_checkpoints"
 
 	finalityCheckpoints := beacon.GetFinalityCheckpointsResponse{}
 	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, endpoint, &finalityCheckpoints); err != nil {

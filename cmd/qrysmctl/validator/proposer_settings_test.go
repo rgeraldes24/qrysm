@@ -60,8 +60,8 @@ func getValidatorHappyPathTestServer(t *testing.T) *httptest.Server {
 				require.Equal(t, ok, true)
 				err := json.NewEncoder(w).Encode(&apimiddleware.GetFeeRecipientByPubkeyResponseJson{
 					Data: &apimiddleware.FeeRecipientJson{
-						Pubkey:      validatorKey,
-						Zondaddress: address,
+						Pubkey:     validatorKey,
+						QRLaddress: address,
 					},
 				})
 				require.NoError(t, err)

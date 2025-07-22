@@ -67,11 +67,11 @@ func (s *Service) RefreshQNR() {
 		return
 	}
 	if bytes.Equal(bitV, currentBitV) && bytes.Equal(bitS, currentBitS) &&
-		s.Metadata().Version() == version.Altair {
+		s.Metadata().Version() == version.Capella {
 		// return early if bitfields haven't changed
 		return
 	}
-	s.updateSubnetRecordWithMetadataV2(bitV, bitS)
+	s.updateSubnetRecordWithMetadata(bitV, bitS)
 
 	// ping all peers to inform them of new metadata
 	s.pingPeers()

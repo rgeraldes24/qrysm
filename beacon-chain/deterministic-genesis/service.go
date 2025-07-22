@@ -121,7 +121,7 @@ func (s *Service) Start() {
 		BaseFeePerGas: make([]byte, 32),
 		BlockHash:     make([]byte, 32),
 	}
-	genesisState, _, err := interop.GenerateGenesisStateCapella(s.ctx, s.cfg.GenesisTime, s.cfg.NumValidators, ee, &zondpb.Eth1Data{BlockHash: make([]byte, 32)})
+	genesisState, _, err := interop.GenerateGenesisStateCapella(s.ctx, s.cfg.GenesisTime, s.cfg.NumValidators, ee, &zondpb.ExecutionNodeData{BlockHash: make([]byte, 32)})
 	if err != nil {
 		log.WithError(err).Fatal("Could not generate interop genesis state")
 	}
@@ -159,9 +159,9 @@ func (_ *Service) AllDeposits(_ context.Context, _ *big.Int) []*zondpb.Deposit {
 	return []*zondpb.Deposit{}
 }
 
-// ChainStartEth1Data mocks out the powchain functionality for interop.
-func (_ *Service) ChainStartEth1Data() *zondpb.Eth1Data {
-	return &zondpb.Eth1Data{}
+// ChainStartExecutionNodeData mocks out the powchain functionality for interop.
+func (_ *Service) ChainStartExecutionNodeData() *zondpb.ExecutionNodeData {
+	return &zondpb.ExecutionNodeData{}
 }
 
 // PreGenesisState returns an empty beacon state.

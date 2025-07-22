@@ -73,7 +73,7 @@ func ProcessEpoch(ctx context.Context, state state.BeaconState) (state.BeaconSta
 	if err != nil {
 		return nil, err
 	}
-	state, err = e.ProcessEth1DataReset(state)
+	state, err = e.ProcessExecutionNodeDataReset(state)
 	if err != nil {
 		return nil, err
 	}

@@ -187,7 +187,7 @@ func (BeaconBlockBody) RandaoReveal() [field_params.DilithiumSignatureLength]byt
 	panic("implement me")
 }
 
-func (BeaconBlockBody) Eth1Data() *zond.Eth1Data {
+func (BeaconBlockBody) ExecutionNodeData() *zond.ExecutionNodeData {
 	panic("implement me")
 }
 
@@ -243,7 +243,7 @@ func (b *BeaconBlockBody) SetRandaoReveal([]byte) {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetEth1Data(*zond.Eth1Data) {
+func (b *BeaconBlockBody) SetExecutionNodeData(*zond.ExecutionNodeData) {
 	panic("implement me")
 }
 

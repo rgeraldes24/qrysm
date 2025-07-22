@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/proto/migration"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
+	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
 )
 
 const (

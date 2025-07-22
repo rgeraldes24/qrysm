@@ -8,8 +8,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/validator/client/beacon-api/mock"
@@ -128,7 +128,7 @@ func TestGetGenesis(t *testing.T) {
 			if testCase.queriesDepositContract {
 				jsonRestHandler.EXPECT().GetRestJsonResponse(
 					ctx,
-					"/zond/v1/config/deposit_contract",
+					"/qrl/v1/config/deposit_contract",
 					&depositContractJson,
 				).Return(
 					nil,
@@ -155,7 +155,7 @@ func TestGetGenesis(t *testing.T) {
 }
 
 func TestGetSyncStatus(t *testing.T) {
-	const syncingEndpoint = "/zond/v1/node/syncing"
+	const syncingEndpoint = "/qrl/v1/node/syncing"
 
 	testCases := []struct {
 		name                 string
@@ -231,7 +231,7 @@ func TestGetSyncStatus(t *testing.T) {
 }
 
 func TestGetVersion(t *testing.T) {
-	const versionEndpoint = "/zond/v1/node/version"
+	const versionEndpoint = "/qrl/v1/node/version"
 
 	testCases := []struct {
 		name                 string

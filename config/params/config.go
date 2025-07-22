@@ -224,9 +224,9 @@ func ConfigForkVersions(b *BeaconChainConfig) map[[fieldparams.VersionLength]byt
 	}
 }
 
-// Eth1DataVotesLength returns the maximum length of the votes on the Eth1 data,
+// ExecutionNodeDataVotesLength returns the maximum length of the votes on the Eth1 data,
 // computed from the parameters in BeaconChainConfig.
-func (b *BeaconChainConfig) Eth1DataVotesLength() uint64 {
+func (b *BeaconChainConfig) ExecutionNodeDataVotesLength() uint64 {
 	return uint64(b.EpochsPerEth1VotingPeriod.Mul(uint64(b.SlotsPerEpoch)))
 }
 

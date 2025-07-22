@@ -69,10 +69,10 @@ func TestProcessDeposit_OK(t *testing.T) {
 	deposits, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
 
-	eth1Data, err := util.DeterministicEth1Data(len(deposits))
+	executionNodeData, err := util.DeterministicExecutionNodeData(len(deposits))
 	require.NoError(t, err)
 
-	err = web3Service.processDeposit(context.Background(), eth1Data, deposits[0])
+	err = web3Service.processDeposit(context.Background(), executionNodeData, deposits[0])
 	require.NoError(t, err, "could not process deposit")
 
 	valcount, err := helpers.ActiveValidatorCount(context.Background(), web3Service.preGenesisState, 0)
@@ -97,12 +97,12 @@ func TestProcessDeposit_InvalidMerkleBranch(t *testing.T) {
 	deposits, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
 
-	eth1Data, err := util.DeterministicEth1Data(len(deposits))
+	executionNodeData, err := util.DeterministicExecutionNodeData(len(deposits))
 	require.NoError(t, err)
 
 	deposits[0].Proof = [][]byte{{'f', 'a', 'k', 'e'}}
 
-	err = web3Service.processDeposit(context.Background(), eth1Data, deposits[0])
+	err = web3Service.processDeposit(context.Background(), executionNodeData, deposits[0])
 	require.NotNil(t, err, "No errors, when an error was expected")
 
 	want := "deposit merkle branch of deposit root did not verify for root"
@@ -134,14 +134,14 @@ func TestProcessDeposit_UnableToVerify(t *testing.T) {
 	require.NoError(t, err)
 	root, err := generatedTrie.HashTreeRoot()
 	require.NoError(t, err)
-	eth1Data := &zondpb.Eth1Data{
+	executionNodeData := &zondpb.ExecutionNodeData{
 		DepositCount: 1,
 		DepositRoot:  root[:],
 	}
 	proof, err := generatedTrie.MerkleProof(0)
 	require.NoError(t, err)
 	deposits[0].Proof = proof
-	err = web3Service.processDeposit(context.Background(), eth1Data, deposits[0])
+	err = web3Service.processDeposit(context.Background(), executionNodeData, deposits[0])
 	require.NoError(t, err)
 	want := "signature did not verify"
 
@@ -187,7 +187,7 @@ func TestProcessDeposit_IncompleteDeposit(t *testing.T) {
 	require.NoError(t, err)
 	root, err := generatedTrie.HashTreeRoot()
 	require.NoError(t, err)
-	eth1Data := &zondpb.Eth1Data{
+	executionNodeData := &zondpb.ExecutionNodeData{
 		DepositCount: 1,
 		DepositRoot:  root[:],
 	}
@@ -204,12 +204,12 @@ func TestProcessDeposit_IncompleteDeposit(t *testing.T) {
 
 		trieRoot, err := generatedTrie.HashTreeRoot()
 		require.NoError(t, err)
-		eth1Data.DepositRoot = trieRoot[:]
-		eth1Data.DepositCount = uint64(i + 1)
+		executionNodeData.DepositRoot = trieRoot[:]
+		executionNodeData.DepositCount = uint64(i + 1)
 
 		deposit.Proof, err = generatedTrie.MerkleProof(i)
 		require.NoError(t, err)
-		err = web3Service.processDeposit(context.Background(), eth1Data, deposit)
+		err = web3Service.processDeposit(context.Background(), executionNodeData, deposit)
 		require.NoError(t, err, fmt.Sprintf("Could not process deposit at %d", i))
 
 		valcount, err := helpers.ActiveValidatorCount(context.Background(), web3Service.preGenesisState, 0)
@@ -234,12 +234,12 @@ func TestProcessDeposit_AllDepositedSuccessfully(t *testing.T) {
 
 	deposits, keys, err := util.DeterministicDepositsAndKeys(10)
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(deposits))
+	executionNodeData, err := util.DeterministicExecutionNodeData(len(deposits))
 	require.NoError(t, err)
 
 	for i := range keys {
-		eth1Data.DepositCount = uint64(i + 1)
-		err = web3Service.processDeposit(context.Background(), eth1Data, deposits[i])
+		executionNodeData.DepositCount = uint64(i + 1)
+		err = web3Service.processDeposit(context.Background(), executionNodeData, deposits[i])
 		require.NoError(t, err, fmt.Sprintf("Could not process deposit at %d", i))
 
 		valCount, err := helpers.ActiveValidatorCount(context.Background(), web3Service.preGenesisState, 0)

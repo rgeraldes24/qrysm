@@ -142,7 +142,7 @@ func (s *PremineGenesisConfig) empty() (state.BeaconState, error) {
 	if err = e.SetFinalizedCheckpoint(zcp); err != nil {
 		return nil, err
 	}
-	if err = e.SetEth1DataVotes([]*zondpb.Eth1Data{}); err != nil {
+	if err = e.SetExecutionNodeDataVotes([]*zondpb.ExecutionNodeData{}); err != nil {
 		return nil, err
 	}
 	return e.Copy(), nil
@@ -153,10 +153,10 @@ func (s *PremineGenesisConfig) processDeposits(ctx context.Context, g state.Beac
 	if err != nil {
 		return err
 	}
-	if err = s.setEth1Data(g); err != nil {
+	if err = s.setExecutionNodeData(g); err != nil {
 		return err
 	}
-	if _, err = helpers.UpdateGenesisEth1Data(g, deposits, g.Eth1Data()); err != nil {
+	if _, err = helpers.UpdateGenesisExecutionNodeData(g, deposits, g.ExecutionNodeData()); err != nil {
 		return err
 	}
 	_, err = b.ProcessPreGenesisDeposits(ctx, g, deposits)
@@ -200,7 +200,7 @@ func (s *PremineGenesisConfig) keys() ([]dilithium.DilithiumKey, []dilithium.Pub
 	return prv, pub, nil
 }
 
-func (s *PremineGenesisConfig) setEth1Data(g state.BeaconState) error {
+func (s *PremineGenesisConfig) setExecutionNodeData(g state.BeaconState) error {
 	if err := g.SetEth1DepositIndex(0); err != nil {
 		return err
 	}
@@ -208,7 +208,7 @@ func (s *PremineGenesisConfig) setEth1Data(g state.BeaconState) error {
 	if err != nil {
 		return err
 	}
-	return g.SetEth1Data(&zondpb.Eth1Data{DepositRoot: dr[:], BlockHash: s.GB.Hash().Bytes()})
+	return g.SetExecutionNodeData(&zondpb.ExecutionNodeData{DepositRoot: dr[:], BlockHash: s.GB.Hash().Bytes()})
 }
 
 func emptyDepositRoot() ([32]byte, error) {
@@ -262,8 +262,8 @@ func (s *PremineGenesisConfig) populate(g state.BeaconState) error {
 	}
 
 	// For pre-mined genesis, we want to keep the deposit root set to the root of an empty trie.
-	// This needs to be set again because the methods used by processDeposits mutate the state's eth1data.
-	return s.setEth1Data(g)
+	// This needs to be set again because the methods used by processDeposits mutate the state's executionNodeData.
+	return s.setExecutionNodeData(g)
 }
 
 func (s *PremineGenesisConfig) setGenesisValidatorsRoot(g state.BeaconState) error {
@@ -353,7 +353,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 	case version.Capella:
 		body = &zondpb.BeaconBlockBodyCapella{
 			RandaoReveal: make([]byte, field_params.DilithiumSignatureLength),
-			Eth1Data: &zondpb.Eth1Data{
+			ExecutionNodeData: &zondpb.ExecutionNodeData{
 				DepositRoot: make([]byte, 32),
 				BlockHash:   make([]byte, 32),
 			},

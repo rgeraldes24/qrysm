@@ -9,7 +9,7 @@ import (
 	validatorServiceConfig "github.com/theQRL/qrysm/config/validator/service"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/monitoring/backup"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/validator/db/kv"
 )
 
@@ -48,13 +48,13 @@ type ValidatorDB interface {
 	LowestSignedSourceEpoch(ctx context.Context, publicKey [field_params.DilithiumPubkeyLength]byte) (primitives.Epoch, bool, error)
 	AttestedPublicKeys(ctx context.Context) ([][field_params.DilithiumPubkeyLength]byte, error)
 	CheckSlashableAttestation(
-		ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoot [32]byte, att *zondpb.IndexedAttestation,
+		ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoot [32]byte, att *qrysmpb.IndexedAttestation,
 	) (kv.SlashingKind, error)
 	SaveAttestationForPubKey(
-		ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoot [32]byte, att *zondpb.IndexedAttestation,
+		ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoot [32]byte, att *qrysmpb.IndexedAttestation,
 	) error
 	SaveAttestationsForPubKey(
-		ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoots [][32]byte, atts []*zondpb.IndexedAttestation,
+		ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoots [][32]byte, atts []*qrysmpb.IndexedAttestation,
 	) error
 	AttestationHistoryForPubKey(
 		ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte,

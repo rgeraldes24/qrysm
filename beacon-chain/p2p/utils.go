@@ -120,9 +120,10 @@ func metaDataFromConfig(cfg *Config) (metadata.Metadata, error) {
 		return nil, err
 	}
 	if metaDataPath == "" && !defaultMetadataExist {
-		metaData := &pb.MetaDataV0{
+		metaData := &pb.MetaDataV1{
 			SeqNumber: 0,
 			Attnets:   bitfield.NewBitvector64(),
+			Syncnets:  bitfield.NewBitvector4(),
 		}
 		dst, err := proto.Marshal(metaData)
 		if err != nil {
@@ -131,7 +132,7 @@ func metaDataFromConfig(cfg *Config) (metadata.Metadata, error) {
 		if err := file.WriteFile(defaultKeyPath, dst); err != nil {
 			return nil, err
 		}
-		return wrapper.WrappedMetadataV0(metaData), nil
+		return wrapper.WrappedMetadataV1(metaData), nil
 	}
 	if defaultMetadataExist && metaDataPath == "" {
 		metaDataPath = defaultKeyPath
@@ -141,11 +142,11 @@ func metaDataFromConfig(cfg *Config) (metadata.Metadata, error) {
 		log.WithError(err).Error("Error reading metadata from file")
 		return nil, err
 	}
-	metaData := &pb.MetaDataV0{}
+	metaData := &pb.MetaDataV1{}
 	if err := proto.Unmarshal(src, metaData); err != nil {
 		return nil, err
 	}
-	return wrapper.WrappedMetadataV0(metaData), nil
+	return wrapper.WrappedMetadataV1(metaData), nil
 }
 
 // Attempt to dial an address to verify its connectivity

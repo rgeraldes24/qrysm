@@ -279,7 +279,7 @@ func TestRecentBeaconBlocks_RPCRequestSent(t *testing.T) {
 	}
 
 	// Setup streams
-	pcl := protocol.ID("/eth2/beacon_chain/req/beacon_blocks_by_root/2/ssz_snappy")
+	pcl := protocol.ID("/consensus/beacon_chain/req/beacon_blocks_by_root/2/ssz_snappy")
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(10000, 10000, time.Second, false)
 

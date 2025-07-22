@@ -152,7 +152,7 @@ func TestMetadataRPCHandler_SendsMetadataAltair(t *testing.T) {
 	p1.Connect(p2)
 	assert.Equal(t, 1, len(p1.BHost.Network().Peers()), "Expected peers to be connected")
 	bitfield := [8]byte{'A', 'B'}
-	p2.LocalMetadata = wrapper.WrappedMetadataV0(&pb.MetaDataV0{
+	p2.LocalMetadata = wrapper.WrappedMetadataV1(&pb.MetaDataV1{
 		SeqNumber: 2,
 		Attnets:   bitfield[:],
 	})

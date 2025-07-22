@@ -30,7 +30,7 @@ type Chain struct {
 	HashesByHeight    map[int][]byte
 	TimesByHeight     map[int]uint64
 	BlockNumberByTime map[uint64]*big.Int
-	Eth1Data          *zondpb.Eth1Data
+	ExecutionNodeData *zondpb.ExecutionNodeData
 	GenesisEth1Block  *big.Int
 	GenesisState      state.BeaconState
 	CurrEndpoint      string
@@ -104,9 +104,9 @@ func (m *Chain) BlockByTimestamp(_ context.Context, time uint64) (*types.HeaderI
 	return &types.HeaderInfo{Number: chosenNumber, Time: chosenTime}, nil
 }
 
-// ChainStartEth1Data --
-func (m *Chain) ChainStartEth1Data() *zondpb.Eth1Data {
-	return m.Eth1Data
+// ChainStartExecutionNodeData --
+func (m *Chain) ChainStartExecutionNodeData() *zondpb.ExecutionNodeData {
+	return m.ExecutionNodeData
 }
 
 // PreGenesisState --

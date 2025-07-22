@@ -30,7 +30,7 @@ var (
 	depositEventSignature = hash.HashKeccak256([]byte("DepositEvent(bytes,bytes,bytes,bytes,bytes)"))
 )
 
-const eth1DataSavingInterval = 1000
+const executionNodeDataSavingInterval = 1000
 const maxTolerableDifference = 50
 const defaultEth1HeaderReqLimit = uint64(1000)
 const depositLogRequestLimit = 10000
@@ -90,7 +90,7 @@ func (s *Service) ProcessLog(ctx context.Context, depositLog *gzondtypes.Log) er
 		if err := s.ProcessDepositLog(ctx, depositLog); err != nil {
 			return errors.Wrap(err, "Could not process deposit log")
 		}
-		if s.lastReceivedMerkleIndex%eth1DataSavingInterval == 0 {
+		if s.lastReceivedMerkleIndex%executionNodeDataSavingInterval == 0 {
 			return s.savePowchainData(ctx)
 		}
 		return nil
@@ -187,7 +187,7 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gzondtypes.
 // processPastLogs processes all the past logs from the deposit contract and
 // updates the deposit trie with the data from each individual log.
 func (s *Service) processPastLogs(ctx context.Context) error {
-	currentBlockNum := s.latestEth1Data.LastRequestedBlock
+	currentBlockNum := s.latestExecutionNodeData.LastRequestedBlock
 	deploymentBlock := params.BeaconNetworkConfig().ContractDeploymentBlock
 	// Start from the deployment block if our last requested block
 	// is behind it. This is as the deposit logs can only start from the
@@ -218,9 +218,9 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 		}
 	}
 
-	s.latestEth1DataLock.Lock()
-	s.latestEth1Data.LastRequestedBlock = currentBlockNum
-	s.latestEth1DataLock.Unlock()
+	s.latestExecutionNodeDataLock.Lock()
+	s.latestExecutionNodeData.LastRequestedBlock = currentBlockNum
+	s.latestExecutionNodeDataLock.Unlock()
 
 	c, err := s.cfg.beaconDB.FinalizedCheckpoint(ctx)
 	if err != nil {
@@ -291,16 +291,16 @@ func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint6
 		return 0, 0, err
 	}
 
-	s.latestEth1DataLock.RLock()
-	lastReqBlock := s.latestEth1Data.LastRequestedBlock
-	s.latestEth1DataLock.RUnlock()
+	s.latestExecutionNodeDataLock.RLock()
+	lastReqBlock := s.latestExecutionNodeData.LastRequestedBlock
+	s.latestExecutionNodeDataLock.RUnlock()
 
 	for i, filterLog := range logs {
 		if filterLog.BlockNumber > currentBlockNum {
 			// set new block number after checking for chainstart for previous block.
-			s.latestEth1DataLock.Lock()
-			s.latestEth1Data.LastRequestedBlock = currentBlockNum
-			s.latestEth1DataLock.Unlock()
+			s.latestExecutionNodeDataLock.Lock()
+			s.latestExecutionNodeData.LastRequestedBlock = currentBlockNum
+			s.latestExecutionNodeDataLock.Unlock()
 			currentBlockNum = filterLog.BlockNumber
 		}
 		if err := s.ProcessLog(ctx, &logs[i]); err != nil {
@@ -308,9 +308,9 @@ func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint6
 			// we reset the last requested block to the previous valid block range. This
 			// prevents the beacon from advancing processing of logs to another range
 			// in the event of an execution client failure.
-			s.latestEth1DataLock.Lock()
-			s.latestEth1Data.LastRequestedBlock = lastReqBlock
-			s.latestEth1DataLock.Unlock()
+			s.latestExecutionNodeDataLock.Lock()
+			s.latestExecutionNodeData.LastRequestedBlock = lastReqBlock
+			s.latestExecutionNodeDataLock.Unlock()
 			return 0, 0, err
 		}
 	}
@@ -337,12 +337,12 @@ func (s *Service) requestBatchedHeadersAndLogs(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if requestedBlock > s.latestEth1Data.LastRequestedBlock &&
-		requestedBlock-s.latestEth1Data.LastRequestedBlock > maxTolerableDifference {
-		log.Infof("Falling back to historical headers and logs sync. Current difference is %d", requestedBlock-s.latestEth1Data.LastRequestedBlock)
+	if requestedBlock > s.latestExecutionNodeData.LastRequestedBlock &&
+		requestedBlock-s.latestExecutionNodeData.LastRequestedBlock > maxTolerableDifference {
+		log.Infof("Falling back to historical headers and logs sync. Current difference is %d", requestedBlock-s.latestExecutionNodeData.LastRequestedBlock)
 		return s.processPastLogs(ctx)
 	}
-	for i := s.latestEth1Data.LastRequestedBlock + 1; i <= requestedBlock; i++ {
+	for i := s.latestExecutionNodeData.LastRequestedBlock + 1; i <= requestedBlock; i++ {
 		// Cache eth1 block header here.
 		_, err := s.BlockHashByHeight(ctx, big.NewInt(0).SetUint64(i))
 		if err != nil {
@@ -352,9 +352,9 @@ func (s *Service) requestBatchedHeadersAndLogs(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		s.latestEth1DataLock.Lock()
-		s.latestEth1Data.LastRequestedBlock = i
-		s.latestEth1DataLock.Unlock()
+		s.latestExecutionNodeDataLock.Lock()
+		s.latestExecutionNodeData.LastRequestedBlock = i
+		s.latestExecutionNodeDataLock.Unlock()
 	}
 
 	return nil
@@ -366,11 +366,11 @@ func (s *Service) savePowchainData(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	eth1Data := &zondpb.ETH1ChainData{
-		CurrentEth1Data:   s.latestEth1Data,
-		ChainstartData:    s.chainStartData,
-		BeaconState:       pbState, // I promise not to mutate it!
-		DepositContainers: s.cfg.depositCache.AllDepositContainers(ctx),
+	executionNodeData := &zondpb.ETH1ChainData{
+		CurrentExecutionNodeData: s.latestExecutionNodeData,
+		ChainstartData:           s.chainStartData,
+		BeaconState:              pbState, // I promise not to mutate it!
+		DepositContainers:        s.cfg.depositCache.AllDepositContainers(ctx),
 	}
 	if features.Get().EnableEIP4881 {
 		fd, err := s.cfg.depositCache.FinalizedDeposits(ctx)
@@ -381,7 +381,7 @@ func (s *Service) savePowchainData(ctx context.Context) error {
 		if !ok {
 			return errors.New("deposit tree was not EIP4881 DepositTree")
 		}
-		eth1Data.DepositSnapshot, err = tree.ToProto()
+		executionNodeData.DepositSnapshot, err = tree.ToProto()
 		if err != nil {
 			return err
 		}
@@ -390,7 +390,7 @@ func (s *Service) savePowchainData(ctx context.Context) error {
 		if !ok {
 			return errors.New("deposit tree was not SparseMerkleTrie")
 		}
-		eth1Data.Trie = tree.ToProto()
+		executionNodeData.Trie = tree.ToProto()
 	}
-	return s.cfg.beaconDB.SaveExecutionChainData(ctx, eth1Data)
+	return s.cfg.beaconDB.SaveExecutionChainData(ctx, executionNodeData)
 }

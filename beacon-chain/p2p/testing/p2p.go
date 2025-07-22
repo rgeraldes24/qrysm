@@ -32,8 +32,8 @@ import (
 
 // We have to declare this again here to prevent a circular dependency
 // with the main p2p package.
-const metatadataV1Topic = "/eth2/beacon_chain/req/metadata/1"
-const metatadataV2Topic = "/eth2/beacon_chain/req/metadata/2"
+const metatadataV1Topic = "/consensus/beacon_chain/req/metadata/1"
+const metatadataV2Topic = "/consensus/beacon_chain/req/metadata/2"
 
 // TestP2P represents a p2p implementation that can be used for testing.
 type TestP2P struct {

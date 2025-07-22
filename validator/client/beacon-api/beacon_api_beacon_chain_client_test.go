@@ -13,9 +13,9 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/theQRL/go-zond/common/hexutil"
 	gatewaymiddleware "github.com/theQRL/qrysm/api/gateway/apimiddleware"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrysm/validator"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -27,7 +27,7 @@ import (
 )
 
 func TestListValidators(t *testing.T) {
-	const blockHeaderEndpoint = "/zond/v1/beacon/headers/head"
+	const blockHeaderEndpoint = "/qrl/v1/beacon/headers/head"
 
 	t.Run("invalid token", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
@@ -588,8 +588,8 @@ func TestListValidators(t *testing.T) {
 }
 
 func TestGetChainHead(t *testing.T) {
-	const finalityCheckpointsEndpoint = "/zond/v1/beacon/states/head/finality_checkpoints"
-	const headBlockHeadersEndpoint = "/zond/v1/beacon/headers/head"
+	const finalityCheckpointsEndpoint = "/qrl/v1/beacon/states/head/finality_checkpoints"
+	const headBlockHeadersEndpoint = "/qrl/v1/beacon/headers/head"
 
 	generateValidFinalityCheckpointsResponse := func() beacon.GetFinalityCheckpointsResponse {
 		return beacon.GetFinalityCheckpointsResponse{

@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/scorers"
 	mockp2p "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	leakybucket "github.com/theQRL/qrysm/container/leaky-bucket"
-	zondpb "github.com/theQRL/qrysm/proto/zond/v1"
+	zondpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )

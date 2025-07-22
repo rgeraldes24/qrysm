@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // MockClient is a mock implementation of BuilderClient.
@@ -32,7 +32,7 @@ func (MockClient) GetHeader(_ context.Context, _ primitives.Slot, _ [32]byte, _ 
 }
 
 // RegisterValidator --
-func (m MockClient) RegisterValidator(_ context.Context, svr []*zondpb.SignedValidatorRegistrationV1) error {
+func (m MockClient) RegisterValidator(_ context.Context, svr []*qrysmpb.SignedValidatorRegistrationV1) error {
 	for _, r := range svr {
 		b := bytesutil.ToBytes2592(r.Message.Pubkey)
 		m.RegisteredVals[b] = true

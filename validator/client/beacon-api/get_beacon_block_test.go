@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/client/beacon-api/mock"
@@ -127,7 +127,7 @@ func TestGetBeaconBlock_CapellaValid(t *testing.T) {
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 	jsonRestHandler.EXPECT().GetRestJsonResponse(
 		ctx,
-		fmt.Sprintf("/zond/v1/validator/blocks/%d?graffiti=%s&randao_reveal=%s", slot, hexutil.Encode(graffiti), hexutil.Encode(randaoReveal)),
+		fmt.Sprintf("/qrl/v1/validator/blocks/%d?graffiti=%s&randao_reveal=%s", slot, hexutil.Encode(graffiti), hexutil.Encode(randaoReveal)),
 		&abstractProduceBlockResponseJson{},
 	).SetArg(
 		2,
@@ -152,8 +152,8 @@ func TestGetBeaconBlock_CapellaValid(t *testing.T) {
 	beaconBlock, err := validatorClient.getBeaconBlock(ctx, slot, randaoReveal, graffiti)
 	require.NoError(t, err)
 
-	expectedBeaconBlock := &zondpb.GenericBeaconBlock{
-		Block: &zondpb.GenericBeaconBlock_Capella{
+	expectedBeaconBlock := &qrysmpb.GenericBeaconBlock{
+		Block: &qrysmpb.GenericBeaconBlock_Capella{
 			Capella: capellaProtoBeaconBlock,
 		},
 	}

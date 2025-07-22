@@ -898,8 +898,8 @@ github.com/raulk/go-watchdog v1.3.0 h1:oUmdlHxdkXRJlwfG0O9omj8ukerm8MEQavSiDTEtB
 github.com/raulk/go-watchdog v1.3.0/go.mod h1:fIvOnLbF0b0ZwkB9YU4mOW9Did//4vPZtDqv66NfsMU=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
-github.com/rgeraldes24/go-zond v0.0.0-20250718105748-0649eaaeb070 h1:D8z+4D1/LZ3Xc/I8+3ng6OKNkKUja3HZcDtgtI8kcJw=
-github.com/rgeraldes24/go-zond v0.0.0-20250718105748-0649eaaeb070/go.mod h1:7LdYdNTiPW2m/pHqlA+4+66RSyMPCCknFcP8UMdcoGE=
+github.com/rgeraldes24/go-zond v0.0.0-20250719093039-de94263012f9 h1:/qxL6t5ldJnT+ZTz8mt9+QUWXf6jF8mmdtH9dlVqYzc=
+github.com/rgeraldes24/go-zond v0.0.0-20250719093039-de94263012f9/go.mod h1:7LdYdNTiPW2m/pHqlA+4+66RSyMPCCknFcP8UMdcoGE=
 github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250702080128-b3082ce292d8 h1:r1XOO0tZ1L15nPqVQEgbZDTj+NQjAm+RxObDf1TKZgM=
 github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250702080128-b3082ce292d8/go.mod h1:Olsh1FZZHY7SI9PUBHllXI/h/wYDYtEL9gJM/ahMZsw=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=

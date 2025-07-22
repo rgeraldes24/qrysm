@@ -8,8 +8,8 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/validator"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/validator"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -33,7 +33,7 @@ func TestBeaconApiValidatorClient_GetAttestationDataValid(t *testing.T) {
 	produceAttestationDataResponseJson := validator.GetAttestationDataResponse{}
 	jsonRestHandler.EXPECT().GetRestJsonResponse(
 		ctx,
-		fmt.Sprintf("/zond/v1/validator/attestation_data?committee_index=%d&slot=%d", committeeIndex, slot),
+		fmt.Sprintf("/qrl/v1/validator/attestation_data?committee_index=%d&slot=%d", committeeIndex, slot),
 		&produceAttestationDataResponseJson,
 	).Return(
 		nil,
@@ -74,7 +74,7 @@ func TestBeaconApiValidatorClient_GetAttestationDataError(t *testing.T) {
 	produceAttestationDataResponseJson := validator.GetAttestationDataResponse{}
 	jsonRestHandler.EXPECT().GetRestJsonResponse(
 		ctx,
-		fmt.Sprintf("/zond/v1/validator/attestation_data?committee_index=%d&slot=%d", committeeIndex, slot),
+		fmt.Sprintf("/qrl/v1/validator/attestation_data?committee_index=%d&slot=%d", committeeIndex, slot),
 		&produceAttestationDataResponseJson,
 	).Return(
 		nil,
@@ -149,8 +149,8 @@ func TestBeaconApiValidatorClient_ProposeBeaconBlockValid(t *testing.T) {
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 	jsonRestHandler.EXPECT().PostRestJson(
 		ctx,
-		"/zond/v1/beacon/blocks",
-		map[string]string{"Eth-Consensus-Version": "capella"},
+		"/qrl/v1/beacon/blocks",
+		map[string]string{"QRL-Consensus-Version": "capella"},
 		gomock.Any(),
 		nil,
 	).Return(
@@ -186,8 +186,8 @@ func TestBeaconApiValidatorClient_ProposeBeaconBlockError(t *testing.T) {
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 	jsonRestHandler.EXPECT().PostRestJson(
 		ctx,
-		"/zond/v1/beacon/blocks",
-		map[string]string{"Eth-Consensus-Version": "capella"},
+		"/qrl/v1/beacon/blocks",
+		map[string]string{"QRL-Consensus-Version": "capella"},
 		gomock.Any(),
 		nil,
 	).Return(

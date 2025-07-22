@@ -15,8 +15,8 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 )

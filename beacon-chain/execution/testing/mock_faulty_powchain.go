@@ -48,9 +48,9 @@ func (*FaultyExecutionChain) BlockByTimestamp(context.Context, uint64) (*types.H
 	return &types.HeaderInfo{Number: big.NewInt(0)}, nil
 }
 
-// ChainStartEth1Data --
-func (*FaultyExecutionChain) ChainStartEth1Data() *zondpb.Eth1Data {
-	return &zondpb.Eth1Data{}
+// ChainStartExecutionNodeData --
+func (*FaultyExecutionChain) ChainStartExecutionNodeData() *zondpb.ExecutionNodeData {
+	return &zondpb.ExecutionNodeData{}
 }
 
 // PreGenesisState --

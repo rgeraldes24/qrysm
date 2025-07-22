@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/math"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 var errInvalidUint256 = errors.New("invalid Uint256")
@@ -155,7 +155,7 @@ func FromProtoCapella(payload *v1.ExecutionPayloadCapella) (ExecutionPayloadCape
 	}, nil
 }
 
-// ExecHeaderResponseCapella is the response of builder API /zond/v1/builder/header/{slot}/{parent_hash}/{pubkey} for Capella.
+// ExecHeaderResponseCapella is the response of builder API /qrl/v1/builder/header/{slot}/{parent_hash}/{pubkey} for Capella.
 type ExecHeaderResponseCapella struct {
 	Data struct {
 		Signature hexutil.Bytes      `json:"signature"`
@@ -164,24 +164,24 @@ type ExecHeaderResponseCapella struct {
 }
 
 // ToProto returns a SignedBuilderBidCapella Proto from ExecHeaderResponseCapella.
-func (ehr *ExecHeaderResponseCapella) ToProto() (*zond.SignedBuilderBidCapella, error) {
+func (ehr *ExecHeaderResponseCapella) ToProto() (*qrysmpb.SignedBuilderBidCapella, error) {
 	bb, err := ehr.Data.Message.ToProto()
 	if err != nil {
 		return nil, err
 	}
-	return &zond.SignedBuilderBidCapella{
+	return &qrysmpb.SignedBuilderBidCapella{
 		Message:   bb,
 		Signature: bytesutil.SafeCopyBytes(ehr.Data.Signature),
 	}, nil
 }
 
 // ToProto returns a BuilderBidCapella Proto.
-func (bb *BuilderBidCapella) ToProto() (*zond.BuilderBidCapella, error) {
+func (bb *BuilderBidCapella) ToProto() (*qrysmpb.BuilderBidCapella, error) {
 	header, err := bb.Header.ToProto()
 	if err != nil {
 		return nil, err
 	}
-	return &zond.BuilderBidCapella{
+	return &qrysmpb.BuilderBidCapella{
 		Header: header,
 		Value:  bytesutil.SafeCopyBytes(bb.Value.SSZBytes()),
 		Pubkey: bytesutil.SafeCopyBytes(bb.Pubkey),
@@ -276,7 +276,7 @@ func (h *ExecutionPayloadHeaderCapella) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-// ExecPayloadResponseCapella is the builder API /zond/v1/builder/blinded_blocks for Capella.
+// ExecPayloadResponseCapella is the builder API /qrl/v1/builder/blinded_blocks for Capella.
 type ExecPayloadResponseCapella struct {
 	Version string                  `json:"version"`
 	Data    ExecutionPayloadCapella `json:"data"`
@@ -350,7 +350,7 @@ type Withdrawal struct {
 
 // ProposerSlashing is a field in BlindedBeaconBlockBodyCapella.
 type ProposerSlashing struct {
-	*zond.ProposerSlashing
+	*qrysmpb.ProposerSlashing
 }
 
 // MarshalJSON returns a JSON byte array representation of ProposerSlashing.
@@ -366,7 +366,7 @@ func (s *ProposerSlashing) MarshalJSON() ([]byte, error) {
 
 // SignedBeaconBlockHeader is a field of ProposerSlashing.
 type SignedBeaconBlockHeader struct {
-	*zond.SignedBeaconBlockHeader
+	*qrysmpb.SignedBeaconBlockHeader
 }
 
 // MarshalJSON returns a JSON byte array representation of SignedBeaconBlockHeader.
@@ -382,7 +382,7 @@ func (h *SignedBeaconBlockHeader) MarshalJSON() ([]byte, error) {
 
 // BeaconBlockHeader is a field of SignedBeaconBlockHeader.
 type BeaconBlockHeader struct {
-	*zond.BeaconBlockHeader
+	*qrysmpb.BeaconBlockHeader
 }
 
 // MarshalJSON returns a JSON byte array representation of BeaconBlockHeader.
@@ -404,7 +404,7 @@ func (h *BeaconBlockHeader) MarshalJSON() ([]byte, error) {
 
 // IndexedAttestation is a field of AttesterSlashing.
 type IndexedAttestation struct {
-	*zond.IndexedAttestation
+	*qrysmpb.IndexedAttestation
 }
 
 // MarshalJSON returns a JSON byte array representation of IndexedAttestation.
@@ -431,7 +431,7 @@ func (a *IndexedAttestation) MarshalJSON() ([]byte, error) {
 
 // AttesterSlashing is a field of a Beacon Block Body.
 type AttesterSlashing struct {
-	*zond.AttesterSlashing
+	*qrysmpb.AttesterSlashing
 }
 
 // MarshalJSON returns a JSON byte array representation of AttesterSlashing.
@@ -447,7 +447,7 @@ func (s *AttesterSlashing) MarshalJSON() ([]byte, error) {
 
 // Checkpoint is a field of AttestationData.
 type Checkpoint struct {
-	*zond.Checkpoint
+	*qrysmpb.Checkpoint
 }
 
 // MarshalJSON returns a JSON byte array representation of Checkpoint.
@@ -463,7 +463,7 @@ func (c *Checkpoint) MarshalJSON() ([]byte, error) {
 
 // AttestationData is a field of IndexedAttestation.
 type AttestationData struct {
-	*zond.AttestationData
+	*qrysmpb.AttestationData
 }
 
 // MarshalJSON returns a JSON byte array representation of AttestationData.
@@ -485,7 +485,7 @@ func (a *AttestationData) MarshalJSON() ([]byte, error) {
 
 // Attestation is a field of Beacon Block Body.
 type Attestation struct {
-	*zond.Attestation
+	*qrysmpb.Attestation
 }
 
 // MarshalJSON returns a JSON byte array representation of Attestation.
@@ -508,7 +508,7 @@ func (a *Attestation) MarshalJSON() ([]byte, error) {
 
 // DepositData is a field of Deposit.
 type DepositData struct {
-	*zond.Deposit_Data
+	*qrysmpb.Deposit_Data
 }
 
 // MarshalJSON returns a JSON byte array representation of DepositData.
@@ -528,7 +528,7 @@ func (d *DepositData) MarshalJSON() ([]byte, error) {
 
 // Deposit is a field of Beacon Block Body.
 type Deposit struct {
-	*zond.Deposit
+	*qrysmpb.Deposit
 }
 
 // MarshalJSON returns a JSON byte array representation of Deposit.
@@ -548,7 +548,7 @@ func (d *Deposit) MarshalJSON() ([]byte, error) {
 
 // SignedVoluntaryExit is a field of Beacon Block Body.
 type SignedVoluntaryExit struct {
-	*zond.SignedVoluntaryExit
+	*qrysmpb.SignedVoluntaryExit
 }
 
 // MarshalJSON returns a JSON byte array representation of SignedVoluntaryExit.
@@ -564,7 +564,7 @@ func (sve *SignedVoluntaryExit) MarshalJSON() ([]byte, error) {
 
 // VoluntaryExit is a field in SignedVoluntaryExit
 type VoluntaryExit struct {
-	*zond.VoluntaryExit
+	*qrysmpb.VoluntaryExit
 }
 
 // MarshalJSON returns a JSON byte array representation of VoluntaryExit
@@ -580,7 +580,7 @@ func (ve *VoluntaryExit) MarshalJSON() ([]byte, error) {
 
 // SyncAggregate is a field of Beacon Block Body.
 type SyncAggregate struct {
-	*zond.SyncAggregate
+	*qrysmpb.SyncAggregate
 }
 
 // MarshalJSON returns a JSON byte array representation of SyncAggregate.
@@ -599,13 +599,13 @@ func (s *SyncAggregate) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// Eth1Data is a field of Beacon Block Body.
-type Eth1Data struct {
-	*zond.Eth1Data
+// ExecutionNodeData is a field of Beacon Block Body.
+type ExecutionNodeData struct {
+	*qrysmpb.ExecutionNodeData
 }
 
-// MarshalJSON returns a JSON byte array representation of Eth1Data.
-func (e *Eth1Data) MarshalJSON() ([]byte, error) {
+// MarshalJSON returns a JSON byte array representation of ExecutionNodeData.
+func (e *ExecutionNodeData) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		DepositRoot  hexutil.Bytes `json:"deposit_root"`
 		DepositCount string        `json:"deposit_count"`
@@ -619,7 +619,7 @@ func (e *Eth1Data) MarshalJSON() ([]byte, error) {
 
 // SignedDilithiumToExecutionChange is a field in Beacon Block Body for capella and above.
 type SignedDilithiumToExecutionChange struct {
-	*zond.SignedDilithiumToExecutionChange
+	*qrysmpb.SignedDilithiumToExecutionChange
 }
 
 // MarshalJSON returns a JSON byte array representation of SignedDilithiumToExecutionChange.
@@ -635,7 +635,7 @@ func (ch *SignedDilithiumToExecutionChange) MarshalJSON() ([]byte, error) {
 
 // DilithiumToExecutionChange is a field in SignedDilithiumToExecutionChange.
 type DilithiumToExecutionChange struct {
-	*zond.DilithiumToExecutionChange
+	*qrysmpb.DilithiumToExecutionChange
 }
 
 // MarshalJSON returns a JSON byte array representation of DilithiumToExecutionChange.

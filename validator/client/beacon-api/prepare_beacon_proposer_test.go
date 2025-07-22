@@ -9,14 +9,14 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/client/beacon-api/mock"
 )
 
-const prepareBeaconProposerTestEndpoint = "/zond/v1/validator/prepare_beacon_proposer"
+const prepareBeaconProposerTestEndpoint = "/qrl/v1/validator/prepare_beacon_proposer"
 
 func TestPrepareBeaconProposer_Valid(t *testing.T) {
 	const feeRecipient1 = "Qca008b199c03a2a2f6bc2ed52d6404c4d8510b35"
@@ -65,7 +65,7 @@ func TestPrepareBeaconProposer_Valid(t *testing.T) {
 	decodedFeeRecipient3, err := hexutil.DecodeQ(feeRecipient3)
 	require.NoError(t, err)
 
-	protoRecipients := []*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
+	protoRecipients := []*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
 		{
 			ValidatorIndex: 1,
 			FeeRecipient:   decodedFeeRecipient1,

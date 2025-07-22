@@ -36,19 +36,6 @@ message QNRForkID {
  Spec Definition:
  MetaData
  (
-  seq_number: uint64
-  attnets: Bitvector[ATTESTATION_SUBNET_COUNT]
- )
-*/
-message MetaDataV0 {
-  uint64 seq_number = 1;
-  bytes attnets = 2 [(theqrl.zond.ext.ssz_size) = "8", (theqrl.zond.ext.cast_type) = "github.com/theQRL/go-bitfield.Bitvector64"];
-}
-
-/*
- Spec Definition:
- MetaData
- (
  seq_number: uint64
  attnets: Bitvector[ATTESTATION_SUBNET_COUNT]
  )

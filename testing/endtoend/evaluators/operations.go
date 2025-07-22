@@ -17,9 +17,9 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz/detect"
+	zondpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
 	"github.com/theQRL/qrysm/testing/endtoend/helpers"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	"github.com/theQRL/qrysm/testing/endtoend/policies"
@@ -113,7 +113,7 @@ var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 	Evaluation: validatorsAreWithdrawn,
 }
 
-// ValidatorsVoteWithTheMajority verifies whether validator vote for eth1data using the majority algorithm.
+// ValidatorsVoteWithTheMajority verifies whether validator vote for executionNodeData using the majority algorithm.
 var ValidatorsVoteWithTheMajority = e2etypes.Evaluator{
 	Name:       "validators_vote_with_the_majority_%d",
 	Policy:     policies.AfterNthEpoch(0),
@@ -485,11 +485,11 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 		case *zondpb.BeaconBlockContainer_CapellaBlock:
 			b := blk.GetCapellaBlock().Block
 			slot = b.Slot
-			vote = b.Body.Eth1Data.BlockHash
+			vote = b.Body.ExecutionNodeData.BlockHash
 		case *zondpb.BeaconBlockContainer_BlindedCapellaBlock:
 			b := blk.GetBlindedCapellaBlock().Block
 			slot = b.Slot
-			vote = b.Body.Eth1Data.BlockHash
+			vote = b.Body.ExecutionNodeData.BlockHash
 		default:
 			return errors.New("invalid block type")
 		}
@@ -509,11 +509,11 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 			isFirstSlotInVotingPeriod = slot%slotsPerVotingPeriod == 0
 		}
 		if isFirstSlotInVotingPeriod {
-			ec.ExpectedEth1DataVote = vote
+			ec.ExpectedExecutionNodeDataVote = vote
 			return nil
 		}
 
-		if !bytes.Equal(vote, ec.ExpectedEth1DataVote) {
+		if !bytes.Equal(vote, ec.ExpectedExecutionNodeDataVote) {
 			for i := primitives.Slot(0); i < slot; i++ {
 				v, ok := ec.SeenVotes[i]
 				if ok {
@@ -522,8 +522,8 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 					fmt.Printf("did not see slot=%d\n", i)
 				}
 			}
-			return fmt.Errorf("incorrect eth1data vote for slot %d; expected: %#x vs voted: %#x",
-				slot, ec.ExpectedEth1DataVote, vote)
+			return fmt.Errorf("incorrect executionNodeData vote for slot %d; expected: %#x vs voted: %#x",
+				slot, ec.ExpectedExecutionNodeDataVote, vote)
 		}
 	}
 	return nil

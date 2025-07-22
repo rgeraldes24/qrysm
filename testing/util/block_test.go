@@ -146,9 +146,9 @@ func TestGenerateFullBlock_ValidDeposits(t *testing.T) {
 	beaconState, privs := DeterministicGenesisStateCapella(t, 256)
 	deposits, _, err := DeterministicDepositsAndKeys(257)
 	require.NoError(t, err)
-	eth1Data, err := DeterministicEth1Data(len(deposits))
+	executionNodeData, err := DeterministicExecutionNodeData(len(deposits))
 	require.NoError(t, err)
-	require.NoError(t, beaconState.SetEth1Data(eth1Data))
+	require.NoError(t, beaconState.SetExecutionNodeData(executionNodeData))
 	conf := &BlockGenConfig{
 		NumDeposits: 1,
 	}

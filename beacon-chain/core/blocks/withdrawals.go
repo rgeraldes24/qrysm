@@ -16,8 +16,8 @@ import (
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz"
+	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
 )
 
 const executionToDilithiumPadding = 12

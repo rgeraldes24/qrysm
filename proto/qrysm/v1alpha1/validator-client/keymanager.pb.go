@@ -13,8 +13,8 @@ import (
 
 	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	github_com_theQRL_qrysm_consensus_types_validator "github.com/theQRL/qrysm/consensus-types/validator"
+	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	v1alpha1 "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	_ "github.com/theQRL/qrysm/proto/zond/ext"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"

@@ -55,7 +55,7 @@ func TestService_decodePubsubMessage(t *testing.T) {
 		},
 		{
 			name:    "topic not mapped to any message type",
-			topic:   "/eth2/abababab/foo/ssz_snappy",
+			topic:   "/consensus/abababab/foo/ssz_snappy",
 			wantErr: p2p.ErrMessageNotMapped,
 		},
 		{

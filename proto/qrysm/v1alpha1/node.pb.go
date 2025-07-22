@@ -11,7 +11,7 @@ import (
 	reflect "reflect"
 	sync "sync"
 
-	_ "github.com/theQRL/qrysm/proto/zond/ext"
+	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -578,7 +578,7 @@ func (x *HostData) GetQnr() string {
 	return ""
 }
 
-type ETH1ConnectionStatus struct {
+type ExecutionNodeConnectionStatus struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -589,8 +589,8 @@ type ETH1ConnectionStatus struct {
 	ConnectionErrors       []string `protobuf:"bytes,4,rep,name=connection_errors,json=connectionErrors,proto3" json:"connection_errors,omitempty"`
 }
 
-func (x *ETH1ConnectionStatus) Reset() {
-	*x = ETH1ConnectionStatus{}
+func (x *ExecutionNodeConnectionStatus) Reset() {
+	*x = ExecutionNodeConnectionStatus{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -598,13 +598,13 @@ func (x *ETH1ConnectionStatus) Reset() {
 	}
 }
 
-func (x *ETH1ConnectionStatus) String() string {
+func (x *ExecutionNodeConnectionStatus) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ETH1ConnectionStatus) ProtoMessage() {}
+func (*ExecutionNodeConnectionStatus) ProtoMessage() {}
 
-func (x *ETH1ConnectionStatus) ProtoReflect() protoreflect.Message {
+func (x *ExecutionNodeConnectionStatus) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_node_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -616,33 +616,33 @@ func (x *ETH1ConnectionStatus) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ETH1ConnectionStatus.ProtoReflect.Descriptor instead.
-func (*ETH1ConnectionStatus) Descriptor() ([]byte, []int) {
+// Deprecated: Use ExecutionNodeConnectionStatus.ProtoReflect.Descriptor instead.
+func (*ExecutionNodeConnectionStatus) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *ETH1ConnectionStatus) GetCurrentAddress() string {
+func (x *ExecutionNodeConnectionStatus) GetCurrentAddress() string {
 	if x != nil {
 		return x.CurrentAddress
 	}
 	return ""
 }
 
-func (x *ETH1ConnectionStatus) GetCurrentConnectionError() string {
+func (x *ExecutionNodeConnectionStatus) GetCurrentConnectionError() string {
 	if x != nil {
 		return x.CurrentConnectionError
 	}
 	return ""
 }
 
-func (x *ETH1ConnectionStatus) GetAddresses() []string {
+func (x *ExecutionNodeConnectionStatus) GetAddresses() []string {
 	if x != nil {
 		return x.Addresses
 	}
 	return nil
 }
 
-func (x *ETH1ConnectionStatus) GetConnectionErrors() []string {
+func (x *ExecutionNodeConnectionStatus) GetConnectionErrors() []string {
 	if x != nil {
 		return x.ConnectionErrors
 	}
@@ -816,19 +816,19 @@ func file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP() []byte {
 var file_proto_qrysm_v1alpha1_node_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_proto_qrysm_v1alpha1_node_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_proto_qrysm_v1alpha1_node_proto_goTypes = []interface{}{
-	(PeerDirection)(0),            // 0: theqrl.zond.v1alpha1.PeerDirection
-	(ConnectionState)(0),          // 1: theqrl.zond.v1alpha1.ConnectionState
-	(*SyncStatus)(nil),            // 2: theqrl.zond.v1alpha1.SyncStatus
-	(*Genesis)(nil),               // 3: theqrl.zond.v1alpha1.Genesis
-	(*Version)(nil),               // 4: theqrl.zond.v1alpha1.Version
-	(*ImplementedServices)(nil),   // 5: theqrl.zond.v1alpha1.ImplementedServices
-	(*PeerRequest)(nil),           // 6: theqrl.zond.v1alpha1.PeerRequest
-	(*Peers)(nil),                 // 7: theqrl.zond.v1alpha1.Peers
-	(*Peer)(nil),                  // 8: theqrl.zond.v1alpha1.Peer
-	(*HostData)(nil),              // 9: theqrl.zond.v1alpha1.HostData
-	(*ETH1ConnectionStatus)(nil),  // 10: theqrl.zond.v1alpha1.ETH1ConnectionStatus
-	(*timestamppb.Timestamp)(nil), // 11: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),         // 12: google.protobuf.Empty
+	(PeerDirection)(0),                    // 0: theqrl.zond.v1alpha1.PeerDirection
+	(ConnectionState)(0),                  // 1: theqrl.zond.v1alpha1.ConnectionState
+	(*SyncStatus)(nil),                    // 2: theqrl.zond.v1alpha1.SyncStatus
+	(*Genesis)(nil),                       // 3: theqrl.zond.v1alpha1.Genesis
+	(*Version)(nil),                       // 4: theqrl.zond.v1alpha1.Version
+	(*ImplementedServices)(nil),           // 5: theqrl.zond.v1alpha1.ImplementedServices
+	(*PeerRequest)(nil),                   // 6: theqrl.zond.v1alpha1.PeerRequest
+	(*Peers)(nil),                         // 7: theqrl.zond.v1alpha1.Peers
+	(*Peer)(nil),                          // 8: theqrl.zond.v1alpha1.Peer
+	(*HostData)(nil),                      // 9: theqrl.zond.v1alpha1.HostData
+	(*ExecutionNodeConnectionStatus)(nil), // 10: theqrl.zond.v1alpha1.ExecutionNodeConnectionStatus
+	(*timestamppb.Timestamp)(nil),         // 11: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),                 // 12: google.protobuf.Empty
 }
 var file_proto_qrysm_v1alpha1_node_proto_depIdxs = []int32{
 	11, // 0: theqrl.zond.v1alpha1.Genesis.genesis_time:type_name -> google.protobuf.Timestamp
@@ -842,7 +842,7 @@ var file_proto_qrysm_v1alpha1_node_proto_depIdxs = []int32{
 	12, // 8: theqrl.zond.v1alpha1.Node.GetHost:input_type -> google.protobuf.Empty
 	6,  // 9: theqrl.zond.v1alpha1.Node.GetPeer:input_type -> theqrl.zond.v1alpha1.PeerRequest
 	12, // 10: theqrl.zond.v1alpha1.Node.ListPeers:input_type -> google.protobuf.Empty
-	12, // 11: theqrl.zond.v1alpha1.Node.GetETH1ConnectionStatus:input_type -> google.protobuf.Empty
+	12, // 11: theqrl.zond.v1alpha1.Node.GetExecutionNodeConnectionStatus:input_type -> google.protobuf.Empty
 	2,  // 12: theqrl.zond.v1alpha1.Node.GetSyncStatus:output_type -> theqrl.zond.v1alpha1.SyncStatus
 	3,  // 13: theqrl.zond.v1alpha1.Node.GetGenesis:output_type -> theqrl.zond.v1alpha1.Genesis
 	4,  // 14: theqrl.zond.v1alpha1.Node.GetVersion:output_type -> theqrl.zond.v1alpha1.Version
@@ -850,7 +850,7 @@ var file_proto_qrysm_v1alpha1_node_proto_depIdxs = []int32{
 	9,  // 16: theqrl.zond.v1alpha1.Node.GetHost:output_type -> theqrl.zond.v1alpha1.HostData
 	8,  // 17: theqrl.zond.v1alpha1.Node.GetPeer:output_type -> theqrl.zond.v1alpha1.Peer
 	7,  // 18: theqrl.zond.v1alpha1.Node.ListPeers:output_type -> theqrl.zond.v1alpha1.Peers
-	10, // 19: theqrl.zond.v1alpha1.Node.GetETH1ConnectionStatus:output_type -> theqrl.zond.v1alpha1.ETH1ConnectionStatus
+	10, // 19: theqrl.zond.v1alpha1.Node.GetExecutionNodeConnectionStatus:output_type -> theqrl.zond.v1alpha1.ExecutionNodeConnectionStatus
 	12, // [12:20] is the sub-list for method output_type
 	4,  // [4:12] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
@@ -961,7 +961,7 @@ func file_proto_qrysm_v1alpha1_node_proto_init() {
 			}
 		}
 		file_proto_qrysm_v1alpha1_node_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ETH1ConnectionStatus); i {
+			switch v := v.(*ExecutionNodeConnectionStatus); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1013,7 +1013,7 @@ type NodeClient interface {
 	GetHost(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*HostData, error)
 	GetPeer(ctx context.Context, in *PeerRequest, opts ...grpc.CallOption) (*Peer, error)
 	ListPeers(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Peers, error)
-	GetETH1ConnectionStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ETH1ConnectionStatus, error)
+	GetExecutionNodeConnectionStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ExecutionNodeConnectionStatus, error)
 }
 
 type nodeClient struct {
@@ -1087,9 +1087,9 @@ func (c *nodeClient) ListPeers(ctx context.Context, in *emptypb.Empty, opts ...g
 	return out, nil
 }
 
-func (c *nodeClient) GetETH1ConnectionStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ETH1ConnectionStatus, error) {
-	out := new(ETH1ConnectionStatus)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Node/GetETH1ConnectionStatus", in, out, opts...)
+func (c *nodeClient) GetExecutionNodeConnectionStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ExecutionNodeConnectionStatus, error) {
+	out := new(ExecutionNodeConnectionStatus)
+	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Node/GetExecutionNodeConnectionStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1105,7 +1105,7 @@ type NodeServer interface {
 	GetHost(context.Context, *emptypb.Empty) (*HostData, error)
 	GetPeer(context.Context, *PeerRequest) (*Peer, error)
 	ListPeers(context.Context, *emptypb.Empty) (*Peers, error)
-	GetETH1ConnectionStatus(context.Context, *emptypb.Empty) (*ETH1ConnectionStatus, error)
+	GetExecutionNodeConnectionStatus(context.Context, *emptypb.Empty) (*ExecutionNodeConnectionStatus, error)
 }
 
 // UnimplementedNodeServer can be embedded to have forward compatible implementations.
@@ -1133,8 +1133,8 @@ func (*UnimplementedNodeServer) GetPeer(context.Context, *PeerRequest) (*Peer, e
 func (*UnimplementedNodeServer) ListPeers(context.Context, *emptypb.Empty) (*Peers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListPeers not implemented")
 }
-func (*UnimplementedNodeServer) GetETH1ConnectionStatus(context.Context, *emptypb.Empty) (*ETH1ConnectionStatus, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetETH1ConnectionStatus not implemented")
+func (*UnimplementedNodeServer) GetExecutionNodeConnectionStatus(context.Context, *emptypb.Empty) (*ExecutionNodeConnectionStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetExecutionNodeConnectionStatus not implemented")
 }
 
 func RegisterNodeServer(s *grpc.Server, srv NodeServer) {
@@ -1267,20 +1267,20 @@ func _Node_ListPeers_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Node_GetETH1ConnectionStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Node_GetExecutionNodeConnectionStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NodeServer).GetETH1ConnectionStatus(ctx, in)
+		return srv.(NodeServer).GetExecutionNodeConnectionStatus(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Node/GetETH1ConnectionStatus",
+		FullMethod: "/theqrl.zond.v1alpha1.Node/GetExecutionNodeConnectionStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NodeServer).GetETH1ConnectionStatus(ctx, req.(*emptypb.Empty))
+		return srv.(NodeServer).GetExecutionNodeConnectionStatus(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1318,8 +1318,8 @@ var _Node_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Node_ListPeers_Handler,
 		},
 		{
-			MethodName: "GetETH1ConnectionStatus",
-			Handler:    _Node_GetETH1ConnectionStatus_Handler,
+			MethodName: "GetExecutionNodeConnectionStatus",
+			Handler:    _Node_GetExecutionNodeConnectionStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -137,7 +137,7 @@ func (b *SignedBeaconBlock) ToBlinded() (interfaces.ReadOnlySignedBeaconBlock, e
 					StateRoot:     b.block.stateRoot[:],
 					Body: &zond.BlindedBeaconBlockBodyCapella{
 						RandaoReveal:                b.block.body.randaoReveal[:],
-						Eth1Data:                    b.block.body.eth1Data,
+						ExecutionNodeData:           b.block.body.executionNodeData,
 						Graffiti:                    b.block.body.graffiti[:],
 						ProposerSlashings:           b.block.body.proposerSlashings,
 						AttesterSlashings:           b.block.body.attesterSlashings,
@@ -507,9 +507,9 @@ func (b *BeaconBlockBody) RandaoReveal() [field_params.DilithiumSignatureLength]
 	return b.randaoReveal
 }
 
-// Eth1Data returns the eth1 data in the block.
-func (b *BeaconBlockBody) Eth1Data() *zond.Eth1Data {
-	return b.eth1Data
+// ExecutionNodeData returns the eth1 data in the block.
+func (b *BeaconBlockBody) ExecutionNodeData() *zond.ExecutionNodeData {
+	return b.executionNodeData
 }
 
 // Graffiti returns the graffiti in the block.

@@ -9,7 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	beacon "github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
+	beacon "github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
 	primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 )
 

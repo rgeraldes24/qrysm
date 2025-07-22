@@ -18,24 +18,24 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/api/client"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/network/forks"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
+	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 const (
-	getSignedBlockPath             = "/zond/v1/beacon/blocks"
-	getBlockRootPath               = "/zond/v1/beacon/blocks/{{.Id}}/root"
-	getForkForStatePath            = "/zond/v1/beacon/states/{{.Id}}/fork"
-	getWeakSubjectivityPath        = "/zond/v1/beacon/weak_subjectivity"
-	getForkSchedulePath            = "/zond/v1/config/fork_schedule"
-	getConfigSpecPath              = "/zond/v1/config/spec"
-	getStatePath                   = "/zond/v1/debug/beacon/states"
-	getNodeVersionPath             = "/zond/v1/node/version"
-	changeDilithiumtoExecutionPath = "/zond/v1/beacon/pool/dilithium_to_execution_changes"
+	getSignedBlockPath             = "/qrl/v1/beacon/blocks"
+	getBlockRootPath               = "/qrl/v1/beacon/blocks/{{.Id}}/root"
+	getForkForStatePath            = "/qrl/v1/beacon/states/{{.Id}}/fork"
+	getWeakSubjectivityPath        = "/qrl/v1/beacon/weak_subjectivity"
+	getForkSchedulePath            = "/qrl/v1/config/fork_schedule"
+	getConfigSpecPath              = "/qrl/v1/config/spec"
+	getStatePath                   = "/qrl/v1/debug/beacon/states"
+	getNodeVersionPath             = "/qrl/v1/node/version"
+	changeDilithiumtoExecutionPath = "/qrl/v1/beacon/pool/dilithium_to_execution_changes"
 )
 
 // StateOrBlockId represents the block_id / state_id parameters that several of the Zond Beacon API methods accept.
@@ -143,7 +143,7 @@ var getForkTpl = idTemplate(getForkForStatePath)
 // Block identifier can be one of: "head" (canonical head in node's view), "genesis", "finalized",
 // <slot>, <hex encoded blockRoot with 0x prefix>. Variables of type StateOrBlockId are exported by this package
 // for the named identifiers.
-func (c *Client) GetFork(ctx context.Context, stateId StateOrBlockId) (*zondpb.Fork, error) {
+func (c *Client) GetFork(ctx context.Context, stateId StateOrBlockId) (*qrysmpb.Fork, error) {
 	body, err := c.Get(ctx, getForkTpl(stateId))
 	if err != nil {
 		return nil, errors.Wrapf(err, "error requesting fork by state id = %s", stateId)

@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/progress"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/slashings"
 	"github.com/theQRL/qrysm/validator/db"
 	"github.com/theQRL/qrysm/validator/db/kv"
@@ -20,7 +20,7 @@ import (
 )
 
 // ImportStandardProtectionJSON takes in EIP-3076 compliant JSON file used for slashing protection
-// by Zond validators and imports its data into Qrysm's internal representation of slashing
+// by QRL validators and imports its data into Qrysm's internal representation of slashing
 // protection in the validator client's database. For more information, see the EIP document here:
 // https://eips.ethereum.org/EIPS/eip-3076.
 func ImportStandardProtectionJSON(ctx context.Context, validatorDB db.Database, r io.Reader) error {
@@ -124,7 +124,7 @@ func ImportStandardProtectionJSON(ctx context.Context, validatorDB db.Database, 
 		if err := bar.Add(1); err != nil {
 			log.WithError(err).Debug("Could not increase progress bar")
 		}
-		indexedAtts := make([]*zondpb.IndexedAttestation, len(attestations))
+		indexedAtts := make([]*qrysmpb.IndexedAttestation, len(attestations))
 		signingRoots := make([][32]byte, len(attestations))
 		for i, att := range attestations {
 			indexedAtt := createAttestation(att.Source, att.Target)
@@ -368,13 +368,13 @@ func transformSignedAttestations(pubKey [field_params.DilithiumPubkeyLength]byte
 	return historicalAtts, nil
 }
 
-func createAttestation(source, target primitives.Epoch) *zondpb.IndexedAttestation {
-	return &zondpb.IndexedAttestation{
-		Data: &zondpb.AttestationData{
-			Source: &zondpb.Checkpoint{
+func createAttestation(source, target primitives.Epoch) *qrysmpb.IndexedAttestation {
+	return &qrysmpb.IndexedAttestation{
+		Data: &qrysmpb.AttestationData{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: source,
 			},
-			Target: &zondpb.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: target,
 			},
 		},

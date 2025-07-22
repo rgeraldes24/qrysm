@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/async/event"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/validator/accounts/iface"
 	"github.com/theQRL/qrysm/validator/keymanager"
 	"github.com/theQRL/qrysm/validator/keymanager/local"
@@ -23,7 +23,7 @@ const (
 	// DerivationPathFormat describes the structure of how keys are derived from a master key.
 	DerivationPathFormat = "m / purpose / coin_type / account_index / withdrawal_key / validating_key"
 	// ValidatingKeyDerivationPathTemplate defining the hierarchical path for validating
-	// keys for Qrysm Zond validators. According to EIP-2334, the format is as follows:
+	// keys for Qrysm QRL validators. According to EIP-2334, the format is as follows:
 	// m / purpose / coin_type / account_index / withdrawal_key / validating_key
 	ValidatingKeyDerivationPathTemplate = "m/12381/3600/%d/0/0"
 )
@@ -114,14 +114,14 @@ func (km *Keymanager) FetchValidatingSeeds(ctx context.Context) ([][common2.Seed
 // ImportKeystores for a derived keymanager.
 func (km *Keymanager) ImportKeystores(
 	ctx context.Context, keystores []*keymanager.Keystore, passwords []string,
-) ([]*zondpbservice.ImportedKeystoreStatus, error) {
+) ([]*qrlpbservice.ImportedKeystoreStatus, error) {
 	return km.localKM.ImportKeystores(ctx, keystores, passwords)
 }
 
 // DeleteKeystores for a derived keymanager.
 func (km *Keymanager) DeleteKeystores(
 	ctx context.Context, publicKeys [][]byte,
-) ([]*zondpbservice.DeletedKeystoreStatus, error) {
+) ([]*qrlpbservice.DeletedKeystoreStatus, error) {
 	return km.localKM.DeleteKeystores(ctx, publicKeys)
 }
 

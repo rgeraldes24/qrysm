@@ -46,7 +46,7 @@ type ReadOnlyBeaconState interface {
 	ReadOnlyBlockRoots
 	ReadOnlyStateRoots
 	ReadOnlyRandaoMixes
-	ReadOnlyEth1Data
+	ReadOnlyExecutionNodeData
 	ReadOnlyValidators
 	ReadOnlyBalances
 	ReadOnlyCheckpoint
@@ -76,7 +76,7 @@ type WriteOnlyBeaconState interface {
 	WriteOnlyBlockRoots
 	WriteOnlyStateRoots
 	WriteOnlyRandaoMixes
-	WriteOnlyEth1Data
+	WriteOnlyExecutionNodeData
 	WriteOnlyValidators
 	WriteOnlyBalances
 	WriteOnlyCheckpoint
@@ -159,10 +159,10 @@ type ReadOnlyRandaoMixes interface {
 	RandaoMixesLength() int
 }
 
-// ReadOnlyEth1Data defines a struct which only has read access to eth1 data methods.
-type ReadOnlyEth1Data interface {
-	Eth1Data() *zondpb.Eth1Data
-	Eth1DataVotes() []*zondpb.Eth1Data
+// ReadOnlyExecutionNodeData defines a struct which only has read access to eth1 data methods.
+type ReadOnlyExecutionNodeData interface {
+	ExecutionNodeData() *zondpb.ExecutionNodeData
+	ExecutionNodeDataVotes() []*zondpb.ExecutionNodeData
 	Eth1DepositIndex() uint64
 }
 
@@ -202,11 +202,11 @@ type WriteOnlyStateRoots interface {
 	UpdateStateRootAtIndex(idx uint64, stateRoot [32]byte) error
 }
 
-// WriteOnlyEth1Data defines a struct which only has write access to eth1 data methods.
-type WriteOnlyEth1Data interface {
-	SetEth1Data(val *zondpb.Eth1Data) error
-	SetEth1DataVotes(val []*zondpb.Eth1Data) error
-	AppendEth1DataVotes(val *zondpb.Eth1Data) error
+// WriteOnlyExecutionNodeData defines a struct which only has write access to eth1 data methods.
+type WriteOnlyExecutionNodeData interface {
+	SetExecutionNodeData(val *zondpb.ExecutionNodeData) error
+	SetExecutionNodeDataVotes(val []*zondpb.ExecutionNodeData) error
+	AppendExecutionNodeDataVotes(val *zondpb.ExecutionNodeData) error
 	SetEth1DepositIndex(val uint64) error
 }
 

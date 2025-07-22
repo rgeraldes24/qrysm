@@ -93,7 +93,7 @@ func Test_SignedBeaconBlock_Header(t *testing.T) {
 	bb := &BeaconBlockBody{
 		version:      version.Capella,
 		randaoReveal: [field_params.DilithiumSignatureLength]byte{},
-		eth1Data: &zond.Eth1Data{
+		executionNodeData: &zond.ExecutionNodeData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},
@@ -311,11 +311,11 @@ func Test_BeaconBlockBody_RandaoReveal(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.ToBytes4595([]byte("randaoreveal")), bb.Block().Body().RandaoReveal())
 }
 
-func Test_BeaconBlockBody_Eth1Data(t *testing.T) {
-	e := &zond.Eth1Data{DepositRoot: []byte("depositroot")}
+func Test_BeaconBlockBody_ExecutionNodeData(t *testing.T) {
+	e := &zond.ExecutionNodeData{DepositRoot: []byte("depositroot")}
 	bb := &SignedBeaconBlock{block: &BeaconBlock{body: &BeaconBlockBody{}}}
-	bb.SetEth1Data(e)
-	assert.DeepEqual(t, e, bb.Block().Body().Eth1Data())
+	bb.SetExecutionNodeData(e)
+	assert.DeepEqual(t, e, bb.Block().Body().ExecutionNodeData())
 }
 
 func Test_BeaconBlockBody_Graffiti(t *testing.T) {
@@ -361,7 +361,7 @@ func Test_BeaconBlockBody_VoluntaryExits(t *testing.T) {
 
 func Test_BeaconBlockBody_SyncAggregate(t *testing.T) {
 	sa := &zond.SyncAggregate{}
-	bb := &SignedBeaconBlock{version: version.Altair, block: &BeaconBlock{version: version.Altair, body: &BeaconBlockBody{version: version.Altair}}}
+	bb := &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{version: version.Capella, body: &BeaconBlockBody{version: version.Capella}}}
 	require.NoError(t, bb.SetSyncAggregate(sa))
 	result, err := bb.Block().Body().SyncAggregate()
 	require.NoError(t, err)
@@ -427,7 +427,7 @@ func hydrateBeaconBlockBody() *zond.BeaconBlockBodyCapella {
 	return &zond.BeaconBlockBodyCapella{
 		RandaoReveal: make([]byte, field_params.DilithiumSignatureLength),
 		Graffiti:     make([]byte, fieldparams.RootLength),
-		Eth1Data: &zond.Eth1Data{
+		ExecutionNodeData: &zond.ExecutionNodeData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		},

@@ -214,12 +214,12 @@ func verifyDeposit(beaconState state.ReadOnlyBeaconState, deposit *zondpb.Deposi
 	if deposit == nil || deposit.Data == nil {
 		return errors.New("received nil deposit or nil deposit data")
 	}
-	eth1Data := beaconState.Eth1Data()
-	if eth1Data == nil {
-		return errors.New("received nil eth1data in the beacon state")
+	executionNodeData := beaconState.ExecutionNodeData()
+	if executionNodeData == nil {
+		return errors.New("received nil executionNodeData in the beacon state")
 	}
 
-	receiptRoot := eth1Data.DepositRoot
+	receiptRoot := executionNodeData.DepositRoot
 	leaf, err := deposit.Data.HashTreeRoot()
 	if err != nil {
 		return errors.Wrap(err, "could not tree hash deposit data")

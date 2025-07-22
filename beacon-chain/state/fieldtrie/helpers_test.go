@@ -24,10 +24,10 @@ func Test_handlePendingAttestation_OutOfRange(t *testing.T) {
 	assert.ErrorContains(t, "index 3 greater than number of pending attestations 1", err)
 }
 
-func Test_handleEth1DataSlice_OutOfRange(t *testing.T) {
-	items := make([]*zondpb.Eth1Data, 1)
+func Test_handleExecutionNodeDataSlice_OutOfRange(t *testing.T) {
+	items := make([]*zondpb.ExecutionNodeData, 1)
 	indices := []uint64{3}
-	_, err := handleEth1DataSlice(items, indices, false)
+	_, err := handleExecutionNodeDataSlice(items, indices, false)
 	assert.ErrorContains(t, "index 3 greater than number of items in eth1 data slice 1", err)
 
 }
@@ -181,11 +181,11 @@ func TestFieldTrie_NativeState_fieldConvertersNative(t *testing.T) {
 			errMsg:  "Wanted type of customtypes.RandaoMixes",
 		},
 		{
-			name: "Eth1DataVotes type not found",
+			name: "ExecutionNodeDataVotes type not found",
 			args: &args{
 				field:   types.FieldIndex(9),
 				indices: []uint64{},
-				elements: []*zondpb.Eth1Data{
+				elements: []*zondpb.ExecutionNodeData{
 					{
 						DepositRoot:  make([]byte, fieldparams.RootLength),
 						DepositCount: 1,
@@ -196,11 +196,11 @@ func TestFieldTrie_NativeState_fieldConvertersNative(t *testing.T) {
 			wantHex: []string{"0x4833912e1264aef8a18392d795f3f2eed17cf5c0e8471cb0c0db2ec5aca10231"},
 		},
 		{
-			name: "Eth1DataVotes convertAll false",
+			name: "ExecutionNodeDataVotes convertAll false",
 			args: &args{
 				field:   types.FieldIndex(9),
 				indices: []uint64{1},
-				elements: []*zondpb.Eth1Data{
+				elements: []*zondpb.ExecutionNodeData{
 					{
 						DepositRoot:  make([]byte, fieldparams.RootLength),
 						DepositCount: 2,
@@ -215,7 +215,7 @@ func TestFieldTrie_NativeState_fieldConvertersNative(t *testing.T) {
 			wantHex: []string{"0x4833912e1264aef8a18392d795f3f2eed17cf5c0e8471cb0c0db2ec5aca10231"},
 		},
 		{
-			name: "Eth1DataVotes type not found",
+			name: "ExecutionNodeDataVotes type not found",
 			args: &args{
 				field:      types.FieldIndex(9),
 				indices:    []uint64{},
@@ -223,7 +223,7 @@ func TestFieldTrie_NativeState_fieldConvertersNative(t *testing.T) {
 				convertAll: true,
 			},
 			wantHex: nil,
-			errMsg:  fmt.Sprintf("Wanted type of %T", []*zondpb.Eth1Data{}),
+			errMsg:  fmt.Sprintf("Wanted type of %T", []*zondpb.ExecutionNodeData{}),
 		},
 		{
 			name: "Balance",

@@ -31,19 +31,19 @@ func TestExecuteCapellaStateTransitionNoVerify_FullProcess(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(syncCommittee))
 
-	eth1Data := &zondpb.Eth1Data{
+	executionNodeData := &zondpb.ExecutionNodeData{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
 	}
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
-	e := beaconState.Eth1Data()
+	e := beaconState.ExecutionNodeData()
 	e.DepositCount = 100
-	require.NoError(t, beaconState.SetEth1Data(e))
+	require.NoError(t, beaconState.SetExecutionNodeData(e))
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetEth1DataVotes([]*zondpb.Eth1Data{eth1Data}))
+	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*zondpb.ExecutionNodeData{executionNodeData}))
 
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 	epoch := time.CurrentEpoch(beaconState)
@@ -62,7 +62,7 @@ func TestExecuteCapellaStateTransitionNoVerify_FullProcess(t *testing.T) {
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
 	block.Block.Body.RandaoReveal = randaoReveal
-	block.Block.Body.Eth1Data = eth1Data
+	block.Block.Body.ExecutionNodeData = executionNodeData
 
 	syncBits := bitfield.NewBitvector16()
 	for i := range syncBits {
@@ -115,19 +115,19 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(syncCommittee))
 
-	eth1Data := &zondpb.Eth1Data{
+	executionNodeData := &zondpb.ExecutionNodeData{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
 	}
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
-	e := beaconState.Eth1Data()
+	e := beaconState.ExecutionNodeData()
 	e.DepositCount = 100
-	require.NoError(t, beaconState.SetEth1Data(e))
+	require.NoError(t, beaconState.SetExecutionNodeData(e))
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetEth1DataVotes([]*zondpb.Eth1Data{eth1Data}))
+	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*zondpb.ExecutionNodeData{executionNodeData}))
 
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 	epoch := time.CurrentEpoch(beaconState)
@@ -146,7 +146,7 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
 	block.Block.Body.RandaoReveal = randaoReveal
-	block.Block.Body.Eth1Data = eth1Data
+	block.Block.Body.ExecutionNodeData = executionNodeData
 
 	syncBits := bitfield.NewBitvector16()
 	for i := range syncBits {
@@ -231,7 +231,7 @@ func createFullCapellaBlockWithOperations(t *testing.T) (state.BeaconState,
 			StateRoot:     blk.Block.StateRoot,
 			Body: &zondpb.BeaconBlockBodyCapella{
 				RandaoReveal:      blk.Block.Body.RandaoReveal,
-				Eth1Data:          blk.Block.Body.Eth1Data,
+				ExecutionNodeData: blk.Block.Body.ExecutionNodeData,
 				Graffiti:          blk.Block.Body.Graffiti,
 				ProposerSlashings: blk.Block.Body.ProposerSlashings,
 				AttesterSlashings: blk.Block.Body.AttesterSlashings,

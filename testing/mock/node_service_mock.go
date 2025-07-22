@@ -37,24 +37,24 @@ func (m *MockNodeClient) EXPECT() *MockNodeClientMockRecorder {
 	return m.recorder
 }
 
-// GetETH1ConnectionStatus mocks base method.
-func (m *MockNodeClient) GetETH1ConnectionStatus(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.ETH1ConnectionStatus, error) {
+// GetExecutionNodeConnectionStatus mocks base method.
+func (m *MockNodeClient) GetExecutionNodeConnectionStatus(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.ExecutionNodeConnectionStatus, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetETH1ConnectionStatus", varargs...)
-	ret0, _ := ret[0].(*zond.ETH1ConnectionStatus)
+	ret := m.ctrl.Call(m, "GetExecutionNodeConnectionStatus", varargs...)
+	ret0, _ := ret[0].(*zond.ExecutionNodeConnectionStatus)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetETH1ConnectionStatus indicates an expected call of GetETH1ConnectionStatus.
-func (mr *MockNodeClientMockRecorder) GetETH1ConnectionStatus(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// GetExecutionNodeConnectionStatus indicates an expected call of GetExecutionNodeConnectionStatus.
+func (mr *MockNodeClientMockRecorder) GetExecutionNodeConnectionStatus(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetETH1ConnectionStatus", reflect.TypeOf((*MockNodeClient)(nil).GetETH1ConnectionStatus), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExecutionNodeConnectionStatus", reflect.TypeOf((*MockNodeClient)(nil).GetExecutionNodeConnectionStatus), varargs...)
 }
 
 // GetGenesis mocks base method.

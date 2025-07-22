@@ -8,8 +8,8 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
+	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -378,7 +378,7 @@ func Test_V1Alpha1BeaconBlockCapellaToV1Blinded(t *testing.T) {
 	alphaBlock.ParentRoot = parentRoot
 	alphaBlock.StateRoot = stateRoot
 	alphaBlock.Body.RandaoReveal = randaoReveal
-	alphaBlock.Body.Eth1Data = &zondpbalpha.Eth1Data{
+	alphaBlock.Body.ExecutionNodeData = &zondpbalpha.ExecutionNodeData{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
@@ -420,12 +420,12 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 		state.BlockRoots = [][]byte{bytesutil.PadTo([]byte("blockroots"), 32)}
 		state.StateRoots = [][]byte{bytesutil.PadTo([]byte("stateroots"), 32)}
 		state.HistoricalRoots = [][]byte{bytesutil.PadTo([]byte("historicalroots"), 32)}
-		state.Eth1Data = &zondpbalpha.Eth1Data{
+		state.ExecutionNodeData = &zondpbalpha.ExecutionNodeData{
 			DepositRoot:  bytesutil.PadTo([]byte("e1ddepositroot"), 32),
 			DepositCount: 6,
 			BlockHash:    bytesutil.PadTo([]byte("e1dblockhash"), 32),
 		}
-		state.Eth1DataVotes = []*zondpbalpha.Eth1Data{{
+		state.ExecutionNodeDataVotes = []*zondpbalpha.ExecutionNodeData{{
 			DepositRoot:  bytesutil.PadTo([]byte("e1dvdepositroot"), 32),
 			DepositCount: 7,
 			BlockHash:    bytesutil.PadTo([]byte("e1dvblockhash"), 32),
@@ -522,17 +522,17 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("stateroots"), 32), result.StateRoots[0])
 	assert.Equal(t, 1, len(result.HistoricalRoots))
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("historicalroots"), 32), result.HistoricalRoots[0])
-	resultEth1Data := result.Eth1Data
-	require.NotNil(t, resultEth1Data)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1ddepositroot"), 32), resultEth1Data.DepositRoot)
-	assert.Equal(t, uint64(6), resultEth1Data.DepositCount)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dblockhash"), 32), resultEth1Data.BlockHash)
-	require.Equal(t, 1, len(result.Eth1DataVotes))
-	resultEth1DataVote := result.Eth1DataVotes[0]
-	require.NotNil(t, resultEth1DataVote)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvdepositroot"), 32), resultEth1DataVote.DepositRoot)
-	assert.Equal(t, uint64(7), resultEth1DataVote.DepositCount)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvblockhash"), 32), resultEth1DataVote.BlockHash)
+	resultExecutionNodeData := result.ExecutionNodeData
+	require.NotNil(t, resultExecutionNodeData)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1ddepositroot"), 32), resultExecutionNodeData.DepositRoot)
+	assert.Equal(t, uint64(6), resultExecutionNodeData.DepositCount)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dblockhash"), 32), resultExecutionNodeData.BlockHash)
+	require.Equal(t, 1, len(result.ExecutionNodeDataVotes))
+	resultExecutionNodeDataVote := result.ExecutionNodeDataVotes[0]
+	require.NotNil(t, resultExecutionNodeDataVote)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvdepositroot"), 32), resultExecutionNodeDataVote.DepositRoot)
+	assert.Equal(t, uint64(7), resultExecutionNodeDataVote.DepositCount)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("e1dvblockhash"), 32), resultExecutionNodeDataVote.BlockHash)
 	assert.Equal(t, uint64(8), result.Eth1DepositIndex)
 	require.Equal(t, 1, len(result.Validators))
 	resultValidator := result.Validators[0]

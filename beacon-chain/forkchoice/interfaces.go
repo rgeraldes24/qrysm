@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
+	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
 )
 
 // BalancesByRooter is a handler to obtain the effective balances of the state

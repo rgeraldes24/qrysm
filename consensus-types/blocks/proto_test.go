@@ -305,7 +305,7 @@ func bodyPbCapella() *zond.BeaconBlockBodyCapella {
 	f := getFields()
 	return &zond.BeaconBlockBodyCapella{
 		RandaoReveal: f.sig[:],
-		Eth1Data: &zond.Eth1Data{
+		ExecutionNodeData: &zond.ExecutionNodeData{
 			DepositRoot:  f.root[:],
 			DepositCount: 128,
 			BlockHash:    f.root[:],
@@ -326,7 +326,7 @@ func bodyPbBlindedCapella() *zond.BlindedBeaconBlockBodyCapella {
 	f := getFields()
 	return &zond.BlindedBeaconBlockBodyCapella{
 		RandaoReveal: f.sig[:],
-		Eth1Data: &zond.Eth1Data{
+		ExecutionNodeData: &zond.ExecutionNodeData{
 			DepositRoot:  f.root[:],
 			DepositCount: 128,
 			BlockHash:    f.root[:],
@@ -350,7 +350,7 @@ func bodyCapella(t *testing.T) *BeaconBlockBody {
 	return &BeaconBlockBody{
 		version:      version.Capella,
 		randaoReveal: f.sig,
-		eth1Data: &zond.Eth1Data{
+		executionNodeData: &zond.ExecutionNodeData{
 			DepositRoot:  f.root[:],
 			DepositCount: 128,
 			BlockHash:    f.root[:],
@@ -375,7 +375,7 @@ func bodyBlindedCapella(t *testing.T) *BeaconBlockBody {
 		version:      version.Capella,
 		isBlinded:    true,
 		randaoReveal: f.sig,
-		eth1Data: &zond.Eth1Data{
+		executionNodeData: &zond.ExecutionNodeData{
 			DepositRoot:  f.root[:],
 			DepositCount: 128,
 			BlockHash:    f.root[:],

@@ -58,23 +58,23 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 		return nil, errors.Wrapf(err, "failed to decode randao reveal `%s`", block.Body.RandaoReveal)
 	}
 
-	if block.Body.Eth1Data == nil {
+	if block.Body.ExecutionNodeData == nil {
 		return nil, errors.New("eth1 data is nil")
 	}
 
-	depositRoot, err := hexutil.Decode(block.Body.Eth1Data.DepositRoot)
+	depositRoot, err := hexutil.Decode(block.Body.ExecutionNodeData.DepositRoot)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode deposit root `%s`", block.Body.Eth1Data.DepositRoot)
+		return nil, errors.Wrapf(err, "failed to decode deposit root `%s`", block.Body.ExecutionNodeData.DepositRoot)
 	}
 
-	depositCount, err := strconv.ParseUint(block.Body.Eth1Data.DepositCount, 10, 64)
+	depositCount, err := strconv.ParseUint(block.Body.ExecutionNodeData.DepositCount, 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse deposit count `%s`", block.Body.Eth1Data.DepositCount)
+		return nil, errors.Wrapf(err, "failed to parse deposit count `%s`", block.Body.ExecutionNodeData.DepositCount)
 	}
 
-	blockHash, err := hexutil.Decode(block.Body.Eth1Data.BlockHash)
+	blockHash, err := hexutil.Decode(block.Body.ExecutionNodeData.BlockHash)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode block hash `%s`", block.Body.Eth1Data.BlockHash)
+		return nil, errors.Wrapf(err, "failed to decode block hash `%s`", block.Body.ExecutionNodeData.BlockHash)
 	}
 
 	graffiti, err := hexutil.Decode(block.Body.Graffiti)
@@ -215,7 +215,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 		StateRoot:     stateRoot,
 		Body: &zondpb.BeaconBlockBodyCapella{
 			RandaoReveal: randaoReveal,
-			Eth1Data: &zondpb.Eth1Data{
+			ExecutionNodeData: &zondpb.ExecutionNodeData{
 				DepositRoot:  depositRoot,
 				DepositCount: depositCount,
 				BlockHash:    blockHash,

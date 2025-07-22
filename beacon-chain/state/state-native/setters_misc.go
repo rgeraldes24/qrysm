@@ -20,7 +20,7 @@ import (
 // fields except for the following below.
 // 1) BlockRoots
 // 2) StateRoots
-// 3) Eth1DataVotes
+// 3) ExecutionNodeDataVotes
 // 4) RandaoMixes
 // 5) HistoricalRoots
 // 6) CurrentEpochAttestations

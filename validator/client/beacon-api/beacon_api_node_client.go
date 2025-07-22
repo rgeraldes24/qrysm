@@ -23,7 +23,7 @@ type beaconApiNodeClient struct {
 
 func (c *beaconApiNodeClient) GetSyncStatus(ctx context.Context, _ *empty.Empty) (*zondpb.SyncStatus, error) {
 	syncingResponse := apimiddleware.SyncingResponseJson{}
-	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/zond/v1/node/syncing", &syncingResponse); err != nil {
+	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/qrl/v1/node/syncing", &syncingResponse); err != nil {
 		return nil, errors.Wrap(err, "failed to get sync status")
 	}
 
@@ -53,7 +53,7 @@ func (c *beaconApiNodeClient) GetGenesis(ctx context.Context, _ *empty.Empty) (*
 	}
 
 	depositContractJson := apimiddleware.DepositContractResponseJson{}
-	if _, err = c.jsonRestHandler.GetRestJsonResponse(ctx, "/zond/v1/config/deposit_contract", &depositContractJson); err != nil {
+	if _, err = c.jsonRestHandler.GetRestJsonResponse(ctx, "/qrl/v1/config/deposit_contract", &depositContractJson); err != nil {
 		return nil, errors.Wrapf(err, "failed to query deposit contract information")
 	}
 
@@ -77,7 +77,7 @@ func (c *beaconApiNodeClient) GetGenesis(ctx context.Context, _ *empty.Empty) (*
 
 func (c *beaconApiNodeClient) GetVersion(ctx context.Context, _ *empty.Empty) (*zondpb.Version, error) {
 	var versionResponse apimiddleware.VersionResponseJson
-	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/zond/v1/node/version", &versionResponse); err != nil {
+	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/qrl/v1/node/version", &versionResponse); err != nil {
 		return nil, errors.Wrapf(err, "failed to query node version")
 	}
 

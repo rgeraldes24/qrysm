@@ -240,7 +240,7 @@ func recomputeRootFromLayerVariable(idx int, item [32]byte, layers [][]*[32]byte
 func AddInMixin(root [32]byte, length uint64) ([32]byte, error) {
 	rootBuf := new(bytes.Buffer)
 	if err := binary.Write(rootBuf, binary.LittleEndian, length); err != nil {
-		return [32]byte{}, errors.Wrap(err, "could not marshal eth1data votes length")
+		return [32]byte{}, errors.Wrap(err, "could not marshal executionNodeData votes length")
 	}
 	// We need to mix in the length of the slice.
 	rootBufRoot := make([]byte, 32)

@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/io/prompt"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
+	zondpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/validator/keymanager"
 )

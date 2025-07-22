@@ -9,11 +9,11 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/validator"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/validator"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 type dutiesProvider interface {
@@ -32,8 +32,8 @@ type committeeIndexSlotPair struct {
 	slot           primitives.Slot
 }
 
-func (c beaconApiValidatorClient) getDuties(ctx context.Context, in *zondpb.DutiesRequest) (*zondpb.DutiesResponse, error) {
-	multipleValidatorStatus, err := c.multipleValidatorStatus(ctx, &zondpb.MultipleValidatorStatusRequest{PublicKeys: in.PublicKeys})
+func (c beaconApiValidatorClient) getDuties(ctx context.Context, in *qrysmpb.DutiesRequest) (*qrysmpb.DutiesResponse, error) {
+	multipleValidatorStatus, err := c.multipleValidatorStatus(ctx, &qrysmpb.MultipleValidatorStatusRequest{PublicKeys: in.PublicKeys})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get validator status")
 	}
@@ -48,7 +48,7 @@ func (c beaconApiValidatorClient) getDuties(ctx context.Context, in *zondpb.Duti
 		return nil, errors.Wrapf(err, "failed to get duties for next epoch `%d`", in.Epoch+1)
 	}
 
-	return &zondpb.DutiesResponse{
+	return &qrysmpb.DutiesResponse{
 		CurrentEpochDuties: currentEpochDuties,
 		NextEpochDuties:    nextEpochDuties,
 	}, nil
@@ -57,8 +57,8 @@ func (c beaconApiValidatorClient) getDuties(ctx context.Context, in *zondpb.Duti
 func (c beaconApiValidatorClient) getDutiesForEpoch(
 	ctx context.Context,
 	epoch primitives.Epoch,
-	multipleValidatorStatus *zondpb.MultipleValidatorStatusResponse,
-) ([]*zondpb.DutiesResponse_Duty, error) {
+	multipleValidatorStatus *qrysmpb.MultipleValidatorStatusResponse,
+) ([]*qrysmpb.DutiesResponse_Duty, error) {
 	attesterDuties, err := c.dutiesProvider.GetAttesterDuties(ctx, epoch, multipleValidatorStatus.Indices)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get attester duties for epoch `%d`", epoch)
@@ -159,7 +159,7 @@ func (c beaconApiValidatorClient) getDutiesForEpoch(
 		committeeMapping[key] = validatorIndices
 	}
 
-	duties := make([]*zondpb.DutiesResponse_Duty, len(multipleValidatorStatus.Statuses))
+	duties := make([]*qrysmpb.DutiesResponse_Duty, len(multipleValidatorStatus.Statuses))
 	for index, validatorStatus := range multipleValidatorStatus.Statuses {
 		validatorIndex := multipleValidatorStatus.Indices[index]
 		pubkey := multipleValidatorStatus.PublicKeys[index]
@@ -177,7 +177,7 @@ func (c beaconApiValidatorClient) getDutiesForEpoch(
 			}
 		}
 
-		duties[index] = &zondpb.DutiesResponse_Duty{
+		duties[index] = &qrysmpb.DutiesResponse_Duty{
 			Committee:       committeeValidatorIndices,
 			CommitteeIndex:  committeeIndex,
 			AttesterSlot:    attesterSlot,
@@ -196,7 +196,7 @@ func (c beaconApiValidatorClient) getDutiesForEpoch(
 func (c beaconApiDutiesProvider) GetCommittees(ctx context.Context, epoch primitives.Epoch) ([]*shared.Committee, error) {
 	committeeParams := url.Values{}
 	committeeParams.Add("epoch", strconv.FormatUint(uint64(epoch), 10))
-	committeesRequest := buildURL("/zond/v1/beacon/states/head/committees", committeeParams)
+	committeesRequest := buildURL("/qrl/v1/beacon/states/head/committees", committeeParams)
 
 	var stateCommittees beacon.GetCommitteesResponse
 	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, committeesRequest, &stateCommittees); err != nil {
@@ -229,7 +229,7 @@ func (c beaconApiDutiesProvider) GetAttesterDuties(ctx context.Context, epoch pr
 	}
 
 	attesterDuties := &validator.GetAttesterDutiesResponse{}
-	if _, err := c.jsonRestHandler.PostRestJson(ctx, fmt.Sprintf("/zond/v1/validator/duties/attester/%d", epoch), nil, bytes.NewBuffer(validatorIndicesBytes), attesterDuties); err != nil {
+	if _, err := c.jsonRestHandler.PostRestJson(ctx, fmt.Sprintf("/qrl/v1/validator/duties/attester/%d", epoch), nil, bytes.NewBuffer(validatorIndicesBytes), attesterDuties); err != nil {
 		return nil, errors.Wrap(err, "failed to send POST data to REST endpoint")
 	}
 
@@ -245,7 +245,7 @@ func (c beaconApiDutiesProvider) GetAttesterDuties(ctx context.Context, epoch pr
 // GetProposerDuties retrieves the proposer duties for the given epoch
 func (c beaconApiDutiesProvider) GetProposerDuties(ctx context.Context, epoch primitives.Epoch) ([]*validator.ProposerDuty, error) {
 	proposerDuties := validator.GetProposerDutiesResponse{}
-	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, fmt.Sprintf("/zond/v1/validator/duties/proposer/%d", epoch), &proposerDuties); err != nil {
+	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, fmt.Sprintf("/qrl/v1/validator/duties/proposer/%d", epoch), &proposerDuties); err != nil {
 		return nil, errors.Wrapf(err, "failed to query proposer duties for epoch `%d`", epoch)
 	}
 
@@ -275,7 +275,7 @@ func (c beaconApiDutiesProvider) GetSyncDuties(ctx context.Context, epoch primit
 	}
 
 	syncDuties := validator.GetSyncCommitteeDutiesResponse{}
-	if _, err := c.jsonRestHandler.PostRestJson(ctx, fmt.Sprintf("/zond/v1/validator/duties/sync/%d", epoch), nil, bytes.NewBuffer(validatorIndicesBytes), &syncDuties); err != nil {
+	if _, err := c.jsonRestHandler.PostRestJson(ctx, fmt.Sprintf("/qrl/v1/validator/duties/sync/%d", epoch), nil, bytes.NewBuffer(validatorIndicesBytes), &syncDuties); err != nil {
 		return nil, errors.Wrap(err, "failed to send POST data to REST endpoint")
 	}
 

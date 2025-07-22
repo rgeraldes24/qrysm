@@ -11,8 +11,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/validator"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/validator"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -51,7 +51,7 @@ func buildURL(path string, queryParams ...neturl.Values) string {
 }
 
 func (c *beaconApiValidatorClient) getFork(ctx context.Context) (*beacon.GetStateForkResponse, error) {
-	const endpoint = "/zond/v1/beacon/states/head/fork"
+	const endpoint = "/qrl/v1/beacon/states/head/fork"
 
 	stateForkResponseJson := &beacon.GetStateForkResponse{}
 
@@ -67,7 +67,7 @@ func (c *beaconApiValidatorClient) getFork(ctx context.Context) (*beacon.GetStat
 }
 
 func (c *beaconApiValidatorClient) getHeaders(ctx context.Context) (*beacon.GetBlockHeadersResponse, error) {
-	const endpoint = "/zond/v1/beacon/headers"
+	const endpoint = "/qrl/v1/beacon/headers"
 
 	blockHeadersResponseJson := &beacon.GetBlockHeadersResponse{}
 
@@ -83,7 +83,7 @@ func (c *beaconApiValidatorClient) getHeaders(ctx context.Context) (*beacon.GetB
 }
 
 func (c *beaconApiValidatorClient) getLiveness(ctx context.Context, epoch primitives.Epoch, validatorIndexes []string) (*validator.GetLivenessResponse, error) {
-	const endpoint = "/zond/v1/validator/liveness/"
+	const endpoint = "/qrl/v1/validator/liveness/"
 	url := endpoint + strconv.FormatUint(uint64(epoch), 10)
 
 	livenessResponseJson := &validator.GetLivenessResponse{}
@@ -101,7 +101,7 @@ func (c *beaconApiValidatorClient) getLiveness(ctx context.Context, epoch primit
 }
 
 func (c *beaconApiValidatorClient) getSyncing(ctx context.Context) (*apimiddleware.SyncingResponseJson, error) {
-	const endpoint = "/zond/v1/node/syncing"
+	const endpoint = "/qrl/v1/node/syncing"
 
 	syncingResponseJson := &apimiddleware.SyncingResponseJson{}
 

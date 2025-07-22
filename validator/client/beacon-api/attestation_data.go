@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/validator"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/validator"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
@@ -21,7 +21,7 @@ func (c beaconApiValidatorClient) getAttestationData(
 	params.Add("slot", strconv.FormatUint(uint64(reqSlot), 10))
 	params.Add("committee_index", strconv.FormatUint(uint64(reqCommitteeIndex), 10))
 
-	query := buildURL("/zond/v1/validator/attestation_data", params)
+	query := buildURL("/qrl/v1/validator/attestation_data", params)
 	produceAttestationDataResponseJson := validator.GetAttestationDataResponse{}
 
 	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, query, &produceAttestationDataResponseJson); err != nil {

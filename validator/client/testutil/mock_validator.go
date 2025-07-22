@@ -9,7 +9,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	validatorserviceconfig "github.com/theQRL/qrysm/config/validator/service"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	qrysmTime "github.com/theQRL/qrysm/time"
 	"github.com/theQRL/qrysm/validator/client/iface"
 	"github.com/theQRL/qrysm/validator/keymanager"
@@ -51,7 +51,7 @@ type FakeValidator struct {
 	Balances                          map[[field_params.DilithiumPubkeyLength]byte]uint64
 	IndexToPubkeyMap                  map[uint64][field_params.DilithiumPubkeyLength]byte
 	PubkeyToIndexMap                  map[[field_params.DilithiumPubkeyLength]byte]uint64
-	PubkeysToStatusesMap              map[[field_params.DilithiumPubkeyLength]byte]zondpb.ValidatorStatus
+	PubkeysToStatusesMap              map[[field_params.DilithiumPubkeyLength]byte]qrysmpb.ValidatorStatus
 	proposerSettings                  *validatorserviceconfig.ProposerSettings
 	ProposerSettingWait               time.Duration
 	Km                                keymanager.IKeymanager
@@ -203,7 +203,7 @@ func (fv *FakeValidator) PubkeysToIndices(_ context.Context) map[[field_params.D
 }
 
 // PubkeysToStatuses for mocking.
-func (fv *FakeValidator) PubkeysToStatuses(_ context.Context) map[[field_params.DilithiumPubkeyLength]byte]zondpb.ValidatorStatus {
+func (fv *FakeValidator) PubkeysToStatuses(_ context.Context) map[[field_params.DilithiumPubkeyLength]byte]qrysmpb.ValidatorStatus {
 	return fv.PubkeysToStatusesMap
 }
 
@@ -271,7 +271,7 @@ func (*FakeValidator) SetPubKeyToValidatorIndexMap(_ context.Context, _ keymanag
 }
 
 // SignValidatorRegistrationRequest for mocking
-func (*FakeValidator) SignValidatorRegistrationRequest(_ context.Context, _ iface.SigningFunc, _ *zondpb.ValidatorRegistrationV1) (*zondpb.SignedValidatorRegistrationV1, error) {
+func (*FakeValidator) SignValidatorRegistrationRequest(_ context.Context, _ iface.SigningFunc, _ *qrysmpb.ValidatorRegistrationV1) (*qrysmpb.SignedValidatorRegistrationV1, error) {
 	return nil, nil
 }
 

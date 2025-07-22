@@ -50,7 +50,7 @@ func TestService_Broadcast(t *testing.T) {
 		PreviousVersion: []byte("barr"),
 	}
 
-	topic := "/eth2/%x/testing"
+	topic := "/consensus/%x/testing"
 	// Set a test gossip mapping for testpb.TestSimpleMessage.
 	GossipTypeMapping[reflect.TypeOf(msg)] = topic
 	digest, err := p.currentForkDigest()
@@ -113,7 +113,7 @@ func TestService_Attestation_Subnet(t *testing.T) {
 					Slot:           2,
 				},
 			},
-			topic: "/eth2/00000000/beacon_attestation_2",
+			topic: "/consensus/00000000/beacon_attestation_2",
 		},
 		{
 			att: &zondpb.Attestation{
@@ -122,7 +122,7 @@ func TestService_Attestation_Subnet(t *testing.T) {
 					Slot:           10,
 				},
 			},
-			topic: "/eth2/00000000/beacon_attestation_21",
+			topic: "/consensus/00000000/beacon_attestation_21",
 		},
 		{
 			att: &zondpb.Attestation{
@@ -131,7 +131,7 @@ func TestService_Attestation_Subnet(t *testing.T) {
 					Slot:           529,
 				},
 			},
-			topic: "/eth2/00000000/beacon_attestation_8",
+			topic: "/consensus/00000000/beacon_attestation_8",
 		},
 	}
 	for _, tt := range tests {
@@ -257,10 +257,11 @@ func TestService_BroadcastAttestationWithDiscoveryAttempts(t *testing.T) {
 		// Set for 2nd peer
 		if i == 2 {
 			s.dv5Listener = listener
-			s.metaData = wrapper.WrappedMetadataV0(new(zondpb.MetaDataV0))
+			s.metaData = wrapper.WrappedMetadataV1(new(zondpb.MetaDataV1))
 			bitV := bitfield.NewBitvector64()
 			bitV.SetBitAt(subnet, true)
-			s.updateSubnetRecordWithMetadata(bitV)
+			bitS := bitfield.NewBitvector4()
+			s.updateSubnetRecordWithMetadata(bitV, bitS)
 		}
 		assert.NoError(t, err, "Could not start discovery for node")
 		listeners = append(listeners, listener)

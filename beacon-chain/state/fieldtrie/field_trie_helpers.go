@@ -69,8 +69,8 @@ func fieldConverters(field types.FieldIndex, indices []uint64, elements interfac
 		return convert32ByteArrays[customtypes.StateRoots](indices, elements, convertAll)
 	case types.RandaoMixes:
 		return convert32ByteArrays[customtypes.RandaoMixes](indices, elements, convertAll)
-	case types.Eth1DataVotes:
-		return convertEth1DataVotes(indices, elements, convertAll)
+	case types.ExecutionNodeDataVotes:
+		return convertExecutionNodeDataVotes(indices, elements, convertAll)
 	case types.Validators:
 		return convertValidators(indices, elements, convertAll)
 	case types.Balances:
@@ -89,12 +89,12 @@ func convert32ByteArrays[T ~[][32]byte](indices []uint64, elements interface{}, 
 	return handle32ByteArrays(val, indices, convertAll)
 }
 
-func convertEth1DataVotes(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
-	val, ok := elements.([]*zondpb.Eth1Data)
+func convertExecutionNodeDataVotes(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
+	val, ok := elements.([]*zondpb.ExecutionNodeData)
 	if !ok {
-		return nil, errors.Errorf("Wanted type of %T but got %T", []*zondpb.Eth1Data{}, elements)
+		return nil, errors.Errorf("Wanted type of %T but got %T", []*zondpb.ExecutionNodeData{}, elements)
 	}
-	return handleEth1DataSlice(val, indices, convertAll)
+	return handleExecutionNodeDataSlice(val, indices, convertAll)
 }
 
 func convertValidators(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
@@ -169,15 +169,15 @@ func handleValidatorSlice(val []*zondpb.Validator, indices []uint64, convertAll 
 	return roots, nil
 }
 
-// handleEth1DataSlice processes a list of eth1data and indices into the appropriate roots.
-func handleEth1DataSlice(val []*zondpb.Eth1Data, indices []uint64, convertAll bool) ([][32]byte, error) {
+// handleExecutionNodeDataSlice processes a list of executionNodeData and indices into the appropriate roots.
+func handleExecutionNodeDataSlice(val []*zondpb.ExecutionNodeData, indices []uint64, convertAll bool) ([][32]byte, error) {
 	length := len(indices)
 	if convertAll {
 		length = len(val)
 	}
 	roots := make([][32]byte, 0, length)
-	rootCreator := func(input *zondpb.Eth1Data) error {
-		newRoot, err := stateutil.Eth1DataRootWithHasher(input)
+	rootCreator := func(input *zondpb.ExecutionNodeData) error {
+		newRoot, err := stateutil.ExecutionNodeDataRootWithHasher(input)
 		if err != nil {
 			return err
 		}

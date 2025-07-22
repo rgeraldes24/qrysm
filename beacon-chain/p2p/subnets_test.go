@@ -125,7 +125,7 @@ func TestStartDiscV5_DiscoverPeersWithSubnets(t *testing.T) {
 	// Update QNR of a peer.
 	testService := &Service{
 		dv5Listener: listeners[0],
-		metaData: wrapper.WrappedMetadataV0(&pb.MetaDataV0{
+		metaData: wrapper.WrappedMetadataV1(&pb.MetaDataV1{
 			Attnets: bitfield.NewBitvector64(),
 		}),
 	}

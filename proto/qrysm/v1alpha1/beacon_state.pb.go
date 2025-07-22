@@ -13,7 +13,7 @@ import (
 	github_com_theQRL_go_bitfield "github.com/theQRL/go-bitfield"
 	github_com_theQRL_qrysm_consensus_types_primitives "github.com/theQRL/qrysm/consensus-types/primitives"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
-	_ "github.com/theQRL/qrysm/proto/zond/ext"
+	_ "github.com/theQRL/qrysm/proto/qrl/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -636,8 +636,8 @@ type BeaconStateCapella struct {
 	BlockRoots                   [][]byte                                                          `protobuf:"bytes,2002,rep,name=block_roots,json=blockRoots,proto3" json:"block_roots,omitempty" ssz-size:"1024,32"`
 	StateRoots                   [][]byte                                                          `protobuf:"bytes,2003,rep,name=state_roots,json=stateRoots,proto3" json:"state_roots,omitempty" ssz-size:"1024,32"`
 	HistoricalRoots              [][]byte                                                          `protobuf:"bytes,2004,rep,name=historical_roots,json=historicalRoots,proto3" json:"historical_roots,omitempty" ssz-max:"16777216" ssz-size:"?,32"`
-	Eth1Data                     *Eth1Data                                                         `protobuf:"bytes,3001,opt,name=eth1_data,json=eth1Data,proto3" json:"eth1_data,omitempty"`
-	Eth1DataVotes                []*Eth1Data                                                       `protobuf:"bytes,3002,rep,name=eth1_data_votes,json=eth1DataVotes,proto3" json:"eth1_data_votes,omitempty" ssz-max:"256"`
+	ExecutionNodeData            *ExecutionNodeData                                                `protobuf:"bytes,3001,opt,name=eth1_data,json=executionNodeData,proto3" json:"eth1_data,omitempty"`
+	ExecutionNodeDataVotes       []*ExecutionNodeData                                              `protobuf:"bytes,3002,rep,name=eth1_data_votes,json=executionNodeDataVotes,proto3" json:"eth1_data_votes,omitempty" ssz-max:"256"`
 	Eth1DepositIndex             uint64                                                            `protobuf:"varint,3003,opt,name=eth1_deposit_index,json=eth1DepositIndex,proto3" json:"eth1_deposit_index,omitempty"`
 	Validators                   []*Validator                                                      `protobuf:"bytes,4001,rep,name=validators,proto3" json:"validators,omitempty" ssz-max:"1099511627776"`
 	Balances                     []uint64                                                          `protobuf:"varint,4002,rep,packed,name=balances,proto3" json:"balances,omitempty" ssz-max:"1099511627776"`
@@ -746,16 +746,16 @@ func (x *BeaconStateCapella) GetHistoricalRoots() [][]byte {
 	return nil
 }
 
-func (x *BeaconStateCapella) GetEth1Data() *Eth1Data {
+func (x *BeaconStateCapella) GetExecutionNodeData() *ExecutionNodeData {
 	if x != nil {
-		return x.Eth1Data
+		return x.ExecutionNodeData
 	}
 	return nil
 }
 
-func (x *BeaconStateCapella) GetEth1DataVotes() []*Eth1Data {
+func (x *BeaconStateCapella) GetExecutionNodeDataVotes() []*ExecutionNodeData {
 	if x != nil {
-		return x.Eth1DataVotes
+		return x.ExecutionNodeDataVotes
 	}
 	return nil
 }
@@ -1241,7 +1241,7 @@ var file_proto_qrysm_v1alpha1_beacon_state_proto_goTypes = []interface{}{
 	(*HistoricalSummary)(nil),                // 11: theqrl.zond.v1alpha1.HistoricalSummary
 	(*AttestationData)(nil),                  // 12: theqrl.zond.v1alpha1.AttestationData
 	(*BeaconBlockHeader)(nil),                // 13: theqrl.zond.v1alpha1.BeaconBlockHeader
-	(*Eth1Data)(nil),                         // 14: theqrl.zond.v1alpha1.Eth1Data
+	(*ExecutionNodeData)(nil),                // 14: theqrl.zond.v1alpha1.ExecutionNodeData
 	(*Validator)(nil),                        // 15: theqrl.zond.v1alpha1.Validator
 	(*Checkpoint)(nil),                       // 16: theqrl.zond.v1alpha1.Checkpoint
 	(*v1.ExecutionPayloadHeaderCapella)(nil), // 17: theqrl.engine.v1.ExecutionPayloadHeaderCapella
@@ -1251,8 +1251,8 @@ var file_proto_qrysm_v1alpha1_beacon_state_proto_depIdxs = []int32{
 	0,  // 1: theqrl.zond.v1alpha1.CheckPtInfo.fork:type_name -> theqrl.zond.v1alpha1.Fork
 	0,  // 2: theqrl.zond.v1alpha1.BeaconStateCapella.fork:type_name -> theqrl.zond.v1alpha1.Fork
 	13, // 3: theqrl.zond.v1alpha1.BeaconStateCapella.latest_block_header:type_name -> theqrl.zond.v1alpha1.BeaconBlockHeader
-	14, // 4: theqrl.zond.v1alpha1.BeaconStateCapella.eth1_data:type_name -> theqrl.zond.v1alpha1.Eth1Data
-	14, // 5: theqrl.zond.v1alpha1.BeaconStateCapella.eth1_data_votes:type_name -> theqrl.zond.v1alpha1.Eth1Data
+	14, // 4: theqrl.zond.v1alpha1.BeaconStateCapella.eth1_data:type_name -> theqrl.zond.v1alpha1.ExecutionNodeData
+	14, // 5: theqrl.zond.v1alpha1.BeaconStateCapella.eth1_data_votes:type_name -> theqrl.zond.v1alpha1.ExecutionNodeData
 	15, // 6: theqrl.zond.v1alpha1.BeaconStateCapella.validators:type_name -> theqrl.zond.v1alpha1.Validator
 	16, // 7: theqrl.zond.v1alpha1.BeaconStateCapella.previous_justified_checkpoint:type_name -> theqrl.zond.v1alpha1.Checkpoint
 	16, // 8: theqrl.zond.v1alpha1.BeaconStateCapella.current_justified_checkpoint:type_name -> theqrl.zond.v1alpha1.Checkpoint

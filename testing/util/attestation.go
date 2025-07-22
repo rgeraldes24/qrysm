@@ -19,8 +19,8 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/rand"
+	attv1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	attv1 "github.com/theQRL/qrysm/proto/zond/v1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
 )

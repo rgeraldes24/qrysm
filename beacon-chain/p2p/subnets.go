@@ -143,23 +143,10 @@ func (s *Service) hasPeerWithSubnet(topic string) bool {
 }
 
 // Updates the service's discv5 listener record's attestation subnet
-// with a new value for a bitfield of subnets tracked. It also updates
-// the node's metadata by increasing the sequence number and the
-// subnets tracked by the node.
-func (s *Service) updateSubnetRecordWithMetadata(bitV bitfield.Bitvector64) {
-	entry := qnr.WithEntry(attSubnetQnrKey, &bitV)
-	s.dv5Listener.LocalNode().Set(entry)
-	s.metaData = wrapper.WrappedMetadataV0(&pb.MetaDataV0{
-		SeqNumber: s.metaData.SequenceNumber() + 1,
-		Attnets:   bitV,
-	})
-}
-
-// Updates the service's discv5 listener record's attestation subnet
 // with a new value for a bitfield of subnets tracked. It also record's
 // the sync committee subnet in the qnr. It also updates the node's
 // metadata by increasing the sequence number and the subnets tracked by the node.
-func (s *Service) updateSubnetRecordWithMetadataV2(bitVAtt bitfield.Bitvector64, bitVSync bitfield.Bitvector4) {
+func (s *Service) updateSubnetRecordWithMetadata(bitVAtt bitfield.Bitvector64, bitVSync bitfield.Bitvector4) {
 	entry := qnr.WithEntry(attSubnetQnrKey, &bitVAtt)
 	subEntry := qnr.WithEntry(syncCommsSubnetQnrKey, &bitVSync)
 	s.dv5Listener.LocalNode().Set(entry)

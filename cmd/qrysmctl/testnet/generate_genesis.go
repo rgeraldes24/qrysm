@@ -271,6 +271,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if err := json.Unmarshal(gbytes, gen); err != nil {
 			return nil, err
 		}
+		// TODO(rgeraldes24)
 		// set timestamps for genesis and shanghai fork
 		gen.Timestamp = f.GenesisTime
 
@@ -298,7 +299,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 	}
 
 	if f.OverrideZond1Data {
-		log.Print("Overriding Eth1Data with data from execution client")
+		log.Print("Overriding ExecutionNodeData with data from execution client")
 		conn, err := rpc.Dial(generateGenesisStateFlags.ExecutionEndpoint)
 		if err != nil {
 			return nil, errors.Wrapf(
@@ -319,12 +320,12 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get hash tree root")
 		}
-		e1d := &zondpb.Eth1Data{
+		e1d := &zondpb.ExecutionNodeData{
 			DepositRoot:  depositRoot[:],
 			DepositCount: 0,
 			BlockHash:    header.Hash().Bytes(),
 		}
-		if err := genesisState.SetEth1Data(e1d); err != nil {
+		if err := genesisState.SetExecutionNodeData(e1d); err != nil {
 			return nil, err
 		}
 		if err := genesisState.SetEth1DepositIndex(0); err != nil {

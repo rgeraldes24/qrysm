@@ -79,7 +79,7 @@ func TestStatusRPCHandler_Disconnects_OnForkVersionMismatch(t *testing.T) {
 		assert.NoError(t, stream.Close())
 	})
 
-	pcl2 := protocol.ID("/eth2/beacon_chain/req/goodbye/1/ssz_snappy")
+	pcl2 := protocol.ID("/consensus/beacon_chain/req/goodbye/1/ssz_snappy")
 	topic = string(pcl2)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 	var wg2 sync.WaitGroup
@@ -268,12 +268,12 @@ func TestHandshakeHandlers_Roundtrip(t *testing.T) {
 	p2 := p2ptest.NewTestP2P(t)
 	db := testingDB.SetupDB(t)
 
-	p1.LocalMetadata = wrapper.WrappedMetadataV0(&zondpb.MetaDataV0{
+	p1.LocalMetadata = wrapper.WrappedMetadataV1(&zondpb.MetaDataV1{
 		SeqNumber: 2,
 		Attnets:   bytesutil.PadTo([]byte{'A', 'B'}, 8),
 	})
 
-	p2.LocalMetadata = wrapper.WrappedMetadataV0(&zondpb.MetaDataV0{
+	p2.LocalMetadata = wrapper.WrappedMetadataV1(&zondpb.MetaDataV1{
 		SeqNumber: 2,
 		Attnets:   bytesutil.PadTo([]byte{'C', 'D'}, 8),
 	})
@@ -336,7 +336,7 @@ func TestHandshakeHandlers_Roundtrip(t *testing.T) {
 	go r.Start()
 
 	// Setup streams
-	pcl := protocol.ID("/eth2/beacon_chain/req/status/1/ssz_snappy")
+	pcl := protocol.ID("/consensus/beacon_chain/req/status/1/ssz_snappy")
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 	var wg sync.WaitGroup
@@ -358,7 +358,7 @@ func TestHandshakeHandlers_Roundtrip(t *testing.T) {
 		}
 	})
 
-	pcl = "/eth2/beacon_chain/req/ping/1/ssz_snappy"
+	pcl = "/consensus/beacon_chain/req/ping/1/ssz_snappy"
 	topic = string(pcl)
 	r2.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 	var wg2 sync.WaitGroup
@@ -455,7 +455,7 @@ func TestStatusRPCRequest_RequestSent(t *testing.T) {
 	}
 
 	// Setup streams
-	pcl := protocol.ID("/eth2/beacon_chain/req/status/1/ssz_snappy")
+	pcl := protocol.ID("/consensus/beacon_chain/req/status/1/ssz_snappy")
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 	var wg sync.WaitGroup
@@ -565,7 +565,7 @@ func TestStatusRPCRequest_FinalizedBlockExists(t *testing.T) {
 	}
 
 	// Setup streams
-	pcl := protocol.ID("/eth2/beacon_chain/req/status/1/ssz_snappy")
+	pcl := protocol.ID("/consensus/beacon_chain/req/status/1/ssz_snappy")
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 	var wg sync.WaitGroup
@@ -752,7 +752,7 @@ func TestStatusRPCRequest_FinalizedBlockSkippedSlots(t *testing.T) {
 		}
 
 		// Setup streams
-		pcl := protocol.ID("/eth2/beacon_chain/req/status/1/ssz_snappy")
+		pcl := protocol.ID("/consensus/beacon_chain/req/status/1/ssz_snappy")
 		topic := string(pcl)
 		r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 		var wg sync.WaitGroup
@@ -828,7 +828,7 @@ func TestStatusRPCRequest_BadPeerHandshake(t *testing.T) {
 	go r.Start()
 
 	// Setup streams
-	pcl := protocol.ID("/eth2/beacon_chain/req/status/1/ssz_snappy")
+	pcl := protocol.ID("/consensus/beacon_chain/req/status/1/ssz_snappy")
 	topic := string(pcl)
 	r.rateLimiter.limiterMap[topic] = leakybucket.NewCollector(1, 1, time.Second, false)
 	var wg sync.WaitGroup

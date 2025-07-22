@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
+	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 

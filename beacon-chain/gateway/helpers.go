@@ -4,8 +4,8 @@ import (
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/theQRL/qrysm/api/gateway"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
+	zondpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 

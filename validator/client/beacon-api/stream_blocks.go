@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"google.golang.org/grpc"
 )
 
@@ -25,18 +25,18 @@ type streamBlocksAltairClient struct {
 	grpc.ClientStream
 	ctx                 context.Context
 	beaconApiClient     beaconApiValidatorClient
-	streamBlocksRequest *zondpb.StreamBlocksRequest
+	streamBlocksRequest *qrysmpb.StreamBlocksRequest
 	prevBlockSlot       primitives.Slot
 	pingDelay           time.Duration
 }
 
 type headSignedBeaconBlockResult struct {
-	streamBlocksResponse *zondpb.StreamBlocksResponse
+	streamBlocksResponse *qrysmpb.StreamBlocksResponse
 	executionOptimistic  bool
 	slot                 primitives.Slot
 }
 
-func (c beaconApiValidatorClient) streamBlocks(ctx context.Context, in *zondpb.StreamBlocksRequest, pingDelay time.Duration) zondpb.BeaconNodeValidator_StreamBlocksAltairClient {
+func (c beaconApiValidatorClient) streamBlocks(ctx context.Context, in *qrysmpb.StreamBlocksRequest, pingDelay time.Duration) qrysmpb.BeaconNodeValidator_StreamBlocksAltairClient {
 	return &streamBlocksAltairClient{
 		ctx:                 ctx,
 		beaconApiClient:     c,
@@ -45,7 +45,7 @@ func (c beaconApiValidatorClient) streamBlocks(ctx context.Context, in *zondpb.S
 	}
 }
 
-func (c *streamBlocksAltairClient) Recv() (*zondpb.StreamBlocksResponse, error) {
+func (c *streamBlocksAltairClient) Recv() (*qrysmpb.StreamBlocksResponse, error) {
 	result, err := c.beaconApiClient.getHeadSignedBeaconBlock(c.ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get latest signed block")
@@ -72,7 +72,7 @@ func (c beaconApiValidatorClient) getHeadSignedBeaconBlock(ctx context.Context) 
 	// Since we don't know yet what the json looks like, we unmarshal into an abstract structure that has only a version
 	// and a blob of data
 	signedBlockResponseJson := abstractSignedBlockResponseJson{}
-	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/zond/v1/beacon/blocks/head", &signedBlockResponseJson); err != nil {
+	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, "/qrl/v1/beacon/blocks/head", &signedBlockResponseJson); err != nil {
 		return nil, errors.Wrap(err, "failed to query GET REST endpoint")
 	}
 
@@ -80,7 +80,7 @@ func (c beaconApiValidatorClient) getHeadSignedBeaconBlock(ctx context.Context) 
 	decoder := json.NewDecoder(bytes.NewReader(signedBlockResponseJson.Data))
 	decoder.DisallowUnknownFields()
 
-	response := &zondpb.StreamBlocksResponse{}
+	response := &qrysmpb.StreamBlocksResponse{}
 	var slot primitives.Slot
 
 	switch signedBlockResponseJson.Version {
@@ -100,8 +100,8 @@ func (c beaconApiValidatorClient) getHeadSignedBeaconBlock(ctx context.Context) 
 			return nil, errors.Wrapf(err, "failed to decode capella block signature `%s`", jsonCapellaBlock.Signature)
 		}
 
-		response.Block = &zondpb.StreamBlocksResponse_CapellaBlock{
-			CapellaBlock: &zondpb.SignedBeaconBlockCapella{
+		response.Block = &qrysmpb.StreamBlocksResponse_CapellaBlock{
+			CapellaBlock: &qrysmpb.SignedBeaconBlockCapella{
 				Signature: decodedSignature,
 				Block:     capellaBlock,
 			},

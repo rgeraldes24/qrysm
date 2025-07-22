@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/internal"
 	"github.com/theQRL/qrysm/validator/keymanager/remote-web3signer/v1/mock"
@@ -300,12 +300,12 @@ func TestKeymanager_AddPublicKeys(t *testing.T) {
 	statuses, err := km.AddPublicKeys(ctx, publicKeys)
 	require.NoError(t, err)
 	for _, status := range statuses {
-		require.Equal(t, zondpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
+		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
 	}
 	statuses, err = km.AddPublicKeys(ctx, publicKeys)
 	require.NoError(t, err)
 	for _, status := range statuses {
-		require.Equal(t, zondpbservice.ImportedRemoteKeysStatus_DUPLICATE, status.Status)
+		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_DUPLICATE, status.Status)
 	}
 }
 
@@ -331,19 +331,19 @@ func TestKeymanager_DeletePublicKeys(t *testing.T) {
 	statuses, err := km.AddPublicKeys(ctx, publicKeys)
 	require.NoError(t, err)
 	for _, status := range statuses {
-		require.Equal(t, zondpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
+		require.Equal(t, qrlpbservice.ImportedRemoteKeysStatus_IMPORTED, status.Status)
 	}
 
 	s, err := km.DeletePublicKeys(ctx, publicKeys)
 	require.NoError(t, err)
 	for _, status := range s {
-		require.Equal(t, zondpbservice.DeletedRemoteKeysStatus_DELETED, status.Status)
+		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_DELETED, status.Status)
 	}
 
 	s, err = km.DeletePublicKeys(ctx, publicKeys)
 	require.NoError(t, err)
 	for _, status := range s {
-		require.Equal(t, zondpbservice.DeletedRemoteKeysStatus_NOT_FOUND, status.Status)
+		require.Equal(t, qrlpbservice.DeletedRemoteKeysStatus_NOT_FOUND, status.Status)
 	}
 }
 */

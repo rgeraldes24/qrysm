@@ -127,7 +127,7 @@ func copyBlockData(src interfaces.SignedBeaconBlock, dst interfaces.SignedBeacon
 	dst.SetParentRoot(parentRoot[:])
 	dst.SetStateRoot(stateRoot[:])
 	dst.SetRandaoReveal(randaoReveal[:])
-	dst.SetEth1Data(src.Block().Body().Eth1Data())
+	dst.SetExecutionNodeData(src.Block().Body().ExecutionNodeData())
 	dst.SetGraffiti(graffiti[:])
 	dst.SetProposerSlashings(src.Block().Body().ProposerSlashings())
 	dst.SetAttesterSlashings(src.Block().Body().AttesterSlashings())

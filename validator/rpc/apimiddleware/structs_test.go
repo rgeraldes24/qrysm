@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	"github.com/theQRL/qrysm/proto/zond/service"
+	"github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/testing/require"
 )
 

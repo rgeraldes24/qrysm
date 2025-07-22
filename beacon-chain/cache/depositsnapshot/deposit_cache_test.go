@@ -1191,8 +1191,8 @@ func BenchmarkDepositTree_HashTreeRootOldImplementation(b *testing.B) {
 	}
 }
 
-func emptyEth1data() *zondpb.Eth1Data {
-	return &zondpb.Eth1Data{
+func emptyExecutionNodeData() *zondpb.ExecutionNodeData {
+	return &zondpb.ExecutionNodeData{
 		DepositRoot:  make([]byte, 32),
 		DepositCount: 0,
 		BlockHash:    make([]byte, 32),

@@ -21,7 +21,7 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 	// Same validator created 3 valid deposits within the same block
 	dep, _, err := util.DeterministicDepositsAndKeysSameValidator(3)
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(dep))
+	executionNodeData, err := util.DeterministicExecutionNodeData(len(dep))
 	require.NoError(t, err)
 	registry := []*zondpb.Validator{
 		{
@@ -31,9 +31,9 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 	}
 	balances := []uint64{0}
 	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
-		Validators: registry,
-		Balances:   balances,
-		Eth1Data:   eth1Data,
+		Validators:        registry,
+		Balances:          balances,
+		ExecutionNodeData: executionNodeData,
 		Fork: &zondpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -64,7 +64,7 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 
 	deposit.Proof = proof
 	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
-		Eth1Data: &zondpb.Eth1Data{
+		ExecutionNodeData: &zondpb.ExecutionNodeData{
 			DepositRoot: []byte{0},
 			BlockHash:   []byte{1},
 		},
@@ -78,7 +78,7 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {
 	dep, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(dep))
+	executionNodeData, err := util.DeterministicExecutionNodeData(len(dep))
 	require.NoError(t, err)
 
 	registry := []*zondpb.Validator{
@@ -89,9 +89,9 @@ func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {
 	}
 	balances := []uint64{0}
 	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
-		Validators: registry,
-		Balances:   balances,
-		Eth1Data:   eth1Data,
+		Validators:        registry,
+		Balances:          balances,
+		ExecutionNodeData: executionNodeData,
 		Fork: &zondpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -149,7 +149,7 @@ func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T)
 	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
 		Validators: registry,
 		Balances:   balances,
-		Eth1Data: &zondpb.Eth1Data{
+		ExecutionNodeData: &zondpb.ExecutionNodeData{
 			DepositRoot: root[:],
 			BlockHash:   root[:],
 		},
@@ -164,7 +164,7 @@ func TestProcessDeposit_AddsNewValidatorDeposit(t *testing.T) {
 	// Similar to TestProcessDeposits_AddsNewValidatorDeposit except that this test directly calls ProcessDeposit
 	dep, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	eth1Data, err := util.DeterministicEth1Data(len(dep))
+	executionNodeData, err := util.DeterministicExecutionNodeData(len(dep))
 	require.NoError(t, err)
 
 	registry := []*zondpb.Validator{
@@ -175,9 +175,9 @@ func TestProcessDeposit_AddsNewValidatorDeposit(t *testing.T) {
 	}
 	balances := []uint64{0}
 	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
-		Validators: registry,
-		Balances:   balances,
-		Eth1Data:   eth1Data,
+		Validators:        registry,
+		Balances:          balances,
+		ExecutionNodeData: executionNodeData,
 		Fork: &zondpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -206,7 +206,7 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 	require.NoError(t, err)
 	root, err := dt.HashTreeRoot()
 	require.NoError(t, err)
-	eth1Data := &zondpb.Eth1Data{
+	executionNodeData := &zondpb.ExecutionNodeData{
 		DepositRoot:  root[:],
 		DepositCount: 1,
 	}
@@ -218,9 +218,9 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 	}
 	balances := []uint64{0}
 	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
-		Validators: registry,
-		Balances:   balances,
-		Eth1Data:   eth1Data,
+		Validators:        registry,
+		Balances:          balances,
+		ExecutionNodeData: executionNodeData,
 		Fork: &zondpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,

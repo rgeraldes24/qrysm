@@ -51,11 +51,11 @@ func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
 	}
-	eth1Data, err := DeterministicEth1Data(len(deposits))
+	executionNodeData, err := DeterministicExecutionNodeData(len(deposits))
 	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get eth1data for %d deposits", numValidators))
+		t.Fatal(errors.Wrapf(err, "failed to get executionNodeData for %d deposits", numValidators))
 	}
-	beaconState, err := GenesisBeaconStateCapella(context.Background(), deposits, uint64(0), eth1Data)
+	beaconState, err := GenesisBeaconStateCapella(context.Background(), deposits, uint64(0), executionNodeData)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get genesis beacon state of %d validators", numValidators))
 	}
@@ -64,14 +64,14 @@ func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state
 }
 
 // GenesisBeaconStateCapella returns the genesis beacon state.
-func GenesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, eth1Data *zondpb.Eth1Data) (state.BeaconState, error) {
+func GenesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, executionNodeData *zondpb.ExecutionNodeData) (state.BeaconState, error) {
 	st, err := emptyGenesisStateCapella()
 	if err != nil {
 		return nil, err
 	}
 
 	// Process initial deposits.
-	st, err = helpers.UpdateGenesisEth1Data(st, deposits, eth1Data)
+	st, err = helpers.UpdateGenesisExecutionNodeData(st, deposits, executionNodeData)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func GenesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, 
 		return nil, errors.Wrap(err, "could not process validator deposits")
 	}
 
-	return buildGenesisBeaconStateCapella(genesisTime, st, st.Eth1Data())
+	return buildGenesisBeaconStateCapella(genesisTime, st, st.ExecutionNodeData())
 }
 
 // emptyGenesisStateCapella returns an empty genesis state in Capella format.
@@ -105,24 +105,24 @@ func emptyGenesisStateCapella() (state.BeaconState, error) {
 		PreviousEpochParticipation: []byte{},
 
 		// Eth1 data.
-		Eth1Data:         &zondpb.Eth1Data{},
-		Eth1DataVotes:    []*zondpb.Eth1Data{},
-		Eth1DepositIndex: 0,
+		ExecutionNodeData:      &zondpb.ExecutionNodeData{},
+		ExecutionNodeDataVotes: []*zondpb.ExecutionNodeData{},
+		Eth1DepositIndex:       0,
 
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{},
 	}
 	return state_native.InitializeFromProtoCapella(st)
 }
 
-func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, eth1Data *zondpb.Eth1Data) (state.BeaconState, error) {
-	if eth1Data == nil {
-		return nil, errors.New("no eth1data provided for genesis state")
+func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, executionNodeData *zondpb.ExecutionNodeData) (state.BeaconState, error) {
+	if executionNodeData == nil {
+		return nil, errors.New("no executionNodeData provided for genesis state")
 	}
 
 	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
 	for i := 0; i < len(randaoMixes); i++ {
 		h := make([]byte, 32)
-		copy(h, eth1Data.BlockHash)
+		copy(h, executionNodeData.BlockHash)
 		randaoMixes[i] = h
 	}
 
@@ -205,15 +205,15 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 		Slashings:       slashings,
 
 		// Eth1 data.
-		Eth1Data:         eth1Data,
-		Eth1DataVotes:    []*zondpb.Eth1Data{},
-		Eth1DepositIndex: preState.Eth1DepositIndex(),
+		ExecutionNodeData:      executionNodeData,
+		ExecutionNodeDataVotes: []*zondpb.ExecutionNodeData{},
+		Eth1DepositIndex:       preState.Eth1DepositIndex(),
 	}
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
 	bodyRoot, err := (&zondpb.BeaconBlockBodyCapella{
 		RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
-		Eth1Data: &zondpb.Eth1Data{
+		ExecutionNodeData: &zondpb.ExecutionNodeData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},

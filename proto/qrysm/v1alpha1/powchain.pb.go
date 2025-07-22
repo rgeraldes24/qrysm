@@ -26,12 +26,12 @@ type ETH1ChainData struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CurrentEth1Data   *LatestETH1Data     `protobuf:"bytes,1,opt,name=current_eth1_data,json=currentEth1Data,proto3" json:"current_eth1_data,omitempty"`
-	ChainstartData    *ChainStartData     `protobuf:"bytes,2,opt,name=chainstart_data,json=chainstartData,proto3" json:"chainstart_data,omitempty"`
-	BeaconState       *BeaconStateCapella `protobuf:"bytes,3,opt,name=beacon_state,json=beaconState,proto3" json:"beacon_state,omitempty"`
-	Trie              *SparseMerkleTrie   `protobuf:"bytes,4,opt,name=trie,proto3" json:"trie,omitempty"`
-	DepositContainers []*DepositContainer `protobuf:"bytes,5,rep,name=deposit_containers,json=depositContainers,proto3" json:"deposit_containers,omitempty"`
-	DepositSnapshot   *DepositSnapshot    `protobuf:"bytes,6,opt,name=deposit_snapshot,json=depositSnapshot,proto3" json:"deposit_snapshot,omitempty"`
+	CurrentExecutionNodeData *LatestExecutionNodeData `protobuf:"bytes,1,opt,name=current_eth1_data,json=currentExecutionNodeData,proto3" json:"current_eth1_data,omitempty"`
+	ChainstartData           *ChainStartData          `protobuf:"bytes,2,opt,name=chainstart_data,json=chainstartData,proto3" json:"chainstart_data,omitempty"`
+	BeaconState              *BeaconStateCapella      `protobuf:"bytes,3,opt,name=beacon_state,json=beaconState,proto3" json:"beacon_state,omitempty"`
+	Trie                     *SparseMerkleTrie        `protobuf:"bytes,4,opt,name=trie,proto3" json:"trie,omitempty"`
+	DepositContainers        []*DepositContainer      `protobuf:"bytes,5,rep,name=deposit_containers,json=depositContainers,proto3" json:"deposit_containers,omitempty"`
+	DepositSnapshot          *DepositSnapshot         `protobuf:"bytes,6,opt,name=deposit_snapshot,json=depositSnapshot,proto3" json:"deposit_snapshot,omitempty"`
 }
 
 func (x *ETH1ChainData) Reset() {
@@ -66,9 +66,9 @@ func (*ETH1ChainData) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ETH1ChainData) GetCurrentEth1Data() *LatestETH1Data {
+func (x *ETH1ChainData) GetCurrentExecutionNodeData() *LatestExecutionNodeData {
 	if x != nil {
-		return x.CurrentEth1Data
+		return x.CurrentExecutionNodeData
 	}
 	return nil
 }
@@ -187,7 +187,7 @@ func (x *DepositSnapshot) GetExecutionDepth() uint64 {
 	return 0
 }
 
-type LatestETH1Data struct {
+type LatestExecutionNodeData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -198,8 +198,8 @@ type LatestETH1Data struct {
 	LastRequestedBlock uint64 `protobuf:"varint,4,opt,name=last_requested_block,json=lastRequestedBlock,proto3" json:"last_requested_block,omitempty"`
 }
 
-func (x *LatestETH1Data) Reset() {
-	*x = LatestETH1Data{}
+func (x *LatestExecutionNodeData) Reset() {
+	*x = LatestExecutionNodeData{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -207,13 +207,13 @@ func (x *LatestETH1Data) Reset() {
 	}
 }
 
-func (x *LatestETH1Data) String() string {
+func (x *LatestExecutionNodeData) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*LatestETH1Data) ProtoMessage() {}
+func (*LatestExecutionNodeData) ProtoMessage() {}
 
-func (x *LatestETH1Data) ProtoReflect() protoreflect.Message {
+func (x *LatestExecutionNodeData) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -225,33 +225,33 @@ func (x *LatestETH1Data) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LatestETH1Data.ProtoReflect.Descriptor instead.
-func (*LatestETH1Data) Descriptor() ([]byte, []int) {
+// Deprecated: Use LatestExecutionNodeData.ProtoReflect.Descriptor instead.
+func (*LatestExecutionNodeData) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *LatestETH1Data) GetBlockHeight() uint64 {
+func (x *LatestExecutionNodeData) GetBlockHeight() uint64 {
 	if x != nil {
 		return x.BlockHeight
 	}
 	return 0
 }
 
-func (x *LatestETH1Data) GetBlockTime() uint64 {
+func (x *LatestExecutionNodeData) GetBlockTime() uint64 {
 	if x != nil {
 		return x.BlockTime
 	}
 	return 0
 }
 
-func (x *LatestETH1Data) GetBlockHash() []byte {
+func (x *LatestExecutionNodeData) GetBlockHash() []byte {
 	if x != nil {
 		return x.BlockHash
 	}
 	return nil
 }
 
-func (x *LatestETH1Data) GetLastRequestedBlock() uint64 {
+func (x *LatestExecutionNodeData) GetLastRequestedBlock() uint64 {
 	if x != nil {
 		return x.LastRequestedBlock
 	}
@@ -263,9 +263,9 @@ type ChainStartData struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	GenesisTime  uint64    `protobuf:"varint,2,opt,name=genesis_time,json=genesisTime,proto3" json:"genesis_time,omitempty"`
-	GenesisBlock uint64    `protobuf:"varint,3,opt,name=genesis_block,json=genesisBlock,proto3" json:"genesis_block,omitempty"`
-	Eth1Data     *Eth1Data `protobuf:"bytes,4,opt,name=eth1_data,json=eth1Data,proto3" json:"eth1_data,omitempty"`
+	GenesisTime       uint64             `protobuf:"varint,2,opt,name=genesis_time,json=genesisTime,proto3" json:"genesis_time,omitempty"`
+	GenesisBlock      uint64             `protobuf:"varint,3,opt,name=genesis_block,json=genesisBlock,proto3" json:"genesis_block,omitempty"`
+	ExecutionNodeData *ExecutionNodeData `protobuf:"bytes,4,opt,name=eth1_data,json=executionNodeData,proto3" json:"eth1_data,omitempty"`
 }
 
 func (x *ChainStartData) Reset() {
@@ -314,9 +314,9 @@ func (x *ChainStartData) GetGenesisBlock() uint64 {
 	return 0
 }
 
-func (x *ChainStartData) GetEth1Data() *Eth1Data {
+func (x *ChainStartData) GetExecutionNodeData() *ExecutionNodeData {
 	if x != nil {
-		return x.Eth1Data
+		return x.ExecutionNodeData
 	}
 	return nil
 }
@@ -625,25 +625,25 @@ func file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_powchain_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_proto_qrysm_v1alpha1_powchain_proto_goTypes = []interface{}{
-	(*ETH1ChainData)(nil),      // 0: theqrl.zond.v1alpha1.ETH1ChainData
-	(*DepositSnapshot)(nil),    // 1: theqrl.zond.v1alpha1.DepositSnapshot
-	(*LatestETH1Data)(nil),     // 2: theqrl.zond.v1alpha1.LatestETH1Data
-	(*ChainStartData)(nil),     // 3: theqrl.zond.v1alpha1.ChainStartData
-	(*SparseMerkleTrie)(nil),   // 4: theqrl.zond.v1alpha1.SparseMerkleTrie
-	(*TrieLayer)(nil),          // 5: theqrl.zond.v1alpha1.TrieLayer
-	(*DepositContainer)(nil),   // 6: theqrl.zond.v1alpha1.DepositContainer
-	(*BeaconStateCapella)(nil), // 7: theqrl.zond.v1alpha1.BeaconStateCapella
-	(*Eth1Data)(nil),           // 8: theqrl.zond.v1alpha1.Eth1Data
-	(*Deposit)(nil),            // 9: theqrl.zond.v1alpha1.Deposit
+	(*ETH1ChainData)(nil),           // 0: theqrl.zond.v1alpha1.ETH1ChainData
+	(*DepositSnapshot)(nil),         // 1: theqrl.zond.v1alpha1.DepositSnapshot
+	(*LatestExecutionNodeData)(nil), // 2: theqrl.zond.v1alpha1.LatestExecutionNodeData
+	(*ChainStartData)(nil),          // 3: theqrl.zond.v1alpha1.ChainStartData
+	(*SparseMerkleTrie)(nil),        // 4: theqrl.zond.v1alpha1.SparseMerkleTrie
+	(*TrieLayer)(nil),               // 5: theqrl.zond.v1alpha1.TrieLayer
+	(*DepositContainer)(nil),        // 6: theqrl.zond.v1alpha1.DepositContainer
+	(*BeaconStateCapella)(nil),      // 7: theqrl.zond.v1alpha1.BeaconStateCapella
+	(*ExecutionNodeData)(nil),       // 8: theqrl.zond.v1alpha1.ExecutionNodeData
+	(*Deposit)(nil),                 // 9: theqrl.zond.v1alpha1.Deposit
 }
 var file_proto_qrysm_v1alpha1_powchain_proto_depIdxs = []int32{
-	2, // 0: theqrl.zond.v1alpha1.ETH1ChainData.current_eth1_data:type_name -> theqrl.zond.v1alpha1.LatestETH1Data
+	2, // 0: theqrl.zond.v1alpha1.ETH1ChainData.current_eth1_data:type_name -> theqrl.zond.v1alpha1.LatestExecutionNodeData
 	3, // 1: theqrl.zond.v1alpha1.ETH1ChainData.chainstart_data:type_name -> theqrl.zond.v1alpha1.ChainStartData
 	7, // 2: theqrl.zond.v1alpha1.ETH1ChainData.beacon_state:type_name -> theqrl.zond.v1alpha1.BeaconStateCapella
 	4, // 3: theqrl.zond.v1alpha1.ETH1ChainData.trie:type_name -> theqrl.zond.v1alpha1.SparseMerkleTrie
 	6, // 4: theqrl.zond.v1alpha1.ETH1ChainData.deposit_containers:type_name -> theqrl.zond.v1alpha1.DepositContainer
 	1, // 5: theqrl.zond.v1alpha1.ETH1ChainData.deposit_snapshot:type_name -> theqrl.zond.v1alpha1.DepositSnapshot
-	8, // 6: theqrl.zond.v1alpha1.ChainStartData.eth1_data:type_name -> theqrl.zond.v1alpha1.Eth1Data
+	8, // 6: theqrl.zond.v1alpha1.ChainStartData.eth1_data:type_name -> theqrl.zond.v1alpha1.ExecutionNodeData
 	5, // 7: theqrl.zond.v1alpha1.SparseMerkleTrie.layers:type_name -> theqrl.zond.v1alpha1.TrieLayer
 	9, // 8: theqrl.zond.v1alpha1.DepositContainer.deposit:type_name -> theqrl.zond.v1alpha1.Deposit
 	9, // [9:9] is the sub-list for method output_type
@@ -686,7 +686,7 @@ func file_proto_qrysm_v1alpha1_powchain_proto_init() {
 			}
 		}
 		file_proto_qrysm_v1alpha1_powchain_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LatestETH1Data); i {
+			switch v := v.(*LatestExecutionNodeData); i {
 			case 0:
 				return &v.state
 			case 1:

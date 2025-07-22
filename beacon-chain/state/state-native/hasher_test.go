@@ -27,8 +27,8 @@ func TestComputeFieldRootsWithHasher_Capella(t *testing.T) {
 	historicalRoots, err := util.PrepareRoots(int(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetHistoricalRoots(historicalRoots))
-	require.NoError(t, beaconState.SetEth1Data(eth1Data()))
-	require.NoError(t, beaconState.SetEth1DataVotes([]*zondpb.Eth1Data{eth1Data()}))
+	require.NoError(t, beaconState.SetExecutionNodeData(executionNodeData()))
+	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*zondpb.ExecutionNodeData{executionNodeData()}))
 	require.NoError(t, beaconState.SetEth1DepositIndex(123))
 	require.NoError(t, beaconState.SetValidators([]*zondpb.Validator{validator()}))
 	require.NoError(t, beaconState.SetBalances([]uint64{1, 2, 3}))
@@ -127,10 +127,10 @@ func latestBlockHeader() *zondpb.BeaconBlockHeader {
 	}
 }
 
-func eth1Data() *zondpb.Eth1Data {
+func executionNodeData() *zondpb.ExecutionNodeData {
 	dr := bytesutil.ToBytes32([]byte("deposit"))
 	bh := bytesutil.ToBytes32([]byte("block"))
-	return &zondpb.Eth1Data{
+	return &zondpb.ExecutionNodeData{
 		DepositRoot:  dr[:],
 		DepositCount: 123,
 		BlockHash:    bh[:],

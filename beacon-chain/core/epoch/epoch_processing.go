@@ -208,7 +208,7 @@ func ProcessSlashings(state state.BeaconState, slashingMultiplier uint64) (state
 	return state, err
 }
 
-// ProcessEth1DataReset processes updates to ETH1 data votes during epoch processing.
+// ProcessExecutionNodeDataReset processes updates to ETH1 data votes during epoch processing.
 //
 // Spec pseudocode definition:
 //
@@ -217,13 +217,13 @@ func ProcessSlashings(state state.BeaconState, slashingMultiplier uint64) (state
 //	  # Reset eth1 data votes
 //	  if next_epoch % EPOCHS_PER_ETH1_VOTING_PERIOD == 0:
 //	      state.eth1_data_votes = []
-func ProcessEth1DataReset(state state.BeaconState) (state.BeaconState, error) {
+func ProcessExecutionNodeDataReset(state state.BeaconState) (state.BeaconState, error) {
 	currentEpoch := time.CurrentEpoch(state)
 	nextEpoch := currentEpoch + 1
 
 	// Reset ETH1 data votes.
 	if nextEpoch%params.BeaconConfig().EpochsPerEth1VotingPeriod == 0 {
-		if err := state.SetEth1DataVotes([]*zondpb.Eth1Data{}); err != nil {
+		if err := state.SetExecutionNodeDataVotes([]*zondpb.ExecutionNodeData{}); err != nil {
 			return nil, err
 		}
 	}

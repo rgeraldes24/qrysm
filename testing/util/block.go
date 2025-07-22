@@ -18,8 +18,8 @@ import (
 	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
+	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
 	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
 	"github.com/theQRL/qrysm/testing/assertions"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -193,12 +193,12 @@ func generateAttesterSlashings(
 	return attesterSlashings, nil
 }
 
-func generateDepositsAndEth1Data(
+func generateDepositsAndExecutionNodeData(
 	bState state.BeaconState,
 	numDeposits uint64,
 ) (
 	[]*zondpb.Deposit,
-	*zondpb.Eth1Data,
+	*zondpb.ExecutionNodeData,
 	error,
 ) {
 	previousDepsLen := bState.Eth1DepositIndex()
@@ -206,11 +206,11 @@ func generateDepositsAndEth1Data(
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not get deposits")
 	}
-	eth1Data, err := DeterministicEth1Data(len(currentDeposits))
+	executionNodeData, err := DeterministicExecutionNodeData(len(currentDeposits))
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not get eth1data")
+		return nil, nil, errors.Wrap(err, "could not get executionNodeData")
 	}
-	return currentDeposits[previousDepsLen:], eth1Data, nil
+	return currentDeposits[previousDepsLen:], executionNodeData, nil
 }
 
 func GenerateVoluntaryExits(bState state.BeaconState, k dilithium.DilithiumKey, idx primitives.ValidatorIndex) (*zondpb.SignedVoluntaryExit, error) {
@@ -338,8 +338,8 @@ func HydrateBeaconBlockBodyCapella(b *zondpb.BeaconBlockBodyCapella) *zondpb.Bea
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &zondpb.Eth1Data{
+	if b.ExecutionNodeData == nil {
+		b.ExecutionNodeData = &zondpb.ExecutionNodeData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}
@@ -431,8 +431,8 @@ func HydrateBlindedBeaconBlockBodyCapella(b *zondpb.BlindedBeaconBlockBodyCapell
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &zondpb.Eth1Data{
+	if b.ExecutionNodeData == nil {
+		b.ExecutionNodeData = &zondpb.ExecutionNodeData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		}
@@ -524,8 +524,8 @@ func HydrateV1BlindedBeaconBlockBodyCapella(b *v1.BlindedBeaconBlockBodyCapella)
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &v1.Eth1Data{
+	if b.ExecutionNodeData == nil {
+		b.ExecutionNodeData = &v1.ExecutionNodeData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		}
@@ -591,8 +591,8 @@ func HydrateV1CapellaBeaconBlockBody(b *v1.BeaconBlockBodyCapella) *v1.BeaconBlo
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
-	if b.Eth1Data == nil {
-		b.Eth1Data = &v1.Eth1Data{
+	if b.ExecutionNodeData == nil {
+		b.ExecutionNodeData = &v1.ExecutionNodeData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}

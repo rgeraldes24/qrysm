@@ -73,9 +73,9 @@ func GenerateFullBlockCapella(
 
 	numToGen = conf.NumDeposits
 	var newDeposits []*zondpb.Deposit
-	eth1Data := bState.Eth1Data()
+	executionNodeData := bState.ExecutionNodeData()
 	if numToGen > 0 {
-		newDeposits, eth1Data, err = generateDepositsAndEth1Data(bState, numToGen)
+		newDeposits, executionNodeData, err = generateDepositsAndExecutionNodeData(bState, numToGen)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed generating %d deposits:", numToGen)
 		}
@@ -197,7 +197,7 @@ func GenerateFullBlockCapella(
 		ParentRoot:    parentRoot[:],
 		ProposerIndex: idx,
 		Body: &zondpb.BeaconBlockBodyCapella{
-			Eth1Data:                    eth1Data,
+			ExecutionNodeData:           executionNodeData,
 			RandaoReveal:                reveal,
 			ProposerSlashings:           pSlashings,
 			AttesterSlashings:           aSlashings,

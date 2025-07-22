@@ -17,7 +17,7 @@ func (s *Store) SaveExecutionChainData(ctx context.Context, data *v1alpha1.ETH1C
 	defer span.End()
 
 	if data == nil {
-		err := errors.New("cannot save nil eth1data")
+		err := errors.New("cannot save nil executionNodeData")
 		tracing.AnnotateError(span, err)
 		return err
 	}

@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/async/event"
 	"github.com/theQRL/qrysm/io/logs"
 	"github.com/theQRL/qrysm/monitoring/tracing"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/validator/client"
 	iface "github.com/theQRL/qrysm/validator/client/iface"
@@ -160,7 +160,7 @@ func (s *Server) Start() {
 
 	// Register services available for the gRPC server.
 	reflection.Register(s.grpcServer)
-	zondpbservice.RegisterKeyManagementServer(s.grpcServer, s)
+	qrlpbservice.RegisterKeyManagementServer(s.grpcServer, s)
 
 	go func() {
 		if s.listener != nil {

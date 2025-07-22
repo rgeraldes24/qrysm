@@ -40,7 +40,7 @@ func NewBeaconStateCapella(options ...func(state *zondpb.BeaconStateCapella) err
 		RandaoMixes:                filledByteSlice2D(uint64(params.BeaconConfig().EpochsPerHistoricalVector), 32),
 		Validators:                 make([]*zondpb.Validator, 0),
 		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		Eth1Data: &zondpb.Eth1Data{
+		ExecutionNodeData: &zondpb.ExecutionNodeData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		},
@@ -48,7 +48,7 @@ func NewBeaconStateCapella(options ...func(state *zondpb.BeaconStateCapella) err
 			PreviousVersion: make([]byte, 4),
 			CurrentVersion:  make([]byte, 4),
 		},
-		Eth1DataVotes:               make([]*zondpb.Eth1Data, 0),
+		ExecutionNodeDataVotes:      make([]*zondpb.ExecutionNodeData, 0),
 		HistoricalSummaries:         make([]*zondpb.HistoricalSummary, 0),
 		JustificationBits:           bitfield.Bitvector4{0x0},
 		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
