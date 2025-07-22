@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	"github.com/theQRL/go-zond/common"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // DepositCache combines the interfaces for retrieving and inserting deposit information.
@@ -16,13 +16,13 @@ type DepositCache interface {
 
 // DepositFetcher defines a struct which can retrieve deposit information from a store.
 type DepositFetcher interface {
-	AllDeposits(ctx context.Context, untilBlk *big.Int) []*zondpb.Deposit
-	AllDepositContainers(ctx context.Context) []*zondpb.DepositContainer
-	DepositByPubkey(ctx context.Context, pubKey []byte) (*zondpb.Deposit, *big.Int)
+	AllDeposits(ctx context.Context, untilBlk *big.Int) []*qrysmpb.Deposit
+	AllDepositContainers(ctx context.Context) []*qrysmpb.DepositContainer
+	DepositByPubkey(ctx context.Context, pubKey []byte) (*qrysmpb.Deposit, *big.Int)
 	DepositsNumberAndRootAtHeight(ctx context.Context, blockHeight *big.Int) (uint64, [32]byte)
-	InsertPendingDeposit(ctx context.Context, d *zondpb.Deposit, blockNum uint64, index int64, depositRoot [32]byte)
-	PendingDeposits(ctx context.Context, untilBlk *big.Int) []*zondpb.Deposit
-	PendingContainers(ctx context.Context, untilBlk *big.Int) []*zondpb.DepositContainer
+	InsertPendingDeposit(ctx context.Context, d *qrysmpb.Deposit, blockNum uint64, index int64, depositRoot [32]byte)
+	PendingDeposits(ctx context.Context, untilBlk *big.Int) []*qrysmpb.Deposit
+	PendingContainers(ctx context.Context, untilBlk *big.Int) []*qrysmpb.DepositContainer
 	PrunePendingDeposits(ctx context.Context, merkleTreeIndex int64)
 	PruneProofs(ctx context.Context, untilDepositIndex int64) error
 	FinalizedFetcher
@@ -30,8 +30,8 @@ type DepositFetcher interface {
 
 // DepositInserter defines a struct which can insert deposit information from a store.
 type DepositInserter interface {
-	InsertDeposit(ctx context.Context, d *zondpb.Deposit, blockNum uint64, index int64, depositRoot [32]byte) error
-	InsertDepositContainers(ctx context.Context, ctrs []*zondpb.DepositContainer)
+	InsertDeposit(ctx context.Context, d *qrysmpb.Deposit, blockNum uint64, index int64, depositRoot [32]byte) error
+	InsertDepositContainers(ctx context.Context, ctrs []*qrysmpb.DepositContainer)
 	InsertFinalizedDeposits(ctx context.Context, eth1DepositIndex int64, executionHash common.Hash, executionNumber uint64) error
 }
 
@@ -39,7 +39,7 @@ type DepositInserter interface {
 // It extends the "DepositFetcher" interface with additional methods for fetching finalized deposits.
 type FinalizedFetcher interface {
 	FinalizedDeposits(ctx context.Context) (FinalizedDeposits, error)
-	NonFinalizedDeposits(ctx context.Context, lastFinalizedIndex int64, untilBlk *big.Int) []*zondpb.Deposit
+	NonFinalizedDeposits(ctx context.Context, lastFinalizedIndex int64, untilBlk *big.Int) []*qrysmpb.Deposit
 }
 
 // FinalizedDeposits defines a method to access a merkle tree containing deposits and their indexes.

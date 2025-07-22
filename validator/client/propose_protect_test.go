@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -28,11 +28,11 @@ func Test_slashableProposalCheck_PreventsLowerThanMinProposal(t *testing.T) {
 
 	// We expect the same block with a slot lower than the lowest
 	// signed slot to fail validation.
-	blk := &zondpb.SignedBeaconBlockCapella{
-		Block: &zondpb.BeaconBlockCapella{
+	blk := &qrysmpb.SignedBeaconBlockCapella{
+		Block: &qrysmpb.BeaconBlockCapella{
 			Slot:          lowestSignedSlot - 1,
 			ProposerIndex: 0,
-			Body:          &zondpb.BeaconBlockBodyCapella{},
+			Body:          &qrysmpb.BeaconBlockBodyCapella{},
 		},
 		Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
 	}
@@ -43,11 +43,11 @@ func Test_slashableProposalCheck_PreventsLowerThanMinProposal(t *testing.T) {
 
 	// We expect the same block with a slot equal to the lowest
 	// signed slot to pass validation if signing roots are equal.
-	blk = &zondpb.SignedBeaconBlockCapella{
-		Block: &zondpb.BeaconBlockCapella{
+	blk = &qrysmpb.SignedBeaconBlockCapella{
+		Block: &qrysmpb.BeaconBlockCapella{
 			Slot:          lowestSignedSlot,
 			ProposerIndex: 0,
-			Body:          &zondpb.BeaconBlockBodyCapella{},
+			Body:          &qrysmpb.BeaconBlockBodyCapella{},
 		},
 		Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
 	}
@@ -65,11 +65,11 @@ func Test_slashableProposalCheck_PreventsLowerThanMinProposal(t *testing.T) {
 
 	// We expect the same block with a slot > than the lowest
 	// signed slot to pass validation.
-	blk = &zondpb.SignedBeaconBlockCapella{
-		Block: &zondpb.BeaconBlockCapella{
+	blk = &qrysmpb.SignedBeaconBlockCapella{
+		Block: &qrysmpb.BeaconBlockCapella{
 			Slot:          lowestSignedSlot + 1,
 			ProposerIndex: 0,
-			Body:          &zondpb.BeaconBlockBodyCapella{},
+			Body:          &qrysmpb.BeaconBlockBodyCapella{},
 		},
 		Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
 	}
@@ -85,11 +85,11 @@ func Test_slashableProposalCheck(t *testing.T) {
 	validator, _, validatorKey, finish := setup(t)
 	defer finish()
 
-	blk := util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{
-		Block: &zondpb.BeaconBlockCapella{
+	blk := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
+		Block: &qrysmpb.BeaconBlockCapella{
 			Slot:          10,
 			ProposerIndex: 0,
-			Body:          &zondpb.BeaconBlockBodyCapella{},
+			Body:          &qrysmpb.BeaconBlockBodyCapella{},
 		},
 		Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
 	})

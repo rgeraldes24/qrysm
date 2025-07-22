@@ -15,7 +15,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
 )
@@ -78,7 +78,7 @@ func (cf *VersionedUnmarshaler) UnmarshalBeaconState(marshaled []byte) (s state.
 	forkName := version.String(cf.Fork)
 	switch fork := cf.Fork; fork {
 	case version.Capella:
-		st := &zondpb.BeaconStateCapella{}
+		st := &qrysmpb.BeaconStateCapella{}
 		err = st.UnmarshalSSZ(marshaled)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to unmarshal state, detected fork=%s", forkName)
@@ -126,7 +126,7 @@ func (cf *VersionedUnmarshaler) UnmarshalBeaconBlock(marshaled []byte) (interfac
 	var blk ssz.Unmarshaler
 	switch cf.Fork {
 	case version.Capella:
-		blk = &zondpb.SignedBeaconBlockCapella{}
+		blk = &qrysmpb.SignedBeaconBlockCapella{}
 	default:
 		forkName := version.String(cf.Fork)
 		return nil, fmt.Errorf("unable to initialize ReadOnlyBeaconBlock for fork version=%s at slot=%d", forkName, slot)
@@ -152,7 +152,7 @@ func (cf *VersionedUnmarshaler) UnmarshalBlindedBeaconBlock(marshaled []byte) (i
 	var blk ssz.Unmarshaler
 	switch cf.Fork {
 	case version.Capella:
-		blk = &zondpb.SignedBlindedBeaconBlockCapella{}
+		blk = &qrysmpb.SignedBlindedBeaconBlockCapella{}
 	default:
 		forkName := version.String(cf.Fork)
 		return nil, fmt.Errorf("unable to initialize ReadOnlyBeaconBlock for fork version=%s at slot=%d", forkName, slot)

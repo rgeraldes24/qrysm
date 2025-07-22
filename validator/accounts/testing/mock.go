@@ -10,7 +10,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	validatorserviceconfig "github.com/theQRL/qrysm/config/validator/service"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/validator/accounts/iface"
 	iface2 "github.com/theQRL/qrysm/validator/client/iface"
 	"github.com/theQRL/qrysm/validator/keymanager"
@@ -199,7 +199,7 @@ func (_ *MockValidator) SetPubKeyToValidatorIndexMap(_ context.Context, _ keyman
 }
 
 // SignValidatorRegistrationRequest for mocking
-func (_ *MockValidator) SignValidatorRegistrationRequest(_ context.Context, _ iface2.SigningFunc, _ *zondpb.ValidatorRegistrationV1) (*zondpb.SignedValidatorRegistrationV1, error) {
+func (_ *MockValidator) SignValidatorRegistrationRequest(_ context.Context, _ iface2.SigningFunc, _ *qrysmpb.ValidatorRegistrationV1) (*qrysmpb.SignedValidatorRegistrationV1, error) {
 	panic("implement me")
 }
 

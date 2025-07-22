@@ -8,8 +8,8 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
-	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -52,12 +52,12 @@ var (
 
 func Test_V1Alpha1AggregateAttAndProofToV1(t *testing.T) {
 	proof := [32]byte{1}
-	att := util.HydrateAttestation(&zondpbalpha.Attestation{
-		Data: &zondpbalpha.AttestationData{
+	att := util.HydrateAttestation(&qrysmpbalpha.Attestation{
+		Data: &qrysmpbalpha.AttestationData{
 			Slot: 5,
 		},
 	})
-	alpha := &zondpbalpha.AggregateAttestationAndProof{
+	alpha := &qrysmpbalpha.AggregateAttestationAndProof{
 		AggregatorIndex: 1,
 		Aggregate:       att,
 		SelectionProof:  proof[:],
@@ -69,24 +69,24 @@ func Test_V1Alpha1AggregateAttAndProofToV1(t *testing.T) {
 }
 
 func Test_V1Alpha1AttSlashingToV1(t *testing.T) {
-	alphaAttestation := &zondpbalpha.IndexedAttestation{
+	alphaAttestation := &qrysmpbalpha.IndexedAttestation{
 		AttestingIndices: attestingIndices,
-		Data: &zondpbalpha.AttestationData{
+		Data: &qrysmpbalpha.AttestationData{
 			Slot:            slot,
 			CommitteeIndex:  committeeIndex,
 			BeaconBlockRoot: beaconBlockRoot,
-			Source: &zondpbalpha.Checkpoint{
+			Source: &qrysmpbalpha.Checkpoint{
 				Epoch: epoch,
 				Root:  sourceRoot,
 			},
-			Target: &zondpbalpha.Checkpoint{
+			Target: &qrysmpbalpha.Checkpoint{
 				Epoch: epoch,
 				Root:  targetRoot,
 			},
 		},
 		Signatures: [][]byte{signature},
 	}
-	alphaSlashing := &zondpbalpha.AttesterSlashing{
+	alphaSlashing := &qrysmpbalpha.AttesterSlashing{
 		Attestation_1: alphaAttestation,
 		Attestation_2: alphaAttestation,
 	}
@@ -100,14 +100,14 @@ func Test_V1Alpha1AttSlashingToV1(t *testing.T) {
 }
 
 func Test_V1Alpha1ProposerSlashingToV1(t *testing.T) {
-	alphaHeader := util.HydrateSignedBeaconHeader(&zondpbalpha.SignedBeaconBlockHeader{})
+	alphaHeader := util.HydrateSignedBeaconHeader(&qrysmpbalpha.SignedBeaconBlockHeader{})
 	alphaHeader.Header.Slot = slot
 	alphaHeader.Header.ProposerIndex = validatorIndex
 	alphaHeader.Header.ParentRoot = parentRoot
 	alphaHeader.Header.StateRoot = stateRoot
 	alphaHeader.Header.BodyRoot = bodyRoot
 	alphaHeader.Signature = signature
-	alphaSlashing := &zondpbalpha.ProposerSlashing{
+	alphaSlashing := &qrysmpbalpha.ProposerSlashing{
 		Header_1: alphaHeader,
 		Header_2: alphaHeader,
 	}
@@ -121,8 +121,8 @@ func Test_V1Alpha1ProposerSlashingToV1(t *testing.T) {
 }
 
 func Test_V1Alpha1ExitToV1(t *testing.T) {
-	alphaExit := &zondpbalpha.SignedVoluntaryExit{
-		Exit: &zondpbalpha.VoluntaryExit{
+	alphaExit := &qrysmpbalpha.SignedVoluntaryExit{
+		Exit: &qrysmpbalpha.VoluntaryExit{
 			Epoch:          epoch,
 			ValidatorIndex: validatorIndex,
 		},
@@ -138,8 +138,8 @@ func Test_V1Alpha1ExitToV1(t *testing.T) {
 }
 
 func Test_V1ExitToV1Alpha1(t *testing.T) {
-	v1Exit := &zondpbv1.SignedVoluntaryExit{
-		Message: &zondpbv1.VoluntaryExit{
+	v1Exit := &qrlpbv1.SignedVoluntaryExit{
+		Message: &qrlpbv1.VoluntaryExit{
 			Epoch:          epoch,
 			ValidatorIndex: validatorIndex,
 		},
@@ -155,24 +155,24 @@ func Test_V1ExitToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1AttSlashingToV1Alpha1(t *testing.T) {
-	v1Attestation := &zondpbv1.IndexedAttestation{
+	v1Attestation := &qrlpbv1.IndexedAttestation{
 		AttestingIndices: attestingIndices,
-		Data: &zondpbv1.AttestationData{
+		Data: &qrlpbv1.AttestationData{
 			Slot:            slot,
 			Index:           committeeIndex,
 			BeaconBlockRoot: beaconBlockRoot,
-			Source: &zondpbv1.Checkpoint{
+			Source: &qrlpbv1.Checkpoint{
 				Epoch: epoch,
 				Root:  sourceRoot,
 			},
-			Target: &zondpbv1.Checkpoint{
+			Target: &qrlpbv1.Checkpoint{
 				Epoch: epoch,
 				Root:  targetRoot,
 			},
 		},
 		Signatures: [][]byte{signature},
 	}
-	v1Slashing := &zondpbv1.AttesterSlashing{
+	v1Slashing := &qrlpbv1.AttesterSlashing{
 		Attestation_1: v1Attestation,
 		Attestation_2: v1Attestation,
 	}
@@ -186,8 +186,8 @@ func Test_V1AttSlashingToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1ProposerSlashingToV1Alpha1(t *testing.T) {
-	v1Header := &zondpbv1.SignedBeaconBlockHeader{
-		Message: &zondpbv1.BeaconBlockHeader{
+	v1Header := &qrlpbv1.SignedBeaconBlockHeader{
+		Message: &qrlpbv1.BeaconBlockHeader{
 			Slot:          slot,
 			ProposerIndex: validatorIndex,
 			ParentRoot:    parentRoot,
@@ -196,7 +196,7 @@ func Test_V1ProposerSlashingToV1Alpha1(t *testing.T) {
 		},
 		Signature: signature,
 	}
-	v1Slashing := &zondpbv1.ProposerSlashing{
+	v1Slashing := &qrlpbv1.ProposerSlashing{
 		SignedHeader_1: v1Header,
 		SignedHeader_2: v1Header,
 	}
@@ -210,17 +210,17 @@ func Test_V1ProposerSlashingToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1Alpha1AttToV1(t *testing.T) {
-	alphaAtt := &zondpbalpha.Attestation{
+	alphaAtt := &qrysmpbalpha.Attestation{
 		AggregationBits: aggregationBits,
-		Data: &zondpbalpha.AttestationData{
+		Data: &qrysmpbalpha.AttestationData{
 			Slot:            slot,
 			CommitteeIndex:  committeeIndex,
 			BeaconBlockRoot: beaconBlockRoot,
-			Source: &zondpbalpha.Checkpoint{
+			Source: &qrysmpbalpha.Checkpoint{
 				Epoch: epoch,
 				Root:  sourceRoot,
 			},
-			Target: &zondpbalpha.Checkpoint{
+			Target: &qrysmpbalpha.Checkpoint{
 				Epoch: epoch,
 				Root:  targetRoot,
 			},
@@ -237,17 +237,17 @@ func Test_V1Alpha1AttToV1(t *testing.T) {
 }
 
 func Test_V1AttToV1Alpha1(t *testing.T) {
-	v1Att := &zondpbv1.Attestation{
+	v1Att := &qrlpbv1.Attestation{
 		AggregationBits: aggregationBits,
-		Data: &zondpbv1.AttestationData{
+		Data: &qrlpbv1.AttestationData{
 			Slot:            slot,
 			Index:           committeeIndex,
 			BeaconBlockRoot: beaconBlockRoot,
-			Source: &zondpbv1.Checkpoint{
+			Source: &qrlpbv1.Checkpoint{
 				Epoch: epoch,
 				Root:  sourceRoot,
 			},
-			Target: &zondpbv1.Checkpoint{
+			Target: &qrlpbv1.Checkpoint{
 				Epoch: epoch,
 				Root:  targetRoot,
 			},
@@ -264,7 +264,7 @@ func Test_V1AttToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1Alpha1ValidatorToV1(t *testing.T) {
-	v1Alpha1Validator := &zondpbalpha.Validator{
+	v1Alpha1Validator := &qrysmpbalpha.Validator{
 		PublicKey:                  []byte("pubkey"),
 		WithdrawalCredentials:      []byte("withdraw"),
 		EffectiveBalance:           99,
@@ -288,7 +288,7 @@ func Test_V1Alpha1ValidatorToV1(t *testing.T) {
 }
 
 func Test_V1ValidatorToV1Alpha1(t *testing.T) {
-	v1Validator := &zondpbv1.Validator{
+	v1Validator := &qrlpbv1.Validator{
 		Pubkey:                     []byte("pubkey"),
 		WithdrawalCredentials:      []byte("withdraw"),
 		EffectiveBalance:           99,
@@ -312,10 +312,10 @@ func Test_V1ValidatorToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1SignedAggregateAttAndProofToV1Alpha1(t *testing.T) {
-	v1Att := &zondpbv1.SignedAggregateAttestationAndProof{
-		Message: &zondpbv1.AggregateAttestationAndProof{
+	v1Att := &qrlpbv1.SignedAggregateAttestationAndProof{
+		Message: &qrlpbv1.AggregateAttestationAndProof{
 			AggregatorIndex: 1,
-			Aggregate:       util.HydrateV1Attestation(&zondpbv1.Attestation{}),
+			Aggregate:       util.HydrateV1Attestation(&qrlpbv1.Attestation{}),
 			SelectionProof:  selectionProof,
 		},
 		Signature: signature,
@@ -330,7 +330,7 @@ func Test_V1SignedAggregateAttAndProofToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1AttestationToV1Alpha1(t *testing.T) {
-	v1Att := util.HydrateV1Attestation(&zondpbv1.Attestation{})
+	v1Att := util.HydrateV1Attestation(&qrlpbv1.Attestation{})
 	v1Alpha1Att := V1AttToV1Alpha1(v1Att)
 
 	v1Root, err := v1Att.HashTreeRoot()
@@ -341,10 +341,10 @@ func Test_V1AttestationToV1Alpha1(t *testing.T) {
 }
 
 func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
-	alphaContribution := &zondpbalpha.SignedContributionAndProof{
-		Message: &zondpbalpha.ContributionAndProof{
+	alphaContribution := &qrysmpbalpha.SignedContributionAndProof{
+		Message: &qrysmpbalpha.ContributionAndProof{
 			AggregatorIndex: validatorIndex,
-			Contribution: &zondpbalpha.SyncCommitteeContribution{
+			Contribution: &qrysmpbalpha.SyncCommitteeContribution{
 				Slot:              slot,
 				BlockRoot:         blockHash,
 				SubcommitteeIndex: 1,
@@ -372,20 +372,20 @@ func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
 }
 
 func Test_V1Alpha1BeaconBlockCapellaToV1Blinded(t *testing.T) {
-	alphaBlock := util.HydrateBeaconBlockCapella(&zondpbalpha.BeaconBlockCapella{})
+	alphaBlock := util.HydrateBeaconBlockCapella(&qrysmpbalpha.BeaconBlockCapella{})
 	alphaBlock.Slot = slot
 	alphaBlock.ProposerIndex = validatorIndex
 	alphaBlock.ParentRoot = parentRoot
 	alphaBlock.StateRoot = stateRoot
 	alphaBlock.Body.RandaoReveal = randaoReveal
-	alphaBlock.Body.ExecutionNodeData = &zondpbalpha.ExecutionNodeData{
+	alphaBlock.Body.ExecutionNodeData = &qrysmpbalpha.ExecutionNodeData{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
 	}
 	syncCommitteeBits := bitfield.NewBitvector16()
 	syncCommitteeBits.SetBitAt(100, true)
-	alphaBlock.Body.SyncAggregate = &zondpbalpha.SyncAggregate{
+	alphaBlock.Body.SyncAggregate = &qrysmpbalpha.SyncAggregate{
 		SyncCommitteeBits:       syncCommitteeBits,
 		SyncCommitteeSignatures: [][]byte{signature},
 	}
@@ -401,16 +401,16 @@ func Test_V1Alpha1BeaconBlockCapellaToV1Blinded(t *testing.T) {
 }
 
 func TestBeaconStateCapellaToProto(t *testing.T) {
-	source, err := util.NewBeaconStateCapella(util.FillRootsNaturalOptCapella, func(state *zondpbalpha.BeaconStateCapella) error {
+	source, err := util.NewBeaconStateCapella(util.FillRootsNaturalOptCapella, func(state *qrysmpbalpha.BeaconStateCapella) error {
 		state.GenesisTime = 1
 		state.GenesisValidatorsRoot = bytesutil.PadTo([]byte("genesisvalidatorsroot"), 32)
 		state.Slot = 2
-		state.Fork = &zondpbalpha.Fork{
+		state.Fork = &qrysmpbalpha.Fork{
 			PreviousVersion: bytesutil.PadTo([]byte("123"), 4),
 			CurrentVersion:  bytesutil.PadTo([]byte("456"), 4),
 			Epoch:           3,
 		}
-		state.LatestBlockHeader = &zondpbalpha.BeaconBlockHeader{
+		state.LatestBlockHeader = &qrysmpbalpha.BeaconBlockHeader{
 			Slot:          4,
 			ProposerIndex: 5,
 			ParentRoot:    bytesutil.PadTo([]byte("lbhparentroot"), 32),
@@ -420,18 +420,18 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 		state.BlockRoots = [][]byte{bytesutil.PadTo([]byte("blockroots"), 32)}
 		state.StateRoots = [][]byte{bytesutil.PadTo([]byte("stateroots"), 32)}
 		state.HistoricalRoots = [][]byte{bytesutil.PadTo([]byte("historicalroots"), 32)}
-		state.ExecutionNodeData = &zondpbalpha.ExecutionNodeData{
+		state.ExecutionNodeData = &qrysmpbalpha.ExecutionNodeData{
 			DepositRoot:  bytesutil.PadTo([]byte("e1ddepositroot"), 32),
 			DepositCount: 6,
 			BlockHash:    bytesutil.PadTo([]byte("e1dblockhash"), 32),
 		}
-		state.ExecutionNodeDataVotes = []*zondpbalpha.ExecutionNodeData{{
+		state.ExecutionNodeDataVotes = []*qrysmpbalpha.ExecutionNodeData{{
 			DepositRoot:  bytesutil.PadTo([]byte("e1dvdepositroot"), 32),
 			DepositCount: 7,
 			BlockHash:    bytesutil.PadTo([]byte("e1dvblockhash"), 32),
 		}}
 		state.Eth1DepositIndex = 8
-		state.Validators = []*zondpbalpha.Validator{{
+		state.Validators = []*qrysmpbalpha.Validator{{
 			PublicKey:                  bytesutil.PadTo([]byte("publickey"), 2592),
 			WithdrawalCredentials:      bytesutil.PadTo([]byte("withdrawalcredentials"), 32),
 			EffectiveBalance:           9,
@@ -445,25 +445,25 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 		state.RandaoMixes = [][]byte{bytesutil.PadTo([]byte("randaomixes"), 32)}
 		state.Slashings = []uint64{15}
 		state.JustificationBits = bitfield.Bitvector4{1}
-		state.PreviousJustifiedCheckpoint = &zondpbalpha.Checkpoint{
+		state.PreviousJustifiedCheckpoint = &qrysmpbalpha.Checkpoint{
 			Epoch: 30,
 			Root:  bytesutil.PadTo([]byte("pjcroot"), 32),
 		}
-		state.CurrentJustifiedCheckpoint = &zondpbalpha.Checkpoint{
+		state.CurrentJustifiedCheckpoint = &qrysmpbalpha.Checkpoint{
 			Epoch: 31,
 			Root:  bytesutil.PadTo([]byte("cjcroot"), 32),
 		}
-		state.FinalizedCheckpoint = &zondpbalpha.Checkpoint{
+		state.FinalizedCheckpoint = &qrysmpbalpha.Checkpoint{
 			Epoch: 32,
 			Root:  bytesutil.PadTo([]byte("fcroot"), 32),
 		}
 		state.PreviousEpochParticipation = []byte("previousepochparticipation")
 		state.CurrentEpochParticipation = []byte("currentepochparticipation")
 		state.InactivityScores = []uint64{1, 2, 3}
-		state.CurrentSyncCommittee = &zondpbalpha.SyncCommittee{
+		state.CurrentSyncCommittee = &qrysmpbalpha.SyncCommittee{
 			Pubkeys: [][]byte{bytesutil.PadTo([]byte("cscpubkeys"), 2592)},
 		}
-		state.NextSyncCommittee = &zondpbalpha.SyncCommittee{
+		state.NextSyncCommittee = &qrysmpbalpha.SyncCommittee{
 			Pubkeys: [][]byte{bytesutil.PadTo([]byte("nscpubkeys"), 2592)},
 		}
 		state.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderCapella{
@@ -485,7 +485,7 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 		}
 		state.NextWithdrawalIndex = 123
 		state.NextWithdrawalValidatorIndex = 123
-		state.HistoricalSummaries = []*zondpbalpha.HistoricalSummary{
+		state.HistoricalSummaries = []*qrysmpbalpha.HistoricalSummary{
 			{
 				BlockSummaryRoot: bytesutil.PadTo([]byte("blocksummaryroot"), 32),
 				StateSummaryRoot: bytesutil.PadTo([]byte("statesummaryroot"), 32),
@@ -595,8 +595,8 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 }
 
 func TestV1Alpha1SignedDilithiumToExecChangeToV1(t *testing.T) {
-	alphaChange := &zondpbalpha.SignedDilithiumToExecutionChange{
-		Message: &zondpbalpha.DilithiumToExecutionChange{
+	alphaChange := &qrysmpbalpha.SignedDilithiumToExecutionChange{
+		Message: &qrysmpbalpha.DilithiumToExecutionChange{
 			ValidatorIndex:      validatorIndex,
 			FromDilithiumPubkey: bytesutil.PadTo([]byte("fromdilithiumpubkey"), 2592),
 			ToExecutionAddress:  bytesutil.PadTo([]byte("toexecutionaddress"), 20),

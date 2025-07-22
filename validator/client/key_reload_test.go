@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	validatormock "github.com/theQRL/qrysm/testing/validator-mock"
@@ -35,15 +35,15 @@ func TestValidator_HandleKeyReload(t *testing.T) {
 		}
 
 		resp := testutil.GenerateMultipleValidatorStatusResponse([][]byte{inactive.pub[:], active.pub[:]})
-		resp.Statuses[0].Status = zondpb.ValidatorStatus_UNKNOWN_STATUS
-		resp.Statuses[1].Status = zondpb.ValidatorStatus_ACTIVE
+		resp.Statuses[0].Status = qrysmpb.ValidatorStatus_UNKNOWN_STATUS
+		resp.Statuses[1].Status = qrysmpb.ValidatorStatus_ACTIVE
 		client.EXPECT().MultipleValidatorStatus(
 			gomock.Any(),
-			&zondpb.MultipleValidatorStatusRequest{
+			&qrysmpb.MultipleValidatorStatusRequest{
 				PublicKeys: [][]byte{inactive.pub[:], active.pub[:]},
 			},
 		).Return(resp, nil)
-		beaconClient.EXPECT().ListValidators(gomock.Any(), gomock.Any()).Return(&zondpb.Validators{}, nil)
+		beaconClient.EXPECT().ListValidators(gomock.Any(), gomock.Any()).Return(&qrysmpb.Validators{}, nil)
 
 		anyActive, err := v.HandleKeyReload(context.Background(), [][field_params.DilithiumPubkeyLength]byte{inactive.pub, active.pub})
 		require.NoError(t, err)
@@ -66,14 +66,14 @@ func TestValidator_HandleKeyReload(t *testing.T) {
 		}
 
 		resp := testutil.GenerateMultipleValidatorStatusResponse([][]byte{kp.pub[:]})
-		resp.Statuses[0].Status = zondpb.ValidatorStatus_UNKNOWN_STATUS
+		resp.Statuses[0].Status = qrysmpb.ValidatorStatus_UNKNOWN_STATUS
 		client.EXPECT().MultipleValidatorStatus(
 			gomock.Any(),
-			&zondpb.MultipleValidatorStatusRequest{
+			&qrysmpb.MultipleValidatorStatusRequest{
 				PublicKeys: [][]byte{kp.pub[:]},
 			},
 		).Return(resp, nil)
-		beaconClient.EXPECT().ListValidators(gomock.Any(), gomock.Any()).Return(&zondpb.Validators{}, nil)
+		beaconClient.EXPECT().ListValidators(gomock.Any(), gomock.Any()).Return(&qrysmpb.Validators{}, nil)
 
 		anyActive, err := v.HandleKeyReload(context.Background(), [][field_params.DilithiumPubkeyLength]byte{kp.pub})
 		require.NoError(t, err)
@@ -93,7 +93,7 @@ func TestValidator_HandleKeyReload(t *testing.T) {
 
 		client.EXPECT().MultipleValidatorStatus(
 			gomock.Any(),
-			&zondpb.MultipleValidatorStatusRequest{
+			&qrysmpb.MultipleValidatorStatusRequest{
 				PublicKeys: [][]byte{kp.pub[:]},
 			},
 		).Return(nil, errors.New("error"))

@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
@@ -60,8 +60,8 @@ type Simulator struct {
 	beaconBlocksFeed      *event.Feed
 	sentAttSlashingFeed   *event.Feed
 	sentBlockSlashingFeed *event.Feed
-	sentProposerSlashings map[[32]byte]*zondpb.ProposerSlashing
-	sentAttesterSlashings map[[32]byte]*zondpb.AttesterSlashing
+	sentProposerSlashings map[[32]byte]*qrysmpb.ProposerSlashing
+	sentAttesterSlashings map[[32]byte]*qrysmpb.AttesterSlashing
 	genesisTime           time.Time
 }
 
@@ -109,8 +109,8 @@ func New(ctx context.Context, srvConfig *ServiceConfig) (*Simulator, error) {
 		beaconBlocksFeed:      beaconBlocksFeed,
 		sentAttSlashingFeed:   sentAttSlashingFeed,
 		sentBlockSlashingFeed: sentBlockSlashingFeed,
-		sentProposerSlashings: make(map[[32]byte]*zondpb.ProposerSlashing),
-		sentAttesterSlashings: make(map[[32]byte]*zondpb.AttesterSlashing),
+		sentProposerSlashings: make(map[[32]byte]*qrysmpb.ProposerSlashing),
+		sentAttesterSlashings: make(map[[32]byte]*qrysmpb.AttesterSlashing),
 	}, nil
 }
 
@@ -236,8 +236,8 @@ func (s *Simulator) verifySlashingsWereDetected(ctx context.Context) {
 	poolAttesterSlashings := s.srvConfig.SlashingsPool.PendingAttesterSlashings(
 		ctx, nil, true, /* no limit */
 	)
-	detectedProposerSlashings := make(map[[32]byte]*zondpb.ProposerSlashing)
-	detectedAttesterSlashings := make(map[[32]byte]*zondpb.AttesterSlashing)
+	detectedProposerSlashings := make(map[[32]byte]*qrysmpb.ProposerSlashing)
+	detectedAttesterSlashings := make(map[[32]byte]*qrysmpb.AttesterSlashing)
 	for _, slashing := range poolProposerSlashings {
 		slashingRoot, err := slashing.HashTreeRoot()
 		if err != nil {

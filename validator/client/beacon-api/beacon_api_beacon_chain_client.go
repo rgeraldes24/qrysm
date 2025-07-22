@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrysm/validator"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"github.com/theQRL/qrysm/validator/client/iface"
 )
@@ -45,7 +45,7 @@ func (c beaconApiBeaconChainClient) getHeadBlockHeaders(ctx context.Context) (*b
 	return &blockHeader, nil
 }
 
-func (c beaconApiBeaconChainClient) GetChainHead(ctx context.Context, _ *empty.Empty) (*zondpb.ChainHead, error) {
+func (c beaconApiBeaconChainClient) GetChainHead(ctx context.Context, _ *empty.Empty) (*qrysmpb.ChainHead, error) {
 	const endpoint = "/qrl/v1/beacon/states/head/finality_checkpoints"
 
 	finalityCheckpoints := beacon.GetFinalityCheckpointsResponse{}
@@ -131,7 +131,7 @@ func (c beaconApiBeaconChainClient) GetChainHead(ctx context.Context, _ *empty.E
 		return nil, errors.Wrapf(err, "failed to decode head block root `%s`", blockHeader.Data.Root)
 	}
 
-	return &zondpb.ChainHead{
+	return &qrysmpb.ChainHead{
 		HeadSlot:                   primitives.Slot(headSlot),
 		HeadEpoch:                  headEpoch,
 		HeadBlockRoot:              headBlockRoot,
@@ -148,7 +148,7 @@ func (c beaconApiBeaconChainClient) GetChainHead(ctx context.Context, _ *empty.E
 	}, nil
 }
 
-func (c beaconApiBeaconChainClient) ListValidatorBalances(ctx context.Context, in *zondpb.ListValidatorBalancesRequest) (*zondpb.ValidatorBalances, error) {
+func (c beaconApiBeaconChainClient) ListValidatorBalances(ctx context.Context, in *qrysmpb.ListValidatorBalancesRequest) (*qrysmpb.ValidatorBalances, error) {
 	if c.fallbackClient != nil {
 		return c.fallbackClient.ListValidatorBalances(ctx, in)
 	}
@@ -157,7 +157,7 @@ func (c beaconApiBeaconChainClient) ListValidatorBalances(ctx context.Context, i
 	panic("beaconApiBeaconChainClient.ListValidatorBalances is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiBeaconChainClientWithFallback.")
 }
 
-func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *zondpb.ListValidatorsRequest) (*zondpb.Validators, error) {
+func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *qrysmpb.ListValidatorsRequest) (*qrysmpb.Validators, error) {
 	pageSize := in.PageSize
 
 	// We follow the gRPC behavior here, which returns a maximum of 250 results when pageSize == 0
@@ -188,7 +188,7 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *zond
 	var epoch primitives.Epoch
 
 	switch queryFilter := in.QueryFilter.(type) {
-	case *zondpb.ListValidatorsRequest_Epoch:
+	case *qrysmpb.ListValidatorsRequest_Epoch:
 		slot, err := slots.EpochStart(queryFilter.Epoch)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to get first slot for epoch `%d`", queryFilter.Epoch)
@@ -197,7 +197,7 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *zond
 			return nil, errors.Wrapf(err, "failed to get state validators for slot `%d`", slot)
 		}
 		epoch = slots.ToEpoch(slot)
-	case *zondpb.ListValidatorsRequest_Genesis:
+	case *qrysmpb.ListValidatorsRequest_Genesis:
 		if stateValidators, err = c.stateValidatorsProvider.GetStateValidatorsForSlot(ctx, 0, pubkeys, in.Indices, statuses); err != nil {
 			return nil, errors.Wrapf(err, "failed to get genesis state validators")
 		}
@@ -236,7 +236,7 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *zond
 		end = uint64(len(stateValidators.Data))
 	}
 
-	validators := make([]*zondpb.Validators_ValidatorContainer, end-start)
+	validators := make([]*qrysmpb.Validators_ValidatorContainer, end-start)
 	for idx := start; idx < end; idx++ {
 		stateValidator := stateValidators.Data[idx]
 
@@ -284,9 +284,9 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *zond
 			return nil, errors.Wrapf(err, "failed to parse validator withdrawable epoch `%s`", stateValidator.Validator.WithdrawableEpoch)
 		}
 
-		validators[idx-start] = &zondpb.Validators_ValidatorContainer{
+		validators[idx-start] = &qrysmpb.Validators_ValidatorContainer{
 			Index: primitives.ValidatorIndex(validatorIndex),
-			Validator: &zondpb.Validator{
+			Validator: &qrysmpb.Validator{
 				PublicKey:                  pubkey,
 				WithdrawalCredentials:      withdrawalCredentials,
 				EffectiveBalance:           effectiveBalance,
@@ -304,7 +304,7 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *zond
 		nextPageToken = strconv.FormatUint(pageToken+1, 10)
 	}
 
-	return &zondpb.Validators{
+	return &qrysmpb.Validators{
 		TotalSize:     int32(len(stateValidators.Data)),
 		Epoch:         epoch,
 		ValidatorList: validators,
@@ -312,7 +312,7 @@ func (c beaconApiBeaconChainClient) ListValidators(ctx context.Context, in *zond
 	}, nil
 }
 
-func (c beaconApiBeaconChainClient) GetValidatorPerformance(ctx context.Context, in *zondpb.ValidatorPerformanceRequest) (*zondpb.ValidatorPerformanceResponse, error) {
+func (c beaconApiBeaconChainClient) GetValidatorPerformance(ctx context.Context, in *qrysmpb.ValidatorPerformanceRequest) (*qrysmpb.ValidatorPerformanceResponse, error) {
 	request, err := json.Marshal(validator.ValidatorPerformanceRequest{
 		PublicKeys: in.PublicKeys,
 		Indices:    in.Indices,
@@ -331,7 +331,7 @@ func (c beaconApiBeaconChainClient) GetValidatorPerformance(ctx context.Context,
 		return nil, errors.Wrap(err, "failed to get validator performance")
 	}
 
-	return &zondpb.ValidatorPerformanceResponse{
+	return &qrysmpb.ValidatorPerformanceResponse{
 		CurrentEffectiveBalances:      resp.CurrentEffectiveBalances,
 		CorrectlyVotedSource:          resp.CorrectlyVotedSource,
 		CorrectlyVotedTarget:          resp.CorrectlyVotedTarget,

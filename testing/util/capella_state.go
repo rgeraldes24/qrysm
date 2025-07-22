@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -64,7 +64,7 @@ func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state
 }
 
 // GenesisBeaconStateCapella returns the genesis beacon state.
-func GenesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, executionNodeData *zondpb.ExecutionNodeData) (state.BeaconState, error) {
+func GenesisBeaconStateCapella(ctx context.Context, deposits []*qrysmpb.Deposit, genesisTime uint64, executionNodeData *qrysmpb.ExecutionNodeData) (state.BeaconState, error) {
 	st, err := emptyGenesisStateCapella()
 	if err != nil {
 		return nil, err
@@ -86,16 +86,16 @@ func GenesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, 
 
 // emptyGenesisStateCapella returns an empty genesis state in Capella format.
 func emptyGenesisStateCapella() (state.BeaconState, error) {
-	st := &zondpb.BeaconStateCapella{
+	st := &qrysmpb.BeaconStateCapella{
 		// Misc fields.
 		Slot: 0,
-		Fork: &zondpb.Fork{
+		Fork: &qrysmpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			Epoch:           0,
 		},
 		// Validator registry fields.
-		Validators:       []*zondpb.Validator{},
+		Validators:       []*qrysmpb.Validator{},
 		Balances:         []uint64{},
 		InactivityScores: []uint64{},
 
@@ -105,8 +105,8 @@ func emptyGenesisStateCapella() (state.BeaconState, error) {
 		PreviousEpochParticipation: []byte{},
 
 		// Eth1 data.
-		ExecutionNodeData:      &zondpb.ExecutionNodeData{},
-		ExecutionNodeDataVotes: []*zondpb.ExecutionNodeData{},
+		ExecutionNodeData:      &qrysmpb.ExecutionNodeData{},
+		ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{},
 		Eth1DepositIndex:       0,
 
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{},
@@ -114,7 +114,7 @@ func emptyGenesisStateCapella() (state.BeaconState, error) {
 	return state_native.InitializeFromProtoCapella(st)
 }
 
-func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, executionNodeData *zondpb.ExecutionNodeData) (state.BeaconState, error) {
+func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, executionNodeData *qrysmpb.ExecutionNodeData) (state.BeaconState, error) {
 	if executionNodeData == nil {
 		return nil, errors.New("no executionNodeData provided for genesis state")
 	}
@@ -162,13 +162,13 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 	if err != nil {
 		return nil, err
 	}
-	st := &zondpb.BeaconStateCapella{
+	st := &qrysmpb.BeaconStateCapella{
 		// Misc fields.
 		Slot:                  0,
 		GenesisTime:           genesisTime,
 		GenesisValidatorsRoot: genesisValidatorsRoot[:],
 
-		Fork: &zondpb.Fork{
+		Fork: &qrysmpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			Epoch:           0,
@@ -185,16 +185,16 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 		RandaoMixes: randaoMixes,
 
 		// Finality.
-		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{
+		PreviousJustifiedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{
+		CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
 		JustificationBits: []byte{0},
-		FinalizedCheckpoint: &zondpb.Checkpoint{
+		FinalizedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
@@ -206,19 +206,19 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 
 		// Eth1 data.
 		ExecutionNodeData:      executionNodeData,
-		ExecutionNodeDataVotes: []*zondpb.ExecutionNodeData{},
+		ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{},
 		Eth1DepositIndex:       preState.Eth1DepositIndex(),
 	}
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
-	bodyRoot, err := (&zondpb.BeaconBlockBodyCapella{
+	bodyRoot, err := (&qrysmpb.BeaconBlockBodyCapella{
 		RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
-		ExecutionNodeData: &zondpb.ExecutionNodeData{
+		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},
 		Graffiti: make([]byte, 32),
-		SyncAggregate: &zondpb.SyncAggregate{
+		SyncAggregate: &qrysmpb.SyncAggregate{
 			SyncCommitteeBits:       scBits[:],
 			SyncCommitteeSignatures: [][]byte{},
 		},
@@ -237,7 +237,7 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 		return nil, errors.Wrap(err, "could not hash tree root empty block body")
 	}
 
-	st.LatestBlockHeader = &zondpb.BeaconBlockHeader{
+	st.LatestBlockHeader = &qrysmpb.BeaconBlockHeader{
 		ParentRoot: zeroHash,
 		StateRoot:  zeroHash,
 		BodyRoot:   bodyRoot[:],
@@ -250,10 +250,10 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 		pubKeys = append(pubKeys, vals[j].PublicKey)
 	}
 
-	st.CurrentSyncCommittee = &zondpb.SyncCommittee{
+	st.CurrentSyncCommittee = &qrysmpb.SyncCommittee{
 		Pubkeys: pubKeys,
 	}
-	st.NextSyncCommittee = &zondpb.SyncCommittee{
+	st.NextSyncCommittee = &qrysmpb.SyncCommittee{
 		Pubkeys: pubKeys,
 	}
 
@@ -277,7 +277,7 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 func processPreGenesisDeposits(
 	ctx context.Context,
 	beaconState state.BeaconState,
-	deposits []*zondpb.Deposit,
+	deposits []*qrysmpb.Deposit,
 ) (state.BeaconState, error) {
 	var err error
 	beaconState, err = altair.ProcessDeposits(ctx, beaconState, deposits)

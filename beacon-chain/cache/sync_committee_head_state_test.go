@@ -7,13 +7,13 @@ import (
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
 func TestSyncCommitteeHeadState(t *testing.T) {
-	capellaState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
-		Fork: &zondpb.Fork{
+	capellaState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		Fork: &qrysmpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 		},

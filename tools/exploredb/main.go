@@ -25,7 +25,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	bolt "go.etcd.io/bbolt"
 )
 
@@ -521,12 +521,12 @@ func sizeAndCountGeneric(genericItems interface{}, err error) (uint64, uint64) {
 	}
 
 	switch items := genericItems.(type) {
-	case []*zondpb.ExecutionNodeData:
+	case []*qrysmpb.ExecutionNodeData:
 		for _, item := range items {
 			size += uint64(item.SizeSSZ())
 		}
 		count = uint64(len(items))
-	case []*zondpb.Validator:
+	case []*qrysmpb.Validator:
 		for _, item := range items {
 			size += uint64(item.SizeSSZ())
 		}

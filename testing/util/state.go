@@ -10,13 +10,13 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // FillRootsNaturalOptCapella is meant to be used as an option when calling NewBeaconStateCapella.
 // It fills state and block roots with hex representations of natural numbers starting with 0.
 // Example: 16 becomes 0x00...0f.
-func FillRootsNaturalOptCapella(state *zondpb.BeaconStateCapella) error {
+func FillRootsNaturalOptCapella(state *qrysmpb.BeaconStateCapella) error {
 	roots, err := PrepareRoots(int(params.BeaconConfig().SlotsPerHistoricalRoot))
 	if err != nil {
 		return err
@@ -27,39 +27,39 @@ func FillRootsNaturalOptCapella(state *zondpb.BeaconStateCapella) error {
 }
 
 // NewBeaconStateCapella creates a beacon state with minimum marshalable fields.
-func NewBeaconStateCapella(options ...func(state *zondpb.BeaconStateCapella) error) (state.BeaconState, error) {
+func NewBeaconStateCapella(options ...func(state *qrysmpb.BeaconStateCapella) error) (state.BeaconState, error) {
 	pubkeys := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	for i := range pubkeys {
 		pubkeys[i] = make([]byte, 2592)
 	}
 
-	seed := &zondpb.BeaconStateCapella{
+	seed := &qrysmpb.BeaconStateCapella{
 		BlockRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
 		StateRoots:                 filledByteSlice2D(uint64(params.BeaconConfig().SlotsPerHistoricalRoot), 32),
 		Slashings:                  make([]uint64, params.BeaconConfig().EpochsPerSlashingsVector),
 		RandaoMixes:                filledByteSlice2D(uint64(params.BeaconConfig().EpochsPerHistoricalVector), 32),
-		Validators:                 make([]*zondpb.Validator, 0),
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		ExecutionNodeData: &zondpb.ExecutionNodeData{
+		Validators:                 make([]*qrysmpb.Validator, 0),
+		CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		},
-		Fork: &zondpb.Fork{
+		Fork: &qrysmpb.Fork{
 			PreviousVersion: make([]byte, 4),
 			CurrentVersion:  make([]byte, 4),
 		},
-		ExecutionNodeDataVotes:      make([]*zondpb.ExecutionNodeData, 0),
-		HistoricalSummaries:         make([]*zondpb.HistoricalSummary, 0),
+		ExecutionNodeDataVotes:      make([]*qrysmpb.ExecutionNodeData, 0),
+		HistoricalSummaries:         make([]*qrysmpb.HistoricalSummary, 0),
 		JustificationBits:           bitfield.Bitvector4{0x0},
-		FinalizedCheckpoint:         &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		LatestBlockHeader:           HydrateBeaconHeader(&zondpb.BeaconBlockHeader{}),
-		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+		FinalizedCheckpoint:         &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+		LatestBlockHeader:           HydrateBeaconHeader(&qrysmpb.BeaconBlockHeader{}),
+		PreviousJustifiedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 		PreviousEpochParticipation:  make([]byte, 0),
 		CurrentEpochParticipation:   make([]byte, 0),
-		CurrentSyncCommittee: &zondpb.SyncCommittee{
+		CurrentSyncCommittee: &qrysmpb.SyncCommittee{
 			Pubkeys: pubkeys,
 		},
-		NextSyncCommittee: &zondpb.SyncCommittee{
+		NextSyncCommittee: &qrysmpb.SyncCommittee{
 			Pubkeys: pubkeys,
 		},
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{

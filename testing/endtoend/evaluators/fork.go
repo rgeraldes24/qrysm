@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/testing/endtoend/helpers"
 	"github.com/theQRL/qrysm/testing/endtoend/policies"
@@ -51,10 +51,10 @@ var CapellaForkTransition = types.Evaluator{
 
 func altairForkOccurs(_ *types.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconNodeValidatorClient(conn)
+	client := qrysmpb.NewBeaconNodeValidatorClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), streamDeadline)
 	defer cancel()
-	stream, err := client.StreamBlocksAltair(ctx, &zondpb.StreamBlocksRequest{VerifiedOnly: true})
+	stream, err := client.StreamBlocksAltair(ctx, &qrysmpb.StreamBlocksRequest{VerifiedOnly: true})
 	if err != nil {
 		return errors.Wrap(err, "failed to get stream")
 	}
@@ -93,10 +93,10 @@ func altairForkOccurs(_ *types.EvaluationContext, conns ...*grpc.ClientConn) err
 
 func bellatrixForkOccurs(_ *types.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconNodeValidatorClient(conn)
+	client := qrysmpb.NewBeaconNodeValidatorClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), streamDeadline)
 	defer cancel()
-	stream, err := client.StreamBlocksAltair(ctx, &zondpb.StreamBlocksRequest{VerifiedOnly: true})
+	stream, err := client.StreamBlocksAltair(ctx, &qrysmpb.StreamBlocksRequest{VerifiedOnly: true})
 	if err != nil {
 		return errors.Wrap(err, "failed to get stream")
 	}
@@ -138,10 +138,10 @@ func bellatrixForkOccurs(_ *types.EvaluationContext, conns ...*grpc.ClientConn) 
 
 func capellaForkOccurs(_ *types.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconNodeValidatorClient(conn)
+	client := qrysmpb.NewBeaconNodeValidatorClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), streamDeadline)
 	defer cancel()
-	stream, err := client.StreamBlocksAltair(ctx, &zondpb.StreamBlocksRequest{VerifiedOnly: true})
+	stream, err := client.StreamBlocksAltair(ctx, &qrysmpb.StreamBlocksRequest{VerifiedOnly: true})
 	if err != nil {
 		return errors.Wrap(err, "failed to get stream")
 	}

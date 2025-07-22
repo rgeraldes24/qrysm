@@ -8,7 +8,7 @@ import (
 	"github.com/golang/snappy"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/spectest/utils"
 	"github.com/theQRL/qrysm/testing/util"
@@ -34,7 +34,7 @@ func RunSlotProcessingTests(t *testing.T, config string) {
 			require.NoError(t, err)
 			preBeaconStateSSZ, err := snappy.Decode(nil /* dst */, preBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
-			base := &zondpb.BeaconStateCapella{}
+			base := &qrysmpb.BeaconStateCapella{}
 			require.NoError(t, base.UnmarshalSSZ(preBeaconStateSSZ), "Failed to unmarshal")
 			beaconState, err := state_native.InitializeFromProtoCapella(base)
 			require.NoError(t, err)
@@ -49,7 +49,7 @@ func RunSlotProcessingTests(t *testing.T, config string) {
 			require.NoError(t, err)
 			postBeaconStateSSZ, err := snappy.Decode(nil /* dst */, postBeaconStateFile)
 			require.NoError(t, err, "Failed to decompress")
-			postBeaconState := &zondpb.BeaconStateCapella{}
+			postBeaconState := &qrysmpb.BeaconStateCapella{}
 			require.NoError(t, postBeaconState.UnmarshalSSZ(postBeaconStateSSZ), "Failed to unmarshal")
 			postState, err := transition.ProcessSlots(context.Background(), beaconState, beaconState.Slot().Add(slotsCount))
 			require.NoError(t, err)

@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrysm/validator"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/time/slots"
@@ -35,7 +35,7 @@ func TestListValidators(t *testing.T) {
 		ctx := context.Background()
 
 		beaconChainClient := beaconApiBeaconChainClient{}
-		_, err := beaconChainClient.ListValidators(ctx, &zondpb.ListValidatorsRequest{
+		_, err := beaconChainClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{
 			PageToken: "foo",
 		})
 		assert.ErrorContains(t, "failed to parse page token `foo`", err)
@@ -47,8 +47,8 @@ func TestListValidators(t *testing.T) {
 		ctx := context.Background()
 
 		beaconChainClient := beaconApiBeaconChainClient{}
-		_, err := beaconChainClient.ListValidators(ctx, &zondpb.ListValidatorsRequest{
-			QueryFilter: &zondpb.ListValidatorsRequest_Epoch{
+		_, err := beaconChainClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{
+			QueryFilter: &qrysmpb.ListValidatorsRequest_Epoch{
 				Epoch: math.MaxUint64,
 			},
 		})
@@ -67,8 +67,8 @@ func TestListValidators(t *testing.T) {
 		)
 
 		beaconChainClient := beaconApiBeaconChainClient{stateValidatorsProvider: stateValidatorsProvider}
-		_, err := beaconChainClient.ListValidators(ctx, &zondpb.ListValidatorsRequest{
-			QueryFilter: &zondpb.ListValidatorsRequest_Epoch{
+		_, err := beaconChainClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{
+			QueryFilter: &qrysmpb.ListValidatorsRequest_Epoch{
 				Epoch: 0,
 			},
 		})
@@ -87,8 +87,8 @@ func TestListValidators(t *testing.T) {
 		)
 
 		beaconChainClient := beaconApiBeaconChainClient{stateValidatorsProvider: stateValidatorsProvider}
-		_, err := beaconChainClient.ListValidators(ctx, &zondpb.ListValidatorsRequest{
-			QueryFilter: &zondpb.ListValidatorsRequest_Genesis{},
+		_, err := beaconChainClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{
+			QueryFilter: &qrysmpb.ListValidatorsRequest_Genesis{},
 		})
 		assert.ErrorContains(t, "failed to get genesis state validators: bar error", err)
 	})
@@ -105,7 +105,7 @@ func TestListValidators(t *testing.T) {
 		)
 
 		beaconChainClient := beaconApiBeaconChainClient{stateValidatorsProvider: stateValidatorsProvider}
-		_, err := beaconChainClient.ListValidators(ctx, &zondpb.ListValidatorsRequest{
+		_, err := beaconChainClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{
 			QueryFilter: nil,
 		})
 		assert.ErrorContains(t, "failed to get head state validators: foo error", err)
@@ -132,7 +132,7 @@ func TestListValidators(t *testing.T) {
 			stateValidatorsProvider: stateValidatorsProvider,
 			jsonRestHandler:         jsonRestHandler,
 		}
-		_, err := beaconChainClient.ListValidators(ctx, &zondpb.ListValidatorsRequest{
+		_, err := beaconChainClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{
 			QueryFilter: nil,
 		})
 		assert.ErrorContains(t, "failed to get head block header: bar error", err)
@@ -211,7 +211,7 @@ func TestListValidators(t *testing.T) {
 					stateValidatorsProvider: stateValidatorsProvider,
 					jsonRestHandler:         jsonRestHandler,
 				}
-				_, err := beaconChainClient.ListValidators(ctx, &zondpb.ListValidatorsRequest{
+				_, err := beaconChainClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{
 					QueryFilter: nil,
 				})
 				assert.ErrorContains(t, testCase.expectedError, err)
@@ -341,8 +341,8 @@ func TestListValidators(t *testing.T) {
 				)
 
 				beaconChainClient := beaconApiBeaconChainClient{stateValidatorsProvider: stateValidatorsProvider}
-				_, err := beaconChainClient.ListValidators(ctx, &zondpb.ListValidatorsRequest{
-					QueryFilter: &zondpb.ListValidatorsRequest_Genesis{},
+				_, err := beaconChainClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{
+					QueryFilter: &qrysmpb.ListValidatorsRequest_Genesis{},
 				})
 				assert.ErrorContains(t, testCase.expectedError, err)
 			})
@@ -386,7 +386,7 @@ func TestListValidators(t *testing.T) {
 		testCases := []struct {
 			name                                string
 			generateJsonStateValidatorsResponse func() *beacon.GetValidatorsResponse
-			generateProtoValidatorsResponse     func() *zondpb.Validators
+			generateProtoValidatorsResponse     func() *qrysmpb.Validators
 			pubkeys                             [][]byte
 			pubkeyStrings                       []string
 			indices                             []primitives.ValidatorIndex
@@ -411,12 +411,12 @@ func TestListValidators(t *testing.T) {
 
 					return validatorsResponse
 				},
-				generateProtoValidatorsResponse: func() *zondpb.Validators {
-					validators := make([]*zondpb.Validators_ValidatorContainer, 250)
+				generateProtoValidatorsResponse: func() *qrysmpb.Validators {
+					validators := make([]*qrysmpb.Validators_ValidatorContainer, 250)
 					for idx := 0; idx < len(validators); idx++ {
-						validators[idx] = &zondpb.Validators_ValidatorContainer{
+						validators[idx] = &qrysmpb.Validators_ValidatorContainer{
 							Index: 1,
-							Validator: &zondpb.Validator{
+							Validator: &qrysmpb.Validator{
 								PublicKey:                  []byte{2},
 								WithdrawalCredentials:      []byte{3},
 								EffectiveBalance:           4,
@@ -429,7 +429,7 @@ func TestListValidators(t *testing.T) {
 						}
 					}
 
-					return &zondpb.Validators{
+					return &qrysmpb.Validators{
 						ValidatorList: validators,
 						TotalSize:     267,
 						Epoch:         0,
@@ -446,12 +446,12 @@ func TestListValidators(t *testing.T) {
 			{
 				name:                                "pageSize==1 and pageToken==0",
 				generateJsonStateValidatorsResponse: generateValidStateValidatorsResponse,
-				generateProtoValidatorsResponse: func() *zondpb.Validators {
-					return &zondpb.Validators{
-						ValidatorList: []*zondpb.Validators_ValidatorContainer{
+				generateProtoValidatorsResponse: func() *qrysmpb.Validators {
+					return &qrysmpb.Validators{
+						ValidatorList: []*qrysmpb.Validators_ValidatorContainer{
 							{
 								Index: 1,
-								Validator: &zondpb.Validator{
+								Validator: &qrysmpb.Validator{
 									PublicKey:                  []byte{2},
 									WithdrawalCredentials:      []byte{3},
 									EffectiveBalance:           4,
@@ -474,12 +474,12 @@ func TestListValidators(t *testing.T) {
 			{
 				name:                                "pageSize==2 and pageToken==0",
 				generateJsonStateValidatorsResponse: generateValidStateValidatorsResponse,
-				generateProtoValidatorsResponse: func() *zondpb.Validators {
-					return &zondpb.Validators{
-						ValidatorList: []*zondpb.Validators_ValidatorContainer{
+				generateProtoValidatorsResponse: func() *qrysmpb.Validators {
+					return &qrysmpb.Validators{
+						ValidatorList: []*qrysmpb.Validators_ValidatorContainer{
 							{
 								Index: 1,
-								Validator: &zondpb.Validator{
+								Validator: &qrysmpb.Validator{
 									PublicKey:                  []byte{2},
 									WithdrawalCredentials:      []byte{3},
 									EffectiveBalance:           4,
@@ -492,7 +492,7 @@ func TestListValidators(t *testing.T) {
 							},
 							{
 								Index: 9,
-								Validator: &zondpb.Validator{
+								Validator: &qrysmpb.Validator{
 									PublicKey:                  []byte{10},
 									WithdrawalCredentials:      []byte{11},
 									EffectiveBalance:           12,
@@ -515,12 +515,12 @@ func TestListValidators(t *testing.T) {
 			{
 				name:                                "pageSize==1 and pageToken==1",
 				generateJsonStateValidatorsResponse: generateValidStateValidatorsResponse,
-				generateProtoValidatorsResponse: func() *zondpb.Validators {
-					return &zondpb.Validators{
-						ValidatorList: []*zondpb.Validators_ValidatorContainer{
+				generateProtoValidatorsResponse: func() *qrysmpb.Validators {
+					return &qrysmpb.Validators{
+						ValidatorList: []*qrysmpb.Validators_ValidatorContainer{
 							{
 								Index: 9,
-								Validator: &zondpb.Validator{
+								Validator: &qrysmpb.Validator{
 									PublicKey:                  []byte{10},
 									WithdrawalCredentials:      []byte{11},
 									EffectiveBalance:           12,
@@ -543,9 +543,9 @@ func TestListValidators(t *testing.T) {
 			{
 				name:                                "pageSize==1 and pageToken==2",
 				generateJsonStateValidatorsResponse: generateValidStateValidatorsResponse,
-				generateProtoValidatorsResponse: func() *zondpb.Validators {
-					return &zondpb.Validators{
-						ValidatorList: []*zondpb.Validators_ValidatorContainer{},
+				generateProtoValidatorsResponse: func() *qrysmpb.Validators {
+					return &qrysmpb.Validators{
+						ValidatorList: []*qrysmpb.Validators_ValidatorContainer{},
 						TotalSize:     2,
 						Epoch:         0,
 						NextPageToken: "",
@@ -569,8 +569,8 @@ func TestListValidators(t *testing.T) {
 				)
 
 				beaconChainClient := beaconApiBeaconChainClient{stateValidatorsProvider: stateValidatorsProvider}
-				validators, err := beaconChainClient.ListValidators(ctx, &zondpb.ListValidatorsRequest{
-					QueryFilter: &zondpb.ListValidatorsRequest_Genesis{},
+				validators, err := beaconChainClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{
+					QueryFilter: &qrysmpb.ListValidatorsRequest_Genesis{},
 					PublicKeys:  [][]byte{},
 					Indices:     []primitives.ValidatorIndex{},
 					Active:      false,
@@ -910,7 +910,7 @@ func TestGetChainHead(t *testing.T) {
 		expectedFinalizedSlot, err := slots.EpochStart(5)
 		require.NoError(t, err)
 
-		expectedChainHead := &zondpb.ChainHead{
+		expectedChainHead := &qrysmpb.ChainHead{
 			PreviousJustifiedEpoch:     1,
 			PreviousJustifiedBlockRoot: []byte{2},
 			PreviousJustifiedSlot:      expectedPreviousJustifiedSlot,
@@ -949,7 +949,7 @@ func Test_beaconApiBeaconChainClient_GetValidatorPerformance(t *testing.T) {
 	require.NoError(t, err)
 
 	wantResponse := &validator.ValidatorPerformanceResponse{}
-	want := &zondpb.ValidatorPerformanceResponse{}
+	want := &qrysmpb.ValidatorPerformanceResponse{}
 	jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 	jsonRestHandler.EXPECT().PostRestJson(
 		ctx,
@@ -966,7 +966,7 @@ func Test_beaconApiBeaconChainClient_GetValidatorPerformance(t *testing.T) {
 		jsonRestHandler: jsonRestHandler,
 	}
 
-	got, err := c.GetValidatorPerformance(ctx, &zondpb.ValidatorPerformanceRequest{
+	got, err := c.GetValidatorPerformance(ctx, &qrysmpb.ValidatorPerformanceRequest{
 		PublicKeys: [][]byte{publicKeys[0][:], publicKeys[2][:], publicKeys[1][:]},
 	})
 	require.NoError(t, err)

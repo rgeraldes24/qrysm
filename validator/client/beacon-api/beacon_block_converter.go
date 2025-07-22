@@ -10,17 +10,17 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 type beaconBlockConverter interface {
-	ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*zondpb.BeaconBlockCapella, error)
+	ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*qrysmpb.BeaconBlockCapella, error)
 }
 
 type beaconApiBeaconBlockConverter struct{}
 
 // ConvertRESTCapellaBlockToProto converts a Capella JSON beacon block to its protobuf equivalent
-func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*zondpb.BeaconBlockCapella, error) {
+func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *apimiddleware.BeaconBlockCapellaJson) (*qrysmpb.BeaconBlockCapella, error) {
 	if block.Body == nil {
 		return nil, errors.New("block body is nil")
 	}
@@ -208,14 +208,14 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 		return nil, errors.Wrap(err, "failed to get dilithium to execution changes")
 	}
 
-	return &zondpb.BeaconBlockCapella{
+	return &qrysmpb.BeaconBlockCapella{
 		Slot:          primitives.Slot(blockSlot),
 		ProposerIndex: primitives.ValidatorIndex(blockProposerIndex),
 		ParentRoot:    parentRoot,
 		StateRoot:     stateRoot,
-		Body: &zondpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyCapella{
 			RandaoReveal: randaoReveal,
-			ExecutionNodeData: &zondpb.ExecutionNodeData{
+			ExecutionNodeData: &qrysmpb.ExecutionNodeData{
 				DepositRoot:  depositRoot,
 				DepositCount: depositCount,
 				BlockHash:    blockHash,
@@ -226,7 +226,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 			Attestations:      attestations,
 			Deposits:          deposits,
 			VoluntaryExits:    voluntaryExits,
-			SyncAggregate: &zondpb.SyncAggregate{
+			SyncAggregate: &qrysmpb.SyncAggregate{
 				SyncCommitteeBits:       syncCommitteeBits,
 				SyncCommitteeSignatures: syncCommitteeSignatures,
 			},

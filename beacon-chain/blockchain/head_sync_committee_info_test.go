@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 	"github.com/theQRL/qrysm/time/slots"
@@ -53,7 +53,7 @@ func TestService_headCurrentSyncCommitteeIndices(t *testing.T) {
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
 		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, field_params.DilithiumPubkeyLength))
 	}
-	syncCommittee := &zondpb.SyncCommittee{
+	syncCommittee := &qrysmpb.SyncCommittee{
 		Pubkeys: pubKeys,
 	}
 	require.NoError(t, s.SetCurrentSyncCommittee(syncCommittee))
@@ -80,7 +80,7 @@ func TestService_headNextSyncCommitteeIndices(t *testing.T) {
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
 		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, field_params.DilithiumPubkeyLength))
 	}
-	syncCommittee := &zondpb.SyncCommittee{
+	syncCommittee := &qrysmpb.SyncCommittee{
 		Pubkeys: pubKeys,
 	}
 	require.NoError(t, s.SetCurrentSyncCommittee(syncCommittee))

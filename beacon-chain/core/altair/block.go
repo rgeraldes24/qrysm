@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"golang.org/x/sync/errgroup"
 )
@@ -47,7 +47,7 @@ import (
 //	        increase_balance(state, get_beacon_proposer_index(state), proposer_reward)
 //	    else:
 //	        decrease_balance(state, participant_index, participant_reward)
-func ProcessSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb.SyncAggregate) (state.BeaconState, uint64, error) {
+func ProcessSyncAggregate(ctx context.Context, s state.BeaconState, sync *qrysmpb.SyncAggregate) (state.BeaconState, uint64, error) {
 	s, votedKeys, reward, err := processSyncAggregate(ctx, s, sync)
 	if err != nil {
 		return nil, 0, errors.Wrap(err, "could not filter sync committee votes")
@@ -63,7 +63,7 @@ func ProcessSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb
 // verifying the Dilithium signatures. It returns the modified beacons state, the list of validators'
 // public keys that voted (for future signature verification) and the proposer reward for including
 // sync aggregate messages.
-func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *zondpb.SyncAggregate) (
+func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *qrysmpb.SyncAggregate) (
 	state.BeaconState,
 	[]dilithium.PublicKey,
 	uint64,

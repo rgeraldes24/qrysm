@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/validator/client/beacon-api/mock"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -25,7 +25,7 @@ func TestGetGenesis(t *testing.T) {
 		depositContractResponse apimiddleware.DepositContractResponseJson
 		depositContractError    error
 		queriesDepositContract  bool
-		expectedResponse        *zondpb.Genesis
+		expectedResponse        *qrysmpb.Genesis
 		expectedError           string
 	}{
 		{
@@ -97,7 +97,7 @@ func TestGetGenesis(t *testing.T) {
 					Address: hexutil.Encode([]byte{3}),
 				},
 			},
-			expectedResponse: &zondpb.Genesis{
+			expectedResponse: &qrysmpb.Genesis{
 				GenesisTime: &timestamppb.Timestamp{
 					Seconds: 654812,
 				},
@@ -161,7 +161,7 @@ func TestGetSyncStatus(t *testing.T) {
 		name                 string
 		restEndpointResponse apimiddleware.SyncingResponseJson
 		restEndpointError    error
-		expectedResponse     *zondpb.SyncStatus
+		expectedResponse     *qrysmpb.SyncStatus
 		expectedError        string
 	}{
 		{
@@ -181,7 +181,7 @@ func TestGetSyncStatus(t *testing.T) {
 					IsSyncing: false,
 				},
 			},
-			expectedResponse: &zondpb.SyncStatus{
+			expectedResponse: &qrysmpb.SyncStatus{
 				Syncing: false,
 			},
 		},
@@ -192,7 +192,7 @@ func TestGetSyncStatus(t *testing.T) {
 					IsSyncing: true,
 				},
 			},
-			expectedResponse: &zondpb.SyncStatus{
+			expectedResponse: &qrysmpb.SyncStatus{
 				Syncing: true,
 			},
 		},
@@ -237,7 +237,7 @@ func TestGetVersion(t *testing.T) {
 		name                 string
 		restEndpointResponse apimiddleware.VersionResponseJson
 		restEndpointError    error
-		expectedResponse     *zondpb.Version
+		expectedResponse     *qrysmpb.Version
 		expectedError        string
 	}{
 		{
@@ -257,7 +257,7 @@ func TestGetVersion(t *testing.T) {
 					Version: "qrysm/local",
 				},
 			},
-			expectedResponse: &zondpb.Version{
+			expectedResponse: &qrysmpb.Version{
 				Version: "qrysm/local",
 			},
 		},

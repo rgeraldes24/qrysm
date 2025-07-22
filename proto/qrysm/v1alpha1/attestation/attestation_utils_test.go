@@ -10,8 +10,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/dilithium/common"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -19,19 +18,19 @@ import (
 
 func TestConvertToIndexed(t *testing.T) {
 	type args struct {
-		attestation *zondpb.Attestation
+		attestation *qrysmpb.Attestation
 		committee   []primitives.ValidatorIndex
 	}
 	tests := []struct {
 		name string
 		args args
-		want *zondpb.IndexedAttestation
+		want *qrysmpb.IndexedAttestation
 		err  string
 	}{
 		{
 			name: "missing signatures",
 			args: args{
-				attestation: &zondpb.Attestation{
+				attestation: &qrysmpb.Attestation{
 					AggregationBits: bitfield.Bitlist{0b1111},
 					Signatures:      [][]byte{[]byte("sig0"), []byte("sig1")},
 				},
@@ -42,7 +41,7 @@ func TestConvertToIndexed(t *testing.T) {
 		{
 			name: "Invalid bit length",
 			args: args{
-				attestation: &zondpb.Attestation{
+				attestation: &qrysmpb.Attestation{
 					AggregationBits: bitfield.Bitlist{0b11111},
 					Signatures:      [][]byte{[]byte("sig0"), []byte("sig1"), []byte("sig2")},
 				},
@@ -53,13 +52,13 @@ func TestConvertToIndexed(t *testing.T) {
 		{
 			name: "Full committee attested",
 			args: args{
-				attestation: &zondpb.Attestation{
+				attestation: &qrysmpb.Attestation{
 					AggregationBits: bitfield.Bitlist{0b1111},
 					Signatures:      [][]byte{[]byte("sig0"), []byte("sig1"), []byte("sig2")},
 				},
 				committee: []primitives.ValidatorIndex{25, 30, 17},
 			},
-			want: &zondpb.IndexedAttestation{
+			want: &qrysmpb.IndexedAttestation{
 				AttestingIndices: []uint64{17, 25, 30},
 				Signatures:       [][]byte{[]byte("sig2"), []byte("sig0"), []byte("sig1")},
 			},
@@ -67,13 +66,13 @@ func TestConvertToIndexed(t *testing.T) {
 		{
 			name: "Partial committee attested",
 			args: args{
-				attestation: &zondpb.Attestation{
+				attestation: &qrysmpb.Attestation{
 					AggregationBits: bitfield.Bitlist{0b1101},
 					Signatures:      [][]byte{[]byte("sig0"), []byte("sig2")},
 				},
 				committee: []primitives.ValidatorIndex{40, 50, 60},
 			},
-			want: &zondpb.IndexedAttestation{
+			want: &qrysmpb.IndexedAttestation{
 				AttestingIndices: []uint64{40, 60},
 				Signatures:       [][]byte{[]byte("sig0"), []byte("sig2")},
 			},
@@ -153,14 +152,14 @@ func TestAttestingIndices(t *testing.T) {
 func TestIsValidAttestationIndices(t *testing.T) {
 	tests := []struct {
 		name      string
-		att       *zond.IndexedAttestation
+		att       *qrysmpb.IndexedAttestation
 		wantedErr string
 	}{
 		{
 			name: "Indices should not be nil",
-			att: &zond.IndexedAttestation{
-				Data: &zond.AttestationData{
-					Target: &zond.Checkpoint{},
+			att: &qrysmpb.IndexedAttestation{
+				Data: &qrysmpb.AttestationData{
+					Target: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -168,10 +167,10 @@ func TestIsValidAttestationIndices(t *testing.T) {
 		},
 		{
 			name: "Indices should be non-empty",
-			att: &zond.IndexedAttestation{
+			att: &qrysmpb.IndexedAttestation{
 				AttestingIndices: []uint64{},
-				Data: &zond.AttestationData{
-					Target: &zond.Checkpoint{},
+				Data: &qrysmpb.AttestationData{
+					Target: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -179,10 +178,10 @@ func TestIsValidAttestationIndices(t *testing.T) {
 		},
 		{
 			name: "Greater than max validators per committee",
-			att: &zond.IndexedAttestation{
+			att: &qrysmpb.IndexedAttestation{
 				AttestingIndices: make([]uint64, params.BeaconConfig().MaxValidatorsPerCommittee+1),
-				Data: &zond.AttestationData{
-					Target: &zond.Checkpoint{},
+				Data: &qrysmpb.AttestationData{
+					Target: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -190,10 +189,10 @@ func TestIsValidAttestationIndices(t *testing.T) {
 		},
 		{
 			name: "Needs to be sorted",
-			att: &zond.IndexedAttestation{
+			att: &qrysmpb.IndexedAttestation{
 				AttestingIndices: []uint64{3, 2, 1},
-				Data: &zond.AttestationData{
-					Target: &zond.Checkpoint{},
+				Data: &qrysmpb.AttestationData{
+					Target: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -201,10 +200,10 @@ func TestIsValidAttestationIndices(t *testing.T) {
 		},
 		{
 			name: "unique indices",
-			att: &zondpb.IndexedAttestation{
+			att: &qrysmpb.IndexedAttestation{
 				AttestingIndices: []uint64{1, 2, 3, 3},
-				Data: &zondpb.AttestationData{
-					Target: &zondpb.Checkpoint{},
+				Data: &qrysmpb.AttestationData{
+					Target: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -212,30 +211,30 @@ func TestIsValidAttestationIndices(t *testing.T) {
 		},
 		{
 			name: "Valid indices",
-			att: &zond.IndexedAttestation{
+			att: &qrysmpb.IndexedAttestation{
 				AttestingIndices: []uint64{1, 2, 3},
-				Data: &zond.AttestationData{
-					Target: &zond.Checkpoint{},
+				Data: &qrysmpb.AttestationData{
+					Target: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
 		},
 		{
 			name: "Valid indices with length of 2",
-			att: &zond.IndexedAttestation{
+			att: &qrysmpb.IndexedAttestation{
 				AttestingIndices: []uint64{1, 2},
-				Data: &zond.AttestationData{
-					Target: &zond.Checkpoint{},
+				Data: &qrysmpb.AttestationData{
+					Target: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
 		},
 		{
 			name: "Valid indices with length of 1",
-			att: &zond.IndexedAttestation{
+			att: &qrysmpb.IndexedAttestation{
 				AttestingIndices: []uint64{1},
-				Data: &zond.AttestationData{
-					Target: &zond.Checkpoint{},
+				Data: &qrysmpb.AttestationData{
+					Target: &qrysmpb.Checkpoint{},
 				},
 				Signatures: [][]byte{},
 			},
@@ -269,10 +268,10 @@ func BenchmarkIsValidAttestationIndices(b *testing.B) {
 	for i := 0; i < len(indices); i++ {
 		indices[i] = uint64(i)
 	}
-	att := &zond.IndexedAttestation{
+	att := &qrysmpb.IndexedAttestation{
 		AttestingIndices: indices,
-		Data: &zond.AttestationData{
-			Target: &zond.Checkpoint{},
+		Data: &qrysmpb.AttestationData{
+			Target: &qrysmpb.Checkpoint{},
 		},
 		Signatures: [][]byte{},
 	}
@@ -287,35 +286,35 @@ func BenchmarkIsValidAttestationIndices(b *testing.B) {
 func TestAttDataIsEqual(t *testing.T) {
 	type test struct {
 		name     string
-		attData1 *zond.AttestationData
-		attData2 *zond.AttestationData
+		attData1 *qrysmpb.AttestationData
+		attData2 *qrysmpb.AttestationData
 		equal    bool
 	}
 	tests := []test{
 		{
 			name: "same",
-			attData1: &zond.AttestationData{
+			attData1: &qrysmpb.AttestationData{
 				Slot:            5,
 				CommitteeIndex:  2,
 				BeaconBlockRoot: []byte("great block"),
-				Source: &zond.Checkpoint{
+				Source: &qrysmpb.Checkpoint{
 					Epoch: 4,
 					Root:  []byte("good source"),
 				},
-				Target: &zond.Checkpoint{
+				Target: &qrysmpb.Checkpoint{
 					Epoch: 10,
 					Root:  []byte("good target"),
 				},
 			},
-			attData2: &zond.AttestationData{
+			attData2: &qrysmpb.AttestationData{
 				Slot:            5,
 				CommitteeIndex:  2,
 				BeaconBlockRoot: []byte("great block"),
-				Source: &zond.Checkpoint{
+				Source: &qrysmpb.Checkpoint{
 					Epoch: 4,
 					Root:  []byte("good source"),
 				},
-				Target: &zond.Checkpoint{
+				Target: &qrysmpb.Checkpoint{
 					Epoch: 10,
 					Root:  []byte("good target"),
 				},
@@ -324,28 +323,28 @@ func TestAttDataIsEqual(t *testing.T) {
 		},
 		{
 			name: "diff slot",
-			attData1: &zond.AttestationData{
+			attData1: &qrysmpb.AttestationData{
 				Slot:            5,
 				CommitteeIndex:  2,
 				BeaconBlockRoot: []byte("great block"),
-				Source: &zond.Checkpoint{
+				Source: &qrysmpb.Checkpoint{
 					Epoch: 4,
 					Root:  []byte("good source"),
 				},
-				Target: &zond.Checkpoint{
+				Target: &qrysmpb.Checkpoint{
 					Epoch: 10,
 					Root:  []byte("good target"),
 				},
 			},
-			attData2: &zond.AttestationData{
+			attData2: &qrysmpb.AttestationData{
 				Slot:            4,
 				CommitteeIndex:  2,
 				BeaconBlockRoot: []byte("great block"),
-				Source: &zond.Checkpoint{
+				Source: &qrysmpb.Checkpoint{
 					Epoch: 4,
 					Root:  []byte("good source"),
 				},
-				Target: &zond.Checkpoint{
+				Target: &qrysmpb.Checkpoint{
 					Epoch: 10,
 					Root:  []byte("good target"),
 				},
@@ -353,28 +352,28 @@ func TestAttDataIsEqual(t *testing.T) {
 		},
 		{
 			name: "diff block",
-			attData1: &zond.AttestationData{
+			attData1: &qrysmpb.AttestationData{
 				Slot:            5,
 				CommitteeIndex:  2,
 				BeaconBlockRoot: []byte("good block"),
-				Source: &zond.Checkpoint{
+				Source: &qrysmpb.Checkpoint{
 					Epoch: 4,
 					Root:  []byte("good source"),
 				},
-				Target: &zond.Checkpoint{
+				Target: &qrysmpb.Checkpoint{
 					Epoch: 10,
 					Root:  []byte("good target"),
 				},
 			},
-			attData2: &zond.AttestationData{
+			attData2: &qrysmpb.AttestationData{
 				Slot:            5,
 				CommitteeIndex:  2,
 				BeaconBlockRoot: []byte("great block"),
-				Source: &zond.Checkpoint{
+				Source: &qrysmpb.Checkpoint{
 					Epoch: 4,
 					Root:  []byte("good source"),
 				},
-				Target: &zond.Checkpoint{
+				Target: &qrysmpb.Checkpoint{
 					Epoch: 10,
 					Root:  []byte("good target"),
 				},
@@ -382,28 +381,28 @@ func TestAttDataIsEqual(t *testing.T) {
 		},
 		{
 			name: "diff source root",
-			attData1: &zond.AttestationData{
+			attData1: &qrysmpb.AttestationData{
 				Slot:            5,
 				CommitteeIndex:  2,
 				BeaconBlockRoot: []byte("great block"),
-				Source: &zond.Checkpoint{
+				Source: &qrysmpb.Checkpoint{
 					Epoch: 4,
 					Root:  []byte("good source"),
 				},
-				Target: &zond.Checkpoint{
+				Target: &qrysmpb.Checkpoint{
 					Epoch: 10,
 					Root:  []byte("good target"),
 				},
 			},
-			attData2: &zond.AttestationData{
+			attData2: &qrysmpb.AttestationData{
 				Slot:            5,
 				CommitteeIndex:  2,
 				BeaconBlockRoot: []byte("great block"),
-				Source: &zond.Checkpoint{
+				Source: &qrysmpb.Checkpoint{
 					Epoch: 4,
 					Root:  []byte("bad source"),
 				},
-				Target: &zond.Checkpoint{
+				Target: &qrysmpb.Checkpoint{
 					Epoch: 10,
 					Root:  []byte("good target"),
 				},
@@ -420,18 +419,18 @@ func TestAttDataIsEqual(t *testing.T) {
 func TestCheckPointIsEqual(t *testing.T) {
 	type test struct {
 		name     string
-		checkPt1 *zond.Checkpoint
-		checkPt2 *zond.Checkpoint
+		checkPt1 *qrysmpb.Checkpoint
+		checkPt2 *qrysmpb.Checkpoint
 		equal    bool
 	}
 	tests := []test{
 		{
 			name: "same",
-			checkPt1: &zond.Checkpoint{
+			checkPt1: &qrysmpb.Checkpoint{
 				Epoch: 4,
 				Root:  []byte("good source"),
 			},
-			checkPt2: &zond.Checkpoint{
+			checkPt2: &qrysmpb.Checkpoint{
 				Epoch: 4,
 				Root:  []byte("good source"),
 			},
@@ -439,11 +438,11 @@ func TestCheckPointIsEqual(t *testing.T) {
 		},
 		{
 			name: "diff epoch",
-			checkPt1: &zond.Checkpoint{
+			checkPt1: &qrysmpb.Checkpoint{
 				Epoch: 4,
 				Root:  []byte("good source"),
 			},
-			checkPt2: &zond.Checkpoint{
+			checkPt2: &qrysmpb.Checkpoint{
 				Epoch: 5,
 				Root:  []byte("good source"),
 			},
@@ -451,11 +450,11 @@ func TestCheckPointIsEqual(t *testing.T) {
 		},
 		{
 			name: "diff root",
-			checkPt1: &zond.Checkpoint{
+			checkPt1: &qrysmpb.Checkpoint{
 				Epoch: 4,
 				Root:  []byte("good source"),
 			},
-			checkPt2: &zond.Checkpoint{
+			checkPt2: &qrysmpb.Checkpoint{
 				Epoch: 4,
 				Root:  []byte("bad source"),
 			},
@@ -470,28 +469,28 @@ func TestCheckPointIsEqual(t *testing.T) {
 }
 
 func BenchmarkAttDataIsEqual(b *testing.B) {
-	attData1 := &zond.AttestationData{
+	attData1 := &qrysmpb.AttestationData{
 		Slot:            5,
 		CommitteeIndex:  2,
 		BeaconBlockRoot: []byte("great block"),
-		Source: &zond.Checkpoint{
+		Source: &qrysmpb.Checkpoint{
 			Epoch: 4,
 			Root:  []byte("good source"),
 		},
-		Target: &zond.Checkpoint{
+		Target: &qrysmpb.Checkpoint{
 			Epoch: 10,
 			Root:  []byte("good target"),
 		},
 	}
-	attData2 := &zond.AttestationData{
+	attData2 := &qrysmpb.AttestationData{
 		Slot:            5,
 		CommitteeIndex:  2,
 		BeaconBlockRoot: []byte("great block"),
-		Source: &zond.Checkpoint{
+		Source: &qrysmpb.Checkpoint{
 			Epoch: 4,
 			Root:  []byte("good source"),
 		},
-		Target: &zond.Checkpoint{
+		Target: &qrysmpb.Checkpoint{
 			Epoch: 10,
 			Root:  []byte("good target"),
 		},
@@ -521,7 +520,7 @@ func TestVerifyIndexedAttestationSigs(t *testing.T) {
 	pk1, _ := dilithium.PublicKeyFromBytes(rawPk1)
 
 	type args struct {
-		idxAtt  *zondpb.IndexedAttestation
+		idxAtt  *qrysmpb.IndexedAttestation
 		pubKeys []common.PublicKey
 		domain  []byte
 	}
@@ -533,17 +532,17 @@ func TestVerifyIndexedAttestationSigs(t *testing.T) {
 		{
 			name: "nothing to verify",
 			args: args{
-				idxAtt: &zondpb.IndexedAttestation{
+				idxAtt: &qrysmpb.IndexedAttestation{
 					AttestingIndices: []uint64{0, 1},
-					Data: &zondpb.AttestationData{
+					Data: &qrysmpb.AttestationData{
 						Slot:            5,
 						CommitteeIndex:  2,
 						BeaconBlockRoot: []byte("11111111111111111111111111111111"), // 32 bytes
-						Source: &zondpb.Checkpoint{
+						Source: &qrysmpb.Checkpoint{
 							Epoch: 4,
 							Root:  []byte("11111111111111111111111111111111"), // 32 bytes
 						},
-						Target: &zondpb.Checkpoint{
+						Target: &qrysmpb.Checkpoint{
 							Epoch: 10,
 							Root:  []byte("11111111111111111111111111111111"), // 32 bytes
 						},
@@ -557,17 +556,17 @@ func TestVerifyIndexedAttestationSigs(t *testing.T) {
 		{
 			name: "missing signature",
 			args: args{
-				idxAtt: &zondpb.IndexedAttestation{
+				idxAtt: &qrysmpb.IndexedAttestation{
 					AttestingIndices: []uint64{0, 1},
-					Data: &zondpb.AttestationData{
+					Data: &qrysmpb.AttestationData{
 						Slot:            5,
 						CommitteeIndex:  2,
 						BeaconBlockRoot: []byte("11111111111111111111111111111111"), // 32 bytes
-						Source: &zondpb.Checkpoint{
+						Source: &qrysmpb.Checkpoint{
 							Epoch: 4,
 							Root:  []byte("11111111111111111111111111111111"), // 32 bytes
 						},
-						Target: &zondpb.Checkpoint{
+						Target: &qrysmpb.Checkpoint{
 							Epoch: 10,
 							Root:  []byte("11111111111111111111111111111111"), // 32 bytes
 						},
@@ -582,17 +581,17 @@ func TestVerifyIndexedAttestationSigs(t *testing.T) {
 		{
 			name: "missing pubkey",
 			args: args{
-				idxAtt: &zondpb.IndexedAttestation{
+				idxAtt: &qrysmpb.IndexedAttestation{
 					AttestingIndices: []uint64{0, 1},
-					Data: &zondpb.AttestationData{
+					Data: &qrysmpb.AttestationData{
 						Slot:            5,
 						CommitteeIndex:  2,
 						BeaconBlockRoot: []byte("11111111111111111111111111111111"), // 32 bytes
-						Source: &zondpb.Checkpoint{
+						Source: &qrysmpb.Checkpoint{
 							Epoch: 4,
 							Root:  []byte("11111111111111111111111111111111"), // 32 bytes
 						},
-						Target: &zondpb.Checkpoint{
+						Target: &qrysmpb.Checkpoint{
 							Epoch: 10,
 							Root:  []byte("11111111111111111111111111111111"), // 32 bytes
 						},
@@ -607,17 +606,17 @@ func TestVerifyIndexedAttestationSigs(t *testing.T) {
 		{
 			name: "valid Indexed Attestation",
 			args: args{
-				idxAtt: &zondpb.IndexedAttestation{
+				idxAtt: &qrysmpb.IndexedAttestation{
 					AttestingIndices: []uint64{0, 1},
-					Data: &zondpb.AttestationData{
+					Data: &qrysmpb.AttestationData{
 						Slot:            5,
 						CommitteeIndex:  2,
 						BeaconBlockRoot: []byte("11111111111111111111111111111111"), // 32 bytes
-						Source: &zondpb.Checkpoint{
+						Source: &qrysmpb.Checkpoint{
 							Epoch: 4,
 							Root:  []byte("11111111111111111111111111111111"), // 32 bytes
 						},
-						Target: &zondpb.Checkpoint{
+						Target: &qrysmpb.Checkpoint{
 							Epoch: 10,
 							Root:  []byte("11111111111111111111111111111111"), // 32 bytes
 						},

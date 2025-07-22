@@ -8,7 +8,7 @@ import (
 	fssz "github.com/prysmaticlabs/fastssz"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	common "github.com/theQRL/qrysm/testing/spectest/shared/common/ssz_static"
 )
@@ -20,9 +20,9 @@ func RunSSZStaticTests(t *testing.T, config string) {
 
 func customHtr(t *testing.T, htrs []common.HTR, object interface{}) []common.HTR {
 	switch object.(type) {
-	case *zondpb.BeaconStateCapella:
+	case *qrysmpb.BeaconStateCapella:
 		htrs = append(htrs, func(s interface{}) ([32]byte, error) {
-			beaconState, err := state_native.InitializeFromProtoCapella(s.(*zondpb.BeaconStateCapella))
+			beaconState, err := state_native.InitializeFromProtoCapella(s.(*qrysmpb.BeaconStateCapella))
 			require.NoError(t, err)
 			return beaconState.HashTreeRoot(context.Background())
 		})
@@ -39,79 +39,79 @@ func unmarshalledSSZ(t *testing.T, serializedBytes []byte, folderName string) (i
 	case "ExecutionPayloadHeader":
 		obj = &enginev1.ExecutionPayloadHeaderCapella{}
 	case "Attestation":
-		obj = &zondpb.Attestation{}
+		obj = &qrysmpb.Attestation{}
 	case "AttestationData":
-		obj = &zondpb.AttestationData{}
+		obj = &qrysmpb.AttestationData{}
 	case "AttesterSlashing":
-		obj = &zondpb.AttesterSlashing{}
+		obj = &qrysmpb.AttesterSlashing{}
 	case "AggregateAndProof":
-		obj = &zondpb.AggregateAttestationAndProof{}
+		obj = &qrysmpb.AggregateAttestationAndProof{}
 	case "BeaconBlock":
-		obj = &zondpb.BeaconBlockCapella{}
+		obj = &qrysmpb.BeaconBlockCapella{}
 	case "BeaconBlockBody":
-		obj = &zondpb.BeaconBlockBodyCapella{}
+		obj = &qrysmpb.BeaconBlockBodyCapella{}
 	case "BeaconBlockHeader":
-		obj = &zondpb.BeaconBlockHeader{}
+		obj = &qrysmpb.BeaconBlockHeader{}
 	case "BeaconState":
-		obj = &zondpb.BeaconStateCapella{}
+		obj = &qrysmpb.BeaconStateCapella{}
 	case "Checkpoint":
-		obj = &zondpb.Checkpoint{}
+		obj = &qrysmpb.Checkpoint{}
 	case "Deposit":
-		obj = &zondpb.Deposit{}
+		obj = &qrysmpb.Deposit{}
 	case "DepositMessage":
-		obj = &zondpb.DepositMessage{}
+		obj = &qrysmpb.DepositMessage{}
 	case "DepositData":
-		obj = &zondpb.Deposit_Data{}
+		obj = &qrysmpb.Deposit_Data{}
 	case "ExecutionNodeData":
-		obj = &zondpb.ExecutionNodeData{}
+		obj = &qrysmpb.ExecutionNodeData{}
 	case "Eth1Block":
 		t.Skip("Unused type")
 		return nil, nil
 	case "Fork":
-		obj = &zondpb.Fork{}
+		obj = &qrysmpb.Fork{}
 	case "ForkData":
-		obj = &zondpb.ForkData{}
+		obj = &qrysmpb.ForkData{}
 	case "HistoricalBatch":
-		obj = &zondpb.HistoricalBatch{}
+		obj = &qrysmpb.HistoricalBatch{}
 	case "IndexedAttestation":
-		obj = &zondpb.IndexedAttestation{}
+		obj = &qrysmpb.IndexedAttestation{}
 	case "LightClientHeader":
 		t.Skip("not a beacon node type, this is a light node type")
 		return nil, nil
 	case "PendingAttestation":
-		obj = &zondpb.PendingAttestation{}
+		obj = &qrysmpb.PendingAttestation{}
 	case "ProposerSlashing":
-		obj = &zondpb.ProposerSlashing{}
+		obj = &qrysmpb.ProposerSlashing{}
 	case "SignedAggregateAndProof":
-		obj = &zondpb.SignedAggregateAttestationAndProof{}
+		obj = &qrysmpb.SignedAggregateAttestationAndProof{}
 	case "SignedBeaconBlock":
-		obj = &zondpb.SignedBeaconBlockCapella{}
+		obj = &qrysmpb.SignedBeaconBlockCapella{}
 	case "SignedBeaconBlockHeader":
-		obj = &zondpb.SignedBeaconBlockHeader{}
+		obj = &qrysmpb.SignedBeaconBlockHeader{}
 	case "SignedVoluntaryExit":
-		obj = &zondpb.SignedVoluntaryExit{}
+		obj = &qrysmpb.SignedVoluntaryExit{}
 	case "SigningData":
-		obj = &zondpb.SigningData{}
+		obj = &qrysmpb.SigningData{}
 	case "Validator":
-		obj = &zondpb.Validator{}
+		obj = &qrysmpb.Validator{}
 	case "VoluntaryExit":
-		obj = &zondpb.VoluntaryExit{}
+		obj = &qrysmpb.VoluntaryExit{}
 	case "SyncCommitteeMessage":
-		obj = &zondpb.SyncCommitteeMessage{}
+		obj = &qrysmpb.SyncCommitteeMessage{}
 	case "SyncCommitteeContribution":
-		obj = &zondpb.SyncCommitteeContribution{}
+		obj = &qrysmpb.SyncCommitteeContribution{}
 	case "ContributionAndProof":
-		obj = &zondpb.ContributionAndProof{}
+		obj = &qrysmpb.ContributionAndProof{}
 	case "SignedContributionAndProof":
-		obj = &zondpb.SignedContributionAndProof{}
+		obj = &qrysmpb.SignedContributionAndProof{}
 	case "SyncAggregate":
-		obj = &zondpb.SyncAggregate{}
+		obj = &qrysmpb.SyncAggregate{}
 	case "SyncAggregatorSelectionData":
-		obj = &zondpb.SyncAggregatorSelectionData{}
+		obj = &qrysmpb.SyncAggregatorSelectionData{}
 	case "SyncCommittee":
-		obj = &zondpb.SyncCommittee{}
+		obj = &qrysmpb.SyncCommittee{}
 	case "HistoricalSummary":
-		obj = &zondpb.HistoricalSummary{}
+		obj = &qrysmpb.HistoricalSummary{}
 	case "LightClientOptimisticUpdate":
 		t.Skip("not a beacon node type, this is a light node type")
 		return nil, nil
@@ -128,13 +128,13 @@ func unmarshalledSSZ(t *testing.T, serializedBytes []byte, folderName string) (i
 		t.Skip("not a beacon node type, this is a light node type")
 		return nil, nil
 	// case "PowBlock":
-	// 	obj = &zondpb.PowBlock{}
+	// 	obj = &qrysmpb.PowBlock{}
 	case "Withdrawal":
 		obj = &enginev1.Withdrawal{}
 	case "DilithiumToExecutionChange":
-		obj = &zondpb.DilithiumToExecutionChange{}
+		obj = &qrysmpb.DilithiumToExecutionChange{}
 	case "SignedDilithiumToExecutionChange":
-		obj = &zondpb.SignedDilithiumToExecutionChange{}
+		obj = &qrysmpb.SignedDilithiumToExecutionChange{}
 	default:
 		return nil, errors.New("type not found")
 	}

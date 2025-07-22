@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
 )
 
@@ -25,7 +25,7 @@ var (
 
 // InsertDeposit into the database. If deposit or block number are nil
 // then this method does nothing.
-func (c *Cache) InsertDeposit(ctx context.Context, d *zondpb.Deposit, blockNum uint64, index int64, depositRoot [32]byte) error {
+func (c *Cache) InsertDeposit(ctx context.Context, d *qrysmpb.Deposit, blockNum uint64, index int64, depositRoot [32]byte) error {
 	ctx, span := trace.StartSpan(ctx, "Cache.InsertDeposit")
 	defer span.End()
 	if d == nil {
@@ -45,9 +45,9 @@ func (c *Cache) InsertDeposit(ctx context.Context, d *zondpb.Deposit, blockNum u
 	}
 	// Keep the slice sorted on insertion in order to avoid costly sorting on retrieval.
 	heightIdx := sort.Search(len(c.deposits), func(i int) bool { return c.deposits[i].Index >= index })
-	depCtr := &zondpb.DepositContainer{Deposit: d, Eth1BlockHeight: blockNum, DepositRoot: depositRoot[:], Index: index}
+	depCtr := &qrysmpb.DepositContainer{Deposit: d, Eth1BlockHeight: blockNum, DepositRoot: depositRoot[:], Index: index}
 	newDeposits := append(
-		[]*zondpb.DepositContainer{depCtr},
+		[]*qrysmpb.DepositContainer{depCtr},
 		c.deposits[heightIdx:]...)
 	c.deposits = append(c.deposits[:heightIdx], newDeposits...)
 	// Append the deposit to our map, in the event no deposits
@@ -59,7 +59,7 @@ func (c *Cache) InsertDeposit(ctx context.Context, d *zondpb.Deposit, blockNum u
 }
 
 // InsertDepositContainers inserts a set of deposit containers into our deposit cache.
-func (c *Cache) InsertDepositContainers(ctx context.Context, ctrs []*zondpb.DepositContainer) {
+func (c *Cache) InsertDepositContainers(ctx context.Context, ctrs []*qrysmpb.DepositContainer) {
 	ctx, span := trace.StartSpan(ctx, "Cache.InsertDepositContainers")
 	defer span.End()
 	c.depositsLock.Lock()
@@ -67,7 +67,7 @@ func (c *Cache) InsertDepositContainers(ctx context.Context, ctrs []*zondpb.Depo
 
 	// Initialize slice if nil object provided.
 	if ctrs == nil {
-		ctrs = make([]*zondpb.DepositContainer, 0)
+		ctrs = make([]*qrysmpb.DepositContainer, 0)
 	}
 	sort.SliceStable(ctrs, func(i int, j int) bool { return ctrs[i].Index < ctrs[j].Index })
 	c.deposits = ctrs

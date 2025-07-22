@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 	fssz "github.com/prysmaticlabs/fastssz"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	common "github.com/theQRL/qrysm/testing/spectest/shared/common/ssz_static"
 )
@@ -20,9 +20,9 @@ func ExampleRunSSZStaticTests() {
 		var obj interface{}
 		switch objectName {
 		case "Attestation":
-			obj = &zondpb.Attestation{}
+			obj = &qrysmpb.Attestation{}
 		case "BeaconState":
-			obj = &zondpb.BeaconStateCapella{}
+			obj = &qrysmpb.BeaconStateCapella{}
 		case "Eth1Block":
 			// Some types may not apply to qrysm, but exist in the spec test folders. It is OK to
 			// skip these tests with a valid justification. Otherwise, the test should fail with an
@@ -47,9 +47,9 @@ func ExampleRunSSZStaticTests() {
 	// is used and you want to ensure it passes spectests.
 	customHTR := func(t *testing.T, htrs []common.HTR, object interface{}) []common.HTR {
 		switch object.(type) {
-		case *zondpb.BeaconBlockBodyCapella:
+		case *qrysmpb.BeaconBlockBodyCapella:
 			htrs = append(htrs, func(s interface{}) ([32]byte, error) {
-				beaconState, err := state_native.InitializeFromProtoCapella(s.(*zondpb.BeaconStateCapella))
+				beaconState, err := state_native.InitializeFromProtoCapella(s.(*qrysmpb.BeaconStateCapella))
 				require.NoError(t, err)
 				return beaconState.HashTreeRoot(context.TODO())
 			})

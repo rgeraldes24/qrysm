@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	types "github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	validatormock "github.com/theQRL/qrysm/testing/validator-mock"
@@ -290,8 +290,8 @@ func TestListAccounts_LocalKeymanager(t *testing.T) {
 	for i := range pubKeys {
 		pks = append(pks, pubKeys[i][:])
 	}
-	req := &zondpb.MultipleValidatorStatusRequest{PublicKeys: pks}
-	resp := &zondpb.MultipleValidatorStatusResponse{Indices: []types.ValidatorIndex{1, math.MaxUint64, 2}}
+	req := &qrysmpb.MultipleValidatorStatusRequest{PublicKeys: pks}
+	resp := &qrysmpb.MultipleValidatorStatusResponse{Indices: []types.ValidatorIndex{1, math.MaxUint64, 2}}
 
 	m.
 		EXPECT().

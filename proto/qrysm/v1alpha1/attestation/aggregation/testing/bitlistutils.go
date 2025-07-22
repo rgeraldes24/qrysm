@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/go-bitfield"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time"
 )
 
@@ -77,8 +77,8 @@ func Bitlists64WithMultipleBitSet(t testing.TB, n, length, count uint64) []*bitf
 }
 
 // MakeAttestationsFromBitlists creates list of attestations from list of bitlist.
-func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*zondpb.Attestation {
-	atts := make([]*zondpb.Attestation, len(bl))
+func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*qrysmpb.Attestation {
+	atts := make([]*qrysmpb.Attestation, len(bl))
 	for i, b := range bl {
 		indices := b.BitIndices()
 		signatures := make([][]byte, len(indices))
@@ -86,9 +86,9 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*zondpb.Attestation {
 			signatures[i] = make([]byte, field_params.DilithiumSignatureLength)
 		}
 
-		atts[i] = &zondpb.Attestation{
+		atts[i] = &qrysmpb.Attestation{
 			AggregationBits: b,
-			Data: &zondpb.AttestationData{
+			Data: &qrysmpb.AttestationData{
 				Slot:           42,
 				CommitteeIndex: 1,
 			},
@@ -99,8 +99,8 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*zondpb.Attestation {
 }
 
 // MakeSyncContributionsFromBitVector creates list of sync contributions from list of bitvector.
-func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector16) []*zondpb.SyncCommitteeContribution {
-	c := make([]*zondpb.SyncCommitteeContribution, len(bl))
+func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector16) []*qrysmpb.SyncCommitteeContribution {
+	c := make([]*qrysmpb.SyncCommitteeContribution, len(bl))
 	for i, b := range bl {
 		indices := b.BitIndices()
 		signatures := make([][]byte, len(indices))
@@ -108,7 +108,7 @@ func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector16) []*zondpb.Syn
 			signatures[i] = make([]byte, field_params.DilithiumSignatureLength)
 		}
 
-		c[i] = &zondpb.SyncCommitteeContribution{
+		c[i] = &qrysmpb.SyncCommitteeContribution{
 			Slot:              primitives.Slot(1),
 			SubcommitteeIndex: 2,
 			AggregationBits:   b,

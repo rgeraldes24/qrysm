@@ -14,20 +14,19 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/validator"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-var beaconAPITogRPCValidatorStatus = map[string]zondpb.ValidatorStatus{
-	"pending_initialized": zondpb.ValidatorStatus_DEPOSITED,
-	"pending_queued":      zondpb.ValidatorStatus_PENDING,
-	"active_ongoing":      zondpb.ValidatorStatus_ACTIVE,
-	"active_exiting":      zondpb.ValidatorStatus_EXITING,
-	"active_slashed":      zondpb.ValidatorStatus_SLASHING,
-	"exited_unslashed":    zondpb.ValidatorStatus_EXITED,
-	"exited_slashed":      zondpb.ValidatorStatus_EXITED,
-	"withdrawal_possible": zondpb.ValidatorStatus_EXITED,
-	"withdrawal_done":     zondpb.ValidatorStatus_EXITED,
+var beaconAPITogRPCValidatorStatus = map[string]qrysmpb.ValidatorStatus{
+	"pending_initialized": qrysmpb.ValidatorStatus_DEPOSITED,
+	"pending_queued":      qrysmpb.ValidatorStatus_PENDING,
+	"active_ongoing":      qrysmpb.ValidatorStatus_ACTIVE,
+	"active_exiting":      qrysmpb.ValidatorStatus_EXITING,
+	"active_slashed":      qrysmpb.ValidatorStatus_SLASHING,
+	"exited_unslashed":    qrysmpb.ValidatorStatus_EXITED,
+	"exited_slashed":      qrysmpb.ValidatorStatus_EXITED,
+	"withdrawal_possible": qrysmpb.ValidatorStatus_EXITED,
+	"withdrawal_done":     qrysmpb.ValidatorStatus_EXITED,
 }
 
 func validRoot(root string) bool {

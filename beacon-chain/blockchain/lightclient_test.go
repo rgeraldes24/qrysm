@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -21,7 +21,7 @@ type testlc struct {
 	state          state.BeaconState
 	block          interfaces.ReadOnlySignedBeaconBlock
 	attestedState  state.BeaconState
-	attestedHeader *zondpb.BeaconBlockHeader
+	attestedHeader *qrysmpb.BeaconBlockHeader
 }
 
 func newTestLc(t *testing.T) *testlc {

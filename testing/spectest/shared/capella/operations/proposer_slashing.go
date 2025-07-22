@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/validators"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/spectest/utils"
 	"github.com/theQRL/qrysm/testing/util"
@@ -29,10 +29,10 @@ func RunProposerSlashingTest(t *testing.T, config string) {
 			require.NoError(t, err)
 			proposerSlashingSSZ, err := snappy.Decode(nil /* dst */, proposerSlashingFile)
 			require.NoError(t, err, "Failed to decompress")
-			proposerSlashing := &zondpb.ProposerSlashing{}
+			proposerSlashing := &qrysmpb.ProposerSlashing{}
 			require.NoError(t, proposerSlashing.UnmarshalSSZ(proposerSlashingSSZ), "Failed to unmarshal")
 
-			body := &zondpb.BeaconBlockBodyCapella{ProposerSlashings: []*zondpb.ProposerSlashing{proposerSlashing}}
+			body := &qrysmpb.BeaconBlockBodyCapella{ProposerSlashings: []*qrysmpb.ProposerSlashing{proposerSlashing}}
 			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				return blocks.ProcessProposerSlashings(ctx, s, b.Block().Body().ProposerSlashings(), validators.SlashValidator)
 			})

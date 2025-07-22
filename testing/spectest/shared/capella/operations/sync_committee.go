@@ -9,7 +9,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/spectest/utils"
 	"github.com/theQRL/qrysm/testing/util"
@@ -28,10 +28,10 @@ func RunSyncCommitteeTest(t *testing.T, config string) {
 			require.NoError(t, err)
 			syncCommitteeSSZ, err := snappy.Decode(nil /* dst */, syncCommitteeFile)
 			require.NoError(t, err, "Failed to decompress")
-			sc := &zondpb.SyncAggregate{}
+			sc := &qrysmpb.SyncAggregate{}
 			require.NoError(t, sc.UnmarshalSSZ(syncCommitteeSSZ), "Failed to unmarshal")
 
-			body := &zondpb.BeaconBlockBodyCapella{SyncAggregate: sc}
+			body := &qrysmpb.BeaconBlockBodyCapella{SyncAggregate: sc}
 			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				st, _, err := altair.ProcessSyncAggregate(context.Background(), s, body.SyncAggregate)
 				if err != nil {
