@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/service/node_service.proto
+// source: proto/qrl/service/node_service.proto
 
 package service
 
@@ -98,27 +98,27 @@ var file_proto_zond_service_node_service_proto_rawDesc = []byte{
 
 var file_proto_zond_service_node_service_proto_goTypes = []interface{}{
 	(*emptypb.Empty)(nil),        // 0: google.protobuf.Empty
-	(*v1.PeersRequest)(nil),      // 1: theqrl.zond.v1.PeersRequest
-	(*v1.PeerRequest)(nil),       // 2: theqrl.zond.v1.PeerRequest
-	(*v1.IdentityResponse)(nil),  // 3: theqrl.zond.v1.IdentityResponse
-	(*v1.PeersResponse)(nil),     // 4: theqrl.zond.v1.PeersResponse
-	(*v1.PeerResponse)(nil),      // 5: theqrl.zond.v1.PeerResponse
-	(*v1.PeerCountResponse)(nil), // 6: theqrl.zond.v1.PeerCountResponse
-	(*v1.VersionResponse)(nil),   // 7: theqrl.zond.v1.VersionResponse
+	(*v1.PeersRequest)(nil),      // 1: theqrl.qrl.v1.PeersRequest
+	(*v1.PeerRequest)(nil),       // 2: theqrl.qrl.v1.PeerRequest
+	(*v1.IdentityResponse)(nil),  // 3: theqrl.qrl.v1.IdentityResponse
+	(*v1.PeersResponse)(nil),     // 4: theqrl.qrl.v1.PeersResponse
+	(*v1.PeerResponse)(nil),      // 5: theqrl.qrl.v1.PeerResponse
+	(*v1.PeerCountResponse)(nil), // 6: theqrl.qrl.v1.PeerCountResponse
+	(*v1.VersionResponse)(nil),   // 7: theqrl.qrl.v1.VersionResponse
 }
 var file_proto_zond_service_node_service_proto_depIdxs = []int32{
-	0, // 0: theqrl.zond.service.BeaconNode.GetIdentity:input_type -> google.protobuf.Empty
-	1, // 1: theqrl.zond.service.BeaconNode.ListPeers:input_type -> theqrl.zond.v1.PeersRequest
-	2, // 2: theqrl.zond.service.BeaconNode.GetPeer:input_type -> theqrl.zond.v1.PeerRequest
-	0, // 3: theqrl.zond.service.BeaconNode.PeerCount:input_type -> google.protobuf.Empty
-	0, // 4: theqrl.zond.service.BeaconNode.GetVersion:input_type -> google.protobuf.Empty
-	0, // 5: theqrl.zond.service.BeaconNode.GetHealth:input_type -> google.protobuf.Empty
-	3, // 6: theqrl.zond.service.BeaconNode.GetIdentity:output_type -> theqrl.zond.v1.IdentityResponse
-	4, // 7: theqrl.zond.service.BeaconNode.ListPeers:output_type -> theqrl.zond.v1.PeersResponse
-	5, // 8: theqrl.zond.service.BeaconNode.GetPeer:output_type -> theqrl.zond.v1.PeerResponse
-	6, // 9: theqrl.zond.service.BeaconNode.PeerCount:output_type -> theqrl.zond.v1.PeerCountResponse
-	7, // 10: theqrl.zond.service.BeaconNode.GetVersion:output_type -> theqrl.zond.v1.VersionResponse
-	0, // 11: theqrl.zond.service.BeaconNode.GetHealth:output_type -> google.protobuf.Empty
+	0, // 0: theqrl.qrl.service.BeaconNode.GetIdentity:input_type -> google.protobuf.Empty
+	1, // 1: theqrl.qrl.service.BeaconNode.ListPeers:input_type -> theqrl.qrl.v1.PeersRequest
+	2, // 2: theqrl.qrl.service.BeaconNode.GetPeer:input_type -> theqrl.qrl.v1.PeerRequest
+	0, // 3: theqrl.qrl.service.BeaconNode.PeerCount:input_type -> google.protobuf.Empty
+	0, // 4: theqrl.qrl.service.BeaconNode.GetVersion:input_type -> google.protobuf.Empty
+	0, // 5: theqrl.qrl.service.BeaconNode.GetHealth:input_type -> google.protobuf.Empty
+	3, // 6: theqrl.qrl.service.BeaconNode.GetIdentity:output_type -> theqrl.qrl.v1.IdentityResponse
+	4, // 7: theqrl.qrl.service.BeaconNode.ListPeers:output_type -> theqrl.qrl.v1.PeersResponse
+	5, // 8: theqrl.qrl.service.BeaconNode.GetPeer:output_type -> theqrl.qrl.v1.PeerResponse
+	6, // 9: theqrl.qrl.service.BeaconNode.PeerCount:output_type -> theqrl.qrl.v1.PeerCountResponse
+	7, // 10: theqrl.qrl.service.BeaconNode.GetVersion:output_type -> theqrl.qrl.v1.VersionResponse
+	0, // 11: theqrl.qrl.service.BeaconNode.GetHealth:output_type -> google.protobuf.Empty
 	6, // [6:12] is the sub-list for method output_type
 	0, // [0:6] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -180,7 +180,7 @@ func NewBeaconNodeClient(cc grpc.ClientConnInterface) BeaconNodeClient {
 
 func (c *beaconNodeClient) GetIdentity(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.IdentityResponse, error) {
 	out := new(v1.IdentityResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconNode/GetIdentity", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconNode/GetIdentity", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (c *beaconNodeClient) GetIdentity(ctx context.Context, in *emptypb.Empty, o
 
 func (c *beaconNodeClient) ListPeers(ctx context.Context, in *v1.PeersRequest, opts ...grpc.CallOption) (*v1.PeersResponse, error) {
 	out := new(v1.PeersResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconNode/ListPeers", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconNode/ListPeers", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func (c *beaconNodeClient) ListPeers(ctx context.Context, in *v1.PeersRequest, o
 
 func (c *beaconNodeClient) GetPeer(ctx context.Context, in *v1.PeerRequest, opts ...grpc.CallOption) (*v1.PeerResponse, error) {
 	out := new(v1.PeerResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconNode/GetPeer", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconNode/GetPeer", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +207,7 @@ func (c *beaconNodeClient) GetPeer(ctx context.Context, in *v1.PeerRequest, opts
 
 func (c *beaconNodeClient) PeerCount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.PeerCountResponse, error) {
 	out := new(v1.PeerCountResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconNode/PeerCount", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconNode/PeerCount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +216,7 @@ func (c *beaconNodeClient) PeerCount(ctx context.Context, in *emptypb.Empty, opt
 
 func (c *beaconNodeClient) GetVersion(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.VersionResponse, error) {
 	out := new(v1.VersionResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconNode/GetVersion", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconNode/GetVersion", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +225,7 @@ func (c *beaconNodeClient) GetVersion(ctx context.Context, in *emptypb.Empty, op
 
 func (c *beaconNodeClient) GetHealth(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconNode/GetHealth", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconNode/GetHealth", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -279,7 +279,7 @@ func _BeaconNode_GetIdentity_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconNode/GetIdentity",
+		FullMethod: "/theqrl.qrl.service.BeaconNode/GetIdentity",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconNodeServer).GetIdentity(ctx, req.(*emptypb.Empty))
@@ -297,7 +297,7 @@ func _BeaconNode_ListPeers_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconNode/ListPeers",
+		FullMethod: "/theqrl.qrl.service.BeaconNode/ListPeers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconNodeServer).ListPeers(ctx, req.(*v1.PeersRequest))
@@ -315,7 +315,7 @@ func _BeaconNode_GetPeer_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconNode/GetPeer",
+		FullMethod: "/theqrl.qrl.service.BeaconNode/GetPeer",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconNodeServer).GetPeer(ctx, req.(*v1.PeerRequest))
@@ -333,7 +333,7 @@ func _BeaconNode_PeerCount_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconNode/PeerCount",
+		FullMethod: "/theqrl.qrl.service.BeaconNode/PeerCount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconNodeServer).PeerCount(ctx, req.(*emptypb.Empty))
@@ -351,7 +351,7 @@ func _BeaconNode_GetVersion_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconNode/GetVersion",
+		FullMethod: "/theqrl.qrl.service.BeaconNode/GetVersion",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconNodeServer).GetVersion(ctx, req.(*emptypb.Empty))
@@ -369,7 +369,7 @@ func _BeaconNode_GetHealth_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconNode/GetHealth",
+		FullMethod: "/theqrl.qrl.service.BeaconNode/GetHealth",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconNodeServer).GetHealth(ctx, req.(*emptypb.Empty))
@@ -378,7 +378,7 @@ func _BeaconNode_GetHealth_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 var _BeaconNode_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "theqrl.zond.service.BeaconNode",
+	ServiceName: "theqrl.qrl.service.BeaconNode",
 	HandlerType: (*BeaconNodeServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -407,5 +407,5 @@ var _BeaconNode_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/zond/service/node_service.proto",
+	Metadata: "proto/qrl/service/node_service.proto",
 }

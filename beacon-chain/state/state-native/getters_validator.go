@@ -8,19 +8,19 @@ import (
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // Validators participating in consensus on the beacon chain.
-func (b *BeaconState) Validators() []*zondpb.Validator {
+func (b *BeaconState) Validators() []*qrysmpb.Validator {
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
 	return b.validatorsVal()
 }
 
-func (b *BeaconState) validatorsVal() []*zondpb.Validator {
-	var v []*zondpb.Validator
+func (b *BeaconState) validatorsVal() []*qrysmpb.Validator {
+	var v []*qrysmpb.Validator
 	if features.Get().EnableExperimentalState {
 		if b.validatorsMultiValue == nil {
 			return nil
@@ -33,13 +33,13 @@ func (b *BeaconState) validatorsVal() []*zondpb.Validator {
 		v = b.validators
 	}
 
-	res := make([]*zondpb.Validator, len(v))
+	res := make([]*qrysmpb.Validator, len(v))
 	for i := 0; i < len(res); i++ {
 		val := v[i]
 		if val == nil {
 			continue
 		}
-		res[i] = zondpb.CopyValidator(val)
+		res[i] = qrysmpb.CopyValidator(val)
 	}
 	return res
 }
@@ -47,12 +47,12 @@ func (b *BeaconState) validatorsVal() []*zondpb.Validator {
 // references of validators participating in consensus on the beacon chain.
 // This assumes that a lock is already held on BeaconState. This does not
 // copy fully and instead just copies the reference.
-func (b *BeaconState) validatorsReferences() []*zondpb.Validator {
+func (b *BeaconState) validatorsReferences() []*qrysmpb.Validator {
 	if b.validators == nil {
 		return nil
 	}
 
-	res := make([]*zondpb.Validator, len(b.validators))
+	res := make([]*qrysmpb.Validator, len(b.validators))
 	for i := 0; i < len(res); i++ {
 		validator := b.validators[i]
 		if validator == nil {
@@ -75,33 +75,33 @@ func (b *BeaconState) validatorsLen() int {
 }
 
 // ValidatorAtIndex is the validator at the provided index.
-func (b *BeaconState) ValidatorAtIndex(idx primitives.ValidatorIndex) (*zondpb.Validator, error) {
+func (b *BeaconState) ValidatorAtIndex(idx primitives.ValidatorIndex) (*qrysmpb.Validator, error) {
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
 	return b.validatorAtIndex(idx)
 }
 
-func (b *BeaconState) validatorAtIndex(idx primitives.ValidatorIndex) (*zondpb.Validator, error) {
+func (b *BeaconState) validatorAtIndex(idx primitives.ValidatorIndex) (*qrysmpb.Validator, error) {
 	if features.Get().EnableExperimentalState {
 		if b.validatorsMultiValue == nil {
-			return &zondpb.Validator{}, nil
+			return &qrysmpb.Validator{}, nil
 		}
 		v, err := b.validatorsMultiValue.At(b, uint64(idx))
 		if err != nil {
 			return nil, err
 		}
-		return zondpb.CopyValidator(v), nil
+		return qrysmpb.CopyValidator(v), nil
 	}
 
 	if b.validators == nil {
-		return &zondpb.Validator{}, nil
+		return &qrysmpb.Validator{}, nil
 	}
 	if uint64(len(b.validators)) <= uint64(idx) {
 		return nil, errors.Wrapf(consensus_types.ErrOutOfBounds, "validator index %d does not exist", idx)
 	}
 	val := b.validators[idx]
-	return zondpb.CopyValidator(val), nil
+	return qrysmpb.CopyValidator(val), nil
 }
 
 // ValidatorAtIndexReadOnly is the validator at the provided index. This method
@@ -159,7 +159,7 @@ func (b *BeaconState) PubkeyAtIndex(idx primitives.ValidatorIndex) [field_params
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
-	var v *zondpb.Validator
+	var v *qrysmpb.Validator
 	if features.Get().EnableExperimentalState {
 		var err error
 		v, err = b.validatorsMultiValue.At(b, uint64(idx))

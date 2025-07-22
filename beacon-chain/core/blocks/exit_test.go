@@ -13,34 +13,34 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
 
 func TestProcessVoluntaryExits_NotActiveLongEnoughToExit(t *testing.T) {
-	exits := []*zondpb.SignedVoluntaryExit{
+	exits := []*qrysmpb.SignedVoluntaryExit{
 		{
-			Exit: &zondpb.VoluntaryExit{
+			Exit: &qrysmpb.VoluntaryExit{
 				ValidatorIndex: 0,
 				Epoch:          0,
 			},
 		},
 	}
-	registry := []*zondpb.Validator{
+	registry := []*qrysmpb.Validator{
 		{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		},
 	}
-	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Validators: registry,
 		Slot:       10,
 	})
 	require.NoError(t, err)
 	b := util.NewBeaconBlockCapella()
-	b.Block = &zondpb.BeaconBlockCapella{
-		Body: &zondpb.BeaconBlockBodyCapella{
+	b.Block = &qrysmpb.BeaconBlockCapella{
+		Body: &qrysmpb.BeaconBlockBodyCapella{
 			VoluntaryExits: exits,
 		},
 	}
@@ -51,26 +51,26 @@ func TestProcessVoluntaryExits_NotActiveLongEnoughToExit(t *testing.T) {
 }
 
 func TestProcessVoluntaryExits_ExitAlreadySubmitted(t *testing.T) {
-	exits := []*zondpb.SignedVoluntaryExit{
+	exits := []*qrysmpb.SignedVoluntaryExit{
 		{
-			Exit: &zondpb.VoluntaryExit{
+			Exit: &qrysmpb.VoluntaryExit{
 				Epoch: 10,
 			},
 		},
 	}
-	registry := []*zondpb.Validator{
+	registry := []*qrysmpb.Validator{
 		{
 			ExitEpoch: 10,
 		},
 	}
-	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Validators: registry,
 		Slot:       0,
 	})
 	require.NoError(t, err)
 	b := util.NewBeaconBlockCapella()
-	b.Block = &zondpb.BeaconBlockCapella{
-		Body: &zondpb.BeaconBlockBodyCapella{
+	b.Block = &qrysmpb.BeaconBlockCapella{
+		Body: &qrysmpb.BeaconBlockBodyCapella{
 			VoluntaryExits: exits,
 		},
 	}
@@ -81,23 +81,23 @@ func TestProcessVoluntaryExits_ExitAlreadySubmitted(t *testing.T) {
 }
 
 func TestProcessVoluntaryExits_AppliesCorrectStatus(t *testing.T) {
-	exits := []*zondpb.SignedVoluntaryExit{
+	exits := []*qrysmpb.SignedVoluntaryExit{
 		{
-			Exit: &zondpb.VoluntaryExit{
+			Exit: &qrysmpb.VoluntaryExit{
 				ValidatorIndex: 0,
 				Epoch:          0,
 			},
 		},
 	}
-	registry := []*zondpb.Validator{
+	registry := []*qrysmpb.Validator{
 		{
 			ExitEpoch:       params.BeaconConfig().FarFutureEpoch,
 			ActivationEpoch: 0,
 		},
 	}
-	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Validators: registry,
-		Fork: &zondpb.Fork{
+		Fork: &qrysmpb.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 		},
@@ -118,8 +118,8 @@ func TestProcessVoluntaryExits_AppliesCorrectStatus(t *testing.T) {
 	require.NoError(t, err)
 
 	b := util.NewBeaconBlockCapella()
-	b.Block = &zondpb.BeaconBlockCapella{
-		Body: &zondpb.BeaconBlockBodyCapella{
+	b.Block = &qrysmpb.BeaconBlockCapella{
+		Body: &qrysmpb.BeaconBlockBodyCapella{
 			VoluntaryExits: exits,
 		},
 	}
@@ -136,20 +136,20 @@ func TestProcessVoluntaryExits_AppliesCorrectStatus(t *testing.T) {
 func TestVerifyExitAndSignature(t *testing.T) {
 	tests := []struct {
 		name    string
-		setup   func() (*zondpb.Validator, *zondpb.SignedVoluntaryExit, state.ReadOnlyBeaconState, error)
+		setup   func() (*qrysmpb.Validator, *qrysmpb.SignedVoluntaryExit, state.ReadOnlyBeaconState, error)
 		wantErr string
 	}{
 		{
 			name: "Empty Exit",
-			setup: func() (*zondpb.Validator, *zondpb.SignedVoluntaryExit, state.ReadOnlyBeaconState, error) {
-				fork := &zondpb.Fork{
+			setup: func() (*qrysmpb.Validator, *qrysmpb.SignedVoluntaryExit, state.ReadOnlyBeaconState, error) {
+				fork := &qrysmpb.Fork{
 					PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 					CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 					Epoch:           0,
 				}
 				genesisRoot := [32]byte{'a'}
 
-				st := &zondpb.BeaconStateCapella{
+				st := &qrysmpb.BeaconStateCapella{
 					Slot:                  0,
 					Fork:                  fork,
 					GenesisValidatorsRoot: genesisRoot[:],
@@ -159,20 +159,20 @@ func TestVerifyExitAndSignature(t *testing.T) {
 				if err != nil {
 					return nil, nil, nil, err
 				}
-				return &zondpb.Validator{}, &zondpb.SignedVoluntaryExit{}, s, nil
+				return &qrysmpb.Validator{}, &qrysmpb.SignedVoluntaryExit{}, s, nil
 			},
 			wantErr: "nil exit",
 		},
 		{
 			name: "Happy Path",
-			setup: func() (*zondpb.Validator, *zondpb.SignedVoluntaryExit, state.ReadOnlyBeaconState, error) {
-				fork := &zondpb.Fork{
+			setup: func() (*qrysmpb.Validator, *qrysmpb.SignedVoluntaryExit, state.ReadOnlyBeaconState, error) {
+				fork := &qrysmpb.Fork{
 					PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 					CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 					Epoch:           0,
 				}
-				signedExit := &zondpb.SignedVoluntaryExit{
-					Exit: &zondpb.VoluntaryExit{
+				signedExit := &qrysmpb.SignedVoluntaryExit{
+					Exit: &qrysmpb.VoluntaryExit{
 						Epoch:          2,
 						ValidatorIndex: 0,
 					},
@@ -198,14 +198,14 @@ func TestVerifyExitAndSignature(t *testing.T) {
 		},
 		{
 			name: "bad signature",
-			setup: func() (*zondpb.Validator, *zondpb.SignedVoluntaryExit, state.ReadOnlyBeaconState, error) {
-				fork := &zondpb.Fork{
+			setup: func() (*qrysmpb.Validator, *qrysmpb.SignedVoluntaryExit, state.ReadOnlyBeaconState, error) {
+				fork := &qrysmpb.Fork{
 					PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 					CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 					Epoch:           0,
 				}
-				signedExit := &zondpb.SignedVoluntaryExit{
-					Exit: &zondpb.VoluntaryExit{
+				signedExit := &qrysmpb.SignedVoluntaryExit{
+					Exit: &qrysmpb.VoluntaryExit{
 						Epoch:          2,
 						ValidatorIndex: 0,
 					},

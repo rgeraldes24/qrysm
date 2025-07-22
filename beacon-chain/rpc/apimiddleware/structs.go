@@ -5,7 +5,7 @@ import (
 
 	"github.com/theQRL/qrysm/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 )
 
 //----------------
@@ -13,7 +13,7 @@ import (
 //----------------
 
 // WeakSubjectivityResponse is used to marshal/unmarshal the response for the
-// /zond/v1/beacon/weak_subjectivity endpoint.
+// /qrl/v1/beacon/weak_subjectivity endpoint.
 type WeakSubjectivityResponse struct {
 	Data *struct {
 		Checkpoint *CheckpointJson `json:"ws_checkpoint"`
@@ -638,7 +638,7 @@ func (ssz *SszResponseJson) SSZData() string {
 }
 
 func (*SszResponseJson) SSZVersion() string {
-	return strings.ToLower(zondpbv1.Version_PHASE0.String())
+	return strings.ToLower(qrlpb.Version_PHASE0.String())
 }
 
 func (*SszResponseJson) SSZOptimistic() bool {

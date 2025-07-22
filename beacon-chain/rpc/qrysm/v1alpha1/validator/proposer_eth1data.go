@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
@@ -30,7 +30,7 @@ import (
 //   - Otherwise:
 //   - Determine the vote with the highest count. Prefer the vote with the highest eth1 block height in the event of a tie.
 //   - This vote's block is the eth1 block to use for the block proposal.
-func (vs *Server) executionNodeDataMajorityVote(ctx context.Context, beaconState state.BeaconState) (*zondpb.ExecutionNodeData, error) {
+func (vs *Server) executionNodeDataMajorityVote(ctx context.Context, beaconState state.BeaconState) (*qrysmpb.ExecutionNodeData, error) {
 	ctx, cancel := context.WithTimeout(ctx, executionNodeDataTimeout)
 	defer cancel()
 
@@ -78,7 +78,7 @@ func (vs *Server) executionNodeDataMajorityVote(ctx context.Context, beaconState
 			log.WithError(err).Error("Could not get hash of last block by latest valid time")
 			return vs.randomExecutionNodeDataVote(ctx)
 		}
-		return &zondpb.ExecutionNodeData{
+		return &qrysmpb.ExecutionNodeData{
 			BlockHash:    h.Bytes(),
 			DepositCount: lastBlockDepositCount,
 			DepositRoot:  lastBlockDepositRoot[:],
@@ -96,7 +96,7 @@ func (vs *Server) slotStartTime(slot primitives.Slot) uint64 {
 func (vs *Server) canonicalExecutionNodeData(
 	ctx context.Context,
 	beaconState state.BeaconState,
-	currentVote *zondpb.ExecutionNodeData) (*zondpb.ExecutionNodeData, *big.Int, error) {
+	currentVote *qrysmpb.ExecutionNodeData) (*qrysmpb.ExecutionNodeData, *big.Int, error) {
 	var eth1BlockHash [32]byte
 
 	// Add in current vote, to get accurate vote tally
@@ -107,7 +107,7 @@ func (vs *Server) canonicalExecutionNodeData(
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not determine if current executionNodeData vote has enough support")
 	}
-	var canonicalExecutionNodeData *zondpb.ExecutionNodeData
+	var canonicalExecutionNodeData *qrysmpb.ExecutionNodeData
 	if hasSupport {
 		canonicalExecutionNodeData = currentVote
 		eth1BlockHash = bytesutil.ToBytes32(currentVote.BlockHash)
@@ -125,7 +125,7 @@ func (vs *Server) canonicalExecutionNodeData(
 	return canonicalExecutionNodeData, canonicalExecutionNodeDataHeight, nil
 }
 
-func (vs *Server) mockExecutionNodeDataVote(ctx context.Context, slot primitives.Slot) (*zondpb.ExecutionNodeData, error) {
+func (vs *Server) mockExecutionNodeDataVote(ctx context.Context, slot primitives.Slot) (*qrysmpb.ExecutionNodeData, error) {
 	if !executionNodeDataNotification {
 		log.Warn("Beacon Node is no longer connected to an ETH1 chain, so ETH1 data votes are now mocked.")
 		executionNodeDataNotification = true
@@ -148,14 +148,14 @@ func (vs *Server) mockExecutionNodeDataVote(ctx context.Context, slot primitives
 	enc = fastssz.MarshalUint64(enc, uint64(slots.ToEpoch(slot))+uint64(slotInVotingPeriod))
 	depRoot := hash.Hash(enc)
 	blockHash := hash.Hash(depRoot[:])
-	return &zondpb.ExecutionNodeData{
+	return &qrysmpb.ExecutionNodeData{
 		DepositRoot:  depRoot[:],
 		DepositCount: headState.Eth1DepositIndex(),
 		BlockHash:    blockHash[:],
 	}, nil
 }
 
-func (vs *Server) randomExecutionNodeDataVote(ctx context.Context) (*zondpb.ExecutionNodeData, error) {
+func (vs *Server) randomExecutionNodeDataVote(ctx context.Context) (*qrysmpb.ExecutionNodeData, error) {
 	if !executionNodeDataNotification {
 		log.Warn("Beacon Node is no longer connected to an ETH1 chain, so ETH1 data votes are now random.")
 		executionNodeDataNotification = true
@@ -170,7 +170,7 @@ func (vs *Server) randomExecutionNodeDataVote(ctx context.Context) (*zondpb.Exec
 	randGen := rand.NewGenerator()
 	depRoot := hash.Hash(bytesutil.Bytes32(randGen.Uint64()))
 	blockHash := hash.Hash(bytesutil.Bytes32(randGen.Uint64()))
-	return &zondpb.ExecutionNodeData{
+	return &qrysmpb.ExecutionNodeData{
 		DepositRoot:  depRoot[:],
 		DepositCount: headState.Eth1DepositIndex(),
 		BlockHash:    blockHash[:],

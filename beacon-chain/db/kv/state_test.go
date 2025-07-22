@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -137,7 +137,7 @@ func TestState_CanSaveRetrieveValidatorEntriesFromCache(t *testing.T) {
 		assert.Equal(t, true, ok)
 		require.NotNil(t, data)
 
-		valEntry, vType := data.(*zondpb.Validator)
+		valEntry, vType := data.(*qrysmpb.Validator)
 		assert.Equal(t, true, vType)
 		require.NotNil(t, valEntry)
 
@@ -387,7 +387,7 @@ func TestStore_DeleteFinalizedState(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, finalizedState.SetSlot(100))
 	require.NoError(t, db.SaveState(ctx, finalizedState, finalizedBlockRoot))
-	finalizedCheckpoint := &zondpb.Checkpoint{Root: finalizedBlockRoot[:]}
+	finalizedCheckpoint := &qrysmpb.Checkpoint{Root: finalizedBlockRoot[:]}
 	require.NoError(t, db.SaveFinalizedCheckpoint(ctx, finalizedCheckpoint))
 	wantedErr := "cannot delete finalized block or state"
 	assert.ErrorContains(t, wantedErr, db.DeleteState(ctx, finalizedBlockRoot))
@@ -535,7 +535,7 @@ func TestStore_CleanUpDirtyStates_AboveThreshold(t *testing.T) {
 		require.NoError(t, db.SaveState(context.Background(), st, r))
 	}
 
-	require.NoError(t, db.SaveFinalizedCheckpoint(context.Background(), &zondpb.Checkpoint{
+	require.NoError(t, db.SaveFinalizedCheckpoint(context.Background(), &qrysmpb.Checkpoint{
 		Root:  bRoots[len(bRoots)-1][:],
 		Epoch: primitives.Epoch(slotsPerArchivedPoint / params.BeaconConfig().SlotsPerEpoch),
 	}))
@@ -574,7 +574,7 @@ func TestStore_CleanUpDirtyStates_Finalized(t *testing.T) {
 		require.NoError(t, db.SaveState(context.Background(), st, r))
 	}
 
-	require.NoError(t, db.SaveFinalizedCheckpoint(context.Background(), &zondpb.Checkpoint{Root: genesisRoot[:]}))
+	require.NoError(t, db.SaveFinalizedCheckpoint(context.Background(), &qrysmpb.Checkpoint{Root: genesisRoot[:]}))
 	require.NoError(t, db.CleanUpDirtyStates(context.Background(), params.BeaconConfig().SlotsPerEpoch))
 	require.Equal(t, true, db.HasState(context.Background(), genesisRoot))
 }
@@ -605,7 +605,7 @@ func TestStore_CleanUpDirtyStates_DontDeleteNonFinalized(t *testing.T) {
 		require.NoError(t, db.SaveState(context.Background(), st, r))
 	}
 
-	require.NoError(t, db.SaveFinalizedCheckpoint(context.Background(), &zondpb.Checkpoint{Root: genesisRoot[:]}))
+	require.NoError(t, db.SaveFinalizedCheckpoint(context.Background(), &qrysmpb.Checkpoint{Root: genesisRoot[:]}))
 	require.NoError(t, db.CleanUpDirtyStates(context.Background(), params.BeaconConfig().SlotsPerEpoch))
 
 	for _, rt := range unfinalizedRoots {
@@ -613,12 +613,12 @@ func TestStore_CleanUpDirtyStates_DontDeleteNonFinalized(t *testing.T) {
 	}
 }
 
-func validators(limit int) []*zondpb.Validator {
-	var vals []*zondpb.Validator
+func validators(limit int) []*qrysmpb.Validator {
+	var vals []*qrysmpb.Validator
 	for i := 0; i < limit; i++ {
 		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, rand.Uint64())
-		val := &zondpb.Validator{
+		val := &qrysmpb.Validator{
 			PublicKey:                  pubKey,
 			WithdrawalCredentials:      bytesutil.ToBytes(rand.Uint64(), 32),
 			EffectiveBalance:           rand.Uint64(),

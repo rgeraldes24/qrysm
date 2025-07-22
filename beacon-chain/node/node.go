@@ -917,11 +917,11 @@ func (b *BeaconNode) registerGRPCGateway(router *mux.Router) error {
 
 	gatewayConfig := gateway.DefaultConfig(enableDebugRPCEndpoints, httpModules)
 	muxs := make([]*apigateway.PbMux, 0)
-	if gatewayConfig.V1AlphaPbMux != nil {
-		muxs = append(muxs, gatewayConfig.V1AlphaPbMux)
+	if gatewayConfig.QrysmPbMux != nil {
+		muxs = append(muxs, gatewayConfig.QrysmPbMux)
 	}
-	if gatewayConfig.ZondPbMux != nil {
-		muxs = append(muxs, gatewayConfig.ZondPbMux)
+	if gatewayConfig.QRLPbMux != nil {
+		muxs = append(muxs, gatewayConfig.QRLPbMux)
 	}
 
 	opts := []apigateway.Option{
@@ -935,7 +935,7 @@ func (b *BeaconNode) registerGRPCGateway(router *mux.Router) error {
 		apigateway.WithAllowedOrigins(allowedOrigins),
 		apigateway.WithTimeout(uint64(timeout)),
 	}
-	if flags.EnableHTTPZondAPI(httpModules) {
+	if flags.EnableHTTPQRLAPI(httpModules) {
 		opts = append(opts, apigateway.WithApiMiddleware(&apimiddleware.BeaconEndpointFactory{}))
 	}
 	g, err := apigateway.New(b.ctx, opts...)

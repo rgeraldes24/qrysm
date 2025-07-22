@@ -23,8 +23,8 @@ import (
 	mockp2p "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	syncmock "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
 	"github.com/theQRL/qrysm/consensus-types/wrapper"
-	zondpb "github.com/theQRL/qrysm/proto/qrl/v1"
-	pb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -85,7 +85,7 @@ func TestGetIdentity(t *testing.T) {
 	require.NoError(t, err)
 	attnets := bitfield.NewBitvector64()
 	attnets.SetBitAt(1, true)
-	metadataProvider := &mockp2p.MockMetadataProvider{Data: wrapper.WrappedMetadataV1(&pb.MetaDataV1{SeqNumber: 1, Attnets: attnets})}
+	metadataProvider := &mockp2p.MockMetadataProvider{Data: wrapper.WrappedMetadataV1(&qrysmpb.MetaDataV1{SeqNumber: 1, Attnets: attnets})}
 
 	t.Run("OK", func(t *testing.T) {
 		peerManager := &mockp2p.MockPeerManager{
@@ -176,23 +176,23 @@ func TestGetPeer(t *testing.T) {
 	peerFetcher.Peers().Add(qnrRecord, decodedId, p2pMultiAddr, network.DirInbound)
 
 	t.Run("OK", func(t *testing.T) {
-		resp, err := s.GetPeer(ctx, &zondpb.PeerRequest{PeerId: rawId})
+		resp, err := s.GetPeer(ctx, &qrlpb.PeerRequest{PeerId: rawId})
 		require.NoError(t, err)
 		assert.Equal(t, rawId, resp.Data.PeerId)
 		assert.Equal(t, p2pAddr, resp.Data.LastSeenP2PAddress)
 		assert.Equal(t, "qnr:yoABgmlwhAcHBwc", resp.Data.Qnr)
-		assert.Equal(t, zondpb.ConnectionState_DISCONNECTED, resp.Data.State)
-		assert.Equal(t, zondpb.PeerDirection_INBOUND, resp.Data.Direction)
+		assert.Equal(t, qrlpb.ConnectionState_DISCONNECTED, resp.Data.State)
+		assert.Equal(t, qrlpb.PeerDirection_INBOUND, resp.Data.Direction)
 	})
 
 	t.Run("Invalid ID", func(t *testing.T) {
-		_, err = s.GetPeer(ctx, &zondpb.PeerRequest{PeerId: "foo"})
+		_, err = s.GetPeer(ctx, &qrlpb.PeerRequest{PeerId: "foo"})
 		assert.ErrorContains(t, "Invalid peer ID", err)
 	})
 
 	t.Run("Peer not found", func(t *testing.T) {
 		generatedId := "16Uiu2HAmQqFdEcHbSmQTQuLoAhnMUrgoWoraKK4cUJT6FuuqHqTU"
-		_, err = s.GetPeer(ctx, &zondpb.PeerRequest{PeerId: generatedId})
+		_, err = s.GetPeer(ctx, &qrlpb.PeerRequest{PeerId: generatedId})
 		assert.ErrorContains(t, "Peer not found", err)
 	})
 }
@@ -247,9 +247,9 @@ func TestListPeers(t *testing.T) {
 		// We will check the first peer from the list.
 		expectedId := ids[0]
 
-		resp, err := s.ListPeers(context.Background(), &zondpb.PeersRequest{
-			State:     []zondpb.ConnectionState{zondpb.ConnectionState_CONNECTING},
-			Direction: []zondpb.PeerDirection{zondpb.PeerDirection_INBOUND},
+		resp, err := s.ListPeers(context.Background(), &qrlpb.PeersRequest{
+			State:     []qrlpb.ConnectionState{qrlpb.ConnectionState_CONNECTING},
+			Direction: []qrlpb.PeerDirection{qrlpb.PeerDirection_INBOUND},
 		})
 		require.NoError(t, err)
 		require.Equal(t, 1, len(resp.Data))
@@ -263,62 +263,62 @@ func TestListPeers(t *testing.T) {
 		expectedP2PAddr, err := peerStatus.Address(expectedId)
 		require.NoError(t, err)
 		assert.Equal(t, expectedP2PAddr.String(), returnedPeer.LastSeenP2PAddress)
-		assert.Equal(t, zondpb.ConnectionState_CONNECTING, returnedPeer.State)
-		assert.Equal(t, zondpb.PeerDirection_INBOUND, returnedPeer.Direction)
+		assert.Equal(t, qrlpb.ConnectionState_CONNECTING, returnedPeer.State)
+		assert.Equal(t, qrlpb.PeerDirection_INBOUND, returnedPeer.Direction)
 	})
 
 	filterTests := []struct {
 		name       string
-		states     []zondpb.ConnectionState
-		directions []zondpb.PeerDirection
+		states     []qrlpb.ConnectionState
+		directions []qrlpb.PeerDirection
 		wantIds    []peer.ID
 	}{
 		{
 			name:       "No filters - return all peers",
-			states:     []zondpb.ConnectionState{},
-			directions: []zondpb.PeerDirection{},
+			states:     []qrlpb.ConnectionState{},
+			directions: []qrlpb.PeerDirection{},
 			wantIds:    ids[:len(ids)-1], // Excluding last peer as it is not connected.
 		},
 		{
 			name:       "State filter empty - return peers for all states",
-			states:     []zondpb.ConnectionState{},
-			directions: []zondpb.PeerDirection{zondpb.PeerDirection_INBOUND},
+			states:     []qrlpb.ConnectionState{},
+			directions: []qrlpb.PeerDirection{qrlpb.PeerDirection_INBOUND},
 			wantIds:    []peer.ID{ids[0], ids[2], ids[4], ids[6]},
 		},
 		{
 			name:       "Direction filter empty - return peers for all directions",
-			states:     []zondpb.ConnectionState{zondpb.ConnectionState_CONNECTED},
-			directions: []zondpb.PeerDirection{},
+			states:     []qrlpb.ConnectionState{qrlpb.ConnectionState_CONNECTED},
+			directions: []qrlpb.PeerDirection{},
 			wantIds:    []peer.ID{ids[2], ids[3]},
 		},
 		{
 			name:       "One state and direction",
-			states:     []zondpb.ConnectionState{zondpb.ConnectionState_DISCONNECTED},
-			directions: []zondpb.PeerDirection{zondpb.PeerDirection_INBOUND},
+			states:     []qrlpb.ConnectionState{qrlpb.ConnectionState_DISCONNECTED},
+			directions: []qrlpb.PeerDirection{qrlpb.PeerDirection_INBOUND},
 			wantIds:    []peer.ID{ids[6]},
 		},
 		{
 			name:       "Multiple states and directions",
-			states:     []zondpb.ConnectionState{zondpb.ConnectionState_CONNECTING, zondpb.ConnectionState_DISCONNECTING},
-			directions: []zondpb.PeerDirection{zondpb.PeerDirection_INBOUND, zondpb.PeerDirection_OUTBOUND},
+			states:     []qrlpb.ConnectionState{qrlpb.ConnectionState_CONNECTING, qrlpb.ConnectionState_DISCONNECTING},
+			directions: []qrlpb.PeerDirection{qrlpb.PeerDirection_INBOUND, qrlpb.PeerDirection_OUTBOUND},
 			wantIds:    []peer.ID{ids[0], ids[1], ids[4], ids[5]},
 		},
 		{
 			name:       "Unknown filter is ignored",
-			states:     []zondpb.ConnectionState{zondpb.ConnectionState_CONNECTED, 99},
-			directions: []zondpb.PeerDirection{zondpb.PeerDirection_OUTBOUND, 99},
+			states:     []qrlpb.ConnectionState{qrlpb.ConnectionState_CONNECTED, 99},
+			directions: []qrlpb.PeerDirection{qrlpb.PeerDirection_OUTBOUND, 99},
 			wantIds:    []peer.ID{ids[3]},
 		},
 		{
 			name:       "Only unknown filters - return all peers",
-			states:     []zondpb.ConnectionState{99},
-			directions: []zondpb.PeerDirection{99},
+			states:     []qrlpb.ConnectionState{99},
+			directions: []qrlpb.PeerDirection{99},
 			wantIds:    ids[:len(ids)-1], // Excluding last peer as it is not connected.
 		},
 	}
 	for _, tt := range filterTests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := s.ListPeers(context.Background(), &zondpb.PeersRequest{
+			resp, err := s.ListPeers(context.Background(), &qrlpb.PeersRequest{
 				State:     tt.states,
 				Direction: tt.directions,
 			})
@@ -346,8 +346,8 @@ func TestListPeers_NoPeersReturnsEmptyArray(t *testing.T) {
 	peerFetcher.ClearPeers()
 	s := Server{PeersFetcher: peerFetcher}
 
-	resp, err := s.ListPeers(context.Background(), &zondpb.PeersRequest{
-		State: []zondpb.ConnectionState{zondpb.ConnectionState_CONNECTED},
+	resp, err := s.ListPeers(context.Background(), &qrlpb.PeersRequest{
+		State: []qrlpb.ConnectionState{qrlpb.ConnectionState_CONNECTED},
 	})
 	require.NoError(t, err)
 	require.NotNil(t, resp.Data)
@@ -424,9 +424,9 @@ func BenchmarkListPeers(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err := s.ListPeers(context.Background(), &zondpb.PeersRequest{
-			State:     []zondpb.ConnectionState{},
-			Direction: []zondpb.PeerDirection{},
+		_, err := s.ListPeers(context.Background(), &qrlpb.PeersRequest{
+			State:     []qrlpb.ConnectionState{},
+			Direction: []qrlpb.PeerDirection{},
 		})
 		require.NoError(b, err)
 	}

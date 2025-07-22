@@ -41,7 +41,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/network/http"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -51,17 +51,17 @@ import (
 func TestGetAggregateAttestation(t *testing.T) {
 	root1 := bytesutil.PadTo([]byte("root1"), 32)
 	sig1 := bytesutil.PadTo([]byte("sig1"), fieldparams.DilithiumSignatureLength)
-	attSlot1 := &zondpbalpha.Attestation{
+	attSlot1 := &qrysmpb.Attestation{
 		AggregationBits: []byte{0, 1},
-		Data: &zondpbalpha.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  1,
 			BeaconBlockRoot: root1,
-			Source: &zondpbalpha.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root1,
 			},
-			Target: &zondpbalpha.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root1,
 			},
@@ -70,17 +70,17 @@ func TestGetAggregateAttestation(t *testing.T) {
 	}
 	root21 := bytesutil.PadTo([]byte("root2_1"), 32)
 	sig21 := bytesutil.PadTo([]byte("sig2_1"), fieldparams.DilithiumSignatureLength)
-	attslot21 := &zondpbalpha.Attestation{
+	attslot21 := &qrysmpb.Attestation{
 		AggregationBits: []byte{0, 1, 1},
-		Data: &zondpbalpha.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            2,
 			CommitteeIndex:  2,
 			BeaconBlockRoot: root21,
-			Source: &zondpbalpha.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root21,
 			},
-			Target: &zondpbalpha.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root21,
 			},
@@ -89,17 +89,17 @@ func TestGetAggregateAttestation(t *testing.T) {
 	}
 	root22 := bytesutil.PadTo([]byte("root2_2"), 32)
 	sig22 := bytesutil.PadTo([]byte("sig2_2"), fieldparams.DilithiumSignatureLength)
-	attslot22 := &zondpbalpha.Attestation{
+	attslot22 := &qrysmpb.Attestation{
 		AggregationBits: []byte{0, 1, 1, 1},
-		Data: &zondpbalpha.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            2,
 			CommitteeIndex:  3,
 			BeaconBlockRoot: root22,
-			Source: &zondpbalpha.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root22,
 			},
-			Target: &zondpbalpha.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root22,
 			},
@@ -108,17 +108,17 @@ func TestGetAggregateAttestation(t *testing.T) {
 	}
 	root33 := bytesutil.PadTo([]byte("root3_3"), 32)
 	sig33 := bytesutil.PadTo([]byte("sig3_3"), fieldparams.DilithiumSignatureLength)
-	attslot33 := &zondpbalpha.Attestation{
+	attslot33 := &qrysmpb.Attestation{
 		AggregationBits: []byte{1, 0, 0, 1},
-		Data: &zondpbalpha.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            2,
 			CommitteeIndex:  3,
 			BeaconBlockRoot: root33,
-			Source: &zondpbalpha.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root33,
 			},
-			Target: &zondpbalpha.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root33,
 			},
@@ -126,7 +126,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 		Signatures: [][]byte{sig33},
 	}
 	pool := attestations.NewPool()
-	err := pool.SaveAggregatedAttestations([]*zondpbalpha.Attestation{attSlot1, attslot21, attslot22})
+	err := pool.SaveAggregatedAttestations([]*qrysmpb.Attestation{attSlot1, attslot21, attslot22})
 	assert.NoError(t, err)
 	s := &Server{
 		AttestationsPool: pool,
@@ -163,7 +163,7 @@ func TestGetAggregateAttestation(t *testing.T) {
 	t.Run("aggregate beforehand", func(t *testing.T) {
 		err = s.AttestationsPool.SaveUnaggregatedAttestation(attslot33)
 		require.NoError(t, err)
-		newAtt := zondpbalpha.CopyAttestation(attslot33)
+		newAtt := qrysmpb.CopyAttestation(attslot33)
 		newAtt.AggregationBits = []byte{0, 1, 0, 1}
 		err = s.AttestationsPool.SaveUnaggregatedAttestation(newAtt)
 		require.NoError(t, err)
@@ -256,34 +256,34 @@ func TestGetAggregateAttestation(t *testing.T) {
 func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *testing.T) {
 	root := bytesutil.PadTo([]byte("root"), 32)
 	sig := bytesutil.PadTo([]byte("sig"), fieldparams.DilithiumSignatureLength)
-	att1 := &zondpbalpha.Attestation{
+	att1 := &qrysmpb.Attestation{
 		AggregationBits: []byte{3, 0, 0, 1},
-		Data: &zondpbalpha.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  1,
 			BeaconBlockRoot: root,
-			Source: &zondpbalpha.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root,
 			},
-			Target: &zondpbalpha.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root,
 			},
 		},
 		Signatures: [][]byte{sig},
 	}
-	att2 := &zondpbalpha.Attestation{
+	att2 := &qrysmpb.Attestation{
 		AggregationBits: []byte{0, 3, 0, 1},
-		Data: &zondpbalpha.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  1,
 			BeaconBlockRoot: root,
-			Source: &zondpbalpha.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root,
 			},
-			Target: &zondpbalpha.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  root,
 			},
@@ -291,7 +291,7 @@ func TestGetAggregateAttestation_SameSlotAndRoot_ReturnMostAggregationBits(t *te
 		Signatures: [][]byte{sig},
 	}
 	pool := attestations.NewPool()
-	err := pool.SaveAggregatedAttestations([]*zondpbalpha.Attestation{att1, att2})
+	err := pool.SaveAggregatedAttestations([]*qrysmpb.Attestation{att1, att2})
 	assert.NoError(t, err)
 	s := &Server{
 		AttestationsPool: pool,
@@ -839,7 +839,7 @@ func TestGetAttestationData(t *testing.T) {
 		beaconState, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
 		require.NoError(t, beaconState.SetSlot(slot))
-		err = beaconState.SetCurrentJustifiedCheckpoint(&zondpbalpha.Checkpoint{
+		err = beaconState.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{
 			Epoch: 2,
 			Root:  justifiedRoot[:],
 		})
@@ -975,7 +975,7 @@ func TestGetAttestationData(t *testing.T) {
 	})
 
 	t.Run("handles in progress request", func(t *testing.T) {
-		state, err := state_native.InitializeFromProtoCapella(&zondpbalpha.BeaconStateCapella{Slot: 100})
+		state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Slot: 100})
 		require.NoError(t, err)
 		ctx := context.Background()
 		slot := primitives.Slot(2)
@@ -1014,12 +1014,12 @@ func TestGetAttestationData(t *testing.T) {
 			},
 		}
 
-		expectedResponsePb := &zondpbalpha.AttestationData{
+		expectedResponsePb := &qrysmpb.AttestationData{
 			Slot:            slot,
 			CommitteeIndex:  1,
 			BeaconBlockRoot: make([]byte, 32),
-			Source:          &zondpbalpha.Checkpoint{Epoch: 42, Root: make([]byte, 32)},
-			Target:          &zondpbalpha.Checkpoint{Epoch: 55, Root: make([]byte, 32)},
+			Source:          &qrysmpb.Checkpoint{Epoch: 42, Root: make([]byte, 32)},
+			Target:          &qrysmpb.Checkpoint{Epoch: 55, Root: make([]byte, 32)},
 		}
 
 		url := fmt.Sprintf("http://example.com?slot=%d&committee_index=%d", slot, 1)
@@ -1027,7 +1027,7 @@ func TestGetAttestationData(t *testing.T) {
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 
-		requestPb := &zondpbalpha.AttestationDataRequest{
+		requestPb := &qrysmpb.AttestationDataRequest{
 			CommitteeIndex: 1,
 			Slot:           slot,
 		}
@@ -1119,11 +1119,11 @@ func TestGetAttestationData(t *testing.T) {
 		require.NoError(t, beaconState.SetSlot(slot))
 		offset := int64(slot.Mul(params.BeaconConfig().SecondsPerSlot))
 		require.NoError(t, beaconState.SetGenesisTime(uint64(time.Now().Unix()-offset)))
-		err = beaconState.SetLatestBlockHeader(util.HydrateBeaconHeader(&zondpbalpha.BeaconBlockHeader{
+		err = beaconState.SetLatestBlockHeader(util.HydrateBeaconHeader(&qrysmpb.BeaconBlockHeader{
 			ParentRoot: blockRoot2[:],
 		}))
 		require.NoError(t, err)
-		err = beaconState.SetCurrentJustifiedCheckpoint(&zondpbalpha.Checkpoint{
+		err = beaconState.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{
 			Epoch: 2,
 			Root:  justifiedRoot[:],
 		})
@@ -1209,7 +1209,7 @@ func TestGetAttestationData(t *testing.T) {
 		beaconState, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
 		require.NoError(t, beaconState.SetSlot(slot))
-		err = beaconState.SetCurrentJustifiedCheckpoint(&zondpbalpha.Checkpoint{
+		err = beaconState.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  justifiedRoot[:],
 		})
@@ -1305,7 +1305,7 @@ func TestGetAttestationData(t *testing.T) {
 		beaconState, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
 		require.NoError(t, beaconState.SetSlot(slot))
-		err = beaconState.SetCurrentJustifiedCheckpoint(&zondpbalpha.Checkpoint{
+		err = beaconState.SetCurrentJustifiedCheckpoint(&qrysmpb.Checkpoint{
 			Epoch: slots.ToEpoch(1500),
 			Root:  justifiedBlockRoot[:],
 		})
@@ -1368,7 +1368,7 @@ func TestGetAttestationData(t *testing.T) {
 func TestProduceSyncCommitteeContribution(t *testing.T) {
 	root := bytesutil.PadTo([]byte("0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"), 32)
 	sig := []byte{}
-	messsage := &zondpbalpha.SyncCommitteeMessage{
+	messsage := &qrysmpb.SyncCommitteeMessage{
 		Slot:           1,
 		BlockRoot:      root,
 		ValidatorIndex: 0,
@@ -2049,14 +2049,14 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 	st, _ := util.DeterministicGenesisStateCapella(t, numVals)
 	require.NoError(t, st.SetGenesisTime(uint64(genesisTime.Unix())))
 	vals := st.Validators()
-	currCommittee := &zondpbalpha.SyncCommittee{}
+	currCommittee := &qrysmpb.SyncCommittee{}
 	for i := 0; i < 5; i++ {
 		currCommittee.Pubkeys = append(currCommittee.Pubkeys, vals[i].PublicKey)
 	}
 	// add one public key twice - this is needed for one of the test cases
 	currCommittee.Pubkeys = append(currCommittee.Pubkeys, vals[0].PublicKey)
 	require.NoError(t, st.SetCurrentSyncCommittee(currCommittee))
-	nextCommittee := &zondpbalpha.SyncCommittee{}
+	nextCommittee := &qrysmpb.SyncCommittee{}
 	for i := 5; i < 10; i++ {
 		nextCommittee.Pubkeys = append(nextCommittee.Pubkeys, vals[i].PublicKey)
 	}
@@ -2227,12 +2227,12 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 		require.NoError(t, newSyncPeriodSt.SetSlot(newSyncPeriodStartSlot))
 		require.NoError(t, newSyncPeriodSt.SetGenesisTime(uint64(genesisTime.Unix())))
 		vals := newSyncPeriodSt.Validators()
-		currCommittee := &zondpbalpha.SyncCommittee{}
+		currCommittee := &qrysmpb.SyncCommittee{}
 		for i := 5; i < 10; i++ {
 			currCommittee.Pubkeys = append(currCommittee.Pubkeys, vals[i].PublicKey)
 		}
 		require.NoError(t, newSyncPeriodSt.SetCurrentSyncCommittee(currCommittee))
-		nextCommittee := &zondpbalpha.SyncCommittee{}
+		nextCommittee := &qrysmpb.SyncCommittee{}
 		for i := 0; i < 5; i++ {
 			nextCommittee.Pubkeys = append(nextCommittee.Pubkeys, vals[i].PublicKey)
 		}
@@ -2312,8 +2312,8 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 	t.Run("execution optimistic", func(t *testing.T) {
 		ctx := context.Background()
 		db := dbutil.SetupDB(t)
-		require.NoError(t, db.SaveStateSummary(ctx, &zondpbalpha.StateSummary{Slot: 0, Root: []byte("root")}))
-		require.NoError(t, db.SaveLastValidatedCheckpoint(ctx, &zondpbalpha.Checkpoint{Epoch: 0, Root: []byte("root")}))
+		require.NoError(t, db.SaveStateSummary(ctx, &qrysmpb.StateSummary{Slot: 0, Root: []byte("root")}))
+		require.NoError(t, db.SaveLastValidatedCheckpoint(ctx, &qrysmpb.Checkpoint{Epoch: 0, Root: []byte("root")}))
 
 		parentRoot := [32]byte{'a'}
 		blk := util.NewBeaconBlockCapella()
@@ -2334,7 +2334,7 @@ func TestGetSyncCommitteeDuties(t *testing.T) {
 			Genesis:    genesisTime,
 			Optimistic: true,
 			Slot:       &slot,
-			FinalizedCheckPoint: &zondpbalpha.Checkpoint{
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{
 				Root:  root[:],
 				Epoch: 1,
 			},

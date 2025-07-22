@@ -1,4 +1,4 @@
-package zond
+package qrl
 
 import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"

@@ -17,7 +17,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -37,8 +37,8 @@ func TestServer_ListAssignments_CannotRequestFutureEpoch(t *testing.T) {
 	wanted := errNoEpochInfoError
 	_, err := bs.ListValidatorAssignments(
 		ctx,
-		&zondpb.ListValidatorAssignmentsRequest{
-			QueryFilter: &zondpb.ListValidatorAssignmentsRequest_Epoch{
+		&qrysmpb.ListValidatorAssignmentsRequest{
+			QueryFilter: &qrysmpb.ListValidatorAssignmentsRequest_Epoch{
 				Epoch: slots.ToEpoch(bs.GenesisTimeFetcher.CurrentSlot()) + 1,
 			},
 		},
@@ -65,15 +65,15 @@ func TestServer_ListAssignments_NoResults(t *testing.T) {
 		StateGen:           stategen.New(db, doublylinkedtree.New()),
 		ReplayerBuilder:    mockstategen.NewMockReplayerBuilder(mockstategen.WithMockState(st)),
 	}
-	wanted := &zondpb.ValidatorAssignments{
-		Assignments:   make([]*zondpb.ValidatorAssignments_CommitteeAssignment, 0),
+	wanted := &qrysmpb.ValidatorAssignments{
+		Assignments:   make([]*qrysmpb.ValidatorAssignments_CommitteeAssignment, 0),
 		TotalSize:     int32(0),
 		NextPageToken: strconv.Itoa(0),
 	}
 	res, err := bs.ListValidatorAssignments(
 		ctx,
-		&zondpb.ListValidatorAssignmentsRequest{
-			QueryFilter: &zondpb.ListValidatorAssignmentsRequest_Genesis{
+		&qrysmpb.ListValidatorAssignmentsRequest{
+			QueryFilter: &qrysmpb.ListValidatorAssignmentsRequest_Genesis{
 				Genesis: true,
 			},
 		},
@@ -89,12 +89,12 @@ func TestServer_ListAssignments_Pagination_InputOutOfRange(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
 	count := 100
-	validators := make([]*zondpb.Validator, 0, count)
+	validators := make([]*qrysmpb.Validator, 0, count)
 	for i := 0; i < count; i++ {
 		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
 		withdrawalCred := make([]byte, 32)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
-		validators = append(validators, &zondpb.Validator{
+		validators = append(validators, &qrysmpb.Validator{
 			PublicKey:             pubKey,
 			WithdrawalCredentials: withdrawalCred,
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
@@ -119,7 +119,7 @@ func TestServer_ListAssignments_Pagination_InputOutOfRange(t *testing.T) {
 			State: s,
 		},
 		FinalizationFetcher: &mock.ChainService{
-			FinalizedCheckPoint: &zondpb.Checkpoint{
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{
 				Epoch: 0,
 			},
 		},
@@ -129,9 +129,9 @@ func TestServer_ListAssignments_Pagination_InputOutOfRange(t *testing.T) {
 	}
 
 	wanted := fmt.Sprintf("page start %d >= list %d", 500, count)
-	_, err = bs.ListValidatorAssignments(context.Background(), &zondpb.ListValidatorAssignmentsRequest{
+	_, err = bs.ListValidatorAssignments(context.Background(), &qrysmpb.ListValidatorAssignmentsRequest{
 		PageToken:   strconv.Itoa(2),
-		QueryFilter: &zondpb.ListValidatorAssignmentsRequest_Genesis{Genesis: true},
+		QueryFilter: &qrysmpb.ListValidatorAssignmentsRequest_Genesis{Genesis: true},
 	})
 	assert.ErrorContains(t, wanted, err)
 }
@@ -141,7 +141,7 @@ func TestServer_ListAssignments_Pagination_ExceedsMaxPageSize(t *testing.T) {
 	exceedsMax := int32(cmd.Get().MaxRPCPageSize + 1)
 
 	wanted := fmt.Sprintf("Requested page size %d can not be greater than max size %d", exceedsMax, cmd.Get().MaxRPCPageSize)
-	req := &zondpb.ListValidatorAssignmentsRequest{
+	req := &qrysmpb.ListValidatorAssignmentsRequest{
 		PageToken: strconv.Itoa(0),
 		PageSize:  exceedsMax,
 	}
@@ -154,14 +154,14 @@ func TestServer_ListAssignments_Pagination_DefaultPageSize_NoArchive(t *testing.
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
 	count := 500
-	validators := make([]*zondpb.Validator, 0, count)
+	validators := make([]*qrysmpb.Validator, 0, count)
 	for i := 0; i < count; i++ {
 		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
 		withdrawalCred := make([]byte, 32)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		// Mark the validators with index divisible by 3 inactive.
 		if i%3 == 0 {
-			validators = append(validators, &zondpb.Validator{
+			validators = append(validators, &qrysmpb.Validator{
 				PublicKey:             pubKey,
 				WithdrawalCredentials: withdrawalCred,
 				ExitEpoch:             0,
@@ -169,7 +169,7 @@ func TestServer_ListAssignments_Pagination_DefaultPageSize_NoArchive(t *testing.
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 			})
 		} else {
-			validators = append(validators, &zondpb.Validator{
+			validators = append(validators, &qrysmpb.Validator{
 				PublicKey:             pubKey,
 				WithdrawalCredentials: withdrawalCred,
 				ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
@@ -195,7 +195,7 @@ func TestServer_ListAssignments_Pagination_DefaultPageSize_NoArchive(t *testing.
 			State: s,
 		},
 		FinalizationFetcher: &mock.ChainService{
-			FinalizedCheckPoint: &zondpb.Checkpoint{
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{
 				Epoch: 0,
 			},
 		},
@@ -204,13 +204,13 @@ func TestServer_ListAssignments_Pagination_DefaultPageSize_NoArchive(t *testing.
 		ReplayerBuilder:    mockstategen.NewMockReplayerBuilder(mockstategen.WithMockState(s)),
 	}
 
-	res, err := bs.ListValidatorAssignments(context.Background(), &zondpb.ListValidatorAssignmentsRequest{
-		QueryFilter: &zondpb.ListValidatorAssignmentsRequest_Genesis{Genesis: true},
+	res, err := bs.ListValidatorAssignments(context.Background(), &qrysmpb.ListValidatorAssignmentsRequest{
+		QueryFilter: &qrysmpb.ListValidatorAssignmentsRequest_Genesis{Genesis: true},
 	})
 	require.NoError(t, err)
 
 	// Construct the wanted assignments.
-	var wanted []*zondpb.ValidatorAssignments_CommitteeAssignment
+	var wanted []*qrysmpb.ValidatorAssignments_CommitteeAssignment
 
 	activeIndices, err := helpers.ActiveValidatorIndices(ctx, s, 0)
 	require.NoError(t, err)
@@ -218,7 +218,7 @@ func TestServer_ListAssignments_Pagination_DefaultPageSize_NoArchive(t *testing.
 	require.NoError(t, err)
 	for _, index := range activeIndices[0:params.BeaconConfig().DefaultPageSize] {
 		require.NoError(t, err)
-		wanted = append(wanted, &zondpb.ValidatorAssignments_CommitteeAssignment{
+		wanted = append(wanted, &qrysmpb.ValidatorAssignments_CommitteeAssignment{
 			BeaconCommittees: committeeAssignments[index].Committee,
 			CommitteeIndex:   committeeAssignments[index].CommitteeIndex,
 			AttesterSlot:     committeeAssignments[index].AttesterSlot,
@@ -235,12 +235,12 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 
 	ctx := context.Background()
 	count := 100
-	validators := make([]*zondpb.Validator, 0, count)
+	validators := make([]*qrysmpb.Validator, 0, count)
 	withdrawCreds := make([]byte, 32)
 	for i := 0; i < count; i++ {
 		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
-		val := &zondpb.Validator{
+		val := &qrysmpb.Validator{
 			PublicKey:             pubKey,
 			WithdrawalCredentials: withdrawCreds,
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
@@ -260,7 +260,7 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 	bs := &Server{
 		BeaconDB: db,
 		FinalizationFetcher: &mock.ChainService{
-			FinalizedCheckPoint: &zondpb.Checkpoint{
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{
 				Epoch: 0,
 			},
 		},
@@ -273,12 +273,12 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 	binary.LittleEndian.PutUint64(pubKey1, 1)
 	pubKey2 := make([]byte, field_params.DilithiumPubkeyLength)
 	binary.LittleEndian.PutUint64(pubKey2, 2)
-	req := &zondpb.ListValidatorAssignmentsRequest{PublicKeys: [][]byte{pubKey1, pubKey2}, Indices: []primitives.ValidatorIndex{2, 3}}
+	req := &qrysmpb.ListValidatorAssignmentsRequest{PublicKeys: [][]byte{pubKey1, pubKey2}, Indices: []primitives.ValidatorIndex{2, 3}}
 	res, err := bs.ListValidatorAssignments(context.Background(), req)
 	require.NoError(t, err)
 
 	// Construct the wanted assignments.
-	var wanted []*zondpb.ValidatorAssignments_CommitteeAssignment
+	var wanted []*qrysmpb.ValidatorAssignments_CommitteeAssignment
 
 	activeIndices, err := helpers.ActiveValidatorIndices(ctx, s, 0)
 	require.NoError(t, err)
@@ -286,7 +286,7 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 	require.NoError(t, err)
 	for _, index := range activeIndices[1:4] {
 		require.NoError(t, err)
-		wanted = append(wanted, &zondpb.ValidatorAssignments_CommitteeAssignment{
+		wanted = append(wanted, &qrysmpb.ValidatorAssignments_CommitteeAssignment{
 			BeaconCommittees: committeeAssignments[index].Committee,
 			CommitteeIndex:   committeeAssignments[index].CommitteeIndex,
 			AttesterSlot:     committeeAssignments[index].AttesterSlot,
@@ -303,12 +303,12 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
 	count := 100
-	validators := make([]*zondpb.Validator, 0, count)
+	validators := make([]*qrysmpb.Validator, 0, count)
 	withdrawCred := make([]byte, 32)
 	for i := 0; i < count; i++ {
 		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
-		val := &zondpb.Validator{
+		val := &qrysmpb.Validator{
 			PublicKey:             pubKey,
 			WithdrawalCredentials: withdrawCred,
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
@@ -329,7 +329,7 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 	bs := &Server{
 		BeaconDB: db,
 		FinalizationFetcher: &mock.ChainService{
-			FinalizedCheckPoint: &zondpb.Checkpoint{
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{
 				Epoch: 0,
 			},
 		},
@@ -339,12 +339,12 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 
 	addDefaultReplayerBuilder(bs, db)
 
-	req := &zondpb.ListValidatorAssignmentsRequest{Indices: []primitives.ValidatorIndex{1, 2, 3, 4, 5, 6}, PageSize: 2, PageToken: "1"}
+	req := &qrysmpb.ListValidatorAssignmentsRequest{Indices: []primitives.ValidatorIndex{1, 2, 3, 4, 5, 6}, PageSize: 2, PageToken: "1"}
 	res, err := bs.ListValidatorAssignments(context.Background(), req)
 	require.NoError(t, err)
 
 	// Construct the wanted assignments.
-	var assignments []*zondpb.ValidatorAssignments_CommitteeAssignment
+	var assignments []*qrysmpb.ValidatorAssignments_CommitteeAssignment
 
 	activeIndices, err := helpers.ActiveValidatorIndices(ctx, s, 0)
 	require.NoError(t, err)
@@ -352,7 +352,7 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 	require.NoError(t, err)
 	for _, index := range activeIndices[3:5] {
 		require.NoError(t, err)
-		assignments = append(assignments, &zondpb.ValidatorAssignments_CommitteeAssignment{
+		assignments = append(assignments, &qrysmpb.ValidatorAssignments_CommitteeAssignment{
 			BeaconCommittees: committeeAssignments[index].Committee,
 			CommitteeIndex:   committeeAssignments[index].CommitteeIndex,
 			AttesterSlot:     committeeAssignments[index].AttesterSlot,
@@ -361,7 +361,7 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 		})
 	}
 
-	wantedRes := &zondpb.ValidatorAssignments{
+	wantedRes := &qrysmpb.ValidatorAssignments{
 		Assignments:   assignments,
 		TotalSize:     int32(len(req.Indices)),
 		NextPageToken: "2",
@@ -371,14 +371,14 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 
 	// Test the wrap around scenario.
 	assignments = nil
-	req = &zondpb.ListValidatorAssignmentsRequest{Indices: []primitives.ValidatorIndex{1, 2, 3, 4, 5, 6}, PageSize: 5, PageToken: "1"}
+	req = &qrysmpb.ListValidatorAssignmentsRequest{Indices: []primitives.ValidatorIndex{1, 2, 3, 4, 5, 6}, PageSize: 5, PageToken: "1"}
 	res, err = bs.ListValidatorAssignments(context.Background(), req)
 	require.NoError(t, err)
 	cAssignments, proposerIndexToSlots, err := helpers.CommitteeAssignments(context.Background(), s, 0)
 	require.NoError(t, err)
 	for _, index := range activeIndices[6:7] {
 		require.NoError(t, err)
-		assignments = append(assignments, &zondpb.ValidatorAssignments_CommitteeAssignment{
+		assignments = append(assignments, &qrysmpb.ValidatorAssignments_CommitteeAssignment{
 			BeaconCommittees: cAssignments[index].Committee,
 			CommitteeIndex:   cAssignments[index].CommitteeIndex,
 			AttesterSlot:     cAssignments[index].AttesterSlot,
@@ -387,7 +387,7 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 		})
 	}
 
-	wantedRes = &zondpb.ValidatorAssignments{
+	wantedRes = &qrysmpb.ValidatorAssignments{
 		Assignments:   assignments,
 		TotalSize:     int32(len(req.Indices)),
 		NextPageToken: "",

@@ -40,7 +40,7 @@ func TestGetValidators(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -77,7 +77,7 @@ func TestGetValidators(t *testing.T) {
 
 		request := httptest.NewRequest(
 			http.MethodGet,
-			"http://example.com/zond/v1/beacon/states/{state_id}/validators?id=15&id=26",
+			"http://example.com/qrl/v1/beacon/states/{state_id}/validators?id=15&id=26",
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -109,7 +109,7 @@ func TestGetValidators(t *testing.T) {
 		hexPubkey2 := hexutil.Encode(pubkey2[:])
 		request := httptest.NewRequest(
 			http.MethodGet,
-			fmt.Sprintf("http://example.com/zond/v1/beacon/states/{state_id}/validators?id=%s&id=%s", hexPubkey1, hexPubkey2),
+			fmt.Sprintf("http://example.com/qrl/v1/beacon/states/{state_id}/validators?id=%s&id=%s", hexPubkey1, hexPubkey2),
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -139,7 +139,7 @@ func TestGetValidators(t *testing.T) {
 		hexPubkey := hexutil.Encode(pubkey[:])
 		request := httptest.NewRequest(
 			http.MethodGet,
-			fmt.Sprintf("http://example.com/zond/v1/beacon/states/{state_id}/validators?id=%s&id=60", hexPubkey),
+			fmt.Sprintf("http://example.com/qrl/v1/beacon/states/{state_id}/validators?id=%s&id=60", hexPubkey),
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -162,7 +162,7 @@ func TestGetValidators(t *testing.T) {
 			HeadFetcher: &chainMock.ChainService{},
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators", nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 
@@ -188,7 +188,7 @@ func TestGetValidators(t *testing.T) {
 		hexPubkey := hexutil.Encode(pubkey[:])
 		request := httptest.NewRequest(
 			http.MethodGet,
-			fmt.Sprintf("http://example.com/zond/v1/beacon/states/{state_id}/validators?id=%s&id=%s", hexPubkey, hexutil.Encode([]byte(strings.Repeat("x", fieldparams.DilithiumPubkeyLength)))),
+			fmt.Sprintf("http://example.com/qrl/v1/beacon/states/{state_id}/validators?id=%s&id=%s", hexPubkey, hexutil.Encode([]byte(strings.Repeat("x", fieldparams.DilithiumPubkeyLength)))),
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -213,7 +213,7 @@ func TestGetValidators(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators?id=1&id=99999", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators?id=1&id=99999", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -236,7 +236,7 @@ func TestGetValidators(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -264,7 +264,7 @@ func TestGetValidators(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -357,7 +357,7 @@ func TestListValidators_FilterByStatus(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators?status=active", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators?status=active", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -388,7 +388,7 @@ func TestListValidators_FilterByStatus(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators?status=active_ongoing", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators?status=active_ongoing", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -418,7 +418,7 @@ func TestListValidators_FilterByStatus(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators?status=exited", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators?status=exited", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -449,7 +449,7 @@ func TestListValidators_FilterByStatus(t *testing.T) {
 
 		request := httptest.NewRequest(
 			http.MethodGet,
-			"http://example.com/zond/v1/beacon/states/{state_id}/validators?status=pending_initialized&status=exited_unslashed",
+			"http://example.com/qrl/v1/beacon/states/{state_id}/validators?status=pending_initialized&status=exited_unslashed",
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -482,7 +482,7 @@ func TestListValidators_FilterByStatus(t *testing.T) {
 
 		request := httptest.NewRequest(
 			http.MethodGet,
-			"http://example.com/zond/v1/beacon/states/{state_id}/validators?status=pending&status=exited_slashed",
+			"http://example.com/qrl/v1/beacon/states/{state_id}/validators?status=pending&status=exited_slashed",
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -519,7 +519,7 @@ func TestGetValidator(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head", "validator_id": "15"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -554,7 +554,7 @@ func TestGetValidator(t *testing.T) {
 
 		pubKey := st.PubkeyAtIndex(primitives.ValidatorIndex(20))
 		hexPubkey := hexutil.Encode(pubKey[:])
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head", "validator_id": hexPubkey})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -573,7 +573,7 @@ func TestGetValidator(t *testing.T) {
 			HeadFetcher: &chainMock.ChainService{},
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
 		request = mux.SetURLVars(request, map[string]string{"validator_id": "1"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -593,7 +593,7 @@ func TestGetValidator(t *testing.T) {
 			HeadFetcher: &chainMock.ChainService{},
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -613,7 +613,7 @@ func TestGetValidator(t *testing.T) {
 			HeadFetcher: &chainMock.ChainService{},
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head", "validator_id": "99999"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -633,7 +633,7 @@ func TestGetValidator(t *testing.T) {
 			HeadFetcher: &chainMock.ChainService{},
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head", "validator_id": hexutil.Encode([]byte(strings.Repeat("x", fieldparams.DilithiumPubkeyLength)))})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -656,7 +656,7 @@ func TestGetValidator(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head", "validator_id": "15"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -684,7 +684,7 @@ func TestGetValidator(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head", "validator_id": "15"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -718,7 +718,7 @@ func TestGetValidatorBalances(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validator_balances", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validator_balances", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -745,7 +745,7 @@ func TestGetValidatorBalances(t *testing.T) {
 
 		request := httptest.NewRequest(
 			http.MethodGet,
-			"http://example.com/zond/v1/beacon/states/{state_id}/validator_balances?id=15&id=26",
+			"http://example.com/qrl/v1/beacon/states/{state_id}/validator_balances?id=15&id=26",
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -777,7 +777,7 @@ func TestGetValidatorBalances(t *testing.T) {
 
 		request := httptest.NewRequest(
 			http.MethodGet,
-			fmt.Sprintf("http://example.com/zond/v1/beacon/states/{state_id}/validator_balances?id=%s&id=%s", hexPubkey1, hexPubkey2),
+			fmt.Sprintf("http://example.com/qrl/v1/beacon/states/{state_id}/validator_balances?id=%s&id=%s", hexPubkey1, hexPubkey2),
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -807,7 +807,7 @@ func TestGetValidatorBalances(t *testing.T) {
 		hexPubkey := hexutil.Encode(pubkey[:])
 		request := httptest.NewRequest(
 			http.MethodGet,
-			fmt.Sprintf("http://example.com/zond/v1/beacon/states/{state_id}/validators?id=%s&id=60", hexPubkey),
+			fmt.Sprintf("http://example.com/qrl/v1/beacon/states/{state_id}/validators?id=%s&id=60", hexPubkey),
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -837,7 +837,7 @@ func TestGetValidatorBalances(t *testing.T) {
 		hexPubkey := hexutil.Encode(pubkey[:])
 		request := httptest.NewRequest(
 			http.MethodGet,
-			fmt.Sprintf("http://example.com/zond/v1/beacon/states/{state_id}/validator_balances?id=%s&id=%s", hexPubkey, hexutil.Encode([]byte(strings.Repeat("x", fieldparams.DilithiumPubkeyLength)))),
+			fmt.Sprintf("http://example.com/qrl/v1/beacon/states/{state_id}/validator_balances?id=%s&id=%s", hexPubkey, hexutil.Encode([]byte(strings.Repeat("x", fieldparams.DilithiumPubkeyLength)))),
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -862,7 +862,7 @@ func TestGetValidatorBalances(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validator_balances?id=1&id=99999", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validator_balances?id=1&id=99999", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -882,7 +882,7 @@ func TestGetValidatorBalances(t *testing.T) {
 			HeadFetcher: &chainMock.ChainService{},
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/states/{state_id}/validator_balances", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validator_balances", nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 
@@ -906,7 +906,7 @@ func TestGetValidatorBalances(t *testing.T) {
 
 		request := httptest.NewRequest(
 			http.MethodGet,
-			"http://example.com/zond/v1/beacon/states/{state_id}/validator_balances?id=15",
+			"http://example.com/qrl/v1/beacon/states/{state_id}/validator_balances?id=15",
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -938,7 +938,7 @@ func TestGetValidatorBalances(t *testing.T) {
 
 		request := httptest.NewRequest(
 			http.MethodGet,
-			"http://example.com/zond/v1/beacon/states/{state_id}/validator_balances?id=15",
+			"http://example.com/qrl/v1/beacon/states/{state_id}/validator_balances?id=15",
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})

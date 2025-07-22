@@ -17,9 +17,9 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz/detect"
-	zondpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+	qrysmpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/endtoend/helpers"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	"github.com/theQRL/qrysm/testing/endtoend/policies"
@@ -133,13 +133,13 @@ func (m mismatch) String() string {
 func processesDepositsInBlocks(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	expected := ec.Balances(e2etypes.PostGenesisDepositBatch)
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 	chainHead, err := client.GetChainHead(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "failed to get chain head")
 	}
 
-	req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: chainHead.HeadEpoch - 1}}
+	req := &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: chainHead.HeadEpoch - 1}}
 	blks, err := client.ListBeaconBlocks(context.Background(), req)
 	if err != nil {
 		return errors.Wrap(err, "failed to get blocks from beacon-chain")
@@ -173,7 +173,7 @@ func processesDepositsInBlocks(ec *e2etypes.EvaluationContext, conns ...*grpc.Cl
 
 func verifyGraffitiInBlocks(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 	chainHead, err := client.GetChainHead(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "failed to get chain head")
@@ -183,7 +183,7 @@ func verifyGraffitiInBlocks(_ *e2etypes.EvaluationContext, conns ...*grpc.Client
 	if begin > 0 {
 		begin = begin.Sub(1)
 	}
-	req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
+	req := &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: begin}}
 	blks, err := client.ListBeaconBlocks(context.Background(), req)
 	if err != nil {
 		return errors.Wrap(err, "failed to get blocks from beacon-chain")
@@ -212,7 +212,7 @@ func verifyGraffitiInBlocks(_ *e2etypes.EvaluationContext, conns ...*grpc.Client
 
 func activatesDepositedValidators(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 
 	chainHead, err := client.GetChainHead(context.Background(), &emptypb.Empty{})
 	if err != nil {
@@ -271,11 +271,11 @@ func activatesDepositedValidators(ec *e2etypes.EvaluationContext, conns ...*grpc
 	return nil
 }
 
-func getAllValidators(c zondpb.BeaconChainClient) ([]*zondpb.Validator, error) {
-	vals := make([]*zondpb.Validator, 0)
+func getAllValidators(c qrysmpb.BeaconChainClient) ([]*qrysmpb.Validator, error) {
+	vals := make([]*qrysmpb.Validator, 0)
 	pageToken := "0"
 	for pageToken != "" {
-		validatorRequest := &zondpb.ListValidatorsRequest{
+		validatorRequest := &qrysmpb.ListValidatorsRequest{
 			PageSize:  100,
 			PageToken: pageToken,
 		}
@@ -293,7 +293,7 @@ func getAllValidators(c zondpb.BeaconChainClient) ([]*zondpb.Validator, error) {
 
 func depositedValidatorsAreActive(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 
 	chainHead, err := client.GetChainHead(context.Background(), &emptypb.Empty{})
 	if err != nil {
@@ -345,16 +345,16 @@ func depositedValidatorsAreActive(ec *e2etypes.EvaluationContext, conns ...*grpc
 
 func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	valClient := zondpb.NewBeaconNodeValidatorClient(conn)
-	beaconClient := zondpb.NewBeaconChainClient(conn)
-	debugClient := zondpb.NewDebugClient(conn)
+	valClient := qrysmpb.NewBeaconNodeValidatorClient(conn)
+	beaconClient := qrysmpb.NewBeaconChainClient(conn)
+	debugClient := qrysmpb.NewDebugClient(conn)
 
 	ctx := context.Background()
 	chainHead, err := beaconClient.GetChainHead(ctx, &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "could not get chain head")
 	}
-	stObj, err := debugClient.GetBeaconState(ctx, &zondpb.BeaconStateRequest{QueryFilter: &zondpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
+	stObj, err := debugClient.GetBeaconState(ctx, &qrysmpb.BeaconStateRequest{QueryFilter: &qrysmpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
 	if err != nil {
 		return errors.Wrap(err, "could not get state object")
 	}
@@ -386,11 +386,11 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 	}
 
 	var sendExit = func(exitedIndex primitives.ValidatorIndex) error {
-		voluntaryExit := &zondpb.VoluntaryExit{
+		voluntaryExit := &qrysmpb.VoluntaryExit{
 			Epoch:          chainHead.HeadEpoch,
 			ValidatorIndex: exitedIndex,
 		}
-		req := &zondpb.DomainRequest{
+		req := &qrysmpb.DomainRequest{
 			Epoch:  chainHead.HeadEpoch,
 			Domain: params.BeaconConfig().DomainVoluntaryExit[:],
 		}
@@ -403,7 +403,7 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 			return err
 		}
 		signature := privKeys[exitedIndex].Sign(signingData[:])
-		signedExit := &zondpb.SignedVoluntaryExit{
+		signedExit := &qrysmpb.SignedVoluntaryExit{
 			Exit:      voluntaryExit,
 			Signature: signature.Marshal(),
 		}
@@ -440,10 +440,10 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 
 func validatorsHaveExited(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 	for k := range ec.ExitedVals {
-		validatorRequest := &zondpb.GetValidatorRequest{
-			QueryFilter: &zondpb.GetValidatorRequest_PublicKey{
+		validatorRequest := &qrysmpb.GetValidatorRequest{
+			QueryFilter: &qrysmpb.GetValidatorRequest_PublicKey{
 				PublicKey: k[:],
 			},
 		}
@@ -460,7 +460,7 @@ func validatorsHaveExited(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 
 func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 	chainHead, err := client.GetChainHead(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "failed to get chain head")
@@ -471,7 +471,7 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 	if begin > 0 {
 		begin = begin.Sub(1)
 	}
-	req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
+	req := &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: begin}}
 	blks, err := client.ListBeaconBlocks(context.Background(), req)
 	if err != nil {
 		return errors.Wrap(err, "failed to get blocks from beacon-chain")
@@ -482,11 +482,11 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 		var slot primitives.Slot
 		var vote []byte
 		switch blk.Block.(type) {
-		case *zondpb.BeaconBlockContainer_CapellaBlock:
+		case *qrysmpb.BeaconBlockContainer_CapellaBlock:
 			b := blk.GetCapellaBlock().Block
 			slot = b.Slot
 			vote = b.Body.ExecutionNodeData.BlockHash
-		case *zondpb.BeaconBlockContainer_BlindedCapellaBlock:
+		case *qrysmpb.BeaconBlockContainer_BlindedCapellaBlock:
 			b := blk.GetBlindedCapellaBlock().Block
 			slot = b.Slot
 			vote = b.Body.ExecutionNodeData.BlockHash
@@ -531,16 +531,16 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 
 func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	beaconAPIClient := zondpbservice.NewBeaconChainClient(conn)
-	beaconClient := zondpb.NewBeaconChainClient(conn)
-	debugClient := zondpb.NewDebugClient(conn)
+	beaconAPIClient := qrysmpbservice.NewBeaconChainClient(conn)
+	beaconClient := qrysmpb.NewBeaconChainClient(conn)
+	debugClient := qrysmpb.NewDebugClient(conn)
 
 	ctx := context.Background()
 	chainHead, err := beaconClient.GetChainHead(ctx, &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "could not get chain head")
 	}
-	stObj, err := debugClient.GetBeaconState(ctx, &zondpb.BeaconStateRequest{QueryFilter: &zondpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
+	stObj, err := debugClient.GetBeaconState(ctx, &qrysmpb.BeaconStateRequest{QueryFilter: &qrysmpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
 	if err != nil {
 		return errors.Wrap(err, "could not get state object")
 	}
@@ -612,15 +612,15 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 
 func validatorsAreWithdrawn(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	beaconClient := zondpb.NewBeaconChainClient(conn)
-	debugClient := zondpb.NewDebugClient(conn)
+	beaconClient := qrysmpb.NewBeaconChainClient(conn)
+	debugClient := qrysmpb.NewDebugClient(conn)
 
 	ctx := context.Background()
 	chainHead, err := beaconClient.GetChainHead(ctx, &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "could not get chain head")
 	}
-	stObj, err := debugClient.GetBeaconState(ctx, &zondpb.BeaconStateRequest{QueryFilter: &zondpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
+	stObj, err := debugClient.GetBeaconState(ctx, &qrysmpb.BeaconStateRequest{QueryFilter: &qrysmpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
 	if err != nil {
 		return errors.Wrap(err, "could not get state object")
 	}

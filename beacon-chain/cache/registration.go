@@ -12,7 +12,7 @@ import (
 )
 
 // RegistrationCache is used to store the cached results of an Validator Registration request.
-// beacon api /zond/v1/validator/register_validator
+// beacon api /qrl/v1/validator/register_validator
 type RegistrationCache struct {
 	indexToRegistration map[primitives.ValidatorIndex]*qrysmpb.ValidatorRegistrationV1
 	lock                sync.RWMutex

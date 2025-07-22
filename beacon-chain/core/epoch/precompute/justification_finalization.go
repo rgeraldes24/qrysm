@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
@@ -16,7 +16,7 @@ var errNilState = errors.New("nil state")
 // UnrealizedCheckpoints returns the justification and finalization checkpoints of the
 // given state as if it was progressed with empty slots until the next epoch. It
 // also returns the total active balance during the epoch.
-func UnrealizedCheckpoints(st state.BeaconState) (*zondpb.Checkpoint, *zondpb.Checkpoint, error) {
+func UnrealizedCheckpoints(st state.BeaconState) (*qrysmpb.Checkpoint, *qrysmpb.Checkpoint, error) {
 	if st == nil || st.IsNil() {
 		return nil, nil, errNilState
 	}
@@ -150,7 +150,7 @@ func weighJustificationAndFinalization(state state.BeaconState, newBits bitfield
 //	# The 1st/2nd most recent epochs are justified, the 1st using the 2nd as source
 //	if all(bits[0:2]) and old_current_justified_checkpoint.epoch + 1 == current_epoch:
 //	    state.finalized_checkpoint = old_current_justified_checkpoint
-func computeCheckpoints(state state.BeaconState, newBits bitfield.Bitvector4) (*zondpb.Checkpoint, *zondpb.Checkpoint, error) {
+func computeCheckpoints(state state.BeaconState, newBits bitfield.Bitvector4) (*qrysmpb.Checkpoint, *qrysmpb.Checkpoint, error) {
 	prevEpoch := time.PrevEpoch(state)
 	currentEpoch := time.CurrentEpoch(state)
 	oldPrevJustifiedCheckpoint := state.PreviousJustifiedCheckpoint()

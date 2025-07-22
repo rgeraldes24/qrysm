@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -34,12 +34,12 @@ func TestGetBeaconState(t *testing.T) {
 			FinalizationFetcher:   &blockchainmock.ChainService{},
 			BeaconDB:              db,
 		}
-		resp, err := server.GetBeaconState(context.Background(), &zondpbv1.BeaconStateRequest{
+		resp, err := server.GetBeaconState(context.Background(), &qrlpb.BeaconStateRequest{
 			StateId: []byte("head"),
 		})
 		require.NoError(t, err)
 		assert.NotNil(t, resp)
-		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
+		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		parentRoot := [32]byte{'a'}
@@ -60,7 +60,7 @@ func TestGetBeaconState(t *testing.T) {
 			FinalizationFetcher:   &blockchainmock.ChainService{},
 			BeaconDB:              db,
 		}
-		resp, err := server.GetBeaconState(context.Background(), &zondpbv1.BeaconStateRequest{
+		resp, err := server.GetBeaconState(context.Background(), &qrlpb.BeaconStateRequest{
 			StateId: []byte("head"),
 		})
 		require.NoError(t, err)
@@ -93,7 +93,7 @@ func TestGetBeaconState(t *testing.T) {
 			FinalizationFetcher:   chainService,
 			BeaconDB:              db,
 		}
-		resp, err := server.GetBeaconState(context.Background(), &zondpbv1.BeaconStateRequest{
+		resp, err := server.GetBeaconState(context.Background(), &qrlpb.BeaconStateRequest{
 			StateId: []byte("head"),
 		})
 		require.NoError(t, err)
@@ -113,14 +113,14 @@ func TestGetBeaconStateSSZ(t *testing.T) {
 				BeaconState: fakeState,
 			},
 		}
-		resp, err := server.GetBeaconStateSSZ(context.Background(), &zondpbv1.BeaconStateRequest{
+		resp, err := server.GetBeaconStateSSZ(context.Background(), &qrlpb.BeaconStateRequest{
 			StateId: make([]byte, 0),
 		})
 		require.NoError(t, err)
 		assert.NotNil(t, resp)
 
 		assert.DeepEqual(t, sszState, resp.Data)
-		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
+		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
 	})
 }
 

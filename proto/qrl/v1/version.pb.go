@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/v1/version.proto
+// source: proto/qrl/v1/version.proto
 
 package v1
 
@@ -107,7 +107,7 @@ func file_proto_zond_v1_version_proto_rawDescGZIP() []byte {
 
 var file_proto_zond_v1_version_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_zond_v1_version_proto_goTypes = []interface{}{
-	(Version)(0), // 0: theqrl.zond.v1.Version
+	(Version)(0), // 0: theqrl.qrl.v1.Version
 }
 var file_proto_zond_v1_version_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type

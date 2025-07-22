@@ -27,7 +27,7 @@ import (
 	"github.com/theQRL/qrysm/contracts/deposit/mock"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/clientstats"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -246,9 +246,9 @@ func TestStatus(t *testing.T) {
 	testCases := map[*Service]string{
 		// "status is ok" cases
 		{}: "",
-		{isRunning: true, latestExecutionNodeData: &zondpb.LatestExecutionNodeData{BlockTime: afterFiveMinutesAgo}}:   "",
-		{isRunning: false, latestExecutionNodeData: &zondpb.LatestExecutionNodeData{BlockTime: beforeFiveMinutesAgo}}: "",
-		{isRunning: false, runError: errors.New("test runError")}:                                                     "",
+		{isRunning: true, latestExecutionNodeData: &qrysmpb.LatestExecutionNodeData{BlockTime: afterFiveMinutesAgo}}:   "",
+		{isRunning: false, latestExecutionNodeData: &qrysmpb.LatestExecutionNodeData{BlockTime: beforeFiveMinutesAgo}}: "",
+		{isRunning: false, runError: errors.New("test runError")}:                                                      "",
 		// "status is error" cases
 		{isRunning: true, runError: errors.New("test runError")}: "test runError",
 	}
@@ -284,15 +284,15 @@ func TestHandlePanic_OK(t *testing.T) {
 }
 
 func TestInitDepositCache_OK(t *testing.T) {
-	ctrs := []*zondpb.DepositContainer{
-		{Index: 0, Eth1BlockHeight: 2, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("A")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
-		{Index: 1, Eth1BlockHeight: 4, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("B")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
-		{Index: 2, Eth1BlockHeight: 6, Deposit: &zondpb.Deposit{Proof: [][]byte{[]byte("c")}, Data: &zondpb.Deposit_Data{PublicKey: []byte{}}}},
+	ctrs := []*qrysmpb.DepositContainer{
+		{Index: 0, Eth1BlockHeight: 2, Deposit: &qrysmpb.Deposit{Proof: [][]byte{[]byte("A")}, Data: &qrysmpb.Deposit_Data{PublicKey: []byte{}}}},
+		{Index: 1, Eth1BlockHeight: 4, Deposit: &qrysmpb.Deposit{Proof: [][]byte{[]byte("B")}, Data: &qrysmpb.Deposit_Data{PublicKey: []byte{}}}},
+		{Index: 2, Eth1BlockHeight: 6, Deposit: &qrysmpb.Deposit{Proof: [][]byte{[]byte("c")}, Data: &qrysmpb.Deposit_Data{PublicKey: []byte{}}}},
 	}
 	gs, _ := util.DeterministicGenesisStateCapella(t, 1)
 	beaconDB := dbutil.SetupDB(t)
 	s := &Service{
-		chainStartData:  &zondpb.ChainStartData{},
+		chainStartData:  &qrysmpb.ChainStartData{},
 		preGenesisState: gs,
 		cfg:             &config{beaconDB: beaconDB},
 	}
@@ -311,12 +311,12 @@ func TestInitDepositCache_OK(t *testing.T) {
 }
 
 func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
-	ctrs := []*zondpb.DepositContainer{
+	ctrs := []*qrysmpb.DepositContainer{
 		{
 			Index:           0,
 			Eth1BlockHeight: 2,
-			Deposit: &zondpb.Deposit{
-				Data: &zondpb.Deposit_Data{
+			Deposit: &qrysmpb.Deposit{
+				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
 					Signature:             make([]byte, 4595),
@@ -326,8 +326,8 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 		{
 			Index:           1,
 			Eth1BlockHeight: 4,
-			Deposit: &zondpb.Deposit{
-				Data: &zondpb.Deposit_Data{
+			Deposit: &qrysmpb.Deposit{
+				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
 					Signature:             make([]byte, 4595),
@@ -337,8 +337,8 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 		{
 			Index:           2,
 			Eth1BlockHeight: 6,
-			Deposit: &zondpb.Deposit{
-				Data: &zondpb.Deposit_Data{
+			Deposit: &qrysmpb.Deposit{
+				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
 					Signature:             make([]byte, 4595),
@@ -349,7 +349,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 	gs, _ := util.DeterministicGenesisStateCapella(t, 1)
 	beaconDB := dbutil.SetupDB(t)
 	s := &Service{
-		chainStartData:  &zondpb.ChainStartData{},
+		chainStartData:  &qrysmpb.ChainStartData{},
 		preGenesisState: gs,
 		cfg:             &config{beaconDB: beaconDB},
 	}
@@ -371,7 +371,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 	require.NoError(t, emptyState.SetEth1DepositIndex(3))
 
 	ctx := context.Background()
-	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &zondpb.Checkpoint{Epoch: slots.ToEpoch(0), Root: headRoot[:]}))
+	require.NoError(t, beaconDB.SaveFinalizedCheckpoint(ctx, &qrysmpb.Checkpoint{Epoch: slots.ToEpoch(0), Root: headRoot[:]}))
 	s.cfg.finalizedStateAtStartup = emptyState
 
 	require.NoError(t, s.initDepositCaches(context.Background(), ctrs))
@@ -564,9 +564,9 @@ func TestService_EnsureValidPowchainData(t *testing.T) {
 
 	require.NoError(t, s1.cfg.beaconDB.SaveGenesisData(context.Background(), genState))
 
-	err = s1.cfg.beaconDB.SaveExecutionChainData(context.Background(), &zondpb.ETH1ChainData{
-		ChainstartData:    &zondpb.ChainStartData{},
-		DepositContainers: []*zondpb.DepositContainer{{Index: 1}},
+	err = s1.cfg.beaconDB.SaveExecutionChainData(context.Background(), &qrysmpb.ETH1ChainData{
+		ChainstartData:    &qrysmpb.ChainStartData{},
+		DepositContainers: []*qrysmpb.DepositContainer{{Index: 1}},
 	})
 	require.NoError(t, err)
 	require.NoError(t, s1.ensureValidPowchainData(context.Background()))
@@ -581,22 +581,22 @@ func TestService_EnsureValidPowchainData(t *testing.T) {
 func TestService_ValidateDepositContainers(t *testing.T) {
 	var tt = []struct {
 		name        string
-		ctrsFunc    func() []*zondpb.DepositContainer
+		ctrsFunc    func() []*qrysmpb.DepositContainer
 		expectedRes bool
 	}{
 		{
 			name: "zero containers",
-			ctrsFunc: func() []*zondpb.DepositContainer {
-				return make([]*zondpb.DepositContainer, 0)
+			ctrsFunc: func() []*qrysmpb.DepositContainer {
+				return make([]*qrysmpb.DepositContainer, 0)
 			},
 			expectedRes: true,
 		},
 		{
 			name: "ordered containers",
-			ctrsFunc: func() []*zondpb.DepositContainer {
-				ctrs := make([]*zondpb.DepositContainer, 0)
+			ctrsFunc: func() []*qrysmpb.DepositContainer {
+				ctrs := make([]*qrysmpb.DepositContainer, 0)
 				for i := 0; i < 10; i++ {
-					ctrs = append(ctrs, &zondpb.DepositContainer{Index: int64(i), Eth1BlockHeight: uint64(i + 10)})
+					ctrs = append(ctrs, &qrysmpb.DepositContainer{Index: int64(i), Eth1BlockHeight: uint64(i + 10)})
 				}
 				return ctrs
 			},
@@ -604,10 +604,10 @@ func TestService_ValidateDepositContainers(t *testing.T) {
 		},
 		{
 			name: "0th container missing",
-			ctrsFunc: func() []*zondpb.DepositContainer {
-				ctrs := make([]*zondpb.DepositContainer, 0)
+			ctrsFunc: func() []*qrysmpb.DepositContainer {
+				ctrs := make([]*qrysmpb.DepositContainer, 0)
 				for i := 1; i < 10; i++ {
-					ctrs = append(ctrs, &zondpb.DepositContainer{Index: int64(i), Eth1BlockHeight: uint64(i + 10)})
+					ctrs = append(ctrs, &qrysmpb.DepositContainer{Index: int64(i), Eth1BlockHeight: uint64(i + 10)})
 				}
 				return ctrs
 			},
@@ -615,13 +615,13 @@ func TestService_ValidateDepositContainers(t *testing.T) {
 		},
 		{
 			name: "skipped containers",
-			ctrsFunc: func() []*zondpb.DepositContainer {
-				ctrs := make([]*zondpb.DepositContainer, 0)
+			ctrsFunc: func() []*qrysmpb.DepositContainer {
+				ctrs := make([]*qrysmpb.DepositContainer, 0)
 				for i := 0; i < 10; i++ {
 					if i == 5 || i == 7 {
 						continue
 					}
-					ctrs = append(ctrs, &zondpb.DepositContainer{Index: int64(i), Eth1BlockHeight: uint64(i + 10)})
+					ctrs = append(ctrs, &qrysmpb.DepositContainer{Index: int64(i), Eth1BlockHeight: uint64(i + 10)})
 				}
 				return ctrs
 			},
@@ -708,7 +708,7 @@ func TestService_FollowBlock(t *testing.T) {
 		cfg:            &config{eth1HeaderReqLimit: 1000},
 		rpcClient:      &mockExecution.RPCClient{BlockNumMap: bMap},
 		headerCache:    newHeaderCache(),
-		latestExecutionNodeData: &zondpb.LatestExecutionNodeData{BlockTime: (3000 * 40) + followTime, BlockHeight: 3000},
+		latestExecutionNodeData: &qrysmpb.LatestExecutionNodeData{BlockTime: (3000 * 40) + followTime, BlockHeight: 3000},
 	}
 	h, err := s.followedBlockHeight(context.Background())
 	assert.NoError(t, err)
@@ -762,13 +762,13 @@ func TestService_migrateOldDepositTree(t *testing.T) {
 		WithDepositCache(cache),
 	)
 	require.NoError(t, err)
-	executionNodeData := &zondpb.ETH1ChainData{
-		BeaconState: &zondpb.BeaconStateCapella{
-			ExecutionNodeData: &zondpb.ExecutionNodeData{
+	executionNodeData := &qrysmpb.ETH1ChainData{
+		BeaconState: &qrysmpb.BeaconStateCapella{
+			ExecutionNodeData: &qrysmpb.ExecutionNodeData{
 				DepositCount: 800,
 			},
 		},
-		CurrentExecutionNodeData: &zondpb.LatestExecutionNodeData{
+		CurrentExecutionNodeData: &qrysmpb.LatestExecutionNodeData{
 			BlockHeight: 100,
 		},
 	}

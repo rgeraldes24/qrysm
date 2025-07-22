@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/v1/validator.proto
+// source: proto/qrl/v1/validator.proto
 
 package v1
 
@@ -275,7 +275,7 @@ type ProduceBlockResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Version Version               `protobuf:"varint,1,opt,name=version,proto3,enum=theqrl.zond.v1.Version" json:"version,omitempty"`
+	Version Version               `protobuf:"varint,1,opt,name=version,proto3,enum=theqrl.qrl.v1.Version" json:"version,omitempty"`
 	Data    *BeaconBlockContainer `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 }
 
@@ -330,7 +330,7 @@ type ProduceBlindedBlockResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Version Version                      `protobuf:"varint,1,opt,name=version,proto3,enum=theqrl.zond.v1.Version" json:"version,omitempty"`
+	Version Version                      `protobuf:"varint,1,opt,name=version,proto3,enum=theqrl.qrl.v1.Version" json:"version,omitempty"`
 	Data    *BlindedBeaconBlockContainer `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 }
 
@@ -750,25 +750,25 @@ func file_proto_zond_v1_validator_proto_rawDescGZIP() []byte {
 var file_proto_zond_v1_validator_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_zond_v1_validator_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_proto_zond_v1_validator_proto_goTypes = []interface{}{
-	(ValidatorStatus)(0),                // 0: theqrl.zond.v1.ValidatorStatus
-	(*Validator)(nil),                   // 1: theqrl.zond.v1.Validator
-	(*ProduceBlockRequest)(nil),         // 2: theqrl.zond.v1.ProduceBlockRequest
-	(*ProduceBlockResponse)(nil),        // 3: theqrl.zond.v1.ProduceBlockResponse
-	(*ProduceBlindedBlockResponse)(nil), // 4: theqrl.zond.v1.ProduceBlindedBlockResponse
-	(*SyncCommitteeContribution)(nil),   // 5: theqrl.zond.v1.SyncCommitteeContribution
-	(*ContributionAndProof)(nil),        // 6: theqrl.zond.v1.ContributionAndProof
-	(*SignedContributionAndProof)(nil),  // 7: theqrl.zond.v1.SignedContributionAndProof
-	(Version)(0),                        // 8: theqrl.zond.v1.Version
-	(*BeaconBlockContainer)(nil),        // 9: theqrl.zond.v1.BeaconBlockContainer
-	(*BlindedBeaconBlockContainer)(nil), // 10: theqrl.zond.v1.BlindedBeaconBlockContainer
+	(ValidatorStatus)(0),                // 0: theqrl.qrl.v1.ValidatorStatus
+	(*Validator)(nil),                   // 1: theqrl.qrl.v1.Validator
+	(*ProduceBlockRequest)(nil),         // 2: theqrl.qrl.v1.ProduceBlockRequest
+	(*ProduceBlockResponse)(nil),        // 3: theqrl.qrl.v1.ProduceBlockResponse
+	(*ProduceBlindedBlockResponse)(nil), // 4: theqrl.qrl.v1.ProduceBlindedBlockResponse
+	(*SyncCommitteeContribution)(nil),   // 5: theqrl.qrl.v1.SyncCommitteeContribution
+	(*ContributionAndProof)(nil),        // 6: theqrl.qrl.v1.ContributionAndProof
+	(*SignedContributionAndProof)(nil),  // 7: theqrl.qrl.v1.SignedContributionAndProof
+	(Version)(0),                        // 8: theqrl.qrl.v1.Version
+	(*BeaconBlockContainer)(nil),        // 9: theqrl.qrl.v1.BeaconBlockContainer
+	(*BlindedBeaconBlockContainer)(nil), // 10: theqrl.qrl.v1.BlindedBeaconBlockContainer
 }
 var file_proto_zond_v1_validator_proto_depIdxs = []int32{
-	8,  // 0: theqrl.zond.v1.ProduceBlockResponse.version:type_name -> theqrl.zond.v1.Version
-	9,  // 1: theqrl.zond.v1.ProduceBlockResponse.data:type_name -> theqrl.zond.v1.BeaconBlockContainer
-	8,  // 2: theqrl.zond.v1.ProduceBlindedBlockResponse.version:type_name -> theqrl.zond.v1.Version
-	10, // 3: theqrl.zond.v1.ProduceBlindedBlockResponse.data:type_name -> theqrl.zond.v1.BlindedBeaconBlockContainer
-	5,  // 4: theqrl.zond.v1.ContributionAndProof.contribution:type_name -> theqrl.zond.v1.SyncCommitteeContribution
-	6,  // 5: theqrl.zond.v1.SignedContributionAndProof.message:type_name -> theqrl.zond.v1.ContributionAndProof
+	8,  // 0: theqrl.qrl.v1.ProduceBlockResponse.version:type_name -> theqrl.qrl.v1.Version
+	9,  // 1: theqrl.qrl.v1.ProduceBlockResponse.data:type_name -> theqrl.qrl.v1.BeaconBlockContainer
+	8,  // 2: theqrl.qrl.v1.ProduceBlindedBlockResponse.version:type_name -> theqrl.qrl.v1.Version
+	10, // 3: theqrl.qrl.v1.ProduceBlindedBlockResponse.data:type_name -> theqrl.qrl.v1.BlindedBeaconBlockContainer
+	5,  // 4: theqrl.qrl.v1.ContributionAndProof.contribution:type_name -> theqrl.qrl.v1.SyncCommitteeContribution
+	6,  // 5: theqrl.qrl.v1.SignedContributionAndProof.message:type_name -> theqrl.qrl.v1.ContributionAndProof
 	6,  // [6:6] is the sub-list for method output_type
 	6,  // [6:6] is the sub-list for method input_type
 	6,  // [6:6] is the sub-list for extension type_name

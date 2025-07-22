@@ -9,7 +9,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/testutil"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/proto/migration"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -34,12 +34,12 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 
 		expected, err := migration.V1Alpha1BeaconBlockBlindedCapellaToV1Blinded(b.Block)
 		require.NoError(t, err)
-		resp, err := bs.GetBlindedBlock(ctx, &zondpbv1.BlockRequest{})
+		resp, err := bs.GetBlindedBlock(ctx, &qrlpb.BlockRequest{})
 		require.NoError(t, err)
-		capellaBlock, ok := resp.Data.Message.(*zondpbv1.SignedBlindedBeaconBlockContainer_CapellaBlock)
+		capellaBlock, ok := resp.Data.Message.(*qrlpb.SignedBlindedBeaconBlockContainer_CapellaBlock)
 		require.Equal(t, true, ok)
 		assert.DeepEqual(t, expected, capellaBlock.CapellaBlock)
-		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
+		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		b := util.NewBlindedBeaconBlockCapella()
@@ -57,7 +57,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 			OptimisticModeFetcher: mockChainService,
 		}
 
-		resp, err := bs.GetBlindedBlock(ctx, &zondpbv1.BlockRequest{})
+		resp, err := bs.GetBlindedBlock(ctx, &qrlpb.BlockRequest{})
 		require.NoError(t, err)
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
@@ -77,7 +77,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 			OptimisticModeFetcher: mockChainService,
 		}
 
-		resp, err := bs.GetBlindedBlock(ctx, &zondpbv1.BlockRequest{BlockId: root[:]})
+		resp, err := bs.GetBlindedBlock(ctx, &qrlpb.BlockRequest{BlockId: root[:]})
 		require.NoError(t, err)
 		assert.Equal(t, true, resp.Finalized)
 	})
@@ -97,7 +97,7 @@ func TestServer_GetBlindedBlock(t *testing.T) {
 			OptimisticModeFetcher: mockChainService,
 		}
 
-		resp, err := bs.GetBlindedBlock(ctx, &zondpbv1.BlockRequest{BlockId: root[:]})
+		resp, err := bs.GetBlindedBlock(ctx, &qrlpb.BlockRequest{BlockId: root[:]})
 		require.NoError(t, err)
 		assert.Equal(t, false, resp.Finalized)
 	})
@@ -120,11 +120,11 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 
 		expected, err := blk.MarshalSSZ()
 		require.NoError(t, err)
-		resp, err := bs.GetBlindedBlockSSZ(ctx, &zondpbv1.BlockRequest{})
+		resp, err := bs.GetBlindedBlockSSZ(ctx, &qrlpb.BlockRequest{})
 		require.NoError(t, err)
 		assert.NotNil(t, resp)
 		assert.DeepEqual(t, expected, resp.Data)
-		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
+		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
 		b := util.NewBlindedBeaconBlockCapella()
@@ -142,7 +142,7 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 			OptimisticModeFetcher: mockChainService,
 		}
 
-		resp, err := bs.GetBlindedBlockSSZ(ctx, &zondpbv1.BlockRequest{})
+		resp, err := bs.GetBlindedBlockSSZ(ctx, &qrlpb.BlockRequest{})
 		require.NoError(t, err)
 		assert.Equal(t, true, resp.ExecutionOptimistic)
 	})
@@ -162,7 +162,7 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 			OptimisticModeFetcher: mockChainService,
 		}
 
-		resp, err := bs.GetBlindedBlockSSZ(ctx, &zondpbv1.BlockRequest{BlockId: root[:]})
+		resp, err := bs.GetBlindedBlockSSZ(ctx, &qrlpb.BlockRequest{BlockId: root[:]})
 		require.NoError(t, err)
 		assert.Equal(t, true, resp.Finalized)
 	})
@@ -182,7 +182,7 @@ func TestServer_GetBlindedBlockSSZ(t *testing.T) {
 			OptimisticModeFetcher: mockChainService,
 		}
 
-		resp, err := bs.GetBlindedBlockSSZ(ctx, &zondpbv1.BlockRequest{BlockId: root[:]})
+		resp, err := bs.GetBlindedBlockSSZ(ctx, &qrlpb.BlockRequest{BlockId: root[:]})
 		require.NoError(t, err)
 		assert.Equal(t, false, resp.Finalized)
 	})

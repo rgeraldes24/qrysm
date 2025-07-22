@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state/state-native/types"
 	"github.com/theQRL/qrysm/beacon-chain/state/stateutil"
 	pmath "github.com/theQRL/qrysm/math"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // ProofFromMerkleLayers creates a proof starting at the leaf index of the state Merkle layers.
@@ -90,17 +90,17 @@ func convert32ByteArrays[T ~[][32]byte](indices []uint64, elements interface{}, 
 }
 
 func convertExecutionNodeDataVotes(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
-	val, ok := elements.([]*zondpb.ExecutionNodeData)
+	val, ok := elements.([]*qrysmpb.ExecutionNodeData)
 	if !ok {
-		return nil, errors.Errorf("Wanted type of %T but got %T", []*zondpb.ExecutionNodeData{}, elements)
+		return nil, errors.Errorf("Wanted type of %T but got %T", []*qrysmpb.ExecutionNodeData{}, elements)
 	}
 	return handleExecutionNodeDataSlice(val, indices, convertAll)
 }
 
 func convertValidators(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
-	val, ok := elements.([]*zondpb.Validator)
+	val, ok := elements.([]*qrysmpb.Validator)
 	if !ok {
-		return nil, errors.Errorf("Wanted type of %T but got %T", []*zondpb.Validator{}, elements)
+		return nil, errors.Errorf("Wanted type of %T but got %T", []*qrysmpb.Validator{}, elements)
 	}
 	return handleValidatorSlice(val, indices, convertAll)
 }
@@ -141,13 +141,13 @@ func handle32ByteArrays(val [][32]byte, indices []uint64, convertAll bool) ([][3
 }
 
 // handleValidatorSlice returns the validator indices in a slice of root format.
-func handleValidatorSlice(val []*zondpb.Validator, indices []uint64, convertAll bool) ([][32]byte, error) {
+func handleValidatorSlice(val []*qrysmpb.Validator, indices []uint64, convertAll bool) ([][32]byte, error) {
 	length := len(indices)
 	if convertAll {
 		return stateutil.OptimizedValidatorRoots(val)
 	}
 	roots := make([][32]byte, 0, length)
-	rootCreator := func(input *zondpb.Validator) error {
+	rootCreator := func(input *qrysmpb.Validator) error {
 		newRoot, err := stateutil.ValidatorRootWithHasher(input)
 		if err != nil {
 			return err
@@ -170,13 +170,13 @@ func handleValidatorSlice(val []*zondpb.Validator, indices []uint64, convertAll 
 }
 
 // handleExecutionNodeDataSlice processes a list of executionNodeData and indices into the appropriate roots.
-func handleExecutionNodeDataSlice(val []*zondpb.ExecutionNodeData, indices []uint64, convertAll bool) ([][32]byte, error) {
+func handleExecutionNodeDataSlice(val []*qrysmpb.ExecutionNodeData, indices []uint64, convertAll bool) ([][32]byte, error) {
 	length := len(indices)
 	if convertAll {
 		length = len(val)
 	}
 	roots := make([][32]byte, 0, length)
-	rootCreator := func(input *zondpb.ExecutionNodeData) error {
+	rootCreator := func(input *qrysmpb.ExecutionNodeData) error {
 		newRoot, err := stateutil.ExecutionNodeDataRootWithHasher(input)
 		if err != nil {
 			return err
@@ -208,13 +208,13 @@ func handleExecutionNodeDataSlice(val []*zondpb.ExecutionNodeData, indices []uin
 }
 
 // handlePendingAttestationSlice returns the root of a slice of pending attestations.
-func handlePendingAttestationSlice(val []*zondpb.PendingAttestation, indices []uint64, convertAll bool) ([][32]byte, error) {
+func handlePendingAttestationSlice(val []*qrysmpb.PendingAttestation, indices []uint64, convertAll bool) ([][32]byte, error) {
 	length := len(indices)
 	if convertAll {
 		length = len(val)
 	}
 	roots := make([][32]byte, 0, length)
-	rootCreator := func(input *zondpb.PendingAttestation) error {
+	rootCreator := func(input *qrysmpb.PendingAttestation) error {
 		newRoot, err := stateutil.PendingAttRootWithHasher(input)
 		if err != nil {
 			return err

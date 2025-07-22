@@ -15,8 +15,8 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/peerdata"
 	"github.com/theQRL/qrysm/proto/migration"
-	zondpb "github.com/theQRL/qrysm/proto/qrl/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc"
@@ -27,16 +27,16 @@ import (
 )
 
 var (
-	stateConnecting    = zondpb.ConnectionState_CONNECTING.String()
-	stateConnected     = zondpb.ConnectionState_CONNECTED.String()
-	stateDisconnecting = zondpb.ConnectionState_DISCONNECTING.String()
-	stateDisconnected  = zondpb.ConnectionState_DISCONNECTED.String()
-	directionInbound   = zondpb.PeerDirection_INBOUND.String()
-	directionOutbound  = zondpb.PeerDirection_OUTBOUND.String()
+	stateConnecting    = qrlpb.ConnectionState_CONNECTING.String()
+	stateConnected     = qrlpb.ConnectionState_CONNECTED.String()
+	stateDisconnecting = qrlpb.ConnectionState_DISCONNECTING.String()
+	stateDisconnected  = qrlpb.ConnectionState_DISCONNECTED.String()
+	directionInbound   = qrlpb.PeerDirection_INBOUND.String()
+	directionOutbound  = qrlpb.PeerDirection_OUTBOUND.String()
 )
 
 // GetIdentity retrieves data about the node's network presence.
-func (ns *Server) GetIdentity(ctx context.Context, _ *emptypb.Empty) (*zondpb.IdentityResponse, error) {
+func (ns *Server) GetIdentity(ctx context.Context, _ *emptypb.Empty) (*qrlpb.IdentityResponse, error) {
 	_, span := trace.StartSpan(ctx, "node.GetIdentity")
 	defer span.End()
 
@@ -63,13 +63,13 @@ func (ns *Server) GetIdentity(ctx context.Context, _ *emptypb.Empty) (*zondpb.Id
 		discoveryAddresses[i] = sourceDisc[i].String()
 	}
 
-	meta := &zondpb.Metadata{
+	meta := &qrlpb.Metadata{
 		SeqNumber: ns.MetadataProvider.MetadataSeq(),
 		Attnets:   ns.MetadataProvider.Metadata().AttnetsBitfield(),
 	}
 
-	return &zondpb.IdentityResponse{
-		Data: &zondpb.Identity{
+	return &qrlpb.IdentityResponse{
+		Data: &qrlpb.Identity{
 			PeerId:             peerId,
 			Qnr:                qnr,
 			P2PAddresses:       p2pAddresses,
@@ -80,7 +80,7 @@ func (ns *Server) GetIdentity(ctx context.Context, _ *emptypb.Empty) (*zondpb.Id
 }
 
 // GetPeer retrieves data about the given peer.
-func (ns *Server) GetPeer(ctx context.Context, req *zondpb.PeerRequest) (*zondpb.PeerResponse, error) {
+func (ns *Server) GetPeer(ctx context.Context, req *qrlpb.PeerRequest) (*qrlpb.PeerResponse, error) {
 	_, span := trace.StartSpan(ctx, "node.GetPeer")
 	defer span.End()
 
@@ -112,17 +112,17 @@ func (ns *Server) GetPeer(ctx context.Context, req *zondpb.PeerRequest) (*zondpb
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not obtain direction: %v", err)
 	}
-	if zond.PeerDirection(direction) == zond.PeerDirection_UNKNOWN {
+	if qrysmpb.PeerDirection(direction) == qrysmpb.PeerDirection_UNKNOWN {
 		return nil, status.Error(codes.NotFound, "Peer not found")
 	}
 
-	v1ConnState := migration.V1Alpha1ConnectionStateToV1(zond.ConnectionState(state))
-	v1PeerDirection, err := migration.V1Alpha1PeerDirectionToV1(zond.PeerDirection(direction))
+	v1ConnState := migration.V1Alpha1ConnectionStateToV1(qrysmpb.ConnectionState(state))
+	v1PeerDirection, err := migration.V1Alpha1PeerDirectionToV1(qrysmpb.PeerDirection(direction))
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not handle peer direction: %v", err)
 	}
-	return &zondpb.PeerResponse{
-		Data: &zondpb.Peer{
+	return &qrlpb.PeerResponse{
+		Data: &qrlpb.Peer{
 			PeerId:             req.PeerId,
 			Qnr:                "qnr:" + serializedQnr,
 			LastSeenP2PAddress: p2pAddress.String(),
@@ -133,7 +133,7 @@ func (ns *Server) GetPeer(ctx context.Context, req *zondpb.PeerRequest) (*zondpb
 }
 
 // ListPeers retrieves data about the node's network peers.
-func (ns *Server) ListPeers(ctx context.Context, req *zondpb.PeersRequest) (*zondpb.PeersResponse, error) {
+func (ns *Server) ListPeers(ctx context.Context, req *qrlpb.PeersRequest) (*qrlpb.PeersResponse, error) {
 	_, span := trace.StartSpan(ctx, "node.ListPeers")
 	defer span.End()
 
@@ -142,7 +142,7 @@ func (ns *Server) ListPeers(ctx context.Context, req *zondpb.PeersRequest) (*zon
 
 	if emptyStateFilter && emptyDirectionFilter {
 		allIds := peerStatus.All()
-		allPeers := make([]*zondpb.Peer, 0, len(allIds))
+		allPeers := make([]*qrlpb.Peer, 0, len(allIds))
 		for _, id := range allIds {
 			p, err := peerInfo(peerStatus, id)
 			if err != nil {
@@ -153,7 +153,7 @@ func (ns *Server) ListPeers(ctx context.Context, req *zondpb.PeersRequest) (*zon
 			}
 			allPeers = append(allPeers, p)
 		}
-		return &zondpb.PeersResponse{Data: allPeers}, nil
+		return &qrlpb.PeersResponse{Data: allPeers}, nil
 	}
 
 	var stateIds []peer.ID
@@ -213,7 +213,7 @@ func (ns *Server) ListPeers(ctx context.Context, req *zondpb.PeersRequest) (*zon
 			}
 		}
 	}
-	filteredPeers := make([]*zondpb.Peer, 0, len(filteredIds))
+	filteredPeers := make([]*qrlpb.Peer, 0, len(filteredIds))
 	for _, id := range filteredIds {
 		p, err := peerInfo(peerStatus, id)
 		if err != nil {
@@ -225,18 +225,18 @@ func (ns *Server) ListPeers(ctx context.Context, req *zondpb.PeersRequest) (*zon
 		filteredPeers = append(filteredPeers, p)
 	}
 
-	return &zondpb.PeersResponse{Data: filteredPeers}, nil
+	return &qrlpb.PeersResponse{Data: filteredPeers}, nil
 }
 
 // PeerCount retrieves number of known peers.
-func (ns *Server) PeerCount(ctx context.Context, _ *emptypb.Empty) (*zondpb.PeerCountResponse, error) {
+func (ns *Server) PeerCount(ctx context.Context, _ *emptypb.Empty) (*qrlpb.PeerCountResponse, error) {
 	_, span := trace.StartSpan(ctx, "node.PeerCount")
 	defer span.End()
 
 	peerStatus := ns.PeersFetcher.Peers()
 
-	return &zondpb.PeerCountResponse{
-		Data: &zondpb.PeerCountResponse_PeerCount{
+	return &qrlpb.PeerCountResponse{
+		Data: &qrlpb.PeerCountResponse_PeerCount{
 			Disconnected:  uint64(len(peerStatus.Disconnected())),
 			Connecting:    uint64(len(peerStatus.Connecting())),
 			Connected:     uint64(len(peerStatus.Connected())),
@@ -247,13 +247,13 @@ func (ns *Server) PeerCount(ctx context.Context, _ *emptypb.Empty) (*zondpb.Peer
 
 // GetVersion requests that the beacon node identify information about its implementation in a
 // format similar to a HTTP User-Agent field.
-func (*Server) GetVersion(ctx context.Context, _ *emptypb.Empty) (*zondpb.VersionResponse, error) {
+func (*Server) GetVersion(ctx context.Context, _ *emptypb.Empty) (*qrlpb.VersionResponse, error) {
 	_, span := trace.StartSpan(ctx, "node.GetVersion")
 	defer span.End()
 
 	v := fmt.Sprintf("Qrysm/%s (%s %s)", version.SemanticVersion(), runtime.GOOS, runtime.GOARCH)
-	return &zondpb.VersionResponse{
-		Data: &zondpb.NodeVersion{
+	return &qrlpb.VersionResponse{
+		Data: &qrlpb.NodeVersion{
 			Version: v,
 		},
 	}, nil
@@ -286,7 +286,7 @@ func (ns *Server) GetHealth(ctx context.Context, _ *emptypb.Empty) (*emptypb.Emp
 	return &emptypb.Empty{}, status.Error(codes.Internal, "Node not initialized or having issues")
 }
 
-func handleEmptyFilters(req *zondpb.PeersRequest) (emptyState, emptyDirection bool) {
+func handleEmptyFilters(req *qrlpb.PeersRequest) (emptyState, emptyDirection bool) {
 	emptyState = true
 	for _, stateFilter := range req.State {
 		normalized := strings.ToUpper(stateFilter.String())
@@ -311,7 +311,7 @@ func handleEmptyFilters(req *zondpb.PeersRequest) (emptyState, emptyDirection bo
 	return emptyState, emptyDirection
 }
 
-func peerInfo(peerStatus *peers.Status, id peer.ID) (*zondpb.Peer, error) {
+func peerInfo(peerStatus *peers.Status, id peer.ID) (*qrlpb.Peer, error) {
 	qnr, err := peerStatus.QNR(id)
 	if err != nil {
 		if errors.Is(err, peerdata.ErrPeerUnknown) {
@@ -347,15 +347,15 @@ func peerInfo(peerStatus *peers.Status, id peer.ID) (*zondpb.Peer, error) {
 		}
 		return nil, errors.Wrap(err, "could not obtain direction")
 	}
-	if zond.PeerDirection(direction) == zond.PeerDirection_UNKNOWN {
+	if qrysmpb.PeerDirection(direction) == qrysmpb.PeerDirection_UNKNOWN {
 		return nil, nil
 	}
-	v1ConnState := migration.V1Alpha1ConnectionStateToV1(zond.ConnectionState(connectionState))
-	v1PeerDirection, err := migration.V1Alpha1PeerDirectionToV1(zond.PeerDirection(direction))
+	v1ConnState := migration.V1Alpha1ConnectionStateToV1(qrysmpb.ConnectionState(connectionState))
+	v1PeerDirection, err := migration.V1Alpha1PeerDirectionToV1(qrysmpb.PeerDirection(direction))
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not handle peer direction")
 	}
-	p := zondpb.Peer{
+	p := qrlpb.Peer{
 		PeerId:    id.String(),
 		State:     v1ConnState,
 		Direction: v1PeerDirection,

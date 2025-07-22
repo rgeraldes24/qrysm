@@ -16,8 +16,8 @@ import (
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 const executionToDilithiumPadding = 12
@@ -67,7 +67,7 @@ func ProcessDilithiumToExecutionChanges(
 //	    + b'\x00' * 11
 //	    + address_change.to_execution_address
 //	)
-func processDilithiumToExecutionChange(st state.BeaconState, signed *zondpb.SignedDilithiumToExecutionChange) (state.BeaconState, error) {
+func processDilithiumToExecutionChange(st state.BeaconState, signed *qrysmpb.SignedDilithiumToExecutionChange) (state.BeaconState, error) {
 	// Checks that the message passes the validation conditions.
 	val, err := ValidateDilithiumToExecutionChange(st, signed)
 	if err != nil {
@@ -84,7 +84,7 @@ func processDilithiumToExecutionChange(st state.BeaconState, signed *zondpb.Sign
 
 // ValidateDilithiumToExecutionChange validates the execution change message against the state and returns the
 // validator referenced by the message.
-func ValidateDilithiumToExecutionChange(st state.ReadOnlyBeaconState, signed *zondpb.SignedDilithiumToExecutionChange) (*zondpb.Validator, error) {
+func ValidateDilithiumToExecutionChange(st state.ReadOnlyBeaconState, signed *qrysmpb.SignedDilithiumToExecutionChange) (*qrysmpb.Validator, error) {
 	if signed == nil {
 		return nil, errNilSignedWithdrawalMessage
 	}
@@ -208,7 +208,7 @@ func ProcessWithdrawals(st state.BeaconState, executionData interfaces.Execution
 // messages and transforms them into a signature batch object.
 func DilithiumChangesSignatureBatch(
 	st state.ReadOnlyBeaconState,
-	changes []*zondpb.SignedDilithiumToExecutionChange,
+	changes []*qrysmpb.SignedDilithiumToExecutionChange,
 ) (*dilithium.SignatureBatch, error) {
 	// Return early if no changes
 	if len(changes) == 0 {
@@ -247,7 +247,7 @@ func DilithiumChangesSignatureBatch(
 // is from a previous fork.
 func VerifyDilithiumChangeSignature(
 	st state.ReadOnlyBeaconState,
-	change *zondpbv1.SignedDilithiumToExecutionChange,
+	change *qrlpb.SignedDilithiumToExecutionChange,
 ) error {
 	c := params.BeaconConfig()
 	domain, err := signing.ComputeDomain(c.DomainDilithiumToExecutionChange, c.GenesisForkVersion, st.GenesisValidatorsRoot())

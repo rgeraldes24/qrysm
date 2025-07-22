@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/v1/beacon_lightclient.proto
+// source: proto/qrl/v1/beacon_lightclient.proto
 
 package v1
 
@@ -186,7 +186,7 @@ type LightClientFinalityUpdateWithVersion struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Version Version                    `protobuf:"varint,1,opt,name=version,proto3,enum=theqrl.zond.v1.Version" json:"version,omitempty"`
+	Version Version                    `protobuf:"varint,1,opt,name=version,proto3,enum=theqrl.qrl.v1.Version" json:"version,omitempty"`
 	Data    *LightClientFinalityUpdate `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 }
 
@@ -320,7 +320,7 @@ type LightClientOptimisticUpdateWithVersion struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Version Version                      `protobuf:"varint,1,opt,name=version,proto3,enum=theqrl.zond.v1.Version" json:"version,omitempty"`
+	Version Version                      `protobuf:"varint,1,opt,name=version,proto3,enum=theqrl.qrl.v1.Version" json:"version,omitempty"`
 	Data    *LightClientOptimisticUpdate `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 }
 
@@ -590,33 +590,33 @@ func file_proto_zond_v1_beacon_lightclient_proto_rawDescGZIP() []byte {
 
 var file_proto_zond_v1_beacon_lightclient_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_proto_zond_v1_beacon_lightclient_proto_goTypes = []interface{}{
-	(*LightClientBootstrap)(nil),                   // 0: theqrl.zond.v1.LightClientBootstrap
-	(*LightClientUpdate)(nil),                      // 1: theqrl.zond.v1.LightClientUpdate
-	(*LightClientFinalityUpdateWithVersion)(nil),   // 2: theqrl.zond.v1.LightClientFinalityUpdateWithVersion
-	(*LightClientFinalityUpdate)(nil),              // 3: theqrl.zond.v1.LightClientFinalityUpdate
-	(*LightClientOptimisticUpdateWithVersion)(nil), // 4: theqrl.zond.v1.LightClientOptimisticUpdateWithVersion
-	(*LightClientOptimisticUpdate)(nil),            // 5: theqrl.zond.v1.LightClientOptimisticUpdate
-	(*BeaconBlockHeader)(nil),                      // 6: theqrl.zond.v1.BeaconBlockHeader
-	(*SyncCommittee)(nil),                          // 7: theqrl.zond.v1.SyncCommittee
-	(*SyncAggregate)(nil),                          // 8: theqrl.zond.v1.SyncAggregate
-	(Version)(0),                                   // 9: theqrl.zond.v1.Version
+	(*LightClientBootstrap)(nil),                   // 0: theqrl.qrl.v1.LightClientBootstrap
+	(*LightClientUpdate)(nil),                      // 1: theqrl.qrl.v1.LightClientUpdate
+	(*LightClientFinalityUpdateWithVersion)(nil),   // 2: theqrl.qrl.v1.LightClientFinalityUpdateWithVersion
+	(*LightClientFinalityUpdate)(nil),              // 3: theqrl.qrl.v1.LightClientFinalityUpdate
+	(*LightClientOptimisticUpdateWithVersion)(nil), // 4: theqrl.qrl.v1.LightClientOptimisticUpdateWithVersion
+	(*LightClientOptimisticUpdate)(nil),            // 5: theqrl.qrl.v1.LightClientOptimisticUpdate
+	(*BeaconBlockHeader)(nil),                      // 6: theqrl.qrl.v1.BeaconBlockHeader
+	(*SyncCommittee)(nil),                          // 7: theqrl.qrl.v1.SyncCommittee
+	(*SyncAggregate)(nil),                          // 8: theqrl.qrl.v1.SyncAggregate
+	(Version)(0),                                   // 9: theqrl.qrl.v1.Version
 }
 var file_proto_zond_v1_beacon_lightclient_proto_depIdxs = []int32{
-	6,  // 0: theqrl.zond.v1.LightClientBootstrap.header:type_name -> theqrl.zond.v1.BeaconBlockHeader
-	7,  // 1: theqrl.zond.v1.LightClientBootstrap.current_sync_committee:type_name -> theqrl.zond.v1.SyncCommittee
-	6,  // 2: theqrl.zond.v1.LightClientUpdate.attested_header:type_name -> theqrl.zond.v1.BeaconBlockHeader
-	7,  // 3: theqrl.zond.v1.LightClientUpdate.next_sync_committee:type_name -> theqrl.zond.v1.SyncCommittee
-	6,  // 4: theqrl.zond.v1.LightClientUpdate.finalized_header:type_name -> theqrl.zond.v1.BeaconBlockHeader
-	8,  // 5: theqrl.zond.v1.LightClientUpdate.sync_aggregate:type_name -> theqrl.zond.v1.SyncAggregate
-	9,  // 6: theqrl.zond.v1.LightClientFinalityUpdateWithVersion.version:type_name -> theqrl.zond.v1.Version
-	3,  // 7: theqrl.zond.v1.LightClientFinalityUpdateWithVersion.data:type_name -> theqrl.zond.v1.LightClientFinalityUpdate
-	6,  // 8: theqrl.zond.v1.LightClientFinalityUpdate.attested_header:type_name -> theqrl.zond.v1.BeaconBlockHeader
-	6,  // 9: theqrl.zond.v1.LightClientFinalityUpdate.finalized_header:type_name -> theqrl.zond.v1.BeaconBlockHeader
-	8,  // 10: theqrl.zond.v1.LightClientFinalityUpdate.sync_aggregate:type_name -> theqrl.zond.v1.SyncAggregate
-	9,  // 11: theqrl.zond.v1.LightClientOptimisticUpdateWithVersion.version:type_name -> theqrl.zond.v1.Version
-	5,  // 12: theqrl.zond.v1.LightClientOptimisticUpdateWithVersion.data:type_name -> theqrl.zond.v1.LightClientOptimisticUpdate
-	6,  // 13: theqrl.zond.v1.LightClientOptimisticUpdate.attested_header:type_name -> theqrl.zond.v1.BeaconBlockHeader
-	8,  // 14: theqrl.zond.v1.LightClientOptimisticUpdate.sync_aggregate:type_name -> theqrl.zond.v1.SyncAggregate
+	6,  // 0: theqrl.qrl.v1.LightClientBootstrap.header:type_name -> theqrl.qrl.v1.BeaconBlockHeader
+	7,  // 1: theqrl.qrl.v1.LightClientBootstrap.current_sync_committee:type_name -> theqrl.qrl.v1.SyncCommittee
+	6,  // 2: theqrl.qrl.v1.LightClientUpdate.attested_header:type_name -> theqrl.qrl.v1.BeaconBlockHeader
+	7,  // 3: theqrl.qrl.v1.LightClientUpdate.next_sync_committee:type_name -> theqrl.qrl.v1.SyncCommittee
+	6,  // 4: theqrl.qrl.v1.LightClientUpdate.finalized_header:type_name -> theqrl.qrl.v1.BeaconBlockHeader
+	8,  // 5: theqrl.qrl.v1.LightClientUpdate.sync_aggregate:type_name -> theqrl.qrl.v1.SyncAggregate
+	9,  // 6: theqrl.qrl.v1.LightClientFinalityUpdateWithVersion.version:type_name -> theqrl.qrl.v1.Version
+	3,  // 7: theqrl.qrl.v1.LightClientFinalityUpdateWithVersion.data:type_name -> theqrl.qrl.v1.LightClientFinalityUpdate
+	6,  // 8: theqrl.qrl.v1.LightClientFinalityUpdate.attested_header:type_name -> theqrl.qrl.v1.BeaconBlockHeader
+	6,  // 9: theqrl.qrl.v1.LightClientFinalityUpdate.finalized_header:type_name -> theqrl.qrl.v1.BeaconBlockHeader
+	8,  // 10: theqrl.qrl.v1.LightClientFinalityUpdate.sync_aggregate:type_name -> theqrl.qrl.v1.SyncAggregate
+	9,  // 11: theqrl.qrl.v1.LightClientOptimisticUpdateWithVersion.version:type_name -> theqrl.qrl.v1.Version
+	5,  // 12: theqrl.qrl.v1.LightClientOptimisticUpdateWithVersion.data:type_name -> theqrl.qrl.v1.LightClientOptimisticUpdate
+	6,  // 13: theqrl.qrl.v1.LightClientOptimisticUpdate.attested_header:type_name -> theqrl.qrl.v1.BeaconBlockHeader
+	8,  // 14: theqrl.qrl.v1.LightClientOptimisticUpdate.sync_aggregate:type_name -> theqrl.qrl.v1.SyncAggregate
 	15, // [15:15] is the sub-list for method output_type
 	15, // [15:15] is the sub-list for method input_type
 	15, // [15:15] is the sub-list for extension type_name

@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	mathutil "github.com/theQRL/qrysm/math"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
@@ -83,7 +83,7 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 
 // hasETH1WithdrawalCredential returns whether the validator has an ETH1
 // Withdrawal prefix. It assumes that the caller has a lock on the state
-func hasETH1WithdrawalCredential(val *zondpb.Validator) bool {
+func hasETH1WithdrawalCredential(val *qrysmpb.Validator) bool {
 	if val == nil {
 		return false
 	}
@@ -94,7 +94,7 @@ func hasETH1WithdrawalCredential(val *zondpb.Validator) bool {
 // isFullyWithdrawableValidator returns whether the validator is able to perform a full
 // withdrawal. This differ from the spec helper in that the balance > 0 is not
 // checked. This function assumes that the caller holds a lock on the state
-func isFullyWithdrawableValidator(val *zondpb.Validator, epoch primitives.Epoch) bool {
+func isFullyWithdrawableValidator(val *qrysmpb.Validator, epoch primitives.Epoch) bool {
 	if val == nil {
 		return false
 	}
@@ -103,7 +103,7 @@ func isFullyWithdrawableValidator(val *zondpb.Validator, epoch primitives.Epoch)
 
 // isPartiallyWithdrawable returns whether the validator is able to perform a
 // partial withdrawal. This function assumes that the caller has a lock on the state
-func isPartiallyWithdrawableValidator(val *zondpb.Validator, balance uint64) bool {
+func isPartiallyWithdrawableValidator(val *qrysmpb.Validator, balance uint64) bool {
 	if val == nil {
 		return false
 	}

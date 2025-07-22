@@ -1,4 +1,4 @@
-package zond_test
+package qrl_test
 
 import (
 	"math/rand"

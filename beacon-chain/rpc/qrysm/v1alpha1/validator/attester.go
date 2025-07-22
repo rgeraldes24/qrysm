@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
@@ -20,7 +20,7 @@ import (
 
 // GetAttestationData requests that the beacon node produce an attestation data object,
 // which the validator acting as an attester will then sign.
-func (vs *Server) GetAttestationData(ctx context.Context, req *zondpb.AttestationDataRequest) (*zondpb.AttestationData, error) {
+func (vs *Server) GetAttestationData(ctx context.Context, req *qrysmpb.AttestationDataRequest) (*qrysmpb.AttestationData, error) {
 	ctx, span := trace.StartSpan(ctx, "AttesterServer.RequestAttestation")
 	defer span.End()
 	span.AddAttributes(
@@ -46,7 +46,7 @@ func (vs *Server) GetAttestationData(ctx context.Context, req *zondpb.Attestatio
 
 // ProposeAttestation is a function called by an attester to vote
 // on a block via an attestation object as defined in the Ethereum Serenity specification.
-func (vs *Server) ProposeAttestation(ctx context.Context, att *zondpb.Attestation) (*zondpb.AttestResponse, error) {
+func (vs *Server) ProposeAttestation(ctx context.Context, att *qrysmpb.Attestation) (*qrysmpb.AttestResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "AttesterServer.ProposeAttestation")
 	defer span.End()
 
@@ -85,20 +85,20 @@ func (vs *Server) ProposeAttestation(ctx context.Context, att *zondpb.Attestatio
 
 	go func() {
 		ctx = trace.NewContext(context.Background(), trace.FromContext(ctx))
-		attCopy := zondpb.CopyAttestation(att)
+		attCopy := qrysmpb.CopyAttestation(att)
 		if err := vs.AttPool.SaveUnaggregatedAttestation(attCopy); err != nil {
 			log.WithError(err).Error("Could not handle attestation in operations service")
 			return
 		}
 	}()
 
-	return &zondpb.AttestResponse{
+	return &qrysmpb.AttestResponse{
 		AttestationDataRoot: root[:],
 	}, nil
 }
 
 // SubscribeCommitteeSubnets subscribes to the committee ID subnet given subscribe request.
-func (vs *Server) SubscribeCommitteeSubnets(ctx context.Context, req *zondpb.CommitteeSubnetsSubscribeRequest) (*emptypb.Empty, error) {
+func (vs *Server) SubscribeCommitteeSubnets(ctx context.Context, req *qrysmpb.CommitteeSubnetsSubscribeRequest) (*emptypb.Empty, error) {
 	ctx, span := trace.StartSpan(ctx, "AttesterServer.SubscribeCommitteeSubnets")
 	defer span.End()
 

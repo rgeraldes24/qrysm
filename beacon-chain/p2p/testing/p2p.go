@@ -25,7 +25,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/p2p/encoder"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/scorers"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/metadata"
 	"google.golang.org/protobuf/proto"
 )
@@ -165,13 +165,13 @@ func (p *TestP2P) Broadcast(_ context.Context, _ proto.Message) error {
 }
 
 // BroadcastAttestation broadcasts an attestation.
-func (p *TestP2P) BroadcastAttestation(_ context.Context, _ uint64, _ *zondpb.Attestation) error {
+func (p *TestP2P) BroadcastAttestation(_ context.Context, _ uint64, _ *qrysmpb.Attestation) error {
 	p.BroadcastCalled = true
 	return nil
 }
 
 // BroadcastSyncCommitteeMessage broadcasts a sync committee message.
-func (p *TestP2P) BroadcastSyncCommitteeMessage(_ context.Context, _ uint64, _ *zondpb.SyncCommitteeMessage) error {
+func (p *TestP2P) BroadcastSyncCommitteeMessage(_ context.Context, _ uint64, _ *qrysmpb.SyncCommitteeMessage) error {
 	p.BroadcastCalled = true
 	return nil
 }

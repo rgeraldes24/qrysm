@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // ForkVersionByteLength length of fork version byte array.
@@ -63,7 +63,7 @@ func ComputeDomainAndSign(st state.ReadOnlyBeaconState, epoch primitives.Epoch, 
 	// This allows for signed validator exits to be valid forever.
 	/*
 		if st.Version() >= version.Deneb && domain == params.BeaconConfig().DomainVoluntaryExit {
-			fork = &zondpb.Fork{
+			fork = &qrysmpb.Fork{
 				PreviousVersion: params.BeaconConfig().CapellaForkVersion,
 				CurrentVersion:  params.BeaconConfig().CapellaForkVersion,
 				Epoch:           params.BeaconConfig().CapellaForkEpoch,
@@ -105,7 +105,7 @@ func SigningData(rootFunc func() ([32]byte, error), domain []byte) ([32]byte, er
 	if err != nil {
 		return [32]byte{}, err
 	}
-	container := &zondpb.SigningData{
+	container := &qrysmpb.SigningData{
 		ObjectRoot: objRoot[:],
 		Domain:     domain,
 	}
@@ -146,7 +146,7 @@ func VerifySigningRoot(obj fssz.HashRoot, pub, signature, domain []byte) error {
 }
 
 // VerifyBlockHeaderSigningRoot verifies the signing root of a block header given its public key, signature and domain.
-func VerifyBlockHeaderSigningRoot(blkHdr *zondpb.BeaconBlockHeader, pub, signature, domain []byte) error {
+func VerifyBlockHeaderSigningRoot(blkHdr *qrysmpb.BeaconBlockHeader, pub, signature, domain []byte) error {
 	publicKey, err := dilithium.PublicKeyFromBytes(pub)
 	if err != nil {
 		return errors.Wrap(err, "could not convert bytes to public key")
@@ -268,7 +268,7 @@ func computeForkDataRoot(version, root []byte) ([32]byte, error) {
 		return val, nil
 	}
 	digestMapLock.RUnlock()
-	r, err := (&zondpb.ForkData{
+	r, err := (&qrysmpb.ForkData{
 		CurrentVersion:        version,
 		GenesisValidatorsRoot: root,
 	}).HashTreeRoot()

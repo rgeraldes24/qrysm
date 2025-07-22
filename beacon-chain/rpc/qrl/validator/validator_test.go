@@ -9,8 +9,8 @@ import (
 	builderTest "github.com/theQRL/qrysm/beacon-chain/builder/testing"
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
-	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/mock"
 	"github.com/theQRL/qrysm/testing/require"
@@ -22,7 +22,7 @@ func TestProduceBlock(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("Capella", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: &qrysmpb.BeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -31,15 +31,15 @@ func TestProduceBlock(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		resp, err := server.ProduceBlock(ctx, &zondpbv1.ProduceBlockRequest{})
+		resp, err := server.ProduceBlock(ctx, &qrlpb.ProduceBlockRequest{})
 		require.NoError(t, err)
-		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
-		containerBlock, ok := resp.Data.Block.(*zondpbv1.BeaconBlockContainer_CapellaBlock)
+		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
+		containerBlock, ok := resp.Data.Block.(*qrlpb.BeaconBlockContainer_CapellaBlock)
 		require.Equal(t, true, ok)
 		assert.Equal(t, primitives.Slot(123), containerBlock.CapellaBlock.Slot)
 	})
 	t.Run("Capella blinded", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: &qrysmpb.BlindedBeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -48,11 +48,11 @@ func TestProduceBlock(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		_, err := server.ProduceBlock(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlock(ctx, &qrlpb.ProduceBlockRequest{})
 		assert.ErrorContains(t, "Prepared Capella beacon block is blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: &qrysmpb.BeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -62,7 +62,7 @@ func TestProduceBlock(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: true},
 		}
 
-		_, err := server.ProduceBlock(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlock(ctx, &qrlpb.ProduceBlockRequest{})
 		require.ErrorContains(t, "The node is currently optimistic and cannot serve validators", err)
 	})
 	t.Run("sync not ready", func(t *testing.T) {
@@ -83,9 +83,9 @@ func TestProduceBlockSSZ(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("Capella", func(t *testing.T) {
-		b := util.HydrateBeaconBlockCapella(&zondpbalpha.BeaconBlockCapella{})
+		b := util.HydrateBeaconBlockCapella(&qrysmpb.BeaconBlockCapella{})
 		b.Slot = 123
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: b}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: b}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -94,14 +94,14 @@ func TestProduceBlockSSZ(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		resp, err := server.ProduceBlockSSZ(ctx, &zondpbv1.ProduceBlockRequest{})
+		resp, err := server.ProduceBlockSSZ(ctx, &qrlpb.ProduceBlockRequest{})
 		require.NoError(t, err)
 		expectedData, err := b.MarshalSSZ()
 		assert.NoError(t, err)
 		assert.DeepEqual(t, expectedData, resp.Data)
 	})
 	t.Run("Capella blinded", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: &qrysmpb.BlindedBeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -110,11 +110,11 @@ func TestProduceBlockSSZ(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		_, err := server.ProduceBlockSSZ(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlockSSZ(ctx, &qrlpb.ProduceBlockRequest{})
 		assert.ErrorContains(t, "Prepared Capella beacon block is blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: &qrysmpb.BeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -124,7 +124,7 @@ func TestProduceBlockSSZ(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: true},
 		}
 
-		_, err := server.ProduceBlockSSZ(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlockSSZ(ctx, &qrlpb.ProduceBlockRequest{})
 		require.ErrorContains(t, "The node is currently optimistic and cannot serve validators", err)
 	})
 	t.Run("sync not ready", func(t *testing.T) {
@@ -145,7 +145,7 @@ func TestProduceBlindedBlock(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("Capella", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: &qrysmpb.BlindedBeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -155,16 +155,16 @@ func TestProduceBlindedBlock(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		resp, err := server.ProduceBlindedBlock(ctx, &zondpbv1.ProduceBlockRequest{})
+		resp, err := server.ProduceBlindedBlock(ctx, &qrlpb.ProduceBlockRequest{})
 		require.NoError(t, err)
 
-		assert.Equal(t, zondpbv1.Version_CAPELLA, resp.Version)
-		containerBlock, ok := resp.Data.Block.(*zondpbv1.BlindedBeaconBlockContainer_CapellaBlock)
+		assert.Equal(t, qrlpb.Version_CAPELLA, resp.Version)
+		containerBlock, ok := resp.Data.Block.(*qrlpb.BlindedBeaconBlockContainer_CapellaBlock)
 		require.Equal(t, true, ok)
 		assert.Equal(t, primitives.Slot(123), containerBlock.CapellaBlock.Slot)
 	})
 	t.Run("Capella full", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: &qrysmpb.BeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -174,11 +174,11 @@ func TestProduceBlindedBlock(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		_, err := server.ProduceBlindedBlock(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlindedBlock(ctx, &qrlpb.ProduceBlockRequest{})
 		assert.ErrorContains(t, "Prepared beacon block is not blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: &qrysmpb.BlindedBeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -188,7 +188,7 @@ func TestProduceBlindedBlock(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: true},
 		}
 
-		_, err := server.ProduceBlindedBlock(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlindedBlock(ctx, &qrlpb.ProduceBlockRequest{})
 		require.ErrorContains(t, "The node is currently optimistic and cannot serve validators", err)
 	})
 	t.Run("builder not configured", func(t *testing.T) {
@@ -217,9 +217,9 @@ func TestProduceBlindedBlockSSZ(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("Capella", func(t *testing.T) {
-		b := util.HydrateBlindedBeaconBlockCapella(&zondpbalpha.BlindedBeaconBlockCapella{})
+		b := util.HydrateBlindedBeaconBlockCapella(&qrysmpb.BlindedBeaconBlockCapella{})
 		b.Slot = 123
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: b}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: b}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -229,14 +229,14 @@ func TestProduceBlindedBlockSSZ(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		resp, err := server.ProduceBlindedBlockSSZ(ctx, &zondpbv1.ProduceBlockRequest{})
+		resp, err := server.ProduceBlindedBlockSSZ(ctx, &qrlpb.ProduceBlockRequest{})
 		require.NoError(t, err)
 		expectedData, err := b.MarshalSSZ()
 		assert.NoError(t, err)
 		assert.DeepEqual(t, expectedData, resp.Data)
 	})
 	t.Run("Capella full", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_Capella{Capella: &zondpbalpha.BeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: &qrysmpb.BeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -246,11 +246,11 @@ func TestProduceBlindedBlockSSZ(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: false},
 		}
 
-		_, err := server.ProduceBlindedBlockSSZ(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlindedBlockSSZ(ctx, &qrlpb.ProduceBlockRequest{})
 		assert.ErrorContains(t, "Prepared Capella beacon block is not blinded", err)
 	})
 	t.Run("optimistic", func(t *testing.T) {
-		blk := &zondpbalpha.GenericBeaconBlock{Block: &zondpbalpha.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zondpbalpha.BlindedBeaconBlockCapella{Slot: 123}}}
+		blk := &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: &qrysmpb.BlindedBeaconBlockCapella{Slot: 123}}}
 		v1alpha1Server := mock.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(blk, nil)
 		server := &Server{
@@ -260,7 +260,7 @@ func TestProduceBlindedBlockSSZ(t *testing.T) {
 			OptimisticModeFetcher: &mockChain.ChainService{Optimistic: true},
 		}
 
-		_, err := server.ProduceBlindedBlockSSZ(ctx, &zondpbv1.ProduceBlockRequest{})
+		_, err := server.ProduceBlindedBlockSSZ(ctx, &qrlpb.ProduceBlockRequest{})
 		require.ErrorContains(t, "The node is currently optimistic and cannot serve validators", err)
 	})
 	t.Run("builder not configured", func(t *testing.T) {

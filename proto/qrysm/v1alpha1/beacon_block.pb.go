@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: proto/qrysm/v1alpha1/beacon_block.proto
 
-package zond
+package qrl
 
 import (
 	reflect "reflect"
@@ -2113,75 +2113,75 @@ func file_proto_qrysm_v1alpha1_beacon_block_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_beacon_block_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_proto_qrysm_v1alpha1_beacon_block_proto_goTypes = []interface{}{
-	(*GenericSignedBeaconBlock)(nil),         // 0: theqrl.zond.v1alpha1.GenericSignedBeaconBlock
-	(*GenericBeaconBlock)(nil),               // 1: theqrl.zond.v1alpha1.GenericBeaconBlock
-	(*ProposerSlashing)(nil),                 // 2: theqrl.zond.v1alpha1.ProposerSlashing
-	(*AttesterSlashing)(nil),                 // 3: theqrl.zond.v1alpha1.AttesterSlashing
-	(*Deposit)(nil),                          // 4: theqrl.zond.v1alpha1.Deposit
-	(*VoluntaryExit)(nil),                    // 5: theqrl.zond.v1alpha1.VoluntaryExit
-	(*SignedVoluntaryExit)(nil),              // 6: theqrl.zond.v1alpha1.SignedVoluntaryExit
-	(*ExecutionNodeData)(nil),                // 7: theqrl.zond.v1alpha1.ExecutionNodeData
-	(*BeaconBlockHeader)(nil),                // 8: theqrl.zond.v1alpha1.BeaconBlockHeader
-	(*SignedBeaconBlockHeader)(nil),          // 9: theqrl.zond.v1alpha1.SignedBeaconBlockHeader
-	(*IndexedAttestation)(nil),               // 10: theqrl.zond.v1alpha1.IndexedAttestation
-	(*SyncAggregate)(nil),                    // 11: theqrl.zond.v1alpha1.SyncAggregate
-	(*SignedBeaconBlockCapella)(nil),         // 12: theqrl.zond.v1alpha1.SignedBeaconBlockCapella
-	(*BeaconBlockCapella)(nil),               // 13: theqrl.zond.v1alpha1.BeaconBlockCapella
-	(*BeaconBlockBodyCapella)(nil),           // 14: theqrl.zond.v1alpha1.BeaconBlockBodyCapella
-	(*SignedBlindedBeaconBlockCapella)(nil),  // 15: theqrl.zond.v1alpha1.SignedBlindedBeaconBlockCapella
-	(*BlindedBeaconBlockCapella)(nil),        // 16: theqrl.zond.v1alpha1.BlindedBeaconBlockCapella
-	(*BlindedBeaconBlockBodyCapella)(nil),    // 17: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella
-	(*ValidatorRegistrationV1)(nil),          // 18: theqrl.zond.v1alpha1.ValidatorRegistrationV1
-	(*SignedValidatorRegistrationsV1)(nil),   // 19: theqrl.zond.v1alpha1.SignedValidatorRegistrationsV1
-	(*SignedValidatorRegistrationV1)(nil),    // 20: theqrl.zond.v1alpha1.SignedValidatorRegistrationV1
-	(*BuilderBidCapella)(nil),                // 21: theqrl.zond.v1alpha1.BuilderBidCapella
-	(*SignedBuilderBidCapella)(nil),          // 22: theqrl.zond.v1alpha1.SignedBuilderBidCapella
-	(*Deposit_Data)(nil),                     // 23: theqrl.zond.v1alpha1.Deposit.Data
-	(*AttestationData)(nil),                  // 24: theqrl.zond.v1alpha1.AttestationData
-	(*Attestation)(nil),                      // 25: theqrl.zond.v1alpha1.Attestation
+	(*GenericSignedBeaconBlock)(nil),         // 0: theqrl.qrl.v1alpha1.GenericSignedBeaconBlock
+	(*GenericBeaconBlock)(nil),               // 1: theqrl.qrl.v1alpha1.GenericBeaconBlock
+	(*ProposerSlashing)(nil),                 // 2: theqrl.qrl.v1alpha1.ProposerSlashing
+	(*AttesterSlashing)(nil),                 // 3: theqrl.qrl.v1alpha1.AttesterSlashing
+	(*Deposit)(nil),                          // 4: theqrl.qrl.v1alpha1.Deposit
+	(*VoluntaryExit)(nil),                    // 5: theqrl.qrl.v1alpha1.VoluntaryExit
+	(*SignedVoluntaryExit)(nil),              // 6: theqrl.qrl.v1alpha1.SignedVoluntaryExit
+	(*ExecutionNodeData)(nil),                // 7: theqrl.qrl.v1alpha1.ExecutionNodeData
+	(*BeaconBlockHeader)(nil),                // 8: theqrl.qrl.v1alpha1.BeaconBlockHeader
+	(*SignedBeaconBlockHeader)(nil),          // 9: theqrl.qrl.v1alpha1.SignedBeaconBlockHeader
+	(*IndexedAttestation)(nil),               // 10: theqrl.qrl.v1alpha1.IndexedAttestation
+	(*SyncAggregate)(nil),                    // 11: theqrl.qrl.v1alpha1.SyncAggregate
+	(*SignedBeaconBlockCapella)(nil),         // 12: theqrl.qrl.v1alpha1.SignedBeaconBlockCapella
+	(*BeaconBlockCapella)(nil),               // 13: theqrl.qrl.v1alpha1.BeaconBlockCapella
+	(*BeaconBlockBodyCapella)(nil),           // 14: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella
+	(*SignedBlindedBeaconBlockCapella)(nil),  // 15: theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockCapella
+	(*BlindedBeaconBlockCapella)(nil),        // 16: theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella
+	(*BlindedBeaconBlockBodyCapella)(nil),    // 17: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella
+	(*ValidatorRegistrationV1)(nil),          // 18: theqrl.qrl.v1alpha1.ValidatorRegistrationV1
+	(*SignedValidatorRegistrationsV1)(nil),   // 19: theqrl.qrl.v1alpha1.SignedValidatorRegistrationsV1
+	(*SignedValidatorRegistrationV1)(nil),    // 20: theqrl.qrl.v1alpha1.SignedValidatorRegistrationV1
+	(*BuilderBidCapella)(nil),                // 21: theqrl.qrl.v1alpha1.BuilderBidCapella
+	(*SignedBuilderBidCapella)(nil),          // 22: theqrl.qrl.v1alpha1.SignedBuilderBidCapella
+	(*Deposit_Data)(nil),                     // 23: theqrl.qrl.v1alpha1.Deposit.Data
+	(*AttestationData)(nil),                  // 24: theqrl.qrl.v1alpha1.AttestationData
+	(*Attestation)(nil),                      // 25: theqrl.qrl.v1alpha1.Attestation
 	(*v1.ExecutionPayloadCapella)(nil),       // 26: theqrl.engine.v1.ExecutionPayloadCapella
-	(*SignedDilithiumToExecutionChange)(nil), // 27: theqrl.zond.v1alpha1.SignedDilithiumToExecutionChange
+	(*SignedDilithiumToExecutionChange)(nil), // 27: theqrl.qrl.v1alpha1.SignedDilithiumToExecutionChange
 	(*v1.ExecutionPayloadHeaderCapella)(nil), // 28: theqrl.engine.v1.ExecutionPayloadHeaderCapella
 }
 var file_proto_qrysm_v1alpha1_beacon_block_proto_depIdxs = []int32{
-	12, // 0: theqrl.zond.v1alpha1.GenericSignedBeaconBlock.capella:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlockCapella
-	15, // 1: theqrl.zond.v1alpha1.GenericSignedBeaconBlock.blinded_capella:type_name -> theqrl.zond.v1alpha1.SignedBlindedBeaconBlockCapella
-	13, // 2: theqrl.zond.v1alpha1.GenericBeaconBlock.capella:type_name -> theqrl.zond.v1alpha1.BeaconBlockCapella
-	16, // 3: theqrl.zond.v1alpha1.GenericBeaconBlock.blinded_capella:type_name -> theqrl.zond.v1alpha1.BlindedBeaconBlockCapella
-	9,  // 4: theqrl.zond.v1alpha1.ProposerSlashing.header_1:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlockHeader
-	9,  // 5: theqrl.zond.v1alpha1.ProposerSlashing.header_2:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlockHeader
-	10, // 6: theqrl.zond.v1alpha1.AttesterSlashing.attestation_1:type_name -> theqrl.zond.v1alpha1.IndexedAttestation
-	10, // 7: theqrl.zond.v1alpha1.AttesterSlashing.attestation_2:type_name -> theqrl.zond.v1alpha1.IndexedAttestation
-	23, // 8: theqrl.zond.v1alpha1.Deposit.data:type_name -> theqrl.zond.v1alpha1.Deposit.Data
-	5,  // 9: theqrl.zond.v1alpha1.SignedVoluntaryExit.exit:type_name -> theqrl.zond.v1alpha1.VoluntaryExit
-	8,  // 10: theqrl.zond.v1alpha1.SignedBeaconBlockHeader.header:type_name -> theqrl.zond.v1alpha1.BeaconBlockHeader
-	24, // 11: theqrl.zond.v1alpha1.IndexedAttestation.data:type_name -> theqrl.zond.v1alpha1.AttestationData
-	13, // 12: theqrl.zond.v1alpha1.SignedBeaconBlockCapella.block:type_name -> theqrl.zond.v1alpha1.BeaconBlockCapella
-	14, // 13: theqrl.zond.v1alpha1.BeaconBlockCapella.body:type_name -> theqrl.zond.v1alpha1.BeaconBlockBodyCapella
-	7,  // 14: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.eth1_data:type_name -> theqrl.zond.v1alpha1.ExecutionNodeData
-	2,  // 15: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.proposer_slashings:type_name -> theqrl.zond.v1alpha1.ProposerSlashing
-	3,  // 16: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.attester_slashings:type_name -> theqrl.zond.v1alpha1.AttesterSlashing
-	25, // 17: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.attestations:type_name -> theqrl.zond.v1alpha1.Attestation
-	4,  // 18: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.deposits:type_name -> theqrl.zond.v1alpha1.Deposit
-	6,  // 19: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.voluntary_exits:type_name -> theqrl.zond.v1alpha1.SignedVoluntaryExit
-	11, // 20: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.sync_aggregate:type_name -> theqrl.zond.v1alpha1.SyncAggregate
-	26, // 21: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.execution_payload:type_name -> theqrl.engine.v1.ExecutionPayloadCapella
-	27, // 22: theqrl.zond.v1alpha1.BeaconBlockBodyCapella.dilithium_to_execution_changes:type_name -> theqrl.zond.v1alpha1.SignedDilithiumToExecutionChange
-	16, // 23: theqrl.zond.v1alpha1.SignedBlindedBeaconBlockCapella.block:type_name -> theqrl.zond.v1alpha1.BlindedBeaconBlockCapella
-	17, // 24: theqrl.zond.v1alpha1.BlindedBeaconBlockCapella.body:type_name -> theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella
-	7,  // 25: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.eth1_data:type_name -> theqrl.zond.v1alpha1.ExecutionNodeData
-	2,  // 26: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.proposer_slashings:type_name -> theqrl.zond.v1alpha1.ProposerSlashing
-	3,  // 27: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.attester_slashings:type_name -> theqrl.zond.v1alpha1.AttesterSlashing
-	25, // 28: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.attestations:type_name -> theqrl.zond.v1alpha1.Attestation
-	4,  // 29: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.deposits:type_name -> theqrl.zond.v1alpha1.Deposit
-	6,  // 30: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.voluntary_exits:type_name -> theqrl.zond.v1alpha1.SignedVoluntaryExit
-	11, // 31: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.sync_aggregate:type_name -> theqrl.zond.v1alpha1.SyncAggregate
-	28, // 32: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.execution_payload_header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
-	27, // 33: theqrl.zond.v1alpha1.BlindedBeaconBlockBodyCapella.dilithium_to_execution_changes:type_name -> theqrl.zond.v1alpha1.SignedDilithiumToExecutionChange
-	20, // 34: theqrl.zond.v1alpha1.SignedValidatorRegistrationsV1.messages:type_name -> theqrl.zond.v1alpha1.SignedValidatorRegistrationV1
-	18, // 35: theqrl.zond.v1alpha1.SignedValidatorRegistrationV1.message:type_name -> theqrl.zond.v1alpha1.ValidatorRegistrationV1
-	28, // 36: theqrl.zond.v1alpha1.BuilderBidCapella.header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
-	21, // 37: theqrl.zond.v1alpha1.SignedBuilderBidCapella.message:type_name -> theqrl.zond.v1alpha1.BuilderBidCapella
+	12, // 0: theqrl.qrl.v1alpha1.GenericSignedBeaconBlock.capella:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockCapella
+	15, // 1: theqrl.qrl.v1alpha1.GenericSignedBeaconBlock.blinded_capella:type_name -> theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockCapella
+	13, // 2: theqrl.qrl.v1alpha1.GenericBeaconBlock.capella:type_name -> theqrl.qrl.v1alpha1.BeaconBlockCapella
+	16, // 3: theqrl.qrl.v1alpha1.GenericBeaconBlock.blinded_capella:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella
+	9,  // 4: theqrl.qrl.v1alpha1.ProposerSlashing.header_1:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockHeader
+	9,  // 5: theqrl.qrl.v1alpha1.ProposerSlashing.header_2:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockHeader
+	10, // 6: theqrl.qrl.v1alpha1.AttesterSlashing.attestation_1:type_name -> theqrl.qrl.v1alpha1.IndexedAttestation
+	10, // 7: theqrl.qrl.v1alpha1.AttesterSlashing.attestation_2:type_name -> theqrl.qrl.v1alpha1.IndexedAttestation
+	23, // 8: theqrl.qrl.v1alpha1.Deposit.data:type_name -> theqrl.qrl.v1alpha1.Deposit.Data
+	5,  // 9: theqrl.qrl.v1alpha1.SignedVoluntaryExit.exit:type_name -> theqrl.qrl.v1alpha1.VoluntaryExit
+	8,  // 10: theqrl.qrl.v1alpha1.SignedBeaconBlockHeader.header:type_name -> theqrl.qrl.v1alpha1.BeaconBlockHeader
+	24, // 11: theqrl.qrl.v1alpha1.IndexedAttestation.data:type_name -> theqrl.qrl.v1alpha1.AttestationData
+	13, // 12: theqrl.qrl.v1alpha1.SignedBeaconBlockCapella.block:type_name -> theqrl.qrl.v1alpha1.BeaconBlockCapella
+	14, // 13: theqrl.qrl.v1alpha1.BeaconBlockCapella.body:type_name -> theqrl.qrl.v1alpha1.BeaconBlockBodyCapella
+	7,  // 14: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.eth1_data:type_name -> theqrl.qrl.v1alpha1.ExecutionNodeData
+	2,  // 15: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.proposer_slashings:type_name -> theqrl.qrl.v1alpha1.ProposerSlashing
+	3,  // 16: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.attester_slashings:type_name -> theqrl.qrl.v1alpha1.AttesterSlashing
+	25, // 17: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.attestations:type_name -> theqrl.qrl.v1alpha1.Attestation
+	4,  // 18: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.deposits:type_name -> theqrl.qrl.v1alpha1.Deposit
+	6,  // 19: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.voluntary_exits:type_name -> theqrl.qrl.v1alpha1.SignedVoluntaryExit
+	11, // 20: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.sync_aggregate:type_name -> theqrl.qrl.v1alpha1.SyncAggregate
+	26, // 21: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.execution_payload:type_name -> theqrl.engine.v1.ExecutionPayloadCapella
+	27, // 22: theqrl.qrl.v1alpha1.BeaconBlockBodyCapella.dilithium_to_execution_changes:type_name -> theqrl.qrl.v1alpha1.SignedDilithiumToExecutionChange
+	16, // 23: theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockCapella.block:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella
+	17, // 24: theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella.body:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella
+	7,  // 25: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.eth1_data:type_name -> theqrl.qrl.v1alpha1.ExecutionNodeData
+	2,  // 26: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.proposer_slashings:type_name -> theqrl.qrl.v1alpha1.ProposerSlashing
+	3,  // 27: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.attester_slashings:type_name -> theqrl.qrl.v1alpha1.AttesterSlashing
+	25, // 28: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.attestations:type_name -> theqrl.qrl.v1alpha1.Attestation
+	4,  // 29: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.deposits:type_name -> theqrl.qrl.v1alpha1.Deposit
+	6,  // 30: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.voluntary_exits:type_name -> theqrl.qrl.v1alpha1.SignedVoluntaryExit
+	11, // 31: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.sync_aggregate:type_name -> theqrl.qrl.v1alpha1.SyncAggregate
+	28, // 32: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.execution_payload_header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
+	27, // 33: theqrl.qrl.v1alpha1.BlindedBeaconBlockBodyCapella.dilithium_to_execution_changes:type_name -> theqrl.qrl.v1alpha1.SignedDilithiumToExecutionChange
+	20, // 34: theqrl.qrl.v1alpha1.SignedValidatorRegistrationsV1.messages:type_name -> theqrl.qrl.v1alpha1.SignedValidatorRegistrationV1
+	18, // 35: theqrl.qrl.v1alpha1.SignedValidatorRegistrationV1.message:type_name -> theqrl.qrl.v1alpha1.ValidatorRegistrationV1
+	28, // 36: theqrl.qrl.v1alpha1.BuilderBidCapella.header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
+	21, // 37: theqrl.qrl.v1alpha1.SignedBuilderBidCapella.message:type_name -> theqrl.qrl.v1alpha1.BuilderBidCapella
 	38, // [38:38] is the sub-list for method output_type
 	38, // [38:38] is the sub-list for method input_type
 	38, // [38:38] is the sub-list for extension type_name

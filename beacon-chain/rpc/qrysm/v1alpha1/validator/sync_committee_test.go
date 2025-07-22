@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -71,7 +71,7 @@ func TestSubmitSyncMessage_OK(t *testing.T) {
 			},
 		},
 	}
-	msg := &zondpb.SyncCommitteeMessage{
+	msg := &qrysmpb.SyncCommitteeMessage{
 		Slot:           1,
 		ValidatorIndex: 2,
 	}
@@ -79,7 +79,7 @@ func TestSubmitSyncMessage_OK(t *testing.T) {
 	require.NoError(t, err)
 	savedMsgs, err := server.CoreService.SyncCommitteePool.SyncCommitteeMessages(1)
 	require.NoError(t, err)
-	require.DeepEqual(t, []*zondpb.SyncCommitteeMessage{msg}, savedMsgs)
+	require.DeepEqual(t, []*qrysmpb.SyncCommitteeMessage{msg}, savedMsgs)
 }
 
 func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
@@ -93,7 +93,7 @@ func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 	}
 	var pubKey [field_params.DilithiumPubkeyLength]byte
 	// Request slot 0, should get the index 0 for validator 0.
-	res, err := server.GetSyncSubcommitteeIndex(context.Background(), &zondpb.SyncSubcommitteeIndexRequest{
+	res, err := server.GetSyncSubcommitteeIndex(context.Background(), &qrysmpb.SyncSubcommitteeIndexRequest{
 		PublicKey: pubKey[:], Slot: primitives.Slot(0),
 	})
 	require.NoError(t, err)
@@ -122,7 +122,7 @@ func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 	secKey, err := dilithium.RandKey()
 	require.NoError(t, err)
 	sig := secKey.Sign([]byte{'A'}).Marshal()
-	msg := &zondpb.SyncCommitteeMessage{
+	msg := &qrysmpb.SyncCommitteeMessage{
 		Slot:           1,
 		ValidatorIndex: 2,
 		BlockRoot:      make([]byte, 32),
@@ -136,7 +136,7 @@ func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 	require.NoError(t, err)
 
 	contr, err := server.GetSyncCommitteeContribution(context.Background(),
-		&zondpb.SyncCommitteeContributionRequest{
+		&qrysmpb.SyncCommitteeContributionRequest{
 			Slot:      1,
 			PublicKey: val.PublicKey,
 			SubnetId:  0})
@@ -152,9 +152,9 @@ func TestSubmitSignedContributionAndProof_OK(t *testing.T) {
 			OperationNotifier: (&mock.ChainService{}).OperationNotifier(),
 		},
 	}
-	contribution := &zondpb.SignedContributionAndProof{
-		Message: &zondpb.ContributionAndProof{
-			Contribution: &zondpb.SyncCommitteeContribution{
+	contribution := &qrysmpb.SignedContributionAndProof{
+		Message: &qrysmpb.ContributionAndProof{
+			Contribution: &qrysmpb.SyncCommitteeContribution{
 				Slot:              1,
 				SubcommitteeIndex: 2,
 				Signatures:        [][]byte{},
@@ -165,7 +165,7 @@ func TestSubmitSignedContributionAndProof_OK(t *testing.T) {
 	require.NoError(t, err)
 	savedMsgs, err := server.CoreService.SyncCommitteePool.SyncCommitteeContributions(1)
 	require.NoError(t, err)
-	require.DeepEqual(t, []*zondpb.SyncCommitteeContribution{contribution.Message.Contribution}, savedMsgs)
+	require.DeepEqual(t, []*qrysmpb.SyncCommitteeContribution{contribution.Message.Contribution}, savedMsgs)
 }
 
 func TestSubmitSignedContributionAndProof_Notification(t *testing.T) {
@@ -182,9 +182,9 @@ func TestSubmitSignedContributionAndProof_Notification(t *testing.T) {
 	opSub := server.CoreService.OperationNotifier.OperationFeed().Subscribe(opChannel)
 	defer opSub.Unsubscribe()
 
-	contribution := &zondpb.SignedContributionAndProof{
-		Message: &zondpb.ContributionAndProof{
-			Contribution: &zondpb.SyncCommitteeContribution{
+	contribution := &qrysmpb.SignedContributionAndProof{
+		Message: &qrysmpb.ContributionAndProof{
+			Contribution: &qrysmpb.SyncCommitteeContribution{
 				Slot:              1,
 				SubcommitteeIndex: 2,
 			},

@@ -20,7 +20,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // Chain defines a properly functioning mock for the powchain service.
@@ -30,7 +30,7 @@ type Chain struct {
 	HashesByHeight    map[int][]byte
 	TimesByHeight     map[int]uint64
 	BlockNumberByTime map[uint64]*big.Int
-	ExecutionNodeData *zondpb.ExecutionNodeData
+	ExecutionNodeData *qrysmpb.ExecutionNodeData
 	GenesisEth1Block  *big.Int
 	GenesisState      state.BeaconState
 	CurrEndpoint      string
@@ -105,7 +105,7 @@ func (m *Chain) BlockByTimestamp(_ context.Context, time uint64) (*types.HeaderI
 }
 
 // ChainStartExecutionNodeData --
-func (m *Chain) ChainStartExecutionNodeData() *zondpb.ExecutionNodeData {
+func (m *Chain) ChainStartExecutionNodeData() *qrysmpb.ExecutionNodeData {
 	return m.ExecutionNodeData
 }
 

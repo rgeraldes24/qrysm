@@ -19,7 +19,7 @@ import (
 	p2ptest "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/consensus-types/wrapper"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	testpb "github.com/theQRL/qrysm/proto/testing"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -44,7 +44,7 @@ func TestService_Broadcast(t *testing.T) {
 		genesisValidatorsRoot: bytesutil.PadTo([]byte{'A'}, 32),
 	}
 
-	msg := &zondpb.Fork{
+	msg := &qrysmpb.Fork{
 		Epoch:           55,
 		CurrentVersion:  []byte("fooo"),
 		PreviousVersion: []byte("barr"),
@@ -75,7 +75,7 @@ func TestService_Broadcast(t *testing.T) {
 		incomingMessage, err := sub.Next(ctx)
 		require.NoError(t, err)
 
-		result := &zondpb.Fork{}
+		result := &qrysmpb.Fork{}
 		require.NoError(t, p.Encoding().DecodeGossip(incomingMessage.Data, result))
 		if !proto.Equal(result, msg) {
 			tt.Errorf("Did not receive expected message, got %+v, wanted %+v", result, msg)
@@ -98,17 +98,17 @@ func TestService_Broadcast_ReturnsErr_TopicNotMapped(t *testing.T) {
 }
 
 func TestService_Attestation_Subnet(t *testing.T) {
-	if gtm := GossipTypeMapping[reflect.TypeOf(&zondpb.Attestation{})]; gtm != AttestationSubnetTopicFormat {
+	if gtm := GossipTypeMapping[reflect.TypeOf(&qrysmpb.Attestation{})]; gtm != AttestationSubnetTopicFormat {
 		t.Errorf("Constant is out of date. Wanted %s, got %s", AttestationSubnetTopicFormat, gtm)
 	}
 
 	tests := []struct {
-		att   *zondpb.Attestation
+		att   *qrysmpb.Attestation
 		topic string
 	}{
 		{
-			att: &zondpb.Attestation{
-				Data: &zondpb.AttestationData{
+			att: &qrysmpb.Attestation{
+				Data: &qrysmpb.AttestationData{
 					CommitteeIndex: 0,
 					Slot:           2,
 				},
@@ -116,8 +116,8 @@ func TestService_Attestation_Subnet(t *testing.T) {
 			topic: "/consensus/00000000/beacon_attestation_2",
 		},
 		{
-			att: &zondpb.Attestation{
-				Data: &zondpb.AttestationData{
+			att: &qrysmpb.Attestation{
+				Data: &qrysmpb.AttestationData{
 					CommitteeIndex: 11,
 					Slot:           10,
 				},
@@ -125,8 +125,8 @@ func TestService_Attestation_Subnet(t *testing.T) {
 			topic: "/consensus/00000000/beacon_attestation_21",
 		},
 		{
-			att: &zondpb.Attestation{
-				Data: &zondpb.AttestationData{
+			att: &qrysmpb.Attestation{
+				Data: &qrysmpb.AttestationData{
 					CommitteeIndex: 55,
 					Slot:           529,
 				},
@@ -162,7 +162,7 @@ func TestService_BroadcastAttestation(t *testing.T) {
 		}),
 	}
 
-	msg := util.HydrateAttestation(&zondpb.Attestation{AggregationBits: bitfield.NewBitlist(7)})
+	msg := util.HydrateAttestation(&qrysmpb.Attestation{AggregationBits: bitfield.NewBitlist(7)})
 	subnet := uint64(5)
 
 	topic := AttestationSubnetTopicFormat
@@ -189,7 +189,7 @@ func TestService_BroadcastAttestation(t *testing.T) {
 		incomingMessage, err := sub.Next(ctx)
 		require.NoError(t, err)
 
-		result := &zondpb.Attestation{}
+		result := &qrysmpb.Attestation{}
 		require.NoError(t, p.Encoding().DecodeGossip(incomingMessage.Data, result))
 		if !proto.Equal(result, msg) {
 			tt.Errorf("Did not receive expected message, got %+v, wanted %+v", result, msg)
@@ -257,7 +257,7 @@ func TestService_BroadcastAttestationWithDiscoveryAttempts(t *testing.T) {
 		// Set for 2nd peer
 		if i == 2 {
 			s.dv5Listener = listener
-			s.metaData = wrapper.WrappedMetadataV1(new(zondpb.MetaDataV1))
+			s.metaData = wrapper.WrappedMetadataV1(new(qrysmpb.MetaDataV1))
 			bitV := bitfield.NewBitvector64()
 			bitV.SetBitAt(subnet, true)
 			bitS := bitfield.NewBitvector4()
@@ -328,7 +328,7 @@ func TestService_BroadcastAttestationWithDiscoveryAttempts(t *testing.T) {
 	go p.listenForNewNodes()
 	go p2.listenForNewNodes()
 
-	msg := util.HydrateAttestation(&zondpb.Attestation{AggregationBits: bitfield.NewBitlist(7)})
+	msg := util.HydrateAttestation(&qrysmpb.Attestation{AggregationBits: bitfield.NewBitlist(7)})
 	topic := AttestationSubnetTopicFormat
 	GossipTypeMapping[reflect.TypeOf(msg)] = topic
 	digest, err := p.currentForkDigest()
@@ -368,7 +368,7 @@ func TestService_BroadcastAttestationWithDiscoveryAttempts(t *testing.T) {
 		incomingMessage, err := sub.Next(ctx)
 		require.NoError(t, err)
 
-		result := &zondpb.Attestation{}
+		result := &qrysmpb.Attestation{}
 		require.NoError(t, p.Encoding().DecodeGossip(incomingMessage.Data, result))
 		if !proto.Equal(result, msg) {
 			tt.Errorf("Did not receive expected message, got %+v, wanted %+v", result, msg)
@@ -404,7 +404,7 @@ func TestService_BroadcastSyncCommittee(t *testing.T) {
 		}),
 	}
 
-	msg := util.HydrateSyncCommittee(&zondpb.SyncCommitteeMessage{})
+	msg := util.HydrateSyncCommittee(&qrysmpb.SyncCommitteeMessage{})
 	subnet := uint64(5)
 
 	topic := SyncCommitteeSubnetTopicFormat
@@ -431,7 +431,7 @@ func TestService_BroadcastSyncCommittee(t *testing.T) {
 		incomingMessage, err := sub.Next(ctx)
 		require.NoError(t, err)
 
-		result := &zondpb.SyncCommitteeMessage{}
+		result := &qrysmpb.SyncCommitteeMessage{}
 		require.NoError(t, p.Encoding().DecodeGossip(incomingMessage.Data, result))
 		if !proto.Equal(result, msg) {
 			tt.Errorf("Did not receive expected message, got %+v, wanted %+v", result, msg)

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/v1/sync_committee.proto
+// source: proto/qrl/v1/sync_committee.proto
 
 package v1
 
@@ -513,18 +513,18 @@ func file_proto_zond_v1_sync_committee_proto_rawDescGZIP() []byte {
 
 var file_proto_zond_v1_sync_committee_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_proto_zond_v1_sync_committee_proto_goTypes = []interface{}{
-	(*SubmitSyncCommitteeSignaturesRequest)(nil), // 0: theqrl.zond.v1.SubmitSyncCommitteeSignaturesRequest
-	(*SyncCommittee)(nil),                        // 1: theqrl.zond.v1.SyncCommittee
-	(*SyncCommitteeMessage)(nil),                 // 2: theqrl.zond.v1.SyncCommitteeMessage
-	(*StateSyncCommitteesRequest)(nil),           // 3: theqrl.zond.v1.StateSyncCommitteesRequest
-	(*StateSyncCommitteesResponse)(nil),          // 4: theqrl.zond.v1.StateSyncCommitteesResponse
-	(*SyncCommitteeValidators)(nil),              // 5: theqrl.zond.v1.SyncCommitteeValidators
-	(*SyncSubcommitteeValidators)(nil),           // 6: theqrl.zond.v1.SyncSubcommitteeValidators
+	(*SubmitSyncCommitteeSignaturesRequest)(nil), // 0: theqrl.qrl.v1.SubmitSyncCommitteeSignaturesRequest
+	(*SyncCommittee)(nil),                        // 1: theqrl.qrl.v1.SyncCommittee
+	(*SyncCommitteeMessage)(nil),                 // 2: theqrl.qrl.v1.SyncCommitteeMessage
+	(*StateSyncCommitteesRequest)(nil),           // 3: theqrl.qrl.v1.StateSyncCommitteesRequest
+	(*StateSyncCommitteesResponse)(nil),          // 4: theqrl.qrl.v1.StateSyncCommitteesResponse
+	(*SyncCommitteeValidators)(nil),              // 5: theqrl.qrl.v1.SyncCommitteeValidators
+	(*SyncSubcommitteeValidators)(nil),           // 6: theqrl.qrl.v1.SyncSubcommitteeValidators
 }
 var file_proto_zond_v1_sync_committee_proto_depIdxs = []int32{
-	2, // 0: theqrl.zond.v1.SubmitSyncCommitteeSignaturesRequest.data:type_name -> theqrl.zond.v1.SyncCommitteeMessage
-	5, // 1: theqrl.zond.v1.StateSyncCommitteesResponse.data:type_name -> theqrl.zond.v1.SyncCommitteeValidators
-	6, // 2: theqrl.zond.v1.SyncCommitteeValidators.validator_aggregates:type_name -> theqrl.zond.v1.SyncSubcommitteeValidators
+	2, // 0: theqrl.qrl.v1.SubmitSyncCommitteeSignaturesRequest.data:type_name -> theqrl.qrl.v1.SyncCommitteeMessage
+	5, // 1: theqrl.qrl.v1.StateSyncCommitteesResponse.data:type_name -> theqrl.qrl.v1.SyncCommitteeValidators
+	6, // 2: theqrl.qrl.v1.SyncCommitteeValidators.validator_aggregates:type_name -> theqrl.qrl.v1.SyncSubcommitteeValidators
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name

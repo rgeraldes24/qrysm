@@ -9,7 +9,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/consensus-types/validator"
 	"github.com/theQRL/qrysm/proto/migration"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -18,7 +18,7 @@ func Test_ValidatorStatus(t *testing.T) {
 	farFutureEpoch := params.BeaconConfig().FarFutureEpoch
 
 	type args struct {
-		validator *zondpbv1.Validator
+		validator *qrlpb.Validator
 		epoch     primitives.Epoch
 	}
 	tests := []struct {
@@ -30,7 +30,7 @@ func Test_ValidatorStatus(t *testing.T) {
 		{
 			name: "pending initialized",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:            farFutureEpoch,
 					ActivationEligibilityEpoch: farFutureEpoch,
 				},
@@ -41,7 +41,7 @@ func Test_ValidatorStatus(t *testing.T) {
 		{
 			name: "pending queued",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:            10,
 					ActivationEligibilityEpoch: 2,
 				},
@@ -52,7 +52,7 @@ func Test_ValidatorStatus(t *testing.T) {
 		{
 			name: "active ongoing",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch: 3,
 					ExitEpoch:       farFutureEpoch,
 				},
@@ -63,7 +63,7 @@ func Test_ValidatorStatus(t *testing.T) {
 		{
 			name: "active slashed",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch: 3,
 					ExitEpoch:       30,
 					Slashed:         true,
@@ -75,7 +75,7 @@ func Test_ValidatorStatus(t *testing.T) {
 		{
 			name: "active exiting",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch: 3,
 					ExitEpoch:       30,
 					Slashed:         false,
@@ -87,7 +87,7 @@ func Test_ValidatorStatus(t *testing.T) {
 		{
 			name: "exited slashed",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:   3,
 					ExitEpoch:         30,
 					WithdrawableEpoch: 40,
@@ -100,7 +100,7 @@ func Test_ValidatorStatus(t *testing.T) {
 		{
 			name: "exited unslashed",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:   3,
 					ExitEpoch:         30,
 					WithdrawableEpoch: 40,
@@ -113,7 +113,7 @@ func Test_ValidatorStatus(t *testing.T) {
 		{
 			name: "withdrawal possible",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:   3,
 					ExitEpoch:         30,
 					WithdrawableEpoch: 40,
@@ -127,7 +127,7 @@ func Test_ValidatorStatus(t *testing.T) {
 		{
 			name: "withdrawal done",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:   3,
 					ExitEpoch:         30,
 					WithdrawableEpoch: 40,
@@ -156,7 +156,7 @@ func Test_ValidatorSubStatus(t *testing.T) {
 	farFutureEpoch := params.BeaconConfig().FarFutureEpoch
 
 	type args struct {
-		validator *zondpbv1.Validator
+		validator *qrlpb.Validator
 		epoch     primitives.Epoch
 	}
 	tests := []struct {
@@ -168,7 +168,7 @@ func Test_ValidatorSubStatus(t *testing.T) {
 		{
 			name: "pending initialized",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:            farFutureEpoch,
 					ActivationEligibilityEpoch: farFutureEpoch,
 				},
@@ -179,7 +179,7 @@ func Test_ValidatorSubStatus(t *testing.T) {
 		{
 			name: "pending queued",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:            10,
 					ActivationEligibilityEpoch: 2,
 				},
@@ -190,7 +190,7 @@ func Test_ValidatorSubStatus(t *testing.T) {
 		{
 			name: "active ongoing",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch: 3,
 					ExitEpoch:       farFutureEpoch,
 				},
@@ -201,7 +201,7 @@ func Test_ValidatorSubStatus(t *testing.T) {
 		{
 			name: "active slashed",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch: 3,
 					ExitEpoch:       30,
 					Slashed:         true,
@@ -213,7 +213,7 @@ func Test_ValidatorSubStatus(t *testing.T) {
 		{
 			name: "active exiting",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch: 3,
 					ExitEpoch:       30,
 					Slashed:         false,
@@ -225,7 +225,7 @@ func Test_ValidatorSubStatus(t *testing.T) {
 		{
 			name: "exited slashed",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:   3,
 					ExitEpoch:         30,
 					WithdrawableEpoch: 40,
@@ -238,7 +238,7 @@ func Test_ValidatorSubStatus(t *testing.T) {
 		{
 			name: "exited unslashed",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:   3,
 					ExitEpoch:         30,
 					WithdrawableEpoch: 40,
@@ -251,7 +251,7 @@ func Test_ValidatorSubStatus(t *testing.T) {
 		{
 			name: "withdrawal possible",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:   3,
 					ExitEpoch:         30,
 					WithdrawableEpoch: 40,
@@ -265,7 +265,7 @@ func Test_ValidatorSubStatus(t *testing.T) {
 		{
 			name: "withdrawal done",
 			args: args{
-				validator: &zondpbv1.Validator{
+				validator: &qrlpb.Validator{
 					ActivationEpoch:   3,
 					ExitEpoch:         30,
 					WithdrawableEpoch: 40,
@@ -296,8 +296,8 @@ func Test_ValidatorSubStatus(t *testing.T) {
 // Having a test like this allows us to use e.g. `if value < 10` for validity checks.
 func TestNumberOfStatuses(t *testing.T) {
 	lastValidEnumValue := 12
-	x := zondpbv1.ValidatorStatus(lastValidEnumValue)
+	x := qrlpb.ValidatorStatus(lastValidEnumValue)
 	assert.NotEqual(t, strconv.Itoa(lastValidEnumValue), x.String())
-	x = zondpbv1.ValidatorStatus(lastValidEnumValue + 1)
+	x = qrlpb.ValidatorStatus(lastValidEnumValue + 1)
 	assert.Equal(t, strconv.Itoa(lastValidEnumValue+1), x.String())
 }

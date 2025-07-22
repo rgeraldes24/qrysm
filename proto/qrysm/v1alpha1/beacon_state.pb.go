@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: proto/qrysm/v1alpha1/beacon_state.proto
 
-package zond
+package qrl
 
 import (
 	reflect "reflect"
@@ -1227,40 +1227,40 @@ func file_proto_qrysm_v1alpha1_beacon_state_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_beacon_state_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_proto_qrysm_v1alpha1_beacon_state_proto_goTypes = []interface{}{
-	(*Fork)(nil),                             // 0: theqrl.zond.v1alpha1.Fork
-	(*PendingAttestation)(nil),               // 1: theqrl.zond.v1alpha1.PendingAttestation
-	(*HistoricalBatch)(nil),                  // 2: theqrl.zond.v1alpha1.HistoricalBatch
-	(*StateSummary)(nil),                     // 3: theqrl.zond.v1alpha1.StateSummary
-	(*SigningData)(nil),                      // 4: theqrl.zond.v1alpha1.SigningData
-	(*ForkData)(nil),                         // 5: theqrl.zond.v1alpha1.ForkData
-	(*CheckPtInfo)(nil),                      // 6: theqrl.zond.v1alpha1.CheckPtInfo
-	(*DepositMessage)(nil),                   // 7: theqrl.zond.v1alpha1.DepositMessage
-	(*SyncCommittee)(nil),                    // 8: theqrl.zond.v1alpha1.SyncCommittee
-	(*SyncAggregatorSelectionData)(nil),      // 9: theqrl.zond.v1alpha1.SyncAggregatorSelectionData
-	(*BeaconStateCapella)(nil),               // 10: theqrl.zond.v1alpha1.BeaconStateCapella
-	(*HistoricalSummary)(nil),                // 11: theqrl.zond.v1alpha1.HistoricalSummary
-	(*AttestationData)(nil),                  // 12: theqrl.zond.v1alpha1.AttestationData
-	(*BeaconBlockHeader)(nil),                // 13: theqrl.zond.v1alpha1.BeaconBlockHeader
-	(*ExecutionNodeData)(nil),                // 14: theqrl.zond.v1alpha1.ExecutionNodeData
-	(*Validator)(nil),                        // 15: theqrl.zond.v1alpha1.Validator
-	(*Checkpoint)(nil),                       // 16: theqrl.zond.v1alpha1.Checkpoint
+	(*Fork)(nil),                             // 0: theqrl.qrl.v1alpha1.Fork
+	(*PendingAttestation)(nil),               // 1: theqrl.qrl.v1alpha1.PendingAttestation
+	(*HistoricalBatch)(nil),                  // 2: theqrl.qrl.v1alpha1.HistoricalBatch
+	(*StateSummary)(nil),                     // 3: theqrl.qrl.v1alpha1.StateSummary
+	(*SigningData)(nil),                      // 4: theqrl.qrl.v1alpha1.SigningData
+	(*ForkData)(nil),                         // 5: theqrl.qrl.v1alpha1.ForkData
+	(*CheckPtInfo)(nil),                      // 6: theqrl.qrl.v1alpha1.CheckPtInfo
+	(*DepositMessage)(nil),                   // 7: theqrl.qrl.v1alpha1.DepositMessage
+	(*SyncCommittee)(nil),                    // 8: theqrl.qrl.v1alpha1.SyncCommittee
+	(*SyncAggregatorSelectionData)(nil),      // 9: theqrl.qrl.v1alpha1.SyncAggregatorSelectionData
+	(*BeaconStateCapella)(nil),               // 10: theqrl.qrl.v1alpha1.BeaconStateCapella
+	(*HistoricalSummary)(nil),                // 11: theqrl.qrl.v1alpha1.HistoricalSummary
+	(*AttestationData)(nil),                  // 12: theqrl.qrl.v1alpha1.AttestationData
+	(*BeaconBlockHeader)(nil),                // 13: theqrl.qrl.v1alpha1.BeaconBlockHeader
+	(*ExecutionNodeData)(nil),                // 14: theqrl.qrl.v1alpha1.ExecutionNodeData
+	(*Validator)(nil),                        // 15: theqrl.qrl.v1alpha1.Validator
+	(*Checkpoint)(nil),                       // 16: theqrl.qrl.v1alpha1.Checkpoint
 	(*v1.ExecutionPayloadHeaderCapella)(nil), // 17: theqrl.engine.v1.ExecutionPayloadHeaderCapella
 }
 var file_proto_qrysm_v1alpha1_beacon_state_proto_depIdxs = []int32{
-	12, // 0: theqrl.zond.v1alpha1.PendingAttestation.data:type_name -> theqrl.zond.v1alpha1.AttestationData
-	0,  // 1: theqrl.zond.v1alpha1.CheckPtInfo.fork:type_name -> theqrl.zond.v1alpha1.Fork
-	0,  // 2: theqrl.zond.v1alpha1.BeaconStateCapella.fork:type_name -> theqrl.zond.v1alpha1.Fork
-	13, // 3: theqrl.zond.v1alpha1.BeaconStateCapella.latest_block_header:type_name -> theqrl.zond.v1alpha1.BeaconBlockHeader
-	14, // 4: theqrl.zond.v1alpha1.BeaconStateCapella.eth1_data:type_name -> theqrl.zond.v1alpha1.ExecutionNodeData
-	14, // 5: theqrl.zond.v1alpha1.BeaconStateCapella.eth1_data_votes:type_name -> theqrl.zond.v1alpha1.ExecutionNodeData
-	15, // 6: theqrl.zond.v1alpha1.BeaconStateCapella.validators:type_name -> theqrl.zond.v1alpha1.Validator
-	16, // 7: theqrl.zond.v1alpha1.BeaconStateCapella.previous_justified_checkpoint:type_name -> theqrl.zond.v1alpha1.Checkpoint
-	16, // 8: theqrl.zond.v1alpha1.BeaconStateCapella.current_justified_checkpoint:type_name -> theqrl.zond.v1alpha1.Checkpoint
-	16, // 9: theqrl.zond.v1alpha1.BeaconStateCapella.finalized_checkpoint:type_name -> theqrl.zond.v1alpha1.Checkpoint
-	8,  // 10: theqrl.zond.v1alpha1.BeaconStateCapella.current_sync_committee:type_name -> theqrl.zond.v1alpha1.SyncCommittee
-	8,  // 11: theqrl.zond.v1alpha1.BeaconStateCapella.next_sync_committee:type_name -> theqrl.zond.v1alpha1.SyncCommittee
-	17, // 12: theqrl.zond.v1alpha1.BeaconStateCapella.latest_execution_payload_header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
-	11, // 13: theqrl.zond.v1alpha1.BeaconStateCapella.historical_summaries:type_name -> theqrl.zond.v1alpha1.HistoricalSummary
+	12, // 0: theqrl.qrl.v1alpha1.PendingAttestation.data:type_name -> theqrl.qrl.v1alpha1.AttestationData
+	0,  // 1: theqrl.qrl.v1alpha1.CheckPtInfo.fork:type_name -> theqrl.qrl.v1alpha1.Fork
+	0,  // 2: theqrl.qrl.v1alpha1.BeaconStateCapella.fork:type_name -> theqrl.qrl.v1alpha1.Fork
+	13, // 3: theqrl.qrl.v1alpha1.BeaconStateCapella.latest_block_header:type_name -> theqrl.qrl.v1alpha1.BeaconBlockHeader
+	14, // 4: theqrl.qrl.v1alpha1.BeaconStateCapella.eth1_data:type_name -> theqrl.qrl.v1alpha1.ExecutionNodeData
+	14, // 5: theqrl.qrl.v1alpha1.BeaconStateCapella.eth1_data_votes:type_name -> theqrl.qrl.v1alpha1.ExecutionNodeData
+	15, // 6: theqrl.qrl.v1alpha1.BeaconStateCapella.validators:type_name -> theqrl.qrl.v1alpha1.Validator
+	16, // 7: theqrl.qrl.v1alpha1.BeaconStateCapella.previous_justified_checkpoint:type_name -> theqrl.qrl.v1alpha1.Checkpoint
+	16, // 8: theqrl.qrl.v1alpha1.BeaconStateCapella.current_justified_checkpoint:type_name -> theqrl.qrl.v1alpha1.Checkpoint
+	16, // 9: theqrl.qrl.v1alpha1.BeaconStateCapella.finalized_checkpoint:type_name -> theqrl.qrl.v1alpha1.Checkpoint
+	8,  // 10: theqrl.qrl.v1alpha1.BeaconStateCapella.current_sync_committee:type_name -> theqrl.qrl.v1alpha1.SyncCommittee
+	8,  // 11: theqrl.qrl.v1alpha1.BeaconStateCapella.next_sync_committee:type_name -> theqrl.qrl.v1alpha1.SyncCommittee
+	17, // 12: theqrl.qrl.v1alpha1.BeaconStateCapella.latest_execution_payload_header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
+	11, // 13: theqrl.qrl.v1alpha1.BeaconStateCapella.historical_summaries:type_name -> theqrl.qrl.v1alpha1.HistoricalSummary
 	14, // [14:14] is the sub-list for method output_type
 	14, // [14:14] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name

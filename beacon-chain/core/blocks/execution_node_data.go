@@ -7,7 +7,7 @@ import (
 
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // ProcessExecutionNodeDataInBlock is an operation performed on each
@@ -20,7 +20,7 @@ import (
 //	 state.eth1_data_votes.append(body.eth1_data)
 //	 if state.eth1_data_votes.count(body.eth1_data) * 2 > EPOCHS_PER_ETH1_VOTING_PERIOD * SLOTS_PER_EPOCH:
 //	     state.eth1_data = body.eth1_data
-func ProcessExecutionNodeDataInBlock(_ context.Context, beaconState state.BeaconState, executionNodeData *zondpb.ExecutionNodeData) (state.BeaconState, error) {
+func ProcessExecutionNodeDataInBlock(_ context.Context, beaconState state.BeaconState, executionNodeData *qrysmpb.ExecutionNodeData) (state.BeaconState, error) {
 	if beaconState == nil || beaconState.IsNil() {
 		return nil, errors.New("nil state")
 	}
@@ -40,7 +40,7 @@ func ProcessExecutionNodeDataInBlock(_ context.Context, beaconState state.Beacon
 }
 
 // AreExecutionNodeDataEqual checks equality between two eth1 data objects.
-func AreExecutionNodeDataEqual(a, b *zondpb.ExecutionNodeData) bool {
+func AreExecutionNodeDataEqual(a, b *qrysmpb.ExecutionNodeData) bool {
 	if a == nil && b == nil {
 		return true
 	}
@@ -56,9 +56,9 @@ func AreExecutionNodeDataEqual(a, b *zondpb.ExecutionNodeData) bool {
 // eth1 voting period. A vote is cast by including executionNodeData in a block and part of state processing
 // appends executionNodeData to the state in the ExecutionNodeDataVotes list. Iterating through this list checks the
 // votes to see if they match the executionNodeData.
-func ExecutionNodeDataHasEnoughSupport(beaconState state.ReadOnlyBeaconState, data *zondpb.ExecutionNodeData) (bool, error) {
+func ExecutionNodeDataHasEnoughSupport(beaconState state.ReadOnlyBeaconState, data *qrysmpb.ExecutionNodeData) (bool, error) {
 	voteCount := uint64(0)
-	data = zondpb.CopyExecutionNodeData(data)
+	data = qrysmpb.CopyExecutionNodeData(data)
 
 	for _, vote := range beaconState.ExecutionNodeDataVotes() {
 		if AreExecutionNodeDataEqual(vote, data) {

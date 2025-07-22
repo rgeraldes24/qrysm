@@ -2,11 +2,11 @@
 // source: proto/qrysm/v1alpha1/health.proto
 
 /*
-Package zond is a reverse proxy.
+Package qrl is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package zond
+package qrl
 
 import (
 	"context"
@@ -112,7 +112,7 @@ func RegisterHealthHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.Health/StreamBeaconLogs")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.Health/StreamBeaconLogs")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

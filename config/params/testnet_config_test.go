@@ -11,16 +11,6 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-// TODO(now.youtrack.cloud/issue/TQ-17)
-/*
-func testnetConfigFilePath(t *testing.T, network string) string {
-	fPath, err := bazel.Runfile("external/zond_networks")
-	require.NoError(t, err)
-	configFilePath := path.Join(fPath, "shared", network, "config.yaml")
-	return configFilePath
-}
-*/
-
 func TestE2EConfigParity(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	testDir := bazel.TestTmpDir()

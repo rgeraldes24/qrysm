@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/io/prompt"
-	zondpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/validator/accounts/wallet"
 	"github.com/theQRL/qrysm/validator/keymanager"
 )
@@ -156,11 +156,11 @@ func (acm *AccountsCLIManager) Import(ctx context.Context) error {
 	var successfullyImportedAccounts []string
 	for i, status := range statuses {
 		switch status.Status {
-		case zondpbservice.ImportedKeystoreStatus_IMPORTED:
+		case qrlpbservice.ImportedKeystoreStatus_IMPORTED:
 			successfullyImportedAccounts = append(successfullyImportedAccounts, keystoresImported[i].Pubkey)
-		case zondpbservice.ImportedKeystoreStatus_DUPLICATE:
+		case qrlpbservice.ImportedKeystoreStatus_DUPLICATE:
 			log.Warnf("Duplicate key %s found in import request, skipped", keystoresImported[i].Pubkey)
-		case zondpbservice.ImportedKeystoreStatus_ERROR:
+		case qrlpbservice.ImportedKeystoreStatus_ERROR:
 			log.Warnf("Could not import keystore for %s: %s", keystoresImported[i].Pubkey[:12], status.Message)
 		}
 	}
@@ -178,12 +178,12 @@ func (acm *AccountsCLIManager) Import(ctx context.Context) error {
 
 // ImportAccounts can import external, EIP-2335 compliant keystore.json files as
 // new accounts into the Qrysm validator wallet.
-func ImportAccounts(ctx context.Context, cfg *ImportAccountsConfig) ([]*zondpbservice.ImportedKeystoreStatus, error) {
+func ImportAccounts(ctx context.Context, cfg *ImportAccountsConfig) ([]*qrlpbservice.ImportedKeystoreStatus, error) {
 	if cfg.AccountPassword == "" {
-		statuses := make([]*zondpbservice.ImportedKeystoreStatus, len(cfg.Keystores))
+		statuses := make([]*qrlpbservice.ImportedKeystoreStatus, len(cfg.Keystores))
 		for i, keystore := range cfg.Keystores {
-			statuses[i] = &zondpbservice.ImportedKeystoreStatus{
-				Status: zondpbservice.ImportedKeystoreStatus_ERROR,
+			statuses[i] = &qrlpbservice.ImportedKeystoreStatus{
+				Status: qrlpbservice.ImportedKeystoreStatus_ERROR,
 				Message: fmt.Sprintf(
 					"account password is required to import keystore %s",
 					keystore.Pubkey,
@@ -248,15 +248,15 @@ func importPrivateKeyAsAccount(ctx context.Context, wallet *wallet.Wallet, impor
 	}
 	for _, status := range statuses {
 		switch status.Status {
-		case zondpbservice.ImportedKeystoreStatus_IMPORTED:
+		case qrlpbservice.ImportedKeystoreStatus_IMPORTED:
 			fmt.Printf(
 				"Imported account with public key %#x, view all accounts by running `accounts list`\n",
 				au.BrightMagenta(bytesutil.Trunc(privKey.PublicKey().Marshal())),
 			)
 			return nil
-		case zondpbservice.ImportedKeystoreStatus_ERROR:
+		case qrlpbservice.ImportedKeystoreStatus_ERROR:
 			return fmt.Errorf("could not import keystore for %s: %s", keystore.Pubkey, status.Message)
-		case zondpbservice.ImportedKeystoreStatus_DUPLICATE:
+		case qrlpbservice.ImportedKeystoreStatus_DUPLICATE:
 			return fmt.Errorf("duplicate key %s skipped", keystore.Pubkey)
 		}
 	}

@@ -25,7 +25,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
@@ -43,7 +43,7 @@ const (
 
 // GetBeaconBlock is called by a proposer during its assigned slot to request a block to sign
 // by passing in the slot and the signed randao reveal of the slot.
-func (vs *Server) GetBeaconBlock(ctx context.Context, req *zondpb.BlockRequest) (*zondpb.GenericBeaconBlock, error) {
+func (vs *Server) GetBeaconBlock(ctx context.Context, req *qrysmpb.BlockRequest) (*qrysmpb.GenericBeaconBlock, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.GetBeaconBlock")
 	defer span.End()
 	span.AddAttributes(trace.Int64Attribute("slot", int64(req.Slot)))
@@ -130,7 +130,7 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 		// Set eth1 data.
 		executionNodeData, err := vs.executionNodeDataMajorityVote(ctx, head)
 		if err != nil {
-			executionNodeData = &zondpb.ExecutionNodeData{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
+			executionNodeData = &qrysmpb.ExecutionNodeData{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
 			log.WithError(err).Error("Could not get executionNodeData")
 		}
 		sBlk.SetExecutionNodeData(executionNodeData)
@@ -138,8 +138,8 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 		// Set deposit and attestation.
 		deposits, atts, err := vs.packDepositsAndAttestations(ctx, head, executionNodeData) // TODO: split attestations and deposits
 		if err != nil {
-			sBlk.SetDeposits([]*zondpb.Deposit{})
-			sBlk.SetAttestations([]*zondpb.Attestation{})
+			sBlk.SetDeposits([]*qrysmpb.Deposit{})
+			sBlk.SetAttestations([]*qrysmpb.Attestation{})
 			log.WithError(err).Error("Could not pack deposits and attestations")
 		} else {
 			sBlk.SetDeposits(deposits)
@@ -188,7 +188,7 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 
 // ProposeBeaconBlock is called by a proposer during its assigned slot to create a block in an attempt
 // to get it processed by the beacon node as the canonical head.
-func (vs *Server) ProposeBeaconBlock(ctx context.Context, req *zondpb.GenericSignedBeaconBlock) (*zondpb.ProposeResponse, error) {
+func (vs *Server) ProposeBeaconBlock(ctx context.Context, req *qrysmpb.GenericSignedBeaconBlock) (*qrysmpb.ProposeResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.ProposeBeaconBlock")
 	defer span.End()
 
@@ -235,21 +235,21 @@ func (vs *Server) ProposeBeaconBlock(ctx context.Context, req *zondpb.GenericSig
 		Data: &blockfeed.ReceivedBlockData{SignedBlock: blk},
 	})
 
-	return &zondpb.ProposeResponse{
+	return &qrysmpb.ProposeResponse{
 		BlockRoot: root[:],
 	}, nil
 }
 
 // PrepareBeaconProposer caches and updates the fee recipient for the given proposer.
 func (vs *Server) PrepareBeaconProposer(
-	ctx context.Context, request *zondpb.PrepareBeaconProposerRequest,
+	ctx context.Context, request *qrysmpb.PrepareBeaconProposerRequest,
 ) (*emptypb.Empty, error) {
 	ctx, span := trace.StartSpan(ctx, "validator.PrepareBeaconProposer")
 	defer span.End()
 	var feeRecipients []common.Address
 	var validatorIndices []primitives.ValidatorIndex
 
-	newRecipients := make([]*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer, 0, len(request.Recipients))
+	newRecipients := make([]*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer, 0, len(request.Recipients))
 	for _, r := range request.Recipients {
 		f, err := vs.BeaconDB.FeeRecipientByValidatorID(ctx, r.ValidatorIndex)
 		switch {
@@ -285,17 +285,17 @@ func (vs *Server) PrepareBeaconProposer(
 }
 
 // GetFeeRecipientByPubKey returns a fee recipient from the beacon node's settings or db based on a given public key
-func (vs *Server) GetFeeRecipientByPubKey(ctx context.Context, request *zondpb.FeeRecipientByPubKeyRequest) (*zondpb.FeeRecipientByPubKeyResponse, error) {
+func (vs *Server) GetFeeRecipientByPubKey(ctx context.Context, request *qrysmpb.FeeRecipientByPubKeyRequest) (*qrysmpb.FeeRecipientByPubKeyResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "validator.GetFeeRecipientByPublicKey")
 	defer span.End()
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "request was empty")
 	}
 
-	resp, err := vs.ValidatorIndex(ctx, &zondpb.ValidatorIndexRequest{PublicKey: request.PublicKey})
+	resp, err := vs.ValidatorIndex(ctx, &qrysmpb.ValidatorIndexRequest{PublicKey: request.PublicKey})
 	if err != nil {
 		if strings.Contains(err.Error(), "Could not find validator index") {
-			return &zondpb.FeeRecipientByPubKeyResponse{
+			return &qrysmpb.FeeRecipientByPubKeyResponse{
 				FeeRecipient: params.BeaconConfig().DefaultFeeRecipient.Bytes(),
 			}, nil
 		} else {
@@ -306,7 +306,7 @@ func (vs *Server) GetFeeRecipientByPubKey(ctx context.Context, request *zondpb.F
 	address, err := vs.BeaconDB.FeeRecipientByValidatorID(ctx, resp.GetIndex())
 	if err != nil {
 		if errors.Is(err, kv.ErrNotFoundFeeRecipient) {
-			return &zondpb.FeeRecipientByPubKeyResponse{
+			return &qrysmpb.FeeRecipientByPubKeyResponse{
 				FeeRecipient: params.BeaconConfig().DefaultFeeRecipient.Bytes(),
 			}, nil
 		} else {
@@ -314,7 +314,7 @@ func (vs *Server) GetFeeRecipientByPubKey(ctx context.Context, request *zondpb.F
 			return nil, status.Errorf(codes.Internal, err.Error())
 		}
 	}
-	return &zondpb.FeeRecipientByPubKeyResponse{
+	return &qrysmpb.FeeRecipientByPubKeyResponse{
 		FeeRecipient: address.Bytes(),
 	}, nil
 }
@@ -340,7 +340,7 @@ func (vs *Server) computeStateRoot(ctx context.Context, block interfaces.ReadOnl
 }
 
 // SubmitValidatorRegistrations submits validator registrations.
-func (vs *Server) SubmitValidatorRegistrations(ctx context.Context, reg *zondpb.SignedValidatorRegistrationsV1) (*emptypb.Empty, error) {
+func (vs *Server) SubmitValidatorRegistrations(ctx context.Context, reg *qrysmpb.SignedValidatorRegistrationsV1) (*emptypb.Empty, error) {
 	if vs.BlockBuilder == nil || !vs.BlockBuilder.Configured() {
 		return &emptypb.Empty{}, status.Errorf(codes.InvalidArgument, "Could not register block builder: %v", builder.ErrNoBuilder)
 	}

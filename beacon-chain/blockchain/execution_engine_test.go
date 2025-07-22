@@ -726,7 +726,7 @@ func Test_GetPayloadAttribute_PrepareAllPayloads(t *testing.T) {
 	hasPayload, attr, vId := service.getPayloadAttribute(ctx, st, 0, []byte{})
 	require.Equal(t, true, hasPayload)
 	require.Equal(t, primitives.ValidatorIndex(0), vId)
-	require.Equal(t, params.BeaconConfig().ZondBurnAddress, common.BytesToAddress(attr.SuggestedFeeRecipient()).String())
+	require.Equal(t, params.BeaconConfig().QRLBurnAddress, common.BytesToAddress(attr.SuggestedFeeRecipient()).String())
 	require.LogsContain(t, hook, "Fee recipient is currently using the burn address")
 }
 
@@ -747,7 +747,7 @@ func Test_GetPayloadAttributeV2(t *testing.T) {
 	hasPayload, attr, vId := service.getPayloadAttribute(ctx, st, slot, params.BeaconConfig().ZeroHash[:])
 	require.Equal(t, true, hasPayload)
 	require.Equal(t, suggestedVid, vId)
-	require.Equal(t, params.BeaconConfig().ZondBurnAddress, common.BytesToAddress(attr.SuggestedFeeRecipient()).String())
+	require.Equal(t, params.BeaconConfig().QRLBurnAddress, common.BytesToAddress(attr.SuggestedFeeRecipient()).String())
 	require.LogsContain(t, hook, "Fee recipient is currently using the burn address")
 	a, err := attr.Withdrawals()
 	require.NoError(t, err)

@@ -31,7 +31,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	qrysmTime "github.com/theQRL/qrysm/time"
 	"github.com/theQRL/qrysm/time/slots"
 )
@@ -75,7 +75,7 @@ type config struct {
 	AttService              *attestations.Service
 	StateGen                *stategen.State
 	SlasherAttestationsFeed *event.Feed
-	WeakSubjectivityCheckpt *zondpb.Checkpoint
+	WeakSubjectivityCheckpt *qrysmpb.Checkpoint
 	BlockFetcher            execution.POWBlockFetcher
 	FinalizedStateAtStartUp state.BeaconState
 	ExecutionEngineCaller   execution.EngineCaller

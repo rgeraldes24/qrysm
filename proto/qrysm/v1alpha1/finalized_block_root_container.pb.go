@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: proto/qrysm/v1alpha1/finalized_block_root_container.proto
 
-package zond
+package qrl
 
 import (
 	reflect "reflect"
@@ -117,7 +117,7 @@ func file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_rawDescGZIP(
 
 var file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_goTypes = []interface{}{
-	(*FinalizedBlockRootContainer)(nil), // 0: theqrl.zond.v1alpha1.FinalizedBlockRootContainer
+	(*FinalizedBlockRootContainer)(nil), // 0: theqrl.qrl.v1alpha1.FinalizedBlockRootContainer
 }
 var file_proto_qrysm_v1alpha1_finalized_block_root_container_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type

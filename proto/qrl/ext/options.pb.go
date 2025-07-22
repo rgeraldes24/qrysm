@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/ext/options.proto
+// source: proto/qrl/ext/options.proto
 
 package ext
 
@@ -26,31 +26,31 @@ var file_proto_zond_ext_options_proto_extTypes = []protoimpl.ExtensionInfo{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
 		ExtensionType: (*string)(nil),
 		Field:         50000,
-		Name:          "theqrl.zond.ext.cast_type",
+		Name:          "theqrl.qrl.ext.cast_type",
 		Tag:           "bytes,50000,opt,name=cast_type",
-		Filename:      "proto/zond/ext/options.proto",
+		Filename:      "proto/qrl/ext/options.proto",
 	},
 	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
 		ExtensionType: (*string)(nil),
 		Field:         50001,
-		Name:          "theqrl.zond.ext.ssz_size",
+		Name:          "theqrl.qrl.ext.ssz_size",
 		Tag:           "bytes,50001,opt,name=ssz_size",
-		Filename:      "proto/zond/ext/options.proto",
+		Filename:      "proto/qrl/ext/options.proto",
 	},
 	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
 		ExtensionType: (*string)(nil),
 		Field:         50002,
-		Name:          "theqrl.zond.ext.ssz_max",
+		Name:          "theqrl.qrl.ext.ssz_max",
 		Tag:           "bytes,50002,opt,name=ssz_max",
-		Filename:      "proto/zond/ext/options.proto",
+		Filename:      "proto/qrl/ext/options.proto",
 	},
 	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
 		ExtensionType: (*string)(nil),
 		Field:         50003,
-		Name:          "theqrl.zond.ext.spec_name",
+		Name:          "theqrl.qrl.ext.spec_name",
 		Tag:           "bytes,50003,opt,name=spec_name",
 		Filename:      "proto/zond/ext/options.proto",
 	},
@@ -105,10 +105,10 @@ var file_proto_zond_ext_options_proto_goTypes = []interface{}{
 	(*descriptorpb.FieldOptions)(nil), // 0: google.protobuf.FieldOptions
 }
 var file_proto_zond_ext_options_proto_depIdxs = []int32{
-	0, // 0: theqrl.zond.ext.cast_type:extendee -> google.protobuf.FieldOptions
-	0, // 1: theqrl.zond.ext.ssz_size:extendee -> google.protobuf.FieldOptions
-	0, // 2: theqrl.zond.ext.ssz_max:extendee -> google.protobuf.FieldOptions
-	0, // 3: theqrl.zond.ext.spec_name:extendee -> google.protobuf.FieldOptions
+	0, // 0: theqrl.qrl.ext.cast_type:extendee -> google.protobuf.FieldOptions
+	0, // 1: theqrl.qrl.ext.ssz_size:extendee -> google.protobuf.FieldOptions
+	0, // 2: theqrl.qrl.ext.ssz_max:extendee -> google.protobuf.FieldOptions
+	0, // 3: theqrl.qrl.ext.spec_name:extendee -> google.protobuf.FieldOptions
 	4, // [4:4] is the sub-list for method output_type
 	4, // [4:4] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name

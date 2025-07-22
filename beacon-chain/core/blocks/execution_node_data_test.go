@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -18,10 +18,10 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func FakeDeposits(n uint64) []*zondpb.ExecutionNodeData {
-	deposits := make([]*zondpb.ExecutionNodeData, n)
+func FakeDeposits(n uint64) []*qrysmpb.ExecutionNodeData {
+	deposits := make([]*qrysmpb.ExecutionNodeData, n)
 	for i := uint64(0); i < n; i++ {
-		deposits[i] = &zondpb.ExecutionNodeData{
+		deposits[i] = &qrysmpb.ExecutionNodeData{
 			DepositCount: 1,
 			DepositRoot:  bytesutil.PadTo([]byte("root"), 32),
 		}
@@ -31,14 +31,14 @@ func FakeDeposits(n uint64) []*zondpb.ExecutionNodeData {
 
 func TestExecutionNodeDataHasEnoughSupport(t *testing.T) {
 	tests := []struct {
-		stateVotes         []*zondpb.ExecutionNodeData
-		data               *zondpb.ExecutionNodeData
+		stateVotes         []*qrysmpb.ExecutionNodeData
+		data               *qrysmpb.ExecutionNodeData
 		hasSupport         bool
 		votingPeriodLength primitives.Epoch
 	}{
 		{
 			stateVotes: FakeDeposits(uint64(params.BeaconConfig().SlotsPerEpoch.Mul(4))),
-			data: &zondpb.ExecutionNodeData{
+			data: &qrysmpb.ExecutionNodeData{
 				DepositCount: 1,
 				DepositRoot:  bytesutil.PadTo([]byte("root"), 32),
 			},
@@ -46,7 +46,7 @@ func TestExecutionNodeDataHasEnoughSupport(t *testing.T) {
 			votingPeriodLength: 7,
 		}, {
 			stateVotes: FakeDeposits(uint64(params.BeaconConfig().SlotsPerEpoch.Mul(4))),
-			data: &zondpb.ExecutionNodeData{
+			data: &qrysmpb.ExecutionNodeData{
 				DepositCount: 1,
 				DepositRoot:  bytesutil.PadTo([]byte("root"), 32),
 			},
@@ -54,7 +54,7 @@ func TestExecutionNodeDataHasEnoughSupport(t *testing.T) {
 			votingPeriodLength: 8,
 		}, {
 			stateVotes: FakeDeposits(uint64(params.BeaconConfig().SlotsPerEpoch.Mul(4))),
-			data: &zondpb.ExecutionNodeData{
+			data: &qrysmpb.ExecutionNodeData{
 				DepositCount: 1,
 				DepositRoot:  bytesutil.PadTo([]byte("root"), 32),
 			},
@@ -70,7 +70,7 @@ func TestExecutionNodeDataHasEnoughSupport(t *testing.T) {
 			c.EpochsPerEth1VotingPeriod = tt.votingPeriodLength
 			params.OverrideBeaconConfig(c)
 
-			s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+			s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 				ExecutionNodeDataVotes: tt.stateVotes,
 			})
 			require.NoError(t, err)
@@ -91,8 +91,8 @@ func TestExecutionNodeDataHasEnoughSupport(t *testing.T) {
 
 func TestAreExecutionNodeDataEqual(t *testing.T) {
 	type args struct {
-		a *zondpb.ExecutionNodeData
-		b *zondpb.ExecutionNodeData
+		a *qrysmpb.ExecutionNodeData
+		b *qrysmpb.ExecutionNodeData
 	}
 	tests := []struct {
 		name string
@@ -111,7 +111,7 @@ func TestAreExecutionNodeDataEqual(t *testing.T) {
 			name: "false when only one is nil",
 			args: args{
 				a: nil,
-				b: &zondpb.ExecutionNodeData{
+				b: &qrysmpb.ExecutionNodeData{
 					DepositRoot:  make([]byte, 32),
 					DepositCount: 0,
 					BlockHash:    make([]byte, 32),
@@ -122,12 +122,12 @@ func TestAreExecutionNodeDataEqual(t *testing.T) {
 		{
 			name: "true when real equality",
 			args: args{
-				a: &zondpb.ExecutionNodeData{
+				a: &qrysmpb.ExecutionNodeData{
 					DepositRoot:  make([]byte, 32),
 					DepositCount: 0,
 					BlockHash:    make([]byte, 32),
 				},
-				b: &zondpb.ExecutionNodeData{
+				b: &qrysmpb.ExecutionNodeData{
 					DepositRoot:  make([]byte, 32),
 					DepositCount: 0,
 					BlockHash:    make([]byte, 32),
@@ -138,12 +138,12 @@ func TestAreExecutionNodeDataEqual(t *testing.T) {
 		{
 			name: "false is field value differs",
 			args: args{
-				a: &zondpb.ExecutionNodeData{
+				a: &qrysmpb.ExecutionNodeData{
 					DepositRoot:  make([]byte, 32),
 					DepositCount: 0,
 					BlockHash:    make([]byte, 32),
 				},
-				b: &zondpb.ExecutionNodeData{
+				b: &qrysmpb.ExecutionNodeData{
 					DepositRoot:  make([]byte, 32),
 					DepositCount: 64,
 					BlockHash:    make([]byte, 32),
@@ -160,15 +160,15 @@ func TestAreExecutionNodeDataEqual(t *testing.T) {
 }
 
 func TestProcessExecutionNodeData_SetsCorrectly(t *testing.T) {
-	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
-		ExecutionNodeDataVotes: []*zondpb.ExecutionNodeData{},
+	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
+		ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{},
 	})
 	require.NoError(t, err)
 
 	b := util.NewBeaconBlockCapella()
-	b.Block = &zondpb.BeaconBlockCapella{
-		Body: &zondpb.BeaconBlockBodyCapella{
-			ExecutionNodeData: &zondpb.ExecutionNodeData{
+	b.Block = &qrysmpb.BeaconBlockCapella{
+		Body: &qrysmpb.BeaconBlockBodyCapella{
+			ExecutionNodeData: &qrysmpb.ExecutionNodeData{
 				DepositRoot: []byte{2},
 				BlockHash:   []byte{3},
 			},
@@ -186,7 +186,7 @@ func TestProcessExecutionNodeData_SetsCorrectly(t *testing.T) {
 	if len(newExecutionNodeDataVotes) <= 1 {
 		t.Error("Expected new execution node data votes to have length > 1")
 	}
-	if !proto.Equal(beaconState.ExecutionNodeData(), zondpb.CopyExecutionNodeData(b.Block.Body.ExecutionNodeData)) {
+	if !proto.Equal(beaconState.ExecutionNodeData(), qrysmpb.CopyExecutionNodeData(b.Block.Body.ExecutionNodeData)) {
 		t.Errorf(
 			"Expected latest execution node data to have been set to %v, received %v",
 			b.Block.Body.ExecutionNodeData,

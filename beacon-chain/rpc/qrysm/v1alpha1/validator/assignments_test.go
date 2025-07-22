@@ -21,7 +21,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -64,7 +64,7 @@ func TestGetDuties_OK(t *testing.T) {
 	}
 
 	// Test the first validator in registry.
-	req := &zondpb.DutiesRequest{
+	req := &qrysmpb.DutiesRequest{
 		PublicKeys: [][]byte{deposits[0].Data.PublicKey},
 	}
 	res, err := vs.GetDuties(context.Background(), req)
@@ -76,7 +76,7 @@ func TestGetDuties_OK(t *testing.T) {
 
 	// Test the last validator in registry.
 	lastValidatorIndex := depChainStart - 1
-	req = &zondpb.DutiesRequest{
+	req = &qrysmpb.DutiesRequest{
 		PublicKeys: [][]byte{deposits[lastValidatorIndex].Data.PublicKey},
 	}
 	res, err = vs.GetDuties(context.Background(), req)
@@ -87,7 +87,7 @@ func TestGetDuties_OK(t *testing.T) {
 	}
 
 	// We request for duties for all validators.
-	req = &zondpb.DutiesRequest{
+	req = &qrysmpb.DutiesRequest{
 		PublicKeys: pubKeys,
 		Epoch:      0,
 	}
@@ -109,7 +109,7 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	require.NoError(t, err)
 	bs, err := util.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionNodeData)
 	require.NoError(t, err, "Could not setup genesis bs")
-	h := &zondpb.BeaconBlockHeader{
+	h := &qrysmpb.BeaconBlockHeader{
 		StateRoot:  bytesutil.PadTo([]byte{'a'}, fieldparams.RootLength),
 		ParentRoot: bytesutil.PadTo([]byte{'b'}, fieldparams.RootLength),
 		BodyRoot:   bytesutil.PadTo([]byte{'c'}, fieldparams.RootLength),
@@ -126,7 +126,7 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
 		nextSyncCommitteePubKeys = append(nextSyncCommitteePubKeys, bytesutil.PadTo([]byte{}, field_params.DilithiumPubkeyLength))
 	}
-	nextSyncCommittee := &zondpb.SyncCommittee{Pubkeys: nextSyncCommitteePubKeys}
+	nextSyncCommittee := &qrysmpb.SyncCommittee{Pubkeys: nextSyncCommitteePubKeys}
 
 	require.NoError(t, bs.SetNextSyncCommittee(nextSyncCommittee))
 	pubKeys := make([][]byte, len(deposits))
@@ -151,7 +151,7 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	}
 
 	// Test the first validator in registry.
-	req := &zondpb.DutiesRequest{
+	req := &qrysmpb.DutiesRequest{
 		PublicKeys: [][]byte{deposits[0].Data.PublicKey},
 	}
 	res, err := vs.GetDuties(context.Background(), req)
@@ -163,7 +163,7 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 
 	// Test the last validator in registry.
 	lastValidatorIndex := params.BeaconConfig().SyncCommitteeSize - 1
-	req = &zondpb.DutiesRequest{
+	req = &qrysmpb.DutiesRequest{
 		PublicKeys: [][]byte{deposits[lastValidatorIndex].Data.PublicKey},
 	}
 	res, err = vs.GetDuties(context.Background(), req)
@@ -174,7 +174,7 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	}
 
 	// We request for duties for all validators.
-	req = &zondpb.DutiesRequest{
+	req = &qrysmpb.DutiesRequest{
 		PublicKeys: pubKeys,
 		Epoch:      0,
 	}
@@ -191,7 +191,7 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	}
 
 	// Current epoch and next epoch duties should not be equal at the sync period epoch boundary.
-	req = &zondpb.DutiesRequest{
+	req = &qrysmpb.DutiesRequest{
 		PublicKeys: pubKeys,
 		Epoch:      params.BeaconConfig().EpochsPerSyncCommitteePeriod - 1,
 	}
@@ -212,7 +212,7 @@ func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 	require.NoError(t, err)
 	bs, err := util.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionNodeData)
 	require.NoError(t, err)
-	h := &zondpb.BeaconBlockHeader{
+	h := &qrysmpb.BeaconBlockHeader{
 		StateRoot:  bytesutil.PadTo([]byte{'a'}, fieldparams.RootLength),
 		ParentRoot: bytesutil.PadTo([]byte{'b'}, fieldparams.RootLength),
 		BodyRoot:   bytesutil.PadTo([]byte{'c'}, fieldparams.RootLength),
@@ -242,7 +242,7 @@ func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 	}
 
 	unknownPubkey := bytesutil.PadTo([]byte{'u'}, 48)
-	req := &zondpb.DutiesRequest{
+	req := &qrysmpb.DutiesRequest{
 		PublicKeys: [][]byte{unknownPubkey},
 	}
 	res, err := vs.GetDuties(context.Background(), req)
@@ -258,7 +258,7 @@ func TestGetDuties_SlotOutOfUpperBound(t *testing.T) {
 	vs := &Server{
 		TimeFetcher: chain,
 	}
-	req := &zondpb.DutiesRequest{
+	req := &qrysmpb.DutiesRequest{
 		Epoch: primitives.Epoch(chain.CurrentSlot()/params.BeaconConfig().SlotsPerEpoch + 2),
 	}
 	_, err := vs.duties(context.Background(), req)
@@ -298,7 +298,7 @@ func TestGetDuties_CurrentEpoch_ShouldNotFail(t *testing.T) {
 	}
 
 	// Test the first validator in registry.
-	req := &zondpb.DutiesRequest{
+	req := &qrysmpb.DutiesRequest{
 		PublicKeys: [][]byte{deposits[0].Data.PublicKey},
 	}
 	res, err := vs.GetDuties(context.Background(), req)
@@ -340,7 +340,7 @@ func TestGetDuties_MultipleKeys_OK(t *testing.T) {
 	pubkey1 := deposits[1].Data.PublicKey
 
 	// Test the first validator in registry.
-	req := &zondpb.DutiesRequest{
+	req := &qrysmpb.DutiesRequest{
 		PublicKeys: [][]byte{pubkey0, pubkey1},
 	}
 	res, err := vs.GetDuties(context.Background(), req)
@@ -354,14 +354,14 @@ func TestGetDuties_SyncNotReady(t *testing.T) {
 	vs := &Server{
 		SyncChecker: &mockSync.Sync{IsSyncing: true},
 	}
-	_, err := vs.GetDuties(context.Background(), &zondpb.DutiesRequest{})
+	_, err := vs.GetDuties(context.Background(), &qrysmpb.DutiesRequest{})
 	assert.ErrorContains(t, "Syncing to latest head", err)
 }
 
 func TestAssignValidatorToSubnet(t *testing.T) {
 	k := pubKey(3)
 
-	core.AssignValidatorToSubnetProto(k, zondpb.ValidatorStatus_ACTIVE)
+	core.AssignValidatorToSubnetProto(k, qrysmpb.ValidatorStatus_ACTIVE)
 	coms, ok, exp := cache.SubnetIDs.GetPersistentSubnets(k)
 	require.Equal(t, true, ok, "No cache entry found for validator")
 	assert.Equal(t, params.BeaconConfig().RandomSubnetsPerValidator, uint64(len(coms)))
@@ -380,10 +380,10 @@ func TestAssignValidatorToSyncSubnet(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		committee = append(committee, pubKey(uint64(i)))
 	}
-	sCommittee := &zondpb.SyncCommittee{
+	sCommittee := &qrysmpb.SyncCommittee{
 		Pubkeys: committee,
 	}
-	registerSyncSubnet(0, 0, k, sCommittee, zondpb.ValidatorStatus_ACTIVE)
+	registerSyncSubnet(0, 0, k, sCommittee, qrysmpb.ValidatorStatus_ACTIVE)
 	coms, _, ok, exp := cache.SyncSubnetIDs.GetSyncCommitteeSubnets(k, 0)
 	require.Equal(t, true, ok, "No cache entry found for validator")
 	assert.Equal(t, uint64(1), uint64(len(coms)))
@@ -425,7 +425,7 @@ func BenchmarkCommitteeAssignment(b *testing.B) {
 	for i, deposit := range deposits {
 		pks[i] = deposit.Data.PublicKey
 	}
-	req := &zondpb.DutiesRequest{
+	req := &qrysmpb.DutiesRequest{
 		PublicKeys: pks,
 		Epoch:      0,
 	}

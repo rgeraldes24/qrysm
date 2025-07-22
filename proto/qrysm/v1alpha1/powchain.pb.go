@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: proto/qrysm/v1alpha1/powchain.proto
 
-package zond
+package qrl
 
 import (
 	reflect "reflect"
@@ -625,27 +625,27 @@ func file_proto_qrysm_v1alpha1_powchain_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_powchain_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_proto_qrysm_v1alpha1_powchain_proto_goTypes = []interface{}{
-	(*ETH1ChainData)(nil),           // 0: theqrl.zond.v1alpha1.ETH1ChainData
-	(*DepositSnapshot)(nil),         // 1: theqrl.zond.v1alpha1.DepositSnapshot
-	(*LatestExecutionNodeData)(nil), // 2: theqrl.zond.v1alpha1.LatestExecutionNodeData
-	(*ChainStartData)(nil),          // 3: theqrl.zond.v1alpha1.ChainStartData
-	(*SparseMerkleTrie)(nil),        // 4: theqrl.zond.v1alpha1.SparseMerkleTrie
-	(*TrieLayer)(nil),               // 5: theqrl.zond.v1alpha1.TrieLayer
-	(*DepositContainer)(nil),        // 6: theqrl.zond.v1alpha1.DepositContainer
-	(*BeaconStateCapella)(nil),      // 7: theqrl.zond.v1alpha1.BeaconStateCapella
-	(*ExecutionNodeData)(nil),       // 8: theqrl.zond.v1alpha1.ExecutionNodeData
-	(*Deposit)(nil),                 // 9: theqrl.zond.v1alpha1.Deposit
+	(*ETH1ChainData)(nil),           // 0: theqrl.qrl.v1alpha1.ETH1ChainData
+	(*DepositSnapshot)(nil),         // 1: theqrl.qrl.v1alpha1.DepositSnapshot
+	(*LatestExecutionNodeData)(nil), // 2: theqrl.qrl.v1alpha1.LatestExecutionNodeData
+	(*ChainStartData)(nil),          // 3: theqrl.qrl.v1alpha1.ChainStartData
+	(*SparseMerkleTrie)(nil),        // 4: theqrl.qrl.v1alpha1.SparseMerkleTrie
+	(*TrieLayer)(nil),               // 5: theqrl.qrl.v1alpha1.TrieLayer
+	(*DepositContainer)(nil),        // 6: theqrl.qrl.v1alpha1.DepositContainer
+	(*BeaconStateCapella)(nil),      // 7: theqrl.qrl.v1alpha1.BeaconStateCapella
+	(*ExecutionNodeData)(nil),       // 8: theqrl.qrl.v1alpha1.ExecutionNodeData
+	(*Deposit)(nil),                 // 9: theqrl.qrl.v1alpha1.Deposit
 }
 var file_proto_qrysm_v1alpha1_powchain_proto_depIdxs = []int32{
-	2, // 0: theqrl.zond.v1alpha1.ETH1ChainData.current_eth1_data:type_name -> theqrl.zond.v1alpha1.LatestExecutionNodeData
-	3, // 1: theqrl.zond.v1alpha1.ETH1ChainData.chainstart_data:type_name -> theqrl.zond.v1alpha1.ChainStartData
-	7, // 2: theqrl.zond.v1alpha1.ETH1ChainData.beacon_state:type_name -> theqrl.zond.v1alpha1.BeaconStateCapella
-	4, // 3: theqrl.zond.v1alpha1.ETH1ChainData.trie:type_name -> theqrl.zond.v1alpha1.SparseMerkleTrie
-	6, // 4: theqrl.zond.v1alpha1.ETH1ChainData.deposit_containers:type_name -> theqrl.zond.v1alpha1.DepositContainer
-	1, // 5: theqrl.zond.v1alpha1.ETH1ChainData.deposit_snapshot:type_name -> theqrl.zond.v1alpha1.DepositSnapshot
-	8, // 6: theqrl.zond.v1alpha1.ChainStartData.eth1_data:type_name -> theqrl.zond.v1alpha1.ExecutionNodeData
-	5, // 7: theqrl.zond.v1alpha1.SparseMerkleTrie.layers:type_name -> theqrl.zond.v1alpha1.TrieLayer
-	9, // 8: theqrl.zond.v1alpha1.DepositContainer.deposit:type_name -> theqrl.zond.v1alpha1.Deposit
+	2, // 0: theqrl.qrl.v1alpha1.ETH1ChainData.current_eth1_data:type_name -> theqrl.qrl.v1alpha1.LatestExecutionNodeData
+	3, // 1: theqrl.qrl.v1alpha1.ETH1ChainData.chainstart_data:type_name -> theqrl.qrl.v1alpha1.ChainStartData
+	7, // 2: theqrl.qrl.v1alpha1.ETH1ChainData.beacon_state:type_name -> theqrl.qrl.v1alpha1.BeaconStateCapella
+	4, // 3: theqrl.qrl.v1alpha1.ETH1ChainData.trie:type_name -> theqrl.qrl.v1alpha1.SparseMerkleTrie
+	6, // 4: theqrl.qrl.v1alpha1.ETH1ChainData.deposit_containers:type_name -> theqrl.qrl.v1alpha1.DepositContainer
+	1, // 5: theqrl.qrl.v1alpha1.ETH1ChainData.deposit_snapshot:type_name -> theqrl.qrl.v1alpha1.DepositSnapshot
+	8, // 6: theqrl.qrl.v1alpha1.ChainStartData.eth1_data:type_name -> theqrl.qrl.v1alpha1.ExecutionNodeData
+	5, // 7: theqrl.qrl.v1alpha1.SparseMerkleTrie.layers:type_name -> theqrl.qrl.v1alpha1.TrieLayer
+	9, // 8: theqrl.qrl.v1alpha1.DepositContainer.deposit:type_name -> theqrl.qrl.v1alpha1.Deposit
 	9, // [9:9] is the sub-list for method output_type
 	9, // [9:9] is the sub-list for method input_type
 	9, // [9:9] is the sub-list for extension type_name

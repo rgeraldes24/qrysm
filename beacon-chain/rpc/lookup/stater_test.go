@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -27,7 +27,7 @@ func TestGetState(t *testing.T) {
 	ctx := context.Background()
 
 	headSlot := primitives.Slot(123)
-	fillSlot := func(state *zondpb.BeaconStateCapella) error {
+	fillSlot := func(state *qrysmpb.BeaconStateCapella) error {
 		state.Slot = headSlot
 		return nil
 	}
@@ -61,7 +61,7 @@ func TestGetState(t *testing.T) {
 		r, err := b.Block.HashTreeRoot()
 		require.NoError(t, err)
 
-		bs, err := util.NewBeaconStateCapella(func(state *zondpb.BeaconStateCapella) error {
+		bs, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
 			state.BlockRoots[0] = r[:]
 			return nil
 		})
@@ -69,7 +69,7 @@ func TestGetState(t *testing.T) {
 		newStateRoot, err := bs.HashTreeRoot(ctx)
 		require.NoError(t, err)
 
-		require.NoError(t, db.SaveStateSummary(ctx, &zondpb.StateSummary{Root: r[:]}))
+		require.NoError(t, db.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: r[:]}))
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, r))
 		require.NoError(t, db.SaveState(ctx, bs, r))
 
@@ -99,7 +99,7 @@ func TestGetState(t *testing.T) {
 
 		p := BeaconDbStater{
 			ChainInfoFetcher: &chainMock.ChainService{
-				FinalizedCheckPoint: &zondpb.Checkpoint{
+				FinalizedCheckPoint: &qrysmpb.Checkpoint{
 					Root:  stateRoot[:],
 					Epoch: 10,
 				},
@@ -123,7 +123,7 @@ func TestGetState(t *testing.T) {
 
 		p := BeaconDbStater{
 			ChainInfoFetcher: &chainMock.ChainService{
-				CurrentJustifiedCheckPoint: &zondpb.Checkpoint{
+				CurrentJustifiedCheckPoint: &qrysmpb.Checkpoint{
 					Root:  stateRoot[:],
 					Epoch: 10,
 				},
@@ -216,7 +216,7 @@ func TestGetStateRoot(t *testing.T) {
 	ctx := context.Background()
 
 	headSlot := primitives.Slot(123)
-	fillSlot := func(state *zondpb.BeaconStateCapella) error {
+	fillSlot := func(state *qrysmpb.BeaconStateCapella) error {
 		state.Slot = headSlot
 		return nil
 	}
@@ -249,13 +249,13 @@ func TestGetStateRoot(t *testing.T) {
 		r, err := b.Block.HashTreeRoot()
 		require.NoError(t, err)
 
-		bs, err := util.NewBeaconStateCapella(func(state *zondpb.BeaconStateCapella) error {
+		bs, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
 			state.BlockRoots[0] = r[:]
 			return nil
 		})
 		require.NoError(t, err)
 
-		require.NoError(t, db.SaveStateSummary(ctx, &zondpb.StateSummary{Root: r[:]}))
+		require.NoError(t, db.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: r[:]}))
 		require.NoError(t, db.SaveGenesisBlockRoot(ctx, r))
 		require.NoError(t, db.SaveState(ctx, bs, r))
 
@@ -280,7 +280,7 @@ func TestGetStateRoot(t *testing.T) {
 		blk.Block.Slot = 40
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
-		cp := &zondpb.Checkpoint{
+		cp := &qrysmpb.Checkpoint{
 			Epoch: 5,
 			Root:  root[:],
 		}
@@ -311,7 +311,7 @@ func TestGetStateRoot(t *testing.T) {
 		blk.Block.Slot = 40
 		root, err := blk.Block.HashTreeRoot()
 		require.NoError(t, err)
-		cp := &zondpb.Checkpoint{
+		cp := &qrysmpb.Checkpoint{
 			Epoch: 5,
 			Root:  root[:],
 		}
@@ -413,9 +413,9 @@ func TestStateBySlot_FutureSlot(t *testing.T) {
 }
 
 func TestStateBySlot_AfterHeadSlot(t *testing.T) {
-	headSt, err := statenative.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{Slot: 100})
+	headSt, err := statenative.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Slot: 100})
 	require.NoError(t, err)
-	slotSt, err := statenative.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{Slot: 101})
+	slotSt, err := statenative.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Slot: 101})
 	require.NoError(t, err)
 	currentSlot := primitives.Slot(102)
 	mock := &chainMock.ChainService{State: headSt, Slot: &currentSlot}

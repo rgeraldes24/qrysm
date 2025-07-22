@@ -811,25 +811,25 @@ var file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_goTypes = []inte
 	(*BuilderConfig)(nil),                         // 5: theqrl.validator.accounts.v2.BuilderConfig
 	(*ProposerSettingsPayload)(nil),               // 6: theqrl.validator.accounts.v2.ProposerSettingsPayload
 	nil,                                           // 7: theqrl.validator.accounts.v2.ProposerSettingsPayload.ProposerConfigEntry
-	(*v1alpha1.AttestationData)(nil),              // 8: theqrl.zond.v1alpha1.AttestationData
-	(*v1alpha1.AggregateAttestationAndProof)(nil), // 9: theqrl.zond.v1alpha1.AggregateAttestationAndProof
-	(*v1alpha1.VoluntaryExit)(nil),                // 10: theqrl.zond.v1alpha1.VoluntaryExit
-	(*v1alpha1.SyncAggregatorSelectionData)(nil),  // 11: theqrl.zond.v1alpha1.SyncAggregatorSelectionData
-	(*v1alpha1.ContributionAndProof)(nil),         // 12: theqrl.zond.v1alpha1.ContributionAndProof
-	(*v1alpha1.ValidatorRegistrationV1)(nil),      // 13: theqrl.zond.v1alpha1.ValidatorRegistrationV1
-	(*v1alpha1.BeaconBlockCapella)(nil),           // 14: theqrl.zond.v1alpha1.BeaconBlockCapella
-	(*v1alpha1.BlindedBeaconBlockCapella)(nil),    // 15: theqrl.zond.v1alpha1.BlindedBeaconBlockCapella
+	(*v1alpha1.AttestationData)(nil),              // 8: theqrl.qrl.v1alpha1.AttestationData
+	(*v1alpha1.AggregateAttestationAndProof)(nil), // 9: theqrl.qrl.v1alpha1.AggregateAttestationAndProof
+	(*v1alpha1.VoluntaryExit)(nil),                // 10: theqrl.qrl.v1alpha1.VoluntaryExit
+	(*v1alpha1.SyncAggregatorSelectionData)(nil),  // 11: theqrl.qrl.v1alpha1.SyncAggregatorSelectionData
+	(*v1alpha1.ContributionAndProof)(nil),         // 12: theqrl.qrl.v1alpha1.ContributionAndProof
+	(*v1alpha1.ValidatorRegistrationV1)(nil),      // 13: theqrl.qrl.v1alpha1.ValidatorRegistrationV1
+	(*v1alpha1.BeaconBlockCapella)(nil),           // 14: theqrl.qrl.v1alpha1.BeaconBlockCapella
+	(*v1alpha1.BlindedBeaconBlockCapella)(nil),    // 15: theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella
 	(*emptypb.Empty)(nil),                         // 16: google.protobuf.Empty
 }
 var file_proto_qrysm_v1alpha1_validator_client_keymanager_proto_depIdxs = []int32{
-	8,  // 0: theqrl.validator.accounts.v2.SignRequest.attestation_data:type_name -> theqrl.zond.v1alpha1.AttestationData
-	9,  // 1: theqrl.validator.accounts.v2.SignRequest.aggregate_attestation_and_proof:type_name -> theqrl.zond.v1alpha1.AggregateAttestationAndProof
-	10, // 2: theqrl.validator.accounts.v2.SignRequest.exit:type_name -> theqrl.zond.v1alpha1.VoluntaryExit
-	11, // 3: theqrl.validator.accounts.v2.SignRequest.sync_aggregator_selection_data:type_name -> theqrl.zond.v1alpha1.SyncAggregatorSelectionData
-	12, // 4: theqrl.validator.accounts.v2.SignRequest.contribution_and_proof:type_name -> theqrl.zond.v1alpha1.ContributionAndProof
-	13, // 5: theqrl.validator.accounts.v2.SignRequest.registration:type_name -> theqrl.zond.v1alpha1.ValidatorRegistrationV1
-	14, // 6: theqrl.validator.accounts.v2.SignRequest.block_capella:type_name -> theqrl.zond.v1alpha1.BeaconBlockCapella
-	15, // 7: theqrl.validator.accounts.v2.SignRequest.blinded_block_capella:type_name -> theqrl.zond.v1alpha1.BlindedBeaconBlockCapella
+	8,  // 0: theqrl.validator.accounts.v2.SignRequest.attestation_data:type_name -> theqrl.qrl.v1alpha1.AttestationData
+	9,  // 1: theqrl.validator.accounts.v2.SignRequest.aggregate_attestation_and_proof:type_name -> theqrl.qrl.v1alpha1.AggregateAttestationAndProof
+	10, // 2: theqrl.validator.accounts.v2.SignRequest.exit:type_name -> theqrl.qrl.v1alpha1.VoluntaryExit
+	11, // 3: theqrl.validator.accounts.v2.SignRequest.sync_aggregator_selection_data:type_name -> theqrl.qrl.v1alpha1.SyncAggregatorSelectionData
+	12, // 4: theqrl.validator.accounts.v2.SignRequest.contribution_and_proof:type_name -> theqrl.qrl.v1alpha1.ContributionAndProof
+	13, // 5: theqrl.validator.accounts.v2.SignRequest.registration:type_name -> theqrl.qrl.v1alpha1.ValidatorRegistrationV1
+	14, // 6: theqrl.validator.accounts.v2.SignRequest.block_capella:type_name -> theqrl.qrl.v1alpha1.BeaconBlockCapella
+	15, // 7: theqrl.validator.accounts.v2.SignRequest.blinded_block_capella:type_name -> theqrl.qrl.v1alpha1.BlindedBeaconBlockCapella
 	0,  // 8: theqrl.validator.accounts.v2.SignResponse.status:type_name -> theqrl.validator.accounts.v2.SignResponse.Status
 	5,  // 9: theqrl.validator.accounts.v2.ProposerOptionPayload.builder:type_name -> theqrl.validator.accounts.v2.BuilderConfig
 	7,  // 10: theqrl.validator.accounts.v2.ProposerSettingsPayload.proposer_config:type_name -> theqrl.validator.accounts.v2.ProposerSettingsPayload.ProposerConfigEntry

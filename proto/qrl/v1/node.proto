@@ -13,18 +13,18 @@
 // limitations under the License.
 syntax = "proto3";
 
-package theqrl.zond.v1;
+package theqrl.qrl.v1;
 
 import "google/protobuf/descriptor.proto";
 
-import "proto/zond/ext/options.proto";
+import "proto/qrl/ext/options.proto";
 
-option csharp_namespace = "TheQRL.Zond.V1";
+option csharp_namespace = "TheQRL.QRL.V1";
 option go_package = "github.com/theQRL/qrysm/proto/qrl/v1";
 option java_multiple_files = true;
 option java_outer_classname = "BeaconNodeProto";
-option java_package = "org.theqrl.zond.v1";
-option php_namespace = "TheQRL\\Zond\\v1";
+option java_package = "org.theqrl.qrl.v1";
+option php_namespace = "TheQRL\\QRL\\v1";
 
 message IdentityResponse {
   Identity data = 1;
@@ -48,7 +48,7 @@ message Metadata {
   // the node MUST increment seq_number by 1.
   uint64 seq_number = 1;
   // Attnets is a bitvector representing the node's persistent attestation subnet subscriptions.
-  bytes attnets = 2 [(theqrl.zond.ext.ssz_size) = "8", (theqrl.zond.ext.cast_type) = "github.com/theQRL/go-bitfield.Bitvector64"];
+  bytes attnets = 2 [(theqrl.qrl.ext.ssz_size) = "8", (theqrl.qrl.ext.cast_type) = "github.com/theQRL/go-bitfield.Bitvector64"];
 }
 
 message PeerRequest {

@@ -9,7 +9,7 @@ import (
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/proto/migration"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc"
@@ -19,7 +19,7 @@ import (
 )
 
 // GetBlindedBlock retrieves blinded block for given block id.
-func (bs *Server) GetBlindedBlock(ctx context.Context, req *zondpbv1.BlockRequest) (*zondpbv1.BlindedBlockResponse, error) {
+func (bs *Server) GetBlindedBlock(ctx context.Context, req *qrlpb.BlockRequest) (*qrlpb.BlindedBlockResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.GetBlindedBlock")
 	defer span.End()
 
@@ -50,7 +50,7 @@ func (bs *Server) GetBlindedBlock(ctx context.Context, req *zondpbv1.BlockReques
 }
 
 // GetBlindedBlockSSZ returns the SSZ-serialized version of the blinded beacon block for given block id.
-func (bs *Server) GetBlindedBlockSSZ(ctx context.Context, req *zondpbv1.BlockRequest) (*zondpbv1.SSZContainer, error) {
+func (bs *Server) GetBlindedBlockSSZ(ctx context.Context, req *qrlpb.BlockRequest) (*qrlpb.SSZContainer, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.GetBlindedBlockSSZ")
 	defer span.End()
 
@@ -77,7 +77,7 @@ func (bs *Server) GetBlindedBlockSSZ(ctx context.Context, req *zondpbv1.BlockReq
 	return nil, status.Errorf(codes.Internal, "Unknown block type %T", blk)
 }
 
-func (bs *Server) getBlindedBlockCapella(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*zondpbv1.BlindedBlockResponse, error) {
+func (bs *Server) getBlindedBlockCapella(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*qrlpb.BlindedBlockResponse, error) {
 	capellaBlk, err := blk.PbCapellaBlock()
 	if err != nil {
 		// ErrUnsupportedField means that we have another block type
@@ -99,10 +99,10 @@ func (bs *Server) getBlindedBlockCapella(ctx context.Context, blk interfaces.Rea
 					return nil, errors.Wrapf(err, "could not check if block is optimistic")
 				}
 				sig := blk.Signature()
-				return &zondpbv1.BlindedBlockResponse{
-					Version: zondpbv1.Version_CAPELLA,
-					Data: &zondpbv1.SignedBlindedBeaconBlockContainer{
-						Message:   &zondpbv1.SignedBlindedBeaconBlockContainer_CapellaBlock{CapellaBlock: v2Blk},
+				return &qrlpb.BlindedBlockResponse{
+					Version: qrlpb.Version_CAPELLA,
+					Data: &qrlpb.SignedBlindedBeaconBlockContainer{
+						Message:   &qrlpb.SignedBlindedBeaconBlockContainer_CapellaBlock{CapellaBlock: v2Blk},
 						Signature: sig[:],
 					},
 					ExecutionOptimistic: isOptimistic,
@@ -137,17 +137,17 @@ func (bs *Server) getBlindedBlockCapella(ctx context.Context, blk interfaces.Rea
 		return nil, errors.Wrapf(err, "could not check if block is optimistic")
 	}
 	sig := blk.Signature()
-	return &zondpbv1.BlindedBlockResponse{
-		Version: zondpbv1.Version_CAPELLA,
-		Data: &zondpbv1.SignedBlindedBeaconBlockContainer{
-			Message:   &zondpbv1.SignedBlindedBeaconBlockContainer_CapellaBlock{CapellaBlock: v2Blk},
+	return &qrlpb.BlindedBlockResponse{
+		Version: qrlpb.Version_CAPELLA,
+		Data: &qrlpb.SignedBlindedBeaconBlockContainer{
+			Message:   &qrlpb.SignedBlindedBeaconBlockContainer_CapellaBlock{CapellaBlock: v2Blk},
 			Signature: sig[:],
 		},
 		ExecutionOptimistic: isOptimistic,
 	}, nil
 }
 
-func (bs *Server) getBlindedSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*zondpbv1.SSZContainer, error) {
+func (bs *Server) getBlindedSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*qrlpb.SSZContainer, error) {
 	capellaBlk, err := blk.PbCapellaBlock()
 	if err != nil {
 		// ErrUnsupportedField means that we have another block type
@@ -169,7 +169,7 @@ func (bs *Server) getBlindedSSZBlockCapella(ctx context.Context, blk interfaces.
 					return nil, errors.Wrapf(err, "could not check if block is optimistic")
 				}
 				sig := blk.Signature()
-				data := &zondpbv1.SignedBlindedBeaconBlockCapella{
+				data := &qrlpb.SignedBlindedBeaconBlockCapella{
 					Message:   v2Blk,
 					Signature: sig[:],
 				}
@@ -177,8 +177,8 @@ func (bs *Server) getBlindedSSZBlockCapella(ctx context.Context, blk interfaces.
 				if err != nil {
 					return nil, errors.Wrapf(err, "could not marshal block into SSZ")
 				}
-				return &zondpbv1.SSZContainer{
-					Version:             zondpbv1.Version_CAPELLA,
+				return &qrlpb.SSZContainer{
+					Version:             qrlpb.Version_CAPELLA,
 					ExecutionOptimistic: isOptimistic,
 					Data:                sszData,
 				}, nil
@@ -211,7 +211,7 @@ func (bs *Server) getBlindedSSZBlockCapella(ctx context.Context, blk interfaces.
 		return nil, errors.Wrapf(err, "could not check if block is optimistic")
 	}
 	sig := blk.Signature()
-	data := &zondpbv1.SignedBlindedBeaconBlockCapella{
+	data := &qrlpb.SignedBlindedBeaconBlockCapella{
 		Message:   v2Blk,
 		Signature: sig[:],
 	}
@@ -219,5 +219,5 @@ func (bs *Server) getBlindedSSZBlockCapella(ctx context.Context, blk interfaces.
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not marshal block into SSZ")
 	}
-	return &zondpbv1.SSZContainer{Version: zondpbv1.Version_CAPELLA, ExecutionOptimistic: isOptimistic, Data: sszData}, nil
+	return &qrlpb.SSZContainer{Version: qrlpb.Version_CAPELLA, ExecutionOptimistic: isOptimistic, Data: sszData}, nil
 }

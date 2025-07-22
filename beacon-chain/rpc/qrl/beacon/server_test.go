@@ -1,5 +1,5 @@
 package beacon
 
-import zondpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+import qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 
-var _ zondpbservice.BeaconChainServer = (*Server)(nil)
+var _ qrlpbservice.BeaconChainServer = (*Server)(nil)

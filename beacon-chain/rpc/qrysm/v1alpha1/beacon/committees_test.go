@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	blocktest "github.com/theQRL/qrysm/consensus-types/blocks/testing"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -62,13 +62,13 @@ func TestServer_ListBeaconCommittees_CurrentEpoch(t *testing.T) {
 	committees, err := computeCommittees(context.Background(), 0, activeIndices, attesterSeed)
 	require.NoError(t, err)
 
-	wanted := &zondpb.BeaconCommittees{
+	wanted := &qrysmpb.BeaconCommittees{
 		Epoch:                0,
 		Committees:           committees.SlotToUint64(),
 		ActiveValidatorCount: uint64(numValidators),
 	}
-	res, err := bs.ListBeaconCommittees(context.Background(), &zondpb.ListCommitteesRequest{
-		QueryFilter: &zondpb.ListCommitteesRequest_Genesis{Genesis: true},
+	res, err := bs.ListBeaconCommittees(context.Background(), &qrysmpb.ListCommitteesRequest{
+		QueryFilter: &qrysmpb.ListCommitteesRequest_Genesis{Genesis: true},
 	})
 	require.NoError(t, err)
 	if !proto.Equal(res, wanted) {
@@ -131,14 +131,14 @@ func TestServer_ListBeaconCommittees_PreviousEpoch(t *testing.T) {
 	require.NoError(t, err)
 
 	tests := []struct {
-		req *zondpb.ListCommitteesRequest
-		res *zondpb.BeaconCommittees
+		req *qrysmpb.ListCommitteesRequest
+		res *qrysmpb.BeaconCommittees
 	}{
 		{
-			req: &zondpb.ListCommitteesRequest{
-				QueryFilter: &zondpb.ListCommitteesRequest_Epoch{Epoch: 1},
+			req: &qrysmpb.ListCommitteesRequest{
+				QueryFilter: &qrysmpb.ListCommitteesRequest_Epoch{Epoch: 1},
 			},
-			res: &zondpb.BeaconCommittees{
+			res: &qrysmpb.BeaconCommittees{
 				Epoch:                1,
 				Committees:           wanted.SlotToUint64(),
 				ActiveValidatorCount: uint64(numValidators),
@@ -180,7 +180,7 @@ func TestRetrieveCommitteesForRoot(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, db.SaveGenesisBlockRoot(ctx, gRoot))
 	require.NoError(t, db.SaveState(ctx, headState, gRoot))
-	stateSummary := &zondpb.StateSummary{
+	stateSummary := &qrysmpb.StateSummary{
 		Slot: 0,
 		Root: gRoot[:],
 	}
@@ -199,12 +199,12 @@ func TestRetrieveCommitteesForRoot(t *testing.T) {
 	committees, activeIndices, err := bs.retrieveCommitteesForRoot(context.Background(), gRoot[:])
 	require.NoError(t, err)
 
-	wantedRes := &zondpb.BeaconCommittees{
+	wantedRes := &qrysmpb.BeaconCommittees{
 		Epoch:                0,
 		Committees:           wanted.SlotToUint64(),
 		ActiveValidatorCount: uint64(numValidators),
 	}
-	receivedRes := &zondpb.BeaconCommittees{
+	receivedRes := &qrysmpb.BeaconCommittees{
 		Epoch:                0,
 		Committees:           committees.SlotToUint64(),
 		ActiveValidatorCount: uint64(len(activeIndices)),
@@ -214,12 +214,12 @@ func TestRetrieveCommitteesForRoot(t *testing.T) {
 
 func setupActiveValidators(t *testing.T, count int) state.BeaconState {
 	balances := make([]uint64, count)
-	validators := make([]*zondpb.Validator, 0, count)
+	validators := make([]*qrysmpb.Validator, 0, count)
 	for i := 0; i < count; i++ {
 		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		balances[i] = uint64(i)
-		validators = append(validators, &zondpb.Validator{
+		validators = append(validators, &qrysmpb.Validator{
 			PublicKey:             pubKey,
 			ActivationEpoch:       0,
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,

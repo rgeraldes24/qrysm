@@ -6,7 +6,7 @@ Package zond is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package zond
+package qrl
 
 import (
 	"context"
@@ -940,7 +940,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetDuties")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetDuties")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -963,7 +963,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/DomainData")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/DomainData")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1000,7 +1000,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/ValidatorIndex")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ValidatorIndex")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1023,7 +1023,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/ValidatorStatus")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ValidatorStatus")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1046,7 +1046,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/MultipleValidatorStatus")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/MultipleValidatorStatus")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1069,7 +1069,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetBeaconBlock")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetBeaconBlock")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1092,7 +1092,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/ProposeBeaconBlock")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ProposeBeaconBlock")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1115,7 +1115,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/PrepareBeaconProposer")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/PrepareBeaconProposer")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1138,7 +1138,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetFeeRecipientByPubKey")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetFeeRecipientByPubKey")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1161,7 +1161,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetAttestationData")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetAttestationData")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1184,7 +1184,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/ProposeAttestation")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ProposeAttestation")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1207,7 +1207,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubmitAggregateSelectionProof")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitAggregateSelectionProof")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1230,7 +1230,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubmitSignedAggregateSelectionProof")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitSignedAggregateSelectionProof")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1253,7 +1253,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/ProposeExit")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ProposeExit")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1276,7 +1276,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubscribeCommitteeSubnets")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubscribeCommitteeSubnets")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1299,7 +1299,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/CheckDoppelGanger")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/CheckDoppelGanger")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1322,7 +1322,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetSyncMessageBlockRoot")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetSyncMessageBlockRoot")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1345,7 +1345,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubmitSyncMessage")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitSyncMessage")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1368,7 +1368,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetSyncSubcommitteeIndex")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetSyncSubcommitteeIndex")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1391,7 +1391,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetSyncCommitteeContribution")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetSyncCommitteeContribution")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1414,7 +1414,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubmitSignedContributionAndProof")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitSignedContributionAndProof")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1444,7 +1444,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubmitValidatorRegistrations")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitValidatorRegistrations")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1467,7 +1467,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/AssignValidatorToSubnet")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/AssignValidatorToSubnet")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1490,7 +1490,7 @@ func RegisterBeaconNodeValidatorHandlerServer(ctx context.Context, mux *runtime.
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SignaturesAndAggregationBits")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SignaturesAndAggregationBits")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1552,7 +1552,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetDuties")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetDuties")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1572,7 +1572,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/DomainData")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/DomainData")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1592,7 +1592,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/WaitForChainStart")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/WaitForChainStart")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1612,7 +1612,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/WaitForActivation")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/WaitForActivation")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1632,7 +1632,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/ValidatorIndex")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ValidatorIndex")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1652,7 +1652,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/ValidatorStatus")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ValidatorStatus")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1672,7 +1672,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/MultipleValidatorStatus")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/MultipleValidatorStatus")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1692,7 +1692,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetBeaconBlock")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetBeaconBlock")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1712,7 +1712,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/ProposeBeaconBlock")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ProposeBeaconBlock")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1732,7 +1732,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/PrepareBeaconProposer")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/PrepareBeaconProposer")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1752,7 +1752,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetFeeRecipientByPubKey")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetFeeRecipientByPubKey")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1772,7 +1772,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetAttestationData")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetAttestationData")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1792,7 +1792,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/ProposeAttestation")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ProposeAttestation")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1812,7 +1812,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubmitAggregateSelectionProof")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitAggregateSelectionProof")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1832,7 +1832,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubmitSignedAggregateSelectionProof")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitSignedAggregateSelectionProof")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1852,7 +1852,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/ProposeExit")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/ProposeExit")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1872,7 +1872,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubscribeCommitteeSubnets")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubscribeCommitteeSubnets")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1892,7 +1892,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/CheckDoppelGanger")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/CheckDoppelGanger")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1912,7 +1912,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetSyncMessageBlockRoot")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetSyncMessageBlockRoot")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1932,7 +1932,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubmitSyncMessage")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitSyncMessage")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1952,7 +1952,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetSyncSubcommitteeIndex")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetSyncSubcommitteeIndex")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1972,7 +1972,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/GetSyncCommitteeContribution")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/GetSyncCommitteeContribution")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1992,7 +1992,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubmitSignedContributionAndProof")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitSignedContributionAndProof")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2012,7 +2012,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/StreamBlocksAltair")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/StreamBlocksAltair")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2032,7 +2032,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SubmitValidatorRegistrations")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SubmitValidatorRegistrations")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2052,7 +2052,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/AssignValidatorToSubnet")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/AssignValidatorToSubnet")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2072,7 +2072,7 @@ func RegisterBeaconNodeValidatorHandlerClient(ctx context.Context, mux *runtime.
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconNodeValidator/SignaturesAndAggregationBits")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconNodeValidator/SignaturesAndAggregationBits")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

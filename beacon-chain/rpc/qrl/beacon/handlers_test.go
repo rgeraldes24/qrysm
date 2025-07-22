@@ -328,7 +328,7 @@ func TestServer_GetBlockRoot(t *testing.T) {
 	beaconDB := dbTest.SetupDB(t)
 	ctx := context.Background()
 
-	url := "http://example.com/zond/v1/beacon/blocks/{block_id}/root"
+	url := "http://example.com/qrl/v1/beacon/blocks/{block_id}/root"
 	genBlk, blkContainers := fillDBTestBlocks(ctx, t, beaconDB)
 	headBlock := blkContainers[len(blkContainers)-1]
 	t.Run("get root", func(t *testing.T) {
@@ -537,7 +537,7 @@ func TestServer_GetBlockRoot(t *testing.T) {
 
 func TestGetStateFork(t *testing.T) {
 	ctx := context.Background()
-	request := httptest.NewRequest(http.MethodGet, "http://foo.example/zond/v1/beacon/states/{state_id}/fork", nil)
+	request := httptest.NewRequest(http.MethodGet, "http://foo.example/qrl/v1/beacon/states/{state_id}/fork", nil)
 	request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 	request.Header.Set("Accept", "application/octet-stream")
 	writer := httptest.NewRecorder()
@@ -576,7 +576,7 @@ func TestGetStateFork(t *testing.T) {
 	assert.DeepEqual(t, hexutil.Encode(expectedFork.CurrentVersion), stateForkReponse.Data.CurrentVersion)
 	assert.DeepEqual(t, hexutil.Encode(expectedFork.PreviousVersion), stateForkReponse.Data.PreviousVersion)
 	t.Run("execution optimistic", func(t *testing.T) {
-		request = httptest.NewRequest(http.MethodGet, "http://foo.example/zond/v1/beacon/states/{state_id}/fork", nil)
+		request = httptest.NewRequest(http.MethodGet, "http://foo.example/qrl/v1/beacon/states/{state_id}/fork", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		request.Header.Set("Accept", "application/octet-stream")
 		writer = httptest.NewRecorder()
@@ -607,7 +607,7 @@ func TestGetStateFork(t *testing.T) {
 	})
 
 	t.Run("finalized", func(t *testing.T) {
-		request = httptest.NewRequest(http.MethodGet, "http://foo.example/zond/v1/beacon/states/{state_id}/fork", nil)
+		request = httptest.NewRequest(http.MethodGet, "http://foo.example/qrl/v1/beacon/states/{state_id}/fork", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		request.Header.Set("Accept", "application/octet-stream")
 		writer = httptest.NewRecorder()
@@ -647,7 +647,7 @@ func TestGetStateFork(t *testing.T) {
 func TestGetCommittees(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
-	url := "http://example.com/zond/v1/beacon/states/{state_id}/committees"
+	url := "http://example.com/qrl/v1/beacon/states/{state_id}/committees"
 
 	var st state.BeaconState
 	st, _ = util.DeterministicGenesisStateCapella(t, 8192)
@@ -873,7 +873,7 @@ func TestGetBlockHeaders(t *testing.T) {
 	b4.Block.ParentRoot = bytesutil.PadTo([]byte{1}, 32)
 	util.SaveBlock(t, ctx, beaconDB, b4)
 
-	url := "http://example.com/zond/v1/beacon/headers"
+	url := "http://example.com/qrl/v1/beacon/headers"
 
 	t.Run("list headers", func(t *testing.T) {
 		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
@@ -1078,7 +1078,7 @@ func TestServer_GetBlockHeader(t *testing.T) {
 	}
 
 	t.Run("ok", func(t *testing.T) {
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/headers/{block_id}", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/headers/{block_id}", nil)
 		request = mux.SetURLVars(request, map[string]string{"block_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -1097,7 +1097,7 @@ func TestServer_GetBlockHeader(t *testing.T) {
 		assert.Equal(t, "0x7374617465726f6f740000000000000000000000000000000000000000000000", resp.Data.Header.Message.StateRoot)
 	})
 	t.Run("missing block_id", func(t *testing.T) {
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/headers/{block_id}", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/headers/{block_id}", nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 
@@ -1122,7 +1122,7 @@ func TestServer_GetBlockHeader(t *testing.T) {
 			Blocker:               mockBlockFetcher,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/headers/{block_id}", nil)
+		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/headers/{block_id}", nil)
 		request = mux.SetURLVars(request, map[string]string{"block_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -1146,7 +1146,7 @@ func TestServer_GetBlockHeader(t *testing.T) {
 				Blocker:               mockBlockFetcher,
 			}
 
-			request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/headers/{block_id}", nil)
+			request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/headers/{block_id}", nil)
 			request = mux.SetURLVars(request, map[string]string{"block_id": hexutil.Encode(r[:])})
 			writer := httptest.NewRecorder()
 			writer.Body = &bytes.Buffer{}
@@ -1166,7 +1166,7 @@ func TestServer_GetBlockHeader(t *testing.T) {
 				Blocker:               mockBlockFetcher,
 			}
 
-			request := httptest.NewRequest(http.MethodGet, "http://example.com/zond/v1/beacon/headers/{block_id}", nil)
+			request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/headers/{block_id}", nil)
 			request = mux.SetURLVars(request, map[string]string{"block_id": hexutil.Encode(r[:])})
 			writer := httptest.NewRecorder()
 			writer.Body = &bytes.Buffer{}
@@ -1210,7 +1210,7 @@ func TestGetFinalityCheckpoints(t *testing.T) {
 	}
 
 	t.Run("ok", func(t *testing.T) {
-		request := httptest.NewRequest(http.MethodGet, "/zond/v1/beacon/states/{state_id}/finality_checkpoints", nil)
+		request := httptest.NewRequest(http.MethodGet, "/qrl/v1/beacon/states/{state_id}/finality_checkpoints", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -1228,7 +1228,7 @@ func TestGetFinalityCheckpoints(t *testing.T) {
 		assert.DeepEqual(t, hexutil.Encode(fakeState.PreviousJustifiedCheckpoint().Root), resp.Data.PreviousJustified.Root)
 	})
 	t.Run("no state_id", func(t *testing.T) {
-		request := httptest.NewRequest(http.MethodGet, "/zond/v1/beacon/states/{state_id}/finality_checkpoints", nil)
+		request := httptest.NewRequest(http.MethodGet, "/qrl/v1/beacon/states/{state_id}/finality_checkpoints", nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 
@@ -1250,7 +1250,7 @@ func TestGetFinalityCheckpoints(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "/zond/v1/beacon/states/{state_id}/finality_checkpoints", nil)
+		request := httptest.NewRequest(http.MethodGet, "/qrl/v1/beacon/states/{state_id}/finality_checkpoints", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -1278,7 +1278,7 @@ func TestGetFinalityCheckpoints(t *testing.T) {
 			FinalizationFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "/zond/v1/beacon/states/{state_id}/finality_checkpoints", nil)
+		request := httptest.NewRequest(http.MethodGet, "/qrl/v1/beacon/states/{state_id}/finality_checkpoints", nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
@@ -1309,7 +1309,7 @@ func TestGetGenesis(t *testing.T) {
 			ChainInfoFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "/zond/v1/beacon/genesis", nil)
+		request := httptest.NewRequest(http.MethodGet, "/qrl/v1/beacon/genesis", nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 
@@ -1333,7 +1333,7 @@ func TestGetGenesis(t *testing.T) {
 			ChainInfoFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "/zond/v1/beacon/genesis", nil)
+		request := httptest.NewRequest(http.MethodGet, "/qrl/v1/beacon/genesis", nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 
@@ -1354,7 +1354,7 @@ func TestGetGenesis(t *testing.T) {
 			ChainInfoFetcher:   chainService,
 		}
 
-		request := httptest.NewRequest(http.MethodGet, "/zond/v1/beacon/genesis", nil)
+		request := httptest.NewRequest(http.MethodGet, "/qrl/v1/beacon/genesis", nil)
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 
@@ -1374,7 +1374,7 @@ func TestGetDepositContract(t *testing.T) {
 	config.DepositContractAddress = "Q4242424242424242424242424242424242424242"
 	params.OverrideBeaconConfig(config)
 
-	request := httptest.NewRequest(http.MethodGet, "/zond/v1/beacon/states/{state_id}/finality_checkpoints", nil)
+	request := httptest.NewRequest(http.MethodGet, "/qrl/v1/beacon/states/{state_id}/finality_checkpoints", nil)
 	writer := httptest.NewRecorder()
 	writer.Body = &bytes.Buffer{}
 

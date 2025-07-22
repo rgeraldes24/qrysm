@@ -13,7 +13,7 @@ import (
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/proto/migration"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
@@ -30,7 +30,7 @@ var (
 // GetWeakSubjectivity computes the starting epoch of the current weak subjectivity period, and then also
 // determines the best block root and state root to use for a Checkpoint Sync starting from that point.
 // DEPRECATED: GetWeakSubjectivity endpoint will no longer be supported
-func (bs *Server) GetWeakSubjectivity(ctx context.Context, _ *empty.Empty) (*zondpbv1.WeakSubjectivityResponse, error) {
+func (bs *Server) GetWeakSubjectivity(ctx context.Context, _ *empty.Empty) (*qrlpb.WeakSubjectivityResponse, error) {
 	if err := rpchelpers.ValidateSyncGRPC(ctx, bs.SyncChecker, bs.HeadFetcher, bs.GenesisTimeFetcher, bs.OptimisticModeFetcher); err != nil {
 		// This is already a grpc error, so we can't wrap it any further
 		return nil, err
@@ -58,9 +58,9 @@ func (bs *Server) GetWeakSubjectivity(ctx context.Context, _ *empty.Empty) (*zon
 	}
 	stateRoot := cb.Block().StateRoot()
 	log.Printf("weak subjectivity checkpoint reported as epoch=%d, block root=%#x, state root=%#x", wsEpoch, cbr, stateRoot)
-	return &zondpbv1.WeakSubjectivityResponse{
-		Data: &zondpbv1.WeakSubjectivityData{
-			WsCheckpoint: &zondpbv1.Checkpoint{
+	return &qrlpb.WeakSubjectivityResponse{
+		Data: &qrlpb.WeakSubjectivityData{
+			WsCheckpoint: &qrlpb.Checkpoint{
 				Epoch: wsEpoch,
 				Root:  cbr[:],
 			},
@@ -70,7 +70,7 @@ func (bs *Server) GetWeakSubjectivity(ctx context.Context, _ *empty.Empty) (*zon
 }
 
 // GetBlock retrieves block details for given block ID.
-func (bs *Server) GetBlock(ctx context.Context, req *zondpbv1.BlockRequest) (*zondpbv1.BlockResponse, error) {
+func (bs *Server) GetBlock(ctx context.Context, req *qrlpb.BlockRequest) (*qrlpb.BlockResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.GetBlock")
 	defer span.End()
 
@@ -101,7 +101,7 @@ func (bs *Server) GetBlock(ctx context.Context, req *zondpbv1.BlockRequest) (*zo
 }
 
 // GetBlockSSZ returns the SSZ-serialized version of the beacon block for given block ID.
-func (bs *Server) GetBlockSSZ(ctx context.Context, req *zondpbv1.BlockRequest) (*zondpbv1.SSZContainer, error) {
+func (bs *Server) GetBlockSSZ(ctx context.Context, req *qrlpb.BlockRequest) (*qrlpb.SSZContainer, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.GetBlockSSZ")
 	defer span.End()
 
@@ -129,7 +129,7 @@ func (bs *Server) GetBlockSSZ(ctx context.Context, req *zondpbv1.BlockRequest) (
 }
 
 // ListBlockAttestations retrieves attestation included in requested block.
-func (bs *Server) ListBlockAttestations(ctx context.Context, req *zondpbv1.BlockRequest) (*zondpbv1.BlockAttestationsResponse, error) {
+func (bs *Server) ListBlockAttestations(ctx context.Context, req *qrlpb.BlockRequest) (*qrlpb.BlockAttestationsResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.ListBlockAttestations")
 	defer span.End()
 
@@ -140,7 +140,7 @@ func (bs *Server) ListBlockAttestations(ctx context.Context, req *zondpbv1.Block
 	}
 
 	v1Alpha1Attestations := blk.Block().Body().Attestations()
-	v1Attestations := make([]*zondpbv1.Attestation, 0, len(v1Alpha1Attestations))
+	v1Attestations := make([]*qrlpb.Attestation, 0, len(v1Alpha1Attestations))
 	for _, att := range v1Alpha1Attestations {
 		migratedAtt := migration.V1Alpha1AttestationToV1(att)
 		v1Attestations = append(v1Attestations, migratedAtt)
@@ -153,14 +153,14 @@ func (bs *Server) ListBlockAttestations(ctx context.Context, req *zondpbv1.Block
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not check if block is optimistic: %v", err)
 	}
-	return &zondpbv1.BlockAttestationsResponse{
+	return &qrlpb.BlockAttestationsResponse{
 		Data:                v1Attestations,
 		ExecutionOptimistic: isOptimistic,
 		Finalized:           bs.FinalizationFetcher.IsFinalized(ctx, root),
 	}, nil
 }
 
-func (bs *Server) getBlockCapella(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*zondpbv1.BlockResponse, error) {
+func (bs *Server) getBlockCapella(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*qrlpb.BlockResponse, error) {
 	capellaBlk, err := blk.PbCapellaBlock()
 	if err != nil {
 		// ErrUnsupportedField means that we have another block type
@@ -190,10 +190,10 @@ func (bs *Server) getBlockCapella(ctx context.Context, blk interfaces.ReadOnlySi
 					return nil, errors.Wrapf(err, "could not check if block is optimistic")
 				}
 				sig := blk.Signature()
-				return &zondpbv1.BlockResponse{
-					Version: zondpbv1.Version_CAPELLA,
-					Data: &zondpbv1.SignedBeaconBlockContainer{
-						Message:   &zondpbv1.SignedBeaconBlockContainer_CapellaBlock{CapellaBlock: v2Blk},
+				return &qrlpb.BlockResponse{
+					Version: qrlpb.Version_CAPELLA,
+					Data: &qrlpb.SignedBeaconBlockContainer{
+						Message:   &qrlpb.SignedBeaconBlockContainer_CapellaBlock{CapellaBlock: v2Blk},
 						Signature: sig[:],
 					},
 					ExecutionOptimistic: isOptimistic,
@@ -220,17 +220,17 @@ func (bs *Server) getBlockCapella(ctx context.Context, blk interfaces.ReadOnlySi
 		return nil, errors.Wrapf(err, "could not check if block is optimistic")
 	}
 	sig := blk.Signature()
-	return &zondpbv1.BlockResponse{
-		Version: zondpbv1.Version_CAPELLA,
-		Data: &zondpbv1.SignedBeaconBlockContainer{
-			Message:   &zondpbv1.SignedBeaconBlockContainer_CapellaBlock{CapellaBlock: v2Blk},
+	return &qrlpb.BlockResponse{
+		Version: qrlpb.Version_CAPELLA,
+		Data: &qrlpb.SignedBeaconBlockContainer{
+			Message:   &qrlpb.SignedBeaconBlockContainer_CapellaBlock{CapellaBlock: v2Blk},
 			Signature: sig[:],
 		},
 		ExecutionOptimistic: isOptimistic,
 	}, nil
 }
 
-func (bs *Server) getSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*zondpbv1.SSZContainer, error) {
+func (bs *Server) getSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnlySignedBeaconBlock) (*qrlpb.SSZContainer, error) {
 	capellaBlk, err := blk.PbCapellaBlock()
 	if err != nil {
 		// ErrUnsupportedField means that we have another block type
@@ -260,7 +260,7 @@ func (bs *Server) getSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnl
 					return nil, errors.Wrapf(err, "could not check if block is optimistic")
 				}
 				sig := blk.Signature()
-				data := &zondpbv1.SignedBeaconBlockCapella{
+				data := &qrlpb.SignedBeaconBlockCapella{
 					Message:   v2Blk,
 					Signature: sig[:],
 				}
@@ -268,8 +268,8 @@ func (bs *Server) getSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnl
 				if err != nil {
 					return nil, errors.Wrapf(err, "could not marshal block into SSZ")
 				}
-				return &zondpbv1.SSZContainer{
-					Version:             zondpbv1.Version_CAPELLA,
+				return &qrlpb.SSZContainer{
+					Version:             qrlpb.Version_CAPELLA,
 					ExecutionOptimistic: isOptimistic,
 					Data:                sszData,
 				}, nil
@@ -295,7 +295,7 @@ func (bs *Server) getSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnl
 		return nil, errors.Wrapf(err, "could not check if block is optimistic")
 	}
 	sig := blk.Signature()
-	data := &zondpbv1.SignedBeaconBlockCapella{
+	data := &qrlpb.SignedBeaconBlockCapella{
 		Message:   v2Blk,
 		Signature: sig[:],
 	}
@@ -303,5 +303,5 @@ func (bs *Server) getSSZBlockCapella(ctx context.Context, blk interfaces.ReadOnl
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not marshal block into SSZ")
 	}
-	return &zondpbv1.SSZContainer{Version: zondpbv1.Version_CAPELLA, ExecutionOptimistic: isOptimistic, Data: sszData}, nil
+	return &qrlpb.SSZContainer{Version: qrlpb.Version_CAPELLA, ExecutionOptimistic: isOptimistic, Data: sszData}, nil
 }

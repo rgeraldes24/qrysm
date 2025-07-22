@@ -24,75 +24,75 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/network/http"
-	zondpbv1alpha1 "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
 
 func TestListAttestations(t *testing.T) {
-	att1 := &zondpbv1alpha1.Attestation{
+	att1 := &qrysmpb.Attestation{
 		AggregationBits: []byte{1, 10},
-		Data: &zondpbv1alpha1.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  1,
 			BeaconBlockRoot: bytesutil.PadTo([]byte("blockroot1"), 32),
-			Source: &zondpbv1alpha1.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  bytesutil.PadTo([]byte("sourceroot1"), 32),
 			},
-			Target: &zondpbv1alpha1.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 10,
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
 		Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), field_params.DilithiumSignatureLength)},
 	}
-	att2 := &zondpbv1alpha1.Attestation{
+	att2 := &qrysmpb.Attestation{
 		AggregationBits: []byte{1, 10},
-		Data: &zondpbv1alpha1.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            1,
 			CommitteeIndex:  4,
 			BeaconBlockRoot: bytesutil.PadTo([]byte("blockroot2"), 32),
-			Source: &zondpbv1alpha1.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  bytesutil.PadTo([]byte("sourceroot2"), 32),
 			},
-			Target: &zondpbv1alpha1.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 10,
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
 		Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), field_params.DilithiumSignatureLength)},
 	}
-	att3 := &zondpbv1alpha1.Attestation{
+	att3 := &qrysmpb.Attestation{
 		AggregationBits: bitfield.NewBitlist(8),
-		Data: &zondpbv1alpha1.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            2,
 			CommitteeIndex:  2,
 			BeaconBlockRoot: bytesutil.PadTo([]byte("blockroot3"), 32),
-			Source: &zondpbv1alpha1.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  bytesutil.PadTo([]byte("sourceroot3"), 32),
 			},
-			Target: &zondpbv1alpha1.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 10,
 				Root:  bytesutil.PadTo([]byte("targetroot3"), 32),
 			},
 		},
 		Signatures: [][]byte{bytesutil.PadTo([]byte("signature3"), field_params.DilithiumSignatureLength)},
 	}
-	att4 := &zondpbv1alpha1.Attestation{
+	att4 := &qrysmpb.Attestation{
 		AggregationBits: bitfield.NewBitlist(8),
-		Data: &zondpbv1alpha1.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            2,
 			CommitteeIndex:  4,
 			BeaconBlockRoot: bytesutil.PadTo([]byte("blockroot4"), 32),
-			Source: &zondpbv1alpha1.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 1,
 				Root:  bytesutil.PadTo([]byte("sourceroot4"), 32),
 			},
-			Target: &zondpbv1alpha1.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 10,
 				Root:  bytesutil.PadTo([]byte("targetroot4"), 32),
 			},
@@ -102,8 +102,8 @@ func TestListAttestations(t *testing.T) {
 	s := &Server{
 		AttestationsPool: attestations.NewPool(),
 	}
-	require.NoError(t, s.AttestationsPool.SaveAggregatedAttestations([]*zondpbv1alpha1.Attestation{att1, att2}))
-	require.NoError(t, s.AttestationsPool.SaveUnaggregatedAttestations([]*zondpbv1alpha1.Attestation{att3, att4}))
+	require.NoError(t, s.AttestationsPool.SaveAggregatedAttestations([]*qrysmpb.Attestation{att1, att2}))
+	require.NoError(t, s.AttestationsPool.SaveUnaggregatedAttestations([]*qrysmpb.Attestation{att3, att4}))
 
 	t.Run("empty request", func(t *testing.T) {
 		url := "http://example.com"
@@ -185,16 +185,16 @@ func TestSubmitAttestations(t *testing.T) {
 
 	_, keys, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	validators := []*zondpbv1alpha1.Validator{
+	validators := []*qrysmpb.Validator{
 		{
 			PublicKey: keys[0].PublicKey().Marshal(),
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		},
 	}
-	bs, err := util.NewBeaconStateCapella(func(state *zondpbv1alpha1.BeaconStateCapella) error {
+	bs, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
 		state.Validators = validators
 		state.Slot = 1
-		state.PreviousJustifiedCheckpoint = &zondpbv1alpha1.Checkpoint{
+		state.PreviousJustifiedCheckpoint = &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  bytesutil.PadTo([]byte("sourceroot1"), 32),
 		}
@@ -302,15 +302,15 @@ func TestSubmitAttestations(t *testing.T) {
 }
 
 func TestListVoluntaryExits(t *testing.T) {
-	exit1 := &zondpbv1alpha1.SignedVoluntaryExit{
-		Exit: &zondpbv1alpha1.VoluntaryExit{
+	exit1 := &qrysmpb.SignedVoluntaryExit{
+		Exit: &qrysmpb.VoluntaryExit{
 			Epoch:          1,
 			ValidatorIndex: 1,
 		},
 		Signature: bytesutil.PadTo([]byte("signature1"), field_params.DilithiumSignatureLength),
 	}
-	exit2 := &zondpbv1alpha1.SignedVoluntaryExit{
-		Exit: &zondpbv1alpha1.VoluntaryExit{
+	exit2 := &qrysmpb.SignedVoluntaryExit{
+		Exit: &qrysmpb.VoluntaryExit{
 			Epoch:          2,
 			ValidatorIndex: 2,
 		},
@@ -318,7 +318,7 @@ func TestListVoluntaryExits(t *testing.T) {
 	}
 
 	s := &Server{
-		VoluntaryExitsPool: &mock.PoolMock{Exits: []*zondpbv1alpha1.SignedVoluntaryExit{exit1, exit2}},
+		VoluntaryExitsPool: &mock.PoolMock{Exits: []*qrysmpb.SignedVoluntaryExit{exit1, exit2}},
 	}
 
 	request := httptest.NewRequest(http.MethodGet, "http://example.com", nil)
@@ -347,12 +347,12 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
 		_, keys, err := util.DeterministicDepositsAndKeys(1)
 		require.NoError(t, err)
-		validator := &zondpbv1alpha1.Validator{
+		validator := &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 			PublicKey: keys[0].PublicKey().Marshal(),
 		}
-		bs, err := util.NewBeaconStateCapella(func(state *zondpbv1alpha1.BeaconStateCapella) error {
-			state.Validators = []*zondpbv1alpha1.Validator{validator}
+		bs, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
+			state.Validators = []*qrysmpb.Validator{validator}
 			// Satisfy activity time required before exiting.
 			state.Slot = params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod))
 			return nil
@@ -464,12 +464,12 @@ func TestSubmitVoluntaryExit(t *testing.T) {
 	t.Run("invalid validator index", func(t *testing.T) {
 		_, keys, err := util.DeterministicDepositsAndKeys(1)
 		require.NoError(t, err)
-		validator := &zondpbv1alpha1.Validator{
+		validator := &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 			PublicKey: keys[0].PublicKey().Marshal(),
 		}
-		bs, err := util.NewBeaconStateCapella(func(state *zondpbv1alpha1.BeaconStateCapella) error {
-			state.Validators = []*zondpbv1alpha1.Validator{validator}
+		bs, err := util.NewBeaconStateCapella(func(state *qrysmpb.BeaconStateCapella) error {
+			state.Validators = []*qrysmpb.Validator{validator}
 			return nil
 		})
 		require.NoError(t, err)

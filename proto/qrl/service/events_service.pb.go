@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/service/events_service.proto
+// source: proto/qrl/service/events_service.proto
 
 package service
 
@@ -63,12 +63,12 @@ var file_proto_zond_service_events_service_proto_rawDesc = []byte{
 }
 
 var file_proto_zond_service_events_service_proto_goTypes = []interface{}{
-	(*v1.StreamEventsRequest)(nil), // 0: theqrl.zond.v1.StreamEventsRequest
+	(*v1.StreamEventsRequest)(nil), // 0: theqrl.qrl.v1.StreamEventsRequest
 	(*gateway.EventSource)(nil),    // 1: gateway.EventSource
 }
 var file_proto_zond_service_events_service_proto_depIdxs = []int32{
-	0, // 0: theqrl.zond.service.Events.StreamEvents:input_type -> theqrl.zond.v1.StreamEventsRequest
-	1, // 1: theqrl.zond.service.Events.StreamEvents:output_type -> gateway.EventSource
+	0, // 0: theqrl.qrl.service.Events.StreamEvents:input_type -> theqrl.qrl.v1.StreamEventsRequest
+	1, // 1: theqrl.qrl.service.Events.StreamEvents:output_type -> gateway.EventSource
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -124,7 +124,7 @@ func NewEventsClient(cc grpc.ClientConnInterface) EventsClient {
 }
 
 func (c *eventsClient) StreamEvents(ctx context.Context, in *v1.StreamEventsRequest, opts ...grpc.CallOption) (Events_StreamEventsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Events_serviceDesc.Streams[0], "/theqrl.zond.service.Events/StreamEvents", opts...)
+	stream, err := c.cc.NewStream(ctx, &_Events_serviceDesc.Streams[0], "/theqrl.qrl.service.Events/StreamEvents", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +194,7 @@ func (x *eventsStreamEventsServer) Send(m *gateway.EventSource) error {
 }
 
 var _Events_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "theqrl.zond.service.Events",
+	ServiceName: "theqrl.qrl.service.Events",
 	HandlerType: (*EventsServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
@@ -204,5 +204,5 @@ var _Events_serviceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "proto/zond/service/events_service.proto",
+	Metadata: "proto/qrl/service/events_service.proto",
 }

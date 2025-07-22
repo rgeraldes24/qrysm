@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/cmd"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -21,8 +21,8 @@ const errEpoch = "Cannot retrieve information about an epoch in the future, curr
 // ListValidatorAssignments retrieves the validator assignments for a given epoch,
 // optional validator indices or public keys may be included to filter validator assignments.
 func (bs *Server) ListValidatorAssignments(
-	ctx context.Context, req *zondpb.ListValidatorAssignmentsRequest,
-) (*zondpb.ValidatorAssignments, error) {
+	ctx context.Context, req *qrysmpb.ListValidatorAssignmentsRequest,
+) (*qrysmpb.ValidatorAssignments, error) {
 	if int(req.PageSize) > cmd.Get().MaxRPCPageSize {
 		return nil, status.Errorf(
 			codes.InvalidArgument,
@@ -32,16 +32,16 @@ func (bs *Server) ListValidatorAssignments(
 		)
 	}
 
-	var res []*zondpb.ValidatorAssignments_CommitteeAssignment
+	var res []*qrysmpb.ValidatorAssignments_CommitteeAssignment
 	filtered := map[primitives.ValidatorIndex]bool{} // track filtered validators to prevent duplication in the response.
 	filteredIndices := make([]primitives.ValidatorIndex, 0)
 	var requestedEpoch primitives.Epoch
 	switch q := req.QueryFilter.(type) {
-	case *zondpb.ListValidatorAssignmentsRequest_Genesis:
+	case *qrysmpb.ListValidatorAssignmentsRequest_Genesis:
 		if q.Genesis {
 			requestedEpoch = 0
 		}
-	case *zondpb.ListValidatorAssignmentsRequest_Epoch:
+	case *qrysmpb.ListValidatorAssignmentsRequest_Epoch:
 		requestedEpoch = q.Epoch
 	}
 
@@ -89,8 +89,8 @@ func (bs *Server) ListValidatorAssignments(
 	}
 	if len(filteredIndices) == 0 {
 		if len(activeIndices) == 0 {
-			return &zondpb.ValidatorAssignments{
-				Assignments:   make([]*zondpb.ValidatorAssignments_CommitteeAssignment, 0),
+			return &qrysmpb.ValidatorAssignments{
+				Assignments:   make([]*qrysmpb.ValidatorAssignments_CommitteeAssignment, 0),
 				TotalSize:     int32(0),
 				NextPageToken: strconv.Itoa(0),
 			}, nil
@@ -116,7 +116,7 @@ func (bs *Server) ListValidatorAssignments(
 				index, requestedState.NumValidators())
 		}
 		comAssignment := committeeAssignments[index]
-		assign := &zondpb.ValidatorAssignments_CommitteeAssignment{
+		assign := &qrysmpb.ValidatorAssignments_CommitteeAssignment{
 			BeaconCommittees: comAssignment.Committee,
 			CommitteeIndex:   comAssignment.CommitteeIndex,
 			AttesterSlot:     comAssignment.AttesterSlot,
@@ -126,7 +126,7 @@ func (bs *Server) ListValidatorAssignments(
 		res = append(res, assign)
 	}
 
-	return &zondpb.ValidatorAssignments{
+	return &qrysmpb.ValidatorAssignments{
 		Epoch:         requestedEpoch,
 		Assignments:   res,
 		NextPageToken: nextPageToken,

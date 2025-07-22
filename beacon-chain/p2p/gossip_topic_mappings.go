@@ -3,22 +3,22 @@ package p2p
 import (
 	"reflect"
 
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"google.golang.org/protobuf/proto"
 )
 
 // gossipTopicMappings represent the protocol ID to protobuf message type map for easy
 // lookup.
 var gossipTopicMappings = map[string]proto.Message{
-	BlockSubnetTopicFormat:                      &zondpb.SignedBeaconBlockCapella{},
-	AttestationSubnetTopicFormat:                &zondpb.Attestation{},
-	ExitSubnetTopicFormat:                       &zondpb.SignedVoluntaryExit{},
-	ProposerSlashingSubnetTopicFormat:           &zondpb.ProposerSlashing{},
-	AttesterSlashingSubnetTopicFormat:           &zondpb.AttesterSlashing{},
-	AggregateAndProofSubnetTopicFormat:          &zondpb.SignedAggregateAttestationAndProof{},
-	SyncContributionAndProofSubnetTopicFormat:   &zondpb.SignedContributionAndProof{},
-	SyncCommitteeSubnetTopicFormat:              &zondpb.SyncCommitteeMessage{},
-	DilithiumToExecutionChangeSubnetTopicFormat: &zondpb.SignedDilithiumToExecutionChange{},
+	BlockSubnetTopicFormat:                      &qrysmpb.SignedBeaconBlockCapella{},
+	AttestationSubnetTopicFormat:                &qrysmpb.Attestation{},
+	ExitSubnetTopicFormat:                       &qrysmpb.SignedVoluntaryExit{},
+	ProposerSlashingSubnetTopicFormat:           &qrysmpb.ProposerSlashing{},
+	AttesterSlashingSubnetTopicFormat:           &qrysmpb.AttesterSlashing{},
+	AggregateAndProofSubnetTopicFormat:          &qrysmpb.SignedAggregateAttestationAndProof{},
+	SyncContributionAndProofSubnetTopicFormat:   &qrysmpb.SignedContributionAndProof{},
+	SyncCommitteeSubnetTopicFormat:              &qrysmpb.SyncCommitteeMessage{},
+	DilithiumToExecutionChangeSubnetTopicFormat: &qrysmpb.SignedDilithiumToExecutionChange{},
 }
 
 // GossipTopicMappings is a function to return the assigned data type

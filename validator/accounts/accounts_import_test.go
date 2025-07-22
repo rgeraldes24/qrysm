@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/accounts/iface"
@@ -55,7 +55,7 @@ func TestImportAccounts_NoPassword(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Equal(t, 1, len(resp))
-	require.Equal(t, resp[0].Status, zondpbservice.ImportedKeystoreStatus_ERROR)
+	require.Equal(t, resp[0].Status, qrlpbservice.ImportedKeystoreStatus_ERROR)
 }
 
 /*

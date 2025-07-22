@@ -14,7 +14,7 @@ import (
 	slashertypes "github.com/theQRL/qrysm/beacon-chain/slasher/types"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	bolt "go.etcd.io/bbolt"
 	"go.opencensus.io/trace"
 	"golang.org/x/sync/errgroup"
@@ -319,10 +319,10 @@ func (s *Store) SaveSlasherChunks(
 // proposal signing root. If so, we return a double block proposal object.
 func (s *Store) CheckDoubleBlockProposals(
 	ctx context.Context, proposals []*slashertypes.SignedBlockHeaderWrapper,
-) ([]*zondpb.ProposerSlashing, error) {
+) ([]*qrysmpb.ProposerSlashing, error) {
 	ctx, span := trace.StartSpan(ctx, "BeaconDB.CheckDoubleBlockProposals")
 	defer span.End()
-	proposerSlashings := make([]*zondpb.ProposerSlashing, 0, len(proposals))
+	proposerSlashings := make([]*qrysmpb.ProposerSlashing, 0, len(proposals))
 	err := s.db.View(func(tx *bolt.Tx) error {
 		bkt := tx.Bucket(proposalRecordsBucket)
 		for _, proposal := range proposals {
@@ -343,7 +343,7 @@ func (s *Store) CheckDoubleBlockProposals(
 				if err != nil {
 					return err
 				}
-				proposerSlashings = append(proposerSlashings, &zondpb.ProposerSlashing{
+				proposerSlashings = append(proposerSlashings, &qrysmpb.ProposerSlashing{
 					Header_1: existingProposalWrapper.SignedBeaconBlockHeader,
 					Header_2: proposal.SignedBeaconBlockHeader,
 				})
@@ -421,7 +421,7 @@ func (s *Store) SaveBlockProposals(
 func (s *Store) HighestAttestations(
 	_ context.Context,
 	indices []primitives.ValidatorIndex,
-) ([]*zondpb.HighestAttestation, error) {
+) ([]*qrysmpb.HighestAttestation, error) {
 	if len(indices) == 0 {
 		return nil, nil
 	}
@@ -436,7 +436,7 @@ func (s *Store) HighestAttestations(
 		encodedIndices[i] = encodeValidatorIndex(valIdx)
 	}
 
-	history := make([]*zondpb.HighestAttestation, 0, len(encodedIndices))
+	history := make([]*qrysmpb.HighestAttestation, 0, len(encodedIndices))
 	err = s.db.View(func(tx *bolt.Tx) error {
 		signingRootsBkt := tx.Bucket(attestationDataRootsBucket)
 		attRecordsBkt := tx.Bucket(attestationRecordsBucket)
@@ -452,7 +452,7 @@ func (s *Store) HighestAttestations(
 					if err != nil {
 						return err
 					}
-					highestAtt := &zondpb.HighestAttestation{
+					highestAtt := &qrysmpb.HighestAttestation{
 						ValidatorIndex:     uint64(indices[i]),
 						HighestSourceEpoch: attWrapper.IndexedAttestation.Data.Source.Epoch,
 						HighestTargetEpoch: attWrapper.IndexedAttestation.Data.Target.Epoch,
@@ -531,7 +531,7 @@ func decodeAttestationRecord(encoded []byte) (*slashertypes.IndexedAttestationWr
 		return nil, fmt.Errorf("wrong length for encoded attestation record, want 32, got %d", len(encoded))
 	}
 	signingRoot := encoded[:signingRootSize]
-	decodedAtt := &zondpb.IndexedAttestation{}
+	decodedAtt := &qrysmpb.IndexedAttestation{}
 	decodedAttBytes, err := snappy.Decode(nil, encoded[signingRootSize:])
 	if err != nil {
 		return nil, err
@@ -564,7 +564,7 @@ func decodeProposalRecord(encoded []byte) (*slashertypes.SignedBlockHeaderWrappe
 		)
 	}
 	signingRoot := encoded[:signingRootSize]
-	decodedBlkHdr := &zondpb.SignedBeaconBlockHeader{}
+	decodedBlkHdr := &qrysmpb.SignedBeaconBlockHeader{}
 	decodedHdrBytes, err := snappy.Decode(nil, encoded[signingRootSize:])
 	if err != nil {
 		return nil, err

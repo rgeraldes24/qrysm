@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: proto/qrysm/v1alpha1/node.proto
 
-package zond
+package qrl
 
 import (
 	context "context"
@@ -442,8 +442,8 @@ type Peer struct {
 	unknownFields protoimpl.UnknownFields
 
 	Address         string          `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	Direction       PeerDirection   `protobuf:"varint,2,opt,name=direction,proto3,enum=theqrl.zond.v1alpha1.PeerDirection" json:"direction,omitempty"`
-	ConnectionState ConnectionState `protobuf:"varint,3,opt,name=connection_state,json=connectionState,proto3,enum=theqrl.zond.v1alpha1.ConnectionState" json:"connection_state,omitempty"`
+	Direction       PeerDirection   `protobuf:"varint,2,opt,name=direction,proto3,enum=theqrl.qrl.v1alpha1.PeerDirection" json:"direction,omitempty"`
+	ConnectionState ConnectionState `protobuf:"varint,3,opt,name=connection_state,json=connectionState,proto3,enum=theqrl.qrl.v1alpha1.ConnectionState" json:"connection_state,omitempty"`
 	PeerId          string          `protobuf:"bytes,4,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
 	Qnr             string          `protobuf:"bytes,5,opt,name=qnr,proto3" json:"qnr,omitempty"`
 }
@@ -816,41 +816,41 @@ func file_proto_qrysm_v1alpha1_node_proto_rawDescGZIP() []byte {
 var file_proto_qrysm_v1alpha1_node_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_proto_qrysm_v1alpha1_node_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_proto_qrysm_v1alpha1_node_proto_goTypes = []interface{}{
-	(PeerDirection)(0),                    // 0: theqrl.zond.v1alpha1.PeerDirection
-	(ConnectionState)(0),                  // 1: theqrl.zond.v1alpha1.ConnectionState
-	(*SyncStatus)(nil),                    // 2: theqrl.zond.v1alpha1.SyncStatus
-	(*Genesis)(nil),                       // 3: theqrl.zond.v1alpha1.Genesis
-	(*Version)(nil),                       // 4: theqrl.zond.v1alpha1.Version
-	(*ImplementedServices)(nil),           // 5: theqrl.zond.v1alpha1.ImplementedServices
-	(*PeerRequest)(nil),                   // 6: theqrl.zond.v1alpha1.PeerRequest
-	(*Peers)(nil),                         // 7: theqrl.zond.v1alpha1.Peers
-	(*Peer)(nil),                          // 8: theqrl.zond.v1alpha1.Peer
-	(*HostData)(nil),                      // 9: theqrl.zond.v1alpha1.HostData
-	(*ExecutionNodeConnectionStatus)(nil), // 10: theqrl.zond.v1alpha1.ExecutionNodeConnectionStatus
+	(PeerDirection)(0),                    // 0: theqrl.qrl.v1alpha1.PeerDirection
+	(ConnectionState)(0),                  // 1: theqrl.qrl.v1alpha1.ConnectionState
+	(*SyncStatus)(nil),                    // 2: theqrl.qrl.v1alpha1.SyncStatus
+	(*Genesis)(nil),                       // 3: theqrl.qrl.v1alpha1.Genesis
+	(*Version)(nil),                       // 4: theqrl.qrl.v1alpha1.Version
+	(*ImplementedServices)(nil),           // 5: theqrl.qrl.v1alpha1.ImplementedServices
+	(*PeerRequest)(nil),                   // 6: theqrl.qrl.v1alpha1.PeerRequest
+	(*Peers)(nil),                         // 7: theqrl.qrl.v1alpha1.Peers
+	(*Peer)(nil),                          // 8: theqrl.qrl.v1alpha1.Peer
+	(*HostData)(nil),                      // 9: theqrl.qrl.v1alpha1.HostData
+	(*ExecutionNodeConnectionStatus)(nil), // 10: theqrl.qrl.v1alpha1.ExecutionNodeConnectionStatus
 	(*timestamppb.Timestamp)(nil),         // 11: google.protobuf.Timestamp
 	(*emptypb.Empty)(nil),                 // 12: google.protobuf.Empty
 }
 var file_proto_qrysm_v1alpha1_node_proto_depIdxs = []int32{
-	11, // 0: theqrl.zond.v1alpha1.Genesis.genesis_time:type_name -> google.protobuf.Timestamp
-	8,  // 1: theqrl.zond.v1alpha1.Peers.peers:type_name -> theqrl.zond.v1alpha1.Peer
-	0,  // 2: theqrl.zond.v1alpha1.Peer.direction:type_name -> theqrl.zond.v1alpha1.PeerDirection
-	1,  // 3: theqrl.zond.v1alpha1.Peer.connection_state:type_name -> theqrl.zond.v1alpha1.ConnectionState
-	12, // 4: theqrl.zond.v1alpha1.Node.GetSyncStatus:input_type -> google.protobuf.Empty
-	12, // 5: theqrl.zond.v1alpha1.Node.GetGenesis:input_type -> google.protobuf.Empty
-	12, // 6: theqrl.zond.v1alpha1.Node.GetVersion:input_type -> google.protobuf.Empty
-	12, // 7: theqrl.zond.v1alpha1.Node.ListImplementedServices:input_type -> google.protobuf.Empty
-	12, // 8: theqrl.zond.v1alpha1.Node.GetHost:input_type -> google.protobuf.Empty
-	6,  // 9: theqrl.zond.v1alpha1.Node.GetPeer:input_type -> theqrl.zond.v1alpha1.PeerRequest
-	12, // 10: theqrl.zond.v1alpha1.Node.ListPeers:input_type -> google.protobuf.Empty
-	12, // 11: theqrl.zond.v1alpha1.Node.GetExecutionNodeConnectionStatus:input_type -> google.protobuf.Empty
-	2,  // 12: theqrl.zond.v1alpha1.Node.GetSyncStatus:output_type -> theqrl.zond.v1alpha1.SyncStatus
-	3,  // 13: theqrl.zond.v1alpha1.Node.GetGenesis:output_type -> theqrl.zond.v1alpha1.Genesis
-	4,  // 14: theqrl.zond.v1alpha1.Node.GetVersion:output_type -> theqrl.zond.v1alpha1.Version
-	5,  // 15: theqrl.zond.v1alpha1.Node.ListImplementedServices:output_type -> theqrl.zond.v1alpha1.ImplementedServices
-	9,  // 16: theqrl.zond.v1alpha1.Node.GetHost:output_type -> theqrl.zond.v1alpha1.HostData
-	8,  // 17: theqrl.zond.v1alpha1.Node.GetPeer:output_type -> theqrl.zond.v1alpha1.Peer
-	7,  // 18: theqrl.zond.v1alpha1.Node.ListPeers:output_type -> theqrl.zond.v1alpha1.Peers
-	10, // 19: theqrl.zond.v1alpha1.Node.GetExecutionNodeConnectionStatus:output_type -> theqrl.zond.v1alpha1.ExecutionNodeConnectionStatus
+	11, // 0: theqrl.qrl.v1alpha1.Genesis.genesis_time:type_name -> google.protobuf.Timestamp
+	8,  // 1: theqrl.qrl.v1alpha1.Peers.peers:type_name -> theqrl.qrl.v1alpha1.Peer
+	0,  // 2: theqrl.qrl.v1alpha1.Peer.direction:type_name -> theqrl.qrl.v1alpha1.PeerDirection
+	1,  // 3: theqrl.qrl.v1alpha1.Peer.connection_state:type_name -> theqrl.qrl.v1alpha1.ConnectionState
+	12, // 4: theqrl.qrl.v1alpha1.Node.GetSyncStatus:input_type -> google.protobuf.Empty
+	12, // 5: theqrl.qrl.v1alpha1.Node.GetGenesis:input_type -> google.protobuf.Empty
+	12, // 6: theqrl.qrl.v1alpha1.Node.GetVersion:input_type -> google.protobuf.Empty
+	12, // 7: theqrl.qrl.v1alpha1.Node.ListImplementedServices:input_type -> google.protobuf.Empty
+	12, // 8: theqrl.qrl.v1alpha1.Node.GetHost:input_type -> google.protobuf.Empty
+	6,  // 9: theqrl.qrl.v1alpha1.Node.GetPeer:input_type -> theqrl.qrl.v1alpha1.PeerRequest
+	12, // 10: theqrl.qrl.v1alpha1.Node.ListPeers:input_type -> google.protobuf.Empty
+	12, // 11: theqrl.qrl.v1alpha1.Node.GetExecutionNodeConnectionStatus:input_type -> google.protobuf.Empty
+	2,  // 12: theqrl.qrl.v1alpha1.Node.GetSyncStatus:output_type -> theqrl.qrl.v1alpha1.SyncStatus
+	3,  // 13: theqrl.qrl.v1alpha1.Node.GetGenesis:output_type -> theqrl.qrl.v1alpha1.Genesis
+	4,  // 14: theqrl.qrl.v1alpha1.Node.GetVersion:output_type -> theqrl.qrl.v1alpha1.Version
+	5,  // 15: theqrl.qrl.v1alpha1.Node.ListImplementedServices:output_type -> theqrl.qrl.v1alpha1.ImplementedServices
+	9,  // 16: theqrl.qrl.v1alpha1.Node.GetHost:output_type -> theqrl.qrl.v1alpha1.HostData
+	8,  // 17: theqrl.qrl.v1alpha1.Node.GetPeer:output_type -> theqrl.qrl.v1alpha1.Peer
+	7,  // 18: theqrl.qrl.v1alpha1.Node.ListPeers:output_type -> theqrl.qrl.v1alpha1.Peers
+	10, // 19: theqrl.qrl.v1alpha1.Node.GetExecutionNodeConnectionStatus:output_type -> theqrl.qrl.v1alpha1.ExecutionNodeConnectionStatus
 	12, // [12:20] is the sub-list for method output_type
 	4,  // [4:12] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
@@ -1026,7 +1026,7 @@ func NewNodeClient(cc grpc.ClientConnInterface) NodeClient {
 
 func (c *nodeClient) GetSyncStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*SyncStatus, error) {
 	out := new(SyncStatus)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Node/GetSyncStatus", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Node/GetSyncStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1035,7 +1035,7 @@ func (c *nodeClient) GetSyncStatus(ctx context.Context, in *emptypb.Empty, opts 
 
 func (c *nodeClient) GetGenesis(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Genesis, error) {
 	out := new(Genesis)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Node/GetGenesis", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Node/GetGenesis", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1044,7 +1044,7 @@ func (c *nodeClient) GetGenesis(ctx context.Context, in *emptypb.Empty, opts ...
 
 func (c *nodeClient) GetVersion(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Version, error) {
 	out := new(Version)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Node/GetVersion", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Node/GetVersion", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1053,7 +1053,7 @@ func (c *nodeClient) GetVersion(ctx context.Context, in *emptypb.Empty, opts ...
 
 func (c *nodeClient) ListImplementedServices(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ImplementedServices, error) {
 	out := new(ImplementedServices)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Node/ListImplementedServices", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Node/ListImplementedServices", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1062,7 +1062,7 @@ func (c *nodeClient) ListImplementedServices(ctx context.Context, in *emptypb.Em
 
 func (c *nodeClient) GetHost(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*HostData, error) {
 	out := new(HostData)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Node/GetHost", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Node/GetHost", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1071,7 +1071,7 @@ func (c *nodeClient) GetHost(ctx context.Context, in *emptypb.Empty, opts ...grp
 
 func (c *nodeClient) GetPeer(ctx context.Context, in *PeerRequest, opts ...grpc.CallOption) (*Peer, error) {
 	out := new(Peer)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Node/GetPeer", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Node/GetPeer", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1080,7 +1080,7 @@ func (c *nodeClient) GetPeer(ctx context.Context, in *PeerRequest, opts ...grpc.
 
 func (c *nodeClient) ListPeers(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Peers, error) {
 	out := new(Peers)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Node/ListPeers", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Node/ListPeers", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1089,7 +1089,7 @@ func (c *nodeClient) ListPeers(ctx context.Context, in *emptypb.Empty, opts ...g
 
 func (c *nodeClient) GetExecutionNodeConnectionStatus(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ExecutionNodeConnectionStatus, error) {
 	out := new(ExecutionNodeConnectionStatus)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Node/GetExecutionNodeConnectionStatus", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Node/GetExecutionNodeConnectionStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1151,7 +1151,7 @@ func _Node_GetSyncStatus_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Node/GetSyncStatus",
+		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetSyncStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeServer).GetSyncStatus(ctx, req.(*emptypb.Empty))
@@ -1169,7 +1169,7 @@ func _Node_GetGenesis_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Node/GetGenesis",
+		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetGenesis",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeServer).GetGenesis(ctx, req.(*emptypb.Empty))
@@ -1187,7 +1187,7 @@ func _Node_GetVersion_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Node/GetVersion",
+		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetVersion",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeServer).GetVersion(ctx, req.(*emptypb.Empty))
@@ -1205,7 +1205,7 @@ func _Node_ListImplementedServices_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Node/ListImplementedServices",
+		FullMethod: "/theqrl.qrl.v1alpha1.Node/ListImplementedServices",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeServer).ListImplementedServices(ctx, req.(*emptypb.Empty))
@@ -1223,7 +1223,7 @@ func _Node_GetHost_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Node/GetHost",
+		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetHost",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeServer).GetHost(ctx, req.(*emptypb.Empty))
@@ -1241,7 +1241,7 @@ func _Node_GetPeer_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Node/GetPeer",
+		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetPeer",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeServer).GetPeer(ctx, req.(*PeerRequest))
@@ -1259,7 +1259,7 @@ func _Node_ListPeers_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Node/ListPeers",
+		FullMethod: "/theqrl.qrl.v1alpha1.Node/ListPeers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeServer).ListPeers(ctx, req.(*emptypb.Empty))
@@ -1277,7 +1277,7 @@ func _Node_GetExecutionNodeConnectionStatus_Handler(srv interface{}, ctx context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Node/GetExecutionNodeConnectionStatus",
+		FullMethod: "/theqrl.qrl.v1alpha1.Node/GetExecutionNodeConnectionStatus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeServer).GetExecutionNodeConnectionStatus(ctx, req.(*emptypb.Empty))
@@ -1286,7 +1286,7 @@ func _Node_GetExecutionNodeConnectionStatus_Handler(srv interface{}, ctx context
 }
 
 var _Node_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "theqrl.zond.v1alpha1.Node",
+	ServiceName: "theqrl.qrl.v1alpha1.Node",
 	HandlerType: (*NodeServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // GenesisBeaconStateCapella gets called when MinGenesisActiveValidatorCount count of
@@ -59,7 +59,7 @@ import (
 //	  return state
 //
 // This method differs from the spec so as to process deposits beforehand instead of the end of the function.
-func GenesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, genesisTime uint64, executionNodeData *zondpb.ExecutionNodeData, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
+func GenesisBeaconStateCapella(ctx context.Context, deposits []*qrysmpb.Deposit, genesisTime uint64, executionNodeData *qrysmpb.ExecutionNodeData, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
 	st, err := EmptyGenesisStateCapella()
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func GenesisBeaconStateCapella(ctx context.Context, deposits []*zondpb.Deposit, 
 
 // OptimizedGenesisBeaconStateCapella is used to create a state that has already processed deposits. This is to efficiently
 // create a mainnet state at chainstart.
-func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, executionNodeData *zondpb.ExecutionNodeData, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
+func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, executionNodeData *qrysmpb.ExecutionNodeData, ep *enginev1.ExecutionPayloadCapella) (state.BeaconState, error) {
 	if executionNodeData == nil {
 		return nil, errors.New("no executionNodeData provided for genesis state")
 	}
@@ -144,13 +144,13 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 	if err != nil {
 		return nil, err
 	}
-	st := &zondpb.BeaconStateCapella{
+	st := &qrysmpb.BeaconStateCapella{
 		// Misc fields.
 		Slot:                  0,
 		GenesisTime:           genesisTime,
 		GenesisValidatorsRoot: genesisValidatorsRoot[:],
 
-		Fork: &zondpb.Fork{
+		Fork: &qrysmpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			Epoch:           0,
@@ -164,16 +164,16 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 		RandaoMixes: randaoMixes,
 
 		// Finality.
-		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{
+		PreviousJustifiedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{
+		CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
 		JustificationBits: []byte{0},
-		FinalizedCheckpoint: &zondpb.Checkpoint{
+		FinalizedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
@@ -185,20 +185,20 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 
 		// Eth1 data.
 		ExecutionNodeData:            executionNodeData,
-		ExecutionNodeDataVotes:       []*zondpb.ExecutionNodeData{},
+		ExecutionNodeDataVotes:       []*qrysmpb.ExecutionNodeData{},
 		Eth1DepositIndex:             preState.Eth1DepositIndex(),
 		LatestExecutionPayloadHeader: eph,
 		InactivityScores:             scores,
 	}
 
-	bodyRoot, err := (&zondpb.BeaconBlockBodyCapella{
+	bodyRoot, err := (&qrysmpb.BeaconBlockBodyCapella{
 		RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
-		ExecutionNodeData: &zondpb.ExecutionNodeData{
+		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},
 		Graffiti: make([]byte, 32),
-		SyncAggregate: &zondpb.SyncAggregate{
+		SyncAggregate: &qrysmpb.SyncAggregate{
 			SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
 			SyncCommitteeSignatures: [][]byte{},
 		},
@@ -218,7 +218,7 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 		return nil, errors.Wrap(err, "could not hash tree root empty block body")
 	}
 
-	st.LatestBlockHeader = &zondpb.BeaconBlockHeader{
+	st.LatestBlockHeader = &qrysmpb.BeaconBlockHeader{
 		ParentRoot: zeroHash,
 		StateRoot:  zeroHash,
 		BodyRoot:   bodyRoot[:],
@@ -243,24 +243,24 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 
 // EmptyGenesisStateCapella returns an empty beacon state object.
 func EmptyGenesisStateCapella() (state.BeaconState, error) {
-	st := &zondpb.BeaconStateCapella{
+	st := &qrysmpb.BeaconStateCapella{
 		// Misc fields.
 		Slot: 0,
-		Fork: &zondpb.Fork{
+		Fork: &qrysmpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			Epoch:           0,
 		},
 		// Validator registry fields.
-		Validators: []*zondpb.Validator{},
+		Validators: []*qrysmpb.Validator{},
 		Balances:   []uint64{},
 
 		JustificationBits: []byte{0},
 		HistoricalRoots:   [][]byte{},
 
 		// Eth1 data.
-		ExecutionNodeData:      &zondpb.ExecutionNodeData{},
-		ExecutionNodeDataVotes: []*zondpb.ExecutionNodeData{},
+		ExecutionNodeData:      &qrysmpb.ExecutionNodeData{},
+		ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{},
 		Eth1DepositIndex:       0,
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
 			ParentHash:       make([]byte, 32),

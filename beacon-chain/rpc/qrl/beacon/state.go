@@ -9,7 +9,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
@@ -22,7 +22,7 @@ type stateRequest struct {
 }
 
 // GetStateRoot calculates HashTreeRoot for state with given 'stateId'. If stateId is root, same value will be returned.
-func (bs *Server) GetStateRoot(ctx context.Context, req *zondpb.StateRequest) (*zondpb.StateRootResponse, error) {
+func (bs *Server) GetStateRoot(ctx context.Context, req *qrlpb.StateRequest) (*qrlpb.StateRootResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.GetStateRoot")
 	defer span.End()
 
@@ -49,8 +49,8 @@ func (bs *Server) GetStateRoot(ctx context.Context, req *zondpb.StateRequest) (*
 	}
 	isFinalized := bs.FinalizationFetcher.IsFinalized(ctx, blockRoot)
 
-	return &zondpb.StateRootResponse{
-		Data: &zondpb.StateRootResponse_StateRoot{
+	return &qrlpb.StateRootResponse{
+		Data: &qrlpb.StateRootResponse_StateRoot{
 			Root: stateRoot,
 		},
 		ExecutionOptimistic: isOptimistic,
@@ -62,7 +62,7 @@ func (bs *Server) GetStateRoot(ctx context.Context, req *zondpb.StateRequest) (*
 // If an epoch is not specified then the RANDAO mix for the state's current epoch will be returned.
 // By adjusting the state_id parameter you can query for any historic value of the RANDAO mix.
 // Ordinarily states from the same epoch will mutate the RANDAO mix for that epoch as blocks are applied.
-func (bs *Server) GetRandao(ctx context.Context, req *zondpb.RandaoRequest) (*zondpb.RandaoResponse, error) {
+func (bs *Server) GetRandao(ctx context.Context, req *qrlpb.RandaoRequest) (*qrlpb.RandaoResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.GetRandao")
 	defer span.End()
 
@@ -103,8 +103,8 @@ func (bs *Server) GetRandao(ctx context.Context, req *zondpb.RandaoRequest) (*zo
 	}
 	isFinalized := bs.FinalizationFetcher.IsFinalized(ctx, blockRoot)
 
-	return &zondpb.RandaoResponse{
-		Data:                &zondpb.RandaoResponse_Randao{Randao: randao},
+	return &qrlpb.RandaoResponse{
+		Data:                &qrlpb.RandaoResponse_Randao{Randao: randao},
 		ExecutionOptimistic: isOptimistic,
 		Finalized:           isFinalized,
 	}, nil

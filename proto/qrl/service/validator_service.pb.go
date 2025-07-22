@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/service/validator_service.proto
+// source: proto/qrl/service/validator_service.proto
 
 package service
 
@@ -94,20 +94,20 @@ var file_proto_zond_service_validator_service_proto_rawDesc = []byte{
 }
 
 var file_proto_zond_service_validator_service_proto_goTypes = []interface{}{
-	(*v1.ProduceBlockRequest)(nil),         // 0: theqrl.zond.v1.ProduceBlockRequest
-	(*v1.ProduceBlockResponse)(nil),        // 1: theqrl.zond.v1.ProduceBlockResponse
-	(*v1.SSZContainer)(nil),                // 2: theqrl.zond.v1.SSZContainer
-	(*v1.ProduceBlindedBlockResponse)(nil), // 3: theqrl.zond.v1.ProduceBlindedBlockResponse
+	(*v1.ProduceBlockRequest)(nil),         // 0: theqrl.qrl.v1.ProduceBlockRequest
+	(*v1.ProduceBlockResponse)(nil),        // 1: theqrl.qrl.v1.ProduceBlockResponse
+	(*v1.SSZContainer)(nil),                // 2: theqrl.qrl.v1.SSZContainer
+	(*v1.ProduceBlindedBlockResponse)(nil), // 3: theqrl.qrl.v1.ProduceBlindedBlockResponse
 }
 var file_proto_zond_service_validator_service_proto_depIdxs = []int32{
-	0, // 0: theqrl.zond.service.BeaconValidator.ProduceBlock:input_type -> theqrl.zond.v1.ProduceBlockRequest
-	0, // 1: theqrl.zond.service.BeaconValidator.ProduceBlockSSZ:input_type -> theqrl.zond.v1.ProduceBlockRequest
-	0, // 2: theqrl.zond.service.BeaconValidator.ProduceBlindedBlock:input_type -> theqrl.zond.v1.ProduceBlockRequest
-	0, // 3: theqrl.zond.service.BeaconValidator.ProduceBlindedBlockSSZ:input_type -> theqrl.zond.v1.ProduceBlockRequest
-	1, // 4: theqrl.zond.service.BeaconValidator.ProduceBlock:output_type -> theqrl.zond.v1.ProduceBlockResponse
-	2, // 5: theqrl.zond.service.BeaconValidator.ProduceBlockSSZ:output_type -> theqrl.zond.v1.SSZContainer
-	3, // 6: theqrl.zond.service.BeaconValidator.ProduceBlindedBlock:output_type -> theqrl.zond.v1.ProduceBlindedBlockResponse
-	2, // 7: theqrl.zond.service.BeaconValidator.ProduceBlindedBlockSSZ:output_type -> theqrl.zond.v1.SSZContainer
+	0, // 0: theqrl.qrl.service.BeaconValidator.ProduceBlock:input_type -> theqrl.qrl.v1.ProduceBlockRequest
+	0, // 1: theqrl.qrl.service.BeaconValidator.ProduceBlockSSZ:input_type -> theqrl.qrl.v1.ProduceBlockRequest
+	0, // 2: theqrl.qrl.service.BeaconValidator.ProduceBlindedBlock:input_type -> theqrl.qrl.v1.ProduceBlockRequest
+	0, // 3: theqrl.qrl.service.BeaconValidator.ProduceBlindedBlockSSZ:input_type -> theqrl.qrl.v1.ProduceBlockRequest
+	1, // 4: theqrl.qrl.service.BeaconValidator.ProduceBlock:output_type -> theqrl.qrl.v1.ProduceBlockResponse
+	2, // 5: theqrl.qrl.service.BeaconValidator.ProduceBlockSSZ:output_type -> theqrl.qrl.v1.SSZContainer
+	3, // 6: theqrl.qrl.service.BeaconValidator.ProduceBlindedBlock:output_type -> theqrl.qrl.v1.ProduceBlindedBlockResponse
+	2, // 7: theqrl.qrl.service.BeaconValidator.ProduceBlindedBlockSSZ:output_type -> theqrl.qrl.v1.SSZContainer
 	4, // [4:8] is the sub-list for method output_type
 	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -167,7 +167,7 @@ func NewBeaconValidatorClient(cc grpc.ClientConnInterface) BeaconValidatorClient
 
 func (c *beaconValidatorClient) ProduceBlock(ctx context.Context, in *v1.ProduceBlockRequest, opts ...grpc.CallOption) (*v1.ProduceBlockResponse, error) {
 	out := new(v1.ProduceBlockResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconValidator/ProduceBlock", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconValidator/ProduceBlock", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (c *beaconValidatorClient) ProduceBlock(ctx context.Context, in *v1.Produce
 
 func (c *beaconValidatorClient) ProduceBlockSSZ(ctx context.Context, in *v1.ProduceBlockRequest, opts ...grpc.CallOption) (*v1.SSZContainer, error) {
 	out := new(v1.SSZContainer)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconValidator/ProduceBlockSSZ", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconValidator/ProduceBlockSSZ", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +185,7 @@ func (c *beaconValidatorClient) ProduceBlockSSZ(ctx context.Context, in *v1.Prod
 
 func (c *beaconValidatorClient) ProduceBlindedBlock(ctx context.Context, in *v1.ProduceBlockRequest, opts ...grpc.CallOption) (*v1.ProduceBlindedBlockResponse, error) {
 	out := new(v1.ProduceBlindedBlockResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconValidator/ProduceBlindedBlock", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconValidator/ProduceBlindedBlock", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +194,7 @@ func (c *beaconValidatorClient) ProduceBlindedBlock(ctx context.Context, in *v1.
 
 func (c *beaconValidatorClient) ProduceBlindedBlockSSZ(ctx context.Context, in *v1.ProduceBlockRequest, opts ...grpc.CallOption) (*v1.SSZContainer, error) {
 	out := new(v1.SSZContainer)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconValidator/ProduceBlindedBlockSSZ", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconValidator/ProduceBlindedBlockSSZ", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +240,7 @@ func _BeaconValidator_ProduceBlock_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconValidator/ProduceBlock",
+		FullMethod: "/theqrl.qrl.service.BeaconValidator/ProduceBlock",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconValidatorServer).ProduceBlock(ctx, req.(*v1.ProduceBlockRequest))
@@ -258,7 +258,7 @@ func _BeaconValidator_ProduceBlockSSZ_Handler(srv interface{}, ctx context.Conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconValidator/ProduceBlockSSZ",
+		FullMethod: "/theqrl.qrl.service.BeaconValidator/ProduceBlockSSZ",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconValidatorServer).ProduceBlockSSZ(ctx, req.(*v1.ProduceBlockRequest))
@@ -276,7 +276,7 @@ func _BeaconValidator_ProduceBlindedBlock_Handler(srv interface{}, ctx context.C
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconValidator/ProduceBlindedBlock",
+		FullMethod: "/theqrl.qrl.service.BeaconValidator/ProduceBlindedBlock",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconValidatorServer).ProduceBlindedBlock(ctx, req.(*v1.ProduceBlockRequest))
@@ -294,7 +294,7 @@ func _BeaconValidator_ProduceBlindedBlockSSZ_Handler(srv interface{}, ctx contex
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconValidator/ProduceBlindedBlockSSZ",
+		FullMethod: "/theqrl.qrl.service.BeaconValidator/ProduceBlindedBlockSSZ",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconValidatorServer).ProduceBlindedBlockSSZ(ctx, req.(*v1.ProduceBlockRequest))
@@ -303,7 +303,7 @@ func _BeaconValidator_ProduceBlindedBlockSSZ_Handler(srv interface{}, ctx contex
 }
 
 var _BeaconValidator_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "theqrl.zond.service.BeaconValidator",
+	ServiceName: "theqrl.qrl.service.BeaconValidator",
 	HandlerType: (*BeaconValidatorServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -324,5 +324,5 @@ var _BeaconValidator_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/zond/service/validator_service.proto",
+	Metadata: "proto/qrl/service/validator_service.proto",
 }

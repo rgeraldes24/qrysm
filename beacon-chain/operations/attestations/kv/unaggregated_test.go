@@ -9,7 +9,7 @@ import (
 	c "github.com/patrickmn/go-cache"
 	fssz "github.com/prysmaticlabs/fastssz"
 	"github.com/theQRL/go-bitfield"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -18,7 +18,7 @@ import (
 func TestKV_Unaggregated_SaveUnaggregatedAttestation(t *testing.T) {
 	tests := []struct {
 		name          string
-		att           *zondpb.Attestation
+		att           *qrysmpb.Attestation
 		count         int
 		wantErrString string
 	}{
@@ -28,13 +28,13 @@ func TestKV_Unaggregated_SaveUnaggregatedAttestation(t *testing.T) {
 		},
 		{
 			name:          "already aggregated",
-			att:           &zondpb.Attestation{AggregationBits: bitfield.Bitlist{0b10101}, Data: &zondpb.AttestationData{Slot: 2}},
+			att:           &qrysmpb.Attestation{AggregationBits: bitfield.Bitlist{0b10101}, Data: &qrysmpb.AttestationData{Slot: 2}},
 			wantErrString: "attestation is aggregated",
 		},
 		{
 			name: "invalid hash",
-			att: &zondpb.Attestation{
-				Data: &zondpb.AttestationData{
+			att: &qrysmpb.Attestation{
+				Data: &qrysmpb.AttestationData{
 					BeaconBlockRoot: []byte{0b0},
 				},
 			},
@@ -42,13 +42,13 @@ func TestKV_Unaggregated_SaveUnaggregatedAttestation(t *testing.T) {
 		},
 		{
 			name:  "normal save",
-			att:   util.HydrateAttestation(&zondpb.Attestation{AggregationBits: bitfield.Bitlist{0b0001}}),
+			att:   util.HydrateAttestation(&qrysmpb.Attestation{AggregationBits: bitfield.Bitlist{0b0001}}),
 			count: 1,
 		},
 		{
 			name: "already seen",
-			att: util.HydrateAttestation(&zondpb.Attestation{
-				Data: &zondpb.AttestationData{
+			att: util.HydrateAttestation(&qrysmpb.Attestation{
+				Data: &qrysmpb.AttestationData{
 					Slot: 100,
 				},
 				AggregationBits: bitfield.Bitlist{0b10000001},
@@ -56,7 +56,7 @@ func TestKV_Unaggregated_SaveUnaggregatedAttestation(t *testing.T) {
 			count: 0,
 		},
 	}
-	r, err := hashFn(util.HydrateAttestationData(&zondpb.AttestationData{Slot: 100}))
+	r, err := hashFn(util.HydrateAttestationData(&qrysmpb.AttestationData{Slot: 100}))
 	require.NoError(t, err)
 
 	for _, tt := range tests {
@@ -84,25 +84,25 @@ func TestKV_Unaggregated_SaveUnaggregatedAttestation(t *testing.T) {
 func TestKV_Unaggregated_SaveUnaggregatedAttestations(t *testing.T) {
 	tests := []struct {
 		name          string
-		atts          []*zondpb.Attestation
+		atts          []*qrysmpb.Attestation
 		count         int
 		wantErrString string
 	}{
 		{
 			name: "unaggregated only",
-			atts: []*zondpb.Attestation{
-				util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}}),
-				util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}}),
-				util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}}),
+			atts: []*qrysmpb.Attestation{
+				util.HydrateAttestation(&qrysmpb.Attestation{Data: &qrysmpb.AttestationData{Slot: 1}}),
+				util.HydrateAttestation(&qrysmpb.Attestation{Data: &qrysmpb.AttestationData{Slot: 2}}),
+				util.HydrateAttestation(&qrysmpb.Attestation{Data: &qrysmpb.AttestationData{Slot: 3}}),
 			},
 			count: 3,
 		},
 		{
 			name: "has aggregated",
-			atts: []*zondpb.Attestation{
-				util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}}),
-				{AggregationBits: bitfield.Bitlist{0b1111}, Data: &zondpb.AttestationData{Slot: 2}},
-				util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}}),
+			atts: []*qrysmpb.Attestation{
+				util.HydrateAttestation(&qrysmpb.Attestation{Data: &qrysmpb.AttestationData{Slot: 1}}),
+				{AggregationBits: bitfield.Bitlist{0b1111}, Data: &qrysmpb.AttestationData{Slot: 2}},
+				util.HydrateAttestation(&qrysmpb.Attestation{Data: &qrysmpb.AttestationData{Slot: 3}}),
 			},
 			wantErrString: "attestation is aggregated",
 			count:         1,
@@ -134,29 +134,29 @@ func TestKV_Unaggregated_DeleteUnaggregatedAttestation(t *testing.T) {
 
 	t.Run("aggregated attestation", func(t *testing.T) {
 		cache := NewAttCaches()
-		att := &zondpb.Attestation{AggregationBits: bitfield.Bitlist{0b1111}, Data: &zondpb.AttestationData{Slot: 2}}
+		att := &qrysmpb.Attestation{AggregationBits: bitfield.Bitlist{0b1111}, Data: &qrysmpb.AttestationData{Slot: 2}}
 		err := cache.DeleteUnaggregatedAttestation(att)
 		assert.ErrorContains(t, "attestation is aggregated", err)
 	})
 
 	t.Run("successful deletion", func(t *testing.T) {
 		cache := NewAttCaches()
-		att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b101}})
-		att2 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2}, AggregationBits: bitfield.Bitlist{0b110}})
-		att3 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 3}, AggregationBits: bitfield.Bitlist{0b110}})
-		atts := []*zondpb.Attestation{att1, att2, att3}
+		att1 := util.HydrateAttestation(&qrysmpb.Attestation{Data: &qrysmpb.AttestationData{Slot: 1}, AggregationBits: bitfield.Bitlist{0b101}})
+		att2 := util.HydrateAttestation(&qrysmpb.Attestation{Data: &qrysmpb.AttestationData{Slot: 2}, AggregationBits: bitfield.Bitlist{0b110}})
+		att3 := util.HydrateAttestation(&qrysmpb.Attestation{Data: &qrysmpb.AttestationData{Slot: 3}, AggregationBits: bitfield.Bitlist{0b110}})
+		atts := []*qrysmpb.Attestation{att1, att2, att3}
 		require.NoError(t, cache.SaveUnaggregatedAttestations(atts))
 		for _, att := range atts {
 			assert.NoError(t, cache.DeleteUnaggregatedAttestation(att))
 		}
 		returned, err := cache.UnaggregatedAttestations()
 		require.NoError(t, err)
-		assert.DeepEqual(t, []*zondpb.Attestation{}, returned)
+		assert.DeepEqual(t, []*qrysmpb.Attestation{}, returned)
 	})
 }
 
 func TestKV_Unaggregated_DeleteSeenUnaggregatedAttestations(t *testing.T) {
-	d := util.HydrateAttestationData(&zondpb.AttestationData{})
+	d := util.HydrateAttestationData(&qrysmpb.AttestationData{})
 
 	t.Run("no attestations", func(t *testing.T) {
 		cache := NewAttCaches()
@@ -167,10 +167,10 @@ func TestKV_Unaggregated_DeleteSeenUnaggregatedAttestations(t *testing.T) {
 
 	t.Run("none seen", func(t *testing.T) {
 		cache := NewAttCaches()
-		atts := []*zondpb.Attestation{
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1001}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1010}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1100}}),
+		atts := []*qrysmpb.Attestation{
+			util.HydrateAttestation(&qrysmpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1001}}),
+			util.HydrateAttestation(&qrysmpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1010}}),
+			util.HydrateAttestation(&qrysmpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1100}}),
 		}
 		require.NoError(t, cache.SaveUnaggregatedAttestations(atts))
 		assert.Equal(t, 3, cache.UnaggregatedAttestationCount())
@@ -184,10 +184,10 @@ func TestKV_Unaggregated_DeleteSeenUnaggregatedAttestations(t *testing.T) {
 
 	t.Run("some seen", func(t *testing.T) {
 		cache := NewAttCaches()
-		atts := []*zondpb.Attestation{
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1001}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1010}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1100}}),
+		atts := []*qrysmpb.Attestation{
+			util.HydrateAttestation(&qrysmpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1001}}),
+			util.HydrateAttestation(&qrysmpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1010}}),
+			util.HydrateAttestation(&qrysmpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1100}}),
 		}
 		require.NoError(t, cache.SaveUnaggregatedAttestations(atts))
 		assert.Equal(t, 3, cache.UnaggregatedAttestationCount())
@@ -204,15 +204,15 @@ func TestKV_Unaggregated_DeleteSeenUnaggregatedAttestations(t *testing.T) {
 			return bytes.Compare(returned[i].AggregationBits, returned[j].AggregationBits) < 0
 		})
 		require.NoError(t, err)
-		assert.DeepEqual(t, []*zondpb.Attestation{atts[0], atts[2]}, returned)
+		assert.DeepEqual(t, []*qrysmpb.Attestation{atts[0], atts[2]}, returned)
 	})
 
 	t.Run("all seen", func(t *testing.T) {
 		cache := NewAttCaches()
-		atts := []*zondpb.Attestation{
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1001}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1010}}),
-			util.HydrateAttestation(&zondpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1100}}),
+		atts := []*qrysmpb.Attestation{
+			util.HydrateAttestation(&qrysmpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1001}}),
+			util.HydrateAttestation(&qrysmpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1010}}),
+			util.HydrateAttestation(&qrysmpb.Attestation{Data: d, AggregationBits: bitfield.Bitlist{0b1100}}),
 		}
 		require.NoError(t, cache.SaveUnaggregatedAttestations(atts))
 		assert.Equal(t, 3, cache.UnaggregatedAttestationCount())
@@ -228,26 +228,26 @@ func TestKV_Unaggregated_DeleteSeenUnaggregatedAttestations(t *testing.T) {
 		assert.Equal(t, 0, cache.UnaggregatedAttestationCount())
 		returned, err := cache.UnaggregatedAttestations()
 		require.NoError(t, err)
-		assert.DeepEqual(t, []*zondpb.Attestation{}, returned)
+		assert.DeepEqual(t, []*qrysmpb.Attestation{}, returned)
 	})
 }
 
 func TestKV_Unaggregated_UnaggregatedAttestationsBySlotIndex(t *testing.T) {
 	cache := NewAttCaches()
 
-	att1 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1, CommitteeIndex: 1}, AggregationBits: bitfield.Bitlist{0b101}})
-	att2 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 1, CommitteeIndex: 2}, AggregationBits: bitfield.Bitlist{0b110}})
-	att3 := util.HydrateAttestation(&zondpb.Attestation{Data: &zondpb.AttestationData{Slot: 2, CommitteeIndex: 1}, AggregationBits: bitfield.Bitlist{0b110}})
-	atts := []*zondpb.Attestation{att1, att2, att3}
+	att1 := util.HydrateAttestation(&qrysmpb.Attestation{Data: &qrysmpb.AttestationData{Slot: 1, CommitteeIndex: 1}, AggregationBits: bitfield.Bitlist{0b101}})
+	att2 := util.HydrateAttestation(&qrysmpb.Attestation{Data: &qrysmpb.AttestationData{Slot: 1, CommitteeIndex: 2}, AggregationBits: bitfield.Bitlist{0b110}})
+	att3 := util.HydrateAttestation(&qrysmpb.Attestation{Data: &qrysmpb.AttestationData{Slot: 2, CommitteeIndex: 1}, AggregationBits: bitfield.Bitlist{0b110}})
+	atts := []*qrysmpb.Attestation{att1, att2, att3}
 
 	for _, att := range atts {
 		require.NoError(t, cache.SaveUnaggregatedAttestation(att))
 	}
 	ctx := context.Background()
 	returned := cache.UnaggregatedAttestationsBySlotIndex(ctx, 1, 1)
-	assert.DeepEqual(t, []*zondpb.Attestation{att1}, returned)
+	assert.DeepEqual(t, []*qrysmpb.Attestation{att1}, returned)
 	returned = cache.UnaggregatedAttestationsBySlotIndex(ctx, 1, 2)
-	assert.DeepEqual(t, []*zondpb.Attestation{att2}, returned)
+	assert.DeepEqual(t, []*qrysmpb.Attestation{att2}, returned)
 	returned = cache.UnaggregatedAttestationsBySlotIndex(ctx, 2, 1)
-	assert.DeepEqual(t, []*zondpb.Attestation{att3}, returned)
+	assert.DeepEqual(t, []*qrysmpb.Attestation{att3}, returned)
 }

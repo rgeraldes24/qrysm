@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"google.golang.org/protobuf/proto"
 )
 
 // constructGenericBeaconBlock constructs a `GenericBeaconBlock` based on the block version and other parameters.
-func (vs *Server) constructGenericBeaconBlock(sBlk interfaces.SignedBeaconBlock) (*zondpb.GenericBeaconBlock, error) {
+func (vs *Server) constructGenericBeaconBlock(sBlk interfaces.SignedBeaconBlock) (*qrysmpb.GenericBeaconBlock, error) {
 	if sBlk == nil || sBlk.Block() == nil {
 		return nil, fmt.Errorf("block cannot be nil")
 	}
@@ -31,9 +31,9 @@ func (vs *Server) constructGenericBeaconBlock(sBlk interfaces.SignedBeaconBlock)
 	}
 }
 
-func (vs *Server) constructCapellaBlock(pb proto.Message, isBlinded bool, payloadValue uint64) *zondpb.GenericBeaconBlock {
+func (vs *Server) constructCapellaBlock(pb proto.Message, isBlinded bool, payloadValue uint64) *qrysmpb.GenericBeaconBlock {
 	if isBlinded {
-		return &zondpb.GenericBeaconBlock{Block: &zondpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: pb.(*zondpb.BlindedBeaconBlockCapella)}, IsBlinded: true, PayloadValue: payloadValue}
+		return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: pb.(*qrysmpb.BlindedBeaconBlockCapella)}, IsBlinded: true, PayloadValue: payloadValue}
 	}
-	return &zondpb.GenericBeaconBlock{Block: &zondpb.GenericBeaconBlock_Capella{Capella: pb.(*zondpb.BeaconBlockCapella)}, IsBlinded: false, PayloadValue: payloadValue}
+	return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: pb.(*qrysmpb.BeaconBlockCapella)}, IsBlinded: false, PayloadValue: payloadValue}
 }

@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: proto/qrysm/v1alpha1/attestation.proto
 
-package zond
+package qrl
 
 import (
 	reflect "reflect"
@@ -445,18 +445,18 @@ func file_proto_qrysm_v1alpha1_attestation_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_attestation_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_proto_qrysm_v1alpha1_attestation_proto_goTypes = []interface{}{
-	(*Attestation)(nil),                        // 0: theqrl.zond.v1alpha1.Attestation
-	(*AggregateAttestationAndProof)(nil),       // 1: theqrl.zond.v1alpha1.AggregateAttestationAndProof
-	(*SignedAggregateAttestationAndProof)(nil), // 2: theqrl.zond.v1alpha1.SignedAggregateAttestationAndProof
-	(*AttestationData)(nil),                    // 3: theqrl.zond.v1alpha1.AttestationData
-	(*Checkpoint)(nil),                         // 4: theqrl.zond.v1alpha1.Checkpoint
+	(*Attestation)(nil),                        // 0: theqrl.qrl.v1alpha1.Attestation
+	(*AggregateAttestationAndProof)(nil),       // 1: theqrl.qrl.v1alpha1.AggregateAttestationAndProof
+	(*SignedAggregateAttestationAndProof)(nil), // 2: theqrl.qrl.v1alpha1.SignedAggregateAttestationAndProof
+	(*AttestationData)(nil),                    // 3: theqrl.qrl.v1alpha1.AttestationData
+	(*Checkpoint)(nil),                         // 4: theqrl.qrl.v1alpha1.Checkpoint
 }
 var file_proto_qrysm_v1alpha1_attestation_proto_depIdxs = []int32{
-	3, // 0: theqrl.zond.v1alpha1.Attestation.data:type_name -> theqrl.zond.v1alpha1.AttestationData
-	0, // 1: theqrl.zond.v1alpha1.AggregateAttestationAndProof.aggregate:type_name -> theqrl.zond.v1alpha1.Attestation
-	1, // 2: theqrl.zond.v1alpha1.SignedAggregateAttestationAndProof.message:type_name -> theqrl.zond.v1alpha1.AggregateAttestationAndProof
-	4, // 3: theqrl.zond.v1alpha1.AttestationData.source:type_name -> theqrl.zond.v1alpha1.Checkpoint
-	4, // 4: theqrl.zond.v1alpha1.AttestationData.target:type_name -> theqrl.zond.v1alpha1.Checkpoint
+	3, // 0: theqrl.qrl.v1alpha1.Attestation.data:type_name -> theqrl.qrl.v1alpha1.AttestationData
+	0, // 1: theqrl.qrl.v1alpha1.AggregateAttestationAndProof.aggregate:type_name -> theqrl.qrl.v1alpha1.Attestation
+	1, // 2: theqrl.qrl.v1alpha1.SignedAggregateAttestationAndProof.message:type_name -> theqrl.qrl.v1alpha1.AggregateAttestationAndProof
+	4, // 3: theqrl.qrl.v1alpha1.AttestationData.source:type_name -> theqrl.qrl.v1alpha1.Checkpoint
+	4, // 4: theqrl.qrl.v1alpha1.AttestationData.target:type_name -> theqrl.qrl.v1alpha1.Checkpoint
 	5, // [5:5] is the sub-list for method output_type
 	5, // [5:5] is the sub-list for method input_type
 	5, // [5:5] is the sub-list for extension type_name

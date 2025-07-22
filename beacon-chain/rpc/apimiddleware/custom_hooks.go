@@ -10,7 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/api/gateway/apimiddleware"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 )
 
 // https://ethereum.github.io/beacon-APIs/?urls.primaryName=dev#/Beacon/submitPoolBLSToExecutionChange
@@ -229,7 +229,7 @@ func serializeBlock(response interface{}) (apimiddleware.RunDefault, []byte, api
 
 	var actualRespContainer interface{}
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv1.Version_CAPELLA.String())):
+	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
 		actualRespContainer = &capellaBlockResponseJson{
 			Version: respContainer.Version,
 			Data: &SignedBeaconBlockCapellaJson{
@@ -258,7 +258,7 @@ func serializeBlindedBlock(response interface{}) (apimiddleware.RunDefault, []by
 
 	var actualRespContainer interface{}
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv1.Version_CAPELLA.String())):
+	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
 		actualRespContainer = &capellaBlindedBlockResponseJson{
 			Version: respContainer.Version,
 			Data: &SignedBlindedBeaconBlockCapellaJson{
@@ -292,7 +292,7 @@ func serializeState(response interface{}) (apimiddleware.RunDefault, []byte, api
 
 	var actualRespContainer interface{}
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv1.Version_CAPELLA.String())):
+	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
 		actualRespContainer = &capellaStateResponseJson{
 			Version: respContainer.Version,
 			Data:    respContainer.Data.CapellaState,
@@ -326,7 +326,7 @@ func serializeProducedBlock(response interface{}) (apimiddleware.RunDefault, []b
 
 	var actualRespContainer interface{}
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv1.Version_CAPELLA.String())):
+	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
 		actualRespContainer = &capellaProduceBlockResponseJson{
 			Version: respContainer.Version,
 			Data:    respContainer.Data.CapellaBlock,
@@ -350,7 +350,7 @@ func serializeProducedBlindedBlock(response interface{}) (apimiddleware.RunDefau
 
 	var actualRespContainer interface{}
 	switch {
-	case strings.EqualFold(respContainer.Version, strings.ToLower(zondpbv1.Version_CAPELLA.String())):
+	case strings.EqualFold(respContainer.Version, strings.ToLower(qrlpb.Version_CAPELLA.String())):
 		actualRespContainer = &capellaProduceBlindedBlockResponseJson{
 			Version: respContainer.Version,
 			Data:    respContainer.Data.CapellaBlock,

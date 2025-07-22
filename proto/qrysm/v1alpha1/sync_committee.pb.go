@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: proto/qrysm/v1alpha1/sync_committee.proto
 
-package zond
+package qrl
 
 import (
 	reflect "reflect"
@@ -393,14 +393,14 @@ func file_proto_qrysm_v1alpha1_sync_committee_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_sync_committee_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_proto_qrysm_v1alpha1_sync_committee_proto_goTypes = []interface{}{
-	(*SyncCommitteeMessage)(nil),       // 0: theqrl.zond.v1alpha1.SyncCommitteeMessage
-	(*SyncCommitteeContribution)(nil),  // 1: theqrl.zond.v1alpha1.SyncCommitteeContribution
-	(*ContributionAndProof)(nil),       // 2: theqrl.zond.v1alpha1.ContributionAndProof
-	(*SignedContributionAndProof)(nil), // 3: theqrl.zond.v1alpha1.SignedContributionAndProof
+	(*SyncCommitteeMessage)(nil),       // 0: theqrl.qrl.v1alpha1.SyncCommitteeMessage
+	(*SyncCommitteeContribution)(nil),  // 1: theqrl.qrl.v1alpha1.SyncCommitteeContribution
+	(*ContributionAndProof)(nil),       // 2: theqrl.qrl.v1alpha1.ContributionAndProof
+	(*SignedContributionAndProof)(nil), // 3: theqrl.qrl.v1alpha1.SignedContributionAndProof
 }
 var file_proto_qrysm_v1alpha1_sync_committee_proto_depIdxs = []int32{
-	1, // 0: theqrl.zond.v1alpha1.ContributionAndProof.contribution:type_name -> theqrl.zond.v1alpha1.SyncCommitteeContribution
-	2, // 1: theqrl.zond.v1alpha1.SignedContributionAndProof.message:type_name -> theqrl.zond.v1alpha1.ContributionAndProof
+	1, // 0: theqrl.qrl.v1alpha1.ContributionAndProof.contribution:type_name -> theqrl.qrl.v1alpha1.SyncCommitteeContribution
+	2, // 1: theqrl.qrl.v1alpha1.SignedContributionAndProof.message:type_name -> theqrl.qrl.v1alpha1.ContributionAndProof
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

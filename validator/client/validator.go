@@ -1084,7 +1084,7 @@ func (v *validator) buildPrepProposerReqs(ctx context.Context, pubkeys [][fieldp
 				FeeRecipient:   feeRecipient[:],
 			})
 
-			if hexutil.EncodeQ(feeRecipient.Bytes()) == params.BeaconConfig().ZondBurnAddress {
+			if hexutil.EncodeQ(feeRecipient.Bytes()) == params.BeaconConfig().QRLBurnAddress {
 				log.WithFields(logrus.Fields{
 					"validatorIndex": validatorIndex,
 					"feeRecipient":   feeRecipient,
@@ -1103,7 +1103,7 @@ func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][fieldpara
 		return signedValRegRegs, nil
 	}
 	for i, k := range pubkeys {
-		feeRecipient, err := common.NewAddressFromString(params.BeaconConfig().ZondBurnAddress)
+		feeRecipient, err := common.NewAddressFromString(params.BeaconConfig().QRLBurnAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -1165,7 +1165,7 @@ func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][fieldpara
 
 		signedValRegRegs = append(signedValRegRegs, signedReq)
 
-		if hexutil.EncodeQ(feeRecipient.Bytes()) == params.BeaconConfig().ZondBurnAddress {
+		if hexutil.EncodeQ(feeRecipient.Bytes()) == params.BeaconConfig().QRLBurnAddress {
 			log.WithFields(logrus.Fields{
 				"pubkey":       fmt.Sprintf("%#x", req.Pubkey),
 				"feeRecipient": feeRecipient,

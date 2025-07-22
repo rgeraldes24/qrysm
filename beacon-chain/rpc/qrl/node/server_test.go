@@ -1,7 +1,7 @@
 package node
 
 import (
-	zondpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 )
 
-var _ zondpbservice.BeaconNodeServer = (*Server)(nil)
+var _ qrlpbservice.BeaconNodeServer = (*Server)(nil)

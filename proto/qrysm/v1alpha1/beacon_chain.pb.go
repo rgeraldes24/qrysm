@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: proto/qrysm/v1alpha1/beacon_chain.proto
 
-package zond
+package qrl
 
 import (
 	context "context"
@@ -3779,105 +3779,105 @@ func file_proto_qrysm_v1alpha1_beacon_chain_proto_rawDescGZIP() []byte {
 var file_proto_qrysm_v1alpha1_beacon_chain_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_qrysm_v1alpha1_beacon_chain_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
 var file_proto_qrysm_v1alpha1_beacon_chain_proto_goTypes = []interface{}{
-	(SetAction)(0),                                   // 0: theqrl.zond.v1alpha1.SetAction
-	(*ListIndexedAttestationsRequest)(nil),           // 1: theqrl.zond.v1alpha1.ListIndexedAttestationsRequest
-	(*ListAttestationsRequest)(nil),                  // 2: theqrl.zond.v1alpha1.ListAttestationsRequest
-	(*ListAttestationsResponse)(nil),                 // 3: theqrl.zond.v1alpha1.ListAttestationsResponse
-	(*ListIndexedAttestationsResponse)(nil),          // 4: theqrl.zond.v1alpha1.ListIndexedAttestationsResponse
-	(*ListBlocksRequest)(nil),                        // 5: theqrl.zond.v1alpha1.ListBlocksRequest
-	(*ListBeaconBlocksResponse)(nil),                 // 6: theqrl.zond.v1alpha1.ListBeaconBlocksResponse
-	(*BeaconBlockContainer)(nil),                     // 7: theqrl.zond.v1alpha1.BeaconBlockContainer
-	(*ChainHead)(nil),                                // 8: theqrl.zond.v1alpha1.ChainHead
-	(*ListCommitteesRequest)(nil),                    // 9: theqrl.zond.v1alpha1.ListCommitteesRequest
-	(*BeaconCommittees)(nil),                         // 10: theqrl.zond.v1alpha1.BeaconCommittees
-	(*ListValidatorBalancesRequest)(nil),             // 11: theqrl.zond.v1alpha1.ListValidatorBalancesRequest
-	(*ValidatorBalances)(nil),                        // 12: theqrl.zond.v1alpha1.ValidatorBalances
-	(*ListValidatorsRequest)(nil),                    // 13: theqrl.zond.v1alpha1.ListValidatorsRequest
-	(*GetValidatorRequest)(nil),                      // 14: theqrl.zond.v1alpha1.GetValidatorRequest
-	(*Validators)(nil),                               // 15: theqrl.zond.v1alpha1.Validators
-	(*GetValidatorActiveSetChangesRequest)(nil),      // 16: theqrl.zond.v1alpha1.GetValidatorActiveSetChangesRequest
-	(*ActiveSetChanges)(nil),                         // 17: theqrl.zond.v1alpha1.ActiveSetChanges
-	(*ValidatorPerformanceRequest)(nil),              // 18: theqrl.zond.v1alpha1.ValidatorPerformanceRequest
-	(*ValidatorPerformanceResponse)(nil),             // 19: theqrl.zond.v1alpha1.ValidatorPerformanceResponse
-	(*ListValidatorAssignmentsRequest)(nil),          // 20: theqrl.zond.v1alpha1.ListValidatorAssignmentsRequest
-	(*ValidatorAssignments)(nil),                     // 21: theqrl.zond.v1alpha1.ValidatorAssignments
-	(*GetValidatorParticipationRequest)(nil),         // 22: theqrl.zond.v1alpha1.GetValidatorParticipationRequest
-	(*ValidatorParticipationResponse)(nil),           // 23: theqrl.zond.v1alpha1.ValidatorParticipationResponse
-	(*AttestationPoolRequest)(nil),                   // 24: theqrl.zond.v1alpha1.AttestationPoolRequest
-	(*AttestationPoolResponse)(nil),                  // 25: theqrl.zond.v1alpha1.AttestationPoolResponse
-	(*BeaconConfig)(nil),                             // 26: theqrl.zond.v1alpha1.BeaconConfig
-	(*SubmitSlashingResponse)(nil),                   // 27: theqrl.zond.v1alpha1.SubmitSlashingResponse
-	(*IndividualVotesRequest)(nil),                   // 28: theqrl.zond.v1alpha1.IndividualVotesRequest
-	(*IndividualVotesRespond)(nil),                   // 29: theqrl.zond.v1alpha1.IndividualVotesRespond
-	(*BeaconCommittees_CommitteeItem)(nil),           // 30: theqrl.zond.v1alpha1.BeaconCommittees.CommitteeItem
-	(*BeaconCommittees_CommitteesList)(nil),          // 31: theqrl.zond.v1alpha1.BeaconCommittees.CommitteesList
-	nil,                                              // 32: theqrl.zond.v1alpha1.BeaconCommittees.CommitteesEntry
-	(*ValidatorBalances_Balance)(nil),                // 33: theqrl.zond.v1alpha1.ValidatorBalances.Balance
-	(*Validators_ValidatorContainer)(nil),            // 34: theqrl.zond.v1alpha1.Validators.ValidatorContainer
-	(*ValidatorAssignments_CommitteeAssignment)(nil), // 35: theqrl.zond.v1alpha1.ValidatorAssignments.CommitteeAssignment
-	nil, // 36: theqrl.zond.v1alpha1.BeaconConfig.ConfigEntry
-	(*IndividualVotesRespond_IndividualVote)(nil), // 37: theqrl.zond.v1alpha1.IndividualVotesRespond.IndividualVote
-	(*Attestation)(nil),                           // 38: theqrl.zond.v1alpha1.Attestation
-	(*IndexedAttestation)(nil),                    // 39: theqrl.zond.v1alpha1.IndexedAttestation
-	(*SignedBeaconBlockCapella)(nil),              // 40: theqrl.zond.v1alpha1.SignedBeaconBlockCapella
-	(*SignedBlindedBeaconBlockCapella)(nil),       // 41: theqrl.zond.v1alpha1.SignedBlindedBeaconBlockCapella
-	(*ValidatorParticipation)(nil),                // 42: theqrl.zond.v1alpha1.ValidatorParticipation
-	(*Validator)(nil),                             // 43: theqrl.zond.v1alpha1.Validator
+	(SetAction)(0),                                   // 0: theqrl.qrl.v1alpha1.SetAction
+	(*ListIndexedAttestationsRequest)(nil),           // 1: theqrl.qrl.v1alpha1.ListIndexedAttestationsRequest
+	(*ListAttestationsRequest)(nil),                  // 2: theqrl.qrl.v1alpha1.ListAttestationsRequest
+	(*ListAttestationsResponse)(nil),                 // 3: theqrl.qrl.v1alpha1.ListAttestationsResponse
+	(*ListIndexedAttestationsResponse)(nil),          // 4: theqrl.qrl.v1alpha1.ListIndexedAttestationsResponse
+	(*ListBlocksRequest)(nil),                        // 5: theqrl.qrl.v1alpha1.ListBlocksRequest
+	(*ListBeaconBlocksResponse)(nil),                 // 6: theqrl.qrl.v1alpha1.ListBeaconBlocksResponse
+	(*BeaconBlockContainer)(nil),                     // 7: theqrl.qrl.v1alpha1.BeaconBlockContainer
+	(*ChainHead)(nil),                                // 8: theqrl.qrl.v1alpha1.ChainHead
+	(*ListCommitteesRequest)(nil),                    // 9: theqrl.qrl.v1alpha1.ListCommitteesRequest
+	(*BeaconCommittees)(nil),                         // 10: theqrl.qrl.v1alpha1.BeaconCommittees
+	(*ListValidatorBalancesRequest)(nil),             // 11: theqrl.qrl.v1alpha1.ListValidatorBalancesRequest
+	(*ValidatorBalances)(nil),                        // 12: theqrl.qrl.v1alpha1.ValidatorBalances
+	(*ListValidatorsRequest)(nil),                    // 13: theqrl.qrl.v1alpha1.ListValidatorsRequest
+	(*GetValidatorRequest)(nil),                      // 14: theqrl.qrl.v1alpha1.GetValidatorRequest
+	(*Validators)(nil),                               // 15: theqrl.qrl.v1alpha1.Validators
+	(*GetValidatorActiveSetChangesRequest)(nil),      // 16: theqrl.qrl.v1alpha1.GetValidatorActiveSetChangesRequest
+	(*ActiveSetChanges)(nil),                         // 17: theqrl.qrl.v1alpha1.ActiveSetChanges
+	(*ValidatorPerformanceRequest)(nil),              // 18: theqrl.qrl.v1alpha1.ValidatorPerformanceRequest
+	(*ValidatorPerformanceResponse)(nil),             // 19: theqrl.qrl.v1alpha1.ValidatorPerformanceResponse
+	(*ListValidatorAssignmentsRequest)(nil),          // 20: theqrl.qrl.v1alpha1.ListValidatorAssignmentsRequest
+	(*ValidatorAssignments)(nil),                     // 21: theqrl.qrl.v1alpha1.ValidatorAssignments
+	(*GetValidatorParticipationRequest)(nil),         // 22: theqrl.qrl.v1alpha1.GetValidatorParticipationRequest
+	(*ValidatorParticipationResponse)(nil),           // 23: theqrl.qrl.v1alpha1.ValidatorParticipationResponse
+	(*AttestationPoolRequest)(nil),                   // 24: theqrl.qrl.v1alpha1.AttestationPoolRequest
+	(*AttestationPoolResponse)(nil),                  // 25: theqrl.qrl.v1alpha1.AttestationPoolResponse
+	(*BeaconConfig)(nil),                             // 26: theqrl.qrl.v1alpha1.BeaconConfig
+	(*SubmitSlashingResponse)(nil),                   // 27: theqrl.qrl.v1alpha1.SubmitSlashingResponse
+	(*IndividualVotesRequest)(nil),                   // 28: theqrl.qrl.v1alpha1.IndividualVotesRequest
+	(*IndividualVotesRespond)(nil),                   // 29: theqrl.qrl.v1alpha1.IndividualVotesRespond
+	(*BeaconCommittees_CommitteeItem)(nil),           // 30: theqrl.qrl.v1alpha1.BeaconCommittees.CommitteeItem
+	(*BeaconCommittees_CommitteesList)(nil),          // 31: theqrl.qrl.v1alpha1.BeaconCommittees.CommitteesList
+	nil,                                              // 32: theqrl.qrl.v1alpha1.BeaconCommittees.CommitteesEntry
+	(*ValidatorBalances_Balance)(nil),                // 33: theqrl.qrl.v1alpha1.ValidatorBalances.Balance
+	(*Validators_ValidatorContainer)(nil),            // 34: theqrl.qrl.v1alpha1.Validators.ValidatorContainer
+	(*ValidatorAssignments_CommitteeAssignment)(nil), // 35: theqrl.qrl.v1alpha1.ValidatorAssignments.CommitteeAssignment
+	nil, // 36: theqrl.qrl.v1alpha1.BeaconConfig.ConfigEntry
+	(*IndividualVotesRespond_IndividualVote)(nil), // 37: theqrl.qrl.v1alpha1.IndividualVotesRespond.IndividualVote
+	(*Attestation)(nil),                           // 38: theqrl.qrl.v1alpha1.Attestation
+	(*IndexedAttestation)(nil),                    // 39: theqrl.qrl.v1alpha1.IndexedAttestation
+	(*SignedBeaconBlockCapella)(nil),              // 40: theqrl.qrl.v1alpha1.SignedBeaconBlockCapella
+	(*SignedBlindedBeaconBlockCapella)(nil),       // 41: theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockCapella
+	(*ValidatorParticipation)(nil),                // 42: theqrl.qrl.v1alpha1.ValidatorParticipation
+	(*Validator)(nil),                             // 43: theqrl.qrl.v1alpha1.Validator
 	(*emptypb.Empty)(nil),                         // 44: google.protobuf.Empty
-	(*AttesterSlashing)(nil),                      // 45: theqrl.zond.v1alpha1.AttesterSlashing
-	(*ProposerSlashing)(nil),                      // 46: theqrl.zond.v1alpha1.ProposerSlashing
+	(*AttesterSlashing)(nil),                      // 45: theqrl.qrl.v1alpha1.AttesterSlashing
+	(*ProposerSlashing)(nil),                      // 46: theqrl.qrl.v1alpha1.ProposerSlashing
 }
 var file_proto_qrysm_v1alpha1_beacon_chain_proto_depIdxs = []int32{
-	38, // 0: theqrl.zond.v1alpha1.ListAttestationsResponse.attestations:type_name -> theqrl.zond.v1alpha1.Attestation
-	39, // 1: theqrl.zond.v1alpha1.ListIndexedAttestationsResponse.indexed_attestations:type_name -> theqrl.zond.v1alpha1.IndexedAttestation
-	7,  // 2: theqrl.zond.v1alpha1.ListBeaconBlocksResponse.block_containers:type_name -> theqrl.zond.v1alpha1.BeaconBlockContainer
-	40, // 3: theqrl.zond.v1alpha1.BeaconBlockContainer.capella_block:type_name -> theqrl.zond.v1alpha1.SignedBeaconBlockCapella
-	41, // 4: theqrl.zond.v1alpha1.BeaconBlockContainer.blinded_capella_block:type_name -> theqrl.zond.v1alpha1.SignedBlindedBeaconBlockCapella
-	32, // 5: theqrl.zond.v1alpha1.BeaconCommittees.committees:type_name -> theqrl.zond.v1alpha1.BeaconCommittees.CommitteesEntry
-	33, // 6: theqrl.zond.v1alpha1.ValidatorBalances.balances:type_name -> theqrl.zond.v1alpha1.ValidatorBalances.Balance
-	34, // 7: theqrl.zond.v1alpha1.Validators.validator_list:type_name -> theqrl.zond.v1alpha1.Validators.ValidatorContainer
-	35, // 8: theqrl.zond.v1alpha1.ValidatorAssignments.assignments:type_name -> theqrl.zond.v1alpha1.ValidatorAssignments.CommitteeAssignment
-	42, // 9: theqrl.zond.v1alpha1.ValidatorParticipationResponse.participation:type_name -> theqrl.zond.v1alpha1.ValidatorParticipation
-	38, // 10: theqrl.zond.v1alpha1.AttestationPoolResponse.attestations:type_name -> theqrl.zond.v1alpha1.Attestation
-	36, // 11: theqrl.zond.v1alpha1.BeaconConfig.config:type_name -> theqrl.zond.v1alpha1.BeaconConfig.ConfigEntry
-	37, // 12: theqrl.zond.v1alpha1.IndividualVotesRespond.individual_votes:type_name -> theqrl.zond.v1alpha1.IndividualVotesRespond.IndividualVote
-	30, // 13: theqrl.zond.v1alpha1.BeaconCommittees.CommitteesList.committees:type_name -> theqrl.zond.v1alpha1.BeaconCommittees.CommitteeItem
-	31, // 14: theqrl.zond.v1alpha1.BeaconCommittees.CommitteesEntry.value:type_name -> theqrl.zond.v1alpha1.BeaconCommittees.CommitteesList
-	43, // 15: theqrl.zond.v1alpha1.Validators.ValidatorContainer.validator:type_name -> theqrl.zond.v1alpha1.Validator
-	2,  // 16: theqrl.zond.v1alpha1.BeaconChain.ListAttestations:input_type -> theqrl.zond.v1alpha1.ListAttestationsRequest
-	1,  // 17: theqrl.zond.v1alpha1.BeaconChain.ListIndexedAttestations:input_type -> theqrl.zond.v1alpha1.ListIndexedAttestationsRequest
-	24, // 18: theqrl.zond.v1alpha1.BeaconChain.AttestationPool:input_type -> theqrl.zond.v1alpha1.AttestationPoolRequest
-	5,  // 19: theqrl.zond.v1alpha1.BeaconChain.ListBeaconBlocks:input_type -> theqrl.zond.v1alpha1.ListBlocksRequest
-	44, // 20: theqrl.zond.v1alpha1.BeaconChain.GetChainHead:input_type -> google.protobuf.Empty
-	9,  // 21: theqrl.zond.v1alpha1.BeaconChain.ListBeaconCommittees:input_type -> theqrl.zond.v1alpha1.ListCommitteesRequest
-	11, // 22: theqrl.zond.v1alpha1.BeaconChain.ListValidatorBalances:input_type -> theqrl.zond.v1alpha1.ListValidatorBalancesRequest
-	13, // 23: theqrl.zond.v1alpha1.BeaconChain.ListValidators:input_type -> theqrl.zond.v1alpha1.ListValidatorsRequest
-	14, // 24: theqrl.zond.v1alpha1.BeaconChain.GetValidator:input_type -> theqrl.zond.v1alpha1.GetValidatorRequest
-	16, // 25: theqrl.zond.v1alpha1.BeaconChain.GetValidatorActiveSetChanges:input_type -> theqrl.zond.v1alpha1.GetValidatorActiveSetChangesRequest
-	18, // 26: theqrl.zond.v1alpha1.BeaconChain.GetValidatorPerformance:input_type -> theqrl.zond.v1alpha1.ValidatorPerformanceRequest
-	20, // 27: theqrl.zond.v1alpha1.BeaconChain.ListValidatorAssignments:input_type -> theqrl.zond.v1alpha1.ListValidatorAssignmentsRequest
-	22, // 28: theqrl.zond.v1alpha1.BeaconChain.GetValidatorParticipation:input_type -> theqrl.zond.v1alpha1.GetValidatorParticipationRequest
-	44, // 29: theqrl.zond.v1alpha1.BeaconChain.GetBeaconConfig:input_type -> google.protobuf.Empty
-	45, // 30: theqrl.zond.v1alpha1.BeaconChain.SubmitAttesterSlashing:input_type -> theqrl.zond.v1alpha1.AttesterSlashing
-	46, // 31: theqrl.zond.v1alpha1.BeaconChain.SubmitProposerSlashing:input_type -> theqrl.zond.v1alpha1.ProposerSlashing
-	28, // 32: theqrl.zond.v1alpha1.BeaconChain.GetIndividualVotes:input_type -> theqrl.zond.v1alpha1.IndividualVotesRequest
-	3,  // 33: theqrl.zond.v1alpha1.BeaconChain.ListAttestations:output_type -> theqrl.zond.v1alpha1.ListAttestationsResponse
-	4,  // 34: theqrl.zond.v1alpha1.BeaconChain.ListIndexedAttestations:output_type -> theqrl.zond.v1alpha1.ListIndexedAttestationsResponse
-	25, // 35: theqrl.zond.v1alpha1.BeaconChain.AttestationPool:output_type -> theqrl.zond.v1alpha1.AttestationPoolResponse
-	6,  // 36: theqrl.zond.v1alpha1.BeaconChain.ListBeaconBlocks:output_type -> theqrl.zond.v1alpha1.ListBeaconBlocksResponse
-	8,  // 37: theqrl.zond.v1alpha1.BeaconChain.GetChainHead:output_type -> theqrl.zond.v1alpha1.ChainHead
-	10, // 38: theqrl.zond.v1alpha1.BeaconChain.ListBeaconCommittees:output_type -> theqrl.zond.v1alpha1.BeaconCommittees
-	12, // 39: theqrl.zond.v1alpha1.BeaconChain.ListValidatorBalances:output_type -> theqrl.zond.v1alpha1.ValidatorBalances
-	15, // 40: theqrl.zond.v1alpha1.BeaconChain.ListValidators:output_type -> theqrl.zond.v1alpha1.Validators
-	43, // 41: theqrl.zond.v1alpha1.BeaconChain.GetValidator:output_type -> theqrl.zond.v1alpha1.Validator
-	17, // 42: theqrl.zond.v1alpha1.BeaconChain.GetValidatorActiveSetChanges:output_type -> theqrl.zond.v1alpha1.ActiveSetChanges
-	19, // 43: theqrl.zond.v1alpha1.BeaconChain.GetValidatorPerformance:output_type -> theqrl.zond.v1alpha1.ValidatorPerformanceResponse
-	21, // 44: theqrl.zond.v1alpha1.BeaconChain.ListValidatorAssignments:output_type -> theqrl.zond.v1alpha1.ValidatorAssignments
-	23, // 45: theqrl.zond.v1alpha1.BeaconChain.GetValidatorParticipation:output_type -> theqrl.zond.v1alpha1.ValidatorParticipationResponse
-	26, // 46: theqrl.zond.v1alpha1.BeaconChain.GetBeaconConfig:output_type -> theqrl.zond.v1alpha1.BeaconConfig
-	27, // 47: theqrl.zond.v1alpha1.BeaconChain.SubmitAttesterSlashing:output_type -> theqrl.zond.v1alpha1.SubmitSlashingResponse
-	27, // 48: theqrl.zond.v1alpha1.BeaconChain.SubmitProposerSlashing:output_type -> theqrl.zond.v1alpha1.SubmitSlashingResponse
-	29, // 49: theqrl.zond.v1alpha1.BeaconChain.GetIndividualVotes:output_type -> theqrl.zond.v1alpha1.IndividualVotesRespond
+	38, // 0: theqrl.qrl.v1alpha1.ListAttestationsResponse.attestations:type_name -> theqrl.qrl.v1alpha1.Attestation
+	39, // 1: theqrl.qrl.v1alpha1.ListIndexedAttestationsResponse.indexed_attestations:type_name -> theqrl.qrl.v1alpha1.IndexedAttestation
+	7,  // 2: theqrl.qrl.v1alpha1.ListBeaconBlocksResponse.block_containers:type_name -> theqrl.qrl.v1alpha1.BeaconBlockContainer
+	40, // 3: theqrl.qrl.v1alpha1.BeaconBlockContainer.capella_block:type_name -> theqrl.qrl.v1alpha1.SignedBeaconBlockCapella
+	41, // 4: theqrl.qrl.v1alpha1.BeaconBlockContainer.blinded_capella_block:type_name -> theqrl.qrl.v1alpha1.SignedBlindedBeaconBlockCapella
+	32, // 5: theqrl.qrl.v1alpha1.BeaconCommittees.committees:type_name -> theqrl.qrl.v1alpha1.BeaconCommittees.CommitteesEntry
+	33, // 6: theqrl.qrl.v1alpha1.ValidatorBalances.balances:type_name -> theqrl.qrl.v1alpha1.ValidatorBalances.Balance
+	34, // 7: theqrl.qrl.v1alpha1.Validators.validator_list:type_name -> theqrl.qrl.v1alpha1.Validators.ValidatorContainer
+	35, // 8: theqrl.qrl.v1alpha1.ValidatorAssignments.assignments:type_name -> theqrl.qrl.v1alpha1.ValidatorAssignments.CommitteeAssignment
+	42, // 9: theqrl.qrl.v1alpha1.ValidatorParticipationResponse.participation:type_name -> theqrl.qrl.v1alpha1.ValidatorParticipation
+	38, // 10: theqrl.qrl.v1alpha1.AttestationPoolResponse.attestations:type_name -> theqrl.qrl.v1alpha1.Attestation
+	36, // 11: theqrl.qrl.v1alpha1.BeaconConfig.config:type_name -> theqrl.qrl.v1alpha1.BeaconConfig.ConfigEntry
+	37, // 12: theqrl.qrl.v1alpha1.IndividualVotesRespond.individual_votes:type_name -> theqrl.qrl.v1alpha1.IndividualVotesRespond.IndividualVote
+	30, // 13: theqrl.qrl.v1alpha1.BeaconCommittees.CommitteesList.committees:type_name -> theqrl.qrl.v1alpha1.BeaconCommittees.CommitteeItem
+	31, // 14: theqrl.qrl.v1alpha1.BeaconCommittees.CommitteesEntry.value:type_name -> theqrl.qrl.v1alpha1.BeaconCommittees.CommitteesList
+	43, // 15: theqrl.qrl.v1alpha1.Validators.ValidatorContainer.validator:type_name -> theqrl.qrl.v1alpha1.Validator
+	2,  // 16: theqrl.qrl.v1alpha1.BeaconChain.ListAttestations:input_type -> theqrl.qrl.v1alpha1.ListAttestationsRequest
+	1,  // 17: theqrl.qrl.v1alpha1.BeaconChain.ListIndexedAttestations:input_type -> theqrl.qrl.v1alpha1.ListIndexedAttestationsRequest
+	24, // 18: theqrl.qrl.v1alpha1.BeaconChain.AttestationPool:input_type -> theqrl.qrl.v1alpha1.AttestationPoolRequest
+	5,  // 19: theqrl.qrl.v1alpha1.BeaconChain.ListBeaconBlocks:input_type -> theqrl.qrl.v1alpha1.ListBlocksRequest
+	44, // 20: theqrl.qrl.v1alpha1.BeaconChain.GetChainHead:input_type -> google.protobuf.Empty
+	9,  // 21: theqrl.qrl.v1alpha1.BeaconChain.ListBeaconCommittees:input_type -> theqrl.qrl.v1alpha1.ListCommitteesRequest
+	11, // 22: theqrl.qrl.v1alpha1.BeaconChain.ListValidatorBalances:input_type -> theqrl.qrl.v1alpha1.ListValidatorBalancesRequest
+	13, // 23: theqrl.qrl.v1alpha1.BeaconChain.ListValidators:input_type -> theqrl.qrl.v1alpha1.ListValidatorsRequest
+	14, // 24: theqrl.qrl.v1alpha1.BeaconChain.GetValidator:input_type -> theqrl.qrl.v1alpha1.GetValidatorRequest
+	16, // 25: theqrl.qrl.v1alpha1.BeaconChain.GetValidatorActiveSetChanges:input_type -> theqrl.qrl.v1alpha1.GetValidatorActiveSetChangesRequest
+	18, // 26: theqrl.qrl.v1alpha1.BeaconChain.GetValidatorPerformance:input_type -> theqrl.qrl.v1alpha1.ValidatorPerformanceRequest
+	20, // 27: theqrl.qrl.v1alpha1.BeaconChain.ListValidatorAssignments:input_type -> theqrl.qrl.v1alpha1.ListValidatorAssignmentsRequest
+	22, // 28: theqrl.qrl.v1alpha1.BeaconChain.GetValidatorParticipation:input_type -> theqrl.qrl.v1alpha1.GetValidatorParticipationRequest
+	44, // 29: theqrl.qrl.v1alpha1.BeaconChain.GetBeaconConfig:input_type -> google.protobuf.Empty
+	45, // 30: theqrl.qrl.v1alpha1.BeaconChain.SubmitAttesterSlashing:input_type -> theqrl.qrl.v1alpha1.AttesterSlashing
+	46, // 31: theqrl.qrl.v1alpha1.BeaconChain.SubmitProposerSlashing:input_type -> theqrl.qrl.v1alpha1.ProposerSlashing
+	28, // 32: theqrl.qrl.v1alpha1.BeaconChain.GetIndividualVotes:input_type -> theqrl.qrl.v1alpha1.IndividualVotesRequest
+	3,  // 33: theqrl.qrl.v1alpha1.BeaconChain.ListAttestations:output_type -> theqrl.qrl.v1alpha1.ListAttestationsResponse
+	4,  // 34: theqrl.qrl.v1alpha1.BeaconChain.ListIndexedAttestations:output_type -> theqrl.qrl.v1alpha1.ListIndexedAttestationsResponse
+	25, // 35: theqrl.qrl.v1alpha1.BeaconChain.AttestationPool:output_type -> theqrl.qrl.v1alpha1.AttestationPoolResponse
+	6,  // 36: theqrl.qrl.v1alpha1.BeaconChain.ListBeaconBlocks:output_type -> theqrl.qrl.v1alpha1.ListBeaconBlocksResponse
+	8,  // 37: theqrl.qrl.v1alpha1.BeaconChain.GetChainHead:output_type -> theqrl.qrl.v1alpha1.ChainHead
+	10, // 38: theqrl.qrl.v1alpha1.BeaconChain.ListBeaconCommittees:output_type -> theqrl.qrl.v1alpha1.BeaconCommittees
+	12, // 39: theqrl.qrl.v1alpha1.BeaconChain.ListValidatorBalances:output_type -> theqrl.qrl.v1alpha1.ValidatorBalances
+	15, // 40: theqrl.qrl.v1alpha1.BeaconChain.ListValidators:output_type -> theqrl.qrl.v1alpha1.Validators
+	43, // 41: theqrl.qrl.v1alpha1.BeaconChain.GetValidator:output_type -> theqrl.qrl.v1alpha1.Validator
+	17, // 42: theqrl.qrl.v1alpha1.BeaconChain.GetValidatorActiveSetChanges:output_type -> theqrl.qrl.v1alpha1.ActiveSetChanges
+	19, // 43: theqrl.qrl.v1alpha1.BeaconChain.GetValidatorPerformance:output_type -> theqrl.qrl.v1alpha1.ValidatorPerformanceResponse
+	21, // 44: theqrl.qrl.v1alpha1.BeaconChain.ListValidatorAssignments:output_type -> theqrl.qrl.v1alpha1.ValidatorAssignments
+	23, // 45: theqrl.qrl.v1alpha1.BeaconChain.GetValidatorParticipation:output_type -> theqrl.qrl.v1alpha1.ValidatorParticipationResponse
+	26, // 46: theqrl.qrl.v1alpha1.BeaconChain.GetBeaconConfig:output_type -> theqrl.qrl.v1alpha1.BeaconConfig
+	27, // 47: theqrl.qrl.v1alpha1.BeaconChain.SubmitAttesterSlashing:output_type -> theqrl.qrl.v1alpha1.SubmitSlashingResponse
+	27, // 48: theqrl.qrl.v1alpha1.BeaconChain.SubmitProposerSlashing:output_type -> theqrl.qrl.v1alpha1.SubmitSlashingResponse
+	29, // 49: theqrl.qrl.v1alpha1.BeaconChain.GetIndividualVotes:output_type -> theqrl.qrl.v1alpha1.IndividualVotesRespond
 	33, // [33:50] is the sub-list for method output_type
 	16, // [16:33] is the sub-list for method input_type
 	16, // [16:16] is the sub-list for extension type_name
@@ -4424,7 +4424,7 @@ func NewBeaconChainClient(cc grpc.ClientConnInterface) BeaconChainClient {
 
 func (c *beaconChainClient) ListAttestations(ctx context.Context, in *ListAttestationsRequest, opts ...grpc.CallOption) (*ListAttestationsResponse, error) {
 	out := new(ListAttestationsResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/ListAttestations", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/ListAttestations", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4433,7 +4433,7 @@ func (c *beaconChainClient) ListAttestations(ctx context.Context, in *ListAttest
 
 func (c *beaconChainClient) ListIndexedAttestations(ctx context.Context, in *ListIndexedAttestationsRequest, opts ...grpc.CallOption) (*ListIndexedAttestationsResponse, error) {
 	out := new(ListIndexedAttestationsResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/ListIndexedAttestations", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/ListIndexedAttestations", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4442,7 +4442,7 @@ func (c *beaconChainClient) ListIndexedAttestations(ctx context.Context, in *Lis
 
 func (c *beaconChainClient) AttestationPool(ctx context.Context, in *AttestationPoolRequest, opts ...grpc.CallOption) (*AttestationPoolResponse, error) {
 	out := new(AttestationPoolResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/AttestationPool", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/AttestationPool", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4451,7 +4451,7 @@ func (c *beaconChainClient) AttestationPool(ctx context.Context, in *Attestation
 
 func (c *beaconChainClient) ListBeaconBlocks(ctx context.Context, in *ListBlocksRequest, opts ...grpc.CallOption) (*ListBeaconBlocksResponse, error) {
 	out := new(ListBeaconBlocksResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/ListBeaconBlocks", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/ListBeaconBlocks", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4461,7 +4461,7 @@ func (c *beaconChainClient) ListBeaconBlocks(ctx context.Context, in *ListBlocks
 // Deprecated: Do not use.
 func (c *beaconChainClient) GetChainHead(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ChainHead, error) {
 	out := new(ChainHead)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/GetChainHead", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/GetChainHead", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4470,7 +4470,7 @@ func (c *beaconChainClient) GetChainHead(ctx context.Context, in *emptypb.Empty,
 
 func (c *beaconChainClient) ListBeaconCommittees(ctx context.Context, in *ListCommitteesRequest, opts ...grpc.CallOption) (*BeaconCommittees, error) {
 	out := new(BeaconCommittees)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/ListBeaconCommittees", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/ListBeaconCommittees", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4479,7 +4479,7 @@ func (c *beaconChainClient) ListBeaconCommittees(ctx context.Context, in *ListCo
 
 func (c *beaconChainClient) ListValidatorBalances(ctx context.Context, in *ListValidatorBalancesRequest, opts ...grpc.CallOption) (*ValidatorBalances, error) {
 	out := new(ValidatorBalances)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/ListValidatorBalances", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/ListValidatorBalances", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4488,7 +4488,7 @@ func (c *beaconChainClient) ListValidatorBalances(ctx context.Context, in *ListV
 
 func (c *beaconChainClient) ListValidators(ctx context.Context, in *ListValidatorsRequest, opts ...grpc.CallOption) (*Validators, error) {
 	out := new(Validators)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/ListValidators", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/ListValidators", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4497,7 +4497,7 @@ func (c *beaconChainClient) ListValidators(ctx context.Context, in *ListValidato
 
 func (c *beaconChainClient) GetValidator(ctx context.Context, in *GetValidatorRequest, opts ...grpc.CallOption) (*Validator, error) {
 	out := new(Validator)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/GetValidator", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidator", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4506,7 +4506,7 @@ func (c *beaconChainClient) GetValidator(ctx context.Context, in *GetValidatorRe
 
 func (c *beaconChainClient) GetValidatorActiveSetChanges(ctx context.Context, in *GetValidatorActiveSetChangesRequest, opts ...grpc.CallOption) (*ActiveSetChanges, error) {
 	out := new(ActiveSetChanges)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorActiveSetChanges", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorActiveSetChanges", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4515,7 +4515,7 @@ func (c *beaconChainClient) GetValidatorActiveSetChanges(ctx context.Context, in
 
 func (c *beaconChainClient) GetValidatorPerformance(ctx context.Context, in *ValidatorPerformanceRequest, opts ...grpc.CallOption) (*ValidatorPerformanceResponse, error) {
 	out := new(ValidatorPerformanceResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorPerformance", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorPerformance", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4524,7 +4524,7 @@ func (c *beaconChainClient) GetValidatorPerformance(ctx context.Context, in *Val
 
 func (c *beaconChainClient) ListValidatorAssignments(ctx context.Context, in *ListValidatorAssignmentsRequest, opts ...grpc.CallOption) (*ValidatorAssignments, error) {
 	out := new(ValidatorAssignments)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/ListValidatorAssignments", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/ListValidatorAssignments", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4533,7 +4533,7 @@ func (c *beaconChainClient) ListValidatorAssignments(ctx context.Context, in *Li
 
 func (c *beaconChainClient) GetValidatorParticipation(ctx context.Context, in *GetValidatorParticipationRequest, opts ...grpc.CallOption) (*ValidatorParticipationResponse, error) {
 	out := new(ValidatorParticipationResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorParticipation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorParticipation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4542,7 +4542,7 @@ func (c *beaconChainClient) GetValidatorParticipation(ctx context.Context, in *G
 
 func (c *beaconChainClient) GetBeaconConfig(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BeaconConfig, error) {
 	out := new(BeaconConfig)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/GetBeaconConfig", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/GetBeaconConfig", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4551,7 +4551,7 @@ func (c *beaconChainClient) GetBeaconConfig(ctx context.Context, in *emptypb.Emp
 
 func (c *beaconChainClient) SubmitAttesterSlashing(ctx context.Context, in *AttesterSlashing, opts ...grpc.CallOption) (*SubmitSlashingResponse, error) {
 	out := new(SubmitSlashingResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/SubmitAttesterSlashing", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/SubmitAttesterSlashing", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4560,7 +4560,7 @@ func (c *beaconChainClient) SubmitAttesterSlashing(ctx context.Context, in *Atte
 
 func (c *beaconChainClient) SubmitProposerSlashing(ctx context.Context, in *ProposerSlashing, opts ...grpc.CallOption) (*SubmitSlashingResponse, error) {
 	out := new(SubmitSlashingResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/SubmitProposerSlashing", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/SubmitProposerSlashing", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4569,7 +4569,7 @@ func (c *beaconChainClient) SubmitProposerSlashing(ctx context.Context, in *Prop
 
 func (c *beaconChainClient) GetIndividualVotes(ctx context.Context, in *IndividualVotesRequest, opts ...grpc.CallOption) (*IndividualVotesRespond, error) {
 	out := new(IndividualVotesRespond)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.BeaconChain/GetIndividualVotes", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.BeaconChain/GetIndividualVotes", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -4668,7 +4668,7 @@ func _BeaconChain_ListAttestations_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/ListAttestations",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListAttestations",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListAttestations(ctx, req.(*ListAttestationsRequest))
@@ -4686,7 +4686,7 @@ func _BeaconChain_ListIndexedAttestations_Handler(srv interface{}, ctx context.C
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/ListIndexedAttestations",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListIndexedAttestations",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListIndexedAttestations(ctx, req.(*ListIndexedAttestationsRequest))
@@ -4704,7 +4704,7 @@ func _BeaconChain_AttestationPool_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/AttestationPool",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/AttestationPool",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).AttestationPool(ctx, req.(*AttestationPoolRequest))
@@ -4722,7 +4722,7 @@ func _BeaconChain_ListBeaconBlocks_Handler(srv interface{}, ctx context.Context,
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/ListBeaconBlocks",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListBeaconBlocks",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListBeaconBlocks(ctx, req.(*ListBlocksRequest))
@@ -4740,7 +4740,7 @@ func _BeaconChain_GetChainHead_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/GetChainHead",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetChainHead",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetChainHead(ctx, req.(*emptypb.Empty))
@@ -4758,7 +4758,7 @@ func _BeaconChain_ListBeaconCommittees_Handler(srv interface{}, ctx context.Cont
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/ListBeaconCommittees",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListBeaconCommittees",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListBeaconCommittees(ctx, req.(*ListCommitteesRequest))
@@ -4776,7 +4776,7 @@ func _BeaconChain_ListValidatorBalances_Handler(srv interface{}, ctx context.Con
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/ListValidatorBalances",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListValidatorBalances",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListValidatorBalances(ctx, req.(*ListValidatorBalancesRequest))
@@ -4794,7 +4794,7 @@ func _BeaconChain_ListValidators_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/ListValidators",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListValidators",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListValidators(ctx, req.(*ListValidatorsRequest))
@@ -4812,7 +4812,7 @@ func _BeaconChain_GetValidator_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/GetValidator",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetValidator",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetValidator(ctx, req.(*GetValidatorRequest))
@@ -4830,7 +4830,7 @@ func _BeaconChain_GetValidatorActiveSetChanges_Handler(srv interface{}, ctx cont
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorActiveSetChanges",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorActiveSetChanges",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetValidatorActiveSetChanges(ctx, req.(*GetValidatorActiveSetChangesRequest))
@@ -4848,7 +4848,7 @@ func _BeaconChain_GetValidatorPerformance_Handler(srv interface{}, ctx context.C
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorPerformance",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorPerformance",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetValidatorPerformance(ctx, req.(*ValidatorPerformanceRequest))
@@ -4866,7 +4866,7 @@ func _BeaconChain_ListValidatorAssignments_Handler(srv interface{}, ctx context.
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/ListValidatorAssignments",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/ListValidatorAssignments",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListValidatorAssignments(ctx, req.(*ListValidatorAssignmentsRequest))
@@ -4884,7 +4884,7 @@ func _BeaconChain_GetValidatorParticipation_Handler(srv interface{}, ctx context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorParticipation",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorParticipation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetValidatorParticipation(ctx, req.(*GetValidatorParticipationRequest))
@@ -4902,7 +4902,7 @@ func _BeaconChain_GetBeaconConfig_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/GetBeaconConfig",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetBeaconConfig",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetBeaconConfig(ctx, req.(*emptypb.Empty))
@@ -4920,7 +4920,7 @@ func _BeaconChain_SubmitAttesterSlashing_Handler(srv interface{}, ctx context.Co
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/SubmitAttesterSlashing",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/SubmitAttesterSlashing",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).SubmitAttesterSlashing(ctx, req.(*AttesterSlashing))
@@ -4938,7 +4938,7 @@ func _BeaconChain_SubmitProposerSlashing_Handler(srv interface{}, ctx context.Co
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/SubmitProposerSlashing",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/SubmitProposerSlashing",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).SubmitProposerSlashing(ctx, req.(*ProposerSlashing))
@@ -4956,7 +4956,7 @@ func _BeaconChain_GetIndividualVotes_Handler(srv interface{}, ctx context.Contex
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.BeaconChain/GetIndividualVotes",
+		FullMethod: "/theqrl.qrl.v1alpha1.BeaconChain/GetIndividualVotes",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetIndividualVotes(ctx, req.(*IndividualVotesRequest))
@@ -4965,7 +4965,7 @@ func _BeaconChain_GetIndividualVotes_Handler(srv interface{}, ctx context.Contex
 }
 
 var _BeaconChain_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "theqrl.zond.v1alpha1.BeaconChain",
+	ServiceName: "theqrl.qrl.v1alpha1.BeaconChain",
 	HandlerType: (*BeaconChainServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

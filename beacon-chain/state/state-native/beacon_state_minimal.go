@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // BeaconState defines a struct containing utilities for the Zond Beacon Chain state, defining
@@ -24,18 +24,18 @@ type BeaconState struct {
 	genesisTime                         uint64
 	genesisValidatorsRoot               [32]byte
 	slot                                primitives.Slot
-	fork                                *zondpb.Fork
-	latestBlockHeader                   *zondpb.BeaconBlockHeader
+	fork                                *qrysmpb.Fork
+	latestBlockHeader                   *qrysmpb.BeaconBlockHeader
 	blockRoots                          customtypes.BlockRoots
 	blockRootsMultiValue                *MultiValueBlockRoots
 	stateRoots                          customtypes.StateRoots
 	stateRootsMultiValue                *MultiValueStateRoots
 	historicalRoots                     customtypes.HistoricalRoots
-	historicalSummaries                 []*zondpb.HistoricalSummary
-	executionNodeData                   *zondpb.ExecutionNodeData
-	executionNodeDataVotes              []*zondpb.ExecutionNodeData
+	historicalSummaries                 []*qrysmpb.HistoricalSummary
+	executionNodeData                   *qrysmpb.ExecutionNodeData
+	executionNodeDataVotes              []*qrysmpb.ExecutionNodeData
 	eth1DepositIndex                    uint64
-	validators                          []*zondpb.Validator
+	validators                          []*qrysmpb.Validator
 	validatorsMultiValue                *MultiValueValidators
 	balances                            []uint64
 	balancesMultiValue                  *MultiValueBalances
@@ -45,13 +45,13 @@ type BeaconState struct {
 	previousEpochParticipation          []byte
 	currentEpochParticipation           []byte
 	justificationBits                   bitfield.Bitvector4
-	previousJustifiedCheckpoint         *zondpb.Checkpoint
-	currentJustifiedCheckpoint          *zondpb.Checkpoint
-	finalizedCheckpoint                 *zondpb.Checkpoint
+	previousJustifiedCheckpoint         *qrysmpb.Checkpoint
+	currentJustifiedCheckpoint          *qrysmpb.Checkpoint
+	finalizedCheckpoint                 *qrysmpb.Checkpoint
 	inactivityScores                    []uint64
 	inactivityScoresMultiValue          *MultiValueInactivityScores
-	currentSyncCommittee                *zondpb.SyncCommittee
-	nextSyncCommittee                   *zondpb.SyncCommittee
+	currentSyncCommittee                *qrysmpb.SyncCommittee
+	nextSyncCommittee                   *qrysmpb.SyncCommittee
 	latestExecutionPayloadHeaderCapella *enginev1.ExecutionPayloadHeaderCapella
 	nextWithdrawalIndex                 uint64
 	nextWithdrawalValidatorIndex        primitives.ValidatorIndex
@@ -72,28 +72,28 @@ type beaconStateMarshalable struct {
 	GenesisTime                         uint64                                  `json:"genesis_time" yaml:"genesis_time"`
 	GenesisValidatorsRoot               [32]byte                                `json:"genesis_validators_root" yaml:"genesis_validators_root"`
 	Slot                                primitives.Slot                         `json:"slot" yaml:"slot"`
-	Fork                                *zondpb.Fork                            `json:"fork" yaml:"fork"`
-	LatestBlockHeader                   *zondpb.BeaconBlockHeader               `json:"latest_block_header" yaml:"latest_block_header"`
+	Fork                                *qrysmpb.Fork                           `json:"fork" yaml:"fork"`
+	LatestBlockHeader                   *qrysmpb.BeaconBlockHeader              `json:"latest_block_header" yaml:"latest_block_header"`
 	BlockRoots                          customtypes.BlockRoots                  `json:"block_roots" yaml:"block_roots"`
 	StateRoots                          customtypes.StateRoots                  `json:"state_roots" yaml:"state_roots"`
 	HistoricalRoots                     customtypes.HistoricalRoots             `json:"historical_roots" yaml:"historical_roots"`
-	HistoricalSummaries                 []*zondpb.HistoricalSummary             `json:"historical_summaries" yaml:"historical_summaries"`
-	ExecutionNodeData                   *zondpb.ExecutionNodeData               `json:"eth_1_data" yaml:"eth_1_data"`
-	ExecutionNodeDataVotes              []*zondpb.ExecutionNodeData             `json:"eth_1_data_votes" yaml:"eth_1_data_votes"`
+	HistoricalSummaries                 []*qrysmpb.HistoricalSummary            `json:"historical_summaries" yaml:"historical_summaries"`
+	ExecutionNodeData                   *qrysmpb.ExecutionNodeData              `json:"eth_1_data" yaml:"eth_1_data"`
+	ExecutionNodeDataVotes              []*qrysmpb.ExecutionNodeData            `json:"eth_1_data_votes" yaml:"eth_1_data_votes"`
 	Eth1DepositIndex                    uint64                                  `json:"eth_1_deposit_index" yaml:"eth_1_deposit_index"`
-	Validators                          []*zondpb.Validator                     `json:"validators" yaml:"validators"`
+	Validators                          []*qrysmpb.Validator                    `json:"validators" yaml:"validators"`
 	Balances                            []uint64                                `json:"balances" yaml:"balances"`
 	RandaoMixes                         customtypes.RandaoMixes                 `json:"randao_mixes" yaml:"randao_mixes"`
 	Slashings                           []uint64                                `json:"slashings" yaml:"slashings"`
 	PreviousEpochParticipation          []byte                                  `json:"previous_epoch_participation" yaml:"previous_epoch_participation"`
 	CurrentEpochParticipation           []byte                                  `json:"current_epoch_participation" yaml:"current_epoch_participation"`
 	JustificationBits                   bitfield.Bitvector4                     `json:"justification_bits" yaml:"justification_bits"`
-	PreviousJustifiedCheckpoint         *zondpb.Checkpoint                      `json:"previous_justified_checkpoint" yaml:"previous_justified_checkpoint"`
-	CurrentJustifiedCheckpoint          *zondpb.Checkpoint                      `json:"current_justified_checkpoint" yaml:"current_justified_checkpoint"`
-	FinalizedCheckpoint                 *zondpb.Checkpoint                      `json:"finalized_checkpoint" yaml:"finalized_checkpoint"`
+	PreviousJustifiedCheckpoint         *qrysmpb.Checkpoint                     `json:"previous_justified_checkpoint" yaml:"previous_justified_checkpoint"`
+	CurrentJustifiedCheckpoint          *qrysmpb.Checkpoint                     `json:"current_justified_checkpoint" yaml:"current_justified_checkpoint"`
+	FinalizedCheckpoint                 *qrysmpb.Checkpoint                     `json:"finalized_checkpoint" yaml:"finalized_checkpoint"`
 	InactivityScores                    []uint64                                `json:"inactivity_scores" yaml:"inactivity_scores"`
-	CurrentSyncCommittee                *zondpb.SyncCommittee                   `json:"current_sync_committee" yaml:"current_sync_committee"`
-	NextSyncCommittee                   *zondpb.SyncCommittee                   `json:"next_sync_committee" yaml:"next_sync_committee"`
+	CurrentSyncCommittee                *qrysmpb.SyncCommittee                  `json:"current_sync_committee" yaml:"current_sync_committee"`
+	NextSyncCommittee                   *qrysmpb.SyncCommittee                  `json:"next_sync_committee" yaml:"next_sync_committee"`
 	LatestExecutionPayloadHeaderCapella *enginev1.ExecutionPayloadHeaderCapella `json:"latest_execution_payload_header_capella" yaml:"latest_execution_payload_header_capella"`
 	NextWithdrawalIndex                 uint64                                  `json:"next_withdrawal_index" yaml:"next_withdrawal_index"`
 	NextWithdrawalValidatorIndex        primitives.ValidatorIndex               `json:"next_withdrawal_validator_index" yaml:"next_withdrawal_validator_index"`
@@ -105,7 +105,7 @@ func (b *BeaconState) MarshalJSON() ([]byte, error) {
 	var mixes customtypes.RandaoMixes
 	var balances []uint64
 	var inactivityScores []uint64
-	var vals []*zondpb.Validator
+	var vals []*qrysmpb.Validator
 
 	if features.Get().EnableExperimentalState {
 		bRoots = b.blockRootsMultiValue.Value(b)

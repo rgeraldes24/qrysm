@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/v1/node.proto
+// source: proto/qrl/v1/node.proto
 
 package v1
 
@@ -355,8 +355,8 @@ type PeersRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	State     []ConnectionState `protobuf:"varint,1,rep,packed,name=state,proto3,enum=theqrl.zond.v1.ConnectionState" json:"state,omitempty"`
-	Direction []PeerDirection   `protobuf:"varint,2,rep,packed,name=direction,proto3,enum=theqrl.zond.v1.PeerDirection" json:"direction,omitempty"`
+	State     []ConnectionState `protobuf:"varint,1,rep,packed,name=state,proto3,enum=theqrl.qrl.v1.ConnectionState" json:"state,omitempty"`
+	Direction []PeerDirection   `protobuf:"varint,2,rep,packed,name=direction,proto3,enum=theqrl.qrl.v1.PeerDirection" json:"direction,omitempty"`
 }
 
 func (x *PeersRequest) Reset() {
@@ -562,8 +562,8 @@ type Peer struct {
 	PeerId             string          `protobuf:"bytes,1,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
 	Qnr                string          `protobuf:"bytes,2,opt,name=qnr,proto3" json:"qnr,omitempty"`
 	LastSeenP2PAddress string          `protobuf:"bytes,3,opt,name=last_seen_p2p_address,json=lastSeenP2pAddress,proto3" json:"last_seen_p2p_address,omitempty"`
-	State              ConnectionState `protobuf:"varint,4,opt,name=state,proto3,enum=theqrl.zond.v1.ConnectionState" json:"state,omitempty"`
-	Direction          PeerDirection   `protobuf:"varint,5,opt,name=direction,proto3,enum=theqrl.zond.v1.PeerDirection" json:"direction,omitempty"`
+	State              ConnectionState `protobuf:"varint,4,opt,name=state,proto3,enum=theqrl.qrl.v1.ConnectionState" json:"state,omitempty"`
+	Direction          PeerDirection   `protobuf:"varint,5,opt,name=direction,proto3,enum=theqrl.qrl.v1.PeerDirection" json:"direction,omitempty"`
 }
 
 func (x *Peer) Reset() {
@@ -971,34 +971,34 @@ func file_proto_zond_v1_node_proto_rawDescGZIP() []byte {
 var file_proto_zond_v1_node_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_proto_zond_v1_node_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_proto_zond_v1_node_proto_goTypes = []interface{}{
-	(PeerDirection)(0),                  // 0: theqrl.zond.v1.PeerDirection
-	(ConnectionState)(0),                // 1: theqrl.zond.v1.ConnectionState
-	(*IdentityResponse)(nil),            // 2: theqrl.zond.v1.IdentityResponse
-	(*Identity)(nil),                    // 3: theqrl.zond.v1.Identity
-	(*Metadata)(nil),                    // 4: theqrl.zond.v1.Metadata
-	(*PeerRequest)(nil),                 // 5: theqrl.zond.v1.PeerRequest
-	(*PeersRequest)(nil),                // 6: theqrl.zond.v1.PeersRequest
-	(*PeerResponse)(nil),                // 7: theqrl.zond.v1.PeerResponse
-	(*PeersResponse)(nil),               // 8: theqrl.zond.v1.PeersResponse
-	(*PeerCountResponse)(nil),           // 9: theqrl.zond.v1.PeerCountResponse
-	(*Peer)(nil),                        // 10: theqrl.zond.v1.Peer
-	(*VersionResponse)(nil),             // 11: theqrl.zond.v1.VersionResponse
-	(*NodeVersion)(nil),                 // 12: theqrl.zond.v1.NodeVersion
-	(*PeerResponse_Meta)(nil),           // 13: theqrl.zond.v1.PeerResponse.Meta
-	(*PeerCountResponse_PeerCount)(nil), // 14: theqrl.zond.v1.PeerCountResponse.PeerCount
+	(PeerDirection)(0),                  // 0: theqrl.qrl.v1.PeerDirection
+	(ConnectionState)(0),                // 1: theqrl.qrl.v1.ConnectionState
+	(*IdentityResponse)(nil),            // 2: theqrl.qrl.v1.IdentityResponse
+	(*Identity)(nil),                    // 3: theqrl.qrl.v1.Identity
+	(*Metadata)(nil),                    // 4: theqrl.qrl.v1.Metadata
+	(*PeerRequest)(nil),                 // 5: theqrl.qrl.v1.PeerRequest
+	(*PeersRequest)(nil),                // 6: theqrl.qrl.v1.PeersRequest
+	(*PeerResponse)(nil),                // 7: theqrl.qrl.v1.PeerResponse
+	(*PeersResponse)(nil),               // 8: theqrl.qrl.v1.PeersResponse
+	(*PeerCountResponse)(nil),           // 9: theqrl.qrl.v1.PeerCountResponse
+	(*Peer)(nil),                        // 10: theqrl.qrl.v1.Peer
+	(*VersionResponse)(nil),             // 11: theqrl.qrl.v1.VersionResponse
+	(*NodeVersion)(nil),                 // 12: theqrl.qrl.v1.NodeVersion
+	(*PeerResponse_Meta)(nil),           // 13: theqrl.qrl.v1.PeerResponse.Meta
+	(*PeerCountResponse_PeerCount)(nil), // 14: theqrl.qrl.v1.PeerCountResponse.PeerCount
 }
 var file_proto_zond_v1_node_proto_depIdxs = []int32{
-	3,  // 0: theqrl.zond.v1.IdentityResponse.data:type_name -> theqrl.zond.v1.Identity
-	4,  // 1: theqrl.zond.v1.Identity.metadata:type_name -> theqrl.zond.v1.Metadata
-	1,  // 2: theqrl.zond.v1.PeersRequest.state:type_name -> theqrl.zond.v1.ConnectionState
-	0,  // 3: theqrl.zond.v1.PeersRequest.direction:type_name -> theqrl.zond.v1.PeerDirection
-	10, // 4: theqrl.zond.v1.PeerResponse.data:type_name -> theqrl.zond.v1.Peer
-	13, // 5: theqrl.zond.v1.PeerResponse.meta:type_name -> theqrl.zond.v1.PeerResponse.Meta
-	10, // 6: theqrl.zond.v1.PeersResponse.data:type_name -> theqrl.zond.v1.Peer
-	14, // 7: theqrl.zond.v1.PeerCountResponse.data:type_name -> theqrl.zond.v1.PeerCountResponse.PeerCount
-	1,  // 8: theqrl.zond.v1.Peer.state:type_name -> theqrl.zond.v1.ConnectionState
-	0,  // 9: theqrl.zond.v1.Peer.direction:type_name -> theqrl.zond.v1.PeerDirection
-	12, // 10: theqrl.zond.v1.VersionResponse.data:type_name -> theqrl.zond.v1.NodeVersion
+	3,  // 0: theqrl.qrl.v1.IdentityResponse.data:type_name -> theqrl.qrl.v1.Identity
+	4,  // 1: theqrl.qrl.v1.Identity.metadata:type_name -> theqrl.qrl.v1.Metadata
+	1,  // 2: theqrl.qrl.v1.PeersRequest.state:type_name -> theqrl.qrl.v1.ConnectionState
+	0,  // 3: theqrl.qrl.v1.PeersRequest.direction:type_name -> theqrl.qrl.v1.PeerDirection
+	10, // 4: theqrl.qrl.v1.PeerResponse.data:type_name -> theqrl.qrl.v1.Peer
+	13, // 5: theqrl.qrl.v1.PeerResponse.meta:type_name -> theqrl.qrl.v1.PeerResponse.Meta
+	10, // 6: theqrl.qrl.v1.PeersResponse.data:type_name -> theqrl.qrl.v1.Peer
+	14, // 7: theqrl.qrl.v1.PeerCountResponse.data:type_name -> theqrl.qrl.v1.PeerCountResponse.PeerCount
+	1,  // 8: theqrl.qrl.v1.Peer.state:type_name -> theqrl.qrl.v1.ConnectionState
+	0,  // 9: theqrl.qrl.v1.Peer.direction:type_name -> theqrl.qrl.v1.PeerDirection
+	12, // 10: theqrl.qrl.v1.VersionResponse.data:type_name -> theqrl.qrl.v1.NodeVersion
 	11, // [11:11] is the sub-list for method output_type
 	11, // [11:11] is the sub-list for method input_type
 	11, // [11:11] is the sub-list for extension type_name

@@ -7,11 +7,11 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // UpdateGenesisExecutionNodeData updates eth1 data for genesis state.
-func UpdateGenesisExecutionNodeData(state state.BeaconState, deposits []*zondpb.Deposit, executionNodeData *zondpb.ExecutionNodeData) (state.BeaconState, error) {
+func UpdateGenesisExecutionNodeData(state state.BeaconState, deposits []*qrysmpb.Deposit, executionNodeData *qrysmpb.ExecutionNodeData) (state.BeaconState, error) {
 	if executionNodeData == nil {
 		return nil, errors.New("no executionNodeData provided for genesis state")
 	}

@@ -42,7 +42,7 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 	}{
 		{
 			name: "no state_id url params",
-			path: "/zond/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot" +
+			path: "/qrl/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot" +
 				strconv.FormatUint(uint64(currentSlot), 10),
 			urlParams:    map[string]string{},
 			state:        nil,
@@ -50,14 +50,14 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 		},
 		{
 			name:         "invalid proposal slot value",
-			path:         "/zond/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot=aaa",
+			path:         "/qrl/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot=aaa",
 			urlParams:    map[string]string{"state_id": "head"},
 			state:        st,
 			errorMessage: "invalid proposal slot value",
 		},
 		{
 			name: "proposal slot == Capella start slot",
-			path: "/zond/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot=" +
+			path: "/qrl/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot=" +
 				strconv.FormatUint(uint64(capellaSlot), 10),
 			urlParams:    map[string]string{"state_id": "head"},
 			state:        st,
@@ -65,7 +65,7 @@ func TestExpectedWithdrawals_BadRequest(t *testing.T) {
 		},
 		{
 			name: "Proposal slot >= 512 slots ahead of state slot",
-			path: "/zond/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot=" +
+			path: "/qrl/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot=" +
 				strconv.FormatUint(uint64(currentSlot+512), 10),
 			urlParams:    map[string]string{"state_id": "head"},
 			state:        st,
@@ -159,7 +159,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 			Stater:                &testutil.MockStater{BeaconState: st},
 		}
 		request := httptest.NewRequest(
-			"GET", "/zond/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot="+
+			"GET", "/qrl/v1/builder/states/{state_id}/expected_withdrawals?proposal_slot="+
 				strconv.FormatUint(uint64(currentSlot+params.BeaconConfig().SlotsPerEpoch), 10), nil)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
 		writer := httptest.NewRecorder()

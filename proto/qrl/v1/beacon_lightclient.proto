@@ -13,36 +13,36 @@
 // limitations under the License.
 syntax = "proto3";
 
-package theqrl.zond.v1;
+package theqrl.qrl.v1;
 
-import "proto/zond/ext/options.proto";
-import "proto/zond/v1/beacon_block.proto";
-import "proto/zond/v1/version.proto";
-import "proto/zond/v1/sync_committee.proto";
+import "proto/qrl/ext/options.proto";
+import "proto/qrl/v1/beacon_block.proto";
+import "proto/qrl/v1/version.proto";
+import "proto/qrl/v1/sync_committee.proto";
 
-option csharp_namespace = "TheQRL.Zond.V1";
+option csharp_namespace = "TheQRL.QRL.V1";
 option go_package = "github.com/theQRL/qrysm/proto/qrl/v1";
 option java_multiple_files = true;
 option java_outer_classname = "SyncCommitteeProto";
-option java_package = "org.theqrl.zond.v1";
-option php_namespace = "TheQRL\\Zond\\v1";
+option java_package = "org.theqrl.qrl.v1";
+option php_namespace = "TheQRL\\QRL\\v1";
 
 // Beacon LightClient API related messages.
 
 message LightClientBootstrap {
   BeaconBlockHeader header = 1;
   SyncCommittee current_sync_committee = 2;
-  repeated bytes current_sync_committee_branch = 3 [(theqrl.zond.ext.ssz_size) = "current_sync_committee_branch.depth,32"];
+  repeated bytes current_sync_committee_branch = 3 [(theqrl.qrl.ext.ssz_size) = "current_sync_committee_branch.depth,32"];
 }
 
 message LightClientUpdate {
   BeaconBlockHeader attested_header = 1;
   SyncCommittee next_sync_committee = 2;
-  repeated bytes next_sync_committee_branch = 3 [(theqrl.zond.ext.ssz_size) = "next_sync_committee_branch.depth,32"];
+  repeated bytes next_sync_committee_branch = 3 [(theqrl.qrl.ext.ssz_size) = "next_sync_committee_branch.depth,32"];
   BeaconBlockHeader finalized_header = 4;
-  repeated bytes finality_branch = 5 [(theqrl.zond.ext.ssz_size) = "finality_branch.depth,32"];
+  repeated bytes finality_branch = 5 [(theqrl.qrl.ext.ssz_size) = "finality_branch.depth,32"];
   SyncAggregate sync_aggregate = 6;
-  uint64 signature_slot = 7 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];
+  uint64 signature_slot = 7 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];
 }
 
 message LightClientFinalityUpdateWithVersion {
@@ -53,9 +53,9 @@ message LightClientFinalityUpdateWithVersion {
 message LightClientFinalityUpdate {
   BeaconBlockHeader attested_header = 1;
   BeaconBlockHeader finalized_header = 2;
-  repeated bytes finality_branch = 3 [(theqrl.zond.ext.ssz_size) = "finality_branch.depth,32"];
+  repeated bytes finality_branch = 3 [(theqrl.qrl.ext.ssz_size) = "finality_branch.depth,32"];
   SyncAggregate sync_aggregate = 4;
-  uint64 signature_slot = 5 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];
+  uint64 signature_slot = 5 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];
 }
 
 message LightClientOptimisticUpdateWithVersion {
@@ -66,5 +66,5 @@ message LightClientOptimisticUpdateWithVersion {
 message LightClientOptimisticUpdate {
   BeaconBlockHeader attested_header = 1;
   SyncAggregate sync_aggregate = 2;
-  uint64 signature_slot = 3 [(theqrl.zond.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];
+  uint64 signature_slot = 3 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];
 }

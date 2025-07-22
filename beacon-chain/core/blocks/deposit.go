@@ -14,14 +14,14 @@ import (
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/math"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // ProcessPreGenesisDeposits processes a deposit for the beacon state before chainstart.
 func ProcessPreGenesisDeposits(
 	ctx context.Context,
 	beaconState state.BeaconState,
-	deposits []*zondpb.Deposit,
+	deposits []*qrysmpb.Deposit,
 ) (state.BeaconState, error) {
 	var err error
 	beaconState, err = ProcessDeposits(ctx, beaconState, deposits)
@@ -36,7 +36,7 @@ func ProcessPreGenesisDeposits(
 }
 
 // ActivateValidatorWithEffectiveBalance updates validator's effective balance, and if it's above MaxEffectiveBalance, validator becomes active in genesis.
-func ActivateValidatorWithEffectiveBalance(beaconState state.BeaconState, deposits []*zondpb.Deposit) (state.BeaconState, error) {
+func ActivateValidatorWithEffectiveBalance(beaconState state.BeaconState, deposits []*qrysmpb.Deposit) (state.BeaconState, error) {
 	for _, d := range deposits {
 		pubkey := d.Data.PublicKey
 		index, ok := beaconState.ValidatorIndexByPubkey(bytesutil.ToBytes2592(pubkey))
@@ -77,7 +77,7 @@ func ActivateValidatorWithEffectiveBalance(beaconState state.BeaconState, deposi
 func ProcessDeposits(
 	ctx context.Context,
 	beaconState state.BeaconState,
-	deposits []*zondpb.Deposit,
+	deposits []*qrysmpb.Deposit,
 ) (state.BeaconState, error) {
 	// Attempt to verify all deposit signatures at once, if this fails then fall back to processing
 	// individual deposits with signature verification enabled.
@@ -99,7 +99,7 @@ func ProcessDeposits(
 }
 
 // BatchVerifyDepositsSignatures batch verifies deposit signatures.
-func BatchVerifyDepositsSignatures(ctx context.Context, deposits []*zondpb.Deposit) (bool, error) {
+func BatchVerifyDepositsSignatures(ctx context.Context, deposits []*qrysmpb.Deposit) (bool, error) {
 	var err error
 	domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)
 	if err != nil {
@@ -156,7 +156,7 @@ func BatchVerifyDepositsSignatures(ctx context.Context, deposits []*zondpb.Depos
 //	    # Increase balance by deposit amount
 //	    index = ValidatorIndex(validator_pubkeys.index(pubkey))
 //	    increase_balance(state, index, amount)
-func ProcessDeposit(beaconState state.BeaconState, deposit *zondpb.Deposit, verifySignature bool) (state.BeaconState, bool, error) {
+func ProcessDeposit(beaconState state.BeaconState, deposit *qrysmpb.Deposit, verifySignature bool) (state.BeaconState, bool, error) {
 	var newValidator bool
 	if err := verifyDeposit(beaconState, deposit); err != nil {
 		if deposit == nil || deposit.Data == nil {
@@ -187,7 +187,7 @@ func ProcessDeposit(beaconState state.BeaconState, deposit *zondpb.Deposit, veri
 		if params.BeaconConfig().MaxEffectiveBalance < effectiveBalance {
 			effectiveBalance = params.BeaconConfig().MaxEffectiveBalance
 		}
-		if err := beaconState.AppendValidator(&zondpb.Validator{
+		if err := beaconState.AppendValidator(&qrysmpb.Validator{
 			PublicKey:                  pubKey,
 			WithdrawalCredentials:      deposit.Data.WithdrawalCredentials,
 			ActivationEligibilityEpoch: params.BeaconConfig().FarFutureEpoch,
@@ -209,7 +209,7 @@ func ProcessDeposit(beaconState state.BeaconState, deposit *zondpb.Deposit, veri
 	return beaconState, newValidator, nil
 }
 
-func verifyDeposit(beaconState state.ReadOnlyBeaconState, deposit *zondpb.Deposit) error {
+func verifyDeposit(beaconState state.ReadOnlyBeaconState, deposit *qrysmpb.Deposit) error {
 	// Verify Merkle proof of deposit and deposit trie root.
 	if deposit == nil || deposit.Data == nil {
 		return errors.New("received nil deposit or nil deposit data")
@@ -240,11 +240,11 @@ func verifyDeposit(beaconState state.ReadOnlyBeaconState, deposit *zondpb.Deposi
 	return nil
 }
 
-func verifyDepositDataSigningRoot(obj *zondpb.Deposit_Data, domain []byte) error {
+func verifyDepositDataSigningRoot(obj *qrysmpb.Deposit_Data, domain []byte) error {
 	return deposit.VerifyDepositSignature(obj, domain)
 }
 
-func verifyDepositDataWithDomain(ctx context.Context, deps []*zondpb.Deposit, domain []byte) error {
+func verifyDepositDataWithDomain(ctx context.Context, deps []*qrysmpb.Deposit, domain []byte) error {
 	if len(deps) == 0 {
 		return nil
 	}
@@ -264,7 +264,7 @@ func verifyDepositDataWithDomain(ctx context.Context, deps []*zondpb.Deposit, do
 		}
 		pks[i] = []dilithium.PublicKey{dpk}
 		sigs[i] = [][]byte{dep.Data.Signature}
-		depositMessage := &zondpb.DepositMessage{
+		depositMessage := &qrysmpb.DepositMessage{
 			PublicKey:             dep.Data.PublicKey,
 			WithdrawalCredentials: dep.Data.WithdrawalCredentials,
 			Amount:                dep.Data.Amount,

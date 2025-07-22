@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/sync"
 	"github.com/theQRL/qrysm/io/logs"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -45,15 +45,15 @@ type Server struct {
 }
 
 // GetSyncStatus checks the current network sync status of the node.
-func (ns *Server) GetSyncStatus(_ context.Context, _ *empty.Empty) (*zondpb.SyncStatus, error) {
-	return &zondpb.SyncStatus{
+func (ns *Server) GetSyncStatus(_ context.Context, _ *empty.Empty) (*qrysmpb.SyncStatus, error) {
+	return &qrysmpb.SyncStatus{
 		Syncing: ns.SyncChecker.Syncing(),
 	}, nil
 }
 
 // GetGenesis fetches genesis chain information of QRL. Returns unix timestamp 0
 // if a genesis time has yet to be determined.
-func (ns *Server) GetGenesis(ctx context.Context, _ *empty.Empty) (*zondpb.Genesis, error) {
+func (ns *Server) GetGenesis(ctx context.Context, _ *empty.Empty) (*qrysmpb.Genesis, error) {
 	contractAddr, err := ns.BeaconDB.DepositContractAddress(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not retrieve contract address from db: %v", err)
@@ -68,7 +68,7 @@ func (ns *Server) GetGenesis(ctx context.Context, _ *empty.Empty) (*zondpb.Genes
 	}
 
 	genValRoot := ns.GenesisFetcher.GenesisValidatorsRoot()
-	return &zondpb.Genesis{
+	return &qrysmpb.Genesis{
 		GenesisTime:            gt,
 		DepositContractAddress: contractAddr,
 		GenesisValidatorsRoot:  genValRoot[:],
@@ -76,8 +76,8 @@ func (ns *Server) GetGenesis(ctx context.Context, _ *empty.Empty) (*zondpb.Genes
 }
 
 // GetVersion checks the version information of the beacon node.
-func (_ *Server) GetVersion(_ context.Context, _ *empty.Empty) (*zondpb.Version, error) {
-	return &zondpb.Version{
+func (_ *Server) GetVersion(_ context.Context, _ *empty.Empty) (*qrysmpb.Version, error) {
+	return &qrysmpb.Version{
 		Version: version.Version(),
 	}, nil
 }
@@ -87,20 +87,20 @@ func (_ *Server) GetVersion(_ context.Context, _ *empty.Empty) (*zondpb.Version,
 // Any service not present in this list may return UNIMPLEMENTED or
 // PERMISSION_DENIED. The server may also support fetching services by grpc
 // reflection.
-func (ns *Server) ListImplementedServices(_ context.Context, _ *empty.Empty) (*zondpb.ImplementedServices, error) {
+func (ns *Server) ListImplementedServices(_ context.Context, _ *empty.Empty) (*qrysmpb.ImplementedServices, error) {
 	serviceInfo := ns.Server.GetServiceInfo()
 	serviceNames := make([]string, 0, len(serviceInfo))
 	for svc := range serviceInfo {
 		serviceNames = append(serviceNames, svc)
 	}
 	sort.Strings(serviceNames)
-	return &zondpb.ImplementedServices{
+	return &qrysmpb.ImplementedServices{
 		Services: serviceNames,
 	}, nil
 }
 
 // GetHost returns the p2p data on the current local and host peer.
-func (ns *Server) GetHost(_ context.Context, _ *empty.Empty) (*zondpb.HostData, error) {
+func (ns *Server) GetHost(_ context.Context, _ *empty.Empty) (*qrysmpb.HostData, error) {
 	var stringAddr []string
 	for _, addr := range ns.PeerManager.Host().Addrs() {
 		stringAddr = append(stringAddr, addr.String())
@@ -115,7 +115,7 @@ func (ns *Server) GetHost(_ context.Context, _ *empty.Empty) (*zondpb.HostData, 
 		}
 	}
 
-	return &zondpb.HostData{
+	return &qrysmpb.HostData{
 		Addresses: stringAddr,
 		PeerId:    ns.PeerManager.PeerID().String(),
 		Qnr:       qnr,
@@ -123,7 +123,7 @@ func (ns *Server) GetHost(_ context.Context, _ *empty.Empty) (*zondpb.HostData, 
 }
 
 // GetPeer returns the data known about the peer defined by the provided peer id.
-func (ns *Server) GetPeer(_ context.Context, peerReq *zondpb.PeerRequest) (*zondpb.Peer, error) {
+func (ns *Server) GetPeer(_ context.Context, peerReq *qrysmpb.PeerRequest) (*qrysmpb.Peer, error) {
 	pid, err := peer.Decode(peerReq.PeerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Unable to parse provided peer id: %v", err)
@@ -136,12 +136,12 @@ func (ns *Server) GetPeer(_ context.Context, peerReq *zondpb.PeerRequest) (*zond
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Requested peer does not exist: %v", err)
 	}
-	pbDirection := zondpb.PeerDirection_UNKNOWN
+	pbDirection := qrysmpb.PeerDirection_UNKNOWN
 	switch dir {
 	case network.DirInbound:
-		pbDirection = zondpb.PeerDirection_INBOUND
+		pbDirection = qrysmpb.PeerDirection_INBOUND
 	case network.DirOutbound:
-		pbDirection = zondpb.PeerDirection_OUTBOUND
+		pbDirection = qrysmpb.PeerDirection_OUTBOUND
 	}
 	connState, err := ns.PeersFetcher.Peers().ConnectionState(pid)
 	if err != nil {
@@ -158,19 +158,19 @@ func (ns *Server) GetPeer(_ context.Context, peerReq *zondpb.PeerRequest) (*zond
 			return nil, status.Errorf(codes.Internal, "Unable to serialize qnr: %v", err)
 		}
 	}
-	return &zondpb.Peer{
+	return &qrysmpb.Peer{
 		Address:         addr.String(),
 		Direction:       pbDirection,
-		ConnectionState: zondpb.ConnectionState(connState),
+		ConnectionState: qrysmpb.ConnectionState(connState),
 		PeerId:          peerReq.PeerId,
 		Qnr:             qnr,
 	}, nil
 }
 
 // ListPeers lists the peers connected to this node.
-func (ns *Server) ListPeers(ctx context.Context, _ *empty.Empty) (*zondpb.Peers, error) {
+func (ns *Server) ListPeers(ctx context.Context, _ *empty.Empty) (*qrysmpb.Peers, error) {
 	peers := ns.PeersFetcher.Peers().Connected()
-	res := make([]*zondpb.Peer, 0, len(peers))
+	res := make([]*qrysmpb.Peer, 0, len(peers))
 	for _, pid := range peers {
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
@@ -199,35 +199,35 @@ func (ns *Server) ListPeers(ctx context.Context, _ *empty.Empty) (*zondpb.Peers,
 			multiAddrStr = multiaddr.String()
 		}
 		address := fmt.Sprintf("%s/p2p/%s", multiAddrStr, pid.String())
-		pbDirection := zondpb.PeerDirection_UNKNOWN
+		pbDirection := qrysmpb.PeerDirection_UNKNOWN
 		switch direction {
 		case network.DirInbound:
-			pbDirection = zondpb.PeerDirection_INBOUND
+			pbDirection = qrysmpb.PeerDirection_INBOUND
 		case network.DirOutbound:
-			pbDirection = zondpb.PeerDirection_OUTBOUND
+			pbDirection = qrysmpb.PeerDirection_OUTBOUND
 		}
-		res = append(res, &zondpb.Peer{
+		res = append(res, &qrysmpb.Peer{
 			Address:         address,
 			Direction:       pbDirection,
-			ConnectionState: zondpb.ConnectionState_CONNECTED,
+			ConnectionState: qrysmpb.ConnectionState_CONNECTED,
 			PeerId:          pid.String(),
 			Qnr:             qnr,
 		})
 	}
 
-	return &zondpb.Peers{
+	return &qrysmpb.Peers{
 		Peers: res,
 	}, nil
 }
 
 // GetExecutionNodeConnectionStatus gets data about the QRL1 endpoints.
-func (ns *Server) GetExecutionNodeConnectionStatus(_ context.Context, _ *empty.Empty) (*zondpb.ExecutionNodeConnectionStatus, error) {
+func (ns *Server) GetExecutionNodeConnectionStatus(_ context.Context, _ *empty.Empty) (*qrysmpb.ExecutionNodeConnectionStatus, error) {
 	var currErr string
 	err := ns.POWChainInfoFetcher.ExecutionClientConnectionErr()
 	if err != nil {
 		currErr = err.Error()
 	}
-	return &zondpb.ExecutionNodeConnectionStatus{
+	return &qrysmpb.ExecutionNodeConnectionStatus{
 		CurrentAddress:         ns.POWChainInfoFetcher.ExecutionClientEndpoint(),
 		CurrentConnectionError: currErr,
 		Addresses:              []string{ns.POWChainInfoFetcher.ExecutionClientEndpoint()},

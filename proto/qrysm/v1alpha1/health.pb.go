@@ -4,7 +4,7 @@
 // 	protoc        v4.23.3
 // source: proto/qrysm/v1alpha1/health.proto
 
-package zond
+package qrl
 
 import (
 	context "context"
@@ -122,12 +122,12 @@ func file_proto_qrysm_v1alpha1_health_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_health_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_proto_qrysm_v1alpha1_health_proto_goTypes = []interface{}{
-	(*LogsResponse)(nil), // 0: theqrl.zond.v1alpha1.LogsResponse
+	(*LogsResponse)(nil), // 0: theqrl.qrl.v1alpha1.LogsResponse
 	(*empty.Empty)(nil),  // 1: google.protobuf.Empty
 }
 var file_proto_qrysm_v1alpha1_health_proto_depIdxs = []int32{
-	1, // 0: theqrl.zond.v1alpha1.Health.StreamBeaconLogs:input_type -> google.protobuf.Empty
-	0, // 1: theqrl.zond.v1alpha1.Health.StreamBeaconLogs:output_type -> theqrl.zond.v1alpha1.LogsResponse
+	1, // 0: theqrl.qrl.v1alpha1.Health.StreamBeaconLogs:input_type -> google.protobuf.Empty
+	0, // 1: theqrl.qrl.v1alpha1.Health.StreamBeaconLogs:output_type -> theqrl.qrl.v1alpha1.LogsResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -200,7 +200,7 @@ func NewHealthClient(cc grpc.ClientConnInterface) HealthClient {
 
 // Deprecated: Do not use.
 func (c *healthClient) StreamBeaconLogs(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (Health_StreamBeaconLogsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Health_serviceDesc.Streams[0], "/theqrl.zond.v1alpha1.Health/StreamBeaconLogs", opts...)
+	stream, err := c.cc.NewStream(ctx, &_Health_serviceDesc.Streams[0], "/theqrl.qrl.v1alpha1.Health/StreamBeaconLogs", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +271,7 @@ func (x *healthStreamBeaconLogsServer) Send(m *LogsResponse) error {
 }
 
 var _Health_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "theqrl.zond.v1alpha1.Health",
+	ServiceName: "theqrl.qrl.v1alpha1.Health",
 	HandlerType: (*HealthServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{

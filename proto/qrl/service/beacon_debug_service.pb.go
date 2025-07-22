@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/service/beacon_debug_service.proto
+// source: proto/qrl/service/beacon_debug_service.proto
 
 package service
 
@@ -95,22 +95,22 @@ var file_proto_zond_service_beacon_debug_service_proto_rawDesc = []byte{
 }
 
 var file_proto_zond_service_beacon_debug_service_proto_goTypes = []interface{}{
-	(*v1.BeaconStateRequest)(nil),      // 0: theqrl.zond.v1.BeaconStateRequest
+	(*v1.BeaconStateRequest)(nil),      // 0: theqrl.qrl.v1.BeaconStateRequest
 	(*emptypb.Empty)(nil),              // 1: google.protobuf.Empty
-	(*v1.BeaconStateResponse)(nil),     // 2: theqrl.zond.v1.BeaconStateResponse
-	(*v1.SSZContainer)(nil),            // 3: theqrl.zond.v1.SSZContainer
-	(*v1.ForkChoiceHeadsResponse)(nil), // 4: theqrl.zond.v1.ForkChoiceHeadsResponse
-	(*v1.ForkChoiceDump)(nil),          // 5: theqrl.zond.v1.ForkChoiceDump
+	(*v1.BeaconStateResponse)(nil),     // 2: theqrl.qrl.v1.BeaconStateResponse
+	(*v1.SSZContainer)(nil),            // 3: theqrl.qrl.v1.SSZContainer
+	(*v1.ForkChoiceHeadsResponse)(nil), // 4: theqrl.qrl.v1.ForkChoiceHeadsResponse
+	(*v1.ForkChoiceDump)(nil),          // 5: theqrl.qrl.v1.ForkChoiceDump
 }
 var file_proto_zond_service_beacon_debug_service_proto_depIdxs = []int32{
-	0, // 0: theqrl.zond.service.BeaconDebug.GetBeaconState:input_type -> theqrl.zond.v1.BeaconStateRequest
-	0, // 1: theqrl.zond.service.BeaconDebug.GetBeaconStateSSZ:input_type -> theqrl.zond.v1.BeaconStateRequest
-	1, // 2: theqrl.zond.service.BeaconDebug.ListForkChoiceHeads:input_type -> google.protobuf.Empty
-	1, // 3: theqrl.zond.service.BeaconDebug.GetForkChoice:input_type -> google.protobuf.Empty
-	2, // 4: theqrl.zond.service.BeaconDebug.GetBeaconState:output_type -> theqrl.zond.v1.BeaconStateResponse
-	3, // 5: theqrl.zond.service.BeaconDebug.GetBeaconStateSSZ:output_type -> theqrl.zond.v1.SSZContainer
-	4, // 6: theqrl.zond.service.BeaconDebug.ListForkChoiceHeads:output_type -> theqrl.zond.v1.ForkChoiceHeadsResponse
-	5, // 7: theqrl.zond.service.BeaconDebug.GetForkChoice:output_type -> theqrl.zond.v1.ForkChoiceDump
+	0, // 0: theqrl.qrl.service.BeaconDebug.GetBeaconState:input_type -> theqrl.qrl.v1.BeaconStateRequest
+	0, // 1: theqrl.qrl.service.BeaconDebug.GetBeaconStateSSZ:input_type -> theqrl.qrl.v1.BeaconStateRequest
+	1, // 2: theqrl.qrl.service.BeaconDebug.ListForkChoiceHeads:input_type -> google.protobuf.Empty
+	1, // 3: theqrl.qrl.service.BeaconDebug.GetForkChoice:input_type -> google.protobuf.Empty
+	2, // 4: theqrl.qrl.service.BeaconDebug.GetBeaconState:output_type -> theqrl.qrl.v1.BeaconStateResponse
+	3, // 5: theqrl.qrl.service.BeaconDebug.GetBeaconStateSSZ:output_type -> theqrl.qrl.v1.SSZContainer
+	4, // 6: theqrl.qrl.service.BeaconDebug.ListForkChoiceHeads:output_type -> theqrl.qrl.v1.ForkChoiceHeadsResponse
+	5, // 7: theqrl.qrl.service.BeaconDebug.GetForkChoice:output_type -> theqrl.qrl.v1.ForkChoiceDump
 	4, // [4:8] is the sub-list for method output_type
 	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -170,7 +170,7 @@ func NewBeaconDebugClient(cc grpc.ClientConnInterface) BeaconDebugClient {
 
 func (c *beaconDebugClient) GetBeaconState(ctx context.Context, in *v1.BeaconStateRequest, opts ...grpc.CallOption) (*v1.BeaconStateResponse, error) {
 	out := new(v1.BeaconStateResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconDebug/GetBeaconState", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconDebug/GetBeaconState", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +179,7 @@ func (c *beaconDebugClient) GetBeaconState(ctx context.Context, in *v1.BeaconSta
 
 func (c *beaconDebugClient) GetBeaconStateSSZ(ctx context.Context, in *v1.BeaconStateRequest, opts ...grpc.CallOption) (*v1.SSZContainer, error) {
 	out := new(v1.SSZContainer)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconDebug/GetBeaconStateSSZ", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconDebug/GetBeaconStateSSZ", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func (c *beaconDebugClient) GetBeaconStateSSZ(ctx context.Context, in *v1.Beacon
 
 func (c *beaconDebugClient) ListForkChoiceHeads(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.ForkChoiceHeadsResponse, error) {
 	out := new(v1.ForkChoiceHeadsResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconDebug/ListForkChoiceHeads", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconDebug/ListForkChoiceHeads", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func (c *beaconDebugClient) ListForkChoiceHeads(ctx context.Context, in *emptypb
 
 func (c *beaconDebugClient) GetForkChoice(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.ForkChoiceDump, error) {
 	out := new(v1.ForkChoiceDump)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconDebug/GetForkChoice", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconDebug/GetForkChoice", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -243,7 +243,7 @@ func _BeaconDebug_GetBeaconState_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconDebug/GetBeaconState",
+		FullMethod: "/theqrl.qrl.service.BeaconDebug/GetBeaconState",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconDebugServer).GetBeaconState(ctx, req.(*v1.BeaconStateRequest))
@@ -261,7 +261,7 @@ func _BeaconDebug_GetBeaconStateSSZ_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconDebug/GetBeaconStateSSZ",
+		FullMethod: "/theqrl.qrl.service.BeaconDebug/GetBeaconStateSSZ",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconDebugServer).GetBeaconStateSSZ(ctx, req.(*v1.BeaconStateRequest))
@@ -279,7 +279,7 @@ func _BeaconDebug_ListForkChoiceHeads_Handler(srv interface{}, ctx context.Conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconDebug/ListForkChoiceHeads",
+		FullMethod: "/theqrl.qrl.service.BeaconDebug/ListForkChoiceHeads",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconDebugServer).ListForkChoiceHeads(ctx, req.(*emptypb.Empty))
@@ -297,7 +297,7 @@ func _BeaconDebug_GetForkChoice_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconDebug/GetForkChoice",
+		FullMethod: "/theqrl.qrl.service.BeaconDebug/GetForkChoice",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconDebugServer).GetForkChoice(ctx, req.(*emptypb.Empty))
@@ -306,7 +306,7 @@ func _BeaconDebug_GetForkChoice_Handler(srv interface{}, ctx context.Context, de
 }
 
 var _BeaconDebug_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "theqrl.zond.service.BeaconDebug",
+	ServiceName: "theqrl.qrl.service.BeaconDebug",
 	HandlerType: (*BeaconDebugServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -327,5 +327,5 @@ var _BeaconDebug_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/zond/service/beacon_debug_service.proto",
+	Metadata: "proto/qrl/service/beacon_debug_service.proto",
 }

@@ -14,8 +14,8 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	"github.com/theQRL/qrysm/proto/migration"
-	zondpbservice "github.com/theQRL/qrysm/proto/qrl/service"
-	zondpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
 	"google.golang.org/grpc/codes"
@@ -61,7 +61,7 @@ var casesHandled = map[string]bool{
 // The topics supported include block events, attestations, chain reorgs, voluntary exits,
 // chain finality, and more.
 func (s *Server) StreamEvents(
-	req *zondpb.StreamEventsRequest, stream zondpbservice.Events_StreamEventsServer,
+	req *qrlpb.StreamEventsRequest, stream qrlpbservice.Events_StreamEventsServer,
 ) error {
 	if req == nil || len(req.Topics) == 0 {
 		return status.Error(codes.InvalidArgument, "No topics specified to subscribe to")
@@ -108,7 +108,7 @@ func (s *Server) StreamEvents(
 }
 
 func handleBlockOperationEvents(
-	stream zondpbservice.Events_StreamEventsServer, requestedTopics map[string]bool, event *feed.Event,
+	stream qrlpbservice.Events_StreamEventsServer, requestedTopics map[string]bool, event *feed.Event,
 ) error {
 	switch event.Type {
 	case operation.AggregatedAttReceived:
@@ -167,12 +167,12 @@ func handleBlockOperationEvents(
 }
 
 func (s *Server) handleStateEvents(
-	stream zondpbservice.Events_StreamEventsServer, requestedTopics map[string]bool, event *feed.Event,
+	stream qrlpbservice.Events_StreamEventsServer, requestedTopics map[string]bool, event *feed.Event,
 ) error {
 	switch event.Type {
 	case statefeed.NewHead:
 		if _, ok := requestedTopics[HeadTopic]; ok {
-			head, ok := event.Data.(*zondpb.EventHead)
+			head, ok := event.Data.(*qrlpb.EventHead)
 			if !ok {
 				return nil
 			}
@@ -197,7 +197,7 @@ func (s *Server) handleStateEvents(
 		if _, ok := requestedTopics[FinalizedCheckpointTopic]; !ok {
 			return nil
 		}
-		finalizedCheckpoint, ok := event.Data.(*zondpb.EventFinalizedCheckpoint)
+		finalizedCheckpoint, ok := event.Data.(*qrlpb.EventFinalizedCheckpoint)
 		if !ok {
 			return nil
 		}
@@ -206,7 +206,7 @@ func (s *Server) handleStateEvents(
 		if _, ok := requestedTopics[ChainReorgTopic]; !ok {
 			return nil
 		}
-		reorg, ok := event.Data.(*zondpb.EventChainReorg)
+		reorg, ok := event.Data.(*qrlpb.EventChainReorg)
 		if !ok {
 			return nil
 		}
@@ -227,7 +227,7 @@ func (s *Server) handleStateEvents(
 		if err != nil {
 			return errors.Wrap(err, "could not hash tree root block")
 		}
-		eventBlock := &zondpb.EventBlock{
+		eventBlock := &qrlpb.EventBlock{
 			Slot:                blkData.Slot,
 			Block:               item[:],
 			ExecutionOptimistic: blkData.Optimistic,
@@ -241,7 +241,7 @@ func (s *Server) handleStateEvents(
 // streamPayloadAttributes on new head event.
 // This event stream is intended to be used by builders and relays.
 // parent_ fields are based on state at N_{current_slot}, while the rest of fields are based on state of N_{current_slot + 1}
-func (s *Server) streamPayloadAttributes(stream zondpbservice.Events_StreamEventsServer) error {
+func (s *Server) streamPayloadAttributes(stream qrlpbservice.Events_StreamEventsServer) error {
 	headRoot, err := s.HeadFetcher.HeadRoot(s.Ctx)
 	if err != nil {
 		return errors.Wrap(err, "could not get head root")
@@ -287,9 +287,9 @@ func (s *Server) streamPayloadAttributes(stream zondpbservice.Events_StreamEvent
 		if err != nil {
 			return err
 		}
-		return streamData(stream, PayloadAttributesTopic, &zondpb.EventPayloadAttributeV2{
+		return streamData(stream, PayloadAttributesTopic, &qrlpb.EventPayloadAttributeV2{
 			Version: version.String(headState.Version()),
-			Data: &zondpb.EventPayloadAttributeV2_BasePayloadAttribute{
+			Data: &qrlpb.EventPayloadAttributeV2_BasePayloadAttribute{
 				ProposerIndex:     proposerIndex,
 				ProposalSlot:      headState.Slot(),
 				ParentBlockNumber: headPayload.BlockNumber(),
@@ -308,7 +308,7 @@ func (s *Server) streamPayloadAttributes(stream zondpbservice.Events_StreamEvent
 	}
 }
 
-func streamData(stream zondpbservice.Events_StreamEventsServer, name string, data proto.Message) error {
+func streamData(stream qrlpbservice.Events_StreamEventsServer, name string, data proto.Message) error {
 	returnData, err := anypb.New(data)
 	if err != nil {
 		return err

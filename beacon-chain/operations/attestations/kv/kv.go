@@ -10,7 +10,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/hash"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 var hashFn = hash.HashProto
@@ -20,13 +20,13 @@ var hashFn = hash.HashProto
 // such are unaggregated, aggregated or attestations within a block.
 type AttCaches struct {
 	aggregatedAttLock  sync.RWMutex
-	aggregatedAtt      map[[32]byte][]*zondpb.Attestation
+	aggregatedAtt      map[[32]byte][]*qrysmpb.Attestation
 	unAggregateAttLock sync.RWMutex
-	unAggregatedAtt    map[[32]byte]*zondpb.Attestation
+	unAggregatedAtt    map[[32]byte]*qrysmpb.Attestation
 	forkchoiceAttLock  sync.RWMutex
-	forkchoiceAtt      map[[32]byte]*zondpb.Attestation
+	forkchoiceAtt      map[[32]byte]*qrysmpb.Attestation
 	blockAttLock       sync.RWMutex
-	blockAtt           map[[32]byte][]*zondpb.Attestation
+	blockAtt           map[[32]byte][]*qrysmpb.Attestation
 	seenAtt            *cache.Cache
 }
 
@@ -36,10 +36,10 @@ func NewAttCaches() *AttCaches {
 	secsInEpoch := time.Duration(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot))
 	c := cache.New(secsInEpoch*time.Second, 2*secsInEpoch*time.Second)
 	pool := &AttCaches{
-		unAggregatedAtt: make(map[[32]byte]*zondpb.Attestation),
-		aggregatedAtt:   make(map[[32]byte][]*zondpb.Attestation),
-		forkchoiceAtt:   make(map[[32]byte]*zondpb.Attestation),
-		blockAtt:        make(map[[32]byte][]*zondpb.Attestation),
+		unAggregatedAtt: make(map[[32]byte]*qrysmpb.Attestation),
+		aggregatedAtt:   make(map[[32]byte][]*qrysmpb.Attestation),
+		forkchoiceAtt:   make(map[[32]byte]*qrysmpb.Attestation),
+		blockAtt:        make(map[[32]byte][]*qrysmpb.Attestation),
 		seenAtt:         c,
 	}
 

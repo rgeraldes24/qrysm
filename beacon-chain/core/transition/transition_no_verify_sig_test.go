@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -19,7 +19,7 @@ import (
 func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 
-	executionNodeData := &zondpb.ExecutionNodeData{
+	executionNodeData := &qrysmpb.ExecutionNodeData{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
@@ -31,7 +31,7 @@ func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*zondpb.ExecutionNodeData{executionNodeData}))
+	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*qrysmpb.ExecutionNodeData{executionNodeData}))
 
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 	epoch := time.CurrentEpoch(beaconState)
@@ -75,7 +75,7 @@ func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 
-	executionNodeData := &zondpb.ExecutionNodeData{
+	executionNodeData := &qrysmpb.ExecutionNodeData{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
@@ -87,7 +87,7 @@ func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *test
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*zondpb.ExecutionNodeData{executionNodeData}))
+	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*qrysmpb.ExecutionNodeData{executionNodeData}))
 
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 	epoch := time.CurrentEpoch(beaconState)

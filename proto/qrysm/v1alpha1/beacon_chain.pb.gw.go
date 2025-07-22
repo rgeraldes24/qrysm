@@ -6,7 +6,7 @@ Package zond is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package zond
+package qrl
 
 import (
 	"context"
@@ -623,7 +623,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListAttestations")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListAttestations")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -646,7 +646,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListIndexedAttestations")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListIndexedAttestations")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -669,7 +669,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/AttestationPool")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/AttestationPool")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -692,7 +692,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListBeaconBlocks")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListBeaconBlocks")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -715,7 +715,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetChainHead")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetChainHead")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -738,7 +738,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListBeaconCommittees")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListBeaconCommittees")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -761,7 +761,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListValidatorBalances")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListValidatorBalances")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -784,7 +784,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListValidators")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListValidators")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -807,7 +807,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetValidator")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidator")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -830,7 +830,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorActiveSetChanges")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorActiveSetChanges")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -853,7 +853,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorPerformance")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorPerformance")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -876,7 +876,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListValidatorAssignments")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListValidatorAssignments")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -899,7 +899,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorParticipation")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorParticipation")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -922,7 +922,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetBeaconConfig")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetBeaconConfig")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -945,7 +945,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/SubmitAttesterSlashing")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/SubmitAttesterSlashing")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -968,7 +968,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/SubmitProposerSlashing")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/SubmitProposerSlashing")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -991,7 +991,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetIndividualVotes")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetIndividualVotes")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1053,7 +1053,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListAttestations")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListAttestations")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1073,7 +1073,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListIndexedAttestations")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListIndexedAttestations")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1093,7 +1093,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/AttestationPool")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/AttestationPool")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1113,7 +1113,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListBeaconBlocks")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListBeaconBlocks")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1133,7 +1133,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetChainHead")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetChainHead")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1153,7 +1153,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListBeaconCommittees")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListBeaconCommittees")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1173,7 +1173,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListValidatorBalances")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListValidatorBalances")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1193,7 +1193,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListValidators")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListValidators")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1213,7 +1213,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetValidator")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidator")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1233,7 +1233,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorActiveSetChanges")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorActiveSetChanges")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1253,7 +1253,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorPerformance")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorPerformance")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1273,7 +1273,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/ListValidatorAssignments")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/ListValidatorAssignments")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1293,7 +1293,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetValidatorParticipation")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetValidatorParticipation")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1313,7 +1313,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetBeaconConfig")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetBeaconConfig")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1333,7 +1333,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/SubmitAttesterSlashing")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/SubmitAttesterSlashing")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1353,7 +1353,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/SubmitProposerSlashing")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/SubmitProposerSlashing")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1373,7 +1373,7 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.zond.v1alpha1.BeaconChain/GetIndividualVotes")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.v1alpha1.BeaconChain/GetIndividualVotes")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

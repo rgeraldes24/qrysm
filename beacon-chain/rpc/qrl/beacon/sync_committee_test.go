@@ -14,8 +14,8 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
-	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -32,7 +32,7 @@ func Test_currentCommitteeIndicesFromState(t *testing.T) {
 		wantedIndices[i] = primitives.ValidatorIndex(i)
 		wantedCommittee[i] = vals[i].PublicKey
 	}
-	require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
+	require.NoError(t, st.SetCurrentSyncCommittee(&qrysmpb.SyncCommittee{
 		Pubkeys: wantedCommittee,
 	}))
 
@@ -44,7 +44,7 @@ func Test_currentCommitteeIndicesFromState(t *testing.T) {
 	})
 	t.Run("validator in committee not found in state", func(t *testing.T) {
 		wantedCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 48)
-		require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
+		require.NoError(t, st.SetCurrentSyncCommittee(&qrysmpb.SyncCommittee{
 			Pubkeys: wantedCommittee,
 		}))
 		_, _, err := currentCommitteeIndicesFromState(st)
@@ -61,7 +61,7 @@ func Test_nextCommitteeIndicesFromState(t *testing.T) {
 		wantedIndices[i] = primitives.ValidatorIndex(i)
 		wantedCommittee[i] = vals[i].PublicKey
 	}
-	require.NoError(t, st.SetNextSyncCommittee(&zondpbalpha.SyncCommittee{
+	require.NoError(t, st.SetNextSyncCommittee(&qrysmpb.SyncCommittee{
 		Pubkeys: wantedCommittee,
 	}))
 
@@ -73,7 +73,7 @@ func Test_nextCommitteeIndicesFromState(t *testing.T) {
 	})
 	t.Run("validator in committee not found in state", func(t *testing.T) {
 		wantedCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 48)
-		require.NoError(t, st.SetNextSyncCommittee(&zondpbalpha.SyncCommittee{
+		require.NoError(t, st.SetNextSyncCommittee(&qrysmpb.SyncCommittee{
 			Pubkeys: wantedCommittee,
 		}))
 		_, _, err := nextCommitteeIndicesFromState(st)
@@ -88,7 +88,7 @@ func Test_extractSyncSubcommittees(t *testing.T) {
 	for i := 0; i < len(syncCommittee); i++ {
 		syncCommittee[i] = vals[i].PublicKey
 	}
-	require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
+	require.NoError(t, st.SetCurrentSyncCommittee(&qrysmpb.SyncCommittee{
 		Pubkeys: syncCommittee,
 	}))
 
@@ -121,7 +121,7 @@ func Test_extractSyncSubcommittees(t *testing.T) {
 	})
 	t.Run("validator in subcommittee not found in state", func(t *testing.T) {
 		syncCommittee[0] = bytesutil.PadTo([]byte("fakepubkey"), 48)
-		require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
+		require.NoError(t, st.SetCurrentSyncCommittee(&qrysmpb.SyncCommittee{
 			Pubkeys: syncCommittee,
 		}))
 		committee, err := st.CurrentSyncCommittee()
@@ -139,7 +139,7 @@ func TestListSyncCommittees(t *testing.T) {
 	for i := 0; i < len(syncCommittee); i++ {
 		syncCommittee[i] = vals[i].PublicKey
 	}
-	require.NoError(t, st.SetCurrentSyncCommittee(&zondpbalpha.SyncCommittee{
+	require.NoError(t, st.SetCurrentSyncCommittee(&qrysmpb.SyncCommittee{
 		Pubkeys: syncCommittee,
 	}))
 	stRoot, err := st.HashTreeRoot(ctx)
@@ -161,7 +161,7 @@ func TestListSyncCommittees(t *testing.T) {
 		BeaconDB:              db,
 		ChainInfoFetcher:      chainService,
 	}
-	req := &zondpbv1.StateSyncCommitteesRequest{StateId: stRoot[:]}
+	req := &qrlpb.StateSyncCommitteesRequest{StateId: stRoot[:]}
 	resp, err := s.ListSyncCommittees(ctx, req)
 	require.NoError(t, err)
 	require.NotNil(t, resp.Data)
@@ -283,7 +283,7 @@ func TestListSyncCommitteesFuture(t *testing.T) {
 	for i := 0; i < len(syncCommittee); i++ {
 		syncCommittee[i] = vals[i].PublicKey
 	}
-	require.NoError(t, st.SetNextSyncCommittee(&zondpbalpha.SyncCommittee{
+	require.NoError(t, st.SetNextSyncCommittee(&qrysmpb.SyncCommittee{
 		Pubkeys: syncCommittee,
 	}))
 	db := dbTest.SetupDB(t)
@@ -301,7 +301,7 @@ func TestListSyncCommitteesFuture(t *testing.T) {
 		FinalizationFetcher:   chainService,
 		BeaconDB:              db,
 	}
-	req := &zondpbv1.StateSyncCommitteesRequest{StateId: []byte("head")}
+	req := &qrlpb.StateSyncCommitteesRequest{StateId: []byte("head")}
 	epoch := 2 * params.BeaconConfig().EpochsPerSyncCommitteePeriod
 	req.Epoch = &epoch
 	_, err := s.ListSyncCommittees(ctx, req)

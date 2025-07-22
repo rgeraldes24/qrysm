@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/v1/events.proto
+// source: proto/qrl/v1/events.proto
 
 package v1
 
@@ -701,18 +701,18 @@ func file_proto_zond_v1_events_proto_rawDescGZIP() []byte {
 
 var file_proto_zond_v1_events_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_proto_zond_v1_events_proto_goTypes = []interface{}{
-	(*StreamEventsRequest)(nil),                          // 0: theqrl.zond.v1.StreamEventsRequest
-	(*EventHead)(nil),                                    // 1: theqrl.zond.v1.EventHead
-	(*EventBlock)(nil),                                   // 2: theqrl.zond.v1.EventBlock
-	(*EventChainReorg)(nil),                              // 3: theqrl.zond.v1.EventChainReorg
-	(*EventFinalizedCheckpoint)(nil),                     // 4: theqrl.zond.v1.EventFinalizedCheckpoint
-	(*EventPayloadAttributeV2)(nil),                      // 5: theqrl.zond.v1.EventPayloadAttributeV2
-	(*EventPayloadAttributeV2_BasePayloadAttribute)(nil), // 6: theqrl.zond.v1.EventPayloadAttributeV2.BasePayloadAttribute
+	(*StreamEventsRequest)(nil),                          // 0: theqrl.qrl.v1.StreamEventsRequest
+	(*EventHead)(nil),                                    // 1: theqrl.qrl.v1.EventHead
+	(*EventBlock)(nil),                                   // 2: theqrl.qrl.v1.EventBlock
+	(*EventChainReorg)(nil),                              // 3: theqrl.qrl.v1.EventChainReorg
+	(*EventFinalizedCheckpoint)(nil),                     // 4: theqrl.qrl.v1.EventFinalizedCheckpoint
+	(*EventPayloadAttributeV2)(nil),                      // 5: theqrl.qrl.v1.EventPayloadAttributeV2
+	(*EventPayloadAttributeV2_BasePayloadAttribute)(nil), // 6: theqrl.qrl.v1.EventPayloadAttributeV2.BasePayloadAttribute
 	(*v1.PayloadAttributesV2)(nil),                       // 7: theqrl.engine.v1.PayloadAttributesV2
 }
 var file_proto_zond_v1_events_proto_depIdxs = []int32{
-	6, // 0: theqrl.zond.v1.EventPayloadAttributeV2.data:type_name -> theqrl.zond.v1.EventPayloadAttributeV2.BasePayloadAttribute
-	7, // 1: theqrl.zond.v1.EventPayloadAttributeV2.BasePayloadAttribute.payload_attributes:type_name -> theqrl.engine.v1.PayloadAttributesV2
+	6, // 0: theqrl.qrl.v1.EventPayloadAttributeV2.data:type_name -> theqrl.qrl.v1.EventPayloadAttributeV2.BasePayloadAttribute
+	7, // 1: theqrl.qrl.v1.EventPayloadAttributeV2.BasePayloadAttribute.payload_attributes:type_name -> theqrl.engine.v1.PayloadAttributesV2
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

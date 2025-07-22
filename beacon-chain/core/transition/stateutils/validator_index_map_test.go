@@ -8,14 +8,14 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
 func TestValidatorIndexMap_OK(t *testing.T) {
-	base := &zondpb.BeaconStateCapella{
-		Validators: []*zondpb.Validator{
+	base := &qrysmpb.BeaconStateCapella{
+		Validators: []*qrysmpb.Validator{
 			{
 				PublicKey: []byte("zero"),
 			},

@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: proto/qrysm/v1alpha1/debug.proto
 
-package zond
+package qrl
 
 import (
 	context "context"
@@ -258,7 +258,7 @@ type LoggingLevelRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Level LoggingLevelRequest_Level `protobuf:"varint,1,opt,name=level,proto3,enum=theqrl.zond.v1alpha1.LoggingLevelRequest_Level" json:"level,omitempty"`
+	Level LoggingLevelRequest_Level `protobuf:"varint,1,opt,name=level,proto3,enum=theqrl.qrl.v1alpha1.LoggingLevelRequest_Level" json:"level,omitempty"`
 }
 
 func (x *LoggingLevelRequest) Reset() {
@@ -353,8 +353,8 @@ type DebugPeerResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	ListeningAddresses []string                    `protobuf:"bytes,1,rep,name=listening_addresses,json=listeningAddresses,proto3" json:"listening_addresses,omitempty"`
-	Direction          PeerDirection               `protobuf:"varint,2,opt,name=direction,proto3,enum=theqrl.zond.v1alpha1.PeerDirection" json:"direction,omitempty"`
-	ConnectionState    ConnectionState             `protobuf:"varint,3,opt,name=connection_state,json=connectionState,proto3,enum=theqrl.zond.v1alpha1.ConnectionState" json:"connection_state,omitempty"`
+	Direction          PeerDirection               `protobuf:"varint,2,opt,name=direction,proto3,enum=theqrl.qrl.v1alpha1.PeerDirection" json:"direction,omitempty"`
+	ConnectionState    ConnectionState             `protobuf:"varint,3,opt,name=connection_state,json=connectionState,proto3,enum=theqrl.qrl.v1alpha1.ConnectionState" json:"connection_state,omitempty"`
 	PeerId             string                      `protobuf:"bytes,4,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
 	Qnr                string                      `protobuf:"bytes,5,opt,name=qnr,proto3" json:"qnr,omitempty"`
 	PeerInfo           *DebugPeerResponse_PeerInfo `protobuf:"bytes,6,opt,name=peer_info,json=peerInfo,proto3" json:"peer_info,omitempty"`
@@ -918,46 +918,46 @@ func file_proto_qrysm_v1alpha1_debug_proto_rawDescGZIP() []byte {
 var file_proto_qrysm_v1alpha1_debug_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_qrysm_v1alpha1_debug_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_proto_qrysm_v1alpha1_debug_proto_goTypes = []interface{}{
-	(LoggingLevelRequest_Level)(0),     // 0: theqrl.zond.v1alpha1.LoggingLevelRequest.Level
-	(*BeaconStateRequest)(nil),         // 1: theqrl.zond.v1alpha1.BeaconStateRequest
-	(*BlockRequestByRoot)(nil),         // 2: theqrl.zond.v1alpha1.BlockRequestByRoot
-	(*SSZResponse)(nil),                // 3: theqrl.zond.v1alpha1.SSZResponse
-	(*LoggingLevelRequest)(nil),        // 4: theqrl.zond.v1alpha1.LoggingLevelRequest
-	(*DebugPeerResponses)(nil),         // 5: theqrl.zond.v1alpha1.DebugPeerResponses
-	(*DebugPeerResponse)(nil),          // 6: theqrl.zond.v1alpha1.DebugPeerResponse
-	(*ScoreInfo)(nil),                  // 7: theqrl.zond.v1alpha1.ScoreInfo
-	(*TopicScoreSnapshot)(nil),         // 8: theqrl.zond.v1alpha1.TopicScoreSnapshot
-	(*DebugPeerResponse_PeerInfo)(nil), // 9: theqrl.zond.v1alpha1.DebugPeerResponse.PeerInfo
-	nil,                                // 10: theqrl.zond.v1alpha1.ScoreInfo.TopicScoresEntry
-	(PeerDirection)(0),                 // 11: theqrl.zond.v1alpha1.PeerDirection
-	(ConnectionState)(0),               // 12: theqrl.zond.v1alpha1.ConnectionState
-	(*Status)(nil),                     // 13: theqrl.zond.v1alpha1.Status
-	(*MetaDataV1)(nil),                 // 15: theqrl.zond.v1alpha1.MetaDataV1
+	(LoggingLevelRequest_Level)(0),     // 0: theqrl.qrl.v1alpha1.LoggingLevelRequest.Level
+	(*BeaconStateRequest)(nil),         // 1: theqrl.qrl.v1alpha1.BeaconStateRequest
+	(*BlockRequestByRoot)(nil),         // 2: theqrl.qrl.v1alpha1.BlockRequestByRoot
+	(*SSZResponse)(nil),                // 3: theqrl.qrl.v1alpha1.SSZResponse
+	(*LoggingLevelRequest)(nil),        // 4: theqrl.qrl.v1alpha1.LoggingLevelRequest
+	(*DebugPeerResponses)(nil),         // 5: theqrl.qrl.v1alpha1.DebugPeerResponses
+	(*DebugPeerResponse)(nil),          // 6: theqrl.qrl.v1alpha1.DebugPeerResponse
+	(*ScoreInfo)(nil),                  // 7: theqrl.qrl.v1alpha1.ScoreInfo
+	(*TopicScoreSnapshot)(nil),         // 8: theqrl.qrl.v1alpha1.TopicScoreSnapshot
+	(*DebugPeerResponse_PeerInfo)(nil), // 9: theqrl.qrl.v1alpha1.DebugPeerResponse.PeerInfo
+	nil,                                // 10: theqrl.qrl.v1alpha1.ScoreInfo.TopicScoresEntry
+	(PeerDirection)(0),                 // 11: theqrl.qrl.v1alpha1.PeerDirection
+	(ConnectionState)(0),               // 12: theqrl.qrl.v1alpha1.ConnectionState
+	(*Status)(nil),                     // 13: theqrl.qrl.v1alpha1.Status
+	(*MetaDataV1)(nil),                 // 15: theqrl.qrl.v1alpha1.MetaDataV1
 	(*emptypb.Empty)(nil),              // 16: google.protobuf.Empty
-	(*PeerRequest)(nil),                // 17: theqrl.zond.v1alpha1.PeerRequest
+	(*PeerRequest)(nil),                // 17: theqrl.qrl.v1alpha1.PeerRequest
 }
 var file_proto_qrysm_v1alpha1_debug_proto_depIdxs = []int32{
-	0,  // 0: theqrl.zond.v1alpha1.LoggingLevelRequest.level:type_name -> theqrl.zond.v1alpha1.LoggingLevelRequest.Level
-	6,  // 1: theqrl.zond.v1alpha1.DebugPeerResponses.responses:type_name -> theqrl.zond.v1alpha1.DebugPeerResponse
-	11, // 2: theqrl.zond.v1alpha1.DebugPeerResponse.direction:type_name -> theqrl.zond.v1alpha1.PeerDirection
-	12, // 3: theqrl.zond.v1alpha1.DebugPeerResponse.connection_state:type_name -> theqrl.zond.v1alpha1.ConnectionState
-	9,  // 4: theqrl.zond.v1alpha1.DebugPeerResponse.peer_info:type_name -> theqrl.zond.v1alpha1.DebugPeerResponse.PeerInfo
-	13, // 5: theqrl.zond.v1alpha1.DebugPeerResponse.peer_status:type_name -> theqrl.zond.v1alpha1.Status
-	7,  // 6: theqrl.zond.v1alpha1.DebugPeerResponse.score_info:type_name -> theqrl.zond.v1alpha1.ScoreInfo
-	10, // 7: theqrl.zond.v1alpha1.ScoreInfo.topic_scores:type_name -> theqrl.zond.v1alpha1.ScoreInfo.TopicScoresEntry
-	14, // 8: theqrl.zond.v1alpha1.DebugPeerResponse.PeerInfo.metadataV0:type_name -> theqrl.zond.v1alpha1.MetaDataV0
-	15, // 9: theqrl.zond.v1alpha1.DebugPeerResponse.PeerInfo.metadataV1:type_name -> theqrl.zond.v1alpha1.MetaDataV1
-	8,  // 10: theqrl.zond.v1alpha1.ScoreInfo.TopicScoresEntry.value:type_name -> theqrl.zond.v1alpha1.TopicScoreSnapshot
-	1,  // 11: theqrl.zond.v1alpha1.Debug.GetBeaconState:input_type -> theqrl.zond.v1alpha1.BeaconStateRequest
-	2,  // 12: theqrl.zond.v1alpha1.Debug.GetBlock:input_type -> theqrl.zond.v1alpha1.BlockRequestByRoot
-	4,  // 13: theqrl.zond.v1alpha1.Debug.SetLoggingLevel:input_type -> theqrl.zond.v1alpha1.LoggingLevelRequest
-	16, // 14: theqrl.zond.v1alpha1.Debug.ListPeers:input_type -> google.protobuf.Empty
-	17, // 15: theqrl.zond.v1alpha1.Debug.GetPeer:input_type -> theqrl.zond.v1alpha1.PeerRequest
-	3,  // 16: theqrl.zond.v1alpha1.Debug.GetBeaconState:output_type -> theqrl.zond.v1alpha1.SSZResponse
-	3,  // 17: theqrl.zond.v1alpha1.Debug.GetBlock:output_type -> theqrl.zond.v1alpha1.SSZResponse
-	16, // 18: theqrl.zond.v1alpha1.Debug.SetLoggingLevel:output_type -> google.protobuf.Empty
-	5,  // 19: theqrl.zond.v1alpha1.Debug.ListPeers:output_type -> theqrl.zond.v1alpha1.DebugPeerResponses
-	6,  // 20: theqrl.zond.v1alpha1.Debug.GetPeer:output_type -> theqrl.zond.v1alpha1.DebugPeerResponse
+	0,  // 0: theqrl.qrl.v1alpha1.LoggingLevelRequest.level:type_name -> theqrl.qrl.v1alpha1.LoggingLevelRequest.Level
+	6,  // 1: theqrl.qrl.v1alpha1.DebugPeerResponses.responses:type_name -> theqrl.qrl.v1alpha1.DebugPeerResponse
+	11, // 2: theqrl.qrl.v1alpha1.DebugPeerResponse.direction:type_name -> theqrl.qrl.v1alpha1.PeerDirection
+	12, // 3: theqrl.qrl.v1alpha1.DebugPeerResponse.connection_state:type_name -> theqrl.qrl.v1alpha1.ConnectionState
+	9,  // 4: theqrl.qrl.v1alpha1.DebugPeerResponse.peer_info:type_name -> theqrl.qrl.v1alpha1.DebugPeerResponse.PeerInfo
+	13, // 5: theqrl.qrl.v1alpha1.DebugPeerResponse.peer_status:type_name -> theqrl.qrl.v1alpha1.Status
+	7,  // 6: theqrl.qrl.v1alpha1.DebugPeerResponse.score_info:type_name -> theqrl.qrl.v1alpha1.ScoreInfo
+	10, // 7: theqrl.qrl.v1alpha1.ScoreInfo.topic_scores:type_name -> theqrl.qrl.v1alpha1.ScoreInfo.TopicScoresEntry
+	14, // 8: theqrl.qrl.v1alpha1.DebugPeerResponse.PeerInfo.metadataV0:type_name -> theqrl.qrl.v1alpha1.MetaDataV0
+	15, // 9: theqrl.qrl.v1alpha1.DebugPeerResponse.PeerInfo.metadataV1:type_name -> theqrl.qrl.v1alpha1.MetaDataV1
+	8,  // 10: theqrl.qrl.v1alpha1.ScoreInfo.TopicScoresEntry.value:type_name -> theqrl.qrl.v1alpha1.TopicScoreSnapshot
+	1,  // 11: theqrl.qrl.v1alpha1.Debug.GetBeaconState:input_type -> theqrl.qrl.v1alpha1.BeaconStateRequest
+	2,  // 12: theqrl.qrl.v1alpha1.Debug.GetBlock:input_type -> theqrl.qrl.v1alpha1.BlockRequestByRoot
+	4,  // 13: theqrl.qrl.v1alpha1.Debug.SetLoggingLevel:input_type -> theqrl.qrl.v1alpha1.LoggingLevelRequest
+	16, // 14: theqrl.qrl.v1alpha1.Debug.ListPeers:input_type -> google.protobuf.Empty
+	17, // 15: theqrl.qrl.v1alpha1.Debug.GetPeer:input_type -> theqrl.qrl.v1alpha1.PeerRequest
+	3,  // 16: theqrl.qrl.v1alpha1.Debug.GetBeaconState:output_type -> theqrl.qrl.v1alpha1.SSZResponse
+	3,  // 17: theqrl.qrl.v1alpha1.Debug.GetBlock:output_type -> theqrl.qrl.v1alpha1.SSZResponse
+	16, // 18: theqrl.qrl.v1alpha1.Debug.SetLoggingLevel:output_type -> google.protobuf.Empty
+	5,  // 19: theqrl.qrl.v1alpha1.Debug.ListPeers:output_type -> theqrl.qrl.v1alpha1.DebugPeerResponses
+	6,  // 20: theqrl.qrl.v1alpha1.Debug.GetPeer:output_type -> theqrl.qrl.v1alpha1.DebugPeerResponse
 	16, // [16:21] is the sub-list for method output_type
 	11, // [11:16] is the sub-list for method input_type
 	11, // [11:11] is the sub-list for extension type_name
@@ -1136,7 +1136,7 @@ func NewDebugClient(cc grpc.ClientConnInterface) DebugClient {
 
 func (c *debugClient) GetBeaconState(ctx context.Context, in *BeaconStateRequest, opts ...grpc.CallOption) (*SSZResponse, error) {
 	out := new(SSZResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Debug/GetBeaconState", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Debug/GetBeaconState", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1145,7 +1145,7 @@ func (c *debugClient) GetBeaconState(ctx context.Context, in *BeaconStateRequest
 
 func (c *debugClient) GetBlock(ctx context.Context, in *BlockRequestByRoot, opts ...grpc.CallOption) (*SSZResponse, error) {
 	out := new(SSZResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Debug/GetBlock", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Debug/GetBlock", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1154,7 +1154,7 @@ func (c *debugClient) GetBlock(ctx context.Context, in *BlockRequestByRoot, opts
 
 func (c *debugClient) SetLoggingLevel(ctx context.Context, in *LoggingLevelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Debug/SetLoggingLevel", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Debug/SetLoggingLevel", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1163,7 +1163,7 @@ func (c *debugClient) SetLoggingLevel(ctx context.Context, in *LoggingLevelReque
 
 func (c *debugClient) ListPeers(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DebugPeerResponses, error) {
 	out := new(DebugPeerResponses)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Debug/ListPeers", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Debug/ListPeers", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1172,7 +1172,7 @@ func (c *debugClient) ListPeers(ctx context.Context, in *emptypb.Empty, opts ...
 
 func (c *debugClient) GetPeer(ctx context.Context, in *PeerRequest, opts ...grpc.CallOption) (*DebugPeerResponse, error) {
 	out := new(DebugPeerResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.v1alpha1.Debug/GetPeer", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.v1alpha1.Debug/GetPeer", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1222,7 +1222,7 @@ func _Debug_GetBeaconState_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Debug/GetBeaconState",
+		FullMethod: "/theqrl.qrl.v1alpha1.Debug/GetBeaconState",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DebugServer).GetBeaconState(ctx, req.(*BeaconStateRequest))
@@ -1240,7 +1240,7 @@ func _Debug_GetBlock_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Debug/GetBlock",
+		FullMethod: "/theqrl.qrl.v1alpha1.Debug/GetBlock",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DebugServer).GetBlock(ctx, req.(*BlockRequestByRoot))
@@ -1258,7 +1258,7 @@ func _Debug_SetLoggingLevel_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Debug/SetLoggingLevel",
+		FullMethod: "/theqrl.qrl.v1alpha1.Debug/SetLoggingLevel",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DebugServer).SetLoggingLevel(ctx, req.(*LoggingLevelRequest))
@@ -1276,7 +1276,7 @@ func _Debug_ListPeers_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Debug/ListPeers",
+		FullMethod: "/theqrl.qrl.v1alpha1.Debug/ListPeers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DebugServer).ListPeers(ctx, req.(*emptypb.Empty))
@@ -1294,7 +1294,7 @@ func _Debug_GetPeer_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.v1alpha1.Debug/GetPeer",
+		FullMethod: "/theqrl.qrl.v1alpha1.Debug/GetPeer",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DebugServer).GetPeer(ctx, req.(*PeerRequest))
@@ -1303,7 +1303,7 @@ func _Debug_GetPeer_Handler(srv interface{}, ctx context.Context, dec func(inter
 }
 
 var _Debug_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "theqrl.zond.v1alpha1.Debug",
+	ServiceName: "theqrl.qrl.v1alpha1.Debug",
 	HandlerType: (*DebugServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

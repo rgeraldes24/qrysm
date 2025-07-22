@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/hash"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -42,7 +42,7 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 
 	// Misc fields checks.
 	assert.Equal(t, primitives.Slot(0), newState.Slot(), "Slot was not correctly initialized")
-	if !proto.Equal(newState.Fork(), &zondpb.Fork{
+	if !proto.Equal(newState.Fork(), &qrysmpb.Fork{
 		PreviousVersion: genesisForkVersion,
 		CurrentVersion:  genesisForkVersion,
 		Epoch:           genesisEpoch,
@@ -82,7 +82,7 @@ func TestGenesisBeaconState_OK(t *testing.T) {
 
 	// Deposit root checks.
 	assert.DeepEqual(t, executionNodeData.DepositRoot, newState.ExecutionNodeData().DepositRoot, "ExecutionNodeData DepositRoot was not correctly initialized")
-	assert.DeepSSZEqual(t, []*zondpb.ExecutionNodeData{}, newState.ExecutionNodeDataVotes(), "ExecutionNodeDataVotes was not correctly initialized")
+	assert.DeepSSZEqual(t, []*qrysmpb.ExecutionNodeData{}, newState.ExecutionNodeDataVotes(), "ExecutionNodeDataVotes was not correctly initialized")
 }
 
 func TestGenesisState_HashEquality(t *testing.T) {
@@ -98,7 +98,7 @@ func TestGenesisState_HashEquality(t *testing.T) {
 		BaseFeePerGas: make([]byte, 32),
 		BlockHash:     make([]byte, 32),
 	}
-	state1, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, &zondpb.ExecutionNodeData{BlockHash: make([]byte, 32)}, ee1)
+	state1, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, &qrysmpb.ExecutionNodeData{BlockHash: make([]byte, 32)}, ee1)
 	require.NoError(t, err)
 	ee := &enginev1.ExecutionPayloadCapella{
 		ParentHash:    make([]byte, 32),
@@ -110,7 +110,7 @@ func TestGenesisState_HashEquality(t *testing.T) {
 		BaseFeePerGas: make([]byte, 32),
 		BlockHash:     make([]byte, 32),
 	}
-	state, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, &zondpb.ExecutionNodeData{BlockHash: make([]byte, 32)}, ee)
+	state, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, &qrysmpb.ExecutionNodeData{BlockHash: make([]byte, 32)}, ee)
 	require.NoError(t, err)
 
 	pbState1, err := state_native.ProtobufBeaconStateCapella(state1.ToProto())
@@ -130,7 +130,7 @@ func TestGenesisState_HashEquality(t *testing.T) {
 func TestGenesisState_InitializesLatestBlockHashes(t *testing.T) {
 	deposits, _, err := util.DeterministicDepositsAndKeys(100)
 	require.NoError(t, err)
-	s, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, &zondpb.ExecutionNodeData{}, &enginev1.ExecutionPayloadCapella{})
+	s, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, &qrysmpb.ExecutionNodeData{}, &enginev1.ExecutionPayloadCapella{})
 	require.NoError(t, err)
 	got, want := uint64(len(s.BlockRoots())), uint64(params.BeaconConfig().SlotsPerHistoricalRoot)
 	assert.Equal(t, want, got, "Wrong number of recent block hashes")

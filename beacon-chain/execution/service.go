@@ -37,7 +37,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/clientstats"
 	"github.com/theQRL/qrysm/network"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	qrysmTime "github.com/theQRL/qrysm/time"
 	"github.com/theQRL/qrysm/time/slots"
 )
@@ -67,7 +67,7 @@ var (
 // ChainStartFetcher retrieves information pertaining to the chain start event
 // of the beacon chain for usage across various services.
 type ChainStartFetcher interface {
-	ChainStartExecutionNodeData() *zondpb.ExecutionNodeData
+	ChainStartExecutionNodeData() *qrysmpb.ExecutionNodeData
 	PreGenesisState() state.BeaconState
 	ClearPreGenesisData()
 }
@@ -146,10 +146,10 @@ type Service struct {
 	httpLogger                  bind.ContractFilterer
 	rpcClient                   RPCClient
 	headerCache                 *headerCache // cache to store block hash/block height.
-	latestExecutionNodeData     *zondpb.LatestExecutionNodeData
+	latestExecutionNodeData     *qrysmpb.LatestExecutionNodeData
 	depositContractCaller       *contracts.DepositContractCaller
 	depositTrie                 cache.MerkleTree
-	chainStartData              *zondpb.ChainStartData
+	chainStartData              *qrysmpb.ChainStartData
 	lastReceivedMerkleIndex     int64 // Keeps track of the last received index to prevent log spam.
 	runError                    error
 	preGenesisState             state.BeaconState
@@ -182,7 +182,7 @@ func NewService(ctx context.Context, opts ...Option) (*Service, error) {
 			beaconNodeStatsUpdater: &NopBeaconNodeStatsUpdater{},
 			eth1HeaderReqLimit:     defaultEth1HeaderReqLimit,
 		},
-		latestExecutionNodeData: &zondpb.LatestExecutionNodeData{
+		latestExecutionNodeData: &qrysmpb.LatestExecutionNodeData{
 			BlockHeight:        0,
 			BlockTime:          0,
 			BlockHash:          []byte{},
@@ -190,8 +190,8 @@ func NewService(ctx context.Context, opts ...Option) (*Service, error) {
 		},
 		headerCache: newHeaderCache(),
 		depositTrie: depositTrie,
-		chainStartData: &zondpb.ChainStartData{
-			ExecutionNodeData: &zondpb.ExecutionNodeData{},
+		chainStartData: &qrysmpb.ChainStartData{
+			ExecutionNodeData: &qrysmpb.ExecutionNodeData{},
 		},
 		lastReceivedMerkleIndex: -1,
 		preGenesisState:         genState,
@@ -249,7 +249,7 @@ func (s *Service) ClearPreGenesisData() {
 }
 
 // ChainStartExecutionNodeData returns the eth1 data at chainstart.
-func (s *Service) ChainStartExecutionNodeData() *zondpb.ExecutionNodeData {
+func (s *Service) ChainStartExecutionNodeData() *qrysmpb.ExecutionNodeData {
 	return s.chainStartData.ExecutionNodeData
 }
 
@@ -320,7 +320,7 @@ func (s *Service) followedBlockHeight(ctx context.Context) (uint64, error) {
 	return blk.Number.Uint64(), nil
 }
 
-func (s *Service) initDepositCaches(ctx context.Context, ctrs []*zondpb.DepositContainer) error {
+func (s *Service) initDepositCaches(ctx context.Context, ctrs []*qrysmpb.DepositContainer) error {
 	if len(ctrs) == 0 {
 		return nil
 	}
@@ -674,7 +674,7 @@ func (s *Service) determineEarliestVotingBlock(ctx context.Context, followBlock 
 
 // initializes our service from the provided executionNodeData object by initializing all the relevant
 // fields and data.
-func (s *Service) initializeExecutionNodeData(ctx context.Context, executionNodeDataInDB *zondpb.ETH1ChainData) error {
+func (s *Service) initializeExecutionNodeData(ctx context.Context, executionNodeDataInDB *qrysmpb.ETH1ChainData) error {
 	// The node has no executionNodeData persisted on disk, so we exit and instead
 	// request from contract logs.
 	if executionNodeDataInDB == nil {
@@ -731,7 +731,7 @@ func (s *Service) initializeExecutionNodeData(ctx context.Context, executionNode
 
 // Validates that all deposit containers are valid and have their relevant indices
 // in order.
-func validateDepositContainers(ctrs []*zondpb.DepositContainer) bool {
+func validateDepositContainers(ctrs []*qrysmpb.DepositContainer) bool {
 	ctrLen := len(ctrs)
 	// Exit for empty containers.
 	if ctrLen == 0 {
@@ -772,12 +772,12 @@ func (s *Service) ensureValidPowchainData(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		s.chainStartData = &zondpb.ChainStartData{
+		s.chainStartData = &qrysmpb.ChainStartData{
 			GenesisTime:       genState.GenesisTime(),
 			GenesisBlock:      0,
 			ExecutionNodeData: genState.ExecutionNodeData(),
 		}
-		executionNodeData = &zondpb.ETH1ChainData{
+		executionNodeData = &qrysmpb.ETH1ChainData{
 			CurrentExecutionNodeData: s.latestExecutionNodeData,
 			ChainstartData:           s.chainStartData,
 			BeaconState:              pbState,
@@ -804,7 +804,7 @@ func (s *Service) ensureValidPowchainData(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) migrateOldDepositTree(executionNodeDataInDB *zondpb.ETH1ChainData) error {
+func (s *Service) migrateOldDepositTree(executionNodeDataInDB *qrysmpb.ETH1ChainData) error {
 	oldDepositTrie, err := trie.CreateTrieFromProto(executionNodeDataInDB.Trie)
 	if err != nil {
 		return err

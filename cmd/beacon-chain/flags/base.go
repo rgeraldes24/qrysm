@@ -92,8 +92,8 @@ var (
 	// HTTPModules define the set of enabled HTTP APIs.
 	HTTPModules = &cli.StringFlag{
 		Name:  "http-modules",
-		Usage: "Comma-separated list of API module names. Possible values: `" + QrysmAPIModule + `,` + ZondAPIModule + "`.",
-		Value: QrysmAPIModule + `,` + ZondAPIModule,
+		Usage: "Comma-separated list of API module names. Possible values: `" + QrysmAPIModule + `,` + QRLAPIModule + "`.",
+		Value: QrysmAPIModule + `,` + QRLAPIModule,
 	}
 	// DisableGRPCGateway for JSON-HTTP requests to the beacon node.
 	DisableGRPCGateway = &cli.BoolFlag{
@@ -160,7 +160,7 @@ var (
 	// EnableDebugRPCEndpoints as /v1/beacon/state.
 	EnableDebugRPCEndpoints = &cli.BoolFlag{
 		Name:  "enable-debug-rpc-endpoints",
-		Usage: "Enables the debug rpc service, containing utility endpoints such as /zond/v1alpha1/beacon/state.",
+		Usage: "Enables the debug rpc service, containing utility endpoints such as /qrl/v1alpha1/beacon/state.",
 	}
 	// SubscribeToAllSubnets defines a flag to specify whether to subscribe to all possible attestation/sync subnets or not.
 	SubscribeToAllSubnets = &cli.BoolFlag{
@@ -214,7 +214,7 @@ var (
 	SuggestedFeeRecipient = &cli.StringFlag{
 		Name:  "suggested-fee-recipient",
 		Usage: "This address will receive the transaction fees produced by any blocks from this node. Validator client can override this value through the preparebeaconproposer api.",
-		Value: params.BeaconConfig().ZondBurnAddress,
+		Value: params.BeaconConfig().QRLBurnAddress,
 	}
 	// SlasherDirFlag defines a path on disk where the slasher database is stored.
 	SlasherDirFlag = &cli.StringFlag{

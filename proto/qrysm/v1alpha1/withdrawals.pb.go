@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: proto/qrysm/v1alpha1/withdrawals.proto
 
-package zond
+package qrl
 
 import (
 	reflect "reflect"
@@ -202,11 +202,11 @@ func file_proto_qrysm_v1alpha1_withdrawals_proto_rawDescGZIP() []byte {
 
 var file_proto_qrysm_v1alpha1_withdrawals_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_proto_qrysm_v1alpha1_withdrawals_proto_goTypes = []interface{}{
-	(*DilithiumToExecutionChange)(nil),       // 0: theqrl.zond.v1alpha1.DilithiumToExecutionChange
-	(*SignedDilithiumToExecutionChange)(nil), // 1: theqrl.zond.v1alpha1.SignedDilithiumToExecutionChange
+	(*DilithiumToExecutionChange)(nil),       // 0: theqrl.qrl.v1alpha1.DilithiumToExecutionChange
+	(*SignedDilithiumToExecutionChange)(nil), // 1: theqrl.qrl.v1alpha1.SignedDilithiumToExecutionChange
 }
 var file_proto_qrysm_v1alpha1_withdrawals_proto_depIdxs = []int32{
-	0, // 0: theqrl.zond.v1alpha1.SignedDilithiumToExecutionChange.message:type_name -> theqrl.zond.v1alpha1.DilithiumToExecutionChange
+	0, // 0: theqrl.qrl.v1alpha1.SignedDilithiumToExecutionChange.message:type_name -> theqrl.qrl.v1alpha1.DilithiumToExecutionChange
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

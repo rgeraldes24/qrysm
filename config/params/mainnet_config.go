@@ -207,8 +207,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Light client
 	MinSyncCommitteeParticipants: 1,
 
-	// Bellatrix
-	ZondBurnAddress:        "Q0000000000000000000000000000000000000000",
+	QRLBurnAddress:         "Q0000000000000000000000000000000000000000",
 	DefaultBuilderGasLimit: uint64(30000000),
 
 	// Mevboost circuit breaker

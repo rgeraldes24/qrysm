@@ -11,7 +11,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -23,19 +23,19 @@ func TestProcessJustificationAndFinalizationPreCompute_ConsecutiveEpochs(t *test
 	for i := 0; i < len(blockRoots); i++ {
 		blockRoots[i] = []byte{byte(i)}
 	}
-	base := &zondpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateCapella{
 		Slot: params.BeaconConfig().SlotsPerEpoch*2 + 1,
-		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{
+		PreviousJustifiedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{
+		CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
-		FinalizedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+		FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 		JustificationBits:   bitfield.Bitvector4{0x0F}, // 0b1111
-		Validators:          []*zondpb.Validator{{ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}},
+		Validators:          []*qrysmpb.Validator{{ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}},
 		Balances:            []uint64{a, a, a, a}, // validator total balance should be 128000000000
 		BlockRoots:          blockRoots,
 	}
@@ -60,19 +60,19 @@ func TestProcessJustificationAndFinalizationPreCompute_JustifyCurrentEpoch(t *te
 	for i := 0; i < len(blockRoots); i++ {
 		blockRoots[i] = []byte{byte(i)}
 	}
-	base := &zondpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateCapella{
 		Slot: params.BeaconConfig().SlotsPerEpoch*2 + 1,
-		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{
+		PreviousJustifiedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{
+		CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
-		FinalizedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+		FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 		JustificationBits:   bitfield.Bitvector4{0x03}, // 0b0011
-		Validators:          []*zondpb.Validator{{ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}},
+		Validators:          []*qrysmpb.Validator{{ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}},
 		Balances:            []uint64{a, a, a, a}, // validator total balance should be 128000000000
 		BlockRoots:          blockRoots,
 	}
@@ -97,20 +97,20 @@ func TestProcessJustificationAndFinalizationPreCompute_JustifyPrevEpoch(t *testi
 	for i := 0; i < len(blockRoots); i++ {
 		blockRoots[i] = []byte{byte(i)}
 	}
-	base := &zondpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateCapella{
 		Slot: params.BeaconConfig().SlotsPerEpoch*2 + 1,
-		PreviousJustifiedCheckpoint: &zondpb.Checkpoint{
+		PreviousJustifiedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{
+		CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 0,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
 		JustificationBits: bitfield.Bitvector4{0x03}, // 0b0011
-		Validators:        []*zondpb.Validator{{ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}},
+		Validators:        []*qrysmpb.Validator{{ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}, {ExitEpoch: e}},
 		Balances:          []uint64{a, a, a, a}, // validator total balance should be 128000000000
-		BlockRoots:        blockRoots, FinalizedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+		BlockRoots:        blockRoots, FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 	}
 	state, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
@@ -127,10 +127,10 @@ func TestProcessJustificationAndFinalizationPreCompute_JustifyPrevEpoch(t *testi
 }
 
 func TestUnrealizedCheckpoints(t *testing.T) {
-	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
+	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 	balances := make([]uint64, len(validators))
 	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
+		validators[i] = &qrysmpb.Validator{
 			ExitEpoch:        params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance,
 		}
@@ -140,9 +140,9 @@ func TestUnrealizedCheckpoints(t *testing.T) {
 	cjr := [32]byte{'c'}
 	je := primitives.Epoch(3)
 	fe := primitives.Epoch(2)
-	pjcp := &zondpb.Checkpoint{Root: pjr[:], Epoch: fe}
-	cjcp := &zondpb.Checkpoint{Root: cjr[:], Epoch: je}
-	fcp := &zondpb.Checkpoint{Root: pjr[:], Epoch: fe}
+	pjcp := &qrysmpb.Checkpoint{Root: pjr[:], Epoch: fe}
+	cjcp := &qrysmpb.Checkpoint{Root: cjr[:], Epoch: je}
+	fcp := &qrysmpb.Checkpoint{Root: pjr[:], Epoch: fe}
 	tests := []struct {
 		name                                 string
 		slot                                 primitives.Slot
@@ -208,7 +208,7 @@ func TestUnrealizedCheckpoints(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			base := &zondpb.BeaconStateCapella{
+			base := &qrysmpb.BeaconStateCapella{
 				RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 
 				Validators:                  validators,
@@ -251,9 +251,9 @@ func TestUnrealizedCheckpoints(t *testing.T) {
 }
 
 func Test_ComputeCheckpoints_CantUpdateToLower(t *testing.T) {
-	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Slot: params.BeaconConfig().SlotsPerEpoch * 2,
-		CurrentJustifiedCheckpoint: &zondpb.Checkpoint{
+		CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{
 			Epoch: 2,
 		},
 	})

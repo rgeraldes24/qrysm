@@ -3,7 +3,7 @@ package synccommittee
 import (
 	"testing"
 
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -15,7 +15,7 @@ func TestSyncCommitteeContributionCache_Nil(t *testing.T) {
 func TestSyncCommitteeContributionCache_RoundTrip(t *testing.T) {
 	store := NewStore()
 
-	conts := []*zondpb.SyncCommitteeContribution{
+	conts := []*qrysmpb.SyncCommitteeContribution{
 		{Slot: 1, SubcommitteeIndex: 0, Signatures: [][]byte{[]byte{'a'}}},
 		{Slot: 1, SubcommitteeIndex: 1, Signatures: [][]byte{[]byte{'b'}}},
 		{Slot: 2, SubcommitteeIndex: 0, Signatures: [][]byte{[]byte{'c'}}},
@@ -36,36 +36,36 @@ func TestSyncCommitteeContributionCache_RoundTrip(t *testing.T) {
 
 	conts, err := store.SyncCommitteeContributions(1)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{}, conts)
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{}, conts)
 
 	conts, err = store.SyncCommitteeContributions(2)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{}, conts)
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{}, conts)
 
 	conts, err = store.SyncCommitteeContributions(3)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{
 		{Slot: 3, SubcommitteeIndex: 0, Signatures: [][]byte{[]byte{'e'}}},
 		{Slot: 3, SubcommitteeIndex: 1, Signatures: [][]byte{[]byte{'f'}}},
 	}, conts)
 
 	conts, err = store.SyncCommitteeContributions(4)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{
 		{Slot: 4, SubcommitteeIndex: 0, Signatures: [][]byte{[]byte{'g'}}},
 		{Slot: 4, SubcommitteeIndex: 1, Signatures: [][]byte{[]byte{'h'}}},
 	}, conts)
 
 	conts, err = store.SyncCommitteeContributions(5)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{
 		{Slot: 5, SubcommitteeIndex: 0, Signatures: [][]byte{[]byte{'i'}}},
 		{Slot: 5, SubcommitteeIndex: 1, Signatures: [][]byte{[]byte{'j'}}},
 	}, conts)
 
 	conts, err = store.SyncCommitteeContributions(6)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{
 		{Slot: 6, SubcommitteeIndex: 0, Signatures: [][]byte{[]byte{'k'}}},
 		{Slot: 6, SubcommitteeIndex: 1, Signatures: [][]byte{[]byte{'l'}}},
 	}, conts)
@@ -73,35 +73,35 @@ func TestSyncCommitteeContributionCache_RoundTrip(t *testing.T) {
 	// All the contributions should persist after get.
 	conts, err = store.SyncCommitteeContributions(1)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{}, conts)
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{}, conts)
 	conts, err = store.SyncCommitteeContributions(2)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{}, conts)
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{}, conts)
 
 	conts, err = store.SyncCommitteeContributions(3)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{
 		{Slot: 3, SubcommitteeIndex: 0, Signatures: [][]byte{[]byte{'e'}}},
 		{Slot: 3, SubcommitteeIndex: 1, Signatures: [][]byte{[]byte{'f'}}},
 	}, conts)
 
 	conts, err = store.SyncCommitteeContributions(4)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{
 		{Slot: 4, SubcommitteeIndex: 0, Signatures: [][]byte{[]byte{'g'}}},
 		{Slot: 4, SubcommitteeIndex: 1, Signatures: [][]byte{[]byte{'h'}}},
 	}, conts)
 
 	conts, err = store.SyncCommitteeContributions(5)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{
 		{Slot: 5, SubcommitteeIndex: 0, Signatures: [][]byte{[]byte{'i'}}},
 		{Slot: 5, SubcommitteeIndex: 1, Signatures: [][]byte{[]byte{'j'}}},
 	}, conts)
 
 	conts, err = store.SyncCommitteeContributions(6)
 	require.NoError(t, err)
-	require.DeepSSZEqual(t, []*zondpb.SyncCommitteeContribution{
+	require.DeepSSZEqual(t, []*qrysmpb.SyncCommitteeContribution{
 		{Slot: 6, SubcommitteeIndex: 0, Signatures: [][]byte{[]byte{'k'}}},
 		{Slot: 6, SubcommitteeIndex: 1, Signatures: [][]byte{[]byte{'l'}}},
 	}, conts)

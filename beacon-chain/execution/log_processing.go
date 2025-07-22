@@ -22,7 +22,7 @@ import (
 	contracts "github.com/theQRL/qrysm/contracts/deposit"
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
@@ -124,7 +124,7 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gzondtypes.
 
 	// We then decode the deposit input in order to create a deposit object
 	// we can store in our persistent DB.
-	depositData := &zondpb.Deposit_Data{
+	depositData := &qrysmpb.Deposit_Data{
 		Amount:                bytesutil.FromBytes8(amount),
 		PublicKey:             pubkey,
 		Signature:             signature,
@@ -142,7 +142,7 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gzondtypes.
 	if err = s.depositTrie.Insert(depositHash[:], int(index)); err != nil {
 		return err
 	}
-	deposit := &zondpb.Deposit{
+	deposit := &qrysmpb.Deposit{
 		Data: depositData,
 	}
 
@@ -366,7 +366,7 @@ func (s *Service) savePowchainData(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	executionNodeData := &zondpb.ETH1ChainData{
+	executionNodeData := &qrysmpb.ETH1ChainData{
 		CurrentExecutionNodeData: s.latestExecutionNodeData,
 		ChainstartData:           s.chainStartData,
 		BeaconState:              pbState, // I promise not to mutate it!

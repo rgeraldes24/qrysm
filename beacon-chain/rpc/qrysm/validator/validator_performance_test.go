@@ -20,7 +20,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -249,7 +249,7 @@ func setHeadState(t *testing.T, headState state.BeaconState, publicKeys [][field
 	require.NoError(t, headState.SetBalances(balances))
 	require.NoError(t, headState.SetInactivityScores([]uint64{0, 0, 0}))
 
-	validators := []*zondpb.Validator{
+	validators := []*qrysmpb.Validator{
 		{
 			PublicKey:       publicKeys[0][:],
 			ActivationEpoch: 5,

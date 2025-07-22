@@ -6,7 +6,7 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -15,8 +15,8 @@ func TestProcessSyncCommitteeContribution(t *testing.T) {
 	hook := logTest.NewGlobal()
 	s := setupService(t)
 
-	contrib := &zondpb.SignedContributionAndProof{
-		Message: &zondpb.ContributionAndProof{
+	contrib := &qrysmpb.SignedContributionAndProof{
+		Message: &qrysmpb.ContributionAndProof{
 			AggregatorIndex: 1,
 		},
 	}
@@ -31,10 +31,10 @@ func TestProcessSyncAggregate(t *testing.T) {
 	s := setupService(t)
 	beaconState, _ := util.DeterministicGenesisStateCapella(t, 256)
 
-	block := &zondpb.BeaconBlockCapella{
+	block := &qrysmpb.BeaconBlockCapella{
 		Slot: 2,
-		Body: &zondpb.BeaconBlockBodyCapella{
-			SyncAggregate: &zondpb.SyncAggregate{
+		Body: &qrysmpb.BeaconBlockBodyCapella{
+			SyncAggregate: &qrysmpb.SyncAggregate{
 				SyncCommitteeBits: bitfield.Bitvector16{
 					0x31, 0xff,
 				},

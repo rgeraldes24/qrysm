@@ -21,8 +21,8 @@ import (
 	consensusBlocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	"github.com/theQRL/qrysm/proto/migration"
-	zondpb "github.com/theQRL/qrysm/proto/qrl/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/mock"
@@ -37,7 +37,7 @@ func TestStreamEvents_Preconditions(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockStream := mock.NewMockEvents_StreamEventsServer(ctrl)
-		err := srv.StreamEvents(&zondpb.StreamEventsRequest{Topics: nil}, mockStream)
+		err := srv.StreamEvents(&qrlpb.StreamEventsRequest{Topics: nil}, mockStream)
 		require.ErrorContains(t, "No topics specified", err)
 	})
 	t.Run("topic_not_allowed", func(t *testing.T) {
@@ -45,7 +45,7 @@ func TestStreamEvents_Preconditions(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockStream := mock.NewMockEvents_StreamEventsServer(ctrl)
-		err := srv.StreamEvents(&zondpb.StreamEventsRequest{Topics: []string{"foobar"}}, mockStream)
+		err := srv.StreamEvents(&qrlpb.StreamEventsRequest{Topics: []string{"foobar"}}, mockStream)
 		require.ErrorContains(t, "Topic foobar not allowed", err)
 	})
 }
@@ -56,8 +56,8 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
 
-		wantedAttV1alpha1 := util.HydrateAttestation(&zond.Attestation{
-			Data: &zond.AttestationData{
+		wantedAttV1alpha1 := util.HydrateAttestation(&qrysmpb.Attestation{
+			Data: &qrysmpb.AttestationData{
 				Slot: 8,
 			},
 		})
@@ -90,8 +90,8 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
 
-		wantedAttV1alpha1 := &zond.AggregateAttestationAndProof{
-			Aggregate: util.HydrateAttestation(&zond.Attestation{}),
+		wantedAttV1alpha1 := &qrysmpb.AggregateAttestationAndProof{
+			Aggregate: util.HydrateAttestation(&qrysmpb.Attestation{}),
 		}
 		wantedAtt := migration.V1Alpha1AggregateAttAndProofToV1(wantedAttV1alpha1)
 		genericResponse, err := anypb.New(wantedAtt)
@@ -122,8 +122,8 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
 
-		wantedExitV1alpha1 := &zond.SignedVoluntaryExit{
-			Exit: &zond.VoluntaryExit{
+		wantedExitV1alpha1 := &qrysmpb.SignedVoluntaryExit{
+			Exit: &qrysmpb.VoluntaryExit{
 				Epoch:          1,
 				ValidatorIndex: 1,
 			},
@@ -158,10 +158,10 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
 
-		wantedContributionV1alpha1 := &zond.SignedContributionAndProof{
-			Message: &zond.ContributionAndProof{
+		wantedContributionV1alpha1 := &qrysmpb.SignedContributionAndProof{
+			Message: &qrysmpb.ContributionAndProof{
 				AggregatorIndex: 1,
-				Contribution: &zond.SyncCommitteeContribution{
+				Contribution: &qrysmpb.SyncCommitteeContribution{
 					Slot:              1,
 					BlockRoot:         []byte("root"),
 					SubcommitteeIndex: 1,
@@ -201,8 +201,8 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
 
-		wantedChangeV1alpha1 := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		wantedChangeV1alpha1 := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex:      1,
 				FromDilithiumPubkey: []byte("from"),
 				ToExecutionAddress:  []byte("to"),
@@ -241,7 +241,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
 
-		wantedHead := &zondpb.EventHead{
+		wantedHead := &qrlpb.EventHead{
 			Slot:                      8,
 			Block:                     make([]byte, 32),
 			State:                     make([]byte, 32),
@@ -299,17 +299,17 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		require.NoError(t, err, "Could get expected withdrawals")
 		require.NotEqual(t, len(withdrawals), 0)
 		var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
-		blk := &zond.SignedBeaconBlockCapella{
-			Block: &zond.BeaconBlockCapella{
+		blk := &qrysmpb.SignedBeaconBlockCapella{
+			Block: &qrysmpb.BeaconBlockCapella{
 				ProposerIndex: 0,
 				Slot:          1,
 				ParentRoot:    parentRoot[:],
 				StateRoot:     genesis.Block.StateRoot,
-				Body: &zond.BeaconBlockBodyCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{
 					RandaoReveal:      genesis.Block.Body.RandaoReveal,
 					Graffiti:          genesis.Block.Body.Graffiti,
 					ExecutionNodeData: genesis.Block.Body.ExecutionNodeData,
-					SyncAggregate:     &zond.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
+					SyncAggregate:     &qrysmpb.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
 					ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 						BlockNumber:   1,
 						ParentHash:    make([]byte, fieldparams.RootLength),
@@ -344,9 +344,9 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		prevRando, err := helpers.RandaoMix(beaconState, qrysmtime.CurrentEpoch(beaconState))
 		require.NoError(t, err)
 
-		wantedPayload := &zondpb.EventPayloadAttributeV2{
+		wantedPayload := &qrlpb.EventPayloadAttributeV2{
 			Version: version.String(version.Capella),
-			Data: &zondpb.EventPayloadAttributeV2_BasePayloadAttribute{
+			Data: &qrlpb.EventPayloadAttributeV2_BasePayloadAttribute{
 				ProposerIndex:     0,
 				ProposalSlot:      2,
 				ParentBlockNumber: 1,
@@ -385,7 +385,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
 
-		wantedCheckpoint := &zondpb.EventFinalizedCheckpoint{
+		wantedCheckpoint := &qrlpb.EventFinalizedCheckpoint{
 			Block:               make([]byte, 32),
 			State:               make([]byte, 32),
 			Epoch:               8,
@@ -416,7 +416,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
 
-		wantedReorg := &zondpb.EventChainReorg{
+		wantedReorg := &qrlpb.EventChainReorg{
 			Slot:                8,
 			Depth:               1,
 			OldHeadBlock:        make([]byte, 32),
@@ -451,20 +451,20 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 		srv, ctrl, mockStream := setupServer(ctx, t)
 		defer ctrl.Finish()
 
-		blk := util.HydrateSignedBeaconBlockCapella(&zond.SignedBeaconBlockCapella{
-			Block: &zond.BeaconBlockCapella{
+		blk := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
+			Block: &qrysmpb.BeaconBlockCapella{
 				Slot: 8,
 			},
 		})
 		bodyRoot, err := blk.Block.Body.HashTreeRoot()
 		require.NoError(t, err)
-		wantedHeader := util.HydrateBeaconHeader(&zond.BeaconBlockHeader{
+		wantedHeader := util.HydrateBeaconHeader(&qrysmpb.BeaconBlockHeader{
 			Slot:     8,
 			BodyRoot: bodyRoot[:],
 		})
 		wantedBlockRoot, err := wantedHeader.HashTreeRoot()
 		require.NoError(t, err)
-		genericResponse, err := anypb.New(&zondpb.EventBlock{
+		genericResponse, err := anypb.New(&qrlpb.EventBlock{
 			Slot:                8,
 			Block:               wantedBlockRoot[:],
 			ExecutionOptimistic: true,
@@ -500,7 +500,7 @@ func TestStreamEvents_CommaSeparatedTopics(t *testing.T) {
 	srv, ctrl, mockStream := setupServer(ctx, t)
 	defer ctrl.Finish()
 
-	wantedHead := &zondpb.EventHead{
+	wantedHead := &qrlpb.EventHead{
 		Slot:                      8,
 		Block:                     make([]byte, 32),
 		State:                     make([]byte, 32),
@@ -528,7 +528,7 @@ func TestStreamEvents_CommaSeparatedTopics(t *testing.T) {
 		feed: srv.StateNotifier.StateFeed(),
 	})
 
-	wantedCheckpoint := &zondpb.EventFinalizedCheckpoint{
+	wantedCheckpoint := &qrlpb.EventFinalizedCheckpoint{
 		Block: make([]byte, 32),
 		State: make([]byte, 32),
 		Epoch: 8,
@@ -583,7 +583,7 @@ func assertFeedSendAndReceive(ctx context.Context, args *assertFeedArgs) {
 	})
 	args.stream.EXPECT().Context().Return(ctx).AnyTimes()
 
-	req := &zondpb.StreamEventsRequest{Topics: args.topics}
+	req := &qrlpb.StreamEventsRequest{Topics: args.topics}
 	go func(tt *testing.T) {
 		assert.NoError(tt, args.srv.StreamEvents(req, args.stream), "Could not call RPC method")
 	}(args.t)

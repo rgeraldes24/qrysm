@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/scorers"
 	mockp2p "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	leakybucket "github.com/theQRL/qrysm/container/leaky-bucket"
-	zondpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -159,7 +159,7 @@ func TestService_RejectInboundPeersBeyondLimit(t *testing.T) {
 	inboundLimit += 1
 	// Add in up to inbound peer limit.
 	for i := 0; i < int(inboundLimit); i++ {
-		addPeer(t, s.peers, peerdata.PeerConnectionState(zondpb.ConnectionState_CONNECTED))
+		addPeer(t, s.peers, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
 	}
 	valid = s.InterceptAccept(&maEndpoints{raddr: multiAddress})
 	if valid {

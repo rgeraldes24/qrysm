@@ -23,7 +23,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/genesis",
+					"raw": "http://localhost:3500/qrl/v1/beacon/genesis",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -57,7 +57,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/states/{state_id}/root",
+					"raw": "http://localhost:3500/qrl/v1/beacon/states/{state_id}/root",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -93,7 +93,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/states/{state_id}/fork",
+					"raw": "http://localhost:3500/qrl/v1/beacon/states/{state_id}/fork",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -129,7 +129,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/states/{state_id}/finality_checkpoints",
+					"raw": "http://localhost:3500/qrl/v1/beacon/states/{state_id}/finality_checkpoints",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -165,7 +165,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/states/{state_id}/validators",
+					"raw": "http://localhost:3500/qrl/v1/beacon/states/{state_id}/validators",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -213,7 +213,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/states/{state_id}/validators/{validator_id}",
+					"raw": "http://localhost:3500/qrl/v1/beacon/states/{state_id}/validators/{validator_id}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -250,7 +250,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/states/{state_id}/validator_balances",
+					"raw": "http://localhost:3500/qrl/v1/beacon/states/{state_id}/validator_balances",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -293,7 +293,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/states/{state_id}/committees",
+					"raw": "http://localhost:3500/qrl/v1/beacon/states/{state_id}/committees",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -346,7 +346,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/states/{state_id}/sync_committees",
+					"raw": "http://localhost:3500/qrl/v1/beacon/states/{state_id}/sync_committees",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -389,7 +389,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/headers",
+					"raw": "http://localhost:3500/qrl/v1/beacon/headers",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -423,7 +423,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/headers/{block_id}",
+					"raw": "http://localhost:3500/qrl/v1/beacon/headers/{block_id}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -455,7 +455,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/blocks",
+					"raw": "http://localhost:3500/qrl/v1/beacon/blocks",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -498,7 +498,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/blocks/{block_id}",
+					"raw": "http://localhost:3500/qrl/v1/beacon/blocks/{block_id}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -532,7 +532,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/blocks/{block_id}",
+					"raw": "http://localhost:3500/qrl/v1/beacon/blocks/{block_id}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -555,7 +555,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/blocks/{block_id}/root",
+					"raw": "http://localhost:3500/qrl/v1/beacon/blocks/{block_id}/root",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -579,7 +579,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/blocks/{block_id}/attestations",
+					"raw": "http://localhost:3500/qrl/v1/beacon/blocks/{block_id}/attestations",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -615,7 +615,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/pool/attestations",
+					"raw": "http://localhost:3500/qrl/v1/beacon/pool/attestations",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -647,7 +647,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/pool/attestations",
+					"raw": "http://localhost:3500/qrl/v1/beacon/pool/attestations",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -670,7 +670,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/pool/attester_slashings",
+					"raw": "http://localhost:3500/qrl/v1/beacon/pool/attester_slashings",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -702,7 +702,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/pool/attester_slashings",
+					"raw": "http://localhost:3500/qrl/v1/beacon/pool/attester_slashings",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -725,7 +725,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/pool/proposer_slashings",
+					"raw": "http://localhost:3500/qrl/v1/beacon/pool/proposer_slashings",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -757,7 +757,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/pool/proposer_slashings",
+					"raw": "http://localhost:3500/qrl/v1/beacon/pool/proposer_slashings",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -789,7 +789,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/pool/sync_committees",
+					"raw": "http://localhost:3500/qrl/v1/beacon/pool/sync_committees",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -812,7 +812,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/pool/voluntary_exits",
+					"raw": "http://localhost:3500/qrl/v1/beacon/pool/voluntary_exits",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -844,7 +844,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/beacon/pool/voluntary_exits",
+					"raw": "http://localhost:3500/qrl/v1/beacon/pool/voluntary_exits",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -867,7 +867,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/config/fork_schedule",
+					"raw": "http://localhost:3500/qrl/v1/config/fork_schedule",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -889,7 +889,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/config/spec",
+					"raw": "http://localhost:3500/qrl/v1/config/spec",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -911,7 +911,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/config/deposit_contract",
+					"raw": "http://localhost:3500/qrl/v1/config/deposit_contract",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1239,7 +1239,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/duties/sync/{epoch}",
+					"raw": "http://localhost:3500/qrl/v1/validator/duties/sync/{epoch}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1263,7 +1263,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/blocks/{slot}?graffiti=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2=&randao_reveal=0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505",
+					"raw": "http://localhost:3500/qrl/v1/validator/blocks/{slot}?graffiti=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2=&randao_reveal=0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1296,7 +1296,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/blinded_blocks/{slot}?graffiti=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2=&randao_reveal=0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505",
+					"raw": "http://localhost:3500/qrl/v1/validator/blinded_blocks/{slot}?graffiti=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2=&randao_reveal=0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1329,7 +1329,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/attestation_data?slot=1820830&committee_index=1",
+					"raw": "http://localhost:3500/qrl/v1/validator/attestation_data?slot=1820830&committee_index=1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1361,7 +1361,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/aggregate_attestation?attestation_data_root=MHhjZjhlMGQ0ZTk1ODczNjliMjMwMWQwNzkwMzQ3MzIwMzAyY2MwOTQzZDVhMTg4NDU2MDM2N2U4MjA4ZDkyMGYy",
+					"raw": "http://localhost:3500/qrl/v1/validator/aggregate_attestation?attestation_data_root=MHhjZjhlMGQ0ZTk1ODczNjliMjMwMWQwNzkwMzQ3MzIwMzAyY2MwOTQzZDVhMTg4NDU2MDM2N2U4MjA4ZDkyMGYy",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1403,7 +1403,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/aggregate_and_proofs",
+					"raw": "http://localhost:3500/qrl/v1/validator/aggregate_and_proofs",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1446,7 +1446,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/beacon_committee_subscriptions",
+					"raw": "http://localhost:3500/qrl/v1/validator/beacon_committee_subscriptions",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1477,7 +1477,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/sync_committee_subscriptions",
+					"raw": "http://localhost:3500/qrl/v1/validator/sync_committee_subscriptions",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1499,7 +1499,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/sync_committee_contribution?slot=100000&subcommittee_index=1&beacon_block_root=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2",
+					"raw": "http://localhost:3500/qrl/v1/validator/sync_committee_contribution?slot=100000&subcommittee_index=1&beacon_block_root=0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1544,7 +1544,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3500/zond/v1/validator/contribution_and_proofs",
+					"raw": "http://localhost:3500/qrl/v1/validator/contribution_and_proofs",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -1576,7 +1576,7 @@
 					"raw": "[\n  {\n    \"validator_index\": \"1\",\n    \"fee_recipient\": \"Qabcf8e0d4e9587369b2301d0790347320302cc09\"\n  }\n]"
 				},
 				"url": {
-					"raw": "/zond/v1/validator/prepare_beacon_proposer",
+					"raw": "/qrl/v1/validator/prepare_beacon_proposer",
 					"path": [
 						"zond",
 						"v1",

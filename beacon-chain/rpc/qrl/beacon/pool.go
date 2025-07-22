@@ -12,8 +12,8 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/helpers"
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/proto/migration"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
-	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -24,7 +24,7 @@ const broadcastDilithiumChangesRateLimit = 128
 
 // ListPoolAttesterSlashings retrieves attester slashings known by the node but
 // not necessarily incorporated into any block.
-func (bs *Server) ListPoolAttesterSlashings(ctx context.Context, _ *emptypb.Empty) (*zondpbv1.AttesterSlashingsPoolResponse, error) {
+func (bs *Server) ListPoolAttesterSlashings(ctx context.Context, _ *emptypb.Empty) (*qrlpb.AttesterSlashingsPoolResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.ListPoolAttesterSlashings")
 	defer span.End()
 
@@ -34,19 +34,19 @@ func (bs *Server) ListPoolAttesterSlashings(ctx context.Context, _ *emptypb.Empt
 	}
 	sourceSlashings := bs.SlashingsPool.PendingAttesterSlashings(ctx, headState, true /* return unlimited slashings */)
 
-	slashings := make([]*zondpbv1.AttesterSlashing, len(sourceSlashings))
+	slashings := make([]*qrlpb.AttesterSlashing, len(sourceSlashings))
 	for i, s := range sourceSlashings {
 		slashings[i] = migration.V1Alpha1AttSlashingToV1(s)
 	}
 
-	return &zondpbv1.AttesterSlashingsPoolResponse{
+	return &qrlpb.AttesterSlashingsPoolResponse{
 		Data: slashings,
 	}, nil
 }
 
 // SubmitAttesterSlashing submits AttesterSlashing object to node's pool and
 // if passes validation node MUST broadcast it to network.
-func (bs *Server) SubmitAttesterSlashing(ctx context.Context, req *zondpbv1.AttesterSlashing) (*emptypb.Empty, error) {
+func (bs *Server) SubmitAttesterSlashing(ctx context.Context, req *qrlpb.AttesterSlashing) (*emptypb.Empty, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.SubmitAttesterSlashing")
 	defer span.End()
 
@@ -80,7 +80,7 @@ func (bs *Server) SubmitAttesterSlashing(ctx context.Context, req *zondpbv1.Atte
 
 // ListPoolProposerSlashings retrieves proposer slashings known by the node
 // but not necessarily incorporated into any block.
-func (bs *Server) ListPoolProposerSlashings(ctx context.Context, _ *emptypb.Empty) (*zondpbv1.ProposerSlashingPoolResponse, error) {
+func (bs *Server) ListPoolProposerSlashings(ctx context.Context, _ *emptypb.Empty) (*qrlpb.ProposerSlashingPoolResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.ListPoolProposerSlashings")
 	defer span.End()
 
@@ -90,19 +90,19 @@ func (bs *Server) ListPoolProposerSlashings(ctx context.Context, _ *emptypb.Empt
 	}
 	sourceSlashings := bs.SlashingsPool.PendingProposerSlashings(ctx, headState, true /* return unlimited slashings */)
 
-	slashings := make([]*zondpbv1.ProposerSlashing, len(sourceSlashings))
+	slashings := make([]*qrlpb.ProposerSlashing, len(sourceSlashings))
 	for i, s := range sourceSlashings {
 		slashings[i] = migration.V1Alpha1ProposerSlashingToV1(s)
 	}
 
-	return &zondpbv1.ProposerSlashingPoolResponse{
+	return &qrlpb.ProposerSlashingPoolResponse{
 		Data: slashings,
 	}, nil
 }
 
 // SubmitProposerSlashing submits AttesterSlashing object to node's pool and if
 // passes validation node MUST broadcast it to network.
-func (bs *Server) SubmitProposerSlashing(ctx context.Context, req *zondpbv1.ProposerSlashing) (*emptypb.Empty, error) {
+func (bs *Server) SubmitProposerSlashing(ctx context.Context, req *qrlpb.ProposerSlashing) (*emptypb.Empty, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.SubmitProposerSlashing")
 	defer span.End()
 
@@ -136,7 +136,7 @@ func (bs *Server) SubmitProposerSlashing(ctx context.Context, req *zondpbv1.Prop
 
 // SubmitSignedDilithiumToExecutionChanges submits said object to the node's pool
 // if it passes validation the node must broadcast it to the network.
-func (bs *Server) SubmitSignedDilithiumToExecutionChanges(ctx context.Context, req *zondpbv1.SubmitDilithiumToExecutionChangesRequest) (*emptypb.Empty, error) {
+func (bs *Server) SubmitSignedDilithiumToExecutionChanges(ctx context.Context, req *qrlpb.SubmitDilithiumToExecutionChangesRequest) (*emptypb.Empty, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.SubmitSignedDilithiumToExecutionChanges")
 	defer span.End()
 	st, err := bs.ChainInfoFetcher.HeadStateReadOnly(ctx)
@@ -144,7 +144,7 @@ func (bs *Server) SubmitSignedDilithiumToExecutionChanges(ctx context.Context, r
 		return nil, status.Errorf(codes.Internal, "Could not get head state: %v", err)
 	}
 	var failures []*helpers.SingleIndexedVerificationFailure
-	var toBroadcast []*zondpbalpha.SignedDilithiumToExecutionChange
+	var toBroadcast []*qrysmpb.SignedDilithiumToExecutionChange
 
 	for i, change := range req.GetChanges() {
 		alphaChange := migration.V1SignedDilithiumToExecutionChangeToV1Alpha1(change)
@@ -191,7 +191,7 @@ func (bs *Server) SubmitSignedDilithiumToExecutionChanges(ctx context.Context, r
 // broadcastDilithiumBatch broadcasts the first `broadcastDilithiumChangesRateLimit` messages from the slice pointed to by ptr.
 // It validates the messages again because they could have been invalidated by being included in blocks since the last validation.
 // It removes the messages from the slice and modifies it in place.
-func (bs *Server) broadcastDilithiumBatch(ctx context.Context, ptr *[]*zondpbalpha.SignedDilithiumToExecutionChange) {
+func (bs *Server) broadcastDilithiumBatch(ctx context.Context, ptr *[]*qrysmpb.SignedDilithiumToExecutionChange) {
 	limit := broadcastDilithiumChangesRateLimit
 	if len(*ptr) < broadcastDilithiumChangesRateLimit {
 		limit = len(*ptr)
@@ -216,7 +216,7 @@ func (bs *Server) broadcastDilithiumBatch(ctx context.Context, ptr *[]*zondpbalp
 	*ptr = (*ptr)[limit:]
 }
 
-func (bs *Server) broadcastDilithiumChanges(ctx context.Context, changes []*zondpbalpha.SignedDilithiumToExecutionChange) {
+func (bs *Server) broadcastDilithiumChanges(ctx context.Context, changes []*qrysmpb.SignedDilithiumToExecutionChange) {
 	bs.broadcastDilithiumBatch(ctx, &changes)
 	if len(changes) == 0 {
 		return
@@ -237,7 +237,7 @@ func (bs *Server) broadcastDilithiumChanges(ctx context.Context, changes []*zond
 }
 
 // ListDilithiumToExecutionChanges retrieves Dilithium to execution changes known by the node but not necessarily incorporated into any block
-func (bs *Server) ListDilithiumToExecutionChanges(ctx context.Context, _ *emptypb.Empty) (*zondpbv1.DilithiumToExecutionChangesPoolResponse, error) {
+func (bs *Server) ListDilithiumToExecutionChanges(ctx context.Context, _ *emptypb.Empty) (*qrlpb.DilithiumToExecutionChangesPoolResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.ListDilithiumToExecutionChanges")
 	defer span.End()
 
@@ -246,12 +246,12 @@ func (bs *Server) ListDilithiumToExecutionChanges(ctx context.Context, _ *emptyp
 		return nil, status.Errorf(codes.Internal, "Could not get Dilithium to execution changes: %v", err)
 	}
 
-	changes := make([]*zondpbv1.SignedDilithiumToExecutionChange, len(sourceChanges))
+	changes := make([]*qrlpb.SignedDilithiumToExecutionChange, len(sourceChanges))
 	for i, ch := range sourceChanges {
 		changes[i] = migration.V1Alpha1SignedDilithiumToExecChangeToV1(ch)
 	}
 
-	return &zondpbv1.DilithiumToExecutionChangesPoolResponse{
+	return &qrlpb.DilithiumToExecutionChangesPoolResponse{
 		Data: changes,
 	}, nil
 }

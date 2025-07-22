@@ -32,7 +32,7 @@ import (
 	validator2 "github.com/theQRL/qrysm/consensus-types/validator"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/network/http"
-	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
@@ -62,7 +62,7 @@ func (s *Server) GetAggregateAttestation(w http.ResponseWriter, r *http.Request)
 	}
 
 	allAtts := s.AttestationsPool.AggregatedAttestations()
-	var bestMatchingAtt *zondpbalpha.Attestation
+	var bestMatchingAtt *qrysmpb.Attestation
 	for _, att := range allAtts {
 		if att.Data.Slot == primitives.Slot(slot) {
 			root, err := att.Data.HashTreeRoot()
@@ -170,7 +170,7 @@ func (s *Server) SubmitAggregateAndProofs(w http.ResponseWriter, r *http.Request
 		}
 		rpcError := s.CoreService.SubmitSignedAggregateSelectionProof(
 			ctx,
-			&zondpbalpha.SignedAggregateSubmitRequest{SignedAggregateAndProof: consensusItem},
+			&qrysmpb.SignedAggregateSubmitRequest{SignedAggregateAndProof: consensusItem},
 		)
 		if rpcError != nil {
 			_, ok := rpcError.Err.(*core.AggregateBroadcastFailedError)
@@ -422,7 +422,7 @@ func (s *Server) GetAttestationData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	attestationData, rpcError := s.CoreService.GetAttestationData(ctx, &zondpbalpha.AttestationDataRequest{
+	attestationData, rpcError := s.CoreService.GetAttestationData(ctx, &qrysmpb.AttestationDataRequest{
 		Slot:           primitives.Slot(slot),
 		CommitteeIndex: primitives.CommitteeIndex(committeeIndex),
 	})
@@ -500,7 +500,7 @@ func (s *Server) produceSyncCommitteeContribution(
 	}
 	sigs, aggregatedBits, err := s.CoreService.SignaturesAndAggregationBits(
 		ctx,
-		&zondpbalpha.SignaturesAndAggregationBitsRequest{
+		&qrysmpb.SignaturesAndAggregationBitsRequest{
 			Msgs:      msgs,
 			Slot:      slot,
 			SubnetId:  index,
@@ -547,7 +547,7 @@ func (s *Server) RegisterValidator(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	registrations := make([]*zondpbalpha.SignedValidatorRegistrationV1, len(jsonRegistrations))
+	registrations := make([]*qrysmpb.SignedValidatorRegistrationV1, len(jsonRegistrations))
 	for i, registration := range jsonRegistrations {
 		reg, err := registration.ToConsensus()
 		if err != nil {
@@ -950,7 +950,7 @@ func (s *Server) GetSyncCommitteeDuties(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	nextSyncCommitteeFirstEpoch := currentSyncCommitteeFirstEpoch + params.BeaconConfig().EpochsPerSyncCommitteePeriod
-	var committee *zondpbalpha.SyncCommittee
+	var committee *qrysmpb.SyncCommittee
 	if requestedEpoch >= nextSyncCommitteeFirstEpoch {
 		committee, err = st.NextSyncCommittee()
 		if err != nil {

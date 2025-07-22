@@ -10,8 +10,8 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
-	zondpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
@@ -20,7 +20,7 @@ import (
 
 // ListSyncCommittees retrieves the sync committees for the given epoch.
 // If the epoch is not passed in, then the sync committees for the epoch of the state will be obtained.
-func (bs *Server) ListSyncCommittees(ctx context.Context, req *zondpbv1.StateSyncCommitteesRequest) (*zondpbv1.StateSyncCommitteesResponse, error) {
+func (bs *Server) ListSyncCommittees(ctx context.Context, req *qrlpb.StateSyncCommitteesRequest) (*qrlpb.StateSyncCommitteesResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.ListSyncCommittees")
 	defer span.End()
 
@@ -69,7 +69,7 @@ func (bs *Server) ListSyncCommittees(ctx context.Context, req *zondpbv1.StateSyn
 	}
 
 	var committeeIndices []primitives.ValidatorIndex
-	var committee *zondpbalpha.SyncCommittee
+	var committee *qrysmpb.SyncCommittee
 	if requestNextCommittee {
 		// Get the next sync committee and sync committee indices from the state.
 		committeeIndices, committee, err = nextCommitteeIndicesFromState(st)
@@ -99,8 +99,8 @@ func (bs *Server) ListSyncCommittees(ctx context.Context, req *zondpbv1.StateSyn
 	}
 	isFinalized := bs.FinalizationFetcher.IsFinalized(ctx, blockRoot)
 
-	return &zondpbv1.StateSyncCommitteesResponse{
-		Data: &zondpbv1.SyncCommitteeValidators{
+	return &qrlpb.StateSyncCommitteesResponse{
+		Data: &qrlpb.SyncCommitteeValidators{
 			Validators:          committeeIndices,
 			ValidatorAggregates: subcommittees,
 		},
@@ -109,7 +109,7 @@ func (bs *Server) ListSyncCommittees(ctx context.Context, req *zondpbv1.StateSyn
 	}, nil
 }
 
-func committeeIndicesFromState(st state.BeaconState, committee *zondpbalpha.SyncCommittee) ([]primitives.ValidatorIndex, *zondpbalpha.SyncCommittee, error) {
+func committeeIndicesFromState(st state.BeaconState, committee *qrysmpb.SyncCommittee) ([]primitives.ValidatorIndex, *qrysmpb.SyncCommittee, error) {
 	committeeIndices := make([]primitives.ValidatorIndex, len(committee.Pubkeys))
 	for i, key := range committee.Pubkeys {
 		index, ok := st.ValidatorIndexByPubkey(bytesutil.ToBytes2592(key))
@@ -124,7 +124,7 @@ func committeeIndicesFromState(st state.BeaconState, committee *zondpbalpha.Sync
 	return committeeIndices, committee, nil
 }
 
-func currentCommitteeIndicesFromState(st state.BeaconState) ([]primitives.ValidatorIndex, *zondpbalpha.SyncCommittee, error) {
+func currentCommitteeIndicesFromState(st state.BeaconState) ([]primitives.ValidatorIndex, *qrysmpb.SyncCommittee, error) {
 	committee, err := st.CurrentSyncCommittee()
 	if err != nil {
 		return nil, nil, fmt.Errorf(
@@ -135,7 +135,7 @@ func currentCommitteeIndicesFromState(st state.BeaconState) ([]primitives.Valida
 	return committeeIndicesFromState(st, committee)
 }
 
-func nextCommitteeIndicesFromState(st state.BeaconState) ([]primitives.ValidatorIndex, *zondpbalpha.SyncCommittee, error) {
+func nextCommitteeIndicesFromState(st state.BeaconState) ([]primitives.ValidatorIndex, *qrysmpb.SyncCommittee, error) {
 	committee, err := st.NextSyncCommittee()
 	if err != nil {
 		return nil, nil, fmt.Errorf(
@@ -146,9 +146,9 @@ func nextCommitteeIndicesFromState(st state.BeaconState) ([]primitives.Validator
 	return committeeIndicesFromState(st, committee)
 }
 
-func extractSyncSubcommittees(st state.BeaconState, committee *zondpbalpha.SyncCommittee) ([]*zondpbv1.SyncSubcommitteeValidators, error) {
+func extractSyncSubcommittees(st state.BeaconState, committee *qrysmpb.SyncCommittee) ([]*qrlpb.SyncSubcommitteeValidators, error) {
 	subcommitteeCount := params.BeaconConfig().SyncCommitteeSubnetCount
-	subcommittees := make([]*zondpbv1.SyncSubcommitteeValidators, subcommitteeCount)
+	subcommittees := make([]*qrlpb.SyncSubcommitteeValidators, subcommitteeCount)
 	for i := uint64(0); i < subcommitteeCount; i++ {
 		pubkeys, err := altair.SyncSubCommitteePubkeys(committee, primitives.CommitteeIndex(i))
 		if err != nil {
@@ -156,7 +156,7 @@ func extractSyncSubcommittees(st state.BeaconState, committee *zondpbalpha.SyncC
 				"failed to get subcommittee pubkeys: %v", err,
 			)
 		}
-		subcommittee := &zondpbv1.SyncSubcommitteeValidators{Validators: make([]primitives.ValidatorIndex, len(pubkeys))}
+		subcommittee := &qrlpb.SyncSubcommitteeValidators{Validators: make([]primitives.ValidatorIndex, len(pubkeys))}
 		for j, key := range pubkeys {
 			index, ok := st.ValidatorIndexByPubkey(bytesutil.ToBytes2592(key))
 			if !ok {

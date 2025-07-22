@@ -55,13 +55,13 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 	case errors.As(err, kv.ErrNotFoundFeeRecipient):
 		// If fee recipient is not found in DB and not set from beacon node CLI,
 		// use the burn address.
-		if feeRecipient.String() == params.BeaconConfig().ZondBurnAddress {
+		if feeRecipient.String() == params.BeaconConfig().QRLBurnAddress {
 			logrus.WithFields(logrus.Fields{
 				"validatorIndex": vIdx,
-				"burnAddress":    params.BeaconConfig().ZondBurnAddress,
+				"burnAddress":    params.BeaconConfig().QRLBurnAddress,
 			}).Warn("Fee recipient is currently using the burn address, " +
 				"you will not be rewarded transaction fees on this setting. " +
-				"Please set a different zond address as the fee recipient. " +
+				"Please set a different qrl address as the fee recipient. " +
 				"Please refer to our documentation for instructions")
 		}
 	default:

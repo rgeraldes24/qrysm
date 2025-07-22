@@ -24,7 +24,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -37,7 +37,7 @@ func TestServer_ListAttestations_NoResults(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
 
-	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Slot: 0,
 	})
 	require.NoError(t, err)
@@ -47,13 +47,13 @@ func TestServer_ListAttestations_NoResults(t *testing.T) {
 			State: st,
 		},
 	}
-	wanted := &zondpb.ListAttestationsResponse{
-		Attestations:  make([]*zondpb.Attestation, 0),
+	wanted := &qrysmpb.ListAttestationsResponse{
+		Attestations:  make([]*qrysmpb.Attestation, 0),
 		TotalSize:     int32(0),
 		NextPageToken: strconv.Itoa(0),
 	}
-	res, err := bs.ListAttestations(ctx, &zondpb.ListAttestationsRequest{
-		QueryFilter: &zondpb.ListAttestationsRequest_GenesisEpoch{GenesisEpoch: true},
+	res, err := bs.ListAttestations(ctx, &qrysmpb.ListAttestationsRequest{
+		QueryFilter: &qrysmpb.ListAttestationsRequest_GenesisEpoch{GenesisEpoch: true},
 	})
 	require.NoError(t, err)
 	if !proto.Equal(wanted, res) {
@@ -65,7 +65,7 @@ func TestServer_ListAttestations_Genesis(t *testing.T) {
 	db := dbTest.SetupDB(t)
 	ctx := context.Background()
 
-	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Slot: 0,
 	})
 	require.NoError(t, err)
@@ -76,9 +76,9 @@ func TestServer_ListAttestations_Genesis(t *testing.T) {
 		},
 	}
 
-	att := util.HydrateAttestation(&zondpb.Attestation{
+	att := util.HydrateAttestation(&qrysmpb.Attestation{
 		AggregationBits: bitfield.NewBitlist(0),
-		Data: &zondpb.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:           2,
 			CommitteeIndex: 1,
 		},
@@ -87,19 +87,19 @@ func TestServer_ListAttestations_Genesis(t *testing.T) {
 	parentRoot := [32]byte{1, 2, 3}
 	signedBlock := util.NewBeaconBlockCapella()
 	signedBlock.Block.ParentRoot = bytesutil.PadTo(parentRoot[:], 32)
-	signedBlock.Block.Body.Attestations = []*zondpb.Attestation{att}
+	signedBlock.Block.Body.Attestations = []*qrysmpb.Attestation{att}
 	root, err := signedBlock.Block.HashTreeRoot()
 	require.NoError(t, err)
 	util.SaveBlock(t, ctx, db, signedBlock)
 	require.NoError(t, db.SaveGenesisBlockRoot(ctx, root))
-	wanted := &zondpb.ListAttestationsResponse{
-		Attestations:  []*zondpb.Attestation{att},
+	wanted := &qrysmpb.ListAttestationsResponse{
+		Attestations:  []*qrysmpb.Attestation{att},
 		NextPageToken: "",
 		TotalSize:     1,
 	}
 
-	res, err := bs.ListAttestations(ctx, &zondpb.ListAttestationsRequest{
-		QueryFilter: &zondpb.ListAttestationsRequest_GenesisEpoch{
+	res, err := bs.ListAttestations(ctx, &qrysmpb.ListAttestationsRequest{
+		QueryFilter: &qrysmpb.ListAttestationsRequest_GenesisEpoch{
 			GenesisEpoch: true,
 		},
 	})
@@ -112,15 +112,15 @@ func TestServer_ListAttestations_NoPagination(t *testing.T) {
 	ctx := context.Background()
 
 	count := primitives.Slot(8)
-	atts := make([]*zondpb.Attestation, 0, count)
+	atts := make([]*qrysmpb.Attestation, 0, count)
 	for i := primitives.Slot(0); i < count; i++ {
 		blockExample := util.NewBeaconBlockCapella()
-		blockExample.Block.Body.Attestations = []*zondpb.Attestation{
+		blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
 			{
 				Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength)},
-				Data: &zondpb.AttestationData{
-					Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
-					Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
+				Data: &qrysmpb.AttestationData{
+					Target:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
+					Source:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
 					BeaconBlockRoot: bytesutil.PadTo([]byte("root"), 32),
 					Slot:            i,
 				},
@@ -135,8 +135,8 @@ func TestServer_ListAttestations_NoPagination(t *testing.T) {
 		BeaconDB: db,
 	}
 
-	received, err := bs.ListAttestations(ctx, &zondpb.ListAttestationsRequest{
-		QueryFilter: &zondpb.ListAttestationsRequest_GenesisEpoch{
+	received, err := bs.ListAttestations(ctx, &qrysmpb.ListAttestationsRequest{
+		QueryFilter: &qrysmpb.ListAttestationsRequest_GenesisEpoch{
 			GenesisEpoch: true,
 		},
 	})
@@ -154,21 +154,21 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 	targetRoot := [32]byte{7, 8, 9}
 	targetEpoch := primitives.Epoch(7)
 
-	unwrappedBlocks := []*zondpb.SignedBeaconBlockCapella{
+	unwrappedBlocks := []*qrysmpb.SignedBeaconBlockCapella{
 		util.HydrateSignedBeaconBlockCapella(
-			&zondpb.SignedBeaconBlockCapella{
-				Block: &zondpb.BeaconBlockCapella{
+			&qrysmpb.SignedBeaconBlockCapella{
+				Block: &qrysmpb.BeaconBlockCapella{
 					Slot: 4,
-					Body: &zondpb.BeaconBlockBodyCapella{
-						Attestations: []*zondpb.Attestation{
+					Body: &qrysmpb.BeaconBlockBodyCapella{
+						Attestations: []*qrysmpb.Attestation{
 							{
-								Data: &zondpb.AttestationData{
+								Data: &qrysmpb.AttestationData{
 									BeaconBlockRoot: someRoot[:],
-									Source: &zondpb.Checkpoint{
+									Source: &qrysmpb.Checkpoint{
 										Root:  sourceRoot[:],
 										Epoch: sourceEpoch,
 									},
-									Target: &zondpb.Checkpoint{
+									Target: &qrysmpb.Checkpoint{
 										Root:  targetRoot[:],
 										Epoch: targetEpoch,
 									},
@@ -181,19 +181,19 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 					},
 				},
 			}),
-		util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{
-			Block: &zondpb.BeaconBlockCapella{
+		util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
+			Block: &qrysmpb.BeaconBlockCapella{
 				Slot: 5 + params.BeaconConfig().SlotsPerEpoch,
-				Body: &zondpb.BeaconBlockBodyCapella{
-					Attestations: []*zondpb.Attestation{
+				Body: &qrysmpb.BeaconBlockBodyCapella{
+					Attestations: []*qrysmpb.Attestation{
 						{
-							Data: &zondpb.AttestationData{
+							Data: &qrysmpb.AttestationData{
 								BeaconBlockRoot: someRoot[:],
-								Source: &zondpb.Checkpoint{
+								Source: &qrysmpb.Checkpoint{
 									Root:  sourceRoot[:],
 									Epoch: sourceEpoch,
 								},
-								Target: &zondpb.Checkpoint{
+								Target: &qrysmpb.Checkpoint{
 									Root:  targetRoot[:],
 									Epoch: targetEpoch,
 								},
@@ -207,19 +207,19 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 			},
 		}),
 		util.HydrateSignedBeaconBlockCapella(
-			&zondpb.SignedBeaconBlockCapella{
-				Block: &zondpb.BeaconBlockCapella{
+			&qrysmpb.SignedBeaconBlockCapella{
+				Block: &qrysmpb.BeaconBlockCapella{
 					Slot: 5,
-					Body: &zondpb.BeaconBlockBodyCapella{
-						Attestations: []*zondpb.Attestation{
+					Body: &qrysmpb.BeaconBlockBodyCapella{
+						Attestations: []*qrysmpb.Attestation{
 							{
-								Data: &zondpb.AttestationData{
+								Data: &qrysmpb.AttestationData{
 									BeaconBlockRoot: someRoot[:],
-									Source: &zondpb.Checkpoint{
+									Source: &qrysmpb.Checkpoint{
 										Root:  sourceRoot[:],
 										Epoch: sourceEpoch,
 									},
-									Target: &zondpb.Checkpoint{
+									Target: &qrysmpb.Checkpoint{
 										Root:  targetRoot[:],
 										Epoch: targetEpoch,
 									},
@@ -247,13 +247,13 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 		BeaconDB: db,
 	}
 
-	received, err := bs.ListAttestations(ctx, &zondpb.ListAttestationsRequest{
-		QueryFilter: &zondpb.ListAttestationsRequest_Epoch{Epoch: 1},
+	received, err := bs.ListAttestations(ctx, &qrysmpb.ListAttestationsRequest{
+		QueryFilter: &qrysmpb.ListAttestationsRequest_Epoch{Epoch: 1},
 	})
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(received.Attestations))
-	received, err = bs.ListAttestations(ctx, &zondpb.ListAttestationsRequest{
-		QueryFilter: &zondpb.ListAttestationsRequest_GenesisEpoch{GenesisEpoch: true},
+	received, err = bs.ListAttestations(ctx, &qrysmpb.ListAttestationsRequest{
+		QueryFilter: &qrysmpb.ListAttestationsRequest_GenesisEpoch{GenesisEpoch: true},
 	})
 	require.NoError(t, err)
 	assert.Equal(t, 2, len(received.Attestations))
@@ -264,14 +264,14 @@ func TestServer_ListAttestations_Pagination_CustomPageParameters(t *testing.T) {
 	ctx := context.Background()
 
 	count := params.BeaconConfig().SlotsPerEpoch * 4
-	atts := make([]*zondpb.Attestation, 0, count)
+	atts := make([]*qrysmpb.Attestation, 0, count)
 	for i := primitives.Slot(0); i < params.BeaconConfig().SlotsPerEpoch; i++ {
 		for s := primitives.CommitteeIndex(0); s < 4; s++ {
 			blockExample := util.NewBeaconBlockCapella()
 			blockExample.Block.Slot = i
-			blockExample.Block.Body.Attestations = []*zondpb.Attestation{
-				util.HydrateAttestation(&zondpb.Attestation{
-					Data: &zondpb.AttestationData{
+			blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
+				util.HydrateAttestation(&qrysmpb.Attestation{
+					Data: &qrysmpb.AttestationData{
 						CommitteeIndex: s,
 						Slot:           i,
 					},
@@ -290,20 +290,20 @@ func TestServer_ListAttestations_Pagination_CustomPageParameters(t *testing.T) {
 
 	tests := []struct {
 		name string
-		req  *zondpb.ListAttestationsRequest
-		res  *zondpb.ListAttestationsResponse
+		req  *qrysmpb.ListAttestationsRequest
+		res  *qrysmpb.ListAttestationsResponse
 	}{
 		{
 			name: "1st of 3 pages",
-			req: &zondpb.ListAttestationsRequest{
-				QueryFilter: &zondpb.ListAttestationsRequest_GenesisEpoch{
+			req: &qrysmpb.ListAttestationsRequest{
+				QueryFilter: &qrysmpb.ListAttestationsRequest_GenesisEpoch{
 					GenesisEpoch: true,
 				},
 				PageToken: strconv.Itoa(1),
 				PageSize:  3,
 			},
-			res: &zondpb.ListAttestationsResponse{
-				Attestations: []*zondpb.Attestation{
+			res: &qrysmpb.ListAttestationsResponse{
+				Attestations: []*qrysmpb.Attestation{
 					atts[3],
 					atts[4],
 					atts[5],
@@ -314,15 +314,15 @@ func TestServer_ListAttestations_Pagination_CustomPageParameters(t *testing.T) {
 		},
 		{
 			name: "10 of size 1",
-			req: &zondpb.ListAttestationsRequest{
-				QueryFilter: &zondpb.ListAttestationsRequest_GenesisEpoch{
+			req: &qrysmpb.ListAttestationsRequest{
+				QueryFilter: &qrysmpb.ListAttestationsRequest_GenesisEpoch{
 					GenesisEpoch: true,
 				},
 				PageToken: strconv.Itoa(10),
 				PageSize:  1,
 			},
-			res: &zondpb.ListAttestationsResponse{
-				Attestations: []*zondpb.Attestation{
+			res: &qrysmpb.ListAttestationsResponse{
+				Attestations: []*qrysmpb.Attestation{
 					atts[10],
 				},
 				NextPageToken: strconv.Itoa(11),
@@ -331,15 +331,15 @@ func TestServer_ListAttestations_Pagination_CustomPageParameters(t *testing.T) {
 		},
 		{
 			name: "2 of size 8",
-			req: &zondpb.ListAttestationsRequest{
-				QueryFilter: &zondpb.ListAttestationsRequest_GenesisEpoch{
+			req: &qrysmpb.ListAttestationsRequest{
+				QueryFilter: &qrysmpb.ListAttestationsRequest_GenesisEpoch{
 					GenesisEpoch: true,
 				},
 				PageToken: strconv.Itoa(2),
 				PageSize:  8,
 			},
-			res: &zondpb.ListAttestationsResponse{
-				Attestations: []*zondpb.Attestation{
+			res: &qrysmpb.ListAttestationsResponse{
+				Attestations: []*qrysmpb.Attestation{
 					atts[16],
 					atts[17],
 					atts[18],
@@ -367,17 +367,17 @@ func TestServer_ListAttestations_Pagination_OutOfRange(t *testing.T) {
 	ctx := context.Background()
 	util.NewBeaconBlockCapella()
 	count := primitives.Slot(1)
-	atts := make([]*zondpb.Attestation, 0, count)
+	atts := make([]*qrysmpb.Attestation, 0, count)
 	for i := primitives.Slot(0); i < count; i++ {
-		blockExample := util.HydrateSignedBeaconBlockCapella(&zondpb.SignedBeaconBlockCapella{
-			Block: &zondpb.BeaconBlockCapella{
-				Body: &zondpb.BeaconBlockBodyCapella{
-					Attestations: []*zondpb.Attestation{
+		blockExample := util.HydrateSignedBeaconBlockCapella(&qrysmpb.SignedBeaconBlockCapella{
+			Block: &qrysmpb.BeaconBlockCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{
+					Attestations: []*qrysmpb.Attestation{
 						{
-							Data: &zondpb.AttestationData{
+							Data: &qrysmpb.AttestationData{
 								BeaconBlockRoot: bytesutil.PadTo([]byte("root"), fieldparams.RootLength),
-								Source:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-								Target:          &zondpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+								Source:          &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
+								Target:          &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
 								Slot:            i,
 							},
 							AggregationBits: bitfield.Bitlist{0b11},
@@ -395,8 +395,8 @@ func TestServer_ListAttestations_Pagination_OutOfRange(t *testing.T) {
 		BeaconDB: db,
 	}
 
-	req := &zondpb.ListAttestationsRequest{
-		QueryFilter: &zondpb.ListAttestationsRequest_Epoch{
+	req := &qrysmpb.ListAttestationsRequest{
+		QueryFilter: &qrysmpb.ListAttestationsRequest_Epoch{
 			Epoch: 0,
 		},
 		PageToken: strconv.Itoa(1),
@@ -413,7 +413,7 @@ func TestServer_ListAttestations_Pagination_ExceedsMaxPageSize(t *testing.T) {
 	exceedsMax := int32(cmd.Get().MaxRPCPageSize + 1)
 
 	wanted := fmt.Sprintf("Requested page size %d can not be greater than max size %d", exceedsMax, cmd.Get().MaxRPCPageSize)
-	req := &zondpb.ListAttestationsRequest{PageToken: strconv.Itoa(0), PageSize: exceedsMax}
+	req := &qrysmpb.ListAttestationsRequest{PageToken: strconv.Itoa(0), PageSize: exceedsMax}
 	_, err := bs.ListAttestations(ctx, req)
 	assert.ErrorContains(t, wanted, err)
 }
@@ -423,15 +423,15 @@ func TestServer_ListAttestations_Pagination_DefaultPageSize(t *testing.T) {
 	ctx := context.Background()
 
 	count := primitives.Slot(params.BeaconConfig().DefaultPageSize)
-	atts := make([]*zondpb.Attestation, 0, count)
+	atts := make([]*qrysmpb.Attestation, 0, count)
 	for i := primitives.Slot(0); i < count; i++ {
 		blockExample := util.NewBeaconBlockCapella()
-		blockExample.Block.Body.Attestations = []*zondpb.Attestation{
+		blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
 			{
-				Data: &zondpb.AttestationData{
+				Data: &qrysmpb.AttestationData{
 					BeaconBlockRoot: bytesutil.PadTo([]byte("root"), 32),
-					Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
-					Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
+					Target:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
+					Source:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
 					Slot:            i,
 				},
 				Signatures:      [][]byte{bytesutil.PadTo([]byte("root"), fieldparams.DilithiumSignatureLength)},
@@ -446,8 +446,8 @@ func TestServer_ListAttestations_Pagination_DefaultPageSize(t *testing.T) {
 		BeaconDB: db,
 	}
 
-	req := &zondpb.ListAttestationsRequest{
-		QueryFilter: &zondpb.ListAttestationsRequest_GenesisEpoch{
+	req := &qrysmpb.ListAttestationsRequest{
+		QueryFilter: &qrysmpb.ListAttestationsRequest_GenesisEpoch{
 			GenesisEpoch: true,
 		},
 	}
@@ -461,7 +461,7 @@ func TestServer_ListAttestations_Pagination_DefaultPageSize(t *testing.T) {
 
 func TestServer_mapAttestationToTargetRoot(t *testing.T) {
 	count := primitives.Slot(100)
-	atts := make([]*zondpb.Attestation, count)
+	atts := make([]*qrysmpb.Attestation, count)
 	targetRoot1 := bytesutil.ToBytes32([]byte("root1"))
 	targetRoot2 := bytesutil.ToBytes32([]byte("root2"))
 
@@ -472,9 +472,9 @@ func TestServer_mapAttestationToTargetRoot(t *testing.T) {
 		} else {
 			targetRoot = targetRoot2
 		}
-		atts[i] = &zondpb.Attestation{
-			Data: &zondpb.AttestationData{
-				Target: &zondpb.Checkpoint{
+		atts[i] = &qrysmpb.Attestation{
+			Data: &qrysmpb.AttestationData{
+				Target: &qrysmpb.Checkpoint{
 					Root: targetRoot[:],
 				},
 			},
@@ -500,8 +500,8 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 	targetRoot2 := bytesutil.ToBytes32([]byte("root2"))
 
 	count := params.BeaconConfig().SlotsPerEpoch
-	atts := make([]*zondpb.Attestation, 0, count)
-	atts2 := make([]*zondpb.Attestation, 0, count)
+	atts := make([]*qrysmpb.Attestation, 0, count)
+	atts2 := make([]*qrysmpb.Attestation, 0, count)
 
 	for i := primitives.Slot(0); i < count; i++ {
 		var targetRoot [32]byte
@@ -511,15 +511,15 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 			targetRoot = targetRoot2
 		}
 		blockExample := util.NewBeaconBlockCapella()
-		blockExample.Block.Body.Attestations = []*zondpb.Attestation{
+		blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
 			{
 				Signatures: [][]byte{},
-				Data: &zondpb.AttestationData{
+				Data: &qrysmpb.AttestationData{
 					BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-					Target: &zondpb.Checkpoint{
+					Target: &qrysmpb.Checkpoint{
 						Root: targetRoot[:],
 					},
-					Source: &zondpb.Checkpoint{
+					Source: &qrysmpb.Checkpoint{
 						Root: make([]byte, fieldparams.RootLength),
 					},
 					Slot:           i,
@@ -542,7 +542,7 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 	state, _ := util.DeterministicGenesisStateCapella(t, numValidators)
 
 	// Next up we convert the test attestations to indexed form:
-	indexedAtts := make([]*zondpb.IndexedAttestation, len(atts)+len(atts2))
+	indexedAtts := make([]*qrysmpb.IndexedAttestation, len(atts)+len(atts2))
 	for i := 0; i < len(atts); i++ {
 		att := atts[i]
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), state, att.Data.Slot, att.Data.CommitteeIndex)
@@ -566,13 +566,13 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 		HeadFetcher:        &chainMock.ChainService{State: state},
 		StateGen:           stategen.New(db, doublylinkedtree.New()),
 	}
-	err := db.SaveStateSummary(ctx, &zondpb.StateSummary{
+	err := db.SaveStateSummary(ctx, &qrysmpb.StateSummary{
 		Root: targetRoot1[:],
 		Slot: 1,
 	})
 	require.NoError(t, err)
 
-	err = db.SaveStateSummary(ctx, &zondpb.StateSummary{
+	err = db.SaveStateSummary(ctx, &qrysmpb.StateSummary{
 		Root: targetRoot2[:],
 		Slot: 2,
 	})
@@ -581,8 +581,8 @@ func TestServer_ListIndexedAttestations_GenesisEpoch(t *testing.T) {
 	require.NoError(t, db.SaveState(ctx, state, bytesutil.ToBytes32(targetRoot1[:])))
 	require.NoError(t, state.SetSlot(state.Slot()+1))
 	require.NoError(t, db.SaveState(ctx, state, bytesutil.ToBytes32(targetRoot2[:])))
-	res, err := bs.ListIndexedAttestations(ctx, &zondpb.ListIndexedAttestationsRequest{
-		QueryFilter: &zondpb.ListIndexedAttestationsRequest_GenesisEpoch{
+	res, err := bs.ListIndexedAttestations(ctx, &qrysmpb.ListIndexedAttestationsRequest{
+		QueryFilter: &qrysmpb.ListIndexedAttestationsRequest_GenesisEpoch{
 			GenesisEpoch: true,
 		},
 	})
@@ -607,22 +607,22 @@ func TestServer_ListIndexedAttestations_OldEpoch(t *testing.T) {
 
 	blockRoot := bytesutil.ToBytes32([]byte("root"))
 	count := params.BeaconConfig().SlotsPerEpoch
-	atts := make([]*zondpb.Attestation, 0, count)
+	atts := make([]*qrysmpb.Attestation, 0, count)
 	epoch := primitives.Epoch(50)
 	startSlot, err := slots.EpochStart(epoch)
 	require.NoError(t, err)
 
 	for i := startSlot; i < count; i++ {
-		blockExample := &zondpb.SignedBeaconBlockCapella{
-			Block: &zondpb.BeaconBlockCapella{
-				Body: &zondpb.BeaconBlockBodyCapella{
-					Attestations: []*zondpb.Attestation{
+		blockExample := &qrysmpb.SignedBeaconBlockCapella{
+			Block: &qrysmpb.BeaconBlockCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{
+					Attestations: []*qrysmpb.Attestation{
 						{
-							Data: &zondpb.AttestationData{
+							Data: &qrysmpb.AttestationData{
 								BeaconBlockRoot: blockRoot[:],
 								Slot:            i,
 								CommitteeIndex:  0,
-								Target: &zondpb.Checkpoint{
+								Target: &qrysmpb.Checkpoint{
 									Epoch: epoch,
 									Root:  make([]byte, fieldparams.RootLength),
 								},
@@ -649,7 +649,7 @@ func TestServer_ListIndexedAttestations_OldEpoch(t *testing.T) {
 	require.NoError(t, state.SetSlot(startSlot))
 
 	// Next up we convert the test attestations to indexed form:
-	indexedAtts := make([]*zondpb.IndexedAttestation, len(atts))
+	indexedAtts := make([]*qrysmpb.IndexedAttestation, len(atts))
 	for i := 0; i < len(atts); i++ {
 		att := atts[i]
 		committee, err := helpers.BeaconCommitteeFromState(context.Background(), state, att.Data.Slot, att.Data.CommitteeIndex)
@@ -666,14 +666,14 @@ func TestServer_ListIndexedAttestations_OldEpoch(t *testing.T) {
 		},
 		StateGen: stategen.New(db, doublylinkedtree.New()),
 	}
-	err = db.SaveStateSummary(ctx, &zondpb.StateSummary{
+	err = db.SaveStateSummary(ctx, &qrysmpb.StateSummary{
 		Root: blockRoot[:],
 		Slot: params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch)),
 	})
 	require.NoError(t, err)
 	require.NoError(t, db.SaveState(ctx, state, bytesutil.ToBytes32([]byte("root"))))
-	res, err := bs.ListIndexedAttestations(ctx, &zondpb.ListIndexedAttestationsRequest{
-		QueryFilter: &zondpb.ListIndexedAttestationsRequest_Epoch{
+	res, err := bs.ListIndexedAttestations(ctx, &qrysmpb.ListIndexedAttestationsRequest{
+		QueryFilter: &qrysmpb.ListIndexedAttestationsRequest_Epoch{
 			Epoch: epoch,
 		},
 	})
@@ -687,7 +687,7 @@ func TestServer_AttestationPool_Pagination_ExceedsMaxPageSize(t *testing.T) {
 	exceedsMax := int32(cmd.Get().MaxRPCPageSize + 1)
 
 	wanted := fmt.Sprintf("Requested page size %d can not be greater than max size %d", exceedsMax, cmd.Get().MaxRPCPageSize)
-	req := &zondpb.AttestationPoolRequest{PageToken: strconv.Itoa(0), PageSize: exceedsMax}
+	req := &qrysmpb.AttestationPoolRequest{PageToken: strconv.Itoa(0), PageSize: exceedsMax}
 	_, err := bs.AttestationPool(ctx, req)
 	assert.ErrorContains(t, wanted, err)
 }
@@ -698,33 +698,33 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 		AttestationsPool: attestations.NewPool(),
 	}
 
-	atts := []*zondpb.Attestation{
+	atts := []*qrysmpb.Attestation{
 		{
-			Data: &zondpb.AttestationData{
+			Data: &qrysmpb.AttestationData{
 				Slot:            1,
 				BeaconBlockRoot: bytesutil.PadTo([]byte{1}, 32),
-				Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{1}, 32)},
-				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{1}, 32)},
+				Source:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte{1}, 32)},
+				Target:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte{1}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
 			Signatures:      [][]byte{bytesutil.PadTo([]byte{1}, fieldparams.DilithiumSignatureLength), bytesutil.PadTo([]byte{1}, fieldparams.DilithiumSignatureLength)},
 		},
 		{
-			Data: &zondpb.AttestationData{
+			Data: &qrysmpb.AttestationData{
 				Slot:            2,
 				BeaconBlockRoot: bytesutil.PadTo([]byte{2}, 32),
-				Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{2}, 32)},
-				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{2}, 32)},
+				Source:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte{2}, 32)},
+				Target:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte{2}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
 			Signatures:      [][]byte{bytesutil.PadTo([]byte{2}, fieldparams.DilithiumSignatureLength), bytesutil.PadTo([]byte{2}, fieldparams.DilithiumSignatureLength)},
 		},
 		{
-			Data: &zondpb.AttestationData{
+			Data: &qrysmpb.AttestationData{
 				Slot:            3,
 				BeaconBlockRoot: bytesutil.PadTo([]byte{3}, 32),
-				Source:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{3}, 32)},
-				Target:          &zondpb.Checkpoint{Root: bytesutil.PadTo([]byte{3}, 32)},
+				Source:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte{3}, 32)},
+				Target:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte{3}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
 			Signatures:      [][]byte{bytesutil.PadTo([]byte{3}, fieldparams.DilithiumSignatureLength), bytesutil.PadTo([]byte{3}, fieldparams.DilithiumSignatureLength)},
@@ -732,7 +732,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 	}
 	require.NoError(t, bs.AttestationsPool.SaveAggregatedAttestations(atts))
 
-	req := &zondpb.AttestationPoolRequest{
+	req := &qrysmpb.AttestationPoolRequest{
 		PageToken: strconv.Itoa(1),
 		PageSize:  100,
 	}
@@ -747,7 +747,7 @@ func TestServer_AttestationPool_Pagination_DefaultPageSize(t *testing.T) {
 		AttestationsPool: attestations.NewPool(),
 	}
 
-	atts := make([]*zondpb.Attestation, params.BeaconConfig().DefaultPageSize+1)
+	atts := make([]*qrysmpb.Attestation, params.BeaconConfig().DefaultPageSize+1)
 	for i := 0; i < len(atts); i++ {
 		att := util.NewAttestation()
 		att.Data.Slot = primitives.Slot(i)
@@ -755,7 +755,7 @@ func TestServer_AttestationPool_Pagination_DefaultPageSize(t *testing.T) {
 	}
 	require.NoError(t, bs.AttestationsPool.SaveAggregatedAttestations(atts))
 
-	req := &zondpb.AttestationPoolRequest{}
+	req := &qrysmpb.AttestationPoolRequest{}
 	res, err := bs.AttestationPool(ctx, req)
 	require.NoError(t, err)
 	assert.Equal(t, params.BeaconConfig().DefaultPageSize, len(res.Attestations), "Unexpected number of attestations")
@@ -769,7 +769,7 @@ func TestServer_AttestationPool_Pagination_CustomPageSize(t *testing.T) {
 	}
 
 	numAtts := 100
-	atts := make([]*zondpb.Attestation, numAtts)
+	atts := make([]*qrysmpb.Attestation, numAtts)
 	for i := 0; i < len(atts); i++ {
 		att := util.NewAttestation()
 		att.Data.Slot = primitives.Slot(i)
@@ -777,35 +777,35 @@ func TestServer_AttestationPool_Pagination_CustomPageSize(t *testing.T) {
 	}
 	require.NoError(t, bs.AttestationsPool.SaveAggregatedAttestations(atts))
 	tests := []struct {
-		req *zondpb.AttestationPoolRequest
-		res *zondpb.AttestationPoolResponse
+		req *qrysmpb.AttestationPoolRequest
+		res *qrysmpb.AttestationPoolResponse
 	}{
 		{
-			req: &zondpb.AttestationPoolRequest{
+			req: &qrysmpb.AttestationPoolRequest{
 				PageToken: strconv.Itoa(1),
 				PageSize:  3,
 			},
-			res: &zondpb.AttestationPoolResponse{
+			res: &qrysmpb.AttestationPoolResponse{
 				NextPageToken: "2",
 				TotalSize:     int32(numAtts),
 			},
 		},
 		{
-			req: &zondpb.AttestationPoolRequest{
+			req: &qrysmpb.AttestationPoolRequest{
 				PageToken: strconv.Itoa(3),
 				PageSize:  30,
 			},
-			res: &zondpb.AttestationPoolResponse{
+			res: &qrysmpb.AttestationPoolResponse{
 				NextPageToken: "",
 				TotalSize:     int32(numAtts),
 			},
 		},
 		{
-			req: &zondpb.AttestationPoolRequest{
+			req: &qrysmpb.AttestationPoolRequest{
 				PageToken: strconv.Itoa(0),
 				PageSize:  int32(numAtts),
 			},
-			res: &zondpb.AttestationPoolResponse{
+			res: &qrysmpb.AttestationPoolResponse{
 				NextPageToken: "",
 				TotalSize:     int32(numAtts),
 			},

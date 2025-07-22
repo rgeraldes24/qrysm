@@ -5,7 +5,7 @@ import (
 	customtypes "github.com/theQRL/qrysm/beacon-chain/state/state-native/custom-types"
 	"github.com/theQRL/qrysm/config/features"
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 )
 
@@ -20,7 +20,7 @@ func (b *BeaconState) ToProtoUnsafe() interface{} {
 	br := b.blockRootsVal().Slice()
 	sr := b.stateRootsVal().Slice()
 	rm := b.randaoMixesVal().Slice()
-	var vals []*zondpb.Validator
+	var vals []*qrysmpb.Validator
 	var bals []uint64
 	if features.Get().EnableExperimentalState {
 		vals = b.validatorsVal()
@@ -32,7 +32,7 @@ func (b *BeaconState) ToProtoUnsafe() interface{} {
 
 	switch b.version {
 	case version.Capella:
-		return &zondpb.BeaconStateCapella{
+		return &qrysmpb.BeaconStateCapella{
 			GenesisTime:                  b.genesisTime,
 			GenesisValidatorsRoot:        gvrCopy[:],
 			Slot:                         b.slot,
@@ -85,7 +85,7 @@ func (b *BeaconState) ToProto() interface{} {
 
 	switch b.version {
 	case version.Capella:
-		return &zondpb.BeaconStateCapella{
+		return &qrysmpb.BeaconStateCapella{
 			GenesisTime:                  b.genesisTime,
 			GenesisValidatorsRoot:        gvrCopy[:],
 			Slot:                         b.slot,
@@ -183,8 +183,8 @@ func (b *BeaconState) stateRootAtIndex(idx uint64) ([32]byte, error) {
 
 // ProtobufBeaconStateCapella transforms an input into beacon state Capella in the form of protobuf.
 // Error is returned if the input is not type protobuf beacon state.
-func ProtobufBeaconStateCapella(s interface{}) (*zondpb.BeaconStateCapella, error) {
-	pbState, ok := s.(*zondpb.BeaconStateCapella)
+func ProtobufBeaconStateCapella(s interface{}) (*qrysmpb.BeaconStateCapella, error) {
+	pbState, ok := s.(*qrysmpb.BeaconStateCapella)
 	if !ok {
 		return nil, errors.New("input is not type pb.BeaconStateCapella")
 	}

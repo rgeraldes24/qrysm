@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/v1/beacon_chain.proto
+// source: proto/qrl/v1/beacon_chain.proto
 
 package v1
 
@@ -630,7 +630,7 @@ func (x *DepositContract) GetAddress() string {
 	return ""
 }
 
-// Deprecated: Marked as deprecated in proto/zond/v1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrl/v1/beacon_chain.proto.
 type WeakSubjectivityResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -678,7 +678,7 @@ func (x *WeakSubjectivityResponse) GetData() *WeakSubjectivityData {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in proto/zond/v1/beacon_chain.proto.
+// Deprecated: Marked as deprecated in proto/qrl/v1/beacon_chain.proto.
 type WeakSubjectivityData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -854,7 +854,7 @@ type ForkChoiceNode struct {
 	ExecutionOptimistic      bool                                                     `protobuf:"varint,10,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
 	ExecutionBlockHash       []byte                                                   `protobuf:"bytes,11,opt,name=execution_block_hash,json=executionBlockHash,proto3" json:"execution_block_hash,omitempty" ssz-size:"32"`
 	Timestamp                uint64                                                   `protobuf:"varint,12,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Validity                 ForkChoiceNodeValidity                                   `protobuf:"varint,13,opt,name=validity,proto3,enum=theqrl.zond.v1.ForkChoiceNodeValidity" json:"validity,omitempty"`
+	Validity                 ForkChoiceNodeValidity                                   `protobuf:"varint,13,opt,name=validity,proto3,enum=theqrl.qrl.v1.ForkChoiceNodeValidity" json:"validity,omitempty"`
 }
 
 func (x *ForkChoiceNode) Reset() {
@@ -1300,49 +1300,49 @@ func file_proto_zond_v1_beacon_chain_proto_rawDescGZIP() []byte {
 var file_proto_zond_v1_beacon_chain_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_zond_v1_beacon_chain_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_proto_zond_v1_beacon_chain_proto_goTypes = []interface{}{
-	(ForkChoiceNodeValidity)(0),                     // 0: theqrl.zond.v1.ForkChoiceNodeValidity
-	(*StateRequest)(nil),                            // 1: theqrl.zond.v1.StateRequest
-	(*StateRootResponse)(nil),                       // 2: theqrl.zond.v1.StateRootResponse
-	(*BlockAttestationsResponse)(nil),               // 3: theqrl.zond.v1.BlockAttestationsResponse
-	(*BlockRequest)(nil),                            // 4: theqrl.zond.v1.BlockRequest
-	(*BlockSSZResponse)(nil),                        // 5: theqrl.zond.v1.BlockSSZResponse
-	(*AttesterSlashingsPoolResponse)(nil),           // 6: theqrl.zond.v1.AttesterSlashingsPoolResponse
-	(*ProposerSlashingPoolResponse)(nil),            // 7: theqrl.zond.v1.ProposerSlashingPoolResponse
-	(*ForkScheduleResponse)(nil),                    // 8: theqrl.zond.v1.ForkScheduleResponse
-	(*SpecResponse)(nil),                            // 9: theqrl.zond.v1.SpecResponse
-	(*DepositContractResponse)(nil),                 // 10: theqrl.zond.v1.DepositContractResponse
-	(*DepositContract)(nil),                         // 11: theqrl.zond.v1.DepositContract
-	(*WeakSubjectivityResponse)(nil),                // 12: theqrl.zond.v1.WeakSubjectivityResponse
-	(*WeakSubjectivityData)(nil),                    // 13: theqrl.zond.v1.WeakSubjectivityData
-	(*ForkChoiceDump)(nil),                          // 14: theqrl.zond.v1.ForkChoiceDump
-	(*ForkChoiceNode)(nil),                          // 15: theqrl.zond.v1.ForkChoiceNode
-	(*DilithiumToExecutionChangesPoolResponse)(nil), // 16: theqrl.zond.v1.DilithiumToExecutionChangesPoolResponse
-	(*StateRootResponse_StateRoot)(nil),             // 17: theqrl.zond.v1.StateRootResponse.StateRoot
-	nil,                                             // 18: theqrl.zond.v1.SpecResponse.DataEntry
-	(*Attestation)(nil),                             // 19: theqrl.zond.v1.Attestation
-	(*AttesterSlashing)(nil),                        // 20: theqrl.zond.v1.AttesterSlashing
-	(*ProposerSlashing)(nil),                        // 21: theqrl.zond.v1.ProposerSlashing
-	(*Fork)(nil),                                    // 22: theqrl.zond.v1.Fork
-	(*Checkpoint)(nil),                              // 23: theqrl.zond.v1.Checkpoint
-	(*SignedDilithiumToExecutionChange)(nil),        // 24: theqrl.zond.v1.SignedDilithiumToExecutionChange
+	(ForkChoiceNodeValidity)(0),                     // 0: theqrl.qrl.v1.ForkChoiceNodeValidity
+	(*StateRequest)(nil),                            // 1: theqrl.qrl.v1.StateRequest
+	(*StateRootResponse)(nil),                       // 2: theqrl.qrl.v1.StateRootResponse
+	(*BlockAttestationsResponse)(nil),               // 3: theqrl.qrl.v1.BlockAttestationsResponse
+	(*BlockRequest)(nil),                            // 4: theqrl.qrl.v1.BlockRequest
+	(*BlockSSZResponse)(nil),                        // 5: theqrl.qrl.v1.BlockSSZResponse
+	(*AttesterSlashingsPoolResponse)(nil),           // 6: theqrl.qrl.v1.AttesterSlashingsPoolResponse
+	(*ProposerSlashingPoolResponse)(nil),            // 7: theqrl.qrl.v1.ProposerSlashingPoolResponse
+	(*ForkScheduleResponse)(nil),                    // 8: theqrl.qrl.v1.ForkScheduleResponse
+	(*SpecResponse)(nil),                            // 9: theqrl.qrl.v1.SpecResponse
+	(*DepositContractResponse)(nil),                 // 10: theqrl.qrl.v1.DepositContractResponse
+	(*DepositContract)(nil),                         // 11: theqrl.qrl.v1.DepositContract
+	(*WeakSubjectivityResponse)(nil),                // 12: theqrl.qrl.v1.WeakSubjectivityResponse
+	(*WeakSubjectivityData)(nil),                    // 13: theqrl.qrl.v1.WeakSubjectivityData
+	(*ForkChoiceDump)(nil),                          // 14: theqrl.qrl.v1.ForkChoiceDump
+	(*ForkChoiceNode)(nil),                          // 15: theqrl.qrl.v1.ForkChoiceNode
+	(*DilithiumToExecutionChangesPoolResponse)(nil), // 16: theqrl.qrl.v1.DilithiumToExecutionChangesPoolResponse
+	(*StateRootResponse_StateRoot)(nil),             // 17: theqrl.qrl.v1.StateRootResponse.StateRoot
+	nil,                                             // 18: theqrl.qrl.v1.SpecResponse.DataEntry
+	(*Attestation)(nil),                             // 19: theqrl.qrl.v1.Attestation
+	(*AttesterSlashing)(nil),                        // 20: theqrl.qrl.v1.AttesterSlashing
+	(*ProposerSlashing)(nil),                        // 21: theqrl.qrl.v1.ProposerSlashing
+	(*Fork)(nil),                                    // 22: theqrl.qrl.v1.Fork
+	(*Checkpoint)(nil),                              // 23: theqrl.qrl.v1.Checkpoint
+	(*SignedDilithiumToExecutionChange)(nil),        // 24: theqrl.qrl.v1.SignedDilithiumToExecutionChange
 }
 var file_proto_zond_v1_beacon_chain_proto_depIdxs = []int32{
-	17, // 0: theqrl.zond.v1.StateRootResponse.data:type_name -> theqrl.zond.v1.StateRootResponse.StateRoot
-	19, // 1: theqrl.zond.v1.BlockAttestationsResponse.data:type_name -> theqrl.zond.v1.Attestation
-	20, // 2: theqrl.zond.v1.AttesterSlashingsPoolResponse.data:type_name -> theqrl.zond.v1.AttesterSlashing
-	21, // 3: theqrl.zond.v1.ProposerSlashingPoolResponse.data:type_name -> theqrl.zond.v1.ProposerSlashing
-	22, // 4: theqrl.zond.v1.ForkScheduleResponse.data:type_name -> theqrl.zond.v1.Fork
-	18, // 5: theqrl.zond.v1.SpecResponse.data:type_name -> theqrl.zond.v1.SpecResponse.DataEntry
-	11, // 6: theqrl.zond.v1.DepositContractResponse.data:type_name -> theqrl.zond.v1.DepositContract
-	13, // 7: theqrl.zond.v1.WeakSubjectivityResponse.data:type_name -> theqrl.zond.v1.WeakSubjectivityData
-	23, // 8: theqrl.zond.v1.WeakSubjectivityData.ws_checkpoint:type_name -> theqrl.zond.v1.Checkpoint
-	23, // 9: theqrl.zond.v1.ForkChoiceDump.justified_checkpoint:type_name -> theqrl.zond.v1.Checkpoint
-	23, // 10: theqrl.zond.v1.ForkChoiceDump.finalized_checkpoint:type_name -> theqrl.zond.v1.Checkpoint
-	23, // 11: theqrl.zond.v1.ForkChoiceDump.unrealized_justified_checkpoint:type_name -> theqrl.zond.v1.Checkpoint
-	23, // 12: theqrl.zond.v1.ForkChoiceDump.unrealized_finalized_checkpoint:type_name -> theqrl.zond.v1.Checkpoint
-	15, // 13: theqrl.zond.v1.ForkChoiceDump.fork_choice_nodes:type_name -> theqrl.zond.v1.ForkChoiceNode
-	0,  // 14: theqrl.zond.v1.ForkChoiceNode.validity:type_name -> theqrl.zond.v1.ForkChoiceNodeValidity
-	24, // 15: theqrl.zond.v1.DilithiumToExecutionChangesPoolResponse.data:type_name -> theqrl.zond.v1.SignedDilithiumToExecutionChange
+	17, // 0: theqrl.qrl.v1.StateRootResponse.data:type_name -> theqrl.qrl.v1.StateRootResponse.StateRoot
+	19, // 1: theqrl.qrl.v1.BlockAttestationsResponse.data:type_name -> theqrl.qrl.v1.Attestation
+	20, // 2: theqrl.qrl.v1.AttesterSlashingsPoolResponse.data:type_name -> theqrl.qrl.v1.AttesterSlashing
+	21, // 3: theqrl.qrl.v1.ProposerSlashingPoolResponse.data:type_name -> theqrl.qrl.v1.ProposerSlashing
+	22, // 4: theqrl.qrl.v1.ForkScheduleResponse.data:type_name -> theqrl.qrl.v1.Fork
+	18, // 5: theqrl.qrl.v1.SpecResponse.data:type_name -> theqrl.qrl.v1.SpecResponse.DataEntry
+	11, // 6: theqrl.qrl.v1.DepositContractResponse.data:type_name -> theqrl.qrl.v1.DepositContract
+	13, // 7: theqrl.qrl.v1.WeakSubjectivityResponse.data:type_name -> theqrl.qrl.v1.WeakSubjectivityData
+	23, // 8: theqrl.qrl.v1.WeakSubjectivityData.ws_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
+	23, // 9: theqrl.qrl.v1.ForkChoiceDump.justified_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
+	23, // 10: theqrl.qrl.v1.ForkChoiceDump.finalized_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
+	23, // 11: theqrl.qrl.v1.ForkChoiceDump.unrealized_justified_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
+	23, // 12: theqrl.qrl.v1.ForkChoiceDump.unrealized_finalized_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
+	15, // 13: theqrl.qrl.v1.ForkChoiceDump.fork_choice_nodes:type_name -> theqrl.qrl.v1.ForkChoiceNode
+	0,  // 14: theqrl.qrl.v1.ForkChoiceNode.validity:type_name -> theqrl.qrl.v1.ForkChoiceNodeValidity
+	24, // 15: theqrl.qrl.v1.DilithiumToExecutionChangesPoolResponse.data:type_name -> theqrl.qrl.v1.SignedDilithiumToExecutionChange
 	16, // [16:16] is the sub-list for method output_type
 	16, // [16:16] is the sub-list for method input_type
 	16, // [16:16] is the sub-list for extension type_name

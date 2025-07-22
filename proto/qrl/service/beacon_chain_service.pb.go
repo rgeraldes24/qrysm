@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/service/beacon_chain_service.proto
+// source: proto/qrl/service/beacon_chain_service.proto
 
 package service
 
@@ -227,62 +227,62 @@ var file_proto_zond_service_beacon_chain_service_proto_rawDesc = []byte{
 
 var file_proto_zond_service_beacon_chain_service_proto_goTypes = []interface{}{
 	(*emptypb.Empty)(nil),                               // 0: google.protobuf.Empty
-	(*v1.StateRequest)(nil),                             // 1: theqrl.zond.v1.StateRequest
-	(*v1.StateSyncCommitteesRequest)(nil),               // 2: theqrl.zond.v1.StateSyncCommitteesRequest
-	(*v1.RandaoRequest)(nil),                            // 3: theqrl.zond.v1.RandaoRequest
-	(*v1.BlockRequest)(nil),                             // 4: theqrl.zond.v1.BlockRequest
-	(*v1.AttesterSlashing)(nil),                         // 5: theqrl.zond.v1.AttesterSlashing
-	(*v1.ProposerSlashing)(nil),                         // 6: theqrl.zond.v1.ProposerSlashing
-	(*v1.SubmitDilithiumToExecutionChangesRequest)(nil), // 7: theqrl.zond.v1.SubmitDilithiumToExecutionChangesRequest
-	(*v1.WeakSubjectivityResponse)(nil),                 // 8: theqrl.zond.v1.WeakSubjectivityResponse
-	(*v1.StateRootResponse)(nil),                        // 9: theqrl.zond.v1.StateRootResponse
-	(*v1.StateSyncCommitteesResponse)(nil),              // 10: theqrl.zond.v1.StateSyncCommitteesResponse
-	(*v1.RandaoResponse)(nil),                           // 11: theqrl.zond.v1.RandaoResponse
-	(*v1.BlockResponse)(nil),                            // 12: theqrl.zond.v1.BlockResponse
-	(*v1.BlindedBlockResponse)(nil),                     // 13: theqrl.zond.v1.BlindedBlockResponse
-	(*v1.SSZContainer)(nil),                             // 14: theqrl.zond.v1.SSZContainer
-	(*v1.BlockAttestationsResponse)(nil),                // 15: theqrl.zond.v1.BlockAttestationsResponse
-	(*v1.AttesterSlashingsPoolResponse)(nil),            // 16: theqrl.zond.v1.AttesterSlashingsPoolResponse
-	(*v1.ProposerSlashingPoolResponse)(nil),             // 17: theqrl.zond.v1.ProposerSlashingPoolResponse
-	(*v1.DilithiumToExecutionChangesPoolResponse)(nil),  // 18: theqrl.zond.v1.DilithiumToExecutionChangesPoolResponse
-	(*v1.ForkScheduleResponse)(nil),                     // 19: theqrl.zond.v1.ForkScheduleResponse
-	(*v1.SpecResponse)(nil),                             // 20: theqrl.zond.v1.SpecResponse
+	(*v1.StateRequest)(nil),                             // 1: theqrl.qrl.v1.StateRequest
+	(*v1.StateSyncCommitteesRequest)(nil),               // 2: theqrl.qrl.v1.StateSyncCommitteesRequest
+	(*v1.RandaoRequest)(nil),                            // 3: theqrl.qrl.v1.RandaoRequest
+	(*v1.BlockRequest)(nil),                             // 4: theqrl.qrl.v1.BlockRequest
+	(*v1.AttesterSlashing)(nil),                         // 5: theqrl.qrl.v1.AttesterSlashing
+	(*v1.ProposerSlashing)(nil),                         // 6: theqrl.qrl.v1.ProposerSlashing
+	(*v1.SubmitDilithiumToExecutionChangesRequest)(nil), // 7: theqrl.qrl.v1.SubmitDilithiumToExecutionChangesRequest
+	(*v1.WeakSubjectivityResponse)(nil),                 // 8: theqrl.qrl.v1.WeakSubjectivityResponse
+	(*v1.StateRootResponse)(nil),                        // 9: theqrl.qrl.v1.StateRootResponse
+	(*v1.StateSyncCommitteesResponse)(nil),              // 10: theqrl.qrl.v1.StateSyncCommitteesResponse
+	(*v1.RandaoResponse)(nil),                           // 11: theqrl.qrl.v1.RandaoResponse
+	(*v1.BlockResponse)(nil),                            // 12: theqrl.qrl.v1.BlockResponse
+	(*v1.BlindedBlockResponse)(nil),                     // 13: theqrl.qrl.v1.BlindedBlockResponse
+	(*v1.SSZContainer)(nil),                             // 14: theqrl.qrl.v1.SSZContainer
+	(*v1.BlockAttestationsResponse)(nil),                // 15: theqrl.qrl.v1.BlockAttestationsResponse
+	(*v1.AttesterSlashingsPoolResponse)(nil),            // 16: theqrl.qrl.v1.AttesterSlashingsPoolResponse
+	(*v1.ProposerSlashingPoolResponse)(nil),             // 17: theqrl.qrl.v1.ProposerSlashingPoolResponse
+	(*v1.DilithiumToExecutionChangesPoolResponse)(nil),  // 18: theqrl.qrl.v1.DilithiumToExecutionChangesPoolResponse
+	(*v1.ForkScheduleResponse)(nil),                     // 19: theqrl.qrl.v1.ForkScheduleResponse
+	(*v1.SpecResponse)(nil),                             // 20: theqrl.qrl.v1.SpecResponse
 }
 var file_proto_zond_service_beacon_chain_service_proto_depIdxs = []int32{
-	0,  // 0: theqrl.zond.service.BeaconChain.GetWeakSubjectivity:input_type -> google.protobuf.Empty
-	1,  // 1: theqrl.zond.service.BeaconChain.GetStateRoot:input_type -> theqrl.zond.v1.StateRequest
-	2,  // 2: theqrl.zond.service.BeaconChain.ListSyncCommittees:input_type -> theqrl.zond.v1.StateSyncCommitteesRequest
-	3,  // 3: theqrl.zond.service.BeaconChain.GetRandao:input_type -> theqrl.zond.v1.RandaoRequest
-	4,  // 4: theqrl.zond.service.BeaconChain.GetBlock:input_type -> theqrl.zond.v1.BlockRequest
-	4,  // 5: theqrl.zond.service.BeaconChain.GetBlindedBlock:input_type -> theqrl.zond.v1.BlockRequest
-	4,  // 6: theqrl.zond.service.BeaconChain.GetBlindedBlockSSZ:input_type -> theqrl.zond.v1.BlockRequest
-	4,  // 7: theqrl.zond.service.BeaconChain.GetBlockSSZ:input_type -> theqrl.zond.v1.BlockRequest
-	4,  // 8: theqrl.zond.service.BeaconChain.ListBlockAttestations:input_type -> theqrl.zond.v1.BlockRequest
-	0,  // 9: theqrl.zond.service.BeaconChain.ListPoolAttesterSlashings:input_type -> google.protobuf.Empty
-	5,  // 10: theqrl.zond.service.BeaconChain.SubmitAttesterSlashing:input_type -> theqrl.zond.v1.AttesterSlashing
-	0,  // 11: theqrl.zond.service.BeaconChain.ListPoolProposerSlashings:input_type -> google.protobuf.Empty
-	6,  // 12: theqrl.zond.service.BeaconChain.SubmitProposerSlashing:input_type -> theqrl.zond.v1.ProposerSlashing
-	7,  // 13: theqrl.zond.service.BeaconChain.SubmitSignedDilithiumToExecutionChanges:input_type -> theqrl.zond.v1.SubmitDilithiumToExecutionChangesRequest
-	0,  // 14: theqrl.zond.service.BeaconChain.ListDilithiumToExecutionChanges:input_type -> google.protobuf.Empty
-	0,  // 15: theqrl.zond.service.BeaconChain.GetForkSchedule:input_type -> google.protobuf.Empty
-	0,  // 16: theqrl.zond.service.BeaconChain.GetSpec:input_type -> google.protobuf.Empty
-	8,  // 17: theqrl.zond.service.BeaconChain.GetWeakSubjectivity:output_type -> theqrl.zond.v1.WeakSubjectivityResponse
-	9,  // 18: theqrl.zond.service.BeaconChain.GetStateRoot:output_type -> theqrl.zond.v1.StateRootResponse
-	10, // 19: theqrl.zond.service.BeaconChain.ListSyncCommittees:output_type -> theqrl.zond.v1.StateSyncCommitteesResponse
-	11, // 20: theqrl.zond.service.BeaconChain.GetRandao:output_type -> theqrl.zond.v1.RandaoResponse
-	12, // 21: theqrl.zond.service.BeaconChain.GetBlock:output_type -> theqrl.zond.v1.BlockResponse
-	13, // 22: theqrl.zond.service.BeaconChain.GetBlindedBlock:output_type -> theqrl.zond.v1.BlindedBlockResponse
-	14, // 23: theqrl.zond.service.BeaconChain.GetBlindedBlockSSZ:output_type -> theqrl.zond.v1.SSZContainer
-	14, // 24: theqrl.zond.service.BeaconChain.GetBlockSSZ:output_type -> theqrl.zond.v1.SSZContainer
-	15, // 25: theqrl.zond.service.BeaconChain.ListBlockAttestations:output_type -> theqrl.zond.v1.BlockAttestationsResponse
-	16, // 26: theqrl.zond.service.BeaconChain.ListPoolAttesterSlashings:output_type -> theqrl.zond.v1.AttesterSlashingsPoolResponse
-	0,  // 27: theqrl.zond.service.BeaconChain.SubmitAttesterSlashing:output_type -> google.protobuf.Empty
-	17, // 28: theqrl.zond.service.BeaconChain.ListPoolProposerSlashings:output_type -> theqrl.zond.v1.ProposerSlashingPoolResponse
-	0,  // 29: theqrl.zond.service.BeaconChain.SubmitProposerSlashing:output_type -> google.protobuf.Empty
-	0,  // 30: theqrl.zond.service.BeaconChain.SubmitSignedDilithiumToExecutionChanges:output_type -> google.protobuf.Empty
-	18, // 31: theqrl.zond.service.BeaconChain.ListDilithiumToExecutionChanges:output_type -> theqrl.zond.v1.DilithiumToExecutionChangesPoolResponse
-	19, // 32: theqrl.zond.service.BeaconChain.GetForkSchedule:output_type -> theqrl.zond.v1.ForkScheduleResponse
-	20, // 33: theqrl.zond.service.BeaconChain.GetSpec:output_type -> theqrl.zond.v1.SpecResponse
+	0,  // 0: theqrl.qrl.service.BeaconChain.GetWeakSubjectivity:input_type -> google.protobuf.Empty
+	1,  // 1: theqrl.qrl.service.BeaconChain.GetStateRoot:input_type -> theqrl.qrl.v1.StateRequest
+	2,  // 2: theqrl.qrl.service.BeaconChain.ListSyncCommittees:input_type -> theqrl.qrl.v1.StateSyncCommitteesRequest
+	3,  // 3: theqrl.qrl.service.BeaconChain.GetRandao:input_type -> theqrl.qrl.v1.RandaoRequest
+	4,  // 4: theqrl.qrl.service.BeaconChain.GetBlock:input_type -> theqrl.qrl.v1.BlockRequest
+	4,  // 5: theqrl.qrl.service.BeaconChain.GetBlindedBlock:input_type -> theqrl.qrl.v1.BlockRequest
+	4,  // 6: theqrl.qrl.ervice.BeaconChain.GetBlindedBlockSSZ:input_type -> theqrl.qrl.v1.BlockRequest
+	4,  // 7: theqrl.qrl.service.BeaconChain.GetBlockSSZ:input_type -> theqrl.qrl.v1.BlockRequest
+	4,  // 8: theqrl.qrl.service.BeaconChain.ListBlockAttestations:input_type -> theqrl.qrl.v1.BlockRequest
+	0,  // 9: theqrl.qrl.service.BeaconChain.ListPoolAttesterSlashings:input_type -> google.protobuf.Empty
+	5,  // 10: theqrl.qrl.service.BeaconChain.SubmitAttesterSlashing:input_type -> theqrl.qrl.v1.AttesterSlashing
+	0,  // 11: theqrl.qrl.service.BeaconChain.ListPoolProposerSlashings:input_type -> google.protobuf.Empty
+	6,  // 12: theqrl.qrl.service.BeaconChain.SubmitProposerSlashing:input_type -> theqrl.qrl.v1.ProposerSlashing
+	7,  // 13: theqrl.qrl.service.BeaconChain.SubmitSignedDilithiumToExecutionChanges:input_type -> theqrl.qrl.v1.SubmitDilithiumToExecutionChangesRequest
+	0,  // 14: theqrl.qrl.service.BeaconChain.ListDilithiumToExecutionChanges:input_type -> google.protobuf.Empty
+	0,  // 15: theqrl.qrl.service.BeaconChain.GetForkSchedule:input_type -> google.protobuf.Empty
+	0,  // 16: theqrl.qrl.service.BeaconChain.GetSpec:input_type -> google.protobuf.Empty
+	8,  // 17: theqrl.qrl.service.BeaconChain.GetWeakSubjectivity:output_type -> theqrl.qrl.v1.WeakSubjectivityResponse
+	9,  // 18: theqrl.qrl.service.BeaconChain.GetStateRoot:output_type -> theqrl.qrl.v1.StateRootResponse
+	10, // 19: theqrl.qrl.service.BeaconChain.ListSyncCommittees:output_type -> theqrl.qrl.v1.StateSyncCommitteesResponse
+	11, // 20: theqrl.qrl.service.BeaconChain.GetRandao:output_type -> theqrl.qrl.v1.RandaoResponse
+	12, // 21: theqrl.qrl.service.BeaconChain.GetBlock:output_type -> theqrl.qrl.v1.BlockResponse
+	13, // 22: theqrl.qrl.service.BeaconChain.GetBlindedBlock:output_type -> theqrl.qrl.v1.BlindedBlockResponse
+	14, // 23: theqrl.qrl.service.BeaconChain.GetBlindedBlockSSZ:output_type -> theqrl.qrl.v1.SSZContainer
+	14, // 24: theqrl.qrl.service.BeaconChain.GetBlockSSZ:output_type -> theqrl.qrl.v1.SSZContainer
+	15, // 25: theqrl.qrl.service.BeaconChain.ListBlockAttestations:output_type -> theqrl.qrl.v1.BlockAttestationsResponse
+	16, // 26: theqrl.qrl.service.BeaconChain.ListPoolAttesterSlashings:output_type -> theqrl.qrl.v1.AttesterSlashingsPoolResponse
+	0,  // 27: theqrl.qrl.service.BeaconChain.SubmitAttesterSlashing:output_type -> google.protobuf.Empty
+	17, // 28: theqrl.qrl.service.BeaconChain.ListPoolProposerSlashings:output_type -> theqrl.qrl.v1.ProposerSlashingPoolResponse
+	0,  // 29: theqrl.qrl.service.BeaconChain.SubmitProposerSlashing:output_type -> google.protobuf.Empty
+	0,  // 30: theqrl.qrl.service.BeaconChain.SubmitSignedDilithiumToExecutionChanges:output_type -> google.protobuf.Empty
+	18, // 31: theqrl.qrl.service.BeaconChain.ListDilithiumToExecutionChanges:output_type -> theqrl.qrl.v1.DilithiumToExecutionChangesPoolResponse
+	19, // 32: theqrl.qrl.service.BeaconChain.GetForkSchedule:output_type -> theqrl.qrl.v1.ForkScheduleResponse
+	20, // 33: theqrl.qrl.service.BeaconChain.GetSpec:output_type -> theqrl.qrl.v1.SpecResponse
 	17, // [17:34] is the sub-list for method output_type
 	0,  // [0:17] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
@@ -357,7 +357,7 @@ func NewBeaconChainClient(cc grpc.ClientConnInterface) BeaconChainClient {
 // Deprecated: Do not use.
 func (c *beaconChainClient) GetWeakSubjectivity(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.WeakSubjectivityResponse, error) {
 	out := new(v1.WeakSubjectivityResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/GetWeakSubjectivity", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/GetWeakSubjectivity", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +366,7 @@ func (c *beaconChainClient) GetWeakSubjectivity(ctx context.Context, in *emptypb
 
 func (c *beaconChainClient) GetStateRoot(ctx context.Context, in *v1.StateRequest, opts ...grpc.CallOption) (*v1.StateRootResponse, error) {
 	out := new(v1.StateRootResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/GetStateRoot", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/GetStateRoot", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -375,7 +375,7 @@ func (c *beaconChainClient) GetStateRoot(ctx context.Context, in *v1.StateReques
 
 func (c *beaconChainClient) ListSyncCommittees(ctx context.Context, in *v1.StateSyncCommitteesRequest, opts ...grpc.CallOption) (*v1.StateSyncCommitteesResponse, error) {
 	out := new(v1.StateSyncCommitteesResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/ListSyncCommittees", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/ListSyncCommittees", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -384,7 +384,7 @@ func (c *beaconChainClient) ListSyncCommittees(ctx context.Context, in *v1.State
 
 func (c *beaconChainClient) GetRandao(ctx context.Context, in *v1.RandaoRequest, opts ...grpc.CallOption) (*v1.RandaoResponse, error) {
 	out := new(v1.RandaoResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/GetRandao", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/GetRandao", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -393,7 +393,7 @@ func (c *beaconChainClient) GetRandao(ctx context.Context, in *v1.RandaoRequest,
 
 func (c *beaconChainClient) GetBlock(ctx context.Context, in *v1.BlockRequest, opts ...grpc.CallOption) (*v1.BlockResponse, error) {
 	out := new(v1.BlockResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/GetBlock", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/GetBlock", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -402,7 +402,7 @@ func (c *beaconChainClient) GetBlock(ctx context.Context, in *v1.BlockRequest, o
 
 func (c *beaconChainClient) GetBlindedBlock(ctx context.Context, in *v1.BlockRequest, opts ...grpc.CallOption) (*v1.BlindedBlockResponse, error) {
 	out := new(v1.BlindedBlockResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/GetBlindedBlock", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/GetBlindedBlock", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -411,7 +411,7 @@ func (c *beaconChainClient) GetBlindedBlock(ctx context.Context, in *v1.BlockReq
 
 func (c *beaconChainClient) GetBlindedBlockSSZ(ctx context.Context, in *v1.BlockRequest, opts ...grpc.CallOption) (*v1.SSZContainer, error) {
 	out := new(v1.SSZContainer)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/GetBlindedBlockSSZ", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/GetBlindedBlockSSZ", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -420,7 +420,7 @@ func (c *beaconChainClient) GetBlindedBlockSSZ(ctx context.Context, in *v1.Block
 
 func (c *beaconChainClient) GetBlockSSZ(ctx context.Context, in *v1.BlockRequest, opts ...grpc.CallOption) (*v1.SSZContainer, error) {
 	out := new(v1.SSZContainer)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/GetBlockSSZ", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/GetBlockSSZ", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -429,7 +429,7 @@ func (c *beaconChainClient) GetBlockSSZ(ctx context.Context, in *v1.BlockRequest
 
 func (c *beaconChainClient) ListBlockAttestations(ctx context.Context, in *v1.BlockRequest, opts ...grpc.CallOption) (*v1.BlockAttestationsResponse, error) {
 	out := new(v1.BlockAttestationsResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/ListBlockAttestations", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/ListBlockAttestations", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -438,7 +438,7 @@ func (c *beaconChainClient) ListBlockAttestations(ctx context.Context, in *v1.Bl
 
 func (c *beaconChainClient) ListPoolAttesterSlashings(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.AttesterSlashingsPoolResponse, error) {
 	out := new(v1.AttesterSlashingsPoolResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/ListPoolAttesterSlashings", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/ListPoolAttesterSlashings", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -447,7 +447,7 @@ func (c *beaconChainClient) ListPoolAttesterSlashings(ctx context.Context, in *e
 
 func (c *beaconChainClient) SubmitAttesterSlashing(ctx context.Context, in *v1.AttesterSlashing, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/SubmitAttesterSlashing", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/SubmitAttesterSlashing", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -456,7 +456,7 @@ func (c *beaconChainClient) SubmitAttesterSlashing(ctx context.Context, in *v1.A
 
 func (c *beaconChainClient) ListPoolProposerSlashings(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.ProposerSlashingPoolResponse, error) {
 	out := new(v1.ProposerSlashingPoolResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/ListPoolProposerSlashings", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/ListPoolProposerSlashings", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -465,7 +465,7 @@ func (c *beaconChainClient) ListPoolProposerSlashings(ctx context.Context, in *e
 
 func (c *beaconChainClient) SubmitProposerSlashing(ctx context.Context, in *v1.ProposerSlashing, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/SubmitProposerSlashing", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/SubmitProposerSlashing", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -474,7 +474,7 @@ func (c *beaconChainClient) SubmitProposerSlashing(ctx context.Context, in *v1.P
 
 func (c *beaconChainClient) SubmitSignedDilithiumToExecutionChanges(ctx context.Context, in *v1.SubmitDilithiumToExecutionChangesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/SubmitSignedDilithiumToExecutionChanges", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/SubmitSignedDilithiumToExecutionChanges", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -483,7 +483,7 @@ func (c *beaconChainClient) SubmitSignedDilithiumToExecutionChanges(ctx context.
 
 func (c *beaconChainClient) ListDilithiumToExecutionChanges(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.DilithiumToExecutionChangesPoolResponse, error) {
 	out := new(v1.DilithiumToExecutionChangesPoolResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/ListDilithiumToExecutionChanges", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/ListDilithiumToExecutionChanges", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -492,7 +492,7 @@ func (c *beaconChainClient) ListDilithiumToExecutionChanges(ctx context.Context,
 
 func (c *beaconChainClient) GetForkSchedule(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.ForkScheduleResponse, error) {
 	out := new(v1.ForkScheduleResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/GetForkSchedule", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/GetForkSchedule", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -501,7 +501,7 @@ func (c *beaconChainClient) GetForkSchedule(ctx context.Context, in *emptypb.Emp
 
 func (c *beaconChainClient) GetSpec(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.SpecResponse, error) {
 	out := new(v1.SpecResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.zond.service.BeaconChain/GetSpec", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/GetSpec", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -600,7 +600,7 @@ func _BeaconChain_GetWeakSubjectivity_Handler(srv interface{}, ctx context.Conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/GetWeakSubjectivity",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/GetWeakSubjectivity",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetWeakSubjectivity(ctx, req.(*emptypb.Empty))
@@ -618,7 +618,7 @@ func _BeaconChain_GetStateRoot_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/GetStateRoot",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/GetStateRoot",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetStateRoot(ctx, req.(*v1.StateRequest))
@@ -636,7 +636,7 @@ func _BeaconChain_ListSyncCommittees_Handler(srv interface{}, ctx context.Contex
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/ListSyncCommittees",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/ListSyncCommittees",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListSyncCommittees(ctx, req.(*v1.StateSyncCommitteesRequest))
@@ -654,7 +654,7 @@ func _BeaconChain_GetRandao_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/GetRandao",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/GetRandao",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetRandao(ctx, req.(*v1.RandaoRequest))
@@ -672,7 +672,7 @@ func _BeaconChain_GetBlock_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/GetBlock",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/GetBlock",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetBlock(ctx, req.(*v1.BlockRequest))
@@ -690,7 +690,7 @@ func _BeaconChain_GetBlindedBlock_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/GetBlindedBlock",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/GetBlindedBlock",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetBlindedBlock(ctx, req.(*v1.BlockRequest))
@@ -708,7 +708,7 @@ func _BeaconChain_GetBlindedBlockSSZ_Handler(srv interface{}, ctx context.Contex
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/GetBlindedBlockSSZ",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/GetBlindedBlockSSZ",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetBlindedBlockSSZ(ctx, req.(*v1.BlockRequest))
@@ -726,7 +726,7 @@ func _BeaconChain_GetBlockSSZ_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/GetBlockSSZ",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/GetBlockSSZ",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetBlockSSZ(ctx, req.(*v1.BlockRequest))
@@ -744,7 +744,7 @@ func _BeaconChain_ListBlockAttestations_Handler(srv interface{}, ctx context.Con
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/ListBlockAttestations",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/ListBlockAttestations",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListBlockAttestations(ctx, req.(*v1.BlockRequest))
@@ -762,7 +762,7 @@ func _BeaconChain_ListPoolAttesterSlashings_Handler(srv interface{}, ctx context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/ListPoolAttesterSlashings",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/ListPoolAttesterSlashings",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListPoolAttesterSlashings(ctx, req.(*emptypb.Empty))
@@ -780,7 +780,7 @@ func _BeaconChain_SubmitAttesterSlashing_Handler(srv interface{}, ctx context.Co
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/SubmitAttesterSlashing",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/SubmitAttesterSlashing",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).SubmitAttesterSlashing(ctx, req.(*v1.AttesterSlashing))
@@ -798,7 +798,7 @@ func _BeaconChain_ListPoolProposerSlashings_Handler(srv interface{}, ctx context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/ListPoolProposerSlashings",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/ListPoolProposerSlashings",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListPoolProposerSlashings(ctx, req.(*emptypb.Empty))
@@ -816,7 +816,7 @@ func _BeaconChain_SubmitProposerSlashing_Handler(srv interface{}, ctx context.Co
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/SubmitProposerSlashing",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/SubmitProposerSlashing",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).SubmitProposerSlashing(ctx, req.(*v1.ProposerSlashing))
@@ -834,7 +834,7 @@ func _BeaconChain_SubmitSignedDilithiumToExecutionChanges_Handler(srv interface{
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/SubmitSignedDilithiumToExecutionChanges",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/SubmitSignedDilithiumToExecutionChanges",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).SubmitSignedDilithiumToExecutionChanges(ctx, req.(*v1.SubmitDilithiumToExecutionChangesRequest))
@@ -852,7 +852,7 @@ func _BeaconChain_ListDilithiumToExecutionChanges_Handler(srv interface{}, ctx c
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/ListDilithiumToExecutionChanges",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/ListDilithiumToExecutionChanges",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).ListDilithiumToExecutionChanges(ctx, req.(*emptypb.Empty))
@@ -870,7 +870,7 @@ func _BeaconChain_GetForkSchedule_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/GetForkSchedule",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/GetForkSchedule",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetForkSchedule(ctx, req.(*emptypb.Empty))
@@ -888,7 +888,7 @@ func _BeaconChain_GetSpec_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/theqrl.zond.service.BeaconChain/GetSpec",
+		FullMethod: "/theqrl.qrl.service.BeaconChain/GetSpec",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BeaconChainServer).GetSpec(ctx, req.(*emptypb.Empty))
@@ -897,7 +897,7 @@ func _BeaconChain_GetSpec_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 var _BeaconChain_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "theqrl.zond.service.BeaconChain",
+	ServiceName: "theqrl.qrl.service.BeaconChain",
 	HandlerType: (*BeaconChainServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -970,5 +970,5 @@ var _BeaconChain_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/zond/service/beacon_chain_service.proto",
+	Metadata: "proto/qrl/service/beacon_chain_service.proto",
 }

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/v1/ssz.proto
+// source: proto/qrl/v1/ssz.proto
 
 package v1
 
@@ -26,7 +26,7 @@ type SSZContainer struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Version             Version `protobuf:"varint,1,opt,name=version,proto3,enum=theqrl.zond.v1.Version" json:"version,omitempty"`
+	Version             Version `protobuf:"varint,1,opt,name=version,proto3,enum=theqrl.qrl.v1.Version" json:"version,omitempty"`
 	ExecutionOptimistic bool    `protobuf:"varint,2,opt,name=execution_optimistic,json=executionOptimistic,proto3" json:"execution_optimistic,omitempty"`
 	Data                []byte  `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
 	Finalized           bool    `protobuf:"varint,4,opt,name=finalized,proto3" json:"finalized,omitempty"`
@@ -134,11 +134,11 @@ func file_proto_zond_v1_ssz_proto_rawDescGZIP() []byte {
 
 var file_proto_zond_v1_ssz_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_proto_zond_v1_ssz_proto_goTypes = []interface{}{
-	(*SSZContainer)(nil), // 0: theqrl.zond.v1.SSZContainer
-	(Version)(0),         // 1: theqrl.zond.v1.Version
+	(*SSZContainer)(nil), // 0: theqrl.qrl.v1.SSZContainer
+	(Version)(0),         // 1: theqrl.qrl.v1.Version
 }
 var file_proto_zond_v1_ssz_proto_depIdxs = []int32{
-	1, // 0: theqrl.zond.v1.SSZContainer.version:type_name -> theqrl.zond.v1.Version
+	1, // 0: theqrl.qrl.v1.SSZContainer.version:type_name -> theqrl.qrl.v1.Version
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

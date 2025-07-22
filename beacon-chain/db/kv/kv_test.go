@@ -7,7 +7,7 @@ import (
 
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 	bolt "go.etcd.io/bbolt"
@@ -39,7 +39,7 @@ func Test_setupBlockStorageType(t *testing.T) {
 		root, err := wrappedBlock.Block().HashTreeRoot()
 		require.NoError(t, err)
 		require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
-		require.NoError(t, store.SaveStateSummary(ctx, &zondpb.StateSummary{Root: root[:]}))
+		require.NoError(t, store.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: root[:]}))
 		require.NoError(t, store.SaveHeadBlockRoot(ctx, root))
 		retrievedBlk, err := store.Block(ctx, root)
 		require.NoError(t, err)
@@ -60,7 +60,7 @@ func Test_setupBlockStorageType(t *testing.T) {
 		root, err := wrappedBlock.Block().HashTreeRoot()
 		require.NoError(t, err)
 		require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
-		require.NoError(t, store.SaveStateSummary(ctx, &zondpb.StateSummary{Root: root[:]}))
+		require.NoError(t, store.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: root[:]}))
 		require.NoError(t, store.SaveHeadBlockRoot(ctx, root))
 		retrievedBlk, err := store.Block(ctx, root)
 		require.NoError(t, err)
@@ -83,7 +83,7 @@ func Test_setupBlockStorageType(t *testing.T) {
 		root, err := wrappedBlock.Block().HashTreeRoot()
 		require.NoError(t, err)
 		require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
-		require.NoError(t, store.SaveStateSummary(ctx, &zondpb.StateSummary{Root: root[:]}))
+		require.NoError(t, store.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: root[:]}))
 		require.NoError(t, store.SaveHeadBlockRoot(ctx, root))
 		retrievedBlk, err := store.Block(ctx, root)
 		require.NoError(t, err)
@@ -137,7 +137,7 @@ func Test_setupBlockStorageType(t *testing.T) {
 		root, err := wrappedBlock.Block().HashTreeRoot()
 		require.NoError(t, err)
 		require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
-		require.NoError(t, store.SaveStateSummary(ctx, &zondpb.StateSummary{Root: root[:]}))
+		require.NoError(t, store.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: root[:]}))
 		require.NoError(t, store.SaveHeadBlockRoot(ctx, root))
 		retrievedBlk, err := store.Block(ctx, root)
 		require.NoError(t, err)
@@ -170,7 +170,7 @@ func Test_setupBlockStorageType(t *testing.T) {
 		root, err := wrappedBlock.Block().HashTreeRoot()
 		require.NoError(t, err)
 		require.NoError(t, store.SaveBlock(ctx, wrappedBlock))
-		require.NoError(t, store.SaveStateSummary(ctx, &zondpb.StateSummary{Root: root[:]}))
+		require.NoError(t, store.SaveStateSummary(ctx, &qrysmpb.StateSummary{Root: root[:]}))
 		require.NoError(t, store.SaveHeadBlockRoot(ctx, root))
 		retrievedBlk, err := store.Block(ctx, root)
 		require.NoError(t, err)

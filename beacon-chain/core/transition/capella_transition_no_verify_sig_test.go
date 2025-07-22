@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -31,7 +31,7 @@ func TestExecuteCapellaStateTransitionNoVerify_FullProcess(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(syncCommittee))
 
-	executionNodeData := &zondpb.ExecutionNodeData{
+	executionNodeData := &qrysmpb.ExecutionNodeData{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
@@ -43,7 +43,7 @@ func TestExecuteCapellaStateTransitionNoVerify_FullProcess(t *testing.T) {
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*zondpb.ExecutionNodeData{executionNodeData}))
+	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*qrysmpb.ExecutionNodeData{executionNodeData}))
 
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 	epoch := time.CurrentEpoch(beaconState)
@@ -70,7 +70,7 @@ func TestExecuteCapellaStateTransitionNoVerify_FullProcess(t *testing.T) {
 	}
 	indices, err := altair.NextSyncCommitteeIndices(context.Background(), beaconState)
 	require.NoError(t, err)
-	h := zondpb.CopyBeaconBlockHeader(beaconState.LatestBlockHeader())
+	h := qrysmpb.CopyBeaconBlockHeader(beaconState.LatestBlockHeader())
 	prevStateRoot, err := beaconState.HashTreeRoot(context.Background())
 	require.NoError(t, err)
 	h.StateRoot = prevStateRoot[:]
@@ -83,7 +83,7 @@ func TestExecuteCapellaStateTransitionNoVerify_FullProcess(t *testing.T) {
 		require.NoError(t, err)
 		syncSigs[i] = sb
 	}
-	syncAggregate := &zondpb.SyncAggregate{
+	syncAggregate := &qrysmpb.SyncAggregate{
 		SyncCommitteeBits:       syncBits,
 		SyncCommitteeSignatures: syncSigs,
 	}
@@ -115,7 +115,7 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetCurrentSyncCommittee(syncCommittee))
 
-	executionNodeData := &zondpb.ExecutionNodeData{
+	executionNodeData := &qrysmpb.ExecutionNodeData{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
@@ -127,7 +127,7 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*zondpb.ExecutionNodeData{executionNodeData}))
+	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*qrysmpb.ExecutionNodeData{executionNodeData}))
 
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 	epoch := time.CurrentEpoch(beaconState)
@@ -154,7 +154,7 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 	}
 	indices, err := altair.NextSyncCommitteeIndices(context.Background(), beaconState)
 	require.NoError(t, err)
-	h := zondpb.CopyBeaconBlockHeader(beaconState.LatestBlockHeader())
+	h := qrysmpb.CopyBeaconBlockHeader(beaconState.LatestBlockHeader())
 	prevStateRoot, err := beaconState.HashTreeRoot(context.Background())
 	require.NoError(t, err)
 	h.StateRoot = prevStateRoot[:]
@@ -167,7 +167,7 @@ func TestExecuteBellatrixStateTransitionNoVerifySignature_CouldNotVerifyStateRoo
 		require.NoError(t, err)
 		syncSigs[i] = sb
 	}
-	syncAggregate := &zondpb.SyncAggregate{
+	syncAggregate := &qrysmpb.SyncAggregate{
 		SyncCommitteeBits:       syncBits,
 		SyncCommitteeSignatures: syncSigs,
 	}
@@ -213,7 +213,7 @@ func TestProcessEpoch_BadBalanceCapella(t *testing.T) {
 }
 
 func createFullCapellaBlockWithOperations(t *testing.T) (state.BeaconState,
-	*zondpb.SignedBeaconBlockCapella) {
+	*qrysmpb.SignedBeaconBlockCapella) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 32)
 	sCom, err := altair.NextSyncCommittee(context.Background(), beaconState)
 	assert.NoError(t, err)
@@ -223,13 +223,13 @@ func createFullCapellaBlockWithOperations(t *testing.T) (state.BeaconState,
 		&util.BlockGenConfig{NumAttestations: 1, NumVoluntaryExits: 0, NumDeposits: 0}, 1)
 	require.NoError(t, err)
 
-	blkCapella := &zondpb.SignedBeaconBlockCapella{
-		Block: &zondpb.BeaconBlockCapella{
+	blkCapella := &qrysmpb.SignedBeaconBlockCapella{
+		Block: &qrysmpb.BeaconBlockCapella{
 			Slot:          blk.Block.Slot,
 			ProposerIndex: blk.Block.ProposerIndex,
 			ParentRoot:    blk.Block.ParentRoot,
 			StateRoot:     blk.Block.StateRoot,
-			Body: &zondpb.BeaconBlockBodyCapella{
+			Body: &qrysmpb.BeaconBlockBodyCapella{
 				RandaoReveal:      blk.Block.Body.RandaoReveal,
 				ExecutionNodeData: blk.Block.Body.ExecutionNodeData,
 				Graffiti:          blk.Block.Body.Graffiti,

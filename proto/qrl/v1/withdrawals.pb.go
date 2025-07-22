@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.31.0
 // 	protoc        v4.25.1
-// source: proto/zond/v1/withdrawals.proto
+// source: proto/qrl/v1/withdrawals.proto
 
 package v1
 
@@ -253,13 +253,13 @@ func file_proto_zond_v1_withdrawals_proto_rawDescGZIP() []byte {
 
 var file_proto_zond_v1_withdrawals_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_proto_zond_v1_withdrawals_proto_goTypes = []interface{}{
-	(*DilithiumToExecutionChange)(nil),               // 0: theqrl.zond.v1.DilithiumToExecutionChange
-	(*SignedDilithiumToExecutionChange)(nil),         // 1: theqrl.zond.v1.SignedDilithiumToExecutionChange
-	(*SubmitDilithiumToExecutionChangesRequest)(nil), // 2: theqrl.zond.v1.SubmitDilithiumToExecutionChangesRequest
+	(*DilithiumToExecutionChange)(nil),               // 0: theqrl.qrl.v1.DilithiumToExecutionChange
+	(*SignedDilithiumToExecutionChange)(nil),         // 1: theqrl.qrl.v1.SignedDilithiumToExecutionChange
+	(*SubmitDilithiumToExecutionChangesRequest)(nil), // 2: theqrl.qrl.v1.SubmitDilithiumToExecutionChangesRequest
 }
 var file_proto_zond_v1_withdrawals_proto_depIdxs = []int32{
-	0, // 0: theqrl.zond.v1.SignedDilithiumToExecutionChange.message:type_name -> theqrl.zond.v1.DilithiumToExecutionChange
-	1, // 1: theqrl.zond.v1.SubmitDilithiumToExecutionChangesRequest.changes:type_name -> theqrl.zond.v1.SignedDilithiumToExecutionChange
+	0, // 0: theqrl.qrl.v1.SignedDilithiumToExecutionChange.message:type_name -> theqrl.qrl.v1.DilithiumToExecutionChange
+	1, // 1: theqrl.qrl.v1.SubmitDilithiumToExecutionChangesRequest.changes:type_name -> theqrl.qrl.v1.SignedDilithiumToExecutionChange
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

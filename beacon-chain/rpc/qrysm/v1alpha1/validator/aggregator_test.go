@@ -21,7 +21,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
 	attaggregation "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation/aggregation/attestations"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -32,7 +32,7 @@ import (
 func TestSubmitAggregateAndProof_Syncing(t *testing.T) {
 	ctx := context.Background()
 
-	s, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{})
+	s, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
 	require.NoError(t, err)
 
 	aggregatorServer := &Server{
@@ -40,7 +40,7 @@ func TestSubmitAggregateAndProof_Syncing(t *testing.T) {
 		SyncChecker: &mockSync.Sync{IsSyncing: true},
 	}
 
-	req := &zondpb.AggregateSelectionRequest{CommitteeIndex: 1}
+	req := &qrysmpb.AggregateSelectionRequest{CommitteeIndex: 1}
 	wanted := "Syncing to latest head, not ready to respond"
 	_, err = aggregatorServer.SubmitAggregateSelectionProof(ctx, req)
 	assert.ErrorContains(t, wanted, err)
@@ -49,7 +49,7 @@ func TestSubmitAggregateAndProof_Syncing(t *testing.T) {
 func TestSubmitAggregateAndProof_CantFindValidatorIndex(t *testing.T) {
 	ctx := context.Background()
 
-	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
 	require.NoError(t, err)
@@ -64,7 +64,7 @@ func TestSubmitAggregateAndProof_CantFindValidatorIndex(t *testing.T) {
 	priv, err := dilithium.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte{'A'})
-	req := &zondpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey(3)}
+	req := &qrysmpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey(3)}
 	wanted := "Could not locate validator index in DB"
 	_, err = server.SubmitAggregateSelectionProof(ctx, req)
 	assert.ErrorContains(t, wanted, err)
@@ -73,9 +73,9 @@ func TestSubmitAggregateAndProof_CantFindValidatorIndex(t *testing.T) {
 func TestSubmitAggregateAndProof_IsAggregatorAndNoAtts(t *testing.T) {
 	ctx := context.Background()
 
-	s, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
-		Validators: []*zondpb.Validator{
+		Validators: []*qrysmpb.Validator{
 			{PublicKey: pubKey(0)},
 			{PublicKey: pubKey(1)},
 		},
@@ -96,7 +96,7 @@ func TestSubmitAggregateAndProof_IsAggregatorAndNoAtts(t *testing.T) {
 	v, err := s.ValidatorAtIndex(1)
 	require.NoError(t, err)
 	pubKey := v.PublicKey
-	req := &zondpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
+	req := &qrysmpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
 
 	_, err = server.SubmitAggregateSelectionProof(ctx, req)
 	assert.ErrorContains(t, "Could not find attestation for slot and committee in pool", err)
@@ -131,7 +131,7 @@ func TestSubmitAggregateAndProof_UnaggregateOk(t *testing.T) {
 	v, err := beaconState.ValidatorAtIndex(1)
 	require.NoError(t, err)
 	pubKey := v.PublicKey
-	req := &zondpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
+	req := &qrysmpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
 
 	require.NoError(t, aggregatorServer.AttPool.SaveUnaggregatedAttestation(att0))
 	_, err = aggregatorServer.SubmitAggregateSelectionProof(ctx, req)
@@ -170,7 +170,7 @@ func TestSubmitAggregateAndProof_AggregateOk(t *testing.T) {
 	v, err := beaconState.ValidatorAtIndex(1)
 	require.NoError(t, err)
 	pubKey := v.PublicKey
-	req := &zondpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
+	req := &qrysmpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
 
 	require.NoError(t, aggregatorServer.AttPool.SaveAggregatedAttestation(att0))
 	require.NoError(t, aggregatorServer.AttPool.SaveAggregatedAttestation(att1))
@@ -211,7 +211,7 @@ func TestSubmitAggregateAndProof_AggregateNotOk(t *testing.T) {
 	v, err := beaconState.ValidatorAtIndex(1)
 	require.NoError(t, err)
 	pubKey := v.PublicKey
-	req := &zondpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
+	req := &qrysmpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
 
 	_, err = aggregatorServer.SubmitAggregateSelectionProof(ctx, req)
 	assert.ErrorContains(t, "Could not find attestation for slot and committee in pool", err)
@@ -220,12 +220,12 @@ func TestSubmitAggregateAndProof_AggregateNotOk(t *testing.T) {
 	assert.Equal(t, 0, len(aggregatedAtts), "Wanted aggregated attestation")
 }
 
-func generateAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilithium.DilithiumKey) (*zondpb.Attestation, error) {
+func generateAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilithium.DilithiumKey) (*qrysmpb.Attestation, error) {
 	aggBits := bitfield.NewBitlist(4)
 	aggBits.SetBitAt(index, true)
 	aggBits.SetBitAt(index+1, true)
-	att := util.HydrateAttestation(&zondpb.Attestation{
-		Data:            &zondpb.AttestationData{CommitteeIndex: 1},
+	att := util.HydrateAttestation(&qrysmpb.Attestation{
+		Data:            &qrysmpb.AttestationData{CommitteeIndex: 1},
 		AggregationBits: aggBits,
 	})
 	committee, err := helpers.BeaconCommitteeFromState(context.Background(), state, att.Data.Slot, att.Data.CommitteeIndex)
@@ -254,11 +254,11 @@ func generateAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilit
 	return att, nil
 }
 
-func generateUnaggregatedAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilithium.DilithiumKey) (*zondpb.Attestation, error) {
+func generateUnaggregatedAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilithium.DilithiumKey) (*qrysmpb.Attestation, error) {
 	aggBits := bitfield.NewBitlist(4)
 	aggBits.SetBitAt(index, true)
-	att := util.HydrateAttestation(&zondpb.Attestation{
-		Data: &zondpb.AttestationData{
+	att := util.HydrateAttestation(&qrysmpb.Attestation{
+		Data: &qrysmpb.AttestationData{
 			CommitteeIndex: 1,
 		},
 		AggregationBits: aggBits,
@@ -337,9 +337,9 @@ func TestSubmitAggregateAndProof_PreferOwnAttestation(t *testing.T) {
 	v, err := beaconState.ValidatorAtIndex(1)
 	require.NoError(t, err)
 	pubKey := v.PublicKey
-	req := &zondpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
+	req := &qrysmpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
 
-	err = aggregatorServer.AttPool.SaveAggregatedAttestations([]*zondpb.Attestation{
+	err = aggregatorServer.AttPool.SaveAggregatedAttestations([]*qrysmpb.Attestation{
 		att0,
 		att1,
 		att2,
@@ -389,9 +389,9 @@ func TestSubmitAggregateAndProof_SelectsMostBitsWhenOwnAttestationNotPresent(t *
 	v, err := beaconState.ValidatorAtIndex(1)
 	require.NoError(t, err)
 	pubKey := v.PublicKey
-	req := &zondpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
+	req := &qrysmpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey}
 
-	err = aggregatorServer.AttPool.SaveAggregatedAttestations([]*zondpb.Attestation{
+	err = aggregatorServer.AttPool.SaveAggregatedAttestations([]*qrysmpb.Attestation{
 		att0,
 		att1,
 	})
@@ -406,12 +406,12 @@ func TestSubmitSignedAggregateSelectionProof_ZeroHashesSignatures(t *testing.T) 
 	aggregatorServer := &Server{
 		TimeFetcher: &mock.ChainService{Genesis: time.Now()},
 	}
-	req := &zondpb.SignedAggregateSubmitRequest{
-		SignedAggregateAndProof: &zondpb.SignedAggregateAttestationAndProof{
+	req := &qrysmpb.SignedAggregateSubmitRequest{
+		SignedAggregateAndProof: &qrysmpb.SignedAggregateAttestationAndProof{
 			Signature: make([]byte, field_params.DilithiumSignatureLength),
-			Message: &zondpb.AggregateAttestationAndProof{
-				Aggregate: &zondpb.Attestation{
-					Data: &zondpb.AttestationData{},
+			Message: &qrysmpb.AggregateAttestationAndProof{
+				Aggregate: &qrysmpb.Attestation{
+					Data: &qrysmpb.AttestationData{},
 				},
 			},
 		},
@@ -419,12 +419,12 @@ func TestSubmitSignedAggregateSelectionProof_ZeroHashesSignatures(t *testing.T) 
 	_, err := aggregatorServer.SubmitSignedAggregateSelectionProof(context.Background(), req)
 	require.ErrorContains(t, "signed signatures can't be zero hashes", err)
 
-	req = &zondpb.SignedAggregateSubmitRequest{
-		SignedAggregateAndProof: &zondpb.SignedAggregateAttestationAndProof{
+	req = &qrysmpb.SignedAggregateSubmitRequest{
+		SignedAggregateAndProof: &qrysmpb.SignedAggregateAttestationAndProof{
 			Signature: []byte{'a'},
-			Message: &zondpb.AggregateAttestationAndProof{
-				Aggregate: &zondpb.Attestation{
-					Data: &zondpb.AttestationData{},
+			Message: &qrysmpb.AggregateAttestationAndProof{
+				Aggregate: &qrysmpb.Attestation{
+					Data: &qrysmpb.AttestationData{},
 				},
 				SelectionProof: make([]byte, field_params.DilithiumSignatureLength),
 			},
@@ -441,13 +441,13 @@ func TestSubmitSignedAggregateSelectionProof_InvalidSlot(t *testing.T) {
 			GenesisTimeFetcher: c,
 		},
 	}
-	req := &zondpb.SignedAggregateSubmitRequest{
-		SignedAggregateAndProof: &zondpb.SignedAggregateAttestationAndProof{
+	req := &qrysmpb.SignedAggregateSubmitRequest{
+		SignedAggregateAndProof: &qrysmpb.SignedAggregateAttestationAndProof{
 			Signature: []byte{'a'},
-			Message: &zondpb.AggregateAttestationAndProof{
+			Message: &qrysmpb.AggregateAttestationAndProof{
 				SelectionProof: []byte{'a'},
-				Aggregate: &zondpb.Attestation{
-					Data: &zondpb.AttestationData{Slot: 1000},
+				Aggregate: &qrysmpb.Attestation{
+					Data: &qrysmpb.AttestationData{Slot: 1000},
 				},
 			},
 		},

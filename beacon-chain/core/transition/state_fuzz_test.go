@@ -7,7 +7,7 @@ import (
 	fuzz "github.com/google/gofuzz"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -16,9 +16,9 @@ func TestGenesisBeaconState_1000(t *testing.T) {
 	defer SkipSlotCache.Enable()
 	fuzzer := fuzz.NewWithSeed(0)
 	fuzzer.NilChance(0.1)
-	deposits := make([]*zondpb.Deposit, 300000)
+	deposits := make([]*qrysmpb.Deposit, 300000)
 	var genesisTime uint64
-	executionNodeData := &zondpb.ExecutionNodeData{}
+	executionNodeData := &qrysmpb.ExecutionNodeData{}
 	for i := 0; i < 1000; i++ {
 		fuzzer.Fuzz(&deposits)
 		fuzzer.Fuzz(&genesisTime)
@@ -39,9 +39,9 @@ func TestOptimizedGenesisBeaconState_1000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
 	fuzzer.NilChance(0.1)
 	var genesisTime uint64
-	preState, err := state_native.InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{})
+	preState, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
 	require.NoError(t, err)
-	executionNodeData := &zondpb.ExecutionNodeData{}
+	executionNodeData := &qrysmpb.ExecutionNodeData{}
 	for i := 0; i < 1000; i++ {
 		fuzzer.Fuzz(&genesisTime)
 		fuzzer.Fuzz(executionNodeData)

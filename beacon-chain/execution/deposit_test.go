@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -134,7 +134,7 @@ func TestProcessDeposit_UnableToVerify(t *testing.T) {
 	require.NoError(t, err)
 	root, err := generatedTrie.HashTreeRoot()
 	require.NoError(t, err)
-	executionNodeData := &zondpb.ExecutionNodeData{
+	executionNodeData := &qrysmpb.ExecutionNodeData{
 		DepositCount: 1,
 		DepositRoot:  root[:],
 	}
@@ -162,10 +162,10 @@ func TestProcessDeposit_IncompleteDeposit(t *testing.T) {
 	)
 	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
 	web3Service = setDefaultMocks(web3Service)
-	require.NoError(t, web3Service.preGenesisState.SetValidators([]*zondpb.Validator{}))
+	require.NoError(t, web3Service.preGenesisState.SetValidators([]*qrysmpb.Validator{}))
 
-	deposit := &zondpb.Deposit{
-		Data: &zondpb.Deposit_Data{
+	deposit := &qrysmpb.Deposit{
+		Data: &qrysmpb.Deposit_Data{
 			Amount:                params.BeaconConfig().EffectiveBalanceIncrement, // incomplete deposit
 			WithdrawalCredentials: bytesutil.PadTo([]byte("testing"), 32),
 			Signature:             bytesutil.PadTo([]byte("test"), field_params.DilithiumSignatureLength),
@@ -187,7 +187,7 @@ func TestProcessDeposit_IncompleteDeposit(t *testing.T) {
 	require.NoError(t, err)
 	root, err := generatedTrie.HashTreeRoot()
 	require.NoError(t, err)
-	executionNodeData := &zondpb.ExecutionNodeData{
+	executionNodeData := &qrysmpb.ExecutionNodeData{
 		DepositCount: 1,
 		DepositRoot:  root[:],
 	}

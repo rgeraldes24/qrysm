@@ -16,8 +16,8 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
-	zondpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 func GenerateDilithiumToExecutionChange(dilithiumExecutionChangesFolder string,
@@ -158,7 +158,7 @@ func ValidateDilithiumToExecutionChange(dilithiumToExecutionChange *DilithiumToE
 		return false
 	}
 
-	message := &zondpbv1.DilithiumToExecutionChange{
+	message := &qrlpb.DilithiumToExecutionChange{
 		ValidatorIndex:      primitives.ValidatorIndex(uintValidatorIndex),
 		FromDilithiumPubkey: fromDilithiumPubkey.Marshal(),
 		ToExecutionAddress:  toExecutionAddress}
@@ -176,7 +176,7 @@ func ValidateDilithiumToExecutionChange(dilithiumToExecutionChange *DilithiumToE
 		panic(fmt.Errorf("failed to compute domain %v", err))
 	}
 
-	signingData := &zondpb.SigningData{
+	signingData := &qrysmpb.SigningData{
 		ObjectRoot: root[:],
 		Domain:     domain,
 	}
