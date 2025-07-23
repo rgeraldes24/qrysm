@@ -17,12 +17,12 @@ package theqrl.qrl.v1alpha1;
 
 import "proto/qrl/ext/options.proto";
 
-option csharp_namespace = "TheQRL.Zond.v1alpha1";
-option go_package = "github.com/theQRL/qrysm/proto/qrysm/v1alpha1;zond";
+option csharp_namespace = "TheQRL.QRL.v1alpha1";
+option go_package = "github.com/theQRL/qrysm/proto/qrysm/v1alpha1;qrl";
 option java_multiple_files = true;
 option java_outer_classname = "WithdrawalsProto";
 option java_package = "org.theqrl.qrl.v1alpha1";
-option php_namespace = "TheQRL\\Zond\\v1alpha1";
+option php_namespace = "TheQRL\\QRL\\v1alpha1";
 
 // The message requesting a Dilithium to execution withdrawal credentials change
 message DilithiumToExecutionChange {

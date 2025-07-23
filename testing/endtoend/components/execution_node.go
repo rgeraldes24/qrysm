@@ -30,7 +30,7 @@ type ExecutionNodeSet struct {
 	nodes   []e2etypes.ComponentRunner
 }
 
-// NewNodeSet creates and returns a set of zond nodes.
+// NewNodeSet creates and returns a set of qrl execution nodes.
 func NewExecutionNodeSet() *ExecutionNodeSet {
 	return &ExecutionNodeSet{
 		started: make(chan struct{}, 1),
@@ -122,7 +122,7 @@ func (s *ExecutionNodeSet) ComponentAtIndex(i int) (e2etypes.ComponentRunner, er
 	return s.nodes[i], nil
 }
 
-// Node represents a zond node.
+// ExecutionNode represents a qrl execution node.
 type ExecutionNode struct {
 	e2etypes.ComponentRunner
 	started chan struct{}
@@ -197,18 +197,18 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 		fmt.Sprintf("--port=%d", e2e.TestParams.Ports.GzondExecutionNodePort+node.index),
 		fmt.Sprintf("--networkid=%d", NetworkId),
 		"--http",
-		"--http.api=engine,net,zond",
+		"--http.api=engine,net,qrl",
 		"--http.addr=127.0.0.1",
 		"--http.corsdomain=\"*\"",
 		"--http.vhosts=\"*\"",
 		"--ws",
-		"--ws.api=net,zond,engine",
+		"--ws.api=net,qrl,engine",
 		"--ws.addr=127.0.0.1",
 		"--ws.origins=\"*\"",
 		"--ipcdisable",
 		"--verbosity=4",
 		"--syncmode=full",
-		// fmt.Sprintf("--txpool.locals=%s", ZondAddress),
+		// fmt.Sprintf("--txpool.locals=%s", QRLAddress),
 	}
 
 	// give the miner start a couple of tries, since the p2p networking check is flaky
@@ -223,14 +223,14 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 		}
 		runCmd.Stderr = errLog
 		if err = runCmd.Start(); err != nil {
-			return fmt.Errorf("failed to start zond chain: %w", err)
+			return fmt.Errorf("failed to start qrl chain: %w", err)
 		}
 		if err = helpers.WaitForTextInFile(errLog, "Started P2P networking"); err != nil {
 			kerr := runCmd.Process.Kill()
 			if kerr != nil {
 				log.WithError(kerr).Error("error sending kill to failed node command process")
 			}
-			retryErr = fmt.Errorf("P2P log not found, this means the zond chain had issues starting: %w", err)
+			retryErr = fmt.Errorf("P2P log not found, this means the qrl chain had issues starting: %w", err)
 			continue
 		}
 		node.cmd = runCmd

@@ -119,9 +119,9 @@ func InitWithReset(c *Flags) func() {
 // configureTestnet sets the config according to specified testnet flag
 func configureTestnet(ctx *cli.Context) error {
 	if ctx.IsSet(cmd.ChainConfigFileFlag.Name) {
-		log.Warn("Running on custom Zond network specified in a chain configuration yaml file")
+		log.Warn("Running on custom QRL network specified in a chain configuration yaml file")
 	} else {
-		log.Warn("Running on Zond Mainnet")
+		log.Warn("Running on QRL Mainnet")
 	}
 	if err := params.SetActive(params.MainnetConfig().Copy()); err != nil {
 		return err

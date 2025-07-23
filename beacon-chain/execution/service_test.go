@@ -8,7 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	zond "github.com/theQRL/go-zond"
+	qrl "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/accounts/abi/bind/backends"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
@@ -45,14 +45,14 @@ type goodLogger struct {
 
 func (_ *goodLogger) Close() {}
 
-func (g *goodLogger) SubscribeFilterLogs(ctx context.Context, q zond.FilterQuery, ch chan<- gzondtypes.Log) (zond.Subscription, error) {
+func (g *goodLogger) SubscribeFilterLogs(ctx context.Context, q qrl.FilterQuery, ch chan<- gzondtypes.Log) (qrl.Subscription, error) {
 	if g.backend == nil {
 		return new(event.Feed).Subscribe(ch), nil
 	}
 	return g.backend.SubscribeFilterLogs(ctx, q, ch)
 }
 
-func (g *goodLogger) FilterLogs(ctx context.Context, q zond.FilterQuery) ([]gzondtypes.Log, error) {
+func (g *goodLogger) FilterLogs(ctx context.Context, q qrl.FilterQuery) ([]gzondtypes.Log, error) {
 	if g.backend == nil {
 		logs := make([]gzondtypes.Log, 3)
 		for i := 0; i < len(logs); i++ {
@@ -144,7 +144,7 @@ func TestStop_OK(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 Zond execution chain service")
+	require.NoError(t, err, "unable to setup web3 QRL execution chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -152,7 +152,7 @@ func TestStop_OK(t *testing.T) {
 	testAcc.Backend.Commit()
 
 	err = web3Service.Stop()
-	require.NoError(t, err, "Unable to stop web3 Zond execution chain service")
+	require.NoError(t, err, "Unable to stop web3 QRL execution chain service")
 
 	// The context should have been canceled.
 	assert.NotNil(t, web3Service.ctx.Err(), "Context wasnt canceled")
@@ -174,7 +174,7 @@ func TestService_Eth1Synced(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 Zond execution chain service")
+	require.NoError(t, err, "unable to setup web3 QRL execution chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -199,7 +199,7 @@ func TestFollowBlock_OK(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 Zond execution chain service")
+	require.NoError(t, err, "unable to setup web3 QRL execution chain service")
 
 	// simulated backend sets eth1 block
 	// time as 10 seconds
@@ -276,11 +276,11 @@ func TestHandlePanic_OK(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 Zond execution chain service")
+	require.NoError(t, err, "unable to setup web3 QRL execution chain service")
 	// nil executionNodeDataFetcher would panic if cached value not used
 	web3Service.rpcClient = nil
 	web3Service.processBlockHeader(nil)
-	require.LogsContain(t, hook, "Panicked when handling data from Zond execution chain!")
+	require.LogsContain(t, hook, "Panicked when handling data from QRL execution chain!")
 }
 
 func TestInitDepositCache_OK(t *testing.T) {
@@ -395,7 +395,7 @@ func TestNewService_EarliestVotingBlock(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 Zond execution chain service")
+	require.NoError(t, err, "unable to setup web3 QRL execution chain service")
 	// simulated backend sets eth1 block
 	// time as 10 seconds
 	params.SetupTestConfigCleanup(t)
@@ -450,7 +450,7 @@ func TestNewService_Eth1HeaderRequLimit(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 Zond execution chain service")
+	require.NoError(t, err, "unable to setup web3 QRL execution chain service")
 	assert.Equal(t, defaultEth1HeaderReqLimit, s1.cfg.eth1HeaderReqLimit, "default eth1 header request limit not set")
 	s2, err := NewService(context.Background(),
 		WithHttpEndpoint(endpoint),
@@ -458,7 +458,7 @@ func TestNewService_Eth1HeaderRequLimit(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithEth1HeaderRequestLimit(uint64(150)),
 	)
-	require.NoError(t, err, "unable to setup web3 Zond execution chain service")
+	require.NoError(t, err, "unable to setup web3 QRL execution chain service")
 	assert.Equal(t, uint64(150), s2.cfg.eth1HeaderReqLimit, "unable to set eth1HeaderRequestLimit")
 }
 

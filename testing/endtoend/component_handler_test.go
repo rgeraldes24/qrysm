@@ -81,7 +81,7 @@ func (c *componentHandler) setup() {
 	})
 	c.bootnode = bootNode
 
-	// Zond execution nodes.
+	// QRL execution nodes.
 	executionNodes := components.NewExecutionNodeSet()
 	g.Go(func() error {
 		if err := executionNodes.Start(ctx); err != nil {

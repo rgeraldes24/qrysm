@@ -22,7 +22,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/network/forks"
-	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
@@ -38,9 +38,9 @@ const (
 	changeDilithiumtoExecutionPath = "/qrl/v1/beacon/pool/dilithium_to_execution_changes"
 )
 
-// StateOrBlockId represents the block_id / state_id parameters that several of the Zond Beacon API methods accept.
+// StateOrBlockId represents the block_id / state_id parameters that several of the QRL Beacon API methods accept.
 // StateOrBlockId constants are defined for named identifiers, and helper methods are provided
-// for slot and root identifiers. Example text from the Zond Beacon Node API documentation:
+// for slot and root identifiers. Example text from the QRL Beacon Node API documentation:
 //
 // "Block identifier can be one of: "head" (canonical head in node's view), "genesis", "finalized",
 // <slot>, <hex encoded blockRoot with 0x prefix>."
@@ -85,7 +85,7 @@ func renderGetBlockPath(id StateOrBlockId) string {
 	return path.Join(getSignedBlockPath, string(id))
 }
 
-// Client provides a collection of helper methods for calling the Zond Beacon Node API endpoints.
+// Client provides a collection of helper methods for calling the QRL Beacon Node API endpoints.
 type Client struct {
 	*client.Client
 }
@@ -177,12 +177,12 @@ func (c *Client) GetForkSchedule(ctx context.Context) (forks.OrderedSchedule, er
 }
 
 // GetConfigSpec retrieve the current configs of the network used by the beacon node.
-func (c *Client) GetConfigSpec(ctx context.Context) (*v1.SpecResponse, error) {
+func (c *Client) GetConfigSpec(ctx context.Context) (*qrlpb.SpecResponse, error) {
 	body, err := c.Get(ctx, getConfigSpecPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "error requesting configSpecPath")
 	}
-	fsr := &v1.SpecResponse{}
+	fsr := &qrlpb.SpecResponse{}
 	err = json.Unmarshal(body, fsr)
 	if err != nil {
 		return nil, err

@@ -97,7 +97,7 @@ func cliActionNewSeed(cliCtx *cli.Context) error {
 		keystorePassword = strings.TrimRight(string(data), "\r\n")
 	} else {
 		fmt.Println("Create a password that secures your validator keystore(s). " +
-			"You will need to re-enter this to decrypt them when you setup your Zond validators.")
+			"You will need to re-enter this to decrypt them when you setup your QRL validators.")
 		password, err := term.ReadPassword(int(syscall.Stdin))
 		if err != nil {
 			return err

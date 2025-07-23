@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/crypto/dilithium/common"
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/ssz"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -26,13 +26,13 @@ func TestPendingDilithiumToExecChanges(t *testing.T) {
 	})
 	t.Run("non-empty pool", func(t *testing.T) {
 		pool := NewPool()
-		pool.InsertDilithiumToExecChange(&zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		pool.InsertDilithiumToExecChange(&qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: 0,
 			},
 		})
-		pool.InsertDilithiumToExecChange(&zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		pool.InsertDilithiumToExecChange(&qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: 1,
 			},
 		})
@@ -43,22 +43,22 @@ func TestPendingDilithiumToExecChanges(t *testing.T) {
 }
 
 func TestDilithiumToExecChangesForInclusion(t *testing.T) {
-	spb := &zond.BeaconStateCapella{
-		Fork: &zond.Fork{
+	spb := &qrysmpb.BeaconStateCapella{
+		Fork: &qrysmpb.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 		},
 	}
 	numValidators := 2 * params.BeaconConfig().MaxDilithiumToExecutionChanges
-	validators := make([]*zond.Validator, numValidators)
-	dilithiumChanges := make([]*zond.DilithiumToExecutionChange, numValidators)
+	validators := make([]*qrysmpb.Validator, numValidators)
+	dilithiumChanges := make([]*qrysmpb.DilithiumToExecutionChange, numValidators)
 	spb.Balances = make([]uint64, numValidators)
 	privKeys := make([]common.SecretKey, numValidators)
 	maxEffectiveBalance := params.BeaconConfig().MaxEffectiveBalance
 	executionAddress := []byte{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13}
 
 	for i := range validators {
-		v := &zond.Validator{}
+		v := &qrysmpb.Validator{}
 		v.EffectiveBalance = maxEffectiveBalance
 		v.WithdrawableEpoch = params.BeaconConfig().FarFutureEpoch
 		v.WithdrawalCredentials = make([]byte, 32)
@@ -67,7 +67,7 @@ func TestDilithiumToExecChangesForInclusion(t *testing.T) {
 		privKeys[i] = priv
 		pubkey := priv.PublicKey().Marshal()
 
-		message := &zond.DilithiumToExecutionChange{
+		message := &qrysmpb.DilithiumToExecutionChange{
 			ToExecutionAddress:  executionAddress,
 			ValidatorIndex:      primitives.ValidatorIndex(i),
 			FromDilithiumPubkey: pubkey,
@@ -84,12 +84,12 @@ func TestDilithiumToExecChangesForInclusion(t *testing.T) {
 	st, err := state_native.InitializeFromProtoCapella(spb)
 	require.NoError(t, err)
 
-	signedChanges := make([]*zond.SignedDilithiumToExecutionChange, numValidators)
+	signedChanges := make([]*qrysmpb.SignedDilithiumToExecutionChange, numValidators)
 	for i, message := range dilithiumChanges {
 		signature, err := signing.ComputeDomainAndSign(st, time.CurrentEpoch(st), message, params.BeaconConfig().DomainDilithiumToExecutionChange, privKeys[i])
 		require.NoError(t, err)
 
-		signed := &zond.SignedDilithiumToExecutionChange{
+		signed := &qrysmpb.SignedDilithiumToExecutionChange{
 			Message:   message,
 			Signature: signature,
 		}
@@ -172,8 +172,8 @@ func TestDilithiumToExecChangesForInclusion(t *testing.T) {
 func TestInsertDilithiumToExecChange(t *testing.T) {
 	t.Run("empty pool", func(t *testing.T) {
 		pool := NewPool()
-		change := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		change := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			},
 		}
@@ -188,13 +188,13 @@ func TestInsertDilithiumToExecChange(t *testing.T) {
 	})
 	t.Run("item in pool", func(t *testing.T) {
 		pool := NewPool()
-		old := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		old := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			},
 		}
-		change := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		change := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(1),
 			},
 		}
@@ -215,14 +215,14 @@ func TestInsertDilithiumToExecChange(t *testing.T) {
 	})
 	t.Run("validator index already exists", func(t *testing.T) {
 		pool := NewPool()
-		old := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		old := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			},
 			Signature: []byte("old"),
 		}
-		change := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		change := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			},
 			Signature: []byte("change"),
@@ -242,8 +242,8 @@ func TestInsertDilithiumToExecChange(t *testing.T) {
 func TestMarkIncluded(t *testing.T) {
 	t.Run("one element in pool", func(t *testing.T) {
 		pool := NewPool()
-		change := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		change := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			}}
 		pool.InsertDilithiumToExecChange(change)
@@ -254,16 +254,16 @@ func TestMarkIncluded(t *testing.T) {
 	})
 	t.Run("first of multiple elements", func(t *testing.T) {
 		pool := NewPool()
-		first := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		first := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			}}
-		second := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		second := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(1),
 			}}
-		third := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		third := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(2),
 			}}
 		pool.InsertDilithiumToExecChange(first)
@@ -276,16 +276,16 @@ func TestMarkIncluded(t *testing.T) {
 	})
 	t.Run("last of multiple elements", func(t *testing.T) {
 		pool := NewPool()
-		first := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		first := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			}}
-		second := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		second := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(1),
 			}}
-		third := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		third := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(2),
 			}}
 		pool.InsertDilithiumToExecChange(first)
@@ -298,16 +298,16 @@ func TestMarkIncluded(t *testing.T) {
 	})
 	t.Run("in the middle of multiple elements", func(t *testing.T) {
 		pool := NewPool()
-		first := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		first := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			}}
-		second := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		second := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(1),
 			}}
-		third := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		third := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(2),
 			}}
 		pool.InsertDilithiumToExecChange(first)
@@ -320,16 +320,16 @@ func TestMarkIncluded(t *testing.T) {
 	})
 	t.Run("not in pool", func(t *testing.T) {
 		pool := NewPool()
-		first := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		first := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			}}
-		second := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		second := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(1),
 			}}
-		change := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		change := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(2),
 			}}
 		pool.InsertDilithiumToExecChange(first)
@@ -352,8 +352,8 @@ func TestValidatorExists(t *testing.T) {
 	})
 	t.Run("validator added to pool", func(t *testing.T) {
 		pool := NewPool()
-		change := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		change := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			}}
 		pool.InsertDilithiumToExecChange(change)
@@ -361,18 +361,18 @@ func TestValidatorExists(t *testing.T) {
 	})
 	t.Run("multiple validators added to pool", func(t *testing.T) {
 		pool := NewPool()
-		change := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		change := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			}}
 		pool.InsertDilithiumToExecChange(change)
-		change = &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		change = &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(10),
 			}}
 		pool.InsertDilithiumToExecChange(change)
-		change = &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		change = &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(30),
 			}}
 		pool.InsertDilithiumToExecChange(change)
@@ -383,8 +383,8 @@ func TestValidatorExists(t *testing.T) {
 	})
 	t.Run("validator added and then removed", func(t *testing.T) {
 		pool := NewPool()
-		change := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		change := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			}}
 		pool.InsertDilithiumToExecChange(change)
@@ -393,18 +393,18 @@ func TestValidatorExists(t *testing.T) {
 	})
 	t.Run("multiple validators added to pool and removed", func(t *testing.T) {
 		pool := NewPool()
-		firstChange := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		firstChange := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(0),
 			}}
 		pool.InsertDilithiumToExecChange(firstChange)
-		secondChange := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		secondChange := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(10),
 			}}
 		pool.InsertDilithiumToExecChange(secondChange)
-		thirdChange := &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		thirdChange := &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex: primitives.ValidatorIndex(30),
 			}}
 		pool.InsertDilithiumToExecChange(thirdChange)
@@ -420,18 +420,18 @@ func TestValidatorExists(t *testing.T) {
 
 func TestPoolCycleMap(t *testing.T) {
 	pool := NewPool()
-	firstChange := &zond.SignedDilithiumToExecutionChange{
-		Message: &zond.DilithiumToExecutionChange{
+	firstChange := &qrysmpb.SignedDilithiumToExecutionChange{
+		Message: &qrysmpb.DilithiumToExecutionChange{
 			ValidatorIndex: primitives.ValidatorIndex(0),
 		}}
 	pool.InsertDilithiumToExecChange(firstChange)
-	secondChange := &zond.SignedDilithiumToExecutionChange{
-		Message: &zond.DilithiumToExecutionChange{
+	secondChange := &qrysmpb.SignedDilithiumToExecutionChange{
+		Message: &qrysmpb.DilithiumToExecutionChange{
 			ValidatorIndex: primitives.ValidatorIndex(10),
 		}}
 	pool.InsertDilithiumToExecChange(secondChange)
-	thirdChange := &zond.SignedDilithiumToExecutionChange{
-		Message: &zond.DilithiumToExecutionChange{
+	thirdChange := &qrysmpb.SignedDilithiumToExecutionChange{
+		Message: &qrysmpb.DilithiumToExecutionChange{
 			ValidatorIndex: primitives.ValidatorIndex(30),
 		}}
 	pool.InsertDilithiumToExecChange(thirdChange)

@@ -2,7 +2,7 @@
 // source: proto/qrysm/v1alpha1/beacon_chain.proto
 
 /*
-Package zond is a reverse proxy.
+Package qrl is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */

@@ -74,7 +74,7 @@ go_test(
     embed = [":go_default_library"],
     shard_count = 4,
     tags = ["minimal"],
-    zond_network = "minimal",
+    qrl_network = "minimal",
     deps = [
         "//beacon-chain/blockchain/testing:go_default_library",
         "//beacon-chain/core/altair:go_default_library",

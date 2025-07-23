@@ -28,7 +28,7 @@ var (
 		Usage: "A zond web3 provider string http endpoint",
 		Value: "http://localhost:8545",
 	}
-	// DepositContractAddressFlag for the validator deposit contract on zond.
+	// DepositContractAddressFlag for the validator deposit contract on qrl.
 	DepositContractAddressFlag = &cli.StringFlag{
 		Name:  "deposit-contract",
 		Usage: "Address of the deposit contract",

@@ -49,7 +49,7 @@ message AttesterSlashing {
     IndexedAttestation attestation_2 = 2;
 }
 
-// Deposit into the Zond consensus from the Zond deposit contract.
+// Deposit into the QRL consensus from the QRL deposit contract.
 message Deposit {
     message Data {
         // 2592 byte Dilithium public key of the validator.
@@ -243,7 +243,7 @@ message BeaconBlockCapella {
   BeaconBlockBodyCapella body = 5;
 }
 
-// The Zond consensus beacon block. The message does not contain a validator signature.
+// The QRL consensus beacon block. The message does not contain a validator signature.
 message BlindedBeaconBlockCapella {
   // Beacon chain slot that this block represents.
   uint64 slot = 1 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];

@@ -24,11 +24,11 @@ import (
 	"github.com/theQRL/qrysm/testing/util"
 )
 
-var gplanckPerZond = big.NewInt(int64(params.BeaconConfig().GplanckPerZond))
+var gplanckPerQuanta = big.NewInt(int64(params.BeaconConfig().GplanckPerQuanta))
 
 func amtInGplanck(deposit *zond.Deposit) *big.Int {
 	amt := big.NewInt(0).SetUint64(deposit.Data.Amount)
-	return amt.Mul(amt, gplanckPerZond)
+	return amt.Mul(amt, gplanckPerQuanta)
 }
 
 // computeDeposits uses the deterministic validator generator to generate deposits for `nvals` (number of validators).

@@ -8,5 +8,5 @@ go_test(
         #"@consensus_spec_tests_minimal//:test_data",
     ],
     tags = ["spectest"],
-    zond_network = "minimal",
+    qrl_network = "minimal",
 )

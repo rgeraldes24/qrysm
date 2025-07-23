@@ -8,13 +8,13 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	qrlpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"google.golang.org/protobuf/proto"
 )
 
 // BlockIfaceToV1BlockHeader converts a signed beacon block interface into a signed beacon block header.
-func BlockIfaceToV1BlockHeader(block interfaces.ReadOnlySignedBeaconBlock) (*qrlpbv1.SignedBeaconBlockHeader, error) {
+func BlockIfaceToV1BlockHeader(block interfaces.ReadOnlySignedBeaconBlock) (*qrlpb.SignedBeaconBlockHeader, error) {
 	bodyRoot, err := block.Block().Body().HashTreeRoot()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get body root of block")
@@ -22,8 +22,8 @@ func BlockIfaceToV1BlockHeader(block interfaces.ReadOnlySignedBeaconBlock) (*qrl
 	parentRoot := block.Block().ParentRoot()
 	stateRoot := block.Block().StateRoot()
 	sig := block.Signature()
-	return &qrlpbv1.SignedBeaconBlockHeader{
-		Message: &qrlpbv1.BeaconBlockHeader{
+	return &qrlpb.SignedBeaconBlockHeader{
+		Message: &qrlpb.BeaconBlockHeader{
 			Slot:          block.Block().Slot(),
 			ProposerIndex: block.Block().ProposerIndex(),
 			ParentRoot:    parentRoot[:],
@@ -35,11 +35,11 @@ func BlockIfaceToV1BlockHeader(block interfaces.ReadOnlySignedBeaconBlock) (*qrl
 }
 
 // V1Alpha1AggregateAttAndProofToV1 converts a v1alpha1 aggregate attestation and proof to v1.
-func V1Alpha1AggregateAttAndProofToV1(v1alpha1Att *qrysmpb.AggregateAttestationAndProof) *qrlpbv1.AggregateAttestationAndProof {
+func V1Alpha1AggregateAttAndProofToV1(v1alpha1Att *qrysmpb.AggregateAttestationAndProof) *qrlpb.AggregateAttestationAndProof {
 	if v1alpha1Att == nil {
-		return &qrlpbv1.AggregateAttestationAndProof{}
+		return &qrlpb.AggregateAttestationAndProof{}
 	}
-	return &qrlpbv1.AggregateAttestationAndProof{
+	return &qrlpb.AggregateAttestationAndProof{
 		AggregatorIndex: v1alpha1Att.AggregatorIndex,
 		Aggregate:       V1Alpha1AttestationToV1(v1alpha1Att.Aggregate),
 		SelectionProof:  v1alpha1Att.SelectionProof,
@@ -47,7 +47,7 @@ func V1Alpha1AggregateAttAndProofToV1(v1alpha1Att *qrysmpb.AggregateAttestationA
 }
 
 // V1SignedAggregateAttAndProofToV1Alpha1 converts a v1 signed aggregate attestation and proof to v1alpha1.
-func V1SignedAggregateAttAndProofToV1Alpha1(v1Att *qrlpbv1.SignedAggregateAttestationAndProof) *qrysmpb.SignedAggregateAttestationAndProof {
+func V1SignedAggregateAttAndProofToV1Alpha1(v1Att *qrlpb.SignedAggregateAttestationAndProof) *qrysmpb.SignedAggregateAttestationAndProof {
 	if v1Att == nil {
 		return &qrysmpb.SignedAggregateAttestationAndProof{}
 	}
@@ -62,11 +62,11 @@ func V1SignedAggregateAttAndProofToV1Alpha1(v1Att *qrlpbv1.SignedAggregateAttest
 }
 
 // V1Alpha1IndexedAttToV1 converts a v1alpha1 indexed attestation to v1.
-func V1Alpha1IndexedAttToV1(v1alpha1Att *qrysmpb.IndexedAttestation) *qrlpbv1.IndexedAttestation {
+func V1Alpha1IndexedAttToV1(v1alpha1Att *qrysmpb.IndexedAttestation) *qrlpb.IndexedAttestation {
 	if v1alpha1Att == nil {
-		return &qrlpbv1.IndexedAttestation{}
+		return &qrlpb.IndexedAttestation{}
 	}
-	return &qrlpbv1.IndexedAttestation{
+	return &qrlpb.IndexedAttestation{
 		AttestingIndices: v1alpha1Att.AttestingIndices,
 		Data:             V1Alpha1AttDataToV1(v1alpha1Att.Data),
 		Signatures:       v1alpha1Att.Signatures,
@@ -74,11 +74,11 @@ func V1Alpha1IndexedAttToV1(v1alpha1Att *qrysmpb.IndexedAttestation) *qrlpbv1.In
 }
 
 // V1Alpha1AttestationToV1 converts a v1alpha1 attestation to v1.
-func V1Alpha1AttestationToV1(v1alpha1Att *qrysmpb.Attestation) *qrlpbv1.Attestation {
+func V1Alpha1AttestationToV1(v1alpha1Att *qrysmpb.Attestation) *qrlpb.Attestation {
 	if v1alpha1Att == nil {
-		return &qrlpbv1.Attestation{}
+		return &qrlpb.Attestation{}
 	}
-	return &qrlpbv1.Attestation{
+	return &qrlpb.Attestation{
 		AggregationBits: v1alpha1Att.AggregationBits,
 		Data:            V1Alpha1AttDataToV1(v1alpha1Att.Data),
 		Signatures:      v1alpha1Att.Signatures,
@@ -86,7 +86,7 @@ func V1Alpha1AttestationToV1(v1alpha1Att *qrysmpb.Attestation) *qrlpbv1.Attestat
 }
 
 // V1AttestationToV1Alpha1 converts a v1 attestation to v1alpha1.
-func V1AttestationToV1Alpha1(v1Att *qrlpbv1.Attestation) *qrysmpb.Attestation {
+func V1AttestationToV1Alpha1(v1Att *qrlpb.Attestation) *qrysmpb.Attestation {
 	if v1Att == nil {
 		return &qrysmpb.Attestation{}
 	}
@@ -98,19 +98,19 @@ func V1AttestationToV1Alpha1(v1Att *qrlpbv1.Attestation) *qrysmpb.Attestation {
 }
 
 // V1Alpha1AttDataToV1 converts a v1alpha1 attestation data to v1.
-func V1Alpha1AttDataToV1(v1alpha1AttData *qrysmpb.AttestationData) *qrlpbv1.AttestationData {
+func V1Alpha1AttDataToV1(v1alpha1AttData *qrysmpb.AttestationData) *qrlpb.AttestationData {
 	if v1alpha1AttData == nil || v1alpha1AttData.Source == nil || v1alpha1AttData.Target == nil {
-		return &qrlpbv1.AttestationData{}
+		return &qrlpb.AttestationData{}
 	}
-	return &qrlpbv1.AttestationData{
+	return &qrlpb.AttestationData{
 		Slot:            v1alpha1AttData.Slot,
 		Index:           v1alpha1AttData.CommitteeIndex,
 		BeaconBlockRoot: v1alpha1AttData.BeaconBlockRoot,
-		Source: &qrlpbv1.Checkpoint{
+		Source: &qrlpb.Checkpoint{
 			Root:  v1alpha1AttData.Source.Root,
 			Epoch: v1alpha1AttData.Source.Epoch,
 		},
-		Target: &qrlpbv1.Checkpoint{
+		Target: &qrlpb.Checkpoint{
 			Root:  v1alpha1AttData.Target.Root,
 			Epoch: v1alpha1AttData.Target.Epoch,
 		},
@@ -118,23 +118,23 @@ func V1Alpha1AttDataToV1(v1alpha1AttData *qrysmpb.AttestationData) *qrlpbv1.Atte
 }
 
 // V1Alpha1AttSlashingToV1 converts a v1alpha1 attester slashing to v1.
-func V1Alpha1AttSlashingToV1(v1alpha1Slashing *qrysmpb.AttesterSlashing) *qrlpbv1.AttesterSlashing {
+func V1Alpha1AttSlashingToV1(v1alpha1Slashing *qrysmpb.AttesterSlashing) *qrlpb.AttesterSlashing {
 	if v1alpha1Slashing == nil {
-		return &qrlpbv1.AttesterSlashing{}
+		return &qrlpb.AttesterSlashing{}
 	}
-	return &qrlpbv1.AttesterSlashing{
+	return &qrlpb.AttesterSlashing{
 		Attestation_1: V1Alpha1IndexedAttToV1(v1alpha1Slashing.Attestation_1),
 		Attestation_2: V1Alpha1IndexedAttToV1(v1alpha1Slashing.Attestation_2),
 	}
 }
 
 // V1Alpha1SignedHeaderToV1 converts a v1alpha1 signed beacon block header to v1.
-func V1Alpha1SignedHeaderToV1(v1alpha1Hdr *qrysmpb.SignedBeaconBlockHeader) *qrlpbv1.SignedBeaconBlockHeader {
+func V1Alpha1SignedHeaderToV1(v1alpha1Hdr *qrysmpb.SignedBeaconBlockHeader) *qrlpb.SignedBeaconBlockHeader {
 	if v1alpha1Hdr == nil || v1alpha1Hdr.Header == nil {
-		return &qrlpbv1.SignedBeaconBlockHeader{}
+		return &qrlpb.SignedBeaconBlockHeader{}
 	}
-	return &qrlpbv1.SignedBeaconBlockHeader{
-		Message: &qrlpbv1.BeaconBlockHeader{
+	return &qrlpb.SignedBeaconBlockHeader{
+		Message: &qrlpb.BeaconBlockHeader{
 			Slot:          v1alpha1Hdr.Header.Slot,
 			ProposerIndex: v1alpha1Hdr.Header.ProposerIndex,
 			ParentRoot:    v1alpha1Hdr.Header.ParentRoot,
@@ -146,7 +146,7 @@ func V1Alpha1SignedHeaderToV1(v1alpha1Hdr *qrysmpb.SignedBeaconBlockHeader) *qrl
 }
 
 // V1SignedHeaderToV1Alpha1 converts a v1 signed beacon block header to v1alpha1.
-func V1SignedHeaderToV1Alpha1(v1Header *qrlpbv1.SignedBeaconBlockHeader) *qrysmpb.SignedBeaconBlockHeader {
+func V1SignedHeaderToV1Alpha1(v1Header *qrlpb.SignedBeaconBlockHeader) *qrysmpb.SignedBeaconBlockHeader {
 	if v1Header == nil || v1Header.Message == nil {
 		return &qrysmpb.SignedBeaconBlockHeader{}
 	}
@@ -163,23 +163,23 @@ func V1SignedHeaderToV1Alpha1(v1Header *qrlpbv1.SignedBeaconBlockHeader) *qrysmp
 }
 
 // V1Alpha1ProposerSlashingToV1 converts a v1alpha1 proposer slashing to v1.
-func V1Alpha1ProposerSlashingToV1(v1alpha1Slashing *qrysmpb.ProposerSlashing) *qrlpbv1.ProposerSlashing {
+func V1Alpha1ProposerSlashingToV1(v1alpha1Slashing *qrysmpb.ProposerSlashing) *qrlpb.ProposerSlashing {
 	if v1alpha1Slashing == nil {
-		return &qrlpbv1.ProposerSlashing{}
+		return &qrlpb.ProposerSlashing{}
 	}
-	return &qrlpbv1.ProposerSlashing{
+	return &qrlpb.ProposerSlashing{
 		SignedHeader_1: V1Alpha1SignedHeaderToV1(v1alpha1Slashing.Header_1),
 		SignedHeader_2: V1Alpha1SignedHeaderToV1(v1alpha1Slashing.Header_2),
 	}
 }
 
 // V1Alpha1ExitToV1 converts a v1alpha1 SignedVoluntaryExit to v1.
-func V1Alpha1ExitToV1(v1alpha1Exit *qrysmpb.SignedVoluntaryExit) *qrlpbv1.SignedVoluntaryExit {
+func V1Alpha1ExitToV1(v1alpha1Exit *qrysmpb.SignedVoluntaryExit) *qrlpb.SignedVoluntaryExit {
 	if v1alpha1Exit == nil || v1alpha1Exit.Exit == nil {
-		return &qrlpbv1.SignedVoluntaryExit{}
+		return &qrlpb.SignedVoluntaryExit{}
 	}
-	return &qrlpbv1.SignedVoluntaryExit{
-		Message: &qrlpbv1.VoluntaryExit{
+	return &qrlpb.SignedVoluntaryExit{
+		Message: &qrlpb.VoluntaryExit{
 			Epoch:          v1alpha1Exit.Exit.Epoch,
 			ValidatorIndex: v1alpha1Exit.Exit.ValidatorIndex,
 		},
@@ -188,7 +188,7 @@ func V1Alpha1ExitToV1(v1alpha1Exit *qrysmpb.SignedVoluntaryExit) *qrlpbv1.Signed
 }
 
 // V1ExitToV1Alpha1 converts a v1 SignedVoluntaryExit to v1alpha1.
-func V1ExitToV1Alpha1(v1Exit *qrlpbv1.SignedVoluntaryExit) *qrysmpb.SignedVoluntaryExit {
+func V1ExitToV1Alpha1(v1Exit *qrlpb.SignedVoluntaryExit) *qrysmpb.SignedVoluntaryExit {
 	if v1Exit == nil || v1Exit.Message == nil {
 		return &qrysmpb.SignedVoluntaryExit{}
 	}
@@ -202,7 +202,7 @@ func V1ExitToV1Alpha1(v1Exit *qrlpbv1.SignedVoluntaryExit) *qrysmpb.SignedVolunt
 }
 
 // V1AttToV1Alpha1 converts a v1 attestation to v1alpha1.
-func V1AttToV1Alpha1(v1Att *qrlpbv1.Attestation) *qrysmpb.Attestation {
+func V1AttToV1Alpha1(v1Att *qrlpb.Attestation) *qrysmpb.Attestation {
 	if v1Att == nil {
 		return &qrysmpb.Attestation{}
 	}
@@ -214,7 +214,7 @@ func V1AttToV1Alpha1(v1Att *qrlpbv1.Attestation) *qrysmpb.Attestation {
 }
 
 // V1IndexedAttToV1Alpha1 converts a v1 indexed attestation to v1alpha1.
-func V1IndexedAttToV1Alpha1(v1Att *qrlpbv1.IndexedAttestation) *qrysmpb.IndexedAttestation {
+func V1IndexedAttToV1Alpha1(v1Att *qrlpb.IndexedAttestation) *qrysmpb.IndexedAttestation {
 	if v1Att == nil {
 		return &qrysmpb.IndexedAttestation{}
 	}
@@ -226,7 +226,7 @@ func V1IndexedAttToV1Alpha1(v1Att *qrlpbv1.IndexedAttestation) *qrysmpb.IndexedA
 }
 
 // V1AttDataToV1Alpha1 converts a v1 attestation data to v1alpha1.
-func V1AttDataToV1Alpha1(v1AttData *qrlpbv1.AttestationData) *qrysmpb.AttestationData {
+func V1AttDataToV1Alpha1(v1AttData *qrlpb.AttestationData) *qrysmpb.AttestationData {
 	if v1AttData == nil || v1AttData.Source == nil || v1AttData.Target == nil {
 		return &qrysmpb.AttestationData{}
 	}
@@ -246,7 +246,7 @@ func V1AttDataToV1Alpha1(v1AttData *qrlpbv1.AttestationData) *qrysmpb.Attestatio
 }
 
 // V1AttSlashingToV1Alpha1 converts a v1 attester slashing to v1alpha1.
-func V1AttSlashingToV1Alpha1(v1Slashing *qrlpbv1.AttesterSlashing) *qrysmpb.AttesterSlashing {
+func V1AttSlashingToV1Alpha1(v1Slashing *qrlpb.AttesterSlashing) *qrysmpb.AttesterSlashing {
 	if v1Slashing == nil {
 		return &qrysmpb.AttesterSlashing{}
 	}
@@ -257,7 +257,7 @@ func V1AttSlashingToV1Alpha1(v1Slashing *qrlpbv1.AttesterSlashing) *qrysmpb.Atte
 }
 
 // V1ProposerSlashingToV1Alpha1 converts a v1 proposer slashing to v1alpha1.
-func V1ProposerSlashingToV1Alpha1(v1Slashing *qrlpbv1.ProposerSlashing) *qrysmpb.ProposerSlashing {
+func V1ProposerSlashingToV1Alpha1(v1Slashing *qrlpb.ProposerSlashing) *qrysmpb.ProposerSlashing {
 	if v1Slashing == nil {
 		return &qrysmpb.ProposerSlashing{}
 	}
@@ -268,11 +268,11 @@ func V1ProposerSlashingToV1Alpha1(v1Slashing *qrlpbv1.ProposerSlashing) *qrysmpb
 }
 
 // V1Alpha1ValidatorToV1 converts a v1alpha1 validator to v1.
-func V1Alpha1ValidatorToV1(v1Alpha1Validator *qrysmpb.Validator) *qrlpbv1.Validator {
+func V1Alpha1ValidatorToV1(v1Alpha1Validator *qrysmpb.Validator) *qrlpb.Validator {
 	if v1Alpha1Validator == nil {
-		return &qrlpbv1.Validator{}
+		return &qrlpb.Validator{}
 	}
-	return &qrlpbv1.Validator{
+	return &qrlpb.Validator{
 		Pubkey:                     v1Alpha1Validator.PublicKey,
 		WithdrawalCredentials:      v1Alpha1Validator.WithdrawalCredentials,
 		EffectiveBalance:           v1Alpha1Validator.EffectiveBalance,
@@ -285,7 +285,7 @@ func V1Alpha1ValidatorToV1(v1Alpha1Validator *qrysmpb.Validator) *qrlpbv1.Valida
 }
 
 // V1ValidatorToV1Alpha1 converts a v1 validator to v1alpha1.
-func V1ValidatorToV1Alpha1(v1Validator *qrlpbv1.Validator) *qrysmpb.Validator {
+func V1ValidatorToV1Alpha1(v1Validator *qrlpb.Validator) *qrysmpb.Validator {
 	if v1Validator == nil {
 		return &qrysmpb.Validator{}
 	}
@@ -303,12 +303,12 @@ func V1ValidatorToV1Alpha1(v1Validator *qrlpbv1.Validator) *qrysmpb.Validator {
 
 // V1Alpha1BeaconBlockCapellaToV1 converts a v1alpha1 Capella beacon block to a v1
 // Capella block.
-func V1Alpha1BeaconBlockCapellaToV1(v1alpha1Block *qrysmpb.BeaconBlockCapella) (*qrlpbv1.BeaconBlockCapella, error) {
+func V1Alpha1BeaconBlockCapellaToV1(v1alpha1Block *qrysmpb.BeaconBlockCapella) (*qrlpb.BeaconBlockCapella, error) {
 	marshaledBlk, err := proto.Marshal(v1alpha1Block)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not marshal block")
 	}
-	v1Block := &qrlpbv1.BeaconBlockCapella{}
+	v1Block := &qrlpb.BeaconBlockCapella{}
 	if err := proto.Unmarshal(marshaledBlk, v1Block); err != nil {
 		return nil, errors.Wrap(err, "could not unmarshal block")
 	}
@@ -316,12 +316,12 @@ func V1Alpha1BeaconBlockCapellaToV1(v1alpha1Block *qrysmpb.BeaconBlockCapella) (
 }
 
 // V1Alpha1BeaconBlockBlindedCapellaToV1Blinded converts a v1alpha1 Blinded Capella beacon block to a v1 Blinded Capella block.
-func V1Alpha1BeaconBlockBlindedCapellaToV1Blinded(v1alpha1Block *qrysmpb.BlindedBeaconBlockCapella) (*qrlpbv1.BlindedBeaconBlockCapella, error) {
+func V1Alpha1BeaconBlockBlindedCapellaToV1Blinded(v1alpha1Block *qrysmpb.BlindedBeaconBlockCapella) (*qrlpb.BlindedBeaconBlockCapella, error) {
 	marshaledBlk, err := proto.Marshal(v1alpha1Block)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not marshal block")
 	}
-	v1Block := &qrlpbv1.BlindedBeaconBlockCapella{}
+	v1Block := &qrlpb.BlindedBeaconBlockCapella{}
 	if err := proto.Unmarshal(marshaledBlk, v1Block); err != nil {
 		return nil, errors.Wrap(err, "could not unmarshal block")
 	}
@@ -330,13 +330,13 @@ func V1Alpha1BeaconBlockBlindedCapellaToV1Blinded(v1alpha1Block *qrysmpb.Blinded
 
 // V1Alpha1BeaconBlockCapellaToV1Blinded converts a v1alpha1 Capella beacon block to a v1
 // blinded Capella block.
-func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCapella) (*qrlpbv1.BlindedBeaconBlockCapella, error) {
+func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCapella) (*qrlpb.BlindedBeaconBlockCapella, error) {
 	sourceProposerSlashings := v1alpha1Block.Body.ProposerSlashings
-	resultProposerSlashings := make([]*qrlpbv1.ProposerSlashing, len(sourceProposerSlashings))
+	resultProposerSlashings := make([]*qrlpb.ProposerSlashing, len(sourceProposerSlashings))
 	for i, s := range sourceProposerSlashings {
-		resultProposerSlashings[i] = &qrlpbv1.ProposerSlashing{
-			SignedHeader_1: &qrlpbv1.SignedBeaconBlockHeader{
-				Message: &qrlpbv1.BeaconBlockHeader{
+		resultProposerSlashings[i] = &qrlpb.ProposerSlashing{
+			SignedHeader_1: &qrlpb.SignedBeaconBlockHeader{
+				Message: &qrlpb.BeaconBlockHeader{
 					Slot:          s.Header_1.Header.Slot,
 					ProposerIndex: s.Header_1.Header.ProposerIndex,
 					ParentRoot:    bytesutil.SafeCopyBytes(s.Header_1.Header.ParentRoot),
@@ -345,8 +345,8 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 				},
 				Signature: bytesutil.SafeCopyBytes(s.Header_1.Signature),
 			},
-			SignedHeader_2: &qrlpbv1.SignedBeaconBlockHeader{
-				Message: &qrlpbv1.BeaconBlockHeader{
+			SignedHeader_2: &qrlpb.SignedBeaconBlockHeader{
+				Message: &qrlpb.BeaconBlockHeader{
 					Slot:          s.Header_2.Header.Slot,
 					ProposerIndex: s.Header_2.Header.ProposerIndex,
 					ParentRoot:    bytesutil.SafeCopyBytes(s.Header_2.Header.ParentRoot),
@@ -359,7 +359,7 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 	}
 
 	sourceAttesterSlashings := v1alpha1Block.Body.AttesterSlashings
-	resultAttesterSlashings := make([]*qrlpbv1.AttesterSlashing, len(sourceAttesterSlashings))
+	resultAttesterSlashings := make([]*qrlpb.AttesterSlashing, len(sourceAttesterSlashings))
 	for i, s := range sourceAttesterSlashings {
 		att1Indices := make([]uint64, len(s.Attestation_1.AttestingIndices))
 		copy(att1Indices, s.Attestation_1.AttestingIndices)
@@ -374,35 +374,35 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 			signatures2[i] = bytesutil.SafeCopyBytes(sig)
 		}
 
-		resultAttesterSlashings[i] = &qrlpbv1.AttesterSlashing{
-			Attestation_1: &qrlpbv1.IndexedAttestation{
+		resultAttesterSlashings[i] = &qrlpb.AttesterSlashing{
+			Attestation_1: &qrlpb.IndexedAttestation{
 				AttestingIndices: att1Indices,
-				Data: &qrlpbv1.AttestationData{
+				Data: &qrlpb.AttestationData{
 					Slot:            s.Attestation_1.Data.Slot,
 					Index:           s.Attestation_1.Data.CommitteeIndex,
 					BeaconBlockRoot: bytesutil.SafeCopyBytes(s.Attestation_1.Data.BeaconBlockRoot),
-					Source: &qrlpbv1.Checkpoint{
+					Source: &qrlpb.Checkpoint{
 						Epoch: s.Attestation_1.Data.Source.Epoch,
 						Root:  bytesutil.SafeCopyBytes(s.Attestation_1.Data.Source.Root),
 					},
-					Target: &qrlpbv1.Checkpoint{
+					Target: &qrlpb.Checkpoint{
 						Epoch: s.Attestation_1.Data.Target.Epoch,
 						Root:  bytesutil.SafeCopyBytes(s.Attestation_1.Data.Target.Root),
 					},
 				},
 				Signatures: signatures1,
 			},
-			Attestation_2: &qrlpbv1.IndexedAttestation{
+			Attestation_2: &qrlpb.IndexedAttestation{
 				AttestingIndices: att2Indices,
-				Data: &qrlpbv1.AttestationData{
+				Data: &qrlpb.AttestationData{
 					Slot:            s.Attestation_2.Data.Slot,
 					Index:           s.Attestation_2.Data.CommitteeIndex,
 					BeaconBlockRoot: bytesutil.SafeCopyBytes(s.Attestation_2.Data.BeaconBlockRoot),
-					Source: &qrlpbv1.Checkpoint{
+					Source: &qrlpb.Checkpoint{
 						Epoch: s.Attestation_2.Data.Source.Epoch,
 						Root:  bytesutil.SafeCopyBytes(s.Attestation_2.Data.Source.Root),
 					},
-					Target: &qrlpbv1.Checkpoint{
+					Target: &qrlpb.Checkpoint{
 						Epoch: s.Attestation_2.Data.Target.Epoch,
 						Root:  bytesutil.SafeCopyBytes(s.Attestation_2.Data.Target.Root),
 					},
@@ -413,24 +413,24 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 	}
 
 	sourceAttestations := v1alpha1Block.Body.Attestations
-	resultAttestations := make([]*qrlpbv1.Attestation, len(sourceAttestations))
+	resultAttestations := make([]*qrlpb.Attestation, len(sourceAttestations))
 	for i, a := range sourceAttestations {
 		signatures := make([][]byte, len(a.Signatures))
 		for i, sig := range a.Signatures {
 			signatures[i] = bytesutil.SafeCopyBytes(sig)
 		}
 
-		resultAttestations[i] = &qrlpbv1.Attestation{
+		resultAttestations[i] = &qrlpb.Attestation{
 			AggregationBits: bytesutil.SafeCopyBytes(a.AggregationBits),
-			Data: &qrlpbv1.AttestationData{
+			Data: &qrlpb.AttestationData{
 				Slot:            a.Data.Slot,
 				Index:           a.Data.CommitteeIndex,
 				BeaconBlockRoot: bytesutil.SafeCopyBytes(a.Data.BeaconBlockRoot),
-				Source: &qrlpbv1.Checkpoint{
+				Source: &qrlpb.Checkpoint{
 					Epoch: a.Data.Source.Epoch,
 					Root:  bytesutil.SafeCopyBytes(a.Data.Source.Root),
 				},
-				Target: &qrlpbv1.Checkpoint{
+				Target: &qrlpb.Checkpoint{
 					Epoch: a.Data.Target.Epoch,
 					Root:  bytesutil.SafeCopyBytes(a.Data.Target.Root),
 				},
@@ -440,11 +440,11 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 	}
 
 	sourceDeposits := v1alpha1Block.Body.Deposits
-	resultDeposits := make([]*qrlpbv1.Deposit, len(sourceDeposits))
+	resultDeposits := make([]*qrlpb.Deposit, len(sourceDeposits))
 	for i, d := range sourceDeposits {
-		resultDeposits[i] = &qrlpbv1.Deposit{
+		resultDeposits[i] = &qrlpb.Deposit{
 			Proof: bytesutil.SafeCopy2dBytes(d.Proof),
-			Data: &qrlpbv1.Deposit_Data{
+			Data: &qrlpb.Deposit_Data{
 				Pubkey:                bytesutil.SafeCopyBytes(d.Data.PublicKey),
 				WithdrawalCredentials: bytesutil.SafeCopyBytes(d.Data.WithdrawalCredentials),
 				Amount:                d.Data.Amount,
@@ -454,10 +454,10 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 	}
 
 	sourceExits := v1alpha1Block.Body.VoluntaryExits
-	resultExits := make([]*qrlpbv1.SignedVoluntaryExit, len(sourceExits))
+	resultExits := make([]*qrlpb.SignedVoluntaryExit, len(sourceExits))
 	for i, e := range sourceExits {
-		resultExits[i] = &qrlpbv1.SignedVoluntaryExit{
-			Message: &qrlpbv1.VoluntaryExit{
+		resultExits[i] = &qrlpb.SignedVoluntaryExit{
+			Message: &qrlpb.VoluntaryExit{
 				Epoch:          e.Exit.Epoch,
 				ValidatorIndex: e.Exit.ValidatorIndex,
 			},
@@ -475,10 +475,10 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 		return nil, errors.Wrapf(err, "could not calculate transactions root")
 	}
 
-	changes := make([]*qrlpbv1.SignedDilithiumToExecutionChange, len(v1alpha1Block.Body.DilithiumToExecutionChanges))
+	changes := make([]*qrlpb.SignedDilithiumToExecutionChange, len(v1alpha1Block.Body.DilithiumToExecutionChanges))
 	for i, change := range v1alpha1Block.Body.DilithiumToExecutionChanges {
-		changes[i] = &qrlpbv1.SignedDilithiumToExecutionChange{
-			Message: &qrlpbv1.DilithiumToExecutionChange{
+		changes[i] = &qrlpb.SignedDilithiumToExecutionChange{
+			Message: &qrlpb.DilithiumToExecutionChange{
 				ValidatorIndex:      change.Message.ValidatorIndex,
 				FromDilithiumPubkey: bytesutil.SafeCopyBytes(change.Message.FromDilithiumPubkey),
 				ToExecutionAddress:  bytesutil.SafeCopyBytes(change.Message.ToExecutionAddress),
@@ -492,9 +492,9 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 		syncSigs[i] = bytesutil.SafeCopyBytes(sig)
 	}
 
-	resultBlockBody := &qrlpbv1.BlindedBeaconBlockBodyCapella{
+	resultBlockBody := &qrlpb.BlindedBeaconBlockBodyCapella{
 		RandaoReveal: bytesutil.SafeCopyBytes(v1alpha1Block.Body.RandaoReveal),
-		ExecutionNodeData: &qrlpbv1.ExecutionNodeData{
+		ExecutionNodeData: &qrlpb.ExecutionNodeData{
 			DepositRoot:  bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionNodeData.DepositRoot),
 			DepositCount: v1alpha1Block.Body.ExecutionNodeData.DepositCount,
 			BlockHash:    bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionNodeData.BlockHash),
@@ -505,7 +505,7 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 		Attestations:      resultAttestations,
 		Deposits:          resultDeposits,
 		VoluntaryExits:    resultExits,
-		SyncAggregate: &qrlpbv1.SyncAggregate{
+		SyncAggregate: &qrlpb.SyncAggregate{
 			SyncCommitteeBits:       bytesutil.SafeCopyBytes(v1alpha1Block.Body.SyncAggregate.SyncCommitteeBits),
 			SyncCommitteeSignatures: syncSigs,
 		},
@@ -528,7 +528,7 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 		},
 		DilithiumToExecutionChanges: changes,
 	}
-	v1Block := &qrlpbv1.BlindedBeaconBlockCapella{
+	v1Block := &qrlpb.BlindedBeaconBlockCapella{
 		Slot:          v1alpha1Block.Slot,
 		ProposerIndex: v1alpha1Block.ProposerIndex,
 		ParentRoot:    bytesutil.SafeCopyBytes(v1alpha1Block.ParentRoot),
@@ -539,7 +539,7 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 }
 
 // BeaconStateCapellaToProto converts a state.BeaconState object to its protobuf equivalent.
-func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpbv1.BeaconStateCapella, error) {
+func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpb.BeaconStateCapella, error) {
 	sourceFork := st.Fork()
 	sourceLatestBlockHeader := st.LatestBlockHeader()
 	sourceExecutionNodeData := st.ExecutionNodeData()
@@ -550,17 +550,17 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpbv1.BeaconStateCapell
 	sourceCurrJustifiedCheckpoint := st.CurrentJustifiedCheckpoint()
 	sourceFinalizedCheckpoint := st.FinalizedCheckpoint()
 
-	resultExecutionNodeDataVotes := make([]*qrlpbv1.ExecutionNodeData, len(sourceExecutionNodeDataVotes))
+	resultExecutionNodeDataVotes := make([]*qrlpb.ExecutionNodeData, len(sourceExecutionNodeDataVotes))
 	for i, vote := range sourceExecutionNodeDataVotes {
-		resultExecutionNodeDataVotes[i] = &qrlpbv1.ExecutionNodeData{
+		resultExecutionNodeDataVotes[i] = &qrlpb.ExecutionNodeData{
 			DepositRoot:  bytesutil.SafeCopyBytes(vote.DepositRoot),
 			DepositCount: vote.DepositCount,
 			BlockHash:    bytesutil.SafeCopyBytes(vote.BlockHash),
 		}
 	}
-	resultValidators := make([]*qrlpbv1.Validator, len(sourceValidators))
+	resultValidators := make([]*qrlpb.Validator, len(sourceValidators))
 	for i, validator := range sourceValidators {
-		resultValidators[i] = &qrlpbv1.Validator{
+		resultValidators[i] = &qrlpb.Validator{
 			Pubkey:                     bytesutil.SafeCopyBytes(validator.PublicKey),
 			WithdrawalCredentials:      bytesutil.SafeCopyBytes(validator.WithdrawalCredentials),
 			EffectiveBalance:           validator.EffectiveBalance,
@@ -612,9 +612,9 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpbv1.BeaconStateCapell
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get historical summaries")
 	}
-	sourceHistoricalSummaries := make([]*qrlpbv1.HistoricalSummary, len(summaries))
+	sourceHistoricalSummaries := make([]*qrlpb.HistoricalSummary, len(summaries))
 	for i, summary := range summaries {
-		sourceHistoricalSummaries[i] = &qrlpbv1.HistoricalSummary{
+		sourceHistoricalSummaries[i] = &qrlpb.HistoricalSummary{
 			BlockSummaryRoot: summary.BlockSummaryRoot,
 			StateSummaryRoot: summary.StateSummaryRoot,
 		}
@@ -624,16 +624,16 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpbv1.BeaconStateCapell
 		return nil, errors.Wrap(err, "could not get historical roots")
 	}
 
-	result := &qrlpbv1.BeaconStateCapella{
+	result := &qrlpb.BeaconStateCapella{
 		GenesisTime:           st.GenesisTime(),
 		GenesisValidatorsRoot: bytesutil.SafeCopyBytes(st.GenesisValidatorsRoot()),
 		Slot:                  st.Slot(),
-		Fork: &qrlpbv1.Fork{
+		Fork: &qrlpb.Fork{
 			PreviousVersion: bytesutil.SafeCopyBytes(sourceFork.PreviousVersion),
 			CurrentVersion:  bytesutil.SafeCopyBytes(sourceFork.CurrentVersion),
 			Epoch:           sourceFork.Epoch,
 		},
-		LatestBlockHeader: &qrlpbv1.BeaconBlockHeader{
+		LatestBlockHeader: &qrlpb.BeaconBlockHeader{
 			Slot:          sourceLatestBlockHeader.Slot,
 			ProposerIndex: sourceLatestBlockHeader.ProposerIndex,
 			ParentRoot:    bytesutil.SafeCopyBytes(sourceLatestBlockHeader.ParentRoot),
@@ -642,7 +642,7 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpbv1.BeaconStateCapell
 		},
 		BlockRoots: bytesutil.SafeCopy2dBytes(st.BlockRoots()),
 		StateRoots: bytesutil.SafeCopy2dBytes(st.StateRoots()),
-		ExecutionNodeData: &qrlpbv1.ExecutionNodeData{
+		ExecutionNodeData: &qrlpb.ExecutionNodeData{
 			DepositRoot:  bytesutil.SafeCopyBytes(sourceExecutionNodeData.DepositRoot),
 			DepositCount: sourceExecutionNodeData.DepositCount,
 			BlockHash:    bytesutil.SafeCopyBytes(sourceExecutionNodeData.BlockHash),
@@ -656,23 +656,23 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpbv1.BeaconStateCapell
 		PreviousEpochParticipation: bytesutil.SafeCopyBytes(sourcePrevEpochParticipation),
 		CurrentEpochParticipation:  bytesutil.SafeCopyBytes(sourceCurrEpochParticipation),
 		JustificationBits:          bytesutil.SafeCopyBytes(sourceJustificationBits),
-		PreviousJustifiedCheckpoint: &qrlpbv1.Checkpoint{
+		PreviousJustifiedCheckpoint: &qrlpb.Checkpoint{
 			Epoch: sourcePrevJustifiedCheckpoint.Epoch,
 			Root:  bytesutil.SafeCopyBytes(sourcePrevJustifiedCheckpoint.Root),
 		},
-		CurrentJustifiedCheckpoint: &qrlpbv1.Checkpoint{
+		CurrentJustifiedCheckpoint: &qrlpb.Checkpoint{
 			Epoch: sourceCurrJustifiedCheckpoint.Epoch,
 			Root:  bytesutil.SafeCopyBytes(sourceCurrJustifiedCheckpoint.Root),
 		},
-		FinalizedCheckpoint: &qrlpbv1.Checkpoint{
+		FinalizedCheckpoint: &qrlpb.Checkpoint{
 			Epoch: sourceFinalizedCheckpoint.Epoch,
 			Root:  bytesutil.SafeCopyBytes(sourceFinalizedCheckpoint.Root),
 		},
 		InactivityScores: sourceInactivityScores,
-		CurrentSyncCommittee: &qrlpbv1.SyncCommittee{
+		CurrentSyncCommittee: &qrlpb.SyncCommittee{
 			Pubkeys: bytesutil.SafeCopy2dBytes(sourceCurrSyncCommittee.Pubkeys),
 		},
-		NextSyncCommittee: &qrlpbv1.SyncCommittee{
+		NextSyncCommittee: &qrlpb.SyncCommittee{
 			Pubkeys: bytesutil.SafeCopy2dBytes(sourceNextSyncCommittee.Pubkeys),
 		},
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
@@ -702,11 +702,11 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpbv1.BeaconStateCapell
 }
 
 // V1Alpha1SignedContributionAndProofToV1 converts a v1alpha1 SignedContributionAndProof object to its v1 equivalent.
-func V1Alpha1SignedContributionAndProofToV1(alphaContribution *qrysmpb.SignedContributionAndProof) *qrlpbv1.SignedContributionAndProof {
-	result := &qrlpbv1.SignedContributionAndProof{
-		Message: &qrlpbv1.ContributionAndProof{
+func V1Alpha1SignedContributionAndProofToV1(alphaContribution *qrysmpb.SignedContributionAndProof) *qrlpb.SignedContributionAndProof {
+	result := &qrlpb.SignedContributionAndProof{
+		Message: &qrlpb.ContributionAndProof{
 			AggregatorIndex: alphaContribution.Message.AggregatorIndex,
-			Contribution: &qrlpbv1.SyncCommitteeContribution{
+			Contribution: &qrlpb.SyncCommitteeContribution{
 				Slot:              alphaContribution.Message.Contribution.Slot,
 				BeaconBlockRoot:   alphaContribution.Message.Contribution.BlockRoot,
 				SubcommitteeIndex: alphaContribution.Message.Contribution.SubcommitteeIndex,
@@ -721,7 +721,7 @@ func V1Alpha1SignedContributionAndProofToV1(alphaContribution *qrysmpb.SignedCon
 }
 
 // V1SignedDilithiumToExecutionChangeToV1Alpha1 converts a V1 SignedDilithiumToExecutionChange to its v1alpha1 equivalent.
-func V1SignedDilithiumToExecutionChangeToV1Alpha1(change *qrlpbv1.SignedDilithiumToExecutionChange) *qrysmpb.SignedDilithiumToExecutionChange {
+func V1SignedDilithiumToExecutionChangeToV1Alpha1(change *qrlpb.SignedDilithiumToExecutionChange) *qrysmpb.SignedDilithiumToExecutionChange {
 	return &qrysmpb.SignedDilithiumToExecutionChange{
 		Message: &qrysmpb.DilithiumToExecutionChange{
 			ValidatorIndex:      change.Message.ValidatorIndex,
@@ -733,9 +733,9 @@ func V1SignedDilithiumToExecutionChangeToV1Alpha1(change *qrlpbv1.SignedDilithiu
 }
 
 // V1Alpha1SignedDilithiumToExecChangeToV1 converts a v1alpha1 SignedDilithiumToExecutionChange object to its v1 equivalent.
-func V1Alpha1SignedDilithiumToExecChangeToV1(alphaChange *qrysmpb.SignedDilithiumToExecutionChange) *qrlpbv1.SignedDilithiumToExecutionChange {
-	result := &qrlpbv1.SignedDilithiumToExecutionChange{
-		Message: &qrlpbv1.DilithiumToExecutionChange{
+func V1Alpha1SignedDilithiumToExecChangeToV1(alphaChange *qrysmpb.SignedDilithiumToExecutionChange) *qrlpb.SignedDilithiumToExecutionChange {
+	result := &qrlpb.SignedDilithiumToExecutionChange{
+		Message: &qrlpb.DilithiumToExecutionChange{
 			ValidatorIndex:      alphaChange.Message.ValidatorIndex,
 			FromDilithiumPubkey: bytesutil.SafeCopyBytes(alphaChange.Message.FromDilithiumPubkey),
 			ToExecutionAddress:  bytesutil.SafeCopyBytes(alphaChange.Message.ToExecutionAddress),

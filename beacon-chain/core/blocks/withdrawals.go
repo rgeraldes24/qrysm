@@ -76,7 +76,7 @@ func processDilithiumToExecutionChange(st state.BeaconState, signed *qrysmpb.Sig
 
 	message := signed.Message
 	newCredentials := make([]byte, executionToDilithiumPadding)
-	newCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+	newCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 	val.WithdrawalCredentials = append(newCredentials, message.ToExecutionAddress...)
 	err = st.UpdateValidatorAtIndex(message.ValidatorIndex, val)
 	return st, err

@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/network/forks"
-	qrysmpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,19 +18,19 @@ import (
 )
 
 // GetForkSchedule retrieve all scheduled upcoming forks this node is aware of.
-func (_ *Server) GetForkSchedule(ctx context.Context, _ *emptypb.Empty) (*qrysmpb.ForkScheduleResponse, error) {
+func (_ *Server) GetForkSchedule(ctx context.Context, _ *emptypb.Empty) (*qrlpb.ForkScheduleResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.GetForkSchedule")
 	defer span.End()
 
 	schedule := params.BeaconConfig().ForkVersionSchedule
 	if len(schedule) == 0 {
-		return &qrysmpb.ForkScheduleResponse{
-			Data: make([]*qrysmpb.Fork, 0),
+		return &qrlpb.ForkScheduleResponse{
+			Data: make([]*qrlpb.Fork, 0),
 		}, nil
 	}
 
 	versions := forks.SortedForkVersions(schedule)
-	chainForks := make([]*qrysmpb.Fork, len(schedule))
+	chainForks := make([]*qrlpb.Fork, len(schedule))
 	var previous, current []byte
 	for i, v := range versions {
 		if i == 0 {
@@ -40,14 +40,14 @@ func (_ *Server) GetForkSchedule(ctx context.Context, _ *emptypb.Empty) (*qrysmp
 		}
 		copyV := v
 		current = copyV[:]
-		chainForks[i] = &qrysmpb.Fork{
+		chainForks[i] = &qrlpb.Fork{
 			PreviousVersion: previous,
 			CurrentVersion:  current,
 			Epoch:           schedule[v],
 		}
 	}
 
-	return &qrysmpb.ForkScheduleResponse{
+	return &qrlpb.ForkScheduleResponse{
 		Data: chainForks,
 	}, nil
 }
@@ -56,7 +56,7 @@ func (_ *Server) GetForkSchedule(ctx context.Context, _ *emptypb.Empty) (*qrysmp
 // Values are returned with following format:
 // - any value starting with 0x in the spec is returned as a hex string.
 // - all other values are returned as number.
-func (_ *Server) GetSpec(ctx context.Context, _ *emptypb.Empty) (*qrysmpb.SpecResponse, error) {
+func (_ *Server) GetSpec(ctx context.Context, _ *emptypb.Empty) (*qrlpb.SpecResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "beacon.GetSpec")
 	defer span.End()
 
@@ -64,7 +64,7 @@ func (_ *Server) GetSpec(ctx context.Context, _ *emptypb.Empty) (*qrysmpb.SpecRe
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to prepare spec data: %v", err)
 	}
-	return &qrysmpb.SpecResponse{Data: data}, nil
+	return &qrlpb.SpecResponse{Data: data}, nil
 }
 
 func prepareConfigSpec() (map[string]string, error) {

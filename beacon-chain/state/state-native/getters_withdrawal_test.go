@@ -34,7 +34,7 @@ func TestHasETH1WithdrawalCredentials(t *testing.T) {
 	creds := []byte{0xFA, 0xCC}
 	v := &qrysmpb.Validator{WithdrawalCredentials: creds}
 	require.Equal(t, false, hasETH1WithdrawalCredential(v))
-	creds = []byte{params.BeaconConfig().ZondAddressWithdrawalPrefixByte, 0xCC}
+	creds = []byte{params.BeaconConfig().QRLAddressWithdrawalPrefixByte, 0xCC}
 	v = &qrysmpb.Validator{WithdrawalCredentials: creds}
 	require.Equal(t, true, hasETH1WithdrawalCredential(v))
 	// No Withdrawal cred
@@ -51,14 +51,14 @@ func TestIsFullyWithdrawableValidator(t *testing.T) {
 	}
 	require.Equal(t, false, isFullyWithdrawableValidator(v, 3))
 	// Wrong withdrawable epoch
-	creds = []byte{params.BeaconConfig().ZondAddressWithdrawalPrefixByte, 0xCC}
+	creds = []byte{params.BeaconConfig().QRLAddressWithdrawalPrefixByte, 0xCC}
 	v = &qrysmpb.Validator{
 		WithdrawalCredentials: creds,
 		WithdrawableEpoch:     2,
 	}
 	require.Equal(t, false, isFullyWithdrawableValidator(v, 1))
 	// Fully withdrawable
-	creds = []byte{params.BeaconConfig().ZondAddressWithdrawalPrefixByte, 0xCC}
+	creds = []byte{params.BeaconConfig().QRLAddressWithdrawalPrefixByte, 0xCC}
 	v = &qrysmpb.Validator{
 		WithdrawalCredentials: creds,
 		WithdrawableEpoch:     2,
@@ -80,7 +80,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 				WithdrawableEpoch:     primitives.Epoch(1),
 			}
-			val.WithdrawalCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+			val.WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 			s.validators[i] = val
 		}
 		expected, err := s.ExpectedWithdrawals()
@@ -101,7 +101,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 				WithdrawableEpoch:     primitives.Epoch(1),
 			}
-			val.WithdrawalCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+			val.WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 			s.validators[i] = val
 		}
 		s.validators[3].WithdrawableEpoch = primitives.Epoch(0)
@@ -129,7 +129,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 				WithdrawableEpoch:     primitives.Epoch(1),
 			}
-			val.WithdrawalCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+			val.WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 			s.validators[i] = val
 		}
 		s.balances[3] += params.BeaconConfig().MinDepositAmount
@@ -157,7 +157,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 				WithdrawableEpoch:     primitives.Epoch(1),
 			}
-			val.WithdrawalCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+			val.WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 			val.WithdrawalCredentials[31] = byte(i)
 			s.validators[i] = val
 		}
@@ -195,7 +195,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 				WithdrawableEpoch:     primitives.Epoch(1),
 			}
-			val.WithdrawalCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+			val.WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 			s.validators[i] = val
 		}
 		expected, err := s.ExpectedWithdrawals()
@@ -222,7 +222,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 				WithdrawableEpoch:     primitives.Epoch(0),
 			}
-			val.WithdrawalCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+			val.WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 			s.validators[i] = val
 		}
 		expected, err := s.ExpectedWithdrawals()
@@ -249,7 +249,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 				WithdrawableEpoch:     primitives.Epoch(0),
 			}
-			val.WithdrawalCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+			val.WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 			s.validators[i] = val
 		}
 		expected, err := s.ExpectedWithdrawals()
@@ -277,7 +277,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 				WithdrawableEpoch:     primitives.Epoch(1),
 			}
-			val.WithdrawalCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+			val.WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 			s.validators[i] = val
 		}
 		s.validators[3].WithdrawableEpoch = primitives.Epoch(0)
@@ -299,7 +299,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 				WithdrawableEpoch:     primitives.Epoch(1),
 			}
-			val.WithdrawalCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+			val.WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 			s.validators[i] = val
 		}
 		s.balances[3] += params.BeaconConfig().MinDepositAmount

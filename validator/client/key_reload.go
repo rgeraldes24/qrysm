@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
 )
 
@@ -19,7 +19,7 @@ func (v *validator) HandleKeyReload(ctx context.Context, currentKeys [][field_pa
 	for i := range currentKeys {
 		statusRequestKeys[i] = currentKeys[i][:]
 	}
-	resp, err := v.validatorClient.MultipleValidatorStatus(ctx, &zond.MultipleValidatorStatusRequest{
+	resp, err := v.validatorClient.MultipleValidatorStatus(ctx, &qrysmpb.MultipleValidatorStatusRequest{
 		PublicKeys: statusRequestKeys,
 	})
 	if err != nil {
@@ -33,7 +33,7 @@ func (v *validator) HandleKeyReload(ctx context.Context, currentKeys [][field_pa
 			index:     resp.Indices[i],
 		}
 	}
-	vals, err := v.beaconClient.ListValidators(ctx, &zond.ListValidatorsRequest{Active: true, PageSize: 0})
+	vals, err := v.beaconClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{Active: true, PageSize: 0})
 	if err != nil {
 		return false, errors.Wrap(err, "could not get active validator count")
 	}

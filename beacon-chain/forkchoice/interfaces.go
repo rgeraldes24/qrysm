@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 )
 
 // BalancesByRooter is a handler to obtain the effective balances of the state
@@ -62,7 +62,7 @@ type Getter interface {
 	NodeCount() int
 	HighestReceivedBlockSlot() primitives.Slot
 	ReceivedBlocksLastEpoch() (uint64, error)
-	ForkChoiceDump(context.Context) (*v1.ForkChoiceDump, error)
+	ForkChoiceDump(context.Context) (*qrlpb.ForkChoiceDump, error)
 	Weight(root [32]byte) (uint64, error)
 	Tips() ([][32]byte, []primitives.Slot)
 	IsOptimistic(root [32]byte) (bool, error)

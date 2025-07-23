@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	qrlpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -138,8 +138,8 @@ func Test_V1Alpha1ExitToV1(t *testing.T) {
 }
 
 func Test_V1ExitToV1Alpha1(t *testing.T) {
-	v1Exit := &qrlpbv1.SignedVoluntaryExit{
-		Message: &qrlpbv1.VoluntaryExit{
+	v1Exit := &qrlpb.SignedVoluntaryExit{
+		Message: &qrlpb.VoluntaryExit{
 			Epoch:          epoch,
 			ValidatorIndex: validatorIndex,
 		},
@@ -155,24 +155,24 @@ func Test_V1ExitToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1AttSlashingToV1Alpha1(t *testing.T) {
-	v1Attestation := &qrlpbv1.IndexedAttestation{
+	v1Attestation := &qrlpb.IndexedAttestation{
 		AttestingIndices: attestingIndices,
-		Data: &qrlpbv1.AttestationData{
+		Data: &qrlpb.AttestationData{
 			Slot:            slot,
 			Index:           committeeIndex,
 			BeaconBlockRoot: beaconBlockRoot,
-			Source: &qrlpbv1.Checkpoint{
+			Source: &qrlpb.Checkpoint{
 				Epoch: epoch,
 				Root:  sourceRoot,
 			},
-			Target: &qrlpbv1.Checkpoint{
+			Target: &qrlpb.Checkpoint{
 				Epoch: epoch,
 				Root:  targetRoot,
 			},
 		},
 		Signatures: [][]byte{signature},
 	}
-	v1Slashing := &qrlpbv1.AttesterSlashing{
+	v1Slashing := &qrlpb.AttesterSlashing{
 		Attestation_1: v1Attestation,
 		Attestation_2: v1Attestation,
 	}
@@ -186,8 +186,8 @@ func Test_V1AttSlashingToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1ProposerSlashingToV1Alpha1(t *testing.T) {
-	v1Header := &qrlpbv1.SignedBeaconBlockHeader{
-		Message: &qrlpbv1.BeaconBlockHeader{
+	v1Header := &qrlpb.SignedBeaconBlockHeader{
+		Message: &qrlpb.BeaconBlockHeader{
 			Slot:          slot,
 			ProposerIndex: validatorIndex,
 			ParentRoot:    parentRoot,
@@ -196,7 +196,7 @@ func Test_V1ProposerSlashingToV1Alpha1(t *testing.T) {
 		},
 		Signature: signature,
 	}
-	v1Slashing := &qrlpbv1.ProposerSlashing{
+	v1Slashing := &qrlpb.ProposerSlashing{
 		SignedHeader_1: v1Header,
 		SignedHeader_2: v1Header,
 	}
@@ -237,17 +237,17 @@ func Test_V1Alpha1AttToV1(t *testing.T) {
 }
 
 func Test_V1AttToV1Alpha1(t *testing.T) {
-	v1Att := &qrlpbv1.Attestation{
+	v1Att := &qrlpb.Attestation{
 		AggregationBits: aggregationBits,
-		Data: &qrlpbv1.AttestationData{
+		Data: &qrlpb.AttestationData{
 			Slot:            slot,
 			Index:           committeeIndex,
 			BeaconBlockRoot: beaconBlockRoot,
-			Source: &qrlpbv1.Checkpoint{
+			Source: &qrlpb.Checkpoint{
 				Epoch: epoch,
 				Root:  sourceRoot,
 			},
-			Target: &qrlpbv1.Checkpoint{
+			Target: &qrlpb.Checkpoint{
 				Epoch: epoch,
 				Root:  targetRoot,
 			},
@@ -288,7 +288,7 @@ func Test_V1Alpha1ValidatorToV1(t *testing.T) {
 }
 
 func Test_V1ValidatorToV1Alpha1(t *testing.T) {
-	v1Validator := &qrlpbv1.Validator{
+	v1Validator := &qrlpb.Validator{
 		Pubkey:                     []byte("pubkey"),
 		WithdrawalCredentials:      []byte("withdraw"),
 		EffectiveBalance:           99,
@@ -312,10 +312,10 @@ func Test_V1ValidatorToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1SignedAggregateAttAndProofToV1Alpha1(t *testing.T) {
-	v1Att := &qrlpbv1.SignedAggregateAttestationAndProof{
-		Message: &qrlpbv1.AggregateAttestationAndProof{
+	v1Att := &qrlpb.SignedAggregateAttestationAndProof{
+		Message: &qrlpb.AggregateAttestationAndProof{
 			AggregatorIndex: 1,
-			Aggregate:       util.HydrateV1Attestation(&qrlpbv1.Attestation{}),
+			Aggregate:       util.HydrateV1Attestation(&qrlpb.Attestation{}),
 			SelectionProof:  selectionProof,
 		},
 		Signature: signature,
@@ -330,7 +330,7 @@ func Test_V1SignedAggregateAttAndProofToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1AttestationToV1Alpha1(t *testing.T) {
-	v1Att := util.HydrateV1Attestation(&qrlpbv1.Attestation{})
+	v1Att := util.HydrateV1Attestation(&qrlpb.Attestation{})
 	v1Alpha1Att := V1AttToV1Alpha1(v1Att)
 
 	v1Root, err := v1Att.HashTreeRoot()

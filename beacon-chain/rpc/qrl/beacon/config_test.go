@@ -48,7 +48,7 @@ func TestGetSpec(t *testing.T) {
 	config.EffectiveBalanceIncrement = 23
 	config.GenesisForkVersion = []byte("GenesisForkVersion")
 	config.DilithiumWithdrawalPrefixByte = byte('b')
-	config.ZondAddressWithdrawalPrefixByte = byte('c')
+	config.QRLAddressWithdrawalPrefixByte = byte('c')
 	config.GenesisDelay = 24
 	config.SecondsPerSlot = 25
 	config.MinAttestationInclusionDelay = 26
@@ -185,7 +185,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "0x"+hex.EncodeToString([]byte("GenesisForkVersion")), v)
 		case "DILITHIUM_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x62", v)
-		case "ZOND_ADDRESS_WITHDRAWAL_PREFIX":
+		case "QRL_ADDRESS_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x63", v)
 		case "GENESIS_DELAY":
 			assert.Equal(t, "24", v)

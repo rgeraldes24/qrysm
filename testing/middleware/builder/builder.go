@@ -34,7 +34,7 @@ import (
 	"github.com/theQRL/qrysm/network"
 	"github.com/theQRL/qrysm/network/authorization"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 const (
@@ -88,7 +88,7 @@ type Builder struct {
 	currId       *v1.PayloadIDBytes
 	currPayload  interfaces.ExecutionData
 	mux          *gMux.Router
-	validatorMap map[string]*zond.ValidatorRegistrationV1
+	validatorMap map[string]*qrysmpb.ValidatorRegistrationV1
 	srv          *http.Server
 }
 
@@ -134,7 +134,7 @@ func New(opts ...Option) (*Builder, error) {
 	p.address = addr
 	p.srv = srv
 	p.execClient = execClient
-	p.validatorMap = map[string]*zond.ValidatorRegistrationV1{}
+	p.validatorMap = map[string]*qrysmpb.ValidatorRegistrationV1{}
 	p.mux = router
 	return p, nil
 }
@@ -304,7 +304,7 @@ func (p *Builder) handleHeaderRequestCapella(w http.ResponseWriter) {
 		Value:  val,
 		Pubkey: secKey.PublicKey().Marshal(),
 	}
-	sszBid := &zond.BuilderBidCapella{
+	sszBid := &qrysmpb.BuilderBidCapella{
 		Header: hdr,
 		Value:  val.SSZBytes(),
 		Pubkey: secKey.PublicKey().Marshal(),
@@ -437,7 +437,7 @@ func parseRequestBytes(req *http.Request) ([]byte, error) {
 	return requestBytes, nil
 }
 
-// Checks whether the JSON-RPC request is for the Zond engine API.
+// Checks whether the JSON-RPC request is for the QRL engine API.
 func isEngineAPICall(reqBytes []byte) bool {
 	jsonRequest, err := unmarshalRPCObject(reqBytes)
 	if err != nil {

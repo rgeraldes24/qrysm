@@ -137,8 +137,8 @@ func logHead(endpt string, head *pb.ChainHead) {
 func logParticipation(endpt string, p *pb.ValidatorParticipation) {
 	log.WithFields(
 		logrus.Fields{
-			"VotedZond":        p.VotedZond,
-			"TotalZond":        p.EligibleZond,
+			"VotedQuanta":        p.VotedQuanta,
+			"TotalQuanta":        p.EligibleQuanta,
 			"ParticipationRate": p.GlobalParticipationRate,
 		}).Info("Participation rate from beacon node ", endpt)
 }

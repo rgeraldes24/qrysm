@@ -65,7 +65,7 @@ service BeaconChain {
     // yet processed. Pool attestations eventually expire as the slot
     // advances, so an attestation missing from this request does not imply
     // that it was included in a block. The attestation may have expired.
-    // Refer to the Zond Beacon Chain specification for more details on how
+    // Refer to the QRL Beacon Chain specification for more details on how
     // attestations are processed and when they are no longer valid.
     // https://github.com/ethereum/consensus-specs/blob/dev/specs/core/0_beacon-chain.md#attestations
     rpc AttestationPool(AttestationPoolRequest) returns (AttestationPoolResponse) {
@@ -519,7 +519,7 @@ message GetValidatorRequest {
 message Validators {
     // Epoch which the state was considered to determine the active validator
     // set. This field is not optional. Zero value epoch indicates the validator
-    // set is from the Zond proof of stake genesis set.
+    // set is from the QRL proof of stake genesis set.
     uint64 epoch = 1 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Epoch"];
 
     message ValidatorContainer {

@@ -1,4 +1,4 @@
-// Package rpc defines a gRPC server implementing the Zond consensus API as needed
+// Package rpc defines a gRPC server implementing the QRL consensus API as needed
 // by validator clients and consumers of chain data.
 package rpc
 
@@ -329,7 +329,7 @@ func (s *Service) Start() {
 		BeaconMonitoringHost: s.cfg.BeaconMonitoringHost,
 		BeaconMonitoringPort: s.cfg.BeaconMonitoringPort,
 	}
-	nodeServerZond := &node.Server{
+	nodeServerQRL := &node.Server{
 		BeaconDB:                  s.cfg.BeaconDB,
 		Server:                    s.grpcServer,
 		SyncChecker:               s.cfg.SyncService,
@@ -342,7 +342,7 @@ func (s *Service) Start() {
 		ExecutionChainInfoFetcher: s.cfg.ExecutionChainInfoFetcher,
 	}
 
-	s.cfg.Router.HandleFunc("/qrl/v1/node/syncing", nodeServerZond.GetSyncStatus).Methods(http.MethodGet)
+	s.cfg.Router.HandleFunc("/qrl/v1/node/syncing", nodeServerQRL.GetSyncStatus).Methods(http.MethodGet)
 
 	nodeServerQrysm := &nodeqrysm.Server{
 		BeaconDB:                  s.cfg.BeaconDB,
@@ -443,7 +443,7 @@ func (s *Service) Start() {
 	s.cfg.Router.HandleFunc("/qrl/v1/beacon/states/{state_id}/validator_balances", beaconChainServerV1.GetValidatorBalances).Methods(http.MethodGet)
 
 	qrysmpb.RegisterNodeServer(s.grpcServer, nodeServer)
-	qrlpbservice.RegisterBeaconNodeServer(s.grpcServer, nodeServerZond)
+	qrlpbservice.RegisterBeaconNodeServer(s.grpcServer, nodeServerQRL)
 	qrysmpb.RegisterBeaconChainServer(s.grpcServer, beaconChainServer)
 	qrlpbservice.RegisterBeaconChainServer(s.grpcServer, beaconChainServerV1)
 	qrlpbservice.RegisterEventsServer(s.grpcServer, &events.Server{

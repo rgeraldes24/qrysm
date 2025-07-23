@@ -11,5 +11,5 @@ go_test(
         "minimal",
         "spectest",
     ],
-    zond_network = "minimal",
+    qrl_network = "minimal",
 )

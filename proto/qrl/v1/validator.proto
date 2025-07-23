@@ -21,14 +21,14 @@ import "proto/qrl/ext/options.proto";
 import "proto/qrl/v1/beacon_block.proto";
 import "proto/qrl/v1/version.proto";
 
-option csharp_namespace = "TheQRL.Zond.V1";
+option csharp_namespace = "TheQRL.QRL.V1";
 option go_package = "github.com/theQRL/qrysm/proto/qrl/v1";
 option java_multiple_files = true;
 option java_outer_classname = "ValidatorProto";
 option java_package = "org.theqrl.qrl.v1";
-option php_namespace = "TheQRL\\Zond\\v1";
+option php_namespace = "TheQRL\\QRL\\v1";
 
-// A Zond validator.
+// A QRL validator.
 message Validator {
     // 2592 byte Dilithium public key used for the validator's activities.
     bytes pubkey = 1 [(theqrl.qrl.ext.ssz_size) = "2592", (theqrl.qrl.ext.spec_name) = "pubkey"];

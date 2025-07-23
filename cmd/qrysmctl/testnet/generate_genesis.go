@@ -28,20 +28,20 @@ import (
 
 var (
 	generateGenesisStateFlags = struct {
-		DepositJsonFile     string
-		ChainConfigFile     string
-		ConfigName          string
-		NumValidators       uint64
-		GenesisTime         uint64
-		GenesisTimeDelay    uint64
-		OutputSSZ           string
-		OutputJSON          string
-		OutputYaml          string
-		ForkName            string
-		OverrideZond1Data   bool
-		ExecutionEndpoint   string
-		GzondGenesisJsonIn  string
-		GzondGenesisJsonOut string
+		DepositJsonFile           string
+		ChainConfigFile           string
+		ConfigName                string
+		NumValidators             uint64
+		GenesisTime               uint64
+		GenesisTimeDelay          uint64
+		OutputSSZ                 string
+		OutputJSON                string
+		OutputYaml                string
+		ForkName                  string
+		OverrideExecutionNodeData bool
+		ExecutionEndpoint         string
+		GzondGenesisJsonIn        string
+		GzondGenesisJsonOut       string
 	}{}
 	log           = logrus.WithField("prefix", "genesis")
 	outputSSZFlag = &cli.StringFlag{
@@ -105,9 +105,9 @@ var (
 				Usage:       "Delay genesis time by N seconds",
 			},
 			&cli.BoolFlag{
-				Name:        "override-zond1data",
-				Destination: &generateGenesisStateFlags.OverrideZond1Data,
-				Usage:       "Overrides Zond1Data with values from execution client. If unset, defaults to false",
+				Name:        "override-executionodedata",
+				Destination: &generateGenesisStateFlags.OverrideExecutionNodeData,
+				Usage:       "Overrides ExecutionNodeData with values from execution client. If unset, defaults to false",
 				Value:       false,
 			},
 			&cli.StringFlag{

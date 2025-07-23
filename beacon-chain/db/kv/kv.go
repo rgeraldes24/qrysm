@@ -82,7 +82,7 @@ var blockedBuckets = [][]byte{
 }
 
 // Store defines an implementation of the Qrysm Database interface
-// using BoltDB as the underlying persistent kv-store for Zond Beacon Nodes.
+// using BoltDB as the underlying persistent kv-store for QRL Beacon Nodes.
 type Store struct {
 	db                  *bolt.DB
 	databasePath        string

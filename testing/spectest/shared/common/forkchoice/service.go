@@ -107,7 +107,7 @@ func (m *engineMock) ExecutionBlockByHash(_ context.Context, hash common.Hash, _
 	}
 
 	return &pb.ExecutionBlock{
-		Header: zondtypes.Header{
+		Header: gzondtypes.Header{
 			ParentHash: common.BytesToHash(b.ParentHash),
 		},
 		Hash:            common.BytesToHash(b.BlockHash),

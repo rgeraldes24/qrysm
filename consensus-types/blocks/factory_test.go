@@ -8,7 +8,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -16,36 +16,36 @@ import (
 
 func Test_NewSignedBeaconBlock(t *testing.T) {
 	t.Run("GenericSignedBeaconBlock_Capella", func(t *testing.T) {
-		pb := &zond.GenericSignedBeaconBlock_Capella{
-			Capella: &zond.SignedBeaconBlockCapella{
-				Block: &zond.BeaconBlockCapella{
-					Body: &zond.BeaconBlockBodyCapella{}}}}
+		pb := &qrysmpb.GenericSignedBeaconBlock_Capella{
+			Capella: &qrysmpb.SignedBeaconBlockCapella{
+				Block: &qrysmpb.BeaconBlockCapella{
+					Body: &qrysmpb.BeaconBlockBodyCapella{}}}}
 		b, err := NewSignedBeaconBlock(pb)
 		require.NoError(t, err)
 		assert.Equal(t, version.Capella, b.Version())
 	})
 	t.Run("SignedBeaconBlockCapella", func(t *testing.T) {
-		pb := &zond.SignedBeaconBlockCapella{
-			Block: &zond.BeaconBlockCapella{
-				Body: &zond.BeaconBlockBodyCapella{}}}
+		pb := &qrysmpb.SignedBeaconBlockCapella{
+			Block: &qrysmpb.BeaconBlockCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{}}}
 		b, err := NewSignedBeaconBlock(pb)
 		require.NoError(t, err)
 		assert.Equal(t, version.Capella, b.Version())
 	})
 	t.Run("GenericSignedBeaconBlock_BlindedCapella", func(t *testing.T) {
-		pb := &zond.GenericSignedBeaconBlock_BlindedCapella{
-			BlindedCapella: &zond.SignedBlindedBeaconBlockCapella{
-				Block: &zond.BlindedBeaconBlockCapella{
-					Body: &zond.BlindedBeaconBlockBodyCapella{}}}}
+		pb := &qrysmpb.GenericSignedBeaconBlock_BlindedCapella{
+			BlindedCapella: &qrysmpb.SignedBlindedBeaconBlockCapella{
+				Block: &qrysmpb.BlindedBeaconBlockCapella{
+					Body: &qrysmpb.BlindedBeaconBlockBodyCapella{}}}}
 		b, err := NewSignedBeaconBlock(pb)
 		require.NoError(t, err)
 		assert.Equal(t, version.Capella, b.Version())
 		assert.Equal(t, true, b.IsBlinded())
 	})
 	t.Run("SignedBlindedBeaconBlockCapella", func(t *testing.T) {
-		pb := &zond.SignedBlindedBeaconBlockCapella{
-			Block: &zond.BlindedBeaconBlockCapella{
-				Body: &zond.BlindedBeaconBlockBodyCapella{}}}
+		pb := &qrysmpb.SignedBlindedBeaconBlockCapella{
+			Block: &qrysmpb.BlindedBeaconBlockCapella{
+				Body: &qrysmpb.BlindedBeaconBlockBodyCapella{}}}
 		b, err := NewSignedBeaconBlock(pb)
 		require.NoError(t, err)
 		assert.Equal(t, version.Capella, b.Version())
@@ -63,26 +63,26 @@ func Test_NewSignedBeaconBlock(t *testing.T) {
 
 func Test_NewBeaconBlock(t *testing.T) {
 	t.Run("GenericBeaconBlock_Capella", func(t *testing.T) {
-		pb := &zond.GenericBeaconBlock_Capella{Capella: &zond.BeaconBlockCapella{Body: &zond.BeaconBlockBodyCapella{}}}
+		pb := &qrysmpb.GenericBeaconBlock_Capella{Capella: &qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{}}}
 		b, err := NewBeaconBlock(pb)
 		require.NoError(t, err)
 		assert.Equal(t, version.Capella, b.Version())
 	})
 	t.Run("BeaconBlockCapella", func(t *testing.T) {
-		pb := &zond.BeaconBlockCapella{Body: &zond.BeaconBlockBodyCapella{}}
+		pb := &qrysmpb.BeaconBlockCapella{Body: &qrysmpb.BeaconBlockBodyCapella{}}
 		b, err := NewBeaconBlock(pb)
 		require.NoError(t, err)
 		assert.Equal(t, version.Capella, b.Version())
 	})
 	t.Run("GenericBeaconBlock_BlindedCapella", func(t *testing.T) {
-		pb := &zond.GenericBeaconBlock_BlindedCapella{BlindedCapella: &zond.BlindedBeaconBlockCapella{Body: &zond.BlindedBeaconBlockBodyCapella{}}}
+		pb := &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: &qrysmpb.BlindedBeaconBlockCapella{Body: &qrysmpb.BlindedBeaconBlockBodyCapella{}}}
 		b, err := NewBeaconBlock(pb)
 		require.NoError(t, err)
 		assert.Equal(t, version.Capella, b.Version())
 		assert.Equal(t, true, b.IsBlinded())
 	})
 	t.Run("BlindedBeaconBlockCapella", func(t *testing.T) {
-		pb := &zond.BlindedBeaconBlockCapella{Body: &zond.BlindedBeaconBlockBodyCapella{}}
+		pb := &qrysmpb.BlindedBeaconBlockCapella{Body: &qrysmpb.BlindedBeaconBlockBodyCapella{}}
 		b, err := NewBeaconBlock(pb)
 		require.NoError(t, err)
 		assert.Equal(t, version.Capella, b.Version())
@@ -100,7 +100,7 @@ func Test_NewBeaconBlock(t *testing.T) {
 
 func Test_NewBeaconBlockBody(t *testing.T) {
 	t.Run("BeaconBlockBodyCapella", func(t *testing.T) {
-		pb := &zond.BeaconBlockBodyCapella{}
+		pb := &qrysmpb.BeaconBlockBodyCapella{}
 		i, err := NewBeaconBlockBody(pb)
 		require.NoError(t, err)
 		b, ok := i.(*BeaconBlockBody)
@@ -108,7 +108,7 @@ func Test_NewBeaconBlockBody(t *testing.T) {
 		assert.Equal(t, version.Capella, b.version)
 	})
 	t.Run("BlindedBeaconBlockBodyCapella", func(t *testing.T) {
-		pb := &zond.BlindedBeaconBlockBodyCapella{}
+		pb := &qrysmpb.BlindedBeaconBlockBodyCapella{}
 		i, err := NewBeaconBlockBody(pb)
 		require.NoError(t, err)
 		b, ok := i.(*BeaconBlockBody)
@@ -153,9 +153,9 @@ func TestBuildSignedBeaconBlockFromExecutionPayload(t *testing.T) {
 	})
 
 	t.Run("not blinded payload", func(t *testing.T) {
-		capellaBlock := &zond.SignedBeaconBlockCapella{
-			Block: &zond.BeaconBlockCapella{
-				Body: &zond.BeaconBlockBodyCapella{}}}
+		capellaBlock := &qrysmpb.SignedBeaconBlockCapella{
+			Block: &qrysmpb.BeaconBlockCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{}}}
 		blk, err := NewSignedBeaconBlock(capellaBlock)
 		require.NoError(t, err)
 		_, err = BuildSignedBeaconBlockFromExecutionPayload(blk, nil)
@@ -178,9 +178,9 @@ func TestBuildSignedBeaconBlockFromExecutionPayload(t *testing.T) {
 		require.NoError(t, err)
 		header, err := PayloadToHeaderCapella(wrapped)
 		require.NoError(t, err)
-		blindedBlock := &zond.SignedBlindedBeaconBlockCapella{
-			Block: &zond.BlindedBeaconBlockCapella{
-				Body: &zond.BlindedBeaconBlockBodyCapella{}}}
+		blindedBlock := &qrysmpb.SignedBlindedBeaconBlockCapella{
+			Block: &qrysmpb.BlindedBeaconBlockCapella{
+				Body: &qrysmpb.BlindedBeaconBlockBodyCapella{}}}
 
 		// Modify the header.
 		header.GasUsed += 1
@@ -207,9 +207,9 @@ func TestBuildSignedBeaconBlockFromExecutionPayload(t *testing.T) {
 		require.NoError(t, err)
 		header, err := PayloadToHeaderCapella(wrapped)
 		require.NoError(t, err)
-		blindedBlock := &zond.SignedBlindedBeaconBlockCapella{
-			Block: &zond.BlindedBeaconBlockCapella{
-				Body: &zond.BlindedBeaconBlockBodyCapella{}}}
+		blindedBlock := &qrysmpb.SignedBlindedBeaconBlockCapella{
+			Block: &qrysmpb.BlindedBeaconBlockCapella{
+				Body: &qrysmpb.BlindedBeaconBlockBodyCapella{}}}
 		blindedBlock.Block.Body.ExecutionPayloadHeader = header
 
 		blk, err := NewSignedBeaconBlock(blindedBlock)

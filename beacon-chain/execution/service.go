@@ -72,7 +72,7 @@ type ChainStartFetcher interface {
 	ClearPreGenesisData()
 }
 
-// ChainInfoFetcher retrieves information about eth1 metadata at the Zond consensus genesis time.
+// ChainInfoFetcher retrieves information about eth1 metadata at the QRL consensus genesis time.
 type ChainInfoFetcher interface {
 	GenesisExecutionChainInfo() (uint64, *big.Int)
 	ExecutionClientConnected() bool
@@ -406,7 +406,7 @@ func (s *Service) batchRequestHeaders(startBlock, endBlock uint64) ([]*types.Hea
 	for i := startBlock; i <= endBlock; i++ {
 		header := &types.HeaderInfo{}
 		elems = append(elems, zondRPC.BatchElem{
-			Method: "zond_getBlockByNumber",
+			Method: "qrl_getBlockByNumber",
 			Args:   []interface{}{hexutil.EncodeBig(big.NewInt(0).SetUint64(i)), false},
 			Result: header,
 			Error:  error(nil),
@@ -437,7 +437,7 @@ func safelyHandlePanic() {
 	if r := recover(); r != nil {
 		log.WithFields(logrus.Fields{
 			"r": r,
-		}).Error("Panicked when handling data from Zond execution chain! Recovering...")
+		}).Error("Panicked when handling data from QRL execution chain! Recovering...")
 
 		debug.PrintStack()
 	}

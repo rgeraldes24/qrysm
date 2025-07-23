@@ -1,5 +1,5 @@
 // Package client represents a gRPC polling-based implementation
-// of a Zond validator client.
+// of a QRL validator client.
 package client
 
 import (
@@ -195,7 +195,7 @@ func recheckValidatingKeysBucket(ctx context.Context, valDB vdb.Database, km key
 }
 
 // WaitForChainStart checks whether the beacon node has started its runtime. That is,
-// it calls to the beacon node which then verifies the Zond deposit contract logs to check
+// it calls to the beacon node which then verifies the QRL deposit contract logs to check
 // for the ChainStart log to have been emitted. If so, it starts a ticker based on the ChainStart
 // unix timestamp which will be used to keep track of time within the validator client.
 func (v *validator) WaitForChainStart(ctx context.Context) error {
@@ -372,7 +372,7 @@ func (v *validator) checkAndLogValidatorStatus(statuses []*validatorStatus, acti
 		case qrysmpb.ValidatorStatus_EXITED:
 			log.Info("Validator exited")
 		case qrysmpb.ValidatorStatus_INVALID:
-			log.Warn("Invalid Zond deposit")
+			log.Warn("Invalid QRL deposit")
 		default:
 			log.WithFields(logrus.Fields{
 				"activationEpoch": status.status.ActivationEpoch,

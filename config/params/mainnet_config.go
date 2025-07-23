@@ -71,9 +71,9 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EffectiveBalanceIncrement: 1 * 1e9,
 
 	// Initial value constants.
-	DilithiumWithdrawalPrefixByte:   byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
-	ZondAddressWithdrawalPrefixByte: byte(1), // TODO (cyyber): Change it to 0
-	ZeroHash:                        [32]byte{},
+	DilithiumWithdrawalPrefixByte:  byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
+	QRLAddressWithdrawalPrefixByte: byte(1), // TODO (cyyber): Change it to 0
+	ZeroHash:                       [32]byte{},
 
 	// Time parameter constants.
 	MinAttestationInclusionDelay:     1,
@@ -96,7 +96,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	ReorgMaxEpochsSinceFinalization: 2,
 	IntervalsPerSlot:                3,
 
-	// Zond execution layer parameters.
+	// QRL execution layer parameters.
 	DepositChainID:         1, // Chain ID of qrl1 mainnet.
 	DepositNetworkID:       1, // Network ID of qrl11 mainnet.
 	DepositContractAddress: "Q00000000219ab540356cBB839Cbe05303d7705Fa",
@@ -150,7 +150,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	DomainDilithiumToExecutionChange:  bytesutil.Uint32ToBytes4(0x0A000000),
 
 	// Qrysm constants.
-	GplanckPerZond:               1000000000,
+	GplanckPerQuanta:             1000000000,
 	DefaultBufferSize:            10000,
 	WithdrawalPrivkeyFileName:    "/shardwithdrawalkey",
 	ValidatorPrivkeyFileName:     "/validatorprivatekey",

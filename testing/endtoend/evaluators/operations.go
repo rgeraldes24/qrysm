@@ -368,7 +368,7 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 	}
 	execIndices := []int{}
 	err = st.ReadFromEveryValidator(func(idx int, val state.ReadOnlyValidator) error {
-		if val.WithdrawalCredentials()[0] == params.BeaconConfig().ZondAddressWithdrawalPrefixByte {
+		if val.WithdrawalCredentials()[0] == params.BeaconConfig().QRLAddressWithdrawalPrefixByte {
 			execIndices = append(execIndices, idx)
 		}
 		return nil
@@ -579,7 +579,7 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 		if err != nil {
 			return err
 		}
-		if val.WithdrawalCredentials[0] == params.BeaconConfig().ZondAddressWithdrawalPrefixByte {
+		if val.WithdrawalCredentials[0] == params.BeaconConfig().QRLAddressWithdrawalPrefixByte {
 			continue
 		}
 		if !bytes.Equal(val.PublicKey, privKeys[idx].PublicKey().Marshal()) {
@@ -642,9 +642,9 @@ func validatorsAreWithdrawn(ec *e2etypes.EvaluationContext, conns ...*grpc.Clien
 		if err != nil {
 			return err
 		}
-		// Only return an error if the validator has more than 1 zond
+		// Only return an error if the validator has more than 1 quanta
 		// in its balance.
-		if bal > 1*params.BeaconConfig().GplanckPerZond {
+		if bal > 1*params.BeaconConfig().GplanckPerQuanta {
 			return errors.Errorf("Validator index %d with key %#x hasn't withdrawn. Their balance is %d.", valIdx, key, bal)
 		}
 	}

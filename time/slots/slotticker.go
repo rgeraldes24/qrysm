@@ -1,4 +1,4 @@
-// Package slots includes ticker and timer-related functions for Zond consensus.
+// Package slots includes ticker and timer-related functions for QRL consensus.
 package slots
 
 import (

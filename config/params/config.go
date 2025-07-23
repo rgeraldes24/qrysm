@@ -45,9 +45,9 @@ type BeaconChainConfig struct {
 	EffectiveBalanceIncrement uint64 `yaml:"EFFECTIVE_BALANCE_INCREMENT" spec:"true"` // EffectiveBalanceIncrement is used for converting the high balance into the low balance for validators.
 
 	// Initial value constants.
-	DilithiumWithdrawalPrefixByte   byte     `yaml:"DILITHIUM_WITHDRAWAL_PREFIX" spec:"true"`    // DilithiumWithdrawalPrefixByte is used for Dilithium withdrawal and it's the first byte.
-	ZondAddressWithdrawalPrefixByte byte     `yaml:"ZOND_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // ZondAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
-	ZeroHash                        [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
+	DilithiumWithdrawalPrefixByte  byte     `yaml:"DILITHIUM_WITHDRAWAL_PREFIX" spec:"true"`   // DilithiumWithdrawalPrefixByte is used for Dilithium withdrawal and it's the first byte.
+	QRLAddressWithdrawalPrefixByte byte     `yaml:"QRL_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // QRLAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
+	ZeroHash                       [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
 
 	// Time parameters constants.
 	GenesisDelay                         uint64           `yaml:"GENESIS_DELAY" spec:"true"`                   // GenesisDelay is the minimum number of seconds to delay starting the Ethereum Beacon Chain genesis. Must be at least 1 second.
@@ -73,7 +73,7 @@ type BeaconChainConfig struct {
 	ReorgMaxEpochsSinceFinalization primitives.Epoch `yaml:"REORG_MAX_EPOCHS_SINCE_FINALIZATION" spec:"true"` // This defines a limit to consider safe to orphan a block if the network is finalizing
 	IntervalsPerSlot                uint64           `yaml:"INTERVALS_PER_SLOT" spec:"true"`                  // IntervalsPerSlot defines the number of fork choice intervals in a slot defined in the fork choice spec.
 
-	// Zond execution layer parameters.
+	// QRL execution layer parameters.
 	DepositChainID         uint64 `yaml:"DEPOSIT_CHAIN_ID" spec:"true"`         // DepositChainID of the eth1 network. This used for replay protection.
 	DepositNetworkID       uint64 `yaml:"DEPOSIT_NETWORK_ID" spec:"true"`       // DepositNetworkID of the eth1 network. This used for replay protection.
 	DepositContractAddress string `yaml:"DEPOSIT_CONTRACT_ADDRESS" spec:"true"` // DepositContractAddress is the address of the deposit contract.
@@ -119,7 +119,7 @@ type BeaconChainConfig struct {
 	DomainDilithiumToExecutionChange  [4]byte // DomainDilithiumToExecutionChange defines the Dilithium signature domain to change withdrawal addresses to Zond prefix
 
 	// Qrysm constants.
-	GplanckPerZond               uint64                                     // GplanckPerZond is the amount of gplanck corresponding to 1 zond.
+	GplanckPerQuanta             uint64                                     // GplanckPerQuanta is the amount of gplanck corresponding to 1 quanta.
 	DefaultBufferSize            int                                        // DefaultBufferSize for channels across the Qrysm repository.
 	ValidatorPrivkeyFileName     string                                     // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
 	WithdrawalPrivkeyFileName    string                                     // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.

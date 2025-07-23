@@ -5,12 +5,12 @@ package theqrl.qrl.v1alpha1;
 import "proto/qrysm/v1alpha1/beacon_block.proto";
 import "proto/qrysm/v1alpha1/beacon_state.proto";
 
-option csharp_namespace = "TheQRL.Zond.V1alpha1";
-option go_package = "github.com/theQRL/qrysm/proto/qrysm/v1alpha1;zond";
+option csharp_namespace = "TheQRL.QRL.V1alpha1";
+option go_package = "github.com/theQRL/qrysm/proto/qrysm/v1alpha1;qrl";
 option java_multiple_files = true;
 option java_outer_classname = "PowchainProto";
 option java_package = "org.theqrl.qrl.v1alpha1";
-option php_namespace = "TheQRL\\Zond\\v1alpha1";
+option php_namespace = "TheQRL\\QRL\\v1alpha1";
 
 // ETH1ChainData is a container which holds all the relevant eth1
 // information

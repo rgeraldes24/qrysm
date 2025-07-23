@@ -9,7 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	grpc "google.golang.org/grpc"
 	metadata "google.golang.org/grpc/metadata"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -39,7 +39,7 @@ func (m *MockBeaconNodeValidatorClient) EXPECT() *MockBeaconNodeValidatorClientM
 }
 
 // AssignValidatorToSubnet mocks base method.
-func (m *MockBeaconNodeValidatorClient) AssignValidatorToSubnet(arg0 context.Context, arg1 *zond.AssignValidatorToSubnetRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorClient) AssignValidatorToSubnet(arg0 context.Context, arg1 *qrysmpb.AssignValidatorToSubnetRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -59,14 +59,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) AssignValidatorToSubnet(arg
 }
 
 // CheckDoppelGanger mocks base method.
-func (m *MockBeaconNodeValidatorClient) CheckDoppelGanger(arg0 context.Context, arg1 *zond.DoppelGangerRequest, arg2 ...grpc.CallOption) (*zond.DoppelGangerResponse, error) {
+func (m *MockBeaconNodeValidatorClient) CheckDoppelGanger(arg0 context.Context, arg1 *qrysmpb.DoppelGangerRequest, arg2 ...grpc.CallOption) (*qrysmpb.DoppelGangerResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "CheckDoppelGanger", varargs...)
-	ret0, _ := ret[0].(*zond.DoppelGangerResponse)
+	ret0, _ := ret[0].(*qrysmpb.DoppelGangerResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -79,14 +79,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) CheckDoppelGanger(arg0, arg
 }
 
 // DomainData mocks base method.
-func (m *MockBeaconNodeValidatorClient) DomainData(arg0 context.Context, arg1 *zond.DomainRequest, arg2 ...grpc.CallOption) (*zond.DomainResponse, error) {
+func (m *MockBeaconNodeValidatorClient) DomainData(arg0 context.Context, arg1 *qrysmpb.DomainRequest, arg2 ...grpc.CallOption) (*qrysmpb.DomainResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "DomainData", varargs...)
-	ret0, _ := ret[0].(*zond.DomainResponse)
+	ret0, _ := ret[0].(*qrysmpb.DomainResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -99,14 +99,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) DomainData(arg0, arg1 inter
 }
 
 // GetAttestationData mocks base method.
-func (m *MockBeaconNodeValidatorClient) GetAttestationData(arg0 context.Context, arg1 *zond.AttestationDataRequest, arg2 ...grpc.CallOption) (*zond.AttestationData, error) {
+func (m *MockBeaconNodeValidatorClient) GetAttestationData(arg0 context.Context, arg1 *qrysmpb.AttestationDataRequest, arg2 ...grpc.CallOption) (*qrysmpb.AttestationData, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetAttestationData", varargs...)
-	ret0, _ := ret[0].(*zond.AttestationData)
+	ret0, _ := ret[0].(*qrysmpb.AttestationData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -119,14 +119,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) GetAttestationData(arg0, ar
 }
 
 // GetBeaconBlock mocks base method.
-func (m *MockBeaconNodeValidatorClient) GetBeaconBlock(arg0 context.Context, arg1 *zond.BlockRequest, arg2 ...grpc.CallOption) (*zond.GenericBeaconBlock, error) {
+func (m *MockBeaconNodeValidatorClient) GetBeaconBlock(arg0 context.Context, arg1 *qrysmpb.BlockRequest, arg2 ...grpc.CallOption) (*qrysmpb.GenericBeaconBlock, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetBeaconBlock", varargs...)
-	ret0, _ := ret[0].(*zond.GenericBeaconBlock)
+	ret0, _ := ret[0].(*qrysmpb.GenericBeaconBlock)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -139,14 +139,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) GetBeaconBlock(arg0, arg1 i
 }
 
 // GetDuties mocks base method.
-func (m *MockBeaconNodeValidatorClient) GetDuties(arg0 context.Context, arg1 *zond.DutiesRequest, arg2 ...grpc.CallOption) (*zond.DutiesResponse, error) {
+func (m *MockBeaconNodeValidatorClient) GetDuties(arg0 context.Context, arg1 *qrysmpb.DutiesRequest, arg2 ...grpc.CallOption) (*qrysmpb.DutiesResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetDuties", varargs...)
-	ret0, _ := ret[0].(*zond.DutiesResponse)
+	ret0, _ := ret[0].(*qrysmpb.DutiesResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -159,14 +159,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) GetDuties(arg0, arg1 interf
 }
 
 // GetFeeRecipientByPubKey mocks base method.
-func (m *MockBeaconNodeValidatorClient) GetFeeRecipientByPubKey(arg0 context.Context, arg1 *zond.FeeRecipientByPubKeyRequest, arg2 ...grpc.CallOption) (*zond.FeeRecipientByPubKeyResponse, error) {
+func (m *MockBeaconNodeValidatorClient) GetFeeRecipientByPubKey(arg0 context.Context, arg1 *qrysmpb.FeeRecipientByPubKeyRequest, arg2 ...grpc.CallOption) (*qrysmpb.FeeRecipientByPubKeyResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetFeeRecipientByPubKey", varargs...)
-	ret0, _ := ret[0].(*zond.FeeRecipientByPubKeyResponse)
+	ret0, _ := ret[0].(*qrysmpb.FeeRecipientByPubKeyResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -179,14 +179,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) GetFeeRecipientByPubKey(arg
 }
 
 // GetSyncCommitteeContribution mocks base method.
-func (m *MockBeaconNodeValidatorClient) GetSyncCommitteeContribution(arg0 context.Context, arg1 *zond.SyncCommitteeContributionRequest, arg2 ...grpc.CallOption) (*zond.SyncCommitteeContribution, error) {
+func (m *MockBeaconNodeValidatorClient) GetSyncCommitteeContribution(arg0 context.Context, arg1 *qrysmpb.SyncCommitteeContributionRequest, arg2 ...grpc.CallOption) (*qrysmpb.SyncCommitteeContribution, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetSyncCommitteeContribution", varargs...)
-	ret0, _ := ret[0].(*zond.SyncCommitteeContribution)
+	ret0, _ := ret[0].(*qrysmpb.SyncCommitteeContribution)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -199,14 +199,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) GetSyncCommitteeContributio
 }
 
 // GetSyncMessageBlockRoot mocks base method.
-func (m *MockBeaconNodeValidatorClient) GetSyncMessageBlockRoot(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.SyncMessageBlockRootResponse, error) {
+func (m *MockBeaconNodeValidatorClient) GetSyncMessageBlockRoot(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrysmpb.SyncMessageBlockRootResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetSyncMessageBlockRoot", varargs...)
-	ret0, _ := ret[0].(*zond.SyncMessageBlockRootResponse)
+	ret0, _ := ret[0].(*qrysmpb.SyncMessageBlockRootResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -219,14 +219,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) GetSyncMessageBlockRoot(arg
 }
 
 // GetSyncSubcommitteeIndex mocks base method.
-func (m *MockBeaconNodeValidatorClient) GetSyncSubcommitteeIndex(arg0 context.Context, arg1 *zond.SyncSubcommitteeIndexRequest, arg2 ...grpc.CallOption) (*zond.SyncSubcommitteeIndexResponse, error) {
+func (m *MockBeaconNodeValidatorClient) GetSyncSubcommitteeIndex(arg0 context.Context, arg1 *qrysmpb.SyncSubcommitteeIndexRequest, arg2 ...grpc.CallOption) (*qrysmpb.SyncSubcommitteeIndexResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetSyncSubcommitteeIndex", varargs...)
-	ret0, _ := ret[0].(*zond.SyncSubcommitteeIndexResponse)
+	ret0, _ := ret[0].(*qrysmpb.SyncSubcommitteeIndexResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -239,14 +239,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) GetSyncSubcommitteeIndex(ar
 }
 
 // MultipleValidatorStatus mocks base method.
-func (m *MockBeaconNodeValidatorClient) MultipleValidatorStatus(arg0 context.Context, arg1 *zond.MultipleValidatorStatusRequest, arg2 ...grpc.CallOption) (*zond.MultipleValidatorStatusResponse, error) {
+func (m *MockBeaconNodeValidatorClient) MultipleValidatorStatus(arg0 context.Context, arg1 *qrysmpb.MultipleValidatorStatusRequest, arg2 ...grpc.CallOption) (*qrysmpb.MultipleValidatorStatusResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "MultipleValidatorStatus", varargs...)
-	ret0, _ := ret[0].(*zond.MultipleValidatorStatusResponse)
+	ret0, _ := ret[0].(*qrysmpb.MultipleValidatorStatusResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -259,7 +259,7 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) MultipleValidatorStatus(arg
 }
 
 // PrepareBeaconProposer mocks base method.
-func (m *MockBeaconNodeValidatorClient) PrepareBeaconProposer(arg0 context.Context, arg1 *zond.PrepareBeaconProposerRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorClient) PrepareBeaconProposer(arg0 context.Context, arg1 *qrysmpb.PrepareBeaconProposerRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -279,14 +279,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) PrepareBeaconProposer(arg0,
 }
 
 // ProposeAttestation mocks base method.
-func (m *MockBeaconNodeValidatorClient) ProposeAttestation(arg0 context.Context, arg1 *zond.Attestation, arg2 ...grpc.CallOption) (*zond.AttestResponse, error) {
+func (m *MockBeaconNodeValidatorClient) ProposeAttestation(arg0 context.Context, arg1 *qrysmpb.Attestation, arg2 ...grpc.CallOption) (*qrysmpb.AttestResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ProposeAttestation", varargs...)
-	ret0, _ := ret[0].(*zond.AttestResponse)
+	ret0, _ := ret[0].(*qrysmpb.AttestResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -299,14 +299,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) ProposeAttestation(arg0, ar
 }
 
 // ProposeBeaconBlock mocks base method.
-func (m *MockBeaconNodeValidatorClient) ProposeBeaconBlock(arg0 context.Context, arg1 *zond.GenericSignedBeaconBlock, arg2 ...grpc.CallOption) (*zond.ProposeResponse, error) {
+func (m *MockBeaconNodeValidatorClient) ProposeBeaconBlock(arg0 context.Context, arg1 *qrysmpb.GenericSignedBeaconBlock, arg2 ...grpc.CallOption) (*qrysmpb.ProposeResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ProposeBeaconBlock", varargs...)
-	ret0, _ := ret[0].(*zond.ProposeResponse)
+	ret0, _ := ret[0].(*qrysmpb.ProposeResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -319,14 +319,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) ProposeBeaconBlock(arg0, ar
 }
 
 // ProposeExit mocks base method.
-func (m *MockBeaconNodeValidatorClient) ProposeExit(arg0 context.Context, arg1 *zond.SignedVoluntaryExit, arg2 ...grpc.CallOption) (*zond.ProposeExitResponse, error) {
+func (m *MockBeaconNodeValidatorClient) ProposeExit(arg0 context.Context, arg1 *qrysmpb.SignedVoluntaryExit, arg2 ...grpc.CallOption) (*qrysmpb.ProposeExitResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ProposeExit", varargs...)
-	ret0, _ := ret[0].(*zond.ProposeExitResponse)
+	ret0, _ := ret[0].(*qrysmpb.ProposeExitResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -339,14 +339,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) ProposeExit(arg0, arg1 inte
 }
 
 // SignaturesAndAggregationBits mocks base method.
-func (m *MockBeaconNodeValidatorClient) SignaturesAndAggregationBits(arg0 context.Context, arg1 *zond.SignaturesAndAggregationBitsRequest, arg2 ...grpc.CallOption) (*zond.SignaturesAndAggregationBitsResponse, error) {
+func (m *MockBeaconNodeValidatorClient) SignaturesAndAggregationBits(arg0 context.Context, arg1 *qrysmpb.SignaturesAndAggregationBitsRequest, arg2 ...grpc.CallOption) (*qrysmpb.SignaturesAndAggregationBitsResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SignaturesAndAggregationBits", varargs...)
-	ret0, _ := ret[0].(*zond.SignaturesAndAggregationBitsResponse)
+	ret0, _ := ret[0].(*qrysmpb.SignaturesAndAggregationBitsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -359,14 +359,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) SignaturesAndAggregationBit
 }
 
 // StreamBlocksAltair mocks base method.
-func (m *MockBeaconNodeValidatorClient) StreamBlocksAltair(arg0 context.Context, arg1 *zond.StreamBlocksRequest, arg2 ...grpc.CallOption) (zond.BeaconNodeValidator_StreamBlocksAltairClient, error) {
+func (m *MockBeaconNodeValidatorClient) StreamBlocksAltair(arg0 context.Context, arg1 *qrysmpb.StreamBlocksRequest, arg2 ...grpc.CallOption) (qrysmpb.BeaconNodeValidator_StreamBlocksAltairClient, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "StreamBlocksAltair", varargs...)
-	ret0, _ := ret[0].(zond.BeaconNodeValidator_StreamBlocksAltairClient)
+	ret0, _ := ret[0].(qrysmpb.BeaconNodeValidator_StreamBlocksAltairClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -379,14 +379,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) StreamBlocksAltair(arg0, ar
 }
 
 // SubmitAggregateSelectionProof mocks base method.
-func (m *MockBeaconNodeValidatorClient) SubmitAggregateSelectionProof(arg0 context.Context, arg1 *zond.AggregateSelectionRequest, arg2 ...grpc.CallOption) (*zond.AggregateSelectionResponse, error) {
+func (m *MockBeaconNodeValidatorClient) SubmitAggregateSelectionProof(arg0 context.Context, arg1 *qrysmpb.AggregateSelectionRequest, arg2 ...grpc.CallOption) (*qrysmpb.AggregateSelectionResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SubmitAggregateSelectionProof", varargs...)
-	ret0, _ := ret[0].(*zond.AggregateSelectionResponse)
+	ret0, _ := ret[0].(*qrysmpb.AggregateSelectionResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -399,14 +399,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) SubmitAggregateSelectionPro
 }
 
 // SubmitSignedAggregateSelectionProof mocks base method.
-func (m *MockBeaconNodeValidatorClient) SubmitSignedAggregateSelectionProof(arg0 context.Context, arg1 *zond.SignedAggregateSubmitRequest, arg2 ...grpc.CallOption) (*zond.SignedAggregateSubmitResponse, error) {
+func (m *MockBeaconNodeValidatorClient) SubmitSignedAggregateSelectionProof(arg0 context.Context, arg1 *qrysmpb.SignedAggregateSubmitRequest, arg2 ...grpc.CallOption) (*qrysmpb.SignedAggregateSubmitResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "SubmitSignedAggregateSelectionProof", varargs...)
-	ret0, _ := ret[0].(*zond.SignedAggregateSubmitResponse)
+	ret0, _ := ret[0].(*qrysmpb.SignedAggregateSubmitResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -419,7 +419,7 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) SubmitSignedAggregateSelect
 }
 
 // SubmitSignedContributionAndProof mocks base method.
-func (m *MockBeaconNodeValidatorClient) SubmitSignedContributionAndProof(arg0 context.Context, arg1 *zond.SignedContributionAndProof, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorClient) SubmitSignedContributionAndProof(arg0 context.Context, arg1 *qrysmpb.SignedContributionAndProof, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -439,7 +439,7 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) SubmitSignedContributionAnd
 }
 
 // SubmitSyncMessage mocks base method.
-func (m *MockBeaconNodeValidatorClient) SubmitSyncMessage(arg0 context.Context, arg1 *zond.SyncCommitteeMessage, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorClient) SubmitSyncMessage(arg0 context.Context, arg1 *qrysmpb.SyncCommitteeMessage, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -459,7 +459,7 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) SubmitSyncMessage(arg0, arg
 }
 
 // SubmitValidatorRegistrations mocks base method.
-func (m *MockBeaconNodeValidatorClient) SubmitValidatorRegistrations(arg0 context.Context, arg1 *zond.SignedValidatorRegistrationsV1, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorClient) SubmitValidatorRegistrations(arg0 context.Context, arg1 *qrysmpb.SignedValidatorRegistrationsV1, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -479,7 +479,7 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) SubmitValidatorRegistration
 }
 
 // SubscribeCommitteeSubnets mocks base method.
-func (m *MockBeaconNodeValidatorClient) SubscribeCommitteeSubnets(arg0 context.Context, arg1 *zond.CommitteeSubnetsSubscribeRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorClient) SubscribeCommitteeSubnets(arg0 context.Context, arg1 *qrysmpb.CommitteeSubnetsSubscribeRequest, arg2 ...grpc.CallOption) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -499,14 +499,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) SubscribeCommitteeSubnets(a
 }
 
 // ValidatorIndex mocks base method.
-func (m *MockBeaconNodeValidatorClient) ValidatorIndex(arg0 context.Context, arg1 *zond.ValidatorIndexRequest, arg2 ...grpc.CallOption) (*zond.ValidatorIndexResponse, error) {
+func (m *MockBeaconNodeValidatorClient) ValidatorIndex(arg0 context.Context, arg1 *qrysmpb.ValidatorIndexRequest, arg2 ...grpc.CallOption) (*qrysmpb.ValidatorIndexResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ValidatorIndex", varargs...)
-	ret0, _ := ret[0].(*zond.ValidatorIndexResponse)
+	ret0, _ := ret[0].(*qrysmpb.ValidatorIndexResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -519,14 +519,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) ValidatorIndex(arg0, arg1 i
 }
 
 // ValidatorStatus mocks base method.
-func (m *MockBeaconNodeValidatorClient) ValidatorStatus(arg0 context.Context, arg1 *zond.ValidatorStatusRequest, arg2 ...grpc.CallOption) (*zond.ValidatorStatusResponse, error) {
+func (m *MockBeaconNodeValidatorClient) ValidatorStatus(arg0 context.Context, arg1 *qrysmpb.ValidatorStatusRequest, arg2 ...grpc.CallOption) (*qrysmpb.ValidatorStatusResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ValidatorStatus", varargs...)
-	ret0, _ := ret[0].(*zond.ValidatorStatusResponse)
+	ret0, _ := ret[0].(*qrysmpb.ValidatorStatusResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -539,14 +539,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) ValidatorStatus(arg0, arg1 
 }
 
 // WaitForActivation mocks base method.
-func (m *MockBeaconNodeValidatorClient) WaitForActivation(arg0 context.Context, arg1 *zond.ValidatorActivationRequest, arg2 ...grpc.CallOption) (zond.BeaconNodeValidator_WaitForActivationClient, error) {
+func (m *MockBeaconNodeValidatorClient) WaitForActivation(arg0 context.Context, arg1 *qrysmpb.ValidatorActivationRequest, arg2 ...grpc.CallOption) (qrysmpb.BeaconNodeValidator_WaitForActivationClient, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "WaitForActivation", varargs...)
-	ret0, _ := ret[0].(zond.BeaconNodeValidator_WaitForActivationClient)
+	ret0, _ := ret[0].(qrysmpb.BeaconNodeValidator_WaitForActivationClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -559,14 +559,14 @@ func (mr *MockBeaconNodeValidatorClientMockRecorder) WaitForActivation(arg0, arg
 }
 
 // WaitForChainStart mocks base method.
-func (m *MockBeaconNodeValidatorClient) WaitForChainStart(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (zond.BeaconNodeValidator_WaitForChainStartClient, error) {
+func (m *MockBeaconNodeValidatorClient) WaitForChainStart(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (qrysmpb.BeaconNodeValidator_WaitForChainStartClient, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "WaitForChainStart", varargs...)
-	ret0, _ := ret[0].(zond.BeaconNodeValidator_WaitForChainStartClient)
+	ret0, _ := ret[0].(qrysmpb.BeaconNodeValidator_WaitForChainStartClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -645,10 +645,10 @@ func (mr *MockBeaconNodeValidator_WaitForChainStartClientMockRecorder) Header() 
 }
 
 // Recv mocks base method.
-func (m *MockBeaconNodeValidator_WaitForChainStartClient) Recv() (*zond.ChainStartResponse, error) {
+func (m *MockBeaconNodeValidator_WaitForChainStartClient) Recv() (*qrysmpb.ChainStartResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Recv")
-	ret0, _ := ret[0].(*zond.ChainStartResponse)
+	ret0, _ := ret[0].(*qrysmpb.ChainStartResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -768,10 +768,10 @@ func (mr *MockBeaconNodeValidator_WaitForActivationClientMockRecorder) Header() 
 }
 
 // Recv mocks base method.
-func (m *MockBeaconNodeValidator_WaitForActivationClient) Recv() (*zond.ValidatorActivationResponse, error) {
+func (m *MockBeaconNodeValidator_WaitForActivationClient) Recv() (*qrysmpb.ValidatorActivationResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Recv")
-	ret0, _ := ret[0].(*zond.ValidatorActivationResponse)
+	ret0, _ := ret[0].(*qrysmpb.ValidatorActivationResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

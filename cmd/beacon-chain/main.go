@@ -1,4 +1,4 @@
-// Package beacon-chain defines the entire runtime of a Zond beacon node.
+// Package beacon-chain defines the entire runtime of a QRL beacon node.
 package main
 
 import (

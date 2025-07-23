@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	qrysmpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
@@ -45,18 +45,18 @@ type ForkchoiceFetcher interface {
 	HighestReceivedBlockSlot() primitives.Slot
 	ReceivedBlocksLastEpoch() (uint64, error)
 	InsertNode(context.Context, state.BeaconState, [32]byte) error
-	ForkChoiceDump(context.Context) (*qrysmpbv1.ForkChoiceDump, error)
+	ForkChoiceDump(context.Context) (*qrlpb.ForkChoiceDump, error)
 	NewSlot(context.Context, primitives.Slot) error
 	ProposerBoost() [32]byte
 }
 
-// TimeFetcher retrieves the Zond consensus data that's related to time.
+// TimeFetcher retrieves the QRL consensus data that's related to time.
 type TimeFetcher interface {
 	GenesisTime() time.Time
 	CurrentSlot() primitives.Slot
 }
 
-// GenesisFetcher retrieves the Zond consensus data related to its genesis.
+// GenesisFetcher retrieves the QRL consensus data related to its genesis.
 type GenesisFetcher interface {
 	GenesisValidatorsRoot() [32]byte
 }
@@ -79,7 +79,7 @@ type HeadFetcher interface {
 	HeadDomainFetcher
 }
 
-// ForkFetcher retrieves the current fork information of the Zond beacon chain.
+// ForkFetcher retrieves the current fork information of the QRL beacon chain.
 type ForkFetcher interface {
 	CurrentFork() *qrysmpb.Fork
 	GenesisFetcher

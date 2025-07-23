@@ -9,7 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	metadata "google.golang.org/grpc/metadata"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
@@ -38,7 +38,7 @@ func (m *MockBeaconNodeValidatorServer) EXPECT() *MockBeaconNodeValidatorServerM
 }
 
 // AssignValidatorToSubnet mocks base method.
-func (m *MockBeaconNodeValidatorServer) AssignValidatorToSubnet(arg0 context.Context, arg1 *zond.AssignValidatorToSubnetRequest) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorServer) AssignValidatorToSubnet(arg0 context.Context, arg1 *qrysmpb.AssignValidatorToSubnetRequest) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AssignValidatorToSubnet", arg0, arg1)
 	ret0, _ := ret[0].(*emptypb.Empty)
@@ -53,10 +53,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) AssignValidatorToSubnet(arg
 }
 
 // CheckDoppelGanger mocks base method.
-func (m *MockBeaconNodeValidatorServer) CheckDoppelGanger(arg0 context.Context, arg1 *zond.DoppelGangerRequest) (*zond.DoppelGangerResponse, error) {
+func (m *MockBeaconNodeValidatorServer) CheckDoppelGanger(arg0 context.Context, arg1 *qrysmpb.DoppelGangerRequest) (*qrysmpb.DoppelGangerResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckDoppelGanger", arg0, arg1)
-	ret0, _ := ret[0].(*zond.DoppelGangerResponse)
+	ret0, _ := ret[0].(*qrysmpb.DoppelGangerResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -68,10 +68,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) CheckDoppelGanger(arg0, arg
 }
 
 // DomainData mocks base method.
-func (m *MockBeaconNodeValidatorServer) DomainData(arg0 context.Context, arg1 *zond.DomainRequest) (*zond.DomainResponse, error) {
+func (m *MockBeaconNodeValidatorServer) DomainData(arg0 context.Context, arg1 *qrysmpb.DomainRequest) (*qrysmpb.DomainResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DomainData", arg0, arg1)
-	ret0, _ := ret[0].(*zond.DomainResponse)
+	ret0, _ := ret[0].(*qrysmpb.DomainResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -83,10 +83,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) DomainData(arg0, arg1 inter
 }
 
 // GetAttestationData mocks base method.
-func (m *MockBeaconNodeValidatorServer) GetAttestationData(arg0 context.Context, arg1 *zond.AttestationDataRequest) (*zond.AttestationData, error) {
+func (m *MockBeaconNodeValidatorServer) GetAttestationData(arg0 context.Context, arg1 *qrysmpb.AttestationDataRequest) (*qrysmpb.AttestationData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAttestationData", arg0, arg1)
-	ret0, _ := ret[0].(*zond.AttestationData)
+	ret0, _ := ret[0].(*qrysmpb.AttestationData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -98,10 +98,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) GetAttestationData(arg0, ar
 }
 
 // GetBeaconBlock mocks base method.
-func (m *MockBeaconNodeValidatorServer) GetBeaconBlock(arg0 context.Context, arg1 *zond.BlockRequest) (*zond.GenericBeaconBlock, error) {
+func (m *MockBeaconNodeValidatorServer) GetBeaconBlock(arg0 context.Context, arg1 *qrysmpb.BlockRequest) (*qrysmpb.GenericBeaconBlock, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBeaconBlock", arg0, arg1)
-	ret0, _ := ret[0].(*zond.GenericBeaconBlock)
+	ret0, _ := ret[0].(*qrysmpb.GenericBeaconBlock)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -113,10 +113,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) GetBeaconBlock(arg0, arg1 i
 }
 
 // GetDuties mocks base method.
-func (m *MockBeaconNodeValidatorServer) GetDuties(arg0 context.Context, arg1 *zond.DutiesRequest) (*zond.DutiesResponse, error) {
+func (m *MockBeaconNodeValidatorServer) GetDuties(arg0 context.Context, arg1 *qrysmpb.DutiesRequest) (*qrysmpb.DutiesResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDuties", arg0, arg1)
-	ret0, _ := ret[0].(*zond.DutiesResponse)
+	ret0, _ := ret[0].(*qrysmpb.DutiesResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -128,10 +128,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) GetDuties(arg0, arg1 interf
 }
 
 // GetFeeRecipientByPubKey mocks base method.
-func (m *MockBeaconNodeValidatorServer) GetFeeRecipientByPubKey(arg0 context.Context, arg1 *zond.FeeRecipientByPubKeyRequest) (*zond.FeeRecipientByPubKeyResponse, error) {
+func (m *MockBeaconNodeValidatorServer) GetFeeRecipientByPubKey(arg0 context.Context, arg1 *qrysmpb.FeeRecipientByPubKeyRequest) (*qrysmpb.FeeRecipientByPubKeyResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeeRecipientByPubKey", arg0, arg1)
-	ret0, _ := ret[0].(*zond.FeeRecipientByPubKeyResponse)
+	ret0, _ := ret[0].(*qrysmpb.FeeRecipientByPubKeyResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -143,10 +143,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) GetFeeRecipientByPubKey(arg
 }
 
 // GetSyncCommitteeContribution mocks base method.
-func (m *MockBeaconNodeValidatorServer) GetSyncCommitteeContribution(arg0 context.Context, arg1 *zond.SyncCommitteeContributionRequest) (*zond.SyncCommitteeContribution, error) {
+func (m *MockBeaconNodeValidatorServer) GetSyncCommitteeContribution(arg0 context.Context, arg1 *qrysmpb.SyncCommitteeContributionRequest) (*qrysmpb.SyncCommitteeContribution, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSyncCommitteeContribution", arg0, arg1)
-	ret0, _ := ret[0].(*zond.SyncCommitteeContribution)
+	ret0, _ := ret[0].(*qrysmpb.SyncCommitteeContribution)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -158,10 +158,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) GetSyncCommitteeContributio
 }
 
 // GetSyncMessageBlockRoot mocks base method.
-func (m *MockBeaconNodeValidatorServer) GetSyncMessageBlockRoot(arg0 context.Context, arg1 *emptypb.Empty) (*zond.SyncMessageBlockRootResponse, error) {
+func (m *MockBeaconNodeValidatorServer) GetSyncMessageBlockRoot(arg0 context.Context, arg1 *emptypb.Empty) (*qrysmpb.SyncMessageBlockRootResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSyncMessageBlockRoot", arg0, arg1)
-	ret0, _ := ret[0].(*zond.SyncMessageBlockRootResponse)
+	ret0, _ := ret[0].(*qrysmpb.SyncMessageBlockRootResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -173,10 +173,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) GetSyncMessageBlockRoot(arg
 }
 
 // GetSyncSubcommitteeIndex mocks base method.
-func (m *MockBeaconNodeValidatorServer) GetSyncSubcommitteeIndex(arg0 context.Context, arg1 *zond.SyncSubcommitteeIndexRequest) (*zond.SyncSubcommitteeIndexResponse, error) {
+func (m *MockBeaconNodeValidatorServer) GetSyncSubcommitteeIndex(arg0 context.Context, arg1 *qrysmpb.SyncSubcommitteeIndexRequest) (*qrysmpb.SyncSubcommitteeIndexResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSyncSubcommitteeIndex", arg0, arg1)
-	ret0, _ := ret[0].(*zond.SyncSubcommitteeIndexResponse)
+	ret0, _ := ret[0].(*qrysmpb.SyncSubcommitteeIndexResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -188,10 +188,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) GetSyncSubcommitteeIndex(ar
 }
 
 // MultipleValidatorStatus mocks base method.
-func (m *MockBeaconNodeValidatorServer) MultipleValidatorStatus(arg0 context.Context, arg1 *zond.MultipleValidatorStatusRequest) (*zond.MultipleValidatorStatusResponse, error) {
+func (m *MockBeaconNodeValidatorServer) MultipleValidatorStatus(arg0 context.Context, arg1 *qrysmpb.MultipleValidatorStatusRequest) (*qrysmpb.MultipleValidatorStatusResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MultipleValidatorStatus", arg0, arg1)
-	ret0, _ := ret[0].(*zond.MultipleValidatorStatusResponse)
+	ret0, _ := ret[0].(*qrysmpb.MultipleValidatorStatusResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -203,7 +203,7 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) MultipleValidatorStatus(arg
 }
 
 // PrepareBeaconProposer mocks base method.
-func (m *MockBeaconNodeValidatorServer) PrepareBeaconProposer(arg0 context.Context, arg1 *zond.PrepareBeaconProposerRequest) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorServer) PrepareBeaconProposer(arg0 context.Context, arg1 *qrysmpb.PrepareBeaconProposerRequest) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PrepareBeaconProposer", arg0, arg1)
 	ret0, _ := ret[0].(*emptypb.Empty)
@@ -218,10 +218,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) PrepareBeaconProposer(arg0,
 }
 
 // ProposeAttestation mocks base method.
-func (m *MockBeaconNodeValidatorServer) ProposeAttestation(arg0 context.Context, arg1 *zond.Attestation) (*zond.AttestResponse, error) {
+func (m *MockBeaconNodeValidatorServer) ProposeAttestation(arg0 context.Context, arg1 *qrysmpb.Attestation) (*qrysmpb.AttestResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProposeAttestation", arg0, arg1)
-	ret0, _ := ret[0].(*zond.AttestResponse)
+	ret0, _ := ret[0].(*qrysmpb.AttestResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -233,10 +233,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) ProposeAttestation(arg0, ar
 }
 
 // ProposeBeaconBlock mocks base method.
-func (m *MockBeaconNodeValidatorServer) ProposeBeaconBlock(arg0 context.Context, arg1 *zond.GenericSignedBeaconBlock) (*zond.ProposeResponse, error) {
+func (m *MockBeaconNodeValidatorServer) ProposeBeaconBlock(arg0 context.Context, arg1 *qrysmpb.GenericSignedBeaconBlock) (*qrysmpb.ProposeResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProposeBeaconBlock", arg0, arg1)
-	ret0, _ := ret[0].(*zond.ProposeResponse)
+	ret0, _ := ret[0].(*qrysmpb.ProposeResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -248,10 +248,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) ProposeBeaconBlock(arg0, ar
 }
 
 // ProposeExit mocks base method.
-func (m *MockBeaconNodeValidatorServer) ProposeExit(arg0 context.Context, arg1 *zond.SignedVoluntaryExit) (*zond.ProposeExitResponse, error) {
+func (m *MockBeaconNodeValidatorServer) ProposeExit(arg0 context.Context, arg1 *qrysmpb.SignedVoluntaryExit) (*qrysmpb.ProposeExitResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ProposeExit", arg0, arg1)
-	ret0, _ := ret[0].(*zond.ProposeExitResponse)
+	ret0, _ := ret[0].(*qrysmpb.ProposeExitResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -263,10 +263,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) ProposeExit(arg0, arg1 inte
 }
 
 // SignaturesAndAggregationBits mocks base method.
-func (m *MockBeaconNodeValidatorServer) SignaturesAndAggregationBits(arg0 context.Context, arg1 *zond.SignaturesAndAggregationBitsRequest) (*zond.SignaturesAndAggregationBitsResponse, error) {
+func (m *MockBeaconNodeValidatorServer) SignaturesAndAggregationBits(arg0 context.Context, arg1 *qrysmpb.SignaturesAndAggregationBitsRequest) (*qrysmpb.SignaturesAndAggregationBitsResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SignaturesAndAggregationBits", arg0, arg1)
-	ret0, _ := ret[0].(*zond.SignaturesAndAggregationBitsResponse)
+	ret0, _ := ret[0].(*qrysmpb.SignaturesAndAggregationBitsResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -278,7 +278,7 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) SignaturesAndAggregationBit
 }
 
 // StreamBlocksAltair mocks base method.
-func (m *MockBeaconNodeValidatorServer) StreamBlocksAltair(arg0 *zond.StreamBlocksRequest, arg1 zond.BeaconNodeValidator_StreamBlocksAltairServer) error {
+func (m *MockBeaconNodeValidatorServer) StreamBlocksAltair(arg0 *qrysmpb.StreamBlocksRequest, arg1 qrysmpb.BeaconNodeValidator_StreamBlocksAltairServer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "StreamBlocksAltair", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -292,10 +292,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) StreamBlocksAltair(arg0, ar
 }
 
 // SubmitAggregateSelectionProof mocks base method.
-func (m *MockBeaconNodeValidatorServer) SubmitAggregateSelectionProof(arg0 context.Context, arg1 *zond.AggregateSelectionRequest) (*zond.AggregateSelectionResponse, error) {
+func (m *MockBeaconNodeValidatorServer) SubmitAggregateSelectionProof(arg0 context.Context, arg1 *qrysmpb.AggregateSelectionRequest) (*qrysmpb.AggregateSelectionResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubmitAggregateSelectionProof", arg0, arg1)
-	ret0, _ := ret[0].(*zond.AggregateSelectionResponse)
+	ret0, _ := ret[0].(*qrysmpb.AggregateSelectionResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -307,10 +307,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitAggregateSelectionPro
 }
 
 // SubmitSignedAggregateSelectionProof mocks base method.
-func (m *MockBeaconNodeValidatorServer) SubmitSignedAggregateSelectionProof(arg0 context.Context, arg1 *zond.SignedAggregateSubmitRequest) (*zond.SignedAggregateSubmitResponse, error) {
+func (m *MockBeaconNodeValidatorServer) SubmitSignedAggregateSelectionProof(arg0 context.Context, arg1 *qrysmpb.SignedAggregateSubmitRequest) (*qrysmpb.SignedAggregateSubmitResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubmitSignedAggregateSelectionProof", arg0, arg1)
-	ret0, _ := ret[0].(*zond.SignedAggregateSubmitResponse)
+	ret0, _ := ret[0].(*qrysmpb.SignedAggregateSubmitResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -322,7 +322,7 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitSignedAggregateSelect
 }
 
 // SubmitSignedContributionAndProof mocks base method.
-func (m *MockBeaconNodeValidatorServer) SubmitSignedContributionAndProof(arg0 context.Context, arg1 *zond.SignedContributionAndProof) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorServer) SubmitSignedContributionAndProof(arg0 context.Context, arg1 *qrysmpb.SignedContributionAndProof) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubmitSignedContributionAndProof", arg0, arg1)
 	ret0, _ := ret[0].(*emptypb.Empty)
@@ -337,7 +337,7 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitSignedContributionAnd
 }
 
 // SubmitSyncMessage mocks base method.
-func (m *MockBeaconNodeValidatorServer) SubmitSyncMessage(arg0 context.Context, arg1 *zond.SyncCommitteeMessage) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorServer) SubmitSyncMessage(arg0 context.Context, arg1 *qrysmpb.SyncCommitteeMessage) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubmitSyncMessage", arg0, arg1)
 	ret0, _ := ret[0].(*emptypb.Empty)
@@ -352,7 +352,7 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitSyncMessage(arg0, arg
 }
 
 // SubmitValidatorRegistrations mocks base method.
-func (m *MockBeaconNodeValidatorServer) SubmitValidatorRegistrations(arg0 context.Context, arg1 *zond.SignedValidatorRegistrationsV1) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorServer) SubmitValidatorRegistrations(arg0 context.Context, arg1 *qrysmpb.SignedValidatorRegistrationsV1) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubmitValidatorRegistrations", arg0, arg1)
 	ret0, _ := ret[0].(*emptypb.Empty)
@@ -367,7 +367,7 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) SubmitValidatorRegistration
 }
 
 // SubscribeCommitteeSubnets mocks base method.
-func (m *MockBeaconNodeValidatorServer) SubscribeCommitteeSubnets(arg0 context.Context, arg1 *zond.CommitteeSubnetsSubscribeRequest) (*emptypb.Empty, error) {
+func (m *MockBeaconNodeValidatorServer) SubscribeCommitteeSubnets(arg0 context.Context, arg1 *qrysmpb.CommitteeSubnetsSubscribeRequest) (*emptypb.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubscribeCommitteeSubnets", arg0, arg1)
 	ret0, _ := ret[0].(*emptypb.Empty)
@@ -382,10 +382,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) SubscribeCommitteeSubnets(a
 }
 
 // ValidatorIndex mocks base method.
-func (m *MockBeaconNodeValidatorServer) ValidatorIndex(arg0 context.Context, arg1 *zond.ValidatorIndexRequest) (*zond.ValidatorIndexResponse, error) {
+func (m *MockBeaconNodeValidatorServer) ValidatorIndex(arg0 context.Context, arg1 *qrysmpb.ValidatorIndexRequest) (*qrysmpb.ValidatorIndexResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ValidatorIndex", arg0, arg1)
-	ret0, _ := ret[0].(*zond.ValidatorIndexResponse)
+	ret0, _ := ret[0].(*qrysmpb.ValidatorIndexResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -397,10 +397,10 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) ValidatorIndex(arg0, arg1 i
 }
 
 // ValidatorStatus mocks base method.
-func (m *MockBeaconNodeValidatorServer) ValidatorStatus(arg0 context.Context, arg1 *zond.ValidatorStatusRequest) (*zond.ValidatorStatusResponse, error) {
+func (m *MockBeaconNodeValidatorServer) ValidatorStatus(arg0 context.Context, arg1 *qrysmpb.ValidatorStatusRequest) (*qrysmpb.ValidatorStatusResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ValidatorStatus", arg0, arg1)
-	ret0, _ := ret[0].(*zond.ValidatorStatusResponse)
+	ret0, _ := ret[0].(*qrysmpb.ValidatorStatusResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -412,7 +412,7 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) ValidatorStatus(arg0, arg1 
 }
 
 // WaitForActivation mocks base method.
-func (m *MockBeaconNodeValidatorServer) WaitForActivation(arg0 *zond.ValidatorActivationRequest, arg1 zond.BeaconNodeValidator_WaitForActivationServer) error {
+func (m *MockBeaconNodeValidatorServer) WaitForActivation(arg0 *qrysmpb.ValidatorActivationRequest, arg1 qrysmpb.BeaconNodeValidator_WaitForActivationServer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WaitForActivation", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -426,7 +426,7 @@ func (mr *MockBeaconNodeValidatorServerMockRecorder) WaitForActivation(arg0, arg
 }
 
 // WaitForChainStart mocks base method.
-func (m *MockBeaconNodeValidatorServer) WaitForChainStart(arg0 *emptypb.Empty, arg1 zond.BeaconNodeValidator_WaitForChainStartServer) error {
+func (m *MockBeaconNodeValidatorServer) WaitForChainStart(arg0 *emptypb.Empty, arg1 qrysmpb.BeaconNodeValidator_WaitForChainStartServer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WaitForChainStart", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -491,7 +491,7 @@ func (mr *MockBeaconNodeValidator_WaitForActivationServerMockRecorder) RecvMsg(a
 }
 
 // Send mocks base method.
-func (m *MockBeaconNodeValidator_WaitForActivationServer) Send(arg0 *zond.ValidatorActivationResponse) error {
+func (m *MockBeaconNodeValidator_WaitForActivationServer) Send(arg0 *qrysmpb.ValidatorActivationResponse) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Send", arg0)
 	ret0, _ := ret[0].(error)
@@ -610,7 +610,7 @@ func (mr *MockBeaconNodeValidator_WaitForChainStartServerMockRecorder) RecvMsg(a
 }
 
 // Send mocks base method.
-func (m *MockBeaconNodeValidator_WaitForChainStartServer) Send(arg0 *zond.ChainStartResponse) error {
+func (m *MockBeaconNodeValidator_WaitForChainStartServer) Send(arg0 *qrysmpb.ChainStartResponse) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Send", arg0)
 	ret0, _ := ret[0].(error)

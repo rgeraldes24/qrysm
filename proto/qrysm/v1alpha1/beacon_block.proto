@@ -71,7 +71,7 @@ message AttesterSlashing {
     IndexedAttestation attestation_2 = 2;
 }
 
-// Deposit into the Ethereum consensus from the Zond deposit contract.
+// Deposit into the Ethereum consensus from the QRL deposit contract.
 message Deposit {
     // DepositData that is encoded into a deposit signature.
     message Data {
@@ -113,7 +113,7 @@ message SignedVoluntaryExit {
     bytes signature = 2 [(theqrl.qrl.ext.ssz_size) = "4595"];
 }
 
-// ExecutionNodeData represents references to the Zond deposit contract.
+// ExecutionNodeData represents references to the QRL deposit contract.
 message ExecutionNodeData {
     // The 32 byte deposit tree root for the last deposit included in this
     // block.
@@ -123,7 +123,7 @@ message ExecutionNodeData {
     // including the deposits in this block.
     uint64 deposit_count = 2;
 
-    // The 32 byte block hash of the Zond execution block considered for deposit
+    // The 32 byte block hash of the QRL execution block considered for deposit
     // inclusion.
     bytes block_hash = 3 [(theqrl.qrl.ext.ssz_size) = "32"];
 }
@@ -203,7 +203,7 @@ message BeaconBlockBodyCapella {
     // The validators RANDAO reveal 4595 byte value.
     bytes randao_reveal = 1 [(theqrl.qrl.ext.ssz_size) = "4595"];
 
-    // A reference to the Zond execution chain.
+    // A reference to the QRL execution chain.
     ExecutionNodeData eth1_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and
@@ -267,7 +267,7 @@ message BlindedBeaconBlockBodyCapella {
     // The validators RANDAO reveal 4595 byte value.
     bytes randao_reveal = 1 [(theqrl.qrl.ext.ssz_size) = "4595"];
 
-    // A reference to the Zond execution client.
+    // A reference to the QRL execution client.
     ExecutionNodeData eth1_data = 2;
 
     // 32 byte field of arbitrary data. This field may contain any data and

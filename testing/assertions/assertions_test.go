@@ -8,7 +8,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	testpb "github.com/theQRL/qrysm/proto/testing"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/assertions"
@@ -323,11 +323,11 @@ func TestAssert_DeepSSZEqual(t *testing.T) {
 			name: "equal structs",
 			args: args{
 				tb: &assertions.TBMock{},
-				expected: &zond.Checkpoint{
+				expected: &qrysmpb.Checkpoint{
 					Epoch: 5,
 					Root:  []byte("hi there"),
 				},
-				actual: &zond.Checkpoint{
+				actual: &qrysmpb.Checkpoint{
 					Epoch: 5,
 					Root:  []byte("hi there"),
 				},
@@ -394,11 +394,11 @@ func TestAssert_DeepNotSSZEqual(t *testing.T) {
 			name: "not equal structs",
 			args: args{
 				tb: &assertions.TBMock{},
-				expected: &zond.Checkpoint{
+				expected: &qrysmpb.Checkpoint{
 					Epoch: 5,
 					Root:  []byte("hello there"),
 				},
-				actual: &zond.Checkpoint{
+				actual: &qrysmpb.Checkpoint{
 					Epoch: 3,
 					Root:  []byte("hi there"),
 				},
@@ -600,7 +600,7 @@ func Test_NotNil(t *testing.T) {
 		obj  interface{}
 		msgs []interface{}
 	}
-	var nilBlock *zond.SignedBeaconBlockCapella = nil
+	var nilBlock *qrysmpb.SignedBeaconBlockCapella = nil
 	tests := []struct {
 		name        string
 		args        args

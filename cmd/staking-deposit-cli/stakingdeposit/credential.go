@@ -18,24 +18,24 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/hash"
-	qrysmpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 type Credential struct {
-	signingKeyPath           string
-	withdrawalSeed           string
-	signingSeed              string
-	amount                   uint64
-	chainSetting             *config.ChainSetting
-	hexZondWithdrawalAddress string
+	signingKeyPath          string
+	withdrawalSeed          string
+	signingSeed             string
+	amount                  uint64
+	chainSetting            *config.ChainSetting
+	hexQRLWithdrawalAddress string
 }
 
-func (c *Credential) ZondWithdrawalAddress() (common.Address, error) {
-	if len(c.hexZondWithdrawalAddress) == 0 {
+func (c *Credential) QRLWithdrawalAddress() (common.Address, error) {
+	if len(c.hexQRLWithdrawalAddress) == 0 {
 		return common.Address{}, nil
 	}
-	withdrawalAddress, err := common.NewAddressFromString(c.hexZondWithdrawalAddress)
+	withdrawalAddress, err := common.NewAddressFromString(c.hexQRLWithdrawalAddress)
 	if err != nil {
 		return common.Address{}, err
 	}
@@ -52,12 +52,12 @@ func (c *Credential) WithdrawalPK() []byte {
 }
 
 func (c *Credential) WithdrawalPrefix() (uint8, error) {
-	withdrawalAddress, err := c.ZondWithdrawalAddress()
+	withdrawalAddress, err := c.QRLWithdrawalAddress()
 	if err != nil {
 		return 0, err
 	}
 	if reflect.DeepEqual(withdrawalAddress, common.Address{}) {
-		return params.BeaconConfig().ZondAddressWithdrawalPrefixByte, nil
+		return params.BeaconConfig().QRLAddressWithdrawalPrefixByte, nil
 	}
 	return params.BeaconConfig().DilithiumWithdrawalPrefixByte, nil
 }
@@ -79,21 +79,21 @@ func (c *Credential) WithdrawalCredentials() ([32]byte, error) {
 		withdrawalCredentials[0] = params.BeaconConfig().DilithiumWithdrawalPrefixByte
 		h := hash.Hash(c.WithdrawalPK())
 		copy(withdrawalCredentials[1:], h[1:])
-	case params.BeaconConfig().ZondAddressWithdrawalPrefixByte:
-		zondWithdrawalAddress, err := c.ZondWithdrawalAddress()
+	case params.BeaconConfig().QRLAddressWithdrawalPrefixByte:
+		QRLWithdrawalAddress, err := c.QRLWithdrawalAddress()
 		if err != nil {
 			return [32]byte{}, err
 		}
-		if reflect.DeepEqual(zondWithdrawalAddress, common.Address{}) {
-			panic(fmt.Errorf("empty zond withdrawal address"))
+		if reflect.DeepEqual(QRLWithdrawalAddress, common.Address{}) {
+			panic(fmt.Errorf("empty qrl withdrawal address"))
 		}
-		withdrawalCredentials[0] = params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+		withdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 		// 1 byte reserved for withdrawal prefix
 		if common.AddressLength > len(withdrawalCredentials)-1 {
 			panic(fmt.Errorf("address length %d is more than remaining length in withdrawal credentials %d",
 				common.AddressLength, len(withdrawalCredentials)))
 		}
-		copy(withdrawalCredentials[len(withdrawalCredentials)-common.AddressLength:], zondWithdrawalAddress.Bytes())
+		copy(withdrawalCredentials[len(withdrawalCredentials)-common.AddressLength:], QRLWithdrawalAddress.Bytes())
 	default:
 		panic(fmt.Errorf("invalid withdrawal type %d", withdrawalType))
 	}
@@ -123,8 +123,8 @@ func (c *Credential) VerifyKeystore(keystoreFileFolder, password string) bool {
 	return c.signingSeed == misc.EncodeHex(seedBytes[:])
 }
 
-func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *qrysmpbv1.SignedDilithiumToExecutionChange {
-	if len(c.hexZondWithdrawalAddress) == 0 {
+func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *qrlpb.SignedDilithiumToExecutionChange {
+	if len(c.hexQRLWithdrawalAddress) == 0 {
 		panic("the execution address should not be empty")
 	}
 
@@ -134,12 +134,12 @@ func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *qrysm
 		panic(fmt.Errorf("failed to generate secret Key from withdrawal seed %v", err))
 	}
 
-	execAddr, err := c.ZondWithdrawalAddress()
+	execAddr, err := c.QRLWithdrawalAddress()
 	if err != nil {
 		panic(fmt.Errorf("failed to read withdrawal address %v", err))
 	}
 
-	message := &qrysmpbv1.DilithiumToExecutionChange{
+	message := &qrlpb.DilithiumToExecutionChange{
 		ValidatorIndex:      primitives.ValidatorIndex(validatorIndex),
 		FromDilithiumPubkey: c.WithdrawalPK(),
 		ToExecutionAddress:  execAddr.Bytes()}
@@ -168,7 +168,7 @@ func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *qrysm
 	}
 	signature := d.Sign(signingRoot[:])
 
-	return &qrysmpbv1.SignedDilithiumToExecutionChange{
+	return &qrlpb.SignedDilithiumToExecutionChange{
 		Message:   message,
 		Signature: signature.Marshal(),
 	}
@@ -180,7 +180,7 @@ func (c *Credential) GetDilithiumToExecutionChangeData(validatorIndex uint64) *D
 }
 
 func NewCredential(seed string, index, amount uint64,
-	chainSetting *config.ChainSetting, hexZondWithdrawalAddress string) (*Credential, error) {
+	chainSetting *config.ChainSetting, hexQRLWithdrawalAddress string) (*Credential, error) {
 	purpose := "12381" // TODO (cyyber): Purpose code to be decided later
 	coinType := "238"  // TODO (cyyber): coinType to be decided later
 	account := strconv.FormatUint(index, 10)
@@ -196,11 +196,11 @@ func NewCredential(seed string, index, amount uint64,
 		return nil, err
 	}
 	return &Credential{
-		signingKeyPath:           signingKeyPath,
-		withdrawalSeed:           withdrawalSeed,
-		signingSeed:              signingSeed,
-		amount:                   amount,
-		chainSetting:             chainSetting,
-		hexZondWithdrawalAddress: hexZondWithdrawalAddress,
+		signingKeyPath:          signingKeyPath,
+		withdrawalSeed:          withdrawalSeed,
+		signingSeed:             signingSeed,
+		amount:                  amount,
+		chainSetting:            chainSetting,
+		hexQRLWithdrawalAddress: hexQRLWithdrawalAddress,
 	}, nil
 }

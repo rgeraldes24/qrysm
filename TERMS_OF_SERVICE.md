@@ -27,7 +27,7 @@ In no event will the QRL core team, associated entities or any contributors be l
 
 ### Indemnification
 To the maximum extent permitted by law, you will defend, indemnify and hold the QRL developers, associated entities and contributors harmless from and against any and all claims, actions, suits, investigations, or proceedings by any third party (including any party or purported party to or beneficiary or purported beneficiary of any transaction on Qrysm), as well as any and all losses, liabilities,
-damages, costs, and expenses (including reasonable attorneys’ fees) arising out of, accruing from, or in any way related to (i) your breach of the terms of this Agreement, (ii) any transaction, or the failure to occur of any transaction on Prysm, and (iii) your negligence, fraud, or willful misconduct.
+damages, costs, and expenses (including reasonable attorneys’ fees) arising out of, accruing from, or in any way related to (i) your breach of the terms of this Agreement, (ii) any transaction, or the failure to occur of any transaction on Qrysm, and (iii) your negligence, fraud, or willful misconduct.
 
 ### Compliance with Laws and Tax Obligations
 Your use of Qrysm is subject to all applicable laws of any governmental authority, including, without limitation, federal, state and foreign securities laws, tax laws, tariff and trade laws, ordinances, judgments, decrees, injunctions, writs and orders or like actions of any governmental authority and rules, regulations, orders, interpretations, licenses, and permits of any federal,

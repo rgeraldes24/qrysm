@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/peerdata"
 	http2 "github.com/theQRL/qrysm/network/http"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // ListTrustedPeer retrieves data about the node's trusted peers.
@@ -37,8 +37,8 @@ func (s *Server) ListTrustedPeer(w http.ResponseWriter, r *http.Request) {
 				PeerID:             id.String(),
 				Qnr:                "",
 				LastSeenP2PAddress: "",
-				State:              zond.ConnectionState(corenet.NotConnected).String(),
-				Direction:          zond.PeerDirection(corenet.DirUnknown).String(),
+				State:              qrysmpb.ConnectionState(corenet.NotConnected).String(),
+				Direction:          qrysmpb.PeerDirection(corenet.DirUnknown).String(),
 			}
 		}
 		allPeers = append(allPeers, p)
@@ -156,11 +156,11 @@ func httpPeerInfo(peerStatus *peers.Status, id peer.ID) (*Peer, error) {
 		}
 		return nil, errors.Wrap(err, "could not obtain direction")
 	}
-	if zond.PeerDirection(direction) == zond.PeerDirection_UNKNOWN {
+	if qrysmpb.PeerDirection(direction) == qrysmpb.PeerDirection_UNKNOWN {
 		return nil, nil
 	}
-	v1ConnState := zond.ConnectionState(connectionState).String()
-	v1PeerDirection := zond.PeerDirection(direction).String()
+	v1ConnState := qrysmpb.ConnectionState(connectionState).String()
+	v1PeerDirection := qrysmpb.PeerDirection(direction).String()
 	p := Peer{
 		PeerID:    id.String(),
 		State:     v1ConnState,

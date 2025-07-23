@@ -29,8 +29,8 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.EffectiveBalanceIncrement = 1e9
 
 	// Initial values
-	minimalConfig.DilithiumWithdrawalPrefixByte = byte(0)   // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
-	minimalConfig.ZondAddressWithdrawalPrefixByte = byte(1) // TODO (cyyber): Change it to 0
+	minimalConfig.DilithiumWithdrawalPrefixByte = byte(0)  // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
+	minimalConfig.QRLAddressWithdrawalPrefixByte = byte(1) // TODO (cyyber): Change it to 0
 
 	// Time parameters
 	minimalConfig.SecondsPerSlot = 6
@@ -83,7 +83,7 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.InactivityScoreBias = 4
 	minimalConfig.EpochsPerSyncCommitteePeriod = 8
 
-	// Zond execution layer parameters.
+	// QRL execution layer parameters.
 	minimalConfig.DepositChainID = 5
 	minimalConfig.DepositNetworkID = 5
 	minimalConfig.DepositContractAddress = "Q1234567890123456789012345678901234567890"

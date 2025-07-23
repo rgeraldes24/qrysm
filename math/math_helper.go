@@ -213,7 +213,7 @@ func AddInt(i ...int) (int, error) {
 	return sum, nil
 }
 
-// Planck is the smallest unit of Zond, represented as a pointer to a bigInt.
+// Planck is the smallest unit of QRL, represented as a pointer to a bigInt.
 type Planck *big.Int
 
 // Gplanck is a denomination of 1e9 Planck represented as an uint64.
@@ -225,9 +225,9 @@ func PlanckToGplanck(v Planck) Gplanck {
 	if v == nil {
 		return 0
 	}
-	gplanckPerZond := big.NewInt(1e9)
+	gplanckPerQuanta := big.NewInt(1e9)
 	copied := big.NewInt(0).Set(v)
-	copied.Div(copied, gplanckPerZond)
+	copied.Div(copied, gplanckPerQuanta)
 	return Gplanck(copied.Uint64())
 }
 

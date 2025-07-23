@@ -202,7 +202,7 @@ go_test(
         "validator_test.go",
     ],
     embed = [":go_default_library"],
-    zond_network = "minimal",
+    qrl_network = "minimal",
     tags = ["minimal"],
     deps = common_deps,
 )

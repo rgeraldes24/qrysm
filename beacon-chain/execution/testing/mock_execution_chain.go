@@ -148,7 +148,7 @@ type RPCClient struct {
 func (*RPCClient) Close() {}
 
 func (r *RPCClient) CallContext(ctx context.Context, obj interface{}, methodName string, args ...interface{}) error {
-	if r.BlockNumMap != nil && methodName == "zond_getBlockByNumber" {
+	if r.BlockNumMap != nil && methodName == "qrl_getBlockByNumber" {
 		val, ok := args[0].(string)
 		if !ok {
 			return errors.Errorf("wrong argument type provided: %T", args[0])
@@ -165,7 +165,7 @@ func (r *RPCClient) CallContext(ctx context.Context, obj interface{}, methodName
 		*assertedObj = b
 		return nil
 	}
-	if r.Backend == nil && methodName == "zond_getBlockByNumber" {
+	if r.Backend == nil && methodName == "qrl_getBlockByNumber" {
 		h := &gzondtypes.Header{
 			Number: big.NewInt(15),
 			Time:   150,
@@ -182,7 +182,7 @@ func (r *RPCClient) CallContext(ctx context.Context, obj interface{}, methodName
 		return nil
 	}
 	switch methodName {
-	case "zond_getBlockByNumber":
+	case "qrl_getBlockByNumber":
 		val, ok := args[0].(string)
 		if !ok {
 			return errors.Errorf("wrong argument type provided: %T", args[0])
@@ -208,7 +208,7 @@ func (r *RPCClient) CallContext(ctx context.Context, obj interface{}, methodName
 			Number: h.Number,
 			Time:   h.Time,
 		}
-	case "zond_getBlockByHash":
+	case "qrl_getBlockByHash":
 		val, ok := args[0].(common.Hash)
 		if !ok {
 			return errors.Errorf("wrong argument type provided: %T", args[0])

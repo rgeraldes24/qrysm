@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 )
 
-// HeaderInfo specifies the block header information in the Zond execution layer.
+// HeaderInfo specifies the block header information in the QRL execution layer.
 type HeaderInfo struct {
 	Number *big.Int    `json:"number"`
 	Hash   common.Hash `json:"hash"`

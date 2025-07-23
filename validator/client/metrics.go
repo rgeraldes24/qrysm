@@ -324,11 +324,11 @@ func (v *validator) logForEachValidator(index int, pubKey []byte, resp *qrysmpb.
 	}
 
 	fmtKey := fmt.Sprintf("%#x", pubKey)
-	gplanckPerZond := float64(params.BeaconConfig().GplanckPerZond)
+	gplanckPerQuanta := float64(params.BeaconConfig().GplanckPerQuanta)
 	if v.prevBalance[pubKeyBytes] > 0 {
-		newBalance := float64(balAfterEpoch) / gplanckPerZond
-		prevBalance := float64(balBeforeEpoch) / gplanckPerZond
-		startBalance := float64(v.startBalances[pubKeyBytes]) / gplanckPerZond
+		newBalance := float64(balAfterEpoch) / gplanckPerQuanta
+		prevBalance := float64(balBeforeEpoch) / gplanckPerQuanta
+		startBalance := float64(v.startBalances[pubKeyBytes]) / gplanckPerQuanta
 		percentNet := (newBalance - prevBalance) / prevBalance
 		percentSinceStart := (newBalance - startBalance) / startBalance
 

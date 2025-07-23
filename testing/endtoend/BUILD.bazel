@@ -105,7 +105,7 @@ go_test(
         "@com_github_theqrl_go_zond//cmd/gzond",
         #"@web3signer",
     ],
-    zond_network = "minimal",
+    qrl_network = "minimal",
     flaky = True,
     shard_count = 2,
     tags = [
@@ -138,7 +138,7 @@ go_test(
         "@com_github_theqrl_go_zond//cmd/gzond",
         "@web3signer",
     ],
-    zond_network = "minimal",
+    qrl_network = "minimal",
     flaky = True,
     shard_count = 2,
     tags = [
@@ -170,7 +170,7 @@ go_test(
         "@com_github_theqrl_go_zond//cmd/gzond",
         "@web3signer",
     ],
-    zond_network = "mainnet",
+    qrl_network = "mainnet",
     flaky = True,
     shard_count = 2,
     tags = [
@@ -203,7 +203,7 @@ go_test(
         "@com_github_theqrl_go_zond//cmd/gzond",
         "@web3signer",
     ],
-    zond_network = "mainnet",
+    qrl_network = "mainnet",
     flaky = True,
     shard_count = 2,
     tags = [
@@ -236,7 +236,7 @@ go_test(
         "@com_github_theqrl_go_zond//cmd/gzond",
         "@web3signer",
     ],
-    zond_network = "minimal",
+    qrl_network = "minimal",
     flaky = True,
     shard_count = 2,
     tags = [

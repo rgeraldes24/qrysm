@@ -96,7 +96,7 @@ func TestConfigureExecutionSetting(t *testing.T) {
 	assert.Equal(t, recipient0, params.BeaconConfig().DefaultFeeRecipient)
 
 	assert.LogsContain(t, hook,
-		"is not a checksum Zond address",
+		"is not a checksum QRL address",
 	)
 	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "QaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa"))
 	cliCtx = cli.NewContext(&app, set, nil)

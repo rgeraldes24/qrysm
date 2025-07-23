@@ -33,9 +33,9 @@ const (
 	// GetPayloadMethodV2 v2 request string for JSON-RPC.
 	GetPayloadMethodV2 = "engine_getPayloadV2"
 	// ExecutionBlockByHashMethod request string for JSON-RPC.
-	ExecutionBlockByHashMethod = "zond_getBlockByHash"
+	ExecutionBlockByHashMethod = "qrl_getBlockByHash"
 	// ExecutionBlockByNumberMethod request string for JSON-RPC.
-	ExecutionBlockByNumberMethod = "zond_getBlockByNumber"
+	ExecutionBlockByNumberMethod = "qrl_getBlockByNumber"
 	// GetPayloadBodiesByHashV1 v1 request string for JSON-RPC.
 	GetPayloadBodiesByHashV1 = "engine_getPayloadBodiesByHashV1"
 	// GetPayloadBodiesByRangeV1 v1 request string for JSON-RPC.
@@ -200,7 +200,7 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 }
 
 // LatestExecutionBlock fetches the latest execution engine block by calling
-// zond_blockByNumber via JSON-RPC.
+// qrl_blockByNumber via JSON-RPC.
 func (s *Service) LatestExecutionBlock(ctx context.Context) (*pb.ExecutionBlock, error) {
 	ctx, span := trace.StartSpan(ctx, "powchain.engine-api-client.LatestExecutionBlock")
 	defer span.End()
@@ -217,7 +217,7 @@ func (s *Service) LatestExecutionBlock(ctx context.Context) (*pb.ExecutionBlock,
 }
 
 // ExecutionBlockByHash fetches an execution engine block by hash by calling
-// zond_blockByHash via JSON-RPC.
+// qrl_blockByHash via JSON-RPC.
 func (s *Service) ExecutionBlockByHash(ctx context.Context, hash common.Hash, withTxs bool) (*pb.ExecutionBlock, error) {
 	ctx, span := trace.StartSpan(ctx, "powchain.engine-api-client.ExecutionBlockByHash")
 	defer span.End()
@@ -227,7 +227,7 @@ func (s *Service) ExecutionBlockByHash(ctx context.Context, hash common.Hash, wi
 }
 
 // ExecutionBlocksByHashes fetches a batch of execution engine blocks by hash by calling
-// zond_blockByHash via JSON-RPC.
+// qrl_blockByHash via JSON-RPC.
 func (s *Service) ExecutionBlocksByHashes(ctx context.Context, hashes []common.Hash, withTxs bool) ([]*pb.ExecutionBlock, error) {
 	_, span := trace.StartSpan(ctx, "powchain.engine-api-client.ExecutionBlocksByHashes")
 	defer span.End()

@@ -136,7 +136,7 @@ func (node *Builder) Start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	jwtPath := path.Join(e2e.TestParams.TestPath, "zonddata/"+strconv.Itoa(node.index)+"/")
+	jwtPath := path.Join(e2e.TestParams.TestPath, "qrldata/"+strconv.Itoa(node.index)+"/")
 	jwtPath = path.Join(jwtPath, "gzond/jwtsecret")
 	secret, err := parseJWTSecretFromFile(jwtPath)
 	if err != nil {

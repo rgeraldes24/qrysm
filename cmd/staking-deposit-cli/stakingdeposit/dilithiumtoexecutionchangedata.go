@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
-	qrlpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 )
 
 type DilithiumToExecutionChangeMessage struct {
@@ -27,7 +27,7 @@ type DilithiumToExecutionChangeData struct {
 }
 
 func NewDilithiumToExecutionChangeData(
-	signedDilithiumToExecutionChange *qrlpbv1.SignedDilithiumToExecutionChange,
+	signedDilithiumToExecutionChange *qrlpb.SignedDilithiumToExecutionChange,
 	chainSetting *config.ChainSetting) *DilithiumToExecutionChangeData {
 	return &DilithiumToExecutionChangeData{
 		Message: &DilithiumToExecutionChangeMessage{

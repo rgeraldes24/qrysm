@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/proto/migration"
-	qrlpbv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 )
 
 const (
@@ -27,8 +27,8 @@ const (
 //	    sync_aggregate=update.sync_aggregate,
 //	    signature_slot=update.signature_slot,
 //	)
-func CreateLightClientFinalityUpdate(update *qrlpbv1.LightClientUpdate) *qrlpbv1.LightClientFinalityUpdate {
-	return &qrlpbv1.LightClientFinalityUpdate{
+func CreateLightClientFinalityUpdate(update *qrlpb.LightClientUpdate) *qrlpb.LightClientFinalityUpdate {
+	return &qrlpb.LightClientFinalityUpdate{
 		AttestedHeader:  update.AttestedHeader,
 		FinalizedHeader: update.FinalizedHeader,
 		FinalityBranch:  update.FinalityBranch,
@@ -45,8 +45,8 @@ func CreateLightClientFinalityUpdate(update *qrlpbv1.LightClientUpdate) *qrlpbv1
 //	    sync_aggregate=update.sync_aggregate,
 //	    signature_slot=update.signature_slot,
 //	)
-func CreateLightClientOptimisticUpdate(update *qrlpbv1.LightClientUpdate) *qrlpbv1.LightClientOptimisticUpdate {
-	return &qrlpbv1.LightClientOptimisticUpdate{
+func CreateLightClientOptimisticUpdate(update *qrlpb.LightClientUpdate) *qrlpb.LightClientOptimisticUpdate {
+	return &qrlpb.LightClientOptimisticUpdate{
 		AttestedHeader: update.AttestedHeader,
 		SyncAggregate:  update.SyncAggregate,
 		SignatureSlot:  update.SignatureSlot,
@@ -57,7 +57,7 @@ func NewLightClientOptimisticUpdateFromBeaconState(
 	ctx context.Context,
 	state state.BeaconState,
 	block interfaces.ReadOnlySignedBeaconBlock,
-	attestedState state.BeaconState) (*qrlpbv1.LightClientUpdate, error) {
+	attestedState state.BeaconState) (*qrlpb.LightClientUpdate, error) {
 	// assert sum(block.message.body.sync_aggregate.sync_committee_bits) >= MIN_SYNC_COMMITTEE_PARTICIPANTS
 	syncAggregate, err := block.Block().Body().SyncAggregate()
 	if err != nil {
@@ -121,7 +121,7 @@ func NewLightClientOptimisticUpdateFromBeaconState(
 	}
 
 	// Return result
-	attestedHeaderResult := &qrlpbv1.BeaconBlockHeader{
+	attestedHeaderResult := &qrlpb.BeaconBlockHeader{
 		Slot:          attestedHeader.Slot,
 		ProposerIndex: attestedHeader.ProposerIndex,
 		ParentRoot:    attestedHeader.ParentRoot,
@@ -129,12 +129,12 @@ func NewLightClientOptimisticUpdateFromBeaconState(
 		BodyRoot:      attestedHeader.BodyRoot,
 	}
 
-	syncAggregateResult := &qrlpbv1.SyncAggregate{
+	syncAggregateResult := &qrlpb.SyncAggregate{
 		SyncCommitteeBits:       syncAggregate.SyncCommitteeBits,
 		SyncCommitteeSignatures: syncAggregate.SyncCommitteeSignatures,
 	}
 
-	result := &qrlpbv1.LightClientUpdate{
+	result := &qrlpb.LightClientUpdate{
 		AttestedHeader: attestedHeaderResult,
 		SyncAggregate:  syncAggregateResult,
 		SignatureSlot:  block.Block().Slot(),
@@ -148,7 +148,7 @@ func NewLightClientFinalityUpdateFromBeaconState(
 	state state.BeaconState,
 	block interfaces.ReadOnlySignedBeaconBlock,
 	attestedState state.BeaconState,
-	finalizedBlock interfaces.ReadOnlySignedBeaconBlock) (*qrlpbv1.LightClientUpdate, error) {
+	finalizedBlock interfaces.ReadOnlySignedBeaconBlock) (*qrlpb.LightClientUpdate, error) {
 	result, err := NewLightClientOptimisticUpdateFromBeaconState(
 		ctx,
 		state,
@@ -160,7 +160,7 @@ func NewLightClientFinalityUpdateFromBeaconState(
 	}
 
 	// Indicate finality whenever possible
-	var finalizedHeader *qrlpbv1.BeaconBlockHeader
+	var finalizedHeader *qrlpb.BeaconBlockHeader
 	var finalityBranch [][]byte
 
 	if finalizedBlock != nil && !finalizedBlock.IsNil() {
@@ -184,7 +184,7 @@ func NewLightClientFinalityUpdateFromBeaconState(
 				return nil, fmt.Errorf("invalid finalized header root %v", attestedState.FinalizedCheckpoint().Root)
 			}
 
-			finalizedHeader = &qrlpbv1.BeaconBlockHeader{
+			finalizedHeader = &qrlpb.BeaconBlockHeader{
 				Slot:          0,
 				ProposerIndex: 0,
 				ParentRoot:    make([]byte, 32),
@@ -199,7 +199,7 @@ func NewLightClientFinalityUpdateFromBeaconState(
 			return nil, fmt.Errorf("could not get finalized root proof %v", bErr)
 		}
 	} else {
-		finalizedHeader = &qrlpbv1.BeaconBlockHeader{
+		finalizedHeader = &qrlpb.BeaconBlockHeader{
 			Slot:          0,
 			ProposerIndex: 0,
 			ParentRoot:    make([]byte, 32),
@@ -218,8 +218,8 @@ func NewLightClientFinalityUpdateFromBeaconState(
 	return result, nil
 }
 
-func NewLightClientUpdateFromFinalityUpdate(update *qrlpbv1.LightClientFinalityUpdate) *qrlpbv1.LightClientUpdate {
-	return &qrlpbv1.LightClientUpdate{
+func NewLightClientUpdateFromFinalityUpdate(update *qrlpb.LightClientFinalityUpdate) *qrlpb.LightClientUpdate {
+	return &qrlpb.LightClientUpdate{
 		AttestedHeader:  update.AttestedHeader,
 		FinalizedHeader: update.FinalizedHeader,
 		FinalityBranch:  update.FinalityBranch,
@@ -228,8 +228,8 @@ func NewLightClientUpdateFromFinalityUpdate(update *qrlpbv1.LightClientFinalityU
 	}
 }
 
-func NewLightClientUpdateFromOptimisticUpdate(update *qrlpbv1.LightClientOptimisticUpdate) *qrlpbv1.LightClientUpdate {
-	return &qrlpbv1.LightClientUpdate{
+func NewLightClientUpdateFromOptimisticUpdate(update *qrlpb.LightClientOptimisticUpdate) *qrlpb.LightClientUpdate {
+	return &qrlpb.LightClientUpdate{
 		AttestedHeader: update.AttestedHeader,
 		SyncAggregate:  update.SyncAggregate,
 		SignatureSlot:  update.SignatureSlot,

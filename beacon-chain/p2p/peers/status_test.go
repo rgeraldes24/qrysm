@@ -19,8 +19,8 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/consensus-types/wrapper"
-	qrysmpb "github.com/theQRL/qrysm/proto/qrl/v1"
-	pb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -189,7 +189,7 @@ func TestPeerCommitteeIndices(t *testing.T) {
 			bitV.SetBitAt(uint64(i), true)
 		}
 	}
-	p.SetMetadata(id, wrapper.WrappedMetadataV1(&pb.MetaDataV1{
+	p.SetMetadata(id, wrapper.WrappedMetadataV1(&qrysmpb.MetaDataV1{
 		SeqNumber: 2,
 		Attnets:   bitV,
 	}))
@@ -224,7 +224,7 @@ func TestPeerSubscribedToSubnet(t *testing.T) {
 			bitV.SetBitAt(uint64(i), true)
 		}
 	}
-	p.SetMetadata(expectedPeer, wrapper.WrappedMetadataV1(&pb.MetaDataV1{
+	p.SetMetadata(expectedPeer, wrapper.WrappedMetadataV1(&qrysmpb.MetaDataV1{
 		SeqNumber: 2,
 		Attnets:   bitV,
 	}))
@@ -290,7 +290,7 @@ func TestPeerChainState(t *testing.T) {
 	require.NoError(t, err)
 
 	finalizedEpoch := primitives.Epoch(123)
-	p.SetChainState(id, &pb.Status{FinalizedEpoch: finalizedEpoch})
+	p.SetChainState(id, &qrysmpb.Status{FinalizedEpoch: finalizedEpoch})
 
 	resChainState, err := p.ChainState(id)
 	require.NoError(t, err)
@@ -325,7 +325,7 @@ func TestPeerWithNilChainState(t *testing.T) {
 
 	resChainState, err := p.ChainState(id)
 	require.Equal(t, peerdata.ErrNoPeerStatus, err)
-	var nothing *pb.Status
+	var nothing *qrysmpb.Status
 	require.Equal(t, resChainState, nothing)
 }
 
@@ -397,7 +397,7 @@ func TestAddMetaData(t *testing.T) {
 	}
 	newPeer := p.All()[2]
 
-	newMetaData := &pb.MetaDataV1{
+	newMetaData := &qrysmpb.MetaDataV1{
 		SeqNumber: 8,
 		Attnets:   bitfield.NewBitvector64(),
 	}
@@ -571,7 +571,7 @@ func TestPeerIPTracker(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		badPeers = append(badPeers, createPeer(t, p, addr, network.DirUnknown, peerdata.PeerConnectionState(qrysmpb.ConnectionState_DISCONNECTED)))
+		badPeers = append(badPeers, createPeer(t, p, addr, network.DirUnknown, peerdata.PeerConnectionState(qrlpb.ConnectionState_DISCONNECTED)))
 	}
 	for _, pr := range badPeers {
 		assert.Equal(t, true, p.IsBad(pr), "peer with bad ip is not bad")
@@ -613,35 +613,35 @@ func TestTrimmedOrderedPeers(t *testing.T) {
 	copy(mockroot5[:], "five")
 	// Peer 1
 	pid1 := addPeer(t, p, peers.PeerConnected)
-	p.SetChainState(pid1, &pb.Status{
+	p.SetChainState(pid1, &qrysmpb.Status{
 		HeadSlot:       3 * params.BeaconConfig().SlotsPerEpoch,
 		FinalizedEpoch: 3,
 		FinalizedRoot:  mockroot3[:],
 	})
 	// Peer 2
 	pid2 := addPeer(t, p, peers.PeerConnected)
-	p.SetChainState(pid2, &pb.Status{
+	p.SetChainState(pid2, &qrysmpb.Status{
 		HeadSlot:       4 * params.BeaconConfig().SlotsPerEpoch,
 		FinalizedEpoch: 4,
 		FinalizedRoot:  mockroot4[:],
 	})
 	// Peer 3
 	pid3 := addPeer(t, p, peers.PeerConnected)
-	p.SetChainState(pid3, &pb.Status{
+	p.SetChainState(pid3, &qrysmpb.Status{
 		HeadSlot:       5 * params.BeaconConfig().SlotsPerEpoch,
 		FinalizedEpoch: 5,
 		FinalizedRoot:  mockroot5[:],
 	})
 	// Peer 4
 	pid4 := addPeer(t, p, peers.PeerConnected)
-	p.SetChainState(pid4, &pb.Status{
+	p.SetChainState(pid4, &qrysmpb.Status{
 		HeadSlot:       2 * params.BeaconConfig().SlotsPerEpoch,
 		FinalizedEpoch: 2,
 		FinalizedRoot:  mockroot2[:],
 	})
 	// Peer 5
 	pid5 := addPeer(t, p, peers.PeerConnected)
-	p.SetChainState(pid5, &pb.Status{
+	p.SetChainState(pid5, &qrysmpb.Status{
 		HeadSlot:       2 * params.BeaconConfig().SlotsPerEpoch,
 		FinalizedEpoch: 2,
 		FinalizedRoot:  mockroot2[:],
@@ -680,12 +680,12 @@ func TestAtInboundPeerLimit(t *testing.T) {
 	})
 	for i := 0; i < 15; i++ {
 		// Peer added to peer handler.
-		createPeer(t, p, nil, network.DirOutbound, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
+		createPeer(t, p, nil, network.DirOutbound, peerdata.PeerConnectionState(qrlpb.ConnectionState_CONNECTED))
 	}
 	assert.Equal(t, false, p.IsAboveInboundLimit(), "Inbound limit exceeded")
 	for i := 0; i < 31; i++ {
 		// Peer added to peer handler.
-		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
+		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrlpb.ConnectionState_CONNECTED))
 	}
 	assert.Equal(t, true, p.IsAboveInboundLimit(), "Inbound limit not exceeded")
 }
@@ -705,7 +705,7 @@ func TestPrunePeers(t *testing.T) {
 	})
 	for i := 0; i < 15; i++ {
 		// Peer added to peer handler.
-		createPeer(t, p, nil, network.DirOutbound, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
+		createPeer(t, p, nil, network.DirOutbound, peerdata.PeerConnectionState(qrlpb.ConnectionState_CONNECTED))
 	}
 	// Assert there are no prunable peers.
 	peersToPrune := p.PeersToPrune()
@@ -713,7 +713,7 @@ func TestPrunePeers(t *testing.T) {
 
 	for i := 0; i < 18; i++ {
 		// Peer added to peer handler.
-		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
+		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrlpb.ConnectionState_CONNECTED))
 	}
 
 	// Assert there are the correct prunable peers.
@@ -723,7 +723,7 @@ func TestPrunePeers(t *testing.T) {
 	// Add in more peers.
 	for i := 0; i < 13; i++ {
 		// Peer added to peer handler.
-		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
+		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrlpb.ConnectionState_CONNECTED))
 	}
 
 	// Set up bad scores for inbound peers.
@@ -767,7 +767,7 @@ func TestPrunePeers_TrustedPeers(t *testing.T) {
 
 	for i := 0; i < 15; i++ {
 		// Peer added to peer handler.
-		createPeer(t, p, nil, network.DirOutbound, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
+		createPeer(t, p, nil, network.DirOutbound, peerdata.PeerConnectionState(qrlpb.ConnectionState_CONNECTED))
 	}
 	// Assert there are no prunable peers.
 	peersToPrune := p.PeersToPrune()
@@ -775,7 +775,7 @@ func TestPrunePeers_TrustedPeers(t *testing.T) {
 
 	for i := 0; i < 18; i++ {
 		// Peer added to peer handler.
-		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
+		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrlpb.ConnectionState_CONNECTED))
 	}
 
 	// Assert there are the correct prunable peers.
@@ -785,7 +785,7 @@ func TestPrunePeers_TrustedPeers(t *testing.T) {
 	// Add in more peers.
 	for i := 0; i < 13; i++ {
 		// Peer added to peer handler.
-		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
+		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrlpb.ConnectionState_CONNECTED))
 	}
 
 	trustedPeers := []peer.ID{}
@@ -821,7 +821,7 @@ func TestPrunePeers_TrustedPeers(t *testing.T) {
 	// Add more peers to check if trusted peers can be pruned after they are deleted from trusted peer set.
 	for i := 0; i < 9; i++ {
 		// Peer added to peer handler.
-		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrysmpb.ConnectionState_CONNECTED))
+		createPeer(t, p, nil, network.DirInbound, peerdata.PeerConnectionState(qrlpb.ConnectionState_CONNECTED))
 	}
 
 	// Delete trusted peers.
@@ -1002,7 +1002,7 @@ func TestStatus_BestPeer(t *testing.T) {
 				},
 			})
 			for _, peerConfig := range tt.peers {
-				p.SetChainState(addPeer(t, p, peers.PeerConnected), &pb.Status{
+				p.SetChainState(addPeer(t, p, peers.PeerConnected), &qrysmpb.Status{
 					FinalizedEpoch: peerConfig.finalizedEpoch,
 					HeadSlot:       peerConfig.headSlot,
 				})
@@ -1029,7 +1029,7 @@ func TestBestFinalized_returnsMaxValue(t *testing.T) {
 	for i := 0; i <= maxPeers+100; i++ {
 		p.Add(new(qnr.Record), peer.ID(rune(i)), nil, network.DirOutbound)
 		p.SetConnectionState(peer.ID(rune(i)), peers.PeerConnected)
-		p.SetChainState(peer.ID(rune(i)), &pb.Status{
+		p.SetChainState(peer.ID(rune(i)), &qrysmpb.Status{
 			FinalizedEpoch: 10,
 		})
 	}
@@ -1052,7 +1052,7 @@ func TestStatus_BestNonFinalized(t *testing.T) {
 	for i, headSlot := range peerSlots {
 		p.Add(new(qnr.Record), peer.ID(rune(i)), nil, network.DirOutbound)
 		p.SetConnectionState(peer.ID(rune(i)), peers.PeerConnected)
-		p.SetChainState(peer.ID(rune(i)), &pb.Status{
+		p.SetChainState(peer.ID(rune(i)), &qrysmpb.Status{
 			HeadSlot: headSlot,
 		})
 	}
@@ -1075,17 +1075,17 @@ func TestStatus_CurrentEpoch(t *testing.T) {
 	})
 	// Peer 1
 	pid1 := addPeer(t, p, peers.PeerConnected)
-	p.SetChainState(pid1, &pb.Status{
+	p.SetChainState(pid1, &qrysmpb.Status{
 		HeadSlot: params.BeaconConfig().SlotsPerEpoch * 4,
 	})
 	// Peer 2
 	pid2 := addPeer(t, p, peers.PeerConnected)
-	p.SetChainState(pid2, &pb.Status{
+	p.SetChainState(pid2, &qrysmpb.Status{
 		HeadSlot: params.BeaconConfig().SlotsPerEpoch * 5,
 	})
 	// Peer 3
 	pid3 := addPeer(t, p, peers.PeerConnected)
-	p.SetChainState(pid3, &pb.Status{
+	p.SetChainState(pid3, &qrysmpb.Status{
 		HeadSlot: params.BeaconConfig().SlotsPerEpoch * 4,
 	})
 
@@ -1142,7 +1142,7 @@ func addPeer(t *testing.T, p *peers.Status, state peerdata.PeerConnectionState) 
 	require.NoError(t, err)
 	p.Add(new(qnr.Record), id, nil, network.DirUnknown)
 	p.SetConnectionState(id, state)
-	p.SetMetadata(id, wrapper.WrappedMetadataV1(&pb.MetaDataV1{
+	p.SetMetadata(id, wrapper.WrappedMetadataV1(&qrysmpb.MetaDataV1{
 		SeqNumber: 0,
 		Attnets:   bitfield.NewBitvector64(),
 	}))
