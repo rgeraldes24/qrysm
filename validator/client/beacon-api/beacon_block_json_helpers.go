@@ -35,11 +35,11 @@ func jsonifyDilithiumToExecutionChanges(dilithiumToExecutionChanges []*qrysmpb.S
 	return jsonDilithiumToExecutionChanges
 }
 
-func jsonifyExecutionNodeData(executionNodeData *qrysmpb.ExecutionNodeData) *apimiddleware.ExecutionNodeDataJson {
-	return &apimiddleware.ExecutionNodeDataJson{
-		BlockHash:    hexutil.Encode(executionNodeData.BlockHash),
-		DepositCount: uint64ToString(executionNodeData.DepositCount),
-		DepositRoot:  hexutil.Encode(executionNodeData.DepositRoot),
+func jsonifyExecutionData(executionData *qrysmpb.ExecutionData) *apimiddleware.ExecutionDataJson {
+	return &apimiddleware.ExecutionDataJson{
+		BlockHash:    hexutil.Encode(executionData.BlockHash),
+		DepositCount: uint64ToString(executionData.DepositCount),
+		DepositRoot:  hexutil.Encode(executionData.DepositRoot),
 	}
 }
 

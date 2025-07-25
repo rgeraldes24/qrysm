@@ -463,15 +463,15 @@ func RegisterDebugHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Debug_GetBeaconState_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "debug", "state"}, ""))
+	pattern_Debug_GetBeaconState_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "debug", "state"}, ""))
 
-	pattern_Debug_GetBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "debug", "block"}, ""))
+	pattern_Debug_GetBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "debug", "block"}, ""))
 
-	pattern_Debug_SetLoggingLevel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "debug", "logging"}, ""))
+	pattern_Debug_SetLoggingLevel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "debug", "logging"}, ""))
 
-	pattern_Debug_ListPeers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "debug", "peers"}, ""))
+	pattern_Debug_ListPeers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "debug", "peers"}, ""))
 
-	pattern_Debug_GetPeer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "debug", "peer"}, ""))
+	pattern_Debug_GetPeer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "debug", "peer"}, ""))
 )
 
 var (

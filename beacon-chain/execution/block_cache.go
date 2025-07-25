@@ -20,20 +20,20 @@ var (
 
 	// maxCacheSize is 2x of the follow distance for additional cache padding.
 	// Requests should be only accessing blocks within recent blocks within the
-	// Eth1FollowDistance.
-	maxCacheSize = 2 * params.BeaconConfig().Eth1FollowDistance
+	// ExecutionFollowDistance.
+	maxCacheSize = 2 * params.BeaconConfig().ExecutionFollowDistance
 
 	// Metrics
 	headerCacheMiss = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "powchain_header_cache_miss",
+		Name: "execution_chain_header_cache_miss",
 		Help: "The number of header requests that aren't present in the cache.",
 	})
 	headerCacheHit = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "powchain_header_cache_hit",
+		Name: "execution_chain_header_cache_hit",
 		Help: "The number of header requests that are present in the cache.",
 	})
 	headerCacheSize = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "powchain_header_cache_size",
+		Name: "execution_chain_header_cache_size",
 		Help: "The number of headers in the header cache",
 	})
 )

@@ -39,7 +39,7 @@ func TestProposeBeaconBlock_BlindedCapella(t *testing.T) {
 				Attestations:      jsonifyAttestations(blindedCapellaBlock.BlindedCapella.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(blindedCapellaBlock.BlindedCapella.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(blindedCapellaBlock.BlindedCapella.Block.Body.Deposits),
-				ExecutionNodeData: jsonifyExecutionNodeData(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionNodeData),
+				ExecutionData:     jsonifyExecutionData(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionData),
 				Graffiti:          hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.Graffiti),
 				ProposerSlashings: jsonifyProposerSlashings(blindedCapellaBlock.BlindedCapella.Block.Body.ProposerSlashings),
 				RandaoReveal:      hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.RandaoReveal),
@@ -104,7 +104,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 				StateRoot:     test_helpers.FillByteSlice(32, 4),
 				Body: &qrysmpb.BlindedBeaconBlockBodyCapella{
 					RandaoReveal: test_helpers.FillByteSlice(4595, 5),
-					ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+					ExecutionData: &qrysmpb.ExecutionData{
 						DepositRoot:  test_helpers.FillByteSlice(32, 6),
 						DepositCount: 7,
 						BlockHash:    test_helpers.FillByteSlice(32, 8),

@@ -32,9 +32,9 @@ type BeaconState struct {
 	stateRootsMultiValue                *MultiValueStateRoots
 	historicalRoots                     customtypes.HistoricalRoots
 	historicalSummaries                 []*qrysmpb.HistoricalSummary
-	executionNodeData                   *qrysmpb.ExecutionNodeData
-	executionNodeDataVotes              []*qrysmpb.ExecutionNodeData
-	eth1DepositIndex                    uint64
+	executionData                       *qrysmpb.ExecutionData
+	executionDataVotes                  []*qrysmpb.ExecutionData
+	executionDepositIndex               uint64
 	validators                          []*qrysmpb.Validator
 	validatorsMultiValue                *MultiValueValidators
 	balances                            []uint64
@@ -78,9 +78,9 @@ type beaconStateMarshalable struct {
 	StateRoots                          customtypes.StateRoots                  `json:"state_roots" yaml:"state_roots"`
 	HistoricalRoots                     customtypes.HistoricalRoots             `json:"historical_roots" yaml:"historical_roots"`
 	HistoricalSummaries                 []*qrysmpb.HistoricalSummary            `json:"historical_summaries" yaml:"historical_summaries"`
-	ExecutionNodeData                   *qrysmpb.ExecutionNodeData              `json:"eth_1_data" yaml:"eth_1_data"`
-	ExecutionNodeDataVotes              []*qrysmpb.ExecutionNodeData            `json:"eth_1_data_votes" yaml:"eth_1_data_votes"`
-	Eth1DepositIndex                    uint64                                  `json:"eth_1_deposit_index" yaml:"eth_1_deposit_index"`
+	ExecutionData                       *qrysmpb.ExecutionData                  `json:"execution_data" yaml:"execution_data"`
+	ExecutionDataVotes                  []*qrysmpb.ExecutionData                `json:"execution_data_votes" yaml:"execution_data_votes"`
+	ExecutionDepositIndex               uint64                                  `json:"execution_deposit_index" yaml:"execution_deposit_index"`
 	Validators                          []*qrysmpb.Validator                    `json:"validators" yaml:"validators"`
 	Balances                            []uint64                                `json:"balances" yaml:"balances"`
 	RandaoMixes                         customtypes.RandaoMixes                 `json:"randao_mixes" yaml:"randao_mixes"`
@@ -134,9 +134,9 @@ func (b *BeaconState) MarshalJSON() ([]byte, error) {
 		StateRoots:                          sRoots,
 		HistoricalRoots:                     b.historicalRoots,
 		HistoricalSummaries:                 b.historicalSummaries,
-		ExecutionNodeData:                   b.executionNodeData,
-		ExecutionNodeDataVotes:              b.executionNodeDataVotes,
-		Eth1DepositIndex:                    b.eth1DepositIndex,
+		ExecutionData:                       b.executionData,
+		ExecutionDataVotes:                  b.executionDataVotes,
+		ExecutionDepositIndex:               b.executionDepositIndex,
 		Validators:                          vals,
 		Balances:                            balances,
 		RandaoMixes:                         mixes,

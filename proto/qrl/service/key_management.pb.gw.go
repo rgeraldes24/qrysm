@@ -1060,25 +1060,25 @@ func RegisterKeyManagementHandlerClient(ctx context.Context, mux *runtime.ServeM
 }
 
 var (
-	pattern_KeyManagement_ListKeystores_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"internal", "zond", "v1", "keystores"}, ""))
+	pattern_KeyManagement_ListKeystores_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"internal", "qrl", "v1", "keystores"}, ""))
 
-	pattern_KeyManagement_ImportKeystores_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"internal", "zond", "v1", "keystores"}, ""))
+	pattern_KeyManagement_ImportKeystores_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"internal", "qrl", "v1", "keystores"}, ""))
 
-	pattern_KeyManagement_DeleteKeystores_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"internal", "zond", "v1", "keystores"}, ""))
+	pattern_KeyManagement_DeleteKeystores_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"internal", "qrl", "v1", "keystores"}, ""))
 
-	pattern_KeyManagement_ListFeeRecipientByPubkey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "zond", "v1", "validator", "pubkey", "feerecipient"}, ""))
+	pattern_KeyManagement_ListFeeRecipientByPubkey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "qrl", "v1", "validator", "pubkey", "feerecipient"}, ""))
 
-	pattern_KeyManagement_SetFeeRecipientByPubkey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "zond", "v1", "validator", "pubkey", "feerecipient"}, ""))
+	pattern_KeyManagement_SetFeeRecipientByPubkey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "qrl", "v1", "validator", "pubkey", "feerecipient"}, ""))
 
-	pattern_KeyManagement_DeleteFeeRecipientByPubkey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "zond", "v1", "validator", "pubkey", "feerecipient"}, ""))
+	pattern_KeyManagement_DeleteFeeRecipientByPubkey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "qrl", "v1", "validator", "pubkey", "feerecipient"}, ""))
 
-	pattern_KeyManagement_GetGasLimit_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "zond", "v1", "validator", "pubkey", "gas_limit"}, ""))
+	pattern_KeyManagement_GetGasLimit_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "qrl", "v1", "validator", "pubkey", "gas_limit"}, ""))
 
-	pattern_KeyManagement_SetGasLimit_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "zond", "v1", "validator", "pubkey", "gas_limit"}, ""))
+	pattern_KeyManagement_SetGasLimit_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "qrl", "v1", "validator", "pubkey", "gas_limit"}, ""))
 
-	pattern_KeyManagement_DeleteGasLimit_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "zond", "v1", "validator", "pubkey", "gas_limit"}, ""))
+	pattern_KeyManagement_DeleteGasLimit_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "qrl", "v1", "validator", "pubkey", "gas_limit"}, ""))
 
-	pattern_KeyManagement_SetVoluntaryExit_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "zond", "v1", "validator", "pubkey", "voluntary_exit"}, ""))
+	pattern_KeyManagement_SetVoluntaryExit_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"internal", "qrl", "v1", "validator", "pubkey", "voluntary_exit"}, ""))
 )
 
 var (

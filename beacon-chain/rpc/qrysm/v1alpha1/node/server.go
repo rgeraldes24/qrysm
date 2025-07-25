@@ -31,17 +31,17 @@ import (
 // providing RPC endpoints for verifying a beacon node's sync status, genesis and
 // version information, and services the node implements and runs.
 type Server struct {
-	LogsStreamer         logs.Streamer
-	SyncChecker          sync.Checker
-	Server               *grpc.Server
-	BeaconDB             db.ReadOnlyDatabase
-	PeersFetcher         p2p.PeersProvider
-	PeerManager          p2p.PeerManager
-	GenesisTimeFetcher   blockchain.TimeFetcher
-	GenesisFetcher       blockchain.GenesisFetcher
-	POWChainInfoFetcher  execution.ChainInfoFetcher
-	BeaconMonitoringHost string
-	BeaconMonitoringPort int
+	LogsStreamer              logs.Streamer
+	SyncChecker               sync.Checker
+	Server                    *grpc.Server
+	BeaconDB                  db.ReadOnlyDatabase
+	PeersFetcher              p2p.PeersProvider
+	PeerManager               p2p.PeerManager
+	GenesisTimeFetcher        blockchain.TimeFetcher
+	GenesisFetcher            blockchain.GenesisFetcher
+	ExecutionChainInfoFetcher execution.ChainInfoFetcher
+	BeaconMonitoringHost      string
+	BeaconMonitoringPort      int
 }
 
 // GetSyncStatus checks the current network sync status of the node.
@@ -223,13 +223,13 @@ func (ns *Server) ListPeers(ctx context.Context, _ *empty.Empty) (*qrysmpb.Peers
 // GetExecutionNodeConnectionStatus gets data about the QRL1 endpoints.
 func (ns *Server) GetExecutionNodeConnectionStatus(_ context.Context, _ *empty.Empty) (*qrysmpb.ExecutionNodeConnectionStatus, error) {
 	var currErr string
-	err := ns.POWChainInfoFetcher.ExecutionClientConnectionErr()
+	err := ns.ExecutionChainInfoFetcher.ExecutionClientConnectionErr()
 	if err != nil {
 		currErr = err.Error()
 	}
 	return &qrysmpb.ExecutionNodeConnectionStatus{
-		CurrentAddress:         ns.POWChainInfoFetcher.ExecutionClientEndpoint(),
+		CurrentAddress:         ns.ExecutionChainInfoFetcher.ExecutionClientEndpoint(),
 		CurrentConnectionError: currErr,
-		Addresses:              []string{ns.POWChainInfoFetcher.ExecutionClientEndpoint()},
+		Addresses:              []string{ns.ExecutionChainInfoFetcher.ExecutionClientEndpoint()},
 	}, nil
 }

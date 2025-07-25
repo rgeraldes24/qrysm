@@ -142,7 +142,7 @@ func RegisterEventsHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 }
 
 var (
-	pattern_Events_StreamEvents_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"internal", "zond", "v1", "events"}, ""))
+	pattern_Events_StreamEvents_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"internal", "qrl", "v1", "events"}, ""))
 )
 
 var (

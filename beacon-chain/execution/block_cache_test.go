@@ -46,9 +46,9 @@ func TestBlockCache_byHash(t *testing.T) {
 	// TODO(now.youtrack.cloud/issue/TQ-5)
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
-	conf.Eth1FollowDistance = 2048
+	conf.ExecutionFollowDistance = 2048
 	params.OverrideBeaconConfig(conf)
-	maxCacheSize = 2 * params.BeaconConfig().Eth1FollowDistance
+	maxCacheSize = 2 * params.BeaconConfig().ExecutionFollowDistance
 
 	cache := newHeaderCache()
 

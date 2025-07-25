@@ -236,7 +236,7 @@ func TestMapBeaconBlockAltair(t *testing.T) {
 					StateRoot:     make([]byte, fieldparams.RootLength),
 					Body: &qrysmpb.BeaconBlockBodyAltair{
 						RandaoReveal: make([]byte, 32),
-						ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+						ExecutionData: &qrysmpb.ExecutionData{
 							DepositRoot:  make([]byte, fieldparams.RootLength),
 							DepositCount: 0,
 							BlockHash:    make([]byte, 32),
@@ -371,7 +371,7 @@ func TestMapBeaconBlockBody(t *testing.T) {
 			args: args{
 				body: &qrysmpb.BeaconBlockBody{
 					RandaoReveal: make([]byte, 32),
-					ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+					ExecutionData: &qrysmpb.ExecutionData{
 						DepositRoot:  make([]byte, fieldparams.RootLength),
 						DepositCount: 0,
 						BlockHash:    make([]byte, 32),

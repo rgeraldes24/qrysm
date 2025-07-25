@@ -27,9 +27,9 @@ func TestComputeFieldRootsWithHasher_Capella(t *testing.T) {
 	historicalRoots, err := util.PrepareRoots(int(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetHistoricalRoots(historicalRoots))
-	require.NoError(t, beaconState.SetExecutionNodeData(executionNodeData()))
-	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*qrysmpb.ExecutionNodeData{executionNodeData()}))
-	require.NoError(t, beaconState.SetEth1DepositIndex(123))
+	require.NoError(t, beaconState.SetExecutionData(executionData()))
+	require.NoError(t, beaconState.SetExecutionDataVotes([]*qrysmpb.ExecutionData{executionData()}))
+	require.NoError(t, beaconState.SetExecutionDepositIndex(123))
 	require.NoError(t, beaconState.SetValidators([]*qrysmpb.Validator{validator()}))
 	require.NoError(t, beaconState.SetBalances([]uint64{1, 2, 3}))
 	randaoMixes, err := util.PrepareRoots(int(params.BeaconConfig().EpochsPerHistoricalVector))
@@ -127,10 +127,10 @@ func latestBlockHeader() *qrysmpb.BeaconBlockHeader {
 	}
 }
 
-func executionNodeData() *qrysmpb.ExecutionNodeData {
+func executionData() *qrysmpb.ExecutionData {
 	dr := bytesutil.ToBytes32([]byte("deposit"))
 	bh := bytesutil.ToBytes32([]byte("block"))
-	return &qrysmpb.ExecutionNodeData{
+	return &qrysmpb.ExecutionData{
 		DepositRoot:  dr[:],
 		DepositCount: 123,
 		BlockHash:    bh[:],

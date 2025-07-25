@@ -156,7 +156,7 @@ func CalculateStateRoot(
 //	def process_block(state: BeaconState, block: ReadOnlyBeaconBlock) -> None:
 //	  process_block_header(state, block)
 //	  process_randao(state, block.body)
-//	  process_eth1_data(state, block.body)
+//	  process_execution_data(state, block.body)
 //	  process_operations(state, block.body)
 func ProcessBlockNoVerifyAnySig(
 	ctx context.Context,
@@ -223,7 +223,7 @@ func ProcessBlockNoVerifyAnySig(
 //
 //	def process_operations(state: BeaconState, body: ReadOnlyBeaconBlockBody) -> None:
 //	  # Verify that outstanding deposits are processed up to the maximum number of deposits
-//	  assert len(body.deposits) == min(MAX_DEPOSITS, state.eth1_data.deposit_count - state.eth1_deposit_index)
+//	  assert len(body.deposits) == min(MAX_DEPOSITS, state.execution_data.deposit_count - state.execution_deposit_index)
 //
 //	  def for_ops(operations: Sequence[Any], fn: Callable[[BeaconState, Any], None]) -> None:
 //	      for operation in operations:
@@ -272,7 +272,7 @@ func ProcessOperationsNoVerifyAttsSigs(
 //	if is_execution_enabled(state, block.body):
 //	    process_execution_payload(state, block.body.execution_payload, EXECUTION_ENGINE)  # [New in Bellatrix]
 //	process_randao(state, block.body)
-//	process_eth1_data(state, block.body)
+//	process_execution_data(state, block.body)
 //	process_operations(state, block.body)
 //	process_sync_aggregate(state, block.body.sync_aggregate)
 func ProcessBlockForStateRoot(
@@ -325,10 +325,10 @@ func ProcessBlockForStateRoot(
 		return nil, errors.Wrap(err, "could not verify and process randao")
 	}
 
-	state, err = b.ProcessExecutionNodeDataInBlock(ctx, state, signed.Block().Body().ExecutionNodeData())
+	state, err = b.ProcessExecutionDataInBlock(ctx, state, signed.Block().Body().ExecutionData())
 	if err != nil {
 		tracing.AnnotateError(span, err)
-		return nil, errors.Wrap(err, "could not process eth1 data")
+		return nil, errors.Wrap(err, "could not process execution data")
 	}
 
 	state, err = ProcessOperationsNoVerifyAttsSigs(ctx, state, signed)

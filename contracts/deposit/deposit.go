@@ -79,7 +79,7 @@ func WithdrawalCredentialsHash(withdrawalKey dilithium.DilithiumKey) []byte {
 	return append([]byte{params.BeaconConfig().DilithiumWithdrawalPrefixByte}, h[1:]...)[:32]
 }
 
-// VerifyDepositSignature verifies the correctness of Eth1 deposit BLS signature
+// VerifyDepositSignature verifies the correctness of Execution deposit Dilithium signature
 func VerifyDepositSignature(dd *qrysmpb.Deposit_Data, domain []byte) error {
 	ddCopy := qrysmpb.CopyDepositData(dd)
 	publicKey, err := dilithium.PublicKeyFromBytes(ddCopy.PublicKey)

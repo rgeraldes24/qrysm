@@ -41,7 +41,7 @@ func (dc *DepositCache) InsertPendingDeposit(ctx context.Context, d *qrysmpb.Dep
 	dc.depositsLock.Lock()
 	defer dc.depositsLock.Unlock()
 	dc.pendingDeposits = append(dc.pendingDeposits,
-		&qrysmpb.DepositContainer{Deposit: d, Eth1BlockHeight: blockNum, Index: index, DepositRoot: depositRoot[:]})
+		&qrysmpb.DepositContainer{Deposit: d, ExecutionBlockHeight: blockNum, Index: index, DepositRoot: depositRoot[:]})
 	pendingDepositsCount.Inc()
 	span.AddAttributes(trace.Int64Attribute("count", int64(len(dc.pendingDeposits))))
 }
@@ -73,7 +73,7 @@ func (dc *DepositCache) PendingContainers(ctx context.Context, untilBlk *big.Int
 
 	depositCntrs := make([]*qrysmpb.DepositContainer, 0, len(dc.pendingDeposits))
 	for _, ctnr := range dc.pendingDeposits {
-		if untilBlk == nil || untilBlk.Uint64() >= ctnr.Eth1BlockHeight {
+		if untilBlk == nil || untilBlk.Uint64() >= ctnr.ExecutionBlockHeight {
 			depositCntrs = append(depositCntrs, ctnr)
 		}
 	}

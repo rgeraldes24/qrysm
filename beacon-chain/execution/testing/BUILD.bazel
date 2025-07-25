@@ -6,7 +6,7 @@ go_library(
     srcs = [
         "mock_engine_client.go",
         "mock_execution_chain.go",
-        "mock_faulty_powchain.go",
+        "mock_faulty_execution_chain.go",
     ],
     importpath = "github.com/theQRL/qrysm/beacon-chain/execution/testing",
     visibility = [

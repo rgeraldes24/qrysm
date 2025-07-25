@@ -58,23 +58,23 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 		return nil, errors.Wrapf(err, "failed to decode randao reveal `%s`", block.Body.RandaoReveal)
 	}
 
-	if block.Body.ExecutionNodeData == nil {
-		return nil, errors.New("eth1 data is nil")
+	if block.Body.ExecutionData == nil {
+		return nil, errors.New("execution data is nil")
 	}
 
-	depositRoot, err := hexutil.Decode(block.Body.ExecutionNodeData.DepositRoot)
+	depositRoot, err := hexutil.Decode(block.Body.ExecutionData.DepositRoot)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode deposit root `%s`", block.Body.ExecutionNodeData.DepositRoot)
+		return nil, errors.Wrapf(err, "failed to decode deposit root `%s`", block.Body.ExecutionData.DepositRoot)
 	}
 
-	depositCount, err := strconv.ParseUint(block.Body.ExecutionNodeData.DepositCount, 10, 64)
+	depositCount, err := strconv.ParseUint(block.Body.ExecutionData.DepositCount, 10, 64)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse deposit count `%s`", block.Body.ExecutionNodeData.DepositCount)
+		return nil, errors.Wrapf(err, "failed to parse deposit count `%s`", block.Body.ExecutionData.DepositCount)
 	}
 
-	blockHash, err := hexutil.Decode(block.Body.ExecutionNodeData.BlockHash)
+	blockHash, err := hexutil.Decode(block.Body.ExecutionData.BlockHash)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode block hash `%s`", block.Body.ExecutionNodeData.BlockHash)
+		return nil, errors.Wrapf(err, "failed to decode block hash `%s`", block.Body.ExecutionData.BlockHash)
 	}
 
 	graffiti, err := hexutil.Decode(block.Body.Graffiti)
@@ -215,7 +215,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 		StateRoot:     stateRoot,
 		Body: &qrysmpb.BeaconBlockBodyCapella{
 			RandaoReveal: randaoReveal,
-			ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot:  depositRoot,
 				DepositCount: depositCount,
 				BlockHash:    blockHash,

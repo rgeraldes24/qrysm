@@ -127,12 +127,12 @@ func BatchVerifyDepositsSignatures(ctx context.Context, deposits []*qrysmpb.Depo
 //	    leaf=hash_tree_root(deposit.data),
 //	    branch=deposit.proof,
 //	    depth=DEPOSIT_CONTRACT_TREE_DEPTH + 1,  # Add 1 for the List length mix-in
-//	    index=state.eth1_deposit_index,
-//	    root=state.eth1_data.deposit_root,
+//	    index=state.execution_deposit_index,
+//	    root=state.execution_data.deposit_root,
 //	)
 //
 //	# Deposits must be processed in order
-//	state.eth1_deposit_index += 1
+//	state.execution_deposit_index += 1
 //
 //	pubkey = deposit.data.pubkey
 //	amount = deposit.data.amount
@@ -164,7 +164,7 @@ func ProcessDeposit(beaconState state.BeaconState, deposit *qrysmpb.Deposit, ver
 		}
 		return nil, newValidator, errors.Wrapf(err, "could not verify deposit from %#x", bytesutil.Trunc(deposit.Data.PublicKey))
 	}
-	if err := beaconState.SetEth1DepositIndex(beaconState.Eth1DepositIndex() + 1); err != nil {
+	if err := beaconState.SetExecutionDepositIndex(beaconState.ExecutionDepositIndex() + 1); err != nil {
 		return nil, newValidator, err
 	}
 	pubKey := deposit.Data.PublicKey
@@ -214,12 +214,12 @@ func verifyDeposit(beaconState state.ReadOnlyBeaconState, deposit *qrysmpb.Depos
 	if deposit == nil || deposit.Data == nil {
 		return errors.New("received nil deposit or nil deposit data")
 	}
-	executionNodeData := beaconState.ExecutionNodeData()
-	if executionNodeData == nil {
-		return errors.New("received nil executionNodeData in the beacon state")
+	executionData := beaconState.ExecutionData()
+	if executionData == nil {
+		return errors.New("received nil executionData in the beacon state")
 	}
 
-	receiptRoot := executionNodeData.DepositRoot
+	receiptRoot := executionData.DepositRoot
 	leaf, err := deposit.Data.HashTreeRoot()
 	if err != nil {
 		return errors.Wrap(err, "could not tree hash deposit data")
@@ -227,7 +227,7 @@ func verifyDeposit(beaconState state.ReadOnlyBeaconState, deposit *qrysmpb.Depos
 	if ok := trie.VerifyMerkleProofWithDepth(
 		receiptRoot,
 		leaf[:],
-		beaconState.Eth1DepositIndex(),
+		beaconState.ExecutionDepositIndex(),
 		deposit.Proof,
 		params.BeaconConfig().DepositContractTreeDepth,
 	); !ok {

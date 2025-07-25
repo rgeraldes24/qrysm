@@ -51,11 +51,11 @@ func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
 	}
-	executionNodeData, err := DeterministicExecutionNodeData(len(deposits))
+	executionData, err := DeterministicExecutionData(len(deposits))
 	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get executionNodeData for %d deposits", numValidators))
+		t.Fatal(errors.Wrapf(err, "failed to get executionData for %d deposits", numValidators))
 	}
-	beaconState, err := GenesisBeaconStateCapella(context.Background(), deposits, uint64(0), executionNodeData)
+	beaconState, err := GenesisBeaconStateCapella(context.Background(), deposits, uint64(0), executionData)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get genesis beacon state of %d validators", numValidators))
 	}
@@ -64,14 +64,14 @@ func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state
 }
 
 // GenesisBeaconStateCapella returns the genesis beacon state.
-func GenesisBeaconStateCapella(ctx context.Context, deposits []*qrysmpb.Deposit, genesisTime uint64, executionNodeData *qrysmpb.ExecutionNodeData) (state.BeaconState, error) {
+func GenesisBeaconStateCapella(ctx context.Context, deposits []*qrysmpb.Deposit, genesisTime uint64, executionData *qrysmpb.ExecutionData) (state.BeaconState, error) {
 	st, err := emptyGenesisStateCapella()
 	if err != nil {
 		return nil, err
 	}
 
 	// Process initial deposits.
-	st, err = helpers.UpdateGenesisExecutionNodeData(st, deposits, executionNodeData)
+	st, err = helpers.UpdateGenesisExecutionData(st, deposits, executionData)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func GenesisBeaconStateCapella(ctx context.Context, deposits []*qrysmpb.Deposit,
 		return nil, errors.Wrap(err, "could not process validator deposits")
 	}
 
-	return buildGenesisBeaconStateCapella(genesisTime, st, st.ExecutionNodeData())
+	return buildGenesisBeaconStateCapella(genesisTime, st, st.ExecutionData())
 }
 
 // emptyGenesisStateCapella returns an empty genesis state in Capella format.
@@ -104,25 +104,25 @@ func emptyGenesisStateCapella() (state.BeaconState, error) {
 		CurrentEpochParticipation:  []byte{},
 		PreviousEpochParticipation: []byte{},
 
-		// Eth1 data.
-		ExecutionNodeData:      &qrysmpb.ExecutionNodeData{},
-		ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{},
-		Eth1DepositIndex:       0,
+		// Execution data.
+		ExecutionData:         &qrysmpb.ExecutionData{},
+		ExecutionDataVotes:    []*qrysmpb.ExecutionData{},
+		ExecutionDepositIndex: 0,
 
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{},
 	}
 	return state_native.InitializeFromProtoCapella(st)
 }
 
-func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, executionNodeData *qrysmpb.ExecutionNodeData) (state.BeaconState, error) {
-	if executionNodeData == nil {
-		return nil, errors.New("no executionNodeData provided for genesis state")
+func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, executionData *qrysmpb.ExecutionData) (state.BeaconState, error) {
+	if executionData == nil {
+		return nil, errors.New("no executionData provided for genesis state")
 	}
 
 	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
 	for i := 0; i < len(randaoMixes); i++ {
 		h := make([]byte, 32)
-		copy(h, executionNodeData.BlockHash)
+		copy(h, executionData.BlockHash)
 		randaoMixes[i] = h
 	}
 
@@ -204,16 +204,16 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 		StateRoots:      stateRoots,
 		Slashings:       slashings,
 
-		// Eth1 data.
-		ExecutionNodeData:      executionNodeData,
-		ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{},
-		Eth1DepositIndex:       preState.Eth1DepositIndex(),
+		// Execution data.
+		ExecutionData:         executionData,
+		ExecutionDataVotes:    []*qrysmpb.ExecutionData{},
+		ExecutionDepositIndex: preState.ExecutionDepositIndex(),
 	}
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
 	bodyRoot, err := (&qrysmpb.BeaconBlockBodyCapella{
 		RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},

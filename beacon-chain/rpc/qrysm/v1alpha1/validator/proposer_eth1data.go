@@ -18,73 +18,73 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 )
 
-// executionNodeDataMajorityVote determines the appropriate executionNodeData for a block proposal using
+// executionDataMajorityVote determines the appropriate executionData for a block proposal using
 // an algorithm called Voting with the Majority. The algorithm works as follows:
 //   - Determine the timestamp for the start slot for the eth1 voting period.
 //   - Determine the earliest and latest timestamps that a valid block can have.
 //   - Determine the first block not before the earliest timestamp. This block is the lower bound.
 //   - Determine the last block not after the latest timestamp. This block is the upper bound.
-//   - If the last block is too early, use current executionNodeData from the beacon state.
+//   - If the last block is too early, use current executionData from the beacon state.
 //   - Filter out votes on unknown blocks and blocks which are outside of the range determined by the lower and upper bounds.
-//   - If no blocks are left after filtering votes, use executionNodeData from the latest valid block.
+//   - If no blocks are left after filtering votes, use executionData from the latest valid block.
 //   - Otherwise:
-//   - Determine the vote with the highest count. Prefer the vote with the highest eth1 block height in the event of a tie.
-//   - This vote's block is the eth1 block to use for the block proposal.
-func (vs *Server) executionNodeDataMajorityVote(ctx context.Context, beaconState state.BeaconState) (*qrysmpb.ExecutionNodeData, error) {
-	ctx, cancel := context.WithTimeout(ctx, executionNodeDataTimeout)
+//   - Determine the vote with the highest count. Prefer the vote with the highest execution block height in the event of a tie.
+//   - This vote's block is the execution block to use for the block proposal.
+func (vs *Server) executionDataMajorityVote(ctx context.Context, beaconState state.BeaconState) (*qrysmpb.ExecutionData, error) {
+	ctx, cancel := context.WithTimeout(ctx, executionDataTimeout)
 	defer cancel()
 
 	slot := beaconState.Slot()
 	votingPeriodStartTime := vs.slotStartTime(slot)
 
 	if vs.MockExecutionNodeVotes {
-		return vs.mockExecutionNodeDataVote(ctx, slot)
+		return vs.mockExecutionDataVote(ctx, slot)
 	}
 	if !vs.ExecutionNodeInfoFetcher.ExecutionClientConnected() {
-		return vs.randomExecutionNodeDataVote(ctx)
+		return vs.randomExecutionDataVote(ctx)
 	}
-	executionNodeDataNotification = false
+	executionDataNotification = false
 
 	genesisTime, _ := vs.ExecutionNodeInfoFetcher.GenesisExecutionChainInfo()
-	followDistanceSeconds := params.BeaconConfig().Eth1FollowDistance * params.BeaconConfig().SecondsPerETH1Block
+	followDistanceSeconds := params.BeaconConfig().ExecutionFollowDistance * params.BeaconConfig().SecondsPerExecutionBlock
 	latestValidTime := votingPeriodStartTime - followDistanceSeconds
 	earliestValidTime := votingPeriodStartTime - 2*followDistanceSeconds
 
-	// Special case for starting from a pre-mined genesis: the eth1 vote should be genesis until the chain has advanced
-	// by ETH1_FOLLOW_DISTANCE. The head state should maintain the same ExecutionNodeData until this condition has passed, so
-	// trust the existing head for the right eth1 vote until we can get a meaningful value from the deposit contract.
+	// Special case for starting from a pre-mined genesis: the execution vote should be genesis until the chain has advanced
+	// by EXECUTION_FOLLOW_DISTANCE. The head state should maintain the same ExecutionData until this condition has passed, so
+	// trust the existing head for the right execution vote until we can get a meaningful value from the deposit contract.
 	if latestValidTime < genesisTime+followDistanceSeconds {
-		log.WithField("genesisTime", genesisTime).WithField("latestValidTime", latestValidTime).Warn("voting period before genesis + follow distance, using executionNodeData from head")
-		return vs.HeadFetcher.HeadExecutionNodeData(), nil
+		log.WithField("genesisTime", genesisTime).WithField("latestValidTime", latestValidTime).Warn("voting period before genesis + follow distance, using executionData from head")
+		return vs.HeadFetcher.HeadExecutionData(), nil
 	}
 
 	lastBlockByLatestValidTime, err := vs.ExecutionNodeBlockFetcher.BlockByTimestamp(ctx, latestValidTime)
 	if err != nil {
 		log.WithError(err).Error("Could not get last block by latest valid time")
-		return vs.randomExecutionNodeDataVote(ctx)
+		return vs.randomExecutionDataVote(ctx)
 	}
 	if lastBlockByLatestValidTime.Time < earliestValidTime {
-		return vs.HeadFetcher.HeadExecutionNodeData(), nil
+		return vs.HeadFetcher.HeadExecutionData(), nil
 	}
 
 	lastBlockDepositCount, lastBlockDepositRoot := vs.DepositFetcher.DepositsNumberAndRootAtHeight(ctx, lastBlockByLatestValidTime.Number)
 	if lastBlockDepositCount == 0 {
-		return vs.ChainStartFetcher.ChainStartExecutionNodeData(), nil
+		return vs.ChainStartFetcher.ChainStartExecutionData(), nil
 	}
 
-	if lastBlockDepositCount >= vs.HeadFetcher.HeadExecutionNodeData().DepositCount {
+	if lastBlockDepositCount >= vs.HeadFetcher.HeadExecutionData().DepositCount {
 		h, err := vs.ExecutionNodeBlockFetcher.BlockHashByHeight(ctx, lastBlockByLatestValidTime.Number)
 		if err != nil {
 			log.WithError(err).Error("Could not get hash of last block by latest valid time")
-			return vs.randomExecutionNodeDataVote(ctx)
+			return vs.randomExecutionDataVote(ctx)
 		}
-		return &qrysmpb.ExecutionNodeData{
+		return &qrysmpb.ExecutionData{
 			BlockHash:    h.Bytes(),
 			DepositCount: lastBlockDepositCount,
 			DepositRoot:  lastBlockDepositRoot[:],
 		}, nil
 	}
-	return vs.HeadFetcher.HeadExecutionNodeData(), nil
+	return vs.HeadFetcher.HeadExecutionData(), nil
 }
 
 func (vs *Server) slotStartTime(slot primitives.Slot) uint64 {
@@ -92,54 +92,54 @@ func (vs *Server) slotStartTime(slot primitives.Slot) uint64 {
 	return slots.VotingPeriodStartTime(startTime, slot)
 }
 
-// canonicalExecutionNodeData determines the canonical executionNodeData and eth1 block height to use for determining deposits.
-func (vs *Server) canonicalExecutionNodeData(
+// canonicalExecutionData determines the canonical executionData and execution block height to use for determining deposits.
+func (vs *Server) canonicalExecutionData(
 	ctx context.Context,
 	beaconState state.BeaconState,
-	currentVote *qrysmpb.ExecutionNodeData) (*qrysmpb.ExecutionNodeData, *big.Int, error) {
-	var eth1BlockHash [32]byte
+	currentVote *qrysmpb.ExecutionData) (*qrysmpb.ExecutionData, *big.Int, error) {
+	var executionBlockHash [32]byte
 
 	// Add in current vote, to get accurate vote tally
-	if err := beaconState.AppendExecutionNodeDataVotes(currentVote); err != nil {
-		return nil, nil, errors.Wrap(err, "could not append eth1 data votes to state")
+	if err := beaconState.AppendExecutionDataVotes(currentVote); err != nil {
+		return nil, nil, errors.Wrap(err, "could not append execution data votes to state")
 	}
-	hasSupport, err := blocks.ExecutionNodeDataHasEnoughSupport(beaconState, currentVote)
+	hasSupport, err := blocks.ExecutionDataHasEnoughSupport(beaconState, currentVote)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not determine if current executionNodeData vote has enough support")
+		return nil, nil, errors.Wrap(err, "could not determine if current executionData vote has enough support")
 	}
-	var canonicalExecutionNodeData *qrysmpb.ExecutionNodeData
+	var canonicalExecutionData *qrysmpb.ExecutionData
 	if hasSupport {
-		canonicalExecutionNodeData = currentVote
-		eth1BlockHash = bytesutil.ToBytes32(currentVote.BlockHash)
+		canonicalExecutionData = currentVote
+		executionBlockHash = bytesutil.ToBytes32(currentVote.BlockHash)
 	} else {
-		canonicalExecutionNodeData = beaconState.ExecutionNodeData()
-		eth1BlockHash = bytesutil.ToBytes32(beaconState.ExecutionNodeData().BlockHash)
+		canonicalExecutionData = beaconState.ExecutionData()
+		executionBlockHash = bytesutil.ToBytes32(beaconState.ExecutionData().BlockHash)
 	}
-	if features.Get().DisableStakinContractCheck && eth1BlockHash == [32]byte{} {
-		return canonicalExecutionNodeData, new(big.Int).SetInt64(0), nil
+	if features.Get().DisableStakinContractCheck && executionBlockHash == [32]byte{} {
+		return canonicalExecutionData, new(big.Int).SetInt64(0), nil
 	}
-	_, canonicalExecutionNodeDataHeight, err := vs.ExecutionNodeBlockFetcher.BlockExists(ctx, eth1BlockHash)
+	_, canonicalExecutionDataHeight, err := vs.ExecutionNodeBlockFetcher.BlockExists(ctx, executionBlockHash)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not fetch executionNodeData height")
+		return nil, nil, errors.Wrap(err, "could not fetch executionData height")
 	}
-	return canonicalExecutionNodeData, canonicalExecutionNodeDataHeight, nil
+	return canonicalExecutionData, canonicalExecutionDataHeight, nil
 }
 
-func (vs *Server) mockExecutionNodeDataVote(ctx context.Context, slot primitives.Slot) (*qrysmpb.ExecutionNodeData, error) {
-	if !executionNodeDataNotification {
-		log.Warn("Beacon Node is no longer connected to an ETH1 chain, so ETH1 data votes are now mocked.")
-		executionNodeDataNotification = true
+func (vs *Server) mockExecutionDataVote(ctx context.Context, slot primitives.Slot) (*qrysmpb.ExecutionData, error) {
+	if !executionDataNotification {
+		log.Warn("Beacon Node is no longer connected to an execution chain, so execution data votes are now mocked.")
+		executionDataNotification = true
 	}
 	// If a mock execution node data votes is specified, we use the following for the
-	// executionNodeData we provide to every proposer based on https://github.com/ethereum/eth2.0-pm/issues/62:
+	// executionData we provide to every proposer based on https://github.com/ethereum/eth2.0-pm/issues/62:
 	//
-	// slot_in_voting_period = current_slot % SLOTS_PER_ETH1_VOTING_PERIOD
-	// ExecutionNodeData(
+	// slot_in_voting_period = current_slot % SLOTS_PER_EXECUTION_VOTING_PERIOD
+	// ExecutionData(
 	//   DepositRoot = hash(current_epoch + slot_in_voting_period),
-	//   DepositCount = state.eth1_deposit_index,
+	//   DepositCount = state.execution_deposit_index,
 	//   BlockHash = hash(hash(current_epoch + slot_in_voting_period)),
 	// )
-	slotInVotingPeriod := slot.ModSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerEth1VotingPeriod)))
+	slotInVotingPeriod := slot.ModSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerExecutionVotingPeriod)))
 	headState, err := vs.HeadFetcher.HeadStateReadOnly(ctx)
 	if err != nil {
 		return nil, err
@@ -148,17 +148,17 @@ func (vs *Server) mockExecutionNodeDataVote(ctx context.Context, slot primitives
 	enc = fastssz.MarshalUint64(enc, uint64(slots.ToEpoch(slot))+uint64(slotInVotingPeriod))
 	depRoot := hash.Hash(enc)
 	blockHash := hash.Hash(depRoot[:])
-	return &qrysmpb.ExecutionNodeData{
+	return &qrysmpb.ExecutionData{
 		DepositRoot:  depRoot[:],
-		DepositCount: headState.Eth1DepositIndex(),
+		DepositCount: headState.ExecutionDepositIndex(),
 		BlockHash:    blockHash[:],
 	}, nil
 }
 
-func (vs *Server) randomExecutionNodeDataVote(ctx context.Context) (*qrysmpb.ExecutionNodeData, error) {
-	if !executionNodeDataNotification {
-		log.Warn("Beacon Node is no longer connected to an ETH1 chain, so ETH1 data votes are now random.")
-		executionNodeDataNotification = true
+func (vs *Server) randomExecutionDataVote(ctx context.Context) (*qrysmpb.ExecutionData, error) {
+	if !executionDataNotification {
+		log.Warn("Beacon Node is no longer connected to an execution chain, so execution data votes are now random.")
+		executionDataNotification = true
 	}
 	headState, err := vs.HeadFetcher.HeadStateReadOnly(ctx)
 	if err != nil {
@@ -170,9 +170,9 @@ func (vs *Server) randomExecutionNodeDataVote(ctx context.Context) (*qrysmpb.Exe
 	randGen := rand.NewGenerator()
 	depRoot := hash.Hash(bytesutil.Bytes32(randGen.Uint64()))
 	blockHash := hash.Hash(bytesutil.Bytes32(randGen.Uint64()))
-	return &qrysmpb.ExecutionNodeData{
+	return &qrysmpb.ExecutionData{
 		DepositRoot:  depRoot[:],
-		DepositCount: headState.Eth1DepositIndex(),
+		DepositCount: headState.ExecutionDepositIndex(),
 		BlockHash:    blockHash[:],
 	}, nil
 }

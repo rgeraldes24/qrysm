@@ -137,7 +137,7 @@ func configureInteropConfig(cliCtx *cli.Context) error {
 	}
 	genTimeIsSet := cliCtx.IsSet(flags.InteropGenesisTimeFlag.Name)
 	numValsIsSet := cliCtx.IsSet(flags.InteropNumValidatorsFlag.Name)
-	votesIsSet := cliCtx.IsSet(flags.InteropMockExecutionNodeDataVotesFlag.Name)
+	votesIsSet := cliCtx.IsSet(flags.InteropMockExecutionDataVotesFlag.Name)
 
 	if genTimeIsSet || numValsIsSet || votesIsSet {
 		if err := params.SetActive(params.InteropConfig().Copy()); err != nil {

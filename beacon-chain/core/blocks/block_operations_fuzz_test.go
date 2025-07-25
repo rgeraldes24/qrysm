@@ -26,7 +26,7 @@ func TestFuzzProcessBlockHeader_10000(t *testing.T) {
 
 		s, err := state_native.InitializeFromProtoUnsafeCapella(state)
 		require.NoError(t, err)
-		if block.Block == nil || block.Block.Body == nil || block.Block.Body.ExecutionNodeData == nil {
+		if block.Block == nil || block.Block.Body == nil || block.Block.Body.ExecutionData == nil {
 			continue
 		}
 		wsb, err := blocks.NewSignedBeaconBlock(block)
@@ -60,46 +60,46 @@ func TestFuzzverifyDepositDataSigningRoot_10000(_ *testing.T) {
 	}
 }
 
-func TestFuzzProcessExecutionNodeDataInBlock_10000(t *testing.T) {
+func TestFuzzProcessExecutionDataInBlock_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
-	e := &qrysmpb.ExecutionNodeData{}
+	e := &qrysmpb.ExecutionData{}
 	state, err := state_native.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{})
 	require.NoError(t, err)
 	for i := 0; i < 10000; i++ {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(e)
-		s, err := ProcessExecutionNodeDataInBlock(context.Background(), state, e)
+		s, err := ProcessExecutionDataInBlock(context.Background(), state, e)
 		if err != nil && s != nil {
-			t.Fatalf("state should be nil on err. found: %v on error: %v for state: %v and executionNodeData: %v", s, err, state, e)
+			t.Fatalf("state should be nil on err. found: %v on error: %v for state: %v and executionData: %v", s, err, state, e)
 		}
 	}
 }
 
-func TestFuzzareExecutionNodeDataEqual_10000(_ *testing.T) {
+func TestFuzzareExecutionDataEqual_10000(_ *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
-	executionNodeData := &qrysmpb.ExecutionNodeData{}
-	executionNodeData2 := &qrysmpb.ExecutionNodeData{}
+	executionData := &qrysmpb.ExecutionData{}
+	executionData2 := &qrysmpb.ExecutionData{}
 
 	for i := 0; i < 10000; i++ {
-		fuzzer.Fuzz(executionNodeData)
-		fuzzer.Fuzz(executionNodeData2)
-		AreExecutionNodeDataEqual(executionNodeData, executionNodeData2)
-		AreExecutionNodeDataEqual(executionNodeData, executionNodeData)
+		fuzzer.Fuzz(executionData)
+		fuzzer.Fuzz(executionData2)
+		AreExecutionDataEqual(executionData, executionData2)
+		AreExecutionDataEqual(executionData, executionData)
 	}
 }
 
-func TestFuzzExecutionNodeDataHasEnoughSupport_10000(t *testing.T) {
+func TestFuzzExecutionDataHasEnoughSupport_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
-	executionNodeData := &qrysmpb.ExecutionNodeData{}
-	var stateVotes []*qrysmpb.ExecutionNodeData
+	executionData := &qrysmpb.ExecutionData{}
+	var stateVotes []*qrysmpb.ExecutionData
 	for i := 0; i < 100000; i++ {
-		fuzzer.Fuzz(executionNodeData)
+		fuzzer.Fuzz(executionData)
 		fuzzer.Fuzz(&stateVotes)
 		s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-			ExecutionNodeDataVotes: stateVotes,
+			ExecutionDataVotes: stateVotes,
 		})
 		require.NoError(t, err)
-		_, err = ExecutionNodeDataHasEnoughSupport(s, executionNodeData)
+		_, err = ExecutionDataHasEnoughSupport(s, executionData)
 		_ = err
 	}
 

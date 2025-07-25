@@ -15,7 +15,7 @@ type votes struct {
 	hashes     map[[32]byte]uint
 	roots      map[[32]byte]uint
 	counts     map[uint64]uint
-	votes      map[[32]byte]*v1alpha1.ExecutionNodeData
+	votes      map[[32]byte]*v1alpha1.ExecutionData
 	voteCounts map[[32]byte]uint
 	total      uint
 }
@@ -25,7 +25,7 @@ func newVotes() *votes {
 		hashes:     make(map[[32]byte]uint),
 		roots:      make(map[[32]byte]uint),
 		counts:     make(map[uint64]uint),
-		votes:      make(map[[32]byte]*v1alpha1.ExecutionNodeData),
+		votes:      make(map[[32]byte]*v1alpha1.ExecutionData),
 		voteCounts: make(map[[32]byte]uint),
 	}
 }
@@ -34,7 +34,7 @@ func (v *votes) Insert(blk interfaces.ReadOnlyBeaconBlock) {
 	v.l.Lock()
 	defer v.l.Unlock()
 
-	e1d := blk.Body().ExecutionNodeData()
+	e1d := blk.Body().ExecutionData()
 	htr, err := e1d.HashTreeRoot()
 	if err != nil {
 		panic(err)
@@ -50,7 +50,7 @@ func (v *votes) Insert(blk interfaces.ReadOnlyBeaconBlock) {
 func (v *votes) Report() string {
 	v.l.RLock()
 	defer v.l.RUnlock()
-	format := `====ExecutionNodeData Voting Report====
+	format := `====ExecutionData Voting Report====
 
 Total votes: %d
 

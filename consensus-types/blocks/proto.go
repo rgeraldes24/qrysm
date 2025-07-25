@@ -123,7 +123,7 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 			}
 			return &zond.BlindedBeaconBlockBodyCapella{
 				RandaoReveal:                b.randaoReveal[:],
-				ExecutionNodeData:           b.executionNodeData,
+				ExecutionData:               b.executionData,
 				Graffiti:                    b.graffiti[:],
 				ProposerSlashings:           b.proposerSlashings,
 				AttesterSlashings:           b.attesterSlashings,
@@ -145,7 +145,7 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 		}
 		return &zond.BeaconBlockBodyCapella{
 			RandaoReveal:                b.randaoReveal[:],
-			ExecutionNodeData:           b.executionNodeData,
+			ExecutionData:               b.executionData,
 			Graffiti:                    b.graffiti[:],
 			ProposerSlashings:           b.proposerSlashings,
 			AttesterSlashings:           b.attesterSlashings,
@@ -249,7 +249,7 @@ func initBlockBodyFromProtoCapella(pb *zond.BeaconBlockBodyCapella) (*BeaconBloc
 		version:                     version.Capella,
 		isBlinded:                   false,
 		randaoReveal:                bytesutil.ToBytes4595(pb.RandaoReveal),
-		executionNodeData:           pb.ExecutionNodeData,
+		executionData:               pb.ExecutionData,
 		graffiti:                    bytesutil.ToBytes32(pb.Graffiti),
 		proposerSlashings:           pb.ProposerSlashings,
 		attesterSlashings:           pb.AttesterSlashings,
@@ -277,7 +277,7 @@ func initBlindedBlockBodyFromProtoCapella(pb *zond.BlindedBeaconBlockBodyCapella
 		version:                     version.Capella,
 		isBlinded:                   true,
 		randaoReveal:                bytesutil.ToBytes4595(pb.RandaoReveal),
-		executionNodeData:           pb.ExecutionNodeData,
+		executionData:               pb.ExecutionData,
 		graffiti:                    bytesutil.ToBytes32(pb.Graffiti),
 		proposerSlashings:           pb.ProposerSlashings,
 		attesterSlashings:           pb.AttesterSlashings,

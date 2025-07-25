@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/testing/spectest/shared/capella/epoch_processing"
 )
 
-func TestMainnet_Capella_EpochProcessing_ExecutionNodeDataReset(t *testing.T) {
-	epoch_processing.RunExecutionNodeDataResetTests(t, "mainnet")
+func TestMainnet_Capella_EpochProcessing_ExecutionDataReset(t *testing.T) {
+	epoch_processing.RunExecutionDataResetTests(t, "mainnet")
 }
 */

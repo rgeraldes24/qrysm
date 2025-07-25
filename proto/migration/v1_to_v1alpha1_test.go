@@ -18,7 +18,7 @@ func Test_CapellaToV1Alpha1SignedBlock(t *testing.T) {
 	v1Block.Message.ParentRoot = parentRoot
 	v1Block.Message.StateRoot = stateRoot
 	v1Block.Message.Body.RandaoReveal = randaoReveal
-	v1Block.Message.Body.ExecutionNodeData = &qrlpb.ExecutionNodeData{
+	v1Block.Message.Body.ExecutionData = &qrlpb.ExecutionData{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
@@ -69,7 +69,7 @@ func Test_BlindedCapellaToV1Alpha1SignedBlock(t *testing.T) {
 	v1Block.Message.ParentRoot = parentRoot
 	v1Block.Message.StateRoot = stateRoot
 	v1Block.Message.Body.RandaoReveal = randaoReveal
-	v1Block.Message.Body.ExecutionNodeData = &qrlpb.ExecutionNodeData{
+	v1Block.Message.Body.ExecutionData = &qrlpb.ExecutionData{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,

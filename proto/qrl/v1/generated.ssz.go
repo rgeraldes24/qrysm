@@ -1103,13 +1103,13 @@ func (s *SignedVoluntaryExit) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	return
 }
 
-// MarshalSSZ ssz marshals the ExecutionNodeData object
-func (e *ExecutionNodeData) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the ExecutionData object
+func (e *ExecutionData) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(e)
 }
 
-// MarshalSSZTo ssz marshals the ExecutionNodeData object to a target array
-func (e *ExecutionNodeData) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the ExecutionData object to a target array
+func (e *ExecutionData) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 
 	// Field (0) 'DepositRoot'
@@ -1132,8 +1132,8 @@ func (e *ExecutionNodeData) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the ExecutionNodeData object
-func (e *ExecutionNodeData) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the ExecutionData object
+func (e *ExecutionData) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size != 72 {
@@ -1158,19 +1158,19 @@ func (e *ExecutionNodeData) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the ExecutionNodeData object
-func (e *ExecutionNodeData) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the ExecutionData object
+func (e *ExecutionData) SizeSSZ() (size int) {
 	size = 72
 	return
 }
 
-// HashTreeRoot ssz hashes the ExecutionNodeData object
-func (e *ExecutionNodeData) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the ExecutionData object
+func (e *ExecutionData) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(e)
 }
 
-// HashTreeRootWith ssz hashes the ExecutionNodeData object with a hasher
-func (e *ExecutionNodeData) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the ExecutionData object with a hasher
+func (e *ExecutionData) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'DepositRoot'
@@ -2285,11 +2285,11 @@ func (b *BeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, err error
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'ExecutionNodeData'
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = new(ExecutionNodeData)
+	// Field (1) 'ExecutionData'
+	if b.ExecutionData == nil {
+		b.ExecutionData = new(ExecutionData)
 	}
-	if dst, err = b.ExecutionNodeData.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ExecutionData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -2454,11 +2454,11 @@ func (b *BeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:4595]...)
 
-	// Field (1) 'ExecutionNodeData'
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = new(ExecutionNodeData)
+	// Field (1) 'ExecutionData'
+	if b.ExecutionData == nil {
+		b.ExecutionData = new(ExecutionData)
 	}
-	if err = b.ExecutionNodeData.UnmarshalSSZ(buf[4595:4667]); err != nil {
+	if err = b.ExecutionData.UnmarshalSSZ(buf[4595:4667]); err != nil {
 		return err
 	}
 
@@ -2711,8 +2711,8 @@ func (b *BeaconBlockBodyCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'ExecutionNodeData'
-	if err = b.ExecutionNodeData.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ExecutionData'
+	if err = b.ExecutionData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 
@@ -2878,11 +2878,11 @@ func (b *BlindedBeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, er
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'ExecutionNodeData'
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = new(ExecutionNodeData)
+	// Field (1) 'ExecutionData'
+	if b.ExecutionData == nil {
+		b.ExecutionData = new(ExecutionData)
 	}
-	if dst, err = b.ExecutionNodeData.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ExecutionData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -3047,11 +3047,11 @@ func (b *BlindedBeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:4595]...)
 
-	// Field (1) 'ExecutionNodeData'
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = new(ExecutionNodeData)
+	// Field (1) 'ExecutionData'
+	if b.ExecutionData == nil {
+		b.ExecutionData = new(ExecutionData)
 	}
-	if err = b.ExecutionNodeData.UnmarshalSSZ(buf[4595:4667]); err != nil {
+	if err = b.ExecutionData.UnmarshalSSZ(buf[4595:4667]); err != nil {
 		return err
 	}
 
@@ -3304,8 +3304,8 @@ func (b *BlindedBeaconBlockBodyCapella) HashTreeRootWith(hh *ssz.Hasher) (err er
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'ExecutionNodeData'
-	if err = b.ExecutionNodeData.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ExecutionData'
+	if err = b.ExecutionData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 

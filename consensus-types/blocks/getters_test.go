@@ -93,7 +93,7 @@ func Test_SignedBeaconBlock_Header(t *testing.T) {
 	bb := &BeaconBlockBody{
 		version:      version.Capella,
 		randaoReveal: [field_params.DilithiumSignatureLength]byte{},
-		executionNodeData: &zond.ExecutionNodeData{
+		executionData: &zond.ExecutionData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},
@@ -311,11 +311,11 @@ func Test_BeaconBlockBody_RandaoReveal(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.ToBytes4595([]byte("randaoreveal")), bb.Block().Body().RandaoReveal())
 }
 
-func Test_BeaconBlockBody_ExecutionNodeData(t *testing.T) {
-	e := &zond.ExecutionNodeData{DepositRoot: []byte("depositroot")}
+func Test_BeaconBlockBody_ExecutionData(t *testing.T) {
+	e := &zond.ExecutionData{DepositRoot: []byte("depositroot")}
 	bb := &SignedBeaconBlock{block: &BeaconBlock{body: &BeaconBlockBody{}}}
-	bb.SetExecutionNodeData(e)
-	assert.DeepEqual(t, e, bb.Block().Body().ExecutionNodeData())
+	bb.SetExecutionData(e)
+	assert.DeepEqual(t, e, bb.Block().Body().ExecutionData())
 }
 
 func Test_BeaconBlockBody_Graffiti(t *testing.T) {
@@ -427,7 +427,7 @@ func hydrateBeaconBlockBody() *zond.BeaconBlockBodyCapella {
 	return &zond.BeaconBlockBodyCapella{
 		RandaoReveal: make([]byte, field_params.DilithiumSignatureLength),
 		Graffiti:     make([]byte, fieldparams.RootLength),
-		ExecutionNodeData: &zond.ExecutionNodeData{
+		ExecutionData: &zond.ExecutionData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		},

@@ -29,7 +29,7 @@ func TestGenerateGenesisStateCapella(t *testing.T) {
 		BlockHash:     make([]byte, 32),
 		Transactions:  make([][]byte, 0),
 	}
-	e1d := &qrysmpb.ExecutionNodeData{
+	e1d := &qrysmpb.ExecutionData{
 		DepositRoot:  make([]byte, 32),
 		DepositCount: 0,
 		BlockHash:    make([]byte, 32),
@@ -41,8 +41,8 @@ func TestGenerateGenesisStateCapella(t *testing.T) {
 	require.NoError(t, err)
 	dr, err := tr.HashTreeRoot()
 	require.NoError(t, err)
-	g.ExecutionNodeData.DepositRoot = dr[:]
-	g.ExecutionNodeData.BlockHash = make([]byte, 32)
+	g.ExecutionData.DepositRoot = dr[:]
+	g.ExecutionData.BlockHash = make([]byte, 32)
 	st, err := state_native.InitializeFromProtoUnsafeCapella(g)
 	require.NoError(t, err)
 	_, err = st.MarshalSSZ()

@@ -599,13 +599,13 @@ func (s *SyncAggregate) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// ExecutionNodeData is a field of Beacon Block Body.
-type ExecutionNodeData struct {
-	*qrysmpb.ExecutionNodeData
+// ExecutionData is a field of Beacon Block Body.
+type ExecutionData struct {
+	*qrysmpb.ExecutionData
 }
 
-// MarshalJSON returns a JSON byte array representation of ExecutionNodeData.
-func (e *ExecutionNodeData) MarshalJSON() ([]byte, error) {
+// MarshalJSON returns a JSON byte array representation of ExecutionData.
+func (e *ExecutionData) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		DepositRoot  hexutil.Bytes `json:"deposit_root"`
 		DepositCount string        `json:"deposit_count"`

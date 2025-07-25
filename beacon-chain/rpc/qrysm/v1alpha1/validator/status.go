@@ -284,13 +284,13 @@ func (vs *Server) validatorStatus(
 	switch resp.Status {
 	// Unknown status means the validator has not been put into the state yet.
 	case qrysmpb.ValidatorStatus_UNKNOWN_STATUS:
-		// If no connection to ETH1, the deposit block number or position in queue cannot be determined.
+		// If no connection to execution node, the deposit block number or position in queue cannot be determined.
 		if !vs.ExecutionNodeInfoFetcher.ExecutionClientConnected() {
-			log.Warn("Not connected to ETH1. Cannot determine validator ETH1 deposit block number")
+			log.Warn("Not connected to execution node. Cannot determine validator execution deposit block number")
 			return resp, nonExistentIndex
 		}
-		dep, eth1BlockNumBigInt := vs.DepositFetcher.DepositByPubkey(ctx, pubKey)
-		if eth1BlockNumBigInt == nil { // No deposit found in ETH1.
+		dep, executionBlockNumBigInt := vs.DepositFetcher.DepositByPubkey(ctx, pubKey)
+		if executionBlockNumBigInt == nil { // No deposit found in execution node.
 			return resp, nonExistentIndex
 		}
 		domain, err := signing.ComputeDomain(
@@ -304,24 +304,24 @@ func (vs *Server) validatorStatus(
 		}
 		if err := deposit.VerifyDepositSignature(dep.Data, domain); err != nil {
 			resp.Status = qrysmpb.ValidatorStatus_INVALID
-			log.Warn("Invalid Eth1 deposit")
+			log.Warn("Invalid execution deposit")
 			return resp, nonExistentIndex
 		}
 		// Set validator deposit status if their deposit is visible.
 		resp.Status = depositStatus(dep.Data.Amount)
-		resp.Eth1DepositBlockNumber = eth1BlockNumBigInt.Uint64()
+		resp.ExecutionDepositBlockNumber = executionBlockNumBigInt.Uint64()
 
 		return resp, nonExistentIndex
 	// Deposited, Pending or Partially Deposited mean the validator has been put into the state.
 	case qrysmpb.ValidatorStatus_DEPOSITED, qrysmpb.ValidatorStatus_PENDING, qrysmpb.ValidatorStatus_PARTIALLY_DEPOSITED:
 		if resp.Status == qrysmpb.ValidatorStatus_PENDING {
 			if vs.DepositFetcher == nil {
-				log.Warn("Not connected to ETH1. Cannot determine validator ETH1 deposit.")
+				log.Warn("Not connected to execution node. Cannot determine validator execution deposit.")
 			} else {
 				// Check if there was a deposit.
-				_, eth1BlockNumBigInt := vs.DepositFetcher.DepositByPubkey(ctx, pubKey)
-				if eth1BlockNumBigInt != nil {
-					resp.Eth1DepositBlockNumber = eth1BlockNumBigInt.Uint64()
+				_, executionBlockNumBigInt := vs.DepositFetcher.DepositByPubkey(ctx, pubKey)
+				if executionBlockNumBigInt != nil {
+					resp.ExecutionDepositBlockNumber = executionBlockNumBigInt.Uint64()
 				}
 			}
 		}

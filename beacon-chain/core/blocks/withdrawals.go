@@ -63,7 +63,7 @@ func ProcessDilithiumToExecutionChanges(
 //	assert dilithium.Verify(address_change.from_dilitium_pubkey, signing_root, signed_address_change.signature)
 //
 //	validator.withdrawal_credentials = (
-//	    ETH1_ADDRESS_WITHDRAWAL_PREFIX
+//	    EXECUTION_ADDRESS_WITHDRAWAL_PREFIX
 //	    + b'\x00' * 11
 //	    + address_change.to_execution_address
 //	)

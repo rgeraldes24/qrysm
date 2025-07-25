@@ -32,9 +32,9 @@ var capellaFields = []types.FieldIndex{
 	types.BlockRoots,
 	types.StateRoots,
 	types.HistoricalRoots,
-	types.ExecutionNodeData,
-	types.ExecutionNodeDataVotes,
-	types.Eth1DepositIndex,
+	types.ExecutionData,
+	types.ExecutionDataVotes,
+	types.ExecutionDepositIndex,
 	types.Validators,
 	types.Balances,
 	types.RandaoMixes,
@@ -85,9 +85,9 @@ func InitializeFromProtoUnsafeCapella(st *qrysmpb.BeaconStateCapella) (state.Bea
 		fork:                                st.Fork,
 		latestBlockHeader:                   st.LatestBlockHeader,
 		historicalRoots:                     hRoots,
-		executionNodeData:                   st.ExecutionNodeData,
-		executionNodeDataVotes:              st.ExecutionNodeDataVotes,
-		eth1DepositIndex:                    st.Eth1DepositIndex,
+		executionData:                       st.ExecutionData,
+		executionDataVotes:                  st.ExecutionDataVotes,
+		executionDepositIndex:               st.ExecutionDepositIndex,
 		slashings:                           st.Slashings,
 		previousEpochParticipation:          st.PreviousEpochParticipation,
 		currentEpochParticipation:           st.CurrentEpochParticipation,
@@ -158,7 +158,7 @@ func InitializeFromProtoUnsafeCapella(st *qrysmpb.BeaconStateCapella) (state.Bea
 
 	// Initialize field reference tracking for shared data.
 	b.sharedFieldReferences[types.HistoricalRoots] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.ExecutionNodeDataVotes] = stateutil.NewRef(1)
+	b.sharedFieldReferences[types.ExecutionDataVotes] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.Slashings] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.PreviousEpochParticipationBits] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.CurrentEpochParticipationBits] = stateutil.NewRef(1)
@@ -196,19 +196,19 @@ func (b *BeaconState) Copy() state.BeaconState {
 		// Primitive types, safe to copy.
 		genesisTime:                  b.genesisTime,
 		slot:                         b.slot,
-		eth1DepositIndex:             b.eth1DepositIndex,
+		executionDepositIndex:        b.executionDepositIndex,
 		nextWithdrawalIndex:          b.nextWithdrawalIndex,
 		nextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 
 		// Large arrays, infrequently changed, constant size.
-		blockRoots:             b.blockRoots,
-		blockRootsMultiValue:   b.blockRootsMultiValue,
-		stateRoots:             b.stateRoots,
-		stateRootsMultiValue:   b.stateRootsMultiValue,
-		randaoMixes:            b.randaoMixes,
-		randaoMixesMultiValue:  b.randaoMixesMultiValue,
-		executionNodeDataVotes: b.executionNodeDataVotes,
-		slashings:              b.slashings,
+		blockRoots:            b.blockRoots,
+		blockRootsMultiValue:  b.blockRootsMultiValue,
+		stateRoots:            b.stateRoots,
+		stateRootsMultiValue:  b.stateRootsMultiValue,
+		randaoMixes:           b.randaoMixes,
+		randaoMixesMultiValue: b.randaoMixesMultiValue,
+		executionDataVotes:    b.executionDataVotes,
+		slashings:             b.slashings,
 
 		// Large arrays, increases over time.
 		balances:                   b.balances,
@@ -227,7 +227,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 		justificationBits:                   b.justificationBitsVal(),
 		fork:                                b.forkVal(),
 		latestBlockHeader:                   b.latestBlockHeaderVal(),
-		executionNodeData:                   b.executionNodeDataVal(),
+		executionData:                       b.executionDataVal(),
 		previousJustifiedCheckpoint:         b.previousJustifiedCheckpointVal(),
 		currentJustifiedCheckpoint:          b.currentJustifiedCheckpointVal(),
 		finalizedCheckpoint:                 b.finalizedCheckpointVal(),
@@ -408,8 +408,8 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 		return b.genesisValidatorsRoot, nil
 	case types.Slot:
 		return ssz.Uint64Root(uint64(b.slot)), nil
-	case types.Eth1DepositIndex:
-		return ssz.Uint64Root(b.eth1DepositIndex), nil
+	case types.ExecutionDepositIndex:
+		return ssz.Uint64Root(b.executionDepositIndex), nil
 	case types.Fork:
 		return ssz.ForkRoot(b.fork)
 	case types.LatestBlockHeader:
@@ -424,14 +424,14 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 			hRoots[i] = b.historicalRoots[i][:]
 		}
 		return ssz.ByteArrayRootWithLimit(hRoots, fieldparams.HistoricalRootsLength)
-	case types.ExecutionNodeData:
-		return stateutil.Eth1Root(b.executionNodeData)
-	case types.ExecutionNodeDataVotes:
+	case types.ExecutionData:
+		return stateutil.Eth1Root(b.executionData)
+	case types.ExecutionDataVotes:
 		if b.rebuildTrie[field] {
 			err := b.resetFieldTrie(
 				field,
-				b.executionNodeDataVotes,
-				params.BeaconConfig().ExecutionNodeDataVotesLength(),
+				b.executionDataVotes,
+				params.BeaconConfig().ExecutionDataVotesLength(),
 			)
 			if err != nil {
 				return [32]byte{}, err
@@ -439,7 +439,7 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 			delete(b.rebuildTrie, field)
 			return b.stateFieldLeaves[field].TrieRoot()
 		}
-		return b.recomputeFieldTrie(field, b.executionNodeDataVotes)
+		return b.recomputeFieldTrie(field, b.executionDataVotes)
 	case types.Validators:
 		return b.validatorsRootSelector(field)
 	case types.Balances:

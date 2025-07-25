@@ -62,11 +62,8 @@ func unmarshalledSSZ(t *testing.T, serializedBytes []byte, folderName string) (i
 		obj = &qrysmpb.DepositMessage{}
 	case "DepositData":
 		obj = &qrysmpb.Deposit_Data{}
-	case "ExecutionNodeData":
-		obj = &qrysmpb.ExecutionNodeData{}
-	case "Eth1Block":
-		t.Skip("Unused type")
-		return nil, nil
+	case "ExecutionData":
+		obj = &qrysmpb.ExecutionData{}
 	case "Fork":
 		obj = &qrysmpb.Fork{}
 	case "ForkData":

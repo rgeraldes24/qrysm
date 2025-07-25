@@ -71,7 +71,7 @@ type HeadFetcher interface {
 	HeadStateReadOnly(ctx context.Context) (state.ReadOnlyBeaconState, error)
 	HeadValidatorsIndices(ctx context.Context, epoch primitives.Epoch) ([]primitives.ValidatorIndex, error)
 	HeadGenesisValidatorsRoot() [32]byte
-	HeadExecutionNodeData() *qrysmpb.ExecutionNodeData
+	HeadExecutionData() *qrysmpb.ExecutionData
 	HeadPublicKeyToValidatorIndex(pubKey [field_params.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool)
 	HeadValidatorIndexToPublicKey(ctx context.Context, index primitives.ValidatorIndex) ([field_params.DilithiumPubkeyLength]byte, error)
 	ChainHeads() ([][32]byte, []primitives.Slot)
@@ -254,15 +254,15 @@ func (s *Service) HeadGenesisValidatorsRoot() [32]byte {
 	return s.headGenesisValidatorsRoot()
 }
 
-// HeadExecutionNodeData returns the executionNodeData of the current head state.
-func (s *Service) HeadExecutionNodeData() *qrysmpb.ExecutionNodeData {
+// HeadExecutionData returns the executionData of the current head state.
+func (s *Service) HeadExecutionData() *qrysmpb.ExecutionData {
 	s.headLock.RLock()
 	defer s.headLock.RUnlock()
 
 	if !s.hasHeadState() {
-		return &qrysmpb.ExecutionNodeData{}
+		return &qrysmpb.ExecutionData{}
 	}
-	return s.head.state.ExecutionNodeData()
+	return s.head.state.ExecutionData()
 }
 
 // GenesisTime returns the genesis time of beacon chain.

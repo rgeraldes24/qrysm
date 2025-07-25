@@ -5,10 +5,10 @@ import (
 )
 
 var (
-	// InteropMockExecutionNodeDataVotesFlag enables mocking the eth1 proof-of-work chain data put into blocks by proposers.
-	InteropMockExecutionNodeDataVotesFlag = &cli.BoolFlag{
-		Name:  "interop-executionNodeData-votes",
-		Usage: "Enable mocking of eth1 data votes for proposers to package into blocks",
+	// InteropMockExecutionDataVotesFlag enables mocking the eth1 proof-of-work chain data put into blocks by proposers.
+	InteropMockExecutionDataVotesFlag = &cli.BoolFlag{
+		Name:  "interop-executionData-votes",
+		Usage: "Enable mocking of execution data votes for proposers to package into blocks",
 	}
 
 	// InteropGenesisTimeFlag specifies genesis time for state generation.

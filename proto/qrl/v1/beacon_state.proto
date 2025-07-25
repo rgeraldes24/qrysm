@@ -69,10 +69,10 @@ message BeaconStateCapella {
   repeated bytes state_roots = 2003 [(theqrl.qrl.ext.ssz_size) = "state_roots.size"];
   repeated bytes historical_roots = 2004 [(theqrl.qrl.ext.ssz_size) = "?,32", (theqrl.qrl.ext.ssz_max)  = "16777216"];
 
-  // Eth1 [3001-4000]
-  ExecutionNodeData eth1_data = 3001;
-  repeated ExecutionNodeData eth1_data_votes = 3002 [(theqrl.qrl.ext.ssz_max) = "eth1_data_votes.size"];
-  uint64 eth1_deposit_index = 3003;
+  // Execution [3001-4000]
+  ExecutionData execution_data = 3001;
+  repeated ExecutionData execution_data_votes = 3002 [(theqrl.qrl.ext.ssz_max) = "execution_data_votes.size"];
+  uint64 execution_deposit_index = 3003;
 
   // Registry [4001-5000]
   repeated Validator validators = 4001 [(theqrl.qrl.ext.ssz_max) = "1099511627776"];

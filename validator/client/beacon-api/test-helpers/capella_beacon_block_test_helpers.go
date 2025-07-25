@@ -15,7 +15,7 @@ func GenerateProtoCapellaBeaconBlock() *qrysmpb.BeaconBlockCapella {
 		StateRoot:     FillByteSlice(32, 4),
 		Body: &qrysmpb.BeaconBlockBodyCapella{
 			RandaoReveal: FillByteSlice(4595, 5),
-			ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot:  FillByteSlice(32, 6),
 				DepositCount: 7,
 				BlockHash:    FillByteSlice(32, 8),
@@ -280,7 +280,7 @@ func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockCapellaJson {
 		StateRoot:     FillEncodedByteSlice(32, 4),
 		Body: &apimiddleware.BeaconBlockBodyCapellaJson{
 			RandaoReveal: FillEncodedByteSlice(4595, 5),
-			ExecutionNodeData: &apimiddleware.ExecutionNodeDataJson{
+			ExecutionData: &apimiddleware.ExecutionDataJson{
 				DepositRoot:  FillEncodedByteSlice(32, 6),
 				DepositCount: "7",
 				BlockHash:    FillEncodedByteSlice(32, 8),

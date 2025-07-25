@@ -542,14 +542,14 @@ func (s *Server) ListFeeRecipientByPubkey(ctx context.Context, req *qrlpbservice
 		proposerOption, found := proposerSettings.ProposeConfig[bytesutil.ToBytes2592(validatorKey)]
 
 		if found && proposerOption.FeeRecipientConfig != nil {
-			finalResp.Data.QRLaddress = proposerOption.FeeRecipientConfig.FeeRecipient.Bytes()
+			finalResp.Data.Qrladdress = proposerOption.FeeRecipientConfig.FeeRecipient.Bytes()
 			return finalResp, nil
 		}
 	}
 
 	// If fee recipient is defined in default configuration, use it
 	if proposerSettings != nil && proposerSettings.DefaultConfig != nil && proposerSettings.DefaultConfig.FeeRecipientConfig != nil {
-		finalResp.Data.QRLaddress = proposerSettings.DefaultConfig.FeeRecipientConfig.FeeRecipient.Bytes()
+		finalResp.Data.Qrladdress = proposerSettings.DefaultConfig.FeeRecipientConfig.FeeRecipient.Bytes()
 		return finalResp, nil
 	}
 
@@ -563,7 +563,7 @@ func (s *Server) ListFeeRecipientByPubkey(ctx context.Context, req *qrlpbservice
 	}
 
 	if resp != nil && len(resp.FeeRecipient) != 0 {
-		finalResp.Data.QRLaddress = resp.FeeRecipient
+		finalResp.Data.Qrladdress = resp.FeeRecipient
 		return finalResp, nil
 	}
 
@@ -577,13 +577,13 @@ func (s *Server) SetFeeRecipientByPubkey(ctx context.Context, req *qrlpbservice.
 	}
 
 	validatorKey := req.Pubkey
-	feeRecipient := common.BytesToAddress(req.QRLaddress)
+	feeRecipient := common.BytesToAddress(req.Qrladdress)
 
 	if err := validatePublicKey(validatorKey); err != nil {
 		return nil, status.Error(codes.FailedPrecondition, err.Error())
 	}
 
-	encoded := hexutil.EncodeQ(req.QRLaddress)
+	encoded := hexutil.EncodeQ(req.Qrladdress)
 
 	if !common.IsAddress(encoded) {
 		return nil, status.Error(

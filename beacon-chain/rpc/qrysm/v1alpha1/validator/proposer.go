@@ -32,13 +32,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// executionNodeDataNotification is a latch to stop flooding logs with the same warning.
-var executionNodeDataNotification bool
+// executionDataNotification is a latch to stop flooding logs with the same warning.
+var executionDataNotification bool
 
 const (
 	// CouldNotDecodeBlock means that a signed beacon block couldn't be created from the block present in the request.
-	CouldNotDecodeBlock      = "Could not decode block"
-	executionNodeDataTimeout = 2 * time.Second
+	CouldNotDecodeBlock  = "Could not decode block"
+	executionDataTimeout = 2 * time.Second
 )
 
 // GetBeaconBlock is called by a proposer during its assigned slot to request a block to sign
@@ -127,16 +127,16 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 	go func() {
 		defer wg.Done()
 
-		// Set eth1 data.
-		executionNodeData, err := vs.executionNodeDataMajorityVote(ctx, head)
+		// Set execution data.
+		executionData, err := vs.executionDataMajorityVote(ctx, head)
 		if err != nil {
-			executionNodeData = &qrysmpb.ExecutionNodeData{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
-			log.WithError(err).Error("Could not get executionNodeData")
+			executionData = &qrysmpb.ExecutionData{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
+			log.WithError(err).Error("Could not get executionData")
 		}
-		sBlk.SetExecutionNodeData(executionNodeData)
+		sBlk.SetExecutionData(executionData)
 
 		// Set deposit and attestation.
-		deposits, atts, err := vs.packDepositsAndAttestations(ctx, head, executionNodeData) // TODO: split attestations and deposits
+		deposits, atts, err := vs.packDepositsAndAttestations(ctx, head, executionData) // TODO: split attestations and deposits
 		if err != nil {
 			sBlk.SetDeposits([]*qrysmpb.Deposit{})
 			sBlk.SetAttestations([]*qrysmpb.Attestation{})

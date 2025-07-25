@@ -494,10 +494,10 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 
 	resultBlockBody := &qrlpb.BlindedBeaconBlockBodyCapella{
 		RandaoReveal: bytesutil.SafeCopyBytes(v1alpha1Block.Body.RandaoReveal),
-		ExecutionNodeData: &qrlpb.ExecutionNodeData{
-			DepositRoot:  bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionNodeData.DepositRoot),
-			DepositCount: v1alpha1Block.Body.ExecutionNodeData.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionNodeData.BlockHash),
+		ExecutionData: &qrlpb.ExecutionData{
+			DepositRoot:  bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionData.DepositRoot),
+			DepositCount: v1alpha1Block.Body.ExecutionData.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(v1alpha1Block.Body.ExecutionData.BlockHash),
 		},
 		Graffiti:          bytesutil.SafeCopyBytes(v1alpha1Block.Body.Graffiti),
 		ProposerSlashings: resultProposerSlashings,
@@ -542,17 +542,17 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpb.BeaconStateCapella, error) {
 	sourceFork := st.Fork()
 	sourceLatestBlockHeader := st.LatestBlockHeader()
-	sourceExecutionNodeData := st.ExecutionNodeData()
-	sourceExecutionNodeDataVotes := st.ExecutionNodeDataVotes()
+	sourceExecutionData := st.ExecutionData()
+	sourceExecutionDataVotes := st.ExecutionDataVotes()
 	sourceValidators := st.Validators()
 	sourceJustificationBits := st.JustificationBits()
 	sourcePrevJustifiedCheckpoint := st.PreviousJustifiedCheckpoint()
 	sourceCurrJustifiedCheckpoint := st.CurrentJustifiedCheckpoint()
 	sourceFinalizedCheckpoint := st.FinalizedCheckpoint()
 
-	resultExecutionNodeDataVotes := make([]*qrlpb.ExecutionNodeData, len(sourceExecutionNodeDataVotes))
-	for i, vote := range sourceExecutionNodeDataVotes {
-		resultExecutionNodeDataVotes[i] = &qrlpb.ExecutionNodeData{
+	resultExecutionDataVotes := make([]*qrlpb.ExecutionData, len(sourceExecutionDataVotes))
+	for i, vote := range sourceExecutionDataVotes {
+		resultExecutionDataVotes[i] = &qrlpb.ExecutionData{
 			DepositRoot:  bytesutil.SafeCopyBytes(vote.DepositRoot),
 			DepositCount: vote.DepositCount,
 			BlockHash:    bytesutil.SafeCopyBytes(vote.BlockHash),
@@ -642,13 +642,13 @@ func BeaconStateCapellaToProto(st state.BeaconState) (*qrlpb.BeaconStateCapella,
 		},
 		BlockRoots: bytesutil.SafeCopy2dBytes(st.BlockRoots()),
 		StateRoots: bytesutil.SafeCopy2dBytes(st.StateRoots()),
-		ExecutionNodeData: &qrlpb.ExecutionNodeData{
-			DepositRoot:  bytesutil.SafeCopyBytes(sourceExecutionNodeData.DepositRoot),
-			DepositCount: sourceExecutionNodeData.DepositCount,
-			BlockHash:    bytesutil.SafeCopyBytes(sourceExecutionNodeData.BlockHash),
+		ExecutionData: &qrlpb.ExecutionData{
+			DepositRoot:  bytesutil.SafeCopyBytes(sourceExecutionData.DepositRoot),
+			DepositCount: sourceExecutionData.DepositCount,
+			BlockHash:    bytesutil.SafeCopyBytes(sourceExecutionData.BlockHash),
 		},
-		ExecutionNodeDataVotes:     resultExecutionNodeDataVotes,
-		Eth1DepositIndex:           st.Eth1DepositIndex(),
+		ExecutionDataVotes:         resultExecutionDataVotes,
+		ExecutionDepositIndex:      st.ExecutionDepositIndex(),
 		Validators:                 resultValidators,
 		Balances:                   st.Balances(),
 		RandaoMixes:                bytesutil.SafeCopy2dBytes(st.RandaoMixes()),

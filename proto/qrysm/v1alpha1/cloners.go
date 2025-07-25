@@ -5,12 +5,12 @@ import (
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 )
 
-// CopyExecutionNodeData copies the provided executionNodeData object.
-func CopyExecutionNodeData(data *ExecutionNodeData) *ExecutionNodeData {
+// CopyExecutionData copies the provided executionData object.
+func CopyExecutionData(data *ExecutionData) *ExecutionData {
 	if data == nil {
 		return nil
 	}
-	return &ExecutionNodeData{
+	return &ExecutionData{
 		DepositRoot:  bytesutil.SafeCopyBytes(data.DepositRoot),
 		DepositCount: data.DepositCount,
 		BlockHash:    bytesutil.SafeCopyBytes(data.BlockHash),
@@ -350,7 +350,7 @@ func CopyBeaconBlockBodyCapella(body *BeaconBlockBodyCapella) *BeaconBlockBodyCa
 	}
 	return &BeaconBlockBodyCapella{
 		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		ExecutionNodeData:           CopyExecutionNodeData(body.ExecutionNodeData),
+		ExecutionData:               CopyExecutionData(body.ExecutionData),
 		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),
@@ -395,7 +395,7 @@ func CopyBlindedBeaconBlockBodyCapella(body *BlindedBeaconBlockBodyCapella) *Bli
 	}
 	return &BlindedBeaconBlockBodyCapella{
 		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		ExecutionNodeData:           CopyExecutionNodeData(body.ExecutionNodeData),
+		ExecutionData:               CopyExecutionData(body.ExecutionData),
 		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),

@@ -19,19 +19,19 @@ import (
 func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 
-	executionNodeData := &qrysmpb.ExecutionNodeData{
+	executionData := &qrysmpb.ExecutionData{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
 	}
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
-	e := beaconState.ExecutionNodeData()
+	e := beaconState.ExecutionData()
 	e.DepositCount = 100
-	require.NoError(t, beaconState.SetExecutionNodeData(e))
+	require.NoError(t, beaconState.SetExecutionData(e))
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*qrysmpb.ExecutionNodeData{executionNodeData}))
+	require.NoError(t, beaconState.SetExecutionDataVotes([]*qrysmpb.ExecutionData{executionData}))
 
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 	epoch := time.CurrentEpoch(beaconState)
@@ -50,7 +50,7 @@ func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
 	block.Block.Body.RandaoReveal = randaoReveal
-	block.Block.Body.ExecutionNodeData = executionNodeData
+	block.Block.Body.ExecutionData = executionData
 
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -75,19 +75,19 @@ func TestExecuteStateTransitionNoVerify_FullProcess(t *testing.T) {
 func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 
-	executionNodeData := &qrysmpb.ExecutionNodeData{
+	executionData := &qrysmpb.ExecutionData{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
 	}
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
-	e := beaconState.ExecutionNodeData()
+	e := beaconState.ExecutionData()
 	e.DepositCount = 100
-	require.NoError(t, beaconState.SetExecutionNodeData(e))
+	require.NoError(t, beaconState.SetExecutionData(e))
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*qrysmpb.ExecutionNodeData{executionNodeData}))
+	require.NoError(t, beaconState.SetExecutionDataVotes([]*qrysmpb.ExecutionData{executionData}))
 
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))
 	epoch := time.CurrentEpoch(beaconState)
@@ -106,7 +106,7 @@ func TestExecuteStateTransitionNoVerifySignature_CouldNotVerifyStateRoot(t *test
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
 	block.Block.Body.RandaoReveal = randaoReveal
-	block.Block.Body.ExecutionNodeData = executionNodeData
+	block.Block.Body.ExecutionData = executionData
 
 	wsb, err := blocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)

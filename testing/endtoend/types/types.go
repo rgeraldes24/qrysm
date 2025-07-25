@@ -105,9 +105,9 @@ type DepositBalancer interface {
 // EvaluationContext allows for additional data to be provided to evaluators that need extra state.
 type EvaluationContext struct {
 	DepositBalancer
-	ExitedVals                    map[[field_params.DilithiumPubkeyLength]byte]bool
-	SeenVotes                     map[primitives.Slot][]byte
-	ExpectedExecutionNodeDataVote []byte
+	ExitedVals                map[[field_params.DilithiumPubkeyLength]byte]bool
+	SeenVotes                 map[primitives.Slot][]byte
+	ExpectedExecutionDataVote []byte
 }
 
 // NewEvaluationContext handles initializing internal datastructures (like maps) provided by the EvaluationContext.

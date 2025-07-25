@@ -291,7 +291,7 @@ func generateSignedBeaconBlock(
 		StateRoot:     bytesutil.PadTo([]byte(stateRoot), hashLen),
 		ProposerIndex: proposerIndex,
 		Body: &qrysmpb.BeaconBlockBodyCapella{
-			ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+			ExecutionData: &qrysmpb.ExecutionData{
 				BlockHash:    bytesutil.PadTo([]byte("bad block hash"), hashLen),
 				DepositRoot:  bytesutil.PadTo([]byte("bad deposit root"), hashLen),
 				DepositCount: 1,

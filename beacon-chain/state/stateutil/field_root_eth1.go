@@ -8,16 +8,16 @@ import (
 // Eth1Root computes the HashTreeRoot Merkleization of
 // a BeaconBlockHeader struct according to the eth2
 // Simple Serialize specification.
-func Eth1Root(executionNodeData *qrysmpb.ExecutionNodeData) ([32]byte, error) {
-	if executionNodeData == nil {
-		return [32]byte{}, errors.New("nil eth1 data")
+func Eth1Root(executionData *qrysmpb.ExecutionData) ([32]byte, error) {
+	if executionData == nil {
+		return [32]byte{}, errors.New("nil execution data")
 	}
-	return ExecutionNodeDataRootWithHasher(executionNodeData)
+	return ExecutionDataRootWithHasher(executionData)
 }
 
-// ExecutionNodeDataVotesRoot computes the HashTreeRoot Merkleization of
-// a list of ExecutionNodeData structs according to the eth2
+// ExecutionDataVotesRoot computes the HashTreeRoot Merkleization of
+// a list of ExecutionData structs according to the eth2
 // Simple Serialize specification.
-func ExecutionNodeDataVotesRoot(executionNodeDataVotes []*qrysmpb.ExecutionNodeData) ([32]byte, error) {
-	return ExecutionNodeDatasRoot(executionNodeDataVotes)
+func ExecutionDataVotesRoot(executionDataVotes []*qrysmpb.ExecutionData) ([32]byte, error) {
+	return ExecutionDatasRoot(executionDataVotes)
 }

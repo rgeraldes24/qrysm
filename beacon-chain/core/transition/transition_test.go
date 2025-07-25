@@ -48,19 +48,19 @@ func TestExecuteStateTransition_IncorrectSlot(t *testing.T) {
 func TestExecuteStateTransition_FullProcess(t *testing.T) {
 	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 100)
 
-	executionNodeData := &qrysmpb.ExecutionNodeData{
+	executionData := &qrysmpb.ExecutionData{
 		DepositCount: 100,
 		DepositRoot:  bytesutil.PadTo([]byte{2}, 32),
 		BlockHash:    make([]byte, 32),
 	}
 	require.NoError(t, beaconState.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
-	e := beaconState.ExecutionNodeData()
+	e := beaconState.ExecutionData()
 	e.DepositCount = 100
-	require.NoError(t, beaconState.SetExecutionNodeData(e))
+	require.NoError(t, beaconState.SetExecutionData(e))
 	bh := beaconState.LatestBlockHeader()
 	bh.Slot = beaconState.Slot()
 	require.NoError(t, beaconState.SetLatestBlockHeader(bh))
-	require.NoError(t, beaconState.SetExecutionNodeDataVotes([]*qrysmpb.ExecutionNodeData{executionNodeData}))
+	require.NoError(t, beaconState.SetExecutionDataVotes([]*qrysmpb.ExecutionData{executionData}))
 
 	oldMix, err := beaconState.RandaoMixAtIndex(1)
 	require.NoError(t, err)
@@ -82,7 +82,7 @@ func TestExecuteStateTransition_FullProcess(t *testing.T) {
 	block.Block.Slot = beaconState.Slot() + 1
 	block.Block.ParentRoot = parentRoot[:]
 	block.Block.Body.RandaoReveal = randaoReveal
-	block.Block.Body.ExecutionNodeData = executionNodeData
+	block.Block.Body.ExecutionData = executionData
 
 	wsb, err := consensusblocks.NewSignedBeaconBlock(block)
 	require.NoError(t, err)
@@ -176,8 +176,8 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 	block.Block.Body.Attestations = attestations
 	block.Block.Body.AttesterSlashings = attesterSlashings
 	block.Block.Body.VoluntaryExits = exits
-	block.Block.Body.ExecutionNodeData.DepositRoot = bytesutil.PadTo([]byte{2}, 32)
-	block.Block.Body.ExecutionNodeData.BlockHash = bytesutil.PadTo([]byte{3}, 32)
+	block.Block.Body.ExecutionData.DepositRoot = bytesutil.PadTo([]byte{2}, 32)
+	block.Block.Body.ExecutionData.BlockHash = bytesutil.PadTo([]byte{3}, 32)
 	err = beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
 	require.NoError(t, err)
 	cp := beaconState.CurrentJustifiedCheckpoint()
@@ -267,8 +267,8 @@ func TestProcessBlock_OverMaxVoluntaryExits(t *testing.T) {
 
 func TestProcessBlock_IncorrectDeposits(t *testing.T) {
 	base := &qrysmpb.BeaconStateCapella{
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 100},
-		Eth1DepositIndex:  98,
+		ExecutionData:         &qrysmpb.ExecutionData{DepositCount: 100},
+		ExecutionDepositIndex: 98,
 	}
 	s, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
@@ -280,7 +280,7 @@ func TestProcessBlock_IncorrectDeposits(t *testing.T) {
 		},
 	}
 	want := fmt.Sprintf("incorrect outstanding deposits in block body, wanted: %d, got: %d",
-		s.ExecutionNodeData().DepositCount-s.Eth1DepositIndex(), len(b.Block.Body.Deposits))
+		s.ExecutionData().DepositCount-s.ExecutionDepositIndex(), len(b.Block.Body.Deposits))
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
 	_, err = transition.VerifyOperationLengths(context.Background(), s, wsb)

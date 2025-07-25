@@ -39,9 +39,9 @@ func TestGetDuties_OK(t *testing.T) {
 	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(t, err)
-	executionNodeData, err := util.DeterministicExecutionNodeData(len(deposits))
+	executionData, err := util.DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionNodeData, &enginev1.ExecutionPayloadCapella{})
+	bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
 	require.NoError(t, err, "Could not setup genesis bs")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
@@ -105,9 +105,9 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 	genesis := util.NewBeaconBlockCapella()
 	deposits, _, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().SyncCommitteeSize)
 	require.NoError(t, err)
-	executionNodeData, err := util.DeterministicExecutionNodeData(len(deposits))
+	executionData, err := util.DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
-	bs, err := util.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionNodeData)
+	bs, err := util.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData)
 	require.NoError(t, err, "Could not setup genesis bs")
 	h := &qrysmpb.BeaconBlockHeader{
 		StateRoot:  bytesutil.PadTo([]byte{'a'}, fieldparams.RootLength),
@@ -208,9 +208,9 @@ func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 	genesis := util.NewBeaconBlockCapella()
 	deposits, _, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().SyncCommitteeSize)
 	require.NoError(t, err)
-	executionNodeData, err := util.DeterministicExecutionNodeData(len(deposits))
+	executionData, err := util.DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
-	bs, err := util.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionNodeData)
+	bs, err := util.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData)
 	require.NoError(t, err)
 	h := &qrysmpb.BeaconBlockHeader{
 		StateRoot:  bytesutil.PadTo([]byte{'a'}, fieldparams.RootLength),
@@ -270,9 +270,9 @@ func TestGetDuties_CurrentEpoch_ShouldNotFail(t *testing.T) {
 	depChainStart := params.BeaconConfig().MinGenesisActiveValidatorCount
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(t, err)
-	executionNodeData, err := util.DeterministicExecutionNodeData(len(deposits))
+	executionData, err := util.DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
-	bState, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionNodeData, &enginev1.ExecutionPayloadCapella{})
+	bState, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
 	require.NoError(t, err, "Could not setup genesis state")
 	// Set state to non-epoch start slot.
 	require.NoError(t, bState.SetSlot(5))
@@ -312,9 +312,9 @@ func TestGetDuties_MultipleKeys_OK(t *testing.T) {
 
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(t, err)
-	executionNodeData, err := util.DeterministicExecutionNodeData(len(deposits))
+	executionData, err := util.DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
-	bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionNodeData, &enginev1.ExecutionPayloadCapella{})
+	bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
 	require.NoError(t, err, "Could not setup genesis bs")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
@@ -401,9 +401,9 @@ func BenchmarkCommitteeAssignment(b *testing.B) {
 	depChainStart := uint64(8192 * 2)
 	deposits, _, err := util.DeterministicDepositsAndKeys(depChainStart)
 	require.NoError(b, err)
-	executionNodeData, err := util.DeterministicExecutionNodeData(len(deposits))
+	executionData, err := util.DeterministicExecutionData(len(deposits))
 	require.NoError(b, err)
-	bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionNodeData, &enginev1.ExecutionPayloadCapella{})
+	bs, err := transition.GenesisBeaconStateCapella(context.Background(), deposits, 0, executionData, &enginev1.ExecutionPayloadCapella{})
 	require.NoError(b, err, "Could not setup genesis bs")
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(b, err, "Could not get signing root")

@@ -45,7 +45,7 @@ func TestLatestMainchainInfo_OK(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "Unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "Unable to setup web3 execution chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
@@ -65,23 +65,23 @@ func TestLatestMainchainInfo_OK(t *testing.T) {
 	require.NoError(t, err)
 
 	tickerChan := make(chan time.Time)
-	web3Service.eth1HeadTicker = &time.Ticker{C: tickerChan}
+	web3Service.executionHeadTicker = &time.Ticker{C: tickerChan}
 	tickerChan <- time.Now()
 	web3Service.cancel()
 	exitRoutine <- true
 
-	assert.Equal(t, web3Service.latestExecutionNodeData.BlockHeight, header.Number.Uint64())
-	assert.Equal(t, hexutil.Encode(web3Service.latestExecutionNodeData.BlockHash), header.Hash.Hex())
-	assert.Equal(t, web3Service.latestExecutionNodeData.BlockTime, header.Time)
+	assert.Equal(t, web3Service.latestExecutionData.BlockHeight, header.Number.Uint64())
+	assert.Equal(t, hexutil.Encode(web3Service.latestExecutionData.BlockHash), header.Hash.Hex())
+	assert.Equal(t, web3Service.latestExecutionData.BlockTime, header.Time)
 }
 
 func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
 	// TODO(now.youtrack.cloud/issue/TQ-5)
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
-	conf.Eth1FollowDistance = 2048
+	conf.ExecutionFollowDistance = 2048
 	params.OverrideBeaconConfig(conf)
-	maxCacheSize = 2 * params.BeaconConfig().Eth1FollowDistance
+	maxCacheSize = 2 * params.BeaconConfig().ExecutionFollowDistance
 
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
@@ -93,7 +93,7 @@ func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 execution chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = &mockExecution.RPCClient{}
@@ -115,7 +115,7 @@ func TestBlockHashByHeight_ReturnsHash(t *testing.T) {
 	require.Equal(t, true, exists, "Expected block info to be cached")
 }
 
-func TestBlockHashByHeight_ReturnsError_WhenNoEth1Client(t *testing.T) {
+func TestBlockHashByHeight_ReturnsError_WhenNoExecutionClient(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
 	require.NoError(t, err)
@@ -126,7 +126,7 @@ func TestBlockHashByHeight_ReturnsError_WhenNoEth1Client(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 execution chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = nil
@@ -140,9 +140,9 @@ func TestBlockExists_ValidHash(t *testing.T) {
 	// TODO(now.youtrack.cloud/issue/TQ-5)
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
-	conf.Eth1FollowDistance = 2048
+	conf.ExecutionFollowDistance = 2048
 	params.OverrideBeaconConfig(conf)
-	maxCacheSize = 2 * params.BeaconConfig().Eth1FollowDistance
+	maxCacheSize = 2 * params.BeaconConfig().ExecutionFollowDistance
 
 	beaconDB := dbutil.SetupDB(t)
 	testAcc, err := mock.Setup()
@@ -156,7 +156,7 @@ func TestBlockExists_ValidHash(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 execution chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = &mockExecution.RPCClient{Backend: testAcc.Backend}
@@ -186,7 +186,7 @@ func TestBlockExists_InvalidHash(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 execution chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 
@@ -198,9 +198,9 @@ func TestBlockExists_UsesCachedBlockInfo(t *testing.T) {
 	// TODO(now.youtrack.cloud/issue/TQ-5)
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
-	conf.Eth1FollowDistance = 2048
+	conf.ExecutionFollowDistance = 2048
 	params.OverrideBeaconConfig(conf)
-	maxCacheSize = 2 * params.BeaconConfig().Eth1FollowDistance
+	maxCacheSize = 2 * params.BeaconConfig().ExecutionFollowDistance
 
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
@@ -212,7 +212,7 @@ func TestBlockExists_UsesCachedBlockInfo(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 execution chain service")
 
 	header := &types.HeaderInfo{
 		Number: big.NewInt(0),
@@ -250,8 +250,8 @@ func TestService_BlockNumberByTimestamp(t *testing.T) {
 	ctx := context.Background()
 	hd, err := testAcc.Backend.HeaderByNumber(ctx, nil)
 	require.NoError(t, err)
-	web3Service.latestExecutionNodeData.BlockTime = hd.Time
-	web3Service.latestExecutionNodeData.BlockHeight = hd.Number.Uint64()
+	web3Service.latestExecutionData.BlockTime = hd.Time
+	web3Service.latestExecutionData.BlockHeight = hd.Number.Uint64()
 	blk, err := web3Service.BlockByTimestamp(ctx, 1000 /* time */)
 	require.NoError(t, err)
 	if blk.Number.Cmp(big.NewInt(0)) == 0 {
@@ -282,17 +282,17 @@ func TestService_BlockNumberByTimestampLessTargetTime(t *testing.T) {
 	ctx := context.Background()
 	hd, err := testAcc.Backend.HeaderByNumber(ctx, nil)
 	require.NoError(t, err)
-	web3Service.latestExecutionNodeData.BlockTime = hd.Time
+	web3Service.latestExecutionData.BlockTime = hd.Time
 	// Use extremely small deadline to illustrate that context deadlines are respected.
 	ctx, cancel := context.WithTimeout(ctx, 100*time.Nanosecond)
 	defer cancel()
 
 	// Provide an unattainable target time
-	_, err = web3Service.findMaxTargetEth1Block(ctx, hd.Number, hd.Time/2)
+	_, err = web3Service.findMaxTargetExecutionBlock(ctx, hd.Number, hd.Time/2)
 	require.ErrorContains(t, context.DeadlineExceeded.Error(), err)
 
 	// Provide an attainable target time
-	blk, err := web3Service.findMaxTargetEth1Block(context.Background(), hd.Number, hd.Time-5)
+	blk, err := web3Service.findMaxTargetExecutionBlock(context.Background(), hd.Number, hd.Time-5)
 	require.NoError(t, err)
 	require.NotEqual(t, hd.Number.Uint64(), blk.Number.Uint64(), "retrieved block is not less than the head")
 }
@@ -320,22 +320,22 @@ func TestService_BlockNumberByTimestampMoreTargetTime(t *testing.T) {
 	ctx := context.Background()
 	hd, err := testAcc.Backend.HeaderByNumber(ctx, nil)
 	require.NoError(t, err)
-	web3Service.latestExecutionNodeData.BlockTime = hd.Time
+	web3Service.latestExecutionData.BlockTime = hd.Time
 	// Use extremely small deadline to illustrate that context deadlines are respected.
 	ctx, cancel := context.WithTimeout(ctx, 100*time.Nanosecond)
 	defer cancel()
 
 	// Provide an unattainable target time with respect to head
-	_, err = web3Service.findMinTargetEth1Block(ctx, big.NewInt(0).Div(hd.Number, big.NewInt(2)), hd.Time)
+	_, err = web3Service.findMinTargetExecutionBlock(ctx, big.NewInt(0).Div(hd.Number, big.NewInt(2)), hd.Time)
 	require.ErrorContains(t, context.DeadlineExceeded.Error(), err)
 
 	// Provide an attainable target time with respect to head
-	blk, err := web3Service.findMinTargetEth1Block(context.Background(), big.NewInt(0).Sub(hd.Number, big.NewInt(5)), hd.Time)
+	blk, err := web3Service.findMinTargetExecutionBlock(context.Background(), big.NewInt(0).Sub(hd.Number, big.NewInt(5)), hd.Time)
 	require.NoError(t, err)
 	require.Equal(t, hd.Number.Uint64(), blk.Number.Uint64(), "retrieved block is not equal to the head")
 }
 
-func TestService_BlockTimeByHeight_ReturnsError_WhenNoEth1Client(t *testing.T) {
+func TestService_BlockTimeByHeight_ReturnsError_WhenNoExecutionClient(t *testing.T) {
 	beaconDB := dbutil.SetupDB(t)
 	server, endpoint, err := mockExecution.SetupRPCServer()
 	require.NoError(t, err)
@@ -346,7 +346,7 @@ func TestService_BlockTimeByHeight_ReturnsError_WhenNoEth1Client(t *testing.T) {
 		WithHttpEndpoint(endpoint),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 execution chain service")
 
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.rpcClient = nil

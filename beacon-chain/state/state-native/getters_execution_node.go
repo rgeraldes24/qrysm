@@ -4,61 +4,61 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-// ExecutionNodeData corresponding to the proof-of-work chain information stored in the beacon state.
-func (b *BeaconState) ExecutionNodeData() *qrysmpb.ExecutionNodeData {
-	if b.executionNodeData == nil {
+// ExecutionData corresponding to the proof-of-work chain information stored in the beacon state.
+func (b *BeaconState) ExecutionData() *qrysmpb.ExecutionData {
+	if b.executionData == nil {
 		return nil
 	}
 
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
-	return b.executionNodeDataVal()
+	return b.executionDataVal()
 }
 
-// executionNodeDataVal corresponding to the proof-of-work chain information stored in the beacon state.
+// executionDataVal corresponding to the proof-of-work chain information stored in the beacon state.
 // This assumes that a lock is already held on BeaconState.
-func (b *BeaconState) executionNodeDataVal() *qrysmpb.ExecutionNodeData {
-	if b.executionNodeData == nil {
+func (b *BeaconState) executionDataVal() *qrysmpb.ExecutionData {
+	if b.executionData == nil {
 		return nil
 	}
 
-	return qrysmpb.CopyExecutionNodeData(b.executionNodeData)
+	return qrysmpb.CopyExecutionData(b.executionData)
 }
 
-// ExecutionNodeDataVotes corresponds to votes from Ethereum on the canonical proof-of-work chain
+// ExecutionDataVotes corresponds to votes from Ethereum on the canonical proof-of-work chain
 // data retrieved from eth1.
-func (b *BeaconState) ExecutionNodeDataVotes() []*qrysmpb.ExecutionNodeData {
-	if b.executionNodeDataVotes == nil {
+func (b *BeaconState) ExecutionDataVotes() []*qrysmpb.ExecutionData {
+	if b.executionDataVotes == nil {
 		return nil
 	}
 
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
-	return b.executionNodeDataVotesVal()
+	return b.executionDataVotesVal()
 }
 
-// executionNodeDataVotesVal corresponds to votes from Ethereum on the canonical proof-of-work chain
+// executionDataVotesVal corresponds to votes from Ethereum on the canonical proof-of-work chain
 // data retrieved from eth1.
 // This assumes that a lock is already held on BeaconState.
-func (b *BeaconState) executionNodeDataVotesVal() []*qrysmpb.ExecutionNodeData {
-	if b.executionNodeDataVotes == nil {
+func (b *BeaconState) executionDataVotesVal() []*qrysmpb.ExecutionData {
+	if b.executionDataVotes == nil {
 		return nil
 	}
 
-	res := make([]*qrysmpb.ExecutionNodeData, len(b.executionNodeDataVotes))
+	res := make([]*qrysmpb.ExecutionData, len(b.executionDataVotes))
 	for i := 0; i < len(res); i++ {
-		res[i] = qrysmpb.CopyExecutionNodeData(b.executionNodeDataVotes[i])
+		res[i] = qrysmpb.CopyExecutionData(b.executionDataVotes[i])
 	}
 	return res
 }
 
-// Eth1DepositIndex corresponds to the index of the deposit made to the
-// validator deposit contract at the time of this state's eth1 data.
-func (b *BeaconState) Eth1DepositIndex() uint64 {
+// ExecutionDepositIndex corresponds to the index of the deposit made to the
+// validator deposit contract at the time of this state's execution data.
+func (b *BeaconState) ExecutionDepositIndex() uint64 {
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
-	return b.eth1DepositIndex
+	return b.executionDepositIndex
 }

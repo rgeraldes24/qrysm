@@ -93,7 +93,7 @@ var appHelpFlagGroups = []flagGroup{
 	{
 		Name: "beacon-chain",
 		Flags: []cli.Flag{
-			flags.InteropMockExecutionNodeDataVotesFlag,
+			flags.InteropMockExecutionDataVotesFlag,
 			flags.DepositContractFlag,
 			flags.ContractDeploymentBlock,
 			flags.RPCHost,

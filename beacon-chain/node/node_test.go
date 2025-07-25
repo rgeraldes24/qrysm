@@ -40,7 +40,7 @@ func TestNodeClose_OK(t *testing.T) {
 
 	app := cli.App{}
 	set := flag.NewFlagSet("test", 0)
-	set.Bool("test-skip-pow", true, "skip pow dial")
+	set.Bool("test-skip-execution", true, "skip execution dial")
 	set.String("datadir", tmp, "node data directory")
 	set.String("p2p-encoding", "ssz", "p2p encoding scheme")
 	set.Bool("demo-config", true, "demo configuration")
@@ -103,7 +103,7 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 		BaseFeePerGas: make([]byte, 32),
 		BlockHash:     make([]byte, 32),
 	}
-	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, numValidators, ee, &qrysmpb.ExecutionNodeData{BlockHash: make([]byte, 32)})
+	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, numValidators, ee, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)})
 	require.NoError(t, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < 2; i++ {
 		var someRoot [32]byte

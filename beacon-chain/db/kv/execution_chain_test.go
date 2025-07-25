@@ -7,9 +7,9 @@ import (
 	v1alpha1 "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-func TestStore_SavePowchainData(t *testing.T) {
+func TestStore_SaveExecutionChainData(t *testing.T) {
 	type args struct {
-		data *v1alpha1.ETH1ChainData
+		data *v1alpha1.ExecutionChainData
 	}
 	tests := []struct {
 		name    string
@@ -28,7 +28,7 @@ func TestStore_SavePowchainData(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			store := setupDB(t)
 			if err := store.SaveExecutionChainData(context.Background(), tt.args.data); (err != nil) != tt.wantErr {
-				t.Errorf("SaveExecutionChainData() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("SaveExecutionData() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

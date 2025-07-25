@@ -1496,39 +1496,39 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 }
 
 var (
-	pattern_BeaconChain_GetWeakSubjectivity_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "zond", "v1", "beacon", "weak_subjectivity"}, ""))
+	pattern_BeaconChain_GetWeakSubjectivity_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "qrl", "v1", "beacon", "weak_subjectivity"}, ""))
 
-	pattern_BeaconChain_GetStateRoot_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "zond", "v1", "beacon", "states", "state_id", "root"}, ""))
+	pattern_BeaconChain_GetStateRoot_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "qrl", "v1", "beacon", "states", "state_id", "root"}, ""))
 
-	pattern_BeaconChain_ListSyncCommittees_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "zond", "v1", "beacon", "states", "state_id", "sync_committees"}, ""))
+	pattern_BeaconChain_ListSyncCommittees_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "qrl", "v1", "beacon", "states", "state_id", "sync_committees"}, ""))
 
-	pattern_BeaconChain_GetRandao_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "zond", "v1", "beacon", "states", "state_id", "randao"}, ""))
+	pattern_BeaconChain_GetRandao_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "qrl", "v1", "beacon", "states", "state_id", "randao"}, ""))
 
-	pattern_BeaconChain_GetBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "zond", "v1", "beacon", "blocks", "block_id"}, ""))
+	pattern_BeaconChain_GetBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "qrl", "v1", "beacon", "blocks", "block_id"}, ""))
 
-	pattern_BeaconChain_GetBlindedBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "zond", "v1", "beacon", "blinded_blocks", "block_id"}, ""))
+	pattern_BeaconChain_GetBlindedBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "qrl", "v1", "beacon", "blinded_blocks", "block_id"}, ""))
 
-	pattern_BeaconChain_GetBlindedBlockSSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "zond", "v1", "beacon", "blinded_blocks", "block_id", "ssz"}, ""))
+	pattern_BeaconChain_GetBlindedBlockSSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "qrl", "v1", "beacon", "blinded_blocks", "block_id", "ssz"}, ""))
 
-	pattern_BeaconChain_GetBlockSSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "zond", "v1", "beacon", "blocks", "block_id", "ssz"}, ""))
+	pattern_BeaconChain_GetBlockSSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "qrl", "v1", "beacon", "blocks", "block_id", "ssz"}, ""))
 
-	pattern_BeaconChain_ListBlockAttestations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "zond", "v1", "beacon", "blocks", "block_id", "attestations"}, ""))
+	pattern_BeaconChain_ListBlockAttestations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "qrl", "v1", "beacon", "blocks", "block_id", "attestations"}, ""))
 
-	pattern_BeaconChain_ListPoolAttesterSlashings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "zond", "v1", "beacon", "pool", "attester_slashings"}, ""))
+	pattern_BeaconChain_ListPoolAttesterSlashings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "beacon", "pool", "attester_slashings"}, ""))
 
-	pattern_BeaconChain_SubmitAttesterSlashing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "zond", "v1", "beacon", "pool", "attester_slashings"}, ""))
+	pattern_BeaconChain_SubmitAttesterSlashing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "beacon", "pool", "attester_slashings"}, ""))
 
-	pattern_BeaconChain_ListPoolProposerSlashings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "zond", "v1", "beacon", "pool", "proposer_slashings"}, ""))
+	pattern_BeaconChain_ListPoolProposerSlashings_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "beacon", "pool", "proposer_slashings"}, ""))
 
-	pattern_BeaconChain_SubmitProposerSlashing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "zond", "v1", "beacon", "pool", "proposer_slashings"}, ""))
+	pattern_BeaconChain_SubmitProposerSlashing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "beacon", "pool", "proposer_slashings"}, ""))
 
-	pattern_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "zond", "v1", "beacon", "pool", "dilithium_to_execution_changes"}, ""))
+	pattern_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "beacon", "pool", "dilithium_to_execution_changes"}, ""))
 
-	pattern_BeaconChain_ListDilithiumToExecutionChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "zond", "v1", "beacon", "pool", "dilithium_to_execution_changes"}, ""))
+	pattern_BeaconChain_ListDilithiumToExecutionChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "beacon", "pool", "dilithium_to_execution_changes"}, ""))
 
-	pattern_BeaconChain_GetForkSchedule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "zond", "v1", "config", "fork_schedule"}, ""))
+	pattern_BeaconChain_GetForkSchedule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "qrl", "v1", "config", "fork_schedule"}, ""))
 
-	pattern_BeaconChain_GetSpec_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "zond", "v1", "config", "spec"}, ""))
+	pattern_BeaconChain_GetSpec_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "qrl", "v1", "config", "spec"}, ""))
 )
 
 var (

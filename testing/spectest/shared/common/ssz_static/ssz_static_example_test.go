@@ -23,12 +23,6 @@ func ExampleRunSSZStaticTests() {
 			obj = &qrysmpb.Attestation{}
 		case "BeaconState":
 			obj = &qrysmpb.BeaconStateCapella{}
-		case "Eth1Block":
-			// Some types may not apply to qrysm, but exist in the spec test folders. It is OK to
-			// skip these tests with a valid justification. Otherwise, the test should fail with an
-			// unsupported type.
-			t.Skip("Unused type")
-			return nil, nil
 		default:
 			return nil, fmt.Errorf("unsupported type: %s", objectName)
 		}

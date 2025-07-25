@@ -108,7 +108,7 @@ var Buckets = [][]byte{
 	voluntaryExitsBucket,
 	chainMetadataBucket,
 	checkpointBucket,
-	powchainBucket,
+	executionChainBucket,
 	stateSummaryBucket,
 	stateValidatorsBucket,
 	// Indices buckets.

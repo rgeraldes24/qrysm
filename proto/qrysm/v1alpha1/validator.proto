@@ -440,7 +440,7 @@ message ValidatorStatusResponse {
 
     // The block number of the Ethereum proof-of-work chain
     // where the deposit for the validator was included.
-    uint64 eth1_deposit_block_number = 2;
+    uint64 execution_deposit_block_number = 2;
 
     // The slot in the beacon chain in which the validator's
     // deposit was included in a block.

@@ -187,7 +187,7 @@ func (BeaconBlockBody) RandaoReveal() [field_params.DilithiumSignatureLength]byt
 	panic("implement me")
 }
 
-func (BeaconBlockBody) ExecutionNodeData() *zond.ExecutionNodeData {
+func (BeaconBlockBody) ExecutionData() *zond.ExecutionData {
 	panic("implement me")
 }
 
@@ -243,7 +243,7 @@ func (b *BeaconBlockBody) SetRandaoReveal([]byte) {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetExecutionNodeData(*zond.ExecutionNodeData) {
+func (b *BeaconBlockBody) SetExecutionData(*zond.ExecutionData) {
 	panic("implement me")
 }
 

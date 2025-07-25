@@ -88,10 +88,10 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 			ParentRoot: parentRoot[:],
 			StateRoot:  genesis.Block.StateRoot,
 			Body: &qrysmpb.BeaconBlockBodyCapella{
-				RandaoReveal:      genesis.Block.Body.RandaoReveal,
-				Graffiti:          genesis.Block.Body.Graffiti,
-				ExecutionNodeData: genesis.Block.Body.ExecutionNodeData,
-				SyncAggregate:     &qrysmpb.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
+				RandaoReveal:  genesis.Block.Body.RandaoReveal,
+				Graffiti:      genesis.Block.Body.Graffiti,
+				ExecutionData: genesis.Block.Body.ExecutionData,
+				SyncAggregate: &qrysmpb.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
 				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 					ParentHash:    make([]byte, fieldparams.RootLength),
 					FeeRecipient:  make([]byte, fieldparams.FeeRecipientLength),
@@ -336,10 +336,10 @@ func TestProposer_ComputeStateRoot_OK(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestProposer_PendingDeposits_ExecutionNodeDataVoteOK(t *testing.T) {
+func TestProposer_PendingDeposits_ExecutionDataVoteOK(t *testing.T) {
 	ctx := context.Background()
 
-	height := big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance))
+	height := big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance))
 	newHeight := big.NewInt(height.Int64() + 11000)
 	p := &mockExecution.Chain{
 		LatestBlockNumber: height,
@@ -349,16 +349,16 @@ func TestProposer_PendingDeposits_ExecutionNodeDataVoteOK(t *testing.T) {
 		},
 	}
 
-	var votes []*qrysmpb.ExecutionNodeData
+	var votes []*qrysmpb.ExecutionData
 
 	blockHash := make([]byte, 32)
 	copy(blockHash, "0x1")
-	vote := &qrysmpb.ExecutionNodeData{
+	vote := &qrysmpb.ExecutionData{
 		DepositRoot:  make([]byte, 32),
 		BlockHash:    blockHash,
 		DepositCount: 3,
 	}
-	period := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerEth1VotingPeriod)))
+	period := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerExecutionVotingPeriod)))
 	for i := 0; i <= int(period/2); i++ {
 		votes = append(votes, vote)
 	}
@@ -367,13 +367,13 @@ func TestProposer_PendingDeposits_ExecutionNodeDataVoteOK(t *testing.T) {
 	copy(blockHash, "0x0")
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
-	require.NoError(t, beaconState.SetEth1DepositIndex(2))
-	require.NoError(t, beaconState.SetExecutionNodeData(&qrysmpb.ExecutionNodeData{
+	require.NoError(t, beaconState.SetExecutionDepositIndex(2))
+	require.NoError(t, beaconState.SetExecutionData(&qrysmpb.ExecutionData{
 		DepositRoot:  make([]byte, 32),
 		BlockHash:    blockHash,
 		DepositCount: 2,
 	}))
-	require.NoError(t, beaconState.SetExecutionNodeDataVotes(votes))
+	require.NoError(t, beaconState.SetExecutionDataVotes(votes))
 
 	blk := util.NewBeaconBlockCapella()
 	blkRoot, err := blk.Block.HashTreeRoot()
@@ -389,37 +389,37 @@ func TestProposer_PendingDeposits_ExecutionNodeDataVoteOK(t *testing.T) {
 
 	// It should also return the recent deposits after their follow window.
 	p.LatestBlockNumber = big.NewInt(0).Add(p.LatestBlockNumber, big.NewInt(10000))
-	_, eth1Height, err := bs.canonicalExecutionNodeData(ctx, beaconState, &qrysmpb.ExecutionNodeData{})
+	_, eth1Height, err := bs.canonicalExecutionData(ctx, beaconState, &qrysmpb.ExecutionData{})
 	require.NoError(t, err)
 
 	assert.Equal(t, 0, eth1Height.Cmp(height))
 
-	newState, err := b.ProcessExecutionNodeDataInBlock(ctx, beaconState, blk.Block.Body.ExecutionNodeData)
+	newState, err := b.ProcessExecutionDataInBlock(ctx, beaconState, blk.Block.Body.ExecutionData)
 	require.NoError(t, err)
 
-	if proto.Equal(newState.ExecutionNodeData(), vote) {
-		t.Errorf("executionNodeData in the state equal to vote, when not expected to"+
+	if proto.Equal(newState.ExecutionData(), vote) {
+		t.Errorf("executionData in the state equal to vote, when not expected to"+
 			"have majority: Got %v", vote)
 	}
 
-	blk.Block.Body.ExecutionNodeData = vote
+	blk.Block.Body.ExecutionData = vote
 
-	_, eth1Height, err = bs.canonicalExecutionNodeData(ctx, beaconState, vote)
+	_, eth1Height, err = bs.canonicalExecutionData(ctx, beaconState, vote)
 	require.NoError(t, err)
 	assert.Equal(t, 0, eth1Height.Cmp(newHeight))
 
-	newState, err = b.ProcessExecutionNodeDataInBlock(ctx, beaconState, blk.Block.Body.ExecutionNodeData)
+	newState, err = b.ProcessExecutionDataInBlock(ctx, beaconState, blk.Block.Body.ExecutionData)
 	require.NoError(t, err)
 
-	if !proto.Equal(newState.ExecutionNodeData(), vote) {
-		t.Errorf("executionNodeData in the state not of the expected kind: Got %v but wanted %v", newState.ExecutionNodeData(), vote)
+	if !proto.Equal(newState.ExecutionData(), vote) {
+		t.Errorf("executionData in the state not of the expected kind: Got %v but wanted %v", newState.ExecutionData(), vote)
 	}
 }
 
 func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 	ctx := context.Background()
 
-	height := big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance))
+	height := big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance))
 	p := &mockExecution.Chain{
 		LatestBlockNumber: height,
 		HashesByHeight: map[int][]byte{
@@ -428,11 +428,11 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 	}
 
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:   bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot: make([]byte, 32),
 		},
-		Eth1DepositIndex: 2,
+		ExecutionDepositIndex: 2,
 	})
 	require.NoError(t, err)
 
@@ -442,8 +442,8 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 	// Using the merkleTreeIndex as the block number for this test...
 	readyDeposits := []*qrysmpb.DepositContainer{
 		{
-			Index:           0,
-			Eth1BlockHeight: 2,
+			Index:                0,
+			ExecutionBlockHeight: 2,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
@@ -452,8 +452,8 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 				}},
 		},
 		{
-			Index:           1,
-			Eth1BlockHeight: 8,
+			Index:                1,
+			ExecutionBlockHeight: 8,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
@@ -465,8 +465,8 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 
 	recentDeposits := []*qrysmpb.DepositContainer{
 		{
-			Index:           2,
-			Eth1BlockHeight: 400,
+			Index:                2,
+			ExecutionBlockHeight: 400,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
@@ -475,8 +475,8 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 				}},
 		},
 		{
-			Index:           3,
-			Eth1BlockHeight: 600,
+			Index:                3,
+			ExecutionBlockHeight: 600,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
@@ -498,12 +498,12 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 		assert.NoError(t, depositTrie.Insert(depositHash[:], int(dp.Index)))
 		root, err := depositTrie.HashTreeRoot()
 		require.NoError(t, err)
-		assert.NoError(t, depositCache.InsertDeposit(ctx, dp.Deposit, dp.Eth1BlockHeight, dp.Index, root))
+		assert.NoError(t, depositCache.InsertDeposit(ctx, dp.Deposit, dp.ExecutionBlockHeight, dp.Index, root))
 	}
 	for _, dp := range recentDeposits {
 		root, err := depositTrie.HashTreeRoot()
 		require.NoError(t, err)
-		depositCache.InsertPendingDeposit(ctx, dp.Deposit, dp.Eth1BlockHeight, dp.Index, root)
+		depositCache.InsertPendingDeposit(ctx, dp.Deposit, dp.ExecutionBlockHeight, dp.Index, root)
 	}
 
 	blk := util.NewBeaconBlockCapella()
@@ -522,22 +522,22 @@ func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
 		HeadFetcher:               &mock.ChainService{State: beaconState, Root: blkRoot[:]},
 	}
 
-	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionNodeData{})
+	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionData{})
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(deposits), "Received unexpected list of deposits")
 
 	// It should not return the recent deposits after their follow window.
 	// as latest block number makes no difference in retrieval of deposits
 	p.LatestBlockNumber = big.NewInt(0).Add(p.LatestBlockNumber, big.NewInt(10000))
-	deposits, err = bs.deposits(ctx, beaconState, &qrysmpb.ExecutionNodeData{})
+	deposits, err = bs.deposits(ctx, beaconState, &qrysmpb.ExecutionData{})
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(deposits), "Received unexpected number of pending deposits")
 }
 
-func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
+func TestProposer_PendingDeposits_FollowsCorrectExecutionBlock(t *testing.T) {
 	ctx := context.Background()
 
-	height := big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance))
+	height := big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance))
 	newHeight := big.NewInt(height.Int64() + 11000)
 	p := &mockExecution.Chain{
 		LatestBlockNumber: height,
@@ -547,26 +547,26 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 		},
 	}
 
-	var votes []*qrysmpb.ExecutionNodeData
+	var votes []*qrysmpb.ExecutionData
 
-	vote := &qrysmpb.ExecutionNodeData{
+	vote := &qrysmpb.ExecutionData{
 		BlockHash:    bytesutil.PadTo([]byte("0x1"), 32),
 		DepositRoot:  make([]byte, 32),
 		DepositCount: 7,
 	}
-	period := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerEth1VotingPeriod)))
+	period := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerExecutionVotingPeriod)))
 	for i := 0; i <= int(period/2); i++ {
 		votes = append(votes, vote)
 	}
 
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:    []byte("0x0"),
 			DepositRoot:  make([]byte, 32),
 			DepositCount: 5,
 		},
-		Eth1DepositIndex:       1,
-		ExecutionNodeDataVotes: votes,
+		ExecutionDepositIndex: 1,
+		ExecutionDataVotes:    votes,
 	})
 	require.NoError(t, err)
 	blk := util.NewBeaconBlockCapella()
@@ -581,8 +581,8 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 	// Using the merkleTreeIndex as the block number for this test...
 	readyDeposits := []*qrysmpb.DepositContainer{
 		{
-			Index:           0,
-			Eth1BlockHeight: 8,
+			Index:                0,
+			ExecutionBlockHeight: 8,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
@@ -591,8 +591,8 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 				}},
 		},
 		{
-			Index:           1,
-			Eth1BlockHeight: 14,
+			Index:                1,
+			ExecutionBlockHeight: 14,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
@@ -604,8 +604,8 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 
 	recentDeposits := []*qrysmpb.DepositContainer{
 		{
-			Index:           2,
-			Eth1BlockHeight: 5000,
+			Index:                2,
+			ExecutionBlockHeight: 5000,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
@@ -614,8 +614,8 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 				}},
 		},
 		{
-			Index:           3,
-			Eth1BlockHeight: 6000,
+			Index:                3,
+			ExecutionBlockHeight: 6000,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
@@ -637,12 +637,12 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 		assert.NoError(t, depositTrie.Insert(depositHash[:], int(dp.Index)))
 		root, err := depositTrie.HashTreeRoot()
 		require.NoError(t, err)
-		assert.NoError(t, depositCache.InsertDeposit(ctx, dp.Deposit, dp.Eth1BlockHeight, dp.Index, root))
+		assert.NoError(t, depositCache.InsertDeposit(ctx, dp.Deposit, dp.ExecutionBlockHeight, dp.Index, root))
 	}
 	for _, dp := range recentDeposits {
 		root, err := depositTrie.HashTreeRoot()
 		require.NoError(t, err)
-		depositCache.InsertPendingDeposit(ctx, dp.Deposit, dp.Eth1BlockHeight, dp.Index, root)
+		depositCache.InsertPendingDeposit(ctx, dp.Deposit, dp.ExecutionBlockHeight, dp.Index, root)
 	}
 
 	bs := &Server{
@@ -655,22 +655,22 @@ func TestProposer_PendingDeposits_FollowsCorrectEth1Block(t *testing.T) {
 		HeadFetcher:               &mock.ChainService{State: beaconState, Root: blkRoot[:]},
 	}
 
-	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionNodeData{})
+	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionData{})
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(deposits), "Received unexpected list of deposits")
 
 	// It should also return the recent deposits after their follow window.
 	p.LatestBlockNumber = big.NewInt(0).Add(p.LatestBlockNumber, big.NewInt(10000))
 	// we should get our pending deposits once this vote pushes the vote tally to include
-	// the updated eth1 data.
+	// the updated execution data.
 	deposits, err = bs.deposits(ctx, beaconState, vote)
 	require.NoError(t, err)
 	assert.Equal(t, len(recentDeposits), len(deposits), "Received unexpected number of pending deposits")
 }
 
-func TestProposer_PendingDeposits_CantReturnBelowStateEth1DepositIndex(t *testing.T) {
+func TestProposer_PendingDeposits_CantReturnBelowStateExecutionDepositIndex(t *testing.T) {
 	ctx := context.Background()
-	height := big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance))
+	height := big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance))
 	p := &mockExecution.Chain{
 		LatestBlockNumber: height,
 		HashesByHeight: map[int][]byte{
@@ -680,12 +680,12 @@ func TestProposer_PendingDeposits_CantReturnBelowStateEth1DepositIndex(t *testin
 
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
-	require.NoError(t, beaconState.SetExecutionNodeData(&qrysmpb.ExecutionNodeData{
+	require.NoError(t, beaconState.SetExecutionData(&qrysmpb.ExecutionData{
 		BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 		DepositRoot:  make([]byte, 32),
 		DepositCount: 100,
 	}))
-	require.NoError(t, beaconState.SetEth1DepositIndex(10))
+	require.NoError(t, beaconState.SetExecutionDepositIndex(10))
 	blk := util.NewBeaconBlockCapella()
 	blk.Block.Slot = beaconState.Slot()
 	blkRoot, err := blk.HashTreeRoot()
@@ -760,7 +760,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateEth1DepositIndex(t *testin
 
 	// It should also return the recent deposits after their follow window.
 	p.LatestBlockNumber = big.NewInt(0).Add(p.LatestBlockNumber, big.NewInt(10000))
-	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionNodeData{})
+	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionData{})
 	require.NoError(t, err)
 
 	expectedDeposits := 6
@@ -770,7 +770,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateEth1DepositIndex(t *testin
 func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 	ctx := context.Background()
 
-	height := big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance))
+	height := big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance))
 	p := &mockExecution.Chain{
 		LatestBlockNumber: height,
 		HashesByHeight: map[int][]byte{
@@ -779,12 +779,12 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 	}
 
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
 			DepositCount: 100,
 		},
-		Eth1DepositIndex: 2,
+		ExecutionDepositIndex: 2,
 	})
 	require.NoError(t, err)
 	blk := util.NewBeaconBlockCapella()
@@ -860,7 +860,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 
 	// It should also return the recent deposits after their follow window.
 	p.LatestBlockNumber = big.NewInt(0).Add(p.LatestBlockNumber, big.NewInt(10000))
-	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionNodeData{})
+	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionData{})
 	require.NoError(t, err)
 	assert.Equal(t, params.BeaconConfig().MaxDeposits, uint64(len(deposits)), "Received unexpected number of pending deposits")
 }
@@ -868,7 +868,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 	ctx := context.Background()
 
-	height := big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance))
+	height := big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance))
 	p := &mockExecution.Chain{
 		LatestBlockNumber: height,
 		HashesByHeight: map[int][]byte{
@@ -877,12 +877,12 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 	}
 
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
 			DepositCount: 5,
 		},
-		Eth1DepositIndex: 2,
+		ExecutionDepositIndex: 2,
 	})
 	require.NoError(t, err)
 	blk := util.NewBeaconBlockCapella()
@@ -958,7 +958,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 
 	// It should also return the recent deposits after their follow window.
 	p.LatestBlockNumber = big.NewInt(0).Add(p.LatestBlockNumber, big.NewInt(10000))
-	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionNodeData{})
+	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionData{})
 	require.NoError(t, err)
 	assert.Equal(t, 3, len(deposits), "Received unexpected number of pending deposits")
 }
@@ -966,7 +966,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 	ctx := context.Background()
 
-	height := big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance))
+	height := big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance))
 	p := &mockExecution.Chain{
 		LatestBlockNumber: height,
 		HashesByHeight: map[int][]byte{
@@ -975,12 +975,12 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 	}
 
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
 			DepositCount: 4,
 		},
-		Eth1DepositIndex: 1,
+		ExecutionDepositIndex: 1,
 	})
 	require.NoError(t, err)
 	blk := util.NewBeaconBlockCapella()
@@ -995,8 +995,8 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 	// Using the merkleTreeIndex as the block number for this test...
 	finalizedDeposits := []*qrysmpb.DepositContainer{
 		{
-			Index:           0,
-			Eth1BlockHeight: 10,
+			Index:                0,
+			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
@@ -1005,8 +1005,8 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 				}},
 		},
 		{
-			Index:           1,
-			Eth1BlockHeight: 10,
+			Index:                1,
+			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
@@ -1018,8 +1018,8 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 
 	recentDeposits := []*qrysmpb.DepositContainer{
 		{
-			Index:           2,
-			Eth1BlockHeight: 11,
+			Index:                2,
+			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
@@ -1028,8 +1028,8 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 				}},
 		},
 		{
-			Index:           3,
-			Eth1BlockHeight: 11,
+			Index:                3,
+			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
@@ -1051,12 +1051,12 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 		assert.NoError(t, depositTrie.Insert(depositHash[:], int(dp.Index)))
 		root, err := depositTrie.HashTreeRoot()
 		require.NoError(t, err)
-		assert.NoError(t, depositCache.InsertDeposit(ctx, dp.Deposit, dp.Eth1BlockHeight, dp.Index, root))
+		assert.NoError(t, depositCache.InsertDeposit(ctx, dp.Deposit, dp.ExecutionBlockHeight, dp.Index, root))
 	}
 	for _, dp := range recentDeposits {
 		root, err := depositTrie.HashTreeRoot()
 		require.NoError(t, err)
-		depositCache.InsertPendingDeposit(ctx, dp.Deposit, dp.Eth1BlockHeight, dp.Index, root)
+		depositCache.InsertPendingDeposit(ctx, dp.Deposit, dp.ExecutionBlockHeight, dp.Index, root)
 	}
 
 	bs := &Server{
@@ -1069,7 +1069,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 		HeadFetcher:               &mock.ChainService{State: beaconState, Root: blkRoot[:]},
 	}
 
-	dt, err := bs.depositTrie(ctx, &qrysmpb.ExecutionNodeData{}, big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance)))
+	dt, err := bs.depositTrie(ctx, &qrysmpb.ExecutionData{}, big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance)))
 	require.NoError(t, err)
 
 	actualRoot, err := dt.HashTreeRoot()
@@ -1082,7 +1082,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 	ctx := context.Background()
 
-	height := big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance))
+	height := big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance))
 	p := &mockExecution.Chain{
 		LatestBlockNumber: height,
 		HashesByHeight: map[int][]byte{
@@ -1091,12 +1091,12 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 	}
 
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:    bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot:  make([]byte, 32),
 			DepositCount: 4,
 		},
-		Eth1DepositIndex: 1,
+		ExecutionDepositIndex: 1,
 	})
 	require.NoError(t, err)
 	blk := util.NewBeaconBlockCapella()
@@ -1111,8 +1111,8 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 	// Using the merkleTreeIndex as the block number for this test...
 	finalizedDeposits := []*qrysmpb.DepositContainer{
 		{
-			Index:           0,
-			Eth1BlockHeight: 10,
+			Index:                0,
+			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
@@ -1121,8 +1121,8 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 				}},
 		},
 		{
-			Index:           1,
-			Eth1BlockHeight: 10,
+			Index:                1,
+			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
@@ -1134,8 +1134,8 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 
 	recentDeposits := []*qrysmpb.DepositContainer{
 		{
-			Index:           2,
-			Eth1BlockHeight: 11,
+			Index:                2,
+			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
@@ -1144,8 +1144,8 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 				}},
 		},
 		{
-			Index:           3,
-			Eth1BlockHeight: 11,
+			Index:                3,
+			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
@@ -1167,12 +1167,12 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 		assert.NoError(t, depositTrie.Insert(depositHash[:], int(dp.Index)))
 		root, err := depositTrie.HashTreeRoot()
 		require.NoError(t, err)
-		assert.NoError(t, depositCache.InsertDeposit(ctx, dp.Deposit, dp.Eth1BlockHeight, dp.Index, root))
+		assert.NoError(t, depositCache.InsertDeposit(ctx, dp.Deposit, dp.ExecutionBlockHeight, dp.Index, root))
 	}
 	for _, dp := range recentDeposits {
 		root, err := depositTrie.HashTreeRoot()
 		require.NoError(t, err)
-		depositCache.InsertPendingDeposit(ctx, dp.Deposit, dp.Eth1BlockHeight, dp.Index, root)
+		depositCache.InsertPendingDeposit(ctx, dp.Deposit, dp.ExecutionBlockHeight, dp.Index, root)
 	}
 	d := depositCache.AllDepositContainers(ctx)
 	origDeposit, ok := proto.Clone(d[0].Deposit).(*qrysmpb.Deposit)
@@ -1198,7 +1198,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 		HeadFetcher:               &mock.ChainService{State: beaconState, Root: blkRoot[:]},
 	}
 
-	dt, err := bs.depositTrie(ctx, &qrysmpb.ExecutionNodeData{}, big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance)))
+	dt, err := bs.depositTrie(ctx, &qrysmpb.ExecutionData{}, big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance)))
 	require.NoError(t, err)
 
 	expectedRoot, err := depositTrie.HashTreeRoot()
@@ -1211,15 +1211,15 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 
 func TestProposer_ValidateDepositTrie(t *testing.T) {
 	tt := []struct {
-		name                     string
-		executionNodeDataCreator func() *qrysmpb.ExecutionNodeData
-		trieCreator              func() *trie.SparseMerkleTrie
-		success                  bool
+		name                 string
+		executionDataCreator func() *qrysmpb.ExecutionData
+		trieCreator          func() *trie.SparseMerkleTrie
+		success              bool
 	}{
 		{
 			name: "invalid trie items",
-			executionNodeDataCreator: func() *qrysmpb.ExecutionNodeData {
-				return &qrysmpb.ExecutionNodeData{DepositRoot: []byte{}, DepositCount: 10, BlockHash: []byte{}}
+			executionDataCreator: func() *qrysmpb.ExecutionData {
+				return &qrysmpb.ExecutionData{DepositRoot: []byte{}, DepositCount: 10, BlockHash: []byte{}}
 			},
 			trieCreator: func() *trie.SparseMerkleTrie {
 				newTrie, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
@@ -1230,13 +1230,13 @@ func TestProposer_ValidateDepositTrie(t *testing.T) {
 		},
 		{
 			name: "invalid deposit root",
-			executionNodeDataCreator: func() *qrysmpb.ExecutionNodeData {
+			executionDataCreator: func() *qrysmpb.ExecutionData {
 				newTrie, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
 				assert.NoError(t, err)
 				assert.NoError(t, newTrie.Insert([]byte{'a'}, 0))
 				assert.NoError(t, newTrie.Insert([]byte{'b'}, 1))
 				assert.NoError(t, newTrie.Insert([]byte{'c'}, 2))
-				return &qrysmpb.ExecutionNodeData{DepositRoot: []byte{'B'}, DepositCount: 3, BlockHash: []byte{}}
+				return &qrysmpb.ExecutionData{DepositRoot: []byte{'B'}, DepositCount: 3, BlockHash: []byte{}}
 			},
 			trieCreator: func() *trie.SparseMerkleTrie {
 				newTrie, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
@@ -1250,7 +1250,7 @@ func TestProposer_ValidateDepositTrie(t *testing.T) {
 		},
 		{
 			name: "valid deposit trie",
-			executionNodeDataCreator: func() *qrysmpb.ExecutionNodeData {
+			executionDataCreator: func() *qrysmpb.ExecutionData {
 				newTrie, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
 				assert.NoError(t, err)
 				assert.NoError(t, newTrie.Insert([]byte{'a'}, 0))
@@ -1258,7 +1258,7 @@ func TestProposer_ValidateDepositTrie(t *testing.T) {
 				assert.NoError(t, newTrie.Insert([]byte{'c'}, 2))
 				rt, err := newTrie.HashTreeRoot()
 				require.NoError(t, err)
-				return &qrysmpb.ExecutionNodeData{DepositRoot: rt[:], DepositCount: 3, BlockHash: []byte{}}
+				return &qrysmpb.ExecutionData{DepositRoot: rt[:], DepositCount: 3, BlockHash: []byte{}}
 			},
 			trieCreator: func() *trie.SparseMerkleTrie {
 				newTrie, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
@@ -1274,7 +1274,7 @@ func TestProposer_ValidateDepositTrie(t *testing.T) {
 
 	for _, test := range tt {
 		t.Run(test.name, func(t *testing.T) {
-			valid, err := validateDepositTrie(test.trieCreator(), test.executionNodeDataCreator())
+			valid, err := validateDepositTrie(test.trieCreator(), test.executionDataCreator())
 			assert.Equal(t, test.success, valid)
 			if valid {
 				assert.NoError(t, err)
@@ -1283,7 +1283,7 @@ func TestProposer_ValidateDepositTrie(t *testing.T) {
 	}
 }
 
-func TestProposer_ExecutionNodeData_MajorityVote_SpansGenesis(t *testing.T) {
+func TestProposer_ExecutionData_MajorityVote_SpansGenesis(t *testing.T) {
 	ctx := context.Background()
 	// Voting period will span genesis, causing the special case for pre-mined genesis to kick in.
 	// In other words some part of the valid time range is before genesis, so querying the block cache would fail
@@ -1304,30 +1304,30 @@ func TestProposer_ExecutionNodeData_MajorityVote_SpansGenesis(t *testing.T) {
 		ExecutionNodeBlockFetcher: p,
 		BlockFetcher:              p,
 		DepositFetcher:            depositCache,
-		HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{BlockHash: headBlockHash, DepositCount: 0}},
+		HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{BlockHash: headBlockHash, DepositCount: 0}},
 	}
 
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Slot: slot,
-		ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+		ExecutionDataVotes: []*qrysmpb.ExecutionData{
 			{BlockHash: []byte("earliest"), DepositCount: 1},
 		},
 	})
 	require.NoError(t, err)
-	majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+	majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 	require.NoError(t, err)
-	assert.DeepEqual(t, headBlockHash, majorityVoteExecutionNodeData.BlockHash)
+	assert.DeepEqual(t, headBlockHash, majorityVoteExecutionData.BlockHash)
 }
 
-func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
-	followDistanceSecs := params.BeaconConfig().Eth1FollowDistance * params.BeaconConfig().SecondsPerETH1Block
+func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
+	followDistanceSecs := params.BeaconConfig().ExecutionFollowDistance * params.BeaconConfig().SecondsPerExecutionBlock
 	followSlots := followDistanceSecs / params.BeaconConfig().SecondsPerSlot
 	slot := primitives.Slot(256 + followSlots)
 	earliestValidTime, latestValidTime := majorityVoteBoundaryTime(slot)
 
 	dc := qrysmpb.DepositContainer{
-		Index:           0,
-		Eth1BlockHeight: 0,
+		Index:                0,
+		ExecutionBlockHeight: 0,
 		Deposit: &qrysmpb.Deposit{
 			Data: &qrysmpb.Deposit_Data{
 				PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
@@ -1341,7 +1341,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 	require.NoError(t, err)
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
-	assert.NoError(t, depositCache.InsertDeposit(context.Background(), dc.Deposit, dc.Eth1BlockHeight, dc.Index, root))
+	assert.NoError(t, depositCache.InsertDeposit(context.Background(), dc.Deposit, dc.ExecutionBlockHeight, dc.Index, root))
 
 	t.Run("choose highest count", func(t *testing.T) {
 		t.Skip()
@@ -1353,7 +1353,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("first"), DepositCount: 1},
 				{BlockHash: []byte("first"), DepositCount: 1},
 				{BlockHash: []byte("second"), DepositCount: 1},
@@ -1367,14 +1367,14 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := []byte("first")
 		assert.DeepEqual(t, expectedHash, hash)
@@ -1389,7 +1389,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("earliest"), DepositCount: 1},
 				{BlockHash: []byte("earliest"), DepositCount: 1},
 				{BlockHash: []byte("second"), DepositCount: 1},
@@ -1403,14 +1403,14 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := []byte("earliest")
 		assert.DeepEqual(t, expectedHash, hash)
@@ -1425,7 +1425,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("first"), DepositCount: 1},
 				{BlockHash: []byte("latest"), DepositCount: 1},
 				{BlockHash: []byte("latest"), DepositCount: 1},
@@ -1439,14 +1439,14 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := []byte("latest")
 		assert.DeepEqual(t, expectedHash, hash)
@@ -1462,7 +1462,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("before_range"), DepositCount: 1},
 				{BlockHash: []byte("before_range"), DepositCount: 1},
 				{BlockHash: []byte("first"), DepositCount: 1},
@@ -1476,14 +1476,14 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := []byte("first")
 		assert.DeepEqual(t, expectedHash, hash)
@@ -1499,7 +1499,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("first"), DepositCount: 1},
 				{BlockHash: []byte("after_range"), DepositCount: 1},
 				{BlockHash: []byte("after_range"), DepositCount: 1},
@@ -1513,14 +1513,14 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := []byte("first")
 		assert.DeepEqual(t, expectedHash, hash)
@@ -1536,7 +1536,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("unknown"), DepositCount: 1},
 				{BlockHash: []byte("unknown"), DepositCount: 1},
 				{BlockHash: []byte("first"), DepositCount: 1},
@@ -1550,20 +1550,20 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := []byte("first")
 		assert.DeepEqual(t, expectedHash, hash)
 	})
 
-	t.Run("no blocks in range - choose current executionNodeData", func(t *testing.T) {
+	t.Run("no blocks in range - choose current executionData", func(t *testing.T) {
 		p := mockExecution.New().
 			InsertBlock(49, earliestValidTime-1, []byte("before_range")).
 			InsertBlock(101, latestValidTime+1, []byte("after_range"))
@@ -1573,21 +1573,21 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		currentExecutionNodeData := &qrysmpb.ExecutionNodeData{DepositCount: 1, BlockHash: []byte("current")}
+		currentExecutionData := &qrysmpb.ExecutionData{DepositCount: 1, BlockHash: []byte("current")}
 		ps := &Server{
 			ChainStartFetcher:         p,
 			ExecutionNodeInfoFetcher:  p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: currentExecutionNodeData},
+			HeadFetcher:               &mock.ChainService{ExecutionData: currentExecutionData},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := []byte("current")
 		assert.DeepEqual(t, expectedHash, hash)
@@ -1602,7 +1602,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("before_range"), DepositCount: 1},
 				{BlockHash: []byte("after_range"), DepositCount: 1},
 			},
@@ -1615,14 +1615,14 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := make([]byte, 32)
 		copy(expectedHash, "second")
@@ -1635,8 +1635,8 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			InsertBlock(100, latestValidTime, []byte("latest"))
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-			Slot:                   slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{}})
+			Slot:               slot,
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{}})
 		require.NoError(t, err)
 
 		ps := &Server{
@@ -1645,21 +1645,21 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := make([]byte, 32)
 		copy(expectedHash, "latest")
 		assert.DeepEqual(t, expectedHash, hash)
 	})
 
-	t.Run("no votes and more recent block has less deposits - choose current executionNodeData", func(t *testing.T) {
+	t.Run("no votes and more recent block has less deposits - choose current executionData", func(t *testing.T) {
 		p := mockExecution.New().
 			InsertBlock(50, earliestValidTime, []byte("earliest")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
@@ -1669,22 +1669,22 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		// Set the deposit count in current executionNodeData to exceed the latest most recent block's deposit count.
-		currentExecutionNodeData := &qrysmpb.ExecutionNodeData{DepositCount: 2, BlockHash: []byte("current")}
+		// Set the deposit count in current executionData to exceed the latest most recent block's deposit count.
+		currentExecutionData := &qrysmpb.ExecutionData{DepositCount: 2, BlockHash: []byte("current")}
 		ps := &Server{
 			ChainStartFetcher:         p,
 			ExecutionNodeInfoFetcher:  p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: currentExecutionNodeData},
+			HeadFetcher:               &mock.ChainService{ExecutionData: currentExecutionData},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := []byte("current")
 		assert.DeepEqual(t, expectedHash, hash)
@@ -1700,7 +1700,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("first"), DepositCount: 1},
 				{BlockHash: []byte("second"), DepositCount: 1},
 			},
@@ -1713,14 +1713,14 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := []byte("second")
 		assert.DeepEqual(t, expectedHash, hash)
@@ -1736,7 +1736,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("no_new_deposits"), DepositCount: 0},
 				{BlockHash: []byte("no_new_deposits"), DepositCount: 0},
 				{BlockHash: []byte("second"), DepositCount: 1},
@@ -1750,14 +1750,14 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := []byte("second")
 		assert.DeepEqual(t, expectedHash, hash)
@@ -1769,7 +1769,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("earliest"), DepositCount: 1},
 			},
 		})
@@ -1781,14 +1781,14 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := []byte("earliest")
 		assert.DeepEqual(t, expectedHash, hash)
@@ -1803,7 +1803,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("before_range"), DepositCount: 1},
 			},
 		})
@@ -1815,26 +1815,26 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 1}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 1}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
 		expectedHash := make([]byte, 32)
 		copy(expectedHash, "first")
 		assert.DeepEqual(t, expectedHash, hash)
 	})
 
-	t.Run("no deposits - choose chain start executionNodeData", func(t *testing.T) {
+	t.Run("no deposits - choose chain start executionData", func(t *testing.T) {
 		p := mockExecution.New().
 			InsertBlock(50, earliestValidTime, []byte("earliest")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
-		p.ExecutionNodeData = &qrysmpb.ExecutionNodeData{
-			BlockHash: []byte("executionNodeData"),
+		p.ExecutionData = &qrysmpb.ExecutionData{
+			BlockHash: []byte("executionData"),
 		}
 
 		depositCache, err := depositcache.New()
@@ -1842,7 +1842,7 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 
 		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot: slot,
-			ExecutionNodeDataVotes: []*qrysmpb.ExecutionNodeData{
+			ExecutionDataVotes: []*qrysmpb.ExecutionData{
 				{BlockHash: []byte("earliest"), DepositCount: 1},
 			},
 		})
@@ -1854,16 +1854,16 @@ func TestProposer_ExecutionNodeData_MajorityVote(t *testing.T) {
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
-			HeadFetcher:               &mock.ChainService{ExecutionNodeData: &qrysmpb.ExecutionNodeData{DepositCount: 0}},
+			HeadFetcher:               &mock.ChainService{ExecutionData: &qrysmpb.ExecutionData{DepositCount: 0}},
 		}
 
 		ctx := context.Background()
-		majorityVoteExecutionNodeData, err := ps.executionNodeDataMajorityVote(ctx, beaconState)
+		majorityVoteExecutionData, err := ps.executionDataMajorityVote(ctx, beaconState)
 		require.NoError(t, err)
 
-		hash := majorityVoteExecutionNodeData.BlockHash
+		hash := majorityVoteExecutionData.BlockHash
 
-		expectedHash := []byte("executionNodeData")
+		expectedHash := []byte("executionData")
 		assert.DeepEqual(t, expectedHash, hash)
 	})
 }
@@ -1969,24 +1969,24 @@ func TestProposer_FilterAttestation(t *testing.T) {
 	}
 }
 
-func TestProposer_Deposits_ReturnsEmptyList_IfLatestExecutionNodeDataEqGenesisEth1Block(t *testing.T) {
+func TestProposer_Deposits_ReturnsEmptyList_IfLatestExecutionDataEqGenesisExecution1Block(t *testing.T) {
 	ctx := context.Background()
 
-	height := big.NewInt(int64(params.BeaconConfig().Eth1FollowDistance))
+	height := big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance))
 	p := &mockExecution.Chain{
 		LatestBlockNumber: height,
 		HashesByHeight: map[int][]byte{
 			int(height.Int64()): []byte("0x0"),
 		},
-		GenesisEth1Block: height,
+		GenesisExecutionBlock: height,
 	}
 
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			BlockHash:   bytesutil.PadTo([]byte("0x0"), 32),
 			DepositRoot: make([]byte, 32),
 		},
-		Eth1DepositIndex: 2,
+		ExecutionDepositIndex: 2,
 	})
 	require.NoError(t, err)
 	blk := util.NewBeaconBlockCapella()
@@ -2063,7 +2063,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestExecutionNodeDataEqGenesisEt
 
 	// It should also return the recent deposits after their follow window.
 	p.LatestBlockNumber = big.NewInt(0).Add(p.LatestBlockNumber, big.NewInt(10000))
-	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionNodeData{})
+	deposits, err := bs.deposits(ctx, beaconState, &qrysmpb.ExecutionData{})
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(deposits), "Received unexpected number of pending deposits")
 }
@@ -2287,10 +2287,10 @@ func TestProposer_SubmitValidatorRegistrations(t *testing.T) {
 }
 
 func majorityVoteBoundaryTime(slot primitives.Slot) (uint64, uint64) {
-	s := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerEth1VotingPeriod))
+	s := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerExecutionVotingPeriod))
 	slotStartTime := uint64(mockExecution.GenesisTime) + uint64((slot - (slot % (s))).Mul(params.BeaconConfig().SecondsPerSlot))
-	earliestValidTime := slotStartTime - 2*params.BeaconConfig().SecondsPerETH1Block*params.BeaconConfig().Eth1FollowDistance
-	latestValidTime := slotStartTime - params.BeaconConfig().SecondsPerETH1Block*params.BeaconConfig().Eth1FollowDistance
+	earliestValidTime := slotStartTime - 2*params.BeaconConfig().SecondsPerExecutionBlock*params.BeaconConfig().ExecutionFollowDistance
+	latestValidTime := slotStartTime - params.BeaconConfig().SecondsPerExecutionBlock*params.BeaconConfig().ExecutionFollowDistance
 
 	return earliestValidTime, latestValidTime
 }

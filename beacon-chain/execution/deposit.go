@@ -23,9 +23,9 @@ func DepositContractAddress() (string, error) {
 	return address, nil
 }
 
-func (s *Service) processDeposit(ctx context.Context, executionNodeData *qrysmpb.ExecutionNodeData, deposit *qrysmpb.Deposit) error {
+func (s *Service) processDeposit(ctx context.Context, executionData *qrysmpb.ExecutionData, deposit *qrysmpb.Deposit) error {
 	var err error
-	if err := s.preGenesisState.SetExecutionNodeData(executionNodeData); err != nil {
+	if err := s.preGenesisState.SetExecutionData(executionData); err != nil {
 		return err
 	}
 	beaconState, err := blocks.ProcessPreGenesisDeposits(ctx, s.preGenesisState, []*qrysmpb.Deposit{deposit})

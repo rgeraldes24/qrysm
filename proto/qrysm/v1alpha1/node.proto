@@ -86,11 +86,10 @@ service Node {
         };
     }
 
-    // TODO(rgeraldes24): qrl1
-    // // Retrieve the status of the ETH1 connections.
+    // Retrieve the status of the execution node connections.
     rpc GetExecutionNodeConnectionStatus(google.protobuf.Empty) returns (ExecutionNodeConnectionStatus) {
         option (google.api.http) = {
-            get: "/qrl/v1alpha1/node/qrl1/connections"
+            get: "/qrl/v1alpha1/node/execution/connections"
         };
     }
 }
@@ -182,7 +181,7 @@ enum ConnectionState {
 // ExecutionNodeConnectionStatus states the current address and error of the ETH1 API
 // endpoint. It also provides the addresses and errors for any fallback URLs. 
 message ExecutionNodeConnectionStatus {
-    // Current ETH1 HTTP endpoint.
+    // Current Execution Node HTTP endpoint.
     string current_address = 1;
 
     // Current error (if any) of the current connection.

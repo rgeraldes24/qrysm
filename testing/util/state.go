@@ -40,7 +40,7 @@ func NewBeaconStateCapella(options ...func(state *qrysmpb.BeaconStateCapella) er
 		RandaoMixes:                filledByteSlice2D(uint64(params.BeaconConfig().EpochsPerHistoricalVector), 32),
 		Validators:                 make([]*qrysmpb.Validator, 0),
 		CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		},
@@ -48,7 +48,7 @@ func NewBeaconStateCapella(options ...func(state *qrysmpb.BeaconStateCapella) er
 			PreviousVersion: make([]byte, 4),
 			CurrentVersion:  make([]byte, 4),
 		},
-		ExecutionNodeDataVotes:      make([]*qrysmpb.ExecutionNodeData, 0),
+		ExecutionDataVotes:          make([]*qrysmpb.ExecutionData, 0),
 		HistoricalSummaries:         make([]*qrysmpb.HistoricalSummary, 0),
 		JustificationBits:           bitfield.Bitvector4{0x0},
 		FinalizedCheckpoint:         &qrysmpb.Checkpoint{Root: make([]byte, fieldparams.RootLength)},

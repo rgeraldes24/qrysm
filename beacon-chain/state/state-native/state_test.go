@@ -227,7 +227,7 @@ func generateState(t *testing.T) state.BeaconState {
 		},
 		Validators: vals,
 		Balances:   bals,
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
 		},

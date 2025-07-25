@@ -102,15 +102,15 @@ func MapBeaconBlockBody(body *qrysmpb.BeaconBlockBody) (*BeaconBlockBody, error)
 	if body == nil {
 		return nil, fmt.Errorf("beacon block body is nil")
 	}
-	if body.ExecutionNodeData == nil {
-		return nil, fmt.Errorf("eth1 data in Beacon Block Body is nil")
+	if body.ExecutionData == nil {
+		return nil, fmt.Errorf("execution data in Beacon Block Body is nil")
 	}
 	block := &BeaconBlockBody{
 		RandaoReveal: body.RandaoReveal,
-		ExecutionNodeData: &ExecutionNodeData{
-			DepositRoot:  body.ExecutionNodeData.DepositRoot,
-			DepositCount: fmt.Sprint(body.ExecutionNodeData.DepositCount),
-			BlockHash:    body.ExecutionNodeData.BlockHash,
+		ExecutionData: &ExecutionData{
+			DepositRoot:  body.ExecutionData.DepositRoot,
+			DepositCount: fmt.Sprint(body.ExecutionData.DepositCount),
+			BlockHash:    body.ExecutionData.BlockHash,
 		},
 		Graffiti:          body.Graffiti,
 		ProposerSlashings: make([]*ProposerSlashing, len(body.ProposerSlashings)),
@@ -304,10 +304,10 @@ func MapBeaconBlockBodyAltair(body *qrlpb.BeaconBlockBodyAltair) (*BeaconBlockBo
 
 	block := &BeaconBlockBodyAltair{
 		RandaoReveal: body.RandaoReveal,
-		ExecutionNodeData: &ExecutionNodeData{
-			DepositRoot:  body.ExecutionNodeData.DepositRoot,
-			DepositCount: fmt.Sprint(body.ExecutionNodeData.DepositCount),
-			BlockHash:    body.ExecutionNodeData.BlockHash,
+		ExecutionData: &ExecutionData{
+			DepositRoot:  body.ExecutionData.DepositRoot,
+			DepositCount: fmt.Sprint(body.ExecutionData.DepositCount),
+			BlockHash:    body.ExecutionData.BlockHash,
 		},
 		Graffiti:          body.Graffiti,
 		ProposerSlashings: make([]*ProposerSlashing, len(body.ProposerSlashings)),

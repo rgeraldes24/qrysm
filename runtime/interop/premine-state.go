@@ -142,7 +142,7 @@ func (s *PremineGenesisConfig) empty() (state.BeaconState, error) {
 	if err = e.SetFinalizedCheckpoint(zcp); err != nil {
 		return nil, err
 	}
-	if err = e.SetExecutionNodeDataVotes([]*qrysmpb.ExecutionNodeData{}); err != nil {
+	if err = e.SetExecutionDataVotes([]*qrysmpb.ExecutionData{}); err != nil {
 		return nil, err
 	}
 	return e.Copy(), nil
@@ -153,10 +153,10 @@ func (s *PremineGenesisConfig) processDeposits(ctx context.Context, g state.Beac
 	if err != nil {
 		return err
 	}
-	if err = s.setExecutionNodeData(g); err != nil {
+	if err = s.setExecutionData(g); err != nil {
 		return err
 	}
-	if _, err = helpers.UpdateGenesisExecutionNodeData(g, deposits, g.ExecutionNodeData()); err != nil {
+	if _, err = helpers.UpdateGenesisExecutionData(g, deposits, g.ExecutionData()); err != nil {
 		return err
 	}
 	_, err = b.ProcessPreGenesisDeposits(ctx, g, deposits)
@@ -200,15 +200,15 @@ func (s *PremineGenesisConfig) keys() ([]dilithium.DilithiumKey, []dilithium.Pub
 	return prv, pub, nil
 }
 
-func (s *PremineGenesisConfig) setExecutionNodeData(g state.BeaconState) error {
-	if err := g.SetEth1DepositIndex(0); err != nil {
+func (s *PremineGenesisConfig) setExecutionData(g state.BeaconState) error {
+	if err := g.SetExecutionDepositIndex(0); err != nil {
 		return err
 	}
 	dr, err := emptyDepositRoot()
 	if err != nil {
 		return err
 	}
-	return g.SetExecutionNodeData(&qrysmpb.ExecutionNodeData{DepositRoot: dr[:], BlockHash: s.GB.Hash().Bytes()})
+	return g.SetExecutionData(&qrysmpb.ExecutionData{DepositRoot: dr[:], BlockHash: s.GB.Hash().Bytes()})
 }
 
 func emptyDepositRoot() ([32]byte, error) {
@@ -262,8 +262,8 @@ func (s *PremineGenesisConfig) populate(g state.BeaconState) error {
 	}
 
 	// For pre-mined genesis, we want to keep the deposit root set to the root of an empty trie.
-	// This needs to be set again because the methods used by processDeposits mutate the state's executionNodeData.
-	return s.setExecutionNodeData(g)
+	// This needs to be set again because the methods used by processDeposits mutate the state's executionData.
+	return s.setExecutionData(g)
 }
 
 func (s *PremineGenesisConfig) setGenesisValidatorsRoot(g state.BeaconState) error {
@@ -353,7 +353,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 	case version.Capella:
 		body = &qrysmpb.BeaconBlockBodyCapella{
 			RandaoReveal: make([]byte, field_params.DilithiumSignatureLength),
-			ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot: make([]byte, 32),
 				BlockHash:   make([]byte, 32),
 			},

@@ -507,17 +507,17 @@ func RegisterBeaconNodeHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
-	pattern_BeaconNode_GetIdentity_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "zond", "v1", "node", "identity"}, ""))
+	pattern_BeaconNode_GetIdentity_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "qrl", "v1", "node", "identity"}, ""))
 
-	pattern_BeaconNode_ListPeers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "zond", "v1", "node", "peers"}, ""))
+	pattern_BeaconNode_ListPeers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "qrl", "v1", "node", "peers"}, ""))
 
-	pattern_BeaconNode_GetPeer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "zond", "v1", "node", "peers", "peer_id"}, ""))
+	pattern_BeaconNode_GetPeer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "qrl", "v1", "node", "peers", "peer_id"}, ""))
 
-	pattern_BeaconNode_PeerCount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "zond", "v1", "node", "peer_count"}, ""))
+	pattern_BeaconNode_PeerCount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "qrl", "v1", "node", "peer_count"}, ""))
 
-	pattern_BeaconNode_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "zond", "v1", "node", "version"}, ""))
+	pattern_BeaconNode_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "qrl", "v1", "node", "version"}, ""))
 
-	pattern_BeaconNode_GetHealth_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "zond", "v1", "node", "health"}, ""))
+	pattern_BeaconNode_GetHealth_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "qrl", "v1", "node", "health"}, ""))
 )
 
 var (

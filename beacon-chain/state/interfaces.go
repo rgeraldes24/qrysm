@@ -46,7 +46,7 @@ type ReadOnlyBeaconState interface {
 	ReadOnlyBlockRoots
 	ReadOnlyStateRoots
 	ReadOnlyRandaoMixes
-	ReadOnlyExecutionNodeData
+	ReadOnlyExecutionData
 	ReadOnlyValidators
 	ReadOnlyBalances
 	ReadOnlyCheckpoint
@@ -76,7 +76,7 @@ type WriteOnlyBeaconState interface {
 	WriteOnlyBlockRoots
 	WriteOnlyStateRoots
 	WriteOnlyRandaoMixes
-	WriteOnlyExecutionNodeData
+	WriteOnlyExecutionData
 	WriteOnlyValidators
 	WriteOnlyBalances
 	WriteOnlyCheckpoint
@@ -159,11 +159,11 @@ type ReadOnlyRandaoMixes interface {
 	RandaoMixesLength() int
 }
 
-// ReadOnlyExecutionNodeData defines a struct which only has read access to eth1 data methods.
-type ReadOnlyExecutionNodeData interface {
-	ExecutionNodeData() *qrysmpb.ExecutionNodeData
-	ExecutionNodeDataVotes() []*qrysmpb.ExecutionNodeData
-	Eth1DepositIndex() uint64
+// ReadOnlyExecutionData defines a struct which only has read access to execution data methods.
+type ReadOnlyExecutionData interface {
+	ExecutionData() *qrysmpb.ExecutionData
+	ExecutionDataVotes() []*qrysmpb.ExecutionData
+	ExecutionDepositIndex() uint64
 }
 
 // ReadOnlyWithdrawals defines a struct which only has read access to withdrawal methods.
@@ -202,12 +202,12 @@ type WriteOnlyStateRoots interface {
 	UpdateStateRootAtIndex(idx uint64, stateRoot [32]byte) error
 }
 
-// WriteOnlyExecutionNodeData defines a struct which only has write access to eth1 data methods.
-type WriteOnlyExecutionNodeData interface {
-	SetExecutionNodeData(val *qrysmpb.ExecutionNodeData) error
-	SetExecutionNodeDataVotes(val []*qrysmpb.ExecutionNodeData) error
-	AppendExecutionNodeDataVotes(val *qrysmpb.ExecutionNodeData) error
-	SetEth1DepositIndex(val uint64) error
+// WriteOnlyExecutionData defines a struct which only has write access to execution data methods.
+type WriteOnlyExecutionData interface {
+	SetExecutionData(val *qrysmpb.ExecutionData) error
+	SetExecutionDataVotes(val []*qrysmpb.ExecutionData) error
+	AppendExecutionDataVotes(val *qrysmpb.ExecutionData) error
+	SetExecutionDepositIndex(val uint64) error
 }
 
 // WriteOnlyValidators defines a struct which only has write access to validators methods.

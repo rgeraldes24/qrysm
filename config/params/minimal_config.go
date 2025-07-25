@@ -39,13 +39,13 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.SqrRootSlotsPerEpoch = 2
 	minimalConfig.MinSeedLookahead = 1
 	minimalConfig.MaxSeedLookahead = 4
-	minimalConfig.EpochsPerEth1VotingPeriod = 4
+	minimalConfig.EpochsPerExecutionVotingPeriod = 4
 	minimalConfig.SlotsPerHistoricalRoot = 64
 	minimalConfig.MinValidatorWithdrawabilityDelay = 256
 	minimalConfig.ShardCommitteePeriod = 64
 	minimalConfig.MinEpochsToInactivityPenalty = 4
-	minimalConfig.Eth1FollowDistance = 16
-	minimalConfig.SecondsPerETH1Block = 60
+	minimalConfig.ExecutionFollowDistance = 16
+	minimalConfig.SecondsPerExecutionBlock = 60
 
 	// State vector lengths
 	minimalConfig.EpochsPerHistoricalVector = 64

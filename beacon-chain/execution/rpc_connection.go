@@ -46,7 +46,7 @@ func (s *Service) setupExecutionClientConnections(ctx context.Context, currEndpo
 		}
 		return errors.Wrap(err, errStr)
 	}
-	s.updateConnectedETH1(true)
+	s.updateConnectedExecution(true)
 	s.runError = nil
 	return nil
 }
@@ -81,7 +81,7 @@ func (s *Service) pollConnectionStatus(ctx context.Context) {
 			log.Infof("Connected to new endpoint: %s", logs.MaskCredentialsLogging(s.cfg.currHttpEndpoint.Url))
 			return
 		case <-s.ctx.Done():
-			log.Debug("Received cancelled context,closing existing powchain service")
+			log.Debug("Received cancelled context,closing existing execution chain service")
 			return
 		}
 	}
@@ -90,7 +90,7 @@ func (s *Service) pollConnectionStatus(ctx context.Context) {
 // Forces to retry an execution client connection.
 func (s *Service) retryExecutionClientConnection(ctx context.Context, err error) {
 	s.runError = errors.Wrap(err, "retryExecutionClientConnection")
-	s.updateConnectedETH1(false)
+	s.updateConnectedExecution(false)
 	// Back off for a while before redialing.
 	time.Sleep(backOffPeriod)
 	currClient := s.rpcClient

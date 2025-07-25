@@ -306,10 +306,10 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 				ParentRoot:    parentRoot[:],
 				StateRoot:     genesis.Block.StateRoot,
 				Body: &qrysmpb.BeaconBlockBodyCapella{
-					RandaoReveal:      genesis.Block.Body.RandaoReveal,
-					Graffiti:          genesis.Block.Body.Graffiti,
-					ExecutionNodeData: genesis.Block.Body.ExecutionNodeData,
-					SyncAggregate:     &qrysmpb.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
+					RandaoReveal:  genesis.Block.Body.RandaoReveal,
+					Graffiti:      genesis.Block.Body.Graffiti,
+					ExecutionData: genesis.Block.Body.ExecutionData,
+					SyncAggregate: &qrysmpb.SyncAggregate{SyncCommitteeBits: scBits[:], SyncCommitteeSignatures: [][]byte{}},
 					ExecutionPayload: &enginev1.ExecutionPayloadCapella{
 						BlockNumber:   1,
 						ParentHash:    make([]byte, fieldparams.RootLength),

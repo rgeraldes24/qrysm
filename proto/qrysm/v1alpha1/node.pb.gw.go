@@ -592,21 +592,21 @@ func RegisterNodeHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 }
 
 var (
-	pattern_Node_GetSyncStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "node", "syncing"}, ""))
+	pattern_Node_GetSyncStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "node", "syncing"}, ""))
 
-	pattern_Node_GetGenesis_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "node", "genesis"}, ""))
+	pattern_Node_GetGenesis_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "node", "genesis"}, ""))
 
-	pattern_Node_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "node", "version"}, ""))
+	pattern_Node_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "node", "version"}, ""))
 
-	pattern_Node_ListImplementedServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "node", "services"}, ""))
+	pattern_Node_ListImplementedServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "node", "services"}, ""))
 
-	pattern_Node_GetHost_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "node", "p2p"}, ""))
+	pattern_Node_GetHost_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "node", "p2p"}, ""))
 
-	pattern_Node_GetPeer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "node", "peer"}, ""))
+	pattern_Node_GetPeer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "node", "peer"}, ""))
 
-	pattern_Node_ListPeers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"zond", "v1alpha1", "node", "peers"}, ""))
+	pattern_Node_ListPeers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"qrl", "v1alpha1", "node", "peers"}, ""))
 
-	pattern_Node_GetExecutionNodeConnectionStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"zond", "v1alpha1", "node", "zond1", "connections"}, ""))
+	pattern_Node_GetExecutionNodeConnectionStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"qrl", "v1alpha1", "node", "qrl1", "connections"}, ""))
 )
 
 var (

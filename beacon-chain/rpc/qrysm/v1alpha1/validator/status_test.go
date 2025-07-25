@@ -44,7 +44,7 @@ func TestValidatorStatus_DepositedEth1(t *testing.T) {
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
 	assert.NoError(t, depositCache.InsertDeposit(ctx, deposit, 0 /*blockNum*/, 0, root))
-	height := time.Unix(int64(params.BeaconConfig().Eth1FollowDistance), 0).Unix()
+	height := time.Unix(int64(params.BeaconConfig().ExecutionFollowDistance), 0).Unix()
 	p := &mockExecution.Chain{
 		TimesByHeight: map[int]uint64{
 			0: uint64(height),
@@ -86,7 +86,7 @@ func TestValidatorStatus_Deposited(t *testing.T) {
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
 	assert.NoError(t, depositCache.InsertDeposit(ctx, deposit, 0 /*blockNum*/, 0, root))
-	height := time.Unix(int64(params.BeaconConfig().Eth1FollowDistance), 0).Unix()
+	height := time.Unix(int64(params.BeaconConfig().ExecutionFollowDistance), 0).Unix()
 	p := &mockExecution.Chain{
 		TimesByHeight: map[int]uint64{
 			0: uint64(height),
@@ -131,7 +131,7 @@ func TestValidatorStatus_PartiallyDeposited(t *testing.T) {
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
 	assert.NoError(t, depositCache.InsertDeposit(ctx, deposit, 0 /*blockNum*/, 0, root))
-	height := time.Unix(int64(params.BeaconConfig().Eth1FollowDistance), 0).Unix()
+	height := time.Unix(int64(params.BeaconConfig().ExecutionFollowDistance), 0).Unix()
 	p := &mockExecution.Chain{
 		TimesByHeight: map[int]uint64{
 			0: uint64(height),
@@ -186,7 +186,7 @@ func TestValidatorStatus_Pending_MultipleDeposits(t *testing.T) {
 	assert.NoError(t, depositCache.InsertDeposit(ctx, deposit, 0 /*blockNum*/, 0, root))
 	assert.NoError(t, depositCache.InsertDeposit(ctx, deposit, 0 /*blockNum*/, 1, root))
 
-	height := time.Unix(int64(params.BeaconConfig().Eth1FollowDistance), 0).Unix()
+	height := time.Unix(int64(params.BeaconConfig().ExecutionFollowDistance), 0).Unix()
 	p := &mockExecution.Chain{
 		TimesByHeight: map[int]uint64{
 			0: uint64(height),
@@ -262,7 +262,7 @@ func TestValidatorStatus_Pending(t *testing.T) {
 	require.NoError(t, err)
 	assert.NoError(t, depositCache.InsertDeposit(ctx, deposit, 0 /*blockNum*/, 0, root))
 
-	height := time.Unix(int64(params.BeaconConfig().Eth1FollowDistance), 0).Unix()
+	height := time.Unix(int64(params.BeaconConfig().ExecutionFollowDistance), 0).Unix()
 	p := &mockExecution.Chain{
 		TimesByHeight: map[int]uint64{
 			0: uint64(height),
@@ -324,7 +324,7 @@ func TestValidatorStatus_Exiting(t *testing.T) {
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
 	assert.NoError(t, depositCache.InsertDeposit(ctx, deposit, 0 /*blockNum*/, 0, root))
-	height := time.Unix(int64(params.BeaconConfig().Eth1FollowDistance), 0).Unix()
+	height := time.Unix(int64(params.BeaconConfig().ExecutionFollowDistance), 0).Unix()
 	p := &mockExecution.Chain{
 		TimesByHeight: map[int]uint64{
 			0: uint64(height),
@@ -383,7 +383,7 @@ func TestValidatorStatus_Slashing(t *testing.T) {
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
 	assert.NoError(t, depositCache.InsertDeposit(ctx, deposit, 0 /*blockNum*/, 0, root))
-	height := time.Unix(int64(params.BeaconConfig().Eth1FollowDistance), 0).Unix()
+	height := time.Unix(int64(params.BeaconConfig().ExecutionFollowDistance), 0).Unix()
 	p := &mockExecution.Chain{
 		TimesByHeight: map[int]uint64{
 			0: uint64(height),
@@ -441,7 +441,7 @@ func TestValidatorStatus_Exited(t *testing.T) {
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
 	assert.NoError(t, depositCache.InsertDeposit(ctx, deposit, 0 /*blockNum*/, 0, root))
-	height := time.Unix(int64(params.BeaconConfig().Eth1FollowDistance), 0).Unix()
+	height := time.Unix(int64(params.BeaconConfig().ExecutionFollowDistance), 0).Unix()
 	p := &mockExecution.Chain{
 		TimesByHeight: map[int]uint64{
 			0: uint64(height),
@@ -674,7 +674,7 @@ func TestValidatorStatus_CorrectActivationQueue(t *testing.T) {
 
 	}
 
-	height := time.Unix(int64(params.BeaconConfig().Eth1FollowDistance), 0).Unix()
+	height := time.Unix(int64(params.BeaconConfig().ExecutionFollowDistance), 0).Unix()
 	p := &mockExecution.Chain{
 		TimesByHeight: map[int]uint64{
 			0: uint64(height),
@@ -918,7 +918,7 @@ func TestValidatorStatus_Invalid(t *testing.T) {
 	root, err := depositTrie.HashTreeRoot()
 	require.NoError(t, err)
 	assert.NoError(t, depositCache.InsertDeposit(ctx, deposit, 0 /*blockNum*/, 0, root))
-	height := time.Unix(int64(params.BeaconConfig().Eth1FollowDistance), 0).Unix()
+	height := time.Unix(int64(params.BeaconConfig().ExecutionFollowDistance), 0).Unix()
 	p := &mockExecution.Chain{
 		TimesByHeight: map[int]uint64{
 			0: uint64(height),

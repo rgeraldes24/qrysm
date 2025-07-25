@@ -80,11 +80,11 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 	assert.Equal(t, expected.DeprecatedSafeSlotsToUpdateJustified, actual.DeprecatedSafeSlotsToUpdateJustified, "%s: SafeSlotsToUpdateJustified", name)
 
 	// Validator params.
-	assert.Equal(t, expected.Eth1FollowDistance, actual.Eth1FollowDistance, "%s: Eth1FollowDistance", name)
+	assert.Equal(t, expected.ExecutionFollowDistance, actual.ExecutionFollowDistance, "%s: Eth1FollowDistance", name)
 	assert.Equal(t, expected.TargetAggregatorsPerCommittee, actual.TargetAggregatorsPerCommittee, "%s: TargetAggregatorsPerCommittee", name)
 	assert.Equal(t, expected.RandomSubnetsPerValidator, actual.RandomSubnetsPerValidator, "%s: RandomSubnetsPerValidator", name)
 	assert.Equal(t, expected.EpochsPerRandomSubnetSubscription, actual.EpochsPerRandomSubnetSubscription, "%s: EpochsPerRandomSubnetSubscription", name)
-	assert.Equal(t, expected.SecondsPerETH1Block, actual.SecondsPerETH1Block, "%s: SecondsPerETH1Block", name)
+	assert.Equal(t, expected.SecondsPerExecutionBlock, actual.SecondsPerExecutionBlock, "%s: SecondsPerExecutionBlock", name)
 
 	// Deposit contract.
 	assert.Equal(t, expected.DepositChainID, actual.DepositChainID, "%s: DepositChainID", name)
@@ -109,7 +109,7 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 	assert.Equal(t, expected.SlotsPerEpoch, actual.SlotsPerEpoch, "%s: SlotsPerEpoch", name)
 	assert.Equal(t, expected.MinSeedLookahead, actual.MinSeedLookahead, "%s: MinSeedLookahead", name)
 	assert.Equal(t, expected.MaxSeedLookahead, actual.MaxSeedLookahead, "%s: MaxSeedLookahead", name)
-	assert.Equal(t, expected.EpochsPerEth1VotingPeriod, actual.EpochsPerEth1VotingPeriod, "%s: EpochsPerEth1VotingPeriod", name)
+	assert.Equal(t, expected.EpochsPerExecutionVotingPeriod, actual.EpochsPerExecutionVotingPeriod, "%s: EpochsPerEth1VotingPeriod", name)
 	assert.Equal(t, expected.SlotsPerHistoricalRoot, actual.SlotsPerHistoricalRoot, "%s: SlotsPerHistoricalRoot", name)
 	assert.Equal(t, expected.MinValidatorWithdrawabilityDelay, actual.MinValidatorWithdrawabilityDelay, "%s: MinValidatorWithdrawabilityDelay", name)
 	assert.Equal(t, expected.ShardCommitteePeriod, actual.ShardCommitteePeriod, "%s: ShardCommitteePeriod", name)

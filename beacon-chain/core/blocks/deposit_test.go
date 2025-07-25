@@ -24,7 +24,7 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 
 	dep, _, err := util.DeterministicDepositsAndKeysSameValidator(3)
 	require.NoError(t, err)
-	executionNodeData, err := util.DeterministicExecutionNodeData(len(dep))
+	executionData, err := util.DeterministicExecutionData(len(dep))
 	require.NoError(t, err)
 	b := util.NewBeaconBlockCapella()
 	b.Block = &qrysmpb.BeaconBlockCapella{
@@ -41,9 +41,9 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 	}
 	balances := []uint64{0}
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		Validators:        registry,
-		Balances:          balances,
-		ExecutionNodeData: executionNodeData,
+		Validators:    registry,
+		Balances:      balances,
+		ExecutionData: executionData,
 		Fork: &qrysmpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -81,7 +81,7 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 		},
 	}
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: []byte{0},
 			BlockHash:   []byte{1},
 		},
@@ -95,7 +95,7 @@ func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {
 	dep, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	executionNodeData, err := util.DeterministicExecutionNodeData(len(dep))
+	executionData, err := util.DeterministicExecutionData(len(dep))
 	require.NoError(t, err)
 
 	b := util.NewBeaconBlockCapella()
@@ -112,9 +112,9 @@ func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {
 	}
 	balances := []uint64{0}
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		Validators:        registry,
-		Balances:          balances,
-		ExecutionNodeData: executionNodeData,
+		Validators:    registry,
+		Balances:      balances,
+		ExecutionData: executionData,
 		Fork: &qrysmpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -178,7 +178,7 @@ func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T)
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Validators: registry,
 		Balances:   balances,
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: root[:],
 			BlockHash:   root[:],
 		},
@@ -193,7 +193,7 @@ func TestProcessDeposit_AddsNewValidatorDeposit(t *testing.T) {
 	// Similar to TestProcessDeposits_AddsNewValidatorDeposit except that this test directly calls ProcessDeposit
 	dep, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	executionNodeData, err := util.DeterministicExecutionNodeData(len(dep))
+	executionData, err := util.DeterministicExecutionData(len(dep))
 	require.NoError(t, err)
 
 	registry := []*qrysmpb.Validator{
@@ -204,9 +204,9 @@ func TestProcessDeposit_AddsNewValidatorDeposit(t *testing.T) {
 	}
 	balances := []uint64{0}
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		Validators:        registry,
-		Balances:          balances,
-		ExecutionNodeData: executionNodeData,
+		Validators:    registry,
+		Balances:      balances,
+		ExecutionData: executionData,
 		Fork: &qrysmpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -236,7 +236,7 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 	require.NoError(t, err)
 	root, err := dt.HashTreeRoot()
 	require.NoError(t, err)
-	executionNodeData := &qrysmpb.ExecutionNodeData{
+	executionData := &qrysmpb.ExecutionData{
 		DepositRoot:  root[:],
 		DepositCount: 1,
 	}
@@ -248,9 +248,9 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 	}
 	balances := []uint64{0}
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		Validators:        registry,
-		Balances:          balances,
-		ExecutionNodeData: executionNodeData,
+		Validators:    registry,
+		Balances:      balances,
+		ExecutionData: executionData,
 		Fork: &qrysmpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -261,10 +261,10 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 	require.NoError(t, err, "Expected invalid block deposit to be ignored without error")
 	assert.Equal(t, false, isNewValidator, "Expected isNewValidator to be false")
 
-	if newState.Eth1DepositIndex() != 1 {
+	if newState.ExecutionDepositIndex() != 1 {
 		t.Errorf(
-			"Expected Eth1DepositIndex to be increased by 1 after processing an invalid deposit, received change: %v",
-			newState.Eth1DepositIndex(),
+			"Expected ExecutionDepositIndex to be increased by 1 after processing an invalid deposit, received change: %v",
+			newState.ExecutionDepositIndex(),
 		)
 	}
 	if len(newState.Validators()) != 1 {
@@ -294,7 +294,7 @@ func TestPreGenesisDeposits_SkipInvalidDeposit(t *testing.T) {
 	root, err := dt.HashTreeRoot()
 	require.NoError(t, err)
 
-	executionNodeData := &qrysmpb.ExecutionNodeData{
+	executionData := &qrysmpb.ExecutionData{
 		DepositRoot:  root[:],
 		DepositCount: 1,
 	}
@@ -306,9 +306,9 @@ func TestPreGenesisDeposits_SkipInvalidDeposit(t *testing.T) {
 	}
 	balances := []uint64{0}
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
-		Validators:        registry,
-		Balances:          balances,
-		ExecutionNodeData: executionNodeData,
+		Validators:    registry,
+		Balances:      balances,
+		ExecutionData: executionData,
 		Fork: &qrysmpb.Fork{
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
@@ -328,10 +328,10 @@ func TestPreGenesisDeposits_SkipInvalidDeposit(t *testing.T) {
 		require.Equal(t, primitives.Epoch(0), val.ActivationEpoch)
 		require.Equal(t, primitives.Epoch(0), val.ActivationEligibilityEpoch)
 	}
-	if newState.Eth1DepositIndex() != 100 {
+	if newState.ExecutionDepositIndex() != 100 {
 		t.Errorf(
-			"Expected Eth1DepositIndex to be increased by 99 after processing an invalid deposit, received change: %v",
-			newState.Eth1DepositIndex(),
+			"Expected ExecutionDepositIndex to be increased by 99 after processing an invalid deposit, received change: %v",
+			newState.ExecutionDepositIndex(),
 		)
 	}
 	if len(newState.Validators()) != 100 {
@@ -386,7 +386,7 @@ func TestProcessDeposit_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T) 
 	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Validators: registry,
 		Balances:   balances,
-		ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: root[:],
 			BlockHash:   root[:],
 		},

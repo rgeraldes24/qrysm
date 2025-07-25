@@ -10,18 +10,18 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-func BenchmarkAppendExecutionNodeDataVotes(b *testing.B) {
+func BenchmarkAppendExecutionDataVotes(b *testing.B) {
 	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{})
 	require.NoError(b, err)
 
-	max := params.BeaconConfig().ExecutionNodeDataVotesLength()
+	max := params.BeaconConfig().ExecutionDataVotesLength()
 
 	if max < 2 {
-		b.Fatalf("ExecutionNodeDataVotesLength is less than 2")
+		b.Fatalf("ExecutionDataVotesLength is less than 2")
 	}
 
 	for i := uint64(0); i < max-2; i++ {
-		err := st.AppendExecutionNodeDataVotes(&qrysmpb.ExecutionNodeData{
+		err := st.AppendExecutionDataVotes(&qrysmpb.ExecutionData{
 			DepositCount: i,
 			DepositRoot:  make([]byte, 64),
 			BlockHash:    make([]byte, 64),
@@ -32,7 +32,7 @@ func BenchmarkAppendExecutionNodeDataVotes(b *testing.B) {
 	ref := st.Copy()
 
 	for i := 0; i < b.N; i++ {
-		err := ref.AppendExecutionNodeDataVotes(&zond.ExecutionNodeData{DepositCount: uint64(i)})
+		err := ref.AppendExecutionDataVotes(&zond.ExecutionData{DepositCount: uint64(i)})
 		require.NoError(b, err)
 		ref = st.Copy()
 	}

@@ -403,13 +403,13 @@ func RegisterBeaconDebugHandlerClient(ctx context.Context, mux *runtime.ServeMux
 }
 
 var (
-	pattern_BeaconDebug_GetBeaconState_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"internal", "zond", "v1", "debug", "beacon", "states", "state_id"}, ""))
+	pattern_BeaconDebug_GetBeaconState_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6}, []string{"internal", "qrl", "v1", "debug", "beacon", "states", "state_id"}, ""))
 
-	pattern_BeaconDebug_GetBeaconStateSSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"internal", "zond", "v1", "debug", "beacon", "states", "state_id", "ssz"}, ""))
+	pattern_BeaconDebug_GetBeaconStateSSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"internal", "qrl", "v1", "debug", "beacon", "states", "state_id", "ssz"}, ""))
 
-	pattern_BeaconDebug_ListForkChoiceHeads_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "zond", "v1", "debug", "beacon", "heads"}, ""))
+	pattern_BeaconDebug_ListForkChoiceHeads_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "debug", "beacon", "heads"}, ""))
 
-	pattern_BeaconDebug_GetForkChoice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "zond", "v1", "debug", "fork_choice"}, ""))
+	pattern_BeaconDebug_GetForkChoice_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "qrl", "v1", "debug", "fork_choice"}, ""))
 )
 
 var (

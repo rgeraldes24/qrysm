@@ -14,7 +14,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func TestExecutionchainCmd(t *testing.T) {
+func TestExecutionChainCmd(t *testing.T) {
 	app := cli.App{}
 	set := flag.NewFlagSet("test", 0)
 	set.String(flags.ExecutionEngineEndpoint.Name, "primary", "")
@@ -91,7 +91,7 @@ func Test_parseJWTSecretFromFile(t *testing.T) {
 	})
 }
 
-func TestPowchainPreregistration_EmptyWeb3Provider(t *testing.T) {
+func TestExecutionChainPreregistration_EmptyWeb3Provider(t *testing.T) {
 	app := cli.App{}
 	set := flag.NewFlagSet("test", 0)
 	set.String(flags.ExecutionEngineEndpoint.Name, "", "")

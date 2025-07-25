@@ -10,10 +10,10 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-// UpdateGenesisExecutionNodeData updates eth1 data for genesis state.
-func UpdateGenesisExecutionNodeData(state state.BeaconState, deposits []*qrysmpb.Deposit, executionNodeData *qrysmpb.ExecutionNodeData) (state.BeaconState, error) {
-	if executionNodeData == nil {
-		return nil, errors.New("no executionNodeData provided for genesis state")
+// UpdateGenesisExecutionData updates execution data for genesis state.
+func UpdateGenesisExecutionData(state state.BeaconState, deposits []*qrysmpb.Deposit, executionData *qrysmpb.ExecutionData) (state.BeaconState, error) {
+	if executionData == nil {
+		return nil, errors.New("no executionData provided for genesis state")
 	}
 
 	leaves := make([][]byte, 0, len(deposits))
@@ -45,8 +45,8 @@ func UpdateGenesisExecutionNodeData(state state.BeaconState, deposits []*qrysmpb
 	if err != nil {
 		return nil, err
 	}
-	executionNodeData.DepositRoot = depositRoot[:]
-	err = state.SetExecutionNodeData(executionNodeData)
+	executionData.DepositRoot = depositRoot[:]
+	err = state.SetExecutionData(executionData)
 	if err != nil {
 		return nil, err
 	}

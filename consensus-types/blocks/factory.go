@@ -179,7 +179,7 @@ func BuildSignedBeaconBlockFromExecutionPayload(
 				StateRoot:     stateRoot[:],
 				Body: &qrysmpb.BeaconBlockBodyCapella{
 					RandaoReveal:                randaoReveal[:],
-					ExecutionNodeData:           b.Body().ExecutionNodeData(),
+					ExecutionData:               b.Body().ExecutionData(),
 					Graffiti:                    graffiti[:],
 					ProposerSlashings:           b.Body().ProposerSlashings(),
 					AttesterSlashings:           b.Body().AttesterSlashings(),

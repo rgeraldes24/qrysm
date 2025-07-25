@@ -50,7 +50,7 @@ type ReadOnlyDatabase interface {
 	// Deposit contract related handlers.
 	DepositContractAddress(ctx context.Context) ([]byte, error)
 	// ExecutionChainData operations.
-	ExecutionChainData(ctx context.Context) (*qrysmpb.ETH1ChainData, error)
+	ExecutionChainData(ctx context.Context) (*qrysmpb.ExecutionChainData, error)
 	// Fee recipients operations.
 	FeeRecipientByValidatorID(ctx context.Context, id primitives.ValidatorIndex) (common.Address, error)
 	RegistrationByValidatorID(ctx context.Context, id primitives.ValidatorIndex) (*qrysmpb.ValidatorRegistrationV1, error)
@@ -82,8 +82,8 @@ type NoHeadAccessDatabase interface {
 	SaveLastValidatedCheckpoint(ctx context.Context, checkpoint *qrysmpb.Checkpoint) error
 	// Deposit contract related handlers.
 	SaveDepositContractAddress(ctx context.Context, addr common.Address) error
-	// SaveExecutionChainData operations.
-	SaveExecutionChainData(ctx context.Context, data *qrysmpb.ETH1ChainData) error
+	// SaveExecutioChainData operations.
+	SaveExecutionChainData(ctx context.Context, data *qrysmpb.ExecutionChainData) error
 	// Run any required database migrations.
 	RunMigrations(ctx context.Context) error
 	// Fee recipients operations.

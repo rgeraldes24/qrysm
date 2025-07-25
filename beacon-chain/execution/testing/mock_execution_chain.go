@@ -1,4 +1,4 @@
-// Package testing provides useful mocks for an eth1 powchain
+// Package testing provides useful mocks for an execution chain
 // service as needed by unit tests for the beacon node.
 package testing
 
@@ -23,20 +23,20 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-// Chain defines a properly functioning mock for the powchain service.
+// Chain defines a properly functioning mock for the execution chain service.
 type Chain struct {
-	ChainFeed         *event.Feed
-	LatestBlockNumber *big.Int
-	HashesByHeight    map[int][]byte
-	TimesByHeight     map[int]uint64
-	BlockNumberByTime map[uint64]*big.Int
-	ExecutionNodeData *qrysmpb.ExecutionNodeData
-	GenesisEth1Block  *big.Int
-	GenesisState      state.BeaconState
-	CurrEndpoint      string
-	CurrError         error
-	Endpoints         []string
-	Errors            []error
+	ChainFeed             *event.Feed
+	LatestBlockNumber     *big.Int
+	HashesByHeight        map[int][]byte
+	TimesByHeight         map[int]uint64
+	BlockNumberByTime     map[uint64]*big.Int
+	ExecutionData         *qrysmpb.ExecutionData
+	GenesisExecutionBlock *big.Int
+	GenesisState          state.BeaconState
+	CurrEndpoint          string
+	CurrError             error
+	Endpoints             []string
+	Errors                []error
 }
 
 // GenesisTime represents a static past date - JAN 01 2000.
@@ -53,7 +53,7 @@ func New() *Chain {
 
 // GenesisExecutionChainInfo --
 func (m *Chain) GenesisExecutionChainInfo() (uint64, *big.Int) {
-	blk := m.GenesisEth1Block
+	blk := m.GenesisExecutionBlock
 	if blk == nil {
 		blk = big.NewInt(GenesisTime)
 	}
@@ -104,19 +104,9 @@ func (m *Chain) BlockByTimestamp(_ context.Context, time uint64) (*types.HeaderI
 	return &types.HeaderInfo{Number: chosenNumber, Time: chosenTime}, nil
 }
 
-// ChainStartExecutionNodeData --
-func (m *Chain) ChainStartExecutionNodeData() *qrysmpb.ExecutionNodeData {
-	return m.ExecutionNodeData
-}
-
-// PreGenesisState --
-func (m *Chain) PreGenesisState() state.BeaconState {
-	return m.GenesisState
-}
-
-// ClearPreGenesisData --
-func (*Chain) ClearPreGenesisData() {
-	// no-op
+// ChainStartExecutionData --
+func (m *Chain) ChainStartExecutionData() *qrysmpb.ExecutionData {
+	return m.ExecutionData
 }
 
 func (*Chain) ExecutionClientConnected() bool {

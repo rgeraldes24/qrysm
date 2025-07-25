@@ -32,7 +32,7 @@ type DepositFetcher interface {
 type DepositInserter interface {
 	InsertDeposit(ctx context.Context, d *qrysmpb.Deposit, blockNum uint64, index int64, depositRoot [32]byte) error
 	InsertDepositContainers(ctx context.Context, ctrs []*qrysmpb.DepositContainer)
-	InsertFinalizedDeposits(ctx context.Context, eth1DepositIndex int64, executionHash common.Hash, executionNumber uint64) error
+	InsertFinalizedDeposits(ctx context.Context, executionDepositIndex int64, executionHash common.Hash, executionNumber uint64) error
 }
 
 // FinalizedFetcher is a smaller interface defined to be the bare minimum to satisfy “Service”.

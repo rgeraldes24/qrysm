@@ -53,8 +53,8 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 	if b.Body == nil {
 		return nil, NewDecodeError(errNilValue, "Body")
 	}
-	if b.Body.ExecutionNodeData == nil {
-		return nil, NewDecodeError(errNilValue, "Body.ExecutionNodeData")
+	if b.Body.ExecutionData == nil {
+		return nil, NewDecodeError(errNilValue, "Body.ExecutionData")
 	}
 	if b.Body.SyncAggregate == nil {
 		return nil, NewDecodeError(errNilValue, "Body.SyncAggregate")
@@ -83,17 +83,17 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.RandaoReveal")
 	}
-	depositRoot, err := DecodeHexWithLength(b.Body.ExecutionNodeData.DepositRoot, fieldparams.RootLength)
+	depositRoot, err := DecodeHexWithLength(b.Body.ExecutionData.DepositRoot, fieldparams.RootLength)
 	if err != nil {
-		return nil, NewDecodeError(err, "Body.ExecutionNodeData.DepositRoot")
+		return nil, NewDecodeError(err, "Body.ExecutionData.DepositRoot")
 	}
-	depositCount, err := strconv.ParseUint(b.Body.ExecutionNodeData.DepositCount, 10, 64)
+	depositCount, err := strconv.ParseUint(b.Body.ExecutionData.DepositCount, 10, 64)
 	if err != nil {
-		return nil, NewDecodeError(err, "Body.ExecutionNodeData.DepositCount")
+		return nil, NewDecodeError(err, "Body.ExecutionData.DepositCount")
 	}
-	blockHash, err := DecodeHexWithLength(b.Body.ExecutionNodeData.BlockHash, common.HashLength)
+	blockHash, err := DecodeHexWithLength(b.Body.ExecutionData.BlockHash, common.HashLength)
 	if err != nil {
-		return nil, NewDecodeError(err, "Body.ExecutionNodeData.BlockHash")
+		return nil, NewDecodeError(err, "Body.ExecutionData.BlockHash")
 	}
 	graffiti, err := DecodeHexWithLength(b.Body.Graffiti, fieldparams.RootLength)
 	if err != nil {
@@ -237,7 +237,7 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 		StateRoot:     stateRoot,
 		Body: &zond.BeaconBlockBodyCapella{
 			RandaoReveal: randaoReveal,
-			ExecutionNodeData: &zond.ExecutionNodeData{
+			ExecutionData: &zond.ExecutionData{
 				DepositRoot:  depositRoot,
 				DepositCount: depositCount,
 				BlockHash:    blockHash,
@@ -309,8 +309,8 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 	if b.Body == nil {
 		return nil, NewDecodeError(errNilValue, "Body")
 	}
-	if b.Body.ExecutionNodeData == nil {
-		return nil, NewDecodeError(errNilValue, "Body.ExecutionNodeData")
+	if b.Body.ExecutionData == nil {
+		return nil, NewDecodeError(errNilValue, "Body.ExecutionData")
 	}
 	if b.Body.SyncAggregate == nil {
 		return nil, NewDecodeError(errNilValue, "Body.SyncAggregate")
@@ -339,17 +339,17 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.RandaoReveal")
 	}
-	depositRoot, err := DecodeHexWithLength(b.Body.ExecutionNodeData.DepositRoot, fieldparams.RootLength)
+	depositRoot, err := DecodeHexWithLength(b.Body.ExecutionData.DepositRoot, fieldparams.RootLength)
 	if err != nil {
-		return nil, NewDecodeError(err, "Body.ExecutionNodeData.DepositRoot")
+		return nil, NewDecodeError(err, "Body.ExecutionData.DepositRoot")
 	}
-	depositCount, err := strconv.ParseUint(b.Body.ExecutionNodeData.DepositCount, 10, 64)
+	depositCount, err := strconv.ParseUint(b.Body.ExecutionData.DepositCount, 10, 64)
 	if err != nil {
-		return nil, NewDecodeError(err, "Body.ExecutionNodeData.DepositCount")
+		return nil, NewDecodeError(err, "Body.ExecutionData.DepositCount")
 	}
-	blockHash, err := DecodeHexWithLength(b.Body.ExecutionNodeData.BlockHash, common.HashLength)
+	blockHash, err := DecodeHexWithLength(b.Body.ExecutionData.BlockHash, common.HashLength)
 	if err != nil {
-		return nil, NewDecodeError(err, "Body.ExecutionNodeData.BlockHash")
+		return nil, NewDecodeError(err, "Body.ExecutionData.BlockHash")
 	}
 	graffiti, err := DecodeHexWithLength(b.Body.Graffiti, fieldparams.RootLength)
 	if err != nil {
@@ -461,7 +461,7 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 		StateRoot:     stateRoot,
 		Body: &zond.BlindedBeaconBlockBodyCapella{
 			RandaoReveal: randaoReveal,
-			ExecutionNodeData: &zond.ExecutionNodeData{
+			ExecutionData: &zond.ExecutionData{
 				DepositRoot:  depositRoot,
 				DepositCount: depositCount,
 				BlockHash:    blockHash,
@@ -549,10 +549,10 @@ func BlindedBeaconBlockCapellaFromConsensus(b *zond.BlindedBeaconBlockCapella) (
 		StateRoot:     hexutil.Encode(b.StateRoot),
 		Body: &BlindedBeaconBlockBodyCapella{
 			RandaoReveal: hexutil.Encode(b.Body.RandaoReveal),
-			ExecutionNodeData: &ExecutionNodeData{
-				DepositRoot:  hexutil.Encode(b.Body.ExecutionNodeData.DepositRoot),
-				DepositCount: fmt.Sprintf("%d", b.Body.ExecutionNodeData.DepositCount),
-				BlockHash:    hexutil.Encode(b.Body.ExecutionNodeData.BlockHash),
+			ExecutionData: &ExecutionData{
+				DepositRoot:  hexutil.Encode(b.Body.ExecutionData.DepositRoot),
+				DepositCount: fmt.Sprintf("%d", b.Body.ExecutionData.DepositCount),
+				BlockHash:    hexutil.Encode(b.Body.ExecutionData.BlockHash),
 			},
 			Graffiti:          hexutil.Encode(b.Body.Graffiti),
 			ProposerSlashings: proposerSlashings,
@@ -651,10 +651,10 @@ func BeaconBlockCapellaFromConsensus(b *zond.BeaconBlockCapella) (*BeaconBlockCa
 		StateRoot:     hexutil.Encode(b.StateRoot),
 		Body: &BeaconBlockBodyCapella{
 			RandaoReveal: hexutil.Encode(b.Body.RandaoReveal),
-			ExecutionNodeData: &ExecutionNodeData{
-				DepositRoot:  hexutil.Encode(b.Body.ExecutionNodeData.DepositRoot),
-				DepositCount: fmt.Sprintf("%d", b.Body.ExecutionNodeData.DepositCount),
-				BlockHash:    hexutil.Encode(b.Body.ExecutionNodeData.BlockHash),
+			ExecutionData: &ExecutionData{
+				DepositRoot:  hexutil.Encode(b.Body.ExecutionData.DepositRoot),
+				DepositCount: fmt.Sprintf("%d", b.Body.ExecutionData.DepositCount),
+				BlockHash:    hexutil.Encode(b.Body.ExecutionData.BlockHash),
 			},
 			Graffiti:          hexutil.Encode(b.Body.Graffiti),
 			ProposerSlashings: proposerSlashings,

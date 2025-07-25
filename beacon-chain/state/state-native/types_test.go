@@ -53,7 +53,7 @@ func TestBeaconState_ProtoBeaconStateCompatibility(t *testing.T) {
 }
 
 func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateCapella {
-	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, count, &enginev1.ExecutionPayloadCapella{}, &qrysmpb.ExecutionNodeData{})
+	genesisState, _, err := interop.GenerateGenesisStateCapella(context.Background(), 0, count, &enginev1.ExecutionPayloadCapella{}, &qrysmpb.ExecutionData{})
 	require.NoError(tb, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte

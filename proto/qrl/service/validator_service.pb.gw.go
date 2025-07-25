@@ -547,13 +547,13 @@ func RegisterBeaconValidatorHandlerClient(ctx context.Context, mux *runtime.Serv
 }
 
 var (
-	pattern_BeaconValidator_ProduceBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "zond", "v1", "validator", "blocks", "slot"}, ""))
+	pattern_BeaconValidator_ProduceBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "qrl", "v1", "validator", "blocks", "slot"}, ""))
 
-	pattern_BeaconValidator_ProduceBlockSSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "zond", "v1", "validator", "blocks", "slot", "ssz"}, ""))
+	pattern_BeaconValidator_ProduceBlockSSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "qrl", "v1", "validator", "blocks", "slot", "ssz"}, ""))
 
-	pattern_BeaconValidator_ProduceBlindedBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "zond", "v1", "validator", "blinded_blocks", "slot"}, ""))
+	pattern_BeaconValidator_ProduceBlindedBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5}, []string{"internal", "qrl", "v1", "validator", "blinded_blocks", "slot"}, ""))
 
-	pattern_BeaconValidator_ProduceBlindedBlockSSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "zond", "v1", "validator", "blinded_blocks", "slot", "ssz"}, ""))
+	pattern_BeaconValidator_ProduceBlindedBlockSSZ_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 2, 6}, []string{"internal", "qrl", "v1", "validator", "blinded_blocks", "slot", "ssz"}, ""))
 )
 
 var (

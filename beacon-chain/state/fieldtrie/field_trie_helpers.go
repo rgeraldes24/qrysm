@@ -69,8 +69,8 @@ func fieldConverters(field types.FieldIndex, indices []uint64, elements interfac
 		return convert32ByteArrays[customtypes.StateRoots](indices, elements, convertAll)
 	case types.RandaoMixes:
 		return convert32ByteArrays[customtypes.RandaoMixes](indices, elements, convertAll)
-	case types.ExecutionNodeDataVotes:
-		return convertExecutionNodeDataVotes(indices, elements, convertAll)
+	case types.ExecutionDataVotes:
+		return convertExecutionDataVotes(indices, elements, convertAll)
 	case types.Validators:
 		return convertValidators(indices, elements, convertAll)
 	case types.Balances:
@@ -89,12 +89,12 @@ func convert32ByteArrays[T ~[][32]byte](indices []uint64, elements interface{}, 
 	return handle32ByteArrays(val, indices, convertAll)
 }
 
-func convertExecutionNodeDataVotes(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
-	val, ok := elements.([]*qrysmpb.ExecutionNodeData)
+func convertExecutionDataVotes(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
+	val, ok := elements.([]*qrysmpb.ExecutionData)
 	if !ok {
-		return nil, errors.Errorf("Wanted type of %T but got %T", []*qrysmpb.ExecutionNodeData{}, elements)
+		return nil, errors.Errorf("Wanted type of %T but got %T", []*qrysmpb.ExecutionData{}, elements)
 	}
-	return handleExecutionNodeDataSlice(val, indices, convertAll)
+	return handleExecutionDataSlice(val, indices, convertAll)
 }
 
 func convertValidators(indices []uint64, elements interface{}, convertAll bool) ([][32]byte, error) {
@@ -169,15 +169,15 @@ func handleValidatorSlice(val []*qrysmpb.Validator, indices []uint64, convertAll
 	return roots, nil
 }
 
-// handleExecutionNodeDataSlice processes a list of executionNodeData and indices into the appropriate roots.
-func handleExecutionNodeDataSlice(val []*qrysmpb.ExecutionNodeData, indices []uint64, convertAll bool) ([][32]byte, error) {
+// handleExecutionDataSlice processes a list of executionData and indices into the appropriate roots.
+func handleExecutionDataSlice(val []*qrysmpb.ExecutionData, indices []uint64, convertAll bool) ([][32]byte, error) {
 	length := len(indices)
 	if convertAll {
 		length = len(val)
 	}
 	roots := make([][32]byte, 0, length)
-	rootCreator := func(input *qrysmpb.ExecutionNodeData) error {
-		newRoot, err := stateutil.ExecutionNodeDataRootWithHasher(input)
+	rootCreator := func(input *qrysmpb.ExecutionData) error {
+		newRoot, err := stateutil.ExecutionDataRootWithHasher(input)
 		if err != nil {
 			return err
 		}
@@ -196,7 +196,7 @@ func handleExecutionNodeDataSlice(val []*qrysmpb.ExecutionNodeData, indices []ui
 	if len(val) > 0 {
 		for _, idx := range indices {
 			if idx > uint64(len(val))-1 {
-				return nil, fmt.Errorf("index %d greater than number of items in eth1 data slice %d", idx, len(val))
+				return nil, fmt.Errorf("index %d greater than number of items in execution data slice %d", idx, len(val))
 			}
 			err := rootCreator(val[idx])
 			if err != nil {

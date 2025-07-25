@@ -160,7 +160,7 @@ func TestNodeServer_GetExecutionNodeConnectionStatus(t *testing.T) {
 		CurrError:    err,
 	}
 	ns := &Server{
-		POWChainInfoFetcher: mockFetcher,
+		ExecutionChainInfoFetcher: mockFetcher,
 	}
 	qrysmpb.RegisterNodeServer(server, ns)
 	reflection.Register(server)

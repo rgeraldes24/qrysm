@@ -67,7 +67,7 @@ func (c *Cache) AllDeposits(ctx context.Context, untilBlk *big.Int) []*qrysmpb.D
 func (c *Cache) allDeposits(untilBlk *big.Int) []*qrysmpb.Deposit {
 	var deposits []*qrysmpb.Deposit
 	for _, ctnr := range c.deposits {
-		cBlk := big.NewInt(0).SetUint64(ctnr.Eth1BlockHeight)
+		cBlk := big.NewInt(0).SetUint64(ctnr.ExecutionBlockHeight)
 		if untilBlk == nil || untilBlk.Cmp(cBlk) >= 0 {
 			deposits = append(deposits, ctnr.Deposit)
 		}
@@ -117,7 +117,7 @@ func (c *Cache) DepositByPubkey(ctx context.Context, pubKey []byte) (*qrysmpb.De
 	// validator key has multiple deposits assigned to
 	// it.
 	deposit = deps[0].Deposit
-	blockNum = big.NewInt(int64(deps[0].Eth1BlockHeight))
+	blockNum = big.NewInt(int64(deps[0].ExecutionBlockHeight))
 	return deposit, blockNum
 }
 
@@ -129,10 +129,10 @@ func (c *Cache) DepositsNumberAndRootAtHeight(ctx context.Context, blockHeight *
 	c.depositsLock.RLock()
 	defer c.depositsLock.RUnlock()
 	heightIdx := sort.Search(len(c.deposits), func(i int) bool {
-		dBlkHeight := big.NewInt(0).SetUint64(c.deposits[i].Eth1BlockHeight)
+		dBlkHeight := big.NewInt(0).SetUint64(c.deposits[i].ExecutionBlockHeight)
 		return dBlkHeight.Cmp(blockHeight) > 0
 	})
-	// send the deposit root of the empty trie, if eth1follow distance is greater than the time of the earliest
+	// send the deposit root of the empty trie, if executionfollow distance is greater than the time of the earliest
 	// deposit.
 	if heightIdx == 0 {
 		return 0, [32]byte{}
@@ -171,7 +171,7 @@ func (c *Cache) NonFinalizedDeposits(ctx context.Context, lastFinalizedIndex int
 
 	var deposits []*qrysmpb.Deposit
 	for _, d := range c.deposits {
-		if (d.Index > lastFinalizedIndex) && (untilBlk == nil || untilBlk.Uint64() >= d.Eth1BlockHeight) {
+		if (d.Index > lastFinalizedIndex) && (untilBlk == nil || untilBlk.Uint64() >= d.ExecutionBlockHeight) {
 			deposits = append(deposits, d.Deposit)
 		}
 	}
@@ -240,7 +240,7 @@ func (c *Cache) InsertPendingDeposit(ctx context.Context, d *qrysmpb.Deposit, bl
 	c.depositsLock.Lock()
 	defer c.depositsLock.Unlock()
 	c.pendingDeposits = append(c.pendingDeposits,
-		&qrysmpb.DepositContainer{Deposit: d, Eth1BlockHeight: blockNum, Index: index, DepositRoot: depositRoot[:]})
+		&qrysmpb.DepositContainer{Deposit: d, ExecutionBlockHeight: blockNum, Index: index, DepositRoot: depositRoot[:]})
 	pendingDepositsCount.Set(float64(len(c.pendingDeposits)))
 	span.AddAttributes(trace.Int64Attribute("count", int64(len(c.pendingDeposits))))
 }
@@ -290,7 +290,7 @@ func (c *Cache) PendingContainers(ctx context.Context, untilBlk *big.Int) []*qry
 
 	depositCntrs := make([]*qrysmpb.DepositContainer, 0, len(c.pendingDeposits))
 	for _, ctnr := range c.pendingDeposits {
-		if untilBlk == nil || untilBlk.Uint64() >= ctnr.Eth1BlockHeight {
+		if untilBlk == nil || untilBlk.Uint64() >= ctnr.ExecutionBlockHeight {
 			depositCntrs = append(depositCntrs, ctnr)
 		}
 	}

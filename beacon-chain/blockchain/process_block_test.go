@@ -697,8 +697,8 @@ func TestInsertFinalizedDeposits(t *testing.T) {
 	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetExecutionNodeData(&qrysmpb.ExecutionNodeData{DepositCount: 10, BlockHash: make([]byte, 32)}))
-	assert.NoError(t, gs.SetEth1DepositIndex(8))
+	assert.NoError(t, gs.SetExecutionData(&qrysmpb.ExecutionData{DepositCount: 10, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs.SetExecutionDepositIndex(8))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	var zeroSig [4595]byte
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {
@@ -727,8 +727,8 @@ func TestInsertFinalizedDeposits_PrunePendingDeposits(t *testing.T) {
 	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetExecutionNodeData(&qrysmpb.ExecutionNodeData{DepositCount: 10, BlockHash: make([]byte, 32)}))
-	assert.NoError(t, gs.SetEth1DepositIndex(8))
+	assert.NoError(t, gs.SetExecutionData(&qrysmpb.ExecutionData{DepositCount: 10, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs.SetExecutionDepositIndex(8))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	var zeroSig [4595]byte
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {
@@ -767,12 +767,12 @@ func TestInsertFinalizedDeposits_MultipleFinalizedRoutines(t *testing.T) {
 	gs, _ := util.DeterministicGenesisStateCapella(t, 32)
 	require.NoError(t, service.saveGenesisData(ctx, gs))
 	gs = gs.Copy()
-	assert.NoError(t, gs.SetExecutionNodeData(&qrysmpb.ExecutionNodeData{DepositCount: 7, BlockHash: make([]byte, 32)}))
-	assert.NoError(t, gs.SetEth1DepositIndex(6))
+	assert.NoError(t, gs.SetExecutionData(&qrysmpb.ExecutionData{DepositCount: 7, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs.SetExecutionDepositIndex(6))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k'}, gs))
 	gs2 := gs.Copy()
-	assert.NoError(t, gs2.SetExecutionNodeData(&qrysmpb.ExecutionNodeData{DepositCount: 15, BlockHash: make([]byte, 32)}))
-	assert.NoError(t, gs2.SetEth1DepositIndex(13))
+	assert.NoError(t, gs2.SetExecutionData(&qrysmpb.ExecutionData{DepositCount: 15, BlockHash: make([]byte, 32)}))
+	assert.NoError(t, gs2.SetExecutionDepositIndex(13))
 	assert.NoError(t, service.cfg.StateGen.SaveState(ctx, [32]byte{'m', 'o', 'c', 'k', '2'}, gs2))
 	var zeroSig [4595]byte
 	for i := uint64(0); i < uint64(4*params.BeaconConfig().SlotsPerEpoch); i++ {

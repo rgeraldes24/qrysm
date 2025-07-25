@@ -1,5 +1,5 @@
 // Package interopcoldstart allows for spinning up a deterministic-genesis
-// local chain without the need for eth1 deposits useful for
+// local chain without the need for execution deposits useful for
 // local client development and interoperability testing.
 package interopcoldstart
 
@@ -121,7 +121,7 @@ func (s *Service) Start() {
 		BaseFeePerGas: make([]byte, 32),
 		BlockHash:     make([]byte, 32),
 	}
-	genesisState, _, err := interop.GenerateGenesisStateCapella(s.ctx, s.cfg.GenesisTime, s.cfg.NumValidators, ee, &qrysmpb.ExecutionNodeData{BlockHash: make([]byte, 32)})
+	genesisState, _, err := interop.GenerateGenesisStateCapella(s.ctx, s.cfg.GenesisTime, s.cfg.NumValidators, ee, &qrysmpb.ExecutionData{BlockHash: make([]byte, 32)})
 	if err != nil {
 		log.WithError(err).Fatal("Could not generate interop genesis state")
 	}
@@ -159,23 +159,9 @@ func (_ *Service) AllDeposits(_ context.Context, _ *big.Int) []*qrysmpb.Deposit 
 	return []*qrysmpb.Deposit{}
 }
 
-// ChainStartExecutionNodeData mocks out the powchain functionality for interop.
-func (_ *Service) ChainStartExecutionNodeData() *qrysmpb.ExecutionNodeData {
-	return &qrysmpb.ExecutionNodeData{}
-}
-
-// PreGenesisState returns an empty beacon state.
-func (_ *Service) PreGenesisState() state.BeaconState {
-	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{})
-	if err != nil {
-		panic("could not initialize state")
-	}
-	return s
-}
-
-// ClearPreGenesisData --
-func (_ *Service) ClearPreGenesisData() {
-	// no-op
+// ChainStartExecutionData mocks out the execution chain functionality for interop.
+func (_ *Service) ChainStartExecutionData() *qrysmpb.ExecutionData {
+	return &qrysmpb.ExecutionData{}
 }
 
 // DepositByPubkey mocks out the deposit cache functionality for interop.

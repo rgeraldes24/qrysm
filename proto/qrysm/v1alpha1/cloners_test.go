@@ -10,14 +10,14 @@ import (
 	"github.com/theQRL/qrysm/testing/assert"
 )
 
-func TestCopyExecutionNodeData(t *testing.T) {
-	data := genExecutionNodeData()
+func TestCopyExecutionData(t *testing.T) {
+	data := genExecutionData()
 
-	got := v1alpha1.CopyExecutionNodeData(data)
+	got := v1alpha1.CopyExecutionData(data)
 	if !reflect.DeepEqual(got, data) {
-		t.Errorf("CopyExecutionNodeData() = %v, want %v", got, data)
+		t.Errorf("CopyExecutionData() = %v, want %v", got, data)
 	}
-	assert.NotEmpty(t, got, "Copied executionNodeData has empty fields")
+	assert.NotEmpty(t, got, "Copied executionData has empty fields")
 }
 
 func TestCopyPendingAttestation(t *testing.T) {
@@ -401,8 +401,8 @@ func genCheckpoint() *v1alpha1.Checkpoint {
 	}
 }
 
-func genExecutionNodeData() *v1alpha1.ExecutionNodeData {
-	return &v1alpha1.ExecutionNodeData{
+func genExecutionData() *v1alpha1.ExecutionData {
+	return &v1alpha1.ExecutionData{
 		DepositRoot:  bytes(32),
 		DepositCount: 4,
 		BlockHash:    bytes(32),
@@ -552,7 +552,7 @@ func genSyncAggregate() *v1alpha1.SyncAggregate {
 func genBeaconBlockBodyCapella() *v1alpha1.BeaconBlockBodyCapella {
 	return &v1alpha1.BeaconBlockBodyCapella{
 		RandaoReveal:                bytes(4595),
-		ExecutionNodeData:           genExecutionNodeData(),
+		ExecutionData:               genExecutionData(),
 		Graffiti:                    bytes(32),
 		ProposerSlashings:           genProposerSlashings(5),
 		AttesterSlashings:           genAttesterSlashings(5),
@@ -585,7 +585,7 @@ func genSignedBeaconBlockCapella() *v1alpha1.SignedBeaconBlockCapella {
 func genBlindedBeaconBlockBodyCapella() *v1alpha1.BlindedBeaconBlockBodyCapella {
 	return &v1alpha1.BlindedBeaconBlockBodyCapella{
 		RandaoReveal:                bytes(4595),
-		ExecutionNodeData:           genExecutionNodeData(),
+		ExecutionData:               genExecutionData(),
 		Graffiti:                    bytes(32),
 		ProposerSlashings:           genProposerSlashings(5),
 		AttesterSlashings:           genAttesterSlashings(5),

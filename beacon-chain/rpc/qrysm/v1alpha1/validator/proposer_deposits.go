@@ -18,14 +18,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (vs *Server) packDepositsAndAttestations(ctx context.Context, head state.BeaconState, executionNodeData *qrysmpb.ExecutionNodeData) ([]*qrysmpb.Deposit, []*qrysmpb.Attestation, error) {
+func (vs *Server) packDepositsAndAttestations(ctx context.Context, head state.BeaconState, executionData *qrysmpb.ExecutionData) ([]*qrysmpb.Deposit, []*qrysmpb.Attestation, error) {
 	eg, egctx := errgroup.WithContext(ctx)
 	var deposits []*qrysmpb.Deposit
 	var atts []*qrysmpb.Attestation
 
 	eg.Go(func() error {
 		// Pack ETH1 deposits which have not been included in the beacon chain.
-		localDeposits, err := vs.deposits(egctx, head, executionNodeData)
+		localDeposits, err := vs.deposits(egctx, head, executionData)
 		if err != nil {
 			return status.Errorf(codes.Internal, "Could not get ETH1 deposits: %v", err)
 		}
@@ -59,14 +59,14 @@ func (vs *Server) packDepositsAndAttestations(ctx context.Context, head state.Be
 }
 
 // deposits returns a list of pending deposits that are ready for inclusion in the next beacon
-// block. Determining deposits depends on the current executionNodeData vote for the block and whether or not
-// this executionNodeData has enough support to be considered for deposits inclusion. If current vote has
+// block. Determining deposits depends on the current executionData vote for the block and whether or not
+// this executionData has enough support to be considered for deposits inclusion. If current vote has
 // enough support, then use that vote for basis of determining deposits, otherwise use current state
-// executionNodeData.
+// executionData.
 func (vs *Server) deposits(
 	ctx context.Context,
 	beaconState state.BeaconState,
-	currentVote *qrysmpb.ExecutionNodeData,
+	currentVote *qrysmpb.ExecutionData,
 ) ([]*qrysmpb.Deposit, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.deposits")
 	defer span.End()
@@ -79,26 +79,26 @@ func (vs *Server) deposits(
 		log.Warn("not connected to execution node, skip pending deposit insertion")
 		return []*qrysmpb.Deposit{}, nil
 	}
-	// Need to fetch if the deposits up to the state's latest eth1 data matches
+	// Need to fetch if the deposits up to the state's latest execution data matches
 	// the number of all deposits in this RPC call. If not, then we return nil.
-	canonicalExecutionNodeData, canonicalExecutionNodeDataHeight, err := vs.canonicalExecutionNodeData(ctx, beaconState, currentVote)
+	canonicalExecutionData, canonicalExecutionDataHeight, err := vs.canonicalExecutionData(ctx, beaconState, currentVote)
 	if err != nil {
 		return nil, err
 	}
 
-	_, genesisEth1Block := vs.ExecutionNodeInfoFetcher.GenesisExecutionChainInfo()
-	if genesisEth1Block.Cmp(canonicalExecutionNodeDataHeight) == 0 {
+	_, genesisExecutionBlock := vs.ExecutionNodeInfoFetcher.GenesisExecutionChainInfo()
+	if genesisExecutionBlock.Cmp(canonicalExecutionDataHeight) == 0 {
 		return []*qrysmpb.Deposit{}, nil
 	}
 
 	// If there are no pending deposits, exit early.
-	allPendingContainers := vs.PendingDepositsFetcher.PendingContainers(ctx, canonicalExecutionNodeDataHeight)
+	allPendingContainers := vs.PendingDepositsFetcher.PendingContainers(ctx, canonicalExecutionDataHeight)
 	if len(allPendingContainers) == 0 {
 		log.Debug("no pending deposits for inclusion in block")
 		return []*qrysmpb.Deposit{}, nil
 	}
 
-	depositTrie, err := vs.depositTrie(ctx, canonicalExecutionNodeData, canonicalExecutionNodeDataHeight)
+	depositTrie, err := vs.depositTrie(ctx, canonicalExecutionData, canonicalExecutionDataHeight)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not retrieve deposit trie")
 	}
@@ -107,7 +107,7 @@ func (vs *Server) deposits(
 	// deposits are sorted from lowest to highest.
 	var pendingDeps []*qrysmpb.DepositContainer
 	for _, dep := range allPendingContainers {
-		if uint64(dep.Index) >= beaconState.Eth1DepositIndex() && uint64(dep.Index) < canonicalExecutionNodeData.DepositCount {
+		if uint64(dep.Index) >= beaconState.ExecutionDepositIndex() && uint64(dep.Index) < canonicalExecutionData.DepositCount {
 			pendingDeps = append(pendingDeps, dep)
 		}
 		// Don't try to pack more than the max allowed in a block
@@ -130,7 +130,7 @@ func (vs *Server) deposits(
 	return pendingDeposits, nil
 }
 
-func (vs *Server) depositTrie(ctx context.Context, canonicalExecutionNodeData *qrysmpb.ExecutionNodeData, canonicalExecutionNodeDataHeight *big.Int) (cache.MerkleTree, error) {
+func (vs *Server) depositTrie(ctx context.Context, canonicalExecutionData *qrysmpb.ExecutionData, canonicalExecutionDataHeight *big.Int) (cache.MerkleTree, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.depositTrie")
 	defer span.End()
 
@@ -141,17 +141,17 @@ func (vs *Server) depositTrie(ctx context.Context, canonicalExecutionNodeData *q
 		return nil, err
 	}
 	depositTrie = finalizedDeposits.Deposits()
-	upToExecutionNodeDataDeposits := vs.DepositFetcher.NonFinalizedDeposits(ctx, finalizedDeposits.MerkleTrieIndex(), canonicalExecutionNodeDataHeight)
+	upToExecutionDataDeposits := vs.DepositFetcher.NonFinalizedDeposits(ctx, finalizedDeposits.MerkleTrieIndex(), canonicalExecutionDataHeight)
 	insertIndex := finalizedDeposits.MerkleTrieIndex() + 1
 
-	if shouldRebuildTrie(canonicalExecutionNodeData.DepositCount, uint64(len(upToExecutionNodeDataDeposits))) {
+	if shouldRebuildTrie(canonicalExecutionData.DepositCount, uint64(len(upToExecutionDataDeposits))) {
 		log.WithFields(logrus.Fields{
-			"unfinalized deposits": len(upToExecutionNodeDataDeposits),
-			"total deposit count":  canonicalExecutionNodeData.DepositCount,
+			"unfinalized deposits": len(upToExecutionDataDeposits),
+			"total deposit count":  canonicalExecutionData.DepositCount,
 		}).Warn("Too many unfinalized deposits, building a deposit trie from scratch.")
-		return vs.rebuildDepositTrie(ctx, canonicalExecutionNodeData, canonicalExecutionNodeDataHeight)
+		return vs.rebuildDepositTrie(ctx, canonicalExecutionData, canonicalExecutionDataHeight)
 	}
-	for _, dep := range upToExecutionNodeDataDeposits {
+	for _, dep := range upToExecutionDataDeposits {
 		depHash, err := dep.Data.HashTreeRoot()
 		if err != nil {
 			return nil, errors.Wrap(err, "could not hash deposit data")
@@ -161,23 +161,23 @@ func (vs *Server) depositTrie(ctx context.Context, canonicalExecutionNodeData *q
 		}
 		insertIndex++
 	}
-	valid, err := validateDepositTrie(depositTrie, canonicalExecutionNodeData)
+	valid, err := validateDepositTrie(depositTrie, canonicalExecutionData)
 	// Log a warning here, as the cached trie is invalid.
 	if !valid {
 		log.WithError(err).Warn("Cached deposit trie is invalid, rebuilding it now")
-		return vs.rebuildDepositTrie(ctx, canonicalExecutionNodeData, canonicalExecutionNodeDataHeight)
+		return vs.rebuildDepositTrie(ctx, canonicalExecutionData, canonicalExecutionDataHeight)
 	}
 
 	return depositTrie, nil
 }
 
 // rebuilds our deposit trie by recreating it from all processed deposits till
-// specified eth1 block height.
-func (vs *Server) rebuildDepositTrie(ctx context.Context, canonicalExecutionNodeData *qrysmpb.ExecutionNodeData, canonicalExecutionNodeDataHeight *big.Int) (cache.MerkleTree, error) {
+// specified execution block height.
+func (vs *Server) rebuildDepositTrie(ctx context.Context, canonicalExecutionData *qrysmpb.ExecutionData, canonicalExecutionDataHeight *big.Int) (cache.MerkleTree, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.rebuildDepositTrie")
 	defer span.End()
 
-	deposits := vs.DepositFetcher.AllDeposits(ctx, canonicalExecutionNodeDataHeight)
+	deposits := vs.DepositFetcher.AllDeposits(ctx, canonicalExecutionDataHeight)
 	trieItems := make([][]byte, 0, len(deposits))
 	for _, dep := range deposits {
 		depHash, err := dep.Data.HashTreeRoot()
@@ -191,7 +191,7 @@ func (vs *Server) rebuildDepositTrie(ctx context.Context, canonicalExecutionNode
 		return nil, err
 	}
 
-	valid, err := validateDepositTrie(depositTrie, canonicalExecutionNodeData)
+	valid, err := validateDepositTrie(depositTrie, canonicalExecutionData)
 	// Log an error here, as even with rebuilding the trie, it is still invalid.
 	if !valid {
 		log.WithError(err).Error("Rebuilt deposit trie is invalid")
@@ -199,20 +199,20 @@ func (vs *Server) rebuildDepositTrie(ctx context.Context, canonicalExecutionNode
 	return depositTrie, nil
 }
 
-// validate that the provided deposit trie matches up with the canonical eth1 data provided.
-func validateDepositTrie(trie cache.MerkleTree, canonicalExecutionNodeData *qrysmpb.ExecutionNodeData) (bool, error) {
-	if trie == nil || canonicalExecutionNodeData == nil {
-		return false, errors.New("nil trie or executionNodeData provided")
+// validate that the provided deposit trie matches up with the canonical execution data provided.
+func validateDepositTrie(trie cache.MerkleTree, canonicalExecutionData *qrysmpb.ExecutionData) (bool, error) {
+	if trie == nil || canonicalExecutionData == nil {
+		return false, errors.New("nil trie or executionData provided")
 	}
-	if trie.NumOfItems() != int(canonicalExecutionNodeData.DepositCount) {
-		return false, errors.Errorf("wanted the canonical count of %d but received %d", canonicalExecutionNodeData.DepositCount, trie.NumOfItems())
+	if trie.NumOfItems() != int(canonicalExecutionData.DepositCount) {
+		return false, errors.Errorf("wanted the canonical count of %d but received %d", canonicalExecutionData.DepositCount, trie.NumOfItems())
 	}
 	rt, err := trie.HashTreeRoot()
 	if err != nil {
 		return false, err
 	}
-	if !bytes.Equal(rt[:], canonicalExecutionNodeData.DepositRoot) {
-		return false, errors.Errorf("wanted the canonical deposit root of %#x but received %#x", canonicalExecutionNodeData.DepositRoot, rt)
+	if !bytes.Equal(rt[:], canonicalExecutionData.DepositRoot) {
+		return false, errors.Errorf("wanted the canonical deposit root of %#x but received %#x", canonicalExecutionData.DepositRoot, rt)
 	}
 	return true, nil
 }
@@ -222,8 +222,8 @@ func constructMerkleProof(trie cache.MerkleTree, index int, deposit *qrysmpb.Dep
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not generate merkle proof for deposit at index %d", index)
 	}
-	// For every deposit, we construct a Merkle proof using the powchain service's
-	// in-memory deposits trie, which is updated only once the state's LatestExecutionNodeData
+	// For every deposit, we construct a Merkle proof using the execution chain service's
+	// in-memory deposits trie, which is updated only once the state's LatestExecutionData
 	// property changes during a state transition after a voting period.
 	deposit.Proof = proof
 	return deposit, nil

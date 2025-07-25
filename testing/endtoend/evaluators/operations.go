@@ -33,11 +33,11 @@ import (
 var depositValCount = e2e.DepositCount
 var numOfExits = 2
 
-var followDistanceSeconds = params.E2ETestConfig().Eth1FollowDistance * params.E2ETestConfig().SecondsPerETH1Block
+var followDistanceSeconds = params.E2ETestConfig().ExecutionFollowDistance * params.E2ETestConfig().SecondsPerExecutionBlock
 var secondsPerEpoch = params.E2ETestConfig().SecondsPerSlot * uint64(params.E2ETestConfig().SlotsPerEpoch)
 
 // Deposits should be processed in twice the length of the epochs per eth1 voting period.
-var depositsInBlockStart = primitives.Epoch(2*followDistanceSeconds/secondsPerEpoch) + params.E2ETestConfig().EpochsPerEth1VotingPeriod*2
+var depositsInBlockStart = primitives.Epoch(2*followDistanceSeconds/secondsPerEpoch) + params.E2ETestConfig().EpochsPerExecutionVotingPeriod*2
 
 // deposits included + finalization + MaxSeedLookahead for activation.
 var depositActivationStartEpoch = depositsInBlockStart + 2 + params.E2ETestConfig().MaxSeedLookahead
@@ -113,7 +113,7 @@ var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 	Evaluation: validatorsAreWithdrawn,
 }
 
-// ValidatorsVoteWithTheMajority verifies whether validator vote for executionNodeData using the majority algorithm.
+// ValidatorsVoteWithTheMajority verifies whether validator vote for executionData using the majority algorithm.
 var ValidatorsVoteWithTheMajority = e2etypes.Evaluator{
 	Name:       "validators_vote_with_the_majority_%d",
 	Policy:     policies.AfterNthEpoch(0),
@@ -477,7 +477,7 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 		return errors.Wrap(err, "failed to get blocks from beacon-chain")
 	}
 
-	slotsPerVotingPeriod := params.E2ETestConfig().SlotsPerEpoch.Mul(uint64(params.E2ETestConfig().EpochsPerEth1VotingPeriod))
+	slotsPerVotingPeriod := params.E2ETestConfig().SlotsPerEpoch.Mul(uint64(params.E2ETestConfig().EpochsPerExecutionVotingPeriod))
 	for _, blk := range blks.BlockContainers {
 		var slot primitives.Slot
 		var vote []byte
@@ -485,11 +485,11 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 		case *qrysmpb.BeaconBlockContainer_CapellaBlock:
 			b := blk.GetCapellaBlock().Block
 			slot = b.Slot
-			vote = b.Body.ExecutionNodeData.BlockHash
+			vote = b.Body.ExecutionData.BlockHash
 		case *qrysmpb.BeaconBlockContainer_BlindedCapellaBlock:
 			b := blk.GetBlindedCapellaBlock().Block
 			slot = b.Slot
-			vote = b.Body.ExecutionNodeData.BlockHash
+			vote = b.Body.ExecutionData.BlockHash
 		default:
 			return errors.New("invalid block type")
 		}
@@ -509,11 +509,11 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 			isFirstSlotInVotingPeriod = slot%slotsPerVotingPeriod == 0
 		}
 		if isFirstSlotInVotingPeriod {
-			ec.ExpectedExecutionNodeDataVote = vote
+			ec.ExpectedExecutionDataVote = vote
 			return nil
 		}
 
-		if !bytes.Equal(vote, ec.ExpectedExecutionNodeDataVote) {
+		if !bytes.Equal(vote, ec.ExpectedExecutionDataVote) {
 			for i := primitives.Slot(0); i < slot; i++ {
 				v, ok := ec.SeenVotes[i]
 				if ok {
@@ -522,8 +522,8 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 					fmt.Printf("did not see slot=%d\n", i)
 				}
 			}
-			return fmt.Errorf("incorrect executionNodeData vote for slot %d; expected: %#x vs voted: %#x",
-				slot, ec.ExpectedExecutionNodeDataVote, vote)
+			return fmt.Errorf("incorrect executionData vote for slot %d; expected: %#x vs voted: %#x",
+				slot, ec.ExpectedExecutionDataVote, vote)
 		}
 	}
 	return nil

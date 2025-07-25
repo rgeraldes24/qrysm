@@ -52,14 +52,14 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 	require.NoError(t, err)
 	mockTrie, err := trie.NewTrie(0)
 	require.NoError(t, err)
-	err = beaconDB.SaveExecutionChainData(ctx, &qrysmpb.ETH1ChainData{
+	err = beaconDB.SaveExecutionChainData(ctx, &qrysmpb.ExecutionChainData{
 		BeaconState: pbState,
 		Trie:        mockTrie.ToProto(),
-		CurrentExecutionNodeData: &qrysmpb.LatestExecutionNodeData{
+		CurrentExecutionData: &qrysmpb.LatestExecutionData{
 			BlockHash: make([]byte, 32),
 		},
 		ChainstartData: &qrysmpb.ChainStartData{
-			ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot:  make([]byte, 32),
 				DepositCount: 0,
 				BlockHash:    make([]byte, 32),

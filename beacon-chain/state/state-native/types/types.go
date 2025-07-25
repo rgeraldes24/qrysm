@@ -44,12 +44,12 @@ func (f FieldIndex) String() string {
 		return "stateRoots"
 	case HistoricalRoots:
 		return "historicalRoots"
-	case ExecutionNodeData:
-		return "executionNodeData"
-	case ExecutionNodeDataVotes:
-		return "executionNodeDataVotes"
-	case Eth1DepositIndex:
-		return "eth1DepositIndex"
+	case ExecutionData:
+		return "executionData"
+	case ExecutionDataVotes:
+		return "executionDataVotes"
+	case ExecutionDepositIndex:
+		return "executionDepositIndex"
 	case Validators:
 		return "validators"
 	case Balances:
@@ -109,11 +109,11 @@ func (f FieldIndex) RealPosition() int {
 		return 6
 	case HistoricalRoots:
 		return 7
-	case ExecutionNodeData:
+	case ExecutionData:
 		return 8
-	case ExecutionNodeDataVotes:
+	case ExecutionDataVotes:
 		return 9
-	case Eth1DepositIndex:
+	case ExecutionDepositIndex:
 		return 10
 	case Validators:
 		return 11
@@ -180,9 +180,9 @@ const (
 	BlockRoots
 	StateRoots
 	HistoricalRoots
-	ExecutionNodeData
-	ExecutionNodeDataVotes
-	Eth1DepositIndex
+	ExecutionData
+	ExecutionDataVotes
+	ExecutionDepositIndex
 	Validators
 	Balances
 	RandaoMixes

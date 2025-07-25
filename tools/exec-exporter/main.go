@@ -22,10 +22,10 @@ import (
 )
 
 var (
-	allWatching []*Watching
-	loadSeconds float64
-	totalLoaded int64
-	eth         *qrlclient.Client
+	allWatching   []*Watching
+	loadSeconds   float64
+	totalLoaded   int64
+	executionNode *qrlclient.Client
 )
 
 var (
@@ -94,7 +94,7 @@ type Watching struct {
 // ConnectionToGzond - Connect to remote server.
 func ConnectionToGzond(url string) error {
 	var err error
-	eth, err = qrlclient.Dial(url)
+	executionNode, err = qrlclient.Dial(url)
 	return err
 }
 
@@ -105,16 +105,16 @@ func QRLBalance(address string) *big.Float {
 		fmt.Printf("Error fetching QRL Balance for address: %v\n", address)
 		return nil
 	}
-	balance, err := eth.BalanceAt(context.TODO(), addr, nil)
+	balance, err := executionNode.BalanceAt(context.TODO(), addr, nil)
 	if err != nil {
 		fmt.Printf("Error fetching QRL Balance for address: %v\n", address)
 	}
 	return ToQuanta(balance)
 }
 
-// CurrentBlock in ETH1.
+// CurrentBlock in execution chain.
 func CurrentBlock() uint64 {
-	block, err := eth.BlockByNumber(context.TODO(), nil)
+	block, err := executionNode.BlockByNumber(context.TODO(), nil)
 	if err != nil {
 		fmt.Printf("Error fetching current block height: %v\n", err)
 		return 0

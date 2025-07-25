@@ -19,7 +19,7 @@ Example response
 ```
 Looking back from current epoch 71132 back to 71104                                                                                                           
 Next period starts at epoch 71168 (3h50m1.542950367s)                                                                                                         
-====ExecutionNodeData Voting Report====                                                                                                                                
+====ExecutionData Voting Report====                                                                                                                                
                                                                                                                                                               
 Total votes: 732                                                                                                                                              
                                                                                                                                                               

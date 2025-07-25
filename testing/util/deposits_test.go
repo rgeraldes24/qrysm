@@ -277,7 +277,7 @@ func TestSetupInitialDeposits_1024Entries_PartialDeposits(t *testing.T) {
 func TestDepositTrieFromDeposits(t *testing.T) {
 	deposits, _, err := DeterministicDepositsAndKeys(100)
 	require.NoError(t, err)
-	executionNodeData, err := DeterministicExecutionNodeData(len(deposits))
+	executionData, err := DeterministicExecutionData(len(deposits))
 	require.NoError(t, err)
 
 	depositTrie, _, err := DepositTrieFromDeposits(deposits)
@@ -287,7 +287,7 @@ func TestDepositTrieFromDeposits(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !bytes.Equal(root[:], executionNodeData.DepositRoot) {
-		t.Fatal("expected deposit trie root to equal executionNodeData deposit root")
+	if !bytes.Equal(root[:], executionData.DepositRoot) {
+		t.Fatal("expected deposit trie root to equal executionData deposit root")
 	}
 }

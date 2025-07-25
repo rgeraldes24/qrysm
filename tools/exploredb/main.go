@@ -343,10 +343,10 @@ func printStates(stateC <-chan *modifiedState, doneC chan<- bool) {
 			size, count = sizeAndCountOfByteList(roots)
 			log.Infof("historical_roots              : size = %s, count = %d", humanize.Bytes(size), count)
 		}
-		log.Infof("eth1_data                     : sizeSSZ = %s", humanize.Bytes(uint64(st.ExecutionNodeData().SizeSSZ())))
-		size, count = sizeAndCountGeneric(st.ExecutionNodeDataVotes(), nil)
-		log.Infof("eth1_data_votes               : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
-		log.Infof("eth1_deposit_index            : %d", st.Eth1DepositIndex())
+		log.Infof("execution_data          : sizeSSZ = %s", humanize.Bytes(uint64(st.ExecutionData().SizeSSZ())))
+		size, count = sizeAndCountGeneric(st.ExecutionDataVotes(), nil)
+		log.Infof("execution_data_votes    : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
+		log.Infof("execution_deposit_index            : %d", st.ExecutionDepositIndex())
 		size, count = sizeAndCountGeneric(st.Validators(), nil)
 		log.Infof("validators                    : sizeSSZ = %s, count = %d", humanize.Bytes(size), count)
 		size, count = sizeAndCountOfUin64List(st.Balances())
@@ -521,7 +521,7 @@ func sizeAndCountGeneric(genericItems interface{}, err error) (uint64, uint64) {
 	}
 
 	switch items := genericItems.(type) {
-	case []*qrysmpb.ExecutionNodeData:
+	case []*qrysmpb.ExecutionData:
 		for _, item := range items {
 			size += uint64(item.SizeSSZ())
 		}

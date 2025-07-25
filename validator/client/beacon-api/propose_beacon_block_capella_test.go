@@ -38,7 +38,7 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 				Attestations:      jsonifyAttestations(capellaBlock.Capella.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(capellaBlock.Capella.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(capellaBlock.Capella.Block.Body.Deposits),
-				ExecutionNodeData: jsonifyExecutionNodeData(capellaBlock.Capella.Block.Body.ExecutionNodeData),
+				ExecutionData:     jsonifyExecutionData(capellaBlock.Capella.Block.Body.ExecutionData),
 				Graffiti:          hexutil.Encode(capellaBlock.Capella.Block.Body.Graffiti),
 				ProposerSlashings: jsonifyProposerSlashings(capellaBlock.Capella.Block.Body.ProposerSlashings),
 				RandaoReveal:      hexutil.Encode(capellaBlock.Capella.Block.Body.RandaoReveal),

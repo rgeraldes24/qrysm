@@ -193,24 +193,24 @@ func generateAttesterSlashings(
 	return attesterSlashings, nil
 }
 
-func generateDepositsAndExecutionNodeData(
+func generateDepositsAndExecutionData(
 	bState state.BeaconState,
 	numDeposits uint64,
 ) (
 	[]*qrysmpb.Deposit,
-	*qrysmpb.ExecutionNodeData,
+	*qrysmpb.ExecutionData,
 	error,
 ) {
-	previousDepsLen := bState.Eth1DepositIndex()
+	previousDepsLen := bState.ExecutionDepositIndex()
 	currentDeposits, _, err := DeterministicDepositsAndKeys(previousDepsLen + numDeposits)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not get deposits")
 	}
-	executionNodeData, err := DeterministicExecutionNodeData(len(currentDeposits))
+	executionData, err := DeterministicExecutionData(len(currentDeposits))
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not get executionNodeData")
+		return nil, nil, errors.Wrap(err, "could not get executionData")
 	}
-	return currentDeposits[previousDepsLen:], executionNodeData, nil
+	return currentDeposits[previousDepsLen:], executionData, nil
 }
 
 func GenerateVoluntaryExits(bState state.BeaconState, k dilithium.DilithiumKey, idx primitives.ValidatorIndex) (*qrysmpb.SignedVoluntaryExit, error) {
@@ -338,8 +338,8 @@ func HydrateBeaconBlockBodyCapella(b *qrysmpb.BeaconBlockBodyCapella) *qrysmpb.B
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = &qrysmpb.ExecutionNodeData{
+	if b.ExecutionData == nil {
+		b.ExecutionData = &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}
@@ -431,8 +431,8 @@ func HydrateBlindedBeaconBlockBodyCapella(b *qrysmpb.BlindedBeaconBlockBodyCapel
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)
 	}
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = &qrysmpb.ExecutionNodeData{
+	if b.ExecutionData == nil {
+		b.ExecutionData = &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		}
@@ -524,8 +524,8 @@ func HydrateV1BlindedBeaconBlockBodyCapella(b *v1.BlindedBeaconBlockBodyCapella)
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)
 	}
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = &v1.ExecutionNodeData{
+	if b.ExecutionData == nil {
+		b.ExecutionData = &v1.ExecutionData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		}
@@ -591,8 +591,8 @@ func HydrateV1CapellaBeaconBlockBody(b *v1.BeaconBlockBodyCapella) *v1.BeaconBlo
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = &v1.ExecutionNodeData{
+	if b.ExecutionData == nil {
+		b.ExecutionData = &v1.ExecutionData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}

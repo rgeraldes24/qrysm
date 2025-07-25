@@ -25,7 +25,7 @@ func NewGenesisBlock(stateRoot []byte) *qrysmpb.SignedBeaconBlockCapella {
 			StateRoot:  bytesutil.PadTo(stateRoot, 32),
 			Body: &qrysmpb.BeaconBlockBodyCapella{
 				RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
-				ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+				ExecutionData: &qrysmpb.ExecutionData{
 					DepositRoot: make([]byte, 32),
 					BlockHash:   make([]byte, 32),
 				},
@@ -66,7 +66,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 				StateRoot:  root[:],
 				Body: &qrysmpb.BeaconBlockBodyCapella{
 					RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
-					ExecutionNodeData: &qrysmpb.ExecutionNodeData{
+					ExecutionData: &qrysmpb.ExecutionData{
 						DepositRoot: make([]byte, 32),
 						BlockHash:   make([]byte, 32),
 					},

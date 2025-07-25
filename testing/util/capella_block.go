@@ -73,9 +73,9 @@ func GenerateFullBlockCapella(
 
 	numToGen = conf.NumDeposits
 	var newDeposits []*qrysmpb.Deposit
-	executionNodeData := bState.ExecutionNodeData()
+	executionData := bState.ExecutionData()
 	if numToGen > 0 {
-		newDeposits, executionNodeData, err = generateDepositsAndExecutionNodeData(bState, numToGen)
+		newDeposits, executionData, err = generateDepositsAndExecutionData(bState, numToGen)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed generating %d deposits:", numToGen)
 		}
@@ -197,7 +197,7 @@ func GenerateFullBlockCapella(
 		ParentRoot:    parentRoot[:],
 		ProposerIndex: idx,
 		Body: &qrysmpb.BeaconBlockBodyCapella{
-			ExecutionNodeData:           executionNodeData,
+			ExecutionData:               executionData,
 			RandaoReveal:                reveal,
 			ProposerSlashings:           pSlashings,
 			AttesterSlashings:           aSlashings,

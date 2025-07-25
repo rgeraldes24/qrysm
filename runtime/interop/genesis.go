@@ -64,7 +64,7 @@ var DefaultDepositContractStorage = map[string]string{
 var bigz = big.NewInt(0)
 var testAccountBalance = big.NewInt(0)
 
-// GzondTestnetGenesis creates a genesis.json for eth1 clients with a set of defaults suitable for ephemeral testnets,
+// GzondTestnetGenesis creates a genesis.json for execution clients with a set of defaults suitable for ephemeral testnets,
 // like in an e2e test. The parameters are minimal but the full value is returned unmarshaled so that it can be
 // customized as desired.
 func GzondTestnetGenesis(genesisTime uint64, cfg *clparams.BeaconChainConfig) *core.Genesis {

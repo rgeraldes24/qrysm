@@ -239,20 +239,20 @@ func TestGenesisValidatorsRoot_CanRetrieve(t *testing.T) {
 	assert.Equal(t, [32]byte{'a'}, c.GenesisValidatorsRoot(), "Did not get correct genesis validators root")
 }
 
-func TestHeadExecutionNodeData_Nil(t *testing.T) {
+func TestHeadExecutionData_Nil(t *testing.T) {
 	beaconDB := testDB.SetupDB(t)
 	c := setupBeaconChain(t, beaconDB)
-	assert.DeepEqual(t, &qrysmpb.ExecutionNodeData{}, c.HeadExecutionNodeData(), "Incorrect pre chain start value")
+	assert.DeepEqual(t, &qrysmpb.ExecutionData{}, c.HeadExecutionData(), "Incorrect pre chain start value")
 }
 
-func TestHeadExecutionNodeData_CanRetrieve(t *testing.T) {
-	d := &qrysmpb.ExecutionNodeData{DepositCount: 999}
-	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{ExecutionNodeData: d})
+func TestHeadExecutionData_CanRetrieve(t *testing.T) {
+	d := &qrysmpb.ExecutionData{DepositCount: 999}
+	s, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{ExecutionData: d})
 	require.NoError(t, err)
 	c := &Service{}
 	c.head = &head{state: s}
-	if !proto.Equal(c.HeadExecutionNodeData(), d) {
-		t.Error("Received incorrect eth1 data")
+	if !proto.Equal(c.HeadExecutionData(), d) {
+		t.Error("Received incorrect execution data")
 	}
 }
 

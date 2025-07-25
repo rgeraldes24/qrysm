@@ -232,8 +232,8 @@ func DepositTrieSubset(sparseTrie *trie.SparseMerkleTrie, size int) (*trie.Spars
 	return depositTrie, roots, nil
 }
 
-// DeterministicExecutionNodeData takes an array of deposits and returns the executionNodeData made from the deposit trie.
-func DeterministicExecutionNodeData(size int) (*qrysmpb.ExecutionNodeData, error) {
+// DeterministicExecutionData takes an array of deposits and returns the executionData made from the deposit trie.
+func DeterministicExecutionData(size int) (*qrysmpb.ExecutionData, error) {
 	depositTrie, _, err := DeterministicDepositTrie(size)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create trie")
@@ -242,12 +242,12 @@ func DeterministicExecutionNodeData(size int) (*qrysmpb.ExecutionNodeData, error
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to compute deposit trie root")
 	}
-	executionNodeData := &qrysmpb.ExecutionNodeData{
+	executionData := &qrysmpb.ExecutionData{
 		BlockHash:    root[:],
 		DepositRoot:  root[:],
 		DepositCount: uint64(size),
 	}
-	return executionNodeData, nil
+	return executionData, nil
 }
 
 // DepositTrieFromDeposits takes an array of deposits and returns the deposit trie.

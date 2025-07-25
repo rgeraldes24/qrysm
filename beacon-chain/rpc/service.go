@@ -317,17 +317,17 @@ func (s *Service) Start() {
 	s.cfg.Router.HandleFunc("/qrl/v3/validator/blocks/{slot}", validatorServerV1.ProduceBlockV3).Methods(http.MethodGet)
 
 	nodeServer := &nodev1alpha1.Server{
-		LogsStreamer:         logs.NewStreamServer(),
-		BeaconDB:             s.cfg.BeaconDB,
-		Server:               s.grpcServer,
-		SyncChecker:          s.cfg.SyncService,
-		GenesisTimeFetcher:   s.cfg.GenesisTimeFetcher,
-		PeersFetcher:         s.cfg.PeersFetcher,
-		PeerManager:          s.cfg.PeerManager,
-		GenesisFetcher:       s.cfg.GenesisFetcher,
-		POWChainInfoFetcher:  s.cfg.ExecutionChainInfoFetcher,
-		BeaconMonitoringHost: s.cfg.BeaconMonitoringHost,
-		BeaconMonitoringPort: s.cfg.BeaconMonitoringPort,
+		LogsStreamer:              logs.NewStreamServer(),
+		BeaconDB:                  s.cfg.BeaconDB,
+		Server:                    s.grpcServer,
+		SyncChecker:               s.cfg.SyncService,
+		GenesisTimeFetcher:        s.cfg.GenesisTimeFetcher,
+		PeersFetcher:              s.cfg.PeersFetcher,
+		PeerManager:               s.cfg.PeerManager,
+		GenesisFetcher:            s.cfg.GenesisFetcher,
+		ExecutionChainInfoFetcher: s.cfg.ExecutionChainInfoFetcher,
+		BeaconMonitoringHost:      s.cfg.BeaconMonitoringHost,
+		BeaconMonitoringPort:      s.cfg.BeaconMonitoringPort,
 	}
 	nodeServerQRL := &node.Server{
 		BeaconDB:                  s.cfg.BeaconDB,

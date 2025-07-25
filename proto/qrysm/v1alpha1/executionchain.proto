@@ -8,14 +8,14 @@ import "proto/qrysm/v1alpha1/beacon_state.proto";
 option csharp_namespace = "TheQRL.QRL.V1alpha1";
 option go_package = "github.com/theQRL/qrysm/proto/qrysm/v1alpha1;qrl";
 option java_multiple_files = true;
-option java_outer_classname = "PowchainProto";
+option java_outer_classname = "ExecutionChainProto";
 option java_package = "org.theqrl.qrl.v1alpha1";
 option php_namespace = "TheQRL\\QRL\\v1alpha1";
 
-// ETH1ChainData is a container which holds all the relevant eth1
+// ExecutionChainData is a container which holds all the relevant execution
 // information
-message ETH1ChainData {
-    LatestExecutionNodeData current_eth1_data = 1 ;
+message ExecutionChainData {
+    LatestExecutionData current_execution_data = 1 ;
     ChainStartData chainstart_data = 2;
     BeaconStateCapella beacon_state = 3;
     SparseMerkleTrie trie = 4;
@@ -31,8 +31,8 @@ message DepositSnapshot {
     bytes execution_hash = 4;
     uint64 execution_depth = 5;
 }
-// LatestExecutionNodeData contains the current state of the eth1 chain.
-message LatestExecutionNodeData {
+// LatestExecutionData contains the current state of the execution chain.
+message LatestExecutionData {
     uint64 block_height = 1;
     uint64 block_time = 2;
     bytes block_hash = 3;
@@ -41,9 +41,9 @@ message LatestExecutionNodeData {
 
 // ChainStartData contains all the information related to chainstart.
 message ChainStartData {
-    uint64 genesis_time = 2;
-    uint64 genesis_block = 3;
-    ExecutionNodeData eth1_data = 4;
+    uint64 genesis_time = 1;
+    uint64 genesis_block = 2;
+    ExecutionData execution_data = 3;
 }
 
 // SparseMerkleTrie is used to describe the model of our deposit trie.

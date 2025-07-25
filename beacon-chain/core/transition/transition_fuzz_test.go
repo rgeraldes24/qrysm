@@ -167,7 +167,7 @@ func TestFuzzProcessBlockForStateRoot_1000(t *testing.T) {
 	for i := 0; i < 1000; i++ {
 		fuzzer.Fuzz(state)
 		fuzzer.Fuzz(sb)
-		if sb.Block == nil || sb.Block.Body == nil || sb.Block.Body.ExecutionNodeData == nil {
+		if sb.Block == nil || sb.Block.Body == nil || sb.Block.Body.ExecutionData == nil {
 			continue
 		}
 		wsb, err := blocks.NewSignedBeaconBlock(sb)

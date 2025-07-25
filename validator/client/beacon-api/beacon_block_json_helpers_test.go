@@ -67,20 +67,20 @@ func TestBeaconBlockJsonHelpers_JsonifyDilithiumToExecutionChanges(t *testing.T)
 	assert.DeepEqual(t, expectedResult, result)
 }
 
-func TestBeaconBlockJsonHelpers_JsonifyExecutionNodeData(t *testing.T) {
-	input := &qrysmpb.ExecutionNodeData{
+func TestBeaconBlockJsonHelpers_JsonifyExecutionData(t *testing.T) {
+	input := &qrysmpb.ExecutionData{
 		DepositRoot:  []byte{1},
 		DepositCount: 2,
 		BlockHash:    []byte{3},
 	}
 
-	expectedResult := &apimiddleware.ExecutionNodeDataJson{
+	expectedResult := &apimiddleware.ExecutionDataJson{
 		DepositRoot:  hexutil.Encode([]byte{1}),
 		DepositCount: "2",
 		BlockHash:    hexutil.Encode([]byte{3}),
 	}
 
-	result := jsonifyExecutionNodeData(input)
+	result := jsonifyExecutionData(input)
 	assert.DeepEqual(t, expectedResult, result)
 }
 

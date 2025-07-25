@@ -48,7 +48,7 @@ type ChainService struct {
 	Balance                     *precompute.Balance
 	CanonicalRoots              map[[32]byte]bool
 	Fork                        *qrysmpb.Fork
-	ExecutionNodeData           *qrysmpb.ExecutionNodeData
+	ExecutionData               *qrysmpb.ExecutionData
 	InitSyncBlockRoots          map[[32]byte]bool
 	DB                          db.Database
 	State                       state.BeaconState
@@ -335,9 +335,9 @@ func (s *ChainService) HeadValidatorsIndices(ctx context.Context, epoch primitiv
 	return helpers.ActiveValidatorIndices(ctx, s.State, epoch)
 }
 
-// HeadExecutionNodeData provides the current ExecutionNodeData of the head state.
-func (s *ChainService) HeadExecutionNodeData() *qrysmpb.ExecutionNodeData {
-	return s.ExecutionNodeData
+// HeadExecutionData provides the current ExecutionData of the head state.
+func (s *ChainService) HeadExecutionData() *qrysmpb.ExecutionData {
+	return s.ExecutionData
 }
 
 // GenesisTime mocks the same method in the chain service.

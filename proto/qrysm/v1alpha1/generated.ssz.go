@@ -1103,13 +1103,13 @@ func (s *SignedVoluntaryExit) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	return
 }
 
-// MarshalSSZ ssz marshals the ExecutionNodeData object
-func (e *ExecutionNodeData) MarshalSSZ() ([]byte, error) {
+// MarshalSSZ ssz marshals the ExecutionData object
+func (e *ExecutionData) MarshalSSZ() ([]byte, error) {
 	return ssz.MarshalSSZ(e)
 }
 
-// MarshalSSZTo ssz marshals the ExecutionNodeData object to a target array
-func (e *ExecutionNodeData) MarshalSSZTo(buf []byte) (dst []byte, err error) {
+// MarshalSSZTo ssz marshals the ExecutionData object to a target array
+func (e *ExecutionData) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = buf
 
 	// Field (0) 'DepositRoot'
@@ -1132,8 +1132,8 @@ func (e *ExecutionNodeData) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	return
 }
 
-// UnmarshalSSZ ssz unmarshals the ExecutionNodeData object
-func (e *ExecutionNodeData) UnmarshalSSZ(buf []byte) error {
+// UnmarshalSSZ ssz unmarshals the ExecutionData object
+func (e *ExecutionData) UnmarshalSSZ(buf []byte) error {
 	var err error
 	size := uint64(len(buf))
 	if size != 72 {
@@ -1158,19 +1158,19 @@ func (e *ExecutionNodeData) UnmarshalSSZ(buf []byte) error {
 	return err
 }
 
-// SizeSSZ returns the ssz encoded size in bytes for the ExecutionNodeData object
-func (e *ExecutionNodeData) SizeSSZ() (size int) {
+// SizeSSZ returns the ssz encoded size in bytes for the ExecutionData object
+func (e *ExecutionData) SizeSSZ() (size int) {
 	size = 72
 	return
 }
 
-// HashTreeRoot ssz hashes the ExecutionNodeData object
-func (e *ExecutionNodeData) HashTreeRoot() ([32]byte, error) {
+// HashTreeRoot ssz hashes the ExecutionData object
+func (e *ExecutionData) HashTreeRoot() ([32]byte, error) {
 	return ssz.HashWithDefaultHasher(e)
 }
 
-// HashTreeRootWith ssz hashes the ExecutionNodeData object with a hasher
-func (e *ExecutionNodeData) HashTreeRootWith(hh *ssz.Hasher) (err error) {
+// HashTreeRootWith ssz hashes the ExecutionData object with a hasher
+func (e *ExecutionData) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	indx := hh.Index()
 
 	// Field (0) 'DepositRoot'
@@ -2021,11 +2021,11 @@ func (b *BeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, err error
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'ExecutionNodeData'
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = new(ExecutionNodeData)
+	// Field (1) 'ExecutionData'
+	if b.ExecutionData == nil {
+		b.ExecutionData = new(ExecutionData)
 	}
-	if dst, err = b.ExecutionNodeData.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ExecutionData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -2190,11 +2190,11 @@ func (b *BeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:4595]...)
 
-	// Field (1) 'ExecutionNodeData'
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = new(ExecutionNodeData)
+	// Field (1) 'ExecutionData'
+	if b.ExecutionData == nil {
+		b.ExecutionData = new(ExecutionData)
 	}
-	if err = b.ExecutionNodeData.UnmarshalSSZ(buf[4595:4667]); err != nil {
+	if err = b.ExecutionData.UnmarshalSSZ(buf[4595:4667]); err != nil {
 		return err
 	}
 
@@ -2447,8 +2447,8 @@ func (b *BeaconBlockBodyCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'ExecutionNodeData'
-	if err = b.ExecutionNodeData.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ExecutionData'
+	if err = b.ExecutionData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 
@@ -2878,11 +2878,11 @@ func (b *BlindedBeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, er
 	}
 	dst = append(dst, b.RandaoReveal...)
 
-	// Field (1) 'ExecutionNodeData'
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = new(ExecutionNodeData)
+	// Field (1) 'ExecutionData'
+	if b.ExecutionData == nil {
+		b.ExecutionData = new(ExecutionData)
 	}
-	if dst, err = b.ExecutionNodeData.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ExecutionData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
@@ -3047,11 +3047,11 @@ func (b *BlindedBeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 	}
 	b.RandaoReveal = append(b.RandaoReveal, buf[0:4595]...)
 
-	// Field (1) 'ExecutionNodeData'
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = new(ExecutionNodeData)
+	// Field (1) 'ExecutionData'
+	if b.ExecutionData == nil {
+		b.ExecutionData = new(ExecutionData)
 	}
-	if err = b.ExecutionNodeData.UnmarshalSSZ(buf[4595:4667]); err != nil {
+	if err = b.ExecutionData.UnmarshalSSZ(buf[4595:4667]); err != nil {
 		return err
 	}
 
@@ -3304,8 +3304,8 @@ func (b *BlindedBeaconBlockBodyCapella) HashTreeRootWith(hh *ssz.Hasher) (err er
 	}
 	hh.PutBytes(b.RandaoReveal)
 
-	// Field (1) 'ExecutionNodeData'
-	if err = b.ExecutionNodeData.HashTreeRootWith(hh); err != nil {
+	// Field (1) 'ExecutionData'
+	if err = b.ExecutionData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 
@@ -4612,20 +4612,20 @@ func (b *BeaconStateCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 	dst = ssz.WriteOffset(dst, offset)
 	offset += len(b.HistoricalRoots) * 32
 
-	// Field (8) 'ExecutionNodeData'
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = new(ExecutionNodeData)
+	// Field (8) 'ExecutionData'
+	if b.ExecutionData == nil {
+		b.ExecutionData = new(ExecutionData)
 	}
-	if dst, err = b.ExecutionNodeData.MarshalSSZTo(dst); err != nil {
+	if dst, err = b.ExecutionData.MarshalSSZTo(dst); err != nil {
 		return
 	}
 
-	// Offset (9) 'ExecutionNodeDataVotes'
+	// Offset (9) 'ExecutionDataVotes'
 	dst = ssz.WriteOffset(dst, offset)
-	offset += len(b.ExecutionNodeDataVotes) * 72
+	offset += len(b.ExecutionDataVotes) * 72
 
-	// Field (10) 'Eth1DepositIndex'
-	dst = ssz.MarshalUint64(dst, b.Eth1DepositIndex)
+	// Field (10) 'ExecutionDepositIndex'
+	dst = ssz.MarshalUint64(dst, b.ExecutionDepositIndex)
 
 	// Offset (11) 'Validators'
 	dst = ssz.WriteOffset(dst, offset)
@@ -4746,13 +4746,13 @@ func (b *BeaconStateCapella) MarshalSSZTo(buf []byte) (dst []byte, err error) {
 		dst = append(dst, b.HistoricalRoots[ii]...)
 	}
 
-	// Field (9) 'ExecutionNodeDataVotes'
-	if size := len(b.ExecutionNodeDataVotes); size > 256 {
-		err = ssz.ErrListTooBigFn("--.ExecutionNodeDataVotes", size, 256)
+	// Field (9) 'ExecutionDataVotes'
+	if size := len(b.ExecutionDataVotes); size > 256 {
+		err = ssz.ErrListTooBigFn("--.ExecutionDataVotes", size, 256)
 		return
 	}
-	for ii := 0; ii < len(b.ExecutionNodeDataVotes); ii++ {
-		if dst, err = b.ExecutionNodeDataVotes[ii].MarshalSSZTo(dst); err != nil {
+	for ii := 0; ii < len(b.ExecutionDataVotes); ii++ {
+		if dst, err = b.ExecutionDataVotes[ii].MarshalSSZTo(dst); err != nil {
 			return
 		}
 	}
@@ -4885,21 +4885,21 @@ func (b *BeaconStateCapella) UnmarshalSSZ(buf []byte) error {
 		return ssz.ErrInvalidVariableOffset
 	}
 
-	// Field (8) 'ExecutionNodeData'
-	if b.ExecutionNodeData == nil {
-		b.ExecutionNodeData = new(ExecutionNodeData)
+	// Field (8) 'ExecutionData'
+	if b.ExecutionData == nil {
+		b.ExecutionData = new(ExecutionData)
 	}
-	if err = b.ExecutionNodeData.UnmarshalSSZ(buf[65716:65788]); err != nil {
+	if err = b.ExecutionData.UnmarshalSSZ(buf[65716:65788]); err != nil {
 		return err
 	}
 
-	// Offset (9) 'ExecutionNodeDataVotes'
+	// Offset (9) 'ExecutionDataVotes'
 	if o9 = ssz.ReadOffset(buf[65788:65792]); o9 > size || o7 > o9 {
 		return ssz.ErrOffset
 	}
 
-	// Field (10) 'Eth1DepositIndex'
-	b.Eth1DepositIndex = ssz.UnmarshallUint64(buf[65792:65800])
+	// Field (10) 'ExecutionDepositIndex'
+	b.ExecutionDepositIndex = ssz.UnmarshallUint64(buf[65792:65800])
 
 	// Offset (11) 'Validators'
 	if o11 = ssz.ReadOffset(buf[65800:65804]); o11 > size || o9 > o11 {
@@ -5019,19 +5019,19 @@ func (b *BeaconStateCapella) UnmarshalSSZ(buf []byte) error {
 		}
 	}
 
-	// Field (9) 'ExecutionNodeDataVotes'
+	// Field (9) 'ExecutionDataVotes'
 	{
 		buf = tail[o9:o11]
 		num, err := ssz.DivideInt2(len(buf), 72, 256)
 		if err != nil {
 			return err
 		}
-		b.ExecutionNodeDataVotes = make([]*ExecutionNodeData, num)
+		b.ExecutionDataVotes = make([]*ExecutionData, num)
 		for ii := 0; ii < num; ii++ {
-			if b.ExecutionNodeDataVotes[ii] == nil {
-				b.ExecutionNodeDataVotes[ii] = new(ExecutionNodeData)
+			if b.ExecutionDataVotes[ii] == nil {
+				b.ExecutionDataVotes[ii] = new(ExecutionData)
 			}
-			if err = b.ExecutionNodeDataVotes[ii].UnmarshalSSZ(buf[ii*72 : (ii+1)*72]); err != nil {
+			if err = b.ExecutionDataVotes[ii].UnmarshalSSZ(buf[ii*72 : (ii+1)*72]); err != nil {
 				return err
 			}
 		}
@@ -5143,8 +5143,8 @@ func (b *BeaconStateCapella) SizeSSZ() (size int) {
 	// Field (7) 'HistoricalRoots'
 	size += len(b.HistoricalRoots) * 32
 
-	// Field (9) 'ExecutionNodeDataVotes'
-	size += len(b.ExecutionNodeDataVotes) * 72
+	// Field (9) 'ExecutionDataVotes'
+	size += len(b.ExecutionDataVotes) * 72
 
 	// Field (11) 'Validators'
 	size += len(b.Validators) * 2665
@@ -5272,20 +5272,20 @@ func (b *BeaconStateCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 		}
 	}
 
-	// Field (8) 'ExecutionNodeData'
-	if err = b.ExecutionNodeData.HashTreeRootWith(hh); err != nil {
+	// Field (8) 'ExecutionData'
+	if err = b.ExecutionData.HashTreeRootWith(hh); err != nil {
 		return
 	}
 
-	// Field (9) 'ExecutionNodeDataVotes'
+	// Field (9) 'ExecutionDataVotes'
 	{
 		subIndx := hh.Index()
-		num := uint64(len(b.ExecutionNodeDataVotes))
+		num := uint64(len(b.ExecutionDataVotes))
 		if num > 256 {
 			err = ssz.ErrIncorrectListSize
 			return
 		}
-		for _, elem := range b.ExecutionNodeDataVotes {
+		for _, elem := range b.ExecutionDataVotes {
 			if err = elem.HashTreeRootWith(hh); err != nil {
 				return
 			}
@@ -5297,8 +5297,8 @@ func (b *BeaconStateCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 		}
 	}
 
-	// Field (10) 'Eth1DepositIndex'
-	hh.PutUint64(b.Eth1DepositIndex)
+	// Field (10) 'ExecutionDepositIndex'
+	hh.PutUint64(b.ExecutionDepositIndex)
 
 	// Field (11) 'Validators'
 	{

@@ -82,12 +82,12 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	SqrRootSlotsPerEpoch:             11,
 	MinSeedLookahead:                 1,
 	MaxSeedLookahead:                 4,
-	EpochsPerEth1VotingPeriod:        2,    // TODO (cyyber) : Re-evaluate the value
+	EpochsPerExecutionVotingPeriod:   2,    // TODO (cyyber) : Re-evaluate the value
 	SlotsPerHistoricalRoot:           1024, // TODO (cyyber) : Re-evaluate the value
 	MinValidatorWithdrawabilityDelay: 16,   // TODO (cyyber) : Re-evaluate the value
 	ShardCommitteePeriod:             16,   // TODO (cyyber) : Re-evaluate the value
 	MinEpochsToInactivityPenalty:     4,
-	Eth1FollowDistance:               0, // TODO(now.youtrack.cloud/issue/TQ-5)
+	ExecutionFollowDistance:          0, // TODO(now.youtrack.cloud/issue/TQ-5)
 
 	// Fork choice algorithm constants.
 	ProposerScoreBoost:              40,
@@ -106,12 +106,12 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EpochsPerRandomSubnetSubscription: 1 << 8,
 
 	// While eth1 mainnet block times are closer to 13s, we must conform with other clients in
-	// order to vote on the correct eth1 blocks.
+	// order to vote on the correct execution blocks.
 	//
 	// Additional context: https://github.com/ethereum/consensus-specs/issues/2132
 	// Bug prompting this change: https://github.com/prysmaticlabs/prysm/issues/7856
 	// Future optimization: https://github.com/prysmaticlabs/prysm/issues/7739
-	SecondsPerETH1Block: 60,
+	SecondsPerExecutionBlock: 60,
 
 	// State list length constants.
 	EpochsPerHistoricalVector: 65536,

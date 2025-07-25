@@ -51,7 +51,7 @@ ssz_gen_marshal(
         "Deposit",
         "DepositData",
         "DilithiumToExecutionChange",
-        "ExecutionNodeData",
+        "ExecutionData",
         "IndexedAttestation",
         "ProposerSlashing",
         "SignedAggregateAttestationAndProof",

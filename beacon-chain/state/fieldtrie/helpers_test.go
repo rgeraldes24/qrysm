@@ -24,11 +24,11 @@ func Test_handlePendingAttestation_OutOfRange(t *testing.T) {
 	assert.ErrorContains(t, "index 3 greater than number of pending attestations 1", err)
 }
 
-func Test_handleExecutionNodeDataSlice_OutOfRange(t *testing.T) {
-	items := make([]*qrysmpb.ExecutionNodeData, 1)
+func Test_handleExecutionDataSlice_OutOfRange(t *testing.T) {
+	items := make([]*qrysmpb.ExecutionData, 1)
 	indices := []uint64{3}
-	_, err := handleExecutionNodeDataSlice(items, indices, false)
-	assert.ErrorContains(t, "index 3 greater than number of items in eth1 data slice 1", err)
+	_, err := handleExecutionDataSlice(items, indices, false)
+	assert.ErrorContains(t, "index 3 greater than number of items in execution data slice 1", err)
 
 }
 
@@ -181,11 +181,11 @@ func TestFieldTrie_NativeState_fieldConvertersNative(t *testing.T) {
 			errMsg:  "Wanted type of customtypes.RandaoMixes",
 		},
 		{
-			name: "ExecutionNodeDataVotes type not found",
+			name: "ExecutionDataVotes type not found",
 			args: &args{
 				field:   types.FieldIndex(9),
 				indices: []uint64{},
-				elements: []*qrysmpb.ExecutionNodeData{
+				elements: []*qrysmpb.ExecutionData{
 					{
 						DepositRoot:  make([]byte, fieldparams.RootLength),
 						DepositCount: 1,
@@ -196,11 +196,11 @@ func TestFieldTrie_NativeState_fieldConvertersNative(t *testing.T) {
 			wantHex: []string{"0x4833912e1264aef8a18392d795f3f2eed17cf5c0e8471cb0c0db2ec5aca10231"},
 		},
 		{
-			name: "ExecutionNodeDataVotes convertAll false",
+			name: "ExecutionDataVotes convertAll false",
 			args: &args{
 				field:   types.FieldIndex(9),
 				indices: []uint64{1},
-				elements: []*qrysmpb.ExecutionNodeData{
+				elements: []*qrysmpb.ExecutionData{
 					{
 						DepositRoot:  make([]byte, fieldparams.RootLength),
 						DepositCount: 2,
@@ -215,7 +215,7 @@ func TestFieldTrie_NativeState_fieldConvertersNative(t *testing.T) {
 			wantHex: []string{"0x4833912e1264aef8a18392d795f3f2eed17cf5c0e8471cb0c0db2ec5aca10231"},
 		},
 		{
-			name: "ExecutionNodeDataVotes type not found",
+			name: "ExecutionDataVotes type not found",
 			args: &args{
 				field:      types.FieldIndex(9),
 				indices:    []uint64{},
@@ -223,7 +223,7 @@ func TestFieldTrie_NativeState_fieldConvertersNative(t *testing.T) {
 				convertAll: true,
 			},
 			wantHex: nil,
-			errMsg:  fmt.Sprintf("Wanted type of %T", []*qrysmpb.ExecutionNodeData{}),
+			errMsg:  fmt.Sprintf("Wanted type of %T", []*qrysmpb.ExecutionData{}),
 		},
 		{
 			name: "Balance",

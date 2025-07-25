@@ -15,7 +15,7 @@ type BeaconBlockCapella struct {
 
 type BeaconBlockBodyCapella struct {
 	RandaoReveal                string                              `json:"randao_reveal" validate:"required"`
-	ExecutionNodeData           *ExecutionNodeData                  `json:"eth1_data" validate:"required"`
+	ExecutionData               *ExecutionData                      `json:"execution_data" validate:"required"`
 	Graffiti                    string                              `json:"graffiti" validate:"required"`
 	ProposerSlashings           []*ProposerSlashing                 `json:"proposer_slashings" validate:"required,dive"`
 	AttesterSlashings           []*AttesterSlashing                 `json:"attester_slashings" validate:"required,dive"`
@@ -42,7 +42,7 @@ type BlindedBeaconBlockCapella struct {
 
 type BlindedBeaconBlockBodyCapella struct {
 	RandaoReveal                string                              `json:"randao_reveal" validate:"required"`
-	ExecutionNodeData           *ExecutionNodeData                  `json:"eth1_data" validate:"required"`
+	ExecutionData               *ExecutionData                      `json:"execution_data" validate:"required"`
 	Graffiti                    string                              `json:"graffiti" validate:"required"`
 	ProposerSlashings           []*ProposerSlashing                 `json:"proposer_slashings" validate:"required,dive"`
 	AttesterSlashings           []*AttesterSlashing                 `json:"attester_slashings" validate:"required,dive"`
@@ -54,7 +54,7 @@ type BlindedBeaconBlockBodyCapella struct {
 	DilithiumToExecutionChanges []*SignedDilithiumToExecutionChange `json:"dilithium_to_execution_changes" validate:"required,dive"`
 }
 
-type ExecutionNodeData struct {
+type ExecutionData struct {
 	DepositRoot  string `json:"deposit_root" validate:"required"`
 	DepositCount string `json:"deposit_count" validate:"required"`
 	BlockHash    string `json:"block_hash" validate:"required"`

@@ -300,14 +300,14 @@ func VerifyOperationLengths(_ context.Context, state state.BeaconState, b interf
 			params.BeaconConfig().MaxVoluntaryExits,
 		)
 	}
-	executionNodeData := state.ExecutionNodeData()
-	if executionNodeData == nil {
-		return nil, errors.New("nil executionNodeData in state")
+	executionData := state.ExecutionData()
+	if executionData == nil {
+		return nil, errors.New("nil executionData in state")
 	}
-	if state.Eth1DepositIndex() > executionNodeData.DepositCount {
-		return nil, fmt.Errorf("expected state.deposit_index %d <= executionNodeData.deposit_count %d", state.Eth1DepositIndex(), executionNodeData.DepositCount)
+	if state.ExecutionDepositIndex() > executionData.DepositCount {
+		return nil, fmt.Errorf("expected state.deposit_index %d <= executionData.deposit_count %d", state.ExecutionDepositIndex(), executionData.DepositCount)
 	}
-	maxDeposits := math.Min(params.BeaconConfig().MaxDeposits, executionNodeData.DepositCount-state.Eth1DepositIndex())
+	maxDeposits := math.Min(params.BeaconConfig().MaxDeposits, executionData.DepositCount-state.ExecutionDepositIndex())
 	// Verify outstanding deposits are processed up to max number of deposits
 	if uint64(len(body.Deposits())) != maxDeposits {
 		return nil, fmt.Errorf("incorrect outstanding deposits in block body, wanted: %d, got: %d",

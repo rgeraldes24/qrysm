@@ -96,32 +96,32 @@ func TestAllDeposits_ReturnsAllDeposits(t *testing.T) {
 
 	deposits := []*qrysmpb.DepositContainer{
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 10,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 10,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 10,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 11,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 11,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 11,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 11,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 12,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 12,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 12,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 12,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 	}
 	dc.deposits = deposits
@@ -136,32 +136,32 @@ func TestAllDeposits_FiltersDepositUpToAndIncludingBlockNumber(t *testing.T) {
 
 	deposits := []*qrysmpb.DepositContainer{
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 10,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 10,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 10,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 10,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 11,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 11,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 11,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 11,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 12,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 12,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 		{
-			Eth1BlockHeight: 12,
-			Deposit:         &qrysmpb.Deposit{},
+			ExecutionBlockHeight: 12,
+			Deposit:              &qrysmpb.Deposit{},
 		},
 	}
 	dc.deposits = deposits
@@ -177,25 +177,25 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 		require.NoError(t, err)
 		dc.deposits = []*qrysmpb.DepositContainer{
 			{
-				Eth1BlockHeight: 10,
-				Index:           0,
-				Deposit:         &qrysmpb.Deposit{},
+				ExecutionBlockHeight: 10,
+				Index:                0,
+				Deposit:              &qrysmpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 10,
-				Index:           1,
-				Deposit:         &qrysmpb.Deposit{},
+				ExecutionBlockHeight: 10,
+				Index:                1,
+				Deposit:              &qrysmpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 11,
-				Index:           2,
-				Deposit:         &qrysmpb.Deposit{},
+				ExecutionBlockHeight: 11,
+				Index:                2,
+				Deposit:              &qrysmpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 13,
-				Index:           3,
-				Deposit:         &qrysmpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				ExecutionBlockHeight: 13,
+				Index:                3,
+				Deposit:              &qrysmpb.Deposit{},
+				DepositRoot:          wantedRoot,
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(13))
@@ -208,10 +208,10 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 
 		dc.deposits = []*qrysmpb.DepositContainer{
 			{
-				Eth1BlockHeight: 10,
-				Index:           0,
-				Deposit:         &qrysmpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				ExecutionBlockHeight: 10,
+				Index:                0,
+				Deposit:              &qrysmpb.Deposit{},
+				DepositRoot:          wantedRoot,
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(10))
@@ -224,20 +224,20 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 
 		dc.deposits = []*qrysmpb.DepositContainer{
 			{
-				Eth1BlockHeight: 8,
-				Index:           0,
-				Deposit:         &qrysmpb.Deposit{},
+				ExecutionBlockHeight: 8,
+				Index:                0,
+				Deposit:              &qrysmpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 9,
-				Index:           1,
-				Deposit:         &qrysmpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				ExecutionBlockHeight: 9,
+				Index:                1,
+				Deposit:              &qrysmpb.Deposit{},
+				DepositRoot:          wantedRoot,
 			},
 			{
-				Eth1BlockHeight: 11,
-				Index:           2,
-				Deposit:         &qrysmpb.Deposit{},
+				ExecutionBlockHeight: 11,
+				Index:                2,
+				Deposit:              &qrysmpb.Deposit{},
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(10))
@@ -250,10 +250,10 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 
 		dc.deposits = []*qrysmpb.DepositContainer{
 			{
-				Eth1BlockHeight: 8,
-				Index:           0,
-				Deposit:         &qrysmpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				ExecutionBlockHeight: 8,
+				Index:                0,
+				Deposit:              &qrysmpb.Deposit{},
+				DepositRoot:          wantedRoot,
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(7))
@@ -266,10 +266,10 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 
 		dc.deposits = []*qrysmpb.DepositContainer{
 			{
-				Eth1BlockHeight: 8,
-				Index:           0,
-				Deposit:         &qrysmpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				ExecutionBlockHeight: 8,
+				Index:                0,
+				Deposit:              &qrysmpb.Deposit{},
+				DepositRoot:          wantedRoot,
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(10))
@@ -282,30 +282,30 @@ func TestDepositsNumberAndRootAtHeight(t *testing.T) {
 
 		dc.deposits = []*qrysmpb.DepositContainer{
 			{
-				Eth1BlockHeight: 8,
-				Index:           0,
-				Deposit:         &qrysmpb.Deposit{},
+				ExecutionBlockHeight: 8,
+				Index:                0,
+				Deposit:              &qrysmpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 8,
-				Index:           1,
-				Deposit:         &qrysmpb.Deposit{},
+				ExecutionBlockHeight: 8,
+				Index:                1,
+				Deposit:              &qrysmpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 9,
-				Index:           2,
-				Deposit:         &qrysmpb.Deposit{},
-				DepositRoot:     wantedRoot,
+				ExecutionBlockHeight: 9,
+				Index:                2,
+				Deposit:              &qrysmpb.Deposit{},
+				DepositRoot:          wantedRoot,
 			},
 			{
-				Eth1BlockHeight: 10,
-				Index:           3,
-				Deposit:         &qrysmpb.Deposit{},
+				ExecutionBlockHeight: 10,
+				Index:                3,
+				Deposit:              &qrysmpb.Deposit{},
 			},
 			{
-				Eth1BlockHeight: 10,
-				Index:           4,
-				Deposit:         &qrysmpb.Deposit{},
+				ExecutionBlockHeight: 10,
+				Index:                4,
+				Deposit:              &qrysmpb.Deposit{},
 			},
 		}
 		n, root := dc.DepositsNumberAndRootAtHeight(context.Background(), big.NewInt(9))
@@ -319,7 +319,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 	require.NoError(t, err)
 	ctrs := []*qrysmpb.DepositContainer{
 		{
-			Eth1BlockHeight: 9,
+			ExecutionBlockHeight: 9,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk0"), 48),
@@ -329,7 +329,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 			},
 		},
 		{
-			Eth1BlockHeight: 10,
+			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk1"), 48),
@@ -339,7 +339,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 			},
 		},
 		{
-			Eth1BlockHeight: 11,
+			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk1"), 48),
@@ -349,7 +349,7 @@ func TestDepositByPubkey_ReturnsFirstMatchingDeposit(t *testing.T) {
 			},
 		},
 		{
-			Eth1BlockHeight: 12,
+			ExecutionBlockHeight: 12,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte("pk2"), 48),
@@ -561,7 +561,7 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 	assert.Equal(t, int64(2), cachedDeposits.MerkleTrieIndex())
 }
 
-func TestFinalizedDeposits_HandleLowerEth1DepositIndex(t *testing.T) {
+func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 	dc, err := New()
 	require.NoError(t, err)
 
@@ -656,7 +656,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 
 	finalizedDeposits := []*qrysmpb.DepositContainer{
 		{
-			Eth1BlockHeight: 10,
+			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
@@ -667,7 +667,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Index: 0,
 		},
 		{
-			Eth1BlockHeight: 10,
+			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
@@ -680,7 +680,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 	}
 	dc.deposits = append(finalizedDeposits,
 		&qrysmpb.DepositContainer{
-			Eth1BlockHeight: 10,
+			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
@@ -691,7 +691,7 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			Index: 2,
 		},
 		&qrysmpb.DepositContainer{
-			Eth1BlockHeight: 11,
+			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.DilithiumPubkeyLength),
@@ -713,7 +713,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 
 	finalizedDeposits := []*qrysmpb.DepositContainer{
 		{
-			Eth1BlockHeight: 10,
+			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
@@ -724,7 +724,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Index: 0,
 		},
 		{
-			Eth1BlockHeight: 10,
+			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
@@ -737,7 +737,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 	}
 	dc.deposits = append(finalizedDeposits,
 		&qrysmpb.DepositContainer{
-			Eth1BlockHeight: 10,
+			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
@@ -748,7 +748,7 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			Index: 2,
 		},
 		&qrysmpb.DepositContainer{
-			Eth1BlockHeight: 11,
+			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.DilithiumPubkeyLength),
@@ -770,7 +770,7 @@ func TestFinalizedDeposits_ReturnsTrieCorrectly(t *testing.T) {
 
 	generateCtr := func(height uint64, index int64) *qrysmpb.DepositContainer {
 		return &qrysmpb.DepositContainer{
-			Eth1BlockHeight: height,
+			ExecutionBlockHeight: height,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{uint8(index)}, field_params.DilithiumPubkeyLength),

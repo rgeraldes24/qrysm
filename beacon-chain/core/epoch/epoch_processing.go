@@ -208,22 +208,22 @@ func ProcessSlashings(state state.BeaconState, slashingMultiplier uint64) (state
 	return state, err
 }
 
-// ProcessExecutionNodeDataReset processes updates to ETH1 data votes during epoch processing.
+// ProcessExecutionDataReset processes updates to execution data votes during epoch processing.
 //
 // Spec pseudocode definition:
 //
-//	def process_eth1_data_reset(state: BeaconState) -> None:
+//	def process_execution_data_reset(state: BeaconState) -> None:
 //	  next_epoch = Epoch(get_current_epoch(state) + 1)
-//	  # Reset eth1 data votes
-//	  if next_epoch % EPOCHS_PER_ETH1_VOTING_PERIOD == 0:
-//	      state.eth1_data_votes = []
-func ProcessExecutionNodeDataReset(state state.BeaconState) (state.BeaconState, error) {
+//	  # Reset execution data votes
+//	  if next_epoch % EPOCHS_PER_EXECUTION_VOTING_PERIOD == 0:
+//	      state.execution_data_votes = []
+func ProcessExecutionDataReset(state state.BeaconState) (state.BeaconState, error) {
 	currentEpoch := time.CurrentEpoch(state)
 	nextEpoch := currentEpoch + 1
 
-	// Reset ETH1 data votes.
-	if nextEpoch%params.BeaconConfig().EpochsPerEth1VotingPeriod == 0 {
-		if err := state.SetExecutionNodeDataVotes([]*qrysmpb.ExecutionNodeData{}); err != nil {
+	// Reset execution data votes.
+	if nextEpoch%params.BeaconConfig().EpochsPerExecutionVotingPeriod == 0 {
+		if err := state.SetExecutionDataVotes([]*qrysmpb.ExecutionData{}); err != nil {
 			return nil, err
 		}
 	}

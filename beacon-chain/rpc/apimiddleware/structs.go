@@ -227,7 +227,7 @@ type BeaconBlockJson struct {
 
 type BeaconBlockBodyJson struct {
 	RandaoReveal      string                     `json:"randao_reveal" hex:"true"`
-	ExecutionNodeData *ExecutionNodeDataJson     `json:"eth1_data"`
+	ExecutionData     *ExecutionDataJson         `json:"execution_data"`
 	Graffiti          string                     `json:"graffiti" hex:"true"`
 	ProposerSlashings []*ProposerSlashingJson    `json:"proposer_slashings"`
 	AttesterSlashings []*AttesterSlashingJson    `json:"attester_slashings"`
@@ -286,7 +286,7 @@ type BlindedBeaconBlockCapellaJson struct {
 
 type BeaconBlockBodyCapellaJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	ExecutionNodeData           *ExecutionNodeDataJson                  `json:"eth1_data"`
+	ExecutionData               *ExecutionDataJson                      `json:"execution_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -300,7 +300,7 @@ type BeaconBlockBodyCapellaJson struct {
 
 type BlindedBeaconBlockBodyCapellaJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	ExecutionNodeData           *ExecutionNodeDataJson                  `json:"eth1_data"`
+	ExecutionData               *ExecutionDataJson                      `json:"execution_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -366,7 +366,7 @@ type BeaconBlockHeaderJson struct {
 	BodyRoot      string `json:"body_root" hex:"true"`
 }
 
-type ExecutionNodeDataJson struct {
+type ExecutionDataJson struct {
 	DepositRoot  string `json:"deposit_root" hex:"true"`
 	DepositCount string `json:"deposit_count"`
 	BlockHash    string `json:"block_hash" hex:"true"`
@@ -480,9 +480,9 @@ type BeaconStateCapellaJson struct {
 	BlockRoots                   []string                           `json:"block_roots" hex:"true"`
 	StateRoots                   []string                           `json:"state_roots" hex:"true"`
 	HistoricalRoots              []string                           `json:"historical_roots" hex:"true"`
-	ExecutionNodeData            *ExecutionNodeDataJson             `json:"eth1_data"`
-	ExecutionNodeDataVotes       []*ExecutionNodeDataJson           `json:"eth1_data_votes"`
-	Eth1DepositIndex             string                             `json:"eth1_deposit_index"`
+	ExecutionData                *ExecutionDataJson                 `json:"execution_data"`
+	ExecutionDataVotes           []*ExecutionDataJson               `json:"execution_data_votes"`
+	ExecutionChainDepositIndex   string                             `json:"execution_deposit_index"`
 	Validators                   []*ValidatorJson                   `json:"validators"`
 	Balances                     []string                           `json:"balances"`
 	RandaoMixes                  []string                           `json:"randao_mixes" hex:"true"`

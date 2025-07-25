@@ -184,8 +184,8 @@ func TestConfigureInterop(t *testing.T) {
 			func() *cli.Context {
 				app := cli.App{}
 				set := flag.NewFlagSet("test", 0)
-				set.Bool(flags.InteropMockExecutionNodeDataVotesFlag.Name, false, "")
-				assert.NoError(t, set.Set(flags.InteropMockExecutionNodeDataVotesFlag.Name, "true"))
+				set.Bool(flags.InteropMockExecutionDataVotesFlag.Name, false, "")
+				assert.NoError(t, set.Set(flags.InteropMockExecutionDataVotesFlag.Name, "true"))
 				return cli.NewContext(&app, set, nil)
 			},
 			"interop",

@@ -67,7 +67,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const testSkipPowFlag = "test-skip-pow"
+const testSkipExecutionFlag = "test-skip-execution"
 
 // Used as a struct to keep cli flag options for configuring services
 // for the beacon node. We keep this as a separate struct to not pollute the actual BeaconNode
@@ -227,8 +227,8 @@ func New(cliCtx *cli.Context, opts ...Option) (*BeaconNode, error) {
 		return nil, err
 	}
 
-	log.Debugln("Registering POW Chain Service")
-	if err := beacon.registerPOWChainService(); err != nil {
+	log.Debugln("Registering Execution Chain Service")
+	if err := beacon.registerExecutionChainService(); err != nil {
 		return nil, err
 	}
 
@@ -648,11 +648,11 @@ func (b *BeaconNode) registerBlockchainService(fc forkchoice.ForkChoicer, gs *st
 	return b.services.RegisterService(blockchainService)
 }
 
-func (b *BeaconNode) registerPOWChainService() error {
-	if b.cliCtx.Bool(testSkipPowFlag) {
+func (b *BeaconNode) registerExecutionChainService() error {
+	if b.cliCtx.Bool(testSkipExecutionFlag) {
 		return b.services.RegisterService(&execution.Service{})
 	}
-	bs, err := execution.NewPowchainCollector(b.ctx)
+	bs, err := execution.NewExecutionChainCollector(b.ctx)
 	if err != nil {
 		return err
 	}
@@ -817,7 +817,7 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 	beaconMonitoringPort := b.cliCtx.Int(flags.MonitoringPortFlag.Name)
 	cert := b.cliCtx.String(flags.CertFlag.Name)
 	key := b.cliCtx.String(flags.KeyFlag.Name)
-	mockExecutionNodeDataVotes := b.cliCtx.Bool(flags.InteropMockExecutionNodeDataVotesFlag.Name)
+	mockExecutionDataVotes := b.cliCtx.Bool(flags.InteropMockExecutionDataVotesFlag.Name)
 
 	maxMsgSize := b.cliCtx.Int(cmd.GrpcMaxCallRecvMsgSizeFlag.Name)
 	enableDebugRPCEndpoints := b.cliCtx.Bool(flags.EnableDebugRPCEndpoints.Name)
@@ -857,7 +857,7 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 		ExecutionChainService:         web3Service,
 		ExecutionChainInfoFetcher:     web3Service,
 		ChainStartFetcher:             chainStartFetcher,
-		MockExecutionNodeVotes:        mockExecutionNodeDataVotes,
+		MockExecutionNodeVotes:        mockExecutionDataVotes,
 		SyncService:                   syncService,
 		DepositFetcher:                depositFetcher,
 		PendingDepositFetcher:         b.depositCache,

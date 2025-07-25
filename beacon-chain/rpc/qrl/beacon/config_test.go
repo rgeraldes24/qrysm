@@ -34,11 +34,11 @@ func TestGetSpec(t *testing.T) {
 	config.HysteresisQuotient = 9
 	config.HysteresisDownwardMultiplier = 10
 	config.HysteresisUpwardMultiplier = 11
-	config.Eth1FollowDistance = 13
+	config.ExecutionFollowDistance = 13
 	config.TargetAggregatorsPerCommittee = 14
 	config.RandomSubnetsPerValidator = 15
 	config.EpochsPerRandomSubnetSubscription = 16
-	config.SecondsPerETH1Block = 17
+	config.SecondsPerExecutionBlock = 17
 	config.DepositChainID = 18
 	config.DepositNetworkID = 19
 	config.DepositContractAddress = "DepositContractAddress"
@@ -55,7 +55,7 @@ func TestGetSpec(t *testing.T) {
 	config.SlotsPerEpoch = 27
 	config.MinSeedLookahead = 28
 	config.MaxSeedLookahead = 29
-	config.EpochsPerEth1VotingPeriod = 30
+	config.EpochsPerExecutionVotingPeriod = 30
 	config.SlotsPerHistoricalRoot = 31
 	config.MinValidatorWithdrawabilityDelay = 32
 	config.ShardCommitteePeriod = 33

@@ -54,7 +54,7 @@ type ReadOnlyBeaconBlock interface {
 // that is a beacon block body.
 type ReadOnlyBeaconBlockBody interface {
 	RandaoReveal() [field_params.DilithiumSignatureLength]byte
-	ExecutionNodeData() *qrysmpb.ExecutionNodeData
+	ExecutionData() *qrysmpb.ExecutionData
 	Graffiti() [field_params.RootLength]byte
 	ProposerSlashings() []*qrysmpb.ProposerSlashing
 	AttesterSlashings() []*qrysmpb.AttesterSlashing
@@ -80,7 +80,7 @@ type SignedBeaconBlock interface {
 	SetAttesterSlashings([]*qrysmpb.AttesterSlashing)
 	SetProposerSlashings([]*qrysmpb.ProposerSlashing)
 	SetGraffiti([]byte)
-	SetExecutionNodeData(*qrysmpb.ExecutionNodeData)
+	SetExecutionData(*qrysmpb.ExecutionData)
 	SetRandaoReveal([]byte)
 	SetBlinded(bool)
 	SetStateRoot([]byte)

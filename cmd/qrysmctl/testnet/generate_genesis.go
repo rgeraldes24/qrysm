@@ -28,20 +28,20 @@ import (
 
 var (
 	generateGenesisStateFlags = struct {
-		DepositJsonFile           string
-		ChainConfigFile           string
-		ConfigName                string
-		NumValidators             uint64
-		GenesisTime               uint64
-		GenesisTimeDelay          uint64
-		OutputSSZ                 string
-		OutputJSON                string
-		OutputYaml                string
-		ForkName                  string
-		OverrideExecutionNodeData bool
-		ExecutionEndpoint         string
-		GzondGenesisJsonIn        string
-		GzondGenesisJsonOut       string
+		DepositJsonFile       string
+		ChainConfigFile       string
+		ConfigName            string
+		NumValidators         uint64
+		GenesisTime           uint64
+		GenesisTimeDelay      uint64
+		OutputSSZ             string
+		OutputJSON            string
+		OutputYaml            string
+		ForkName              string
+		OverrideExecutionData bool
+		ExecutionEndpoint     string
+		GzondGenesisJsonIn    string
+		GzondGenesisJsonOut   string
 	}{}
 	log           = logrus.WithField("prefix", "genesis")
 	outputSSZFlag = &cli.StringFlag{
@@ -106,8 +106,8 @@ var (
 			},
 			&cli.BoolFlag{
 				Name:        "override-executionodedata",
-				Destination: &generateGenesisStateFlags.OverrideExecutionNodeData,
-				Usage:       "Overrides ExecutionNodeData with values from execution client. If unset, defaults to false",
+				Destination: &generateGenesisStateFlags.OverrideExecutionData,
+				Usage:       "Overrides ExecutionData with values from execution client. If unset, defaults to false",
 				Value:       false,
 			},
 			&cli.StringFlag{
@@ -298,8 +298,8 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		return nil, err
 	}
 
-	if f.OverrideZond1Data {
-		log.Print("Overriding ExecutionNodeData with data from execution client")
+	if f.OverrideExecutionData {
+		log.Print("Overriding ExecutionData with data from execution client")
 		conn, err := rpc.Dial(generateGenesisStateFlags.ExecutionEndpoint)
 		if err != nil {
 			return nil, errors.Wrapf(
@@ -320,15 +320,15 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get hash tree root")
 		}
-		e1d := &qrysmpb.ExecutionNodeData{
+		e1d := &qrysmpb.ExecutionData{
 			DepositRoot:  depositRoot[:],
 			DepositCount: 0,
 			BlockHash:    header.Hash().Bytes(),
 		}
-		if err := genesisState.SetExecutionNodeData(e1d); err != nil {
+		if err := genesisState.SetExecutionData(e1d); err != nil {
 			return nil, err
 		}
-		if err := genesisState.SetEth1DepositIndex(0); err != nil {
+		if err := genesisState.SetExecutionDepositIndex(0); err != nil {
 			return nil, err
 		}
 	}

@@ -842,7 +842,7 @@ func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 			got, err := s.ListFeeRecipientByPubkey(ctx, &qrlpbservice.PubkeyRequest{Pubkey: byteval})
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.want.QRLAddress, common.BytesToAddress(got.Data.QRLaddress).Hex())
+			assert.Equal(t, tt.want.QRLAddress, common.BytesToAddress(got.Data.Qrladdress).Hex())
 		})
 	}
 }
@@ -1077,7 +1077,7 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 
 			qrlAddr, err := common.NewAddressFromString(tt.args)
 			require.NoError(t, err)
-			_, err = s.SetFeeRecipientByPubkey(ctx, &qrlpbservice.SetFeeRecipientByPubkeyRequest{Pubkey: byteval, QRLaddress: qrlAddr.Bytes()})
+			_, err = s.SetFeeRecipientByPubkey(ctx, &qrlpbservice.SetFeeRecipientByPubkeyRequest{Pubkey: byteval, Qrladdress: qrlAddr.Bytes()})
 			require.NoError(t, err)
 
 			assert.Equal(t, tt.want.valQRLAddress, s.validatorService.ProposerSettings().ProposeConfig[bytesutil.ToBytes2592(byteval)].FeeRecipientConfig.FeeRecipient.Hex())
