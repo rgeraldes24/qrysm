@@ -18,7 +18,7 @@ go_library(
         "proposer_capella.go",
         "proposer_deposits.go",
         "proposer_empty_block.go",
-        "proposer_executionData.go",
+        "proposer_executiondata.go",
         "proposer_execution_payload.go",
         "proposer_exits.go",
         "proposer_slashings.go",
