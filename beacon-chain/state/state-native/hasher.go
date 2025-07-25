@@ -82,24 +82,24 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 	fieldRoots[types.HistoricalRoots.RealPosition()] = historicalRootsRt[:]
 
 	// ExecutionData data structure root.
-	eth1HashTreeRoot, err := stateutil.Eth1Root(state.executionData)
+	executionHashTreeRoot, err := stateutil.ExecutionRoot(state.executionData)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not compute executionData merkleization")
 	}
-	fieldRoots[types.ExecutionData.RealPosition()] = eth1HashTreeRoot[:]
+	fieldRoots[types.ExecutionData.RealPosition()] = executionHashTreeRoot[:]
 
 	// ExecutionDataVotes slice root.
-	eth1VotesRoot, err := stateutil.ExecutionDataVotesRoot(state.executionDataVotes)
+	executionVotesRoot, err := stateutil.ExecutionDataVotesRoot(state.executionDataVotes)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not compute executionData votes merkleization")
 	}
-	fieldRoots[types.ExecutionDataVotes.RealPosition()] = eth1VotesRoot[:]
+	fieldRoots[types.ExecutionDataVotes.RealPosition()] = executionVotesRoot[:]
 
-	// Eth1DepositIndex root.
-	eth1DepositIndexBuf := make([]byte, 8)
-	binary.LittleEndian.PutUint64(eth1DepositIndexBuf, state.executionDepositIndex)
-	eth1DepositBuf := bytesutil.ToBytes32(eth1DepositIndexBuf)
-	fieldRoots[types.ExecutionDepositIndex.RealPosition()] = eth1DepositBuf[:]
+	// ExecutionDepositIndex root.
+	executionDepositIndexBuf := make([]byte, 8)
+	binary.LittleEndian.PutUint64(executionDepositIndexBuf, state.executionDepositIndex)
+	executionDepositBuf := bytesutil.ToBytes32(executionDepositIndexBuf)
+	fieldRoots[types.ExecutionDepositIndex.RealPosition()] = executionDepositBuf[:]
 
 	// Validators slice root.
 	validatorsRoot, err := stateutil.ValidatorRegistryRoot(state.validatorsVal())

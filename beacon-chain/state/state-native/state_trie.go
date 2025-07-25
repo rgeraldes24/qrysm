@@ -425,7 +425,7 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 		}
 		return ssz.ByteArrayRootWithLimit(hRoots, fieldparams.HistoricalRootsLength)
 	case types.ExecutionData:
-		return stateutil.Eth1Root(b.executionData)
+		return stateutil.ExecutionRoot(b.executionData)
 	case types.ExecutionDataVotes:
 		if b.rebuildTrie[field] {
 			err := b.resetFieldTrie(

@@ -236,9 +236,9 @@ type BeaconStateCapella struct {
 	BlockRoots                   [][]byte                                                          `protobuf:"bytes,2002,rep,name=block_roots,json=blockRoots,proto3" json:"block_roots,omitempty" ssz-size:"1024,32"`
 	StateRoots                   [][]byte                                                          `protobuf:"bytes,2003,rep,name=state_roots,json=stateRoots,proto3" json:"state_roots,omitempty" ssz-size:"1024,32"`
 	HistoricalRoots              [][]byte                                                          `protobuf:"bytes,2004,rep,name=historical_roots,json=historicalRoots,proto3" json:"historical_roots,omitempty" ssz-max:"16777216" ssz-size:"?,32"`
-	ExecutionData                *ExecutionData                                                    `protobuf:"bytes,3001,opt,name=eth1_data,json=eth1Data,proto3" json:"eth1_data,omitempty"`
-	ExecutionDataVotes           []*ExecutionData                                                  `protobuf:"bytes,3002,rep,name=eth1_data_votes,json=eth1DataVotes,proto3" json:"eth1_data_votes,omitempty" ssz-max:"256"`
-	ExecutionDepositIndex        uint64                                                            `protobuf:"varint,3003,opt,name=eth1_deposit_index,json=eth1DepositIndex,proto3" json:"eth1_deposit_index,omitempty"`
+	ExecutionData                *ExecutionData                                                    `protobuf:"bytes,3001,opt,name=execution_data,json=executionData,proto3" json:"execution_data,omitempty"`
+	ExecutionDataVotes           []*ExecutionData                                                  `protobuf:"bytes,3002,rep,name=execution_data_votes,json=executionDataVotes,proto3" json:"execution_data_votes,omitempty" ssz-max:"256"`
+	ExecutionDepositIndex        uint64                                                            `protobuf:"varint,3003,opt,name=execution_deposit_index,json=executionDepositIndex,proto3" json:"execution_deposit_index,omitempty"`
 	Validators                   []*Validator                                                      `protobuf:"bytes,4001,rep,name=validators,proto3" json:"validators,omitempty" ssz-max:"1099511627776"`
 	Balances                     []uint64                                                          `protobuf:"varint,4002,rep,packed,name=balances,proto3" json:"balances,omitempty" ssz-max:"1099511627776"`
 	RandaoMixes                  [][]byte                                                          `protobuf:"bytes,5001,rep,name=randao_mixes,json=randaoMixes,proto3" json:"randao_mixes,omitempty" ssz-size:"65536,32"`
@@ -1326,8 +1326,8 @@ var file_proto_qrl_v1_beacon_state_proto_depIdxs = []int32{
 	13, // 0: theqrl.qrl.v1.PendingAttestation.data:type_name -> theqrl.qrl.v1.AttestationData
 	2,  // 1: theqrl.qrl.v1.BeaconStateCapella.fork:type_name -> theqrl.qrl.v1.Fork
 	14, // 2: theqrl.qrl.v1.BeaconStateCapella.latest_block_header:type_name -> theqrl.qrl.v1.BeaconBlockHeader
-	15, // 3: theqrl.qrl.v1.BeaconStateCapella.eth1_data:type_name -> theqrl.qrl.v1.ExecutionData
-	15, // 4: theqrl.qrl.v1.BeaconStateCapella.eth1_data_votes:type_name -> theqrl.qrl.v1.ExecutionData
+	15, // 3: theqrl.qrl.v1.BeaconStateCapella.execution_data:type_name -> theqrl.qrl.v1.ExecutionData
+	15, // 4: theqrl.qrl.v1.BeaconStateCapella.execution_data_votes:type_name -> theqrl.qrl.v1.ExecutionData
 	16, // 5: theqrl.qrl.v1.BeaconStateCapella.validators:type_name -> theqrl.qrl.v1.Validator
 	17, // 6: theqrl.qrl.v1.BeaconStateCapella.previous_justified_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
 	17, // 7: theqrl.qrl.v1.BeaconStateCapella.current_justified_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint

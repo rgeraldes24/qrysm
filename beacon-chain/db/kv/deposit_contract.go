@@ -10,7 +10,7 @@ import (
 )
 
 // DepositContractAddress returns contract address is the address of
-// the deposit contract on the proof of work chain.
+// the deposit contract on the execution chain.
 func (s *Store) DepositContractAddress(ctx context.Context) ([]byte, error) {
 	ctx, span := trace.StartSpan(ctx, "BeaconDB.DepositContractAddress")
 	defer span.End()

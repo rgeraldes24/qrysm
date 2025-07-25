@@ -26,7 +26,7 @@ type ExecutionChainData struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CurrentExecutionData *LatestExecutionData `protobuf:"bytes,1,opt,name=current_eth1_data,json=currentEth1Data,proto3" json:"current_eth1_data,omitempty"`
+	CurrentExecutionData *LatestExecutionData `protobuf:"bytes,1,opt,name=current_execution_data,json=currentExecutionData,proto3" json:"current_execution_data,omitempty"`
 	ChainstartData       *ChainStartData      `protobuf:"bytes,2,opt,name=chainstart_data,json=chainstartData,proto3" json:"chainstart_data,omitempty"`
 	BeaconState          *BeaconStateCapella  `protobuf:"bytes,3,opt,name=beacon_state,json=beaconState,proto3" json:"beacon_state,omitempty"`
 	Trie                 *SparseMerkleTrie    `protobuf:"bytes,4,opt,name=trie,proto3" json:"trie,omitempty"`
@@ -265,7 +265,7 @@ type ChainStartData struct {
 
 	GenesisTime   uint64         `protobuf:"varint,2,opt,name=genesis_time,json=genesisTime,proto3" json:"genesis_time,omitempty"`
 	GenesisBlock  uint64         `protobuf:"varint,3,opt,name=genesis_block,json=genesisBlock,proto3" json:"genesis_block,omitempty"`
-	ExecutionData *ExecutionData `protobuf:"bytes,4,opt,name=eth1_data,json=eth1Data,proto3" json:"eth1_data,omitempty"`
+	ExecutionData *ExecutionData `protobuf:"bytes,4,opt,name=execution_data,json=executionData,proto3" json:"execution_data,omitempty"`
 }
 
 func (x *ChainStartData) Reset() {
@@ -437,7 +437,7 @@ type DepositContainer struct {
 	unknownFields protoimpl.UnknownFields
 
 	Index                int64    `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`
-	ExecutionBlockHeight uint64   `protobuf:"varint,2,opt,name=eth1_block_height,json=executionBlockHeight,proto3" json:"eth1_block_height,omitempty"`
+	ExecutionBlockHeight uint64   `protobuf:"varint,2,opt,name=execution_block_height,json=executionBlockHeight,proto3" json:"execution_block_height,omitempty"`
 	Deposit              *Deposit `protobuf:"bytes,3,opt,name=deposit,proto3" json:"deposit,omitempty"`
 	DepositRoot          []byte   `protobuf:"bytes,4,opt,name=deposit_root,json=depositRoot,proto3" json:"deposit_root,omitempty"`
 }
@@ -637,13 +637,13 @@ var file_proto_qrysm_v1alpha1_executionchain_proto_goTypes = []interface{}{
 	(*Deposit)(nil),             // 9: theqrl.qrl.v1alpha1.Deposit
 }
 var file_proto_qrysm_v1alpha1_executionchain_proto_depIdxs = []int32{
-	2, // 0: theqrl.qrl.v1alpha1.ExecutionData.current_eth1_data:type_name -> theqrl.qrl.v1alpha1.LatestExecutionData
+	2, // 0: theqrl.qrl.v1alpha1.ExecutionData.current_execution_data:type_name -> theqrl.qrl.v1alpha1.LatestExecutionData
 	3, // 1: theqrl.qrl.v1alpha1.ExecutionData.chainstart_data:type_name -> theqrl.qrl.v1alpha1.ChainStartData
 	7, // 2: theqrl.qrl.v1alpha1.ExecutionData.beacon_state:type_name -> theqrl.qrl.v1alpha1.BeaconStateCapella
 	4, // 3: theqrl.qrl.v1alpha1.ExecutionData.trie:type_name -> theqrl.qrl.v1alpha1.SparseMerkleTrie
 	6, // 4: theqrl.qrl.v1alpha1.ExecutionData.deposit_containers:type_name -> theqrl.qrl.v1alpha1.DepositContainer
 	1, // 5: theqrl.qrl.v1alpha1.ExecutionData.deposit_snapshot:type_name -> theqrl.qrl.v1alpha1.DepositSnapshot
-	8, // 6: theqrl.qrl.v1alpha1.ChainStartData.eth1_data:type_name -> theqrl.qrl.v1alpha1.ExecutionData
+	8, // 6: theqrl.qrl.v1alpha1.ChainStartData.execution_data:type_name -> theqrl.qrl.v1alpha1.ExecutionData
 	5, // 7: theqrl.qrl.v1alpha1.SparseMerkleTrie.layers:type_name -> theqrl.qrl.v1alpha1.TrieLayer
 	9, // 8: theqrl.qrl.v1alpha1.DepositContainer.deposit:type_name -> theqrl.qrl.v1alpha1.Deposit
 	9, // [9:9] is the sub-list for method output_type

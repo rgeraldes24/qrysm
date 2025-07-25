@@ -136,7 +136,7 @@ func (b *BeaconState) MarshalJSON() ([]byte, error) {
 		HistoricalSummaries:                 b.historicalSummaries,
 		ExecutionData:                       b.executionData,
 		ExecutionDataVotes:                  b.executionDataVotes,
-		Eth1DepositIndex:                    b.eth1DepositIndex,
+		ExecutionDepositIndex:               b.executionDepositIndex,
 		Validators:                          vals,
 		Balances:                            balances,
 		RandaoMixes:                         mixes,

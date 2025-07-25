@@ -63,7 +63,7 @@ var appFlags = []cli.Flag{
 	flags.ChainID,
 	flags.NetworkID,
 	flags.WeakSubjectivityCheckpoint,
-	flags.Eth1HeaderReqLimit,
+	flags.ExecutionHeaderReqLimit,
 	flags.MinPeersPerSubnet,
 	flags.SuggestedFeeRecipient,
 	flags.MevRelayEndpoint,
@@ -218,7 +218,7 @@ func main() {
 
 func startNode(ctx *cli.Context) error {
 	// Fix data dir for Windows users.
-	outdatedDataDir := filepath.Join(file.HomeDir(), "AppData", "Roaming", "Eth2")
+	outdatedDataDir := filepath.Join(file.HomeDir(), "AppData", "Roaming", "Qrysm")
 	currentDataDir := ctx.String(cmd.DataDirFlag.Name)
 	if err := cmd.FixDefaultDataDir(outdatedDataDir, currentDataDir); err != nil {
 		return err

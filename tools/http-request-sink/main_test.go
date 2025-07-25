@@ -21,9 +21,10 @@ type sampleRPCRequest struct {
 
 func Test_parseAndCaptureRequest(t *testing.T) {
 	tmpFile := filepath.Join(t.TempDir(), "faketest.log")
+	// TODO(rgeraldes24)
 	body := &sampleRPCRequest{
-		Name:      "eth2",
-		ETHMethod: "eth2_produceBlock",
+		Name:      "beacon",
+		ETHMethod: "beacon_produceBlock",
 		Address:   "0x0923920930923",
 	}
 	enc, err := json.Marshal(body)

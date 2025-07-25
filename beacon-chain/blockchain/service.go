@@ -76,7 +76,7 @@ type config struct {
 	StateGen                *stategen.State
 	SlasherAttestationsFeed *event.Feed
 	WeakSubjectivityCheckpt *qrysmpb.Checkpoint
-	BlockFetcher            execution.POWBlockFetcher
+	BlockFetcher            execution.ExecutionBlockFetcher
 	FinalizedStateAtStartUp state.BeaconState
 	ExecutionEngineCaller   execution.EngineCaller
 }

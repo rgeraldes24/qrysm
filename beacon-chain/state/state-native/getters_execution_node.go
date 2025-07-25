@@ -27,7 +27,7 @@ func (b *BeaconState) executionDataVal() *qrysmpb.ExecutionData {
 }
 
 // ExecutionDataVotes corresponds to votes from Ethereum on the canonical proof-of-work chain
-// data retrieved from eth1.
+// data retrieved from execution.
 func (b *BeaconState) ExecutionDataVotes() []*qrysmpb.ExecutionData {
 	if b.executionDataVotes == nil {
 		return nil
@@ -40,7 +40,7 @@ func (b *BeaconState) ExecutionDataVotes() []*qrysmpb.ExecutionData {
 }
 
 // executionDataVotesVal corresponds to votes from Ethereum on the canonical proof-of-work chain
-// data retrieved from eth1.
+// data retrieved from execution.
 // This assumes that a lock is already held on BeaconState.
 func (b *BeaconState) executionDataVotesVal() []*qrysmpb.ExecutionData {
 	if b.executionDataVotes == nil {

@@ -24,10 +24,10 @@ func (vs *Server) packDepositsAndAttestations(ctx context.Context, head state.Be
 	var atts []*qrysmpb.Attestation
 
 	eg.Go(func() error {
-		// Pack ETH1 deposits which have not been included in the beacon chain.
+		// Pack execution deposits which have not been included in the beacon chain.
 		localDeposits, err := vs.deposits(egctx, head, executionData)
 		if err != nil {
-			return status.Errorf(codes.Internal, "Could not get ETH1 deposits: %v", err)
+			return status.Errorf(codes.Internal, "Could not get execution deposits: %v", err)
 		}
 		// if the original context is cancelled, then cancel this routine too
 		select {

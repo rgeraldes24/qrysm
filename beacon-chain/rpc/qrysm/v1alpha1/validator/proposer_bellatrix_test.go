@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	dbTest "github.com/theQRL/qrysm/beacon-chain/db/testing"
-	powtesting "github.com/theQRL/qrysm/beacon-chain/execution/testing"
+	exectesting "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
@@ -61,7 +61,7 @@ func TestServer_setExecutionData(t *testing.T) {
 	}}
 	id := &v1.PayloadIDBytes{0x1}
 	vs := &Server{
-		ExecutionEngineCaller:  &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 1, Withdrawals: withdrawals}, BlockValue: 0},
+		ExecutionEngineCaller:  &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 1, Withdrawals: withdrawals}, BlockValue: 0},
 		HeadFetcher:            &blockchainTest.ChainService{State: capellaTransitionState},
 		FinalizationFetcher:    &blockchainTest.ChainService{},
 		BeaconDB:               beaconDB,
@@ -207,7 +207,7 @@ func TestServer_setExecutionData(t *testing.T) {
 	t.Run("Builder configured. Local block has higher value", func(t *testing.T) {
 		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 		require.NoError(t, err)
-		vs.ExecutionEngineCaller = &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 2}
+		vs.ExecutionEngineCaller = &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 2}
 		b := blk.Block()
 		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
 		require.NoError(t, err)
@@ -228,7 +228,7 @@ func TestServer_setExecutionData(t *testing.T) {
 
 		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 		require.NoError(t, err)
-		vs.ExecutionEngineCaller = &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 1}
+		vs.ExecutionEngineCaller = &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 3}, BlockValue: 1}
 		b := blk.Block()
 		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
 		require.NoError(t, err)
@@ -249,7 +249,7 @@ func TestServer_setExecutionData(t *testing.T) {
 			HasConfigured: true,
 			Cfg:           &builderTest.Config{BeaconDB: beaconDB},
 		}
-		vs.ExecutionEngineCaller = &powtesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 4}, BlockValue: 0}
+		vs.ExecutionEngineCaller = &exectesting.EngineClient{PayloadIDBytes: id, ExecutionPayloadCapella: &v1.ExecutionPayloadCapella{BlockNumber: 4}, BlockValue: 0}
 		b := blk.Block()
 		localPayload, _, err := vs.getLocalPayload(ctx, b, capellaTransitionState)
 		require.NoError(t, err)

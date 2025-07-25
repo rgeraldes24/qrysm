@@ -174,7 +174,7 @@ func TestDerivedKeymanager_Sign(t *testing.T) {
 	pubKeys, err := dr.FetchValidatingPublicKeys(ctx)
 	require.NoError(t, err)
 	// We prepare naive data to sign.
-	data := []byte("eth2data")
+	data := []byte("consensusdata")
 	signRequest := &validatorpb.SignRequest{
 		PublicKey:   pubKeys[0][:],
 		SigningRoot: data,

@@ -2238,7 +2238,7 @@ var file_proto_qrl_v1_beacon_block_proto_depIdxs = []int32{
 	21, // 19: theqrl.qrl.v1.SignedBlindedBeaconBlockCapella.message:type_name -> theqrl.qrl.v1.BlindedBeaconBlockCapella
 	22, // 20: theqrl.qrl.v1.BeaconBlockCapella.body:type_name -> theqrl.qrl.v1.BeaconBlockBodyCapella
 	23, // 21: theqrl.qrl.v1.BlindedBeaconBlockCapella.body:type_name -> theqrl.qrl.v1.BlindedBeaconBlockBodyCapella
-	5,  // 22: theqrl.qrl.v1.BeaconBlockBodyCapella.eth1_data:type_name -> theqrl.qrl.v1.ExecutionData
+	5,  // 22: theqrl.qrl.v1.BeaconBlockBodyCapella.execution_data:type_name -> theqrl.qrl.v1.ExecutionData
 	0,  // 23: theqrl.qrl.v1.BeaconBlockBodyCapella.proposer_slashings:type_name -> theqrl.qrl.v1.ProposerSlashing
 	1,  // 24: theqrl.qrl.v1.BeaconBlockBodyCapella.attester_slashings:type_name -> theqrl.qrl.v1.AttesterSlashing
 	27, // 25: theqrl.qrl.v1.BeaconBlockBodyCapella.attestations:type_name -> theqrl.qrl.v1.Attestation
@@ -2247,7 +2247,7 @@ var file_proto_qrl_v1_beacon_block_proto_depIdxs = []int32{
 	9,  // 28: theqrl.qrl.v1.BeaconBlockBodyCapella.sync_aggregate:type_name -> theqrl.qrl.v1.SyncAggregate
 	28, // 29: theqrl.qrl.v1.BeaconBlockBodyCapella.execution_payload:type_name -> theqrl.engine.v1.ExecutionPayloadCapella
 	29, // 30: theqrl.qrl.v1.BeaconBlockBodyCapella.dilithium_to_execution_changes:type_name -> theqrl.qrl.v1.SignedDilithiumToExecutionChange
-	5,  // 31: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.eth1_data:type_name -> theqrl.qrl.v1.ExecutionData
+	5,  // 31: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.execution_data:type_name -> theqrl.qrl.v1.ExecutionData
 	0,  // 32: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.proposer_slashings:type_name -> theqrl.qrl.v1.ProposerSlashing
 	1,  // 33: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.attester_slashings:type_name -> theqrl.qrl.v1.AttesterSlashing
 	27, // 34: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.attestations:type_name -> theqrl.qrl.v1.Attestation

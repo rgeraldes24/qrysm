@@ -116,12 +116,12 @@ func TestWeb3SignerConfig(t *testing.T) {
 			name: "happy path with external url",
 			args: &args{
 				baseURL:          "http://localhost:8545",
-				publicKeysOrURLs: []string{"http://localhost:8545/api/v1/eth2/publicKeys"},
+				publicKeysOrURLs: []string{"http://localhost:8545/api/v1/consensus/publicKeys"},
 			},
 			want: &remoteweb3signer.SetupConfig{
 				BaseEndpoint:          "http://localhost:8545",
 				GenesisValidatorsRoot: nil,
-				PublicKeysURL:         "http://localhost:8545/api/v1/eth2/publicKeys",
+				PublicKeysURL:         "http://localhost:8545/api/v1/consensus/publicKeys",
 				ProvidedPublicKeys:    nil,
 			},
 		},
@@ -177,7 +177,7 @@ func TestWeb3SignerConfig(t *testing.T) {
 			args: &args{
 				baseURL: "http://localhost:8545",
 				publicKeysOrURLs: []string{"0xa99a76ed7796f7be22d5b7e85deeb7c5677e88e511e0b337618f8c4eb61349b4bf2d153f649f7b53359fe8b94a38e44c," +
-					"0xb89bebc699769726a318c8e9971bd3171297c61aea4a6578a7a4f94b547dcba5bac16a89108b6b6a1fe3695d1a874a0b", "http://localhost:8545/api/v1/eth2/publicKeys"},
+					"0xb89bebc699769726a318c8e9971bd3171297c61aea4a6578a7a4f94b547dcba5bac16a89108b6b6a1fe3695d1a874a0b", "http://localhost:8545/api/v1/consensus/publicKeys"},
 			},
 			want:       nil,
 			wantErrMsg: "could not decode public key for web3signer",

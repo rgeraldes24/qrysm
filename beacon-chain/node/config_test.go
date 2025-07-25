@@ -66,7 +66,7 @@ func TestConfigureProofOfWork(t *testing.T) {
 	require.NoError(t, set.Set(flags.DepositContractFlag.Name, "deposit-contract"))
 	cliCtx := cli.NewContext(&app, set, nil)
 
-	require.NoError(t, configureEth1Config(cliCtx))
+	require.NoError(t, configureExecutionConfig(cliCtx))
 
 	assert.Equal(t, uint64(100), params.BeaconConfig().DepositChainID)
 	assert.Equal(t, uint64(200), params.BeaconConfig().DepositNetworkID)

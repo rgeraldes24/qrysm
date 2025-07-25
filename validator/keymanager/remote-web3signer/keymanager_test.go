@@ -60,7 +60,7 @@ func TestKeymanager_Sign(t *testing.T) {
 	config := &SetupConfig{
 		BaseEndpoint:          "http://example.com",
 		GenesisValidatorsRoot: root,
-		PublicKeysURL:         "http://example2.com/api/v1/eth2/publicKeys",
+		PublicKeysURL:         "http://example2.com/api/v1/consensus/publicKeys",
 	}
 	km, err := NewKeymanager(ctx, config)
 	if err != nil {
@@ -236,7 +236,7 @@ func TestKeymanager_FetchValidatingPublicKeys_HappyPath_WithExternalURL(t *testi
 	config := &SetupConfig{
 		BaseEndpoint:          "http://example.com",
 		GenesisValidatorsRoot: root,
-		PublicKeysURL:         "http://example2.com/api/v1/eth2/publicKeys",
+		PublicKeysURL:         "http://example2.com/api/v1/consensus/publicKeys",
 	}
 	km, err := NewKeymanager(ctx, config)
 	if err != nil {
@@ -265,7 +265,7 @@ func TestKeymanager_FetchValidatingPublicKeys_WithExternalURL_ThrowsError(t *tes
 	config := &SetupConfig{
 		BaseEndpoint:          "http://example.com",
 		GenesisValidatorsRoot: root,
-		PublicKeysURL:         "http://example2.com/api/v1/eth2/publicKeys",
+		PublicKeysURL:         "http://example2.com/api/v1/consensus/publicKeys",
 	}
 	km, err := NewKeymanager(ctx, config)
 	if err != nil {
@@ -275,7 +275,7 @@ func TestKeymanager_FetchValidatingPublicKeys_WithExternalURL_ThrowsError(t *tes
 	resp, err := km.FetchValidatingPublicKeys(ctx)
 	assert.NotNil(t, err)
 	assert.Nil(t, resp)
-	assert.Equal(t, "could not get public keys from remote server url: http://example2.com/api/v1/eth2/publicKeys: mock error", fmt.Sprintf("%v", err))
+	assert.Equal(t, "could not get public keys from remote server url: http://example2.com/api/v1/consensus/publicKeys: mock error", fmt.Sprintf("%v", err))
 }
 
 func TestKeymanager_AddPublicKeys(t *testing.T) {

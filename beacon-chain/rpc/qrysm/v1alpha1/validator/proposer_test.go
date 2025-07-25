@@ -143,7 +143,7 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	randaoReveal, err := util.RandaoReveal(beaconState, 0, privKeys)
 	require.NoError(t, err)
 
-	graffiti := bytesutil.ToBytes32([]byte("eth2"))
+	graffiti := bytesutil.ToBytes32([]byte("qrl"))
 	require.NoError(t, err)
 	req := &qrysmpb.BlockRequest{
 		Slot:         capellaSlot + 1,
@@ -389,10 +389,10 @@ func TestProposer_PendingDeposits_ExecutionDataVoteOK(t *testing.T) {
 
 	// It should also return the recent deposits after their follow window.
 	p.LatestBlockNumber = big.NewInt(0).Add(p.LatestBlockNumber, big.NewInt(10000))
-	_, eth1Height, err := bs.canonicalExecutionData(ctx, beaconState, &qrysmpb.ExecutionData{})
+	_, executionHeight, err := bs.canonicalExecutionData(ctx, beaconState, &qrysmpb.ExecutionData{})
 	require.NoError(t, err)
 
-	assert.Equal(t, 0, eth1Height.Cmp(height))
+	assert.Equal(t, 0, executionHeight.Cmp(height))
 
 	newState, err := b.ProcessExecutionDataInBlock(ctx, beaconState, blk.Block.Body.ExecutionData)
 	require.NoError(t, err)
@@ -404,9 +404,9 @@ func TestProposer_PendingDeposits_ExecutionDataVoteOK(t *testing.T) {
 
 	blk.Block.Body.ExecutionData = vote
 
-	_, eth1Height, err = bs.canonicalExecutionData(ctx, beaconState, vote)
+	_, executionHeight, err = bs.canonicalExecutionData(ctx, beaconState, vote)
 	require.NoError(t, err)
-	assert.Equal(t, 0, eth1Height.Cmp(newHeight))
+	assert.Equal(t, 0, executionHeight.Cmp(newHeight))
 
 	newState, err = b.ProcessExecutionDataInBlock(ctx, beaconState, blk.Block.Body.ExecutionData)
 	require.NoError(t, err)
@@ -416,7 +416,7 @@ func TestProposer_PendingDeposits_ExecutionDataVoteOK(t *testing.T) {
 	}
 }
 
-func TestProposer_PendingDeposits_OutsideEth1FollowWindow(t *testing.T) {
+func TestProposer_PendingDeposits_OutsideExecutionFollowWindow(t *testing.T) {
 	ctx := context.Background()
 
 	height := big.NewInt(int64(params.BeaconConfig().ExecutionFollowDistance))

@@ -143,7 +143,7 @@ type SentDeposit struct {
 // the `partial` flag specifies that half of the deposits should be broken up into 2 transactions.
 // Once the set of deposits has been generated, it submits a transaction for each deposit
 // (using 2 transactions for partial deposits) and then uses WaitForBlocks (which spams the miner node with transactions
-// to and from its own address) to advance the chain until it has moved forward ETH1_FOLLOW_DISTANCE blocks.
+// to and from its own address) to advance the chain until it has moved forward EXECUTION_FOLLOW_DISTANCE blocks.
 func (d *Depositor) SendAndMine(ctx context.Context, offset, nvals int, batch types.DepositBatch, partial bool) error {
 	balance, err := d.Client.BalanceAt(ctx, d.Key.Address, nil)
 	if err != nil {

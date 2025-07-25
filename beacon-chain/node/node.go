@@ -143,7 +143,7 @@ func New(cliCtx *cli.Context, opts ...Option) (*BeaconNode, error) {
 	if err := configureSlotsPerArchivedPoint(cliCtx); err != nil {
 		return nil, err
 	}
-	if err := configureEth1Config(cliCtx); err != nil {
+	if err := configureExecutionConfig(cliCtx); err != nil {
 		return nil, err
 	}
 	configureNetwork(cliCtx)

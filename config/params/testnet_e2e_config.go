@@ -24,9 +24,9 @@ func E2ETestConfig() *BeaconChainConfig {
 	e2eConfig.MaxSeedLookahead = 1
 	e2eConfig.MinValidatorWithdrawabilityDelay = 1
 
-	// PoW parameters.
-	e2eConfig.DepositChainID = 1337   // Chain ID of eth1 dev net.
-	e2eConfig.DepositNetworkID = 1337 // Network ID of eth1 dev net.
+	// Execution parameters.
+	e2eConfig.DepositChainID = 1337   // Chain ID of execution node.
+	e2eConfig.DepositNetworkID = 1337 // Network ID of execution node.
 
 	// Qrysm constants.
 	e2eConfig.ConfigName = EndToEndName
@@ -52,9 +52,9 @@ func E2EMainnetTestConfig() *BeaconChainConfig {
 	e2eConfig.ShardCommitteePeriod = 4
 	e2eConfig.MinValidatorWithdrawabilityDelay = 1
 
-	// PoW parameters.
-	e2eConfig.DepositChainID = 1337   // Chain ID of eth1 dev net.
-	e2eConfig.DepositNetworkID = 1337 // Network ID of eth1 dev net.
+	// Execution parameters.
+	e2eConfig.DepositChainID = 1337   // Chain ID of execution node.
+	e2eConfig.DepositNetworkID = 1337 // Network ID of execution node.
 
 	// Qrysm constants.
 	e2eConfig.ConfigName = EndToEndMainnetName

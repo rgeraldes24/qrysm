@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	ethApiNamespace = "/api/v1/eth2/sign/"
+	ethApiNamespace = "/api/v1/consensus/sign/"
 )
 
 type SignRequestJson []byte

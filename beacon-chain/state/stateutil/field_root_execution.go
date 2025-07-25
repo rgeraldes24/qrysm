@@ -5,10 +5,10 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-// Eth1Root computes the HashTreeRoot Merkleization of
+// ExecutionRoot computes the HashTreeRoot Merkleization of
 // a BeaconBlockHeader struct according to the eth2
 // Simple Serialize specification.
-func Eth1Root(executionData *qrysmpb.ExecutionData) ([32]byte, error) {
+func ExecutionRoot(executionData *qrysmpb.ExecutionData) ([32]byte, error) {
 	if executionData == nil {
 		return [32]byte{}, errors.New("nil execution data")
 	}

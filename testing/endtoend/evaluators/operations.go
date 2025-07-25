@@ -36,7 +36,7 @@ var numOfExits = 2
 var followDistanceSeconds = params.E2ETestConfig().ExecutionFollowDistance * params.E2ETestConfig().SecondsPerExecutionBlock
 var secondsPerEpoch = params.E2ETestConfig().SecondsPerSlot * uint64(params.E2ETestConfig().SlotsPerEpoch)
 
-// Deposits should be processed in twice the length of the epochs per eth1 voting period.
+// Deposits should be processed in twice the length of the epochs per execution voting period.
 var depositsInBlockStart = primitives.Epoch(2*followDistanceSeconds/secondsPerEpoch) + params.E2ETestConfig().EpochsPerExecutionVotingPeriod*2
 
 // deposits included + finalization + MaxSeedLookahead for activation.

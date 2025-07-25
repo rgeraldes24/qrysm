@@ -94,10 +94,10 @@ func TestInvertExecutionMetrics(t *testing.T) {
 	}
 }
 
-func TestFalseEth2Synced(t *testing.T) {
+func TestFalseBeaconSynced(t *testing.T) {
 	bnScraper := beaconNodeScraper{}
-	eth2NotSynced := strings.Replace(prometheusTestBody, "beacon_head_slot 256552", "beacon_head_slot 256559", 1)
-	bnScraper.tripper = &mockRT{body: eth2NotSynced}
+	beaconNotSynced := strings.Replace(prometheusTestBody, "beacon_head_slot 256552", "beacon_head_slot 256559", 1)
+	bnScraper.tripper = &mockRT{body: beaconNotSynced}
 	r, err := bnScraper.Scrape()
 	require.NoError(t, err, "Unexpected error calling beaconNodeScraper.Scrape")
 
@@ -242,10 +242,10 @@ p2p_peer_count{state="Disconnecting"} 0
 # HELP execution_chain_sync_execution_connected Boolean indicating whether a fallback execution endpoint is currently connected: 0=false, 1=true.
 # TYPE execution_chain_sync_execution_connected gauge
 execution_chain_sync_execution_connected 1
-# HELP execution_chain_sync_execution_fallback_configured Boolean recording whether a fallback eth1 endpoint was configured: 0=false, 1=true.
+# HELP execution_chain_sync_execution_fallback_configured Boolean recording whether a fallback execution endpoint was configured: 0=false, 1=true.
 # TYPE execution_chain_sync_execution_fallback_configured gauge
 execution_chain_sync_execution_fallback_configured 1
-# HELP execution_chain_sync_execution_fallback_connected Boolean indicating whether a fallback eth1 endpoint is currently connected: 0=false, 1=true.
+# HELP execution_chain_sync_execution_fallback_connected Boolean indicating whether a fallback execution endpoint is currently connected: 0=false, 1=true.
 # TYPE execution_chain_sync_execution_fallback_connected gauge
 execution_chain_sync_execution_fallback_connected 1
 `

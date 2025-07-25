@@ -10,7 +10,7 @@ import (
 	chainMock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	dbTest "github.com/theQRL/qrysm/beacon-chain/db/testing"
-	powtesting "github.com/theQRL/qrysm/beacon-chain/execution/testing"
+	exectesting "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
@@ -118,7 +118,7 @@ func TestServer_getExecutionPayload(t *testing.T) {
 			params.OverrideBeaconConfig(cfg)
 
 			vs := &Server{
-				ExecutionEngineCaller:  &powtesting.EngineClient{PayloadIDBytes: tt.payloadID, ErrForkchoiceUpdated: tt.forkchoiceErr, ExecutionPayloadCapella: &pb.ExecutionPayloadCapella{}, BuilderOverride: tt.override},
+				ExecutionEngineCaller:  &exectesting.EngineClient{PayloadIDBytes: tt.payloadID, ErrForkchoiceUpdated: tt.forkchoiceErr, ExecutionPayloadCapella: &pb.ExecutionPayloadCapella{}, BuilderOverride: tt.override},
 				HeadFetcher:            &chainMock.ChainService{State: tt.st},
 				FinalizationFetcher:    &chainMock.ChainService{},
 				BeaconDB:               beaconDB,
@@ -157,7 +157,7 @@ func TestServer_getExecutionPayloadContextTimeout(t *testing.T) {
 	require.NoError(t, beaconDB.SaveFeeRecipientsByValidatorIDs(context.Background(), []primitives.ValidatorIndex{0}, []common.Address{{}}))
 
 	vs := &Server{
-		ExecutionEngineCaller:  &powtesting.EngineClient{PayloadIDBytes: &pb.PayloadIDBytes{}, ErrGetPayload: context.DeadlineExceeded, ExecutionPayloadCapella: &pb.ExecutionPayloadCapella{}},
+		ExecutionEngineCaller:  &exectesting.EngineClient{PayloadIDBytes: &pb.PayloadIDBytes{}, ErrGetPayload: context.DeadlineExceeded, ExecutionPayloadCapella: &pb.ExecutionPayloadCapella{}},
 		HeadFetcher:            &chainMock.ChainService{State: nonTransitionSt},
 		BeaconDB:               beaconDB,
 		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
@@ -207,7 +207,7 @@ func TestServer_getExecutionPayload_UnexpectedFeeRecipient(t *testing.T) {
 	payload := emptyPayloadCapella()
 	payload.FeeRecipient = feeRecipient[:]
 	vs := &Server{
-		ExecutionEngineCaller: &powtesting.EngineClient{
+		ExecutionEngineCaller: &exectesting.EngineClient{
 			PayloadIDBytes:          payloadID,
 			ExecutionPayloadCapella: payload,
 		},

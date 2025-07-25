@@ -20,7 +20,7 @@ import (
 
 // executionDataMajorityVote determines the appropriate executionData for a block proposal using
 // an algorithm called Voting with the Majority. The algorithm works as follows:
-//   - Determine the timestamp for the start slot for the eth1 voting period.
+//   - Determine the timestamp for the start slot for the execution voting period.
 //   - Determine the earliest and latest timestamps that a valid block can have.
 //   - Determine the first block not before the earliest timestamp. This block is the lower bound.
 //   - Determine the last block not after the latest timestamp. This block is the upper bound.
@@ -166,7 +166,7 @@ func (vs *Server) randomExecutionDataVote(ctx context.Context) (*qrysmpb.Executi
 	}
 
 	// set random roots and block hashes to prevent a majority from being
-	// built if the eth1 node is offline
+	// built if the execution node is offline
 	randGen := rand.NewGenerator()
 	depRoot := hash.Hash(bytesutil.Bytes32(randGen.Uint64()))
 	blockHash := hash.Hash(bytesutil.Bytes32(randGen.Uint64()))

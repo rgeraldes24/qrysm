@@ -63,7 +63,7 @@ message TrieLayer {
 // deposit related information for a particular deposit.
 message DepositContainer {
     int64 index = 1;
-    uint64 eth1_block_height = 2;
+    uint64 execution_block_height = 2;
     Deposit deposit = 3;
     bytes deposit_root = 4;
 }

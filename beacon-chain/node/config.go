@@ -88,7 +88,7 @@ func configureSlotsPerArchivedPoint(cliCtx *cli.Context) error {
 	return nil
 }
 
-func configureEth1Config(cliCtx *cli.Context) error {
+func configureExecutionConfig(cliCtx *cli.Context) error {
 	c := params.BeaconConfig().Copy()
 	if cliCtx.IsSet(flags.ChainID.Name) {
 		c.DepositChainID = cliCtx.Uint64(flags.ChainID.Name)

@@ -30,20 +30,20 @@ func TestNextWithdrawalValidatorIndex(t *testing.T) {
 	})
 }
 
-func TestHasETH1WithdrawalCredentials(t *testing.T) {
+func TestHasExecutionWithdrawalCredentials(t *testing.T) {
 	creds := []byte{0xFA, 0xCC}
 	v := &qrysmpb.Validator{WithdrawalCredentials: creds}
-	require.Equal(t, false, hasETH1WithdrawalCredential(v))
+	require.Equal(t, false, hasExecutionWithdrawalCredential(v))
 	creds = []byte{params.BeaconConfig().QRLAddressWithdrawalPrefixByte, 0xCC}
 	v = &qrysmpb.Validator{WithdrawalCredentials: creds}
-	require.Equal(t, true, hasETH1WithdrawalCredential(v))
+	require.Equal(t, true, hasExecutionWithdrawalCredential(v))
 	// No Withdrawal cred
 	v = &qrysmpb.Validator{}
-	require.Equal(t, false, hasETH1WithdrawalCredential(v))
+	require.Equal(t, false, hasExecutionWithdrawalCredential(v))
 }
 
 func TestIsFullyWithdrawableValidator(t *testing.T) {
-	// No ETH1 prefix
+	// No execution prefix
 	creds := []byte{0xFA, 0xCC}
 	v := &qrysmpb.Validator{
 		WithdrawalCredentials: creds,

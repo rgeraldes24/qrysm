@@ -1,5 +1,5 @@
 // Package execution defines a runtime service which is tasked with
-// communicating with an eth1 endpoint, processing logs from a deposit
+// communicating with an execution endpoint, processing logs from a deposit
 // contract, and the latest execution data headers for usage in the beacon node.
 package execution
 
@@ -58,9 +58,9 @@ var (
 )
 
 var (
-	// time to wait before trying to reconnect with the eth1 node.
+	// time to wait before trying to reconnect with the execution node.
 	backOffPeriod = 15 * time.Second
-	// amount of times before we log the status of the eth1 dial attempt.
+	// amount of times before we log the status of the execution dial attempt.
 	logThreshold = 8
 )
 
@@ -70,7 +70,7 @@ type ChainStartFetcher interface {
 	ChainStartExecutionData() *qrysmpb.ExecutionData
 }
 
-// ChainInfoFetcher retrieves information about eth1 metadata at the QRL consensus genesis time.
+// ChainInfoFetcher retrieves information about execution metadata at the QRL consensus genesis time.
 type ChainInfoFetcher interface {
 	GenesisExecutionChainInfo() (uint64, *big.Int)
 	ExecutionClientConnected() bool
@@ -78,8 +78,8 @@ type ChainInfoFetcher interface {
 	ExecutionClientConnectionErr() error
 }
 
-// POWBlockFetcher defines a struct that can retrieve mainchain blocks.
-type POWBlockFetcher interface {
+// ExecutionBlockFetcher defines a struct that can retrieve execution chain blocks.
+type ExecutionBlockFetcher interface {
 	BlockTimeByHeight(ctx context.Context, height *big.Int) (uint64, error)
 	BlockByTimestamp(ctx context.Context, time uint64) (*types.HeaderInfo, error)
 	BlockHashByHeight(ctx context.Context, height *big.Int) (common.Hash, error)
@@ -90,10 +90,10 @@ type POWBlockFetcher interface {
 type Chain interface {
 	ChainStartFetcher
 	ChainInfoFetcher
-	POWBlockFetcher
+	ExecutionBlockFetcher
 }
 
-// RPCClient defines the rpc methods required to interact with the eth1 node.
+// RPCClient defines the rpc methods required to interact with the execution node.
 type RPCClient interface {
 	Close()
 	BatchCall(b []zondRPC.BatchElem) error
@@ -284,7 +284,7 @@ func (s *Service) updateConnectedExecution(state bool) {
 	s.updateBeaconNodeStats()
 }
 
-// refers to the latest execution block which follows the condition: eth1_timestamp +
+// refers to the latest execution block which follows the condition: execution_timestamp +
 // SECONDS_PER_EXECUTION_BLOCK * EXECUTION_FOLLOW_DISTANCE <= current_unix_time
 func (s *Service) followedBlockHeight(ctx context.Context) (uint64, error) {
 	followTime := params.BeaconConfig().ExecutionFollowDistance * params.BeaconConfig().SecondsPerExecutionBlock
@@ -430,7 +430,7 @@ func safelyHandlePanic() {
 	}
 }
 
-func (s *Service) handleETH1FollowDistance() {
+func (s *Service) handleExecutionFollowDistance() {
 	defer safelyHandlePanic()
 	ctx := s.ctx
 
@@ -461,7 +461,7 @@ func (s *Service) handleETH1FollowDistance() {
 	}
 }
 
-func (s *Service) initPOWService() {
+func (s *Service) initExecutionService() {
 	// Use a custom logger to only log errors
 	logCounter := 0
 	errorLogger := func(err error, msg string) {
@@ -502,7 +502,7 @@ func (s *Service) initPOWService() {
 				)
 				continue
 			}
-			// Cache eth1 headers from our voting period.
+			// Cache execution headers from our voting period.
 			if err := s.cacheHeadersForExecutionDataVote(ctx); err != nil {
 				err = errors.Wrap(err, "cacheHeadersForExecutionDataVote")
 				s.retryExecutionClientConnection(ctx, err)
@@ -547,7 +547,7 @@ func (s *Service) initPOWService() {
 func (s *Service) run(done <-chan struct{}) {
 	s.runError = nil
 
-	s.initPOWService()
+	s.initExecutionService()
 
 	for {
 		select {
@@ -562,17 +562,17 @@ func (s *Service) run(done <-chan struct{}) {
 			head, err := s.HeaderByNumber(s.ctx, nil)
 			if err != nil {
 				s.pollConnectionStatus(s.ctx)
-				log.WithError(err).Debug("Could not fetch latest eth1 header")
+				log.WithError(err).Debug("Could not fetch latest execution header")
 				continue
 			}
 			s.processBlockHeader(head)
-			s.handleETH1FollowDistance()
+			s.handleExecutionFollowDistance()
 		}
 	}
 }
 
 // cacheHeadersForExecutionDataVote makes sure that voting for executionData after startup utilizes cached headers
-// instead of making multiple RPC requests to the eth1 endpoint.
+// instead of making multiple RPC requests to the execution endpoint.
 func (s *Service) cacheHeadersForExecutionDataVote(ctx context.Context) error {
 	// Find the end block to request from.
 	end, err := s.followedBlockHeight(ctx)
@@ -605,7 +605,7 @@ func (s *Service) cacheBlockHeaders(start, end uint64) error {
 		_, err := s.batchRequestHeaders(startReq, endReq)
 		if err != nil {
 			if clientTimedOutError(err) {
-				// Reduce batch size as eth1 node is
+				// Reduce batch size as execution node is
 				// unable to respond to the request in time.
 				batchSize /= 2
 				// Always have it greater than 0.

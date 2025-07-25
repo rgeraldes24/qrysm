@@ -118,7 +118,7 @@ var appHelpFlagGroups = []flagGroup{
 			flags.ChainID,
 			flags.NetworkID,
 			flags.WeakSubjectivityCheckpoint,
-			flags.Eth1HeaderReqLimit,
+			flags.ExecutionHeaderReqLimit,
 			flags.MinPeersPerSubnet,
 			flags.MevRelayEndpoint,
 			flags.MaxBuilderEpochMissedSlots,

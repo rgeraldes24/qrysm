@@ -49,7 +49,7 @@ type Server struct {
 	GenesisFetcher            blockchain.GenesisFetcher
 	FinalizationFetcher       blockchain.FinalizationFetcher
 	TimeFetcher               blockchain.TimeFetcher
-	BlockFetcher              execution.POWBlockFetcher
+	BlockFetcher              execution.ExecutionBlockFetcher
 	DepositFetcher            cache.DepositFetcher
 	ChainStartFetcher         execution.ChainStartFetcher
 	ExecutionNodeInfoFetcher  execution.ChainInfoFetcher
@@ -64,7 +64,7 @@ type Server struct {
 	SyncCommitteePool         synccommittee.Pool
 	BlockReceiver             blockchain.BlockReceiver
 	MockExecutionNodeVotes    bool
-	ExecutionNodeBlockFetcher execution.POWBlockFetcher
+	ExecutionNodeBlockFetcher execution.ExecutionBlockFetcher
 	PendingDepositsFetcher    depositcache.PendingDepositsFetcher
 	OperationNotifier         opfeed.Notifier
 	StateGen                  stategen.StateManager

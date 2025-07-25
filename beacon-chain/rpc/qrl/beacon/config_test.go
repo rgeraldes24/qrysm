@@ -157,7 +157,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "11", v)
 		case "SAFE_SLOTS_TO_UPDATE_JUSTIFIED":
 			assert.Equal(t, "0", v)
-		case "ETH1_FOLLOW_DISTANCE":
+		case "EXECUTION_FOLLOW_DISTANCE":
 			assert.Equal(t, "13", v)
 		case "TARGET_AGGREGATORS_PER_COMMITTEE":
 			assert.Equal(t, "14", v)
@@ -165,7 +165,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "15", v)
 		case "EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION":
 			assert.Equal(t, "16", v)
-		case "SECONDS_PER_ETH1_BLOCK":
+		case "SECONDS_PER_EXECUTION_BLOCK":
 			assert.Equal(t, "17", v)
 		case "DEPOSIT_CHAIN_ID":
 			assert.Equal(t, "18", v)
@@ -199,7 +199,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "28", v)
 		case "MAX_SEED_LOOKAHEAD":
 			assert.Equal(t, "29", v)
-		case "EPOCHS_PER_ETH1_VOTING_PERIOD":
+		case "EPOCHS_PER_EXECUTION_VOTING_PERIOD":
 			assert.Equal(t, "30", v)
 		case "SLOTS_PER_HISTORICAL_ROOT":
 			assert.Equal(t, "31", v)

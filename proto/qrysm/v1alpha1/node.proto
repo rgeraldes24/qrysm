@@ -178,7 +178,7 @@ enum ConnectionState {
     CONNECTING = 3;
 }
 
-// ExecutionNodeConnectionStatus states the current address and error of the ETH1 API
+// ExecutionNodeConnectionStatus states the current address and error of the execution API
 // endpoint. It also provides the addresses and errors for any fallback URLs. 
 message ExecutionNodeConnectionStatus {
     // Current Execution Node HTTP endpoint.

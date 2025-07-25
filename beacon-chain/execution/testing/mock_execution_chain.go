@@ -121,11 +121,11 @@ func (m *Chain) ExecutionClientConnectionErr() error {
 	return m.CurrError
 }
 
-func (m *Chain) ETH1Endpoints() []string {
+func (m *Chain) ExecutionEndpoints() []string {
 	return m.Endpoints
 }
 
-func (m *Chain) ETH1ConnectionErrors() []error {
+func (m *Chain) ExecutionConnectionErrors() []error {
 	return m.Errors
 }
 

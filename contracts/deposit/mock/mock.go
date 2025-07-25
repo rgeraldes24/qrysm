@@ -22,7 +22,7 @@ var (
 )
 
 // TestAccount represents a test account in the simulated backend,
-// through which we can perform actions on the eth1.0 chain.
+// through which we can perform actions on the execution chain.
 type TestAccount struct {
 	Addr         common.Address
 	ContractAddr common.Address

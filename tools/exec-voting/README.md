@@ -1,6 +1,6 @@
-# eth1voting
+# exec-voting
 
-This tool can be used to query a Qrysm node to print eth1voting information.
+This tool can be used to query a Qrysm node to print exec-voting information.
 
 Flags:
 ```
@@ -12,7 +12,7 @@ Flags:
 
 Usage:
 ```
-bazel run //tools/eth1voting -- -beacon=127.0.0.1:4000 -genesis=1606824023
+bazel run //tools/exec-voting -- -beacon=127.0.0.1:4000 -genesis=1606824023
 ```
 
 Example response

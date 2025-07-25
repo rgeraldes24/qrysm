@@ -1,4 +1,4 @@
-// Package v1 defines mappings of types as defined by the web3signer official specification for its v1 version i.e. /api/v1/eth2
+// Package v1 defines mappings of types as defined by the web3signer official specification for its v1 version i.e. /api/v1/consensus
 /* Web3Signer Specs are found by searching Consensys' Web3Signer API specification*/
 package v1
 

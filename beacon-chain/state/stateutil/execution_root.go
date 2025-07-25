@@ -41,27 +41,27 @@ func ExecutionDataRootWithHasher(executionData *qrysmpb.ExecutionData) ([32]byte
 
 // ExecutionDatasRoot returns the hash tree root of input `executionDatas`.
 func ExecutionDatasRoot(executionDatas []*qrysmpb.ExecutionData) ([32]byte, error) {
-	eth1VotesRoots := make([][32]byte, 0, len(executionDatas))
+	executionVotesRoots := make([][32]byte, 0, len(executionDatas))
 	for i := 0; i < len(executionDatas); i++ {
-		eth1, err := ExecutionDataRootWithHasher(executionDatas[i])
+		execution, err := ExecutionDataRootWithHasher(executionDatas[i])
 		if err != nil {
 			return [32]byte{}, errors.Wrap(err, "could not compute executionData merkleization")
 		}
-		eth1VotesRoots = append(eth1VotesRoots, eth1)
+		executionVotesRoots = append(executionVotesRoots, execution)
 	}
 
-	eth1VotesRootsRoot, err := ssz.BitwiseMerkleize(eth1VotesRoots, uint64(len(eth1VotesRoots)), params.BeaconConfig().ExecutionDataVotesLength())
+	executionVotesRootsRoot, err := ssz.BitwiseMerkleize(executionVotesRoots, uint64(len(executionVotesRoots)), params.BeaconConfig().ExecutionDataVotesLength())
 	if err != nil {
 		return [32]byte{}, errors.Wrap(err, "could not compute executionData votes merkleization")
 	}
-	eth1VotesRootBuf := new(bytes.Buffer)
-	if err := binary.Write(eth1VotesRootBuf, binary.LittleEndian, uint64(len(executionDatas))); err != nil {
+	executionVotesRootBuf := new(bytes.Buffer)
+	if err := binary.Write(executionVotesRootBuf, binary.LittleEndian, uint64(len(executionDatas))); err != nil {
 		return [32]byte{}, errors.Wrap(err, "could not marshal executionData votes length")
 	}
 	// We need to mix in the length of the slice.
-	eth1VotesRootBufRoot := make([]byte, 32)
-	copy(eth1VotesRootBufRoot, eth1VotesRootBuf.Bytes())
-	root := ssz.MixInLength(eth1VotesRootsRoot, eth1VotesRootBufRoot)
+	executionVotesRootBufRoot := make([]byte, 32)
+	copy(executionVotesRootBufRoot, executionVotesRootBuf.Bytes())
+	root := ssz.MixInLength(executionVotesRootsRoot, executionVotesRootBufRoot)
 
 	return root, nil
 }

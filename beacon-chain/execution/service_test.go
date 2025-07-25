@@ -36,7 +36,7 @@ import (
 
 var _ ChainStartFetcher = (*Service)(nil)
 var _ ChainInfoFetcher = (*Service)(nil)
-var _ POWBlockFetcher = (*Service)(nil)
+var _ ExecutionBlockFetcher = (*Service)(nil)
 var _ Chain = (*Service)(nil)
 
 type goodLogger struct {
@@ -435,7 +435,7 @@ func TestNewService_EarliestVotingBlock(t *testing.T) {
 
 }
 
-func TestNewService_Eth1HeaderRequLimit(t *testing.T) {
+func TestNewService_ExecutionHeaderRequLimit(t *testing.T) {
 	testAcc, err := mock.Setup()
 	require.NoError(t, err, "Unable to set up simulated backend")
 	beaconDB := dbutil.SetupDB(t)
@@ -451,7 +451,7 @@ func TestNewService_Eth1HeaderRequLimit(t *testing.T) {
 		WithDatabase(beaconDB),
 	)
 	require.NoError(t, err, "unable to setup web3 QRL execution chain service")
-	assert.Equal(t, defaultExecutionHeaderReqLimit, s1.cfg.executionHeaderReqLimit, "default eth1 header request limit not set")
+	assert.Equal(t, defaultExecutionHeaderReqLimit, s1.cfg.executionHeaderReqLimit, "default execution header request limit not set")
 	s2, err := NewService(context.Background(),
 		WithHttpEndpoint(endpoint),
 		WithDepositContractAddress(testAcc.ContractAddr),
@@ -459,7 +459,7 @@ func TestNewService_Eth1HeaderRequLimit(t *testing.T) {
 		WithExecutionHeaderRequestLimit(uint64(150)),
 	)
 	require.NoError(t, err, "unable to setup web3 QRL execution chain service")
-	assert.Equal(t, uint64(150), s2.cfg.executionHeaderReqLimit, "unable to set eth1HeaderRequestLimit")
+	assert.Equal(t, uint64(150), s2.cfg.executionHeaderReqLimit, "unable to set executionHeaderRequestLimit")
 }
 
 type mockBSUpdater struct {
@@ -634,7 +634,7 @@ func TestService_ValidateDepositContainers(t *testing.T) {
 	}
 }
 
-func TestETH1Endpoints(t *testing.T) {
+func TestExecutionEndpoints(t *testing.T) {
 	server, firstEndpoint, err := mockExecution.SetupRPCServer()
 	require.NoError(t, err)
 	t.Cleanup(func() {
@@ -686,11 +686,11 @@ func TestService_CacheBlockHeaders(t *testing.T) {
 func TestService_FollowBlock(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	conf := params.BeaconConfig().Copy()
-	conf.Eth1FollowDistance = 2048
+	conf.ExecutionFollowDistance = 2048
 	conf.SecondsPerExecutionBlock = 14
 	params.OverrideBeaconConfig(conf)
 
-	followTime := params.BeaconConfig().Eth1FollowDistance * params.BeaconConfig().SecondsPerExecutionBlock
+	followTime := params.BeaconConfig().ExecutionFollowDistance * params.BeaconConfig().SecondsPerExecutionBlock
 	followTime += 10000
 	bMap := make(map[uint64]*types.HeaderInfo)
 	for i := uint64(3000); i > 0; i-- {
@@ -705,7 +705,7 @@ func TestService_FollowBlock(t *testing.T) {
 		}
 	}
 	s := &Service{
-		cfg:            &config{eth1HeaderReqLimit: 1000},
+		cfg:            &config{executionHeaderReqLimit: 1000},
 		rpcClient:      &mockExecution.RPCClient{BlockNumMap: bMap},
 		headerCache:    newHeaderCache(),
 		latestExecutionData: &qrysmpb.LatestExecutionData{BlockTime: (3000 * 40) + followTime, BlockHeight: 3000},

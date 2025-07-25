@@ -32,7 +32,7 @@ func (s *Service) CanSubscribe(topic string) bool {
 	if parts[0] != "" {
 		return false
 	}
-	if parts[1] != "eth2" {
+	if parts[1] != "consensus" {
 		return false
 	}
 	capellaForkDigest, err := s.currentForkDigest()

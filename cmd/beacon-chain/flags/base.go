@@ -1,5 +1,5 @@
 // Package flags defines beacon-node specific runtime flags for
-// setting important values such as ports, eth1 endpoints, and more.
+// setting important values such as ports, execution endpoints, and more.
 package flags
 
 import (
@@ -126,7 +126,7 @@ var (
 		Usage: "The required number of valid peers to connect with before syncing.",
 		Value: 3,
 	}
-	// ContractDeploymentBlock is the block in which the eth1 deposit contract was deployed.
+	// ContractDeploymentBlock is the block in which the execution deposit contract was deployed.
 	ContractDeploymentBlock = &cli.IntFlag{
 		Name:  "contract-deployment-block",
 		Usage: "The execution block in which the deposit contract was deployed.",
@@ -189,9 +189,9 @@ var (
 		Name:  "engine-endpoint-timeout-seconds",
 		Usage: "Sets the execution engine timeout (seconds) for execution payload semantics (forkchoiceUpdated, newPayload)",
 	}
-	// Eth1HeaderReqLimit defines a flag to set the maximum number of headers that a deposit log query can fetch. If none is set, 1000 will be the limit.
-	Eth1HeaderReqLimit = &cli.Uint64Flag{
-		Name:  "eth1-header-req-limit",
+	// ExecutionHeaderReqLimit defines a flag to set the maximum number of headers that a deposit log query can fetch. If none is set, 1000 will be the limit.
+	ExecutionHeaderReqLimit = &cli.Uint64Flag{
+		Name:  "execution-header-req-limit",
 		Usage: "Sets the maximum number of headers that a deposit log query can fetch.",
 		Value: uint64(1000),
 	}

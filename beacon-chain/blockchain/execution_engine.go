@@ -48,6 +48,7 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 		log.Error("Head block is nil")
 		return nil, nil
 	}
+	// TODO(rgeraldes24)
 	// Must not call fork choice updated until the transition conditions are met on the Pow network.
 	isExecutionBlk, err := blocks.IsExecutionBlock(headBlk.Body())
 	if err != nil {

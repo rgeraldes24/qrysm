@@ -30,7 +30,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func TestValidatorStatus_DepositedEth1(t *testing.T) {
+func TestValidatorStatus_DepositedExecution(t *testing.T) {
 	ctx := context.Background()
 	deposits, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err, "Could not generate deposits and keys")
