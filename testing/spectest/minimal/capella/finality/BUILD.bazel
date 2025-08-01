@@ -7,10 +7,10 @@ go_test(
     data = [
         #"@consensus_spec_tests_minimal//:test_data",
     ],
+    qrl_network = "minimal",
     shard_count = 1,
     tags = [
         "minimal",
         "spectest",
     ],
-    qrl_network = "minimal",
 )
