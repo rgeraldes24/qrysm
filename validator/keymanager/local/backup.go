@@ -6,9 +6,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/validator/keymanager"
 )
 

@@ -67,7 +67,6 @@ require (
 	github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63
 	github.com/theQRL/go-qrllib v0.0.0-20230406170304-b7eb19c367e1
 	github.com/theQRL/go-zond v0.1.1
-	github.com/theQRL/go-zond-wallet-encryptor-keystore v0.0.0-20231020114450-f6f12b82ea8b
 	github.com/thomaso-mirodin/intmath v0.0.0-20160323211736-5dc6d854e46e
 	github.com/trailofbits/go-mutexasserts v0.0.0-20230328101604-8cdbc5f3d279
 	github.com/urfave/cli/v2 v2.27.1
@@ -81,7 +80,7 @@ require (
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/sync v0.5.0
 	golang.org/x/term v0.16.0
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/text v0.14.0
 	golang.org/x/tools v0.16.0
 	google.golang.org/genproto v0.0.0-20230227214838-9b19f0bdc514
 	google.golang.org/grpc v1.53.0
@@ -256,5 +255,3 @@ replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/theQRL/grpc-gate
 replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20250719093039-de94263012f9
 
 replace github.com/theQRL/tx-fuzz => github.com/rgeraldes24/tx-fuzz v0.0.0-20250430111120-47f2ef4cdb94
-
-replace github.com/theQRL/go-zond-wallet-encryptor-keystore => github.com/rgeraldes24/go-zond-wallet-encryptor-keystore v0.0.0-20250702080128-b3082ce292d8
