@@ -85,7 +85,10 @@ func normPassphrase(input string) string {
 		if len(string(rune)) == 1 && stripChars[string(rune)[0]] {
 			continue
 		}
-		res.WriteRune(rune)
+		_, err := res.WriteRune(rune)
+		if err != nil {
+			return ""
+		}
 	}
 
 	return res.String()
