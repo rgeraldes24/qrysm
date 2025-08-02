@@ -55,7 +55,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 	web3Provider := cliCtx.String(flags.HTTPWeb3ProviderFlag.Name)
 	rpcClient, err := rpc.Dial(web3Provider)
 	if err != nil {
-		return fmt.Errorf("failed to connect to the zond provider. reason: %v", err)
+		return fmt.Errorf("failed to connect to the qrl provider. reason: %v", err)
 	}
 	qrlCli := qrlclient.NewClient(rpcClient)
 	chainID, err := qrlCli.ChainID(cliCtx.Context)
