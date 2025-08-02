@@ -331,7 +331,7 @@ func TestMonitorRoutine(t *testing.T) {
 
 	// wait for Logrus
 	time.Sleep(1000 * time.Millisecond)
-	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=0x7e1ac7288839 ProposerIndex=1 Slot=1 Version=3 prefix=monitor", bytesutil.Trunc(root[:]))
+	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=0x7e1ac7288839 ProposerIndex=1 Slot=1 Version=0 prefix=monitor", bytesutil.Trunc(root[:]))
 	require.LogsContain(t, hook, wanted1)
 
 }

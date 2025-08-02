@@ -73,7 +73,7 @@ func TestProposeBeaconBlock_BlindedCapella(t *testing.T) {
 	ctx := context.Background()
 
 	// Make sure that what we send in the POST body is the marshalled version of the protobuf block
-	headers := map[string]string{"QRL-Consensus-Version": "capella"}
+	headers := map[string]string{"Qrl-Consensus-Version": "capella"}
 	jsonRestHandler.EXPECT().PostRestJson(
 		ctx,
 		"/qrl/v1/beacon/blinded_blocks",

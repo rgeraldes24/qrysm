@@ -150,7 +150,7 @@ func TestBeaconApiValidatorClient_ProposeBeaconBlockValid(t *testing.T) {
 	jsonRestHandler.EXPECT().PostRestJson(
 		ctx,
 		"/qrl/v1/beacon/blocks",
-		map[string]string{"QRL-Consensus-Version": "capella"},
+		map[string]string{"Qrl-Consensus-Version": "capella"},
 		gomock.Any(),
 		nil,
 	).Return(
@@ -187,7 +187,7 @@ func TestBeaconApiValidatorClient_ProposeBeaconBlockError(t *testing.T) {
 	jsonRestHandler.EXPECT().PostRestJson(
 		ctx,
 		"/qrl/v1/beacon/blocks",
-		map[string]string{"QRL-Consensus-Version": "capella"},
+		map[string]string{"Qrl-Consensus-Version": "capella"},
 		gomock.Any(),
 		nil,
 	).Return(

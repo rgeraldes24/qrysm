@@ -70,7 +70,7 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 	require.NoError(t, err)
 
 	// Make sure that what we send in the POST body is the marshalled version of the protobuf block
-	headers := map[string]string{"QRL-Consensus-Version": "capella"}
+	headers := map[string]string{"Qrl-Consensus-Version": "capella"}
 	jsonRestHandler.EXPECT().PostRestJson(
 		context.Background(),
 		"/qrl/v1/beacon/blocks",

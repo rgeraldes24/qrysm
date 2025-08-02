@@ -290,7 +290,7 @@ func (c *Client) SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlyS
 			return nil, errors.Wrap(err, "error encoding the SignedBlindedBeaconBlockCapella value body in SubmitBlindedBlockCapella")
 		}
 		versionOpt := func(r *http.Request) {
-			r.Header.Add("QRL-Consensus-Version", version.String(version.Capella))
+			r.Header.Add("Qrl-Consensus-Version", version.String(version.Capella))
 		}
 		rb, err := c.do(ctx, http.MethodPost, postBlindedBeaconBlockPath, bytes.NewBuffer(body), versionOpt)
 

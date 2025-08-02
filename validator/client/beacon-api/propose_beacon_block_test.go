@@ -67,7 +67,7 @@ func TestProposeBeaconBlock_Error(t *testing.T) {
 				ctx := context.Background()
 				jsonRestHandler := mock.NewMockjsonRestHandler(ctrl)
 
-				headers := map[string]string{"QRL-Consensus-Version": testCase.consensusVersion}
+				headers := map[string]string{"Qrl-Consensus-Version": testCase.consensusVersion}
 				jsonRestHandler.EXPECT().PostRestJson(
 					ctx,
 					testCase.endpoint,

@@ -57,7 +57,7 @@ func (c beaconApiValidatorClient) proposeBeaconBlock(ctx context.Context, in *qr
 		endpoint = "/qrl/v1/beacon/blocks"
 	}
 
-	headers := map[string]string{"QRL-Consensus-Version": consensusVersion}
+	headers := map[string]string{"Qrl-Consensus-Version": consensusVersion}
 	if httpError, err := c.jsonRestHandler.PostRestJson(ctx, endpoint, headers, bytes.NewBuffer(marshalledSignedBeaconBlockJson), nil); err != nil {
 		if httpError != nil && httpError.Code == http.StatusAccepted {
 			// Error 202 means that the block was successfully broadcasted, but validation failed
