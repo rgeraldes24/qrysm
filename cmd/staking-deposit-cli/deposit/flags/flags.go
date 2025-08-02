@@ -15,17 +15,17 @@ var (
 		// Value: filepath.Join(DefaultValidatorKeysDir(), ValidatorKeysDefaultDirName),
 		Value: ValidatorKeysDefaultDirName,
 	}
-	// ZondSeedFileFlag for transaction signing.
-	ZondSeedFileFlag = &cli.StringFlag{
-		Name:     "zond-seed-file",
-		Usage:    "File containing a seed for sending deposit transactions from zond",
+	// QRLSeedFileFlag for transaction signing.
+	QRLSeedFileFlag = &cli.StringFlag{
+		Name:     "qrl-seed-file",
+		Usage:    "File containing a seed for sending deposit transactions from qrl",
 		Value:    "",
 		Required: true,
 	}
-	// HTTPWeb3ProviderFlag provides an HTTP access endpoint to a ZOND RPC.
+	// HTTPWeb3ProviderFlag provides an HTTP access endpoint to a QRL RPC.
 	HTTPWeb3ProviderFlag = &cli.StringFlag{
 		Name:  "http-web3provider",
-		Usage: "A zond web3 provider string http endpoint",
+		Usage: "A qrl web3 provider string http endpoint",
 		Value: "http://localhost:8545",
 	}
 	// DepositContractAddressFlag for the validator deposit contract on qrl.

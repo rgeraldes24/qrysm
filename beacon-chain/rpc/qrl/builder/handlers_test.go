@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	http2 "github.com/theQRL/qrysm/network/http"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -112,12 +112,12 @@ func TestExpectedWithdrawals(t *testing.T) {
 
 		// Update state with updated validator fields
 		valCount := 17
-		validators := make([]*zond.Validator, 0, valCount)
+		validators := make([]*qrysmpb.Validator, 0, valCount)
 		balances := make([]uint64, 0, valCount)
 		for i := 0; i < valCount; i++ {
 			dilithiumKey, err := dilithium.RandKey()
 			require.NoError(t, err)
-			val := &zond.Validator{
+			val := &qrysmpb.Validator{
 				PublicKey:             dilithiumKey.PublicKey().Marshal(),
 				WithdrawalCredentials: make([]byte, 32),
 				ExitEpoch:             params.BeaconConfig().FarFutureEpoch,

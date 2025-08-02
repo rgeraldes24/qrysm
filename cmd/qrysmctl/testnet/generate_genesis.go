@@ -275,7 +275,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		// set timestamps for genesis and shanghai fork
 		gen.Timestamp = f.GenesisTime
 
-		log.Info("setting fork zond times")
+		log.Info("setting fork qrl times")
 	} else {
 		gen = interop.GzondTestnetGenesis(f.GenesisTime, params.BeaconConfig())
 	}

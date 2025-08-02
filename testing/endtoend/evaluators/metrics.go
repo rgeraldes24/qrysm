@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/network/forks"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	"github.com/theQRL/qrysm/testing/endtoend/policies"
 	"github.com/theQRL/qrysm/testing/endtoend/types"
@@ -86,7 +86,7 @@ var metricComparisonTests = []comparisonTest{
 }
 
 func metricsTest(_ *types.EvaluationContext, conns ...*grpc.ClientConn) error {
-	genesis, err := zond.NewNodeClient(conns[0]).GetGenesis(context.Background(), &emptypb.Empty{})
+	genesis, err := qrysmpb.NewNodeClient(conns[0]).GetGenesis(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		return err
 	}
@@ -110,8 +110,8 @@ func metricsTest(_ *types.EvaluationContext, conns ...*grpc.ClientConn) error {
 		}
 		time.Sleep(connTimeDelay)
 
-		beaconClient := zond.NewBeaconChainClient(conns[i])
-		nodeClient := zond.NewNodeClient(conns[i])
+		beaconClient := qrysmpb.NewBeaconChainClient(conns[i])
+		nodeClient := qrysmpb.NewNodeClient(conns[i])
 		chainHead, err := beaconClient.GetChainHead(context.Background(), &emptypb.Empty{})
 		if err != nil {
 			return err

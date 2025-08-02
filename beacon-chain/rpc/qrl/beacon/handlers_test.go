@@ -33,7 +33,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/network/http"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/testing/assert"
 	mock2 "github.com/theQRL/qrysm/testing/mock"
@@ -47,8 +47,8 @@ func TestPublishBlock(t *testing.T) {
 
 	t.Run("Capella", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
-		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
-			block, ok := req.Block.(*zond.GenericSignedBeaconBlock_Capella)
+		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *qrysmpb.GenericSignedBeaconBlock) bool {
+			block, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_Capella)
 			converted, err := shared.BeaconBlockCapellaFromConsensus(block.Capella.Block)
 			require.NoError(t, err)
 			var signedblock *shared.SignedBeaconBlockCapella
@@ -118,8 +118,8 @@ func TestPublishBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	t.Run("Capella", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
-		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
-			_, ok := req.Block.(*zond.GenericSignedBeaconBlock_Capella)
+		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *qrysmpb.GenericSignedBeaconBlock) bool {
+			_, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_Capella)
 			return ok
 		}))
 		server := &Server{
@@ -159,8 +159,8 @@ func TestPublishBlindedBlock(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	t.Run("Blinded Capella", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
-		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
-			block, ok := req.Block.(*zond.GenericSignedBeaconBlock_BlindedCapella)
+		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *qrysmpb.GenericSignedBeaconBlock) bool {
+			block, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_BlindedCapella)
 			converted, err := shared.BlindedBeaconBlockCapellaFromConsensus(block.BlindedCapella.Block)
 			require.NoError(t, err)
 			var signedblock *shared.SignedBlindedBeaconBlockCapella
@@ -230,8 +230,8 @@ func TestPublishBlindedBlockSSZ(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	t.Run("Capella", func(t *testing.T) {
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
-		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *zond.GenericSignedBeaconBlock) bool {
-			_, ok := req.Block.(*zond.GenericSignedBeaconBlock_BlindedCapella)
+		v1alpha1Server.EXPECT().ProposeBeaconBlock(gomock.Any(), mock.MatchedBy(func(req *qrysmpb.GenericSignedBeaconBlock) bool {
+			_, ok := req.Block.(*qrysmpb.GenericSignedBeaconBlock_BlindedCapella)
 			return ok
 		}))
 		server := &Server{
@@ -332,14 +332,14 @@ func TestServer_GetBlockRoot(t *testing.T) {
 	genBlk, blkContainers := fillDBTestBlocks(ctx, t, beaconDB)
 	headBlock := blkContainers[len(blkContainers)-1]
 	t.Run("get root", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 
 		mockChainFetcher := &chainMock.ChainService{
 			DB:                  beaconDB,
 			Block:               wsb,
 			Root:                headBlock.BlockRoot,
-			FinalizedCheckPoint: &zond.Checkpoint{Root: blkContainers[64].BlockRoot},
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{Root: blkContainers[64].BlockRoot},
 			FinalizedRoots:      map[[32]byte]bool{},
 		}
 
@@ -451,14 +451,14 @@ func TestServer_GetBlockRoot(t *testing.T) {
 		}
 	})
 	t.Run("execution optimistic", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 
 		mockChainFetcher := &chainMock.ChainService{
 			DB:                  beaconDB,
 			Block:               wsb,
 			Root:                headBlock.BlockRoot,
-			FinalizedCheckPoint: &zond.Checkpoint{Root: blkContainers[64].BlockRoot},
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{Root: blkContainers[64].BlockRoot},
 			Optimistic:          true,
 			FinalizedRoots:      map[[32]byte]bool{},
 			OptimisticRoots: map[[32]byte]bool{
@@ -486,14 +486,14 @@ func TestServer_GetBlockRoot(t *testing.T) {
 		require.DeepEqual(t, resp.ExecutionOptimistic, true)
 	})
 	t.Run("finalized", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 
 		mockChainFetcher := &chainMock.ChainService{
 			DB:                  beaconDB,
 			Block:               wsb,
 			Root:                headBlock.BlockRoot,
-			FinalizedCheckPoint: &zond.Checkpoint{Root: blkContainers[64].BlockRoot},
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{Root: blkContainers[64].BlockRoot},
 			Optimistic:          true,
 			FinalizedRoots: map[[32]byte]bool{
 				bytesutil.ToBytes32(blkContainers[32].BlockRoot): true,
@@ -543,8 +543,8 @@ func TestGetStateFork(t *testing.T) {
 	writer := httptest.NewRecorder()
 	writer.Body = &bytes.Buffer{}
 
-	fillFork := func(state *zond.BeaconStateCapella) error {
-		state.Fork = &zond.Fork{
+	fillFork := func(state *qrysmpb.BeaconStateCapella) error {
+		state.Fork = &qrysmpb.Fork{
 			PreviousVersion: []byte("prev"),
 			CurrentVersion:  []byte("curr"),
 			Epoch:           123,
@@ -876,13 +876,13 @@ func TestGetBlockHeaders(t *testing.T) {
 	url := "http://example.com/qrl/v1/beacon/headers"
 
 	t.Run("list headers", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 		mockChainFetcher := &chainMock.ChainService{
 			DB:                  beaconDB,
 			Block:               wsb,
 			Root:                headBlock.BlockRoot,
-			FinalizedCheckPoint: &zond.Checkpoint{Root: blkContainers[64].BlockRoot},
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{Root: blkContainers[64].BlockRoot},
 			FinalizedRoots:      map[[32]byte]bool{},
 		}
 		bs := &Server{
@@ -896,15 +896,15 @@ func TestGetBlockHeaders(t *testing.T) {
 			name       string
 			slot       primitives.Slot
 			parentRoot string
-			want       []*zond.SignedBeaconBlockCapella
+			want       []*qrysmpb.SignedBeaconBlockCapella
 			wantErr    bool
 		}{
 			{
 				name:       "slot",
 				slot:       primitives.Slot(30),
 				parentRoot: "",
-				want: []*zond.SignedBeaconBlockCapella{
-					blkContainers[30].Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock,
+				want: []*qrysmpb.SignedBeaconBlockCapella{
+					blkContainers[30].Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock,
 					b1,
 					b2,
 				},
@@ -912,8 +912,8 @@ func TestGetBlockHeaders(t *testing.T) {
 			{
 				name:       "parent root",
 				parentRoot: hexutil.Encode(b1.Block.ParentRoot),
-				want: []*zond.SignedBeaconBlockCapella{
-					blkContainers[1].Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock,
+				want: []*qrysmpb.SignedBeaconBlockCapella{
+					blkContainers[1].Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock,
 					b1,
 					b3,
 					b4,
@@ -936,7 +936,7 @@ func TestGetBlockHeaders(t *testing.T) {
 				for i, blk := range tt.want {
 					expectedBodyRoot, err := blk.Block.Body.HashTreeRoot()
 					require.NoError(t, err)
-					expectedHeader := &zond.BeaconBlockHeader{
+					expectedHeader := &qrysmpb.BeaconBlockHeader{
 						Slot:          blk.Block.Slot,
 						ProposerIndex: blk.Block.ProposerIndex,
 						ParentRoot:    blk.Block.ParentRoot,
@@ -953,13 +953,13 @@ func TestGetBlockHeaders(t *testing.T) {
 	})
 
 	t.Run("execution optimistic", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 		mockChainFetcher := &chainMock.ChainService{
 			DB:                  beaconDB,
 			Block:               wsb,
 			Root:                headBlock.BlockRoot,
-			FinalizedCheckPoint: &zond.Checkpoint{Root: blkContainers[64].BlockRoot},
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{Root: blkContainers[64].BlockRoot},
 			Optimistic:          true,
 			FinalizedRoots:      map[[32]byte]bool{},
 			OptimisticRoots: map[[32]byte]bool{
@@ -986,7 +986,7 @@ func TestGetBlockHeaders(t *testing.T) {
 	})
 
 	t.Run("finalized", func(t *testing.T) {
-		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*zond.BeaconBlockContainer_CapellaBlock).CapellaBlock)
+		wsb, err := blocks.NewSignedBeaconBlock(headBlock.Block.(*qrysmpb.BeaconBlockContainer_CapellaBlock).CapellaBlock)
 		require.NoError(t, err)
 		child1 := util.NewBeaconBlockCapella()
 		child1.Block.ParentRoot = bytesutil.PadTo([]byte("parent"), 32)
@@ -1004,7 +1004,7 @@ func TestGetBlockHeaders(t *testing.T) {
 			DB:                  beaconDB,
 			Block:               wsb,
 			Root:                headBlock.BlockRoot,
-			FinalizedCheckPoint: &zond.Checkpoint{Root: blkContainers[64].BlockRoot},
+			FinalizedCheckPoint: &qrysmpb.Checkpoint{Root: blkContainers[64].BlockRoot},
 			FinalizedRoots:      map[[32]byte]bool{child1Root: true, child2Root: false},
 		}
 		bs := &Server{
@@ -1181,16 +1181,16 @@ func TestServer_GetBlockHeader(t *testing.T) {
 }
 
 func TestGetFinalityCheckpoints(t *testing.T) {
-	fillCheckpoints := func(state *zond.BeaconStateCapella) error {
-		state.PreviousJustifiedCheckpoint = &zond.Checkpoint{
+	fillCheckpoints := func(state *qrysmpb.BeaconStateCapella) error {
+		state.PreviousJustifiedCheckpoint = &qrysmpb.Checkpoint{
 			Root:  bytesutil.PadTo([]byte("previous"), 32),
 			Epoch: 113,
 		}
-		state.CurrentJustifiedCheckpoint = &zond.Checkpoint{
+		state.CurrentJustifiedCheckpoint = &qrysmpb.Checkpoint{
 			Root:  bytesutil.PadTo([]byte("current"), 32),
 			Epoch: 123,
 		}
-		state.FinalizedCheckpoint = &zond.Checkpoint{
+		state.FinalizedCheckpoint = &qrysmpb.Checkpoint{
 			Root:  bytesutil.PadTo([]byte("finalized"), 32),
 			Epoch: 103,
 		}

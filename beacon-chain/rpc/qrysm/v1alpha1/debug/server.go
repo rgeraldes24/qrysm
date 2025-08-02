@@ -10,7 +10,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	golog "github.com/ipfs/go-log/v2"
 	"github.com/sirupsen/logrus"
-	zondlog "github.com/theQRL/go-zond/log"
+	gzondlog "github.com/theQRL/go-zond/log"
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
@@ -56,9 +56,9 @@ func (_ *Server) SetLoggingLevel(_ context.Context, req *pbrpc.LoggingLevelReque
 		// Libp2p specific logging.
 		golog.SetAllLoggers(golog.LevelDebug)
 		// Gzond specific logging.
-		glogger := zondlog.NewGlogHandler(zondlog.StreamHandler(os.Stderr, zondlog.TerminalFormat(true)))
-		glogger.Verbosity(zondlog.LvlTrace)
-		zondlog.Root().SetHandler(glogger)
+		glogger := gzondlog.NewGlogHandler(gzondlog.StreamHandler(os.Stderr, gzondlog.TerminalFormat(true)))
+		glogger.Verbosity(gzondlog.LvlTrace)
+		gzondlog.Root().SetHandler(glogger)
 	}
 	return &empty.Empty{}, nil
 }

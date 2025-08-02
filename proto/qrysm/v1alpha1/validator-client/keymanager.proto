@@ -18,7 +18,7 @@ option php_namespace = "TheQRL\\Validator\\Accounts\\V2";
 
 // RemoteSigner service API.
 //
-// Defines a remote-signing keymanager which manages zond2
+// Defines a remote-signing keymanager which manages consensus
 // validator accounts and can sign respective messages.
 service RemoteSigner {
     // ListPublicKeysResponse managed by a remote signer.

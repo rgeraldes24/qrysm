@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	rpctesting "github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared/testing"
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	mock2 "github.com/theQRL/qrysm/testing/mock"
 	"github.com/theQRL/qrysm/testing/require"
@@ -32,7 +32,7 @@ func TestProduceBlockV3(t *testing.T) {
 		require.NoError(t, err)
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(
-			func() (*zond.GenericBeaconBlock, error) {
+			func() (*qrysmpb.GenericBeaconBlock, error) {
 				return block.Message.ToGeneric()
 			}())
 		mockChainService := &blockchainTesting.ChainService{}
@@ -62,7 +62,7 @@ func TestProduceBlockV3(t *testing.T) {
 		require.NoError(t, err)
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(
-			func() (*zond.GenericBeaconBlock, error) {
+			func() (*qrysmpb.GenericBeaconBlock, error) {
 				g, err := block.Message.ToGeneric()
 				require.NoError(t, err)
 				g.PayloadValue = 2000 //some fake value
@@ -151,7 +151,7 @@ func TestProduceBlockV3SSZ(t *testing.T) {
 		require.NoError(t, err)
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(
-			func() (*zond.GenericBeaconBlock, error) {
+			func() (*qrysmpb.GenericBeaconBlock, error) {
 				return block.Message.ToGeneric()
 			}())
 		mockChainService := &blockchainTesting.ChainService{}
@@ -170,7 +170,7 @@ func TestProduceBlockV3SSZ(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		g, err := block.ToGeneric()
 		require.NoError(t, err)
-		bl, ok := g.Block.(*zond.GenericSignedBeaconBlock_Capella)
+		bl, ok := g.Block.(*qrysmpb.GenericSignedBeaconBlock_Capella)
 		require.Equal(t, true, ok)
 		ssz, err := bl.Capella.Block.MarshalSSZ()
 		require.NoError(t, err)
@@ -184,7 +184,7 @@ func TestProduceBlockV3SSZ(t *testing.T) {
 		require.NoError(t, err)
 		v1alpha1Server := mock2.NewMockBeaconNodeValidatorServer(ctrl)
 		v1alpha1Server.EXPECT().GetBeaconBlock(gomock.Any(), gomock.Any()).Return(
-			func() (*zond.GenericBeaconBlock, error) {
+			func() (*qrysmpb.GenericBeaconBlock, error) {
 				g, err := block.Message.ToGeneric()
 				require.NoError(t, err)
 				g.PayloadValue = 2000 //some fake value
@@ -206,7 +206,7 @@ func TestProduceBlockV3SSZ(t *testing.T) {
 		assert.Equal(t, http.StatusOK, writer.Code)
 		g, err := block.ToGeneric()
 		require.NoError(t, err)
-		bl, ok := g.Block.(*zond.GenericSignedBeaconBlock_BlindedCapella)
+		bl, ok := g.Block.(*qrysmpb.GenericSignedBeaconBlock_BlindedCapella)
 		require.Equal(t, true, ok)
 		ssz, err := bl.BlindedCapella.Block.MarshalSSZ()
 		require.NoError(t, err)

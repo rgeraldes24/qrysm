@@ -5,7 +5,7 @@ import (
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"google.golang.org/protobuf/proto"
 )
@@ -24,28 +24,28 @@ func (b *SignedBeaconBlock) Proto() (proto.Message, error) {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			var block *zond.BlindedBeaconBlockCapella
+			var block *qrysmpb.BlindedBeaconBlockCapella
 			if blockMessage != nil {
 				var ok bool
-				block, ok = blockMessage.(*zond.BlindedBeaconBlockCapella)
+				block, ok = blockMessage.(*qrysmpb.BlindedBeaconBlockCapella)
 				if !ok {
 					return nil, errIncorrectBlockVersion
 				}
 			}
-			return &zond.SignedBlindedBeaconBlockCapella{
+			return &qrysmpb.SignedBlindedBeaconBlockCapella{
 				Block:     block,
 				Signature: b.signature[:],
 			}, nil
 		}
-		var block *zond.BeaconBlockCapella
+		var block *qrysmpb.BeaconBlockCapella
 		if blockMessage != nil {
 			var ok bool
-			block, ok = blockMessage.(*zond.BeaconBlockCapella)
+			block, ok = blockMessage.(*qrysmpb.BeaconBlockCapella)
 			if !ok {
 				return nil, errIncorrectBlockVersion
 			}
 		}
-		return &zond.SignedBeaconBlockCapella{
+		return &qrysmpb.SignedBeaconBlockCapella{
 			Block:     block,
 			Signature: b.signature[:],
 		}, nil
@@ -68,15 +68,15 @@ func (b *BeaconBlock) Proto() (proto.Message, error) {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			var body *zond.BlindedBeaconBlockBodyCapella
+			var body *qrysmpb.BlindedBeaconBlockBodyCapella
 			if bodyMessage != nil {
 				var ok bool
-				body, ok = bodyMessage.(*zond.BlindedBeaconBlockBodyCapella)
+				body, ok = bodyMessage.(*qrysmpb.BlindedBeaconBlockBodyCapella)
 				if !ok {
 					return nil, errIncorrectBodyVersion
 				}
 			}
-			return &zond.BlindedBeaconBlockCapella{
+			return &qrysmpb.BlindedBeaconBlockCapella{
 				Slot:          b.slot,
 				ProposerIndex: b.proposerIndex,
 				ParentRoot:    b.parentRoot[:],
@@ -84,15 +84,15 @@ func (b *BeaconBlock) Proto() (proto.Message, error) {
 				Body:          body,
 			}, nil
 		}
-		var body *zond.BeaconBlockBodyCapella
+		var body *qrysmpb.BeaconBlockBodyCapella
 		if bodyMessage != nil {
 			var ok bool
-			body, ok = bodyMessage.(*zond.BeaconBlockBodyCapella)
+			body, ok = bodyMessage.(*qrysmpb.BeaconBlockBodyCapella)
 			if !ok {
 				return nil, errIncorrectBodyVersion
 			}
 		}
-		return &zond.BeaconBlockCapella{
+		return &qrysmpb.BeaconBlockCapella{
 			Slot:          b.slot,
 			ProposerIndex: b.proposerIndex,
 			ParentRoot:    b.parentRoot[:],
@@ -121,7 +121,7 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 					return nil, errPayloadHeaderWrongType
 				}
 			}
-			return &zond.BlindedBeaconBlockBodyCapella{
+			return &qrysmpb.BlindedBeaconBlockBodyCapella{
 				RandaoReveal:                b.randaoReveal[:],
 				ExecutionData:               b.executionData,
 				Graffiti:                    b.graffiti[:],
@@ -143,7 +143,7 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 				return nil, errPayloadWrongType
 			}
 		}
-		return &zond.BeaconBlockBodyCapella{
+		return &qrysmpb.BeaconBlockBodyCapella{
 			RandaoReveal:                b.randaoReveal[:],
 			ExecutionData:               b.executionData,
 			Graffiti:                    b.graffiti[:],
@@ -161,7 +161,7 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 	}
 }
 
-func initSignedBlockFromProtoCapella(pb *zond.SignedBeaconBlockCapella) (*SignedBeaconBlock, error) {
+func initSignedBlockFromProtoCapella(pb *qrysmpb.SignedBeaconBlockCapella) (*SignedBeaconBlock, error) {
 	if pb == nil {
 		return nil, errNilBlock
 	}
@@ -178,7 +178,7 @@ func initSignedBlockFromProtoCapella(pb *zond.SignedBeaconBlockCapella) (*Signed
 	return b, nil
 }
 
-func initBlindedSignedBlockFromProtoCapella(pb *zond.SignedBlindedBeaconBlockCapella) (*SignedBeaconBlock, error) {
+func initBlindedSignedBlockFromProtoCapella(pb *qrysmpb.SignedBlindedBeaconBlockCapella) (*SignedBeaconBlock, error) {
 	if pb == nil {
 		return nil, errNilBlock
 	}
@@ -195,7 +195,7 @@ func initBlindedSignedBlockFromProtoCapella(pb *zond.SignedBlindedBeaconBlockCap
 	return b, nil
 }
 
-func initBlockFromProtoCapella(pb *zond.BeaconBlockCapella) (*BeaconBlock, error) {
+func initBlockFromProtoCapella(pb *qrysmpb.BeaconBlockCapella) (*BeaconBlock, error) {
 	if pb == nil {
 		return nil, errNilBlock
 	}
@@ -215,7 +215,7 @@ func initBlockFromProtoCapella(pb *zond.BeaconBlockCapella) (*BeaconBlock, error
 	return b, nil
 }
 
-func initBlindedBlockFromProtoCapella(pb *zond.BlindedBeaconBlockCapella) (*BeaconBlock, error) {
+func initBlindedBlockFromProtoCapella(pb *qrysmpb.BlindedBeaconBlockCapella) (*BeaconBlock, error) {
 	if pb == nil {
 		return nil, errNilBlock
 	}
@@ -235,7 +235,7 @@ func initBlindedBlockFromProtoCapella(pb *zond.BlindedBeaconBlockCapella) (*Beac
 	return b, nil
 }
 
-func initBlockBodyFromProtoCapella(pb *zond.BeaconBlockBodyCapella) (*BeaconBlockBody, error) {
+func initBlockBodyFromProtoCapella(pb *qrysmpb.BeaconBlockBodyCapella) (*BeaconBlockBody, error) {
 	if pb == nil {
 		return nil, errNilBlockBody
 	}
@@ -263,7 +263,7 @@ func initBlockBodyFromProtoCapella(pb *zond.BeaconBlockBodyCapella) (*BeaconBloc
 	return b, nil
 }
 
-func initBlindedBlockBodyFromProtoCapella(pb *zond.BlindedBeaconBlockBodyCapella) (*BeaconBlockBody, error) {
+func initBlindedBlockBodyFromProtoCapella(pb *qrysmpb.BlindedBeaconBlockBodyCapella) (*BeaconBlockBody, error) {
 	if pb == nil {
 		return nil, errNilBlockBody
 	}

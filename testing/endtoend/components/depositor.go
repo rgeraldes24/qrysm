@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	contracts "github.com/theQRL/qrysm/contracts/deposit"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	"github.com/theQRL/qrysm/testing/endtoend/types"
 	"github.com/theQRL/qrysm/testing/util"
@@ -26,7 +26,7 @@ import (
 
 var gplanckPerQuanta = big.NewInt(int64(params.BeaconConfig().GplanckPerQuanta))
 
-func amtInGplanck(deposit *zond.Deposit) *big.Int {
+func amtInGplanck(deposit *qrysmpb.Deposit) *big.Int {
 	amt := big.NewInt(0).SetUint64(deposit.Data.Amount)
 	return amt.Mul(amt, gplanckPerQuanta)
 }
@@ -36,7 +36,7 @@ func amtInGplanck(deposit *zond.Deposit) *big.Int {
 // the `offset` parameter skips the first N validators in the deterministic list.
 // In order to test the requirement that our deposit follower is able to handle multiple partial deposits,
 // the `partial` flag specifies that half of the deposits should be broken up into 2 transactions.
-func computeDeposits(offset, nvals int, partial bool) ([]*zond.Deposit, error) {
+func computeDeposits(offset, nvals int, partial bool) ([]*qrysmpb.Deposit, error) {
 	balances := make([]uint64, offset+nvals)
 	partialIndex := len(balances) // set beyond loop invariant so by default nothing gets partial
 	if partial {
@@ -57,7 +57,7 @@ func computeDeposits(offset, nvals int, partial bool) ([]*zond.Deposit, error) {
 	}
 	deposits, _, err := util.DepositsWithBalance(balances)
 	if err != nil {
-		return []*zond.Deposit{}, err
+		return []*qrysmpb.Deposit{}, err
 	}
 
 	// if partial = false, these will be a no-op (partialIndex == len(deposits)),
@@ -130,7 +130,7 @@ func (h *DepositHistory) Balances(batch types.DepositBatch) map[[field_params.Di
 // SentDeposit is the record of an individual deposit which has been successfully submitted as a transaction.
 type SentDeposit struct {
 	root    [32]byte
-	deposit *zond.Deposit
+	deposit *qrysmpb.Deposit
 	tx      *gzondtypes.Transaction
 	time    time.Time
 	batch   types.DepositBatch
@@ -178,7 +178,7 @@ func (d *Depositor) SendAndMine(ctx context.Context, offset, nvals int, batch ty
 
 // SendDeposit sends a single deposit. A record of this deposit will be tracked for the life of the Depositor,
 // allowing evaluators to use the deposit history to make assertions about those deposits.
-func (d *Depositor) SendDeposit(dep *zond.Deposit, txo *bind.TransactOpts, batch types.DepositBatch) error {
+func (d *Depositor) SendDeposit(dep *qrysmpb.Deposit, txo *bind.TransactOpts, batch types.DepositBatch) error {
 	contract, err := d.contractDepositor()
 	if err != nil {
 		return err

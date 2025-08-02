@@ -12,7 +12,7 @@ import (
 	qrl "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
-	zondRPC "github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/qrysm/beacon-chain/execution/types"
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/config/params"
@@ -232,7 +232,7 @@ func (s *Service) ExecutionBlocksByHashes(ctx context.Context, hashes []common.H
 	_, span := trace.StartSpan(ctx, "executionChain.engine-api-client.ExecutionBlocksByHashes")
 	defer span.End()
 	numOfHashes := len(hashes)
-	elems := make([]zondRPC.BatchElem, 0, numOfHashes)
+	elems := make([]rpc.BatchElem, 0, numOfHashes)
 	execBlks := make([]*pb.ExecutionBlock, 0, numOfHashes)
 	if numOfHashes == 0 {
 		return execBlks, nil
@@ -240,7 +240,7 @@ func (s *Service) ExecutionBlocksByHashes(ctx context.Context, hashes []common.H
 	for _, h := range hashes {
 		blk := &pb.ExecutionBlock{}
 		newH := h
-		elems = append(elems, zondRPC.BatchElem{
+		elems = append(elems, rpc.BatchElem{
 			Method: ExecutionBlockByHashMethod,
 			Args:   []interface{}{newH, withTxs},
 			Result: blk,
@@ -565,7 +565,7 @@ func handleRPCError(err error) error {
 	if isTimeout(err) {
 		return ErrHTTPTimeout
 	}
-	e, ok := err.(zondRPC.Error)
+	e, ok := err.(rpc.Error)
 	if !ok {
 		// TODO(now.youtrack.cloud/issue/TQ-1)
 		if strings.Contains(err.Error(), "401 Unauthorized") {
@@ -608,7 +608,7 @@ func handleRPCError(err error) error {
 	case -32000:
 		errServerErrorCount.Inc()
 		// Only -32000 status codes are data errors in the RPC specification.
-		errWithData, ok := err.(zondRPC.DataError)
+		errWithData, ok := err.(rpc.DataError)
 		if !ok {
 			return errors.Wrapf(err, "got an unexpected error in JSON-RPC response")
 		}
@@ -639,11 +639,11 @@ func toBlockNumArg(number *big.Int) string {
 	if number.Cmp(pending) == 0 {
 		return "pending"
 	}
-	finalized := big.NewInt(int64(zondRPC.FinalizedBlockNumber))
+	finalized := big.NewInt(int64(rpc.FinalizedBlockNumber))
 	if number.Cmp(finalized) == 0 {
 		return "finalized"
 	}
-	safe := big.NewInt(int64(zondRPC.SafeBlockNumber))
+	safe := big.NewInt(int64(rpc.SafeBlockNumber))
 	if number.Cmp(safe) == 0 {
 		return "safe"
 	}

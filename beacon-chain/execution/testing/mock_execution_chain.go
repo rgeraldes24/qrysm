@@ -250,10 +250,10 @@ func (m *Chain) InsertBlock(height int, time uint64, hash []byte) *Chain {
 
 func SetupRPCServer() (*rpc.Server, string, error) {
 	srv := rpc.NewServer()
-	if err := srv.RegisterName("zond", &testZONDRPC{}); err != nil {
+	if err := srv.RegisterName("qrl", &testQRLRPC{}); err != nil {
 		return nil, "", err
 	}
-	if err := srv.RegisterName("net", &testZONDRPC{}); err != nil {
+	if err := srv.RegisterName("net", &testQRLRPC{}); err != nil {
 		return nil, "", err
 	}
 	hs := httptest.NewUnstartedServer(srv)
@@ -261,14 +261,14 @@ func SetupRPCServer() (*rpc.Server, string, error) {
 	return srv, hs.URL, nil
 }
 
-type testZONDRPC struct{}
+type testQRLRPC struct{}
 
-func (*testZONDRPC) NoArgsRets() {}
+func (*testQRLRPC) NoArgsRets() {}
 
-func (*testZONDRPC) ChainId(_ context.Context) *hexutil.Big {
+func (*testQRLRPC) ChainId(_ context.Context) *hexutil.Big {
 	return (*hexutil.Big)(big.NewInt(int64(params.BeaconConfig().DepositChainID)))
 }
 
-func (*testZONDRPC) Version(_ context.Context) string {
+func (*testQRLRPC) Version(_ context.Context) string {
 	return fmt.Sprintf("%d", params.BeaconConfig().DepositNetworkID)
 }

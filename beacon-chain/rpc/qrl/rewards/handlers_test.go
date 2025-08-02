@@ -28,7 +28,7 @@ import (
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/network/http"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -42,14 +42,14 @@ func TestBlockRewards(t *testing.T) {
 	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, st.SetSlot(1))
 	require.NoError(t, err)
-	validators := make([]*zond.Validator, 0, valCount)
+	validators := make([]*qrysmpb.Validator, 0, valCount)
 	balances := make([]uint64, 0, valCount)
 	secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
 	for i := 0; i < valCount; i++ {
 		dilithiumKey, err := dilithium.RandKey()
 		require.NoError(t, err)
 		secretKeys = append(secretKeys, dilithiumKey)
-		validators = append(validators, &zond.Validator{
+		validators = append(validators, &qrysmpb.Validator{
 			PublicKey:         dilithiumKey.PublicKey().Marshal(),
 			ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
@@ -72,48 +72,48 @@ func TestBlockRewards(t *testing.T) {
 	b.Block.Slot = 2
 	// we have to set the proposer index to the value that will be randomly chosen (fortunately it's deterministic)
 	b.Block.ProposerIndex = 12
-	b.Block.Body.Attestations = []*zond.Attestation{
+	b.Block.Body.Attestations = []*qrysmpb.Attestation{
 		{
 			AggregationBits: bitfield.Bitlist{0b00000111},
-			Data:            util.HydrateAttestationData(&zond.AttestationData{}),
+			Data:            util.HydrateAttestationData(&qrysmpb.AttestationData{}),
 			Signatures:      [][]byte{make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength)},
 		},
 		{
 			AggregationBits: bitfield.Bitlist{0b00000111},
-			Data:            util.HydrateAttestationData(&zond.AttestationData{}),
+			Data:            util.HydrateAttestationData(&qrysmpb.AttestationData{}),
 			Signatures:      [][]byte{make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength)},
 		},
 	}
-	attData1 := util.HydrateAttestationData(&zond.AttestationData{BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32)})
-	attData2 := util.HydrateAttestationData(&zond.AttestationData{BeaconBlockRoot: bytesutil.PadTo([]byte("root2"), 32)})
+	attData1 := util.HydrateAttestationData(&qrysmpb.AttestationData{BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32)})
+	attData2 := util.HydrateAttestationData(&qrysmpb.AttestationData{BeaconBlockRoot: bytesutil.PadTo([]byte("root2"), 32)})
 	domain, err := signing.Domain(st.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, st.GenesisValidatorsRoot())
 	require.NoError(t, err)
 	sigRoot1, err := signing.ComputeSigningRoot(attData1, domain)
 	require.NoError(t, err)
 	sigRoot2, err := signing.ComputeSigningRoot(attData2, domain)
 	require.NoError(t, err)
-	b.Block.Body.AttesterSlashings = []*zond.AttesterSlashing{
+	b.Block.Body.AttesterSlashings = []*qrysmpb.AttesterSlashing{
 		{
-			Attestation_1: &zond.IndexedAttestation{
+			Attestation_1: &qrysmpb.IndexedAttestation{
 				AttestingIndices: []uint64{0},
 				Data:             attData1,
 				Signatures:       [][]byte{secretKeys[0].Sign(sigRoot1[:]).Marshal()},
 			},
-			Attestation_2: &zond.IndexedAttestation{
+			Attestation_2: &qrysmpb.IndexedAttestation{
 				AttestingIndices: []uint64{0},
 				Data:             attData2,
 				Signatures:       [][]byte{secretKeys[0].Sign(sigRoot2[:]).Marshal()},
 			},
 		},
 	}
-	header1 := &zond.BeaconBlockHeader{
+	header1 := &qrysmpb.BeaconBlockHeader{
 		Slot:          0,
 		ProposerIndex: 1,
 		ParentRoot:    bytesutil.PadTo([]byte("root1"), 32),
 		StateRoot:     bytesutil.PadTo([]byte("root1"), 32),
 		BodyRoot:      bytesutil.PadTo([]byte("root1"), 32),
 	}
-	header2 := &zond.BeaconBlockHeader{
+	header2 := &qrysmpb.BeaconBlockHeader{
 		Slot:          0,
 		ProposerIndex: 1,
 		ParentRoot:    bytesutil.PadTo([]byte("root2"), 32),
@@ -126,13 +126,13 @@ func TestBlockRewards(t *testing.T) {
 	require.NoError(t, err)
 	sigRoot2, err = signing.ComputeSigningRoot(header2, domain)
 	require.NoError(t, err)
-	b.Block.Body.ProposerSlashings = []*zond.ProposerSlashing{
+	b.Block.Body.ProposerSlashings = []*qrysmpb.ProposerSlashing{
 		{
-			Header_1: &zond.SignedBeaconBlockHeader{
+			Header_1: &qrysmpb.SignedBeaconBlockHeader{
 				Header:    header1,
 				Signature: secretKeys[1].Sign(sigRoot1[:]).Marshal(),
 			},
-			Header_2: &zond.SignedBeaconBlockHeader{
+			Header_2: &qrysmpb.SignedBeaconBlockHeader{
 				Header:    header2,
 				Signature: secretKeys[1].Sign(sigRoot2[:]).Marshal(),
 			},
@@ -150,7 +150,7 @@ func TestBlockRewards(t *testing.T) {
 	// These validators have to sign the message.
 	sig1 := secretKeys[149].Sign(r[:]).Marshal()
 	sig2 := secretKeys[48].Sign(r[:]).Marshal()
-	b.Block.Body.SyncAggregate = &zond.SyncAggregate{SyncCommitteeBits: scBits, SyncCommitteeSignatures: [][]byte{sig1, sig2}}
+	b.Block.Body.SyncAggregate = &qrysmpb.SyncAggregate{SyncCommitteeBits: scBits, SyncCommitteeSignatures: [][]byte{sig1, sig2}}
 
 	sbb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
@@ -195,14 +195,14 @@ func TestAttestationRewards(t *testing.T) {
 	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*3-1))
-	validators := make([]*zond.Validator, 0, valCount)
+	validators := make([]*qrysmpb.Validator, 0, valCount)
 	balances := make([]uint64, 0, valCount)
 	secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
 	for i := 0; i < valCount; i++ {
 		dilithiumKey, err := dilithium.RandKey()
 		require.NoError(t, err)
 		secretKeys = append(secretKeys, dilithiumKey)
-		validators = append(validators, &zond.Validator{
+		validators = append(validators, &qrysmpb.Validator{
 			PublicKey:         dilithiumKey.PublicKey().Marshal(),
 			ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
@@ -314,14 +314,14 @@ func TestAttestationRewards(t *testing.T) {
 		st, err := util.NewBeaconStateCapella()
 		require.NoError(t, err)
 		require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*3-1))
-		validators := make([]*zond.Validator, 0, valCount)
+		validators := make([]*qrysmpb.Validator, 0, valCount)
 		balances := make([]uint64, 0, valCount)
 		secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
 		for i := 0; i < valCount; i++ {
 			dilithiumKey, err := dilithium.RandKey()
 			require.NoError(t, err)
 			secretKeys = append(secretKeys, dilithiumKey)
-			validators = append(validators, &zond.Validator{
+			validators = append(validators, &qrysmpb.Validator{
 				PublicKey:         dilithiumKey.PublicKey().Marshal(),
 				ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 				WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
@@ -467,13 +467,13 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	st, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
-	validators := make([]*zond.Validator, 0, valCount)
+	validators := make([]*qrysmpb.Validator, 0, valCount)
 	secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
 	for i := 0; i < valCount; i++ {
 		dilithiumKey, err := dilithium.RandKey()
 		require.NoError(t, err)
 		secretKeys = append(secretKeys, dilithiumKey)
-		validators = append(validators, &zond.Validator{
+		validators = append(validators, &qrysmpb.Validator{
 			PublicKey:         dilithiumKey.PublicKey().Marshal(),
 			ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
@@ -487,7 +487,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 		syncCommitteePubkeys[i] = secretKeys[i].PublicKey().Marshal()
 	}
 	require.NoError(t, err)
-	require.NoError(t, st.SetCurrentSyncCommittee(&zond.SyncCommittee{
+	require.NoError(t, st.SetCurrentSyncCommittee(&qrysmpb.SyncCommittee{
 		Pubkeys: syncCommitteePubkeys,
 	}))
 
@@ -510,7 +510,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	for i := range sigs {
 		sigs[i] = secretKeys[i].Sign(r[:]).Marshal()
 	}
-	b.Block.Body.SyncAggregate = &zond.SyncAggregate{SyncCommitteeBits: scBits, SyncCommitteeSignatures: sigs}
+	b.Block.Body.SyncAggregate = &qrysmpb.SyncAggregate{SyncCommitteeBits: scBits, SyncCommitteeSignatures: sigs}
 	sbb, err := blocks.NewSignedBeaconBlock(b)
 	require.NoError(t, err)
 	require.NoError(t, err)

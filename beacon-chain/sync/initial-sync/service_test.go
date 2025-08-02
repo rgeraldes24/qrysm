@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/cmd/beacon-chain/flags"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -59,7 +59,7 @@ func TestService_InitStartStop(t *testing.T) {
 
 				return &mock.ChainService{
 					State: st,
-					FinalizedCheckPoint: &zond.Checkpoint{
+					FinalizedCheckPoint: &qrysmpb.Checkpoint{
 						Epoch: 0,
 					},
 					Genesis:        time.Unix(4113849600, 0),
@@ -83,7 +83,7 @@ func TestService_InitStartStop(t *testing.T) {
 				require.NoError(t, err)
 				return &mock.ChainService{
 					State: st,
-					FinalizedCheckPoint: &zond.Checkpoint{
+					FinalizedCheckPoint: &qrysmpb.Checkpoint{
 						Epoch: 0,
 					},
 					Genesis:        time.Now().Add(-5 * time.Minute),
@@ -110,7 +110,7 @@ func TestService_InitStartStop(t *testing.T) {
 				require.NoError(t, st.SetSlot(futureSlot))
 				return &mock.ChainService{
 					State: st,
-					FinalizedCheckPoint: &zond.Checkpoint{
+					FinalizedCheckPoint: &qrysmpb.Checkpoint{
 						Epoch: slots.ToEpoch(futureSlot),
 					},
 					Genesis:        makeGenesisTime(futureSlot),
@@ -353,7 +353,7 @@ func TestService_Resync(t *testing.T) {
 					State: st,
 					Root:  genesisRoot[:],
 					DB:    beaconDB,
-					FinalizedCheckPoint: &zond.Checkpoint{
+					FinalizedCheckPoint: &qrysmpb.Checkpoint{
 						Epoch: slots.ToEpoch(futureSlot),
 					},
 					Genesis:        time.Now(),

@@ -139,7 +139,7 @@ func NewExecutionNode(index int) *ExecutionNode {
 	}
 }
 
-// Start runs a non-mining zond node.
+// Start runs an execution qrl node.
 // To connect to a miner and start working properly, this node should be a part of a NodeSet.
 func (node *ExecutionNode) Start(ctx context.Context) error {
 	binaryPath, found := bazel.FindBinary("cmd/gzond", "gzond")
@@ -147,18 +147,18 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 		return errors.New("go-zond binary not found")
 	}
 
-	zondPath := path.Join(e2e.TestParams.TestPath, "zonddata/"+strconv.Itoa(node.index)+"/")
+	qrlPath := path.Join(e2e.TestParams.TestPath, "qrldata/"+strconv.Itoa(node.index)+"/")
 	// Clear out potentially existing dir to prevent issues.
-	if _, err := os.Stat(zondPath); !os.IsNotExist(err) {
-		if err = os.RemoveAll(zondPath); err != nil {
+	if _, err := os.Stat(qrlPath); !os.IsNotExist(err) {
+		if err = os.RemoveAll(qrlPath); err != nil {
 			return err
 		}
 	}
 
-	if err := file.MkdirAll(zondPath); err != nil {
+	if err := file.MkdirAll(qrlPath); err != nil {
 		return err
 	}
-	gzondJsonPath := path.Join(zondPath, "genesis.json")
+	gzondJsonPath := path.Join(qrlPath, "genesis.json")
 
 	gen := interop.GzondTestnetGenesis(e2e.TestParams.ELGenesisTime, params.BeaconConfig())
 	b, err := json.Marshal(gen)
@@ -174,7 +174,7 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 		return err
 	}
 
-	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", zondPath), gzondJsonPath) // #nosec G204 -- Safe
+	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", qrlPath), gzondJsonPath) // #nosec G204 -- Safe
 	initFile, err := helpers.DeleteAndCreateFile(e2e.TestParams.LogPath, "execution-init_"+strconv.Itoa(node.index)+".log")
 	if err != nil {
 		return err
@@ -189,7 +189,7 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 
 	args := []string{
 		"--nat=none", // disable nat traversal in e2e, it is failure prone and not needed
-		fmt.Sprintf("--datadir=%s", zondPath),
+		fmt.Sprintf("--datadir=%s", qrlPath),
 		fmt.Sprintf("--http.port=%d", e2e.TestParams.Ports.GzondExecutionNodeRPCPort+node.index),
 		fmt.Sprintf("--ws.port=%d", e2e.TestParams.Ports.GzondExecutionNodeWSPort+node.index),
 		fmt.Sprintf("--authrpc.port=%d", e2e.TestParams.Ports.GzondExecutionNodeAuthRPCPort+node.index),

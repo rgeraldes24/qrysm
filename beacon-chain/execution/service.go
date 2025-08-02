@@ -20,7 +20,7 @@ import (
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
-	zondRPC "github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/qrysm/beacon-chain/cache"
 	"github.com/theQRL/qrysm/beacon-chain/cache/depositsnapshot"
 	statefeed "github.com/theQRL/qrysm/beacon-chain/core/feed/state"
@@ -96,7 +96,7 @@ type Chain interface {
 // RPCClient defines the rpc methods required to interact with the execution node.
 type RPCClient interface {
 	Close()
-	BatchCall(b []zondRPC.BatchElem) error
+	BatchCall(b []rpc.BatchElem) error
 	CallContext(ctx context.Context, result interface{}, method string, args ...interface{}) error
 }
 
@@ -104,7 +104,7 @@ type RPCClientEmpty struct {
 }
 
 func (RPCClientEmpty) Close() {}
-func (RPCClientEmpty) BatchCall([]zondRPC.BatchElem) error {
+func (RPCClientEmpty) BatchCall([]rpc.BatchElem) error {
 	return errors.New("rpc client is not initialized")
 }
 
@@ -385,14 +385,14 @@ func (s *Service) batchRequestHeaders(startBlock, endBlock uint64) ([]*types.Hea
 		return nil, fmt.Errorf("start block height %d cannot be > end block height %d", startBlock, endBlock)
 	}
 	requestRange := (endBlock - startBlock) + 1
-	elems := make([]zondRPC.BatchElem, 0, requestRange)
+	elems := make([]rpc.BatchElem, 0, requestRange)
 	headers := make([]*types.HeaderInfo, 0, requestRange)
 	if requestRange == 0 {
 		return headers, nil
 	}
 	for i := startBlock; i <= endBlock; i++ {
 		header := &types.HeaderInfo{}
-		elems = append(elems, zondRPC.BatchElem{
+		elems = append(elems, rpc.BatchElem{
 			Method: "qrl_getBlockByNumber",
 			Args:   []interface{}{hexutil.EncodeBig(big.NewInt(0).SetUint64(i)), false},
 			Result: header,

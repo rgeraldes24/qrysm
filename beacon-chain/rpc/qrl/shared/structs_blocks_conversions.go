@@ -13,12 +13,12 @@ import (
 	bytesutil2 "github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/math"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 var errNilValue = errors.New("nil value")
 
-func (b *SignedBeaconBlockCapella) ToGeneric() (*zond.GenericSignedBeaconBlock, error) {
+func (b *SignedBeaconBlockCapella) ToGeneric() (*qrysmpb.GenericSignedBeaconBlock, error) {
 	if b == nil {
 		return nil, errNilValue
 	}
@@ -31,22 +31,22 @@ func (b *SignedBeaconBlockCapella) ToGeneric() (*zond.GenericSignedBeaconBlock, 
 	if err != nil {
 		return nil, NewDecodeError(err, "Message")
 	}
-	block := &zond.SignedBeaconBlockCapella{
+	block := &qrysmpb.SignedBeaconBlockCapella{
 		Block:     bl,
 		Signature: sig,
 	}
-	return &zond.GenericSignedBeaconBlock{Block: &zond.GenericSignedBeaconBlock_Capella{Capella: block}}, nil
+	return &qrysmpb.GenericSignedBeaconBlock{Block: &qrysmpb.GenericSignedBeaconBlock_Capella{Capella: block}}, nil
 }
 
-func (b *BeaconBlockCapella) ToGeneric() (*zond.GenericBeaconBlock, error) {
+func (b *BeaconBlockCapella) ToGeneric() (*qrysmpb.GenericBeaconBlock, error) {
 	block, err := b.ToConsensus()
 	if err != nil {
 		return nil, err
 	}
-	return &zond.GenericBeaconBlock{Block: &zond.GenericBeaconBlock_Capella{Capella: block}}, nil
+	return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_Capella{Capella: block}}, nil
 }
 
-func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
+func (b *BeaconBlockCapella) ToConsensus() (*qrysmpb.BeaconBlockCapella, error) {
 	if b == nil {
 		return nil, errNilValue
 	}
@@ -230,14 +230,14 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 		return nil, NewDecodeError(err, "Body.DilithiumToExecutionChanges")
 	}
 
-	return &zond.BeaconBlockCapella{
+	return &qrysmpb.BeaconBlockCapella{
 		Slot:          primitives.Slot(slot),
 		ProposerIndex: primitives.ValidatorIndex(proposerIndex),
 		ParentRoot:    parentRoot,
 		StateRoot:     stateRoot,
-		Body: &zond.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyCapella{
 			RandaoReveal: randaoReveal,
-			ExecutionData: &zond.ExecutionData{
+			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot:  depositRoot,
 				DepositCount: depositCount,
 				BlockHash:    blockHash,
@@ -248,7 +248,7 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 			Attestations:      atts,
 			Deposits:          deposits,
 			VoluntaryExits:    exits,
-			SyncAggregate: &zond.SyncAggregate{
+			SyncAggregate: &qrysmpb.SyncAggregate{
 				SyncCommitteeBits:       syncCommitteeBits,
 				SyncCommitteeSignatures: syncCommitteeSigs,
 			},
@@ -274,7 +274,7 @@ func (b *BeaconBlockCapella) ToConsensus() (*zond.BeaconBlockCapella, error) {
 	}, nil
 }
 
-func (b *SignedBlindedBeaconBlockCapella) ToGeneric() (*zond.GenericSignedBeaconBlock, error) {
+func (b *SignedBlindedBeaconBlockCapella) ToGeneric() (*qrysmpb.GenericSignedBeaconBlock, error) {
 	if b == nil {
 		return nil, errNilValue
 	}
@@ -287,22 +287,22 @@ func (b *SignedBlindedBeaconBlockCapella) ToGeneric() (*zond.GenericSignedBeacon
 	if err != nil {
 		return nil, NewDecodeError(err, "Message")
 	}
-	block := &zond.SignedBlindedBeaconBlockCapella{
+	block := &qrysmpb.SignedBlindedBeaconBlockCapella{
 		Block:     bl,
 		Signature: sig,
 	}
-	return &zond.GenericSignedBeaconBlock{Block: &zond.GenericSignedBeaconBlock_BlindedCapella{BlindedCapella: block}, IsBlinded: true, PayloadValue: 0 /* can't get payload value from blinded block */}, nil
+	return &qrysmpb.GenericSignedBeaconBlock{Block: &qrysmpb.GenericSignedBeaconBlock_BlindedCapella{BlindedCapella: block}, IsBlinded: true, PayloadValue: 0 /* can't get payload value from blinded block */}, nil
 }
 
-func (b *BlindedBeaconBlockCapella) ToGeneric() (*zond.GenericBeaconBlock, error) {
+func (b *BlindedBeaconBlockCapella) ToGeneric() (*qrysmpb.GenericBeaconBlock, error) {
 	block, err := b.ToConsensus()
 	if err != nil {
 		return nil, err
 	}
-	return &zond.GenericBeaconBlock{Block: &zond.GenericBeaconBlock_BlindedCapella{BlindedCapella: block}, IsBlinded: true, PayloadValue: 0 /* can't get payload value from blinded block */}, nil
+	return &qrysmpb.GenericBeaconBlock{Block: &qrysmpb.GenericBeaconBlock_BlindedCapella{BlindedCapella: block}, IsBlinded: true, PayloadValue: 0 /* can't get payload value from blinded block */}, nil
 }
 
-func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapella, error) {
+func (b *BlindedBeaconBlockCapella) ToConsensus() (*qrysmpb.BlindedBeaconBlockCapella, error) {
 	if b == nil {
 		return nil, errNilValue
 	}
@@ -454,14 +454,14 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 		return nil, NewDecodeError(err, "Body.DilithiumToExecutionChanges")
 	}
 
-	return &zond.BlindedBeaconBlockCapella{
+	return &qrysmpb.BlindedBeaconBlockCapella{
 		Slot:          primitives.Slot(slot),
 		ProposerIndex: primitives.ValidatorIndex(proposerIndex),
 		ParentRoot:    parentRoot,
 		StateRoot:     stateRoot,
-		Body: &zond.BlindedBeaconBlockBodyCapella{
+		Body: &qrysmpb.BlindedBeaconBlockBodyCapella{
 			RandaoReveal: randaoReveal,
-			ExecutionData: &zond.ExecutionData{
+			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot:  depositRoot,
 				DepositCount: depositCount,
 				BlockHash:    blockHash,
@@ -472,7 +472,7 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 			Attestations:      atts,
 			Deposits:          deposits,
 			VoluntaryExits:    exits,
-			SyncAggregate: &zond.SyncAggregate{
+			SyncAggregate: &qrysmpb.SyncAggregate{
 				SyncCommitteeBits:       syncCommitteeBits,
 				SyncCommitteeSignatures: syncCommitteeSigs,
 			},
@@ -498,7 +498,7 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*zond.BlindedBeaconBlockCapel
 	}, nil
 }
 
-func BeaconBlockHeaderFromConsensus(h *zond.BeaconBlockHeader) *BeaconBlockHeader {
+func BeaconBlockHeaderFromConsensus(h *qrysmpb.BeaconBlockHeader) *BeaconBlockHeader {
 	return &BeaconBlockHeader{
 		Slot:          strconv.FormatUint(uint64(h.Slot), 10),
 		ProposerIndex: strconv.FormatUint(uint64(h.ProposerIndex), 10),
@@ -508,7 +508,7 @@ func BeaconBlockHeaderFromConsensus(h *zond.BeaconBlockHeader) *BeaconBlockHeade
 	}
 }
 
-func BlindedBeaconBlockCapellaFromConsensus(b *zond.BlindedBeaconBlockCapella) (*BlindedBeaconBlockCapella, error) {
+func BlindedBeaconBlockCapellaFromConsensus(b *qrysmpb.BlindedBeaconBlockCapella) (*BlindedBeaconBlockCapella, error) {
 	proposerSlashings, err := ProposerSlashingsFromConsensus(b.Body.ProposerSlashings)
 	if err != nil {
 		return nil, err
@@ -586,7 +586,7 @@ func BlindedBeaconBlockCapellaFromConsensus(b *zond.BlindedBeaconBlockCapella) (
 	}, nil
 }
 
-func SignedBlindedBeaconBlockCapellaFromConsensus(b *zond.SignedBlindedBeaconBlockCapella) (*SignedBlindedBeaconBlockCapella, error) {
+func SignedBlindedBeaconBlockCapellaFromConsensus(b *qrysmpb.SignedBlindedBeaconBlockCapella) (*SignedBlindedBeaconBlockCapella, error) {
 	blindedBlock, err := BlindedBeaconBlockCapellaFromConsensus(b.Block)
 	if err != nil {
 		return nil, err
@@ -597,7 +597,7 @@ func SignedBlindedBeaconBlockCapellaFromConsensus(b *zond.SignedBlindedBeaconBlo
 	}, nil
 }
 
-func BeaconBlockCapellaFromConsensus(b *zond.BeaconBlockCapella) (*BeaconBlockCapella, error) {
+func BeaconBlockCapellaFromConsensus(b *qrysmpb.BeaconBlockCapella) (*BeaconBlockCapella, error) {
 	proposerSlashings, err := ProposerSlashingsFromConsensus(b.Body.ProposerSlashings)
 	if err != nil {
 		return nil, err
@@ -688,7 +688,7 @@ func BeaconBlockCapellaFromConsensus(b *zond.BeaconBlockCapella) (*BeaconBlockCa
 	}, nil
 }
 
-func ProposerSlashingsToConsensus(src []*ProposerSlashing) ([]*zond.ProposerSlashing, error) {
+func ProposerSlashingsToConsensus(src []*ProposerSlashing) ([]*qrysmpb.ProposerSlashing, error) {
 	if src == nil {
 		return nil, errNilValue
 	}
@@ -696,7 +696,7 @@ func ProposerSlashingsToConsensus(src []*ProposerSlashing) ([]*zond.ProposerSlas
 	if err != nil {
 		return nil, err
 	}
-	proposerSlashings := make([]*zond.ProposerSlashing, len(src))
+	proposerSlashings := make([]*qrysmpb.ProposerSlashing, len(src))
 	for i, s := range src {
 		if s == nil {
 			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d]", i))
@@ -762,9 +762,9 @@ func ProposerSlashingsToConsensus(src []*ProposerSlashing) ([]*zond.ProposerSlas
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].SignedHeader2.Message.BodyRoot", i))
 		}
-		proposerSlashings[i] = &zond.ProposerSlashing{
-			Header_1: &zond.SignedBeaconBlockHeader{
-				Header: &zond.BeaconBlockHeader{
+		proposerSlashings[i] = &qrysmpb.ProposerSlashing{
+			Header_1: &qrysmpb.SignedBeaconBlockHeader{
+				Header: &qrysmpb.BeaconBlockHeader{
 					Slot:          primitives.Slot(h1Slot),
 					ProposerIndex: primitives.ValidatorIndex(h1ProposerIndex),
 					ParentRoot:    h1ParentRoot,
@@ -773,8 +773,8 @@ func ProposerSlashingsToConsensus(src []*ProposerSlashing) ([]*zond.ProposerSlas
 				},
 				Signature: h1Sig,
 			},
-			Header_2: &zond.SignedBeaconBlockHeader{
-				Header: &zond.BeaconBlockHeader{
+			Header_2: &qrysmpb.SignedBeaconBlockHeader{
+				Header: &qrysmpb.BeaconBlockHeader{
 					Slot:          primitives.Slot(h2Slot),
 					ProposerIndex: primitives.ValidatorIndex(h2ProposerIndex),
 					ParentRoot:    h2ParentRoot,
@@ -788,7 +788,7 @@ func ProposerSlashingsToConsensus(src []*ProposerSlashing) ([]*zond.ProposerSlas
 	return proposerSlashings, nil
 }
 
-func ProposerSlashingsFromConsensus(src []*zond.ProposerSlashing) ([]*ProposerSlashing, error) {
+func ProposerSlashingsFromConsensus(src []*qrysmpb.ProposerSlashing) ([]*ProposerSlashing, error) {
 	proposerSlashings := make([]*ProposerSlashing, len(src))
 	for i, s := range src {
 		proposerSlashings[i] = &ProposerSlashing{
@@ -817,7 +817,7 @@ func ProposerSlashingsFromConsensus(src []*zond.ProposerSlashing) ([]*ProposerSl
 	return proposerSlashings, nil
 }
 
-func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*zond.AttesterSlashing, error) {
+func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*qrysmpb.AttesterSlashing, error) {
 	if src == nil {
 		return nil, errNilValue
 	}
@@ -826,7 +826,7 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*zond.AttesterSlas
 		return nil, err
 	}
 
-	attesterSlashings := make([]*zond.AttesterSlashing, len(src))
+	attesterSlashings := make([]*qrysmpb.AttesterSlashing, len(src))
 	for i, s := range src {
 		if s == nil {
 			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d]", i))
@@ -889,13 +889,13 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*zond.AttesterSlas
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation2.Data", i))
 		}
-		attesterSlashings[i] = &zond.AttesterSlashing{
-			Attestation_1: &zond.IndexedAttestation{
+		attesterSlashings[i] = &qrysmpb.AttesterSlashing{
+			Attestation_1: &qrysmpb.IndexedAttestation{
 				AttestingIndices: a1AttestingIndices,
 				Data:             a1Data,
 				Signatures:       a1Sigs,
 			},
-			Attestation_2: &zond.IndexedAttestation{
+			Attestation_2: &qrysmpb.IndexedAttestation{
 				AttestingIndices: a2AttestingIndices,
 				Data:             a2Data,
 				Signatures:       a2Sigs,
@@ -905,7 +905,7 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*zond.AttesterSlas
 	return attesterSlashings, nil
 }
 
-func AttesterSlashingsFromConsensus(src []*zond.AttesterSlashing) ([]*AttesterSlashing, error) {
+func AttesterSlashingsFromConsensus(src []*qrysmpb.AttesterSlashing) ([]*AttesterSlashing, error) {
 	attesterSlashings := make([]*AttesterSlashing, len(src))
 	for i, s := range src {
 		a1Sigs := make([]string, len(s.Attestation_1.Signatures))
@@ -966,7 +966,7 @@ func AttesterSlashingsFromConsensus(src []*zond.AttesterSlashing) ([]*AttesterSl
 	return attesterSlashings, nil
 }
 
-func AttsToConsensus(src []*Attestation) ([]*zond.Attestation, error) {
+func AttsToConsensus(src []*Attestation) ([]*qrysmpb.Attestation, error) {
 	if src == nil {
 		return nil, errNilValue
 	}
@@ -975,7 +975,7 @@ func AttsToConsensus(src []*Attestation) ([]*zond.Attestation, error) {
 		return nil, err
 	}
 
-	atts := make([]*zond.Attestation, len(src))
+	atts := make([]*qrysmpb.Attestation, len(src))
 	for i, a := range src {
 		atts[i], err = a.ToConsensus()
 		if err != nil {
@@ -985,7 +985,7 @@ func AttsToConsensus(src []*Attestation) ([]*zond.Attestation, error) {
 	return atts, nil
 }
 
-func AttsFromConsensus(src []*zond.Attestation) ([]*Attestation, error) {
+func AttsFromConsensus(src []*qrysmpb.Attestation) ([]*Attestation, error) {
 	atts := make([]*Attestation, len(src))
 	for i, a := range src {
 		atts[i] = AttestationFromConsensus(a)
@@ -993,7 +993,7 @@ func AttsFromConsensus(src []*zond.Attestation) ([]*Attestation, error) {
 	return atts, nil
 }
 
-func DepositsToConsensus(src []*Deposit) ([]*zond.Deposit, error) {
+func DepositsToConsensus(src []*Deposit) ([]*qrysmpb.Deposit, error) {
 	if src == nil {
 		return nil, errNilValue
 	}
@@ -1002,7 +1002,7 @@ func DepositsToConsensus(src []*Deposit) ([]*zond.Deposit, error) {
 		return nil, err
 	}
 
-	deposits := make([]*zond.Deposit, len(src))
+	deposits := make([]*qrysmpb.Deposit, len(src))
 	for i, d := range src {
 		if d.Data == nil {
 			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d].Data", i))
@@ -1036,9 +1036,9 @@ func DepositsToConsensus(src []*Deposit) ([]*zond.Deposit, error) {
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Signature", i))
 		}
-		deposits[i] = &zond.Deposit{
+		deposits[i] = &qrysmpb.Deposit{
 			Proof: proof,
-			Data: &zond.Deposit_Data{
+			Data: &qrysmpb.Deposit_Data{
 				PublicKey:             pubkey,
 				WithdrawalCredentials: withdrawalCreds,
 				Amount:                amount,
@@ -1049,7 +1049,7 @@ func DepositsToConsensus(src []*Deposit) ([]*zond.Deposit, error) {
 	return deposits, nil
 }
 
-func DepositsFromConsensus(src []*zond.Deposit) ([]*Deposit, error) {
+func DepositsFromConsensus(src []*qrysmpb.Deposit) ([]*Deposit, error) {
 	deposits := make([]*Deposit, len(src))
 	for i, d := range src {
 		proof := make([]string, len(d.Proof))
@@ -1069,7 +1069,7 @@ func DepositsFromConsensus(src []*zond.Deposit) ([]*Deposit, error) {
 	return deposits, nil
 }
 
-func ExitsToConsensus(src []*SignedVoluntaryExit) ([]*zond.SignedVoluntaryExit, error) {
+func ExitsToConsensus(src []*SignedVoluntaryExit) ([]*qrysmpb.SignedVoluntaryExit, error) {
 	if src == nil {
 		return nil, errNilValue
 	}
@@ -1078,7 +1078,7 @@ func ExitsToConsensus(src []*SignedVoluntaryExit) ([]*zond.SignedVoluntaryExit, 
 		return nil, err
 	}
 
-	exits := make([]*zond.SignedVoluntaryExit, len(src))
+	exits := make([]*qrysmpb.SignedVoluntaryExit, len(src))
 	for i, e := range src {
 		exits[i], err = e.ToConsensus()
 		if err != nil {
@@ -1088,7 +1088,7 @@ func ExitsToConsensus(src []*SignedVoluntaryExit) ([]*zond.SignedVoluntaryExit, 
 	return exits, nil
 }
 
-func ExitsFromConsensus(src []*zond.SignedVoluntaryExit) ([]*SignedVoluntaryExit, error) {
+func ExitsFromConsensus(src []*qrysmpb.SignedVoluntaryExit) ([]*SignedVoluntaryExit, error) {
 	exits := make([]*SignedVoluntaryExit, len(src))
 	for i, e := range src {
 		exits[i] = &SignedVoluntaryExit{
@@ -1102,7 +1102,7 @@ func ExitsFromConsensus(src []*zond.SignedVoluntaryExit) ([]*SignedVoluntaryExit
 	return exits, nil
 }
 
-func DilithiumChangesToConsensus(src []*SignedDilithiumToExecutionChange) ([]*zond.SignedDilithiumToExecutionChange, error) {
+func DilithiumChangesToConsensus(src []*SignedDilithiumToExecutionChange) ([]*qrysmpb.SignedDilithiumToExecutionChange, error) {
 	if src == nil {
 		return nil, errNilValue
 	}
@@ -1111,7 +1111,7 @@ func DilithiumChangesToConsensus(src []*SignedDilithiumToExecutionChange) ([]*zo
 		return nil, err
 	}
 
-	changes := make([]*zond.SignedDilithiumToExecutionChange, len(src))
+	changes := make([]*qrysmpb.SignedDilithiumToExecutionChange, len(src))
 	for i, ch := range src {
 		if ch.Message == nil {
 			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d]", i))
@@ -1133,8 +1133,8 @@ func DilithiumChangesToConsensus(src []*SignedDilithiumToExecutionChange) ([]*zo
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Message.ToExecutionAddress", i))
 		}
-		changes[i] = &zond.SignedDilithiumToExecutionChange{
-			Message: &zond.DilithiumToExecutionChange{
+		changes[i] = &qrysmpb.SignedDilithiumToExecutionChange{
+			Message: &qrysmpb.DilithiumToExecutionChange{
 				ValidatorIndex:      primitives.ValidatorIndex(index),
 				FromDilithiumPubkey: pubkey,
 				ToExecutionAddress:  address,
@@ -1145,7 +1145,7 @@ func DilithiumChangesToConsensus(src []*SignedDilithiumToExecutionChange) ([]*zo
 	return changes, nil
 }
 
-func DilithiumChangesFromConsensus(src []*zond.SignedDilithiumToExecutionChange) ([]*SignedDilithiumToExecutionChange, error) {
+func DilithiumChangesFromConsensus(src []*qrysmpb.SignedDilithiumToExecutionChange) ([]*SignedDilithiumToExecutionChange, error) {
 	changes := make([]*SignedDilithiumToExecutionChange, len(src))
 	for i, ch := range src {
 		changes[i] = &SignedDilithiumToExecutionChange{

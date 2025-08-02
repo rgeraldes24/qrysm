@@ -20,7 +20,7 @@ import (
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	gzondtypes "github.com/theQRL/go-zond/core/types"
-	zondRPC "github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/go-zond/trie"
 	builderAPI "github.com/theQRL/qrysm/api/client/builder"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
@@ -84,7 +84,7 @@ type ExecHeaderResponseCapella struct {
 type Builder struct {
 	cfg          *config
 	address      string
-	execClient   *zondRPC.Client
+	execClient   *rpc.Client
 	currId       *v1.PayloadIDBytes
 	currPayload  interfaces.ExecutionData
 	mux          *gMux.Router

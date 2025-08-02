@@ -26,7 +26,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/network/http"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
@@ -67,10 +67,10 @@ func (s *Server) publishBlindedBlockSSZ(ctx context.Context, w http.ResponseWrit
 		http2.HandleError(w, "Could not read request body: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	capellaBlock := &zond.SignedBlindedBeaconBlockCapella{}
+	capellaBlock := &qrysmpb.SignedBlindedBeaconBlockCapella{}
 	if err := capellaBlock.UnmarshalSSZ(body); err == nil {
-		genericBlock := &zond.GenericSignedBeaconBlock{
-			Block: &zond.GenericSignedBeaconBlock_BlindedCapella{
+		genericBlock := &qrysmpb.GenericSignedBeaconBlock{
+			Block: &qrysmpb.GenericSignedBeaconBlock_BlindedCapella{
 				BlindedCapella: capellaBlock,
 			},
 		}
@@ -143,10 +143,10 @@ func (s *Server) publishBlockSSZ(ctx context.Context, w http.ResponseWriter, r *
 		http2.HandleError(w, "Could not read request body", http.StatusInternalServerError)
 		return
 	}
-	capellaBlock := &zond.SignedBeaconBlockCapella{}
+	capellaBlock := &qrysmpb.SignedBeaconBlockCapella{}
 	if err := capellaBlock.UnmarshalSSZ(body); err == nil {
-		genericBlock := &zond.GenericSignedBeaconBlock{
-			Block: &zond.GenericSignedBeaconBlock_Capella{
+		genericBlock := &qrysmpb.GenericSignedBeaconBlock{
+			Block: &qrysmpb.GenericSignedBeaconBlock_Capella{
 				Capella: capellaBlock,
 			},
 		}
@@ -191,7 +191,7 @@ func (s *Server) publishBlock(ctx context.Context, w http.ResponseWriter, r *htt
 	http2.HandleError(w, "Body does not represent a valid block type"+blockVersionError, http.StatusBadRequest)
 }
 
-func (bs *Server) proposeBlock(ctx context.Context, w http.ResponseWriter, blk *zond.GenericSignedBeaconBlock) {
+func (bs *Server) proposeBlock(ctx context.Context, w http.ResponseWriter, blk *qrysmpb.GenericSignedBeaconBlock) {
 	_, err := bs.V1Alpha1ValidatorServer.ProposeBeaconBlock(ctx, blk)
 	if err != nil {
 		http2.HandleError(w, err.Error(), http.StatusInternalServerError)
@@ -205,7 +205,7 @@ func unmarshalStrict(data []byte, v interface{}) error {
 	return dec.Decode(v)
 }
 
-func (s *Server) validateBroadcast(ctx context.Context, r *http.Request, blk *zond.GenericSignedBeaconBlock) error {
+func (s *Server) validateBroadcast(ctx context.Context, r *http.Request, blk *qrysmpb.GenericSignedBeaconBlock) error {
 	switch r.URL.Query().Get(broadcastValidationQueryParam) {
 	case broadcastValidationConsensus:
 		b, err := blocks.NewSignedBeaconBlock(blk.Block)

@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/lookup"
 	"github.com/theQRL/qrysm/beacon-chain/sync"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // Server defines a server implementation of the gRPC Validator service,
@@ -27,7 +27,7 @@ type Server struct {
 	Stater                 lookup.Stater
 	OptimisticModeFetcher  blockchain.OptimisticModeFetcher
 	SyncCommitteePool      synccommittee.Pool
-	V1Alpha1Server         zond.BeaconNodeValidatorServer
+	V1Alpha1Server         qrysmpb.BeaconNodeValidatorServer
 	ProposerSlotIndexCache *cache.ProposerPayloadIDsCache
 	ChainInfoFetcher       blockchain.ChainInfoFetcher
 	BeaconDB               db.HeadAccessDatabase

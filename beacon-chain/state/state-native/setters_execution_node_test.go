@@ -6,7 +6,6 @@ import (
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/config/params"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -32,7 +31,7 @@ func BenchmarkAppendExecutionDataVotes(b *testing.B) {
 	ref := st.Copy()
 
 	for i := 0; i < b.N; i++ {
-		err := ref.AppendExecutionDataVotes(&zond.ExecutionData{DepositCount: uint64(i)})
+		err := ref.AppendExecutionDataVotes(&qrysmpb.ExecutionData{DepositCount: uint64(i)})
 		require.NoError(b, err)
 		ref = st.Copy()
 	}

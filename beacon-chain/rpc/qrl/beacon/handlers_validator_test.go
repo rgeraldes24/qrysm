@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	http2 "github.com/theQRL/qrysm/network/http"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -282,7 +282,7 @@ func TestListValidators_FilterByStatus(t *testing.T) {
 	st, _ = util.DeterministicGenesisStateCapella(t, 8192)
 
 	farFutureEpoch := params.BeaconConfig().FarFutureEpoch
-	validators := []*zond.Validator{
+	validators := []*qrysmpb.Validator{
 		// Pending initialized.
 		{
 			ActivationEpoch:            farFutureEpoch,

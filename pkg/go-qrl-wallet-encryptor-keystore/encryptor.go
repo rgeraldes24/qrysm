@@ -2,7 +2,7 @@ package keystorev1
 
 import "fmt"
 
-// Encryptor is an encryptor that follows the Zond keystore V1 specification.
+// Encryptor is an encryptor that follows the QRL keystore V1 specification.
 type Encryptor struct {
 	cipher string
 }

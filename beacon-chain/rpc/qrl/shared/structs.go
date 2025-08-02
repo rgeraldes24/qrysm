@@ -9,7 +9,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/consensus-types/validator"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 type Attestation struct {
@@ -114,7 +114,7 @@ type Fork struct {
 	Epoch           string `json:"epoch"`
 }
 
-func (s *Fork) ToConsensus() (*zond.Fork, error) {
+func (s *Fork) ToConsensus() (*qrysmpb.Fork, error) {
 	previousVersion, err := hexutil.Decode(s.PreviousVersion)
 	if err != nil {
 		return nil, NewDecodeError(err, "PreviousVersion")
@@ -127,7 +127,7 @@ func (s *Fork) ToConsensus() (*zond.Fork, error) {
 	if err != nil {
 		return nil, NewDecodeError(err, "Epoch")
 	}
-	return &zond.Fork{
+	return &qrysmpb.Fork{
 		PreviousVersion: previousVersion,
 		CurrentVersion:  currentVersion,
 		Epoch:           primitives.Epoch(epoch),
@@ -141,7 +141,7 @@ type SyncCommitteeMessage struct {
 	Signature       string `json:"signature"`
 }
 
-func (s *SignedValidatorRegistration) ToConsensus() (*zond.SignedValidatorRegistrationV1, error) {
+func (s *SignedValidatorRegistration) ToConsensus() (*qrysmpb.SignedValidatorRegistrationV1, error) {
 	msg, err := s.Message.ToConsensus()
 	if err != nil {
 		return nil, NewDecodeError(err, "Message")
@@ -153,13 +153,13 @@ func (s *SignedValidatorRegistration) ToConsensus() (*zond.SignedValidatorRegist
 	if len(sig) != fieldparams.DilithiumSignatureLength {
 		return nil, fmt.Errorf("Signature length was %d when expecting length %d", len(sig), fieldparams.DilithiumSignatureLength)
 	}
-	return &zond.SignedValidatorRegistrationV1{
+	return &qrysmpb.SignedValidatorRegistrationV1{
 		Message:   msg,
 		Signature: sig,
 	}, nil
 }
 
-func (s *ValidatorRegistration) ToConsensus() (*zond.ValidatorRegistrationV1, error) {
+func (s *ValidatorRegistration) ToConsensus() (*qrysmpb.ValidatorRegistrationV1, error) {
 	feeRecipient, err := hexutil.DecodeQ(s.FeeRecipient)
 	if err != nil {
 		return nil, NewDecodeError(err, "FeeRecipient")
@@ -182,7 +182,7 @@ func (s *ValidatorRegistration) ToConsensus() (*zond.ValidatorRegistrationV1, er
 	if err != nil {
 		return nil, NewDecodeError(err, "Timestamp")
 	}
-	return &zond.ValidatorRegistrationV1{
+	return &qrysmpb.ValidatorRegistrationV1{
 		FeeRecipient: feeRecipient,
 		GasLimit:     gasLimit,
 		Timestamp:    timestamp,
@@ -190,7 +190,7 @@ func (s *ValidatorRegistration) ToConsensus() (*zond.ValidatorRegistrationV1, er
 	}, nil
 }
 
-func ValidatorRegistrationFromConsensus(vr *zond.ValidatorRegistrationV1) (*ValidatorRegistration, error) {
+func ValidatorRegistrationFromConsensus(vr *qrysmpb.ValidatorRegistrationV1) (*ValidatorRegistration, error) {
 	if vr == nil {
 		return nil, errors.New("ValidatorRegistrationV1 is empty")
 	}
@@ -202,7 +202,7 @@ func ValidatorRegistrationFromConsensus(vr *zond.ValidatorRegistrationV1) (*Vali
 	}, nil
 }
 
-func SignedValidatorRegistrationFromConsensus(vr *zond.SignedValidatorRegistrationV1) (*SignedValidatorRegistration, error) {
+func SignedValidatorRegistrationFromConsensus(vr *qrysmpb.SignedValidatorRegistrationV1) (*SignedValidatorRegistration, error) {
 	if vr == nil {
 		return nil, errors.New("SignedValidatorRegistrationV1 is empty")
 	}
@@ -216,7 +216,7 @@ func SignedValidatorRegistrationFromConsensus(vr *zond.SignedValidatorRegistrati
 	}, nil
 }
 
-func (s *SignedContributionAndProof) ToConsensus() (*zond.SignedContributionAndProof, error) {
+func (s *SignedContributionAndProof) ToConsensus() (*qrysmpb.SignedContributionAndProof, error) {
 	msg, err := s.Message.ToConsensus()
 	if err != nil {
 		return nil, NewDecodeError(err, "Message")
@@ -226,13 +226,13 @@ func (s *SignedContributionAndProof) ToConsensus() (*zond.SignedContributionAndP
 		return nil, NewDecodeError(err, "Signature")
 	}
 
-	return &zond.SignedContributionAndProof{
+	return &qrysmpb.SignedContributionAndProof{
 		Message:   msg,
 		Signature: sig,
 	}, nil
 }
 
-func (c *ContributionAndProof) ToConsensus() (*zond.ContributionAndProof, error) {
+func (c *ContributionAndProof) ToConsensus() (*qrysmpb.ContributionAndProof, error) {
 	contribution, err := c.Contribution.ToConsensus()
 	if err != nil {
 		return nil, NewDecodeError(err, "Contribution")
@@ -246,14 +246,14 @@ func (c *ContributionAndProof) ToConsensus() (*zond.ContributionAndProof, error)
 		return nil, NewDecodeError(err, "SelectionProof")
 	}
 
-	return &zond.ContributionAndProof{
+	return &qrysmpb.ContributionAndProof{
 		AggregatorIndex: primitives.ValidatorIndex(aggregatorIndex),
 		Contribution:    contribution,
 		SelectionProof:  selectionProof,
 	}, nil
 }
 
-func (s *SyncCommitteeContribution) ToConsensus() (*zond.SyncCommitteeContribution, error) {
+func (s *SyncCommitteeContribution) ToConsensus() (*qrysmpb.SyncCommitteeContribution, error) {
 	slot, err := strconv.ParseUint(s.Slot, 10, 64)
 	if err != nil {
 		return nil, NewDecodeError(err, "Slot")
@@ -280,7 +280,7 @@ func (s *SyncCommitteeContribution) ToConsensus() (*zond.SyncCommitteeContributi
 		sigs[i] = sig
 	}
 
-	return &zond.SyncCommitteeContribution{
+	return &qrysmpb.SyncCommitteeContribution{
 		Slot:              primitives.Slot(slot),
 		BlockRoot:         bbRoot,
 		SubcommitteeIndex: subcommitteeIndex,
@@ -289,7 +289,7 @@ func (s *SyncCommitteeContribution) ToConsensus() (*zond.SyncCommitteeContributi
 	}, nil
 }
 
-func (s *SignedAggregateAttestationAndProof) ToConsensus() (*zond.SignedAggregateAttestationAndProof, error) {
+func (s *SignedAggregateAttestationAndProof) ToConsensus() (*qrysmpb.SignedAggregateAttestationAndProof, error) {
 	msg, err := s.Message.ToConsensus()
 	if err != nil {
 		return nil, NewDecodeError(err, "Message")
@@ -299,13 +299,13 @@ func (s *SignedAggregateAttestationAndProof) ToConsensus() (*zond.SignedAggregat
 		return nil, NewDecodeError(err, "Signature")
 	}
 
-	return &zond.SignedAggregateAttestationAndProof{
+	return &qrysmpb.SignedAggregateAttestationAndProof{
 		Message:   msg,
 		Signature: sig,
 	}, nil
 }
 
-func (a *AggregateAttestationAndProof) ToConsensus() (*zond.AggregateAttestationAndProof, error) {
+func (a *AggregateAttestationAndProof) ToConsensus() (*qrysmpb.AggregateAttestationAndProof, error) {
 	aggIndex, err := strconv.ParseUint(a.AggregatorIndex, 10, 64)
 	if err != nil {
 		return nil, NewDecodeError(err, "AggregatorIndex")
@@ -318,14 +318,14 @@ func (a *AggregateAttestationAndProof) ToConsensus() (*zond.AggregateAttestation
 	if err != nil {
 		return nil, NewDecodeError(err, "SelectionProof")
 	}
-	return &zond.AggregateAttestationAndProof{
+	return &qrysmpb.AggregateAttestationAndProof{
 		AggregatorIndex: primitives.ValidatorIndex(aggIndex),
 		Aggregate:       agg,
 		SelectionProof:  proof,
 	}, nil
 }
 
-func (a *Attestation) ToConsensus() (*zond.Attestation, error) {
+func (a *Attestation) ToConsensus() (*qrysmpb.Attestation, error) {
 	aggBits, err := hexutil.Decode(a.AggregationBits)
 	if err != nil {
 		return nil, NewDecodeError(err, "AggregationBits")
@@ -344,14 +344,14 @@ func (a *Attestation) ToConsensus() (*zond.Attestation, error) {
 		sigs[i] = sig
 	}
 
-	return &zond.Attestation{
+	return &qrysmpb.Attestation{
 		AggregationBits: aggBits,
 		Data:            data,
 		Signatures:      sigs,
 	}, nil
 }
 
-func AttestationFromConsensus(a *zond.Attestation) *Attestation {
+func AttestationFromConsensus(a *qrysmpb.Attestation) *Attestation {
 	sigs := make([]string, len(a.Signatures))
 	for i, sig := range a.Signatures {
 		sigs[i] = hexutil.Encode(sig)
@@ -364,7 +364,7 @@ func AttestationFromConsensus(a *zond.Attestation) *Attestation {
 	}
 }
 
-func (a *AttestationData) ToConsensus() (*zond.AttestationData, error) {
+func (a *AttestationData) ToConsensus() (*qrysmpb.AttestationData, error) {
 	slot, err := strconv.ParseUint(a.Slot, 10, 64)
 	if err != nil {
 		return nil, NewDecodeError(err, "Slot")
@@ -386,7 +386,7 @@ func (a *AttestationData) ToConsensus() (*zond.AttestationData, error) {
 		return nil, NewDecodeError(err, "Target")
 	}
 
-	return &zond.AttestationData{
+	return &qrysmpb.AttestationData{
 		Slot:            primitives.Slot(slot),
 		CommitteeIndex:  primitives.CommitteeIndex(committeeIndex),
 		BeaconBlockRoot: bbRoot,
@@ -395,7 +395,7 @@ func (a *AttestationData) ToConsensus() (*zond.AttestationData, error) {
 	}, nil
 }
 
-func AttestationDataFromConsensus(a *zond.AttestationData) *AttestationData {
+func AttestationDataFromConsensus(a *qrysmpb.AttestationData) *AttestationData {
 	return &AttestationData{
 		Slot:            strconv.FormatUint(uint64(a.Slot), 10),
 		CommitteeIndex:  strconv.FormatUint(uint64(a.CommitteeIndex), 10),
@@ -405,7 +405,7 @@ func AttestationDataFromConsensus(a *zond.AttestationData) *AttestationData {
 	}
 }
 
-func (c *Checkpoint) ToConsensus() (*zond.Checkpoint, error) {
+func (c *Checkpoint) ToConsensus() (*qrysmpb.Checkpoint, error) {
 	epoch, err := strconv.ParseUint(c.Epoch, 10, 64)
 	if err != nil {
 		return nil, NewDecodeError(err, "Epoch")
@@ -415,13 +415,13 @@ func (c *Checkpoint) ToConsensus() (*zond.Checkpoint, error) {
 		return nil, NewDecodeError(err, "Root")
 	}
 
-	return &zond.Checkpoint{
+	return &qrysmpb.Checkpoint{
 		Epoch: primitives.Epoch(epoch),
 		Root:  root,
 	}, nil
 }
 
-func CheckpointFromConsensus(c *zond.Checkpoint) *Checkpoint {
+func CheckpointFromConsensus(c *qrysmpb.Checkpoint) *Checkpoint {
 	return &Checkpoint{
 		Epoch: strconv.FormatUint(uint64(c.Epoch), 10),
 		Root:  hexutil.Encode(c.Root),
@@ -479,7 +479,7 @@ func (b *BeaconCommitteeSubscription) ToConsensus() (*validator.BeaconCommitteeS
 	}, nil
 }
 
-func (e *SignedVoluntaryExit) ToConsensus() (*zond.SignedVoluntaryExit, error) {
+func (e *SignedVoluntaryExit) ToConsensus() (*qrysmpb.SignedVoluntaryExit, error) {
 	sig, err := hexutil.Decode(e.Signature)
 	if err != nil {
 		return nil, NewDecodeError(err, "Signature")
@@ -489,20 +489,20 @@ func (e *SignedVoluntaryExit) ToConsensus() (*zond.SignedVoluntaryExit, error) {
 		return nil, NewDecodeError(err, "Message")
 	}
 
-	return &zond.SignedVoluntaryExit{
+	return &qrysmpb.SignedVoluntaryExit{
 		Exit:      exit,
 		Signature: sig,
 	}, nil
 }
 
-func SignedVoluntaryExitFromConsensus(e *zond.SignedVoluntaryExit) *SignedVoluntaryExit {
+func SignedVoluntaryExitFromConsensus(e *qrysmpb.SignedVoluntaryExit) *SignedVoluntaryExit {
 	return &SignedVoluntaryExit{
 		Message:   VoluntaryExitFromConsensus(e.Exit),
 		Signature: hexutil.Encode(e.Signature),
 	}
 }
 
-func (e *VoluntaryExit) ToConsensus() (*zond.VoluntaryExit, error) {
+func (e *VoluntaryExit) ToConsensus() (*qrysmpb.VoluntaryExit, error) {
 	epoch, err := strconv.ParseUint(e.Epoch, 10, 64)
 	if err != nil {
 		return nil, NewDecodeError(err, "Epoch")
@@ -512,13 +512,13 @@ func (e *VoluntaryExit) ToConsensus() (*zond.VoluntaryExit, error) {
 		return nil, NewDecodeError(err, "ValidatorIndex")
 	}
 
-	return &zond.VoluntaryExit{
+	return &qrysmpb.VoluntaryExit{
 		Epoch:          primitives.Epoch(epoch),
 		ValidatorIndex: primitives.ValidatorIndex(valIndex),
 	}, nil
 }
 
-func (m *SyncCommitteeMessage) ToConsensus() (*zond.SyncCommitteeMessage, error) {
+func (m *SyncCommitteeMessage) ToConsensus() (*qrysmpb.SyncCommitteeMessage, error) {
 	slot, err := strconv.ParseUint(m.Slot, 10, 64)
 	if err != nil {
 		return nil, NewDecodeError(err, "Slot")
@@ -536,7 +536,7 @@ func (m *SyncCommitteeMessage) ToConsensus() (*zond.SyncCommitteeMessage, error)
 		return nil, NewDecodeError(err, "Signature")
 	}
 
-	return &zond.SyncCommitteeMessage{
+	return &qrysmpb.SyncCommitteeMessage{
 		Slot:           primitives.Slot(slot),
 		BlockRoot:      root,
 		ValidatorIndex: primitives.ValidatorIndex(valIndex),
@@ -544,7 +544,7 @@ func (m *SyncCommitteeMessage) ToConsensus() (*zond.SyncCommitteeMessage, error)
 	}, nil
 }
 
-func VoluntaryExitFromConsensus(e *zond.VoluntaryExit) *VoluntaryExit {
+func VoluntaryExitFromConsensus(e *qrysmpb.VoluntaryExit) *VoluntaryExit {
 	return &VoluntaryExit{
 		Epoch:          strconv.FormatUint(uint64(e.Epoch), 10),
 		ValidatorIndex: strconv.FormatUint(uint64(e.ValidatorIndex), 10),

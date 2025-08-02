@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	zondTypes "github.com/theQRL/qrysm/pkg/go-qrl-types"
+	qrlTypes "github.com/theQRL/qrysm/pkg/go-qrl-types"
 )
 
 type AccountIDProvider interface {
@@ -16,7 +16,7 @@ type AccountNameProvider interface {
 }
 
 type AccountPublicKeyProvider interface {
-	PublicKey() zondTypes.PublicKey
+	PublicKey() qrlTypes.PublicKey
 }
 
 type AccountPathProvider interface {
@@ -36,11 +36,11 @@ type AccountLocker interface {
 }
 
 type AccountSigner interface {
-	Sign(ctx context.Context, data []byte) (zondTypes.Signature, error)
+	Sign(ctx context.Context, data []byte) (qrlTypes.Signature, error)
 }
 
 type AccountProtectingSigner interface {
-	SignGeneric(ctx context.Context, data []byte, domain []byte) (zondTypes.Signature, error)
+	SignGeneric(ctx context.Context, data []byte, domain []byte) (qrlTypes.Signature, error)
 
 	SignBeaconProposal(ctx context.Context,
 		slot uint64,
@@ -48,7 +48,7 @@ type AccountProtectingSigner interface {
 		parentRoot []byte,
 		stateRoot []byte,
 		bodyRoot []byte,
-		domain []byte) (zondTypes.Signature, error)
+		domain []byte) (qrlTypes.Signature, error)
 
 	SignBeaconAttestation(ctx context.Context,
 		slot uint64,
@@ -58,7 +58,7 @@ type AccountProtectingSigner interface {
 		sourceRoot []byte,
 		targetEpoch uint64,
 		targetRoot []byte,
-		domain []byte) (zondTypes.Signature, error)
+		domain []byte) (qrlTypes.Signature, error)
 }
 
 type AccountProtectingMultiSigner interface {
@@ -71,11 +71,11 @@ type AccountProtectingMultiSigner interface {
 		sourceRoot []byte,
 		targetEpoch uint64,
 		targetRoot []byte,
-		domain []byte) ([]zondTypes.Signature, error)
+		domain []byte) ([]qrlTypes.Signature, error)
 }
 
 type AccountCompositePublicKeyProvider interface {
-	CompositePublicKey() zondTypes.PublicKey
+	CompositePublicKey() qrlTypes.PublicKey
 }
 
 type AccountSigningThresholdProvider interface {
@@ -83,7 +83,7 @@ type AccountSigningThresholdProvider interface {
 }
 
 type AccountVerificationVectorProvider interface {
-	VerificationVector() []zondTypes.PublicKey
+	VerificationVector() []qrlTypes.PublicKey
 }
 
 type AccountParticipantsProvider interface {
@@ -91,7 +91,7 @@ type AccountParticipantsProvider interface {
 }
 
 type AccountPrivateKeyProvider interface {
-	PrivateKey(ctx context.Context) (zondTypes.PrivateKey, error)
+	PrivateKey(ctx context.Context) (qrlTypes.PrivateKey, error)
 }
 
 type Account interface {

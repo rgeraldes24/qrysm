@@ -224,7 +224,7 @@ func (r *testRunner) testTxGeneration(ctx context.Context, g *errgroup.Group, ke
 	txGenerator := components.NewTransactionGenerator(keystorePath, r.config.Seed)
 	g.Go(func() error {
 		if err := helpers.ComponentsStarted(ctx, requiredNodes); err != nil {
-			return fmt.Errorf("transaction generator requires zond execution nodes to be run: %w", err)
+			return fmt.Errorf("transaction generator requires qrl execution nodes to be run: %w", err)
 		}
 		return txGenerator.Start(ctx)
 	})
@@ -266,14 +266,14 @@ func (r *testRunner) waitForMatchingHead(ctx context.Context, timeout time.Durat
 /*
 func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, i int, conns []*grpc.ClientConn, bnAPI, qnr, minerQnr string) error {
 	matchTimeout := 3 * time.Minute
-	zondNode := zondcomp.NewNode(i, minerQnr)
+	qrlNode := qrlcomp.NewNode(i, minerQnr)
 	g.Go(func() error {
-		return zondNode.Start(ctx)
+		return qrlNode.Start(ctx)
 	})
-	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{zondNode}); err != nil {
+	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{qrlNode}); err != nil {
 		return fmt.Errorf("sync beacon node not ready: %w", err)
 	}
-	proxyNode := zondcomp.NewProxy(i)
+	proxyNode := qrlcomp.NewProxy(i)
 	g.Go(func() error {
 		return proxyNode.Start(ctx)
 	})
@@ -496,7 +496,7 @@ func (r *testRunner) defaultEndToEndRun() error {
 
 	// index := e2e.TestParams.BeaconNodeCount
 	if config.TestSync {
-		if err := r.testBeaconChainSync(ctx, g, conns, tickingStartTime, bootNode.QNR() /*, zondMiner.QNR()*/); err != nil {
+		if err := r.testBeaconChainSync(ctx, g, conns, tickingStartTime, bootNode.QNR() /*, qrlMiner.QNR()*/); err != nil {
 			return errors.Wrap(err, "beacon chain sync test failed")
 		}
 		// index += 1
@@ -509,7 +509,7 @@ func (r *testRunner) defaultEndToEndRun() error {
 	/*
 		if config.TestCheckpointSync {
 			httpEndpoints := helpers.BeaconAPIHostnames(e2e.TestParams.BeaconNodeCount)
-			mqnr := zondMiner.QNR()
+			mqnr := qrlMiner.QNR()
 			bqnr := bootNode.QNR()
 			if err := r.testCheckpointSync(ctx, g, index, conns, httpEndpoints[0], bqnr, mqnr); err != nil {
 				return errors.Wrap(err, "checkpoint sync test failed")

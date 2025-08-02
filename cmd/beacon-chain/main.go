@@ -10,7 +10,7 @@ import (
 	golog "github.com/ipfs/go-log/v2"
 	joonix "github.com/joonix/log"
 	"github.com/sirupsen/logrus"
-	zondlog "github.com/theQRL/go-zond/log"
+	gzondlog "github.com/theQRL/go-zond/log"
 	"github.com/theQRL/qrysm/beacon-chain/builder"
 	"github.com/theQRL/qrysm/beacon-chain/node"
 	"github.com/theQRL/qrysm/cmd"
@@ -246,9 +246,9 @@ func startNode(ctx *cli.Context) error {
 		// libp2p specific logging.
 		golog.SetAllLoggers(golog.LevelDebug)
 		// Gzond specific logging.
-		glogger := zondlog.NewGlogHandler(zondlog.StreamHandler(os.Stderr, zondlog.TerminalFormat(true)))
-		glogger.Verbosity(zondlog.LvlTrace)
-		zondlog.Root().SetHandler(glogger)
+		glogger := gzondlog.NewGlogHandler(gzondlog.StreamHandler(os.Stderr, gzondlog.TerminalFormat(true)))
+		glogger.Verbosity(gzondlog.LvlTrace)
+		gzondlog.Root().SetHandler(glogger)
 	}
 
 	blockchainFlagOpts, err := blockchaincmd.FlagOptions(ctx)

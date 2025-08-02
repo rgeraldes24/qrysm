@@ -21,12 +21,12 @@ import "google/protobuf/descriptor.proto";
 import "proto/qrl/v1/validator.proto";
 import "proto/qrl/v1/ssz.proto";
 
-option csharp_namespace = "TheQRL.Zond.Service";
+option csharp_namespace = "TheQRL.QRL.Service";
 option go_package = "github.com/theQRL/qrysm/proto/qrl/service";
 option java_multiple_files = true;
 option java_outer_classname = "ValidatorServiceProto";
 option java_package = "org.theqrl.qrl.service";
-option php_namespace = "TheQRL\\Zond\\Service";
+option php_namespace = "TheQRL\\QRL\\Service";
 
 // Beacon chain validator API
 //

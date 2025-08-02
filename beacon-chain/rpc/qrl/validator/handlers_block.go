@@ -14,7 +14,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	http2 "github.com/theQRL/qrysm/network/http"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"go.opencensus.io/trace"
 )
@@ -67,7 +67,7 @@ func (s *Server) ProduceBlockV3(w http.ResponseWriter, r *http.Request) {
 		graffiti = g
 	}
 
-	s.produceBlockV3(ctx, w, r, &zond.BlockRequest{
+	s.produceBlockV3(ctx, w, r, &qrysmpb.BlockRequest{
 		Slot:         primitives.Slot(slot),
 		RandaoReveal: randaoReveal,
 		Graffiti:     graffiti,
@@ -75,7 +75,7 @@ func (s *Server) ProduceBlockV3(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *Server) produceBlockV3(ctx context.Context, w http.ResponseWriter, r *http.Request, v1alpha1req *zond.BlockRequest) {
+func (s *Server) produceBlockV3(ctx context.Context, w http.ResponseWriter, r *http.Request, v1alpha1req *qrysmpb.BlockRequest) {
 	isSSZ := http2.SszRequested(r)
 	if !isSSZ {
 		log.Error("Checking for SSZ failed, defaulting to JSON")
@@ -96,12 +96,12 @@ func (s *Server) produceBlockV3(ctx context.Context, w http.ResponseWriter, r *h
 		http2.HandleError(w, "The node is currently optimistic and cannot serve validators", http.StatusServiceUnavailable)
 		return
 	}
-	blindedCapellaBlock, ok := v1alpha1resp.Block.(*zond.GenericBeaconBlock_BlindedCapella)
+	blindedCapellaBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_BlindedCapella)
 	if ok {
 		handleProduceBlindedCapellaV3(ctx, w, isSSZ, blindedCapellaBlock, v1alpha1resp.PayloadValue)
 		return
 	}
-	capellaBlock, ok := v1alpha1resp.Block.(*zond.GenericBeaconBlock_Capella)
+	capellaBlock, ok := v1alpha1resp.Block.(*qrysmpb.GenericBeaconBlock_Capella)
 	if ok {
 		handleProduceCapellaV3(ctx, w, isSSZ, capellaBlock, v1alpha1resp.PayloadValue)
 		return
@@ -112,7 +112,7 @@ func handleProduceBlindedCapellaV3(
 	ctx context.Context,
 	w http.ResponseWriter,
 	isSSZ bool,
-	blk *zond.GenericBeaconBlock_BlindedCapella,
+	blk *qrysmpb.GenericBeaconBlock_BlindedCapella,
 	payloadValue uint64,
 ) {
 	_, span := trace.StartSpan(ctx, "validator.ProduceBlockV3.internal.handleProduceBlindedCapellaV3")
@@ -148,7 +148,7 @@ func handleProduceCapellaV3(
 	ctx context.Context,
 	w http.ResponseWriter,
 	isSSZ bool,
-	blk *zond.GenericBeaconBlock_Capella,
+	blk *qrysmpb.GenericBeaconBlock_Capella,
 	payloadValue uint64,
 ) {
 	_, span := trace.StartSpan(ctx, "validator.ProduceBlockV3.internal.handleProduceCapellaV3")
