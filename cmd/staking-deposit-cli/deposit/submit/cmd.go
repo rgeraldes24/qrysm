@@ -18,7 +18,7 @@ var Command = &cli.Command{
 	},
 	Flags: []cli.Flag{
 		flags.ValidatorKeysDirFlag,
-		flags.QRLSeedFileFlag,
+		flags.SeedFileFlag,
 		flags.DepositContractAddressFlag,
 		flags.HTTPWeb3ProviderFlag,
 		flags.DepositDelaySecondsFlag,

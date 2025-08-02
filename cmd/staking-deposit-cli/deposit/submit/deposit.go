@@ -71,7 +71,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 		return fmt.Errorf("failed to create a new instance of the deposit contract. reason: %v", err)
 	}
 
-	signingSeedFile := cliCtx.String(flags.ZondSeedFileFlag.Name)
+	signingSeedFile := cliCtx.String(flags.SeedFileFlag.Name)
 	signingSeedHex, err := os.ReadFile(signingSeedFile)
 	if err != nil {
 		return fmt.Errorf("failed to read seed file. reason: %v", err)

@@ -15,9 +15,9 @@ var (
 		// Value: filepath.Join(DefaultValidatorKeysDir(), ValidatorKeysDefaultDirName),
 		Value: ValidatorKeysDefaultDirName,
 	}
-	// QRLSeedFileFlag for transaction signing.
-	QRLSeedFileFlag = &cli.StringFlag{
-		Name:     "qrl-seed-file",
+	// SeedFileFlag for transaction signing.
+	SeedFileFlag = &cli.StringFlag{
+		Name:     "seed-file",
 		Usage:    "File containing a seed for sending deposit transactions from qrl",
 		Value:    "",
 		Required: true,
