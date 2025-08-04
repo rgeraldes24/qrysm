@@ -6,7 +6,6 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-// TODO(rgeraldes24)
 var urltests = []struct {
 	url       string
 	maskedUrl string

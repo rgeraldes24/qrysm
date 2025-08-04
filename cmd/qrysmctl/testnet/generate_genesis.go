@@ -271,11 +271,11 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if err := json.Unmarshal(gbytes, gen); err != nil {
 			return nil, err
 		}
-		// TODO(rgeraldes24)
-		// set timestamps for genesis and shanghai fork
+		// set timestamps for genesis
 		gen.Timestamp = f.GenesisTime
 
-		log.Info("setting fork qrl times")
+		// TODO(rgeraldes24): unused for now
+		// log.Info("setting fork qrl times")
 	} else {
 		gen = interop.GzondTestnetGenesis(f.GenesisTime, params.BeaconConfig())
 	}

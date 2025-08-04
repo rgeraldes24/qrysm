@@ -223,7 +223,6 @@ func (s *Service) createLocalNode(
 
 	localNode, err = addForkEntry(localNode, s.genesisTime, s.genesisValidatorsRoot)
 	if err != nil {
-		// TODO(rgeraldes24)
 		return nil, errors.Wrap(err, "could not add beacon fork version entry to qnr")
 	}
 	localNode = initializeAttSubnets(localNode)

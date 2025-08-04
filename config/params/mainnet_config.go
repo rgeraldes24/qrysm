@@ -105,7 +105,6 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	RandomSubnetsPerValidator:         1 << 0,
 	EpochsPerRandomSubnetSubscription: 1 << 8,
 
-	// TODO(rgeraldes24)
 	// While eth1 mainnet block times are closer to 13s, we must conform with other clients in
 	// order to vote on the correct execution blocks.
 	//
