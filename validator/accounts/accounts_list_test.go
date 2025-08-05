@@ -183,7 +183,6 @@ func TestListAccounts_LocalKeymanager(t *testing.T) {
 	newLine := fmt.Sprintln()
 	lines := strings.Split(string(out), newLine)
 
-	// TODO(rgeraldes24)
 	// Expected output example:
 	/*
 		(keymanager kind) local wallet
