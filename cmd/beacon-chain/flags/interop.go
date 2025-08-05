@@ -7,7 +7,7 @@ import (
 var (
 	// InteropMockExecutionDataVotesFlag enables mocking the execution chain data put into blocks by proposers.
 	InteropMockExecutionDataVotesFlag = &cli.BoolFlag{
-		Name:  "interop-executionData-votes",
+		Name:  "interop-executiondata-votes",
 		Usage: "Enable mocking of execution data votes for proposers to package into blocks",
 	}
 

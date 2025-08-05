@@ -97,8 +97,8 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	IntervalsPerSlot:                3,
 
 	// QRL execution layer parameters.
-	DepositChainID:         1, // Chain ID of qrl1 mainnet.
-	DepositNetworkID:       1, // Network ID of qrl11 mainnet.
+	DepositChainID:         1, // Chain ID of execution network.
+	DepositNetworkID:       1, // Network ID of execution network.
 	DepositContractAddress: "Q00000000219ab540356cBB839Cbe05303d7705Fa",
 
 	// Validator params.

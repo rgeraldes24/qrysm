@@ -188,7 +188,7 @@ func (bb *BuilderBidCapella) ToProto() (*qrysmpb.BuilderBidCapella, error) {
 	}, nil
 }
 
-// ToProto returns a ExecutionPayloadHeaderCapella Proto
+// ToProto returns an ExecutionPayloadHeaderCapella Proto
 func (h *ExecutionPayloadHeaderCapella) ToProto() (*v1.ExecutionPayloadHeaderCapella, error) {
 	return &v1.ExecutionPayloadHeaderCapella{
 		ParentHash:       bytesutil.SafeCopyBytes(h.ParentHash),
@@ -301,12 +301,12 @@ type ExecutionPayloadCapella struct {
 	Withdrawals   []Withdrawal    `json:"withdrawals"`
 }
 
-// ToProto returns a ExecutionPayloadCapella Proto.
+// ToProto returns an ExecutionPayloadCapella Proto.
 func (r *ExecPayloadResponseCapella) ToProto() (*v1.ExecutionPayloadCapella, error) {
 	return r.Data.ToProto()
 }
 
-// ToProto returns a ExecutionPayloadCapella Proto.
+// ToProto returns an ExecutionPayloadCapella Proto.
 func (p *ExecutionPayloadCapella) ToProto() (*v1.ExecutionPayloadCapella, error) {
 	txs := make([][]byte, len(p.Transactions))
 	for i := range p.Transactions {

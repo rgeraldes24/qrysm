@@ -27,7 +27,7 @@ type NetworkConfig struct {
 	MinimumPeersInSubnetSearch uint64 // PeersInSubnetSearch is the required amount of peers that we need to be able to lookup in a subnet search.
 
 	// Chain Network Config
-	ContractDeploymentBlock uint64   // ContractDeploymentBlock is the qrl1 block in which the deposit contract is deployed.
+	ContractDeploymentBlock uint64   // ContractDeploymentBlock is the execution block in which the deposit contract is deployed.
 	BootstrapNodes          []string // BootstrapNodes are the addresses of the bootnodes.
 }
 

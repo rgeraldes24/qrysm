@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	ethApiNamespace = "/api/v1/consensus/sign/"
+	qrlApiNamespace = "/api/v1/consensus/sign/"
 )
 
 type SignRequestJson []byte
@@ -64,7 +64,7 @@ func NewApiClient(baseEndpoint string) (*ApiClient, error) {
 
 // Sign is a wrapper method around the web3signer sign api.
 func (client *ApiClient) Sign(ctx context.Context, pubKey string, request SignRequestJson) (dilithium.Signature, error) {
-	requestPath := ethApiNamespace + pubKey
+	requestPath := qrlApiNamespace + pubKey
 	resp, err := client.doRequest(ctx, http.MethodPost, client.BaseURL.String()+requestPath, bytes.NewBuffer(request))
 	if err != nil {
 		return nil, err

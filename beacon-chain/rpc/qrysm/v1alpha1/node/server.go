@@ -220,7 +220,7 @@ func (ns *Server) ListPeers(ctx context.Context, _ *empty.Empty) (*qrysmpb.Peers
 	}, nil
 }
 
-// GetExecutionNodeConnectionStatus gets data about the QRL1 endpoints.
+// GetExecutionNodeConnectionStatus gets data about the execution endpoints.
 func (ns *Server) GetExecutionNodeConnectionStatus(_ context.Context, _ *empty.Empty) (*qrysmpb.ExecutionNodeConnectionStatus, error) {
 	var currErr string
 	err := ns.ExecutionChainInfoFetcher.ExecutionClientConnectionErr()

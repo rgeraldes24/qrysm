@@ -291,7 +291,7 @@ func MapBeaconBlockAltair(block *qrysmpb.BeaconBlockAltair) (*BeaconBlockAltair,
 }
 
 // MapBeaconBlockBodyAltair maps the eth2.BeaconBlockBodyAltair proto to the Web3Signer spec.
-func MapBeaconBlockBodyAltair(body *qrlpb.BeaconBlockBodyAltair) (*BeaconBlockBodyAltair, error) {
+func MapBeaconBlockBodyAltair(body *qrysmpb.BeaconBlockBodyAltair) (*BeaconBlockBodyAltair, error) {
 	if body == nil {
 		return nil, fmt.Errorf("beacon block body altair is nil")
 	}
@@ -359,7 +359,7 @@ func MapBeaconBlockBodyAltair(body *qrlpb.BeaconBlockBodyAltair) (*BeaconBlockBo
 }
 
 // MapSyncAggregatorSelectionData maps the eth2.SyncAggregatorSelectionData proto to the Web3Signer spec.
-func MapSyncAggregatorSelectionData(data *qrlpb.SyncAggregatorSelectionData) (*SyncAggregatorSelectionData, error) {
+func MapSyncAggregatorSelectionData(data *qrysmpb.SyncAggregatorSelectionData) (*SyncAggregatorSelectionData, error) {
 	if data == nil {
 		return nil, fmt.Errorf("sync aggregator selection data is nil")
 	}
@@ -370,7 +370,7 @@ func MapSyncAggregatorSelectionData(data *qrlpb.SyncAggregatorSelectionData) (*S
 }
 
 // MapContributionAndProof maps the eth2.ContributionAndProof proto to the Web3Signer spec.
-func MapContributionAndProof(contribution *qrlpb.ContributionAndProof) (*ContributionAndProof, error) {
+func MapContributionAndProof(contribution *qrysmpb.ContributionAndProof) (*ContributionAndProof, error) {
 	if contribution == nil {
 		return nil, fmt.Errorf("contribution and proof is nil")
 	}
