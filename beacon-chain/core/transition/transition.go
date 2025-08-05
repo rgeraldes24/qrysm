@@ -302,10 +302,10 @@ func VerifyOperationLengths(_ context.Context, state state.BeaconState, b interf
 	}
 	executionData := state.ExecutionData()
 	if executionData == nil {
-		return nil, errors.New("nil executionData in state")
+		return nil, errors.New("nil executiondata in state")
 	}
 	if state.ExecutionDepositIndex() > executionData.DepositCount {
-		return nil, fmt.Errorf("expected state.deposit_index %d <= executionData.deposit_count %d", state.ExecutionDepositIndex(), executionData.DepositCount)
+		return nil, fmt.Errorf("expected state.deposit_index %d <= executiondata.deposit_count %d", state.ExecutionDepositIndex(), executionData.DepositCount)
 	}
 	maxDeposits := math.Min(params.BeaconConfig().MaxDeposits, executionData.DepositCount-state.ExecutionDepositIndex())
 	// Verify outstanding deposits are processed up to max number of deposits
