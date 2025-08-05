@@ -225,7 +225,7 @@ func (dc *DepositCache) DepositsNumberAndRootAtHeight(ctx context.Context, block
 	dc.depositsLock.RLock()
 	defer dc.depositsLock.RUnlock()
 	heightIdx := sort.Search(len(dc.deposits), func(i int) bool { return dc.deposits[i].ExecutionBlockHeight > blockHeight.Uint64() })
-	// send the deposit root of the empty trie, if execution1follow distance is greater than the time of the earliest
+	// send the deposit root of the empty trie, if executionfollow distance is greater than the time of the earliest
 	// deposit.
 	if heightIdx == 0 {
 		return 0, [32]byte{}

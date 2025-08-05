@@ -20,20 +20,20 @@ import (
 )
 
 type testCase struct {
-	DepositData     depositData `yaml:"deposit_data"`
-	DepositDataRoot [32]byte    `yaml:"deposit_data_root"`
-	ExecutionData        *executionData   `yaml:"execution_data"`
-	BlockHeight     uint64      `yaml:"block_height"`
-	Snapshot        snapshot    `yaml:"snapshot"`
+	DepositData     depositData    `yaml:"deposit_data"`
+	DepositDataRoot [32]byte       `yaml:"deposit_data_root"`
+	ExecutionData   *executionData `yaml:"execution_data"`
+	BlockHeight     uint64         `yaml:"block_height"`
+	Snapshot        snapshot       `yaml:"snapshot"`
 }
 
 func (tc *testCase) UnmarshalYAML(value *yaml.Node) error {
 	raw := struct {
-		DepositData     depositData `yaml:"deposit_data"`
-		DepositDataRoot string      `yaml:"deposit_data_root"`
-		ExecutionData        *executionData   `yaml:"execution_data"`
-		BlockHeight     string      `yaml:"block_height"`
-		Snapshot        snapshot    `yaml:"snapshot"`
+		DepositData     depositData    `yaml:"deposit_data"`
+		DepositDataRoot string         `yaml:"deposit_data_root"`
+		ExecutionData   *executionData `yaml:"execution_data"`
+		BlockHeight     string         `yaml:"block_height"`
+		Snapshot        snapshot       `yaml:"snapshot"`
 	}{}
 	err := value.Decode(&raw)
 	if err != nil {
