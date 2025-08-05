@@ -45,18 +45,18 @@ func ExecutionDatasRoot(executionDatas []*qrysmpb.ExecutionData) ([32]byte, erro
 	for i := 0; i < len(executionDatas); i++ {
 		execution, err := ExecutionDataRootWithHasher(executionDatas[i])
 		if err != nil {
-			return [32]byte{}, errors.Wrap(err, "could not compute executionData merkleization")
+			return [32]byte{}, errors.Wrap(err, "could not compute executiondata merkleization")
 		}
 		executionVotesRoots = append(executionVotesRoots, execution)
 	}
 
 	executionVotesRootsRoot, err := ssz.BitwiseMerkleize(executionVotesRoots, uint64(len(executionVotesRoots)), params.BeaconConfig().ExecutionDataVotesLength())
 	if err != nil {
-		return [32]byte{}, errors.Wrap(err, "could not compute executionData votes merkleization")
+		return [32]byte{}, errors.Wrap(err, "could not compute executiondata votes merkleization")
 	}
 	executionVotesRootBuf := new(bytes.Buffer)
 	if err := binary.Write(executionVotesRootBuf, binary.LittleEndian, uint64(len(executionDatas))); err != nil {
-		return [32]byte{}, errors.Wrap(err, "could not marshal executionData votes length")
+		return [32]byte{}, errors.Wrap(err, "could not marshal executiondata votes length")
 	}
 	// We need to mix in the length of the slice.
 	executionVotesRootBufRoot := make([]byte, 32)
