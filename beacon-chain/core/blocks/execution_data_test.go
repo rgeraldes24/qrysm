@@ -184,11 +184,11 @@ func TestProcessExecutionData_SetsCorrectly(t *testing.T) {
 
 	newExecutionDataVotes := beaconState.ExecutionDataVotes()
 	if len(newExecutionDataVotes) <= 1 {
-		t.Error("Expected new execution node data votes to have length > 1")
+		t.Error("Expected new execution data votes to have length > 1")
 	}
 	if !proto.Equal(beaconState.ExecutionData(), qrysmpb.CopyExecutionData(b.Block.Body.ExecutionData)) {
 		t.Errorf(
-			"Expected latest execution node data to have been set to %v, received %v",
+			"Expected latest execution data to have been set to %v, received %v",
 			b.Block.Body.ExecutionData,
 			beaconState.ExecutionData(),
 		)
