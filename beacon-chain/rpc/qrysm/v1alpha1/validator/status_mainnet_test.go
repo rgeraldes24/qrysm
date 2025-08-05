@@ -74,11 +74,11 @@ func TestValidatorStatus_Active(t *testing.T) {
 		},
 	}
 	vs := &Server{
-		ChainStartFetcher:        p,
-		BlockFetcher:             p,
-		ExecutionNodeInfoFetcher: p,
-		DepositFetcher:           depositCache,
-		HeadFetcher:              &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
+		ChainStartFetcher:    p,
+		BlockFetcher:         p,
+		ExecutionInfoFetcher: p,
+		DepositFetcher:       depositCache,
+		HeadFetcher:          &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
 	}
 	req := &qrysmpb.ValidatorStatusRequest{
 		PublicKey: pubkey,

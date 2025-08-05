@@ -40,12 +40,12 @@ func (vs *Server) executionDataMajorityVote(ctx context.Context, beaconState sta
 	if vs.MockExecutionNodeVotes {
 		return vs.mockExecutionDataVote(ctx, slot)
 	}
-	if !vs.ExecutionNodeInfoFetcher.ExecutionClientConnected() {
+	if !vs.ExecutionInfoFetcher.ExecutionClientConnected() {
 		return vs.randomExecutionDataVote(ctx)
 	}
 	executionDataNotification = false
 
-	genesisTime, _ := vs.ExecutionNodeInfoFetcher.GenesisExecutionChainInfo()
+	genesisTime, _ := vs.ExecutionInfoFetcher.GenesisExecutionChainInfo()
 	followDistanceSeconds := params.BeaconConfig().ExecutionFollowDistance * params.BeaconConfig().SecondsPerExecutionBlock
 	latestValidTime := votingPeriodStartTime - followDistanceSeconds
 	earliestValidTime := votingPeriodStartTime - 2*followDistanceSeconds
@@ -88,7 +88,7 @@ func (vs *Server) executionDataMajorityVote(ctx context.Context, beaconState sta
 }
 
 func (vs *Server) slotStartTime(slot primitives.Slot) uint64 {
-	startTime, _ := vs.ExecutionNodeInfoFetcher.GenesisExecutionChainInfo()
+	startTime, _ := vs.ExecutionInfoFetcher.GenesisExecutionChainInfo()
 	return slots.VotingPeriodStartTime(startTime, slot)
 }
 

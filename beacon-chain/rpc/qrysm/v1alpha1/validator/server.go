@@ -52,7 +52,7 @@ type Server struct {
 	BlockFetcher              execution.ExecutionBlockFetcher
 	DepositFetcher            cache.DepositFetcher
 	ChainStartFetcher         execution.ChainStartFetcher
-	ExecutionNodeInfoFetcher  execution.ChainInfoFetcher
+	ExecutionInfoFetcher      execution.ChainInfoFetcher
 	OptimisticModeFetcher     blockchain.OptimisticModeFetcher
 	SyncChecker               sync.Checker
 	StateNotifier             statefeed.Notifier

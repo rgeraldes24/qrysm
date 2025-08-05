@@ -285,7 +285,7 @@ func (vs *Server) validatorStatus(
 	// Unknown status means the validator has not been put into the state yet.
 	case qrysmpb.ValidatorStatus_UNKNOWN_STATUS:
 		// If no connection to execution node, the deposit block number or position in queue cannot be determined.
-		if !vs.ExecutionNodeInfoFetcher.ExecutionClientConnected() {
+		if !vs.ExecutionInfoFetcher.ExecutionClientConnected() {
 			log.Warn("Not connected to execution node. Cannot determine validator execution deposit block number")
 			return resp, nonExistentIndex
 		}

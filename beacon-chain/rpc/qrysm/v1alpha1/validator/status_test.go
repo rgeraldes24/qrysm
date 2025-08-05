@@ -58,7 +58,7 @@ func TestValidatorStatus_DepositedExecution(t *testing.T) {
 		HeadFetcher: &mockChain.ChainService{
 			State: stateObj,
 		},
-		ExecutionNodeInfoFetcher: p,
+		ExecutionInfoFetcher: p,
 	}
 	req := &qrysmpb.ValidatorStatusRequest{
 		PublicKey: pubKey1,
@@ -100,7 +100,7 @@ func TestValidatorStatus_Deposited(t *testing.T) {
 		HeadFetcher: &mockChain.ChainService{
 			State: stateObj,
 		},
-		ExecutionNodeInfoFetcher: p,
+		ExecutionInfoFetcher: p,
 	}
 	req := &qrysmpb.ValidatorStatusRequest{
 		PublicKey: pubKey1,
@@ -153,7 +153,7 @@ func TestValidatorStatus_PartiallyDeposited(t *testing.T) {
 		HeadFetcher: &mockChain.ChainService{
 			State: stateObj,
 		},
-		ExecutionNodeInfoFetcher: p,
+		ExecutionInfoFetcher: p,
 	}
 	req := &qrysmpb.ValidatorStatusRequest{
 		PublicKey: pubKey1,
@@ -212,7 +212,7 @@ func TestValidatorStatus_Pending_MultipleDeposits(t *testing.T) {
 		HeadFetcher: &mockChain.ChainService{
 			State: stateObj,
 		},
-		ExecutionNodeInfoFetcher: p,
+		ExecutionInfoFetcher: p,
 	}
 	req := &qrysmpb.ValidatorStatusRequest{
 		PublicKey: pubKey1,
@@ -269,11 +269,11 @@ func TestValidatorStatus_Pending(t *testing.T) {
 		},
 	}
 	vs := &Server{
-		ChainStartFetcher:        p,
-		BlockFetcher:             p,
-		ExecutionNodeInfoFetcher: p,
-		DepositFetcher:           depositCache,
-		HeadFetcher:              &mockChain.ChainService{State: st, Root: genesisRoot[:]},
+		ChainStartFetcher:    p,
+		BlockFetcher:         p,
+		ExecutionInfoFetcher: p,
+		DepositFetcher:       depositCache,
+		HeadFetcher:          &mockChain.ChainService{State: st, Root: genesisRoot[:]},
 	}
 	req := &qrysmpb.ValidatorStatusRequest{
 		PublicKey: pubKey,
@@ -331,11 +331,11 @@ func TestValidatorStatus_Exiting(t *testing.T) {
 		},
 	}
 	vs := &Server{
-		ChainStartFetcher:        p,
-		BlockFetcher:             p,
-		ExecutionNodeInfoFetcher: p,
-		DepositFetcher:           depositCache,
-		HeadFetcher:              &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
+		ChainStartFetcher:    p,
+		BlockFetcher:         p,
+		ExecutionInfoFetcher: p,
+		DepositFetcher:       depositCache,
+		HeadFetcher:          &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
 	}
 	req := &qrysmpb.ValidatorStatusRequest{
 		PublicKey: pubKey,
@@ -390,11 +390,11 @@ func TestValidatorStatus_Slashing(t *testing.T) {
 		},
 	}
 	vs := &Server{
-		ChainStartFetcher:        p,
-		ExecutionNodeInfoFetcher: p,
-		DepositFetcher:           depositCache,
-		BlockFetcher:             p,
-		HeadFetcher:              &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
+		ChainStartFetcher:    p,
+		ExecutionInfoFetcher: p,
+		DepositFetcher:       depositCache,
+		BlockFetcher:         p,
+		HeadFetcher:          &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
 	}
 	req := &qrysmpb.ValidatorStatusRequest{
 		PublicKey: pubKey,
@@ -448,11 +448,11 @@ func TestValidatorStatus_Exited(t *testing.T) {
 		},
 	}
 	vs := &Server{
-		ChainStartFetcher:        p,
-		ExecutionNodeInfoFetcher: p,
-		BlockFetcher:             p,
-		DepositFetcher:           depositCache,
-		HeadFetcher:              &mockChain.ChainService{State: st, Root: genesisRoot[:]},
+		ChainStartFetcher:    p,
+		ExecutionInfoFetcher: p,
+		BlockFetcher:         p,
+		DepositFetcher:       depositCache,
+		HeadFetcher:          &mockChain.ChainService{State: st, Root: genesisRoot[:]},
 	}
 	req := &qrysmpb.ValidatorStatusRequest{
 		PublicKey: pubKey,
@@ -472,8 +472,8 @@ func TestValidatorStatus_UnknownStatus(t *testing.T) {
 	})
 	require.NoError(t, err)
 	vs := &Server{
-		DepositFetcher:           depositCache,
-		ExecutionNodeInfoFetcher: &mockExecution.Chain{},
+		DepositFetcher:       depositCache,
+		ExecutionInfoFetcher: &mockExecution.Chain{},
 		HeadFetcher: &mockChain.ChainService{
 			State: stateObj,
 		},
@@ -534,12 +534,12 @@ func TestActivationStatus_OK(t *testing.T) {
 	assert.NoError(t, depositCache.InsertDeposit(context.Background(), dep, 0, 1, root))
 
 	vs := &Server{
-		Ctx:                      context.Background(),
-		ChainStartFetcher:        &mockExecution.Chain{},
-		BlockFetcher:             &mockExecution.Chain{},
-		ExecutionNodeInfoFetcher: &mockExecution.Chain{},
-		DepositFetcher:           depositCache,
-		HeadFetcher:              &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
+		Ctx:                  context.Background(),
+		ChainStartFetcher:    &mockExecution.Chain{},
+		BlockFetcher:         &mockExecution.Chain{},
+		ExecutionInfoFetcher: &mockExecution.Chain{},
+		DepositFetcher:       depositCache,
+		HeadFetcher:          &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
 	}
 	activeExists, response, err := vs.activationStatus(context.Background(), pubKeys)
 	require.NoError(t, err)
@@ -681,11 +681,11 @@ func TestValidatorStatus_CorrectActivationQueue(t *testing.T) {
 		},
 	}
 	vs := &Server{
-		ChainStartFetcher:        p,
-		BlockFetcher:             p,
-		ExecutionNodeInfoFetcher: p,
-		DepositFetcher:           depositCache,
-		HeadFetcher:              &mockChain.ChainService{State: st, Root: genesisRoot[:]},
+		ChainStartFetcher:    p,
+		BlockFetcher:         p,
+		ExecutionInfoFetcher: p,
+		DepositFetcher:       depositCache,
+		HeadFetcher:          &mockChain.ChainService{State: st, Root: genesisRoot[:]},
 	}
 	req := &qrysmpb.ValidatorStatusRequest{
 		PublicKey: pbKey,
@@ -761,13 +761,13 @@ func TestMultipleValidatorStatus_Pubkeys(t *testing.T) {
 	assert.NoError(t, depositCache.InsertDeposit(context.Background(), dep, 0, 1, root))
 
 	vs := &Server{
-		Ctx:                      context.Background(),
-		ChainStartFetcher:        &mockExecution.Chain{},
-		BlockFetcher:             &mockExecution.Chain{},
-		ExecutionNodeInfoFetcher: &mockExecution.Chain{},
-		DepositFetcher:           depositCache,
-		HeadFetcher:              &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
-		SyncChecker:              &mockSync.Sync{IsSyncing: false},
+		Ctx:                  context.Background(),
+		ChainStartFetcher:    &mockExecution.Chain{},
+		BlockFetcher:         &mockExecution.Chain{},
+		ExecutionInfoFetcher: &mockExecution.Chain{},
+		DepositFetcher:       depositCache,
+		HeadFetcher:          &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
+		SyncChecker:          &mockSync.Sync{IsSyncing: false},
 	}
 
 	want := []*qrysmpb.ValidatorStatusResponse{
@@ -856,12 +856,12 @@ func TestMultipleValidatorStatus_Indices(t *testing.T) {
 	require.NoError(t, err, "Could not get signing root")
 
 	vs := &Server{
-		Ctx:                      context.Background(),
-		ChainStartFetcher:        &mockExecution.Chain{},
-		BlockFetcher:             &mockExecution.Chain{},
-		ExecutionNodeInfoFetcher: &mockExecution.Chain{},
-		HeadFetcher:              &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
-		SyncChecker:              &mockSync.Sync{IsSyncing: false},
+		Ctx:                  context.Background(),
+		ChainStartFetcher:    &mockExecution.Chain{},
+		BlockFetcher:         &mockExecution.Chain{},
+		ExecutionInfoFetcher: &mockExecution.Chain{},
+		HeadFetcher:          &mockChain.ChainService{State: stateObj, Root: genesisRoot[:]},
+		SyncChecker:          &mockSync.Sync{IsSyncing: false},
 	}
 
 	want := []*qrysmpb.ValidatorStatusResponse{
@@ -932,7 +932,7 @@ func TestValidatorStatus_Invalid(t *testing.T) {
 		HeadFetcher: &mockChain.ChainService{
 			State: stateObj,
 		},
-		ExecutionNodeInfoFetcher: p,
+		ExecutionInfoFetcher: p,
 	}
 	req := &qrysmpb.ValidatorStatusRequest{
 		PublicKey: pubKey1,

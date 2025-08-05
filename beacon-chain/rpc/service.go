@@ -258,7 +258,7 @@ func (s *Service) Start() {
 		BlockFetcher:              s.cfg.ExecutionChainService,
 		DepositFetcher:            s.cfg.DepositFetcher,
 		ChainStartFetcher:         s.cfg.ChainStartFetcher,
-		ExecutionNodeInfoFetcher:  s.cfg.ExecutionChainService,
+		ExecutionInfoFetcher:      s.cfg.ExecutionChainService,
 		OptimisticModeFetcher:     s.cfg.OptimisticModeFetcher,
 		SyncChecker:               s.cfg.SyncService,
 		StateNotifier:             s.cfg.StateNotifier,

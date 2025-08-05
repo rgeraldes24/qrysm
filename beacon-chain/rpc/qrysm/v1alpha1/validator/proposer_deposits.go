@@ -75,7 +75,7 @@ func (vs *Server) deposits(
 		return []*qrysmpb.Deposit{}, nil
 	}
 
-	if !vs.ExecutionNodeInfoFetcher.ExecutionClientConnected() {
+	if !vs.ExecutionInfoFetcher.ExecutionClientConnected() {
 		log.Warn("not connected to execution node, skip pending deposit insertion")
 		return []*qrysmpb.Deposit{}, nil
 	}
@@ -86,7 +86,7 @@ func (vs *Server) deposits(
 		return nil, err
 	}
 
-	_, genesisExecutionBlock := vs.ExecutionNodeInfoFetcher.GenesisExecutionChainInfo()
+	_, genesisExecutionBlock := vs.ExecutionInfoFetcher.GenesisExecutionChainInfo()
 	if genesisExecutionBlock.Cmp(canonicalExecutionDataHeight) == 0 {
 		return []*qrysmpb.Deposit{}, nil
 	}

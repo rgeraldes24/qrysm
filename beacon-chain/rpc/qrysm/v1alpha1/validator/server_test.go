@@ -74,12 +74,12 @@ func TestWaitForActivation_ContextClosed(t *testing.T) {
 	require.NoError(t, err)
 
 	vs := &Server{
-		Ctx:                      ctx,
-		ChainStartFetcher:        &mockExecution.Chain{},
-		BlockFetcher:             &mockExecution.Chain{},
-		ExecutionNodeInfoFetcher: &mockExecution.Chain{},
-		DepositFetcher:           depositCache,
-		HeadFetcher:              &mockChain.ChainService{State: beaconState, Root: genesisRoot[:]},
+		Ctx:                  ctx,
+		ChainStartFetcher:    &mockExecution.Chain{},
+		BlockFetcher:         &mockExecution.Chain{},
+		ExecutionInfoFetcher: &mockExecution.Chain{},
+		DepositFetcher:       depositCache,
+		HeadFetcher:          &mockChain.ChainService{State: beaconState, Root: genesisRoot[:]},
 	}
 	req := &qrysmpb.ValidatorActivationRequest{
 		PublicKeys: [][]byte{pubKey(1)},

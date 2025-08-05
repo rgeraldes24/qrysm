@@ -143,11 +143,11 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 		State: bs, Root: genesisRoot[:], Genesis: time.Now().Add(time.Duration(-1*int64(slot-1)) * time.Second),
 	}
 	vs := &Server{
-		HeadFetcher:              chain,
-		TimeFetcher:              chain,
-		ExecutionNodeInfoFetcher: &mockExecution.Chain{},
-		SyncChecker:              &mockSync.Sync{IsSyncing: false},
-		ProposerSlotIndexCache:   cache.NewProposerPayloadIDsCache(),
+		HeadFetcher:            chain,
+		TimeFetcher:            chain,
+		ExecutionInfoFetcher:   &mockExecution.Chain{},
+		SyncChecker:            &mockSync.Sync{IsSyncing: false},
+		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 	}
 
 	// Test the first validator in registry.
@@ -233,12 +233,12 @@ func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 	require.NoError(t, err)
 
 	vs := &Server{
-		HeadFetcher:              chain,
-		TimeFetcher:              chain,
-		ExecutionNodeInfoFetcher: &mockExecution.Chain{},
-		SyncChecker:              &mockSync.Sync{IsSyncing: false},
-		DepositFetcher:           depositCache,
-		ProposerSlotIndexCache:   cache.NewProposerPayloadIDsCache(),
+		HeadFetcher:            chain,
+		TimeFetcher:            chain,
+		ExecutionInfoFetcher:   &mockExecution.Chain{},
+		SyncChecker:            &mockSync.Sync{IsSyncing: false},
+		DepositFetcher:         depositCache,
+		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 	}
 
 	unknownPubkey := bytesutil.PadTo([]byte{'u'}, 48)

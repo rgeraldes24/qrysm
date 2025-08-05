@@ -193,7 +193,7 @@ func getProposerServer(db db.HeadAccessDatabase, headState state.BeaconState, he
 		SyncChecker:               &mockSync.Sync{IsSyncing: false},
 		BlockReceiver:             mockChainService,
 		ChainStartFetcher:         &mockExecution.Chain{},
-		ExecutionNodeInfoFetcher:  &mockExecution.Chain{},
+		ExecutionInfoFetcher:      &mockExecution.Chain{},
 		ExecutionNodeBlockFetcher: &mockExecution.Chain{},
 		FinalizationFetcher:       mockChainService,
 		ForkFetcher:               mockChainService,
@@ -311,7 +311,7 @@ func TestProposer_ComputeStateRoot_OK(t *testing.T) {
 
 	proposerServer := &Server{
 		ChainStartFetcher:         &mockExecution.Chain{},
-		ExecutionNodeInfoFetcher:  &mockExecution.Chain{},
+		ExecutionInfoFetcher:      &mockExecution.Chain{},
 		ExecutionNodeBlockFetcher: &mockExecution.Chain{},
 		StateGen:                  stategen.New(db, doublylinkedtree.New()),
 	}
@@ -381,7 +381,7 @@ func TestProposer_PendingDeposits_ExecutionDataVoteOK(t *testing.T) {
 
 	bs := &Server{
 		ChainStartFetcher:         p,
-		ExecutionNodeInfoFetcher:  p,
+		ExecutionInfoFetcher:      p,
 		ExecutionNodeBlockFetcher: p,
 		BlockReceiver:             &mock.ChainService{State: beaconState, Root: blkRoot[:]},
 		HeadFetcher:               &mock.ChainService{State: beaconState, Root: blkRoot[:]},
@@ -514,7 +514,7 @@ func TestProposer_PendingDeposits_OutsideExecutionFollowWindow(t *testing.T) {
 
 	bs := &Server{
 		ChainStartFetcher:         p,
-		ExecutionNodeInfoFetcher:  p,
+		ExecutionInfoFetcher:      p,
 		ExecutionNodeBlockFetcher: p,
 		DepositFetcher:            depositCache,
 		PendingDepositsFetcher:    depositCache,
@@ -647,7 +647,7 @@ func TestProposer_PendingDeposits_FollowsCorrectExecutionBlock(t *testing.T) {
 
 	bs := &Server{
 		ChainStartFetcher:         p,
-		ExecutionNodeInfoFetcher:  p,
+		ExecutionInfoFetcher:      p,
 		ExecutionNodeBlockFetcher: p,
 		DepositFetcher:            depositCache,
 		PendingDepositsFetcher:    depositCache,
@@ -750,7 +750,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateExecutionDepositIndex(t *t
 
 	bs := &Server{
 		ChainStartFetcher:         p,
-		ExecutionNodeInfoFetcher:  p,
+		ExecutionInfoFetcher:      p,
 		ExecutionNodeBlockFetcher: p,
 		DepositFetcher:            depositCache,
 		PendingDepositsFetcher:    depositCache,
@@ -850,7 +850,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 
 	bs := &Server{
 		ChainStartFetcher:         p,
-		ExecutionNodeInfoFetcher:  p,
+		ExecutionInfoFetcher:      p,
 		ExecutionNodeBlockFetcher: p,
 		DepositFetcher:            depositCache,
 		PendingDepositsFetcher:    depositCache,
@@ -950,7 +950,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 		BlockReceiver:             &mock.ChainService{State: beaconState, Root: blkRoot[:]},
 		HeadFetcher:               &mock.ChainService{State: beaconState, Root: blkRoot[:]},
 		ChainStartFetcher:         p,
-		ExecutionNodeInfoFetcher:  p,
+		ExecutionInfoFetcher:      p,
 		ExecutionNodeBlockFetcher: p,
 		DepositFetcher:            depositCache,
 		PendingDepositsFetcher:    depositCache,
@@ -1061,7 +1061,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 
 	bs := &Server{
 		ChainStartFetcher:         p,
-		ExecutionNodeInfoFetcher:  p,
+		ExecutionInfoFetcher:      p,
 		ExecutionNodeBlockFetcher: p,
 		DepositFetcher:            depositCache,
 		PendingDepositsFetcher:    depositCache,
@@ -1190,7 +1190,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 
 	bs := &Server{
 		ChainStartFetcher:         p,
-		ExecutionNodeInfoFetcher:  p,
+		ExecutionInfoFetcher:      p,
 		ExecutionNodeBlockFetcher: p,
 		DepositFetcher:            depositCache,
 		PendingDepositsFetcher:    depositCache,
@@ -1300,7 +1300,7 @@ func TestProposer_ExecutionData_MajorityVote_SpansGenesis(t *testing.T) {
 	require.NoError(t, err)
 	ps := &Server{
 		ChainStartFetcher:         p,
-		ExecutionNodeInfoFetcher:  p,
+		ExecutionInfoFetcher:      p,
 		ExecutionNodeBlockFetcher: p,
 		BlockFetcher:              p,
 		DepositFetcher:            depositCache,
@@ -1363,7 +1363,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1399,7 +1399,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1435,7 +1435,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1472,7 +1472,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1509,7 +1509,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1546,7 +1546,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1576,7 +1576,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 		currentExecutionData := &qrysmpb.ExecutionData{DepositCount: 1, BlockHash: []byte("current")}
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1611,7 +1611,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1641,7 +1641,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1673,7 +1673,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 		currentExecutionData := &qrysmpb.ExecutionData{DepositCount: 2, BlockHash: []byte("current")}
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1709,7 +1709,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1746,7 +1746,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1777,7 +1777,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1811,7 +1811,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -1850,7 +1850,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 
 		ps := &Server{
 			ChainStartFetcher:         p,
-			ExecutionNodeInfoFetcher:  p,
+			ExecutionInfoFetcher:      p,
 			ExecutionNodeBlockFetcher: p,
 			BlockFetcher:              p,
 			DepositFetcher:            depositCache,
@@ -2055,7 +2055,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestExecutionDataEqGenesisExecut
 		BlockReceiver:             &mock.ChainService{State: beaconState, Root: blkRoot[:]},
 		HeadFetcher:               &mock.ChainService{State: beaconState, Root: blkRoot[:]},
 		ChainStartFetcher:         p,
-		ExecutionNodeInfoFetcher:  p,
+		ExecutionInfoFetcher:      p,
 		ExecutionNodeBlockFetcher: p,
 		DepositFetcher:            depositCache,
 		PendingDepositsFetcher:    depositCache,
