@@ -79,7 +79,7 @@ var (
 	}, []string{"state"})
 	currentExecutionDataDepositCount = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "current_execution_data_deposit_count",
-		Help: "The current execution chain deposit count in the last processed state executionData field.",
+		Help: "The current execution deposit count in the last processed state executionData field.",
 	})
 	processedDepositsCount = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "beacon_processed_deposits_total",
