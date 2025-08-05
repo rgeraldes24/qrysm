@@ -105,7 +105,7 @@ var (
 				Usage:       "Delay genesis time by N seconds",
 			},
 			&cli.BoolFlag{
-				Name:        "override-executionodedata",
+				Name:        "override-executiodata",
 				Destination: &generateGenesisStateFlags.OverrideExecutionData,
 				Usage:       "Overrides ExecutionData with values from execution client. If unset, defaults to false",
 				Value:       false,
@@ -274,7 +274,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		// set timestamps for genesis
 		gen.Timestamp = f.GenesisTime
 
-		// TODO(rgeraldes24): unused for now
+		// NOTE(rgeraldes24): unused for now
 		// log.Info("setting fork qrl times")
 	} else {
 		gen = interop.GzondTestnetGenesis(f.GenesisTime, params.BeaconConfig())
