@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/rand"
-	attv1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
@@ -207,7 +207,7 @@ func HydrateAttestation(a *qrysmpb.Attestation) *qrysmpb.Attestation {
 
 // HydrateV1Attestation hydrates a v1 attestation object with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1Attestation(a *attv1.Attestation) *attv1.Attestation {
+func HydrateV1Attestation(a *qrlpb.Attestation) *qrlpb.Attestation {
 	if a.Signatures == nil {
 		sig := make([]byte, 4595)
 		a.Signatures = [][]byte{sig}
@@ -216,7 +216,7 @@ func HydrateV1Attestation(a *attv1.Attestation) *attv1.Attestation {
 		a.AggregationBits = make([]byte, 1)
 	}
 	if a.Data == nil {
-		a.Data = &attv1.AttestationData{}
+		a.Data = &qrlpb.AttestationData{}
 	}
 	a.Data = HydrateV1AttestationData(a.Data)
 	return a
@@ -245,18 +245,18 @@ func HydrateAttestationData(d *qrysmpb.AttestationData) *qrysmpb.AttestationData
 
 // HydrateV1AttestationData hydrates a v1 attestation data object with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1AttestationData(d *attv1.AttestationData) *attv1.AttestationData {
+func HydrateV1AttestationData(d *qrlpb.AttestationData) *qrlpb.AttestationData {
 	if d.BeaconBlockRoot == nil {
 		d.BeaconBlockRoot = make([]byte, fieldparams.RootLength)
 	}
 	if d.Target == nil {
-		d.Target = &attv1.Checkpoint{}
+		d.Target = &qrlpb.Checkpoint{}
 	}
 	if d.Target.Root == nil {
 		d.Target.Root = make([]byte, fieldparams.RootLength)
 	}
 	if d.Source == nil {
-		d.Source = &attv1.Checkpoint{}
+		d.Source = &qrlpb.Checkpoint{}
 	}
 	if d.Source.Root == nil {
 		d.Source.Root = make([]byte, fieldparams.RootLength)
