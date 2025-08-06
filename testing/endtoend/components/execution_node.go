@@ -139,7 +139,7 @@ func NewExecutionNode(index int) *ExecutionNode {
 	}
 }
 
-// Start runs an execution qrl node.
+// Start runs a qrl execution node.
 // To connect to a miner and start working properly, this node should be a part of a NodeSet.
 func (node *ExecutionNode) Start(ctx context.Context) error {
 	binaryPath, found := bazel.FindBinary("cmd/gzond", "gzond")

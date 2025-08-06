@@ -53,7 +53,7 @@ func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state
 	}
 	executionData, err := DeterministicExecutionData(len(deposits))
 	if err != nil {
-		t.Fatal(errors.Wrapf(err, "failed to get executionData for %d deposits", numValidators))
+		t.Fatal(errors.Wrapf(err, "failed to get executiondata for %d deposits", numValidators))
 	}
 	beaconState, err := GenesisBeaconStateCapella(context.Background(), deposits, uint64(0), executionData)
 	if err != nil {
@@ -116,7 +116,7 @@ func emptyGenesisStateCapella() (state.BeaconState, error) {
 
 func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconState, executionData *qrysmpb.ExecutionData) (state.BeaconState, error) {
 	if executionData == nil {
-		return nil, errors.New("no executionData provided for genesis state")
+		return nil, errors.New("no executiondata provided for genesis state")
 	}
 
 	randaoMixes := make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector)
