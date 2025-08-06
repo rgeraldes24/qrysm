@@ -223,7 +223,7 @@ func (s *Service) createLocalNode(
 
 	localNode, err = addForkEntry(localNode, s.genesisTime, s.genesisValidatorsRoot)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not add beacon fork version entry to qnr")
+		return nil, errors.Wrap(err, "could not add consensus fork version entry to qnr")
 	}
 	localNode = initializeAttSubnets(localNode)
 	return initializeSyncCommSubnets(localNode), nil
