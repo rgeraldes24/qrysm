@@ -44,15 +44,15 @@ import (
 
 var (
 	validDepositsCount = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "execchain_valid_deposits_received",
+		Name: "execution_chain_valid_deposits_received",
 		Help: "The number of valid deposits received in the deposit contract",
 	})
 	blockNumberGauge = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "execchain_block_number",
+		Name: "execution_chain_block_number",
 		Help: "The current block number in the proof-of-work chain",
 	})
 	missedDepositLogsCount = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "execchain_missed_deposit_logs",
+		Name: "execution_chain_missed_deposit_logs",
 		Help: "The number of times a missed deposit log is detected",
 	})
 )

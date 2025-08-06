@@ -79,7 +79,7 @@ var EmptyBlockHash = errors.New("Block hash is empty 0x0000...")
 
 // NewPayload calls the engine_newPayloadVX method via JSON-RPC.
 func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionData, versionedHashes []common.Hash, parentBlockRoot *common.Hash) ([]byte, error) {
-	ctx, span := trace.StartSpan(ctx, "execchain.engine-api-client.NewPayload")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.NewPayload")
 	defer span.End()
 	start := time.Now()
 	defer func() {
@@ -125,7 +125,7 @@ func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionDa
 func (s *Service) ForkchoiceUpdated(
 	ctx context.Context, state *pb.ForkchoiceState, attrs payloadattribute.Attributer,
 ) (*pb.PayloadIDBytes, []byte, error) {
-	ctx, span := trace.StartSpan(ctx, "execchain.engine-api-client.ForkchoiceUpdated")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.ForkchoiceUpdated")
 	defer span.End()
 	start := time.Now()
 	defer func() {
@@ -176,7 +176,7 @@ func (s *Service) ForkchoiceUpdated(
 // GetPayload calls the engine_getPayloadVX method via JSON-RPC.
 // It returns the execution data as well as the blobs bundle.
 func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primitives.Slot) (interfaces.ExecutionData, bool, error) {
-	ctx, span := trace.StartSpan(ctx, "execchain.engine-api-client.GetPayload")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.GetPayload")
 	defer span.End()
 	start := time.Now()
 	defer func() {
@@ -202,7 +202,7 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 // LatestExecutionBlock fetches the latest execution engine block by calling
 // qrl_blockByNumber via JSON-RPC.
 func (s *Service) LatestExecutionBlock(ctx context.Context) (*pb.ExecutionBlock, error) {
-	ctx, span := trace.StartSpan(ctx, "execchain.engine-api-client.LatestExecutionBlock")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.LatestExecutionBlock")
 	defer span.End()
 
 	result := &pb.ExecutionBlock{}
@@ -219,7 +219,7 @@ func (s *Service) LatestExecutionBlock(ctx context.Context) (*pb.ExecutionBlock,
 // ExecutionBlockByHash fetches an execution engine block by hash by calling
 // qrl_blockByHash via JSON-RPC.
 func (s *Service) ExecutionBlockByHash(ctx context.Context, hash common.Hash, withTxs bool) (*pb.ExecutionBlock, error) {
-	ctx, span := trace.StartSpan(ctx, "execchain.engine-api-client.ExecutionBlockByHash")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.ExecutionBlockByHash")
 	defer span.End()
 	result := &pb.ExecutionBlock{}
 	err := s.rpcClient.CallContext(ctx, result, ExecutionBlockByHashMethod, hash, withTxs)
@@ -229,7 +229,7 @@ func (s *Service) ExecutionBlockByHash(ctx context.Context, hash common.Hash, wi
 // ExecutionBlocksByHashes fetches a batch of execution engine blocks by hash by calling
 // qrl_blockByHash via JSON-RPC.
 func (s *Service) ExecutionBlocksByHashes(ctx context.Context, hashes []common.Hash, withTxs bool) ([]*pb.ExecutionBlock, error) {
-	_, span := trace.StartSpan(ctx, "execchain.engine-api-client.ExecutionBlocksByHashes")
+	_, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.ExecutionBlocksByHashes")
 	defer span.End()
 	numOfHashes := len(hashes)
 	elems := make([]rpc.BatchElem, 0, numOfHashes)
@@ -282,7 +282,7 @@ func (s *Service) HeaderByNumber(ctx context.Context, number *big.Int) (*types.H
 
 // GetPayloadBodiesByHash returns the relevant payload bodies for the provided block hash.
 func (s *Service) GetPayloadBodiesByHash(ctx context.Context, executionBlockHashes []common.Hash) ([]*pb.ExecutionPayloadBodyV1, error) {
-	ctx, span := trace.StartSpan(ctx, "execchain.engine-api-client.GetPayloadBodiesByHashV1")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.GetPayloadBodiesByHashV1")
 	defer span.End()
 
 	result := make([]*pb.ExecutionPayloadBodyV1, 0)
@@ -301,7 +301,7 @@ func (s *Service) GetPayloadBodiesByHash(ctx context.Context, executionBlockHash
 
 // GetPayloadBodiesByRange returns the relevant payload bodies for the provided range.
 func (s *Service) GetPayloadBodiesByRange(ctx context.Context, start, count uint64) ([]*pb.ExecutionPayloadBodyV1, error) {
-	ctx, span := trace.StartSpan(ctx, "execchain.engine-api-client.GetPayloadBodiesByRangeV1")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.GetPayloadBodiesByRangeV1")
 	defer span.End()
 
 	result := make([]*pb.ExecutionPayloadBodyV1, 0)

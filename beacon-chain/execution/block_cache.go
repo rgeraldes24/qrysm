@@ -25,15 +25,15 @@ var (
 
 	// Metrics
 	headerCacheMiss = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "execchain_header_cache_miss",
+		Name: "execution_chain_header_cache_miss",
 		Help: "The number of header requests that aren't present in the cache.",
 	})
 	headerCacheHit = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "execchain_header_cache_hit",
+		Name: "execution_chain_header_cache_hit",
 		Help: "The number of header requests that are present in the cache.",
 	})
 	headerCacheSize = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "execchain_header_cache_size",
+		Name: "execution_chain_header_cache_size",
 		Help: "The number of headers in the header cache",
 	})
 )
