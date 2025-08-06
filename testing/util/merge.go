@@ -1,7 +1,7 @@
 package util
 
 import (
-	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
@@ -16,6 +16,6 @@ func NewBlindedBeaconBlockCapella() *qrysmpb.SignedBlindedBeaconBlockCapella {
 }
 
 // NewBlindedBeaconBlockCapellaV1 creates a blinded beacon block with minimum marshalable fields.
-func NewBlindedBeaconBlockCapellaV1() *v1.SignedBlindedBeaconBlockCapella {
-	return HydrateV1SignedBlindedBeaconBlockCapella(&v1.SignedBlindedBeaconBlockCapella{})
+func NewBlindedBeaconBlockCapellaV1() *qrlpb.SignedBlindedBeaconBlockCapella {
+	return HydrateV1SignedBlindedBeaconBlockCapella(&qrlpb.SignedBlindedBeaconBlockCapella{})
 }
