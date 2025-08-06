@@ -227,7 +227,7 @@ func TestDiscv5_AddRetrieveForkEntryQNR(t *testing.T) {
 	}
 	enc, err := qnrForkID.MarshalSSZ()
 	require.NoError(t, err)
-	entry := qnr.WithEntry(qrl2QNRKey, enc)
+	entry := qnr.WithEntry(consensusQNRKey, enc)
 	// In epoch 1 of current time, the fork version should be
 	// {0, 0, 0, 1} according to the configuration override above.
 	temp := t.TempDir()

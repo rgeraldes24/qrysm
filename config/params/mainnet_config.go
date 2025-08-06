@@ -30,7 +30,7 @@ var mainnetNetworkConfig = &NetworkConfig{
 	MaximumGossipClockDisparity:     500 * time.Millisecond,
 	MessageDomainInvalidSnappy:      [4]byte{00, 00, 00, 00},
 	MessageDomainValidSnappy:        [4]byte{01, 00, 00, 00},
-	QRL2Key:                         "qrl2",
+	ConsensusKey:                    "consensus",
 	AttSubnetKey:                    "attnets",
 	SyncCommsSubnetKey:              "syncnets",
 	MinimumPeersInSubnetSearch:      20,

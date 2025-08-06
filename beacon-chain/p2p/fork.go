@@ -17,7 +17,7 @@ import (
 )
 
 // QNR key used for QRL consensus-related fork data.
-var qrl2QNRKey = params.BeaconNetworkConfig().QRL2Key
+var consensusQNRKey = params.BeaconNetworkConfig().ConsensusKey
 
 // ForkDigest returns the current fork digest of
 // the node according to the local clock.
@@ -108,7 +108,7 @@ func addForkEntry(
 	if err != nil {
 		return nil, err
 	}
-	forkEntry := qnr.WithEntry(qrl2QNRKey, enc)
+	forkEntry := qnr.WithEntry(consensusQNRKey, enc)
 	node.Set(forkEntry)
 	return node, nil
 }
@@ -117,7 +117,7 @@ func addForkEntry(
 // under the QRL consensus QnrKey
 func forkEntry(record *qnr.Record) (*pb.QNRForkID, error) {
 	sszEncodedForkEntry := make([]byte, 16)
-	entry := qnr.WithEntry(qrl2QNRKey, &sszEncodedForkEntry)
+	entry := qnr.WithEntry(consensusQNRKey, &sszEncodedForkEntry)
 	err := record.Load(entry)
 	if err != nil {
 		return nil, err

@@ -21,7 +21,7 @@ type NetworkConfig struct {
 	MessageDomainValidSnappy        [4]byte         `yaml:"MESSAGE_DOMAIN_VALID_SNAPPY"`        // MessageDomainValidSnappy is the 4-byte domain for gossip message-id isolation of valid snappy messages.
 
 	// DiscoveryV5 Config
-	QRL2Key                    string // QRL2Key is the QNR key of the QRL consensus object in an qnr.
+	ConsensusKey               string // ConsensusKey is the QNR key of the QRL consensus object in an qnr.
 	AttSubnetKey               string // AttSubnetKey is the QNR key of the subnet bitfield in the qnr.
 	SyncCommsSubnetKey         string // SyncCommsSubnetKey is the QNR key of the sync committee subnet bitfield in the qnr.
 	MinimumPeersInSubnetSearch uint64 // PeersInSubnetSearch is the required amount of peers that we need to be able to lookup in a subnet search.
