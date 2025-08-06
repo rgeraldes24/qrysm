@@ -102,7 +102,7 @@ type Config struct {
 	GenesisTimeFetcher            blockchain.TimeFetcher
 	GenesisFetcher                blockchain.GenesisFetcher
 	EnableDebugRPCEndpoints       bool
-	MockExecutionNodeVotes        bool
+	MockExecutionVotes            bool
 	AttestationsPool              attestations.Pool
 	ExitPool                      voluntaryexits.PoolManager
 	SlashingsPool                 slashings.PoolManager
@@ -266,7 +266,7 @@ func (s *Service) Start() {
 		OperationNotifier:         s.cfg.OperationNotifier,
 		P2P:                       s.cfg.Broadcaster,
 		BlockReceiver:             s.cfg.BlockReceiver,
-		MockExecutionNodeVotes:    s.cfg.MockExecutionNodeVotes,
+		MockExecutionVotes:        s.cfg.MockExecutionVotes,
 		ExecutionNodeBlockFetcher: s.cfg.ExecutionChainService,
 		PendingDepositsFetcher:    s.cfg.PendingDepositFetcher,
 		SlashingsPool:             s.cfg.SlashingsPool,

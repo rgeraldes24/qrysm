@@ -59,10 +59,10 @@ func (vs *Server) packDepositsAndAttestations(ctx context.Context, head state.Be
 }
 
 // deposits returns a list of pending deposits that are ready for inclusion in the next beacon
-// block. Determining deposits depends on the current executionData vote for the block and whether or not
-// this executionData has enough support to be considered for deposits inclusion. If current vote has
+// block. Determining deposits depends on the current executiondata vote for the block and whether or not
+// this executiondata has enough support to be considered for deposits inclusion. If current vote has
 // enough support, then use that vote for basis of determining deposits, otherwise use current state
-// executionData.
+// executiondata.
 func (vs *Server) deposits(
 	ctx context.Context,
 	beaconState state.BeaconState,
@@ -71,7 +71,7 @@ func (vs *Server) deposits(
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.deposits")
 	defer span.End()
 
-	if vs.MockExecutionNodeVotes {
+	if vs.MockExecutionVotes {
 		return []*qrysmpb.Deposit{}, nil
 	}
 

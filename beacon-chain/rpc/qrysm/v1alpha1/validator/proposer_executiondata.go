@@ -37,7 +37,7 @@ func (vs *Server) executionDataMajorityVote(ctx context.Context, beaconState sta
 	slot := beaconState.Slot()
 	votingPeriodStartTime := vs.slotStartTime(slot)
 
-	if vs.MockExecutionNodeVotes {
+	if vs.MockExecutionVotes {
 		return vs.mockExecutionDataVote(ctx, slot)
 	}
 	if !vs.ExecutionInfoFetcher.ExecutionClientConnected() {

@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/qrlclient"
-	qrlRPC "github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/qrysm/config/params"
 	contracts "github.com/theQRL/qrysm/contracts/deposit"
 	"github.com/theQRL/qrysm/io/logs"
@@ -107,7 +107,7 @@ func (s *Service) retryExecutionClientConnection(ctx context.Context, err error)
 }
 
 // Initializes an RPC connection with authentication headers.
-func (s *Service) newRPCClientWithAuth(ctx context.Context, endpoint network.Endpoint) (*qrlRPC.Client, error) {
+func (s *Service) newRPCClientWithAuth(ctx context.Context, endpoint network.Endpoint) (*rpc.Client, error) {
 	headers := http.Header{}
 	if endpoint.Auth.Method != authorization.None {
 		header, err := endpoint.Auth.ToHeaderValue()

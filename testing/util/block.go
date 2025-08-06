@@ -208,7 +208,7 @@ func generateDepositsAndExecutionData(
 	}
 	executionData, err := DeterministicExecutionData(len(currentDeposits))
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not get executionData")
+		return nil, nil, errors.Wrap(err, "could not get executiondata")
 	}
 	return currentDeposits[previousDepsLen:], executionData, nil
 }

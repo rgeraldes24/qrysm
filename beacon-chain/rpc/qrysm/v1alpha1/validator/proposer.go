@@ -131,7 +131,7 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 		executionData, err := vs.executionDataMajorityVote(ctx, head)
 		if err != nil {
 			executionData = &qrysmpb.ExecutionData{DepositRoot: params.BeaconConfig().ZeroHash[:], BlockHash: params.BeaconConfig().ZeroHash[:]}
-			log.WithError(err).Error("Could not get executionData")
+			log.WithError(err).Error("Could not get executiondata")
 		}
 		sBlk.SetExecutionData(executionData)
 

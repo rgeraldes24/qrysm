@@ -857,7 +857,7 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 		ExecutionChainService:         web3Service,
 		ExecutionChainInfoFetcher:     web3Service,
 		ChainStartFetcher:             chainStartFetcher,
-		MockExecutionNodeVotes:        mockExecutionDataVotes,
+		MockExecutionVotes:            mockExecutionDataVotes,
 		SyncService:                   syncService,
 		DepositFetcher:                depositFetcher,
 		PendingDepositFetcher:         b.depositCache,

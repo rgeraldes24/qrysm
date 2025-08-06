@@ -198,7 +198,7 @@ func getProposerServer(db db.HeadAccessDatabase, headState state.BeaconState, he
 		FinalizationFetcher:       mockChainService,
 		ForkFetcher:               mockChainService,
 		ForkchoiceFetcher:         mockChainService,
-		MockExecutionNodeVotes:    true,
+		MockExecutionVotes:        true,
 		AttPool:                   attestations.NewPool(),
 		SlashingsPool:             slashings.NewPool(),
 		ExitPool:                  voluntaryexits.NewPool(),
