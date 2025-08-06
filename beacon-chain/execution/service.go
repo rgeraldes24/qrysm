@@ -44,15 +44,15 @@ import (
 
 var (
 	validDepositsCount = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "execution_chain_valid_deposits_received",
+		Name: "execchain_valid_deposits_received",
 		Help: "The number of valid deposits received in the deposit contract",
 	})
 	blockNumberGauge = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "execution_chain_block_number",
+		Name: "execchain_block_number",
 		Help: "The current block number in the proof-of-work chain",
 	})
 	missedDepositLogsCount = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "execution_chain_missed_deposit_logs",
+		Name: "execchain_missed_deposit_logs",
 		Help: "The number of times a missed deposit log is detected",
 	})
 )
@@ -571,7 +571,7 @@ func (s *Service) run(done <-chan struct{}) {
 	}
 }
 
-// cacheHeadersForExecutionDataVote makes sure that voting for executionData after startup utilizes cached headers
+// cacheHeadersForExecutionDataVote makes sure that voting for executiondata after startup utilizes cached headers
 // instead of making multiple RPC requests to the execution endpoint.
 func (s *Service) cacheHeadersForExecutionDataVote(ctx context.Context) error {
 	// Find the end block to request from.
@@ -659,10 +659,10 @@ func (s *Service) determineEarliestVotingBlock(ctx context.Context, followBlock 
 	return hdr.Number.Uint64(), nil
 }
 
-// initializes our service from the provided executionData object by initializing all the relevant
+// initializes our service from the provided executiondata object by initializing all the relevant
 // fields and data.
 func (s *Service) initializeExecutionData(ctx context.Context, executionDataInDB *qrysmpb.ExecutionChainData) error {
-	// The node has no executionData persisted on disk, so we exit and instead
+	// The node has no executiondata persisted on disk, so we exit and instead
 	// request from contract logs.
 	if executionDataInDB == nil {
 		return nil
