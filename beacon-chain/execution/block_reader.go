@@ -24,7 +24,7 @@ var errBlockTimeTooLate = errors.New("provided time is later than the current ex
 
 // BlockExists returns true if the block exists, its height and any possible error encountered.
 func (s *Service) BlockExists(ctx context.Context, hash common.Hash) (bool, *big.Int, error) {
-	ctx, span := trace.StartSpan(ctx, "executionChain.BlockExists")
+	ctx, span := trace.StartSpan(ctx, "execchain.BlockExists")
 	defer span.End()
 
 	if exists, hdrInfo, err := s.headerCache.HeaderInfoByHash(hash); exists || err != nil {
@@ -49,7 +49,7 @@ func (s *Service) BlockExists(ctx context.Context, hash common.Hash) (bool, *big
 
 // BlockHashByHeight returns the block hash of the block at the given height.
 func (s *Service) BlockHashByHeight(ctx context.Context, height *big.Int) (common.Hash, error) {
-	ctx, span := trace.StartSpan(ctx, "executionChain.BlockHashByHeight")
+	ctx, span := trace.StartSpan(ctx, "execchain.BlockHashByHeight")
 	defer span.End()
 
 	if exists, hInfo, err := s.headerCache.HeaderInfoByHeight(height); exists || err != nil {
@@ -79,7 +79,7 @@ func (s *Service) BlockHashByHeight(ctx context.Context, height *big.Int) (commo
 
 // BlockTimeByHeight fetches an execution block timestamp by its height.
 func (s *Service) BlockTimeByHeight(ctx context.Context, height *big.Int) (uint64, error) {
-	ctx, span := trace.StartSpan(ctx, "executionChain.BlockTimeByHeight")
+	ctx, span := trace.StartSpan(ctx, "execchain.BlockTimeByHeight")
 	defer span.End()
 	if s.rpcClient == nil {
 		err := errors.New("nil rpc client")
@@ -98,7 +98,7 @@ func (s *Service) BlockTimeByHeight(ctx context.Context, height *big.Int) (uint6
 // This is an optimized version with the worst case being O(2*repeatedSearches) number of calls
 // while in best case search for the block is performed in O(1).
 func (s *Service) BlockByTimestamp(ctx context.Context, time uint64) (*types.HeaderInfo, error) {
-	ctx, span := trace.StartSpan(ctx, "executionChain.BlockByTimestamp")
+	ctx, span := trace.StartSpan(ctx, "execchain.BlockByTimestamp")
 	defer span.End()
 
 	s.latestExecutionDataLock.RLock()
