@@ -5,7 +5,7 @@ load("//tools:qrysm_image.bzl", "qrysm_image_upload")
 go_library(
     name = "go_default_library",
     srcs = ["main.go"],
-    importpath = "github.com/theQRL/qrysm/tools/exec-exporter",
+    importpath = "github.com/theQRL/qrysm/tools/execexporter",
     visibility = ["//visibility:private"],
     deps = [
         "//runtime/maxprocs:go_default_library",
@@ -17,19 +17,19 @@ go_library(
 )
 
 go_binary(
-    name = "exec-exporter",
+    name = "execexporter",
     embed = [":go_default_library"],
     visibility = ["//visibility:public"],
 )
 
 qrysm_image_upload(
     name = "push_images",
-    binary = ":exec-exporter",
-    entrypoint = ["/exec-exporter"],
+    binary = ":execexporter",
+    entrypoint = ["/execexporter"],
     repository = "index.docker.io/theqrl/qrysm-exec-monitor",
     symlinks = {
         # Backwards compatibility for images that depended on the old filepath.
-        "/app/tools/exec-exporter/exec-exporter": "/exec-exporter",
+        "/app/tools/execexporter/execexporter": "/execexporter",
     },
     tags = ["manual"],
 )

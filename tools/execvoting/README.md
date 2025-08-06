@@ -1,6 +1,6 @@
-# exec-voting
+# execvoting
 
-This tool can be used to query a Qrysm node to print exec-voting information.
+This tool can be used to query a Qrysm node to print execvoting information.
 
 Flags:
 ```
@@ -12,7 +12,7 @@ Flags:
 
 Usage:
 ```
-bazel run //tools/exec-voting -- -beacon=127.0.0.1:4000 -genesis=1606824023
+bazel run //tools/execvoting -- -beacon=127.0.0.1:4000 -genesis=1606824023
 ```
 
 Example response

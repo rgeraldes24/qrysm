@@ -7,7 +7,7 @@ go_library(
         "main.go",
         "votes.go",
     ],
-    importpath = "github.com/theQRL/qrysm/tools/exec-voting",
+    importpath = "github.com/theQRL/qrysm/tools/execvoting",
     visibility = ["//visibility:private"],
     deps = [
         "//config/params:go_default_library",
@@ -23,7 +23,7 @@ go_library(
 )
 
 go_binary(
-    name = "exec-voting",
+    name = "execvoting",
     embed = [":go_default_library"],
     visibility = ["//visibility:public"],
 )
