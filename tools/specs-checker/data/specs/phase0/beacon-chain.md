@@ -419,7 +419,7 @@ def slash_validator(state: BeaconState,
     increase_balance(state, whistleblower_index, Gplanck(whistleblower_reward - proposer_reward))
 ```
 ```python
-def initialize_beacon_state_from_exection(execution_block_hash: Bytes32,
+def initialize_beacon_state_from_execution(execution_block_hash: Bytes32,
                                       execution_timestamp: uint64,
                                       deposits: Sequence[Deposit]) -> BeaconState:
     fork = Fork(
