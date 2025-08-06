@@ -58,7 +58,7 @@ func (vs *Server) executionDataMajorityVote(ctx context.Context, beaconState sta
 		return vs.HeadFetcher.HeadExecutionData(), nil
 	}
 
-	lastBlockByLatestValidTime, err := vs.ExecutionNodeBlockFetcher.BlockByTimestamp(ctx, latestValidTime)
+	lastBlockByLatestValidTime, err := vs.ExecutionBlockFetcher.BlockByTimestamp(ctx, latestValidTime)
 	if err != nil {
 		log.WithError(err).Error("Could not get last block by latest valid time")
 		return vs.randomExecutionDataVote(ctx)
@@ -73,7 +73,7 @@ func (vs *Server) executionDataMajorityVote(ctx context.Context, beaconState sta
 	}
 
 	if lastBlockDepositCount >= vs.HeadFetcher.HeadExecutionData().DepositCount {
-		h, err := vs.ExecutionNodeBlockFetcher.BlockHashByHeight(ctx, lastBlockByLatestValidTime.Number)
+		h, err := vs.ExecutionBlockFetcher.BlockHashByHeight(ctx, lastBlockByLatestValidTime.Number)
 		if err != nil {
 			log.WithError(err).Error("Could not get hash of last block by latest valid time")
 			return vs.randomExecutionDataVote(ctx)
@@ -118,7 +118,7 @@ func (vs *Server) canonicalExecutionData(
 	if features.Get().DisableStakinContractCheck && executionBlockHash == [32]byte{} {
 		return canonicalExecutionData, new(big.Int).SetInt64(0), nil
 	}
-	_, canonicalExecutionDataHeight, err := vs.ExecutionNodeBlockFetcher.BlockExists(ctx, executionBlockHash)
+	_, canonicalExecutionDataHeight, err := vs.ExecutionBlockFetcher.BlockExists(ctx, executionBlockHash)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "could not fetch executionData height")
 	}
