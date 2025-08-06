@@ -70,7 +70,7 @@ func TestFuzzProcessExecutionDataInBlock_10000(t *testing.T) {
 		fuzzer.Fuzz(e)
 		s, err := ProcessExecutionDataInBlock(context.Background(), state, e)
 		if err != nil && s != nil {
-			t.Fatalf("state should be nil on err. found: %v on error: %v for state: %v and executionData: %v", s, err, state, e)
+			t.Fatalf("state should be nil on err. found: %v on error: %v for state: %v and executiondata: %v", s, err, state, e)
 		}
 	}
 }

@@ -52,10 +52,10 @@ func AreExecutionDataEqual(a, b *qrysmpb.ExecutionData) bool {
 		bytes.Equal(a.DepositRoot, b.DepositRoot)
 }
 
-// ExecutionDataHasEnoughSupport returns true when the given executionData has more than 50% votes in the
-// execution voting period. A vote is cast by including executionData in a block and part of state processing
-// appends executionData to the state in the ExecutionDataVotes list. Iterating through this list checks the
-// votes to see if they match the executionData.
+// ExecutionDataHasEnoughSupport returns true when the given executiondata has more than 50% votes in the
+// execution voting period. A vote is cast by including executiondata in a block and part of state processing
+// appends executiondata to the state in the ExecutionDataVotes list. Iterating through this list checks the
+// votes to see if they match the executiondata.
 func ExecutionDataHasEnoughSupport(beaconState state.ReadOnlyBeaconState, data *qrysmpb.ExecutionData) (bool, error) {
 	voteCount := uint64(0)
 	data = qrysmpb.CopyExecutionData(data)
@@ -66,7 +66,7 @@ func ExecutionDataHasEnoughSupport(beaconState state.ReadOnlyBeaconState, data *
 		}
 	}
 
-	// If 50+% majority converged on the same executionData, then it has enough support to update the
+	// If 50+% majority converged on the same executiondata, then it has enough support to update the
 	// state.
 	support := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().EpochsPerExecutionVotingPeriod))
 	return voteCount*2 > uint64(support), nil
