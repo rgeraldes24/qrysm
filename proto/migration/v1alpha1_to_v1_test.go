@@ -9,7 +9,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
-	qrysmpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -52,12 +52,12 @@ var (
 
 func Test_V1Alpha1AggregateAttAndProofToV1(t *testing.T) {
 	proof := [32]byte{1}
-	att := util.HydrateAttestation(&qrysmpbalpha.Attestation{
-		Data: &qrysmpbalpha.AttestationData{
+	att := util.HydrateAttestation(&qrysmpb.Attestation{
+		Data: &qrysmpb.AttestationData{
 			Slot: 5,
 		},
 	})
-	alpha := &qrysmpbalpha.AggregateAttestationAndProof{
+	alpha := &qrysmpb.AggregateAttestationAndProof{
 		AggregatorIndex: 1,
 		Aggregate:       att,
 		SelectionProof:  proof[:],
@@ -69,24 +69,24 @@ func Test_V1Alpha1AggregateAttAndProofToV1(t *testing.T) {
 }
 
 func Test_V1Alpha1AttSlashingToV1(t *testing.T) {
-	alphaAttestation := &qrysmpbalpha.IndexedAttestation{
+	alphaAttestation := &qrysmpb.IndexedAttestation{
 		AttestingIndices: attestingIndices,
-		Data: &qrysmpbalpha.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            slot,
 			CommitteeIndex:  committeeIndex,
 			BeaconBlockRoot: beaconBlockRoot,
-			Source: &qrysmpbalpha.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: epoch,
 				Root:  sourceRoot,
 			},
-			Target: &qrysmpbalpha.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: epoch,
 				Root:  targetRoot,
 			},
 		},
 		Signatures: [][]byte{signature},
 	}
-	alphaSlashing := &qrysmpbalpha.AttesterSlashing{
+	alphaSlashing := &qrysmpb.AttesterSlashing{
 		Attestation_1: alphaAttestation,
 		Attestation_2: alphaAttestation,
 	}
@@ -100,14 +100,14 @@ func Test_V1Alpha1AttSlashingToV1(t *testing.T) {
 }
 
 func Test_V1Alpha1ProposerSlashingToV1(t *testing.T) {
-	alphaHeader := util.HydrateSignedBeaconHeader(&qrysmpbalpha.SignedBeaconBlockHeader{})
+	alphaHeader := util.HydrateSignedBeaconHeader(&qrysmpb.SignedBeaconBlockHeader{})
 	alphaHeader.Header.Slot = slot
 	alphaHeader.Header.ProposerIndex = validatorIndex
 	alphaHeader.Header.ParentRoot = parentRoot
 	alphaHeader.Header.StateRoot = stateRoot
 	alphaHeader.Header.BodyRoot = bodyRoot
 	alphaHeader.Signature = signature
-	alphaSlashing := &qrysmpbalpha.ProposerSlashing{
+	alphaSlashing := &qrysmpb.ProposerSlashing{
 		Header_1: alphaHeader,
 		Header_2: alphaHeader,
 	}
@@ -121,8 +121,8 @@ func Test_V1Alpha1ProposerSlashingToV1(t *testing.T) {
 }
 
 func Test_V1Alpha1ExitToV1(t *testing.T) {
-	alphaExit := &qrysmpbalpha.SignedVoluntaryExit{
-		Exit: &qrysmpbalpha.VoluntaryExit{
+	alphaExit := &qrysmpb.SignedVoluntaryExit{
+		Exit: &qrysmpb.VoluntaryExit{
 			Epoch:          epoch,
 			ValidatorIndex: validatorIndex,
 		},
@@ -210,17 +210,17 @@ func Test_V1ProposerSlashingToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1Alpha1AttToV1(t *testing.T) {
-	alphaAtt := &qrysmpbalpha.Attestation{
+	alphaAtt := &qrysmpb.Attestation{
 		AggregationBits: aggregationBits,
-		Data: &qrysmpbalpha.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            slot,
 			CommitteeIndex:  committeeIndex,
 			BeaconBlockRoot: beaconBlockRoot,
-			Source: &qrysmpbalpha.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: epoch,
 				Root:  sourceRoot,
 			},
-			Target: &qrysmpbalpha.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: epoch,
 				Root:  targetRoot,
 			},
@@ -264,7 +264,7 @@ func Test_V1AttToV1Alpha1(t *testing.T) {
 }
 
 func Test_V1Alpha1ValidatorToV1(t *testing.T) {
-	v1Alpha1Validator := &qrysmpbalpha.Validator{
+	v1Alpha1Validator := &qrysmpb.Validator{
 		PublicKey:                  []byte("pubkey"),
 		WithdrawalCredentials:      []byte("withdraw"),
 		EffectiveBalance:           99,
@@ -341,10 +341,10 @@ func Test_V1AttestationToV1Alpha1(t *testing.T) {
 }
 
 func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
-	alphaContribution := &qrysmpbalpha.SignedContributionAndProof{
-		Message: &qrysmpbalpha.ContributionAndProof{
+	alphaContribution := &qrysmpb.SignedContributionAndProof{
+		Message: &qrysmpb.ContributionAndProof{
 			AggregatorIndex: validatorIndex,
-			Contribution: &qrysmpbalpha.SyncCommitteeContribution{
+			Contribution: &qrysmpb.SyncCommitteeContribution{
 				Slot:              slot,
 				BlockRoot:         blockHash,
 				SubcommitteeIndex: 1,
@@ -372,20 +372,20 @@ func TestV1Alpha1SignedContributionAndProofToV1(t *testing.T) {
 }
 
 func Test_V1Alpha1BeaconBlockCapellaToV1Blinded(t *testing.T) {
-	alphaBlock := util.HydrateBeaconBlockCapella(&qrysmpbalpha.BeaconBlockCapella{})
+	alphaBlock := util.HydrateBeaconBlockCapella(&qrysmpb.BeaconBlockCapella{})
 	alphaBlock.Slot = slot
 	alphaBlock.ProposerIndex = validatorIndex
 	alphaBlock.ParentRoot = parentRoot
 	alphaBlock.StateRoot = stateRoot
 	alphaBlock.Body.RandaoReveal = randaoReveal
-	alphaBlock.Body.ExecutionData = &qrysmpbalpha.ExecutionData{
+	alphaBlock.Body.ExecutionData = &qrysmpb.ExecutionData{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
 	}
 	syncCommitteeBits := bitfield.NewBitvector16()
 	syncCommitteeBits.SetBitAt(100, true)
-	alphaBlock.Body.SyncAggregate = &qrysmpbalpha.SyncAggregate{
+	alphaBlock.Body.SyncAggregate = &qrysmpb.SyncAggregate{
 		SyncCommitteeBits:       syncCommitteeBits,
 		SyncCommitteeSignatures: [][]byte{signature},
 	}
@@ -401,16 +401,16 @@ func Test_V1Alpha1BeaconBlockCapellaToV1Blinded(t *testing.T) {
 }
 
 func TestBeaconStateCapellaToProto(t *testing.T) {
-	source, err := util.NewBeaconStateCapella(util.FillRootsNaturalOptCapella, func(state *qrysmpbalpha.BeaconStateCapella) error {
+	source, err := util.NewBeaconStateCapella(util.FillRootsNaturalOptCapella, func(state *qrysmpb.BeaconStateCapella) error {
 		state.GenesisTime = 1
 		state.GenesisValidatorsRoot = bytesutil.PadTo([]byte("genesisvalidatorsroot"), 32)
 		state.Slot = 2
-		state.Fork = &qrysmpbalpha.Fork{
+		state.Fork = &qrysmpb.Fork{
 			PreviousVersion: bytesutil.PadTo([]byte("123"), 4),
 			CurrentVersion:  bytesutil.PadTo([]byte("456"), 4),
 			Epoch:           3,
 		}
-		state.LatestBlockHeader = &qrysmpbalpha.BeaconBlockHeader{
+		state.LatestBlockHeader = &qrysmpb.BeaconBlockHeader{
 			Slot:          4,
 			ProposerIndex: 5,
 			ParentRoot:    bytesutil.PadTo([]byte("lbhparentroot"), 32),
@@ -420,18 +420,18 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 		state.BlockRoots = [][]byte{bytesutil.PadTo([]byte("blockroots"), 32)}
 		state.StateRoots = [][]byte{bytesutil.PadTo([]byte("stateroots"), 32)}
 		state.HistoricalRoots = [][]byte{bytesutil.PadTo([]byte("historicalroots"), 32)}
-		state.ExecutionData = &qrysmpbalpha.ExecutionData{
+		state.ExecutionData = &qrysmpb.ExecutionData{
 			DepositRoot:  bytesutil.PadTo([]byte("e1ddepositroot"), 32),
 			DepositCount: 6,
 			BlockHash:    bytesutil.PadTo([]byte("e1dblockhash"), 32),
 		}
-		state.ExecutionDataVotes = []*qrysmpbalpha.ExecutionData{{
+		state.ExecutionDataVotes = []*qrysmpb.ExecutionData{{
 			DepositRoot:  bytesutil.PadTo([]byte("e1dvdepositroot"), 32),
 			DepositCount: 7,
 			BlockHash:    bytesutil.PadTo([]byte("e1dvblockhash"), 32),
 		}}
 		state.ExecutionDepositIndex = 8
-		state.Validators = []*qrysmpbalpha.Validator{{
+		state.Validators = []*qrysmpb.Validator{{
 			PublicKey:                  bytesutil.PadTo([]byte("publickey"), 2592),
 			WithdrawalCredentials:      bytesutil.PadTo([]byte("withdrawalcredentials"), 32),
 			EffectiveBalance:           9,
@@ -445,25 +445,25 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 		state.RandaoMixes = [][]byte{bytesutil.PadTo([]byte("randaomixes"), 32)}
 		state.Slashings = []uint64{15}
 		state.JustificationBits = bitfield.Bitvector4{1}
-		state.PreviousJustifiedCheckpoint = &qrysmpbalpha.Checkpoint{
+		state.PreviousJustifiedCheckpoint = &qrysmpb.Checkpoint{
 			Epoch: 30,
 			Root:  bytesutil.PadTo([]byte("pjcroot"), 32),
 		}
-		state.CurrentJustifiedCheckpoint = &qrysmpbalpha.Checkpoint{
+		state.CurrentJustifiedCheckpoint = &qrysmpb.Checkpoint{
 			Epoch: 31,
 			Root:  bytesutil.PadTo([]byte("cjcroot"), 32),
 		}
-		state.FinalizedCheckpoint = &qrysmpbalpha.Checkpoint{
+		state.FinalizedCheckpoint = &qrysmpb.Checkpoint{
 			Epoch: 32,
 			Root:  bytesutil.PadTo([]byte("fcroot"), 32),
 		}
 		state.PreviousEpochParticipation = []byte("previousepochparticipation")
 		state.CurrentEpochParticipation = []byte("currentepochparticipation")
 		state.InactivityScores = []uint64{1, 2, 3}
-		state.CurrentSyncCommittee = &qrysmpbalpha.SyncCommittee{
+		state.CurrentSyncCommittee = &qrysmpb.SyncCommittee{
 			Pubkeys: [][]byte{bytesutil.PadTo([]byte("cscpubkeys"), 2592)},
 		}
-		state.NextSyncCommittee = &qrysmpbalpha.SyncCommittee{
+		state.NextSyncCommittee = &qrysmpb.SyncCommittee{
 			Pubkeys: [][]byte{bytesutil.PadTo([]byte("nscpubkeys"), 2592)},
 		}
 		state.LatestExecutionPayloadHeader = &enginev1.ExecutionPayloadHeaderCapella{
@@ -485,7 +485,7 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 		}
 		state.NextWithdrawalIndex = 123
 		state.NextWithdrawalValidatorIndex = 123
-		state.HistoricalSummaries = []*qrysmpbalpha.HistoricalSummary{
+		state.HistoricalSummaries = []*qrysmpb.HistoricalSummary{
 			{
 				BlockSummaryRoot: bytesutil.PadTo([]byte("blocksummaryroot"), 32),
 				StateSummaryRoot: bytesutil.PadTo([]byte("statesummaryroot"), 32),
@@ -595,8 +595,8 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 }
 
 func TestV1Alpha1SignedDilithiumToExecChangeToV1(t *testing.T) {
-	alphaChange := &qrysmpbalpha.SignedDilithiumToExecutionChange{
-		Message: &qrysmpbalpha.DilithiumToExecutionChange{
+	alphaChange := &qrysmpb.SignedDilithiumToExecutionChange{
+		Message: &qrysmpb.DilithiumToExecutionChange{
 			ValidatorIndex:      validatorIndex,
 			FromDilithiumPubkey: bytesutil.PadTo([]byte("fromdilithiumpubkey"), 2592),
 			ToExecutionAddress:  bytesutil.PadTo([]byte("toexecutionaddress"), 20),
