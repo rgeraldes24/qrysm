@@ -213,7 +213,7 @@ func AddInt(i ...int) (int, error) {
 	return sum, nil
 }
 
-// Planck is the smallest unit of QRL, represented as a pointer to a bigInt.
+// Planck is the smallest unit of Quanta, represented as a pointer to a bigInt.
 type Planck *big.Int
 
 // Gplanck is a denomination of 1e9 Planck represented as an uint64.

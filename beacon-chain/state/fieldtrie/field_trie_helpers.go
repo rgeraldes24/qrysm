@@ -169,7 +169,7 @@ func handleValidatorSlice(val []*qrysmpb.Validator, indices []uint64, convertAll
 	return roots, nil
 }
 
-// handleExecutionDataSlice processes a list of executionData and indices into the appropriate roots.
+// handleExecutionDataSlice processes a list of executiondata and indices into the appropriate roots.
 func handleExecutionDataSlice(val []*qrysmpb.ExecutionData, indices []uint64, convertAll bool) ([][32]byte, error) {
 	length := len(indices)
 	if convertAll {
