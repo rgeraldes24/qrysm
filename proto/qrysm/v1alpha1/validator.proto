@@ -61,8 +61,8 @@ service BeaconNodeValidator {
         };
     }
 
-    // WaitForChainStart queries the logs of the Validator Deposit Contract on the Ethereum
-    // proof-of-work chain to verify the beacon chain has started its runtime and
+    // WaitForChainStart queries the logs of the Validator Deposit Contract on the QRL
+    // execution chain to verify the beacon chain has started its runtime and
     // validators are ready to begin their responsibilities.
     //
     // If the chain has not yet started, this endpoint starts a server-side stream which updates
@@ -438,7 +438,7 @@ message ValidatorStatusResponse {
     // The corresponding validator status.
     ValidatorStatus status = 1;
 
-    // The block number of the Ethereum proof-of-work chain
+    // The block number of the QRL execution chain
     // where the deposit for the validator was included.
     uint64 execution_deposit_block_number = 2;
 

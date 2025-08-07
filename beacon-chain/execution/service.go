@@ -49,7 +49,7 @@ var (
 	})
 	blockNumberGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "execution_chain_block_number",
-		Help: "The current block number in the proof-of-work chain",
+		Help: "The current block number in the execution chain",
 	})
 	missedDepositLogsCount = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "execution_chain_missed_deposit_logs",

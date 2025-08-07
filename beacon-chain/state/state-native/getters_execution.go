@@ -4,7 +4,7 @@ import (
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-// ExecutionData corresponding to the proof-of-work chain information stored in the beacon state.
+// ExecutionData corresponding to the execution chain information stored in the beacon state.
 func (b *BeaconState) ExecutionData() *qrysmpb.ExecutionData {
 	if b.executionData == nil {
 		return nil
@@ -16,7 +16,7 @@ func (b *BeaconState) ExecutionData() *qrysmpb.ExecutionData {
 	return b.executionDataVal()
 }
 
-// executionDataVal corresponding to the proof-of-work chain information stored in the beacon state.
+// executionDataVal corresponding to the execution chain information stored in the beacon state.
 // This assumes that a lock is already held on BeaconState.
 func (b *BeaconState) executionDataVal() *qrysmpb.ExecutionData {
 	if b.executionData == nil {
@@ -26,7 +26,7 @@ func (b *BeaconState) executionDataVal() *qrysmpb.ExecutionData {
 	return qrysmpb.CopyExecutionData(b.executionData)
 }
 
-// ExecutionDataVotes corresponds to votes from Ethereum on the canonical proof-of-work chain
+// ExecutionDataVotes corresponds to votes from Ethereum on the canonical execution chain
 // data retrieved from execution.
 func (b *BeaconState) ExecutionDataVotes() []*qrysmpb.ExecutionData {
 	if b.executionDataVotes == nil {
@@ -39,7 +39,7 @@ func (b *BeaconState) ExecutionDataVotes() []*qrysmpb.ExecutionData {
 	return b.executionDataVotesVal()
 }
 
-// executionDataVotesVal corresponds to votes from Ethereum on the canonical proof-of-work chain
+// executionDataVotesVal corresponds to votes from QRL on the canonical execution chain
 // data retrieved from execution.
 // This assumes that a lock is already held on BeaconState.
 func (b *BeaconState) executionDataVotesVal() []*qrysmpb.ExecutionData {

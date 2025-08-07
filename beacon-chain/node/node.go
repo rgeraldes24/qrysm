@@ -678,7 +678,7 @@ func (b *BeaconNode) registerExecutionChainService() error {
 	)
 	web3Service, err := execution.NewService(b.ctx, opts...)
 	if err != nil {
-		return errors.Wrap(err, "could not register proof-of-work chain web3Service")
+		return errors.Wrap(err, "could not register execution chain web3Service")
 	}
 
 	return b.services.RegisterService(web3Service)
