@@ -398,7 +398,7 @@ func TestProposer_PendingDeposits_ExecutionDataVoteOK(t *testing.T) {
 	require.NoError(t, err)
 
 	if proto.Equal(newState.ExecutionData(), vote) {
-		t.Errorf("executionData in the state equal to vote, when not expected to"+
+		t.Errorf("executiondata in the state equal to vote, when not expected to"+
 			"have majority: Got %v", vote)
 	}
 
@@ -412,7 +412,7 @@ func TestProposer_PendingDeposits_ExecutionDataVoteOK(t *testing.T) {
 	require.NoError(t, err)
 
 	if !proto.Equal(newState.ExecutionData(), vote) {
-		t.Errorf("executionData in the state not of the expected kind: Got %v but wanted %v", newState.ExecutionData(), vote)
+		t.Errorf("executiondata in the state not of the expected kind: Got %v but wanted %v", newState.ExecutionData(), vote)
 	}
 }
 
@@ -1563,7 +1563,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 		assert.DeepEqual(t, expectedHash, hash)
 	})
 
-	t.Run("no blocks in range - choose current executionData", func(t *testing.T) {
+	t.Run("no blocks in range - choose current executiondata", func(t *testing.T) {
 		p := mockExecution.New().
 			InsertBlock(49, earliestValidTime-1, []byte("before_range")).
 			InsertBlock(101, latestValidTime+1, []byte("after_range"))
@@ -1659,7 +1659,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 		assert.DeepEqual(t, expectedHash, hash)
 	})
 
-	t.Run("no votes and more recent block has less deposits - choose current executionData", func(t *testing.T) {
+	t.Run("no votes and more recent block has less deposits - choose current executiondata", func(t *testing.T) {
 		p := mockExecution.New().
 			InsertBlock(50, earliestValidTime, []byte("earliest")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
@@ -1669,7 +1669,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		// Set the deposit count in current executionData to exceed the latest most recent block's deposit count.
+		// Set the deposit count in current executiondata to exceed the latest most recent block's deposit count.
 		currentExecutionData := &qrysmpb.ExecutionData{DepositCount: 2, BlockHash: []byte("current")}
 		ps := &Server{
 			ChainStartFetcher:     p,
@@ -1829,7 +1829,7 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 		assert.DeepEqual(t, expectedHash, hash)
 	})
 
-	t.Run("no deposits - choose chain start executionData", func(t *testing.T) {
+	t.Run("no deposits - choose chain start executiondata", func(t *testing.T) {
 		p := mockExecution.New().
 			InsertBlock(50, earliestValidTime, []byte("earliest")).
 			InsertBlock(100, latestValidTime, []byte("latest"))
