@@ -235,7 +235,7 @@ func createLocalNode(privKey *ecdsa.PrivateKey, ipAddr net.IP, port int) (*qnode
 	}
 
 	localNode := qnode.NewLocalNode(db, privKey)
-	localNode.Set(qnr.WithEntry("beacon", forkEntry))
+	localNode.Set(qnr.WithEntry("consensus", forkEntry))
 	localNode.Set(qnr.WithEntry("attnets", bitfield.NewBitvector64()))
 	localNode.SetFallbackIP(external)
 	localNode.SetFallbackUDP(port)
