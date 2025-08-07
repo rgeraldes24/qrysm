@@ -26,7 +26,7 @@ qrysm_image_upload(
     name = "push_images",
     binary = ":execexporter",
     entrypoint = ["/execexporter"],
-    repository = "index.docker.io/theqrl/qrysm-exec-monitor",
+    repository = "index.docker.io/theqrl/qrysm-execmonitor",
     symlinks = {
         # Backwards compatibility for images that depended on the old filepath.
         "/app/tools/execexporter/execexporter": "/execexporter",
