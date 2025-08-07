@@ -22,8 +22,8 @@ type sampleRPCRequest struct {
 func Test_parseAndCaptureRequest(t *testing.T) {
 	tmpFile := filepath.Join(t.TempDir(), "faketest.log")
 	body := &sampleRPCRequest{
-		Name:      "consensus",
-		QRLMethod: "consensus_produceBlock",
+		Name:      "qrl",
+		QRLMethod: "qrl_produceBlock",
 		Address:   "0x0923920930923",
 	}
 	enc, err := json.Marshal(body)
