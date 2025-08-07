@@ -36,6 +36,7 @@ func TestPoWBlock(t *testing.T) {
 	require.NoError(t, err)
 	builder := NewBuilder(t, st, blk)
 	builder.PoWBlock(&zondpb.PowBlock{BlockHash: []byte{1, 2, 3}})
+
 	require.Equal(t, 1, len(builder.execMock.powBlocks))
 }
 */
