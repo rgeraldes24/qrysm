@@ -113,7 +113,7 @@ var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 	Evaluation: validatorsAreWithdrawn,
 }
 
-// ValidatorsVoteWithTheMajority verifies whether validator vote for executionData using the majority algorithm.
+// ValidatorsVoteWithTheMajority verifies whether validator vote for executiondata using the majority algorithm.
 var ValidatorsVoteWithTheMajority = e2etypes.Evaluator{
 	Name:       "validators_vote_with_the_majority_%d",
 	Policy:     policies.AfterNthEpoch(0),
@@ -522,7 +522,7 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 					fmt.Printf("did not see slot=%d\n", i)
 				}
 			}
-			return fmt.Errorf("incorrect executionData vote for slot %d; expected: %#x vs voted: %#x",
+			return fmt.Errorf("incorrect executiondata vote for slot %d; expected: %#x vs voted: %#x",
 				slot, ec.ExpectedExecutionDataVote, vote)
 		}
 	}
