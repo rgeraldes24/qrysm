@@ -28,7 +28,7 @@ func DefaultConfig(enableDebugRPCEndpoints bool, httpModules string) MuxConfig {
 		if enableDebugRPCEndpoints {
 			qrysmRegistrations = append(qrysmRegistrations, qrysmpb.RegisterDebugHandler)
 		}
-		v1AlphaMux := gwruntime.NewServeMux(
+		qrysmMux := gwruntime.NewServeMux(
 			gwruntime.WithMarshalerOption(gwruntime.MIMEWildcard, &gwruntime.HTTPBodyMarshaler{
 				Marshaler: &gwruntime.JSONPb{
 					MarshalOptions: protojson.MarshalOptions{
@@ -46,7 +46,7 @@ func DefaultConfig(enableDebugRPCEndpoints bool, httpModules string) MuxConfig {
 		qrysmPbHandler = &gateway.PbMux{
 			Registrations: qrysmRegistrations,
 			Patterns:      []string{"/qrl/v1alpha1/", "/qrl/v1alpha2/"},
-			Mux:           v1AlphaMux,
+			Mux:           qrysmMux,
 		}
 	}
 	if flags.EnableHTTPQRLAPI(httpModules) {
