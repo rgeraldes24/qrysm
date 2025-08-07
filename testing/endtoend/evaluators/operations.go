@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz/detect"
-	qrysmpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+	"github.com/theQRL/qrysm/proto/qrl/service"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/endtoend/helpers"
@@ -531,7 +531,7 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 
 func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	beaconAPIClient := qrysmpbservice.NewBeaconChainClient(conn)
+	beaconAPIClient := service.NewBeaconChainClient(conn)
 	beaconClient := qrysmpb.NewBeaconChainClient(conn)
 	debugClient := qrysmpb.NewDebugClient(conn)
 
