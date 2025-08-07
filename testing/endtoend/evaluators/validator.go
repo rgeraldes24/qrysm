@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
-	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/endtoend/policies"
 	"github.com/theQRL/qrysm/testing/endtoend/types"
@@ -117,7 +117,7 @@ func validatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.ClientCo
 	expected := float32(expectedParticipation)
 
 	if partRate < expected {
-		st, err := debugClient.GetBeaconState(context.Background(), &v1.BeaconStateRequest{StateId: []byte("head")})
+		st, err := debugClient.GetBeaconState(context.Background(), &qrlpb.BeaconStateRequest{StateId: []byte("head")})
 		if err != nil {
 			return errors.Wrap(err, "failed to get beacon state")
 		}
@@ -125,7 +125,7 @@ func validatorsParticipating(_ *types.EvaluationContext, conns ...*grpc.ClientCo
 		var missTgtVals []uint64
 		var missHeadVals []uint64
 		switch obj := st.Data.State.(type) {
-		case *v1.BeaconStateContainer_CapellaState:
+		case *qrlpb.BeaconStateContainer_CapellaState:
 			missSrcVals, missTgtVals, missHeadVals, err = findMissingValidators(obj.CapellaState.PreviousEpochParticipation)
 			if err != nil {
 				return errors.Wrap(err, "failed to get missing validators")

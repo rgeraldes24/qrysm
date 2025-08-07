@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assertions"
 	"github.com/theQRL/qrysm/testing/require"
@@ -488,7 +488,7 @@ func HydrateBlindedBeaconBlockBodyCapella(b *qrysmpb.BlindedBeaconBlockBodyCapel
 
 // HydrateV1SignedBlindedBeaconBlockCapella hydrates a signed blinded beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1SignedBlindedBeaconBlockCapella(b *v1.SignedBlindedBeaconBlockCapella) *v1.SignedBlindedBeaconBlockCapella {
+func HydrateV1SignedBlindedBeaconBlockCapella(b *qrlpb.SignedBlindedBeaconBlockCapella) *qrlpb.SignedBlindedBeaconBlockCapella {
 	if b.Signature == nil {
 		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
 	}
@@ -498,9 +498,9 @@ func HydrateV1SignedBlindedBeaconBlockCapella(b *v1.SignedBlindedBeaconBlockCape
 
 // HydrateV1BlindedBeaconBlockCapella hydrates a blinded beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1BlindedBeaconBlockCapella(b *v1.BlindedBeaconBlockCapella) *v1.BlindedBeaconBlockCapella {
+func HydrateV1BlindedBeaconBlockCapella(b *qrlpb.BlindedBeaconBlockCapella) *qrlpb.BlindedBeaconBlockCapella {
 	if b == nil {
-		b = &v1.BlindedBeaconBlockCapella{}
+		b = &qrlpb.BlindedBeaconBlockCapella{}
 	}
 	if b.ParentRoot == nil {
 		b.ParentRoot = make([]byte, fieldparams.RootLength)
@@ -514,9 +514,9 @@ func HydrateV1BlindedBeaconBlockCapella(b *v1.BlindedBeaconBlockCapella) *v1.Bli
 
 // HydrateV1BlindedBeaconBlockBodyCapella hydrates a blinded beacon block body with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1BlindedBeaconBlockBodyCapella(b *v1.BlindedBeaconBlockBodyCapella) *v1.BlindedBeaconBlockBodyCapella {
+func HydrateV1BlindedBeaconBlockBodyCapella(b *qrlpb.BlindedBeaconBlockBodyCapella) *qrlpb.BlindedBeaconBlockBodyCapella {
 	if b == nil {
-		b = &v1.BlindedBeaconBlockBodyCapella{}
+		b = &qrlpb.BlindedBeaconBlockBodyCapella{}
 	}
 	if b.RandaoReveal == nil {
 		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)
@@ -525,13 +525,13 @@ func HydrateV1BlindedBeaconBlockBodyCapella(b *v1.BlindedBeaconBlockBodyCapella)
 		b.Graffiti = make([]byte, 32)
 	}
 	if b.ExecutionData == nil {
-		b.ExecutionData = &v1.ExecutionData{
+		b.ExecutionData = &qrlpb.ExecutionData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, 32),
 		}
 	}
 	if b.SyncAggregate == nil {
-		b.SyncAggregate = &v1.SyncAggregate{
+		b.SyncAggregate = &qrlpb.SyncAggregate{
 			SyncCommitteeBits:       make([]byte, 64),
 			SyncCommitteeSignatures: [][]byte{},
 		}
@@ -555,7 +555,7 @@ func HydrateV1BlindedBeaconBlockBodyCapella(b *v1.BlindedBeaconBlockBodyCapella)
 
 // HydrateV1CapellaSignedBeaconBlock hydrates a signed beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1CapellaSignedBeaconBlock(b *v1.SignedBeaconBlockCapella) *v1.SignedBeaconBlockCapella {
+func HydrateV1CapellaSignedBeaconBlock(b *qrlpb.SignedBeaconBlockCapella) *qrlpb.SignedBeaconBlockCapella {
 	if b.Signature == nil {
 		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
 	}
@@ -565,9 +565,9 @@ func HydrateV1CapellaSignedBeaconBlock(b *v1.SignedBeaconBlockCapella) *v1.Signe
 
 // HydrateV1CapellaBeaconBlock hydrates a beacon block with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1CapellaBeaconBlock(b *v1.BeaconBlockCapella) *v1.BeaconBlockCapella {
+func HydrateV1CapellaBeaconBlock(b *qrlpb.BeaconBlockCapella) *qrlpb.BeaconBlockCapella {
 	if b == nil {
-		b = &v1.BeaconBlockCapella{}
+		b = &qrlpb.BeaconBlockCapella{}
 	}
 	if b.ParentRoot == nil {
 		b.ParentRoot = make([]byte, fieldparams.RootLength)
@@ -581,9 +581,9 @@ func HydrateV1CapellaBeaconBlock(b *v1.BeaconBlockCapella) *v1.BeaconBlockCapell
 
 // HydrateV1CapellaBeaconBlockBody hydrates a beacon block body with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1CapellaBeaconBlockBody(b *v1.BeaconBlockBodyCapella) *v1.BeaconBlockBodyCapella {
+func HydrateV1CapellaBeaconBlockBody(b *qrlpb.BeaconBlockBodyCapella) *qrlpb.BeaconBlockBodyCapella {
 	if b == nil {
-		b = &v1.BeaconBlockBodyCapella{}
+		b = &qrlpb.BeaconBlockBodyCapella{}
 	}
 	if b.RandaoReveal == nil {
 		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)
@@ -592,13 +592,13 @@ func HydrateV1CapellaBeaconBlockBody(b *v1.BeaconBlockBodyCapella) *v1.BeaconBlo
 		b.Graffiti = make([]byte, fieldparams.RootLength)
 	}
 	if b.ExecutionData == nil {
-		b.ExecutionData = &v1.ExecutionData{
+		b.ExecutionData = &qrlpb.ExecutionData{
 			DepositRoot: make([]byte, fieldparams.RootLength),
 			BlockHash:   make([]byte, fieldparams.RootLength),
 		}
 	}
 	if b.SyncAggregate == nil {
-		b.SyncAggregate = &v1.SyncAggregate{
+		b.SyncAggregate = &qrlpb.SyncAggregate{
 			SyncCommitteeBits:       make([]byte, 64),
 			SyncCommitteeSignatures: [][]byte{},
 		}

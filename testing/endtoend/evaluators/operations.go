@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz/detect"
 	qrysmpbservice "github.com/theQRL/qrysm/proto/qrl/service"
-	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/endtoend/helpers"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
@@ -566,7 +566,7 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 	if err != nil {
 		return err
 	}
-	changes := make([]*v1.SignedDilithiumToExecutionChange, 0)
+	changes := make([]*qrlpb.SignedDilithiumToExecutionChange, 0)
 	// Only send half the number of changes each time, to allow us to test
 	// at the fork boundary.
 	wantedChanges := numOfExits / 2
@@ -585,7 +585,7 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 		if !bytes.Equal(val.PublicKey, privKeys[idx].PublicKey().Marshal()) {
 			return errors.Errorf("pubkey is not equal, wanted %#x but received %#x", val.PublicKey, privKeys[idx].PublicKey().Marshal())
 		}
-		message := &v1.DilithiumToExecutionChange{
+		message := &qrlpb.DilithiumToExecutionChange{
 			ValidatorIndex:      idx,
 			FromDilithiumPubkey: privKeys[idx].PublicKey().Marshal(),
 			ToExecutionAddress:  bytesutil.ToBytes(uint64(idx), 20),
@@ -599,13 +599,13 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 			return err
 		}
 		signature := privKeys[idx].Sign(sigRoot[:]).Marshal()
-		change := &v1.SignedDilithiumToExecutionChange{
+		change := &qrlpb.SignedDilithiumToExecutionChange{
 			Message:   message,
 			Signature: signature,
 		}
 		changes = append(changes, change)
 	}
-	_, err = beaconAPIClient.SubmitSignedDilithiumToExecutionChanges(ctx, &v1.SubmitDilithiumToExecutionChangesRequest{Changes: changes})
+	_, err = beaconAPIClient.SubmitSignedDilithiumToExecutionChanges(ctx, &qrlpb.SubmitDilithiumToExecutionChangesRequest{Changes: changes})
 
 	return err
 }

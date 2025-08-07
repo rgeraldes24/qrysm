@@ -5,7 +5,7 @@ import (
 
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
-	v1 "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -27,14 +27,14 @@ func TestHydrateAttestationData(t *testing.T) {
 }
 
 func TestHydrateV1Attestation(t *testing.T) {
-	a := HydrateV1Attestation(&v1.Attestation{})
+	a := HydrateV1Attestation(&qrlpb.Attestation{})
 	_, err := a.HashTreeRoot()
 	require.NoError(t, err)
 	require.DeepEqual(t, a.Signatures[0], make([]byte, fieldparams.DilithiumSignatureLength))
 }
 
 func TestHydrateV1AttestationData(t *testing.T) {
-	d := HydrateV1AttestationData(&v1.AttestationData{})
+	d := HydrateV1AttestationData(&qrlpb.AttestationData{})
 	_, err := d.HashTreeRoot()
 	require.NoError(t, err)
 	require.DeepEqual(t, d.BeaconBlockRoot, make([]byte, fieldparams.RootLength))
