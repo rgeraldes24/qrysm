@@ -86,8 +86,8 @@ service Node {
         };
     }
 
-    // Retrieve the status of the execution node connections.
-    rpc GetExecutionNodeConnectionStatus(google.protobuf.Empty) returns (ExecutionNodeConnectionStatus) {
+    // Retrieve the status of the execution connections.
+    rpc GetExecutionConnectionStatus(google.protobuf.Empty) returns (ExecutionConnectionStatus) {
         option (google.api.http) = {
             get: "/qrl/v1alpha1/node/execution/connections"
         };
@@ -178,10 +178,10 @@ enum ConnectionState {
     CONNECTING = 3;
 }
 
-// ExecutionNodeConnectionStatus states the current address and error of the execution API
+// ExecutionConnectionStatus states the current address and error of the execution API
 // endpoint. It also provides the addresses and errors for any fallback URLs. 
-message ExecutionNodeConnectionStatus {
-    // Current Execution Node HTTP endpoint.
+message ExecutionConnectionStatus {
+    // Current Execution HTTP endpoint.
     string current_address = 1;
 
     // Current error (if any) of the current connection.

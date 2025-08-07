@@ -315,7 +315,7 @@ func (x *ProduceBlockResponse) GetVersion() Version {
 	if x != nil {
 		return x.Version
 	}
-	return Version_PHASE0
+	return Version_CAPELLA
 }
 
 func (x *ProduceBlockResponse) GetData() *BeaconBlockContainer {
@@ -370,7 +370,7 @@ func (x *ProduceBlindedBlockResponse) GetVersion() Version {
 	if x != nil {
 		return x.Version
 	}
-	return Version_PHASE0
+	return Version_CAPELLA
 }
 
 func (x *ProduceBlindedBlockResponse) GetData() *BlindedBeaconBlockContainer {
