@@ -220,14 +220,14 @@ func (ns *Server) ListPeers(ctx context.Context, _ *empty.Empty) (*qrysmpb.Peers
 	}, nil
 }
 
-// GetExecutionNodeConnectionStatus gets data about the execution endpoints.
-func (ns *Server) GetExecutionNodeConnectionStatus(_ context.Context, _ *empty.Empty) (*qrysmpb.ExecutionNodeConnectionStatus, error) {
+// GetExecutionConnectionStatus gets data about the execution endpoints.
+func (ns *Server) GetExecutionConnectionStatus(_ context.Context, _ *empty.Empty) (*qrysmpb.ExecutionConnectionStatus, error) {
 	var currErr string
 	err := ns.ExecutionChainInfoFetcher.ExecutionClientConnectionErr()
 	if err != nil {
 		currErr = err.Error()
 	}
-	return &qrysmpb.ExecutionNodeConnectionStatus{
+	return &qrysmpb.ExecutionConnectionStatus{
 		CurrentAddress:         ns.ExecutionChainInfoFetcher.ExecutionClientEndpoint(),
 		CurrentConnectionError: currErr,
 		Addresses:              []string{ns.ExecutionChainInfoFetcher.ExecutionClientEndpoint()},

@@ -638,7 +638,7 @@ func (ssz *SszResponseJson) SSZData() string {
 }
 
 func (*SszResponseJson) SSZVersion() string {
-	return strings.ToLower(qrlpb.Version_PHASE0.String())
+	return strings.ToLower(qrlpb.Version_CAPELLA.String())
 }
 
 func (*SszResponseJson) SSZOptimistic() bool {
