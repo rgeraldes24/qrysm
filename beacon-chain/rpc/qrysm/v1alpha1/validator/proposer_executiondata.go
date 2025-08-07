@@ -18,15 +18,15 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 )
 
-// executionDataMajorityVote determines the appropriate executionData for a block proposal using
+// executionDataMajorityVote determines the appropriate executiondata for a block proposal using
 // an algorithm called Voting with the Majority. The algorithm works as follows:
 //   - Determine the timestamp for the start slot for the execution voting period.
 //   - Determine the earliest and latest timestamps that a valid block can have.
 //   - Determine the first block not before the earliest timestamp. This block is the lower bound.
 //   - Determine the last block not after the latest timestamp. This block is the upper bound.
-//   - If the last block is too early, use current executionData from the beacon state.
+//   - If the last block is too early, use current executiondata from the beacon state.
 //   - Filter out votes on unknown blocks and blocks which are outside of the range determined by the lower and upper bounds.
-//   - If no blocks are left after filtering votes, use executionData from the latest valid block.
+//   - If no blocks are left after filtering votes, use executiondata from the latest valid block.
 //   - Otherwise:
 //   - Determine the vote with the highest count. Prefer the vote with the highest execution block height in the event of a tie.
 //   - This vote's block is the execution block to use for the block proposal.
@@ -54,7 +54,7 @@ func (vs *Server) executionDataMajorityVote(ctx context.Context, beaconState sta
 	// by EXECUTION_FOLLOW_DISTANCE. The head state should maintain the same ExecutionData until this condition has passed, so
 	// trust the existing head for the right execution vote until we can get a meaningful value from the deposit contract.
 	if latestValidTime < genesisTime+followDistanceSeconds {
-		log.WithField("genesisTime", genesisTime).WithField("latestValidTime", latestValidTime).Warn("voting period before genesis + follow distance, using executionData from head")
+		log.WithField("genesisTime", genesisTime).WithField("latestValidTime", latestValidTime).Warn("voting period before genesis + follow distance, using executiondata from head")
 		return vs.HeadFetcher.HeadExecutionData(), nil
 	}
 
@@ -92,7 +92,7 @@ func (vs *Server) slotStartTime(slot primitives.Slot) uint64 {
 	return slots.VotingPeriodStartTime(startTime, slot)
 }
 
-// canonicalExecutionData determines the canonical executionData and execution block height to use for determining deposits.
+// canonicalExecutionData determines the canonical executiondata and execution block height to use for determining deposits.
 func (vs *Server) canonicalExecutionData(
 	ctx context.Context,
 	beaconState state.BeaconState,
@@ -105,7 +105,7 @@ func (vs *Server) canonicalExecutionData(
 	}
 	hasSupport, err := blocks.ExecutionDataHasEnoughSupport(beaconState, currentVote)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not determine if current executionData vote has enough support")
+		return nil, nil, errors.Wrap(err, "could not determine if current executiondata vote has enough support")
 	}
 	var canonicalExecutionData *qrysmpb.ExecutionData
 	if hasSupport {
@@ -120,7 +120,7 @@ func (vs *Server) canonicalExecutionData(
 	}
 	_, canonicalExecutionDataHeight, err := vs.ExecutionBlockFetcher.BlockExists(ctx, executionBlockHash)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not fetch executionData height")
+		return nil, nil, errors.Wrap(err, "could not fetch executiondata height")
 	}
 	return canonicalExecutionData, canonicalExecutionDataHeight, nil
 }
@@ -131,7 +131,7 @@ func (vs *Server) mockExecutionDataVote(ctx context.Context, slot primitives.Slo
 		executionDataNotification = true
 	}
 	// If a mock execution data votes is specified, we use the following for the
-	// executionData we provide to every proposer based on https://github.com/ethereum/eth2.0-pm/issues/62:
+	// executiondata we provide to every proposer based on https://github.com/ethereum/eth2.0-pm/issues/62:
 	//
 	// slot_in_voting_period = current_slot % SLOTS_PER_EXECUTION_VOTING_PERIOD
 	// ExecutionData(
