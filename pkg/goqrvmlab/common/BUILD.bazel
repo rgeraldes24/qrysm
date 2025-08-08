@@ -10,8 +10,8 @@ go_library(
     importpath = "github.com/theQRL/qrysm/pkg/goqrvmlab/common",
     visibility = ["//visibility:public"],
     deps = [
-        "//pkg/goqrvmlab/qrvms:go_default_library",
         "//pkg/goqrvmlab/fuzzing:go_default_library",
+        "//pkg/goqrvmlab/qrvms:go_default_library",
         "//pkg/goqrvmlab/utils:go_default_library",
         "@com_github_theqrl_go_zond//common:go_default_library",
         "@com_github_theqrl_go_zond//common/hexutil:go_default_library",
