@@ -84,7 +84,7 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 	// ExecutionData data structure root.
 	executionHashTreeRoot, err := stateutil.ExecutionRoot(state.executionData)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not compute executionData merkleization")
+		return nil, errors.Wrap(err, "could not compute executiondata merkleization")
 	}
 	fieldRoots[types.ExecutionData.RealPosition()] = executionHashTreeRoot[:]
 
