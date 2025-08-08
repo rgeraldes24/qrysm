@@ -202,7 +202,7 @@ func (vs *Server) rebuildDepositTrie(ctx context.Context, canonicalExecutionData
 // validate that the provided deposit trie matches up with the canonical execution data provided.
 func validateDepositTrie(trie cache.MerkleTree, canonicalExecutionData *qrysmpb.ExecutionData) (bool, error) {
 	if trie == nil || canonicalExecutionData == nil {
-		return false, errors.New("nil trie or executionData provided")
+		return false, errors.New("nil trie or executiondata provided")
 	}
 	if trie.NumOfItems() != int(canonicalExecutionData.DepositCount) {
 		return false, errors.Errorf("wanted the canonical count of %d but received %d", canonicalExecutionData.DepositCount, trie.NumOfItems())
