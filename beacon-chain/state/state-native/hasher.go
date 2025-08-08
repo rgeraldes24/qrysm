@@ -91,7 +91,7 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 	// ExecutionDataVotes slice root.
 	executionVotesRoot, err := stateutil.ExecutionDataVotesRoot(state.executionDataVotes)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not compute executionData votes merkleization")
+		return nil, errors.Wrap(err, "could not compute executiondata votes merkleization")
 	}
 	fieldRoots[types.ExecutionDataVotes.RealPosition()] = executionVotesRoot[:]
 
