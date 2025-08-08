@@ -4,7 +4,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	runtimeDebug "runtime/debug"
 
 	golog "github.com/ipfs/go-log/v2"
@@ -22,7 +21,6 @@ import (
 	"github.com/theQRL/qrysm/cmd/beacon-chain/sync/checkpoint"
 	"github.com/theQRL/qrysm/cmd/beacon-chain/sync/genesis"
 	"github.com/theQRL/qrysm/config/features"
-	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/io/logs"
 	"github.com/theQRL/qrysm/monitoring/journald"
 	"github.com/theQRL/qrysm/runtime/debug"
@@ -217,13 +215,6 @@ func main() {
 }
 
 func startNode(ctx *cli.Context) error {
-	// Fix data dir for Windows users.
-	outdatedDataDir := filepath.Join(file.HomeDir(), "AppData", "Roaming", "Qrysm")
-	currentDataDir := ctx.String(cmd.DataDirFlag.Name)
-	if err := cmd.FixDefaultDataDir(outdatedDataDir, currentDataDir); err != nil {
-		return err
-	}
-
 	// verify if ToS accepted
 	if err := tos.VerifyTosAcceptedOrPrompt(ctx); err != nil {
 		return err
