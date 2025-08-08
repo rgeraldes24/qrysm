@@ -1,0 +1,14 @@
+load("@qrysm//tools/go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["viewmanager.go"],
+    importpath = "github.com/theQRL/qrysm/pkg/goqrvmlab/ui",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/goqrvmlab/ops:go_default_library",
+        "//pkg/goqrvmlab/traces:go_default_library",
+        "@com_github_gdamore_tcell_v2//:go_default_library",
+        "@com_github_rivo_tview//:go_default_library",
+    ],
+)

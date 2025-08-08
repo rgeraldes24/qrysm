@@ -9,16 +9,17 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/FuzzyVM/filler"
 	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/accounts/keystore"
 	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-zond/core/types"
+	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/rand"
+	"github.com/theQRL/qrysm/pkg/FuzzyVM/filler"
+	txfuzz "github.com/theQRL/qrysm/pkg/tx-fuzz"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
-
-	// txfuzz "github.com/theQRL/tx-fuzz"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -95,63 +96,60 @@ func (s *TransactionGenerator) Started() <-chan struct{} {
 }
 
 func SendTransaction(client *rpc.Client, key *dilithium.Dilithium, f *filler.Filler, gasFeeCap *big.Int, gasTipCap *big.Int, addr string, N uint64, al bool) error {
-	// backend := qrlclient.NewClient(client)
+	backend := qrlclient.NewClient(client)
 
-	// sender, err := common.NewAddressFromString(addr)
-	// if err != nil {
-	// 	return err
-	// }
-	// chainid, err := backend.ChainID(context.Background())
-	// if err != nil {
-	// 	return err
-	// }
-	// nonce, err := backend.PendingNonceAt(context.Background(), sender)
-	// if err != nil {
-	// 	return err
-	// }
-	// expectedGasFeeCap, err := backend.SuggestGasPrice(context.Background())
-	// if err != nil {
-	// 	return err
-	// }
-	// if expectedGasFeeCap.Cmp(gasFeeCap) > 0 {
-	// 	gasFeeCap = expectedGasFeeCap
-	// }
-	// expectedGasTipCap, err := backend.SuggestGasTipCap(context.Background())
-	// if err != nil {
-	// 	return err
-	// }
-	// if expectedGasTipCap.Cmp(gasTipCap) > 0 {
-	// 	gasTipCap = expectedGasTipCap
-	// }
+	sender, err := common.NewAddressFromString(addr)
+	if err != nil {
+		return err
+	}
+	chainid, err := backend.ChainID(context.Background())
+	if err != nil {
+		return err
+	}
+	nonce, err := backend.PendingNonceAt(context.Background(), sender)
+	if err != nil {
+		return err
+	}
+	expectedGasFeeCap, err := backend.SuggestGasPrice(context.Background())
+	if err != nil {
+		return err
+	}
+	if expectedGasFeeCap.Cmp(gasFeeCap) > 0 {
+		gasFeeCap = expectedGasFeeCap
+	}
+	expectedGasTipCap, err := backend.SuggestGasTipCap(context.Background())
+	if err != nil {
+		return err
+	}
+	if expectedGasTipCap.Cmp(gasTipCap) > 0 {
+		gasTipCap = expectedGasTipCap
+	}
 
 	g, _ := errgroup.WithContext(context.Background())
 	for i := uint64(0); i < N; i++ {
-		// index := i
+		index := i
 		g.Go(func() error {
-			// TODO(rgeraldes24): disabling now because of the tx-fuzz dep
-			/*
-				tx, err := txfuzz.RandomValidTx(client, f, sender, nonce+index, gasFeeCap, gasTipCap, nil, al)
-				if err != nil {
-					// In the event the transaction constructed is not valid, we continue with the routine
-					// rather than complete stop it.
-					//nolint:nilerr
-					return nil
-				}
-				signedTx, err := types.SignTx(tx, types.NewShanghaiSigner(chainid), key)
-				if err != nil {
-					// We continue on in the event there is a reason we can't sign this
-					// transaction(unlikely).
-					//nolint:nilerr
-					return nil
-				}
-				err = backend.SendTransaction(context.Background(), signedTx)
-				if err != nil {
-					// We continue on if the constructed transaction is invalid
-					// and can't be submitted on chain.
-					//nolint:nilerr
-					return nil
-				}
-			*/
+			tx, err := txfuzz.RandomValidTx(client, f, sender, nonce+index, gasFeeCap, gasTipCap, nil, al)
+			if err != nil {
+				// In the event the transaction constructed is not valid, we continue with the routine
+				// rather than complete stop it.
+				//nolint:nilerr
+				return nil
+			}
+			signedTx, err := types.SignTx(tx, types.NewShanghaiSigner(chainid), key)
+			if err != nil {
+				// We continue on in the event there is a reason we can't sign this
+				// transaction(unlikely).
+				//nolint:nilerr
+				return nil
+			}
+			err = backend.SendTransaction(context.Background(), signedTx)
+			if err != nil {
+				// We continue on if the constructed transaction is invalid
+				// and can't be submitted on chain.
+				//nolint:nilerr
+				return nil
+			}
 			return nil
 		})
 	}
