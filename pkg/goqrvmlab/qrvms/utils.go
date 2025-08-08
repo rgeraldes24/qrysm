@@ -1,4 +1,4 @@
-package evms
+package qrvms
 
 import (
 	"bytes"

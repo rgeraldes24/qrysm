@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the goevmlab library. If not, see <http://www.gnu.org/licenses/>.
 
-package evms
+package qrvms
 
 import (
 	"bufio"
@@ -24,67 +24,68 @@ import (
 	"io"
 	"os"
 	"os/exec"
-
 	"time"
 
 	"github.com/theQRL/go-zond/log"
 	"github.com/theQRL/go-zond/qrl/tracers/logger"
 )
 
-// NimbusEVM is s Evm-interface wrapper around the `evmstate` binary, based on nimbus-eth1.
-type NimbusEVM struct {
+// GzondQRVM is a Qrvm-interface wrapper around the `qrvm` binary, based on go-zond.
+type GzondQRVM struct {
 	path string
-	name string
+	name string // in case multiple instances are used
+
 	// Some metrics
 	stats *VmStat
 }
 
-func NewNimbusEVM(path string, name string) *NimbusEVM {
-	return &NimbusEVM{
+func NewGzondQRVM(path string, name string) *GzondQRVM {
+	return &GzondQRVM{
 		path:  path,
 		name:  name,
 		stats: &VmStat{},
 	}
 }
 
-func (evm *NimbusEVM) Instance(int) Evm {
-	return evm
+func (qrvm *GzondQRVM) Instance(int) Qrvm {
+	return qrvm
 }
 
-func (evm *NimbusEVM) Name() string {
-	return evm.name
+func (qrvm *GzondQRVM) Name() string {
+	return qrvm.name
 }
 
 // GetStateRoot runs the test and returns the stateroot
 // This currently only works for non-filled statetests. TODO: make it work even if the
 // test is filled. Either by getting the whole trace, or adding stateroot to exec std output
 // even in success-case
-func (evm *NimbusEVM) GetStateRoot(path string) (root, command string, err error) {
+func (qrvm *GzondQRVM) GetStateRoot(path string) (root, command string, err error) {
 	// In this mode, we can run it without tracing
-	cmd := exec.Command(evm.path, path)
-	data, _ := cmd.Output()
-
-	root, err = evm.ParseStateRoot(data)
+	cmd := exec.Command(qrvm.path, "statetest", path)
+	data, err := cmd.Output()
 	if err != nil {
-		log.Error("Failed to find stateroot", "vm", evm.Name(), "cmd", cmd.String())
+		return "", cmd.String(), err
+	}
+	root, err = qrvm.ParseStateRoot(data)
+	if err != nil {
+		log.Error("Failed to find stateroot", "vm", qrvm.Name(), "cmd", cmd.String())
 		return "", cmd.String(), err
 	}
 	return root, cmd.String(), err
 }
 
 // ParseStateRoot reads geth's stateroot from the combined output.
-func (evm *NimbusEVM) ParseStateRoot(data []byte) (string, error) {
-
+func (qrvm *GzondQRVM) ParseStateRoot(data []byte) (string, error) {
 	start := bytes.Index(data, []byte(`"stateRoot": "`))
 	end := start + 14 + 66
 	if start == -1 || end >= len(data) {
-		return "", fmt.Errorf("%v: no stateroot found", evm.Name())
+		return "", fmt.Errorf("%v: no stateroot found", qrvm.Name())
 	}
 	return string(data[start+14 : end]), nil
 }
 
-// RunStateTest implements the Evm interface
-func (evm *NimbusEVM) RunStateTest(path string, out io.Writer, speedTest bool) (*tracingResult, error) {
+// RunStateTest implements the Qrvm interface
+func (qrvm *GzondQRVM) RunStateTest(path string, out io.Writer, speedTest bool) (*tracingResult, error) {
 	var (
 		t0     = time.Now()
 		stderr io.ReadCloser
@@ -92,9 +93,9 @@ func (evm *NimbusEVM) RunStateTest(path string, out io.Writer, speedTest bool) (
 		cmd    *exec.Cmd
 	)
 	if speedTest {
-		cmd = exec.Command(evm.path, "--noreturndata", "--nomemory", "--nostorage", path)
+		cmd = exec.Command(qrvm.path, "--nomemory", "--noreturndata", "--nostack", "statetest", path)
 	} else {
-		cmd = exec.Command(evm.path, "--json", "--noreturndata", "--nomemory", "--nostorage", path)
+		cmd = exec.Command(qrvm.path, "--json", "--noreturndata", "--nomemory", "statetest", path)
 	}
 	if stderr, err = cmd.StderrPipe(); err != nil {
 		return &tracingResult{Cmd: cmd.String()}, err
@@ -103,29 +104,38 @@ func (evm *NimbusEVM) RunStateTest(path string, out io.Writer, speedTest bool) (
 		return &tracingResult{Cmd: cmd.String()}, err
 	}
 	// copy everything to the given writer
-	evm.Copy(out, stderr)
-	// Nimbus returns a non-zero exit code for tests that do not pass. We just ignore that.
-	_ = cmd.Wait()
+	qrvm.Copy(out, stderr)
+	err = cmd.Wait()
 	// release resources
-	duration, slow := evm.stats.TraceDone(t0)
+	duration, slow := qrvm.stats.TraceDone(t0)
 
 	return &tracingResult{
 		Slow:     slow,
 		ExecTime: duration,
 		Cmd:      cmd.String(),
-	}, nil
+	}, err
 }
 
-func (vm *NimbusEVM) Close() {
+func (qrvm *GzondQRVM) Close() {
 }
 
-func (evm *NimbusEVM) Copy(out io.Writer, input io.Reader) {
+// Copy reads from the reader, does some geth-specific filtering and
+// outputs items onto the channel
+func (qrvm *GzondQRVM) Copy(out io.Writer, input io.Reader) {
+	qrvm.copyUntilEnd(out, input)
+}
+
+// copyUntilEnd reads from the reader, does some geth-specific filtering and
+// outputs items onto the channel
+func (qrvm *GzondQRVM) copyUntilEnd(out io.Writer, input io.Reader) stateRoot {
+	buf := bufferPool.Get().([]byte)
+	//lint:ignore SA6002: argument should be pointer-like to avoid allocations.
+	defer bufferPool.Put(buf)
 	var stateRoot stateRoot
 	scanner := bufio.NewScanner(input)
-	scanner.Buffer(make([]byte, 1024*1024), 32*1024*1024) // Start with 1MB buffer, allow up to 32 MB
-
-	// When nimbus encounters an error, it may already have spat out the info prematurely.
-	// We need to merge it back to one item, just like geth
+	scanner.Buffer(buf, 32*1024*1024)
+	// When geth encounters an error, it may already have spat out the info, prematurely.
+	// We need to merge it back to one item
 	// https://github.com/theQRL/go-zond/pull/23970#issuecomment-979851712
 	var prev *logger.StructLog
 	var yield = func(current *logger.StructLog) {
@@ -147,27 +157,33 @@ func (evm *NimbusEVM) Copy(out io.Writer, input io.Reader) {
 			prev = current
 		}
 	}
-
 	for scanner.Scan() {
 		data := scanner.Bytes()
-
-		// Nimbus sometimes report a negative refund
-		if i := bytes.Index(data, []byte(`"refund":-`)); i > 0 {
-			// we can just make it positive, it will be zeroed later
-			data[i+9] = byte(' ')
+		if len(data) > 0 && data[0] == '#' {
+			// Output preceded by # is ignored, but can be used for debugging, e.g.
+			// to check that the generated tests cover the intended surface.
+			fmt.Printf("%v: %v\n", qrvm.Name(), string(data))
+			continue
 		}
-
 		var elem logger.StructLog
 		if err := json.Unmarshal(data, &elem); err != nil {
-			fmt.Printf("nimb err: %v, line\n\t%v\n", err, string(data))
+			fmt.Printf("geth err: %v, line\n\t%v\n", err, string(data))
 			continue
 		}
 		// If the output cannot be marshalled, all fields will be blanks.
 		// We can detect that through 'depth', which should never be less than 1
 		// for any actual opcode
 		if elem.Depth == 0 {
+			/* It might be the stateroot
+			{"output":"","gasUsed":"0x2d1cc4","error":"gas uint64 overflow"}
+			{"stateRoot": "0xa2b3391f7a85bf1ad08dc541a1b99da3c591c156351391f26ec88c557ff12134"}
+			*/
 			if stateRoot.StateRoot == "" {
 				_ = json.Unmarshal(data, &stateRoot)
+			}
+			// If we have a stateroot, we're done
+			if len(stateRoot.StateRoot) > 0 {
+				break
 			}
 			continue
 		}
@@ -183,8 +199,9 @@ func (evm *NimbusEVM) Copy(out io.Writer, input io.Reader) {
 	if _, err := out.Write(append(root, '\n')); err != nil {
 		fmt.Fprintf(os.Stderr, "Error writing to out: %v\n", err)
 	}
+	return stateRoot
 }
 
-func (evm *NimbusEVM) Stats() []any {
-	return evm.stats.Stats()
+func (qrvm *GzondQRVM) Stats() []any {
+	return qrvm.stats.Stats()
 }

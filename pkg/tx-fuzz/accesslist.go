@@ -35,7 +35,7 @@ type accessListMutator func(list *types.AccessList) *types.AccessList
 
 var mutators = []accessListMutator{
 	noChange,
-	delete,
+	deleteAL,
 	addRandom,
 	replaceRandom,
 	replaceRandomSlot,
@@ -52,7 +52,7 @@ func MutateAccessList(list types.AccessList) *types.AccessList {
 func noChange(list *types.AccessList) *types.AccessList { return list }
 
 // empty the access list
-func delete(list *types.AccessList) *types.AccessList { return &types.AccessList{} }
+func deleteAL(list *types.AccessList) *types.AccessList { return &types.AccessList{} }
 
 // add a random entry and random slots to the list
 func addRandom(list *types.AccessList) *types.AccessList {

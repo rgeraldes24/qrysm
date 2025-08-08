@@ -83,17 +83,17 @@ func GenerateCallFProgram(maxSections int) ([]byte, int) {
 	default:
 		//p.Push0()
 
-		len := rand.Intn(255)
+		length := rand.Intn(255)
 		p.Push(oneOf(
 			asBig("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"),
 			asBig("0x1000000000000000000000000000000000000000000000000000000000000000"),
-			big.NewInt(int64(len)),
-			big.NewInt(int64(len-1)),
-			big.NewInt(int64(len+1)),
+			big.NewInt(int64(length)),
+			big.NewInt(int64(length-1)),
+			big.NewInt(int64(length+1)),
 		))
-		dests := make([]uint16, len)
-		if len > 0 && rand.Intn(4) != 0 {
-			dests[len-1] = uint16(0x10000 - 2*len - 2)
+		dests := make([]uint16, length)
+		if length > 0 && rand.Intn(4) != 0 {
+			dests[length-1] = uint16(0x10000 - 2*length - 2)
 		}
 		p.RJumpV(dests)
 		// we push one and pop one

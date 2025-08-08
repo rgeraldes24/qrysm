@@ -45,7 +45,7 @@ func (*bn256MulCaller) call(p *program.Program, f *filler.Filler) error {
 	// 32 bytes scalar
 	bytes := make([]byte, 32)
 	copy(bytes, scalar.Bytes())
-	p.Mstore(bytes[:], 64)
+	p.Mstore(bytes, 64)
 	CallRandomizer(p, f, c)
 	return nil
 }

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the goevmlab library. If not, see <http://www.gnu.org/licenses/>.
 
-package evms
+package qrvms
 
 import (
 	"bufio"
@@ -30,34 +30,34 @@ import (
 	"github.com/theQRL/go-zond/qrl/tracers/logger"
 )
 
-type EvmoneVM struct {
+type QrvmoneVM struct {
 	path string
 	name string
 
 	stats *VmStat
 }
 
-func NewEvmoneVM(path string, name string) *EvmoneVM {
-	return &EvmoneVM{
+func NewQrvmoneVM(path string, name string) *QrvmoneVM {
+	return &QrvmoneVM{
 		path:  path,
 		name:  name,
 		stats: &VmStat{},
 	}
 }
 
-func (evm *EvmoneVM) Instance(int) Evm {
-	return evm
+func (qrvm *QrvmoneVM) Instance(int) Qrvm {
+	return qrvm
 }
 
-func (evm *EvmoneVM) Name() string {
-	return fmt.Sprintf("evmone-%s", evm.name)
+func (qrvm *QrvmoneVM) Name() string {
+	return fmt.Sprintf("qrvmone-%s", qrvm.name)
 }
 
-func (evm *EvmoneVM) GetStateRoot(path string) (root, command string, err error) {
-	cmd := exec.Command(evm.path, "--trace-summary", path)
+func (qrvm *QrvmoneVM) GetStateRoot(path string) (root, command string, err error) {
+	cmd := exec.Command(qrvm.path, "--trace-summary", path)
 	data, err := StdErrOutput(cmd)
 
-	// In case of root hash mismatch evmone exists with 1. Ignore this.
+	// In case of root hash mismatch qrvmone exists with 1. Ignore this.
 	if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 1 {
 		err = nil
 	}
@@ -65,26 +65,26 @@ func (evm *EvmoneVM) GetStateRoot(path string) (root, command string, err error)
 		return "", cmd.String(), err
 	}
 
-	root, err = evm.ParseStateRoot(data)
+	root, err = qrvm.ParseStateRoot(data)
 	if err != nil {
-		log.Error("Failed to find stateroot", "vm", evm.Name(), "cmd", cmd.String())
+		log.Error("Failed to find stateroot", "vm", qrvm.Name(), "cmd", cmd.String())
 		return "", cmd.String(), err
 	}
 	return root, cmd.String(), nil
 }
 
-func (evm *EvmoneVM) ParseStateRoot(data []byte) (root string, err error) {
+func (qrvm *QrvmoneVM) ParseStateRoot(data []byte) (root string, err error) {
 	pattern := []byte(`"stateRoot":"`)
 	idx := bytes.Index(data, pattern)
 	start := idx + len(pattern)
 	end := start + 32*2 + 2
 	if idx == -1 || end >= len(data) {
-		return "", fmt.Errorf("%v: no stateroot found", evm.Name())
+		return "", fmt.Errorf("%v: no stateroot found", qrvm.Name())
 	}
 	return string(data[start:end]), nil
 }
 
-func (evm *EvmoneVM) RunStateTest(path string, out io.Writer, speedTest bool) (*tracingResult, error) {
+func (qrvm *QrvmoneVM) RunStateTest(path string, out io.Writer, speedTest bool) (*tracingResult, error) {
 	var (
 		t0     = time.Now()
 		stderr io.ReadCloser
@@ -92,7 +92,7 @@ func (evm *EvmoneVM) RunStateTest(path string, out io.Writer, speedTest bool) (*
 		cmd    *exec.Cmd
 	)
 
-	cmd = exec.Command(evm.path, "--trace", path)
+	cmd = exec.Command(qrvm.path, "--trace", path)
 
 	if stderr, err = cmd.StderrPipe(); err != nil {
 		return nil, err
@@ -101,11 +101,11 @@ func (evm *EvmoneVM) RunStateTest(path string, out io.Writer, speedTest bool) (*
 		return nil, err
 	}
 
-	evm.Copy(out, stderr)
+	qrvm.Copy(out, stderr)
 	err = cmd.Wait()
-	duration, slow := evm.stats.TraceDone(t0)
+	duration, slow := qrvm.stats.TraceDone(t0)
 
-	// In case of root hash mismatch evmone exists with 1. Ignore this.
+	// In case of root hash mismatch qrvmone exists with 1. Ignore this.
 	if exitErr, ok := err.(*exec.ExitError); ok && exitErr.ExitCode() == 1 {
 		err = nil
 	}
@@ -117,10 +117,10 @@ func (evm *EvmoneVM) RunStateTest(path string, out io.Writer, speedTest bool) (*
 	}, err
 }
 
-func (vm *EvmoneVM) Close() {
+func (vm *QrvmoneVM) Close() {
 }
 
-func (evm *EvmoneVM) Copy(out io.Writer, input io.Reader) {
+func (qrvm *QrvmoneVM) Copy(out io.Writer, input io.Reader) {
 	buf := bufferPool.Get().([]byte)
 	//lint:ignore SA6002: argument should be pointer-like to avoid allocations.
 	defer bufferPool.Put(buf)
@@ -144,7 +144,7 @@ func (evm *EvmoneVM) Copy(out io.Writer, input io.Reader) {
 		}
 		var elem logger.StructLog
 		if err := json.Unmarshal(data, &elem); err != nil {
-			fmt.Printf("evmone err: %v, line\n\t%v\n", err, string(data))
+			fmt.Printf("qrvmone err: %v, line\n\t%v\n", err, string(data))
 			continue
 		}
 
@@ -164,6 +164,6 @@ func (evm *EvmoneVM) Copy(out io.Writer, input io.Reader) {
 	}
 }
 
-func (evm *EvmoneVM) Stats() []any {
-	return evm.stats.Stats()
+func (qrvm *QrvmoneVM) Stats() []any {
+	return qrvm.stats.Stats()
 }

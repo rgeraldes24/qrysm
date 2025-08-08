@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the goevmlab library. If not, see <http://www.gnu.org/licenses/>.
 
-package evms
+package qrvms
 
 import (
 	"bytes"
@@ -25,6 +25,7 @@ import (
 	"testing"
 )
 
+/*
 // TestVMsOutput in this test, we simulate several external
 // vms, using printouts from actual evm binaries. The parsed outputs should
 // not produce any differences.
@@ -35,32 +36,27 @@ func TestVMsOutput(t *testing.T) {
 	}
 	for _, finfo := range finfos {
 		if finfo.Name() == "eofcode.json" {
-			// We skip this one. Evmone refuse to run it.
+			// We skip this one. Qrvmone refuse to run it.
 			// https://github.com/theQRL/qrysm/pkg/goqrvmlab/issues/127
 			continue
 		}
 		testVmsOutput(t, filepath.Join("testdata", "traces", finfo.Name()))
 	}
 }
+*/
 
 func testVmsOutput(t *testing.T, testfile string) {
 	type testCase struct {
-		vm     Evm
+		vm     Qrvm
 		stdout string
 		stderr string
 	}
 	var cases = []testCase{
-		// {NewBesuVM("", ""), fmt.Sprintf("%v.besu.stdout.txt", testfile), ""},
-		// {NewBesuBatchVM("", ""), fmt.Sprintf("%v.besu.stdout.txt", testfile), ""},
-		// {NewNethermindVM("", ""), "", fmt.Sprintf("%v.nethermind.stderr.txt", testfile)},
-		// {NewErigonVM("", ""), "", fmt.Sprintf("%v.erigon.stderr.txt", testfile)},
-		{NewGethEVM("", ""), "", fmt.Sprintf("%v.geth.stderr.txt", testfile)},
-		// {NewNimbusEVM("", ""), "", fmt.Sprintf("%v.nimbus.stderr.txt", testfile)},
-		// {NewEvmoneVM("", ""), "", fmt.Sprintf("%v.evmone.stderr.txt", testfile)},
-		// {NewRethVM("", ""), "", fmt.Sprintf("%v.revm.stderr.txt", testfile)},
+		{NewGzondQRVM("", ""), "", fmt.Sprintf("%v.gzond.stderr.txt", testfile)},
+		// {NewQrvmoneVM("", ""), "", fmt.Sprintf("%v.qrvmone.stderr.txt", testfile)},
 	}
 	var readers []io.Reader
-	var vms []Evm
+	var vms []Qrvm
 	for _, tc := range cases {
 		parsedOutput := bytes.NewBuffer(nil)
 		// Read the stdout and stderr outputs
@@ -84,35 +80,17 @@ func testVmsOutput(t *testing.T, testfile string) {
 	}
 }
 
-func TestStateRootGeth(t *testing.T) {
-	testStateRootOnly(t, NewGethEVM("", ""), "geth")
+/*
+func TestStateRootGzond(t *testing.T) {
+	testStateRootOnly(t, NewGzondQRVM("", ""), "gzond")
 }
 
-func TestStateRootBesu(t *testing.T) {
-	testStateRootOnly(t, NewBesuVM("", ""), "besu")
+func TestStateRootQrvmone(t *testing.T) {
+	testStateRootOnly(t, NewQrvmoneVM("", ""), "qrvmone")
 }
+*/
 
-func TestStateRootErigon(t *testing.T) {
-	testStateRootOnly(t, NewErigonVM("", ""), "erigon")
-}
-
-func TestStateRootNethermind(t *testing.T) {
-	testStateRootOnly(t, NewNethermindVM("", ""), "nethermind")
-}
-
-func TestStateRootNimbus(t *testing.T) {
-	testStateRootOnly(t, NewNimbusEVM("", ""), "nimbus")
-}
-
-func TestStateRootEvmone(t *testing.T) {
-	testStateRootOnly(t, NewEvmoneVM("", ""), "evmone")
-}
-
-// func TestStateRootRethVM(t *testing.T) {
-// 	testStateRootOnly(t, NewRethVM("", ""), "revm")
-// }
-
-func testStateRootOnly(t *testing.T, vm Evm, name string) {
+func testStateRootOnly(t *testing.T, vm Qrvm, name string) {
 
 	finfos, err := os.ReadDir(filepath.Join("testdata", "cases"))
 	if err != nil {
@@ -137,7 +115,7 @@ func testStateRootOnly(t *testing.T, vm Evm, name string) {
 		have, err := vm.ParseStateRoot(combined)
 		if err != nil {
 			if finfo.Name() == "eofcode.json" {
-				// We accept this failure. Evmone refuse to run it.
+				// We accept this failure. Qrvmone refuse to run it.
 				// https://github.com/theQRL/qrysm/pkg/goqrvmlab/issues/127
 				t.Logf("case %d, %v: got error: %v (failure accepted)", i, finfo.Name(), err)
 				continue

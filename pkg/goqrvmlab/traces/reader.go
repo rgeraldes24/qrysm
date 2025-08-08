@@ -295,9 +295,7 @@ func readJson(data []byte) (*Traces, error) {
 	// 'result', but not the full RPC response
 	err := json.Unmarshal(data, &traceData.Result)
 	if err != nil {
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
 	}
 	if traceData.Result.Logs == nil {
 		// Attempt two: read into traceTxRPCResponse, in case

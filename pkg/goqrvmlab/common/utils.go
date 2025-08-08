@@ -42,56 +42,24 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/go-zond/core"
 	"github.com/theQRL/go-zond/log"
-	"github.com/theQRL/qrysm/pkg/goqrvmlab/evms"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/fuzzing"
+	"github.com/theQRL/qrysm/pkg/goqrvmlab/qrvms"
 	"github.com/theQRL/qrysm/pkg/goqrvmlab/utils"
 	"github.com/urfave/cli/v2"
 )
 
 var (
-	GethFlag = &cli.StringSliceFlag{
-		Name:  "geth",
-		Usage: "Location of go-ethereum 'evm' binary",
+	GzondFlag = &cli.StringSliceFlag{
+		Name:  "gzond",
+		Usage: "Location of go-zond 'qrvm' binary",
 	}
-	GethBatchFlag = &cli.StringSliceFlag{
-		Name:  "gethbatch",
-		Usage: "Location of go-ethereum 'evm' binary",
+	GzondBatchFlag = &cli.StringSliceFlag{
+		Name:  "gzondbatch",
+		Usage: "Location of go-zond 'qrvm' binary",
 	}
-	NethermindFlag = &cli.StringSliceFlag{
-		Name:  "nethermind",
-		Usage: "Location of nethermind 'nethtest' binary",
-	}
-	NethBatchFlag = &cli.StringSliceFlag{
-		Name:  "nethbatch",
-		Usage: "Location of nethermind 'nethtest' binary",
-	}
-	BesuFlag = &cli.StringSliceFlag{
-		Name:  "besu",
-		Usage: "Location of besu vm binary",
-	}
-	BesuBatchFlag = &cli.StringSliceFlag{
-		Name:  "besubatch",
-		Usage: "Location of besu vm binary",
-	}
-	ErigonFlag = &cli.StringSliceFlag{
-		Name:  "erigon",
-		Usage: "Location of erigon 'evm' binary",
-	}
-	ErigonBatchFlag = &cli.StringSliceFlag{
-		Name:  "erigonbatch",
-		Usage: "Location of erigon 'evm' binary",
-	}
-	NimbusFlag = &cli.StringSliceFlag{
-		Name:  "nimbus",
-		Usage: "Location of nimbus 'evmstate' binary",
-	}
-	EvmoneFlag = &cli.StringSliceFlag{
-		Name:  "evmone",
-		Usage: "Location of evmone 'evmone' binary",
-	}
-	RethFlag = &cli.StringSliceFlag{
-		Name:  "revme",
-		Usage: "Location of reth 'revme' binary",
+	QrvmoneFlag = &cli.StringSliceFlag{
+		Name:  "qrvmone",
+		Usage: "Location of qrvmone 'qrvmone' binary",
 	}
 	ThreadFlag = &cli.IntFlag{
 		Name:  "parallel",
@@ -119,75 +87,36 @@ var (
 	}
 	SkipTraceFlag = &cli.BoolFlag{
 		Name: "skiptrace",
-		Usage: "If 'skiptrace' is set to true, then the evms will execute _without_ tracing, and only the final stateroot will be compared after execution.\n" +
+		Usage: "If 'skiptrace' is set to true, then the qrvms will execute _without_ tracing, and only the final stateroot will be compared after execution.\n" +
 			"This mode is faster, and can be used even if the clients-under-test has known errors in the trace-output, \n" +
 			"but has a very high chance of missing cases which could be exploitable.",
 	}
 	VmFlags = []cli.Flag{
-		GethFlag,
-		GethBatchFlag,
-		NethermindFlag,
-		NethBatchFlag,
-		BesuFlag,
-		BesuBatchFlag,
-		ErigonFlag,
-		ErigonBatchFlag,
-		NimbusFlag,
-		EvmoneFlag,
-		RethFlag,
+		GzondFlag,
+		GzondBatchFlag,
+		QrvmoneFlag,
 	}
 	traceLengthSA = utils.NewSlidingAverage()
 )
 
-func initVMs(c *cli.Context) []evms.Evm {
+func initVMs(c *cli.Context) []qrvms.Qrvm {
 	var (
-		gethBins        = c.StringSlice(GethFlag.Name)
-		gethBatchBins   = c.StringSlice(GethBatchFlag.Name)
-		nethBins        = c.StringSlice(NethermindFlag.Name)
-		nethBatchBins   = c.StringSlice(NethBatchFlag.Name)
-		besuBins        = c.StringSlice(BesuFlag.Name)
-		besuBatchBins   = c.StringSlice(BesuBatchFlag.Name)
-		erigonBins      = c.StringSlice(ErigonFlag.Name)
-		erigonBatchBins = c.StringSlice(ErigonBatchFlag.Name)
-		nimBins         = c.StringSlice(NimbusFlag.Name)
-		evmoneBins      = c.StringSlice(EvmoneFlag.Name)
-		// revmBins        = c.StringSlice(RethFlag.Name)
+		gzondBins      = c.StringSlice(GzondFlag.Name)
+		gzondBatchBins = c.StringSlice(GzondBatchFlag.Name)
+		qrvmoneBins    = c.StringSlice(QrvmoneFlag.Name)
 
-		vms []evms.Evm
+		vms []qrvms.Qrvm
 	)
-	for i, bin := range gethBins {
-		vms = append(vms, evms.NewGethEVM(bin, fmt.Sprintf("geth-%d", i)))
+	for i, bin := range gzondBins {
+		vms = append(vms, qrvms.NewGzondQRVM(bin, fmt.Sprintf("gzond-%d", i)))
 	}
-	for i, bin := range gethBatchBins {
-		vms = append(vms, evms.NewGethBatchVM(bin, fmt.Sprintf("gethbatch-%d", i)))
+	for i, bin := range gzondBatchBins {
+		vms = append(vms, qrvms.NewGzondBatchVM(bin, fmt.Sprintf("gzondbatch-%d", i)))
 	}
-	for i, bin := range nethBins {
-		vms = append(vms, evms.NewNethermindVM(bin, fmt.Sprintf("nethermind-%d", i)))
+	for i, bin := range qrvmoneBins {
+		vms = append(vms, qrvms.NewQrvmoneVM(bin, fmt.Sprintf("%d", i)))
 	}
-	for i, bin := range nethBatchBins {
-		vms = append(vms, evms.NewNethermindBatchVM(bin, fmt.Sprintf("nethbatch-%d", i)))
-	}
-	for i, bin := range besuBins {
-		vms = append(vms, evms.NewBesuVM(bin, fmt.Sprintf("besu-%d", i)))
-	}
-	for i, bin := range besuBatchBins {
-		vms = append(vms, evms.NewBesuBatchVM(bin, fmt.Sprintf("besubatch-%d", i)))
-	}
-	for i, bin := range erigonBins {
-		vms = append(vms, evms.NewErigonVM(bin, fmt.Sprintf("erigon-%d", i)))
-	}
-	for i, bin := range erigonBatchBins {
-		vms = append(vms, evms.NewErigonBatchVM(bin, fmt.Sprintf("erigonbatch-%d", i)))
-	}
-	for i, bin := range nimBins {
-		vms = append(vms, evms.NewNimbusEVM(bin, fmt.Sprintf("nimbus-%d", i)))
-	}
-	for i, bin := range evmoneBins {
-		vms = append(vms, evms.NewEvmoneVM(bin, fmt.Sprintf("%d", i)))
-	}
-	// for i, bin := range revmBins {
-	// 	vms = append(vms, evms.NewRethVM(bin, fmt.Sprintf("%d", i)))
-	// }
+
 	return vms
 
 }
@@ -206,7 +135,7 @@ func RootsEqual(path string, c *cli.Context) (bool, error) {
 	}
 	wg.Add(len(vms))
 	for i, vm := range vms {
-		go func(index int, vm evms.Evm) {
+		go func(index int, vm qrvms.Qrvm) {
 			root, _, err := vm.GetStateRoot(path)
 			roots[index] = root
 			errs[index] = err
@@ -244,8 +173,8 @@ func RunSingleTest(path string, c *cli.Context) (bool, error) {
 		return true, fmt.Errorf("No vms specified!")
 	}
 	// Open/create outputs for writing
-	for _, evm := range vms {
-		out, err := os.OpenFile(fmt.Sprintf("./%v-output.jsonl", evm.Name()), os.O_TRUNC|os.O_CREATE|os.O_RDWR, 0755)
+	for _, qrvm := range vms {
+		out, err := os.OpenFile(fmt.Sprintf("./%v-output.jsonl", qrvm.Name()), os.O_TRUNC|os.O_CREATE|os.O_RDWR, 0755)
 		if err != nil {
 			return true, fmt.Errorf("failed opening file %v", err)
 		}
@@ -261,10 +190,10 @@ func RunSingleTest(path string, c *cli.Context) (bool, error) {
 	wg.Add(len(vms))
 	var commands = make([]string, len(vms))
 	for i, vm := range vms {
-		go func(evm evms.Evm, i int) {
+		go func(qrvm qrvms.Qrvm, i int) {
 			defer wg.Done()
 			bufout := bufio.NewWriter(outputs[i])
-			res, err := evm.RunStateTest(path, bufout, false)
+			res, err := qrvm.RunStateTest(path, bufout, false)
 			bufout.Flush()
 			if res != nil {
 				commands[i] = res.Cmd
@@ -273,7 +202,7 @@ func RunSingleTest(path string, c *cli.Context) (bool, error) {
 				log.Error("Error running test", "err", err)
 				return
 			}
-			log.Debug("Test done", "evm", evm.Name(), "time", res.ExecTime)
+			log.Debug("Test done", "qrvm", qrvm.Name(), "time", res.ExecTime)
 		}(vm, i)
 	}
 	wg.Wait()
@@ -284,7 +213,7 @@ func RunSingleTest(path string, c *cli.Context) (bool, error) {
 		readers = append(readers, f)
 	}
 	// Compare outputs
-	if eq, _ := evms.CompareFiles(vms, readers); !eq {
+	if eq, _ := qrvms.CompareFiles(vms, readers); !eq {
 		out := new(strings.Builder)
 		fmt.Fprintf(out, "Consensus error\n")
 		fmt.Fprintf(out, "Testcase: %v\n", path)
@@ -322,11 +251,11 @@ func TestSpeed(dir string, c *cli.Context) error {
 			return err
 		}
 		// Run the binaries sequentially
-		for _, evm := range vms {
-			log.Debug("Starting test", "evm", evm.Name(), "file", path)
-			res, err := evm.RunStateTest(path, io.Discard, true)
+		for _, qrvm := range vms {
+			log.Debug("Starting test", "qrvm", qrvm.Name(), "file", path)
+			res, err := qrvm.RunStateTest(path, io.Discard, true)
 			if err != nil {
-				log.Error("Error starting vm", "vm", evm.Name(), "err", err)
+				log.Error("Error starting vm", "vm", qrvm.Name(), "err", err)
 				return err
 			}
 			logger := log.Debug
@@ -335,7 +264,7 @@ func TestSpeed(dir string, c *cli.Context) error {
 			} else if res.ExecTime > infoThreshold {
 				logger = log.Info
 			}
-			logger("Execution speed", "evm", evm.Name(), "file", path,
+			logger("Execution speed", "qrvm", qrvm.Name(), "file", path,
 				"time", res.ExecTime, "cmd", res.Cmd)
 
 		}
@@ -504,7 +433,7 @@ type testMeta struct {
 	testCh      chan string
 	consensusCh chan string
 	wg          sync.WaitGroup
-	vms         []evms.Evm
+	vms         []qrvms.Qrvm
 	numTests    atomic.Uint64
 
 	deleteFilesWhenDone bool
@@ -586,21 +515,21 @@ func (l *lineCountingHasher) Reset() {
 	l.lines = 0
 }
 
-func (meta *testMeta) vmLoop(evm evms.Evm, taskCh, resultCh chan *task) {
+func (meta *testMeta) vmLoop(qrvm qrvms.Qrvm, taskCh, resultCh chan *task) {
 	defer meta.wg.Done()
 	var hasher = newLineCountingHasher()
 	for t := range taskCh {
 		hasher.Reset()
-		res, err := evm.RunStateTest(t.file, hasher, t.skipTrace)
+		res, err := qrvm.RunStateTest(t.file, hasher, t.skipTrace)
 		if err != nil {
-			log.Error("Error starting vm", "err", err, "evm", evm.Name())
-			t.err = fmt.Errorf("error starting vm %v: %w", evm.Name(), err)
+			log.Error("Error starting vm", "err", err, "qrvm", qrvm.Name())
+			t.err = fmt.Errorf("error starting vm %v: %w", qrvm.Name(), err)
 			// Send back
 			resultCh <- t
 			continue
 		}
 		if res.Slow {
-			log.Warn("Slow test found", "evm", evm.Name(), "time", res.ExecTime, "cmd", res.Cmd, "file", t.file)
+			log.Warn("Slow test found", "qrvm", qrvm.Name(), "time", res.ExecTime, "cmd", res.Cmd, "file", t.file)
 		}
 		t.slow = res.Slow
 		t.result = hasher.h.Sum(nil)
@@ -640,26 +569,26 @@ func (meta *testMeta) handleConsensusFlaw(testfile string) {
 	fmt.Fprintf(os.Stdout, "Consensus error\n")
 	fmt.Fprintf(os.Stdout, "Testcase: %v\n", testfile)
 	var readers []io.Reader
-	for _, evm := range meta.vms {
-		filename := fmt.Sprintf("./%v-output.jsonl", evm.Name())
+	for _, qrvm := range meta.vms {
+		filename := fmt.Sprintf("./%v-output.jsonl", qrvm.Name())
 		out, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR, 0755)
 		if err != nil {
 			log.Error("Failed opening file", "err", err)
 			panic(err)
 		}
-		res, err := evm.RunStateTest(testfile, out, false)
+		res, err := qrvm.RunStateTest(testfile, out, false)
 		if err != nil {
 			log.Error("Failed running vm", "err", err)
 			panic(err)
 		}
-		fmt.Fprintf(os.Stdout, "- %v: %v\n", evm.Name(), filename)
+		fmt.Fprintf(os.Stdout, "- %v: %v\n", qrvm.Name(), filename)
 		fmt.Fprintf(os.Stdout, "  - command: %v\n", res.Cmd)
 		_ = out.Sync()
 		_, _ = out.Seek(0, 0)
 		readers = append(readers, out)
 	}
 	// Compare outputs (and show diff)
-	evms.CompareFiles(meta.vms, readers)
+	qrvms.CompareFiles(meta.vms, readers)
 	for _, f := range readers {
 		f.(*os.File).Close()
 	}

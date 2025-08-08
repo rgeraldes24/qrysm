@@ -112,9 +112,9 @@ func (*returnGenerator) Execute(env Environment) {
 	// Returns with offset, len
 	var (
 		offset = uint32(env.f.MemInt().Uint64())
-		len    = uint32(env.f.MemInt().Uint64())
+		length = uint32(env.f.MemInt().Uint64())
 	)
-	env.p.Return(offset, len)
+	env.p.Return(offset, length)
 }
 
 func (*returnGenerator) Importance() int {

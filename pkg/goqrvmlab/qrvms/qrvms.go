@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the goevmlab library. If not, see <http://www.gnu.org/licenses/>.
 
-package evms
+package qrvms
 
 import (
 	"bufio"
@@ -24,10 +24,10 @@ import (
 	"sync"
 )
 
-// The Evm interface represents external EVM implementations, which can
+// The Qrvm interface represents external QRVM implementations, which can
 // be e.g. docker instances or binaries
-type Evm interface {
-	// RunStateTest runs the statetest on the underlying EVM, and writes
+type Qrvm interface {
+	// RunStateTest runs the statetest on the underlying QRVM, and writes
 	// the output to the given writer
 	RunStateTest(path string, writer io.Writer, skipTrace bool) (*tracingResult, error)
 	// GetStateRoot runs the test and returns the stateroot
@@ -42,11 +42,11 @@ type Evm interface {
 	Name() string
 	Stats() []any
 
-	// Instance delivers an instance of the EVM which will be executed per-thread.
+	// Instance delivers an instance of the QRVM which will be executed per-thread.
 	// This method may deliver the same instance each time, but it may also
 	// deliver e.g. a unique version which has preallocated buffers. Such an instance
 	// is not concurrency-safe, but is fine to deliver in this method.
-	Instance(threadId int) Evm
+	Instance(threadId int) Qrvm
 }
 
 type stateRoot struct {
@@ -55,7 +55,7 @@ type stateRoot struct {
 
 // CompareFiles returns true if the files are equal, along with the number of line s
 // compared
-func CompareFiles(vms []Evm, readers []io.Reader) (bool, int) {
+func CompareFiles(vms []Qrvm, readers []io.Reader) (bool, int) {
 	var scanners []*bufio.Scanner
 	for _, r := range readers {
 		scanner := bufio.NewScanner(r)
