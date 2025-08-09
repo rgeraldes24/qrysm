@@ -94,10 +94,10 @@ func TestInvertExecutionMetrics(t *testing.T) {
 	}
 }
 
-func TestFalseBeaconSynced(t *testing.T) {
+func TestFalseConsensusSynced(t *testing.T) {
 	bnScraper := beaconNodeScraper{}
-	beaconNotSynced := strings.Replace(prometheusTestBody, "beacon_head_slot 256552", "beacon_head_slot 256559", 1)
-	bnScraper.tripper = &mockRT{body: beaconNotSynced}
+	consensusNotSynced := strings.Replace(prometheusTestBody, "beacon_head_slot 256552", "beacon_head_slot 256559", 1)
+	bnScraper.tripper = &mockRT{body: consensusNotSynced}
 	r, err := bnScraper.Scrape()
 	require.NoError(t, err, "Unexpected error calling beaconNodeScraper.Scrape")
 
