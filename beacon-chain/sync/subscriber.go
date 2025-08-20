@@ -26,7 +26,7 @@ import (
 	"github.com/theQRL/qrysm/container/slice"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	"github.com/theQRL/qrysm/network/forks"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/messagehandler"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
@@ -442,7 +442,7 @@ func (s *Service) subscribeAggregatorSubnet(
 ) {
 	// do not subscribe if we have no peers in the same
 	// subnet
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(&zondpb.Attestation{})]
+	topic := p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.Attestation{})]
 	subnetTopic := fmt.Sprintf(topic, digest, idx)
 	// check if subscription exists and if not subscribe the relevant subnet.
 	if _, exists := subscriptions[idx]; !exists {
@@ -468,7 +468,7 @@ func (s *Service) subscribeSyncSubnet(
 ) {
 	// do not subscribe if we have no peers in the same
 	// subnet
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(&zondpb.SyncCommitteeMessage{})]
+	topic := p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.SyncCommitteeMessage{})]
 	subnetTopic := fmt.Sprintf(topic, digest, idx)
 	// check if subscription exists and if not subscribe the relevant subnet.
 	if _, exists := subscriptions[idx]; !exists {
@@ -601,7 +601,7 @@ func (s *Service) subscribeDynamicWithSyncSubnets(
 
 // lookup peers for attester specific subnets.
 func (s *Service) lookupAttesterSubnets(digest [4]byte, idx uint64) {
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(&zondpb.Attestation{})]
+	topic := p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.Attestation{})]
 	subnetTopic := fmt.Sprintf(topic, digest, idx)
 	if !s.validPeersExist(subnetTopic) {
 		log.Debugf("No peers found subscribed to attestation gossip subnet with "+
@@ -665,7 +665,7 @@ func (s *Service) filterNeededPeers(pids []peer.ID) []peer.ID {
 	currSlot := s.cfg.clock.CurrentSlot()
 	wantedSubs := s.retrievePersistentSubs(currSlot)
 	wantedSubs = slice.SetUint64(append(wantedSubs, s.attesterSubnetIndices(currSlot)...))
-	topic := p2p.GossipTypeMapping[reflect.TypeOf(&zondpb.Attestation{})]
+	topic := p2p.GossipTypeMapping[reflect.TypeOf(&qrysmpb.Attestation{})]
 
 	// Map of peers in subnets
 	peerMap := make(map[peer.ID]bool)

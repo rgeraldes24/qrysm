@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -20,7 +20,7 @@ func TestRandaoMix_OK(t *testing.T) {
 		binary.LittleEndian.PutUint64(intInBytes, uint64(i))
 		randaoMixes[i] = intInBytes
 	}
-	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{RandaoMixes: randaoMixes})
+	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{RandaoMixes: randaoMixes})
 	require.NoError(t, err)
 	tests := []struct {
 		epoch     primitives.Epoch
@@ -54,7 +54,7 @@ func TestRandaoMix_CopyOK(t *testing.T) {
 		binary.LittleEndian.PutUint64(intInBytes, uint64(i))
 		randaoMixes[i] = intInBytes
 	}
-	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{RandaoMixes: randaoMixes})
+	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{RandaoMixes: randaoMixes})
 	require.NoError(t, err)
 	tests := []struct {
 		epoch     primitives.Epoch
@@ -95,7 +95,7 @@ func TestGenerateSeed_OK(t *testing.T) {
 		randaoMixes[i] = intInBytes
 	}
 	slot := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().MinSeedLookahead * 10))
-	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		RandaoMixes: randaoMixes,
 		Slot:        slot,
 	})

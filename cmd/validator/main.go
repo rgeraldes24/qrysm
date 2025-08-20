@@ -1,4 +1,4 @@
-// Package main defines a validator client, a critical actor in Zond which manages
+// Package main defines a validator client, a critical actor in QRL which manages
 // a keystore of private keys, connects to a beacon node to receive assignments,
 // and submits blocks/attestations as needed.
 package main
@@ -6,7 +6,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	runtimeDebug "runtime/debug"
 
 	joonix "github.com/joonix/log"
@@ -18,7 +17,6 @@ import (
 	slashingprotectioncommands "github.com/theQRL/qrysm/cmd/validator/slashing-protection"
 	walletcommands "github.com/theQRL/qrysm/cmd/validator/wallet"
 	"github.com/theQRL/qrysm/config/features"
-	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/io/logs"
 	"github.com/theQRL/qrysm/monitoring/journald"
 	"github.com/theQRL/qrysm/runtime/debug"
@@ -116,7 +114,7 @@ func init() {
 func main() {
 	app := cli.App{}
 	app.Name = "validator"
-	app.Usage = `launches an Zond validator client that interacts with a beacon chain, starts proposer and attester services, p2p connections, and more`
+	app.Usage = `launches a QRL validator client that interacts with a beacon chain, starts proposer and attester services, p2p connections, and more`
 	app.Version = version.Version()
 	app.Action = func(ctx *cli.Context) error {
 		if err := startNode(ctx); err != nil {
@@ -170,13 +168,6 @@ func main() {
 			if err := logs.ConfigurePersistentLogging(logFileName); err != nil {
 				log.WithError(err).Error("Failed to configuring logging to disk.")
 			}
-		}
-
-		// Fix data dir for Windows users.
-		outdatedDataDir := filepath.Join(file.HomeDir(), "AppData", "Roaming", "ZondValidators")
-		currentDataDir := flags.DefaultValidatorDir()
-		if err := cmd.FixDefaultDataDir(outdatedDataDir, currentDataDir); err != nil {
-			log.WithError(err).Error("Cannot update data directory")
 		}
 
 		if err := debug.Setup(ctx); err != nil {

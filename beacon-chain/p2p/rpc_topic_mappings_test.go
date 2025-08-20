@@ -46,7 +46,7 @@ func TestTopicDeconstructor(t *testing.T) {
 		{
 			name:          "malformed status topic",
 			topic:         protocolPrefix + "/statis" + SchemaVersionV1,
-			expectedError: "unable to find a valid message for /eth2/beacon_chain/req/statis/1",
+			expectedError: "unable to find a valid message for /consensus/beacon_chain/req/statis/1",
 			output:        []string{""},
 		},
 		{
@@ -58,7 +58,7 @@ func TestTopicDeconstructor(t *testing.T) {
 		{
 			name:          "beacon block by range topic with malformed version",
 			topic:         protocolPrefix + BeaconBlocksByRangeMessageName + "/v" + "/ssz_snappy",
-			expectedError: "unable to find a valid schema version for /eth2/beacon_chain/req/beacon_blocks_by_range/v/ssz_snappy",
+			expectedError: "unable to find a valid schema version for /consensus/beacon_chain/req/beacon_blocks_by_range/v/ssz_snappy",
 			output:        []string{""},
 		},
 	}

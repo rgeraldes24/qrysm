@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 type abstractProduceBlockResponseJson struct {
@@ -19,7 +19,7 @@ type abstractProduceBlockResponseJson struct {
 	Data    json.RawMessage `json:"data"`
 }
 
-func (c beaconApiValidatorClient) getBeaconBlock(ctx context.Context, slot primitives.Slot, randaoReveal []byte, graffiti []byte) (*zondpb.GenericBeaconBlock, error) {
+func (c beaconApiValidatorClient) getBeaconBlock(ctx context.Context, slot primitives.Slot, randaoReveal []byte, graffiti []byte) (*qrysmpb.GenericBeaconBlock, error) {
 	queryParams := neturl.Values{}
 	queryParams.Add("randao_reveal", hexutil.Encode(randaoReveal))
 
@@ -27,7 +27,7 @@ func (c beaconApiValidatorClient) getBeaconBlock(ctx context.Context, slot primi
 		queryParams.Add("graffiti", hexutil.Encode(graffiti))
 	}
 
-	queryUrl := buildURL(fmt.Sprintf("/zond/v1/validator/blocks/%d", slot), queryParams)
+	queryUrl := buildURL(fmt.Sprintf("/qrl/v1/validator/blocks/%d", slot), queryParams)
 
 	// Since we don't know yet what the json looks like, we unmarshal into an abstract structure that has only a version
 	// and a blob of data
@@ -40,7 +40,7 @@ func (c beaconApiValidatorClient) getBeaconBlock(ctx context.Context, slot primi
 	decoder := json.NewDecoder(bytes.NewReader(produceBlockResponseJson.Data))
 	decoder.DisallowUnknownFields()
 
-	response := &zondpb.GenericBeaconBlock{}
+	response := &qrysmpb.GenericBeaconBlock{}
 
 	switch produceBlockResponseJson.Version {
 	case "capella":
@@ -53,7 +53,7 @@ func (c beaconApiValidatorClient) getBeaconBlock(ctx context.Context, slot primi
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to get capella block")
 		}
-		response.Block = &zondpb.GenericBeaconBlock_Capella{
+		response.Block = &qrysmpb.GenericBeaconBlock_Capella{
 			Capella: capellaBlock,
 		}
 	default:

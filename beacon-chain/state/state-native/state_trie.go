@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/container/slice"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"go.opencensus.io/trace"
 	"google.golang.org/protobuf/proto"
@@ -32,9 +32,9 @@ var capellaFields = []types.FieldIndex{
 	types.BlockRoots,
 	types.StateRoots,
 	types.HistoricalRoots,
-	types.Eth1Data,
-	types.Eth1DataVotes,
-	types.Eth1DepositIndex,
+	types.ExecutionData,
+	types.ExecutionDataVotes,
+	types.ExecutionDepositIndex,
 	types.Validators,
 	types.Balances,
 	types.RandaoMixes,
@@ -60,13 +60,13 @@ const (
 )
 
 // InitializeFromProtoCapella the beacon state from a protobuf representation.
-func InitializeFromProtoCapella(st *zondpb.BeaconStateCapella) (state.BeaconState, error) {
-	return InitializeFromProtoUnsafeCapella(proto.Clone(st).(*zondpb.BeaconStateCapella))
+func InitializeFromProtoCapella(st *qrysmpb.BeaconStateCapella) (state.BeaconState, error) {
+	return InitializeFromProtoUnsafeCapella(proto.Clone(st).(*qrysmpb.BeaconStateCapella))
 }
 
 // InitializeFromProtoUnsafeCapella directly uses the beacon state protobuf fields
 // and sets them as fields of the BeaconState type.
-func InitializeFromProtoUnsafeCapella(st *zondpb.BeaconStateCapella) (state.BeaconState, error) {
+func InitializeFromProtoUnsafeCapella(st *qrysmpb.BeaconStateCapella) (state.BeaconState, error) {
 	if st == nil {
 		return nil, errors.New("received nil state")
 	}
@@ -85,9 +85,9 @@ func InitializeFromProtoUnsafeCapella(st *zondpb.BeaconStateCapella) (state.Beac
 		fork:                                st.Fork,
 		latestBlockHeader:                   st.LatestBlockHeader,
 		historicalRoots:                     hRoots,
-		eth1Data:                            st.Eth1Data,
-		eth1DataVotes:                       st.Eth1DataVotes,
-		eth1DepositIndex:                    st.Eth1DepositIndex,
+		executionData:                       st.ExecutionData,
+		executionDataVotes:                  st.ExecutionDataVotes,
+		executionDepositIndex:               st.ExecutionDepositIndex,
 		slashings:                           st.Slashings,
 		previousEpochParticipation:          st.PreviousEpochParticipation,
 		currentEpochParticipation:           st.CurrentEpochParticipation,
@@ -158,7 +158,7 @@ func InitializeFromProtoUnsafeCapella(st *zondpb.BeaconStateCapella) (state.Beac
 
 	// Initialize field reference tracking for shared data.
 	b.sharedFieldReferences[types.HistoricalRoots] = stateutil.NewRef(1)
-	b.sharedFieldReferences[types.Eth1DataVotes] = stateutil.NewRef(1)
+	b.sharedFieldReferences[types.ExecutionDataVotes] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.Slashings] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.PreviousEpochParticipationBits] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.CurrentEpochParticipationBits] = stateutil.NewRef(1)
@@ -196,7 +196,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 		// Primitive types, safe to copy.
 		genesisTime:                  b.genesisTime,
 		slot:                         b.slot,
-		eth1DepositIndex:             b.eth1DepositIndex,
+		executionDepositIndex:        b.executionDepositIndex,
 		nextWithdrawalIndex:          b.nextWithdrawalIndex,
 		nextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 
@@ -207,7 +207,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 		stateRootsMultiValue:  b.stateRootsMultiValue,
 		randaoMixes:           b.randaoMixes,
 		randaoMixesMultiValue: b.randaoMixesMultiValue,
-		eth1DataVotes:         b.eth1DataVotes,
+		executionDataVotes:    b.executionDataVotes,
 		slashings:             b.slashings,
 
 		// Large arrays, increases over time.
@@ -227,7 +227,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 		justificationBits:                   b.justificationBitsVal(),
 		fork:                                b.forkVal(),
 		latestBlockHeader:                   b.latestBlockHeaderVal(),
-		eth1Data:                            b.eth1DataVal(),
+		executionData:                       b.executionDataVal(),
 		previousJustifiedCheckpoint:         b.previousJustifiedCheckpointVal(),
 		currentJustifiedCheckpoint:          b.currentJustifiedCheckpointVal(),
 		finalizedCheckpoint:                 b.finalizedCheckpointVal(),
@@ -408,8 +408,8 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 		return b.genesisValidatorsRoot, nil
 	case types.Slot:
 		return ssz.Uint64Root(uint64(b.slot)), nil
-	case types.Eth1DepositIndex:
-		return ssz.Uint64Root(b.eth1DepositIndex), nil
+	case types.ExecutionDepositIndex:
+		return ssz.Uint64Root(b.executionDepositIndex), nil
 	case types.Fork:
 		return ssz.ForkRoot(b.fork)
 	case types.LatestBlockHeader:
@@ -424,14 +424,14 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 			hRoots[i] = b.historicalRoots[i][:]
 		}
 		return ssz.ByteArrayRootWithLimit(hRoots, fieldparams.HistoricalRootsLength)
-	case types.Eth1Data:
-		return stateutil.Eth1Root(b.eth1Data)
-	case types.Eth1DataVotes:
+	case types.ExecutionData:
+		return stateutil.ExecutionRoot(b.executionData)
+	case types.ExecutionDataVotes:
 		if b.rebuildTrie[field] {
 			err := b.resetFieldTrie(
 				field,
-				b.eth1DataVotes,
-				params.BeaconConfig().Eth1DataVotesLength(),
+				b.executionDataVotes,
+				params.BeaconConfig().ExecutionDataVotesLength(),
 			)
 			if err != nil {
 				return [32]byte{}, err
@@ -439,7 +439,7 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 			delete(b.rebuildTrie, field)
 			return b.stateFieldLeaves[field].TrieRoot()
 		}
-		return b.recomputeFieldTrie(field, b.eth1DataVotes)
+		return b.recomputeFieldTrie(field, b.executionDataVotes)
 	case types.Validators:
 		return b.validatorsRootSelector(field)
 	case types.Balances:

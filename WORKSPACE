@@ -315,23 +315,6 @@ http_archive(
 #     url = "https://github.com/ethereum/consensus-specs/archive/refs/tags/%s.tar.gz" % consensus_spec_version,
 # )
 
-# TODO(now.youtrack.cloud/issue/TQ-17)
-#http_archive(
-#    name = "zond_networks",
-#    build_file_content = """
-#filegroup(
-#    name = "configs",
-#    srcs = glob([
-#        "shared/**/config.yaml",
-#    ]),
-#    visibility = ["//visibility:public"],
-#)
-#    """,
-#    sha256 = "2701e1e1a3ec10c673fe7dbdbbe6f02c8ae8c922aebbf6e720d8c72d5458aafe",
-#    strip_prefix = "eth2-networks-7b4897888cebef23801540236f73123e21774954",
-#    url = "https://github.com/eth-clients/eth2-networks/archive/7b4897888cebef23801540236f73123e21774954.tar.gz",
-#)
-
 http_archive(
     name = "com_google_protobuf",
     sha256 = "9bd87b8280ef720d3240514f884e56a712f2218f0d693b48050c836028940a42",

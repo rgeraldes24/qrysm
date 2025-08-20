@@ -10,7 +10,7 @@ import (
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"google.golang.org/protobuf/proto"
 )
@@ -127,7 +127,7 @@ func copyBlockData(src interfaces.SignedBeaconBlock, dst interfaces.SignedBeacon
 	dst.SetParentRoot(parentRoot[:])
 	dst.SetStateRoot(stateRoot[:])
 	dst.SetRandaoReveal(randaoReveal[:])
-	dst.SetEth1Data(src.Block().Body().Eth1Data())
+	dst.SetExecutionData(src.Block().Body().ExecutionData())
 	dst.SetGraffiti(graffiti[:])
 	dst.SetProposerSlashings(src.Block().Body().ProposerSlashings())
 	dst.SetAttesterSlashings(src.Block().Body().AttesterSlashings())
@@ -148,9 +148,9 @@ func copyBlockData(src interfaces.SignedBeaconBlock, dst interfaces.SignedBeacon
 func (u *unblinder) blindedProtoBlock() (proto.Message, error) {
 	switch u.b.Version() {
 	case version.Capella:
-		return &zondpb.SignedBlindedBeaconBlockCapella{
-			Block: &zondpb.BlindedBeaconBlockCapella{
-				Body: &zondpb.BlindedBeaconBlockBodyCapella{},
+		return &qrysmpb.SignedBlindedBeaconBlockCapella{
+			Block: &qrysmpb.BlindedBeaconBlockCapella{
+				Body: &qrysmpb.BlindedBeaconBlockBodyCapella{},
 			},
 		}, nil
 	default:
@@ -161,9 +161,9 @@ func (u *unblinder) blindedProtoBlock() (proto.Message, error) {
 func (u *unblinder) protoBlock() (proto.Message, error) {
 	switch u.b.Version() {
 	case version.Capella:
-		return &zondpb.SignedBeaconBlockCapella{
-			Block: &zondpb.BeaconBlockCapella{
-				Body: &zondpb.BeaconBlockBodyCapella{},
+		return &qrysmpb.SignedBeaconBlockCapella{
+			Block: &qrysmpb.BeaconBlockCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{},
 			},
 		}, nil
 	default:

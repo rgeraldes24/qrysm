@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -34,12 +34,12 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 		bogusPeer := p2ptest.NewTestP2P(t)
 		p1.Connect(bogusPeer)
 
-		req := &zondpb.BeaconBlocksByRangeRequest{}
+		req := &qrysmpb.BeaconBlocksByRangeRequest{}
 		_, err := SendBeaconBlocksByRangeRequest(ctx, startup.NewClock(time.Now(), [32]byte{}), p1, bogusPeer.PeerID(), req, nil)
 		assert.ErrorContains(t, "protocols not supported", err)
 	})
 
-	knownBlocks := make([]*zondpb.SignedBeaconBlockCapella, 0)
+	knownBlocks := make([]*qrysmpb.SignedBeaconBlockCapella, 0)
 	genesisBlk := util.NewBeaconBlockCapella()
 	genesisBlkRoot, err := genesisBlk.Block.HashTreeRoot()
 	require.NoError(t, err)
@@ -59,7 +59,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 				assert.NoError(t, stream.Close())
 			}()
 
-			req := &zondpb.BeaconBlocksByRangeRequest{}
+			req := &qrysmpb.BeaconBlocksByRangeRequest{}
 			assert.NoError(t, p2pProvider.Encoding().DecodeWithMaxLength(stream, req))
 
 			for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step); i += primitives.Slot(req.Step) {
@@ -98,7 +98,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 		p1.Connect(p2)
 		p2.SetStreamHandler(pcl, knownBlocksProvider(p2, nil))
 
-		req := &zondpb.BeaconBlocksByRangeRequest{
+		req := &qrysmpb.BeaconBlocksByRangeRequest{
 			StartSlot: 20,
 			Count:     128,
 			Step:      1,
@@ -115,7 +115,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 		p2.SetStreamHandler(pcl, knownBlocksProvider(p2, nil))
 
 		// No error from block processor.
-		req := &zondpb.BeaconBlocksByRangeRequest{
+		req := &qrysmpb.BeaconBlocksByRangeRequest{
 			StartSlot: 20,
 			Count:     128,
 			Step:      1,
@@ -137,7 +137,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 		p2.SetStreamHandler(pcl, knownBlocksProvider(p2, nil))
 
 		// Send error from block processor.
-		req := &zondpb.BeaconBlocksByRangeRequest{
+		req := &qrysmpb.BeaconBlocksByRangeRequest{
 			StartSlot: 20,
 			Count:     128,
 			Step:      1,
@@ -156,7 +156,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 		p2.SetStreamHandler(pcl, knownBlocksProvider(p2, nil))
 
 		// No cap on max roots.
-		req := &zondpb.BeaconBlocksByRangeRequest{
+		req := &qrysmpb.BeaconBlocksByRangeRequest{
 			StartSlot: 20,
 			Count:     128,
 			Step:      1,
@@ -198,7 +198,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 			return nil
 		}))
 
-		req := &zondpb.BeaconBlocksByRangeRequest{
+		req := &qrysmpb.BeaconBlocksByRangeRequest{
 			StartSlot: 20,
 			Count:     128,
 			Step:      1,
@@ -224,7 +224,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 				assert.NoError(t, stream.Close())
 			}()
 
-			req := &zondpb.BeaconBlocksByRangeRequest{}
+			req := &qrysmpb.BeaconBlocksByRangeRequest{}
 			assert.NoError(t, p2.Encoding().DecodeWithMaxLength(stream, req))
 
 			for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step); i += primitives.Slot(req.Step) {
@@ -240,7 +240,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 			}
 		})
 
-		req := &zondpb.BeaconBlocksByRangeRequest{
+		req := &qrysmpb.BeaconBlocksByRangeRequest{
 			StartSlot: 20,
 			Count:     128,
 			Step:      1,
@@ -267,7 +267,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 				assert.NoError(t, stream.Close())
 			}()
 
-			req := &zondpb.BeaconBlocksByRangeRequest{}
+			req := &qrysmpb.BeaconBlocksByRangeRequest{}
 			assert.NoError(t, p2.Encoding().DecodeWithMaxLength(stream, req))
 
 			for i := req.StartSlot; i < req.StartSlot.Add(req.Count*req.Step); i += primitives.Slot(req.Step) {
@@ -283,7 +283,7 @@ func TestSendRequest_SendBeaconBlocksByRangeRequest(t *testing.T) {
 			}
 		})
 
-		req := &zondpb.BeaconBlocksByRangeRequest{
+		req := &qrysmpb.BeaconBlocksByRangeRequest{
 			StartSlot: 20,
 			Count:     128,
 			Step:      10,
@@ -300,7 +300,7 @@ func TestSendRequest_SendBeaconBlocksByRootRequest(t *testing.T) {
 	defer cancel()
 	pcl := fmt.Sprintf("%s/ssz_snappy", p2p.RPCBlocksByRootTopicV2)
 
-	knownBlocks := make(map[[32]byte]*zondpb.SignedBeaconBlockCapella)
+	knownBlocks := make(map[[32]byte]*qrysmpb.SignedBeaconBlockCapella)
 	knownRoots := make([][32]byte, 0)
 	for i := 0; i < 5; i++ {
 		blk := util.NewBeaconBlockCapella()

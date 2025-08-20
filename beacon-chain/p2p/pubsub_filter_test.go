@@ -70,7 +70,7 @@ func TestService_CanSubscribe(t *testing.T) {
 		},
 		{
 			name:  "topic not in gossip mapping",
-			topic: fmt.Sprintf("/eth2/%x/foobar", digest) + validProtocolSuffix,
+			topic: fmt.Sprintf("/consensus/%x/foobar", digest) + validProtocolSuffix,
 			want:  false,
 		},
 		{

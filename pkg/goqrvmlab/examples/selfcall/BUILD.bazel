@@ -1,0 +1,27 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary")
+load("@qrysm//tools/go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["main.go"],
+    importpath = "github.com/theQRL/qrysm/pkg/goqrvmlab/examples/selfcall",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//pkg/goqrvmlab/common:go_default_library",
+        "//pkg/goqrvmlab/ops:go_default_library",
+        "//pkg/goqrvmlab/program:go_default_library",
+        "@com_github_theqrl_go_zond//common:go_default_library",
+        "@com_github_theqrl_go_zond//core:go_default_library",
+        "@com_github_theqrl_go_zond//core/rawdb:go_default_library",
+        "@com_github_theqrl_go_zond//core/state:go_default_library",
+        "@com_github_theqrl_go_zond//core/vm:go_default_library",
+        "@com_github_theqrl_go_zond//core/vm/runtime:go_default_library",
+        "@com_github_theqrl_go_zond//params:go_default_library",
+    ],
+)
+
+go_binary(
+    name = "selfcall",
+    embed = [":go_default_library"],
+    visibility = ["//visibility:public"],
+)

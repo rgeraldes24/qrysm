@@ -13,8 +13,8 @@ import (
 
 	"github.com/bazelbuild/rules_go/go/tools/bazel"
 	"github.com/pkg/errors"
+	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
-	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/runtime/interop"
@@ -30,7 +30,7 @@ type ExecutionNodeSet struct {
 	nodes   []e2etypes.ComponentRunner
 }
 
-// NewNodeSet creates and returns a set of zond nodes.
+// NewNodeSet creates and returns a set of qrl execution nodes.
 func NewExecutionNodeSet() *ExecutionNodeSet {
 	return &ExecutionNodeSet{
 		started: make(chan struct{}, 1),
@@ -122,12 +122,12 @@ func (s *ExecutionNodeSet) ComponentAtIndex(i int) (e2etypes.ComponentRunner, er
 	return s.nodes[i], nil
 }
 
-// Node represents a zond node.
+// ExecutionNode represents a qrl execution node.
 type ExecutionNode struct {
 	e2etypes.ComponentRunner
 	started chan struct{}
 	index   int
-	enr     string
+	qnr     string
 	cmd     *exec.Cmd
 }
 
@@ -139,7 +139,7 @@ func NewExecutionNode(index int) *ExecutionNode {
 	}
 }
 
-// Start runs a non-mining zond node.
+// Start runs a qrl execution node.
 // To connect to a miner and start working properly, this node should be a part of a NodeSet.
 func (node *ExecutionNode) Start(ctx context.Context) error {
 	binaryPath, found := bazel.FindBinary("cmd/gzond", "gzond")
@@ -147,18 +147,18 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 		return errors.New("go-zond binary not found")
 	}
 
-	zondPath := path.Join(e2e.TestParams.TestPath, "zonddata/"+strconv.Itoa(node.index)+"/")
+	qrlPath := path.Join(e2e.TestParams.TestPath, "qrldata/"+strconv.Itoa(node.index)+"/")
 	// Clear out potentially existing dir to prevent issues.
-	if _, err := os.Stat(zondPath); !os.IsNotExist(err) {
-		if err = os.RemoveAll(zondPath); err != nil {
+	if _, err := os.Stat(qrlPath); !os.IsNotExist(err) {
+		if err = os.RemoveAll(qrlPath); err != nil {
 			return err
 		}
 	}
 
-	if err := file.MkdirAll(zondPath); err != nil {
+	if err := file.MkdirAll(qrlPath); err != nil {
 		return err
 	}
-	gzondJsonPath := path.Join(zondPath, "genesis.json")
+	gzondJsonPath := path.Join(qrlPath, "genesis.json")
 
 	gen := interop.GzondTestnetGenesis(e2e.TestParams.ELGenesisTime, params.BeaconConfig())
 	b, err := json.Marshal(gen)
@@ -174,7 +174,7 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 		return err
 	}
 
-	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", zondPath), gzondJsonPath) // #nosec G204 -- Safe
+	initCmd := exec.CommandContext(ctx, binaryPath, "init", fmt.Sprintf("--datadir=%s", qrlPath), gzondJsonPath) // #nosec G204 -- Safe
 	initFile, err := helpers.DeleteAndCreateFile(e2e.TestParams.LogPath, "execution-init_"+strconv.Itoa(node.index)+".log")
 	if err != nil {
 		return err
@@ -189,26 +189,26 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 
 	args := []string{
 		"--nat=none", // disable nat traversal in e2e, it is failure prone and not needed
-		fmt.Sprintf("--datadir=%s", zondPath),
+		fmt.Sprintf("--datadir=%s", qrlPath),
 		fmt.Sprintf("--http.port=%d", e2e.TestParams.Ports.GzondExecutionNodeRPCPort+node.index),
 		fmt.Sprintf("--ws.port=%d", e2e.TestParams.Ports.GzondExecutionNodeWSPort+node.index),
 		fmt.Sprintf("--authrpc.port=%d", e2e.TestParams.Ports.GzondExecutionNodeAuthRPCPort+node.index),
-		fmt.Sprintf("--bootnodes=%s", node.enr),
+		fmt.Sprintf("--bootnodes=%s", node.qnr),
 		fmt.Sprintf("--port=%d", e2e.TestParams.Ports.GzondExecutionNodePort+node.index),
 		fmt.Sprintf("--networkid=%d", NetworkId),
 		"--http",
-		"--http.api=engine,net,zond",
+		"--http.api=engine,net,qrl",
 		"--http.addr=127.0.0.1",
 		"--http.corsdomain=\"*\"",
 		"--http.vhosts=\"*\"",
 		"--ws",
-		"--ws.api=net,zond,engine",
+		"--ws.api=net,qrl,engine",
 		"--ws.addr=127.0.0.1",
 		"--ws.origins=\"*\"",
 		"--ipcdisable",
 		"--verbosity=4",
 		"--syncmode=full",
-		// fmt.Sprintf("--txpool.locals=%s", ZondAddress),
+		// fmt.Sprintf("--txpool.locals=%s", QRLAddress),
 	}
 
 	// give the miner start a couple of tries, since the p2p networking check is flaky
@@ -223,14 +223,14 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 		}
 		runCmd.Stderr = errLog
 		if err = runCmd.Start(); err != nil {
-			return fmt.Errorf("failed to start zond chain: %w", err)
+			return fmt.Errorf("failed to start qrl chain: %w", err)
 		}
 		if err = helpers.WaitForTextInFile(errLog, "Started P2P networking"); err != nil {
 			kerr := runCmd.Process.Kill()
 			if kerr != nil {
 				log.WithError(kerr).Error("error sending kill to failed node command process")
 			}
-			retryErr = fmt.Errorf("P2P log not found, this means the zond chain had issues starting: %w", err)
+			retryErr = fmt.Errorf("P2P log not found, this means the qrl chain had issues starting: %w", err)
 			continue
 		}
 		node.cmd = runCmd
@@ -242,7 +242,7 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 				return fmt.Errorf("failed to connect to ipc: %w", err)
 			}
 
-			web3 := zondclient.NewClient(client)
+			web3 := qrlclient.NewClient(client)
 			block, err := web3.BlockByNumber(ctx, nil)
 			if err != nil {
 				return err
@@ -263,7 +263,7 @@ func (node *ExecutionNode) Start(ctx context.Context) error {
 	return node.cmd.Wait()
 }
 
-// Started checks whether zond node is started and ready to be queried.
+// Started checks whether qrl execution node is started and ready to be queried.
 func (node *ExecutionNode) Started() <-chan struct{} {
 	return node.started
 }

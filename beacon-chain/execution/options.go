@@ -13,7 +13,7 @@ import (
 
 type Option func(s *Service) error
 
-// WithHttpEndpoint parse http endpoint for the powchain service to use.
+// WithHttpEndpoint parse http endpoint for the execution chain service to use.
 func WithHttpEndpoint(endpointString string) Option {
 	return func(s *Service) error {
 		s.cfg.currHttpEndpoint = network.HttpEndpoint(endpointString)
@@ -85,10 +85,10 @@ func WithStateGen(gen *stategen.State) Option {
 	}
 }
 
-// WithEth1HeaderRequestLimit to set the upper limit of eth1 header requests.
-func WithEth1HeaderRequestLimit(limit uint64) Option {
+// WithExecutionHeaderRequestLimit to set the upper limit of execution header requests.
+func WithExecutionHeaderRequestLimit(limit uint64) Option {
 	return func(s *Service) error {
-		s.cfg.eth1HeaderReqLimit = limit
+		s.cfg.executionHeaderReqLimit = limit
 		return nil
 	}
 }

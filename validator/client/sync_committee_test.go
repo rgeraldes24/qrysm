@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -22,13 +22,13 @@ import (
 func TestSubmitSyncCommitteeMessage_ValidatorDutiesRequestFailure(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, m, validatorKey, finish := setup(t)
-	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{}}
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{}}
 	defer finish()
 
 	m.validatorClient.EXPECT().GetSyncMessageBlockRoot(
 		gomock.Any(), // ctx
 		&emptypb.Empty{},
-	).Return(&zondpb.SyncMessageBlockRootResponse{
+	).Return(&qrysmpb.SyncMessageBlockRootResponse{
 		Root: bytesutil.PadTo([]byte{}, 32),
 	}, nil)
 
@@ -44,7 +44,7 @@ func TestSubmitSyncCommitteeMessage_BadDomainData(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -56,7 +56,7 @@ func TestSubmitSyncCommitteeMessage_BadDomainData(t *testing.T) {
 	m.validatorClient.EXPECT().GetSyncMessageBlockRoot(
 		gomock.Any(), // ctx
 		&emptypb.Empty{},
-	).Return(&zondpb.SyncMessageBlockRootResponse{
+	).Return(&qrysmpb.SyncMessageBlockRootResponse{
 		Root: bytesutil.PadTo(r, 32),
 	}, nil)
 
@@ -76,7 +76,7 @@ func TestSubmitSyncCommitteeMessage_CouldNotSubmit(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -88,20 +88,20 @@ func TestSubmitSyncCommitteeMessage_CouldNotSubmit(t *testing.T) {
 	m.validatorClient.EXPECT().GetSyncMessageBlockRoot(
 		gomock.Any(), // ctx
 		&emptypb.Empty{},
-	).Return(&zondpb.SyncMessageBlockRootResponse{
+	).Return(&qrysmpb.SyncMessageBlockRootResponse{
 		Root: bytesutil.PadTo(r, 32),
 	}, nil)
 
 	m.validatorClient.EXPECT().
 		DomainData(gomock.Any(), // ctx
 			gomock.Any()). // epoch
-		Return(&zondpb.DomainResponse{
+		Return(&qrysmpb.DomainResponse{
 			SignatureDomain: make([]byte, 32),
 		}, nil)
 
 	m.validatorClient.EXPECT().SubmitSyncMessage(
 		gomock.Any(), // ctx
-		gomock.AssignableToTypeOf(&zondpb.SyncCommitteeMessage{}),
+		gomock.AssignableToTypeOf(&qrysmpb.SyncCommitteeMessage{}),
 	).Return(&emptypb.Empty{}, errors.New("uh oh") /* error */)
 
 	var pubKey [field_params.DilithiumPubkeyLength]byte
@@ -117,7 +117,7 @@ func TestSubmitSyncCommitteeMessage_OK(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -129,22 +129,22 @@ func TestSubmitSyncCommitteeMessage_OK(t *testing.T) {
 	m.validatorClient.EXPECT().GetSyncMessageBlockRoot(
 		gomock.Any(), // ctx
 		&emptypb.Empty{},
-	).Return(&zondpb.SyncMessageBlockRootResponse{
+	).Return(&qrysmpb.SyncMessageBlockRootResponse{
 		Root: bytesutil.PadTo(r, 32),
 	}, nil)
 
 	m.validatorClient.EXPECT().
 		DomainData(gomock.Any(), // ctx
 			gomock.Any()). // epoch
-		Return(&zondpb.DomainResponse{
+		Return(&qrysmpb.DomainResponse{
 			SignatureDomain: make([]byte, 32),
 		}, nil)
 
-	var generatedMsg *zondpb.SyncCommitteeMessage
+	var generatedMsg *qrysmpb.SyncCommitteeMessage
 	m.validatorClient.EXPECT().SubmitSyncMessage(
 		gomock.Any(), // ctx
-		gomock.AssignableToTypeOf(&zondpb.SyncCommitteeMessage{}),
-	).Do(func(_ context.Context, msg *zondpb.SyncCommitteeMessage) {
+		gomock.AssignableToTypeOf(&qrysmpb.SyncCommitteeMessage{}),
+	).Do(func(_ context.Context, msg *qrysmpb.SyncCommitteeMessage) {
 		generatedMsg = msg
 	}).Return(&emptypb.Empty{}, nil /* error */)
 
@@ -161,7 +161,7 @@ func TestSubmitSyncCommitteeMessage_OK(t *testing.T) {
 func TestSubmitSignedContributionAndProof_ValidatorDutiesRequestFailure(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, _, validatorKey, finish := setup(t)
-	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{}}
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{}}
 	defer finish()
 
 	var pubKey [field_params.DilithiumPubkeyLength]byte
@@ -175,7 +175,7 @@ func TestSubmitSignedContributionAndProof_GetSyncSubcommitteeIndexFailure(t *tes
 	validator, m, validatorKey, finish := setup(t)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -188,11 +188,11 @@ func TestSubmitSignedContributionAndProof_GetSyncSubcommitteeIndexFailure(t *tes
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
-		&zondpb.SyncSubcommitteeIndexRequest{
+		&qrysmpb.SyncSubcommitteeIndexRequest{
 			Slot:      1,
 			PublicKey: pubKey[:],
 		},
-	).Return(&zondpb.SyncSubcommitteeIndexResponse{}, errors.New("Bad index"))
+	).Return(&qrysmpb.SyncSubcommitteeIndexResponse{}, errors.New("Bad index"))
 
 	validator.SubmitSignedContributionAndProof(context.Background(), 1, pubKey)
 	require.LogsContain(t, hook, "Could not get sync subcommittee index")
@@ -203,7 +203,7 @@ func TestSubmitSignedContributionAndProof_NothingToDo(t *testing.T) {
 	validator, m, validatorKey, finish := setup(t)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -216,11 +216,11 @@ func TestSubmitSignedContributionAndProof_NothingToDo(t *testing.T) {
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
-		&zondpb.SyncSubcommitteeIndexRequest{
+		&qrysmpb.SyncSubcommitteeIndexRequest{
 			Slot:      1,
 			PublicKey: pubKey[:],
 		},
-	).Return(&zondpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{}}, nil)
+	).Return(&qrysmpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{}}, nil)
 
 	validator.SubmitSignedContributionAndProof(context.Background(), 1, pubKey)
 	require.LogsContain(t, hook, "Empty subcommittee index list, do nothing")
@@ -231,7 +231,7 @@ func TestSubmitSignedContributionAndProof_BadDomain(t *testing.T) {
 	validator, m, validatorKey, finish := setup(t)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -244,16 +244,16 @@ func TestSubmitSignedContributionAndProof_BadDomain(t *testing.T) {
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
-		&zondpb.SyncSubcommitteeIndexRequest{
+		&qrysmpb.SyncSubcommitteeIndexRequest{
 			Slot:      1,
 			PublicKey: pubKey[:],
 		},
-	).Return(&zondpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{1}}, nil)
+	).Return(&qrysmpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{1}}, nil)
 
 	m.validatorClient.EXPECT().
 		DomainData(gomock.Any(), // ctx
 			gomock.Any()). // epoch
-		Return(&zondpb.DomainResponse{
+		Return(&qrysmpb.DomainResponse{
 			SignatureDomain: make([]byte, 32),
 		}, errors.New("bad domain response"))
 
@@ -273,7 +273,7 @@ func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) 
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -286,22 +286,22 @@ func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) 
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
-		&zondpb.SyncSubcommitteeIndexRequest{
+		&qrysmpb.SyncSubcommitteeIndexRequest{
 			Slot:      1,
 			PublicKey: pubKey[:],
 		},
-	).Return(&zondpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{1}}, nil)
+	).Return(&qrysmpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{1}}, nil)
 
 	m.validatorClient.EXPECT().
 		DomainData(gomock.Any(), // ctx
 			gomock.Any()). // epoch
-		Return(&zondpb.DomainResponse{
+		Return(&qrysmpb.DomainResponse{
 			SignatureDomain: make([]byte, 32),
 		}, nil)
 
 	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
 		gomock.Any(), // ctx
-		&zondpb.SyncCommitteeContributionRequest{
+		&qrysmpb.SyncCommitteeContributionRequest{
 			Slot:      1,
 			PublicKey: pubKey[:],
 			SubnetId:  0,
@@ -323,7 +323,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -336,16 +336,16 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
-		&zondpb.SyncSubcommitteeIndexRequest{
+		&qrysmpb.SyncSubcommitteeIndexRequest{
 			Slot:      1,
 			PublicKey: pubKey[:],
 		},
-	).Return(&zondpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{1}}, nil)
+	).Return(&qrysmpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{1}}, nil)
 
 	m.validatorClient.EXPECT().
 		DomainData(gomock.Any(), // ctx
 			gomock.Any()). // epoch
-		Return(&zondpb.DomainResponse{
+		Return(&qrysmpb.DomainResponse{
 			SignatureDomain: make([]byte, 32),
 		}, nil)
 
@@ -353,12 +353,12 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	aggBits.SetBitAt(0, true)
 	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
 		gomock.Any(), // ctx
-		&zondpb.SyncCommitteeContributionRequest{
+		&qrysmpb.SyncCommitteeContributionRequest{
 			Slot:      1,
 			PublicKey: pubKey[:],
 			SubnetId:  0,
 		},
-	).Return(&zondpb.SyncCommitteeContribution{
+	).Return(&qrysmpb.SyncCommitteeContribution{
 		BlockRoot:       make([]byte, field_params.RootLength),
 		Signatures:      [][]byte{},
 		AggregationBits: aggBits,
@@ -367,16 +367,16 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	m.validatorClient.EXPECT().
 		DomainData(gomock.Any(), // ctx
 			gomock.Any()). // epoch
-		Return(&zondpb.DomainResponse{
+		Return(&qrysmpb.DomainResponse{
 			SignatureDomain: make([]byte, 32),
 		}, nil)
 
 	m.validatorClient.EXPECT().SubmitSignedContributionAndProof(
 		gomock.Any(), // ctx
-		gomock.AssignableToTypeOf(&zondpb.SignedContributionAndProof{
-			Message: &zondpb.ContributionAndProof{
+		gomock.AssignableToTypeOf(&qrysmpb.SignedContributionAndProof{
+			Message: &qrysmpb.ContributionAndProof{
 				AggregatorIndex: 7,
-				Contribution: &zondpb.SyncCommitteeContribution{
+				Contribution: &qrysmpb.SyncCommitteeContribution{
 					BlockRoot:         make([]byte, field_params.RootLength),
 					Signatures:        [][]byte{},
 					AggregationBits:   bitfield.NewBitvector16(),
@@ -401,7 +401,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
 	validatorIndex := primitives.ValidatorIndex(7)
 	committee := []primitives.ValidatorIndex{0, 3, 4, 2, validatorIndex, 6, 8, 9, 10}
-	validator.duties = &zondpb.DutiesResponse{CurrentEpochDuties: []*zondpb.DutiesResponse_Duty{
+	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
 		{
 			PublicKey:      validatorKey.PublicKey().Marshal(),
 			Committee:      committee,
@@ -414,16 +414,16 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
-		&zondpb.SyncSubcommitteeIndexRequest{
+		&qrysmpb.SyncSubcommitteeIndexRequest{
 			Slot:      1,
 			PublicKey: pubKey[:],
 		},
-	).Return(&zondpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{1}}, nil)
+	).Return(&qrysmpb.SyncSubcommitteeIndexResponse{Indices: []primitives.CommitteeIndex{1}}, nil)
 
 	m.validatorClient.EXPECT().
 		DomainData(gomock.Any(), // ctx
 			gomock.Any()). // epoch
-		Return(&zondpb.DomainResponse{
+		Return(&qrysmpb.DomainResponse{
 			SignatureDomain: make([]byte, 32),
 		}, nil)
 
@@ -431,12 +431,12 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	aggBits.SetBitAt(0, true)
 	m.validatorClient.EXPECT().GetSyncCommitteeContribution(
 		gomock.Any(), // ctx
-		&zondpb.SyncCommitteeContributionRequest{
+		&qrysmpb.SyncCommitteeContributionRequest{
 			Slot:      1,
 			PublicKey: pubKey[:],
 			SubnetId:  0,
 		},
-	).Return(&zondpb.SyncCommitteeContribution{
+	).Return(&qrysmpb.SyncCommitteeContribution{
 		BlockRoot:       make([]byte, field_params.RootLength),
 		Signatures:      [][]byte{},
 		AggregationBits: aggBits,
@@ -445,16 +445,16 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	m.validatorClient.EXPECT().
 		DomainData(gomock.Any(), // ctx
 			gomock.Any()). // epoch
-		Return(&zondpb.DomainResponse{
+		Return(&qrysmpb.DomainResponse{
 			SignatureDomain: make([]byte, 32),
 		}, nil)
 
 	m.validatorClient.EXPECT().SubmitSignedContributionAndProof(
 		gomock.Any(), // ctx
-		gomock.AssignableToTypeOf(&zondpb.SignedContributionAndProof{
-			Message: &zondpb.ContributionAndProof{
+		gomock.AssignableToTypeOf(&qrysmpb.SignedContributionAndProof{
+			Message: &qrysmpb.ContributionAndProof{
 				AggregatorIndex: 7,
-				Contribution: &zondpb.SyncCommitteeContribution{
+				Contribution: &qrysmpb.SyncCommitteeContribution{
 					BlockRoot:         make([]byte, 32),
 					Signatures:        [][]byte{},
 					AggregationBits:   bitfield.NewBitvector16(),

@@ -116,12 +116,12 @@ func TestWeb3SignerConfig(t *testing.T) {
 			name: "happy path with external url",
 			args: &args{
 				baseURL:          "http://localhost:8545",
-				publicKeysOrURLs: []string{"http://localhost:8545/api/v1/eth2/publicKeys"},
+				publicKeysOrURLs: []string{"http://localhost:8545/api/v1/consensus/publicKeys"},
 			},
 			want: &remoteweb3signer.SetupConfig{
 				BaseEndpoint:          "http://localhost:8545",
 				GenesisValidatorsRoot: nil,
-				PublicKeysURL:         "http://localhost:8545/api/v1/eth2/publicKeys",
+				PublicKeysURL:         "http://localhost:8545/api/v1/consensus/publicKeys",
 				ProvidedPublicKeys:    nil,
 			},
 		},
@@ -177,7 +177,7 @@ func TestWeb3SignerConfig(t *testing.T) {
 			args: &args{
 				baseURL: "http://localhost:8545",
 				publicKeysOrURLs: []string{"0xa99a76ed7796f7be22d5b7e85deeb7c5677e88e511e0b337618f8c4eb61349b4bf2d153f649f7b53359fe8b94a38e44c," +
-					"0xb89bebc699769726a318c8e9971bd3171297c61aea4a6578a7a4f94b547dcba5bac16a89108b6b6a1fe3695d1a874a0b", "http://localhost:8545/api/v1/eth2/publicKeys"},
+					"0xb89bebc699769726a318c8e9971bd3171297c61aea4a6578a7a4f94b547dcba5bac16a89108b6b6a1fe3695d1a874a0b", "http://localhost:8545/api/v1/consensus/publicKeys"},
 			},
 			want:       nil,
 			wantErrMsg: "could not decode public key for web3signer",
@@ -211,13 +211,13 @@ func TestWeb3SignerConfig(t *testing.T) {
 
 func TestProposerSettings(t *testing.T) {
 	hook := logtest.NewGlobal()
-	recipient0, err := common.NewAddressFromString("Zae967917c465db8578ca9024c205720b1a3651A9")
+	recipient0, err := common.NewAddressFromString("Qae967917c465db8578ca9024c205720b1a3651A9")
 	require.NoError(t, err)
-	recipient1, err := common.NewAddressFromString("Z50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3")
+	recipient1, err := common.NewAddressFromString("Q50155530FCE8a85ec7055A5F8b2bE214B3DaeFd3")
 	require.NoError(t, err)
-	recipient2, err := common.NewAddressFromString("Z60155530FCE8a85ec7055A5F8b2bE214B3DaeFd4")
+	recipient2, err := common.NewAddressFromString("Q60155530FCE8a85ec7055A5F8b2bE214B3DaeFd4")
 	require.NoError(t, err)
-	recipient3, err := common.NewAddressFromString("Z6e35733c5af9B61374A128e6F85f553aF09ff89A")
+	recipient3, err := common.NewAddressFromString("Q6e35733c5af9B61374A128e6F85f553aF09ff89A")
 	require.NoError(t, err)
 
 	type proposerSettingsFlag struct {
@@ -291,7 +291,7 @@ func TestProposerSettings(t *testing.T) {
 				}
 			},
 			wantErr: "",
-			wantLog: "is not a checksum Zond address",
+			wantLog: "is not a checksum QRL address",
 		},
 		{
 			name: "Happy Path Config file File multiple fee recipients",
@@ -413,7 +413,7 @@ func TestProposerSettings(t *testing.T) {
 				proposerSettingsFlagValues: &proposerSettingsFlag{
 					dir:        "",
 					url:        "",
-					defaultfee: "Z6e35733c5af9B61374A128e6F85f553aF09ff89A",
+					defaultfee: "Q6e35733c5af9B61374A128e6F85f553aF09ff89A",
 				},
 			},
 			want: func() *validatorserviceconfig.ProposerSettings {
@@ -434,7 +434,7 @@ func TestProposerSettings(t *testing.T) {
 				proposerSettingsFlagValues: &proposerSettingsFlag{
 					dir:        "",
 					url:        "",
-					defaultfee: "Z6e35733c5af9B61374A128e6F85f553aF09ff89A",
+					defaultfee: "Q6e35733c5af9B61374A128e6F85f553aF09ff89A",
 				},
 			},
 			want: func() *validatorserviceconfig.ProposerSettings {
@@ -460,7 +460,7 @@ func TestProposerSettings(t *testing.T) {
 				proposerSettingsFlagValues: &proposerSettingsFlag{
 					dir:        "",
 					url:        "",
-					defaultfee: "Z6e35733c5af9B61374A128e6F85f553aF09ff89A",
+					defaultfee: "Q6e35733c5af9B61374A128e6F85f553aF09ff89A",
 					defaultgas: "50000000",
 				},
 			},
@@ -487,7 +487,7 @@ func TestProposerSettings(t *testing.T) {
 				proposerSettingsFlagValues: &proposerSettingsFlag{
 					dir:        "./testdata/good-prepare-beacon-proposer-config.json",
 					url:        "",
-					defaultfee: "Z6e35733c5af9B61374A128e6F85f553aF09ff89B",
+					defaultfee: "Q6e35733c5af9B61374A128e6F85f553aF09ff89B",
 				},
 			},
 			want: func() *validatorserviceconfig.ProposerSettings {
@@ -516,7 +516,7 @@ func TestProposerSettings(t *testing.T) {
 				proposerSettingsFlagValues: &proposerSettingsFlag{
 					dir:        "./testdata/good-prepare-beacon-proposer-config.json",
 					url:        "",
-					defaultfee: "Z6e35733c5af9B61374A128e6F85f553aF09ff89B",
+					defaultfee: "Q6e35733c5af9B61374A128e6F85f553aF09ff89B",
 				},
 			},
 			want: func() *validatorserviceconfig.ProposerSettings {

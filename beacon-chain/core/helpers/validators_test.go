@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -31,7 +31,7 @@ func TestIsActiveValidator_OK(t *testing.T) {
 		{a: 64, b: true},
 	}
 	for _, test := range tests {
-		validator := &zondpb.Validator{ActivationEpoch: 10, ExitEpoch: 100}
+		validator := &qrysmpb.Validator{ActivationEpoch: 10, ExitEpoch: 100}
 		assert.Equal(t, test.b, IsActiveValidator(validator, test.a), "IsActiveValidator(%d)", test.a)
 	}
 }
@@ -47,8 +47,8 @@ func TestIsActiveValidatorUsingTrie_OK(t *testing.T) {
 		{a: 1000, b: false},
 		{a: 64, b: true},
 	}
-	val := &zondpb.Validator{ActivationEpoch: 10, ExitEpoch: 100}
-	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{Validators: []*zondpb.Validator{val}})
+	val := &qrysmpb.Validator{ActivationEpoch: 10, ExitEpoch: 100}
+	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Validators: []*qrysmpb.Validator{val}})
 	require.NoError(t, err)
 	for _, test := range tests {
 		readOnlyVal, err := beaconState.ValidatorAtIndexReadOnly(0)
@@ -75,9 +75,9 @@ func TestIsActiveNonSlashedValidatorUsingTrie_OK(t *testing.T) {
 		{a: 64, s: true, b: false},
 	}
 	for _, test := range tests {
-		val := &zondpb.Validator{ActivationEpoch: 10, ExitEpoch: 100}
+		val := &qrysmpb.Validator{ActivationEpoch: 10, ExitEpoch: 100}
 		val.Slashed = test.s
-		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{Validators: []*zondpb.Validator{val}})
+		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Validators: []*qrysmpb.Validator{val}})
 		require.NoError(t, err)
 		readOnlyVal, err := beaconState.ValidatorAtIndexReadOnly(0)
 		require.NoError(t, err)
@@ -88,13 +88,13 @@ func TestIsActiveNonSlashedValidatorUsingTrie_OK(t *testing.T) {
 func TestIsSlashableValidator_OK(t *testing.T) {
 	tests := []struct {
 		name      string
-		validator *zondpb.Validator
+		validator *qrysmpb.Validator
 		epoch     primitives.Epoch
 		slashable bool
 	}{
 		{
 			name: "Unset withdrawable, slashable",
-			validator: &zondpb.Validator{
+			validator: &qrysmpb.Validator{
 				WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 			},
 			epoch:     0,
@@ -102,7 +102,7 @@ func TestIsSlashableValidator_OK(t *testing.T) {
 		},
 		{
 			name: "before withdrawable, slashable",
-			validator: &zondpb.Validator{
+			validator: &qrysmpb.Validator{
 				WithdrawableEpoch: 5,
 			},
 			epoch:     3,
@@ -110,7 +110,7 @@ func TestIsSlashableValidator_OK(t *testing.T) {
 		},
 		{
 			name: "inactive, not slashable",
-			validator: &zondpb.Validator{
+			validator: &qrysmpb.Validator{
 				ActivationEpoch:   5,
 				WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 			},
@@ -119,7 +119,7 @@ func TestIsSlashableValidator_OK(t *testing.T) {
 		},
 		{
 			name: "after withdrawable, not slashable",
-			validator: &zondpb.Validator{
+			validator: &qrysmpb.Validator{
 				WithdrawableEpoch: 3,
 			},
 			epoch:     3,
@@ -127,7 +127,7 @@ func TestIsSlashableValidator_OK(t *testing.T) {
 		},
 		{
 			name: "slashed and withdrawable, not slashable",
-			validator: &zondpb.Validator{
+			validator: &qrysmpb.Validator{
 				Slashed:           true,
 				ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 				WithdrawableEpoch: 1,
@@ -137,7 +137,7 @@ func TestIsSlashableValidator_OK(t *testing.T) {
 		},
 		{
 			name: "slashed, not slashable",
-			validator: &zondpb.Validator{
+			validator: &qrysmpb.Validator{
 				Slashed:           true,
 				ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 				WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
@@ -147,7 +147,7 @@ func TestIsSlashableValidator_OK(t *testing.T) {
 		},
 		{
 			name: "inactive and slashed, not slashable",
-			validator: &zondpb.Validator{
+			validator: &qrysmpb.Validator{
 				Slashed:           true,
 				ActivationEpoch:   4,
 				ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
@@ -166,7 +166,7 @@ func TestIsSlashableValidator_OK(t *testing.T) {
 				assert.Equal(t, test.slashable, slashableValidator, "Expected active validator slashable to be %t", test.slashable)
 			})
 			t.Run("with trie", func(t *testing.T) {
-				beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{Validators: []*zondpb.Validator{test.validator}})
+				beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Validators: []*qrysmpb.Validator{test.validator}})
 				require.NoError(t, err)
 				readOnlyVal, err := beaconState.ValidatorAtIndexReadOnly(0)
 				require.NoError(t, err)
@@ -184,14 +184,14 @@ func TestBeaconProposerIndex_OK(t *testing.T) {
 	c := params.BeaconConfig()
 	c.MinGenesisActiveValidatorCount = 16384
 	params.OverrideBeaconConfig(c)
-	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount/8)
+	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount/8)
 	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
+		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Validators:  validators,
 		Slot:        0,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -241,9 +241,9 @@ func TestBeaconProposerIndex_BadState(t *testing.T) {
 	c := params.BeaconConfig()
 	c.MinGenesisActiveValidatorCount = 16384
 	params.OverrideBeaconConfig(c)
-	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount/8)
+	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount/8)
 	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
+		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
@@ -252,7 +252,7 @@ func TestBeaconProposerIndex_BadState(t *testing.T) {
 		roots[i] = make([]byte, fieldparams.RootLength)
 	}
 
-	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Validators:  validators,
 		Slot:        0,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -269,14 +269,14 @@ func TestBeaconProposerIndex_BadState(t *testing.T) {
 }
 
 func TestComputeProposerIndex_Compatibility(t *testing.T) {
-	validators := make([]*zondpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
+	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
+		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
 
-	state, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	state, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 	})
@@ -317,13 +317,13 @@ func TestDelayedActivationExitEpoch_OK(t *testing.T) {
 
 func TestActiveValidatorCount_Genesis(t *testing.T) {
 	c := 1000
-	validators := make([]*zondpb.Validator, c)
+	validators := make([]*qrysmpb.Validator, c)
 	for i := 0; i < len(validators); i++ {
-		validators[i] = &zondpb.Validator{
+		validators[i] = &qrysmpb.Validator{
 			ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 		}
 	}
-	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Slot:        0,
 		Validators:  validators,
 		RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -353,14 +353,14 @@ func TestChurnLimit_OK(t *testing.T) {
 	for _, test := range tests {
 		ClearCache()
 
-		validators := make([]*zondpb.Validator, test.validatorCount)
+		validators := make([]*qrysmpb.Validator, test.validatorCount)
 		for i := 0; i < len(validators); i++ {
-			validators[i] = &zondpb.Validator{
+			validators[i] = &qrysmpb.Validator{
 				ExitEpoch: params.BeaconConfig().FarFutureEpoch,
 			}
 		}
 
-		beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+		beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 			Slot:        1,
 			Validators:  validators,
 			RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
@@ -378,7 +378,7 @@ func TestChurnLimit_OK(t *testing.T) {
 func TestActiveValidatorIndices(t *testing.T) {
 	farFutureEpoch := params.BeaconConfig().FarFutureEpoch
 	type args struct {
-		state *zondpb.BeaconStateCapella
+		state *qrysmpb.BeaconStateCapella
 		epoch primitives.Epoch
 	}
 	tests := []struct {
@@ -390,9 +390,9 @@ func TestActiveValidatorIndices(t *testing.T) {
 		{
 			name: "all_active_epoch_10",
 			args: args{
-				state: &zondpb.BeaconStateCapella{
+				state: &qrysmpb.BeaconStateCapella{
 					RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
-					Validators: []*zondpb.Validator{
+					Validators: []*qrysmpb.Validator{
 						{
 							ActivationEpoch: 0,
 							ExitEpoch:       farFutureEpoch,
@@ -414,9 +414,9 @@ func TestActiveValidatorIndices(t *testing.T) {
 		{
 			name: "some_active_epoch_10",
 			args: args{
-				state: &zondpb.BeaconStateCapella{
+				state: &qrysmpb.BeaconStateCapella{
 					RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
-					Validators: []*zondpb.Validator{
+					Validators: []*qrysmpb.Validator{
 						{
 							ActivationEpoch: 0,
 							ExitEpoch:       farFutureEpoch,
@@ -438,9 +438,9 @@ func TestActiveValidatorIndices(t *testing.T) {
 		{
 			name: "some_active_with_recent_new_epoch_10",
 			args: args{
-				state: &zondpb.BeaconStateCapella{
+				state: &qrysmpb.BeaconStateCapella{
 					RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
-					Validators: []*zondpb.Validator{
+					Validators: []*qrysmpb.Validator{
 						{
 							ActivationEpoch: 0,
 							ExitEpoch:       farFutureEpoch,
@@ -466,9 +466,9 @@ func TestActiveValidatorIndices(t *testing.T) {
 		{
 			name: "some_active_with_recent_new_epoch_10",
 			args: args{
-				state: &zondpb.BeaconStateCapella{
+				state: &qrysmpb.BeaconStateCapella{
 					RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
-					Validators: []*zondpb.Validator{
+					Validators: []*qrysmpb.Validator{
 						{
 							ActivationEpoch: 0,
 							ExitEpoch:       farFutureEpoch,
@@ -494,9 +494,9 @@ func TestActiveValidatorIndices(t *testing.T) {
 		{
 			name: "some_active_with_recent_new_epoch_10",
 			args: args{
-				state: &zondpb.BeaconStateCapella{
+				state: &qrysmpb.BeaconStateCapella{
 					RandaoMixes: make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
-					Validators: []*zondpb.Validator{
+					Validators: []*qrysmpb.Validator{
 						{
 							ActivationEpoch: 0,
 							ExitEpoch:       farFutureEpoch,
@@ -539,7 +539,7 @@ func TestActiveValidatorIndices(t *testing.T) {
 func TestComputeProposerIndex(t *testing.T) {
 	seed := bytesutil.ToBytes32([]byte("seed"))
 	type args struct {
-		validators []*zondpb.Validator
+		validators []*qrysmpb.Validator
 		indices    []primitives.ValidatorIndex
 		seed       [32]byte
 	}
@@ -552,7 +552,7 @@ func TestComputeProposerIndex(t *testing.T) {
 		{
 			name: "all_active_indices",
 			args: args{
-				validators: []*zondpb.Validator{
+				validators: []*qrysmpb.Validator{
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
@@ -567,7 +567,7 @@ func TestComputeProposerIndex(t *testing.T) {
 		{ // Regression test for https://github.com/prysmaticlabs/prysm/issues/4259.
 			name: "1_active_index",
 			args: args{
-				validators: []*zondpb.Validator{
+				validators: []*qrysmpb.Validator{
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
@@ -582,7 +582,7 @@ func TestComputeProposerIndex(t *testing.T) {
 		{
 			name: "empty_active_indices",
 			args: args{
-				validators: []*zondpb.Validator{
+				validators: []*qrysmpb.Validator{
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
@@ -597,7 +597,7 @@ func TestComputeProposerIndex(t *testing.T) {
 		{
 			name: "active_indices_out_of_range",
 			args: args{
-				validators: []*zondpb.Validator{
+				validators: []*qrysmpb.Validator{
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
@@ -612,7 +612,7 @@ func TestComputeProposerIndex(t *testing.T) {
 		{
 			name: "second_half_active",
 			args: args{
-				validators: []*zondpb.Validator{
+				validators: []*qrysmpb.Validator{
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 					{EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
@@ -632,7 +632,7 @@ func TestComputeProposerIndex(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			bState := &zondpb.BeaconStateCapella{Validators: tt.args.validators}
+			bState := &qrysmpb.BeaconStateCapella{Validators: tt.args.validators}
 			stTrie, err := state_native.InitializeFromProtoUnsafeCapella(bState)
 			require.NoError(t, err)
 			got, err := ComputeProposerIndex(stTrie, tt.args.indices, tt.args.seed)
@@ -649,17 +649,17 @@ func TestComputeProposerIndex(t *testing.T) {
 func TestIsEligibleForActivationQueue(t *testing.T) {
 	tests := []struct {
 		name      string
-		validator *zondpb.Validator
+		validator *qrysmpb.Validator
 		want      bool
 	}{
 		{"Eligible",
-			&zondpb.Validator{ActivationEligibilityEpoch: params.BeaconConfig().FarFutureEpoch, EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
+			&qrysmpb.Validator{ActivationEligibilityEpoch: params.BeaconConfig().FarFutureEpoch, EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 			true},
 		{"Incorrect activation eligibility epoch",
-			&zondpb.Validator{ActivationEligibilityEpoch: 1, EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
+			&qrysmpb.Validator{ActivationEligibilityEpoch: 1, EffectiveBalance: params.BeaconConfig().MaxEffectiveBalance},
 			false},
 		{"Not enough balance",
-			&zondpb.Validator{ActivationEligibilityEpoch: params.BeaconConfig().FarFutureEpoch, EffectiveBalance: 1},
+			&qrysmpb.Validator{ActivationEligibilityEpoch: params.BeaconConfig().FarFutureEpoch, EffectiveBalance: 1},
 			false},
 	}
 	for _, tt := range tests {
@@ -672,21 +672,21 @@ func TestIsEligibleForActivationQueue(t *testing.T) {
 func TestIsIsEligibleForActivation(t *testing.T) {
 	tests := []struct {
 		name      string
-		validator *zondpb.Validator
-		state     *zondpb.BeaconStateCapella
+		validator *qrysmpb.Validator
+		state     *qrysmpb.BeaconStateCapella
 		want      bool
 	}{
 		{"Eligible",
-			&zondpb.Validator{ActivationEligibilityEpoch: 1, ActivationEpoch: params.BeaconConfig().FarFutureEpoch},
-			&zondpb.BeaconStateCapella{FinalizedCheckpoint: &zondpb.Checkpoint{Epoch: 2}},
+			&qrysmpb.Validator{ActivationEligibilityEpoch: 1, ActivationEpoch: params.BeaconConfig().FarFutureEpoch},
+			&qrysmpb.BeaconStateCapella{FinalizedCheckpoint: &qrysmpb.Checkpoint{Epoch: 2}},
 			true},
 		{"Not yet finalized",
-			&zondpb.Validator{ActivationEligibilityEpoch: 1, ActivationEpoch: params.BeaconConfig().FarFutureEpoch},
-			&zondpb.BeaconStateCapella{FinalizedCheckpoint: &zondpb.Checkpoint{Root: make([]byte, 32)}},
+			&qrysmpb.Validator{ActivationEligibilityEpoch: 1, ActivationEpoch: params.BeaconConfig().FarFutureEpoch},
+			&qrysmpb.BeaconStateCapella{FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)}},
 			false},
 		{"Incorrect activation epoch",
-			&zondpb.Validator{ActivationEligibilityEpoch: 1},
-			&zondpb.BeaconStateCapella{FinalizedCheckpoint: &zondpb.Checkpoint{Epoch: 2}},
+			&qrysmpb.Validator{ActivationEligibilityEpoch: 1},
+			&qrysmpb.BeaconStateCapella{FinalizedCheckpoint: &qrysmpb.Checkpoint{Epoch: 2}},
 			false},
 	}
 	for _, tt := range tests {
@@ -698,7 +698,7 @@ func TestIsIsEligibleForActivation(t *testing.T) {
 	}
 }
 
-func computeProposerIndexWithValidators(validators []*zondpb.Validator, activeIndices []primitives.ValidatorIndex, seed [32]byte) (primitives.ValidatorIndex, error) {
+func computeProposerIndexWithValidators(validators []*qrysmpb.Validator, activeIndices []primitives.ValidatorIndex, seed [32]byte) (primitives.ValidatorIndex, error) {
 	length := uint64(len(activeIndices))
 	if length == 0 {
 		return 0, errors.New("empty active indices list")
@@ -729,13 +729,13 @@ func computeProposerIndexWithValidators(validators []*zondpb.Validator, activeIn
 }
 
 func TestLastActivatedValidatorIndex_OK(t *testing.T) {
-	beaconState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{})
+	beaconState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{})
 	require.NoError(t, err)
 
-	validators := make([]*zondpb.Validator, 4)
+	validators := make([]*qrysmpb.Validator, 4)
 	balances := make([]uint64, len(validators))
 	for i := uint64(0); i < 4; i++ {
-		validators[i] = &zondpb.Validator{
+		validators[i] = &qrysmpb.Validator{
 			PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			EffectiveBalance:      32 * 1e9,

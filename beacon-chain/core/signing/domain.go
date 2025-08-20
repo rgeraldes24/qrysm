@@ -4,7 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // Domain returns the domain version for Dilithium private key to sign and verify.
@@ -18,7 +18,7 @@ import (
 //	  epoch = get_current_epoch(state) if epoch is None else epoch
 //	  fork_version = state.fork.previous_version if epoch < state.fork.epoch else state.fork.current_version
 //	  return compute_domain(domain_type, fork_version, state.genesis_validators_root)
-func Domain(fork *zond.Fork, epoch primitives.Epoch, domainType [dilithium.DomainByteLength]byte, genesisRoot []byte) ([]byte, error) {
+func Domain(fork *qrysmpb.Fork, epoch primitives.Epoch, domainType [dilithium.DomainByteLength]byte, genesisRoot []byte) ([]byte, error) {
 	if fork == nil {
 		return []byte{}, errors.New("nil fork or domain type")
 	}

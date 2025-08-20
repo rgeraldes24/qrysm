@@ -1,0 +1,36 @@
+load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "gzond.go",
+        "gzondbatcher.go",
+        "marshalling.go",
+        "qrvmone.go",
+        "qrvms.go",
+        "utils.go",
+        "vmstats.go",
+    ],
+    importpath = "github.com/theQRL/qrysm/pkg/goqrvmlab/qrvms",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/goqrvmlab/utils:go_default_library",
+        "@com_github_theqrl_go_zond//common/hexutil:go_default_library",
+        "@com_github_theqrl_go_zond//log:go_default_library",
+        "@com_github_theqrl_go_zond//qrl/tracers/logger:go_default_library",
+    ],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = [
+        "marshalling_test.go",
+        "output_test.go",
+    ],
+    data = glob(["testdata/**"]),
+    embed = [":go_default_library"],
+    deps = [
+        "@com_github_holiman_uint256//:go_default_library",
+        "@com_github_theqrl_go_zond//qrl/tracers/logger:go_default_library",
+    ],
+)

@@ -7,16 +7,13 @@ import (
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/beacon-chain/blockchain"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/consensus-types/wrapper"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/network/forks"
-	pb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/metadata"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
@@ -41,44 +38,48 @@ func (s *Service) metaDataHandler(_ context.Context, _ interface{}, stream libp2
 		}
 		return nilErr
 	}
-	_, _, streamVersion, err := p2p.TopicDeconstructor(string(stream.Protocol()))
-	if err != nil {
-		resp, genErr := s.generateErrorResponse(responseCodeServerError, types.ErrGeneric.Error())
-		if genErr != nil {
-			log.WithError(genErr).Debug("Could not generate a response error")
-		} else if _, wErr := stream.Write(resp); wErr != nil {
-			log.WithError(wErr).Debug("Could not write to stream")
+	// NOTE(rgeraldes24): unused for now
+	/*
+		_, _, streamVersion, err := p2p.TopicDeconstructor(string(stream.Protocol()))
+		if err != nil {
+			resp, genErr := s.generateErrorResponse(responseCodeServerError, types.ErrGeneric.Error())
+			if genErr != nil {
+				log.WithError(genErr).Debug("Could not generate a response error")
+			} else if _, wErr := stream.Write(resp); wErr != nil {
+				log.WithError(wErr).Debug("Could not write to stream")
+			}
+			return err
 		}
-		return err
-	}
+		currMd := s.cfg.p2p.Metadata()
+		switch streamVersion {
+		case p2p.SchemaVersionV1:
+			// We have a v1 metadata object saved locally, so we
+			// convert it back to a v0 metadata object.
+			if currMd.Version() != version.Capella {
+				currMd = wrapper.WrappedMetadataV0(
+					&pb.MetaDataV0{
+						Attnets:   currMd.AttnetsBitfield(),
+						SeqNumber: currMd.SequenceNumber(),
+					})
+			}
+		case p2p.SchemaVersionV2:
+			// We have a v0 metadata object saved locally, so we
+			// convert it to a v1 metadata object.
+			if currMd.Version() != version.Capella {
+				currMd = wrapper.WrappedMetadataV1(
+					&pb.MetaDataV1{
+						Attnets:   currMd.AttnetsBitfield(),
+						SeqNumber: currMd.SequenceNumber(),
+						Syncnets:  bitfield.Bitvector4{byte(0x00)},
+					})
+			}
+		}
+	*/
 	currMd := s.cfg.p2p.Metadata()
-	switch streamVersion {
-	case p2p.SchemaVersionV1:
-		// We have a v1 metadata object saved locally, so we
-		// convert it back to a v0 metadata object.
-		if currMd.Version() != version.Phase0 {
-			currMd = wrapper.WrappedMetadataV0(
-				&pb.MetaDataV0{
-					Attnets:   currMd.AttnetsBitfield(),
-					SeqNumber: currMd.SequenceNumber(),
-				})
-		}
-	case p2p.SchemaVersionV2:
-		// We have a v0 metadata object saved locally, so we
-		// convert it to a v1 metadata object.
-		if currMd.Version() != version.Altair {
-			currMd = wrapper.WrappedMetadataV1(
-				&pb.MetaDataV1{
-					Attnets:   currMd.AttnetsBitfield(),
-					SeqNumber: currMd.SequenceNumber(),
-					Syncnets:  bitfield.Bitvector4{byte(0x00)},
-				})
-		}
-	}
 	if _, err := stream.Write([]byte{responseCodeSuccess}); err != nil {
 		return err
 	}
-	_, err = s.cfg.p2p.Encoding().EncodeWithMaxLength(stream, currMd)
+	_, err := s.cfg.p2p.Encoding().EncodeWithMaxLength(stream, currMd)
 	if err != nil {
 		return err
 	}
@@ -129,9 +130,7 @@ func (s *Service) sendMetaDataRequest(ctx context.Context, id peer.ID) (metadata
 	// Defensive check to ensure valid objects are being sent.
 	topicVersion := ""
 	switch msg.Version() {
-	case version.Phase0:
-		topicVersion = p2p.SchemaVersionV1
-	case version.Altair:
+	case version.Capella:
 		topicVersion = p2p.SchemaVersionV2
 	}
 	if err := validateVersion(topicVersion, stream); err != nil {

@@ -23,7 +23,7 @@ for ((i = 0; i < ${#proto_mocks_v1alpha1[@]}; i++)); do
     GO11MODULE=on mockgen -package=mock -destination="$file" github.com/theQRL/qrysm/proto/qrysm/v1alpha1 "$interfaces"
 done
 
-# github.com/theQRL/qrysm/proto/zond/service
+# github.com/theQRL/qrysm/proto/qrl/service
 # ---------------------------------------------------
 proto_mocks_service=(
       "$mock_path/event_service_mock.go EventsClient,Events_StreamEventsClient,Events_StreamEventsServer"
@@ -34,7 +34,7 @@ for ((i = 0; i < ${#proto_mocks_service[@]}; i++)); do
     interfaces=${proto_mocks_service[i]#* };
     echo "generating $file for interfaces: $interfaces";
     echo
-    GO11MODULE=on mockgen -package=mock -destination="$file" github.com/theQRL/qrysm/proto/zond/service "$interfaces"
+    GO11MODULE=on mockgen -package=mock -destination="$file" github.com/theQRL/qrysm/proto/qrl/service "$interfaces"
 done
 
 # github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client

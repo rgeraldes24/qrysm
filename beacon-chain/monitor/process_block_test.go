@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -24,23 +24,23 @@ import (
 func TestProcessSlashings(t *testing.T) {
 	tests := []struct {
 		name      string
-		block     *zondpb.BeaconBlockCapella
+		block     *qrysmpb.BeaconBlockCapella
 		wantedErr string
 	}{
 		{
 			name: "Proposer slashing a tracked index",
-			block: &zondpb.BeaconBlockCapella{
-				Body: &zondpb.BeaconBlockBodyCapella{
-					ProposerSlashings: []*zondpb.ProposerSlashing{
+			block: &qrysmpb.BeaconBlockCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{
+					ProposerSlashings: []*qrysmpb.ProposerSlashing{
 						{
-							Header_1: &zondpb.SignedBeaconBlockHeader{
-								Header: &zondpb.BeaconBlockHeader{
+							Header_1: &qrysmpb.SignedBeaconBlockHeader{
+								Header: &qrysmpb.BeaconBlockHeader{
 									ProposerIndex: 2,
 									Slot:          params.BeaconConfig().SlotsPerEpoch + 1,
 								},
 							},
-							Header_2: &zondpb.SignedBeaconBlockHeader{
-								Header: &zondpb.BeaconBlockHeader{
+							Header_2: &qrysmpb.SignedBeaconBlockHeader{
+								Header: &qrysmpb.BeaconBlockHeader{
 									ProposerIndex: 2,
 									Slot:          0,
 								},
@@ -53,18 +53,18 @@ func TestProcessSlashings(t *testing.T) {
 		},
 		{
 			name: "Proposer slashing an untracked index",
-			block: &zondpb.BeaconBlockCapella{
-				Body: &zondpb.BeaconBlockBodyCapella{
-					ProposerSlashings: []*zondpb.ProposerSlashing{
+			block: &qrysmpb.BeaconBlockCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{
+					ProposerSlashings: []*qrysmpb.ProposerSlashing{
 						{
-							Header_1: &zondpb.SignedBeaconBlockHeader{
-								Header: &zondpb.BeaconBlockHeader{
+							Header_1: &qrysmpb.SignedBeaconBlockHeader{
+								Header: &qrysmpb.BeaconBlockHeader{
 									ProposerIndex: 3,
 									Slot:          params.BeaconConfig().SlotsPerEpoch + 4,
 								},
 							},
-							Header_2: &zondpb.SignedBeaconBlockHeader{
-								Header: &zondpb.BeaconBlockHeader{
+							Header_2: &qrysmpb.SignedBeaconBlockHeader{
+								Header: &qrysmpb.BeaconBlockHeader{
 									ProposerIndex: 3,
 									Slot:          0,
 								},
@@ -77,17 +77,17 @@ func TestProcessSlashings(t *testing.T) {
 		},
 		{
 			name: "Attester slashing a tracked index",
-			block: &zondpb.BeaconBlockCapella{
-				Body: &zondpb.BeaconBlockBodyCapella{
-					AttesterSlashings: []*zondpb.AttesterSlashing{
+			block: &qrysmpb.BeaconBlockCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{
+					AttesterSlashings: []*qrysmpb.AttesterSlashing{
 						{
-							Attestation_1: util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
-								Data: &zondpb.AttestationData{
-									Source: &zondpb.Checkpoint{Epoch: 1},
+							Attestation_1: util.HydrateIndexedAttestation(&qrysmpb.IndexedAttestation{
+								Data: &qrysmpb.AttestationData{
+									Source: &qrysmpb.Checkpoint{Epoch: 1},
 								},
 								AttestingIndices: []uint64{1, 3, 4},
 							}),
-							Attestation_2: util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
+							Attestation_2: util.HydrateIndexedAttestation(&qrysmpb.IndexedAttestation{
 								AttestingIndices: []uint64{1, 5, 6},
 							}),
 						},
@@ -99,17 +99,17 @@ func TestProcessSlashings(t *testing.T) {
 		},
 		{
 			name: "Attester slashing untracked index",
-			block: &zondpb.BeaconBlockCapella{
-				Body: &zondpb.BeaconBlockBodyCapella{
-					AttesterSlashings: []*zondpb.AttesterSlashing{
+			block: &qrysmpb.BeaconBlockCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{
+					AttesterSlashings: []*qrysmpb.AttesterSlashing{
 						{
-							Attestation_1: util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
-								Data: &zondpb.AttestationData{
-									Source: &zondpb.Checkpoint{Epoch: 1},
+							Attestation_1: util.HydrateIndexedAttestation(&qrysmpb.IndexedAttestation{
+								Data: &qrysmpb.AttestationData{
+									Source: &qrysmpb.Checkpoint{Epoch: 1},
 								},
 								AttestingIndices: []uint64{1, 3, 4},
 							}),
-							Attestation_2: util.HydrateIndexedAttestation(&zondpb.IndexedAttestation{
+							Attestation_2: util.HydrateIndexedAttestation(&qrysmpb.IndexedAttestation{
 								AttestingIndices: []uint64{3, 5, 6},
 							}),
 						},
@@ -143,28 +143,28 @@ func TestProcessSlashings(t *testing.T) {
 func TestProcessProposedBlock(t *testing.T) {
 	tests := []struct {
 		name      string
-		block     *zondpb.BeaconBlockCapella
+		block     *qrysmpb.BeaconBlockCapella
 		wantedErr string
 	}{
 		{
 			name: "Block proposed by tracked validator",
-			block: &zondpb.BeaconBlockCapella{
+			block: &qrysmpb.BeaconBlockCapella{
 				Slot:          6,
 				ProposerIndex: 86,
 				ParentRoot:    bytesutil.PadTo([]byte("hello-world"), 32),
 				StateRoot:     bytesutil.PadTo([]byte("state-world"), 32),
-				Body:          &zondpb.BeaconBlockBodyCapella{},
+				Body:          &qrysmpb.BeaconBlockBodyCapella{},
 			},
-			wantedErr: "\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=0x68656c6c6f2d NewBalance=40000000000000 ParentRoot=0x68656c6c6f2d ProposerIndex=86 Slot=6 Version=3 prefix=monitor",
+			wantedErr: "\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=0x68656c6c6f2d NewBalance=40000000000000 ParentRoot=0x68656c6c6f2d ProposerIndex=86 Slot=6 Version=0 prefix=monitor",
 		},
 		{
 			name: "Block proposed by untracked validator",
-			block: &zondpb.BeaconBlockCapella{
+			block: &qrysmpb.BeaconBlockCapella{
 				Slot:          6,
 				ProposerIndex: 13,
 				ParentRoot:    bytesutil.PadTo([]byte("hello-world"), 32),
 				StateRoot:     bytesutil.PadTo([]byte("state-world"), 32),
-				Body:          &zondpb.BeaconBlockBodyCapella{},
+				Body:          &qrysmpb.BeaconBlockBodyCapella{},
 			},
 		},
 	}
@@ -274,7 +274,7 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	root, err := b.GetBlock().HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, svc.config.StateGen.SaveState(ctx, root, genesis))
-	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=0x5330430bdbfc ProposerIndex=185 Slot=1 Version=3 prefix=monitor", bytesutil.Trunc(root[:]))
+	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=0x5330430bdbfc ProposerIndex=185 Slot=1 Version=0 prefix=monitor", bytesutil.Trunc(root[:]))
 	wanted2 := fmt.Sprintf("\"Proposer slashing was included\" BodyRoot1=0x000100000000 BodyRoot2=0x000200000000 ProposerIndex=%d SlashingSlot=0 Slot=1 prefix=monitor", idx)
 	wanted3 := "\"Sync committee contribution included\" BalanceChange=0 ContribCount=3 ExpectedContribCount=3 NewBalance=40000000000000 ValidatorIndex=1 prefix=monitor"
 	wanted4 := "\"Sync committee contribution included\" BalanceChange=0 ContribCount=1 ExpectedContribCount=1 NewBalance=40000000000000 ValidatorIndex=2 prefix=monitor"

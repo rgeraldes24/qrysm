@@ -78,7 +78,7 @@ func cliActionExistingSeed(cliCtx *cli.Context) error {
 	// TODO: (cyyber) Replace seed by mnemonic
 
 	fmt.Println("Create a password that secures your validator keystore(s). " +
-		"You will need to re-enter this to decrypt them when you setup your Zond validators.")
+		"You will need to re-enter this to decrypt them when you setup your QRL validators.")
 	keystorePassword, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return err

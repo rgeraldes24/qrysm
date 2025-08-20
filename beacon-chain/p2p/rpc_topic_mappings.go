@@ -16,7 +16,7 @@ const SchemaVersionV1 = "/1"
 const SchemaVersionV2 = "/2"
 
 // Specifies the protocol prefix for all our Req/Resp topics.
-const protocolPrefix = "/eth2/beacon_chain/req"
+const protocolPrefix = "/consensus/beacon_chain/req"
 
 // StatusMessageName specifies the name for the status message topic.
 const StatusMessageName = "/status"

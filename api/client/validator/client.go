@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	localKeysPath = "/zond/v1/keystores"
-	// remoteKeysPath   = "/zond/v1/remotekeys"
-	feeRecipientPath = "/zond/v1/validator/{pubkey}/feerecipient"
+	localKeysPath = "/qrl/v1/keystores"
+	// remoteKeysPath   = "/qrl/v1/remotekeys"
+	feeRecipientPath = "/qrl/v1/validator/{pubkey}/feerecipient"
 )
 
 // Client provides a collection of helper methods for calling the Keymanager API endpoints.
@@ -108,7 +108,7 @@ func (c *Client) GetFeeRecipientAddresses(ctx context.Context, validators []stri
 		if feejson.Data == nil {
 			continue
 		}
-		feeRecipients[index] = feejson.Data.Zondaddress
+		feeRecipients[index] = feejson.Data.QRLaddress
 	}
 	return feeRecipients, nil
 }

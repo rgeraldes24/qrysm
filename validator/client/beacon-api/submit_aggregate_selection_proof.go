@@ -10,11 +10,11 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
-func (c *beaconApiValidatorClient) submitAggregateSelectionProof(ctx context.Context, in *zondpb.AggregateSelectionRequest) (*zondpb.AggregateSelectionResponse, error) {
+func (c *beaconApiValidatorClient) submitAggregateSelectionProof(ctx context.Context, in *qrysmpb.AggregateSelectionRequest) (*qrysmpb.AggregateSelectionResponse, error) {
 	isOptimistic, err := c.isOptimistic(ctx)
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (c *beaconApiValidatorClient) submitAggregateSelectionProof(ctx context.Con
 		return nil, errors.New("the node is currently optimistic and cannot serve validators")
 	}
 
-	validatorIndexResponse, err := c.validatorIndex(ctx, &zondpb.ValidatorIndexRequest{PublicKey: in.PublicKey})
+	validatorIndexResponse, err := c.validatorIndex(ctx, &qrysmpb.ValidatorIndexRequest{PublicKey: in.PublicKey})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get validator index")
 	}
@@ -75,8 +75,8 @@ func (c *beaconApiValidatorClient) submitAggregateSelectionProof(ctx context.Con
 		return nil, errors.Wrap(err, "failed to convert aggregate attestation json to proto")
 	}
 
-	return &zondpb.AggregateSelectionResponse{
-		AggregateAndProof: &zondpb.AggregateAttestationAndProof{
+	return &qrysmpb.AggregateSelectionResponse{
+		AggregateAndProof: &qrysmpb.AggregateAttestationAndProof{
 			AggregatorIndex: validatorIndexResponse.Index,
 			Aggregate:       aggregatedAttestation,
 			SelectionProof:  in.SlotSignature,
@@ -88,7 +88,7 @@ func (c *beaconApiValidatorClient) getAggregateAttestation(ctx context.Context, 
 	params := url.Values{}
 	params.Add("slot", strconv.FormatUint(uint64(slot), 10))
 	params.Add("attestation_data_root", hexutil.Encode(attestationDataRoot))
-	endpoint := buildURL("/zond/v1/validator/aggregate_attestation", params)
+	endpoint := buildURL("/qrl/v1/validator/aggregate_attestation", params)
 
 	var aggregateAttestationResponse apimiddleware.AggregateAttestationResponseJson
 	if _, err := c.jsonRestHandler.GetRestJsonResponse(ctx, endpoint, &aggregateAttestationResponse); err != nil {

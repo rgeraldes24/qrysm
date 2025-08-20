@@ -1,16 +1,16 @@
-package zond
+package qrl
 
 import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 )
 
-// CopyETH1Data copies the provided eth1data object.
-func CopyETH1Data(data *Eth1Data) *Eth1Data {
+// CopyExecutionData copies the provided executionData object.
+func CopyExecutionData(data *ExecutionData) *ExecutionData {
 	if data == nil {
 		return nil
 	}
-	return &Eth1Data{
+	return &ExecutionData{
 		DepositRoot:  bytesutil.SafeCopyBytes(data.DepositRoot),
 		DepositCount: data.DepositCount,
 		BlockHash:    bytesutil.SafeCopyBytes(data.BlockHash),
@@ -350,7 +350,7 @@ func CopyBeaconBlockBodyCapella(body *BeaconBlockBodyCapella) *BeaconBlockBodyCa
 	}
 	return &BeaconBlockBodyCapella{
 		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:                    CopyETH1Data(body.Eth1Data),
+		ExecutionData:               CopyExecutionData(body.ExecutionData),
 		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),
@@ -395,7 +395,7 @@ func CopyBlindedBeaconBlockBodyCapella(body *BlindedBeaconBlockBodyCapella) *Bli
 	}
 	return &BlindedBeaconBlockBodyCapella{
 		RandaoReveal:                bytesutil.SafeCopyBytes(body.RandaoReveal),
-		Eth1Data:                    CopyETH1Data(body.Eth1Data),
+		ExecutionData:               CopyExecutionData(body.ExecutionData),
 		Graffiti:                    bytesutil.SafeCopyBytes(body.Graffiti),
 		ProposerSlashings:           CopyProposerSlashings(body.ProposerSlashings),
 		AttesterSlashings:           CopyAttesterSlashings(body.AttesterSlashings),

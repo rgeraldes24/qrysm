@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/encoding/ssz"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -137,9 +137,9 @@ func Test_unblindBuilderBlock(t *testing.T) {
 				b := util.NewBlindedBeaconBlockCapella()
 				b.Block.Slot = 1
 				b.Block.ProposerIndex = 2
-				b.Block.Body.DilithiumToExecutionChanges = []*zond.SignedDilithiumToExecutionChange{
+				b.Block.Body.DilithiumToExecutionChanges = []*qrysmpb.SignedDilithiumToExecutionChange{
 					{
-						Message: &zond.DilithiumToExecutionChange{
+						Message: &qrysmpb.DilithiumToExecutionChange{
 							ValidatorIndex:      123,
 							FromDilithiumPubkey: []byte{'a'},
 							ToExecutionAddress:  []byte{'a'},
@@ -147,7 +147,7 @@ func Test_unblindBuilderBlock(t *testing.T) {
 						Signature: []byte("sig123"),
 					},
 					{
-						Message: &zond.DilithiumToExecutionChange{
+						Message: &qrysmpb.DilithiumToExecutionChange{
 							ValidatorIndex:      456,
 							FromDilithiumPubkey: []byte{'b'},
 							ToExecutionAddress:  []byte{'b'},
@@ -184,9 +184,9 @@ func Test_unblindBuilderBlock(t *testing.T) {
 				b := util.NewBeaconBlockCapella()
 				b.Block.Slot = 1
 				b.Block.ProposerIndex = 2
-				b.Block.Body.DilithiumToExecutionChanges = []*zond.SignedDilithiumToExecutionChange{
+				b.Block.Body.DilithiumToExecutionChanges = []*qrysmpb.SignedDilithiumToExecutionChange{
 					{
-						Message: &zond.DilithiumToExecutionChange{
+						Message: &qrysmpb.DilithiumToExecutionChange{
 							ValidatorIndex:      123,
 							FromDilithiumPubkey: []byte{'a'},
 							ToExecutionAddress:  []byte{'a'},
@@ -194,7 +194,7 @@ func Test_unblindBuilderBlock(t *testing.T) {
 						Signature: []byte("sig123"),
 					},
 					{
-						Message: &zond.DilithiumToExecutionChange{
+						Message: &qrysmpb.DilithiumToExecutionChange{
 							ValidatorIndex:      456,
 							FromDilithiumPubkey: []byte{'b'},
 							ToExecutionAddress:  []byte{'b'},

@@ -42,8 +42,8 @@ import (
 	"github.com/theQRL/qrysm/monitoring/backup"
 	"github.com/theQRL/qrysm/monitoring/prometheus"
 	tracing2 "github.com/theQRL/qrysm/monitoring/tracing"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
 	"github.com/theQRL/qrysm/runtime"
 	"github.com/theQRL/qrysm/runtime/debug"
 	"github.com/theQRL/qrysm/runtime/prereqs"
@@ -60,7 +60,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-// ValidatorClient defines an instance of a Zond validator that manages
+// ValidatorClient defines an instance of a QRL validator that manages
 // the entire lifecycle of services attached to it participating in proof of stake.
 type ValidatorClient struct {
 	cliCtx            *cli.Context
@@ -462,7 +462,7 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 	}
 	recipient, err := common.NewAddressFromString(fileConfig.DefaultConfig.FeeRecipient)
 	if err != nil {
-		return nil, errors.New("default fileConfig fee recipient is not a valid zond address")
+		return nil, errors.New("default fileConfig fee recipient is not a valid qrl address")
 	}
 	psExists, err := db.ProposerSettingsExists(cliCtx.Context)
 	if err != nil {
@@ -552,7 +552,7 @@ func verifyOption(key string, option *validatorpb.ProposerOptionPayload) error {
 		return fmt.Errorf("fee recipient is required for proposer %s", key)
 	}
 	if !common.IsAddress(option.FeeRecipient) {
-		return errors.New("fee recipient is not a valid zond address")
+		return errors.New("fee recipient is not a valid qrl address")
 	}
 	if err := warnNonChecksummedAddress(option.FeeRecipient); err != nil {
 		return err
@@ -629,10 +629,10 @@ func warnNonChecksummedAddress(feeRecipient string) error {
 		return errors.Wrapf(err, "could not decode fee recipient %s", feeRecipient)
 	}
 	if !mixedcaseAddress.ValidChecksum() {
-		log.Warnf("Fee recipient %s is not a checksum Zond address. "+
+		log.Warnf("Fee recipient %s is not a checksum QRL address. "+
 			"The checksummed address is %s and will be used as the fee recipient. "+
 			"We recommend using a mixed-case address (checksum) "+
-			"to prevent spelling mistakes in your fee recipient Zond address", feeRecipient, mixedcaseAddress.Address().Hex())
+			"to prevent spelling mistakes in your fee recipient QRL address", feeRecipient, mixedcaseAddress.Address().Hex())
 	}
 	return nil
 }
@@ -713,7 +713,7 @@ func (c *ValidatorClient) registerRPCGatewayService(cliCtx *cli.Context) error {
 	maxCallSize := cliCtx.Uint64(cmd.GrpcMaxCallRecvMsgSizeFlag.Name)
 
 	registrations := []gateway.PbHandlerRegistration{
-		zondpbservice.RegisterKeyManagementHandler,
+		qrlpbservice.RegisterKeyManagementHandler,
 	}
 	gwmux := gwruntime.NewServeMux(
 		gwruntime.WithMarshalerOption(gwruntime.MIMEWildcard, &gwruntime.HTTPBodyMarshaler{
@@ -734,11 +734,11 @@ func (c *ValidatorClient) registerRPCGatewayService(cliCtx *cli.Context) error {
 	)
 	muxHandler := func(apiMware *apimiddleware.ApiProxyMiddleware, h http.HandlerFunc, w http.ResponseWriter, req *http.Request) {
 		// The validator gateway handler requires this special logic as it serves two kinds of APIs, namely
-		// the standard validator keymanager API under the /zond namespace, and the Qrysm internal
+		// the standard validator keymanager API under the /qrl namespace, and the Qrysm internal
 		// validator API under the /api namespace. Finally, it also serves requests to host the validator web UI.
-		if strings.HasPrefix(req.URL.Path, "/api/zond/") {
+		if strings.HasPrefix(req.URL.Path, "/api/qrl/") {
 			req.URL.Path = strings.Replace(req.URL.Path, "/api", "", 1)
-			// If the prefix has /zond/, we handle it with the standard API gateway middleware.
+			// If the prefix has /qrl/, we handle it with the standard API gateway middleware.
 			apiMware.ServeHTTP(w, req)
 		} else if strings.HasPrefix(req.URL.Path, "/api") {
 			req.URL.Path = strings.Replace(req.URL.Path, "/api", "", 1)
@@ -749,7 +749,7 @@ func (c *ValidatorClient) registerRPCGatewayService(cliCtx *cli.Context) error {
 
 	pbHandler := &gateway.PbMux{
 		Registrations: registrations,
-		Patterns:      []string{"/internal/zond/v1/"},
+		Patterns:      []string{"/internal/qrl/v1/"},
 		Mux:           gwmux,
 	}
 	opts := []gateway.Option{

@@ -67,7 +67,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const testSkipPowFlag = "test-skip-pow"
+const testSkipExecutionFlag = "test-skip-execution"
 
 // Used as a struct to keep cli flag options for configuring services
 // for the beacon node. We keep this as a separate struct to not pollute the actual BeaconNode
@@ -143,7 +143,7 @@ func New(cliCtx *cli.Context, opts ...Option) (*BeaconNode, error) {
 	if err := configureSlotsPerArchivedPoint(cliCtx); err != nil {
 		return nil, err
 	}
-	if err := configureEth1Config(cliCtx); err != nil {
+	if err := configureExecutionConfig(cliCtx); err != nil {
 		return nil, err
 	}
 	configureNetwork(cliCtx)
@@ -227,8 +227,8 @@ func New(cliCtx *cli.Context, opts ...Option) (*BeaconNode, error) {
 		return nil, err
 	}
 
-	log.Debugln("Registering POW Chain Service")
-	if err := beacon.registerPOWChainService(); err != nil {
+	log.Debugln("Registering Execution Chain Service")
+	if err := beacon.registerExecutionChainService(); err != nil {
 		return nil, err
 	}
 
@@ -648,11 +648,11 @@ func (b *BeaconNode) registerBlockchainService(fc forkchoice.ForkChoicer, gs *st
 	return b.services.RegisterService(blockchainService)
 }
 
-func (b *BeaconNode) registerPOWChainService() error {
-	if b.cliCtx.Bool(testSkipPowFlag) {
+func (b *BeaconNode) registerExecutionChainService() error {
+	if b.cliCtx.Bool(testSkipExecutionFlag) {
 		return b.services.RegisterService(&execution.Service{})
 	}
-	bs, err := execution.NewPowchainCollector(b.ctx)
+	bs, err := execution.NewExecutionChainCollector(b.ctx)
 	if err != nil {
 		return err
 	}
@@ -678,7 +678,7 @@ func (b *BeaconNode) registerPOWChainService() error {
 	)
 	web3Service, err := execution.NewService(b.ctx, opts...)
 	if err != nil {
-		return errors.Wrap(err, "could not register proof-of-work chain web3Service")
+		return errors.Wrap(err, "could not register execution chain web3Service")
 	}
 
 	return b.services.RegisterService(web3Service)
@@ -817,7 +817,7 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 	beaconMonitoringPort := b.cliCtx.Int(flags.MonitoringPortFlag.Name)
 	cert := b.cliCtx.String(flags.CertFlag.Name)
 	key := b.cliCtx.String(flags.KeyFlag.Name)
-	mockEth1DataVotes := b.cliCtx.Bool(flags.InteropMockEth1DataVotesFlag.Name)
+	mockExecutionDataVotes := b.cliCtx.Bool(flags.InteropMockExecutionDataVotesFlag.Name)
 
 	maxMsgSize := b.cliCtx.Int(cmd.GrpcMaxCallRecvMsgSizeFlag.Name)
 	enableDebugRPCEndpoints := b.cliCtx.Bool(flags.EnableDebugRPCEndpoints.Name)
@@ -857,7 +857,7 @@ func (b *BeaconNode) registerRPCService(router *mux.Router) error {
 		ExecutionChainService:         web3Service,
 		ExecutionChainInfoFetcher:     web3Service,
 		ChainStartFetcher:             chainStartFetcher,
-		MockEth1Votes:                 mockEth1DataVotes,
+		MockExecutionVotes:            mockExecutionDataVotes,
 		SyncService:                   syncService,
 		DepositFetcher:                depositFetcher,
 		PendingDepositFetcher:         b.depositCache,
@@ -917,11 +917,11 @@ func (b *BeaconNode) registerGRPCGateway(router *mux.Router) error {
 
 	gatewayConfig := gateway.DefaultConfig(enableDebugRPCEndpoints, httpModules)
 	muxs := make([]*apigateway.PbMux, 0)
-	if gatewayConfig.V1AlphaPbMux != nil {
-		muxs = append(muxs, gatewayConfig.V1AlphaPbMux)
+	if gatewayConfig.QrysmPbMux != nil {
+		muxs = append(muxs, gatewayConfig.QrysmPbMux)
 	}
-	if gatewayConfig.ZondPbMux != nil {
-		muxs = append(muxs, gatewayConfig.ZondPbMux)
+	if gatewayConfig.QRLPbMux != nil {
+		muxs = append(muxs, gatewayConfig.QRLPbMux)
 	}
 
 	opts := []apigateway.Option{
@@ -935,7 +935,7 @@ func (b *BeaconNode) registerGRPCGateway(router *mux.Router) error {
 		apigateway.WithAllowedOrigins(allowedOrigins),
 		apigateway.WithTimeout(uint64(timeout)),
 	}
-	if flags.EnableHTTPZondAPI(httpModules) {
+	if flags.EnableHTTPQRLAPI(httpModules) {
 		opts = append(opts, apigateway.WithApiMiddleware(&apimiddleware.BeaconEndpointFactory{}))
 	}
 	g, err := apigateway.New(b.ctx, opts...)

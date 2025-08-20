@@ -6,7 +6,7 @@ import (
 
 	statenative "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -15,7 +15,7 @@ import (
 func TestInitializeFromProto_Capella(t *testing.T) {
 	type test struct {
 		name  string
-		state *zondpb.BeaconStateCapella
+		state *qrysmpb.BeaconStateCapella
 		error string
 	}
 	initTests := []test{
@@ -26,14 +26,14 @@ func TestInitializeFromProto_Capella(t *testing.T) {
 		},
 		{
 			name: "nil validators",
-			state: &zondpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateCapella{
 				Slot:       4,
 				Validators: nil,
 			},
 		},
 		{
 			name:  "empty state",
-			state: &zondpb.BeaconStateCapella{},
+			state: &qrysmpb.BeaconStateCapella{},
 		},
 	}
 	for _, tt := range initTests {
@@ -51,20 +51,20 @@ func TestInitializeFromProto_Capella(t *testing.T) {
 func TestInitializeFromProtoUnsafe_Capella(t *testing.T) {
 	type test struct {
 		name  string
-		state *zondpb.BeaconStateCapella
+		state *qrysmpb.BeaconStateCapella
 		error string
 	}
 	initTests := []test{
 		{
 			name: "nil validators",
-			state: &zondpb.BeaconStateCapella{
+			state: &qrysmpb.BeaconStateCapella{
 				Slot:       4,
 				Validators: nil,
 			},
 		},
 		{
 			name:  "empty state",
-			state: &zondpb.BeaconStateCapella{},
+			state: &qrysmpb.BeaconStateCapella{},
 		},
 	}
 	for _, tt := range initTests {
@@ -177,7 +177,7 @@ func TestBeaconState_AppendValidator_DoesntMutateCopy(t *testing.T) {
 	st1 := st0.Copy()
 	originalCount := st1.NumValidators()
 
-	val := &zondpb.Validator{Slashed: true}
+	val := &qrysmpb.Validator{Slashed: true}
 	assert.NoError(t, st0.AppendValidator(val))
 	assert.Equal(t, originalCount, st1.NumValidators(), "st1 NumValidators mutated")
 	_, ok := st1.ValidatorIndexByPubkey(bytesutil.ToBytes2592(val.PublicKey))
@@ -195,14 +195,14 @@ func TestBeaconState_ValidatorMutation_Capella(t *testing.T) {
 	require.NoError(t, err)
 
 	// Reset tries
-	require.NoError(t, testState.UpdateValidatorAtIndex(200, new(zondpb.Validator)))
+	require.NoError(t, testState.UpdateValidatorAtIndex(200, new(qrysmpb.Validator)))
 	_, err = testState.HashTreeRoot(context.Background())
 	require.NoError(t, err)
 
 	newState1 := testState.Copy()
 	_ = testState.Copy()
 
-	require.NoError(t, testState.UpdateValidatorAtIndex(15, &zondpb.Validator{
+	require.NoError(t, testState.UpdateValidatorAtIndex(15, &qrysmpb.Validator{
 		PublicKey:                  make([]byte, 48),
 		WithdrawalCredentials:      make([]byte, 32),
 		EffectiveBalance:           1111,
@@ -226,7 +226,7 @@ func TestBeaconState_ValidatorMutation_Capella(t *testing.T) {
 
 	assert.Equal(t, rt, rt2)
 
-	require.NoError(t, newState1.UpdateValidatorAtIndex(150, &zondpb.Validator{
+	require.NoError(t, newState1.UpdateValidatorAtIndex(150, &qrysmpb.Validator{
 		PublicKey:                  make([]byte, 48),
 		WithdrawalCredentials:      make([]byte, 32),
 		EffectiveBalance:           2111,

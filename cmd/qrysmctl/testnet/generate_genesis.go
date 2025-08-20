@@ -14,13 +14,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/core"
+	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
-	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/io/file"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/interop"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/urfave/cli/v2"
@@ -28,20 +28,20 @@ import (
 
 var (
 	generateGenesisStateFlags = struct {
-		DepositJsonFile     string
-		ChainConfigFile     string
-		ConfigName          string
-		NumValidators       uint64
-		GenesisTime         uint64
-		GenesisTimeDelay    uint64
-		OutputSSZ           string
-		OutputJSON          string
-		OutputYaml          string
-		ForkName            string
-		OverrideZond1Data   bool
-		ExecutionEndpoint   string
-		GzondGenesisJsonIn  string
-		GzondGenesisJsonOut string
+		DepositJsonFile       string
+		ChainConfigFile       string
+		ConfigName            string
+		NumValidators         uint64
+		GenesisTime           uint64
+		GenesisTimeDelay      uint64
+		OutputSSZ             string
+		OutputJSON            string
+		OutputYaml            string
+		ForkName              string
+		OverrideExecutionData bool
+		ExecutionEndpoint     string
+		GzondGenesisJsonIn    string
+		GzondGenesisJsonOut   string
 	}{}
 	log           = logrus.WithField("prefix", "genesis")
 	outputSSZFlag = &cli.StringFlag{
@@ -105,9 +105,9 @@ var (
 				Usage:       "Delay genesis time by N seconds",
 			},
 			&cli.BoolFlag{
-				Name:        "override-zond1data",
-				Destination: &generateGenesisStateFlags.OverrideZond1Data,
-				Usage:       "Overrides Zond1Data with values from execution client. If unset, defaults to false",
+				Name:        "override-executiodata",
+				Destination: &generateGenesisStateFlags.OverrideExecutionData,
+				Usage:       "Overrides ExecutionData with values from execution client. If unset, defaults to false",
 				Value:       false,
 			},
 			&cli.StringFlag{
@@ -271,10 +271,11 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if err := json.Unmarshal(gbytes, gen); err != nil {
 			return nil, err
 		}
-		// set timestamps for genesis and shanghai fork
+		// set timestamps for genesis
 		gen.Timestamp = f.GenesisTime
 
-		log.Info("setting fork zond times")
+		// NOTE(rgeraldes24): unused for now
+		// log.Info("setting fork qrl times")
 	} else {
 		gen = interop.GzondTestnetGenesis(f.GenesisTime, params.BeaconConfig())
 	}
@@ -297,8 +298,8 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		return nil, err
 	}
 
-	if f.OverrideZond1Data {
-		log.Print("Overriding Eth1Data with data from execution client")
+	if f.OverrideExecutionData {
+		log.Print("Overriding ExecutionData with data from execution client")
 		conn, err := rpc.Dial(generateGenesisStateFlags.ExecutionEndpoint)
 		if err != nil {
 			return nil, errors.Wrapf(
@@ -306,7 +307,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 				"could not dial %s please make sure you are running your execution client",
 				generateGenesisStateFlags.ExecutionEndpoint)
 		}
-		client := zondclient.NewClient(conn)
+		client := qrlclient.NewClient(conn)
 		header, err := client.HeaderByNumber(ctx, big.NewInt(0))
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get header by number")
@@ -319,15 +320,15 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get hash tree root")
 		}
-		e1d := &zondpb.Eth1Data{
+		e1d := &qrysmpb.ExecutionData{
 			DepositRoot:  depositRoot[:],
 			DepositCount: 0,
 			BlockHash:    header.Hash().Bytes(),
 		}
-		if err := genesisState.SetEth1Data(e1d); err != nil {
+		if err := genesisState.SetExecutionData(e1d); err != nil {
 			return nil, err
 		}
-		if err := genesisState.SetEth1DepositIndex(0); err != nil {
+		if err := genesisState.SetExecutionDepositIndex(0); err != nil {
 			return nil, err
 		}
 	}
@@ -335,12 +336,12 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 	return genesisState, err
 }
 
-func depositEntriesFromJSON(enc []byte) ([][]byte, []*zondpb.Deposit_Data, error) {
+func depositEntriesFromJSON(enc []byte) ([][]byte, []*qrysmpb.Deposit_Data, error) {
 	var depositJSON []*depositDataJSON
 	if err := json.Unmarshal(enc, &depositJSON); err != nil {
 		return nil, nil, err
 	}
-	dds := make([]*zondpb.Deposit_Data, len(depositJSON))
+	dds := make([]*qrysmpb.Deposit_Data, len(depositJSON))
 	roots := make([][]byte, len(depositJSON))
 	for i, val := range depositJSON {
 		root, data, err := depositJSONToDepositData(val)
@@ -353,7 +354,7 @@ func depositEntriesFromJSON(enc []byte) ([][]byte, []*zondpb.Deposit_Data, error
 	return roots, dds, nil
 }
 
-func depositJSONToDepositData(input *depositDataJSON) ([]byte, *zondpb.Deposit_Data, error) {
+func depositJSONToDepositData(input *depositDataJSON) ([]byte, *qrysmpb.Deposit_Data, error) {
 	root, err := hex.DecodeString(strings.TrimPrefix(input.DepositDataRoot, "0x"))
 	if err != nil {
 		return nil, nil, err
@@ -370,7 +371,7 @@ func depositJSONToDepositData(input *depositDataJSON) ([]byte, *zondpb.Deposit_D
 	if err != nil {
 		return nil, nil, err
 	}
-	return root, &zondpb.Deposit_Data{
+	return root, &qrysmpb.Deposit_Data{
 		PublicKey:             pk,
 		WithdrawalCredentials: creds,
 		Amount:                input.Amount,

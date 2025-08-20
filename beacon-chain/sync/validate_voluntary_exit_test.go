@@ -24,27 +24,27 @@ import (
 	lruwrpr "github.com/theQRL/qrysm/cache/lru"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/dilithium"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-func setupValidExit(t *testing.T) (*zondpb.SignedVoluntaryExit, state.BeaconState) {
-	exit := &zondpb.SignedVoluntaryExit{
-		Exit: &zondpb.VoluntaryExit{
+func setupValidExit(t *testing.T) (*qrysmpb.SignedVoluntaryExit, state.BeaconState) {
+	exit := &qrysmpb.SignedVoluntaryExit{
+		Exit: &qrysmpb.VoluntaryExit{
 			ValidatorIndex: 0,
 			Epoch:          1 + params.BeaconConfig().ShardCommitteePeriod,
 		},
 	}
-	registry := []*zondpb.Validator{
+	registry := []*qrysmpb.Validator{
 		{
 			ExitEpoch:       params.BeaconConfig().FarFutureEpoch,
 			ActivationEpoch: 0,
 		},
 	}
-	st, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{
+	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
 		Validators: registry,
-		Fork: &zondpb.Fork{
+		Fork: &qrysmpb.Fork{
 			CurrentVersion:  params.BeaconConfig().GenesisForkVersion,
 			PreviousVersion: params.BeaconConfig().GenesisForkVersion,
 		},

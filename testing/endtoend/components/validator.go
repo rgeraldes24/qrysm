@@ -28,7 +28,7 @@ import (
 	e2etypes "github.com/theQRL/qrysm/testing/endtoend/types"
 )
 
-const DefaultFeeRecipientAddress = "Z099FB65722e7b2455043bfebF6177f1D2E9738d9"
+const DefaultFeeRecipientAddress = "Q099FB65722e7b2455043bfebF6177f1D2E9738d9"
 
 var _ e2etypes.ComponentRunner = (*ValidatorNode)(nil)
 var _ e2etypes.ComponentRunner = (*ValidatorNodeSet)(nil)
@@ -222,7 +222,7 @@ func (v *ValidatorNode) Start(ctx context.Context) error {
 		return err
 	}
 	args := []string{
-		fmt.Sprintf("--%s=%s/zond-val-%d", cmdshared.DataDirFlag.Name, e2e.TestParams.TestPath, index),
+		fmt.Sprintf("--%s=%s/qrl-val-%d", cmdshared.DataDirFlag.Name, e2e.TestParams.TestPath, index),
 		fmt.Sprintf("--%s=%s", cmdshared.LogFileName.Name, file.Name()),
 		fmt.Sprintf("--%s=%s", flags.GraffitiFileFlag.Name, gFile),
 		fmt.Sprintf("--%s=%d", flags.MonitoringPortFlag.Name, e2e.TestParams.Ports.ValidatorMetricsPort+index),

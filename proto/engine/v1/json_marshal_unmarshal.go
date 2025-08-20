@@ -27,7 +27,7 @@ func (b PayloadIDBytes) MarshalJSON() ([]byte, error) {
 	return json.Marshal(hexutil.Bytes(b[:]))
 }
 
-// ExecutionBlock is the response kind received by the zond_getBlockByHash and
+// ExecutionBlock is the response kind received by the qrl_getBlockByHash and
 // zomd_getBlockByNumber endpoints via JSON-RPC.
 type ExecutionBlock struct {
 	Version int
@@ -343,7 +343,7 @@ func (e *ExecutionPayloadCapellaWithValue) UnmarshalJSON(enc []byte) error {
 type payloadAttributesV2JSON struct {
 	Timestamp             hexutil.Uint64 `json:"timestamp"`
 	PrevRandao            hexutil.Bytes  `json:"prevRandao"`
-	SuggestedFeeRecipient hexutil.BytesZ `json:"suggestedFeeRecipient"`
+	SuggestedFeeRecipient hexutil.BytesQ `json:"suggestedFeeRecipient"`
 	Withdrawals           []*Withdrawal  `json:"withdrawals"`
 }
 

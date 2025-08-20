@@ -14,7 +14,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/io/file"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/validator/client"
 	beacon_api "github.com/theQRL/qrysm/validator/client/beacon-api"
 	"github.com/theQRL/qrysm/validator/client/iface"
@@ -185,12 +185,12 @@ func displayExitInfo(rawExitedKeys [][]byte, trimmedExitedKeys []string) {
 	}
 }
 
-func writeSignedVoluntaryExitJSON(ctx context.Context, sve *zond.SignedVoluntaryExit, outputDirectory string) error {
+func writeSignedVoluntaryExitJSON(ctx context.Context, sve *qrysmpb.SignedVoluntaryExit, outputDirectory string) error {
 	if err := file.MkdirAll(outputDirectory); err != nil {
 		return err
 	}
 
-	jsve := beacon_api.JsonifySignedVoluntaryExits([]*zond.SignedVoluntaryExit{sve})[0]
+	jsve := beacon_api.JsonifySignedVoluntaryExits([]*qrysmpb.SignedVoluntaryExit{sve})[0]
 	b, err := json.Marshal(jsve)
 	if err != nil {
 		return errors.Wrap(err, "failed to marshal JSON signed voluntary exit")

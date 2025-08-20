@@ -1,5 +1,5 @@
 // Package client represents a gRPC polling-based implementation
-// of a Zond validator client.
+// of a QRL validator client.
 package client
 
 import (
@@ -24,7 +24,6 @@ import (
 	"github.com/theQRL/qrysm/async/event"
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
 	"github.com/theQRL/qrysm/config/features"
-	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	validatorserviceconfig "github.com/theQRL/qrysm/config/validator/service"
@@ -33,7 +32,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	accountsiface "github.com/theQRL/qrysm/validator/accounts/iface"
 	"github.com/theQRL/qrysm/validator/accounts/wallet"
@@ -73,15 +72,15 @@ type validator struct {
 	highestValidSlotLock               sync.Mutex
 	prevBalanceLock                    sync.RWMutex
 	slashableKeysLock                  sync.RWMutex
-	eipImportBlacklistedPublicKeys     map[[field_params.DilithiumPubkeyLength]byte]bool
+	eipImportBlacklistedPublicKeys     map[[fieldparams.DilithiumPubkeyLength]byte]bool
 	walletInitializedFeed              *event.Feed
 	attLogs                            map[[32]byte]*attSubmitted
-	startBalances                      map[[field_params.DilithiumPubkeyLength]byte]uint64
+	startBalances                      map[[fieldparams.DilithiumPubkeyLength]byte]uint64
 	dutiesLock                         sync.RWMutex
-	duties                             *zondpb.DutiesResponse
-	prevBalance                        map[[field_params.DilithiumPubkeyLength]byte]uint64
-	pubkeyToValidatorIndex             map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex
-	signedValidatorRegistrations       map[[field_params.DilithiumPubkeyLength]byte]*zondpb.SignedValidatorRegistrationV1
+	duties                             *qrysmpb.DutiesResponse
+	prevBalance                        map[[fieldparams.DilithiumPubkeyLength]byte]uint64
+	pubkeyToValidatorIndex             map[[fieldparams.DilithiumPubkeyLength]byte]primitives.ValidatorIndex
+	signedValidatorRegistrations       map[[fieldparams.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1
 	graffitiOrderedIndex               uint64
 	aggregatedSlotCommitteeIDCache     *lru.Cache
 	domainDataCache                    *ristretto.Cache
@@ -107,7 +106,7 @@ type validator struct {
 
 type validatorStatus struct {
 	publicKey []byte
-	status    *zondpb.ValidatorStatusResponse
+	status    *qrysmpb.ValidatorStatusResponse
 	index     primitives.ValidatorIndex
 }
 
@@ -149,7 +148,7 @@ func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
 // recheckKeys checks if the validator has any keys that need to be rechecked.
 // the keymanager implements a subscription to push these updates to the validator.
 func recheckKeys(ctx context.Context, valDB vdb.Database, keyManager keymanager.IKeymanager) {
-	var validatingKeys [][field_params.DilithiumPubkeyLength]byte
+	var validatingKeys [][fieldparams.DilithiumPubkeyLength]byte
 	var err error
 	validatingKeys, err = keyManager.FetchValidatingPublicKeys(ctx)
 	if err != nil {
@@ -173,7 +172,7 @@ func recheckValidatingKeysBucket(ctx context.Context, valDB vdb.Database, km key
 	if !ok {
 		return
 	}
-	validatingPubKeysChan := make(chan [][field_params.DilithiumPubkeyLength]byte, 1)
+	validatingPubKeysChan := make(chan [][fieldparams.DilithiumPubkeyLength]byte, 1)
 	sub := importedKeymanager.SubscribeAccountChanges(validatingPubKeysChan)
 	defer func() {
 		sub.Unsubscribe()
@@ -196,7 +195,7 @@ func recheckValidatingKeysBucket(ctx context.Context, valDB vdb.Database, km key
 }
 
 // WaitForChainStart checks whether the beacon node has started its runtime. That is,
-// it calls to the beacon node which then verifies the Zond deposit contract logs to check
+// it calls to the beacon node which then verifies the QRL deposit contract logs to check
 // for the ChainStart log to have been emitted. If so, it starts a ticker based on the ChainStart
 // unix timestamp which will be used to keep track of time within the validator client.
 func (v *validator) WaitForChainStart(ctx context.Context) error {
@@ -283,7 +282,7 @@ func (v *validator) WaitForSync(ctx context.Context) error {
 // blocks from the beacon node. Upon receiving a block, the service
 // broadcasts it to a feed for other usages to subscribe to.
 func (v *validator) ReceiveBlocks(ctx context.Context, connectionErrorChannel chan<- error) {
-	stream, err := v.validatorClient.StreamBlocksAltair(ctx, &zondpb.StreamBlocksRequest{VerifiedOnly: true})
+	stream, err := v.validatorClient.StreamBlocksAltair(ctx, &qrysmpb.StreamBlocksRequest{VerifiedOnly: true})
 	if err != nil {
 		log.WithError(err).Error("Failed to retrieve blocks stream, " + iface.ErrConnectionIssue.Error())
 		connectionErrorChannel <- errors.Wrap(iface.ErrConnectionIssue, err.Error())
@@ -306,7 +305,7 @@ func (v *validator) ReceiveBlocks(ctx context.Context, connectionErrorChannel ch
 		}
 		var blk interfaces.ReadOnlySignedBeaconBlock
 		switch b := res.Block.(type) {
-		case *zondpb.StreamBlocksResponse_CapellaBlock:
+		case *qrysmpb.StreamBlocksResponse_CapellaBlock:
 			blk, err = blocks.NewSignedBeaconBlock(b.CapellaBlock)
 		}
 		if err != nil {
@@ -346,15 +345,15 @@ func (v *validator) checkAndLogValidatorStatus(statuses []*validatorStatus, acti
 			ValidatorStatusesGaugeVec.WithLabelValues(fmtKey).Set(float64(status.status.Status))
 		}
 		switch status.status.Status {
-		case zondpb.ValidatorStatus_UNKNOWN_STATUS:
+		case qrysmpb.ValidatorStatus_UNKNOWN_STATUS:
 			log.Info("Waiting for deposit to be observed by beacon node")
-		case zondpb.ValidatorStatus_DEPOSITED:
+		case qrysmpb.ValidatorStatus_DEPOSITED:
 			if status.status.PositionInActivationQueue != 0 {
 				log.WithField(
 					"positionInActivationQueue", status.status.PositionInActivationQueue,
 				).Info("Deposit processed, entering activation queue after finalization")
 			}
-		case zondpb.ValidatorStatus_PENDING:
+		case qrysmpb.ValidatorStatus_PENDING:
 			secondsPerEpoch := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot))
 			expectedWaitingTime :=
 				time.Duration((status.status.PositionInActivationQueue+activationsPerEpoch)/activationsPerEpoch*secondsPerEpoch) * time.Second
@@ -368,12 +367,12 @@ func (v *validator) checkAndLogValidatorStatus(statuses []*validatorStatus, acti
 					"activationEpoch": status.status.ActivationEpoch,
 				}).Info("Waiting for activation")
 			}
-		case zondpb.ValidatorStatus_ACTIVE, zondpb.ValidatorStatus_EXITING:
+		case qrysmpb.ValidatorStatus_ACTIVE, qrysmpb.ValidatorStatus_EXITING:
 			validatorActivated = true
-		case zondpb.ValidatorStatus_EXITED:
+		case qrysmpb.ValidatorStatus_EXITED:
 			log.Info("Validator exited")
-		case zondpb.ValidatorStatus_INVALID:
-			log.Warn("Invalid Zond deposit")
+		case qrysmpb.ValidatorStatus_INVALID:
+			log.Warn("Invalid QRL deposit")
 		default:
 			log.WithFields(logrus.Fields{
 				"activationEpoch": status.status.ActivationEpoch,
@@ -385,7 +384,7 @@ func (v *validator) checkAndLogValidatorStatus(statuses []*validatorStatus, acti
 
 func logActiveValidatorStatus(statuses []*validatorStatus) {
 	for _, s := range statuses {
-		if s.status.Status != zondpb.ValidatorStatus_ACTIVE {
+		if s.status.Status != qrysmpb.ValidatorStatus_ACTIVE {
 			continue
 		}
 		log.WithFields(logrus.Fields{
@@ -433,7 +432,7 @@ func (v *validator) CheckDoppelGanger(ctx context.Context) error {
 	if len(pubkeys) == 0 {
 		return nil
 	}
-	req := &zondpb.DoppelGangerRequest{ValidatorRequests: []*zondpb.DoppelGangerRequest_ValidatorRequest{}}
+	req := &qrysmpb.DoppelGangerRequest{ValidatorRequests: []*qrysmpb.DoppelGangerRequest_ValidatorRequest{}}
 	for _, pkey := range pubkeys {
 		copiedKey := pkey
 		attRec, err := v.db.AttestationHistoryForPubKey(ctx, copiedKey)
@@ -444,7 +443,7 @@ func (v *validator) CheckDoppelGanger(ctx context.Context) error {
 			// If no history exists we simply send in a zero
 			// value for the request epoch and root.
 			req.ValidatorRequests = append(req.ValidatorRequests,
-				&zondpb.DoppelGangerRequest_ValidatorRequest{
+				&qrysmpb.DoppelGangerRequest_ValidatorRequest{
 					PublicKey:  copiedKey[:],
 					Epoch:      0,
 					SignedRoot: make([]byte, fieldparams.RootLength),
@@ -456,7 +455,7 @@ func (v *validator) CheckDoppelGanger(ctx context.Context) error {
 			return errors.New("attestation record mismatched public key")
 		}
 		req.ValidatorRequests = append(req.ValidatorRequests,
-			&zondpb.DoppelGangerRequest_ValidatorRequest{
+			&qrysmpb.DoppelGangerRequest_ValidatorRequest{
 				PublicKey:  r.PubKey[:],
 				Epoch:      r.Target,
 				SignedRoot: r.SigningRoot[:],
@@ -474,11 +473,11 @@ func (v *validator) CheckDoppelGanger(ctx context.Context) error {
 	return buildDuplicateError(resp.Responses)
 }
 
-func buildDuplicateError(response []*zondpb.DoppelGangerResponse_ValidatorResponse) error {
+func buildDuplicateError(response []*qrysmpb.DoppelGangerResponse_ValidatorResponse) error {
 	duplicates := make([][]byte, 0)
 	for _, valRes := range response {
 		if valRes.DuplicateExists {
-			var copiedKey [field_params.DilithiumPubkeyLength]byte
+			var copiedKey [fieldparams.DilithiumPubkeyLength]byte
 			copy(copiedKey[:], valRes.PublicKey)
 			duplicates = append(duplicates, copiedKey[:])
 		}
@@ -536,7 +535,7 @@ func (v *validator) UpdateDuties(ctx context.Context, slot primitives.Slot) erro
 	}
 
 	// Filter out the slashable public keys from the duties request.
-	filteredKeys := make([][field_params.DilithiumPubkeyLength]byte, 0, len(validatingKeys))
+	filteredKeys := make([][fieldparams.DilithiumPubkeyLength]byte, 0, len(validatingKeys))
 	v.slashableKeysLock.RLock()
 	for _, pubKey := range validatingKeys {
 		if ok := v.eipImportBlacklistedPublicKeys[pubKey]; !ok {
@@ -550,7 +549,7 @@ func (v *validator) UpdateDuties(ctx context.Context, slot primitives.Slot) erro
 	}
 	v.slashableKeysLock.RUnlock()
 
-	req := &zondpb.DutiesRequest{
+	req := &qrysmpb.DutiesRequest{
 		Epoch:      primitives.Epoch(slot / params.BeaconConfig().SlotsPerEpoch),
 		PublicKeys: bytesutil.FromBytes2592Array(filteredKeys),
 	}
@@ -567,7 +566,7 @@ func (v *validator) UpdateDuties(ctx context.Context, slot primitives.Slot) erro
 
 	allExitedCounter := 0
 	for i := range resp.CurrentEpochDuties {
-		if resp.CurrentEpochDuties[i].Status == zondpb.ValidatorStatus_EXITED {
+		if resp.CurrentEpochDuties[i].Status == qrysmpb.ValidatorStatus_EXITED {
 			allExitedCounter++
 		}
 	}
@@ -598,7 +597,7 @@ func (v *validator) UpdateDuties(ctx context.Context, slot primitives.Slot) erro
 
 // subscribeToSubnets iterates through each validator duty, signs each slot, and asks beacon node
 // to eagerly subscribe to subnets so that the aggregator has attestations to aggregate.
-func (v *validator) subscribeToSubnets(ctx context.Context, res *zondpb.DutiesResponse) error {
+func (v *validator) subscribeToSubnets(ctx context.Context, res *qrysmpb.DutiesResponse) error {
 	subscribeSlots := make([]primitives.Slot, 0, len(res.CurrentEpochDuties)+len(res.NextEpochDuties))
 	subscribeCommitteeIndices := make([]primitives.CommitteeIndex, 0, len(res.CurrentEpochDuties)+len(res.NextEpochDuties))
 	subscribeIsAggregator := make([]bool, 0, len(res.CurrentEpochDuties)+len(res.NextEpochDuties))
@@ -607,7 +606,7 @@ func (v *validator) subscribeToSubnets(ctx context.Context, res *zondpb.DutiesRe
 
 	for _, duty := range res.CurrentEpochDuties {
 		pk := bytesutil.ToBytes2592(duty.PublicKey)
-		if duty.Status == zondpb.ValidatorStatus_ACTIVE || duty.Status == zondpb.ValidatorStatus_EXITING {
+		if duty.Status == qrysmpb.ValidatorStatus_ACTIVE || duty.Status == qrysmpb.ValidatorStatus_EXITING {
 			attesterSlot := duty.AttesterSlot
 			committeeIndex := duty.CommitteeIndex
 			validatorIndex := duty.ValidatorIndex
@@ -633,7 +632,7 @@ func (v *validator) subscribeToSubnets(ctx context.Context, res *zondpb.DutiesRe
 	}
 
 	for _, duty := range res.NextEpochDuties {
-		if duty.Status == zondpb.ValidatorStatus_ACTIVE || duty.Status == zondpb.ValidatorStatus_EXITING {
+		if duty.Status == qrysmpb.ValidatorStatus_ACTIVE || duty.Status == qrysmpb.ValidatorStatus_EXITING {
 			attesterSlot := duty.AttesterSlot
 			committeeIndex := duty.CommitteeIndex
 			validatorIndex := duty.ValidatorIndex
@@ -659,7 +658,7 @@ func (v *validator) subscribeToSubnets(ctx context.Context, res *zondpb.DutiesRe
 	}
 
 	_, err := v.validatorClient.SubscribeCommitteeSubnets(ctx,
-		&zondpb.CommitteeSubnetsSubscribeRequest{
+		&qrysmpb.CommitteeSubnetsSubscribeRequest{
 			Slots:        subscribeSlots,
 			CommitteeIds: subscribeCommitteeIndices,
 			IsAggregator: subscribeIsAggregator,
@@ -673,10 +672,10 @@ func (v *validator) subscribeToSubnets(ctx context.Context, res *zondpb.DutiesRe
 // RolesAt slot returns the validator roles at the given slot. Returns nil if the
 // validator is known to not have a roles at the slot. Returns UNKNOWN if the
 // validator assignments are unknown. Otherwise returns a valid ValidatorRole map.
-func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[field_params.DilithiumPubkeyLength]byte][]iface.ValidatorRole, error) {
+func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[fieldparams.DilithiumPubkeyLength]byte][]iface.ValidatorRole, error) {
 	v.dutiesLock.RLock()
 	defer v.dutiesLock.RUnlock()
-	rolesAt := make(map[[field_params.DilithiumPubkeyLength]byte][]iface.ValidatorRole)
+	rolesAt := make(map[[fieldparams.DilithiumPubkeyLength]byte][]iface.ValidatorRole)
 	for validator, duty := range v.duties.CurrentEpochDuties {
 		var roles []iface.ValidatorRole
 
@@ -732,7 +731,7 @@ func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[fie
 			roles = append(roles, iface.RoleUnknown)
 		}
 
-		var pubKey [field_params.DilithiumPubkeyLength]byte
+		var pubKey [fieldparams.DilithiumPubkeyLength]byte
 		copy(pubKey[:], duty.PublicKey)
 		rolesAt[pubKey] = roles
 	}
@@ -749,7 +748,7 @@ func (v *validator) Keymanager() (keymanager.IKeymanager, error) {
 
 // isAggregator checks if a validator is an aggregator of a given slot and committee,
 // it uses a modulo calculated by validator count in committee and samples randomness around it.
-func (v *validator) isAggregator(ctx context.Context, committee []primitives.ValidatorIndex, slot primitives.Slot, pubKey [field_params.DilithiumPubkeyLength]byte) (bool, error) {
+func (v *validator) isAggregator(ctx context.Context, committee []primitives.ValidatorIndex, slot primitives.Slot, pubKey [fieldparams.DilithiumPubkeyLength]byte) (bool, error) {
 	modulo := uint64(1)
 	if len(committee)/int(params.BeaconConfig().TargetAggregatorsPerCommittee) > 1 {
 		modulo = uint64(len(committee)) / params.BeaconConfig().TargetAggregatorsPerCommittee
@@ -773,8 +772,8 @@ func (v *validator) isAggregator(ctx context.Context, committee []primitives.Val
 //
 //	modulo = max(1, SYNC_COMMITTEE_SIZE // SYNC_COMMITTEE_SUBNET_COUNT // TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE)
 //	return bytes_to_uint64(hash(signature)[0:8]) % modulo == 0
-func (v *validator) isSyncCommitteeAggregator(ctx context.Context, slot primitives.Slot, pubKey [field_params.DilithiumPubkeyLength]byte) (bool, error) {
-	res, err := v.validatorClient.GetSyncSubcommitteeIndex(ctx, &zondpb.SyncSubcommitteeIndexRequest{
+func (v *validator) isSyncCommitteeAggregator(ctx context.Context, slot primitives.Slot, pubKey [fieldparams.DilithiumPubkeyLength]byte) (bool, error) {
+	res, err := v.validatorClient.GetSyncSubcommitteeIndex(ctx, &qrysmpb.SyncSubcommitteeIndexRequest{
 		PublicKey: pubKey[:],
 		Slot:      slot,
 	})
@@ -820,11 +819,11 @@ func (v *validator) UpdateDomainDataCaches(ctx context.Context, slot primitives.
 	}
 }
 
-func (v *validator) domainData(ctx context.Context, epoch primitives.Epoch, domain []byte) (*zondpb.DomainResponse, error) {
+func (v *validator) domainData(ctx context.Context, epoch primitives.Epoch, domain []byte) (*qrysmpb.DomainResponse, error) {
 	v.domainDataLock.Lock()
 	defer v.domainDataLock.Unlock()
 
-	req := &zondpb.DomainRequest{
+	req := &qrysmpb.DomainRequest{
 		Epoch:  epoch,
 		Domain: domain,
 	}
@@ -832,7 +831,7 @@ func (v *validator) domainData(ctx context.Context, epoch primitives.Epoch, doma
 	key := strings.Join([]string{strconv.FormatUint(uint64(req.Epoch), 10), hex.EncodeToString(req.Domain)}, ",")
 
 	if val, ok := v.domainDataCache.Get(key); ok {
-		return proto.Clone(val.(proto.Message)).(*zondpb.DomainResponse), nil
+		return proto.Clone(val.(proto.Message)).(*qrysmpb.DomainResponse), nil
 	}
 
 	res, err := v.validatorClient.DomainData(ctx, req)
@@ -844,7 +843,7 @@ func (v *validator) domainData(ctx context.Context, epoch primitives.Epoch, doma
 	return res, nil
 }
 
-func (v *validator) logDuties(slot primitives.Slot, currentEpochDuties []*zondpb.DutiesResponse_Duty, nextEpochDuties []*zondpb.DutiesResponse_Duty) {
+func (v *validator) logDuties(slot primitives.Slot, currentEpochDuties []*qrysmpb.DutiesResponse_Duty, nextEpochDuties []*qrysmpb.DutiesResponse_Duty) {
 	attesterKeys := make([][]string, params.BeaconConfig().SlotsPerEpoch)
 	for i := range attesterKeys {
 		attesterKeys[i] = make([]string, 0)
@@ -860,7 +859,7 @@ func (v *validator) logDuties(slot primitives.Slot, currentEpochDuties []*zondpb
 
 		// Only interested in validators who are attesting/proposing.
 		// Note that SLASHING validators will have duties but their results are ignored by the network so we don't bother with them.
-		if duty.Status != zondpb.ValidatorStatus_ACTIVE && duty.Status != zondpb.ValidatorStatus_EXITING {
+		if duty.Status != qrysmpb.ValidatorStatus_ACTIVE && duty.Status != qrysmpb.ValidatorStatus_EXITING {
 			continue
 		}
 
@@ -900,7 +899,7 @@ func (v *validator) logDuties(slot primitives.Slot, currentEpochDuties []*zondpb
 
 		// Only interested in validators who are attesting/proposing.
 		// Note that slashed validators will have duties but their results are ignored by the network so we don't bother with them.
-		if duty.Status != zondpb.ValidatorStatus_ACTIVE && duty.Status != zondpb.ValidatorStatus_EXITING {
+		if duty.Status != qrysmpb.ValidatorStatus_ACTIVE && duty.Status != qrysmpb.ValidatorStatus_EXITING {
 			continue
 		}
 
@@ -990,7 +989,7 @@ func (v *validator) PushProposerSettings(ctx context.Context, km keymanager.IKey
 			"proposerSettingsReqCount": len(proposerReqs),
 		}).Debugln("Request count did not match included validator count. Only keys that have been activated will be included in the request.")
 	}
-	if _, err := v.validatorClient.PrepareBeaconProposer(ctx, &zondpb.PrepareBeaconProposerRequest{
+	if _, err := v.validatorClient.PrepareBeaconProposer(ctx, &qrysmpb.PrepareBeaconProposerRequest{
 		Recipients: proposerReqs,
 	}); err != nil {
 		return err
@@ -1007,8 +1006,8 @@ func (v *validator) PushProposerSettings(ctx context.Context, km keymanager.IKey
 	return nil
 }
 
-func (v *validator) filterAndCacheActiveKeys(ctx context.Context, pubkeys [][field_params.DilithiumPubkeyLength]byte, slot primitives.Slot) ([][field_params.DilithiumPubkeyLength]byte, error) {
-	filteredKeys := make([][field_params.DilithiumPubkeyLength]byte, 0)
+func (v *validator) filterAndCacheActiveKeys(ctx context.Context, pubkeys [][fieldparams.DilithiumPubkeyLength]byte, slot primitives.Slot) ([][fieldparams.DilithiumPubkeyLength]byte, error) {
+	filteredKeys := make([][fieldparams.DilithiumPubkeyLength]byte, 0)
 	statusRequestKeys := make([][]byte, 0)
 	for _, k := range pubkeys {
 		_, ok := v.pubkeyToValidatorIndex[k]
@@ -1026,7 +1025,7 @@ func (v *validator) filterAndCacheActiveKeys(ctx context.Context, pubkeys [][fie
 		copiedk := k
 		statusRequestKeys = append(statusRequestKeys, copiedk[:])
 	}
-	resp, err := v.validatorClient.MultipleValidatorStatus(ctx, &zondpb.MultipleValidatorStatusRequest{
+	resp, err := v.validatorClient.MultipleValidatorStatus(ctx, &qrysmpb.MultipleValidatorStatusRequest{
 		PublicKeys: statusRequestKeys,
 	})
 	if err != nil {
@@ -1034,10 +1033,10 @@ func (v *validator) filterAndCacheActiveKeys(ctx context.Context, pubkeys [][fie
 	}
 	for i, status := range resp.Statuses {
 		// skip registration creation if validator is not active status
-		nonActive := status.Status != zondpb.ValidatorStatus_ACTIVE
+		nonActive := status.Status != qrysmpb.ValidatorStatus_ACTIVE
 		// Handle edge case at the start of the epoch with newly activated validators
 		currEpoch := primitives.Epoch(slot / params.BeaconConfig().SlotsPerEpoch)
-		currActivated := status.Status == zondpb.ValidatorStatus_PENDING && currEpoch >= status.ActivationEpoch
+		currActivated := status.Status == qrysmpb.ValidatorStatus_PENDING && currEpoch >= status.ActivationEpoch
 		if nonActive && !currActivated {
 			log.WithFields(logrus.Fields{
 				"publickey": hexutil.Encode(resp.PublicKeys[i]),
@@ -1051,8 +1050,8 @@ func (v *validator) filterAndCacheActiveKeys(ctx context.Context, pubkeys [][fie
 	return filteredKeys, nil
 }
 
-func (v *validator) buildPrepProposerReqs(ctx context.Context, pubkeys [][field_params.DilithiumPubkeyLength]byte /* only active pubkeys */) ([]*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer, error) {
-	var prepareProposerReqs []*zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer
+func (v *validator) buildPrepProposerReqs(ctx context.Context, pubkeys [][fieldparams.DilithiumPubkeyLength]byte /* only active pubkeys */) ([]*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer, error) {
+	var prepareProposerReqs []*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer
 	for _, k := range pubkeys {
 		// Default case: Define fee recipient to burn address
 		var feeRecipient common.Address
@@ -1080,12 +1079,12 @@ func (v *validator) buildPrepProposerReqs(ctx context.Context, pubkeys [][field_
 		}
 
 		if isFeeRecipientDefined {
-			prepareProposerReqs = append(prepareProposerReqs, &zondpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
+			prepareProposerReqs = append(prepareProposerReqs, &qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
 				ValidatorIndex: validatorIndex,
 				FeeRecipient:   feeRecipient[:],
 			})
 
-			if hexutil.EncodeZ(feeRecipient.Bytes()) == params.BeaconConfig().ZondBurnAddress {
+			if hexutil.EncodeQ(feeRecipient.Bytes()) == params.BeaconConfig().QRLBurnAddress {
 				log.WithFields(logrus.Fields{
 					"validatorIndex": validatorIndex,
 					"feeRecipient":   feeRecipient,
@@ -1096,15 +1095,15 @@ func (v *validator) buildPrepProposerReqs(ctx context.Context, pubkeys [][field_
 	return prepareProposerReqs, nil
 }
 
-func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][field_params.DilithiumPubkeyLength]byte /* only active pubkeys */, signer iface.SigningFunc) ([]*zondpb.SignedValidatorRegistrationV1, error) {
-	var signedValRegRegs []*zondpb.SignedValidatorRegistrationV1
+func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][fieldparams.DilithiumPubkeyLength]byte /* only active pubkeys */, signer iface.SigningFunc) ([]*qrysmpb.SignedValidatorRegistrationV1, error) {
+	var signedValRegRegs []*qrysmpb.SignedValidatorRegistrationV1
 
 	// if the timestamp is pre-genesis, don't create registrations
 	if v.genesisTime > uint64(time.Now().UTC().Unix()) {
 		return signedValRegRegs, nil
 	}
 	for i, k := range pubkeys {
-		feeRecipient, err := common.NewAddressFromString(params.BeaconConfig().ZondBurnAddress)
+		feeRecipient, err := common.NewAddressFromString(params.BeaconConfig().QRLBurnAddress)
 		if err != nil {
 			return nil, err
 		}
@@ -1148,7 +1147,7 @@ func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][field_par
 			continue
 		}
 
-		req := &zondpb.ValidatorRegistrationV1{
+		req := &qrysmpb.ValidatorRegistrationV1{
 			FeeRecipient: feeRecipient[:],
 			GasLimit:     gasLimit,
 			Timestamp:    uint64(time.Now().UTC().Unix()),
@@ -1166,7 +1165,7 @@ func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][field_par
 
 		signedValRegRegs = append(signedValRegRegs, signedReq)
 
-		if hexutil.EncodeZ(feeRecipient.Bytes()) == params.BeaconConfig().ZondBurnAddress {
+		if hexutil.EncodeQ(feeRecipient.Bytes()) == params.BeaconConfig().QRLBurnAddress {
 			log.WithFields(logrus.Fields{
 				"pubkey":       fmt.Sprintf("%#x", req.Pubkey),
 				"feeRecipient": feeRecipient,
@@ -1176,8 +1175,8 @@ func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][field_par
 	return signedValRegRegs, nil
 }
 
-func (v *validator) validatorIndex(ctx context.Context, pubkey [field_params.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool, error) {
-	resp, err := v.validatorClient.ValidatorIndex(ctx, &zondpb.ValidatorIndexRequest{PublicKey: pubkey[:]})
+func (v *validator) validatorIndex(ctx context.Context, pubkey [fieldparams.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool, error) {
+	resp, err := v.validatorClient.ValidatorIndex(ctx, &qrysmpb.ValidatorIndexRequest{PublicKey: pubkey[:]})
 	switch {
 	case status.Code(err) == codes.NotFound:
 		log.Debugf("Could not find validator index for public key %#x. "+

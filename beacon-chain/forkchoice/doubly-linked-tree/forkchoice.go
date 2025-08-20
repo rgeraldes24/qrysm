@@ -15,8 +15,8 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 )
@@ -142,7 +142,7 @@ func (f *ForkChoice) InsertNode(ctx context.Context, state state.BeaconState, ro
 }
 
 // updateCheckpoints update the checkpoints when inserting a new node.
-func (f *ForkChoice) updateCheckpoints(ctx context.Context, jc, fc *zondpb.Checkpoint) error {
+func (f *ForkChoice) updateCheckpoints(ctx context.Context, jc, fc *qrysmpb.Checkpoint) error {
 	if jc.Epoch > f.store.justifiedCheckpoint.Epoch {
 		f.store.prevJustifiedCheckpoint = f.store.justifiedCheckpoint
 		jcRoot := bytesutil.ToBytes32(jc.Root)
@@ -551,24 +551,24 @@ func (f *ForkChoice) UnrealizedJustifiedPayloadBlockHash() [32]byte {
 }
 
 // ForkChoiceDump returns a full dump of forkchoice.
-func (f *ForkChoice) ForkChoiceDump(ctx context.Context) (*v1.ForkChoiceDump, error) {
-	jc := &v1.Checkpoint{
+func (f *ForkChoice) ForkChoiceDump(ctx context.Context) (*qrlpb.ForkChoiceDump, error) {
+	jc := &qrlpb.Checkpoint{
 		Epoch: f.store.justifiedCheckpoint.Epoch,
 		Root:  f.store.justifiedCheckpoint.Root[:],
 	}
-	ujc := &v1.Checkpoint{
+	ujc := &qrlpb.Checkpoint{
 		Epoch: f.store.unrealizedJustifiedCheckpoint.Epoch,
 		Root:  f.store.unrealizedJustifiedCheckpoint.Root[:],
 	}
-	fc := &v1.Checkpoint{
+	fc := &qrlpb.Checkpoint{
 		Epoch: f.store.finalizedCheckpoint.Epoch,
 		Root:  f.store.finalizedCheckpoint.Root[:],
 	}
-	ufc := &v1.Checkpoint{
+	ufc := &qrlpb.Checkpoint{
 		Epoch: f.store.unrealizedFinalizedCheckpoint.Epoch,
 		Root:  f.store.unrealizedFinalizedCheckpoint.Root[:],
 	}
-	nodes := make([]*v1.ForkChoiceNode, 0, f.NodeCount())
+	nodes := make([]*qrlpb.ForkChoiceNode, 0, f.NodeCount())
 	var err error
 	if f.store.treeRootNode != nil {
 		nodes, err = f.store.treeRootNode.nodeTreeDump(ctx, nodes)
@@ -580,7 +580,7 @@ func (f *ForkChoice) ForkChoiceDump(ctx context.Context) (*v1.ForkChoiceDump, er
 	if f.store.headNode != nil {
 		headRoot = f.store.headNode.root
 	}
-	resp := &v1.ForkChoiceDump{
+	resp := &qrlpb.ForkChoiceDump{
 		JustifiedCheckpoint:           jc,
 		UnrealizedJustifiedCheckpoint: ujc,
 		FinalizedCheckpoint:           fc,

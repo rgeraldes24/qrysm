@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"google.golang.org/protobuf/proto"
 )
@@ -44,17 +44,17 @@ func (mb *mockBroadcaster) Broadcast(_ context.Context, _ proto.Message) error {
 	return nil
 }
 
-func (mb *mockBroadcaster) BroadcastAttestation(_ context.Context, _ uint64, _ *zondpb.Attestation) error {
+func (mb *mockBroadcaster) BroadcastAttestation(_ context.Context, _ uint64, _ *qrysmpb.Attestation) error {
 	mb.broadcastCalled = true
 	return nil
 }
 
-func (mb *mockBroadcaster) BroadcastSyncCommitteeMessage(_ context.Context, _ uint64, _ *zondpb.SyncCommitteeMessage) error {
+func (mb *mockBroadcaster) BroadcastSyncCommitteeMessage(_ context.Context, _ uint64, _ *qrysmpb.SyncCommitteeMessage) error {
 	mb.broadcastCalled = true
 	return nil
 }
 
-func (mb *mockBroadcaster) BroadcastDilithiumChanges(_ context.Context, _ []*zondpb.SignedDilithiumToExecutionChange) {
+func (mb *mockBroadcaster) BroadcastDilithiumChanges(_ context.Context, _ []*qrysmpb.SignedDilithiumToExecutionChange) {
 }
 
 var _ p2p.Broadcaster = (*mockBroadcaster)(nil)

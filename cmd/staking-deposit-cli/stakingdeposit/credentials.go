@@ -124,12 +124,12 @@ func (c *Credentials) ExportDilithiumToExecutionChangeJSON(folder string, valida
 }
 
 func NewCredentialsFromSeed(seed string, numKeys uint64, amounts []uint64,
-	chainSettings *config.ChainSetting, startIndex uint64, hexZondWithdrawalAddress string) (*Credentials, error) {
+	chainSettings *config.ChainSetting, startIndex uint64, hexQRLWithdrawalAddress string) (*Credentials, error) {
 	credentials := &Credentials{
 		credentials: make([]*Credential, numKeys),
 	}
 	for index := startIndex; index < startIndex+numKeys; index++ {
-		c, err := NewCredential(seed, index, amounts[index-startIndex], chainSettings, hexZondWithdrawalAddress)
+		c, err := NewCredential(seed, index, amounts[index-startIndex], chainSettings, hexQRLWithdrawalAddress)
 		if err != nil {
 			return nil, err
 		}

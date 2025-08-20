@@ -7,15 +7,15 @@ import (
 	"github.com/theQRL/qrysm/config/features"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // SetLatestBlockHeader in the beacon state.
-func (b *BeaconState) SetLatestBlockHeader(val *zondpb.BeaconBlockHeader) error {
+func (b *BeaconState) SetLatestBlockHeader(val *qrysmpb.BeaconBlockHeader) error {
 	b.lock.Lock()
 	defer b.lock.Unlock()
 
-	b.latestBlockHeader = zondpb.CopyBeaconBlockHeader(val)
+	b.latestBlockHeader = qrysmpb.CopyBeaconBlockHeader(val)
 	b.markFieldAsDirty(types.LatestBlockHeader)
 	return nil
 }

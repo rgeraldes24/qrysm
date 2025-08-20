@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/mock"
 	"github.com/theQRL/qrysm/testing/require"
@@ -36,9 +36,9 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	pubKey1 := priv1.PublicKey().Marshal()
 	pubKey2 := priv2.PublicKey().Marshal()
 
-	beaconState := &zondpb.BeaconStateCapella{
+	beaconState := &qrysmpb.BeaconStateCapella{
 		Slot: 4000,
-		Validators: []*zondpb.Validator{
+		Validators: []*qrysmpb.Validator{
 			{
 				ActivationEpoch:       0,
 				ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
@@ -50,7 +50,7 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	block := util.NewBeaconBlockCapella()
 	genesisRoot, err := block.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
-	depData := &zondpb.Deposit_Data{
+	depData := &qrysmpb.Deposit_Data{
 		PublicKey:             pubKey1,
 		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
 		Signature:             make([]byte, field_params.DilithiumSignatureLength),
@@ -61,7 +61,7 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	require.NoError(t, err)
 	depData.Signature = priv1.Sign(signingRoot[:]).Marshal()
 
-	deposit := &zondpb.Deposit{
+	deposit := &qrysmpb.Deposit{
 		Data: depData,
 	}
 	depositTrie, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
@@ -75,14 +75,14 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	s, err := state_native.InitializeFromProtoUnsafeCapella(beaconState)
 	require.NoError(t, err)
 	vs := &Server{
-		Ctx:               context.Background(),
-		ChainStartFetcher: &mockExecution.Chain{},
-		BlockFetcher:      &mockExecution.Chain{},
-		Eth1InfoFetcher:   &mockExecution.Chain{},
-		DepositFetcher:    depositCache,
-		HeadFetcher:       &mockChain.ChainService{State: s, Root: genesisRoot[:]},
+		Ctx:                  context.Background(),
+		ChainStartFetcher:    &mockExecution.Chain{},
+		BlockFetcher:         &mockExecution.Chain{},
+		ExecutionInfoFetcher: &mockExecution.Chain{},
+		DepositFetcher:       depositCache,
+		HeadFetcher:          &mockChain.ChainService{State: s, Root: genesisRoot[:]},
 	}
-	req := &zondpb.ValidatorActivationRequest{
+	req := &qrysmpb.ValidatorActivationRequest{
 		PublicKeys: [][]byte{pubKey1, pubKey2},
 	}
 	ctrl := gomock.NewController(t)
@@ -91,18 +91,18 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	mockChainStream := mock.NewMockBeaconNodeValidator_WaitForActivationServer(ctrl)
 	mockChainStream.EXPECT().Context().Return(context.Background())
 	mockChainStream.EXPECT().Send(
-		&zondpb.ValidatorActivationResponse{
-			Statuses: []*zondpb.ValidatorActivationResponse_Status{
+		&qrysmpb.ValidatorActivationResponse{
+			Statuses: []*qrysmpb.ValidatorActivationResponse_Status{
 				{
 					PublicKey: pubKey1,
-					Status: &zondpb.ValidatorStatusResponse{
-						Status: zondpb.ValidatorStatus_ACTIVE,
+					Status: &qrysmpb.ValidatorStatusResponse{
+						Status: qrysmpb.ValidatorStatus_ACTIVE,
 					},
 					Index: 0,
 				},
 				{
 					PublicKey: pubKey2,
-					Status: &zondpb.ValidatorStatusResponse{
+					Status: &qrysmpb.ValidatorStatusResponse{
 						ActivationEpoch: params.BeaconConfig().FarFutureEpoch,
 					},
 					Index: nonExistentIndex,

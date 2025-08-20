@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -253,8 +253,8 @@ func Test_encodeDecodeProposalRecord(t *testing.T) {
 		{
 			name: "failing encode/decode",
 			blkHdr: &slashertypes.SignedBlockHeaderWrapper{
-				SignedBeaconBlockHeader: &zondpb.SignedBeaconBlockHeader{
-					Header: &zondpb.BeaconBlockHeader{},
+				SignedBeaconBlockHeader: &qrysmpb.SignedBeaconBlockHeader{
+					Header: &qrysmpb.BeaconBlockHeader{},
 				},
 			},
 			wantErr: true,
@@ -305,8 +305,8 @@ func Test_encodeDecodeAttestationRecord(t *testing.T) {
 		{
 			name: "failing encode/decode",
 			attWrapper: &slashertypes.IndexedAttestationWrapper{
-				IndexedAttestation: &zondpb.IndexedAttestation{
-					Data: &zondpb.AttestationData{},
+				IndexedAttestation: &qrysmpb.IndexedAttestation{
+					Data: &qrysmpb.AttestationData{},
 				},
 			},
 			wantErr: true,
@@ -345,7 +345,7 @@ func TestStore_HighestAttestations(t *testing.T) {
 	tests := []struct {
 		name             string
 		attestationsInDB []*slashertypes.IndexedAttestationWrapper
-		expected         []*zondpb.HighestAttestation
+		expected         []*qrysmpb.HighestAttestation
 		indices          []primitives.ValidatorIndex
 		wantErr          bool
 	}{
@@ -355,7 +355,7 @@ func TestStore_HighestAttestations(t *testing.T) {
 				createAttestationWrapper(0, 3, []uint64{1}, []byte{1}),
 			},
 			indices: []primitives.ValidatorIndex{1},
-			expected: []*zondpb.HighestAttestation{
+			expected: []*qrysmpb.HighestAttestation{
 				{
 					ValidatorIndex:     1,
 					HighestSourceEpoch: 0,
@@ -372,7 +372,7 @@ func TestStore_HighestAttestations(t *testing.T) {
 				createAttestationWrapper(5, 6, []uint64{5}, []byte{4}),
 			},
 			indices: []primitives.ValidatorIndex{2, 3, 4, 5},
-			expected: []*zondpb.HighestAttestation{
+			expected: []*qrysmpb.HighestAttestation{
 				{
 					ValidatorIndex:     2,
 					HighestSourceEpoch: 0,
@@ -404,7 +404,7 @@ func TestStore_HighestAttestations(t *testing.T) {
 				createAttestationWrapper(6, 7, []uint64{5}, []byte{4}),
 			},
 			indices: []primitives.ValidatorIndex{2, 3, 4, 5},
-			expected: []*zondpb.HighestAttestation{
+			expected: []*qrysmpb.HighestAttestation{
 				{
 					ValidatorIndex:     2,
 					HighestSourceEpoch: 4,
@@ -508,7 +508,7 @@ func BenchmarkStore_CheckDoubleBlockProposals(b *testing.B) {
 }
 
 func createProposalWrapper(t *testing.T, slot primitives.Slot, proposerIndex primitives.ValidatorIndex, signingRoot []byte) *slashertypes.SignedBlockHeaderWrapper {
-	header := &zondpb.BeaconBlockHeader{
+	header := &qrysmpb.BeaconBlockHeader{
 		Slot:          slot,
 		ProposerIndex: proposerIndex,
 		ParentRoot:    params.BeaconConfig().ZeroHash[:],
@@ -520,7 +520,7 @@ func createProposalWrapper(t *testing.T, slot primitives.Slot, proposerIndex pri
 		t.Fatal(err)
 	}
 	return &slashertypes.SignedBlockHeaderWrapper{
-		SignedBeaconBlockHeader: &zondpb.SignedBeaconBlockHeader{
+		SignedBeaconBlockHeader: &qrysmpb.SignedBeaconBlockHeader{
 			Header:    header,
 			Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
 		},
@@ -533,19 +533,19 @@ func createAttestationWrapper(source, target primitives.Epoch, indices []uint64,
 	if signingRoot == nil {
 		signRoot = params.BeaconConfig().ZeroHash
 	}
-	data := &zondpb.AttestationData{
+	data := &qrysmpb.AttestationData{
 		BeaconBlockRoot: params.BeaconConfig().ZeroHash[:],
-		Source: &zondpb.Checkpoint{
+		Source: &qrysmpb.Checkpoint{
 			Epoch: source,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
-		Target: &zondpb.Checkpoint{
+		Target: &qrysmpb.Checkpoint{
 			Epoch: target,
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
 	}
 	return &slashertypes.IndexedAttestationWrapper{
-		IndexedAttestation: &zondpb.IndexedAttestation{
+		IndexedAttestation: &qrysmpb.IndexedAttestation{
 			AttestingIndices: indices,
 			Data:             data,
 			Signatures:       [][]byte{params.BeaconConfig().EmptyDilithiumSignature[:]},

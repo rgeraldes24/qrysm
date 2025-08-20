@@ -9,7 +9,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	"github.com/theQRL/qrysm/testing/endtoend/policies"
 	e2etypes "github.com/theQRL/qrysm/testing/endtoend/types"
@@ -28,7 +28,7 @@ var APIGatewayV1Alpha1VerifyIntegrity = e2etypes.Evaluator{
 }
 
 const (
-	v1Alpha1GatewayPathTemplate = "http://localhost:%d/zond/v1alpha1"
+	v1Alpha1GatewayPathTemplate = "http://localhost:%d/qrl/v1alpha1"
 )
 
 type apiComparisonFunc func(beaconNodeIdx int, conn *grpc.ClientConn) error
@@ -55,13 +55,13 @@ func withComparePeers(beaconNodeIdx int, conn *grpc.ClientConn) error {
 		Direction       string `json:"direction"`
 		ConnectionState string `json:"connectionState"`
 		PeerId          string `json:"peerId"`
-		Enr             string `json:"enr"`
+		Qnr             string `json:"qnr"`
 	}
 	type peersResponseJSON struct {
 		Peers []*peerJSON `json:"peers"`
 	}
 	ctx := context.Background()
-	nodeClient := zondpb.NewNodeClient(conn)
+	nodeClient := qrysmpb.NewNodeClient(conn)
 	resp, err := nodeClient.ListPeers(ctx, &empty.Empty{})
 	if err != nil {
 		return err
@@ -82,7 +82,7 @@ func withComparePeers(beaconNodeIdx int, conn *grpc.ClientConn) error {
 			len(resp.Peers),
 		)
 	}
-	grpcPeerMap := make(map[string]*zondpb.Peer)
+	grpcPeerMap := make(map[string]*qrysmpb.Peer)
 	jsonPeerMap := make(map[string]*peerJSON)
 	for i := 0; i < len(respJSON.Peers); i++ {
 		grpcPeerMap[resp.Peers[i].PeerId] = resp.Peers[i]
@@ -126,12 +126,12 @@ func withComparePeers(beaconNodeIdx int, conn *grpc.ClientConn) error {
 				grpcPeer.PeerId,
 			)
 		}
-		if peer.Enr != grpcPeer.Enr {
+		if peer.Qnr != grpcPeer.Qnr {
 			return fmt.Errorf(
-				"HTTP gateway peer %s with enr %s does not match gRPC %s",
+				"HTTP gateway peer %s with qnr %s does not match gRPC %s",
 				id,
-				peer.Enr,
-				grpcPeer.Enr,
+				peer.Qnr,
+				grpcPeer.Qnr,
 			)
 		}
 	}
@@ -161,9 +161,9 @@ func withCompareListAttestations(beaconNodeIdx int, conn *grpc.ClientConn) error
 		TotalSize     int32              `json:"totalSize"`
 	}
 	ctx := context.Background()
-	beaconClient := zondpb.NewBeaconChainClient(conn)
-	resp, err := beaconClient.ListAttestations(ctx, &zondpb.ListAttestationsRequest{
-		QueryFilter: &zondpb.ListAttestationsRequest_GenesisEpoch{GenesisEpoch: true},
+	beaconClient := qrysmpb.NewBeaconChainClient(conn)
+	resp, err := beaconClient.ListAttestations(ctx, &qrysmpb.ListAttestationsRequest{
+		QueryFilter: &qrysmpb.ListAttestationsRequest_GenesisEpoch{GenesisEpoch: true},
 	})
 	if err != nil {
 		return err
@@ -306,9 +306,9 @@ func withCompareValidators(beaconNodeIdx int, conn *grpc.ClientConn) error {
 		TotalSize     int32                     `json:"totalSize"`
 	}
 	ctx := context.Background()
-	beaconClient := zondpb.NewBeaconChainClient(conn)
-	resp, err := beaconClient.ListValidators(ctx, &zondpb.ListValidatorsRequest{
-		QueryFilter: &zondpb.ListValidatorsRequest_Genesis{
+	beaconClient := qrysmpb.NewBeaconChainClient(conn)
+	resp, err := beaconClient.ListValidators(ctx, &qrysmpb.ListValidatorsRequest{
+		QueryFilter: &qrysmpb.ListValidatorsRequest_Genesis{
 			Genesis: true,
 		},
 		PageSize: 4,
@@ -386,7 +386,7 @@ func withCompareChainHead(beaconNodeIdx int, conn *grpc.ClientConn) error {
 		JustifiedEpoch     string `json:"justifiedEpoch"`
 		JustifiedBlockRoot string `json:"justifiedBlockRoot"`
 	}
-	beaconClient := zondpb.NewBeaconChainClient(conn)
+	beaconClient := qrysmpb.NewBeaconChainClient(conn)
 	ctx := context.Background()
 	resp, err := beaconClient.GetChainHead(ctx, &empty.Empty{})
 	if err != nil {

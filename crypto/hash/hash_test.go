@@ -7,7 +7,7 @@ import (
 	fuzz "github.com/google/gofuzz"
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	pb "github.com/theQRL/qrysm/proto/testing"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -85,9 +85,9 @@ func TestHashProtoFuzz(t *testing.T) {
 }
 
 func BenchmarkHashProto(b *testing.B) {
-	att := &zondpb.Attestation{
+	att := &qrysmpb.Attestation{
 		AggregationBits: nil,
-		Data: &zondpb.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            5,
 			CommitteeIndex:  3,
 			BeaconBlockRoot: []byte{},

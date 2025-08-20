@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -14,7 +14,7 @@ func TestNewBeaconStateCapella(t *testing.T) {
 	require.NoError(t, err)
 	b, err := st.MarshalSSZ()
 	require.NoError(t, err)
-	got := &zondpb.BeaconStateCapella{}
+	got := &qrysmpb.BeaconStateCapella{}
 	require.NoError(t, got.UnmarshalSSZ(b))
 	assert.DeepEqual(t, st.ToProtoUnsafe(), got)
 }

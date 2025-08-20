@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/theQRL/qrysm/api/gateway/apimiddleware"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 )
 
 //----------------
@@ -13,7 +13,7 @@ import (
 //----------------
 
 // WeakSubjectivityResponse is used to marshal/unmarshal the response for the
-// /zond/v1/beacon/weak_subjectivity endpoint.
+// /qrl/v1/beacon/weak_subjectivity endpoint.
 type WeakSubjectivityResponse struct {
 	Data *struct {
 		Checkpoint *CheckpointJson `json:"ws_checkpoint"`
@@ -227,7 +227,7 @@ type BeaconBlockJson struct {
 
 type BeaconBlockBodyJson struct {
 	RandaoReveal      string                     `json:"randao_reveal" hex:"true"`
-	Eth1Data          *Eth1DataJson              `json:"eth1_data"`
+	ExecutionData     *ExecutionDataJson         `json:"execution_data"`
 	Graffiti          string                     `json:"graffiti" hex:"true"`
 	ProposerSlashings []*ProposerSlashingJson    `json:"proposer_slashings"`
 	AttesterSlashings []*AttesterSlashingJson    `json:"attester_slashings"`
@@ -286,7 +286,7 @@ type BlindedBeaconBlockCapellaJson struct {
 
 type BeaconBlockBodyCapellaJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	Eth1Data                    *Eth1DataJson                           `json:"eth1_data"`
+	ExecutionData               *ExecutionDataJson                      `json:"execution_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -300,7 +300,7 @@ type BeaconBlockBodyCapellaJson struct {
 
 type BlindedBeaconBlockBodyCapellaJson struct {
 	RandaoReveal                string                                  `json:"randao_reveal" hex:"true"`
-	Eth1Data                    *Eth1DataJson                           `json:"eth1_data"`
+	ExecutionData               *ExecutionDataJson                      `json:"execution_data"`
 	Graffiti                    string                                  `json:"graffiti" hex:"true"`
 	ProposerSlashings           []*ProposerSlashingJson                 `json:"proposer_slashings"`
 	AttesterSlashings           []*AttesterSlashingJson                 `json:"attester_slashings"`
@@ -366,7 +366,7 @@ type BeaconBlockHeaderJson struct {
 	BodyRoot      string `json:"body_root" hex:"true"`
 }
 
-type Eth1DataJson struct {
+type ExecutionDataJson struct {
 	DepositRoot  string `json:"deposit_root" hex:"true"`
 	DepositCount string `json:"deposit_count"`
 	BlockHash    string `json:"block_hash" hex:"true"`
@@ -441,7 +441,7 @@ type VoluntaryExitJson struct {
 
 type IdentityJson struct {
 	PeerId             string        `json:"peer_id"`
-	Enr                string        `json:"enr"`
+	Qnr                string        `json:"qnr"`
 	P2PAddresses       []string      `json:"p2p_addresses"`
 	DiscoveryAddresses []string      `json:"discovery_addresses"`
 	Metadata           *MetadataJson `json:"metadata"`
@@ -454,7 +454,7 @@ type MetadataJson struct {
 
 type PeerJson struct {
 	PeerId    string `json:"peer_id"`
-	Enr       string `json:"enr"`
+	Qnr       string `json:"qnr"`
 	Address   string `json:"last_seen_p2p_address"`
 	State     string `json:"state" enum:"true"`
 	Direction string `json:"direction" enum:"true"`
@@ -480,9 +480,9 @@ type BeaconStateCapellaJson struct {
 	BlockRoots                   []string                           `json:"block_roots" hex:"true"`
 	StateRoots                   []string                           `json:"state_roots" hex:"true"`
 	HistoricalRoots              []string                           `json:"historical_roots" hex:"true"`
-	Eth1Data                     *Eth1DataJson                      `json:"eth1_data"`
-	Eth1DataVotes                []*Eth1DataJson                    `json:"eth1_data_votes"`
-	Eth1DepositIndex             string                             `json:"eth1_deposit_index"`
+	ExecutionData                *ExecutionDataJson                 `json:"execution_data"`
+	ExecutionDataVotes           []*ExecutionDataJson               `json:"execution_data_votes"`
+	ExecutionChainDepositIndex   string                             `json:"execution_deposit_index"`
 	Validators                   []*ValidatorJson                   `json:"validators"`
 	Balances                     []string                           `json:"balances"`
 	RandaoMixes                  []string                           `json:"randao_mixes" hex:"true"`
@@ -638,7 +638,7 @@ func (ssz *SszResponseJson) SSZData() string {
 }
 
 func (*SszResponseJson) SSZVersion() string {
-	return strings.ToLower(zondpbv1.Version_PHASE0.String())
+	return strings.ToLower(qrlpb.Version_CAPELLA.String())
 }
 
 func (*SszResponseJson) SSZOptimistic() bool {

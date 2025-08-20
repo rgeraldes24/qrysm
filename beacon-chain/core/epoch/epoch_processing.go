@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/math"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
 )
 
@@ -27,7 +27,7 @@ import (
 // by activation epoch and by index number.
 type sortableIndices struct {
 	indices    []primitives.ValidatorIndex
-	validators []*zondpb.Validator
+	validators []*qrysmpb.Validator
 }
 
 // Len is the number of elements in the collection.
@@ -58,7 +58,7 @@ func (s sortableIndices) Less(i, j int) bool {
 //	  Note: ``get_total_balance`` returns ``EFFECTIVE_BALANCE_INCREMENT`` Gplanck minimum to avoid divisions by zero.
 //	  """
 //	  return get_total_balance(state, get_unslashed_attesting_indices(state, attestations))
-func AttestingBalance(ctx context.Context, state state.ReadOnlyBeaconState, atts []*zondpb.PendingAttestation) (uint64, error) {
+func AttestingBalance(ctx context.Context, state state.ReadOnlyBeaconState, atts []*qrysmpb.PendingAttestation) (uint64, error) {
 	indices, err := UnslashedAttestingIndices(ctx, state, atts)
 	if err != nil {
 		return 0, errors.Wrap(err, "could not get attesting indices")
@@ -193,7 +193,7 @@ func ProcessSlashings(state state.BeaconState, slashingMultiplier uint64) (state
 	// below equally.
 	increment := params.BeaconConfig().EffectiveBalanceIncrement
 	minSlashing := math.Min(totalSlashing*slashingMultiplier, totalBalance)
-	err = state.ApplyToEveryValidator(func(idx int, val *zondpb.Validator) (bool, *zondpb.Validator, error) {
+	err = state.ApplyToEveryValidator(func(idx int, val *qrysmpb.Validator) (bool, *qrysmpb.Validator, error) {
 		correctEpoch := (currentEpoch + exitLength/2) == val.WithdrawableEpoch
 		if val.Slashed && correctEpoch {
 			penaltyNumerator := val.EffectiveBalance / increment * minSlashing
@@ -208,22 +208,22 @@ func ProcessSlashings(state state.BeaconState, slashingMultiplier uint64) (state
 	return state, err
 }
 
-// ProcessEth1DataReset processes updates to ETH1 data votes during epoch processing.
+// ProcessExecutionDataReset processes updates to execution data votes during epoch processing.
 //
 // Spec pseudocode definition:
 //
-//	def process_eth1_data_reset(state: BeaconState) -> None:
+//	def process_execution_data_reset(state: BeaconState) -> None:
 //	  next_epoch = Epoch(get_current_epoch(state) + 1)
-//	  # Reset eth1 data votes
-//	  if next_epoch % EPOCHS_PER_ETH1_VOTING_PERIOD == 0:
-//	      state.eth1_data_votes = []
-func ProcessEth1DataReset(state state.BeaconState) (state.BeaconState, error) {
+//	  # Reset execution data votes
+//	  if next_epoch % EPOCHS_PER_EXECUTION_VOTING_PERIOD == 0:
+//	      state.execution_data_votes = []
+func ProcessExecutionDataReset(state state.BeaconState) (state.BeaconState, error) {
 	currentEpoch := time.CurrentEpoch(state)
 	nextEpoch := currentEpoch + 1
 
-	// Reset ETH1 data votes.
-	if nextEpoch%params.BeaconConfig().EpochsPerEth1VotingPeriod == 0 {
-		if err := state.SetEth1DataVotes([]*zondpb.Eth1Data{}); err != nil {
+	// Reset execution data votes.
+	if nextEpoch%params.BeaconConfig().EpochsPerExecutionVotingPeriod == 0 {
+		if err := state.SetExecutionDataVotes([]*qrysmpb.ExecutionData{}); err != nil {
 			return nil, err
 		}
 	}
@@ -257,7 +257,7 @@ func ProcessEffectiveBalanceUpdates(state state.BeaconState) (state.BeaconState,
 	bals := state.Balances()
 
 	// Update effective balances with hysteresis.
-	validatorFunc := func(idx int, val *zondpb.Validator) (bool, *zondpb.Validator, error) {
+	validatorFunc := func(idx int, val *qrysmpb.Validator) (bool, *qrysmpb.Validator, error) {
 		if val == nil {
 			return false, nil, fmt.Errorf("validator %d is nil in state", idx)
 		}
@@ -272,7 +272,7 @@ func ProcessEffectiveBalanceUpdates(state state.BeaconState) (state.BeaconState,
 				effectiveBal = balance - balance%effBalanceInc
 			}
 			if effectiveBal != val.EffectiveBalance {
-				newVal := zondpb.CopyValidator(val)
+				newVal := qrysmpb.CopyValidator(val)
 				newVal.EffectiveBalance = effectiveBal
 				return true, newVal, nil
 			}
@@ -368,7 +368,7 @@ func ProcessHistoricalDataUpdate(state state.BeaconState) (state.BeaconState, er
 		if err != nil {
 			return nil, err
 		}
-		if err := state.AppendHistoricalSummaries(&zondpb.HistoricalSummary{BlockSummaryRoot: br[:], StateSummaryRoot: sr[:]}); err != nil {
+		if err := state.AppendHistoricalSummaries(&qrysmpb.HistoricalSummary{BlockSummaryRoot: br[:], StateSummaryRoot: sr[:]}); err != nil {
 			return nil, err
 		}
 	}
@@ -387,7 +387,7 @@ func ProcessHistoricalDataUpdate(state state.BeaconState) (state.BeaconState, er
 //	  for a in attestations:
 //	      output = output.union(get_attesting_indices(state, a.data, a.aggregation_bits))
 //	  return set(filter(lambda index: not state.validators[index].slashed, output))
-func UnslashedAttestingIndices(ctx context.Context, state state.ReadOnlyBeaconState, atts []*zondpb.PendingAttestation) ([]primitives.ValidatorIndex, error) {
+func UnslashedAttestingIndices(ctx context.Context, state state.ReadOnlyBeaconState, atts []*qrysmpb.PendingAttestation) ([]primitives.ValidatorIndex, error) {
 	var setIndices []primitives.ValidatorIndex
 	seen := make(map[uint64]bool)
 

@@ -7,14 +7,14 @@ import (
 	fuzz "github.com/google/gofuzz"
 	"github.com/theQRL/qrysm/beacon-chain/core/altair"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
 func TestFuzzProcessDeposits_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
-	state := &zondpb.BeaconStateCapella{}
-	deposits := make([]*zondpb.Deposit, 100)
+	state := &qrysmpb.BeaconStateCapella{}
+	deposits := make([]*qrysmpb.Deposit, 100)
 	ctx := context.Background()
 	for i := 0; i < 10000; i++ {
 		fuzzer.Fuzz(state)
@@ -32,8 +32,8 @@ func TestFuzzProcessDeposits_10000(t *testing.T) {
 
 func TestFuzzProcessDeposit_10000(t *testing.T) {
 	fuzzer := fuzz.NewWithSeed(0)
-	state := &zondpb.BeaconStateCapella{}
-	deposit := &zondpb.Deposit{}
+	state := &qrysmpb.BeaconStateCapella{}
+	deposit := &qrysmpb.Deposit{}
 
 	for i := 0; i < 10000; i++ {
 		fuzzer.Fuzz(state)

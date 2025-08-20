@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
@@ -68,7 +68,7 @@ func (v *validator) SubmitSyncCommitteeMessage(ctx context.Context, slot primiti
 		return
 	}
 
-	msg := &zondpb.SyncCommitteeMessage{
+	msg := &qrysmpb.SyncCommitteeMessage{
 		Slot:           slot,
 		BlockRoot:      res.Root,
 		ValidatorIndex: duty.ValidatorIndex,
@@ -103,7 +103,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 		return
 	}
 
-	indexRes, err := v.validatorClient.GetSyncSubcommitteeIndex(ctx, &zondpb.SyncSubcommitteeIndexRequest{
+	indexRes, err := v.validatorClient.GetSyncSubcommitteeIndex(ctx, &qrysmpb.SyncSubcommitteeIndexRequest{
 		PublicKey: pubKey[:],
 		Slot:      slot,
 	})
@@ -135,7 +135,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 		}
 		subCommitteeSize := params.BeaconConfig().SyncCommitteeSize / params.BeaconConfig().SyncCommitteeSubnetCount
 		subnet := uint64(comIdx) / subCommitteeSize
-		contribution, err := v.validatorClient.GetSyncCommitteeContribution(ctx, &zondpb.SyncCommitteeContributionRequest{
+		contribution, err := v.validatorClient.GetSyncCommitteeContribution(ctx, &qrysmpb.SyncCommitteeContributionRequest{
 			Slot:      slot,
 			PublicKey: pubKey[:],
 			SubnetId:  subnet,
@@ -153,7 +153,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 			continue
 		}
 
-		contributionAndProof := &zondpb.ContributionAndProof{
+		contributionAndProof := &qrysmpb.ContributionAndProof{
 			AggregatorIndex: duty.ValidatorIndex,
 			Contribution:    contribution,
 			SelectionProof:  selectionProofs[i],
@@ -164,7 +164,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 			return
 		}
 
-		if _, err := v.validatorClient.SubmitSignedContributionAndProof(ctx, &zondpb.SignedContributionAndProof{
+		if _, err := v.validatorClient.SubmitSignedContributionAndProof(ctx, &qrysmpb.SignedContributionAndProof{
 			Message:   contributionAndProof,
 			Signature: sig,
 		}); err != nil {
@@ -187,7 +187,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 }
 
 // Signs and returns selection proofs per validator for slot and pub key.
-func (v *validator) selectionProofs(ctx context.Context, slot primitives.Slot, pubKey [field_params.DilithiumPubkeyLength]byte, indexRes *zondpb.SyncSubcommitteeIndexResponse) ([][]byte, error) {
+func (v *validator) selectionProofs(ctx context.Context, slot primitives.Slot, pubKey [field_params.DilithiumPubkeyLength]byte, indexRes *qrysmpb.SyncSubcommitteeIndexResponse) ([][]byte, error) {
 	selectionProofs := make([][]byte, len(indexRes.Indices))
 	cfg := params.BeaconConfig()
 	size := cfg.SyncCommitteeSize
@@ -210,7 +210,7 @@ func (v *validator) signSyncSelectionData(ctx context.Context, pubKey [field_par
 	if err != nil {
 		return nil, err
 	}
-	data := &zondpb.SyncAggregatorSelectionData{
+	data := &qrysmpb.SyncAggregatorSelectionData{
 		Slot:              slot,
 		SubcommitteeIndex: index,
 	}
@@ -232,7 +232,7 @@ func (v *validator) signSyncSelectionData(ctx context.Context, pubKey [field_par
 }
 
 // This returns the signature of validator signing over sync committee contribution and proof object.
-func (v *validator) signContributionAndProof(ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, c *zondpb.ContributionAndProof, slot primitives.Slot) ([]byte, error) {
+func (v *validator) signContributionAndProof(ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, c *qrysmpb.ContributionAndProof, slot primitives.Slot) ([]byte, error) {
 	d, err := v.domainData(ctx, slots.ToEpoch(c.Contribution.Slot), params.BeaconConfig().DomainContributionAndProof[:])
 	if err != nil {
 		return nil, err

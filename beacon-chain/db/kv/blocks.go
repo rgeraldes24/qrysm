@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/container/slice"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
 	bolt "go.etcd.io/bbolt"
@@ -89,7 +89,7 @@ func (s *Store) BackfillBlockRoot(ctx context.Context) ([32]byte, error) {
 	return root, err
 }
 
-// HeadBlock returns the latest canonical block in the Zond Beacon Chain.
+// HeadBlock returns the latest canonical block in the QRL Beacon Chain.
 func (s *Store) HeadBlock(ctx context.Context) (interfaces.ReadOnlySignedBeaconBlock, error) {
 	ctx, span := trace.StartSpan(ctx, "BeaconDB.HeadBlock")
 	defer span.End()
@@ -505,7 +505,7 @@ func (s *Store) FeeRecipientByValidatorID(ctx context.Context, id primitives.Val
 			if enc == nil {
 				return errors.Wrapf(ErrNotFoundFeeRecipient, "validator id %d", id)
 			}
-			reg := &zondpb.ValidatorRegistrationV1{}
+			reg := &qrysmpb.ValidatorRegistrationV1{}
 			if err := decode(ctx, enc, reg); err != nil {
 				return err
 			}
@@ -539,10 +539,10 @@ func (s *Store) SaveFeeRecipientsByValidatorIDs(ctx context.Context, ids []primi
 
 // RegistrationByValidatorID returns the validator registration object for a validator id.
 // `ErrNotFoundFeeRecipient` is returned if the validator id is not found.
-func (s *Store) RegistrationByValidatorID(ctx context.Context, id primitives.ValidatorIndex) (*zondpb.ValidatorRegistrationV1, error) {
+func (s *Store) RegistrationByValidatorID(ctx context.Context, id primitives.ValidatorIndex) (*qrysmpb.ValidatorRegistrationV1, error) {
 	ctx, span := trace.StartSpan(ctx, "BeaconDB.RegistrationByValidatorID")
 	defer span.End()
-	reg := &zondpb.ValidatorRegistrationV1{}
+	reg := &qrysmpb.ValidatorRegistrationV1{}
 	err := s.db.View(func(tx *bolt.Tx) error {
 		bkt := tx.Bucket(registrationBucket)
 		enc := bkt.Get(bytesutil.Uint64ToBytesBigEndian(uint64(id)))
@@ -556,7 +556,7 @@ func (s *Store) RegistrationByValidatorID(ctx context.Context, id primitives.Val
 
 // SaveRegistrationsByValidatorIDs saves the validator registrations for validator ids.
 // Error is returned if `ids` and `registrations` are not the same length.
-func (s *Store) SaveRegistrationsByValidatorIDs(ctx context.Context, ids []primitives.ValidatorIndex, regs []*zondpb.ValidatorRegistrationV1) error {
+func (s *Store) SaveRegistrationsByValidatorIDs(ctx context.Context, ids []primitives.ValidatorIndex, regs []*qrysmpb.ValidatorRegistrationV1) error {
 	ctx, span := trace.StartSpan(ctx, "BeaconDB.SaveRegistrationsByValidatorIDs")
 	defer span.End()
 
@@ -793,12 +793,12 @@ func unmarshalBlock(_ context.Context, enc []byte) (interfaces.ReadOnlySignedBea
 	var rawBlock ssz.Unmarshaler
 	switch {
 	case hasCapellaKey(enc):
-		rawBlock = &zondpb.SignedBeaconBlockCapella{}
+		rawBlock = &qrysmpb.SignedBeaconBlockCapella{}
 		if err := rawBlock.UnmarshalSSZ(enc[len(capellaKey):]); err != nil {
 			return nil, errors.Wrap(err, "could not unmarshal Capella block")
 		}
 	case hasCapellaBlindKey(enc):
-		rawBlock = &zondpb.SignedBlindedBeaconBlockCapella{}
+		rawBlock = &qrysmpb.SignedBlindedBeaconBlockCapella{}
 		if err := rawBlock.UnmarshalSSZ(enc[len(capellaBlindKey):]); err != nil {
 			return nil, errors.Wrap(err, "could not unmarshal blinded Capella block")
 		}

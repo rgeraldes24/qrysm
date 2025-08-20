@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -29,7 +29,7 @@ func TestGenerateGenesisStateCapella(t *testing.T) {
 		BlockHash:     make([]byte, 32),
 		Transactions:  make([][]byte, 0),
 	}
-	e1d := &zondpb.Eth1Data{
+	e1d := &qrysmpb.ExecutionData{
 		DepositRoot:  make([]byte, 32),
 		DepositCount: 0,
 		BlockHash:    make([]byte, 32),
@@ -41,8 +41,8 @@ func TestGenerateGenesisStateCapella(t *testing.T) {
 	require.NoError(t, err)
 	dr, err := tr.HashTreeRoot()
 	require.NoError(t, err)
-	g.Eth1Data.DepositRoot = dr[:]
-	g.Eth1Data.BlockHash = make([]byte, 32)
+	g.ExecutionData.DepositRoot = dr[:]
+	g.ExecutionData.BlockHash = make([]byte, 32)
 	st, err := state_native.InitializeFromProtoUnsafeCapella(g)
 	require.NoError(t, err)
 	_, err = st.MarshalSSZ()

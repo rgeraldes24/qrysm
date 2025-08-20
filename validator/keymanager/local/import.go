@@ -8,10 +8,10 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/monitoring/progress"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
+	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/validator/keymanager"
 )
 
@@ -25,7 +25,7 @@ func (km *Keymanager) ImportKeystores(
 	ctx context.Context,
 	keystores []*keymanager.Keystore,
 	passwords []string,
-) ([]*zondpbservice.ImportedKeystoreStatus, error) {
+) ([]*qrlpbservice.ImportedKeystoreStatus, error) {
 	if len(passwords) == 0 {
 		return nil, ErrNoPasswords
 	}
@@ -35,7 +35,7 @@ func (km *Keymanager) ImportKeystores(
 	enc := keystorev1.New()
 	bar := progress.InitializeProgressBar(len(keystores), "Importing accounts...")
 	keys := map[string]string{}
-	statuses := make([]*zondpbservice.ImportedKeystoreStatus, len(keystores))
+	statuses := make([]*qrlpbservice.ImportedKeystoreStatus, len(keystores))
 	var err error
 	// 1) Copy the in memory keystore
 	storeCopy := km.accountsStore.Copy()
@@ -49,8 +49,8 @@ func (km *Keymanager) ImportKeystores(
 		var pubKeyBytes []byte
 		seedBytes, pubKeyBytes, _, err = km.attemptDecryptKeystore(enc, keystores[i], passwords[i])
 		if err != nil {
-			statuses[i] = &zondpbservice.ImportedKeystoreStatus{
-				Status:  zondpbservice.ImportedKeystoreStatus_ERROR,
+			statuses[i] = &qrlpbservice.ImportedKeystoreStatus{
+				Status:  qrlpbservice.ImportedKeystoreStatus_ERROR,
 				Message: err.Error(),
 			}
 			continue
@@ -63,16 +63,16 @@ func (km *Keymanager) ImportKeystores(
 		_, isDuplicateInExisting := existingPubKeys[string(pubKeyBytes)]
 		if isDuplicateInArray || isDuplicateInExisting {
 			log.Warnf("Duplicate key in import will be ignored: %#x", pubKeyBytes)
-			statuses[i] = &zondpbservice.ImportedKeystoreStatus{
-				Status: zondpbservice.ImportedKeystoreStatus_DUPLICATE,
+			statuses[i] = &qrlpbservice.ImportedKeystoreStatus{
+				Status: qrlpbservice.ImportedKeystoreStatus_DUPLICATE,
 			}
 			continue
 		}
 
 		keys[string(pubKeyBytes)] = string(seedBytes)
 		importedKeys = append(importedKeys, pubKeyBytes)
-		statuses[i] = &zondpbservice.ImportedKeystoreStatus{
-			Status: zondpbservice.ImportedKeystoreStatus_IMPORTED,
+		statuses[i] = &qrlpbservice.ImportedKeystoreStatus{
+			Status: qrlpbservice.ImportedKeystoreStatus_IMPORTED,
 		}
 	}
 	if len(importedKeys) == 0 {

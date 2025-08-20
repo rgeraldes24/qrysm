@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -31,7 +31,7 @@ func TestStore_IsFinalizedBlock(t *testing.T) {
 	root, err := blks[slotsPerEpoch].Block().HashTreeRoot()
 	require.NoError(t, err)
 
-	cp := &zondpb.Checkpoint{
+	cp := &qrysmpb.Checkpoint{
 		Epoch: 1,
 		Root:  root[:],
 	}
@@ -100,7 +100,7 @@ func TestStore_IsFinalized_ForkEdgeCase(t *testing.T) {
 	require.NoError(t, db.SaveBlocks(ctx, blocks2))
 
 	// First checkpoint
-	checkpoint1 := &zondpb.Checkpoint{
+	checkpoint1 := &qrysmpb.Checkpoint{
 		Root:  sszRootOrDie(t, blocks1[0]),
 		Epoch: 1,
 	}
@@ -117,7 +117,7 @@ func TestStore_IsFinalized_ForkEdgeCase(t *testing.T) {
 	}
 
 	// Second checkpoint
-	checkpoint2 := &zondpb.Checkpoint{
+	checkpoint2 := &qrysmpb.Checkpoint{
 		Root:  sszRootOrDie(t, blocks2[0]),
 		Epoch: 2,
 	}
@@ -147,7 +147,7 @@ func TestStore_IsFinalizedChildBlock(t *testing.T) {
 		root, err := blks[slotsPerEpoch].Block().HashTreeRoot()
 		require.NoError(t, err)
 
-		cp := &zondpb.Checkpoint{
+		cp := &qrysmpb.Checkpoint{
 			Epoch: 1,
 			Root:  root[:],
 		}
@@ -193,7 +193,7 @@ func sszRootOrDie(t *testing.T, block interfaces.ReadOnlySignedBeaconBlock) []by
 }
 
 func makeBlocksCapella(t *testing.T, i, n uint64, previousRoot [32]byte) []interfaces.ReadOnlySignedBeaconBlock {
-	blocks := make([]*zondpb.SignedBeaconBlockCapella, n)
+	blocks := make([]*qrysmpb.SignedBeaconBlockCapella, n)
 	ifaceBlocks := make([]interfaces.ReadOnlySignedBeaconBlock, n)
 	for j := i; j < n+i; j++ {
 		parentRoot := make([]byte, fieldparams.RootLength)

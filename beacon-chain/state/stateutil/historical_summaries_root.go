@@ -8,10 +8,10 @@ import (
 	"github.com/pkg/errors"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/encoding/ssz"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-func HistoricalSummariesRoot(summaries []*zondpb.HistoricalSummary) ([32]byte, error) {
+func HistoricalSummariesRoot(summaries []*qrysmpb.HistoricalSummary) ([32]byte, error) {
 	max := uint64(fieldparams.HistoricalRootsLength)
 	if uint64(len(summaries)) > max {
 		return [32]byte{}, fmt.Errorf("historical summary exceeds max length %d", max)

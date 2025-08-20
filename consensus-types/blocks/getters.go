@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/runtime/version"
 )
@@ -54,10 +54,10 @@ func (b *SignedBeaconBlock) Copy() (interfaces.ReadOnlySignedBeaconBlock, error)
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			cp := zond.CopySignedBlindedBeaconBlockCapella(pb.(*zond.SignedBlindedBeaconBlockCapella))
+			cp := qrysmpb.CopySignedBlindedBeaconBlockCapella(pb.(*qrysmpb.SignedBlindedBeaconBlockCapella))
 			return initBlindedSignedBlockFromProtoCapella(cp)
 		}
-		cp := zond.CopySignedBeaconBlockCapella(pb.(*zond.SignedBeaconBlockCapella))
+		cp := qrysmpb.CopySignedBeaconBlockCapella(pb.(*qrysmpb.SignedBeaconBlockCapella))
 		return initSignedBlockFromProtoCapella(cp)
 	default:
 		return nil, errIncorrectBlockVersion
@@ -65,7 +65,7 @@ func (b *SignedBeaconBlock) Copy() (interfaces.ReadOnlySignedBeaconBlock, error)
 }
 
 // PbGenericBlock returns a generic signed beacon block.
-func (b *SignedBeaconBlock) PbGenericBlock() (*zond.GenericSignedBeaconBlock, error) {
+func (b *SignedBeaconBlock) PbGenericBlock() (*qrysmpb.GenericSignedBeaconBlock, error) {
 	pb, err := b.Proto()
 	if err != nil {
 		return nil, err
@@ -73,12 +73,12 @@ func (b *SignedBeaconBlock) PbGenericBlock() (*zond.GenericSignedBeaconBlock, er
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			return &zond.GenericSignedBeaconBlock{
-				Block: &zond.GenericSignedBeaconBlock_BlindedCapella{BlindedCapella: pb.(*zond.SignedBlindedBeaconBlockCapella)},
+			return &qrysmpb.GenericSignedBeaconBlock{
+				Block: &qrysmpb.GenericSignedBeaconBlock_BlindedCapella{BlindedCapella: pb.(*qrysmpb.SignedBlindedBeaconBlockCapella)},
 			}, nil
 		}
-		return &zond.GenericSignedBeaconBlock{
-			Block: &zond.GenericSignedBeaconBlock_Capella{Capella: pb.(*zond.SignedBeaconBlockCapella)},
+		return &qrysmpb.GenericSignedBeaconBlock{
+			Block: &qrysmpb.GenericSignedBeaconBlock_Capella{Capella: pb.(*qrysmpb.SignedBeaconBlockCapella)},
 		}, nil
 	default:
 		return nil, errIncorrectBlockVersion
@@ -86,7 +86,7 @@ func (b *SignedBeaconBlock) PbGenericBlock() (*zond.GenericSignedBeaconBlock, er
 }
 
 // PbCapellaBlock returns the underlying protobuf object.
-func (b *SignedBeaconBlock) PbCapellaBlock() (*zond.SignedBeaconBlockCapella, error) {
+func (b *SignedBeaconBlock) PbCapellaBlock() (*qrysmpb.SignedBeaconBlockCapella, error) {
 	if b.IsBlinded() {
 		return nil, consensus_types.ErrNotSupported("PbCapellaBlock", b.version)
 	}
@@ -94,11 +94,11 @@ func (b *SignedBeaconBlock) PbCapellaBlock() (*zond.SignedBeaconBlockCapella, er
 	if err != nil {
 		return nil, err
 	}
-	return pb.(*zond.SignedBeaconBlockCapella), nil
+	return pb.(*qrysmpb.SignedBeaconBlockCapella), nil
 }
 
 // PbBlindedCapellaBlock returns the underlying protobuf object.
-func (b *SignedBeaconBlock) PbBlindedCapellaBlock() (*zond.SignedBlindedBeaconBlockCapella, error) {
+func (b *SignedBeaconBlock) PbBlindedCapellaBlock() (*qrysmpb.SignedBlindedBeaconBlockCapella, error) {
 	if !b.IsBlinded() {
 		return nil, consensus_types.ErrNotSupported("PbBlindedCapellaBlock", b.version)
 	}
@@ -106,7 +106,7 @@ func (b *SignedBeaconBlock) PbBlindedCapellaBlock() (*zond.SignedBlindedBeaconBl
 	if err != nil {
 		return nil, err
 	}
-	return pb.(*zond.SignedBlindedBeaconBlockCapella), nil
+	return pb.(*qrysmpb.SignedBlindedBeaconBlockCapella), nil
 }
 
 // ToBlinded converts a non-blinded block to its blinded equivalent.
@@ -129,15 +129,15 @@ func (b *SignedBeaconBlock) ToBlinded() (interfaces.ReadOnlySignedBeaconBlock, e
 			return nil, err
 		}
 		return initBlindedSignedBlockFromProtoCapella(
-			&zond.SignedBlindedBeaconBlockCapella{
-				Block: &zond.BlindedBeaconBlockCapella{
+			&qrysmpb.SignedBlindedBeaconBlockCapella{
+				Block: &qrysmpb.BlindedBeaconBlockCapella{
 					Slot:          b.block.slot,
 					ProposerIndex: b.block.proposerIndex,
 					ParentRoot:    b.block.parentRoot[:],
 					StateRoot:     b.block.stateRoot[:],
-					Body: &zond.BlindedBeaconBlockBodyCapella{
+					Body: &qrysmpb.BlindedBeaconBlockBodyCapella{
 						RandaoReveal:                b.block.body.randaoReveal[:],
-						Eth1Data:                    b.block.body.eth1Data,
+						ExecutionData:               b.block.body.executionData,
 						Graffiti:                    b.block.body.graffiti[:],
 						ProposerSlashings:           b.block.body.proposerSlashings,
 						AttesterSlashings:           b.block.body.attesterSlashings,
@@ -182,7 +182,7 @@ func (b *SignedBeaconBlock) ValueInGplanck() uint64 {
 }
 
 // Header converts the underlying protobuf object from blinded block to header format.
-func (b *SignedBeaconBlock) Header() (*zond.SignedBeaconBlockHeader, error) {
+func (b *SignedBeaconBlock) Header() (*qrysmpb.SignedBeaconBlockHeader, error) {
 	if b.IsNil() {
 		return nil, errNilBlock
 	}
@@ -191,8 +191,8 @@ func (b *SignedBeaconBlock) Header() (*zond.SignedBeaconBlockHeader, error) {
 		return nil, errors.Wrapf(err, "could not hash block body")
 	}
 
-	return &zond.SignedBeaconBlockHeader{
-		Header: &zond.BeaconBlockHeader{
+	return &qrysmpb.SignedBeaconBlockHeader{
+		Header: &qrysmpb.BeaconBlockHeader{
 			Slot:          b.block.slot,
 			ProposerIndex: b.block.proposerIndex,
 			ParentRoot:    b.block.parentRoot[:],
@@ -212,9 +212,9 @@ func (b *SignedBeaconBlock) MarshalSSZ() ([]byte, error) {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			return pb.(*zond.SignedBlindedBeaconBlockCapella).MarshalSSZ()
+			return pb.(*qrysmpb.SignedBlindedBeaconBlockCapella).MarshalSSZ()
 		}
-		return pb.(*zond.SignedBeaconBlockCapella).MarshalSSZ()
+		return pb.(*qrysmpb.SignedBeaconBlockCapella).MarshalSSZ()
 	default:
 		return []byte{}, errIncorrectBlockVersion
 	}
@@ -230,9 +230,9 @@ func (b *SignedBeaconBlock) MarshalSSZTo(dst []byte) ([]byte, error) {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			return pb.(*zond.SignedBlindedBeaconBlockCapella).MarshalSSZTo(dst)
+			return pb.(*qrysmpb.SignedBlindedBeaconBlockCapella).MarshalSSZTo(dst)
 		}
-		return pb.(*zond.SignedBeaconBlockCapella).MarshalSSZTo(dst)
+		return pb.(*qrysmpb.SignedBeaconBlockCapella).MarshalSSZTo(dst)
 	default:
 		return []byte{}, errIncorrectBlockVersion
 	}
@@ -252,9 +252,9 @@ func (b *SignedBeaconBlock) SizeSSZ() int {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			return pb.(*zond.SignedBlindedBeaconBlockCapella).SizeSSZ()
+			return pb.(*qrysmpb.SignedBlindedBeaconBlockCapella).SizeSSZ()
 		}
-		return pb.(*zond.SignedBeaconBlockCapella).SizeSSZ()
+		return pb.(*qrysmpb.SignedBeaconBlockCapella).SizeSSZ()
 	default:
 		panic(incorrectBlockVersion)
 	}
@@ -266,7 +266,7 @@ func (b *SignedBeaconBlock) UnmarshalSSZ(buf []byte) error {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			pb := &zond.SignedBlindedBeaconBlockCapella{}
+			pb := &qrysmpb.SignedBlindedBeaconBlockCapella{}
 			if err := pb.UnmarshalSSZ(buf); err != nil {
 				return err
 			}
@@ -276,7 +276,7 @@ func (b *SignedBeaconBlock) UnmarshalSSZ(buf []byte) error {
 				return err
 			}
 		} else {
-			pb := &zond.SignedBeaconBlockCapella{}
+			pb := &qrysmpb.SignedBeaconBlockCapella{}
 			if err := pb.UnmarshalSSZ(buf); err != nil {
 				return err
 			}
@@ -342,9 +342,9 @@ func (b *BeaconBlock) HashTreeRoot() ([field_params.RootLength]byte, error) {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			return pb.(*zond.BlindedBeaconBlockCapella).HashTreeRoot()
+			return pb.(*qrysmpb.BlindedBeaconBlockCapella).HashTreeRoot()
 		}
-		return pb.(*zond.BeaconBlockCapella).HashTreeRoot()
+		return pb.(*qrysmpb.BeaconBlockCapella).HashTreeRoot()
 	default:
 		return [field_params.RootLength]byte{}, errIncorrectBlockVersion
 	}
@@ -359,9 +359,9 @@ func (b *BeaconBlock) HashTreeRootWith(h *ssz.Hasher) error {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			return pb.(*zond.BlindedBeaconBlockCapella).HashTreeRootWith(h)
+			return pb.(*qrysmpb.BlindedBeaconBlockCapella).HashTreeRootWith(h)
 		}
-		return pb.(*zond.BeaconBlockCapella).HashTreeRootWith(h)
+		return pb.(*qrysmpb.BeaconBlockCapella).HashTreeRootWith(h)
 	default:
 		return errIncorrectBlockVersion
 	}
@@ -377,9 +377,9 @@ func (b *BeaconBlock) MarshalSSZ() ([]byte, error) {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			return pb.(*zond.BlindedBeaconBlockCapella).MarshalSSZ()
+			return pb.(*qrysmpb.BlindedBeaconBlockCapella).MarshalSSZ()
 		}
-		return pb.(*zond.BeaconBlockCapella).MarshalSSZ()
+		return pb.(*qrysmpb.BeaconBlockCapella).MarshalSSZ()
 	default:
 		return []byte{}, errIncorrectBlockVersion
 	}
@@ -395,9 +395,9 @@ func (b *BeaconBlock) MarshalSSZTo(dst []byte) ([]byte, error) {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			return pb.(*zond.BlindedBeaconBlockCapella).MarshalSSZTo(dst)
+			return pb.(*qrysmpb.BlindedBeaconBlockCapella).MarshalSSZTo(dst)
 		}
-		return pb.(*zond.BeaconBlockCapella).MarshalSSZTo(dst)
+		return pb.(*qrysmpb.BeaconBlockCapella).MarshalSSZTo(dst)
 	default:
 		return []byte{}, errIncorrectBlockVersion
 	}
@@ -417,9 +417,9 @@ func (b *BeaconBlock) SizeSSZ() int {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			return pb.(*zond.BlindedBeaconBlockCapella).SizeSSZ()
+			return pb.(*qrysmpb.BlindedBeaconBlockCapella).SizeSSZ()
 		}
-		return pb.(*zond.BeaconBlockCapella).SizeSSZ()
+		return pb.(*qrysmpb.BeaconBlockCapella).SizeSSZ()
 	default:
 		panic(incorrectBodyVersion)
 	}
@@ -431,7 +431,7 @@ func (b *BeaconBlock) UnmarshalSSZ(buf []byte) error {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			pb := &zond.BlindedBeaconBlockCapella{}
+			pb := &qrysmpb.BlindedBeaconBlockCapella{}
 			if err := pb.UnmarshalSSZ(buf); err != nil {
 				return err
 			}
@@ -441,7 +441,7 @@ func (b *BeaconBlock) UnmarshalSSZ(buf []byte) error {
 				return err
 			}
 		} else {
-			pb := &zond.BeaconBlockCapella{}
+			pb := &qrysmpb.BeaconBlockCapella{}
 			if err := pb.UnmarshalSSZ(buf); err != nil {
 				return err
 			}
@@ -467,9 +467,9 @@ func (b *BeaconBlock) AsSignRequestObject() (validatorpb.SignRequestObject, erro
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			return &validatorpb.SignRequest_BlindedBlockCapella{BlindedBlockCapella: pb.(*zond.BlindedBeaconBlockCapella)}, nil
+			return &validatorpb.SignRequest_BlindedBlockCapella{BlindedBlockCapella: pb.(*qrysmpb.BlindedBeaconBlockCapella)}, nil
 		}
-		return &validatorpb.SignRequest_BlockCapella{BlockCapella: pb.(*zond.BeaconBlockCapella)}, nil
+		return &validatorpb.SignRequest_BlockCapella{BlockCapella: pb.(*qrysmpb.BeaconBlockCapella)}, nil
 	default:
 		return nil, errIncorrectBlockVersion
 	}
@@ -487,10 +487,10 @@ func (b *BeaconBlock) Copy() (interfaces.ReadOnlyBeaconBlock, error) {
 	switch b.version {
 	case version.Capella:
 		if b.IsBlinded() {
-			cp := zond.CopyBlindedBeaconBlockCapella(pb.(*zond.BlindedBeaconBlockCapella))
+			cp := qrysmpb.CopyBlindedBeaconBlockCapella(pb.(*qrysmpb.BlindedBeaconBlockCapella))
 			return initBlindedBlockFromProtoCapella(cp)
 		}
-		cp := zond.CopyBeaconBlockCapella(pb.(*zond.BeaconBlockCapella))
+		cp := qrysmpb.CopyBeaconBlockCapella(pb.(*qrysmpb.BeaconBlockCapella))
 		return initBlockFromProtoCapella(cp)
 	default:
 		return nil, errIncorrectBlockVersion
@@ -507,9 +507,9 @@ func (b *BeaconBlockBody) RandaoReveal() [field_params.DilithiumSignatureLength]
 	return b.randaoReveal
 }
 
-// Eth1Data returns the eth1 data in the block.
-func (b *BeaconBlockBody) Eth1Data() *zond.Eth1Data {
-	return b.eth1Data
+// ExecutionData returns the execution data in the block.
+func (b *BeaconBlockBody) ExecutionData() *qrysmpb.ExecutionData {
+	return b.executionData
 }
 
 // Graffiti returns the graffiti in the block.
@@ -518,32 +518,32 @@ func (b *BeaconBlockBody) Graffiti() [field_params.RootLength]byte {
 }
 
 // ProposerSlashings returns the proposer slashings in the block.
-func (b *BeaconBlockBody) ProposerSlashings() []*zond.ProposerSlashing {
+func (b *BeaconBlockBody) ProposerSlashings() []*qrysmpb.ProposerSlashing {
 	return b.proposerSlashings
 }
 
 // AttesterSlashings returns the attester slashings in the block.
-func (b *BeaconBlockBody) AttesterSlashings() []*zond.AttesterSlashing {
+func (b *BeaconBlockBody) AttesterSlashings() []*qrysmpb.AttesterSlashing {
 	return b.attesterSlashings
 }
 
 // Attestations returns the stored attestations in the block.
-func (b *BeaconBlockBody) Attestations() []*zond.Attestation {
+func (b *BeaconBlockBody) Attestations() []*qrysmpb.Attestation {
 	return b.attestations
 }
 
 // Deposits returns the stored deposits in the block.
-func (b *BeaconBlockBody) Deposits() []*zond.Deposit {
+func (b *BeaconBlockBody) Deposits() []*qrysmpb.Deposit {
 	return b.deposits
 }
 
 // VoluntaryExits returns the voluntary exits in the block.
-func (b *BeaconBlockBody) VoluntaryExits() []*zond.SignedVoluntaryExit {
+func (b *BeaconBlockBody) VoluntaryExits() []*qrysmpb.SignedVoluntaryExit {
 	return b.voluntaryExits
 }
 
 // SyncAggregate returns the sync aggregate in the block.
-func (b *BeaconBlockBody) SyncAggregate() (*zond.SyncAggregate, error) {
+func (b *BeaconBlockBody) SyncAggregate() (*qrysmpb.SyncAggregate, error) {
 	return b.syncAggregate, nil
 }
 
@@ -576,7 +576,7 @@ func (b *BeaconBlockBody) Execution() (interfaces.ExecutionData, error) {
 	}
 }
 
-func (b *BeaconBlockBody) DilithiumToExecutionChanges() ([]*zond.SignedDilithiumToExecutionChange, error) {
+func (b *BeaconBlockBody) DilithiumToExecutionChanges() ([]*qrysmpb.SignedDilithiumToExecutionChange, error) {
 	return b.dilithiumToExecutionChanges, nil
 }
 
@@ -589,9 +589,9 @@ func (b *BeaconBlockBody) HashTreeRoot() ([field_params.RootLength]byte, error) 
 	switch b.version {
 	case version.Capella:
 		if b.isBlinded {
-			return pb.(*zond.BlindedBeaconBlockBodyCapella).HashTreeRoot()
+			return pb.(*qrysmpb.BlindedBeaconBlockBodyCapella).HashTreeRoot()
 		}
-		return pb.(*zond.BeaconBlockBodyCapella).HashTreeRoot()
+		return pb.(*qrysmpb.BeaconBlockBodyCapella).HashTreeRoot()
 	default:
 		return [field_params.RootLength]byte{}, errIncorrectBodyVersion
 	}

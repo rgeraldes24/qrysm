@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 )
 
@@ -32,13 +32,13 @@ func NewSignedBeaconBlock(i interface{}) (interfaces.SignedBeaconBlock, error) {
 	switch b := i.(type) {
 	case nil:
 		return nil, ErrNilObject
-	case *zond.GenericSignedBeaconBlock_Capella:
+	case *qrysmpb.GenericSignedBeaconBlock_Capella:
 		return initSignedBlockFromProtoCapella(b.Capella)
-	case *zond.SignedBeaconBlockCapella:
+	case *qrysmpb.SignedBeaconBlockCapella:
 		return initSignedBlockFromProtoCapella(b)
-	case *zond.GenericSignedBeaconBlock_BlindedCapella:
+	case *qrysmpb.GenericSignedBeaconBlock_BlindedCapella:
 		return initBlindedSignedBlockFromProtoCapella(b.BlindedCapella)
-	case *zond.SignedBlindedBeaconBlockCapella:
+	case *qrysmpb.SignedBlindedBeaconBlockCapella:
 		return initBlindedSignedBlockFromProtoCapella(b)
 	default:
 		return nil, errors.Wrapf(ErrUnsupportedSignedBeaconBlock, "unable to create block from type %T", i)
@@ -50,13 +50,13 @@ func NewBeaconBlock(i interface{}) (interfaces.ReadOnlyBeaconBlock, error) {
 	switch b := i.(type) {
 	case nil:
 		return nil, ErrNilObject
-	case *zond.GenericBeaconBlock_Capella:
+	case *qrysmpb.GenericBeaconBlock_Capella:
 		return initBlockFromProtoCapella(b.Capella)
-	case *zond.BeaconBlockCapella:
+	case *qrysmpb.BeaconBlockCapella:
 		return initBlockFromProtoCapella(b)
-	case *zond.GenericBeaconBlock_BlindedCapella:
+	case *qrysmpb.GenericBeaconBlock_BlindedCapella:
 		return initBlindedBlockFromProtoCapella(b.BlindedCapella)
-	case *zond.BlindedBeaconBlockCapella:
+	case *qrysmpb.BlindedBeaconBlockCapella:
 		return initBlindedBlockFromProtoCapella(b)
 	default:
 		return nil, errors.Wrapf(errUnsupportedBeaconBlock, "unable to create block from type %T", i)
@@ -68,9 +68,9 @@ func NewBeaconBlockBody(i interface{}) (interfaces.ReadOnlyBeaconBlockBody, erro
 	switch b := i.(type) {
 	case nil:
 		return nil, ErrNilObject
-	case *zond.BeaconBlockBodyCapella:
+	case *qrysmpb.BeaconBlockBodyCapella:
 		return initBlockBodyFromProtoCapella(b)
-	case *zond.BlindedBeaconBlockBodyCapella:
+	case *qrysmpb.BlindedBeaconBlockBodyCapella:
 		return initBlindedBlockBodyFromProtoCapella(b)
 	default:
 		return nil, errors.Wrapf(errUnsupportedBeaconBlockBody, "unable to create block body from type %T", i)
@@ -89,17 +89,17 @@ func BuildSignedBeaconBlock(blk interfaces.ReadOnlyBeaconBlock, signature []byte
 	switch blk.Version() {
 	case version.Capella:
 		if blk.IsBlinded() {
-			pb, ok := pb.(*zond.BlindedBeaconBlockCapella)
+			pb, ok := pb.(*qrysmpb.BlindedBeaconBlockCapella)
 			if !ok {
 				return nil, errIncorrectBlockVersion
 			}
-			return NewSignedBeaconBlock(&zond.SignedBlindedBeaconBlockCapella{Block: pb, Signature: signature})
+			return NewSignedBeaconBlock(&qrysmpb.SignedBlindedBeaconBlockCapella{Block: pb, Signature: signature})
 		}
-		pb, ok := pb.(*zond.BeaconBlockCapella)
+		pb, ok := pb.(*qrysmpb.BeaconBlockCapella)
 		if !ok {
 			return nil, errIncorrectBlockVersion
 		}
-		return NewSignedBeaconBlock(&zond.SignedBeaconBlockCapella{Block: pb, Signature: signature})
+		return NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: pb, Signature: signature})
 	default:
 		return nil, errUnsupportedBeaconBlock
 	}
@@ -171,15 +171,15 @@ func BuildSignedBeaconBlockFromExecutionPayload(
 		if err != nil {
 			return nil, err
 		}
-		fullBlock = &zond.SignedBeaconBlockCapella{
-			Block: &zond.BeaconBlockCapella{
+		fullBlock = &qrysmpb.SignedBeaconBlockCapella{
+			Block: &qrysmpb.BeaconBlockCapella{
 				Slot:          b.Slot(),
 				ProposerIndex: b.ProposerIndex(),
 				ParentRoot:    parentRoot[:],
 				StateRoot:     stateRoot[:],
-				Body: &zond.BeaconBlockBodyCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{
 					RandaoReveal:                randaoReveal[:],
-					Eth1Data:                    b.Body().Eth1Data(),
+					ExecutionData:               b.Body().ExecutionData(),
 					Graffiti:                    graffiti[:],
 					ProposerSlashings:           b.Body().ProposerSlashings(),
 					AttesterSlashings:           b.Body().AttesterSlashings(),
@@ -202,11 +202,11 @@ func BuildSignedBeaconBlockFromExecutionPayload(
 
 // BeaconBlockContainerToSignedBeaconBlock converts BeaconBlockContainer (API response) to a SignedBeaconBlock.
 // This is particularly useful for using the values from API calls.
-func BeaconBlockContainerToSignedBeaconBlock(obj *zond.BeaconBlockContainer) (interfaces.ReadOnlySignedBeaconBlock, error) {
+func BeaconBlockContainerToSignedBeaconBlock(obj *qrysmpb.BeaconBlockContainer) (interfaces.ReadOnlySignedBeaconBlock, error) {
 	switch obj.Block.(type) {
-	case *zond.BeaconBlockContainer_BlindedCapellaBlock:
+	case *qrysmpb.BeaconBlockContainer_BlindedCapellaBlock:
 		return NewSignedBeaconBlock(obj.GetBlindedCapellaBlock())
-	case *zond.BeaconBlockContainer_CapellaBlock:
+	case *qrysmpb.BeaconBlockContainer_CapellaBlock:
 		return NewSignedBeaconBlock(obj.GetCapellaBlock())
 	default:
 		return nil, errors.New("container block type not recognized")

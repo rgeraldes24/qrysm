@@ -19,10 +19,10 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
-	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/config/params"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	e2etypes "github.com/theQRL/qrysm/testing/endtoend/types"
 	"github.com/theQRL/qrysm/time/slots"
@@ -342,7 +342,7 @@ func ComponentsStarted(ctx context.Context, comps []e2etypes.ComponentRunner) er
 }
 
 // EpochTickerStartTime calculates the best time to start epoch ticker for a given genesis.
-func EpochTickerStartTime(genesis *zond.Genesis) time.Time {
+func EpochTickerStartTime(genesis *qrysmpb.Genesis) time.Time {
 	epochSeconds := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot))
 	epochSecondsHalf := time.Duration(int64(epochSeconds*1000)/2) * time.Millisecond
 	// Adding a half slot here to ensure the requests are in the middle of an epoch.
@@ -381,10 +381,10 @@ func WaitOnNodes(ctx context.Context, nodes []e2etypes.ComponentRunner, nodesSta
 	return g.Wait()
 }
 
-func ExecutionNodeRPCClient() (*zondclient.Client, error) {
+func ExecutionNodeRPCClient() (*qrlclient.Client, error) {
 	client, err := rpc.Dial(e2e.TestParams.ExecutionNodeRPCURL(e2e.ExecutionNodeComponentOffset).String())
 	if err != nil {
 		return nil, err
 	}
-	return zondclient.NewClient(client), nil
+	return qrlclient.NewClient(client), nil
 }

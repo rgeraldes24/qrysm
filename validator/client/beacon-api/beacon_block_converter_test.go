@@ -33,11 +33,11 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			},
 		},
 		{
-			name:                 "nil eth1 data",
-			expectedErrorMessage: "eth1 data is nil",
+			name:                 "nil execution data",
+			expectedErrorMessage: "execution data is nil",
 			generateData: func() *apimiddleware.BeaconBlockCapellaJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.Eth1Data = nil
+				beaconBlock.Body.ExecutionData = nil
 				return beaconBlock
 			},
 		},
@@ -91,7 +91,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			expectedErrorMessage: "failed to decode deposit root `bar`",
 			generateData: func() *apimiddleware.BeaconBlockCapellaJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.Eth1Data.DepositRoot = "bar"
+				beaconBlock.Body.ExecutionData.DepositRoot = "bar"
 				return beaconBlock
 			},
 		},
@@ -100,7 +100,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			expectedErrorMessage: "failed to parse deposit count `foo`",
 			generateData: func() *apimiddleware.BeaconBlockCapellaJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.Eth1Data.DepositCount = "foo"
+				beaconBlock.Body.ExecutionData.DepositCount = "foo"
 				return beaconBlock
 			},
 		},
@@ -109,7 +109,7 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 			expectedErrorMessage: "failed to decode block hash `bar`",
 			generateData: func() *apimiddleware.BeaconBlockCapellaJson {
 				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.Eth1Data.BlockHash = "bar"
+				beaconBlock.Body.ExecutionData.BlockHash = "bar"
 				return beaconBlock
 			},
 		},

@@ -10,7 +10,7 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	apimiddleware "github.com/theQRL/qrysm/api/gateway/apimiddleware"
-	beacon "github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
+	beacon "github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
 )
 
 // MockgenesisProvider is a mock of genesisProvider interface.

@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/slashings"
 	bolt "go.etcd.io/bbolt"
 	"go.opencensus.io/trace"
@@ -141,7 +141,7 @@ func (s *Store) AttestationHistoryForPubKey(ctx context.Context, pubKey [field_p
 // CheckSlashableAttestation verifies an incoming attestation is
 // not a double vote for a validator public key nor a surround vote.
 func (s *Store) CheckSlashableAttestation(
-	ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoot [32]byte, att *zondpb.IndexedAttestation,
+	ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoot [32]byte, att *qrysmpb.IndexedAttestation,
 ) (SlashingKind, error) {
 	ctx, span := trace.StartSpan(ctx, "Validator.CheckSlashableAttestation")
 	defer span.End()
@@ -201,7 +201,7 @@ func (s *Store) CheckSlashableAttestation(
 
 // Iterate from the back of the bucket since we are looking for target_epoch > att.target_epoch
 func (*Store) checkSurroundedVote(
-	targetEpochsBucket *bolt.Bucket, att *zondpb.IndexedAttestation,
+	targetEpochsBucket *bolt.Bucket, att *qrysmpb.IndexedAttestation,
 ) (SlashingKind, error) {
 	c := targetEpochsBucket.Cursor()
 	for k, v := c.Last(); k != nil; k, v = c.Prev() {
@@ -218,10 +218,10 @@ func (*Store) checkSurroundedVote(
 		}
 
 		for _, existingSourceEpoch := range attestedSourceEpochs {
-			existingAtt := &zondpb.IndexedAttestation{
-				Data: &zondpb.AttestationData{
-					Source: &zondpb.Checkpoint{Epoch: existingSourceEpoch},
-					Target: &zondpb.Checkpoint{Epoch: existingTargetEpoch},
+			existingAtt := &qrysmpb.IndexedAttestation{
+				Data: &qrysmpb.AttestationData{
+					Source: &qrysmpb.Checkpoint{Epoch: existingSourceEpoch},
+					Target: &qrysmpb.Checkpoint{Epoch: existingTargetEpoch},
 				},
 			}
 			surrounded := slashings.IsSurround(existingAtt, att)
@@ -241,7 +241,7 @@ func (*Store) checkSurroundedVote(
 
 // Iterate from the back of the bucket since we are looking for source_epoch > att.source_epoch
 func (*Store) checkSurroundingVote(
-	sourceEpochsBucket *bolt.Bucket, att *zondpb.IndexedAttestation,
+	sourceEpochsBucket *bolt.Bucket, att *qrysmpb.IndexedAttestation,
 ) (SlashingKind, error) {
 	c := sourceEpochsBucket.Cursor()
 	for k, v := c.Last(); k != nil; k, v = c.Prev() {
@@ -258,10 +258,10 @@ func (*Store) checkSurroundingVote(
 		}
 
 		for _, existingTargetEpoch := range attestedTargetEpochs {
-			existingAtt := &zondpb.IndexedAttestation{
-				Data: &zondpb.AttestationData{
-					Source: &zondpb.Checkpoint{Epoch: existingSourceEpoch},
-					Target: &zondpb.Checkpoint{Epoch: existingTargetEpoch},
+			existingAtt := &qrysmpb.IndexedAttestation{
+				Data: &qrysmpb.AttestationData{
+					Source: &qrysmpb.Checkpoint{Epoch: existingSourceEpoch},
+					Target: &qrysmpb.Checkpoint{Epoch: existingTargetEpoch},
 				},
 			}
 			surrounding := slashings.IsSurround(att, existingAtt)
@@ -281,7 +281,7 @@ func (*Store) checkSurroundingVote(
 
 // SaveAttestationsForPubKey stores a batch of attestations all at once.
 func (s *Store) SaveAttestationsForPubKey(
-	ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoots [][32]byte, atts []*zondpb.IndexedAttestation,
+	ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoots [][32]byte, atts []*qrysmpb.IndexedAttestation,
 ) error {
 	ctx, span := trace.StartSpan(ctx, "Validator.SaveAttestationsForPubKey")
 	defer span.End()
@@ -307,7 +307,7 @@ func (s *Store) SaveAttestationsForPubKey(
 // SaveAttestationForPubKey saves an attestation for a validator public
 // key for local validator slashing protection.
 func (s *Store) SaveAttestationForPubKey(
-	ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoot [32]byte, att *zondpb.IndexedAttestation,
+	ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, signingRoot [32]byte, att *qrysmpb.IndexedAttestation,
 ) error {
 	ctx, span := trace.StartSpan(ctx, "Validator.SaveAttestationForPubKey")
 	defer span.End()

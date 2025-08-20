@@ -136,7 +136,7 @@ func (node *Proxy) Start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	jwtPath := path.Join(e2e.TestParams.TestPath, "zonddata/"+strconv.Itoa(node.index)+"/")
+	jwtPath := path.Join(e2e.TestParams.TestPath, "qrldata/"+strconv.Itoa(node.index)+"/")
 	jwtPath = path.Join(jwtPath, "gzond/jwtsecret")
 	secret, err := parseJWTSecretFromFile(jwtPath)
 	if err != nil {
@@ -153,7 +153,7 @@ func (node *Proxy) Start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	log.Infof("Starting zond proxy %d with port: %d and file %s", node.index, e2e.TestParams.Ports.ProxyPort+node.index, f.Name())
+	log.Infof("Starting qrl proxy %d with port: %d and file %s", node.index, e2e.TestParams.Ports.ProxyPort+node.index, f.Name())
 
 	// Set cancel into context.
 	ctx, cancel := context.WithCancel(ctx)
@@ -164,7 +164,7 @@ func (node *Proxy) Start(ctx context.Context) error {
 	return nProxy.Start(ctx)
 }
 
-// Started checks whether the zond proxy is started and ready to be queried.
+// Started checks whether the qrl proxy is started and ready to be queried.
 func (node *Proxy) Started() <-chan struct{} {
 	return node.started
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -237,7 +237,7 @@ func TestNode_SetFullyValidated(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, false, opt)
 
-	respNodes := make([]*v1.ForkChoiceNode, 0)
+	respNodes := make([]*qrlpb.ForkChoiceNode, 0)
 	respNodes, err = f.store.treeRootNode.nodeTreeDump(ctx, respNodes)
 	require.NoError(t, err)
 	require.Equal(t, len(respNodes), f.NodeCount())

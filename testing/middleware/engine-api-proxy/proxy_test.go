@@ -111,7 +111,7 @@ func TestProxy_CustomInterceptors(t *testing.T) {
 		}()
 		time.Sleep(time.Millisecond * 100)
 
-		method := "zond_syncing"
+		method := "qrl_syncing"
 
 		// RPC method to intercept.
 		proxy.AddRequestInterceptor(
@@ -282,7 +282,7 @@ func Test_isEngineAPICall(t *testing.T) {
 		{
 			name: "non-engine method",
 			args: &jsonRPCObject{
-				Method: "zond_syncing",
+				Method: "qrl_syncing",
 				ID:     1,
 				Result: false,
 			},

@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -27,10 +27,10 @@ func TestComputeFieldRootsWithHasher_Capella(t *testing.T) {
 	historicalRoots, err := util.PrepareRoots(int(params.BeaconConfig().SlotsPerHistoricalRoot))
 	require.NoError(t, err)
 	require.NoError(t, beaconState.SetHistoricalRoots(historicalRoots))
-	require.NoError(t, beaconState.SetEth1Data(eth1Data()))
-	require.NoError(t, beaconState.SetEth1DataVotes([]*zondpb.Eth1Data{eth1Data()}))
-	require.NoError(t, beaconState.SetEth1DepositIndex(123))
-	require.NoError(t, beaconState.SetValidators([]*zondpb.Validator{validator()}))
+	require.NoError(t, beaconState.SetExecutionData(executionData()))
+	require.NoError(t, beaconState.SetExecutionDataVotes([]*qrysmpb.ExecutionData{executionData()}))
+	require.NoError(t, beaconState.SetExecutionDepositIndex(123))
+	require.NoError(t, beaconState.SetValidators([]*qrysmpb.Validator{validator()}))
 	require.NoError(t, beaconState.SetBalances([]uint64{1, 2, 3}))
 	randaoMixes, err := util.PrepareRoots(int(params.BeaconConfig().EpochsPerHistoricalVector))
 	require.NoError(t, err)
@@ -50,14 +50,14 @@ func TestComputeFieldRootsWithHasher_Capella(t *testing.T) {
 	require.NoError(t, beaconState.SetLatestExecutionPayloadHeader(wrappedHeader))
 	require.NoError(t, beaconState.SetNextWithdrawalIndex(123))
 	require.NoError(t, beaconState.SetNextWithdrawalValidatorIndex(123))
-	require.NoError(t, beaconState.AppendHistoricalSummaries(&zondpb.HistoricalSummary{
+	require.NoError(t, beaconState.AppendHistoricalSummaries(&qrysmpb.HistoricalSummary{
 		BlockSummaryRoot: bytesutil.PadTo([]byte("block summary root"), 32),
 		StateSummaryRoot: bytesutil.PadTo([]byte("state summary root"), 32),
 	}))
 
 	nativeState, ok := beaconState.(*statenative.BeaconState)
 	require.Equal(t, true, ok)
-	protoState, ok := nativeState.ToProtoUnsafe().(*zondpb.BeaconStateCapella)
+	protoState, ok := nativeState.ToProtoUnsafe().(*qrysmpb.BeaconStateCapella)
 	require.Equal(t, true, ok)
 	initState, err := statenative.InitializeFromProtoCapella(protoState)
 	require.NoError(t, err)
@@ -104,21 +104,21 @@ func genesisValidatorsRoot() []byte {
 	return gvr[:]
 }
 
-func fork() *zondpb.Fork {
+func fork() *qrysmpb.Fork {
 	prev := bytesutil.ToBytes4([]byte("prev"))
 	curr := bytesutil.ToBytes4([]byte("curr"))
-	return &zondpb.Fork{
+	return &qrysmpb.Fork{
 		PreviousVersion: prev[:],
 		CurrentVersion:  curr[:],
 		Epoch:           123,
 	}
 }
 
-func latestBlockHeader() *zondpb.BeaconBlockHeader {
+func latestBlockHeader() *qrysmpb.BeaconBlockHeader {
 	pr := bytesutil.ToBytes32([]byte("parent"))
 	sr := bytesutil.ToBytes32([]byte("state"))
 	br := bytesutil.ToBytes32([]byte("body"))
-	return &zondpb.BeaconBlockHeader{
+	return &qrysmpb.BeaconBlockHeader{
 		Slot:          123,
 		ProposerIndex: 123,
 		ParentRoot:    pr[:],
@@ -127,20 +127,20 @@ func latestBlockHeader() *zondpb.BeaconBlockHeader {
 	}
 }
 
-func eth1Data() *zondpb.Eth1Data {
+func executionData() *qrysmpb.ExecutionData {
 	dr := bytesutil.ToBytes32([]byte("deposit"))
 	bh := bytesutil.ToBytes32([]byte("block"))
-	return &zondpb.Eth1Data{
+	return &qrysmpb.ExecutionData{
 		DepositRoot:  dr[:],
 		DepositCount: 123,
 		BlockHash:    bh[:],
 	}
 }
 
-func validator() *zondpb.Validator {
+func validator() *qrysmpb.Validator {
 	pk := bytesutil.ToBytes48([]byte("public"))
 	wc := bytesutil.ToBytes32([]byte("withdrawal"))
-	return &zondpb.Validator{
+	return &qrysmpb.Validator{
 		PublicKey:                  pk[:],
 		WithdrawalCredentials:      wc[:],
 		EffectiveBalance:           123,
@@ -152,20 +152,20 @@ func validator() *zondpb.Validator {
 	}
 }
 
-func pendingAttestation(prefix string) *zondpb.PendingAttestation {
+func pendingAttestation(prefix string) *qrysmpb.PendingAttestation {
 	bbr := bytesutil.ToBytes32([]byte(prefix + "beacon"))
 	r := bytesutil.ToBytes32([]byte(prefix + "root"))
-	return &zondpb.PendingAttestation{
+	return &qrysmpb.PendingAttestation{
 		AggregationBits: bitfield.Bitlist{0x00, 0xFF, 0xFF, 0xFF},
-		Data: &zondpb.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			Slot:            123,
 			CommitteeIndex:  123,
 			BeaconBlockRoot: bbr[:],
-			Source: &zondpb.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Epoch: 123,
 				Root:  r[:],
 			},
-			Target: &zondpb.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: 123,
 				Root:  r[:],
 			},
@@ -181,21 +181,21 @@ func justificationBits() bitfield.Bitvector4 {
 	return v
 }
 
-func checkpoint(prefix string) *zondpb.Checkpoint {
+func checkpoint(prefix string) *qrysmpb.Checkpoint {
 	r := bytesutil.ToBytes32([]byte(prefix + "root"))
-	return &zondpb.Checkpoint{
+	return &qrysmpb.Checkpoint{
 		Epoch: 123,
 		Root:  r[:],
 	}
 }
 
-func syncCommittee(prefix string) *zondpb.SyncCommittee {
+func syncCommittee(prefix string) *qrysmpb.SyncCommittee {
 	pubkeys := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	for i := range pubkeys {
 		key := bytesutil.ToBytes48([]byte(prefix + "pubkey"))
 		pubkeys[i] = key[:]
 	}
-	return &zondpb.SyncCommittee{
+	return &qrysmpb.SyncCommittee{
 		Pubkeys: pubkeys,
 	}
 }

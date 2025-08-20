@@ -103,7 +103,7 @@ func base64ToHexProcessor(v reflect.Value) error {
 
 func base64ToChecksumAddressProcessor(v reflect.Value) error {
 	if v.String() == "" {
-		v.SetString("Z")
+		v.SetString("Q")
 		return nil
 	}
 	b, err := base64.StdEncoding.DecodeString(v.String())

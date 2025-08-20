@@ -5,27 +5,27 @@ import (
 
 	"github.com/theQRL/go-bitfield"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
 
 func Test_CapellaToV1Alpha1SignedBlock(t *testing.T) {
-	v1Block := util.HydrateV1CapellaSignedBeaconBlock(&zondpbv1.SignedBeaconBlockCapella{})
+	v1Block := util.HydrateV1CapellaSignedBeaconBlock(&qrlpb.SignedBeaconBlockCapella{})
 	v1Block.Message.Slot = slot
 	v1Block.Message.ProposerIndex = validatorIndex
 	v1Block.Message.ParentRoot = parentRoot
 	v1Block.Message.StateRoot = stateRoot
 	v1Block.Message.Body.RandaoReveal = randaoReveal
-	v1Block.Message.Body.Eth1Data = &zondpbv1.Eth1Data{
+	v1Block.Message.Body.ExecutionData = &qrlpb.ExecutionData{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
 	}
 	syncCommitteeBits := bitfield.NewBitvector16()
 	syncCommitteeBits.SetBitAt(100, true)
-	v1Block.Message.Body.SyncAggregate = &zondpbv1.SyncAggregate{
+	v1Block.Message.Body.SyncAggregate = &qrlpb.SyncAggregate{
 		SyncCommitteeBits:       syncCommitteeBits,
 		SyncCommitteeSignatures: [][]byte{signature},
 	}
@@ -63,20 +63,20 @@ func Test_CapellaToV1Alpha1SignedBlock(t *testing.T) {
 }
 
 func Test_BlindedCapellaToV1Alpha1SignedBlock(t *testing.T) {
-	v1Block := util.HydrateV1SignedBlindedBeaconBlockCapella(&zondpbv1.SignedBlindedBeaconBlockCapella{})
+	v1Block := util.HydrateV1SignedBlindedBeaconBlockCapella(&qrlpb.SignedBlindedBeaconBlockCapella{})
 	v1Block.Message.Slot = slot
 	v1Block.Message.ProposerIndex = validatorIndex
 	v1Block.Message.ParentRoot = parentRoot
 	v1Block.Message.StateRoot = stateRoot
 	v1Block.Message.Body.RandaoReveal = randaoReveal
-	v1Block.Message.Body.Eth1Data = &zondpbv1.Eth1Data{
+	v1Block.Message.Body.ExecutionData = &qrlpb.ExecutionData{
 		DepositRoot:  depositRoot,
 		DepositCount: depositCount,
 		BlockHash:    blockHash,
 	}
 	syncCommitteeBits := bitfield.NewBitvector16()
 	syncCommitteeBits.SetBitAt(100, true)
-	v1Block.Message.Body.SyncAggregate = &zondpbv1.SyncAggregate{
+	v1Block.Message.Body.SyncAggregate = &qrlpb.SyncAggregate{
 		SyncCommitteeBits:       syncCommitteeBits,
 		SyncCommitteeSignatures: [][]byte{signature},
 	}

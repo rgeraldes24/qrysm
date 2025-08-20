@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/theQRL/go-zond"
+	qrl "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
-	zondRPC "github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/qrysm/beacon-chain/execution/types"
 	"github.com/theQRL/qrysm/config/features"
 	"github.com/theQRL/qrysm/config/params"
@@ -33,9 +33,9 @@ const (
 	// GetPayloadMethodV2 v2 request string for JSON-RPC.
 	GetPayloadMethodV2 = "engine_getPayloadV2"
 	// ExecutionBlockByHashMethod request string for JSON-RPC.
-	ExecutionBlockByHashMethod = "zond_getBlockByHash"
+	ExecutionBlockByHashMethod = "qrl_getBlockByHash"
 	// ExecutionBlockByNumberMethod request string for JSON-RPC.
-	ExecutionBlockByNumberMethod = "zond_getBlockByNumber"
+	ExecutionBlockByNumberMethod = "qrl_getBlockByNumber"
 	// GetPayloadBodiesByHashV1 v1 request string for JSON-RPC.
 	GetPayloadBodiesByHashV1 = "engine_getPayloadBodiesByHashV1"
 	// GetPayloadBodiesByRangeV1 v1 request string for JSON-RPC.
@@ -79,7 +79,7 @@ var EmptyBlockHash = errors.New("Block hash is empty 0x0000...")
 
 // NewPayload calls the engine_newPayloadVX method via JSON-RPC.
 func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionData, versionedHashes []common.Hash, parentBlockRoot *common.Hash) ([]byte, error) {
-	ctx, span := trace.StartSpan(ctx, "powchain.engine-api-client.NewPayload")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.NewPayload")
 	defer span.End()
 	start := time.Now()
 	defer func() {
@@ -125,7 +125,7 @@ func (s *Service) NewPayload(ctx context.Context, payload interfaces.ExecutionDa
 func (s *Service) ForkchoiceUpdated(
 	ctx context.Context, state *pb.ForkchoiceState, attrs payloadattribute.Attributer,
 ) (*pb.PayloadIDBytes, []byte, error) {
-	ctx, span := trace.StartSpan(ctx, "powchain.engine-api-client.ForkchoiceUpdated")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.ForkchoiceUpdated")
 	defer span.End()
 	start := time.Now()
 	defer func() {
@@ -176,7 +176,7 @@ func (s *Service) ForkchoiceUpdated(
 // GetPayload calls the engine_getPayloadVX method via JSON-RPC.
 // It returns the execution data as well as the blobs bundle.
 func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primitives.Slot) (interfaces.ExecutionData, bool, error) {
-	ctx, span := trace.StartSpan(ctx, "powchain.engine-api-client.GetPayload")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.GetPayload")
 	defer span.End()
 	start := time.Now()
 	defer func() {
@@ -200,9 +200,9 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 }
 
 // LatestExecutionBlock fetches the latest execution engine block by calling
-// zond_blockByNumber via JSON-RPC.
+// qrl_blockByNumber via JSON-RPC.
 func (s *Service) LatestExecutionBlock(ctx context.Context) (*pb.ExecutionBlock, error) {
-	ctx, span := trace.StartSpan(ctx, "powchain.engine-api-client.LatestExecutionBlock")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.LatestExecutionBlock")
 	defer span.End()
 
 	result := &pb.ExecutionBlock{}
@@ -217,9 +217,9 @@ func (s *Service) LatestExecutionBlock(ctx context.Context) (*pb.ExecutionBlock,
 }
 
 // ExecutionBlockByHash fetches an execution engine block by hash by calling
-// zond_blockByHash via JSON-RPC.
+// qrl_blockByHash via JSON-RPC.
 func (s *Service) ExecutionBlockByHash(ctx context.Context, hash common.Hash, withTxs bool) (*pb.ExecutionBlock, error) {
-	ctx, span := trace.StartSpan(ctx, "powchain.engine-api-client.ExecutionBlockByHash")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.ExecutionBlockByHash")
 	defer span.End()
 	result := &pb.ExecutionBlock{}
 	err := s.rpcClient.CallContext(ctx, result, ExecutionBlockByHashMethod, hash, withTxs)
@@ -227,12 +227,12 @@ func (s *Service) ExecutionBlockByHash(ctx context.Context, hash common.Hash, wi
 }
 
 // ExecutionBlocksByHashes fetches a batch of execution engine blocks by hash by calling
-// zond_blockByHash via JSON-RPC.
+// qrl_blockByHash via JSON-RPC.
 func (s *Service) ExecutionBlocksByHashes(ctx context.Context, hashes []common.Hash, withTxs bool) ([]*pb.ExecutionBlock, error) {
-	_, span := trace.StartSpan(ctx, "powchain.engine-api-client.ExecutionBlocksByHashes")
+	_, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.ExecutionBlocksByHashes")
 	defer span.End()
 	numOfHashes := len(hashes)
-	elems := make([]zondRPC.BatchElem, 0, numOfHashes)
+	elems := make([]rpc.BatchElem, 0, numOfHashes)
 	execBlks := make([]*pb.ExecutionBlock, 0, numOfHashes)
 	if numOfHashes == 0 {
 		return execBlks, nil
@@ -240,7 +240,7 @@ func (s *Service) ExecutionBlocksByHashes(ctx context.Context, hashes []common.H
 	for _, h := range hashes {
 		blk := &pb.ExecutionBlock{}
 		newH := h
-		elems = append(elems, zondRPC.BatchElem{
+		elems = append(elems, rpc.BatchElem{
 			Method: ExecutionBlockByHashMethod,
 			Args:   []interface{}{newH, withTxs},
 			Result: blk,
@@ -265,7 +265,7 @@ func (s *Service) HeaderByHash(ctx context.Context, hash common.Hash) (*types.He
 	var hdr *types.HeaderInfo
 	err := s.rpcClient.CallContext(ctx, &hdr, ExecutionBlockByHashMethod, hash, false /* no transactions */)
 	if err == nil && hdr == nil {
-		err = zond.NotFound
+		err = qrl.NotFound
 	}
 	return hdr, err
 }
@@ -275,14 +275,14 @@ func (s *Service) HeaderByNumber(ctx context.Context, number *big.Int) (*types.H
 	var hdr *types.HeaderInfo
 	err := s.rpcClient.CallContext(ctx, &hdr, ExecutionBlockByNumberMethod, toBlockNumArg(number), false /* no transactions */)
 	if err == nil && hdr == nil {
-		err = zond.NotFound
+		err = qrl.NotFound
 	}
 	return hdr, err
 }
 
 // GetPayloadBodiesByHash returns the relevant payload bodies for the provided block hash.
 func (s *Service) GetPayloadBodiesByHash(ctx context.Context, executionBlockHashes []common.Hash) ([]*pb.ExecutionPayloadBodyV1, error) {
-	ctx, span := trace.StartSpan(ctx, "powchain.engine-api-client.GetPayloadBodiesByHashV1")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.GetPayloadBodiesByHashV1")
 	defer span.End()
 
 	result := make([]*pb.ExecutionPayloadBodyV1, 0)
@@ -301,7 +301,7 @@ func (s *Service) GetPayloadBodiesByHash(ctx context.Context, executionBlockHash
 
 // GetPayloadBodiesByRange returns the relevant payload bodies for the provided range.
 func (s *Service) GetPayloadBodiesByRange(ctx context.Context, start, count uint64) ([]*pb.ExecutionPayloadBodyV1, error) {
-	ctx, span := trace.StartSpan(ctx, "powchain.engine-api-client.GetPayloadBodiesByRangeV1")
+	ctx, span := trace.StartSpan(ctx, "execution-chain.engine-api-client.GetPayloadBodiesByRangeV1")
 	defer span.End()
 
 	result := make([]*pb.ExecutionPayloadBodyV1, 0)
@@ -565,7 +565,7 @@ func handleRPCError(err error) error {
 	if isTimeout(err) {
 		return ErrHTTPTimeout
 	}
-	e, ok := err.(zondRPC.Error)
+	e, ok := err.(rpc.Error)
 	if !ok {
 		// TODO(now.youtrack.cloud/issue/TQ-1)
 		if strings.Contains(err.Error(), "401 Unauthorized") {
@@ -608,7 +608,7 @@ func handleRPCError(err error) error {
 	case -32000:
 		errServerErrorCount.Inc()
 		// Only -32000 status codes are data errors in the RPC specification.
-		errWithData, ok := err.(zondRPC.DataError)
+		errWithData, ok := err.(rpc.DataError)
 		if !ok {
 			return errors.Wrapf(err, "got an unexpected error in JSON-RPC response")
 		}
@@ -639,11 +639,11 @@ func toBlockNumArg(number *big.Int) string {
 	if number.Cmp(pending) == 0 {
 		return "pending"
 	}
-	finalized := big.NewInt(int64(zondRPC.FinalizedBlockNumber))
+	finalized := big.NewInt(int64(rpc.FinalizedBlockNumber))
 	if number.Cmp(finalized) == 0 {
 		return "finalized"
 	}
-	safe := big.NewInt(int64(zondRPC.SafeBlockNumber))
+	safe := big.NewInt(int64(rpc.SafeBlockNumber))
 	if number.Cmp(safe) == 0 {
 		return "safe"
 	}

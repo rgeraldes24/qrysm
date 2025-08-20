@@ -30,15 +30,15 @@ var mainnetNetworkConfig = &NetworkConfig{
 	MaximumGossipClockDisparity:     500 * time.Millisecond,
 	MessageDomainInvalidSnappy:      [4]byte{00, 00, 00, 00},
 	MessageDomainValidSnappy:        [4]byte{01, 00, 00, 00},
-	ETH2Key:                         "eth2",
+	ConsensusKey:                    "consensus",
 	AttSubnetKey:                    "attnets",
 	SyncCommsSubnetKey:              "syncnets",
 	MinimumPeersInSubnetSearch:      20,
 	ContractDeploymentBlock:         11184524, // Note: contract was deployed in block 11052984 but no transactions were sent until 11184524.
 	BootstrapNodes:                  []string{
 		// TODO(now.youtrack.cloud/issue/TQ-13)
-		// "enr:-Ku4QImhMc1z8yCiNJ1TyUxdcfNucje3BGwEHzodEZUan8PherEo4sF7pPHPSIB1NNuSg5fZy7qFsjmUKs2ea1Whi0EBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpD1pf1CAAAAAP__________gmlkgnY0gmlwhBLf22SJc2VjcDI1NmsxoQOVphkDqal4QzPMksc5wnpuC3gvSC8AfbFOnZY_On34wIN1ZHCCIyg",
-		// "enr:-Ku4QP2xDnEtUXIjzJ_DhlCRN9SN99RYQPJL92TMlSv7U5C1YnYLjwOQHgZIUXw6c-BvRg2Yc2QsZxxoS_pPRVe0yK8Bh2F0dG5ldHOIAAAAAAAAAACEZXRoMpD1pf1CAAAAAP__________gmlkgnY0gmlwhBLf22SJc2VjcDI1NmsxoQMeFF5GrS7UZpAH2Ly84aLK-TyvH-dRo0JM1i8yygH50YN1ZHCCJxA",
+		// "qnr:-Ku4QImhMc1z8yCiNJ1TyUxdcfNucje3BGwEHzodEZUan8PherEo4sF7pPHPSIB1NNuSg5fZy7qFsjmUKs2ea1Whi0EBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpD1pf1CAAAAAP__________gmlkgnY0gmlwhBLf22SJc2VjcDI1NmsxoQOVphkDqal4QzPMksc5wnpuC3gvSC8AfbFOnZY_On34wIN1ZHCCIyg",
+		// "qnr:-Ku4QP2xDnEtUXIjzJ_DhlCRN9SN99RYQPJL92TMlSv7U5C1YnYLjwOQHgZIUXw6c-BvRg2Yc2QsZxxoS_pPRVe0yK8Bh2F0dG5ldHOIAAAAAAAAAACEZXRoMpD1pf1CAAAAAP__________gmlkgnY0gmlwhBLf22SJc2VjcDI1NmsxoQMeFF5GrS7UZpAH2Ly84aLK-TyvH-dRo0JM1i8yygH50YN1ZHCCJxA",
 	},
 }
 
@@ -71,9 +71,9 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EffectiveBalanceIncrement: 1 * 1e9,
 
 	// Initial value constants.
-	DilithiumWithdrawalPrefixByte:   byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
-	ZondAddressWithdrawalPrefixByte: byte(1), // TODO (cyyber): Change it to 0
-	ZeroHash:                        [32]byte{},
+	DilithiumWithdrawalPrefixByte:  byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
+	QRLAddressWithdrawalPrefixByte: byte(1), // TODO (cyyber): Change it to 0
+	ZeroHash:                       [32]byte{},
 
 	// Time parameter constants.
 	MinAttestationInclusionDelay:     1,
@@ -82,12 +82,12 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	SqrRootSlotsPerEpoch:             11,
 	MinSeedLookahead:                 1,
 	MaxSeedLookahead:                 4,
-	EpochsPerEth1VotingPeriod:        2,    // TODO (cyyber) : Re-evaluate the value
+	EpochsPerExecutionVotingPeriod:   2,    // TODO (cyyber) : Re-evaluate the value
 	SlotsPerHistoricalRoot:           1024, // TODO (cyyber) : Re-evaluate the value
 	MinValidatorWithdrawabilityDelay: 16,   // TODO (cyyber) : Re-evaluate the value
 	ShardCommitteePeriod:             16,   // TODO (cyyber) : Re-evaluate the value
 	MinEpochsToInactivityPenalty:     4,
-	Eth1FollowDistance:               0, // TODO(now.youtrack.cloud/issue/TQ-5)
+	ExecutionFollowDistance:          0, // TODO(now.youtrack.cloud/issue/TQ-5)
 
 	// Fork choice algorithm constants.
 	ProposerScoreBoost:              40,
@@ -96,22 +96,22 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	ReorgMaxEpochsSinceFinalization: 2,
 	IntervalsPerSlot:                3,
 
-	// Zond execution layer parameters.
-	DepositChainID:         1, // Chain ID of eth1 mainnet.
-	DepositNetworkID:       1, // Network ID of eth1 mainnet.
-	DepositContractAddress: "Z00000000219ab540356cBB839Cbe05303d7705Fa",
+	// QRL execution layer parameters.
+	DepositChainID:         1, // Chain ID of execution network.
+	DepositNetworkID:       1, // Network ID of execution network.
+	DepositContractAddress: "Q00000000219ab540356cBB839Cbe05303d7705Fa",
 
 	// Validator params.
 	RandomSubnetsPerValidator:         1 << 0,
 	EpochsPerRandomSubnetSubscription: 1 << 8,
 
 	// While eth1 mainnet block times are closer to 13s, we must conform with other clients in
-	// order to vote on the correct eth1 blocks.
+	// order to vote on the correct execution blocks.
 	//
 	// Additional context: https://github.com/ethereum/consensus-specs/issues/2132
 	// Bug prompting this change: https://github.com/prysmaticlabs/prysm/issues/7856
 	// Future optimization: https://github.com/prysmaticlabs/prysm/issues/7739
-	SecondsPerETH1Block: 60,
+	SecondsPerExecutionBlock: 60,
 
 	// State list length constants.
 	EpochsPerHistoricalVector: 65536,
@@ -150,7 +150,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	DomainDilithiumToExecutionChange:  bytesutil.Uint32ToBytes4(0x0A000000),
 
 	// Qrysm constants.
-	GplanckPerZond:               1000000000,
+	GplanckPerQuanta:             1000000000,
 	DefaultBufferSize:            10000,
 	WithdrawalPrivkeyFileName:    "/shardwithdrawalkey",
 	ValidatorPrivkeyFileName:     "/validatorprivatekey",
@@ -207,8 +207,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Light client
 	MinSyncCommitteeParticipants: 1,
 
-	// Bellatrix
-	ZondBurnAddress:        "Z0000000000000000000000000000000000000000",
+	QRLBurnAddress:         "Q0000000000000000000000000000000000000000",
 	DefaultBuilderGasLimit: uint64(30000000),
 
 	// Mevboost circuit breaker

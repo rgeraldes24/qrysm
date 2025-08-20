@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/monitoring/tracing"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 	"google.golang.org/protobuf/proto"
@@ -54,7 +54,7 @@ func (s *Service) Broadcast(ctx context.Context, msg proto.Message) error {
 
 // BroadcastAttestation broadcasts an attestation to the p2p network, the message is assumed to be
 // broadcasted to the current fork.
-func (s *Service) BroadcastAttestation(ctx context.Context, subnet uint64, att *zondpb.Attestation) error {
+func (s *Service) BroadcastAttestation(ctx context.Context, subnet uint64, att *qrysmpb.Attestation) error {
 	if att == nil {
 		return errors.New("attempted to broadcast nil attestation")
 	}
@@ -75,7 +75,7 @@ func (s *Service) BroadcastAttestation(ctx context.Context, subnet uint64, att *
 
 // BroadcastSyncCommitteeMessage broadcasts a sync committee message to the p2p network, the message is assumed to be
 // broadcasted to the current fork.
-func (s *Service) BroadcastSyncCommitteeMessage(ctx context.Context, subnet uint64, sMsg *zondpb.SyncCommitteeMessage) error {
+func (s *Service) BroadcastSyncCommitteeMessage(ctx context.Context, subnet uint64, sMsg *qrysmpb.SyncCommitteeMessage) error {
 	if sMsg == nil {
 		return errors.New("attempted to broadcast nil sync committee message")
 	}
@@ -94,7 +94,7 @@ func (s *Service) BroadcastSyncCommitteeMessage(ctx context.Context, subnet uint
 	return nil
 }
 
-func (s *Service) broadcastAttestation(ctx context.Context, subnet uint64, att *zondpb.Attestation, forkDigest [4]byte) {
+func (s *Service) broadcastAttestation(ctx context.Context, subnet uint64, att *qrysmpb.Attestation, forkDigest [4]byte) {
 	ctx, span := trace.StartSpan(ctx, "p2p.broadcastAttestation")
 	defer span.End()
 	ctx = trace.NewContext(context.Background(), span) // clear parent context / deadline.
@@ -147,7 +147,7 @@ func (s *Service) broadcastAttestation(ctx context.Context, subnet uint64, att *
 	}
 }
 
-func (s *Service) broadcastSyncCommittee(ctx context.Context, subnet uint64, sMsg *zondpb.SyncCommitteeMessage, forkDigest [4]byte) {
+func (s *Service) broadcastSyncCommittee(ctx context.Context, subnet uint64, sMsg *qrysmpb.SyncCommitteeMessage, forkDigest [4]byte) {
 	ctx, span := trace.StartSpan(ctx, "p2p.broadcastSyncCommittee")
 	defer span.End()
 	ctx = trace.NewContext(context.Background(), span) // clear parent context / deadline.

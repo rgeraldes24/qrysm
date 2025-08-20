@@ -37,14 +37,14 @@ type BeaconNodeSet struct {
 	e2etypes.ComponentRunner
 	config  *e2etypes.E2EConfig
 	nodes   []e2etypes.ComponentRunner
-	enr     string
+	qnr     string
 	ids     []string
 	started chan struct{}
 }
 
-// SetENR assigns ENR to the set of beacon nodes.
-func (s *BeaconNodeSet) SetENR(enr string) {
-	s.enr = enr
+// SetQNR assigns QNR to the set of beacon nodes.
+func (s *BeaconNodeSet) SetQNR(qnr string) {
+	s.qnr = qnr
 }
 
 // NewBeaconNodes creates and returns a set of beacon nodes.
@@ -57,14 +57,14 @@ func NewBeaconNodes(config *e2etypes.E2EConfig) *BeaconNodeSet {
 
 // Start starts all the beacon nodes in set.
 func (s *BeaconNodeSet) Start(ctx context.Context) error {
-	if s.enr == "" {
-		return errors.New("empty ENR")
+	if s.qnr == "" {
+		return errors.New("empty QNR")
 	}
 
 	// Create beacon nodes.
 	nodes := make([]e2etypes.ComponentRunner, e2e.TestParams.BeaconNodeCount)
 	for i := 0; i < e2e.TestParams.BeaconNodeCount; i++ {
-		nodes[i] = NewBeaconNode(s.config, i, s.enr)
+		nodes[i] = NewBeaconNode(s.config, i, s.qnr)
 	}
 	s.nodes = nodes
 
@@ -155,17 +155,17 @@ type BeaconNode struct {
 	config  *e2etypes.E2EConfig
 	started chan struct{}
 	index   int
-	enr     string
+	qnr     string
 	peerID  string
 	cmd     *exec.Cmd
 }
 
 // NewBeaconNode creates and returns a beacon node.
-func NewBeaconNode(config *e2etypes.E2EConfig, index int, enr string) *BeaconNode {
+func NewBeaconNode(config *e2etypes.E2EConfig, index int, qnr string) *BeaconNode {
 	return &BeaconNode{
 		config:  config,
 		index:   index,
-		enr:     enr,
+		qnr:     qnr,
 		started: make(chan struct{}, 1),
 	}
 }
@@ -221,7 +221,7 @@ func (node *BeaconNode) Start(ctx context.Context) error {
 		return errors.New("beacon chain binary not found")
 	}
 
-	config, index, enr := node.config, node.index, node.enr
+	config, index, qnr := node.config, node.index, node.qnr
 	stdOutFile, err := helpers.DeleteAndCreateFile(e2e.TestParams.LogPath, fmt.Sprintf(e2e.BeaconNodeLogFileName, index))
 	if err != nil {
 		return err
@@ -233,7 +233,7 @@ func (node *BeaconNode) Start(ctx context.Context) error {
 	// if node.config.TestCheckpointSync {
 	// 	expectedNumOfPeers += 1
 	// }
-	jwtPath := path.Join(e2e.TestParams.TestPath, "zonddata/"+strconv.Itoa(node.index)+"/")
+	jwtPath := path.Join(e2e.TestParams.TestPath, "qrldata/"+strconv.Itoa(node.index)+"/")
 	jwtPath = path.Join(jwtPath, "gzond/jwtsecret")
 
 	genesisPath, err := node.saveGenesis(ctx)
@@ -246,7 +246,7 @@ func (node *BeaconNode) Start(ctx context.Context) error {
 	}
 	args := []string{
 		fmt.Sprintf("--%s=%s", genesis.StatePath.Name, genesisPath),
-		fmt.Sprintf("--%s=%s/zond-beacon-node-%d", cmdshared.DataDirFlag.Name, e2e.TestParams.TestPath, index),
+		fmt.Sprintf("--%s=%s/qrl-beacon-node-%d", cmdshared.DataDirFlag.Name, e2e.TestParams.TestPath, index),
 		fmt.Sprintf("--%s=%s", cmdshared.LogFileName.Name, stdOutFile.Name()),
 		fmt.Sprintf("--%s=%s", flags.DepositContractFlag.Name, params.BeaconConfig().DepositContractAddress),
 		fmt.Sprintf("--%s=%d", flags.RPCPort.Name, e2e.TestParams.Ports.QrysmBeaconNodeRPCPort+index),
@@ -261,7 +261,7 @@ func (node *BeaconNode) Start(ctx context.Context) error {
 		fmt.Sprintf("--%s=%d", flags.ContractDeploymentBlock.Name, 0),
 		fmt.Sprintf("--%s=%d", flags.MinPeersPerSubnet.Name, 0),
 		fmt.Sprintf("--%s=%d", cmdshared.RPCMaxPageSizeFlag.Name, params.BeaconConfig().MinGenesisActiveValidatorCount),
-		fmt.Sprintf("--%s=%s", cmdshared.BootstrapNode.Name, enr),
+		fmt.Sprintf("--%s=%s", cmdshared.BootstrapNode.Name, qnr),
 		fmt.Sprintf("--%s=%s", cmdshared.VerbosityFlag.Name, "debug"),
 		fmt.Sprintf("--%s=%d", flags.BlockBatchLimitBurstFactor.Name, 8),
 		fmt.Sprintf("--%s=%s", cmdshared.ChainConfigFileFlag.Name, cfgPath),

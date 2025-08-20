@@ -3,14 +3,14 @@ package flags
 import "strings"
 
 const QrysmAPIModule string = "qrysm"
-const ZondAPIModule string = "zond"
+const QRLAPIModule string = "qrl"
 
 func EnableHTTPQrysmAPI(httpModules string) bool {
 	return enableAPI(httpModules, QrysmAPIModule)
 }
 
-func EnableHTTPZondAPI(httpModules string) bool {
-	return enableAPI(httpModules, ZondAPIModule)
+func EnableHTTPQRLAPI(httpModules string) bool {
+	return enableAPI(httpModules, QRLAPIModule)
 }
 
 func enableAPI(httpModules, api string) bool {

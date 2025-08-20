@@ -21,7 +21,7 @@ import (
 	leakybucket "github.com/theQRL/qrysm/container/leaky-bucket"
 	"github.com/theQRL/qrysm/container/slice"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -1057,7 +1057,7 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 
 	// The chain1 contains 1000 blocks and is a dead end.
 	// The chain2 contains 1184 blocks, with fork started at slot 512 of chain1.
-	chain1 := extendBlockSequence(t, []*zond.SignedBeaconBlockCapella{}, 1000)
+	chain1 := extendBlockSequence(t, []*qrysmpb.SignedBeaconBlockCapella{}, 1000)
 	forkedSlot := primitives.Slot(804)
 	chain2 := extendBlockSequence(t, chain1[:forkedSlot], 400)
 	finalizedSlot := primitives.Slot(255)
@@ -1074,7 +1074,7 @@ func TestBlocksQueue_stuckInUnfavourableFork(t *testing.T) {
 		State: st,
 		Root:  genesisRoot[:],
 		DB:    beaconDB,
-		FinalizedCheckPoint: &zond.Checkpoint{
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: finalizedEpoch,
 			Root:  []byte(fmt.Sprintf("finalized_root %d", finalizedEpoch)),
 		},
@@ -1265,7 +1265,7 @@ func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 	beaconDB := dbtest.SetupDB(t)
 	p2p := p2pt.NewTestP2P(t)
 
-	chain := extendBlockSequence(t, []*zond.SignedBeaconBlockCapella{}, 128)
+	chain := extendBlockSequence(t, []*qrysmpb.SignedBeaconBlockCapella{}, 128)
 	finalizedSlot := primitives.Slot(82)
 	finalizedEpoch := slots.ToEpoch(finalizedSlot)
 
@@ -1280,7 +1280,7 @@ func TestBlocksQueue_stuckWhenHeadIsSetToOrphanedBlock(t *testing.T) {
 		State: st,
 		Root:  genesisRoot[:],
 		DB:    beaconDB,
-		FinalizedCheckPoint: &zond.Checkpoint{
+		FinalizedCheckPoint: &qrysmpb.Checkpoint{
 			Epoch: finalizedEpoch,
 			Root:  []byte(fmt.Sprintf("finalized_root %d", finalizedEpoch)),
 		},

@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 	qrysmTime "github.com/theQRL/qrysm/time"
@@ -32,7 +32,7 @@ func TestAttestationCheckPtState_FarFutureSlot(t *testing.T) {
 	service.genesisTime = time.Now()
 
 	e := primitives.Epoch(slots.MaxSlotBuffer/uint64(params.BeaconConfig().SlotsPerEpoch) + 1)
-	_, err := service.AttestationTargetState(context.Background(), &zondpb.Checkpoint{Epoch: e})
+	_, err := service.AttestationTargetState(context.Background(), &qrysmpb.Checkpoint{Epoch: e})
 	require.ErrorContains(t, "exceeds max allowed value relative to the local clock", err)
 }
 
@@ -100,8 +100,8 @@ func TestProcessAttestations_Ok(t *testing.T) {
 	copied, err = transition.ProcessSlots(ctx, copied, 1)
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.BeaconDB.SaveState(ctx, copied, tRoot))
-	ofc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
-	ojc := &zondpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
+	ofc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
+	ojc := &qrysmpb.Checkpoint{Root: params.BeaconConfig().ZeroHash[:]}
 	state, blkRoot, err := prepareForkchoiceState(ctx, 0, tRoot, tRoot, params.BeaconConfig().ZeroHash, ojc, ofc)
 	require.NoError(t, err)
 	require.NoError(t, service.cfg.ForkChoiceStore.InsertNode(ctx, state, blkRoot))
@@ -118,7 +118,7 @@ func TestService_ProcessAttestationsAndUpdateHead(t *testing.T) {
 	service.genesisTime = qrysmTime.Now().Add(-2 * time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second)
 	genesisState, pks := util.DeterministicGenesisStateCapella(t, 64)
 	require.NoError(t, service.saveGenesisData(ctx, genesisState))
-	ojc := &zondpb.Checkpoint{Epoch: 0, Root: service.originBlockRoot[:]}
+	ojc := &qrysmpb.Checkpoint{Epoch: 0, Root: service.originBlockRoot[:]}
 	require.NoError(t, fcs.UpdateJustifiedCheckpoint(ctx, &forkchoicetypes.Checkpoint{Epoch: 0, Root: service.originBlockRoot}))
 	copied := genesisState.Copy()
 	// Generate a new block for attesters to attest
@@ -196,7 +196,7 @@ func TestService_UpdateHead_NoAtts(t *testing.T) {
 	require.Equal(t, tRoot, service.head.root)
 
 	// Insert a new block to forkchoice
-	ojc := &zondpb.Checkpoint{Epoch: 0, Root: params.BeaconConfig().ZeroHash[:]}
+	ojc := &qrysmpb.Checkpoint{Epoch: 0, Root: params.BeaconConfig().ZeroHash[:]}
 	b, err := util.GenerateFullBlockCapella(genesisState, pks, util.DefaultBlockGenConfig(), 2)
 	require.NoError(t, err)
 	b.Block.ParentRoot = service.originBlockRoot[:]

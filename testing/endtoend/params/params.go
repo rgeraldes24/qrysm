@@ -56,23 +56,23 @@ type ports struct {
 
 type paths struct{}
 
-// ZondStaticFile abstracts the location of the zond static file folder in the e2e directory, so that
+// QRLStaticFile abstracts the location of the qrl static file folder in the e2e directory, so that
 // a relative path can be used.
 // The relative path is specified as a variadic slice of path parts, in the same way as path.Join.
-func (*paths) ZondStaticFile(rel ...string) string {
+func (*paths) QRLStaticFile(rel ...string) string {
 	parts := append([]string{StaticFilesPath}, rel...)
 	return path.Join(parts...)
 }
 
-// ZondRunfile returns the full path to a file in the zond static directory, within bazel's run context.
+// QRLRunfile returns the full path to a file in the qrl static directory, within bazel's run context.
 // The relative path is specified as a variadic slice of path parts, in the same style as path.Join.
-func (p *paths) ZondRunfile(rel ...string) (string, error) {
-	return bazel.Runfile(p.ZondStaticFile(rel...))
+func (p *paths) QRLRunfile(rel ...string) (string, error) {
+	return bazel.Runfile(p.QRLStaticFile(rel...))
 }
 
 // TestKeyPath returns the full path to the file containing the test cryptographic keys.
 func (p *paths) TestKeyPath() (string, error) {
-	return p.ZondRunfile(keyFilename)
+	return p.QRLRunfile(keyFilename)
 }
 
 // TestParams is the globally accessible var for getting config elements.
@@ -85,7 +85,7 @@ func (p *params) Logfile(rel ...string) string {
 }
 
 // ExecutionNodeRPCURL gives the full url to use to connect to the given execution client's RPC endpoint.
-// The `index` param corresponds to the `index` field of the `zond.ExecutionNode` e2e component.
+// The `index` param corresponds to the `index` field of the `qrl.ExecutionNode` e2e component.
 // These are off by one compared to corresponding beacon nodes, because the miner is assigned index 0.
 // eg instance the index of the EL instance associated with beacon node index `0` would typically be `1`.
 func (p *params) ExecutionNodeRPCURL(index int) *url.URL {

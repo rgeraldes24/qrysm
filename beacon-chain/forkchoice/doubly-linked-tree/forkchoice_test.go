@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/hash"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -32,7 +32,7 @@ func prepareForkchoiceState(
 	justifiedEpoch primitives.Epoch,
 	finalizedEpoch primitives.Epoch,
 ) (state.BeaconState, [32]byte, error) {
-	blockHeader := &zondpb.BeaconBlockHeader{
+	blockHeader := &qrysmpb.BeaconBlockHeader{
 		ParentRoot: parentRoot[:],
 	}
 
@@ -40,15 +40,15 @@ func prepareForkchoiceState(
 		BlockHash: payloadHash[:],
 	}
 
-	justifiedCheckpoint := &zondpb.Checkpoint{
+	justifiedCheckpoint := &qrysmpb.Checkpoint{
 		Epoch: justifiedEpoch,
 	}
 
-	finalizedCheckpoint := &zondpb.Checkpoint{
+	finalizedCheckpoint := &qrysmpb.Checkpoint{
 		Epoch: finalizedEpoch,
 	}
 
-	base := &zondpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateCapella{
 		Slot:                         slot,
 		RandaoMixes:                  make([][]byte, params.BeaconConfig().EpochsPerHistoricalVector),
 		CurrentJustifiedCheckpoint:   justifiedCheckpoint,
@@ -590,8 +590,8 @@ func TestStore_InsertChain(t *testing.T) {
 	wsb, err := blocks.NewSignedBeaconBlock(blk)
 	require.NoError(t, err)
 	blks = append(blks, &forkchoicetypes.BlockAndCheckpoints{Block: wsb.Block(),
-		JustifiedCheckpoint: &zondpb.Checkpoint{Epoch: 1, Root: params.BeaconConfig().ZeroHash[:]},
-		FinalizedCheckpoint: &zondpb.Checkpoint{Epoch: 1, Root: params.BeaconConfig().ZeroHash[:]},
+		JustifiedCheckpoint: &qrysmpb.Checkpoint{Epoch: 1, Root: params.BeaconConfig().ZeroHash[:]},
+		FinalizedCheckpoint: &qrysmpb.Checkpoint{Epoch: 1, Root: params.BeaconConfig().ZeroHash[:]},
 	})
 	for i := uint64(2); i < 11; i++ {
 		blk := util.NewBeaconBlockCapella()
@@ -601,8 +601,8 @@ func TestStore_InsertChain(t *testing.T) {
 		wsb, err = blocks.NewSignedBeaconBlock(blk)
 		require.NoError(t, err)
 		blks = append(blks, &forkchoicetypes.BlockAndCheckpoints{Block: wsb.Block(),
-			JustifiedCheckpoint: &zondpb.Checkpoint{Epoch: 1, Root: params.BeaconConfig().ZeroHash[:]},
-			FinalizedCheckpoint: &zondpb.Checkpoint{Epoch: 1, Root: params.BeaconConfig().ZeroHash[:]},
+			JustifiedCheckpoint: &qrysmpb.Checkpoint{Epoch: 1, Root: params.BeaconConfig().ZeroHash[:]},
+			FinalizedCheckpoint: &qrysmpb.Checkpoint{Epoch: 1, Root: params.BeaconConfig().ZeroHash[:]},
 		})
 		root, err = blk.Block.HashTreeRoot()
 		require.NoError(t, err)
@@ -693,8 +693,8 @@ func TestForkChoice_UpdateCheckpoints(t *testing.T) {
 			fcs.store.justifiedCheckpoint = tt.justified
 			fcs.store.finalizedCheckpoint = tt.finalized
 
-			jc := &zondpb.Checkpoint{Epoch: tt.newJustified.Epoch, Root: tt.newJustified.Root[:]}
-			fc := &zondpb.Checkpoint{Epoch: tt.newFinalized.Epoch, Root: tt.newFinalized.Root[:]}
+			jc := &qrysmpb.Checkpoint{Epoch: tt.newJustified.Epoch, Root: tt.newJustified.Root[:]}
+			fc := &qrysmpb.Checkpoint{Epoch: tt.newFinalized.Epoch, Root: tt.newFinalized.Root[:]}
 			err = fcs.updateCheckpoints(ctx, jc, fc)
 			if len(tt.wantedErr) > 0 {
 				require.ErrorContains(t, tt.wantedErr, err)

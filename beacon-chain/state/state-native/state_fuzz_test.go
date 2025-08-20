@@ -9,7 +9,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -33,7 +33,7 @@ func FuzzCapellaStateHashTreeRoot(f *testing.F) {
 			// Perform a XOR on the byte of the selected index.
 			stateSSZ[num] ^= diffBuffer[i+8]
 		}
-		pbState := &zondpb.BeaconStateCapella{}
+		pbState := &qrysmpb.BeaconStateCapella{}
 		err := pbState.UnmarshalSSZ(stateSSZ)
 		if err != nil {
 			return
@@ -57,7 +57,7 @@ func FuzzCapellaStateHashTreeRoot(f *testing.F) {
 		}
 		assert.NoError(t, err)
 		// Perform a cold HTR calculation by initializing a new state.
-		innerState, ok := stateObj.ToProtoUnsafe().(*zondpb.BeaconStateCapella)
+		innerState, ok := stateObj.ToProtoUnsafe().(*qrysmpb.BeaconStateCapella)
 		assert.Equal(t, true, ok, "inner state is a not a beacon state capella proto")
 		newState, err := native.InitializeFromProtoUnsafeCapella(innerState)
 		assert.NoError(t, err)

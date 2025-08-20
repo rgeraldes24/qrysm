@@ -10,11 +10,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
-	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/async/event"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/runtime/interop"
 	"github.com/theQRL/qrysm/validator/accounts/iface"
@@ -53,7 +53,7 @@ type SetupConfig struct {
 }
 
 // Defines a struct containing 1-to-1 corresponding
-// private keys and public keys for Zond validators.
+// private keys and public keys for QRL validators.
 type accountStore struct {
 	Seeds      [][]byte `json:"seeds"`
 	PublicKeys [][]byte `json:"public_keys"`
@@ -385,7 +385,7 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 		fmt.Printf("Showing %d validator accounts\n", numAccounts)
 	}
 	fmt.Println(
-		au.BrightRed("View the zond deposit transaction data for your accounts " +
+		au.BrightRed("View the qrl deposit transaction data for your accounts " +
 			"by running `validator accounts list --show-deposit-data`"),
 	)
 
@@ -414,7 +414,7 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 		}
 		fmt.Printf(
 			"%s\n",
-			au.BrightRed("If you imported your account coming from the zond launchpad, you will find your "+
+			au.BrightRed("If you imported your account coming from the qrl launchpad, you will find your "+
 				"deposit_data.json in the staking-deposit-cli's validator_keys folder"),
 		)
 		fmt.Println("")

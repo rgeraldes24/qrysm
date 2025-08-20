@@ -74,7 +74,7 @@ func TestExtractGossipDigest(t *testing.T) {
 		},
 		{
 			name:    "too short topic",
-			topic:   "/eth2/",
+			topic:   "/consensus/",
 			want:    [4]byte{},
 			wantErr: true,
 			error:   errors.New("invalid topic format"),
@@ -88,7 +88,7 @@ func TestExtractGossipDigest(t *testing.T) {
 		},
 		{
 			name:    "invalid digest in topic",
-			topic:   "/eth2/zzxxyyaa/beacon_block" + "/" + encoder.ProtocolSuffixSSZSnappy,
+			topic:   "/consensus/zzxxyyaa/beacon_block" + "/" + encoder.ProtocolSuffixSSZSnappy,
 			want:    [4]byte{},
 			wantErr: true,
 			error:   errors.New("encoding/hex: invalid byte"),
@@ -102,7 +102,7 @@ func TestExtractGossipDigest(t *testing.T) {
 		},
 		{
 			name:    "too short topic, missing suffixes",
-			topic:   "/eth2/b5303f2a",
+			topic:   "/consensus/b5303f2a",
 			want:    [4]byte{},
 			wantErr: true,
 			error:   errors.New("invalid topic format"),

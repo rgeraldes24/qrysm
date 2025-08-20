@@ -20,11 +20,11 @@ import (
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	gzondtypes "github.com/theQRL/go-zond/core/types"
-	zondRPC "github.com/theQRL/go-zond/rpc"
+	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/go-zond/trie"
 	builderAPI "github.com/theQRL/qrysm/api/client/builder"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/shared"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
@@ -34,14 +34,14 @@ import (
 	"github.com/theQRL/qrysm/network"
 	"github.com/theQRL/qrysm/network/authorization"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 const (
-	statusPath   = "/zond/v1/builder/status"
-	registerPath = "/zond/v1/builder/validators"
-	headerPath   = "/zond/v1/builder/header/{slot:[0-9]+}/{parent_hash:0x[a-fA-F0-9]+}/{pubkey:0x[a-fA-F0-9]+}"
-	blindedPath  = "/zond/v1/builder/blinded_blocks"
+	statusPath   = "/qrl/v1/builder/status"
+	registerPath = "/qrl/v1/builder/validators"
+	headerPath   = "/qrl/v1/builder/header/{slot:[0-9]+}/{parent_hash:0x[a-fA-F0-9]+}/{pubkey:0x[a-fA-F0-9]+}"
+	blindedPath  = "/qrl/v1/builder/blinded_blocks"
 
 	// ForkchoiceUpdatedMethodV2 v2 request string for JSON-RPC.
 	ForkchoiceUpdatedMethodV2 = "engine_forkchoiceUpdatedV2"
@@ -84,11 +84,11 @@ type ExecHeaderResponseCapella struct {
 type Builder struct {
 	cfg          *config
 	address      string
-	execClient   *zondRPC.Client
+	execClient   *rpc.Client
 	currId       *v1.PayloadIDBytes
 	currPayload  interfaces.ExecutionData
 	mux          *gMux.Router
-	validatorMap map[string]*zond.ValidatorRegistrationV1
+	validatorMap map[string]*qrysmpb.ValidatorRegistrationV1
 	srv          *http.Server
 }
 
@@ -134,7 +134,7 @@ func New(opts ...Option) (*Builder, error) {
 	p.address = addr
 	p.srv = srv
 	p.execClient = execClient
-	p.validatorMap = map[string]*zond.ValidatorRegistrationV1{}
+	p.validatorMap = map[string]*qrysmpb.ValidatorRegistrationV1{}
 	p.mux = router
 	return p, nil
 }
@@ -227,7 +227,7 @@ func (p *Builder) handleEngineCalls(req, resp []byte) {
 }
 
 func (p *Builder) isBuilderCall(req *http.Request) bool {
-	return strings.Contains(req.URL.Path, "/zond/v1/builder/")
+	return strings.Contains(req.URL.Path, "/qrl/v1/builder/")
 }
 
 func (p *Builder) registerValidators(w http.ResponseWriter, req *http.Request) {
@@ -304,7 +304,7 @@ func (p *Builder) handleHeaderRequestCapella(w http.ResponseWriter) {
 		Value:  val,
 		Pubkey: secKey.PublicKey().Marshal(),
 	}
-	sszBid := &zond.BuilderBidCapella{
+	sszBid := &qrysmpb.BuilderBidCapella{
 		Header: hdr,
 		Value:  val.SSZBytes(),
 		Pubkey: secKey.PublicKey().Marshal(),
@@ -437,7 +437,7 @@ func parseRequestBytes(req *http.Request) ([]byte, error) {
 	return requestBytes, nil
 }
 
-// Checks whether the JSON-RPC request is for the Zond engine API.
+// Checks whether the JSON-RPC request is for the QRL engine API.
 func isEngineAPICall(reqBytes []byte) bool {
 	jsonRequest, err := unmarshalRPCObject(reqBytes)
 	if err != nil {

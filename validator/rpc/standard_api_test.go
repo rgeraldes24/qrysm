@@ -16,7 +16,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/google/uuid"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	keystorev1 "github.com/theQRL/go-zond-wallet-encryptor-keystore"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/cmd/validator/flags"
@@ -28,9 +27,10 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/validator"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	validatormock "github.com/theQRL/qrysm/testing/validator-mock"
@@ -129,7 +129,7 @@ func TestServer_ListKeystores(t *testing.T) {
 func TestServer_ImportKeystores(t *testing.T) {
 	t.Run("wallet not ready", func(t *testing.T) {
 		s := Server{}
-		response, err := s.ImportKeystores(context.Background(), &zondpbservice.ImportKeystoresRequest{})
+		response, err := s.ImportKeystores(context.Background(), &qrlpbservice.ImportKeystoresRequest{})
 		require.NoError(t, err)
 		require.Equal(t, 0, len(response.Data))
 	})
@@ -162,40 +162,40 @@ func TestServer_ImportKeystores(t *testing.T) {
 		validatorService:  vs,
 	}
 	t.Run("200 response even if faulty keystore in request", func(t *testing.T) {
-		response, err := s.ImportKeystores(context.Background(), &zondpbservice.ImportKeystoresRequest{
+		response, err := s.ImportKeystores(context.Background(), &qrlpbservice.ImportKeystoresRequest{
 			Keystores: []string{"hi"},
 			Passwords: []string{"hi"},
 		})
 		require.NoError(t, err)
 		require.Equal(t, 1, len(response.Data))
-		require.Equal(t, zondpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
+		require.Equal(t, qrlpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
 	})
 	t.Run("200 response even if  no passwords in request", func(t *testing.T) {
-		response, err := s.ImportKeystores(context.Background(), &zondpbservice.ImportKeystoresRequest{
+		response, err := s.ImportKeystores(context.Background(), &qrlpbservice.ImportKeystoresRequest{
 			Keystores: []string{"hi"},
 			Passwords: []string{},
 		})
 		require.NoError(t, err)
 		require.Equal(t, 1, len(response.Data))
-		require.Equal(t, zondpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
+		require.Equal(t, qrlpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
 	})
 	t.Run("200 response even if  keystores more than passwords in request", func(t *testing.T) {
-		response, err := s.ImportKeystores(context.Background(), &zondpbservice.ImportKeystoresRequest{
+		response, err := s.ImportKeystores(context.Background(), &qrlpbservice.ImportKeystoresRequest{
 			Keystores: []string{"hi", "hi"},
 			Passwords: []string{"hi"},
 		})
 		require.NoError(t, err)
 		require.Equal(t, 2, len(response.Data))
-		require.Equal(t, zondpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
+		require.Equal(t, qrlpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
 	})
 	t.Run("200 response even if number of passwords does not match number of keystores", func(t *testing.T) {
-		response, err := s.ImportKeystores(context.Background(), &zondpbservice.ImportKeystoresRequest{
+		response, err := s.ImportKeystores(context.Background(), &qrlpbservice.ImportKeystoresRequest{
 			Keystores: []string{"hi"},
 			Passwords: []string{"hi", "hi"},
 		})
 		require.NoError(t, err)
 		require.Equal(t, 1, len(response.Data))
-		require.Equal(t, zondpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
+		require.Equal(t, qrlpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
 	})
 	t.Run("200 response even if faulty slashing protection data", func(t *testing.T) {
 		numKeystores := 5
@@ -208,7 +208,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 			require.NoError(t, err)
 			passwords[i] = password
 		}
-		resp, err := s.ImportKeystores(context.Background(), &zondpbservice.ImportKeystoresRequest{
+		resp, err := s.ImportKeystores(context.Background(), &qrlpbservice.ImportKeystoresRequest{
 			Keystores:          encodedKeystores,
 			Passwords:          passwords,
 			SlashingProtection: "foobar",
@@ -216,7 +216,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, numKeystores, len(resp.Data))
 		for _, st := range resp.Data {
-			require.Equal(t, zondpbservice.ImportedKeystoreStatus_ERROR, st.Status)
+			require.Equal(t, qrlpbservice.ImportedKeystoreStatus_ERROR, st.Status)
 		}
 	})
 	t.Run("returns proper statuses for keystores in request", func(t *testing.T) {
@@ -264,7 +264,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 		encodedSlashingProtection, err := json.Marshal(mockJSON)
 		require.NoError(t, err)
 
-		resp, err := s.ImportKeystores(context.Background(), &zondpbservice.ImportKeystoresRequest{
+		resp, err := s.ImportKeystores(context.Background(), &qrlpbservice.ImportKeystoresRequest{
 			Keystores:          encodedKeystores,
 			Passwords:          passwords,
 			SlashingProtection: string(encodedSlashingProtection),
@@ -272,7 +272,7 @@ func TestServer_ImportKeystores(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, numKeystores, len(resp.Data))
 		for _, status := range resp.Data {
-			require.Equal(t, zondpbservice.ImportedKeystoreStatus_IMPORTED, status.Status)
+			require.Equal(t, qrlpbservice.ImportedKeystoreStatus_IMPORTED, status.Status)
 		}
 	})
 }
@@ -302,13 +302,13 @@ func TestServer_ImportKeystores_WrongKeymanagerKind(t *testing.T) {
 		wallet:            w,
 		validatorService:  vs,
 	}
-	response, err := s.ImportKeystores(context.Background(), &zondpbservice.ImportKeystoresRequest{
+	response, err := s.ImportKeystores(context.Background(), &qrlpbservice.ImportKeystoresRequest{
 		Keystores: []string{"hi"},
 		Passwords: []string{"hi"},
 	})
 	require.NoError(t, err)
 	require.Equal(t, 1, len(response.Data))
-	require.Equal(t, zondpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
+	require.Equal(t, qrlpbservice.ImportedKeystoreStatus_ERROR, response.Data[0].Status)
 	require.Equal(t, "Keymanager kind cannot import keys", response.Data[0].Message)
 }
 */
@@ -316,7 +316,7 @@ func TestServer_ImportKeystores_WrongKeymanagerKind(t *testing.T) {
 func TestServer_DeleteKeystores(t *testing.T) {
 	t.Run("wallet not ready", func(t *testing.T) {
 		s := Server{}
-		response, err := s.DeleteKeystores(context.Background(), &zondpbservice.DeleteKeystoresRequest{})
+		response, err := s.DeleteKeystores(context.Background(), &qrlpbservice.DeleteKeystoresRequest{})
 		require.NoError(t, err)
 		require.Equal(t, 0, len(response.Data))
 	})
@@ -374,7 +374,7 @@ func TestServer_DeleteKeystores(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("no slashing protection response if no keys in request even if we have a history in DB", func(t *testing.T) {
-		resp, err := srv.DeleteKeystores(context.Background(), &zondpbservice.DeleteKeystoresRequest{
+		resp, err := srv.DeleteKeystores(context.Background(), &qrlpbservice.DeleteKeystoresRequest{
 			Pubkeys: nil,
 		})
 		require.NoError(t, err)
@@ -394,7 +394,7 @@ func TestServer_DeleteKeystores(t *testing.T) {
 	}
 	tests := []struct {
 		keys         []*keyCase
-		wantStatuses []zondpbservice.DeletedKeystoreStatus_Status
+		wantStatuses []qrlpbservice.DeletedKeystoreStatus_Status
 	}{
 		{
 			keys: []*keyCase{
@@ -403,11 +403,11 @@ func TestServer_DeleteKeystores(t *testing.T) {
 				{id: "d"},
 				{id: "c", wantProtectionData: true},
 			},
-			wantStatuses: []zondpbservice.DeletedKeystoreStatus_Status{
-				zondpbservice.DeletedKeystoreStatus_DELETED,
-				zondpbservice.DeletedKeystoreStatus_NOT_ACTIVE,
-				zondpbservice.DeletedKeystoreStatus_NOT_FOUND,
-				zondpbservice.DeletedKeystoreStatus_DELETED,
+			wantStatuses: []qrlpbservice.DeletedKeystoreStatus_Status{
+				qrlpbservice.DeletedKeystoreStatus_DELETED,
+				qrlpbservice.DeletedKeystoreStatus_NOT_ACTIVE,
+				qrlpbservice.DeletedKeystoreStatus_NOT_FOUND,
+				qrlpbservice.DeletedKeystoreStatus_DELETED,
 			},
 		},
 		{
@@ -415,17 +415,17 @@ func TestServer_DeleteKeystores(t *testing.T) {
 				{id: "a", wantProtectionData: true},
 				{id: "c", wantProtectionData: true},
 			},
-			wantStatuses: []zondpbservice.DeletedKeystoreStatus_Status{
-				zondpbservice.DeletedKeystoreStatus_NOT_ACTIVE,
-				zondpbservice.DeletedKeystoreStatus_NOT_ACTIVE,
+			wantStatuses: []qrlpbservice.DeletedKeystoreStatus_Status{
+				qrlpbservice.DeletedKeystoreStatus_NOT_ACTIVE,
+				qrlpbservice.DeletedKeystoreStatus_NOT_ACTIVE,
 			},
 		},
 		{
 			keys: []*keyCase{
 				{id: "x"},
 			},
-			wantStatuses: []zondpbservice.DeletedKeystoreStatus_Status{
-				zondpbservice.DeletedKeystoreStatus_NOT_FOUND,
+			wantStatuses: []qrlpbservice.DeletedKeystoreStatus_Status{
+				qrlpbservice.DeletedKeystoreStatus_NOT_FOUND,
 			},
 		},
 	}
@@ -435,7 +435,7 @@ func TestServer_DeleteKeystores(t *testing.T) {
 			pk := publicKeysWithId[tc.keys[i].id]
 			keys[i] = pk[:]
 		}
-		resp, err := srv.DeleteKeystores(ctx, &zondpbservice.DeleteKeystoresRequest{Pubkeys: keys})
+		resp, err := srv.DeleteKeystores(ctx, &qrlpbservice.DeleteKeystoresRequest{Pubkeys: keys})
 		require.NoError(t, err)
 		require.Equal(t, len(keys), len(resp.Data))
 		slashingProtectionData := &format.EIPSlashingProtectionFormat{}
@@ -501,12 +501,12 @@ func TestServer_DeleteKeystores_FailedSlashingProtectionExport(t *testing.T) {
 		require.NoError(t, validatorDB.Close())
 	}()
 
-	response, err := srv.DeleteKeystores(context.Background(), &zondpbservice.DeleteKeystoresRequest{
+	response, err := srv.DeleteKeystores(context.Background(), &qrlpbservice.DeleteKeystoresRequest{
 		Pubkeys: [][]byte{[]byte("a")},
 	})
 	require.NoError(t, err)
 	require.Equal(t, 1, len(response.Data))
-	require.Equal(t, zondpbservice.DeletedKeystoreStatus_ERROR, response.Data[0].Status)
+	require.Equal(t, qrlpbservice.DeletedKeystoreStatus_ERROR, response.Data[0].Status)
 	require.Equal(t, "Non duplicate keys that were existing were deleted, but could not export slashing protection history.",
 		response.Data[0].Message,
 	)
@@ -538,7 +538,7 @@ func TestServer_DeleteKeystores_WrongKeymanagerKind(t *testing.T) {
 		wallet:            w,
 		validatorService:  vs,
 	}
-	_, err = s.DeleteKeystores(ctx, &zondpbservice.DeleteKeystoresRequest{Pubkeys: [][]byte{[]byte("a")}})
+	_, err = s.DeleteKeystores(ctx, &qrlpbservice.DeleteKeystoresRequest{Pubkeys: [][]byte{[]byte("a")}})
 	require.ErrorContains(t, "Wrong wallet type", err)
 	require.ErrorContains(t, "Only Imported or Derived wallets can delete accounts", err)
 }
@@ -673,19 +673,19 @@ func TestServer_ImportRemoteKeys(t *testing.T) {
 	}
 	bytevalue, err := hexutil.Decode("0xe0a586bb51db522c31abcbce14e6cbf6a5bbc7b3331cdb76378ca1b98acff048c11099c2713f229c349c430a6aa5623fab8d39ec266e0e7d81543fc2e4b905ec7fba75b9ab3aae53e18e2a018297ebe4bb2d0a22bd13b60b938461d922ec81dfe152224c51abcccd4105799ee2b70b53cf2401a3c01664c20ab368c4c3ccc764be5063488750f79480adcac444e274fb46500aeb2449d2a81e44c3528c70554a9ecd5b25b39550d469a43f5ec2afce668aa6598aa1c5618e569bdf08ec700a21950d6d2df3337ff196b6fcb53de94e7e127dbd7edf9c5df70c41c715b48cf4e5ab5d0e1bc4d9ead578150f98244ea47dba29af25b12a72054618d0341ebbae8e5c61cf6583c0151fdcf1323ee3cd65f8f739dc621f2aa77f8dfe36a7cef15162972c25a193bd306918deb8d6395367586ee6a534340c07caf6496dc393a0189cf81325499132a012a2b8a6152be3d3d010aadba896af83d9d447741a66100f72da46c9282a8a9af5bfec0d84d88882ce0a090147dbcef2f100f8744094a8e3712c26d875996f56a92fd99a39537197f0bbe58bb706061426e62406a300626f64b7dd813c756c159cea82a6cf82b9890be40284720b9aa9c6f1a3a78bfb8607b438ec3665225fe21370770cfdbbc20ef6525362d413ab23e85d5f6ef38a43b44874828137ab977dd9a145913ecffe2700a225042b766158d26288434511014928efdb857df4217430e18bd6c370c8327b4451611c66a118193f1155ffeef32d9b26b02d04cd083964f53b59b5ffd02789be6e8aeae4f615afb39e53f5cfbf3d9ec23640fea711fc6751abe9b3606959ac12aeb827a76a515f27d0e0f1e003e00a91a1d20b97ecde53202d6f9d61a1d4b0bd7d4f0622c2a90d67ba40f59a450191aa340bcc7b3b3107830ce1fb791a97930fd68c6b9ea0848c0591edb0a6302e0984d7f096ccb980803bbeaae3550d8996a001ecba956d3c2bb20eaa33094071e639983693f64809e449c29b59bc0b4f1530ec273f366db337bc64d95a9e26cc21ed0685cb2c606b994505bdd6237dfdb414df7eee7544f34cdf5f0e6ca1e5280b493446cb883413e26e06a00354bced7a5fd410fd92ffc39443d9e8f208aec8d81d958c060203bbe75db0cb2b982524b5e91135d4ef671ebe6c55c24bdb00d89b78c7d8fed674d1fac6d6d61bb671a996d3efe27a254e40967cb60c3c7ac5814ca5e5768f268c7002ba200da9200fc5498d07833c4b25a111d35f64cd26b108a897616d4324984e0833937344b904b964d5f292eeba6075987b5cc092bd40697ef9b2ea95cbc1eed5bf3f6337145351e98291853c3bf75eb1a533817cab5dc8d87abf034696e8dc9ad20089d79086b8608cb07101b62ae744beba3cc71e75701d46c35f317ecd1f3bb6d6078bd8cf25a55bbd200d7bfb5c9e3e2167a6abe8a6636ca82bdd63c3007b39d9a57b9f258ee4bb94325b20744087ba3a2bbda513ed067b003a0d6a4197bae5776cb25899911f92e3cdd779931e98cb11846dac49480af3c2fc3596825ccbb7a7dfa3e714d8fc809acc57577dd448e477bff03a907f8410f2ae12a9ab4a3d7738315c07f42e5af416560aafa035ae4d4b72d5e59a45dcd4c91000cd8cef454c7a157276cb2610d2d08a7bc90550c85e317fdb2d83ee26f49198dd035bbe39d6eedfbc91a1cffb5682f0410204c281f3cb8d702258c77214d77e92f1e5f4db2a6be18911c5f3950a3228d1850722f4ce0a5d56a8acf2e0311290e1334a2bfbf1251d6cb46f2a028aaa7be144f38fdb222e8a2d6320f98796731847b2449774c025a452c72dfbb9f05959c88ed86256f5fcea5458c3e22340d8ad3c3ff548f03346c55f74d6ab3aff1311a302bb8c5cd55b44528fd08ecab030c1e47385ed27de5819fd798ada8858462de7fd55aa7239e03079d976669e52ff22bf9ab6fa4860064dd5033ca6ae1fec5c628e5bc2b190ae5483514d841a25b04d127d9c536e32f3bada7b46cbb14b5718c88ed826a8c19d1fd43a7f7ff6860a88adf9fcf1415eb2c56e12a7dc6a73e24bd7cbcc7fa39ce7358f20736adc11842e72a5107bcbe78f56bb56fe403d51ea531d7d4f2681fd05f5326d7e5dd7e889a3380f9dfe8124d8f258d6f9ba6f0f6467e787d996da6310196a70f551e64d1a9dc51fe907227f43a1fb54a572db183edb726375a7a1096daeb8d7b069bf8886d282dabdb7e9101fadcdfb23c57be75a193cc3459401d14836d250b197e6ae0e4818b2bea75db388bf36f311eff18ac14b9f0fe1a354d8d397439fd202d61d545f430676eb16c6ecc4c3f583fa8767d65cdc4f3155af47629cf1b0b833a12391b02b1781f1c31cb6b05160241b1e02c5889db631ad2fa905d608b2831b45529dd7550d5ff91d4b7ae23533b1f6875b38be0f26f4479cb75579d8612ff2cfec981344598c76054584f6350d296c2436e2d43f184556d4e6208483e010ba8bcdf413d659fab3353bb8f53f085dfe24910f28b82ae382047383e81922f2d05b13d073b3fbb8042c9c1dd6a073109afffac32117a6b4162387949a9c2b21661eb321a340978b4c43dcb8ce264d6e30751c1e91551f4c2efec349bf0f083db63f3bbbbc83be7eb044b17a7fbfdeedbdd80e76580a5082d7534cea34620997ee593fc0c725a9cc41f192cdcb85d2021f2dafea48f14f63d01329845c0533210075ac3d1b674a5535d37c5c5acbd8fdee0ef9d3dc66b9fdec661f3ed53d1c70c825937716af2d44510d07876b3d52c063e7ddca41faee15d3b81940dd50d41ad5791b4b37f44cecc11db9ce58c7555491ee822e8ff1d8b0dac3eb409f8b827561ea6b7d88af82892a53ff2d239c76a8a1a717b101c7b9d7db85a84a508276b8d1ba972d31089cce5dba3ed722ead0849d336b1002f41f1b1b93d2a7e56e5c222d21327d872534aae80e8f7020c4fda6fd4765bd94df4aa38c51924b356412ae0ceff6adfdad9b9c793ee6aec73a902f658ffd6af25abf374368e38a8b9e91b34d2eeca566eb39ffa67978077870b21279afc7760f38639ad6fa152af670f25de919fcecc16755bafff466a0b8d9910bf84bc5917a33ed76fd62c47a9a2ca68055668a13f11616b7f95cda26c2b09bbe8c83609af99ec41470bda5b12524a849950caf6fb96d908dabca97187858c83a54cb2dee7fcabbc0fea8d3ca1b860d1d7b5eb1dc2a687330d2fb237f55d97fbab4694e4037355548f1c20122da77eb0b7b90205989bb9ef52f76f88770eabf56f5d9ccaf572b3eadb7c9810e93b675e7e9ea26f8d8749fcb23c63993d62406db2a53996dc053e698e70360492e2c467e1baf2d76a9dc74f23c3be3d27685c5fd07a30d2aab3f2cd7fde563e29a3434ee6a51f795a5e114a3d6259732362126da789d82ee54dae91c3e2c060a4f79943068cb6a3ee5692587a67816aa5a9c5ff3805173c72a5ad2b0ebd8588253bae50da117d938901f8ffbf725ced16a76f9f53d782ebe1f0d6f6dfdaa4fe8f93ec6246b66e561c740fc7eaf6c771659e90f545b9e89221fc9450543424f0a14ad7484253251f658e56cf1cb161b4cee63c6c5b96cf8c06e6aa524c8209205de7fdbf1e233135755ed6300ed4c096764fe4dd4855f421d272cd63150db47bc6f47bf624798")
 	require.NoError(t, err)
-	remoteKeys := []*zondpbservice.ImportRemoteKeysRequest_Keystore{
+	remoteKeys := []*qrlpbservice.ImportRemoteKeysRequest_Keystore{
 		{
 			Pubkey: bytevalue,
 		},
 	}
 
 	t.Run("returns proper data with existing pub keystores", func(t *testing.T) {
-		resp, err := s.ImportRemoteKeys(context.Background(), &zondpbservice.ImportRemoteKeysRequest{
+		resp, err := s.ImportRemoteKeys(context.Background(), &qrlpbservice.ImportRemoteKeysRequest{
 			RemoteKeys: remoteKeys,
 		})
-		expectedStatuses := []*zondpbservice.ImportedRemoteKeysStatus{
+		expectedStatuses := []*qrlpbservice.ImportedRemoteKeysStatus{
 			{
-				Status:  zondpbservice.ImportedRemoteKeysStatus_IMPORTED,
+				Status:  qrlpbservice.ImportedRemoteKeysStatus_IMPORTED,
 				Message: fmt.Sprintf("Successfully added pubkey: %v", hexutil.Encode(bytevalue)),
 			},
 		}
@@ -731,12 +731,12 @@ func TestServer_DeleteRemoteKeys(t *testing.T) {
 	}
 
 	t.Run("returns proper data with existing pub keystores", func(t *testing.T) {
-		resp, err := s.DeleteRemoteKeys(context.Background(), &zondpbservice.DeleteRemoteKeysRequest{
+		resp, err := s.DeleteRemoteKeys(context.Background(), &qrlpbservice.DeleteRemoteKeysRequest{
 			Pubkeys: [][]byte{bytevalue},
 		})
-		expectedStatuses := []*zondpbservice.DeletedRemoteKeysStatus{
+		expectedStatuses := []*qrlpbservice.DeletedRemoteKeysStatus{
 			{
-				Status:  zondpbservice.DeletedRemoteKeysStatus_DELETED,
+				Status:  qrlpbservice.DeletedRemoteKeysStatus_DELETED,
 				Message: fmt.Sprintf("Successfully deleted pubkey: %v", hexutil.Encode(bytevalue)),
 			},
 		}
@@ -756,20 +756,20 @@ func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 	ctx := context.Background()
 	byteval, err := hexutil.Decode("0xa375ef0deba74124a22dd4f4574ab2affc8b1383d3e81ce9e37193992ea309c25b32b675954d03d1effdf720866aa802ae6ab63eef4d3b07f1908fab4e77393089883f5e004e8f9910cb4a1f4dcef862b35011eda1224619a0a5dd71a0575e6edaa2209d0e3ac40268371be06b65b29c32ee66d0762f33dab89a98d3fac30dfeca2f3fb403289b5bcfb10d957345b6ab5b0379daf7f1fa49f4f9d4ed272ffde8e083ee818b389d968ac7098ab2c3cdecae71dc4c9b7b8621d938bde950e67fe1e2168c611682c17794c58c25def2b6d0c0c30ec0a2594116377643eab8748dee9195e89d98b017638cfec4803492038a8470cab9da0ff7f4e8cf9bc5b5a713d48a12c822816a7af6f4dd84737af34e1c3773a345c236970e6e6da0309358cbb0a2fefcc078629c6dcefb0773839b76f7984f2c12517050111296709fa46edd7a2ad9afc91b6734e524f812f7e84c0e2054bd0a0963a473210ae38ed65d6e0cc331cd7b657e67f757c92567a57d7210e61497f4bf75d457f026e2157b980f089bbeff76c75c6e2ad40a0b1fa0772fb7dc7caec457c374e121865efda2009a168af2ec262e0a2abdcab890f3d0e65b6802a08c9bccc9e8bc07eb4ad36188eb936deeb41288741001c1308ab7d087e3b573667ff074edbfbb2c13f44cfc6fee9629afe8d03e720d2a46694e8135ddd29a6e1c31376b87d8280542b76b51f169c99f833dedcd26d0bf22f164c869690d7da774f1d8b2c558f1d62ad1723dabad575a5e80d994d16ae50c6ac8b11a90ceefa720865361d4fa5fd6b8a7db26684896619ad31760a96d247b137e6ffb0f7944ade85d287beb1fcb14219d2628c4c7f173f8fe442460d8de4a490a44a55f91eaf2a9996c7268b1f3050a50a792e3ba4caecfecb9475ca52835de7a5dac4aa6b39a3cfa505ab9f5a6aa9d1f0e2cd522d67be4c96ca63989f4b51e061638ca99dd865826fcc2f283035ded49412b34cf0a08870b7e23fa190edf99f2975f77ae604001c5989498ecc329ce69263bf70565549d6389a754e60e9ddc7f504985c32d1d5ad2e87795fd0f4feaaf47e279bd66b27f673790d77cd8e5fb059d98508bb8f50bc6586ced9082e2ca7145983e2a688c4d13a8574fce5f4b36c7931cee07867016aaa1417be98521e4d306fd02eeee0b2c4525dcfadb93a56bda02a537d58518a42981209948ff101caed8cce1e9200a31541601652e27280ea64da769b812d5c6e9226f82afdfd496917b892d371735dea17e04bc3d3f1bbe58dc723a154b494c7829b449244cc5b27d986475c3309df1cd3878fd3ffae0173b00ed4e412c5b592da3237500a6f3a463bc67055e0d7ebfad7aa52d424a4e449856b404633921325fffc3296532cb3f1a1e839bbefad1215ad89992de1ced86d1195b28fb9eb32fd59a7c4c21be2e1804c2ef98b1f1514fb3aab4c523e937f976655d0d17b22f07ac42514abeae5c2e7581fa566b559a864793b6c0bb321bf95d6b55a088f66c6452f32698ec20a74a42c623eab6f633b7f7fdadec5fcd8029d9d52ba5095ba1922cca59eb53b1dd984980404a9e957182fe6b94d2573ce63099c136a47949320d8e0fdefedcb4cdda25a3bb8f46dca234162d4ff5f841f4fcafbb5a801699176425b8be28712af5d2ce6e4d1202754c6529ef2b29f0e9fa6874213a2665947a74864ed8735bbedfbd16eb950e147104d6a414c37b9d2810f97214625c97171aa83f42f948ab8b31fef51644584ec438bb3a68f0ba88b96ccfcd860424363b171810b5ea59680ca762e89ef785482a8ecdbeede9f31040d24365e9d38cfa0c194c3054f5070897bda5da8881176666f21f5a73940187f87e91c154c1f5e4d66c791d055dd0e9330967522e6acfac511642d7500e6c004bc58c9a17d8607df8b3942ccf57c85b9e6f3ae59669e3eb44c57bf45453dd93df273a5ba7e985ae283a53cbdedb562ed5cc8cab9d81ba507d63e55a398eab58a3c9789b0b6b1983380cf779598340ed3c06c8744fffc679aa29bfbcce00713637fefe21e6e4a72f52fb997ff2f7bd9cfb48de0746b0aa613fda708cafdf52b20924acacef459802dcdee4da4e059f0712c9b5e77ffdfdefc3ac46c44fa4b7ed8daaa8ec3c18b0de2acc93f405adf0a6a3e6aebda14ce3932ffc5c2d5bd36fab8d4760a697bee4859be9fcfa496c56ed20517a539ba50aef0cc23426649c14fa6e3fe475ac3be4bc7173ce64f5fb78581bd52a703e0966930d9d8cf5436e82577dae757e3ecc32097ddf3df0cc60d81ff0d3adf8ef8f4d7e274defeec687717b76f5027c939cda3148c7e21d9c73bb71c7ef8b2cb5a508c08995c4974228e53535989a0220ab945babba304851971ef9934760b0bb2bbb8dfac9462a63d15b60c77994e821c9dde88b89fa371214c30e3f7838ac3a653360e05fedf59472e63020bbdcb5e38171b35793eb7213b0dd086f04027ef6354cb66e9a99d172d63e009c532575251bf7cbf50ebbf1458c194dddd3a52d0296c804e88f5654bc2fce6eb669756410c23b975a281c0230990f8b89e3a0a64383db1e0bf0f527bb0aef2d539095374be8248378af311562bf2eb00066a1374a24c547e64cb7d23827a906a1f396afcba9afe21aaf638749b334955d699386f7984f230979fda02954b82ae8b367341a27d858d3ae0566ed0e1e66f0fadfa97240ebc6e991151a239fa6dcc8ba9c6dc9f7f34390cf90153c07f5701e31203dbc350dc08c0e3715f8698a71f975cdced652642170bf5d6566d08390e0457842c8f7ae6dd4d10c2c58f8d3207b11a48a01dc6b80a57b2a539c3824ba52ea6ec25e36733f83236c24e025e611e62a5638375e419e90dd30bbd3648302d73dcfd6ec51f0ab568f564881789650f199b69b18f8a20c5508a84f09dea451f7db55992f0bdd4298fb53e2bdf45abcef685b81f0a861ee24dbe8f5eed012a148f55ee40f0d503e35c5f812f8c9a97d98478779312c16a6c40974da6add7b7122a4795fc809e3168926645eb2dcefbbd6a246564df0a6e806222f6fc947f76f67c941124f017475ac2c6fbd5d4ef7659eadf7a0754e9ea6118f5801049895b3f7137322f4a0a856b61c0528cc5516d51eaf91727ae91ccfca0a07cf486b268f39df21c409dcb71e081fd78694042d68593f0a853fcec1956863dd246fab44e3ee10df5bf7b6634674cc8ed0ab1bc26f6f773c4583c1d5ccdb7bd94026ef0a4f5d92942712e6f9e053330807a9e6e4fe2ed197079944a8825c996f16322ebfe76a00e69cdbdd4a7c91569cb545c8fa022277d0cdef61c4b64b000775acba1787f9723b9123c95e18120e15d34e1e95e42900cc6d1233169727d80a20b86e140e6877dff2f76dfd1f344fd1069fc4aa22101fd6865bf0c5d437656a13fa3699993221a183ff2440f1b390c3f54025ee2daebed9fb86eeea8d83999c58bb1b4f6d9e665e5987e970fe1dbf7a4f64e1663dbbc3d42d1f425b242462fe1709ccee918e18d6058f0c501b4ae04a0690139c6e38c7bfcb0e32461fdd6b6d9464d18cb4ccc26672ccfafd4b615457639fb14367b120112e2a426426b9ebc80841cb385103073026382aad0dd566e14c589ce7e7476f65c44fa172d94c83110664ff7995b14bce8f95b1f1474bdc")
 	require.NoError(t, err)
-	recipient0, err := common.NewAddressFromString("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
+	recipient0, err := common.NewAddressFromString("Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
-	recipient1, err := common.NewAddressFromString("ZFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+	recipient1, err := common.NewAddressFromString("QFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 	require.NoError(t, err)
 
 	type want struct {
-		ZondAddress string
+		QRLAddress string
 	}
 
 	tests := []struct {
 		name   string
 		args   *validatorserviceconfig.ProposerSettings
 		want   *want
-		cached *zond.FeeRecipientByPubKeyResponse
+		cached *qrysmpb.FeeRecipientByPubKeyResponse
 	}{
 		{
 			name: "ProposerSettings.ProposeConfig.FeeRecipientConfig defined for pubkey (and ProposerSettings.DefaultConfig.FeeRecipientConfig defined)",
@@ -788,7 +788,7 @@ func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 				},
 			},
 			want: &want{
-				ZondAddress: recipient0.Hex(),
+				QRLAddress: recipient0.Hex(),
 			},
 		},
 		{
@@ -802,16 +802,16 @@ func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 				},
 			},
 			want: &want{
-				ZondAddress: recipient0.Hex(),
+				QRLAddress: recipient0.Hex(),
 			},
 		},
 		{
 			name: "ProposerSettings is nil and beacon node response is correct",
 			args: nil,
 			want: &want{
-				ZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				QRLAddress: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
-			cached: &zond.FeeRecipientByPubKeyResponse{
+			cached: &qrysmpb.FeeRecipientByPubKeyResponse{
 				FeeRecipient: recipient0.Bytes(),
 			},
 		},
@@ -839,10 +839,10 @@ func TestServer_ListFeeRecipientByPubkey(t *testing.T) {
 				beaconNodeValidatorClient: mockValidatorClient,
 			}
 
-			got, err := s.ListFeeRecipientByPubkey(ctx, &zondpbservice.PubkeyRequest{Pubkey: byteval})
+			got, err := s.ListFeeRecipientByPubkey(ctx, &qrlpbservice.PubkeyRequest{Pubkey: byteval})
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.want.ZondAddress, common.BytesToAddress(got.Data.Zondaddress).Hex())
+			assert.Equal(t, tt.want.QRLAddress, common.BytesToAddress(got.Data.Qrladdress).Hex())
 		})
 	}
 }
@@ -867,7 +867,7 @@ func TestServer_ListFeeRecipientByPubKey_BeaconNodeError(t *testing.T) {
 		beaconNodeValidatorClient: mockValidatorClient,
 	}
 
-	_, err = s.ListFeeRecipientByPubkey(ctx, &zondpbservice.PubkeyRequest{Pubkey: byteval})
+	_, err = s.ListFeeRecipientByPubkey(ctx, &qrlpbservice.PubkeyRequest{Pubkey: byteval})
 	require.ErrorContains(t, "Failed to retrieve default fee recipient from beacon node", err)
 }
 
@@ -891,7 +891,7 @@ func TestServer_ListFeeRecipientByPubKey_NoFeeRecipientSet(t *testing.T) {
 		beaconNodeValidatorClient: mockValidatorClient,
 	}
 
-	_, err = s.ListFeeRecipientByPubkey(ctx, &zondpbservice.PubkeyRequest{Pubkey: byteval})
+	_, err = s.ListFeeRecipientByPubkey(ctx, &qrlpbservice.PubkeyRequest{Pubkey: byteval})
 	require.ErrorContains(t, "No fee recipient set", err)
 }
 
@@ -910,7 +910,7 @@ func TestServer_ListFeeRecipientByPubkey_InvalidPubKey(t *testing.T) {
 		validatorService: &client.ValidatorService{},
 	}
 
-	req := &zondpbservice.PubkeyRequest{
+	req := &qrlpbservice.PubkeyRequest{
 		Pubkey: []byte{},
 	}
 
@@ -929,11 +929,11 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 	require.NoError(t, err)
 
 	type want struct {
-		valZondAddress string
+		valQRLAddress string
 		// defaultEthaddress string
 	}
 	type beaconResp struct {
-		resp  *zond.FeeRecipientByPubKeyResponse
+		resp  *qrysmpb.FeeRecipientByPubKeyResponse
 		error error
 	}
 	tests := []struct {
@@ -946,10 +946,10 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 	}{
 		{
 			name:             "ProposerSetting is nil",
-			args:             "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args:             "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: nil,
 			want: &want{
-				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valQRLAddress: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -959,12 +959,12 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig is nil",
-			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: nil,
 			},
 			want: &want{
-				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valQRLAddress: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -974,13 +974,13 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig is nil AND ProposerSetting.Defaultconfig is defined",
-			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: nil,
 				DefaultConfig: &validatorserviceconfig.ProposerOption{},
 			},
 			want: &want{
-				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valQRLAddress: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -990,14 +990,14 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig is defined for pubkey",
-			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): {},
 				},
 			},
 			want: &want{
-				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valQRLAddress: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -1007,12 +1007,12 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig not defined for pubkey",
-			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{},
 			},
 			want: &want{
-				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valQRLAddress: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -1022,14 +1022,14 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig is nil for pubkey",
-			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): nil,
 				},
 			},
 			want: &want{
-				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valQRLAddress: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -1039,7 +1039,7 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 		},
 		{
 			name: "ProposerSetting.ProposeConfig is nil for pubkey AND DefaultConfig is not nil",
-			args: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+			args: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			proposerSettings: &validatorserviceconfig.ProposerSettings{
 				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 					bytesutil.ToBytes2592(byteval): nil,
@@ -1047,7 +1047,7 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 				DefaultConfig: &validatorserviceconfig.ProposerOption{},
 			},
 			want: &want{
-				valZondAddress: "Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
+				valQRLAddress: "Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9",
 			},
 			wantErr: false,
 			beaconReturn: &beaconResp{
@@ -1075,12 +1075,12 @@ func TestServer_FeeRecipientByPubkey(t *testing.T) {
 				valDB:                     validatorDB,
 			}
 
-			zondAddr, err := common.NewAddressFromString(tt.args)
+			qrlAddr, err := common.NewAddressFromString(tt.args)
 			require.NoError(t, err)
-			_, err = s.SetFeeRecipientByPubkey(ctx, &zondpbservice.SetFeeRecipientByPubkeyRequest{Pubkey: byteval, Zondaddress: zondAddr.Bytes()})
+			_, err = s.SetFeeRecipientByPubkey(ctx, &qrlpbservice.SetFeeRecipientByPubkeyRequest{Pubkey: byteval, Qrladdress: qrlAddr.Bytes()})
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.want.valZondAddress, s.validatorService.ProposerSettings().ProposeConfig[bytesutil.ToBytes2592(byteval)].FeeRecipientConfig.FeeRecipient.Hex())
+			assert.Equal(t, tt.want.valQRLAddress, s.validatorService.ProposerSettings().ProposeConfig[bytesutil.ToBytes2592(byteval)].FeeRecipientConfig.FeeRecipient.Hex())
 		})
 	}
 }
@@ -1100,7 +1100,7 @@ func TestServer_SetFeeRecipientByPubkey_InvalidPubKey(t *testing.T) {
 		validatorService: &client.ValidatorService{},
 	}
 
-	req := &zondpbservice.SetFeeRecipientByPubkeyRequest{
+	req := &qrlpbservice.SetFeeRecipientByPubkeyRequest{
 		Pubkey: []byte{},
 	}
 
@@ -1118,24 +1118,24 @@ func TestServer_SetGasLimit_InvalidFeeRecipient(t *testing.T) {
 		validatorService: &client.ValidatorService{},
 	}
 
-	req := &zondpbservice.SetFeeRecipientByPubkeyRequest{
+	req := &qrlpbservice.SetFeeRecipientByPubkeyRequest{
 		Pubkey: byteval,
 	}
 
 	_, err = s.SetFeeRecipientByPubkey(ctx, req)
-	require.ErrorContains(t, "Fee recipient is not a valid Zond address", err)
+	require.ErrorContains(t, "Fee recipient is not a valid QRL address", err)
 }
 
 func TestServer_DeleteFeeRecipientByPubkey(t *testing.T) {
 	ctx := grpc.NewContextWithServerTransportStream(context.Background(), &runtime.ServerTransportStream{})
 	byteval, err := hexutil.Decode("0xf6c41c2d6baa52105e65c3c128fa7b3cbb67b2c5a30af6f984fdb144739b534585fbc683a6800dbfe777dd4ae8af54bbcfa894e56513279cad5b978d6faf0a6d9ea2646ecdf1337223210803b948d83ef3a45aeb5b7f9c88bc43dc0655d878dbf578e9d4a2eb83ca3d300d30ce21c6756f5a15d589592b61f295669ea8e55c95a5c494517b9f27c335fd760ab6358034bce0089ed377c13314eac650b9e70d24e165f05acc9f7cd51dad6c216ea5b0bbabb5941fc17d59a1b9ad4d6cdf01768aa4513cf3444ad7a23823e892be4c85e8024706a03e0878fc005c52ed08ef41e56192459093ac82ebf9189e8199997977a336c4fc97da1ecdc6e76da090f35e93aee367c1457998963266e59338c2c241d113dbb5a48be82c9e3a3ea7b90d84dbbc65b76d833a54e522cdc41db212f7aa2f741502ca9d567ab64574454206c33a72effb676007a4dfdbcd358865df822d52fe2e74684122dfa0a8b7382b69256543408ea42785cd4f7d93d26fd7df702680bba33558170549c162d1bf69493e33970aa33b741a553902dda80a76bac4e38bf849b30ab436f6be48018889ad7be38ae4907c52e81f94a129a841d7f82d2dd2058d4f9c6cf0c914f245445397da1e6dbedf110e0bc5cbfa71cb7d8abcd542968fee270bb3be39f6aa6fead4d35ac63213be8f194902d5b6a85f1c29d7a16fdb9a2d6675048d7672d45021eaca3a742672524bd77937f5e4881abff9046375cc6245abb688a6387a515661a3c5d077c630b5883d9fb0f50e804a8ff368413db048e1bddafd563841d113ad54c12fbfe02b6f8901fef312e0fa921a435c103338582fa310c3cbe5e26319e04d1493c46d6216f5b7455d9567640739d4abd9d3897634faa612b0f2054a5da2379ab374da50f406bfd82762f9191e90173d346af7ec6b43026b556edd4e7c3d5e85ea089961bba7a1e441e21a96c6b34a74bca18788376ac3e27cd24443716d98a9953c24e4f60aa36846cc1a06dfbfa5e7eb6c389a6a687dc2919b6944320a7a7960274db334bc2263a8e46fe78eb9f3d6f59fd1e908d74e28283bafea01f528bf1b475f23cd75725de3e34a3354abd6f4896787b7238673acf362969548dc5ef8de5e8aecf20b29ae329935536df1c547e8047f94f12d05142ed1b27a331d101b307ec61d34fc226c3fee2aef9e9a3beb99c37d8ce186579a27301fdec54a620ab037ddb28d316c8467120203977e24b6fa801d8524910e0a849da79efd54600da1ebfd2beb3ce35ca5161ace13fef5bdfe8a5a415e0943b4ed27fb2f6182aea57871b9a43d6d7e48e1c667db6c2b5ba58348b6e5ace49bd2a6a662813eec2aeb40feaf6a2f513262adfcc226c0d853be7cbd981a925dd77f3aa42bf055b550470c94ef1d1e4cf2f3e0c89f3ba74ed4ef2e49478158873c71e4993b31ab73c16b084a66abe789c9b5059cfae7f41a3b3c2ad0925976d342ef3703f0ef37bb8acbdaa4753d921b6c94e5206b981a33e0ffa42e8edc578ed980fbaa0b12c75a149c4ab1dfa9d1c84a99a9b9bcc92fe2cb7bfea289d21068719cdaeddfed24f472af45110999fec25e20ebd5912f9a46a86c476c4218a264c5c600280d1f5ffb6422c9e052f56b18f2c072b0e32a1e1c5280c7fb387e2b869da701e73359907a5ff402e3f8a0e0d3689726a96f4e17e89ea2697e08a124fcb04ab235c954dd3a971a7bfa55a454e30ba1b650488d7c38fdc594d7e3421703dff2b9c4f89839b786c54a7a771afbc7d2c08f3dd780bb144aa7ed6db5834e818f1d05544e3c593c10b918d1f6a2819e142edac44d5a7c0124a7db677281e71a88c8da8c56aff7a38ec6cc85fb1a394fe7cc047a67cd40b1831bdede39b47269916dd7d2ae0f44ce18ebc5be2704a048bd39456810f38970634179ba8b7cb791e43c0ce55569180f1405272af483219c90bd55451353e87bea6f0b3268a7c3a0db2e7fc7ef09ee39c758b08a200aa9f7826ded60f4087ec4f008bdb9ebe071ca1929b49a756b369fe2e33a9b478aec17d0f6b5f3d53f550434e5ffdc1f42362865871d53e1ad10a9566804f56b7fb6d31d11b748cb18a014d05361a0eac3da43108904aaae0effe61ce65d999587f3514f609c8e9dd2c334eea7514fbb3877113e1802c1d5b1ea628e6a3c74a34f0e280e8f3b0cb878c6a14519b7c6ec4fa5c6f181e93b90a3bb937372c7bae60f87f4cdca74ff455b7aad4c347606b8c92662d00665ff766eafc95018c79d78f3198333323b507f9cb2cd661e3d01201c213e85a461f3ab02c7abd4524fc3762912c483f7cf6d4fae58720af67ad3ec70112f90d02e2d4170a582ec5f1015b89b8eaebab00321efe4e1d2e72aa43212c7720f6369a9e557aafadc77686f5ba77321220acc84e44aabb32bb56a821a34264fd44223a9cbbf04a37a270d4910de736da028d3e543adb12ae1860e3efb281d6763607f919e82a135d5cdb2976ef6993c22c842932478fe3e1101794be57e55af788e5a994c65f5e17a8d3df930a05dfd9344927b6808742751e14c5ac1fdf31573678134740d43c49904d18a501d14105846802dca4333225ff39ab76238e4239bb0bb82e54ae7bd5b9a3b148abdb915953dc9d5eb2bf9a3fc401d4adc7c96f4fb12c5c9f691ba67ebbb82311e6c1a53904361e1220deb23ac3b474c35994a545a55b7cddab72d6b15b28d2c6a19c65e1d11eb465ea69533a82d25e5f1d59d87f80eecd7e2d27cc6020cd17c460bf2a3865530f892a7713f7345b6585c4a99b833b86440fb81e2649429b10e2d5a5f868043d794b75eea4ec4cb4dfe35b54659271f12a00877dc394d33e76c9262d98d8a4a0b24c0b24eeba8a7c3982ae1b946acf4d332c414c7d99e375287f5529b2d03921da76ec37d42f7622246d8af8d5d8227124c01c62beb79b96c0c0b13a34ad07fe256b234cf3859843a7fcb81360fac6d196fbd044b4627027412c7779a26e4fc5ed655428b3bbd5fc04960638db48c539205d6804b43ac9909fe4706f0a9b4d90d5087f899b15bbba8e3560573ee2ff8cfd103022f6b26ead55d98b5e2b58ec884d1b724f7bbd5254eb6740009e4541663a29f062b1e7281a5bca4d5456fb8feedb5d24df137a6c62ce4b2add9e2bb682acca91d403b477bfb61f28525840d0b37367573391efa6d003286cd4fda89e17e109005b217e2e63b1c7d581480e779941ea3facc87b1995ee177b62530d480723fab9a233404855f55295c461ee471d4467009e7e768271f498c16826a316c7fbedbf1c55c95f1e8ffc154e58c02d826080bfd71c8bcd95b160b378af4f6e8ffc246a1a7fbae3508aeddac603e1ec1960db30fe0fe751c9c72f33e9a1abfff9a78b545e88603de5aed94ab3d86417d3561e5f48debefdd5c94b0760eb3d106969c6836e8b56853cf34a909c9e9e099c48b149df2381667a7ef103292bd2a79fe543f6706e563e858e84ae741381cc89fbb6ce40d9f2838739c53fdcdcb783736ebccdfcdacf1049315eb3b57d96d39a0361a69e4c20d493dbb4ad4468ccaae0c0674ecef4e9bdef2d9f2aa04e1938bd1ac1f07bb9acd71cd811874242a19cd86d52a70aa1cd190ae2800127e545a7230c8f0bdcf5f0b7d627304fbcd85d47e995a992fd6134377b975d9")
 	require.NoError(t, err)
-	recipient0, err := common.NewAddressFromString("Z055Fb65722E7b2455012BFEBf6177F1D2e9738D5")
+	recipient0, err := common.NewAddressFromString("Q055Fb65722E7b2455012BFEBf6177F1D2e9738D5")
 	require.NoError(t, err)
-	recipient1, err := common.NewAddressFromString("Z046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
+	recipient1, err := common.NewAddressFromString("Q046Fb65722E7b2455012BFEBf6177F1D2e9738D9")
 	require.NoError(t, err)
 	type want struct {
-		ZondAddress string
+		QRLAddress string
 	}
 	tests := []struct {
 		name             string
@@ -1160,7 +1160,7 @@ func TestServer_DeleteFeeRecipientByPubkey(t *testing.T) {
 				},
 			},
 			want: &want{
-				ZondAddress: recipient1.Hex(),
+				QRLAddress: recipient1.Hex(),
 			},
 			wantErr: false,
 		},
@@ -1180,7 +1180,7 @@ func TestServer_DeleteFeeRecipientByPubkey(t *testing.T) {
 				validatorService: vs,
 				valDB:            validatorDB,
 			}
-			_, err = s.DeleteFeeRecipientByPubkey(ctx, &zondpbservice.PubkeyRequest{Pubkey: byteval})
+			_, err = s.DeleteFeeRecipientByPubkey(ctx, &qrlpbservice.PubkeyRequest{Pubkey: byteval})
 			require.NoError(t, err)
 
 			assert.Equal(t, true, s.validatorService.ProposerSettings().ProposeConfig[bytesutil.ToBytes2592(byteval)].FeeRecipientConfig == nil)
@@ -1203,7 +1203,7 @@ func TestServer_DeleteFeeRecipientByPubkey_InvalidPubKey(t *testing.T) {
 		validatorService: &client.ValidatorService{},
 	}
 
-	req := &zondpbservice.PubkeyRequest{
+	req := &qrlpbservice.PubkeyRequest{
 		Pubkey: []byte{},
 	}
 
@@ -1274,7 +1274,7 @@ func TestServer_GetGasLimit(t *testing.T) {
 			s := &Server{
 				validatorService: vs,
 			}
-			got, err := s.GetGasLimit(ctx, &zondpbservice.PubkeyRequest{Pubkey: tt.pubkey[:]})
+			got, err := s.GetGasLimit(ctx, &qrlpbservice.PubkeyRequest{Pubkey: tt.pubkey[:]})
 			require.NoError(t, err)
 			assert.Equal(t, tt.want, got.Data.GasLimit)
 		})
@@ -1293,7 +1293,7 @@ func TestServer_SetGasLimit(t *testing.T) {
 	require.NoError(t, err2)
 
 	type beaconResp struct {
-		resp  *zond.FeeRecipientByPubKeyResponse
+		resp  *qrysmpb.FeeRecipientByPubKeyResponse
 		error error
 	}
 
@@ -1437,7 +1437,7 @@ func TestServer_SetGasLimit(t *testing.T) {
 				).Return(tt.beaconReturn.resp, tt.beaconReturn.error)
 			}
 
-			_, err = s.SetGasLimit(ctx, &zondpbservice.SetGasLimitRequest{Pubkey: tt.pubkey, GasLimit: tt.newGasLimit})
+			_, err = s.SetGasLimit(ctx, &qrlpbservice.SetGasLimitRequest{Pubkey: tt.pubkey, GasLimit: tt.newGasLimit})
 			if tt.wantErr != "" {
 				require.ErrorContains(t, tt.wantErr, err)
 			} else {
@@ -1465,7 +1465,7 @@ func TestServer_SetGasLimit_InvalidPubKey(t *testing.T) {
 		validatorService: &client.ValidatorService{},
 	}
 
-	req := &zondpbservice.SetGasLimitRequest{
+	req := &qrlpbservice.SetGasLimitRequest{
 		Pubkey: []byte{},
 	}
 
@@ -1599,7 +1599,7 @@ func TestServer_DeleteGasLimit(t *testing.T) {
 			}
 			// Set up global default value for builder gas limit.
 			params.BeaconConfig().DefaultBuilderGasLimit = uint64(globalDefaultGasLimit)
-			_, err = s.DeleteGasLimit(ctx, &zondpbservice.DeleteGasLimitRequest{Pubkey: tt.pubkey})
+			_, err = s.DeleteGasLimit(ctx, &qrlpbservice.DeleteGasLimitRequest{Pubkey: tt.pubkey})
 			if tt.wantError != nil {
 				assert.ErrorContains(t, fmt.Sprintf("code = %s", tt.wantError.Error()), err)
 			} else {
@@ -1674,20 +1674,20 @@ func TestServer_SetVoluntaryExit(t *testing.T) {
 		Seconds: time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
 	}
 
-	beaconClient.EXPECT().ValidatorIndex(gomock.Any(), &zond.ValidatorIndexRequest{PublicKey: pubKeys[0][:]}).
+	beaconClient.EXPECT().ValidatorIndex(gomock.Any(), &qrysmpb.ValidatorIndexRequest{PublicKey: pubKeys[0][:]}).
 		Times(3).
-		Return(&zond.ValidatorIndexResponse{Index: 2}, nil)
+		Return(&qrysmpb.ValidatorIndexResponse{Index: 2}, nil)
 
 	beaconClient.EXPECT().DomainData(
 		gomock.Any(), // ctx
 		gomock.Any(), // epoch
 	).Times(3).
-		Return(&zond.DomainResponse{SignatureDomain: make([]byte, 32)}, nil /*err*/)
+		Return(&qrysmpb.DomainResponse{SignatureDomain: make([]byte, 32)}, nil /*err*/)
 
 	mockNodeClient.EXPECT().
 		GetGenesis(gomock.Any(), gomock.Any()).
 		Times(3).
-		Return(&zond.Genesis{GenesisTime: genesisTime}, nil)
+		Return(&qrysmpb.Genesis{GenesisTime: genesisTime}, nil)
 
 	s := &Server{
 		validatorService:          vs,
@@ -1728,14 +1728,14 @@ func TestServer_SetVoluntaryExit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := s.SetVoluntaryExit(ctx, &zondpbservice.SetVoluntaryExitRequest{Pubkey: pubKeys[0][:], Epoch: tt.epoch})
+			resp, err := s.SetVoluntaryExit(ctx, &qrlpbservice.SetVoluntaryExitRequest{Pubkey: pubKeys[0][:], Epoch: tt.epoch})
 			require.NoError(t, err)
 			if tt.w.epoch == 0 {
 				genesisResponse, err := s.beaconNodeClient.GetGenesis(ctx, &emptypb.Empty{})
 				require.NoError(t, err)
 				tt.w.epoch, err = client.CurrentEpoch(genesisResponse.GenesisTime)
 				require.NoError(t, err)
-				resp2, err := s.SetVoluntaryExit(ctx, &zondpbservice.SetVoluntaryExitRequest{Pubkey: pubKeys[0][:], Epoch: tt.epoch})
+				resp2, err := s.SetVoluntaryExit(ctx, &qrlpbservice.SetVoluntaryExitRequest{Pubkey: pubKeys[0][:], Epoch: tt.epoch})
 				require.NoError(t, err)
 				tt.w.signature = resp2.Data.Signature
 			}

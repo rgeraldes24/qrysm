@@ -6,7 +6,7 @@ import (
 	coreutils "github.com/theQRL/qrysm/beacon-chain/core/transition/stateutils"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // ValidatorMapHandler is a container to hold the map and a reference tracker for how many
@@ -18,7 +18,7 @@ type ValidatorMapHandler struct {
 }
 
 // NewValMapHandler returns a new validator map handler.
-func NewValMapHandler(vals []*zondpb.Validator) *ValidatorMapHandler {
+func NewValMapHandler(vals []*qrysmpb.Validator) *ValidatorMapHandler {
 	return &ValidatorMapHandler{
 		valIdxMap: coreutils.ValidatorIndexMap(vals),
 		mapRef:    &Reference{refs: 1},

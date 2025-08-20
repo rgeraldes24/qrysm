@@ -12,12 +12,11 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
-	zond "github.com/theQRL/go-zond"
+	qrl "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
 	gzondtypes "github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/go-zond/rpc"
-	zondRPC "github.com/theQRL/go-zond/rpc"
 	mocks "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	"github.com/theQRL/qrysm/config/features"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
@@ -45,12 +44,12 @@ type RPCClientBad struct {
 }
 
 func (RPCClientBad) Close() {}
-func (RPCClientBad) BatchCall([]zondRPC.BatchElem) error {
+func (RPCClientBad) BatchCall([]rpc.BatchElem) error {
 	return errors.New("rpc client is not initialized")
 }
 
 func (RPCClientBad) CallContext(context.Context, interface{}, string, ...interface{}) error {
-	return zond.NotFound
+	return qrl.NotFound
 }
 
 func TestClient_IPC(t *testing.T) {
@@ -433,7 +432,7 @@ func TestReconstructFullBlock(t *testing.T) {
 
 		jsonPayload := make(map[string]interface{})
 
-		to, err := common.NewAddressFromString("Z095e7baea6a6c7c4c2dfeb977efac326af552d87")
+		to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 		require.NoError(t, err)
 		tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 			Nonce: 0,
@@ -529,7 +528,7 @@ func TestReconstructFullBlockBatch(t *testing.T) {
 
 		jsonPayload := make(map[string]interface{})
 
-		to, err := common.NewAddressFromString("Z095e7baea6a6c7c4c2dfeb977efac326af552d87")
+		to, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 		require.NoError(t, err)
 		tx := gzondtypes.NewTx(&gzondtypes.DynamicFeeTx{
 			Nonce: 0,
@@ -953,7 +952,7 @@ func TestHeaderByHash_NotFound(t *testing.T) {
 	srv.rpcClient = RPCClientBad{}
 
 	_, err := srv.HeaderByHash(context.Background(), [32]byte{})
-	assert.Equal(t, zond.NotFound, err)
+	assert.Equal(t, qrl.NotFound, err)
 }
 
 func TestHeaderByNumber_NotFound(t *testing.T) {
@@ -961,7 +960,7 @@ func TestHeaderByNumber_NotFound(t *testing.T) {
 	srv.rpcClient = RPCClientBad{}
 
 	_, err := srv.HeaderByNumber(context.Background(), big.NewInt(100))
-	assert.Equal(t, zond.NotFound, err)
+	assert.Equal(t, qrl.NotFound, err)
 }
 
 func TestToBlockNumArg(t *testing.T) {
@@ -1239,7 +1238,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
@@ -1280,7 +1279,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
@@ -1321,7 +1320,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
@@ -1330,7 +1329,7 @@ func TestCapella_PayloadBodiesByHash(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          2,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
@@ -1490,7 +1489,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
@@ -1531,7 +1530,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
@@ -1572,7 +1571,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          1,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}
@@ -1581,7 +1580,7 @@ func TestCapella_PayloadBodiesByRange(t *testing.T) {
 				Withdrawals: []*pb.Withdrawal{{
 					Index:          2,
 					ValidatorIndex: 1,
-					Address:        hexutil.MustDecodeZ("Zcf8e0d4e9587369b2301d0790347320302cc0943"),
+					Address:        hexutil.MustDecodeQ("Qcf8e0d4e9587369b2301d0790347320302cc0943"),
 					Amount:         1,
 				}},
 			}

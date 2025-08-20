@@ -9,7 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	grpc "google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
@@ -37,35 +37,35 @@ func (m *MockNodeClient) EXPECT() *MockNodeClientMockRecorder {
 	return m.recorder
 }
 
-// GetETH1ConnectionStatus mocks base method.
-func (m *MockNodeClient) GetETH1ConnectionStatus(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.ETH1ConnectionStatus, error) {
+// GetExecutionConnectionStatus mocks base method.
+func (m *MockNodeClient) GetExecutionConnectionStatus(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrysmpb.ExecutionConnectionStatus, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetETH1ConnectionStatus", varargs...)
-	ret0, _ := ret[0].(*zond.ETH1ConnectionStatus)
+	ret := m.ctrl.Call(m, "GetExecutionConnectionStatus", varargs...)
+	ret0, _ := ret[0].(*qrysmpb.ExecutionConnectionStatus)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetETH1ConnectionStatus indicates an expected call of GetETH1ConnectionStatus.
-func (mr *MockNodeClientMockRecorder) GetETH1ConnectionStatus(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// GetExecutionConnectionStatus indicates an expected call of GetExecutionConnectionStatus.
+func (mr *MockNodeClientMockRecorder) GetExecutionConnectionStatus(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetETH1ConnectionStatus", reflect.TypeOf((*MockNodeClient)(nil).GetETH1ConnectionStatus), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExecutionConnectionStatus", reflect.TypeOf((*MockNodeClient)(nil).GetExecutionConnectionStatus), varargs...)
 }
 
 // GetGenesis mocks base method.
-func (m *MockNodeClient) GetGenesis(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.Genesis, error) {
+func (m *MockNodeClient) GetGenesis(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrysmpb.Genesis, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetGenesis", varargs...)
-	ret0, _ := ret[0].(*zond.Genesis)
+	ret0, _ := ret[0].(*qrysmpb.Genesis)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -78,14 +78,14 @@ func (mr *MockNodeClientMockRecorder) GetGenesis(arg0, arg1 interface{}, arg2 ..
 }
 
 // GetHost mocks base method.
-func (m *MockNodeClient) GetHost(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.HostData, error) {
+func (m *MockNodeClient) GetHost(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrysmpb.HostData, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetHost", varargs...)
-	ret0, _ := ret[0].(*zond.HostData)
+	ret0, _ := ret[0].(*qrysmpb.HostData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -98,14 +98,14 @@ func (mr *MockNodeClientMockRecorder) GetHost(arg0, arg1 interface{}, arg2 ...in
 }
 
 // GetPeer mocks base method.
-func (m *MockNodeClient) GetPeer(arg0 context.Context, arg1 *zond.PeerRequest, arg2 ...grpc.CallOption) (*zond.Peer, error) {
+func (m *MockNodeClient) GetPeer(arg0 context.Context, arg1 *qrysmpb.PeerRequest, arg2 ...grpc.CallOption) (*qrysmpb.Peer, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetPeer", varargs...)
-	ret0, _ := ret[0].(*zond.Peer)
+	ret0, _ := ret[0].(*qrysmpb.Peer)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -118,14 +118,14 @@ func (mr *MockNodeClientMockRecorder) GetPeer(arg0, arg1 interface{}, arg2 ...in
 }
 
 // GetSyncStatus mocks base method.
-func (m *MockNodeClient) GetSyncStatus(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.SyncStatus, error) {
+func (m *MockNodeClient) GetSyncStatus(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrysmpb.SyncStatus, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetSyncStatus", varargs...)
-	ret0, _ := ret[0].(*zond.SyncStatus)
+	ret0, _ := ret[0].(*qrysmpb.SyncStatus)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -138,14 +138,14 @@ func (mr *MockNodeClientMockRecorder) GetSyncStatus(arg0, arg1 interface{}, arg2
 }
 
 // GetVersion mocks base method.
-func (m *MockNodeClient) GetVersion(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.Version, error) {
+func (m *MockNodeClient) GetVersion(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrysmpb.Version, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetVersion", varargs...)
-	ret0, _ := ret[0].(*zond.Version)
+	ret0, _ := ret[0].(*qrysmpb.Version)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -158,14 +158,14 @@ func (mr *MockNodeClientMockRecorder) GetVersion(arg0, arg1 interface{}, arg2 ..
 }
 
 // ListImplementedServices mocks base method.
-func (m *MockNodeClient) ListImplementedServices(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.ImplementedServices, error) {
+func (m *MockNodeClient) ListImplementedServices(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrysmpb.ImplementedServices, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ListImplementedServices", varargs...)
-	ret0, _ := ret[0].(*zond.ImplementedServices)
+	ret0, _ := ret[0].(*qrysmpb.ImplementedServices)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -178,14 +178,14 @@ func (mr *MockNodeClientMockRecorder) ListImplementedServices(arg0, arg1 interfa
 }
 
 // ListPeers mocks base method.
-func (m *MockNodeClient) ListPeers(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*zond.Peers, error) {
+func (m *MockNodeClient) ListPeers(arg0 context.Context, arg1 *emptypb.Empty, arg2 ...grpc.CallOption) (*qrysmpb.Peers, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ListPeers", varargs...)
-	ret0, _ := ret[0].(*zond.Peers)
+	ret0, _ := ret[0].(*qrysmpb.Peers)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

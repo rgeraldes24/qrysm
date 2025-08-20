@@ -88,7 +88,7 @@ func configureSlotsPerArchivedPoint(cliCtx *cli.Context) error {
 	return nil
 }
 
-func configureEth1Config(cliCtx *cli.Context) error {
+func configureExecutionConfig(cliCtx *cli.Context) error {
 	c := params.BeaconConfig().Copy()
 	if cliCtx.IsSet(flags.ChainID.Name) {
 		c.DepositChainID = cliCtx.Uint64(flags.ChainID.Name)
@@ -137,7 +137,7 @@ func configureInteropConfig(cliCtx *cli.Context) error {
 	}
 	genTimeIsSet := cliCtx.IsSet(flags.InteropGenesisTimeFlag.Name)
 	numValsIsSet := cliCtx.IsSet(flags.InteropNumValidatorsFlag.Name)
-	votesIsSet := cliCtx.IsSet(flags.InteropMockEth1DataVotesFlag.Name)
+	votesIsSet := cliCtx.IsSet(flags.InteropMockExecutionDataVotesFlag.Name)
 
 	if genTimeIsSet || numValsIsSet || votesIsSet {
 		if err := params.SetActive(params.InteropConfig().Copy()); err != nil {
@@ -151,7 +151,7 @@ func configureExecutionSetting(cliCtx *cli.Context) error {
 	// TODO(now.youtrack.cloud/issue/TQ-1)
 	if !cliCtx.IsSet(flags.SuggestedFeeRecipient.Name) {
 		log.Warnf("In order to receive transaction fees from proposing blocks, " +
-			"you must provide flag --" + flags.SuggestedFeeRecipient.Name + " with a valid zond address when starting your beacon node. " +
+			"you must provide flag --" + flags.SuggestedFeeRecipient.Name + " with a valid qrl address when starting your beacon node. " +
 			"Please see our documentation for more information on this requirement (https://docs.prylabs.network/docs/execution-node/fee-recipient).")
 		return nil
 	}
@@ -169,10 +169,10 @@ func configureExecutionSetting(cliCtx *cli.Context) error {
 		return nil
 	}
 	if !mixedcaseAddress.ValidChecksum() {
-		log.Warnf("Fee recipient %s is not a checksum Zond address. "+
+		log.Warnf("Fee recipient %s is not a checksum QRL address. "+
 			"The checksummed address is %s and will be used as the fee recipient. "+
 			"We recommend using a mixed-case address (checksum) "+
-			"to prevent spelling mistakes in your fee recipient Zond address", ha, checksumAddress.Hex())
+			"to prevent spelling mistakes in your fee recipient QRL address", ha, checksumAddress.Hex())
 	}
 	c.DefaultFeeRecipient = checksumAddress
 	log.Infof("Default fee recipient is set to %s, recipient may be overwritten from validator client and persist in db."+

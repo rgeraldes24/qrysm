@@ -15,7 +15,7 @@ import (
 	"github.com/multiformats/go-multiaddr"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-zond/p2p/discover"
-	"github.com/theQRL/go-zond/p2p/enode"
+	"github.com/theQRL/go-zond/p2p/qnode"
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/encoder"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
@@ -30,10 +30,10 @@ import (
 )
 
 type mockListener struct {
-	localNode *enode.LocalNode
+	localNode *qnode.LocalNode
 }
 
-func (m mockListener) Self() *enode.Node {
+func (m mockListener) Self() *qnode.Node {
 	return m.localNode.Node()
 }
 
@@ -41,31 +41,31 @@ func (mockListener) Close() {
 	// no-op
 }
 
-func (mockListener) Lookup(enode.ID) []*enode.Node {
+func (mockListener) Lookup(qnode.ID) []*qnode.Node {
 	panic("implement me")
 }
 
-func (mockListener) ReadRandomNodes(_ []*enode.Node) int {
+func (mockListener) ReadRandomNodes(_ []*qnode.Node) int {
 	panic("implement me")
 }
 
-func (mockListener) Resolve(*enode.Node) *enode.Node {
+func (mockListener) Resolve(*qnode.Node) *qnode.Node {
 	panic("implement me")
 }
 
-func (mockListener) Ping(*enode.Node) error {
+func (mockListener) Ping(*qnode.Node) error {
 	panic("implement me")
 }
 
-func (mockListener) RequestENR(*enode.Node) (*enode.Node, error) {
+func (mockListener) RequestQNR(*qnode.Node) (*qnode.Node, error) {
 	panic("implement me")
 }
 
-func (mockListener) LocalNode() *enode.LocalNode {
+func (mockListener) LocalNode() *qnode.LocalNode {
 	panic("implement me")
 }
 
-func (mockListener) RandomNodes() enode.Iterator {
+func (mockListener) RandomNodes() qnode.Iterator {
 	panic("implement me")
 }
 

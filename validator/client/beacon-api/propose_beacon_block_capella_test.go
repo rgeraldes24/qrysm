@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/client/beacon-api/mock"
@@ -24,7 +24,7 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 
 	capellaBlock := generateSignedCapellaBlock()
 
-	genericSignedBlock := &zondpb.GenericSignedBeaconBlock{}
+	genericSignedBlock := &qrysmpb.GenericSignedBeaconBlock{}
 	genericSignedBlock.Block = capellaBlock
 
 	jsonCapellaBlock := &apimiddleware.SignedBeaconBlockCapellaJson{
@@ -38,7 +38,7 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 				Attestations:      jsonifyAttestations(capellaBlock.Capella.Block.Body.Attestations),
 				AttesterSlashings: jsonifyAttesterSlashings(capellaBlock.Capella.Block.Body.AttesterSlashings),
 				Deposits:          jsonifyDeposits(capellaBlock.Capella.Block.Body.Deposits),
-				Eth1Data:          jsonifyEth1Data(capellaBlock.Capella.Block.Body.Eth1Data),
+				ExecutionData:     jsonifyExecutionData(capellaBlock.Capella.Block.Body.ExecutionData),
 				Graffiti:          hexutil.Encode(capellaBlock.Capella.Block.Body.Graffiti),
 				ProposerSlashings: jsonifyProposerSlashings(capellaBlock.Capella.Block.Body.ProposerSlashings),
 				RandaoReveal:      hexutil.Encode(capellaBlock.Capella.Block.Body.RandaoReveal),
@@ -70,10 +70,10 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 	require.NoError(t, err)
 
 	// Make sure that what we send in the POST body is the marshalled version of the protobuf block
-	headers := map[string]string{"Eth-Consensus-Version": "capella"}
+	headers := map[string]string{"Qrl-Consensus-Version": "capella"}
 	jsonRestHandler.EXPECT().PostRestJson(
 		context.Background(),
-		"/zond/v1/beacon/blocks",
+		"/qrl/v1/beacon/blocks",
 		headers,
 		bytes.NewBuffer(marshalledBlock),
 		nil,
@@ -91,9 +91,9 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 	assert.DeepEqual(t, expectedBlockRoot[:], proposeResponse.BlockRoot)
 }
 
-func generateSignedCapellaBlock() *zondpb.GenericSignedBeaconBlock_Capella {
-	return &zondpb.GenericSignedBeaconBlock_Capella{
-		Capella: &zondpb.SignedBeaconBlockCapella{
+func generateSignedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Capella {
+	return &qrysmpb.GenericSignedBeaconBlock_Capella{
+		Capella: &qrysmpb.SignedBeaconBlockCapella{
 			Block:     test_helpers.GenerateProtoCapellaBeaconBlock(),
 			Signature: test_helpers.FillByteSlice(4595, 127),
 		},

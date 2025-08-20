@@ -1,0 +1,24 @@
+load("@qrysm//tools/go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "basic_tracer.go",
+        "printer_tracer.go",
+        "utils.go",
+    ],
+    importpath = "github.com/theQRL/qrysm/pkg/goqrvmlab/common",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/goqrvmlab/fuzzing:go_default_library",
+        "//pkg/goqrvmlab/qrvms:go_default_library",
+        "//pkg/goqrvmlab/utils:go_default_library",
+        "@com_github_theqrl_go_zond//common:go_default_library",
+        "@com_github_theqrl_go_zond//common/hexutil:go_default_library",
+        "@com_github_theqrl_go_zond//core:go_default_library",
+        "@com_github_theqrl_go_zond//core/vm:go_default_library",
+        "@com_github_theqrl_go_zond//log:go_default_library",
+        "@com_github_theqrl_go_zond//qrl/tracers:go_default_library",
+        "@com_github_urfave_cli_v2//:go_default_library",
+    ],
+)

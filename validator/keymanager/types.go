@@ -8,8 +8,8 @@ import (
 	"github.com/theQRL/qrysm/async/event"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/crypto/dilithium"
+	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
 )
 
 // IKeymanager defines a general keymanager interface for Qrysm wallets.
@@ -42,12 +42,12 @@ type Signer interface {
 type Importer interface {
 	ImportKeystores(
 		ctx context.Context, keystores []*Keystore, passwords []string,
-	) ([]*zondpbservice.ImportedKeystoreStatus, error)
+	) ([]*qrlpbservice.ImportedKeystoreStatus, error)
 }
 
 // Deleter can delete keystores from the keymanager.
 type Deleter interface {
-	DeleteKeystores(ctx context.Context, publicKeys [][]byte) ([]*zondpbservice.DeletedKeystoreStatus, error)
+	DeleteKeystores(ctx context.Context, publicKeys [][]byte) ([]*qrlpbservice.DeletedKeystoreStatus, error)
 }
 
 // KeyChangeSubscriber allows subscribing to changes made to the underlying keys.
@@ -62,12 +62,12 @@ type KeyStoreExtractor interface {
 
 // PublicKeyAdder allows adding public keys to the keymanager.
 // type PublicKeyAdder interface {
-// 	AddPublicKeys(ctx context.Context, publicKeys [][field_params.DilithiumPubkeyLength]byte) ([]*zondpbservice.ImportedRemoteKeysStatus, error)
+// 	AddPublicKeys(ctx context.Context, publicKeys [][field_params.DilithiumPubkeyLength]byte) ([]*qrlpbservice.ImportedRemoteKeysStatus, error)
 // }
 
 // PublicKeyDeleter allows deleting public keys set in keymanager.
 // type PublicKeyDeleter interface {
-// 	DeletePublicKeys(ctx context.Context, publicKeys [][field_params.DilithiumPubkeyLength]byte) ([]*zondpbservice.DeletedRemoteKeysStatus, error)
+// 	DeletePublicKeys(ctx context.Context, publicKeys [][field_params.DilithiumPubkeyLength]byte) ([]*qrlpbservice.DeletedRemoteKeysStatus, error)
 // }
 
 type ListKeymanagerAccountConfig struct {

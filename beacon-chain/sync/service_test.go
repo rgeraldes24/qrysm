@@ -17,14 +17,14 @@ import (
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
 
 func TestService_StatusZeroEpoch(t *testing.T) {
-	bState, err := state_native.InitializeFromProtoCapella(&zondpb.BeaconStateCapella{Slot: 0})
+	bState, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{Slot: 0})
 	require.NoError(t, err)
 	chain := &mockChain.ChainService{
 		Genesis: time.Now(),
@@ -62,7 +62,7 @@ func TestSyncHandlers_WaitToSync(t *testing.T) {
 		clockWaiter:  gs,
 	}
 
-	topic := "/eth2/%x/beacon_block"
+	topic := "/consensus/%x/beacon_block"
 	go r.registerHandlers()
 	go r.waitForChainStart()
 	time.Sleep(100 * time.Millisecond)
@@ -163,7 +163,7 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	// Save block into DB so that validateBeaconBlockPubSub() process gets short cut.
 	util.SaveBlock(t, ctx, r.cfg.beaconDB, msg)
 
-	topic := "/eth2/%x/beacon_block"
+	topic := "/consensus/%x/beacon_block"
 	p2p.ReceivePubSub(topic, msg)
 	assert.Equal(t, 0, len(blockChan), "block was received by sync service despite not being fully synced")
 	close(r.initialSyncComplete)

@@ -37,19 +37,19 @@ func FuzzForkChoiceResponse(f *testing.F) {
 	f.Add(output)
 	f.Fuzz(func(t *testing.T, jsonBlob []byte) {
 		gzondResp := &engine.ForkChoiceResponse{}
-		prysmResp := &execution.ForkchoiceUpdatedResponse{}
+		qrysmResp := &execution.ForkchoiceUpdatedResponse{}
 		gzondErr := json.Unmarshal(jsonBlob, gzondResp)
-		prysmErr := json.Unmarshal(jsonBlob, prysmResp)
-		assert.Equal(t, gzondErr != nil, prysmErr != nil, fmt.Sprintf("gzond and prysm unmarshaller return inconsistent errors. %v and %v", gzondErr, prysmErr))
+		qrysmErr := json.Unmarshal(jsonBlob, qrysmResp)
+		assert.Equal(t, gzondErr != nil, qrysmErr != nil, fmt.Sprintf("gzond and qrysm unmarshaller return inconsistent errors. %v and %v", gzondErr, qrysmErr))
 		// Nothing to marshal if we have an error.
 		if gzondErr != nil {
 			return
 		}
 		gzondBlob, gzondErr := json.Marshal(gzondResp)
-		prysmBlob, prysmErr := json.Marshal(prysmResp)
-		assert.Equal(t, gzondErr != nil, prysmErr != nil, "gzond and prysm unmarshaller return inconsistent errors")
+		qrysmBlob, qrysmErr := json.Marshal(qrysmResp)
+		assert.Equal(t, gzondErr != nil, qrysmErr != nil, "gzond and qrysm unmarshaller return inconsistent errors")
 		newGzondResp := &engine.ForkChoiceResponse{}
-		newGzondErr := json.Unmarshal(prysmBlob, newGzondResp)
+		newGzondErr := json.Unmarshal(qrysmBlob, newGzondResp)
 		assert.NoError(t, newGzondErr)
 		if newGzondResp.PayloadStatus.Status == "UNKNOWN" {
 			return
@@ -98,19 +98,19 @@ func FuzzExecutionPayload(f *testing.F) {
 	f.Add(output)
 	f.Fuzz(func(t *testing.T, jsonBlob []byte) {
 		gzondResp := &engine.ExecutionPayloadEnvelope{}
-		prysmResp := &pb.ExecutionPayloadCapellaWithValue{}
+		qrysmResp := &pb.ExecutionPayloadCapellaWithValue{}
 		gzondErr := json.Unmarshal(jsonBlob, gzondResp)
-		prysmErr := json.Unmarshal(jsonBlob, prysmResp)
-		assert.Equal(t, gzondErr != nil, prysmErr != nil, fmt.Sprintf("gzond and prysm unmarshaller return inconsistent errors. %v and %v", gzondErr, prysmErr))
+		qrysmErr := json.Unmarshal(jsonBlob, qrysmResp)
+		assert.Equal(t, gzondErr != nil, qrysmErr != nil, fmt.Sprintf("gzond and qrysm unmarshaller return inconsistent errors. %v and %v", gzondErr, qrysmErr))
 		// Nothing to marshal if we have an error.
 		if gzondErr != nil {
 			return
 		}
 		gzondBlob, gzondErr := json.Marshal(gzondResp)
-		prysmBlob, prysmErr := json.Marshal(prysmResp)
-		assert.Equal(t, gzondErr != nil, prysmErr != nil, "gzond and prysm unmarshaller return inconsistent errors")
+		qrysmBlob, qrysmErr := json.Marshal(qrysmResp)
+		assert.Equal(t, gzondErr != nil, qrysmErr != nil, "gzond and qrysm unmarshaller return inconsistent errors")
 		newGzondResp := &engine.ExecutionPayloadEnvelope{}
-		newGzondErr := json.Unmarshal(prysmBlob, newGzondResp)
+		newGzondErr := json.Unmarshal(qrysmBlob, newGzondResp)
 		assert.NoError(t, newGzondErr)
 		newGzondResp2 := &engine.ExecutionPayloadEnvelope{}
 		newGzondErr = json.Unmarshal(gzondBlob, newGzondResp2)
@@ -123,7 +123,7 @@ func FuzzExecutionPayload(f *testing.F) {
 func FuzzExecutionBlock(f *testing.F) {
 	f.Skip("Is skipped until false positive rate can be resolved.")
 	logsBloom := [256]byte{'j', 'u', 'n', 'k'}
-	addr, err := common.NewAddressFromString("Z095e7baea6a6c7c4c2dfeb977efac326af552d87")
+	addr, err := common.NewAddressFromString("Q095e7baea6a6c7c4c2dfeb977efac326af552d87")
 	assert.NoError(f, err)
 	innerData := &types.DynamicFeeTx{
 		ChainID:   big.NewInt(math.MaxInt),
@@ -159,30 +159,30 @@ func FuzzExecutionBlock(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, jsonBlob []byte) {
 		gzondResp := make(map[string]interface{})
-		prysmResp := &pb.ExecutionBlock{}
+		qrysmResp := &pb.ExecutionBlock{}
 		gzondErr := json.Unmarshal(jsonBlob, &gzondResp)
-		prysmErr := json.Unmarshal(jsonBlob, prysmResp)
+		qrysmErr := json.Unmarshal(jsonBlob, qrysmResp)
 		// Nothing to marshal if we have an error.
-		if gzondErr != nil || prysmErr != nil {
+		if gzondErr != nil || qrysmErr != nil {
 			return
 		}
 		// Exit early if fuzzer is inserting bogus hashes in.
-		if isBogusTransactionHash(prysmResp, gzondResp) {
+		if isBogusTransactionHash(qrysmResp, gzondResp) {
 			return
 		}
 		// Exit early if fuzzer provides bogus fields.
-		valid, err := jsonFieldsAreValid(prysmResp, gzondResp)
+		valid, err := jsonFieldsAreValid(qrysmResp, gzondResp)
 		assert.NoError(t, err)
 		if !valid {
 			return
 		}
-		assert.NoError(t, validateBlockConsistency(prysmResp, gzondResp))
+		assert.NoError(t, validateBlockConsistency(qrysmResp, gzondResp))
 
 		gzondBlob, gzondErr := json.Marshal(gzondResp)
-		prysmBlob, prysmErr := json.Marshal(prysmResp)
-		assert.Equal(t, gzondErr != nil, prysmErr != nil, "gzond and prysm unmarshaller return inconsistent errors")
+		qrysmBlob, qrysmErr := json.Marshal(qrysmResp)
+		assert.Equal(t, gzondErr != nil, qrysmErr != nil, "gzond and qrysm unmarshaller return inconsistent errors")
 		newGzondResp := make(map[string]interface{})
-		newGzondErr := json.Unmarshal(prysmBlob, &newGzondResp)
+		newGzondErr := json.Unmarshal(qrysmBlob, &newGzondResp)
 		assert.NoError(t, newGzondErr)
 		newGzondResp2 := make(map[string]interface{})
 		newGzondErr = json.Unmarshal(gzondBlob, &newGzondResp2)
@@ -216,20 +216,20 @@ func isBogusTransactionHash(blk *pb.ExecutionBlock, jsonMap map[string]interface
 
 func compareHeaders(t *testing.T, jsonBlob []byte) {
 	gzondResp := &types.Header{}
-	prysmResp := &pb.ExecutionBlock{}
+	qrysmResp := &pb.ExecutionBlock{}
 	gzondErr := json.Unmarshal(jsonBlob, gzondResp)
-	prysmErr := json.Unmarshal(jsonBlob, prysmResp)
-	assert.Equal(t, gzondErr != nil, prysmErr != nil, fmt.Sprintf("gzond and prysm unmarshaller return inconsistent errors. %v and %v", gzondErr, prysmErr))
+	qrysmErr := json.Unmarshal(jsonBlob, qrysmResp)
+	assert.Equal(t, gzondErr != nil, qrysmErr != nil, fmt.Sprintf("gzond and qrysm unmarshaller return inconsistent errors. %v and %v", gzondErr, qrysmErr))
 	// Nothing to marshal if we have an error.
 	if gzondErr != nil {
 		return
 	}
 
 	gzondBlob, gzondErr := json.Marshal(gzondResp)
-	prysmBlob, prysmErr := json.Marshal(prysmResp.Header)
-	assert.Equal(t, gzondErr != nil, prysmErr != nil, "gzond and prysm unmarshaller return inconsistent errors")
+	qrysmBlob, qrysmErr := json.Marshal(qrysmResp.Header)
+	assert.Equal(t, gzondErr != nil, qrysmErr != nil, "gzond and qrysm unmarshaller return inconsistent errors")
 	newGzondResp := &types.Header{}
-	newGzondErr := json.Unmarshal(prysmBlob, newGzondResp)
+	newGzondErr := json.Unmarshal(qrysmBlob, newGzondResp)
 	assert.NoError(t, newGzondErr)
 	newGzondResp2 := &types.Header{}
 	newGzondErr = json.Unmarshal(gzondBlob, newGzondResp2)

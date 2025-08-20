@@ -9,7 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond"
+	qrl "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/common"
 	gzondtypes "github.com/theQRL/go-zond/core/types"
@@ -22,7 +22,7 @@ import (
 	contracts "github.com/theQRL/qrysm/contracts/deposit"
 	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
@@ -30,9 +30,9 @@ var (
 	depositEventSignature = hash.HashKeccak256([]byte("DepositEvent(bytes,bytes,bytes,bytes,bytes)"))
 )
 
-const eth1DataSavingInterval = 1000
+const executionDataSavingInterval = 1000
 const maxTolerableDifference = 50
-const defaultEth1HeaderReqLimit = uint64(1000)
+const defaultExecutionHeaderReqLimit = uint64(1000)
 const depositLogRequestLimit = 10000
 const additiveFactorMultiplier = 0.10
 const multiplicativeDecreaseDivisor = 2
@@ -54,9 +54,9 @@ func (s *Service) GenesisExecutionChainInfo() (uint64, *big.Int) {
 	return s.chainStartData.GenesisTime, big.NewInt(int64(s.chainStartData.GenesisBlock))
 }
 
-// ProcessETH1Block processes logs from the provided eth1 block.
-func (s *Service) ProcessETH1Block(ctx context.Context, blkNum *big.Int) error {
-	query := zond.FilterQuery{
+// ProcessExecutionBlock processes logs from the provided execution block.
+func (s *Service) ProcessExecutionBlock(ctx context.Context, blkNum *big.Int) error {
+	query := qrl.FilterQuery{
 		Addresses: []common.Address{
 			s.cfg.depositContractAddr,
 		},
@@ -81,7 +81,7 @@ func (s *Service) ProcessETH1Block(ctx context.Context, blkNum *big.Int) error {
 }
 
 // ProcessLog is the main method which handles the processing of all
-// logs from the deposit contract on the eth1 chain.
+// logs from the deposit contract on the execution chain.
 func (s *Service) ProcessLog(ctx context.Context, depositLog *gzondtypes.Log) error {
 	s.processingLock.RLock()
 	defer s.processingLock.RUnlock()
@@ -90,8 +90,8 @@ func (s *Service) ProcessLog(ctx context.Context, depositLog *gzondtypes.Log) er
 		if err := s.ProcessDepositLog(ctx, depositLog); err != nil {
 			return errors.Wrap(err, "Could not process deposit log")
 		}
-		if s.lastReceivedMerkleIndex%eth1DataSavingInterval == 0 {
-			return s.savePowchainData(ctx)
+		if s.lastReceivedMerkleIndex%executionDataSavingInterval == 0 {
+			return s.saveExecutionChainData(ctx)
 		}
 		return nil
 	}
@@ -100,7 +100,7 @@ func (s *Service) ProcessLog(ctx context.Context, depositLog *gzondtypes.Log) er
 }
 
 // ProcessDepositLog processes the log which had been received from
-// the eth1 chain by trying to ascertain which participant deposited
+// the execution chain by trying to ascertain which participant deposited
 // in the contract.
 func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gzondtypes.Log) error {
 	pubkey, withdrawalCredentials, amount, signature, merkleTreeIndex, err := contracts.UnpackDepositLogData(depositLog.Data)
@@ -109,7 +109,7 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gzondtypes.
 	}
 	// If we have already seen this Merkle index, skip processing the log.
 	// This can happen sometimes when we receive the same log twice from the
-	// ETH1.0 network, and prevents us from updating our trie
+	// execution network, and prevents us from updating our trie
 	// with the same log twice, causing an inconsistent state root.
 	index := int64(binary.LittleEndian.Uint64(merkleTreeIndex)) // lint:ignore uintcast -- MerkleTreeIndex should not exceed int64 in your lifetime.
 	if index <= s.lastReceivedMerkleIndex {
@@ -124,7 +124,7 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gzondtypes.
 
 	// We then decode the deposit input in order to create a deposit object
 	// we can store in our persistent DB.
-	depositData := &zondpb.Deposit_Data{
+	depositData := &qrysmpb.Deposit_Data{
 		Amount:                bytesutil.FromBytes8(amount),
 		PublicKey:             pubkey,
 		Signature:             signature,
@@ -142,7 +142,7 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gzondtypes.
 	if err = s.depositTrie.Insert(depositHash[:], int(index)); err != nil {
 		return err
 	}
-	deposit := &zondpb.Deposit{
+	deposit := &qrysmpb.Deposit{
 		Data: depositData,
 	}
 
@@ -162,7 +162,7 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gzondtypes.
 	s.cfg.depositCache.InsertPendingDeposit(ctx, deposit, depositLog.BlockNumber, index, root)
 
 	log.WithFields(logrus.Fields{
-		"eth1Block":       depositLog.BlockNumber,
+		"executionBlock":  depositLog.BlockNumber,
 		"publicKey":       fmt.Sprintf("%#x", depositData.PublicKey),
 		"merkleTreeIndex": index,
 	}).Debug("Deposit registered from deposit contract")
@@ -187,7 +187,7 @@ func (s *Service) ProcessDepositLog(ctx context.Context, depositLog *gzondtypes.
 // processPastLogs processes all the past logs from the deposit contract and
 // updates the deposit trie with the data from each individual log.
 func (s *Service) processPastLogs(ctx context.Context) error {
-	currentBlockNum := s.latestEth1Data.LastRequestedBlock
+	currentBlockNum := s.latestExecutionData.LastRequestedBlock
 	deploymentBlock := params.BeaconNetworkConfig().ContractDeploymentBlock
 	// Start from the deployment block if our last requested block
 	// is behind it. This is as the deposit logs can only start from the
@@ -208,7 +208,7 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 		return err
 	}
 
-	batchSize := s.cfg.eth1HeaderReqLimit
+	batchSize := s.cfg.executionHeaderReqLimit
 	additiveFactor := uint64(float64(batchSize) * additiveFactorMultiplier)
 
 	for currentBlockNum < latestFollowHeight {
@@ -218,9 +218,9 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 		}
 	}
 
-	s.latestEth1DataLock.Lock()
-	s.latestEth1Data.LastRequestedBlock = currentBlockNum
-	s.latestEth1DataLock.Unlock()
+	s.latestExecutionDataLock.Lock()
+	s.latestExecutionData.LastRequestedBlock = currentBlockNum
+	s.latestExecutionDataLock.Unlock()
 
 	c, err := s.cfg.beaconDB.FinalizedCheckpoint(ctx)
 	if err != nil {
@@ -247,8 +247,8 @@ func (s *Service) processPastLogs(ctx context.Context) error {
 			return err
 		}
 	}
-	if fState != nil && !fState.IsNil() && fState.Eth1DepositIndex() > 0 {
-		s.cfg.depositCache.PrunePendingDeposits(ctx, int64(fState.Eth1DepositIndex())) // lint:ignore uintcast -- deposit index should not exceed int64 in your lifetime.
+	if fState != nil && !fState.IsNil() && fState.ExecutionDepositIndex() > 0 {
+		s.cfg.depositCache.PrunePendingDeposits(ctx, int64(fState.ExecutionDepositIndex())) // lint:ignore uintcast -- deposit index should not exceed int64 in your lifetime.
 	}
 	return nil
 }
@@ -261,7 +261,7 @@ func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint6
 	if end > latestFollowHeight {
 		end = latestFollowHeight
 	}
-	query := zond.FilterQuery{
+	query := qrl.FilterQuery{
 		Addresses: []common.Address{
 			s.cfg.depositContractAddr,
 		},
@@ -291,16 +291,16 @@ func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint6
 		return 0, 0, err
 	}
 
-	s.latestEth1DataLock.RLock()
-	lastReqBlock := s.latestEth1Data.LastRequestedBlock
-	s.latestEth1DataLock.RUnlock()
+	s.latestExecutionDataLock.RLock()
+	lastReqBlock := s.latestExecutionData.LastRequestedBlock
+	s.latestExecutionDataLock.RUnlock()
 
 	for i, filterLog := range logs {
 		if filterLog.BlockNumber > currentBlockNum {
 			// set new block number after checking for chainstart for previous block.
-			s.latestEth1DataLock.Lock()
-			s.latestEth1Data.LastRequestedBlock = currentBlockNum
-			s.latestEth1DataLock.Unlock()
+			s.latestExecutionDataLock.Lock()
+			s.latestExecutionData.LastRequestedBlock = currentBlockNum
+			s.latestExecutionDataLock.Unlock()
 			currentBlockNum = filterLog.BlockNumber
 		}
 		if err := s.ProcessLog(ctx, &logs[i]); err != nil {
@@ -308,20 +308,20 @@ func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint6
 			// we reset the last requested block to the previous valid block range. This
 			// prevents the beacon from advancing processing of logs to another range
 			// in the event of an execution client failure.
-			s.latestEth1DataLock.Lock()
-			s.latestEth1Data.LastRequestedBlock = lastReqBlock
-			s.latestEth1DataLock.Unlock()
+			s.latestExecutionDataLock.Lock()
+			s.latestExecutionData.LastRequestedBlock = lastReqBlock
+			s.latestExecutionDataLock.Unlock()
 			return 0, 0, err
 		}
 	}
 
 	currentBlockNum = end
 
-	if batchSize < s.cfg.eth1HeaderReqLimit {
+	if batchSize < s.cfg.executionHeaderReqLimit {
 		// update the batchSize with additive increase
 		batchSize += additiveFactor
-		if batchSize > s.cfg.eth1HeaderReqLimit {
-			batchSize = s.cfg.eth1HeaderReqLimit
+		if batchSize > s.cfg.executionHeaderReqLimit {
+			batchSize = s.cfg.executionHeaderReqLimit
 		}
 	}
 	return currentBlockNum, batchSize, nil
@@ -331,46 +331,46 @@ func (s *Service) processBlockInBatch(ctx context.Context, currentBlockNum uint6
 // logs from the period last polled to now.
 func (s *Service) requestBatchedHeadersAndLogs(ctx context.Context) error {
 	// We request for the nth block behind the current head, in order to have
-	// stabilized logs when we retrieve it from the eth1 chain.
+	// stabilized logs when we retrieve it from the execution chain.
 
 	requestedBlock, err := s.followedBlockHeight(ctx)
 	if err != nil {
 		return err
 	}
-	if requestedBlock > s.latestEth1Data.LastRequestedBlock &&
-		requestedBlock-s.latestEth1Data.LastRequestedBlock > maxTolerableDifference {
-		log.Infof("Falling back to historical headers and logs sync. Current difference is %d", requestedBlock-s.latestEth1Data.LastRequestedBlock)
+	if requestedBlock > s.latestExecutionData.LastRequestedBlock &&
+		requestedBlock-s.latestExecutionData.LastRequestedBlock > maxTolerableDifference {
+		log.Infof("Falling back to historical headers and logs sync. Current difference is %d", requestedBlock-s.latestExecutionData.LastRequestedBlock)
 		return s.processPastLogs(ctx)
 	}
-	for i := s.latestEth1Data.LastRequestedBlock + 1; i <= requestedBlock; i++ {
-		// Cache eth1 block header here.
+	for i := s.latestExecutionData.LastRequestedBlock + 1; i <= requestedBlock; i++ {
+		// Cache execution block header here.
 		_, err := s.BlockHashByHeight(ctx, big.NewInt(0).SetUint64(i))
 		if err != nil {
 			return err
 		}
-		err = s.ProcessETH1Block(ctx, big.NewInt(0).SetUint64(i))
+		err = s.ProcessExecutionBlock(ctx, big.NewInt(0).SetUint64(i))
 		if err != nil {
 			return err
 		}
-		s.latestEth1DataLock.Lock()
-		s.latestEth1Data.LastRequestedBlock = i
-		s.latestEth1DataLock.Unlock()
+		s.latestExecutionDataLock.Lock()
+		s.latestExecutionData.LastRequestedBlock = i
+		s.latestExecutionDataLock.Unlock()
 	}
 
 	return nil
 }
 
-// savePowchainData saves all powchain related metadata to disk.
-func (s *Service) savePowchainData(ctx context.Context) error {
+// saveExecutionChainData saves all execution chain related metadata to disk.
+func (s *Service) saveExecutionChainData(ctx context.Context) error {
 	pbState, err := statenative.ProtobufBeaconStateCapella(s.preGenesisState.ToProtoUnsafe())
 	if err != nil {
 		return err
 	}
-	eth1Data := &zondpb.ETH1ChainData{
-		CurrentEth1Data:   s.latestEth1Data,
-		ChainstartData:    s.chainStartData,
-		BeaconState:       pbState, // I promise not to mutate it!
-		DepositContainers: s.cfg.depositCache.AllDepositContainers(ctx),
+	executionData := &qrysmpb.ExecutionChainData{
+		CurrentExecutionData: s.latestExecutionData,
+		ChainstartData:       s.chainStartData,
+		BeaconState:          pbState, // I promise not to mutate it!
+		DepositContainers:    s.cfg.depositCache.AllDepositContainers(ctx),
 	}
 	if features.Get().EnableEIP4881 {
 		fd, err := s.cfg.depositCache.FinalizedDeposits(ctx)
@@ -381,7 +381,7 @@ func (s *Service) savePowchainData(ctx context.Context) error {
 		if !ok {
 			return errors.New("deposit tree was not EIP4881 DepositTree")
 		}
-		eth1Data.DepositSnapshot, err = tree.ToProto()
+		executionData.DepositSnapshot, err = tree.ToProto()
 		if err != nil {
 			return err
 		}
@@ -390,7 +390,7 @@ func (s *Service) savePowchainData(ctx context.Context) error {
 		if !ok {
 			return errors.New("deposit tree was not SparseMerkleTrie")
 		}
-		eth1Data.Trie = tree.ToProto()
+		executionData.Trie = tree.ToProto()
 	}
-	return s.cfg.beaconDB.SaveExecutionChainData(ctx, eth1Data)
+	return s.cfg.beaconDB.SaveExecutionChainData(ctx, executionData)
 }

@@ -7,14 +7,14 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	statenative "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	testtmpl "github.com/theQRL/qrysm/beacon-chain/state/testing"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
 
 func TestBeaconState_ValidatorAtIndexReadOnly_HandlesNilSlice_Capella(t *testing.T) {
 	testtmpl.VerifyBeaconStateValidatorAtIndexReadOnlyHandlesNilSlice(t, func() (state.BeaconState, error) {
-		return statenative.InitializeFromProtoUnsafeCapella(&zondpb.BeaconStateCapella{
+		return statenative.InitializeFromProtoUnsafeCapella(&qrysmpb.BeaconStateCapella{
 			Validators: nil,
 		})
 	})

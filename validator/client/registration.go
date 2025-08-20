@@ -10,7 +10,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/validator/client/iface"
 	"go.opencensus.io/trace"
@@ -20,7 +20,7 @@ import (
 func SubmitValidatorRegistrations(
 	ctx context.Context,
 	validatorClient iface.ValidatorClient,
-	signedRegs []*zondpb.SignedValidatorRegistrationV1,
+	signedRegs []*qrysmpb.SignedValidatorRegistrationV1,
 ) error {
 	ctx, span := trace.StartSpan(ctx, "validator.SubmitValidatorRegistrations")
 	defer span.End()
@@ -29,7 +29,7 @@ func SubmitValidatorRegistrations(
 		return nil
 	}
 
-	if _, err := validatorClient.SubmitValidatorRegistrations(ctx, &zondpb.SignedValidatorRegistrationsV1{
+	if _, err := validatorClient.SubmitValidatorRegistrations(ctx, &qrysmpb.SignedValidatorRegistrationsV1{
 		Messages: signedRegs,
 	}); err != nil {
 		if strings.Contains(err.Error(), builder.ErrNoBuilder.Error()) {
@@ -43,7 +43,7 @@ func SubmitValidatorRegistrations(
 }
 
 // Sings validator registration obj with the proposer domain and private key.
-func signValidatorRegistration(ctx context.Context, signer iface.SigningFunc, reg *zondpb.ValidatorRegistrationV1) ([]byte, error) {
+func signValidatorRegistration(ctx context.Context, signer iface.SigningFunc, reg *qrysmpb.ValidatorRegistrationV1) ([]byte, error) {
 	// Per spec, we want the fork version and genesis validator to be nil.
 	// Which is genesis value and zero by default.
 	d, err := signing.ComputeDomain(
@@ -72,7 +72,7 @@ func signValidatorRegistration(ctx context.Context, signer iface.SigningFunc, re
 }
 
 // SignValidatorRegistrationRequest compares and returns either the cached validator registration request or signs a new one.
-func (v *validator) SignValidatorRegistrationRequest(ctx context.Context, signer iface.SigningFunc, newValidatorRegistration *zondpb.ValidatorRegistrationV1) (*zondpb.SignedValidatorRegistrationV1, error) {
+func (v *validator) SignValidatorRegistrationRequest(ctx context.Context, signer iface.SigningFunc, newValidatorRegistration *qrysmpb.ValidatorRegistrationV1) (*qrysmpb.SignedValidatorRegistrationV1, error) {
 	signedReg, ok := v.signedValidatorRegistrations[bytesutil.ToBytes2592(newValidatorRegistration.Pubkey)]
 	if ok && isValidatorRegistrationSame(signedReg.Message, newValidatorRegistration) {
 		return signedReg, nil
@@ -81,7 +81,7 @@ func (v *validator) SignValidatorRegistrationRequest(ctx context.Context, signer
 		if err != nil {
 			return nil, err
 		}
-		newRequest := &zondpb.SignedValidatorRegistrationV1{
+		newRequest := &qrysmpb.SignedValidatorRegistrationV1{
 			Message:   newValidatorRegistration,
 			Signature: sig,
 		}
@@ -90,7 +90,7 @@ func (v *validator) SignValidatorRegistrationRequest(ctx context.Context, signer
 	}
 }
 
-func isValidatorRegistrationSame(cachedVR *zondpb.ValidatorRegistrationV1, newVR *zondpb.ValidatorRegistrationV1) bool {
+func isValidatorRegistrationSame(cachedVR *qrysmpb.ValidatorRegistrationV1, newVR *qrysmpb.ValidatorRegistrationV1) bool {
 	isSame := true
 	if cachedVR.GasLimit != newVR.GasLimit {
 		isSame = false

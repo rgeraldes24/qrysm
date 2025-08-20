@@ -57,8 +57,8 @@ common_deps = [
     "//crypto/dilithium:go_default_library",
     "//encoding/bytesutil:go_default_library",
     "//io/file:go_default_library",
-    "//proto/zond/service:go_default_library",
-    "//proto/zond/v1:go_default_library",
+    "//proto/qrl/service:go_default_library",
+    "//proto/qrl/v1:go_default_library",
     "//math:go_default_library",
     "//proto/engine/v1:go_default_library",
     "//proto/qrysm/v1alpha1:go_default_library",
@@ -105,7 +105,7 @@ go_test(
         "@com_github_theqrl_go_zond//cmd/gzond",
         #"@web3signer",
     ],
-    zond_network = "minimal",
+    qrl_network = "minimal",
     flaky = True,
     shard_count = 2,
     tags = [
@@ -138,7 +138,7 @@ go_test(
         "@com_github_theqrl_go_zond//cmd/gzond",
         "@web3signer",
     ],
-    zond_network = "minimal",
+    qrl_network = "minimal",
     flaky = True,
     shard_count = 2,
     tags = [
@@ -170,7 +170,7 @@ go_test(
         "@com_github_theqrl_go_zond//cmd/gzond",
         "@web3signer",
     ],
-    zond_network = "mainnet",
+    qrl_network = "mainnet",
     flaky = True,
     shard_count = 2,
     tags = [
@@ -203,7 +203,7 @@ go_test(
         "@com_github_theqrl_go_zond//cmd/gzond",
         "@web3signer",
     ],
-    zond_network = "mainnet",
+    qrl_network = "mainnet",
     flaky = True,
     shard_count = 2,
     tags = [
@@ -236,7 +236,7 @@ go_test(
         "@com_github_theqrl_go_zond//cmd/gzond",
         "@web3signer",
     ],
-    zond_network = "minimal",
+    qrl_network = "minimal",
     flaky = True,
     shard_count = 2,
     tags = [

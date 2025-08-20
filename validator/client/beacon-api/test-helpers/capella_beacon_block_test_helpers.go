@@ -4,27 +4,27 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
-func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
-	return &zondpb.BeaconBlockCapella{
+func GenerateProtoCapellaBeaconBlock() *qrysmpb.BeaconBlockCapella {
+	return &qrysmpb.BeaconBlockCapella{
 		Slot:          1,
 		ProposerIndex: 2,
 		ParentRoot:    FillByteSlice(32, 3),
 		StateRoot:     FillByteSlice(32, 4),
-		Body: &zondpb.BeaconBlockBodyCapella{
+		Body: &qrysmpb.BeaconBlockBodyCapella{
 			RandaoReveal: FillByteSlice(4595, 5),
-			Eth1Data: &zondpb.Eth1Data{
+			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot:  FillByteSlice(32, 6),
 				DepositCount: 7,
 				BlockHash:    FillByteSlice(32, 8),
 			},
 			Graffiti: FillByteSlice(32, 9),
-			ProposerSlashings: []*zondpb.ProposerSlashing{
+			ProposerSlashings: []*qrysmpb.ProposerSlashing{
 				{
-					Header_1: &zondpb.SignedBeaconBlockHeader{
-						Header: &zondpb.BeaconBlockHeader{
+					Header_1: &qrysmpb.SignedBeaconBlockHeader{
+						Header: &qrysmpb.BeaconBlockHeader{
 							Slot:          10,
 							ProposerIndex: 11,
 							ParentRoot:    FillByteSlice(32, 12),
@@ -33,8 +33,8 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 						},
 						Signature: FillByteSlice(4595, 15),
 					},
-					Header_2: &zondpb.SignedBeaconBlockHeader{
-						Header: &zondpb.BeaconBlockHeader{
+					Header_2: &qrysmpb.SignedBeaconBlockHeader{
+						Header: &qrysmpb.BeaconBlockHeader{
 							Slot:          16,
 							ProposerIndex: 17,
 							ParentRoot:    FillByteSlice(32, 18),
@@ -45,8 +45,8 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 					},
 				},
 				{
-					Header_1: &zondpb.SignedBeaconBlockHeader{
-						Header: &zondpb.BeaconBlockHeader{
+					Header_1: &qrysmpb.SignedBeaconBlockHeader{
+						Header: &qrysmpb.BeaconBlockHeader{
 							Slot:          22,
 							ProposerIndex: 23,
 							ParentRoot:    FillByteSlice(32, 24),
@@ -55,8 +55,8 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 						},
 						Signature: FillByteSlice(4595, 27),
 					},
-					Header_2: &zondpb.SignedBeaconBlockHeader{
-						Header: &zondpb.BeaconBlockHeader{
+					Header_2: &qrysmpb.SignedBeaconBlockHeader{
+						Header: &qrysmpb.BeaconBlockHeader{
 							Slot:          28,
 							ProposerIndex: 29,
 							ParentRoot:    FillByteSlice(32, 30),
@@ -67,36 +67,36 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 					},
 				},
 			},
-			AttesterSlashings: []*zondpb.AttesterSlashing{
+			AttesterSlashings: []*qrysmpb.AttesterSlashing{
 				{
-					Attestation_1: &zondpb.IndexedAttestation{
+					Attestation_1: &qrysmpb.IndexedAttestation{
 						AttestingIndices: []uint64{34, 35},
-						Data: &zondpb.AttestationData{
+						Data: &qrysmpb.AttestationData{
 							Slot:            36,
 							CommitteeIndex:  37,
 							BeaconBlockRoot: FillByteSlice(32, 38),
-							Source: &zondpb.Checkpoint{
+							Source: &qrysmpb.Checkpoint{
 								Epoch: 39,
 								Root:  FillByteSlice(32, 40),
 							},
-							Target: &zondpb.Checkpoint{
+							Target: &qrysmpb.Checkpoint{
 								Epoch: 41,
 								Root:  FillByteSlice(32, 42),
 							},
 						},
 						Signatures: [][]byte{FillByteSlice(4595, 43)},
 					},
-					Attestation_2: &zondpb.IndexedAttestation{
+					Attestation_2: &qrysmpb.IndexedAttestation{
 						AttestingIndices: []uint64{44, 45},
-						Data: &zondpb.AttestationData{
+						Data: &qrysmpb.AttestationData{
 							Slot:            46,
 							CommitteeIndex:  47,
 							BeaconBlockRoot: FillByteSlice(32, 38),
-							Source: &zondpb.Checkpoint{
+							Source: &qrysmpb.Checkpoint{
 								Epoch: 49,
 								Root:  FillByteSlice(32, 50),
 							},
-							Target: &zondpb.Checkpoint{
+							Target: &qrysmpb.Checkpoint{
 								Epoch: 51,
 								Root:  FillByteSlice(32, 52),
 							},
@@ -105,34 +105,34 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 					},
 				},
 				{
-					Attestation_1: &zondpb.IndexedAttestation{
+					Attestation_1: &qrysmpb.IndexedAttestation{
 						AttestingIndices: []uint64{54, 55},
-						Data: &zondpb.AttestationData{
+						Data: &qrysmpb.AttestationData{
 							Slot:            56,
 							CommitteeIndex:  57,
 							BeaconBlockRoot: FillByteSlice(32, 38),
-							Source: &zondpb.Checkpoint{
+							Source: &qrysmpb.Checkpoint{
 								Epoch: 59,
 								Root:  FillByteSlice(32, 60),
 							},
-							Target: &zondpb.Checkpoint{
+							Target: &qrysmpb.Checkpoint{
 								Epoch: 61,
 								Root:  FillByteSlice(32, 62),
 							},
 						},
 						Signatures: [][]byte{FillByteSlice(4595, 63)},
 					},
-					Attestation_2: &zondpb.IndexedAttestation{
+					Attestation_2: &qrysmpb.IndexedAttestation{
 						AttestingIndices: []uint64{64, 65},
-						Data: &zondpb.AttestationData{
+						Data: &qrysmpb.AttestationData{
 							Slot:            66,
 							CommitteeIndex:  67,
 							BeaconBlockRoot: FillByteSlice(32, 38),
-							Source: &zondpb.Checkpoint{
+							Source: &qrysmpb.Checkpoint{
 								Epoch: 69,
 								Root:  FillByteSlice(32, 70),
 							},
-							Target: &zondpb.Checkpoint{
+							Target: &qrysmpb.Checkpoint{
 								Epoch: 71,
 								Root:  FillByteSlice(32, 72),
 							},
@@ -141,18 +141,18 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 					},
 				},
 			},
-			Attestations: []*zondpb.Attestation{
+			Attestations: []*qrysmpb.Attestation{
 				{
 					AggregationBits: FillByteSlice(4, 74),
-					Data: &zondpb.AttestationData{
+					Data: &qrysmpb.AttestationData{
 						Slot:            75,
 						CommitteeIndex:  76,
 						BeaconBlockRoot: FillByteSlice(32, 38),
-						Source: &zondpb.Checkpoint{
+						Source: &qrysmpb.Checkpoint{
 							Epoch: 78,
 							Root:  FillByteSlice(32, 79),
 						},
-						Target: &zondpb.Checkpoint{
+						Target: &qrysmpb.Checkpoint{
 							Epoch: 80,
 							Root:  FillByteSlice(32, 81),
 						},
@@ -161,15 +161,15 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 				},
 				{
 					AggregationBits: FillByteSlice(4, 83),
-					Data: &zondpb.AttestationData{
+					Data: &qrysmpb.AttestationData{
 						Slot:            84,
 						CommitteeIndex:  85,
 						BeaconBlockRoot: FillByteSlice(32, 38),
-						Source: &zondpb.Checkpoint{
+						Source: &qrysmpb.Checkpoint{
 							Epoch: 87,
 							Root:  FillByteSlice(32, 88),
 						},
-						Target: &zondpb.Checkpoint{
+						Target: &qrysmpb.Checkpoint{
 							Epoch: 89,
 							Root:  FillByteSlice(32, 90),
 						},
@@ -177,10 +177,10 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 					Signatures: [][]byte{FillByteSlice(4595, 91)},
 				},
 			},
-			Deposits: []*zondpb.Deposit{
+			Deposits: []*qrysmpb.Deposit{
 				{
 					Proof: FillByteArraySlice(33, FillByteSlice(32, 92)),
-					Data: &zondpb.Deposit_Data{
+					Data: &qrysmpb.Deposit_Data{
 						PublicKey:             FillByteSlice(2592, 94),
 						WithdrawalCredentials: FillByteSlice(32, 95),
 						Amount:                96,
@@ -189,7 +189,7 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 				},
 				{
 					Proof: FillByteArraySlice(33, FillByteSlice(32, 98)),
-					Data: &zondpb.Deposit_Data{
+					Data: &qrysmpb.Deposit_Data{
 						PublicKey:             FillByteSlice(2592, 100),
 						WithdrawalCredentials: FillByteSlice(32, 101),
 						Amount:                102,
@@ -197,23 +197,23 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 					},
 				},
 			},
-			VoluntaryExits: []*zondpb.SignedVoluntaryExit{
+			VoluntaryExits: []*qrysmpb.SignedVoluntaryExit{
 				{
-					Exit: &zondpb.VoluntaryExit{
+					Exit: &qrysmpb.VoluntaryExit{
 						Epoch:          104,
 						ValidatorIndex: 105,
 					},
 					Signature: FillByteSlice(4595, 106),
 				},
 				{
-					Exit: &zondpb.VoluntaryExit{
+					Exit: &qrysmpb.VoluntaryExit{
 						Epoch:          107,
 						ValidatorIndex: 108,
 					},
 					Signature: FillByteSlice(4595, 109),
 				},
 			},
-			SyncAggregate: &zondpb.SyncAggregate{
+			SyncAggregate: &qrysmpb.SyncAggregate{
 				SyncCommitteeBits:       FillByteSlice(2, 110),
 				SyncCommitteeSignatures: [][]byte{FillByteSlice(4595, 111)},
 			},
@@ -250,9 +250,9 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 					},
 				},
 			},
-			DilithiumToExecutionChanges: []*zondpb.SignedDilithiumToExecutionChange{
+			DilithiumToExecutionChanges: []*qrysmpb.SignedDilithiumToExecutionChange{
 				{
-					Message: &zondpb.DilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      135,
 						FromDilithiumPubkey: FillByteSlice(2592, 136),
 						ToExecutionAddress:  FillByteSlice(20, 137),
@@ -260,7 +260,7 @@ func GenerateProtoCapellaBeaconBlock() *zondpb.BeaconBlockCapella {
 					Signature: FillByteSlice(4595, 138),
 				},
 				{
-					Message: &zondpb.DilithiumToExecutionChange{
+					Message: &qrysmpb.DilithiumToExecutionChange{
 						ValidatorIndex:      139,
 						FromDilithiumPubkey: FillByteSlice(2592, 140),
 						ToExecutionAddress:  FillByteSlice(20, 141),
@@ -280,7 +280,7 @@ func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockCapellaJson {
 		StateRoot:     FillEncodedByteSlice(32, 4),
 		Body: &apimiddleware.BeaconBlockBodyCapellaJson{
 			RandaoReveal: FillEncodedByteSlice(4595, 5),
-			Eth1Data: &apimiddleware.Eth1DataJson{
+			ExecutionData: &apimiddleware.ExecutionDataJson{
 				DepositRoot:  FillEncodedByteSlice(32, 6),
 				DepositCount: "7",
 				BlockHash:    FillEncodedByteSlice(32, 8),

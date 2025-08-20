@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/monitoring/tracing"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	qrysmTime "github.com/theQRL/qrysm/time"
 	"github.com/theQRL/qrysm/time/slots"
@@ -64,7 +64,7 @@ func (v *validator) SubmitAggregateAndProof(ctx context.Context, slot primitives
 	// https://github.com/ethereum/consensus-specs/blob/v0.9.3/specs/validator/0_beacon-chain-validator.md#broadcast-aggregate
 	v.waitToSlotTwoThirds(ctx, slot)
 
-	res, err := v.validatorClient.SubmitAggregateSelectionProof(ctx, &zondpb.AggregateSelectionRequest{
+	res, err := v.validatorClient.SubmitAggregateSelectionProof(ctx, &qrysmpb.AggregateSelectionRequest{
 		Slot:           slot,
 		CommitteeIndex: duty.CommitteeIndex,
 		PublicKey:      pubKey[:],
@@ -89,8 +89,8 @@ func (v *validator) SubmitAggregateAndProof(ctx context.Context, slot primitives
 		log.WithError(err).Error("Could not sign aggregate and proof")
 		return
 	}
-	_, err = v.validatorClient.SubmitSignedAggregateSelectionProof(ctx, &zondpb.SignedAggregateSubmitRequest{
-		SignedAggregateAndProof: &zondpb.SignedAggregateAttestationAndProof{
+	_, err = v.validatorClient.SubmitSignedAggregateSelectionProof(ctx, &qrysmpb.SignedAggregateSubmitRequest{
+		SignedAggregateAndProof: &qrysmpb.SignedAggregateAttestationAndProof{
 			Message:   res.AggregateAndProof,
 			Signature: sig,
 		},
@@ -172,7 +172,7 @@ func (v *validator) waitToSlotTwoThirds(ctx context.Context, slot primitives.Slo
 
 // This returns the signature of validator signing over aggregate and
 // proof object.
-func (v *validator) aggregateAndProofSig(ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, agg *zondpb.AggregateAttestationAndProof, slot primitives.Slot) ([]byte, error) {
+func (v *validator) aggregateAndProofSig(ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, agg *qrysmpb.AggregateAttestationAndProof, slot primitives.Slot) ([]byte, error) {
 	d, err := v.domainData(ctx, slots.ToEpoch(agg.Aggregate.Data.Slot), params.BeaconConfig().DomainAggregateAndProof[:])
 	if err != nil {
 		return nil, err
@@ -196,7 +196,7 @@ func (v *validator) aggregateAndProofSig(ctx context.Context, pubKey [field_para
 	return sig.Marshal(), nil
 }
 
-func (v *validator) addIndicesToLog(duty *zondpb.DutiesResponse_Duty) error {
+func (v *validator) addIndicesToLog(duty *qrysmpb.DutiesResponse_Duty) error {
 	v.attLogsLock.Lock()
 	defer v.attLogsLock.Unlock()
 

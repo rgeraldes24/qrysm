@@ -12,7 +12,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/spectest/utils"
@@ -101,7 +101,7 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 						require.NoError(t, err)
 						slashingSSZ, err := snappy.Decode(nil /* dst */, slashingFile)
 						require.NoError(t, err)
-						slashing := &zondpb.AttesterSlashing{}
+						slashing := &qrysmpb.AttesterSlashing{}
 						require.NoError(t, slashing.UnmarshalSSZ(slashingSSZ), "Failed to unmarshal")
 						builder.AttesterSlashing(slashing)
 					}
@@ -110,7 +110,7 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 						require.NoError(t, err)
 						attSSZ, err := snappy.Decode(nil /* dst */, attFile)
 						require.NoError(t, err)
-						att := &zondpb.Attestation{}
+						att := &qrysmpb.Attestation{}
 						require.NoError(t, att.UnmarshalSSZ(attSSZ), "Failed to unmarshal")
 						builder.Attestation(t, att)
 					}
@@ -123,7 +123,7 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 							require.NoError(t, err)
 							p, err := snappy.Decode(nil, powBlockFile)
 							require.NoError(t, err)
-							pb := &zondpb.PowBlock{}
+							pb := &qrysmpb.PowBlock{}
 							require.NoError(t, pb.UnmarshalSSZ(p), "Failed to unmarshal")
 							builder.PoWBlock(pb)
 						}
@@ -136,7 +136,7 @@ func runTest(t *testing.T, config string, fork int, basePath string) {
 }
 
 func unmarshalCapellaState(t *testing.T, raw []byte) state.BeaconState {
-	base := &zondpb.BeaconStateCapella{}
+	base := &qrysmpb.BeaconStateCapella{}
 	require.NoError(t, base.UnmarshalSSZ(raw))
 	st, err := state_native.InitializeFromProtoCapella(base)
 	require.NoError(t, err)
@@ -144,15 +144,15 @@ func unmarshalCapellaState(t *testing.T, raw []byte) state.BeaconState {
 }
 
 func unmarshalCapellaBlock(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
-	base := &zondpb.BeaconBlockCapella{}
+	base := &qrysmpb.BeaconBlockCapella{}
 	require.NoError(t, base.UnmarshalSSZ(raw))
-	blk, err := blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockCapella{Block: base, Signature: make([]byte, field_params.DilithiumSignatureLength)})
+	blk, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: base, Signature: make([]byte, field_params.DilithiumSignatureLength)})
 	require.NoError(t, err)
 	return blk
 }
 
 func unmarshalSignedCapellaBlock(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
-	base := &zondpb.SignedBeaconBlockCapella{}
+	base := &qrysmpb.SignedBeaconBlockCapella{}
 	require.NoError(t, base.UnmarshalSSZ(raw))
 	blk, err := blocks.NewSignedBeaconBlock(base)
 	require.NoError(t, err)

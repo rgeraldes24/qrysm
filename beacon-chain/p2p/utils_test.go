@@ -6,7 +6,7 @@ import (
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-zond/crypto"
-	"github.com/theQRL/go-zond/p2p/enode"
+	"github.com/theQRL/go-zond/p2p/qnode"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -40,26 +40,26 @@ func TestVerifyConnectivity(t *testing.T) {
 	}
 }
 
-func TestSerializeENR(t *testing.T) {
+func TestSerializeQNR(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 	t.Run("Ok", func(t *testing.T) {
 		key, err := crypto.GenerateKey()
 		require.NoError(t, err)
-		db, err := enode.OpenDB("")
+		db, err := qnode.OpenDB("")
 		require.NoError(t, err)
-		lNode := enode.NewLocalNode(db, key)
+		lNode := qnode.NewLocalNode(db, key)
 		record := lNode.Node().Record()
-		s, err := SerializeENR(record)
+		s, err := SerializeQNR(record)
 		require.NoError(t, err)
 		assert.NotEqual(t, "", s)
-		s = "enr:" + s
-		newRec, err := enode.Parse(enode.ValidSchemes, s)
+		s = "qnr:" + s
+		newRec, err := qnode.Parse(qnode.ValidSchemes, s)
 		require.NoError(t, err)
 		assert.Equal(t, s, newRec.String())
 	})
 
 	t.Run("Nil record", func(t *testing.T) {
-		_, err := SerializeENR(nil)
+		_, err := SerializeQNR(nil)
 		require.NotNil(t, err)
 		assert.ErrorContains(t, "could not serialize nil record", err)
 	})

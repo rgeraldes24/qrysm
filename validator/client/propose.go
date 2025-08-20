@@ -19,7 +19,7 @@ import (
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"github.com/theQRL/qrysm/runtime/version"
 	qrysmTime "github.com/theQRL/qrysm/time"
@@ -33,7 +33,7 @@ const signingRootErr = "could not get signing root"
 const signExitErr = "could not sign voluntary exit proposal"
 
 // ProposeBlock proposes a new beacon block for a given slot. This method collects the
-// previous beacon block, any pending deposits, and ETH1 data from the beacon
+// previous beacon block, any pending deposits, and execution data from the beacon
 // chain node to construct the new block. The new block is then processed with
 // the state root computation, and finally signed by the validator before being
 // sent back to the beacon node for broadcasting.
@@ -73,7 +73,7 @@ func (v *validator) ProposeBlock(ctx context.Context, slot primitives.Slot, pubK
 	}
 
 	// Request block from beacon node
-	b, err := v.validatorClient.GetBeaconBlock(ctx, &zondpb.BlockRequest{
+	b, err := v.validatorClient.GetBeaconBlock(ctx, &qrysmpb.BlockRequest{
 		Slot:         slot,
 		RandaoReveal: randaoReveal,
 		Graffiti:     g,
@@ -231,15 +231,15 @@ func CreateSignedVoluntaryExit(
 	signer iface.SigningFunc,
 	pubKey []byte,
 	epoch primitives.Epoch,
-) (*zondpb.SignedVoluntaryExit, error) {
+) (*qrysmpb.SignedVoluntaryExit, error) {
 	ctx, span := trace.StartSpan(ctx, "validator.CreateSignedVoluntaryExit")
 	defer span.End()
 
-	indexResponse, err := validatorClient.ValidatorIndex(ctx, &zondpb.ValidatorIndexRequest{PublicKey: pubKey})
+	indexResponse, err := validatorClient.ValidatorIndex(ctx, &qrysmpb.ValidatorIndexRequest{PublicKey: pubKey})
 	if err != nil {
 		return nil, errors.Wrap(err, "gRPC call to get validator index failed")
 	}
-	exit := &zondpb.VoluntaryExit{Epoch: epoch, ValidatorIndex: indexResponse.Index}
+	exit := &qrysmpb.VoluntaryExit{Epoch: epoch, ValidatorIndex: indexResponse.Index}
 	slot, err := slots.EpochStart(epoch)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to retrieve slot")
@@ -249,7 +249,7 @@ func CreateSignedVoluntaryExit(
 		return nil, errors.Wrap(err, "failed to sign voluntary exit")
 	}
 
-	return &zondpb.SignedVoluntaryExit{Exit: exit, Signature: sig}, nil
+	return &qrysmpb.SignedVoluntaryExit{Exit: exit, Signature: sig}, nil
 }
 
 // Sign randao reveal with randao domain and private key.
@@ -319,10 +319,10 @@ func signVoluntaryExit(
 	validatorClient iface.ValidatorClient,
 	signer iface.SigningFunc,
 	pubKey []byte,
-	exit *zondpb.VoluntaryExit,
+	exit *qrysmpb.VoluntaryExit,
 	slot primitives.Slot,
 ) ([]byte, error) {
-	req := &zondpb.DomainRequest{
+	req := &qrysmpb.DomainRequest{
 		Epoch:  exit.Epoch,
 		Domain: params.BeaconConfig().DomainVoluntaryExit[:],
 	}
@@ -365,7 +365,7 @@ func (v *validator) getGraffiti(ctx context.Context, pubKey [field_params.Dilith
 	}
 
 	// When specified, individual validator specified graffiti takes the second priority.
-	idx, err := v.validatorClient.ValidatorIndex(ctx, &zondpb.ValidatorIndexRequest{PublicKey: pubKey[:]})
+	idx, err := v.validatorClient.ValidatorIndex(ctx, &qrysmpb.ValidatorIndexRequest{PublicKey: pubKey[:]})
 	if err != nil {
 		return []byte{}, err
 	}

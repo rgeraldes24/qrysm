@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
@@ -33,7 +33,7 @@ func TestUpdateLogAggregateStats(t *testing.T) {
 	v.startBalances[pubKeyBytes[2]] = uint64(33000000000)
 
 	// 7 attestations included
-	responses := []*zondpb.ValidatorPerformanceResponse{
+	responses := []*qrysmpb.ValidatorPerformanceResponse{
 		{
 			PublicKeys: [][]byte{
 				bytesutil.FromBytes2592(pubKeyBytes[0]),

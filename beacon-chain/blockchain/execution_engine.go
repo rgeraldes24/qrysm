@@ -48,7 +48,6 @@ func (s *Service) notifyForkchoiceUpdate(ctx context.Context, arg *notifyForkcho
 		log.Error("Head block is nil")
 		return nil, nil
 	}
-	// Must not call fork choice updated until the transition conditions are met on the Pow network.
 	isExecutionBlk, err := blocks.IsExecutionBlock(headBlk.Body())
 	if err != nil {
 		log.WithError(err).Error("Could not determine if head block is execution block")
@@ -278,13 +277,13 @@ func (s *Service) getPayloadAttribute(ctx context.Context, st state.BeaconState,
 	recipient, err := s.cfg.BeaconDB.FeeRecipientByValidatorID(ctx, proposerID)
 	switch {
 	case errors.Is(err, kv.ErrNotFoundFeeRecipient):
-		if feeRecipient.String() == params.BeaconConfig().ZondBurnAddress {
+		if feeRecipient.String() == params.BeaconConfig().QRLBurnAddress {
 			logrus.WithFields(logrus.Fields{
 				"validatorIndex": proposerID,
-				"burnAddress":    params.BeaconConfig().ZondBurnAddress,
+				"burnAddress":    params.BeaconConfig().QRLBurnAddress,
 			}).Warn("Fee recipient is currently using the burn address, " +
 				"you will not be rewarded transaction fees on this setting. " +
-				"Please set a different zond address as the fee recipient. " +
+				"Please set a different qrl address as the fee recipient. " +
 				"Please refer to our documentation for instructions")
 		}
 	case err != nil:

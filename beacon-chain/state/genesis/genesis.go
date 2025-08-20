@@ -6,7 +6,7 @@ import (
 	"github.com/golang/snappy"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 var embeddedStates = map[string]*[]byte{}
@@ -22,7 +22,7 @@ func State(name string) (state.BeaconState, error) {
 
 // load a compressed ssz state file into a beacon state struct.
 func load(b []byte) (state.BeaconState, error) {
-	st := &zondpb.BeaconStateCapella{}
+	st := &qrysmpb.BeaconStateCapella{}
 	b, err := snappy.Decode(nil /*dst*/, b)
 	if err != nil {
 		return nil, err

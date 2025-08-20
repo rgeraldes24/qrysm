@@ -12,7 +12,7 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/validator/db/kv"
@@ -77,12 +77,12 @@ func TestStore_ImportInterchangeData_BadFormat_PreventsDBWrites(t *testing.T) {
 	// data to our DB, or it does not.
 	for i := 0; i < len(publicKeys); i++ {
 		for _, att := range attestingHistory[i] {
-			indexedAtt := &zondpb.IndexedAttestation{
-				Data: &zondpb.AttestationData{
-					Source: &zondpb.Checkpoint{
+			indexedAtt := &qrysmpb.IndexedAttestation{
+				Data: &qrysmpb.AttestationData{
+					Source: &qrysmpb.Checkpoint{
 						Epoch: att.Source,
 					},
-					Target: &zondpb.Checkpoint{
+					Target: &qrysmpb.Checkpoint{
 						Epoch: att.Target,
 					},
 				},
@@ -129,12 +129,12 @@ func TestStore_ImportInterchangeData_OK(t *testing.T) {
 	// verify those indeed match the originally generated mock histories.
 	for i := 0; i < len(publicKeys); i++ {
 		for _, att := range attestingHistory[i] {
-			indexedAtt := &zondpb.IndexedAttestation{
-				Data: &zondpb.AttestationData{
-					Source: &zondpb.Checkpoint{
+			indexedAtt := &qrysmpb.IndexedAttestation{
+				Data: &qrysmpb.AttestationData{
+					Source: &qrysmpb.Checkpoint{
 						Epoch: att.Source,
 					},
-					Target: &zondpb.Checkpoint{
+					Target: &qrysmpb.Checkpoint{
 						Epoch: att.Target,
 					},
 				},

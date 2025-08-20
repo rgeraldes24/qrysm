@@ -21,19 +21,19 @@ import (
 	"github.com/multiformats/go-multiaddr"
 	ssz "github.com/prysmaticlabs/fastssz"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-zond/p2p/enr"
+	"github.com/theQRL/go-zond/p2p/qnr"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/encoder"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers"
 	"github.com/theQRL/qrysm/beacon-chain/p2p/peers/scorers"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/metadata"
 	"google.golang.org/protobuf/proto"
 )
 
 // We have to declare this again here to prevent a circular dependency
 // with the main p2p package.
-const metatadataV1Topic = "/eth2/beacon_chain/req/metadata/1"
-const metatadataV2Topic = "/eth2/beacon_chain/req/metadata/2"
+const metatadataV1Topic = "/consensus/beacon_chain/req/metadata/1"
+const metatadataV2Topic = "/consensus/beacon_chain/req/metadata/2"
 
 // TestP2P represents a p2p implementation that can be used for testing.
 type TestP2P struct {
@@ -165,13 +165,13 @@ func (p *TestP2P) Broadcast(_ context.Context, _ proto.Message) error {
 }
 
 // BroadcastAttestation broadcasts an attestation.
-func (p *TestP2P) BroadcastAttestation(_ context.Context, _ uint64, _ *zondpb.Attestation) error {
+func (p *TestP2P) BroadcastAttestation(_ context.Context, _ uint64, _ *qrysmpb.Attestation) error {
 	p.BroadcastCalled = true
 	return nil
 }
 
 // BroadcastSyncCommitteeMessage broadcasts a sync committee message.
-func (p *TestP2P) BroadcastSyncCommitteeMessage(_ context.Context, _ uint64, _ *zondpb.SyncCommitteeMessage) error {
+func (p *TestP2P) BroadcastSyncCommitteeMessage(_ context.Context, _ uint64, _ *qrysmpb.SyncCommitteeMessage) error {
 	p.BroadcastCalled = true
 	return nil
 }
@@ -251,9 +251,9 @@ func (p *TestP2P) Host() host.Host {
 	return p.BHost
 }
 
-// ENR returns the enr of the local peer.
-func (_ *TestP2P) ENR() *enr.Record {
-	return new(enr.Record)
+// QNR returns the qnr of the local peer.
+func (_ *TestP2P) QNR() *qnr.Record {
+	return new(qnr.Record)
 }
 
 // DiscoveryAddresses --
@@ -267,7 +267,7 @@ func (p *TestP2P) AddConnectionHandler(f, _ func(ctx context.Context, id peer.ID
 		ConnectedF: func(net network.Network, conn network.Conn) {
 			// Must be handled in a goroutine as this callback cannot be blocking.
 			go func() {
-				p.peers.Add(new(enr.Record), conn.RemotePeer(), conn.RemoteMultiaddr(), conn.Stat().Direction)
+				p.peers.Add(new(qnr.Record), conn.RemotePeer(), conn.RemoteMultiaddr(), conn.Stat().Direction)
 				ctx := context.Background()
 
 				p.peers.SetConnectionState(conn.RemotePeer(), peers.PeerConnecting)
@@ -353,8 +353,8 @@ func (_ *TestP2P) FindPeersWithSubnet(_ context.Context, _ string, _ uint64, _ i
 	return false, nil
 }
 
-// RefreshENR mocks the p2p func.
-func (_ *TestP2P) RefreshENR() {}
+// RefreshQNR mocks the p2p func.
+func (_ *TestP2P) RefreshQNR() {}
 
 // ForkDigest mocks the p2p func.
 func (p *TestP2P) ForkDigest() ([4]byte, error) {

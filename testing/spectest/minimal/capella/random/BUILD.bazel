@@ -7,6 +7,6 @@ go_test(
     data = glob(["*.yaml"]) + [
         #"@consensus_spec_tests_minimal//:test_data",
     ],
+    qrl_network = "minimal",
     tags = ["spectest"],
-    zond_network = "minimal",
 )

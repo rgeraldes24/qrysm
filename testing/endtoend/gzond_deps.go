@@ -12,7 +12,7 @@ import (
 	_ "github.com/theQRL/go-zond/log"               // Required for go-zond e2e.
 	_ "github.com/theQRL/go-zond/metrics"           // Required for go-zond e2e.
 	_ "github.com/theQRL/go-zond/node"              // Required for go-zond e2e.
-	_ "github.com/theQRL/go-zond/zond"              // Required for go-zond e2e.
-	_ "github.com/theQRL/go-zond/zond/downloader"   // Required for go-zond e2e.
-	_ "github.com/theQRL/go-zond/zondclient"        // Required for go-zond e2e.
+	_ "github.com/theQRL/go-zond/qrl"               // Required for go-zond e2e.
+	_ "github.com/theQRL/go-zond/qrl/downloader"    // Required for go-zond e2e.
+	_ "github.com/theQRL/go-zond/qrlclient"         // Required for go-zond e2e.
 )

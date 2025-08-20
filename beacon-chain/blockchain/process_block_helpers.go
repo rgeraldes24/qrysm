@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	mathutil "github.com/theQRL/qrysm/math"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
@@ -102,7 +102,7 @@ func (s *Service) verifyBlkFinalizedSlot(b interfaces.ReadOnlyBeaconBlock) error
 // updateFinalized saves the init sync blocks, finalized checkpoint, migrates
 // to cold old states and saves the last validated checkpoint to DB. It returns
 // early if the new checkpoint is older than the one on db.
-func (s *Service) updateFinalized(ctx context.Context, cp *zondpb.Checkpoint) error {
+func (s *Service) updateFinalized(ctx context.Context, cp *qrysmpb.Checkpoint) error {
 	ctx, span := trace.StartSpan(ctx, "blockChain.updateFinalized")
 	defer span.End()
 
@@ -175,7 +175,7 @@ func (s *Service) ancestorByDB(ctx context.Context, r [32]byte, slot primitives.
 // This retrieves missing blocks from DB (ie. the blocks that couldn't be received over sync) and inserts them to fork choice store.
 // This is useful for block tree visualizer and additional vote accounting.
 func (s *Service) fillInForkChoiceMissingBlocks(ctx context.Context, blk interfaces.ReadOnlyBeaconBlock,
-	fCheckpoint, jCheckpoint *zondpb.Checkpoint) error {
+	fCheckpoint, jCheckpoint *qrysmpb.Checkpoint) error {
 	pendingNodes := make([]*forkchoicetypes.BlockAndCheckpoints, 0)
 
 	// Fork choice only matters from last finalized slot.
@@ -226,30 +226,30 @@ func (s *Service) insertFinalizedDeposits(ctx context.Context, fRoot [32]byte) {
 	}
 	// We update the cache up to the last deposit index in the finalized block's state.
 	// We can be confident that these deposits will be included in some block
-	// because the Eth1 follow distance makes such long-range reorgs extremely unlikely.
-	eth1DepositIndex, err := mathutil.Int(finalizedState.Eth1DepositIndex())
+	// because the execution follow distance makes such long-range reorgs extremely unlikely.
+	executionDepositIndex, err := mathutil.Int(finalizedState.ExecutionDepositIndex())
 	if err != nil {
-		log.WithError(err).Error("could not cast eth1 deposit index")
+		log.WithError(err).Error("could not cast execution deposit index")
 		return
 	}
 	// The deposit index in the state is always the index of the next deposit
 	// to be included(rather than the last one to be processed). This was most likely
 	// done as the state cannot represent signed integers.
-	finalizedEth1DepIdx := eth1DepositIndex - 1
-	if err = s.cfg.DepositCache.InsertFinalizedDeposits(ctx, int64(finalizedEth1DepIdx), common.Hash(finalizedState.Eth1Data().BlockHash),
+	finalizedExecutionDepIdx := executionDepositIndex - 1
+	if err = s.cfg.DepositCache.InsertFinalizedDeposits(ctx, int64(finalizedExecutionDepIdx), common.Hash(finalizedState.ExecutionData().BlockHash),
 		0 /* Setting a zero value as we have no access to block height */); err != nil {
 		log.WithError(err).Error("could not insert finalized deposits")
 		return
 	}
 	// Deposit proofs are only used during state transition and can be safely removed to save space.
-	if err = s.cfg.DepositCache.PruneProofs(ctx, int64(finalizedEth1DepIdx)); err != nil {
+	if err = s.cfg.DepositCache.PruneProofs(ctx, int64(finalizedExecutionDepIdx)); err != nil {
 		log.WithError(err).Error("could not prune deposit proofs")
 	}
 	// Prune deposits which have already been finalized, the below method prunes all pending deposits (non-inclusive) up
-	// to the provided eth1 deposit index.
-	s.cfg.DepositCache.PrunePendingDeposits(ctx, int64(eth1DepositIndex)) // lint:ignore uintcast -- Deposit index should not exceed int64 in your lifetime.
+	// to the provided execution deposit index.
+	s.cfg.DepositCache.PrunePendingDeposits(ctx, int64(executionDepositIndex)) // lint:ignore uintcast -- Deposit index should not exceed int64 in your lifetime.
 
-	log.WithField("duration", time.Since(startTime).String()).Debugf("Finalized deposit insertion completed at index %d", finalizedEth1DepIdx)
+	log.WithField("duration", time.Since(startTime).String()).Debugf("Finalized deposit insertion completed at index %d", finalizedExecutionDepIdx)
 }
 
 // This ensures that the input root defaults to using genesis root instead of zero hashes. This is needed for handling

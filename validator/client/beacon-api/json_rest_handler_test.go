@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/theQRL/qrysm/api/gateway/apimiddleware"
-	"github.com/theQRL/qrysm/beacon-chain/rpc/zond/beacon"
+	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/beacon"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )

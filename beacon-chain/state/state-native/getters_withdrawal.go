@@ -7,11 +7,11 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	mathutil "github.com/theQRL/qrysm/math"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
-const ETH1AddressOffset = 12
+const ExecutionAddressOffset = 12
 
 // NextWithdrawalIndex returns the index that will be assigned to the next withdrawal.
 func (b *BeaconState) NextWithdrawalIndex() (uint64, error) {
@@ -57,7 +57,7 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 			withdrawals = append(withdrawals, &enginev1.Withdrawal{
 				Index:          withdrawalIndex,
 				ValidatorIndex: validatorIndex,
-				Address:        bytesutil.SafeCopyBytes(val.WithdrawalCredentials[ETH1AddressOffset:]),
+				Address:        bytesutil.SafeCopyBytes(val.WithdrawalCredentials[ExecutionAddressOffset:]),
 				Amount:         balance,
 			})
 			withdrawalIndex++
@@ -65,7 +65,7 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 			withdrawals = append(withdrawals, &enginev1.Withdrawal{
 				Index:          withdrawalIndex,
 				ValidatorIndex: validatorIndex,
-				Address:        bytesutil.SafeCopyBytes(val.WithdrawalCredentials[ETH1AddressOffset:]),
+				Address:        bytesutil.SafeCopyBytes(val.WithdrawalCredentials[ExecutionAddressOffset:]),
 				Amount:         balance - params.BeaconConfig().MaxEffectiveBalance,
 			})
 			withdrawalIndex++
@@ -81,33 +81,33 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 	return withdrawals, nil
 }
 
-// hasETH1WithdrawalCredential returns whether the validator has an ETH1
+// hasExecutionWithdrawalCredential returns whether the validator has an execution
 // Withdrawal prefix. It assumes that the caller has a lock on the state
-func hasETH1WithdrawalCredential(val *zondpb.Validator) bool {
+func hasExecutionWithdrawalCredential(val *qrysmpb.Validator) bool {
 	if val == nil {
 		return false
 	}
 	cred := val.WithdrawalCredentials
-	return len(cred) > 0 && cred[0] == params.BeaconConfig().ZondAddressWithdrawalPrefixByte
+	return len(cred) > 0 && cred[0] == params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 }
 
 // isFullyWithdrawableValidator returns whether the validator is able to perform a full
 // withdrawal. This differ from the spec helper in that the balance > 0 is not
 // checked. This function assumes that the caller holds a lock on the state
-func isFullyWithdrawableValidator(val *zondpb.Validator, epoch primitives.Epoch) bool {
+func isFullyWithdrawableValidator(val *qrysmpb.Validator, epoch primitives.Epoch) bool {
 	if val == nil {
 		return false
 	}
-	return hasETH1WithdrawalCredential(val) && val.WithdrawableEpoch <= epoch
+	return hasExecutionWithdrawalCredential(val) && val.WithdrawableEpoch <= epoch
 }
 
 // isPartiallyWithdrawable returns whether the validator is able to perform a
 // partial withdrawal. This function assumes that the caller has a lock on the state
-func isPartiallyWithdrawableValidator(val *zondpb.Validator, balance uint64) bool {
+func isPartiallyWithdrawableValidator(val *qrysmpb.Validator, balance uint64) bool {
 	if val == nil {
 		return false
 	}
 	hasMaxBalance := val.EffectiveBalance == params.BeaconConfig().MaxEffectiveBalance
 	hasExcessBalance := balance > params.BeaconConfig().MaxEffectiveBalance
-	return hasETH1WithdrawalCredential(val) && hasExcessBalance && hasMaxBalance
+	return hasExecutionWithdrawalCredential(val) && hasExcessBalance && hasMaxBalance
 }

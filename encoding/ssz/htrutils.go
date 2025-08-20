@@ -8,7 +8,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // Uint64Root computes the HashTreeRoot Merkleization of
@@ -24,7 +24,7 @@ func Uint64Root(val uint64) [32]byte {
 // ForkRoot computes the HashTreeRoot Merkleization of
 // a Fork struct value according to the Ethereum
 // Simple Serialize specification.
-func ForkRoot(fork *zondpb.Fork) ([32]byte, error) {
+func ForkRoot(fork *qrysmpb.Fork) ([32]byte, error) {
 	fieldRoots := make([][32]byte, 3)
 	if fork != nil {
 		fieldRoots[0] = bytesutil.ToBytes32(fork.PreviousVersion)
@@ -39,7 +39,7 @@ func ForkRoot(fork *zondpb.Fork) ([32]byte, error) {
 // CheckpointRoot computes the HashTreeRoot Merkleization of
 // a InitWithReset struct value according to the Ethereum
 // Simple Serialize specification.
-func CheckpointRoot(checkpoint *zondpb.Checkpoint) ([32]byte, error) {
+func CheckpointRoot(checkpoint *qrysmpb.Checkpoint) ([32]byte, error) {
 	fieldRoots := make([][32]byte, 2)
 	if checkpoint != nil {
 		epochBuf := make([]byte, 8)

@@ -13,7 +13,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -24,7 +24,7 @@ func TestService_ReceiveBlock(t *testing.T) {
 
 	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
 	copiedGen := genesis.Copy()
-	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *zondpb.SignedBeaconBlockCapella {
+	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *qrysmpb.SignedBeaconBlockCapella {
 		blk, err := util.GenerateFullBlockCapella(copiedGen.Copy(), keys, conf, slot)
 		require.NoError(t, err)
 		return blk
@@ -35,7 +35,7 @@ func TestService_ReceiveBlock(t *testing.T) {
 	params.OverrideBeaconConfig(bc)
 
 	type args struct {
-		block *zondpb.SignedBeaconBlockCapella
+		block *qrysmpb.SignedBeaconBlockCapella
 	}
 	tests := []struct {
 		name      string
@@ -192,14 +192,14 @@ func TestService_ReceiveBlockBatch(t *testing.T) {
 	ctx := context.Background()
 
 	genesis, keys := util.DeterministicGenesisStateCapella(t, 64)
-	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *zondpb.SignedBeaconBlockCapella {
+	genFullBlock := func(t *testing.T, conf *util.BlockGenConfig, slot primitives.Slot) *qrysmpb.SignedBeaconBlockCapella {
 		blk, err := util.GenerateFullBlockCapella(genesis, keys, conf, slot)
 		assert.NoError(t, err)
 		return blk
 	}
 
 	type args struct {
-		block *zondpb.SignedBeaconBlockCapella
+		block *qrysmpb.SignedBeaconBlockCapella
 	}
 	tests := []struct {
 		name      string
@@ -309,8 +309,8 @@ func TestHandleBlockDilithiumToExecutionChanges(t *testing.T) {
 	pool := tr.dilithiumPool
 
 	t.Run("Post Capella no changes", func(t *testing.T) {
-		body := &zondpb.BeaconBlockBodyCapella{}
-		pbb := &zondpb.BeaconBlockCapella{
+		body := &qrysmpb.BeaconBlockBodyCapella{}
+		pbb := &qrysmpb.BeaconBlockCapella{
 			Body: body,
 		}
 		blk, err := blocks.NewBeaconBlock(pbb)
@@ -320,16 +320,16 @@ func TestHandleBlockDilithiumToExecutionChanges(t *testing.T) {
 
 	t.Run("Post Capella some changes", func(t *testing.T) {
 		idx := primitives.ValidatorIndex(123)
-		change := &zondpb.DilithiumToExecutionChange{
+		change := &qrysmpb.DilithiumToExecutionChange{
 			ValidatorIndex: idx,
 		}
-		signedChange := &zondpb.SignedDilithiumToExecutionChange{
+		signedChange := &qrysmpb.SignedDilithiumToExecutionChange{
 			Message: change,
 		}
-		body := &zondpb.BeaconBlockBodyCapella{
-			DilithiumToExecutionChanges: []*zondpb.SignedDilithiumToExecutionChange{signedChange},
+		body := &qrysmpb.BeaconBlockBodyCapella{
+			DilithiumToExecutionChanges: []*qrysmpb.SignedDilithiumToExecutionChange{signedChange},
 		}
-		pbb := &zondpb.BeaconBlockCapella{
+		pbb := &qrysmpb.BeaconBlockCapella{
 			Body: body,
 		}
 		blk, err := blocks.NewBeaconBlock(pbb)

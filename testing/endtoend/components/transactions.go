@@ -9,17 +9,17 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/FuzzyVM/filler"
 	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/accounts/keystore"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/core/types"
+	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
-	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/crypto/rand"
+	"github.com/theQRL/qrysm/pkg/FuzzyVM/filler"
+	txfuzz "github.com/theQRL/qrysm/pkg/tx-fuzz"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
-	txfuzz "github.com/theQRL/tx-fuzz"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -96,7 +96,7 @@ func (s *TransactionGenerator) Started() <-chan struct{} {
 }
 
 func SendTransaction(client *rpc.Client, key *dilithium.Dilithium, f *filler.Filler, gasFeeCap *big.Int, gasTipCap *big.Int, addr string, N uint64, al bool) error {
-	backend := zondclient.NewClient(client)
+	backend := qrlclient.NewClient(client)
 
 	sender, err := common.NewAddressFromString(addr)
 	if err != nil {

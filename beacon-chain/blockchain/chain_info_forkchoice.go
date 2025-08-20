@@ -5,7 +5,7 @@ import (
 
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 )
 
 // CachedHeadRoot returns the corresponding value from Forkchoice
@@ -51,7 +51,7 @@ func (s *Service) InsertNode(ctx context.Context, st state.BeaconState, root [32
 }
 
 // ForkChoiceDump returns the corresponding value from forkchoice
-func (s *Service) ForkChoiceDump(ctx context.Context) (*zondpbv1.ForkChoiceDump, error) {
+func (s *Service) ForkChoiceDump(ctx context.Context) (*qrlpb.ForkChoiceDump, error) {
 	s.cfg.ForkChoiceStore.RLock()
 	defer s.cfg.ForkChoiceStore.RUnlock()
 	return s.cfg.ForkChoiceStore.ForkChoiceDump(ctx)

@@ -22,7 +22,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/endtoend/components"
 	ev "github.com/theQRL/qrysm/testing/endtoend/evaluators"
@@ -75,7 +75,7 @@ func (r *testRunner) runBase(runEvents []runEvent) {
 		execNodesComponents := r.comHandler.executionNodes
 		execNodeSet, ok := execNodesComponents.(*components.ExecutionNodeSet)
 		if !ok {
-			return errors.New("in runBase, comHandler.executionNodes.ComponentAtIndex(0) fails type assertion to *zond.Node")
+			return errors.New("in runBase, comHandler.executionNodes.ComponentAtIndex(0) fails type assertion to *qrysmpb.Node")
 		}
 
 		if err := helpers.ComponentsStarted(r.comHandler.ctx, []e2etypes.ComponentRunner{execNodeSet}); err != nil {
@@ -127,7 +127,7 @@ func (r *testRunner) waitExtra(ctx context.Context, e primitives.Epoch, conn *gr
 	spe := uint64(params.BeaconConfig().SlotsPerEpoch.Mul(params.BeaconConfig().SecondsPerSlot))
 	dl := time.Now().Add(time.Second * time.Duration(uint64(extra)*spe))
 
-	beaconClient := zond.NewBeaconChainClient(conn)
+	beaconClient := qrysmpb.NewBeaconChainClient(conn)
 	ctx, cancel := context.WithDeadline(ctx, dl)
 	defer cancel()
 	for {
@@ -224,7 +224,7 @@ func (r *testRunner) testTxGeneration(ctx context.Context, g *errgroup.Group, ke
 	txGenerator := components.NewTransactionGenerator(keystorePath, r.config.Seed)
 	g.Go(func() error {
 		if err := helpers.ComponentsStarted(ctx, requiredNodes); err != nil {
-			return fmt.Errorf("transaction generator requires zond execution nodes to be run: %w", err)
+			return fmt.Errorf("transaction generator requires qrl execution nodes to be run: %w", err)
 		}
 		return txGenerator.Start(ctx)
 	})
@@ -234,8 +234,8 @@ func (r *testRunner) waitForMatchingHead(ctx context.Context, timeout time.Durat
 	start := time.Now()
 	dctx, cancel := context.WithDeadline(ctx, start.Add(timeout))
 	defer cancel()
-	checkClient := zond.NewBeaconChainClient(check)
-	refClient := zond.NewBeaconChainClient(ref)
+	checkClient := qrysmpb.NewBeaconChainClient(check)
+	refClient := qrysmpb.NewBeaconChainClient(ref)
 	for {
 		select {
 		case <-dctx.Done():
@@ -264,16 +264,16 @@ func (r *testRunner) waitForMatchingHead(ctx context.Context, timeout time.Durat
 }
 
 /*
-func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, i int, conns []*grpc.ClientConn, bnAPI, enr, minerEnr string) error {
+func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, i int, conns []*grpc.ClientConn, bnAPI, qnr, minerQnr string) error {
 	matchTimeout := 3 * time.Minute
-	zondNode := zondcomp.NewNode(i, minerEnr)
+	qrlNode := qrlcomp.NewNode(i, minerQnr)
 	g.Go(func() error {
-		return zondNode.Start(ctx)
+		return qrlNode.Start(ctx)
 	})
-	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{zondNode}); err != nil {
+	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{qrlNode}); err != nil {
 		return fmt.Errorf("sync beacon node not ready: %w", err)
 	}
-	proxyNode := zondcomp.NewProxy(i)
+	proxyNode := qrlcomp.NewProxy(i)
 	g.Go(func() error {
 		return proxyNode.Start(ctx)
 	})
@@ -302,7 +302,7 @@ func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, 
 	cfgcp := new(e2etypes.E2EConfig)
 	*cfgcp = *r.config
 	cfgcp.BeaconFlags = flags
-	cpsyncer := components.NewBeaconNode(cfgcp, i, enr)
+	cpsyncer := components.NewBeaconNode(cfgcp, i, qnr)
 	g.Go(func() error {
 		return cpsyncer.Start(ctx)
 	})
@@ -331,7 +331,7 @@ func (r *testRunner) testCheckpointSync(ctx context.Context, g *errgroup.Group, 
 
 // testBeaconChainSync creates another beacon node, and tests whether it can sync to head using previous nodes.
 func (r *testRunner) testBeaconChainSync(ctx context.Context, g *errgroup.Group,
-	conns []*grpc.ClientConn, tickingStartTime time.Time, bootnodeEnr string) error {
+	conns []*grpc.ClientConn, tickingStartTime time.Time, bootnodeQnr string) error {
 	t, config := r.t, r.config
 	index := e2e.TestParams.BeaconNodeCount
 	executionNode := components.NewExecutionNode(index)
@@ -348,7 +348,7 @@ func (r *testRunner) testBeaconChainSync(ctx context.Context, g *errgroup.Group,
 	if err := helpers.ComponentsStarted(ctx, []e2etypes.ComponentRunner{proxyNode}); err != nil {
 		return fmt.Errorf("sync beacon node not ready: %w", err)
 	}
-	syncBeaconNode := components.NewBeaconNode(config, index, bootnodeEnr)
+	syncBeaconNode := components.NewBeaconNode(config, index, bootnodeQnr)
 	g.Go(func() error {
 		return syncBeaconNode.Start(ctx)
 	})
@@ -483,7 +483,7 @@ func (r *testRunner) defaultEndToEndRun() error {
 	defer closeConns()
 
 	// Calculate genesis time.
-	nodeClient := zond.NewNodeClient(conns[0])
+	nodeClient := qrysmpb.NewNodeClient(conns[0])
 	genesis, err := nodeClient.GetGenesis(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 	tickingStartTime := helpers.EpochTickerStartTime(genesis)
@@ -496,7 +496,7 @@ func (r *testRunner) defaultEndToEndRun() error {
 
 	// index := e2e.TestParams.BeaconNodeCount
 	if config.TestSync {
-		if err := r.testBeaconChainSync(ctx, g, conns, tickingStartTime, bootNode.ENR() /*, zondMiner.ENR()*/); err != nil {
+		if err := r.testBeaconChainSync(ctx, g, conns, tickingStartTime, bootNode.QNR() /*, qrlMiner.QNR()*/); err != nil {
 			return errors.Wrap(err, "beacon chain sync test failed")
 		}
 		// index += 1
@@ -505,12 +505,13 @@ func (r *testRunner) defaultEndToEndRun() error {
 		}
 
 	}
+	// TODO(rgeraldes24)
 	/*
 		if config.TestCheckpointSync {
 			httpEndpoints := helpers.BeaconAPIHostnames(e2e.TestParams.BeaconNodeCount)
-			menr := zondMiner.ENR()
-			benr := bootNode.ENR()
-			if err := r.testCheckpointSync(ctx, g, index, conns, httpEndpoints[0], benr, menr); err != nil {
+			mqnr := qrlMiner.QNR()
+			bqnr := bootNode.QNR()
+			if err := r.testCheckpointSync(ctx, g, index, conns, httpEndpoints[0], bqnr, mqnr); err != nil {
 				return errors.Wrap(err, "checkpoint sync test failed")
 			}
 		}
@@ -567,7 +568,7 @@ func (r *testRunner) scenarioRun() error {
 	defer closeConns()
 
 	// Calculate genesis time.
-	nodeClient := zond.NewNodeClient(conns[0])
+	nodeClient := qrysmpb.NewNodeClient(conns[0])
 	genesis, err := nodeClient.GetGenesis(context.Background(), &emptypb.Empty{})
 	require.NoError(t, err)
 	tickingStartTime := helpers.EpochTickerStartTime(genesis)

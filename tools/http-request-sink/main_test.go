@@ -15,15 +15,15 @@ import (
 
 type sampleRPCRequest struct {
 	Name      string `json:"name"`
-	ETHMethod string `json:"eth_method"`
+	QRLMethod string `json:"qrl_method"`
 	Address   string `json:"address"`
 }
 
 func Test_parseAndCaptureRequest(t *testing.T) {
 	tmpFile := filepath.Join(t.TempDir(), "faketest.log")
 	body := &sampleRPCRequest{
-		Name:      "eth2",
-		ETHMethod: "eth2_produceBlock",
+		Name:      "qrl",
+		QRLMethod: "qrl_produceBlock",
 		Address:   "0x0923920930923",
 	}
 	enc, err := json.Marshal(body)

@@ -81,7 +81,7 @@ func (c *componentHandler) setup() {
 	})
 	c.bootnode = bootNode
 
-	// Zond execution nodes.
+	// QRL execution nodes.
 	executionNodes := components.NewExecutionNodeSet()
 	g.Go(func() error {
 		if err := executionNodes.Start(ctx); err != nil {
@@ -137,7 +137,7 @@ func (c *componentHandler) setup() {
 		if err := helpers.ComponentsStarted(ctx, wantedComponents); err != nil {
 			return errors.Wrap(err, "beacon nodes require proxies, execution and boot node to run")
 		}
-		beaconNodes.SetENR(bootNode.ENR())
+		beaconNodes.SetQNR(bootNode.QNR())
 		if err := beaconNodes.Start(ctx); err != nil {
 			return errors.Wrap(err, "failed to start beacon nodes")
 		}

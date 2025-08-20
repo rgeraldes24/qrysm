@@ -22,7 +22,7 @@ cd ./scripts/local_testnet
 
 You will see a list of services running and "Started!" at the end. 
 You can also select your own Qrysm docker image to use by specifying it in `network_params.yml` under the `cl_image` key.
-Full configuration reference for kurtosis is specified [here](https://github.com/theQRL/zond-package?tab=readme-ov-file#configuration).
+Full configuration reference for kurtosis is specified [here](https://github.com/theQRL/qrl-package?tab=readme-ov-file#configuration).
 
 To view all running services:
 

@@ -4,17 +4,16 @@ import (
 	"context"
 	"testing"
 
-	"github.com/theQRL/qrysm/config/features"
-	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	"github.com/theQRL/qrysm/testing/util"
-	"google.golang.org/protobuf/proto"
-
 	mock "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	mockp2p "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
+	"github.com/theQRL/qrysm/config/features"
+	"github.com/theQRL/qrysm/consensus-types/primitives"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
+	"github.com/theQRL/qrysm/testing/util"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestServer_SubmitProposerSlashing(t *testing.T) {
@@ -99,7 +98,7 @@ func TestServer_SubmitProposerSlashing_DontBroadcast(t *testing.T) {
 
 	// We want a proposer slashing for validator with index 2 to
 	// be included in the pool.
-	wanted := &zondpb.SubmitSlashingResponse{
+	wanted := &qrysmpb.SubmitSlashingResponse{
 		SlashedIndices: []primitives.ValidatorIndex{2},
 	}
 	slashing, err := util.GenerateProposerSlashingForValidator(st, privs[2], primitives.ValidatorIndex(2))
@@ -150,7 +149,7 @@ func TestServer_SubmitAttesterSlashing_DontBroadcast(t *testing.T) {
 	// We want the intersection of the slashing attesting indices
 	// to be slashed, so we expect validators 2 and 3 to be in the response
 	// slashed indices.
-	wanted := &zondpb.SubmitSlashingResponse{
+	wanted := &qrysmpb.SubmitSlashingResponse{
 		SlashedIndices: []primitives.ValidatorIndex{2},
 	}
 	res, err := bs.SubmitAttesterSlashing(ctx, slashing)

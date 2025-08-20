@@ -5,7 +5,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zond "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	"google.golang.org/protobuf/proto"
 )
@@ -14,7 +14,7 @@ type SignedBeaconBlock struct {
 	BeaconBlock interfaces.ReadOnlyBeaconBlock
 }
 
-func (SignedBeaconBlock) PbGenericBlock() (*zond.GenericSignedBeaconBlock, error) {
+func (SignedBeaconBlock) PbGenericBlock() (*qrysmpb.GenericSignedBeaconBlock, error) {
 	panic("implement me")
 }
 
@@ -42,11 +42,11 @@ func (SignedBeaconBlock) Proto() (proto.Message, error) {
 	panic("implement me")
 }
 
-func (SignedBeaconBlock) PbCapellaBlock() (*zond.SignedBeaconBlockCapella, error) {
+func (SignedBeaconBlock) PbCapellaBlock() (*qrysmpb.SignedBeaconBlockCapella, error) {
 	panic("implement me")
 }
 
-func (SignedBeaconBlock) PbBlindedCapellaBlock() (*zond.SignedBlindedBeaconBlockCapella, error) {
+func (SignedBeaconBlock) PbBlindedCapellaBlock() (*qrysmpb.SignedBlindedBeaconBlockCapella, error) {
 	panic("implement me")
 }
 
@@ -78,7 +78,7 @@ func (SignedBeaconBlock) ToBlinded() (interfaces.ReadOnlySignedBeaconBlock, erro
 	panic("implement me")
 }
 
-func (SignedBeaconBlock) Header() (*zond.SignedBeaconBlockHeader, error) {
+func (SignedBeaconBlock) Header() (*qrysmpb.SignedBeaconBlockHeader, error) {
 	panic("implement me")
 }
 
@@ -187,7 +187,7 @@ func (BeaconBlockBody) RandaoReveal() [field_params.DilithiumSignatureLength]byt
 	panic("implement me")
 }
 
-func (BeaconBlockBody) Eth1Data() *zond.Eth1Data {
+func (BeaconBlockBody) ExecutionData() *qrysmpb.ExecutionData {
 	panic("implement me")
 }
 
@@ -195,23 +195,23 @@ func (BeaconBlockBody) Graffiti() [field_params.RootLength]byte {
 	panic("implement me")
 }
 
-func (BeaconBlockBody) ProposerSlashings() []*zond.ProposerSlashing {
+func (BeaconBlockBody) ProposerSlashings() []*qrysmpb.ProposerSlashing {
 	panic("implement me")
 }
 
-func (BeaconBlockBody) AttesterSlashings() []*zond.AttesterSlashing {
+func (BeaconBlockBody) AttesterSlashings() []*qrysmpb.AttesterSlashing {
 	panic("implement me")
 }
 
-func (BeaconBlockBody) Deposits() []*zond.Deposit {
+func (BeaconBlockBody) Deposits() []*qrysmpb.Deposit {
 	panic("implement me")
 }
 
-func (BeaconBlockBody) VoluntaryExits() []*zond.SignedVoluntaryExit {
+func (BeaconBlockBody) VoluntaryExits() []*qrysmpb.SignedVoluntaryExit {
 	panic("implement me")
 }
 
-func (BeaconBlockBody) SyncAggregate() (*zond.SyncAggregate, error) {
+func (BeaconBlockBody) SyncAggregate() (*qrysmpb.SyncAggregate, error) {
 	panic("implement me")
 }
 
@@ -231,7 +231,7 @@ func (BeaconBlockBody) Execution() (interfaces.ExecutionData, error) {
 	panic("implement me")
 }
 
-func (BeaconBlockBody) DilithiumToExecutionChanges() ([]*zond.SignedDilithiumToExecutionChange, error) {
+func (BeaconBlockBody) DilithiumToExecutionChanges() ([]*qrysmpb.SignedDilithiumToExecutionChange, error) {
 	panic("implement me")
 }
 
@@ -243,7 +243,7 @@ func (b *BeaconBlockBody) SetRandaoReveal([]byte) {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetEth1Data(*zond.Eth1Data) {
+func (b *BeaconBlockBody) SetExecutionData(*qrysmpb.ExecutionData) {
 	panic("implement me")
 }
 
@@ -251,27 +251,27 @@ func (b *BeaconBlockBody) SetGraffiti([]byte) {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetProposerSlashings([]*zond.ProposerSlashing) {
+func (b *BeaconBlockBody) SetProposerSlashings([]*qrysmpb.ProposerSlashing) {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetAttesterSlashings([]*zond.AttesterSlashing) {
+func (b *BeaconBlockBody) SetAttesterSlashings([]*qrysmpb.AttesterSlashing) {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetAttestations([]*zond.Attestation) {
+func (b *BeaconBlockBody) SetAttestations([]*qrysmpb.Attestation) {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetDeposits([]*zond.Deposit) {
+func (b *BeaconBlockBody) SetDeposits([]*qrysmpb.Deposit) {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetVoluntaryExits([]*zond.SignedVoluntaryExit) {
+func (b *BeaconBlockBody) SetVoluntaryExits([]*qrysmpb.SignedVoluntaryExit) {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetSyncAggregate(*zond.SyncAggregate) error {
+func (b *BeaconBlockBody) SetSyncAggregate(*qrysmpb.SyncAggregate) error {
 	panic("implement me")
 }
 
@@ -279,11 +279,11 @@ func (b *BeaconBlockBody) SetExecution(interfaces.ExecutionData) error {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetDilithiumToExecutionChanges([]*zond.SignedDilithiumToExecutionChange) error {
+func (b *BeaconBlockBody) SetDilithiumToExecutionChanges([]*qrysmpb.SignedDilithiumToExecutionChange) error {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) Attestations() []*zond.Attestation {
+func (b *BeaconBlockBody) Attestations() []*qrysmpb.Attestation {
 	panic("implement me")
 }
 

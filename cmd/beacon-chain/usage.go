@@ -93,7 +93,7 @@ var appHelpFlagGroups = []flagGroup{
 	{
 		Name: "beacon-chain",
 		Flags: []cli.Flag{
-			flags.InteropMockEth1DataVotesFlag,
+			flags.InteropMockExecutionDataVotesFlag,
 			flags.DepositContractFlag,
 			flags.ContractDeploymentBlock,
 			flags.RPCHost,
@@ -118,7 +118,7 @@ var appHelpFlagGroups = []flagGroup{
 			flags.ChainID,
 			flags.NetworkID,
 			flags.WeakSubjectivityCheckpoint,
-			flags.Eth1HeaderReqLimit,
+			flags.ExecutionHeaderReqLimit,
 			flags.MinPeersPerSubnet,
 			flags.MevRelayEndpoint,
 			flags.MaxBuilderEpochMissedSlots,

@@ -13,24 +13,24 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // NewGenesisBlock returns the canonical, genesis block for the beacon chain protocol.
-func NewGenesisBlock(stateRoot []byte) *zondpb.SignedBeaconBlockCapella {
+func NewGenesisBlock(stateRoot []byte) *qrysmpb.SignedBeaconBlockCapella {
 	zeroHash := params.BeaconConfig().ZeroHash[:]
-	block := &zondpb.SignedBeaconBlockCapella{
-		Block: &zondpb.BeaconBlockCapella{
+	block := &qrysmpb.SignedBeaconBlockCapella{
+		Block: &qrysmpb.BeaconBlockCapella{
 			ParentRoot: zeroHash,
 			StateRoot:  bytesutil.PadTo(stateRoot, 32),
-			Body: &zondpb.BeaconBlockBodyCapella{
+			Body: &qrysmpb.BeaconBlockBodyCapella{
 				RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
-				Eth1Data: &zondpb.Eth1Data{
+				ExecutionData: &qrysmpb.ExecutionData{
 					DepositRoot: make([]byte, 32),
 					BlockHash:   make([]byte, 32),
 				},
 				Graffiti: make([]byte, 32),
-				SyncAggregate: &zondpb.SyncAggregate{
+				SyncAggregate: &qrysmpb.SyncAggregate{
 					SyncCommitteeBits: make([]byte, fieldparams.SyncCommitteeLength/8),
 				},
 				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
@@ -59,19 +59,19 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 	}
 	ps := st.ToProto()
 	switch ps.(type) {
-	case *zondpb.BeaconStateCapella:
-		return blocks.NewSignedBeaconBlock(&zondpb.SignedBeaconBlockCapella{
-			Block: &zondpb.BeaconBlockCapella{
+	case *qrysmpb.BeaconStateCapella:
+		return blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{
+			Block: &qrysmpb.BeaconBlockCapella{
 				ParentRoot: params.BeaconConfig().ZeroHash[:],
 				StateRoot:  root[:],
-				Body: &zondpb.BeaconBlockBodyCapella{
+				Body: &qrysmpb.BeaconBlockBodyCapella{
 					RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
-					Eth1Data: &zondpb.Eth1Data{
+					ExecutionData: &qrysmpb.ExecutionData{
 						DepositRoot: make([]byte, 32),
 						BlockHash:   make([]byte, 32),
 					},
 					Graffiti: make([]byte, 32),
-					SyncAggregate: &zondpb.SyncAggregate{
+					SyncAggregate: &qrysmpb.SyncAggregate{
 						SyncCommitteeBits:       make([]byte, fieldparams.SyncCommitteeLength/8),
 						SyncCommitteeSignatures: [][]byte{},
 					},

@@ -9,7 +9,7 @@ import (
 	"github.com/theQRL/qrysm/async"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -26,17 +26,17 @@ func TestPruneExpired_Ticker(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	ad1 := util.HydrateAttestationData(&zondpb.AttestationData{})
+	ad1 := util.HydrateAttestationData(&qrysmpb.AttestationData{})
 
-	ad2 := util.HydrateAttestationData(&zondpb.AttestationData{Slot: 1})
+	ad2 := util.HydrateAttestationData(&qrysmpb.AttestationData{Slot: 1})
 
-	atts := []*zondpb.Attestation{
+	atts := []*qrysmpb.Attestation{
 		{Data: ad1, AggregationBits: bitfield.Bitlist{0b1000, 0b1}, Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength)}},
 		{Data: ad2, AggregationBits: bitfield.Bitlist{0b1000, 0b1}, Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength)}},
 	}
 	require.NoError(t, s.cfg.Pool.SaveUnaggregatedAttestations(atts))
 	require.Equal(t, 2, s.cfg.Pool.UnaggregatedAttestationCount(), "Unexpected number of attestations")
-	atts = []*zondpb.Attestation{
+	atts = []*qrysmpb.Attestation{
 		{Data: ad1, AggregationBits: bitfield.Bitlist{0b1101, 0b1}, Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength)}},
 		{Data: ad2, AggregationBits: bitfield.Bitlist{0b1101, 0b1}, Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength)}},
 	}
@@ -87,15 +87,15 @@ func TestPruneExpired_PruneExpiredAtts(t *testing.T) {
 	s, err := NewService(context.Background(), &Config{Pool: NewPool()})
 	require.NoError(t, err)
 
-	ad1 := util.HydrateAttestationData(&zondpb.AttestationData{})
+	ad1 := util.HydrateAttestationData(&qrysmpb.AttestationData{})
 
-	ad2 := util.HydrateAttestationData(&zondpb.AttestationData{})
+	ad2 := util.HydrateAttestationData(&qrysmpb.AttestationData{})
 
-	att1 := &zondpb.Attestation{Data: ad1, AggregationBits: bitfield.Bitlist{0b1101}}
-	att2 := &zondpb.Attestation{Data: ad1, AggregationBits: bitfield.Bitlist{0b1111}}
-	att3 := &zondpb.Attestation{Data: ad2, AggregationBits: bitfield.Bitlist{0b1101}}
-	att4 := &zondpb.Attestation{Data: ad2, AggregationBits: bitfield.Bitlist{0b1110}}
-	atts := []*zondpb.Attestation{att1, att2, att3, att4}
+	att1 := &qrysmpb.Attestation{Data: ad1, AggregationBits: bitfield.Bitlist{0b1101}}
+	att2 := &qrysmpb.Attestation{Data: ad1, AggregationBits: bitfield.Bitlist{0b1111}}
+	att3 := &qrysmpb.Attestation{Data: ad2, AggregationBits: bitfield.Bitlist{0b1101}}
+	att4 := &qrysmpb.Attestation{Data: ad2, AggregationBits: bitfield.Bitlist{0b1110}}
+	atts := []*qrysmpb.Attestation{att1, att2, att3, att4}
 	require.NoError(t, s.cfg.Pool.SaveAggregatedAttestations(atts))
 	for _, att := range atts {
 		require.NoError(t, s.cfg.Pool.SaveBlockAttestation(att))

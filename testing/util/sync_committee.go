@@ -5,11 +5,11 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // HydrateSyncCommittee hydrates the provided sync committee message.
-func HydrateSyncCommittee(s *zondpb.SyncCommitteeMessage) *zondpb.SyncCommitteeMessage {
+func HydrateSyncCommittee(s *qrysmpb.SyncCommitteeMessage) *qrysmpb.SyncCommitteeMessage {
 	if s.Signature == nil {
 		s.Signature = make([]byte, 4595)
 	}
@@ -21,7 +21,7 @@ func HydrateSyncCommittee(s *zondpb.SyncCommitteeMessage) *zondpb.SyncCommitteeM
 
 // ConvertToCommittee takes a list of pubkeys and returns a SyncCommittee with
 // these keys as members. Some keys may appear repeated
-func ConvertToCommittee(inputKeys [][]byte) *zondpb.SyncCommittee {
+func ConvertToCommittee(inputKeys [][]byte) *qrysmpb.SyncCommittee {
 	var pubKeys [][]byte
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
 		if i < uint64(len(inputKeys)) {
@@ -31,7 +31,7 @@ func ConvertToCommittee(inputKeys [][]byte) *zondpb.SyncCommittee {
 		}
 	}
 
-	return &zondpb.SyncCommittee{
+	return &qrysmpb.SyncCommittee{
 		Pubkeys: pubKeys,
 	}
 }

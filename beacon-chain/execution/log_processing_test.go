@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
-	zond "github.com/theQRL/go-zond"
+	qrl "github.com/theQRL/go-zond"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/beacon-chain/cache/depositcache"
 	testDB "github.com/theQRL/qrysm/beacon-chain/db/testing"
@@ -38,7 +38,7 @@ func TestProcessDepositLog_OK(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 execution chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -52,14 +52,14 @@ func TestProcessDepositLog_OK(t *testing.T) {
 	require.NoError(t, err)
 	data := deposits[0].Data
 
-	testAcc.TxOpts.Value = mock.Amount40000Zond()
+	testAcc.TxOpts.Value = mock.Amount40000Quanta()
 	testAcc.TxOpts.GasLimit = 1000000
 	_, err = testAcc.Contract.Deposit(testAcc.TxOpts, data.PublicKey, data.WithdrawalCredentials, data.Signature, depositRoots[0])
 	require.NoError(t, err, "Could not deposit to deposit contract")
 
 	testAcc.Backend.Commit()
 
-	query := zond.FilterQuery{
+	query := qrl.FilterQuery{
 		Addresses: []common.Address{
 			web3Service.cfg.depositContractAddr,
 		},
@@ -107,7 +107,7 @@ func TestProcessDepositLog_InsertsPendingDeposit(t *testing.T) {
 		WithDatabase(beaconDB),
 		WithDepositCache(depositCache),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 execution chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -120,7 +120,7 @@ func TestProcessDepositLog_InsertsPendingDeposit(t *testing.T) {
 	require.NoError(t, err)
 	data := deposits[0].Data
 
-	testAcc.TxOpts.Value = mock.Amount40000Zond()
+	testAcc.TxOpts.Value = mock.Amount40000Quanta()
 	testAcc.TxOpts.GasLimit = 1000000
 
 	_, err = testAcc.Contract.Deposit(testAcc.TxOpts, data.PublicKey, data.WithdrawalCredentials, data.Signature, depositRoots[0])
@@ -131,7 +131,7 @@ func TestProcessDepositLog_InsertsPendingDeposit(t *testing.T) {
 
 	testAcc.Backend.Commit()
 
-	query := zond.FilterQuery{
+	query := qrl.FilterQuery{
 		Addresses: []common.Address{
 			web3Service.cfg.depositContractAddr,
 		},
@@ -165,7 +165,7 @@ func TestUnpackDepositLogData_OK(t *testing.T) {
 		WithDepositContractAddress(testAcc.ContractAddr),
 		WithDatabase(beaconDB),
 	)
-	require.NoError(t, err, "unable to setup web3 ETH1.0 chain service")
+	require.NoError(t, err, "unable to setup web3 execution chain service")
 	web3Service = setDefaultMocks(web3Service)
 	web3Service.depositContractCaller, err = contracts.NewDepositContractCaller(testAcc.ContractAddr, testAcc.Backend)
 	require.NoError(t, err)
@@ -178,13 +178,13 @@ func TestUnpackDepositLogData_OK(t *testing.T) {
 	require.NoError(t, err)
 	data := deposits[0].Data
 
-	testAcc.TxOpts.Value = mock.Amount40000Zond()
+	testAcc.TxOpts.Value = mock.Amount40000Quanta()
 	testAcc.TxOpts.GasLimit = 1000000
 	_, err = testAcc.Contract.Deposit(testAcc.TxOpts, data.PublicKey, data.WithdrawalCredentials, data.Signature, depositRoots[0])
 	require.NoError(t, err, "Could not deposit to deposit contract")
 	testAcc.Backend.Commit()
 
-	query := zond.FilterQuery{
+	query := qrl.FilterQuery{
 		Addresses: []common.Address{
 			web3Service.cfg.depositContractAddr,
 		},

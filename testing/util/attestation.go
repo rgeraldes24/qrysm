@@ -19,22 +19,22 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/rand"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	attv1 "github.com/theQRL/qrysm/proto/zond/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
 // NewAttestation creates an attestation block with minimum marshalable fields.
-func NewAttestation() *zondpb.Attestation {
-	return &zondpb.Attestation{
+func NewAttestation() *qrysmpb.Attestation {
+	return &qrysmpb.Attestation{
 		AggregationBits: bitfield.Bitlist{0b1101},
-		Data: &zondpb.AttestationData{
+		Data: &qrysmpb.AttestationData{
 			BeaconBlockRoot: make([]byte, fieldparams.RootLength),
-			Source: &zondpb.Checkpoint{
+			Source: &qrysmpb.Checkpoint{
 				Root: make([]byte, fieldparams.RootLength),
 			},
-			Target: &zondpb.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Root: make([]byte, fieldparams.RootLength),
 			},
 		},
@@ -51,8 +51,8 @@ func NewAttestation() *zondpb.Attestation {
 // If you request 4 attestations, but there are 8 committees, you will get 4 fully aggregated attestations.
 func GenerateAttestations(
 	bState state.BeaconState, privs []dilithium.DilithiumKey, numToGen uint64, slot primitives.Slot, randomRoot bool,
-) ([]*zondpb.Attestation, error) {
-	var attestations []*zondpb.Attestation
+) ([]*qrysmpb.Attestation, error) {
+	var attestations []*qrysmpb.Attestation
 	generateHeadState := false
 	bState = bState.Copy()
 	if slot > bState.Slot() {
@@ -151,12 +151,12 @@ func GenerateAttestations(
 			return nil, err
 		}
 
-		attData := &zondpb.AttestationData{
+		attData := &qrysmpb.AttestationData{
 			Slot:            slot,
 			CommitteeIndex:  c,
 			BeaconBlockRoot: headRoot,
 			Source:          bState.CurrentJustifiedCheckpoint(),
-			Target: &zondpb.Checkpoint{
+			Target: &qrysmpb.Checkpoint{
 				Epoch: currentEpoch,
 				Root:  targetRoot,
 			},
@@ -177,7 +177,7 @@ func GenerateAttestations(
 				sigs = append(sigs, privs[committee[b]].Sign(dataRoot[:]).Marshal())
 			}
 
-			att := &zondpb.Attestation{
+			att := &qrysmpb.Attestation{
 				Data:            attData,
 				AggregationBits: aggregationBits,
 				Signatures:      sigs,
@@ -190,7 +190,7 @@ func GenerateAttestations(
 
 // HydrateAttestation hydrates an attestation object with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateAttestation(a *zondpb.Attestation) *zondpb.Attestation {
+func HydrateAttestation(a *qrysmpb.Attestation) *qrysmpb.Attestation {
 	if a.Signatures == nil {
 		sig := make([]byte, 4595)
 		a.Signatures = [][]byte{sig}
@@ -199,7 +199,7 @@ func HydrateAttestation(a *zondpb.Attestation) *zondpb.Attestation {
 		a.AggregationBits = make([]byte, 1)
 	}
 	if a.Data == nil {
-		a.Data = &zondpb.AttestationData{}
+		a.Data = &qrysmpb.AttestationData{}
 	}
 	a.Data = HydrateAttestationData(a.Data)
 	return a
@@ -207,7 +207,7 @@ func HydrateAttestation(a *zondpb.Attestation) *zondpb.Attestation {
 
 // HydrateV1Attestation hydrates a v1 attestation object with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1Attestation(a *attv1.Attestation) *attv1.Attestation {
+func HydrateV1Attestation(a *qrlpb.Attestation) *qrlpb.Attestation {
 	if a.Signatures == nil {
 		sig := make([]byte, 4595)
 		a.Signatures = [][]byte{sig}
@@ -216,7 +216,7 @@ func HydrateV1Attestation(a *attv1.Attestation) *attv1.Attestation {
 		a.AggregationBits = make([]byte, 1)
 	}
 	if a.Data == nil {
-		a.Data = &attv1.AttestationData{}
+		a.Data = &qrlpb.AttestationData{}
 	}
 	a.Data = HydrateV1AttestationData(a.Data)
 	return a
@@ -224,18 +224,18 @@ func HydrateV1Attestation(a *attv1.Attestation) *attv1.Attestation {
 
 // HydrateAttestationData hydrates an attestation data object with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateAttestationData(d *zondpb.AttestationData) *zondpb.AttestationData {
+func HydrateAttestationData(d *qrysmpb.AttestationData) *qrysmpb.AttestationData {
 	if d.BeaconBlockRoot == nil {
 		d.BeaconBlockRoot = make([]byte, fieldparams.RootLength)
 	}
 	if d.Target == nil {
-		d.Target = &zondpb.Checkpoint{}
+		d.Target = &qrysmpb.Checkpoint{}
 	}
 	if d.Target.Root == nil {
 		d.Target.Root = make([]byte, fieldparams.RootLength)
 	}
 	if d.Source == nil {
-		d.Source = &zondpb.Checkpoint{}
+		d.Source = &qrysmpb.Checkpoint{}
 	}
 	if d.Source.Root == nil {
 		d.Source.Root = make([]byte, fieldparams.RootLength)
@@ -245,18 +245,18 @@ func HydrateAttestationData(d *zondpb.AttestationData) *zondpb.AttestationData {
 
 // HydrateV1AttestationData hydrates a v1 attestation data object with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateV1AttestationData(d *attv1.AttestationData) *attv1.AttestationData {
+func HydrateV1AttestationData(d *qrlpb.AttestationData) *qrlpb.AttestationData {
 	if d.BeaconBlockRoot == nil {
 		d.BeaconBlockRoot = make([]byte, fieldparams.RootLength)
 	}
 	if d.Target == nil {
-		d.Target = &attv1.Checkpoint{}
+		d.Target = &qrlpb.Checkpoint{}
 	}
 	if d.Target.Root == nil {
 		d.Target.Root = make([]byte, fieldparams.RootLength)
 	}
 	if d.Source == nil {
-		d.Source = &attv1.Checkpoint{}
+		d.Source = &qrlpb.Checkpoint{}
 	}
 	if d.Source.Root == nil {
 		d.Source.Root = make([]byte, fieldparams.RootLength)
@@ -266,13 +266,13 @@ func HydrateV1AttestationData(d *attv1.AttestationData) *attv1.AttestationData {
 
 // HydrateIndexedAttestation hydrates an indexed attestation with correct field length sizes
 // to comply with fssz marshalling and unmarshalling rules.
-func HydrateIndexedAttestation(a *zondpb.IndexedAttestation) *zondpb.IndexedAttestation {
+func HydrateIndexedAttestation(a *qrysmpb.IndexedAttestation) *qrysmpb.IndexedAttestation {
 	if a.Signatures == nil {
 		sig := make([]byte, 4595)
 		a.Signatures = [][]byte{sig}
 	}
 	if a.Data == nil {
-		a.Data = &zondpb.AttestationData{}
+		a.Data = &qrysmpb.AttestationData{}
 	}
 	a.Data = HydrateAttestationData(a.Data)
 	return a

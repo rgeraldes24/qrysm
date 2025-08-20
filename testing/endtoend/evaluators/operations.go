@@ -17,9 +17,9 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz/detect"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	zondpbservice "github.com/theQRL/qrysm/proto/zond/service"
-	v1 "github.com/theQRL/qrysm/proto/zond/v1"
+	"github.com/theQRL/qrysm/proto/qrl/service"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/endtoend/helpers"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
 	"github.com/theQRL/qrysm/testing/endtoend/policies"
@@ -33,11 +33,11 @@ import (
 var depositValCount = e2e.DepositCount
 var numOfExits = 2
 
-var followDistanceSeconds = params.E2ETestConfig().Eth1FollowDistance * params.E2ETestConfig().SecondsPerETH1Block
+var followDistanceSeconds = params.E2ETestConfig().ExecutionFollowDistance * params.E2ETestConfig().SecondsPerExecutionBlock
 var secondsPerEpoch = params.E2ETestConfig().SecondsPerSlot * uint64(params.E2ETestConfig().SlotsPerEpoch)
 
-// Deposits should be processed in twice the length of the epochs per eth1 voting period.
-var depositsInBlockStart = primitives.Epoch(2*followDistanceSeconds/secondsPerEpoch) + params.E2ETestConfig().EpochsPerEth1VotingPeriod*2
+// Deposits should be processed in twice the length of the epochs per execution voting period.
+var depositsInBlockStart = primitives.Epoch(2*followDistanceSeconds/secondsPerEpoch) + params.E2ETestConfig().EpochsPerExecutionVotingPeriod*2
 
 // deposits included + finalization + MaxSeedLookahead for activation.
 var depositActivationStartEpoch = depositsInBlockStart + 2 + params.E2ETestConfig().MaxSeedLookahead
@@ -113,7 +113,7 @@ var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 	Evaluation: validatorsAreWithdrawn,
 }
 
-// ValidatorsVoteWithTheMajority verifies whether validator vote for eth1data using the majority algorithm.
+// ValidatorsVoteWithTheMajority verifies whether validator vote for executiondata using the majority algorithm.
 var ValidatorsVoteWithTheMajority = e2etypes.Evaluator{
 	Name:       "validators_vote_with_the_majority_%d",
 	Policy:     policies.AfterNthEpoch(0),
@@ -133,13 +133,13 @@ func (m mismatch) String() string {
 func processesDepositsInBlocks(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	expected := ec.Balances(e2etypes.PostGenesisDepositBatch)
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 	chainHead, err := client.GetChainHead(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "failed to get chain head")
 	}
 
-	req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: chainHead.HeadEpoch - 1}}
+	req := &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: chainHead.HeadEpoch - 1}}
 	blks, err := client.ListBeaconBlocks(context.Background(), req)
 	if err != nil {
 		return errors.Wrap(err, "failed to get blocks from beacon-chain")
@@ -173,7 +173,7 @@ func processesDepositsInBlocks(ec *e2etypes.EvaluationContext, conns ...*grpc.Cl
 
 func verifyGraffitiInBlocks(_ *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 	chainHead, err := client.GetChainHead(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "failed to get chain head")
@@ -183,7 +183,7 @@ func verifyGraffitiInBlocks(_ *e2etypes.EvaluationContext, conns ...*grpc.Client
 	if begin > 0 {
 		begin = begin.Sub(1)
 	}
-	req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
+	req := &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: begin}}
 	blks, err := client.ListBeaconBlocks(context.Background(), req)
 	if err != nil {
 		return errors.Wrap(err, "failed to get blocks from beacon-chain")
@@ -212,7 +212,7 @@ func verifyGraffitiInBlocks(_ *e2etypes.EvaluationContext, conns ...*grpc.Client
 
 func activatesDepositedValidators(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 
 	chainHead, err := client.GetChainHead(context.Background(), &emptypb.Empty{})
 	if err != nil {
@@ -271,11 +271,11 @@ func activatesDepositedValidators(ec *e2etypes.EvaluationContext, conns ...*grpc
 	return nil
 }
 
-func getAllValidators(c zondpb.BeaconChainClient) ([]*zondpb.Validator, error) {
-	vals := make([]*zondpb.Validator, 0)
+func getAllValidators(c qrysmpb.BeaconChainClient) ([]*qrysmpb.Validator, error) {
+	vals := make([]*qrysmpb.Validator, 0)
 	pageToken := "0"
 	for pageToken != "" {
-		validatorRequest := &zondpb.ListValidatorsRequest{
+		validatorRequest := &qrysmpb.ListValidatorsRequest{
 			PageSize:  100,
 			PageToken: pageToken,
 		}
@@ -293,7 +293,7 @@ func getAllValidators(c zondpb.BeaconChainClient) ([]*zondpb.Validator, error) {
 
 func depositedValidatorsAreActive(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 
 	chainHead, err := client.GetChainHead(context.Background(), &emptypb.Empty{})
 	if err != nil {
@@ -345,16 +345,16 @@ func depositedValidatorsAreActive(ec *e2etypes.EvaluationContext, conns ...*grpc
 
 func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	valClient := zondpb.NewBeaconNodeValidatorClient(conn)
-	beaconClient := zondpb.NewBeaconChainClient(conn)
-	debugClient := zondpb.NewDebugClient(conn)
+	valClient := qrysmpb.NewBeaconNodeValidatorClient(conn)
+	beaconClient := qrysmpb.NewBeaconChainClient(conn)
+	debugClient := qrysmpb.NewDebugClient(conn)
 
 	ctx := context.Background()
 	chainHead, err := beaconClient.GetChainHead(ctx, &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "could not get chain head")
 	}
-	stObj, err := debugClient.GetBeaconState(ctx, &zondpb.BeaconStateRequest{QueryFilter: &zondpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
+	stObj, err := debugClient.GetBeaconState(ctx, &qrysmpb.BeaconStateRequest{QueryFilter: &qrysmpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
 	if err != nil {
 		return errors.Wrap(err, "could not get state object")
 	}
@@ -368,7 +368,7 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 	}
 	execIndices := []int{}
 	err = st.ReadFromEveryValidator(func(idx int, val state.ReadOnlyValidator) error {
-		if val.WithdrawalCredentials()[0] == params.BeaconConfig().ZondAddressWithdrawalPrefixByte {
+		if val.WithdrawalCredentials()[0] == params.BeaconConfig().QRLAddressWithdrawalPrefixByte {
 			execIndices = append(execIndices, idx)
 		}
 		return nil
@@ -386,11 +386,11 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 	}
 
 	var sendExit = func(exitedIndex primitives.ValidatorIndex) error {
-		voluntaryExit := &zondpb.VoluntaryExit{
+		voluntaryExit := &qrysmpb.VoluntaryExit{
 			Epoch:          chainHead.HeadEpoch,
 			ValidatorIndex: exitedIndex,
 		}
-		req := &zondpb.DomainRequest{
+		req := &qrysmpb.DomainRequest{
 			Epoch:  chainHead.HeadEpoch,
 			Domain: params.BeaconConfig().DomainVoluntaryExit[:],
 		}
@@ -403,7 +403,7 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 			return err
 		}
 		signature := privKeys[exitedIndex].Sign(signingData[:])
-		signedExit := &zondpb.SignedVoluntaryExit{
+		signedExit := &qrysmpb.SignedVoluntaryExit{
 			Exit:      voluntaryExit,
 			Signature: signature.Marshal(),
 		}
@@ -440,10 +440,10 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 
 func validatorsHaveExited(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 	for k := range ec.ExitedVals {
-		validatorRequest := &zondpb.GetValidatorRequest{
-			QueryFilter: &zondpb.GetValidatorRequest_PublicKey{
+		validatorRequest := &qrysmpb.GetValidatorRequest{
+			QueryFilter: &qrysmpb.GetValidatorRequest_PublicKey{
 				PublicKey: k[:],
 			},
 		}
@@ -460,7 +460,7 @@ func validatorsHaveExited(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 
 func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 	chainHead, err := client.GetChainHead(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "failed to get chain head")
@@ -471,25 +471,25 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 	if begin > 0 {
 		begin = begin.Sub(1)
 	}
-	req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: begin}}
+	req := &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: begin}}
 	blks, err := client.ListBeaconBlocks(context.Background(), req)
 	if err != nil {
 		return errors.Wrap(err, "failed to get blocks from beacon-chain")
 	}
 
-	slotsPerVotingPeriod := params.E2ETestConfig().SlotsPerEpoch.Mul(uint64(params.E2ETestConfig().EpochsPerEth1VotingPeriod))
+	slotsPerVotingPeriod := params.E2ETestConfig().SlotsPerEpoch.Mul(uint64(params.E2ETestConfig().EpochsPerExecutionVotingPeriod))
 	for _, blk := range blks.BlockContainers {
 		var slot primitives.Slot
 		var vote []byte
 		switch blk.Block.(type) {
-		case *zondpb.BeaconBlockContainer_CapellaBlock:
+		case *qrysmpb.BeaconBlockContainer_CapellaBlock:
 			b := blk.GetCapellaBlock().Block
 			slot = b.Slot
-			vote = b.Body.Eth1Data.BlockHash
-		case *zondpb.BeaconBlockContainer_BlindedCapellaBlock:
+			vote = b.Body.ExecutionData.BlockHash
+		case *qrysmpb.BeaconBlockContainer_BlindedCapellaBlock:
 			b := blk.GetBlindedCapellaBlock().Block
 			slot = b.Slot
-			vote = b.Body.Eth1Data.BlockHash
+			vote = b.Body.ExecutionData.BlockHash
 		default:
 			return errors.New("invalid block type")
 		}
@@ -509,11 +509,11 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 			isFirstSlotInVotingPeriod = slot%slotsPerVotingPeriod == 0
 		}
 		if isFirstSlotInVotingPeriod {
-			ec.ExpectedEth1DataVote = vote
+			ec.ExpectedExecutionDataVote = vote
 			return nil
 		}
 
-		if !bytes.Equal(vote, ec.ExpectedEth1DataVote) {
+		if !bytes.Equal(vote, ec.ExpectedExecutionDataVote) {
 			for i := primitives.Slot(0); i < slot; i++ {
 				v, ok := ec.SeenVotes[i]
 				if ok {
@@ -522,8 +522,8 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 					fmt.Printf("did not see slot=%d\n", i)
 				}
 			}
-			return fmt.Errorf("incorrect eth1data vote for slot %d; expected: %#x vs voted: %#x",
-				slot, ec.ExpectedEth1DataVote, vote)
+			return fmt.Errorf("incorrect executiondata vote for slot %d; expected: %#x vs voted: %#x",
+				slot, ec.ExpectedExecutionDataVote, vote)
 		}
 	}
 	return nil
@@ -531,16 +531,16 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 
 func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	beaconAPIClient := zondpbservice.NewBeaconChainClient(conn)
-	beaconClient := zondpb.NewBeaconChainClient(conn)
-	debugClient := zondpb.NewDebugClient(conn)
+	beaconAPIClient := service.NewBeaconChainClient(conn)
+	beaconClient := qrysmpb.NewBeaconChainClient(conn)
+	debugClient := qrysmpb.NewDebugClient(conn)
 
 	ctx := context.Background()
 	chainHead, err := beaconClient.GetChainHead(ctx, &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "could not get chain head")
 	}
-	stObj, err := debugClient.GetBeaconState(ctx, &zondpb.BeaconStateRequest{QueryFilter: &zondpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
+	stObj, err := debugClient.GetBeaconState(ctx, &qrysmpb.BeaconStateRequest{QueryFilter: &qrysmpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
 	if err != nil {
 		return errors.Wrap(err, "could not get state object")
 	}
@@ -566,7 +566,7 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 	if err != nil {
 		return err
 	}
-	changes := make([]*v1.SignedDilithiumToExecutionChange, 0)
+	changes := make([]*qrlpb.SignedDilithiumToExecutionChange, 0)
 	// Only send half the number of changes each time, to allow us to test
 	// at the fork boundary.
 	wantedChanges := numOfExits / 2
@@ -579,13 +579,13 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 		if err != nil {
 			return err
 		}
-		if val.WithdrawalCredentials[0] == params.BeaconConfig().ZondAddressWithdrawalPrefixByte {
+		if val.WithdrawalCredentials[0] == params.BeaconConfig().QRLAddressWithdrawalPrefixByte {
 			continue
 		}
 		if !bytes.Equal(val.PublicKey, privKeys[idx].PublicKey().Marshal()) {
 			return errors.Errorf("pubkey is not equal, wanted %#x but received %#x", val.PublicKey, privKeys[idx].PublicKey().Marshal())
 		}
-		message := &v1.DilithiumToExecutionChange{
+		message := &qrlpb.DilithiumToExecutionChange{
 			ValidatorIndex:      idx,
 			FromDilithiumPubkey: privKeys[idx].PublicKey().Marshal(),
 			ToExecutionAddress:  bytesutil.ToBytes(uint64(idx), 20),
@@ -599,28 +599,28 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 			return err
 		}
 		signature := privKeys[idx].Sign(sigRoot[:]).Marshal()
-		change := &v1.SignedDilithiumToExecutionChange{
+		change := &qrlpb.SignedDilithiumToExecutionChange{
 			Message:   message,
 			Signature: signature,
 		}
 		changes = append(changes, change)
 	}
-	_, err = beaconAPIClient.SubmitSignedDilithiumToExecutionChanges(ctx, &v1.SubmitDilithiumToExecutionChangesRequest{Changes: changes})
+	_, err = beaconAPIClient.SubmitSignedDilithiumToExecutionChanges(ctx, &qrlpb.SubmitDilithiumToExecutionChangesRequest{Changes: changes})
 
 	return err
 }
 
 func validatorsAreWithdrawn(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	beaconClient := zondpb.NewBeaconChainClient(conn)
-	debugClient := zondpb.NewDebugClient(conn)
+	beaconClient := qrysmpb.NewBeaconChainClient(conn)
+	debugClient := qrysmpb.NewDebugClient(conn)
 
 	ctx := context.Background()
 	chainHead, err := beaconClient.GetChainHead(ctx, &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "could not get chain head")
 	}
-	stObj, err := debugClient.GetBeaconState(ctx, &zondpb.BeaconStateRequest{QueryFilter: &zondpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
+	stObj, err := debugClient.GetBeaconState(ctx, &qrysmpb.BeaconStateRequest{QueryFilter: &qrysmpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
 	if err != nil {
 		return errors.Wrap(err, "could not get state object")
 	}
@@ -642,9 +642,9 @@ func validatorsAreWithdrawn(ec *e2etypes.EvaluationContext, conns ...*grpc.Clien
 		if err != nil {
 			return err
 		}
-		// Only return an error if the validator has more than 1 zond
+		// Only return an error if the validator has more than 1 quanta
 		// in its balance.
-		if bal > 1*params.BeaconConfig().GplanckPerZond {
+		if bal > 1*params.BeaconConfig().GplanckPerQuanta {
 			return errors.Errorf("Validator index %d with key %#x hasn't withdrawn. Their balance is %d.", valIdx, key, bal)
 		}
 	}

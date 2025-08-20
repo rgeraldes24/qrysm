@@ -9,7 +9,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/spectest/utils"
 	"github.com/theQRL/qrysm/testing/util"
@@ -28,10 +28,10 @@ func RunVoluntaryExitTest(t *testing.T, config string) {
 			require.NoError(t, err)
 			exitSSZ, err := snappy.Decode(nil /* dst */, exitFile)
 			require.NoError(t, err, "Failed to decompress")
-			voluntaryExit := &zondpb.SignedVoluntaryExit{}
+			voluntaryExit := &qrysmpb.SignedVoluntaryExit{}
 			require.NoError(t, voluntaryExit.UnmarshalSSZ(exitSSZ), "Failed to unmarshal")
 
-			body := &zondpb.BeaconBlockBodyCapella{VoluntaryExits: []*zondpb.SignedVoluntaryExit{voluntaryExit}}
+			body := &qrysmpb.BeaconBlockBodyCapella{VoluntaryExits: []*qrysmpb.SignedVoluntaryExit{voluntaryExit}}
 			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
 				return blocks.ProcessVoluntaryExits(ctx, s, b.Block().Body().VoluntaryExits())
 			})

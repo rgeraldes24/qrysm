@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/api/gateway/apimiddleware"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpbv1 "github.com/theQRL/qrysm/proto/zond/v1"
+	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
@@ -202,7 +202,7 @@ func TestSerializeBlock(t *testing.T) {
 func TestSerializeBlindedBlock(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		response := &BlindedBlockResponseJson{
-			Version: zondpbv1.Version_CAPELLA.String(),
+			Version: qrlpb.Version_CAPELLA.String(),
 			Data: &SignedBlindedBeaconBlockContainerJson{
 				CapellaBlock: &BlindedBeaconBlockCapellaJson{
 					Slot:          "1",
@@ -292,7 +292,7 @@ func TestSerializeBlindedBlock(t *testing.T) {
 func TestSerializeState(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		response := &BeaconStateResponseJson{
-			Version: zondpbv1.Version_CAPELLA.String(),
+			Version: qrlpb.Version_CAPELLA.String(),
 			Data: &BeaconStateContainerJson{
 				CapellaState: &BeaconStateCapellaJson{},
 			},
@@ -327,7 +327,7 @@ func TestSerializeState(t *testing.T) {
 func TestSerializeProducedBlock(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		response := &ProduceBlockResponseJson{
-			Version: zondpbv1.Version_CAPELLA.String(),
+			Version: qrlpb.Version_CAPELLA.String(),
 			Data: &BeaconBlockContainerJson{
 				CapellaBlock: &BeaconBlockCapellaJson{
 					Slot:          "1",
@@ -377,7 +377,7 @@ func TestSerializeProducedBlock(t *testing.T) {
 func TestSerializeProduceBlindedBlock(t *testing.T) {
 	t.Run("Capella", func(t *testing.T) {
 		response := &ProduceBlindedBlockResponseJson{
-			Version: zondpbv1.Version_CAPELLA.String(),
+			Version: qrlpb.Version_CAPELLA.String(),
 			Data: &BlindedBeaconBlockContainerJson{
 				CapellaBlock: &BlindedBeaconBlockCapellaJson{
 					Slot:          "1",

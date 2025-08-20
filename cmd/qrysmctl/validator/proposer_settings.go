@@ -37,7 +37,7 @@ func getProposerSettings(c *cli.Context, r io.Reader) error {
 			}
 			defaultFeeRecipient = recipient
 		} else {
-			promptText := "Please enter a default fee recipient address (a zond address in hex format)"
+			promptText := "Please enter a default fee recipient address (a qrl address in Q-prefixed hex format)"
 			resp, err := prompt.ValidatePrompt(r, promptText, validateIsExecutionAddress)
 			if err != nil {
 				return err

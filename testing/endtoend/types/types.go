@@ -105,9 +105,9 @@ type DepositBalancer interface {
 // EvaluationContext allows for additional data to be provided to evaluators that need extra state.
 type EvaluationContext struct {
 	DepositBalancer
-	ExitedVals           map[[field_params.DilithiumPubkeyLength]byte]bool
-	SeenVotes            map[primitives.Slot][]byte
-	ExpectedEth1DataVote []byte
+	ExitedVals                map[[field_params.DilithiumPubkeyLength]byte]bool
+	SeenVotes                 map[primitives.Slot][]byte
+	ExpectedExecutionDataVote []byte
 }
 
 // NewEvaluationContext handles initializing internal datastructures (like maps) provided by the EvaluationContext.
@@ -161,6 +161,6 @@ type EngineProxy interface {
 // of a group of beacon nodes.
 type BeaconNodeSet interface {
 	ComponentRunner
-	// SetENR provides the relevant bootnode's enr to the beacon nodes.
-	SetENR(enr string)
+	// SetQNR provides the relevant bootnode's qnr to the beacon nodes.
+	SetQNR(qnr string)
 }

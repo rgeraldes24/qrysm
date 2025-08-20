@@ -19,7 +19,7 @@ import (
 	validatorserviceconfig "github.com/theQRL/qrysm/config/validator/service"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/validator/accounts/wallet"
 	beaconChainClientFactory "github.com/theQRL/qrysm/validator/client/beacon-chain-client-factory"
 	"github.com/theQRL/qrysm/validator/client/iface"
@@ -45,7 +45,7 @@ type SyncChecker interface {
 // GenesisFetcher can retrieve genesis information such as
 // the genesis time and the validator deposit contract address.
 type GenesisFetcher interface {
-	GenesisInfo(ctx context.Context) (*zondpb.Genesis, error)
+	GenesisInfo(ctx context.Context) (*qrysmpb.Genesis, error)
 }
 
 // ValidatorService represents a service to manage the validator client
@@ -197,7 +197,7 @@ func (v *ValidatorService) Start() {
 		startBalances:                  make(map[[field_params.DilithiumPubkeyLength]byte]uint64),
 		prevBalance:                    make(map[[field_params.DilithiumPubkeyLength]byte]uint64),
 		pubkeyToValidatorIndex:         make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-		signedValidatorRegistrations:   make(map[[field_params.DilithiumPubkeyLength]byte]*zondpb.SignedValidatorRegistrationV1),
+		signedValidatorRegistrations:   make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 		attLogs:                        make(map[[32]byte]*attSubmitted),
 		domainDataCache:                cache,
 		aggregatedSlotCommitteeIDCache: aggregatedSlotCommitteeIDCache,
@@ -334,7 +334,7 @@ func ConstructDialOptions(
 
 // Syncing returns whether or not the beacon node is currently synchronizing the chain.
 func (v *ValidatorService) Syncing(ctx context.Context) (bool, error) {
-	nc := zondpb.NewNodeClient(v.conn.GetGrpcClientConn())
+	nc := qrysmpb.NewNodeClient(v.conn.GetGrpcClientConn())
 	resp, err := nc.GetSyncStatus(ctx, &emptypb.Empty{})
 	if err != nil {
 		return false, err
@@ -344,7 +344,7 @@ func (v *ValidatorService) Syncing(ctx context.Context) (bool, error) {
 
 // GenesisInfo queries the beacon node for the chain genesis info containing
 // the genesis time along with the validator deposit contract address.
-func (v *ValidatorService) GenesisInfo(ctx context.Context) (*zondpb.Genesis, error) {
-	nc := zondpb.NewNodeClient(v.conn.GetGrpcClientConn())
+func (v *ValidatorService) GenesisInfo(ctx context.Context) (*qrysmpb.Genesis, error) {
+	nc := qrysmpb.NewNodeClient(v.conn.GetGrpcClientConn())
 	return nc.GetGenesis(ctx, &emptypb.Empty{})
 }

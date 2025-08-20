@@ -144,6 +144,8 @@ func TestMetadataRPCHandler_SendsMetadata(t *testing.T) {
 	}
 }
 
+// NOTE(rgeraldes24): unused for now
+/*
 func TestMetadataRPCHandler_SendsMetadataAltair(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
 
@@ -231,6 +233,7 @@ func TestMetadataRPCHandler_SendsMetadataAltair(t *testing.T) {
 		t.Error("Peer is disconnected despite receiving a valid ping")
 	}
 }
+*/
 
 func TestExtractMetaDataType(t *testing.T) {
 	// Precompute digests

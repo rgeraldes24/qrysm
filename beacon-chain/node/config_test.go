@@ -66,7 +66,7 @@ func TestConfigureProofOfWork(t *testing.T) {
 	require.NoError(t, set.Set(flags.DepositContractFlag.Name, "deposit-contract"))
 	cliCtx := cli.NewContext(&app, set, nil)
 
-	require.NoError(t, configureEth1Config(cliCtx))
+	require.NoError(t, configureExecutionConfig(cliCtx))
 
 	assert.Equal(t, uint64(100), params.BeaconConfig().DepositChainID)
 	assert.Equal(t, uint64(200), params.BeaconConfig().DepositNetworkID)
@@ -87,22 +87,22 @@ func TestConfigureExecutionSetting(t *testing.T) {
 	assert.LogsContain(t, hook, "ZB is not a valid fee recipient address")
 	require.NoError(t, err)
 
-	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "ZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
 	cliCtx = cli.NewContext(&app, set, nil)
 	err = configureExecutionSetting(cliCtx)
 	require.NoError(t, err)
-	recipient0, err := common.NewAddressFromString("ZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+	recipient0, err := common.NewAddressFromString("QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 	require.NoError(t, err)
 	assert.Equal(t, recipient0, params.BeaconConfig().DefaultFeeRecipient)
 
 	assert.LogsContain(t, hook,
-		"is not a checksum Zond address",
+		"is not a checksum QRL address",
 	)
-	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "ZaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa"))
+	require.NoError(t, set.Set(flags.SuggestedFeeRecipient.Name, "QaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa"))
 	cliCtx = cli.NewContext(&app, set, nil)
 	err = configureExecutionSetting(cliCtx)
 	require.NoError(t, err)
-	recipient1, err := common.NewAddressFromString("ZaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa")
+	recipient1, err := common.NewAddressFromString("QaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa")
 	require.NoError(t, err)
 	assert.Equal(t, recipient1, params.BeaconConfig().DefaultFeeRecipient)
 }
@@ -184,8 +184,8 @@ func TestConfigureInterop(t *testing.T) {
 			func() *cli.Context {
 				app := cli.App{}
 				set := flag.NewFlagSet("test", 0)
-				set.Bool(flags.InteropMockEth1DataVotesFlag.Name, false, "")
-				assert.NoError(t, set.Set(flags.InteropMockEth1DataVotesFlag.Name, "true"))
+				set.Bool(flags.InteropMockExecutionDataVotesFlag.Name, false, "")
+				assert.NoError(t, set.Set(flags.InteropMockExecutionDataVotesFlag.Name, "true"))
 				return cli.NewContext(&app, set, nil)
 			},
 			"interop",

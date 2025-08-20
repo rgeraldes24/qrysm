@@ -9,10 +9,10 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/common/hexutil"
+	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
-	"github.com/theQRL/go-zond/zondclient"
 	"github.com/theQRL/qrysm/config/params"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/interop"
 	"github.com/theQRL/qrysm/testing/endtoend/components"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
@@ -45,12 +45,12 @@ func valKeyMap() (map[string]bool, error) {
 
 func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn) error {
 	conn := conns[0]
-	client := zondpb.NewBeaconChainClient(conn)
+	client := qrysmpb.NewBeaconChainClient(conn)
 	chainHead, err := client.GetChainHead(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		return errors.Wrap(err, "failed to get chain head")
 	}
-	req := &zondpb.ListBlocksRequest{QueryFilter: &zondpb.ListBlocksRequest_Epoch{Epoch: chainHead.HeadEpoch.Sub(1)}}
+	req := &qrysmpb.ListBlocksRequest{QueryFilter: &qrysmpb.ListBlocksRequest_Epoch{Epoch: chainHead.HeadEpoch.Sub(1)}}
 	blks, err := client.ListBeaconBlocks(context.Background(), req)
 	if err != nil {
 		return errors.Wrap(err, "failed to list blocks")
@@ -76,14 +76,14 @@ func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 			if bytes.Equal(payload.BlockHash, make([]byte, 32)) {
 				continue
 			}
-			if len(payload.FeeRecipient) == 0 || hexutil.Encode(payload.FeeRecipient) == params.BeaconConfig().ZondBurnAddress {
+			if len(payload.FeeRecipient) == 0 || hexutil.Encode(payload.FeeRecipient) == params.BeaconConfig().QRLBurnAddress {
 				log.WithField("proposer_index", bb.ProposerIndex).WithField("slot", bb.Slot).Error("fee recipient eval bug")
 				return errors.New("fee recipient is not set")
 			}
 
 			fr := common.BytesToAddress(payload.FeeRecipient)
-			gvr := &zondpb.GetValidatorRequest{
-				QueryFilter: &zondpb.GetValidatorRequest_Index{
+			gvr := &qrysmpb.GetValidatorRequest{
+				QueryFilter: &qrysmpb.GetValidatorRequest_Index{
 					Index: ctr.GetCapellaBlock().Block.ProposerIndex,
 				},
 			}
@@ -122,7 +122,7 @@ func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 }
 
 func checkRecipientBalance(c *rpc.Client, block, parent common.Hash, account common.Address) error {
-	web3 := zondclient.NewClient(c)
+	web3 := qrlclient.NewClient(c)
 	ctx := context.Background()
 	b, err := web3.BlockByHash(ctx, block)
 	if err != nil {

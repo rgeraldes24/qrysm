@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	zondpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
@@ -23,7 +23,7 @@ import (
 
 func TestProcessSyncCommitteeUpdates_CanRotate(t *testing.T) {
 	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().MaxValidatorsPerCommittee)
-	h := &zondpb.BeaconBlockHeader{
+	h := &qrysmpb.BeaconBlockHeader{
 		StateRoot:  bytesutil.PadTo([]byte{'a'}, 32),
 		ParentRoot: bytesutil.PadTo([]byte{'b'}, 32),
 		BodyRoot:   bytesutil.PadTo([]byte{'c'}, 32),
@@ -97,9 +97,9 @@ func TestProcessParticipationFlagUpdates_CanRotate(t *testing.T) {
 }
 
 func TestProcessSlashings_NotSlashed(t *testing.T) {
-	base := &zondpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateCapella{
 		Slot:       0,
-		Validators: []*zondpb.Validator{{Slashed: true}},
+		Validators: []*qrysmpb.Validator{{Slashed: true}},
 		Balances:   []uint64{params.BeaconConfig().MaxEffectiveBalance},
 		Slashings:  []uint64{0, 1e9},
 	}
@@ -113,12 +113,12 @@ func TestProcessSlashings_NotSlashed(t *testing.T) {
 
 func TestProcessSlashings_SlashedLess(t *testing.T) {
 	tests := []struct {
-		state *zondpb.BeaconStateCapella
+		state *qrysmpb.BeaconStateCapella
 		want  uint64
 	}{
 		{
-			state: &zondpb.BeaconStateCapella{
-				Validators: []*zondpb.Validator{
+			state: &qrysmpb.BeaconStateCapella{
+				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
 						EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance},
@@ -129,8 +129,8 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			want: uint64(39997000000000),
 		},
 		{
-			state: &zondpb.BeaconStateCapella{
-				Validators: []*zondpb.Validator{
+			state: &qrysmpb.BeaconStateCapella{
+				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
 						EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance},
@@ -143,8 +143,8 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			want: uint64(39999000000000),
 		},
 		{
-			state: &zondpb.BeaconStateCapella{
-				Validators: []*zondpb.Validator{
+			state: &qrysmpb.BeaconStateCapella{
+				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
 						EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance},
@@ -157,8 +157,8 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 			want: uint64(39997000000000),
 		},
 		{
-			state: &zondpb.BeaconStateCapella{
-				Validators: []*zondpb.Validator{
+			state: &qrysmpb.BeaconStateCapella{
+				Validators: []*qrysmpb.Validator{
 					{Slashed: true,
 						WithdrawableEpoch: params.BeaconConfig().EpochsPerSlashingsVector / 2,
 						EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance - params.BeaconConfig().EffectiveBalanceIncrement},
@@ -184,9 +184,9 @@ func TestProcessSlashings_SlashedLess(t *testing.T) {
 }
 
 func TestProcessSlashings_BadValue(t *testing.T) {
-	base := &zondpb.BeaconStateCapella{
+	base := &qrysmpb.BeaconStateCapella{
 		Slot:       0,
-		Validators: []*zondpb.Validator{{Slashed: true}},
+		Validators: []*qrysmpb.Validator{{Slashed: true}},
 		Balances:   []uint64{params.BeaconConfig().MaxEffectiveBalance},
 		Slashings:  []uint64{math.MaxUint64, 1e9},
 	}
