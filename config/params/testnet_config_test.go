@@ -100,7 +100,7 @@ func compareConfigs(t *testing.T, expected, actual *params.BeaconChainConfig) {
 	require.DeepEqual(t, expected.DomainSyncCommittee, actual.DomainSyncCommittee)
 	require.DeepEqual(t, expected.DomainSyncCommitteeSelectionProof, actual.DomainSyncCommitteeSelectionProof)
 	require.DeepEqual(t, expected.DomainContributionAndProof, actual.DomainContributionAndProof)
-	require.DeepEqual(t, expected.GplanckPerQuanta, actual.GplanckPerQuanta)
+	require.DeepEqual(t, expected.ShorPerQuanta, actual.ShorPerQuanta)
 	require.DeepEqual(t, expected.DefaultBufferSize, actual.DefaultBufferSize)
 	require.DeepEqual(t, expected.ValidatorPrivkeyFileName, actual.ValidatorPrivkeyFileName)
 	require.DeepEqual(t, expected.WithdrawalPrivkeyFileName, actual.WithdrawalPrivkeyFileName)

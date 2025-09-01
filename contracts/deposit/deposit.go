@@ -20,17 +20,17 @@ import (
 //	To submit a deposit:
 //
 //	- Pack the validator's initialization parameters into deposit_data, a Deposit_Data SSZ object.
-//	- Let amount be the amount in Gplanck to be deposited by the validator where MIN_DEPOSIT_AMOUNT <= amount <= MAX_EFFECTIVE_BALANCE.
+//	- Let amount be the amount in Shor to be deposited by the validator where MIN_DEPOSIT_AMOUNT <= amount <= MAX_EFFECTIVE_BALANCE.
 //	- Set deposit_data.amount = amount.
 //	- Let signature be the result of bls_sign of the signing_root(deposit_data) with domain=compute_domain(DOMAIN_DEPOSIT). (Deposits are valid regardless of fork version, compute_domain will default to zeroes there).
-//	- Send a transaction on the QRL execution layer to DEPOSIT_CONTRACT_ADDRESS executing `deposit(pubkey: bytes[48], withdrawal_credentials: bytes[32], signature: bytes[96])` along with a deposit of amount Gplanck.
+//	- Send a transaction on the QRL execution layer to DEPOSIT_CONTRACT_ADDRESS executing `deposit(pubkey: bytes[48], withdrawal_credentials: bytes[32], signature: bytes[96])` along with a deposit of amount Shor.
 //
 // See: https://github.com/ethereum/consensus-specs/blob/master/specs/validator/0_beacon-chain-validator.md#submit-deposit
-func DepositInput(depositKey, withdrawalKey dilithium.DilithiumKey, amountInGplanck uint64, forkVersion []byte) (*qrysmpb.Deposit_Data, [32]byte, error) {
+func DepositInput(depositKey, withdrawalKey dilithium.DilithiumKey, amountInShor uint64, forkVersion []byte) (*qrysmpb.Deposit_Data, [32]byte, error) {
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             depositKey.PublicKey().Marshal(),
 		WithdrawalCredentials: WithdrawalCredentialsHash(withdrawalKey),
-		Amount:                amountInGplanck,
+		Amount:                amountInShor,
 	}
 
 	sr, err := depositMessage.HashTreeRoot()

@@ -33,10 +33,10 @@ import (
 //
 //	# Compute participant and proposer rewards
 //	total_active_increments = get_total_active_balance(state) // EFFECTIVE_BALANCE_INCREMENT
-//	total_base_rewards = Gplanck(get_base_reward_per_increment(state) * total_active_increments)
-//	max_participant_rewards = Gplanck(total_base_rewards * SYNC_REWARD_WEIGHT // WEIGHT_DENOMINATOR // SLOTS_PER_EPOCH)
-//	participant_reward = Gplanck(max_participant_rewards // SYNC_COMMITTEE_SIZE)
-//	proposer_reward = Gplanck(participant_reward * PROPOSER_WEIGHT // (WEIGHT_DENOMINATOR - PROPOSER_WEIGHT))
+//	total_base_rewards = Shor(get_base_reward_per_increment(state) * total_active_increments)
+//	max_participant_rewards = Shor(total_base_rewards * SYNC_REWARD_WEIGHT // WEIGHT_DENOMINATOR // SLOTS_PER_EPOCH)
+//	participant_reward = Shor(max_participant_rewards // SYNC_COMMITTEE_SIZE)
+//	proposer_reward = Shor(participant_reward * PROPOSER_WEIGHT // (WEIGHT_DENOMINATOR - PROPOSER_WEIGHT))
 //
 //	# Apply participant and proposer rewards
 //	all_pubkeys = [v.pubkey for v in state.validators]

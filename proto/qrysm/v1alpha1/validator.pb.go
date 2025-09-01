@@ -1788,13 +1788,13 @@ type ValidatorParticipation struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CurrentEpochActiveGplanck           uint64 `protobuf:"varint,1,opt,name=current_epoch_active_gplanck,json=currentEpochActiveGplanck,proto3" json:"current_epoch_active_gplanck,omitempty"`
-	CurrentEpochAttestingGplanck        uint64 `protobuf:"varint,2,opt,name=current_epoch_attesting_gplanck,json=currentEpochAttestingGplanck,proto3" json:"current_epoch_attesting_gplanck,omitempty"`
-	CurrentEpochTargetAttestingGplanck  uint64 `protobuf:"varint,3,opt,name=current_epoch_target_attesting_gplanck,json=currentEpochTargetAttestingGplanck,proto3" json:"current_epoch_target_attesting_gplanck,omitempty"`
-	PreviousEpochActiveGplanck          uint64 `protobuf:"varint,4,opt,name=previous_epoch_active_gplanck,json=previousEpochActiveGplanck,proto3" json:"previous_epoch_active_gplanck,omitempty"`
-	PreviousEpochAttestingGplanck       uint64 `protobuf:"varint,5,opt,name=previous_epoch_attesting_gplanck,json=previousEpochAttestingGplanck,proto3" json:"previous_epoch_attesting_gplanck,omitempty"`
-	PreviousEpochTargetAttestingGplanck uint64 `protobuf:"varint,6,opt,name=previous_epoch_target_attesting_gplanck,json=previousEpochTargetAttestingGplanck,proto3" json:"previous_epoch_target_attesting_gplanck,omitempty"`
-	PreviousEpochHeadAttestingGplanck   uint64 `protobuf:"varint,7,opt,name=previous_epoch_head_attesting_gplanck,json=previousEpochHeadAttestingGplanck,proto3" json:"previous_epoch_head_attesting_gplanck,omitempty"`
+	CurrentEpochActiveShor           uint64 `protobuf:"varint,1,opt,name=current_epoch_active_shor,json=currentEpochActiveShor,proto3" json:"current_epoch_active_shor,omitempty"`
+	CurrentEpochAttestingShor        uint64 `protobuf:"varint,2,opt,name=current_epoch_attesting_shor,json=currentEpochAttestingShor,proto3" json:"current_epoch_attesting_shor,omitempty"`
+	CurrentEpochTargetAttestingShor  uint64 `protobuf:"varint,3,opt,name=current_epoch_target_attesting_shor,json=currentEpochTargetAttestingShor,proto3" json:"current_epoch_target_attesting_shor,omitempty"`
+	PreviousEpochActiveShor          uint64 `protobuf:"varint,4,opt,name=previous_epoch_active_shor,json=previousEpochActiveShor,proto3" json:"previous_epoch_active_shor,omitempty"`
+	PreviousEpochAttestingShor       uint64 `protobuf:"varint,5,opt,name=previous_epoch_attesting_shor,json=previousEpochAttestingShor,proto3" json:"previous_epoch_attesting_shor,omitempty"`
+	PreviousEpochTargetAttestingShor uint64 `protobuf:"varint,6,opt,name=previous_epoch_target_attesting_shor,json=previousEpochTargetAttestingShor,proto3" json:"previous_epoch_target_attesting_shor,omitempty"`
+	PreviousEpochHeadAttestingShor   uint64 `protobuf:"varint,7,opt,name=previous_epoch_head_attesting_shor,json=previousEpochHeadAttestingShor,proto3" json:"previous_epoch_head_attesting_shor,omitempty"`
 }
 
 func (x *ValidatorParticipation) Reset() {
@@ -1829,51 +1829,51 @@ func (*ValidatorParticipation) Descriptor() ([]byte, []int) {
 	return file_proto_qrysm_v1alpha1_validator_proto_rawDescGZIP(), []int{30}
 }
 
-func (x *ValidatorParticipation) GetCurrentEpochActiveGplanck() uint64 {
+func (x *ValidatorParticipation) GetCurrentEpochActiveShor() uint64 {
 	if x != nil {
-		return x.CurrentEpochActiveGplanck
+		return x.CurrentEpochActiveShor
 	}
 	return 0
 }
 
-func (x *ValidatorParticipation) GetCurrentEpochAttestingGplanck() uint64 {
+func (x *ValidatorParticipation) GetCurrentEpochAttestingShor() uint64 {
 	if x != nil {
-		return x.CurrentEpochAttestingGplanck
+		return x.CurrentEpochAttestingShor
 	}
 	return 0
 }
 
-func (x *ValidatorParticipation) GetCurrentEpochTargetAttestingGplanck() uint64 {
+func (x *ValidatorParticipation) GetCurrentEpochTargetAttestingShor() uint64 {
 	if x != nil {
-		return x.CurrentEpochTargetAttestingGplanck
+		return x.CurrentEpochTargetAttestingShor
 	}
 	return 0
 }
 
-func (x *ValidatorParticipation) GetPreviousEpochActiveGplanck() uint64 {
+func (x *ValidatorParticipation) GetPreviousEpochActiveShor() uint64 {
 	if x != nil {
-		return x.PreviousEpochActiveGplanck
+		return x.PreviousEpochActiveShor
 	}
 	return 0
 }
 
-func (x *ValidatorParticipation) GetPreviousEpochAttestingGplanck() uint64 {
+func (x *ValidatorParticipation) GetPreviousEpochAttestingShor() uint64 {
 	if x != nil {
-		return x.PreviousEpochAttestingGplanck
+		return x.PreviousEpochAttestingShor
 	}
 	return 0
 }
 
-func (x *ValidatorParticipation) GetPreviousEpochTargetAttestingGplanck() uint64 {
+func (x *ValidatorParticipation) GetPreviousEpochTargetAttestingShor() uint64 {
 	if x != nil {
-		return x.PreviousEpochTargetAttestingGplanck
+		return x.PreviousEpochTargetAttestingShor
 	}
 	return 0
 }
 
-func (x *ValidatorParticipation) GetPreviousEpochHeadAttestingGplanck() uint64 {
+func (x *ValidatorParticipation) GetPreviousEpochHeadAttestingShor() uint64 {
 	if x != nil {
-		return x.PreviousEpochHeadAttestingGplanck
+		return x.PreviousEpochHeadAttestingShor
 	}
 	return 0
 }

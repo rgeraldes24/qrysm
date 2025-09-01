@@ -285,7 +285,7 @@ func (p *Builder) handleHeaderRequestCapella(w http.ResponseWriter) {
 	planckVal := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(b.Value))
 	// we set the payload value as twice its actual one so that it always chooses builder payloads vs local payloads
 	planckVal = planckVal.Mul(planckVal, big.NewInt(2))
-	wObj, err := blocks.WrappedExecutionPayloadCapella(b.Payload, math.PlanckToGplanck(planckVal))
+	wObj, err := blocks.WrappedExecutionPayloadCapella(b.Payload, math.PlanckToShor(planckVal))
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not wrap execution payload")
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -52,10 +52,10 @@ func (s sortableIndices) Less(i, j int) bool {
 //
 // Spec pseudocode definition:
 //
-//	def get_attesting_balance(state: BeaconState, attestations: Sequence[PendingAttestation]) -> Gplanck:
+//	def get_attesting_balance(state: BeaconState, attestations: Sequence[PendingAttestation]) -> Shor:
 //	  """
 //	  Return the combined effective balance of the set of unslashed validators participating in ``attestations``.
-//	  Note: ``get_total_balance`` returns ``EFFECTIVE_BALANCE_INCREMENT`` Gplanck minimum to avoid divisions by zero.
+//	  Note: ``get_total_balance`` returns ``EFFECTIVE_BALANCE_INCREMENT`` Shor minimum to avoid divisions by zero.
 //	  """
 //	  return get_total_balance(state, get_unslashed_attesting_indices(state, attestations))
 func AttestingBalance(ctx context.Context, state state.ReadOnlyBeaconState, atts []*qrysmpb.PendingAttestation) (uint64, error) {
@@ -295,7 +295,7 @@ func ProcessEffectiveBalanceUpdates(state state.BeaconState) (state.BeaconState,
 //	def process_slashings_reset(state: BeaconState) -> None:
 //	  next_epoch = Epoch(get_current_epoch(state) + 1)
 //	  # Reset slashings
-//	  state.slashings[next_epoch % EPOCHS_PER_SLASHINGS_VECTOR] = Gplanck(0)
+//	  state.slashings[next_epoch % EPOCHS_PER_SLASHINGS_VECTOR] = Shor(0)
 func ProcessSlashingsReset(state state.BeaconState) (state.BeaconState, error) {
 	currentEpoch := time.CurrentEpoch(state)
 	nextEpoch := currentEpoch + 1

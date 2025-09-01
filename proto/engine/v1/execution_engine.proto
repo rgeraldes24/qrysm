@@ -110,6 +110,6 @@ message Withdrawal {
 	// The execution address receiving the funds
 	bytes address = 3 [(theqrl.qrl.ext.ssz_size) = "20"];
 
-	// The withdrawn amount in Gplanck
+	// The withdrawn amount in Shor
 	uint64 amount = 4;
 }

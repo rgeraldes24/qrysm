@@ -533,13 +533,13 @@ func (bs *Server) GetValidatorParticipation(
 		Epoch:     requestedEpoch,
 		Finalized: requestedEpoch <= cp.Epoch,
 		Participation: &qrysmpb.ValidatorParticipation{
-			CurrentEpochActiveGplanck:           b.ActiveCurrentEpoch,
-			CurrentEpochAttestingGplanck:        b.CurrentEpochAttested,
-			CurrentEpochTargetAttestingGplanck:  b.CurrentEpochTargetAttested,
-			PreviousEpochActiveGplanck:          b.ActivePrevEpoch,
-			PreviousEpochAttestingGplanck:       b.PrevEpochAttested,
-			PreviousEpochTargetAttestingGplanck: b.PrevEpochTargetAttested,
-			PreviousEpochHeadAttestingGplanck:   b.PrevEpochHeadAttested,
+			CurrentEpochActiveShor:           b.ActiveCurrentEpoch,
+			CurrentEpochAttestingShor:        b.CurrentEpochAttested,
+			CurrentEpochTargetAttestingShor:  b.CurrentEpochTargetAttested,
+			PreviousEpochActiveShor:          b.ActivePrevEpoch,
+			PreviousEpochAttestingShor:       b.PrevEpochAttested,
+			PreviousEpochTargetAttestingShor: b.PrevEpochTargetAttested,
+			PreviousEpochHeadAttestingShor:   b.PrevEpochHeadAttested,
 		},
 	}
 
@@ -631,20 +631,20 @@ func (bs *Server) GetIndividualVotes(
 		}
 		pb := val.PublicKey()
 		votes = append(votes, &qrysmpb.IndividualVotesRespond_IndividualVote{
-			Epoch:                               req.Epoch,
-			PublicKey:                           pb[:],
-			ValidatorIndex:                      index,
-			IsSlashed:                           v[index].IsSlashed,
-			IsWithdrawableInCurrentEpoch:        v[index].IsWithdrawableCurrentEpoch,
-			IsActiveInCurrentEpoch:              v[index].IsActiveCurrentEpoch,
-			IsActiveInPreviousEpoch:             v[index].IsActivePrevEpoch,
-			IsCurrentEpochAttester:              v[index].IsCurrentEpochAttester,
-			IsCurrentEpochTargetAttester:        v[index].IsCurrentEpochTargetAttester,
-			IsPreviousEpochAttester:             v[index].IsPrevEpochAttester,
-			IsPreviousEpochTargetAttester:       v[index].IsPrevEpochTargetAttester,
-			IsPreviousEpochHeadAttester:         v[index].IsPrevEpochHeadAttester,
-			CurrentEpochEffectiveBalanceGplanck: v[index].CurrentEpochEffectiveBalance,
-			InactivityScore:                     v[index].InactivityScore,
+			Epoch:                            req.Epoch,
+			PublicKey:                        pb[:],
+			ValidatorIndex:                   index,
+			IsSlashed:                        v[index].IsSlashed,
+			IsWithdrawableInCurrentEpoch:     v[index].IsWithdrawableCurrentEpoch,
+			IsActiveInCurrentEpoch:           v[index].IsActiveCurrentEpoch,
+			IsActiveInPreviousEpoch:          v[index].IsActivePrevEpoch,
+			IsCurrentEpochAttester:           v[index].IsCurrentEpochAttester,
+			IsCurrentEpochTargetAttester:     v[index].IsCurrentEpochTargetAttester,
+			IsPreviousEpochAttester:          v[index].IsPrevEpochAttester,
+			IsPreviousEpochTargetAttester:    v[index].IsPrevEpochTargetAttester,
+			IsPreviousEpochHeadAttester:      v[index].IsPrevEpochHeadAttester,
+			CurrentEpochEffectiveBalanceShor: v[index].CurrentEpochEffectiveBalance,
+			InactivityScore:                  v[index].InactivityScore,
 		})
 	}
 

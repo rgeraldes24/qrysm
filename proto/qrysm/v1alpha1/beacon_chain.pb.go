@@ -2753,20 +2753,20 @@ type IndividualVotesRespond_IndividualVote struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Epoch                               github_com_theQRL_qrysm_consensus_types_primitives.Epoch          `protobuf:"varint,1,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
-	PublicKey                           []byte                                                            `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
-	ValidatorIndex                      github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,3,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
-	IsSlashed                           bool                                                              `protobuf:"varint,4,opt,name=is_slashed,json=isSlashed,proto3" json:"is_slashed,omitempty"`
-	IsWithdrawableInCurrentEpoch        bool                                                              `protobuf:"varint,5,opt,name=is_withdrawable_in_current_epoch,json=isWithdrawableInCurrentEpoch,proto3" json:"is_withdrawable_in_current_epoch,omitempty"`
-	IsActiveInCurrentEpoch              bool                                                              `protobuf:"varint,6,opt,name=is_active_in_current_epoch,json=isActiveInCurrentEpoch,proto3" json:"is_active_in_current_epoch,omitempty"`
-	IsActiveInPreviousEpoch             bool                                                              `protobuf:"varint,7,opt,name=is_active_in_previous_epoch,json=isActiveInPreviousEpoch,proto3" json:"is_active_in_previous_epoch,omitempty"`
-	IsCurrentEpochAttester              bool                                                              `protobuf:"varint,8,opt,name=is_current_epoch_attester,json=isCurrentEpochAttester,proto3" json:"is_current_epoch_attester,omitempty"`
-	IsCurrentEpochTargetAttester        bool                                                              `protobuf:"varint,9,opt,name=is_current_epoch_target_attester,json=isCurrentEpochTargetAttester,proto3" json:"is_current_epoch_target_attester,omitempty"`
-	IsPreviousEpochAttester             bool                                                              `protobuf:"varint,10,opt,name=is_previous_epoch_attester,json=isPreviousEpochAttester,proto3" json:"is_previous_epoch_attester,omitempty"`
-	IsPreviousEpochTargetAttester       bool                                                              `protobuf:"varint,11,opt,name=is_previous_epoch_target_attester,json=isPreviousEpochTargetAttester,proto3" json:"is_previous_epoch_target_attester,omitempty"`
-	IsPreviousEpochHeadAttester         bool                                                              `protobuf:"varint,12,opt,name=is_previous_epoch_head_attester,json=isPreviousEpochHeadAttester,proto3" json:"is_previous_epoch_head_attester,omitempty"`
-	CurrentEpochEffectiveBalanceGplanck uint64                                                            `protobuf:"varint,13,opt,name=current_epoch_effective_balance_gplanck,json=currentEpochEffectiveBalanceGplanck,proto3" json:"current_epoch_effective_balance_gplanck,omitempty"`
-	InactivityScore                     uint64                                                            `protobuf:"varint,14,opt,name=inactivity_score,json=inactivityScore,proto3" json:"inactivity_score,omitempty"`
+	Epoch                            github_com_theQRL_qrysm_consensus_types_primitives.Epoch          `protobuf:"varint,1,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.Epoch"`
+	PublicKey                        []byte                                                            `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
+	ValidatorIndex                   github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex `protobuf:"varint,3,opt,name=validator_index,json=validatorIndex,proto3" json:"validator_index,omitempty" cast-type:"github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"`
+	IsSlashed                        bool                                                              `protobuf:"varint,4,opt,name=is_slashed,json=isSlashed,proto3" json:"is_slashed,omitempty"`
+	IsWithdrawableInCurrentEpoch     bool                                                              `protobuf:"varint,5,opt,name=is_withdrawable_in_current_epoch,json=isWithdrawableInCurrentEpoch,proto3" json:"is_withdrawable_in_current_epoch,omitempty"`
+	IsActiveInCurrentEpoch           bool                                                              `protobuf:"varint,6,opt,name=is_active_in_current_epoch,json=isActiveInCurrentEpoch,proto3" json:"is_active_in_current_epoch,omitempty"`
+	IsActiveInPreviousEpoch          bool                                                              `protobuf:"varint,7,opt,name=is_active_in_previous_epoch,json=isActiveInPreviousEpoch,proto3" json:"is_active_in_previous_epoch,omitempty"`
+	IsCurrentEpochAttester           bool                                                              `protobuf:"varint,8,opt,name=is_current_epoch_attester,json=isCurrentEpochAttester,proto3" json:"is_current_epoch_attester,omitempty"`
+	IsCurrentEpochTargetAttester     bool                                                              `protobuf:"varint,9,opt,name=is_current_epoch_target_attester,json=isCurrentEpochTargetAttester,proto3" json:"is_current_epoch_target_attester,omitempty"`
+	IsPreviousEpochAttester          bool                                                              `protobuf:"varint,10,opt,name=is_previous_epoch_attester,json=isPreviousEpochAttester,proto3" json:"is_previous_epoch_attester,omitempty"`
+	IsPreviousEpochTargetAttester    bool                                                              `protobuf:"varint,11,opt,name=is_previous_epoch_target_attester,json=isPreviousEpochTargetAttester,proto3" json:"is_previous_epoch_target_attester,omitempty"`
+	IsPreviousEpochHeadAttester      bool                                                              `protobuf:"varint,12,opt,name=is_previous_epoch_head_attester,json=isPreviousEpochHeadAttester,proto3" json:"is_previous_epoch_head_attester,omitempty"`
+	CurrentEpochEffectiveBalanceShor uint64                                                            `protobuf:"varint,13,opt,name=current_epoch_effective_balance_shor,json=currentEpochEffectiveBalanceShor,proto3" json:"current_epoch_effective_balance_shor,omitempty"`
+	InactivityScore                  uint64                                                            `protobuf:"varint,14,opt,name=inactivity_score,json=inactivityScore,proto3" json:"inactivity_score,omitempty"`
 }
 
 func (x *IndividualVotesRespond_IndividualVote) Reset() {
@@ -2885,9 +2885,9 @@ func (x *IndividualVotesRespond_IndividualVote) GetIsPreviousEpochHeadAttester()
 	return false
 }
 
-func (x *IndividualVotesRespond_IndividualVote) GetCurrentEpochEffectiveBalanceGplanck() uint64 {
+func (x *IndividualVotesRespond_IndividualVote) GetCurrentEpochEffectiveBalanceShor() uint64 {
 	if x != nil {
-		return x.CurrentEpochEffectiveBalanceGplanck
+		return x.CurrentEpochEffectiveBalanceShor
 	}
 	return 0
 }

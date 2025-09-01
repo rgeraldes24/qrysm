@@ -21,7 +21,7 @@ func (vs *Server) constructGenericBeaconBlock(sBlk interfaces.SignedBeaconBlock)
 	}
 
 	isBlinded := sBlk.IsBlinded()
-	payloadValue := sBlk.ValueInGplanck()
+	payloadValue := sBlk.ValueInShor()
 
 	switch sBlk.Version() {
 	case version.Capella:
