@@ -13,18 +13,18 @@ import (
 
 var balanceCache = cache.NewEffectiveBalanceCache()
 
-// TotalBalance returns the total amount at stake in Gplanck
+// TotalBalance returns the total amount at stake in Shor
 // of input validators.
 //
 // Spec pseudocode definition:
 //
-//	def get_total_balance(state: BeaconState, indices: Set[ValidatorIndex]) -> Gplanck:
+//	def get_total_balance(state: BeaconState, indices: Set[ValidatorIndex]) -> Shor:
 //	 """
 //	 Return the combined effective balance of the ``indices``.
-//	 ``EFFECTIVE_BALANCE_INCREMENT`` Gplanck minimum to avoid divisions by zero.
+//	 ``EFFECTIVE_BALANCE_INCREMENT`` Shor minimum to avoid divisions by zero.
 //	 Math safe up to ~10B ETH, afterwhich this overflows uint64.
 //	 """
-//	 return Gplanck(max(EFFECTIVE_BALANCE_INCREMENT, sum([state.validators[index].effective_balance for index in indices])))
+//	 return Shor(max(EFFECTIVE_BALANCE_INCREMENT, sum([state.validators[index].effective_balance for index in indices])))
 func TotalBalance(state state.ReadOnlyValidators, indices []primitives.ValidatorIndex) uint64 {
 	total := uint64(0)
 
@@ -44,15 +44,15 @@ func TotalBalance(state state.ReadOnlyValidators, indices []primitives.Validator
 	return total
 }
 
-// TotalActiveBalance returns the total amount at stake in Gplanck
+// TotalActiveBalance returns the total amount at stake in Shor
 // of active validators.
 //
 // Spec pseudocode definition:
 //
-//	def get_total_active_balance(state: BeaconState) -> Gplanck:
+//	def get_total_active_balance(state: BeaconState) -> Shor:
 //	 """
 //	 Return the combined effective balance of the active validators.
-//	 Note: ``get_total_balance`` returns ``EFFECTIVE_BALANCE_INCREMENT`` Gplanck minimum to avoid divisions by zero.
+//	 Note: ``get_total_balance`` returns ``EFFECTIVE_BALANCE_INCREMENT`` Shor minimum to avoid divisions by zero.
 //	 """
 //	 return get_total_balance(state, set(get_active_validator_indices(state, get_current_epoch(state))))
 func TotalActiveBalance(s state.ReadOnlyBeaconState) (uint64, error) {
@@ -87,11 +87,11 @@ func TotalActiveBalance(s state.ReadOnlyBeaconState) (uint64, error) {
 	return total, nil
 }
 
-// IncreaseBalance increases validator with the given 'index' balance by 'delta' in Gplanck.
+// IncreaseBalance increases validator with the given 'index' balance by 'delta' in Shor.
 //
 // Spec pseudocode definition:
 //
-//	def increase_balance(state: BeaconState, index: ValidatorIndex, delta: Gplanck) -> None:
+//	def increase_balance(state: BeaconState, index: ValidatorIndex, delta: Shor) -> None:
 //	  """
 //	  Increase the validator balance at index ``index`` by ``delta``.
 //	  """
@@ -108,13 +108,13 @@ func IncreaseBalance(state state.BeaconState, idx primitives.ValidatorIndex, del
 	return state.UpdateBalancesAtIndex(idx, newBal)
 }
 
-// IncreaseBalanceWithVal increases validator with the given 'index' balance by 'delta' in Gplanck.
+// IncreaseBalanceWithVal increases validator with the given 'index' balance by 'delta' in Shor.
 // This method is flattened version of the spec method, taking in the raw balance and returning
 // the post balance.
 //
 // Spec pseudocode definition:
 //
-//	def increase_balance(state: BeaconState, index: ValidatorIndex, delta: Gplanck) -> None:
+//	def increase_balance(state: BeaconState, index: ValidatorIndex, delta: Shor) -> None:
 //	  """
 //	  Increase the validator balance at index ``index`` by ``delta``.
 //	  """
@@ -123,11 +123,11 @@ func IncreaseBalanceWithVal(currBalance, delta uint64) (uint64, error) {
 	return mathutil.Add64(currBalance, delta)
 }
 
-// DecreaseBalance decreases validator with the given 'index' balance by 'delta' in Gplanck.
+// DecreaseBalance decreases validator with the given 'index' balance by 'delta' in Shor.
 //
 // Spec pseudocode definition:
 //
-//	def decrease_balance(state: BeaconState, index: ValidatorIndex, delta: Gplanck) -> None:
+//	def decrease_balance(state: BeaconState, index: ValidatorIndex, delta: Shor) -> None:
 //	  """
 //	  Decrease the validator balance at index ``index`` by ``delta``, with underflow protection.
 //	  """
@@ -140,13 +140,13 @@ func DecreaseBalance(state state.BeaconState, idx primitives.ValidatorIndex, del
 	return state.UpdateBalancesAtIndex(idx, DecreaseBalanceWithVal(balAtIdx, delta))
 }
 
-// DecreaseBalanceWithVal decreases validator with the given 'index' balance by 'delta' in Gplanck.
+// DecreaseBalanceWithVal decreases validator with the given 'index' balance by 'delta' in Shor.
 // This method is flattened version of the spec method, taking in the raw balance and returning
 // the post balance.
 //
 // Spec pseudocode definition:
 //
-//	def decrease_balance(state: BeaconState, index: ValidatorIndex, delta: Gplanck) -> None:
+//	def decrease_balance(state: BeaconState, index: ValidatorIndex, delta: Shor) -> None:
 //	  """
 //	  Decrease the validator balance at index ``index`` by ``delta``, with underflow protection.
 //	  """

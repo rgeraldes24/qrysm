@@ -192,7 +192,7 @@ func (s *Service) GetPayload(ctx context.Context, payloadId [8]byte, slot primit
 	if err != nil {
 		return nil, false, handleRPCError(err)
 	}
-	ed, err := blocks.WrappedExecutionPayloadCapella(result.Payload, blocks.PayloadValueToGplanck(result.Value))
+	ed, err := blocks.WrappedExecutionPayloadCapella(result.Payload, blocks.PayloadValueToShor(result.Value))
 	if err != nil {
 		return nil, false, err
 	}

@@ -166,16 +166,16 @@ func (b *SignedBeaconBlock) IsBlinded() bool {
 	return b.block.body.isBlinded
 }
 
-// ValueInGplanck metadata on the payload value returned by the builder. Value is 0 by default if local.
-func (b *SignedBeaconBlock) ValueInGplanck() uint64 {
+// ValueInShor metadata on the payload value returned by the builder. Value is 0 by default if local.
+func (b *SignedBeaconBlock) ValueInShor() uint64 {
 	exec, err := b.block.body.Execution()
 	if err != nil {
 		log.WithError(err).Warn("failed to retrieve execution payload")
 		return 0
 	}
-	val, err := exec.ValueInGplanck()
+	val, err := exec.ValueInShor()
 	if err != nil {
-		log.WithError(err).Warn("failed to retrieve value in gplanck")
+		log.WithError(err).Warn("failed to retrieve value in shor")
 		return 0
 	}
 	return val

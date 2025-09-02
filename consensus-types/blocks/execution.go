@@ -25,7 +25,7 @@ type executionPayloadCapella struct {
 }
 
 // WrappedExecutionPayloadCapella is a constructor which wraps a protobuf execution payload into an interface.
-func WrappedExecutionPayloadCapella(p *enginev1.ExecutionPayloadCapella, value math.Gplanck) (interfaces.ExecutionData, error) {
+func WrappedExecutionPayloadCapella(p *enginev1.ExecutionPayloadCapella, value math.Shor) (interfaces.ExecutionData, error) {
 	w := executionPayloadCapella{p: p, value: uint64(value)}
 	if w.IsNil() {
 		return nil, consensus_types.ErrNilObjectWrapped
@@ -168,8 +168,8 @@ func (e executionPayloadCapella) PbCapella() (*enginev1.ExecutionPayloadCapella,
 	return e.p, nil
 }
 
-// ValueInGplanck --
-func (e executionPayloadCapella) ValueInGplanck() (uint64, error) {
+// ValueInShor --
+func (e executionPayloadCapella) ValueInShor() (uint64, error) {
 	return e.value, nil
 }
 
@@ -182,7 +182,7 @@ type executionPayloadHeaderCapella struct {
 }
 
 // WrappedExecutionPayloadHeaderCapella is a constructor which wraps a protobuf execution header into an interface.
-func WrappedExecutionPayloadHeaderCapella(p *enginev1.ExecutionPayloadHeaderCapella, value math.Gplanck) (interfaces.ExecutionData, error) {
+func WrappedExecutionPayloadHeaderCapella(p *enginev1.ExecutionPayloadHeaderCapella, value math.Shor) (interfaces.ExecutionData, error) {
 	w := executionPayloadHeaderCapella{p: p, value: uint64(value)}
 	if w.IsNil() {
 		return nil, consensus_types.ErrNilObjectWrapped
@@ -325,8 +325,8 @@ func (executionPayloadHeaderCapella) PbCapella() (*enginev1.ExecutionPayloadCape
 	return nil, consensus_types.ErrUnsupportedField
 }
 
-// ValueInGplanck --
-func (e executionPayloadHeaderCapella) ValueInGplanck() (uint64, error) {
+// ValueInShor --
+func (e executionPayloadHeaderCapella) ValueInShor() (uint64, error) {
 	return e.value, nil
 }
 
@@ -425,9 +425,9 @@ func IsEmptyExecutionData(data interfaces.ExecutionData) (bool, error) {
 	return true, nil
 }
 
-// PayloadValueToGplanck returns a Gplanck value given the payload's value
-func PayloadValueToGplanck(value []byte) math.Gplanck {
+// PayloadValueToShor returns a Shor value given the payload's value
+func PayloadValueToShor(value []byte) math.Shor {
 	// We have to convert big endian to little endian because the value is coming from the execution layer.
 	v := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(value))
-	return math.PlanckToGplanck(v)
+	return math.PlanckToShor(v)
 }

@@ -216,19 +216,19 @@ func AddInt(i ...int) (int, error) {
 // Planck is the smallest unit of Quanta, represented as a pointer to a bigInt.
 type Planck *big.Int
 
-// Gplanck is a denomination of 1e9 Planck represented as an uint64.
-type Gplanck uint64
+// Shor is a denomination of 1e9 Planck represented as an uint64.
+type Shor uint64
 
-// PlanckToGplanck converts big int planck to uint64 gplanck.
+// PlanckToShor converts big int planck to uint64 shor.
 // The input `v` is copied before being modified.
-func PlanckToGplanck(v Planck) Gplanck {
+func PlanckToShor(v Planck) Shor {
 	if v == nil {
 		return 0
 	}
-	gplanckPerQuanta := big.NewInt(1e9)
+	shorPerQuanta := big.NewInt(1e9)
 	copied := big.NewInt(0).Set(v)
-	copied.Div(copied, gplanckPerQuanta)
-	return Gplanck(copied.Uint64())
+	copied.Div(copied, shorPerQuanta)
+	return Shor(copied.Uint64())
 }
 
 // IsValidUint256 given a bigint checks if the value is a valid Uint256

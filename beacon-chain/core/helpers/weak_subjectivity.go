@@ -36,8 +36,8 @@ import (
 //	"""
 //	ws_period = MIN_VALIDATOR_WITHDRAWABILITY_DELAY
 //	N = len(get_active_validator_indices(state, get_current_epoch(state)))
-//	t = get_total_active_balance(state) // N // QUANTA_TO_GPLANCK
-//	T = MAX_EFFECTIVE_BALANCE // QUANTA_TO_GPLANCK
+//	t = get_total_active_balance(state) // N // QUANTA_TO_SHOR
+//	T = MAX_EFFECTIVE_BALANCE // QUANTA_TO_SHOR
 //	delta = get_validator_churn_limit(state)
 //	Delta = MAX_DEPOSITS * SLOTS_PER_EPOCH
 //	D = SAFETY_DECAY
@@ -74,10 +74,10 @@ func ComputeWeakSubjectivityPeriod(ctx context.Context, st state.ReadOnlyBeaconS
 	if err != nil {
 		return 0, fmt.Errorf("cannot find total active balance of validators: %w", err)
 	}
-	t = t / N / cfg.GplanckPerQuanta
+	t = t / N / cfg.ShorPerQuanta
 
 	// Maximum effective balance per validator.
-	T := cfg.MaxEffectiveBalance / cfg.GplanckPerQuanta
+	T := cfg.MaxEffectiveBalance / cfg.ShorPerQuanta
 
 	// Validator churn limit.
 	delta := ValidatorExitChurnLimit(N)

@@ -457,7 +457,7 @@ message ValidatorBalances {
         // Validator's index in the validator set.
         uint64 index = 2 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"];
 
-        // Validator's balance in gplanck.
+        // Validator's balance in shor.
         uint64 balance = 3;
 
         // Validator's status, UNKNOWN if not found.
@@ -772,7 +772,7 @@ message IndividualVotesRespond {
         // Did validator attest head for previous epoch.
         bool is_previous_epoch_head_attester = 12;
         // The current effective balance of the validator.
-        uint64 current_epoch_effective_balance_gplanck = 13;
+        uint64 current_epoch_effective_balance_shor = 13;
         // The inactivity score of the validator tracks validator participation.
         uint64 inactivity_score = 14;
     }

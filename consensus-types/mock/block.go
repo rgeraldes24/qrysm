@@ -82,7 +82,7 @@ func (SignedBeaconBlock) Header() (*qrysmpb.SignedBeaconBlockHeader, error) {
 	panic("implement me")
 }
 
-func (SignedBeaconBlock) ValueInGplanck() uint64 {
+func (SignedBeaconBlock) ValueInShor() uint64 {
 	panic("implement me")
 }
 

@@ -37,7 +37,7 @@ func TestWrapExecutionPayloadCapella(t *testing.T) {
 	}
 	payload, err := blocks.WrappedExecutionPayloadCapella(data, 10)
 	require.NoError(t, err)
-	v, err := payload.ValueInGplanck()
+	v, err := payload.ValueInShor()
 	require.NoError(t, err)
 	assert.Equal(t, uint64(10), v)
 
@@ -65,7 +65,7 @@ func TestWrapExecutionPayloadHeaderCapella(t *testing.T) {
 	payload, err := blocks.WrappedExecutionPayloadHeaderCapella(data, 10)
 	require.NoError(t, err)
 
-	v, err := payload.ValueInGplanck()
+	v, err := payload.ValueInShor()
 	require.NoError(t, err)
 	assert.Equal(t, uint64(10), v)
 

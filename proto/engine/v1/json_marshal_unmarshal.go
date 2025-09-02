@@ -154,13 +154,13 @@ func (j *withdrawalJSON) ToWithdrawal() (*Withdrawal, error) {
 func (w *Withdrawal) MarshalJSON() ([]byte, error) {
 	index := hexutil.Uint64(w.Index)
 	validatorIndex := hexutil.Uint64(w.ValidatorIndex)
-	gplanck := hexutil.Uint64(w.Amount)
+	shor := hexutil.Uint64(w.Amount)
 	address := common.BytesToAddress(w.Address)
 	return json.Marshal(withdrawalJSON{
 		Index:     &index,
 		Validator: &validatorIndex,
 		Address:   &address,
-		Amount:    &gplanck,
+		Amount:    &shor,
 	})
 }
 

@@ -124,10 +124,10 @@ func InitiateValidatorExit(ctx context.Context, s state.BeaconState, idx primiti
 //	  proposer_index = get_beacon_proposer_index(state)
 //	  if whistleblower_index is None:
 //	      whistleblower_index = proposer_index
-//	  whistleblower_reward = Gplanck(validator.effective_balance // WHISTLEBLOWER_REWARD_QUOTIENT)
-//	  proposer_reward = Gplanck(whistleblower_reward // PROPOSER_REWARD_QUOTIENT)
+//	  whistleblower_reward = Shor(validator.effective_balance // WHISTLEBLOWER_REWARD_QUOTIENT)
+//	  proposer_reward = Shor(whistleblower_reward // PROPOSER_REWARD_QUOTIENT)
 //	  increase_balance(state, proposer_index, proposer_reward)
-//	  increase_balance(state, whistleblower_index, Gplanck(whistleblower_reward - proposer_reward))
+//	  increase_balance(state, whistleblower_index, Shor(whistleblower_reward - proposer_reward))
 func SlashValidator(
 	ctx context.Context,
 	s state.BeaconState,

@@ -71,11 +71,11 @@ var (
 	}, []string{"state"})
 	validatorsBalance = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "validators_total_balance",
-		Help: "The total balance of validators, in GPlanck",
+		Help: "The total balance of validators, in Shor",
 	}, []string{"state"})
 	validatorsEffectiveBalance = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "validators_total_effective_balance",
-		Help: "The total effective balance of validators, in GPlanck",
+		Help: "The total effective balance of validators, in Shor",
 	}, []string{"state"})
 	currentExecutionDataDepositCount = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "current_execution_data_deposit_count",
@@ -90,20 +90,20 @@ var (
 		Help: "The number of states a particular field is shared with.",
 	}, []string{"state"})
 	prevEpochActiveBalances = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "beacon_prev_epoch_active_gplanck",
-		Help: "The total amount of quanta, in gplanck, that was active for voting of previous epoch",
+		Name: "beacon_prev_epoch_active_shor",
+		Help: "The total amount of quanta, in shor, that was active for voting of previous epoch",
 	})
 	prevEpochSourceBalances = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "beacon_prev_epoch_source_gplanck",
-		Help: "The total amount of quanta, in gplanck, that has been used in voting attestation source of previous epoch",
+		Name: "beacon_prev_epoch_source_shor",
+		Help: "The total amount of quanta, in shor, that has been used in voting attestation source of previous epoch",
 	})
 	prevEpochTargetBalances = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "beacon_prev_epoch_target_gplanck",
-		Help: "The total amount of quanta, in gplanck, that has been used in voting attestation target of previous epoch",
+		Name: "beacon_prev_epoch_target_shor",
+		Help: "The total amount of quanta, in shor, that has been used in voting attestation target of previous epoch",
 	})
 	prevEpochHeadBalances = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "beacon_prev_epoch_head_gplanck",
-		Help: "The total amount of quanta, in gplanck, that has been used in voting attestation head of previous epoch",
+		Name: "beacon_prev_epoch_head_shor",
+		Help: "The total amount of quanta, in shor, that has been used in voting attestation head of previous epoch",
 	})
 	reorgCount = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "beacon_reorgs_total",
