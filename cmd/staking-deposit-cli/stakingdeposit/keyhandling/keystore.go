@@ -22,10 +22,13 @@ import (
 
 const (
 	// Argon2id parameters.
-	argon2idT      = 8
-	argon2idM      = 1 << 18
-	argon2idP      = 1
-	argon2idKeyLen = 32
+	standardArgon2idT uint32 = 8
+	standardArgon2idM uint32 = 1 << 18
+	standardArgon2idP uint8  = 1
+	lightArgon2idT    uint32 = 8
+	lightArgon2idM    uint32 = 1 << 12
+	lightArgon2idP    uint8  = 1
+	argon2idKeyLen           = 32
 
 	// Misc constants.
 	saltSize = 32
@@ -137,7 +140,7 @@ func NewEmptyKeystore() *Keystore {
 	return k
 }
 
-func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string, salt, aesIV []byte) (*Keystore, error) {
+func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string, lightKDF bool, salt, aesIV []byte) (*Keystore, error) {
 	if salt == nil {
 		salt = make([]uint8, saltSize)
 		if _, err := io.ReadFull(rand.Reader, salt); err != nil {
@@ -151,7 +154,11 @@ func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string
 		}
 	}
 
-	derivedKey := argon2.IDKey([]byte(password), salt, argon2idT, argon2idM, argon2idP, argon2idKeyLen)
+	t, m, p := standardArgon2idT, standardArgon2idM, standardArgon2idP
+	if lightKDF {
+		t, m, p = lightArgon2idT, lightArgon2idM, lightArgon2idP
+	}
+	derivedKey := argon2.IDKey([]byte(password), salt, t, m, p, argon2idKeyLen)
 
 	block, err := aes.NewCipher(derivedKey)
 	if err != nil {
@@ -172,7 +179,7 @@ func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string
 	pk := d.GetPK()
 	return &Keystore{
 		UUID:   uuid.New().String(),
-		Crypto: NewKeystoreCrypto(salt, aesIV, ciphertext, argon2idT, argon2idM, argon2idP, argon2idKeyLen),
+		Crypto: NewKeystoreCrypto(salt, aesIV, ciphertext, t, m, p, argon2idKeyLen),
 		PubKey: misc.EncodeHex(pk[:]),
 		Path:   path,
 	}, nil

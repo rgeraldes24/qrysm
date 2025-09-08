@@ -96,7 +96,7 @@ func cliActionExistingSeed(cliCtx *cli.Context) error {
 
 	stakingdeposit.GenerateKeys(existingSeedFlags.ValidatorStartIndex,
 		existingSeedFlags.NumValidators, existingSeedFlags.Seed, existingSeedFlags.Folder,
-		existingSeedFlags.ChainName, string(keystorePassword), existingSeedFlags.ExecutionAddress)
+		existingSeedFlags.ChainName, string(keystorePassword), existingSeedFlags.ExecutionAddress, false)
 
 	return nil
 }

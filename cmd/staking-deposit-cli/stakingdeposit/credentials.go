@@ -17,11 +17,11 @@ type Credentials struct {
 	credentials []*Credential
 }
 
-func (c *Credentials) ExportKeystores(password, folder string) ([]string, error) {
+func (c *Credentials) ExportKeystores(password, folder string, lightKDF bool) ([]string, error) {
 	bar := progress.InitializeProgressBar(len(c.credentials), "Generating keystores...")
 	var filesAbsolutePath []string
 	for _, credential := range c.credentials {
-		fileAbsolutePath, err := credential.SaveSigningKeystore(password, folder)
+		fileAbsolutePath, err := credential.SaveSigningKeystore(password, folder, lightKDF)
 		if err != nil {
 			return nil, err
 		}
