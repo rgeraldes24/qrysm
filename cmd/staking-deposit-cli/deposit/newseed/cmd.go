@@ -24,6 +24,7 @@ var (
 		ChainName           string
 		ExecutionAddress    string
 		Mnemonic            string
+		LightKDF            bool
 	}{}
 	log = logrus.WithField("prefix", "deposit")
 
@@ -81,6 +82,11 @@ var Commands = []*cli.Command{
 				Destination: &newSeedFlags.Mnemonic,
 				Value:       "",
 			},
+			&cli.BoolFlag{
+				Name:        "lightkdf",
+				Usage:       "Reduce key-derivation RAM & CPU usage at some expense of KDF strength",
+				Destination: &newSeedFlags.LightKDF,
+			},
 			KeystorePasswordFile,
 		},
 	},
@@ -123,7 +129,8 @@ func cliActionNewSeed(cliCtx *cli.Context) error {
 	seed := goqrllib_misc.MnemonicToSeedBin(mnemonic)
 	stakingdeposit.GenerateKeys(newSeedFlags.ValidatorStartIndex,
 		newSeedFlags.NumValidators, misc.EncodeHex(seed[:]), newSeedFlags.Folder,
-		newSeedFlags.ChainName, keystorePassword, newSeedFlags.ExecutionAddress)
+		newSeedFlags.ChainName, keystorePassword, newSeedFlags.ExecutionAddress,
+		newSeedFlags.LightKDF)
 
 	return nil
 }

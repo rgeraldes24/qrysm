@@ -18,7 +18,7 @@ import (
 )
 
 func GenerateKeys(validatorStartIndex, numValidators uint64,
-	seed, folder, chain, keystorePassword, executionAddress string) {
+	seed, folder, chain, keystorePassword, executionAddress string, lightKDF bool) {
 	chainSettings, ok := config.GetConfig().ChainSettings[chain]
 	if !ok {
 		panic(fmt.Errorf("cannot find chain settings for %s", chain))
@@ -40,7 +40,7 @@ func GenerateKeys(validatorStartIndex, numValidators uint64,
 	if err != nil {
 		panic(fmt.Errorf("new credentials from mnemonic failed. reason: %v", err))
 	}
-	keystoreFileFolders, err := credentials.ExportKeystores(keystorePassword, folder)
+	keystoreFileFolders, err := credentials.ExportKeystores(keystorePassword, folder, lightKDF)
 	if err != nil {
 		panic(fmt.Errorf("export keystores failed. reason: %v", err))
 	}

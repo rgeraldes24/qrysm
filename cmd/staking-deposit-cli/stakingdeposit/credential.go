@@ -101,13 +101,13 @@ func (c *Credential) WithdrawalCredentials() ([32]byte, error) {
 	return withdrawalCredentials, nil
 }
 
-func (c *Credential) signingKeystore(password string) (*keyhandling.Keystore, error) {
+func (c *Credential) signingKeystore(password string, lightKDF bool) (*keyhandling.Keystore, error) {
 	seed := misc.StrSeedToBinSeed(c.signingSeed)
-	return keyhandling.Encrypt(seed, password, c.signingKeyPath, nil, nil)
+	return keyhandling.Encrypt(seed, password, c.signingKeyPath, lightKDF, nil, nil)
 }
 
-func (c *Credential) SaveSigningKeystore(password string, folder string) (string, error) {
-	keystore, err := c.signingKeystore(password)
+func (c *Credential) SaveSigningKeystore(password string, folder string, lightKDF bool) (string, error) {
+	keystore, err := c.signingKeystore(password, lightKDF)
 	if err != nil {
 		return "", err
 	}

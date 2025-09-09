@@ -1,6 +1,6 @@
 # FuzzyVM
 
-A framework to fuzz Zond Virtual Machine implementations.
+A framework to fuzz Quantum Resistant Virtual Machine implementations.
 FuzzyVM creates state tests that can be used to differential fuzz QRVM implementations against each other.
 It only focus on the test generation part, the test execution is handled by [goevmlab](https://github.com/holiman/goevmlab).
 

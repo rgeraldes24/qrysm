@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the fuzzy-vm library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package generator provides means to generate state tests for Zond.
+// Package generator provides means to generate state tests for QRL.
 package generator
 
 import (
