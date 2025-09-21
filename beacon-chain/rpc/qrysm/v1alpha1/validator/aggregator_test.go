@@ -19,7 +19,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
@@ -61,7 +61,7 @@ func TestSubmitAggregateAndProof_CantFindValidatorIndex(t *testing.T) {
 		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte{'A'})
 	req := &qrysmpb.AggregateSelectionRequest{CommitteeIndex: 1, SlotSignature: sig.Marshal(), PublicKey: pubKey(3)}
@@ -90,7 +90,7 @@ func TestSubmitAggregateAndProof_IsAggregatorAndNoAtts(t *testing.T) {
 		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte{'A'})
 	v, err := s.ValidatorAtIndex(1)
@@ -125,7 +125,7 @@ func TestSubmitAggregateAndProof_UnaggregateOk(t *testing.T) {
 		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte{'B'})
 	v, err := beaconState.ValidatorAtIndex(1)
@@ -164,7 +164,7 @@ func TestSubmitAggregateAndProof_AggregateOk(t *testing.T) {
 		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte{'B'})
 	v, err := beaconState.ValidatorAtIndex(1)
@@ -205,7 +205,7 @@ func TestSubmitAggregateAndProof_AggregateNotOk(t *testing.T) {
 		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte{'B'})
 	v, err := beaconState.ValidatorAtIndex(1)
@@ -220,7 +220,7 @@ func TestSubmitAggregateAndProof_AggregateNotOk(t *testing.T) {
 	assert.Equal(t, 0, len(aggregatedAtts), "Wanted aggregated attestation")
 }
 
-func generateAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilithium.DilithiumKey) (*qrysmpb.Attestation, error) {
+func generateAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []ml_dsa_87.MLDSA87Key) (*qrysmpb.Attestation, error) {
 	aggBits := bitfield.NewBitlist(4)
 	aggBits.SetBitAt(index, true)
 	aggBits.SetBitAt(index+1, true)
@@ -238,7 +238,7 @@ func generateAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilit
 	}
 
 	sigs := make([][]byte, len(attestingIndices))
-	var zeroSig [4595]byte
+	var zeroSig [4627]byte
 	att.Signatures = [][]byte{zeroSig[:]}
 
 	for i, indice := range attestingIndices {
@@ -254,7 +254,7 @@ func generateAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilit
 	return att, nil
 }
 
-func generateUnaggregatedAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []dilithium.DilithiumKey) (*qrysmpb.Attestation, error) {
+func generateUnaggregatedAtt(state state.ReadOnlyBeaconState, index uint64, privKeys []ml_dsa_87.MLDSA87Key) (*qrysmpb.Attestation, error) {
 	aggBits := bitfield.NewBitlist(4)
 	aggBits.SetBitAt(index, true)
 	att := util.HydrateAttestation(&qrysmpb.Attestation{
@@ -277,7 +277,7 @@ func generateUnaggregatedAtt(state state.ReadOnlyBeaconState, index uint64, priv
 	}
 
 	sigs := make([][]byte, len(attestingIndices))
-	var zeroSig [4595]byte
+	var zeroSig [4627]byte
 	att.Signatures = [][]byte{zeroSig[:]}
 
 	for i, indice := range attestingIndices {
@@ -331,7 +331,7 @@ func TestSubmitAggregateAndProof_PreferOwnAttestation(t *testing.T) {
 		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte{'B'})
 	v, err := beaconState.ValidatorAtIndex(1)
@@ -383,7 +383,7 @@ func TestSubmitAggregateAndProof_SelectsMostBitsWhenOwnAttestationNotPresent(t *
 		OptimisticModeFetcher: &mock.ChainService{Optimistic: false},
 	}
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte{'B'})
 	v, err := beaconState.ValidatorAtIndex(1)
@@ -408,7 +408,7 @@ func TestSubmitSignedAggregateSelectionProof_ZeroHashesSignatures(t *testing.T) 
 	}
 	req := &qrysmpb.SignedAggregateSubmitRequest{
 		SignedAggregateAndProof: &qrysmpb.SignedAggregateAttestationAndProof{
-			Signature: make([]byte, field_params.DilithiumSignatureLength),
+			Signature: make([]byte, field_params.MLDSA87SignatureLength),
 			Message: &qrysmpb.AggregateAttestationAndProof{
 				Aggregate: &qrysmpb.Attestation{
 					Data: &qrysmpb.AttestationData{},
@@ -426,7 +426,7 @@ func TestSubmitSignedAggregateSelectionProof_ZeroHashesSignatures(t *testing.T) 
 				Aggregate: &qrysmpb.Attestation{
 					Data: &qrysmpb.AttestationData{},
 				},
-				SelectionProof: make([]byte, field_params.DilithiumSignatureLength),
+				SelectionProof: make([]byte, field_params.MLDSA87SignatureLength),
 			},
 		},
 	}

@@ -27,7 +27,7 @@ import (
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/dilithiumtoexec"
+	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
@@ -43,7 +43,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/container/trie"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
@@ -154,14 +154,14 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	copiedState := beaconState.Copy()
 	copiedState, err = transition.ProcessSlots(ctx, copiedState, capellaSlot+1)
 	require.NoError(t, err)
-	change, err := util.GenerateDilithiumToExecutionChange(copiedState, privKeys[1], 0)
+	change, err := util.GenerateMLDSA87ToExecutionChange(copiedState, privKeys[1], 0)
 	require.NoError(t, err)
-	proposerServer.DilithiumChangesPool.InsertDilithiumToExecChange(change)
+	proposerServer.MLDSA87ChangesPool.InsertMLDSA87ToExecChange(change)
 
 	got, err := proposerServer.GetBeaconBlock(ctx, req)
 	require.NoError(t, err)
-	require.Equal(t, 1, len(got.GetCapella().Body.DilithiumToExecutionChanges))
-	require.DeepEqual(t, change, got.GetCapella().Body.DilithiumToExecutionChanges[0])
+	require.Equal(t, 1, len(got.GetCapella().Body.Mldsa87ToExecutionChanges))
+	require.DeepEqual(t, change, got.GetCapella().Body.Mldsa87ToExecutionChanges[0])
 }
 
 func TestServer_GetBeaconBlock_Optimistic(t *testing.T) {
@@ -210,12 +210,12 @@ func getProposerServer(db db.HeadAccessDatabase, headState state.BeaconState, he
 		},
 		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 		BeaconDB:               db,
-		DilithiumChangesPool:   dilithiumtoexec.NewPool(),
+		MLDSA87ChangesPool:     mldsa87toexec.NewPool(),
 		BlockBuilder:           &builderTest.MockBuilderService{HasConfigured: true},
 	}
 }
 
-func injectSlashings(t *testing.T, st state.BeaconState, keys []dilithium.DilithiumKey, server *Server) ([]*qrysmpb.ProposerSlashing, []*qrysmpb.AttesterSlashing) {
+func injectSlashings(t *testing.T, st state.BeaconState, keys []ml_dsa_87.MLDSA87Key, server *Server) ([]*qrysmpb.ProposerSlashing, []*qrysmpb.AttesterSlashing) {
 	proposerSlashings := make([]*qrysmpb.ProposerSlashing, params.BeaconConfig().MaxProposerSlashings)
 	for i := primitives.ValidatorIndex(0); uint64(i) < params.BeaconConfig().MaxProposerSlashings; i++ {
 		proposerSlashing, err := util.GenerateProposerSlashingForValidator(st, keys[i], i /* validator index */)
@@ -436,7 +436,7 @@ func TestProposer_PendingDeposits_OutsideExecutionFollowWindow(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	var mockSig [field_params.DilithiumSignatureLength]byte
+	var mockSig [field_params.MLDSA87SignatureLength]byte
 	var mockCreds [32]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
@@ -446,7 +446,7 @@ func TestProposer_PendingDeposits_OutsideExecutionFollowWindow(t *testing.T) {
 			ExecutionBlockHeight: 2,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -456,7 +456,7 @@ func TestProposer_PendingDeposits_OutsideExecutionFollowWindow(t *testing.T) {
 			ExecutionBlockHeight: 8,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -469,7 +469,7 @@ func TestProposer_PendingDeposits_OutsideExecutionFollowWindow(t *testing.T) {
 			ExecutionBlockHeight: 400,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -479,7 +479,7 @@ func TestProposer_PendingDeposits_OutsideExecutionFollowWindow(t *testing.T) {
 			ExecutionBlockHeight: 600,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -575,7 +575,7 @@ func TestProposer_PendingDeposits_FollowsCorrectExecutionBlock(t *testing.T) {
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
 
-	var mockSig [field_params.DilithiumSignatureLength]byte
+	var mockSig [field_params.MLDSA87SignatureLength]byte
 	var mockCreds [32]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
@@ -585,7 +585,7 @@ func TestProposer_PendingDeposits_FollowsCorrectExecutionBlock(t *testing.T) {
 			ExecutionBlockHeight: 8,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -595,7 +595,7 @@ func TestProposer_PendingDeposits_FollowsCorrectExecutionBlock(t *testing.T) {
 			ExecutionBlockHeight: 14,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -608,7 +608,7 @@ func TestProposer_PendingDeposits_FollowsCorrectExecutionBlock(t *testing.T) {
 			ExecutionBlockHeight: 5000,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -618,7 +618,7 @@ func TestProposer_PendingDeposits_FollowsCorrectExecutionBlock(t *testing.T) {
 			ExecutionBlockHeight: 6000,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -691,7 +691,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateExecutionDepositIndex(t *t
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
 
-	var mockSig [field_params.DilithiumSignatureLength]byte
+	var mockSig [field_params.MLDSA87SignatureLength]byte
 	var mockCreds [32]byte
 
 	readyDeposits := []*qrysmpb.DepositContainer{
@@ -699,7 +699,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateExecutionDepositIndex(t *t
 			Index: 0,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -708,7 +708,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateExecutionDepositIndex(t *t
 			Index: 1,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -721,7 +721,7 @@ func TestProposer_PendingDeposits_CantReturnBelowStateExecutionDepositIndex(t *t
 			Index: i,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -791,7 +791,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 	blk.Block.Slot = beaconState.Slot()
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
-	var mockSig [field_params.DilithiumSignatureLength]byte
+	var mockSig [field_params.MLDSA87SignatureLength]byte
 	var mockCreds [32]byte
 
 	readyDeposits := []*qrysmpb.DepositContainer{
@@ -799,7 +799,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 			Index: 0,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -808,7 +808,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 			Index: 1,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -821,7 +821,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanMax(t *testing.T) {
 			Index: i,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -889,7 +889,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 	blk.Block.Slot = beaconState.Slot()
 	blkRoot, err := blk.HashTreeRoot()
 	require.NoError(t, err)
-	var mockSig [field_params.DilithiumSignatureLength]byte
+	var mockSig [field_params.MLDSA87SignatureLength]byte
 	var mockCreds [32]byte
 
 	readyDeposits := []*qrysmpb.DepositContainer{
@@ -897,7 +897,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 			Index: 0,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -906,7 +906,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 			Index: 1,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -919,7 +919,7 @@ func TestProposer_PendingDeposits_CantReturnMoreThanDepositCount(t *testing.T) {
 			Index: i,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -989,7 +989,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 	blkRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	var mockSig [field_params.DilithiumSignatureLength]byte
+	var mockSig [field_params.MLDSA87SignatureLength]byte
 	var mockCreds [32]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
@@ -999,7 +999,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1009,7 +1009,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1022,7 +1022,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1032,7 +1032,7 @@ func TestProposer_DepositTrie_UtilizesCachedFinalizedDeposits(t *testing.T) {
 			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1105,7 +1105,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 	blkRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	var mockSig [field_params.DilithiumSignatureLength]byte
+	var mockSig [field_params.MLDSA87SignatureLength]byte
 	var mockCreds [32]byte
 
 	// Using the merkleTreeIndex as the block number for this test...
@@ -1115,7 +1115,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1125,7 +1125,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1138,7 +1138,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("c"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1148,7 +1148,7 @@ func TestProposer_DepositTrie_RebuildTrie(t *testing.T) {
 			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("d"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -1330,8 +1330,8 @@ func TestProposer_ExecutionData_MajorityVote(t *testing.T) {
 		ExecutionBlockHeight: 0,
 		Deposit: &qrysmpb.Deposit{
 			Data: &qrysmpb.Deposit_Data{
-				PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
-				Signature:             make([]byte, field_params.DilithiumSignatureLength),
+				PublicKey:             bytesutil.PadTo([]byte("a"), field_params.MLDSA87PubkeyLength),
+				Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				WithdrawalCredentials: make([]byte, 32),
 			}},
 	}
@@ -1931,7 +1931,7 @@ func TestProposer_FilterAttestation(t *testing.T) {
 					domain, err := signing.Domain(st.Fork(), 0, params.BeaconConfig().DomainBeaconAttester, params.BeaconConfig().ZeroHash[:])
 					require.NoError(t, err)
 					sigs := make([][]byte, len(attestingIndices))
-					var zeroSig [field_params.DilithiumSignatureLength]byte
+					var zeroSig [field_params.MLDSA87SignatureLength]byte
 					atts[i].Signatures = [][]byte{zeroSig[:]}
 
 					for i, indice := range attestingIndices {
@@ -1994,7 +1994,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestExecutionDataEqGenesisExecut
 	blkRoot, err := blk.Block.HashTreeRoot()
 	require.NoError(t, err)
 
-	var mockSig [field_params.DilithiumSignatureLength]byte
+	var mockSig [field_params.MLDSA87SignatureLength]byte
 	var mockCreds [32]byte
 
 	readyDeposits := []*qrysmpb.DepositContainer{
@@ -2002,7 +2002,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestExecutionDataEqGenesisExecut
 			Index: 0,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("a"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -2011,7 +2011,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestExecutionDataEqGenesisExecut
 			Index: 1,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -2024,7 +2024,7 @@ func TestProposer_Deposits_ReturnsEmptyList_IfLatestExecutionDataEqGenesisExecut
 			Index: i,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{byte(i)}, field_params.MLDSA87PubkeyLength),
 					Signature:             mockSig[:],
 					WithdrawalCredentials: mockCreds[:],
 				}},
@@ -2072,7 +2072,7 @@ func TestProposer_DeleteAttsInPool_Aggregated(t *testing.T) {
 	s := &Server{
 		AttPool: attestations.NewPool(),
 	}
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte("foo")).Marshal()
 	aggregatedAtts := []*qrysmpb.Attestation{
@@ -2100,7 +2100,7 @@ func TestProposer_GetSyncAggregate_OK(t *testing.T) {
 		SyncCommitteePool: synccommittee.NewStore(),
 	}
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sigsLen := 8
 	sigs := make([][]byte, 0, sigsLen)
@@ -2163,7 +2163,7 @@ func TestProposer_PrepareBeaconProposer(t *testing.T) {
 				request: &qrysmpb.PrepareBeaconProposerRequest{
 					Recipients: []*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
 						{
-							FeeRecipient:   make([]byte, field_params.DilithiumPubkeyLength),
+							FeeRecipient:   make([]byte, field_params.MLDSA87PubkeyLength),
 							ValidatorIndex: 1,
 						},
 					},

@@ -396,7 +396,7 @@ func Web3SignerConfig(cliCtx *cli.Context) (*remoteweb3signer.SetupConfig, error
 			}
 			if len(pks) > 0 {
 				pks = slice.Unique[string](pks)
-				var validatorKeys [][field_params.DilithiumPubkeyLength]byte
+				var validatorKeys [][field_params.MLDSA87PubkeyLength]byte
 				for _, key := range pks {
 					decodedKey, decodeErr := hexutil.Decode(key)
 					if decodeErr != nil {
@@ -496,14 +496,14 @@ func proposerSettings(cliCtx *cli.Context, db iface.ValidatorDB) (*validatorServ
 	}
 
 	if fileConfig.ProposerConfig != nil && len(fileConfig.ProposerConfig) != 0 {
-		vpSettings.ProposeConfig = make(map[[field_params.DilithiumPubkeyLength]byte]*validatorServiceConfig.ProposerOption)
+		vpSettings.ProposeConfig = make(map[[field_params.MLDSA87PubkeyLength]byte]*validatorServiceConfig.ProposerOption)
 		for key, option := range fileConfig.ProposerConfig {
 			decodedKey, err := hexutil.Decode(key)
 			if err != nil {
 				return nil, errors.Wrapf(err, "could not decode public key %s", key)
 			}
-			if len(decodedKey) != field_params.DilithiumPubkeyLength {
-				return nil, fmt.Errorf("%v  is not a dilithium public key", key)
+			if len(decodedKey) != field_params.MLDSA87PubkeyLength {
+				return nil, fmt.Errorf("%v  is not a ml-dsa-87 public key", key)
 			}
 			if err := verifyOption(key, option); err != nil {
 				return nil, err

@@ -22,7 +22,7 @@ func (m SignedBeaconBlock) Block() interfaces.ReadOnlyBeaconBlock {
 	return m.BeaconBlock
 }
 
-func (SignedBeaconBlock) Signature() [field_params.DilithiumSignatureLength]byte {
+func (SignedBeaconBlock) Signature() [field_params.MLDSA87SignatureLength]byte {
 	panic("implement me")
 }
 
@@ -183,7 +183,7 @@ func (BeaconBlock) Copy() (interfaces.ReadOnlyBeaconBlock, error) {
 
 type BeaconBlockBody struct{}
 
-func (BeaconBlockBody) RandaoReveal() [field_params.DilithiumSignatureLength]byte {
+func (BeaconBlockBody) RandaoReveal() [field_params.MLDSA87SignatureLength]byte {
 	panic("implement me")
 }
 
@@ -231,7 +231,7 @@ func (BeaconBlockBody) Execution() (interfaces.ExecutionData, error) {
 	panic("implement me")
 }
 
-func (BeaconBlockBody) DilithiumToExecutionChanges() ([]*qrysmpb.SignedDilithiumToExecutionChange, error) {
+func (BeaconBlockBody) MLDSA87ToExecutionChanges() ([]*qrysmpb.SignedMLDSA87ToExecutionChange, error) {
 	panic("implement me")
 }
 
@@ -279,7 +279,7 @@ func (b *BeaconBlockBody) SetExecution(interfaces.ExecutionData) error {
 	panic("implement me")
 }
 
-func (b *BeaconBlockBody) SetDilithiumToExecutionChanges([]*qrysmpb.SignedDilithiumToExecutionChange) error {
+func (b *BeaconBlockBody) SetMLDSA87ToExecutionChanges([]*qrysmpb.SignedMLDSA87ToExecutionChange) error {
 	panic("implement me")
 }
 

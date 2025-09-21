@@ -7,7 +7,7 @@ import (
 
 	"github.com/theQRL/qrysm/async/event"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 )
@@ -24,18 +24,18 @@ type IKeymanager interface {
 
 // KeysFetcher for validating private and public keys.
 type KeysFetcher interface {
-	FetchValidatingSeeds(ctx context.Context) ([][field_params.DilithiumSeedLength]byte, error)
+	FetchValidatingSeeds(ctx context.Context) ([][field_params.MLDSA87SeedLength]byte, error)
 	PublicKeysFetcher
 }
 
 // PublicKeysFetcher for validating public keys.
 type PublicKeysFetcher interface {
-	FetchValidatingPublicKeys(ctx context.Context) ([][field_params.DilithiumPubkeyLength]byte, error)
+	FetchValidatingPublicKeys(ctx context.Context) ([][field_params.MLDSA87PubkeyLength]byte, error)
 }
 
 // Signer allows signing messages using a validator private key.
 type Signer interface {
-	Sign(context.Context, *validatorpb.SignRequest) (dilithium.Signature, error)
+	Sign(context.Context, *validatorpb.SignRequest) (ml_dsa_87.Signature, error)
 }
 
 // Importer can import new keystores into the keymanager.
@@ -52,22 +52,22 @@ type Deleter interface {
 
 // KeyChangeSubscriber allows subscribing to changes made to the underlying keys.
 type KeyChangeSubscriber interface {
-	SubscribeAccountChanges(pubKeysChan chan [][field_params.DilithiumPubkeyLength]byte) event.Subscription
+	SubscribeAccountChanges(pubKeysChan chan [][field_params.MLDSA87PubkeyLength]byte) event.Subscription
 }
 
 // KeyStoreExtractor allows keys to be extracted from the keymanager.
 type KeyStoreExtractor interface {
-	ExtractKeystores(ctx context.Context, publicKeys []dilithium.PublicKey, password string) ([]*Keystore, error)
+	ExtractKeystores(ctx context.Context, publicKeys []ml_dsa_87.PublicKey, password string) ([]*Keystore, error)
 }
 
 // PublicKeyAdder allows adding public keys to the keymanager.
 // type PublicKeyAdder interface {
-// 	AddPublicKeys(ctx context.Context, publicKeys [][field_params.DilithiumPubkeyLength]byte) ([]*qrlpbservice.ImportedRemoteKeysStatus, error)
+// 	AddPublicKeys(ctx context.Context, publicKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.ImportedRemoteKeysStatus, error)
 // }
 
 // PublicKeyDeleter allows deleting public keys set in keymanager.
 // type PublicKeyDeleter interface {
-// 	DeletePublicKeys(ctx context.Context, publicKeys [][field_params.DilithiumPubkeyLength]byte) ([]*qrlpbservice.DeletedRemoteKeysStatus, error)
+// 	DeletePublicKeys(ctx context.Context, publicKeys [][field_params.MLDSA87PubkeyLength]byte) ([]*qrlpbservice.DeletedRemoteKeysStatus, error)
 // }
 
 type ListKeymanagerAccountConfig struct {

@@ -29,7 +29,7 @@ import (
 
 // pubKey is a helper to generate a well-formed public key.
 func pubKey(i uint64) []byte {
-	pubKey := make([]byte, field_params.DilithiumPubkeyLength)
+	pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 	binary.LittleEndian.PutUint64(pubKey, i)
 	return pubKey
 }
@@ -124,7 +124,7 @@ func TestGetCapellaDuties_SyncCommitteeOK(t *testing.T) {
 
 	var nextSyncCommitteePubKeys [][]byte
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
-		nextSyncCommitteePubKeys = append(nextSyncCommitteePubKeys, bytesutil.PadTo([]byte{}, field_params.DilithiumPubkeyLength))
+		nextSyncCommitteePubKeys = append(nextSyncCommitteePubKeys, bytesutil.PadTo([]byte{}, field_params.MLDSA87PubkeyLength))
 	}
 	nextSyncCommittee := &qrysmpb.SyncCommittee{Pubkeys: nextSyncCommitteePubKeys}
 
@@ -280,7 +280,7 @@ func TestGetDuties_CurrentEpoch_ShouldNotFail(t *testing.T) {
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 
-	pubKeys := make([][field_params.DilithiumPubkeyLength]byte, len(deposits))
+	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
 	for i := 0; i < len(deposits); i++ {
 		pubKeys[i] = bytesutil.ToBytes2592(deposits[i].Data.PublicKey)
@@ -319,7 +319,7 @@ func TestGetDuties_MultipleKeys_OK(t *testing.T) {
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(t, err, "Could not get signing root")
 
-	pubKeys := make([][field_params.DilithiumPubkeyLength]byte, len(deposits))
+	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
 	for i := 0; i < len(deposits); i++ {
 		pubKeys[i] = bytesutil.ToBytes2592(deposits[i].Data.PublicKey)
@@ -408,7 +408,7 @@ func BenchmarkCommitteeAssignment(b *testing.B) {
 	genesisRoot, err := genesis.Block.HashTreeRoot()
 	require.NoError(b, err, "Could not get signing root")
 
-	pubKeys := make([][field_params.DilithiumPubkeyLength]byte, len(deposits))
+	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(deposits))
 	indices := make([]uint64, len(deposits))
 	for i := 0; i < len(deposits); i++ {
 		pubKeys[i] = bytesutil.ToBytes2592(deposits[i].Data.PublicKey)

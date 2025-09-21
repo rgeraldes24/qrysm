@@ -24,7 +24,7 @@ go_library(
         "//async/event:go_default_library",
         "//config/features:go_default_library",
         "//config/fieldparams:go_default_library",
-        "//crypto/dilithium:go_default_library",
+        "//crypto/ml_dsa_87:go_default_library",
         "//encoding/bytesutil:go_default_library",
         "//io/file:go_default_library",
         "//monitoring/progress:go_default_library",
@@ -57,7 +57,7 @@ go_test(
     deps = [
         "//async/event:go_default_library",
         "//config/fieldparams:go_default_library",
-        "//crypto/dilithium:go_default_library",
+        "//crypto/ml_dsa_87:go_default_library",
         "//encoding/bytesutil:go_default_library",
         "//pkg/go-qrl-wallet-encryptor-keystore:go_default_library",
         "//proto/qrl/service:go_default_library",

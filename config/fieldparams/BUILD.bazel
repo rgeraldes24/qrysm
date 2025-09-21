@@ -8,6 +8,10 @@ go_library(
     }),
     importpath = "github.com/theQRL/qrysm/config/fieldparams",
     visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_theqrl_go_qrllib//crypto/ml_dsa_87:go_default_library",
+        "@com_github_theqrl_go_qrllib//wallet/common:go_default_library",
+    ],
 )
 
 go_test(

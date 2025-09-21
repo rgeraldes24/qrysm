@@ -247,7 +247,7 @@ func populateValidators(cfg *params.BeaconChainConfig, st state.BeaconState, val
 	balances := make([]uint64, len(validators))
 	for i := uint64(0); i < valCount; i++ {
 		validators[i] = &qrysmpb.Validator{
-			PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
+			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			EffectiveBalance:      avgBalance * 1e9,
 			ExitEpoch:             cfg.FarFutureEpoch,

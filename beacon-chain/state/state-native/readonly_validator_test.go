@@ -53,7 +53,7 @@ func TestReadOnlyValidator_ExitEpoch(t *testing.T) {
 }
 
 func TestReadOnlyValidator_PublicKey(t *testing.T) {
-	key := [field_params.DilithiumPubkeyLength]byte{0xFA, 0xCC}
+	key := [field_params.MLDSA87PubkeyLength]byte{0xFA, 0xCC}
 	v, err := statenative.NewValidator(&qrysmpb.Validator{PublicKey: key[:]})
 	require.NoError(t, err)
 	assert.Equal(t, key, v.PublicKey())

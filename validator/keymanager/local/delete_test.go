@@ -42,8 +42,8 @@ func TestLocalKeymanager_DeleteKeystores(t *testing.T) {
 	require.Equal(t, numAccounts, len(accounts))
 
 	t.Run("keys not found", func(t *testing.T) {
-		notFoundPubKey := [field_params.DilithiumPubkeyLength]byte{1, 2, 3}
-		notFoundPubKey2 := [field_params.DilithiumPubkeyLength]byte{4, 5, 6}
+		notFoundPubKey := [field_params.MLDSA87PubkeyLength]byte{1, 2, 3}
+		notFoundPubKey2 := [field_params.MLDSA87PubkeyLength]byte{4, 5, 6}
 		statuses, err := dr.DeleteKeystores(ctx, [][]byte{notFoundPubKey[:], notFoundPubKey2[:]})
 		require.NoError(t, err)
 		require.Equal(t, 2, len(statuses))

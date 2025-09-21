@@ -15,14 +15,14 @@ import (
 func TestUpdateLogAggregateStats(t *testing.T) {
 	v := &validator{
 		logValidatorBalances: true,
-		startBalances:        make(map[[field_params.DilithiumPubkeyLength]byte]uint64),
-		prevBalance:          make(map[[field_params.DilithiumPubkeyLength]byte]uint64),
+		startBalances:        make(map[[field_params.MLDSA87PubkeyLength]byte]uint64),
+		prevBalance:          make(map[[field_params.MLDSA87PubkeyLength]byte]uint64),
 		voteStats: voteStats{
 			startEpoch: 0, // this would otherwise have been previously set in LogValidatorGainsAndLosses()
 		},
 	}
 
-	pubKeyBytes := [][field_params.DilithiumPubkeyLength]byte{
+	pubKeyBytes := [][field_params.MLDSA87PubkeyLength]byte{
 		bytesutil.ToBytes2592([]byte("000000000000000000000000000000000000000012345678")),
 		bytesutil.ToBytes2592([]byte("000000000000000000000000000000000000000099999999")),
 		bytesutil.ToBytes2592([]byte("000000000000000000000000000000000000000055555555")),

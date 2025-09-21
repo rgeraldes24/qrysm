@@ -28,16 +28,16 @@ var (
 	timestamp        = uint64(10)
 	parentRoot       = bytesutil.PadTo([]byte("parentroot"), fieldparams.RootLength)
 	stateRoot        = bytesutil.PadTo([]byte("stateroot"), fieldparams.RootLength)
-	signature        = bytesutil.PadTo([]byte("signature"), 4595)
+	signature        = bytesutil.PadTo([]byte("signature"), 4627)
 	signatures       = [][]byte{signature}
-	randaoReveal     = bytesutil.PadTo([]byte("randaoreveal"), 4595)
+	randaoReveal     = bytesutil.PadTo([]byte("randaoreveal"), 4627)
 	depositRoot      = bytesutil.PadTo([]byte("depositroot"), fieldparams.RootLength)
 	blockHash        = bytesutil.PadTo([]byte("blockhash"), 32)
 	beaconBlockRoot  = bytesutil.PadTo([]byte("beaconblockroot"), fieldparams.RootLength)
 	sourceRoot       = bytesutil.PadTo([]byte("sourceroot"), fieldparams.RootLength)
 	targetRoot       = bytesutil.PadTo([]byte("targetroot"), fieldparams.RootLength)
 	bodyRoot         = bytesutil.PadTo([]byte("bodyroot"), fieldparams.RootLength)
-	selectionProof   = bytesutil.PadTo([]byte("selectionproof"), 4595)
+	selectionProof   = bytesutil.PadTo([]byte("selectionproof"), 4627)
 	parentHash       = bytesutil.PadTo([]byte("parenthash"), 32)
 	feeRecipient     = bytesutil.PadTo([]byte("feerecipient"), 20)
 	receiptsRoot     = bytesutil.PadTo([]byte("receiptsroot"), 32)
@@ -594,20 +594,20 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("statesummaryroot2"), 32), result.HistoricalSummaries[1].StateSummaryRoot)
 }
 
-func TestV1Alpha1SignedDilithiumToExecChangeToV1(t *testing.T) {
-	alphaChange := &qrysmpb.SignedDilithiumToExecutionChange{
-		Message: &qrysmpb.DilithiumToExecutionChange{
-			ValidatorIndex:      validatorIndex,
-			FromDilithiumPubkey: bytesutil.PadTo([]byte("fromdilithiumpubkey"), 2592),
-			ToExecutionAddress:  bytesutil.PadTo([]byte("toexecutionaddress"), 20),
+func TestV1Alpha1SignedMLDSA87ToExecChangeToV1(t *testing.T) {
+	alphaChange := &qrysmpb.SignedMLDSA87ToExecutionChange{
+		Message: &qrysmpb.MLDSA87ToExecutionChange{
+			ValidatorIndex:     validatorIndex,
+			FromMldsa87Pubkey:  bytesutil.PadTo([]byte("frommldsa87pubkey"), 2592),
+			ToExecutionAddress: bytesutil.PadTo([]byte("toexecutionaddress"), 20),
 		},
 		Signature: signature,
 	}
-	change := V1Alpha1SignedDilithiumToExecChangeToV1(alphaChange)
+	change := V1Alpha1SignedMLDSA87ToExecChangeToV1(alphaChange)
 	require.NotNil(t, change)
 	require.NotNil(t, change.Message)
 	assert.DeepEqual(t, signature, change.Signature)
 	assert.Equal(t, validatorIndex, change.Message.ValidatorIndex)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("fromdilithiumpubkey"), 2592), change.Message.FromDilithiumPubkey)
+	assert.DeepEqual(t, bytesutil.PadTo([]byte("frommldsa87pubkey"), 2592), change.Message.FromMldsa87Pubkey)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("toexecutionaddress"), 20), change.Message.ToExecutionAddress)
 }

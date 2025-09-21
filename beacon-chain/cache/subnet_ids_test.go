@@ -47,12 +47,12 @@ func TestSubnetIDsCache_PersistentCommitteeRoundtrip(t *testing.T) {
 	c := newSubnetIDs()
 
 	for i := 0; i < 20; i++ {
-		pubkey := [field_params.DilithiumPubkeyLength]byte{byte(i)}
+		pubkey := [field_params.MLDSA87PubkeyLength]byte{byte(i)}
 		c.AddPersistentCommittee(pubkey[:], []uint64{uint64(i)}, 0)
 	}
 
 	for i := uint64(0); i < 20; i++ {
-		pubkey := [field_params.DilithiumPubkeyLength]byte{byte(i)}
+		pubkey := [field_params.MLDSA87PubkeyLength]byte{byte(i)}
 
 		idxs, ok, _ := c.GetPersistentSubnets(pubkey[:])
 		if !ok {

@@ -8,7 +8,7 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//cmd/staking-deposit-cli/deposit/existingseed:go_default_library",
-        "//cmd/staking-deposit-cli/deposit/generatedilithiumtoexecutionchange:go_default_library",
+        "//cmd/staking-deposit-cli/deposit/generatemldsa87toexecutionchange:go_default_library",
         "//cmd/staking-deposit-cli/deposit/newseed:go_default_library",
         "//cmd/staking-deposit-cli/deposit/submit:go_default_library",
         "//runtime/version:go_default_library",

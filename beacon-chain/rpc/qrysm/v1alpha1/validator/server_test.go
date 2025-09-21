@@ -17,7 +17,7 @@ import (
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -102,11 +102,11 @@ func TestWaitForActivation_ContextClosed(t *testing.T) {
 }
 
 func TestWaitForActivation_MultipleStatuses(t *testing.T) {
-	priv1, err := dilithium.RandKey()
+	priv1, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
-	priv2, err := dilithium.RandKey()
+	priv2, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
-	priv3, err := dilithium.RandKey()
+	priv3, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 
 	pubKey1 := priv1.PublicKey().Marshal()

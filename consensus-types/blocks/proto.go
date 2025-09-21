@@ -122,17 +122,17 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 				}
 			}
 			return &qrysmpb.BlindedBeaconBlockBodyCapella{
-				RandaoReveal:                b.randaoReveal[:],
-				ExecutionData:               b.executionData,
-				Graffiti:                    b.graffiti[:],
-				ProposerSlashings:           b.proposerSlashings,
-				AttesterSlashings:           b.attesterSlashings,
-				Attestations:                b.attestations,
-				Deposits:                    b.deposits,
-				VoluntaryExits:              b.voluntaryExits,
-				SyncAggregate:               b.syncAggregate,
-				ExecutionPayloadHeader:      ph,
-				DilithiumToExecutionChanges: b.dilithiumToExecutionChanges,
+				RandaoReveal:              b.randaoReveal[:],
+				ExecutionData:             b.executionData,
+				Graffiti:                  b.graffiti[:],
+				ProposerSlashings:         b.proposerSlashings,
+				AttesterSlashings:         b.attesterSlashings,
+				Attestations:              b.attestations,
+				Deposits:                  b.deposits,
+				VoluntaryExits:            b.voluntaryExits,
+				SyncAggregate:             b.syncAggregate,
+				ExecutionPayloadHeader:    ph,
+				Mldsa87ToExecutionChanges: b.mlDSA87ToExecutionChanges,
 			}, nil
 		}
 		var p *enginev1.ExecutionPayloadCapella
@@ -144,17 +144,17 @@ func (b *BeaconBlockBody) Proto() (proto.Message, error) {
 			}
 		}
 		return &qrysmpb.BeaconBlockBodyCapella{
-			RandaoReveal:                b.randaoReveal[:],
-			ExecutionData:               b.executionData,
-			Graffiti:                    b.graffiti[:],
-			ProposerSlashings:           b.proposerSlashings,
-			AttesterSlashings:           b.attesterSlashings,
-			Attestations:                b.attestations,
-			Deposits:                    b.deposits,
-			VoluntaryExits:              b.voluntaryExits,
-			SyncAggregate:               b.syncAggregate,
-			ExecutionPayload:            p,
-			DilithiumToExecutionChanges: b.dilithiumToExecutionChanges,
+			RandaoReveal:              b.randaoReveal[:],
+			ExecutionData:             b.executionData,
+			Graffiti:                  b.graffiti[:],
+			ProposerSlashings:         b.proposerSlashings,
+			AttesterSlashings:         b.attesterSlashings,
+			Attestations:              b.attestations,
+			Deposits:                  b.deposits,
+			VoluntaryExits:            b.voluntaryExits,
+			SyncAggregate:             b.syncAggregate,
+			ExecutionPayload:          p,
+			Mldsa87ToExecutionChanges: b.mlDSA87ToExecutionChanges,
 		}, nil
 	default:
 		return nil, errors.New("unsupported beacon block body version")
@@ -173,7 +173,7 @@ func initSignedBlockFromProtoCapella(pb *qrysmpb.SignedBeaconBlockCapella) (*Sig
 	b := &SignedBeaconBlock{
 		version:   version.Capella,
 		block:     block,
-		signature: bytesutil.ToBytes4595(pb.Signature),
+		signature: bytesutil.ToBytes4627(pb.Signature),
 	}
 	return b, nil
 }
@@ -190,7 +190,7 @@ func initBlindedSignedBlockFromProtoCapella(pb *qrysmpb.SignedBlindedBeaconBlock
 	b := &SignedBeaconBlock{
 		version:   version.Capella,
 		block:     block,
-		signature: bytesutil.ToBytes4595(pb.Signature),
+		signature: bytesutil.ToBytes4627(pb.Signature),
 	}
 	return b, nil
 }
@@ -246,19 +246,19 @@ func initBlockBodyFromProtoCapella(pb *qrysmpb.BeaconBlockBodyCapella) (*BeaconB
 		return nil, err
 	}
 	b := &BeaconBlockBody{
-		version:                     version.Capella,
-		isBlinded:                   false,
-		randaoReveal:                bytesutil.ToBytes4595(pb.RandaoReveal),
-		executionData:               pb.ExecutionData,
-		graffiti:                    bytesutil.ToBytes32(pb.Graffiti),
-		proposerSlashings:           pb.ProposerSlashings,
-		attesterSlashings:           pb.AttesterSlashings,
-		attestations:                pb.Attestations,
-		deposits:                    pb.Deposits,
-		voluntaryExits:              pb.VoluntaryExits,
-		syncAggregate:               pb.SyncAggregate,
-		executionPayload:            p,
-		dilithiumToExecutionChanges: pb.DilithiumToExecutionChanges,
+		version:                   version.Capella,
+		isBlinded:                 false,
+		randaoReveal:              bytesutil.ToBytes4627(pb.RandaoReveal),
+		executionData:             pb.ExecutionData,
+		graffiti:                  bytesutil.ToBytes32(pb.Graffiti),
+		proposerSlashings:         pb.ProposerSlashings,
+		attesterSlashings:         pb.AttesterSlashings,
+		attestations:              pb.Attestations,
+		deposits:                  pb.Deposits,
+		voluntaryExits:            pb.VoluntaryExits,
+		syncAggregate:             pb.SyncAggregate,
+		executionPayload:          p,
+		mlDSA87ToExecutionChanges: pb.Mldsa87ToExecutionChanges,
 	}
 	return b, nil
 }
@@ -274,19 +274,19 @@ func initBlindedBlockBodyFromProtoCapella(pb *qrysmpb.BlindedBeaconBlockBodyCape
 		return nil, err
 	}
 	b := &BeaconBlockBody{
-		version:                     version.Capella,
-		isBlinded:                   true,
-		randaoReveal:                bytesutil.ToBytes4595(pb.RandaoReveal),
-		executionData:               pb.ExecutionData,
-		graffiti:                    bytesutil.ToBytes32(pb.Graffiti),
-		proposerSlashings:           pb.ProposerSlashings,
-		attesterSlashings:           pb.AttesterSlashings,
-		attestations:                pb.Attestations,
-		deposits:                    pb.Deposits,
-		voluntaryExits:              pb.VoluntaryExits,
-		syncAggregate:               pb.SyncAggregate,
-		executionPayloadHeader:      ph,
-		dilithiumToExecutionChanges: pb.DilithiumToExecutionChanges,
+		version:                   version.Capella,
+		isBlinded:                 true,
+		randaoReveal:              bytesutil.ToBytes4627(pb.RandaoReveal),
+		executionData:             pb.ExecutionData,
+		graffiti:                  bytesutil.ToBytes32(pb.Graffiti),
+		proposerSlashings:         pb.ProposerSlashings,
+		attesterSlashings:         pb.AttesterSlashings,
+		attestations:              pb.Attestations,
+		deposits:                  pb.Deposits,
+		voluntaryExits:            pb.VoluntaryExits,
+		syncAggregate:             pb.SyncAggregate,
+		executionPayloadHeader:    ph,
+		mlDSA87ToExecutionChanges: pb.Mldsa87ToExecutionChanges,
 	}
 	return b, nil
 }

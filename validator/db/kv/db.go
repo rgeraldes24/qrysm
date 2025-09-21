@@ -54,7 +54,7 @@ var blockedBuckets = [][]byte{
 
 // Config represents store's config object.
 type Config struct {
-	PubKeys [][field_params.DilithiumPubkeyLength]byte
+	PubKeys [][field_params.MLDSA87PubkeyLength]byte
 }
 
 // Store defines an implementation of the Qrysm Database interface
@@ -178,7 +178,7 @@ func NewKVStore(ctx context.Context, dirPath string, config *Config) (*Store, er
 }
 
 // UpdatePublicKeysBuckets for a specified list of keys.
-func (s *Store) UpdatePublicKeysBuckets(pubKeys [][field_params.DilithiumPubkeyLength]byte) error {
+func (s *Store) UpdatePublicKeysBuckets(pubKeys [][field_params.MLDSA87PubkeyLength]byte) error {
 	return s.update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(historicProposalsBucket)
 		for _, pubKey := range pubKeys {

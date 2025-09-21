@@ -17,7 +17,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/sync"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
@@ -33,7 +33,7 @@ type ServiceConfig struct {
 	HeadStateFetcher            blockchain.HeadFetcher
 	StateGen                    stategen.StateManager
 	SlashingsPool               slashings.PoolManager
-	PrivateKeysByValidatorIndex map[primitives.ValidatorIndex]dilithium.DilithiumKey
+	PrivateKeysByValidatorIndex map[primitives.ValidatorIndex]ml_dsa_87.MLDSA87Key
 	SyncChecker                 sync.Checker
 	ClockWaiter                 startup.ClockWaiter
 	ClockSetter                 startup.ClockSetter

@@ -97,7 +97,7 @@ func TestValidatorStatus_Active(t *testing.T) {
 
 // pubKey is a helper to generate a well-formed public key.
 func generatePubkey(i uint64) []byte {
-	pubKey := make([]byte, field_params.DilithiumPubkeyLength)
+	pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 	binary.LittleEndian.PutUint64(pubKey, i)
 	return pubKey
 }

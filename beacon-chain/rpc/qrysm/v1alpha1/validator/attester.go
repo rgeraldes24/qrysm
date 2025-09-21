@@ -9,7 +9,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/core"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
@@ -51,7 +51,7 @@ func (vs *Server) ProposeAttestation(ctx context.Context, att *qrysmpb.Attestati
 	defer span.End()
 
 	for _, sig := range att.Signatures {
-		if _, err := dilithium.SignatureFromBytes(sig); err != nil {
+		if _, err := ml_dsa_87.SignatureFromBytes(sig); err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "Incorrect attestation signature")
 		}
 	}

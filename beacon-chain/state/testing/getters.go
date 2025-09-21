@@ -55,22 +55,22 @@ func VerifyBeaconStateMatchPreviousJustifiedCheckptNative(t *testing.T, factory 
 }
 
 func VerifyBeaconStateValidatorByPubkey(t *testing.T, factory getState) {
-	keyCreator := func(input []byte) [field_params.DilithiumPubkeyLength]byte {
-		var nKey [field_params.DilithiumPubkeyLength]byte
+	keyCreator := func(input []byte) [field_params.MLDSA87PubkeyLength]byte {
+		var nKey [field_params.MLDSA87PubkeyLength]byte
 		copy(nKey[:1], input)
 		return nKey
 	}
 
 	tests := []struct {
 		name            string
-		modifyFunc      func(b state.BeaconState, k [field_params.DilithiumPubkeyLength]byte)
+		modifyFunc      func(b state.BeaconState, k [field_params.MLDSA87PubkeyLength]byte)
 		exists          bool
 		expectedIdx     primitives.ValidatorIndex
 		largestIdxInSet primitives.ValidatorIndex
 	}{
 		{
 			name: "retrieve validator",
-			modifyFunc: func(b state.BeaconState, key [field_params.DilithiumPubkeyLength]byte) {
+			modifyFunc: func(b state.BeaconState, key [field_params.MLDSA87PubkeyLength]byte) {
 				assert.NoError(t, b.AppendValidator(&qrysmpb.Validator{PublicKey: key[:]}))
 			},
 			exists:      true,
@@ -78,7 +78,7 @@ func VerifyBeaconStateValidatorByPubkey(t *testing.T, factory getState) {
 		},
 		{
 			name: "retrieve validator with multiple validators from the start",
-			modifyFunc: func(b state.BeaconState, key [field_params.DilithiumPubkeyLength]byte) {
+			modifyFunc: func(b state.BeaconState, key [field_params.MLDSA87PubkeyLength]byte) {
 				key1 := keyCreator([]byte{'C'})
 				key2 := keyCreator([]byte{'D'})
 				assert.NoError(t, b.AppendValidator(&qrysmpb.Validator{PublicKey: key[:]}))
@@ -90,7 +90,7 @@ func VerifyBeaconStateValidatorByPubkey(t *testing.T, factory getState) {
 		},
 		{
 			name: "retrieve validator with multiple validators",
-			modifyFunc: func(b state.BeaconState, key [field_params.DilithiumPubkeyLength]byte) {
+			modifyFunc: func(b state.BeaconState, key [field_params.MLDSA87PubkeyLength]byte) {
 				key1 := keyCreator([]byte{'C'})
 				key2 := keyCreator([]byte{'D'})
 				assert.NoError(t, b.AppendValidator(&qrysmpb.Validator{PublicKey: key1[:]}))
@@ -102,7 +102,7 @@ func VerifyBeaconStateValidatorByPubkey(t *testing.T, factory getState) {
 		},
 		{
 			name: "retrieve validator with multiple validators from the start with shared state",
-			modifyFunc: func(b state.BeaconState, key [field_params.DilithiumPubkeyLength]byte) {
+			modifyFunc: func(b state.BeaconState, key [field_params.MLDSA87PubkeyLength]byte) {
 				key1 := keyCreator([]byte{'C'})
 				key2 := keyCreator([]byte{'D'})
 				assert.NoError(t, b.AppendValidator(&qrysmpb.Validator{PublicKey: key[:]}))
@@ -115,7 +115,7 @@ func VerifyBeaconStateValidatorByPubkey(t *testing.T, factory getState) {
 		},
 		{
 			name: "retrieve validator with multiple validators with shared state",
-			modifyFunc: func(b state.BeaconState, key [field_params.DilithiumPubkeyLength]byte) {
+			modifyFunc: func(b state.BeaconState, key [field_params.MLDSA87PubkeyLength]byte) {
 				key1 := keyCreator([]byte{'C'})
 				key2 := keyCreator([]byte{'D'})
 				assert.NoError(t, b.AppendValidator(&qrysmpb.Validator{PublicKey: key1[:]}))
@@ -129,7 +129,7 @@ func VerifyBeaconStateValidatorByPubkey(t *testing.T, factory getState) {
 		},
 		{
 			name: "retrieve validator with multiple validators with shared state at boundary",
-			modifyFunc: func(b state.BeaconState, key [field_params.DilithiumPubkeyLength]byte) {
+			modifyFunc: func(b state.BeaconState, key [field_params.MLDSA87PubkeyLength]byte) {
 				key1 := keyCreator([]byte{'C'})
 				assert.NoError(t, b.AppendValidator(&qrysmpb.Validator{PublicKey: key1[:]}))
 				n := b.Copy()

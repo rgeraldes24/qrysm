@@ -31,14 +31,14 @@ func TestPruneExpired_Ticker(t *testing.T) {
 	ad2 := util.HydrateAttestationData(&qrysmpb.AttestationData{Slot: 1})
 
 	atts := []*qrysmpb.Attestation{
-		{Data: ad1, AggregationBits: bitfield.Bitlist{0b1000, 0b1}, Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength)}},
-		{Data: ad2, AggregationBits: bitfield.Bitlist{0b1000, 0b1}, Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength)}},
+		{Data: ad1, AggregationBits: bitfield.Bitlist{0b1000, 0b1}, Signatures: [][]byte{make([]byte, field_params.MLDSA87SignatureLength)}},
+		{Data: ad2, AggregationBits: bitfield.Bitlist{0b1000, 0b1}, Signatures: [][]byte{make([]byte, field_params.MLDSA87SignatureLength)}},
 	}
 	require.NoError(t, s.cfg.Pool.SaveUnaggregatedAttestations(atts))
 	require.Equal(t, 2, s.cfg.Pool.UnaggregatedAttestationCount(), "Unexpected number of attestations")
 	atts = []*qrysmpb.Attestation{
-		{Data: ad1, AggregationBits: bitfield.Bitlist{0b1101, 0b1}, Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength)}},
-		{Data: ad2, AggregationBits: bitfield.Bitlist{0b1101, 0b1}, Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength)}},
+		{Data: ad1, AggregationBits: bitfield.Bitlist{0b1101, 0b1}, Signatures: [][]byte{make([]byte, field_params.MLDSA87SignatureLength), make([]byte, field_params.MLDSA87SignatureLength), make([]byte, field_params.MLDSA87SignatureLength)}},
+		{Data: ad2, AggregationBits: bitfield.Bitlist{0b1101, 0b1}, Signatures: [][]byte{make([]byte, field_params.MLDSA87SignatureLength), make([]byte, field_params.MLDSA87SignatureLength), make([]byte, field_params.MLDSA87SignatureLength)}},
 	}
 	require.NoError(t, s.cfg.Pool.SaveAggregatedAttestations(atts))
 	assert.Equal(t, 2, s.cfg.Pool.AggregatedAttestationCount())

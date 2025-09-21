@@ -86,15 +86,15 @@ func (c *Credentials) VerifyKeystores(keystoreFileFolders []string, password str
 	return true
 }
 
-func (c *Credentials) ExportDilithiumToExecutionChangeJSON(folder string, validatorIndices []uint64) (string, error) {
-	var dilithiumToExecutionChangeDataList []*DilithiumToExecutionChangeData
+func (c *Credentials) ExportMLDSA87ToExecutionChangeJSON(folder string, validatorIndices []uint64) (string, error) {
+	var mlDSA87ToExecutionChangeDataList []*MLDSA87ToExecutionChangeData
 	for i, credential := range c.credentials {
-		dilithiumToExecutionChangeData := credential.GetDilithiumToExecutionChangeData(validatorIndices[i])
-		dilithiumToExecutionChangeDataList = append(dilithiumToExecutionChangeDataList, dilithiumToExecutionChangeData)
+		mlDSA87ToExecutionChangeData := credential.GetMLDSA87ToExecutionChangeData(validatorIndices[i])
+		mlDSA87ToExecutionChangeDataList = append(mlDSA87ToExecutionChangeDataList, mlDSA87ToExecutionChangeData)
 	}
 
-	fileFolder := filepath.Join(folder, fmt.Sprintf("dilithium_to_execution_change-%d.json", time.Now().Unix()))
-	jsonDepositDataList, err := json.Marshal(dilithiumToExecutionChangeDataList)
+	fileFolder := filepath.Join(folder, fmt.Sprintf("ml_dsa_87_to_execution_change-%d.json", time.Now().Unix()))
+	jsonDepositDataList, err := json.Marshal(mlDSA87ToExecutionChangeDataList)
 	if err != nil {
 		return "", err
 	}

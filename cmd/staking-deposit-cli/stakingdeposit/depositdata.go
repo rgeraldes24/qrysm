@@ -3,7 +3,7 @@ package stakingdeposit
 import (
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/contracts/deposit"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
@@ -22,13 +22,13 @@ type DepositData struct {
 
 func NewDepositData(c *Credential) (*DepositData, error) {
 	binSigningSeed := misc.StrSeedToBinSeed(c.signingSeed)
-	depositKey, err := dilithium.SecretKeyFromSeed(binSigningSeed[:])
+	depositKey, err := ml_dsa_87.SecretKeyFromSeed(binSigningSeed[:])
 	if err != nil {
 		return nil, err
 	}
 
 	binWithdrawalSeed := misc.StrSeedToBinSeed(c.withdrawalSeed)
-	withdrawalKey, err := dilithium.SecretKeyFromSeed(binWithdrawalSeed[:])
+	withdrawalKey, err := ml_dsa_87.SecretKeyFromSeed(binWithdrawalSeed[:])
 	if err != nil {
 		return nil, err
 	}

@@ -25,7 +25,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	http2 "github.com/theQRL/qrysm/network/http"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -44,13 +44,13 @@ func TestBlockRewards(t *testing.T) {
 	require.NoError(t, err)
 	validators := make([]*qrysmpb.Validator, 0, valCount)
 	balances := make([]uint64, 0, valCount)
-	secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
+	secretKeys := make([]ml_dsa_87.MLDSA87Key, 0, valCount)
 	for i := 0; i < valCount; i++ {
-		dilithiumKey, err := dilithium.RandKey()
+		mlDSA87Key, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
-		secretKeys = append(secretKeys, dilithiumKey)
+		secretKeys = append(secretKeys, mlDSA87Key)
 		validators = append(validators, &qrysmpb.Validator{
-			PublicKey:         dilithiumKey.PublicKey().Marshal(),
+			PublicKey:         mlDSA87Key.PublicKey().Marshal(),
 			ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance,
@@ -76,12 +76,12 @@ func TestBlockRewards(t *testing.T) {
 		{
 			AggregationBits: bitfield.Bitlist{0b00000111},
 			Data:            util.HydrateAttestationData(&qrysmpb.AttestationData{}),
-			Signatures:      [][]byte{make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength)},
+			Signatures:      [][]byte{make([]byte, field_params.MLDSA87SignatureLength), make([]byte, field_params.MLDSA87SignatureLength)},
 		},
 		{
 			AggregationBits: bitfield.Bitlist{0b00000111},
 			Data:            util.HydrateAttestationData(&qrysmpb.AttestationData{}),
-			Signatures:      [][]byte{make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength)},
+			Signatures:      [][]byte{make([]byte, field_params.MLDSA87SignatureLength), make([]byte, field_params.MLDSA87SignatureLength)},
 		},
 	}
 	attData1 := util.HydrateAttestationData(&qrysmpb.AttestationData{BeaconBlockRoot: bytesutil.PadTo([]byte("root1"), 32)})
@@ -197,13 +197,13 @@ func TestAttestationRewards(t *testing.T) {
 	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*3-1))
 	validators := make([]*qrysmpb.Validator, 0, valCount)
 	balances := make([]uint64, 0, valCount)
-	secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
+	secretKeys := make([]ml_dsa_87.MLDSA87Key, 0, valCount)
 	for i := 0; i < valCount; i++ {
-		dilithiumKey, err := dilithium.RandKey()
+		mlDSA87Key, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
-		secretKeys = append(secretKeys, dilithiumKey)
+		secretKeys = append(secretKeys, mlDSA87Key)
 		validators = append(validators, &qrysmpb.Validator{
-			PublicKey:         dilithiumKey.PublicKey().Marshal(),
+			PublicKey:         mlDSA87Key.PublicKey().Marshal(),
 			ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance / 64 * uint64(i+1),
@@ -316,13 +316,13 @@ func TestAttestationRewards(t *testing.T) {
 		require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch*3-1))
 		validators := make([]*qrysmpb.Validator, 0, valCount)
 		balances := make([]uint64, 0, valCount)
-		secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
+		secretKeys := make([]ml_dsa_87.MLDSA87Key, 0, valCount)
 		for i := 0; i < valCount; i++ {
-			dilithiumKey, err := dilithium.RandKey()
+			mlDSA87Key, err := ml_dsa_87.RandKey()
 			require.NoError(t, err)
-			secretKeys = append(secretKeys, dilithiumKey)
+			secretKeys = append(secretKeys, mlDSA87Key)
 			validators = append(validators, &qrysmpb.Validator{
-				PublicKey:         dilithiumKey.PublicKey().Marshal(),
+				PublicKey:         mlDSA87Key.PublicKey().Marshal(),
 				ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 				WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 				EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance / 64 * uint64(i),
@@ -392,7 +392,7 @@ func TestAttestationRewards(t *testing.T) {
 	t.Run("unknown validator pubkey", func(t *testing.T) {
 		url := "http://only.the.epoch.number.at.the.end.is.important/1"
 		var body bytes.Buffer
-		privkey, err := dilithium.RandKey()
+		privkey, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		pubkey := fmt.Sprintf("%#x", privkey.PublicKey().Marshal())
 		valIds, err := json.Marshal([]string{"10", pubkey})
@@ -468,13 +468,13 @@ func TestSyncCommiteeRewards(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, st.SetSlot(params.BeaconConfig().SlotsPerEpoch-1))
 	validators := make([]*qrysmpb.Validator, 0, valCount)
-	secretKeys := make([]dilithium.DilithiumKey, 0, valCount)
+	secretKeys := make([]ml_dsa_87.MLDSA87Key, 0, valCount)
 	for i := 0; i < valCount; i++ {
-		dilithiumKey, err := dilithium.RandKey()
+		mlDSA87Key, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
-		secretKeys = append(secretKeys, dilithiumKey)
+		secretKeys = append(secretKeys, mlDSA87Key)
 		validators = append(validators, &qrysmpb.Validator{
-			PublicKey:         dilithiumKey.PublicKey().Marshal(),
+			PublicKey:         mlDSA87Key.PublicKey().Marshal(),
 			ExitEpoch:         params.BeaconConfig().FarFutureEpoch,
 			WithdrawableEpoch: params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance:  params.BeaconConfig().MaxEffectiveBalance,
@@ -685,7 +685,7 @@ func TestSyncCommiteeRewards(t *testing.T) {
 
 		url := "http://only.the.slot.number.at.the.end.is.important/128"
 		var body bytes.Buffer
-		privkey, err := dilithium.RandKey()
+		privkey, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		pubkey := fmt.Sprintf("%#x", privkey.PublicKey().Marshal())
 		valIds, err := json.Marshal([]string{"10", pubkey})

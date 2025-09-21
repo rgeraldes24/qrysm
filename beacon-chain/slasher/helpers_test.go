@@ -410,7 +410,7 @@ func Test_validateBlockHeaderIntegrity(t *testing.T) {
 	type args struct {
 		header *qrysmpb.SignedBeaconBlockHeader
 	}
-	fakeSig := make([]byte, field_params.DilithiumSignatureLength)
+	fakeSig := make([]byte, field_params.MLDSA87SignatureLength)
 	copy(fakeSig, "hi")
 	tests := []struct {
 		name string
@@ -443,7 +443,7 @@ func Test_validateBlockHeaderIntegrity(t *testing.T) {
 			args: args{
 				header: &qrysmpb.SignedBeaconBlockHeader{
 					Header:    &qrysmpb.BeaconBlockHeader{},
-					Signature: make([]byte, field_params.DilithiumSignatureLength+1),
+					Signature: make([]byte, field_params.MLDSA87SignatureLength+1),
 				},
 			},
 			want: false,

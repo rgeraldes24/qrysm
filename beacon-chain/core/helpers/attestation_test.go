@@ -51,7 +51,7 @@ func TestAttestation_ComputeSubnetForAttestation(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, validatorCount)
 
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, field_params.DilithiumPubkeyLength)
+		k := make([]byte, field_params.MLDSA87PubkeyLength)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
 			PublicKey:             k,

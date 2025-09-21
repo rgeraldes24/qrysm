@@ -45,7 +45,7 @@ func Test_BeaconBlockIsNil(t *testing.T) {
 func Test_SignedBeaconBlock_Signature(t *testing.T) {
 	sb := &SignedBeaconBlock{}
 	sb.SetSignature([]byte("signature"))
-	assert.DeepEqual(t, bytesutil.ToBytes4595([]byte("signature")), sb.Signature())
+	assert.DeepEqual(t, bytesutil.ToBytes4627([]byte("signature")), sb.Signature())
 }
 
 func Test_SignedBeaconBlock_Block(t *testing.T) {
@@ -92,7 +92,7 @@ func Test_SignedBeaconBlock_Version(t *testing.T) {
 func Test_SignedBeaconBlock_Header(t *testing.T) {
 	bb := &BeaconBlockBody{
 		version:      version.Capella,
-		randaoReveal: [field_params.DilithiumSignatureLength]byte{},
+		randaoReveal: [field_params.MLDSA87SignatureLength]byte{},
 		executionData: &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),
@@ -128,7 +128,7 @@ func Test_SignedBeaconBlock_Header(t *testing.T) {
 			stateRoot:     bytesutil.ToBytes32([]byte("stateroot")),
 			body:          bb,
 		},
-		signature: bytesutil.ToBytes4595([]byte("signature")),
+		signature: bytesutil.ToBytes4627([]byte("signature")),
 	}
 	h, err := sb.Header()
 	require.NoError(t, err)
@@ -190,7 +190,7 @@ func Test_BeaconBlock_Body(t *testing.T) {
 }
 
 func Test_BeaconBlock_Copy(t *testing.T) {
-	bb := &BeaconBlockBody{version: version.Capella, randaoReveal: bytesutil.ToBytes4595([]byte{246}), graffiti: bytesutil.ToBytes32([]byte("graffiti"))}
+	bb := &BeaconBlockBody{version: version.Capella, randaoReveal: bytesutil.ToBytes4627([]byte{246}), graffiti: bytesutil.ToBytes32([]byte("graffiti"))}
 	b := &BeaconBlock{version: version.Capella, body: bb, slot: 123, proposerIndex: 456, parentRoot: bytesutil.ToBytes32([]byte("parentroot")), stateRoot: bytesutil.ToBytes32([]byte("stateroot"))}
 	cp, err := b.Copy()
 	require.NoError(t, err)
@@ -308,7 +308,7 @@ func Test_BeaconBlockBody_IsNil(t *testing.T) {
 func Test_BeaconBlockBody_RandaoReveal(t *testing.T) {
 	bb := &SignedBeaconBlock{block: &BeaconBlock{body: &BeaconBlockBody{}}}
 	bb.SetRandaoReveal([]byte("randaoreveal"))
-	assert.DeepEqual(t, bytesutil.ToBytes4595([]byte("randaoreveal")), bb.Block().Body().RandaoReveal())
+	assert.DeepEqual(t, bytesutil.ToBytes4627([]byte("randaoreveal")), bb.Block().Body().RandaoReveal())
 }
 
 func Test_BeaconBlockBody_ExecutionData(t *testing.T) {
@@ -368,11 +368,11 @@ func Test_BeaconBlockBody_SyncAggregate(t *testing.T) {
 	assert.DeepEqual(t, result, sa)
 }
 
-func Test_BeaconBlockBody_DilithiumToExecutionChanges(t *testing.T) {
-	changes := []*qrysmpb.SignedDilithiumToExecutionChange{{Message: &qrysmpb.DilithiumToExecutionChange{ToExecutionAddress: []byte("address")}}}
+func Test_BeaconBlockBody_MLDSA87ToExecutionChanges(t *testing.T) {
+	changes := []*qrysmpb.SignedMLDSA87ToExecutionChange{{Message: &qrysmpb.MLDSA87ToExecutionChange{ToExecutionAddress: []byte("address")}}}
 	bb := &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{body: &BeaconBlockBody{version: version.Capella}}}
-	require.NoError(t, bb.SetDilithiumToExecutionChanges(changes))
-	result, err := bb.Block().Body().DilithiumToExecutionChanges()
+	require.NoError(t, bb.SetMLDSA87ToExecutionChanges(changes))
+	result, err := bb.Block().Body().MLDSA87ToExecutionChanges()
 	require.NoError(t, err)
 	assert.DeepSSZEqual(t, result, changes)
 }
@@ -410,7 +410,7 @@ func Test_BeaconBlockBody_HashTreeRoot(t *testing.T) {
 
 func hydrateSignedBeaconBlock() *qrysmpb.SignedBeaconBlockCapella {
 	return &qrysmpb.SignedBeaconBlockCapella{
-		Signature: make([]byte, field_params.DilithiumSignatureLength),
+		Signature: make([]byte, field_params.MLDSA87SignatureLength),
 		Block:     hydrateBeaconBlock(),
 	}
 }
@@ -425,7 +425,7 @@ func hydrateBeaconBlock() *qrysmpb.BeaconBlockCapella {
 
 func hydrateBeaconBlockBody() *qrysmpb.BeaconBlockBodyCapella {
 	return &qrysmpb.BeaconBlockBodyCapella{
-		RandaoReveal: make([]byte, field_params.DilithiumSignatureLength),
+		RandaoReveal: make([]byte, field_params.MLDSA87SignatureLength),
 		Graffiti:     make([]byte, fieldparams.RootLength),
 		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, fieldparams.RootLength),

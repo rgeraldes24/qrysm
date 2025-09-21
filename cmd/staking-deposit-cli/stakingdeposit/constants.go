@@ -1,5 +1,5 @@
 package stakingdeposit
 
 const (
-	defaultDilithiumToExecutionChangesFolderName = "dilithium_to_execution_changes"
+	defaultMLDSA87ToExecutionChangesFolderName = "ml_dsa_87_to_execution_changes"
 )

@@ -31,7 +31,7 @@ func TestBeaconAggregateProofSubscriber_CanSaveAggregatedAttestation(t *testing.
 			}),
 			AggregatorIndex: 100,
 		},
-		Signature: make([]byte, field_params.DilithiumSignatureLength),
+		Signature: make([]byte, field_params.MLDSA87SignatureLength),
 	}
 	require.NoError(t, r.beaconAggregateProofSubscriber(context.Background(), a))
 	assert.DeepSSZEqual(t, []*qrysmpb.Attestation{a.Message.Aggregate}, r.cfg.attPool.AggregatedAttestations(), "Did not save aggregated attestation")

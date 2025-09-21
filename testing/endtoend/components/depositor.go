@@ -112,8 +112,8 @@ func (h *DepositHistory) updateByBatch(sd *SentDeposit) {
 
 // Balances sums, by validator, all deposit amounts that were sent as part of the given batch.
 // This can be used in e2e evaluators to check that the results of deposit transactions are visible on chain.
-func (h *DepositHistory) Balances(batch types.DepositBatch) map[[field_params.DilithiumPubkeyLength]byte]uint64 {
-	balances := make(map[[field_params.DilithiumPubkeyLength]byte]uint64)
+func (h *DepositHistory) Balances(batch types.DepositBatch) map[[field_params.MLDSA87PubkeyLength]byte]uint64 {
+	balances := make(map[[field_params.MLDSA87PubkeyLength]byte]uint64)
 	h.RLock()
 	defer h.RUnlock()
 	for _, d := range h.byBatch[batch] {
@@ -200,7 +200,7 @@ func (d *Depositor) SendDeposit(dep *qrysmpb.Deposit, txo *bind.TransactOpts, ba
 
 // txops is a little helper method that creates a TransactOpts (type encapsulating auth/meta data needed to make a tx).
 func (d *Depositor) txops(ctx context.Context) (*bind.TransactOpts, error) {
-	txo, err := bind.NewKeyedTransactorWithChainID(d.Key.Dilithium, d.NetworkId)
+	txo, err := bind.NewKeyedTransactorWithChainID(d.Key.Wallet, d.NetworkId)
 	if err != nil {
 		return nil, err
 	}

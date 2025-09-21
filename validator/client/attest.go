@@ -32,7 +32,7 @@ import (
 // It fetches the latest beacon block head along with the latest canonical beacon state
 // information in order to sign the block and include information about the validator's
 // participation in voting on the block.
-func (v *validator) SubmitAttestation(ctx context.Context, slot primitives.Slot, pubKey [field_params.DilithiumPubkeyLength]byte) {
+func (v *validator) SubmitAttestation(ctx context.Context, slot primitives.Slot, pubKey [field_params.MLDSA87PubkeyLength]byte) {
 	ctx, span := trace.StartSpan(ctx, "validator.SubmitAttestation")
 	defer span.End()
 	span.AddAttributes(trace.StringAttribute("validator", fmt.Sprintf("%#x", pubKey)))
@@ -181,7 +181,7 @@ func (v *validator) SubmitAttestation(ctx context.Context, slot primitives.Slot,
 }
 
 // Given the validator public key, this gets the validator assignment.
-func (v *validator) duty(pubKey [field_params.DilithiumPubkeyLength]byte) (*qrysmpb.DutiesResponse_Duty, error) {
+func (v *validator) duty(pubKey [field_params.MLDSA87PubkeyLength]byte) (*qrysmpb.DutiesResponse_Duty, error) {
 	v.dutiesLock.RLock()
 	defer v.dutiesLock.RUnlock()
 	if v.duties == nil {
@@ -198,7 +198,7 @@ func (v *validator) duty(pubKey [field_params.DilithiumPubkeyLength]byte) (*qrys
 }
 
 // Given validator's public key, this function returns the signature of an attestation data and its signing root.
-func (v *validator) signAtt(ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, data *qrysmpb.AttestationData, slot primitives.Slot) ([]byte, [32]byte, error) {
+func (v *validator) signAtt(ctx context.Context, pubKey [field_params.MLDSA87PubkeyLength]byte, data *qrysmpb.AttestationData, slot primitives.Slot) ([]byte, [32]byte, error) {
 	domain, root, err := v.getDomainAndSigningRoot(ctx, data)
 	if err != nil {
 		return nil, [32]byte{}, err
@@ -298,7 +298,7 @@ func (v *validator) waitOneThirdOrValidBlock(ctx context.Context, slot primitive
 	}
 }
 
-func attestationLogFields(pubKey [field_params.DilithiumPubkeyLength]byte, indexedAtt *qrysmpb.IndexedAttestation) logrus.Fields {
+func attestationLogFields(pubKey [field_params.MLDSA87PubkeyLength]byte, indexedAtt *qrysmpb.IndexedAttestation) logrus.Fields {
 	return logrus.Fields{
 		"attesterPublicKey": fmt.Sprintf("%#x", pubKey),
 		"attestationSlot":   indexedAtt.Data.Slot,

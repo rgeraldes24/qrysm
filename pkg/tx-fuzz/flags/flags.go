@@ -3,17 +3,9 @@ package flags
 import "github.com/urfave/cli/v2"
 
 var (
-	/*
-		SeedFlag = &cli.Int64Flag{
-			Name:  "seed",
-			Usage: "Seed for the RNG, (Default = RandomSeed)",
-			Value: 0,
-		}
-	*/
-
 	SeedFlag = &cli.StringFlag{
 		Name:  "seed",
-		Usage: "Seed for dilithium account",
+		Usage: "Seed for ml-dsa-87 account",
 		Value: "0xcdfbe6f7602f67a97602e3e9fc24cde1cdffa88acd47745c0b84c5ff55891e1b",
 	}
 

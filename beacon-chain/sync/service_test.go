@@ -10,12 +10,12 @@ import (
 	mockChain "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"
 	dbTest "github.com/theQRL/qrysm/beacon-chain/db/testing"
-	"github.com/theQRL/qrysm/beacon-chain/operations/dilithiumtoexec"
+	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	p2ptest "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -71,7 +71,7 @@ func TestSyncHandlers_WaitToSync(t *testing.T) {
 	require.NoError(t, gs.SetClock(startup.NewClock(time.Now(), vr)))
 	b := []byte("sk")
 	b48 := bytesutil.ToBytes48(b)
-	sk, err := dilithium.SecretKeyFromSeed(b48[:])
+	sk, err := ml_dsa_87.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
 
 	msg := util.NewBeaconBlockCapella()
@@ -122,12 +122,12 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	r := Service{
 		ctx: ctx,
 		cfg: &config{
-			p2p:                 p2p,
-			beaconDB:            dbTest.SetupDB(t),
-			chain:               chainService,
-			blockNotifier:       chainService.BlockNotifier(),
-			initialSync:         &mockSync.Sync{IsSyncing: false},
-			dilithiumToExecPool: dilithiumtoexec.NewPool(),
+			p2p:               p2p,
+			beaconDB:          dbTest.SetupDB(t),
+			chain:             chainService,
+			blockNotifier:     chainService.BlockNotifier(),
+			initialSync:       &mockSync.Sync{IsSyncing: false},
+			mlDSA87ToExecPool: mldsa87toexec.NewPool(),
 		},
 		chainStarted:        abool.New(),
 		subHandler:          newSubTopicHandler(),
@@ -152,7 +152,7 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 
 	b := []byte("sk")
 	b48 := bytesutil.ToBytes48(b)
-	sk, err := dilithium.SecretKeyFromSeed(b48[:])
+	sk, err := ml_dsa_87.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
 	msg := util.NewBeaconBlockCapella()
 	msg.Block.ParentRoot = util.Random32Bytes(t)
@@ -189,10 +189,10 @@ func TestSyncService_StopCleanly(t *testing.T) {
 		ctx:    ctx,
 		cancel: cancel,
 		cfg: &config{
-			p2p:                 p2p,
-			chain:               chainService,
-			initialSync:         &mockSync.Sync{IsSyncing: false},
-			dilithiumToExecPool: dilithiumtoexec.NewPool(),
+			p2p:               p2p,
+			chain:             chainService,
+			initialSync:       &mockSync.Sync{IsSyncing: false},
+			mlDSA87ToExecPool: mldsa87toexec.NewPool(),
 		},
 		chainStarted:        abool.New(),
 		subHandler:          newSubTopicHandler(),

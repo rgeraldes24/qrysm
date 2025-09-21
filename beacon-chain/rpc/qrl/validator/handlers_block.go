@@ -50,7 +50,7 @@ func (s *Server) ProduceBlockV3(w http.ResponseWriter, r *http.Request) {
 		// TODO(now.youtrack.cloud/issue/TQ-10)
 		randaoReveal = primitives.PointAtInfinity
 	} else {
-		rr, err := shared.DecodeHexWithLength(rawRandaoReveal, field_params.DilithiumSignatureLength)
+		rr, err := shared.DecodeHexWithLength(rawRandaoReveal, field_params.MLDSA87SignatureLength)
 		if err != nil {
 			http2.HandleError(w, errors.Wrap(err, "unable to decode randao reveal").Error(), http.StatusBadRequest)
 			return

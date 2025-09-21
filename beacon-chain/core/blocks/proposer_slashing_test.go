@@ -13,7 +13,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -106,7 +106,7 @@ func TestProcessProposerSlashings_ValidatorNotSlashable(t *testing.T) {
 					Slot:          0,
 					BodyRoot:      []byte("foo"),
 				},
-				Signature: bytesutil.PadTo([]byte("A"), field_params.DilithiumSignatureLength),
+				Signature: bytesutil.PadTo([]byte("A"), field_params.MLDSA87SignatureLength),
 			},
 			Header_2: &qrysmpb.SignedBeaconBlockHeader{
 				Header: &qrysmpb.BeaconBlockHeader{
@@ -114,7 +114,7 @@ func TestProcessProposerSlashings_ValidatorNotSlashable(t *testing.T) {
 					Slot:          0,
 					BodyRoot:      []byte("bar"),
 				},
-				Signature: bytesutil.PadTo([]byte("B"), field_params.DilithiumSignatureLength),
+				Signature: bytesutil.PadTo([]byte("B"), field_params.MLDSA87SignatureLength),
 			},
 		},
 	}
@@ -195,11 +195,11 @@ func TestVerifyProposerSlashing(t *testing.T) {
 	beaconState, sks := util.DeterministicGenesisStateCapella(t, 2)
 	currentSlot := primitives.Slot(0)
 	require.NoError(t, beaconState.SetSlot(currentSlot))
-	rand1, err := dilithium.RandKey()
+	rand1, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig1 := rand1.Sign([]byte("foo")).Marshal()
 
-	rand2, err := dilithium.RandKey()
+	rand2, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig2 := rand2.Sign([]byte("bar")).Marshal()
 

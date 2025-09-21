@@ -380,12 +380,12 @@ func TestIsCurrentEpochSyncCommittee_SameBlockRoot(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().SyncCommitteeSize)
 	syncCommittee := &qrysmpb.SyncCommittee{}
 	for i := 0; i < len(validators); i++ {
-		k := make([]byte, field_params.DilithiumPubkeyLength)
+		k := make([]byte, field_params.MLDSA87PubkeyLength)
 		copy(k, strconv.Itoa(i))
 		validators[i] = &qrysmpb.Validator{
 			PublicKey: k,
 		}
-		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, field_params.DilithiumPubkeyLength))
+		syncCommittee.Pubkeys = append(syncCommittee.Pubkeys, bytesutil.PadTo(k, field_params.MLDSA87PubkeyLength))
 	}
 
 	blockRoots := make([][]byte, params.BeaconConfig().SlotsPerHistoricalRoot)

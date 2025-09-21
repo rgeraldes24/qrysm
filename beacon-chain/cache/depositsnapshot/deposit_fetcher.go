@@ -30,7 +30,7 @@ type Cache struct {
 	pendingDeposits   []*qrysmpb.DepositContainer
 	deposits          []*qrysmpb.DepositContainer
 	finalizedDeposits finalizedDepositsContainer
-	depositsByKey     map[[field_params.DilithiumPubkeyLength]byte][]*qrysmpb.DepositContainer
+	depositsByKey     map[[field_params.MLDSA87PubkeyLength]byte][]*qrysmpb.DepositContainer
 	depositsLock      sync.RWMutex
 }
 
@@ -50,7 +50,7 @@ func New() (*Cache, error) {
 	return &Cache{
 		pendingDeposits:   []*qrysmpb.DepositContainer{},
 		deposits:          []*qrysmpb.DepositContainer{},
-		depositsByKey:     map[[field_params.DilithiumPubkeyLength]byte][]*qrysmpb.DepositContainer{},
+		depositsByKey:     map[[field_params.MLDSA87PubkeyLength]byte][]*qrysmpb.DepositContainer{},
 		finalizedDeposits: toFinalizedDepositsContainer(finalizedDepositsTrie, -1),
 	}, nil
 }

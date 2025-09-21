@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/async"
 	"github.com/theQRL/qrysm/config/features"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/io/file"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
@@ -107,9 +107,9 @@ func (km *Keymanager) reloadAccountsFromKeystore(keystore *AccountsKeystoreRepre
 	if len(newAccountsStore.PublicKeys) != len(newAccountsStore.Seeds) {
 		return errors.New("number of public and private keys in keystore do not match")
 	}
-	pubKeys := make([][field_params.DilithiumPubkeyLength]byte, len(newAccountsStore.PublicKeys))
+	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(newAccountsStore.PublicKeys))
 	for i := 0; i < len(newAccountsStore.Seeds); i++ {
-		privKey, err := dilithium.SecretKeyFromSeed(newAccountsStore.Seeds[i])
+		privKey, err := ml_dsa_87.SecretKeyFromSeed(newAccountsStore.Seeds[i])
 		if err != nil {
 			return errors.Wrap(err, "could not initialize private key")
 		}

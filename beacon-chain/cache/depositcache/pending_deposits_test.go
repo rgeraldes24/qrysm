@@ -35,10 +35,10 @@ func TestRemovePendingDeposit_OK(t *testing.T) {
 	proof2 := makeDepositProof()
 	proof2[0] = bytesutil.PadTo([]byte{'A'}, 32)
 	data := &qrysmpb.Deposit_Data{
-		PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
+		PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 		WithdrawalCredentials: make([]byte, 32),
 		Amount:                0,
-		Signature:             make([]byte, field_params.DilithiumSignatureLength),
+		Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 	}
 	depToRemove := &qrysmpb.Deposit{Proof: proof1, Data: data}
 	otherDep := &qrysmpb.Deposit{Proof: proof2, Data: data}
@@ -65,10 +65,10 @@ func TestPendingDeposit_RoundTrip(t *testing.T) {
 	proof := makeDepositProof()
 	proof[0] = bytesutil.PadTo([]byte{'A'}, 32)
 	data := &qrysmpb.Deposit_Data{
-		PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
+		PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 		WithdrawalCredentials: make([]byte, 32),
 		Amount:                0,
-		Signature:             make([]byte, field_params.DilithiumSignatureLength),
+		Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 	}
 	dep := &qrysmpb.Deposit{Proof: proof, Data: data}
 	dc.InsertPendingDeposit(context.Background(), dep, 111, 100, [32]byte{})

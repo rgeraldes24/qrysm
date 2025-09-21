@@ -132,7 +132,7 @@ func (b *BeaconState) ValidatorAtIndexReadOnly(idx primitives.ValidatorIndex) (s
 }
 
 // ValidatorIndexByPubkey returns a given validator by its 2592-byte public key.
-func (b *BeaconState) ValidatorIndexByPubkey(key [field_params.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool) {
+func (b *BeaconState) ValidatorIndexByPubkey(key [field_params.MLDSA87PubkeyLength]byte) (primitives.ValidatorIndex, bool) {
 	if b == nil || b.valMapHandler == nil || b.valMapHandler.IsNil() {
 		return 0, false
 	}
@@ -155,7 +155,7 @@ func (b *BeaconState) ValidatorIndexByPubkey(key [field_params.DilithiumPubkeyLe
 
 // PubkeyAtIndex returns the pubkey at the given
 // validator index.
-func (b *BeaconState) PubkeyAtIndex(idx primitives.ValidatorIndex) [field_params.DilithiumPubkeyLength]byte {
+func (b *BeaconState) PubkeyAtIndex(idx primitives.ValidatorIndex) [field_params.MLDSA87PubkeyLength]byte {
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
@@ -164,17 +164,17 @@ func (b *BeaconState) PubkeyAtIndex(idx primitives.ValidatorIndex) [field_params
 		var err error
 		v, err = b.validatorsMultiValue.At(b, uint64(idx))
 		if err != nil {
-			return [field_params.DilithiumPubkeyLength]byte{}
+			return [field_params.MLDSA87PubkeyLength]byte{}
 		}
 	} else {
 		if uint64(idx) >= uint64(len(b.validators)) {
-			return [field_params.DilithiumPubkeyLength]byte{}
+			return [field_params.MLDSA87PubkeyLength]byte{}
 		}
 		v = b.validators[idx]
 	}
 
 	if v == nil {
-		return [field_params.DilithiumPubkeyLength]byte{}
+		return [field_params.MLDSA87PubkeyLength]byte{}
 	}
 	return bytesutil.ToBytes2592(v.PublicKey)
 }

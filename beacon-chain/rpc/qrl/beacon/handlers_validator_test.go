@@ -188,7 +188,7 @@ func TestGetValidators(t *testing.T) {
 		hexPubkey := hexutil.Encode(pubkey[:])
 		request := httptest.NewRequest(
 			http.MethodGet,
-			fmt.Sprintf("http://example.com/qrl/v1/beacon/states/{state_id}/validators?id=%s&id=%s", hexPubkey, hexutil.Encode([]byte(strings.Repeat("x", fieldparams.DilithiumPubkeyLength)))),
+			fmt.Sprintf("http://example.com/qrl/v1/beacon/states/{state_id}/validators?id=%s&id=%s", hexPubkey, hexutil.Encode([]byte(strings.Repeat("x", fieldparams.MLDSA87PubkeyLength)))),
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})
@@ -634,7 +634,7 @@ func TestGetValidator(t *testing.T) {
 		}
 
 		request := httptest.NewRequest(http.MethodGet, "http://example.com/qrl/v1/beacon/states/{state_id}/validators/{validator_id}", nil)
-		request = mux.SetURLVars(request, map[string]string{"state_id": "head", "validator_id": hexutil.Encode([]byte(strings.Repeat("x", fieldparams.DilithiumPubkeyLength)))})
+		request = mux.SetURLVars(request, map[string]string{"state_id": "head", "validator_id": hexutil.Encode([]byte(strings.Repeat("x", fieldparams.MLDSA87PubkeyLength)))})
 		writer := httptest.NewRecorder()
 		writer.Body = &bytes.Buffer{}
 
@@ -837,7 +837,7 @@ func TestGetValidatorBalances(t *testing.T) {
 		hexPubkey := hexutil.Encode(pubkey[:])
 		request := httptest.NewRequest(
 			http.MethodGet,
-			fmt.Sprintf("http://example.com/qrl/v1/beacon/states/{state_id}/validator_balances?id=%s&id=%s", hexPubkey, hexutil.Encode([]byte(strings.Repeat("x", fieldparams.DilithiumPubkeyLength)))),
+			fmt.Sprintf("http://example.com/qrl/v1/beacon/states/{state_id}/validator_balances?id=%s&id=%s", hexPubkey, hexutil.Encode([]byte(strings.Repeat("x", fieldparams.MLDSA87PubkeyLength)))),
 			nil,
 		)
 		request = mux.SetURLVars(request, map[string]string{"state_id": "head"})

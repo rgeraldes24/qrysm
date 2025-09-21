@@ -46,7 +46,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot1"), 32),
 			},
 		},
-		Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), field_params.DilithiumSignatureLength)},
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature1"), field_params.MLDSA87SignatureLength)},
 	}
 	att2 := &qrysmpb.Attestation{
 		AggregationBits: []byte{1, 10},
@@ -63,7 +63,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot2"), 32),
 			},
 		},
-		Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), field_params.DilithiumSignatureLength)},
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature2"), field_params.MLDSA87SignatureLength)},
 	}
 	att3 := &qrysmpb.Attestation{
 		AggregationBits: bitfield.NewBitlist(8),
@@ -80,7 +80,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot3"), 32),
 			},
 		},
-		Signatures: [][]byte{bytesutil.PadTo([]byte("signature3"), field_params.DilithiumSignatureLength)},
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature3"), field_params.MLDSA87SignatureLength)},
 	}
 	att4 := &qrysmpb.Attestation{
 		AggregationBits: bitfield.NewBitlist(8),
@@ -97,7 +97,7 @@ func TestListAttestations(t *testing.T) {
 				Root:  bytesutil.PadTo([]byte("targetroot4"), 32),
 			},
 		},
-		Signatures: [][]byte{bytesutil.PadTo([]byte("signature4"), field_params.DilithiumSignatureLength)},
+		Signatures: [][]byte{bytesutil.PadTo([]byte("signature4"), field_params.MLDSA87SignatureLength)},
 	}
 	s := &Server{
 		AttestationsPool: attestations.NewPool(),
@@ -307,14 +307,14 @@ func TestListVoluntaryExits(t *testing.T) {
 			Epoch:          1,
 			ValidatorIndex: 1,
 		},
-		Signature: bytesutil.PadTo([]byte("signature1"), field_params.DilithiumSignatureLength),
+		Signature: bytesutil.PadTo([]byte("signature1"), field_params.MLDSA87SignatureLength),
 	}
 	exit2 := &qrysmpb.SignedVoluntaryExit{
 		Exit: &qrysmpb.VoluntaryExit{
 			Epoch:          2,
 			ValidatorIndex: 2,
 		},
-		Signature: bytesutil.PadTo([]byte("signature2"), field_params.DilithiumSignatureLength),
+		Signature: bytesutil.PadTo([]byte("signature2"), field_params.MLDSA87SignatureLength),
 	}
 
 	s := &Server{

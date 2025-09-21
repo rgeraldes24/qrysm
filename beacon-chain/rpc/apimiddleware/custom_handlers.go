@@ -282,8 +282,8 @@ func receiveEvents(eventChan <-chan *sse.Event, w http.ResponseWriter, req *http
 				data = &EventChainReorgJson{}
 			case events.SyncCommitteeContributionTopic:
 				data = &SignedContributionAndProofJson{}
-			case events.DilithiumToExecutionChangeTopic:
-				data = &SignedDilithiumToExecutionChangeJson{}
+			case events.MLDSA87ToExecutionChangeTopic:
+				data = &SignedMLDSA87ToExecutionChangeJson{}
 			case events.PayloadAttributesTopic:
 				dataSubset := &dataSubset{}
 				if err := json.Unmarshal(msg.Data, dataSubset); err != nil {

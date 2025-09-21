@@ -31,7 +31,7 @@ go_test(
     srcs = ["generate_genesis_test.go"],
     embed = [":go_default_library"],
     deps = [
-        "//crypto/dilithium:go_default_library",
+        "//crypto/ml_dsa_87:go_default_library",
         "//runtime/interop:go_default_library",
         "//testing/assert:go_default_library",
         "//testing/require:go_default_library",

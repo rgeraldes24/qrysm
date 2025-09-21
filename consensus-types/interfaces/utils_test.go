@@ -27,7 +27,7 @@ func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("randao"), field_params.DilithiumSignatureLength),
+			RandaoReveal:      bytesutil.PadTo([]byte("randao"), field_params.MLDSA87SignatureLength),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*qrysmpb.ProposerSlashing{},
 			AttesterSlashings: []*qrysmpb.AttesterSlashing{},
@@ -51,7 +51,7 @@ func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 				Transactions:  make([][]byte, 0),
 				Withdrawals:   make([]*enginev1.Withdrawal, 0),
 			},
-			DilithiumToExecutionChanges: []*qrysmpb.SignedDilithiumToExecutionChange{},
+			Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{},
 		},
 	}
 	bodyRoot, err := blk.Body.HashTreeRoot()
@@ -82,7 +82,7 @@ func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("randao"), field_params.DilithiumSignatureLength),
+			RandaoReveal:      bytesutil.PadTo([]byte("randao"), field_params.MLDSA87SignatureLength),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*qrysmpb.ProposerSlashing{},
 			AttesterSlashings: []*qrysmpb.AttesterSlashing{},
@@ -106,7 +106,7 @@ func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				Transactions:  make([][]byte, 0),
 				Withdrawals:   make([]*enginev1.Withdrawal, 0),
 			},
-			DilithiumToExecutionChanges: []*qrysmpb.SignedDilithiumToExecutionChange{},
+			Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{},
 		},
 	}
 	bodyRoot, err := blk.Body.HashTreeRoot()
@@ -151,7 +151,7 @@ func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("randao"), field_params.DilithiumSignatureLength),
+			RandaoReveal:      bytesutil.PadTo([]byte("randao"), field_params.MLDSA87SignatureLength),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*qrysmpb.ProposerSlashing{},
 			AttesterSlashings: []*qrysmpb.AttesterSlashing{},
@@ -174,10 +174,10 @@ func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 				Transactions:  make([][]byte, 0),
 				Withdrawals:   make([]*enginev1.Withdrawal, 0),
 			},
-			DilithiumToExecutionChanges: []*qrysmpb.SignedDilithiumToExecutionChange{},
+			Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{},
 		},
 	},
-		Signature: bytesutil.PadTo([]byte("signature"), field_params.DilithiumSignatureLength),
+		Signature: bytesutil.PadTo([]byte("signature"), field_params.MLDSA87SignatureLength),
 	}
 	bodyRoot, err := blk.Block.Body.HashTreeRoot()
 	require.NoError(t, err)
@@ -209,7 +209,7 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				DepositRoot:  bytesutil.PadTo([]byte("deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("randao"), field_params.DilithiumSignatureLength),
+			RandaoReveal:      bytesutil.PadTo([]byte("randao"), field_params.MLDSA87SignatureLength),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*qrysmpb.ProposerSlashing{},
 			AttesterSlashings: []*qrysmpb.AttesterSlashing{},
@@ -233,10 +233,10 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				Transactions:  make([][]byte, 0),
 				Withdrawals:   make([]*enginev1.Withdrawal, 0),
 			},
-			DilithiumToExecutionChanges: []*qrysmpb.SignedDilithiumToExecutionChange{},
+			Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{},
 		},
 	},
-		Signature: bytesutil.PadTo([]byte("signature"), field_params.DilithiumSignatureLength),
+		Signature: bytesutil.PadTo([]byte("signature"), field_params.MLDSA87SignatureLength),
 	}
 	bodyRoot, err := blk.Block.Body.HashTreeRoot()
 	require.NoError(t, err)
@@ -264,7 +264,7 @@ func TestSignedBeaconBlockHeaderFromBlock_NilBlockBody(t *testing.T) {
 		ParentRoot:    bytesutil.PadTo([]byte("parent root"), hashLen),
 		StateRoot:     bytesutil.PadTo([]byte("state root"), hashLen),
 	},
-		Signature: bytesutil.PadTo([]byte("signature"), field_params.DilithiumSignatureLength),
+		Signature: bytesutil.PadTo([]byte("signature"), field_params.MLDSA87SignatureLength),
 	}
 	_, err := interfaces.SignedBeaconBlockHeaderFromBlock(blk)
 	require.ErrorContains(t, "nil block", err)

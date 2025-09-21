@@ -16,7 +16,7 @@ import (
 	blocktest "github.com/theQRL/qrysm/consensus-types/blocks/testing"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
@@ -31,42 +31,42 @@ import (
 type mocks struct {
 	validatorClient *validatormock.MockValidatorClient
 	nodeClient      *validatormock.MockNodeClient
-	signfunc        func(context.Context, *validatorpb.SignRequest) (dilithium.Signature, error)
+	signfunc        func(context.Context, *validatorpb.SignRequest) (ml_dsa_87.Signature, error)
 }
 
 type mockSignature struct{}
 
-func (mockSignature) Verify(dilithium.PublicKey, []byte) bool {
+func (mockSignature) Verify(ml_dsa_87.PublicKey, []byte) bool {
 	return true
 }
 func (mockSignature) Marshal() []byte {
 	return make([]byte, 32)
 }
-func (m mockSignature) Copy() dilithium.Signature {
+func (m mockSignature) Copy() ml_dsa_87.Signature {
 	return m
 }
 
 func testKeyFromBytes(t *testing.T, b []byte) keypair {
-	pri, err := dilithium.SecretKeyFromSeed(bytesutil.PadTo(b, field_params.DilithiumSeedLength))
+	pri, err := ml_dsa_87.SecretKeyFromSeed(bytesutil.PadTo(b, field_params.MLDSA87SeedLength))
 	require.NoError(t, err, "Failed to generate key from bytes")
 	return keypair{pub: bytesutil.ToBytes2592(pri.PublicKey().Marshal()), pri: pri}
 }
 
-func setup(t *testing.T) (*validator, *mocks, dilithium.DilithiumKey, func()) {
-	validatorKey, err := dilithium.RandKey()
+func setup(t *testing.T) (*validator, *mocks, ml_dsa_87.MLDSA87Key, func()) {
+	validatorKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	return setupWithKey(t, validatorKey)
 }
 
-func setupWithKey(t *testing.T, validatorKey dilithium.DilithiumKey) (*validator, *mocks, dilithium.DilithiumKey, func()) {
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+func setupWithKey(t *testing.T, validatorKey ml_dsa_87.MLDSA87Key) (*validator, *mocks, ml_dsa_87.MLDSA87Key, func()) {
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
-	valDB := testing2.SetupDB(t, [][field_params.DilithiumPubkeyLength]byte{pubKey})
+	valDB := testing2.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{pubKey})
 	ctrl := gomock.NewController(t)
 	m := &mocks{
 		validatorClient: validatormock.NewMockValidatorClient(ctrl),
 		nodeClient:      validatormock.NewMockNodeClient(ctrl),
-		signfunc: func(ctx context.Context, req *validatorpb.SignRequest) (dilithium.Signature, error) {
+		signfunc: func(ctx context.Context, req *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 			return mockSignature{}, nil
 		},
 	}
@@ -88,7 +88,7 @@ func TestProposeBlock_DoesNotProposeGenesisBlock(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, _, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.ProposeBlock(context.Background(), 0, pubKey)
 
@@ -99,7 +99,7 @@ func TestProposeBlock_DomainDataFailed(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 	m.validatorClient.EXPECT().DomainData(
@@ -115,7 +115,7 @@ func TestProposeBlock_DomainDataIsNil(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 	m.validatorClient.EXPECT().DomainData(
@@ -145,7 +145,7 @@ func TestProposeBlock_RequestBlockFailed(t *testing.T) {
 			hook := logTest.NewGlobal()
 			validator, m, validatorKey, finish := setup(t)
 			defer finish()
-			var pubKey [field_params.DilithiumPubkeyLength]byte
+			var pubKey [field_params.MLDSA87PubkeyLength]byte
 			copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 			m.validatorClient.EXPECT().DomainData(
@@ -184,7 +184,7 @@ func TestProposeBlock_ProposeBlockFailed(t *testing.T) {
 			hook := logTest.NewGlobal()
 			validator, m, validatorKey, finish := setup(t)
 			defer finish()
-			var pubKey [field_params.DilithiumPubkeyLength]byte
+			var pubKey [field_params.MLDSA87PubkeyLength]byte
 			copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 			m.validatorClient.EXPECT().DomainData(
@@ -246,7 +246,7 @@ func TestProposeBlock_BlocksDoubleProposal(t *testing.T) {
 			hook := logTest.NewGlobal()
 			validator, m, validatorKey, finish := setup(t)
 			defer finish()
-			var pubKey [field_params.DilithiumPubkeyLength]byte
+			var pubKey [field_params.MLDSA87PubkeyLength]byte
 			copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 			var dummyRoot [32]byte
@@ -292,7 +292,7 @@ func TestProposeBlock_BlocksDoubleProposal_After54KEpochs(t *testing.T) {
 	hook := logTest.NewGlobal()
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 	var dummyRoot [32]byte
@@ -368,7 +368,7 @@ func TestProposeBlock_AllowsPastProposals(t *testing.T) {
 			hook := logTest.NewGlobal()
 			validator, m, validatorKey, finish := setup(t)
 			defer finish()
-			var pubKey [field_params.DilithiumPubkeyLength]byte
+			var pubKey [field_params.MLDSA87PubkeyLength]byte
 			copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 			// Save a dummy proposal history at slot 0.
@@ -466,7 +466,7 @@ func testProposeBlock(t *testing.T, graffiti []byte) {
 			hook := logTest.NewGlobal()
 			validator, m, validatorKey, finish := setup(t)
 			defer finish()
-			var pubKey [field_params.DilithiumPubkeyLength]byte
+			var pubKey [field_params.MLDSA87PubkeyLength]byte
 			copy(pubKey[:], validatorKey.PublicKey().Marshal())
 
 			validator.graffiti = graffiti
@@ -669,7 +669,7 @@ func TestGetGraffiti_Ok(t *testing.T) {
 	m := &mocks{
 		validatorClient: validatormock.NewMockValidatorClient(ctrl),
 	}
-	pubKey := [field_params.DilithiumPubkeyLength]byte{'a'}
+	pubKey := [field_params.MLDSA87PubkeyLength]byte{'a'}
 	tests := []struct {
 		name string
 		v    *validator
@@ -746,8 +746,8 @@ func TestGetGraffiti_Ok(t *testing.T) {
 }
 
 func TestGetGraffitiOrdered_Ok(t *testing.T) {
-	pubKey := [field_params.DilithiumPubkeyLength]byte{'a'}
-	valDB := testing2.SetupDB(t, [][field_params.DilithiumPubkeyLength]byte{pubKey})
+	pubKey := [field_params.MLDSA87PubkeyLength]byte{'a'}
+	valDB := testing2.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{pubKey})
 	ctrl := gomock.NewController(t)
 	m := &mocks{
 		validatorClient: validatormock.NewMockValidatorClient(ctrl),

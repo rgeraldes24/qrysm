@@ -12,7 +12,7 @@ import (
 	slashingsmock "github.com/theQRL/qrysm/beacon-chain/operations/slashings/mock"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
@@ -27,7 +27,7 @@ func TestService_processAttesterSlashings(t *testing.T) {
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
-	privKey, err := dilithium.RandKey()
+	privKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	validators := make([]*qrysmpb.Validator, 1)
 	validators[0] = &qrysmpb.Validator{
@@ -73,7 +73,7 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		// Use valid signature for the first att, but bad one for the second.
 		signature := privKey.Sign(signingRoot[:])
 		firstAtt.Signatures = [][]byte{signature.Marshal()}
-		secondAtt.Signatures = [][]byte{make([]byte, 4595)}
+		secondAtt.Signatures = [][]byte{make([]byte, 4627)}
 
 		slashings := []*qrysmpb.AttesterSlashing{
 			{
@@ -91,7 +91,7 @@ func TestService_processAttesterSlashings(t *testing.T) {
 		hook := logTest.NewGlobal()
 		// Use invalid signature for the first att, but valid for the second.
 		signature := privKey.Sign(signingRoot[:])
-		firstAtt.Signatures = [][]byte{make([]byte, 4595)}
+		firstAtt.Signatures = [][]byte{make([]byte, 4627)}
 		secondAtt.Signatures = [][]byte{signature.Marshal()}
 
 		slashings := []*qrysmpb.AttesterSlashing{
@@ -134,7 +134,7 @@ func TestService_processProposerSlashings(t *testing.T) {
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
-	privKey, err := dilithium.RandKey()
+	privKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	validators := make([]*qrysmpb.Validator, 1)
 	validators[0] = &qrysmpb.Validator{

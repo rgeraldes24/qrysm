@@ -304,9 +304,9 @@ func TestCheckSaveHotStateDB_Overflow(t *testing.T) {
 	assert.LogsDoNotContain(t, hook, "Entering mode to save hot states in DB")
 }
 
-func TestHandleBlockDilithiumToExecutionChanges(t *testing.T) {
+func TestHandleBlockMLDSA87ToExecutionChanges(t *testing.T) {
 	service, tr := minimalTestService(t)
-	pool := tr.dilithiumPool
+	pool := tr.mlDSA87Pool
 
 	t.Run("Post Capella no changes", func(t *testing.T) {
 		body := &qrysmpb.BeaconBlockBodyCapella{}
@@ -315,19 +315,19 @@ func TestHandleBlockDilithiumToExecutionChanges(t *testing.T) {
 		}
 		blk, err := blocks.NewBeaconBlock(pbb)
 		require.NoError(t, err)
-		require.NoError(t, service.markIncludedBlockDilithiumToExecChanges(blk))
+		require.NoError(t, service.markIncludedBlockMLDSA87ToExecChanges(blk))
 	})
 
 	t.Run("Post Capella some changes", func(t *testing.T) {
 		idx := primitives.ValidatorIndex(123)
-		change := &qrysmpb.DilithiumToExecutionChange{
+		change := &qrysmpb.MLDSA87ToExecutionChange{
 			ValidatorIndex: idx,
 		}
-		signedChange := &qrysmpb.SignedDilithiumToExecutionChange{
+		signedChange := &qrysmpb.SignedMLDSA87ToExecutionChange{
 			Message: change,
 		}
 		body := &qrysmpb.BeaconBlockBodyCapella{
-			DilithiumToExecutionChanges: []*qrysmpb.SignedDilithiumToExecutionChange{signedChange},
+			Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{signedChange},
 		}
 		pbb := &qrysmpb.BeaconBlockCapella{
 			Body: body,
@@ -335,9 +335,9 @@ func TestHandleBlockDilithiumToExecutionChanges(t *testing.T) {
 		blk, err := blocks.NewBeaconBlock(pbb)
 		require.NoError(t, err)
 
-		pool.InsertDilithiumToExecChange(signedChange)
+		pool.InsertMLDSA87ToExecChange(signedChange)
 		require.Equal(t, true, pool.ValidatorExists(idx))
-		require.NoError(t, service.markIncludedBlockDilithiumToExecChanges(blk))
+		require.NoError(t, service.markIncludedBlockMLDSA87ToExecChanges(blk))
 		require.Equal(t, false, pool.ValidatorExists(idx))
 	})
 }

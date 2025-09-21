@@ -30,7 +30,7 @@ func FillRootsNaturalOptCapella(state *qrysmpb.BeaconStateCapella) error {
 func NewBeaconStateCapella(options ...func(state *qrysmpb.BeaconStateCapella) error) (state.BeaconState, error) {
 	pubkeys := make([][]byte, params.BeaconConfig().SyncCommitteeSize)
 	for i := range pubkeys {
-		pubkeys[i] = make([]byte, 2592)
+		pubkeys[i] = make([]byte, fieldparams.MLDSA87PubkeyLength)
 	}
 
 	seed := &qrysmpb.BeaconStateCapella{

@@ -12,7 +12,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -46,11 +46,11 @@ func setupCliContext(
 	return cli.NewContext(&app, set, nil)
 }
 
-func createRandomKeystore(t testing.TB, password string) (*keymanager.Keystore, dilithium.DilithiumKey) {
+func createRandomKeystore(t testing.TB, password string) (*keymanager.Keystore, ml_dsa_87.MLDSA87Key) {
 	encryptor := keystorev1.New()
 	id, err := uuid.NewRandom()
 	require.NoError(t, err)
-	validatingKey, err := dilithium.RandKey()
+	validatingKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	pubKey := validatingKey.PublicKey().Marshal()
 	cryptoFields, err := encryptor.Encrypt(validatingKey.Marshal(), password)
@@ -111,7 +111,7 @@ func TestDecrypt(t *testing.T) {
 func TestEncrypt(t *testing.T) {
 	keystoresDir := setupRandomDir(t)
 	keystoreFilePath := filepath.Join(keystoresDir, "keystore.json")
-	privKey, err := dilithium.RandKey()
+	privKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 
 	cliCtx := setupCliContext(t, &cliConfig{

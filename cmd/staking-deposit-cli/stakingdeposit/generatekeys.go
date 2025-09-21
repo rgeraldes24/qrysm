@@ -7,13 +7,13 @@ import (
 	"os"
 	"reflect"
 
-	goqrllib_misc "github.com/theQRL/go-qrllib/misc"
+	goqrllib_misc "github.com/theQRL/go-qrllib/wallet/misc"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
@@ -55,8 +55,13 @@ func GenerateKeys(validatorStartIndex, numValidators uint64,
 		panic("failed to verify the deposit data JSON files")
 	}
 
-	fmt.Println("Please note down your Dilithium seed: ", seed)
-	fmt.Println("Mnemonic: ", goqrllib_misc.SeedBinToMnemonic(misc.StrSeedToBinSeed(seed)))
+	fmt.Println("Please note down your ML-DSA-87 seed: ", seed)
+	binSeed := misc.StrSeedToBinSeed(seed)
+	mnemonic, err := goqrllib_misc.BinToMnemonic(binSeed[:])
+	if err != nil {
+		panic(fmt.Errorf("failed to convert seed %v to mnemonic | reason %v", seed, err))
+	}
+	fmt.Println("Mnemonic: ", mnemonic)
 }
 
 func VerifyDepositDataJSON(fileFolder string, credentials []*Credential) bool {
@@ -80,9 +85,9 @@ func VerifyDepositDataJSON(fileFolder string, credentials []*Credential) bool {
 
 func validateDeposit(depositData *DepositData, credential *Credential) bool {
 	signingSeed := misc.StrSeedToBinSeed(credential.signingSeed)
-	depositKey, err := dilithium.SecretKeyFromSeed(signingSeed[:])
+	depositKey, err := ml_dsa_87.SecretKeyFromSeed(signingSeed[:])
 	if err != nil {
-		panic(fmt.Errorf("failed to derive dilithium depositKey from signingSeed | reason %v", err))
+		panic(fmt.Errorf("failed to derive ML-DSA-87 depositKey from signingSeed | reason %v", err))
 	}
 	pubKey := misc.DecodeHex(depositData.PubKey)
 
@@ -90,7 +95,7 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 
 	signature := misc.DecodeHex(depositData.Signature)
 
-	if len(pubKey) != field_params.DilithiumPubkeyLength {
+	if len(pubKey) != field_params.MLDSA87PubkeyLength {
 		return false
 	}
 	if !reflect.DeepEqual(pubKey, depositKey.PublicKey().Marshal()) {
@@ -98,7 +103,7 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 	}
 
 	if len(withdrawalCredentials) != 32 {
-		panic(fmt.Errorf("failed to derive dilithium depositKey from signingSeed | reason %v", err))
+		panic(fmt.Errorf("failed to derive ML-DSA-87 depositKey from signingSeed | reason %v", err))
 	}
 
 	zeroBytes11 := make([]uint8, 11)
@@ -114,7 +119,7 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 			panic(fmt.Errorf("withdrawalCredentials[12:] %x mismatch with credential.QRLWithdrawalAddress %x",
 				withdrawalCredentials[12:], withdrawalAddr.Bytes()))
 		}
-	} else if reflect.DeepEqual(withdrawalCredentials[0], params.BeaconConfig().DilithiumWithdrawalPrefixByte) {
+	} else if reflect.DeepEqual(withdrawalCredentials[0], params.BeaconConfig().MLDSA87WithdrawalPrefixByte) {
 		hashWithdrawalPK := sha256.Sum256(credential.WithdrawalPK())
 		if !reflect.DeepEqual(withdrawalCredentials[1:], hashWithdrawalPK[1:]) {
 			panic(fmt.Errorf("withdrawalCredentials[1:] %x mismatch with hashWithdrawalPK[1:] %x",
@@ -124,7 +129,7 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 		panic(fmt.Errorf("invalid prefixbyte withdrawalCredentials[0] %x", withdrawalCredentials[0]))
 	}
 
-	if len(signature) != field_params.DilithiumSignatureLength {
+	if len(signature) != field_params.MLDSA87SignatureLength {
 		panic(fmt.Errorf("invalid dilitihium signature length %d", len(signature)))
 	}
 
@@ -157,11 +162,11 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 	if err != nil {
 		panic(fmt.Errorf("could not get signingData.HashTreeRoot() | reason %v", err))
 	}
-	sig, err := dilithium.SignatureFromBytes(signature)
+	sig, err := ml_dsa_87.SignatureFromBytes(signature)
 	if err != nil {
 		panic(fmt.Errorf("could not parse signature bytes | reason %v", err))
 	}
-	publicKey, err := dilithium.PublicKeyFromBytes(pubKey)
+	publicKey, err := ml_dsa_87.PublicKeyFromBytes(pubKey)
 	if err != nil {
 		panic(fmt.Errorf("could not parse public key bytes | reason %v", err))
 	}

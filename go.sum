@@ -189,6 +189,9 @@ github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46t
 github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
+github.com/cyyber/go-zond v0.0.0-20250909095041-1a8635db4b6f h1:fIGws3WPKgMJVhEHetj9uILaXkGJOOKSDwg8wgK5Ioc=
+github.com/cyyber/go-zond v0.0.0-20250909095041-1a8635db4b6f/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
+github.com/cyyber/go-zond v0.0.0-20250921095615-67792a8648de/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
 github.com/d4l3k/messagediff v1.2.1 h1:ZcAIMYsUg0EAp9X+tt8/enBE/Q8Yd5kzPynLyKptt9U=
 github.com/d4l3k/messagediff v1.2.1/go.mod h1:Oozbb1TVXFac9FtSIxHBMnBCq2qeH/2KkEQxENCrlLo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -1026,6 +1029,11 @@ github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63 h1:cU1QlEDDZ3zI
 github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63/go.mod h1:Xm3tb2axH6IT4miFd3hKIeD877Y6aA9Hxf2jOYtfTIk=
 github.com/theQRL/go-qrllib v0.0.0-20230406170304-b7eb19c367e1 h1:YvUxImh18qCxX1rjvYF9wqAAL236s2FqrjzTRqg5Alg=
 github.com/theQRL/go-qrllib v0.0.0-20230406170304-b7eb19c367e1/go.mod h1:IspDEOeIlmm6GujPeTNygL3T72MUluDDyUa20AisjaQ=
+github.com/theQRL/go-qrllib v0.0.0-20250909061333-45d1b89fb22e h1:p2f7jqjQimlq9CV1nG8xq1FRDLIqo4oBuVBAgoj7HFg=
+github.com/theQRL/go-qrllib v0.0.0-20250909061333-45d1b89fb22e/go.mod h1:K2QakL8Z3Nrm7fx+SeKYjVrInu0s9WitHHMyUihBkwQ=
+github.com/theQRL/go-qrllib v0.0.0-20250912073529-16a61002f3c5 h1:fifz6R3QXFyldQHsoSUdy1bPUAU7ckdtvq+9YJQ6qO0=
+github.com/theQRL/go-qrllib v0.0.0-20250912073529-16a61002f3c5/go.mod h1:K2QakL8Z3Nrm7fx+SeKYjVrInu0s9WitHHMyUihBkwQ=
+github.com/theQRL/go-zond v0.1.1/go.mod h1:5sKqD/AAXtpWCmmuisw5bDT5/j3sWG5Bxnh1TYe1BZU=
 github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f h1:hEgl/ykBvqXdxoQc3mFuh59ju8ylNMVwDyAaiRHdLBY=
 github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f/go.mod h1:IOyTYjcIO0rkmnGBfJTL0NJ11exy/Tc2QEuv7hCXp24=
 github.com/thomaso-mirodin/intmath v0.0.0-20160323211736-5dc6d854e46e h1:cR8/SYRgyQCt5cNCMniB/ZScMkhI9nk8U5C7SbISXjo=

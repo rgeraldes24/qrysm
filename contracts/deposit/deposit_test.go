@@ -8,7 +8,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/contracts/deposit"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -16,22 +16,22 @@ import (
 )
 
 func TestDepositInput_GeneratesPb(t *testing.T) {
-	var seed [field_params.DilithiumSeedLength]uint8
+	var seed [field_params.MLDSA87SeedLength]uint8
 	_, err := rand.Read(seed[:])
 	require.NoError(t, err)
-	k1, err := dilithium.SecretKeyFromSeed(seed[:])
+	k1, err := ml_dsa_87.SecretKeyFromSeed(seed[:])
 	require.NoError(t, err)
 
 	_, err = rand.Read(seed[:])
 	require.NoError(t, err)
-	k2, err := dilithium.SecretKeyFromSeed(seed[:])
+	k2, err := ml_dsa_87.SecretKeyFromSeed(seed[:])
 	require.NoError(t, err)
 
 	result, _, err := deposit.DepositInput(k1, k2, 0, nil)
 	require.NoError(t, err)
 	assert.DeepEqual(t, k1.PublicKey().Marshal(), result.PublicKey)
 
-	sig, err := dilithium.SignatureFromBytes(result.Signature)
+	sig, err := ml_dsa_87.SignatureFromBytes(result.Signature)
 	require.NoError(t, err)
 	testData := &qrysmpb.DepositMessage{
 		PublicKey:             result.PublicKey,

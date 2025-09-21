@@ -72,8 +72,8 @@ type HeadFetcher interface {
 	HeadValidatorsIndices(ctx context.Context, epoch primitives.Epoch) ([]primitives.ValidatorIndex, error)
 	HeadGenesisValidatorsRoot() [32]byte
 	HeadExecutionData() *qrysmpb.ExecutionData
-	HeadPublicKeyToValidatorIndex(pubKey [field_params.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool)
-	HeadValidatorIndexToPublicKey(ctx context.Context, index primitives.ValidatorIndex) ([field_params.DilithiumPubkeyLength]byte, error)
+	HeadPublicKeyToValidatorIndex(pubKey [field_params.MLDSA87PubkeyLength]byte) (primitives.ValidatorIndex, bool)
+	HeadValidatorIndexToPublicKey(ctx context.Context, index primitives.ValidatorIndex) ([field_params.MLDSA87PubkeyLength]byte, error)
 	ChainHeads() ([][32]byte, []primitives.Slot)
 	HeadSyncCommitteeFetcher
 	HeadDomainFetcher
@@ -310,7 +310,7 @@ func (s *Service) IsCanonical(ctx context.Context, blockRoot [32]byte) (bool, er
 }
 
 // HeadPublicKeyToValidatorIndex returns the validator index of the `pubkey` in current head state.
-func (s *Service) HeadPublicKeyToValidatorIndex(pubKey [field_params.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool) {
+func (s *Service) HeadPublicKeyToValidatorIndex(pubKey [field_params.MLDSA87PubkeyLength]byte) (primitives.ValidatorIndex, bool) {
 	s.headLock.RLock()
 	defer s.headLock.RUnlock()
 	if !s.hasHeadState() {
@@ -320,15 +320,15 @@ func (s *Service) HeadPublicKeyToValidatorIndex(pubKey [field_params.DilithiumPu
 }
 
 // HeadValidatorIndexToPublicKey returns the pubkey of the validator `index`  in current head state.
-func (s *Service) HeadValidatorIndexToPublicKey(_ context.Context, index primitives.ValidatorIndex) ([field_params.DilithiumPubkeyLength]byte, error) {
+func (s *Service) HeadValidatorIndexToPublicKey(_ context.Context, index primitives.ValidatorIndex) ([field_params.MLDSA87PubkeyLength]byte, error) {
 	s.headLock.RLock()
 	defer s.headLock.RUnlock()
 	if !s.hasHeadState() {
-		return [field_params.DilithiumPubkeyLength]byte{}, nil
+		return [field_params.MLDSA87PubkeyLength]byte{}, nil
 	}
 	v, err := s.headValidatorAtIndex(index)
 	if err != nil {
-		return [field_params.DilithiumPubkeyLength]byte{}, err
+		return [field_params.MLDSA87PubkeyLength]byte{}, err
 	}
 	return v.PublicKey(), nil
 }

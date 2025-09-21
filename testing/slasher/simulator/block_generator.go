@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -71,7 +71,7 @@ func (s *Simulator) generateBlockHeadersForSlot(
 func (s *Simulator) signBlockHeader(
 	beaconState state.BeaconState,
 	header *qrysmpb.SignedBeaconBlockHeader,
-) (dilithium.Signature, error) {
+) (ml_dsa_87.Signature, error) {
 	domain, err := signing.Domain(
 		beaconState.Fork(),
 		0,

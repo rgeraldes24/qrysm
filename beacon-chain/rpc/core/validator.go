@@ -224,7 +224,7 @@ func (s *Service) SubmitSignedAggregateSelectionProof(
 		req.SignedAggregateAndProof.Message.Aggregate == nil || req.SignedAggregateAndProof.Message.Aggregate.Data == nil {
 		return &RpcError{Err: errors.New("signed aggregate request can't be nil"), Reason: BadRequest}
 	}
-	emptySig := make([]byte, field_params.DilithiumSignatureLength)
+	emptySig := make([]byte, field_params.MLDSA87SignatureLength)
 	if bytes.Equal(req.SignedAggregateAndProof.Signature, emptySig) ||
 		bytes.Equal(req.SignedAggregateAndProof.Message.SelectionProof, emptySig) {
 		return &RpcError{Err: errors.New("signed signatures can't be zero hashes"), Reason: BadRequest}

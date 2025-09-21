@@ -12,7 +12,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -26,7 +26,7 @@ func TestSubmitAggregateAndProof_GetDutiesRequestFailure(t *testing.T) {
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{}}
 	defer finish()
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitAggregateAndProof(context.Background(), 0, pubKey)
 
@@ -36,7 +36,7 @@ func TestSubmitAggregateAndProof_GetDutiesRequestFailure(t *testing.T) {
 func TestSubmitAggregateAndProof_SignFails(t *testing.T) {
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.duties = &qrysmpb.DutiesResponse{
 		CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
@@ -60,7 +60,7 @@ func TestSubmitAggregateAndProof_SignFails(t *testing.T) {
 			Aggregate: util.HydrateAttestation(&qrysmpb.Attestation{
 				AggregationBits: make([]byte, 1),
 			}),
-			SelectionProof: make([]byte, 4595),
+			SelectionProof: make([]byte, 4627),
 		},
 	}, nil)
 
@@ -75,7 +75,7 @@ func TestSubmitAggregateAndProof_SignFails(t *testing.T) {
 func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.duties = &qrysmpb.DutiesResponse{
 		CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{
@@ -99,7 +99,7 @@ func TestSubmitAggregateAndProof_Ok(t *testing.T) {
 			Aggregate: util.HydrateAttestation(&qrysmpb.Attestation{
 				AggregationBits: make([]byte, 1),
 			}),
-			SelectionProof: make([]byte, 4595),
+			SelectionProof: make([]byte, 4627),
 		},
 	}, nil)
 
@@ -158,7 +158,7 @@ func TestAggregateAndProofSignature_CanSignValidSignature(t *testing.T) {
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().DomainData(
 		gomock.Any(), // ctx
@@ -170,10 +170,10 @@ func TestAggregateAndProofSignature_CanSignValidSignature(t *testing.T) {
 		Aggregate: util.HydrateAttestation(&qrysmpb.Attestation{
 			AggregationBits: bitfield.NewBitlist(1),
 		}),
-		SelectionProof: make([]byte, 4595),
+		SelectionProof: make([]byte, 4627),
 	}
 	sig, err := validator.aggregateAndProofSig(context.Background(), pubKey, agg, 0 /* slot */)
 	require.NoError(t, err)
-	_, err = dilithium.SignatureFromBytes(sig)
+	_, err = ml_dsa_87.SignatureFromBytes(sig)
 	require.NoError(t, err)
 }

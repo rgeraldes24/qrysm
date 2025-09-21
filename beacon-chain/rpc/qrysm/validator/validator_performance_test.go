@@ -43,7 +43,7 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 	})
 	t.Run("Indices", func(t *testing.T) {
 		ctx := context.Background()
-		publicKeys := [][field_params.DilithiumPubkeyLength]byte{
+		publicKeys := [][field_params.MLDSA87PubkeyLength]byte{
 			bytesutil.ToBytes2592([]byte{1}),
 			bytesutil.ToBytes2592([]byte{2}),
 			bytesutil.ToBytes2592([]byte{3}),
@@ -111,7 +111,7 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 	})
 	t.Run("Indices Pubkeys", func(t *testing.T) {
 		ctx := context.Background()
-		publicKeys := [][field_params.DilithiumPubkeyLength]byte{
+		publicKeys := [][field_params.MLDSA87PubkeyLength]byte{
 			bytesutil.ToBytes2592([]byte{1}),
 			bytesutil.ToBytes2592([]byte{2}),
 			bytesutil.ToBytes2592([]byte{3}),
@@ -182,7 +182,7 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 		params.SetupTestConfigCleanup(t)
 		params.OverrideBeaconConfig(params.MinimalSpecConfig())
 
-		publicKeys := [][field_params.DilithiumPubkeyLength]byte{
+		publicKeys := [][field_params.MLDSA87PubkeyLength]byte{
 			bytesutil.ToBytes2592([]byte{1}),
 			bytesutil.ToBytes2592([]byte{2}),
 			bytesutil.ToBytes2592([]byte{3}),
@@ -239,7 +239,7 @@ func TestServer_GetValidatorPerformance(t *testing.T) {
 	})
 }
 
-func setHeadState(t *testing.T, headState state.BeaconState, publicKeys [][field_params.DilithiumPubkeyLength]byte) state.BeaconState {
+func setHeadState(t *testing.T, headState state.BeaconState, publicKeys [][field_params.MLDSA87PubkeyLength]byte) state.BeaconState {
 	epoch := primitives.Epoch(1)
 	require.NoError(t, headState.SetSlot(params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epoch+1))))
 

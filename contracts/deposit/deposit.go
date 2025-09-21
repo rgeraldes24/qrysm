@@ -6,8 +6,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/hash"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
@@ -26,7 +26,7 @@ import (
 //	- Send a transaction on the QRL execution layer to DEPOSIT_CONTRACT_ADDRESS executing `deposit(pubkey: bytes[48], withdrawal_credentials: bytes[32], signature: bytes[96])` along with a deposit of amount Shor.
 //
 // See: https://github.com/ethereum/consensus-specs/blob/master/specs/validator/0_beacon-chain-validator.md#submit-deposit
-func DepositInput(depositKey, withdrawalKey dilithium.DilithiumKey, amountInShor uint64, forkVersion []byte) (*qrysmpb.Deposit_Data, [32]byte, error) {
+func DepositInput(depositKey, withdrawalKey ml_dsa_87.MLDSA87Key, amountInShor uint64, forkVersion []byte) (*qrysmpb.Deposit_Data, [32]byte, error) {
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             depositKey.PublicKey().Marshal(),
 		WithdrawalCredentials: WithdrawalCredentialsHash(withdrawalKey),
@@ -74,19 +74,19 @@ func DepositInput(depositKey, withdrawalKey dilithium.DilithiumKey, amountInShor
 //	withdrawal_credentials[1:] == hash(withdrawal_pubkey)[1:]
 //
 // where withdrawal_credentials is of type bytes32.
-func WithdrawalCredentialsHash(withdrawalKey dilithium.DilithiumKey) []byte {
+func WithdrawalCredentialsHash(withdrawalKey ml_dsa_87.MLDSA87Key) []byte {
 	h := hash.Hash(withdrawalKey.PublicKey().Marshal())
-	return append([]byte{params.BeaconConfig().DilithiumWithdrawalPrefixByte}, h[1:]...)[:32]
+	return append([]byte{params.BeaconConfig().MLDSA87WithdrawalPrefixByte}, h[1:]...)[:32]
 }
 
-// VerifyDepositSignature verifies the correctness of Execution deposit Dilithium signature
+// VerifyDepositSignature verifies the correctness of Execution deposit ML-DSA-87 signature
 func VerifyDepositSignature(dd *qrysmpb.Deposit_Data, domain []byte) error {
 	ddCopy := qrysmpb.CopyDepositData(dd)
-	publicKey, err := dilithium.PublicKeyFromBytes(ddCopy.PublicKey)
+	publicKey, err := ml_dsa_87.PublicKeyFromBytes(ddCopy.PublicKey)
 	if err != nil {
 		return errors.Wrap(err, "could not convert bytes to public key")
 	}
-	sig, err := dilithium.SignatureFromBytes(ddCopy.Signature)
+	sig, err := ml_dsa_87.SignatureFromBytes(ddCopy.Signature)
 	if err != nil {
 		return errors.Wrap(err, "could not convert bytes to signature")
 	}

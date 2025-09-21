@@ -60,7 +60,7 @@ func Test_BuilderMethodsWithouClient(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, false, s.Configured())
 
-	_, err = s.GetHeader(context.Background(), 0, [32]byte{}, [field_params.DilithiumPubkeyLength]byte{})
+	_, err = s.GetHeader(context.Background(), 0, [32]byte{}, [field_params.MLDSA87PubkeyLength]byte{})
 	assert.ErrorContains(t, ErrNoBuilder.Error(), err)
 
 	_, err = s.SubmitBlindedBlock(context.Background(), nil)

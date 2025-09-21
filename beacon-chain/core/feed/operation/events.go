@@ -20,8 +20,8 @@ const (
 	// SyncCommitteeContributionReceived is sent after a sync committee contribution object has been received.
 	SyncCommitteeContributionReceived
 
-	// DilithiumToExecutionChangeReceived is sent after a Dilithium to execution change object has been received from gossip or rpc.
-	DilithiumToExecutionChangeReceived
+	// MLDSA87ToExecutionChangeReceived is sent after a ML-DSA-87 to execution change object has been received from gossip or rpc.
+	MLDSA87ToExecutionChangeReceived
 )
 
 // UnAggregatedAttReceivedData is the data sent with UnaggregatedAttReceived events.
@@ -48,7 +48,7 @@ type SyncCommitteeContributionReceivedData struct {
 	Contribution *qrysmpb.SignedContributionAndProof
 }
 
-// DilithiumToExecutionChangeReceivedData is the data sent with DilithiumToExecutionChangeReceived events.
-type DilithiumToExecutionChangeReceivedData struct {
-	Change *qrysmpb.SignedDilithiumToExecutionChange
+// MLDSA87ToExecutionChangeReceivedData is the data sent with MLDSA87ToExecutionChangeReceived events.
+type MLDSA87ToExecutionChangeReceivedData struct {
+	Change *qrysmpb.SignedMLDSA87ToExecutionChange
 }

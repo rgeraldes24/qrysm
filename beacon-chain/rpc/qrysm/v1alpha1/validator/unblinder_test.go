@@ -137,20 +137,20 @@ func Test_unblindBuilderBlock(t *testing.T) {
 				b := util.NewBlindedBeaconBlockCapella()
 				b.Block.Slot = 1
 				b.Block.ProposerIndex = 2
-				b.Block.Body.DilithiumToExecutionChanges = []*qrysmpb.SignedDilithiumToExecutionChange{
+				b.Block.Body.Mldsa87ToExecutionChanges = []*qrysmpb.SignedMLDSA87ToExecutionChange{
 					{
-						Message: &qrysmpb.DilithiumToExecutionChange{
-							ValidatorIndex:      123,
-							FromDilithiumPubkey: []byte{'a'},
-							ToExecutionAddress:  []byte{'a'},
+						Message: &qrysmpb.MLDSA87ToExecutionChange{
+							ValidatorIndex:     123,
+							FromMldsa87Pubkey:  []byte{'a'},
+							ToExecutionAddress: []byte{'a'},
 						},
 						Signature: []byte("sig123"),
 					},
 					{
-						Message: &qrysmpb.DilithiumToExecutionChange{
-							ValidatorIndex:      456,
-							FromDilithiumPubkey: []byte{'b'},
-							ToExecutionAddress:  []byte{'b'},
+						Message: &qrysmpb.MLDSA87ToExecutionChange{
+							ValidatorIndex:     456,
+							FromMldsa87Pubkey:  []byte{'b'},
+							ToExecutionAddress: []byte{'b'},
 						},
 						Signature: []byte("sig456"),
 					},
@@ -184,20 +184,20 @@ func Test_unblindBuilderBlock(t *testing.T) {
 				b := util.NewBeaconBlockCapella()
 				b.Block.Slot = 1
 				b.Block.ProposerIndex = 2
-				b.Block.Body.DilithiumToExecutionChanges = []*qrysmpb.SignedDilithiumToExecutionChange{
+				b.Block.Body.Mldsa87ToExecutionChanges = []*qrysmpb.SignedMLDSA87ToExecutionChange{
 					{
-						Message: &qrysmpb.DilithiumToExecutionChange{
-							ValidatorIndex:      123,
-							FromDilithiumPubkey: []byte{'a'},
-							ToExecutionAddress:  []byte{'a'},
+						Message: &qrysmpb.MLDSA87ToExecutionChange{
+							ValidatorIndex:     123,
+							FromMldsa87Pubkey:  []byte{'a'},
+							ToExecutionAddress: []byte{'a'},
 						},
 						Signature: []byte("sig123"),
 					},
 					{
-						Message: &qrysmpb.DilithiumToExecutionChange{
-							ValidatorIndex:      456,
-							FromDilithiumPubkey: []byte{'b'},
-							ToExecutionAddress:  []byte{'b'},
+						Message: &qrysmpb.MLDSA87ToExecutionChange{
+							ValidatorIndex:     456,
+							FromMldsa87Pubkey:  []byte{'b'},
+							ToExecutionAddress: []byte{'b'},
 						},
 						Signature: []byte("sig456"),
 					},

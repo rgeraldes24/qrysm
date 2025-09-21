@@ -8,7 +8,7 @@ import (
 
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/config/features"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	attaggregation "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation/aggregation/attestations"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -26,7 +26,7 @@ func TestBatchAttestations_Multiple(t *testing.T) {
 	s, err := NewService(context.Background(), &Config{Pool: NewPool()})
 	require.NoError(t, err)
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte("dummy_test_data"))
 	var mockRoot [32]byte
@@ -125,7 +125,7 @@ func TestBatchAttestations_Single(t *testing.T) {
 	s, err := NewService(context.Background(), &Config{Pool: NewPool()})
 	require.NoError(t, err)
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte("dummy_test_data"))
 	var mockRoot [32]byte
@@ -170,7 +170,7 @@ func TestAggregateAndSaveForkChoiceAtts_Single(t *testing.T) {
 	s, err := NewService(context.Background(), &Config{Pool: NewPool()})
 	require.NoError(t, err)
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte("dummy_test_data"))
 	var mockRoot [32]byte
@@ -194,7 +194,7 @@ func TestAggregateAndSaveForkChoiceAtts_Multiple(t *testing.T) {
 	s, err := NewService(context.Background(), &Config{Pool: NewPool()})
 	require.NoError(t, err)
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte("dummy_test_data")).Marshal()
 	var mockRoot [32]byte

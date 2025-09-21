@@ -47,7 +47,7 @@ func run(ctx context.Context, v iface.Validator) {
 		handleAssignmentError(err, headSlot)
 	}
 
-	accountsChangedChan := make(chan [][field_params.DilithiumPubkeyLength]byte, 1)
+	accountsChangedChan := make(chan [][field_params.MLDSA87PubkeyLength]byte, 1)
 	km, err := v.Keymanager()
 	if err != nil {
 		log.WithError(err).Fatal("Could not get keymanager")
@@ -139,7 +139,7 @@ func run(ctx context.Context, v iface.Validator) {
 	}
 }
 
-func onAccountsChanged(ctx context.Context, v iface.Validator, current [][field_params.DilithiumPubkeyLength]byte, ac chan [][field_params.DilithiumPubkeyLength]byte) {
+func onAccountsChanged(ctx context.Context, v iface.Validator, current [][field_params.MLDSA87PubkeyLength]byte, ac chan [][field_params.MLDSA87PubkeyLength]byte) {
 	anyActive, err := v.HandleKeyReload(ctx, current)
 	if err != nil {
 		log.WithError(err).Error("Could not properly handle reloaded keys")
@@ -219,11 +219,11 @@ func initializeValidatorAndGetHeadSlot(ctx context.Context, v iface.Validator) (
 	return headSlot, nil
 }
 
-func performRoles(slotCtx context.Context, allRoles map[[field_params.DilithiumPubkeyLength]byte][]iface.ValidatorRole, v iface.Validator, slot primitives.Slot, wg *sync.WaitGroup, span *trace.Span) {
+func performRoles(slotCtx context.Context, allRoles map[[field_params.MLDSA87PubkeyLength]byte][]iface.ValidatorRole, v iface.Validator, slot primitives.Slot, wg *sync.WaitGroup, span *trace.Span) {
 	for pubKey, roles := range allRoles {
 		wg.Add(len(roles))
 		for _, role := range roles {
-			go func(role iface.ValidatorRole, pubKey [field_params.DilithiumPubkeyLength]byte) {
+			go func(role iface.ValidatorRole, pubKey [field_params.MLDSA87PubkeyLength]byte) {
 				defer wg.Done()
 				switch role {
 				case iface.RoleAttester:

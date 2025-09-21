@@ -286,8 +286,8 @@ func decodeIds(w http.ResponseWriter, st state.BeaconState, rawIds []string, ign
 	for _, rawId := range rawIds {
 		pubkey, err := hexutil.Decode(rawId)
 		if err == nil {
-			if len(pubkey) != field_params.DilithiumPubkeyLength {
-				http2.HandleError(w, fmt.Sprintf("Pubkey length is %d instead of %d", len(pubkey), field_params.DilithiumPubkeyLength), http.StatusBadRequest)
+			if len(pubkey) != field_params.MLDSA87PubkeyLength {
+				http2.HandleError(w, fmt.Sprintf("Pubkey length is %d instead of %d", len(pubkey), field_params.MLDSA87PubkeyLength), http.StatusBadRequest)
 				return nil, false
 			}
 			valIndex, ok := st.ValidatorIndexByPubkey(bytesutil.ToBytes2592(pubkey))

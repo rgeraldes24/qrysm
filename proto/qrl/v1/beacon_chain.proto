@@ -172,6 +172,6 @@ enum ForkChoiceNodeValidity {
     OPTIMISTIC = 2;
 }
 
-message DilithiumToExecutionChangesPoolResponse {
-  repeated SignedDilithiumToExecutionChange data = 1;
+message MLDSA87ToExecutionChangesPoolResponse {
+  repeated SignedMLDSA87ToExecutionChange data = 1;
 }

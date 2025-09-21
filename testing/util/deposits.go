@@ -7,8 +7,8 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
-	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/hash"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/interop"
@@ -18,7 +18,7 @@ var lock sync.Mutex
 
 // Caches
 var cachedDeposits []*qrysmpb.Deposit
-var privKeys []dilithium.DilithiumKey
+var privKeys []ml_dsa_87.MLDSA87Key
 var t *trie.SparseMerkleTrie
 
 // DeterministicDepositsAndKeys returns the entered amount of deposits and secret keys.
@@ -26,7 +26,7 @@ var t *trie.SparseMerkleTrie
 // account is key n and the withdrawal account is key n+1.  As such,
 // if all secret keys for n validators are required then numDeposits
 // should be n+1.
-func DeterministicDepositsAndKeys(numDeposits uint64) ([]*qrysmpb.Deposit, []dilithium.DilithiumKey, error) {
+func DeterministicDepositsAndKeys(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_dsa_87.MLDSA87Key, error) {
 	resetCache()
 	lock.Lock()
 	defer lock.Unlock()
@@ -101,8 +101,8 @@ func DepositsWithBalance(balances []uint64) ([]*qrysmpb.Deposit, *trie.SparseMer
 	numExisting := uint64(len(cachedDeposits))
 	numRequired := numDeposits - uint64(len(cachedDeposits))
 
-	var secretKeys []dilithium.DilithiumKey
-	var publicKeys []dilithium.PublicKey
+	var secretKeys []ml_dsa_87.MLDSA87Key
+	var publicKeys []ml_dsa_87.PublicKey
 	if numExisting >= numDeposits+1 {
 		secretKeys = append(secretKeys, privKeys[:numDeposits+1]...)
 		publicKeys = publicKeysFromSecrets(secretKeys)
@@ -159,13 +159,13 @@ func DepositsWithBalance(balances []uint64) ([]*qrysmpb.Deposit, *trie.SparseMer
 }
 
 func signedDeposit(
-	secretKey dilithium.DilithiumKey,
+	secretKey ml_dsa_87.MLDSA87Key,
 	publicKey,
 	withdrawalKey []byte,
 	balance uint64,
 ) (*qrysmpb.Deposit, error) {
 	withdrawalCreds := hash.Hash(withdrawalKey)
-	withdrawalCreds[0] = params.BeaconConfig().DilithiumWithdrawalPrefixByte
+	withdrawalCreds[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             publicKey,
 		Amount:                balance,
@@ -276,14 +276,14 @@ func resetCache() {
 	lock.Lock()
 	defer lock.Unlock()
 	t = nil
-	privKeys = []dilithium.DilithiumKey{}
+	privKeys = []ml_dsa_87.MLDSA87Key{}
 	cachedDeposits = []*qrysmpb.Deposit{}
 }
 
 // DeterministicDepositsAndKeysSameValidator returns the entered amount of deposits and secret keys
 // of the same validator. This is for negative test cases such as same deposits from same validators in a block don't
 // result in duplicated validator indices.
-func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*qrysmpb.Deposit, []dilithium.DilithiumKey, error) {
+func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_dsa_87.MLDSA87Key, error) {
 	resetCache()
 	lock.Lock()
 	defer lock.Unlock()
@@ -311,7 +311,7 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*qrysmpb.D
 		// Create the new deposits and add them to the trie. Always use the first validator to create deposit
 		for i := uint64(0); i < numRequired; i++ {
 			withdrawalCreds := hash.Hash(publicKeys[1].Marshal())
-			withdrawalCreds[0] = params.BeaconConfig().DilithiumWithdrawalPrefixByte
+			withdrawalCreds[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
 
 			depositMessage := &qrysmpb.DepositMessage{
 				PublicKey:             publicKeys[1].Marshal(),
@@ -371,8 +371,8 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*qrysmpb.D
 	return requestedDeposits, privKeys[0:numDeposits], nil
 }
 
-func publicKeysFromSecrets(secretKeys []dilithium.DilithiumKey) []dilithium.PublicKey {
-	publicKeys := make([]dilithium.PublicKey, len(secretKeys))
+func publicKeysFromSecrets(secretKeys []ml_dsa_87.MLDSA87Key) []ml_dsa_87.PublicKey {
+	publicKeys := make([]ml_dsa_87.PublicKey, len(secretKeys))
 	for i, secretKey := range secretKeys {
 		publicKeys[i] = secretKey.PublicKey()
 	}

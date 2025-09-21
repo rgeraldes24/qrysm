@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/validator/keymanager"
@@ -16,7 +16,7 @@ import (
 // in the function input, encrypts them using the specified password,
 // and returns their respective EIP-2335 keystores.
 func (*Keymanager) ExtractKeystores(
-	_ context.Context, publicKeys []dilithium.PublicKey, password string,
+	_ context.Context, publicKeys []ml_dsa_87.PublicKey, password string,
 ) ([]*keymanager.Keystore, error) {
 	lock.Lock()
 	defer lock.Unlock()
@@ -24,7 +24,7 @@ func (*Keymanager) ExtractKeystores(
 	keystores := make([]*keymanager.Keystore, len(publicKeys))
 	for i, pk := range publicKeys {
 		pubKeyBytes := pk.Marshal()
-		secretKey, ok := dilithiumKeysCache[bytesutil.ToBytes2592(pubKeyBytes)]
+		secretKey, ok := mlDSA87KeysCache[bytesutil.ToBytes2592(pubKeyBytes)]
 		if !ok {
 			return nil, fmt.Errorf(
 				"secret key for public key %#x not found in cache",

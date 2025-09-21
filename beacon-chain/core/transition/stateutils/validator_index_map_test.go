@@ -28,7 +28,7 @@ func TestValidatorIndexMap_OK(t *testing.T) {
 	require.NoError(t, err)
 
 	tests := []struct {
-		key [field_params.DilithiumPubkeyLength]byte
+		key [field_params.MLDSA87PubkeyLength]byte
 		val primitives.ValidatorIndex
 		ok  bool
 	}{

@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/core/types"
 	"github.com/theQRL/go-zond/log"
@@ -17,9 +17,9 @@ import (
 
 const TX_TIMEOUT = 5 * time.Minute
 
-func SendBasicTransactions(config *Config, d *dilithium.Dilithium, f *filler.Filler) error {
+func SendBasicTransactions(config *Config, w *ml_dsa_87.Wallet, f *filler.Filler) error {
 	backend := qrlclient.NewClient(config.backend)
-	sender := d.GetAddress()
+	sender := w.GetAddress()
 	chainID, err := backend.ChainID(context.Background())
 	if err != nil {
 		log.Warn("Could not get chainID, using default")

@@ -52,7 +52,7 @@ func (s *MockBuilderService) SubmitBlindedBlock(_ context.Context, b interfaces.
 }
 
 // GetHeader for mocking.
-func (s *MockBuilderService) GetHeader(_ context.Context, slot primitives.Slot, _ [32]byte, _ [field_params.DilithiumPubkeyLength]byte) (builder.SignedBid, error) {
+func (s *MockBuilderService) GetHeader(_ context.Context, slot primitives.Slot, _ [32]byte, _ [field_params.MLDSA87PubkeyLength]byte) (builder.SignedBid, error) {
 	return builder.WrappedSignedBuilderBidCapella(s.BidCapella)
 }
 

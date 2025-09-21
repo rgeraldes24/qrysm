@@ -30,7 +30,7 @@ func TestCorrect_ActiveValidatorsCount(t *testing.T) {
 		validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 		for i := 0; i < len(validators); i++ {
 			validators[i] = &qrysmpb.Validator{
-				PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
+				PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 				WithdrawalCredentials: make([]byte, 32),
 				ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 				Slashed:               false,
@@ -47,7 +47,7 @@ func TestCorrect_ActiveValidatorsCount(t *testing.T) {
 	assert.Equal(t, int(params.BeaconConfig().MinGenesisActiveValidatorCount), int(vals), "mainnet genesis active count isn't accurate")
 	for i := 0; i < 100; i++ {
 		require.NoError(t, bState.AppendValidator(&qrysmpb.Validator{
-			PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
+			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               false,

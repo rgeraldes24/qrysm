@@ -178,7 +178,7 @@ func SyncSubCommitteePubkeys(syncCommittee *qrysmpb.SyncCommittee, subComIdx pri
 //	modulo = max(1, SYNC_COMMITTEE_SIZE // SYNC_COMMITTEE_SUBNET_COUNT // TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE)
 //	return bytes_to_uint64(hash(signature)[0:8]) % modulo == 0
 func IsSyncCommitteeAggregator(sig []byte) (bool, error) {
-	if len(sig) != field_params.DilithiumSignatureLength {
+	if len(sig) != field_params.MLDSA87SignatureLength {
 		return false, errors.New("incorrect sig length")
 	}
 

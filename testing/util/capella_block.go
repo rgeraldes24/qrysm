@@ -15,8 +15,8 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/hash"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -28,7 +28,7 @@ import (
 // This function modifies the passed state as follows:
 func GenerateFullBlockCapella(
 	bState state.BeaconState,
-	privs []dilithium.DilithiumKey,
+	privs []ml_dsa_87.MLDSA87Key,
 	conf *BlockGenConfig,
 	slot primitives.Slot,
 ) (*qrysmpb.SignedBeaconBlockCapella, error) {
@@ -184,9 +184,9 @@ func GenerateFullBlockCapella(
 		return nil, errors.Wrap(err, "could not compute beacon proposer index")
 	}
 
-	changes := make([]*qrysmpb.SignedDilithiumToExecutionChange, conf.NumDilithiumChanges)
-	for i := uint64(0); i < conf.NumDilithiumChanges; i++ {
-		changes[i], err = GenerateDilithiumToExecutionChange(bState, privs[i+1], primitives.ValidatorIndex(i))
+	changes := make([]*qrysmpb.SignedMLDSA87ToExecutionChange, conf.NumMLDSA87Changes)
+	for i := uint64(0); i < conf.NumMLDSA87Changes; i++ {
+		changes[i], err = GenerateMLDSA87ToExecutionChange(bState, privs[i+1], primitives.ValidatorIndex(i))
 		if err != nil {
 			return nil, err
 		}
@@ -197,17 +197,17 @@ func GenerateFullBlockCapella(
 		ParentRoot:    parentRoot[:],
 		ProposerIndex: idx,
 		Body: &qrysmpb.BeaconBlockBodyCapella{
-			ExecutionData:               executionData,
-			RandaoReveal:                reveal,
-			ProposerSlashings:           pSlashings,
-			AttesterSlashings:           aSlashings,
-			Attestations:                atts,
-			VoluntaryExits:              exits,
-			Deposits:                    newDeposits,
-			Graffiti:                    make([]byte, fieldparams.RootLength),
-			SyncAggregate:               newSyncAggregate,
-			ExecutionPayload:            newExecutionPayloadCapella,
-			DilithiumToExecutionChanges: changes,
+			ExecutionData:             executionData,
+			RandaoReveal:              reveal,
+			ProposerSlashings:         pSlashings,
+			AttesterSlashings:         aSlashings,
+			Attestations:              atts,
+			VoluntaryExits:            exits,
+			Deposits:                  newDeposits,
+			Graffiti:                  make([]byte, fieldparams.RootLength),
+			SyncAggregate:             newSyncAggregate,
+			ExecutionPayload:          newExecutionPayloadCapella,
+			Mldsa87ToExecutionChanges: changes,
 		},
 	}
 
@@ -220,17 +220,17 @@ func GenerateFullBlockCapella(
 	return &qrysmpb.SignedBeaconBlockCapella{Block: block, Signature: signature.Marshal()}, nil
 }
 
-// GenerateDilithiumToExecutionChange generates a valid dilithium to exec changes for validator `val` and its private key `priv` with the given beacon state `st`.
-func GenerateDilithiumToExecutionChange(st state.BeaconState, priv dilithium.DilithiumKey, val primitives.ValidatorIndex) (*qrysmpb.SignedDilithiumToExecutionChange, error) {
+// GenerateMLDSA87ToExecutionChange generates a valid ML-DSA-87 to exec changes for validator `val` and its private key `priv` with the given beacon state `st`.
+func GenerateMLDSA87ToExecutionChange(st state.BeaconState, priv ml_dsa_87.MLDSA87Key, val primitives.ValidatorIndex) (*qrysmpb.SignedMLDSA87ToExecutionChange, error) {
 	cred := indexToHash(uint64(val))
 	pubkey := priv.PublicKey().Marshal()
-	message := &qrysmpb.DilithiumToExecutionChange{
-		ToExecutionAddress:  cred[12:],
-		ValidatorIndex:      val,
-		FromDilithiumPubkey: pubkey,
+	message := &qrysmpb.MLDSA87ToExecutionChange{
+		ToExecutionAddress: cred[12:],
+		ValidatorIndex:     val,
+		FromMldsa87Pubkey:  pubkey,
 	}
 	c := params.BeaconConfig()
-	domain, err := signing.ComputeDomain(c.DomainDilithiumToExecutionChange, c.GenesisForkVersion, st.GenesisValidatorsRoot())
+	domain, err := signing.ComputeDomain(c.DomainMLDSA87ToExecutionChange, c.GenesisForkVersion, st.GenesisValidatorsRoot())
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func GenerateDilithiumToExecutionChange(st state.BeaconState, priv dilithium.Dil
 		return nil, err
 	}
 	signature := priv.Sign(sr[:]).Marshal()
-	return &qrysmpb.SignedDilithiumToExecutionChange{
+	return &qrysmpb.SignedMLDSA87ToExecutionChange{
 		Message:   message,
 		Signature: signature,
 	}, nil

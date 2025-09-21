@@ -91,7 +91,7 @@ func TestServer_ListAssignments_Pagination_InputOutOfRange(t *testing.T) {
 	count := 100
 	validators := make([]*qrysmpb.Validator, 0, count)
 	for i := 0; i < count; i++ {
-		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
+		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 		withdrawalCred := make([]byte, 32)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		validators = append(validators, &qrysmpb.Validator{
@@ -156,7 +156,7 @@ func TestServer_ListAssignments_Pagination_DefaultPageSize_NoArchive(t *testing.
 	count := 500
 	validators := make([]*qrysmpb.Validator, 0, count)
 	for i := 0; i < count; i++ {
-		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
+		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 		withdrawalCred := make([]byte, 32)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		// Mark the validators with index divisible by 3 inactive.
@@ -238,7 +238,7 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 	validators := make([]*qrysmpb.Validator, 0, count)
 	withdrawCreds := make([]byte, 32)
 	for i := 0; i < count; i++ {
-		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
+		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		val := &qrysmpb.Validator{
 			PublicKey:             pubKey,
@@ -269,9 +269,9 @@ func TestServer_ListAssignments_FilterPubkeysIndices_NoPagination(t *testing.T) 
 		ReplayerBuilder:    mockstategen.NewMockReplayerBuilder(mockstategen.WithMockState(s)),
 	}
 
-	pubKey1 := make([]byte, field_params.DilithiumPubkeyLength)
+	pubKey1 := make([]byte, field_params.MLDSA87PubkeyLength)
 	binary.LittleEndian.PutUint64(pubKey1, 1)
-	pubKey2 := make([]byte, field_params.DilithiumPubkeyLength)
+	pubKey2 := make([]byte, field_params.MLDSA87PubkeyLength)
 	binary.LittleEndian.PutUint64(pubKey2, 2)
 	req := &qrysmpb.ListValidatorAssignmentsRequest{PublicKeys: [][]byte{pubKey1, pubKey2}, Indices: []primitives.ValidatorIndex{2, 3}}
 	res, err := bs.ListValidatorAssignments(context.Background(), req)
@@ -306,7 +306,7 @@ func TestServer_ListAssignments_CanFilterPubkeysIndices_WithPagination(t *testin
 	validators := make([]*qrysmpb.Validator, 0, count)
 	withdrawCred := make([]byte, 32)
 	for i := 0; i < count; i++ {
-		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
+		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		val := &qrysmpb.Validator{
 			PublicKey:             pubKey,

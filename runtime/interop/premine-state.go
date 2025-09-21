@@ -11,13 +11,12 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/beacon-chain/state/stateutil"
-	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/container/trie"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -192,7 +191,7 @@ func (s *PremineGenesisConfig) deposits() ([]*qrysmpb.Deposit, error) {
 	return deposits, nil
 }
 
-func (s *PremineGenesisConfig) keys() ([]dilithium.DilithiumKey, []dilithium.PublicKey, error) {
+func (s *PremineGenesisConfig) keys() ([]ml_dsa_87.MLDSA87Key, []ml_dsa_87.PublicKey, error) {
 	prv, pub, err := DeterministicallyGenerateKeys(0, s.NVals)
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "could not deterministically generate keys for %d validators", s.NVals)
@@ -352,7 +351,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 	switch s.Version {
 	case version.Capella:
 		body = &qrysmpb.BeaconBlockBodyCapella{
-			RandaoReveal: make([]byte, field_params.DilithiumSignatureLength),
+			RandaoReveal: make([]byte, fieldparams.MLDSA87SignatureLength),
 			ExecutionData: &qrysmpb.ExecutionData{
 				DepositRoot: make([]byte, 32),
 				BlockHash:   make([]byte, 32),
@@ -374,7 +373,7 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 				Transactions:  make([][]byte, 0),
 				Withdrawals:   make([]*enginev1.Withdrawal, 0),
 			},
-			DilithiumToExecutionChanges: make([]*qrysmpb.SignedDilithiumToExecutionChange, 0),
+			Mldsa87ToExecutionChanges: make([]*qrysmpb.SignedMLDSA87ToExecutionChange, 0),
 		}
 	default:
 		return errUnsupportedVersion

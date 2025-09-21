@@ -150,8 +150,8 @@ func (s *SignedValidatorRegistration) ToConsensus() (*qrysmpb.SignedValidatorReg
 	if err != nil {
 		return nil, NewDecodeError(err, "Signature")
 	}
-	if len(sig) != fieldparams.DilithiumSignatureLength {
-		return nil, fmt.Errorf("Signature length was %d when expecting length %d", len(sig), fieldparams.DilithiumSignatureLength)
+	if len(sig) != fieldparams.MLDSA87SignatureLength {
+		return nil, fmt.Errorf("Signature length was %d when expecting length %d", len(sig), fieldparams.MLDSA87SignatureLength)
 	}
 	return &qrysmpb.SignedValidatorRegistrationV1{
 		Message:   msg,
@@ -171,8 +171,8 @@ func (s *ValidatorRegistration) ToConsensus() (*qrysmpb.ValidatorRegistrationV1,
 	if err != nil {
 		return nil, NewDecodeError(err, "FeeRecipient")
 	}
-	if len(pubKey) != fieldparams.DilithiumPubkeyLength {
-		return nil, fmt.Errorf("FeeRecipient length was %d when expecting length %d", len(pubKey), fieldparams.DilithiumPubkeyLength)
+	if len(pubKey) != fieldparams.MLDSA87PubkeyLength {
+		return nil, fmt.Errorf("FeeRecipient length was %d when expecting length %d", len(pubKey), fieldparams.MLDSA87PubkeyLength)
 	}
 	gasLimit, err := strconv.ParseUint(s.GasLimit, 10, 64)
 	if err != nil {
@@ -531,7 +531,7 @@ func (m *SyncCommitteeMessage) ToConsensus() (*qrysmpb.SyncCommitteeMessage, err
 	if err != nil {
 		return nil, NewDecodeError(err, "ValidatorIndex")
 	}
-	sig, err := DecodeHexWithLength(m.Signature, fieldparams.DilithiumSignatureLength)
+	sig, err := DecodeHexWithLength(m.Signature, fieldparams.MLDSA87SignatureLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Signature")
 	}

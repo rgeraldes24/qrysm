@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/dilithiumtoexec"
+	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
@@ -67,9 +67,9 @@ func WithSyncCommsPool(syncCommsPool synccommittee.Pool) Option {
 	}
 }
 
-func WithDilithiumToExecPool(dilithiumToExecPool dilithiumtoexec.PoolManager) Option {
+func WithMLDSA87ToExecPool(mlDSA87ToExecPool mldsa87toexec.PoolManager) Option {
 	return func(s *Service) error {
-		s.cfg.dilithiumToExecPool = dilithiumToExecPool
+		s.cfg.mlDSA87ToExecPool = mlDSA87ToExecPool
 		return nil
 	}
 }

@@ -40,7 +40,7 @@ type ChainService struct {
 	Optimistic                  bool
 	ValidAttestation            bool
 	ValidatorsRoot              [32]byte
-	PublicKey                   [field_params.DilithiumPubkeyLength]byte
+	PublicKey                   [field_params.MLDSA87PubkeyLength]byte
 	FinalizedCheckPoint         *qrysmpb.Checkpoint
 	CurrentJustifiedCheckPoint  *qrysmpb.Checkpoint
 	PreviousJustifiedCheckPoint *qrysmpb.Checkpoint
@@ -420,12 +420,12 @@ func (_ *ChainService) ChainHeads() ([][32]byte, []primitives.Slot) {
 }
 
 // HeadPublicKeyToValidatorIndex mocks HeadPublicKeyToValidatorIndex and always return 0 and true.
-func (_ *ChainService) HeadPublicKeyToValidatorIndex(_ [field_params.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool) {
+func (_ *ChainService) HeadPublicKeyToValidatorIndex(_ [field_params.MLDSA87PubkeyLength]byte) (primitives.ValidatorIndex, bool) {
 	return 0, true
 }
 
 // HeadValidatorIndexToPublicKey mocks HeadValidatorIndexToPublicKey and always return empty and nil.
-func (s *ChainService) HeadValidatorIndexToPublicKey(_ context.Context, _ primitives.ValidatorIndex) ([field_params.DilithiumPubkeyLength]byte, error) {
+func (s *ChainService) HeadValidatorIndexToPublicKey(_ context.Context, _ primitives.ValidatorIndex) ([field_params.MLDSA87PubkeyLength]byte, error) {
 	return s.PublicKey, nil
 }
 

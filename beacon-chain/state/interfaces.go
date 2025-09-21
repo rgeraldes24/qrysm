@@ -104,7 +104,7 @@ type ReadOnlyValidator interface {
 	ActivationEpoch() primitives.Epoch
 	WithdrawableEpoch() primitives.Epoch
 	ExitEpoch() primitives.Epoch
-	PublicKey() [field_params.DilithiumPubkeyLength]byte
+	PublicKey() [field_params.MLDSA87PubkeyLength]byte
 	WithdrawalCredentials() []byte
 	Slashed() bool
 	IsNil() bool
@@ -115,8 +115,8 @@ type ReadOnlyValidators interface {
 	Validators() []*qrysmpb.Validator
 	ValidatorAtIndex(idx primitives.ValidatorIndex) (*qrysmpb.Validator, error)
 	ValidatorAtIndexReadOnly(idx primitives.ValidatorIndex) (ReadOnlyValidator, error)
-	ValidatorIndexByPubkey(key [field_params.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool)
-	PubkeyAtIndex(idx primitives.ValidatorIndex) [field_params.DilithiumPubkeyLength]byte
+	ValidatorIndexByPubkey(key [field_params.MLDSA87PubkeyLength]byte) (primitives.ValidatorIndex, bool)
+	PubkeyAtIndex(idx primitives.ValidatorIndex) [field_params.MLDSA87PubkeyLength]byte
 	NumValidators() int
 	ReadFromEveryValidator(f func(idx int, val ReadOnlyValidator) error) error
 }

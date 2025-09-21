@@ -45,7 +45,7 @@ func TestValidator_HandleKeyReload(t *testing.T) {
 		).Return(resp, nil)
 		beaconClient.EXPECT().ListValidators(gomock.Any(), gomock.Any()).Return(&qrysmpb.Validators{}, nil)
 
-		anyActive, err := v.HandleKeyReload(context.Background(), [][field_params.DilithiumPubkeyLength]byte{inactive.pub, active.pub})
+		anyActive, err := v.HandleKeyReload(context.Background(), [][field_params.MLDSA87PubkeyLength]byte{inactive.pub, active.pub})
 		require.NoError(t, err)
 		assert.Equal(t, true, anyActive)
 		assert.LogsContain(t, hook, "Waiting for deposit to be observed by beacon node")
@@ -75,7 +75,7 @@ func TestValidator_HandleKeyReload(t *testing.T) {
 		).Return(resp, nil)
 		beaconClient.EXPECT().ListValidators(gomock.Any(), gomock.Any()).Return(&qrysmpb.Validators{}, nil)
 
-		anyActive, err := v.HandleKeyReload(context.Background(), [][field_params.DilithiumPubkeyLength]byte{kp.pub})
+		anyActive, err := v.HandleKeyReload(context.Background(), [][field_params.MLDSA87PubkeyLength]byte{kp.pub})
 		require.NoError(t, err)
 		assert.Equal(t, false, anyActive)
 		assert.LogsContain(t, hook, "Waiting for deposit to be observed by beacon node")
@@ -98,7 +98,7 @@ func TestValidator_HandleKeyReload(t *testing.T) {
 			},
 		).Return(nil, errors.New("error"))
 
-		_, err := v.HandleKeyReload(context.Background(), [][field_params.DilithiumPubkeyLength]byte{kp.pub})
+		_, err := v.HandleKeyReload(context.Background(), [][field_params.MLDSA87PubkeyLength]byte{kp.pub})
 		assert.ErrorContains(t, "error", err)
 	})
 }

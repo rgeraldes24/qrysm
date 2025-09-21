@@ -26,13 +26,13 @@ func getHappyPathTestServer(file string, t *testing.T) *httptest.Server {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
 		if r.Method == http.MethodGet {
-			if r.RequestURI == "/qrl/v1/beacon/pool/dilithium_to_execution_changes" {
+			if r.RequestURI == "/qrl/v1/beacon/pool/ml_dsa_87_to_execution_changes" {
 				b, err := os.ReadFile(filepath.Clean(file))
 				require.NoError(t, err)
-				var to []*apimiddleware.SignedDilithiumToExecutionChangeJson
+				var to []*apimiddleware.SignedMLDSA87ToExecutionChangeJson
 				err = json.Unmarshal(b, &to)
 				require.NoError(t, err)
-				err = json.NewEncoder(w).Encode(&apimiddleware.DilithiumToExecutionChangesPoolResponseJson{
+				err = json.NewEncoder(w).Encode(&apimiddleware.MLDSA87ToExecutionChangesPoolResponseJson{
 					Data: to,
 				})
 				require.NoError(t, err)
@@ -215,12 +215,12 @@ func TestCallWithdrawalEndpoint_Errors(t *testing.T) {
 	l, err := net.Listen("tcp", baseurl)
 	require.NoError(t, err)
 	srv := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost && r.RequestURI == "/qrl/v1/beacon/pool/dilithium_to_execution_changes" {
+		if r.Method == http.MethodPost && r.RequestURI == "/qrl/v1/beacon/pool/ml_dsa_87_to_execution_changes" {
 			w.WriteHeader(400)
 			w.Header().Set("Content-Type", "application/json")
 			err = json.NewEncoder(w).Encode(&apimiddleware.IndexedVerificationFailureErrorJson{
 				Failures: []*apimiddleware.SingleIndexedVerificationFailureJson{
-					{Index: 0, Message: "Could not validate SignedDilithiumToExecutionChange"},
+					{Index: 0, Message: "Could not validate SignedMLDSA87ToExecutionChange"},
 				},
 			})
 			require.NoError(t, err)
@@ -273,7 +273,7 @@ func TestCallWithdrawalEndpoint_Errors(t *testing.T) {
 	err = setWithdrawalAddresses(cliCtx)
 	require.ErrorContains(t, "did not receive 2xx response from API", err)
 
-	assert.LogsContain(t, hook, "Could not validate SignedDilithiumToExecutionChange")
+	assert.LogsContain(t, hook, "Could not validate SignedMLDSA87ToExecutionChange")
 }
 
 func TestVerifyWithdrawal_Mutiple(t *testing.T) {
@@ -287,10 +287,10 @@ func TestVerifyWithdrawal_Mutiple(t *testing.T) {
 		if r.Method == http.MethodGet {
 			b, err := os.ReadFile(filepath.Clean(file))
 			require.NoError(t, err)
-			var to []*apimiddleware.SignedDilithiumToExecutionChangeJson
+			var to []*apimiddleware.SignedMLDSA87ToExecutionChangeJson
 			err = json.Unmarshal(b, &to)
 			require.NoError(t, err)
-			err = json.NewEncoder(w).Encode(&apimiddleware.DilithiumToExecutionChangesPoolResponseJson{
+			err = json.NewEncoder(w).Encode(&apimiddleware.MLDSA87ToExecutionChangesPoolResponseJson{
 				Data: to,
 			})
 			require.NoError(t, err)

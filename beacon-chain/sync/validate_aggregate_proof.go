@@ -16,7 +16,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -181,7 +181,7 @@ func (s *Service) validateAggregatedAtt(ctx context.Context, signed *qrysmpb.Sig
 		tracing.AnnotateError(span, wrappedErr)
 		return pubsub.ValidationIgnore, wrappedErr
 	}
-	set := dilithium.NewSet()
+	set := ml_dsa_87.NewSet()
 	set.Join(selectionSigSet).Join(aggregatorSigSet).Join(attSigSet)
 
 	return s.validateWithBatchVerifier(ctx, "aggregate", set)
@@ -247,7 +247,7 @@ func validateSelectionIndex(
 	data *qrysmpb.AttestationData,
 	validatorIndex primitives.ValidatorIndex,
 	proof []byte,
-) (*dilithium.SignatureBatch, error) {
+) (*ml_dsa_87.SignatureBatch, error) {
 	ctx, span := trace.StartSpan(ctx, "sync.validateSelectionIndex")
 	defer span.End()
 
@@ -270,7 +270,7 @@ func validateSelectionIndex(
 	if err != nil {
 		return nil, err
 	}
-	publicKey, err := dilithium.PublicKeyFromBytes(v.PublicKey)
+	publicKey, err := ml_dsa_87.PublicKeyFromBytes(v.PublicKey)
 	if err != nil {
 		return nil, err
 	}
@@ -284,21 +284,21 @@ func validateSelectionIndex(
 	if err != nil {
 		return nil, err
 	}
-	return &dilithium.SignatureBatch{
+	return &ml_dsa_87.SignatureBatch{
 		Signatures:   [][][]byte{{proof}},
-		PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
+		PublicKeys:   [][]ml_dsa_87.PublicKey{{publicKey}},
 		Messages:     [][32]byte{root},
 		Descriptions: []string{signing.SelectionProof},
 	}, nil
 }
 
 // This returns aggregator signature set which can be used to batch verify.
-func aggSigSet(s state.ReadOnlyBeaconState, a *qrysmpb.SignedAggregateAttestationAndProof) (*dilithium.SignatureBatch, error) {
+func aggSigSet(s state.ReadOnlyBeaconState, a *qrysmpb.SignedAggregateAttestationAndProof) (*ml_dsa_87.SignatureBatch, error) {
 	v, err := s.ValidatorAtIndex(a.Message.AggregatorIndex)
 	if err != nil {
 		return nil, err
 	}
-	publicKey, err := dilithium.PublicKeyFromBytes(v.PublicKey)
+	publicKey, err := ml_dsa_87.PublicKeyFromBytes(v.PublicKey)
 	if err != nil {
 		return nil, err
 	}
@@ -312,9 +312,9 @@ func aggSigSet(s state.ReadOnlyBeaconState, a *qrysmpb.SignedAggregateAttestatio
 	if err != nil {
 		return nil, err
 	}
-	return &dilithium.SignatureBatch{
+	return &ml_dsa_87.SignatureBatch{
 		Signatures:   [][][]byte{{a.Signature}},
-		PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
+		PublicKeys:   [][]ml_dsa_87.PublicKey{{publicKey}},
 		Messages:     [][32]byte{root},
 		Descriptions: []string{signing.AggregatorSignature},
 	}, nil

@@ -107,7 +107,7 @@ func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
 	require.NoError(t, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < 2; i++ {
 		var someRoot [32]byte
-		var someKey [field_params.DilithiumPubkeyLength]byte
+		var someKey [field_params.MLDSA87PubkeyLength]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		genesisState.Validators = append(genesisState.Validators, &qrysmpb.Validator{

@@ -18,7 +18,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/rpc/qrl/shared"
 	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	http2 "github.com/theQRL/qrysm/network/http"
 	ethpbalpha "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
@@ -105,7 +105,7 @@ outer:
 		}
 
 		for _, sig := range att.Signatures {
-			if _, err = dilithium.SignatureFromBytes(sig); err != nil {
+			if _, err = ml_dsa_87.SignatureFromBytes(sig); err != nil {
 				attFailures = append(attFailures, &shared.IndexedVerificationFailure{
 					Index:   i,
 					Message: "Incorrect attestation signature: " + err.Error(),

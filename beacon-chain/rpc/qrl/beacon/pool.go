@@ -20,7 +20,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-const broadcastDilithiumChangesRateLimit = 128
+const broadcastMLDSA87ChangesRateLimit = 128
 
 // ListPoolAttesterSlashings retrieves attester slashings known by the node but
 // not necessarily incorporated into any block.
@@ -134,29 +134,29 @@ func (bs *Server) SubmitProposerSlashing(ctx context.Context, req *qrlpb.Propose
 	return &emptypb.Empty{}, nil
 }
 
-// SubmitSignedDilithiumToExecutionChanges submits said object to the node's pool
+// SubmitSignedMLDSA87ToExecutionChanges submits said object to the node's pool
 // if it passes validation the node must broadcast it to the network.
-func (bs *Server) SubmitSignedDilithiumToExecutionChanges(ctx context.Context, req *qrlpb.SubmitDilithiumToExecutionChangesRequest) (*emptypb.Empty, error) {
-	ctx, span := trace.StartSpan(ctx, "beacon.SubmitSignedDilithiumToExecutionChanges")
+func (bs *Server) SubmitSignedMLDSA87ToExecutionChanges(ctx context.Context, req *qrlpb.SubmitMLDSA87ToExecutionChangesRequest) (*emptypb.Empty, error) {
+	ctx, span := trace.StartSpan(ctx, "beacon.SubmitSignedMLDSA87ToExecutionChanges")
 	defer span.End()
 	st, err := bs.ChainInfoFetcher.HeadStateReadOnly(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Could not get head state: %v", err)
 	}
 	var failures []*helpers.SingleIndexedVerificationFailure
-	var toBroadcast []*qrysmpb.SignedDilithiumToExecutionChange
+	var toBroadcast []*qrysmpb.SignedMLDSA87ToExecutionChange
 
 	for i, change := range req.GetChanges() {
-		alphaChange := migration.V1SignedDilithiumToExecutionChangeToV1Alpha1(change)
-		_, err = blocks.ValidateDilithiumToExecutionChange(st, alphaChange)
+		alphaChange := migration.V1SignedMLDSA87ToExecutionChangeToV1Alpha1(change)
+		_, err = blocks.ValidateMLDSA87ToExecutionChange(st, alphaChange)
 		if err != nil {
 			failures = append(failures, &helpers.SingleIndexedVerificationFailure{
 				Index:   i,
-				Message: "Could not validate SignedDilithiumToExecutionChange: " + err.Error(),
+				Message: "Could not validate SignedMLDSA87ToExecutionChange: " + err.Error(),
 			})
 			continue
 		}
-		if err := blocks.VerifyDilithiumChangeSignature(st, change); err != nil {
+		if err := blocks.VerifyMLDSA87ChangeSignature(st, change); err != nil {
 			failures = append(failures, &helpers.SingleIndexedVerificationFailure{
 				Index:   i,
 				Message: "Could not validate signature: " + err.Error(),
@@ -164,36 +164,36 @@ func (bs *Server) SubmitSignedDilithiumToExecutionChanges(ctx context.Context, r
 			continue
 		}
 		bs.OperationNotifier.OperationFeed().Send(&feed.Event{
-			Type: operation.DilithiumToExecutionChangeReceived,
-			Data: &operation.DilithiumToExecutionChangeReceivedData{
+			Type: operation.MLDSA87ToExecutionChangeReceived,
+			Data: &operation.MLDSA87ToExecutionChangeReceivedData{
 				Change: alphaChange,
 			},
 		})
-		bs.DilithiumChangesPool.InsertDilithiumToExecChange(alphaChange)
+		bs.MLDSA87ChangesPool.InsertMLDSA87ToExecChange(alphaChange)
 		toBroadcast = append(toBroadcast, alphaChange)
 	}
-	go bs.broadcastDilithiumChanges(ctx, toBroadcast)
+	go bs.broadcastMLDSA87Changes(ctx, toBroadcast)
 	if len(failures) > 0 {
 		failuresContainer := &helpers.IndexedVerificationFailure{Failures: failures}
 		err := grpc.AppendCustomErrorHeader(ctx, failuresContainer)
 		if err != nil {
 			return nil, status.Errorf(
 				codes.InvalidArgument,
-				"One or more DilithiumToExecutionChange failed validation. Could not prepare DilithiumToExecutionChange failure information: %v",
+				"One or more MLDSA87ToExecutionChange failed validation. Could not prepare MLDSA87ToExecutionChange failure information: %v",
 				err,
 			)
 		}
-		return nil, status.Errorf(codes.InvalidArgument, "One or more DilithiumToExecutionChange failed validation")
+		return nil, status.Errorf(codes.InvalidArgument, "One or more MLDSA87ToExecutionChange failed validation")
 	}
 	return &emptypb.Empty{}, nil
 }
 
-// broadcastDilithiumBatch broadcasts the first `broadcastDilithiumChangesRateLimit` messages from the slice pointed to by ptr.
+// broadcastMLDSA87Batch broadcasts the first `broadcastMLDSA87ChangesRateLimit` messages from the slice pointed to by ptr.
 // It validates the messages again because they could have been invalidated by being included in blocks since the last validation.
 // It removes the messages from the slice and modifies it in place.
-func (bs *Server) broadcastDilithiumBatch(ctx context.Context, ptr *[]*qrysmpb.SignedDilithiumToExecutionChange) {
-	limit := broadcastDilithiumChangesRateLimit
-	if len(*ptr) < broadcastDilithiumChangesRateLimit {
+func (bs *Server) broadcastMLDSA87Batch(ctx context.Context, ptr *[]*qrysmpb.SignedMLDSA87ToExecutionChange) {
+	limit := broadcastMLDSA87ChangesRateLimit
+	if len(*ptr) < broadcastMLDSA87ChangesRateLimit {
 		limit = len(*ptr)
 	}
 	st, err := bs.ChainInfoFetcher.HeadStateReadOnly(ctx)
@@ -203,21 +203,21 @@ func (bs *Server) broadcastDilithiumBatch(ctx context.Context, ptr *[]*qrysmpb.S
 	}
 	for _, ch := range (*ptr)[:limit] {
 		if ch != nil {
-			_, err := blocks.ValidateDilithiumToExecutionChange(st, ch)
+			_, err := blocks.ValidateMLDSA87ToExecutionChange(st, ch)
 			if err != nil {
-				log.WithError(err).Error("could not validate Dilithium to execution change")
+				log.WithError(err).Error("could not validate ML-DSA-87 to execution change")
 				continue
 			}
 			if err := bs.Broadcaster.Broadcast(ctx, ch); err != nil {
-				log.WithError(err).Error("could not broadcast Dilithium to execution changes.")
+				log.WithError(err).Error("could not broadcast ML-DSA-87 to execution changes.")
 			}
 		}
 	}
 	*ptr = (*ptr)[limit:]
 }
 
-func (bs *Server) broadcastDilithiumChanges(ctx context.Context, changes []*qrysmpb.SignedDilithiumToExecutionChange) {
-	bs.broadcastDilithiumBatch(ctx, &changes)
+func (bs *Server) broadcastMLDSA87Changes(ctx context.Context, changes []*qrysmpb.SignedMLDSA87ToExecutionChange) {
+	bs.broadcastMLDSA87Batch(ctx, &changes)
 	if len(changes) == 0 {
 		return
 	}
@@ -228,7 +228,7 @@ func (bs *Server) broadcastDilithiumChanges(ctx context.Context, changes []*qrys
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			bs.broadcastDilithiumBatch(ctx, &changes)
+			bs.broadcastMLDSA87Batch(ctx, &changes)
 			if len(changes) == 0 {
 				return
 			}
@@ -236,22 +236,22 @@ func (bs *Server) broadcastDilithiumChanges(ctx context.Context, changes []*qrys
 	}
 }
 
-// ListDilithiumToExecutionChanges retrieves Dilithium to execution changes known by the node but not necessarily incorporated into any block
-func (bs *Server) ListDilithiumToExecutionChanges(ctx context.Context, _ *emptypb.Empty) (*qrlpb.DilithiumToExecutionChangesPoolResponse, error) {
-	ctx, span := trace.StartSpan(ctx, "beacon.ListDilithiumToExecutionChanges")
+// ListMLDSA87ToExecutionChanges retrieves ML-DSA-87 to execution changes known by the node but not necessarily incorporated into any block
+func (bs *Server) ListMLDSA87ToExecutionChanges(ctx context.Context, _ *emptypb.Empty) (*qrlpb.MLDSA87ToExecutionChangesPoolResponse, error) {
+	ctx, span := trace.StartSpan(ctx, "beacon.ListMLDSA87ToExecutionChanges")
 	defer span.End()
 
-	sourceChanges, err := bs.DilithiumChangesPool.PendingDilithiumToExecChanges()
+	sourceChanges, err := bs.MLDSA87ChangesPool.PendingMLDSA87ToExecChanges()
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Could not get Dilithium to execution changes: %v", err)
+		return nil, status.Errorf(codes.Internal, "Could not get ML-DSA-87 to execution changes: %v", err)
 	}
 
-	changes := make([]*qrlpb.SignedDilithiumToExecutionChange, len(sourceChanges))
+	changes := make([]*qrlpb.SignedMLDSA87ToExecutionChange, len(sourceChanges))
 	for i, ch := range sourceChanges {
-		changes[i] = migration.V1Alpha1SignedDilithiumToExecChangeToV1(ch)
+		changes[i] = migration.V1Alpha1SignedMLDSA87ToExecChangeToV1(ch)
 	}
 
-	return &qrlpb.DilithiumToExecutionChangesPoolResponse{
+	return &qrlpb.MLDSA87ToExecutionChangesPoolResponse{
 		Data: changes,
 	}, nil
 }

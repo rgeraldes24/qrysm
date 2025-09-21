@@ -23,7 +23,7 @@ func TestListKeystores_JSONisEqual(t *testing.T) {
 	protoResponse := &service.ListKeystoresResponse{
 		Data: []*service.ListKeystoresResponse_Keystore{
 			{
-				ValidatingPubkey: make([]byte, field_params.DilithiumPubkeyLength),
+				ValidatingPubkey: make([]byte, field_params.MLDSA87PubkeyLength),
 				// DerivationPath:   "m/44'/60'/0'/0/0",
 			},
 		},
@@ -133,7 +133,7 @@ func TestListRemoteKeys_JSONisEqual(t *testing.T) {
 	protoResponse := &service.ListRemoteKeysResponse{
 		Data: []*service.ListRemoteKeysResponse_Keystore{
 			{
-				Pubkey:   make([]byte, field_params.DilithiumPubkeyLength),
+				Pubkey:   make([]byte, field_params.MLDSA87PubkeyLength),
 				Url:      "http://localhost:8080",
 				Readonly: true,
 			},
@@ -155,7 +155,7 @@ func TestImportRemoteKeys_JSONisEqual(t *testing.T) {
 	protoImportRequest := &service.ImportRemoteKeysRequest{
 		RemoteKeys: []*service.ImportRemoteKeysRequest_Keystore{
 			{
-				Pubkey: make([]byte, field_params.DilithiumPubkeyLength),
+				Pubkey: make([]byte, field_params.MLDSA87PubkeyLength),
 				Url:    "http://localhost:8080",
 			},
 		},

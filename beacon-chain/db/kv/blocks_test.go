@@ -814,7 +814,7 @@ func TestStore_FeeRecipientByValidatorID(t *testing.T) {
 			FeeRecipient: bytesutil.PadTo([]byte("a"), 20),
 			GasLimit:     1,
 			Timestamp:    2,
-			Pubkey:       bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
+			Pubkey:       bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 		}}
 	require.NoError(t, db.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{3}, regs))
 	f, err = db.FeeRecipientByValidatorID(ctx, 3)
@@ -839,19 +839,19 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 			FeeRecipient: bytesutil.PadTo([]byte("a"), 20),
 			GasLimit:     1,
 			Timestamp:    uint64(timestamp),
-			Pubkey:       bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
+			Pubkey:       bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 		},
 		{
 			FeeRecipient: bytesutil.PadTo([]byte("c"), 20),
 			GasLimit:     3,
 			Timestamp:    uint64(timestamp),
-			Pubkey:       bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
+			Pubkey:       bytesutil.PadTo([]byte("d"), field_params.MLDSA87PubkeyLength),
 		},
 		{
 			FeeRecipient: bytesutil.PadTo([]byte("e"), 20),
 			GasLimit:     5,
 			Timestamp:    uint64(timestamp),
-			Pubkey:       bytesutil.PadTo([]byte("f"), field_params.DilithiumPubkeyLength),
+			Pubkey:       bytesutil.PadTo([]byte("f"), field_params.MLDSA87PubkeyLength),
 		},
 	}
 	require.NoError(t, db.SaveRegistrationsByValidatorIDs(ctx, ids, regs))
@@ -861,7 +861,7 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 		FeeRecipient: bytesutil.PadTo([]byte("a"), 20),
 		GasLimit:     1,
 		Timestamp:    uint64(timestamp),
-		Pubkey:       bytesutil.PadTo([]byte("b"), field_params.DilithiumPubkeyLength),
+		Pubkey:       bytesutil.PadTo([]byte("b"), field_params.MLDSA87PubkeyLength),
 	}, f)
 	f, err = db.RegistrationByValidatorID(ctx, 1)
 	require.NoError(t, err)
@@ -869,7 +869,7 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 		FeeRecipient: bytesutil.PadTo([]byte("c"), 20),
 		GasLimit:     3,
 		Timestamp:    uint64(timestamp),
-		Pubkey:       bytesutil.PadTo([]byte("d"), field_params.DilithiumPubkeyLength),
+		Pubkey:       bytesutil.PadTo([]byte("d"), field_params.MLDSA87PubkeyLength),
 	}, f)
 	f, err = db.RegistrationByValidatorID(ctx, 2)
 	require.NoError(t, err)
@@ -877,7 +877,7 @@ func TestStore_RegistrationsByValidatorID(t *testing.T) {
 		FeeRecipient: bytesutil.PadTo([]byte("e"), 20),
 		GasLimit:     5,
 		Timestamp:    uint64(timestamp),
-		Pubkey:       bytesutil.PadTo([]byte("f"), field_params.DilithiumPubkeyLength),
+		Pubkey:       bytesutil.PadTo([]byte("f"), field_params.MLDSA87PubkeyLength),
 	}, f)
 	_, err = db.RegistrationByValidatorID(ctx, 3)
 	want := errors.Wrap(ErrNotFoundFeeRecipient, "validator id 3")

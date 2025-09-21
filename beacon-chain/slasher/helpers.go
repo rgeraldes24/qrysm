@@ -112,8 +112,8 @@ func validateBlockHeaderIntegrity(header *qrysmpb.SignedBeaconBlockHeader) bool 
 	// If a signed block header is malformed, we drop it.
 	if header == nil ||
 		header.Header == nil ||
-		len(header.Signature) != field_params.DilithiumSignatureLength ||
-		bytes.Equal(header.Signature, make([]byte, field_params.DilithiumSignatureLength)) {
+		len(header.Signature) != field_params.MLDSA87SignatureLength ||
+		bytes.Equal(header.Signature, make([]byte, field_params.MLDSA87SignatureLength)) {
 		return false
 	}
 	return true

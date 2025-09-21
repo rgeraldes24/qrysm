@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/container/trie"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -168,11 +168,11 @@ func TestProcessDeposit_IncompleteDeposit(t *testing.T) {
 		Data: &qrysmpb.Deposit_Data{
 			Amount:                params.BeaconConfig().EffectiveBalanceIncrement, // incomplete deposit
 			WithdrawalCredentials: bytesutil.PadTo([]byte("testing"), 32),
-			Signature:             bytesutil.PadTo([]byte("test"), field_params.DilithiumSignatureLength),
+			Signature:             bytesutil.PadTo([]byte("test"), field_params.MLDSA87SignatureLength),
 		},
 	}
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	deposit.Data.PublicKey = priv.PublicKey().Marshal()
 	d, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)

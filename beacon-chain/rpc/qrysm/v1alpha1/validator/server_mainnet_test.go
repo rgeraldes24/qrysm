@@ -13,7 +13,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -28,9 +28,9 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	params.OverrideBeaconConfig(params.MainnetConfig().Copy())
 	ctx := context.Background()
 
-	priv1, err := dilithium.RandKey()
+	priv1, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
-	priv2, err := dilithium.RandKey()
+	priv2, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 
 	pubKey1 := priv1.PublicKey().Marshal()
@@ -53,7 +53,7 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	depData := &qrysmpb.Deposit_Data{
 		PublicKey:             pubKey1,
 		WithdrawalCredentials: bytesutil.PadTo([]byte("hey"), 32),
-		Signature:             make([]byte, field_params.DilithiumSignatureLength),
+		Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 	}
 	domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)
 	require.NoError(t, err)

@@ -298,7 +298,7 @@ func Test_parseUniqueSignedBlocksByPubKey(t *testing.T) {
 	tests := []struct {
 		name    string
 		data    []*format.ProtectionData
-		want    map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedBlock
+		want    map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedBlock
 		wantErr bool
 	}{
 		{
@@ -324,7 +324,7 @@ func Test_parseUniqueSignedBlocksByPubKey(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedBlock{
+			want: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedBlock{
 				publicKeys[0]: {
 					{
 						Slot:        "1",
@@ -367,7 +367,7 @@ func Test_parseUniqueSignedBlocksByPubKey(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedBlock{
+			want: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedBlock{
 				publicKeys[0]: {
 					{
 						Slot:        "1",
@@ -416,7 +416,7 @@ func Test_parseUniqueSignedBlocksByPubKey(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedBlock{
+			want: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedBlock{
 				publicKeys[0]: {
 					{
 						Slot:        "1",
@@ -455,7 +455,7 @@ func Test_parseUniqueSignedBlocksByPubKey(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedBlock{
+			want: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedBlock{
 				publicKeys[0]: {
 					{
 						Slot:        "1",
@@ -498,7 +498,7 @@ func Test_parseUniqueSignedBlocksByPubKey(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedBlock{
+			want: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedBlock{
 				publicKeys[0]: {
 					{
 						Slot:        "1",
@@ -542,7 +542,7 @@ func Test_parseUniqueSignedAttestationsByPubKey(t *testing.T) {
 	tests := []struct {
 		name    string
 		data    []*format.ProtectionData
-		want    map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedAttestation
+		want    map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedAttestation
 		wantErr bool
 	}{
 		{
@@ -570,7 +570,7 @@ func Test_parseUniqueSignedAttestationsByPubKey(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedAttestation{
+			want: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedAttestation{
 				publicKeys[0]: {
 					{
 						SourceEpoch: "1",
@@ -615,7 +615,7 @@ func Test_parseUniqueSignedAttestationsByPubKey(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedAttestation{
+			want: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedAttestation{
 				publicKeys[0]: {
 					{
 						SourceEpoch: "1",
@@ -667,7 +667,7 @@ func Test_parseUniqueSignedAttestationsByPubKey(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedAttestation{
+			want: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedAttestation{
 				publicKeys[0]: {
 					{
 						SourceEpoch: "1",
@@ -709,7 +709,7 @@ func Test_parseUniqueSignedAttestationsByPubKey(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedAttestation{
+			want: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedAttestation{
 				publicKeys[0]: {
 					{
 						SourceEpoch: "1",
@@ -752,7 +752,7 @@ func Test_parseUniqueSignedAttestationsByPubKey(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedAttestation{
+			want: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedAttestation{
 				publicKeys[0]: {
 					{
 						SourceEpoch: "1",
@@ -791,13 +791,13 @@ func Test_parseUniqueSignedAttestationsByPubKey(t *testing.T) {
 func Test_filterSlashablePubKeysFromBlocks(t *testing.T) {
 	var tests = []struct {
 		name     string
-		expected [][field_params.DilithiumPubkeyLength]byte
-		given    map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedBlock
+		expected [][field_params.MLDSA87PubkeyLength]byte
+		given    map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedBlock
 	}{
 		{
 			name:     "No slashable keys returns empty",
-			expected: make([][field_params.DilithiumPubkeyLength]byte, 0),
-			given: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedBlock{
+			expected: make([][field_params.MLDSA87PubkeyLength]byte, 0),
+			given: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedBlock{
 				{1}: {
 					{
 						Slot: "1",
@@ -818,15 +818,15 @@ func Test_filterSlashablePubKeysFromBlocks(t *testing.T) {
 		},
 		{
 			name:     "Empty data returns empty",
-			expected: make([][field_params.DilithiumPubkeyLength]byte, 0),
-			given:    make(map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedBlock),
+			expected: make([][field_params.MLDSA87PubkeyLength]byte, 0),
+			given:    make(map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedBlock),
 		},
 		{
 			name: "Properly finds public keys with slashable data",
-			expected: [][field_params.DilithiumPubkeyLength]byte{
+			expected: [][field_params.MLDSA87PubkeyLength]byte{
 				{1}, {3},
 			},
-			given: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedBlock{
+			given: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedBlock{
 				{1}: {
 					{
 						Slot: "1",
@@ -858,10 +858,10 @@ func Test_filterSlashablePubKeysFromBlocks(t *testing.T) {
 		},
 		{
 			name: "Considers nil signing roots and mismatched signing roots when determining slashable keys",
-			expected: [][field_params.DilithiumPubkeyLength]byte{
+			expected: [][field_params.MLDSA87PubkeyLength]byte{
 				{2}, {3},
 			},
-			given: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedBlock{
+			given: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedBlock{
 				// Different signing roots and same slot should not be slashable.
 				{1}: {
 					{
@@ -899,14 +899,14 @@ func Test_filterSlashablePubKeysFromBlocks(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
-			historyByPubKey := make(map[[field_params.DilithiumPubkeyLength]byte]kv.ProposalHistoryForPubkey)
+			historyByPubKey := make(map[[field_params.MLDSA87PubkeyLength]byte]kv.ProposalHistoryForPubkey)
 			for pubKey, signedBlocks := range tt.given {
 				proposalHistory, err := transformSignedBlocks(ctx, signedBlocks)
 				require.NoError(t, err)
 				historyByPubKey[pubKey] = *proposalHistory
 			}
 			slashablePubKeys := filterSlashablePubKeysFromBlocks(context.Background(), historyByPubKey)
-			wantedPubKeys := make(map[[field_params.DilithiumPubkeyLength]byte]bool)
+			wantedPubKeys := make(map[[field_params.MLDSA87PubkeyLength]byte]bool)
 			for _, pk := range tt.expected {
 				wantedPubKeys[pk] = true
 				wantedPubKeys[pk] = true
@@ -923,14 +923,14 @@ func Test_filterSlashablePubKeysFromAttestations(t *testing.T) {
 	ctx := context.Background()
 	tests := []struct {
 		name                 string
-		previousAttsByPubKey map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedAttestation
-		incomingAttsByPubKey map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedAttestation
-		want                 map[[field_params.DilithiumPubkeyLength]byte]bool
+		previousAttsByPubKey map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedAttestation
+		incomingAttsByPubKey map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedAttestation
+		want                 map[[field_params.MLDSA87PubkeyLength]byte]bool
 		wantErr              bool
 	}{
 		{
 			name: "Properly filters out double voting attester keys",
-			previousAttsByPubKey: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedAttestation{
+			previousAttsByPubKey: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedAttestation{
 				{1}: {
 					{
 						SourceEpoch: "2",
@@ -962,14 +962,14 @@ func Test_filterSlashablePubKeysFromAttestations(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte]bool{
+			want: map[[field_params.MLDSA87PubkeyLength]byte]bool{
 				{1}: true,
 				{3}: true,
 			},
 		},
 		{
 			name: "Returns empty if no keys are slashable",
-			previousAttsByPubKey: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedAttestation{
+			previousAttsByPubKey: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedAttestation{
 				{1}: {
 					{
 						SourceEpoch: "2",
@@ -997,11 +997,11 @@ func Test_filterSlashablePubKeysFromAttestations(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte]bool{},
+			want: map[[field_params.MLDSA87PubkeyLength]byte]bool{},
 		},
 		{
 			name: "Properly filters out surround voting attester keys",
-			previousAttsByPubKey: map[[field_params.DilithiumPubkeyLength]byte][]*format.SignedAttestation{
+			previousAttsByPubKey: map[[field_params.MLDSA87PubkeyLength]byte][]*format.SignedAttestation{
 				{1}: {
 					{
 						SourceEpoch: "2",
@@ -1033,7 +1033,7 @@ func Test_filterSlashablePubKeysFromAttestations(t *testing.T) {
 					},
 				},
 			},
-			want: map[[field_params.DilithiumPubkeyLength]byte]bool{
+			want: map[[field_params.MLDSA87PubkeyLength]byte]bool{
 				{1}: true,
 				{3}: true,
 			},
@@ -1041,8 +1041,8 @@ func Test_filterSlashablePubKeysFromAttestations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			attestingHistoriesByPubKey := make(map[[field_params.DilithiumPubkeyLength]byte][]*kv.AttestationRecord)
-			pubKeys := make([][field_params.DilithiumPubkeyLength]byte, 0)
+			attestingHistoriesByPubKey := make(map[[field_params.MLDSA87PubkeyLength]byte][]*kv.AttestationRecord)
+			pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, 0)
 			for pubKey := range tt.incomingAttsByPubKey {
 				pubKeys = append(pubKeys, pubKey)
 			}

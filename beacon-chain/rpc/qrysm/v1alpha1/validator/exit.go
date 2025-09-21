@@ -24,7 +24,7 @@ func (vs *Server) ProposeExit(ctx context.Context, req *qrysmpb.SignedVoluntaryE
 	if req.Exit == nil {
 		return nil, status.Error(codes.InvalidArgument, "voluntary exit does not exist")
 	}
-	if req.Signature == nil || len(req.Signature) != field_params.DilithiumSignatureLength {
+	if req.Signature == nil || len(req.Signature) != field_params.MLDSA87SignatureLength {
 		return nil, status.Error(codes.InvalidArgument, "invalid signature provided")
 	}
 

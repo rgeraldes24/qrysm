@@ -10,7 +10,7 @@ import (
 	fssz "github.com/prysmaticlabs/fastssz"
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/config/features"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -24,7 +24,7 @@ func TestKV_Aggregated_AggregateUnaggregatedAttestations(t *testing.T) {
 	defer resetFn()
 
 	cache := NewAttCaches()
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig1 := priv.Sign([]byte{'a'})
 	sig2 := priv.Sign([]byte{'b'})
@@ -491,7 +491,7 @@ func TestKV_Aggregated_HasAggregatedAttestation(t *testing.T) {
 
 func TestKV_Aggregated_DuplicateAggregatedAttestations(t *testing.T) {
 	cache := NewAttCaches()
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := priv.Sign([]byte{'a'}).Marshal()
 

@@ -246,7 +246,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root1"), 32),
 					},
 				},
-				Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), field_params.DilithiumSignatureLength)},
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig1"), field_params.MLDSA87SignatureLength)},
 			},
 			{
 				AggregationBits: bitfield.Bitlist{0x01},
@@ -263,7 +263,7 @@ func TestServer_ListBlockAttestations(t *testing.T) {
 						Root:  bytesutil.PadTo([]byte("root2"), 32),
 					},
 				},
-				Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), field_params.DilithiumSignatureLength)},
+				Signatures: [][]byte{bytesutil.PadTo([]byte("sig2"), field_params.MLDSA87SignatureLength)},
 			},
 		}
 		sb, err := blocks.NewSignedBeaconBlock(b)

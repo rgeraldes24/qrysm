@@ -133,7 +133,7 @@ type AggregationSlot struct {
 type AggregateAndProof struct {
 	AggregatorIndex string        `json:"aggregator_index"` // uint64
 	Aggregate       *Attestation  `json:"aggregate"`
-	SelectionProof  hexutil.Bytes `json:"selection_proof"` // 4595 bytes
+	SelectionProof  hexutil.Bytes `json:"selection_proof"` // 4627 bytes
 }
 
 // Attestation a sub property of AggregateAndProofSignRequest.
@@ -288,7 +288,7 @@ type BeaconBlockV2Blinded struct {
 // SyncAggregate is a sub property of BeaconBlockBodyAltair.
 type SyncAggregate struct {
 	SyncCommitteeBits      hexutil.Bytes `json:"sync_committee_bits"`      // SSZ hexadecimal string
-	SyncCommitteeSignature hexutil.Bytes `json:"sync_committee_signature"` // 4595 byte hexadecimal string
+	SyncCommitteeSignature hexutil.Bytes `json:"sync_committee_signature"` // 4627 byte hexadecimal string
 }
 
 // BeaconBlockBlockV2 a sub property of BlockV2SignRequest.
@@ -318,7 +318,7 @@ type SyncAggregatorSelectionData struct {
 // ContributionAndProof a sub property of AggregatorSelectionSignRequest.
 type ContributionAndProof struct {
 	AggregatorIndex string                     `json:"aggregator_index"` // uint64
-	SelectionProof  hexutil.Bytes              `json:"selection_proof"`  // 4595 byte hexadecimal
+	SelectionProof  hexutil.Bytes              `json:"selection_proof"`  // 4627 byte hexadecimal
 	Contribution    *SyncCommitteeContribution `json:"contribution"`
 }
 
@@ -328,7 +328,7 @@ type SyncCommitteeContribution struct {
 	BeaconBlockRoot   hexutil.Bytes `json:"beacon_block_root"`  // Hash32 // Qrysm uses BlockRoot instead of BeaconBlockRoot
 	SubcommitteeIndex string        `json:"subcommittee_index"` // uint64
 	AggregationBits   hexutil.Bytes `json:"aggregation_bits"`   // SSZ hexadecimal string
-	Signature         hexutil.Bytes `json:"signature"`          // 4595 byte hexadecimal string
+	Signature         hexutil.Bytes `json:"signature"`          // 4627 byte hexadecimal string
 }
 
 // ValidatorRegistration a sub property of ValidatorRegistrationSignRequest

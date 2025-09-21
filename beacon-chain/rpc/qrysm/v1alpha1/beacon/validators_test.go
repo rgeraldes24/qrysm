@@ -233,7 +233,7 @@ func TestServer_ListValidatorBalances_ExceedsMaxPageSize(t *testing.T) {
 }
 
 func pubKey(i uint64) []byte {
-	pubKey := make([]byte, field_params.DilithiumPubkeyLength)
+	pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 	binary.LittleEndian.PutUint64(pubKey, i)
 	return pubKey
 }
@@ -1098,7 +1098,7 @@ func TestServer_ListValidators_ProcessHeadStateSlots(t *testing.T) {
 	for i := uint64(0); i < numValidators; i++ {
 		validators[i] = &qrysmpb.Validator{
 			ActivationEpoch:       0,
-			PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
+			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 		}
@@ -1366,7 +1366,7 @@ func TestServer_GetValidatorParticipation_OrphanedUntilGenesis(t *testing.T) {
 	balances := make([]uint64, validatorCount)
 	for i := 0; i < len(validators); i++ {
 		validators[i] = &qrysmpb.Validator{
-			PublicKey:             bytesutil.ToBytes(uint64(i), field_params.DilithiumPubkeyLength),
+			PublicKey:             bytesutil.ToBytes(uint64(i), field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,

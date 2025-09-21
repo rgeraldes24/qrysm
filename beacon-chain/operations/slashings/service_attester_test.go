@@ -7,14 +7,14 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
 
-func validAttesterSlashingForValIdx(t *testing.T, beaconState state.BeaconState, privs []dilithium.DilithiumKey, valIdx ...uint64) *qrysmpb.AttesterSlashing {
+func validAttesterSlashingForValIdx(t *testing.T, beaconState state.BeaconState, privs []ml_dsa_87.MLDSA87Key, valIdx ...uint64) *qrysmpb.AttesterSlashing {
 	var slashings []*qrysmpb.AttesterSlashing
 	for _, idx := range valIdx {
 		slashing, err := util.GenerateAttesterSlashingForValidator(beaconState, privs[idx], primitives.ValidatorIndex(idx))

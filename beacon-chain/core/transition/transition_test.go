@@ -133,12 +133,12 @@ func TestProcessBlock_IncorrectProcessExits(t *testing.T) {
 			Attestation_1: &qrysmpb.IndexedAttestation{
 				Data:             util.HydrateAttestationData(&qrysmpb.AttestationData{}),
 				AttestingIndices: []uint64{0, 1},
-				Signatures:       [][]byte{make([]byte, 4595), make([]byte, 4595)},
+				Signatures:       [][]byte{make([]byte, 4627), make([]byte, 4627)},
 			},
 			Attestation_2: &qrysmpb.IndexedAttestation{
 				Data:             util.HydrateAttestationData(&qrysmpb.AttestationData{}),
 				AttestingIndices: []uint64{0, 1},
-				Signatures:       [][]byte{make([]byte, 4595), make([]byte, 4595)},
+				Signatures:       [][]byte{make([]byte, 4627), make([]byte, 4627)},
 			},
 		},
 	}

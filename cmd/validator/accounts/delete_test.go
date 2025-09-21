@@ -15,7 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/theQRL/qrysm/cmd/validator/flags"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -44,7 +44,7 @@ func setupWalletAndPasswordsDir(t testing.TB) (string, string, string) {
 
 // Returns the fullPath to the newly created keystore file.
 func createKeystore(t *testing.T, path string) (*keymanager.Keystore, string) {
-	validatingKey, err := dilithium.RandKey()
+	validatingKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	encryptor := keystorev1.New()
 	cryptoFields, err := encryptor.Encrypt(validatingKey.Marshal(), password)

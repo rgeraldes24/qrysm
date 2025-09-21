@@ -238,7 +238,7 @@ func (v *validator) LogValidatorGainsAndLosses(ctx context.Context, slot primiti
 		return nil
 	}
 
-	var pks [][field_params.DilithiumPubkeyLength]byte
+	var pks [][field_params.MLDSA87PubkeyLength]byte
 	var err error
 	pks, err = v.keyManager.FetchValidatingPublicKeys(ctx)
 	if err != nil {

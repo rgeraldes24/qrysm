@@ -11,7 +11,7 @@ import (
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -123,12 +123,12 @@ func TestSyncCommittee_CanGet(t *testing.T) {
 	getState := func(t *testing.T, count uint64) state.BeaconState {
 		validators := make([]*qrysmpb.Validator, count)
 		for i := 0; i < len(validators); i++ {
-			dilithiumKey, err := dilithium.RandKey()
+			mlDSA87Key, err := ml_dsa_87.RandKey()
 			require.NoError(t, err)
 			validators[i] = &qrysmpb.Validator{
 				ExitEpoch:        params.BeaconConfig().FarFutureEpoch,
 				EffectiveBalance: params.BeaconConfig().MinDepositAmount,
-				PublicKey:        dilithiumKey.PublicKey().Marshal(),
+				PublicKey:        mlDSA87Key.PublicKey().Marshal(),
 			}
 		}
 		st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{
@@ -356,12 +356,12 @@ func Test_ValidateSyncMessageTime(t *testing.T) {
 func getState(t *testing.T, count uint64) state.BeaconState {
 	validators := make([]*qrysmpb.Validator, count)
 	for i := 0; i < len(validators); i++ {
-		dilithiumKey, err := dilithium.RandKey()
+		mlDSA87Key, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		validators[i] = &qrysmpb.Validator{
 			ExitEpoch:        params.BeaconConfig().FarFutureEpoch,
 			EffectiveBalance: params.BeaconConfig().MinDepositAmount,
-			PublicKey:        dilithiumKey.PublicKey().Marshal(),
+			PublicKey:        mlDSA87Key.PublicKey().Marshal(),
 		}
 	}
 	st, err := state_native.InitializeFromProtoCapella(&qrysmpb.BeaconStateCapella{

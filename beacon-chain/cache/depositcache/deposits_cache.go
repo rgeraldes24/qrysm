@@ -46,7 +46,7 @@ type DepositCache struct {
 	pendingDeposits   []*qrysmpb.DepositContainer
 	deposits          []*qrysmpb.DepositContainer
 	finalizedDeposits FinalizedDeposits
-	depositsByKey     map[[field_params.DilithiumPubkeyLength]byte][]*qrysmpb.DepositContainer
+	depositsByKey     map[[field_params.MLDSA87PubkeyLength]byte][]*qrysmpb.DepositContainer
 	depositsLock      sync.RWMutex
 }
 
@@ -62,7 +62,7 @@ func New() (*DepositCache, error) {
 	return &DepositCache{
 		pendingDeposits:   []*qrysmpb.DepositContainer{},
 		deposits:          []*qrysmpb.DepositContainer{},
-		depositsByKey:     map[[field_params.DilithiumPubkeyLength]byte][]*qrysmpb.DepositContainer{},
+		depositsByKey:     map[[field_params.MLDSA87PubkeyLength]byte][]*qrysmpb.DepositContainer{},
 		finalizedDeposits: FinalizedDeposits{deposits: finalizedDepositsTrie, merkleTrieIndex: -1},
 	}, nil
 }

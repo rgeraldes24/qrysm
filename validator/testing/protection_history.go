@@ -6,7 +6,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/validator/db/kv"
@@ -16,7 +16,7 @@ import (
 // MockSlashingProtectionJSON creates a mock, full slashing protection JSON struct
 // using attesting and proposing histories provided.
 func MockSlashingProtectionJSON(
-	publicKeys [][field_params.DilithiumPubkeyLength]byte,
+	publicKeys [][field_params.MLDSA87PubkeyLength]byte,
 	attestingHistories [][]*kv.AttestationRecord,
 	proposalHistories []kv.ProposalHistoryForPubkey,
 ) (*format.EIPSlashingProtectionFormat, error) {
@@ -52,7 +52,7 @@ func MockSlashingProtectionJSON(
 
 // MockAttestingAndProposalHistories given a number of validators, creates mock attesting
 // and proposing histories within WEAK_SUBJECTIVITY_PERIOD bounds.
-func MockAttestingAndProposalHistories(pubkeys [][field_params.DilithiumPubkeyLength]byte) ([][]*kv.AttestationRecord, []kv.ProposalHistoryForPubkey) {
+func MockAttestingAndProposalHistories(pubkeys [][field_params.MLDSA87PubkeyLength]byte) ([][]*kv.AttestationRecord, []kv.ProposalHistoryForPubkey) {
 	// deduplicate and transform them into our internal format.
 	numValidators := len(pubkeys)
 	attData := make([][]*kv.AttestationRecord, numValidators)
@@ -94,10 +94,10 @@ func MockAttestingAndProposalHistories(pubkeys [][field_params.DilithiumPubkeyLe
 }
 
 // CreateRandomPubKeys --
-func CreateRandomPubKeys(numValidators int) ([][field_params.DilithiumPubkeyLength]byte, error) {
-	pubKeys := make([][field_params.DilithiumPubkeyLength]byte, numValidators)
+func CreateRandomPubKeys(numValidators int) ([][field_params.MLDSA87PubkeyLength]byte, error) {
+	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, numValidators)
 	for i := 0; i < numValidators; i++ {
-		randKey, err := dilithium.RandKey()
+		randKey, err := ml_dsa_87.RandKey()
 		if err != nil {
 			return nil, err
 		}

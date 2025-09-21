@@ -45,7 +45,7 @@ message SyncCommitteeMessage {
   uint64 validator_index = 3 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.ValidatorIndex"];
 
   // Signature by the validator over the block root of `slot`.
-  bytes signature = 4 [(theqrl.qrl.ext.ssz_size) = "4595"];
+  bytes signature = 4 [(theqrl.qrl.ext.ssz_size) = "4627"];
 }
 
 message StateSyncCommitteesRequest {

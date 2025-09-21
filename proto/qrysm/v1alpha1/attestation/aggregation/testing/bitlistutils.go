@@ -83,7 +83,7 @@ func MakeAttestationsFromBitlists(bl []bitfield.Bitlist) []*qrysmpb.Attestation 
 		indices := b.BitIndices()
 		signatures := make([][]byte, len(indices))
 		for i := 0; i < len(indices); i++ {
-			signatures[i] = make([]byte, field_params.DilithiumSignatureLength)
+			signatures[i] = make([]byte, field_params.MLDSA87SignatureLength)
 		}
 
 		atts[i] = &qrysmpb.Attestation{
@@ -105,7 +105,7 @@ func MakeSyncContributionsFromBitVector(bl []bitfield.Bitvector16) []*qrysmpb.Sy
 		indices := b.BitIndices()
 		signatures := make([][]byte, len(indices))
 		for i := 0; i < len(indices); i++ {
-			signatures[i] = make([]byte, field_params.DilithiumSignatureLength)
+			signatures[i] = make([]byte, field_params.MLDSA87SignatureLength)
 		}
 
 		c[i] = &qrysmpb.SyncCommitteeContribution{

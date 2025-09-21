@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/crypto/rand"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
@@ -34,7 +34,7 @@ type BlockGenConfig struct {
 	NumVoluntaryExits    uint64
 	NumTransactions      uint64
 	FullSyncAggregate    bool
-	NumDilithiumChanges  uint64
+	NumMLDSA87Changes    uint64
 }
 
 // DefaultBlockGenConfig returns the block config that utilizes the
@@ -47,14 +47,14 @@ func DefaultBlockGenConfig() *BlockGenConfig {
 		NumDeposits:          0,
 		NumVoluntaryExits:    0,
 		NumTransactions:      0,
-		NumDilithiumChanges:  0,
+		NumMLDSA87Changes:    0,
 	}
 }
 
 // GenerateProposerSlashingForValidator for a specific validator index.
 func GenerateProposerSlashingForValidator(
 	bState state.BeaconState,
-	priv dilithium.DilithiumKey,
+	priv ml_dsa_87.MLDSA87Key,
 	idx primitives.ValidatorIndex,
 ) (*qrysmpb.ProposerSlashing, error) {
 	header1 := HydrateSignedBeaconHeader(&qrysmpb.SignedBeaconBlockHeader{
@@ -93,7 +93,7 @@ func GenerateProposerSlashingForValidator(
 
 func generateProposerSlashings(
 	bState state.BeaconState,
-	privs []dilithium.DilithiumKey,
+	privs []ml_dsa_87.MLDSA87Key,
 	numSlashings uint64,
 ) ([]*qrysmpb.ProposerSlashing, error) {
 	proposerSlashings := make([]*qrysmpb.ProposerSlashing, numSlashings)
@@ -114,7 +114,7 @@ func generateProposerSlashings(
 // GenerateAttesterSlashingForValidator for a specific validator index.
 func GenerateAttesterSlashingForValidator(
 	bState state.BeaconState,
-	priv dilithium.DilithiumKey,
+	priv ml_dsa_87.MLDSA87Key,
 	idx primitives.ValidatorIndex,
 ) (*qrysmpb.AttesterSlashing, error) {
 	currentEpoch := time.CurrentEpoch(bState)
@@ -171,7 +171,7 @@ func GenerateAttesterSlashingForValidator(
 
 func generateAttesterSlashings(
 	bState state.BeaconState,
-	privs []dilithium.DilithiumKey,
+	privs []ml_dsa_87.MLDSA87Key,
 	numSlashings uint64,
 ) ([]*qrysmpb.AttesterSlashing, error) {
 	attesterSlashings := make([]*qrysmpb.AttesterSlashing, numSlashings)
@@ -213,7 +213,7 @@ func generateDepositsAndExecutionData(
 	return currentDeposits[previousDepsLen:], executionData, nil
 }
 
-func GenerateVoluntaryExits(bState state.BeaconState, k dilithium.DilithiumKey, idx primitives.ValidatorIndex) (*qrysmpb.SignedVoluntaryExit, error) {
+func GenerateVoluntaryExits(bState state.BeaconState, k ml_dsa_87.MLDSA87Key, idx primitives.ValidatorIndex) (*qrysmpb.SignedVoluntaryExit, error) {
 	currentEpoch := time.CurrentEpoch(bState)
 	exit := &qrysmpb.SignedVoluntaryExit{
 		Exit: &qrysmpb.VoluntaryExit{
@@ -231,7 +231,7 @@ func GenerateVoluntaryExits(bState state.BeaconState, k dilithium.DilithiumKey, 
 
 func generateVoluntaryExits(
 	bState state.BeaconState,
-	privs []dilithium.DilithiumKey,
+	privs []ml_dsa_87.MLDSA87Key,
 	numExits uint64,
 ) ([]*qrysmpb.SignedVoluntaryExit, error) {
 	currentEpoch := time.CurrentEpoch(bState)
@@ -276,7 +276,7 @@ func randValIndex(bState state.BeaconState) (primitives.ValidatorIndex, error) {
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateSignedBeaconHeader(h *qrysmpb.SignedBeaconBlockHeader) *qrysmpb.SignedBeaconBlockHeader {
 	if h.Signature == nil {
-		h.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
+		h.Signature = make([]byte, fieldparams.MLDSA87SignatureLength)
 	}
 	h.Header = HydrateBeaconHeader(h.Header)
 	return h
@@ -304,7 +304,7 @@ func HydrateBeaconHeader(h *qrysmpb.BeaconBlockHeader) *qrysmpb.BeaconBlockHeade
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateSignedBeaconBlockCapella(b *qrysmpb.SignedBeaconBlockCapella) *qrysmpb.SignedBeaconBlockCapella {
 	if b.Signature == nil {
-		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
+		b.Signature = make([]byte, fieldparams.MLDSA87SignatureLength)
 	}
 	b.Block = HydrateBeaconBlockCapella(b.Block)
 	return b
@@ -333,7 +333,7 @@ func HydrateBeaconBlockBodyCapella(b *qrysmpb.BeaconBlockBodyCapella) *qrysmpb.B
 		b = &qrysmpb.BeaconBlockBodyCapella{}
 	}
 	if b.RandaoReveal == nil {
-		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)
+		b.RandaoReveal = make([]byte, fieldparams.MLDSA87SignatureLength)
 	}
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)
@@ -386,8 +386,8 @@ func HydrateBeaconBlockBodyCapella(b *qrysmpb.BeaconBlockBodyCapella) *qrysmpb.B
 		b.Attestations = make([]*qrysmpb.Attestation, 0)
 	}
 
-	if b.DilithiumToExecutionChanges == nil {
-		b.DilithiumToExecutionChanges = make([]*qrysmpb.SignedDilithiumToExecutionChange, 0)
+	if b.Mldsa87ToExecutionChanges == nil {
+		b.Mldsa87ToExecutionChanges = make([]*qrysmpb.SignedMLDSA87ToExecutionChange, 0)
 	}
 
 	return b
@@ -397,7 +397,7 @@ func HydrateBeaconBlockBodyCapella(b *qrysmpb.BeaconBlockBodyCapella) *qrysmpb.B
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateSignedBlindedBeaconBlockCapella(b *qrysmpb.SignedBlindedBeaconBlockCapella) *qrysmpb.SignedBlindedBeaconBlockCapella {
 	if b.Signature == nil {
-		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
+		b.Signature = make([]byte, fieldparams.MLDSA87SignatureLength)
 	}
 	b.Block = HydrateBlindedBeaconBlockCapella(b.Block)
 	return b
@@ -426,7 +426,7 @@ func HydrateBlindedBeaconBlockBodyCapella(b *qrysmpb.BlindedBeaconBlockBodyCapel
 		b = &qrysmpb.BlindedBeaconBlockBodyCapella{}
 	}
 	if b.RandaoReveal == nil {
-		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)
+		b.RandaoReveal = make([]byte, fieldparams.MLDSA87SignatureLength)
 	}
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)
@@ -479,8 +479,8 @@ func HydrateBlindedBeaconBlockBodyCapella(b *qrysmpb.BlindedBeaconBlockBodyCapel
 		b.Attestations = make([]*qrysmpb.Attestation, 0)
 	}
 
-	if b.DilithiumToExecutionChanges == nil {
-		b.DilithiumToExecutionChanges = make([]*qrysmpb.SignedDilithiumToExecutionChange, 0)
+	if b.Mldsa87ToExecutionChanges == nil {
+		b.Mldsa87ToExecutionChanges = make([]*qrysmpb.SignedMLDSA87ToExecutionChange, 0)
 	}
 
 	return b
@@ -490,7 +490,7 @@ func HydrateBlindedBeaconBlockBodyCapella(b *qrysmpb.BlindedBeaconBlockBodyCapel
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateV1SignedBlindedBeaconBlockCapella(b *qrlpb.SignedBlindedBeaconBlockCapella) *qrlpb.SignedBlindedBeaconBlockCapella {
 	if b.Signature == nil {
-		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
+		b.Signature = make([]byte, fieldparams.MLDSA87SignatureLength)
 	}
 	b.Message = HydrateV1BlindedBeaconBlockCapella(b.Message)
 	return b
@@ -519,7 +519,7 @@ func HydrateV1BlindedBeaconBlockBodyCapella(b *qrlpb.BlindedBeaconBlockBodyCapel
 		b = &qrlpb.BlindedBeaconBlockBodyCapella{}
 	}
 	if b.RandaoReveal == nil {
-		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)
+		b.RandaoReveal = make([]byte, fieldparams.MLDSA87SignatureLength)
 	}
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, 32)
@@ -557,7 +557,7 @@ func HydrateV1BlindedBeaconBlockBodyCapella(b *qrlpb.BlindedBeaconBlockBodyCapel
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateV1CapellaSignedBeaconBlock(b *qrlpb.SignedBeaconBlockCapella) *qrlpb.SignedBeaconBlockCapella {
 	if b.Signature == nil {
-		b.Signature = make([]byte, fieldparams.DilithiumSignatureLength)
+		b.Signature = make([]byte, fieldparams.MLDSA87SignatureLength)
 	}
 	b.Message = HydrateV1CapellaBeaconBlock(b.Message)
 	return b
@@ -586,7 +586,7 @@ func HydrateV1CapellaBeaconBlockBody(b *qrlpb.BeaconBlockBodyCapella) *qrlpb.Bea
 		b = &qrlpb.BeaconBlockBodyCapella{}
 	}
 	if b.RandaoReveal == nil {
-		b.RandaoReveal = make([]byte, fieldparams.DilithiumSignatureLength)
+		b.RandaoReveal = make([]byte, fieldparams.MLDSA87SignatureLength)
 	}
 	if b.Graffiti == nil {
 		b.Graffiti = make([]byte, fieldparams.RootLength)

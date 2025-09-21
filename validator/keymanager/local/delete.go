@@ -22,7 +22,7 @@ func (km *Keymanager) DeleteKeystores(
 	ctx context.Context, publicKeys [][]byte,
 ) ([]*qrlpbservice.DeletedKeystoreStatus, error) {
 	// Check for duplicate keys and filter them out.
-	trackedPublicKeys := make(map[[field_params.DilithiumPubkeyLength]byte]bool)
+	trackedPublicKeys := make(map[[field_params.MLDSA87PubkeyLength]byte]bool)
 	statuses := make([]*qrlpbservice.DeletedKeystoreStatus, 0, len(publicKeys))
 	deletedKeys := make([][]byte, 0, len(publicKeys))
 	// 1) Copy the in memory keystore

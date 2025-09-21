@@ -410,47 +410,47 @@ func convertWithdrawalsToProto(jsonWithdrawals []*apimiddleware.WithdrawalJson) 
 	return withdrawals, nil
 }
 
-func convertDilithiumToExecutionChangesToProto(jsonSignedDilithiumToExecutionChanges []*apimiddleware.SignedDilithiumToExecutionChangeJson) ([]*qrysmpb.SignedDilithiumToExecutionChange, error) {
-	signedDilithiumToExecutionChanges := make([]*qrysmpb.SignedDilithiumToExecutionChange, len(jsonSignedDilithiumToExecutionChanges))
+func convertMLDSA87ToExecutionChangesToProto(jsonSignedMLDSA87ToExecutionChanges []*apimiddleware.SignedMLDSA87ToExecutionChangeJson) ([]*qrysmpb.SignedMLDSA87ToExecutionChange, error) {
+	signedMLDSA87ToExecutionChanges := make([]*qrysmpb.SignedMLDSA87ToExecutionChange, len(jsonSignedMLDSA87ToExecutionChanges))
 
-	for index, jsonDilithiumToExecutionChange := range jsonSignedDilithiumToExecutionChanges {
-		if jsonDilithiumToExecutionChange == nil {
-			return nil, errors.Errorf("dilithium to execution change at index `%d` is nil", index)
+	for index, jsonMLDSA87ToExecutionChange := range jsonSignedMLDSA87ToExecutionChanges {
+		if jsonMLDSA87ToExecutionChange == nil {
+			return nil, errors.Errorf("ml-dsa-87 to execution change at index `%d` is nil", index)
 		}
 
-		if jsonDilithiumToExecutionChange.Message == nil {
-			return nil, errors.Errorf("dilithium to execution change message at index `%d` is nil", index)
+		if jsonMLDSA87ToExecutionChange.Message == nil {
+			return nil, errors.Errorf("ml-dsa-87 to execution change message at index `%d` is nil", index)
 		}
 
-		validatorIndex, err := strconv.ParseUint(jsonDilithiumToExecutionChange.Message.ValidatorIndex, 10, 64)
+		validatorIndex, err := strconv.ParseUint(jsonMLDSA87ToExecutionChange.Message.ValidatorIndex, 10, 64)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to decode validator index `%s`", jsonDilithiumToExecutionChange.Message.ValidatorIndex)
+			return nil, errors.Wrapf(err, "failed to decode validator index `%s`", jsonMLDSA87ToExecutionChange.Message.ValidatorIndex)
 		}
 
-		fromDilithiumPubkey, err := hexutil.Decode(jsonDilithiumToExecutionChange.Message.FromDilithiumPubkey)
+		fromMLDSA87Pubkey, err := hexutil.Decode(jsonMLDSA87ToExecutionChange.Message.FromMLDSA87Pubkey)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to decode dilithium pubkey `%s`", jsonDilithiumToExecutionChange.Message.FromDilithiumPubkey)
+			return nil, errors.Wrapf(err, "failed to decode ml-dsa-87 pubkey `%s`", jsonMLDSA87ToExecutionChange.Message.FromMLDSA87Pubkey)
 		}
 
-		toExecutionAddress, err := hexutil.Decode(jsonDilithiumToExecutionChange.Message.ToExecutionAddress)
+		toExecutionAddress, err := hexutil.Decode(jsonMLDSA87ToExecutionChange.Message.ToExecutionAddress)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to decode execution address `%s`", jsonDilithiumToExecutionChange.Message.ToExecutionAddress)
+			return nil, errors.Wrapf(err, "failed to decode execution address `%s`", jsonMLDSA87ToExecutionChange.Message.ToExecutionAddress)
 		}
 
-		signature, err := hexutil.Decode(jsonDilithiumToExecutionChange.Signature)
+		signature, err := hexutil.Decode(jsonMLDSA87ToExecutionChange.Signature)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to decode signature `%s`", jsonDilithiumToExecutionChange.Signature)
+			return nil, errors.Wrapf(err, "failed to decode signature `%s`", jsonMLDSA87ToExecutionChange.Signature)
 		}
 
-		signedDilithiumToExecutionChanges[index] = &qrysmpb.SignedDilithiumToExecutionChange{
-			Message: &qrysmpb.DilithiumToExecutionChange{
-				ValidatorIndex:      primitives.ValidatorIndex(validatorIndex),
-				FromDilithiumPubkey: fromDilithiumPubkey,
-				ToExecutionAddress:  toExecutionAddress,
+		signedMLDSA87ToExecutionChanges[index] = &qrysmpb.SignedMLDSA87ToExecutionChange{
+			Message: &qrysmpb.MLDSA87ToExecutionChange{
+				ValidatorIndex:     primitives.ValidatorIndex(validatorIndex),
+				FromMldsa87Pubkey:  fromMLDSA87Pubkey,
+				ToExecutionAddress: toExecutionAddress,
 			},
 			Signature: signature,
 		}
 	}
 
-	return signedDilithiumToExecutionChanges, nil
+	return signedMLDSA87ToExecutionChanges, nil
 }

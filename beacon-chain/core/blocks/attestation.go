@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/proto/qrysm/v1alpha1/attestation"
 	"go.opencensus.io/trace"
@@ -153,10 +153,10 @@ func VerifyIndexedAttestation(ctx context.Context, beaconState state.ReadOnlyBea
 		return err
 	}
 	indices := indexedAtt.AttestingIndices
-	var pubkeys []dilithium.PublicKey
+	var pubkeys []ml_dsa_87.PublicKey
 	for i := 0; i < len(indices); i++ {
 		pubkeyAtIdx := beaconState.PubkeyAtIndex(primitives.ValidatorIndex(indices[i]))
-		pk, err := dilithium.PublicKeyFromBytes(pubkeyAtIdx[:])
+		pk, err := ml_dsa_87.PublicKeyFromBytes(pubkeyAtIdx[:])
 		if err != nil {
 			return errors.Wrap(err, "could not deserialize validator public key")
 		}

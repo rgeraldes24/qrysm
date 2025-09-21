@@ -87,7 +87,7 @@ var _ observer = &requestLogger{}
 // BuilderClient provides a collection of helper methods for calling Builder API endpoints.
 type BuilderClient interface {
 	NodeURL() string
-	GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubkey [field_params.DilithiumPubkeyLength]byte) (SignedBid, error)
+	GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubkey [field_params.MLDSA87PubkeyLength]byte) (SignedBid, error)
 	RegisterValidator(ctx context.Context, svr []*qrysmpb.SignedValidatorRegistrationV1) error
 	SubmitBlindedBlock(ctx context.Context, sb interfaces.ReadOnlySignedBeaconBlock) (interfaces.ExecutionData, error)
 	Status(ctx context.Context) error
@@ -190,7 +190,7 @@ func (c *Client) do(ctx context.Context, method string, path string, body io.Rea
 
 var execHeaderTemplate = template.Must(template.New("").Parse(getExecHeaderPath))
 
-func execHeaderPath(slot primitives.Slot, parentHash [32]byte, pubkey [field_params.DilithiumPubkeyLength]byte) (string, error) {
+func execHeaderPath(slot primitives.Slot, parentHash [32]byte, pubkey [field_params.MLDSA87PubkeyLength]byte) (string, error) {
 	v := struct {
 		Slot       primitives.Slot
 		ParentHash string
@@ -209,7 +209,7 @@ func execHeaderPath(slot primitives.Slot, parentHash [32]byte, pubkey [field_par
 }
 
 // GetHeader is used by a proposing validator to request an execution payload header from the Builder node.
-func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubkey [field_params.DilithiumPubkeyLength]byte) (SignedBid, error) {
+func (c *Client) GetHeader(ctx context.Context, slot primitives.Slot, parentHash [32]byte, pubkey [field_params.MLDSA87PubkeyLength]byte) (SignedBid, error) {
 	path, err := execHeaderPath(slot, parentHash, pubkey)
 	if err != nil {
 		return nil, err

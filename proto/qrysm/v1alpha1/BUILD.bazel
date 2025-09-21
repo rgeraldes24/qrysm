@@ -101,9 +101,9 @@ ssz_gen_marshal(
         "SignedValidatorRegistrationV1",
         "ValidatorRegistrationV1",
         "Withdrawal",
-        "SignedDilithiumToExecutionChange",
-        "DilithiumToExecutionChange",
-        "SignedDilithiumToExecutionChange",
+        "SignedMLDSA87ToExecutionChange",
+        "MLDSA87ToExecutionChange",
+        "SignedMLDSA87ToExecutionChange",
         "BuilderBidCapella",
     ],
 )

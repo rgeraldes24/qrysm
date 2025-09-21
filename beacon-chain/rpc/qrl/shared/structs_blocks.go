@@ -14,17 +14,17 @@ type BeaconBlockCapella struct {
 }
 
 type BeaconBlockBodyCapella struct {
-	RandaoReveal                string                              `json:"randao_reveal" validate:"required"`
-	ExecutionData               *ExecutionData                      `json:"execution_data" validate:"required"`
-	Graffiti                    string                              `json:"graffiti" validate:"required"`
-	ProposerSlashings           []*ProposerSlashing                 `json:"proposer_slashings" validate:"required,dive"`
-	AttesterSlashings           []*AttesterSlashing                 `json:"attester_slashings" validate:"required,dive"`
-	Attestations                []*Attestation                      `json:"attestations" validate:"required,dive"`
-	Deposits                    []*Deposit                          `json:"deposits" validate:"required,dive"`
-	VoluntaryExits              []*SignedVoluntaryExit              `json:"voluntary_exits" validate:"required,dive"`
-	SyncAggregate               *SyncAggregate                      `json:"sync_aggregate" validate:"required"`
-	ExecutionPayload            *ExecutionPayloadCapella            `json:"execution_payload" validate:"required"`
-	DilithiumToExecutionChanges []*SignedDilithiumToExecutionChange `json:"dilithium_to_execution_changes" validate:"required,dive"`
+	RandaoReveal              string                            `json:"randao_reveal" validate:"required"`
+	ExecutionData             *ExecutionData                    `json:"execution_data" validate:"required"`
+	Graffiti                  string                            `json:"graffiti" validate:"required"`
+	ProposerSlashings         []*ProposerSlashing               `json:"proposer_slashings" validate:"required,dive"`
+	AttesterSlashings         []*AttesterSlashing               `json:"attester_slashings" validate:"required,dive"`
+	Attestations              []*Attestation                    `json:"attestations" validate:"required,dive"`
+	Deposits                  []*Deposit                        `json:"deposits" validate:"required,dive"`
+	VoluntaryExits            []*SignedVoluntaryExit            `json:"voluntary_exits" validate:"required,dive"`
+	SyncAggregate             *SyncAggregate                    `json:"sync_aggregate" validate:"required"`
+	ExecutionPayload          *ExecutionPayloadCapella          `json:"execution_payload" validate:"required"`
+	MLDSA87ToExecutionChanges []*SignedMLDSA87ToExecutionChange `json:"ml_dsa_87_to_execution_changes" validate:"required,dive"`
 }
 
 type SignedBlindedBeaconBlockCapella struct {
@@ -41,17 +41,17 @@ type BlindedBeaconBlockCapella struct {
 }
 
 type BlindedBeaconBlockBodyCapella struct {
-	RandaoReveal                string                              `json:"randao_reveal" validate:"required"`
-	ExecutionData               *ExecutionData                      `json:"execution_data" validate:"required"`
-	Graffiti                    string                              `json:"graffiti" validate:"required"`
-	ProposerSlashings           []*ProposerSlashing                 `json:"proposer_slashings" validate:"required,dive"`
-	AttesterSlashings           []*AttesterSlashing                 `json:"attester_slashings" validate:"required,dive"`
-	Attestations                []*Attestation                      `json:"attestations" validate:"required,dive"`
-	Deposits                    []*Deposit                          `json:"deposits" validate:"required,dive"`
-	VoluntaryExits              []*SignedVoluntaryExit              `json:"voluntary_exits" validate:"required,dive"`
-	SyncAggregate               *SyncAggregate                      `json:"sync_aggregate" validate:"required"`
-	ExecutionPayloadHeader      *ExecutionPayloadHeaderCapella      `json:"execution_payload_header" validate:"required"`
-	DilithiumToExecutionChanges []*SignedDilithiumToExecutionChange `json:"dilithium_to_execution_changes" validate:"required,dive"`
+	RandaoReveal              string                            `json:"randao_reveal" validate:"required"`
+	ExecutionData             *ExecutionData                    `json:"execution_data" validate:"required"`
+	Graffiti                  string                            `json:"graffiti" validate:"required"`
+	ProposerSlashings         []*ProposerSlashing               `json:"proposer_slashings" validate:"required,dive"`
+	AttesterSlashings         []*AttesterSlashing               `json:"attester_slashings" validate:"required,dive"`
+	Attestations              []*Attestation                    `json:"attestations" validate:"required,dive"`
+	Deposits                  []*Deposit                        `json:"deposits" validate:"required,dive"`
+	VoluntaryExits            []*SignedVoluntaryExit            `json:"voluntary_exits" validate:"required,dive"`
+	SyncAggregate             *SyncAggregate                    `json:"sync_aggregate" validate:"required"`
+	ExecutionPayloadHeader    *ExecutionPayloadHeaderCapella    `json:"execution_payload_header" validate:"required"`
+	MLDSA87ToExecutionChanges []*SignedMLDSA87ToExecutionChange `json:"ml_dsa_87_to_execution_changes" validate:"required,dive"`
 }
 
 type ExecutionData struct {
@@ -189,13 +189,13 @@ type Withdrawal struct {
 	Amount           string `json:"amount" validate:"required"`
 }
 
-type SignedDilithiumToExecutionChange struct {
-	Message   *DilithiumToExecutionChange `json:"message" validate:"required"`
-	Signature string                      `json:"signature" validate:"required"`
+type SignedMLDSA87ToExecutionChange struct {
+	Message   *MLDSA87ToExecutionChange `json:"message" validate:"required"`
+	Signature string                    `json:"signature" validate:"required"`
 }
 
-type DilithiumToExecutionChange struct {
-	ValidatorIndex      string `json:"validator_index" validate:"required"`
-	FromDilithiumPubkey string `json:"from_dilithium_pubkey" validate:"required"`
-	ToExecutionAddress  string `json:"to_execution_address" validate:"required"`
+type MLDSA87ToExecutionChange struct {
+	ValidatorIndex     string `json:"validator_index" validate:"required"`
+	FromMLDSA87Pubkey  string `json:"from_ml_dsa_87_pubkey" validate:"required"`
+	ToExecutionAddress string `json:"to_execution_address" validate:"required"`
 }

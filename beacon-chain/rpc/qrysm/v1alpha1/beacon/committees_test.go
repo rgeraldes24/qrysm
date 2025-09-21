@@ -216,7 +216,7 @@ func setupActiveValidators(t *testing.T, count int) state.BeaconState {
 	balances := make([]uint64, count)
 	validators := make([]*qrysmpb.Validator, 0, count)
 	for i := 0; i < count; i++ {
-		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
+		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, uint64(i))
 		balances[i] = uint64(i)
 		validators = append(validators, &qrysmpb.Validator{

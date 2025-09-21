@@ -15,7 +15,7 @@ import (
 func Test_slashableAttestationCheck(t *testing.T) {
 	validator, _, validatorKey, finish := setup(t)
 	defer finish()
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	att := &qrysmpb.IndexedAttestation{
 		AttestingIndices: []uint64{1, 2},
@@ -42,7 +42,7 @@ func Test_slashableAttestationCheck_UpdatesLowestSignedEpochs(t *testing.T) {
 	validator, m, validatorKey, finish := setup(t)
 	defer finish()
 	ctx := context.Background()
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	att := &qrysmpb.IndexedAttestation{
 		AttestingIndices: []uint64{1, 2},

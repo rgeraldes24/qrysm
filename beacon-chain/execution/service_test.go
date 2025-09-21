@@ -319,7 +319,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{0}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 4595),
+					Signature:             make([]byte, 4627),
 				},
 			},
 		},
@@ -330,7 +330,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{1}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 4595),
+					Signature:             make([]byte, 4627),
 				},
 			},
 		},
@@ -341,7 +341,7 @@ func TestInitDepositCacheWithFinalization_OK(t *testing.T) {
 				Data: &qrysmpb.Deposit_Data{
 					PublicKey:             bytesutil.PadTo([]byte{2}, 2592),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, 4595),
+					Signature:             make([]byte, 4627),
 				},
 			},
 		},

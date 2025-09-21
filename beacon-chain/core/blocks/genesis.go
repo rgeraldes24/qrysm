@@ -24,7 +24,7 @@ func NewGenesisBlock(stateRoot []byte) *qrysmpb.SignedBeaconBlockCapella {
 			ParentRoot: zeroHash,
 			StateRoot:  bytesutil.PadTo(stateRoot, 32),
 			Body: &qrysmpb.BeaconBlockBodyCapella{
-				RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
+				RandaoReveal: make([]byte, fieldparams.MLDSA87SignatureLength),
 				ExecutionData: &qrysmpb.ExecutionData{
 					DepositRoot: make([]byte, 32),
 					BlockHash:   make([]byte, 32),
@@ -45,7 +45,7 @@ func NewGenesisBlock(stateRoot []byte) *qrysmpb.SignedBeaconBlockCapella {
 				},
 			},
 		},
-		Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
+		Signature: params.BeaconConfig().EmptyMLDSA87Signature[:],
 	}
 	return block
 }
@@ -65,7 +65,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 				ParentRoot: params.BeaconConfig().ZeroHash[:],
 				StateRoot:  root[:],
 				Body: &qrysmpb.BeaconBlockBodyCapella{
-					RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
+					RandaoReveal: make([]byte, fieldparams.MLDSA87SignatureLength),
 					ExecutionData: &qrysmpb.ExecutionData{
 						DepositRoot: make([]byte, 32),
 						BlockHash:   make([]byte, 32),
@@ -89,7 +89,7 @@ func NewGenesisBlockForState(ctx context.Context, st state.BeaconState) (interfa
 					},
 				},
 			},
-			Signature: params.BeaconConfig().EmptyDilithiumSignature[:],
+			Signature: params.BeaconConfig().EmptyMLDSA87Signature[:],
 		})
 	default:
 		return nil, ErrUnrecognizedState

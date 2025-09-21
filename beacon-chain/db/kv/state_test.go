@@ -616,7 +616,7 @@ func TestStore_CleanUpDirtyStates_DontDeleteNonFinalized(t *testing.T) {
 func validators(limit int) []*qrysmpb.Validator {
 	var vals []*qrysmpb.Validator
 	for i := 0; i < limit; i++ {
-		pubKey := make([]byte, field_params.DilithiumPubkeyLength)
+		pubKey := make([]byte, field_params.MLDSA87PubkeyLength)
 		binary.LittleEndian.PutUint64(pubKey, rand.Uint64())
 		val := &qrysmpb.Validator{
 			PublicKey:                  pubKey,

@@ -502,7 +502,8 @@ var blockJson = `
       "type": "0x2",
 	  "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -522,7 +523,8 @@ var blockJson = `
       "accessList": [],
       "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -542,7 +544,8 @@ var blockJson = `
       "accessList": [],
       "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -562,7 +565,8 @@ var blockJson = `
       "accessList": [],
       "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -581,7 +585,8 @@ var blockJson = `
       "type": "0x2",
 	  "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -600,7 +605,8 @@ var blockJson = `
       "type": "0x2",
 	  "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -620,7 +626,8 @@ var blockJson = `
       "accessList": [],
       "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -640,7 +647,8 @@ var blockJson = `
       "accessList": [],
       "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -660,7 +668,8 @@ var blockJson = `
       "accessList": [],
       "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -680,7 +689,8 @@ var blockJson = `
       "accessList": [],
       "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -700,7 +710,8 @@ var blockJson = `
       "accessList": [],
       "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -720,7 +731,8 @@ var blockJson = `
       "accessList": [],
       "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -740,7 +752,8 @@ var blockJson = `
       "accessList": [],
       "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     },
     {
       "blockHash": "0xf5bda634715a9d8af2693b600a725a0db285f0267f25b7f60f5b9c502691aef8",
@@ -760,7 +773,8 @@ var blockJson = `
       "accessList": [],
       "chainId": "0x1",
       "publicKey": "",
-      "signature": ""
+      "signature": "",
+      "descriptor": ""
     }
   ],
   "transactionsRoot": "0x46e27176677a4b37c1fa9bae97ffb48b86a316f9e6568b3320e10dd6954b5d1a",

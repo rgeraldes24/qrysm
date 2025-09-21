@@ -106,11 +106,11 @@ func TestValidateAggregateAndProof_NoBlock(t *testing.T) {
 	})
 
 	aggregateAndProof := &qrysmpb.AggregateAttestationAndProof{
-		SelectionProof:  bytesutil.PadTo([]byte{'A'}, field_params.DilithiumSignatureLength),
+		SelectionProof:  bytesutil.PadTo([]byte{'A'}, field_params.MLDSA87SignatureLength),
 		Aggregate:       att,
 		AggregatorIndex: 0,
 	}
-	signedAggregateAndProof := &qrysmpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, field_params.DilithiumSignatureLength)}
+	signedAggregateAndProof := &qrysmpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, field_params.MLDSA87SignatureLength)}
 
 	c := lruwrpr.New(10)
 	r := &Service{
@@ -174,9 +174,9 @@ func TestValidateAggregateAndProof_NotWithinSlotRange(t *testing.T) {
 
 	aggregateAndProof := &qrysmpb.AggregateAttestationAndProof{
 		Aggregate:      att,
-		SelectionProof: make([]byte, field_params.DilithiumSignatureLength),
+		SelectionProof: make([]byte, field_params.MLDSA87SignatureLength),
 	}
-	signedAggregateAndProof := &qrysmpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, field_params.DilithiumSignatureLength)}
+	signedAggregateAndProof := &qrysmpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, field_params.MLDSA87SignatureLength)}
 
 	require.NoError(t, beaconState.SetGenesisTime(uint64(time.Now().Unix())))
 
@@ -258,9 +258,9 @@ func TestValidateAggregateAndProof_ExistedInPool(t *testing.T) {
 
 	aggregateAndProof := &qrysmpb.AggregateAttestationAndProof{
 		Aggregate:      att,
-		SelectionProof: make([]byte, field_params.DilithiumSignatureLength),
+		SelectionProof: make([]byte, field_params.MLDSA87SignatureLength),
 	}
-	signedAggregateAndProof := &qrysmpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, field_params.DilithiumSignatureLength)}
+	signedAggregateAndProof := &qrysmpb.SignedAggregateAttestationAndProof{Message: aggregateAndProof, Signature: make([]byte, field_params.MLDSA87SignatureLength)}
 
 	require.NoError(t, beaconState.SetGenesisTime(uint64(time.Now().Unix())))
 	r := &Service{

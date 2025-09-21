@@ -22,7 +22,7 @@ func Test_Proposer_Setting_Cloning(t *testing.T) {
 	require.NoError(t, err)
 
 	settings := &ProposerSettings{
-		ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*ProposerOption{
+		ProposeConfig: map[[field_params.MLDSA87PubkeyLength]byte]*ProposerOption{
 			bytesutil.ToBytes2592(key1): {
 				FeeRecipientConfig: &FeeRecipientConfig{
 					FeeRecipient: feeRecipient0,
@@ -113,7 +113,7 @@ func TestProposerSettings_ShouldBeSaved(t *testing.T) {
 	require.NoError(t, err)
 
 	type fields struct {
-		ProposeConfig map[[field_params.DilithiumPubkeyLength]byte]*ProposerOption
+		ProposeConfig map[[field_params.MLDSA87PubkeyLength]byte]*ProposerOption
 		DefaultConfig *ProposerOption
 	}
 	tests := []struct {
@@ -124,7 +124,7 @@ func TestProposerSettings_ShouldBeSaved(t *testing.T) {
 		{
 			name: "Should be saved, proposeconfig populated and no default config",
 			fields: fields{
-				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*ProposerOption{
+				ProposeConfig: map[[field_params.MLDSA87PubkeyLength]byte]*ProposerOption{
 					bytesutil.ToBytes2592(key1): {
 						FeeRecipientConfig: &FeeRecipientConfig{
 							FeeRecipient: feeRecipient0,
@@ -160,7 +160,7 @@ func TestProposerSettings_ShouldBeSaved(t *testing.T) {
 		{
 			name: "Should be saved, all populated",
 			fields: fields{
-				ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*ProposerOption{
+				ProposeConfig: map[[field_params.MLDSA87PubkeyLength]byte]*ProposerOption{
 					bytesutil.ToBytes2592(key1): {
 						FeeRecipientConfig: &FeeRecipientConfig{
 							FeeRecipient: feeRecipient0,

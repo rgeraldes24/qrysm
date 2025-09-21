@@ -105,7 +105,7 @@ func marshallBeaconBlockCapella(block *qrysmpb.SignedBeaconBlockCapella) ([]byte
 					Transactions:  jsonifyTransactions(block.Block.Body.ExecutionPayload.Transactions),
 					Withdrawals:   jsonifyWithdrawals(block.Block.Body.ExecutionPayload.Withdrawals),
 				},
-				DilithiumToExecutionChanges: jsonifyDilithiumToExecutionChanges(block.Block.Body.DilithiumToExecutionChanges),
+				MLDSA87ToExecutionChanges: jsonifyMLDSA87ToExecutionChanges(block.Block.Body.Mldsa87ToExecutionChanges),
 			},
 		},
 	}
@@ -148,7 +148,7 @@ func marshallBeaconBlockBlindedCapella(block *qrysmpb.SignedBlindedBeaconBlockCa
 					TransactionsRoot: hexutil.Encode(block.Block.Body.ExecutionPayloadHeader.TransactionsRoot),
 					WithdrawalsRoot:  hexutil.Encode(block.Block.Body.ExecutionPayloadHeader.WithdrawalsRoot),
 				},
-				DilithiumToExecutionChanges: jsonifyDilithiumToExecutionChanges(block.Block.Body.DilithiumToExecutionChanges),
+				MLDSA87ToExecutionChanges: jsonifyMLDSA87ToExecutionChanges(block.Block.Body.Mldsa87ToExecutionChanges),
 			},
 		},
 	}

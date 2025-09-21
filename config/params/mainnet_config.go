@@ -71,7 +71,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EffectiveBalanceIncrement: 1 * 1e9,
 
 	// Initial value constants.
-	DilithiumWithdrawalPrefixByte:  byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
+	MLDSA87WithdrawalPrefixByte:    byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
 	QRLAddressWithdrawalPrefixByte: byte(1), // TODO (cyyber): Change it to 0
 	ZeroHash:                       [32]byte{},
 
@@ -131,10 +131,10 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	MaxDeposits:                      16,
 	MaxVoluntaryExits:                16,
 	MaxWithdrawalsPerPayload:         16,
-	MaxDilithiumToExecutionChanges:   16,
+	MaxMLDSA87ToExecutionChanges:     16,
 	MaxValidatorsPerWithdrawalsSweep: 16384,
 
-	// Dilithium domain values.
+	// ML-DSA-87 domain values.
 	DomainBeaconProposer:              bytesutil.Uint32ToBytes4(0x00000000),
 	DomainBeaconAttester:              bytesutil.Uint32ToBytes4(0x01000000),
 	DomainRandao:                      bytesutil.Uint32ToBytes4(0x02000000),
@@ -147,7 +147,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	DomainContributionAndProof:        bytesutil.Uint32ToBytes4(0x09000000),
 	DomainApplicationMask:             bytesutil.Uint32ToBytes4(0x00000001),
 	DomainApplicationBuilder:          bytesutil.Uint32ToBytes4(0x00000001),
-	DomainDilithiumToExecutionChange:  bytesutil.Uint32ToBytes4(0x0A000000),
+	DomainMLDSA87ToExecutionChange:    bytesutil.Uint32ToBytes4(0x0A000000),
 
 	// Qrysm constants.
 	ShorPerQuanta:                1000000000,
@@ -155,7 +155,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	WithdrawalPrivkeyFileName:    "/shardwithdrawalkey",
 	ValidatorPrivkeyFileName:     "/validatorprivatekey",
 	RPCSyncCheck:                 1,
-	EmptyDilithiumSignature:      [fieldparams.DilithiumSignatureLength]byte{},
+	EmptyMLDSA87Signature:        [fieldparams.MLDSA87SignatureLength]byte{},
 	DefaultPageSize:              250,
 	MaxPeersToSync:               15,
 	SlotsPerArchivedPoint:        2048,

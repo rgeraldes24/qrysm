@@ -14,7 +14,7 @@ go_library(
         "//config/fieldparams:go_default_library",
         "//encoding/bytesutil:go_default_library",
         "@com_github_google_uuid//:go_default_library",
-        "@com_github_theqrl_go_qrllib//dilithium:go_default_library",
+        "@com_github_theqrl_go_qrllib//wallet/ml_dsa_87:go_default_library",
         "@org_golang_x_crypto//argon2:go_default_library",
     ],
 )

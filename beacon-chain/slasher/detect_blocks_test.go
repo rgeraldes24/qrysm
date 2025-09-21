@@ -16,7 +16,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
@@ -35,9 +35,9 @@ func Test_processQueuedBlocks_DetectsDoubleProposals(t *testing.T) {
 	// Initialize validators in the state.
 	numVals := params.BeaconConfig().MinGenesisActiveValidatorCount
 	validators := make([]*qrysmpb.Validator, numVals)
-	privKeys := make([]dilithium.DilithiumKey, numVals)
+	privKeys := make([]ml_dsa_87.MLDSA87Key, numVals)
 	for i := range validators {
-		privKey, err := dilithium.RandKey()
+		privKey, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		privKeys[i] = privKey
 		validators[i] = &qrysmpb.Validator{
@@ -163,7 +163,7 @@ func createProposalWrapper(t *testing.T, slot primitives.Slot, proposerIndex pri
 	}
 	signRoot, err := header.HashTreeRoot()
 	require.NoError(t, err)
-	fakeSig := make([]byte, field_params.DilithiumSignatureLength)
+	fakeSig := make([]byte, field_params.MLDSA87SignatureLength)
 	copy(fakeSig, "hello")
 	return &slashertypes.SignedBlockHeaderWrapper{
 		SignedBeaconBlockHeader: &qrysmpb.SignedBeaconBlockHeader{

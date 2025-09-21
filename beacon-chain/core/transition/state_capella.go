@@ -192,7 +192,7 @@ func OptimizedGenesisBeaconStateCapella(genesisTime uint64, preState state.Beaco
 	}
 
 	bodyRoot, err := (&qrysmpb.BeaconBlockBodyCapella{
-		RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
+		RandaoReveal: make([]byte, fieldparams.MLDSA87SignatureLength),
 		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),

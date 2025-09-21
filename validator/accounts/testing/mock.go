@@ -107,7 +107,7 @@ func (_ *MockValidator) WaitForSync(_ context.Context) error {
 	panic("implement me")
 }
 
-func (_ *MockValidator) WaitForActivation(_ context.Context, _ chan [][field_params.DilithiumPubkeyLength]byte) error {
+func (_ *MockValidator) WaitForActivation(_ context.Context, _ chan [][field_params.MLDSA87PubkeyLength]byte) error {
 	panic("implement me")
 }
 
@@ -131,27 +131,27 @@ func (_ *MockValidator) UpdateDuties(_ context.Context, _ primitives.Slot) error
 	panic("implement me")
 }
 
-func (_ *MockValidator) RolesAt(_ context.Context, _ primitives.Slot) (map[[field_params.DilithiumPubkeyLength]byte][]iface2.ValidatorRole, error) {
+func (_ *MockValidator) RolesAt(_ context.Context, _ primitives.Slot) (map[[field_params.MLDSA87PubkeyLength]byte][]iface2.ValidatorRole, error) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) SubmitAttestation(_ context.Context, _ primitives.Slot, _ [field_params.DilithiumPubkeyLength]byte) {
+func (_ *MockValidator) SubmitAttestation(_ context.Context, _ primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) ProposeBlock(_ context.Context, _ primitives.Slot, _ [field_params.DilithiumPubkeyLength]byte) {
+func (_ *MockValidator) ProposeBlock(_ context.Context, _ primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) SubmitAggregateAndProof(_ context.Context, _ primitives.Slot, _ [field_params.DilithiumPubkeyLength]byte) {
+func (_ *MockValidator) SubmitAggregateAndProof(_ context.Context, _ primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) SubmitSyncCommitteeMessage(_ context.Context, _ primitives.Slot, _ [field_params.DilithiumPubkeyLength]byte) {
+func (_ *MockValidator) SubmitSyncCommitteeMessage(_ context.Context, _ primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) SubmitSignedContributionAndProof(_ context.Context, _ primitives.Slot, _ [field_params.DilithiumPubkeyLength]byte) {
+func (_ *MockValidator) SubmitSignedContributionAndProof(_ context.Context, _ primitives.Slot, _ [field_params.MLDSA87PubkeyLength]byte) {
 	panic("implement me")
 }
 
@@ -175,7 +175,7 @@ func (_ *MockValidator) ReceiveBlocks(_ context.Context, _ chan<- error) {
 	panic("implement me")
 }
 
-func (_ *MockValidator) HandleKeyReload(_ context.Context, _ [][field_params.DilithiumPubkeyLength]byte) (bool, error) {
+func (_ *MockValidator) HandleKeyReload(_ context.Context, _ [][field_params.MLDSA87PubkeyLength]byte) (bool, error) {
 	panic("implement me")
 }
 
