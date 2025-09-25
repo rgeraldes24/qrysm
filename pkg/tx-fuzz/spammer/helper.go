@@ -7,7 +7,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/core/types"
@@ -16,7 +16,7 @@ import (
 
 const batchSize = 50
 
-func SendTx(d *dilithium.Dilithium, backend *qrlclient.Client, to common.Address, value *big.Int) (*types.Transaction, error) {
+func SendTx(d *ml_dsa_87.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int) (*types.Transaction, error) {
 	sender := d.GetAddress()
 	nonce, err := backend.NonceAt(context.Background(), sender, nil)
 	if err != nil {
@@ -25,7 +25,7 @@ func SendTx(d *dilithium.Dilithium, backend *qrlclient.Client, to common.Address
 	return sendTxWithNonce(d, backend, to, value, nonce)
 }
 
-func sendTxWithNonce(d *dilithium.Dilithium, backend *qrlclient.Client, to common.Address, value *big.Int, nonce uint64) (*types.Transaction, error) {
+func sendTxWithNonce(d *ml_dsa_87.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int, nonce uint64) (*types.Transaction, error) {
 	chainid, err := backend.ChainID(context.Background())
 	if err != nil {
 		return nil, err
@@ -45,8 +45,8 @@ func sendTxWithNonce(d *dilithium.Dilithium, backend *qrlclient.Client, to commo
 	return signedTx, backend.SendTransaction(context.Background(), signedTx)
 }
 
-func sendRecurringTx(d *dilithium.Dilithium, backend *qrlclient.Client, to common.Address, value *big.Int, numTxs uint64) (*types.Transaction, error) {
-	sender := d.GetAddress()
+func sendRecurringTx(w *ml_dsa_87.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int, numTxs uint64) (*types.Transaction, error) {
+	sender := w.GetAddress()
 	nonce, err := backend.NonceAt(context.Background(), sender, nil)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func sendRecurringTx(d *dilithium.Dilithium, backend *qrlclient.Client, to commo
 		tx *types.Transaction
 	)
 	for i := 0; i < int(numTxs); i++ {
-		tx, err = sendTxWithNonce(d, backend, to, value, nonce+uint64(i))
+		tx, err = sendTxWithNonce(w, backend, to, value, nonce+uint64(i))
 	}
 	return tx, err
 }
@@ -72,10 +72,10 @@ func Unstuck(config *Config) error {
 	return nil
 }
 
-func tryUnstuck(config *Config, d *dilithium.Dilithium) error {
+func tryUnstuck(config *Config, w *ml_dsa_87.Wallet) error {
 	var (
 		client = qrlclient.NewClient(config.backend)
-		addr   = d.GetAddress()
+		addr   = w.GetAddress()
 	)
 	for i := 0; i < 100; i++ {
 		noTx, err := isStuck(config, addr)
@@ -91,7 +91,7 @@ func tryUnstuck(config *Config, d *dilithium.Dilithium) error {
 			noTx = batchSize
 		}
 		fmt.Println("Sending transaction to unstuck account")
-		tx, err := sendRecurringTx(d, client, addr, big.NewInt(1), noTx)
+		tx, err := sendRecurringTx(w, client, addr, big.NewInt(1), noTx)
 		if err != nil {
 			return err
 		}

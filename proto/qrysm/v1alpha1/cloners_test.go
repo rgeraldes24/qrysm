@@ -347,12 +347,12 @@ func TestCopyWithdrawal(t *testing.T) {
 	assert.NotEmpty(t, got, "Copied withdrawal has empty fields")
 }
 
-func TestCopyDilithiumToExecutionChanges(t *testing.T) {
-	changes := genDilithiumToExecutionChanges(10)
+func TestCopyMLDSA87ToExecutionChanges(t *testing.T) {
+	changes := genMLDSA87ToExecutionChanges(10)
 
-	got := v1alpha1.CopyDilithiumToExecutionChanges(changes)
+	got := v1alpha1.CopyMLDSA87ToExecutionChanges(changes)
 	if !reflect.DeepEqual(got, changes) {
-		t.Errorf("TestCopyDilithiumToExecutionChanges() = %v, want %v", got, changes)
+		t.Errorf("TestCopyMLDSA87ToExecutionChanges() = %v, want %v", got, changes)
 	}
 }
 
@@ -372,7 +372,7 @@ func genAttestation() *v1alpha1.Attestation {
 	return &v1alpha1.Attestation{
 		AggregationBits: bytes(32),
 		Data:            genAttData(),
-		Signatures:      [][]byte{bytes(4595)},
+		Signatures:      [][]byte{bytes(4627)},
 	}
 }
 
@@ -444,7 +444,7 @@ func genIndexedAttestation() *v1alpha1.IndexedAttestation {
 	return &v1alpha1.IndexedAttestation{
 		AttestingIndices: []uint64{1, 2, 3},
 		Data:             genAttData(),
-		Signatures:       [][]byte{bytes(4595)},
+		Signatures:       [][]byte{bytes(4627)},
 	}
 }
 
@@ -538,30 +538,30 @@ func genSyncCommitteeContribution() *v1alpha1.SyncCommitteeContribution {
 		BlockRoot:         bytes(32),
 		SubcommitteeIndex: 4444,
 		AggregationBits:   bytes(32),
-		Signatures:        [][]byte{bytes(4595), bytes(4595)},
+		Signatures:        [][]byte{bytes(4627), bytes(4627)},
 	}
 }
 
 func genSyncAggregate() *v1alpha1.SyncAggregate {
 	return &v1alpha1.SyncAggregate{
 		SyncCommitteeBits:       bytes(32),
-		SyncCommitteeSignatures: [][]byte{bytes(4595)},
+		SyncCommitteeSignatures: [][]byte{bytes(4627)},
 	}
 }
 
 func genBeaconBlockBodyCapella() *v1alpha1.BeaconBlockBodyCapella {
 	return &v1alpha1.BeaconBlockBodyCapella{
-		RandaoReveal:                bytes(4595),
-		ExecutionData:               genExecutionData(),
-		Graffiti:                    bytes(32),
-		ProposerSlashings:           genProposerSlashings(5),
-		AttesterSlashings:           genAttesterSlashings(5),
-		Attestations:                genAttestations(10),
-		Deposits:                    genDeposits(5),
-		VoluntaryExits:              genSignedVoluntaryExits(12),
-		SyncAggregate:               genSyncAggregate(),
-		ExecutionPayload:            genPayloadCapella(),
-		DilithiumToExecutionChanges: genDilithiumToExecutionChanges(10),
+		RandaoReveal:              bytes(4627),
+		ExecutionData:             genExecutionData(),
+		Graffiti:                  bytes(32),
+		ProposerSlashings:         genProposerSlashings(5),
+		AttesterSlashings:         genAttesterSlashings(5),
+		Attestations:              genAttestations(10),
+		Deposits:                  genDeposits(5),
+		VoluntaryExits:            genSignedVoluntaryExits(12),
+		SyncAggregate:             genSyncAggregate(),
+		ExecutionPayload:          genPayloadCapella(),
+		Mldsa87ToExecutionChanges: genMLDSA87ToExecutionChanges(10),
 	}
 }
 
@@ -578,23 +578,23 @@ func genBeaconBlockCapella() *v1alpha1.BeaconBlockCapella {
 func genSignedBeaconBlockCapella() *v1alpha1.SignedBeaconBlockCapella {
 	return &v1alpha1.SignedBeaconBlockCapella{
 		Block:     genBeaconBlockCapella(),
-		Signature: bytes(4595),
+		Signature: bytes(4627),
 	}
 }
 
 func genBlindedBeaconBlockBodyCapella() *v1alpha1.BlindedBeaconBlockBodyCapella {
 	return &v1alpha1.BlindedBeaconBlockBodyCapella{
-		RandaoReveal:                bytes(4595),
-		ExecutionData:               genExecutionData(),
-		Graffiti:                    bytes(32),
-		ProposerSlashings:           genProposerSlashings(5),
-		AttesterSlashings:           genAttesterSlashings(5),
-		Attestations:                genAttestations(10),
-		Deposits:                    genDeposits(5),
-		VoluntaryExits:              genSignedVoluntaryExits(12),
-		SyncAggregate:               genSyncAggregate(),
-		ExecutionPayloadHeader:      genPayloadHeaderCapella(),
-		DilithiumToExecutionChanges: genDilithiumToExecutionChanges(10),
+		RandaoReveal:              bytes(4627),
+		ExecutionData:             genExecutionData(),
+		Graffiti:                  bytes(32),
+		ProposerSlashings:         genProposerSlashings(5),
+		AttesterSlashings:         genAttesterSlashings(5),
+		Attestations:              genAttestations(10),
+		Deposits:                  genDeposits(5),
+		VoluntaryExits:            genSignedVoluntaryExits(12),
+		SyncAggregate:             genSyncAggregate(),
+		ExecutionPayloadHeader:    genPayloadHeaderCapella(),
+		Mldsa87ToExecutionChanges: genMLDSA87ToExecutionChanges(10),
 	}
 }
 
@@ -694,21 +694,21 @@ func genWithdrawal() *enginev1.Withdrawal {
 	}
 }
 
-func genDilithiumToExecutionChanges(num int) []*v1alpha1.SignedDilithiumToExecutionChange {
-	changes := make([]*v1alpha1.SignedDilithiumToExecutionChange, num)
+func genMLDSA87ToExecutionChanges(num int) []*v1alpha1.SignedMLDSA87ToExecutionChange {
+	changes := make([]*v1alpha1.SignedMLDSA87ToExecutionChange, num)
 	for i := 0; i < num; i++ {
-		changes[i] = genDilithiumToExecutionChange()
+		changes[i] = genMLDSA87ToExecutionChange()
 	}
 	return changes
 }
 
-func genDilithiumToExecutionChange() *v1alpha1.SignedDilithiumToExecutionChange {
-	return &v1alpha1.SignedDilithiumToExecutionChange{
-		Message: &v1alpha1.DilithiumToExecutionChange{
-			ValidatorIndex:      123456,
-			FromDilithiumPubkey: bytes(2592),
-			ToExecutionAddress:  bytes(20),
+func genMLDSA87ToExecutionChange() *v1alpha1.SignedMLDSA87ToExecutionChange {
+	return &v1alpha1.SignedMLDSA87ToExecutionChange{
+		Message: &v1alpha1.MLDSA87ToExecutionChange{
+			ValidatorIndex:     123456,
+			FromMldsa87Pubkey:  bytes(2592),
+			ToExecutionAddress: bytes(20),
 		},
-		Signature: bytes(4595),
+		Signature: bytes(4627),
 	}
 }

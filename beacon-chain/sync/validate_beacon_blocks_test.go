@@ -31,7 +31,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -490,7 +490,7 @@ func TestValidateBeaconBlockPubSub_Syncing(t *testing.T) {
 	ctx := context.Background()
 	b := []byte("sk")
 	b48 := bytesutil.ToBytes48(b)
-	sk, err := dilithium.SecretKeyFromSeed(b48[:])
+	sk, err := ml_dsa_87.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
 	msg := util.NewBeaconBlockCapella()
 	msg.Block.ParentRoot = util.Random32Bytes(t)
@@ -599,7 +599,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromFuture(t *testing.T) {
 	ctx := context.Background()
 	b := []byte("sk")
 	b48 := bytesutil.ToBytes48(b)
-	sk, err := dilithium.SecretKeyFromSeed(b48[:])
+	sk, err := ml_dsa_87.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
 	msg := util.NewBeaconBlockCapella()
 	msg.Block.Slot = 10
@@ -647,7 +647,7 @@ func TestValidateBeaconBlockPubSub_RejectBlocksFromThePast(t *testing.T) {
 	b48 := bytesutil.ToBytes48(b)
 	p := p2ptest.NewTestP2P(t)
 	ctx := context.Background()
-	sk, err := dilithium.SecretKeyFromSeed(b48[:])
+	sk, err := ml_dsa_87.SecretKeyFromSeed(b48[:])
 	require.NoError(t, err)
 	msg := util.NewBeaconBlockCapella()
 	msg.Block.ParentRoot = util.Random32Bytes(t)

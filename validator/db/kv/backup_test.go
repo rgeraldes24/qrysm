@@ -41,7 +41,7 @@ func TestStore_Backup(t *testing.T) {
 }
 
 func TestStore_NestedBackup(t *testing.T) {
-	keys := [][field_params.DilithiumPubkeyLength]byte{{'A'}, {'B'}}
+	keys := [][field_params.MLDSA87PubkeyLength]byte{{'A'}, {'B'}}
 	db := setupDB(t, keys)
 	ctx := context.Background()
 	root := [32]byte{1}

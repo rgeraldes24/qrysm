@@ -157,8 +157,8 @@ func (vs *Server) BuildBlockParallel(ctx context.Context, sBlk interfaces.Signed
 		// Set sync aggregate.
 		vs.setSyncAggregate(ctx, sBlk)
 
-		// Set dilithium to execution change.
-		vs.setDilithiumToExecData(sBlk, head)
+		// Set ml-dsa-87 to execution change.
+		vs.setMLDSA87ToExecData(sBlk, head)
 	}()
 
 	localPayload, overrideBuilder, err := vs.getLocalPayload(ctx, sBlk.Block(), head)

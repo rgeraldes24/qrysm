@@ -16,9 +16,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	"go.opencensus.io/trace"
@@ -37,8 +36,8 @@ type SignatureResponse struct {
 
 // HttpSignerClient defines the interface for interacting with a remote web3signer.
 type HttpSignerClient interface {
-	Sign(ctx context.Context, pubKey string, request SignRequestJson) (dilithium.Signature, error)
-	GetPublicKeys(ctx context.Context, url string) ([][field_params.DilithiumPubkeyLength]byte, error)
+	Sign(ctx context.Context, pubKey string, request SignRequestJson) (ml_dsa_87.Signature, error)
+	GetPublicKeys(ctx context.Context, url string) ([][field_params.MLDSA87PubkeyLength]byte, error)
 }
 
 // ApiClient a wrapper object around web3signer APIs. Please refer to the docs from Consensys' web3signer project.
@@ -63,7 +62,7 @@ func NewApiClient(baseEndpoint string) (*ApiClient, error) {
 }
 
 // Sign is a wrapper method around the web3signer sign api.
-func (client *ApiClient) Sign(ctx context.Context, pubKey string, request SignRequestJson) (dilithium.Signature, error) {
+func (client *ApiClient) Sign(ctx context.Context, pubKey string, request SignRequestJson) (ml_dsa_87.Signature, error) {
 	requestPath := qrlApiNamespace + pubKey
 	resp, err := client.doRequest(ctx, http.MethodPost, client.BaseURL.String()+requestPath, bytes.NewBuffer(request))
 	if err != nil {
@@ -81,14 +80,14 @@ func (client *ApiClient) Sign(ctx context.Context, pubKey string, request SignRe
 		if err := unmarshalResponse(resp.Body, &sigResp); err != nil {
 			return nil, err
 		}
-		return dilithium.SignatureFromBytes(sigResp.Signature)
+		return ml_dsa_87.SignatureFromBytes(sigResp.Signature)
 	} else {
 		return unmarshalSignatureResponse(resp.Body)
 	}
 }
 
 // GetPublicKeys is a wrapper method around the web3signer publickeys api (this may be removed in the future or moved to another location due to its usage).
-func (client *ApiClient) GetPublicKeys(ctx context.Context, url string) ([][field_params.DilithiumPubkeyLength]byte, error) {
+func (client *ApiClient) GetPublicKeys(ctx context.Context, url string) ([][field_params.MLDSA87PubkeyLength]byte, error) {
 	resp, err := client.doRequest(ctx, http.MethodGet, url, nil // no body needed on get request )
 	if err != nil {
 		return nil, err
@@ -97,7 +96,7 @@ func (client *ApiClient) GetPublicKeys(ctx context.Context, url string) ([][fiel
 	if err := unmarshalResponse(resp.Body, &publicKeys); err != nil {
 		return nil, err
 	}
-	decodedKeys := make([][field_params.DilithiumPubkeyLength]byte, len(publicKeys))
+	decodedKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(publicKeys))
 	var errorKeyPositions string
 	for i, value := range publicKeys {
 		decodedKey, err := hexutil.Decode(value)
@@ -203,7 +202,7 @@ func unmarshalResponse(responseBody io.ReadCloser, unmarshalledResponseObject in
 	return nil
 }
 
-func unmarshalSignatureResponse(responseBody io.ReadCloser) (dilithium.Signature, error) {
+func unmarshalSignatureResponse(responseBody io.ReadCloser) (ml_dsa_87.Signature, error) {
 	defer closeBody(responseBody)
 	body, err := io.ReadAll(responseBody)
 	if err != nil {
@@ -213,7 +212,7 @@ func unmarshalSignatureResponse(responseBody io.ReadCloser) (dilithium.Signature
 	if err != nil {
 		return nil, err
 	}
-	return dilithium.SignatureFromBytes(sigBytes)
+	return ml_dsa_87.SignatureFromBytes(sigBytes)
 }
 
 // closeBody a utility method to wrap an error for closing

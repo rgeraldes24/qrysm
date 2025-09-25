@@ -57,7 +57,7 @@ func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateCapella 
 	require.NoError(tb, err, "Could not generate genesis beacon state")
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [field_params.DilithiumPubkeyLength]byte
+		var someKey [field_params.MLDSA87PubkeyLength]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		genesisState.Validators = append(genesisState.Validators, &qrysmpb.Validator{
@@ -90,7 +90,7 @@ func setupGenesisState(tb testing.TB, count uint64) *qrysmpb.BeaconStateCapella 
 func BenchmarkCloneValidators_Proto(b *testing.B) {
 	b.StopTimer()
 	validators := make([]*qrysmpb.Validator, 16384)
-	somePubKey := [field_params.DilithiumPubkeyLength]byte{1, 2, 3}
+	somePubKey := [field_params.MLDSA87PubkeyLength]byte{1, 2, 3}
 	someRoot := [32]byte{3, 4, 5}
 	for i := 0; i < len(validators); i++ {
 		validators[i] = &qrysmpb.Validator{
@@ -113,7 +113,7 @@ func BenchmarkCloneValidators_Proto(b *testing.B) {
 func BenchmarkCloneValidators_Manual(b *testing.B) {
 	b.StopTimer()
 	validators := make([]*qrysmpb.Validator, 16384)
-	somePubKey := [field_params.DilithiumPubkeyLength]byte{1, 2, 3}
+	somePubKey := [field_params.MLDSA87PubkeyLength]byte{1, 2, 3}
 	someRoot := [32]byte{3, 4, 5}
 	for i := 0; i < len(validators); i++ {
 		validators[i] = &qrysmpb.Validator{

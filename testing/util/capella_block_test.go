@@ -11,9 +11,9 @@ import (
 	"github.com/theQRL/qrysm/testing/require"
 )
 
-func TestGenerateDilithiumToExecutionChange(t *testing.T) {
+func TestGenerateMLDSA87ToExecutionChange(t *testing.T) {
 	st, keys := DeterministicGenesisStateCapella(t, 64)
-	change, err := GenerateDilithiumToExecutionChange(st, keys[0], 0)
+	change, err := GenerateMLDSA87ToExecutionChange(st, keys[0], 0)
 	require.NoError(t, err)
 
 	message := change.Message
@@ -21,14 +21,14 @@ func TestGenerateDilithiumToExecutionChange(t *testing.T) {
 	require.NoError(t, err)
 
 	cred := val.WithdrawalCredentials
-	require.DeepEqual(t, cred[0], params.BeaconConfig().DilithiumWithdrawalPrefixByte)
+	require.DeepEqual(t, cred[0], params.BeaconConfig().MLDSA87WithdrawalPrefixByte)
 
-	fromPubkey := message.FromDilithiumPubkey
+	fromPubkey := message.FromMldsa87Pubkey
 	hashFn := ssz.NewHasherFunc(hash.CustomSHA256Hasher())
 	digest := hashFn.Hash(fromPubkey)
 	require.DeepEqual(t, digest[1:], digest[1:])
 
-	domain, err := signing.Domain(st.Fork(), time.CurrentEpoch(st), params.BeaconConfig().DomainDilithiumToExecutionChange, st.GenesisValidatorsRoot())
+	domain, err := signing.Domain(st.Fork(), time.CurrentEpoch(st), params.BeaconConfig().DomainMLDSA87ToExecutionChange, st.GenesisValidatorsRoot())
 	require.NoError(t, err)
 
 	require.NoError(t, signing.VerifySigningRoot(message, fromPubkey, change.Signature, domain))

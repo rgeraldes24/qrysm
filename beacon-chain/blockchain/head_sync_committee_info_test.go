@@ -51,7 +51,7 @@ func TestService_headCurrentSyncCommitteeIndices(t *testing.T) {
 	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
 	var pubKeys [][]byte
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
-		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, field_params.DilithiumPubkeyLength))
+		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, field_params.MLDSA87PubkeyLength))
 	}
 	syncCommittee := &qrysmpb.SyncCommittee{
 		Pubkeys: pubKeys,
@@ -78,7 +78,7 @@ func TestService_headNextSyncCommitteeIndices(t *testing.T) {
 	s, _ := util.DeterministicGenesisStateCapella(t, params.BeaconConfig().SyncCommitteeSize)
 	var pubKeys [][]byte
 	for i := uint64(0); i < params.BeaconConfig().SyncCommitteeSize; i++ {
-		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, field_params.DilithiumPubkeyLength))
+		pubKeys = append(pubKeys, bytesutil.PadTo([]byte{}, field_params.MLDSA87PubkeyLength))
 	}
 	syncCommittee := &qrysmpb.SyncCommittee{
 		Pubkeys: pubKeys,

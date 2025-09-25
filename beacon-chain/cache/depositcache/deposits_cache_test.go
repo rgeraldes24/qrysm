@@ -379,9 +379,9 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 0,
@@ -389,9 +389,9 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 1,
@@ -399,9 +399,9 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 2,
@@ -410,9 +410,9 @@ func TestFinalizedDeposits_DepositsCachedCorrectly(t *testing.T) {
 	dc.deposits = append(finalizedDeposits, &qrysmpb.DepositContainer{
 		Deposit: &qrysmpb.Deposit{
 			Data: &qrysmpb.Deposit_Data{
-				PublicKey:             bytesutil.PadTo([]byte{3}, field_params.DilithiumPubkeyLength),
+				PublicKey:             bytesutil.PadTo([]byte{3}, field_params.MLDSA87PubkeyLength),
 				WithdrawalCredentials: make([]byte, 32),
-				Signature:             make([]byte, field_params.DilithiumSignatureLength),
+				Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 			},
 		},
 		Index: 3,
@@ -448,9 +448,9 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 0,
@@ -458,9 +458,9 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 1,
@@ -469,9 +469,9 @@ func TestFinalizedDeposits_UtilizesPreviouslyCachedDeposits(t *testing.T) {
 	newFinalizedDeposit := &qrysmpb.DepositContainer{
 		Deposit: &qrysmpb.Deposit{
 			Data: &qrysmpb.Deposit_Data{
-				PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
+				PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
 				WithdrawalCredentials: make([]byte, 32),
-				Signature:             make([]byte, field_params.DilithiumSignatureLength),
+				Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 			},
 		},
 		Index: 2,
@@ -523,9 +523,9 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 0,
@@ -533,9 +533,9 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 1,
@@ -543,9 +543,9 @@ func TestFinalizedDeposits_HandleSmallerThanExpectedDeposits(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 2,
@@ -569,9 +569,9 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 0,
@@ -579,9 +579,9 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 1,
@@ -589,9 +589,9 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 2,
@@ -599,9 +599,9 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 3,
@@ -609,9 +609,9 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{4}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{4}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 4,
@@ -619,9 +619,9 @@ func TestFinalizedDeposits_HandleLowerExecutionDepositIndex(t *testing.T) {
 		{
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{5}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{5}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 5,
@@ -659,9 +659,9 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 0,
@@ -670,9 +670,9 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 1,
@@ -683,9 +683,9 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 2,
@@ -694,9 +694,9 @@ func TestNonFinalizedDeposits_ReturnsAllNonFinalizedDeposits(t *testing.T) {
 			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 3,
@@ -716,9 +716,9 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{0}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 0,
@@ -727,9 +727,9 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{1}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 1,
@@ -740,9 +740,9 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			ExecutionBlockHeight: 10,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{2}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 2,
@@ -751,9 +751,9 @@ func TestNonFinalizedDeposits_ReturnsNonFinalizedDepositsUpToBlockNumber(t *test
 			ExecutionBlockHeight: 11,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{3}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: 3,
@@ -773,9 +773,9 @@ func TestFinalizedDeposits_ReturnsTrieCorrectly(t *testing.T) {
 			ExecutionBlockHeight: height,
 			Deposit: &qrysmpb.Deposit{
 				Data: &qrysmpb.Deposit_Data{
-					PublicKey:             bytesutil.PadTo([]byte{uint8(index)}, field_params.DilithiumPubkeyLength),
+					PublicKey:             bytesutil.PadTo([]byte{uint8(index)}, field_params.MLDSA87PubkeyLength),
 					WithdrawalCredentials: make([]byte, 32),
-					Signature:             make([]byte, field_params.DilithiumSignatureLength),
+					Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 				},
 			},
 			Index: index,

@@ -27,7 +27,7 @@ func BeaconBlockIsNil(b interfaces.ReadOnlySignedBeaconBlock) error {
 }
 
 // Signature returns the respective block signature.
-func (b *SignedBeaconBlock) Signature() [field_params.DilithiumSignatureLength]byte {
+func (b *SignedBeaconBlock) Signature() [field_params.MLDSA87SignatureLength]byte {
 	return b.signature
 }
 
@@ -136,17 +136,17 @@ func (b *SignedBeaconBlock) ToBlinded() (interfaces.ReadOnlySignedBeaconBlock, e
 					ParentRoot:    b.block.parentRoot[:],
 					StateRoot:     b.block.stateRoot[:],
 					Body: &qrysmpb.BlindedBeaconBlockBodyCapella{
-						RandaoReveal:                b.block.body.randaoReveal[:],
-						ExecutionData:               b.block.body.executionData,
-						Graffiti:                    b.block.body.graffiti[:],
-						ProposerSlashings:           b.block.body.proposerSlashings,
-						AttesterSlashings:           b.block.body.attesterSlashings,
-						Attestations:                b.block.body.attestations,
-						Deposits:                    b.block.body.deposits,
-						VoluntaryExits:              b.block.body.voluntaryExits,
-						SyncAggregate:               b.block.body.syncAggregate,
-						ExecutionPayloadHeader:      header,
-						DilithiumToExecutionChanges: b.block.body.dilithiumToExecutionChanges,
+						RandaoReveal:              b.block.body.randaoReveal[:],
+						ExecutionData:             b.block.body.executionData,
+						Graffiti:                  b.block.body.graffiti[:],
+						ProposerSlashings:         b.block.body.proposerSlashings,
+						AttesterSlashings:         b.block.body.attesterSlashings,
+						Attestations:              b.block.body.attestations,
+						Deposits:                  b.block.body.deposits,
+						VoluntaryExits:            b.block.body.voluntaryExits,
+						SyncAggregate:             b.block.body.syncAggregate,
+						ExecutionPayloadHeader:    header,
+						Mldsa87ToExecutionChanges: b.block.body.mlDSA87ToExecutionChanges,
 					},
 				},
 				Signature: b.signature[:],
@@ -503,7 +503,7 @@ func (b *BeaconBlockBody) IsNil() bool {
 }
 
 // RandaoReveal returns the randao reveal from the block body.
-func (b *BeaconBlockBody) RandaoReveal() [field_params.DilithiumSignatureLength]byte {
+func (b *BeaconBlockBody) RandaoReveal() [field_params.MLDSA87SignatureLength]byte {
 	return b.randaoReveal
 }
 
@@ -576,8 +576,8 @@ func (b *BeaconBlockBody) Execution() (interfaces.ExecutionData, error) {
 	}
 }
 
-func (b *BeaconBlockBody) DilithiumToExecutionChanges() ([]*qrysmpb.SignedDilithiumToExecutionChange, error) {
-	return b.dilithiumToExecutionChanges, nil
+func (b *BeaconBlockBody) MLDSA87ToExecutionChanges() ([]*qrysmpb.SignedMLDSA87ToExecutionChange, error) {
+	return b.mlDSA87ToExecutionChanges, nil
 }
 
 // HashTreeRoot returns the ssz root of the block body.

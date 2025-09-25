@@ -12,8 +12,8 @@ import (
 
 // ValidatorIndexMap builds a lookup map for quickly determining the index of
 // a validator by their public key.
-func ValidatorIndexMap(validators []*qrysmpb.Validator) map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex {
-	m := make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex, len(validators))
+func ValidatorIndexMap(validators []*qrysmpb.Validator) map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex {
+	m := make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex, len(validators))
 	if validators == nil {
 		return m
 	}

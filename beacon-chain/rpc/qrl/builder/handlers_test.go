@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	http2 "github.com/theQRL/qrysm/network/http"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -115,10 +115,10 @@ func TestExpectedWithdrawals(t *testing.T) {
 		validators := make([]*qrysmpb.Validator, 0, valCount)
 		balances := make([]uint64, 0, valCount)
 		for i := 0; i < valCount; i++ {
-			dilithiumKey, err := dilithium.RandKey()
+			mlDSA87Key, err := ml_dsa_87.RandKey()
 			require.NoError(t, err)
 			val := &qrysmpb.Validator{
-				PublicKey:             dilithiumKey.PublicKey().Marshal(),
+				PublicKey:             mlDSA87Key.PublicKey().Marshal(),
 				WithdrawalCredentials: make([]byte, 32),
 				ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 				WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,

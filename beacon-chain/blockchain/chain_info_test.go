@@ -349,7 +349,7 @@ func TestService_HeadPublicKeyToValidatorIndex(t *testing.T) {
 	c := &Service{}
 	c.head = &head{state: s}
 
-	_, e := c.HeadPublicKeyToValidatorIndex([field_params.DilithiumPubkeyLength]byte{})
+	_, e := c.HeadPublicKeyToValidatorIndex([field_params.MLDSA87PubkeyLength]byte{})
 	require.Equal(t, false, e)
 
 	v, err := s.ValidatorAtIndex(0)
@@ -364,12 +364,12 @@ func TestService_HeadPublicKeyToValidatorIndexNil(t *testing.T) {
 	c := &Service{}
 	c.head = nil
 
-	idx, e := c.HeadPublicKeyToValidatorIndex([field_params.DilithiumPubkeyLength]byte{})
+	idx, e := c.HeadPublicKeyToValidatorIndex([field_params.MLDSA87PubkeyLength]byte{})
 	require.Equal(t, false, e)
 	require.Equal(t, primitives.ValidatorIndex(0), idx)
 
 	c.head = &head{state: nil}
-	i, e := c.HeadPublicKeyToValidatorIndex([field_params.DilithiumPubkeyLength]byte{})
+	i, e := c.HeadPublicKeyToValidatorIndex([field_params.MLDSA87PubkeyLength]byte{})
 	require.Equal(t, false, e)
 	require.Equal(t, primitives.ValidatorIndex(0), i)
 }
@@ -394,12 +394,12 @@ func TestService_HeadValidatorIndexToPublicKeyNil(t *testing.T) {
 
 	p, err := c.HeadValidatorIndexToPublicKey(context.Background(), 0)
 	require.NoError(t, err)
-	require.Equal(t, [field_params.DilithiumPubkeyLength]byte{}, p)
+	require.Equal(t, [field_params.MLDSA87PubkeyLength]byte{}, p)
 
 	c.head = &head{state: nil}
 	p, err = c.HeadValidatorIndexToPublicKey(context.Background(), 0)
 	require.NoError(t, err)
-	require.Equal(t, [field_params.DilithiumPubkeyLength]byte{}, p)
+	require.Equal(t, [field_params.MLDSA87PubkeyLength]byte{}, p)
 }
 
 func TestService_IsOptimistic(t *testing.T) {

@@ -117,7 +117,7 @@ func TestServer_ListAttestations_NoPagination(t *testing.T) {
 		blockExample := util.NewBeaconBlockCapella()
 		blockExample.Block.Body.Attestations = []*qrysmpb.Attestation{
 			{
-				Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength)},
+				Signatures: [][]byte{make([]byte, field_params.MLDSA87SignatureLength)},
 				Data: &qrysmpb.AttestationData{
 					Target:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
 					Source:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
@@ -175,7 +175,7 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 									Slot: 3,
 								},
 								AggregationBits: bitfield.Bitlist{0b11},
-								Signatures:      [][]byte{bytesutil.PadTo([]byte("sig"), fieldparams.DilithiumSignatureLength)},
+								Signatures:      [][]byte{bytesutil.PadTo([]byte("sig"), fieldparams.MLDSA87SignatureLength)},
 							},
 						},
 					},
@@ -200,7 +200,7 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 								Slot: 4 + params.BeaconConfig().SlotsPerEpoch,
 							},
 							AggregationBits: bitfield.Bitlist{0b11},
-							Signatures:      [][]byte{bytesutil.PadTo([]byte("sig"), fieldparams.DilithiumSignatureLength)},
+							Signatures:      [][]byte{bytesutil.PadTo([]byte("sig"), fieldparams.MLDSA87SignatureLength)},
 						},
 					},
 				},
@@ -226,7 +226,7 @@ func TestServer_ListAttestations_FiltersCorrectly(t *testing.T) {
 									Slot: 4,
 								},
 								AggregationBits: bitfield.Bitlist{0b11},
-								Signatures:      [][]byte{bytesutil.PadTo([]byte("sig"), fieldparams.DilithiumSignatureLength)},
+								Signatures:      [][]byte{bytesutil.PadTo([]byte("sig"), fieldparams.MLDSA87SignatureLength)},
 							},
 						},
 					},
@@ -381,7 +381,7 @@ func TestServer_ListAttestations_Pagination_OutOfRange(t *testing.T) {
 								Slot:            i,
 							},
 							AggregationBits: bitfield.Bitlist{0b11},
-							Signatures:      [][]byte{make([]byte, fieldparams.DilithiumSignatureLength)},
+							Signatures:      [][]byte{make([]byte, fieldparams.MLDSA87SignatureLength)},
 						},
 					},
 				},
@@ -434,7 +434,7 @@ func TestServer_ListAttestations_Pagination_DefaultPageSize(t *testing.T) {
 					Source:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte("root"), 32)},
 					Slot:            i,
 				},
-				Signatures:      [][]byte{bytesutil.PadTo([]byte("root"), fieldparams.DilithiumSignatureLength)},
+				Signatures:      [][]byte{bytesutil.PadTo([]byte("root"), fieldparams.MLDSA87SignatureLength)},
 				AggregationBits: bitfield.Bitlist{0b11},
 			},
 		}
@@ -707,7 +707,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte{1}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
-			Signatures:      [][]byte{bytesutil.PadTo([]byte{1}, fieldparams.DilithiumSignatureLength), bytesutil.PadTo([]byte{1}, fieldparams.DilithiumSignatureLength)},
+			Signatures:      [][]byte{bytesutil.PadTo([]byte{1}, fieldparams.MLDSA87SignatureLength), bytesutil.PadTo([]byte{1}, fieldparams.MLDSA87SignatureLength)},
 		},
 		{
 			Data: &qrysmpb.AttestationData{
@@ -717,7 +717,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte{2}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
-			Signatures:      [][]byte{bytesutil.PadTo([]byte{2}, fieldparams.DilithiumSignatureLength), bytesutil.PadTo([]byte{2}, fieldparams.DilithiumSignatureLength)},
+			Signatures:      [][]byte{bytesutil.PadTo([]byte{2}, fieldparams.MLDSA87SignatureLength), bytesutil.PadTo([]byte{2}, fieldparams.MLDSA87SignatureLength)},
 		},
 		{
 			Data: &qrysmpb.AttestationData{
@@ -727,7 +727,7 @@ func TestServer_AttestationPool_Pagination_OutOfRange(t *testing.T) {
 				Target:          &qrysmpb.Checkpoint{Root: bytesutil.PadTo([]byte{3}, 32)},
 			},
 			AggregationBits: bitfield.Bitlist{0b1101},
-			Signatures:      [][]byte{bytesutil.PadTo([]byte{3}, fieldparams.DilithiumSignatureLength), bytesutil.PadTo([]byte{3}, fieldparams.DilithiumSignatureLength)},
+			Signatures:      [][]byte{bytesutil.PadTo([]byte{3}, fieldparams.MLDSA87SignatureLength), bytesutil.PadTo([]byte{3}, fieldparams.MLDSA87SignatureLength)},
 		},
 	}
 	require.NoError(t, bs.AttestationsPool.SaveAggregatedAttestations(atts))

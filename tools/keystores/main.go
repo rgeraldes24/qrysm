@@ -16,7 +16,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/io/prompt"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
@@ -182,7 +182,7 @@ func encrypt(cliCtx *cli.Context) error {
 	if err != nil {
 		return errors.Wrapf(err, "could not decode as hex string: %s", seedString)
 	}
-	privKey, err := dilithium.SecretKeyFromSeed(bytesValue)
+	privKey, err := ml_dsa_87.SecretKeyFromSeed(bytesValue)
 	if err != nil {
 		return errors.Wrap(err, "not a valid private key seed")
 	}
@@ -251,7 +251,7 @@ func readAndDecryptKeystore(fullPath, password string) error {
 			return errors.Wrap(err, "could not decode pubkey from keystore")
 		}
 	} else {
-		privKey, err := dilithium.SecretKeyFromSeed(seedBytes)
+		privKey, err := ml_dsa_87.SecretKeyFromSeed(seedBytes)
 		if err != nil {
 			return errors.Wrap(err, "could not initialize private key from bytes")
 		}

@@ -475,13 +475,13 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 		return nil, errors.Wrapf(err, "could not calculate transactions root")
 	}
 
-	changes := make([]*qrlpb.SignedDilithiumToExecutionChange, len(v1alpha1Block.Body.DilithiumToExecutionChanges))
-	for i, change := range v1alpha1Block.Body.DilithiumToExecutionChanges {
-		changes[i] = &qrlpb.SignedDilithiumToExecutionChange{
-			Message: &qrlpb.DilithiumToExecutionChange{
-				ValidatorIndex:      change.Message.ValidatorIndex,
-				FromDilithiumPubkey: bytesutil.SafeCopyBytes(change.Message.FromDilithiumPubkey),
-				ToExecutionAddress:  bytesutil.SafeCopyBytes(change.Message.ToExecutionAddress),
+	changes := make([]*qrlpb.SignedMLDSA87ToExecutionChange, len(v1alpha1Block.Body.Mldsa87ToExecutionChanges))
+	for i, change := range v1alpha1Block.Body.Mldsa87ToExecutionChanges {
+		changes[i] = &qrlpb.SignedMLDSA87ToExecutionChange{
+			Message: &qrlpb.MLDSA87ToExecutionChange{
+				ValidatorIndex:     change.Message.ValidatorIndex,
+				FromMldsa87Pubkey:  bytesutil.SafeCopyBytes(change.Message.FromMldsa87Pubkey),
+				ToExecutionAddress: bytesutil.SafeCopyBytes(change.Message.ToExecutionAddress),
 			},
 			Signature: bytesutil.SafeCopyBytes(change.Signature),
 		}
@@ -526,7 +526,7 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 			TransactionsRoot: transactionsRoot[:],
 			WithdrawalsRoot:  withdrawalsRoot[:],
 		},
-		DilithiumToExecutionChanges: changes,
+		Mldsa87ToExecutionChanges: changes,
 	}
 	v1Block := &qrlpb.BlindedBeaconBlockCapella{
 		Slot:          v1alpha1Block.Slot,
@@ -720,25 +720,25 @@ func V1Alpha1SignedContributionAndProofToV1(alphaContribution *qrysmpb.SignedCon
 	return result
 }
 
-// V1SignedDilithiumToExecutionChangeToV1Alpha1 converts a V1 SignedDilithiumToExecutionChange to its v1alpha1 equivalent.
-func V1SignedDilithiumToExecutionChangeToV1Alpha1(change *qrlpb.SignedDilithiumToExecutionChange) *qrysmpb.SignedDilithiumToExecutionChange {
-	return &qrysmpb.SignedDilithiumToExecutionChange{
-		Message: &qrysmpb.DilithiumToExecutionChange{
-			ValidatorIndex:      change.Message.ValidatorIndex,
-			FromDilithiumPubkey: bytesutil.SafeCopyBytes(change.Message.FromDilithiumPubkey),
-			ToExecutionAddress:  bytesutil.SafeCopyBytes(change.Message.ToExecutionAddress),
+// V1SignedMLDSA87ToExecutionChangeToV1Alpha1 converts a V1 SignedMLDSA87ToExecutionChange to its v1alpha1 equivalent.
+func V1SignedMLDSA87ToExecutionChangeToV1Alpha1(change *qrlpb.SignedMLDSA87ToExecutionChange) *qrysmpb.SignedMLDSA87ToExecutionChange {
+	return &qrysmpb.SignedMLDSA87ToExecutionChange{
+		Message: &qrysmpb.MLDSA87ToExecutionChange{
+			ValidatorIndex:     change.Message.ValidatorIndex,
+			FromMldsa87Pubkey:  bytesutil.SafeCopyBytes(change.Message.FromMldsa87Pubkey),
+			ToExecutionAddress: bytesutil.SafeCopyBytes(change.Message.ToExecutionAddress),
 		},
 		Signature: bytesutil.SafeCopyBytes(change.Signature),
 	}
 }
 
-// V1Alpha1SignedDilithiumToExecChangeToV1 converts a v1alpha1 SignedDilithiumToExecutionChange object to its v1 equivalent.
-func V1Alpha1SignedDilithiumToExecChangeToV1(alphaChange *qrysmpb.SignedDilithiumToExecutionChange) *qrlpb.SignedDilithiumToExecutionChange {
-	result := &qrlpb.SignedDilithiumToExecutionChange{
-		Message: &qrlpb.DilithiumToExecutionChange{
-			ValidatorIndex:      alphaChange.Message.ValidatorIndex,
-			FromDilithiumPubkey: bytesutil.SafeCopyBytes(alphaChange.Message.FromDilithiumPubkey),
-			ToExecutionAddress:  bytesutil.SafeCopyBytes(alphaChange.Message.ToExecutionAddress),
+// V1Alpha1SignedMLDSA87ToExecChangeToV1 converts a v1alpha1 SignedMLDSA87ToExecutionChange object to its v1 equivalent.
+func V1Alpha1SignedMLDSA87ToExecChangeToV1(alphaChange *qrysmpb.SignedMLDSA87ToExecutionChange) *qrlpb.SignedMLDSA87ToExecutionChange {
+	result := &qrlpb.SignedMLDSA87ToExecutionChange{
+		Message: &qrlpb.MLDSA87ToExecutionChange{
+			ValidatorIndex:     alphaChange.Message.ValidatorIndex,
+			FromMldsa87Pubkey:  bytesutil.SafeCopyBytes(alphaChange.Message.FromMldsa87Pubkey),
+			ToExecutionAddress: bytesutil.SafeCopyBytes(alphaChange.Message.ToExecutionAddress),
 		},
 		Signature: bytesutil.SafeCopyBytes(alphaChange.Signature),
 	}

@@ -99,13 +99,13 @@ const (
 
 // DepositBalancer represents a type that can sum, by validator, all deposits made in E2E prior to the function call.
 type DepositBalancer interface {
-	Balances(DepositBatch) map[[field_params.DilithiumPubkeyLength]byte]uint64
+	Balances(DepositBatch) map[[field_params.MLDSA87PubkeyLength]byte]uint64
 }
 
 // EvaluationContext allows for additional data to be provided to evaluators that need extra state.
 type EvaluationContext struct {
 	DepositBalancer
-	ExitedVals                map[[field_params.DilithiumPubkeyLength]byte]bool
+	ExitedVals                map[[field_params.MLDSA87PubkeyLength]byte]bool
 	SeenVotes                 map[primitives.Slot][]byte
 	ExpectedExecutionDataVote []byte
 }
@@ -114,7 +114,7 @@ type EvaluationContext struct {
 func NewEvaluationContext(d DepositBalancer) *EvaluationContext {
 	return &EvaluationContext{
 		DepositBalancer: d,
-		ExitedVals:      make(map[[field_params.DilithiumPubkeyLength]byte]bool),
+		ExitedVals:      make(map[[field_params.MLDSA87PubkeyLength]byte]bool),
 		SeenVotes:       make(map[primitives.Slot][]byte),
 	}
 }

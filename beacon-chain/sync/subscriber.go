@@ -123,9 +123,9 @@ func (s *Service) registerSubscribers(epoch primitives.Epoch, digest [4]byte) {
 	}
 
 	s.subscribe(
-		p2p.DilithiumToExecutionChangeSubnetTopicFormat,
-		s.validateDilithiumToExecutionChange,
-		s.dilithiumToExecutionChangeSubscriber,
+		p2p.MLDSA87ToExecutionChangeSubnetTopicFormat,
+		s.validateMLDSA87ToExecutionChange,
+		s.mlDSA87ToExecutionChangeSubscriber,
 		digest,
 	)
 }

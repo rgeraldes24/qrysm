@@ -21,7 +21,7 @@ var failedAttLocalProtectionErr = "attempted to make slashable attestation, reje
 func (v *validator) slashableAttestationCheck(
 	ctx context.Context,
 	indexedAtt *qrysmpb.IndexedAttestation,
-	pubKey [field_params.DilithiumPubkeyLength]byte,
+	pubKey [field_params.MLDSA87PubkeyLength]byte,
 	signingRoot [32]byte,
 ) error {
 	ctx, span := trace.StartSpan(ctx, "validator.postAttSignUpdate")

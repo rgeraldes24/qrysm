@@ -42,7 +42,7 @@ func TestService_ValidateSyncCommitteeMessage(t *testing.T) {
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{'A'},
 	}
-	var emptySig [field_params.DilithiumSignatureLength]byte
+	var emptySig [field_params.MLDSA87SignatureLength]byte
 	type args struct {
 		pid   peer.ID
 		msg   *qrysmpb.SyncCommitteeMessage

@@ -1,3 +1,3 @@
 package blocks
 
-var ProcessDilithiumToExecutionChange = processDilithiumToExecutionChange
+var ProcessMLDSA87ToExecutionChange = processMLDSA87ToExecutionChange

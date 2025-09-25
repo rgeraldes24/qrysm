@@ -121,7 +121,7 @@ var ValidatorsVoteWithTheMajority = e2etypes.Evaluator{
 }
 
 type mismatch struct {
-	k [field_params.DilithiumPubkeyLength]byte
+	k [field_params.MLDSA87PubkeyLength]byte
 	e uint64
 	o uint64
 }
@@ -144,7 +144,7 @@ func processesDepositsInBlocks(ec *e2etypes.EvaluationContext, conns ...*grpc.Cl
 	if err != nil {
 		return errors.Wrap(err, "failed to get blocks from beacon-chain")
 	}
-	observed := make(map[[field_params.DilithiumPubkeyLength]byte]uint64)
+	observed := make(map[[field_params.MLDSA87PubkeyLength]byte]uint64)
 	for _, blk := range blks.BlockContainers {
 		sb, err := blocks.BeaconBlockContainerToSignedBeaconBlock(blk)
 		if err != nil {
@@ -566,7 +566,7 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 	if err != nil {
 		return err
 	}
-	changes := make([]*qrlpb.SignedDilithiumToExecutionChange, 0)
+	changes := make([]*qrlpb.SignedMLDSA87ToExecutionChange, 0)
 	// Only send half the number of changes each time, to allow us to test
 	// at the fork boundary.
 	wantedChanges := numOfExits / 2
@@ -585,12 +585,12 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 		if !bytes.Equal(val.PublicKey, privKeys[idx].PublicKey().Marshal()) {
 			return errors.Errorf("pubkey is not equal, wanted %#x but received %#x", val.PublicKey, privKeys[idx].PublicKey().Marshal())
 		}
-		message := &qrlpb.DilithiumToExecutionChange{
-			ValidatorIndex:      idx,
-			FromDilithiumPubkey: privKeys[idx].PublicKey().Marshal(),
-			ToExecutionAddress:  bytesutil.ToBytes(uint64(idx), 20),
+		message := &qrlpb.MLDSA87ToExecutionChange{
+			ValidatorIndex:     idx,
+			FromMldsa87Pubkey:  privKeys[idx].PublicKey().Marshal(),
+			ToExecutionAddress: bytesutil.ToBytes(uint64(idx), 20),
 		}
-		domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDilithiumToExecutionChange, params.BeaconConfig().GenesisForkVersion, st.GenesisValidatorsRoot())
+		domain, err := signing.ComputeDomain(params.BeaconConfig().DomainMLDSA87ToExecutionChange, params.BeaconConfig().GenesisForkVersion, st.GenesisValidatorsRoot())
 		if err != nil {
 			return err
 		}
@@ -599,13 +599,13 @@ func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn)
 			return err
 		}
 		signature := privKeys[idx].Sign(sigRoot[:]).Marshal()
-		change := &qrlpb.SignedDilithiumToExecutionChange{
+		change := &qrlpb.SignedMLDSA87ToExecutionChange{
 			Message:   message,
 			Signature: signature,
 		}
 		changes = append(changes, change)
 	}
-	_, err = beaconAPIClient.SubmitSignedDilithiumToExecutionChanges(ctx, &qrlpb.SubmitDilithiumToExecutionChangesRequest{Changes: changes})
+	_, err = beaconAPIClient.SubmitSignedMLDSA87ToExecutionChanges(ctx, &qrlpb.SubmitMLDSA87ToExecutionChangesRequest{Changes: changes})
 
 	return err
 }

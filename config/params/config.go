@@ -45,7 +45,7 @@ type BeaconChainConfig struct {
 	EffectiveBalanceIncrement uint64 `yaml:"EFFECTIVE_BALANCE_INCREMENT" spec:"true"` // EffectiveBalanceIncrement is used for converting the high balance into the low balance for validators.
 
 	// Initial value constants.
-	DilithiumWithdrawalPrefixByte  byte     `yaml:"DILITHIUM_WITHDRAWAL_PREFIX" spec:"true"`   // DilithiumWithdrawalPrefixByte is used for Dilithium withdrawal and it's the first byte.
+	MLDSA87WithdrawalPrefixByte    byte     `yaml:"ML_DSA_87_WITHDRAWAL_PREFIX" spec:"true"`   // MLDSA87WithdrawalPrefixByte is used for ML-DSA-87 withdrawal and it's the first byte.
 	QRLAddressWithdrawalPrefixByte byte     `yaml:"QRL_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // QRLAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
 	ZeroHash                       [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
 
@@ -100,36 +100,36 @@ type BeaconChainConfig struct {
 	MaxDeposits                      uint64 `yaml:"MAX_DEPOSITS" spec:"true"`                         // MaxDeposits defines the maximum number of validator deposits in a block.
 	MaxVoluntaryExits                uint64 `yaml:"MAX_VOLUNTARY_EXITS" spec:"true"`                  // MaxVoluntaryExits defines the maximum number of validator exits in a block.
 	MaxWithdrawalsPerPayload         uint64 `yaml:"MAX_WITHDRAWALS_PER_PAYLOAD" spec:"true"`          // MaxWithdrawalsPerPayload defines the maximum number of withdrawals in a block.
-	MaxDilithiumToExecutionChanges   uint64 `yaml:"MAX_DILITHIUM_TO_EXECUTION_CHANGES" spec:"true"`   // MaxDilithiumToExecutionChanges defines the maximum number of Dilithium-to-execution-change objects in a block.
+	MaxMLDSA87ToExecutionChanges     uint64 `yaml:"MAX_ML_DSA_87_TO_EXECUTION_CHANGES" spec:"true"`   // MaxMLDSA87ToExecutionChanges defines the maximum number of ML-DSA-87-to-execution-change objects in a block.
 	MaxValidatorsPerWithdrawalsSweep uint64 `yaml:"MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP" spec:"true"` // MaxValidatorsPerWithdrawalsSweep bounds the size of the sweep searching for withdrawals per slot.
 
-	// Dilithium domain values.
-	DomainBeaconProposer              [4]byte `yaml:"DOMAIN_BEACON_PROPOSER" spec:"true"`                // DomainBeaconProposer defines the Dilithium signature domain for beacon proposal verification.
-	DomainRandao                      [4]byte `yaml:"DOMAIN_RANDAO" spec:"true"`                         // DomainRandao defines the Dilithium signature domain for randao verification.
-	DomainBeaconAttester              [4]byte `yaml:"DOMAIN_BEACON_ATTESTER" spec:"true"`                // DomainBeaconAttester defines the Dilithium signature domain for attestation verification.
-	DomainDeposit                     [4]byte `yaml:"DOMAIN_DEPOSIT" spec:"true"`                        // DomainDeposit defines the Dilithium signature domain for deposit verification.
-	DomainVoluntaryExit               [4]byte `yaml:"DOMAIN_VOLUNTARY_EXIT" spec:"true"`                 // DomainVoluntaryExit defines the Dilithium signature domain for exit verification.
-	DomainSelectionProof              [4]byte `yaml:"DOMAIN_SELECTION_PROOF" spec:"true"`                // DomainSelectionProof defines the Dilithium signature domain for selection proof.
-	DomainAggregateAndProof           [4]byte `yaml:"DOMAIN_AGGREGATE_AND_PROOF" spec:"true"`            // DomainAggregateAndProof defines the Dilithium signature domain for aggregate and proof.
-	DomainSyncCommittee               [4]byte `yaml:"DOMAIN_SYNC_COMMITTEE" spec:"true"`                 // DomainVoluntaryExit defines the Dilithium signature domain for sync committee.
-	DomainSyncCommitteeSelectionProof [4]byte `yaml:"DOMAIN_SYNC_COMMITTEE_SELECTION_PROOF" spec:"true"` // DomainSelectionProof defines the Dilithium signature domain for sync committee selection proof.
-	DomainContributionAndProof        [4]byte `yaml:"DOMAIN_CONTRIBUTION_AND_PROOF" spec:"true"`         // DomainAggregateAndProof defines the Dilithium signature domain for contribution and proof.
-	DomainApplicationMask             [4]byte `yaml:"DOMAIN_APPLICATION_MASK" spec:"true"`               // DomainApplicationMask defines the Dilithium signature domain for application mask.
-	DomainApplicationBuilder          [4]byte // DomainApplicationBuilder defines the Dilithium signature domain for application builder.
-	DomainDilithiumToExecutionChange  [4]byte // DomainDilithiumToExecutionChange defines the Dilithium signature domain to change withdrawal addresses to QRL prefix
+	// ML-DSA-87 domain values.
+	DomainBeaconProposer              [4]byte `yaml:"DOMAIN_BEACON_PROPOSER" spec:"true"`                // DomainBeaconProposer defines the ML-DSA-87 signature domain for beacon proposal verification.
+	DomainRandao                      [4]byte `yaml:"DOMAIN_RANDAO" spec:"true"`                         // DomainRandao defines the ML-DSA-87 signature domain for randao verification.
+	DomainBeaconAttester              [4]byte `yaml:"DOMAIN_BEACON_ATTESTER" spec:"true"`                // DomainBeaconAttester defines the ML-DSA-87 signature domain for attestation verification.
+	DomainDeposit                     [4]byte `yaml:"DOMAIN_DEPOSIT" spec:"true"`                        // DomainDeposit defines the ML-DSA-87 signature domain for deposit verification.
+	DomainVoluntaryExit               [4]byte `yaml:"DOMAIN_VOLUNTARY_EXIT" spec:"true"`                 // DomainVoluntaryExit defines the ML-DSA-87 signature domain for exit verification.
+	DomainSelectionProof              [4]byte `yaml:"DOMAIN_SELECTION_PROOF" spec:"true"`                // DomainSelectionProof defines the ML-DSA-87 signature domain for selection proof.
+	DomainAggregateAndProof           [4]byte `yaml:"DOMAIN_AGGREGATE_AND_PROOF" spec:"true"`            // DomainAggregateAndProof defines the ML-DSA-87 signature domain for aggregate and proof.
+	DomainSyncCommittee               [4]byte `yaml:"DOMAIN_SYNC_COMMITTEE" spec:"true"`                 // DomainVoluntaryExit defines the ML-DSA-87 signature domain for sync committee.
+	DomainSyncCommitteeSelectionProof [4]byte `yaml:"DOMAIN_SYNC_COMMITTEE_SELECTION_PROOF" spec:"true"` // DomainSelectionProof defines the ML-DSA-87 signature domain for sync committee selection proof.
+	DomainContributionAndProof        [4]byte `yaml:"DOMAIN_CONTRIBUTION_AND_PROOF" spec:"true"`         // DomainAggregateAndProof defines the ML-DSA-87 signature domain for contribution and proof.
+	DomainApplicationMask             [4]byte `yaml:"DOMAIN_APPLICATION_MASK" spec:"true"`               // DomainApplicationMask defines the ML-DSA-87 signature domain for application mask.
+	DomainApplicationBuilder          [4]byte // DomainApplicationBuilder defines the ML-DSA-87 signature domain for application builder.
+	DomainMLDSA87ToExecutionChange    [4]byte // DomainMLDSA87ToExecutionChange defines the ML-DSA-87 signature domain to change withdrawal addresses to QRL prefix
 
 	// Qrysm constants.
-	ShorPerQuanta                uint64                                     // ShorPerQuanta is the amount of shor corresponding to 1 quanta.
-	DefaultBufferSize            int                                        // DefaultBufferSize for channels across the Qrysm repository.
-	ValidatorPrivkeyFileName     string                                     // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
-	WithdrawalPrivkeyFileName    string                                     // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
-	RPCSyncCheck                 time.Duration                              // Number of seconds to query the sync service, to find out if the node is synced or not.
-	EmptyDilithiumSignature      [fieldparams.DilithiumSignatureLength]byte // EmptyDilithiumSignature is used to represent a zeroed out Dilithium Signature.
-	DefaultPageSize              int                                        // DefaultPageSize defines the default page size for RPC server request.
-	MaxPeersToSync               int                                        // MaxPeersToSync describes the limit for number of peers in round robin sync.
-	SlotsPerArchivedPoint        primitives.Slot                            // SlotsPerArchivedPoint defines the number of slots per one archived point.
-	GenesisCountdownInterval     time.Duration                              // How often to log the countdown until the genesis time is reached.
-	BeaconStateCapellaFieldCount int                                        // BeaconStateCapellaFieldCount defines how many fields are in beacon state post upgrade to Capella.
+	ShorPerQuanta                uint64                                   // ShorPerQuanta is the amount of shor corresponding to 1 quanta.
+	DefaultBufferSize            int                                      // DefaultBufferSize for channels across the Qrysm repository.
+	ValidatorPrivkeyFileName     string                                   // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
+	WithdrawalPrivkeyFileName    string                                   // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
+	RPCSyncCheck                 time.Duration                            // Number of seconds to query the sync service, to find out if the node is synced or not.
+	EmptyMLDSA87Signature        [fieldparams.MLDSA87SignatureLength]byte // EmptyMLDSA87Signature is used to represent a zeroed out ML-DSA-87 Signature.
+	DefaultPageSize              int                                      // DefaultPageSize defines the default page size for RPC server request.
+	MaxPeersToSync               int                                      // MaxPeersToSync describes the limit for number of peers in round robin sync.
+	SlotsPerArchivedPoint        primitives.Slot                          // SlotsPerArchivedPoint defines the number of slots per one archived point.
+	GenesisCountdownInterval     time.Duration                            // How often to log the countdown until the genesis time is reached.
+	BeaconStateCapellaFieldCount int                                      // BeaconStateCapellaFieldCount defines how many fields are in beacon state post upgrade to Capella.
 
 	// Slasher constants.
 	WeakSubjectivityPeriod    primitives.Epoch // WeakSubjectivityPeriod defines the time period expressed in number of epochs were proof of stake network should validate block headers and attestations for slashable events.

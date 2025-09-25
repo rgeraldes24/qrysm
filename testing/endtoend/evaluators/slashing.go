@@ -12,7 +12,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/container/slice"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
@@ -279,7 +279,7 @@ func generateSignedBeaconBlock(
 	chainHead *qrysmpb.ChainHead,
 	proposerIndex primitives.ValidatorIndex,
 	valClient qrysmpb.BeaconNodeValidatorClient,
-	privKeys []dilithium.DilithiumKey,
+	privKeys []ml_dsa_87.MLDSA87Key,
 	stateRoot string,
 ) (*qrysmpb.GenericSignedBeaconBlock, error) {
 	ctx := context.Background()
@@ -296,7 +296,7 @@ func generateSignedBeaconBlock(
 				DepositRoot:  bytesutil.PadTo([]byte("bad deposit root"), hashLen),
 				DepositCount: 1,
 			},
-			RandaoReveal:      bytesutil.PadTo([]byte("bad randao"), field_params.DilithiumSignatureLength),
+			RandaoReveal:      bytesutil.PadTo([]byte("bad randao"), field_params.MLDSA87SignatureLength),
 			Graffiti:          bytesutil.PadTo([]byte("teehee"), hashLen),
 			ProposerSlashings: []*qrysmpb.ProposerSlashing{},
 			AttesterSlashings: []*qrysmpb.AttesterSlashing{},

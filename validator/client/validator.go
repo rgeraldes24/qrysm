@@ -72,15 +72,15 @@ type validator struct {
 	highestValidSlotLock               sync.Mutex
 	prevBalanceLock                    sync.RWMutex
 	slashableKeysLock                  sync.RWMutex
-	eipImportBlacklistedPublicKeys     map[[fieldparams.DilithiumPubkeyLength]byte]bool
+	eipImportBlacklistedPublicKeys     map[[fieldparams.MLDSA87PubkeyLength]byte]bool
 	walletInitializedFeed              *event.Feed
 	attLogs                            map[[32]byte]*attSubmitted
-	startBalances                      map[[fieldparams.DilithiumPubkeyLength]byte]uint64
+	startBalances                      map[[fieldparams.MLDSA87PubkeyLength]byte]uint64
 	dutiesLock                         sync.RWMutex
 	duties                             *qrysmpb.DutiesResponse
-	prevBalance                        map[[fieldparams.DilithiumPubkeyLength]byte]uint64
-	pubkeyToValidatorIndex             map[[fieldparams.DilithiumPubkeyLength]byte]primitives.ValidatorIndex
-	signedValidatorRegistrations       map[[fieldparams.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1
+	prevBalance                        map[[fieldparams.MLDSA87PubkeyLength]byte]uint64
+	pubkeyToValidatorIndex             map[[fieldparams.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex
+	signedValidatorRegistrations       map[[fieldparams.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1
 	graffitiOrderedIndex               uint64
 	aggregatedSlotCommitteeIDCache     *lru.Cache
 	domainDataCache                    *ristretto.Cache
@@ -148,7 +148,7 @@ func (v *validator) WaitForKeymanagerInitialization(ctx context.Context) error {
 // recheckKeys checks if the validator has any keys that need to be rechecked.
 // the keymanager implements a subscription to push these updates to the validator.
 func recheckKeys(ctx context.Context, valDB vdb.Database, keyManager keymanager.IKeymanager) {
-	var validatingKeys [][fieldparams.DilithiumPubkeyLength]byte
+	var validatingKeys [][fieldparams.MLDSA87PubkeyLength]byte
 	var err error
 	validatingKeys, err = keyManager.FetchValidatingPublicKeys(ctx)
 	if err != nil {
@@ -172,7 +172,7 @@ func recheckValidatingKeysBucket(ctx context.Context, valDB vdb.Database, km key
 	if !ok {
 		return
 	}
-	validatingPubKeysChan := make(chan [][fieldparams.DilithiumPubkeyLength]byte, 1)
+	validatingPubKeysChan := make(chan [][fieldparams.MLDSA87PubkeyLength]byte, 1)
 	sub := importedKeymanager.SubscribeAccountChanges(validatingPubKeysChan)
 	defer func() {
 		sub.Unsubscribe()
@@ -477,7 +477,7 @@ func buildDuplicateError(response []*qrysmpb.DoppelGangerResponse_ValidatorRespo
 	duplicates := make([][]byte, 0)
 	for _, valRes := range response {
 		if valRes.DuplicateExists {
-			var copiedKey [fieldparams.DilithiumPubkeyLength]byte
+			var copiedKey [fieldparams.MLDSA87PubkeyLength]byte
 			copy(copiedKey[:], valRes.PublicKey)
 			duplicates = append(duplicates, copiedKey[:])
 		}
@@ -535,7 +535,7 @@ func (v *validator) UpdateDuties(ctx context.Context, slot primitives.Slot) erro
 	}
 
 	// Filter out the slashable public keys from the duties request.
-	filteredKeys := make([][fieldparams.DilithiumPubkeyLength]byte, 0, len(validatingKeys))
+	filteredKeys := make([][fieldparams.MLDSA87PubkeyLength]byte, 0, len(validatingKeys))
 	v.slashableKeysLock.RLock()
 	for _, pubKey := range validatingKeys {
 		if ok := v.eipImportBlacklistedPublicKeys[pubKey]; !ok {
@@ -672,10 +672,10 @@ func (v *validator) subscribeToSubnets(ctx context.Context, res *qrysmpb.DutiesR
 // RolesAt slot returns the validator roles at the given slot. Returns nil if the
 // validator is known to not have a roles at the slot. Returns UNKNOWN if the
 // validator assignments are unknown. Otherwise returns a valid ValidatorRole map.
-func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[fieldparams.DilithiumPubkeyLength]byte][]iface.ValidatorRole, error) {
+func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[fieldparams.MLDSA87PubkeyLength]byte][]iface.ValidatorRole, error) {
 	v.dutiesLock.RLock()
 	defer v.dutiesLock.RUnlock()
-	rolesAt := make(map[[fieldparams.DilithiumPubkeyLength]byte][]iface.ValidatorRole)
+	rolesAt := make(map[[fieldparams.MLDSA87PubkeyLength]byte][]iface.ValidatorRole)
 	for validator, duty := range v.duties.CurrentEpochDuties {
 		var roles []iface.ValidatorRole
 
@@ -731,7 +731,7 @@ func (v *validator) RolesAt(ctx context.Context, slot primitives.Slot) (map[[fie
 			roles = append(roles, iface.RoleUnknown)
 		}
 
-		var pubKey [fieldparams.DilithiumPubkeyLength]byte
+		var pubKey [fieldparams.MLDSA87PubkeyLength]byte
 		copy(pubKey[:], duty.PublicKey)
 		rolesAt[pubKey] = roles
 	}
@@ -748,7 +748,7 @@ func (v *validator) Keymanager() (keymanager.IKeymanager, error) {
 
 // isAggregator checks if a validator is an aggregator of a given slot and committee,
 // it uses a modulo calculated by validator count in committee and samples randomness around it.
-func (v *validator) isAggregator(ctx context.Context, committee []primitives.ValidatorIndex, slot primitives.Slot, pubKey [fieldparams.DilithiumPubkeyLength]byte) (bool, error) {
+func (v *validator) isAggregator(ctx context.Context, committee []primitives.ValidatorIndex, slot primitives.Slot, pubKey [fieldparams.MLDSA87PubkeyLength]byte) (bool, error) {
 	modulo := uint64(1)
 	if len(committee)/int(params.BeaconConfig().TargetAggregatorsPerCommittee) > 1 {
 		modulo = uint64(len(committee)) / params.BeaconConfig().TargetAggregatorsPerCommittee
@@ -768,11 +768,11 @@ func (v *validator) isAggregator(ctx context.Context, committee []primitives.Val
 // it uses a modulo calculated by validator count in committee and samples randomness around it.
 //
 // Spec code:
-// def is_sync_committee_aggregator(signature: DilithiumSignature) -> bool:
+// def is_sync_committee_aggregator(signature: MLDSA87Signature) -> bool:
 //
 //	modulo = max(1, SYNC_COMMITTEE_SIZE // SYNC_COMMITTEE_SUBNET_COUNT // TARGET_AGGREGATORS_PER_SYNC_SUBCOMMITTEE)
 //	return bytes_to_uint64(hash(signature)[0:8]) % modulo == 0
-func (v *validator) isSyncCommitteeAggregator(ctx context.Context, slot primitives.Slot, pubKey [fieldparams.DilithiumPubkeyLength]byte) (bool, error) {
+func (v *validator) isSyncCommitteeAggregator(ctx context.Context, slot primitives.Slot, pubKey [fieldparams.MLDSA87PubkeyLength]byte) (bool, error) {
 	res, err := v.validatorClient.GetSyncSubcommitteeIndex(ctx, &qrysmpb.SyncSubcommitteeIndexRequest{
 		PublicKey: pubKey[:],
 		Slot:      slot,
@@ -1006,8 +1006,8 @@ func (v *validator) PushProposerSettings(ctx context.Context, km keymanager.IKey
 	return nil
 }
 
-func (v *validator) filterAndCacheActiveKeys(ctx context.Context, pubkeys [][fieldparams.DilithiumPubkeyLength]byte, slot primitives.Slot) ([][fieldparams.DilithiumPubkeyLength]byte, error) {
-	filteredKeys := make([][fieldparams.DilithiumPubkeyLength]byte, 0)
+func (v *validator) filterAndCacheActiveKeys(ctx context.Context, pubkeys [][fieldparams.MLDSA87PubkeyLength]byte, slot primitives.Slot) ([][fieldparams.MLDSA87PubkeyLength]byte, error) {
+	filteredKeys := make([][fieldparams.MLDSA87PubkeyLength]byte, 0)
 	statusRequestKeys := make([][]byte, 0)
 	for _, k := range pubkeys {
 		_, ok := v.pubkeyToValidatorIndex[k]
@@ -1050,7 +1050,7 @@ func (v *validator) filterAndCacheActiveKeys(ctx context.Context, pubkeys [][fie
 	return filteredKeys, nil
 }
 
-func (v *validator) buildPrepProposerReqs(ctx context.Context, pubkeys [][fieldparams.DilithiumPubkeyLength]byte /* only active pubkeys */) ([]*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer, error) {
+func (v *validator) buildPrepProposerReqs(ctx context.Context, pubkeys [][fieldparams.MLDSA87PubkeyLength]byte /* only active pubkeys */) ([]*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer, error) {
 	var prepareProposerReqs []*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer
 	for _, k := range pubkeys {
 		// Default case: Define fee recipient to burn address
@@ -1095,7 +1095,7 @@ func (v *validator) buildPrepProposerReqs(ctx context.Context, pubkeys [][fieldp
 	return prepareProposerReqs, nil
 }
 
-func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][fieldparams.DilithiumPubkeyLength]byte /* only active pubkeys */, signer iface.SigningFunc) ([]*qrysmpb.SignedValidatorRegistrationV1, error) {
+func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][fieldparams.MLDSA87PubkeyLength]byte /* only active pubkeys */, signer iface.SigningFunc) ([]*qrysmpb.SignedValidatorRegistrationV1, error) {
 	var signedValRegRegs []*qrysmpb.SignedValidatorRegistrationV1
 
 	// if the timestamp is pre-genesis, don't create registrations
@@ -1175,7 +1175,7 @@ func (v *validator) buildSignedRegReqs(ctx context.Context, pubkeys [][fieldpara
 	return signedValRegRegs, nil
 }
 
-func (v *validator) validatorIndex(ctx context.Context, pubkey [fieldparams.DilithiumPubkeyLength]byte) (primitives.ValidatorIndex, bool, error) {
+func (v *validator) validatorIndex(ctx context.Context, pubkey [fieldparams.MLDSA87PubkeyLength]byte) (primitives.ValidatorIndex, bool, error) {
 	resp, err := v.validatorClient.ValidatorIndex(ctx, &qrysmpb.ValidatorIndexRequest{PublicKey: pubkey[:]})
 	switch {
 	case status.Code(err) == codes.NotFound:

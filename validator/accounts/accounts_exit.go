@@ -140,7 +140,7 @@ func PerformVoluntaryExit(
 	return rawExitedKeys, formattedExitedKeys, nil
 }
 
-func prepareAllKeys(validatingKeys [][field_params.DilithiumPubkeyLength]byte) (raw [][]byte, formatted []string) {
+func prepareAllKeys(validatingKeys [][field_params.MLDSA87PubkeyLength]byte) (raw [][]byte, formatted []string) {
 	raw = make([][]byte, len(validatingKeys))
 	formatted = make([]string, len(validatingKeys))
 	for i, pk := range validatingKeys {

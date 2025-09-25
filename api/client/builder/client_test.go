@@ -398,7 +398,7 @@ func testSignedBlindedBeaconBlockCapella(t *testing.T) *qrysmpb.SignedBlindedBea
 					},
 				},
 				SyncAggregate: &qrysmpb.SyncAggregate{
-					SyncCommitteeSignatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength)},
+					SyncCommitteeSignatures: [][]byte{make([]byte, field_params.MLDSA87SignatureLength)},
 					SyncCommitteeBits:       bitfield.Bitvector16{0x01},
 				},
 				ExecutionPayloadHeader: &enginepb.ExecutionPayloadHeaderCapella{

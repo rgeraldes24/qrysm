@@ -31,7 +31,7 @@ func TestProposeAttestation(t *testing.T) {
 				Root:  test_helpers.FillByteSlice(32, 81),
 			},
 		},
-		Signatures: [][]byte{test_helpers.FillByteSlice(4595, 82)},
+		Signatures: [][]byte{test_helpers.FillByteSlice(4627, 82)},
 	}
 
 	tests := []struct {
@@ -54,7 +54,7 @@ func TestProposeAttestation(t *testing.T) {
 			name: "nil attestation data",
 			attestation: &qrysmpb.Attestation{
 				AggregationBits: test_helpers.FillByteSlice(4, 74),
-				Signatures:      [][]byte{test_helpers.FillByteSlice(4595, 82)},
+				Signatures:      [][]byte{test_helpers.FillByteSlice(4627, 82)},
 			},
 			expectedErrorMessage: "attestation data is nil",
 		},
@@ -65,7 +65,7 @@ func TestProposeAttestation(t *testing.T) {
 				Data: &qrysmpb.AttestationData{
 					Target: &qrysmpb.Checkpoint{},
 				},
-				Signatures: [][]byte{test_helpers.FillByteSlice(4595, 82)},
+				Signatures: [][]byte{test_helpers.FillByteSlice(4627, 82)},
 			},
 			expectedErrorMessage: "source/target in attestation data is nil",
 		},
@@ -76,7 +76,7 @@ func TestProposeAttestation(t *testing.T) {
 				Data: &qrysmpb.AttestationData{
 					Source: &qrysmpb.Checkpoint{},
 				},
-				Signatures: [][]byte{test_helpers.FillByteSlice(4595, 82)},
+				Signatures: [][]byte{test_helpers.FillByteSlice(4627, 82)},
 			},
 			expectedErrorMessage: "source/target in attestation data is nil",
 		},
@@ -87,7 +87,7 @@ func TestProposeAttestation(t *testing.T) {
 					Source: &qrysmpb.Checkpoint{},
 					Target: &qrysmpb.Checkpoint{},
 				},
-				Signatures: [][]byte{test_helpers.FillByteSlice(4595, 82)},
+				Signatures: [][]byte{test_helpers.FillByteSlice(4627, 82)},
 			},
 			expectedErrorMessage: "attestation aggregation bits is empty",
 		},

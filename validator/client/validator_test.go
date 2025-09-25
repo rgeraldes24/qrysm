@@ -25,8 +25,8 @@ import (
 	validatorserviceconfig "github.com/theQRL/qrysm/config/validator/service"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	validatorType "github.com/theQRL/qrysm/consensus-types/validator"
-	"github.com/theQRL/qrysm/crypto/dilithium"
-	dilithiummock "github.com/theQRL/qrysm/crypto/dilithium/common/mock"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
+	mldsa87mock "github.com/theQRL/qrysm/crypto/ml_dsa_87/common/mock"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -64,28 +64,28 @@ func genMockKeymanager(t *testing.T, numKeys int) *mockKeymanager {
 }
 
 type keypair struct {
-	pub [field_params.DilithiumPubkeyLength]byte
-	pri dilithium.DilithiumKey
+	pub [field_params.MLDSA87PubkeyLength]byte
+	pri ml_dsa_87.MLDSA87Key
 }
 
 func randKeypair(t *testing.T) keypair {
-	pri, err := dilithium.RandKey()
+	pri, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
-	var pub [field_params.DilithiumPubkeyLength]byte
+	var pub [field_params.MLDSA87PubkeyLength]byte
 	copy(pub[:], pri.PublicKey().Marshal())
 	return keypair{pub: pub, pri: pri}
 }
 
 func newMockKeymanager(t *testing.T, pairs ...keypair) *mockKeymanager {
-	m := &mockKeymanager{keysMap: make(map[[field_params.DilithiumPubkeyLength]byte]dilithium.DilithiumKey)}
+	m := &mockKeymanager{keysMap: make(map[[field_params.MLDSA87PubkeyLength]byte]ml_dsa_87.MLDSA87Key)}
 	require.NoError(t, m.add(pairs...))
 	return m
 }
 
 type mockKeymanager struct {
 	lock                sync.RWMutex
-	keysMap             map[[field_params.DilithiumPubkeyLength]byte]dilithium.DilithiumKey
-	keys                [][field_params.DilithiumPubkeyLength]byte
+	keysMap             map[[field_params.MLDSA87PubkeyLength]byte]ml_dsa_87.MLDSA87Key
+	keys                [][field_params.MLDSA87PubkeyLength]byte
 	fetchNoKeys         bool
 	accountsChangedFeed *event.Feed
 }
@@ -126,18 +126,18 @@ func (m *mockKeymanager) removeOne(kp keypair) {
 	}
 }
 
-func (m *mockKeymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_params.DilithiumPubkeyLength]byte, error) {
+func (m *mockKeymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_params.MLDSA87PubkeyLength]byte, error) {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 	if m.fetchNoKeys {
 		m.fetchNoKeys = false
-		return [][field_params.DilithiumPubkeyLength]byte{}, nil
+		return [][field_params.MLDSA87PubkeyLength]byte{}, nil
 	}
 	return m.keys, nil
 }
 
-func (m *mockKeymanager) Sign(_ context.Context, req *validatorpb.SignRequest) (dilithium.Signature, error) {
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+func (m *mockKeymanager) Sign(_ context.Context, req *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], req.PublicKey)
 	privKey, ok := m.keysMap[pubKey]
 	if !ok {
@@ -147,19 +147,19 @@ func (m *mockKeymanager) Sign(_ context.Context, req *validatorpb.SignRequest) (
 	return sig, nil
 }
 
-func (m *mockKeymanager) SubscribeAccountChanges(pubKeysChan chan [][field_params.DilithiumPubkeyLength]byte) event.Subscription {
+func (m *mockKeymanager) SubscribeAccountChanges(pubKeysChan chan [][field_params.MLDSA87PubkeyLength]byte) event.Subscription {
 	if m.accountsChangedFeed == nil {
 		m.accountsChangedFeed = &event.Feed{}
 	}
 	return m.accountsChangedFeed.Subscribe(pubKeysChan)
 }
 
-func (m *mockKeymanager) SimulateAccountChanges(newKeys [][field_params.DilithiumPubkeyLength]byte) {
+func (m *mockKeymanager) SimulateAccountChanges(newKeys [][field_params.MLDSA87PubkeyLength]byte) {
 	m.accountsChangedFeed.Send(newKeys)
 }
 
 func (*mockKeymanager) ExtractKeystores(
-	_ context.Context, _ []dilithium.PublicKey, _ string,
+	_ context.Context, _ []ml_dsa_87.PublicKey, _ string,
 ) ([]*keymanager.Keystore, error) {
 	return nil, errors.New("extracting keys not supported on mock keymanager")
 }
@@ -192,7 +192,7 @@ func TestWaitForChainStart_SetsGenesisInfo(t *testing.T) {
 	defer ctrl.Finish()
 	client := validatormock.NewMockValidatorClient(ctrl)
 
-	db := dbTest.SetupDB(t, [][field_params.DilithiumPubkeyLength]byte{})
+	db := dbTest.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{})
 	v := validator{
 		validatorClient: client,
 		db:              db,
@@ -238,7 +238,7 @@ func TestWaitForChainStart_SetsGenesisInfo_IncorrectSecondTry(t *testing.T) {
 	defer ctrl.Finish()
 	client := validatormock.NewMockValidatorClient(ctrl)
 
-	db := dbTest.SetupDB(t, [][field_params.DilithiumPubkeyLength]byte{})
+	db := dbTest.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{})
 	v := validator{
 		validatorClient: client,
 		db:              db,
@@ -584,7 +584,7 @@ func TestUpdateDuties_OK_FilterBlacklistedPublicKeys(t *testing.T) {
 
 	numValidators := 10
 	km := genMockKeymanager(t, numValidators)
-	blacklistedPublicKeys := make(map[[field_params.DilithiumPubkeyLength]byte]bool)
+	blacklistedPublicKeys := make(map[[field_params.MLDSA87PubkeyLength]byte]bool)
 	for _, k := range km.keys {
 		blacklistedPublicKeys[k] = true
 	}
@@ -1250,7 +1250,7 @@ func TestIsSyncCommitteeAggregator_OK(t *testing.T) {
 /*
 func TestValidator_WaitForKeymanagerInitialization_web3Signer(t *testing.T) {
 	ctx := context.Background()
-	db := dbTest.SetupDB(t, [][field_params.DilithiumPubkeyLength]byte{})
+	db := dbTest.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{})
 	root := make([]byte, 32)
 	copy(root[2:], "a")
 	err := db.SaveGenesisValidatorsRoot(ctx, root)
@@ -1258,7 +1258,7 @@ func TestValidator_WaitForKeymanagerInitialization_web3Signer(t *testing.T) {
 	w := wallet.NewWalletForWeb3Signer()
 	decodedKey, err := hexutil.Decode("0xa2b5aaad9c6efefe7bb9b1243a043404f3362937cfb6b31833929833173f476630ea2cfeb0d9ddf15f97ca8685948820")
 	require.NoError(t, err)
-	keys := [][field_params.DilithiumPubkeyLength]byte{
+	keys := [][field_params.MLDSA87PubkeyLength]byte{
 		bytesutil.ToBytes2592(decodedKey),
 	}
 	v := validator{
@@ -1280,7 +1280,7 @@ func TestValidator_WaitForKeymanagerInitialization_web3Signer(t *testing.T) {
 /*
 func TestValidator_WaitForKeymanagerInitialization_Web(t *testing.T) {
 	ctx := context.Background()
-	db := dbTest.SetupDB(t, [][field_params.DilithiumPubkeyLength]byte{})
+	db := dbTest.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{})
 	root := make([]byte, 32)
 	copy(root[2:], "a")
 	err := db.SaveGenesisValidatorsRoot(ctx, root)
@@ -1310,7 +1310,7 @@ func TestValidator_WaitForKeymanagerInitialization_Web(t *testing.T) {
 
 func TestValidator_WaitForKeymanagerInitialization_Interop(t *testing.T) {
 	ctx := context.Background()
-	db := dbTest.SetupDB(t, [][field_params.DilithiumPubkeyLength]byte{})
+	db := dbTest.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{})
 	root := make([]byte, 32)
 	copy(root[2:], "a")
 	err := db.SaveGenesisValidatorsRoot(ctx, root)
@@ -1332,7 +1332,7 @@ func TestValidator_WaitForKeymanagerInitialization_Interop(t *testing.T) {
 func TestValidator_PushProposerSettings(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	ctx := context.Background()
-	db := dbTest.SetupDB(t, [][field_params.DilithiumPubkeyLength]byte{})
+	db := dbTest.SetupDB(t, [][field_params.MLDSA87PubkeyLength]byte{})
 	client := validatormock.NewMockValidatorClient(ctrl)
 	nodeClient := validatormock.NewMockNodeClient(ctrl)
 	defaultFeeStr := "Q046Fb65722E7b2455043BFEBf6177F1D2e9738D9"
@@ -1369,8 +1369,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 2,
 						Offset:           1,
@@ -1378,7 +1378,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[field_params.MLDSA87PubkeyLength]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1450,8 +1450,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 2,
 						Offset:           1,
@@ -1459,7 +1459,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[field_params.MLDSA87PubkeyLength]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1527,8 +1527,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 2,
 						Offset:           1,
@@ -1536,7 +1536,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[field_params.MLDSA87PubkeyLength]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1587,8 +1587,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
 						Offset:           1,
@@ -1653,8 +1653,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
 						Offset:           1,
@@ -1716,8 +1716,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
 						Offset:           1,
@@ -1725,7 +1725,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[field_params.MLDSA87PubkeyLength]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1767,8 +1767,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				v := validator{
 					validatorClient:              client,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
 						Offset:           1,
@@ -1776,7 +1776,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[field_params.MLDSA87PubkeyLength]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1809,8 +1809,8 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 					validatorClient:              client,
 					node:                         nodeClient,
 					db:                           db,
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					interopKeysConfig: &local.InteropKeymanagerConfig{
 						NumValidatorKeys: 1,
 						Offset:           1,
@@ -1818,7 +1818,7 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 				}
 				err := v.WaitForKeymanagerInitialization(ctx)
 				require.NoError(t, err)
-				config := make(map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption)
+				config := make(map[[field_params.MLDSA87PubkeyLength]byte]*validatorserviceconfig.ProposerOption)
 				km, err := v.Keymanager()
 				require.NoError(t, err)
 				keys, err := km.FetchValidatingPublicKeys(ctx)
@@ -1916,11 +1916,11 @@ func TestValidator_PushProposerSettings(t *testing.T) {
 	}
 }
 
-func getPubkeyFromString(t *testing.T, stringPubkey string) [field_params.DilithiumPubkeyLength]byte {
+func getPubkeyFromString(t *testing.T, stringPubkey string) [field_params.MLDSA87PubkeyLength]byte {
 	pubkeyTemp, err := hexutil.Decode(stringPubkey)
 	require.NoError(t, err)
 
-	var pubkey [field_params.DilithiumPubkeyLength]byte
+	var pubkey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubkey[:], pubkeyTemp)
 
 	return pubkey
@@ -1985,7 +1985,7 @@ func TestValidator_buildPrepProposerReqs_WithoutDefaultConfig(t *testing.T) {
 		validatorClient: client,
 		proposerSettings: &validatorserviceconfig.ProposerSettings{
 			DefaultConfig: nil,
-			ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
+			ProposeConfig: map[[field_params.MLDSA87PubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 				pubkey1: {
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient1,
@@ -2003,13 +2003,13 @@ func TestValidator_buildPrepProposerReqs_WithoutDefaultConfig(t *testing.T) {
 				},
 			},
 		},
-		pubkeyToValidatorIndex: map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex{
+		pubkeyToValidatorIndex: map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex{
 			pubkey1: 1,
 			pubkey4: 4,
 		},
 	}
 
-	pubkeys := [][field_params.DilithiumPubkeyLength]byte{pubkey1, pubkey2, pubkey3, pubkey4}
+	pubkeys := [][field_params.MLDSA87PubkeyLength]byte{pubkey1, pubkey2, pubkey3, pubkey4}
 
 	expected := []*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
 		{
@@ -2095,7 +2095,7 @@ func TestValidator_buildPrepProposerReqs_WithDefaultConfig(t *testing.T) {
 					FeeRecipient: defaultFeeRecipient,
 				},
 			},
-			ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
+			ProposeConfig: map[[field_params.MLDSA87PubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 				pubkey1: {
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient1,
@@ -2113,13 +2113,13 @@ func TestValidator_buildPrepProposerReqs_WithDefaultConfig(t *testing.T) {
 				},
 			},
 		},
-		pubkeyToValidatorIndex: map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex{
+		pubkeyToValidatorIndex: map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex{
 			pubkey1: 1,
 			pubkey4: 4,
 		},
 	}
 
-	pubkeys := [][field_params.DilithiumPubkeyLength]byte{pubkey1, pubkey2, pubkey3, pubkey4}
+	pubkeys := [][field_params.MLDSA87PubkeyLength]byte{pubkey1, pubkey2, pubkey3, pubkey4}
 
 	expected := []*qrysmpb.PrepareBeaconProposerRequest_FeeRecipientContainer{
 		{
@@ -2164,11 +2164,11 @@ func TestValidator_buildSignedRegReqs_DefaultConfigDisabled(t *testing.T) {
 	ctx := context.Background()
 	client := validatormock.NewMockValidatorClient(ctrl)
 
-	signature := dilithiummock.NewMockSignature(ctrl)
+	signature := mldsa87mock.NewMockSignature(ctrl)
 	signature.EXPECT().Marshal().Return([]byte{})
 
 	v := validator{
-		signedValidatorRegistrations: map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1{},
+		signedValidatorRegistrations: map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1{},
 		validatorClient:              client,
 		proposerSettings: &validatorserviceconfig.ProposerSettings{
 			DefaultConfig: &validatorserviceconfig.ProposerOption{
@@ -2180,7 +2180,7 @@ func TestValidator_buildSignedRegReqs_DefaultConfigDisabled(t *testing.T) {
 					GasLimit: 9999,
 				},
 			},
-			ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
+			ProposeConfig: map[[field_params.MLDSA87PubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 				pubkey1: {
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient1,
@@ -2208,12 +2208,12 @@ func TestValidator_buildSignedRegReqs_DefaultConfigDisabled(t *testing.T) {
 				},
 			},
 		},
-		pubkeyToValidatorIndex: make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
+		pubkeyToValidatorIndex: make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
 	}
 
-	pubkeys := [][field_params.DilithiumPubkeyLength]byte{pubkey1, pubkey2, pubkey3}
+	pubkeys := [][field_params.MLDSA87PubkeyLength]byte{pubkey1, pubkey2, pubkey3}
 
-	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (dilithium.Signature, error) {
+	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 		return signature, nil
 	}
 	v.pubkeyToValidatorIndex[pubkey1] = primitives.ValidatorIndex(1)
@@ -2250,11 +2250,11 @@ func TestValidator_buildSignedRegReqs_DefaultConfigEnabled(t *testing.T) {
 	ctx := context.Background()
 	client := validatormock.NewMockValidatorClient(ctrl)
 
-	signature := dilithiummock.NewMockSignature(ctrl)
+	signature := mldsa87mock.NewMockSignature(ctrl)
 	signature.EXPECT().Marshal().Return([]byte{}).Times(2)
 
 	v := validator{
-		signedValidatorRegistrations: map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1{},
+		signedValidatorRegistrations: map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1{},
 		validatorClient:              client,
 		proposerSettings: &validatorserviceconfig.ProposerSettings{
 			DefaultConfig: &validatorserviceconfig.ProposerOption{
@@ -2266,7 +2266,7 @@ func TestValidator_buildSignedRegReqs_DefaultConfigEnabled(t *testing.T) {
 					GasLimit: 9999,
 				},
 			},
-			ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
+			ProposeConfig: map[[field_params.MLDSA87PubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 				pubkey1: {
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient1,
@@ -2294,12 +2294,12 @@ func TestValidator_buildSignedRegReqs_DefaultConfigEnabled(t *testing.T) {
 				},
 			},
 		},
-		pubkeyToValidatorIndex: make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
+		pubkeyToValidatorIndex: make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
 	}
 
-	pubkeys := [][field_params.DilithiumPubkeyLength]byte{pubkey1, pubkey2, pubkey3}
+	pubkeys := [][field_params.MLDSA87PubkeyLength]byte{pubkey1, pubkey2, pubkey3}
 
-	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (dilithium.Signature, error) {
+	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 		return signature, nil
 	}
 	v.pubkeyToValidatorIndex[pubkey1] = primitives.ValidatorIndex(1)
@@ -2333,7 +2333,7 @@ func TestValidator_buildSignedRegReqs_SignerOnError(t *testing.T) {
 	client := validatormock.NewMockValidatorClient(ctrl)
 
 	v := validator{
-		signedValidatorRegistrations: map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1{},
+		signedValidatorRegistrations: map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1{},
 		validatorClient:              client,
 		proposerSettings: &validatorserviceconfig.ProposerSettings{
 			DefaultConfig: &validatorserviceconfig.ProposerOption{
@@ -2348,9 +2348,9 @@ func TestValidator_buildSignedRegReqs_SignerOnError(t *testing.T) {
 		},
 	}
 
-	pubkeys := [][field_params.DilithiumPubkeyLength]byte{pubkey1}
+	pubkeys := [][field_params.MLDSA87PubkeyLength]byte{pubkey1}
 
-	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (dilithium.Signature, error) {
+	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 		return nil, errors.New("custom error")
 	}
 
@@ -2375,10 +2375,10 @@ func TestValidator_buildSignedRegReqs_TimestampBeforeGenesis(t *testing.T) {
 	ctx := context.Background()
 	client := validatormock.NewMockValidatorClient(ctrl)
 
-	signature := dilithiummock.NewMockSignature(ctrl)
+	signature := mldsa87mock.NewMockSignature(ctrl)
 
 	v := validator{
-		signedValidatorRegistrations: map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1{},
+		signedValidatorRegistrations: map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1{},
 		validatorClient:              client,
 		genesisTime:                  uint64(time.Now().UTC().Unix() + 1000),
 		proposerSettings: &validatorserviceconfig.ProposerSettings{
@@ -2391,7 +2391,7 @@ func TestValidator_buildSignedRegReqs_TimestampBeforeGenesis(t *testing.T) {
 					GasLimit: 9999,
 				},
 			},
-			ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorserviceconfig.ProposerOption{
+			ProposeConfig: map[[field_params.MLDSA87PubkeyLength]byte]*validatorserviceconfig.ProposerOption{
 				pubkey1: {
 					FeeRecipientConfig: &validatorserviceconfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient1,
@@ -2403,12 +2403,12 @@ func TestValidator_buildSignedRegReqs_TimestampBeforeGenesis(t *testing.T) {
 				},
 			},
 		},
-		pubkeyToValidatorIndex: make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
+		pubkeyToValidatorIndex: make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
 	}
 
-	pubkeys := [][field_params.DilithiumPubkeyLength]byte{pubkey1}
+	pubkeys := [][field_params.MLDSA87PubkeyLength]byte{pubkey1}
 
-	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (dilithium.Signature, error) {
+	var signer = func(_ context.Context, _ *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 		return signature, nil
 	}
 	v.pubkeyToValidatorIndex[pubkey1] = primitives.ValidatorIndex(1)

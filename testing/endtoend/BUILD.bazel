@@ -54,7 +54,7 @@ common_deps = [
     "//beacon-chain/state/stategen/mock:go_default_library",
     "//config/params:go_default_library",
     "//consensus-types/primitives:go_default_library",
-    "//crypto/dilithium:go_default_library",
+    "//crypto/ml_dsa_87:go_default_library",
     "//encoding/bytesutil:go_default_library",
     "//io/file:go_default_library",
     "//proto/qrl/service:go_default_library",

@@ -5,11 +5,11 @@ import (
 	"math/rand"
 	"sync"
 
-	"github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/qrysm/pkg/FuzzyVM/filler"
 )
 
-type Spam func(*Config, *dilithium.Dilithium, *filler.Filler) error
+type Spam func(*Config, *ml_dsa_87.Wallet, *filler.Filler) error
 
 func SpamTransactions(config *Config, fun Spam) error {
 	fmt.Printf("Spamming %v transactions per account on %v accounts with seed: 0x%x\n", config.N, len(config.accs), config.seed)
@@ -33,7 +33,7 @@ func SpamTransactions(config *Config, fun Spam) error {
 			f = filler.NewFiller(random)
 		}
 		// Start a fuzzing thread
-		go func(acc *dilithium.Dilithium, filler *filler.Filler) {
+		go func(acc *ml_dsa_87.Wallet, filler *filler.Filler) {
 			defer wg.Done()
 			errCh <- fun(config, acc, f)
 		}(acc, f)

@@ -34,16 +34,16 @@ func SlotFromString(str string) (primitives.Slot, error) {
 }
 
 // PubKeyFromHex takes in a hex string, verifies its length as 2592 bytes, and converts that representation.
-func PubKeyFromHex(str string) ([field_params.DilithiumPubkeyLength]byte, error) {
+func PubKeyFromHex(str string) ([field_params.MLDSA87PubkeyLength]byte, error) {
 	pubKeyBytes, err := hex.DecodeString(strings.TrimPrefix(str, "0x"))
 	if err != nil {
-		return [field_params.DilithiumPubkeyLength]byte{}, err
+		return [field_params.MLDSA87PubkeyLength]byte{}, err
 	}
-	if len(pubKeyBytes) != field_params.DilithiumPubkeyLength {
-		return [field_params.DilithiumPubkeyLength]byte{}, fmt.Errorf("public key is not correct, 2592-byte length: %s", str)
+	if len(pubKeyBytes) != field_params.MLDSA87PubkeyLength {
+		return [field_params.MLDSA87PubkeyLength]byte{}, fmt.Errorf("public key is not correct, 2592-byte length: %s", str)
 	}
-	var pk [field_params.DilithiumPubkeyLength]byte
-	copy(pk[:], pubKeyBytes[:field_params.DilithiumPubkeyLength])
+	var pk [field_params.MLDSA87PubkeyLength]byte
+	copy(pk[:], pubKeyBytes[:field_params.MLDSA87PubkeyLength])
 	return pk, nil
 }
 

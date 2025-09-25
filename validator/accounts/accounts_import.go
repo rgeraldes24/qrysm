@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/io/file"
 	"github.com/theQRL/qrysm/io/prompt"
@@ -227,9 +227,9 @@ func importPrivateKeyAsAccount(ctx context.Context, wallet *wallet.Wallet, impor
 			err, "could not decode file as hex string, does the file contain a valid hex string?",
 		)
 	}
-	privKey, err := dilithium.SecretKeyFromSeed(privKeyBytes)
+	privKey, err := ml_dsa_87.SecretKeyFromSeed(privKeyBytes)
 	if err != nil {
-		return errors.Wrap(err, "not a valid Dilithium private key")
+		return errors.Wrap(err, "not a valid ML-DSA-87 private key")
 	}
 	keystore, err := createKeystoreFromPrivateKey(privKey, wallet.Password())
 	if err != nil {
@@ -282,25 +282,25 @@ func readKeystoreFile(_ context.Context, keystoreFilePath string) (*keymanager.K
 	return keystoreFile, nil
 }
 
-func createKeystoreFromPrivateKey(dilithiumKey dilithium.DilithiumKey, walletPassword string) (*keymanager.Keystore, error) {
+func createKeystoreFromPrivateKey(mlDSA87Key ml_dsa_87.MLDSA87Key, walletPassword string) (*keymanager.Keystore, error) {
 	encryptor := keystorev1.New()
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
 	}
-	cryptoFields, err := encryptor.Encrypt(dilithiumKey.Marshal(), walletPassword)
+	cryptoFields, err := encryptor.Encrypt(mlDSA87Key.Marshal(), walletPassword)
 	if err != nil {
 		return nil, errors.Wrapf(
 			err,
 			"could not encrypt private key with public key %#x",
-			dilithiumKey.PublicKey().Marshal(),
+			mlDSA87Key.PublicKey().Marshal(),
 		)
 	}
 	return &keymanager.Keystore{
 		Crypto:      cryptoFields,
 		ID:          id.String(),
 		Version:     encryptor.Version(),
-		Pubkey:      fmt.Sprintf("%x", dilithiumKey.PublicKey().Marshal()),
+		Pubkey:      fmt.Sprintf("%x", mlDSA87Key.PublicKey().Marshal()),
 		Description: encryptor.Name(),
 	}, nil
 }

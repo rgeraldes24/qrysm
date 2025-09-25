@@ -138,7 +138,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 		go s.sendBlockAttestationsToSlasher(blockCopy, preState)
 	}
 
-	// Handle post block operations such as pruning exits and dilithium messages if incoming block is the head
+	// Handle post block operations such as pruning exits and ml-dsa-87 messages if incoming block is the head
 	if err := s.prunePostBlockOperationPools(ctx, blockCopy, blockRoot); err != nil {
 		log.WithError(err).Error("Could not prune canonical objects from pool ")
 	}
@@ -272,9 +272,9 @@ func (s *Service) prunePostBlockOperationPools(ctx context.Context, blk interfac
 		s.cfg.ExitPool.MarkIncluded(e)
 	}
 
-	// Mark block Dilithium changes as seen so we don't include same ones in future blocks.
-	if err := s.markIncludedBlockDilithiumToExecChanges(blk.Block()); err != nil {
-		return errors.Wrap(err, "could not process DilithiumToExecutionChanges")
+	// Mark block ml-dsa-87 changes as seen so we don't include same ones in future blocks.
+	if err := s.markIncludedBlockMLDSA87ToExecChanges(blk.Block()); err != nil {
+		return errors.Wrap(err, "could not process MLDSA87ToExecutionChanges")
 	}
 
 	// Mark slashings as seen so we don't include same ones in future blocks.
@@ -288,13 +288,13 @@ func (s *Service) prunePostBlockOperationPools(ctx context.Context, blk interfac
 	return nil
 }
 
-func (s *Service) markIncludedBlockDilithiumToExecChanges(headBlock interfaces.ReadOnlyBeaconBlock) error {
-	changes, err := headBlock.Body().DilithiumToExecutionChanges()
+func (s *Service) markIncludedBlockMLDSA87ToExecChanges(headBlock interfaces.ReadOnlyBeaconBlock) error {
+	changes, err := headBlock.Body().MLDSA87ToExecutionChanges()
 	if err != nil {
-		return errors.Wrap(err, "could not get DilithiumToExecutionChanges")
+		return errors.Wrap(err, "could not get MLDSA87ToExecutionChanges")
 	}
 	for _, change := range changes {
-		s.cfg.DilithiumToExecPool.MarkIncluded(change)
+		s.cfg.MLDSA87ToExecPool.MarkIncluded(change)
 	}
 	return nil
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"go.opencensus.io/trace"
 	"golang.org/x/sync/errgroup"
@@ -131,7 +131,7 @@ func AttestingIndices(bf bitfield.Bitfield, committee []primitives.ValidatorInde
 //	 domain = get_domain(state, DOMAIN_BEACON_ATTESTER, indexed_attestation.data.target.epoch)
 //	 signing_root = compute_signing_root(indexed_attestation.data, domain)
 //	 return bls.FastAggregateVerify(pubkeys, signing_root, indexed_attestation.signature)
-func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *qrysmpb.IndexedAttestation, pubKeys []dilithium.PublicKey, domain []byte) error {
+func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *qrysmpb.IndexedAttestation, pubKeys []ml_dsa_87.PublicKey, domain []byte) error {
 	_, span := trace.StartSpan(ctx, "attestationutil.VerifyIndexedAttestationSigs")
 	defer span.End()
 
@@ -150,7 +150,7 @@ func VerifyIndexedAttestationSigs(ctx context.Context, indexedAtt *qrysmpb.Index
 	for i := range indexedAtt.Signatures {
 		index := i
 		grp.Go(func() error {
-			sig, err := dilithium.SignatureFromBytes(indexedAtt.Signatures[index])
+			sig, err := ml_dsa_87.SignatureFromBytes(indexedAtt.Signatures[index])
 			if err != nil {
 				return errors.Wrap(err, "could not convert bytes to signature")
 			}

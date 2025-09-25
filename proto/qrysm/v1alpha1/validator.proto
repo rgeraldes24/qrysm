@@ -52,7 +52,7 @@ service BeaconNodeValidator {
         };
     }
 
-    // DomainData fetches the current Dilithium signature domain version information from the
+    // DomainData fetches the current ML-DSA-87 signature domain version information from the
     // running beacon node's state. This information is used when validators sign
     // blocks and attestations appropriately based on their duty.
     rpc DomainData(DomainRequest) returns (DomainResponse) {
@@ -474,7 +474,7 @@ message DutiesRequest {
     // Epoch at which validators should perform their duties.
     uint64 epoch = 1 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Epoch"];
 
-    // Array of byte encoded Dilithium public keys.
+    // Array of byte encoded ML-DSA-87 public keys.
     repeated bytes public_keys = 2 [(theqrl.qrl.ext.ssz_size) = "?,2592"];
 }
 
@@ -496,7 +496,7 @@ message DutiesResponse {
         // Slots at which a validator must propose a beacon chain block.
         repeated uint64 proposer_slots = 4 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];
 
-        // 2592 byte Dilithium public key for the validator who's assigned to perform a duty.
+        // 2592 byte ML-DSA-87 public key for the validator who's assigned to perform a duty.
         bytes public_key = 5 [(theqrl.qrl.ext.ssz_size) = "2592"];
 
         // The current status of the validator assigned to perform the duty.
@@ -515,7 +515,7 @@ message BlockRequest {
     uint64 slot = 1 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Slot"];
 
     // Validator's 32 byte randao reveal secret of the current epoch.
-    bytes randao_reveal = 2 [(theqrl.qrl.ext.ssz_size) = "4595"];
+    bytes randao_reveal = 2 [(theqrl.qrl.ext.ssz_size) = "4627"];
 
     // Validator's 32 byte graffiti message for the new block.
     bytes graffiti = 3 [(theqrl.qrl.ext.ssz_size) = "32"];
@@ -554,9 +554,9 @@ message AggregateSelectionRequest {
     uint64 committee_index = 2  [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.CommitteeIndex"];
     // 2592 byte public key of the validator.
     bytes public_key = 3 [(theqrl.qrl.ext.ssz_size) = "2592", (theqrl.qrl.ext.spec_name) = "pubkey"];
-    // 4595 byte signature of the validator on the slot. This is used as proof that the validator is
+    // 4627 byte signature of the validator on the slot. This is used as proof that the validator is
     // an aggregator for the given slot.
-    bytes slot_signature = 4 [(theqrl.qrl.ext.ssz_size) = "4595"];
+    bytes slot_signature = 4 [(theqrl.qrl.ext.ssz_size) = "4627"];
 }
 
 message AggregateSelectionResponse {
@@ -588,7 +588,7 @@ message CommitteeSubnetsSubscribeRequest {
 
 // A QRL validator.
 message Validator {
-    // 2592 byte Dilithium public key used for the validator's activities.
+    // 2592 byte ML-DSA-87 public key used for the validator's activities.
     bytes public_key = 1 [(theqrl.qrl.ext.ssz_size) = "2592", (theqrl.qrl.ext.spec_name) = "pubkey"];
 
     // 32 byte hash of the withdrawal destination public key.
@@ -644,7 +644,7 @@ message ValidatorParticipation {
 
 // ValidatorInfo gives information about the state of a validator at a certain epoch.
 message ValidatorInfo {
-    // The validator's 2592 byte Dilithium public key.
+    // The validator's 2592 byte ML-DSA-87 public key.
     bytes public_key = 1;
 
     // The validator's index in the beacon state.
@@ -682,7 +682,7 @@ message DoppelGangerRequest {
 
     // ValidatorRequest data type which represents a request for each validator.
     message ValidatorRequest {
-        // The validator's 2592 byte Dilithium public key.
+        // The validator's 2592 byte ML-DSA-87 public key.
         bytes public_key = 1 [(theqrl.qrl.ext.ssz_size) = "2592", (theqrl.qrl.ext.spec_name) = "pubkey"];
         // The validator's last recorded epoch to attest.
         uint64 epoch = 2 [(theqrl.qrl.ext.cast_type) = "github.com/theQRL/qrysm/consensus-types/primitives.Epoch"];
@@ -695,7 +695,7 @@ message DoppelGangerRequest {
 // after it has checked for all duplicate keys in the network.
 message DoppelGangerResponse {
     message ValidatorResponse {
-        // The validator's 2592 byte Dilithium public key.
+        // The validator's 2592 byte ML-DSA-87 public key.
         bytes public_key = 1 [(theqrl.qrl.ext.ssz_size) = "2592", (theqrl.qrl.ext.spec_name) = "pubkey"];
         // Whether a duplicate of the validator exists.
         bool duplicate_exists = 2;

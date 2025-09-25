@@ -20,7 +20,7 @@ import (
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -187,14 +187,14 @@ func (s *Service) onBlockBatch(ctx context.Context, blks []consensusblocks.ROBlo
 
 	jCheckpoints := make([]*qrysmpb.Checkpoint, len(blks))
 	fCheckpoints := make([]*qrysmpb.Checkpoint, len(blks))
-	sigSet := dilithium.NewSet()
+	sigSet := ml_dsa_87.NewSet()
 	type versionAndHeader struct {
 		version int
 		header  interfaces.ExecutionData
 	}
 	preVersionAndHeaders := make([]*versionAndHeader, len(blks))
 	postVersionAndHeaders := make([]*versionAndHeader, len(blks))
-	var set *dilithium.SignatureBatch
+	var set *ml_dsa_87.SignatureBatch
 	boundaries := make(map[[32]byte]state.BeaconState)
 	for i, b := range blks {
 		v, h, err := getStateVersionAndPayload(preState)

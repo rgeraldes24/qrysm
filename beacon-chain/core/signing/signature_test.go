@@ -6,14 +6,14 @@ import (
 
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 )
 
 func TestVerifyRegistrationSignature(t *testing.T) {
-	sk, err := dilithium.RandKey()
+	sk, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	reg := &qrysmpb.ValidatorRegistrationV1{
 		FeeRecipient: bytesutil.PadTo([]byte("fee"), 20),

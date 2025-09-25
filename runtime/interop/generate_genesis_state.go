@@ -10,8 +10,8 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
-	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/hash"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
@@ -57,8 +57,8 @@ func generateDepositsFromData(depositDataItems []*qrysmpb.Deposit_Data, offset i
 	return deposits, nil
 }
 
-// DepositDataFromKeys generates a list of deposit data items from a set of Dilithium validator keys.
-func DepositDataFromKeys(privKeys []dilithium.DilithiumKey, pubKeys []dilithium.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
+// DepositDataFromKeys generates a list of deposit data items from a set of ML-DSA-87 validator keys.
+func DepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
 	type depositData struct {
 		items []*qrysmpb.Deposit_Data
 		roots [][]byte
@@ -83,12 +83,12 @@ func DepositDataFromKeys(privKeys []dilithium.DilithiumKey, pubKeys []dilithium.
 	return depositDataItems, depositDataRoots, nil
 }
 
-// DepositDataFromKeysWithExecCreds generates a list of deposit data items from a set of Dilithium validator keys.
-func DepositDataFromKeysWithExecCreds(privKeys []dilithium.DilithiumKey, pubKeys []dilithium.PublicKey, numOfCreds uint64) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
+// DepositDataFromKeysWithExecCreds generates a list of deposit data items from a set of ML-DSA-87 validator keys.
+func DepositDataFromKeysWithExecCreds(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey, numOfCreds uint64) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
 	return depositDataFromKeys(privKeys, pubKeys, numOfCreds)
 }
 
-func depositDataFromKeys(privKeys []dilithium.DilithiumKey, pubKeys []dilithium.PublicKey, numOfCreds uint64) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
+func depositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey, numOfCreds uint64) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
 	dataRoots := make([][]byte, len(privKeys))
 	depositDataItems := make([]*qrysmpb.Deposit_Data, len(privKeys))
 	for i := 0; i < len(privKeys); i++ {
@@ -107,8 +107,8 @@ func depositDataFromKeys(privKeys []dilithium.DilithiumKey, pubKeys []dilithium.
 	return depositDataItems, dataRoots, nil
 }
 
-// Generates a deposit data item from Dilithium keys and signs the hash tree root of the data.
-func createDepositData(privKey dilithium.DilithiumKey, pubKey dilithium.PublicKey, withExecCreds bool) (*qrysmpb.Deposit_Data, error) {
+// Generates a deposit data item from ML-DSA-87 keys and signs the hash tree root of the data.
+func createDepositData(privKey ml_dsa_87.MLDSA87Key, pubKey ml_dsa_87.PublicKey, withExecCreds bool) (*qrysmpb.Deposit_Data, error) {
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             pubKey.Marshal(),
 		WithdrawalCredentials: withdrawalCredentialsHash(pubKey.Marshal()),
@@ -146,11 +146,11 @@ func createDepositData(privKey dilithium.DilithiumKey, pubKey dilithium.PublicKe
 //
 // The specification is as follows:
 //
-//	withdrawal_credentials[:1] == DILITHIUM_WITHDRAWAL_PREFIX_BYTE
+//	withdrawal_credentials[:1] == ML_DSA_87_WITHDRAWAL_PREFIX_BYTE
 //	withdrawal_credentials[1:] == hash(withdrawal_pubkey)[1:]
 //
 // where withdrawal_credentials is of type bytes32.
 func withdrawalCredentialsHash(pubKey []byte) []byte {
 	h := hash.Hash(pubKey)
-	return append([]byte{dilithiumWithdrawalPrefixByte}, h[1:]...)[:32]
+	return append([]byte{mlDSA87WithdrawalPrefixByte}, h[1:]...)[:32]
 }

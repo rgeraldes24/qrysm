@@ -15,7 +15,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -91,7 +91,7 @@ func TestGetSyncSubcommitteeIndex_Ok(t *testing.T) {
 			SyncCommitteeIndices: []primitives.CommitteeIndex{0},
 		},
 	}
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	// Request slot 0, should get the index 0 for validator 0.
 	res, err := server.GetSyncSubcommitteeIndex(context.Background(), &qrysmpb.SyncSubcommitteeIndexRequest{
 		PublicKey: pubKey[:], Slot: primitives.Slot(0),
@@ -119,7 +119,7 @@ func TestGetSyncCommitteeContribution_FiltersDuplicates(t *testing.T) {
 		TimeFetcher:           &mock.ChainService{Genesis: time.Now()},
 		OptimisticModeFetcher: &mock.ChainService{},
 	}
-	secKey, err := dilithium.RandKey()
+	secKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := secKey.Sign([]byte{'A'}).Marshal()
 	msg := &qrysmpb.SyncCommitteeMessage{

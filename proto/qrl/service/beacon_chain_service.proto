@@ -169,21 +169,21 @@ service BeaconChain {
     };
   }
 
-  // SubmitSignedDilithiumToExecutionChanges submits said object to node's pool
+  // SubmitSignedMLDSA87ToExecutionChanges submits said object to node's pool
   // and if passes validation node MUST broadcast it to network.
-  rpc SubmitSignedDilithiumToExecutionChanges(v1.SubmitDilithiumToExecutionChangesRequest) returns (google.protobuf.Empty) {
+  rpc SubmitSignedMLDSA87ToExecutionChanges(v1.SubmitMLDSA87ToExecutionChangesRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/internal/qrl/v1/beacon/pool/dilithium_to_execution_changes"
+      post: "/internal/qrl/v1/beacon/pool/ml_dsa_87_to_execution_changes"
       body: "*"
     };
   }
 
-  // ListDilithiumToExecutionChanges retrieves Dilithium to execution changes known by the node but not necessarily incorporated into any block
+  // ListMLDSA87ToExecutionChanges retrieves ML-DSA-87 to execution changes known by the node but not necessarily incorporated into any block
   //
   // Spec: https://ethereum.github.io/beacon-APIs/?urls.primaryName=dev#/Beacon/getPoolBLSToExecutionChanges
-  rpc ListDilithiumToExecutionChanges(google.protobuf.Empty) returns (v1.DilithiumToExecutionChangesPoolResponse) {
+  rpc ListMLDSA87ToExecutionChanges(google.protobuf.Empty) returns (v1.MLDSA87ToExecutionChangesPoolResponse) {
     option (google.api.http) = {
-      get: "/internal/qrl/v1/beacon/pool/dilithium_to_execution_changes"
+      get: "/internal/qrl/v1/beacon/pool/ml_dsa_87_to_execution_changes"
     };
   }
 

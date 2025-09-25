@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/bazelbuild/rules_go/go/tools/bazel"
-	"github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/io/file"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -150,7 +149,7 @@ func TestEIP3076SpecTests(t *testing.T) {
 							Target:          &qrysmpb.Checkpoint{Epoch: target, Root: make([]byte, 32)},
 							Source:          &qrysmpb.Checkpoint{Epoch: source, Root: make([]byte, 32)},
 						},
-						Signature: make([]byte, field_params.DilithiumSignatureLength),
+						Signature: make([]byte, field_params.MLDSA87SignatureLength),
 					}
 
 					var signingRoot [32]byte

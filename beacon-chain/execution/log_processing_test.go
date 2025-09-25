@@ -3,6 +3,7 @@ package execution
 import (
 	"context"
 	"encoding/binary"
+	"fmt"
 	"testing"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
@@ -67,6 +68,10 @@ func TestProcessDepositLog_OK(t *testing.T) {
 
 	logs, err := testAcc.Backend.FilterLogs(web3Service.ctx, query)
 	require.NoError(t, err, "Unable to retrieve logs")
+
+	h2 := testAcc.Backend.Blockchain().CurrentBlock()
+	b2 := testAcc.Backend.Blockchain().GetBlock(h2.Hash(), h2.Number.Uint64())
+	fmt.Println(len(b2.Transactions()))
 
 	if len(logs) == 0 {
 		t.Fatal("no logs")
@@ -136,7 +141,6 @@ func TestProcessDepositLog_InsertsPendingDeposit(t *testing.T) {
 			web3Service.cfg.depositContractAddr,
 		},
 	}
-
 	logs, err := testAcc.Backend.FilterLogs(web3Service.ctx, query)
 	require.NoError(t, err, "Unable to retrieve logs")
 

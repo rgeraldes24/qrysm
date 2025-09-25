@@ -11,7 +11,7 @@ import (
 	p2pType "github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
@@ -60,12 +60,12 @@ func ProcessSyncAggregate(ctx context.Context, s state.BeaconState, sync *qrysmp
 }
 
 // processSyncAggregate applies all the logic in the spec function `process_sync_aggregate` except
-// verifying the Dilithium signatures. It returns the modified beacons state, the list of validators'
+// verifying the ML-DSA-87 signatures. It returns the modified beacons state, the list of validators'
 // public keys that voted (for future signature verification) and the proposer reward for including
 // sync aggregate messages.
 func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *qrysmpb.SyncAggregate) (
 	state.BeaconState,
-	[]dilithium.PublicKey,
+	[]ml_dsa_87.PublicKey,
 	uint64,
 	error) {
 	currentSyncCommittee, err := s.CurrentSyncCommittee()
@@ -79,7 +79,7 @@ func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *qrysmp
 	if sync.SyncCommitteeBits.Len() > uint64(len(committeeKeys)) {
 		return nil, nil, 0, errors.New("bits length exceeds committee length")
 	}
-	votedKeys := make([]dilithium.PublicKey, 0, len(committeeKeys))
+	votedKeys := make([]ml_dsa_87.PublicKey, 0, len(committeeKeys))
 
 	activeBalance, err := helpers.TotalActiveBalance(s)
 	if err != nil {
@@ -103,7 +103,7 @@ func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *qrysmp
 		}
 
 		if sync.SyncCommitteeBits.BitAt(i) {
-			pubKey, err := dilithium.PublicKeyFromBytes(committeeKeys[i])
+			pubKey, err := ml_dsa_87.PublicKeyFromBytes(committeeKeys[i])
 			if err != nil {
 				return nil, nil, 0, err
 			}
@@ -125,7 +125,7 @@ func processSyncAggregate(ctx context.Context, s state.BeaconState, sync *qrysmp
 }
 
 // VerifySyncCommitteeSigs verifies sync committee signatures `syncSigs` is valid with respect to public keys `syncKeys`.
-func VerifySyncCommitteeSigs(s state.BeaconState, syncKeys []dilithium.PublicKey, syncSigs [][]byte) error {
+func VerifySyncCommitteeSigs(s state.BeaconState, syncKeys []ml_dsa_87.PublicKey, syncSigs [][]byte) error {
 	if len(syncSigs) != len(syncKeys) {
 		return fmt.Errorf("provided signatures and pubkeys have differing lengths. S: %d, P: %d",
 			len(syncSigs), len(syncKeys))
@@ -153,7 +153,7 @@ func VerifySyncCommitteeSigs(s state.BeaconState, syncKeys []dilithium.PublicKey
 	for i := range syncSigs {
 		index := i
 		grp.Go(func() error {
-			sig, err := dilithium.SignatureFromBytes(syncSigs[index])
+			sig, err := ml_dsa_87.SignatureFromBytes(syncSigs[index])
 			if err != nil {
 				return err
 			}

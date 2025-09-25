@@ -13,12 +13,12 @@ import (
 
 // MockClient is a mock implementation of BuilderClient.
 type MockClient struct {
-	RegisteredVals map[[2592]byte]bool
+	RegisteredVals map[[field_params.MLDSA87PubkeyLength]byte]bool
 }
 
 // NewClient creates a new, correctly initialized mock.
 func NewClient() MockClient {
-	return MockClient{RegisteredVals: map[[2592]byte]bool{}}
+	return MockClient{RegisteredVals: map[[field_params.MLDSA87PubkeyLength]byte]bool{}}
 }
 
 // NodeURL --
@@ -27,7 +27,7 @@ func (MockClient) NodeURL() string {
 }
 
 // GetHeader --
-func (MockClient) GetHeader(_ context.Context, _ primitives.Slot, _ [32]byte, _ [field_params.DilithiumPubkeyLength]byte) (builder.SignedBid, error) {
+func (MockClient) GetHeader(_ context.Context, _ primitives.Slot, _ [32]byte, _ [field_params.MLDSA87PubkeyLength]byte) (builder.SignedBid, error) {
 	return nil, nil
 }
 

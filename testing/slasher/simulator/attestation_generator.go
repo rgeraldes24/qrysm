@@ -151,7 +151,7 @@ func makeSlashableFromAtt(att *qrysmpb.IndexedAttestation, indices []uint64) *qr
 	return &qrysmpb.IndexedAttestation{
 		AttestingIndices: indices,
 		Data:             attData,
-		Signatures:       [][]byte{params.BeaconConfig().EmptyDilithiumSignature[:]},
+		Signatures:       [][]byte{params.BeaconConfig().EmptyMLDSA87Signature[:]},
 	}
 }
 
@@ -172,6 +172,6 @@ func makeDoubleVoteFromAtt(att *qrysmpb.IndexedAttestation, indices []uint64) *q
 	return &qrysmpb.IndexedAttestation{
 		AttestingIndices: indices,
 		Data:             attData,
-		Signatures:       [][]byte{params.BeaconConfig().EmptyDilithiumSignature[:]},
+		Signatures:       [][]byte{params.BeaconConfig().EmptyMLDSA87Signature[:]},
 	}
 }

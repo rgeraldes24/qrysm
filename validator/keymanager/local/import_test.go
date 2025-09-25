@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/theQRL/go-zond/common/hexutil"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
@@ -25,7 +25,7 @@ func createRandomKeystore(t testing.TB, password string) *keymanager.Keystore {
 	encryptor := keystorev1.New()
 	id, err := uuid.NewRandom()
 	require.NoError(t, err)
-	validatingKey, err := dilithium.RandKey()
+	validatingKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	pubKey := validatingKey.PublicKey().Marshal()
 	cryptoFields, err := encryptor.Encrypt(validatingKey.Marshal(), password)
@@ -44,7 +44,7 @@ func TestLocalKeymanager_NoDuplicates(t *testing.T) {
 	pubKeys := make([][]byte, numKeys)
 	seeds := make([][]byte, numKeys)
 	for i := 0; i < numKeys; i++ {
-		priv, err := dilithium.RandKey()
+		priv, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		seeds[i] = priv.Marshal()
 		pubKeys[i] = priv.PublicKey().Marshal()
@@ -83,7 +83,7 @@ func TestLocalKeymanager_NoDuplicates(t *testing.T) {
 
 	// Now, we run the function again but with a new priv and pubkey and this
 	// time, we do expect a change.
-	privKey, err := dilithium.RandKey()
+	privKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	seeds = append(seeds, privKey.Marshal())
 	pubKeys = append(pubKeys, privKey.PublicKey().Marshal())

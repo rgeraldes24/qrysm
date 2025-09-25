@@ -6,7 +6,7 @@ import (
 
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/pkg/errors"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	"go.opencensus.io/trace"
 )
@@ -16,7 +16,7 @@ const signatureVerificationInterval = 50 * time.Millisecond
 const verifierLimit = 50
 
 type signatureVerifier struct {
-	set     *dilithium.SignatureBatch
+	set     *ml_dsa_87.SignatureBatch
 	resChan chan error
 }
 
@@ -49,7 +49,7 @@ func (s *Service) verifierRoutine() {
 	}
 }
 
-func (s *Service) validateWithBatchVerifier(ctx context.Context, message string, set *dilithium.SignatureBatch) (pubsub.ValidationResult, error) {
+func (s *Service) validateWithBatchVerifier(ctx context.Context, message string, set *ml_dsa_87.SignatureBatch) (pubsub.ValidationResult, error) {
 	_, span := trace.StartSpan(ctx, "sync.validateWithBatchVerifier")
 	defer span.End()
 
@@ -104,7 +104,7 @@ func verifyBatch(verifierBatch []*signatureVerifier) {
 	}
 }
 
-func removeDuplicates(aggSet *dilithium.SignatureBatch) (*dilithium.SignatureBatch, error) {
+func removeDuplicates(aggSet *ml_dsa_87.SignatureBatch) (*ml_dsa_87.SignatureBatch, error) {
 	num, aggSet, err := aggSet.RemoveDuplicates()
 	if err != nil {
 		return nil, err

@@ -61,7 +61,7 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 					Transactions:  jsonifyTransactions(capellaBlock.Capella.Block.Body.ExecutionPayload.Transactions),
 					Withdrawals:   jsonifyWithdrawals(capellaBlock.Capella.Block.Body.ExecutionPayload.Withdrawals),
 				},
-				DilithiumToExecutionChanges: jsonifyDilithiumToExecutionChanges(capellaBlock.Capella.Block.Body.DilithiumToExecutionChanges),
+				MLDSA87ToExecutionChanges: jsonifyMLDSA87ToExecutionChanges(capellaBlock.Capella.Block.Body.Mldsa87ToExecutionChanges),
 			},
 		},
 	}
@@ -95,7 +95,7 @@ func generateSignedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Capella {
 	return &qrysmpb.GenericSignedBeaconBlock_Capella{
 		Capella: &qrysmpb.SignedBeaconBlockCapella{
 			Block:     test_helpers.GenerateProtoCapellaBeaconBlock(),
-			Signature: test_helpers.FillByteSlice(4595, 127),
+			Signature: test_helpers.FillByteSlice(4627, 127),
 		},
 	}
 }

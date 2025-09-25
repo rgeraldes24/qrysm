@@ -15,13 +15,13 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/crypto/rand"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 // RandaoReveal returns a signature of the requested epoch using the beacon proposer private key.
-func RandaoReveal(beaconState state.ReadOnlyBeaconState, epoch primitives.Epoch, privKeys []dilithium.DilithiumKey) ([]byte, error) {
+func RandaoReveal(beaconState state.ReadOnlyBeaconState, epoch primitives.Epoch, privKeys []ml_dsa_87.MLDSA87Key) ([]byte, error) {
 	// We fetch the proposer's index as that is whom the RANDAO will be verified against.
 	proposerIdx, err := helpers.BeaconProposerIndex(context.Background(), beaconState)
 	if err != nil {
@@ -39,8 +39,8 @@ func RandaoReveal(beaconState state.ReadOnlyBeaconState, epoch primitives.Epoch,
 func BlockSignature(
 	bState state.BeaconState,
 	block interface{},
-	privKeys []dilithium.DilithiumKey,
-) (dilithium.Signature, error) {
+	privKeys []ml_dsa_87.MLDSA87Key,
+) (ml_dsa_87.Signature, error) {
 	var wsb interfaces.ReadOnlySignedBeaconBlock
 	var err error
 	// copy the state since we need to process slots

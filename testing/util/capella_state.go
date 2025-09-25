@@ -15,7 +15,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state/stateutil"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
@@ -29,7 +29,7 @@ func DeterministicGenesisStateCapellaWithGenesisBlock(
 	ctx context.Context,
 	db iface.HeadAccessDatabase,
 	numValidators uint64,
-) (state.BeaconState, [32]byte, []dilithium.DilithiumKey) {
+) (state.BeaconState, [32]byte, []ml_dsa_87.MLDSA87Key) {
 	genesisState, privateKeys := DeterministicGenesisStateCapella(t, numValidators)
 	stateRoot, err := genesisState.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
@@ -46,7 +46,7 @@ func DeterministicGenesisStateCapellaWithGenesisBlock(
 }
 
 // DeterministicGenesisStateCapella returns a genesis state in Capella format made using the deterministic deposits.
-func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state.BeaconState, []dilithium.DilithiumKey) {
+func DeterministicGenesisStateCapella(t testing.TB, numValidators uint64) (state.BeaconState, []ml_dsa_87.MLDSA87Key) {
 	deposits, privKeys, err := DeterministicDepositsAndKeys(numValidators)
 	if err != nil {
 		t.Fatal(errors.Wrapf(err, "failed to get %d deposits", numValidators))
@@ -212,7 +212,7 @@ func buildGenesisBeaconStateCapella(genesisTime uint64, preState state.BeaconSta
 
 	var scBits [fieldparams.SyncAggregateSyncCommitteeBytesLength]byte
 	bodyRoot, err := (&qrysmpb.BeaconBlockBodyCapella{
-		RandaoReveal: make([]byte, fieldparams.DilithiumSignatureLength),
+		RandaoReveal: make([]byte, fieldparams.MLDSA87SignatureLength),
 		ExecutionData: &qrysmpb.ExecutionData{
 			DepositRoot: make([]byte, 32),
 			BlockHash:   make([]byte, 32),

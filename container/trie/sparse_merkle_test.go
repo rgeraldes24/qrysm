@@ -95,8 +95,8 @@ func TestMarshalDepositWithProof(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, len(proof), int(params.BeaconConfig().DepositContractTreeDepth)+1)
 	someRoot := [32]byte{1, 2, 3, 4}
-	someSig := [field_params.DilithiumSignatureLength]byte{1, 2, 3, 4}
-	someKey := [field_params.DilithiumPubkeyLength]byte{1, 2, 3, 4}
+	someSig := [field_params.MLDSA87SignatureLength]byte{1, 2, 3, 4}
+	someKey := [field_params.MLDSA87PubkeyLength]byte{1, 2, 3, 4}
 	dep := &qrysmpb.Deposit{
 		Proof: proof,
 		Data: &qrysmpb.Deposit_Data{

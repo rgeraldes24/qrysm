@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
@@ -29,9 +29,9 @@ func TestLocalKeymanager_FetchValidatingPublicKeys(t *testing.T) {
 	// First, generate accounts and their keystore.json files.
 	ctx := context.Background()
 	numAccounts := 10
-	wantedPubKeys := make([][field_params.DilithiumPubkeyLength]byte, 0)
+	wantedPubKeys := make([][field_params.MLDSA87PubkeyLength]byte, 0)
 	for i := 0; i < numAccounts; i++ {
-		privKey, err := dilithium.RandKey()
+		privKey, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		pubKey := bytesutil.ToBytes2592(privKey.PublicKey().Marshal())
 		wantedPubKeys = append(wantedPubKeys, pubKey)
@@ -63,7 +63,7 @@ func TestLocalKeymanager_FetchValidatingSeeds(t *testing.T) {
 	numAccounts := 10
 	wantedSeeds := make([][48]byte, numAccounts)
 	for i := 0; i < numAccounts; i++ {
-		seed, err := dilithium.RandKey()
+		seed, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		seedData := seed.Marshal()
 		pubKey := bytesutil.ToBytes2592(seed.PublicKey().Marshal())
@@ -115,7 +115,7 @@ func TestLocalKeymanager_Sign(t *testing.T) {
 	require.NoError(t, json.Unmarshal(encodedKeystore, keystoreFile))
 
 	// We extract the validator signing private key from the keystore
-	// by utilizing the password and initialize a new Dilithium secret key from
+	// by utilizing the password and initialize a new ML-DSA-87 secret key from
 	// its raw bytes.
 	decryptor := keystorev1.New()
 	enc, err := decryptor.Decrypt(keystoreFile.Crypto, dr.wallet.Password())
@@ -138,9 +138,9 @@ func TestLocalKeymanager_Sign(t *testing.T) {
 	}
 	sig, err := dr.Sign(ctx, signRequest)
 	require.NoError(t, err)
-	pubKey, err := dilithium.PublicKeyFromBytes(publicKeys[0][:])
+	pubKey, err := ml_dsa_87.PublicKeyFromBytes(publicKeys[0][:])
 	require.NoError(t, err)
-	wrongPubKey, err := dilithium.PublicKeyFromBytes(publicKeys[1][:])
+	wrongPubKey, err := ml_dsa_87.PublicKeyFromBytes(publicKeys[1][:])
 	require.NoError(t, err)
 	if !sig.Verify(pubKey, data) {
 		t.Fatalf("Expected sig to verify for pubkey %#x and data %v", pubKey.Marshal(), data)
@@ -163,7 +163,7 @@ func TestLocalKeymanager_Sign_NoPublicKeyInCache(t *testing.T) {
 	req := &validatorpb.SignRequest{
 		PublicKey: []byte("hello world"),
 	}
-	dilithiumKeysCache = make(map[[field_params.DilithiumPubkeyLength]byte]dilithium.DilithiumKey)
+	mlDSA87KeysCache = make(map[[field_params.MLDSA87PubkeyLength]byte]ml_dsa_87.MLDSA87Key)
 	dr := &Keymanager{}
 	_, err := dr.Sign(context.Background(), req)
 	assert.ErrorContains(t, "no signing key found in keys cache", err)

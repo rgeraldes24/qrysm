@@ -56,7 +56,7 @@ func TestSubmitAggregateSelectionProof(t *testing.T) {
 	aggregateAttestation := &qrysmpb.Attestation{
 		AggregationBits: test_helpers.FillByteSlice(4, 74),
 		Data:            attestationDataProto,
-		Signatures:      [][]byte{test_helpers.FillByteSlice(4595, 82)},
+		Signatures:      [][]byte{test_helpers.FillByteSlice(4627, 82)},
 	}
 
 	ctrl := gomock.NewController(t)

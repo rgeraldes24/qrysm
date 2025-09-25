@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/runtime/interop"
 	"github.com/theQRL/qrysm/tools/unencrypted-keys-gen/keygen"
 )
@@ -68,7 +68,7 @@ func generateRandomKeys(num int) (*keygen.UnencryptedKeysContainer, error) {
 	}
 
 	for i := 0; i < num; i++ {
-		sk, err := dilithium.RandKey()
+		sk, err := ml_dsa_87.RandKey()
 		if err != nil {
 			return nil, err
 		}

@@ -32,7 +32,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -50,7 +50,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 		Genesis:        time.Now(),
 		ValidatorsRoot: [32]byte{'A'},
 	}
-	var emptySig [field_params.DilithiumSignatureLength]byte
+	var emptySig [field_params.MLDSA87SignatureLength]byte
 	type args struct {
 		pid   peer.ID
 		msg   *qrysmpb.SignedContributionAndProof
@@ -258,7 +258,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 				s.initCaches()
 				s.cfg.chain = &mockChain.ChainService{}
 				msg.Message.Contribution.BlockRoot = headRoot[:]
-				incorrectProof := [field_params.DilithiumSignatureLength]byte{0xBB}
+				incorrectProof := [field_params.MLDSA87SignatureLength]byte{0xBB}
 				msg.Message.SelectionProof = incorrectProof[:]
 				msg.Message.Contribution.AggregationBits.SetBitAt(1, true)
 
@@ -435,7 +435,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 						isAggregator, err := altair.IsSyncCommitteeAggregator(sig.Marshal())
 						require.NoError(t, err)
 						if isAggregator {
-							infiniteSig := [field_params.DilithiumSignatureLength]byte{0xC0}
+							infiniteSig := [field_params.MLDSA87SignatureLength]byte{0xC0}
 							pubkey = keys[idx].PublicKey().Marshal()
 							msg.Message.AggregatorIndex = idx
 							msg.Message.SelectionProof = sig.Marshal()
@@ -510,7 +510,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 						isAggregator, err := altair.IsSyncCommitteeAggregator(sig.Marshal())
 						require.NoError(t, err)
 						if isAggregator {
-							infiniteSig := [4595]byte{0xC0}
+							infiniteSig := [4627]byte{0xC0}
 							junkRoot := [32]byte{'A'}
 							badSig := keys[idx].Sign(junkRoot[:])
 							msg.Message.AggregatorIndex = idx
@@ -591,7 +591,7 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 						isAggregator, err := altair.IsSyncCommitteeAggregator(sig.Marshal())
 						require.NoError(t, err)
 						if isAggregator {
-							infiniteSig := [field_params.DilithiumSignatureLength]byte{0xC0}
+							infiniteSig := [field_params.MLDSA87SignatureLength]byte{0xC0}
 							msg.Message.AggregatorIndex = idx
 							msg.Message.SelectionProof = sig.Marshal()
 							msg.Message.Contribution.Slot = slots.PrevSlot(hState.Slot())
@@ -1009,7 +1009,7 @@ func TestValidateSyncContributionAndProof(t *testing.T) {
 	}
 }
 
-func fillUpBlocksAndState(ctx context.Context, t *testing.T, beaconDB db.Database) ([32]byte, []dilithium.DilithiumKey) {
+func fillUpBlocksAndState(ctx context.Context, t *testing.T, beaconDB db.Database) ([32]byte, []ml_dsa_87.MLDSA87Key) {
 	gs, keys := util.DeterministicGenesisStateCapella(t, 64)
 	sCom, err := altair.NextSyncCommittee(ctx, gs)
 	assert.NoError(t, err)

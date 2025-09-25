@@ -29,8 +29,8 @@ func (s *Service) forkWatcher() {
 				}
 			*/
 
-			// Broadcast Dilithium changes at the Capella fork boundary
-			s.broadcastDilithiumChanges(currSlot)
+			// Broadcast ML-DSA-87 changes at the Capella fork boundary
+			s.broadcastMLDSA87Changes(currSlot)
 
 		case <-s.ctx.Done():
 			log.Debug("Context closed, exiting goroutine")

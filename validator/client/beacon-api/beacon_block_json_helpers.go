@@ -18,21 +18,21 @@ func jsonifyTransactions(transactions [][]byte) []string {
 	return jsonTransactions
 }
 
-func jsonifyDilithiumToExecutionChanges(dilithiumToExecutionChanges []*qrysmpb.SignedDilithiumToExecutionChange) []*apimiddleware.SignedDilithiumToExecutionChangeJson {
-	jsonDilithiumToExecutionChanges := make([]*apimiddleware.SignedDilithiumToExecutionChangeJson, len(dilithiumToExecutionChanges))
-	for index, signedDilithiumToExecutionChange := range dilithiumToExecutionChanges {
-		dilithiumToExecutionChangeJson := &apimiddleware.DilithiumToExecutionChangeJson{
-			ValidatorIndex:      uint64ToString(signedDilithiumToExecutionChange.Message.ValidatorIndex),
-			FromDilithiumPubkey: hexutil.Encode(signedDilithiumToExecutionChange.Message.FromDilithiumPubkey),
-			ToExecutionAddress:  hexutil.Encode(signedDilithiumToExecutionChange.Message.ToExecutionAddress),
+func jsonifyMLDSA87ToExecutionChanges(mlDSA87ToExecutionChanges []*qrysmpb.SignedMLDSA87ToExecutionChange) []*apimiddleware.SignedMLDSA87ToExecutionChangeJson {
+	jsonMLDSA87ToExecutionChanges := make([]*apimiddleware.SignedMLDSA87ToExecutionChangeJson, len(mlDSA87ToExecutionChanges))
+	for index, signedMLDSA87ToExecutionChange := range mlDSA87ToExecutionChanges {
+		mlDSA87ToExecutionChangeJson := &apimiddleware.MLDSA87ToExecutionChangeJson{
+			ValidatorIndex:     uint64ToString(signedMLDSA87ToExecutionChange.Message.ValidatorIndex),
+			FromMLDSA87Pubkey:  hexutil.Encode(signedMLDSA87ToExecutionChange.Message.FromMldsa87Pubkey),
+			ToExecutionAddress: hexutil.Encode(signedMLDSA87ToExecutionChange.Message.ToExecutionAddress),
 		}
-		signedJson := &apimiddleware.SignedDilithiumToExecutionChangeJson{
-			Message:   dilithiumToExecutionChangeJson,
-			Signature: hexutil.Encode(signedDilithiumToExecutionChange.Signature),
+		signedJson := &apimiddleware.SignedMLDSA87ToExecutionChangeJson{
+			Message:   mlDSA87ToExecutionChangeJson,
+			Signature: hexutil.Encode(signedMLDSA87ToExecutionChange.Signature),
 		}
-		jsonDilithiumToExecutionChanges[index] = signedJson
+		jsonMLDSA87ToExecutionChanges[index] = signedJson
 	}
-	return jsonDilithiumToExecutionChanges
+	return jsonMLDSA87ToExecutionChanges
 }
 
 func jsonifyExecutionData(executionData *qrysmpb.ExecutionData) *apimiddleware.ExecutionDataJson {

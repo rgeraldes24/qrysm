@@ -7,13 +7,13 @@ import (
 	p2pType "github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
 )
 
-func generateSyncAggregate(st state.BeaconState, privs []dilithium.DilithiumKey, parentRoot [32]byte) (*qrysmpb.SyncAggregate, error) {
+func generateSyncAggregate(st state.BeaconState, privs []ml_dsa_87.MLDSA87Key, parentRoot [32]byte) (*qrysmpb.SyncAggregate, error) {
 	nextSlotEpoch := slots.ToEpoch(st.Slot() + 1)
 	currEpoch := slots.ToEpoch(st.Slot())
 

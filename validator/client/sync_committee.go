@@ -22,7 +22,7 @@ import (
 )
 
 // SubmitSyncCommitteeMessage submits the sync committee message to the beacon chain.
-func (v *validator) SubmitSyncCommitteeMessage(ctx context.Context, slot primitives.Slot, pubKey [field_params.DilithiumPubkeyLength]byte) {
+func (v *validator) SubmitSyncCommitteeMessage(ctx context.Context, slot primitives.Slot, pubKey [field_params.MLDSA87PubkeyLength]byte) {
 	ctx, span := trace.StartSpan(ctx, "validator.SubmitSyncCommitteeMessage")
 	defer span.End()
 	span.AddAttributes(trace.StringAttribute("validator", fmt.Sprintf("%#x", pubKey)))
@@ -92,7 +92,7 @@ func (v *validator) SubmitSyncCommitteeMessage(ctx context.Context, slot primiti
 }
 
 // SubmitSignedContributionAndProof submits the signed sync committee contribution and proof to the beacon chain.
-func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot primitives.Slot, pubKey [field_params.DilithiumPubkeyLength]byte) {
+func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot primitives.Slot, pubKey [field_params.MLDSA87PubkeyLength]byte) {
 	ctx, span := trace.StartSpan(ctx, "validator.SubmitSignedContributionAndProof")
 	defer span.End()
 	span.AddAttributes(trace.StringAttribute("validator", fmt.Sprintf("%#x", pubKey)))
@@ -187,7 +187,7 @@ func (v *validator) SubmitSignedContributionAndProof(ctx context.Context, slot p
 }
 
 // Signs and returns selection proofs per validator for slot and pub key.
-func (v *validator) selectionProofs(ctx context.Context, slot primitives.Slot, pubKey [field_params.DilithiumPubkeyLength]byte, indexRes *qrysmpb.SyncSubcommitteeIndexResponse) ([][]byte, error) {
+func (v *validator) selectionProofs(ctx context.Context, slot primitives.Slot, pubKey [field_params.MLDSA87PubkeyLength]byte, indexRes *qrysmpb.SyncSubcommitteeIndexResponse) ([][]byte, error) {
 	selectionProofs := make([][]byte, len(indexRes.Indices))
 	cfg := params.BeaconConfig()
 	size := cfg.SyncCommitteeSize
@@ -205,7 +205,7 @@ func (v *validator) selectionProofs(ctx context.Context, slot primitives.Slot, p
 }
 
 // Signs input slot with domain sync committee selection proof. This is used to create the signature for sync committee selection.
-func (v *validator) signSyncSelectionData(ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, index uint64, slot primitives.Slot) (signature []byte, err error) {
+func (v *validator) signSyncSelectionData(ctx context.Context, pubKey [field_params.MLDSA87PubkeyLength]byte, index uint64, slot primitives.Slot) (signature []byte, err error) {
 	domain, err := v.domainData(ctx, slots.ToEpoch(slot), params.BeaconConfig().DomainSyncCommitteeSelectionProof[:])
 	if err != nil {
 		return nil, err
@@ -232,7 +232,7 @@ func (v *validator) signSyncSelectionData(ctx context.Context, pubKey [field_par
 }
 
 // This returns the signature of validator signing over sync committee contribution and proof object.
-func (v *validator) signContributionAndProof(ctx context.Context, pubKey [field_params.DilithiumPubkeyLength]byte, c *qrysmpb.ContributionAndProof, slot primitives.Slot) ([]byte, error) {
+func (v *validator) signContributionAndProof(ctx context.Context, pubKey [field_params.MLDSA87PubkeyLength]byte, c *qrysmpb.ContributionAndProof, slot primitives.Slot) ([]byte, error) {
 	d, err := v.domainData(ctx, slots.ToEpoch(c.Contribution.Slot), params.BeaconConfig().DomainContributionAndProof[:])
 	if err != nil {
 		return nil, err

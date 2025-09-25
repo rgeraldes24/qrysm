@@ -23,7 +23,7 @@ import (
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
 	lruwrpr "github.com/theQRL/qrysm/cache/lru"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -54,7 +54,7 @@ func setupValidExit(t *testing.T) (*qrysmpb.SignedVoluntaryExit, state.BeaconSta
 	err = st.SetSlot(st.Slot() + params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod)))
 	require.NoError(t, err)
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	exit.Signature, err = signing.ComputeDomainAndSign(st, coreTime.CurrentEpoch(st), exit.Exit, params.BeaconConfig().DomainVoluntaryExit, priv)
 	require.NoError(t, err)

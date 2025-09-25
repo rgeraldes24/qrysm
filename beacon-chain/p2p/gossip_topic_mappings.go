@@ -10,15 +10,15 @@ import (
 // gossipTopicMappings represent the protocol ID to protobuf message type map for easy
 // lookup.
 var gossipTopicMappings = map[string]proto.Message{
-	BlockSubnetTopicFormat:                      &qrysmpb.SignedBeaconBlockCapella{},
-	AttestationSubnetTopicFormat:                &qrysmpb.Attestation{},
-	ExitSubnetTopicFormat:                       &qrysmpb.SignedVoluntaryExit{},
-	ProposerSlashingSubnetTopicFormat:           &qrysmpb.ProposerSlashing{},
-	AttesterSlashingSubnetTopicFormat:           &qrysmpb.AttesterSlashing{},
-	AggregateAndProofSubnetTopicFormat:          &qrysmpb.SignedAggregateAttestationAndProof{},
-	SyncContributionAndProofSubnetTopicFormat:   &qrysmpb.SignedContributionAndProof{},
-	SyncCommitteeSubnetTopicFormat:              &qrysmpb.SyncCommitteeMessage{},
-	DilithiumToExecutionChangeSubnetTopicFormat: &qrysmpb.SignedDilithiumToExecutionChange{},
+	BlockSubnetTopicFormat:                    &qrysmpb.SignedBeaconBlockCapella{},
+	AttestationSubnetTopicFormat:              &qrysmpb.Attestation{},
+	ExitSubnetTopicFormat:                     &qrysmpb.SignedVoluntaryExit{},
+	ProposerSlashingSubnetTopicFormat:         &qrysmpb.ProposerSlashing{},
+	AttesterSlashingSubnetTopicFormat:         &qrysmpb.AttesterSlashing{},
+	AggregateAndProofSubnetTopicFormat:        &qrysmpb.SignedAggregateAttestationAndProof{},
+	SyncContributionAndProofSubnetTopicFormat: &qrysmpb.SignedContributionAndProof{},
+	SyncCommitteeSubnetTopicFormat:            &qrysmpb.SyncCommitteeMessage{},
+	MLDSA87ToExecutionChangeSubnetTopicFormat: &qrysmpb.SignedMLDSA87ToExecutionChange{},
 }
 
 // GossipTopicMappings is a function to return the assigned data type

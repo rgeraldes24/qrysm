@@ -172,7 +172,7 @@ func (v *ValidatorService) Start() {
 		log.WithError(err).Error("Could not read slashable public keys from disk")
 		return
 	}
-	slashablePublicKeys := make(map[[field_params.DilithiumPubkeyLength]byte]bool)
+	slashablePublicKeys := make(map[[field_params.MLDSA87PubkeyLength]byte]bool)
 	for _, pubKey := range sPubKeys {
 		slashablePublicKeys[pubKey] = true
 	}
@@ -194,10 +194,10 @@ func (v *ValidatorService) Start() {
 		graffiti:                       v.graffiti,
 		logValidatorBalances:           v.logValidatorBalances,
 		emitAccountMetrics:             v.emitAccountMetrics,
-		startBalances:                  make(map[[field_params.DilithiumPubkeyLength]byte]uint64),
-		prevBalance:                    make(map[[field_params.DilithiumPubkeyLength]byte]uint64),
-		pubkeyToValidatorIndex:         make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-		signedValidatorRegistrations:   make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+		startBalances:                  make(map[[field_params.MLDSA87PubkeyLength]byte]uint64),
+		prevBalance:                    make(map[[field_params.MLDSA87PubkeyLength]byte]uint64),
+		pubkeyToValidatorIndex:         make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+		signedValidatorRegistrations:   make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 		attLogs:                        make(map[[32]byte]*attSubmitted),
 		domainDataCache:                cache,
 		aggregatedSlotCommitteeIDCache: aggregatedSlotCommitteeIDCache,

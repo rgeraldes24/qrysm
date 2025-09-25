@@ -126,11 +126,11 @@ func logPayload(block interfaces.ReadOnlyBeaconBlock) error {
 		return errors.Wrap(err, "could not get withdrawals")
 	}
 	fields["withdrawals"] = len(withdrawals)
-	changes, err := block.Body().DilithiumToExecutionChanges()
+	changes, err := block.Body().MLDSA87ToExecutionChanges()
 	if err != nil {
-		return errors.Wrap(err, "could not get DilithiumToExecutionChanges")
+		return errors.Wrap(err, "could not get MLDSA87ToExecutionChanges")
 	}
-	fields["dilithiumToExecutionChanges"] = len(changes)
+	fields["mlDSA87ToExecutionChanges"] = len(changes)
 	log.WithFields(fields).Debug("Synced new payload")
 	return nil
 }

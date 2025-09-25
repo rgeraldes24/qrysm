@@ -617,37 +617,37 @@ func (e *ExecutionData) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// SignedDilithiumToExecutionChange is a field in Beacon Block Body for capella and above.
-type SignedDilithiumToExecutionChange struct {
-	*qrysmpb.SignedDilithiumToExecutionChange
+// SignedMLDSA87ToExecutionChange is a field in Beacon Block Body for capella and above.
+type SignedMLDSA87ToExecutionChange struct {
+	*qrysmpb.SignedMLDSA87ToExecutionChange
 }
 
-// MarshalJSON returns a JSON byte array representation of SignedDilithiumToExecutionChange.
-func (ch *SignedDilithiumToExecutionChange) MarshalJSON() ([]byte, error) {
+// MarshalJSON returns a JSON byte array representation of SignedMLDSA87ToExecutionChange.
+func (ch *SignedMLDSA87ToExecutionChange) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		Message   *DilithiumToExecutionChange `json:"message"`
-		Signature hexutil.Bytes               `json:"signature"`
+		Message   *MLDSA87ToExecutionChange `json:"message"`
+		Signature hexutil.Bytes             `json:"signature"`
 	}{
 		Signature: ch.Signature,
-		Message:   &DilithiumToExecutionChange{ch.Message},
+		Message:   &MLDSA87ToExecutionChange{ch.Message},
 	})
 }
 
-// DilithiumToExecutionChange is a field in SignedDilithiumToExecutionChange.
-type DilithiumToExecutionChange struct {
-	*qrysmpb.DilithiumToExecutionChange
+// MLDSA87ToExecutionChange is a field in SignedMLDSA87ToExecutionChange.
+type MLDSA87ToExecutionChange struct {
+	*qrysmpb.MLDSA87ToExecutionChange
 }
 
-// MarshalJSON returns a JSON byte array representation of DilithiumToExecutionChange.
-func (ch *DilithiumToExecutionChange) MarshalJSON() ([]byte, error) {
+// MarshalJSON returns a JSON byte array representation of MLDSA87ToExecutionChange.
+func (ch *MLDSA87ToExecutionChange) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
-		ValidatorIndex      string         `json:"validator_index"`
-		FromDilithiumPubkey hexutil.Bytes  `json:"from_dilithium_pubkey"`
-		ToExecutionAddress  hexutil.BytesQ `json:"to_execution_address"`
+		ValidatorIndex     string         `json:"validator_index"`
+		FromMLDSA87Pubkey  hexutil.Bytes  `json:"from_ml_dsa_87_pubkey"`
+		ToExecutionAddress hexutil.BytesQ `json:"to_execution_address"`
 	}{
-		ValidatorIndex:      fmt.Sprintf("%d", ch.ValidatorIndex),
-		FromDilithiumPubkey: ch.FromDilithiumPubkey,
-		ToExecutionAddress:  ch.ToExecutionAddress,
+		ValidatorIndex:     fmt.Sprintf("%d", ch.ValidatorIndex),
+		FromMLDSA87Pubkey:  ch.FromMldsa87Pubkey,
+		ToExecutionAddress: ch.ToExecutionAddress,
 	})
 }
 

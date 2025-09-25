@@ -23,7 +23,7 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
@@ -87,10 +87,10 @@ func TestServer_setExecutionData(t *testing.T) {
 		blk, err := blocks.NewSignedBeaconBlock(util.NewBeaconBlockCapella())
 		require.NoError(t, err)
 		require.NoError(t, vs.BeaconDB.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{blk.Block().ProposerIndex()},
-			[]*qrysmpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, field_params.DilithiumPubkeyLength)}}))
+			[]*qrysmpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, field_params.MLDSA87PubkeyLength)}}))
 		ti, err := slots.ToTime(uint64(time.Now().Unix()), 0)
 		require.NoError(t, err)
-		sk, err := dilithium.RandKey()
+		sk, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		bid := &qrysmpb.BuilderBidCapella{
 			Header: &v1.ExecutionPayloadHeaderCapella{
@@ -146,10 +146,10 @@ func TestServer_setExecutionData(t *testing.T) {
 		blk, err := blocks.NewSignedBeaconBlock(util.NewBlindedBeaconBlockCapella())
 		require.NoError(t, err)
 		require.NoError(t, vs.BeaconDB.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{blk.Block().ProposerIndex()},
-			[]*qrysmpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, field_params.DilithiumPubkeyLength)}}))
+			[]*qrysmpb.ValidatorRegistrationV1{{FeeRecipient: make([]byte, fieldparams.FeeRecipientLength), Timestamp: uint64(time.Now().Unix()), Pubkey: make([]byte, field_params.MLDSA87PubkeyLength)}}))
 		ti, err := slots.ToTime(uint64(time.Now().Unix()), 0)
 		require.NoError(t, err)
-		sk, err := dilithium.RandKey()
+		sk, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		wr, err := ssz.WithdrawalSliceRoot(withdrawals, fieldparams.MaxWithdrawalsPerPayload)
 		require.NoError(t, err)
@@ -269,7 +269,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 	emptyRoot, err := ssz.TransactionsRoot([][]byte{})
 	require.NoError(t, err)
 
-	sk, err := dilithium.RandKey()
+	sk, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	d := params.BeaconConfig().DomainApplicationBuilder
 	domain, err := signing.ComputeDomain(d, nil, nil)
@@ -434,7 +434,7 @@ func TestServer_getPayloadHeader(t *testing.T) {
 }
 
 func TestServer_validateBuilderSignature(t *testing.T) {
-	sk, err := dilithium.RandKey()
+	sk, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	bid := &qrysmpb.BuilderBidCapella{
 		Header: &v1.ExecutionPayloadHeaderCapella{

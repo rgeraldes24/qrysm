@@ -8,9 +8,8 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
 	common2 "github.com/theQRL/go-qrllib/common"
-	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
 	"github.com/theQRL/qrysm/async/event"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
 	"github.com/theQRL/qrysm/validator/accounts/iface"
@@ -86,7 +85,7 @@ func (km *Keymanager) RecoverAccountsFromMnemonic(
 // in the function input, encrypts them using the specified password,
 // and returns their respective EIP-2335 keystores.
 func (km *Keymanager) ExtractKeystores(
-	ctx context.Context, publicKeys []dilithium.PublicKey, password string,
+	ctx context.Context, publicKeys []ml_dsa_87.PublicKey, password string,
 ) ([]*keymanager.Keystore, error) {
 	return km.localKM.ExtractKeystores(ctx, publicKeys, password)
 }
@@ -97,12 +96,12 @@ func (km *Keymanager) ValidatingAccountNames(_ context.Context) ([]string, error
 }
 
 // Sign signs a message using a validator key.
-func (km *Keymanager) Sign(ctx context.Context, req *validatorpb.SignRequest) (dilithium.Signature, error) {
+func (km *Keymanager) Sign(ctx context.Context, req *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 	return km.localKM.Sign(ctx, req)
 }
 
 // FetchValidatingPublicKeys fetches the list of validating public keys from the keymanager.
-func (km *Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_params.DilithiumPubkeyLength]byte, error) {
+func (km *Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_params.MLDSA87PubkeyLength]byte, error) {
 	return km.localKM.FetchValidatingPublicKeys(ctx)
 }
 
@@ -128,7 +127,7 @@ func (km *Keymanager) DeleteKeystores(
 // SubscribeAccountChanges creates an event subscription for a channel
 // to listen for public key changes at runtime, such as when new validator accounts
 // are imported into the keymanager while the validator process is running.
-func (km *Keymanager) SubscribeAccountChanges(pubKeysChan chan [][field_params.DilithiumPubkeyLength]byte) event.Subscription {
+func (km *Keymanager) SubscribeAccountChanges(pubKeysChan chan [][field_params.MLDSA87PubkeyLength]byte) event.Subscription {
 	return km.localKM.SubscribeAccountChanges(pubKeysChan)
 }
 

@@ -626,8 +626,8 @@ func local_request_BeaconChain_SubmitProposerSlashing_0(ctx context.Context, mar
 
 }
 
-func request_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconChainClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq v1.SubmitDilithiumToExecutionChangesRequest
+func request_BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconChainClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq v1.SubmitMLDSA87ToExecutionChangesRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -638,13 +638,13 @@ func request_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0(ctx context.C
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.SubmitSignedDilithiumToExecutionChanges(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.SubmitSignedMLDSA87ToExecutionChanges(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconChainServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq v1.SubmitDilithiumToExecutionChangesRequest
+func local_request_BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconChainServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq v1.SubmitMLDSA87ToExecutionChangesRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -655,25 +655,25 @@ func local_request_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0(ctx con
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.SubmitSignedDilithiumToExecutionChanges(ctx, &protoReq)
+	msg, err := server.SubmitSignedMLDSA87ToExecutionChanges(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-func request_BeaconChain_ListDilithiumToExecutionChanges_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconChainClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_BeaconChain_ListMLDSA87ToExecutionChanges_0(ctx context.Context, marshaler runtime.Marshaler, client BeaconChainClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := client.ListDilithiumToExecutionChanges(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListMLDSA87ToExecutionChanges(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_BeaconChain_ListDilithiumToExecutionChanges_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconChainServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_BeaconChain_ListMLDSA87ToExecutionChanges_0(ctx context.Context, marshaler runtime.Marshaler, server BeaconChainServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq emptypb.Empty
 	var metadata runtime.ServerMetadata
 
-	msg, err := server.ListDilithiumToExecutionChanges(ctx, &protoReq)
+	msg, err := server.ListMLDSA87ToExecutionChanges(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -1019,18 +1019,18 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("POST", pattern_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.service.BeaconChain/SubmitSignedDilithiumToExecutionChanges")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.service.BeaconChain/SubmitSignedMLDSA87ToExecutionChanges")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -1038,22 +1038,22 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 			return
 		}
 
-		forward_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_BeaconChain_ListDilithiumToExecutionChanges_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_BeaconChain_ListMLDSA87ToExecutionChanges_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.service.BeaconChain/ListDilithiumToExecutionChanges")
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/theqrl.qrl.service.BeaconChain/ListMLDSA87ToExecutionChanges")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_BeaconChain_ListDilithiumToExecutionChanges_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_BeaconChain_ListMLDSA87ToExecutionChanges_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -1061,7 +1061,7 @@ func RegisterBeaconChainHandlerServer(ctx context.Context, mux *runtime.ServeMux
 			return
 		}
 
-		forward_BeaconChain_ListDilithiumToExecutionChanges_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_BeaconChain_ListMLDSA87ToExecutionChanges_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1412,43 +1412,43 @@ func RegisterBeaconChainHandlerClient(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-	mux.Handle("POST", pattern_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.service.BeaconChain/SubmitSignedDilithiumToExecutionChanges")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.service.BeaconChain/SubmitSignedMLDSA87ToExecutionChanges")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("GET", pattern_BeaconChain_ListDilithiumToExecutionChanges_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_BeaconChain_ListMLDSA87ToExecutionChanges_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.service.BeaconChain/ListDilithiumToExecutionChanges")
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/theqrl.qrl.service.BeaconChain/ListMLDSA87ToExecutionChanges")
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_BeaconChain_ListDilithiumToExecutionChanges_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_BeaconChain_ListMLDSA87ToExecutionChanges_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_BeaconChain_ListDilithiumToExecutionChanges_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_BeaconChain_ListMLDSA87ToExecutionChanges_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1522,9 +1522,9 @@ var (
 
 	pattern_BeaconChain_SubmitProposerSlashing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "beacon", "pool", "proposer_slashings"}, ""))
 
-	pattern_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "beacon", "pool", "dilithium_to_execution_changes"}, ""))
+	pattern_BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "beacon", "pool", "ml_dsa_87_to_execution_changes"}, ""))
 
-	pattern_BeaconChain_ListDilithiumToExecutionChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "beacon", "pool", "dilithium_to_execution_changes"}, ""))
+	pattern_BeaconChain_ListMLDSA87ToExecutionChanges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5}, []string{"internal", "qrl", "v1", "beacon", "pool", "ml_dsa_87_to_execution_changes"}, ""))
 
 	pattern_BeaconChain_GetForkSchedule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"internal", "qrl", "v1", "config", "fork_schedule"}, ""))
 
@@ -1558,9 +1558,9 @@ var (
 
 	forward_BeaconChain_SubmitProposerSlashing_0 = runtime.ForwardResponseMessage
 
-	forward_BeaconChain_SubmitSignedDilithiumToExecutionChanges_0 = runtime.ForwardResponseMessage
+	forward_BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_0 = runtime.ForwardResponseMessage
 
-	forward_BeaconChain_ListDilithiumToExecutionChanges_0 = runtime.ForwardResponseMessage
+	forward_BeaconChain_ListMLDSA87ToExecutionChanges_0 = runtime.ForwardResponseMessage
 
 	forward_BeaconChain_GetForkSchedule_0 = runtime.ForwardResponseMessage
 

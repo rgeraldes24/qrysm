@@ -146,7 +146,7 @@ func unmarshalCapellaState(t *testing.T, raw []byte) state.BeaconState {
 func unmarshalCapellaBlock(t *testing.T, raw []byte) interfaces.ReadOnlySignedBeaconBlock {
 	base := &qrysmpb.BeaconBlockCapella{}
 	require.NoError(t, base.UnmarshalSSZ(raw))
-	blk, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: base, Signature: make([]byte, field_params.DilithiumSignatureLength)})
+	blk, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: base, Signature: make([]byte, field_params.MLDSA87SignatureLength)})
 	require.NoError(t, err)
 	return blk
 }

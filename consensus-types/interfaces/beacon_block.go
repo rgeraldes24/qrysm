@@ -14,7 +14,7 @@ import (
 // a signed beacon block.
 type ReadOnlySignedBeaconBlock interface {
 	Block() ReadOnlyBeaconBlock
-	Signature() [field_params.DilithiumSignatureLength]byte
+	Signature() [field_params.MLDSA87SignatureLength]byte
 	IsNil() bool
 	Copy() (ReadOnlySignedBeaconBlock, error)
 	Proto() (proto.Message, error)
@@ -53,7 +53,7 @@ type ReadOnlyBeaconBlock interface {
 // ReadOnlyBeaconBlockBody describes the method set employed by an object
 // that is a beacon block body.
 type ReadOnlyBeaconBlockBody interface {
-	RandaoReveal() [field_params.DilithiumSignatureLength]byte
+	RandaoReveal() [field_params.MLDSA87SignatureLength]byte
 	ExecutionData() *qrysmpb.ExecutionData
 	Graffiti() [field_params.RootLength]byte
 	ProposerSlashings() []*qrysmpb.ProposerSlashing
@@ -66,13 +66,13 @@ type ReadOnlyBeaconBlockBody interface {
 	HashTreeRoot() ([field_params.RootLength]byte, error)
 	Proto() (proto.Message, error)
 	Execution() (ExecutionData, error)
-	DilithiumToExecutionChanges() ([]*qrysmpb.SignedDilithiumToExecutionChange, error)
+	MLDSA87ToExecutionChanges() ([]*qrysmpb.SignedMLDSA87ToExecutionChange, error)
 }
 
 type SignedBeaconBlock interface {
 	ReadOnlySignedBeaconBlock
 	SetExecution(ExecutionData) error
-	SetDilithiumToExecutionChanges([]*qrysmpb.SignedDilithiumToExecutionChange) error
+	SetMLDSA87ToExecutionChanges([]*qrysmpb.SignedMLDSA87ToExecutionChange) error
 	SetSyncAggregate(*qrysmpb.SyncAggregate) error
 	SetVoluntaryExits([]*qrysmpb.SignedVoluntaryExit)
 	SetDeposits([]*qrysmpb.Deposit)

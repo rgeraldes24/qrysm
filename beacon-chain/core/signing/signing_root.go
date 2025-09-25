@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
@@ -42,8 +42,8 @@ const (
 	AggregatorSignature = "aggregator signature"
 	// AttestationSignature represents attestation signature
 	AttestationSignature = "attestation signature"
-	// DilithiumChangeSignature represents signature to DilithiumToExecutionChange
-	DilithiumChangeSignature = "dilithiumchange signature"
+	// MLDSA87ChangeSignature represents signature to MLDSA87ToExecutionChange
+	MLDSA87ChangeSignature = "mldsa87change signature"
 	// SyncCommitteeSignature represents sync committee signature
 	SyncCommitteeSignature = "sync committee signature"
 	// SyncSelectionProof represents sync committee selection proof
@@ -55,7 +55,7 @@ const (
 )
 
 // ComputeDomainAndSign computes the domain and signing root and sign it using the passed in private key.
-func ComputeDomainAndSign(st state.ReadOnlyBeaconState, epoch primitives.Epoch, obj fssz.HashRoot, domain [4]byte, key dilithium.DilithiumKey) ([]byte, error) {
+func ComputeDomainAndSign(st state.ReadOnlyBeaconState, epoch primitives.Epoch, obj fssz.HashRoot, domain [4]byte, key ml_dsa_87.MLDSA87Key) ([]byte, error) {
 	fork := st.Fork()
 
 	// NOTE(rgeraldes24): important for a future fork
@@ -127,11 +127,11 @@ func ComputeDomainVerifySigningRoot(st state.ReadOnlyBeaconState, index primitiv
 
 // VerifySigningRoot verifies the signing root of an object given its public key, signature and domain.
 func VerifySigningRoot(obj fssz.HashRoot, pub, signature, domain []byte) error {
-	publicKey, err := dilithium.PublicKeyFromBytes(pub)
+	publicKey, err := ml_dsa_87.PublicKeyFromBytes(pub)
 	if err != nil {
 		return errors.Wrap(err, "could not convert bytes to public key")
 	}
-	sig, err := dilithium.SignatureFromBytes(signature)
+	sig, err := ml_dsa_87.SignatureFromBytes(signature)
 	if err != nil {
 		return errors.Wrap(err, "could not convert bytes to signature")
 	}
@@ -147,11 +147,11 @@ func VerifySigningRoot(obj fssz.HashRoot, pub, signature, domain []byte) error {
 
 // VerifyBlockHeaderSigningRoot verifies the signing root of a block header given its public key, signature and domain.
 func VerifyBlockHeaderSigningRoot(blkHdr *qrysmpb.BeaconBlockHeader, pub, signature, domain []byte) error {
-	publicKey, err := dilithium.PublicKeyFromBytes(pub)
+	publicKey, err := ml_dsa_87.PublicKeyFromBytes(pub)
 	if err != nil {
 		return errors.Wrap(err, "could not convert bytes to public key")
 	}
-	sig, err := dilithium.SignatureFromBytes(signature)
+	sig, err := ml_dsa_87.SignatureFromBytes(signature)
 	if err != nil {
 		return errors.Wrap(err, "could not convert bytes to signature")
 	}
@@ -176,7 +176,7 @@ func VerifyBlockSigningRoot(pub, signature, domain []byte, rootFunc func() ([32]
 	publicKey := set.PublicKeys[0][0]
 	root := set.Messages[0]
 
-	rSig, err := dilithium.SignatureFromBytes(sig)
+	rSig, err := ml_dsa_87.SignatureFromBytes(sig)
 	if err != nil {
 		return err
 	}
@@ -188,8 +188,8 @@ func VerifyBlockSigningRoot(pub, signature, domain []byte, rootFunc func() ([32]
 
 // BlockSignatureBatch retrieves the relevant signature, message and pubkey data from a block and collating it
 // into a signature batch object.
-func BlockSignatureBatch(pub, signature, domain []byte, rootFunc func() ([32]byte, error)) (*dilithium.SignatureBatch, error) {
-	publicKey, err := dilithium.PublicKeyFromBytes(pub)
+func BlockSignatureBatch(pub, signature, domain []byte, rootFunc func() ([32]byte, error)) (*ml_dsa_87.SignatureBatch, error) {
+	publicKey, err := ml_dsa_87.PublicKeyFromBytes(pub)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not convert bytes to public key")
 	}
@@ -199,15 +199,15 @@ func BlockSignatureBatch(pub, signature, domain []byte, rootFunc func() ([32]byt
 		return nil, errors.Wrap(err, "could not compute signing root")
 	}
 	desc := BlockSignature
-	return &dilithium.SignatureBatch{
+	return &ml_dsa_87.SignatureBatch{
 		Signatures:   [][][]byte{{signature}},
-		PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
+		PublicKeys:   [][]ml_dsa_87.PublicKey{{publicKey}},
 		Messages:     [][32]byte{root},
 		Descriptions: []string{desc},
 	}, nil
 }
 
-// ComputeDomain returns the domain version for Dilithium private key to sign and verify with a zeroed 4-byte
+// ComputeDomain returns the domain version for ML-DSA-87 private key to sign and verify with a zeroed 4-byte
 // array as the fork version.
 //
 // def compute_domain(domain_type: DomainType, fork_version: Version=None, genesis_validators_root: Root=None) -> Domain:
@@ -239,7 +239,7 @@ func ComputeDomain(domainType [DomainByteLength]byte, forkVersion, genesisValida
 	return domain(domainType, forkDataRoot[:]), nil
 }
 
-// This returns the dilithium domain given by the domain type and fork data root.
+// This returns the ML-DSA-87 domain given by the domain type and fork data root.
 func domain(domainType [DomainByteLength]byte, forkDataRoot []byte) []byte {
 	var b []byte
 	b = append(b, domainType[:4]...)

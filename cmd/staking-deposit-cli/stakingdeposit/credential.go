@@ -16,8 +16,8 @@ import (
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
 	"github.com/theQRL/qrysm/crypto/hash"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
@@ -44,9 +44,9 @@ func (c *Credential) QRLWithdrawalAddress() (common.Address, error) {
 
 func (c *Credential) WithdrawalPK() []byte {
 	binWithdrawalSeed := misc.StrSeedToBinSeed(c.withdrawalSeed)
-	withdrawalKey, err := dilithium.SecretKeyFromSeed(binWithdrawalSeed[:])
+	withdrawalKey, err := ml_dsa_87.SecretKeyFromSeed(binWithdrawalSeed[:])
 	if err != nil {
-		panic(fmt.Errorf("failed to generate dilithium key from withdrawalSeed %s", c.withdrawalSeed))
+		panic(fmt.Errorf("failed to generate ml-dsa-87 key from withdrawalSeed %s", c.withdrawalSeed))
 	}
 	return withdrawalKey.PublicKey().Marshal()
 }
@@ -59,7 +59,7 @@ func (c *Credential) WithdrawalPrefix() (uint8, error) {
 	if reflect.DeepEqual(withdrawalAddress, common.Address{}) {
 		return params.BeaconConfig().QRLAddressWithdrawalPrefixByte, nil
 	}
-	return params.BeaconConfig().DilithiumWithdrawalPrefixByte, nil
+	return params.BeaconConfig().MLDSA87WithdrawalPrefixByte, nil
 }
 
 func (c *Credential) WithdrawalType() (byte, error) {
@@ -75,8 +75,8 @@ func (c *Credential) WithdrawalCredentials() ([32]byte, error) {
 	}
 
 	switch withdrawalType {
-	case params.BeaconConfig().DilithiumWithdrawalPrefixByte:
-		withdrawalCredentials[0] = params.BeaconConfig().DilithiumWithdrawalPrefixByte
+	case params.BeaconConfig().MLDSA87WithdrawalPrefixByte:
+		withdrawalCredentials[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
 		h := hash.Hash(c.WithdrawalPK())
 		copy(withdrawalCredentials[1:], h[1:])
 	case params.BeaconConfig().QRLAddressWithdrawalPrefixByte:
@@ -123,13 +123,13 @@ func (c *Credential) VerifyKeystore(keystoreFileFolder, password string) bool {
 	return c.signingSeed == misc.EncodeHex(seedBytes[:])
 }
 
-func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *qrlpb.SignedDilithiumToExecutionChange {
+func (c *Credential) GetMLDSA87ToExecutionChange(validatorIndex uint64) *qrlpb.SignedMLDSA87ToExecutionChange {
 	if len(c.hexQRLWithdrawalAddress) == 0 {
 		panic("the execution address should not be empty")
 	}
 
 	binWithdrawalSeed := misc.DecodeHex(c.withdrawalSeed)
-	d, err := dilithium.SecretKeyFromSeed(binWithdrawalSeed)
+	d, err := ml_dsa_87.SecretKeyFromSeed(binWithdrawalSeed)
 	if err != nil {
 		panic(fmt.Errorf("failed to generate secret Key from withdrawal seed %v", err))
 	}
@@ -139,17 +139,17 @@ func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *qrlpb
 		panic(fmt.Errorf("failed to read withdrawal address %v", err))
 	}
 
-	message := &qrlpb.DilithiumToExecutionChange{
-		ValidatorIndex:      primitives.ValidatorIndex(validatorIndex),
-		FromDilithiumPubkey: c.WithdrawalPK(),
-		ToExecutionAddress:  execAddr.Bytes()}
+	message := &qrlpb.MLDSA87ToExecutionChange{
+		ValidatorIndex:     primitives.ValidatorIndex(validatorIndex),
+		FromMldsa87Pubkey:  c.WithdrawalPK(),
+		ToExecutionAddress: execAddr.Bytes()}
 	root, err := message.HashTreeRoot()
 	if err != nil {
 		panic(fmt.Errorf("failed to generate hash tree root for message %v", err))
 	}
 
 	domain, err := signing.ComputeDomain(
-		params.BeaconConfig().DomainDilithiumToExecutionChange,
+		params.BeaconConfig().DomainMLDSA87ToExecutionChange,
 		c.chainSetting.GenesisForkVersion,    /*forkVersion*/
 		c.chainSetting.GenesisValidatorsRoot, /*genesisValidatorsRoot*/
 	)
@@ -168,15 +168,15 @@ func (c *Credential) GetDilithiumToExecutionChange(validatorIndex uint64) *qrlpb
 	}
 	signature := d.Sign(signingRoot[:])
 
-	return &qrlpb.SignedDilithiumToExecutionChange{
+	return &qrlpb.SignedMLDSA87ToExecutionChange{
 		Message:   message,
 		Signature: signature.Marshal(),
 	}
 }
 
-func (c *Credential) GetDilithiumToExecutionChangeData(validatorIndex uint64) *DilithiumToExecutionChangeData {
-	signedDilithiumToExecutionChange := c.GetDilithiumToExecutionChange(validatorIndex)
-	return NewDilithiumToExecutionChangeData(signedDilithiumToExecutionChange, c.chainSetting)
+func (c *Credential) GetMLDSA87ToExecutionChangeData(validatorIndex uint64) *MLDSA87ToExecutionChangeData {
+	signedMLDSA87ToExecutionChange := c.GetMLDSA87ToExecutionChange(validatorIndex)
+	return NewMLDSA87ToExecutionChangeData(signedMLDSA87ToExecutionChange, c.chainSetting)
 }
 
 func NewCredential(seed string, index, amount uint64,

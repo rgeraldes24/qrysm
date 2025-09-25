@@ -14,7 +14,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -50,14 +50,14 @@ func TestProcessBlockHeader_ImproperBlockSlot(t *testing.T) {
 	require.NoError(t, err)
 
 	currentEpoch := time.CurrentEpoch(state)
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
 	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = pID
 	block.Block.Slot = 10
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)
 	block.Block.ParentRoot = latestBlockSignedRoot[:]
 	block.Signature, err = signing.ComputeDomainAndSign(state, currentEpoch, block.Block, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
@@ -92,7 +92,7 @@ func TestProcessBlockHeader_WrongProposerSig(t *testing.T) {
 	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = proposerIdx
 	block.Block.Slot = 10
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)
 	block.Block.ParentRoot = lbhdr[:]
 	block.Signature, err = signing.ComputeDomainAndSign(beaconState, 0, block.Block, params.BeaconConfig().DomainBeaconProposer, privKeys[proposerIdx+1])
 	require.NoError(t, err)
@@ -127,7 +127,7 @@ func TestProcessBlockHeader_DifferentSlots(t *testing.T) {
 	require.NoError(t, err)
 	currentEpoch := time.CurrentEpoch(state)
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sszBytes := p2ptypes.SSZBytes("hello")
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
@@ -167,7 +167,7 @@ func TestProcessBlockHeader_PreviousBlockRootNotSignedRoot(t *testing.T) {
 	bh.Slot = 9
 	require.NoError(t, state.SetLatestBlockHeader(bh))
 	currentEpoch := time.CurrentEpoch(state)
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sszBytes := p2ptypes.SSZBytes("hello")
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
@@ -193,7 +193,7 @@ func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 	validators := make([]*qrysmpb.Validator, params.BeaconConfig().MinGenesisActiveValidatorCount)
 	for i := 0; i < len(validators); i++ {
 		validators[i] = &qrysmpb.Validator{
-			PublicKey:             make([]byte, field_params.DilithiumPubkeyLength),
+			PublicKey:             make([]byte, field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
 			ExitEpoch:             params.BeaconConfig().FarFutureEpoch,
 			Slashed:               true,
@@ -210,7 +210,7 @@ func TestProcessBlockHeader_SlashedProposer(t *testing.T) {
 	parentRoot, err := state.LatestBlockHeader().HashTreeRoot()
 	require.NoError(t, err)
 	currentEpoch := time.CurrentEpoch(state)
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sszBytes := p2ptypes.SSZBytes("hello")
 	blockSig, err := signing.ComputeDomainAndSign(state, currentEpoch, &sszBytes, params.BeaconConfig().DomainBeaconProposer, priv)
@@ -256,14 +256,14 @@ func TestProcessBlockHeader_OK(t *testing.T) {
 	require.NoError(t, err)
 
 	currentEpoch := time.CurrentEpoch(state)
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
 	block := util.NewBeaconBlockCapella()
 	block.Block.ProposerIndex = pID
 	block.Block.Slot = 10
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)
 	block.Block.ParentRoot = latestBlockSignedRoot[:]
 	block.Signature, err = signing.ComputeDomainAndSign(state, currentEpoch, block.Block, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)
@@ -317,14 +317,14 @@ func TestBlockSignatureSet_OK(t *testing.T) {
 	require.NoError(t, err)
 
 	currentEpoch := time.CurrentEpoch(state)
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	pID, err := helpers.BeaconProposerIndex(context.Background(), state)
 	require.NoError(t, err)
 	block := util.NewBeaconBlockCapella()
 	block.Block.Slot = 10
 	block.Block.ProposerIndex = pID
-	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.DilithiumSignatureLength)
+	block.Block.Body.RandaoReveal = bytesutil.PadTo([]byte{'A', 'B', 'C'}, field_params.MLDSA87SignatureLength)
 	block.Block.ParentRoot = latestBlockSignedRoot[:]
 	block.Signature, err = signing.ComputeDomainAndSign(state, currentEpoch, block.Block, params.BeaconConfig().DomainBeaconProposer, priv)
 	require.NoError(t, err)

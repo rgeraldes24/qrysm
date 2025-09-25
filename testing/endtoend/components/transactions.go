@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/go-zond/accounts/keystore"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/core/types"
@@ -74,7 +74,7 @@ func (t *TransactionGenerator) Start(ctx context.Context) error {
 	ticker := time.NewTicker(txPeriod)
 	gasFeeCap := big.NewInt(1e11)
 	gasTipCap := big.NewInt(3e7)
-	key := testKey.Dilithium
+	key := testKey.Wallet
 	addr := common.Address(key.GetAddress())
 
 	for {
@@ -95,7 +95,7 @@ func (s *TransactionGenerator) Started() <-chan struct{} {
 	return s.started
 }
 
-func SendTransaction(client *rpc.Client, key *dilithium.Dilithium, f *filler.Filler, gasFeeCap *big.Int, gasTipCap *big.Int, addr string, N uint64, al bool) error {
+func SendTransaction(client *rpc.Client, key *ml_dsa_87.Wallet, f *filler.Filler, gasFeeCap *big.Int, gasTipCap *big.Int, addr string, N uint64, al bool) error {
 	backend := qrlclient.NewClient(client)
 
 	sender, err := common.NewAddressFromString(addr)

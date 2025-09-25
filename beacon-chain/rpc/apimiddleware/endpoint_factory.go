@@ -24,8 +24,8 @@ func (_ *BeaconEndpointFactory) Paths() []string {
 		"/qrl/v1/beacon/blinded_blocks/{block_id}",
 		"/qrl/v1/beacon/pool/attester_slashings",
 		"/qrl/v1/beacon/pool/proposer_slashings",
-		"/qrl/v1/beacon/pool/dilithium_to_execution_changes",
-		"/qrl/v1/beacon/pool/dilithium_to_execution_changes",
+		"/qrl/v1/beacon/pool/ml_dsa_87_to_execution_changes",
+		"/qrl/v1/beacon/pool/ml_dsa_87_to_execution_changes",
 		"/qrl/v1/beacon/weak_subjectivity",
 		"/qrl/v1/node/identity",
 		"/qrl/v1/node/peers",
@@ -79,12 +79,12 @@ func (_ *BeaconEndpointFactory) Create(path string) (*apimiddleware.Endpoint, er
 	case "/qrl/v1/beacon/pool/proposer_slashings":
 		endpoint.PostRequest = &ProposerSlashingJson{}
 		endpoint.GetResponse = &ProposerSlashingsPoolResponseJson{}
-	case "/qrl/v1/beacon/pool/dilithium_to_execution_changes":
-		endpoint.PostRequest = &SubmitDilithiumToExecutionChangesRequest{}
-		endpoint.GetResponse = &DilithiumToExecutionChangesPoolResponseJson{}
+	case "/qrl/v1/beacon/pool/ml_dsa_87_to_execution_changes":
+		endpoint.PostRequest = &SubmitMLDSA87ToExecutionChangesRequest{}
+		endpoint.GetResponse = &MLDSA87ToExecutionChangesPoolResponseJson{}
 		endpoint.Err = &IndexedVerificationFailureErrorJson{}
 		endpoint.Hooks = apimiddleware.HookCollection{
-			OnPreDeserializeRequestBodyIntoContainer: wrapDilithiumChangesArray,
+			OnPreDeserializeRequestBodyIntoContainer: wrapMLDSA87ChangesArray,
 		}
 	case "/qrl/v1/beacon/weak_subjectivity":
 		endpoint.GetResponse = &WeakSubjectivityResponse{}

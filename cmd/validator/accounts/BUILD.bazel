@@ -46,7 +46,7 @@ go_test(
         "//build/bazel:go_default_library",
         "//cmd/validator/flags:go_default_library",
         "//config/params:go_default_library",
-        "//crypto/dilithium:go_default_library",
+        "//crypto/ml_dsa_87:go_default_library",
         "//encoding/bytesutil:go_default_library",
         "//io/file:go_default_library",
         "//pkg/go-qrl-wallet-encryptor-keystore:go_default_library",

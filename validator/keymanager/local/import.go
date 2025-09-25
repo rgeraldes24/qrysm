@@ -8,7 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/monitoring/progress"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
 	qrlpbservice "github.com/theQRL/qrysm/proto/qrl/service"
@@ -151,7 +151,7 @@ func (*Keymanager) attemptDecryptKeystore(
 			return nil, nil, "", errors.Wrap(err, "could not decode pubkey from keystore")
 		}
 	} else {
-		privKey, err := dilithium.SecretKeyFromSeed(seedBytes)
+		privKey, err := ml_dsa_87.SecretKeyFromSeed(seedBytes)
 		if err != nil {
 			return nil, nil, "", errors.Wrap(err, "could not initialize private key from bytes")
 		}

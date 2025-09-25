@@ -8,7 +8,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	"github.com/theQRL/qrysm/beacon-chain/forkchoice"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/dilithiumtoexec"
+	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
@@ -100,10 +100,10 @@ func WithSlashingPool(p slashings.PoolManager) Option {
 	}
 }
 
-// WithDilithiumToExecPool to keep track of Dilithium to Execution address changes.
-func WithDilithiumToExecPool(p dilithiumtoexec.PoolManager) Option {
+// WithMLDSA87ToExecPool to keep track of ML-DSA-87 to Execution address changes.
+func WithMLDSA87ToExecPool(p mldsa87toexec.PoolManager) Option {
 	return func(s *Service) error {
-		s.cfg.DilithiumToExecPool = p
+		s.cfg.MLDSA87ToExecPool = p
 		return nil
 	}
 }

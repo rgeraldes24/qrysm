@@ -12,7 +12,7 @@ import (
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -107,7 +107,7 @@ func TestProcessVoluntaryExits_AppliesCorrectStatus(t *testing.T) {
 	err = state.SetSlot(state.Slot() + params.BeaconConfig().SlotsPerEpoch.Mul(uint64(params.BeaconConfig().ShardCommitteePeriod)))
 	require.NoError(t, err)
 
-	priv, err := dilithium.RandKey()
+	priv, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 
 	val, err := state.ValidatorAtIndex(0)
@@ -184,7 +184,7 @@ func TestVerifyExitAndSignature(t *testing.T) {
 				require.NoError(t, err)
 				sb, err := signing.ComputeDomainAndSign(bs, signedExit.Exit.Epoch, signedExit.Exit, params.BeaconConfig().DomainVoluntaryExit, keys[0])
 				require.NoError(t, err)
-				sig, err := dilithium.SignatureFromBytes(sb)
+				sig, err := ml_dsa_87.SignatureFromBytes(sb)
 				require.NoError(t, err)
 				signedExit.Signature = sig.Marshal()
 				if err := bs.SetFork(fork); err != nil {
@@ -216,7 +216,7 @@ func TestVerifyExitAndSignature(t *testing.T) {
 
 				sb, err := signing.ComputeDomainAndSign(bs, signedExit.Exit.Epoch, signedExit.Exit, params.BeaconConfig().DomainVoluntaryExit, keys[0])
 				require.NoError(t, err)
-				sig, err := dilithium.SignatureFromBytes(sb)
+				sig, err := ml_dsa_87.SignatureFromBytes(sb)
 				require.NoError(t, err)
 				signedExit.Signature = sig.Marshal()
 				if err := bs.SetFork(fork); err != nil {

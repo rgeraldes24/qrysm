@@ -23,7 +23,7 @@ func (b *SignedBeaconBlockCapella) ToGeneric() (*qrysmpb.GenericSignedBeaconBloc
 		return nil, errNilValue
 	}
 
-	sig, err := DecodeHexWithLength(b.Signature, fieldparams.DilithiumSignatureLength)
+	sig, err := DecodeHexWithLength(b.Signature, fieldparams.MLDSA87SignatureLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Signature")
 	}
@@ -79,7 +79,7 @@ func (b *BeaconBlockCapella) ToConsensus() (*qrysmpb.BeaconBlockCapella, error) 
 	if err != nil {
 		return nil, NewDecodeError(err, "StateRoot")
 	}
-	randaoReveal, err := DecodeHexWithLength(b.Body.RandaoReveal, fieldparams.DilithiumSignatureLength)
+	randaoReveal, err := DecodeHexWithLength(b.Body.RandaoReveal, fieldparams.MLDSA87SignatureLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.RandaoReveal")
 	}
@@ -126,7 +126,7 @@ func (b *BeaconBlockCapella) ToConsensus() (*qrysmpb.BeaconBlockCapella, error) 
 
 	syncCommitteeSigs := make([][]byte, len(b.Body.SyncAggregate.SyncCommitteeSignatures))
 	for i, sig := range b.Body.SyncAggregate.SyncCommitteeSignatures {
-		syncCommitteeSig, err := DecodeHexWithLength(sig, fieldparams.DilithiumSignatureLength)
+		syncCommitteeSig, err := DecodeHexWithLength(sig, fieldparams.MLDSA87SignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeSignatures")
 		}
@@ -225,9 +225,9 @@ func (b *BeaconBlockCapella) ToConsensus() (*qrysmpb.BeaconBlockCapella, error) 
 			Amount:         amount,
 		}
 	}
-	dilithiumChanges, err := DilithiumChangesToConsensus(b.Body.DilithiumToExecutionChanges)
+	mlDSA87Changes, err := MLDSA87ChangesToConsensus(b.Body.MLDSA87ToExecutionChanges)
 	if err != nil {
-		return nil, NewDecodeError(err, "Body.DilithiumToExecutionChanges")
+		return nil, NewDecodeError(err, "Body.MLDSA87ToExecutionChanges")
 	}
 
 	return &qrysmpb.BeaconBlockCapella{
@@ -269,7 +269,7 @@ func (b *BeaconBlockCapella) ToConsensus() (*qrysmpb.BeaconBlockCapella, error) 
 				Transactions:  payloadTxs,
 				Withdrawals:   withdrawals,
 			},
-			DilithiumToExecutionChanges: dilithiumChanges,
+			Mldsa87ToExecutionChanges: mlDSA87Changes,
 		},
 	}, nil
 }
@@ -279,7 +279,7 @@ func (b *SignedBlindedBeaconBlockCapella) ToGeneric() (*qrysmpb.GenericSignedBea
 		return nil, errNilValue
 	}
 
-	sig, err := DecodeHexWithLength(b.Signature, fieldparams.DilithiumSignatureLength)
+	sig, err := DecodeHexWithLength(b.Signature, fieldparams.MLDSA87SignatureLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Signature")
 	}
@@ -335,7 +335,7 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*qrysmpb.BlindedBeaconBlockCa
 	if err != nil {
 		return nil, NewDecodeError(err, "StateRoot")
 	}
-	randaoReveal, err := DecodeHexWithLength(b.Body.RandaoReveal, fieldparams.DilithiumSignatureLength)
+	randaoReveal, err := DecodeHexWithLength(b.Body.RandaoReveal, fieldparams.MLDSA87SignatureLength)
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.RandaoReveal")
 	}
@@ -382,7 +382,7 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*qrysmpb.BlindedBeaconBlockCa
 
 	syncCommitteeSigs := make([][]byte, len(b.Body.SyncAggregate.SyncCommitteeSignatures))
 	for i, sig := range b.Body.SyncAggregate.SyncCommitteeSignatures {
-		syncCommitteeSig, err := DecodeHexWithLength(sig, fieldparams.DilithiumSignatureLength)
+		syncCommitteeSig, err := DecodeHexWithLength(sig, fieldparams.MLDSA87SignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, "Body.SyncAggregate.SyncCommitteeSignature")
 		}
@@ -449,9 +449,9 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*qrysmpb.BlindedBeaconBlockCa
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.ExecutionPayloadHeader.WithdrawalsRoot")
 	}
-	dilithiumChanges, err := DilithiumChangesToConsensus(b.Body.DilithiumToExecutionChanges)
+	mlDSA87Changes, err := MLDSA87ChangesToConsensus(b.Body.MLDSA87ToExecutionChanges)
 	if err != nil {
-		return nil, NewDecodeError(err, "Body.DilithiumToExecutionChanges")
+		return nil, NewDecodeError(err, "Body.MLDSA87ToExecutionChanges")
 	}
 
 	return &qrysmpb.BlindedBeaconBlockCapella{
@@ -493,7 +493,7 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*qrysmpb.BlindedBeaconBlockCa
 				TransactionsRoot: payloadTxsRoot,
 				WithdrawalsRoot:  payloadWithdrawalsRoot,
 			},
-			DilithiumToExecutionChanges: dilithiumChanges,
+			Mldsa87ToExecutionChanges: mlDSA87Changes,
 		},
 	}, nil
 }
@@ -533,7 +533,7 @@ func BlindedBeaconBlockCapellaFromConsensus(b *qrysmpb.BlindedBeaconBlockCapella
 	if err != nil {
 		return nil, err
 	}
-	dilithiumChanges, err := DilithiumChangesFromConsensus(b.Body.DilithiumToExecutionChanges)
+	mlDSA87Changes, err := MLDSA87ChangesFromConsensus(b.Body.Mldsa87ToExecutionChanges)
 	if err != nil {
 		return nil, err
 	}
@@ -581,7 +581,7 @@ func BlindedBeaconBlockCapellaFromConsensus(b *qrysmpb.BlindedBeaconBlockCapella
 				TransactionsRoot: hexutil.Encode(b.Body.ExecutionPayloadHeader.TransactionsRoot),
 				WithdrawalsRoot:  hexutil.Encode(b.Body.ExecutionPayloadHeader.WithdrawalsRoot), // new in capella
 			},
-			DilithiumToExecutionChanges: dilithiumChanges, // new in capella
+			MLDSA87ToExecutionChanges: mlDSA87Changes, // new in capella
 		},
 	}, nil
 }
@@ -635,7 +635,7 @@ func BeaconBlockCapellaFromConsensus(b *qrysmpb.BeaconBlockCapella) (*BeaconBloc
 			Amount:           fmt.Sprintf("%d", w.Amount),
 		}
 	}
-	dilithiumChanges, err := DilithiumChangesFromConsensus(b.Body.DilithiumToExecutionChanges)
+	mlDSA87Changes, err := MLDSA87ChangesFromConsensus(b.Body.Mldsa87ToExecutionChanges)
 	if err != nil {
 		return nil, err
 	}
@@ -683,7 +683,7 @@ func BeaconBlockCapellaFromConsensus(b *qrysmpb.BeaconBlockCapella) (*BeaconBloc
 				Transactions:  transactions,
 				Withdrawals:   withdrawals, // new in capella
 			},
-			DilithiumToExecutionChanges: dilithiumChanges, // new in capella
+			MLDSA87ToExecutionChanges: mlDSA87Changes, // new in capella
 		},
 	}, nil
 }
@@ -714,7 +714,7 @@ func ProposerSlashingsToConsensus(src []*ProposerSlashing) ([]*qrysmpb.ProposerS
 			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d].SignedHeader2.Message", i))
 		}
 
-		h1Sig, err := DecodeHexWithLength(s.SignedHeader1.Signature, fieldparams.DilithiumSignatureLength)
+		h1Sig, err := DecodeHexWithLength(s.SignedHeader1.Signature, fieldparams.MLDSA87SignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].SignedHeader1.Signature", i))
 		}
@@ -738,7 +738,7 @@ func ProposerSlashingsToConsensus(src []*ProposerSlashing) ([]*qrysmpb.ProposerS
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].SignedHeader1.Message.BodyRoot", i))
 		}
-		h2Sig, err := DecodeHexWithLength(s.SignedHeader2.Signature, fieldparams.DilithiumSignatureLength)
+		h2Sig, err := DecodeHexWithLength(s.SignedHeader2.Signature, fieldparams.MLDSA87SignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].SignedHeader2.Signature", i))
 		}
@@ -840,7 +840,7 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*qrysmpb.AttesterS
 
 		a1Sigs := make([][]byte, len(s.Attestation1.Signatures))
 		for j, sig := range s.Attestation1.Signatures {
-			a1Sig, err := DecodeHexWithLength(sig, fieldparams.DilithiumSignatureLength)
+			a1Sig, err := DecodeHexWithLength(sig, fieldparams.MLDSA87SignatureLength)
 			if err != nil {
 				return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation1.Signatures[%d]", i, j))
 			}
@@ -866,7 +866,7 @@ func AttesterSlashingsToConsensus(src []*AttesterSlashing) ([]*qrysmpb.AttesterS
 
 		a2Sigs := make([][]byte, len(s.Attestation2.Signatures))
 		for j, sig := range s.Attestation2.Signatures {
-			a2Sig, err := DecodeHexWithLength(sig, fieldparams.DilithiumSignatureLength)
+			a2Sig, err := DecodeHexWithLength(sig, fieldparams.MLDSA87SignatureLength)
 			if err != nil {
 				return nil, NewDecodeError(err, fmt.Sprintf("[%d].Attestation2.Signatures[%d]", i, j))
 			}
@@ -1020,7 +1020,7 @@ func DepositsToConsensus(src []*Deposit) ([]*qrysmpb.Deposit, error) {
 				return nil, NewDecodeError(err, fmt.Sprintf("[%d].Proof[%d]", i, j))
 			}
 		}
-		pubkey, err := DecodeHexWithLength(d.Data.Pubkey, fieldparams.DilithiumPubkeyLength)
+		pubkey, err := DecodeHexWithLength(d.Data.Pubkey, fieldparams.MLDSA87PubkeyLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Pubkey", i))
 		}
@@ -1032,7 +1032,7 @@ func DepositsToConsensus(src []*Deposit) ([]*qrysmpb.Deposit, error) {
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Amount", i))
 		}
-		sig, err := DecodeHexWithLength(d.Data.Signature, fieldparams.DilithiumSignatureLength)
+		sig, err := DecodeHexWithLength(d.Data.Signature, fieldparams.MLDSA87SignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Signature", i))
 		}
@@ -1102,7 +1102,7 @@ func ExitsFromConsensus(src []*qrysmpb.SignedVoluntaryExit) ([]*SignedVoluntaryE
 	return exits, nil
 }
 
-func DilithiumChangesToConsensus(src []*SignedDilithiumToExecutionChange) ([]*qrysmpb.SignedDilithiumToExecutionChange, error) {
+func MLDSA87ChangesToConsensus(src []*SignedMLDSA87ToExecutionChange) ([]*qrysmpb.SignedMLDSA87ToExecutionChange, error) {
 	if src == nil {
 		return nil, errNilValue
 	}
@@ -1111,13 +1111,13 @@ func DilithiumChangesToConsensus(src []*SignedDilithiumToExecutionChange) ([]*qr
 		return nil, err
 	}
 
-	changes := make([]*qrysmpb.SignedDilithiumToExecutionChange, len(src))
+	changes := make([]*qrysmpb.SignedMLDSA87ToExecutionChange, len(src))
 	for i, ch := range src {
 		if ch.Message == nil {
 			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d]", i))
 		}
 
-		sig, err := DecodeHexWithLength(ch.Signature, fieldparams.DilithiumSignatureLength)
+		sig, err := DecodeHexWithLength(ch.Signature, fieldparams.MLDSA87SignatureLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Signature", i))
 		}
@@ -1125,19 +1125,19 @@ func DilithiumChangesToConsensus(src []*SignedDilithiumToExecutionChange) ([]*qr
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Message.ValidatorIndex", i))
 		}
-		pubkey, err := DecodeHexWithLength(ch.Message.FromDilithiumPubkey, fieldparams.DilithiumPubkeyLength)
+		pubkey, err := DecodeHexWithLength(ch.Message.FromMLDSA87Pubkey, fieldparams.MLDSA87PubkeyLength)
 		if err != nil {
-			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Message.FromDilithiumPubkey", i))
+			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Message.FromMLDSA87Pubkey", i))
 		}
 		address, err := DecodeAddressWithLength(ch.Message.ToExecutionAddress, common.AddressLength)
 		if err != nil {
 			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Message.ToExecutionAddress", i))
 		}
-		changes[i] = &qrysmpb.SignedDilithiumToExecutionChange{
-			Message: &qrysmpb.DilithiumToExecutionChange{
-				ValidatorIndex:      primitives.ValidatorIndex(index),
-				FromDilithiumPubkey: pubkey,
-				ToExecutionAddress:  address,
+		changes[i] = &qrysmpb.SignedMLDSA87ToExecutionChange{
+			Message: &qrysmpb.MLDSA87ToExecutionChange{
+				ValidatorIndex:     primitives.ValidatorIndex(index),
+				FromMldsa87Pubkey:  pubkey,
+				ToExecutionAddress: address,
 			},
 			Signature: sig,
 		}
@@ -1145,14 +1145,14 @@ func DilithiumChangesToConsensus(src []*SignedDilithiumToExecutionChange) ([]*qr
 	return changes, nil
 }
 
-func DilithiumChangesFromConsensus(src []*qrysmpb.SignedDilithiumToExecutionChange) ([]*SignedDilithiumToExecutionChange, error) {
-	changes := make([]*SignedDilithiumToExecutionChange, len(src))
+func MLDSA87ChangesFromConsensus(src []*qrysmpb.SignedMLDSA87ToExecutionChange) ([]*SignedMLDSA87ToExecutionChange, error) {
+	changes := make([]*SignedMLDSA87ToExecutionChange, len(src))
 	for i, ch := range src {
-		changes[i] = &SignedDilithiumToExecutionChange{
-			Message: &DilithiumToExecutionChange{
-				ValidatorIndex:      fmt.Sprintf("%d", ch.Message.ValidatorIndex),
-				FromDilithiumPubkey: hexutil.Encode(ch.Message.FromDilithiumPubkey),
-				ToExecutionAddress:  hexutil.EncodeQ(ch.Message.ToExecutionAddress),
+		changes[i] = &SignedMLDSA87ToExecutionChange{
+			Message: &MLDSA87ToExecutionChange{
+				ValidatorIndex:     fmt.Sprintf("%d", ch.Message.ValidatorIndex),
+				FromMLDSA87Pubkey:  hexutil.Encode(ch.Message.FromMldsa87Pubkey),
+				ToExecutionAddress: hexutil.EncodeQ(ch.Message.ToExecutionAddress),
 			},
 			Signature: hexutil.Encode(ch.Signature),
 		}

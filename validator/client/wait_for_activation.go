@@ -22,10 +22,10 @@ import (
 // from the gRPC server.
 //
 // If the channel parameter is nil, WaitForActivation creates and manages its own channel.
-func (v *validator) WaitForActivation(ctx context.Context, accountsChangedChan chan [][field_params.DilithiumPubkeyLength]byte) error {
+func (v *validator) WaitForActivation(ctx context.Context, accountsChangedChan chan [][field_params.MLDSA87PubkeyLength]byte) error {
 	// Monitor the key manager for updates.
 	if accountsChangedChan == nil {
-		accountsChangedChan = make(chan [][field_params.DilithiumPubkeyLength]byte, 1)
+		accountsChangedChan = make(chan [][field_params.MLDSA87PubkeyLength]byte, 1)
 		km, err := v.Keymanager()
 		if err != nil {
 			return err
@@ -47,7 +47,7 @@ func (v *validator) WaitForActivation(ctx context.Context, accountsChangedChan c
 // the accountsChangedChan. When an event signal is received, restart the internalWaitForActivation routine.
 // 4) If the stream is reset in error, restart the routine.
 // 5) If the stream returns a response indicating one or more validators are active, exit the routine.
-func (v *validator) internalWaitForActivation(ctx context.Context, accountsChangedChan <-chan [][field_params.DilithiumPubkeyLength]byte) error {
+func (v *validator) internalWaitForActivation(ctx context.Context, accountsChangedChan <-chan [][field_params.MLDSA87PubkeyLength]byte) error {
 	ctx, span := trace.StartSpan(ctx, "validator.WaitForActivation")
 	defer span.End()
 
@@ -101,7 +101,7 @@ func (v *validator) internalWaitForActivation(ctx context.Context, accountsChang
 	return nil
 }
 
-func (v *validator) handleAccountsChanged(ctx context.Context, accountsChangedChan <-chan [][field_params.DilithiumPubkeyLength]byte, stream *qrysmpb.BeaconNodeValidator_WaitForActivationClient, span *trace.Span) error {
+func (v *validator) handleAccountsChanged(ctx context.Context, accountsChangedChan <-chan [][field_params.MLDSA87PubkeyLength]byte, stream *qrysmpb.BeaconNodeValidator_WaitForActivationClient, span *trace.Span) error {
 	for {
 		select {
 		case <-accountsChangedChan:

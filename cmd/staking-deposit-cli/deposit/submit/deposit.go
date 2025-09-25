@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	dilithiumlib "github.com/theQRL/go-qrllib/dilithium"
+	walletmldsa87 "github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/qrlclient"
@@ -83,7 +83,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 		return fmt.Errorf("failed to read seed. reason: %v", err)
 	}
 
-	depositKey, err := dilithiumlib.NewDilithiumFromSeed(bytesutil.ToBytes48(signingSeed))
+	depositKey, err := walletmldsa87.NewWalletFromSeed(bytesutil.ToBytes48(signingSeed))
 	if err != nil {
 		return fmt.Errorf("failed to generate the deposit key from the signing seed. reason: %v", err)
 	}

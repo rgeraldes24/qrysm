@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/theQRL/qrysm/async/event"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -62,7 +62,7 @@ func TestLocalKeymanager_reloadAccountsFromKeystore(t *testing.T) {
 	privKeys := make([][]byte, numAccounts)
 	pubKeys := make([][]byte, numAccounts)
 	for i := 0; i < numAccounts; i++ {
-		privKey, err := dilithium.RandKey()
+		privKey, err := ml_dsa_87.RandKey()
 		require.NoError(t, err)
 		privKeys[i] = privKey.Marshal()
 		pubKeys[i] = privKey.PublicKey().Marshal()
@@ -81,7 +81,7 @@ func TestLocalKeymanager_reloadAccountsFromKeystore(t *testing.T) {
 	lock.RLock()
 	defer lock.RUnlock()
 	for i, keyBytes := range privKeys {
-		privKey, ok := dilithiumKeysCache[bytesutil.ToBytes2592(pubKeys[i])]
+		privKey, ok := mlDSA87KeysCache[bytesutil.ToBytes2592(pubKeys[i])]
 		require.Equal(t, true, ok)
 		require.Equal(t, bytesutil.ToBytes2592(keyBytes), bytesutil.ToBytes2592(privKey.Marshal()))
 	}

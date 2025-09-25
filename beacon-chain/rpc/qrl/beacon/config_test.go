@@ -47,7 +47,7 @@ func TestGetSpec(t *testing.T) {
 	config.EjectionBalance = 22
 	config.EffectiveBalanceIncrement = 23
 	config.GenesisForkVersion = []byte("GenesisForkVersion")
-	config.DilithiumWithdrawalPrefixByte = byte('b')
+	config.MLDSA87WithdrawalPrefixByte = byte('b')
 	config.QRLAddressWithdrawalPrefixByte = byte('c')
 	config.GenesisDelay = 24
 	config.SecondsPerSlot = 25
@@ -92,7 +92,7 @@ func TestGetSpec(t *testing.T) {
 	config.MinSyncCommitteeParticipants = 71
 	config.DefaultFeeRecipient = defaultFeeRecipient
 	config.MaxWithdrawalsPerPayload = 74
-	config.MaxDilithiumToExecutionChanges = 75
+	config.MaxMLDSA87ToExecutionChanges = 75
 	config.MaxValidatorsPerWithdrawalsSweep = 76
 
 	var dbp [4]byte
@@ -183,7 +183,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "23", v)
 		case "GENESIS_FORK_VERSION":
 			assert.Equal(t, "0x"+hex.EncodeToString([]byte("GenesisForkVersion")), v)
-		case "DILITHIUM_WITHDRAWAL_PREFIX":
+		case "ML_DSA_87_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x62", v)
 		case "QRL_ADDRESS_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x63", v)
@@ -297,7 +297,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "0x08000000", v)
 		case "DOMAIN_CONTRIBUTION_AND_PROOF":
 			assert.Equal(t, "0x09000000", v)
-		case "DOMAIN_DILITHIUM_TO_EXECUTION_CHANGE":
+		case "DOMAIN_ML_DSA_87_TO_EXECUTION_CHANGE":
 			assert.Equal(t, "0x0a000000", v)
 		case "DOMAIN_APPLICATION_BUILDER":
 			assert.Equal(t, "0x00000001", v)
@@ -315,7 +315,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "3", v)
 		case "MAX_WITHDRAWALS_PER_PAYLOAD":
 			assert.Equal(t, "74", v)
-		case "MAX_DILITHIUM_TO_EXECUTION_CHANGES":
+		case "MAX_ML_DSA_87_TO_EXECUTION_CHANGES":
 			assert.Equal(t, "75", v)
 		case "MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP":
 			assert.Equal(t, "76", v)

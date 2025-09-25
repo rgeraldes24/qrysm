@@ -7,7 +7,7 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -18,7 +18,7 @@ func TestVerifyBlockHeaderSignature(t *testing.T) {
 	beaconState, err := util.NewBeaconStateCapella()
 	require.NoError(t, err)
 
-	privKey, err := dilithium.RandKey()
+	privKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	validators := make([]*qrysmpb.Validator, 1)
 	validators[0] = &qrysmpb.Validator{

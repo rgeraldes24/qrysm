@@ -19,7 +19,7 @@ import (
 	mockSync "github.com/theQRL/qrysm/beacon-chain/sync/initial-sync/testing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -59,7 +59,7 @@ func TestProposeAttestation_OK(t *testing.T) {
 	require.NoError(t, state.SetSlot(params.BeaconConfig().SlotsPerEpoch+1))
 	require.NoError(t, state.SetValidators(validators))
 
-	sk, err := dilithium.RandKey()
+	sk, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	sig := sk.Sign([]byte("dummy_test_data"))
 	req := &qrysmpb.Attestation{

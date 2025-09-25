@@ -108,9 +108,9 @@ func (b *SignedBeaconBlock) SetExecution(e interfaces.ExecutionData) error {
 	return nil
 }
 
-// SetDilithiumToExecutionChanges sets the Dilithium to execution changes in the block.
+// SetMLDSA87ToExecutionChanges sets the ML-DSA-87 to execution changes in the block.
 // This function is not thread safe, it is only used during block creation.
-func (b *SignedBeaconBlock) SetDilithiumToExecutionChanges(dilithiumToExecutionChanges []*qrysmpb.SignedDilithiumToExecutionChange) error {
-	b.block.body.dilithiumToExecutionChanges = dilithiumToExecutionChanges
+func (b *SignedBeaconBlock) SetMLDSA87ToExecutionChanges(mlDSA87ToExecutionChanges []*qrysmpb.SignedMLDSA87ToExecutionChange) error {
+	b.block.body.mlDSA87ToExecutionChanges = mlDSA87ToExecutionChanges
 	return nil
 }

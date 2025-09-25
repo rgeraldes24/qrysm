@@ -203,9 +203,9 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 		return nil, errors.Wrap(err, "failed to get withdrawals")
 	}
 
-	dilithiumToExecutionChanges, err := convertDilithiumToExecutionChangesToProto(block.Body.DilithiumToExecutionChanges)
+	mlDSA87ToExecutionChanges, err := convertMLDSA87ToExecutionChangesToProto(block.Body.MLDSA87ToExecutionChanges)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get dilithium to execution changes")
+		return nil, errors.Wrap(err, "failed to get ml-dsa-87 to execution changes")
 	}
 
 	return &qrysmpb.BeaconBlockCapella{
@@ -247,7 +247,7 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 				Transactions:  transactions,
 				Withdrawals:   withdrawals,
 			},
-			DilithiumToExecutionChanges: dilithiumToExecutionChanges,
+			Mldsa87ToExecutionChanges: mlDSA87ToExecutionChanges,
 		},
 	}, nil
 }

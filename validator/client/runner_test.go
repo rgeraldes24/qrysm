@@ -189,8 +189,8 @@ func TestKeyReload_ActiveKey(t *testing.T) {
 	ctx := context.Background()
 	km := &mockKeymanager{}
 	v := &testutil.FakeValidator{Km: km}
-	ac := make(chan [][field_params.DilithiumPubkeyLength]byte)
-	current := [][field_params.DilithiumPubkeyLength]byte{testutil.ActiveKey}
+	ac := make(chan [][field_params.MLDSA87PubkeyLength]byte)
+	current := [][field_params.MLDSA87PubkeyLength]byte{testutil.ActiveKey}
 	onAccountsChanged(ctx, v, current, ac)
 	assert.Equal(t, true, v.HandleKeyReloadCalled)
 	// HandleKeyReloadCalled in the FakeValidator returns true if one of the keys is equal to the
@@ -203,8 +203,8 @@ func TestKeyReload_NoActiveKey(t *testing.T) {
 	ctx := context.Background()
 	km := &mockKeymanager{}
 	v := &testutil.FakeValidator{Km: km}
-	ac := make(chan [][field_params.DilithiumPubkeyLength]byte)
-	current := [][field_params.DilithiumPubkeyLength]byte{na}
+	ac := make(chan [][field_params.MLDSA87PubkeyLength]byte)
+	current := [][field_params.MLDSA87PubkeyLength]byte{na}
 	onAccountsChanged(ctx, v, current, ac)
 	assert.Equal(t, true, v.HandleKeyReloadCalled)
 	// HandleKeyReloadCalled in the FakeValidator returns true if one of the keys is equal to the
@@ -213,8 +213,8 @@ func TestKeyReload_NoActiveKey(t *testing.T) {
 	assert.Equal(t, 1, v.WaitForActivationCalled)
 }
 
-func notActive(t *testing.T) [field_params.DilithiumPubkeyLength]byte {
-	var r [field_params.DilithiumPubkeyLength]byte
+func notActive(t *testing.T) [field_params.MLDSA87PubkeyLength]byte {
+	var r [field_params.MLDSA87PubkeyLength]byte
 	copy(r[:], testutil.ActiveKey[:])
 	for i := 0; i < len(r); i++ {
 		r[i] = bits.Reverse8(r[i])

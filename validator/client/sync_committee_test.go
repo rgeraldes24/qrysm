@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/go-bitfield"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -32,7 +32,7 @@ func TestSubmitSyncCommitteeMessage_ValidatorDutiesRequestFailure(t *testing.T) 
 		Root: bytesutil.PadTo([]byte{}, 32),
 	}, nil)
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitSyncCommitteeMessage(context.Background(), 1, pubKey)
 	require.LogsContain(t, hook, "Could not fetch validator assignment")
@@ -64,7 +64,7 @@ func TestSubmitSyncCommitteeMessage_BadDomainData(t *testing.T) {
 		DomainData(gomock.Any(), gomock.Any()).
 		Return(nil, errors.New("uh oh"))
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitSyncCommitteeMessage(context.Background(), 1, pubKey)
 	require.LogsContain(t, hook, "Could not get sync committee domain data")
@@ -104,7 +104,7 @@ func TestSubmitSyncCommitteeMessage_CouldNotSubmit(t *testing.T) {
 		gomock.AssignableToTypeOf(&qrysmpb.SyncCommitteeMessage{}),
 	).Return(&emptypb.Empty{}, errors.New("uh oh") /* error */)
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitSyncCommitteeMessage(context.Background(), 1, pubKey)
 
@@ -148,7 +148,7 @@ func TestSubmitSyncCommitteeMessage_OK(t *testing.T) {
 		generatedMsg = msg
 	}).Return(&emptypb.Empty{}, nil /* error */)
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitSyncCommitteeMessage(context.Background(), 1, pubKey)
 
@@ -164,7 +164,7 @@ func TestSubmitSignedContributionAndProof_ValidatorDutiesRequestFailure(t *testi
 	validator.duties = &qrysmpb.DutiesResponse{CurrentEpochDuties: []*qrysmpb.DutiesResponse_Duty{}}
 	defer finish()
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	validator.SubmitSignedContributionAndProof(context.Background(), 1, pubKey)
 	require.LogsContain(t, hook, "Could not fetch validator assignment")
@@ -184,7 +184,7 @@ func TestSubmitSignedContributionAndProof_GetSyncSubcommitteeIndexFailure(t *tes
 	}}
 	defer finish()
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -212,7 +212,7 @@ func TestSubmitSignedContributionAndProof_NothingToDo(t *testing.T) {
 	}}
 	defer finish()
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -240,7 +240,7 @@ func TestSubmitSignedContributionAndProof_BadDomain(t *testing.T) {
 	}}
 	defer finish()
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -267,7 +267,7 @@ func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) 
 	// Hardcode secret key in order to have a valid aggregator signature.
 	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
 	assert.NoError(t, err)
-	validatorKey, err := dilithium.SecretKeyFromSeed(rawKey)
+	validatorKey, err := ml_dsa_87.SecretKeyFromSeed(rawKey)
 	assert.NoError(t, err)
 
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
@@ -282,7 +282,7 @@ func TestSubmitSignedContributionAndProof_CouldNotGetContribution(t *testing.T) 
 	}}
 	defer finish()
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -317,7 +317,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	// Hardcode secret key in order to have a valid aggregator signature.
 	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
 	assert.NoError(t, err)
-	validatorKey, err := dilithium.SecretKeyFromSeed(rawKey)
+	validatorKey, err := ml_dsa_87.SecretKeyFromSeed(rawKey)
 	assert.NoError(t, err)
 
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
@@ -332,7 +332,7 @@ func TestSubmitSignedContributionAndProof_CouldNotSubmitContribution(t *testing.
 	}}
 	defer finish()
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx
@@ -395,7 +395,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	// Hardcode secret key in order to have a valid aggregator signature.
 	rawKey, err := hex.DecodeString("659e875e1b062c03f2f2a57332974d475b97df6cfc581d322e79642d39aca8fd659e875e1b062c03f2f2a57332974d4a")
 	assert.NoError(t, err)
-	validatorKey, err := dilithium.SecretKeyFromSeed(rawKey)
+	validatorKey, err := ml_dsa_87.SecretKeyFromSeed(rawKey)
 	assert.NoError(t, err)
 
 	validator, m, validatorKey, finish := setupWithKey(t, validatorKey)
@@ -410,7 +410,7 @@ func TestSubmitSignedContributionAndProof_Ok(t *testing.T) {
 	}}
 	defer finish()
 
-	var pubKey [field_params.DilithiumPubkeyLength]byte
+	var pubKey [field_params.MLDSA87PubkeyLength]byte
 	copy(pubKey[:], validatorKey.PublicKey().Marshal())
 	m.validatorClient.EXPECT().GetSyncSubcommitteeIndex(
 		gomock.Any(), // ctx

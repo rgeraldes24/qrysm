@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/contracts/deposit"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/math"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -248,7 +248,7 @@ func verifyDepositDataWithDomain(ctx context.Context, deps []*qrysmpb.Deposit, d
 	if len(deps) == 0 {
 		return nil
 	}
-	pks := make([][]dilithium.PublicKey, len(deps))
+	pks := make([][]ml_dsa_87.PublicKey, len(deps))
 	sigs := make([][][]byte, len(deps))
 	msgs := make([][32]byte, len(deps))
 	for i, dep := range deps {
@@ -258,11 +258,11 @@ func verifyDepositDataWithDomain(ctx context.Context, deps []*qrysmpb.Deposit, d
 		if dep == nil || dep.Data == nil {
 			return errors.New("nil deposit")
 		}
-		dpk, err := dilithium.PublicKeyFromBytes(dep.Data.PublicKey)
+		dpk, err := ml_dsa_87.PublicKeyFromBytes(dep.Data.PublicKey)
 		if err != nil {
 			return err
 		}
-		pks[i] = []dilithium.PublicKey{dpk}
+		pks[i] = []ml_dsa_87.PublicKey{dpk}
 		sigs[i] = [][]byte{dep.Data.Signature}
 		depositMessage := &qrysmpb.DepositMessage{
 			PublicKey:             dep.Data.PublicKey,
@@ -275,7 +275,7 @@ func verifyDepositDataWithDomain(ctx context.Context, deps []*qrysmpb.Deposit, d
 		}
 		msgs[i] = sr
 	}
-	verify, err := dilithium.VerifyMultipleSignatures(sigs, msgs, pks)
+	verify, err := ml_dsa_87.VerifyMultipleSignatures(sigs, msgs, pks)
 	if err != nil {
 		return errors.Errorf("could not verify multiple signatures: %v", err)
 	}

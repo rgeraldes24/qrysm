@@ -92,7 +92,7 @@ func TestServer_validatorRegistered(t *testing.T) {
 	require.Equal(t, false, reg)
 
 	f := bytesutil.PadTo([]byte{}, fieldparams.FeeRecipientLength)
-	p := bytesutil.PadTo([]byte{}, field_params.DilithiumPubkeyLength)
+	p := bytesutil.PadTo([]byte{}, field_params.MLDSA87PubkeyLength)
 	require.NoError(t, db.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{0, 1},
 		[]*qrysmpb.ValidatorRegistrationV1{{FeeRecipient: f, Timestamp: uint64(time.Now().Unix()), Pubkey: p}, {FeeRecipient: f, Timestamp: uint64(time.Now().Unix()), Pubkey: p}}))
 
@@ -134,7 +134,7 @@ func TestServer_canUseBuilder(t *testing.T) {
 	require.Equal(t, false, reg)
 
 	f := bytesutil.PadTo([]byte{}, fieldparams.FeeRecipientLength)
-	p := bytesutil.PadTo([]byte{}, field_params.DilithiumPubkeyLength)
+	p := bytesutil.PadTo([]byte{}, field_params.MLDSA87PubkeyLength)
 	require.NoError(t, db.SaveRegistrationsByValidatorIDs(ctx, []primitives.ValidatorIndex{0},
 		[]*qrysmpb.ValidatorRegistrationV1{{FeeRecipient: f, Timestamp: uint64(time.Now().Unix()), Pubkey: p}}))
 

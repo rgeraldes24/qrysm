@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
@@ -188,7 +188,7 @@ func TestImport_Noninteractive_RandomName(t *testing.T) {
 
 // Returns the fullPath to the newly created keystore file.
 func createRandomNameKeystore(t *testing.T, path string) (*keymanager.Keystore, string) {
-	validatingKey, err := dilithium.RandKey()
+	validatingKey, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	encryptor := keystorev1.New()
 	cryptoFields, err := encryptor.Encrypt(validatingKey.Marshal(), password)

@@ -444,7 +444,7 @@ func requestedValIndices(w http.ResponseWriter, r *http.Request, st state.Beacon
 		index, err := strconv.ParseUint(v, 10, 64)
 		if err != nil {
 			pubkey, err := bytesutil.FromHexString(v)
-			if err != nil || len(pubkey) != field_params.DilithiumPubkeyLength {
+			if err != nil || len(pubkey) != field_params.MLDSA87PubkeyLength {
 				http2.HandleError(w, fmt.Sprintf("%s is not a validator index or pubkey", v), http.StatusBadRequest)
 				return nil, false
 			}

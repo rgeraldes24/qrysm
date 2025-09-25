@@ -66,8 +66,8 @@ func (vs *Server) MultipleValidatorStatus(
 	}
 	responseCap := len(req.PublicKeys) + len(req.Indices)
 	pubKeys := make([][]byte, 0, responseCap)
-	filtered := make(map[[field_params.DilithiumPubkeyLength]byte]bool)
-	filtered[[field_params.DilithiumPubkeyLength]byte{}] = true // Filter out keys with all zeros.
+	filtered := make(map[[field_params.MLDSA87PubkeyLength]byte]bool)
+	filtered[[field_params.MLDSA87PubkeyLength]byte{}] = true // Filter out keys with all zeros.
 	// Filter out duplicate public keys.
 	for _, pubKey := range req.PublicKeys {
 		pubkeyBytes := bytesutil.ToBytes2592(pubKey)

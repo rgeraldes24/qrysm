@@ -1666,8 +1666,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_gopherjs_gopherjs",
         importpath = "github.com/gopherjs/gopherjs",
-        sum = "h1:SFRhRWRwuyWGcFUUWjmOtz6Fplqx6xhgb4pGQc9VJtc=",
-        version = "v1.18.0-beta1.0.20220817214357-b972ef3adc13",
+        sum = "h1:EGx4pi6eqNxGaHF6qqu48+N2wcFQ5qg5FXgOdqsJ5d8=",
+        version = "v0.0.0-20181017120253-0766667cb4d1",
     )
     go_repository(
         name = "com_github_gordonklaus_ineffassign",
@@ -3943,8 +3943,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_theqrl_go_qrllib",
         importpath = "github.com/theQRL/go-qrllib",
-        sum = "h1:YvUxImh18qCxX1rjvYF9wqAAL236s2FqrjzTRqg5Alg=",
-        version = "v0.0.0-20230406170304-b7eb19c367e1",
+        sum = "h1:fifz6R3QXFyldQHsoSUdy1bPUAU7ckdtvq+9YJQ6qO0=",
+        version = "v0.0.0-20250912073529-16a61002f3c5",
     )
 
     go_repository(
@@ -5858,9 +5858,9 @@ def go_dependencies():
         patches = [
             "//third_party:com_github_theqrl_go_zond_secp256k1.patch",
         ],
-        replace = "github.com/rgeraldes24/go-zond",
-        sum = "h1:PfQCCl4VUvOpG9NX2Q5LgePiR6JvP1h7//Xsh7C5eWQ=",
-        version = "v0.0.0-20250901090932-5b28406187a1",
+        replace = "github.com/cyyber/go-zond",
+        sum = "h1:rhGjyX4WBR6L08ltdGEthjyDYAJIhlJV2hBulRuRL3I=",
+        version = "v0.0.0-20250925032229-88e1722956fe",
     )
     go_repository(
         name = "com_github_theqrl_go_zond_types",

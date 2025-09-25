@@ -27,15 +27,15 @@ import (
 )
 
 const (
-	getSignedBlockPath             = "/qrl/v1/beacon/blocks"
-	getBlockRootPath               = "/qrl/v1/beacon/blocks/{{.Id}}/root"
-	getForkForStatePath            = "/qrl/v1/beacon/states/{{.Id}}/fork"
-	getWeakSubjectivityPath        = "/qrl/v1/beacon/weak_subjectivity"
-	getForkSchedulePath            = "/qrl/v1/config/fork_schedule"
-	getConfigSpecPath              = "/qrl/v1/config/spec"
-	getStatePath                   = "/qrl/v1/debug/beacon/states"
-	getNodeVersionPath             = "/qrl/v1/node/version"
-	changeDilithiumtoExecutionPath = "/qrl/v1/beacon/pool/dilithium_to_execution_changes"
+	getSignedBlockPath           = "/qrl/v1/beacon/blocks"
+	getBlockRootPath             = "/qrl/v1/beacon/blocks/{{.Id}}/root"
+	getForkForStatePath          = "/qrl/v1/beacon/states/{{.Id}}/fork"
+	getWeakSubjectivityPath      = "/qrl/v1/beacon/weak_subjectivity"
+	getForkSchedulePath          = "/qrl/v1/config/fork_schedule"
+	getConfigSpecPath            = "/qrl/v1/config/spec"
+	getStatePath                 = "/qrl/v1/debug/beacon/states"
+	getNodeVersionPath           = "/qrl/v1/node/version"
+	changeMLDSA87toExecutionPath = "/qrl/v1/beacon/pool/ml_dsa_87_to_execution_changes"
 )
 
 // StateOrBlockId represents the block_id / state_id parameters that several of the QRL Beacon API methods accept.
@@ -281,10 +281,10 @@ func (c *Client) GetWeakSubjectivity(ctx context.Context) (*WeakSubjectivityData
 	}, nil
 }
 
-// SubmitChangeDilithiumtoExecution calls a beacon API endpoint to set the withdrawal addresses based on the given signed messages.
+// SubmitChangeMLDSA87toExecution calls a beacon API endpoint to set the withdrawal addresses based on the given signed messages.
 // If the API responds with something other than OK there will be failure messages associated to the corresponding request message.
-func (c *Client) SubmitChangeDilithiumtoExecution(ctx context.Context, request []*apimiddleware.SignedDilithiumToExecutionChangeJson) error {
-	u := c.BaseURL().ResolveReference(&url.URL{Path: changeDilithiumtoExecutionPath})
+func (c *Client) SubmitChangeMLDSA87toExecution(ctx context.Context, request []*apimiddleware.SignedMLDSA87ToExecutionChangeJson) error {
+	u := c.BaseURL().ResolveReference(&url.URL{Path: changeMLDSA87toExecutionPath})
 	body, err := json.Marshal(request)
 	if err != nil {
 		return errors.Wrap(err, "failed to marshal JSON")
@@ -320,14 +320,14 @@ func (c *Client) SubmitChangeDilithiumtoExecution(ctx context.Context, request [
 	return nil
 }
 
-// GetDilithiumtoExecutionChanges gets all the set withdrawal messages in the node's operation pool.
+// GetMLDSA87toExecutionChanges gets all the set withdrawal messages in the node's operation pool.
 // Returns a struct representation of json response.
-func (c *Client) GetDilithiumtoExecutionChanges(ctx context.Context) (*apimiddleware.DilithiumToExecutionChangesPoolResponseJson, error) {
-	body, err := c.Get(ctx, changeDilithiumtoExecutionPath)
+func (c *Client) GetMLDSA87toExecutionChanges(ctx context.Context) (*apimiddleware.MLDSA87ToExecutionChangesPoolResponseJson, error) {
+	body, err := c.Get(ctx, changeMLDSA87toExecutionPath)
 	if err != nil {
 		return nil, err
 	}
-	poolResponse := &apimiddleware.DilithiumToExecutionChangesPoolResponseJson{}
+	poolResponse := &apimiddleware.MLDSA87ToExecutionChangesPoolResponseJson{}
 	err = json.Unmarshal(body, poolResponse)
 	if err != nil {
 		return nil, err

@@ -38,8 +38,8 @@ func setWithdrawalAddresses(c *cli.Context) error {
 	return callWithdrawalEndpoints(ctx, beaconNodeHost, setWithdrawalAddressJsons)
 }
 
-func getWithdrawalMessagesFromPathFlag(c *cli.Context) ([]*apimiddleware.SignedDilithiumToExecutionChangeJson, error) {
-	setWithdrawalAddressJsons := make([]*apimiddleware.SignedDilithiumToExecutionChangeJson, 0)
+func getWithdrawalMessagesFromPathFlag(c *cli.Context) ([]*apimiddleware.SignedMLDSA87ToExecutionChangeJson, error) {
+	setWithdrawalAddressJsons := make([]*apimiddleware.SignedMLDSA87ToExecutionChangeJson, 0)
 	foundFilePaths, err := findWithdrawalFiles(c.String(PathFlag.Name))
 	if err != nil {
 		return setWithdrawalAddressJsons, errors.Wrap(err, "failed to find withdrawal files")
@@ -49,27 +49,27 @@ func getWithdrawalMessagesFromPathFlag(c *cli.Context) ([]*apimiddleware.SignedD
 		if err != nil {
 			return setWithdrawalAddressJsons, errors.Wrap(err, "failed to open file")
 		}
-		var to []*apimiddleware.SignedDilithiumToExecutionChangeJson
+		var to []*apimiddleware.SignedMLDSA87ToExecutionChangeJson
 		if err := json.Unmarshal(b, &to); err != nil {
 			log.Warnf("provided file: %s, is not a list of signed withdrawal messages. Error:%s", foundFilePath, err.Error())
 			continue
 		}
 		// verify 0x from file and add if needed
 		for i, obj := range to {
-			if len(obj.Message.FromDilithiumPubkey) == field_params.DilithiumPubkeyLength*2 {
-				to[i].Message.FromDilithiumPubkey = fmt.Sprintf("0x%s", obj.Message.FromDilithiumPubkey)
+			if len(obj.Message.FromMLDSA87Pubkey) == field_params.MLDSA87PubkeyLength*2 {
+				to[i].Message.FromMLDSA87Pubkey = fmt.Sprintf("0x%s", obj.Message.FromMLDSA87Pubkey)
 			}
 			if len(obj.Message.ToExecutionAddress) == common.AddressLength*2 {
 				to[i].Message.ToExecutionAddress = fmt.Sprintf("Q%s", obj.Message.ToExecutionAddress)
 			}
-			if len(obj.Signature) == field_params.DilithiumSignatureLength*2 {
+			if len(obj.Signature) == field_params.MLDSA87SignatureLength*2 {
 				to[i].Signature = fmt.Sprintf("0x%s", obj.Signature)
 			}
-			setWithdrawalAddressJsons = append(setWithdrawalAddressJsons, &apimiddleware.SignedDilithiumToExecutionChangeJson{
-				Message: &apimiddleware.DilithiumToExecutionChangeJson{
-					ValidatorIndex:      to[i].Message.ValidatorIndex,
-					FromDilithiumPubkey: to[i].Message.FromDilithiumPubkey,
-					ToExecutionAddress:  to[i].Message.ToExecutionAddress,
+			setWithdrawalAddressJsons = append(setWithdrawalAddressJsons, &apimiddleware.SignedMLDSA87ToExecutionChangeJson{
+				Message: &apimiddleware.MLDSA87ToExecutionChangeJson{
+					ValidatorIndex:     to[i].Message.ValidatorIndex,
+					FromMLDSA87Pubkey:  to[i].Message.FromMLDSA87Pubkey,
+					ToExecutionAddress: to[i].Message.ToExecutionAddress,
 				},
 				Signature: to[i].Signature,
 			})
@@ -81,13 +81,13 @@ func getWithdrawalMessagesFromPathFlag(c *cli.Context) ([]*apimiddleware.SignedD
 	return setWithdrawalAddressJsons, nil
 }
 
-func callWithdrawalEndpoints(ctx context.Context, host string, request []*apimiddleware.SignedDilithiumToExecutionChangeJson) error {
+func callWithdrawalEndpoints(ctx context.Context, host string, request []*apimiddleware.SignedMLDSA87ToExecutionChangeJson) error {
 	client, err := beacon.NewClient(host)
 	if err != nil {
 		return err
 	}
 
-	err = client.SubmitChangeDilithiumtoExecution(ctx, request)
+	err = client.SubmitChangeMLDSA87toExecution(ctx, request)
 	if err != nil && strings.Contains(err.Error(), "POST error") {
 		// just log the error, so we can check the pool for partial inclusions.
 		log.Error(err)
@@ -99,9 +99,9 @@ func callWithdrawalEndpoints(ctx context.Context, host string, request []*apimid
 	return checkIfWithdrawsAreInPool(ctx, client, request)
 }
 
-func checkIfWithdrawsAreInPool(ctx context.Context, client *beacon.Client, request []*apimiddleware.SignedDilithiumToExecutionChangeJson) error {
+func checkIfWithdrawsAreInPool(ctx context.Context, client *beacon.Client, request []*apimiddleware.SignedMLDSA87ToExecutionChangeJson) error {
 	log.Info("Verifying requested withdrawal messages known to node...")
-	poolResponse, err := client.GetDilithiumtoExecutionChanges(ctx)
+	poolResponse, err := client.GetMLDSA87toExecutionChanges(ctx)
 	if err != nil {
 		return err
 	}

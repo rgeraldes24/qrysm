@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/core/types"
@@ -123,7 +123,7 @@ func CreateAddresses(N int) ([]string, []string) {
 	addrs := make([]string, 0, N)
 
 	for i := 0; i < N; i++ {
-		acc, err := dilithium.New()
+		acc, err := ml_dsa_87.NewWallet()
 		if err != nil {
 			panic(err)
 		}

@@ -17,7 +17,7 @@ import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/crypto/rand"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -38,7 +38,7 @@ func NewAttestation() *qrysmpb.Attestation {
 				Root: make([]byte, fieldparams.RootLength),
 			},
 		},
-		Signatures: [][]byte{make([]byte, field_params.DilithiumSignatureLength), make([]byte, field_params.DilithiumSignatureLength)},
+		Signatures: [][]byte{make([]byte, field_params.MLDSA87SignatureLength), make([]byte, field_params.MLDSA87SignatureLength)},
 	}
 }
 
@@ -50,7 +50,7 @@ func NewAttestation() *qrysmpb.Attestation {
 //
 // If you request 4 attestations, but there are 8 committees, you will get 4 fully aggregated attestations.
 func GenerateAttestations(
-	bState state.BeaconState, privs []dilithium.DilithiumKey, numToGen uint64, slot primitives.Slot, randomRoot bool,
+	bState state.BeaconState, privs []ml_dsa_87.MLDSA87Key, numToGen uint64, slot primitives.Slot, randomRoot bool,
 ) ([]*qrysmpb.Attestation, error) {
 	var attestations []*qrysmpb.Attestation
 	generateHeadState := false
@@ -192,7 +192,7 @@ func GenerateAttestations(
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateAttestation(a *qrysmpb.Attestation) *qrysmpb.Attestation {
 	if a.Signatures == nil {
-		sig := make([]byte, 4595)
+		sig := make([]byte, 4627)
 		a.Signatures = [][]byte{sig}
 	}
 	if a.AggregationBits == nil {
@@ -209,7 +209,7 @@ func HydrateAttestation(a *qrysmpb.Attestation) *qrysmpb.Attestation {
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateV1Attestation(a *qrlpb.Attestation) *qrlpb.Attestation {
 	if a.Signatures == nil {
-		sig := make([]byte, 4595)
+		sig := make([]byte, 4627)
 		a.Signatures = [][]byte{sig}
 	}
 	if a.AggregationBits == nil {
@@ -268,7 +268,7 @@ func HydrateV1AttestationData(d *qrlpb.AttestationData) *qrlpb.AttestationData {
 // to comply with fssz marshalling and unmarshalling rules.
 func HydrateIndexedAttestation(a *qrysmpb.IndexedAttestation) *qrysmpb.IndexedAttestation {
 	if a.Signatures == nil {
-		sig := make([]byte, 4595)
+		sig := make([]byte, 4627)
 		a.Signatures = [][]byte{sig}
 	}
 	if a.Data == nil {

@@ -13,7 +13,7 @@ import (
 	p2ptypes "github.com/theQRL/qrysm/beacon-chain/p2p/types"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -225,7 +225,7 @@ func (s *Service) rejectInvalidContributionSignature(m *qrysmpb.SignedContributi
 		if err != nil {
 			return pubsub.ValidationIgnore, err
 		}
-		publicKey, err := dilithium.PublicKeyFromBytes(pubkey[:])
+		publicKey, err := ml_dsa_87.PublicKeyFromBytes(pubkey[:])
 		if err != nil {
 			tracing.AnnotateError(span, err)
 			return pubsub.ValidationReject, err
@@ -235,9 +235,9 @@ func (s *Service) rejectInvalidContributionSignature(m *qrysmpb.SignedContributi
 			tracing.AnnotateError(span, err)
 			return pubsub.ValidationReject, err
 		}
-		set := &dilithium.SignatureBatch{
+		set := &ml_dsa_87.SignatureBatch{
 			Messages:     [][32]byte{root},
-			PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
+			PublicKeys:   [][]ml_dsa_87.PublicKey{{publicKey}},
 			Signatures:   [][][]byte{{m.Signature}},
 			Descriptions: []string{signing.ContributionSignature},
 		}
@@ -252,7 +252,7 @@ func (s *Service) rejectInvalidSyncAggregateSignature(m *qrysmpb.SignedContribut
 		// The aggregate signature is valid for the message `beacon_block_root` and aggregate pubkey
 		// derived from the participation info in `aggregation_bits` for the subcommittee specified by the `contribution.subcommittee_index`.
 		var activeRawPubkeys [][]byte
-		var publicKeys []dilithium.PublicKey
+		var publicKeys []ml_dsa_87.PublicKey
 		syncPubkeys, err := s.cfg.chain.HeadSyncCommitteePubKeys(ctx, m.Message.Contribution.Slot, primitives.CommitteeIndex(m.Message.Contribution.SubcommitteeIndex))
 		if err != nil {
 			return pubsub.ValidationIgnore, err
@@ -266,7 +266,7 @@ func (s *Service) rejectInvalidSyncAggregateSignature(m *qrysmpb.SignedContribut
 		for i, pk := range syncPubkeys {
 			if bVector.BitAt(uint64(i)) {
 				activeRawPubkeys = append(activeRawPubkeys, pk)
-				pubKey, err := dilithium.PublicKeyFromBytes(pk)
+				pubKey, err := ml_dsa_87.PublicKeyFromBytes(pk)
 				if err != nil {
 					return pubsub.ValidationIgnore, err
 				}
@@ -284,9 +284,9 @@ func (s *Service) rejectInvalidSyncAggregateSignature(m *qrysmpb.SignedContribut
 			tracing.AnnotateError(span, err)
 			return pubsub.ValidationIgnore, err
 		}
-		set := &dilithium.SignatureBatch{
+		set := &ml_dsa_87.SignatureBatch{
 			Messages:     [][32]byte{sigRoot},
-			PublicKeys:   [][]dilithium.PublicKey{publicKeys},
+			PublicKeys:   [][]ml_dsa_87.PublicKey{publicKeys},
 			Signatures:   [][][]byte{m.Message.Contribution.Signatures},
 			Descriptions: []string{signing.SyncAggregateSignature},
 		}
@@ -388,7 +388,7 @@ func (s *Service) verifySyncSelectionData(ctx context.Context, m *qrysmpb.Contri
 	if err != nil {
 		return err
 	}
-	publicKey, err := dilithium.PublicKeyFromBytes(pubkey[:])
+	publicKey, err := ml_dsa_87.PublicKeyFromBytes(pubkey[:])
 	if err != nil {
 		return err
 	}
@@ -396,9 +396,9 @@ func (s *Service) verifySyncSelectionData(ctx context.Context, m *qrysmpb.Contri
 	if err != nil {
 		return err
 	}
-	set := &dilithium.SignatureBatch{
+	set := &ml_dsa_87.SignatureBatch{
 		Messages:     [][32]byte{root},
-		PublicKeys:   [][]dilithium.PublicKey{{publicKey}},
+		PublicKeys:   [][]ml_dsa_87.PublicKey{{publicKey}},
 		Signatures:   [][][]byte{{m.SelectionProof}},
 		Descriptions: []string{signing.SyncSelectionProof},
 	}

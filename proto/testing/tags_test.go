@@ -14,8 +14,8 @@ import (
 )
 
 func TestSSZTagSize(t *testing.T) {
-	sigSize := field_params.DilithiumSignatureLength
-	pubKeySize := field_params.DilithiumPubkeyLength
+	sigSize := field_params.MLDSA87SignatureLength
+	pubKeySize := field_params.MLDSA87PubkeyLength
 	rootSize := 32
 
 	sizes, err := sszTagSizes(pb.SignedBeaconBlockCapella{}, "Signature")

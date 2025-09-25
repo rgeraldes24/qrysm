@@ -132,7 +132,7 @@ func TestVerifyAttestationNoVerifySignatures_OK(t *testing.T) {
 		AggregationBits: aggBits,
 	}
 
-	var zeroSig [field_params.DilithiumSignatureLength]byte
+	var zeroSig [field_params.MLDSA87SignatureLength]byte
 	att.Signatures = [][]byte{zeroSig[:]}
 
 	err := beaconState.SetSlot(beaconState.Slot() + params.BeaconConfig().MinAttestationInclusionDelay)
@@ -159,7 +159,7 @@ func TestVerifyAttestationNoVerifySignatures_BadAttIdx(t *testing.T) {
 		},
 		AggregationBits: aggBits,
 	}
-	var zeroSig [field_params.DilithiumSignatureLength]byte
+	var zeroSig [field_params.MLDSA87SignatureLength]byte
 	att.Signatures = [][]byte{zeroSig[:]}
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+params.BeaconConfig().MinAttestationInclusionDelay))
 	ckp := beaconState.CurrentJustifiedCheckpoint()
@@ -202,7 +202,7 @@ func TestConvertToIndexed_OK(t *testing.T) {
 		},
 	}
 
-	var sig [field_params.DilithiumSignatureLength]byte
+	var sig [field_params.MLDSA87SignatureLength]byte
 	copy(sig[:], "signed")
 	att := util.HydrateAttestation(&qrysmpb.Attestation{
 		Signatures: [][]byte{},
@@ -211,7 +211,7 @@ func TestConvertToIndexed_OK(t *testing.T) {
 		att.AggregationBits = tt.aggregationBitfield
 		signatures := make([][]byte, len(tt.aggregationBitfield.BitIndices()))
 		for i := 0; i < len(tt.aggregationBitfield.BitIndices()); i++ {
-			signatures[i] = make([]byte, 4595)
+			signatures[i] = make([]byte, 4627)
 		}
 		att.Signatures = signatures
 

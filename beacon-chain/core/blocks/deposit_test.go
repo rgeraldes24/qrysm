@@ -11,7 +11,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/container/trie"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -59,9 +59,9 @@ func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
 func TestProcessDeposits_MerkleBranchFailsVerification(t *testing.T) {
 	deposit := &qrysmpb.Deposit{
 		Data: &qrysmpb.Deposit_Data{
-			PublicKey:             bytesutil.PadTo([]byte{1, 2, 3}, field_params.DilithiumPubkeyLength),
+			PublicKey:             bytesutil.PadTo([]byte{1, 2, 3}, field_params.MLDSA87PubkeyLength),
 			WithdrawalCredentials: make([]byte, 32),
-			Signature:             make([]byte, field_params.DilithiumSignatureLength),
+			Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 		},
 	}
 	leaf, err := deposit.Data.HashTreeRoot()
@@ -133,14 +133,14 @@ func TestProcessDeposits_AddsNewValidatorDeposit(t *testing.T) {
 }
 
 func TestProcessDeposits_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T) {
-	sk, err := dilithium.RandKey()
+	sk, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	deposit := &qrysmpb.Deposit{
 		Data: &qrysmpb.Deposit_Data{
 			PublicKey:             sk.PublicKey().Marshal(),
 			Amount:                1000,
 			WithdrawalCredentials: make([]byte, 32),
-			Signature:             make([]byte, field_params.DilithiumSignatureLength),
+			Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 		},
 	}
 	sr, err := signing.ComputeSigningRoot(deposit.Data, bytesutil.ToBytes(3, 32))
@@ -231,7 +231,7 @@ func TestProcessDeposit_SkipsInvalidDeposit(t *testing.T) {
 	// Same test settings as in TestProcessDeposit_AddsNewValidatorDeposit, except that we use an invalid signature
 	dep, _, err := util.DeterministicDepositsAndKeys(1)
 	require.NoError(t, err)
-	dep[0].Data.Signature = make([]byte, field_params.DilithiumSignatureLength)
+	dep[0].Data.Signature = make([]byte, field_params.MLDSA87SignatureLength)
 	dt, _, err := util.DepositTrieFromDeposits(dep)
 	require.NoError(t, err)
 	root, err := dt.HashTreeRoot()
@@ -282,7 +282,7 @@ func TestPreGenesisDeposits_SkipInvalidDeposit(t *testing.T) {
 
 	dep, _, err := util.DeterministicDepositsAndKeys(100)
 	require.NoError(t, err)
-	dep[0].Data.Signature = make([]byte, field_params.DilithiumSignatureLength)
+	dep[0].Data.Signature = make([]byte, field_params.MLDSA87SignatureLength)
 	dt, _, err := util.DepositTrieFromDeposits(dep)
 	require.NoError(t, err)
 
@@ -346,14 +346,14 @@ func TestPreGenesisDeposits_SkipInvalidDeposit(t *testing.T) {
 }
 
 func TestProcessDeposit_RepeatedDeposit_IncreasesValidatorBalance(t *testing.T) {
-	sk, err := dilithium.RandKey()
+	sk, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
 	deposit := &qrysmpb.Deposit{
 		Data: &qrysmpb.Deposit_Data{
 			PublicKey:             sk.PublicKey().Marshal(),
 			Amount:                1000,
 			WithdrawalCredentials: make([]byte, 32),
-			Signature:             make([]byte, field_params.DilithiumSignatureLength),
+			Signature:             make([]byte, field_params.MLDSA87SignatureLength),
 		},
 	}
 	sr, err := signing.ComputeSigningRoot(deposit.Data, bytesutil.ToBytes(3, 32))

@@ -62,7 +62,7 @@ func TestProposeBeaconBlock_BlindedCapella(t *testing.T) {
 					TransactionsRoot: hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.TransactionsRoot),
 					WithdrawalsRoot:  hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.WithdrawalsRoot),
 				},
-				DilithiumToExecutionChanges: jsonifyDilithiumToExecutionChanges(blindedCapellaBlock.BlindedCapella.Block.Body.DilithiumToExecutionChanges),
+				MLDSA87ToExecutionChanges: jsonifyMLDSA87ToExecutionChanges(blindedCapellaBlock.BlindedCapella.Block.Body.Mldsa87ToExecutionChanges),
 			},
 		},
 	}
@@ -103,7 +103,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 				ParentRoot:    test_helpers.FillByteSlice(32, 3),
 				StateRoot:     test_helpers.FillByteSlice(32, 4),
 				Body: &qrysmpb.BlindedBeaconBlockBodyCapella{
-					RandaoReveal: test_helpers.FillByteSlice(4595, 5),
+					RandaoReveal: test_helpers.FillByteSlice(4627, 5),
 					ExecutionData: &qrysmpb.ExecutionData{
 						DepositRoot:  test_helpers.FillByteSlice(32, 6),
 						DepositCount: 7,
@@ -120,7 +120,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 									StateRoot:     test_helpers.FillByteSlice(32, 13),
 									BodyRoot:      test_helpers.FillByteSlice(32, 14),
 								},
-								Signature: test_helpers.FillByteSlice(4595, 15),
+								Signature: test_helpers.FillByteSlice(4627, 15),
 							},
 							Header_2: &qrysmpb.SignedBeaconBlockHeader{
 								Header: &qrysmpb.BeaconBlockHeader{
@@ -130,7 +130,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 									StateRoot:     test_helpers.FillByteSlice(32, 19),
 									BodyRoot:      test_helpers.FillByteSlice(32, 20),
 								},
-								Signature: test_helpers.FillByteSlice(4595, 21),
+								Signature: test_helpers.FillByteSlice(4627, 21),
 							},
 						},
 						{
@@ -142,7 +142,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 									StateRoot:     test_helpers.FillByteSlice(32, 25),
 									BodyRoot:      test_helpers.FillByteSlice(32, 26),
 								},
-								Signature: test_helpers.FillByteSlice(4595, 27),
+								Signature: test_helpers.FillByteSlice(4627, 27),
 							},
 							Header_2: &qrysmpb.SignedBeaconBlockHeader{
 								Header: &qrysmpb.BeaconBlockHeader{
@@ -152,7 +152,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 									StateRoot:     test_helpers.FillByteSlice(32, 31),
 									BodyRoot:      test_helpers.FillByteSlice(32, 32),
 								},
-								Signature: test_helpers.FillByteSlice(4595, 33),
+								Signature: test_helpers.FillByteSlice(4627, 33),
 							},
 						},
 					},
@@ -173,7 +173,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 										Root:  test_helpers.FillByteSlice(32, 42),
 									},
 								},
-								Signatures: [][]byte{test_helpers.FillByteSlice(4595, 43)},
+								Signatures: [][]byte{test_helpers.FillByteSlice(4627, 43)},
 							},
 							Attestation_2: &qrysmpb.IndexedAttestation{
 								AttestingIndices: []uint64{44, 45},
@@ -190,7 +190,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 										Root:  test_helpers.FillByteSlice(32, 52),
 									},
 								},
-								Signatures: [][]byte{test_helpers.FillByteSlice(4595, 53)},
+								Signatures: [][]byte{test_helpers.FillByteSlice(4627, 53)},
 							},
 						},
 						{
@@ -209,7 +209,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 										Root:  test_helpers.FillByteSlice(32, 62),
 									},
 								},
-								Signatures: [][]byte{test_helpers.FillByteSlice(4595, 63)},
+								Signatures: [][]byte{test_helpers.FillByteSlice(4627, 63)},
 							},
 							Attestation_2: &qrysmpb.IndexedAttestation{
 								AttestingIndices: []uint64{64, 65},
@@ -226,7 +226,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 										Root:  test_helpers.FillByteSlice(32, 72),
 									},
 								},
-								Signatures: [][]byte{test_helpers.FillByteSlice(4595, 73)},
+								Signatures: [][]byte{test_helpers.FillByteSlice(4627, 73)},
 							},
 						},
 					},
@@ -246,7 +246,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 									Root:  test_helpers.FillByteSlice(32, 81),
 								},
 							},
-							Signatures: [][]byte{test_helpers.FillByteSlice(4595, 82)},
+							Signatures: [][]byte{test_helpers.FillByteSlice(4627, 82)},
 						},
 						{
 							AggregationBits: test_helpers.FillByteSlice(4, 83),
@@ -263,7 +263,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 									Root:  test_helpers.FillByteSlice(32, 90),
 								},
 							},
-							Signatures: [][]byte{test_helpers.FillByteSlice(4595, 91)},
+							Signatures: [][]byte{test_helpers.FillByteSlice(4627, 91)},
 						},
 					},
 					Deposits: []*qrysmpb.Deposit{
@@ -273,7 +273,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 								PublicKey:             test_helpers.FillByteSlice(2592, 94),
 								WithdrawalCredentials: test_helpers.FillByteSlice(32, 95),
 								Amount:                96,
-								Signature:             test_helpers.FillByteSlice(4595, 97),
+								Signature:             test_helpers.FillByteSlice(4627, 97),
 							},
 						},
 						{
@@ -282,7 +282,7 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 								PublicKey:             test_helpers.FillByteSlice(2592, 100),
 								WithdrawalCredentials: test_helpers.FillByteSlice(32, 101),
 								Amount:                102,
-								Signature:             test_helpers.FillByteSlice(4595, 103),
+								Signature:             test_helpers.FillByteSlice(4627, 103),
 							},
 						},
 					},
@@ -292,19 +292,19 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 								Epoch:          104,
 								ValidatorIndex: 105,
 							},
-							Signature: test_helpers.FillByteSlice(4595, 106),
+							Signature: test_helpers.FillByteSlice(4627, 106),
 						},
 						{
 							Exit: &qrysmpb.VoluntaryExit{
 								Epoch:          107,
 								ValidatorIndex: 108,
 							},
-							Signature: test_helpers.FillByteSlice(4595, 109),
+							Signature: test_helpers.FillByteSlice(4627, 109),
 						},
 					},
 					SyncAggregate: &qrysmpb.SyncAggregate{
 						SyncCommitteeBits:       test_helpers.FillByteSlice(2, 110),
-						SyncCommitteeSignatures: [][]byte{test_helpers.FillByteSlice(4595, 111)},
+						SyncCommitteeSignatures: [][]byte{test_helpers.FillByteSlice(4627, 111)},
 					},
 					ExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderCapella{
 						ParentHash:       test_helpers.FillByteSlice(32, 112),
@@ -323,27 +323,27 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 						TransactionsRoot: test_helpers.FillByteSlice(32, 125),
 						WithdrawalsRoot:  test_helpers.FillByteSlice(32, 126),
 					},
-					DilithiumToExecutionChanges: []*qrysmpb.SignedDilithiumToExecutionChange{
+					Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{
 						{
-							Message: &qrysmpb.DilithiumToExecutionChange{
-								ValidatorIndex:      127,
-								FromDilithiumPubkey: test_helpers.FillByteSlice(2592, 128),
-								ToExecutionAddress:  test_helpers.FillByteSlice(20, 129),
+							Message: &qrysmpb.MLDSA87ToExecutionChange{
+								ValidatorIndex:     127,
+								FromMldsa87Pubkey:  test_helpers.FillByteSlice(2592, 128),
+								ToExecutionAddress: test_helpers.FillByteSlice(20, 129),
 							},
-							Signature: test_helpers.FillByteSlice(4595, 130),
+							Signature: test_helpers.FillByteSlice(4627, 130),
 						},
 						{
-							Message: &qrysmpb.DilithiumToExecutionChange{
-								ValidatorIndex:      131,
-								FromDilithiumPubkey: test_helpers.FillByteSlice(2592, 132),
-								ToExecutionAddress:  test_helpers.FillByteSlice(20, 133),
+							Message: &qrysmpb.MLDSA87ToExecutionChange{
+								ValidatorIndex:     131,
+								FromMldsa87Pubkey:  test_helpers.FillByteSlice(2592, 132),
+								ToExecutionAddress: test_helpers.FillByteSlice(20, 133),
 							},
-							Signature: test_helpers.FillByteSlice(4595, 134),
+							Signature: test_helpers.FillByteSlice(4627, 134),
 						},
 					},
 				},
 			},
-			Signature: test_helpers.FillByteSlice(4595, 135),
+			Signature: test_helpers.FillByteSlice(4627, 135),
 		},
 	}
 }

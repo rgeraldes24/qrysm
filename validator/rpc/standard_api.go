@@ -233,8 +233,8 @@ func (s *Server) transformDeletedKeysStatuses(
 }
 
 // Gets a map of all public keys in the database, useful for O(1) lookups.
-func (s *Server) publicKeysInDB(ctx context.Context) (map[[field_params.DilithiumPubkeyLength]byte]bool, error) {
-	pubKeysInDB := make(map[[field_params.DilithiumPubkeyLength]byte]bool)
+func (s *Server) publicKeysInDB(ctx context.Context) (map[[field_params.MLDSA87PubkeyLength]byte]bool, error) {
+	pubKeysInDB := make(map[[field_params.MLDSA87PubkeyLength]byte]bool)
 	attestedPublicKeys, err := s.valDB.AttestedPublicKeys(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("could not get attested public keys from DB: %v", err)
@@ -320,7 +320,7 @@ func (s *Server) ImportRemoteKeys(ctx context.Context, req *qrlpbservice.ImportR
 		return &qrlpbservice.ImportRemoteKeysResponse{Data: statuses}, nil
 	}
 
-	remoteKeys := make([][field_params.DilithiumPubkeyLength]byte, len(req.RemoteKeys))
+	remoteKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(req.RemoteKeys))
 	isUrlUsed := false
 	for i, obj := range req.RemoteKeys {
 		remoteKeys[i] = bytesutil.ToBytes2592(obj.Pubkey)
@@ -373,7 +373,7 @@ func (s *Server) DeleteRemoteKeys(ctx context.Context, req *qrlpbservice.DeleteR
 		statuses := groupDeleteRemoteKeysErrors(req, "Keymanager kind cannot delete public keys for web3signer keymanager type.")
 		return &qrlpbservice.DeleteRemoteKeysResponse{Data: statuses}, nil
 	}
-	remoteKeys := make([][field_params.DilithiumPubkeyLength]byte, len(req.Pubkeys))
+	remoteKeys := make([][field_params.MLDSA87PubkeyLength]byte, len(req.Pubkeys))
 	for i, key := range req.Pubkeys {
 		remoteKeys[i] = bytesutil.ToBytes2592(key)
 	}
@@ -448,7 +448,7 @@ func (s *Server) SetGasLimit(ctx context.Context, req *qrlpbservice.SetGasLimitR
 		if settings.DefaultConfig == nil || settings.DefaultConfig.BuilderConfig == nil || !settings.DefaultConfig.BuilderConfig.Enabled {
 			return &empty.Empty{}, status.Errorf(codes.FailedPrecondition, "gas limit changes only apply when builder is enabled")
 		}
-		settings.ProposeConfig = make(map[[field_params.DilithiumPubkeyLength]byte]*validatorServiceConfig.ProposerOption)
+		settings.ProposeConfig = make(map[[field_params.MLDSA87PubkeyLength]byte]*validatorServiceConfig.ProposerOption)
 		option := settings.DefaultConfig.Clone()
 		option.BuilderConfig.GasLimit = validator.Uint64(req.GasLimit)
 		settings.ProposeConfig[bytesutil.ToBytes2592(validatorKey)] = option
@@ -593,7 +593,7 @@ func (s *Server) SetFeeRecipientByPubkey(ctx context.Context, req *qrlpbservice.
 	switch {
 	case settings == nil:
 		settings = &validatorServiceConfig.ProposerSettings{
-			ProposeConfig: map[[field_params.DilithiumPubkeyLength]byte]*validatorServiceConfig.ProposerOption{
+			ProposeConfig: map[[field_params.MLDSA87PubkeyLength]byte]*validatorServiceConfig.ProposerOption{
 				bytesutil.ToBytes2592(validatorKey): {
 					FeeRecipientConfig: &validatorServiceConfig.FeeRecipientConfig{
 						FeeRecipient: feeRecipient,
@@ -608,7 +608,7 @@ func (s *Server) SetFeeRecipientByPubkey(ctx context.Context, req *qrlpbservice.
 		if settings.DefaultConfig != nil && settings.DefaultConfig.BuilderConfig != nil {
 			builderConfig = settings.DefaultConfig.BuilderConfig.Clone()
 		}
-		settings.ProposeConfig = map[[field_params.DilithiumPubkeyLength]byte]*validatorServiceConfig.ProposerOption{
+		settings.ProposeConfig = map[[field_params.MLDSA87PubkeyLength]byte]*validatorServiceConfig.ProposerOption{
 			bytesutil.ToBytes2592(validatorKey): {
 				FeeRecipientConfig: &validatorServiceConfig.FeeRecipientConfig{
 					FeeRecipient: feeRecipient,
@@ -680,9 +680,9 @@ func (s *Server) DeleteFeeRecipientByPubkey(ctx context.Context, req *qrlpbservi
 }
 
 func validatePublicKey(pubkey []byte) error {
-	if len(pubkey) != field_params.DilithiumPubkeyLength {
+	if len(pubkey) != field_params.MLDSA87PubkeyLength {
 		return status.Errorf(
-			codes.InvalidArgument, "Provided public key in path is not byte length %d and not a valid dilithium public key", field_params.DilithiumPubkeyLength)
+			codes.InvalidArgument, "Provided public key in path is not byte length %d and not a valid ml-dsa-87 public key", field_params.MLDSA87PubkeyLength)
 	}
 	return nil
 }

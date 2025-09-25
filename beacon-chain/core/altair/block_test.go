@@ -14,7 +14,7 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/assert"
@@ -210,7 +210,7 @@ func TestProcessSyncCommittee_processSyncAggregate(t *testing.T) {
 
 	st, votedKeys, _, err := altair.ProcessSyncAggregateEported(context.Background(), beaconState, syncAggregate)
 	require.NoError(t, err)
-	votedMap := make(map[[field_params.DilithiumPubkeyLength]byte]bool)
+	votedMap := make(map[[field_params.MLDSA87PubkeyLength]byte]bool)
 	for _, key := range votedKeys {
 		votedMap[bytesutil.ToBytes2592(key.Marshal())] = true
 	}
@@ -262,19 +262,19 @@ func Test_VerifySyncCommitteeSigs(t *testing.T) {
 	require.NoError(t, err)
 	sigs := make([][]byte, len(indices))
 	sigsBad := make([][]byte, len(indices))
-	pks := make([]dilithium.PublicKey, len(indices))
+	pks := make([]ml_dsa_87.PublicKey, len(indices))
 	for i, indice := range indices {
 		b := p2pType.SSZBytes(pbr)
 		sb, err := signing.ComputeDomainAndSign(beaconState, time.CurrentEpoch(beaconState), &b, params.BeaconConfig().DomainSyncCommittee, privKeys[indice])
 		require.NoError(t, err)
 		sigs[i] = sb
-		sigsBad[i] = make([]byte, field_params.DilithiumSignatureLength)
+		sigsBad[i] = make([]byte, field_params.MLDSA87SignatureLength)
 		pks[i] = privKeys[indice].PublicKey()
 	}
 
-	dilithiumKey, err := dilithium.RandKey()
+	mlDSA87Key, err := ml_dsa_87.RandKey()
 	require.NoError(t, err)
-	require.ErrorContains(t, "provided signatures and pubkeys have differing lengths", altair.VerifySyncCommitteeSigs(beaconState, pks, [][]byte{dilithiumKey.Sign([]byte{'m', 'e', 'o', 'w'}).Marshal()}))
+	require.ErrorContains(t, "provided signatures and pubkeys have differing lengths", altair.VerifySyncCommitteeSigs(beaconState, pks, [][]byte{mlDSA87Key.Sign([]byte{'m', 'e', 'o', 'w'}).Marshal()}))
 	require.ErrorContains(t, "invalid sync committee signature", altair.VerifySyncCommitteeSigs(beaconState, pks, sigsBad))
 	require.NoError(t, altair.VerifySyncCommitteeSigs(beaconState, pks, sigs))
 }

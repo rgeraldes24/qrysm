@@ -128,7 +128,7 @@ func Test_NewBeaconBlockBody(t *testing.T) {
 }
 
 func Test_BuildSignedBeaconBlock(t *testing.T) {
-	sig := bytesutil.ToBytes4595([]byte("signature"))
+	sig := bytesutil.ToBytes4627([]byte("signature"))
 	t.Run("Capella", func(t *testing.T) {
 		b := &BeaconBlock{version: version.Capella, body: &BeaconBlockBody{version: version.Capella}}
 		sb, err := BuildSignedBeaconBlock(b, sig[:])

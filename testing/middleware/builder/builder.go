@@ -28,7 +28,7 @@ import (
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/math"
 	"github.com/theQRL/qrysm/network"
@@ -272,7 +272,7 @@ func (p *Builder) handleHeaderRequestCapella(w http.ResponseWriter) {
 		return
 	}
 
-	secKey, err := dilithium.RandKey()
+	secKey, err := ml_dsa_87.RandKey()
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not retrieve secret key")
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -13,7 +13,7 @@ import (
 	"runtime"
 
 	"github.com/google/uuid"
-	"github.com/theQRL/go-qrllib/dilithium"
+	"github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -76,7 +76,7 @@ func (k *Keystore) Save(fileFolder string) error {
 	return nil
 }
 
-func (k *Keystore) Decrypt(password string) [field_params.DilithiumSeedLength]byte {
+func (k *Keystore) Decrypt(password string) [field_params.MLDSA87SeedLength]byte {
 	iv, err := hex.DecodeString(k.Crypto.Cipher.Params["iv"].(string))
 	if err != nil {
 		panic(fmt.Errorf("iv hex.DecodeString failed | reason %v", err))
@@ -140,7 +140,7 @@ func NewEmptyKeystore() *Keystore {
 	return k
 }
 
-func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string, lightKDF bool, salt, aesIV []byte) (*Keystore, error) {
+func Encrypt(seed [field_params.MLDSA87SeedLength]uint8, password, path string, lightKDF bool, salt, aesIV []byte) (*Keystore, error) {
 	if salt == nil {
 		salt = make([]uint8, saltSize)
 		if _, err := io.ReadFull(rand.Reader, salt); err != nil {
@@ -172,11 +172,11 @@ func Encrypt(seed [field_params.DilithiumSeedLength]uint8, password, path string
 
 	ciphertext := gcmBlock.Seal(nil, aesIV, seed[:], nil)
 
-	d, err := dilithium.NewDilithiumFromSeed(seed)
+	w, err := ml_dsa_87.NewWalletFromSeed(seed)
 	if err != nil {
 		return nil, err
 	}
-	pk := d.GetPK()
+	pk := w.GetPK()
 	return &Keystore{
 		UUID:   uuid.New().String(),
 		Crypto: NewKeystoreCrypto(salt, aesIV, ciphertext, t, m, p, argon2idKeyLen),

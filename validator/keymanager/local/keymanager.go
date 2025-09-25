@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/qrysm/async/event"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
-	"github.com/theQRL/qrysm/crypto/dilithium"
+	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	keystorev1 "github.com/theQRL/qrysm/pkg/go-qrl-wallet-encryptor-keystore"
 	validatorpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1/validator-client"
@@ -24,9 +24,9 @@ import (
 )
 
 var (
-	lock               sync.RWMutex
-	orderedPublicKeys  = make([][field_params.DilithiumPubkeyLength]byte, 0)
-	dilithiumKeysCache = make(map[[field_params.DilithiumPubkeyLength]byte]dilithium.DilithiumKey)
+	lock              sync.RWMutex
+	orderedPublicKeys = make([][field_params.MLDSA87PubkeyLength]byte, 0)
+	mlDSA87KeysCache  = make(map[[field_params.MLDSA87PubkeyLength]byte]ml_dsa_87.MLDSA87Key)
 )
 
 const (
@@ -79,8 +79,8 @@ type AccountsKeystoreRepresentation struct {
 // ResetCaches for the keymanager.
 func ResetCaches() {
 	lock.Lock()
-	orderedPublicKeys = make([][field_params.DilithiumPubkeyLength]byte, 0)
-	dilithiumKeysCache = make(map[[field_params.DilithiumPubkeyLength]byte]dilithium.DilithiumKey)
+	orderedPublicKeys = make([][field_params.MLDSA87PubkeyLength]byte, 0)
+	mlDSA87KeysCache = make(map[[field_params.MLDSA87PubkeyLength]byte]ml_dsa_87.MLDSA87Key)
 	lock.Unlock()
 }
 
@@ -125,11 +125,11 @@ func NewInteropKeymanager(_ context.Context, offset, numValidatorKeys uint64) (*
 		return nil, errors.Wrap(err, "could not generate interop keys")
 	}
 	lock.Lock()
-	pubKeys := make([][field_params.DilithiumPubkeyLength]byte, numValidatorKeys)
+	pubKeys := make([][field_params.MLDSA87PubkeyLength]byte, numValidatorKeys)
 	for i := uint64(0); i < numValidatorKeys; i++ {
 		publicKey := bytesutil.ToBytes2592(publicKeys[i].Marshal())
 		pubKeys[i] = publicKey
-		dilithiumKeysCache[publicKey] = secretKeys[i]
+		mlDSA87KeysCache[publicKey] = secretKeys[i]
 	}
 	orderedPublicKeys = pubKeys
 	lock.Unlock()
@@ -139,7 +139,7 @@ func NewInteropKeymanager(_ context.Context, offset, numValidatorKeys uint64) (*
 // SubscribeAccountChanges creates an event subscription for a channel
 // to listen for public key changes at runtime, such as when new validator accounts
 // are imported into the keymanager while the validator process is running.
-func (km *Keymanager) SubscribeAccountChanges(pubKeysChan chan [][field_params.DilithiumPubkeyLength]byte) event.Subscription {
+func (km *Keymanager) SubscribeAccountChanges(pubKeysChan chan [][field_params.MLDSA87PubkeyLength]byte) event.Subscription {
 	return km.accountsChangedFeed.Subscribe(pubKeysChan)
 }
 
@@ -160,60 +160,60 @@ func (km *Keymanager) initializeKeysCachesFromKeystore() error {
 	lock.Lock()
 	defer lock.Unlock()
 	count := len(km.accountsStore.Seeds)
-	orderedPublicKeys = make([][field_params.DilithiumPubkeyLength]byte, count)
-	dilithiumKeysCache = make(map[[field_params.DilithiumPubkeyLength]byte]dilithium.DilithiumKey, count)
+	orderedPublicKeys = make([][field_params.MLDSA87PubkeyLength]byte, count)
+	mlDSA87KeysCache = make(map[[field_params.MLDSA87PubkeyLength]byte]ml_dsa_87.MLDSA87Key, count)
 	for i, publicKey := range km.accountsStore.PublicKeys {
 		publicKey2592 := bytesutil.ToBytes2592(publicKey)
 		orderedPublicKeys[i] = publicKey2592
-		secretKey, err := dilithium.SecretKeyFromSeed(km.accountsStore.Seeds[i])
+		secretKey, err := ml_dsa_87.SecretKeyFromSeed(km.accountsStore.Seeds[i])
 		if err != nil {
 			return errors.Wrap(err, "failed to initialize keys caches from account keystore")
 		}
-		dilithiumKeysCache[publicKey2592] = secretKey
+		mlDSA87KeysCache[publicKey2592] = secretKey
 	}
 	return nil
 }
 
 // FetchValidatingPublicKeys fetches the list of active public keys from the local account keystores.
-func (*Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_params.DilithiumPubkeyLength]byte, error) {
+func (*Keymanager) FetchValidatingPublicKeys(ctx context.Context) ([][field_params.MLDSA87PubkeyLength]byte, error) {
 	_, span := trace.StartSpan(ctx, "keymanager.FetchValidatingPublicKeys")
 	defer span.End()
 
 	lock.RLock()
 	keys := orderedPublicKeys
-	result := make([][field_params.DilithiumPubkeyLength]byte, len(keys))
+	result := make([][field_params.MLDSA87PubkeyLength]byte, len(keys))
 	copy(result, keys)
 	lock.RUnlock()
 	return result, nil
 }
 
 // FetchValidatingSeeds fetches the list of private keys from the secret keys cache
-func (km *Keymanager) FetchValidatingSeeds(ctx context.Context) ([][field_params.DilithiumSeedLength]byte, error) {
+func (km *Keymanager) FetchValidatingSeeds(ctx context.Context) ([][field_params.MLDSA87SeedLength]byte, error) {
 	lock.RLock()
 	defer lock.RUnlock()
-	dilithiumSeed := make([][field_params.DilithiumSeedLength]byte, len(dilithiumKeysCache))
+	mlDSA87Seed := make([][field_params.MLDSA87SeedLength]byte, len(mlDSA87KeysCache))
 	pubKeys, err := km.FetchValidatingPublicKeys(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not retrieve public keys")
 	}
 	for i, pk := range pubKeys {
-		seckey, ok := dilithiumKeysCache[pk]
+		seckey, ok := mlDSA87KeysCache[pk]
 		if !ok {
 			return nil, errors.New("Could not fetch private key")
 		}
-		dilithiumSeed[i] = bytesutil.ToBytes48(seckey.Marshal())
+		mlDSA87Seed[i] = bytesutil.ToBytes48(seckey.Marshal())
 	}
-	return dilithiumSeed, nil
+	return mlDSA87Seed, nil
 }
 
 // Sign signs a message using a validator key.
-func (*Keymanager) Sign(ctx context.Context, req *validatorpb.SignRequest) (dilithium.Signature, error) {
+func (*Keymanager) Sign(ctx context.Context, req *validatorpb.SignRequest) (ml_dsa_87.Signature, error) {
 	publicKey := req.PublicKey
 	if publicKey == nil {
 		return nil, errors.New("nil public key in request")
 	}
 	lock.RLock()
-	secretKey, ok := dilithiumKeysCache[bytesutil.ToBytes2592(publicKey)]
+	secretKey, ok := mlDSA87KeysCache[bytesutil.ToBytes2592(publicKey)]
 	lock.RUnlock()
 	if !ok {
 		return nil, errors.New("no signing key found in keys cache")
@@ -234,7 +234,7 @@ func (km *Keymanager) initializeAccountKeystore(ctx context.Context) error {
 		return errors.Wrapf(err, "could not decode keystore file for accounts %s", AccountsKeystoreFileName)
 	}
 	// We extract the validator signing private key from the keystore
-	// by utilizing the password and initialize a new Dilithium secret key from
+	// by utilizing the password and initialize a new ML-DSA-87 secret key from
 	// its raw bytes.
 	password := km.wallet.Password()
 	decryptor := keystorev1.New()
@@ -393,7 +393,7 @@ func (km *Keymanager) ListKeymanagerAccounts(ctx context.Context, cfg keymanager
 	if err != nil {
 		return errors.Wrap(err, "could not fetch validating public keys")
 	}
-	var seeds [][field_params.DilithiumSeedLength]byte
+	var seeds [][field_params.MLDSA87SeedLength]byte
 	if cfg.ShowPrivateKeys {
 		seeds, err = km.FetchValidatingSeeds(ctx)
 		if err != nil {

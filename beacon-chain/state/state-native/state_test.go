@@ -27,7 +27,7 @@ func TestValidatorMap_DistinctCopy(t *testing.T) {
 	vals := make([]*qrysmpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [field_params.DilithiumPubkeyLength]byte
+		var someKey [field_params.MLDSA87PubkeyLength]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &qrysmpb.Validator{
@@ -55,7 +55,7 @@ func TestBeaconState_NoDeadlock_Capella(t *testing.T) {
 	vals := make([]*qrysmpb.Validator, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [field_params.DilithiumPubkeyLength]byte
+		var someKey [field_params.MLDSA87PubkeyLength]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &qrysmpb.Validator{
@@ -183,7 +183,7 @@ func generateState(t *testing.T) state.BeaconState {
 	bals := make([]uint64, 0, count)
 	for i := uint64(1); i < count; i++ {
 		var someRoot [32]byte
-		var someKey [field_params.DilithiumPubkeyLength]byte
+		var someKey [field_params.MLDSA87PubkeyLength]byte
 		copy(someRoot[:], strconv.Itoa(int(i)))
 		copy(someKey[:], strconv.Itoa(int(i)))
 		vals = append(vals, &qrysmpb.Validator{

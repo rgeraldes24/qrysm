@@ -39,7 +39,7 @@ service RemoteSigner {
 // ListPublicKeysResponse contains public keys
 // for the validator secrets managed by the remote signer.
 message ListPublicKeysResponse {
-    // List of 2592 byte, Dilithium validating public keys.
+    // List of 2592 byte, ML-DSA-87 validating public keys.
     repeated bytes validating_public_keys = 1;
 }
 
@@ -51,7 +51,7 @@ message SignRequest {
     bytes public_key = 1;
 
     // Raw bytes signing root the client is requesting to sign. The client is
-    // expected to determine these raw bytes from the appropriate Dilithium
+    // expected to determine these raw bytes from the appropriate ML-DSA-87
     // signing domain as well as the signing root of the data structure
     // the bytes represent.
     bytes signing_root = 2;
@@ -88,7 +88,7 @@ message SignResponse {
         FAILED = 3;
     }
 
-    // Dilithium signature for the data specified in the request.
+    // ML-DSA-87 signature for the data specified in the request.
     bytes signature = 1;
 
     // Status of the signing response, standardized as an enum

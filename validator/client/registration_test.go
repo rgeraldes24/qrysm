@@ -110,8 +110,8 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 			},
 			validatorSetter: func(t *testing.T) *validator {
 				v := validator{
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					genesisTime:                  0,
 				}
 				v.signedValidatorRegistrations[bytesutil.ToBytes2592(validatorKey.PublicKey().Marshal())] = &qrysmpb.SignedValidatorRegistrationV1{
@@ -137,8 +137,8 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 			},
 			validatorSetter: func(t *testing.T) *validator {
 				v := validator{
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					genesisTime:                  0,
 				}
 				v.signedValidatorRegistrations[bytesutil.ToBytes2592(validatorKey.PublicKey().Marshal())] = &qrysmpb.SignedValidatorRegistrationV1{
@@ -164,8 +164,8 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 			},
 			validatorSetter: func(t *testing.T) *validator {
 				v := validator{
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					genesisTime:                  0,
 				}
 				v.signedValidatorRegistrations[bytesutil.ToBytes2592(validatorKey.PublicKey().Marshal())] = &qrysmpb.SignedValidatorRegistrationV1{
@@ -191,8 +191,8 @@ func TestValidator_SignValidatorRegistrationRequest(t *testing.T) {
 			},
 			validatorSetter: func(t *testing.T) *validator {
 				v := validator{
-					pubkeyToValidatorIndex:       make(map[[field_params.DilithiumPubkeyLength]byte]primitives.ValidatorIndex),
-					signedValidatorRegistrations: make(map[[field_params.DilithiumPubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
+					pubkeyToValidatorIndex:       make(map[[field_params.MLDSA87PubkeyLength]byte]primitives.ValidatorIndex),
+					signedValidatorRegistrations: make(map[[field_params.MLDSA87PubkeyLength]byte]*qrysmpb.SignedValidatorRegistrationV1),
 					genesisTime:                  0,
 				}
 				return &v
