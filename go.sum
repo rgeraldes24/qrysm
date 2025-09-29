@@ -192,6 +192,7 @@ github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV
 github.com/cyyber/go-zond v0.0.0-20250909095041-1a8635db4b6f h1:fIGws3WPKgMJVhEHetj9uILaXkGJOOKSDwg8wgK5Ioc=
 github.com/cyyber/go-zond v0.0.0-20250909095041-1a8635db4b6f/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
 github.com/cyyber/go-zond v0.0.0-20250921095615-67792a8648de/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
+github.com/cyyber/go-zond v0.0.0-20250925032229-88e1722956fe h1:rhGjyX4WBR6L08ltdGEthjyDYAJIhlJV2hBulRuRL3I=
 github.com/cyyber/go-zond v0.0.0-20250925032229-88e1722956fe/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
 github.com/d4l3k/messagediff v1.2.1 h1:ZcAIMYsUg0EAp9X+tt8/enBE/Q8Yd5kzPynLyKptt9U=
 github.com/d4l3k/messagediff v1.2.1/go.mod h1:Oozbb1TVXFac9FtSIxHBMnBCq2qeH/2KkEQxENCrlLo=
