@@ -189,6 +189,14 @@ github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46t
 github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
+<<<<<<< HEAD
+=======
+github.com/cyyber/go-zond v0.0.0-20250909095041-1a8635db4b6f h1:fIGws3WPKgMJVhEHetj9uILaXkGJOOKSDwg8wgK5Ioc=
+github.com/cyyber/go-zond v0.0.0-20250909095041-1a8635db4b6f/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
+github.com/cyyber/go-zond v0.0.0-20250921095615-67792a8648de/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
+github.com/cyyber/go-zond v0.0.0-20250925032229-88e1722956fe h1:rhGjyX4WBR6L08ltdGEthjyDYAJIhlJV2hBulRuRL3I=
+github.com/cyyber/go-zond v0.0.0-20250925032229-88e1722956fe/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
+>>>>>>> main
 github.com/d4l3k/messagediff v1.2.1 h1:ZcAIMYsUg0EAp9X+tt8/enBE/Q8Yd5kzPynLyKptt9U=
 github.com/d4l3k/messagediff v1.2.1/go.mod h1:Oozbb1TVXFac9FtSIxHBMnBCq2qeH/2KkEQxENCrlLo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
