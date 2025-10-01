@@ -87,6 +87,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to generate the deposit key from the signing seed. reason: %v", err)
 	}
+	fmt.Println(depositKey.GetAddressStr())
 
 	gasTip, err := qrlCli.SuggestGasTipCap(cliCtx.Context)
 	if err != nil {
