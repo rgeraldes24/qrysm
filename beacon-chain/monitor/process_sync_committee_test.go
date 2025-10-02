@@ -47,6 +47,6 @@ func TestProcessSyncAggregate(t *testing.T) {
 
 	s.processSyncAggregate(beaconState, wrappedBlock)
 	require.LogsContain(t, hook, "\"Sync committee contribution included\" BalanceChange=0 ContribCount=1 ExpectedContribCount=4 NewBalance=40000000000000 ValidatorIndex=1 prefix=monitor")
-	require.LogsContain(t, hook, "\"Sync committee contribution included\" BalanceChange=100000000 ContribCount=2 ExpectedContribCount=2 NewBalance=40000000000000 ValidatorIndex=86 prefix=monitor")
+	require.LogsContain(t, hook, "\"Sync committee contribution included\" BalanceChange=100000000 ContribCount=2 ExpectedContribCount=2 NewBalance=40000000000000 ValidatorIndex=74 prefix=monitor")
 	require.LogsDoNotContain(t, hook, "ValidatorIndex=2")
 }

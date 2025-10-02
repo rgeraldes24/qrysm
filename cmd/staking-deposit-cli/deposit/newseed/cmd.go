@@ -7,7 +7,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	goqrllib_misc "github.com/theQRL/go-qrllib/misc"
+	goqrllib_misc "github.com/theQRL/go-qrllib/wallet/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"
@@ -126,7 +126,10 @@ func cliActionNewSeed(cliCtx *cli.Context) error {
 		mnemonic = keyderivation.GetRandomMnemonic()
 	}
 
-	seed := goqrllib_misc.MnemonicToSeedBin(mnemonic)
+	seed, err := goqrllib_misc.MnemonicToBin(mnemonic)
+	if err != nil {
+		return err
+	}
 	stakingdeposit.GenerateKeys(newSeedFlags.ValidatorStartIndex,
 		newSeedFlags.NumValidators, misc.EncodeHex(seed[:]), newSeedFlags.Folder,
 		newSeedFlags.ChainName, keystorePassword, newSeedFlags.ExecutionAddress,

@@ -346,8 +346,8 @@ func TestGetDuties_MultipleKeys_OK(t *testing.T) {
 	res, err := vs.GetDuties(context.Background(), req)
 	require.NoError(t, err, "Could not call epoch committee assignment")
 	assert.Equal(t, 2, len(res.CurrentEpochDuties))
-	assert.Equal(t, primitives.Slot(0), res.CurrentEpochDuties[0].AttesterSlot)
-	assert.Equal(t, primitives.Slot(2), res.CurrentEpochDuties[1].AttesterSlot)
+	assert.Equal(t, primitives.Slot(5), res.CurrentEpochDuties[0].AttesterSlot)
+	assert.Equal(t, primitives.Slot(3), res.CurrentEpochDuties[1].AttesterSlot)
 }
 
 func TestGetDuties_SyncNotReady(t *testing.T) {

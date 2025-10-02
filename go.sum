@@ -189,11 +189,6 @@ github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46t
 github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7DoTY=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
-github.com/cyyber/go-zond v0.0.0-20250909095041-1a8635db4b6f h1:fIGws3WPKgMJVhEHetj9uILaXkGJOOKSDwg8wgK5Ioc=
-github.com/cyyber/go-zond v0.0.0-20250909095041-1a8635db4b6f/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
-github.com/cyyber/go-zond v0.0.0-20250921095615-67792a8648de/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
-github.com/cyyber/go-zond v0.0.0-20250925032229-88e1722956fe h1:rhGjyX4WBR6L08ltdGEthjyDYAJIhlJV2hBulRuRL3I=
-github.com/cyyber/go-zond v0.0.0-20250925032229-88e1722956fe/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
 github.com/d4l3k/messagediff v1.2.1 h1:ZcAIMYsUg0EAp9X+tt8/enBE/Q8Yd5kzPynLyKptt9U=
 github.com/d4l3k/messagediff v1.2.1/go.mod h1:Oozbb1TVXFac9FtSIxHBMnBCq2qeH/2KkEQxENCrlLo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -911,8 +906,8 @@ github.com/raulk/go-watchdog v1.3.0 h1:oUmdlHxdkXRJlwfG0O9omj8ukerm8MEQavSiDTEtB
 github.com/raulk/go-watchdog v1.3.0/go.mod h1:fIvOnLbF0b0ZwkB9YU4mOW9Did//4vPZtDqv66NfsMU=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rcrowley/go-metrics v0.0.0-20190826022208-cac0b30c2563/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
-github.com/rgeraldes24/go-zond v0.0.0-20250901090932-5b28406187a1 h1:PfQCCl4VUvOpG9NX2Q5LgePiR6JvP1h7//Xsh7C5eWQ=
-github.com/rgeraldes24/go-zond v0.0.0-20250901090932-5b28406187a1/go.mod h1:7LdYdNTiPW2m/pHqlA+4+66RSyMPCCknFcP8UMdcoGE=
+github.com/rgeraldes24/go-zond v0.0.0-20251001052336-48c39540042d h1:K1FuNdNgi45M4/1YV+NXbTycSwFjvCf3VQUAoe5nbBE=
+github.com/rgeraldes24/go-zond v0.0.0-20251001052336-48c39540042d/go.mod h1:uBM0qy30S60OSxNV1YsCw7b27ll0xTDELuSLslbsdWQ=
 github.com/rivo/tview v0.0.0-20240118093911-742cf086196e h1:QLKAX9JLJ9RJVjnywcVg/U8nKNZvdftCtJRv1qzALYI=
 github.com/rivo/tview v0.0.0-20240118093911-742cf086196e/go.mod h1:c0SPlNPXkM+/Zgjn/0vD3W0Ds1yxstN7lpquqLDpWCg=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
@@ -1029,13 +1024,8 @@ github.com/tenntenn/modver v1.0.1/go.mod h1:bePIyQPb7UeioSRkw3Q0XeMhYZSMx9B8ePqg
 github.com/tenntenn/text/transform v0.0.0-20200319021203-7eef512accb3/go.mod h1:ON8b8w4BN/kE1EOhwT0o+d62W65a6aPw1nouo9LMgyY=
 github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63 h1:cU1QlEDDZ3zI6uya2Bbz+ldjvy+j6yhTmDtLkipDvz4=
 github.com/theQRL/go-bitfield v0.0.0-20231204084259-f3b877be8f63/go.mod h1:Xm3tb2axH6IT4miFd3hKIeD877Y6aA9Hxf2jOYtfTIk=
-github.com/theQRL/go-qrllib v0.0.0-20230406170304-b7eb19c367e1 h1:YvUxImh18qCxX1rjvYF9wqAAL236s2FqrjzTRqg5Alg=
-github.com/theQRL/go-qrllib v0.0.0-20230406170304-b7eb19c367e1/go.mod h1:IspDEOeIlmm6GujPeTNygL3T72MUluDDyUa20AisjaQ=
-github.com/theQRL/go-qrllib v0.0.0-20250909061333-45d1b89fb22e h1:p2f7jqjQimlq9CV1nG8xq1FRDLIqo4oBuVBAgoj7HFg=
-github.com/theQRL/go-qrllib v0.0.0-20250909061333-45d1b89fb22e/go.mod h1:K2QakL8Z3Nrm7fx+SeKYjVrInu0s9WitHHMyUihBkwQ=
 github.com/theQRL/go-qrllib v0.0.0-20250912073529-16a61002f3c5 h1:fifz6R3QXFyldQHsoSUdy1bPUAU7ckdtvq+9YJQ6qO0=
 github.com/theQRL/go-qrllib v0.0.0-20250912073529-16a61002f3c5/go.mod h1:K2QakL8Z3Nrm7fx+SeKYjVrInu0s9WitHHMyUihBkwQ=
-github.com/theQRL/go-zond v0.1.1/go.mod h1:5sKqD/AAXtpWCmmuisw5bDT5/j3sWG5Bxnh1TYe1BZU=
 github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f h1:hEgl/ykBvqXdxoQc3mFuh59ju8ylNMVwDyAaiRHdLBY=
 github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f/go.mod h1:IOyTYjcIO0rkmnGBfJTL0NJ11exy/Tc2QEuv7hCXp24=
 github.com/thomaso-mirodin/intmath v0.0.0-20160323211736-5dc6d854e46e h1:cR8/SYRgyQCt5cNCMniB/ZScMkhI9nk8U5C7SbISXjo=
