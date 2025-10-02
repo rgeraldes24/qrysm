@@ -245,8 +245,6 @@ func TestInitializePerformanceStructures(t *testing.T) {
 }
 
 func TestMonitorRoutine(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	ctx := context.Background()
 	hook := logTest.NewGlobal()
 
@@ -272,10 +270,11 @@ func TestMonitorRoutine(t *testing.T) {
 	}
 
 	trackedVals := map[primitives.ValidatorIndex]bool{
-		1: true,
+		24: true,
 	}
+
 	latestPerformance := map[primitives.ValidatorIndex]ValidatorLatestPerformance{
-		1: {
+		24: {
 			balance: 39999900000000,
 		},
 	}
@@ -333,7 +332,7 @@ func TestMonitorRoutine(t *testing.T) {
 
 	// wait for Logrus
 	time.Sleep(1000 * time.Millisecond)
-	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=0x7e1ac7288839 ProposerIndex=1 Slot=1 Version=0 prefix=monitor", bytesutil.Trunc(root[:]))
+	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=0x4cf4a8912448 ProposerIndex=24 Slot=1 Version=0 prefix=monitor", bytesutil.Trunc(root[:]))
 	require.LogsContain(t, hook, wanted1)
 
 }
