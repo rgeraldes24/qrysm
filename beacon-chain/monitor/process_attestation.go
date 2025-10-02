@@ -161,6 +161,7 @@ func (s *Service) processAggregatedAttestation(ctx context.Context, att *qrysmpb
 		log.WithError(err).Error("Could not get attesting indices")
 		return
 	}
+
 	for _, idx := range attestingIndices {
 		if s.canUpdateAttestedValidator(primitives.ValidatorIndex(idx), att.Aggregate.Data.Slot) {
 			logFields := logMessageTimelyFlagsForIndex(primitives.ValidatorIndex(idx), att.Aggregate.Data)

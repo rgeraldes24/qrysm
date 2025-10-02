@@ -150,12 +150,12 @@ func TestProcessProposedBlock(t *testing.T) {
 			name: "Block proposed by tracked validator",
 			block: &qrysmpb.BeaconBlockCapella{
 				Slot:          6,
-				ProposerIndex: 86,
+				ProposerIndex: 74,
 				ParentRoot:    bytesutil.PadTo([]byte("hello-world"), 32),
 				StateRoot:     bytesutil.PadTo([]byte("state-world"), 32),
 				Body:          &qrysmpb.BeaconBlockBodyCapella{},
 			},
-			wantedErr: "\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=0x68656c6c6f2d NewBalance=40000000000000 ParentRoot=0x68656c6c6f2d ProposerIndex=86 Slot=6 Version=0 prefix=monitor",
+			wantedErr: "\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=0x68656c6c6f2d NewBalance=40000000000000 ParentRoot=0x68656c6c6f2d ProposerIndex=74 Slot=6 Version=0 prefix=monitor",
 		},
 		{
 			name: "Block proposed by untracked validator",
