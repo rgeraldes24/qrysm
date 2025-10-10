@@ -3943,8 +3943,8 @@ def qrysm_deps():
     go_repository(
         name = "com_github_theqrl_go_qrllib",
         importpath = "github.com/theQRL/go-qrllib",
-        sum = "h1:fifz6R3QXFyldQHsoSUdy1bPUAU7ckdtvq+9YJQ6qO0=",
-        version = "v0.0.0-20250912073529-16a61002f3c5",
+        sum = "h1:gQ/ERlk4l4fyJtf8V4DOqn2qThTRMSPDVqmqekIwiso=",
+        version = "v0.0.0-20251008091143-a411d9a85341",
     )
 
     go_repository(
@@ -5859,8 +5859,8 @@ def go_dependencies():
             "//third_party:com_github_theqrl_go_zond_secp256k1.patch",
         ],
         replace = "github.com/rgeraldes24/go-zond",
-        sum = "h1:K1FuNdNgi45M4/1YV+NXbTycSwFjvCf3VQUAoe5nbBE=",
-        version = "v0.0.0-20251001052336-48c39540042d",
+        sum = "h1:KCdn3WfyKf2raHk+M++LlrJlKAp6DcOO2anuNpQ8L38=",
+        version = "v0.0.0-20251009125643-ad8051018df7",
     )
     go_repository(
         name = "com_github_theqrl_go_zond_types",
