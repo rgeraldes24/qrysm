@@ -149,7 +149,6 @@ func (d *Depositor) SendAndMine(ctx context.Context, offset, nvals int, batch ty
 	if err != nil {
 		return err
 	}
-
 	log.WithField("balance", balance.String()).WithField("account", d.Key.Address.Hex()).Info("SendAndMine balance check")
 	// This is the "Send" part of the function. Compute deposits for `nvals` validators,
 	// with half of those deposits being split over 2 transactions if the `partial` flag is true,
@@ -192,7 +191,7 @@ func (d *Depositor) SendDeposit(dep *qrysmpb.Deposit, txo *bind.TransactOpts, ba
 	sent := time.Now()
 	tx, err := contract.Deposit(txo, dep.Data.PublicKey, dep.Data.WithdrawalCredentials, dep.Data.Signature, root)
 	if err != nil {
-		return errors.Wrap(err, "unable to send transaction to contract"+d.Key.Address.Hex())
+		return errors.Wrap(err, "unable to send transaction to contract")
 	}
 	d.History().record(&SentDeposit{deposit: dep, time: sent, tx: tx, root: root, batch: batch})
 	txo.Nonce = txo.Nonce.Add(txo.Nonce, big.NewInt(1))
