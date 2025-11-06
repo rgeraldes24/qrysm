@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"os"
 
-	walletmldsa87 "github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
+	"github.com/theQRL/go-zond/crypto/pqcrypto/wallet"
 	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
 	txfuzz "github.com/theQRL/qrysm/pkg/tx-fuzz"
@@ -20,12 +20,12 @@ import (
 type Config struct {
 	backend *rpc.Client // connection to the rpc provider
 
-	N          uint64                  // number of transactions send per account
-	faucetAcc  *walletmldsa87.Wallet   // ml-dsa-87 account of the faucet
-	accs       []*walletmldsa87.Wallet // ml-dsa-87 accounts
-	corpus     [][]byte                // optional corpus to use elements from
-	accessList bool                    // whether to create accesslist transactions
-	gasLimit   uint64                  // gas limit per transaction
+	N          uint64          // number of transactions send per account
+	faucetAcc  wallet.Wallet   // ml-dsa-87 account of the faucet
+	accs       []wallet.Wallet // ml-dsa-87 accounts
+	corpus     [][]byte        // optional corpus to use elements from
+	accessList bool            // whether to create accesslist transactions
+	gasLimit   uint64          // gas limit per transaction
 
 	seed int64            // seed used for generating randomness
 	mut  *mutator.Mutator // Mutator based on the seed
@@ -39,16 +39,16 @@ func NewDefaultConfig(rpcAddr string, N uint64, accessList bool, rng *rand.Rand)
 	}
 
 	// Setup Accounts
-	var accs []*walletmldsa87.Wallet
+	var accs []wallet.Wallet
 	for i := 0; i < len(staticSeeds); i++ {
-		acc, err := walletmldsa87.NewWalletFromHexSeed(staticSeeds[i][2:])
+		acc, err := wallet.RestoreFromSeedHex(staticSeeds[i])
 		if err != nil {
 			return nil, err
 		}
 		accs = append(accs, acc)
 	}
 
-	faucetAcc, err := walletmldsa87.NewWalletFromHexSeed(txfuzz.SEED[2:])
+	faucetAcc, err := wallet.RestoreFromSeedHex(txfuzz.SEED)
 	if err != nil {
 		return nil, err
 	}
@@ -75,26 +75,26 @@ func NewConfigFromContext(c *cli.Context) (*Config, error) {
 	}
 
 	// Setup faucet
-	faucetAcc, err := walletmldsa87.NewWalletFromHexSeed(txfuzz.SEED[2:])
+	faucetAcc, err := wallet.RestoreFromSeedHex(txfuzz.SEED)
 	if err != nil {
 		return nil, err
 	}
 	if seed := c.String(flags.SeedFlag.Name); seed != "" {
-		faucetAcc, err = walletmldsa87.NewWalletFromHexSeed(seed[2:])
+		faucetAcc, err = wallet.RestoreFromSeedHex(seed)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	// Setup Accounts
-	var accs []*walletmldsa87.Wallet
+	var accs []wallet.Wallet
 	nSeeds := c.Int(flags.CountFlag.Name)
 	if nSeeds == 0 || nSeeds > len(staticSeeds) {
 		fmt.Printf("Sanitizing count flag from %v to %v\n", nSeeds, len(staticSeeds))
 		nSeeds = len(staticSeeds)
 	}
 	for i := 0; i < nSeeds; i++ {
-		acc, err := walletmldsa87.NewWalletFromHexSeed(staticSeeds[i][2:])
+		acc, err := wallet.RestoreFromSeedHex(staticSeeds[i])
 		if err != nil {
 			return nil, err
 		}
