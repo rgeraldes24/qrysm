@@ -8,10 +8,9 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//pkg/tx-fuzz:go_default_library",
-        "@com_github_theqrl_go_qrllib//wallet/common:go_default_library",
-        "@com_github_theqrl_go_qrllib//wallet/ml_dsa_87:go_default_library",
         "@com_github_theqrl_go_zond//common:go_default_library",
         "@com_github_theqrl_go_zond//core/types:go_default_library",
+        "@com_github_theqrl_go_zond//crypto/pqcrypto/wallet:go_default_library",
         "@com_github_theqrl_go_zond//qrlclient:go_default_library",
         "@com_github_theqrl_go_zond//rpc:go_default_library",
     ],

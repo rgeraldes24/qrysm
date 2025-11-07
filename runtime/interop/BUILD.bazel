@@ -34,10 +34,12 @@ go_library(
         "//runtime/version:go_default_library",
         "//time:go_default_library",
         "@com_github_pkg_errors//:go_default_library",
+        "@com_github_theqrl_go_qrllib//wallet/ml_dsa_87:go_default_library",
         "@com_github_theqrl_go_zond//common:go_default_library",
         "@com_github_theqrl_go_zond//common/hexutil:go_default_library",
         "@com_github_theqrl_go_zond//core:go_default_library",
         "@com_github_theqrl_go_zond//core/types:go_default_library",
+        "@com_github_theqrl_go_zond//crypto/pqcrypto:go_default_library",
         "@com_github_theqrl_go_zond//params:go_default_library",
     ],
 )

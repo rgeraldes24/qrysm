@@ -119,7 +119,6 @@ ssz_proto_files(
         "beacon_state.proto",
         "sync_committee.proto",
         "validator.proto",
-        "withdrawals.proto",
     ],
     config = select({
         "//conditions:default": "mainnet",

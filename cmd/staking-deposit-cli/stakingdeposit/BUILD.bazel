@@ -3,7 +3,6 @@ load("@qrysm//tools/go:def.bzl", "go_library")
 go_library(
     name = "go_default_library",
     srcs = [
-        "constants.go",
         "credential.go",
         "credentials.go",
         "depositdata.go",
@@ -19,15 +18,11 @@ go_library(
         "//cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation:go_default_library",
         "//config/fieldparams:go_default_library",
         "//config/params:go_default_library",
-        "//consensus-types/primitives:go_default_library",
         "//contracts/deposit:go_default_library",
-        "//crypto/hash:go_default_library",
         "//crypto/ml_dsa_87:go_default_library",
         "//monitoring/progress:go_default_library",
-        "//proto/qrl/v1:go_default_library",
         "//proto/qrysm/v1alpha1:go_default_library",
         "@com_github_theqrl_go_qrllib//wallet/misc:go_default_library",
-        "@com_github_theqrl_go_qrllib//wallet/ml_dsa_87:go_default_library",
         "@com_github_theqrl_go_zond//common:go_default_library",
     ],
 )

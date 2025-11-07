@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
+	walletmldsa87 "github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/go-zond/crypto/pqcrypto"
 	"github.com/theQRL/qrysm/async"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
@@ -13,7 +14,6 @@ import (
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
-	walletmldsa87 "github.com/theQRL/qrysm/wallet/ml_dsa_87"
 )
 
 var (

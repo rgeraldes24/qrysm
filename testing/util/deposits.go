@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
+	walletmldsa87 "github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/crypto/pqcrypto"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
@@ -13,7 +14,6 @@ import (
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/interop"
-	walletmldsa87 "github.com/theQRL/qrysm/wallet/ml_dsa_87"
 )
 
 var lock sync.Mutex
@@ -168,7 +168,7 @@ func signedDeposit(
 ) (*qrysmpb.Deposit, error) {
 	withdrawalCreds := make([]byte, 12)
 	withdrawalCreds[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
-	descriptor := walletmldsa87.NewMLDSA87Descriptor()
+	descriptor := walletmldsa87.NewMLDSA87Descriptor().ToDescriptor()
 	withdrawalAddr, err := pqcrypto.PublicKeyAndDescriptorToAddress(publicKey, descriptor)
 	if err != nil {
 		return nil, err

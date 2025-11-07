@@ -19,7 +19,6 @@ import "google/protobuf/descriptor.proto";
 import "proto/qrl/ext/options.proto";
 import "proto/qrl/v1/attestation.proto";
 import "proto/qrl/v1/version.proto";
-import "proto/qrl/v1/withdrawals.proto";
 import "proto/engine/v1/execution_engine.proto";
 
 option csharp_namespace = "TheQRL.QRL.V1";
