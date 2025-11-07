@@ -5,14 +5,15 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-zond/crypto/pqcrypto"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
-	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/interop"
+	walletmldsa87 "github.com/theQRL/qrysm/wallet/ml_dsa_87"
 )
 
 var lock sync.Mutex
@@ -165,13 +166,17 @@ func signedDeposit(
 	withdrawalKey []byte,
 	balance uint64,
 ) (*qrysmpb.Deposit, error) {
-	withdrawalCreds := hash.Hash(withdrawalKey)
-	// TODO(rgeraldes24)
-	// withdrawalCreds[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
+	withdrawalCreds := make([]byte, 12)
+	withdrawalCreds[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+	descriptor := walletmldsa87.NewMLDSA87Descriptor()
+	withdrawalAddr, err := pqcrypto.PublicKeyAndDescriptorToAddress(publicKey, descriptor)
+	if err != nil {
+		return nil, err
+	}
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             publicKey,
 		Amount:                balance,
-		WithdrawalCredentials: withdrawalCreds[:],
+		WithdrawalCredentials: append(withdrawalCreds, withdrawalAddr[:]...),
 	}
 
 	domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)
@@ -311,15 +316,13 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64, withdrawalAdd
 		privKeys = append(privKeys, secretKeys[:len(secretKeys)-1]...)
 
 		// Create the new deposits and add them to the trie. Always use the first validator to create deposit
-		for i := uint64(0); i < numRequired; i++ {
-			withdrawalCreds := hash.Hash(publicKeys[1].Marshal())
-			// TODO(rgeraldes24)
-			// withdrawalCreds[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
-
+		for i := range numRequired {
+			newCredentials := make([]byte, 12)
+			newCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
 			depositMessage := &qrysmpb.DepositMessage{
 				PublicKey:             publicKeys[1].Marshal(),
 				Amount:                params.BeaconConfig().MaxEffectiveBalance,
-				WithdrawalCredentials: withdrawalCreds[:],
+				WithdrawalCredentials: append(newCredentials, withdrawalAddr[:]...),
 			}
 
 			domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)

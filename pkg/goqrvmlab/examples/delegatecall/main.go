@@ -93,7 +93,6 @@ func runit() error {
 
 	}
 	statedb.CreateAccount(sender)
-	// TODO(rgeraldes24)
 	// statedb.SetBalance(sender, uint256.NewInt(0xfffffffffffffff))
 
 	runtimeConfig := runtime.Config{

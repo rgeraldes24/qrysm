@@ -67,17 +67,6 @@ func DepositInput(depositKey ml_dsa_87.MLDSA87Key, withdrawalAddr common.Address
 	return di, dr, nil
 }
 
-// WithdrawalCredentialsHash forms a 32 byte hash of the withdrawal public
-// address.
-//
-// The specification is as follows:
-//
-//	withdrawal_credentials[:1] == BLS_WITHDRAWAL_PREFIX_BYTE
-//	withdrawal_credentials[1:] == hash(withdrawal_pubkey)[1:]
-//
-// where withdrawal_credentials is of type bytes32.
-// TODO(rgeraldes24)
-
 // VerifyDepositSignature verifies the correctness of Execution deposit ML-DSA-87 signature
 func VerifyDepositSignature(dd *qrysmpb.Deposit_Data, domain []byte) error {
 	ddCopy := qrysmpb.CopyDepositData(dd)

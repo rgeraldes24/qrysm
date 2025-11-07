@@ -6,13 +6,14 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
+	"github.com/theQRL/go-zond/crypto/pqcrypto"
 	"github.com/theQRL/qrysm/async"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
-	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
+	walletmldsa87 "github.com/theQRL/qrysm/wallet/ml_dsa_87"
 )
 
 var (
@@ -56,8 +57,8 @@ func generateDepositsFromData(depositDataItems []*qrysmpb.Deposit_Data, offset i
 	return deposits, nil
 }
 
-// DepositDataFromKeys generates a list of deposit data items from a set of ML-DSA-87 validator keys.
-func DepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
+// AsyncDepositDataFromKeys generates a list of deposit data items from a set of ML-DSA-87 validator keys.
+func AsyncDepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
 	type depositData struct {
 		items []*qrysmpb.Deposit_Data
 		roots [][]byte
@@ -82,8 +83,8 @@ func DepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.Pu
 	return depositDataItems, depositDataRoots, nil
 }
 
-// DepositDataFromKeysWithExecCreds generates a list of deposit data items from a set of ML-DSA-87 validator keys.
-func DepositDataFromKeysWithExecCreds(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
+// DepositDataFromKeys generates a list of deposit data items from a set of ML-DSA-87 validator keys.
+func DepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
 	return depositDataFromKeys(privKeys, pubKeys)
 }
 
@@ -107,14 +108,17 @@ func depositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.Pu
 
 // Generates a deposit data item from ML-DSA-87 keys and signs the hash tree root of the data.
 func createDepositData(privKey ml_dsa_87.MLDSA87Key, pubKey ml_dsa_87.PublicKey) (*qrysmpb.Deposit_Data, error) {
-	// TODO(rgeraldes24)
 	newCredentials := make([]byte, 12)
 	newCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
-	execAddr := bytesutil.ToBytes20(pubKey.Marshal())
+	descriptor := walletmldsa87.NewMLDSA87Descriptor()
+	withdrawalAddr, err := pqcrypto.PublicKeyAndDescriptorToAddress(pubKey.Marshal(), descriptor.ToDescriptor())
+	if err != nil {
+		return nil, err
+	}
 
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             pubKey.Marshal(),
-		WithdrawalCredentials: append(newCredentials, execAddr[:]...),
+		WithdrawalCredentials: append(newCredentials, withdrawalAddr[:]...),
 		Amount:                params.BeaconConfig().MaxEffectiveBalance,
 	}
 

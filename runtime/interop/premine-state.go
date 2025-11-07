@@ -169,7 +169,7 @@ func (s *PremineGenesisConfig) deposits() ([]*qrysmpb.Deposit, error) {
 		if err != nil {
 			return nil, err
 		}
-		dds, roots, err := DepositDataFromKeysWithExecCreds(prv, pub)
+		dds, roots, err := DepositDataFromKeys(prv, pub)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not generate deposit data from keys")
 		}
