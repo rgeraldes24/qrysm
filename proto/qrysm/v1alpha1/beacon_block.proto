@@ -17,7 +17,6 @@ package theqrl.qrl.v1alpha1;
 
 import "proto/qrl/ext/options.proto";
 import "proto/qrysm/v1alpha1/attestation.proto";
-import "proto/qrysm/v1alpha1/withdrawals.proto";
 import "proto/engine/v1/execution_engine.proto";
 
 option csharp_namespace = "TheQRL.QRL.v1alpha1";
