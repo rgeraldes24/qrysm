@@ -45,7 +45,6 @@ type BeaconChainConfig struct {
 	EffectiveBalanceIncrement uint64 `yaml:"EFFECTIVE_BALANCE_INCREMENT" spec:"true"` // EffectiveBalanceIncrement is used for converting the high balance into the low balance for validators.
 
 	// Initial value constants.
-	MLDSA87WithdrawalPrefixByte    byte     `yaml:"ML_DSA_87_WITHDRAWAL_PREFIX" spec:"true"`   // MLDSA87WithdrawalPrefixByte is used for ML-DSA-87 withdrawal and it's the first byte.
 	QRLAddressWithdrawalPrefixByte byte     `yaml:"QRL_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // QRLAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
 	ZeroHash                       [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
 
@@ -100,7 +99,6 @@ type BeaconChainConfig struct {
 	MaxDeposits                      uint64 `yaml:"MAX_DEPOSITS" spec:"true"`                         // MaxDeposits defines the maximum number of validator deposits in a block.
 	MaxVoluntaryExits                uint64 `yaml:"MAX_VOLUNTARY_EXITS" spec:"true"`                  // MaxVoluntaryExits defines the maximum number of validator exits in a block.
 	MaxWithdrawalsPerPayload         uint64 `yaml:"MAX_WITHDRAWALS_PER_PAYLOAD" spec:"true"`          // MaxWithdrawalsPerPayload defines the maximum number of withdrawals in a block.
-	MaxMLDSA87ToExecutionChanges     uint64 `yaml:"MAX_ML_DSA_87_TO_EXECUTION_CHANGES" spec:"true"`   // MaxMLDSA87ToExecutionChanges defines the maximum number of ML-DSA-87-to-execution-change objects in a block.
 	MaxValidatorsPerWithdrawalsSweep uint64 `yaml:"MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP" spec:"true"` // MaxValidatorsPerWithdrawalsSweep bounds the size of the sweep searching for withdrawals per slot.
 
 	// ML-DSA-87 domain values.
@@ -116,7 +114,6 @@ type BeaconChainConfig struct {
 	DomainContributionAndProof        [4]byte `yaml:"DOMAIN_CONTRIBUTION_AND_PROOF" spec:"true"`         // DomainAggregateAndProof defines the ML-DSA-87 signature domain for contribution and proof.
 	DomainApplicationMask             [4]byte `yaml:"DOMAIN_APPLICATION_MASK" spec:"true"`               // DomainApplicationMask defines the ML-DSA-87 signature domain for application mask.
 	DomainApplicationBuilder          [4]byte // DomainApplicationBuilder defines the ML-DSA-87 signature domain for application builder.
-	DomainMLDSA87ToExecutionChange    [4]byte // DomainMLDSA87ToExecutionChange defines the ML-DSA-87 signature domain to change withdrawal addresses to QRL prefix
 
 	// Qrysm constants.
 	ShorPerQuanta                uint64                                   // ShorPerQuanta is the amount of shor corresponding to 1 quanta.

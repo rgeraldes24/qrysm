@@ -14,7 +14,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/forkchoice"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	"github.com/theQRL/qrysm/beacon-chain/state/stategen"
@@ -54,22 +53,18 @@ func (mb *mockBroadcaster) BroadcastSyncCommitteeMessage(_ context.Context, _ ui
 	return nil
 }
 
-func (mb *mockBroadcaster) BroadcastMLDSA87Changes(_ context.Context, _ []*qrysmpb.SignedMLDSA87ToExecutionChange) {
-}
-
 var _ p2p.Broadcaster = (*mockBroadcaster)(nil)
 
 type testServiceRequirements struct {
-	ctx         context.Context
-	db          db.Database
-	fcs         forkchoice.ForkChoicer
-	sg          *stategen.State
-	notif       statefeed.Notifier
-	cs          *startup.ClockSynchronizer
-	attPool     attestations.Pool
-	attSrv      *attestations.Service
-	mlDSA87Pool *mldsa87toexec.Pool
-	dc          *depositcache.DepositCache
+	ctx     context.Context
+	db      db.Database
+	fcs     forkchoice.ForkChoicer
+	sg      *stategen.State
+	notif   statefeed.Notifier
+	cs      *startup.ClockSynchronizer
+	attPool attestations.Pool
+	attSrv  *attestations.Service
+	dc      *depositcache.DepositCache
 }
 
 func minimalTestService(t *testing.T, opts ...Option) (*Service, *testServiceRequirements) {
@@ -83,21 +78,19 @@ func minimalTestService(t *testing.T, opts ...Option) (*Service, *testServiceReq
 	attPool := attestations.NewPool()
 	attSrv, err := attestations.NewService(ctx, &attestations.Config{Pool: attPool})
 	require.NoError(t, err)
-	mlDSA87Pool := mldsa87toexec.NewPool()
 	dc, err := depositcache.New()
 	require.NoError(t, err)
 	mockEngine := &mockExecution.EngineClient{ErrNewPayload: execution.ErrAcceptedSyncingPayloadStatus, ErrForkchoiceUpdated: execution.ErrAcceptedSyncingPayloadStatus}
 	req := &testServiceRequirements{
-		ctx:         ctx,
-		db:          beaconDB,
-		fcs:         fcs,
-		sg:          sg,
-		notif:       notif,
-		cs:          cs,
-		attPool:     attPool,
-		attSrv:      attSrv,
-		mlDSA87Pool: mlDSA87Pool,
-		dc:          dc,
+		ctx:     ctx,
+		db:      beaconDB,
+		fcs:     fcs,
+		sg:      sg,
+		notif:   notif,
+		cs:      cs,
+		attPool: attPool,
+		attSrv:  attSrv,
+		dc:      dc,
 	}
 	defOpts := []Option{WithDatabase(req.db),
 		WithStateNotifier(req.notif),
@@ -106,7 +99,6 @@ func minimalTestService(t *testing.T, opts ...Option) (*Service, *testServiceReq
 		WithClockSynchronizer(req.cs),
 		WithAttestationPool(req.attPool),
 		WithAttestationService(req.attSrv),
-		WithMLDSA87ToExecPool(req.mlDSA87Pool),
 		WithDepositCache(dc),
 		WithExecutionEngineCaller(mockEngine),
 	}

@@ -13,17 +13,16 @@ import (
 )
 
 type fields struct {
-	root                      [32]byte
-	sig                       [field_params.MLDSA87SignatureLength]byte
-	deposits                  []*qrysmpb.Deposit
-	atts                      []*qrysmpb.Attestation
-	proposerSlashings         []*qrysmpb.ProposerSlashing
-	attesterSlashings         []*qrysmpb.AttesterSlashing
-	voluntaryExits            []*qrysmpb.SignedVoluntaryExit
-	syncAggregate             *qrysmpb.SyncAggregate
-	execPayloadCapella        *enginev1.ExecutionPayloadCapella
-	execPayloadHeaderCapella  *enginev1.ExecutionPayloadHeaderCapella
-	mlDSA87ToExecutionChanges []*qrysmpb.SignedMLDSA87ToExecutionChange
+	root                     [32]byte
+	sig                      [field_params.MLDSA87SignatureLength]byte
+	deposits                 []*qrysmpb.Deposit
+	atts                     []*qrysmpb.Attestation
+	proposerSlashings        []*qrysmpb.ProposerSlashing
+	attesterSlashings        []*qrysmpb.AttesterSlashing
+	voluntaryExits           []*qrysmpb.SignedVoluntaryExit
+	syncAggregate            *qrysmpb.SyncAggregate
+	execPayloadCapella       *enginev1.ExecutionPayloadCapella
+	execPayloadHeaderCapella *enginev1.ExecutionPayloadHeaderCapella
 }
 
 func Test_SignedBeaconBlock_Proto(t *testing.T) {
@@ -310,15 +309,14 @@ func bodyPbCapella() *qrysmpb.BeaconBlockBodyCapella {
 			DepositCount: 128,
 			BlockHash:    f.root[:],
 		},
-		Graffiti:                  f.root[:],
-		ProposerSlashings:         f.proposerSlashings,
-		AttesterSlashings:         f.attesterSlashings,
-		Attestations:              f.atts,
-		Deposits:                  f.deposits,
-		VoluntaryExits:            f.voluntaryExits,
-		SyncAggregate:             f.syncAggregate,
-		ExecutionPayload:          f.execPayloadCapella,
-		Mldsa87ToExecutionChanges: f.mlDSA87ToExecutionChanges,
+		Graffiti:          f.root[:],
+		ProposerSlashings: f.proposerSlashings,
+		AttesterSlashings: f.attesterSlashings,
+		Attestations:      f.atts,
+		Deposits:          f.deposits,
+		VoluntaryExits:    f.voluntaryExits,
+		SyncAggregate:     f.syncAggregate,
+		ExecutionPayload:  f.execPayloadCapella,
 	}
 }
 
@@ -331,15 +329,14 @@ func bodyPbBlindedCapella() *qrysmpb.BlindedBeaconBlockBodyCapella {
 			DepositCount: 128,
 			BlockHash:    f.root[:],
 		},
-		Graffiti:                  f.root[:],
-		ProposerSlashings:         f.proposerSlashings,
-		AttesterSlashings:         f.attesterSlashings,
-		Attestations:              f.atts,
-		Deposits:                  f.deposits,
-		VoluntaryExits:            f.voluntaryExits,
-		SyncAggregate:             f.syncAggregate,
-		ExecutionPayloadHeader:    f.execPayloadHeaderCapella,
-		Mldsa87ToExecutionChanges: f.mlDSA87ToExecutionChanges,
+		Graffiti:               f.root[:],
+		ProposerSlashings:      f.proposerSlashings,
+		AttesterSlashings:      f.attesterSlashings,
+		Attestations:           f.atts,
+		Deposits:               f.deposits,
+		VoluntaryExits:         f.voluntaryExits,
+		SyncAggregate:          f.syncAggregate,
+		ExecutionPayloadHeader: f.execPayloadHeaderCapella,
 	}
 }
 
@@ -355,15 +352,14 @@ func bodyCapella(t *testing.T) *BeaconBlockBody {
 			DepositCount: 128,
 			BlockHash:    f.root[:],
 		},
-		graffiti:                  f.root,
-		proposerSlashings:         f.proposerSlashings,
-		attesterSlashings:         f.attesterSlashings,
-		attestations:              f.atts,
-		deposits:                  f.deposits,
-		voluntaryExits:            f.voluntaryExits,
-		syncAggregate:             f.syncAggregate,
-		executionPayload:          p,
-		mlDSA87ToExecutionChanges: f.mlDSA87ToExecutionChanges,
+		graffiti:          f.root,
+		proposerSlashings: f.proposerSlashings,
+		attesterSlashings: f.attesterSlashings,
+		attestations:      f.atts,
+		deposits:          f.deposits,
+		voluntaryExits:    f.voluntaryExits,
+		syncAggregate:     f.syncAggregate,
+		executionPayload:  p,
 	}
 }
 
@@ -380,15 +376,14 @@ func bodyBlindedCapella(t *testing.T) *BeaconBlockBody {
 			DepositCount: 128,
 			BlockHash:    f.root[:],
 		},
-		graffiti:                  f.root,
-		proposerSlashings:         f.proposerSlashings,
-		attesterSlashings:         f.attesterSlashings,
-		attestations:              f.atts,
-		deposits:                  f.deposits,
-		voluntaryExits:            f.voluntaryExits,
-		syncAggregate:             f.syncAggregate,
-		executionPayloadHeader:    ph,
-		mlDSA87ToExecutionChanges: f.mlDSA87ToExecutionChanges,
+		graffiti:               f.root,
+		proposerSlashings:      f.proposerSlashings,
+		attesterSlashings:      f.attesterSlashings,
+		attestations:           f.atts,
+		deposits:               f.deposits,
+		voluntaryExits:         f.voluntaryExits,
+		syncAggregate:          f.syncAggregate,
+		executionPayloadHeader: ph,
 	}
 }
 
@@ -553,26 +548,17 @@ func getFields() fields {
 		TransactionsRoot: root[:],
 		WithdrawalsRoot:  root[:],
 	}
-	mlDSA87ToExecutionChanges := []*qrysmpb.SignedMLDSA87ToExecutionChange{{
-		Message: &qrysmpb.MLDSA87ToExecutionChange{
-			ValidatorIndex:     128,
-			FromMldsa87Pubkey:  b2592,
-			ToExecutionAddress: b20,
-		},
-		Signature: sig[:],
-	}}
 
 	return fields{
-		root:                      root,
-		sig:                       sig,
-		deposits:                  deposits,
-		atts:                      atts,
-		proposerSlashings:         []*qrysmpb.ProposerSlashing{proposerSlashing},
-		attesterSlashings:         []*qrysmpb.AttesterSlashing{attesterSlashing},
-		voluntaryExits:            []*qrysmpb.SignedVoluntaryExit{voluntaryExit},
-		syncAggregate:             syncAggregate,
-		execPayloadCapella:        execPayloadCapella,
-		execPayloadHeaderCapella:  execPayloadHeaderCapella,
-		mlDSA87ToExecutionChanges: mlDSA87ToExecutionChanges,
+		root:                     root,
+		sig:                      sig,
+		deposits:                 deposits,
+		atts:                     atts,
+		proposerSlashings:        []*qrysmpb.ProposerSlashing{proposerSlashing},
+		attesterSlashings:        []*qrysmpb.AttesterSlashing{attesterSlashing},
+		voluntaryExits:           []*qrysmpb.SignedVoluntaryExit{voluntaryExit},
+		syncAggregate:            syncAggregate,
+		execPayloadCapella:       execPayloadCapella,
+		execPayloadHeaderCapella: execPayloadHeaderCapella,
 	}
 }

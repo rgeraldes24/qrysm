@@ -10,7 +10,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
-	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -66,7 +65,7 @@ func DepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.Pu
 	depositDataItems := make([]*qrysmpb.Deposit_Data, len(privKeys))
 	depositDataRoots := make([][]byte, len(privKeys))
 	results, err := async.Scatter(len(privKeys), func(offset int, entries int, _ *sync.RWMutex) (interface{}, error) {
-		items, roots, err := depositDataFromKeys(privKeys[offset:offset+entries], pubKeys[offset:offset+entries], 0)
+		items, roots, err := depositDataFromKeys(privKeys[offset:offset+entries], pubKeys[offset:offset+entries])
 		return &depositData{items: items, roots: roots}, err
 	})
 	if err != nil {
@@ -84,16 +83,15 @@ func DepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.Pu
 }
 
 // DepositDataFromKeysWithExecCreds generates a list of deposit data items from a set of ML-DSA-87 validator keys.
-func DepositDataFromKeysWithExecCreds(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey, numOfCreds uint64) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
-	return depositDataFromKeys(privKeys, pubKeys, numOfCreds)
+func DepositDataFromKeysWithExecCreds(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
+	return depositDataFromKeys(privKeys, pubKeys)
 }
 
-func depositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey, numOfCreds uint64) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
+func depositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
 	dataRoots := make([][]byte, len(privKeys))
 	depositDataItems := make([]*qrysmpb.Deposit_Data, len(privKeys))
 	for i := 0; i < len(privKeys); i++ {
-		withCred := uint64(i) < numOfCreds
-		data, err := createDepositData(privKeys[i], pubKeys[i], withCred)
+		data, err := createDepositData(privKeys[i], pubKeys[i])
 		if err != nil {
 			return nil, nil, errors.Wrapf(err, "could not create deposit data for key: %#x", privKeys[i].Marshal())
 		}
@@ -108,18 +106,18 @@ func depositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.Pu
 }
 
 // Generates a deposit data item from ML-DSA-87 keys and signs the hash tree root of the data.
-func createDepositData(privKey ml_dsa_87.MLDSA87Key, pubKey ml_dsa_87.PublicKey, withExecCreds bool) (*qrysmpb.Deposit_Data, error) {
+func createDepositData(privKey ml_dsa_87.MLDSA87Key, pubKey ml_dsa_87.PublicKey) (*qrysmpb.Deposit_Data, error) {
+	// TODO(rgeraldes24)
+	newCredentials := make([]byte, 12)
+	newCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+	execAddr := bytesutil.ToBytes20(pubKey.Marshal())
+
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             pubKey.Marshal(),
-		WithdrawalCredentials: withdrawalCredentialsHash(pubKey.Marshal()),
+		WithdrawalCredentials: append(newCredentials, execAddr[:]...),
 		Amount:                params.BeaconConfig().MaxEffectiveBalance,
 	}
-	if withExecCreds {
-		newCredentials := make([]byte, 12)
-		newCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
-		execAddr := bytesutil.ToBytes20(pubKey.Marshal())
-		depositMessage.WithdrawalCredentials = append(newCredentials, execAddr[:]...)
-	}
+
 	sr, err := depositMessage.HashTreeRoot()
 	if err != nil {
 		return nil, err
@@ -139,18 +137,4 @@ func createDepositData(privKey ml_dsa_87.MLDSA87Key, pubKey ml_dsa_87.PublicKey,
 		Signature:             privKey.Sign(root[:]).Marshal(),
 	}
 	return di, nil
-}
-
-// withdrawalCredentialsHash forms a 32 byte hash of the withdrawal public
-// address.
-//
-// The specification is as follows:
-//
-//	withdrawal_credentials[:1] == ML_DSA_87_WITHDRAWAL_PREFIX_BYTE
-//	withdrawal_credentials[1:] == hash(withdrawal_pubkey)[1:]
-//
-// where withdrawal_credentials is of type bytes32.
-func withdrawalCredentialsHash(pubKey []byte) []byte {
-	h := hash.Hash(pubKey)
-	return append([]byte{mlDSA87WithdrawalPrefixByte}, h[1:]...)[:32]
 }

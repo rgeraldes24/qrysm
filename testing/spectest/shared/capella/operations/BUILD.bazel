@@ -10,7 +10,6 @@ go_library(
         "deposit.go",
         "execution_payload.go",
         "helpers.go",
-        "ml_dsa_87_to_execution_changes.go",
         "proposer_slashing.go",
         "sync_committee.go",
         "voluntary_exit.go",

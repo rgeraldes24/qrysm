@@ -67,7 +67,6 @@ go_test(
         "deposit_test.go",
         "execution_data_test.go",
         "exit_test.go",
-        "exports_test.go",
         "genesis_test.go",
         "header_test.go",
         "payload_test.go",

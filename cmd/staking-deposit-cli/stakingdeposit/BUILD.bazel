@@ -8,8 +8,6 @@ go_library(
         "credentials.go",
         "depositdata.go",
         "generatekeys.go",
-        "generatemldsa87toexecutionchange.go",
-        "mldsa87toexecutionchangedata.go",
     ],
     importpath = "github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit",
     visibility = ["//visibility:public"],

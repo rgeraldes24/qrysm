@@ -222,27 +222,25 @@ var file_proto_qrl_service_beacon_chain_service_proto_rawDesc = []byte{
 }
 
 var file_proto_qrl_service_beacon_chain_service_proto_goTypes = []interface{}{
-	(*emptypb.Empty)(nil),                             // 0: google.protobuf.Empty
-	(*v1.StateRequest)(nil),                           // 1: theqrl.qrl.v1.StateRequest
-	(*v1.StateSyncCommitteesRequest)(nil),             // 2: theqrl.qrl.v1.StateSyncCommitteesRequest
-	(*v1.RandaoRequest)(nil),                          // 3: theqrl.qrl.v1.RandaoRequest
-	(*v1.BlockRequest)(nil),                           // 4: theqrl.qrl.v1.BlockRequest
-	(*v1.AttesterSlashing)(nil),                       // 5: theqrl.qrl.v1.AttesterSlashing
-	(*v1.ProposerSlashing)(nil),                       // 6: theqrl.qrl.v1.ProposerSlashing
-	(*v1.SubmitMLDSA87ToExecutionChangesRequest)(nil), // 7: theqrl.qrl.v1.SubmitMLDSA87ToExecutionChangesRequest
-	(*v1.WeakSubjectivityResponse)(nil),               // 8: theqrl.qrl.v1.WeakSubjectivityResponse
-	(*v1.StateRootResponse)(nil),                      // 9: theqrl.qrl.v1.StateRootResponse
-	(*v1.StateSyncCommitteesResponse)(nil),            // 10: theqrl.qrl.v1.StateSyncCommitteesResponse
-	(*v1.RandaoResponse)(nil),                         // 11: theqrl.qrl.v1.RandaoResponse
-	(*v1.BlockResponse)(nil),                          // 12: theqrl.qrl.v1.BlockResponse
-	(*v1.BlindedBlockResponse)(nil),                   // 13: theqrl.qrl.v1.BlindedBlockResponse
-	(*v1.SSZContainer)(nil),                           // 14: theqrl.qrl.v1.SSZContainer
-	(*v1.BlockAttestationsResponse)(nil),              // 15: theqrl.qrl.v1.BlockAttestationsResponse
-	(*v1.AttesterSlashingsPoolResponse)(nil),          // 16: theqrl.qrl.v1.AttesterSlashingsPoolResponse
-	(*v1.ProposerSlashingPoolResponse)(nil),           // 17: theqrl.qrl.v1.ProposerSlashingPoolResponse
-	(*v1.MLDSA87ToExecutionChangesPoolResponse)(nil),  // 18: theqrl.qrl.v1.MLDSA87ToExecutionChangesPoolResponse
-	(*v1.ForkScheduleResponse)(nil),                   // 19: theqrl.qrl.v1.ForkScheduleResponse
-	(*v1.SpecResponse)(nil),                           // 20: theqrl.qrl.v1.SpecResponse
+	(*emptypb.Empty)(nil),                    // 0: google.protobuf.Empty
+	(*v1.StateRequest)(nil),                  // 1: theqrl.qrl.v1.StateRequest
+	(*v1.StateSyncCommitteesRequest)(nil),    // 2: theqrl.qrl.v1.StateSyncCommitteesRequest
+	(*v1.RandaoRequest)(nil),                 // 3: theqrl.qrl.v1.RandaoRequest
+	(*v1.BlockRequest)(nil),                  // 4: theqrl.qrl.v1.BlockRequest
+	(*v1.AttesterSlashing)(nil),              // 5: theqrl.qrl.v1.AttesterSlashing
+	(*v1.ProposerSlashing)(nil),              // 6: theqrl.qrl.v1.ProposerSlashing
+	(*v1.WeakSubjectivityResponse)(nil),      // 8: theqrl.qrl.v1.WeakSubjectivityResponse
+	(*v1.StateRootResponse)(nil),             // 9: theqrl.qrl.v1.StateRootResponse
+	(*v1.StateSyncCommitteesResponse)(nil),   // 10: theqrl.qrl.v1.StateSyncCommitteesResponse
+	(*v1.RandaoResponse)(nil),                // 11: theqrl.qrl.v1.RandaoResponse
+	(*v1.BlockResponse)(nil),                 // 12: theqrl.qrl.v1.BlockResponse
+	(*v1.BlindedBlockResponse)(nil),          // 13: theqrl.qrl.v1.BlindedBlockResponse
+	(*v1.SSZContainer)(nil),                  // 14: theqrl.qrl.v1.SSZContainer
+	(*v1.BlockAttestationsResponse)(nil),     // 15: theqrl.qrl.v1.BlockAttestationsResponse
+	(*v1.AttesterSlashingsPoolResponse)(nil), // 16: theqrl.qrl.v1.AttesterSlashingsPoolResponse
+	(*v1.ProposerSlashingPoolResponse)(nil),  // 17: theqrl.qrl.v1.ProposerSlashingPoolResponse
+	(*v1.ForkScheduleResponse)(nil),          // 19: theqrl.qrl.v1.ForkScheduleResponse
+	(*v1.SpecResponse)(nil),                  // 20: theqrl.qrl.v1.SpecResponse
 }
 var file_proto_qrl_service_beacon_chain_service_proto_depIdxs = []int32{
 	0,  // 0: theqrl.qrl.service.BeaconChain.GetWeakSubjectivity:input_type -> google.protobuf.Empty
@@ -258,8 +256,6 @@ var file_proto_qrl_service_beacon_chain_service_proto_depIdxs = []int32{
 	5,  // 10: theqrl.qrl.service.BeaconChain.SubmitAttesterSlashing:input_type -> theqrl.qrl.v1.AttesterSlashing
 	0,  // 11: theqrl.qrl.service.BeaconChain.ListPoolProposerSlashings:input_type -> google.protobuf.Empty
 	6,  // 12: theqrl.qrl.service.BeaconChain.SubmitProposerSlashing:input_type -> theqrl.qrl.v1.ProposerSlashing
-	7,  // 13: theqrl.qrl.service.BeaconChain.SubmitSignedMLDSA87ToExecutionChanges:input_type -> theqrl.qrl.v1.SubmitMLDSA87ToExecutionChangesRequest
-	0,  // 14: theqrl.qrl.service.BeaconChain.ListMLDSA87ToExecutionChanges:input_type -> google.protobuf.Empty
 	0,  // 15: theqrl.qrl.service.BeaconChain.GetForkSchedule:input_type -> google.protobuf.Empty
 	0,  // 16: theqrl.qrl.service.BeaconChain.GetSpec:input_type -> google.protobuf.Empty
 	8,  // 17: theqrl.qrl.service.BeaconChain.GetWeakSubjectivity:output_type -> theqrl.qrl.v1.WeakSubjectivityResponse
@@ -275,8 +271,6 @@ var file_proto_qrl_service_beacon_chain_service_proto_depIdxs = []int32{
 	0,  // 27: theqrl.qrl.service.BeaconChain.SubmitAttesterSlashing:output_type -> google.protobuf.Empty
 	17, // 28: theqrl.qrl.service.BeaconChain.ListPoolProposerSlashings:output_type -> theqrl.qrl.v1.ProposerSlashingPoolResponse
 	0,  // 29: theqrl.qrl.service.BeaconChain.SubmitProposerSlashing:output_type -> google.protobuf.Empty
-	0,  // 30: theqrl.qrl.service.BeaconChain.SubmitSignedMLDSA87ToExecutionChanges:output_type -> google.protobuf.Empty
-	18, // 31: theqrl.qrl.service.BeaconChain.ListMLDSA87ToExecutionChanges:output_type -> theqrl.qrl.v1.MLDSA87ToExecutionChangesPoolResponse
 	19, // 32: theqrl.qrl.service.BeaconChain.GetForkSchedule:output_type -> theqrl.qrl.v1.ForkScheduleResponse
 	20, // 33: theqrl.qrl.service.BeaconChain.GetSpec:output_type -> theqrl.qrl.v1.SpecResponse
 	17, // [17:34] is the sub-list for method output_type
@@ -336,8 +330,6 @@ type BeaconChainClient interface {
 	SubmitAttesterSlashing(ctx context.Context, in *v1.AttesterSlashing, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListPoolProposerSlashings(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.ProposerSlashingPoolResponse, error)
 	SubmitProposerSlashing(ctx context.Context, in *v1.ProposerSlashing, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	SubmitSignedMLDSA87ToExecutionChanges(ctx context.Context, in *v1.SubmitMLDSA87ToExecutionChangesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	ListMLDSA87ToExecutionChanges(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.MLDSA87ToExecutionChangesPoolResponse, error)
 	GetForkSchedule(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.ForkScheduleResponse, error)
 	GetSpec(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.SpecResponse, error)
 }
@@ -468,24 +460,6 @@ func (c *beaconChainClient) SubmitProposerSlashing(ctx context.Context, in *v1.P
 	return out, nil
 }
 
-func (c *beaconChainClient) SubmitSignedMLDSA87ToExecutionChanges(ctx context.Context, in *v1.SubmitMLDSA87ToExecutionChangesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/SubmitSignedMLDSA87ToExecutionChanges", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *beaconChainClient) ListMLDSA87ToExecutionChanges(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.MLDSA87ToExecutionChangesPoolResponse, error) {
-	out := new(v1.MLDSA87ToExecutionChangesPoolResponse)
-	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/ListMLDSA87ToExecutionChanges", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *beaconChainClient) GetForkSchedule(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*v1.ForkScheduleResponse, error) {
 	out := new(v1.ForkScheduleResponse)
 	err := c.cc.Invoke(ctx, "/theqrl.qrl.service.BeaconChain/GetForkSchedule", in, out, opts...)
@@ -520,8 +494,6 @@ type BeaconChainServer interface {
 	SubmitAttesterSlashing(context.Context, *v1.AttesterSlashing) (*emptypb.Empty, error)
 	ListPoolProposerSlashings(context.Context, *emptypb.Empty) (*v1.ProposerSlashingPoolResponse, error)
 	SubmitProposerSlashing(context.Context, *v1.ProposerSlashing) (*emptypb.Empty, error)
-	SubmitSignedMLDSA87ToExecutionChanges(context.Context, *v1.SubmitMLDSA87ToExecutionChangesRequest) (*emptypb.Empty, error)
-	ListMLDSA87ToExecutionChanges(context.Context, *emptypb.Empty) (*v1.MLDSA87ToExecutionChangesPoolResponse, error)
 	GetForkSchedule(context.Context, *emptypb.Empty) (*v1.ForkScheduleResponse, error)
 	GetSpec(context.Context, *emptypb.Empty) (*v1.SpecResponse, error)
 }
@@ -568,12 +540,6 @@ func (*UnimplementedBeaconChainServer) ListPoolProposerSlashings(context.Context
 }
 func (*UnimplementedBeaconChainServer) SubmitProposerSlashing(context.Context, *v1.ProposerSlashing) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubmitProposerSlashing not implemented")
-}
-func (*UnimplementedBeaconChainServer) SubmitSignedMLDSA87ToExecutionChanges(context.Context, *v1.SubmitMLDSA87ToExecutionChangesRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SubmitSignedMLDSA87ToExecutionChanges not implemented")
-}
-func (*UnimplementedBeaconChainServer) ListMLDSA87ToExecutionChanges(context.Context, *emptypb.Empty) (*v1.MLDSA87ToExecutionChangesPoolResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListMLDSA87ToExecutionChanges not implemented")
 }
 func (*UnimplementedBeaconChainServer) GetForkSchedule(context.Context, *emptypb.Empty) (*v1.ForkScheduleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetForkSchedule not implemented")
@@ -820,42 +786,6 @@ func _BeaconChain_SubmitProposerSlashing_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(v1.SubmitMLDSA87ToExecutionChangesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BeaconChainServer).SubmitSignedMLDSA87ToExecutionChanges(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/theqrl.qrl.service.BeaconChain/SubmitSignedMLDSA87ToExecutionChanges",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BeaconChainServer).SubmitSignedMLDSA87ToExecutionChanges(ctx, req.(*v1.SubmitMLDSA87ToExecutionChangesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BeaconChain_ListMLDSA87ToExecutionChanges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BeaconChainServer).ListMLDSA87ToExecutionChanges(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/theqrl.qrl.service.BeaconChain/ListMLDSA87ToExecutionChanges",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BeaconChainServer).ListMLDSA87ToExecutionChanges(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _BeaconChain_GetForkSchedule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
@@ -947,14 +877,6 @@ var _BeaconChain_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SubmitProposerSlashing",
 			Handler:    _BeaconChain_SubmitProposerSlashing_Handler,
-		},
-		{
-			MethodName: "SubmitSignedMLDSA87ToExecutionChanges",
-			Handler:    _BeaconChain_SubmitSignedMLDSA87ToExecutionChanges_Handler,
-		},
-		{
-			MethodName: "ListMLDSA87ToExecutionChanges",
-			Handler:    _BeaconChain_ListMLDSA87ToExecutionChanges_Handler,
 		},
 		{
 			MethodName: "GetForkSchedule",

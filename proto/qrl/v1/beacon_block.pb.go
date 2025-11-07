@@ -1452,17 +1452,16 @@ type BeaconBlockBodyCapella struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	RandaoReveal               []byte                            `protobuf:"bytes,1,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4627"`
-	ExecutionData              *ExecutionData                    `protobuf:"bytes,2,opt,name=execution_data,json=executionData,proto3" json:"execution_data,omitempty"`
-	Graffiti                   []byte                            `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
-	ProposerSlashings          []*ProposerSlashing               `protobuf:"bytes,4,rep,name=proposer_slashings,json=proposerSlashings,proto3" json:"proposer_slashings,omitempty" ssz-max:"16"`
-	AttesterSlashings          []*AttesterSlashing               `protobuf:"bytes,5,rep,name=attester_slashings,json=attesterSlashings,proto3" json:"attester_slashings,omitempty" ssz-max:"2"`
-	Attestations               []*Attestation                    `protobuf:"bytes,6,rep,name=attestations,proto3" json:"attestations,omitempty" ssz-max:"128"`
-	Deposits                   []*Deposit                        `protobuf:"bytes,7,rep,name=deposits,proto3" json:"deposits,omitempty" ssz-max:"16"`
-	VoluntaryExits             []*SignedVoluntaryExit            `protobuf:"bytes,8,rep,name=voluntary_exits,json=voluntaryExits,proto3" json:"voluntary_exits,omitempty" ssz-max:"16"`
-	SyncAggregate              *SyncAggregate                    `protobuf:"bytes,9,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
-	ExecutionPayload           *v1.ExecutionPayloadCapella       `protobuf:"bytes,10,opt,name=execution_payload,json=executionPayload,proto3" json:"execution_payload,omitempty"`
-	MlDsa_87ToExecutionChanges []*SignedMLDSA87ToExecutionChange `protobuf:"bytes,11,rep,name=ml_dsa_87_to_execution_changes,json=mlDsa87ToExecutionChanges,proto3" json:"ml_dsa_87_to_execution_changes,omitempty" ssz-max:"16"`
+	RandaoReveal      []byte                      `protobuf:"bytes,1,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4627"`
+	ExecutionData     *ExecutionData              `protobuf:"bytes,2,opt,name=execution_data,json=executionData,proto3" json:"execution_data,omitempty"`
+	Graffiti          []byte                      `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
+	ProposerSlashings []*ProposerSlashing         `protobuf:"bytes,4,rep,name=proposer_slashings,json=proposerSlashings,proto3" json:"proposer_slashings,omitempty" ssz-max:"16"`
+	AttesterSlashings []*AttesterSlashing         `protobuf:"bytes,5,rep,name=attester_slashings,json=attesterSlashings,proto3" json:"attester_slashings,omitempty" ssz-max:"2"`
+	Attestations      []*Attestation              `protobuf:"bytes,6,rep,name=attestations,proto3" json:"attestations,omitempty" ssz-max:"128"`
+	Deposits          []*Deposit                  `protobuf:"bytes,7,rep,name=deposits,proto3" json:"deposits,omitempty" ssz-max:"16"`
+	VoluntaryExits    []*SignedVoluntaryExit      `protobuf:"bytes,8,rep,name=voluntary_exits,json=voluntaryExits,proto3" json:"voluntary_exits,omitempty" ssz-max:"16"`
+	SyncAggregate     *SyncAggregate              `protobuf:"bytes,9,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
+	ExecutionPayload  *v1.ExecutionPayloadCapella `protobuf:"bytes,10,opt,name=execution_payload,json=executionPayload,proto3" json:"execution_payload,omitempty"`
 }
 
 func (x *BeaconBlockBodyCapella) Reset() {
@@ -1567,29 +1566,21 @@ func (x *BeaconBlockBodyCapella) GetExecutionPayload() *v1.ExecutionPayloadCapel
 	return nil
 }
 
-func (x *BeaconBlockBodyCapella) GetMlDsa_87ToExecutionChanges() []*SignedMLDSA87ToExecutionChange {
-	if x != nil {
-		return x.MlDsa_87ToExecutionChanges
-	}
-	return nil
-}
-
 type BlindedBeaconBlockBodyCapella struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	RandaoReveal              []byte                            `protobuf:"bytes,1,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4627"`
-	ExecutionData             *ExecutionData                    `protobuf:"bytes,2,opt,name=execution_data,json=executionData,proto3" json:"execution_data,omitempty"`
-	Graffiti                  []byte                            `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
-	ProposerSlashings         []*ProposerSlashing               `protobuf:"bytes,4,rep,name=proposer_slashings,json=proposerSlashings,proto3" json:"proposer_slashings,omitempty" ssz-max:"16"`
-	AttesterSlashings         []*AttesterSlashing               `protobuf:"bytes,5,rep,name=attester_slashings,json=attesterSlashings,proto3" json:"attester_slashings,omitempty" ssz-max:"2"`
-	Attestations              []*Attestation                    `protobuf:"bytes,6,rep,name=attestations,proto3" json:"attestations,omitempty" ssz-max:"128"`
-	Deposits                  []*Deposit                        `protobuf:"bytes,7,rep,name=deposits,proto3" json:"deposits,omitempty" ssz-max:"16"`
-	VoluntaryExits            []*SignedVoluntaryExit            `protobuf:"bytes,8,rep,name=voluntary_exits,json=voluntaryExits,proto3" json:"voluntary_exits,omitempty" ssz-max:"16"`
-	SyncAggregate             *SyncAggregate                    `protobuf:"bytes,9,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
-	ExecutionPayloadHeader    *v1.ExecutionPayloadHeaderCapella `protobuf:"bytes,10,opt,name=execution_payload_header,json=executionPayloadHeader,proto3" json:"execution_payload_header,omitempty"`
-	Mldsa87ToExecutionChanges []*SignedMLDSA87ToExecutionChange `protobuf:"bytes,11,rep,name=mldsa87_to_execution_changes,json=mldsa87ToExecutionChanges,proto3" json:"mldsa87_to_execution_changes,omitempty" ssz-max:"16"`
+	RandaoReveal           []byte                            `protobuf:"bytes,1,opt,name=randao_reveal,json=randaoReveal,proto3" json:"randao_reveal,omitempty" ssz-size:"4627"`
+	ExecutionData          *ExecutionData                    `protobuf:"bytes,2,opt,name=execution_data,json=executionData,proto3" json:"execution_data,omitempty"`
+	Graffiti               []byte                            `protobuf:"bytes,3,opt,name=graffiti,proto3" json:"graffiti,omitempty" ssz-size:"32"`
+	ProposerSlashings      []*ProposerSlashing               `protobuf:"bytes,4,rep,name=proposer_slashings,json=proposerSlashings,proto3" json:"proposer_slashings,omitempty" ssz-max:"16"`
+	AttesterSlashings      []*AttesterSlashing               `protobuf:"bytes,5,rep,name=attester_slashings,json=attesterSlashings,proto3" json:"attester_slashings,omitempty" ssz-max:"2"`
+	Attestations           []*Attestation                    `protobuf:"bytes,6,rep,name=attestations,proto3" json:"attestations,omitempty" ssz-max:"128"`
+	Deposits               []*Deposit                        `protobuf:"bytes,7,rep,name=deposits,proto3" json:"deposits,omitempty" ssz-max:"16"`
+	VoluntaryExits         []*SignedVoluntaryExit            `protobuf:"bytes,8,rep,name=voluntary_exits,json=voluntaryExits,proto3" json:"voluntary_exits,omitempty" ssz-max:"16"`
+	SyncAggregate          *SyncAggregate                    `protobuf:"bytes,9,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
+	ExecutionPayloadHeader *v1.ExecutionPayloadHeaderCapella `protobuf:"bytes,10,opt,name=execution_payload_header,json=executionPayloadHeader,proto3" json:"execution_payload_header,omitempty"`
 }
 
 func (x *BlindedBeaconBlockBodyCapella) Reset() {
@@ -1690,13 +1681,6 @@ func (x *BlindedBeaconBlockBodyCapella) GetSyncAggregate() *SyncAggregate {
 func (x *BlindedBeaconBlockBodyCapella) GetExecutionPayloadHeader() *v1.ExecutionPayloadHeaderCapella {
 	if x != nil {
 		return x.ExecutionPayloadHeader
-	}
-	return nil
-}
-
-func (x *BlindedBeaconBlockBodyCapella) GetMldsa87ToExecutionChanges() []*SignedMLDSA87ToExecutionChange {
-	if x != nil {
-		return x.Mldsa87ToExecutionChanges
 	}
 	return nil
 }
@@ -2212,7 +2196,6 @@ var file_proto_qrl_v1_beacon_block_proto_goTypes = []interface{}{
 	(Version)(0),                                      // 26: theqrl.qrl.v1.Version
 	(*Attestation)(nil),                               // 27: theqrl.qrl.v1.Attestation
 	(*v1.ExecutionPayloadCapella)(nil),                // 28: theqrl.engine.v1.ExecutionPayloadCapella
-	(*SignedMLDSA87ToExecutionChange)(nil),            // 29: theqrl.qrl.v1.SignedMLDSA87ToExecutionChange
 	(*v1.ExecutionPayloadHeaderCapella)(nil),          // 30: theqrl.engine.v1.ExecutionPayloadHeaderCapella
 }
 var file_proto_qrl_v1_beacon_block_proto_depIdxs = []int32{
@@ -2246,7 +2229,6 @@ var file_proto_qrl_v1_beacon_block_proto_depIdxs = []int32{
 	4,  // 27: theqrl.qrl.v1.BeaconBlockBodyCapella.voluntary_exits:type_name -> theqrl.qrl.v1.SignedVoluntaryExit
 	9,  // 28: theqrl.qrl.v1.BeaconBlockBodyCapella.sync_aggregate:type_name -> theqrl.qrl.v1.SyncAggregate
 	28, // 29: theqrl.qrl.v1.BeaconBlockBodyCapella.execution_payload:type_name -> theqrl.engine.v1.ExecutionPayloadCapella
-	29, // 30: theqrl.qrl.v1.BeaconBlockBodyCapella.ml_dsa_87_to_execution_changes:type_name -> theqrl.qrl.v1.SignedMLDSA87ToExecutionChange
 	5,  // 31: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.execution_data:type_name -> theqrl.qrl.v1.ExecutionData
 	0,  // 32: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.proposer_slashings:type_name -> theqrl.qrl.v1.ProposerSlashing
 	1,  // 33: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.attester_slashings:type_name -> theqrl.qrl.v1.AttesterSlashing
@@ -2255,7 +2237,6 @@ var file_proto_qrl_v1_beacon_block_proto_depIdxs = []int32{
 	4,  // 36: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.voluntary_exits:type_name -> theqrl.qrl.v1.SignedVoluntaryExit
 	9,  // 37: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.sync_aggregate:type_name -> theqrl.qrl.v1.SyncAggregate
 	30, // 38: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.execution_payload_header:type_name -> theqrl.engine.v1.ExecutionPayloadHeaderCapella
-	29, // 39: theqrl.qrl.v1.BlindedBeaconBlockBodyCapella.mldsa87_to_execution_changes:type_name -> theqrl.qrl.v1.SignedMLDSA87ToExecutionChange
 	40, // [40:40] is the sub-list for method output_type
 	40, // [40:40] is the sub-list for method input_type
 	40, // [40:40] is the sub-list for extension type_name
@@ -2270,7 +2251,6 @@ func file_proto_qrl_v1_beacon_block_proto_init() {
 	}
 	file_proto_qrl_v1_attestation_proto_init()
 	file_proto_qrl_v1_version_proto_init()
-	file_proto_qrl_v1_withdrawals_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_proto_qrl_v1_beacon_block_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ProposerSlashing); i {

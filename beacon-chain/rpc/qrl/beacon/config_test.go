@@ -47,7 +47,6 @@ func TestGetSpec(t *testing.T) {
 	config.EjectionBalance = 22
 	config.EffectiveBalanceIncrement = 23
 	config.GenesisForkVersion = []byte("GenesisForkVersion")
-	config.MLDSA87WithdrawalPrefixByte = byte('b')
 	config.QRLAddressWithdrawalPrefixByte = byte('c')
 	config.GenesisDelay = 24
 	config.SecondsPerSlot = 25
@@ -92,8 +91,7 @@ func TestGetSpec(t *testing.T) {
 	config.MinSyncCommitteeParticipants = 71
 	config.DefaultFeeRecipient = defaultFeeRecipient
 	config.MaxWithdrawalsPerPayload = 74
-	config.MaxMLDSA87ToExecutionChanges = 75
-	config.MaxValidatorsPerWithdrawalsSweep = 76
+	config.MaxValidatorsPerWithdrawalsSweep = 75
 
 	var dbp [4]byte
 	copy(dbp[:], []byte{'0', '0', '0', '1'})
@@ -183,8 +181,6 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "23", v)
 		case "GENESIS_FORK_VERSION":
 			assert.Equal(t, "0x"+hex.EncodeToString([]byte("GenesisForkVersion")), v)
-		case "ML_DSA_87_WITHDRAWAL_PREFIX":
-			assert.Equal(t, "0x62", v)
 		case "QRL_ADDRESS_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x63", v)
 		case "GENESIS_DELAY":
@@ -315,10 +311,8 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "3", v)
 		case "MAX_WITHDRAWALS_PER_PAYLOAD":
 			assert.Equal(t, "74", v)
-		case "MAX_ML_DSA_87_TO_EXECUTION_CHANGES":
-			assert.Equal(t, "75", v)
 		case "MAX_VALIDATORS_PER_WITHDRAWALS_SWEEP":
-			assert.Equal(t, "76", v)
+			assert.Equal(t, "75", v)
 		case "REORG_MAX_EPOCHS_SINCE_FINALIZATION":
 			assert.Equal(t, "2", v)
 		case "REORG_WEIGHT_THRESHOLD":

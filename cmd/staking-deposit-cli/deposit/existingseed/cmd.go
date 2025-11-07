@@ -5,6 +5,7 @@ import (
 	"syscall"
 
 	"github.com/sirupsen/logrus"
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/term"
@@ -17,7 +18,7 @@ var (
 		NumValidators       uint64
 		Folder              string
 		ChainName           string
-		ExecutionAddress    string
+		WithdrawalAddress   string
 	}{}
 	log = logrus.WithField("prefix", "existing-seed")
 )
@@ -65,10 +66,11 @@ var Commands = []*cli.Command{
 				Value:       "betanet",
 			},
 			&cli.StringFlag{
-				Name:        "execution-address",
+				Name:        "withdrawal-address",
 				Usage:       "",
-				Destination: &existingSeedFlags.ExecutionAddress,
+				Destination: &existingSeedFlags.WithdrawalAddress,
 				Value:       "",
+				Required:    true,
 			},
 		},
 	},
@@ -94,9 +96,14 @@ func cliActionExistingSeed(cliCtx *cli.Context) error {
 		return fmt.Errorf("password mismatch")
 	}
 
+	withdrawalAddr, err := common.NewAddressFromString(existingSeedFlags.WithdrawalAddress)
+	if err != nil {
+		return err
+	}
+
 	stakingdeposit.GenerateKeys(existingSeedFlags.ValidatorStartIndex,
 		existingSeedFlags.NumValidators, existingSeedFlags.Seed, existingSeedFlags.Folder,
-		existingSeedFlags.ChainName, string(keystorePassword), existingSeedFlags.ExecutionAddress, false)
+		existingSeedFlags.ChainName, string(keystorePassword), withdrawalAddr, false)
 
 	return nil
 }

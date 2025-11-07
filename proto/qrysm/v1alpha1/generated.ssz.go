@@ -2076,10 +2076,6 @@ func (b *BeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, err error
 	}
 	offset += b.ExecutionPayload.SizeSSZ()
 
-	// Offset (10) 'Mldsa87ToExecutionChanges'
-	dst = ssz.WriteOffset(dst, offset)
-	offset += len(b.Mldsa87ToExecutionChanges) * 7247
-
 	// Field (3) 'ProposerSlashings'
 	if size := len(b.ProposerSlashings); size > 16 {
 		err = ssz.ErrListTooBigFn("--.ProposerSlashings", size, 16)
@@ -2159,17 +2155,6 @@ func (b *BeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, err error
 		return
 	}
 
-	// Field (10) 'Mldsa87ToExecutionChanges'
-	if size := len(b.Mldsa87ToExecutionChanges); size > 16 {
-		err = ssz.ErrListTooBigFn("--.Mldsa87ToExecutionChanges", size, 16)
-		return
-	}
-	for ii := 0; ii < len(b.Mldsa87ToExecutionChanges); ii++ {
-		if dst, err = b.Mldsa87ToExecutionChanges[ii].MarshalSSZTo(dst); err != nil {
-			return
-		}
-	}
-
 	return
 }
 
@@ -2240,11 +2225,6 @@ func (b *BeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 
 	// Offset (9) 'ExecutionPayload'
 	if o9 = ssz.ReadOffset(buf[4755:4759]); o9 > size || o8 > o9 {
-		return ssz.ErrOffset
-	}
-
-	// Offset (10) 'Mldsa87ToExecutionChanges'
-	if o10 = ssz.ReadOffset(buf[4759:4763]); o10 > size || o9 > o10 {
 		return ssz.ErrOffset
 	}
 
@@ -2367,24 +2347,6 @@ func (b *BeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 			return err
 		}
 	}
-
-	// Field (10) 'Mldsa87ToExecutionChanges'
-	{
-		buf = tail[o10:]
-		num, err := ssz.DivideInt2(len(buf), 7247, 16)
-		if err != nil {
-			return err
-		}
-		b.Mldsa87ToExecutionChanges = make([]*SignedMLDSA87ToExecutionChange, num)
-		for ii := 0; ii < num; ii++ {
-			if b.Mldsa87ToExecutionChanges[ii] == nil {
-				b.Mldsa87ToExecutionChanges[ii] = new(SignedMLDSA87ToExecutionChange)
-			}
-			if err = b.Mldsa87ToExecutionChanges[ii].UnmarshalSSZ(buf[ii*7247 : (ii+1)*7247]); err != nil {
-				return err
-			}
-		}
-	}
 	return err
 }
 
@@ -2424,9 +2386,6 @@ func (b *BeaconBlockBodyCapella) SizeSSZ() (size int) {
 		b.ExecutionPayload = new(v1.ExecutionPayloadCapella)
 	}
 	size += b.ExecutionPayload.SizeSSZ()
-
-	// Field (10) 'Mldsa87ToExecutionChanges'
-	size += len(b.Mldsa87ToExecutionChanges) * 7247
 
 	return
 }
@@ -2567,26 +2526,6 @@ func (b *BeaconBlockBodyCapella) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 	// Field (9) 'ExecutionPayload'
 	if err = b.ExecutionPayload.HashTreeRootWith(hh); err != nil {
 		return
-	}
-
-	// Field (10) 'Mldsa87ToExecutionChanges'
-	{
-		subIndx := hh.Index()
-		num := uint64(len(b.Mldsa87ToExecutionChanges))
-		if num > 16 {
-			err = ssz.ErrIncorrectListSize
-			return
-		}
-		for _, elem := range b.Mldsa87ToExecutionChanges {
-			if err = elem.HashTreeRootWith(hh); err != nil {
-				return
-			}
-		}
-		if ssz.EnableVectorizedHTR {
-			hh.MerkleizeWithMixinVectorizedHTR(subIndx, num, 16)
-		} else {
-			hh.MerkleizeWithMixin(subIndx, num, 16)
-		}
 	}
 
 	if ssz.EnableVectorizedHTR {
@@ -2933,10 +2872,6 @@ func (b *BlindedBeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, er
 	}
 	offset += b.ExecutionPayloadHeader.SizeSSZ()
 
-	// Offset (10) 'Mldsa87ToExecutionChanges'
-	dst = ssz.WriteOffset(dst, offset)
-	offset += len(b.Mldsa87ToExecutionChanges) * 7247
-
 	// Field (3) 'ProposerSlashings'
 	if size := len(b.ProposerSlashings); size > 16 {
 		err = ssz.ErrListTooBigFn("--.ProposerSlashings", size, 16)
@@ -3016,17 +2951,6 @@ func (b *BlindedBeaconBlockBodyCapella) MarshalSSZTo(buf []byte) (dst []byte, er
 		return
 	}
 
-	// Field (10) 'Mldsa87ToExecutionChanges'
-	if size := len(b.Mldsa87ToExecutionChanges); size > 16 {
-		err = ssz.ErrListTooBigFn("--.Mldsa87ToExecutionChanges", size, 16)
-		return
-	}
-	for ii := 0; ii < len(b.Mldsa87ToExecutionChanges); ii++ {
-		if dst, err = b.Mldsa87ToExecutionChanges[ii].MarshalSSZTo(dst); err != nil {
-			return
-		}
-	}
-
 	return
 }
 
@@ -3097,11 +3021,6 @@ func (b *BlindedBeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 
 	// Offset (9) 'ExecutionPayloadHeader'
 	if o9 = ssz.ReadOffset(buf[4755:4759]); o9 > size || o8 > o9 {
-		return ssz.ErrOffset
-	}
-
-	// Offset (10) 'Mldsa87ToExecutionChanges'
-	if o10 = ssz.ReadOffset(buf[4759:4763]); o10 > size || o9 > o10 {
 		return ssz.ErrOffset
 	}
 
@@ -3225,23 +3144,6 @@ func (b *BlindedBeaconBlockBodyCapella) UnmarshalSSZ(buf []byte) error {
 		}
 	}
 
-	// Field (10) 'Mldsa87ToExecutionChanges'
-	{
-		buf = tail[o10:]
-		num, err := ssz.DivideInt2(len(buf), 7247, 16)
-		if err != nil {
-			return err
-		}
-		b.Mldsa87ToExecutionChanges = make([]*SignedMLDSA87ToExecutionChange, num)
-		for ii := 0; ii < num; ii++ {
-			if b.Mldsa87ToExecutionChanges[ii] == nil {
-				b.Mldsa87ToExecutionChanges[ii] = new(SignedMLDSA87ToExecutionChange)
-			}
-			if err = b.Mldsa87ToExecutionChanges[ii].UnmarshalSSZ(buf[ii*7247 : (ii+1)*7247]); err != nil {
-				return err
-			}
-		}
-	}
 	return err
 }
 
@@ -3281,9 +3183,6 @@ func (b *BlindedBeaconBlockBodyCapella) SizeSSZ() (size int) {
 		b.ExecutionPayloadHeader = new(v1.ExecutionPayloadHeaderCapella)
 	}
 	size += b.ExecutionPayloadHeader.SizeSSZ()
-
-	// Field (10) 'Mldsa87ToExecutionChanges'
-	size += len(b.Mldsa87ToExecutionChanges) * 7247
 
 	return
 }
@@ -3424,26 +3323,6 @@ func (b *BlindedBeaconBlockBodyCapella) HashTreeRootWith(hh *ssz.Hasher) (err er
 	// Field (9) 'ExecutionPayloadHeader'
 	if err = b.ExecutionPayloadHeader.HashTreeRootWith(hh); err != nil {
 		return
-	}
-
-	// Field (10) 'Mldsa87ToExecutionChanges'
-	{
-		subIndx := hh.Index()
-		num := uint64(len(b.Mldsa87ToExecutionChanges))
-		if num > 16 {
-			err = ssz.ErrIncorrectListSize
-			return
-		}
-		for _, elem := range b.Mldsa87ToExecutionChanges {
-			if err = elem.HashTreeRootWith(hh); err != nil {
-				return
-			}
-		}
-		if ssz.EnableVectorizedHTR {
-			hh.MerkleizeWithMixinVectorizedHTR(subIndx, num, 16)
-		} else {
-			hh.MerkleizeWithMixin(subIndx, num, 16)
-		}
 	}
 
 	if ssz.EnableVectorizedHTR {
@@ -6622,188 +6501,6 @@ func (v *Validator) HashTreeRootWith(hh *ssz.Hasher) (err error) {
 
 	// Field (7) 'WithdrawableEpoch'
 	hh.PutUint64(uint64(v.WithdrawableEpoch))
-
-	if ssz.EnableVectorizedHTR {
-		hh.MerkleizeVectorizedHTR(indx)
-	} else {
-		hh.Merkleize(indx)
-	}
-	return
-}
-
-// MarshalSSZ ssz marshals the MLDSA87ToExecutionChange object
-func (m *MLDSA87ToExecutionChange) MarshalSSZ() ([]byte, error) {
-	return ssz.MarshalSSZ(m)
-}
-
-// MarshalSSZTo ssz marshals the MLDSA87ToExecutionChange object to a target array
-func (m *MLDSA87ToExecutionChange) MarshalSSZTo(buf []byte) (dst []byte, err error) {
-	dst = buf
-
-	// Field (0) 'ValidatorIndex'
-	dst = ssz.MarshalUint64(dst, uint64(m.ValidatorIndex))
-
-	// Field (1) 'FromMldsa87Pubkey'
-	if size := len(m.FromMldsa87Pubkey); size != 2592 {
-		err = ssz.ErrBytesLengthFn("--.FromMldsa87Pubkey", size, 2592)
-		return
-	}
-	dst = append(dst, m.FromMldsa87Pubkey...)
-
-	// Field (2) 'ToExecutionAddress'
-	if size := len(m.ToExecutionAddress); size != 20 {
-		err = ssz.ErrBytesLengthFn("--.ToExecutionAddress", size, 20)
-		return
-	}
-	dst = append(dst, m.ToExecutionAddress...)
-
-	return
-}
-
-// UnmarshalSSZ ssz unmarshals the MLDSA87ToExecutionChange object
-func (m *MLDSA87ToExecutionChange) UnmarshalSSZ(buf []byte) error {
-	var err error
-	size := uint64(len(buf))
-	if size != 2620 {
-		return ssz.ErrSize
-	}
-
-	// Field (0) 'ValidatorIndex'
-	m.ValidatorIndex = github_com_theQRL_qrysm_consensus_types_primitives.ValidatorIndex(ssz.UnmarshallUint64(buf[0:8]))
-
-	// Field (1) 'FromMldsa87Pubkey'
-	if cap(m.FromMldsa87Pubkey) == 0 {
-		m.FromMldsa87Pubkey = make([]byte, 0, len(buf[8:2600]))
-	}
-	m.FromMldsa87Pubkey = append(m.FromMldsa87Pubkey, buf[8:2600]...)
-
-	// Field (2) 'ToExecutionAddress'
-	if cap(m.ToExecutionAddress) == 0 {
-		m.ToExecutionAddress = make([]byte, 0, len(buf[2600:2620]))
-	}
-	m.ToExecutionAddress = append(m.ToExecutionAddress, buf[2600:2620]...)
-
-	return err
-}
-
-// SizeSSZ returns the ssz encoded size in bytes for the MLDSA87ToExecutionChange object
-func (m *MLDSA87ToExecutionChange) SizeSSZ() (size int) {
-	size = 2620
-	return
-}
-
-// HashTreeRoot ssz hashes the MLDSA87ToExecutionChange object
-func (m *MLDSA87ToExecutionChange) HashTreeRoot() ([32]byte, error) {
-	return ssz.HashWithDefaultHasher(m)
-}
-
-// HashTreeRootWith ssz hashes the MLDSA87ToExecutionChange object with a hasher
-func (m *MLDSA87ToExecutionChange) HashTreeRootWith(hh *ssz.Hasher) (err error) {
-	indx := hh.Index()
-
-	// Field (0) 'ValidatorIndex'
-	hh.PutUint64(uint64(m.ValidatorIndex))
-
-	// Field (1) 'FromMldsa87Pubkey'
-	if size := len(m.FromMldsa87Pubkey); size != 2592 {
-		err = ssz.ErrBytesLengthFn("--.FromMldsa87Pubkey", size, 2592)
-		return
-	}
-	hh.PutBytes(m.FromMldsa87Pubkey)
-
-	// Field (2) 'ToExecutionAddress'
-	if size := len(m.ToExecutionAddress); size != 20 {
-		err = ssz.ErrBytesLengthFn("--.ToExecutionAddress", size, 20)
-		return
-	}
-	hh.PutBytes(m.ToExecutionAddress)
-
-	if ssz.EnableVectorizedHTR {
-		hh.MerkleizeVectorizedHTR(indx)
-	} else {
-		hh.Merkleize(indx)
-	}
-	return
-}
-
-// MarshalSSZ ssz marshals the SignedMLDSA87ToExecutionChange object
-func (s *SignedMLDSA87ToExecutionChange) MarshalSSZ() ([]byte, error) {
-	return ssz.MarshalSSZ(s)
-}
-
-// MarshalSSZTo ssz marshals the SignedMLDSA87ToExecutionChange object to a target array
-func (s *SignedMLDSA87ToExecutionChange) MarshalSSZTo(buf []byte) (dst []byte, err error) {
-	dst = buf
-
-	// Field (0) 'Message'
-	if s.Message == nil {
-		s.Message = new(MLDSA87ToExecutionChange)
-	}
-	if dst, err = s.Message.MarshalSSZTo(dst); err != nil {
-		return
-	}
-
-	// Field (1) 'Signature'
-	if size := len(s.Signature); size != 4627 {
-		err = ssz.ErrBytesLengthFn("--.Signature", size, 4627)
-		return
-	}
-	dst = append(dst, s.Signature...)
-
-	return
-}
-
-// UnmarshalSSZ ssz unmarshals the SignedMLDSA87ToExecutionChange object
-func (s *SignedMLDSA87ToExecutionChange) UnmarshalSSZ(buf []byte) error {
-	var err error
-	size := uint64(len(buf))
-	if size != 7247 {
-		return ssz.ErrSize
-	}
-
-	// Field (0) 'Message'
-	if s.Message == nil {
-		s.Message = new(MLDSA87ToExecutionChange)
-	}
-	if err = s.Message.UnmarshalSSZ(buf[0:2620]); err != nil {
-		return err
-	}
-
-	// Field (1) 'Signature'
-	if cap(s.Signature) == 0 {
-		s.Signature = make([]byte, 0, len(buf[2620:7247]))
-	}
-	s.Signature = append(s.Signature, buf[2620:7247]...)
-
-	return err
-}
-
-// SizeSSZ returns the ssz encoded size in bytes for the SignedMLDSA87ToExecutionChange object
-func (s *SignedMLDSA87ToExecutionChange) SizeSSZ() (size int) {
-	size = 7247
-	return
-}
-
-// HashTreeRoot ssz hashes the SignedMLDSA87ToExecutionChange object
-func (s *SignedMLDSA87ToExecutionChange) HashTreeRoot() ([32]byte, error) {
-	return ssz.HashWithDefaultHasher(s)
-}
-
-// HashTreeRootWith ssz hashes the SignedMLDSA87ToExecutionChange object with a hasher
-func (s *SignedMLDSA87ToExecutionChange) HashTreeRootWith(hh *ssz.Hasher) (err error) {
-	indx := hh.Index()
-
-	// Field (0) 'Message'
-	if err = s.Message.HashTreeRootWith(hh); err != nil {
-		return
-	}
-
-	// Field (1) 'Signature'
-	if size := len(s.Signature); size != 4627 {
-		err = ssz.ErrBytesLengthFn("--.Signature", size, 4627)
-		return
-	}
-	hh.PutBytes(s.Signature)
 
 	if ssz.EnableVectorizedHTR {
 		hh.MerkleizeVectorizedHTR(indx)

@@ -171,7 +171,3 @@ enum ForkChoiceNodeValidity {
     INVALID = 1;
     OPTIMISTIC = 2;
 }
-
-message MLDSA87ToExecutionChangesPoolResponse {
-  repeated SignedMLDSA87ToExecutionChange data = 1;
-}

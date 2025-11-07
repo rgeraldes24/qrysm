@@ -338,15 +338,6 @@ func TestGetBeaconBlockConverter_CapellaError(t *testing.T) {
 				return beaconBlock
 			},
 		},
-		{
-			name:                 "bad ml-dsa-87 execution changes",
-			expectedErrorMessage: "failed to get ml-dsa-87 to execution changes",
-			generateData: func() *apimiddleware.BeaconBlockCapellaJson {
-				beaconBlock := test_helpers.GenerateJsonCapellaBeaconBlock()
-				beaconBlock.Body.MLDSA87ToExecutionChanges[0] = nil
-				return beaconBlock
-			},
-		},
 	}
 
 	for _, testCase := range testCases {

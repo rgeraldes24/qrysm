@@ -42,8 +42,6 @@ const (
 	AggregatorSignature = "aggregator signature"
 	// AttestationSignature represents attestation signature
 	AttestationSignature = "attestation signature"
-	// MLDSA87ChangeSignature represents signature to MLDSA87ToExecutionChange
-	MLDSA87ChangeSignature = "mldsa87change signature"
 	// SyncCommitteeSignature represents sync committee signature
 	SyncCommitteeSignature = "sync committee signature"
 	// SyncSelectionProof represents sync committee selection proof

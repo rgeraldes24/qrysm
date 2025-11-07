@@ -8,7 +8,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	"github.com/theQRL/qrysm/beacon-chain/forkchoice"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
 	"github.com/theQRL/qrysm/beacon-chain/p2p"
@@ -96,14 +95,6 @@ func WithExitPool(p voluntaryexits.PoolManager) Option {
 func WithSlashingPool(p slashings.PoolManager) Option {
 	return func(s *Service) error {
 		s.cfg.SlashingPool = p
-		return nil
-	}
-}
-
-// WithMLDSA87ToExecPool to keep track of ML-DSA-87 to Execution address changes.
-func WithMLDSA87ToExecPool(p mldsa87toexec.PoolManager) Option {
-	return func(s *Service) error {
-		s.cfg.MLDSA87ToExecPool = p
 		return nil
 	}
 }

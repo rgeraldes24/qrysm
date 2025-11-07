@@ -39,8 +39,6 @@ const (
 	ChainReorgTopic = "chain_reorg"
 	// SyncCommitteeContributionTopic represents a new sync committee contribution event topic.
 	SyncCommitteeContributionTopic = "contribution_and_proof"
-	// MLDSA87ToExecutionChangeTopic represents a new received ML-DSA-87 to execution change event topic.
-	MLDSA87ToExecutionChangeTopic = "ml_dsa_87_to_execution_change"
 	// PayloadAttributesTopic represents a new payload attributes for execution payload building event topic.
 	PayloadAttributesTopic = "payload_attributes"
 )
@@ -53,7 +51,6 @@ var casesHandled = map[string]bool{
 	FinalizedCheckpointTopic:       true,
 	ChainReorgTopic:                true,
 	SyncCommitteeContributionTopic: true,
-	MLDSA87ToExecutionChangeTopic:  true,
 	PayloadAttributesTopic:         true,
 }
 
@@ -151,16 +148,6 @@ func handleBlockOperationEvents(
 		}
 		v2Data := migration.V1Alpha1SignedContributionAndProofToV1(contributionData.Contribution)
 		return streamData(stream, SyncCommitteeContributionTopic, v2Data)
-	case operation.MLDSA87ToExecutionChangeReceived:
-		if _, ok := requestedTopics[MLDSA87ToExecutionChangeTopic]; !ok {
-			return nil
-		}
-		changeData, ok := event.Data.(*operation.MLDSA87ToExecutionChangeReceivedData)
-		if !ok {
-			return nil
-		}
-		v2Change := migration.V1Alpha1SignedMLDSA87ToExecChangeToV1(changeData.Change)
-		return streamData(stream, MLDSA87ToExecutionChangeTopic, v2Change)
 	default:
 		return nil
 	}

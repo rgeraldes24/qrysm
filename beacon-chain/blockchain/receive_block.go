@@ -272,11 +272,6 @@ func (s *Service) prunePostBlockOperationPools(ctx context.Context, blk interfac
 		s.cfg.ExitPool.MarkIncluded(e)
 	}
 
-	// Mark block ml-dsa-87 changes as seen so we don't include same ones in future blocks.
-	if err := s.markIncludedBlockMLDSA87ToExecChanges(blk.Block()); err != nil {
-		return errors.Wrap(err, "could not process MLDSA87ToExecutionChanges")
-	}
-
 	// Mark slashings as seen so we don't include same ones in future blocks.
 	for _, as := range blk.Block().Body().AttesterSlashings() {
 		s.cfg.SlashingPool.MarkIncludedAttesterSlashing(as)
@@ -285,17 +280,6 @@ func (s *Service) prunePostBlockOperationPools(ctx context.Context, blk interfac
 		s.cfg.SlashingPool.MarkIncludedProposerSlashing(ps)
 	}
 
-	return nil
-}
-
-func (s *Service) markIncludedBlockMLDSA87ToExecChanges(headBlock interfaces.ReadOnlyBeaconBlock) error {
-	changes, err := headBlock.Body().MLDSA87ToExecutionChanges()
-	if err != nil {
-		return errors.Wrap(err, "could not get MLDSA87ToExecutionChanges")
-	}
-	for _, change := range changes {
-		s.cfg.MLDSA87ToExecPool.MarkIncluded(change)
-	}
 	return nil
 }
 

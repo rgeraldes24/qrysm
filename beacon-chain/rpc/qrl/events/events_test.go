@@ -196,43 +196,6 @@ func TestStreamEvents_OperationsEvents(t *testing.T) {
 			feed: srv.OperationNotifier.OperationFeed(),
 		})
 	})
-	t.Run(MLDSA87ToExecutionChangeTopic, func(t *testing.T) {
-		ctx := context.Background()
-		srv, ctrl, mockStream := setupServer(ctx, t)
-		defer ctrl.Finish()
-
-		wantedChangeV1alpha1 := &qrysmpb.SignedMLDSA87ToExecutionChange{
-			Message: &qrysmpb.MLDSA87ToExecutionChange{
-				ValidatorIndex:     1,
-				FromMldsa87Pubkey:  []byte("from"),
-				ToExecutionAddress: []byte("to"),
-			},
-			Signature: make([]byte, 96),
-		}
-		wantedChange := migration.V1Alpha1SignedMLDSA87ToExecChangeToV1(wantedChangeV1alpha1)
-		genericResponse, err := anypb.New(wantedChange)
-		require.NoError(t, err)
-
-		wantedMessage := &gateway.EventSource{
-			Event: MLDSA87ToExecutionChangeTopic,
-			Data:  genericResponse,
-		}
-
-		assertFeedSendAndReceive(ctx, &assertFeedArgs{
-			t:             t,
-			srv:           srv,
-			topics:        []string{MLDSA87ToExecutionChangeTopic},
-			stream:        mockStream,
-			shouldReceive: wantedMessage,
-			itemToSend: &feed.Event{
-				Type: operation.MLDSA87ToExecutionChangeReceived,
-				Data: &operation.MLDSA87ToExecutionChangeReceivedData{
-					Change: wantedChangeV1alpha1,
-				},
-			},
-			feed: srv.OperationNotifier.OperationFeed(),
-		})
-	})
 }
 
 func TestStreamEvents_StateEvents(t *testing.T) {

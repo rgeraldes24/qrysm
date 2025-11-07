@@ -51,7 +51,6 @@ func TestBeaconBlockHeaderFromBlock(t *testing.T) {
 				Transactions:  make([][]byte, 0),
 				Withdrawals:   make([]*enginev1.Withdrawal, 0),
 			},
-			Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{},
 		},
 	}
 	bodyRoot, err := blk.Body.HashTreeRoot()
@@ -106,7 +105,6 @@ func TestBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				Transactions:  make([][]byte, 0),
 				Withdrawals:   make([]*enginev1.Withdrawal, 0),
 			},
-			Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{},
 		},
 	}
 	bodyRoot, err := blk.Body.HashTreeRoot()
@@ -174,7 +172,6 @@ func TestSignedBeaconBlockHeaderFromBlock(t *testing.T) {
 				Transactions:  make([][]byte, 0),
 				Withdrawals:   make([]*enginev1.Withdrawal, 0),
 			},
-			Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{},
 		},
 	},
 		Signature: bytesutil.PadTo([]byte("signature"), field_params.MLDSA87SignatureLength),
@@ -233,7 +230,6 @@ func TestSignedBeaconBlockHeaderFromBlockInterface(t *testing.T) {
 				Transactions:  make([][]byte, 0),
 				Withdrawals:   make([]*enginev1.Withdrawal, 0),
 			},
-			Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{},
 		},
 	},
 		Signature: bytesutil.PadTo([]byte("signature"), field_params.MLDSA87SignatureLength),

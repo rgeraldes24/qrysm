@@ -35,20 +35,19 @@ var (
 
 // BeaconBlockBody is the main beacon block body structure. It can represent any block type.
 type BeaconBlockBody struct {
-	version                   int
-	isBlinded                 bool
-	randaoReveal              [field_params.MLDSA87SignatureLength]byte
-	executionData             *qrysmpb.ExecutionData
-	graffiti                  [field_params.RootLength]byte
-	proposerSlashings         []*qrysmpb.ProposerSlashing
-	attesterSlashings         []*qrysmpb.AttesterSlashing
-	attestations              []*qrysmpb.Attestation
-	deposits                  []*qrysmpb.Deposit
-	voluntaryExits            []*qrysmpb.SignedVoluntaryExit
-	syncAggregate             *qrysmpb.SyncAggregate
-	executionPayload          interfaces.ExecutionData
-	executionPayloadHeader    interfaces.ExecutionData
-	mlDSA87ToExecutionChanges []*qrysmpb.SignedMLDSA87ToExecutionChange
+	version                int
+	isBlinded              bool
+	randaoReveal           [field_params.MLDSA87SignatureLength]byte
+	executionData          *qrysmpb.ExecutionData
+	graffiti               [field_params.RootLength]byte
+	proposerSlashings      []*qrysmpb.ProposerSlashing
+	attesterSlashings      []*qrysmpb.AttesterSlashing
+	attestations           []*qrysmpb.Attestation
+	deposits               []*qrysmpb.Deposit
+	voluntaryExits         []*qrysmpb.SignedVoluntaryExit
+	syncAggregate          *qrysmpb.SyncAggregate
+	executionPayload       interfaces.ExecutionData
+	executionPayloadHeader interfaces.ExecutionData
 }
 
 // BeaconBlock is the main beacon block structure. It can represent any block type.

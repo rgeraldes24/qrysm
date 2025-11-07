@@ -980,53 +980,6 @@ func (x *ForkChoiceNode) GetValidity() ForkChoiceNodeValidity {
 	return ForkChoiceNodeValidity_VALID
 }
 
-type MLDSA87ToExecutionChangesPoolResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Data []*SignedMLDSA87ToExecutionChange `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
-}
-
-func (x *MLDSA87ToExecutionChangesPoolResponse) Reset() {
-	*x = MLDSA87ToExecutionChangesPoolResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_qrl_v1_beacon_chain_proto_msgTypes[15]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *MLDSA87ToExecutionChangesPoolResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*MLDSA87ToExecutionChangesPoolResponse) ProtoMessage() {}
-
-func (x *MLDSA87ToExecutionChangesPoolResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_qrl_v1_beacon_chain_proto_msgTypes[15]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use MLDSA87ToExecutionChangesPoolResponse.ProtoReflect.Descriptor instead.
-func (*MLDSA87ToExecutionChangesPoolResponse) Descriptor() ([]byte, []int) {
-	return file_proto_qrl_v1_beacon_chain_proto_rawDescGZIP(), []int{15}
-}
-
-func (x *MLDSA87ToExecutionChangesPoolResponse) GetData() []*SignedMLDSA87ToExecutionChange {
-	if x != nil {
-		return x.Data
-	}
-	return nil
-}
-
 type StateRootResponse_StateRoot struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1298,31 +1251,29 @@ func file_proto_qrl_v1_beacon_chain_proto_rawDescGZIP() []byte {
 var file_proto_qrl_v1_beacon_chain_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_qrl_v1_beacon_chain_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_proto_qrl_v1_beacon_chain_proto_goTypes = []interface{}{
-	(ForkChoiceNodeValidity)(0),                   // 0: theqrl.qrl.v1.ForkChoiceNodeValidity
-	(*StateRequest)(nil),                          // 1: theqrl.qrl.v1.StateRequest
-	(*StateRootResponse)(nil),                     // 2: theqrl.qrl.v1.StateRootResponse
-	(*BlockAttestationsResponse)(nil),             // 3: theqrl.qrl.v1.BlockAttestationsResponse
-	(*BlockRequest)(nil),                          // 4: theqrl.qrl.v1.BlockRequest
-	(*BlockSSZResponse)(nil),                      // 5: theqrl.qrl.v1.BlockSSZResponse
-	(*AttesterSlashingsPoolResponse)(nil),         // 6: theqrl.qrl.v1.AttesterSlashingsPoolResponse
-	(*ProposerSlashingPoolResponse)(nil),          // 7: theqrl.qrl.v1.ProposerSlashingPoolResponse
-	(*ForkScheduleResponse)(nil),                  // 8: theqrl.qrl.v1.ForkScheduleResponse
-	(*SpecResponse)(nil),                          // 9: theqrl.qrl.v1.SpecResponse
-	(*DepositContractResponse)(nil),               // 10: theqrl.qrl.v1.DepositContractResponse
-	(*DepositContract)(nil),                       // 11: theqrl.qrl.v1.DepositContract
-	(*WeakSubjectivityResponse)(nil),              // 12: theqrl.qrl.v1.WeakSubjectivityResponse
-	(*WeakSubjectivityData)(nil),                  // 13: theqrl.qrl.v1.WeakSubjectivityData
-	(*ForkChoiceDump)(nil),                        // 14: theqrl.qrl.v1.ForkChoiceDump
-	(*ForkChoiceNode)(nil),                        // 15: theqrl.qrl.v1.ForkChoiceNode
-	(*MLDSA87ToExecutionChangesPoolResponse)(nil), // 16: theqrl.qrl.v1.MLDSA87ToExecutionChangesPoolResponse
-	(*StateRootResponse_StateRoot)(nil),           // 17: theqrl.qrl.v1.StateRootResponse.StateRoot
-	nil,                                           // 18: theqrl.qrl.v1.SpecResponse.DataEntry
-	(*Attestation)(nil),                           // 19: theqrl.qrl.v1.Attestation
-	(*AttesterSlashing)(nil),                      // 20: theqrl.qrl.v1.AttesterSlashing
-	(*ProposerSlashing)(nil),                      // 21: theqrl.qrl.v1.ProposerSlashing
-	(*Fork)(nil),                                  // 22: theqrl.qrl.v1.Fork
-	(*Checkpoint)(nil),                            // 23: theqrl.qrl.v1.Checkpoint
-	(*SignedMLDSA87ToExecutionChange)(nil),        // 24: theqrl.qrl.v1.SignedMLDSA87ToExecutionChange
+	(ForkChoiceNodeValidity)(0),           // 0: theqrl.qrl.v1.ForkChoiceNodeValidity
+	(*StateRequest)(nil),                  // 1: theqrl.qrl.v1.StateRequest
+	(*StateRootResponse)(nil),             // 2: theqrl.qrl.v1.StateRootResponse
+	(*BlockAttestationsResponse)(nil),     // 3: theqrl.qrl.v1.BlockAttestationsResponse
+	(*BlockRequest)(nil),                  // 4: theqrl.qrl.v1.BlockRequest
+	(*BlockSSZResponse)(nil),              // 5: theqrl.qrl.v1.BlockSSZResponse
+	(*AttesterSlashingsPoolResponse)(nil), // 6: theqrl.qrl.v1.AttesterSlashingsPoolResponse
+	(*ProposerSlashingPoolResponse)(nil),  // 7: theqrl.qrl.v1.ProposerSlashingPoolResponse
+	(*ForkScheduleResponse)(nil),          // 8: theqrl.qrl.v1.ForkScheduleResponse
+	(*SpecResponse)(nil),                  // 9: theqrl.qrl.v1.SpecResponse
+	(*DepositContractResponse)(nil),       // 10: theqrl.qrl.v1.DepositContractResponse
+	(*DepositContract)(nil),               // 11: theqrl.qrl.v1.DepositContract
+	(*WeakSubjectivityResponse)(nil),      // 12: theqrl.qrl.v1.WeakSubjectivityResponse
+	(*WeakSubjectivityData)(nil),          // 13: theqrl.qrl.v1.WeakSubjectivityData
+	(*ForkChoiceDump)(nil),                // 14: theqrl.qrl.v1.ForkChoiceDump
+	(*ForkChoiceNode)(nil),                // 15: theqrl.qrl.v1.ForkChoiceNode
+	(*StateRootResponse_StateRoot)(nil),   // 17: theqrl.qrl.v1.StateRootResponse.StateRoot
+	nil,                                   // 18: theqrl.qrl.v1.SpecResponse.DataEntry
+	(*Attestation)(nil),                   // 19: theqrl.qrl.v1.Attestation
+	(*AttesterSlashing)(nil),              // 20: theqrl.qrl.v1.AttesterSlashing
+	(*ProposerSlashing)(nil),              // 21: theqrl.qrl.v1.ProposerSlashing
+	(*Fork)(nil),                          // 22: theqrl.qrl.v1.Fork
+	(*Checkpoint)(nil),                    // 23: theqrl.qrl.v1.Checkpoint
 }
 var file_proto_qrl_v1_beacon_chain_proto_depIdxs = []int32{
 	17, // 0: theqrl.qrl.v1.StateRootResponse.data:type_name -> theqrl.qrl.v1.StateRootResponse.StateRoot
@@ -1340,7 +1291,6 @@ var file_proto_qrl_v1_beacon_chain_proto_depIdxs = []int32{
 	23, // 12: theqrl.qrl.v1.ForkChoiceDump.unrealized_finalized_checkpoint:type_name -> theqrl.qrl.v1.Checkpoint
 	15, // 13: theqrl.qrl.v1.ForkChoiceDump.fork_choice_nodes:type_name -> theqrl.qrl.v1.ForkChoiceNode
 	0,  // 14: theqrl.qrl.v1.ForkChoiceNode.validity:type_name -> theqrl.qrl.v1.ForkChoiceNodeValidity
-	24, // 15: theqrl.qrl.v1.MLDSA87ToExecutionChangesPoolResponse.data:type_name -> theqrl.qrl.v1.SignedMLDSA87ToExecutionChange
 	16, // [16:16] is the sub-list for method output_type
 	16, // [16:16] is the sub-list for method input_type
 	16, // [16:16] is the sub-list for extension type_name
@@ -1356,7 +1306,6 @@ func file_proto_qrl_v1_beacon_chain_proto_init() {
 	file_proto_qrl_v1_attestation_proto_init()
 	file_proto_qrl_v1_beacon_block_proto_init()
 	file_proto_qrl_v1_beacon_state_proto_init()
-	file_proto_qrl_v1_withdrawals_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_proto_qrl_v1_beacon_chain_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StateRequest); i {
@@ -1528,18 +1477,6 @@ func file_proto_qrl_v1_beacon_chain_proto_init() {
 		}
 		file_proto_qrl_v1_beacon_chain_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ForkChoiceNode); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_qrl_v1_beacon_chain_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MLDSA87ToExecutionChangesPoolResponse); i {
 			case 0:
 				return &v.state
 			case 1:

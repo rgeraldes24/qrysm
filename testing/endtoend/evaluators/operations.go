@@ -17,8 +17,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/encoding/ssz/detect"
-	"github.com/theQRL/qrysm/proto/qrl/service"
-	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/endtoend/helpers"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
@@ -84,14 +82,6 @@ var ValidatorsHaveExited = e2etypes.Evaluator{
 	Name:       "voluntary_has_exited_%d",
 	Policy:     policies.OnEpoch(8),
 	Evaluation: validatorsHaveExited,
-}
-
-// SubmitWithdrawal sends a withdrawal from a previously exited validator.
-var SubmitWithdrawal = e2etypes.Evaluator{
-	Name: "submit_withdrawal_epoch_%d",
-	// Policy:     policies.BetweenEpochs(helpers.CapellaE2EForkEpoch-2, helpers.CapellaE2EForkEpoch+1),
-	Policy:     policies.BetweenEpochs(8, 11),
-	Evaluation: submitWithdrawal,
 }
 
 // ValidatorsHaveWithdrawn checks the beacon state for the withdrawn validator and ensures it has been withdrawn.
@@ -527,87 +517,6 @@ func validatorsVoteWithTheMajority(ec *e2etypes.EvaluationContext, conns ...*grp
 		}
 	}
 	return nil
-}
-
-func submitWithdrawal(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {
-	conn := conns[0]
-	beaconAPIClient := service.NewBeaconChainClient(conn)
-	beaconClient := qrysmpb.NewBeaconChainClient(conn)
-	debugClient := qrysmpb.NewDebugClient(conn)
-
-	ctx := context.Background()
-	chainHead, err := beaconClient.GetChainHead(ctx, &emptypb.Empty{})
-	if err != nil {
-		return errors.Wrap(err, "could not get chain head")
-	}
-	stObj, err := debugClient.GetBeaconState(ctx, &qrysmpb.BeaconStateRequest{QueryFilter: &qrysmpb.BeaconStateRequest_Slot{Slot: chainHead.HeadSlot}})
-	if err != nil {
-		return errors.Wrap(err, "could not get state object")
-	}
-	versionedMarshaler, err := detect.FromState(stObj.Encoded)
-	if err != nil {
-		return errors.Wrap(err, "could not get state marshaler")
-	}
-	st, err := versionedMarshaler.UnmarshalBeaconState(stObj.Encoded)
-	if err != nil {
-		return errors.Wrap(err, "could not get state")
-	}
-	exitedIndices := make([]primitives.ValidatorIndex, 0)
-
-	for key := range ec.ExitedVals {
-		valIdx, ok := st.ValidatorIndexByPubkey(key)
-		if !ok {
-			return errors.Errorf("pubkey %#x does not exist in our state", key)
-		}
-		exitedIndices = append(exitedIndices, valIdx)
-	}
-
-	_, privKeys, err := util.DeterministicDepositsAndKeys(params.BeaconConfig().MinGenesisActiveValidatorCount)
-	if err != nil {
-		return err
-	}
-	changes := make([]*qrlpb.SignedMLDSA87ToExecutionChange, 0)
-	// Only send half the number of changes each time, to allow us to test
-	// at the fork boundary.
-	wantedChanges := numOfExits / 2
-	for _, idx := range exitedIndices {
-		// Exit sending more change messages.
-		if len(changes) >= wantedChanges {
-			break
-		}
-		val, err := st.ValidatorAtIndex(idx)
-		if err != nil {
-			return err
-		}
-		if val.WithdrawalCredentials[0] == params.BeaconConfig().QRLAddressWithdrawalPrefixByte {
-			continue
-		}
-		if !bytes.Equal(val.PublicKey, privKeys[idx].PublicKey().Marshal()) {
-			return errors.Errorf("pubkey is not equal, wanted %#x but received %#x", val.PublicKey, privKeys[idx].PublicKey().Marshal())
-		}
-		message := &qrlpb.MLDSA87ToExecutionChange{
-			ValidatorIndex:     idx,
-			FromMldsa87Pubkey:  privKeys[idx].PublicKey().Marshal(),
-			ToExecutionAddress: bytesutil.ToBytes(uint64(idx), 20),
-		}
-		domain, err := signing.ComputeDomain(params.BeaconConfig().DomainMLDSA87ToExecutionChange, params.BeaconConfig().GenesisForkVersion, st.GenesisValidatorsRoot())
-		if err != nil {
-			return err
-		}
-		sigRoot, err := signing.ComputeSigningRoot(message, domain)
-		if err != nil {
-			return err
-		}
-		signature := privKeys[idx].Sign(sigRoot[:]).Marshal()
-		change := &qrlpb.SignedMLDSA87ToExecutionChange{
-			Message:   message,
-			Signature: signature,
-		}
-		changes = append(changes, change)
-	}
-	_, err = beaconAPIClient.SubmitSignedMLDSA87ToExecutionChanges(ctx, &qrlpb.SubmitMLDSA87ToExecutionChangesRequest{Changes: changes})
-
-	return err
 }
 
 func validatorsAreWithdrawn(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientConn) error {

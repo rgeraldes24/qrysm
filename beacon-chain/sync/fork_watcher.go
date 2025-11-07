@@ -1,10 +1,7 @@
 package sync
 
-import (
-	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/time/slots"
-)
-
+// TODO(rgeraldes24)
+/*
 // Is a background routine that observes for new incoming forks. Depending on the epoch
 // it will be in charge of subscribing/unsubscribing the relevant topics at the fork boundaries.
 func (s *Service) forkWatcher() {
@@ -16,22 +13,16 @@ func (s *Service) forkWatcher() {
 		// subscriptions for nodes running before a fork epoch.
 		case currSlot := <-slotTicker.C():
 			// NOTE(rgeraldes24): re-enable once we have more forks + need to subscribe/unsubscribe topics
-			/*
-				currEpoch := slots.ToEpoch(currSlot)
-				if err := s.registerForUpcomingFork(currEpoch); err != nil {
-					log.WithError(err).Error("Unable to check for fork in the next epoch")
-					continue
-				}
+			// currEpoch := slots.ToEpoch(currSlot)
+			// if err := s.registerForUpcomingFork(currEpoch); err != nil {
+			// 	log.WithError(err).Error("Unable to check for fork in the next epoch")
+			// 	continue
+			// }
 
-				if err := s.deregisterFromPastFork(currEpoch); err != nil {
-					log.WithError(err).Error("Unable to check for fork in the previous epoch")
-					continue
-				}
-			*/
-
-			// Broadcast ML-DSA-87 changes at the Capella fork boundary
-			s.broadcastMLDSA87Changes(currSlot)
-
+			// if err := s.deregisterFromPastFork(currEpoch); err != nil {
+			// 	log.WithError(err).Error("Unable to check for fork in the previous epoch")
+			// 	continue
+			// }
 		case <-s.ctx.Done():
 			log.Debug("Context closed, exiting goroutine")
 			slotTicker.Done()
@@ -39,6 +30,7 @@ func (s *Service) forkWatcher() {
 		}
 	}
 }
+*/
 
 // Checks if there is a fork in the next epoch and if there is
 // it registers the appropriate gossip and rpc topics.

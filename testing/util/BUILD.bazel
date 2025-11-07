@@ -62,7 +62,6 @@ go_test(
     srcs = [
         "attestation_test.go",
         "block_test.go",
-        "capella_block_test.go",
         "capella_state_test.go",
         "deposits_test.go",
         "helpers_test.go",

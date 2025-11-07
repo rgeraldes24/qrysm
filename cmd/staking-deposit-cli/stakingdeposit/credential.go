@@ -9,37 +9,21 @@ import (
 	"time"
 
 	"github.com/theQRL/go-zond/common"
-	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/consensus-types/primitives"
-	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
-	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
-	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
 
 type Credential struct {
-	signingKeyPath          string
-	withdrawalSeed          string
-	signingSeed             string
-	amount                  uint64
-	chainSetting            *config.ChainSetting
-	hexQRLWithdrawalAddress string
-}
-
-func (c *Credential) QRLWithdrawalAddress() (common.Address, error) {
-	if len(c.hexQRLWithdrawalAddress) == 0 {
-		return common.Address{}, nil
-	}
-	withdrawalAddress, err := common.NewAddressFromString(c.hexQRLWithdrawalAddress)
-	if err != nil {
-		return common.Address{}, err
-	}
-	return withdrawalAddress, nil
+	signingKeyPath    string
+	withdrawalSeed    string
+	signingSeed       string
+	amount            uint64
+	chainSetting      *config.ChainSetting
+	withdrawalAddress common.Address
 }
 
 func (c *Credential) WithdrawalPK() []byte {
@@ -52,14 +36,7 @@ func (c *Credential) WithdrawalPK() []byte {
 }
 
 func (c *Credential) WithdrawalPrefix() (uint8, error) {
-	withdrawalAddress, err := c.QRLWithdrawalAddress()
-	if err != nil {
-		return 0, err
-	}
-	if reflect.DeepEqual(withdrawalAddress, common.Address{}) {
-		return params.BeaconConfig().QRLAddressWithdrawalPrefixByte, nil
-	}
-	return params.BeaconConfig().MLDSA87WithdrawalPrefixByte, nil
+	return params.BeaconConfig().QRLAddressWithdrawalPrefixByte, nil
 }
 
 func (c *Credential) WithdrawalType() (byte, error) {
@@ -75,16 +52,11 @@ func (c *Credential) WithdrawalCredentials() ([32]byte, error) {
 	}
 
 	switch withdrawalType {
-	case params.BeaconConfig().MLDSA87WithdrawalPrefixByte:
-		withdrawalCredentials[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
-		h := hash.Hash(c.WithdrawalPK())
-		copy(withdrawalCredentials[1:], h[1:])
 	case params.BeaconConfig().QRLAddressWithdrawalPrefixByte:
-		QRLWithdrawalAddress, err := c.QRLWithdrawalAddress()
 		if err != nil {
 			return [32]byte{}, err
 		}
-		if reflect.DeepEqual(QRLWithdrawalAddress, common.Address{}) {
+		if reflect.DeepEqual(c.withdrawalAddress, common.Address{}) {
 			panic(fmt.Errorf("empty qrl withdrawal address"))
 		}
 		withdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
@@ -93,7 +65,7 @@ func (c *Credential) WithdrawalCredentials() ([32]byte, error) {
 			panic(fmt.Errorf("address length %d is more than remaining length in withdrawal credentials %d",
 				common.AddressLength, len(withdrawalCredentials)))
 		}
-		copy(withdrawalCredentials[len(withdrawalCredentials)-common.AddressLength:], QRLWithdrawalAddress.Bytes())
+		copy(withdrawalCredentials[len(withdrawalCredentials)-common.AddressLength:], c.withdrawalAddress.Bytes())
 	default:
 		panic(fmt.Errorf("invalid withdrawal type %d", withdrawalType))
 	}
@@ -123,64 +95,8 @@ func (c *Credential) VerifyKeystore(keystoreFileFolder, password string) bool {
 	return c.signingSeed == misc.EncodeHex(seedBytes[:])
 }
 
-func (c *Credential) GetMLDSA87ToExecutionChange(validatorIndex uint64) *qrlpb.SignedMLDSA87ToExecutionChange {
-	if len(c.hexQRLWithdrawalAddress) == 0 {
-		panic("the execution address should not be empty")
-	}
-
-	binWithdrawalSeed := misc.DecodeHex(c.withdrawalSeed)
-	d, err := ml_dsa_87.SecretKeyFromSeed(binWithdrawalSeed)
-	if err != nil {
-		panic(fmt.Errorf("failed to generate secret Key from withdrawal seed %v", err))
-	}
-
-	execAddr, err := c.QRLWithdrawalAddress()
-	if err != nil {
-		panic(fmt.Errorf("failed to read withdrawal address %v", err))
-	}
-
-	message := &qrlpb.MLDSA87ToExecutionChange{
-		ValidatorIndex:     primitives.ValidatorIndex(validatorIndex),
-		FromMldsa87Pubkey:  c.WithdrawalPK(),
-		ToExecutionAddress: execAddr.Bytes()}
-	root, err := message.HashTreeRoot()
-	if err != nil {
-		panic(fmt.Errorf("failed to generate hash tree root for message %v", err))
-	}
-
-	domain, err := signing.ComputeDomain(
-		params.BeaconConfig().DomainMLDSA87ToExecutionChange,
-		c.chainSetting.GenesisForkVersion,    /*forkVersion*/
-		c.chainSetting.GenesisValidatorsRoot, /*genesisValidatorsRoot*/
-	)
-	if err != nil {
-		panic(fmt.Errorf("failed to compute domain %v", err))
-	}
-
-	signingData := &qrysmpb.SigningData{
-		ObjectRoot: root[:],
-		Domain:     domain,
-	}
-
-	signingRoot, err := signingData.HashTreeRoot()
-	if err != nil {
-		panic(fmt.Errorf("failed to generate hash tree root for signingData %v", err))
-	}
-	signature := d.Sign(signingRoot[:])
-
-	return &qrlpb.SignedMLDSA87ToExecutionChange{
-		Message:   message,
-		Signature: signature.Marshal(),
-	}
-}
-
-func (c *Credential) GetMLDSA87ToExecutionChangeData(validatorIndex uint64) *MLDSA87ToExecutionChangeData {
-	signedMLDSA87ToExecutionChange := c.GetMLDSA87ToExecutionChange(validatorIndex)
-	return NewMLDSA87ToExecutionChangeData(signedMLDSA87ToExecutionChange, c.chainSetting)
-}
-
 func NewCredential(seed string, index, amount uint64,
-	chainSetting *config.ChainSetting, hexQRLWithdrawalAddress string) (*Credential, error) {
+	chainSetting *config.ChainSetting, withdrawalAddress common.Address) (*Credential, error) {
 	purpose := "12381" // TODO (cyyber): Purpose code to be decided later
 	coinType := "238"  // TODO (cyyber): coinType to be decided later
 	account := strconv.FormatUint(index, 10)
@@ -196,11 +112,11 @@ func NewCredential(seed string, index, amount uint64,
 		return nil, err
 	}
 	return &Credential{
-		signingKeyPath:          signingKeyPath,
-		withdrawalSeed:          withdrawalSeed,
-		signingSeed:             signingSeed,
-		amount:                  amount,
-		chainSetting:            chainSetting,
-		hexQRLWithdrawalAddress: hexQRLWithdrawalAddress,
+		signingKeyPath:    signingKeyPath,
+		withdrawalSeed:    withdrawalSeed,
+		signingSeed:       signingSeed,
+		amount:            amount,
+		chainSetting:      chainSetting,
+		withdrawalAddress: withdrawalAddress,
 	}, nil
 }

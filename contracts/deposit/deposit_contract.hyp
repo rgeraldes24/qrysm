@@ -23,6 +23,7 @@ interface IDepositContract {
         bytes index
     );
 
+    // TODO(rgeraldes24)
     /// @notice Submit a Phase 0 DepositData object.
     /// @param pubkey A Dilithium public key.
     /// @param withdrawal_credentials Commitment to a public key for withdrawals.

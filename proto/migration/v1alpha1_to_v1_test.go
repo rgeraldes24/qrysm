@@ -593,21 +593,3 @@ func TestBeaconStateCapellaToProto(t *testing.T) {
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("blocksummaryroot2"), 32), result.HistoricalSummaries[1].BlockSummaryRoot)
 	assert.DeepEqual(t, bytesutil.PadTo([]byte("statesummaryroot2"), 32), result.HistoricalSummaries[1].StateSummaryRoot)
 }
-
-func TestV1Alpha1SignedMLDSA87ToExecChangeToV1(t *testing.T) {
-	alphaChange := &qrysmpb.SignedMLDSA87ToExecutionChange{
-		Message: &qrysmpb.MLDSA87ToExecutionChange{
-			ValidatorIndex:     validatorIndex,
-			FromMldsa87Pubkey:  bytesutil.PadTo([]byte("frommldsa87pubkey"), 2592),
-			ToExecutionAddress: bytesutil.PadTo([]byte("toexecutionaddress"), 20),
-		},
-		Signature: signature,
-	}
-	change := V1Alpha1SignedMLDSA87ToExecChangeToV1(alphaChange)
-	require.NotNil(t, change)
-	require.NotNil(t, change.Message)
-	assert.DeepEqual(t, signature, change.Signature)
-	assert.Equal(t, validatorIndex, change.Message.ValidatorIndex)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("frommldsa87pubkey"), 2592), change.Message.FromMldsa87Pubkey)
-	assert.DeepEqual(t, bytesutil.PadTo([]byte("toexecutionaddress"), 20), change.Message.ToExecutionAddress)
-}

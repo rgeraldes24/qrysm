@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	goqrllib_misc "github.com/theQRL/go-qrllib/wallet/misc"
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"
@@ -22,7 +23,7 @@ var (
 		NumValidators       uint64
 		Folder              string
 		ChainName           string
-		ExecutionAddress    string
+		WithdrawalAddress   string
 		Mnemonic            string
 		LightKDF            bool
 	}{}
@@ -71,10 +72,11 @@ var Commands = []*cli.Command{
 				Value:       "testnet",
 			},
 			&cli.StringFlag{
-				Name:        "execution-address",
+				Name:        "withdrawal-address",
 				Usage:       "",
-				Destination: &newSeedFlags.ExecutionAddress,
+				Destination: &newSeedFlags.WithdrawalAddress,
 				Value:       "",
+				Required:    true,
 			},
 			&cli.StringFlag{
 				Name:        "mnemonic",
@@ -130,9 +132,15 @@ func cliActionNewSeed(cliCtx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	withdrawalAddr, err := common.NewAddressFromString(newSeedFlags.WithdrawalAddress)
+	if err != nil {
+		return err
+	}
+
 	stakingdeposit.GenerateKeys(newSeedFlags.ValidatorStartIndex,
 		newSeedFlags.NumValidators, misc.EncodeHex(seed[:]), newSeedFlags.Folder,
-		newSeedFlags.ChainName, keystorePassword, newSeedFlags.ExecutionAddress,
+		newSeedFlags.ChainName, keystorePassword, withdrawalAddr,
 		newSeedFlags.LightKDF)
 
 	return nil

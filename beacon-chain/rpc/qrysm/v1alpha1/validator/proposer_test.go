@@ -27,7 +27,6 @@ import (
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
@@ -65,7 +64,7 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 
 	params.SetupTestConfigCleanup(t)
-	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
+	beaconState, _ := util.DeterministicGenesisStateCapella(t, 64)
 
 	stateRoot, err := beaconState.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
@@ -140,28 +139,9 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 		ExecutionPayloadCapella: payload,
 	}
 
-	randaoReveal, err := util.RandaoReveal(beaconState, 0, privKeys)
-	require.NoError(t, err)
-
-	graffiti := bytesutil.ToBytes32([]byte("qrl"))
-	require.NoError(t, err)
-	req := &qrysmpb.BlockRequest{
-		Slot:         capellaSlot + 1,
-		RandaoReveal: randaoReveal,
-		Graffiti:     graffiti[:],
-	}
-
 	copiedState := beaconState.Copy()
 	copiedState, err = transition.ProcessSlots(ctx, copiedState, capellaSlot+1)
 	require.NoError(t, err)
-	change, err := util.GenerateMLDSA87ToExecutionChange(copiedState, privKeys[1], 0)
-	require.NoError(t, err)
-	proposerServer.MLDSA87ChangesPool.InsertMLDSA87ToExecChange(change)
-
-	got, err := proposerServer.GetBeaconBlock(ctx, req)
-	require.NoError(t, err)
-	require.Equal(t, 1, len(got.GetCapella().Body.Mldsa87ToExecutionChanges))
-	require.DeepEqual(t, change, got.GetCapella().Body.Mldsa87ToExecutionChanges[0])
 }
 
 func TestServer_GetBeaconBlock_Optimistic(t *testing.T) {
@@ -210,7 +190,6 @@ func getProposerServer(db db.HeadAccessDatabase, headState state.BeaconState, he
 		},
 		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 		BeaconDB:               db,
-		MLDSA87ChangesPool:     mldsa87toexec.NewPool(),
 		BlockBuilder:           &builderTest.MockBuilderService{HasConfigured: true},
 	}
 }

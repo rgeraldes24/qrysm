@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"testing"
 
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
@@ -22,12 +23,10 @@ func TestDepositInput_GeneratesPb(t *testing.T) {
 	k1, err := ml_dsa_87.SecretKeyFromSeed(seed[:])
 	require.NoError(t, err)
 
-	_, err = rand.Read(seed[:])
-	require.NoError(t, err)
-	k2, err := ml_dsa_87.SecretKeyFromSeed(seed[:])
+	withdrawalAddr, err := common.NewAddressFromString("Q1234567890123456789012345678901234567890")
 	require.NoError(t, err)
 
-	result, _, err := deposit.DepositInput(k1, k2, 0, nil)
+	result, _, err := deposit.DepositInput(k1, withdrawalAddr, 0, nil)
 	require.NoError(t, err)
 	assert.DeepEqual(t, k1.PublicKey().Marshal(), result.PublicKey)
 

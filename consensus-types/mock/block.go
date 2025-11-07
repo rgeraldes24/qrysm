@@ -231,10 +231,6 @@ func (BeaconBlockBody) Execution() (interfaces.ExecutionData, error) {
 	panic("implement me")
 }
 
-func (BeaconBlockBody) MLDSA87ToExecutionChanges() ([]*qrysmpb.SignedMLDSA87ToExecutionChange, error) {
-	panic("implement me")
-}
-
 func (b *BeaconBlock) SetStateRoot(root []byte) {
 	panic("implement me")
 }
@@ -276,10 +272,6 @@ func (b *BeaconBlockBody) SetSyncAggregate(*qrysmpb.SyncAggregate) error {
 }
 
 func (b *BeaconBlockBody) SetExecution(interfaces.ExecutionData) error {
-	panic("implement me")
-}
-
-func (b *BeaconBlockBody) SetMLDSA87ToExecutionChanges([]*qrysmpb.SignedMLDSA87ToExecutionChange) error {
 	panic("implement me")
 }
 

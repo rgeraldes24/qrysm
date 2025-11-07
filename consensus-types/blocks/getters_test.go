@@ -368,15 +368,6 @@ func Test_BeaconBlockBody_SyncAggregate(t *testing.T) {
 	assert.DeepEqual(t, result, sa)
 }
 
-func Test_BeaconBlockBody_MLDSA87ToExecutionChanges(t *testing.T) {
-	changes := []*qrysmpb.SignedMLDSA87ToExecutionChange{{Message: &qrysmpb.MLDSA87ToExecutionChange{ToExecutionAddress: []byte("address")}}}
-	bb := &SignedBeaconBlock{version: version.Capella, block: &BeaconBlock{body: &BeaconBlockBody{version: version.Capella}}}
-	require.NoError(t, bb.SetMLDSA87ToExecutionChanges(changes))
-	result, err := bb.Block().Body().MLDSA87ToExecutionChanges()
-	require.NoError(t, err)
-	assert.DeepSSZEqual(t, result, changes)
-}
-
 func Test_BeaconBlockBody_Execution(t *testing.T) {
 	executionCapella := &pb.ExecutionPayloadCapella{BlockNumber: 1}
 	eCapella, err := WrappedExecutionPayloadCapella(executionCapella, 0)

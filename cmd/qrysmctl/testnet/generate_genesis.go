@@ -292,8 +292,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 
 	gb := gen.ToBlock()
 
-	// TODO: expose the PregenesisCreds option with a cli flag - for now defaulting to no withdrawal credentials at genesis
-	genesisState, err := interop.NewPreminedGenesis(ctx, f.GenesisTime, nv, 0, v, gb, opts...)
+	genesisState, err := interop.NewPreminedGenesis(ctx, f.GenesisTime, nv, v, gb, opts...)
 	if err != nil {
 		return nil, err
 	}

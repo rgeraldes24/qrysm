@@ -1,13 +1,13 @@
 package stakingdeposit
 
 import (
-	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"os"
 	"reflect"
 
 	goqrllib_misc "github.com/theQRL/go-qrllib/wallet/misc"
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
@@ -18,7 +18,7 @@ import (
 )
 
 func GenerateKeys(validatorStartIndex, numValidators uint64,
-	seed, folder, chain, keystorePassword, executionAddress string, lightKDF bool) {
+	seed, folder, chain, keystorePassword string, withdrawalAddr common.Address, lightKDF bool) {
 	chainSettings, ok := config.GetConfig().ChainSettings[chain]
 	if !ok {
 		panic(fmt.Errorf("cannot find chain settings for %s", chain))
@@ -36,7 +36,7 @@ func GenerateKeys(validatorStartIndex, numValidators uint64,
 	}
 
 	fmt.Println("Generation keystores, this may take a while...")
-	credentials, err := NewCredentialsFromSeed(seed, numValidators, amounts, chainSettings, validatorStartIndex, executionAddress)
+	credentials, err := NewCredentialsFromSeed(seed, numValidators, amounts, chainSettings, validatorStartIndex, withdrawalAddr)
 	if err != nil {
 		panic(fmt.Errorf("new credentials from mnemonic failed. reason: %v", err))
 	}
@@ -111,19 +111,12 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 		if !reflect.DeepEqual(withdrawalCredentials[1:12], zeroBytes11) {
 			panic("withdrawal credentials zero bytes not found for index 1:12")
 		}
-		withdrawalAddr, err := credential.QRLWithdrawalAddress()
 		if err != nil {
 			panic(fmt.Errorf("failed to read withdrawal address | reason %v", err))
 		}
-		if !reflect.DeepEqual(withdrawalCredentials[12:], withdrawalAddr.Bytes()) {
+		if !reflect.DeepEqual(withdrawalCredentials[12:], credential.withdrawalAddress.Bytes()) {
 			panic(fmt.Errorf("withdrawalCredentials[12:] %x mismatch with credential.QRLWithdrawalAddress %x",
-				withdrawalCredentials[12:], withdrawalAddr.Bytes()))
-		}
-	} else if reflect.DeepEqual(withdrawalCredentials[0], params.BeaconConfig().MLDSA87WithdrawalPrefixByte) {
-		hashWithdrawalPK := sha256.Sum256(credential.WithdrawalPK())
-		if !reflect.DeepEqual(withdrawalCredentials[1:], hashWithdrawalPK[1:]) {
-			panic(fmt.Errorf("withdrawalCredentials[1:] %x mismatch with hashWithdrawalPK[1:] %x",
-				withdrawalCredentials[1:], hashWithdrawalPK[1:]))
+				withdrawalCredentials[12:], credential.withdrawalAddress.Bytes()))
 		}
 	} else {
 		panic(fmt.Errorf("invalid prefixbyte withdrawalCredentials[0] %x", withdrawalCredentials[0]))

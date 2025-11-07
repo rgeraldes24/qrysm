@@ -347,15 +347,6 @@ func TestCopyWithdrawal(t *testing.T) {
 	assert.NotEmpty(t, got, "Copied withdrawal has empty fields")
 }
 
-func TestCopyMLDSA87ToExecutionChanges(t *testing.T) {
-	changes := genMLDSA87ToExecutionChanges(10)
-
-	got := v1alpha1.CopyMLDSA87ToExecutionChanges(changes)
-	if !reflect.DeepEqual(got, changes) {
-		t.Errorf("TestCopyMLDSA87ToExecutionChanges() = %v, want %v", got, changes)
-	}
-}
-
 func TestCopyHistoricalSummaries(t *testing.T) {
 	summaries := []*v1alpha1.HistoricalSummary{
 		{BlockSummaryRoot: []byte("block summary root 0"), StateSummaryRoot: []byte("state summary root 0")},
@@ -551,17 +542,16 @@ func genSyncAggregate() *v1alpha1.SyncAggregate {
 
 func genBeaconBlockBodyCapella() *v1alpha1.BeaconBlockBodyCapella {
 	return &v1alpha1.BeaconBlockBodyCapella{
-		RandaoReveal:              bytes(4627),
-		ExecutionData:             genExecutionData(),
-		Graffiti:                  bytes(32),
-		ProposerSlashings:         genProposerSlashings(5),
-		AttesterSlashings:         genAttesterSlashings(5),
-		Attestations:              genAttestations(10),
-		Deposits:                  genDeposits(5),
-		VoluntaryExits:            genSignedVoluntaryExits(12),
-		SyncAggregate:             genSyncAggregate(),
-		ExecutionPayload:          genPayloadCapella(),
-		Mldsa87ToExecutionChanges: genMLDSA87ToExecutionChanges(10),
+		RandaoReveal:      bytes(4627),
+		ExecutionData:     genExecutionData(),
+		Graffiti:          bytes(32),
+		ProposerSlashings: genProposerSlashings(5),
+		AttesterSlashings: genAttesterSlashings(5),
+		Attestations:      genAttestations(10),
+		Deposits:          genDeposits(5),
+		VoluntaryExits:    genSignedVoluntaryExits(12),
+		SyncAggregate:     genSyncAggregate(),
+		ExecutionPayload:  genPayloadCapella(),
 	}
 }
 
@@ -584,17 +574,16 @@ func genSignedBeaconBlockCapella() *v1alpha1.SignedBeaconBlockCapella {
 
 func genBlindedBeaconBlockBodyCapella() *v1alpha1.BlindedBeaconBlockBodyCapella {
 	return &v1alpha1.BlindedBeaconBlockBodyCapella{
-		RandaoReveal:              bytes(4627),
-		ExecutionData:             genExecutionData(),
-		Graffiti:                  bytes(32),
-		ProposerSlashings:         genProposerSlashings(5),
-		AttesterSlashings:         genAttesterSlashings(5),
-		Attestations:              genAttestations(10),
-		Deposits:                  genDeposits(5),
-		VoluntaryExits:            genSignedVoluntaryExits(12),
-		SyncAggregate:             genSyncAggregate(),
-		ExecutionPayloadHeader:    genPayloadHeaderCapella(),
-		Mldsa87ToExecutionChanges: genMLDSA87ToExecutionChanges(10),
+		RandaoReveal:           bytes(4627),
+		ExecutionData:          genExecutionData(),
+		Graffiti:               bytes(32),
+		ProposerSlashings:      genProposerSlashings(5),
+		AttesterSlashings:      genAttesterSlashings(5),
+		Attestations:           genAttestations(10),
+		Deposits:               genDeposits(5),
+		VoluntaryExits:         genSignedVoluntaryExits(12),
+		SyncAggregate:          genSyncAggregate(),
+		ExecutionPayloadHeader: genPayloadHeaderCapella(),
 	}
 }
 
@@ -691,24 +680,5 @@ func genWithdrawal() *enginev1.Withdrawal {
 		ValidatorIndex: 654321,
 		Address:        bytes(20),
 		Amount:         55555,
-	}
-}
-
-func genMLDSA87ToExecutionChanges(num int) []*v1alpha1.SignedMLDSA87ToExecutionChange {
-	changes := make([]*v1alpha1.SignedMLDSA87ToExecutionChange, num)
-	for i := 0; i < num; i++ {
-		changes[i] = genMLDSA87ToExecutionChange()
-	}
-	return changes
-}
-
-func genMLDSA87ToExecutionChange() *v1alpha1.SignedMLDSA87ToExecutionChange {
-	return &v1alpha1.SignedMLDSA87ToExecutionChange{
-		Message: &v1alpha1.MLDSA87ToExecutionChange{
-			ValidatorIndex:     123456,
-			FromMldsa87Pubkey:  bytes(2592),
-			ToExecutionAddress: bytes(20),
-		},
-		Signature: bytes(4627),
 	}
 }

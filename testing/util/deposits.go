@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
@@ -165,7 +166,8 @@ func signedDeposit(
 	balance uint64,
 ) (*qrysmpb.Deposit, error) {
 	withdrawalCreds := hash.Hash(withdrawalKey)
-	withdrawalCreds[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
+	// TODO(rgeraldes24)
+	// withdrawalCreds[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             publicKey,
 		Amount:                balance,
@@ -283,7 +285,7 @@ func resetCache() {
 // DeterministicDepositsAndKeysSameValidator returns the entered amount of deposits and secret keys
 // of the same validator. This is for negative test cases such as same deposits from same validators in a block don't
 // result in duplicated validator indices.
-func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_dsa_87.MLDSA87Key, error) {
+func DeterministicDepositsAndKeysSameValidator(numDeposits uint64, withdrawalAddr common.Address) ([]*qrysmpb.Deposit, []ml_dsa_87.MLDSA87Key, error) {
 	resetCache()
 	lock.Lock()
 	defer lock.Unlock()
@@ -311,7 +313,8 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*qrysmpb.D
 		// Create the new deposits and add them to the trie. Always use the first validator to create deposit
 		for i := uint64(0); i < numRequired; i++ {
 			withdrawalCreds := hash.Hash(publicKeys[1].Marshal())
-			withdrawalCreds[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
+			// TODO(rgeraldes24)
+			// withdrawalCreds[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
 
 			depositMessage := &qrysmpb.DepositMessage{
 				PublicKey:             publicKeys[1].Marshal(),

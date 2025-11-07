@@ -71,8 +71,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EffectiveBalanceIncrement: 1 * 1e9,
 
 	// Initial value constants.
-	MLDSA87WithdrawalPrefixByte:    byte(0), // TODO (cyyber): Change it to 1 & check if we should add XMSSWithdrawalPrefixByte
-	QRLAddressWithdrawalPrefixByte: byte(1), // TODO (cyyber): Change it to 0
+	QRLAddressWithdrawalPrefixByte: byte(0),
 	ZeroHash:                       [32]byte{},
 
 	// Time parameter constants.
@@ -131,7 +130,6 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	MaxDeposits:                      16,
 	MaxVoluntaryExits:                16,
 	MaxWithdrawalsPerPayload:         16,
-	MaxMLDSA87ToExecutionChanges:     16,
 	MaxValidatorsPerWithdrawalsSweep: 16384,
 
 	// ML-DSA-87 domain values.
@@ -147,7 +145,6 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	DomainContributionAndProof:        bytesutil.Uint32ToBytes4(0x09000000),
 	DomainApplicationMask:             bytesutil.Uint32ToBytes4(0x00000001),
 	DomainApplicationBuilder:          bytesutil.Uint32ToBytes4(0x00000001),
-	DomainMLDSA87ToExecutionChange:    bytesutil.Uint32ToBytes4(0x0A000000),
 
 	// Qrysm constants.
 	ShorPerQuanta:                1000000000,
