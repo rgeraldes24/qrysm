@@ -1,6 +1,6 @@
 package sync
 
-// TODO(rgeraldes24)
+// NOTE(rgeraldes24): unused for now
 /*
 // Is a background routine that observes for new incoming forks. Depending on the epoch
 // it will be in charge of subscribing/unsubscribing the relevant topics at the fork boundaries.
@@ -12,7 +12,6 @@ func (s *Service) forkWatcher() {
 		// topics during/after the fork epoch. This routine is to ensure correct
 		// subscriptions for nodes running before a fork epoch.
 		case currSlot := <-slotTicker.C():
-			// NOTE(rgeraldes24): re-enable once we have more forks + need to subscribe/unsubscribe topics
 			// currEpoch := slots.ToEpoch(currSlot)
 			// if err := s.registerForUpcomingFork(currEpoch); err != nil {
 			// 	log.WithError(err).Error("Unable to check for fork in the next epoch")
@@ -30,11 +29,9 @@ func (s *Service) forkWatcher() {
 		}
 	}
 }
-*/
 
 // Checks if there is a fork in the next epoch and if there is
 // it registers the appropriate gossip and rpc topics.
-/*
 func (s *Service) registerForUpcomingFork(currEpoch primitives.Epoch) error {
 	genRoot := s.cfg.clock.GenesisValidatorsRoot()
 	isNextForkEpoch, err := forks.IsForkNextEpoch(s.cfg.clock.GenesisTime(), genRoot[:])
@@ -60,9 +57,7 @@ func (s *Service) registerForUpcomingFork(currEpoch primitives.Epoch) error {
 	}
 	return nil
 }
-*/
 
-/*
 // Checks if there was a fork in the previous epoch, and if there
 // was then we deregister the topics from that particular fork.
 func (s *Service) deregisterFromPastFork(currEpoch primitives.Epoch) error {

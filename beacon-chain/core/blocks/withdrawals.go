@@ -14,7 +14,6 @@ import (
 	"github.com/theQRL/qrysm/encoding/ssz"
 )
 
-// TODO(rgeraldes24)
 // ProcessWithdrawals processes the validator withdrawals from the provided execution payload
 // into the beacon state.
 //
