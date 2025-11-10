@@ -8,7 +8,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/proto/gateway"
 	"github.com/theQRL/go-bitfield"
-	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/async/event"
 	mockChain "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
@@ -237,14 +236,7 @@ func TestStreamEvents_StateEvents(t *testing.T) {
 	t.Run(PayloadAttributesTopic+"_capella", func(t *testing.T) {
 		ctx := context.Background()
 		beaconState, _ := util.DeterministicGenesisStateCapella(t, 1)
-		validator, err := beaconState.ValidatorAtIndex(0)
-		require.NoError(t, err, "Could not get validator")
-		by, err := hexutil.Decode("0x010000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b")
-		require.NoError(t, err)
-		validator.WithdrawalCredentials = by
-		err = beaconState.UpdateValidatorAtIndex(0, validator)
-		require.NoError(t, err)
-		err = beaconState.SetSlot(2)
+		err := beaconState.SetSlot(2)
 		require.NoError(t, err, "Count not set slot")
 		err = beaconState.SetNextWithdrawalValidatorIndex(0)
 		require.NoError(t, err, "Could not set withdrawal index")

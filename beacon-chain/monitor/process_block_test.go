@@ -150,12 +150,12 @@ func TestProcessProposedBlock(t *testing.T) {
 			name: "Block proposed by tracked validator",
 			block: &qrysmpb.BeaconBlockCapella{
 				Slot:          6,
-				ProposerIndex: 74,
+				ProposerIndex: 135,
 				ParentRoot:    bytesutil.PadTo([]byte("hello-world"), 32),
 				StateRoot:     bytesutil.PadTo([]byte("state-world"), 32),
 				Body:          &qrysmpb.BeaconBlockBodyCapella{},
 			},
-			wantedErr: "\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=0x68656c6c6f2d NewBalance=40000000000000 ParentRoot=0x68656c6c6f2d ProposerIndex=74 Slot=6 Version=0 prefix=monitor",
+			wantedErr: "\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=0x68656c6c6f2d NewBalance=40000000000000 ParentRoot=0x68656c6c6f2d ProposerIndex=135 Slot=6 Version=0 prefix=monitor",
 		},
 		{
 			name: "Block proposed by untracked validator",
@@ -215,13 +215,13 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	}
 
 	trackedVals := map[primitives.ValidatorIndex]bool{
-		146: true,
-		1:   true,
-		2:   true,
+		51: true,
+		1:  true,
+		2:  true,
 	}
 
 	latestPerformance := map[primitives.ValidatorIndex]ValidatorLatestPerformance{
-		146: {
+		51: {
 			balance: 39999900000000,
 		},
 		1: {
@@ -274,7 +274,7 @@ func TestProcessBlock_AllEventsTrackedVals(t *testing.T) {
 	root, err := b.GetBlock().HashTreeRoot()
 	require.NoError(t, err)
 	require.NoError(t, svc.config.StateGen.SaveState(ctx, root, genesis))
-	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=0xc0e642f3d027 ProposerIndex=146 Slot=1 Version=0 prefix=monitor", bytesutil.Trunc(root[:]))
+	wanted1 := fmt.Sprintf("\"Proposed beacon block was included\" BalanceChange=100000000 BlockRoot=%#x NewBalance=40000000000000 ParentRoot=0x8239e1756cab ProposerIndex=51 Slot=1 Version=0 prefix=monitor", bytesutil.Trunc(root[:]))
 	wanted2 := fmt.Sprintf("\"Proposer slashing was included\" BodyRoot1=0x000100000000 BodyRoot2=0x000200000000 ProposerIndex=%d SlashingSlot=0 Slot=1 prefix=monitor", idx)
 	wanted3 := "\"Sync committee contribution included\" BalanceChange=0 ContribCount=3 ExpectedContribCount=3 NewBalance=40000000000000 ValidatorIndex=1 prefix=monitor"
 	wanted4 := "\"Sync committee contribution included\" BalanceChange=0 ContribCount=1 ExpectedContribCount=1 NewBalance=40000000000000 ValidatorIndex=2 prefix=monitor"

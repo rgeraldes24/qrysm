@@ -140,7 +140,7 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	}
 
 	copiedState := beaconState.Copy()
-	copiedState, err = transition.ProcessSlots(ctx, copiedState, capellaSlot+1)
+	_, err = transition.ProcessSlots(ctx, copiedState, capellaSlot+1)
 	require.NoError(t, err)
 }
 
@@ -295,7 +295,7 @@ func TestProposer_ComputeStateRoot_OK(t *testing.T) {
 		StateGen:              stategen.New(db, doublylinkedtree.New()),
 	}
 	req := util.NewBeaconBlockCapella()
-	req.Block.ProposerIndex = 71
+	req.Block.ProposerIndex = 35
 	req.Block.ParentRoot = parentRoot[:]
 	req.Block.Slot = 1
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))

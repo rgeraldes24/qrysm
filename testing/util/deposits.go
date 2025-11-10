@@ -56,7 +56,7 @@ func DeterministicDepositsAndKeys(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_
 		// Create the new deposits and add them to the trie.
 		for i := uint64(0); i < numRequired; i++ {
 			balance := params.BeaconConfig().MaxEffectiveBalance
-			deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), publicKeys[i+1].Marshal(), balance)
+			deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), balance)
 			if err != nil {
 				return nil, nil, errors.Wrap(err, "could not create signed deposit")
 			}
@@ -128,7 +128,7 @@ func DepositsWithBalance(balances []uint64) ([]*qrysmpb.Deposit, *trie.SparseMer
 		if len(balances) == int(numDeposits) {
 			balance = balances[i]
 		}
-		deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), publicKeys[i+1].Marshal(), balance)
+		deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), balance)
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "could not create signed deposit")
 		}
@@ -162,8 +162,7 @@ func DepositsWithBalance(balances []uint64) ([]*qrysmpb.Deposit, *trie.SparseMer
 
 func signedDeposit(
 	secretKey ml_dsa_87.MLDSA87Key,
-	publicKey,
-	withdrawalKey []byte,
+	publicKey []byte,
 	balance uint64,
 ) (*qrysmpb.Deposit, error) {
 	withdrawalCreds := make([]byte, 12)
@@ -173,10 +172,11 @@ func signedDeposit(
 	if err != nil {
 		return nil, err
 	}
+	withdrawalCreds = append(withdrawalCreds, withdrawalAddr[:]...)
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             publicKey,
 		Amount:                balance,
-		WithdrawalCredentials: append(withdrawalCreds, withdrawalAddr[:]...),
+		WithdrawalCredentials: withdrawalCreds,
 	}
 
 	domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)
@@ -195,7 +195,7 @@ func signedDeposit(
 	depositData := &qrysmpb.Deposit_Data{
 		PublicKey:             publicKey,
 		Amount:                balance,
-		WithdrawalCredentials: withdrawalCreds[:],
+		WithdrawalCredentials: withdrawalCreds,
 		Signature:             secretKey.Sign(sigRoot[:]).Marshal(),
 	}
 

@@ -94,7 +94,12 @@ func GenerateFullBlockCapella(
 	for i := uint64(0); i < numToGen; i++ {
 		newTransactions[i] = bytesutil.Uint64ToBytesLittleEndian(i)
 	}
-	newWithdrawals := make([]*v1.Withdrawal, 0)
+
+	newWithdrawals, err := bState.ExpectedWithdrawals()
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed generating %d withdrawals:", numToGen)
+	}
+	fmt.Printf("New withdrawals: %d \n", len(newWithdrawals))
 
 	random, err := helpers.RandaoMix(bState, time.CurrentEpoch(bState))
 	if err != nil {
