@@ -91,12 +91,9 @@ var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 		// Determine the withdrawal epoch by using the max seed lookahead. This value
 		// differs for our minimal and mainnet config which is why we calculate it
 		// each time the policy is executed.
-		validWithdrawnEpoch := exitSubmissionEpoch + 1 + params.BeaconConfig().MaxSeedLookahead
-		// Only run this for minimal setups after capella
-		if params.BeaconConfig().ConfigName == params.EndToEndName {
-			// validWithdrawnEpoch = helpers.CapellaE2EForkEpoch + 1
-			validWithdrawnEpoch = 11
-		}
+		// NOTE(rgeraldes24): minimal scenario needs to run for at least 26 epochs to run this evaluator.
+		withdrawableEpoch := corehelpers.ActivationExitEpoch(exitSubmissionEpoch) + params.BeaconConfig().MinValidatorWithdrawabilityDelay
+		validWithdrawnEpoch := withdrawableEpoch + primitives.Epoch(params.BeaconConfig().MinGenesisActiveValidatorCount)/primitives.Epoch(params.BeaconConfig().MaxWithdrawalsPerPayload)
 		requiredPolicy := policies.OnEpoch(validWithdrawnEpoch)
 		return requiredPolicy(currentEpoch)
 	},
@@ -551,6 +548,7 @@ func validatorsAreWithdrawn(ec *e2etypes.EvaluationContext, conns ...*grpc.Clien
 		if err != nil {
 			return err
 		}
+
 		// Only return an error if the validator has more than 1 quanta
 		// in its balance.
 		if bal > 1*params.BeaconConfig().ShorPerQuanta {

@@ -48,10 +48,6 @@ func ProcessWithdrawals(st state.BeaconState, executionData interfaces.Execution
 	if err != nil {
 		return nil, errors.Wrap(err, "could not get expected withdrawals")
 	}
-	fmt.Println(len(expectedWithdrawals))
-	if len(expectedWithdrawals) > 0 {
-		fmt.Println(expectedWithdrawals)
-	}
 
 	var wdRoot [32]byte
 	if executionData.IsBlinded() {
@@ -65,7 +61,6 @@ func ProcessWithdrawals(st state.BeaconState, executionData interfaces.Execution
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get withdrawals")
 		}
-		fmt.Println(len(wds))
 		wdRoot, err = ssz.WithdrawalSliceRoot(wds, fieldparams.MaxWithdrawalsPerPayload)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get withdrawals root")
