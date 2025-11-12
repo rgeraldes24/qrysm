@@ -168,10 +168,10 @@ func signedDeposit(
 ) (*qrysmpb.Deposit, error) {
 	descriptor := walletmldsa87.NewMLDSA87Descriptor().ToDescriptor()
 	withdrawalAddr, err := pqcrypto.PublicKeyAndDescriptorToAddress(publicKey, descriptor)
-	withdrawalCreds := deposit.WithdrawalCredentialsAddress(withdrawalAddr)
 	if err != nil {
 		return nil, err
 	}
+	withdrawalCreds := deposit.WithdrawalCredentialsAddress(withdrawalAddr)
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             publicKey,
 		Amount:                balance,

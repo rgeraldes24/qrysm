@@ -546,7 +546,6 @@ func validatorsAreWithdrawn(ec *e2etypes.EvaluationContext, conns ...*grpc.Clien
 		if err != nil {
 			return err
 		}
-
 		// Only return an error if the validator has more than 1 quanta
 		// in its balance.
 		if bal > 1*params.BeaconConfig().ShorPerQuanta {
