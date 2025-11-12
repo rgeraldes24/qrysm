@@ -16,7 +16,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/container/slice"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	"github.com/theQRL/qrysm/encoding/ssz/equality"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/runtime/version"
 	"github.com/theQRL/qrysm/time/slots"
@@ -266,7 +265,6 @@ func (s *Store) SaveBlock(ctx context.Context, signed interfaces.ReadOnlySignedB
 	if err != nil {
 		return err
 	}
-	log.Debugln(blockRoot)
 	if v, ok := s.blockCache.Get(string(blockRoot[:])); v != nil && ok {
 		return nil
 	}
@@ -304,26 +302,10 @@ func (s *Store) SaveBlocks(ctx context.Context, blks []interfaces.ReadOnlySigned
 		if err != nil {
 			return err
 		}
-		log.Debugln("Marshal")
-		log.Debugln(blockRoot)
 		enc, err := s.marshalBlock(ctx, blk)
 		if err != nil {
 			return err
 		}
-		log.Debugln("Unmarshal")
-		blk2, err := unmarshalBlock(ctx, enc)
-		if err != nil {
-			return err
-		}
-		blockRoot2, err := blk2.Block().HashTreeRoot()
-		if err != nil {
-			return err
-		}
-		log.Debugln(blockRoot2)
-		log.Debugln(equality.DeepEqual(blk, blk2))
-		log.Debugln(blk.Proto())
-		log.Debugln(blk2.Proto())
-
 		blockRoots[i] = blockRoot[:]
 		encodedBlocks[i] = enc
 		indicesByBucket := createBlockIndicesFromBlock(ctx, blk.Block())
