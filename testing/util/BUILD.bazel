@@ -37,6 +37,7 @@ go_library(
         "//consensus-types/interfaces:go_default_library",
         "//consensus-types/primitives:go_default_library",
         "//container/trie:go_default_library",
+        "//contracts/deposit:go_default_library",
         "//crypto/hash:go_default_library",
         "//crypto/ml_dsa_87:go_default_library",
         "//crypto/rand:go_default_library",
