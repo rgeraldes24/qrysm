@@ -91,7 +91,7 @@ var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 		// Determine the withdrawal epoch by using the max seed lookahead. This value
 		// differs for our minimal and mainnet config which is why we calculate it
 		// each time the policy is executed.
-		// NOTE(rgeraldes24): minimal scenario needs to run for at least 26 epochs to run this evaluator.
+		// NOTE(rgeraldes24): minimal scenario needs to run for at least 11 epochs to run this evaluator.
 		withdrawableEpoch := corehelpers.ActivationExitEpoch(exitSubmissionEpoch) + params.BeaconConfig().MinValidatorWithdrawabilityDelay
 		validWithdrawnEpoch := withdrawableEpoch + primitives.Epoch(params.BeaconConfig().MinGenesisActiveValidatorCount)/primitives.Epoch(params.BeaconConfig().MaxWithdrawalsPerPayload)
 		requiredPolicy := policies.OnEpoch(validWithdrawnEpoch)
@@ -355,7 +355,7 @@ func proposeVoluntaryExit(ec *e2etypes.EvaluationContext, conns ...*grpc.ClientC
 	}
 	execIndices := []int{}
 	err = st.ReadFromEveryValidator(func(idx int, val state.ReadOnlyValidator) error {
-		if val.WithdrawalCredentials()[0] == params.BeaconConfig().QRLAddressWithdrawalPrefixByte {
+		if val.WithdrawalCredentials()[0] == params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte {
 			execIndices = append(execIndices, idx)
 		}
 		return nil

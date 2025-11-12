@@ -71,8 +71,8 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	EffectiveBalanceIncrement: 1 * 1e9,
 
 	// Initial value constants.
-	QRLAddressWithdrawalPrefixByte: byte(0),
-	ZeroHash:                       [32]byte{},
+	ExecutionAddressWithdrawalPrefixByte: byte(0),
+	ZeroHash:                             [32]byte{},
 
 	// Time parameter constants.
 	MinAttestationInclusionDelay:     1,

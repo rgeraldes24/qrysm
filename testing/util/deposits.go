@@ -166,7 +166,7 @@ func signedDeposit(
 	balance uint64,
 ) (*qrysmpb.Deposit, error) {
 	withdrawalCreds := make([]byte, 12)
-	withdrawalCreds[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+	withdrawalCreds[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 	descriptor := walletmldsa87.NewMLDSA87Descriptor().ToDescriptor()
 	withdrawalAddr, err := pqcrypto.PublicKeyAndDescriptorToAddress(publicKey, descriptor)
 	if err != nil {
@@ -318,7 +318,7 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64, withdrawalAdd
 		// Create the new deposits and add them to the trie. Always use the first validator to create deposit
 		for i := range numRequired {
 			newCredentials := make([]byte, 12)
-			newCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+			newCredentials[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 			depositMessage := &qrysmpb.DepositMessage{
 				PublicKey:             publicKeys[1].Marshal(),
 				Amount:                params.BeaconConfig().MaxEffectiveBalance,

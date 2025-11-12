@@ -88,7 +88,7 @@ func hasExecutionWithdrawalCredential(val *qrysmpb.Validator) bool {
 		return false
 	}
 	cred := val.WithdrawalCredentials
-	return len(cred) > 0 && cred[0] == params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+	return len(cred) > 0 && cred[0] == params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 }
 
 // isFullyWithdrawableValidator returns whether the validator is able to perform a full

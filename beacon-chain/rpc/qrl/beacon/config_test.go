@@ -47,7 +47,7 @@ func TestGetSpec(t *testing.T) {
 	config.EjectionBalance = 22
 	config.EffectiveBalanceIncrement = 23
 	config.GenesisForkVersion = []byte("GenesisForkVersion")
-	config.QRLAddressWithdrawalPrefixByte = byte('c')
+	config.ExecutionAddressWithdrawalPrefixByte = byte('c')
 	config.GenesisDelay = 24
 	config.SecondsPerSlot = 25
 	config.MinAttestationInclusionDelay = 26

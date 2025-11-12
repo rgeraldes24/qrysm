@@ -107,7 +107,7 @@ func validateDeposit(depositData *DepositData, credential *Credential) bool {
 	}
 
 	zeroBytes11 := make([]uint8, 11)
-	if reflect.DeepEqual(withdrawalCredentials[0], params.BeaconConfig().QRLAddressWithdrawalPrefixByte) {
+	if reflect.DeepEqual(withdrawalCredentials[0], params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte) {
 		if !reflect.DeepEqual(withdrawalCredentials[1:12], zeroBytes11) {
 			panic("withdrawal credentials zero bytes not found for index 1:12")
 		}

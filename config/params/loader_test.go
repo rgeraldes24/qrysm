@@ -99,7 +99,7 @@ func assertEqualConfigs(t *testing.T, name string, fields []string, expected, ac
 
 	// Initial values.
 	assert.DeepEqual(t, expected.GenesisForkVersion, actual.GenesisForkVersion, "%s: GenesisForkVersion", name)
-	assert.DeepEqual(t, expected.QRLAddressWithdrawalPrefixByte, actual.QRLAddressWithdrawalPrefixByte, "%s: QRLAddressWithdrawalPrefixByte", name)
+	assert.DeepEqual(t, expected.ExecutionAddressWithdrawalPrefixByte, actual.ExecutionAddressWithdrawalPrefixByte, "%s: ExecutionAddressWithdrawalPrefixByte", name)
 
 	// Time parameters.
 	assert.Equal(t, expected.GenesisDelay, actual.GenesisDelay, "%s: GenesisDelay", name)

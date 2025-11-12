@@ -45,8 +45,8 @@ type BeaconChainConfig struct {
 	EffectiveBalanceIncrement uint64 `yaml:"EFFECTIVE_BALANCE_INCREMENT" spec:"true"` // EffectiveBalanceIncrement is used for converting the high balance into the low balance for validators.
 
 	// Initial value constants.
-	QRLAddressWithdrawalPrefixByte byte     `yaml:"QRL_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // QRLAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
-	ZeroHash                       [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
+	ExecutionAddressWithdrawalPrefixByte byte     `yaml:"QRL_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // ExecutionAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
+	ZeroHash                             [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
 
 	// Time parameters constants.
 	GenesisDelay                         uint64           `yaml:"GENESIS_DELAY" spec:"true"`                   // GenesisDelay is the minimum number of seconds to delay starting the Ethereum Beacon Chain genesis. Must be at least 1 second.

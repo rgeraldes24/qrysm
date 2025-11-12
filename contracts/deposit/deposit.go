@@ -28,7 +28,7 @@ import (
 // See: https://github.com/ethereum/consensus-specs/blob/master/specs/validator/0_beacon-chain-validator.md#submit-deposit
 func DepositInput(depositKey ml_dsa_87.MLDSA87Key, withdrawalAddr common.Address, amountInShor uint64, forkVersion []byte) (*qrysmpb.Deposit_Data, [32]byte, error) {
 	newCredentials := make([]byte, 12)
-	newCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+	newCredentials[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             depositKey.PublicKey().Marshal(),
 		WithdrawalCredentials: append(newCredentials, withdrawalAddr[:]...),

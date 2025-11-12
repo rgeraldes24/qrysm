@@ -390,10 +390,10 @@ func TestProcessBlindWithdrawals(t *testing.T) {
 				validators[idx].WithdrawableEpoch = epochInPast
 			}
 			st.Balances[idx] = withdrawalAmount(idx)
-			validators[idx].WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+			validators[idx].WithdrawalCredentials[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 		}
 		for _, idx := range arguments.PartialWithdrawalIndices {
-			validators[idx].WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+			validators[idx].WithdrawalCredentials[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 			st.Balances[idx] = withdrawalAmount(idx)
 		}
 		st.Validators = validators
@@ -810,10 +810,10 @@ func TestProcessWithdrawals(t *testing.T) {
 				validators[idx].WithdrawableEpoch = epochInPast
 			}
 			st.Balances[idx] = withdrawalAmount(idx)
-			validators[idx].WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+			validators[idx].WithdrawalCredentials[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 		}
 		for _, idx := range arguments.PartialWithdrawalIndices {
-			validators[idx].WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+			validators[idx].WithdrawalCredentials[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 			st.Balances[idx] = withdrawalAmount(idx)
 		}
 		st.Validators = validators

@@ -36,7 +36,7 @@ func (c *Credential) WithdrawalPK() []byte {
 }
 
 func (c *Credential) WithdrawalPrefix() (uint8, error) {
-	return params.BeaconConfig().QRLAddressWithdrawalPrefixByte, nil
+	return params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte, nil
 }
 
 func (c *Credential) WithdrawalType() (byte, error) {
@@ -52,14 +52,14 @@ func (c *Credential) WithdrawalCredentials() ([32]byte, error) {
 	}
 
 	switch withdrawalType {
-	case params.BeaconConfig().QRLAddressWithdrawalPrefixByte:
+	case params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte:
 		if err != nil {
 			return [32]byte{}, err
 		}
 		if reflect.DeepEqual(c.withdrawalAddress, common.Address{}) {
 			panic(fmt.Errorf("empty qrl withdrawal address"))
 		}
-		withdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+		withdrawalCredentials[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 		// 1 byte reserved for withdrawal prefix
 		if common.AddressLength > len(withdrawalCredentials)-1 {
 			panic(fmt.Errorf("address length %d is more than remaining length in withdrawal credentials %d",

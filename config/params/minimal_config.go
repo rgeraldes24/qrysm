@@ -29,7 +29,7 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.EffectiveBalanceIncrement = 1e9
 
 	// Initial values
-	minimalConfig.QRLAddressWithdrawalPrefixByte = byte(0)
+	minimalConfig.ExecutionAddressWithdrawalPrefixByte = byte(0)
 
 	// Time parameters
 	minimalConfig.SecondsPerSlot = 6
@@ -63,7 +63,7 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.MaxAttestations = 128
 	minimalConfig.MaxDeposits = 16
 	minimalConfig.MaxVoluntaryExits = 16
-	minimalConfig.MaxWithdrawalsPerPayload = 4
+	minimalConfig.MaxWithdrawalsPerPayload = 128
 	minimalConfig.MaxValidatorsPerWithdrawalsSweep = 16
 
 	// Signature domains
