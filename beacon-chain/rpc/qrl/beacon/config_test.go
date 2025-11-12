@@ -181,7 +181,7 @@ func TestGetSpec(t *testing.T) {
 			assert.Equal(t, "23", v)
 		case "GENESIS_FORK_VERSION":
 			assert.Equal(t, "0x"+hex.EncodeToString([]byte("GenesisForkVersion")), v)
-		case "QRL_ADDRESS_WITHDRAWAL_PREFIX":
+		case "EXECUTION_ADDRESS_WITHDRAWAL_PREFIX":
 			assert.Equal(t, "0x63", v)
 		case "GENESIS_DELAY":
 			assert.Equal(t, "24", v)

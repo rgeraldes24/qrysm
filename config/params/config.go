@@ -45,7 +45,7 @@ type BeaconChainConfig struct {
 	EffectiveBalanceIncrement uint64 `yaml:"EFFECTIVE_BALANCE_INCREMENT" spec:"true"` // EffectiveBalanceIncrement is used for converting the high balance into the low balance for validators.
 
 	// Initial value constants.
-	ExecutionAddressWithdrawalPrefixByte byte     `yaml:"QRL_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // ExecutionAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
+	ExecutionAddressWithdrawalPrefixByte byte     `yaml:"EXECUTION_ADDRESS_WITHDRAWAL_PREFIX" spec:"true"` // ExecutionAddressWithdrawalPrefixByte is used for withdrawals and it's the first byte.
 	ZeroHash                             [32]byte // ZeroHash is used to represent a zeroed out 32 byte array.
 
 	// Time parameters constants.

@@ -21,8 +21,8 @@ type Config struct {
 	backend *rpc.Client // connection to the rpc provider
 
 	N          uint64          // number of transactions send per account
-	faucetAcc  wallet.Wallet   // ml-dsa-87 account of the faucet
-	accs       []wallet.Wallet // ml-dsa-87 accounts
+	faucetAcc  wallet.Wallet   // account of the faucet
+	accs       []wallet.Wallet // accounts
 	corpus     [][]byte        // optional corpus to use elements from
 	accessList bool            // whether to create accesslist transactions
 	gasLimit   uint64          // gas limit per transaction

@@ -88,10 +88,8 @@ var ValidatorsHaveExited = e2etypes.Evaluator{
 var ValidatorsHaveWithdrawn = e2etypes.Evaluator{
 	Name: "validator_has_withdrawn_%d",
 	Policy: func(currentEpoch primitives.Epoch) bool {
-		// Determine the withdrawal epoch by using the max seed lookahead. This value
-		// differs for our minimal and mainnet config which is why we calculate it
-		// each time the policy is executed.
-		// NOTE(rgeraldes24): minimal scenario needs to run for at least 11 epochs to run this evaluator.
+		// This value differs for our minimal and mainnet config which
+		// is why we calculate it each time the policy is executed.
 		withdrawableEpoch := corehelpers.ActivationExitEpoch(exitSubmissionEpoch) + params.BeaconConfig().MinValidatorWithdrawabilityDelay
 		validWithdrawnEpoch := withdrawableEpoch + primitives.Epoch(params.BeaconConfig().MinGenesisActiveValidatorCount)/primitives.Epoch(params.BeaconConfig().MaxWithdrawalsPerPayload)
 		requiredPolicy := policies.OnEpoch(validWithdrawnEpoch)

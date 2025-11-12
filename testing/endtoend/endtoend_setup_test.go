@@ -67,7 +67,7 @@ func e2eMinimal(t *testing.T, v int, cfgo ...types.E2EConfigOpt) *testRunner {
 		},
 		ValidatorFlags:      []string{},
 		EpochsToRun:         uint64(epochsToRun),
-		TestSync:            false,
+		TestSync:            true,
 		TestFeature:         true,
 		TestDeposits:        true,
 		UseQrysmShValidator: false,
