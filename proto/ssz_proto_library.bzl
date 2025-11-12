@@ -38,7 +38,7 @@ minimal = {
     "sync_committee_bits.type": "github.com/theQRL/go-bitfield.Bitvector16",
     "sync_committee_aggregate_bytes.size": "2",
     "sync_committee_aggregate_bits.type": "github.com/theQRL/go-bitfield.Bitvector16",
-    "withdrawal.size": "128",
+    "withdrawal.size": "4",
     "logs_bloom.size": "256",
     "extra_data.size": "32",
 }

@@ -99,7 +99,6 @@ func GenerateFullBlockCapella(
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed generating %d withdrawals:", numToGen)
 	}
-	fmt.Printf("New withdrawals: %d \n", len(newWithdrawals))
 
 	random, err := helpers.RandaoMix(bState, time.CurrentEpoch(bState))
 	if err != nil {
