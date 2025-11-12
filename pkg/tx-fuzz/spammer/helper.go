@@ -16,16 +16,16 @@ import (
 
 const batchSize = 50
 
-func SendTx(wallet wallet.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int) (*types.Transaction, error) {
-	sender := wallet.GetAddress()
+func SendTx(w wallet.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int) (*types.Transaction, error) {
+	sender := w.GetAddress()
 	nonce, err := backend.NonceAt(context.Background(), sender, nil)
 	if err != nil {
 		fmt.Printf("Could not get pending nonce: %v", err)
 	}
-	return sendTxWithNonce(wallet, backend, to, value, nonce)
+	return sendTxWithNonce(w, backend, to, value, nonce)
 }
 
-func sendTxWithNonce(wallet wallet.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int, nonce uint64) (*types.Transaction, error) {
+func sendTxWithNonce(w wallet.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int, nonce uint64) (*types.Transaction, error) {
 	chainid, err := backend.ChainID(context.Background())
 	if err != nil {
 		return nil, err
@@ -41,12 +41,12 @@ func sendTxWithNonce(wallet wallet.Wallet, backend *qrlclient.Client, to common.
 		GasTipCap: gasTipCap,
 		Data:      nil,
 	})
-	signedTx, _ := types.SignTx(tx, types.NewShanghaiSigner(chainid), wallet)
+	signedTx, _ := types.SignTx(tx, types.NewShanghaiSigner(chainid), w)
 	return signedTx, backend.SendTransaction(context.Background(), signedTx)
 }
 
-func sendRecurringTx(wallet wallet.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int, numTxs uint64) (*types.Transaction, error) {
-	sender := wallet.GetAddress()
+func sendRecurringTx(w wallet.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int, numTxs uint64) (*types.Transaction, error) {
+	sender := w.GetAddress()
 	nonce, err := backend.NonceAt(context.Background(), sender, nil)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func sendRecurringTx(wallet wallet.Wallet, backend *qrlclient.Client, to common.
 		tx *types.Transaction
 	)
 	for i := 0; i < int(numTxs); i++ {
-		tx, err = sendTxWithNonce(wallet, backend, to, value, nonce+uint64(i))
+		tx, err = sendTxWithNonce(w, backend, to, value, nonce+uint64(i))
 	}
 	return tx, err
 }
