@@ -14,25 +14,14 @@ import (
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 )
 
 type Credential struct {
 	signingKeyPath    string
-	withdrawalSeed    string
 	signingSeed       string
 	amount            uint64
 	chainSetting      *config.ChainSetting
 	withdrawalAddress common.Address
-}
-
-func (c *Credential) WithdrawalPK() []byte {
-	binWithdrawalSeed := misc.StrSeedToBinSeed(c.withdrawalSeed)
-	withdrawalKey, err := ml_dsa_87.SecretKeyFromSeed(binWithdrawalSeed[:])
-	if err != nil {
-		panic(fmt.Errorf("failed to generate ml-dsa-87 key from withdrawalSeed %s", c.withdrawalSeed))
-	}
-	return withdrawalKey.PublicKey().Marshal()
 }
 
 func (c *Credential) WithdrawalPrefix() (uint8, error) {
@@ -100,20 +89,13 @@ func NewCredential(seed string, index, amount uint64,
 	purpose := "12381" // TODO (cyyber): Purpose code to be decided later
 	coinType := "238"  // TODO (cyyber): coinType to be decided later
 	account := strconv.FormatUint(index, 10)
-	withdrawalKeyPath := fmt.Sprintf("m/%s/%s/%s/0", purpose, coinType, account)
-
-	signingKeyPath := fmt.Sprintf("%s/0", withdrawalKeyPath)
-	withdrawalSeed, err := keyderivation.SeedAndPathToSeed(seed, withdrawalKeyPath)
-	if err != nil {
-		return nil, err
-	}
+	signingKeyPath := fmt.Sprintf("m/%s/%s/%s/0/0", purpose, coinType, account)
 	signingSeed, err := keyderivation.SeedAndPathToSeed(seed, signingKeyPath)
 	if err != nil {
 		return nil, err
 	}
 	return &Credential{
 		signingKeyPath:    signingKeyPath,
-		withdrawalSeed:    withdrawalSeed,
 		signingSeed:       signingSeed,
 		amount:            amount,
 		chainSetting:      chainSetting,

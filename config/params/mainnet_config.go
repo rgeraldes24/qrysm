@@ -149,8 +149,6 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	// Qrysm constants.
 	ShorPerQuanta:                1000000000,
 	DefaultBufferSize:            10000,
-	WithdrawalPrivkeyFileName:    "/shardwithdrawalkey",
-	ValidatorPrivkeyFileName:     "/validatorprivatekey",
 	RPCSyncCheck:                 1,
 	EmptyMLDSA87Signature:        [fieldparams.MLDSA87SignatureLength]byte{},
 	DefaultPageSize:              250,

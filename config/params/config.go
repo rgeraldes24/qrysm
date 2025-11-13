@@ -118,8 +118,6 @@ type BeaconChainConfig struct {
 	// Qrysm constants.
 	ShorPerQuanta                uint64                                   // ShorPerQuanta is the amount of shor corresponding to 1 quanta.
 	DefaultBufferSize            int                                      // DefaultBufferSize for channels across the Qrysm repository.
-	ValidatorPrivkeyFileName     string                                   // ValidatorPrivKeyFileName specifies the string name of a validator private key file.
-	WithdrawalPrivkeyFileName    string                                   // WithdrawalPrivKeyFileName specifies the string name of a withdrawal private key file.
 	RPCSyncCheck                 time.Duration                            // Number of seconds to query the sync service, to find out if the node is synced or not.
 	EmptyMLDSA87Signature        [fieldparams.MLDSA87SignatureLength]byte // EmptyMLDSA87Signature is used to represent a zeroed out ML-DSA-87 Signature.
 	DefaultPageSize              int                                      // DefaultPageSize defines the default page size for RPC server request.
