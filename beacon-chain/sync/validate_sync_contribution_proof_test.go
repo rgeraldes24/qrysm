@@ -64,7 +64,6 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 		args     args
 		want     pubsub.ValidationResult
 	}{
-
 		{
 			name: "Is syncing",
 			svcopts: []Option{
