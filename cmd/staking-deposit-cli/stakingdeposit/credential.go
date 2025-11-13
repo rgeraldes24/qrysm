@@ -3,7 +3,6 @@ package stakingdeposit
 import (
 	"fmt"
 	"path/filepath"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -13,7 +12,6 @@ import (
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"
-	"github.com/theQRL/qrysm/config/params"
 )
 
 type Credential struct {
@@ -22,44 +20,6 @@ type Credential struct {
 	amount            uint64
 	chainSetting      *config.ChainSetting
 	withdrawalAddress common.Address
-}
-
-func (c *Credential) WithdrawalPrefix() (uint8, error) {
-	return params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte, nil
-}
-
-func (c *Credential) WithdrawalType() (byte, error) {
-	return c.WithdrawalPrefix()
-}
-
-func (c *Credential) WithdrawalCredentials() ([32]byte, error) {
-	var withdrawalCredentials [32]byte
-
-	withdrawalType, err := c.WithdrawalType()
-	if err != nil {
-		return [32]byte{}, err
-	}
-
-	switch withdrawalType {
-	case params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte:
-		if err != nil {
-			return [32]byte{}, err
-		}
-		if reflect.DeepEqual(c.withdrawalAddress, common.Address{}) {
-			panic(fmt.Errorf("empty qrl withdrawal address"))
-		}
-		withdrawalCredentials[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
-		// 1 byte reserved for withdrawal prefix
-		if common.AddressLength > len(withdrawalCredentials)-1 {
-			panic(fmt.Errorf("address length %d is more than remaining length in withdrawal credentials %d",
-				common.AddressLength, len(withdrawalCredentials)))
-		}
-		copy(withdrawalCredentials[len(withdrawalCredentials)-common.AddressLength:], c.withdrawalAddress.Bytes())
-	default:
-		panic(fmt.Errorf("invalid withdrawal type %d", withdrawalType))
-	}
-
-	return withdrawalCredentials, nil
 }
 
 func (c *Credential) signingKeystore(password string, lightKDF bool) (*keyhandling.Keystore, error) {
