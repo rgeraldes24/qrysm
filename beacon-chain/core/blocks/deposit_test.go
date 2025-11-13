@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/beacon-chain/core/blocks"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
@@ -21,10 +20,8 @@ import (
 )
 
 func TestProcessDeposits_SameValidatorMultipleDepositsSameBlock(t *testing.T) {
-	withdrawalAddr, err := common.NewAddressFromString("Q1234567890123456789012345678901234567890")
-	require.NoError(t, err)
 	// Same validator created 3 valid deposits within the same block
-	dep, _, err := util.DeterministicDepositsAndKeysSameValidator(3, withdrawalAddr)
+	dep, _, err := util.DeterministicDepositsAndKeysSameValidator(3)
 	require.NoError(t, err)
 	executionData, err := util.DeterministicExecutionData(len(dep))
 	require.NoError(t, err)

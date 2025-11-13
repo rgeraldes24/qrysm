@@ -531,7 +531,6 @@ func (b *BeaconNode) startStateGen(ctx context.Context, bfs *backfill.Status, fc
 			if err != nil {
 				return err
 			}
-			log.Debugln(r)
 		}
 	}
 

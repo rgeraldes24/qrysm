@@ -5,7 +5,6 @@ import (
 
 	"github.com/pkg/errors"
 	walletmldsa87 "github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
-	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/crypto/pqcrypto"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
@@ -289,7 +288,7 @@ func resetCache() {
 // DeterministicDepositsAndKeysSameValidator returns the entered amount of deposits and secret keys
 // of the same validator. This is for negative test cases such as same deposits from same validators in a block don't
 // result in duplicated validator indices.
-func DeterministicDepositsAndKeysSameValidator(numDeposits uint64, withdrawalAddr common.Address) ([]*qrysmpb.Deposit, []ml_dsa_87.MLDSA87Key, error) {
+func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_dsa_87.MLDSA87Key, error) {
 	resetCache()
 	lock.Lock()
 	defer lock.Unlock()
@@ -314,12 +313,18 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64, withdrawalAdd
 		}
 		privKeys = append(privKeys, secretKeys[:len(secretKeys)-1]...)
 
+		descriptor := walletmldsa87.NewMLDSA87Descriptor().ToDescriptor()
+		addr1, err := pqcrypto.PublicKeyAndDescriptorToAddress(publicKeys[1].Marshal(), descriptor)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		// Create the new deposits and add them to the trie. Always use the first validator to create deposit
 		for i := range numRequired {
 			depositMessage := &qrysmpb.DepositMessage{
 				PublicKey:             publicKeys[1].Marshal(),
 				Amount:                params.BeaconConfig().MaxEffectiveBalance,
-				WithdrawalCredentials: deposit.WithdrawalCredentialsAddress(withdrawalAddr),
+				WithdrawalCredentials: deposit.WithdrawalCredentialsAddress(addr1),
 			}
 
 			domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)
