@@ -18,7 +18,7 @@ var (
 		NumValidators       uint64
 		Folder              string
 		ChainName           string
-		WithdrawalAddress   string
+		ExecutionAddress    string
 	}{}
 	log = logrus.WithField("prefix", "existing-seed")
 )
@@ -66,9 +66,9 @@ var Commands = []*cli.Command{
 				Value:       "betanet",
 			},
 			&cli.StringFlag{
-				Name:        "withdrawal-address",
+				Name:        "execution-address",
 				Usage:       "",
-				Destination: &existingSeedFlags.WithdrawalAddress,
+				Destination: &existingSeedFlags.ExecutionAddress,
 				Value:       "",
 				Required:    true,
 			},
@@ -96,14 +96,14 @@ func cliActionExistingSeed(cliCtx *cli.Context) error {
 		return fmt.Errorf("password mismatch")
 	}
 
-	withdrawalAddr, err := common.NewAddressFromString(existingSeedFlags.WithdrawalAddress)
+	executionAddr, err := common.NewAddressFromString(existingSeedFlags.ExecutionAddress)
 	if err != nil {
 		return err
 	}
 
 	stakingdeposit.GenerateKeys(existingSeedFlags.ValidatorStartIndex,
 		existingSeedFlags.NumValidators, existingSeedFlags.Seed, existingSeedFlags.Folder,
-		existingSeedFlags.ChainName, string(keystorePassword), withdrawalAddr, false)
+		existingSeedFlags.ChainName, string(keystorePassword), executionAddr, false)
 
 	return nil
 }

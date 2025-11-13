@@ -23,7 +23,7 @@ var (
 		NumValidators       uint64
 		Folder              string
 		ChainName           string
-		WithdrawalAddress   string
+		ExecutionAddress    string
 		Mnemonic            string
 		LightKDF            bool
 	}{}
@@ -72,9 +72,9 @@ var Commands = []*cli.Command{
 				Value:       "testnet",
 			},
 			&cli.StringFlag{
-				Name:        "withdrawal-address",
+				Name:        "execution-address",
 				Usage:       "",
-				Destination: &newSeedFlags.WithdrawalAddress,
+				Destination: &newSeedFlags.ExecutionAddress,
 				Value:       "",
 				Required:    true,
 			},
@@ -133,14 +133,14 @@ func cliActionNewSeed(cliCtx *cli.Context) error {
 		return err
 	}
 
-	withdrawalAddr, err := common.NewAddressFromString(newSeedFlags.WithdrawalAddress)
+	executionAddr, err := common.NewAddressFromString(newSeedFlags.ExecutionAddress)
 	if err != nil {
 		return err
 	}
 
 	stakingdeposit.GenerateKeys(newSeedFlags.ValidatorStartIndex,
 		newSeedFlags.NumValidators, misc.EncodeHex(seed[:]), newSeedFlags.Folder,
-		newSeedFlags.ChainName, keystorePassword, withdrawalAddr,
+		newSeedFlags.ChainName, keystorePassword, executionAddr,
 		newSeedFlags.LightKDF)
 
 	return nil
