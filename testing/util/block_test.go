@@ -45,8 +45,6 @@ func TestGenerateFullBlock_ThousandValidators(t *testing.T) {
 }
 
 func TestGenerateFullBlock_Passes4Epochs(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	params.SetupTestConfigCleanup(t)
 	params.OverrideBeaconConfig(params.MainnetConfig().Copy())
 	beaconState, privs := DeterministicGenesisStateCapella(t, 256)

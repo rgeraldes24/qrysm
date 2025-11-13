@@ -95,11 +95,6 @@ func GenerateFullBlockCapella(
 		newTransactions[i] = bytesutil.Uint64ToBytesLittleEndian(i)
 	}
 
-	newWithdrawals, err := bState.ExpectedWithdrawals()
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed generating %d withdrawals:", numToGen)
-	}
-
 	random, err := helpers.RandaoMix(bState, time.CurrentEpoch(bState))
 	if err != nil {
 		return nil, errors.Wrap(err, "could not process randao mix")
@@ -120,6 +115,11 @@ func GenerateFullBlockCapella(
 		return nil, err
 	}
 
+	withdrawals, err := stCopy.ExpectedWithdrawals()
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed generating %d withdrawals:", numToGen)
+	}
+
 	parentExecution, err := stCopy.LatestExecutionPayloadHeader()
 	if err != nil {
 		return nil, err
@@ -138,7 +138,7 @@ func GenerateFullBlockCapella(
 		BlockHash:     blockHash[:],
 		Timestamp:     uint64(timestamp.Unix()),
 		Transactions:  newTransactions,
-		Withdrawals:   newWithdrawals,
+		Withdrawals:   withdrawals,
 	}
 
 	newHeader := bState.LatestBlockHeader()
