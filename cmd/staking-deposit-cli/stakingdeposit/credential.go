@@ -49,7 +49,7 @@ func NewCredential(seed string, index, amount uint64,
 	purpose := "12381" // TODO (cyyber): Purpose code to be decided later
 	coinType := "238"  // TODO (cyyber): coinType to be decided later
 	account := strconv.FormatUint(index, 10)
-	signingKeyPath := fmt.Sprintf("m/%s/%s/%s/0/0", purpose, coinType, account)
+	signingKeyPath := fmt.Sprintf("m/%s/%s/%s/0", purpose, coinType, account)
 	signingSeed, err := keyderivation.SeedAndPathToSeed(seed, signingKeyPath)
 	if err != nil {
 		return nil, err
