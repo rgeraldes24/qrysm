@@ -29,7 +29,7 @@ func TestDepositTrieRoot_OK(t *testing.T) {
 
 	privKeys, pubKeys, err := interop.DeterministicallyGenerateKeys(0 /*startIndex*/, 101)
 	require.NoError(t, err)
-	depositDataItems, depositDataRoots, err := interop.DepositDataFromKeysAsync(privKeys, pubKeys)
+	depositDataItems, depositDataRoots, err := interop.DepositDataFromKeys(privKeys, pubKeys)
 	require.NoError(t, err)
 
 	testAcc.TxOpts.Value = depositcontract.Amount40000Quanta()
@@ -71,7 +71,7 @@ func TestDepositTrieRoot_Fail(t *testing.T) {
 
 	privKeys, pubKeys, err := interop.DeterministicallyGenerateKeys(0 /*startIndex*/, 101)
 	require.NoError(t, err)
-	depositDataItems, depositDataRoots, err := interop.DepositDataFromKeysAsync(privKeys, pubKeys)
+	depositDataItems, depositDataRoots, err := interop.DepositDataFromKeys(privKeys, pubKeys)
 	require.NoError(t, err)
 	testAcc.TxOpts.Value = depositcontract.Amount40000Quanta()
 

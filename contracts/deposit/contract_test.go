@@ -27,7 +27,7 @@ func TestRegister_Below1ETH(t *testing.T) {
 	// Generate deposit data
 	privKeys, pubKeys, err := interop.DeterministicallyGenerateKeys(0 /*startIndex*/, 1)
 	require.NoError(t, err)
-	depositDataItems, depositDataRoots, err := interop.DepositDataFromKeysAsync(privKeys, pubKeys)
+	depositDataItems, depositDataRoots, err := interop.DepositDataFromKeys(privKeys, pubKeys)
 	require.NoError(t, err)
 
 	var depositDataRoot [32]byte
@@ -46,7 +46,7 @@ func TestValidatorRegister_OK(t *testing.T) {
 	// Generate deposit data
 	privKeys, pubKeys, err := interop.DeterministicallyGenerateKeys(0 /*startIndex*/, 1)
 	require.NoError(t, err)
-	depositDataItems, depositDataRoots, err := interop.DepositDataFromKeysAsync(privKeys, pubKeys)
+	depositDataItems, depositDataRoots, err := interop.DepositDataFromKeys(privKeys, pubKeys)
 	require.NoError(t, err)
 
 	var depositDataRoot [32]byte

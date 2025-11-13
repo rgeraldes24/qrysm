@@ -33,7 +33,7 @@ func createGenesisDepositData(t *testing.T, numKeys int) ([]*depositDataJSON, er
 		privKeys[i] = randKey
 		pubKeys[i] = randKey.PublicKey()
 	}
-	dataList, _, err := interop.DepositDataFromKeysAsync(privKeys, pubKeys)
+	dataList, _, err := interop.DepositDataFromKeys(privKeys, pubKeys)
 	require.NoError(t, err)
 	jsonData := make([]*depositDataJSON, numKeys)
 	for i := 0; i < numKeys; i++ {

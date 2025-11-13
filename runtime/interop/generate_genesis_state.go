@@ -58,8 +58,8 @@ func generateDepositsFromData(depositDataItems []*qrysmpb.Deposit_Data, offset i
 	return deposits, nil
 }
 
-// DepositDataFromKeysAsync generates a list of deposit data items from a set of ML-DSA-87 validator keys.
-func DepositDataFromKeysAsync(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
+// DepositDataFromKeys generates a list of deposit data items from a set of ML-DSA-87 validator keys.
+func DepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
 	type depositData struct {
 		items []*qrysmpb.Deposit_Data
 		roots [][]byte
@@ -82,11 +82,6 @@ func DepositDataFromKeysAsync(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_
 		}
 	}
 	return depositDataItems, depositDataRoots, nil
-}
-
-// DepositDataFromKeys generates a list of deposit data items from a set of ML-DSA-87 validator keys.
-func DepositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
-	return depositDataFromKeys(privKeys, pubKeys)
 }
 
 func depositDataFromKeys(privKeys []ml_dsa_87.MLDSA87Key, pubKeys []ml_dsa_87.PublicKey) ([]*qrysmpb.Deposit_Data, [][]byte, error) {
