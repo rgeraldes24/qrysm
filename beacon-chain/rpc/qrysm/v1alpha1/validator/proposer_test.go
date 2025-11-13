@@ -64,7 +64,7 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	transition.SkipSlotCache.Disable()
 
 	params.SetupTestConfigCleanup(t)
-	beaconState, _ := util.DeterministicGenesisStateCapella(t, 64)
+	beaconState, privKeys := util.DeterministicGenesisStateCapella(t, 64)
 
 	stateRoot, err := beaconState.HashTreeRoot(ctx)
 	require.NoError(t, err, "Could not hash genesis state")
@@ -139,8 +139,22 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 		ExecutionPayloadCapella: payload,
 	}
 
+	randaoReveal, err := util.RandaoReveal(beaconState, 0, privKeys)
+	require.NoError(t, err)
+
+	graffiti := bytesutil.ToBytes32([]byte("qrl"))
+	require.NoError(t, err)
+	req := &qrysmpb.BlockRequest{
+		Slot:         capellaSlot + 1,
+		RandaoReveal: randaoReveal,
+		Graffiti:     graffiti[:],
+	}
+
 	copiedState := beaconState.Copy()
 	_, err = transition.ProcessSlots(ctx, copiedState, capellaSlot+1)
+	require.NoError(t, err)
+
+	_, err = proposerServer.GetBeaconBlock(ctx, req)
 	require.NoError(t, err)
 }
 
