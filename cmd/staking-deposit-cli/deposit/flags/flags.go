@@ -18,7 +18,7 @@ var (
 	// QRLSeedFileFlag for transaction signing.
 	QRLSeedFileFlag = &cli.StringFlag{
 		Name:     "seed-file",
-		Usage:    "File containing a wallet seed for sending deposit transactions from qrl",
+		Usage:    "File containing a seed for sending deposit transactions from qrl",
 		Value:    "",
 		Required: true,
 	}
