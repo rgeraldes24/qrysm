@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/config"
 	"github.com/theQRL/qrysm/monitoring/progress"
 )
@@ -86,50 +87,13 @@ func (c *Credentials) VerifyKeystores(keystoreFileFolders []string, password str
 	return true
 }
 
-func (c *Credentials) ExportMLDSA87ToExecutionChangeJSON(folder string, validatorIndices []uint64) (string, error) {
-	var mlDSA87ToExecutionChangeDataList []*MLDSA87ToExecutionChangeData
-	for i, credential := range c.credentials {
-		mlDSA87ToExecutionChangeData := credential.GetMLDSA87ToExecutionChangeData(validatorIndices[i])
-		mlDSA87ToExecutionChangeDataList = append(mlDSA87ToExecutionChangeDataList, mlDSA87ToExecutionChangeData)
-	}
-
-	fileFolder := filepath.Join(folder, fmt.Sprintf("ml_dsa_87_to_execution_change-%d.json", time.Now().Unix()))
-	jsonDepositDataList, err := json.Marshal(mlDSA87ToExecutionChangeDataList)
-	if err != nil {
-		return "", err
-	}
-
-	f, err := os.Create(fileFolder)
-	if err != nil {
-		return "", err
-	}
-	defer func() {
-		if err := f.Close(); err != nil {
-			log.Println(err)
-		}
-	}()
-
-	if _, err := f.Write(jsonDepositDataList); err != nil {
-		return "", err
-	}
-	if err := f.Sync(); err != nil {
-		return "", err
-	}
-	if runtime.GOOS != "windows" {
-		if err := os.Chmod(fileFolder, 0440); err != nil {
-			return "", err
-		}
-	}
-	return fileFolder, err
-}
-
 func NewCredentialsFromSeed(seed string, numKeys uint64, amounts []uint64,
-	chainSettings *config.ChainSetting, startIndex uint64, hexQRLWithdrawalAddress string) (*Credentials, error) {
+	chainSettings *config.ChainSetting, startIndex uint64, withdrawalAddr common.Address) (*Credentials, error) {
 	credentials := &Credentials{
 		credentials: make([]*Credential, numKeys),
 	}
 	for index := startIndex; index < startIndex+numKeys; index++ {
-		c, err := NewCredential(seed, index, amounts[index-startIndex], chainSettings, hexQRLWithdrawalAddress)
+		c, err := NewCredential(seed, index, amounts[index-startIndex], chainSettings, withdrawalAddr)
 		if err != nil {
 			return nil, err
 		}

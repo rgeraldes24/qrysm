@@ -26,12 +26,11 @@ import (
 var errUnsupportedVersion = errors.New("schema version not supported by PremineGenesisConfig")
 
 type PremineGenesisConfig struct {
-	GenesisTime     uint64
-	NVals           uint64
-	PregenesisCreds uint64
-	Version         int          // as in "github.com/theQRL/qrysm/runtime/version"
-	GB              *types.Block // gzond genesis block
-	depositEntries  *depositEntries
+	GenesisTime    uint64
+	NVals          uint64
+	Version        int          // as in "github.com/theQRL/qrysm/runtime/version"
+	GB             *types.Block // gzond genesis block
+	depositEntries *depositEntries
 }
 
 type depositEntries struct {
@@ -51,13 +50,12 @@ func WithDepositData(dds []*qrysmpb.Deposit_Data, roots [][]byte) PremineGenesis
 }
 
 // NewPreminedGenesis creates a genesis BeaconState at the given fork version, suitable for using as an e2e genesis.
-func NewPreminedGenesis(ctx context.Context, t, nvals, pCreds uint64, version int, gb *types.Block, opts ...PremineGenesisOpt) (state.BeaconState, error) {
+func NewPreminedGenesis(ctx context.Context, t, nvals uint64, version int, gb *types.Block, opts ...PremineGenesisOpt) (state.BeaconState, error) {
 	cfg := &PremineGenesisConfig{
-		GenesisTime:     t,
-		NVals:           nvals,
-		PregenesisCreds: pCreds,
-		Version:         version,
-		GB:              gb,
+		GenesisTime: t,
+		NVals:       nvals,
+		Version:     version,
+		GB:          gb,
 	}
 	for _, o := range opts {
 		o(cfg)
@@ -171,7 +169,7 @@ func (s *PremineGenesisConfig) deposits() ([]*qrysmpb.Deposit, error) {
 		if err != nil {
 			return nil, err
 		}
-		dds, roots, err := DepositDataFromKeysWithExecCreds(prv, pub, s.PregenesisCreds)
+		dds, roots, err := DepositDataFromKeys(prv, pub)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not generate deposit data from keys")
 		}
@@ -373,7 +371,6 @@ func (s *PremineGenesisConfig) setLatestBlockHeader(g state.BeaconState) error {
 				Transactions:  make([][]byte, 0),
 				Withdrawals:   make([]*enginev1.Withdrawal, 0),
 			},
-			Mldsa87ToExecutionChanges: make([]*qrysmpb.SignedMLDSA87ToExecutionChange, 0),
 		}
 	default:
 		return errUnsupportedVersion

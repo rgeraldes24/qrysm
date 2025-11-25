@@ -25,7 +25,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
@@ -76,7 +75,6 @@ type config struct {
 	exitPool                      voluntaryexits.PoolManager
 	slashingPool                  slashings.PoolManager
 	syncCommsPool                 synccommittee.Pool
-	mlDSA87ToExecPool             mldsa87toexec.PoolManager
 	chain                         blockchainService
 	initialSync                   Checker
 	blockNotifier                 blockfeed.Notifier
@@ -265,7 +263,8 @@ func (s *Service) registerHandlers() {
 		}
 		currentEpoch := slots.ToEpoch(slots.CurrentSlot(uint64(s.cfg.clock.GenesisTime().Unix())))
 		s.registerSubscribers(currentEpoch, digest)
-		go s.forkWatcher()
+		// NOTE(rgeraldes24): unused for now
+		// go s.forkWatcher()
 		return
 	case <-s.ctx.Done():
 		log.Debug("Context closed, exiting goroutine")

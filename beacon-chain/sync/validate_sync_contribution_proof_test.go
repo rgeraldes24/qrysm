@@ -165,7 +165,6 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 				}},
 			want: pubsub.ValidationIgnore,
 		},
-
 		{
 			name: "Already Seen Message",
 			svcopts: []Option{
@@ -404,7 +403,6 @@ func TestService_ValidateSyncContributionAndProof(t *testing.T) {
 				}},
 			want: pubsub.ValidationReject,
 		},
-
 		{
 			name: "Invalid Proof Signature",
 			svcopts: []Option{

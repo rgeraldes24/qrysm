@@ -7,7 +7,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
@@ -63,13 +62,6 @@ func WithSlashingPool(slashingPool slashings.PoolManager) Option {
 func WithSyncCommsPool(syncCommsPool synccommittee.Pool) Option {
 	return func(s *Service) error {
 		s.cfg.syncCommsPool = syncCommsPool
-		return nil
-	}
-}
-
-func WithMLDSA87ToExecPool(mlDSA87ToExecPool mldsa87toexec.PoolManager) Option {
-	return func(s *Service) error {
-		s.cfg.mlDSA87ToExecPool = mlDSA87ToExecPool
 		return nil
 	}
 }

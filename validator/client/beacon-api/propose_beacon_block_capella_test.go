@@ -61,7 +61,6 @@ func TestProposeBeaconBlock_Capella(t *testing.T) {
 					Transactions:  jsonifyTransactions(capellaBlock.Capella.Block.Body.ExecutionPayload.Transactions),
 					Withdrawals:   jsonifyWithdrawals(capellaBlock.Capella.Block.Body.ExecutionPayload.Withdrawals),
 				},
-				MLDSA87ToExecutionChanges: jsonifyMLDSA87ToExecutionChanges(capellaBlock.Capella.Block.Body.Mldsa87ToExecutionChanges),
 			},
 		},
 	}

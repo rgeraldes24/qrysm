@@ -24,9 +24,9 @@ interface IDepositContract {
     );
 
     /// @notice Submit a Phase 0 DepositData object.
-    /// @param pubkey A Dilithium public key.
+    /// @param pubkey A ML-DSA-87 public key.
     /// @param withdrawal_credentials Commitment to a public key for withdrawals.
-    /// @param signature A Dilithium signature.
+    /// @param signature A ML-DSA-87 signature.
     /// @param deposit_data_root The SHA-256 hash of the SSZ-encoded DepositData object.
     /// Used as a protection against malformed input.
     function deposit(

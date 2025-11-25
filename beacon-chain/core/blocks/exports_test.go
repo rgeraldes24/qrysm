@@ -1,3 +1,0 @@
-package blocks
-
-var ProcessMLDSA87ToExecutionChange = processMLDSA87ToExecutionChange

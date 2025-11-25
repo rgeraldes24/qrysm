@@ -7,25 +7,25 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/core/types"
+	"github.com/theQRL/go-zond/crypto/pqcrypto/wallet"
 	"github.com/theQRL/go-zond/qrlclient"
 )
 
 const batchSize = 50
 
-func SendTx(d *ml_dsa_87.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int) (*types.Transaction, error) {
-	sender := d.GetAddress()
+func SendTx(w wallet.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int) (*types.Transaction, error) {
+	sender := w.GetAddress()
 	nonce, err := backend.NonceAt(context.Background(), sender, nil)
 	if err != nil {
 		fmt.Printf("Could not get pending nonce: %v", err)
 	}
-	return sendTxWithNonce(d, backend, to, value, nonce)
+	return sendTxWithNonce(w, backend, to, value, nonce)
 }
 
-func sendTxWithNonce(d *ml_dsa_87.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int, nonce uint64) (*types.Transaction, error) {
+func sendTxWithNonce(w wallet.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int, nonce uint64) (*types.Transaction, error) {
 	chainid, err := backend.ChainID(context.Background())
 	if err != nil {
 		return nil, err
@@ -41,11 +41,11 @@ func sendTxWithNonce(d *ml_dsa_87.Wallet, backend *qrlclient.Client, to common.A
 		GasTipCap: gasTipCap,
 		Data:      nil,
 	})
-	signedTx, _ := types.SignTx(tx, types.NewShanghaiSigner(chainid), d)
+	signedTx, _ := types.SignTx(tx, types.NewShanghaiSigner(chainid), w)
 	return signedTx, backend.SendTransaction(context.Background(), signedTx)
 }
 
-func sendRecurringTx(w *ml_dsa_87.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int, numTxs uint64) (*types.Transaction, error) {
+func sendRecurringTx(w wallet.Wallet, backend *qrlclient.Client, to common.Address, value *big.Int, numTxs uint64) (*types.Transaction, error) {
 	sender := w.GetAddress()
 	nonce, err := backend.NonceAt(context.Background(), sender, nil)
 	if err != nil {
@@ -72,7 +72,7 @@ func Unstuck(config *Config) error {
 	return nil
 }
 
-func tryUnstuck(config *Config, w *ml_dsa_87.Wallet) error {
+func tryUnstuck(config *Config, w wallet.Wallet) error {
 	var (
 		client = qrlclient.NewClient(config.backend)
 		addr   = w.GetAddress()

@@ -200,16 +200,6 @@ func ProcessBlockNoVerifyAnySig(
 	set := ml_dsa_87.NewSet()
 	set.Join(bSet).Join(rSet).Join(aSet)
 
-	changes, err := signed.Block().Body().MLDSA87ToExecutionChanges()
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not get MLDSA87ToExecutionChanges")
-	}
-	cSet, err := b.MLDSA87ChangesSignatureBatch(st, changes)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "could not get MLDSA87ToExecutionChanges signatures")
-	}
-	set.Join(cSet)
-
 	return set, st, nil
 }
 
@@ -373,5 +363,5 @@ func altairOperations(
 	if err != nil {
 		return nil, errors.Wrap(err, "could not process voluntary exits")
 	}
-	return b.ProcessMLDSA87ToExecutionChanges(st, signedBeaconBlock)
+	return st, nil
 }

@@ -5,6 +5,7 @@ import (
 	"syscall"
 
 	"github.com/sirupsen/logrus"
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/term"
@@ -69,6 +70,7 @@ var Commands = []*cli.Command{
 				Usage:       "",
 				Destination: &existingSeedFlags.ExecutionAddress,
 				Value:       "",
+				Required:    true,
 			},
 		},
 	},
@@ -94,9 +96,14 @@ func cliActionExistingSeed(cliCtx *cli.Context) error {
 		return fmt.Errorf("password mismatch")
 	}
 
+	executionAddr, err := common.NewAddressFromString(existingSeedFlags.ExecutionAddress)
+	if err != nil {
+		return err
+	}
+
 	stakingdeposit.GenerateKeys(existingSeedFlags.ValidatorStartIndex,
 		existingSeedFlags.NumValidators, existingSeedFlags.Seed, existingSeedFlags.Folder,
-		existingSeedFlags.ChainName, string(keystorePassword), existingSeedFlags.ExecutionAddress, false)
+		existingSeedFlags.ChainName, string(keystorePassword), executionAddr, false)
 
 	return nil
 }

@@ -18,7 +18,6 @@ import (
 	"github.com/theQRL/qrysm/beacon-chain/db"
 	"github.com/theQRL/qrysm/beacon-chain/execution"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
@@ -72,7 +71,6 @@ type Server struct {
 	BeaconDB               db.HeadAccessDatabase
 	ExecutionEngineCaller  execution.EngineCaller
 	BlockBuilder           builder.BlockBuilder
-	MLDSA87ChangesPool     mldsa87toexec.PoolManager
 	ClockWaiter            startup.ClockWaiter
 	CoreService            *core.Service
 }

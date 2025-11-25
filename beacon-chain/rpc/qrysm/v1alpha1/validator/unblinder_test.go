@@ -11,7 +11,6 @@ import (
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/encoding/ssz"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
-	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
 	"github.com/theQRL/qrysm/testing/util"
 )
@@ -137,24 +136,6 @@ func Test_unblindBuilderBlock(t *testing.T) {
 				b := util.NewBlindedBeaconBlockCapella()
 				b.Block.Slot = 1
 				b.Block.ProposerIndex = 2
-				b.Block.Body.Mldsa87ToExecutionChanges = []*qrysmpb.SignedMLDSA87ToExecutionChange{
-					{
-						Message: &qrysmpb.MLDSA87ToExecutionChange{
-							ValidatorIndex:     123,
-							FromMldsa87Pubkey:  []byte{'a'},
-							ToExecutionAddress: []byte{'a'},
-						},
-						Signature: []byte("sig123"),
-					},
-					{
-						Message: &qrysmpb.MLDSA87ToExecutionChange{
-							ValidatorIndex:     456,
-							FromMldsa87Pubkey:  []byte{'b'},
-							ToExecutionAddress: []byte{'b'},
-						},
-						Signature: []byte("sig456"),
-					},
-				}
 				txRoot, err := ssz.TransactionsRoot([][]byte{})
 				require.NoError(t, err)
 				withdrawalsRoot, err := ssz.WithdrawalSliceRoot([]*v1.Withdrawal{}, fieldparams.MaxWithdrawalsPerPayload)
@@ -184,24 +165,6 @@ func Test_unblindBuilderBlock(t *testing.T) {
 				b := util.NewBeaconBlockCapella()
 				b.Block.Slot = 1
 				b.Block.ProposerIndex = 2
-				b.Block.Body.Mldsa87ToExecutionChanges = []*qrysmpb.SignedMLDSA87ToExecutionChange{
-					{
-						Message: &qrysmpb.MLDSA87ToExecutionChange{
-							ValidatorIndex:     123,
-							FromMldsa87Pubkey:  []byte{'a'},
-							ToExecutionAddress: []byte{'a'},
-						},
-						Signature: []byte("sig123"),
-					},
-					{
-						Message: &qrysmpb.MLDSA87ToExecutionChange{
-							ValidatorIndex:     456,
-							FromMldsa87Pubkey:  []byte{'b'},
-							ToExecutionAddress: []byte{'b'},
-						},
-						Signature: []byte("sig456"),
-					},
-				}
 				b.Block.Body.ExecutionPayload = p
 				wb, err := blocks.NewSignedBeaconBlock(b)
 				require.NoError(t, err)

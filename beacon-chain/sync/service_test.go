@@ -10,7 +10,6 @@ import (
 	mockChain "github.com/theQRL/qrysm/beacon-chain/blockchain/testing"
 	"github.com/theQRL/qrysm/beacon-chain/core/feed"
 	dbTest "github.com/theQRL/qrysm/beacon-chain/db/testing"
-	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	p2ptest "github.com/theQRL/qrysm/beacon-chain/p2p/testing"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
 	state_native "github.com/theQRL/qrysm/beacon-chain/state/state-native"
@@ -122,12 +121,11 @@ func TestSyncHandlers_WaitTillSynced(t *testing.T) {
 	r := Service{
 		ctx: ctx,
 		cfg: &config{
-			p2p:               p2p,
-			beaconDB:          dbTest.SetupDB(t),
-			chain:             chainService,
-			blockNotifier:     chainService.BlockNotifier(),
-			initialSync:       &mockSync.Sync{IsSyncing: false},
-			mlDSA87ToExecPool: mldsa87toexec.NewPool(),
+			p2p:           p2p,
+			beaconDB:      dbTest.SetupDB(t),
+			chain:         chainService,
+			blockNotifier: chainService.BlockNotifier(),
+			initialSync:   &mockSync.Sync{IsSyncing: false},
 		},
 		chainStarted:        abool.New(),
 		subHandler:          newSubTopicHandler(),
@@ -189,10 +187,9 @@ func TestSyncService_StopCleanly(t *testing.T) {
 		ctx:    ctx,
 		cancel: cancel,
 		cfg: &config{
-			p2p:               p2p,
-			chain:             chainService,
-			initialSync:       &mockSync.Sync{IsSyncing: false},
-			mlDSA87ToExecPool: mldsa87toexec.NewPool(),
+			p2p:         p2p,
+			chain:       chainService,
+			initialSync: &mockSync.Sync{IsSyncing: false},
 		},
 		chainStarted:        abool.New(),
 		subHandler:          newSubTopicHandler(),

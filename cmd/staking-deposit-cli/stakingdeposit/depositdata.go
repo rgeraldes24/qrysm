@@ -27,20 +27,14 @@ func NewDepositData(c *Credential) (*DepositData, error) {
 		return nil, err
 	}
 
-	binWithdrawalSeed := misc.StrSeedToBinSeed(c.withdrawalSeed)
-	withdrawalKey, err := ml_dsa_87.SecretKeyFromSeed(binWithdrawalSeed[:])
-	if err != nil {
-		return nil, err
-	}
-
-	depositData, dataRoot, err := deposit.DepositInput(depositKey, withdrawalKey, c.amount, c.chainSetting.GenesisForkVersion)
+	depositData, dataRoot, err := deposit.DepositInput(depositKey, c.withdrawalAddress, c.amount, c.chainSetting.GenesisForkVersion)
 	if err != nil {
 		return nil, err
 	}
 
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             depositKey.PublicKey().Marshal(),
-		WithdrawalCredentials: deposit.WithdrawalCredentialsHash(withdrawalKey),
+		WithdrawalCredentials: depositData.WithdrawalCredentials,
 		Amount:                c.amount,
 	}
 

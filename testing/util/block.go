@@ -34,7 +34,6 @@ type BlockGenConfig struct {
 	NumVoluntaryExits    uint64
 	NumTransactions      uint64
 	FullSyncAggregate    bool
-	NumMLDSA87Changes    uint64
 }
 
 // DefaultBlockGenConfig returns the block config that utilizes the
@@ -47,7 +46,6 @@ func DefaultBlockGenConfig() *BlockGenConfig {
 		NumDeposits:          0,
 		NumVoluntaryExits:    0,
 		NumTransactions:      0,
-		NumMLDSA87Changes:    0,
 	}
 }
 
@@ -386,10 +384,6 @@ func HydrateBeaconBlockBodyCapella(b *qrysmpb.BeaconBlockBodyCapella) *qrysmpb.B
 		b.Attestations = make([]*qrysmpb.Attestation, 0)
 	}
 
-	if b.Mldsa87ToExecutionChanges == nil {
-		b.Mldsa87ToExecutionChanges = make([]*qrysmpb.SignedMLDSA87ToExecutionChange, 0)
-	}
-
 	return b
 }
 
@@ -477,10 +471,6 @@ func HydrateBlindedBeaconBlockBodyCapella(b *qrysmpb.BlindedBeaconBlockBodyCapel
 
 	if b.Attestations == nil {
 		b.Attestations = make([]*qrysmpb.Attestation, 0)
-	}
-
-	if b.Mldsa87ToExecutionChanges == nil {
-		b.Mldsa87ToExecutionChanges = make([]*qrysmpb.SignedMLDSA87ToExecutionChange, 0)
 	}
 
 	return b

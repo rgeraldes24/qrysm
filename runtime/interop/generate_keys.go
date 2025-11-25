@@ -11,10 +11,6 @@ import (
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 )
 
-const (
-	mlDSA87WithdrawalPrefixByte = byte(0)
-)
-
 // DeterministicallyGenerateKeys creates ML-DSA-87 private keys.
 func DeterministicallyGenerateKeys(startIndex, numKeys uint64) ([]ml_dsa_87.MLDSA87Key, []ml_dsa_87.PublicKey, error) {
 	mlDSA87Keys := make([]ml_dsa_87.MLDSA87Key, numKeys)

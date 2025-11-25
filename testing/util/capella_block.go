@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-bitfield"
 	"github.com/theQRL/qrysm/beacon-chain/core/helpers"
-	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/beacon-chain/core/time"
 	"github.com/theQRL/qrysm/beacon-chain/core/transition"
 	"github.com/theQRL/qrysm/beacon-chain/state"
@@ -95,7 +94,6 @@ func GenerateFullBlockCapella(
 	for i := uint64(0); i < numToGen; i++ {
 		newTransactions[i] = bytesutil.Uint64ToBytesLittleEndian(i)
 	}
-	newWithdrawals := make([]*v1.Withdrawal, 0)
 
 	random, err := helpers.RandaoMix(bState, time.CurrentEpoch(bState))
 	if err != nil {
@@ -117,6 +115,11 @@ func GenerateFullBlockCapella(
 		return nil, err
 	}
 
+	withdrawals, err := stCopy.ExpectedWithdrawals()
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed generating %d withdrawals:", numToGen)
+	}
+
 	parentExecution, err := stCopy.LatestExecutionPayloadHeader()
 	if err != nil {
 		return nil, err
@@ -135,7 +138,7 @@ func GenerateFullBlockCapella(
 		BlockHash:     blockHash[:],
 		Timestamp:     uint64(timestamp.Unix()),
 		Transactions:  newTransactions,
-		Withdrawals:   newWithdrawals,
+		Withdrawals:   withdrawals,
 	}
 
 	newHeader := bState.LatestBlockHeader()
@@ -184,30 +187,21 @@ func GenerateFullBlockCapella(
 		return nil, errors.Wrap(err, "could not compute beacon proposer index")
 	}
 
-	changes := make([]*qrysmpb.SignedMLDSA87ToExecutionChange, conf.NumMLDSA87Changes)
-	for i := uint64(0); i < conf.NumMLDSA87Changes; i++ {
-		changes[i], err = GenerateMLDSA87ToExecutionChange(bState, privs[i+1], primitives.ValidatorIndex(i))
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	block := &qrysmpb.BeaconBlockCapella{
 		Slot:          slot,
 		ParentRoot:    parentRoot[:],
 		ProposerIndex: idx,
 		Body: &qrysmpb.BeaconBlockBodyCapella{
-			ExecutionData:             executionData,
-			RandaoReveal:              reveal,
-			ProposerSlashings:         pSlashings,
-			AttesterSlashings:         aSlashings,
-			Attestations:              atts,
-			VoluntaryExits:            exits,
-			Deposits:                  newDeposits,
-			Graffiti:                  make([]byte, fieldparams.RootLength),
-			SyncAggregate:             newSyncAggregate,
-			ExecutionPayload:          newExecutionPayloadCapella,
-			Mldsa87ToExecutionChanges: changes,
+			ExecutionData:     executionData,
+			RandaoReveal:      reveal,
+			ProposerSlashings: pSlashings,
+			AttesterSlashings: aSlashings,
+			Attestations:      atts,
+			VoluntaryExits:    exits,
+			Deposits:          newDeposits,
+			Graffiti:          make([]byte, fieldparams.RootLength),
+			SyncAggregate:     newSyncAggregate,
+			ExecutionPayload:  newExecutionPayloadCapella,
 		},
 	}
 
@@ -218,31 +212,6 @@ func GenerateFullBlockCapella(
 	}
 
 	return &qrysmpb.SignedBeaconBlockCapella{Block: block, Signature: signature.Marshal()}, nil
-}
-
-// GenerateMLDSA87ToExecutionChange generates a valid ML-DSA-87 to exec changes for validator `val` and its private key `priv` with the given beacon state `st`.
-func GenerateMLDSA87ToExecutionChange(st state.BeaconState, priv ml_dsa_87.MLDSA87Key, val primitives.ValidatorIndex) (*qrysmpb.SignedMLDSA87ToExecutionChange, error) {
-	cred := indexToHash(uint64(val))
-	pubkey := priv.PublicKey().Marshal()
-	message := &qrysmpb.MLDSA87ToExecutionChange{
-		ToExecutionAddress: cred[12:],
-		ValidatorIndex:     val,
-		FromMldsa87Pubkey:  pubkey,
-	}
-	c := params.BeaconConfig()
-	domain, err := signing.ComputeDomain(c.DomainMLDSA87ToExecutionChange, c.GenesisForkVersion, st.GenesisValidatorsRoot())
-	if err != nil {
-		return nil, err
-	}
-	sr, err := signing.ComputeSigningRoot(message, domain)
-	if err != nil {
-		return nil, err
-	}
-	signature := priv.Sign(sr[:]).Marshal()
-	return &qrysmpb.SignedMLDSA87ToExecutionChange{
-		Message:   message,
-		Signature: signature,
-	}, nil
 }
 
 func indexToHash(i uint64) [32]byte {

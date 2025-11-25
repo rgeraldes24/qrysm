@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/theQRL/qrysm/beacon-chain/builder"
-	consensus_types "github.com/theQRL/qrysm/consensus-types"
 	consensusblocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -117,10 +116,6 @@ func copyBlockData(src interfaces.SignedBeaconBlock, dst interfaces.SignedBeacon
 	randaoReveal := src.Block().Body().RandaoReveal()
 	graffiti := src.Block().Body().Graffiti()
 	sig := src.Signature()
-	mlDSA87ToExecChanges, err := src.Block().Body().MLDSA87ToExecutionChanges()
-	if err != nil && !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return errors.Wrap(err, "could not get ml-dsa-87 to execution changes")
-	}
 
 	dst.SetSlot(src.Block().Slot())
 	dst.SetProposerIndex(src.Block().ProposerIndex())
@@ -138,9 +133,6 @@ func copyBlockData(src interfaces.SignedBeaconBlock, dst interfaces.SignedBeacon
 		return errors.Wrap(err, "could not set sync aggregate")
 	}
 	dst.SetSignature(sig[:])
-	if err = dst.SetMLDSA87ToExecutionChanges(mlDSA87ToExecChanges); err != nil && !errors.Is(err, consensus_types.ErrUnsupportedField) {
-		return errors.Wrap(err, "could not set ml-dsa-87 to execution changes")
-	}
 
 	return nil
 }

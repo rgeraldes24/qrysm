@@ -225,10 +225,6 @@ func (b *BeaconBlockCapella) ToConsensus() (*qrysmpb.BeaconBlockCapella, error) 
 			Amount:         amount,
 		}
 	}
-	mlDSA87Changes, err := MLDSA87ChangesToConsensus(b.Body.MLDSA87ToExecutionChanges)
-	if err != nil {
-		return nil, NewDecodeError(err, "Body.MLDSA87ToExecutionChanges")
-	}
 
 	return &qrysmpb.BeaconBlockCapella{
 		Slot:          primitives.Slot(slot),
@@ -269,7 +265,6 @@ func (b *BeaconBlockCapella) ToConsensus() (*qrysmpb.BeaconBlockCapella, error) 
 				Transactions:  payloadTxs,
 				Withdrawals:   withdrawals,
 			},
-			Mldsa87ToExecutionChanges: mlDSA87Changes,
 		},
 	}, nil
 }
@@ -449,10 +444,6 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*qrysmpb.BlindedBeaconBlockCa
 	if err != nil {
 		return nil, NewDecodeError(err, "Body.ExecutionPayloadHeader.WithdrawalsRoot")
 	}
-	mlDSA87Changes, err := MLDSA87ChangesToConsensus(b.Body.MLDSA87ToExecutionChanges)
-	if err != nil {
-		return nil, NewDecodeError(err, "Body.MLDSA87ToExecutionChanges")
-	}
 
 	return &qrysmpb.BlindedBeaconBlockCapella{
 		Slot:          primitives.Slot(slot),
@@ -493,7 +484,6 @@ func (b *BlindedBeaconBlockCapella) ToConsensus() (*qrysmpb.BlindedBeaconBlockCa
 				TransactionsRoot: payloadTxsRoot,
 				WithdrawalsRoot:  payloadWithdrawalsRoot,
 			},
-			Mldsa87ToExecutionChanges: mlDSA87Changes,
 		},
 	}, nil
 }
@@ -530,10 +520,6 @@ func BlindedBeaconBlockCapellaFromConsensus(b *qrysmpb.BlindedBeaconBlockCapella
 		return nil, err
 	}
 	baseFeePerGas, err := sszBytesToUint256String(b.Body.ExecutionPayloadHeader.BaseFeePerGas)
-	if err != nil {
-		return nil, err
-	}
-	mlDSA87Changes, err := MLDSA87ChangesFromConsensus(b.Body.Mldsa87ToExecutionChanges)
 	if err != nil {
 		return nil, err
 	}
@@ -581,7 +567,6 @@ func BlindedBeaconBlockCapellaFromConsensus(b *qrysmpb.BlindedBeaconBlockCapella
 				TransactionsRoot: hexutil.Encode(b.Body.ExecutionPayloadHeader.TransactionsRoot),
 				WithdrawalsRoot:  hexutil.Encode(b.Body.ExecutionPayloadHeader.WithdrawalsRoot), // new in capella
 			},
-			MLDSA87ToExecutionChanges: mlDSA87Changes, // new in capella
 		},
 	}, nil
 }
@@ -635,10 +620,6 @@ func BeaconBlockCapellaFromConsensus(b *qrysmpb.BeaconBlockCapella) (*BeaconBloc
 			Amount:           fmt.Sprintf("%d", w.Amount),
 		}
 	}
-	mlDSA87Changes, err := MLDSA87ChangesFromConsensus(b.Body.Mldsa87ToExecutionChanges)
-	if err != nil {
-		return nil, err
-	}
 	syncCommitteeSignatures := make([]string, len(b.Body.SyncAggregate.SyncCommitteeSignatures))
 	for i, sig := range b.Body.SyncAggregate.SyncCommitteeSignatures {
 		syncCommitteeSignatures[i] = hexutil.Encode(sig)
@@ -683,7 +664,6 @@ func BeaconBlockCapellaFromConsensus(b *qrysmpb.BeaconBlockCapella) (*BeaconBloc
 				Transactions:  transactions,
 				Withdrawals:   withdrawals, // new in capella
 			},
-			MLDSA87ToExecutionChanges: mlDSA87Changes, // new in capella
 		},
 	}, nil
 }
@@ -1100,64 +1080,6 @@ func ExitsFromConsensus(src []*qrysmpb.SignedVoluntaryExit) ([]*SignedVoluntaryE
 		}
 	}
 	return exits, nil
-}
-
-func MLDSA87ChangesToConsensus(src []*SignedMLDSA87ToExecutionChange) ([]*qrysmpb.SignedMLDSA87ToExecutionChange, error) {
-	if src == nil {
-		return nil, errNilValue
-	}
-	err := VerifyMaxLength(src, 16)
-	if err != nil {
-		return nil, err
-	}
-
-	changes := make([]*qrysmpb.SignedMLDSA87ToExecutionChange, len(src))
-	for i, ch := range src {
-		if ch.Message == nil {
-			return nil, NewDecodeError(errNilValue, fmt.Sprintf("[%d]", i))
-		}
-
-		sig, err := DecodeHexWithLength(ch.Signature, fieldparams.MLDSA87SignatureLength)
-		if err != nil {
-			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Signature", i))
-		}
-		index, err := strconv.ParseUint(ch.Message.ValidatorIndex, 10, 64)
-		if err != nil {
-			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Message.ValidatorIndex", i))
-		}
-		pubkey, err := DecodeHexWithLength(ch.Message.FromMLDSA87Pubkey, fieldparams.MLDSA87PubkeyLength)
-		if err != nil {
-			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Message.FromMLDSA87Pubkey", i))
-		}
-		address, err := DecodeAddressWithLength(ch.Message.ToExecutionAddress, common.AddressLength)
-		if err != nil {
-			return nil, NewDecodeError(err, fmt.Sprintf("[%d].Message.ToExecutionAddress", i))
-		}
-		changes[i] = &qrysmpb.SignedMLDSA87ToExecutionChange{
-			Message: &qrysmpb.MLDSA87ToExecutionChange{
-				ValidatorIndex:     primitives.ValidatorIndex(index),
-				FromMldsa87Pubkey:  pubkey,
-				ToExecutionAddress: address,
-			},
-			Signature: sig,
-		}
-	}
-	return changes, nil
-}
-
-func MLDSA87ChangesFromConsensus(src []*qrysmpb.SignedMLDSA87ToExecutionChange) ([]*SignedMLDSA87ToExecutionChange, error) {
-	changes := make([]*SignedMLDSA87ToExecutionChange, len(src))
-	for i, ch := range src {
-		changes[i] = &SignedMLDSA87ToExecutionChange{
-			Message: &MLDSA87ToExecutionChange{
-				ValidatorIndex:     fmt.Sprintf("%d", ch.Message.ValidatorIndex),
-				FromMLDSA87Pubkey:  hexutil.Encode(ch.Message.FromMldsa87Pubkey),
-				ToExecutionAddress: hexutil.EncodeQ(ch.Message.ToExecutionAddress),
-			},
-			Signature: hexutil.Encode(ch.Signature),
-		}
-	}
-	return changes, nil
 }
 
 func Uint256ToSSZBytes(num string) ([]byte, error) {

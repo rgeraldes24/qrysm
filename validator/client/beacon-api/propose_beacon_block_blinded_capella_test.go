@@ -62,7 +62,6 @@ func TestProposeBeaconBlock_BlindedCapella(t *testing.T) {
 					TransactionsRoot: hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.TransactionsRoot),
 					WithdrawalsRoot:  hexutil.Encode(blindedCapellaBlock.BlindedCapella.Block.Body.ExecutionPayloadHeader.WithdrawalsRoot),
 				},
-				MLDSA87ToExecutionChanges: jsonifyMLDSA87ToExecutionChanges(blindedCapellaBlock.BlindedCapella.Block.Body.Mldsa87ToExecutionChanges),
 			},
 		},
 	}
@@ -322,24 +321,6 @@ func generateSignedBlindedCapellaBlock() *qrysmpb.GenericSignedBeaconBlock_Blind
 						BlockHash:        test_helpers.FillByteSlice(32, 124),
 						TransactionsRoot: test_helpers.FillByteSlice(32, 125),
 						WithdrawalsRoot:  test_helpers.FillByteSlice(32, 126),
-					},
-					Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{
-						{
-							Message: &qrysmpb.MLDSA87ToExecutionChange{
-								ValidatorIndex:     127,
-								FromMldsa87Pubkey:  test_helpers.FillByteSlice(2592, 128),
-								ToExecutionAddress: test_helpers.FillByteSlice(20, 129),
-							},
-							Signature: test_helpers.FillByteSlice(4627, 130),
-						},
-						{
-							Message: &qrysmpb.MLDSA87ToExecutionChange{
-								ValidatorIndex:     131,
-								FromMldsa87Pubkey:  test_helpers.FillByteSlice(2592, 132),
-								ToExecutionAddress: test_helpers.FillByteSlice(20, 133),
-							},
-							Signature: test_helpers.FillByteSlice(4627, 134),
-						},
 					},
 				},
 			},

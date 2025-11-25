@@ -5,8 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"net/url"
 	"path"
 	"regexp"
 	"sort"
@@ -14,7 +12,6 @@ import (
 	"text/template"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/theQRL/go-zond/common/hexutil"
 	"github.com/theQRL/qrysm/api/client"
 	"github.com/theQRL/qrysm/beacon-chain/rpc/apimiddleware"
@@ -27,15 +24,14 @@ import (
 )
 
 const (
-	getSignedBlockPath           = "/qrl/v1/beacon/blocks"
-	getBlockRootPath             = "/qrl/v1/beacon/blocks/{{.Id}}/root"
-	getForkForStatePath          = "/qrl/v1/beacon/states/{{.Id}}/fork"
-	getWeakSubjectivityPath      = "/qrl/v1/beacon/weak_subjectivity"
-	getForkSchedulePath          = "/qrl/v1/config/fork_schedule"
-	getConfigSpecPath            = "/qrl/v1/config/spec"
-	getStatePath                 = "/qrl/v1/debug/beacon/states"
-	getNodeVersionPath           = "/qrl/v1/node/version"
-	changeMLDSA87toExecutionPath = "/qrl/v1/beacon/pool/ml_dsa_87_to_execution_changes"
+	getSignedBlockPath      = "/qrl/v1/beacon/blocks"
+	getBlockRootPath        = "/qrl/v1/beacon/blocks/{{.Id}}/root"
+	getForkForStatePath     = "/qrl/v1/beacon/states/{{.Id}}/fork"
+	getWeakSubjectivityPath = "/qrl/v1/beacon/weak_subjectivity"
+	getForkSchedulePath     = "/qrl/v1/config/fork_schedule"
+	getConfigSpecPath       = "/qrl/v1/config/spec"
+	getStatePath            = "/qrl/v1/debug/beacon/states"
+	getNodeVersionPath      = "/qrl/v1/node/version"
 )
 
 // StateOrBlockId represents the block_id / state_id parameters that several of the QRL Beacon API methods accept.
@@ -279,60 +275,6 @@ func (c *Client) GetWeakSubjectivity(ctx context.Context) (*WeakSubjectivityData
 		BlockRoot: bytesutil.ToBytes32(blockRoot),
 		StateRoot: bytesutil.ToBytes32(stateRoot),
 	}, nil
-}
-
-// SubmitChangeMLDSA87toExecution calls a beacon API endpoint to set the withdrawal addresses based on the given signed messages.
-// If the API responds with something other than OK there will be failure messages associated to the corresponding request message.
-func (c *Client) SubmitChangeMLDSA87toExecution(ctx context.Context, request []*apimiddleware.SignedMLDSA87ToExecutionChangeJson) error {
-	u := c.BaseURL().ResolveReference(&url.URL{Path: changeMLDSA87toExecutionPath})
-	body, err := json.Marshal(request)
-	if err != nil {
-		return errors.Wrap(err, "failed to marshal JSON")
-	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewBuffer(body))
-	if err != nil {
-		return errors.Wrap(err, "invalid format, failed to create new POST request object")
-	}
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := c.Do(req)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		err = resp.Body.Close()
-	}()
-	if resp.StatusCode != http.StatusOK {
-		decoder := json.NewDecoder(resp.Body)
-		decoder.DisallowUnknownFields()
-		errorJson := &apimiddleware.IndexedVerificationFailureErrorJson{}
-		if err := decoder.Decode(errorJson); err != nil {
-			return errors.Wrapf(err, "failed to decode error JSON for %s", resp.Request.URL)
-		}
-		for _, failure := range errorJson.Failures {
-			w := request[failure.Index].Message
-			log.WithFields(log.Fields{
-				"validator_index":    w.ValidatorIndex,
-				"withdrawal_address": w.ToExecutionAddress,
-			}).Error(failure.Message)
-		}
-		return errors.Errorf("POST error %d: %s", errorJson.Code, errorJson.Message)
-	}
-	return nil
-}
-
-// GetMLDSA87toExecutionChanges gets all the set withdrawal messages in the node's operation pool.
-// Returns a struct representation of json response.
-func (c *Client) GetMLDSA87toExecutionChanges(ctx context.Context) (*apimiddleware.MLDSA87ToExecutionChangesPoolResponseJson, error) {
-	body, err := c.Get(ctx, changeMLDSA87toExecutionPath)
-	if err != nil {
-		return nil, err
-	}
-	poolResponse := &apimiddleware.MLDSA87ToExecutionChangesPoolResponseJson{}
-	err = json.Unmarshal(body, poolResponse)
-	if err != nil {
-		return nil, err
-	}
-	return poolResponse, nil
 }
 
 type forkScheduleResponse struct {

@@ -22,17 +22,16 @@ import (
 
 // params struct defines the parameters needed for running E2E tests to properly handle test sharding.
 type params struct {
-	TestPath               string
-	LogPath                string
-	TestShardIndex         int
-	BeaconNodeCount        int
-	Ports                  *ports
-	Paths                  *paths
-	ELGenesisBlock         *types.Block
-	ELGenesisTime          uint64
-	StartTime              time.Time
-	CLGenesisTime          uint64
-	NumberOfExecutionCreds uint64
+	TestPath        string
+	LogPath         string
+	TestShardIndex  int
+	BeaconNodeCount int
+	Ports           *ports
+	Paths           *paths
+	ELGenesisBlock  *types.Block
+	ELGenesisTime   uint64
+	StartTime       time.Time
+	CLGenesisTime   uint64
 }
 
 type ports struct {
@@ -112,9 +111,6 @@ var StandardBeaconCount = 2
 
 // DepositCount is the number of deposits the E2E runner should make to evaluate post-genesis deposit processing.
 var DepositCount = uint64(64)
-
-// PregenesisExecCreds is the number of withdrawal credentials of genesis validators which use an execution address.
-var PregenesisExecCreds = uint64(8)
 
 // NumOfExecEngineTxs is the number of transaction sent to the execution engine.
 var NumOfExecEngineTxs = uint64(200)
@@ -199,14 +195,13 @@ func Init(t *testing.T, beaconNodeCount int) error {
 
 	genTime := uint64(time.Now().Unix()) + StartupBufferSecs
 	TestParams = &params{
-		TestPath:               filepath.Join(testPath, fmt.Sprintf("shard-%d", testShardIndex)),
-		LogPath:                logPath,
-		TestShardIndex:         testShardIndex,
-		BeaconNodeCount:        beaconNodeCount,
-		Ports:                  testPorts,
-		CLGenesisTime:          genTime,
-		ELGenesisTime:          genTime,
-		NumberOfExecutionCreds: PregenesisExecCreds,
+		TestPath:        filepath.Join(testPath, fmt.Sprintf("shard-%d", testShardIndex)),
+		LogPath:         logPath,
+		TestShardIndex:  testShardIndex,
+		BeaconNodeCount: beaconNodeCount,
+		Ports:           testPorts,
+		CLGenesisTime:   genTime,
+		ELGenesisTime:   genTime,
 	}
 	return nil
 }

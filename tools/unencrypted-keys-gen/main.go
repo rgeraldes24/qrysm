@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	numKeys    = flag.Int("num-keys", 0, "Number of validator private/withdrawal keys to generate")
+	numKeys    = flag.Int("num-keys", 0, "Number of validator private keys to generate")
 	startIndex = flag.Uint64("start-index", 0, "Start index for the determinstic keygen algorithm")
 	random     = flag.Bool("random", false, "Randomly generate keys")
 	outputJSON = flag.String("output-json", "", "JSON file to write output to")
@@ -73,8 +73,7 @@ func generateRandomKeys(num int) (*keygen.UnencryptedKeysContainer, error) {
 			return nil, err
 		}
 		ctnr.Keys[i] = &keygen.UnencryptedKeys{
-			ValidatorKey:  sk.Marshal(),
-			WithdrawalKey: sk.Marshal(),
+			ValidatorKey: sk.Marshal(),
 		}
 	}
 
@@ -94,8 +93,7 @@ func generateUnencryptedKeys(startIndex uint64) *keygen.UnencryptedKeysContainer
 
 	for i, sk := range sks {
 		ctnr.Keys[i] = &keygen.UnencryptedKeys{
-			ValidatorKey:  sk.Marshal(),
-			WithdrawalKey: sk.Marshal(),
+			ValidatorKey: sk.Marshal(),
 		}
 	}
 	return ctnr

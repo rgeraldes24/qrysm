@@ -24,49 +24,6 @@ func TestBeaconBlockJsonHelpers_JsonifyTransactions(t *testing.T) {
 	assert.DeepEqual(t, expectedResult, result)
 }
 
-func TestBeaconBlockJsonHelpers_JsonifyMLDSA87ToExecutionChanges(t *testing.T) {
-	input := []*qrysmpb.SignedMLDSA87ToExecutionChange{
-		{
-			Message: &qrysmpb.MLDSA87ToExecutionChange{
-				ValidatorIndex:     1,
-				FromMldsa87Pubkey:  []byte{2},
-				ToExecutionAddress: []byte{3},
-			},
-			Signature: []byte{7},
-		},
-		{
-			Message: &qrysmpb.MLDSA87ToExecutionChange{
-				ValidatorIndex:     4,
-				FromMldsa87Pubkey:  []byte{5},
-				ToExecutionAddress: []byte{6},
-			},
-			Signature: []byte{8},
-		},
-	}
-
-	expectedResult := []*apimiddleware.SignedMLDSA87ToExecutionChangeJson{
-		{
-			Message: &apimiddleware.MLDSA87ToExecutionChangeJson{
-				ValidatorIndex:     "1",
-				FromMLDSA87Pubkey:  hexutil.Encode([]byte{2}),
-				ToExecutionAddress: hexutil.Encode([]byte{3}),
-			},
-			Signature: hexutil.Encode([]byte{7}),
-		},
-		{
-			Message: &apimiddleware.MLDSA87ToExecutionChangeJson{
-				ValidatorIndex:     "4",
-				FromMLDSA87Pubkey:  hexutil.Encode([]byte{5}),
-				ToExecutionAddress: hexutil.Encode([]byte{6}),
-			},
-			Signature: hexutil.Encode([]byte{8}),
-		},
-	}
-
-	result := jsonifyMLDSA87ToExecutionChanges(input)
-	assert.DeepEqual(t, expectedResult, result)
-}
-
 func TestBeaconBlockJsonHelpers_JsonifyExecutionData(t *testing.T) {
 	input := &qrysmpb.ExecutionData{
 		DepositRoot:  []byte{1},

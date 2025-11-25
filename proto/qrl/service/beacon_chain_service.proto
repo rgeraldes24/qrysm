@@ -24,7 +24,6 @@ import "proto/qrl/v1/beacon_chain.proto";
 import "proto/qrl/v1/beacon_state.proto";
 import "proto/qrl/v1/ssz.proto";
 import "proto/qrl/v1/sync_committee.proto";
-import "proto/qrl/v1/withdrawals.proto";
 
 option csharp_namespace = "TheQRL.QRL.Service";
 option go_package = "github.com/theQRL/qrysm/proto/qrl/service";
@@ -168,25 +167,7 @@ service BeaconChain {
       body: "*"
     };
   }
-
-  // SubmitSignedMLDSA87ToExecutionChanges submits said object to node's pool
-  // and if passes validation node MUST broadcast it to network.
-  rpc SubmitSignedMLDSA87ToExecutionChanges(v1.SubmitMLDSA87ToExecutionChangesRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/internal/qrl/v1/beacon/pool/ml_dsa_87_to_execution_changes"
-      body: "*"
-    };
-  }
-
-  // ListMLDSA87ToExecutionChanges retrieves ML-DSA-87 to execution changes known by the node but not necessarily incorporated into any block
-  //
-  // Spec: https://ethereum.github.io/beacon-APIs/?urls.primaryName=dev#/Beacon/getPoolBLSToExecutionChanges
-  rpc ListMLDSA87ToExecutionChanges(google.protobuf.Empty) returns (v1.MLDSA87ToExecutionChangesPoolResponse) {
-    option (google.api.http) = {
-      get: "/internal/qrl/v1/beacon/pool/ml_dsa_87_to_execution_changes"
-    };
-  }
-
+  
   // Beacon config API related endpoints.
 
   // GetForkSchedule retrieve all scheduled upcoming forks this node is aware of.

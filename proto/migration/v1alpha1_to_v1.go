@@ -475,18 +475,6 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 		return nil, errors.Wrapf(err, "could not calculate transactions root")
 	}
 
-	changes := make([]*qrlpb.SignedMLDSA87ToExecutionChange, len(v1alpha1Block.Body.Mldsa87ToExecutionChanges))
-	for i, change := range v1alpha1Block.Body.Mldsa87ToExecutionChanges {
-		changes[i] = &qrlpb.SignedMLDSA87ToExecutionChange{
-			Message: &qrlpb.MLDSA87ToExecutionChange{
-				ValidatorIndex:     change.Message.ValidatorIndex,
-				FromMldsa87Pubkey:  bytesutil.SafeCopyBytes(change.Message.FromMldsa87Pubkey),
-				ToExecutionAddress: bytesutil.SafeCopyBytes(change.Message.ToExecutionAddress),
-			},
-			Signature: bytesutil.SafeCopyBytes(change.Signature),
-		}
-	}
-
 	syncSigs := make([][]byte, len(v1alpha1Block.Body.SyncAggregate.SyncCommitteeSignatures))
 	for i, sig := range v1alpha1Block.Body.SyncAggregate.SyncCommitteeSignatures {
 		syncSigs[i] = bytesutil.SafeCopyBytes(sig)
@@ -526,7 +514,6 @@ func V1Alpha1BeaconBlockCapellaToV1Blinded(v1alpha1Block *qrysmpb.BeaconBlockCap
 			TransactionsRoot: transactionsRoot[:],
 			WithdrawalsRoot:  withdrawalsRoot[:],
 		},
-		Mldsa87ToExecutionChanges: changes,
 	}
 	v1Block := &qrlpb.BlindedBeaconBlockCapella{
 		Slot:          v1alpha1Block.Slot,
@@ -716,31 +703,6 @@ func V1Alpha1SignedContributionAndProofToV1(alphaContribution *qrysmpb.SignedCon
 			SelectionProof: alphaContribution.Message.SelectionProof,
 		},
 		Signature: alphaContribution.Signature,
-	}
-	return result
-}
-
-// V1SignedMLDSA87ToExecutionChangeToV1Alpha1 converts a V1 SignedMLDSA87ToExecutionChange to its v1alpha1 equivalent.
-func V1SignedMLDSA87ToExecutionChangeToV1Alpha1(change *qrlpb.SignedMLDSA87ToExecutionChange) *qrysmpb.SignedMLDSA87ToExecutionChange {
-	return &qrysmpb.SignedMLDSA87ToExecutionChange{
-		Message: &qrysmpb.MLDSA87ToExecutionChange{
-			ValidatorIndex:     change.Message.ValidatorIndex,
-			FromMldsa87Pubkey:  bytesutil.SafeCopyBytes(change.Message.FromMldsa87Pubkey),
-			ToExecutionAddress: bytesutil.SafeCopyBytes(change.Message.ToExecutionAddress),
-		},
-		Signature: bytesutil.SafeCopyBytes(change.Signature),
-	}
-}
-
-// V1Alpha1SignedMLDSA87ToExecChangeToV1 converts a v1alpha1 SignedMLDSA87ToExecutionChange object to its v1 equivalent.
-func V1Alpha1SignedMLDSA87ToExecChangeToV1(alphaChange *qrysmpb.SignedMLDSA87ToExecutionChange) *qrlpb.SignedMLDSA87ToExecutionChange {
-	result := &qrlpb.SignedMLDSA87ToExecutionChange{
-		Message: &qrlpb.MLDSA87ToExecutionChange{
-			ValidatorIndex:     alphaChange.Message.ValidatorIndex,
-			FromMldsa87Pubkey:  bytesutil.SafeCopyBytes(alphaChange.Message.FromMldsa87Pubkey),
-			ToExecutionAddress: bytesutil.SafeCopyBytes(alphaChange.Message.ToExecutionAddress),
-		},
-		Signature: bytesutil.SafeCopyBytes(alphaChange.Signature),
 	}
 	return result
 }

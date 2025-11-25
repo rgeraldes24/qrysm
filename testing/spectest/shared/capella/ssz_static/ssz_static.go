@@ -128,10 +128,6 @@ func unmarshalledSSZ(t *testing.T, serializedBytes []byte, folderName string) (i
 	// 	obj = &qrysmpb.PowBlock{}
 	case "Withdrawal":
 		obj = &enginev1.Withdrawal{}
-	case "MLDSA87ToExecutionChange":
-		obj = &qrysmpb.MLDSA87ToExecutionChange{}
-	case "SignedMLDSA87ToExecutionChange":
-		obj = &qrysmpb.SignedMLDSA87ToExecutionChange{}
 	default:
 		return nil, errors.New("type not found")
 	}

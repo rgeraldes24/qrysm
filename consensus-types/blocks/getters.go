@@ -136,17 +136,16 @@ func (b *SignedBeaconBlock) ToBlinded() (interfaces.ReadOnlySignedBeaconBlock, e
 					ParentRoot:    b.block.parentRoot[:],
 					StateRoot:     b.block.stateRoot[:],
 					Body: &qrysmpb.BlindedBeaconBlockBodyCapella{
-						RandaoReveal:              b.block.body.randaoReveal[:],
-						ExecutionData:             b.block.body.executionData,
-						Graffiti:                  b.block.body.graffiti[:],
-						ProposerSlashings:         b.block.body.proposerSlashings,
-						AttesterSlashings:         b.block.body.attesterSlashings,
-						Attestations:              b.block.body.attestations,
-						Deposits:                  b.block.body.deposits,
-						VoluntaryExits:            b.block.body.voluntaryExits,
-						SyncAggregate:             b.block.body.syncAggregate,
-						ExecutionPayloadHeader:    header,
-						Mldsa87ToExecutionChanges: b.block.body.mlDSA87ToExecutionChanges,
+						RandaoReveal:           b.block.body.randaoReveal[:],
+						ExecutionData:          b.block.body.executionData,
+						Graffiti:               b.block.body.graffiti[:],
+						ProposerSlashings:      b.block.body.proposerSlashings,
+						AttesterSlashings:      b.block.body.attesterSlashings,
+						Attestations:           b.block.body.attestations,
+						Deposits:               b.block.body.deposits,
+						VoluntaryExits:         b.block.body.voluntaryExits,
+						SyncAggregate:          b.block.body.syncAggregate,
+						ExecutionPayloadHeader: header,
 					},
 				},
 				Signature: b.signature[:],
@@ -574,10 +573,6 @@ func (b *BeaconBlockBody) Execution() (interfaces.ExecutionData, error) {
 	default:
 		return nil, errIncorrectBlockVersion
 	}
-}
-
-func (b *BeaconBlockBody) MLDSA87ToExecutionChanges() ([]*qrysmpb.SignedMLDSA87ToExecutionChange, error) {
-	return b.mlDSA87ToExecutionChanges, nil
 }
 
 // HashTreeRoot returns the ssz root of the block body.

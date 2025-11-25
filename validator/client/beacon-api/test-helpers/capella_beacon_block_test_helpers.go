@@ -250,24 +250,6 @@ func GenerateProtoCapellaBeaconBlock() *qrysmpb.BeaconBlockCapella {
 					},
 				},
 			},
-			Mldsa87ToExecutionChanges: []*qrysmpb.SignedMLDSA87ToExecutionChange{
-				{
-					Message: &qrysmpb.MLDSA87ToExecutionChange{
-						ValidatorIndex:     135,
-						FromMldsa87Pubkey:  FillByteSlice(2592, 136),
-						ToExecutionAddress: FillByteSlice(20, 137),
-					},
-					Signature: FillByteSlice(4627, 138),
-				},
-				{
-					Message: &qrysmpb.MLDSA87ToExecutionChange{
-						ValidatorIndex:     139,
-						FromMldsa87Pubkey:  FillByteSlice(2592, 140),
-						ToExecutionAddress: FillByteSlice(20, 141),
-					},
-					Signature: FillByteSlice(4627, 142),
-				},
-			},
 		},
 	}
 }
@@ -513,24 +495,6 @@ func GenerateJsonCapellaBeaconBlock() *apimiddleware.BeaconBlockCapellaJson {
 						ExecutionAddress: FillEncodedByteSlice(20, 133),
 						Amount:           "134",
 					},
-				},
-			},
-			MLDSA87ToExecutionChanges: []*apimiddleware.SignedMLDSA87ToExecutionChangeJson{
-				{
-					Message: &apimiddleware.MLDSA87ToExecutionChangeJson{
-						ValidatorIndex:     "135",
-						FromMLDSA87Pubkey:  FillEncodedByteSlice(2592, 136),
-						ToExecutionAddress: FillEncodedByteSlice(20, 137),
-					},
-					Signature: FillEncodedByteSlice(4627, 138),
-				},
-				{
-					Message: &apimiddleware.MLDSA87ToExecutionChangeJson{
-						ValidatorIndex:     "139",
-						FromMLDSA87Pubkey:  FillEncodedByteSlice(2592, 140),
-						ToExecutionAddress: FillEncodedByteSlice(20, 141),
-					},
-					Signature: FillEncodedByteSlice(4627, 142),
 				},
 			},
 		},

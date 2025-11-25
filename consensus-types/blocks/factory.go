@@ -167,10 +167,6 @@ func BuildSignedBeaconBlockFromExecutionPayload(
 	var fullBlock interface{}
 	switch p := payload.(type) {
 	case *enginev1.ExecutionPayloadCapella:
-		mlDSA87ToExecutionChanges, err := b.Body().MLDSA87ToExecutionChanges()
-		if err != nil {
-			return nil, err
-		}
 		fullBlock = &qrysmpb.SignedBeaconBlockCapella{
 			Block: &qrysmpb.BeaconBlockCapella{
 				Slot:          b.Slot(),
@@ -178,17 +174,16 @@ func BuildSignedBeaconBlockFromExecutionPayload(
 				ParentRoot:    parentRoot[:],
 				StateRoot:     stateRoot[:],
 				Body: &qrysmpb.BeaconBlockBodyCapella{
-					RandaoReveal:              randaoReveal[:],
-					ExecutionData:             b.Body().ExecutionData(),
-					Graffiti:                  graffiti[:],
-					ProposerSlashings:         b.Body().ProposerSlashings(),
-					AttesterSlashings:         b.Body().AttesterSlashings(),
-					Attestations:              b.Body().Attestations(),
-					Deposits:                  b.Body().Deposits(),
-					VoluntaryExits:            b.Body().VoluntaryExits(),
-					SyncAggregate:             syncAgg,
-					ExecutionPayload:          p,
-					Mldsa87ToExecutionChanges: mlDSA87ToExecutionChanges,
+					RandaoReveal:      randaoReveal[:],
+					ExecutionData:     b.Body().ExecutionData(),
+					Graffiti:          graffiti[:],
+					ProposerSlashings: b.Body().ProposerSlashings(),
+					AttesterSlashings: b.Body().AttesterSlashings(),
+					Attestations:      b.Body().Attestations(),
+					Deposits:          b.Body().Deposits(),
+					VoluntaryExits:    b.Body().VoluntaryExits(),
+					SyncAggregate:     syncAgg,
+					ExecutionPayload:  p,
 				},
 			},
 			Signature: sig[:],

@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/go-zond/accounts/keystore"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/core/types"
+	"github.com/theQRL/go-zond/crypto/pqcrypto/wallet"
 	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/qrysm/config/params"
@@ -20,6 +20,7 @@ import (
 	"github.com/theQRL/qrysm/pkg/FuzzyVM/filler"
 	txfuzz "github.com/theQRL/qrysm/pkg/tx-fuzz"
 	e2e "github.com/theQRL/qrysm/testing/endtoend/params"
+
 	"golang.org/x/sync/errgroup"
 )
 
@@ -74,15 +75,15 @@ func (t *TransactionGenerator) Start(ctx context.Context) error {
 	ticker := time.NewTicker(txPeriod)
 	gasFeeCap := big.NewInt(1e11)
 	gasTipCap := big.NewInt(3e7)
-	key := testKey.Wallet
-	addr := common.Address(key.GetAddress())
+	wallet := testKey.Wallet
+	addr := common.Address(wallet.GetAddress())
 
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
-			err := SendTransaction(client, key, f, gasFeeCap, gasTipCap, addr.String(), 1000, false)
+			err := SendTransaction(client, wallet, f, gasFeeCap, gasTipCap, addr.String(), 1000, false)
 			if err != nil {
 				return err
 			}
@@ -95,7 +96,7 @@ func (s *TransactionGenerator) Started() <-chan struct{} {
 	return s.started
 }
 
-func SendTransaction(client *rpc.Client, key *ml_dsa_87.Wallet, f *filler.Filler, gasFeeCap *big.Int, gasTipCap *big.Int, addr string, N uint64, al bool) error {
+func SendTransaction(client *rpc.Client, wallet wallet.Wallet, f *filler.Filler, gasFeeCap *big.Int, gasTipCap *big.Int, addr string, N uint64, al bool) error {
 	backend := qrlclient.NewClient(client)
 
 	sender, err := common.NewAddressFromString(addr)
@@ -136,7 +137,7 @@ func SendTransaction(client *rpc.Client, key *ml_dsa_87.Wallet, f *filler.Filler
 				//nolint:nilerr
 				return nil
 			}
-			signedTx, err := types.SignTx(tx, types.NewShanghaiSigner(chainid), key)
+			signedTx, err := types.SignTx(tx, types.NewShanghaiSigner(chainid), wallet)
 			if err != nil {
 				// We continue on in the event there is a reason we can't sign this
 				// transaction(unlikely).

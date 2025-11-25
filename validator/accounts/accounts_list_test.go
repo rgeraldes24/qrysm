@@ -367,12 +367,10 @@ func TestListAccounts_DerivedKeymanager(t *testing.T) {
 	// Expected output example:
 
 		(keymanager kind) derived, (HD) hierarchical-deterministic
-		(derivation format) m / purpose / coin_type / account_index / withdrawal_key / validating_key
+		(derivation format) m / purpose / coin_type / account_index / validating_key
 		Showing 2 validator accounts
 
 		Account 0 | uniquely-sunny-tarpon
-		[withdrawal public key] 0xa5faa97252104b408340b5d8cae3fa01023fa4dc9e7c7b470821433cf3a2a18158410b7d8a6dcdcd176c6552c2526681
-		[withdrawal private key] 0x5266fd1f13d7af74614fde4fed3b664bfd529bc4ad91118e3db73647b99546df
 		[derivation path] m/12381/3600/0/0
 		[validating public key] 0xa7292d8f8d1c1f3d42cacefd2fc4cd3b82651be37c1eb790bbd294a874829f4b7e1c167345dcc1966cc844132b38097e
 		[validating private key] 0x590707187dae64b42b8d36a95f3d7e11313ddd8b8d871b09e478e08c9bc8740b
@@ -385,8 +383,6 @@ func TestListAccounts_DerivedKeymanager(t *testing.T) {
 		===================================================================
 
 		Account 1 | usually-obliging-pelican
-		[withdrawal public key] 0xb91840d33bb87338bb28605cff837acd50e43a174a8a6d3893108fb91217fa428c12f1b2a25cf3c7aca75d418bcf0384
-		[withdrawal private key] 0x72c5ffa7d08fb16cd35a9cb10494dfd49b46842ea1bcc1a4cf46b46680b66810
 		[derivation path] m/12381/3600/1/0
 		[validating public key] 0x8447f878b701dad4dfa5a884cebc4745b0e8f21340dc56c840826537764dcc54e2e68f80b8d4e5737180212a26211891
 		[validating private key] 0x2cd5b1cddc9d96e50a16bea05d0953447655e3dd59fa1bfefad467c73d6c164a

@@ -121,13 +121,6 @@ func (s *Service) registerSubscribers(epoch primitives.Epoch, digest [4]byte) {
 			digest,
 		)
 	}
-
-	s.subscribe(
-		p2p.MLDSA87ToExecutionChangeSubnetTopicFormat,
-		s.validateMLDSA87ToExecutionChange,
-		s.mlDSA87ToExecutionChangeSubscriber,
-		digest,
-	)
 }
 
 // subscribe to a given topic with a given validator and subscription handler.

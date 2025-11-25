@@ -4,10 +4,12 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
+	walletmldsa87 "github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
+	"github.com/theQRL/go-zond/crypto/pqcrypto"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/container/trie"
-	"github.com/theQRL/qrysm/crypto/hash"
+	"github.com/theQRL/qrysm/contracts/deposit"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
@@ -54,7 +56,7 @@ func DeterministicDepositsAndKeys(numDeposits uint64) ([]*qrysmpb.Deposit, []ml_
 		// Create the new deposits and add them to the trie.
 		for i := uint64(0); i < numRequired; i++ {
 			balance := params.BeaconConfig().MaxEffectiveBalance
-			deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), publicKeys[i+1].Marshal(), balance)
+			deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), balance)
 			if err != nil {
 				return nil, nil, errors.Wrap(err, "could not create signed deposit")
 			}
@@ -126,7 +128,7 @@ func DepositsWithBalance(balances []uint64) ([]*qrysmpb.Deposit, *trie.SparseMer
 		if len(balances) == int(numDeposits) {
 			balance = balances[i]
 		}
-		deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), publicKeys[i+1].Marshal(), balance)
+		deposit, err := signedDeposit(secretKeys[i], publicKeys[i].Marshal(), balance)
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "could not create signed deposit")
 		}
@@ -160,16 +162,19 @@ func DepositsWithBalance(balances []uint64) ([]*qrysmpb.Deposit, *trie.SparseMer
 
 func signedDeposit(
 	secretKey ml_dsa_87.MLDSA87Key,
-	publicKey,
-	withdrawalKey []byte,
+	publicKey []byte,
 	balance uint64,
 ) (*qrysmpb.Deposit, error) {
-	withdrawalCreds := hash.Hash(withdrawalKey)
-	withdrawalCreds[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
+	descriptor := walletmldsa87.NewMLDSA87Descriptor().ToDescriptor()
+	withdrawalAddr, err := pqcrypto.PublicKeyAndDescriptorToAddress(publicKey, descriptor)
+	if err != nil {
+		return nil, err
+	}
+	withdrawalCreds := deposit.WithdrawalCredentialsAddress(withdrawalAddr)
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             publicKey,
 		Amount:                balance,
-		WithdrawalCredentials: withdrawalCreds[:],
+		WithdrawalCredentials: withdrawalCreds,
 	}
 
 	domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)
@@ -188,7 +193,7 @@ func signedDeposit(
 	depositData := &qrysmpb.Deposit_Data{
 		PublicKey:             publicKey,
 		Amount:                balance,
-		WithdrawalCredentials: withdrawalCreds[:],
+		WithdrawalCredentials: withdrawalCreds,
 		Signature:             secretKey.Sign(sigRoot[:]).Marshal(),
 	}
 
@@ -308,15 +313,18 @@ func DeterministicDepositsAndKeysSameValidator(numDeposits uint64) ([]*qrysmpb.D
 		}
 		privKeys = append(privKeys, secretKeys[:len(secretKeys)-1]...)
 
-		// Create the new deposits and add them to the trie. Always use the first validator to create deposit
-		for i := uint64(0); i < numRequired; i++ {
-			withdrawalCreds := hash.Hash(publicKeys[1].Marshal())
-			withdrawalCreds[0] = params.BeaconConfig().MLDSA87WithdrawalPrefixByte
+		descriptor := walletmldsa87.NewMLDSA87Descriptor().ToDescriptor()
+		addr1, err := pqcrypto.PublicKeyAndDescriptorToAddress(publicKeys[1].Marshal(), descriptor)
+		if err != nil {
+			return nil, nil, err
+		}
 
+		// Create the new deposits and add them to the trie. Always use the first validator to create deposit
+		for i := range numRequired {
 			depositMessage := &qrysmpb.DepositMessage{
 				PublicKey:             publicKeys[1].Marshal(),
 				Amount:                params.BeaconConfig().MaxEffectiveBalance,
-				WithdrawalCredentials: withdrawalCreds[:],
+				WithdrawalCredentials: deposit.WithdrawalCredentialsAddress(addr1),
 			}
 
 			domain, err := signing.ComputeDomain(params.BeaconConfig().DomainDeposit, nil, nil)

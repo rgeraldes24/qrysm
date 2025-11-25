@@ -124,7 +124,7 @@ func TestExpectedWithdrawals(t *testing.T) {
 				WithdrawableEpoch:     params.BeaconConfig().FarFutureEpoch,
 				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
 			}
-			val.WithdrawalCredentials[0] = params.BeaconConfig().QRLAddressWithdrawalPrefixByte
+			val.WithdrawalCredentials[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
 			validators = append(validators, val)
 			balances = append(balances, params.BeaconConfig().MaxEffectiveBalance)
 		}

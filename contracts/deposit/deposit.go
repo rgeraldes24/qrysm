@@ -4,9 +4,9 @@ package deposit
 
 import (
 	"github.com/pkg/errors"
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/beacon-chain/core/signing"
 	"github.com/theQRL/qrysm/config/params"
-	"github.com/theQRL/qrysm/crypto/hash"
 	"github.com/theQRL/qrysm/crypto/ml_dsa_87"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
@@ -26,10 +26,10 @@ import (
 //	- Send a transaction on the QRL execution layer to DEPOSIT_CONTRACT_ADDRESS executing `deposit(pubkey: bytes[48], withdrawal_credentials: bytes[32], signature: bytes[96])` along with a deposit of amount Shor.
 //
 // See: https://github.com/ethereum/consensus-specs/blob/master/specs/validator/0_beacon-chain-validator.md#submit-deposit
-func DepositInput(depositKey, withdrawalKey ml_dsa_87.MLDSA87Key, amountInShor uint64, forkVersion []byte) (*qrysmpb.Deposit_Data, [32]byte, error) {
+func DepositInput(depositKey ml_dsa_87.MLDSA87Key, withdrawalAddr common.Address, amountInShor uint64, forkVersion []byte) (*qrysmpb.Deposit_Data, [32]byte, error) {
 	depositMessage := &qrysmpb.DepositMessage{
 		PublicKey:             depositKey.PublicKey().Marshal(),
-		WithdrawalCredentials: WithdrawalCredentialsHash(withdrawalKey),
+		WithdrawalCredentials: WithdrawalCredentialsAddress(withdrawalAddr),
 		Amount:                amountInShor,
 	}
 
@@ -65,18 +65,12 @@ func DepositInput(depositKey, withdrawalKey ml_dsa_87.MLDSA87Key, amountInShor u
 	return di, dr, nil
 }
 
-// WithdrawalCredentialsHash forms a 32 byte hash of the withdrawal public
-// address.
-//
-// The specification is as follows:
-//
-//	withdrawal_credentials[:1] == BLS_WITHDRAWAL_PREFIX_BYTE
-//	withdrawal_credentials[1:] == hash(withdrawal_pubkey)[1:]
-//
-// where withdrawal_credentials is of type bytes32.
-func WithdrawalCredentialsHash(withdrawalKey ml_dsa_87.MLDSA87Key) []byte {
-	h := hash.Hash(withdrawalKey.PublicKey().Marshal())
-	return append([]byte{params.BeaconConfig().MLDSA87WithdrawalPrefixByte}, h[1:]...)[:32]
+// WithdrawalCredentialsAddress forms a 32 byte with the withdrawal execution address.
+func WithdrawalCredentialsAddress(addr common.Address) []byte {
+	creds := make([]byte, 12)
+	creds[0] = params.BeaconConfig().ExecutionAddressWithdrawalPrefixByte
+	creds = append(creds, addr.Bytes()...)
+	return creds
 }
 
 // VerifyDepositSignature verifies the correctness of Execution deposit ML-DSA-87 signature

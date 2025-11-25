@@ -203,11 +203,6 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 		return nil, errors.Wrap(err, "failed to get withdrawals")
 	}
 
-	mlDSA87ToExecutionChanges, err := convertMLDSA87ToExecutionChangesToProto(block.Body.MLDSA87ToExecutionChanges)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get ml-dsa-87 to execution changes")
-	}
-
 	return &qrysmpb.BeaconBlockCapella{
 		Slot:          primitives.Slot(blockSlot),
 		ProposerIndex: primitives.ValidatorIndex(blockProposerIndex),
@@ -247,7 +242,6 @@ func (c beaconApiBeaconBlockConverter) ConvertRESTCapellaBlockToProto(block *api
 				Transactions:  transactions,
 				Withdrawals:   withdrawals,
 			},
-			Mldsa87ToExecutionChanges: mlDSA87ToExecutionChanges,
 		},
 	}, nil
 }

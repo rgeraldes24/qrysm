@@ -1,7 +1,6 @@
 package submit
 
 import (
-	"bytes"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -12,9 +11,9 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	walletmldsa87 "github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/go-zond/accounts/abi/bind"
 	"github.com/theQRL/go-zond/common"
+	"github.com/theQRL/go-zond/crypto/pqcrypto/wallet"
 	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
 	"github.com/theQRL/qrysm/cmd"
@@ -72,20 +71,9 @@ func submitDeposits(cliCtx *cli.Context) error {
 	}
 
 	signingSeedFile := cliCtx.String(flags.QRLSeedFileFlag.Name)
-	signingSeedHex, err := os.ReadFile(signingSeedFile)
+	wallet, err := wallet.RestoreFromFile(signingSeedFile)
 	if err != nil {
-		return fmt.Errorf("failed to read seed file. reason: %v", err)
-	}
-	signingSeedHex = bytes.TrimSpace(signingSeedHex)
-	signingSeed := make([]byte, hex.DecodedLen(len(signingSeedHex)))
-	_, err = hex.Decode(signingSeed, signingSeedHex)
-	if err != nil {
-		return fmt.Errorf("failed to read seed. reason: %v", err)
-	}
-
-	depositKey, err := walletmldsa87.NewWalletFromSeed(bytesutil.ToBytes48(signingSeed))
-	if err != nil {
-		return fmt.Errorf("failed to generate the deposit key from the signing seed. reason: %v", err)
+		return fmt.Errorf("failed to restore wallet from file: %v", err)
 	}
 
 	gasTip, err := qrlCli.SuggestGasTipCap(cliCtx.Context)
@@ -93,7 +81,7 @@ func submitDeposits(cliCtx *cli.Context) error {
 		return fmt.Errorf("failed to get gas tip suggestion. reason: %v", err)
 	}
 
-	txOpts, err := bind.NewKeyedTransactorWithChainID(depositKey, chainID)
+	txOpts, err := bind.NewKeyedTransactorWithChainID(wallet, chainID)
 	if err != nil {
 		return err
 	}

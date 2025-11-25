@@ -79,10 +79,6 @@ type ProposerSlashingsPoolResponseJson struct {
 	Data []*ProposerSlashingJson `json:"data"`
 }
 
-type MLDSA87ToExecutionChangesPoolResponseJson struct {
-	Data []*SignedMLDSA87ToExecutionChangeJson `json:"data"`
-}
-
 type IdentityResponseJson struct {
 	Data *IdentityJson `json:"data"`
 }
@@ -285,31 +281,29 @@ type BlindedBeaconBlockCapellaJson struct {
 }
 
 type BeaconBlockBodyCapellaJson struct {
-	RandaoReveal              string                                `json:"randao_reveal" hex:"true"`
-	ExecutionData             *ExecutionDataJson                    `json:"execution_data"`
-	Graffiti                  string                                `json:"graffiti" hex:"true"`
-	ProposerSlashings         []*ProposerSlashingJson               `json:"proposer_slashings"`
-	AttesterSlashings         []*AttesterSlashingJson               `json:"attester_slashings"`
-	Attestations              []*AttestationJson                    `json:"attestations"`
-	Deposits                  []*DepositJson                        `json:"deposits"`
-	VoluntaryExits            []*SignedVoluntaryExitJson            `json:"voluntary_exits"`
-	SyncAggregate             *SyncAggregateJson                    `json:"sync_aggregate"`
-	ExecutionPayload          *ExecutionPayloadCapellaJson          `json:"execution_payload"`
-	MLDSA87ToExecutionChanges []*SignedMLDSA87ToExecutionChangeJson `json:"ml_dsa_87_to_execution_changes"`
+	RandaoReveal      string                       `json:"randao_reveal" hex:"true"`
+	ExecutionData     *ExecutionDataJson           `json:"execution_data"`
+	Graffiti          string                       `json:"graffiti" hex:"true"`
+	ProposerSlashings []*ProposerSlashingJson      `json:"proposer_slashings"`
+	AttesterSlashings []*AttesterSlashingJson      `json:"attester_slashings"`
+	Attestations      []*AttestationJson           `json:"attestations"`
+	Deposits          []*DepositJson               `json:"deposits"`
+	VoluntaryExits    []*SignedVoluntaryExitJson   `json:"voluntary_exits"`
+	SyncAggregate     *SyncAggregateJson           `json:"sync_aggregate"`
+	ExecutionPayload  *ExecutionPayloadCapellaJson `json:"execution_payload"`
 }
 
 type BlindedBeaconBlockBodyCapellaJson struct {
-	RandaoReveal              string                                `json:"randao_reveal" hex:"true"`
-	ExecutionData             *ExecutionDataJson                    `json:"execution_data"`
-	Graffiti                  string                                `json:"graffiti" hex:"true"`
-	ProposerSlashings         []*ProposerSlashingJson               `json:"proposer_slashings"`
-	AttesterSlashings         []*AttesterSlashingJson               `json:"attester_slashings"`
-	Attestations              []*AttestationJson                    `json:"attestations"`
-	Deposits                  []*DepositJson                        `json:"deposits"`
-	VoluntaryExits            []*SignedVoluntaryExitJson            `json:"voluntary_exits"`
-	SyncAggregate             *SyncAggregateJson                    `json:"sync_aggregate"`
-	ExecutionPayloadHeader    *ExecutionPayloadHeaderCapellaJson    `json:"execution_payload_header"`
-	MLDSA87ToExecutionChanges []*SignedMLDSA87ToExecutionChangeJson `json:"ml_dsa_87_to_execution_changes"`
+	RandaoReveal           string                             `json:"randao_reveal" hex:"true"`
+	ExecutionData          *ExecutionDataJson                 `json:"execution_data"`
+	Graffiti               string                             `json:"graffiti" hex:"true"`
+	ProposerSlashings      []*ProposerSlashingJson            `json:"proposer_slashings"`
+	AttesterSlashings      []*AttesterSlashingJson            `json:"attester_slashings"`
+	Attestations           []*AttestationJson                 `json:"attestations"`
+	Deposits               []*DepositJson                     `json:"deposits"`
+	VoluntaryExits         []*SignedVoluntaryExitJson         `json:"voluntary_exits"`
+	SyncAggregate          *SyncAggregateJson                 `json:"sync_aggregate"`
+	ExecutionPayloadHeader *ExecutionPayloadHeaderCapellaJson `json:"execution_payload_header"`
 }
 
 type ExecutionPayloadCapellaJson struct {
@@ -400,21 +394,6 @@ type AttestationDataJson struct {
 	BeaconBlockRoot string          `json:"beacon_block_root" hex:"true"`
 	Source          *CheckpointJson `json:"source"`
 	Target          *CheckpointJson `json:"target"`
-}
-
-type SignedMLDSA87ToExecutionChangeJson struct {
-	Message   *MLDSA87ToExecutionChangeJson `json:"message"`
-	Signature string                        `json:"signature" hex:"true"`
-}
-
-type MLDSA87ToExecutionChangeJson struct {
-	ValidatorIndex     string `json:"validator_index"`
-	FromMLDSA87Pubkey  string `json:"from_mldsa_87_pubkey" hex:"true"`
-	ToExecutionAddress string `json:"to_execution_address" hex:"true"`
-}
-
-type SubmitMLDSA87ToExecutionChangesRequest struct {
-	Changes []*SignedMLDSA87ToExecutionChangeJson `json:"changes"`
 }
 
 type DepositJson struct {

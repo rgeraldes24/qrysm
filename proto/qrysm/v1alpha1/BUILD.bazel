@@ -101,9 +101,6 @@ ssz_gen_marshal(
         "SignedValidatorRegistrationV1",
         "ValidatorRegistrationV1",
         "Withdrawal",
-        "SignedMLDSA87ToExecutionChange",
-        "MLDSA87ToExecutionChange",
-        "SignedMLDSA87ToExecutionChange",
         "BuilderBidCapella",
     ],
 )
@@ -200,8 +197,7 @@ ssz_proto_files(
         "attestation.proto",
         "beacon_block.proto",
         "beacon_state.proto",
-        "sync_committee.proto",
-        "withdrawals.proto",
+        "sync_committee.proto"
     ],
     config = select({
         "//conditions:default": "mainnet",

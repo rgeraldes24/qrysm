@@ -27,7 +27,6 @@ import (
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/synccommittee"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
@@ -152,16 +151,11 @@ func TestServer_GetBeaconBlock_Capella(t *testing.T) {
 	}
 
 	copiedState := beaconState.Copy()
-	copiedState, err = transition.ProcessSlots(ctx, copiedState, capellaSlot+1)
+	_, err = transition.ProcessSlots(ctx, copiedState, capellaSlot+1)
 	require.NoError(t, err)
-	change, err := util.GenerateMLDSA87ToExecutionChange(copiedState, privKeys[1], 0)
-	require.NoError(t, err)
-	proposerServer.MLDSA87ChangesPool.InsertMLDSA87ToExecChange(change)
 
-	got, err := proposerServer.GetBeaconBlock(ctx, req)
+	_, err = proposerServer.GetBeaconBlock(ctx, req)
 	require.NoError(t, err)
-	require.Equal(t, 1, len(got.GetCapella().Body.Mldsa87ToExecutionChanges))
-	require.DeepEqual(t, change, got.GetCapella().Body.Mldsa87ToExecutionChanges[0])
 }
 
 func TestServer_GetBeaconBlock_Optimistic(t *testing.T) {
@@ -210,7 +204,6 @@ func getProposerServer(db db.HeadAccessDatabase, headState state.BeaconState, he
 		},
 		ProposerSlotIndexCache: cache.NewProposerPayloadIDsCache(),
 		BeaconDB:               db,
-		MLDSA87ChangesPool:     mldsa87toexec.NewPool(),
 		BlockBuilder:           &builderTest.MockBuilderService{HasConfigured: true},
 	}
 }
@@ -316,7 +309,7 @@ func TestProposer_ComputeStateRoot_OK(t *testing.T) {
 		StateGen:              stategen.New(db, doublylinkedtree.New()),
 	}
 	req := util.NewBeaconBlockCapella()
-	req.Block.ProposerIndex = 71
+	req.Block.ProposerIndex = 35
 	req.Block.ParentRoot = parentRoot[:]
 	req.Block.Slot = 1
 	require.NoError(t, beaconState.SetSlot(beaconState.Slot()+1))

@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	goqrllib_misc "github.com/theQRL/go-qrllib/wallet/misc"
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/misc"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit"
 	"github.com/theQRL/qrysm/cmd/staking-deposit-cli/stakingdeposit/keyhandling/keyderivation"
@@ -75,6 +76,7 @@ var Commands = []*cli.Command{
 				Usage:       "",
 				Destination: &newSeedFlags.ExecutionAddress,
 				Value:       "",
+				Required:    true,
 			},
 			&cli.StringFlag{
 				Name:        "mnemonic",
@@ -130,9 +132,15 @@ func cliActionNewSeed(cliCtx *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	executionAddr, err := common.NewAddressFromString(newSeedFlags.ExecutionAddress)
+	if err != nil {
+		return err
+	}
+
 	stakingdeposit.GenerateKeys(newSeedFlags.ValidatorStartIndex,
 		newSeedFlags.NumValidators, misc.EncodeHex(seed[:]), newSeedFlags.Folder,
-		newSeedFlags.ChainName, keystorePassword, newSeedFlags.ExecutionAddress,
+		newSeedFlags.ChainName, keystorePassword, executionAddr,
 		newSeedFlags.LightKDF)
 
 	return nil

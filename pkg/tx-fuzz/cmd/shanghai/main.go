@@ -3,13 +3,11 @@ package main
 import (
 	"context"
 	"encoding/binary"
-	"encoding/hex"
 	"fmt"
 
-	walletcommon "github.com/theQRL/go-qrllib/wallet/common"
-	"github.com/theQRL/go-qrllib/wallet/ml_dsa_87"
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/core/types"
+	"github.com/theQRL/go-zond/crypto/pqcrypto/wallet"
 	"github.com/theQRL/go-zond/qrlclient"
 	"github.com/theQRL/go-zond/rpc"
 	txfuzz "github.com/theQRL/qrysm/pkg/tx-fuzz"
@@ -124,14 +122,9 @@ func repeatOpcode(size int, opcode byte) []byte {
 	return initcode
 }
 
-func getRealBackend() (*rpc.Client, *ml_dsa_87.Wallet) {
+func getRealBackend() (*rpc.Client, wallet.Wallet) {
 	// qrl.sendTransaction({from:personal.listAccounts[0], to:"Qb02A2EdA1b317FBd16760128836B0Ac59B560e9D", value: "100000000000000"})
-
-	binSeed, err := hex.DecodeString(txfuzz.SEED[2:])
-	if err != nil {
-		panic(fmt.Sprintf("failed to decode seed %s | err %v", txfuzz.SEED, err.Error()))
-	}
-	acc, err := ml_dsa_87.NewWalletFromSeed(walletcommon.Seed(binSeed))
+	acc, err := wallet.RestoreFromSeedHex(txfuzz.SEED)
 	if err != nil {
 		panic(err)
 	}

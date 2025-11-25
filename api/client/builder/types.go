@@ -617,40 +617,6 @@ func (e *ExecutionData) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// SignedMLDSA87ToExecutionChange is a field in Beacon Block Body for capella and above.
-type SignedMLDSA87ToExecutionChange struct {
-	*qrysmpb.SignedMLDSA87ToExecutionChange
-}
-
-// MarshalJSON returns a JSON byte array representation of SignedMLDSA87ToExecutionChange.
-func (ch *SignedMLDSA87ToExecutionChange) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		Message   *MLDSA87ToExecutionChange `json:"message"`
-		Signature hexutil.Bytes             `json:"signature"`
-	}{
-		Signature: ch.Signature,
-		Message:   &MLDSA87ToExecutionChange{ch.Message},
-	})
-}
-
-// MLDSA87ToExecutionChange is a field in SignedMLDSA87ToExecutionChange.
-type MLDSA87ToExecutionChange struct {
-	*qrysmpb.MLDSA87ToExecutionChange
-}
-
-// MarshalJSON returns a JSON byte array representation of MLDSA87ToExecutionChange.
-func (ch *MLDSA87ToExecutionChange) MarshalJSON() ([]byte, error) {
-	return json.Marshal(struct {
-		ValidatorIndex     string         `json:"validator_index"`
-		FromMLDSA87Pubkey  hexutil.Bytes  `json:"from_ml_dsa_87_pubkey"`
-		ToExecutionAddress hexutil.BytesQ `json:"to_execution_address"`
-	}{
-		ValidatorIndex:     fmt.Sprintf("%d", ch.ValidatorIndex),
-		FromMLDSA87Pubkey:  ch.FromMldsa87Pubkey,
-		ToExecutionAddress: ch.ToExecutionAddress,
-	})
-}
-
 // ErrorMessage is a JSON representation of the builder API's returned error message.
 type ErrorMessage struct {
 	Code        int      `json:"code"`

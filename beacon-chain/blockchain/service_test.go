@@ -17,7 +17,6 @@ import (
 	mockExecution "github.com/theQRL/qrysm/beacon-chain/execution/testing"
 	doublylinkedtree "github.com/theQRL/qrysm/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/theQRL/qrysm/beacon-chain/operations/attestations"
-	"github.com/theQRL/qrysm/beacon-chain/operations/mldsa87toexec"
 	"github.com/theQRL/qrysm/beacon-chain/operations/slashings"
 	"github.com/theQRL/qrysm/beacon-chain/operations/voluntaryexits"
 	"github.com/theQRL/qrysm/beacon-chain/startup"
@@ -101,7 +100,6 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 		WithStateGen(stateGen),
 		WithProposerIdsCache(cache.NewProposerPayloadIDsCache()),
 		WithClockSynchronizer(startup.NewClockSynchronizer()),
-		WithMLDSA87ToExecPool(mldsa87toexec.NewPool()),
 	}
 
 	chainService, err := NewService(ctx, opts...)

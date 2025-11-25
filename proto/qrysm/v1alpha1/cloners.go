@@ -349,17 +349,16 @@ func CopyBeaconBlockBodyCapella(body *BeaconBlockBodyCapella) *BeaconBlockBodyCa
 		return nil
 	}
 	return &BeaconBlockBodyCapella{
-		RandaoReveal:              bytesutil.SafeCopyBytes(body.RandaoReveal),
-		ExecutionData:             CopyExecutionData(body.ExecutionData),
-		Graffiti:                  bytesutil.SafeCopyBytes(body.Graffiti),
-		ProposerSlashings:         CopyProposerSlashings(body.ProposerSlashings),
-		AttesterSlashings:         CopyAttesterSlashings(body.AttesterSlashings),
-		Attestations:              CopyAttestations(body.Attestations),
-		Deposits:                  CopyDeposits(body.Deposits),
-		VoluntaryExits:            CopySignedVoluntaryExits(body.VoluntaryExits),
-		SyncAggregate:             CopySyncAggregate(body.SyncAggregate),
-		ExecutionPayload:          CopyExecutionPayloadCapella(body.ExecutionPayload),
-		Mldsa87ToExecutionChanges: CopyMLDSA87ToExecutionChanges(body.Mldsa87ToExecutionChanges),
+		RandaoReveal:      bytesutil.SafeCopyBytes(body.RandaoReveal),
+		ExecutionData:     CopyExecutionData(body.ExecutionData),
+		Graffiti:          bytesutil.SafeCopyBytes(body.Graffiti),
+		ProposerSlashings: CopyProposerSlashings(body.ProposerSlashings),
+		AttesterSlashings: CopyAttesterSlashings(body.AttesterSlashings),
+		Attestations:      CopyAttestations(body.Attestations),
+		Deposits:          CopyDeposits(body.Deposits),
+		VoluntaryExits:    CopySignedVoluntaryExits(body.VoluntaryExits),
+		SyncAggregate:     CopySyncAggregate(body.SyncAggregate),
+		ExecutionPayload:  CopyExecutionPayloadCapella(body.ExecutionPayload),
 	}
 }
 
@@ -394,17 +393,16 @@ func CopyBlindedBeaconBlockBodyCapella(body *BlindedBeaconBlockBodyCapella) *Bli
 		return nil
 	}
 	return &BlindedBeaconBlockBodyCapella{
-		RandaoReveal:              bytesutil.SafeCopyBytes(body.RandaoReveal),
-		ExecutionData:             CopyExecutionData(body.ExecutionData),
-		Graffiti:                  bytesutil.SafeCopyBytes(body.Graffiti),
-		ProposerSlashings:         CopyProposerSlashings(body.ProposerSlashings),
-		AttesterSlashings:         CopyAttesterSlashings(body.AttesterSlashings),
-		Attestations:              CopyAttestations(body.Attestations),
-		Deposits:                  CopyDeposits(body.Deposits),
-		VoluntaryExits:            CopySignedVoluntaryExits(body.VoluntaryExits),
-		SyncAggregate:             CopySyncAggregate(body.SyncAggregate),
-		ExecutionPayloadHeader:    CopyExecutionPayloadHeaderCapella(body.ExecutionPayloadHeader),
-		Mldsa87ToExecutionChanges: CopyMLDSA87ToExecutionChanges(body.Mldsa87ToExecutionChanges),
+		RandaoReveal:           bytesutil.SafeCopyBytes(body.RandaoReveal),
+		ExecutionData:          CopyExecutionData(body.ExecutionData),
+		Graffiti:               bytesutil.SafeCopyBytes(body.Graffiti),
+		ProposerSlashings:      CopyProposerSlashings(body.ProposerSlashings),
+		AttesterSlashings:      CopyAttesterSlashings(body.AttesterSlashings),
+		Attestations:           CopyAttestations(body.Attestations),
+		Deposits:               CopyDeposits(body.Deposits),
+		VoluntaryExits:         CopySignedVoluntaryExits(body.VoluntaryExits),
+		SyncAggregate:          CopySyncAggregate(body.SyncAggregate),
+		ExecutionPayloadHeader: CopyExecutionPayloadHeaderCapella(body.ExecutionPayloadHeader),
 	}
 }
 
@@ -482,26 +480,6 @@ func CopyWithdrawal(withdrawal *enginev1.Withdrawal) *enginev1.Withdrawal {
 		Address:        bytesutil.SafeCopyBytes(withdrawal.Address),
 		Amount:         withdrawal.Amount,
 	}
-}
-
-func CopyMLDSA87ToExecutionChanges(changes []*SignedMLDSA87ToExecutionChange) []*SignedMLDSA87ToExecutionChange {
-	if changes == nil {
-		return nil
-	}
-
-	res := make([]*SignedMLDSA87ToExecutionChange, len(changes))
-	for i := 0; i < len(changes); i++ {
-		res[i] = &SignedMLDSA87ToExecutionChange{
-			Message: &MLDSA87ToExecutionChange{
-				ValidatorIndex:     changes[i].Message.ValidatorIndex,
-				FromMldsa87Pubkey:  bytesutil.SafeCopyBytes(changes[i].Message.FromMldsa87Pubkey),
-				ToExecutionAddress: bytesutil.SafeCopyBytes(changes[i].Message.ToExecutionAddress),
-			},
-			Signature: bytesutil.SafeCopyBytes(changes[i].Signature),
-		}
-	}
-
-	return res
 }
 
 // CopyHistoricalSummaries copies the historical summaries.

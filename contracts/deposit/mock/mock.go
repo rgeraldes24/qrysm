@@ -10,8 +10,7 @@ import (
 	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/go-zond/core"
 	"github.com/theQRL/go-zond/core/types"
-	"github.com/theQRL/go-zond/crypto/pqcrypto"
-	field_params "github.com/theQRL/qrysm/config/fieldparams"
+	"github.com/theQRL/go-zond/crypto/pqcrypto/wallet"
 	"github.com/theQRL/qrysm/contracts/deposit"
 )
 
@@ -34,18 +33,13 @@ type TestAccount struct {
 // Setup creates the simulated backend with the deposit contract deployed
 func Setup() (*TestAccount, error) {
 	genesis := make(core.GenesisAlloc)
-	mlDSA87Key, err := pqcrypto.GenerateWalletKey()
+	wallet, err := wallet.Generate(wallet.ML_DSA_87)
 	if err != nil {
 		return nil, err
 	}
 
-	// strip off the 0x and the first 2 characters 04 which is always the EC prefix and is not required.
-	publicKeyBytes := mlDSA87Key.GetPK()
-	var pubKey = make([]byte, field_params.MLDSA87PubkeyLength)
-	copy(pubKey, publicKeyBytes[:])
-
-	addr := mlDSA87Key.GetAddress()
-	txOpts, err := bind.NewKeyedTransactorWithChainID(mlDSA87Key, big.NewInt(1337))
+	addr := wallet.GetAddress()
+	txOpts, err := bind.NewKeyedTransactorWithChainID(wallet, big.NewInt(1337))
 	if err != nil {
 		return nil, err
 	}

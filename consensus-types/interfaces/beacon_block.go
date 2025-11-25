@@ -66,13 +66,11 @@ type ReadOnlyBeaconBlockBody interface {
 	HashTreeRoot() ([field_params.RootLength]byte, error)
 	Proto() (proto.Message, error)
 	Execution() (ExecutionData, error)
-	MLDSA87ToExecutionChanges() ([]*qrysmpb.SignedMLDSA87ToExecutionChange, error)
 }
 
 type SignedBeaconBlock interface {
 	ReadOnlySignedBeaconBlock
 	SetExecution(ExecutionData) error
-	SetMLDSA87ToExecutionChanges([]*qrysmpb.SignedMLDSA87ToExecutionChange) error
 	SetSyncAggregate(*qrysmpb.SyncAggregate) error
 	SetVoluntaryExits([]*qrysmpb.SignedVoluntaryExit)
 	SetDeposits([]*qrysmpb.Deposit)

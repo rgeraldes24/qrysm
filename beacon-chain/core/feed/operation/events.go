@@ -19,9 +19,6 @@ const (
 
 	// SyncCommitteeContributionReceived is sent after a sync committee contribution object has been received.
 	SyncCommitteeContributionReceived
-
-	// MLDSA87ToExecutionChangeReceived is sent after a ML-DSA-87 to execution change object has been received from gossip or rpc.
-	MLDSA87ToExecutionChangeReceived
 )
 
 // UnAggregatedAttReceivedData is the data sent with UnaggregatedAttReceived events.
@@ -46,9 +43,4 @@ type ExitReceivedData struct {
 type SyncCommitteeContributionReceivedData struct {
 	// Contribution is the sync committee contribution object.
 	Contribution *qrysmpb.SignedContributionAndProof
-}
-
-// MLDSA87ToExecutionChangeReceivedData is the data sent with MLDSA87ToExecutionChangeReceived events.
-type MLDSA87ToExecutionChangeReceivedData struct {
-	Change *qrysmpb.SignedMLDSA87ToExecutionChange
 }

@@ -3,7 +3,6 @@ package apimiddleware
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"strconv"
@@ -18,46 +17,6 @@ import (
 	"github.com/theQRL/qrysm/testing/assert"
 	"github.com/theQRL/qrysm/testing/require"
 )
-
-func TestWrapMLDSA87ChangesArray(t *testing.T) {
-	t.Run("ok", func(t *testing.T) {
-		endpoint := &apimiddleware.Endpoint{
-			PostRequest: &SubmitMLDSA87ToExecutionChangesRequest{},
-		}
-		unwrappedChanges := []*SignedMLDSA87ToExecutionChangeJson{{Signature: "sig"}}
-		unwrappedChangesJson, err := json.Marshal(unwrappedChanges)
-		require.NoError(t, err)
-
-		var body bytes.Buffer
-		_, err = body.Write(unwrappedChangesJson)
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-
-		runDefault, errJson := wrapMLDSA87ChangesArray(endpoint, nil, request)
-		require.Equal(t, true, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(true), runDefault)
-		wrappedChanges := &SubmitMLDSA87ToExecutionChangesRequest{}
-		require.NoError(t, json.NewDecoder(request.Body).Decode(wrappedChanges))
-		require.Equal(t, 1, len(wrappedChanges.Changes), "wrong number of wrapped items")
-		assert.Equal(t, "sig", wrappedChanges.Changes[0].Signature)
-	})
-
-	t.Run("invalid_body", func(t *testing.T) {
-		endpoint := &apimiddleware.Endpoint{
-			PostRequest: &SubmitMLDSA87ToExecutionChangesRequest{},
-		}
-		var body bytes.Buffer
-		_, err := body.Write([]byte("invalid"))
-		require.NoError(t, err)
-		request := httptest.NewRequest("POST", "http://foo.example", &body)
-
-		runDefault, errJson := wrapMLDSA87ChangesArray(endpoint, nil, request)
-		require.Equal(t, false, errJson == nil)
-		assert.Equal(t, apimiddleware.RunDefault(false), runDefault)
-		assert.Equal(t, true, strings.Contains(errJson.Msg(), "could not decode body"))
-		assert.Equal(t, http.StatusInternalServerError, errJson.StatusCode())
-	})
-}
 
 func TestSetInitialPublishBlockPostRequest(t *testing.T) {
 	params.SetupTestConfigCleanup(t)
