@@ -1,5 +1,35 @@
 # Full configuration reference [here](https://github.com/theQRL/qrl-package?tab=readme-ov-file#configuration).
+#
+# How to pause the Qrysm testnet
+# Do this in order:
+# 1. Stop all validator clients first
+# 2. Then stop all beacon nodes
+# 3. Then stop all execution clients
+#
+# How to resume the Qrysm testnet
+# Bring things back up in this order:
+# 1. Start all execution clients
+# 2. Start your anchor(number 1) Qrysm beacon node
+# 3. Start the other Qrysm beacon nodes
+# 4. Start validator clients last
+#
 participants:
+  - el_type: gzond
+    el_image: qrledger/go-zond:stable
+    cl_type: qrysm
+    cl_image: qrledger/qrysm:beacon-chain-latest
+    cl_extra_params:
+      - "--min-sync-peers=0"
+      - "--minimum-peers-per-subnet=0"
+    # local build
+    # cl_image: theqrl-dev/qrysm-beacon-chain:latest
+    vc_type: qrysm
+    vc_image: qrledger/qrysm:validator-latest
+    # local build
+    # vc_image: theqrl-dev/qrysm-validator:latest
+    count: 1
+    # use_remote_signer: true
+    # remote_signer_type: clef
   - el_type: gzond
     el_image: qrledger/go-zond:stable
     cl_type: qrysm
@@ -10,12 +40,12 @@ participants:
     vc_image: qrledger/qrysm:validator-latest
     # local build
     # vc_image: theqrl-dev/qrysm-validator:latest
-    count: 2
+    count: 1
     # use_remote_signer: true
     # remote_signer_type: clef
 network_params:
   preset: "mainnet"
-  prefunded_accounts: '{"QD5812F6cf4a0f645aA620CD57319a0Ed649Dd8f5": {"balance": "2000000QRL"}, "Qa5AEDb928f8300DE98C66bb4BB66b9bB137e9A17": {"balance": "2000000QRL"}}'
+  prefunded_accounts: '{"QD5812F6cf4a0f645aA620CD57319a0Ed649Dd8f5": {"balance": "2000000QRL"}, "Qa5AEDb928f8300DE98C66bb4BB66b9bB137e9A17": {"balance": "2000000QRL"}}' # tx spammer/clef accounts
   light_kdf_enabled: True
   # withdrawal_address: "Q8943545177806ED17B9F23F0a21ee5948eCaa776"
   # genesis_delay: 150 # required if light kdf is disabled!
