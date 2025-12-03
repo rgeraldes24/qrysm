@@ -60,6 +60,7 @@ type Getter interface {
 	JustifiedPayloadBlockHash() [32]byte
 	UnrealizedJustifiedPayloadBlockHash() [32]byte
 	NodeCount() int
+	HighestReceivedBlockRoot() [32]byte
 	HighestReceivedBlockSlot() primitives.Slot
 	ReceivedBlocksLastEpoch() (uint64, error)
 	ForkChoiceDump(context.Context) (*qrlpb.ForkChoiceDump, error)

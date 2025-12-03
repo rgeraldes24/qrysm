@@ -15,29 +15,29 @@
 #
 participants:
   - el_type: gzond
-    el_image: qrledger/go-zond:stable
+    el_image: qrledger/go-zond
     cl_type: qrysm
-    cl_image: qrledger/qrysm:beacon-chain-latest
+    cl_image: qrledger/qrysm-beacon-chain
     cl_extra_params:
       - "--min-sync-peers=0"
       - "--minimum-peers-per-subnet=0"
     # local build
     # cl_image: theqrl-dev/qrysm-beacon-chain:latest
     vc_type: qrysm
-    vc_image: qrledger/qrysm:validator-latest
+    vc_image: qrledger/qrysm-validator
     # local build
     # vc_image: theqrl-dev/qrysm-validator:latest
     count: 1
     # use_remote_signer: true
     # remote_signer_type: clef
   - el_type: gzond
-    el_image: qrledger/go-zond:stable
+    el_image: qrledger/go-zond
     cl_type: qrysm
-    cl_image: qrledger/qrysm:beacon-chain-latest
+    cl_image: qrledger/qrysm-beacon-chain
     # local build
     # cl_image: theqrl-dev/qrysm-beacon-chain:latest
     vc_type: qrysm
-    vc_image: qrledger/qrysm:validator-latest
+    vc_image: qrledger/qrysm-validator
     # local build
     # vc_image: theqrl-dev/qrysm-validator:latest
     count: 1
