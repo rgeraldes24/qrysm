@@ -10,6 +10,7 @@ import (
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/features"
+	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
 	"github.com/theQRL/qrysm/time/slots"
@@ -87,7 +88,15 @@ func (s *Service) startupHeadRoot() [32]byte {
 func (s *Service) setupForkchoiceRoot(st state.BeaconState) error {
 	cp := s.FinalizedCheckpt()
 	fRoot := s.ensureRootNotZeros([32]byte(cp.Root))
-	if err := s.cfg.ForkChoiceStore.InsertNode(s.ctx, st, fRoot); err != nil {
+	finalizedBlock, err := s.cfg.BeaconDB.Block(s.ctx, fRoot)
+	if err != nil {
+		return errors.Wrap(err, "could not get finalized checkpoint block")
+	}
+	roblock, err := blocks.NewROBlockWithRoot(finalizedBlock, fRoot)
+	if err != nil {
+		return err
+	}
+	if err := s.cfg.ForkChoiceStore.InsertNode(s.ctx, st, roblock); err != nil {
 		return errors.Wrap(err, "could not insert finalized block to forkchoice")
 	}
 	if !features.Get().EnableStartOptimistic {
@@ -128,6 +137,7 @@ func (s *Service) setupForkchoiceTree(st state.BeaconState) error {
 		log.WithError(err).Error("Could not build forkchoice chain, starting with finalized block as head")
 		return nil
 	}
+
 	s.cfg.ForkChoiceStore.Lock()
 	defer s.cfg.ForkChoiceStore.Unlock()
 	return s.cfg.ForkChoiceStore.InsertChain(s.ctx, chain)
@@ -143,11 +153,15 @@ func (s *Service) buildForkchoiceChain(ctx context.Context, head interfaces.Read
 		return nil, errors.Wrap(err, "could not get head block root")
 	}
 	for {
+		roblock, err := blocks.NewROBlockWithRoot(head, root)
+		if err != nil {
+			return nil, err
+		}
 		// This chain sets the justified checkpoint for every block, including some that are older than jp.
 		// This should be however safe for forkchoice at startup. An alternative would be to hook during the
 		// block processing pipeline when setting the head state, to compute the right states for the justified
 		// checkpoint.
-		chain = append(chain, &forkchoicetypes.BlockAndCheckpoints{Block: head.Block(), JustifiedCheckpoint: jp, FinalizedCheckpoint: cp})
+		chain = append(chain, &forkchoicetypes.BlockAndCheckpoints{Block: roblock, JustifiedCheckpoint: jp, FinalizedCheckpoint: cp})
 		root = head.Block().ParentRoot()
 		if root == fRoot {
 			break
