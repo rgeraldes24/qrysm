@@ -1688,7 +1688,9 @@ func TestNoViableHead_Reboot(t *testing.T) {
 		postState, err := service.validateStateTransition(ctx, preState, wsb)
 		require.NoError(t, err)
 		require.NoError(t, service.savePostStateInfo(ctx, root, wsb, postState))
-		require.NoError(t, service.postBlockProcess(ctx, wsb, root, postState, false))
+		roblock, err := consensusblocks.NewROBlockWithRoot(wsb, root)
+		require.NoError(t, err)
+		require.NoError(t, service.postBlockProcess(ctx, roblock, postState, false))
 	}
 
 	for i := 6; i < 12; i++ {
@@ -1706,7 +1708,9 @@ func TestNoViableHead_Reboot(t *testing.T) {
 		postState, err := service.validateStateTransition(ctx, preState, wsb)
 		require.NoError(t, err)
 		require.NoError(t, service.savePostStateInfo(ctx, root, wsb, postState))
-		err = service.postBlockProcess(ctx, wsb, root, postState, false)
+		roblock, err := consensusblocks.NewROBlockWithRoot(wsb, root)
+		require.NoError(t, err)
+		err = service.postBlockProcess(ctx, roblock, postState, false)
 		require.NoError(t, err)
 	}
 
@@ -1725,7 +1729,9 @@ func TestNoViableHead_Reboot(t *testing.T) {
 	postState, err := service.validateStateTransition(ctx, preState, wsb)
 	require.NoError(t, err)
 	require.NoError(t, service.savePostStateInfo(ctx, lastValidRoot, wsb, postState))
-	err = service.postBlockProcess(ctx, wsb, lastValidRoot, postState, false)
+	roblock, err := consensusblocks.NewROBlockWithRoot(wsb, lastValidRoot)
+	require.NoError(t, err)
+	err = service.postBlockProcess(ctx, roblock, postState, false)
 	require.NoError(t, err)
 	// save the post state and the payload Hash of this block since it will
 	// be the LVH
@@ -1754,7 +1760,9 @@ func TestNoViableHead_Reboot(t *testing.T) {
 		postState, err := service.validateStateTransition(ctx, preState, wsb)
 		require.NoError(t, err)
 		require.NoError(t, service.savePostStateInfo(ctx, root, wsb, postState))
-		require.NoError(t, service.postBlockProcess(ctx, wsb, root, postState, false))
+		roblock, err := consensusblocks.NewROBlockWithRoot(wsb, root)
+		require.NoError(t, err)
+		require.NoError(t, service.postBlockProcess(ctx, roblock, postState, false))
 		require.NoError(t, service.updateJustificationOnBlock(ctx, preState, postState, currStoreJustifiedEpoch))
 		_, err = service.updateFinalizationOnBlock(ctx, preState, postState, currStoreFinalizedEpoch)
 		require.NoError(t, err)
@@ -1869,7 +1877,9 @@ func TestOnBlock_HandleBlockAttestations(t *testing.T) {
 	postState, err := service.validateStateTransition(ctx, preState, wsb)
 	require.NoError(t, err)
 	require.NoError(t, service.savePostStateInfo(ctx, root, wsb, postState))
-	require.NoError(t, service.postBlockProcess(ctx, wsb, root, postState, false))
+	roblock, err := consensusblocks.NewROBlockWithRoot(wsb, root)
+	require.NoError(t, err)
+	require.NoError(t, service.postBlockProcess(ctx, roblock, postState, false))
 
 	st, err = service.HeadState(ctx)
 	require.NoError(t, err)

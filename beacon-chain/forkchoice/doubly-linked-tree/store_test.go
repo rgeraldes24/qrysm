@@ -342,7 +342,7 @@ func TestForkChoice_ReceivedBlocksLastEpoch(t *testing.T) {
 
 	// 256
 	// Received block last epoch is 1
-	_, blk, err = prepareForkchoiceState(ctx, 64, [32]byte{'A'}, b, b, 1, 1)
+	_, blk, err = prepareForkchoiceState(ctx, 256, [32]byte{'A'}, b, b, 1, 1)
 	require.NoError(t, err)
 	_, err = s.insert(ctx, blk, 1, 1)
 	require.NoError(t, err)
@@ -354,7 +354,7 @@ func TestForkChoice_ReceivedBlocksLastEpoch(t *testing.T) {
 
 	// 256 257
 	// Received block last epoch is 2
-	_, blk, err = prepareForkchoiceState(ctx, 65, [32]byte{'B'}, b, b, 1, 1)
+	_, blk, err = prepareForkchoiceState(ctx, 257, [32]byte{'B'}, b, b, 1, 1)
 	require.NoError(t, err)
 	_, err = s.insert(ctx, blk, 1, 1)
 	require.NoError(t, err)
@@ -366,7 +366,7 @@ func TestForkChoice_ReceivedBlocksLastEpoch(t *testing.T) {
 
 	// 256 257 258
 	// Received block last epoch is 3
-	_, blk, err = prepareForkchoiceState(ctx, 66, [32]byte{'C'}, b, b, 1, 1)
+	_, blk, err = prepareForkchoiceState(ctx, 258, [32]byte{'C'}, b, b, 1, 1)
 	require.NoError(t, err)
 	_, err = s.insert(ctx, blk, 1, 1)
 	require.NoError(t, err)
@@ -379,7 +379,7 @@ func TestForkChoice_ReceivedBlocksLastEpoch(t *testing.T) {
 	// 256 257 258
 	//       386
 	// Received block last epoch is 1
-	_, blk, err = prepareForkchoiceState(ctx, 98, [32]byte{'D'}, b, b, 1, 1)
+	_, blk, err = prepareForkchoiceState(ctx, 386, [32]byte{'D'}, b, b, 1, 1)
 	require.NoError(t, err)
 	_, err = s.insert(ctx, blk, 1, 1)
 	require.NoError(t, err)
@@ -393,7 +393,7 @@ func TestForkChoice_ReceivedBlocksLastEpoch(t *testing.T) {
 	//       386
 	//              516
 	// Received block last epoch is 1
-	_, blk, err = prepareForkchoiceState(ctx, 132, [32]byte{'E'}, b, b, 1, 1)
+	_, blk, err = prepareForkchoiceState(ctx, 516, [32]byte{'E'}, b, b, 1, 1)
 	require.NoError(t, err)
 	_, err = s.insert(ctx, blk, 1, 1)
 	require.NoError(t, err)
@@ -408,7 +408,7 @@ func TestForkChoice_ReceivedBlocksLastEpoch(t *testing.T) {
 	//              516
 	//       387
 	// Received block last epoch is still 1. 387 is outside the window
-	_, blk, err = prepareForkchoiceState(ctx, 99, [32]byte{'F'}, b, b, 1, 1)
+	_, blk, err = prepareForkchoiceState(ctx, 387, [32]byte{'F'}, b, b, 1, 1)
 	require.NoError(t, err)
 	_, err = s.insert(ctx, blk, 1, 1)
 	require.NoError(t, err)
@@ -423,7 +423,7 @@ func TestForkChoice_ReceivedBlocksLastEpoch(t *testing.T) {
 	//              516
 	//       387 388
 	// Received block last epoch is still 1. 388 is at the same position as 132
-	_, blk, err = prepareForkchoiceState(ctx, 100, [32]byte{'G'}, b, b, 1, 1)
+	_, blk, err = prepareForkchoiceState(ctx, 388, [32]byte{'G'}, b, b, 1, 1)
 	require.NoError(t, err)
 	_, err = s.insert(ctx, blk, 1, 1)
 	require.NoError(t, err)
@@ -438,7 +438,7 @@ func TestForkChoice_ReceivedBlocksLastEpoch(t *testing.T) {
 	//              516
 	//       387 388 389
 	// Received block last epoch is 2. 389 is within the window
-	_, blk, err = prepareForkchoiceState(ctx, 101, [32]byte{'H'}, b, b, 1, 1)
+	_, blk, err = prepareForkchoiceState(ctx, 389, [32]byte{'H'}, b, b, 1, 1)
 	require.NoError(t, err)
 	_, err = s.insert(ctx, blk, 1, 1)
 	require.NoError(t, err)

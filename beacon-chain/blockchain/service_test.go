@@ -341,6 +341,7 @@ func TestHasBlock_ForkChoiceAndDB_DoublyLinkedTree(t *testing.T) {
 	}
 	b := util.NewBeaconBlockCapella()
 	wsb, err := consensusblocks.NewSignedBeaconBlock(b)
+	require.NoError(t, err)
 	r, err := b.Block.HashTreeRoot()
 	require.NoError(t, err)
 	roblock, err := consensusblocks.NewROBlockWithRoot(wsb, r)
@@ -402,6 +403,7 @@ func BenchmarkHasBlockForkChoiceStore_DoublyLinkedTree(b *testing.B) {
 	require.NoError(b, err)
 	bs := &qrysmpb.BeaconStateCapella{FinalizedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)}, CurrentJustifiedCheckpoint: &qrysmpb.Checkpoint{Root: make([]byte, 32)}}
 	beaconState, err := state_native.InitializeFromProtoCapella(bs)
+	require.NoError(b, err)
 	wsb, err := consensusblocks.NewSignedBeaconBlock(blk)
 	require.NoError(b, err)
 	roblock, err := consensusblocks.NewROBlockWithRoot(wsb, r)
