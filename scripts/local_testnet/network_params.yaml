@@ -1,18 +1,4 @@
 # Full configuration reference [here](https://github.com/theQRL/qrl-package?tab=readme-ov-file#configuration).
-#
-# How to pause the Qrysm testnet
-# Do this in order:
-# 1. Stop all validator clients first
-# 2. Then stop all beacon nodes
-# 3. Then stop all execution clients
-#
-# How to resume the Qrysm testnet
-# Bring things back up in this order:
-# 1. Start all execution clients
-# 2. Start your anchor(number 1) Qrysm beacon node
-# 3. Start the other Qrysm beacon nodes
-# 4. Start validator clients last
-#
 participants:
   - el_type: gzond
     el_image: qrledger/go-zond
@@ -21,26 +7,14 @@ participants:
     cl_extra_params:
       - "--min-sync-peers=0"
       - "--minimum-peers-per-subnet=0"
+      - "--sync-from=head"
     # local build
     # cl_image: theqrl-dev/qrysm-beacon-chain:latest
     vc_type: qrysm
     vc_image: qrledger/qrysm-validator
     # local build
     # vc_image: theqrl-dev/qrysm-validator:latest
-    count: 1
-    # use_remote_signer: true
-    # remote_signer_type: clef
-  - el_type: gzond
-    el_image: qrledger/go-zond
-    cl_type: qrysm
-    cl_image: qrledger/qrysm-beacon-chain
-    # local build
-    # cl_image: theqrl-dev/qrysm-beacon-chain:latest
-    vc_type: qrysm
-    vc_image: qrledger/qrysm-validator
-    # local build
-    # vc_image: theqrl-dev/qrysm-validator:latest
-    count: 1
+    count: 2
     # use_remote_signer: true
     # remote_signer_type: clef
 network_params:
