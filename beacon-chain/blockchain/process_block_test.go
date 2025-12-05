@@ -1648,8 +1648,6 @@ func TestStore_NoViableHead_Liveness(t *testing.T) {
 // INVALID from NewPayload, with LVH block 12. No head is viable. We check that
 // the node can reboot from this state
 func TestNoViableHead_Reboot(t *testing.T) {
-	// TODO(rgeraldes24)
-	t.Skip()
 	params.SetupTestConfigCleanup(t)
 	config := params.BeaconConfig()
 	config.SlotsPerEpoch = 6
