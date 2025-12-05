@@ -70,7 +70,7 @@ func (s *Store) OriginCheckpointBlockRoot(ctx context.Context) ([32]byte, error)
 	return root, err
 }
 
-// HeadBlockRoot returns the latest canonical block root in the Ethereum Beacon Chain.
+// HeadBlockRoot returns the latest canonical block root in the QRL Beacon Chain.
 func (s *Store) HeadBlockRoot() ([32]byte, error) {
 	var root [32]byte
 	err := s.db.View(func(tx *bolt.Tx) error {
