@@ -142,8 +142,6 @@ var (
 		Name:  "disable-aggregate-parallel",
 		Usage: "Disables parallel aggregation of attestations",
 	}
-
-	// forceHeadFlag is a flag to force the head of the beacon chain to a specific block.
 	forceHeadFlag = &cli.StringFlag{
 		Name: "sync-from",
 		Usage: "Forces the head of the beacon chain to a specific block root. Values can be 'head' or a block root." +
