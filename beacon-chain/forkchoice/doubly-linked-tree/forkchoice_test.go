@@ -599,7 +599,6 @@ func TestStore_CommonAncestor(t *testing.T) {
 }
 
 func TestStore_InsertChain(t *testing.T) {
-	ctx := context.Background()
 	f := setup(1, 1)
 	blks := make([]*forkchoicetypes.BlockAndCheckpoints, 0)
 	blk := util.NewBeaconBlockCapella()
@@ -636,9 +635,9 @@ func TestStore_InsertChain(t *testing.T) {
 	// Test partial insertion: first insert the foundation blocks, then a subset
 	f = setup(1, 1)
 	// Insert first 2 blocks to establish a chain from genesis
-	require.NoError(t, f.InsertChain(ctx, blks[:2]))
+	require.NoError(t, f.InsertChain(context.Background(), blks[:2]))
 	// Then insert the remaining blocks
-	require.NoError(t, f.InsertChain(ctx, blks[2:]))
+	require.NoError(t, f.InsertChain(context.Background(), blks[2:]))
 }
 
 func TestForkChoice_UpdateCheckpoints(t *testing.T) {
