@@ -1,9 +1,9 @@
 # Full configuration reference [here](https://github.com/theQRL/qrl-package?tab=readme-ov-file#configuration).
 participants:
   - el_type: gzond
-    el_image: qrledger/go-zond
+    el_image: qrledger/go-zond:stable
     cl_type: qrysm
-    cl_image: qrledger/qrysm-beacon-chain
+    cl_image: qrledger/qrysm:beacon-chain-latest
     cl_extra_params:
       - "--min-sync-peers=0"
       - "--minimum-peers-per-subnet=0"
@@ -11,7 +11,7 @@ participants:
     # local build
     # cl_image: theqrl-dev/qrysm-beacon-chain:latest
     vc_type: qrysm
-    vc_image: qrledger/qrysm-validator
+    vc_image: qrledger/qrysm:validator-latest
     # local build
     # vc_image: theqrl-dev/qrysm-validator:latest
     count: 2
