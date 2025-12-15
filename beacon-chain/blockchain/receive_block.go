@@ -68,6 +68,10 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	currStoreJustifiedEpoch := s.CurrentJustifiedCheckpt().Epoch
 	currStoreFinalizedEpoch := s.FinalizedCheckpt().Epoch
 	currentEpoch := coreTime.CurrentEpoch(preState)
+	roblock, err := blocks.NewROBlockWithRoot(blockCopy, blockRoot)
+	if err != nil {
+		return errors.Wrap(err, "new ro block with root")
+	}
 
 	preStateVersion, preStateHeader, err := getStateVersionAndPayload(preState)
 	if err != nil {
@@ -100,7 +104,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	if err := s.savePostStateInfo(ctx, blockRoot, blockCopy, postState); err != nil {
 		return errors.Wrap(err, "could not save post state info")
 	}
-	if err := s.postBlockProcess(ctx, blockCopy, blockRoot, postState, isValidPayload); err != nil {
+	if err := s.postBlockProcess(ctx, roblock, postState, isValidPayload); err != nil {
 		err := errors.Wrap(err, "could not process block")
 		tracing.AnnotateError(span, err)
 		return err

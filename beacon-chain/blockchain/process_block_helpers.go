@@ -3,6 +3,7 @@ package blockchain
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/pkg/errors"
 	"github.com/theQRL/go-zond/common"
@@ -10,6 +11,7 @@ import (
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	"github.com/theQRL/qrysm/config/params"
+	consensus_blocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/interfaces"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
@@ -19,6 +21,10 @@ import (
 	"github.com/theQRL/qrysm/time/slots"
 	"go.opencensus.io/trace"
 )
+
+// ErrInvalidCheckpointArgs may be returned when the finalized checkpoint has an epoch greater than the justified checkpoint epoch.
+// If you are seeing this error, make sure you haven't mixed up the order of the arguments in the method you are calling.
+var ErrInvalidCheckpointArgs = errors.New("finalized checkpoint cannot be greater than justified checkpoint")
 
 // CurrentSlot returns the current slot based on time.
 func (s *Service) CurrentSlot() primitives.Slot {
@@ -176,6 +182,9 @@ func (s *Service) ancestorByDB(ctx context.Context, r [32]byte, slot primitives.
 // This is useful for block tree visualizer and additional vote accounting.
 func (s *Service) fillInForkChoiceMissingBlocks(ctx context.Context, blk interfaces.ReadOnlyBeaconBlock,
 	fCheckpoint, jCheckpoint *qrysmpb.Checkpoint) error {
+	if fCheckpoint.Epoch > jCheckpoint.Epoch {
+		return ErrInvalidCheckpointArgs
+	}
 	pendingNodes := make([]*forkchoicetypes.BlockAndCheckpoints, 0)
 
 	// Fork choice only matters from last finalized slot.
@@ -184,10 +193,8 @@ func (s *Service) fillInForkChoiceMissingBlocks(ctx context.Context, blk interfa
 	if err != nil {
 		return err
 	}
-	pendingNodes = append(pendingNodes, &forkchoicetypes.BlockAndCheckpoints{Block: blk,
-		JustifiedCheckpoint: jCheckpoint, FinalizedCheckpoint: fCheckpoint})
-	// As long as parent node is not in fork choice store, and parent node is in DB.
 	root := blk.ParentRoot()
+	// As long as parent node is not in fork choice store, and parent node is in DB.
 	for !s.cfg.ForkChoiceStore.HasNode(root) && s.cfg.BeaconDB.HasBlock(ctx, root) {
 		b, err := s.getBlock(ctx, root)
 		if err != nil {
@@ -196,18 +203,23 @@ func (s *Service) fillInForkChoiceMissingBlocks(ctx context.Context, blk interfa
 		if b.Block().Slot() <= fSlot {
 			break
 		}
+		roblock, err := consensus_blocks.NewROBlockWithRoot(b, root)
+		if err != nil {
+			return err
+		}
 		root = b.Block().ParentRoot()
-		args := &forkchoicetypes.BlockAndCheckpoints{Block: b.Block(),
+		args := &forkchoicetypes.BlockAndCheckpoints{Block: roblock,
 			JustifiedCheckpoint: jCheckpoint,
 			FinalizedCheckpoint: fCheckpoint}
 		pendingNodes = append(pendingNodes, args)
 	}
-	if len(pendingNodes) == 1 {
+	if len(pendingNodes) == 0 {
 		return nil
 	}
 	if root != s.ensureRootNotZeros(finalized.Root) && !s.cfg.ForkChoiceStore.HasNode(root) {
 		return ErrNotDescendantOfFinalized
 	}
+	slices.Reverse(pendingNodes)
 	return s.cfg.ForkChoiceStore.InsertChain(ctx, pendingNodes)
 }
 

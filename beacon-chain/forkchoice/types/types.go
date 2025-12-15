@@ -2,7 +2,7 @@ package types
 
 import (
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
-	"github.com/theQRL/qrysm/consensus-types/interfaces"
+	consensus_blocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 )
@@ -17,7 +17,7 @@ type Checkpoint struct {
 
 // BlockAndCheckpoints to call the InsertOptimisticChain function
 type BlockAndCheckpoints struct {
-	Block               interfaces.ReadOnlyBeaconBlock
+	Block               consensus_blocks.ROBlock
 	JustifiedCheckpoint *qrysmpb.Checkpoint
 	FinalizedCheckpoint *qrysmpb.Checkpoint
 }

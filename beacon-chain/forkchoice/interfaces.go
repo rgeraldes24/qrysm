@@ -6,6 +6,7 @@ import (
 	forkchoicetypes "github.com/theQRL/qrysm/beacon-chain/forkchoice/types"
 	"github.com/theQRL/qrysm/beacon-chain/state"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
+	consensus_blocks "github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	qrlpb "github.com/theQRL/qrysm/proto/qrl/v1"
 )
@@ -36,7 +37,7 @@ type HeadRetriever interface {
 
 // BlockProcessor processes the block that's used for accounting fork choice.
 type BlockProcessor interface {
-	InsertNode(context.Context, state.BeaconState, [32]byte) error
+	InsertNode(context.Context, state.BeaconState, consensus_blocks.ROBlock) error
 	InsertChain(context.Context, []*forkchoicetypes.BlockAndCheckpoints) error
 }
 
@@ -60,6 +61,7 @@ type Getter interface {
 	JustifiedPayloadBlockHash() [32]byte
 	UnrealizedJustifiedPayloadBlockHash() [32]byte
 	NodeCount() int
+	HighestReceivedBlockRoot() [32]byte
 	HighestReceivedBlockSlot() primitives.Slot
 	ReceivedBlocksLastEpoch() (uint64, error)
 	ForkChoiceDump(context.Context) (*qrlpb.ForkChoiceDump, error)

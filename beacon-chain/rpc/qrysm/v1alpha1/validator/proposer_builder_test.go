@@ -16,8 +16,10 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	fieldparams "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
+	"github.com/theQRL/qrysm/consensus-types/blocks"
 	"github.com/theQRL/qrysm/consensus-types/primitives"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
+	enginev1 "github.com/theQRL/qrysm/proto/engine/v1"
 	v1 "github.com/theQRL/qrysm/proto/engine/v1"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/testing/require"
@@ -150,7 +152,7 @@ func createState(
 	payloadHash [32]byte,
 	justified *qrysmpb.Checkpoint,
 	finalized *qrysmpb.Checkpoint,
-) (state.BeaconState, [32]byte, error) {
+) (state.BeaconState, blocks.ROBlock, error) {
 
 	base := &qrysmpb.BeaconStateCapella{
 		Slot:                       slot,
@@ -168,5 +170,25 @@ func createState(
 
 	base.BlockRoots[0] = append(base.BlockRoots[0], blockRoot[:]...)
 	st, err := state_native.InitializeFromProtoCapella(base)
-	return st, blockRoot, err
+	if err != nil {
+		return nil, blocks.ROBlock{}, err
+	}
+
+	blk := &qrysmpb.SignedBeaconBlockCapella{
+		Block: &qrysmpb.BeaconBlockCapella{
+			Slot:       slot,
+			ParentRoot: parentRoot[:],
+			Body: &qrysmpb.BeaconBlockBodyCapella{
+				ExecutionPayload: &enginev1.ExecutionPayloadCapella{
+					BlockHash: payloadHash[:],
+				},
+			},
+		},
+	}
+	signed, err := blocks.NewSignedBeaconBlock(blk)
+	if err != nil {
+		return nil, blocks.ROBlock{}, err
+	}
+	roblock, err := blocks.NewROBlockWithRoot(signed, blockRoot)
+	return st, roblock, err
 }

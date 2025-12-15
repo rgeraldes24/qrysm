@@ -142,6 +142,11 @@ var (
 		Name:  "disable-aggregate-parallel",
 		Usage: "Disables parallel aggregation of attestations",
 	}
+	forceHeadFlag = &cli.StringFlag{
+		Name: "sync-from",
+		Usage: "Forces the head of the beacon chain to a specific block root. Values can be 'head' or a block root." +
+			" The block root has to be known to the beacon node and correspond to a block newer than the current finalized checkpoint.",
+	}
 )
 
 // devModeFlags holds list of flags that are set when development mode is on.
@@ -191,6 +196,7 @@ var BeaconChainFlags = append(deprecatedBeaconFlags, append(deprecatedFlags, []c
 	disableResourceManager,
 	DisableRegistrationCache,
 	disableAggregateParallel,
+	forceHeadFlag,
 }...)...)
 
 // E2EBeaconChainFlags contains a list of the beacon chain feature flags to be tested in E2E.
