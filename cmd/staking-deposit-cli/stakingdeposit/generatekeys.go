@@ -55,6 +55,7 @@ func GenerateKeys(validatorStartIndex, numValidators uint64,
 		panic("failed to verify the deposit data JSON files")
 	}
 
+	// TODO (cyyber): Replace this with extended seed
 	fmt.Println("Please note down your ML-DSA-87 seed: ", seed)
 	binSeed := misc.StrSeedToBinSeed(seed)
 	mnemonic, err := goqrllib_misc.BinToMnemonic(binSeed[:])

@@ -9,17 +9,18 @@ import (
 
 const (
 	Preset                                = "mainnet"
-	BlockRootsLength                      = 1024                               // SLOTS_PER_HISTORICAL_ROOT
-	StateRootsLength                      = 1024                               // SLOTS_PER_HISTORICAL_ROOT
-	RandaoMixesLength                     = 65536                              // EPOCHS_PER_HISTORICAL_VECTOR
-	HistoricalRootsLength                 = 16777216                           // HISTORICAL_ROOTS_LIMIT
-	ValidatorRegistryLimit                = 1099511627776                      // VALIDATOR_REGISTRY_LIMIT
-	ExecutionDataVotesLength              = 2                                  // SLOTS_PER_EXECUTION_VOTING_PERIOD
-	PreviousEpochAttestationsLength       = 16384                              // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
-	CurrentEpochAttestationsLength        = 16384                              // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
-	SlashingsLength                       = 1024                               // EPOCHS_PER_SLASHINGS_VECTOR
-	SyncCommitteeLength                   = 16                                 // SYNC_COMMITTEE_SIZE  // TODO (cyyber) : Original value 512, new value needs to be decided
-	RootLength                            = 32                                 // RootLength defines the byte length of a Merkle root.
+	BlockRootsLength                      = 1024          // SLOTS_PER_HISTORICAL_ROOT
+	StateRootsLength                      = 1024          // SLOTS_PER_HISTORICAL_ROOT
+	RandaoMixesLength                     = 65536         // EPOCHS_PER_HISTORICAL_VECTOR
+	HistoricalRootsLength                 = 16777216      // HISTORICAL_ROOTS_LIMIT
+	ValidatorRegistryLimit                = 1099511627776 // VALIDATOR_REGISTRY_LIMIT
+	ExecutionDataVotesLength              = 2             // SLOTS_PER_EXECUTION_VOTING_PERIOD
+	PreviousEpochAttestationsLength       = 16384         // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
+	CurrentEpochAttestationsLength        = 16384         // MAX_ATTESTATIONS * SLOTS_PER_EPOCH
+	SlashingsLength                       = 1024          // EPOCHS_PER_SLASHINGS_VECTOR
+	SyncCommitteeLength                   = 16            // SYNC_COMMITTEE_SIZE  // TODO (cyyber) : Original value 512, new value needs to be decided
+	RootLength                            = 32            // RootLength defines the byte length of a Merkle root.
+	ExtendedSeedLength                    = walletcommon.ExtendedSeedSize
 	MLDSA87SeedLength                     = walletcommon.SeedSize              // MLDSA87SeedLength defines the byte length of a ML-DSA-87 seed.
 	MLDSA87SignatureLength                = cryptomldsa87.CryptoBytes          // MLDSA87SignatureLength defines the byte length of a ML-DSA-87 signature.
 	MLDSA87PubkeyLength                   = cryptomldsa87.CryptoPublicKeyBytes // MLDSA87PubkeyLength defines the byte length of a ML-DSA-87 public key.

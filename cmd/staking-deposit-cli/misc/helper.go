@@ -17,10 +17,10 @@ func StrSeedToBinSeed(strSeed string) [fieldparams.MLDSA87SeedLength]uint8 {
 }
 
 func DecodeHex(hexString string) []byte {
-	if hexString[:2] != "0x" {
-		panic(fmt.Errorf("invalid hex string prefix %s", hexString[:2]))
+	if hexString[:2] == "0x" {
+		hexString = hexString[2:]
 	}
-	hexBytes, err := hex.DecodeString(hexString[2:])
+	hexBytes, err := hex.DecodeString(hexString)
 	if err != nil {
 		panic(fmt.Errorf("failed to decode string %s | reason %v",
 			hexString, err))
