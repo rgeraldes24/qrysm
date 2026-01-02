@@ -1,8 +1,6 @@
 module github.com/theQRL/qrysm
 
-go 1.22
-
-toolchain go1.22.4
+go 1.25.1
 
 require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
@@ -133,7 +131,6 @@ require (
 	github.com/gdamore/encoding v1.0.0 // indirect
 	github.com/getsentry/sentry-go v0.25.0 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
-	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
@@ -240,7 +237,6 @@ require (
 require (
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf
 	github.com/fatih/color v1.13.0 // indirect
-	github.com/gballet/go-libpcsclite v0.0.0-20191108122812-4678299bea08 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/peterh/liner v1.2.0 // indirect
@@ -258,4 +254,4 @@ replace github.com/json-iterator/go => github.com/prestonvanloon/go v1.1.7-0.201
 replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f
 
 //replace github.com/theQRL/go-zond => github.com/cyyber/go-zond v0.0.0-20250909095041-1a8635db4b6f
-replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20251106090627-b72c34e7f446
+replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20251230184906-eb9bba310063

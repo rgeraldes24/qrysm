@@ -237,9 +237,9 @@ func startNode(ctx *cli.Context) error {
 		// libp2p specific logging.
 		golog.SetAllLoggers(golog.LevelDebug)
 		// Gzond specific logging.
-		glogger := gzondlog.NewGlogHandler(gzondlog.StreamHandler(os.Stderr, gzondlog.TerminalFormat(true)))
+		glogger := gzondlog.NewGlogHandler(gzondlog.NewTerminalHandler(os.Stderr, true))
 		glogger.Verbosity(gzondlog.LvlTrace)
-		gzondlog.Root().SetHandler(glogger)
+		gzondlog.SetDefault(gzondlog.NewLogger(glogger))
 	}
 
 	blockchainFlagOpts, err := blockchaincmd.FlagOptions(ctx)

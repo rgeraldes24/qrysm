@@ -81,9 +81,9 @@ func main() {
 		logrus.SetLevel(logrus.DebugLevel)
 
 		// Gzond specific logging.
-		glogger := gzondlog.NewGlogHandler(gzondlog.StreamHandler(os.Stderr, gzondlog.TerminalFormat(false)))
+		glogger := gzondlog.NewGlogHandler(gzondlog.NewTerminalHandler(os.Stderr, false))
 		glogger.Verbosity(gzondlog.LvlTrace)
-		gzondlog.Root().SetHandler(glogger)
+		gzondlog.SetDefault(gzondlog.NewLogger(glogger))
 
 		log.Debug("Debug logging enabled.")
 	}

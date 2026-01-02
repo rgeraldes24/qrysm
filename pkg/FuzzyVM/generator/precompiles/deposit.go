@@ -17,19 +17,15 @@
 package precompiles
 
 import (
-	"testing"
-
-	bn256 "github.com/theQRL/go-zond/crypto/bn256/cloudflare"
+	"github.com/theQRL/go-zond/common"
 	"github.com/theQRL/qrysm/pkg/FuzzyVM/filler"
+	"github.com/theQRL/qrysm/pkg/goqrvmlab/program"
 )
 
-func TestPairing(t *testing.T) {
-	i := 1
-	data := []byte{1, 2, 3, 3, 4, 5, 6, 7, 7, 8, 8, 2, 2, 3}
-	f := filler.NewFiller(data)
-	a, b := pairing(i, f)
-	out := bn256.PairingCheck(a, b)
-	if !out {
-		t.Fail()
-	}
+var depositRootAddr, _ = common.NewAddressFromString("Q0000000000000000000000000000000000000001")
+
+type depositRootCaller struct{}
+
+func (*depositRootCaller) call(p *program.Program, f *filler.Filler) error {
+	return nil
 }

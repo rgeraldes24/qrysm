@@ -4,10 +4,7 @@ go_library(
     name = "go_default_library",
     srcs = [
         "bigModExp.go",
-        "bn256ScalarMul.go",
-        "bn256add.go",
-        "bn256pairing.go",
-        "ecdsa.go",
+        "deposit.go",
         "identity.go",
         "precompiles.go",
         "sha256.go",
@@ -19,16 +16,5 @@ go_library(
         "//pkg/goqrvmlab/program:go_default_library",
         "@com_github_theqrl_go_zond//common:go_default_library",
         "@com_github_theqrl_go_zond//crypto:go_default_library",
-        "@com_github_theqrl_go_zond//crypto/bn256:go_default_library",
-    ],
-)
-
-go_test(
-    name = "go_default_test",
-    srcs = ["bn256pairing_test.go"],
-    embed = [":go_default_library"],
-    deps = [
-        "//pkg/FuzzyVM/filler:go_default_library",
-        "@com_github_theqrl_go_zond//crypto/bn256/cloudflare:go_default_library",
     ],
 )
