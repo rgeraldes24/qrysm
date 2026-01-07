@@ -17,8 +17,6 @@ go_library(
         "@com_github_theqrl_go_zond//common:go_default_library",
         "@com_github_theqrl_go_zond//core/types:go_default_library",
         "@com_github_theqrl_go_zond//params:go_default_library",
-        "@com_github_theqrl_go_zond//qrlclient:go_default_library",
-        "@com_github_theqrl_go_zond//qrlclient/gzondclient:go_default_library",
         "@com_github_theqrl_go_zond//rpc:go_default_library",
     ],
 )

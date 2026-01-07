@@ -12,7 +12,7 @@ func BenchmarkUint64ListRootWithRegistryLimit(b *testing.B) {
 		balances[i] = uint64(i)
 	}
 	b.Run("100k balances", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			_, err := stateutil.Uint64ListRootWithRegistryLimit(balances)
 			if err != nil {
 				b.Fatal(err)

@@ -469,7 +469,7 @@ func BenchmarkHighestAttestations(b *testing.B) {
 	}
 	b.ReportAllocs()
 	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := beaconDB.HighestAttestations(ctx, allIndices)
 		require.NoError(b, err)
 	}
@@ -501,7 +501,7 @@ func BenchmarkStore_CheckDoubleBlockProposals(b *testing.B) {
 
 	b.ReportAllocs()
 	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := beaconDB.CheckAttesterDoubleVotes(ctx, atts)
 		require.NoError(b, err)
 	}

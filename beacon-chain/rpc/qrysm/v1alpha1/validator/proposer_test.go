@@ -2253,8 +2253,8 @@ func BenchmarkServer_PrepareBeaconProposer(b *testing.B) {
 	req := &qrysmpb.PrepareBeaconProposerRequest{
 		Recipients: recipients,
 	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		_, err := proposerServer.PrepareBeaconProposer(ctx, req)
 		if err != nil {
 			b.Fatal(err)

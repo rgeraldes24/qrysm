@@ -36,7 +36,7 @@ func BenchmarkMap_Concrete(b *testing.B) {
 	mm := &safeMap{
 		items: make(map[int]string),
 	}
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for j := 0; j < 1000; j++ {
 			mm.Put(j, "foo")
 			mm.Get(j)
@@ -48,7 +48,7 @@ func BenchmarkMap_Concrete(b *testing.B) {
 func BenchmarkMap_Generic(b *testing.B) {
 	items := make(map[int]string)
 	mm := NewThreadSafeMap(items)
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for j := 0; j < 1000; j++ {
 			mm.Put(j, "foo")
 			mm.Get(j)
@@ -59,7 +59,7 @@ func BenchmarkMap_Generic(b *testing.B) {
 func BenchmarkMap_GenericTx(b *testing.B) {
 	items := make(map[int]string)
 	mm := NewThreadSafeMap(items)
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		for j := 0; j < 1000; j++ {
 			mm.Do(func(mp map[int]string) {
 				mp[j] = "foo"

@@ -100,8 +100,7 @@ func BenchmarkPruneAttestations(b *testing.B) {
 	// since genesis to SLASHING_PROTECTION_PRUNING_EPOCHS * 20.
 	numEpochs := params.BeaconConfig().SlashingProtectionPruningEpochs * 20
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		b.StopTimer()
 		for _, pk := range pks {
 			require.NoError(b, setupAttestationsForEveryEpoch(validatorDB, pk, numEpochs))

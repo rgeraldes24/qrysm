@@ -1835,7 +1835,7 @@ func BenchmarkListValidatorBalances(b *testing.B) {
 
 	req := &qrysmpb.ListValidatorBalancesRequest{PageSize: 100}
 	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := bs.ListValidatorBalances(ctx, req)
 		require.NoError(b, err)
 	}

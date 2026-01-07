@@ -30,14 +30,14 @@ func BenchmarkMarshalling(b *testing.B) {
 	var outp1 []byte
 	b.Run("json", func(b *testing.B) {
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			outp1, _ = json.Marshal(log)
 		}
 	})
 	var outp2 []byte
 	b.Run("fast", func(b *testing.B) {
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			outp2 = FastMarshal(log)
 		}
 	})

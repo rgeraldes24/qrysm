@@ -667,7 +667,7 @@ func checkStateSaveTime(b *testing.B, saveCount int) {
 
 	b.ReportAllocs()
 	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		require.NoError(b, db.SaveState(context.Background(), st, r))
 	}
 }
@@ -707,7 +707,7 @@ func checkStateReadTime(b *testing.B, saveCount int) {
 
 	b.ReportAllocs()
 	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := db.State(context.Background(), r)
 		require.NoError(b, err)
 	}

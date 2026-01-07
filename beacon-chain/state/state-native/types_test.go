@@ -105,7 +105,7 @@ func BenchmarkCloneValidators_Proto(b *testing.B) {
 		}
 	}
 	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		cloneValidatorsWithProto(validators)
 	}
 }
@@ -128,7 +128,7 @@ func BenchmarkCloneValidators_Manual(b *testing.B) {
 		}
 	}
 	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		cloneValidatorsManually(validators)
 	}
 }
@@ -139,7 +139,7 @@ func BenchmarkStateClone_Proto(b *testing.B) {
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 	genesis := setupGenesisState(b, 64)
 	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, ok := proto.Clone(genesis).(*qrysmpb.BeaconStateCapella)
 		assert.Equal(b, true, ok, "Entity is not of type *qrysmpb.BeaconState")
 	}
@@ -153,7 +153,7 @@ func BenchmarkStateClone_Manual(b *testing.B) {
 	st, err := statenative.InitializeFromProtoCapella(genesis)
 	require.NoError(b, err)
 	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = st.ToProto()
 	}
 }

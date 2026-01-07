@@ -25,7 +25,7 @@ func TestHash(t *testing.T) {
 }
 
 func BenchmarkHash(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		hash.Hash([]byte("abc"))
 	}
 }
@@ -49,7 +49,7 @@ func TestHashKeccak256(t *testing.T) {
 }
 
 func BenchmarkHashKeccak256(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		hash.HashKeccak256([]byte("abc"))
 	}
 }
@@ -97,7 +97,7 @@ func BenchmarkHashProto(b *testing.B) {
 		Signatures: nil,
 	}
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		if _, err := hash.HashProto(att); err != nil {
 			b.Log(err)
 		}

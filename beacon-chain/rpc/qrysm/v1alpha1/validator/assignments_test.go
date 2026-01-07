@@ -429,8 +429,8 @@ func BenchmarkCommitteeAssignment(b *testing.B) {
 		PublicKeys: pks,
 		Epoch:      0,
 	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		_, err := vs.GetDuties(context.Background(), req)
 		assert.NoError(b, err)
 	}

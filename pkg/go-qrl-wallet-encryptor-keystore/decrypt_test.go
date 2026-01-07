@@ -109,8 +109,8 @@ func BenchmarkDecrypt(b *testing.B) {
 	encryptor := keystorev1.New()
 	input := make(map[string]any)
 	require.NoError(b, json.Unmarshal([]byte(`{"kdf":{"function":"argon2id","params":{"dklen":32,"m":262144,"p":1,"salt":"2c2f566f38f5b79634d17267d95a0914ed47a44fe91f9cbb0b8765ebaa0b7ddd","t":8}},"cipher":{"function":"aes-256-gcm","params":{"iv":"4c2275c4a14a5e984bfaec2b"},"message":"f833f12f6cb57f6961fb34bbf4ff5019c9fd70e1ab98bf0f1ba164f1b4bc773e853f973b708a4ec1b5e1148de96437ac5fc75da87c6b7293628e9d45b4bc2ab7"}}`), &input))
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		_, err := encryptor.Decrypt(input, "1234567890")
 		require.NoError(b, err)
 	}
@@ -123,8 +123,7 @@ func BenchmarkDecryptParallel(b *testing.B) {
 	numCPUs := runtime.NumCPU()
 	wg := &sync.WaitGroup{}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		wg.Add(numCPUs)
 		for j := 0; j < numCPUs; j++ {
 			go func() {

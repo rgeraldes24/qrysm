@@ -16,7 +16,6 @@ go_library(
         "@com_github_theqrl_go_zond//common:go_default_library",
         "@com_github_theqrl_go_zond//core/rawdb:go_default_library",
         "@com_github_theqrl_go_zond//core/vm:go_default_library",
-        "@com_github_theqrl_go_zond//qrl/tracers/logger:go_default_library",
         "@com_github_theqrl_go_zond//tests:go_default_library",
         "@org_golang_x_crypto//sha3:go_default_library",
     ],

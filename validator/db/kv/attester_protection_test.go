@@ -541,8 +541,8 @@ func benchCheckSurroundVote(
 	} else {
 		surroundingVote = createAttestation(numEpochs+1, numEpochs+2)
 	}
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		for _, pubKey := range pubKeys {
 			slashingKind, err := validatorDB.CheckSlashableAttestation(ctx, pubKey, [32]byte{}, surroundingVote)
 			if shouldSurround {

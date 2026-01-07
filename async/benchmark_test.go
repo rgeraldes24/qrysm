@@ -44,14 +44,14 @@ func hash(input [][]byte) [][]byte {
 }
 
 func BenchmarkHash(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		hash(input)
 	}
 }
 
 func BenchmarkHashMP(b *testing.B) {
 	output := make([][]byte, len(input))
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		workerResults, err := async.Scatter(len(input), func(offset int, entries int, _ *sync.RWMutex) (interface{}, error) {
 			return hash(input[offset : offset+entries]), nil
 		})

@@ -73,13 +73,13 @@ require (
 	go.etcd.io/bbolt v1.3.6
 	go.opencensus.io v0.24.0
 	go.uber.org/automaxprocs v1.5.2
-	golang.org/x/crypto v0.18.0
+	golang.org/x/crypto v0.46.0
 	golang.org/x/exp v0.0.0-20231206192017-f3f8817b8deb
-	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/sync v0.5.0
-	golang.org/x/term v0.16.0
-	golang.org/x/text v0.14.0
-	golang.org/x/tools v0.16.0
+	golang.org/x/mod v0.31.0 // indirect
+	golang.org/x/sync v0.19.0
+	golang.org/x/term v0.38.0
+	golang.org/x/text v0.32.0
+	golang.org/x/tools v0.40.0
 	google.golang.org/genproto v0.0.0-20230227214838-9b19f0bdc514
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.31.0
@@ -92,13 +92,15 @@ require (
 
 require (
 	github.com/gdamore/tcell/v2 v2.7.0
+	github.com/kisielk/errcheck v1.5.0
 	github.com/korovkin/limiter v0.0.0-20230307205149-3d4b2b34c99d
 	github.com/libp2p/go-libp2p-mplex v0.9.0
 	github.com/rivo/tview v0.0.0-20240118093911-742cf086196e
+	honnef.co/go/tools v0.6.0
 )
 
 require (
-	github.com/BurntSushi/toml v1.3.2 // indirect
+	github.com/BurntSushi/toml v1.4.1-0.20240526193622-a339e1f7089c // indirect
 	github.com/DataDog/zstd v1.5.5 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/VictoriaMetrics/fastcache v1.12.2 // indirect
@@ -135,7 +137,7 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/gopacket v1.1.19 // indirect
 	github.com/google/pprof v0.0.0-20231023181126-ff6d637d2a7b // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
@@ -222,9 +224,12 @@ require (
 	go.uber.org/mock v0.3.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
-	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
+	golang.org/x/net v0.48.0 // indirect
 	golang.org/x/oauth2 v0.12.0 // indirect
-	golang.org/x/time v0.3.0 // indirect
+	golang.org/x/telemetry v0.0.0-20251203150158-8fff8a5912fc // indirect
+	golang.org/x/time v0.9.0 // indirect
+	golang.org/x/tools/go/expect v0.1.1-deprecated // indirect
 	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
@@ -241,7 +246,7 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/peterh/liner v1.2.0 // indirect
 	github.com/prysmaticlabs/gohashtree v0.0.3-alpha
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/sys v0.39.0 // indirect
 	google.golang.org/api v0.44.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	k8s.io/klog/v2 v2.80.0 // indirect
@@ -254,4 +259,4 @@ replace github.com/json-iterator/go => github.com/prestonvanloon/go v1.1.7-0.201
 replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/theQRL/grpc-gateway/v2 v2.0.0-20250214142603-49067762c97f
 
 //replace github.com/theQRL/go-zond => github.com/cyyber/go-zond v0.0.0-20250909095041-1a8635db4b6f
-replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20251230184906-eb9bba310063
+replace github.com/theQRL/go-zond => github.com/rgeraldes24/go-zond v0.0.0-20260106132758-131c32a4774d

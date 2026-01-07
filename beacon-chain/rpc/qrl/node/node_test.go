@@ -422,8 +422,7 @@ func BenchmarkListPeers(b *testing.B) {
 
 	s := Server{PeersFetcher: peerFetcher}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := s.ListPeers(context.Background(), &qrlpb.PeersRequest{
 			State:     []qrlpb.ConnectionState{},
 			Direction: []qrlpb.PeerDirection{},

@@ -66,7 +66,7 @@ func BenchmarkStore_SaveLastValidatedCheckpoint(b *testing.B) {
 	db.stateSummaryCache.clear()
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		require.NoError(b, db.SaveLastValidatedCheckpoint(ctx, cp))
 	}
 }

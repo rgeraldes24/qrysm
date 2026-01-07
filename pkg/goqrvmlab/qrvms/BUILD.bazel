@@ -17,7 +17,6 @@ go_library(
         "//pkg/goqrvmlab/utils:go_default_library",
         "@com_github_theqrl_go_zond//common/hexutil:go_default_library",
         "@com_github_theqrl_go_zond//log:go_default_library",
-        "@com_github_theqrl_go_zond//qrl/tracers/logger:go_default_library",
     ],
 )
 
@@ -29,8 +28,5 @@ go_test(
     ],
     data = glob(["testdata/**"]),
     embed = [":go_default_library"],
-    deps = [
-        "@com_github_holiman_uint256//:go_default_library",
-        "@com_github_theqrl_go_zond//qrl/tracers/logger:go_default_library",
-    ],
+    deps = ["@com_github_holiman_uint256//:go_default_library"],
 )

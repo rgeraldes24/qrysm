@@ -26,9 +26,8 @@ func BenchmarkStateMachine_trigger(b *testing.B) {
 	sm.addStateMachine(64)
 
 	b.ReportAllocs()
-	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		data := &fetchRequestParams{
 			start: 23,
 			count: 32,

@@ -468,7 +468,7 @@ func BenchmarkValue(b *testing.B) {
 	b.Run("100,000 shared items", func(b *testing.B) {
 		s := &Slice[int, *testObject]{}
 		s.Init(make([]int, _100k))
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(&testObject{})
 		}
 	})
@@ -481,7 +481,7 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[0].Values[0].ids = append(s.individualItems[0].Values[0].ids, uint64(i))
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_100k)])
 		}
 	})
@@ -493,7 +493,7 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[uint64(i)] = &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}}
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_100k)])
 		}
 	})
@@ -506,7 +506,7 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems[0].Values[0].ids = append(s.appendedItems[0].Values[0].ids, uint64(i))
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_100k)])
 		}
 	})
@@ -519,14 +519,14 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems = append(s.appendedItems, &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}})
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_100k)])
 		}
 	})
 	b.Run("1,000,000 shared items", func(b *testing.B) {
 		s := &Slice[int, *testObject]{}
 		s.Init(make([]int, _1m))
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(&testObject{})
 		}
 	})
@@ -539,7 +539,7 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[0].Values[0].ids = append(s.individualItems[0].Values[0].ids, uint64(i))
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_1m)])
 		}
 	})
@@ -551,7 +551,7 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[uint64(i)] = &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}}
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_1m)])
 		}
 	})
@@ -564,7 +564,7 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems[0].Values[0].ids = append(s.appendedItems[0].Values[0].ids, uint64(i))
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_1m)])
 		}
 	})
@@ -577,14 +577,14 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems = append(s.appendedItems, &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}})
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_1m)])
 		}
 	})
 	b.Run("10,000,000 shared items", func(b *testing.B) {
 		s := &Slice[int, *testObject]{}
 		s.Init(make([]int, _10m))
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(&testObject{})
 		}
 	})
@@ -597,7 +597,7 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[0].Values[0].ids = append(s.individualItems[0].Values[0].ids, uint64(i))
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_10m)])
 		}
 	})
@@ -609,7 +609,7 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[uint64(i)] = &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}}
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_10m)])
 		}
 	})
@@ -622,7 +622,7 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems[0].Values[0].ids = append(s.appendedItems[0].Values[0].ids, uint64(i))
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_10m)])
 		}
 	})
@@ -635,7 +635,7 @@ func BenchmarkValue(b *testing.B) {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems = append(s.appendedItems, &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}})
 		}
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			s.Value(objs[rand.Intn(_10m)])
 		}
 	})

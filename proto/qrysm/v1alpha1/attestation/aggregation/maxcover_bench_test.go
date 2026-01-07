@@ -77,7 +77,7 @@ func BenchmarkMaxCoverProblem_MaxCover(b *testing.B) {
 
 			}
 			b.StartTimer()
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				candidates := make([]*MaxCoverCandidate, len(bitlists))
 				for i := 0; i < len(bitlists); i++ {
 					candidates[i] = NewMaxCoverCandidate(i, &bitlists[i])
@@ -97,7 +97,7 @@ func BenchmarkMaxCoverProblem_MaxCover(b *testing.B) {
 
 			}
 			b.StartTimer()
-			for i := 0; i < b.N; i++ {
+			for b.Loop() {
 				_, _, err := MaxCover(bitlists, len(bitlists), tt.allowOverlaps)
 				_ = err
 			}

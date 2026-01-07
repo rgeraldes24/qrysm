@@ -9,7 +9,6 @@ import (
 	field_params "github.com/theQRL/qrysm/config/fieldparams"
 	"github.com/theQRL/qrysm/config/params"
 	"github.com/theQRL/qrysm/encoding/bytesutil"
-	"github.com/theQRL/qrysm/math"
 	"github.com/theQRL/qrysm/monitoring/tracing"
 	qrysmpb "github.com/theQRL/qrysm/proto/qrysm/v1alpha1"
 	"github.com/theQRL/qrysm/time/slots"
@@ -89,7 +88,7 @@ func (v *validator) internalWaitForActivation(ctx context.Context, accountsChang
 		log.WithError(err).WithField("attempts", attempts).
 			Error("Stream broken while waiting for activation. Reconnecting...")
 		// Reconnection attempt backoff, up to 60s.
-		time.Sleep(time.Second * time.Duration(math.Min(uint64(attempts), 60)))
+		time.Sleep(time.Second * time.Duration(min(uint64(attempts), 60)))
 		return v.internalWaitForActivation(incrementRetries(ctx), accountsChangedChan)
 	}
 
@@ -123,7 +122,7 @@ func (v *validator) handleAccountsChanged(ctx context.Context, accountsChangedCh
 				log.WithError(err).WithField("attempts", attempts).
 					Error("Stream broken while waiting for activation. Reconnecting...")
 				// Reconnection attempt backoff, up to 60s.
-				time.Sleep(time.Second * time.Duration(math.Min(uint64(attempts), 60)))
+				time.Sleep(time.Second * time.Duration(min(uint64(attempts), 60)))
 				return v.internalWaitForActivation(incrementRetries(ctx), accountsChangedChan)
 			}
 

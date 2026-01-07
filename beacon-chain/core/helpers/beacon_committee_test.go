@@ -485,8 +485,7 @@ func BenchmarkComputeCommittee300000_WithPreCache(b *testing.B) {
 		panic(err)
 	}
 
-	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
+	for b.Loop() {
 		_, err := computeCommittee(indices, seed, index, params.BeaconConfig().MaxCommitteesPerSlot)
 		if err != nil {
 			panic(err)
@@ -519,8 +518,7 @@ func BenchmarkComputeCommittee3000000_WithPreCache(b *testing.B) {
 		panic(err)
 	}
 
-	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
+	for b.Loop() {
 		_, err := computeCommittee(indices, seed, index, params.BeaconConfig().MaxCommitteesPerSlot)
 		if err != nil {
 			panic(err)
@@ -549,8 +547,8 @@ func BenchmarkComputeCommittee128000_WithOutPreCache(b *testing.B) {
 
 	i := uint64(0)
 	index := uint64(0)
-	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
+
+	for b.Loop() {
 		i++
 		_, err := computeCommittee(indices, seed, index, params.BeaconConfig().MaxCommitteesPerSlot)
 		if err != nil {
@@ -584,8 +582,8 @@ func BenchmarkComputeCommittee1000000_WithOutCache(b *testing.B) {
 
 	i := uint64(0)
 	index := uint64(0)
-	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
+
+	for b.Loop() {
 		i++
 		_, err := computeCommittee(indices, seed, index, params.BeaconConfig().MaxCommitteesPerSlot)
 		if err != nil {
@@ -619,8 +617,8 @@ func BenchmarkComputeCommittee4000000_WithOutCache(b *testing.B) {
 
 	i := uint64(0)
 	index := uint64(0)
-	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
+
+	for b.Loop() {
 		i++
 		_, err := computeCommittee(indices, seed, index, params.BeaconConfig().MaxCommitteesPerSlot)
 		if err != nil {

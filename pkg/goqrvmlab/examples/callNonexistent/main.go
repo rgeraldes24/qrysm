@@ -140,7 +140,7 @@ func runit() error {
 	// Diagnose it
 	runtimeConfig.QRVMConfig = vm.Config{}
 	res := testing.Benchmark(func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			_, _, err = runtime.Call(aAddr, nil, &runtimeConfig)
 
 		}

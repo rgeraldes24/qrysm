@@ -2543,8 +2543,8 @@ func BenchmarkServer_PrepareBeaconProposer(b *testing.B) {
 	byt, err := json.Marshal(recipients)
 	require.NoError(b, err)
 	var body bytes.Buffer
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		_, err = body.WriteString(string(byt))
 		require.NoError(b, err)
 		url := "http://example.com/qrl/v1/validator/prepare_beacon_proposer"

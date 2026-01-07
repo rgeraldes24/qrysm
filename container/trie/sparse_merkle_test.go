@@ -378,7 +378,7 @@ func BenchmarkGenerateProof(b *testing.B) {
 	require.NoError(b, err)
 
 	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, err := normalTrie.MerkleProof(3)
 		require.NoError(b, err)
 	}
@@ -403,7 +403,7 @@ func BenchmarkVerifyMerkleProofWithDepth(b *testing.B) {
 	root, err := m.HashTreeRoot()
 	require.NoError(b, err)
 	b.StartTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		if ok := trie.VerifyMerkleProofWithDepth(root[:], items[2], 2, proof, params.BeaconConfig().DepositContractTreeDepth); !ok {
 			b.Error("Merkle proof did not verify")
 		}

@@ -1,4 +1,4 @@
-load("@qrysm//tools/go:def.bzl", "go_library", "go_test")
+load("@qrysm//tools/go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
@@ -15,6 +15,5 @@ go_library(
         "//pkg/FuzzyVM/filler:go_default_library",
         "//pkg/goqrvmlab/program:go_default_library",
         "@com_github_theqrl_go_zond//common:go_default_library",
-        "@com_github_theqrl_go_zond//crypto:go_default_library",
     ],
 )

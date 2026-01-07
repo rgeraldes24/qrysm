@@ -17,7 +17,6 @@ go_library(
         "@com_github_theqrl_go_zond//core/state:go_default_library",
         "@com_github_theqrl_go_zond//core/vm:go_default_library",
         "@com_github_theqrl_go_zond//core/vm/runtime:go_default_library",
-        "@com_github_theqrl_go_zond//qrl/tracers/logger:go_default_library",
     ],
 )
 
