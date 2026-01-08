@@ -16,6 +16,12 @@ go_library(
 go_test(
     name = "uintcast_test",
     srcs = ["analyzer_test.go"],
+    data = glob(
+        ["testdata/**"],
+        allow_empty = True,
+    ) + [
+        "@go_sdk//:files",
+    ],
     deps = [
         ":uintcast",
         "//build/bazel",

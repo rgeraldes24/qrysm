@@ -45,5 +45,5 @@ func (m *PasswordReader) ReadPassword() (string, error) {
 // ReadPassword indicates an expected call of ReadPassword
 func (mr *PasswordReaderMockRecorder) ReadPassword() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadPassword", reflect.TypeOf((*PasswordReader)(nil).ReadPassword))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadPassword", reflect.TypeFor[func() (string, error)]())
 }

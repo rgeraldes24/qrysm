@@ -369,7 +369,7 @@ func genAttestation() *v1alpha1.Attestation {
 
 func genAttestations(num int) []*v1alpha1.Attestation {
 	atts := make([]*v1alpha1.Attestation, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		atts[i] = genAttestation()
 	}
 	return atts
@@ -418,7 +418,7 @@ func genProposerSlashing() *v1alpha1.ProposerSlashing {
 
 func genProposerSlashings(num int) []*v1alpha1.ProposerSlashing {
 	ps := make([]*v1alpha1.ProposerSlashing, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		ps[i] = genProposerSlashing()
 	}
 	return ps
@@ -441,7 +441,7 @@ func genIndexedAttestation() *v1alpha1.IndexedAttestation {
 
 func genAttesterSlashings(num int) []*v1alpha1.AttesterSlashing {
 	as := make([]*v1alpha1.AttesterSlashing, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		as[i] = genAttesterSlashing()
 	}
 	return as
@@ -482,7 +482,7 @@ func genDeposit() *v1alpha1.Deposit {
 
 func genDeposits(num int) []*v1alpha1.Deposit {
 	d := make([]*v1alpha1.Deposit, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		d[i] = genDeposit()
 	}
 	return d
@@ -504,7 +504,7 @@ func genSignedVoluntaryExit() *v1alpha1.SignedVoluntaryExit {
 
 func genSignedVoluntaryExits(num int) []*v1alpha1.SignedVoluntaryExit {
 	sv := make([]*v1alpha1.SignedVoluntaryExit, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		sv[i] = genSignedVoluntaryExit()
 	}
 	return sv
@@ -668,7 +668,7 @@ func genPayloadHeaderCapella() *enginev1.ExecutionPayloadHeaderCapella {
 
 func genWithdrawals(num int) []*enginev1.Withdrawal {
 	ws := make([]*enginev1.Withdrawal, num)
-	for i := 0; i < num; i++ {
+	for i := range num {
 		ws[i] = genWithdrawal()
 	}
 	return ws

@@ -15,6 +15,12 @@ go_library(
 go_test(
     name = "comparesame_test",
     srcs = ["analyzer_test.go"],
+    data = glob(
+        ["testdata/**"],
+        allow_empty = True,
+    ) + [
+        "@go_sdk//:files",
+    ],
     embed = [":comparesame"],
     deps = [
         "//build/bazel",

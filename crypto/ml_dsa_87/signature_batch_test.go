@@ -396,7 +396,7 @@ func NewValidSignatureSet(t *testing.T, msgBody string, num int) *SignatureBatch
 		Descriptions: make([]string, num),
 	}
 
-	for i := 0; i < num; i++ {
+	for i := range num {
 		priv, err := RandKey()
 		require.NoError(t, err)
 		pubkey := priv.PublicKey()
@@ -421,7 +421,7 @@ func NewInvalidSignatureSet(t *testing.T, msgBody string, num int, throwErr bool
 		Descriptions: make([]string, num),
 	}
 
-	for i := 0; i < num; i++ {
+	for i := range num {
 		priv, err := RandKey()
 		require.NoError(t, err)
 		pubkey := priv.PublicKey()

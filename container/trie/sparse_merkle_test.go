@@ -20,7 +20,7 @@ func TestCreateTrieFromProto_Validation(t *testing.T) {
 	h := hash.Hash([]byte("hi"))
 	genValidLayers := func(num int) []*qrysmpb.TrieLayer {
 		l := make([]*qrysmpb.TrieLayer, num)
-		for i := 0; i < num; i++ {
+		for i := range num {
 			l[i] = &qrysmpb.TrieLayer{
 				Layer: [][]byte{h[:]},
 			}

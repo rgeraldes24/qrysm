@@ -22,7 +22,7 @@ func TestPendingAttestationRecords_Flush(t *testing.T) {
 
 	// Add 5 atts
 	num := 5
-	for i := 0; i < num; i++ {
+	for i := range num {
 		queue.Append(&AttestationRecord{
 			Target: primitives.Epoch(i),
 		})

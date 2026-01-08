@@ -18,6 +18,12 @@ go_library(
 go_test(
     name = "ineffassign_test",
     srcs = ["analyzer_test.go"],
+    data = glob(
+        ["testdata/**"],
+        allow_empty = True,
+    ) + [
+        "@go_sdk//:files",
+    ],
     embed = [":ineffassign"],
     deps = [
         "//build/bazel",
