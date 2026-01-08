@@ -477,7 +477,7 @@ func BenchmarkValue(b *testing.B) {
 		s.Init(make([]int, _100k))
 		s.individualItems[0] = &MultiValueItem[int]{Values: []*Value[int]{{val: 999, ids: []uint64{}}}}
 		objs := make([]*testObject, _100k)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[0].Values[0].ids = append(s.individualItems[0].Values[0].ids, uint64(i))
 		}
@@ -489,7 +489,7 @@ func BenchmarkValue(b *testing.B) {
 		s := &Slice[int, *testObject]{}
 		s.Init(make([]int, _100k))
 		objs := make([]*testObject, _100k)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[uint64(i)] = &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}}
 		}
@@ -502,7 +502,7 @@ func BenchmarkValue(b *testing.B) {
 		s.Init(make([]int, _100k))
 		s.appendedItems = []*MultiValueItem[int]{{Values: []*Value[int]{{val: 999, ids: []uint64{}}}}}
 		objs := make([]*testObject, _100k)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems[0].Values[0].ids = append(s.appendedItems[0].Values[0].ids, uint64(i))
 		}
@@ -515,7 +515,7 @@ func BenchmarkValue(b *testing.B) {
 		s.Init(make([]int, _100k))
 		s.appendedItems = []*MultiValueItem[int]{}
 		objs := make([]*testObject, _100k)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems = append(s.appendedItems, &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}})
 		}
@@ -535,7 +535,7 @@ func BenchmarkValue(b *testing.B) {
 		s.Init(make([]int, _1m))
 		s.individualItems[0] = &MultiValueItem[int]{Values: []*Value[int]{{val: 999, ids: []uint64{}}}}
 		objs := make([]*testObject, _1m)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[0].Values[0].ids = append(s.individualItems[0].Values[0].ids, uint64(i))
 		}
@@ -547,7 +547,7 @@ func BenchmarkValue(b *testing.B) {
 		s := &Slice[int, *testObject]{}
 		s.Init(make([]int, _1m))
 		objs := make([]*testObject, _1m)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[uint64(i)] = &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}}
 		}
@@ -560,7 +560,7 @@ func BenchmarkValue(b *testing.B) {
 		s.Init(make([]int, _1m))
 		s.appendedItems = []*MultiValueItem[int]{{Values: []*Value[int]{{val: 999, ids: []uint64{}}}}}
 		objs := make([]*testObject, _1m)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems[0].Values[0].ids = append(s.appendedItems[0].Values[0].ids, uint64(i))
 		}
@@ -573,7 +573,7 @@ func BenchmarkValue(b *testing.B) {
 		s.Init(make([]int, _1m))
 		s.appendedItems = []*MultiValueItem[int]{}
 		objs := make([]*testObject, _1m)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems = append(s.appendedItems, &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}})
 		}
@@ -593,7 +593,7 @@ func BenchmarkValue(b *testing.B) {
 		s.Init(make([]int, _10m))
 		s.individualItems[0] = &MultiValueItem[int]{Values: []*Value[int]{{val: 999, ids: []uint64{}}}}
 		objs := make([]*testObject, _10m)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[0].Values[0].ids = append(s.individualItems[0].Values[0].ids, uint64(i))
 		}
@@ -605,7 +605,7 @@ func BenchmarkValue(b *testing.B) {
 		s := &Slice[int, *testObject]{}
 		s.Init(make([]int, _10m))
 		objs := make([]*testObject, _10m)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.individualItems[uint64(i)] = &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}}
 		}
@@ -618,7 +618,7 @@ func BenchmarkValue(b *testing.B) {
 		s.Init(make([]int, _10m))
 		s.appendedItems = []*MultiValueItem[int]{{Values: []*Value[int]{{val: 999, ids: []uint64{}}}}}
 		objs := make([]*testObject, _10m)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems[0].Values[0].ids = append(s.appendedItems[0].Values[0].ids, uint64(i))
 		}
@@ -631,7 +631,7 @@ func BenchmarkValue(b *testing.B) {
 		s.Init(make([]int, _10m))
 		s.appendedItems = []*MultiValueItem[int]{}
 		objs := make([]*testObject, _10m)
-		for i := 0; i < len(objs); i++ {
+		for i := range objs {
 			objs[i] = &testObject{id: uint64(i)}
 			s.appendedItems = append(s.appendedItems, &MultiValueItem[int]{Values: []*Value[int]{{val: i, ids: []uint64{uint64(i)}}}})
 		}

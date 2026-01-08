@@ -69,7 +69,7 @@ func SampleLengthCorpus(N int) []int {
 	res := make([]int, 0, N)
 	resChan := make(chan int, N)
 	limit := limiter.NewConcurrencyLimiter(16)
-	for i := 0; i < N; i++ {
+	for range N {
 		fn := func() {
 			res, err := CreateNewCorpusElement()
 			if err != nil {
@@ -80,7 +80,7 @@ func SampleLengthCorpus(N int) []int {
 		limit.Execute(fn)
 	}
 	limit.WaitAndClose()
-	for i := 0; i < N; i++ {
+	for range N {
 		res = append(res, <-resChan)
 	}
 	return res

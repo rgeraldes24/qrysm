@@ -40,7 +40,7 @@ func testGeneration(N int) (time.Duration, error) {
 		return time.Nanosecond, err
 	}
 	start := time.Now()
-	for i := 0; i < N; i++ {
+	for range N {
 		generator.GenerateProgram(f)
 	}
 	return time.Since(start), nil

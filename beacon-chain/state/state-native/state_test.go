@@ -113,7 +113,7 @@ func TestBeaconState_AppendBalanceWithTrie(t *testing.T) {
 	_, err := st.HashTreeRoot(context.Background())
 	assert.NoError(t, err)
 
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		if i%2 == 0 {
 			assert.NoError(t, st.UpdateBalancesAtIndex(primitives.ValidatorIndex(i), 1000))
 		}

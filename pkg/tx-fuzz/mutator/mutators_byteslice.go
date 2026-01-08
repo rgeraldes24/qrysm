@@ -26,7 +26,7 @@ func byteSliceInsertRandomBytes(m *Mutator, b []byte) []byte {
 	}
 	b = b[:len(b)+n]
 	copy(b[pos+n:], b[pos:])
-	for i := 0; i < n; i++ {
+	for i := range n {
 		b[pos+i] = byte(m.rand(256))
 	}
 	return b

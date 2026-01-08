@@ -30,7 +30,7 @@ func TestFeedPanics(t *testing.T) {
 	{
 		var f Feed
 		f.Send(2)
-		want := feedTypeError{op: "Send", got: reflect.TypeOf(uint64(0)), want: reflect.TypeOf(0)}
+		want := feedTypeError{op: "Send", got: reflect.TypeFor[uint64](), want: reflect.TypeFor[int]()}
 		assert.NoError(t, checkPanic(want, func() { f.Send(uint64(2)) }))
 		// Validate it doesn't deadlock.
 		assert.NoError(t, checkPanic(want, func() { f.Send(uint64(2)) }))
@@ -39,13 +39,13 @@ func TestFeedPanics(t *testing.T) {
 		var f Feed
 		ch := make(chan int)
 		f.Subscribe(ch)
-		want := feedTypeError{op: "Send", got: reflect.TypeOf(uint64(0)), want: reflect.TypeOf(0)}
+		want := feedTypeError{op: "Send", got: reflect.TypeFor[uint64](), want: reflect.TypeFor[int]()}
 		assert.NoError(t, checkPanic(want, func() { f.Send(uint64(2)) }))
 	}
 	{
 		var f Feed
 		f.Send(2)
-		want := feedTypeError{op: "Subscribe", got: reflect.TypeOf(make(chan uint64)), want: reflect.TypeOf(make(chan<- int))}
+		want := feedTypeError{op: "Subscribe", got: reflect.TypeFor[chan uint64](), want: reflect.TypeFor[chan<- int]()}
 		assert.NoError(t, checkPanic(want, func() { f.Subscribe(make(chan uint64)) }))
 	}
 	{
@@ -105,7 +105,7 @@ func TestFeed(t *testing.T) {
 	const n = 1000
 	done.Add(n)
 	subscribed.Add(n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		go subscriber(i)
 	}
 	subscribed.Wait()
@@ -134,7 +134,7 @@ func TestFeedSubscribeSameChannel(t *testing.T) {
 		done.Done()
 	}
 	expectRecv := func(wantValue, n int) {
-		for i := 0; i < n; i++ {
+		for range n {
 			if v := <-ch; v != wantValue {
 				t.Errorf("received %d, want %d", v, wantValue)
 			}
@@ -173,7 +173,7 @@ func TestFeedSubscribeBlockedPost(_ *testing.T) {
 
 	feed.Subscribe(ch1)
 	wg.Add(nsends)
-	for i := 0; i < nsends; i++ {
+	for range nsends {
 		go func() {
 			feed.Send(99)
 			wg.Done()
@@ -210,7 +210,7 @@ func TestFeedUnsubscribeBlockedPost(_ *testing.T) {
 
 	// Queue up some Sends. None of these can make progress while bchan isn't read.
 	wg.Add(nsends)
-	for i := 0; i < nsends; i++ {
+	for range nsends {
 		go func() {
 			feed.Send(99)
 			wg.Done()
@@ -242,11 +242,9 @@ func TestFeedUnsubscribeSentChan(_ *testing.T) {
 	)
 	defer sub2.Unsubscribe()
 
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		feed.Send(0)
-		wg.Done()
-	}()
+	})
 
 	// Wait for the value on ch1.
 	<-ch1
@@ -259,11 +257,9 @@ func TestFeedUnsubscribeSentChan(_ *testing.T) {
 
 	// Send again. This should send to ch2 only, so the wait group will unblock
 	// as soon as a value is received on ch2.
-	wg.Add(1)
-	go func() {
+	wg.Go(func() {
 		feed.Send(0)
-		wg.Done()
-	}()
+	})
 	<-ch2
 	wg.Wait()
 }

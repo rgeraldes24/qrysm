@@ -97,7 +97,7 @@ func (c *AttCaches) aggregateParallel(atts map[[32]byte][]*qrysmpb.Attestation, 
 	n := runtime.GOMAXPROCS(0) // defaults to the value of runtime.NumCPU
 	ch := make(chan []*qrysmpb.Attestation, n)
 	wg.Add(n)
-	for i := 0; i < n; i++ {
+	for range n {
 		go func() {
 			defer wg.Done()
 			for as := range ch {

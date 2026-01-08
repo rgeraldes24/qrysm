@@ -562,7 +562,7 @@ func incrBwd(n int, c chan uint32) {
 }
 
 func incrFwd(n int, c chan uint32) {
-	for i := 0; i < n; i++ {
+	for i := range n {
 		c <- uint32(i)
 	}
 	close(c)

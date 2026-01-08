@@ -377,7 +377,7 @@ func TestAssignValidatorToSyncSubnet(t *testing.T) {
 	k := pubKey(3)
 	committee := make([][]byte, 0)
 
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		committee = append(committee, pubKey(uint64(i)))
 	}
 	sCommittee := &qrysmpb.SyncCommittee{

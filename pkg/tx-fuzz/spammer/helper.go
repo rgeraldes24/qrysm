@@ -77,7 +77,7 @@ func tryUnstuck(config *Config, w wallet.Wallet) error {
 		client = qrlclient.NewClient(config.backend)
 		addr   = w.GetAddress()
 	)
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		noTx, err := isStuck(config, addr)
 		if err != nil {
 			return err

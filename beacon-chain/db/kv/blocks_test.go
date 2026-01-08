@@ -85,7 +85,7 @@ func TestStore_SaveBlock_NoDuplicates(t *testing.T) {
 
 			// Even with a full cache, saving new blocks should not cause
 			// duplicated blocks in the DB.
-			for i := 0; i < 100; i++ {
+			for range 100 {
 				require.NoError(t, db.SaveBlock(ctx, blk))
 			}
 

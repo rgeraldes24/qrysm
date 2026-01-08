@@ -100,7 +100,7 @@ func TestVerifyVerbosely_VerificationThrowsError(t *testing.T) {
 
 func TestSignatureBatch_RemoveDuplicates(t *testing.T) {
 	var keys []MLDSA87Key
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		key, err := RandKey()
 		assert.NoError(t, err)
 		keys = append(keys, key)

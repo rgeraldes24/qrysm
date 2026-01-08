@@ -47,7 +47,7 @@ func TestVerifyMultipleSignatures(t *testing.T) {
 	pubkeys := make([][]common.PublicKey, 100)
 	sigs := make([][][]byte, 100)
 	var msgs [][32]byte
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		msg := [32]byte{'h', 'e', 'l', 'l', 'o', byte(i)}
 		priv, err := RandKey()
 		require.NoError(t, err)
@@ -64,7 +64,7 @@ func TestVerifyMultipleSignatures(t *testing.T) {
 	msg1 := [32]byte{'h', 'e', 'l', 'l', 'o', byte(1)}
 	pubkeys1 := make([]common.PublicKey, 0, 100)
 	sigs1 := make([][]byte, 0, 100)
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		priv, err := RandKey()
 		require.NoError(t, err)
 		pub := priv.PublicKey()
