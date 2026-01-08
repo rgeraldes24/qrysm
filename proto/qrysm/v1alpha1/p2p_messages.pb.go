@@ -458,7 +458,7 @@ func file_proto_qrysm_v1alpha1_p2p_messages_proto_init() {
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
+			GoPackagePath: reflect.TypeFor[x]().PkgPath(),
 			RawDescriptor: file_proto_qrysm_v1alpha1_p2p_messages_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   4,

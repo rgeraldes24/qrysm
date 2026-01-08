@@ -26,7 +26,7 @@ func TestShuffleList_OK(t *testing.T) {
 	var list1 []primitives.ValidatorIndex
 	seed1 := [32]byte{1, 128, 12}
 	seed2 := [32]byte{2, 128, 12}
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		list1 = append(list1, primitives.ValidatorIndex(i))
 	}
 

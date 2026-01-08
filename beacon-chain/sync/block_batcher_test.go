@@ -19,7 +19,7 @@ func TestSortedObj_SortBlocksRoots(t *testing.T) {
 	}
 
 	var blks []blocks.ROBlock
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		slot := primitives.Slot(randFunc())
 		newBlk, err := blocks.NewSignedBeaconBlock(&qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: slot, Body: &qrysmpb.BeaconBlockBodyCapella{}}})
 		require.NoError(t, err)
@@ -47,7 +47,7 @@ func TestSortedObj_NoDuplicates(t *testing.T) {
 		return randGen.Int63n(50)
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		slot := primitives.Slot(randFunc())
 		newBlk := &qrysmpb.SignedBeaconBlockCapella{Block: &qrysmpb.BeaconBlockCapella{Slot: slot, Body: &qrysmpb.BeaconBlockBodyCapella{}}}
 		// append twice

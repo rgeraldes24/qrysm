@@ -973,7 +973,7 @@ func TestServer_CheckDoppelGanger(t *testing.T) {
 					ValidatorRequests: make([]*qrysmpb.DoppelGangerRequest_ValidatorRequest, 0),
 				}
 				response := &qrysmpb.DoppelGangerResponse{Responses: make([]*qrysmpb.DoppelGangerResponse_ValidatorResponse, 0)}
-				for i := 0; i < 3; i++ {
+				for i := range 3 {
 					request.ValidatorRequests = append(request.ValidatorRequests, &qrysmpb.DoppelGangerRequest_ValidatorRequest{
 						PublicKey:  keys[i].PublicKey().Marshal(),
 						Epoch:      1,

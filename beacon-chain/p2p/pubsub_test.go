@@ -48,7 +48,7 @@ func TestService_PublishToTopicConcurrentMapWrite(t *testing.T) {
 
 	wg := sync.WaitGroup{}
 	wg.Add(10)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		go func(i int) {
 			assert.NoError(t, s.PublishToTopic(ctx, topic, []byte{}))
 			wg.Done()

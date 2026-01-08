@@ -10,15 +10,15 @@ diff --color -ruN a/crypto/secp256k1/BUILD.bazel b/crypto/secp256k1/BUILD.bazel
      copts = [
 -        "-Icrypto/secp256k1/libsecp256k1",
 -        "-Icrypto/secp256k1/libsecp256k1/src",
-+        "-Iexternal/com_github_theqrl_go_zond/crypto/secp256k1/libsecp256k1",
-+        "-Iexternal/com_github_theqrl_go_zond/crypto/secp256k1/libsecp256k1/src",
++        "-Ilibsecp256k1",
++        "-Ilibsecp256k1/src",
      ],
      importpath = "github.com/theQRL/go-zond/crypto/secp256k1",
      visibility = ["//visibility:public"],
 diff --color -ruN a/crypto/secp256k1/libsecp256k1/BUILD.bazel b/crypto/secp256k1/libsecp256k1/BUILD.bazel
 --- a/crypto/secp256k1/libsecp256k1/BUILD.bazel	1969-12-31 18:00:00.000000000 -0600
 +++ b/crypto/secp256k1/libsecp256k1/BUILD.bazel	2021-10-14 12:54:27.704265206 -0500
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,41 @@
 +cc_library(
 +    name = "hdrs",
 +    hdrs = [
@@ -52,6 +52,10 @@ diff --color -ruN a/crypto/secp256k1/libsecp256k1/BUILD.bazel b/crypto/secp256k1
 +        "src/scalar_impl.h",
 +        "src/secp256k1.c",
 +        "src/util.h",
++    ],
++    includes = [
++        ".",
++        "src",
 +    ],
 +    visibility = ["//visibility:public"],
 +)

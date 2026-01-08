@@ -97,6 +97,7 @@ require (
 	github.com/libp2p/go-libp2p-mplex v0.9.0
 	github.com/rivo/tview v0.0.0-20240118093911-742cf086196e
 	go.uber.org/mock v0.3.0
+	honnef.co/go/tools v0.0.1-2020.1.4
 )
 
 require (
@@ -227,6 +228,7 @@ require (
 	golang.org/x/oauth2 v0.12.0 // indirect
 	golang.org/x/telemetry v0.0.0-20251203150158-8fff8a5912fc // indirect
 	golang.org/x/time v0.9.0 // indirect
+	golang.org/x/tools/go/expect v0.1.1-deprecated // indirect
 	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect

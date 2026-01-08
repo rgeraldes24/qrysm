@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"slices"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -273,7 +274,7 @@ func HashDir(dir string) (string, error) {
 	}
 
 	h := sha256.New()
-	files = append([]string(nil), files...)
+	files = slices.Clone(files)
 	sort.Strings(files)
 	for _, file := range files {
 		fd, err := os.Open(filepath.Join(dir, file)) // #nosec G304

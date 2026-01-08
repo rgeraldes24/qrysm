@@ -1525,7 +1525,7 @@ func file_proto_qrl_v1_beacon_state_proto_init() {
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
+			GoPackagePath: reflect.TypeFor[x]().PkgPath(),
 			RawDescriptor: file_proto_qrl_v1_beacon_state_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   13,

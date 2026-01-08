@@ -5,9 +5,5 @@ go_library(
     srcs = ["analyzer.go"],
     importpath = "github.com/theQRL/qrysm/tools/analyzers/errcheck",
     visibility = ["//visibility:public"],
-    deps = [
-        "@com_github_kisielk_errcheck//errcheck",
-        "@org_golang_x_tools//go/analysis",
-        "@org_golang_x_tools//go/packages",
-    ],
+    deps = ["@com_github_kisielk_errcheck//errcheck"],
 )
